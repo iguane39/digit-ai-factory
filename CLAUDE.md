@@ -2,17 +2,18 @@
 
 Tu es l'orchestrateur de l'écosystème forge Digit-AI. Ce dépôt est le **seul point de démarrage**
 pour créer un produit mobilisant les cinq forges bout en bout :
-conception → design → development → tests, avec agents en support transverse.
+conception → design → development → tests → MEP, avec agents en support transverse.
 
 Documents de référence (à lire avant tout run) :
 - `INVENTAIRE.md` — état réel des cinq forges, points d'entrée, manques.
 - `CONTRAT-INTERFACE.md` — format d'invocation, ledger, routage par modèle, dette d'intégration.
+- `ETAPE-MEP.md` — la 5e étape : staging autonome, oracle MEP, gate GO production.
 - `BOUCLE-AMELIORATION.md` — comment traiter les retours ; jamais d'amélioration hors de ce cadre.
 - `HYPOTHESES.md` — hypothèses prises ; en ajouter, ne jamais en taire.
 
 ## Lancement d'un run
 
-Le point d'entrée unique est le prompt canonique `PROMPT-NOUVEAU-PRODUIT.md`. À réception d'une
+Le point d'entrée unique est le prompt canonique `PROMPT-PRODUIT.md`. À réception d'une
 demande de nouveau produit :
 
 1. **Ouvrir le run** : créer `runs\<AAAAMMJJ>-<slug>\`, écrire `PRODUIT-TEST.md` (ou le brief reçu),
@@ -37,8 +38,19 @@ demande de nouveau produit :
    stdout capturé et persisté dans `etapes\tests\rapport-forge-tests.json`. Exit 0 = PASS,
    3 = PARTIEL acceptable (consigner les pans non couverts), 1 = FAIL → retour à l'étape
    development (max 3 allers-retours, puis diagnostic).
-6. **Clore le run** : `run_close` au ledger avec le bilan (étapes, verdicts d'oracles, escalades,
+6. **Étape MEP** (portée par le steering — `ETAPE-MEP.md`) : Dockerfile/compose dans le produit,
+   déploiement **staging** réel, `ROLLBACK.md` testé une fois, oracle MEP M-1…M-5 exécuté
+   (build, healthcheck ×3, smoke tests des exigences critiques contre l'instance servie,
+   rollback prouvé, scan secrets de l'image). Puis générer `DOSSIER-MEP.md` et demander le
+   **GO humain** — la production n'est jamais lancée sans lui ; sans GO, clore en
+   `pret_production_en_attente_GO` (état de succès).
+7. **Clore le run** : `run_close` au ledger avec le bilan (étapes, verdicts d'oracles, escalades,
    retours collectés), puis synthèse à l'humain.
+
+**Contrat « prêt client »** (les seuls critères — tous mesurables, aucun « optimal »/« confiance ») :
+oracles des étapes 1-3 verts · forge-tests exit 0 ou 3 avec seuils de couverture et de mutation
+tenus sur les pans mesurés · oracle MEP 5/5 en staging · `DOSSIER-MEP.md` complet · traçabilité
+exigences MVP → tests 100 % · ledger vérifié par `ledger.mjs verify`.
 
 ## Parallélisme et agents
 

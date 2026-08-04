@@ -76,8 +76,9 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   de verrou concurrent connu dans `ledger.mjs`, consigné au backlog). Ils rendent leurs résultats,
   l'orchestrateur consigne.
 - Types utilisés par le steering : `run_open`, `etape_open`, `invocation`, `oracles_verdict`,
-  `escalade_modele`, `question_humain`, `reponse_humain`, `etape_close`, `retour` (alimente la
-  boucle d'amélioration), `run_close`.
+  `escalade_modele`, `question_humain`, `reponse_humain` (dont le GO production de l'étape MEP),
+  `etape_close`, `retour` (alimente la boucle d'amélioration ; champ `source` :
+  `forge | produit | production`), `run_close`.
 
 ## 4. Routage par modèle
 
