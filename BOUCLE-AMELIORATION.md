@@ -28,6 +28,27 @@ retour consigné ──► qualification ──► PROPOSITION (diff + justifica
 - **Vérification** : après application, exécuter le self-test/les oracles de la forge modifiée ;
   un rouge = revert et retour au diagnostic.
 
+## État au 04/08/2026 (soir) — campagne de mise en œuvre exécutée
+
+Sur mandat humain explicite (« mets-les en œuvre, teste-les, pousse-les »), une campagne a traité
+le backlog, chaque forge vérifiée par sa recette native puis rejouée par l'orchestrateur avant push :
+
+- **Appliqués et poussés** : forge-tests R-T1/T2*/T3/T4/T5/T6/T7/T8/T9 + dette uv.lock
+  (5 commits, recette 12/12 rouge + 0 bloquant vert, e2e miniveille exit 3 sans PYTHONUTF8) ·
+  conception R-C3(doc)/C5/C6 (3 commits, self-test 14 règles vert, 4 oracles PASS sur livrable réel) ·
+  design R-D1/D2/D4/D5/D6 (3 commits, self-test vert, run-oracles exit 0 sur livrable réel) ·
+  development R-V1/R-V5-CLI+doc (3 commits, ruff 0, mypy strict 0, 284 tests verts, 19 nouveaux) ·
+  agents R-A1/A2/A3 + durcissement verrou Windows (4 commits, self-test 6/6 rejoué 5×,
+  preuve de concurrence 51/51 seq sans collision).
+- *R-T2 partiel assumé : le `webServer` Playwright du projet audité peut encore écrire chez lui
+  (déclaré `non_juge`) ; pans visuel (goldens versionnés) et mutation (modifie-restaure) déclarés
+  au README de forge-tests plutôt que corrigés.
+- **Différés (exigent un arbitrage humain de fond)** : R-D3 (producteur d'images Gemini — chantier
+  neuf), R-V2 (adaptateurs amont conception/design → development) + R-V4 (recouvrements BMAD et
+  gates — arbitrage de périmètre), R-V3 (délégation des HITL — constitutionnel), ruff à 0 sur
+  forge-tests (30 erreurs préexistantes, dont des défauts PLANTÉS du banc — les corriger
+  fausserait la recette).
+
 ## Backlog initial (issu de l'inventaire du 2026-08-04)
 
 Retours candidats déjà collectés, par forge, priorisés. Statut : `candidat` tant que l'humain n'a
