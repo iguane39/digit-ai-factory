@@ -53,8 +53,8 @@ consistera à les reprendre tels quels, pas à les réinventer.
 ### forge-conception
 | id | Retour | Gravité |
 |---|---|---|
-| R-C1 | Verbe 4 `derive-les-vues` absent → aucune sortie vers Design ni SaaS Forge | bloquant |
-| R-C2 | Lien mort `redige-les-exigences/references/formulation.md` | majeur |
+| R-C1 | ~~Verbe 4 `derive-les-vues` absent~~ — **résolu côté forge** (constaté le 04/08 à la mise sous git : `skills/derive-les-vues/` existe) | résolu |
+| R-C2 | ~~Lien mort `references/formulation.md`~~ — **résolu côté forge** (fichier présent au 04/08) | résolu |
 | R-C3 | Pas de manifeste/README ; état « bloqué sous le seuil » sans protocole machine | majeur |
 | R-C4 | `MISSION.md` sans gabarit ni fixture ; oracles non enregistrés au registre quality-oracles | mineur |
 | R-C5 | *(run pilote)* prédicat binaire E3 matché par sous-chaîne exacte — les formes accordées (« sont présentes ») ne matchent pas, ce qui force des formulations artificielles | mineur |

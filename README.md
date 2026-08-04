@@ -42,8 +42,9 @@ uniquement sur GO humain**, donné sur un dossier de preuve généré (DOSSIER-M
 ## Limites assumées
 
 - Les cinq forges (`digit-ai-forge-conception`, `-design`, `-development`, `-tests`, `-agents`)
-  sont des dépôts **locaux** sous `c:\dev\` — deux n'ont aucun historique git. Ce steering se
-  réutilise depuis un poste portant cette arborescence ; **il ne bootstrappe pas un poste vierge**.
+  sont des dépôts **locaux** sous `c:\dev\` — tous versionnés (git), mais seuls development et
+  agents ont un remote GitHub. Ce steering se réutilise depuis un poste portant cette
+  arborescence ; **il ne bootstrappe pas un poste vierge**.
 - Le run pilote portait sur un produit volontairement petit (backend + page unique) ; la maquette
   design complète (9 écrans) et les cibles de déploiement cloud n'ont pas encore été exercées.
 - Les améliorations des forges sont des **propositions en diff** (backlog :
