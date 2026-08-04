@@ -1,0 +1,96 @@
+# Boucle d'amélioration des forges
+
+Version 1.0.0 — 2026-08-04
+
+Le steering améliore les cinq forges par **itérations bornées**. Jamais d'amélioration spontanée,
+jamais d'application sans validation humaine.
+
+## Le cycle (borné par construction)
+
+```
+retour consigné ──► qualification ──► PROPOSITION (diff + justification) ──► validation humaine ──► application ──► vérification
+     (ledger)        (1 itération =                                          (feu vert explicite,     (par le steering,    (oracles/self-test
+                      1 déclencheur,                                          scopé à ce diff)         commit dans la       de la forge
+                      1 forge,                                                                         forge concernée)     concernée au vert)
+                      1 proposition)
+```
+
+- **Déclencheur** : un `retour` consigné dans un ledger de run. Trois sources : la forge elle-même
+  (défaut rencontré en l'invoquant), une autre forge (incompatibilité d'interface), le produit
+  construit (défaut du livrable remonté à sa forge d'origine). Pas de retour consigné → pas d'itération.
+- **Périmètre** : une itération = **une forge**, un ensemble cohérent de modifications répondant à
+  **un** retour. Pas de refonte opportuniste, pas de drive-by.
+- **Sortie** : un fichier `propositions\<AAAAMMJJ>-<forge>-<slug>.md` contenant : le retour d'origine
+  (référence ledger), le diagnostic, le diff proposé, la justification, le test de vérification
+  (quel oracle/self-test prouvera que c'est corrigé sans régression).
+- **Validation** : le « ok » de l'humain porte sur **cette proposition précise**. Un ok sur le
+  diagnostic ne vaut pas mandat d'application.
+- **Vérification** : après application, exécuter le self-test/les oracles de la forge modifiée ;
+  un rouge = revert et retour au diagnostic.
+
+## Backlog initial (issu de l'inventaire du 2026-08-04)
+
+Retours candidats déjà collectés, par forge, priorisés. Statut : `candidat` tant que l'humain n'a
+pas demandé de proposition.
+
+### forge-tests (les plus urgents — bloquent l'étape 4 en conditions réelles)
+| id | Retour | Gravité |
+|---|---|---|
+| R-T1 | `subprocess.TimeoutExpired` non attrapée (`execution.py:191`) tue l'audit entier sans rapport | bloquant |
+| R-T2 | Garde-fou lecture-seule G-1 violé : artefacts écrits dans le projet audité (34 Mo constatés) | bloquant |
+| R-T3 | `text=True` sans `encoding=` → `UnicodeDecodeError` cp1252 sous Windows | majeur |
+| R-T4 | Rapport non persistable (`--sortie` absent) ; `--generer --json` pollue stdout | majeur |
+| R-T5 | Pan front vise localhost au lieu de `FORGE_TESTS_BASE_URL` | majeur |
+| R-T6 | README périmé (« aucun code produit ») ; exit code 2 spécifié non implémenté | mineur |
+| R-T7 | *(run pilote)* dépendance `coverage` exigée dans le venv du projet cible, déclarée nulle part — « couverture non mesurable » sans message actionnable | majeur |
+| R-T8 | *(run pilote)* `UnicodeEncodeError` cp1252 à l'impression du rapport `--json` sous Windows (contournement invocation : `PYTHONUTF8=1`) | majeur |
+| R-T9 | *(run pilote)* `RapportRefuse` (règle conjointe) meurt en traceback avec un JSON de 0 octet au lieu de produire un rapport de refus structuré | majeur |
+
+Note : des correctifs pour R-T1/R-T2/R-T3/R-T5 sont déjà rédigés dans le prompt de reprise de
+forge-tests, avec la mention « ne rien appliquer sans mon feu vert » — la proposition steering
+consistera à les reprendre tels quels, pas à les réinventer.
+
+### forge-conception
+| id | Retour | Gravité |
+|---|---|---|
+| R-C1 | Verbe 4 `derive-les-vues` absent → aucune sortie vers Design ni SaaS Forge | bloquant |
+| R-C2 | Lien mort `redige-les-exigences/references/formulation.md` | majeur |
+| R-C3 | Pas de manifeste/README ; état « bloqué sous le seuil » sans protocole machine | majeur |
+| R-C4 | `MISSION.md` sans gabarit ni fixture ; oracles non enregistrés au registre quality-oracles | mineur |
+| R-C5 | *(run pilote)* prédicat binaire E3 matché par sous-chaîne exacte — les formes accordées (« sont présentes ») ne matchent pas, ce qui force des formulations artificielles | mineur |
+| R-C6 | *(run pilote)* oracle-claims A1 scanne `besoins[].enonce` qui n'a aucun champ pour loger une source — un chiffre légitime dans un besoin est un FAIL non réparable | mineur |
+
+### forge-design
+| id | Retour | Gravité |
+|---|---|---|
+| R-D1 | Critères bloquants C1/C6/C7 sans exécutant (render_page.py, oracle-claims, oracle-nommage non résolus) | majeur |
+| R-D2 | `run-oracles-design.mjs` non documenté ; skills non installés ; dist/ désynchronisé | majeur |
+| R-D3 | Producteur d'images Gemini spécifié, jugé (oracle-images), jamais implémenté | majeur |
+| R-D4 | Aucune convention d'emplacement des sorties, ledger de run exigé mais non spécifié | mineur |
+| R-D5 | *(run pilote)* `tokens.md` n'offre aucun token sémantique erreur/succès alors que la page témoin doit démontrer un état d'erreur | mineur |
+| R-D6 | *(run pilote)* l'exemple d'échelle typographique de `tokens.md` viole sa propre règle ratio ≥ 1.25 (premier pas ×1.167) | mineur |
+
+### forge-development
+| id | Retour | Gravité |
+|---|---|---|
+| R-V1 | Aucune sortie machine (`SprintReport` jeté, exit toujours 0) | majeur |
+| R-V2 | Aucun adaptateur amont (EXIGENCES.json → `_bmad-output/` ; tokens.css/MARQUE.md → `design/DESIGN.md`) | majeur |
+| R-V3 | `HumanGate` headless toujours False — pas de délégation possible des HITL à un orchestrateur | majeur |
+| R-V4 | Recouvrement non arbitré : BMAD refait la conception, les gates internes recouvrent forge-tests | majeur |
+| R-V5 | Paramètres clés (`saas_scope`, `brand_charter`) inaccessibles par le CLI ; dogfooding DE-1 non fait | mineur |
+
+### forge-agents
+| id | Retour | Gravité |
+|---|---|---|
+| R-A1 | `ledger.mjs` sans verrou d'écriture concurrente (collision seq constatée) | majeur |
+| R-A2 | Chemins absolus obsolètes (`C:/dev/Forge-Agents/`) dans profil d'admission et ledger | majeur |
+| R-A3 | Pas de convention de runs (defs/ vs defs-p4/), pas de README/CLAUDE.md | mineur |
+
+## Ordre recommandé (si l'humain demande des propositions)
+
+1. **R-T1 + R-T2 + R-T3 + R-T5** (forge-tests) — correctifs déjà rédigés côté forge, il ne manque
+   que le feu vert ; débloquent l'étape 4 sur projets réels.
+2. **R-C1** (verbe 4) — débloque la sortie native conception → design et supprime la dette D-C2.
+3. **R-V2** (adaptateurs amont) — c'est la couture centrale de l'écosystème ; à concevoir avec
+   l'arbitrage R-V4.
+4. Le reste au fil des retours de runs.
