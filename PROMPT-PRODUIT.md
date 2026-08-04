@@ -1,6 +1,7 @@
 # Prompt canonique — nouveau produit via la forge
 
-Ouvrir une session Claude Code dans `c:\dev\digit-ai-forge-steering` et coller ce bloc rempli.
+Ouvrir une session Claude Code dans le dépôt steering et coller ce bloc rempli.
+(Poste non équipé : `node bootstrap.mjs` d'abord — cf. README.)
 
 ---
 

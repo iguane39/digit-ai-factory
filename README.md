@@ -10,6 +10,12 @@ prouver.
 Ouvrir une session Claude Code dans ce dossier et coller le prompt de
 [PROMPT-PRODUIT.md](PROMPT-PRODUIT.md) avec son brief. C'est tout.
 
+**Poste non équipé ?** Cloner ce dépôt, puis `node bootstrap.mjs` : le script vérifie les
+prérequis (git, gh authentifié ; uv/python signalés), clone les cinq forges en dépôts frères
+(`core.longpaths` activé — les noms de fichiers des forges dépassent MAX_PATH sinon) et contrôle
+leurs points d'entrée. Racine personnalisable : `--racine <dossier>` + `FORGE_ROOT` en session ;
+mise à jour : `--pull`. Testé : amorçage réel d'un répertoire vierge, 5/5 clonées, exit 0.
+
 L'orchestrateur (piloté par [CLAUDE.md](CLAUDE.md)) déroule cinq étapes :
 
 ```
@@ -41,10 +47,10 @@ uniquement sur GO humain**, donné sur un dossier de preuve généré (DOSSIER-M
 
 ## Limites assumées
 
-- Les cinq forges (`digit-ai-forge-conception`, `-design`, `-development`, `-tests`, `-agents`)
-  vivent sous `c:\dev\` — toutes versionnées, chacune avec son dépôt GitHub privé sous
-  `github.com/iguane39`. Le steering les invoque par **chemins locaux** : il se réutilise depuis
-  un poste portant cette arborescence ; **il ne bootstrappe pas encore un poste vierge**.
+- Les cinq forges sont invoquées par **chemins locaux** (racine = `$FORGE_ROOT` ou le parent de
+  ce dépôt) ; chacune a son dépôt GitHub privé sous `github.com/iguane39`, et `bootstrap.mjs`
+  équipe un poste vierge. Les clones locaux restent la source d'exécution — pas de forge
+  invoquée à distance.
 - Le run pilote portait sur un produit volontairement petit (backend + page unique) ; la maquette
   design complète (9 écrans) et les cibles de déploiement cloud n'ont pas encore été exercées.
 - Les améliorations des forges sont des **propositions en diff** (backlog :

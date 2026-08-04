@@ -97,6 +97,11 @@ accumule la vérité mesurée.
 
 ## 5. Table de routage réelle et dette d'intégration
 
+Racine des chemins : `$FORGE_ROOT`, sinon le parent du dépôt steering (`c:\dev` sur le poste
+d'origine). Amorçage d'un poste : `node bootstrap.mjs [--racine <dossier>] [--pull]` — clone les
+cinq forges (dépôts privés `github.com/iguane39`, `gh` authentifié requis) et vérifie les points
+d'entrée listés ci-dessous.
+
 | Étape | Point d'entrée utilisé | Mode | Dette (écart au contrat) |
 |---|---|---|---|
 | Conception | méthode des 3 skills `c:\dev\digit-ai-forge-conception\skills\*` + oracles `node oracles/oracle-*.mjs <EXIGENCES.json>` | degrade | D-C1 : pas de manifeste ni runner ; D-C2 : verbe 4 `derive-les-vues` absent (CADRAGE-DESIGN.md produit en dégradé d'après les fixtures) ; D-C3 : skills non installés ; D-C4 : lien mort `references/formulation.md` |

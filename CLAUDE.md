@@ -4,6 +4,11 @@ Tu es l'orchestrateur de l'écosystème forge Digit-AI. Ce dépôt est le **seul
 pour créer un produit mobilisant les cinq forges bout en bout :
 conception → design → development → tests → MEP, avec agents en support transverse.
 
+**Résolution des chemins** : la racine des forges est `$FORGE_ROOT` si défini, sinon le dossier
+parent de ce dépôt. Toute mention `c:\dev\digit-ai-forge-*` dans ce fichier et dans
+`CONTRAT-INTERFACE.md` se lit `<racine>\digit-ai-forge-*`. Sur un poste non équipé, exécuter
+d'abord `node bootstrap.mjs` (clone les cinq forges et vérifie leurs points d'entrée).
+
 Documents de référence (à lire avant tout run) :
 - `INVENTAIRE.md` — état réel des cinq forges, points d'entrée, manques.
 - `CONTRAT-INTERFACE.md` — format d'invocation, ledger, routage par modèle, dette d'intégration.
