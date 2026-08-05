@@ -1,17 +1,30 @@
 # Prompt canonique — nouveau produit via la forge
 
-**Ce fichier vit à la racine du projet produit, pas dans le steering.** Créer le dossier du
-nouveau projet, y copier ce fichier, ouvrir une session Claude Code dans ce dossier, coller le
-bloc rempli.
+**Autonome pour tout nouvel utilisateur** : rien n'est supposé installé. Créer un dossier vide
+pour le produit, y copier ce fichier (source :
+https://github.com/iguane39/digit-ai-forge-steering), ouvrir une session Claude Code dans ce
+dossier, coller le bloc rempli.
 
 ---
 
 ```
 Nouveau produit via la forge Digit-AI. Le run vit ICI, dans ce projet.
 
-Steering : localise c:\dev\digit-ai-forge-steering (ou $FORGE_ROOT\digit-ai-forge-steering) ;
-s'il est absent, clone-le (gh repo clone iguane39/digit-ai-forge-steering) puis exécute
-`node bootstrap.mjs` dedans. Suis ensuite son CLAUDE.md avec ce dossier comme projet produit :
+Phase 0 — outillage (ne suppose RIEN d'installé, quel que soit mon système) :
+1. Vérifie les prérequis : git ; gh AUTHENTIFIÉ (les dépôts de la forge sont privés sous
+   github.com/iguane39 — sans accès à ce compte, arrête-toi et dis-moi quoi demander) ;
+   node ≥ 18 ; uv ; python. S'il en manque, liste-les avec la commande d'installation
+   adaptée à mon système, puis attends que je confirme.
+2. Localise la forge : $FORGE_ROOT s'il est défini, sinon cherche un dossier contenant
+   digit-ai-forge-steering parmi : le parent de ce projet, c:\dev, ~/.digit-ai-forge.
+   Si introuvable, installe-la :
+     gh repo clone iguane39/digit-ai-forge-steering ~/.digit-ai-forge/digit-ai-forge-steering
+     node ~/.digit-ai-forge/digit-ai-forge-steering/bootstrap.mjs
+   (bootstrap.mjs clone les 5 forges à côté du steering et vérifie leurs points d'entrée —
+   il doit finir sur « Poste prêt », sinon corrige ce qu'il signale avant de continuer.)
+3. Retiens la racine comme FORGE_ROOT pour toute la session.
+
+Puis suis le CLAUDE.md du steering avec ce dossier comme projet produit :
 ledger et artefacts d'étapes sous forge\, code du produit à la racine.
 
 Brief :
@@ -37,5 +50,5 @@ La production attend mon GO, donné sur le forge\DOSSIER-MEP.md que tu me prése
 ---
 
 Reprise d'un run suspendu : rouvrir une session **dans le projet produit** et demander
-« reprends le run » — l'orchestrateur relit `forge\ledger.jsonl` et reprend à l'étape
-suspendue, sans rejouer les étapes closes.
+« reprends le run » — l'orchestrateur refait la phase 0 (rapide si tout est en place), relit
+`forge\ledger.jsonl` et reprend à l'étape suspendue, sans rejouer les étapes closes.

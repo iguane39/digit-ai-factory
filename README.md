@@ -7,16 +7,19 @@ prouver.
 
 ## Démarrer un produit
 
-Créer le dossier du nouveau produit, y **copier [PROMPT-PRODUIT.md](PROMPT-PRODUIT.md)** (le
-modèle vit ici, l'exemplaire vit dans le projet produit), ouvrir une session Claude Code **dans
-ce nouveau dossier** et coller le prompt rempli. Le run entier — ledger, artefacts d'étapes,
-code — vit dans le projet produit ; le steering n'est qu'une dépendance résolue par chemin.
+Créer un dossier vide pour le nouveau produit, y **copier [PROMPT-PRODUIT.md](PROMPT-PRODUIT.md)**
+(depuis ce dépôt GitHub — c'est le seul fichier nécessaire au départ), ouvrir une session
+Claude Code **dans ce nouveau dossier** et coller le prompt rempli. Le prompt est autonome pour
+tout nouvel utilisateur : sa phase 0 vérifie les prérequis (git, `gh` authentifié avec accès aux
+dépôts privés `iguane39`, node ≥ 18, uv, python), localise la forge ou **l'installe depuis
+GitHub** (`~/.digit-ai-forge` par défaut, via `bootstrap.mjs`), puis le run entier — ledger,
+artefacts d'étapes, code — vit dans le projet produit.
 
-**Poste non équipé ?** Cloner ce dépôt, puis `node bootstrap.mjs` : le script vérifie les
-prérequis (git, gh authentifié ; uv/python signalés), clone les cinq forges en dépôts frères
-(`core.longpaths` activé — les noms de fichiers des forges dépassent MAX_PATH sinon) et contrôle
-leurs points d'entrée. Racine personnalisable : `--racine <dossier>` + `FORGE_ROOT` en session ;
-mise à jour : `--pull`. Testé : amorçage réel d'un répertoire vierge, 5/5 clonées, exit 0.
+**Amorçage manuel** (équivalent de la phase 0) : cloner ce dépôt puis `node bootstrap.mjs` —
+vérifie les prérequis, clone les cinq forges en dépôts frères (`core.longpaths` activé : les
+noms de fichiers des forges dépassent MAX_PATH sinon) et contrôle leurs points d'entrée.
+Options : `--racine <dossier>` (+ `FORGE_ROOT` en session), `--pull` pour mettre à jour.
+Testé : amorçage réel d'un répertoire vierge, 5/5 clonées, exit 0.
 
 L'orchestrateur (piloté par [CLAUDE.md](CLAUDE.md)) déroule cinq étapes :
 

@@ -5,9 +5,11 @@ pour créer un produit mobilisant les cinq forges bout en bout :
 conception → design → development → tests → MEP, avec agents en support transverse.
 
 **Résolution des chemins** : la racine des forges est `$FORGE_ROOT` si défini, sinon le dossier
-parent de ce dépôt. Toute mention `c:\dev\digit-ai-forge-*` dans ce fichier et dans
+parent de ce dépôt (installation type : `~/.digit-ai-forge`, posée par la phase 0 de
+`PROMPT-PRODUIT.md`). Toute mention `c:\dev\digit-ai-forge-*` dans ce fichier et dans
 `CONTRAT-INTERFACE.md` se lit `<racine>\digit-ai-forge-*`. Sur un poste non équipé, exécuter
-d'abord `node bootstrap.mjs` (clone les cinq forges et vérifie leurs points d'entrée).
+d'abord `node bootstrap.mjs` (clone les cinq forges depuis `github.com/iguane39` et vérifie
+leurs points d'entrée).
 
 Documents de référence (à lire avant tout run) :
 - `INVENTAIRE.md` — état réel des cinq forges, points d'entrée, manques.
