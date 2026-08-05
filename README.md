@@ -7,8 +7,10 @@ prouver.
 
 ## Démarrer un produit
 
-Ouvrir une session Claude Code dans ce dossier et coller le prompt de
-[PROMPT-PRODUIT.md](PROMPT-PRODUIT.md) avec son brief. C'est tout.
+Créer le dossier du nouveau produit, y **copier [PROMPT-PRODUIT.md](PROMPT-PRODUIT.md)** (le
+modèle vit ici, l'exemplaire vit dans le projet produit), ouvrir une session Claude Code **dans
+ce nouveau dossier** et coller le prompt rempli. Le run entier — ledger, artefacts d'étapes,
+code — vit dans le projet produit ; le steering n'est qu'une dépendance résolue par chemin.
 
 **Poste non équipé ?** Cloner ce dépôt, puis `node bootstrap.mjs` : le script vérifie les
 prérequis (git, gh authentifié ; uv/python signalés), clone les cinq forges en dépôts frères
@@ -61,14 +63,14 @@ uniquement sur GO humain**, donné sur un dossier de preuve généré (DOSSIER-M
 | Fichier | Rôle |
 |---|---|
 | `CLAUDE.md` | l'orchestrateur — instructions de pilotage de la session (5 étapes) |
-| `PROMPT-PRODUIT.md` | le point d'entrée unique (prompt canonique court) |
+| `PROMPT-PRODUIT.md` | modèle du point d'entrée — à copier à la racine de chaque projet produit |
 | `INVENTAIRE.md` | état réel des cinq forges (points d'entrée, oracles, manques) |
 | `CONTRAT-INTERFACE.md` | format d'invocation, ledger, routage par modèle, dette d'intégration |
 | `ETAPE-MEP.md` | la 5e étape : déploiement staging, oracle MEP, gate GO production |
 | `BOUCLE-AMELIORATION.md` | amélioration des forges (bornée, gated humain) + backlog de retours |
 | `HYPOTHESES.md` | hypothèses prises, datées, révisables |
 | `RUN-PILOTE.md` | preuve d'autonomie : le run pilote et ses verdicts |
-| `runs\` | un dossier par run (local, non versionné) |
+| `runs\` | archive locale du run pilote (les runs vivent désormais dans le projet produit) |
 
 ## Principes
 

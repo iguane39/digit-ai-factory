@@ -48,23 +48,29 @@ Règles :
 
 ## 2. Emplacements
 
-Toute production d'un run vit sous le répertoire du run, jamais dans les dépôts des forges :
+Toute production d'un run vit **dans le projet produit** — jamais dans les dépôts des forges ni
+dans le steering. La session s'ouvre dans le projet produit ; le steering est une dépendance :
 
 ```
-c:\dev\digit-ai-forge-steering\runs\<run-id>\
-  ledger.jsonl              # journal du run (contrat §3)
-  PRODUIT-TEST.md           # description du produit (ou brief d'entrée)
-  QUESTIONS.md              # questions en attente si bloque_question
-  produit\                  # le dépôt du produit construit
-  etapes\
-    conception\             # ENTRANT.md, SURFACE.md, EXIGENCES.json, EXIGENCES.md, CADRAGE-DESIGN.md
-    design\                 # tokens.css, MARQUE.md, page-temoin.html, maquette, revue
-    development\            # artefacts de planification, RUN_LOG.md, findings
-    tests\                  # rapport-forge-tests.json, cas générés
+c:\dev\<nom-produit>\
+  PROMPT-PRODUIT.md         # copie du prompt canonique (auto-documentation, reprise)
+  forge\
+    ledger.jsonl            # journal du run (contrat §3)
+    BRIEF.md                # brief d'entrée
+    QUESTIONS.md            # questions en attente si bloque_question
+    DOSSIER-MEP.md          # dossier de GO production (étape 5)
+    etapes\
+      conception\           # ENTRANT.md, SURFACE.md, EXIGENCES.json, EXIGENCES.md, CADRAGE-DESIGN.md
+      design\               # tokens.css, MARQUE.md, page-temoin.html, maquette, revue
+      development\          # artefacts de planification, RUN_LOG.md, findings
+      tests\                # rapport-forge-tests.json, cas générés
+      mep\                  # ROLLBACK.md, preuves oracle M-1..M-5
+  ...                       # le code du produit, à la racine du projet
 ```
 
-Pour un produit destiné à vivre, `produit\` est ensuite promu vers `c:\dev\<nom-produit>` sur
-validation humaine — jamais automatiquement.
+Le produit naît directement chez lui — aucune promotion à faire. Création de son dépôt git et
+push : sur validation humaine uniquement. (Historique : le run pilote du 04/08 vit encore sous
+`steering\runs\` — convention antérieure, conservée comme archive.)
 
 ## 3. Ledger
 

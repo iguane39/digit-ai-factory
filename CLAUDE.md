@@ -18,11 +18,15 @@ Documents de référence (à lire avant tout run) :
 
 ## Lancement d'un run
 
-Le point d'entrée unique est le prompt canonique `PROMPT-PRODUIT.md`. À réception d'une
-demande de nouveau produit :
+Le point d'entrée unique est le prompt canonique `PROMPT-PRODUIT.md`, **copié à la racine du
+projet produit** — la session s'ouvre dans le projet produit, jamais dans ce dépôt. Le run vit
+dans le projet produit : artefacts d'orchestration sous `forge\`, code du produit à la racine.
+À réception d'une demande de nouveau produit :
 
-1. **Ouvrir le run** : créer `runs\<AAAAMMJJ>-<slug>\`, écrire `PRODUIT-TEST.md` (ou le brief reçu),
-   ouvrir `ledger.jsonl` avec l'entrée `run_open`. Écrivain unique du ledger : toi.
+1. **Ouvrir le run** : dans le projet produit, créer `forge\` (`ledger.jsonl` ouvert avec
+   `run_open`, `BRIEF.md` avec le brief reçu, `etapes\`). Si `PROMPT-PRODUIT.md` n'est pas à la
+   racine du projet, l'y copier depuis le steering (auto-documentation et reprise). Écrivain
+   unique du ledger : toi. Les chemins d'étapes ci-dessous se lisent `<projet>\forge\etapes\…`.
 2. **Étape conception** (mode dégradé, cf. contrat §5) : appliquer les 3 verbes documentés dans
    `c:\dev\digit-ai-forge-conception\skills\` → `ENTRANT.md`, `SURFACE.md`, `EXIGENCES.json` + vues.
    Produire `CADRAGE-DESIGN.md` d'après le format des fixtures (verbe 4 absent — dette D-C2).
@@ -34,7 +38,7 @@ demande de nouveau produit :
    humaine si absents du brief. **Valider** :
    `node c:\dev\digit-ai-forge-design\oracles\run-oracles-design.mjs <html> --tokens <tokens.css> --json-only`.
 4. **Étape development** (mode dégradé — `conductor` inutilisable en headless, dette D-V1) :
-   construire le produit dans `runs\<run>\produit\` à partir de `EXIGENCES.json` (périmètre MVP) et
+   construire le produit à la racine du projet à partir de `EXIGENCES.json` (périmètre MVP) et
    de `tokens.css`. Discipline : modifications chirurgicales, simplicité d'abord, chaque exigence
    MVP tracée vers son implémentation et son test. **Valider** (gates rejoués) : `ruff check` +
    `pytest` au vert sur le produit ; chaque exigence MVP a ≥ 1 test qui la cite par son id.
@@ -78,4 +82,5 @@ exigences MVP → tests 100 % · ledger vérifié par `ledger.mjs verify`.
 - Un livrable d'étape n'est accepté que sur verdict d'oracle exécuté — jamais par confiance.
 - `bloque_question` suspend le run proprement (état persisté au ledger, reprise idempotente) ;
   ne jamais inventer une réponse à la place de l'humain.
-- Promotion du produit hors de `runs\` : sur validation humaine uniquement.
+- Le projet produit s'appartient : création de son dépôt git et push sur validation humaine
+  uniquement.

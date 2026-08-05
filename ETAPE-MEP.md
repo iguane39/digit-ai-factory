@@ -17,7 +17,7 @@ brief**, jamais improvisée en cours de run.
 
 ## 2. Ce que l'étape produit (staging, autonome)
 
-Dans `runs\<run>\etapes\mep\` et `produit\` :
+Dans le projet produit (`forge\etapes\mep\` pour les preuves, racine pour les fichiers de build) :
 
 1. `Dockerfile` (+ `docker-compose.yml` si plusieurs services) dans le produit.
 2. Déploiement **staging** réel : `docker compose up -d` (ou équivalent de la cible), instance
