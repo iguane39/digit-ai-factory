@@ -49,6 +49,40 @@ le backlog, chaque forge vérifiée par sa recette native puis rejouée par l'or
   forge-tests (30 erreurs préexistantes, dont des défauts PLANTÉS du banc — les corriger
   fausserait la recette).
 
+## Campagne du 05/08/2026 — retours du premier produit réel (Produit-12)
+
+Source : `input/RETOURS-FORGES.md` (compilé à la clôture du premier run bout en bout réel,
+brief → production Railway). Mise en œuvre sur mandat humain, chaque forge revérifiée par
+l'orchestrateur avant clôture :
+
+- **forge-tests** : RT-1 (repli sqlite3 dans la sonde data + motifs explicites — prouvé sur
+  MiniVeille : « 33 instructions SQL OBSERVÉES… schéma créé par le code applicatif »), RT-2
+  (`FORGE_TESTS_APP=module:attribut` + finding `sonde-muette:api`), RT-3 (section « Contrat du
+  projet audité » au README, chaque affirmation vérifiée dans le code — 2 écarts découverts et
+  documentés : Alembic non mesuré, batch limité à `app/batch.py`), RT-4 (DDL jamais évincé de la
+  fenêtre, contrainte résiduelle documentée). Recette 12/12 rouge + 0 bloquant vert, 2 runs
+  identiques.
+- **forge-conception** : RC-1 (S1 en `SANS_OBJET` nommé quand ratio ≥ seuil — le `--seuil` de S2
+  devient opérant, self-test double sens conservé), RC-2 (ton par délégation documenté dans
+  derive-les-vues).
+- **forge-design** : RD-2 (`--rendu` sur run-oracles-design : render_page clair + sombre
+  auto-généré + oracle-a11y, SKIP motivé si outillage absent). RD-1 (faux positif V4 intra-icône
+  SVG < 48 px) corrigé dans `~/.claude/skills/digit-ai-page-html/scripts/render_page.py` —
+  **hors git, non poussable**, prouvé dans les deux sens (icône composite ignorée, vrai
+  chevauchement de layout toujours détecté).
+- **forge-development** : RV-1/RV-2 (run-playbook : traçabilité `E-xxx` en docstring + gate grep
+  100 %, checklist « produit auditable » vérifiée contre le code de forge-tests).
+- **forge-agents** : RA-1 (`ledger.mjs append --fichier`, BOM PowerShell absorbé, self-test 8/8
+  rejoué 5×), RA-3 (déclencheur « CDC de cadrage » restreint au motif `## SECTION 0` — un README
+  ne matche plus, le gabarit matche ; **l'installation `~/.claude` porte encore le défaut**, à
+  corriger sur décision). RA-2 (calibrage Sonnet vs Opus) : à mesurer au prochain run.
+- **steering** : RS-1 (verbe 4 natif, D-C2/D-C4 soldées), RS-2 (discipline d'auditabilité à
+  l'étape development), RS-3 (règle de sélection des smoke tests M-3 : impact max du
+  référentiel), RS-4 (M-4 premier déploiement : N-1 = N accepté déclaré), RS-5 (ton par
+  délégation au prompt canonique).
+- **Vérifiés en conditions réelles** (RT-5, confirmations du run) : R-T1/T2/T3/T4/T5/T8 du
+  04/08 tiennent sur un projet réel — entrées closes.
+
 ## Backlog initial (issu de l'inventaire du 2026-08-04)
 
 Retours candidats déjà collectés, par forge, priorisés. Statut : `candidat` tant que l'humain n'a

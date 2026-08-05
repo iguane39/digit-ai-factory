@@ -32,7 +32,8 @@ Brief :
 - Cible : [qui l'utilise]
 - Job principal : [le service rendu, en une phrase]
 - Palier visé : [MVP | V1]
-- Ton de marque (3 mots concrets) : [ex. encre, papier, atelier]
+- Ton de marque : [3 mots concrets, ou délégation « reprendre le ton de <référence> » —
+  résolue par observation datée, consignée en hypothèse, sans me suspendre]
 - Contraintes reprises : [existant à respecter, ou « aucune »]
 - Cible de déploiement : [docker local/staging (défaut) | autre, à préciser]
 

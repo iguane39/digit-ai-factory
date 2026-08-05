@@ -29,9 +29,11 @@ dans le projet produit : artefacts d'orchestration sous `forge\`, code du produi
    `run_open`, `BRIEF.md` avec le brief reçu, `etapes\`). Si `PROMPT-PRODUIT.md` n'est pas à la
    racine du projet, l'y copier depuis le steering (auto-documentation et reprise). Écrivain
    unique du ledger : toi. Les chemins d'étapes ci-dessous se lisent `<projet>\forge\etapes\…`.
-2. **Étape conception** (mode dégradé, cf. contrat §5) : appliquer les 3 verbes documentés dans
-   `c:\dev\digit-ai-forge-conception\skills\` → `ENTRANT.md`, `SURFACE.md`, `EXIGENCES.json` + vues.
-   Produire `CADRAGE-DESIGN.md` d'après le format des fixtures (verbe 4 absent — dette D-C2).
+2. **Étape conception** (mode dégradé, cf. contrat §5) : appliquer les **4 verbes** documentés dans
+   `c:\dev\digit-ai-forge-conception\skills\` → `ENTRANT.md`, `SURFACE.md`, `EXIGENCES.json` + vues,
+   puis `derive-les-vues` → `CADRAGE-DESIGN.md` (sha256 scellé). Un ton fourni par délégation
+   (« reprendre le ton de X ») se résout par observation datée consignée en hypothèse — pas de
+   suspension.
    **Valider** : `node c:\dev\digit-ai-forge-conception\oracles\oracle-{exigences,tracabilite,surface,claims}.mjs <EXIGENCES.json>`.
    Sous le seuil de suffisance → `bloque_question` : écrire `QUESTIONS.md`, suspendre.
 3. **Étape design** (mode dégradé, oracles natifs) : appliquer la méthode `systeme-de-marque`
@@ -42,8 +44,15 @@ dans le projet produit : artefacts d'orchestration sous `forge\`, code du produi
 4. **Étape development** (mode dégradé — `conductor` inutilisable en headless, dette D-V1) :
    construire le produit à la racine du projet à partir de `EXIGENCES.json` (périmètre MVP) et
    de `tokens.css`. Discipline : modifications chirurgicales, simplicité d'abord, chaque exigence
-   MVP tracée vers son implémentation et son test. **Valider** (gates rejoués) : `ruff check` +
-   `pytest` au vert sur le produit ; chaque exigence MVP a ≥ 1 test qui la cite par son id.
+   MVP tracée vers son implémentation et son test. **Discipline d'auditabilité** (le produit naît
+   auditable — cause du seul aller-retour du premier produit réel, retours RS-2/RT-3) : app
+   exposée en instance module (`app.main.app`) et exercée telle quelle par la suite ; couche SQL
+   observable (SQLAlchemy Engine — sinon déclarer le repli) ; contraintes nommées
+   `<type>_<table>_<colonne>` (`ck_*`, `uq_*`) ; `responses=`/`status_code` exacts ; migrations
+   `-- +migrate Up/Down` exercées aller/retour/rejeu ; tests citant les id d'exigences en
+   docstring. Référence : « Contrat du projet audité » du README de forge-tests.
+   **Valider** (gates rejoués) : `ruff check` + `pytest` au vert sur le produit ; chaque exigence
+   MVP a ≥ 1 test qui la cite par son id (gate grep 100 %).
 5. **Étape tests** (mode natif) :
    `uv run python -m forge_tests <racine-produit> --json` depuis `c:\dev\digit-ai-forge-tests`,
    stdout capturé et persisté dans `etapes\tests\rapport-forge-tests.json`. Exit 0 = PASS,
