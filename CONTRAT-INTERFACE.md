@@ -85,6 +85,9 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   `escalade_modele`, `question_humain`, `reponse_humain` (dont le GO production de l'étape MEP),
   `etape_close`, `retour` (alimente la boucle d'amélioration ; champ `source` :
   `forge | produit | production`), `run_close`.
+- `run_open` porte les **versions des forges** utilisées (`versions_forges: {<forge>: <sha court>}`,
+  relevées après le pull d'ouverture) et, pour un run de version, `run_precedent: <run-id>` —
+  le ledger du run N est l'entrée du run N+1 (cf. CLAUDE.md « Run de version »).
 
 ## 4. Routage par modèle
 

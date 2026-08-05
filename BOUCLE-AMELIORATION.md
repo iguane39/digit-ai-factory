@@ -49,6 +49,32 @@ le backlog, chaque forge vérifiée par sa recette native puis rejouée par l'or
   forge-tests (30 erreurs préexistantes, dont des défauts PLANTÉS du banc — les corriger
   fausserait la recette).
 
+## Campagne du 05/08/2026 (soir) — retours de PRODUCTION v0.1.0, généralisés
+
+Source : `input/RETOURS-FORGES-02.md` (complément production : 12 défauts trouvés par
+l'utilisateur en 10 min malgré 100 % de couverture mesurée). Mandat : généraliser — traiter les
+causes racines sur un périmètre large. **Quatre lois transverses** encodées dans le CLAUDE.md du
+steering et déclinées dans chaque forge :
+1. *Toute affordance est câblée ou n'existe pas* — conception : exigence socle candidate ·
+   design : pattern « un CTA = une cible » + contrôle C15 exécutable dans check_maquette.py ·
+   development : discipline + test · tests : **nouveau pan `interface`** (contrôle statique des
+   éléments inertes, tout le projet, limites déclarées) — prouvé : 5/5 câblés sur MiniVeille,
+   5 inertes nommés sur la fixture rouge.
+2. *Frontières d'environnement explicites* — `*_MODE_DEMO` absent par défaut (development,
+   conception), **qualif populée** avant GO (ETAPE-MEP §3 bis) avec endpoint de peuplement gated.
+3. *L'oubli n'existe pas* — surface implicite SaaS proposée d'office et écartée explicitement
+   (enumere-la-surface, exception close et versionnée).
+4. *Une donnée volatile est une donnée* — catalogues/tarifs en base, datés, sourcés
+   (development, conception).
+Plus : **RT-6** `non_testables[]` agrégé au-dessus des 11 adaptateurs + `--reprendre <rapport>`
+(rejoue uniquement le non-exercé, provenance à l'élément — vérifié : `pans_repris_sans_rejeu`) ·
+**RT-8** généralisé en module `forge_tests/sql.py` partagé (3 autres lecteurs corrigés du même
+motif « parser avant filtrer », littéraux gérés, recette 13/13) · **RS-6** run de version défini
+(ledger N = entrée du run N+1, delta par étape, tests toujours complets) · **fraîcheur des
+forges** : pull obligatoire à l'ouverture de run + versions consignées dans `run_open`.
+Différé : RT-7 volet Playwright (« effet observable » dynamique — le contrôle statique couvre le
+repli) ; composants `.jsx/.tsx/.vue/.svelte` hors pan interface (déclaré `non_juge`).
+
 ## Campagne du 05/08/2026 — retours du premier produit réel (asdmailmanager2)
 
 Source : `input/RETOURS-FORGES.md` (compilé à la clôture du premier run bout en bout réel,
