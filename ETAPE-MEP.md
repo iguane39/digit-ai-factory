@@ -32,12 +32,17 @@ Dans le projet produit (`forge\etapes\mep\` pour les preuves, racine pour les fi
 |---|---|---|
 | M-1 | Build du conteneur | `docker build` exit 0, image taguée `<produit>:<run-id>` |
 | M-2 | Healthcheck | HTTP 200 sur l'endpoint de santé de l'instance staging, 3 mesures espacées de 10 s |
-| M-3 | Smoke tests | ≥ 1 parcours rejoué par exigence MVP en bande de risque « critique » (cotation forge-tests), exécutés **contre l'instance staging servie**, pas contre un TestClient |
+| M-3 | Smoke tests | ≥ 1 parcours rejoué par exigence MVP d'impact maximal (champ `cotation.impact` du référentiel `EXIGENCES.json` — toutes les ex æquo du niveau le plus élevé), exécutés **contre l'instance staging servie**, pas contre un TestClient |
 | M-4 | Rollback | procédure de `ROLLBACK.md` exécutée une fois avec succès (retour N-1 + healthcheck 200 + retour N) |
 | M-5 | Propreté | aucun secret en clair dans l'image ni dans compose (scan des fichiers embarqués) |
 
 Verdict au ledger (`oracles_verdict`, étape `mep`). Un contrôle rouge → retour à l'étape
 concernée (max 3 allers-retours, puis diagnostic — même règle que tests↔development).
+
+**Premier déploiement** (aucune version N-1 réelle n'existe) : M-4 se prouve avec N-1 = N —
+la mécanique complète (tags, volumes, arrêt/redémarrage, healthchecks) est exercée, la
+substitution de version ne l'est pas. Preuve dégradée acceptée, **déclarée comme telle** au
+dossier de MEP.
 
 ## 4. Le gate — GO humain (incompressible)
 
