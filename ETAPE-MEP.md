@@ -44,13 +44,30 @@ la mécanique complète (tags, volumes, arrêt/redémarrage, healthchecks) est e
 substitution de version ne l'est pas. Preuve dégradée acceptée, **déclarée comme telle** au
 dossier de MEP.
 
+## 3 bis. Qualif populée (avant le GO — demande utilisateur RT-6/RS-7)
+
+Entre le staging technique et le GO, une **version de qualification populée de données** est
+déployée et auditée comme l'application réelle :
+
+1. Le produit expose un **endpoint de peuplement** gated par drapeau d'environnement (loi 2 —
+   absent en production) ; la qualif est peuplée par cet endpoint, jamais à la main.
+2. `forge_tests` tourne contre l'instance qualif servie (`FORGE_TESTS_BASE_URL`), bout en bout.
+3. Les éléments **non testables faute de configuration** (identifiants tiers, jetons, clés) ne
+   sont ni oubliés ni maquillés : ils sortent dans la section `non_testables[]` du rapport
+   {élément, champs_requis}, présentée à l'humain EN FIN d'audit avec la liste précise à saisir.
+4. Dès que l'humain fournit les éléments : `--reprendre <rapport>` rejoue **uniquement** les
+   éléments non exercés, jusqu'à couverture complète — sans rejouer ce qui a déjà passé.
+
+Le résultat qualif (couverture, non-testables soldés) entre au dossier de MEP.
+
 ## 4. Le gate — GO humain (incompressible)
 
 La mise en **production** exige un GO humain explicite, donné sur `DOSSIER-MEP.md`, qui contient :
 
 - les verdicts d'oracles des 5 étapes (avec références ledger `seq`) ;
 - le rapport forge-tests (couvertures, mutation, findings, pans non couverts) ;
-- le résultat des smoke tests staging (M-3) et du test de rollback (M-4) ;
+- le résultat des smoke tests staging (M-3), du test de rollback (M-4) et de l'audit qualif
+  populée (§3 bis — non-testables soldés ou listés avec leur raison) ;
 - les limites déclarées du run (modes dégradés, `non_juge`, hypothèses prises) ;
 - la commande exacte de mise en production et la procédure de rollback.
 

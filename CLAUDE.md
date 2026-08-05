@@ -11,6 +11,23 @@ parent de ce dépôt (installation type : `~/.digit-ai-forge`, posée par la pha
 d'abord `node bootstrap.mjs` (clone les cinq forges depuis `github.com/iguane39` et vérifie
 leurs points d'entrée).
 
+**Fraîcheur des forges** : à l'ouverture de TOUT run, tirer les dernières versions —
+`git -C <steering> pull --ff-only` puis `node bootstrap.mjs --pull` — et consigner au ledger
+(dans `run_open`) la version de chaque forge (`git -C <forge> log -1 --format=%h`). Un produit
+sait ainsi toujours avec quelles versions de forges il a été construit, et récupère les
+correctifs à chaque run.
+
+**Lois transverses** (issues des runs réels — chaque étape les applique dans son périmètre) :
+1. *Toute affordance est câblée ou n'existe pas* : un élément interactif sans effet observable
+   est un défaut, à toutes les étapes (exigence socle en conception, un CTA = une cible en
+   design, gate en development, contrôle en tests).
+2. *Frontières d'environnement explicites* : tout artefact de démonstration vit derrière un
+   drapeau d'environnement absent par défaut ; la production ne montre jamais de données de démo.
+3. *L'oubli n'existe pas* : la surface implicite (aide, onboarding, compte, favicon, états
+   vides guidés) est proposée d'office et s'écarte explicitement — jamais par omission.
+4. *Une donnée volatile est une donnée, pas du code* : catalogues, tarifs et référentiels
+   susceptibles de vieillir vivent en base, éditables, datés et sourcés.
+
 Documents de référence (à lire avant tout run) :
 - `INVENTAIRE.md` — état réel des cinq forges, points d'entrée, manques.
 - `CONTRAT-INTERFACE.md` — format d'invocation, ledger, routage par modèle, dette d'intégration.
@@ -33,7 +50,8 @@ dans le projet produit : artefacts d'orchestration sous `forge\`, code du produi
    `c:\dev\digit-ai-forge-conception\skills\` → `ENTRANT.md`, `SURFACE.md`, `EXIGENCES.json` + vues,
    puis `derive-les-vues` → `CADRAGE-DESIGN.md` (sha256 scellé). Un ton fourni par délégation
    (« reprendre le ton de X ») se résout par observation datée consignée en hypothèse — pas de
-   suspension.
+   suspension. Loi 3 : la surface implicite SaaS est proposée d'office en exigences candidates
+   et s'écarte explicitement (cf. `enumere-la-surface`).
    **Valider** : `node c:\dev\digit-ai-forge-conception\oracles\oracle-{exigences,tracabilite,surface,claims}.mjs <EXIGENCES.json>`.
    Sous le seuil de suffisance → `bloque_question` : écrire `QUESTIONS.md`, suspendre.
 3. **Étape design** (mode dégradé, oracles natifs) : appliquer la méthode `systeme-de-marque`
@@ -51,6 +69,10 @@ dans le projet produit : artefacts d'orchestration sous `forge\`, code du produi
    `<type>_<table>_<colonne>` (`ck_*`, `uq_*`) ; `responses=`/`status_code` exacts ; migrations
    `-- +migrate Up/Down` exercées aller/retour/rejeu ; tests citant les id d'exigences en
    docstring. Référence : « Contrat du projet audité » du README de forge-tests.
+   **Disciplines de livrable** (lois 1, 2, 4 — issues des défauts de production v0.1.0) :
+   zéro élément interactif sans effet (tout bouton/lien repris de la maquette est câblé ou
+   supprimé) ; artefacts de démonstration derrière `*_MODE_DEMO` absent par défaut ; données
+   volatiles (catalogues, tarifs) en base, éditables, avec date et source de relevé.
    **Valider** (gates rejoués) : `ruff check` + `pytest` au vert sur le produit ; chaque exigence
    MVP a ≥ 1 test qui la cite par son id (gate grep 100 %).
 5. **Étape tests** (mode natif) :
@@ -71,6 +93,20 @@ dans le projet produit : artefacts d'orchestration sous `forge\`, code du produi
 oracles des étapes 1-3 verts · forge-tests exit 0 ou 3 avec seuils de couverture et de mutation
 tenus sur les pans mesurés · oracle MEP 5/5 en staging · `DOSSIER-MEP.md` complet · traçabilité
 exigences MVP → tests 100 % · ledger vérifié par `ledger.mjs verify`.
+
+## Run de version (produit existant)
+
+Le cycle post-production n'est pas improvisé : c'est un **run de version** (retour RS-6 du
+premier produit réel). Entrant : les retours consignés au ledger du run précédent
+(`type: retour`, source `production` ou `produit`) + un brief delta. Le ledger du run N est
+l'entrée du run N+1 — même projet, nouveau `run_open` chaîné (champ `run_precedent`).
+Étapes rejouées **en delta** :
+- conception : exigences nouvelles/modifiées dans `EXIGENCES.json` (ids retirés via
+  `identifiants_retires`, jamais réaffectés), oracles rejoués sur le référentiel entier ;
+- design : seuls les écrans touchés, oracles sur les artefacts modifiés ;
+- development : delta sous les mêmes gates (ruff, pytest, traçabilité des exigences du delta) ;
+- tests : **audit complet** (jamais en delta — la régression ne se voit qu'en entier) ;
+- MEP : staging + qualif populée + GO, comme un premier run (M-4 avec un vrai N-1 cette fois).
 
 ## Parallélisme et agents
 

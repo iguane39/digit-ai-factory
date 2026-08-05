@@ -22,7 +22,10 @@ Phase 0 — outillage (ne suppose RIEN d'installé, quel que soit mon système) 
      node ~/.digit-ai-forge/digit-ai-forge-steering/bootstrap.mjs
    (bootstrap.mjs clone les 5 forges à côté du steering et vérifie leurs points d'entrée —
    il doit finir sur « Poste prêt », sinon corrige ce qu'il signale avant de continuer.)
-3. Retiens la racine comme FORGE_ROOT pour toute la session.
+3. Si la forge était déjà installée : mets-la à jour — `git pull --ff-only` dans le steering
+   puis `node bootstrap.mjs --pull` (les correctifs des forges arrivent en continu ; un run
+   démarre TOUJOURS sur les dernières versions, consignées au ledger).
+4. Retiens la racine comme FORGE_ROOT pour toute la session.
 
 Puis suis le CLAUDE.md du steering avec ce dossier comme projet produit :
 ledger et artefacts d'étapes sous forge\, code du produit à la racine.
