@@ -49,6 +49,15 @@ le backlog, chaque forge vérifiée par sa recette native puis rejouée par l'or
   forge-tests (30 erreurs préexistantes, dont des défauts PLANTÉS du banc — les corriger
   fausserait la recette).
 
+## 06/08/2026 — revue graphique d'implémentation (nouvelle capacité)
+
+Sur proposition humaine validée : forge-design intervient désormais AUSSI en aval — mode
+« critique d'implémentation » de `critique-le-design` v1.1.0 (le produit implémenté jugé contre
+sa promesse design : tokens, écrans/états, CTA, rendu 2 thèmes, voix ; écarts ancrés versés au
+ledger comme retours vers development). Étape 5 bis du steering, en parallèle de tests
+(fonction/forme, frontière écrite avec le pan `interface`). Exercé sur le run pilote : tokens
+conformes, rendu PASS, 1 écart CTA réel détecté du premier coup.
+
 ## Campagne du 05/08/2026 (soir) — retours de PRODUCTION v0.1.0, généralisés
 
 Source : `input/RETOURS-FORGES-02.md` (complément production : 12 défauts trouvés par
