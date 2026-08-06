@@ -62,6 +62,7 @@ projet (2e mandat) · **G** = gate humain.
 |---|---|---|---|---|---|---|
 | 16 | Les rapports finaux destinés à l'humain (DOSSIER-MEP, PV, revues) sont **copiés** dans `output\` au nommage daté (n° 4) — l'original de travail reste sous `forge\etapes\` | cohérence avec `digit-ai-forge-agents/output/` | produits | S | faible | **défaut** |
 | 17 | Les journaux d'oracles (`*.oracles.json`, `*.oracles-historique.jsonl`) sont versionnés dans `forge\` (ce sont des preuves), ignorés partout ailleurs | observée : présents dans ASDMailManager2/forge/ | produits | P0 (.gitignore) | nul | option (conflit C4) |
+| 18 | `forge\retours\` existe (gabarit inclus) ; chaque lot de retours forges est un fichier `RETOURS-<AAAAMMJJ><indice>.md` — un fichier par lot, ids en séquence continue par produit, **jamais modifié après remise** ; remise = copie dans `input\` du steering | **mandat humain du 06/08** ; format éprouvé 2× (ASDMailManager2/forge/RETOURS-FORGES*.md) | produits, nouveaux + rattrapage | P0+S+O | faible | **adoptée** (décision 06/08) |
 
 ## Conflits à trancher (ta décision explicite)
 

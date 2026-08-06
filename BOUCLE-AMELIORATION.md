@@ -5,6 +5,17 @@ Version 1.0.0 — 2026-08-04
 Le steering améliore les cinq forges par **itérations bornées**. Jamais d'amélioration spontanée,
 jamais d'application sans validation humaine.
 
+## Canal des retours produits (règle 18, 06/08/2026)
+
+Chaque produit prépare ses retours dans `forge\retours\` — un lot = un fichier
+`RETOURS-<AAAAMMJJ><indice>.md` (gabarit : `gabarits\RETOURS-FORGES.md`), généré à chaque
+clôture de run et à chaque inspection/incident. **Remise progressive** : l'humain copie le lot
+dans `input\` du steering quand il veut déclencher une campagne — l'original reste chez le
+produit (historique), le lot remis ne se modifie plus. Côté steering : chaque lot reçu est
+traité comme campagne de ce document (généralisation, mise en œuvre, preuve, push), consigné
+ci-dessous avec sa source. Les confirmations positives des lots closent les entrées « à
+vérifier » du backlog.
+
 ## Le cycle (borné par construction)
 
 ```
