@@ -80,6 +80,14 @@ dans le projet produit : artefacts d'orchestration sous `forge\`, code du produi
    stdout capturé et persisté dans `etapes\tests\rapport-forge-tests.json`. Exit 0 = PASS,
    3 = PARTIEL acceptable (consigner les pans non couverts), 1 = FAIL → retour à l'étape
    development (max 3 allers-retours, puis diagnostic).
+   **5 bis. Revue graphique d'implémentation** (en PARALLÈLE de l'étape tests — regards
+   indépendants : la fonction pour tests, la forme ici) : mode « critique d'implémentation »
+   de forge-design (`skills\critique-le-design\references\critique-implementation.md`) —
+   le produit jugé contre SA promesse design (tokens du run, écrans/états, CTA, rendu 2 thèmes,
+   voix). Sortie : `etapes\design\revue-implementation.md`, écarts versés au ledger
+   (`type: retour`, `source: produit`, destinataire development). Verdict Refondre ou
+   ≥ 1 bloquant → retour à development (boucle bornée partagée avec l'étape tests). Un écart
+   voulu se consigne en hypothèse — la revue le classe « accepté », pas défaut.
 6. **Étape MEP** (portée par le steering — `ETAPE-MEP.md`) : Dockerfile/compose dans le produit,
    déploiement **staging** réel, `ROLLBACK.md` testé une fois, oracle MEP M-1…M-5 exécuté
    (build, healthcheck ×3, smoke tests des exigences critiques contre l'instance servie,
