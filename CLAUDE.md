@@ -46,6 +46,15 @@ dans le projet produit : artefacts d'orchestration sous `forge\`, code du produi
    `run_open`, `BRIEF.md` avec le brief reçu, `etapes\`). Si `PROMPT-PRODUIT.md` n'est pas à la
    racine du projet, l'y copier depuis le steering (auto-documentation et reprise). Écrivain
    unique du ledger : toi. Les chemins d'étapes ci-dessous se lisent `<projet>\forge\etapes\…`.
+   **Socle projet** (`REGLES-PROJET.md`, décidé le 06/08) : créer `input\`, `output\`, `docs\`,
+   le `.gitignore` socle (`.env`, `.venv/`, `__pycache__/`, `node_modules/`, `generated/`,
+   `Old/`), `.env.example` (toutes variables attendues, applicatives + infra, tierces marquées
+   `# à fournir :`), le `CLAUDE.md` et le `README.md` du produit, puis `git init -b main` +
+   commit initial — commits locaux à chaque étape, **remote/push sur GO humain seulement**.
+   **Valider** : `node <steering>\oracles\oracle-conformite-projet.mjs <projet>` → PASS exigé
+   avant l'étape 2 ; rejouer l'oracle avant `run_close`. Nommage : tout livrable copié dans
+   `output\`/`docs\` porte `<Marque> - <Objet> - AAAAMMJJ<indice>` ; un livrable remplacé migre
+   dans `Old\` (jamais versionné) ; le code, lui, n'est jamais daté — git est son seul magasin.
 2. **Étape conception** (mode dégradé, cf. contrat §5) : appliquer les **4 verbes** documentés dans
    `c:\dev\digit-ai-forge-conception\skills\` → `ENTRANT.md`, `SURFACE.md`, `EXIGENCES.json` + vues,
    puis `derive-les-vues` → `CADRAGE-DESIGN.md` (sha256 scellé). Un ton fourni par délégation
@@ -108,7 +117,9 @@ Le cycle post-production n'est pas improvisé : c'est un **run de version** (ret
 premier produit réel). Entrant : les retours consignés au ledger du run précédent
 (`type: retour`, source `production` ou `produit`) + un brief delta. Le ledger du run N est
 l'entrée du run N+1 — même projet, nouveau `run_open` chaîné (champ `run_precedent`).
-Étapes rejouées **en delta** :
+Le run de version commence par le **rattrapage du socle** : `oracle-conformite-projet` sur le
+projet, chaque FAIL corrigé (c'est ainsi que les produits antérieurs aux règles se mettent en
+conformité — jamais en masse silencieuse hors run). Étapes rejouées **en delta** :
 - conception : exigences nouvelles/modifiées dans `EXIGENCES.json` (ids retirés via
   `identifiants_retires`, jamais réaffectés), oracles rejoués sur le référentiel entier ;
 - design : seuls les écrans touchés, oracles sur les artefacts modifiés ;
@@ -137,5 +148,5 @@ l'entrée du run N+1 — même projet, nouveau `run_open` chaîné (champ `run_p
 - Un livrable d'étape n'est accepté que sur verdict d'oracle exécuté — jamais par confiance.
 - `bloque_question` suspend le run proprement (état persisté au ledger, reprise idempotente) ;
   ne jamais inventer une réponse à la place de l'humain.
-- Le projet produit s'appartient : création de son dépôt git et push sur validation humaine
-  uniquement.
+- Le projet produit est sous git **local** dès sa naissance (init + commits par étape — décision
+  C2 du 06/08) ; la création du remote et tout push restent sur validation humaine uniquement.
