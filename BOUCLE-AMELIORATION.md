@@ -16,6 +16,17 @@ traité comme campagne de ce document (généralisation, mise en œuvre, preuve,
 ci-dessous avec sa source. Les confirmations positives des lots closent les entrées « à
 vérifier » du backlog.
 
+Convention confirmée par l'usage (RS-8, lot 03) : **un fichier par remise, jamais ré-augmenté
+après transmission** — un fichier cumulatif forcerait le steering à re-trier les lots déjà
+traités. La forme historique `RETOURS-FORGES-<NN>.md` est acceptée au même titre que la forme
+canonique datée ; un `RETOURS-FORGES.md` de tête peut servir d'**index des lots** du produit.
+
+**Cas nominal prouvé** (RS-9, lot 03) : lot 01 remis le 05/08 au soir → RT-6/RT-7 implémentés
+dans la nuit → **constatés en service par le run produit le 06/08** (pan interface 196/196 sur
+16 écrans, `non_testables[]` et `--reprendre` au rapport, 4 divergences réelles attrapées puis
+leur correction validée). Première itération complète de la boucle inter-forges : retour →
+campagne → application → vérification en service, en moins de 24 h. RT-6/RT-7 : **soldés**.
+
 ## Le cycle (borné par construction)
 
 ```
@@ -59,6 +70,26 @@ le backlog, chaque forge vérifiée par sa recette native puis rejouée par l'or
   gates — arbitrage de périmètre), R-V3 (délégation des HITL — constitutionnel), ruff à 0 sur
   forge-tests (30 erreurs préexistantes, dont des défauts PLANTÉS du banc — les corriger
   fausserait la recette).
+
+## 06/08/2026 (soir) — lot 03 : couverture au-dessus des standards + précisions de perception
+
+Source : `input/RETOURS-FORGES-03.md` + campagne pré-rédigée par le run produit
+(`Produit-12/forge/PROMPT-AMELIORATION-FORGE-TESTS.md`), déroulée avec ses critères
+exécutables. **forge-tests** (8 commits) : mutation à périmètre TOTAL (33/34 modules d'ASD
+mutés contre 7, échantillonnage profondeur-seulement, exclusions nominatives), `modules[]`
+sans module silencieux, 6 seuils opposables versionnés (`seuils.py`), **pan `qualif`** (12ᵉ)
+généralisé du prototype produit (bancs servis en HTTP par la recette, rouge 5 défauts nommés /
+vert 14/14), `pans_non_couverts {pour_couvrir}`, RT-9 (garde déportée résolue 1 niveau),
+RT-10 (montages statiques exclus). Résultat de fond : le produit « 100 % vert » sort à
+**mutation 0,505** — dix modules métier sous 0,35, deux à 0,00 : RT-12 est mesuré et opposable.
+La campagne a trouvé 3 défauts non prévus au mandat, dont une **violation G-1 dormante**
+(LF→CRLF sur 23 fichiers du produit — restauré 165/165 empreintes, cause corrigée, témoin en
+recette) et les f-strings Python 3.12 mutées en mutants équivalents. Recette 16/16 rejouée 2×
+identique + rejouée indépendamment par l'orchestrateur. **conception/design** : RC-4 (critère
+onboarding = expérience dominante), RD-6 (un seul CTA visible par écran + test-garde au texte
+visible), RD-7 (aide à 3 niveaux, écran 10 du socle). **RS-8/RS-9** au canal. Non-faits
+déclarés : qualif non exécutée contre ASD servi (G-1 — SKIP motivé accepté par le mandat),
+19 ruff préexistants, suite unitaire propre de forge-tests (dette connue).
 
 ## 06/08/2026 — socle de règles projet (17 règles décidées + oracle exécutable)
 
