@@ -49,6 +49,14 @@ le backlog, chaque forge vérifiée par sa recette native puis rejouée par l'or
   forge-tests (30 erreurs préexistantes, dont des défauts PLANTÉS du banc — les corriger
   fausserait la recette).
 
+## 06/08/2026 — socle de règles projet (17 règles décidées + oracle exécutable)
+
+Inventaire de 11 dépôts → `REGLES-PROJET.md` (17 règles, 4 conflits arbitrés par l'humain :
+Old\ hors git, commits locaux par défaut, code jamais daté, journaux d'oracles versionnés).
+Encodé : socle créé à l'ouverture de run (CLAUDE.md étape 1), rattrapage en tête de run de
+version, et `oracles\oracle-conformite-projet.mjs` (self-test double sens 3/3 ; preuve terrain :
+8 findings nommés sur ASDMailManager2, dont l'absence de git).
+
 ## 06/08/2026 — revue graphique d'implémentation (nouvelle capacité)
 
 Sur proposition humaine validée : forge-design intervient désormais AUSSI en aval — mode

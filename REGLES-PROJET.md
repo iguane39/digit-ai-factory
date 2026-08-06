@@ -1,8 +1,13 @@
-# Règles projet — proposition à décision
+# Règles projet — DÉCIDÉES le 2026-08-06
 
-2026-08-06. **Rien n'est appliqué avant décision humaine.** Chaque règle est une ligne : coche,
-écarte, ou amende (« toutes sauf n° X, Y » fonctionne). Énoncés binaires — ils deviendront
-l'oracle « conformité projet » au 2e mandat.
+**Les 17 règles sont adoptées** (décision humaine du 06/08). Arbitrages des conflits :
+C1 = `Old\` autorisé pour les livrables mais **jamais versionné** (ignoré par git) ;
+C2 = `git init` + **commits locaux par défaut** dès l'ouverture du run, remote/push sur GO
+humain ; C3 = le nommage daté ne s'applique jamais au code ; C4 = journaux d'oracles
+**versionnés** dans `forge\`.
+Application : phase 0 du prompt produit (P0), vérifications steering (S), et l'oracle
+exécutable `oracles\oracle-conformite-projet.mjs` (O) — chaque n° de règle est un n° de finding.
+Rattrapage des projets existants : au prochain run de version de chacun.
 
 Sources : inventaire exécuté sur 11 dépôts (6 forges, produit pilote MiniVeille, ASDMailManager2
 — produit forge réel —, ASDMailManager, AuxPortesDeLaBaie.com, Transcript, BeefProject).

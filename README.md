@@ -70,6 +70,8 @@ uniquement sur GO humain**, donné sur un dossier de preuve généré (DOSSIER-M
 | `INVENTAIRE.md` | état réel des cinq forges (points d'entrée, oracles, manques) |
 | `CONTRAT-INTERFACE.md` | format d'invocation, ledger, routage par modèle, dette d'intégration |
 | `ETAPE-MEP.md` | la 5e étape : déploiement staging, oracle MEP, gate GO production |
+| `REGLES-PROJET.md` | les 17 règles de socle projet (décidées le 06/08) |
+| `oracles\` | `oracle-conformite-projet.mjs` (17 règles, exit 0/1/2) + self-test double sens |
 | `BOUCLE-AMELIORATION.md` | amélioration des forges (bornée, gated humain) + backlog de retours |
 | `HYPOTHESES.md` | hypothèses prises, datées, révisables |
 | `RUN-PILOTE.md` | preuve d'autonomie : le run pilote et ses verdicts |
