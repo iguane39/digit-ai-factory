@@ -45,7 +45,7 @@ projet (2e mandat) · **G** = gate humain.
 
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
-| 11 | Chaque produit naît avec un `CLAUDE.md` : quoi, commandes (build/test/run), conventions locales, pointeur vers `forge\ledger.jsonl` et la reprise | observée 11 projets maison (`AOFR`, `DPGFast`, `DriveOps`…) ; **absente du produit forge réel** | produits, nouveaux + rattrapage | P0+O | faible | **défaut** |
+| 11 | Chaque produit naît avec un `CLAUDE.md` d'après `gabarits\CLAUDE-PRODUIT.md`, **section « Routage forge » remplie** (verdict tests → forge_tests, évolution → run de version, déploiement → MEP ; boucle intérieure libre) — étendue le 06/08 : sans routage, les sessions ad hoc contournent les forges (constaté sur le correctif v0.2.0) | observée 11 projets maison ; absente du produit forge réel | produits, nouveaux + rattrapage | P0+O | faible | **défaut** |
 | 12 | Chaque produit naît avec un `README.md` minimal : une phrase de quoi, 2 commandes de démarrage, lien CLAUDE.md | observée 8/11 ; absente d'Produit-12 | produits, nouveaux + rattrapage | P0+O | faible | **défaut** |
 
 ## E. Environnements et configuration

@@ -26,7 +26,8 @@ const check = (nom, fn) => { try { fn(); console.log(`  [PASS] ${nom}`); pass++;
 // ---- fixture VERTE : projet conforme aux 17 règles ------------------------------------------
 const verte = mkdtempSync(join(tmpdir(), "conf-verte-"));
 for (const d of ["input", "output", "docs", "forge", "output/Old"]) mkdirSync(join(verte, d), { recursive: true });
-writeFileSync(join(verte, "CLAUDE.md"), "# Produit\ncommandes, conventions, reprise forge/ledger.jsonl\n");
+writeFileSync(join(verte, "CLAUDE.md"),
+  "# Produit\n## Routage forge — obligatoire\nvalider : forge_tests\névoluer : run de version\ndéployer : MEP\n");
 writeFileSync(join(verte, "README.md"), "# Produit\nDémarrage : 2 commandes.\n");
 writeFileSync(join(verte, ".env.example"), "# ne jamais renseigner de secret ici\nPORT=8000\nAPI_TIERCE_CLE= # à fournir :\n");
 writeFileSync(join(verte, ".env"), "PORT=8000\n");
@@ -51,7 +52,8 @@ mkdirSync(join(rouge, "output", "Old"), { recursive: true });      // R-1 (input
 writeFileSync(join(rouge, "output", "rapport-final.md"), "x\n");    // R-4 : livrable non daté
 writeFileSync(join(rouge, "output", "Old", "vieux - 20260101a.py"), "x = 1\n"); // R-6 : code sous Old
 writeFileSync(join(rouge, "main - 20260806a.py"), "x = 1\n");       // R-6 : code daté
-// pas de .gitignore → R-7 (Old non ignoré) + R-10 ; pas de git → R-8 ; ni CLAUDE ni README → R-11/R-12 ; pas d'env.example → R-13
+writeFileSync(join(rouge, "CLAUDE.md"), "# Produit\njuste des commandes pytest\n"); // R-11 : présent SANS routage forge
+// pas de .gitignore → R-7 (Old non ignoré) + R-10 ; pas de git → R-8 ; pas de README → R-12 ; pas d'env.example → R-13
 
 check("rouge : chaque règle attendue se déclenche, FAIL exit 1", () => {
   const { exit, rapport } = lance(rouge);

@@ -98,8 +98,20 @@ if (!gitignore) ko("R-10", ".gitignore", "absent");
 else if (!/^\.env$/m.test(gitignore)) ko("R-10", ".gitignore", "n'ignore pas .env");
 else ok("R-10", ".gitignore", "présent, .env ignoré");
 
-// R-11 / R-12 — CLAUDE.md, README.md
-existsSync(p("CLAUDE.md")) ? ok("R-11", "CLAUDE.md", "présent") : ko("R-11", "CLAUDE.md", "absent — chaque produit naît avec son CLAUDE.md");
+// R-11 — CLAUDE.md présent ET porteur de la table de routage forge (étendu le 06/08 :
+// sans elle, les sessions ad hoc contournent les forges — constaté sur le correctif v0.2.0)
+if (!existsSync(p("CLAUDE.md"))) ko("R-11", "CLAUDE.md", "absent — chaque produit naît avec son CLAUDE.md (gabarit steering)");
+else {
+  const claude = readFileSync(p("CLAUDE.md"), "utf8");
+  const manques = [];
+  if (!/##\s*Routage forge/i.test(claude)) manques.push("section « Routage forge »");
+  if (!/forge_tests/.test(claude)) manques.push("route tests (forge_tests)");
+  if (!/run de version/i.test(claude)) manques.push("route évolution (run de version)");
+  if (!/MEP/.test(claude)) manques.push("route déploiement (MEP)");
+  manques.length
+    ? ko("R-11", "CLAUDE.md", `présent mais sans routage forge complet — manque : ${manques.join(", ")}`)
+    : ok("R-11", "CLAUDE.md", "présent, table de routage forge complète");
+}
 existsSync(p("README.md")) ? ok("R-12", "README.md", "présent") : ko("R-12", "README.md", "absent");
 
 // R-13 — .env.example exhaustif (présence + ≥ 1 variable)

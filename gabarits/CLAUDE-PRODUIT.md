@@ -1,0 +1,43 @@
+# <NOM-PRODUIT> — CLAUDE.md
+
+<!-- Gabarit du steering (gabarits\CLAUDE-PRODUIT.md) : l'orchestrateur remplit les <…> à
+     l'ouverture du run. La section « Routage forge » est OBLIGATOIRE et vérifiée par
+     oracle-conformite-projet (règle 11) — ne pas la supprimer ni la vider. -->
+
+<Une phrase : ce que fait le produit, pour qui.>
+
+Ce produit est construit et maintenu par la forge Digit-AI. État du run : `forge\ledger.jsonl`.
+
+## Routage forge — obligatoire
+
+Deux boucles, une règle : la **boucle intérieure** (développer, itérer) est libre ; tout
+**verdict** (valider, livrer, faire évoluer, déployer) passe par les forges. Contourner une
+route ci-dessous, c'est perdre ce qu'elle garantit — si une session s'apprête à le faire,
+elle s'arrête et le dit.
+
+| Intention | Le chemin | Jamais |
+|---|---|---|
+| « Relance les tests », valider, clore | audit forge_tests : `uv run python -m forge_tests "<racine-de-ce-projet>" --json --sortie forge\etapes\tests\rapport-<AAAAMMJJ>.json` depuis `<FORGE_ROOT>\digit-ai-forge-tests` — exit 3 = PARTIEL acceptable documenté ; reprise ciblée : `--reprendre <rapport>` | conclure « tests OK » sur un pytest direct |
+| Corriger une anomalie, faire évoluer | consigner le retour au ledger (`type: retour`) puis **run de version** : rouvrir une session ici, coller `PROMPT-PRODUIT.md` (brief delta) ou « reprends le run » | éditer le code et livrer hors run |
+| Déployer | étape MEP du steering : staging → qualif populée → **GO humain** (`forge\DOSSIER-MEP.md`) | `docker push` / mise en prod à la main |
+| Juger le rendu visuel | mode « critique d'implémentation » de forge-design (produit vs promesse du run) | verdict à l'œil |
+
+Boucle intérieure (libre, sans verdict) : `<commandes locales : pytest, ruff, serveur de dev…>`
+
+## Commandes
+
+- Lancer : `<commande>`
+- Tests locaux (boucle intérieure) : `<commande>`
+- Audit complet (verdict) : voir Routage forge ci-dessus.
+
+## Conventions locales
+
+- Socle projet : règles `REGLES-PROJET.md` du steering (nommage daté des livrables dans
+  `output\`/`docs\`, `Old\` jamais versionné, `.env` jamais committé, commits Conventional
+  Commits français — locaux par défaut, push sur GO humain).
+- `<conventions spécifiques au produit>`
+
+## Reprise
+
+Forge : `<FORGE_ROOT>` (sinon relire `PROMPT-PRODUIT.md`, phase 0). Le ledger
+`forge\ledger.jsonl` porte l'état exact ; les étapes closes ne se rejouent pas.
