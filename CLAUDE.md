@@ -49,7 +49,10 @@ dans le projet produit : artefacts d'orchestration sous `forge\`, code du produi
    **Socle projet** (`REGLES-PROJET.md`, décidé le 06/08) : créer `input\`, `output\`, `docs\`,
    le `.gitignore` socle (`.env`, `.venv/`, `__pycache__/`, `node_modules/`, `generated/`,
    `Old/`), `.env.example` (toutes variables attendues, applicatives + infra, tierces marquées
-   `# à fournir :`), le `CLAUDE.md` et le `README.md` du produit, puis `git init -b main` +
+   `# à fournir :`), le `CLAUDE.md` du produit **d'après `gabarits\CLAUDE-PRODUIT.md`** (la
+   section « Routage forge » est obligatoire et remplie : c'est elle qui garantit que les
+   sessions ad hoc dans le produit passent par les forges pour tout verdict — tests, évolution,
+   déploiement — la boucle intérieure restant libre), le `README.md`, puis `git init -b main` +
    commit initial — commits locaux à chaque étape, **remote/push sur GO humain seulement**.
    **Valider** : `node <steering>\oracles\oracle-conformite-projet.mjs <projet>` → PASS exigé
    avant l'étape 2 ; rejouer l'oracle avant `run_close`. Nommage : tout livrable copié dans
