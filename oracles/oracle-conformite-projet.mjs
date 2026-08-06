@@ -49,6 +49,11 @@ const rel = (f) => relative(cible, f).replaceAll("\\", "/");
 for (const [n, d] of [["R-1", "input"], ["R-2", "output"], ["R-3", "docs"]])
   existsSync(p(d)) ? ok(n, d + "/", "présent") : ko(n, d + "/", `dossier ${d}\\ absent de la racine`);
 
+// R-18 — canal de retours forges (mandat du 06/08 : chaque projet prépare ses lots de retours)
+existsSync(p("forge", "retours"))
+  ? ok("R-18", "forge/retours/", "canal de retours présent")
+  : ko("R-18", "forge/retours/", "dossier forge\\retours\\ absent — les retours vers les forges n'ont pas de canal");
+
 // R-4 — nommage daté des livrables (output/ et docs/ ; input/ non jugé : entrants humains)
 let r4 = true;
 for (const d of ["output", "docs"]) {

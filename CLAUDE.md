@@ -54,6 +54,8 @@ dans le projet produit : artefacts d'orchestration sous `forge\`, code du produi
    sessions ad hoc dans le produit passent par les forges pour tout verdict — tests, évolution,
    déploiement — la boucle intérieure restant libre), le `README.md`, puis `git init -b main` +
    commit initial — commits locaux à chaque étape, **remote/push sur GO humain seulement**.
+   Créer aussi `forge\retours\` avec une copie de `gabarits\RETOURS-FORGES.md` (le canal de
+   retours du produit — règle 18).
    **Valider** : `node <steering>\oracles\oracle-conformite-projet.mjs <projet>` → PASS exigé
    avant l'étape 2 ; rejouer l'oracle avant `run_close`. Nommage : tout livrable copié dans
    `output\`/`docs\` porte `<Marque> - <Objet> - AAAAMMJJ<indice>` ; un livrable remplacé migre
@@ -106,8 +108,13 @@ dans le projet produit : artefacts d'orchestration sous `forge\`, code du produi
    rollback prouvé, scan secrets de l'image). Puis générer `DOSSIER-MEP.md` et demander le
    **GO humain** — la production n'est jamais lancée sans lui ; sans GO, clore en
    `pret_production_en_attente_GO` (état de succès).
-7. **Clore le run** : `run_close` au ledger avec le bilan (étapes, verdicts d'oracles, escalades,
-   retours collectés), puis synthèse à l'humain.
+7. **Clore le run** : compiler les entrées `type: retour` du ledger en un **lot de retours** —
+   `forge\retours\RETOURS-<AAAAMMJJ><indice>.md` d'après `gabarits\RETOURS-FORGES.md` (ids qui
+   continuent la séquence des lots précédents, confirmations positives incluses, statut
+   `a_remettre`) — puis `run_close` au ledger avec le bilan (étapes, verdicts d'oracles,
+   escalades, retours), et synthèse à l'humain **avec le chemin du lot à remettre**. Hors run,
+   toute inspection/incident produit son propre lot dans le même dossier — un fichier par lot,
+   jamais modifié après remise.
 
 **Contrat « prêt client »** (les seuls critères — tous mesurables, aucun « optimal »/« confiance ») :
 oracles des étapes 1-3 verts · forge-tests exit 0 ou 3 avec seuils de couverture et de mutation
@@ -122,7 +129,8 @@ premier produit réel). Entrant : les retours consignés au ledger du run préc�
 l'entrée du run N+1 — même projet, nouveau `run_open` chaîné (champ `run_precedent`).
 Le run de version commence par le **rattrapage du socle** : `oracle-conformite-projet` sur le
 projet, chaque FAIL corrigé (c'est ainsi que les produits antérieurs aux règles se mettent en
-conformité — jamais en masse silencieuse hors run). Étapes rejouées **en delta** :
+conformité — jamais en masse silencieuse hors run). Son entrant inclut les lots de
+`forge\retours\` non encore traités. Étapes rejouées **en delta** :
 - conception : exigences nouvelles/modifiées dans `EXIGENCES.json` (ids retirés via
   `identifiants_retires`, jamais réaffectés), oracles rejoués sur le référentiel entier ;
 - design : seuls les écrans touchés, oracles sur les artefacts modifiés ;

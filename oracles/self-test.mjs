@@ -25,7 +25,8 @@ const check = (nom, fn) => { try { fn(); console.log(`  [PASS] ${nom}`); pass++;
 
 // ---- fixture VERTE : projet conforme aux 17 règles ------------------------------------------
 const verte = mkdtempSync(join(tmpdir(), "conf-verte-"));
-for (const d of ["input", "output", "docs", "forge", "output/Old"]) mkdirSync(join(verte, d), { recursive: true });
+for (const d of ["input", "output", "docs", "forge", "forge/retours", "output/Old"]) mkdirSync(join(verte, d), { recursive: true });
+writeFileSync(join(verte, "forge", "retours", "RETOURS-FORGES.md"), "gabarit\n");
 writeFileSync(join(verte, "CLAUDE.md"),
   "# Produit\n## Routage forge — obligatoire\nvalider : forge_tests\névoluer : run de version\ndéployer : MEP\n");
 writeFileSync(join(verte, "README.md"), "# Produit\nDémarrage : 2 commandes.\n");
@@ -59,7 +60,7 @@ check("rouge : chaque règle attendue se déclenche, FAIL exit 1", () => {
   const { exit, rapport } = lance(rouge);
   if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
   const declenchees = new Set(rapport.findings.filter((f) => f.statut === "FAIL").map((f) => f.regle));
-  for (const attendue of ["R-1", "R-3", "R-4", "R-6", "R-7", "R-8", "R-10", "R-11", "R-12", "R-13"])
+  for (const attendue of ["R-1", "R-3", "R-4", "R-6", "R-7", "R-8", "R-10", "R-11", "R-12", "R-13", "R-18"])
     if (!declenchees.has(attendue)) throw new Error(`règle ${attendue} non déclenchée sur la fixture rouge`);
 });
 
