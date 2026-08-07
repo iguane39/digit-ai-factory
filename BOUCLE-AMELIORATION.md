@@ -71,6 +71,28 @@ le backlog, chaque forge vérifiée par sa recette native puis rejouée par l'or
   forge-tests (30 erreurs préexistantes, dont des défauts PLANTÉS du banc — les corriger
   fausserait la recette).
 
+## 07/08/2026 — cahiers de tests vivants + dashboard d'exécution + boucle de fermeture
+
+Campagne sur prompt humain amélioré (L99). **forge-tests** (5 commits) : cahiers fonctionnel/
+technique DÉRIVÉS et scellés sha256 (exhaustivité opposable : couvert-ou-nommé, chapitres
+dérivés du registre des adaptateurs), jeux de données synthétiques à garde-fou levant (6 motifs
+de refus, domaines `.test`), **`actions[]` ternaire au rapport** (auto_ia / manuelle_dev /
+manuelle_utilisateur × etape_cible development/tests-suite/design/mep-config/forge), dashboard
+HTML autonome 6 onglets à source unique (totaux recomparés au rapport — un total faux est
+détecté en recette ; check_html + render_page PASS, contrastes et débordements mobiles corrigés
+par render_page), `--precedent` pour la tendance, `--reprendre` régénère les livrables.
+Recette : 52 vérifications nouvelles chacune avec son rouge, S-01 tenu, rejouée par
+l'orchestrateur. **steering** : boucle de fermeture bornée multi-étapes (3 cycles, G-2,
+re-audit complet, défaut d'auditeur → canal lots), DOSSIER-MEP embarque dashboard + actions
+utilisateur. Preuve ASD (lecture seule 169/169) : 207 éléments fonctionnels / 204 cas /
+3 non couverts nommés ; 38 exigences orphelines nommées ; audit dégradé DÉCLARÉ (un agent
+travaillait sur le produit — v0.3.0 ; audit complet à rejouer projet libre).
+
+**Retour candidat né de la campagne (RT-13, majeur)** : sous `FORGE_TESTS_SANS_EXECUTION=1`,
+`qualification.qualifier` attribue `FORGE_TESTS_QUALIF_URL` comme champ manquant à TOUS les
+pans SKIP (data/api/migrations compris) — le mécanisme doit préférer le `CHAMPS_REQUIS` propre
+au pan. Conséquence constatée : 16 actions manuelle_utilisateur d'ASD demandent une URL à tort.
+
 ## 06/08/2026 (soir) — lot 03 : couverture au-dessus des standards + précisions de perception
 
 Source : `input/RETOURS-FORGES-03.md` + campagne pré-rédigée par le run produit
