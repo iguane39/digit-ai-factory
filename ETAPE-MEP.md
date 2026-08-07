@@ -65,8 +65,12 @@ Le résultat qualif (couverture, non-testables soldés) entre au dossier de MEP.
 La mise en **production** exige un GO humain explicite, donné sur `DOSSIER-MEP.md`, qui contient :
 
 - les verdicts d'oracles des 5 étapes (avec références ledger `seq`) ;
-- le rapport forge-tests (couvertures, mutation, findings, pans non couverts) et le verdict de
-  la revue graphique d'implémentation (étape 5 bis, écarts à la promesse soldés ou acceptés) ;
+- le rapport forge-tests (couvertures, mutation, findings, pans non couverts), le **dashboard
+  de tests** (copie datée dans `output\`) et la liste `actions[manuelle_utilisateur]` extraite
+  du rapport — chaque saisie attendue de l'utilisateur (champs, où, pourquoi) pour compléter
+  les tests restants ; à réception, `--reprendre` rejoue les seuls tests concernés et le
+  dashboard est régénéré ;
+- le verdict de la revue graphique d'implémentation (étape 5 bis, écarts soldés ou acceptés) ;
 - le résultat des smoke tests staging (M-3), du test de rollback (M-4) et de l'audit qualif
   populée (§3 bis — non-testables soldés ou listés avec leur raison) ;
 - les limites déclarées du run (modes dégradés, `non_juge`, hypothèses prises) ;
