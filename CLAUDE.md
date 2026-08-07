@@ -92,8 +92,21 @@ dans le projet produit : artefacts d'orchestration sous `forge\`, code du produi
 5. **Étape tests** (mode natif) :
    `uv run python -m forge_tests <racine-produit> --json` depuis `c:\dev\digit-ai-forge-tests`,
    stdout capturé et persisté dans `etapes\tests\rapport-forge-tests.json`. Exit 0 = PASS,
-   3 = PARTIEL acceptable (consigner les pans non couverts), 1 = FAIL → retour à l'étape
-   development (max 3 allers-retours, puis diagnostic).
+   3 = PARTIEL acceptable (consigner les pans non couverts), 1 = FAIL → boucle de fermeture.
+   Ajouter `--livrables etapes\tests\livrables\` : cahiers de tests (fonctionnel, technique) +
+   jeux de données synthétiques + dashboard HTML — copiés datés dans `output\` (règle 16).
+   **Boucle de fermeture bornée** : chaque item `actions[]` du rapport porte son `etape_cible` ;
+   router les `auto_ia` — `development` (code, câblage), `tests-suite` (cas générés à adopter,
+   assertions, jeux de données — exécuté sous les gates de development, sur propositions de la
+   forge), `design` (état/écran manquant à la promesse → artefacts design puis delta
+   development), `mep-config` (variable, peuplement — jamais dans le code), `forge` (défaut de
+   l'AUDITEUR → sort de la boucle produit, part au lot de retours — on ne corrige jamais le
+   produit pour contourner un bug de la forge). Chaque cycle se clôt par un RE-AUDIT COMPLET.
+   **Au plus 3 cycles toutes étapes confondues** ; garde G-2 absolue : jamais d'assertion
+   assouplie ni de seuil requalifié — un échec résistant = retour consigné avec diagnostic.
+   Les items `manuelle_dev` et `manuelle_utilisateur` sont listés avec leur attendu détaillé
+   (dashboard, onglet Actions) — l'objectif : maximiser l'auto-traité, ne laisser en manuel
+   que l'irréductible.
    **5 bis. Revue graphique d'implémentation** (en PARALLÈLE de l'étape tests — regards
    indépendants : la fonction pour tests, la forme ici) : mode « critique d'implémentation »
    de forge-design (`skills\critique-le-design\references\critique-implementation.md`) —
