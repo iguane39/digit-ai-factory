@@ -69,13 +69,17 @@ dans le projet produit : artefacts d'orchestration sous `forge\`, code du produi
    **Valider** : `node c:\dev\digit-ai-forge-conception\oracles\oracle-{exigences,tracabilite,surface,claims}.mjs <EXIGENCES.json>`.
    Sous le seuil de suffisance → `bloque_question` : écrire `QUESTIONS.md`, suspendre.
 3. **Étape design** (mode dégradé, oracles natifs) : appliquer la méthode `systeme-de-marque`
-   (→ `tokens.css` + `MARQUE.md` + page témoin) puis, si le produit a une UI, `ameliore-le-design`
+   (→ `tokens.css` + `MARQUE.md` + page témoin, puis `DESIGN.md` dérivé :
+   `node <design>\skills\systeme-de-marque\scripts\generer-design-md.mjs --tokens … --marque …
+   --nom <Produit> --sortie etapes\design\DESIGN.md` — la charte consolidée, régénérée à toute
+   évolution) puis, si le produit a une UI, `ameliore-le-design`
    (→ maquette HTML autonome). Champs `ton` et `contraintes reprises` non dérivables → question
    humaine si absents du brief. **Valider** :
    `node c:\dev\digit-ai-forge-design\oracles\run-oracles-design.mjs <html> --tokens <tokens.css> --json-only`.
 4. **Étape development** (mode dégradé — `conductor` inutilisable en headless, dette D-V1) :
-   construire le produit à la racine du projet à partir de `EXIGENCES.json` (périmètre MVP) et
-   de `tokens.css`. Discipline : modifications chirurgicales, simplicité d'abord, chaque exigence
+   construire le produit à la racine du projet à partir de `EXIGENCES.json` (périmètre MVP),
+   de `tokens.css` et de `DESIGN.md` (copié dans `design\DESIGN.md` du produit — c'est le
+   fichier que le gate design de forge-development linte). Discipline : modifications chirurgicales, simplicité d'abord, chaque exigence
    MVP tracée vers son implémentation et son test. **Discipline d'auditabilité** (le produit naît
    auditable — cause du seul aller-retour du premier produit réel, retours RS-2/RT-3) : app
    exposée en instance module (`app.main.app`) et exercée telle quelle par la suite ; couche SQL
