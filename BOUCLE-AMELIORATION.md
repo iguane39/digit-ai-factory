@@ -84,10 +84,12 @@ oracle-motion complet jamais committé · MISSION.md orpheline · archive pilote
 reprise idempotente jamais exercée · CLAUDE.md ×3,4 sans plafond · auto-violation D-02 chez
 organization. **Nouvelles forges** : forge-ops ADMISE candidate (trou prouvé : MEP sans forge,
 déploiement artisanal, qualif sans instances outillées) · forge-contenu faible (à re-proposer
-sur preuve) · securite/docs/data/migration écartées nominativement. **Questions de mandat
-ouvertes** : Q-A (conductor : réveiller ou déclasser — reco déclasser), Q-B (gouvernance :
-organization propose / steering encode — reco), Q-C (quelles campagnes du top 10).
-Rien mis en œuvre — revue à décision.
+sur preuve) · securite/docs/data/migration écartées nominativement. **Décisions humaines du 08/08** : **Q-A** — le conductor RESTE (décision : « il a été utilisé
+pour ASDMailManager2, on laisse » — statut actif côté produit, l'item « trancher » sort du top
+10 ; D-V1 reste au backlog pour le jour où le steering voudra l'invoquer en headless).
+**Q-B** — « organization organise, steering pilote » : organization = atelier amont des
+conventions, steering = décideur-encodeur-vérificateur (encodé au CLAUDE.md). **Q-C** — top 10
+re-présenté à décision (voir rapport, ajusté post-Q-A).
 
 ## 08/08/2026 — forge-seo et forge-organization au référentiel
 
