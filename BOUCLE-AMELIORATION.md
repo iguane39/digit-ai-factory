@@ -71,6 +71,24 @@ le backlog, chaque forge vérifiée par sa recette native puis rejouée par l'or
   forge-tests (30 erreurs préexistantes, dont des défauts PLANTÉS du banc — les corriger
   fausserait la recette).
 
+## 08/08/2026 (soir) — Revue stratégique de l'écosystème (audit delta, 8 périmètres)
+
+Rapport : `output\Digit-AI - Revue Forge - Écosystème - 20260808a.md` — santé re-exécutée 8/8
+(sauf self-test quality-oracles : 3 échecs repo / 6 installation), modèle de scorage durable
+(GAIN×PREUVE÷EFFORT), test d'admission des nouvelles forges. **Top 10 scoré au rapport** —
+têtes : trancher le statut du conductor (10,0), RT-13 (8,0), régression CRLF SKILL.md (6,0),
+audit complet sur projet libre (4,0), versions_forges jamais consignés au produit réel (4,0).
+**Candidats nouveaux au backlog** : sémantique du registre de dette tests (« resolue » ≠
+corrigé, 0 ok/89) · conductor dormant (Q-A) · dérive repo↔installation prouvée 2.6.1/2.9.1 ·
+oracle-motion complet jamais committé · MISSION.md orpheline · archive pilote hors git ·
+reprise idempotente jamais exercée · CLAUDE.md ×3,4 sans plafond · auto-violation D-02 chez
+organization. **Nouvelles forges** : forge-ops ADMISE candidate (trou prouvé : MEP sans forge,
+déploiement artisanal, qualif sans instances outillées) · forge-contenu faible (à re-proposer
+sur preuve) · securite/docs/data/migration écartées nominativement. **Questions de mandat
+ouvertes** : Q-A (conductor : réveiller ou déclasser — reco déclasser), Q-B (gouvernance :
+organization propose / steering encode — reco), Q-C (quelles campagnes du top 10).
+Rien mis en œuvre — revue à décision.
+
 ## 08/08/2026 — forge-seo et forge-organization au référentiel
 
 Deux forges ajoutées (inventaires exhaustifs au dossier INVENTAIRE.md §6-7) : forge-seo
