@@ -6,8 +6,11 @@ conception → design → development → tests → MEP, avec agents en support 
 Deux forges hors pipeline (ajoutées le 08/08) : **forge-seo** — audit/stratégie SEO post-MEP,
 récurrente, uniquement sur mandat humain explicite (sa doctrine interdit le déclenchement
 automatique ; invocation : contrat §5) ; **forge-organization** — doctrine transverse des
-conventions (D-01→D-12), consultée comme référence, recouvrement avec REGLES-PROJET.md en
-attente de réconciliation.
+conventions (D-01→D-12). Gouvernance tranchée le 08/08 (décision humaine Q-B) :
+**organization organise, steering pilote** — organization est l'atelier amont qui inventorie
+et propose les conventions ; le steering décide, les encode (`REGLES-PROJET.md`) et les fait
+respecter (oracle conformité). Une proposition d'organization devient une règle par décision
+humaine au steering, jamais automatiquement.
 
 **Résolution des chemins** : la racine des forges est `$FORGE_ROOT` si défini, sinon le dossier
 parent de ce dépôt (installation type : `~/.digit-ai-forge`, posée par la phase 0 de
