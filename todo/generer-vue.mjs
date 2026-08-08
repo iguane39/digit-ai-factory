@@ -20,6 +20,7 @@ for (const e of lire(SRC)) {
   if (e.ts > tsMax) tsMax = e.ts;
   if (e.ev === "creation") etats.set(e.id, { ...e });
   else if (e.ev === "maj" && etats.has(e.id)) Object.assign(etats.get(e.id), e);
+  // ev "ingestion" : trace d'idempotence, sans effet sur la vue
 }
 const archives = lire(ARC);
 const ORDRE_STATUT = ["en_cours", "decide", "candidat", "corrige", "ecarte"];

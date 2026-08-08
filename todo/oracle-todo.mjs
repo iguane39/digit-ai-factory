@@ -42,6 +42,7 @@ function lire(fichier) {
 function replier(evenements, ou) {
   const etats = new Map();
   for (const e of evenements) {
+    if (e.ev === "ingestion") { if (!e.lot_sha) ko("R1", `${ou}:${e.ligne}`, "ingestion sans lot_sha"); continue; }
     if (!e.id || !/^TF-\d{4}$/.test(e.id)) { ko("R2", `${ou}:${e.ligne}`, `id invalide : ${e.id}`); continue; }
     if (e.ev === "creation") {
       if (etats.has(e.id)) { ko("R2", e.id, "seconde creation pour le même id"); continue; }

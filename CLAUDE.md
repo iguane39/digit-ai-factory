@@ -146,12 +146,14 @@ dans le projet produit : artefacts d'orchestration sous `forge\`, code du produi
    **GO humain** — la production n'est jamais lancée sans lui ; sans GO, clore en
    `pret_production_en_attente_GO` (état de succès).
 7. **Clore le run** : compiler les entrées `type: retour` du ledger en un **lot de retours** —
-   `forge\retours\RETOURS-<AAAAMMJJ><indice>.md` d'après `gabarits\RETOURS-FORGES.md` (ids qui
-   continuent la séquence des lots précédents, confirmations positives incluses, statut
-   `a_remettre`) — puis `run_close` au ledger avec le bilan (étapes, verdicts d'oracles,
-   escalades, retours), et synthèse à l'humain **avec le chemin du lot à remettre**. Hors run,
-   toute inspection/incident produit son propre lot dans le même dossier — un fichier par lot,
-   jamais modifié après remise.
+   `forge\retours\RETOURS-<AAAAMMJJ><indice>.md` + **sidecar `.tf.jsonl`** (candidatures SANS
+   id, gabarit `gabarits\RETOURS-FORGES.md`) avec contrôle de complétude ledger↔lot — puis
+   **remise automatique** : copie des deux fichiers dans `<steering>\input\`. Ensuite
+   `run_close` au ledger avec le bilan, et synthèse à l'humain. Hors run, toute
+   inspection/incident produit son propre lot — un fichier par lot, jamais modifié après
+   remise. **À réception d'un sidecar dans `input\`** (côté steering) :
+   `node todo\ingerer-lot.mjs <sidecar>` — validation atomique, ids frappés, tout en
+   `candidat` (l'automatique s'arrête là : la décision reste humaine), oracle + vue régénérée.
 
 **Contrat « prêt client »** (les seuls critères — tous mesurables, aucun « optimal »/« confiance ») :
 oracles des étapes 1-3 verts · forge-tests exit 0 ou 3 avec seuils de couverture et de mutation

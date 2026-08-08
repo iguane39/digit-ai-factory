@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=15689047e52a archive=e3b0c44298fc · dernier événement: 2026-08-08T21:30:00Z -->
+     sceaux: actifs=0db9ad70cffe archive=e3b0c44298fc · dernier événement: 2026-08-08T21:30:00Z -->
 
-**41 actifs** (candidat 41 · décidé 0 · en cours 0 · corrigé 0 · écarté 0) · **0 archivés**.
+**48 actifs** (candidat 48 · décidé 0 · en cours 0 · corrigé 0 · écarté 0) · **0 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -66,9 +66,16 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0042 | candidat | 10 | livrables.py : dette() écrit noeud_id en chaîne, le schéma exige un entier | **oui** — Pipeline officiel bloqué sur la mission livrée : 11 écarts au schéma, aucun livrable écrit. Contourné à la main pour produire le rapport. |
+| TF-0043 | candidat | 8 | crawler.py ne lit pas sitemap.xml : l'inventaire du site est celui du graphe de liens | **oui** — Sur auxportesdelabaie.fr le crawler annonce 79 URLs découvertes ; le sitemap en déclare 286, soit 73 % du site absent de l'inventaire. |
+| TF-0044 | candidat | 8 | crawler.py : la métrique pages_orphelines ne peut structurellement pas être non nulle | **oui** — « pages orphelines : 0 » affiché sur un site à 208 orphelines, découvertes seulement en confrontant sitemap et graphe de liens hors outil. |
+| TF-0045 | candidat | 6 | rapport_html.py lit actions-*.csv sans dialecte : un CSV en points-virgules sort en n/d | **oui** — 10 actions sorties intégralement en « n/d » dans une version du rapport, qui se présentait par ailleurs comme complète. |
+| TF-0048 | candidat | 4 | Une évolution de la grille sans table de correspondance réassigne silencieusement les constats | **oui** — 9 fiches sur 13 reprises se sont révélées assignées au mauvais nœud — performance serveur dans Canonical, données structurées dans Performance, GA4 dans Génération De Pages. Détecté par recoupement manuel, aucun outil ne le signalait. |
 | TF-0028 | candidat | 3 | validate --mission contrôle schema_version | **oui** — Observée sur la mission réelle livrée |
+| TF-0046 | candidat | 3 | rapport_html.py échappe le markdown des fiches au lieu de le rendre | **oui** — Tableaux de preuve illisibles dans le rapport ; fiches réécrites en prose et convertisseur de tableaux développé côté mission pour contourner. |
 | TF-0026 | candidat | 2 | --json sur validate.py | non |
 | TF-0027 | candidat | 2 | Trancher le working tree en cours | non |
+| TF-0047 | candidat | 2 | Le « blocage principal » de la synthèse est choisi par l'ordre de la grille, pas par la gravité | **oui** — Sur la mission, le blocage affiché n'était pas le principal, et le texte repris renvoyait à « cette fiche » et à une action non encore introduite. |
 | TF-0029 | candidat | 1 | Générateurs des 3 livrables manquants | non |
 | TF-0030 | candidat | 0.8 | Généraliser les moteurs ad hoc des missions | non |
 

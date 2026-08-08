@@ -16,6 +16,14 @@ aller-retour ou une découverte par lecture de code) · **mineur** (confort/pré
 Si un retour se rapporte à un item du registre TODO-FORGE du steering, citer son id
 (`TF-xxxx`) — chaque retour intégré recevra le sien. **Les forges aussi** peuvent déposer un
 lot avec ce gabarit, ciblant n'importe quelle autre forge (remise : `input\` du steering).
+
+**Sidecar machine (obligatoire depuis le 08/08)** : à côté de ce lot, un fichier
+`RETOURS-<AAAAMMJJ><indice>.tf.jsonl` — une ligne JSON par élément visant une forge :
+`{"schema":1, "titre":…, "contenu":…, "demandeur":"<produit ou forge>", "source":"<lot +
+seq ledger>", "date_demande":…, "forges_cibles_initiales":[…], "score":{gain,preuve,effort}
+si estimable, "preuve_du_cout":…}`. **JAMAIS d'id** : les ids TF sont frappés à l'ingestion
+par le steering. Le sidecar est ce qui rend la remontée automatique — le `.md` reste la
+lecture humaine.
 **Ids uniques par produit** : préfixe par forge (RT/RC/RD/RV/RA/RS) + numéro **jamais
 réutilisé** — continuer la séquence des lots précédents du même produit.
 
