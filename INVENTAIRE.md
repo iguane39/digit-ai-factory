@@ -132,6 +132,46 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
 
 ---
 
+## 6. digit-ai-forge-seo — `c:\dev\digit-ai-forge-seo` *(ajoutée le 08/08)*
+
+- **Rôle** : audit et stratégie SEO — grille de 17 branches / 87 nœuds, scoring, 7 garde-fous
+  anti-hallucination. **Post-MEP et récurrente** (runs de suivi avec diff de snapshots),
+  prestation client facturée — pas un maillon du build. Exige un site servi avec historique
+  (GSC/GA en exports déposés) ; jamais de code source.
+- **Point d'entrée réel** : CLI Python stdlib — `scripts/new_mission.py` (crée l'étude CHEZ le
+  client : `<projet>/seo/` avec METHODE.md estampillée, 104 dossiers, 87 fiches),
+  `scripts/validate.py` (9 contrôles forge / 5 contrôles mission, read-only, exit 0/1),
+  `scripts/rapport_html.py --verifier` (rapport HTML autonome + 7 contrôles). **Refus délibéré
+  de tout déclenchement automatique** (pas de SKILL.md — « un audit commence par une commande
+  explicite ») : à respecter par l'orchestrateur.
+- **Oracles** : `validate.py` exécuté 9/9 (forge) et 5/5 (mission réelle) ; refus de générer un
+  rapport partiel (87 nœuds exigés) ; refus de mission dans la forge elle-même.
+- **Maturité** : 9 commits (un jour), remote GitHub synchronisé, **une mission réelle complète
+  livrée** (auxportesdelabaie.fr : HTML 6ᵉ itération, CSV 24 colonnes, snapshot 87 nœuds,
+  67 mesurés / 20 hors périmètre).
+- **Manques** : 3 livrables sur 5 sans générateur (audit.md, roadmap, dette-instrumentation) ;
+  les moteurs des étapes 2-5 vivent en scripts ad hoc chez la mission (chemins en dur, non
+  généralisés) ; snapshot en dérive de version vs son schéma (1.0.0 vs const 1.1.0), jamais
+  validé machine ; pas de sortie `--json` ; décisions D-08→D-12 en statut « proposé » chez
+  forge-organization.
+
+## 7. digit-ai-forge-organization — `c:\dev\digit-ai-forge-organization` *(ajoutée le 08/08)*
+
+- **Rôle** : **chantier de doctrine transverse** — pas une forge de production. Inventaire des
+  conventions observées sur 52 dossiers de `c:\dev`, 12 décisions D-01→D-12 (nommage, Old\,
+  input/output, CLAUDE.md point d'entrée…), étude P-10 (ingénierie des exigences EARS/ISO
+  29148 → 3 contrôles E7-E9 proposés à forge-conception), et un composant filtres-tableau
+  (le seul exécutable — oracle vérifié dans les deux sens, fixtures rouge/verte).
+- **Point d'entrée** : aucun — piloté en conversation, les documents sont les points d'accroche.
+  Le projet viole ses propres décisions (pas de CLAUDE.md malgré D-05, doctrine à la racine
+  malgré D-06) — jeune d'un jour, auto-déclaré « partiel », Phase 3 (vérificateur de
+  conventions machine) jamais démarrée, 3 questions ouvertes (Q3, Q3-bis, Q4).
+- **Maturité** : mis sous git et poussé le 08/08 par le steering (aucun historique antérieur).
+  Contradiction d'état non arbitrée (composant « installé » vs « rien n'a été installé »).
+- **⚠ Recouvrement à réconcilier** : ses décisions D-01→D-12 et le `REGLES-PROJET.md` du
+  steering (17 règles décidées le 06/08) couvrent le même domaine par deux sources — candidat
+  de réconciliation consigné au backlog.
+
 ## Lecture transverse pour le steering
 
 | Forge | Point d'entrée machine | Oracles exécutables | A déjà produit un livrable réel |
@@ -141,6 +181,8 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
 | development | partiel (CLI, mais HITL + pas de sortie machine) | **oui** (double gate CI) | non (fakes) |
 | tests | **oui** (CLI exit 0/1/3) | oui (bancs rouge/vert) | échec au 1er réel |
 | agents | non (conversationnel) | oui (gates + admission) | oui (propale P4, au 2e run) |
+| seo *(08/08)* | **oui** (CLI Python, exit 0/1) | oui (validate 9/9 + 5/5, refus de rapport partiel) | **oui** (mission client complète) |
+| organization *(08/08)* | non (conversationnel) | partiel (1 oracle vérifié, pas de self-test projet) | oui (doctrine + composant) |
 
 Trois conséquences d'architecture :
 1. **Le steering est le seul conducteur légitime** — Conception l'interdit chez elle, Development l'ignore,

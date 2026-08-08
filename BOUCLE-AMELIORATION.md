@@ -71,6 +71,16 @@ le backlog, chaque forge vérifiée par sa recette native puis rejouée par l'or
   forge-tests (30 erreurs préexistantes, dont des défauts PLANTÉS du banc — les corriger
   fausserait la recette).
 
+## 08/08/2026 — forge-seo et forge-organization au référentiel
+
+Deux forges ajoutées (inventaires exhaustifs au dossier INVENTAIRE.md §6-7) : forge-seo
+(post-MEP récurrente, CLI natif, une mission client réelle livrée, validate 9/9 vérifié) et
+forge-organization (doctrine transverse, mise sous git + GitHub privé par le steering le
+08/08). Bootstrap étendu à 7 forges avec preuves. **Candidats consignés** : réconciliation
+D-01→D-12 (organization) ↔ REGLES-PROJET.md (steering) — deux sources de gouvernance sur le
+même domaine ; côté seo : D-S1→D-S4 (générateurs manquants, snapshot non validé machine,
+moteurs ad hoc chez la mission à généraliser) — au fil des lots.
+
 ## 07/08/2026 — cahiers de tests vivants + dashboard d'exécution + boucle de fermeture
 
 Campagne sur prompt humain amélioré (L99). **forge-tests** (5 commits) : cahiers fonctionnel/
