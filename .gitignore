@@ -1,3 +1,6 @@
 runs/
 *.log
 .env
+*.oracles.json
+*.oracles-cache.json
+*.oracles-historique.jsonl
