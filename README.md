@@ -52,10 +52,11 @@ uniquement sur GO humain**, donné sur un dossier de preuve généré (DOSSIER-M
 
 ## Limites assumées
 
-- Les cinq forges sont invoquées par **chemins locaux** (racine = `$FORGE_ROOT` ou le parent de
-  ce dépôt) ; chacune a son dépôt GitHub privé sous `github.com/iguane39`, et `bootstrap.mjs`
-  équipe un poste vierge. Les clones locaux restent la source d'exécution — pas de forge
-  invoquée à distance.
+- Les **sept** forges (pipeline : conception, design, development, tests, agents ; hors
+  pipeline : seo — post-MEP récurrente sur mandat —, organization — doctrine transverse) sont
+  invoquées par **chemins locaux** (racine = `$FORGE_ROOT` ou le parent de ce dépôt) ; chacune
+  a son dépôt GitHub privé sous `github.com/iguane39`, et `bootstrap.mjs` équipe un poste
+  vierge. Les clones locaux restent la source d'exécution — pas de forge invoquée à distance.
 - Le run pilote portait sur un produit volontairement petit (backend + page unique) ; la maquette
   design complète (9 écrans) et les cibles de déploiement cloud n'ont pas encore été exercées.
 - Les améliorations des forges sont des **propositions en diff** (backlog :

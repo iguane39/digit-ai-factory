@@ -23,6 +23,8 @@ const FORGES = [
   { nom: "digit-ai-forge-development", preuve: "digit-ai-forge-development/pyproject.toml" },
   { nom: "digit-ai-forge-tests", preuve: "forge_tests/__main__.py" },
   { nom: "digit-ai-forge-agents", preuve: ".claude/skills/forge-agents/SKILL.md" },
+  { nom: "digit-ai-forge-seo", preuve: "scripts/validate.py" },
+  { nom: "digit-ai-forge-organization", preuve: "output/composant-filtres-tableau/oracle-filtres-tableau.mjs" },
 ];
 
 const args = process.argv.slice(2);

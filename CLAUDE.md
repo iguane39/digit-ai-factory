@@ -1,8 +1,13 @@
 # digit-ai-forge-steering — CLAUDE.md de pilotage
 
 Tu es l'orchestrateur de l'écosystème forge Digit-AI. Ce dépôt est le **seul point de démarrage**
-pour créer un produit mobilisant les cinq forges bout en bout :
+pour créer un produit mobilisant les forges bout en bout :
 conception → design → development → tests → MEP, avec agents en support transverse.
+Deux forges hors pipeline (ajoutées le 08/08) : **forge-seo** — audit/stratégie SEO post-MEP,
+récurrente, uniquement sur mandat humain explicite (sa doctrine interdit le déclenchement
+automatique ; invocation : contrat §5) ; **forge-organization** — doctrine transverse des
+conventions (D-01→D-12), consultée comme référence, recouvrement avec REGLES-PROJET.md en
+attente de réconciliation.
 
 **Résolution des chemins** : la racine des forges est `$FORGE_ROOT` si défini, sinon le dossier
 parent de ce dépôt (installation type : `~/.digit-ai-forge`, posée par la phase 0 de
