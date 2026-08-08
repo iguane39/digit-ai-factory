@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=0db9ad70cffe archive=e3b0c44298fc · dernier événement: 2026-08-08T21:30:00Z -->
+     sceaux: actifs=81022d5a14b4 archive=e3b0c44298fc · dernier événement: 2026-08-08T21:30:00Z -->
 
-**48 actifs** (candidat 48 · décidé 0 · en cours 0 · corrigé 0 · écarté 0) · **0 archivés**.
+**49 actifs** (candidat 49 · décidé 0 · en cours 0 · corrigé 0 · écarté 0) · **0 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -85,6 +85,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-0035 | candidat | 4 | versions_forges/run_precedent réellement consignés | **oui** — 0/76 entrées sur ASD malgré 2 versions livrées |
 | TF-0036 | candidat | 3 | Archive du run pilote sous git | non |
+| TF-0049 | candidat | 3 | TODO-FORGE : l'écriture directe contourne l'écrivain unique — la détecter par oracle | **oui** — 7 créations sans trace d'ingestion dans le registre réel |
 | TF-0037 | candidat | 1.5 | Plafond de taille CLAUDE.md + alerte | non |
 | TF-0038 | candidat | 1.3 | Exercer une vraie reprise de run interrompu | non |
 | TF-0039 | candidat | 1 | Circuit organization→steering opérationnel | non |
