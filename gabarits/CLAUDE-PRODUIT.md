@@ -21,7 +21,15 @@ elle s'arrête et le dit.
 | Corriger une anomalie, faire évoluer | consigner le retour au ledger (`type: retour`) puis **run de version** : rouvrir une session ici, coller `PROMPT-PRODUIT.md` (brief delta) ou « reprends le run » | éditer le code et livrer hors run |
 | Déployer | étape MEP du steering : staging → qualif populée → **GO humain** (`forge\DOSSIER-MEP.md`) | `docker push` / mise en prod à la main |
 | Juger le rendu visuel | mode « critique d'implémentation » de forge-design (produit vs promesse du run) | verdict à l'œil |
-| Signaler un défaut / retour sur les forges | nouveau lot `forge\retours\RETOURS-<AAAAMMJJ><indice>.md` (gabarit dans `forge\retours\`), à remettre au steering (copie dans son `input\`) | retour oral perdu, ou modification d'un lot déjà remis |
+| Signaler un défaut / retour sur les forges | consigner AU MOMENT MÊME au ledger (`type: retour`, `destinataire: <forge>`) — pas de mémoire de fin de run | retour oral perdu, ou modification d'un lot déjà remis |
+
+**Remontée automatique vers le steering** : toute friction forge observée en session
+(convention découverte en lisant du code, faux positif d'oracle, aller-retour subi) se
+consigne immédiatement au ledger. À la clôture de tout run : compilation ledger → lot `.md`
++ **sidecar `.tf.jsonl`** (gabarit dans `forge\retours\`) avec contrôle de complétude — tout
+retour du ledger a sa candidature, sinon le run le déclare — puis **copie automatique des
+deux fichiers dans `<steering>\input\`**. Le geste humain de remise disparaît ; la décision
+humaine demeure (tout entre en candidat au registre TODO-FORGE).
 
 Boucle intérieure (libre, sans verdict) : `<commandes locales : pytest, ruff, serveur de dev…>`
 

@@ -60,6 +60,59 @@ for (const [nom, lignes] of rouges) {
   });
 }
 
+// ---- circuit d'ingestion (candidature → registre), sur registre TEMPORAIRE -----------------
+const ingerer = join(ICI, "ingerer-lot.mjs");
+const regT = join(T, "registre.jsonl");
+writeFileSync(regT, item({}) + "\n"); // TF-9001 existant → les ids frappés commencent à 9002
+const cand = (sur) => JSON.stringify({
+  schema: 1, titre: "friction X", contenu: "détail", demandeur: "produit-test",
+  source: "lot-fixture seq 4", date_demande: "2026-08-09",
+  forges_cibles_initiales: ["tests"], preuve_du_cout: "constatée en run", ...sur,
+});
+const side = join(T, "lot.tf.jsonl");
+writeFileSync(side, [cand({}), cand({ titre: "friction Y", score: { gain: 4, preuve: 2, effort: 2 } })].join("\n") + "\n");
+const shaReg = () => createHash("sha256").update(readFileSync(regT)).digest("hex");
+
+check("ingestion verte : 2 candidatures → 2 creations en candidat, ids frappés à la suite", () => {
+  execFileSync("node", [ingerer, side, "--registre", regT], { encoding: "utf8" });
+  const evs = readFileSync(regT, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
+  const crees = evs.filter((e) => e.ev === "creation" && e.id !== "TF-9001");
+  if (crees.length !== 2) throw new Error(`${crees.length} créations, attendu 2`);
+  if (crees[0].id !== "TF-9002" || crees[1].id !== "TF-9003") throw new Error(`ids ${crees.map((c) => c.id)} — frappage hors séquence`);
+  if (crees.some((c) => c.statut !== "candidat")) throw new Error("une création n'est pas en candidat — la gouvernance a sauté");
+  if (crees[1].score.valeur !== 4) throw new Error("score proposé mal calculé");
+  if (!evs.some((e) => e.ev === "ingestion" && e.lot_sha)) throw new Error("événement ingestion absent");
+});
+
+check("ingestion idempotente : ré-ingérer le même lot → 0 création, registre inchangé", () => {
+  const avant = shaReg();
+  const sortie = execFileSync("node", [ingerer, side, "--registre", regT], { encoding: "utf8" });
+  if (!sortie.includes("DÉJÀ INGÉRÉ")) throw new Error("l'idempotence n'a pas joué");
+  if (shaReg() !== avant) throw new Error("le registre a changé");
+});
+
+check("ingestion rouge : 1 ligne invalide → rejet ATOMIQUE motivé, registre intact", () => {
+  const mauvais = join(T, "mauvais.tf.jsonl");
+  writeFileSync(mauvais, [cand({}), cand({ titre: undefined })].join("\n") + "\n");
+  const avant = shaReg();
+  try { execFileSync("node", [ingerer, mauvais, "--registre", regT], { encoding: "utf8", stdio: "pipe" }); }
+  catch (e) {
+    if (e.status !== 1) throw new Error(`exit ${e.status} attendu 1`);
+    if (!String(e.stderr).includes("REJET ATOMIQUE")) throw new Error("rejet non motivé");
+    if (shaReg() !== avant) throw new Error("ingestion partielle — le registre a bougé malgré le rejet");
+    return;
+  }
+  throw new Error("aurait dû rejeter");
+});
+
+check("ingestion : une candidature portant un id est refusée (frappage = écrivain unique)", () => {
+  const avecId = join(T, "avec-id.tf.jsonl");
+  writeFileSync(avecId, cand({ id: "TF-0099" }) + "\n");
+  try { execFileSync("node", [ingerer, avecId, "--registre", regT], { encoding: "utf8", stdio: "pipe" }); }
+  catch (e) { if (e.status === 1) return; throw new Error(`exit ${e.status}`); }
+  throw new Error("aurait dû refuser");
+});
+
 // Déterminisme de la vue sur le registre RÉEL
 check("vue : 2 générations identiques (sha256) sur le registre réel", () => {
   execFileSync("node", [join(ICI, "generer-vue.mjs")], { encoding: "utf8" });
