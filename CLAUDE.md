@@ -44,7 +44,11 @@ TF-xxxx ») passe en `decide`. Intake : lots des produits (règle 18), **lots de
 (toute forge peut déposer un lot ciblant n'importe quelle forge — même gabarit, remise dans
 `input\`), demandes humaines directes. À chaque campagne : mettre à jour les items
 (date_correction, corrections_realisees, **gains_constates exigés à la clôture**,
-version_forge_corrigee, produits_beneficiaires) puis régénérer la vue. Consulter le registre
+version_forge_corrigee, produits_beneficiaires) puis régénérer la vue **et la page**
+(`generer-page.mjs` → `TODO.html`, consultation humaine : cases à décider + commentaires,
+export appliqué par `appliquer-export.mjs`). Écriture DIRECTE dans TODO.jsonl par une autre
+session : interdite — toute candidature passe par un sidecar + `ingerer-lot.mjs` (l'absence
+d'événement `ingestion` trahit le contournement — cf. TF-0049). Consulter le registre
 à l'ouverture de tout run. BOUCLE-AMELIORATION.md reste le journal narratif : il référence
 les ids TF, il ne duplique plus les listes.
 

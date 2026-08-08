@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digit-AI — TODO-FORGE · Registre d'amélioration</title>
+  <meta name="description" content="Vue interactive du registre TODO-FORGE : consultation, décisions et commentaires à exporter pour traitement par le steering.">
+  <meta name="theme-color" content="#2563EB">
+  <meta name="color-scheme" content="light">
+  <style>
+    :root {
+      --blue:#2563EB; --bg:#FAFBFF; --surface:#FFFFFF; --ink:#0F172A; --muted:#64748B;
+      --line:#E6EAF2; --amber:#B45309; --amber-fill:#FFFBEB; --teal:#0E9488; --teal-fill:#EFFDFB;
+      --green:#15803D; --green-fill:#F2FCF5; --r:12px; --r-sm:8px;
+      --head:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;
+      --sans:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+      --mono:"JetBrains Mono",ui-monospace,"Consolas",monospace;
+    }
+    *{box-sizing:border-box} html{-webkit-text-size-adjust:100%}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:16px}
+    .wrap{max-width:1100px;margin:0 auto;padding:32px 24px 64px}
+    h1,h2{font-family:var(--head);font-weight:800;line-height:1.2} h1{font-size:1.8rem;margin:0 0 .25em}
+    h2{font-size:1.25rem;font-weight:700;margin:1.6em 0 .5em}
+    code{font-family:var(--mono);font-size:.9em}
+    .meta{color:var(--muted);font-size:.85rem;margin:.4em 0 0}
+    .badge{font-family:var(--mono);font-size:.75rem;color:var(--muted);font-weight:400}
+    .scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+    table{border-collapse:collapse;width:100%;font-size:.92rem}
+    th{font-family:var(--head);font-weight:700;text-align:left;padding:10px 12px;border-bottom:2px solid var(--line);background:var(--surface)}
+    td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+    tr:last-child td{border-bottom:none}
+    .c-coche,.c-id,.c-score{white-space:nowrap} .c-comm{min-width:180px}
+    .statut{font-family:var(--mono);font-size:.78rem;padding:2px 8px;border-radius:999px;border:1px solid var(--line)}
+    .s-candidat{background:var(--surface)} .s-decide{background:var(--teal-fill);color:var(--teal)}
+    .s-en_cours{background:var(--amber-fill);color:var(--amber)} .s-corrige{background:var(--green-fill);color:var(--green)}
+    details summary{cursor:pointer} details p{margin:.5em 0 0}
+    textarea.commentaire{width:100%;font-family:var(--sans);font-size:.88rem;border:1px solid var(--line);border-radius:var(--r-sm);padding:6px 8px;resize:vertical;background:var(--surface);color:var(--ink)}
+    input.decider{width:18px;height:18px;accent-color:var(--blue)}
+    .barre{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 0;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    button#exporter{font-family:var(--head);font-weight:700;font-size:.95rem;background:var(--blue);color:#fff;border:none;border-radius:var(--r-sm);padding:10px 18px;cursor:pointer;min-height:44px}
+    button#exporter:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+    #bilan{color:var(--muted);font-size:.9rem}
+    footer{margin-top:40px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:16px}
+    @media (max-width:768px){.wrap{padding:16px 12px 48px} h1{font-size:1.4rem} table{font-size:.85rem} td,th{padding:6px 8px} .c-comm{min-width:120px}}
+    @media print{.barre,textarea,.decider{display:none}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>TODO-FORGE — registre d'amélioration</h1>
+      <p class="meta">49 actifs (candidat 49 · décidé 0 · en cours 0 · corrigé 0 · écarté 0) · 0 archivés · sceau source <code>81022d5a14b4</code> · dernier événement 2026-08-08T21:30:00Z</p>
+      <p>Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au steering — il sera appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
+    </header>
+    <div class="barre">
+      <button id="exporter" type="button">Exporter les décisions</button>
+      <span id="bilan" aria-live="polite">0 coché · 0 commentaire</span>
+    </div>
+    <main>
+    <section>
+      <h2 id="nouvelle">(nouvelle) <span class="badge">2</span></h2>
+      <div class="scroll"><table data-filterable>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0040" aria-label="Décider TF-0040"></td>
+          <td class="c-id"><code>TF-0040</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">2</td>
+          <td>
+            <details><summary><strong>Créer forge-ops (exploitation)</strong></summary>
+              <p>ADMISE au test : MEP sans forge, déploiement ASD artisanal, qualif sans instances outillées, canal production sans instrument. Verbes : déployer, exploiter, restaurer.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 5 × preuve 2 ÷ effort 5 · <strong>payé en réel</strong> — MEP portée par le steering faute de forge ; déploiement Railway artisanal</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0040" rows="1" aria-label="Commentaire TF-0040" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0041" aria-label="Décider TF-0041"></td>
+          <td class="c-id"><code>TF-0041</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">0.4</td>
+          <td>
+            <details><summary><strong>forge-contenu — à re-proposer sur preuve</strong></summary>
+              <p>Candidate FAIBLE : trou plausible (roadmap SEO sans producteur de contenu, voix MARQUE.md) mais jamais payé par un run. Attendre un lot qui le réclame.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 5</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0041" rows="1" aria-label="Commentaire TF-0041" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section>
+      <h2 id="agents">agents <span class="badge">5</span></h2>
+      <div class="scroll"><table data-filterable>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0021" aria-label="Décider TF-0021"></td>
+          <td class="c-id"><code>TF-0021</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">6</td>
+          <td>
+            <details><summary><strong>Régression CRLF digit-ai-page-html/SKILL.md</strong></summary>
+              <p>Seul SKILL.md en CRLF (repo + installation) : casse le parsing du frontmatter.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — 2 échecs réels du self-test quality-oracles constatés le 08/08</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0021" rows="1" aria-label="Commentaire TF-0021" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0024" aria-label="Décider TF-0024"></td>
+          <td class="c-id"><code>TF-0024</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">2.7</td>
+          <td>
+            <details><summary><strong>Script de sync/diff repo ↔ ~/.claude</strong></summary>
+              <p>Dérive prouvée dans les deux sens (registre 2.6.1 versionné vs 2.9.1 exécuté) : le repo n'est plus la source de ce qui s'exécute.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 3 · <strong>payé en réel</strong> — Constatée deux fois (05/08 et 08/08), dans les deux directions</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0024" rows="1" aria-label="Commentaire TF-0024" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0022" aria-label="Décider TF-0022"></td>
+          <td class="c-id"><code>TF-0022</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">2</td>
+          <td>
+            <details><summary><strong>Committer le travail du 08/08 (file-candidats, gabarit A0)</strong></summary>
+              <p>Usage réel de l'atelier non versionné — risque de perte.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0022" rows="1" aria-label="Commentaire TF-0022" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0023" aria-label="Décider TF-0023"></td>
+          <td class="c-id"><code>TF-0023</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">1.5</td>
+          <td>
+            <details><summary><strong>Réparer le self-test de l'installation (6 échecs)</strong></summary>
+              <p>visual/green préexistant, notebooklm sans frontmatter, data-quality-auditor déclaré ok mais absent.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 2</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0023" rows="1" aria-label="Commentaire TF-0023" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0025" aria-label="Décider TF-0025"></td>
+          <td class="c-id"><code>TF-0025</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">1</td>
+          <td>
+            <details><summary><strong>Statuer sur le skill méta dormant</strong></summary>
+              <p>Compilation d'agents + gates G1-G3 : aucun run depuis le 24/07 ; un run réel ou une dormance assumée documentée.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 3</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0025" rows="1" aria-label="Commentaire TF-0025" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section>
+      <h2 id="conception">conception <span class="badge">5</span></h2>
+      <div class="scroll"><table data-filterable>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0011" aria-label="Décider TF-0011"></td>
+          <td class="c-id"><code>TF-0011</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">2</td>
+          <td>
+            <details><summary><strong>Enregistrer les 4 oracles au registre quality-oracles</strong></summary>
+              <p>R-C4 : invisibles pour tout ré-audit externe via le registre central.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0011" rows="1" aria-label="Commentaire TF-0011" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0012" aria-label="Décider TF-0012"></td>
+          <td class="c-id"><code>TF-0012</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">2</td>
+          <td>
+            <details><summary><strong>Installer les 4 skills sous ~/.claude/skills</strong></summary>
+              <p>Chaîne invocable seulement en copiant les SKILL.md à la main.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0012" rows="1" aria-label="Commentaire TF-0012" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0013" aria-label="Décider TF-0013"></td>
+          <td class="c-id"><code>TF-0013</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">1.5</td>
+          <td>
+            <details><summary><strong>Exercer MISSION.md sur un run réel</strong></summary>
+              <p>La vue vers la SaaS Forge n'a aucun usage constaté (orpheline).</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 2</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0013" rows="1" aria-label="Commentaire TF-0013" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0014" aria-label="Décider TF-0014"></td>
+          <td class="c-id"><code>TF-0014</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">1.5</td>
+          <td>
+            <details><summary><strong>Manifeste + protocole machine « bloqué sous seuil »</strong></summary>
+              <p>R-C3 : le dernier manque d'invocabilité — l'état questions a/b/c n'est pas distinguable mécaniquement de « produit ».</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 2</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0014" rows="1" aria-label="Commentaire TF-0014" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0015" aria-label="Décider TF-0015"></td>
+          <td class="c-id"><code>TF-0015</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">1</td>
+          <td>
+            <details><summary><strong>Coder E7-E9 (EARS/ISO 29148) dans oracle-exigences</strong></summary>
+              <p>L'étude P-10 d'organization reste à l'état d'étude ; 3 contrôles proposés, zéro exécutable.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 3</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0015" rows="1" aria-label="Commentaire TF-0015" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section>
+      <h2 id="design">design <span class="badge">5</span></h2>
+      <div class="scroll"><table data-filterable>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0017" aria-label="Décider TF-0017"></td>
+          <td class="c-id"><code>TF-0017</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">4</td>
+          <td>
+            <details><summary><strong>Committer le chantier oracle-motion</strong></summary>
+              <p>Complet, testé, vert — 22 fichiers non committés : un clone livre 6 oracles, le poste en exécute 7. À faire par SA session (chantier concurrent vivant).</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 1</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0017" rows="1" aria-label="Commentaire TF-0017" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0016" aria-label="Décider TF-0016"></td>
+          <td class="c-id"><code>TF-0016</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">2</td>
+          <td>
+            <details><summary><strong>Rebuild + commit dist/*.skill</strong></summary>
+              <p>Les .skill packagés sont périmés de 4 évolutions fonctionnelles.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0016" rows="1" aria-label="Commentaire TF-0016" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0019" aria-label="Décider TF-0019"></td>
+          <td class="c-id"><code>TF-0019</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">1.5</td>
+          <td>
+            <details><summary><strong>Premier appel réel Gemini (lever R-D3)</strong></summary>
+              <p>NÉCESSITE UN GO HUMAIN EXPLICITE : API payante (garde-fou steering). Le juge (oracle-images) existe, le producteur n'a jamais appelé.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 2</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0019" rows="1" aria-label="Commentaire TF-0019" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0018" aria-label="Décider TF-0018"></td>
+          <td class="c-id"><code>TF-0018</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">1</td>
+          <td>
+            <details><summary><strong>Installer les 4 skills verbes</strong></summary>
+              <p>Non déclenchables par nom sur le poste.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 2</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0018" rows="1" aria-label="Commentaire TF-0018" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0020" aria-label="Décider TF-0020"></td>
+          <td class="c-id"><code>TF-0020</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">1</td>
+          <td>
+            <details><summary><strong>Producteur d'images complet</strong></summary>
+              <p>Générer réellement les visuels des maquettes, jugés par oracle-images I1-I6 existant.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 4</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0020" rows="1" aria-label="Commentaire TF-0020" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section>
+      <h2 id="development">development <span class="badge">4</span></h2>
+      <div class="scroll"><table data-filterable>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0008" aria-label="Décider TF-0008"></td>
+          <td class="c-id"><code>TF-0008</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">4</td>
+          <td>
+            <details><summary><strong>Arbitrage D-V3 : l'amont officiel</strong></summary>
+              <p>EXIGENCES.json/verbe 4 de conception vs BMAD : deux amonts concurrents, tranchés à la main à chaque run.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Décision re-payée à chaque produit construit</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0008" rows="1" aria-label="Commentaire TF-0008" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0007" aria-label="Décider TF-0007"></td>
+          <td class="c-id"><code>TF-0007</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">3</td>
+          <td>
+            <details><summary><strong>Source unique des disciplines de livrable</strong></summary>
+              <p>Le run-playbook fait foi ; le CLAUDE.md steering pointe au lieu de copier (deux copies de prose aujourd'hui).</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 1</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0007" rows="1" aria-label="Commentaire TF-0007" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0010" aria-label="Décider TF-0010"></td>
+          <td class="c-id"><code>TF-0010</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">2.7</td>
+          <td>
+            <details><summary><strong>Gates de livrable exécutables</strong></summary>
+              <p>Traçabilité E-xxx (grep 100 %), marqueurs démo, affordances (délégué au pan interface) : la doctrine RV-1/3/4 devient oracle.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 3 · <strong>payé en réel</strong> — 3 défauts sortis en production v0.1.0</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0010" rows="1" aria-label="Commentaire TF-0010" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0009" aria-label="Décider TF-0009"></td>
+          <td class="c-id"><code>TF-0009</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">2.5</td>
+          <td>
+            <details><summary><strong>HumanGate déléguable + dogfooding</strong></summary>
+              <p>Le conductor est maintenu (décision Q-A 08/08) : lui donner un HumanGate déléguable et une exécution réelle bout en bout.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 5 × preuve 2 ÷ effort 4 · <strong>payé en réel</strong> — D-V1 payée à chaque étape 4 en mode dégradé</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0009" rows="1" aria-label="Commentaire TF-0009" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section>
+      <h2 id="organization">organization <span class="badge">4</span></h2>
+      <div class="scroll"><table data-filterable>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0031" aria-label="Décider TF-0031"></td>
+          <td class="c-id"><code>TF-0031</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">3</td>
+          <td>
+            <details><summary><strong>CLAUDE.md + trancher Q3-bis</strong></summary>
+              <p>Point d'entrée encodant la décision Q-B (organization organise, steering pilote). Q3-bis (préfixe projet/émetteur) = DÉCISION HUMAINE requise, débloque la Phase 3.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 1</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0031" rows="1" aria-label="Commentaire TF-0031" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0032" aria-label="Décider TF-0032"></td>
+          <td class="c-id"><code>TF-0032</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">2</td>
+          <td>
+            <details><summary><strong>Se conformer à sa propre doctrine</strong></summary>
+              <p>Doctrine dans output/ (D-06), en-tête version c réparé (auto-violation D-02 fraîche), committer la version c.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0032" rows="1" aria-label="Commentaire TF-0032" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0033" aria-label="Décider TF-0033"></td>
+          <td class="c-id"><code>TF-0033</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">1</td>
+          <td>
+            <details><summary><strong>Le registre des types devient un fichier</strong></summary>
+              <p>D-04 le promet ; il n'existe qu'en tableau dans un document.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 2</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0033" rows="1" aria-label="Commentaire TF-0033" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0034" aria-label="Décider TF-0034"></td>
+          <td class="c-id"><code>TF-0034</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">1</td>
+          <td>
+            <details><summary><strong>Phase 3 : vérificateur machine des conventions</strong></summary>
+              <p>D-02/03/04/06 mécanisables sur le stock existant. Dépend de TF-0031 (Q3-bis).</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 4</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0034" rows="1" aria-label="Commentaire TF-0034" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section>
+      <h2 id="seo">seo <span class="badge">12</span></h2>
+      <div class="scroll"><table data-filterable>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0042" aria-label="Décider TF-0042"></td>
+          <td class="c-id"><code>TF-0042</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">10</td>
+          <td>
+            <details><summary><strong>livrables.py : dette() écrit noeud_id en chaîne, le schéma exige un entier</strong></summary>
+              <p>scripts/livrables.py ligne 102 reprend n[&quot;id&quot;] tel que lu par front_matter(), donc une chaîne, là où snapshot.schema.json impose un integer. La fonction noeuds_snapshot() évite le même piège ligne 75 par un int(n[&quot;id&quot;]) explicite, commentaire à l'appui — la correction n'a pas été reportée à dette(). Conséquence : le snapshot est jugé non conforme et RIEN n'est écrit, donc toute étude comportant au moins un nœud hors périmètre est bloquée. C'est-à-dire toute étude réelle. Correctif : int(n[&quot;id&quot;]) ligne 102.</p>
+              <p class="meta">Demandeur : run-seo-auxportesdelabaie-20260808 · 2026-08-08 · gain 5 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — Pipeline officiel bloqué sur la mission livrée : 11 écarts au schéma, aucun livrable écrit. Contourné à la main pour produire le rapport.</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0042" rows="1" aria-label="Commentaire TF-0042" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0043" aria-label="Décider TF-0043"></td>
+          <td class="c-id"><code>TF-0043</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">8</td>
+          <td>
+            <details><summary><strong>crawler.py ne lit pas sitemap.xml : l'inventaire du site est celui du graphe de liens</strong></summary>
+              <p>scripts/crawler.py lit robots.txt uniquement pour les permissions (rp.can_fetch) et n'en exploite jamais la directive Sitemap. L'ensemble connus[] n'est alimenté que par les liens suivis. urls_decouvertes ne mesure donc pas les URLs du site mais les URLs atteignables en navigant. Sur la mission : 79 annoncées, 286 déclarées au sitemap. Correctif : une requête sur sitemap.xml, amorcer connus[] avec ses URLs.</p>
+              <p class="meta">Demandeur : run-seo-auxportesdelabaie-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — Sur auxportesdelabaie.fr le crawler annonce 79 URLs découvertes ; le sitemap en déclare 286, soit 73 % du site absent de l'inventaire.</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0043" rows="1" aria-label="Commentaire TF-0043" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0044" aria-label="Décider TF-0044"></td>
+          <td class="c-id"><code>TF-0044</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">8</td>
+          <td>
+            <details><summary><strong>crawler.py : la métrique pages_orphelines ne peut structurellement pas être non nulle</strong></summary>
+              <p>scripts/crawler.py ligne 231 : orphelines = pages du crawl avec _entrants_tous == 0 et profondeur_clic &gt; 0. Or une page n'entre dans l'ensemble crawlé que parce qu'un lien y menait : la condition est insatisfiable. Le contrôle ne peut pas échouer, donc il ne prouve rien, et il affiche un zéro rassurant. Sur la mission, le rapport annonce « pages orphelines : 0 » là où 208 pages sur 286 ne reçoivent aucun lien entrant. Correctif : définir l'orpheline comme URL DÉCLARÉE (sitemap) sans lien entrant après crawl — ce qui suppose l'item sitemap ci-dessus.</p>
+              <p class="meta">Demandeur : run-seo-auxportesdelabaie-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — « pages orphelines : 0 » affiché sur un site à 208 orphelines, découvertes seulement en confrontant sitemap et graphe de liens hors outil.</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0044" rows="1" aria-label="Commentaire TF-0044" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0045" aria-label="Décider TF-0045"></td>
+          <td class="c-id"><code>TF-0045</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">6</td>
+          <td>
+            <details><summary><strong>rapport_html.py lit actions-*.csv sans dialecte : un CSV en points-virgules sort en n/d</strong></summary>
+              <p>csv.DictReader(f) est appelé sans argument delimiter, donc en virgule. Un CSV point-virgule — séparateur par défaut d'Excel en locale française — est lu comme un champ unique par ligne : toutes les colonnes tombent à None et le rapport imprime « n/d » sur l'intégralité du tableau d'actions, sans le moindre avertissement. Correctif : csv.Sniffer, ou refus explicite si l'en-tête attendu n'est pas reconnu.</p>
+              <p class="meta">Demandeur : run-seo-auxportesdelabaie-20260808 · 2026-08-08 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — 10 actions sorties intégralement en « n/d » dans une version du rapport, qui se présentait par ailleurs comme complète.</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0045" rows="1" aria-label="Commentaire TF-0045" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0048" aria-label="Décider TF-0048"></td>
+          <td class="c-id"><code>TF-0048</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">4</td>
+          <td>
+            <details><summary><strong>Une évolution de la grille sans table de correspondance réassigne silencieusement les constats</strong></summary>
+              <p>Le passage de 82 à 87 nœuds a déplacé 14 nœuds d'identifiant. Une étude ouverte sur l'ancienne grille et reprise par id écrit chaque constat dans le mauvais nœud, sans aucune alerte : validate.py contrôle la présence et le front-matter, jamais la cohérence entre le contenu et la question d'audit. Le garde-fou ajouté au rapport (refus si la couverture est incomplète) attrape les nœuds MANQUANTS, pas les nœuds mal remplis. Correctif : publier une table de correspondance versionnée entre empreintes de grille, et un mode migration qui apparie par (branche, nœud) et non par id.</p>
+              <p class="meta">Demandeur : run-seo-auxportesdelabaie-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — 9 fiches sur 13 reprises se sont révélées assignées au mauvais nœud — performance serveur dans Canonical, données structurées dans Performance, GA4 dans Génération De Pages. Détecté par recoupement manuel, aucun outil ne le signalait.</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0048" rows="1" aria-label="Commentaire TF-0048" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0028" aria-label="Décider TF-0028"></td>
+          <td class="c-id"><code>TF-0028</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">3</td>
+          <td>
+            <details><summary><strong>validate --mission contrôle schema_version</strong></summary>
+              <p>Dérive 1.0.0/1.1.0 réelle sur la mission AuxPortesDeLaBaie, invisible machine (le contrôle 4 vérifie autre chose).</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Observée sur la mission réelle livrée</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0028" rows="1" aria-label="Commentaire TF-0028" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0046" aria-label="Décider TF-0046"></td>
+          <td class="c-id"><code>TF-0046</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">3</td>
+          <td>
+            <details><summary><strong>rapport_html.py échappe le markdown des fiches au lieu de le rendre</strong></summary>
+              <p>Le corps des fiches est inséré via esc() sans conversion. Or les fiches sont des fichiers .md et le référentiel lui-même y met du markdown (les en-têtes générés contiennent du gras dans critere_verdict). Les tableaux de preuve sortent en soupe de barres verticales, le gras en astérisques. Deux issues : convertir un sous-ensemble sûr (gras, code, tableaux), ou documenter que les fiches s'écrivent en prose — mais alors retirer le markdown des gabarits de la grille.</p>
+              <p class="meta">Demandeur : run-seo-auxportesdelabaie-20260808 · 2026-08-08 · gain 3 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Tableaux de preuve illisibles dans le rapport ; fiches réécrites en prose et convertisseur de tableaux développé côté mission pour contourner.</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0046" rows="1" aria-label="Commentaire TF-0046" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0026" aria-label="Décider TF-0026"></td>
+          <td class="c-id"><code>TF-0026</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">2</td>
+          <td>
+            <details><summary><strong>--json sur validate.py</strong></summary>
+              <p>Seule sortie machine manquante d'une forge par ailleurs très invocable.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0026" rows="1" aria-label="Commentaire TF-0026" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0027" aria-label="Décider TF-0027"></td>
+          <td class="c-id"><code>TF-0027</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">2</td>
+          <td>
+            <details><summary><strong>Trancher le working tree en cours</strong></summary>
+              <p>gabarit_html.py +575/-207 non committé + 2 fichiers orphelins. À faire par SA session si vivante.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0027" rows="1" aria-label="Commentaire TF-0027" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0047" aria-label="Décider TF-0047"></td>
+          <td class="c-id"><code>TF-0047</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">2</td>
+          <td>
+            <details><summary><strong>Le « blocage principal » de la synthèse est choisi par l'ordre de la grille, pas par la gravité</strong></summary>
+              <p>bloc_synthese() prend faibles[0], soit le premier nœud non conforme dans l'ordre du manifeste, et publie son interprétation comme blocage principal du rapport. L'ordre de la grille est thématique, pas hiérarchique : le nœud 2 passe systématiquement devant des constats bien plus lourds situés plus loin. En prime, l'interprétation d'une fiche est rédigée pour son contexte et peut renvoyer à « cette fiche » ou à une action non encore présentée. Correctif : choisir sur un critère explicite — gravité, ou nœud le plus cité par les actions retenues — ou prévoir un champ dédié dans le snapshot.</p>
+              <p class="meta">Demandeur : run-seo-auxportesdelabaie-20260808 · 2026-08-08 · gain 2 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Sur la mission, le blocage affiché n'était pas le principal, et le texte repris renvoyait à « cette fiche » et à une action non encore introduite.</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0047" rows="1" aria-label="Commentaire TF-0047" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0029" aria-label="Décider TF-0029"></td>
+          <td class="c-id"><code>TF-0029</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">1</td>
+          <td>
+            <details><summary><strong>Générateurs des 3 livrables manquants</strong></summary>
+              <p>audit.md, roadmap, dette-instrumentation : 3 des 5 livrables contractuels sans producteur.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 4</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0029" rows="1" aria-label="Commentaire TF-0029" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0030" aria-label="Décider TF-0030"></td>
+          <td class="c-id"><code>TF-0030</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">0.8</td>
+          <td>
+            <details><summary><strong>Généraliser les moteurs ad hoc des missions</strong></summary>
+              <p>fiches87.py etc. vivent chez la mission avec chemins en dur — non réutilisables.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 4</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0030" rows="1" aria-label="Commentaire TF-0030" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section>
+      <h2 id="steering">steering <span class="badge">6</span></h2>
+      <div class="scroll"><table data-filterable>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0035" aria-label="Décider TF-0035"></td>
+          <td class="c-id"><code>TF-0035</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">4</td>
+          <td>
+            <details><summary><strong>versions_forges/run_precedent réellement consignés</strong></summary>
+              <p>Promis au contrat §3, absents des 76 entrées du ledger du produit réel — + contrôle d'oracle.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — 0/76 entrées sur ASD malgré 2 versions livrées</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0035" rows="1" aria-label="Commentaire TF-0035" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0036" aria-label="Décider TF-0036"></td>
+          <td class="c-id"><code>TF-0036</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">3</td>
+          <td>
+            <details><summary><strong>Archive du run pilote sous git</strong></summary>
+              <p>runs/ est gitignoré : la preuve fondatrice du README n'est qu'un dossier disque.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 1</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0036" rows="1" aria-label="Commentaire TF-0036" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0049" aria-label="Décider TF-0049"></td>
+          <td class="c-id"><code>TF-0049</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">3</td>
+          <td>
+            <details><summary><strong>TODO-FORGE : l'écriture directe contourne l'écrivain unique — la détecter par oracle</strong></summary>
+              <p>Constaté le 08/08 au soir : la session de mission seo (run-seo-auxportesdelabaie-20260808) a appendé 7 créations (TF-0042..0048) directement dans todo/TODO.jsonl, sans sidecar ni événement ingestion — le circuit de remise venait d'être construit et n'était pas encore connu d'elle. Les items sont valides (candidat, ids séquentiels) mais la traçabilité d'ingestion manque. Proposition : règle d'oracle « toute création postérieure au seed dont le demandeur n'est pas le steering doit être couverte par un événement ingestion » + rappel de la remise par sidecar dans les gabarits (fait le 08/08).</p>
+              <p class="meta">Demandeur : steering · 2026-08-08 · gain 3 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — 7 créations sans trace d'ingestion dans le registre réel</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0049" rows="1" aria-label="Commentaire TF-0049" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0037" aria-label="Décider TF-0037"></td>
+          <td class="c-id"><code>TF-0037</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">1.5</td>
+          <td>
+            <details><summary><strong>Plafond de taille CLAUDE.md + alerte</strong></summary>
+              <p>×3,4 en 4 jours sans borne — un CLAUDE.md obèse se lit mal en session.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 2</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0037" rows="1" aria-label="Commentaire TF-0037" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0038" aria-label="Décider TF-0038"></td>
+          <td class="c-id"><code>TF-0038</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">1.3</td>
+          <td>
+            <details><summary><strong>Exercer une vraie reprise de run interrompu</strong></summary>
+              <p>La reprise idempotente est promise au contrat et n'a jamais été testée.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 3</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0038" rows="1" aria-label="Commentaire TF-0038" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0039" aria-label="Décider TF-0039"></td>
+          <td class="c-id"><code>TF-0039</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">1</td>
+          <td>
+            <details><summary><strong>Circuit organization→steering opérationnel</strong></summary>
+              <p>Chaque proposition D-xx passe le circuit décision→REGLES-PROJET→oracle (aboutissement de Q-B). Dépend de TF-0031/TF-0034.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 3</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0039" rows="1" aria-label="Commentaire TF-0039" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section>
+      <h2 id="tests">tests <span class="badge">6</span></h2>
+      <div class="scroll"><table data-filterable>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0001" aria-label="Décider TF-0001"></td>
+          <td class="c-id"><code>TF-0001</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">8</td>
+          <td>
+            <details><summary><strong>RT-13 : champs manquants dérivés du pan</strong></summary>
+              <p>Un pan SKIP n'emprunte plus FORGE_TESTS_QUALIF_URL au domaine acces : chaque adaptateur publie son CHAMPS_REQUIS propre.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — 16 actions manuelle_utilisateur fausses au rapport ASD du 07/08</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0001" rows="1" aria-label="Commentaire TF-0001" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0003" aria-label="Décider TF-0003"></td>
+          <td class="c-id"><code>TF-0003</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">4</td>
+          <td>
+            <details><summary><strong>Audit complet sur projet libre (MiniVeille)</strong></summary>
+              <p>Mutation totale + cahiers + dashboard + actions[] sur un projet figé : première preuve terrain propre des livrables du 07/08.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Audit ASD du 07/08 déclaré dégradé (produit en travaux pendant l'audit)</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0003" rows="1" aria-label="Commentaire TF-0003" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0002" aria-label="Décider TF-0002"></td>
+          <td class="c-id"><code>TF-0002</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">3</td>
+          <td>
+            <details><summary><strong>Contrôle sync registre-dette ↔ code en recette</strong></summary>
+              <p>dette.regenerer en mode vérification, exit 1 si divergence entre le registre committé et le code.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 1</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0002" rows="1" aria-label="Commentaire TF-0002" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0004" aria-label="Décider TF-0004"></td>
+          <td class="c-id"><code>TF-0004</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">2</td>
+          <td>
+            <details><summary><strong>Sémantique du registre de dette</strong></summary>
+              <p>Identifiant stable découplé de l'énoncé ; statut ok exigeant une preuve (test/recette). Aujourd'hui : resolue = énoncé disparu, 0 vraie fermeture sur 89.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 2 · <strong>payé en réel</strong> — Indicateur « 27 résolues » publié à l'inventaire steering sur une base non vérifiée</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0004" rows="1" aria-label="Commentaire TF-0004" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0005" aria-label="Décider TF-0005"></td>
+          <td class="c-id"><code>TF-0005</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">0.7</td>
+          <td>
+            <details><summary><strong>Sélecteur de recette --section</strong></summary>
+              <p>La recette monolithique coûte 3 min 22 à chaque itération, même pour un correctif d'une ligne.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 3 · <strong>payé en réel</strong> — Coût mesuré à chaque itération de campagne</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0005" rows="1" aria-label="Commentaire TF-0005" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0006" aria-label="Décider TF-0006"></td>
+          <td class="c-id"><code>TF-0006</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">0.6</td>
+          <td>
+            <details><summary><strong>Suite unitaire propre de forge-tests</strong></summary>
+              <p>Dette assumée déclarée au README depuis l'origine ; la recette est le seul filet.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 5</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0006" rows="1" aria-label="Commentaire TF-0006" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
+    </main>
+    <footer>Vue générée par <code>todo/generer-page.mjs</code> — ne pas éditer. Source unique : <code>todo/TODO.jsonl</code>. Détail d'un item : <code>grep '"id":"TF-xxxx"' todo/TODO.jsonl</code>.</footer>
+  </div>
+  <script>
+  (function () {
+    "use strict";
+    var SCEAU = "81022d5a14b4";
+    var cle = function (id, type) { return "todo-forge:" + SCEAU + ":" + id + ":" + type; };
+    var coches = document.querySelectorAll("input.decider");
+    var comms = document.querySelectorAll("textarea.commentaire");
+    function bilan() {
+      var c = 0, k = 0;
+      coches.forEach(function (x) { if (x.checked) c++; });
+      comms.forEach(function (x) { if (x.value.trim()) k++; });
+      document.getElementById("bilan").textContent = c + " coché(s) · " + k + " commentaire(s)";
+    }
+    coches.forEach(function (x) {
+      try { x.checked = localStorage.getItem(cle(x.dataset.id, "d")) === "1"; } catch (e) {}
+      x.addEventListener("change", function () { try { localStorage.setItem(cle(x.dataset.id, "d"), x.checked ? "1" : "0"); } catch (e) {} bilan(); });
+    });
+    comms.forEach(function (x) {
+      try { x.value = localStorage.getItem(cle(x.dataset.id, "c")) || ""; } catch (e) {}
+      x.addEventListener("input", function () { try { localStorage.setItem(cle(x.dataset.id, "c"), x.value); } catch (e) {} bilan(); });
+    });
+    document.getElementById("exporter").addEventListener("click", function () {
+      var decisions = [];
+      var parId = {};
+      comms.forEach(function (x) { parId[x.dataset.id] = { commentaire: x.value.trim() }; });
+      coches.forEach(function (x) { (parId[x.dataset.id] = parId[x.dataset.id] || {}).decider = x.checked; });
+      Object.keys(parId).sort().forEach(function (id) {
+        var d = parId[id];
+        if (d.decider || d.commentaire) decisions.push({ id: id, decider: !!d.decider, commentaire: d.commentaire || null });
+      });
+      var contenu = JSON.stringify({ schema: 1, type: "decisions-todo-forge", sceau_source: SCEAU, exporte_le: new Date().toISOString(), decisions: decisions }, null, 1);
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([contenu], { type: "application/json" }));
+      a.download = "TF-decisions-" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + ".json";
+      a.click(); URL.revokeObjectURL(a.href);
+    });
+    bilan();
+  })();
+  </script>
+  <script>
+  /* Composant filtres maison — inliné depuis ~/.claude/skills/digit-ai-page-html/assets/table-filters.js (provenance D-12, zéro réseau) */
+/* Digit-AI — Filtres de colonne sur tableaux de données.
+   Socle commun : voir references/composant-filtres-tableau.md (checklist G1-G6).
+   Viewer-only : le JS ne s'exécute pas à l'export WeasyPrint, la regle @media print
+   du livrable doit reafficher tr[data-tf-hidden]. */
+(function (root) {
+  'use strict';
+
+  var SEUIL_LIGNES = 8;
+
+  function norm(s) {
+    return String(s == null ? '' : s)
+      .normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+  }
+
+  function corps(table) {
+    var tb = table.tBodies && table.tBodies[0];
+    return tb ? Array.prototype.slice.call(tb.rows) : [];
+  }
+
+  function valeur(tr, i) {
+    var td = tr.cells[i];
+    return td ? td.textContent.trim() : '';
+  }
+
+  /* Une colonne est categorielle si ses valeurs se repetent : cardinalite < nb lignes.
+     Un th peut forcer (data-filter-col) ou exclure (data-filter-col="off"). */
+  function colonnesFiltrables(table, lignes) {
+    var ths = table.tHead ? Array.prototype.slice.call(table.tHead.rows[0].cells) : [];
+    var out = [];
+    ths.forEach(function (th, i) {
+      var forcee = th.getAttribute('data-filter-col');
+      if (forcee === 'off') return;
+      var distinctes = {}, n = 0;
+      lignes.forEach(function (tr) {
+        var v = valeur(tr, i);
+        if (!(v in distinctes)) { distinctes[v] = 1; n++; }
+      });
+      if (forcee !== null || (n > 1 && n < lignes.length)) out.push({ th: th, index: i, valeurs: Object.keys(distinctes).sort() });
+    });
+    return out;
+  }
+
+  function bouton(col, id) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tf-btn';
+    b.setAttribute('aria-expanded', 'false');
+    b.setAttribute('aria-controls', id);
+    b.setAttribute('aria-label', 'Filtrer ' + col.th.textContent.trim());
+    b.textContent = '▾';
+    return b;
+  }
+
+  function panneau(col, id) {
+    var p = document.createElement('div');
+    p.className = 'tf-panel';
+    p.id = id;
+    p.hidden = true;
+    p.setAttribute('role', 'group');
+    p.setAttribute('aria-label', 'Filtrer ' + col.th.textContent.trim());
+
+    var rech = document.createElement('input');
+    rech.type = 'search';
+    rech.className = 'tf-search';
+    rech.placeholder = 'Rechercher…';
+    rech.setAttribute('aria-label', 'Rechercher une valeur');
+
+    var actions = document.createElement('div');
+    actions.className = 'tf-actions';
+    var tous = document.createElement('button');
+    tous.type = 'button'; tous.className = 'tf-all'; tous.textContent = 'Tous';
+    var aucun = document.createElement('button');
+    aucun.type = 'button'; aucun.className = 'tf-none'; aucun.textContent = 'Aucun';
+    actions.appendChild(tous); actions.appendChild(aucun);
+
+    var opts = document.createElement('div');
+    opts.className = 'tf-opts';
+    col.valeurs.forEach(function (v) {
+      var lab = document.createElement('label');
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.className = 'tf-opt';
+      cb.value = v;
+      cb.checked = true;                    /* etat initial : tout coche, aucun filtre actif */
+      lab.appendChild(cb);
+      lab.appendChild(document.createTextNode(' ' + (v === '' ? '(vide)' : v)));
+      opts.appendChild(lab);
+    });
+
+    p.appendChild(rech); p.appendChild(actions); p.appendChild(opts);
+    return { panneau: p, recherche: rech, tous: tous, aucun: aucun, options: opts };
+  }
+
+  function init(table) {
+    if (!table || table.getAttribute('data-tf-ready') === '1') return null;
+    if (table.getAttribute('data-filterable') === 'off') return null;
+
+    var lignes = corps(table);
+    var cols = colonnesFiltrables(table, lignes);
+    if (!cols.length) return null;
+
+    var id = table.id || ('tf-' + Math.random().toString(36).slice(2, 8));
+    table.id = id;
+    var compteur = document.querySelector('[data-tf-count-for="' + id + '"]');
+    var etats = [];
+
+    function appliquer() {
+      var visibles = 0;
+      lignes.forEach(function (tr) {
+        var ok = etats.every(function (e) {
+          return e.selection[valeur(tr, e.col.index)] === true;
+        });
+        if (ok) { tr.removeAttribute('data-tf-hidden'); tr.style.display = ''; visibles++; }
+        else { tr.setAttribute('data-tf-hidden', ''); tr.style.display = 'none'; }
+      });
+      etats.forEach(function (e) {
+        var actif = Object.keys(e.selection).some(function (k) { return !e.selection[k]; });
+        e.bouton.classList.toggle('tf-on', actif);
+      });
+      if (compteur) {
+        compteur.textContent = visibles + ' ligne' + (visibles > 1 ? 's' : '') +
+          ' sur ' + lignes.length;
+        compteur.classList.toggle('zero', visibles === 0);
+      }
+    }
+
+    cols.forEach(function (col, k) {
+      var pid = id + '-tf-' + k;
+      var b = bouton(col, pid);
+      var ui = panneau(col, pid);
+      var selection = {};
+      col.valeurs.forEach(function (v) { selection[v] = true; });
+      var etat = { col: col, bouton: b, selection: selection };
+      etats.push(etat);
+
+      col.th.style.position = col.th.style.position || 'relative';
+      col.th.appendChild(b);
+      col.th.appendChild(ui.panneau);
+
+      b.addEventListener('click', function () {
+        var ouvert = b.getAttribute('aria-expanded') === 'true';
+        fermerTout();
+        if (!ouvert) { b.setAttribute('aria-expanded', 'true'); ui.panneau.hidden = false; ui.recherche.focus(); }
+      });
+
+      ui.recherche.addEventListener('input', function () {
+        var q = norm(ui.recherche.value);
+        Array.prototype.forEach.call(ui.options.children, function (lab) {
+          lab.hidden = q !== '' && norm(lab.textContent).indexOf(q) === -1;
+        });
+      });
+
+      /* Tous / Aucun portent sur les valeurs actuellement visibles dans la liste. */
+      function masse(valeurCible) {
+        Array.prototype.forEach.call(ui.options.children, function (lab) {
+          if (lab.hidden) return;
+          var cb = lab.querySelector('.tf-opt');
+          cb.checked = valeurCible;
+          selection[cb.value] = valeurCible;
+        });
+        appliquer();
+      }
+      ui.tous.addEventListener('click', function () { masse(true); });
+      ui.aucun.addEventListener('click', function () { masse(false); });
+
+      ui.options.addEventListener('change', function (ev) {
+        var cb = ev.target;
+        if (!cb.classList.contains('tf-opt')) return;
+        selection[cb.value] = cb.checked;
+        appliquer();
+      });
+
+      ui.panneau.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Escape') { fermerTout(); b.focus(); }
+      });
+    });
+
+    function fermerTout() {
+      etats.forEach(function (e) {
+        e.bouton.setAttribute('aria-expanded', 'false');
+        var p = document.getElementById(e.bouton.getAttribute('aria-controls'));
+        if (p) p.hidden = true;
+      });
+    }
+
+    document.addEventListener('click', function (ev) {
+      if (!table.contains(ev.target)) fermerTout();
+    });
+
+    table.setAttribute('data-tf-ready', '1');
+    appliquer();
+    return { appliquer: appliquer, fermerTout: fermerTout };
+  }
+
+  function initAll(racine) {
+    var scope = racine || document;
+    return Array.prototype.map.call(
+      scope.querySelectorAll('table[data-filterable]'),
+      function (t) { return init(t); }
+    );
+  }
+
+  root.DigitAITableFilters = { init: init, initAll: initAll, SEUIL_LIGNES: SEUIL_LIGNES };
+})(typeof window !== 'undefined' ? window : this);
+
+  </script>
+</body>
+</html>

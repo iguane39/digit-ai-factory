@@ -113,6 +113,42 @@ check("ingestion : une candidature portant un id est refusée (frappage = écriv
   throw new Error("aurait dû refuser");
 });
 
+// ---- circuit export HTML → application (sur le registre TEMPORAIRE regT) -------------------
+const appliquer = join(ICI, "appliquer-export.mjs");
+const exportOk = join(T, "TF-decisions-ok.json");
+writeFileSync(exportOk, JSON.stringify({ schema: 1, type: "decisions-todo-forge", sceau_source: "x", exporte_le: "2026-08-09T08:00:00Z",
+  decisions: [{ id: "TF-9002", decider: true, commentaire: "priorité haute" }, { id: "TF-9003", decider: false, commentaire: "à regrouper avec TF-9002" }] }));
+check("export appliqué : decide tracé (décideur humain) + commentaires conservés", () => {
+  execFileSync("node", [appliquer, exportOk, "--registre", regT], { encoding: "utf8" });
+  const evs = readFileSync(regT, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
+  const etat = new Map();
+  for (const e of evs) { if (e.ev === "creation") etat.set(e.id, { ...e }); else if (e.ev === "maj") Object.assign(etat.get(e.id) ?? {}, e); }
+  const a = etat.get("TF-9002"), b = etat.get("TF-9003");
+  if (a.statut !== "decide" || !a.decideur || a.date_decision !== "2026-08-09") throw new Error("décision non tracée");
+  if (!a.commentaire_humain.includes("priorité haute") || !b.commentaire_humain) throw new Error("commentaire perdu");
+  if (b.statut !== "candidat") throw new Error("commentaire seul ne doit pas changer le statut");
+});
+check("export idempotent : ré-appliqué → 0 modification", () => {
+  const avant = shaReg();
+  const s = execFileSync("node", [appliquer, exportOk, "--registre", regT], { encoding: "utf8" });
+  if (!s.includes("DÉJÀ APPLIQUÉ") || shaReg() !== avant) throw new Error("idempotence en défaut");
+});
+check("export rouge : id inconnu → rejet ATOMIQUE, registre intact", () => {
+  const mauvais = join(T, "TF-decisions-ko.json");
+  writeFileSync(mauvais, JSON.stringify({ schema: 1, type: "decisions-todo-forge", decisions: [{ id: "TF-0000", decider: true }] }));
+  const avant = shaReg();
+  try { execFileSync("node", [appliquer, mauvais, "--registre", regT], { encoding: "utf8", stdio: "pipe" }); }
+  catch (e) { if (e.status !== 1 || shaReg() !== avant) throw new Error("rejet non atomique"); return; }
+  throw new Error("aurait dû rejeter");
+});
+check("export rouge : decider sur un item déjà décidé → rejet (transition illégale)", () => {
+  const redecide = join(T, "TF-decisions-re.json");
+  writeFileSync(redecide, JSON.stringify({ schema: 1, type: "decisions-todo-forge", decisions: [{ id: "TF-9002", decider: true }] }));
+  try { execFileSync("node", [appliquer, redecide, "--registre", regT], { encoding: "utf8", stdio: "pipe" }); }
+  catch (e) { if (e.status === 1) return; throw new Error(`exit ${e.status}`); }
+  throw new Error("aurait dû rejeter");
+});
+
 // Déterminisme de la vue sur le registre RÉEL
 check("vue : 2 générations identiques (sha256) sur le registre réel", () => {
   execFileSync("node", [join(ICI, "generer-vue.mjs")], { encoding: "utf8" });
