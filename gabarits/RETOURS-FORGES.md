@@ -13,6 +13,9 @@
 
 Convention de gravité : **bloquant** (a bloqué ou failli bloquer) · **majeur** (a coûté un
 aller-retour ou une découverte par lecture de code) · **mineur** (confort/précision).
+Si un retour se rapporte à un item du registre TODO-FORGE du steering, citer son id
+(`TF-xxxx`) — chaque retour intégré recevra le sien. **Les forges aussi** peuvent déposer un
+lot avec ce gabarit, ciblant n'importe quelle autre forge (remise : `input\` du steering).
 **Ids uniques par produit** : préfixe par forge (RT/RC/RD/RV/RA/RS) + numéro **jamais
 réutilisé** — continuer la séquence des lots précédents du même produit.
 

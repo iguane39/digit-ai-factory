@@ -1,5 +1,12 @@
 # Boucle d'amélioration des forges
 
+> **Depuis le 08/08 au soir : le suivi actif vit dans `todo\` (registre TODO-FORGE).**
+> Ce document est le **journal narratif** (campagnes, décisions, contexte) — il référence les
+> ids `TF-xxxx` et ne duplique plus les listes d'items. Les plans A/B/C de la revue du 08/08
+> et les candidats encore ouverts des sections ci-dessous sont **migrés** dans le registre
+> (TF-0001…TF-0041, tous en `candidat`) ; les sections historiques restent telles quelles
+> comme archive narrative.
+
 Version 1.0.0 — 2026-08-04
 
 Le steering améliore les cinq forges par **itérations bornées**. Jamais d'amélioration spontanée,

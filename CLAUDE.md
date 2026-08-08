@@ -36,6 +36,18 @@ correctifs à chaque run.
 4. *Une donnée volatile est une donnée, pas du code* : catalogues, tarifs et référentiels
    susceptibles de vieillir vivent en base, éditables, datés et sourcés.
 
+**TODO-FORGE** (`todo\`) : le registre structuré des améliorations — source unique
+`TODO.jsonl` (événements, écrivain unique : toi), vue générée `TODO.md` (jamais éditée),
+archive `TODO-ARCHIVE.jsonl` (ids jamais réutilisés), `oracle-todo.mjs` à faire passer après
+toute écriture. Gouvernance : tout entre en `candidat` ; seul un mandat humain (« décide
+TF-xxxx ») passe en `decide`. Intake : lots des produits (règle 18), **lots des forges**
+(toute forge peut déposer un lot ciblant n'importe quelle forge — même gabarit, remise dans
+`input\`), demandes humaines directes. À chaque campagne : mettre à jour les items
+(date_correction, corrections_realisees, **gains_constates exigés à la clôture**,
+version_forge_corrigee, produits_beneficiaires) puis régénérer la vue. Consulter le registre
+à l'ouverture de tout run. BOUCLE-AMELIORATION.md reste le journal narratif : il référence
+les ids TF, il ne duplique plus les listes.
+
 Documents de référence (à lire avant tout run) :
 - `INVENTAIRE.md` — état réel des cinq forges, points d'entrée, manques.
 - `CONTRAT-INTERFACE.md` — format d'invocation, ledger, routage par modèle, dette d'intégration.
