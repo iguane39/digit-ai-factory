@@ -293,3 +293,13 @@ consistera à les reprendre tels quels, pas à les réinventer.
 3. **R-V2** (adaptateurs amont) — c'est la couture centrale de l'écosystème ; à concevoir avec
    l'arbitrage R-V4.
 4. Le reste au fil des retours de runs.
+
+## 09/08/2026 — renommage : forge-steering devient forge-pilot
+
+Décision humaine du 09/08. Dépôt GitHub renommé (`digit-ai-forge-pilot`, l'ancien nom
+redirige), dossier local renommé avec **jonction de compatibilité**
+`c:\dev\digit-ai-forge-steering → digit-ai-forge-pilot` (les produits existants et leurs
+chemins absolus continuent de fonctionner jusqu'à leur rattrapage en run de version).
+Documents vivants mis à jour ; l'HISTOIRE n'est pas réécrite (ledgers, TODO.jsonl,
+entrées passées de ce journal, livrables datés d'output\ : le mot « steering » y reste un
+fait d'époque). Les événements TF futurs portent `demandeur: pilot`.

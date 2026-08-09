@@ -2,7 +2,7 @@
 /**
  * generer-page.mjs — génère todo/TODO.html : la vue INTERACTIVE du registre TODO-FORGE.
  * Consultation (filtres par table), cases à cocher « décider », commentaires libres, et
- * EXPORT JSON à remettre au steering (traité par appliquer-export.mjs → maj du registre).
+ * EXPORT JSON à remettre au pilot (traité par appliquer-export.mjs → maj du registre).
  *
  * Vue générée à source unique (TODO.jsonl) — NE PAS ÉDITER LE HTML. Déterministe : deux
  * générations sur le même registre produisent le même fichier (horodatage = ts max des
@@ -77,7 +77,7 @@ const html = `<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Digit-AI — TODO-FORGE · Registre d'amélioration</title>
-  <meta name="description" content="Vue interactive du registre TODO-FORGE : consultation, décisions et commentaires à exporter pour traitement par le steering.">
+  <meta name="description" content="Vue interactive du registre TODO-FORGE : consultation, décisions et commentaires à exporter pour traitement par le pilot.">
   <meta name="theme-color" content="#2563EB">
   <meta name="color-scheme" content="light">
   <style>
@@ -123,7 +123,7 @@ const html = `<!DOCTYPE html>
     <header>
       <h1>TODO-FORGE — registre d'amélioration</h1>
       <p class="meta">${etats.size} actifs (candidat ${compte("candidat")} · décidé ${compte("decide")} · en cours ${compte("en_cours")} · corrigé ${compte("corrige")} · écarté ${compte("ecarte")}) · ${nbArchives} archivés · sceau source <code>${sceau}</code> · dernier événement ${esc(tsMax)}</p>
-      <p>Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au steering — il sera appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
+      <p>Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au pilot — il sera appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
     </header>
     <div class="barre">
       <button id="exporter" type="button">Exporter les décisions</button>

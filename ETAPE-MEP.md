@@ -3,7 +3,7 @@
 Version 1.0.0 — 2026-08-04
 
 Aucune forge ne déploie (development s'arrête volontairement à « PR-ready, jamais mergé »).
-La capacité MEP est donc **portée par le steering** — aucune modification des dépôts frères.
+La capacité MEP est donc **portée par le pilot** — aucune modification des dépôts frères.
 Principe : **le staging est autonome, la production est sur GO humain.** La confiance du client
 final se fabrique par un dossier de preuve, pas par l'absence de gate.
 

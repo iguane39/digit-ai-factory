@@ -1,8 +1,8 @@
-# Contrat d'interface — steering ↔ forges
+# Contrat d'interface — pilot ↔ forges
 
 Version 1.0.0 — 2026-08-04
 
-Ce document définit le format standard par lequel le steering invoque chaque forge et récupère
+Ce document définit le format standard par lequel le pilot invoque chaque forge et récupère
 ses résultats. Les forges ne le respectent pas encore nativement : **les écarts sont listés en §5
 comme dette d'intégration**, pas corrigés silencieusement (aucune modification d'un dépôt frère
 sans validation humaine).
@@ -49,7 +49,7 @@ Règles :
 ## 2. Emplacements
 
 Toute production d'un run vit **dans le projet produit** — jamais dans les dépôts des forges ni
-dans le steering. La session s'ouvre dans le projet produit ; le steering est une dépendance :
+dans le pilot. La session s'ouvre dans le projet produit ; le pilot est une dépendance :
 
 ```
 c:\dev\<nom-produit>\
@@ -70,7 +70,7 @@ c:\dev\<nom-produit>\
 
 Le produit naît directement chez lui — aucune promotion à faire. Création de son dépôt git et
 push : sur validation humaine uniquement. (Historique : le run pilote du 04/08 vit encore sous
-`steering\runs\` — convention antérieure, conservée comme archive.)
+`pilot\runs\` — convention antérieure, conservée comme archive.)
 
 ## 3. Ledger
 
@@ -81,7 +81,7 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
 - **Écrivain unique : l'orchestrateur.** Les agents d'étape ne touchent jamais le ledger (défaut
   de verrou concurrent connu dans `ledger.mjs`, consigné au backlog). Ils rendent leurs résultats,
   l'orchestrateur consigne.
-- Types utilisés par le steering : `run_open`, `etape_open`, `invocation`, `oracles_verdict`,
+- Types utilisés par le pilot : `run_open`, `etape_open`, `invocation`, `oracles_verdict`,
   `escalade_modele`, `question_humain`, `reponse_humain` (dont le GO production de l'étape MEP),
   `etape_close`, `retour` (alimente la boucle d'amélioration ; champ `source` :
   `forge | produit | production`), `run_close`.
@@ -106,7 +106,7 @@ accumule la vérité mesurée.
 
 ## 5. Table de routage réelle et dette d'intégration
 
-Racine des chemins : `$FORGE_ROOT`, sinon le parent du dépôt steering (`c:\dev` sur le poste
+Racine des chemins : `$FORGE_ROOT`, sinon le parent du dépôt pilot (`c:\dev` sur le poste
 d'origine). Amorçage d'un poste : `node bootstrap.mjs [--racine <dossier>] [--pull]` — clone les
 cinq forges (dépôts privés `github.com/iguane39`, `gh` authentifié requis) et vérifie les points
 d'entrée listés ci-dessous.
@@ -116,10 +116,10 @@ d'entrée listés ci-dessous.
 | Conception | méthode des **4 skills** `c:\dev\digit-ai-forge-conception\skills\*` (dont `derive-les-vues`) + oracles `node oracles/oracle-*.mjs <EXIGENCES.json>` | degrade | D-C1 : pas de manifeste ni runner ; ~~D-C2 verbe 4 absent~~ et ~~D-C4 lien mort~~ **soldées le 04/08** ; D-C3 : skills non installés |
 | Design | méthode des skills `c:\dev\digit-ai-forge-design\skills\*` + `node oracles/run-oracles-design.mjs <html> [--rendu] --tokens <css> --json-only` ; **aval** : mode critique d'implémentation (étape 5 bis, produit vs promesse design du run) | degrade (oracles natifs) | D-D1 : skills non installés ; D-D2 : C1/C6/C7 sans exécutant local ; D-D3 : pas de producteur d'images (maquettes sans visuels générés) ; D-D4 : `run-oracles-design.mjs` non documenté chez Design |
 | Development | construction directe par agent (méthode du run-playbook lue comme spec), gates rejoués : `ruff check` + `pytest` sur le produit | degrade | D-V1 : `conductor` inutilisable en headless (HITL fermés, `NotImplementedError`, exit toujours 0) ; D-V2 : ~~volet design soldé le 07/08~~ (`generer-design-md.mjs` produit le `design/DESIGN.md` linté par le gate — PASS vérifié) ; reste le volet conception (EXIGENCES.json → `_bmad-output/`) ; D-V3 : recouvrement BMAD/Conception et gates/Tests non arbitré |
-| Tests | `uv run python -m forge_tests <racine-produit> --json` (capture stdout) | **natif** | D-T1 : exit 3 (PARTIEL) traité comme acceptable documenté ; D-T2 : rapport non persisté → le steering le persiste lui-même ; D-T3 : crash timeout / G-1 lecture-seule non corrigés (correctifs en attente de feu vert côté forge-tests) ; D-T4 : `--generer` + `--json` incompatibles sur stdout |
+| Tests | `uv run python -m forge_tests <racine-produit> --json` (capture stdout) | **natif** | D-T1 : exit 3 (PARTIEL) traité comme acceptable documenté ; D-T2 : rapport non persisté → le pilot le persiste lui-même ; D-T3 : crash timeout / G-1 lecture-seule non corrigés (correctifs en attente de feu vert côté forge-tests) ; D-T4 : `--generer` + `--json` incompatibles sur stdout |
 | Agents (transverse) | ledger contract + `compile-agent-def.mjs` si des agents dédiés sont justifiés ; sinon Agent tool du harnais | degrade | D-A1 : composition conversationnelle par doctrine ; D-A2 : `ledger.mjs` sans verrou → règle écrivain unique ; D-A3 : gates G1-G3 inactifs hors session dédiée |
 | SEO (post-MEP, récurrente — 08/08) | CLI natif : `python <seo>\scripts\new_mission.py --projet <produit> --client … --domaine … --modele …` puis méthode `seo\METHODE.md` déroulée en session ; contrôles `validate.py [--mission]` (exit 0/1) ; rapport `rapport_html.py --verifier`. **Jamais de déclenchement automatique** (doctrine de la forge : un audit commence par une commande explicite — mandat humain requis) | natif (scaffold/validation/rendu) + degrade (analyse des 87 nœuds en session) | D-S1 : 3 livrables sur 5 sans générateur ; D-S2 : snapshot non validé contre son schéma (dérive 1.0.0/1.1.0) ; D-S3 : pas de sortie --json ; D-S4 : moteurs d'étapes ad hoc chez la mission, non généralisés |
-| Organization (doctrine transverse — 08/08) | conversationnel — les documents (Inventaire, Décisions D-01→D-12) sont les entrées ; oracle `output\composant-filtres-tableau\oracle-filtres-tableau.mjs` exécutable | degrade | D-O1 : aucun point d'entrée (viole sa propre D-05) ; D-O2 : décisions en prose, pas de `conventions.json` ni vérificateur (Phase 3 non faite) ; D-O3 : recouvrement D-01→D-12 ↔ REGLES-PROJET.md du steering à réconcilier ; D-O4 : 3 questions ouvertes (Q3, Q3-bis, Q4) |
+| Organization (doctrine transverse — 08/08) | conversationnel — les documents (Inventaire, Décisions D-01→D-12) sont les entrées ; oracle `output\composant-filtres-tableau\oracle-filtres-tableau.mjs` exécutable | degrade | D-O1 : aucun point d'entrée (viole sa propre D-05) ; D-O2 : décisions en prose, pas de `conventions.json` ni vérificateur (Phase 3 non faite) ; D-O3 : recouvrement D-01→D-12 ↔ REGLES-PROJET.md du pilot à réconcilier ; D-O4 : 3 questions ouvertes (Q3, Q3-bis, Q4) |
 
 Chaque entrée de dette est reprise dans `BOUCLE-AMELIORATION.md` comme retour candidat.
 
