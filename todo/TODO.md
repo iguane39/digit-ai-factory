@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=45b07d6bc526 archive=e3b0c44298fc · dernier événement: 2026-08-09T09:00:25Z -->
+     sceaux: actifs=79284353bfbf archive=e3b0c44298fc · dernier événement: 2026-08-09T10:11:33Z -->
 
-**54 actifs** (candidat 48 · décidé 0 · en cours 6 · corrigé 0 · écarté 0) · **0 archivés**.
+**60 actifs** (candidat 54 · décidé 0 · en cours 1 · corrigé 5 · écarté 0) · **0 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -19,8 +19,12 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0021 | candidat | 6 | Régression CRLF digit-ai-page-html/SKILL.md | **oui** — 2 échecs réels du self-test quality-oracles constatés le 08/08 |
+| TF-0057 | candidat | 6 | find-in-page.js : même classe pour le conteneur de recherche et le surlignage | **oui** — défaut visible en production sur un rapport client ; écart mesuré 606 px, ramené à 0 px |
+| TF-0060 | candidat | 4.5 | digit-ai-schemas : l'exemple de reference viole 25 fois les regles du socle, dont 7 fois une regle anterieure | **oui** — 25 echecs sur l'asset de reference d'un skill de production, dont 7 sur une regle en vigueur depuis le 08/08 |
+| TF-0058 | candidat | 4 | render_page.py écrit ses PNG dans le dossier du fichier audité | **oui** — 12 fichiers d'oracle déposés dans un dossier de livrables client |
 | TF-0024 | candidat | 2.7 | Script de sync/diff repo ↔ ~/.claude | **oui** — Constatée deux fois (05/08 et 08/08), dans les deux directions |
 | TF-0022 | candidat | 2 | Committer le travail du 08/08 (file-candidats, gabarit A0) | non |
+| TF-0059 | candidat | 2 | render_page V7 : 288 avertissements de rythme vertical noient le signal V1/V4 | **oui** — 288 avertissements V7 contre 8 constats bloquants réels sur le même run |
 | TF-0023 | candidat | 1.5 | Réparer le self-test de l'installation (6 échecs) | non |
 | TF-0025 | candidat | 1 | Statuer sur le skill méta dormant | non |
 
@@ -67,18 +71,20 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0043 | en_cours | 8 | crawler.py ne lit pas sitemap.xml : l'inventaire du site est celui du graphe de liens | **oui** — Sur auxportesdelabaie.fr le crawler annonce 79 URLs découvertes ; le sitemap en déclare 286, soit 73 % du site absent de l'inventaire. |
-| TF-0044 | en_cours | 8 | crawler.py : la métrique pages_orphelines ne peut structurellement pas être non nulle | **oui** — « pages orphelines : 0 » affiché sur un site à 208 orphelines, découvertes seulement en confrontant sitemap et graphe de liens hors outil. |
-| TF-0045 | en_cours | 6 | rapport_html.py lit actions-*.csv sans dialecte : un CSV en points-virgules sort en n/d | **oui** — 10 actions sorties intégralement en « n/d » dans une version du rapport, qui se présentait par ailleurs comme complète. |
-| TF-0046 | en_cours | 3 | rapport_html.py échappe le markdown des fiches au lieu de le rendre | **oui** — Tableaux de preuve illisibles dans le rapport ; fiches réécrites en prose et convertisseur de tableaux développé côté mission pour contourner. |
-| TF-0047 | en_cours | 2 | Le « blocage principal » de la synthèse est choisi par l'ordre de la grille, pas par la gravité | **oui** — Sur la mission, le blocage affiché n'était pas le principal, et le texte repris renvoyait à « cette fiche » et à une action non encore introduite. |
 | TF-0030 | en_cours | 0.8 | Généraliser les moteurs ad hoc des missions | non |
 | TF-0042 | candidat | 10 | livrables.py : dette() écrit noeud_id en chaîne, le schéma exige un entier | **oui** — Pipeline officiel bloqué sur la mission livrée : 11 écarts au schéma, aucun livrable écrit. Contourné à la main pour produire le rapport. |
+| TF-0056 | candidat | 6 | validate.py ne contrôle aucune cohérence référentielle entre actions-*.csv et la grille | **oui** — le défaut de rattachement a traversé la génération de 8 versions du rapport sans être signalé |
 | TF-0048 | candidat | 4 | Une évolution de la grille sans table de correspondance réassigne silencieusement les constats | **oui** — 9 fiches sur 13 reprises se sont révélées assignées au mauvais nœud — performance serveur dans Canonical, données structurées dans Performance, GA4 dans Génération De Pages. Détecté par recoupement manuel, aucun outil ne le signalait. |
+| TF-0055 | candidat | 4 | front_matter() rend des chaînes : aucune action n'était rattachée à son nœud, en silence | **oui** — 0 action sur 10 rattachée à un nœud sur la mission livrée ; détecté en relisant le rendu, aucun contrôle ne le signalait |
 | TF-0028 | candidat | 3 | validate --mission contrôle schema_version | **oui** — Observée sur la mission réelle livrée |
 | TF-0026 | candidat | 2 | --json sur validate.py | non |
 | TF-0027 | candidat | 2 | Trancher le working tree en cours | non |
 | TF-0029 | candidat | 1 | Générateurs des 3 livrables manquants | non |
+| TF-0043 | corrige | 8 | crawler.py ne lit pas sitemap.xml : l'inventaire du site est celui du graphe de liens | **oui** — Sur auxportesdelabaie.fr le crawler annonce 79 URLs découvertes ; le sitemap en déclare 286, soit 73 % du site absent de l'inventaire. |
+| TF-0044 | corrige | 8 | crawler.py : la métrique pages_orphelines ne peut structurellement pas être non nulle | **oui** — « pages orphelines : 0 » affiché sur un site à 208 orphelines, découvertes seulement en confrontant sitemap et graphe de liens hors outil. |
+| TF-0045 | corrige | 6 | rapport_html.py lit actions-*.csv sans dialecte : un CSV en points-virgules sort en n/d | **oui** — 10 actions sorties intégralement en « n/d » dans une version du rapport, qui se présentait par ailleurs comme complète. |
+| TF-0046 | corrige | 3 | rapport_html.py échappe le markdown des fiches au lieu de le rendre | **oui** — Tableaux de preuve illisibles dans le rapport ; fiches réécrites en prose et convertisseur de tableaux développé côté mission pour contourner. |
+| TF-0047 | corrige | 2 | Le « blocage principal » de la synthèse est choisi par l'ordre de la grille, pas par la gravité | **oui** — Sur la mission, le blocage affiché n'était pas le principal, et le texte repris renvoyait à « cette fiche » et à une action non encore introduite. |
 
 ## steering
 
