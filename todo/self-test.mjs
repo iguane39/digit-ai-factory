@@ -47,18 +47,31 @@ const rouges = [
   ["R6 : decide sans decideur", [item({}), maj({ statut: "decide" })]],
   ["R7 : corrige sans gains_constates", [item({}), maj({ statut: "decide", decideur: "h", date_decision: "2026-08-08" }), maj({ ts: "2026-08-08T12:00:00Z", statut: "corrige", corrections_realisees: "x", date_correction: "2026-08-08" })]],
   ["R4 : creation hors statut candidat", [item({ statut: "decide" })]],
+  ["R1 : ingestion sans lot_sha", [item({}), JSON.stringify({ ev: "ingestion", ts: "2026-08-10T10:00:01Z", creations: 0 })]],
+  ["R10 : creation externe (run-*) sans ingestion — écriture directe", [item({ ts: "2026-08-10T10:00:00Z", demandeur: "run-produit-x-20260810" })]],
 ];
 for (const [nom, lignes] of rouges) {
-  const f = join(T, nom.slice(0, 2) + ".jsonl");
+  const regle = nom.split(" ")[0]; // "R1", "R10", …
+  const f = join(T, regle + "-" + createHash("sha256").update(nom).digest("hex").slice(0, 6) + ".jsonl");
   writeFileSync(f, lignes.join("\n") + "\n");
   check(`rouge ${nom} → FAIL exit 1, règle nommée`, () => {
     const r = lance(f);
     if (r === 0) throw new Error("aurait dû échouer");
     if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1`);
-    const regle = nom.slice(0, 2);
     if (!r.sortie.includes(`"${regle}"`)) throw new Error(`règle ${regle} absente des findings`);
   });
 }
+
+// R10 verte : la même creation externe, couverte par son ingestion → PASS
+const r10verte = join(T, "R10-verte.jsonl");
+writeFileSync(r10verte, [
+  item({ ts: "2026-08-10T10:00:00Z", demandeur: "run-produit-x-20260810" }),
+  JSON.stringify({ ev: "ingestion", ts: "2026-08-10T10:00:01Z", lot_sha: "abc", creations: 1 }),
+].join("\n") + "\n");
+check("R10 verte : creation externe couverte par ingestion → PASS", () => {
+  const r = lance(r10verte);
+  if (r !== 0) throw new Error(`exit ${r.code} : ${r.sortie.slice(0, 200)}`);
+});
 
 // ---- circuit d'ingestion (candidature → registre), sur registre TEMPORAIRE -----------------
 const ingerer = join(ICI, "ingerer-lot.mjs");

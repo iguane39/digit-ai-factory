@@ -14,6 +14,11 @@
  *  R7  clôture en corrige exige gains_constates + corrections_realisees + date_correction
  *  R8  l'archive ne contient que des items dont l'état final est archive
  *  R9  ts non décroissants par id
+ *  R10 toute creation issue d'une session externe (demandeur préfixé run-, produit- ou mission-)
+ *      est couverte par un événement ingestion (les N créations précédant l'ingestion,
+ *      cf. ingerer-lot.mjs) — l'écriture directe contourne l'écrivain unique (TF-0049).
+ *      S'applique aux événements postérieurs au 2026-08-09T00:00:00Z : les 7 créations
+ *      du 08/08 (TF-0042..48) précèdent la règle et le circuit de remise, constat consigné.
  */
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -39,10 +44,24 @@ function lire(fichier) {
   }).filter(Boolean);
 }
 
+const SEUIL_R10 = "2026-08-09T00:00:00Z";
+const RE_EXTERNE = /^(run|produit|mission)-/;
+
 function replier(evenements, ou) {
   const etats = new Map();
+  const creationsRecentes = []; // fenêtre pour la couverture d'ingestion (R10)
+  const externesNonCouvertes = [];
   for (const e of evenements) {
-    if (e.ev === "ingestion") { if (!e.lot_sha) ko("R1", `${ou}:${e.ligne}`, "ingestion sans lot_sha"); continue; }
+    if (e.ev === "ingestion") {
+      if (!e.lot_sha) ko("R1", `${ou}:${e.ligne}`, "ingestion sans lot_sha");
+      // l'ingestion couvre les N créations qui la précèdent immédiatement
+      // (garde : splice(-0) viderait tout — une ingestion sans creations ne couvre rien)
+      if (e.creations > 0) for (const c of creationsRecentes.splice(-e.creations)) {
+        const i = externesNonCouvertes.indexOf(c);
+        if (i >= 0) externesNonCouvertes.splice(i, 1);
+      }
+      continue;
+    }
     if (!e.id || !/^TF-\d{4}$/.test(e.id)) { ko("R2", `${ou}:${e.ligne}`, `id invalide : ${e.id}`); continue; }
     if (e.ev === "creation") {
       if (etats.has(e.id)) { ko("R2", e.id, "seconde creation pour le même id"); continue; }
@@ -53,6 +72,8 @@ function replier(evenements, ou) {
       if (!e.score || [e.score.gain, e.score.preuve, e.score.effort, e.score.valeur].some((v) => typeof v !== "number"))
         ko("R4", e.id, "creation sans score complet {gain, preuve, effort, valeur}");
       if (e.statut !== "candidat") ko("R4", e.id, `creation en statut ${e.statut} — tout entre en candidat`);
+      creationsRecentes.push(e.id);
+      if (RE_EXTERNE.test(e.demandeur || "") && e.ts >= SEUIL_R10) externesNonCouvertes.push(e.id);
       etats.set(e.id, { ...e });
     } else if (e.ev === "maj") {
       const etat = etats.get(e.id);
@@ -73,6 +94,8 @@ function replier(evenements, ou) {
       Object.assign(etat, e);
     } else ko("R1", `${ou}:${e.ligne}`, `ev inconnu : ${e.ev}`);
   }
+  for (const id of externesNonCouvertes)
+    ko("R10", id, "creation de session externe sans événement ingestion — l'écriture directe contourne l'écrivain unique (passer par un sidecar + ingerer-lot.mjs)");
   return etats;
 }
 
@@ -84,11 +107,11 @@ for (const [id, e] of etatsArchive)
   if (e.statut !== "archive") ko("R8", id, `dans l'archive avec statut ${e.statut}`);
 
 if (!findings.some((f) => f.statut === "FAIL")) {
-  ok("R1-R9", `${etatsActifs.size} item(s) actif(s), ${etatsArchive.size} archivé(s) — registre intègre`);
+  ok("R1-R10", `${etatsActifs.size} item(s) actif(s), ${etatsArchive.size} archivé(s) — registre intègre`);
 }
 const echecs = findings.filter((f) => f.statut === "FAIL").length;
 console.log(JSON.stringify({
-  oracle: "oracle-todo", version: "1.0.0", verdict: echecs ? "FAIL" : "PASS", findings,
+  oracle: "oracle-todo", version: "1.1.0", verdict: echecs ? "FAIL" : "PASS", findings,
   non_juge: [
     "la pertinence des scores (gain/effort) est un jugement humain, pas une règle",
     "la véracité des gains_constates n'est pas vérifiée dans le monde — seule leur présence l'est",

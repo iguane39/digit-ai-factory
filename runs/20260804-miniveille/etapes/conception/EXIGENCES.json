@@ -1,0 +1,188 @@
+{
+  "projet": "MiniVeille",
+  "date_generation": "2026-08-04",
+  "entrant": {
+    "type": "idée",
+    "libelle": "Produit-test du run pilote — fiche idée de 4 champs (problème, cible, job, palier visé), fournie dans PRODUIT-TEST.md",
+    "seuil_suffisance": "atteint : problème, cible, job principal et palier visé présents et non vides"
+  },
+  "identifiants_retires": [],
+  "besoins": [
+    { "id": "B-01", "enonce": "Le consultant peut enregistrer un lien de veille accompagné d'un ou plusieurs tags." },
+    { "id": "B-02", "enonce": "Le consultant peut consulter l'ensemble de ses liens enregistrés." },
+    { "id": "B-03", "enonce": "Le consultant peut retrouver ses liens en filtrant par tag." },
+    { "id": "B-04", "enonce": "Le consultant peut marquer un lien comme lu pour distinguer ce qui reste à traiter." },
+    { "id": "B-05", "enonce": "Le consultant pilote sa veille depuis une page web unique qui s'appuie sur une API backend, sans authentification." }
+  ],
+  "surface": [
+    { "id": "S-01", "type": "objet", "libelle": "Lien" },
+    { "id": "S-02", "type": "role", "libelle": "Consultant (mono-utilisateur, sans authentification)" },
+    { "id": "S-03", "type": "parcours", "libelle": "Enregistrement d'un lien avec tags" },
+    { "id": "S-04", "type": "parcours", "libelle": "Consultation de la liste des liens" },
+    { "id": "S-05", "type": "parcours", "libelle": "Filtrage des liens par tag" },
+    { "id": "S-06", "type": "parcours", "libelle": "Marquage d'un lien comme lu" },
+    { "id": "S-07", "type": "point-entree", "libelle": "Page web unique" },
+    { "id": "S-08", "type": "point-entree", "libelle": "API backend (FastAPI)" },
+    { "id": "S-09", "type": "regle", "libelle": "L'enregistrement d'un lien s'effectue en moins de 10 secondes" }
+  ],
+  "exigences": [
+    {
+      "id": "E-001",
+      "besoin": "B-01",
+      "enonce": "Le consultant enregistre un lien accompagné d'au moins un tag.",
+      "critere": "Le lien est enregistré avec un identifiant propre et au moins un tag associé.",
+      "palier": "MVP",
+      "statut_epistemique": { "nature": "fait constaté", "source": "PRODUIT-TEST.md, job principal, ligne 5 : « enregistrer un lien avec des tags… »" },
+      "surface": ["S-01", "S-03"],
+      "cotation": { "impact": 5, "confiance": 5, "effort": 2 }
+    },
+    {
+      "id": "E-002",
+      "besoin": "B-01",
+      "enonce": "L'enregistrement d'un lien depuis le formulaire de la page web respecte un délai maximal.",
+      "critere": "Le temps entre l'ouverture du formulaire et la confirmation d'enregistrement est inférieur ou égal à 10 s.",
+      "palier": "MVP",
+      "statut_epistemique": { "nature": "fait constaté", "source": "PRODUIT-TEST.md, job principal, ligne 5 : « en moins de 10 secondes »" },
+      "surface": ["S-01", "S-03", "S-09"],
+      "cotation": { "impact": 4, "confiance": 3, "effort": 3 }
+    },
+    {
+      "id": "E-003",
+      "besoin": "B-02",
+      "enonce": "Le consultant consulte la liste de l'ensemble de ses liens enregistrés.",
+      "critere": "La liste retourne tous les liens enregistrés, quel que soit leur statut de lecture.",
+      "palier": "MVP",
+      "statut_epistemique": { "nature": "fait constaté", "source": "Consigne de cadrage du run, bloc PÉRIMÈTRE : « lister »" },
+      "surface": ["S-01", "S-04"],
+      "cotation": { "impact": 5, "confiance": 4, "effort": 2 }
+    },
+    {
+      "id": "E-004",
+      "besoin": "B-03",
+      "enonce": "Le consultant filtre la liste des liens par un tag choisi.",
+      "critere": "La liste filtrée ne retourne que les liens portant le tag sélectionné.",
+      "palier": "MVP",
+      "statut_epistemique": { "nature": "fait constaté", "source": "PRODUIT-TEST.md, job principal, ligne 5 : « le retrouver par tag »" },
+      "surface": ["S-01", "S-05"],
+      "cotation": { "impact": 5, "confiance": 4, "effort": 2 }
+    },
+    {
+      "id": "E-005",
+      "besoin": "B-04",
+      "enonce": "Le consultant marque un lien comme lu depuis la page web unique.",
+      "critere": "Le champ statut du lien retourne la valeur lu après l'action de marquage.",
+      "palier": "MVP",
+      "statut_epistemique": { "nature": "fait constaté", "source": "PRODUIT-TEST.md, job principal, ligne 5 : « le marquer lu »" },
+      "surface": ["S-01", "S-06"],
+      "cotation": { "impact": 4, "confiance": 4, "effort": 1 }
+    },
+    {
+      "id": "E-006",
+      "besoin": "B-05",
+      "enonce": "Le consultant accède à l'ensemble des fonctions de veille depuis une même page web.",
+      "critere": "Le produit ne compte qu'1 écran pour l'ensemble des fonctions de veille (enregistrement, liste, filtre, marquage lu).",
+      "palier": "MVP",
+      "statut_epistemique": { "nature": "fait constaté", "source": "PRODUIT-TEST.md, palier visé, ligne 6 : « une page web unique »" },
+      "surface": ["S-07"],
+      "cotation": { "impact": 3, "confiance": 4, "effort": 2 }
+    },
+    {
+      "id": "E-007",
+      "besoin": "B-05",
+      "enonce": "La page web unique récupère les données de veille par des appels à une API backend.",
+      "critere": "Aucun accès direct à une base de données depuis la page web n'existe : tout accès aux liens passe par l'API backend.",
+      "palier": "MVP",
+      "statut_epistemique": { "nature": "fait constaté", "source": "PRODUIT-TEST.md, palier visé, ligne 6 : « backend FastAPI + une page web unique »" },
+      "surface": ["S-07", "S-08"],
+      "cotation": { "impact": 3, "confiance": 3, "effort": 2 }
+    },
+    {
+      "id": "E-008",
+      "besoin": "B-02",
+      "enonce": "La liste des liens affiche, pour chaque lien, le tag qui lui est associé.",
+      "critere": "Le tag associé à un lien est affiché à côté de ce lien dans la liste.",
+      "palier": "MVP",
+      "statut_epistemique": {
+        "nature": "hypothèse",
+        "validation": "affichage des tags dans la liste non cité littéralement par l'entrant ; à confirmer par relecture avec le consultant avant livraison du MVP"
+      },
+      "surface": ["S-01", "S-04"],
+      "cotation": { "impact": 3, "confiance": 3, "effort": 2 }
+    },
+    {
+      "id": "E-009",
+      "besoin": "B-02",
+      "enonce": "La liste des liens indique le statut de lecture de chaque lien.",
+      "critere": "Le statut de lecture de chaque lien listé est affiché, sans valeur manquante.",
+      "palier": "MVP",
+      "statut_epistemique": {
+        "nature": "hypothèse",
+        "validation": "affichage du statut de lecture dans la liste non cité littéralement par l'entrant ; à confirmer par relecture avec le consultant avant livraison du MVP"
+      },
+      "surface": ["S-01", "S-04", "S-06"],
+      "cotation": { "impact": 3, "confiance": 3, "effort": 1 }
+    },
+    {
+      "id": "E-010",
+      "besoin": "B-02",
+      "enonce": "Un lien marqué lu reste présent dans la liste non filtrée.",
+      "critere": "Un lien marqué lu apparaît toujours dans la liste non filtrée.",
+      "palier": "MVP",
+      "statut_epistemique": {
+        "nature": "hypothèse",
+        "validation": "comportement de la liste après marquage lu non cité par l'entrant ; à confirmer par relecture avec le consultant avant livraison du MVP"
+      },
+      "surface": ["S-01", "S-04", "S-06"],
+      "cotation": { "impact": 2, "confiance": 3, "effort": 1 }
+    },
+    {
+      "id": "E-011",
+      "besoin": "B-05",
+      "enonce": "Le consultant accède à ses liens sans authentification préalable.",
+      "critere": "Un mécanisme d'authentification est absent de la page web unique et de l'API backend.",
+      "palier": "MVP",
+      "statut_epistemique": { "nature": "fait constaté", "source": "Consigne de cadrage du run, bloc PÉRIMÈTRE : « Pas d'authentification au MVP (mono-utilisateur local) »" },
+      "surface": ["S-02", "S-07", "S-08"],
+      "cotation": { "impact": 3, "confiance": 5, "effort": 1 }
+    },
+    {
+      "id": "E-012",
+      "besoin": "B-01",
+      "enonce": "Le temps d'enregistrement d'un lien est mesuré pour objectiver le respect du délai cible.",
+      "critere": "Le temps d'enregistrement est journalisé pour 100 % des enregistrements effectués.",
+      "palier": "V1",
+      "statut_epistemique": {
+        "nature": "hypothèse",
+        "validation": "monitoring anticipé pour objectiver le critère des 10 s en usage réel ; à mettre en place et confirmer après un mois d'utilisation, avant le palier V1"
+      },
+      "surface": ["S-09"],
+      "cotation": { "impact": 2, "confiance": 2, "effort": 3 }
+    },
+    {
+      "id": "E-013",
+      "besoin": "B-03",
+      "enonce": "Le consultant filtre la liste des liens par plusieurs tags combinés.",
+      "critere": "La liste retourne uniquement les liens portant tous les tags sélectionnés.",
+      "palier": "V1",
+      "statut_epistemique": {
+        "nature": "hypothèse",
+        "validation": "besoin de filtrage multi-tags non cité par l'entrant, anticipé à partir de l'usage probable d'un outil de veille personnel ; à confirmer avec le consultant après une période d'usage du MVP"
+      },
+      "surface": ["S-01", "S-05"],
+      "cotation": { "impact": 3, "confiance": 2, "effort": 3 }
+    },
+    {
+      "id": "E-014",
+      "besoin": "B-04",
+      "enonce": "La page web unique indique le nombre de liens au statut non lu.",
+      "critere": "Le nombre de liens au statut non lu est affiché sur la page unique.",
+      "palier": "V1",
+      "statut_epistemique": {
+        "nature": "hypothèse",
+        "validation": "compteur de liens non lus anticipé comme complément du marquage lu, non cité par l'entrant ; à confirmer avec le consultant avant le palier V1"
+      },
+      "surface": ["S-01", "S-06", "S-07"],
+      "cotation": { "impact": 2, "confiance": 2, "effort": 2 }
+    }
+  ]
+}

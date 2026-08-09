@@ -303,3 +303,54 @@ chemins absolus continuent de fonctionner jusqu'à leur rattrapage en run de ver
 Documents vivants mis à jour ; l'HISTOIRE n'est pas réécrite (ledgers, TODO.jsonl,
 entrées passées de ce journal, livrables datés d'output\ : le mot « steering » y reste un
 fait d'époque). Les événements TF futurs portent `demandeur: pilot`.
+
+## 09/08/2026 (soir) — boucle TODO sur mandat global : 41 items construits en une campagne
+
+**Mandat humain** : « Boucle pour construire tous les éléments de la TODO qui ne nécessitent
+pas d'entrants de ma part. » Décision globale tracée au registre (`decideur` sur chaque
+`decide`). Périmètre : 44 items pris (41 construits + 3 clos de fait sur preuves de la
+veille), 12 laissés en `candidat` avec leur raison (entrant humain requis), 2 restés
+`en_cours` (TF-0029 recommandé à l'écart, TF-0039 attend une décision D-xx).
+
+**Dispositif** : première campagne sous `gabarits\AGENT-CAMPAGNE.md` (TF-0050, construit en
+ouverture puis utilisé par les 7 prompts) — 7 agents parallèles, un par dépôt cible, le
+pilot construisant ses propres items pendant ce temps (R10, R-19, noyau CLAUDE.md ≤ 6 Ko +
+`references\`, oracle-claude-md, archive du run pilote, fiches d'audit, exercice de reprise,
+règles §3 bis et §4 bis du contrat). Chaque rapport vérifié par sondage avant clôture
+(self-tests rejoués, commits inspectés, arbres contrôlés). Détail par item : registre
+TF (`gains_constates` exigés partout), commits cités dans `version_forge_corrigee`.
+
+**Routage instrumenté** (§4 bis du contrat — première campagne mesurée) :
+
+| Tranche | Modèle | Items | Tokens | Outils | Durée | Verdict |
+|---|---|---|---|---|---|---|
+| installations | Sonnet | 2/2 | 76 k | 17 | 2,5 min | vert |
+| organization | Opus | 5/5 | 177 k | 59 | 18 min | vert |
+| conception | Sonnet | 2/2 | 205 k | 97 | 18 min | vert |
+| development | Sonnet | 3/3 | 201 k | 121 | 19 min | vert |
+| seo | Opus | 5/6 | 218 k | 148 | 27 min | vert (1 item non fondé) |
+| tests | Opus | 5/5 | 299 k | 193 | 39 min | vert |
+| agents | Opus | 10/10 | 309 k | 202 | 47 min | vert |
+
+`escalade_modele` : **aucune** sur 7 tranches. Donnée saillante : les 3 tranches Sonnet —
+dont development, qui portait des gates exécutables et le conductor — sont toutes vertes au
+premier coup à coût comparable. Le tableau §4 a désormais de quoi être challengé : la
+prochaine campagne comparable devrait tenter une tranche « construction » de plus en Sonnet.
+
+**Écritures dans les dépôts frères** : couvertes par le mandat global de ce jour, garde-fou
+reformulé au noyau (« hors mandat humain explicite ») — les campagnes mandatées écrivent,
+tout le reste passe par lots et propositions. Le harnais a signalé ces écritures comme
+sensibles sur 3 campagnes : lecture faite, elles sont conformes au mandat (commits locaux,
+jamais de push). Décision à valider séparément : la réconciliation `740ec6c` (quality-oracles
+installation→dépôt) verse sous git du travail de la session du 08/08 — commit isolé,
+réversible seul, vérifié strictement additif (440+/7−).
+
+**Constats de campagne devenus candidatures** : TF-0063…TF-0078 (16 créations, dont la
+dérive skill↔dashboard qui met la recette de forge-tests en rouge — TF-0063 — et la
+canalisation des sidecars du hook qualité — TF-0065). L'incident structurel du jour : trois
+campagnes ont dû nettoyer les journaux `.oracles*` semés par le hook de session dans leurs
+dépôts cibles.
+
+**Bilan registre** : 48 `corrige` (dont les 5 de la veille), 28 `candidat`, 2 `en_cours` ;
+oracle R1-R10 PASS, self-tests TODO 18/18 et conformité 3/3, vue et page régénérées
+(sceau 82c9248684ef).

@@ -1,6 +1,10 @@
-runs/
+# runs/ : les artefacts probants (ledger, étapes, journaux d'oracles) sont versionnés —
+# c'est la preuve fondatrice citée par le README (TF-0036) ; le produit construit, lui,
+# vit dans son propre dépôt et ne se duplique pas ici.
+runs/**/produit/
 *.log
 .env
 *.oracles.json
 *.oracles-cache.json
 *.oracles-historique.jsonl
+!runs/**/*.oracles.json

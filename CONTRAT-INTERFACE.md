@@ -88,6 +88,20 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
 - `run_open` porte les **versions des forges** utilisées (`versions_forges: {<forge>: <sha court>}`,
   relevées après le pull d'ouverture) et, pour un run de version, `run_precedent: <run-id>` —
   le ledger du run N est l'entrée du run N+1 (cf. CLAUDE.md « Run de version »).
+  Contrôle exécutable : R-19 de `oracles/oracle-conformite-projet.mjs` (TF-0035).
+
+### 3 bis. Référentiels à identifiants : évolution sous table de correspondance (TF-0048)
+
+Tout référentiel dont les éléments portent des identifiants consommés par ailleurs (grille de
+nœuds seo, `EXIGENCES.json`, registre de dette de forge-tests, registre TF) obéit à la même loi :
+**une évolution qui déplace ou retire des identifiants embarque une table de correspondance
+versionnée** (`ancien_id → nouvel_id | retiré`), et les consommateurs refusent un artefact dont
+la version de référentiel diffère de la leur sans table applicable. Le précédent payé : le
+passage de la grille seo de 82 à 87 nœuds a déplacé 14 identifiants — une étude reprise par id
+écrivait chaque constat dans le mauvais nœud, sans alerte. Déclinaisons existantes :
+`identifiants_retires` (conception, ids jamais réaffectés), ids TF jamais réutilisés (registre),
+table de correspondance + contrôle de version de grille (seo, TF-0048). Une forge qui fait
+évoluer un référentiel identifié sans sa table est en défaut de contrat.
 
 ## 4. Routage par modèle
 
@@ -103,6 +117,25 @@ modèle supérieur **uniquement** sur échec d'un oracle ou d'un critère d'acce
 ledger (`escalade_modele`, avec la raison). Une affectation qui réussit du premier coup au niveau
 inférieur est la preuve que le routage était bon — le tableau ci-dessus est un a priori, le ledger
 accumule la vérité mesurée.
+
+### 4 bis. Protocole de mesure du routage (TF-0051)
+
+Constat fondateur : ~25 affectations de modèle en 2 produits réels, zéro escalade ET zéro donnée
+comparative — un a priori jamais confronté. Protocole, appliqué à toute campagne ou run :
+
+1. **Consignation systématique** : chaque tranche déléguée porte au journal de campagne (ou au
+   ledger) : modèle affecté, raison de l'affectation, tokens consommés (relevés du harnais),
+   nombre de passes, verdict des vérifications natives. `escalade_modele` se consigne **même
+   « aucune »** — l'absence d'escalade est une donnée, pas un silence.
+2. **Tranches comparables** : dès qu'une campagne comporte ≥ 2 tranches de nature équivalente
+   (même type de correctif, dépôts différents), affecter A→Sonnet et B→Opus et comparer coût
+   par tranche **à qualité égale** (vérification native verte dans les deux cas).
+3. **Verdict** : si Sonnet tient la qualité sur une classe de tâche, le tableau §4 est amendé
+   (la classe descend d'un cran) ; si une escalade se répète sur une classe, elle monte. Toute
+   modification du tableau cite ses mesures.
+
+Première campagne instrumentée : boucle TODO du 09/08 (7 tranches, répartition Opus/Sonnet,
+relevés au journal `BOUCLE-AMELIORATION.md`).
 
 ## 5. Table de routage réelle et dette d'intégration
 

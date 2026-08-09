@@ -35,6 +35,11 @@ writeFileSync(join(verte, ".env"), "PORT=8000\n");
 writeFileSync(join(verte, ".gitignore"), ".env\n.venv/\n__pycache__/\nnode_modules/\ngenerated/\nOld/\n");
 writeFileSync(join(verte, "output", "Digit-AI - Rapport Test - 20260806a.md"), "rapport\n");
 writeFileSync(join(verte, "forge", "audit.oracles.json"), "{}\n");
+writeFileSync(join(verte, "forge", "ledger.jsonl"), [
+  JSON.stringify({ type: "run_open", ts: "2026-08-09T08:00:00Z", versions_forges: { conception: "951d46e", design: "2ae8517", development: "b65ff31", tests: "d0abbd6", agents: "9d3b3a5" } }),
+  JSON.stringify({ type: "run_close", ts: "2026-08-09T18:00:00Z" }),
+  JSON.stringify({ type: "run_open", ts: "2026-08-10T08:00:00Z", run_precedent: "run-20260809", versions_forges: { conception: "951d46e" } }),
+].join("\n") + "\n"); // R-19 verte : versions_forges partout + chaînage du run de version
 writeFileSync(join(verte, "app.py"), "print('produit')\n");
 sh("git", ["init", "-q", "-b", "main"], verte);
 sh("git", ["-c", "user.email=t@t", "-c", "user.name=t", "add", "-A"], verte);
@@ -54,13 +59,18 @@ writeFileSync(join(rouge, "output", "rapport-final.md"), "x\n");    // R-4 : liv
 writeFileSync(join(rouge, "output", "Old", "vieux - 20260101a.py"), "x = 1\n"); // R-6 : code sous Old
 writeFileSync(join(rouge, "main - 20260806a.py"), "x = 1\n");       // R-6 : code daté
 writeFileSync(join(rouge, "CLAUDE.md"), "# Produit\njuste des commandes pytest\n"); // R-11 : présent SANS routage forge
+mkdirSync(join(rouge, "forge"), { recursive: true });
+writeFileSync(join(rouge, "forge", "ledger.jsonl"), [
+  JSON.stringify({ type: "run_open", ts: "2026-08-09T08:00:00Z" }),               // R-19 : sans versions_forges
+  JSON.stringify({ type: "run_open", ts: "2026-08-10T08:00:00Z", versions_forges: { conception: "x" } }), // R-19 : version sans run_precedent
+].join("\n") + "\n");
 // pas de .gitignore → R-7 (Old non ignoré) + R-10 ; pas de git → R-8 ; pas de README → R-12 ; pas d'env.example → R-13
 
 check("rouge : chaque règle attendue se déclenche, FAIL exit 1", () => {
   const { exit, rapport } = lance(rouge);
   if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
   const declenchees = new Set(rapport.findings.filter((f) => f.statut === "FAIL").map((f) => f.regle));
-  for (const attendue of ["R-1", "R-3", "R-4", "R-6", "R-7", "R-8", "R-10", "R-11", "R-12", "R-13", "R-18"])
+  for (const attendue of ["R-1", "R-3", "R-4", "R-6", "R-7", "R-8", "R-10", "R-11", "R-12", "R-13", "R-18", "R-19"])
     if (!declenchees.has(attendue)) throw new Error(`règle ${attendue} non déclenchée sur la fixture rouge`);
 });
 

@@ -148,6 +148,31 @@ else {
   ignore.stdout.trim() ? ko("R-17", rel(journaux[0]), "journaux d'oracles ignorés par git — décision C4 : versionnés (preuves)") : ok("R-17", "forge/", `${journaux.length} journal(aux) d'oracles versionnables`);
 }
 
+// R-19 — versions_forges consignées au ledger (contrat §3, TF-0035) : chaque run_open porte
+// versions_forges (objet non vide — avec quelles forges le produit a été construit) ; tout
+// run_open ultérieur au premier (run de version) porte run_precedent (chaînage des runs).
+const ledgerF = p("forge", "ledger.jsonl");
+if (!existsSync(ledgerF)) so("R-19", "pas de forge\\ledger.jsonl (aucun run ouvert)");
+else {
+  const opens = readFileSync(ledgerF, "utf8").split("\n").filter((l) => l.trim()).map((l) => {
+    try { return JSON.parse(l); } catch { return null; }
+  }).filter((e) => e && (e.type === "run_open" || e.ev === "run_open"));
+  if (!opens.length) ko("R-19", "forge/ledger.jsonl", "ledger présent mais aucun run_open — le ledger s'ouvre par run_open");
+  else {
+    let r19 = true;
+    opens.forEach((o, i) => {
+      const v = o.versions_forges;
+      if (!v || typeof v !== "object" || !Object.keys(v).length) {
+        ko("R-19", `forge/ledger.jsonl (run_open #${i + 1})`, "run_open sans versions_forges — consigner la version de chaque forge (contrat §3, fraîcheur)"); r19 = false;
+      }
+      if (i > 0 && !o.run_precedent) {
+        ko("R-19", `forge/ledger.jsonl (run_open #${i + 1})`, "run de version sans run_precedent — les runs se chaînent"); r19 = false;
+      }
+    });
+    if (r19) ok("R-19", "forge/ledger.jsonl", `${opens.length} run_open avec versions_forges${opens.length > 1 ? " et chaînage run_precedent" : ""}`);
+  }
+}
+
 const nonJuge = [
   "R-5 (pas d'écrasement de version) : invisible statiquement — jugé par revue de diff",
   "R-15 (marqueurs « à fournir » exhaustifs) : l'oracle ne sait pas quelles variables sont tierces",
