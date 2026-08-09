@@ -49,7 +49,7 @@
   <div class="wrap">
     <header>
       <h1>TODO-FORGE — registre d'amélioration</h1>
-      <p class="meta">78 actifs (candidat 28 · décidé 0 · en cours 2 · corrigé 48 · écarté 0) · 0 archivés · sceau source <code>82c9248684ef</code> · dernier événement 2026-08-09T14:00:09Z</p>
+      <p class="meta">79 actifs (candidat 28 · décidé 0 · en cours 2 · corrigé 49 · écarté 0) · 0 archivés · sceau source <code>6730865fc419</code> · dernier événement 2026-08-09T15:30:04Z</p>
       <p>Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au pilot — il sera appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
     </header>
     <div class="barre">
@@ -381,7 +381,7 @@
       </table></div>
     </section>
     <section>
-      <h2 id="design">design <span class="badge">5</span></h2>
+      <h2 id="design">design <span class="badge">6</span></h2>
       <div class="scroll"><table data-filterable>
         <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
@@ -436,6 +436,19 @@
             </details>
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0020" rows="1" aria-label="Commentaire TF-0020" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0079" aria-label="Décider TF-0079" disabled></td>
+          <td class="c-id"><code>TF-0079</code></td>
+          <td><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score">6</td>
+          <td>
+            <details><summary><strong>oracle-tokens T4 contredisait la doctrine du thème clair — sombre rendu optionnel</strong></summary>
+              <p>T4 (forge-design, consommé via le registre quality-oracles) exigeait clair ET sombre : chaque fiche claire était poussée vers un sombre que personne n'a demandé (le schéma écosystème du pilot a dû embarquer 3 blocs sombres pour passer). Or la doctrine du socle digit-ai-page-html est le thème clair, confirmée par directive humaine du 09/08 : « les fiches HTML doivent être en thème clair. » Correctif : clair seul conforme (finding info) ; dès qu'un sombre est déclaré, parité complète et contrastes des deux thèmes restent bloquants.</p>
+              <p class="meta">Demandeur : humain · 2026-08-09 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — 3 blocs sombres imposés au schéma du 09/08 pour satisfaire un contrat que la doctrine contredit</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0079" rows="1" aria-label="Commentaire TF-0079" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0018" aria-label="Décider TF-0018" disabled></td>
@@ -1157,7 +1170,7 @@
   <script>
   (function () {
     "use strict";
-    var SCEAU = "82c9248684ef";
+    var SCEAU = "6730865fc419";
     var cle = function (id, type) { return "todo-forge:" + SCEAU + ":" + id + ":" + type; };
     var coches = document.querySelectorAll("input.decider");
     var comms = document.querySelectorAll("textarea.commentaire");

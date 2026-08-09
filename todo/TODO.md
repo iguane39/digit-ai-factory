@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=82c9248684ef archive=e3b0c44298fc · dernier événement: 2026-08-09T14:00:09Z -->
+     sceaux: actifs=6730865fc419 archive=e3b0c44298fc · dernier événement: 2026-08-09T15:30:04Z -->
 
-**78 actifs** (candidat 28 · décidé 0 · en cours 2 · corrigé 48 · écarté 0) · **0 archivés**.
+**79 actifs** (candidat 28 · décidé 0 · en cours 2 · corrigé 49 · écarté 0) · **0 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -53,6 +53,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0016 | candidat | 2 | Rebuild + commit dist/*.skill | non |
 | TF-0019 | candidat | 1.5 | Premier appel réel Gemini (lever R-D3) | non |
 | TF-0020 | candidat | 1 | Producteur d'images complet | non |
+| TF-0079 | corrige | 6 | oracle-tokens T4 contredisait la doctrine du thème clair — sombre rendu optionnel | **oui** — 3 blocs sombres imposés au schéma du 09/08 pour satisfaire un contrat que la doctrine contredit |
 | TF-0018 | corrige | 1 | Installer les 4 skills verbes | non |
 
 ## development
