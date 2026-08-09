@@ -1,7 +1,7 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=79284353bfbf archive=e3b0c44298fc · dernier événement: 2026-08-09T10:11:33Z -->
+     sceaux: actifs=1a860796b7db archive=e3b0c44298fc · dernier événement: 2026-08-09T10:39:57Z -->
 
 **60 actifs** (candidat 54 · décidé 0 · en cours 1 · corrigé 5 · écarté 0) · **0 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).

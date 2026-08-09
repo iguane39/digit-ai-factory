@@ -82,7 +82,8 @@ dans le projet produit : artefacts d'orchestration sous `forge\`, code du produi
    retours du produit — règle 18).
    **Valider** : `node <steering>\oracles\oracle-conformite-projet.mjs <projet>` → PASS exigé
    avant l'étape 2 ; rejouer l'oracle avant `run_close`. Nommage : tout livrable copié dans
-   `output\`/`docs\` porte `<Marque> - <Objet> - AAAAMMJJ<indice>` ; un livrable remplacé migre
+   `output\`/`docs\` porte `<Projet> - <Objet> - AAAAMMJJ<indice>` — **le nom du projet prime
+   sur l'émetteur** (Q3-bis, décision humaine du 09/08) ; un livrable remplacé migre
    dans `Old\` (jamais versionné) ; le code, lui, n'est jamais daté — git est son seul magasin.
 2. **Étape conception** (mode dégradé, cf. contrat §5) : appliquer les **4 verbes** documentés dans
    `c:\dev\digit-ai-forge-conception\skills\` → `ENTRANT.md`, `SURFACE.md`, `EXIGENCES.json` + vues,
