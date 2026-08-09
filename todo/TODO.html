@@ -49,7 +49,7 @@
   <div class="wrap">
     <header>
       <h1>TODO-FORGE — registre d'amélioration</h1>
-      <p class="meta">49 actifs (candidat 49 · décidé 0 · en cours 0 · corrigé 0 · écarté 0) · 0 archivés · sceau source <code>81022d5a14b4</code> · dernier événement 2026-08-08T21:30:00Z</p>
+      <p class="meta">54 actifs (candidat 48 · décidé 0 · en cours 6 · corrigé 0 · écarté 0) · 0 archivés · sceau source <code>45b07d6bc526</code> · dernier événement 2026-08-09T09:00:25Z</p>
       <p>Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au steering — il sera appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
     </header>
     <div class="barre">
@@ -371,7 +371,7 @@
       </table></div>
     </section>
     <section>
-      <h2 id="organization">organization <span class="badge">4</span></h2>
+      <h2 id="organization">organization <span class="badge">5</span></h2>
       <div class="scroll"><table data-filterable>
         <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
@@ -387,6 +387,19 @@
             </details>
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0031" rows="1" aria-label="Commentaire TF-0031" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0052" aria-label="Décider TF-0052"></td>
+          <td class="c-id"><code>TF-0052</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">3</td>
+          <td>
+            <details><summary><strong>Trancher les 3 arbitrages « Leviers de qualité générique » (organization)</strong></summary>
+              <p>Le doc de conception d'organization (08/08) attend 3 décisions A/B/C : capture déterministe des règles, chargement de spec amont, hook PostToolUse. Chemin le plus court vers un harnais actif au-delà du seul hook C6 (mesuré : 1 hook actif, 3 gates et 8 agents compilés dormants). Métrique : mécanismes actifs vs dormants. Protocole : décision humaine + 1 essai du levier retenu.</p>
+              <p class="meta">Demandeur : steering · 2026-08-09 · gain 3 × preuve 1 ÷ effort 1</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0052" rows="1" aria-label="Commentaire TF-0052" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0032" aria-label="Décider TF-0032"></td>
@@ -436,6 +449,84 @@
         <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0043" aria-label="Décider TF-0043" disabled></td>
+          <td class="c-id"><code>TF-0043</code></td>
+          <td><span class="statut s-en_cours">en_cours</span></td>
+          <td class="c-score">8</td>
+          <td>
+            <details><summary><strong>crawler.py ne lit pas sitemap.xml : l'inventaire du site est celui du graphe de liens</strong></summary>
+              <p>scripts/crawler.py lit robots.txt uniquement pour les permissions (rp.can_fetch) et n'en exploite jamais la directive Sitemap. L'ensemble connus[] n'est alimenté que par les liens suivis. urls_decouvertes ne mesure donc pas les URLs du site mais les URLs atteignables en navigant. Sur la mission : 79 annoncées, 286 déclarées au sitemap. Correctif : une requête sur sitemap.xml, amorcer connus[] avec ses URLs.</p>
+              <p class="meta">Demandeur : run-seo-auxportesdelabaie-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — Sur auxportesdelabaie.fr le crawler annonce 79 URLs découvertes ; le sitemap en déclare 286, soit 73 % du site absent de l'inventaire.</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0043" rows="1" aria-label="Commentaire TF-0043" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0044" aria-label="Décider TF-0044" disabled></td>
+          <td class="c-id"><code>TF-0044</code></td>
+          <td><span class="statut s-en_cours">en_cours</span></td>
+          <td class="c-score">8</td>
+          <td>
+            <details><summary><strong>crawler.py : la métrique pages_orphelines ne peut structurellement pas être non nulle</strong></summary>
+              <p>scripts/crawler.py ligne 231 : orphelines = pages du crawl avec _entrants_tous == 0 et profondeur_clic &gt; 0. Or une page n'entre dans l'ensemble crawlé que parce qu'un lien y menait : la condition est insatisfiable. Le contrôle ne peut pas échouer, donc il ne prouve rien, et il affiche un zéro rassurant. Sur la mission, le rapport annonce « pages orphelines : 0 » là où 208 pages sur 286 ne reçoivent aucun lien entrant. Correctif : définir l'orpheline comme URL DÉCLARÉE (sitemap) sans lien entrant après crawl — ce qui suppose l'item sitemap ci-dessus.</p>
+              <p class="meta">Demandeur : run-seo-auxportesdelabaie-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — « pages orphelines : 0 » affiché sur un site à 208 orphelines, découvertes seulement en confrontant sitemap et graphe de liens hors outil.</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0044" rows="1" aria-label="Commentaire TF-0044" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0045" aria-label="Décider TF-0045" disabled></td>
+          <td class="c-id"><code>TF-0045</code></td>
+          <td><span class="statut s-en_cours">en_cours</span></td>
+          <td class="c-score">6</td>
+          <td>
+            <details><summary><strong>rapport_html.py lit actions-*.csv sans dialecte : un CSV en points-virgules sort en n/d</strong></summary>
+              <p>csv.DictReader(f) est appelé sans argument delimiter, donc en virgule. Un CSV point-virgule — séparateur par défaut d'Excel en locale française — est lu comme un champ unique par ligne : toutes les colonnes tombent à None et le rapport imprime « n/d » sur l'intégralité du tableau d'actions, sans le moindre avertissement. Correctif : csv.Sniffer, ou refus explicite si l'en-tête attendu n'est pas reconnu.</p>
+              <p class="meta">Demandeur : run-seo-auxportesdelabaie-20260808 · 2026-08-08 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — 10 actions sorties intégralement en « n/d » dans une version du rapport, qui se présentait par ailleurs comme complète.</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0045" rows="1" aria-label="Commentaire TF-0045" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0046" aria-label="Décider TF-0046" disabled></td>
+          <td class="c-id"><code>TF-0046</code></td>
+          <td><span class="statut s-en_cours">en_cours</span></td>
+          <td class="c-score">3</td>
+          <td>
+            <details><summary><strong>rapport_html.py échappe le markdown des fiches au lieu de le rendre</strong></summary>
+              <p>Le corps des fiches est inséré via esc() sans conversion. Or les fiches sont des fichiers .md et le référentiel lui-même y met du markdown (les en-têtes générés contiennent du gras dans critere_verdict). Les tableaux de preuve sortent en soupe de barres verticales, le gras en astérisques. Deux issues : convertir un sous-ensemble sûr (gras, code, tableaux), ou documenter que les fiches s'écrivent en prose — mais alors retirer le markdown des gabarits de la grille.</p>
+              <p class="meta">Demandeur : run-seo-auxportesdelabaie-20260808 · 2026-08-08 · gain 3 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Tableaux de preuve illisibles dans le rapport ; fiches réécrites en prose et convertisseur de tableaux développé côté mission pour contourner.</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0046" rows="1" aria-label="Commentaire TF-0046" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0047" aria-label="Décider TF-0047" disabled></td>
+          <td class="c-id"><code>TF-0047</code></td>
+          <td><span class="statut s-en_cours">en_cours</span></td>
+          <td class="c-score">2</td>
+          <td>
+            <details><summary><strong>Le « blocage principal » de la synthèse est choisi par l'ordre de la grille, pas par la gravité</strong></summary>
+              <p>bloc_synthese() prend faibles[0], soit le premier nœud non conforme dans l'ordre du manifeste, et publie son interprétation comme blocage principal du rapport. L'ordre de la grille est thématique, pas hiérarchique : le nœud 2 passe systématiquement devant des constats bien plus lourds situés plus loin. En prime, l'interprétation d'une fiche est rédigée pour son contexte et peut renvoyer à « cette fiche » ou à une action non encore présentée. Correctif : choisir sur un critère explicite — gravité, ou nœud le plus cité par les actions retenues — ou prévoir un champ dédié dans le snapshot.</p>
+              <p class="meta">Demandeur : run-seo-auxportesdelabaie-20260808 · 2026-08-08 · gain 2 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Sur la mission, le blocage affiché n'était pas le principal, et le texte repris renvoyait à « cette fiche » et à une action non encore introduite.</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0047" rows="1" aria-label="Commentaire TF-0047" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0030" aria-label="Décider TF-0030" disabled></td>
+          <td class="c-id"><code>TF-0030</code></td>
+          <td><span class="statut s-en_cours">en_cours</span></td>
+          <td class="c-score">0.8</td>
+          <td>
+            <details><summary><strong>Généraliser les moteurs ad hoc des missions</strong></summary>
+              <p>fiches87.py etc. vivent chez la mission avec chemins en dur — non réutilisables.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 4</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0030" rows="1" aria-label="Commentaire TF-0030" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0042" aria-label="Décider TF-0042"></td>
           <td class="c-id"><code>TF-0042</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
@@ -447,45 +538,6 @@
             </details>
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0042" rows="1" aria-label="Commentaire TF-0042" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0043" aria-label="Décider TF-0043"></td>
-          <td class="c-id"><code>TF-0043</code></td>
-          <td><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score">8</td>
-          <td>
-            <details><summary><strong>crawler.py ne lit pas sitemap.xml : l'inventaire du site est celui du graphe de liens</strong></summary>
-              <p>scripts/crawler.py lit robots.txt uniquement pour les permissions (rp.can_fetch) et n'en exploite jamais la directive Sitemap. L'ensemble connus[] n'est alimenté que par les liens suivis. urls_decouvertes ne mesure donc pas les URLs du site mais les URLs atteignables en navigant. Sur la mission : 79 annoncées, 286 déclarées au sitemap. Correctif : une requête sur sitemap.xml, amorcer connus[] avec ses URLs.</p>
-              <p class="meta">Demandeur : run-seo-auxportesdelabaie-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — Sur auxportesdelabaie.fr le crawler annonce 79 URLs découvertes ; le sitemap en déclare 286, soit 73 % du site absent de l'inventaire.</p>
-            </details>
-          </td>
-          <td class="c-comm"><textarea class="commentaire" data-id="TF-0043" rows="1" aria-label="Commentaire TF-0043" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0044" aria-label="Décider TF-0044"></td>
-          <td class="c-id"><code>TF-0044</code></td>
-          <td><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score">8</td>
-          <td>
-            <details><summary><strong>crawler.py : la métrique pages_orphelines ne peut structurellement pas être non nulle</strong></summary>
-              <p>scripts/crawler.py ligne 231 : orphelines = pages du crawl avec _entrants_tous == 0 et profondeur_clic &gt; 0. Or une page n'entre dans l'ensemble crawlé que parce qu'un lien y menait : la condition est insatisfiable. Le contrôle ne peut pas échouer, donc il ne prouve rien, et il affiche un zéro rassurant. Sur la mission, le rapport annonce « pages orphelines : 0 » là où 208 pages sur 286 ne reçoivent aucun lien entrant. Correctif : définir l'orpheline comme URL DÉCLARÉE (sitemap) sans lien entrant après crawl — ce qui suppose l'item sitemap ci-dessus.</p>
-              <p class="meta">Demandeur : run-seo-auxportesdelabaie-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — « pages orphelines : 0 » affiché sur un site à 208 orphelines, découvertes seulement en confrontant sitemap et graphe de liens hors outil.</p>
-            </details>
-          </td>
-          <td class="c-comm"><textarea class="commentaire" data-id="TF-0044" rows="1" aria-label="Commentaire TF-0044" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0045" aria-label="Décider TF-0045"></td>
-          <td class="c-id"><code>TF-0045</code></td>
-          <td><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score">6</td>
-          <td>
-            <details><summary><strong>rapport_html.py lit actions-*.csv sans dialecte : un CSV en points-virgules sort en n/d</strong></summary>
-              <p>csv.DictReader(f) est appelé sans argument delimiter, donc en virgule. Un CSV point-virgule — séparateur par défaut d'Excel en locale française — est lu comme un champ unique par ligne : toutes les colonnes tombent à None et le rapport imprime « n/d » sur l'intégralité du tableau d'actions, sans le moindre avertissement. Correctif : csv.Sniffer, ou refus explicite si l'en-tête attendu n'est pas reconnu.</p>
-              <p class="meta">Demandeur : run-seo-auxportesdelabaie-20260808 · 2026-08-08 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — 10 actions sorties intégralement en « n/d » dans une version du rapport, qui se présentait par ailleurs comme complète.</p>
-            </details>
-          </td>
-          <td class="c-comm"><textarea class="commentaire" data-id="TF-0045" rows="1" aria-label="Commentaire TF-0045" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0048" aria-label="Décider TF-0048"></td>
@@ -514,19 +566,6 @@
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0028" rows="1" aria-label="Commentaire TF-0028" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
-          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0046" aria-label="Décider TF-0046"></td>
-          <td class="c-id"><code>TF-0046</code></td>
-          <td><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score">3</td>
-          <td>
-            <details><summary><strong>rapport_html.py échappe le markdown des fiches au lieu de le rendre</strong></summary>
-              <p>Le corps des fiches est inséré via esc() sans conversion. Or les fiches sont des fichiers .md et le référentiel lui-même y met du markdown (les en-têtes générés contiennent du gras dans critere_verdict). Les tableaux de preuve sortent en soupe de barres verticales, le gras en astérisques. Deux issues : convertir un sous-ensemble sûr (gras, code, tableaux), ou documenter que les fiches s'écrivent en prose — mais alors retirer le markdown des gabarits de la grille.</p>
-              <p class="meta">Demandeur : run-seo-auxportesdelabaie-20260808 · 2026-08-08 · gain 3 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Tableaux de preuve illisibles dans le rapport ; fiches réécrites en prose et convertisseur de tableaux développé côté mission pour contourner.</p>
-            </details>
-          </td>
-          <td class="c-comm"><textarea class="commentaire" data-id="TF-0046" rows="1" aria-label="Commentaire TF-0046" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0026" aria-label="Décider TF-0026"></td>
           <td class="c-id"><code>TF-0026</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
@@ -553,19 +592,6 @@
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0027" rows="1" aria-label="Commentaire TF-0027" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
-          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0047" aria-label="Décider TF-0047"></td>
-          <td class="c-id"><code>TF-0047</code></td>
-          <td><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>Le « blocage principal » de la synthèse est choisi par l'ordre de la grille, pas par la gravité</strong></summary>
-              <p>bloc_synthese() prend faibles[0], soit le premier nœud non conforme dans l'ordre du manifeste, et publie son interprétation comme blocage principal du rapport. L'ordre de la grille est thématique, pas hiérarchique : le nœud 2 passe systématiquement devant des constats bien plus lourds situés plus loin. En prime, l'interprétation d'une fiche est rédigée pour son contexte et peut renvoyer à « cette fiche » ou à une action non encore présentée. Correctif : choisir sur un critère explicite — gravité, ou nœud le plus cité par les actions retenues — ou prévoir un champ dédié dans le snapshot.</p>
-              <p class="meta">Demandeur : run-seo-auxportesdelabaie-20260808 · 2026-08-08 · gain 2 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Sur la mission, le blocage affiché n'était pas le principal, et le texte repris renvoyait à « cette fiche » et à une action non encore introduite.</p>
-            </details>
-          </td>
-          <td class="c-comm"><textarea class="commentaire" data-id="TF-0047" rows="1" aria-label="Commentaire TF-0047" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0029" aria-label="Décider TF-0029"></td>
           <td class="c-id"><code>TF-0029</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
@@ -578,27 +604,27 @@
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0029" rows="1" aria-label="Commentaire TF-0029" placeholder="commentaire…"></textarea></td>
         </tr>
-        <tr>
-          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0030" aria-label="Décider TF-0030"></td>
-          <td class="c-id"><code>TF-0030</code></td>
-          <td><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score">0.8</td>
-          <td>
-            <details><summary><strong>Généraliser les moteurs ad hoc des missions</strong></summary>
-              <p>fiches87.py etc. vivent chez la mission avec chemins en dur — non réutilisables.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 4</p>
-            </details>
-          </td>
-          <td class="c-comm"><textarea class="commentaire" data-id="TF-0030" rows="1" aria-label="Commentaire TF-0030" placeholder="commentaire…"></textarea></td>
-        </tr>
         </tbody>
       </table></div>
     </section>
     <section>
-      <h2 id="steering">steering <span class="badge">6</span></h2>
+      <h2 id="steering">steering <span class="badge">10</span></h2>
       <div class="scroll"><table data-filterable>
         <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0050" aria-label="Décider TF-0050"></td>
+          <td class="c-id"><code>TF-0050</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">6</td>
+          <td>
+            <details><summary><strong>Gabarit d'agent de campagne — contraintes standard mutualisées</strong></summary>
+              <p>~25 prompts de campagne rédigés à la main cette semaine, répétant chacun ~3 Ko de contraintes identiques (langue, chirurgie, push interdit, commits, vérifications natives, lecture seule, format de retour) — 75 Ko réécrits, et un oubli = un incident potentiel. Mécanisme : gabarits/AGENT-CAMPAGNE.md ; le prompt d'un agent devient gabarit + delta spécifique. Métrique : taille du prompt spécifique (attendu -60 %), zéro omission. Protocole : comparaison à la prochaine campagne multi-agents.</p>
+              <p class="meta">Demandeur : steering · 2026-08-09 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — ~25 prompts × ~3 Ko de contraintes dupliquées relevés sur la semaine</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0050" rows="1" aria-label="Commentaire TF-0050" placeholder="commentaire…"></textarea></td>
+        </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0035" aria-label="Décider TF-0035"></td>
           <td class="c-id"><code>TF-0035</code></td>
@@ -639,6 +665,32 @@
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0049" rows="1" aria-label="Commentaire TF-0049" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0051" aria-label="Décider TF-0051"></td>
+          <td class="c-id"><code>TF-0051</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">3</td>
+          <td>
+            <details><summary><strong>Protocole de mesure du routage Sonnet/Opus</strong></summary>
+              <p>Zéro escalade et zéro donnée comparative sur ~25 affectations de modèle en 2 produits réels (RA-2 cité). Mécanisme : sur la prochaine campagne à ≥ 2 tranches comparables, A→Sonnet / B→Opus, tokens/passes/verdicts au ledger ; escalade_modele consigné systématiquement même « aucune ». Métrique : coût par tranche à qualité égale (recette verte). Protocole : 1 campagne instrumentée.</p>
+              <p class="meta">Demandeur : steering · 2026-08-09 · gain 3 × preuve 1 ÷ effort 1</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0051" rows="1" aria-label="Commentaire TF-0051" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0053" aria-label="Décider TF-0053"></td>
+          <td class="c-id"><code>TF-0053</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">3</td>
+          <td>
+            <details><summary><strong>CLAUDE.md steering découpé en références à la demande (mécanisme de TF-0037)</strong></summary>
+              <p>17 278 octets, ×3,8 en 5 jours (mesuré au git) ; socle de session 77 Ko. Mécanisme : noyau ≤ 6 Ko (lois, garde-fous, routage) + references/ chargées à l'étape — le pattern SKILL.md éprouvé par les forges. Métrique : octets du noyau. Protocole : wc -c + un run de non-régression. Lié à TF-0037 et TF-0007.</p>
+              <p class="meta">Demandeur : steering · 2026-08-09 · gain 3 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — trajectoire CLAUDE.md 4590→17278 octets mesurée sur git</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0053" rows="1" aria-label="Commentaire TF-0053" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0037" aria-label="Décider TF-0037"></td>
           <td class="c-id"><code>TF-0037</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
@@ -676,6 +728,19 @@
             </details>
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0039" rows="1" aria-label="Commentaire TF-0039" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0054" aria-label="Décider TF-0054"></td>
+          <td class="c-id"><code>TF-0054</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">1</td>
+          <td>
+            <details><summary><strong>Baseline d'audit packagée par forge</strong></summary>
+              <p>À la revue du 08/08, 8 agents d'audit ont chacun relu ~32 Ko de baseline commune (INVENTAIRE + BOUCLE). Mécanisme : après chaque audit, la fiche par forge est stockée (output/fiches/&lt;forge&gt;.md) ; l'audit suivant reçoit LA fiche seule. Métrique : tokens par agent d'audit (baseline actuelle 53-100 k). Protocole : prochaine revue comparée.</p>
+              <p class="meta">Demandeur : steering · 2026-08-09 · gain 2 × preuve 1 ÷ effort 2</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0054" rows="1" aria-label="Commentaire TF-0054" placeholder="commentaire…"></textarea></td>
         </tr>
         </tbody>
       </table></div>
@@ -772,7 +837,7 @@
   <script>
   (function () {
     "use strict";
-    var SCEAU = "81022d5a14b4";
+    var SCEAU = "45b07d6bc526";
     var cle = function (id, type) { return "todo-forge:" + SCEAU + ":" + id + ":" + type; };
     var coches = document.querySelectorAll("input.decider");
     var comms = document.querySelectorAll("textarea.commentaire");
