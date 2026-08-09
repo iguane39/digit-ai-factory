@@ -49,7 +49,7 @@
   <div class="wrap">
     <header>
       <h1>TODO-FORGE — registre d'amélioration</h1>
-      <p class="meta">54 actifs (candidat 48 · décidé 0 · en cours 6 · corrigé 0 · écarté 0) · 0 archivés · sceau source <code>45b07d6bc526</code> · dernier événement 2026-08-09T09:00:25Z</p>
+      <p class="meta">60 actifs (candidat 54 · décidé 0 · en cours 1 · corrigé 5 · écarté 0) · 0 archivés · sceau source <code>79284353bfbf</code> · dernier événement 2026-08-09T10:11:33Z</p>
       <p>Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au steering — il sera appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
     </header>
     <div class="barre">
@@ -92,7 +92,7 @@
       </table></div>
     </section>
     <section>
-      <h2 id="agents">agents <span class="badge">5</span></h2>
+      <h2 id="agents">agents <span class="badge">9</span></h2>
       <div class="scroll"><table data-filterable>
         <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
@@ -108,6 +108,45 @@
             </details>
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0021" rows="1" aria-label="Commentaire TF-0021" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0057" aria-label="Décider TF-0057"></td>
+          <td class="c-id"><code>TF-0057</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">6</td>
+          <td>
+            <details><summary><strong>find-in-page.js : même classe pour le conteneur de recherche et le surlignage</strong></summary>
+              <p>L'asset du socle documente un conteneur class='find' et produit des &lt;mark class='find'&gt;. Un livrable qui style son conteneur en display:flex style donc aussi ses surlignages, qui deviennent des boîtes de bloc et coupent les mots. Mesuré au navigateur sur le rapport SEO : le « s » de « clics » atterrissait 606 px avant la fin du « clic » surligné. La règle mark.find, de spécificité supérieure, ne pouvait pas gagner puisqu'elle ne déclarait pas display. Correctif proposé : nommer la classe du surlignage dans l'asset (mark.dai-hl) et lui faire porter un jeu défensif complet (display:inline; padding:0; margin:0). Un composant du socle ne doit pas dépendre du CSS que l'appelant n'écrira pas.</p>
+              <p class="meta">Demandeur : campagne-fiches-html-20260809 · 2026-08-09 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — défaut visible en production sur un rapport client ; écart mesuré 606 px, ramené à 0 px</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0057" rows="1" aria-label="Commentaire TF-0057" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0060" aria-label="Décider TF-0060"></td>
+          <td class="c-id"><code>TF-0060</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">4.5</td>
+          <td>
+            <details><summary><strong>digit-ai-schemas : l'exemple de reference viole 25 fois les regles du socle, dont 7 fois une regle anterieure</strong></summary>
+              <p>L'extension de check_html.py aux regles L1-L10 fait apparaitre une dette dans un skill voisin : assets/exemple-reference.html de digit-ai-schemas rend 18 echecs L3 (badges « Nouveau » et assimiles sans aucune legende : ni title, ni aria-label, ni legende visible) et 7 echecs L4 (tables de 8 lignes ou plus sans data-filterable). Les 7 echecs L4 ne sont PAS nouveaux : le composant de filtres est declare obligatoire au socle depuis le 08/08, l'asset ne s'y est jamais conforme — c'est le controle qui manquait, pas la regle. Aucun de ces 25 constats n'est un faux positif. Hors perimetre du mandat de la campagne (socle + forge-seo + organization) : signale, non corrige, pour ne pas refactorer un skill voisin sans decision.</p>
+              <p class="meta">Demandeur : campagne-fiches-html-20260809 · 2026-08-09 · gain 3 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — 25 echecs sur l'asset de reference d'un skill de production, dont 7 sur une regle en vigueur depuis le 08/08</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0060" rows="1" aria-label="Commentaire TF-0060" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0058" aria-label="Décider TF-0058"></td>
+          <td class="c-id"><code>TF-0058</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">4</td>
+          <td>
+            <details><summary><strong>render_page.py écrit ses PNG dans le dossier du fichier audité</strong></summary>
+              <p>Auditer le rapport client a déposé 12 PNG dans seo/livrables/ du projet — le dossier même que le client reçoit. Nettoyés à la main après coup. Correctif proposé : option --out &lt;dossier&gt; avec un défaut hors du dossier audité (sous-dossier .oracles/ ou scratchpad de session).</p>
+              <p class="meta">Demandeur : campagne-fiches-html-20260809 · 2026-08-09 · gain 2 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — 12 fichiers d'oracle déposés dans un dossier de livrables client</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0058" rows="1" aria-label="Commentaire TF-0058" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0024" aria-label="Décider TF-0024"></td>
@@ -134,6 +173,19 @@
             </details>
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0022" rows="1" aria-label="Commentaire TF-0022" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0059" aria-label="Décider TF-0059"></td>
+          <td class="c-id"><code>TF-0059</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">2</td>
+          <td>
+            <details><summary><strong>render_page V7 : 288 avertissements de rythme vertical noient le signal V1/V4</strong></summary>
+              <p>Sur un document dense de 465 Ko, V7 rend 288 avertissements dont l'écrasante majorité sont des suites de paragraphes de longueurs différentes — c'est-à-dire de la prose normale. Le signal utile (débordements V1, chevauchements V4) devient illisible : il a fallu écrire un script d'agrégation pour lire le verdict. Correctif proposé : exclure du calcul V7 les suites de &lt;p&gt; en flux de prose, ou plafonner le nombre d'avertissements par conteneur. Un oracle qui produit 288 lignes de bruit n'est pas lu, donc ne protège plus.</p>
+              <p class="meta">Demandeur : campagne-fiches-html-20260809 · 2026-08-09 · gain 2 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — 288 avertissements V7 contre 8 constats bloquants réels sur le même run</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0059" rows="1" aria-label="Commentaire TF-0059" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0023" aria-label="Décider TF-0023"></td>
@@ -444,75 +496,10 @@
       </table></div>
     </section>
     <section>
-      <h2 id="seo">seo <span class="badge">12</span></h2>
+      <h2 id="seo">seo <span class="badge">14</span></h2>
       <div class="scroll"><table data-filterable>
         <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
-        <tr>
-          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0043" aria-label="Décider TF-0043" disabled></td>
-          <td class="c-id"><code>TF-0043</code></td>
-          <td><span class="statut s-en_cours">en_cours</span></td>
-          <td class="c-score">8</td>
-          <td>
-            <details><summary><strong>crawler.py ne lit pas sitemap.xml : l'inventaire du site est celui du graphe de liens</strong></summary>
-              <p>scripts/crawler.py lit robots.txt uniquement pour les permissions (rp.can_fetch) et n'en exploite jamais la directive Sitemap. L'ensemble connus[] n'est alimenté que par les liens suivis. urls_decouvertes ne mesure donc pas les URLs du site mais les URLs atteignables en navigant. Sur la mission : 79 annoncées, 286 déclarées au sitemap. Correctif : une requête sur sitemap.xml, amorcer connus[] avec ses URLs.</p>
-              <p class="meta">Demandeur : run-seo-produit-02-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — Sur produit-02.fr le crawler annonce 79 URLs découvertes ; le sitemap en déclare 286, soit 73 % du site absent de l'inventaire.</p>
-            </details>
-          </td>
-          <td class="c-comm"><textarea class="commentaire" data-id="TF-0043" rows="1" aria-label="Commentaire TF-0043" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0044" aria-label="Décider TF-0044" disabled></td>
-          <td class="c-id"><code>TF-0044</code></td>
-          <td><span class="statut s-en_cours">en_cours</span></td>
-          <td class="c-score">8</td>
-          <td>
-            <details><summary><strong>crawler.py : la métrique pages_orphelines ne peut structurellement pas être non nulle</strong></summary>
-              <p>scripts/crawler.py ligne 231 : orphelines = pages du crawl avec _entrants_tous == 0 et profondeur_clic &gt; 0. Or une page n'entre dans l'ensemble crawlé que parce qu'un lien y menait : la condition est insatisfiable. Le contrôle ne peut pas échouer, donc il ne prouve rien, et il affiche un zéro rassurant. Sur la mission, le rapport annonce « pages orphelines : 0 » là où 208 pages sur 286 ne reçoivent aucun lien entrant. Correctif : définir l'orpheline comme URL DÉCLARÉE (sitemap) sans lien entrant après crawl — ce qui suppose l'item sitemap ci-dessus.</p>
-              <p class="meta">Demandeur : run-seo-produit-02-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — « pages orphelines : 0 » affiché sur un site à 208 orphelines, découvertes seulement en confrontant sitemap et graphe de liens hors outil.</p>
-            </details>
-          </td>
-          <td class="c-comm"><textarea class="commentaire" data-id="TF-0044" rows="1" aria-label="Commentaire TF-0044" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0045" aria-label="Décider TF-0045" disabled></td>
-          <td class="c-id"><code>TF-0045</code></td>
-          <td><span class="statut s-en_cours">en_cours</span></td>
-          <td class="c-score">6</td>
-          <td>
-            <details><summary><strong>rapport_html.py lit actions-*.csv sans dialecte : un CSV en points-virgules sort en n/d</strong></summary>
-              <p>csv.DictReader(f) est appelé sans argument delimiter, donc en virgule. Un CSV point-virgule — séparateur par défaut d'Excel en locale française — est lu comme un champ unique par ligne : toutes les colonnes tombent à None et le rapport imprime « n/d » sur l'intégralité du tableau d'actions, sans le moindre avertissement. Correctif : csv.Sniffer, ou refus explicite si l'en-tête attendu n'est pas reconnu.</p>
-              <p class="meta">Demandeur : run-seo-produit-02-20260808 · 2026-08-08 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — 10 actions sorties intégralement en « n/d » dans une version du rapport, qui se présentait par ailleurs comme complète.</p>
-            </details>
-          </td>
-          <td class="c-comm"><textarea class="commentaire" data-id="TF-0045" rows="1" aria-label="Commentaire TF-0045" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0046" aria-label="Décider TF-0046" disabled></td>
-          <td class="c-id"><code>TF-0046</code></td>
-          <td><span class="statut s-en_cours">en_cours</span></td>
-          <td class="c-score">3</td>
-          <td>
-            <details><summary><strong>rapport_html.py échappe le markdown des fiches au lieu de le rendre</strong></summary>
-              <p>Le corps des fiches est inséré via esc() sans conversion. Or les fiches sont des fichiers .md et le référentiel lui-même y met du markdown (les en-têtes générés contiennent du gras dans critere_verdict). Les tableaux de preuve sortent en soupe de barres verticales, le gras en astérisques. Deux issues : convertir un sous-ensemble sûr (gras, code, tableaux), ou documenter que les fiches s'écrivent en prose — mais alors retirer le markdown des gabarits de la grille.</p>
-              <p class="meta">Demandeur : run-seo-produit-02-20260808 · 2026-08-08 · gain 3 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Tableaux de preuve illisibles dans le rapport ; fiches réécrites en prose et convertisseur de tableaux développé côté mission pour contourner.</p>
-            </details>
-          </td>
-          <td class="c-comm"><textarea class="commentaire" data-id="TF-0046" rows="1" aria-label="Commentaire TF-0046" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0047" aria-label="Décider TF-0047" disabled></td>
-          <td class="c-id"><code>TF-0047</code></td>
-          <td><span class="statut s-en_cours">en_cours</span></td>
-          <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>Le « blocage principal » de la synthèse est choisi par l'ordre de la grille, pas par la gravité</strong></summary>
-              <p>bloc_synthese() prend faibles[0], soit le premier nœud non conforme dans l'ordre du manifeste, et publie son interprétation comme blocage principal du rapport. L'ordre de la grille est thématique, pas hiérarchique : le nœud 2 passe systématiquement devant des constats bien plus lourds situés plus loin. En prime, l'interprétation d'une fiche est rédigée pour son contexte et peut renvoyer à « cette fiche » ou à une action non encore présentée. Correctif : choisir sur un critère explicite — gravité, ou nœud le plus cité par les actions retenues — ou prévoir un champ dédié dans le snapshot.</p>
-              <p class="meta">Demandeur : run-seo-produit-02-20260808 · 2026-08-08 · gain 2 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Sur la mission, le blocage affiché n'était pas le principal, et le texte repris renvoyait à « cette fiche » et à une action non encore introduite.</p>
-            </details>
-          </td>
-          <td class="c-comm"><textarea class="commentaire" data-id="TF-0047" rows="1" aria-label="Commentaire TF-0047" placeholder="commentaire…"></textarea></td>
-        </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0030" aria-label="Décider TF-0030" disabled></td>
           <td class="c-id"><code>TF-0030</code></td>
@@ -521,7 +508,7 @@
           <td>
             <details><summary><strong>Généraliser les moteurs ad hoc des missions</strong></summary>
               <p>fiches87.py etc. vivent chez la mission avec chemins en dur — non réutilisables.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 4</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 4<br>Commentaire précédent : 2026-08-09 : volet crawl SOLDÉ (crawler généralisé dans la forge) — restent les autres moteurs ad hoc (fiches87, livrables-gen…)</p>
             </details>
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0030" rows="1" aria-label="Commentaire TF-0030" placeholder="commentaire…"></textarea></td>
@@ -540,6 +527,19 @@
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0042" rows="1" aria-label="Commentaire TF-0042" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0056" aria-label="Décider TF-0056"></td>
+          <td class="c-id"><code>TF-0056</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">6</td>
+          <td>
+            <details><summary><strong>validate.py ne contrôle aucune cohérence référentielle entre actions-*.csv et la grille</strong></summary>
+              <p>Un noeuds_couverts pointant sur un id inexistant, ou d'un type incompatible avec les clés du manifeste, passe sans un mot. C'est ce qui a rendu le défaut de rattachement invisible pendant tout un run. Correctif proposé : contrôle 7 de validate.py --mission — tout id cité par noeuds_couverts existe dans le manifeste, et le taux de rattachement effectif est non nul sur un CSV non vide. Un rattachement à 0 % est un échec, pas une donnée.</p>
+              <p class="meta">Demandeur : campagne-fiches-html-20260809 · 2026-08-09 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — le défaut de rattachement a traversé la génération de 8 versions du rapport sans être signalé</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0056" rows="1" aria-label="Commentaire TF-0056" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0048" aria-label="Décider TF-0048"></td>
           <td class="c-id"><code>TF-0048</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
@@ -551,6 +551,19 @@
             </details>
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0048" rows="1" aria-label="Commentaire TF-0048" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0055" aria-label="Décider TF-0055"></td>
+          <td class="c-id"><code>TF-0055</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">4</td>
+          <td>
+            <details><summary><strong>front_matter() rend des chaînes : aucune action n'était rattachée à son nœud, en silence</strong></summary>
+              <p>collecter() fait {**n, **fm} : fm['id'] (chaîne) écrase l'entier du manifeste. noeuds_couverts étant lu en entiers, le rattachement action → nœud renvoyait systématiquement une liste vide. Rien n'échouait : le rapport se générait, complet et faux — « Nœuds couverts : — » sur les 10 actions, branche « — » donc regroupement par branche sans objet, et le blocage principal retombant sur l'ordre de la grille, c'est-à-dire le défaut que TF-0047 corrige. Corrigé au point d'appel (int(n['id'])), mais c'est la TROISIÈME occurrence de la famille (TF-0042 dans dette(), un int() défensif déjà présent dans noeuds_snapshot()). Correctif de fond : typer front_matter() depuis le manifeste — id entier, booléens, listes — au lieu d'exiger un int() de chaque consommateur.</p>
+              <p class="meta">Demandeur : campagne-fiches-html-20260809 · 2026-08-09 · gain 4 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — 0 action sur 10 rattachée à un nœud sur la mission livrée ; détecté en relisant le rendu, aucun contrôle ne le signalait</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0055" rows="1" aria-label="Commentaire TF-0055" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0028" aria-label="Décider TF-0028"></td>
@@ -603,6 +616,71 @@
             </details>
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0029" rows="1" aria-label="Commentaire TF-0029" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0043" aria-label="Décider TF-0043" disabled></td>
+          <td class="c-id"><code>TF-0043</code></td>
+          <td><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score">8</td>
+          <td>
+            <details><summary><strong>crawler.py ne lit pas sitemap.xml : l'inventaire du site est celui du graphe de liens</strong></summary>
+              <p>scripts/crawler.py lit robots.txt uniquement pour les permissions (rp.can_fetch) et n'en exploite jamais la directive Sitemap. L'ensemble connus[] n'est alimenté que par les liens suivis. urls_decouvertes ne mesure donc pas les URLs du site mais les URLs atteignables en navigant. Sur la mission : 79 annoncées, 286 déclarées au sitemap. Correctif : une requête sur sitemap.xml, amorcer connus[] avec ses URLs.</p>
+              <p class="meta">Demandeur : run-seo-produit-02-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — Sur produit-02.fr le crawler annonce 79 URLs découvertes ; le sitemap en déclare 286, soit 73 % du site absent de l'inventaire.</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0043" rows="1" aria-label="Commentaire TF-0043" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0044" aria-label="Décider TF-0044" disabled></td>
+          <td class="c-id"><code>TF-0044</code></td>
+          <td><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score">8</td>
+          <td>
+            <details><summary><strong>crawler.py : la métrique pages_orphelines ne peut structurellement pas être non nulle</strong></summary>
+              <p>scripts/crawler.py ligne 231 : orphelines = pages du crawl avec _entrants_tous == 0 et profondeur_clic &gt; 0. Or une page n'entre dans l'ensemble crawlé que parce qu'un lien y menait : la condition est insatisfiable. Le contrôle ne peut pas échouer, donc il ne prouve rien, et il affiche un zéro rassurant. Sur la mission, le rapport annonce « pages orphelines : 0 » là où 208 pages sur 286 ne reçoivent aucun lien entrant. Correctif : définir l'orpheline comme URL DÉCLARÉE (sitemap) sans lien entrant après crawl — ce qui suppose l'item sitemap ci-dessus.</p>
+              <p class="meta">Demandeur : run-seo-produit-02-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — « pages orphelines : 0 » affiché sur un site à 208 orphelines, découvertes seulement en confrontant sitemap et graphe de liens hors outil.</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0044" rows="1" aria-label="Commentaire TF-0044" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0045" aria-label="Décider TF-0045" disabled></td>
+          <td class="c-id"><code>TF-0045</code></td>
+          <td><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score">6</td>
+          <td>
+            <details><summary><strong>rapport_html.py lit actions-*.csv sans dialecte : un CSV en points-virgules sort en n/d</strong></summary>
+              <p>csv.DictReader(f) est appelé sans argument delimiter, donc en virgule. Un CSV point-virgule — séparateur par défaut d'Excel en locale française — est lu comme un champ unique par ligne : toutes les colonnes tombent à None et le rapport imprime « n/d » sur l'intégralité du tableau d'actions, sans le moindre avertissement. Correctif : csv.Sniffer, ou refus explicite si l'en-tête attendu n'est pas reconnu.</p>
+              <p class="meta">Demandeur : run-seo-produit-02-20260808 · 2026-08-08 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — 10 actions sorties intégralement en « n/d » dans une version du rapport, qui se présentait par ailleurs comme complète.</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0045" rows="1" aria-label="Commentaire TF-0045" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0046" aria-label="Décider TF-0046" disabled></td>
+          <td class="c-id"><code>TF-0046</code></td>
+          <td><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score">3</td>
+          <td>
+            <details><summary><strong>rapport_html.py échappe le markdown des fiches au lieu de le rendre</strong></summary>
+              <p>Le corps des fiches est inséré via esc() sans conversion. Or les fiches sont des fichiers .md et le référentiel lui-même y met du markdown (les en-têtes générés contiennent du gras dans critere_verdict). Les tableaux de preuve sortent en soupe de barres verticales, le gras en astérisques. Deux issues : convertir un sous-ensemble sûr (gras, code, tableaux), ou documenter que les fiches s'écrivent en prose — mais alors retirer le markdown des gabarits de la grille.</p>
+              <p class="meta">Demandeur : run-seo-produit-02-20260808 · 2026-08-08 · gain 3 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Tableaux de preuve illisibles dans le rapport ; fiches réécrites en prose et convertisseur de tableaux développé côté mission pour contourner.</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0046" rows="1" aria-label="Commentaire TF-0046" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0047" aria-label="Décider TF-0047" disabled></td>
+          <td class="c-id"><code>TF-0047</code></td>
+          <td><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score">2</td>
+          <td>
+            <details><summary><strong>Le « blocage principal » de la synthèse est choisi par l'ordre de la grille, pas par la gravité</strong></summary>
+              <p>bloc_synthese() prend faibles[0], soit le premier nœud non conforme dans l'ordre du manifeste, et publie son interprétation comme blocage principal du rapport. L'ordre de la grille est thématique, pas hiérarchique : le nœud 2 passe systématiquement devant des constats bien plus lourds situés plus loin. En prime, l'interprétation d'une fiche est rédigée pour son contexte et peut renvoyer à « cette fiche » ou à une action non encore présentée. Correctif : choisir sur un critère explicite — gravité, ou nœud le plus cité par les actions retenues — ou prévoir un champ dédié dans le snapshot.</p>
+              <p class="meta">Demandeur : run-seo-produit-02-20260808 · 2026-08-08 · gain 2 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Sur la mission, le blocage affiché n'était pas le principal, et le texte repris renvoyait à « cette fiche » et à une action non encore introduite.</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0047" rows="1" aria-label="Commentaire TF-0047" placeholder="commentaire…"></textarea></td>
         </tr>
         </tbody>
       </table></div>
@@ -837,7 +915,7 @@
   <script>
   (function () {
     "use strict";
-    var SCEAU = "45b07d6bc526";
+    var SCEAU = "79284353bfbf";
     var cle = function (id, type) { return "todo-forge:" + SCEAU + ":" + id + ":" + type; };
     var coches = document.querySelectorAll("input.decider");
     var comms = document.querySelectorAll("textarea.commentaire");
