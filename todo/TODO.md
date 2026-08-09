@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=ade15b01c6c5 archive=e3b0c44298fc · dernier événement: 2026-08-09T10:53:30.245Z -->
+     sceaux: actifs=e4ee8d92f5c0 archive=e3b0c44298fc · dernier événement: 2026-08-09T12:38:19.654Z -->
 
-**61 actifs** (candidat 55 · décidé 0 · en cours 1 · corrigé 5 · écarté 0) · **0 archivés**.
+**62 actifs** (candidat 56 · décidé 0 · en cours 1 · corrigé 5 · écarté 0) · **0 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -67,6 +67,12 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0032 | candidat | 2 | Se conformer à sa propre doctrine | non |
 | TF-0033 | candidat | 1 | Le registre des types devient un fichier | non |
 | TF-0034 | candidat | 1 | Phase 3 : vérificateur machine des conventions | non |
+
+## pilot
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0062 | candidat | 2 | Rattrapage du renommage pilot chez les produits et missions | non |
 
 ## seo
 
