@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=1a860796b7db archive=e3b0c44298fc · dernier événement: 2026-08-09T10:39:57Z -->
+     sceaux: actifs=ade15b01c6c5 archive=e3b0c44298fc · dernier événement: 2026-08-09T10:53:30.245Z -->
 
-**60 actifs** (candidat 54 · décidé 0 · en cours 1 · corrigé 5 · écarté 0) · **0 archivés**.
+**61 actifs** (candidat 55 · décidé 0 · en cours 1 · corrigé 5 · écarté 0) · **0 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -61,6 +61,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0061 | candidat | 6 | Aligner le gabarit A0 (organization) sur L1(b), L2-au-rendu et le nommage Q3-bis | **oui** — la même dérive a déjà été payée 2 fois (skills install↔repo, disciplines dupliquées) |
 | TF-0031 | candidat | 3 | CLAUDE.md + trancher Q3-bis | non |
 | TF-0052 | candidat | 3 | Trancher les 3 arbitrages « Leviers de qualité générique » (organization) | non |
 | TF-0032 | candidat | 2 | Se conformer à sa propre doctrine | non |
