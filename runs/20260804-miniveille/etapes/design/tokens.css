@@ -1,0 +1,90 @@
+/*
+ * tokens.css — MiniVeille
+ * Système de marque, ton « encre, papier, atelier ».
+ * Produit par le skill systeme-de-marque (mode dégradé) — run 20260804-miniveille.
+ *
+ * Palette : PA04 « Encre et cuivre » (corpus/recherche.py, hue 25 OKLCH,
+ *   source https://www.w3.org/TR/css-color-4/#ok-lab), reprise telle quelle :
+ *   un neutre chaud (papier) et un accent cuivré (encre/outil), cohérents avec
+ *   le brief. Aucune contrainte de marque préexistante (produit neuf).
+ * Style de matière : ST14 « Papier et impression » (skill:frontend-design#calibration).
+ * Justification complète et hypothèses : voir MARQUE.md.
+ */
+
+:root {
+  /* Couleurs — OKLCH, jamais HSL. Perceptuellement uniforme.
+     Hue 25 (cuivre chaud) partagée par tous les tokens : cohésion neutres/accent. */
+  --fond: oklch(0.96 0.010 25);
+  --surface: oklch(0.93 0.014 25);
+  --trait: oklch(0.85 0.018 25);
+  --texte: oklch(0.20 0.022 25);
+  --texte-faible: oklch(0.44 0.022 25);
+  --accent: oklch(0.51 0.150 25);
+
+  /* Typographie — trois rôles : la liste de liens affiche aussi des URLs,
+     des dates et des compteurs (données), d'où le rôle mono. Stacks système
+     uniquement — aucune police distante, aucune dépendance réseau. */
+  --police-titre: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+  --police-corps: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+  --police-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* Échelle typographique — ratio constant x1.25 entre chaque pas */
+  --texte-xs: 0.64rem;
+  --texte-sm: 0.8rem;
+  --texte-md: 1rem;
+  --texte-lg: 1.25rem;
+  --texte-xl: 1.5625rem;
+  --texte-2xl: 1.953rem;
+
+  /* Espacement — pas de 4px, noms sémantiques et non pixellisés */
+  --espace-xs: 4px;
+  --espace-sm: 8px;
+  --espace-md: 16px;
+  --espace-lg: 24px;
+  --espace-xl: 32px;
+  --espace-2xl: 48px;
+
+  /* Rayons — variés, jamais une valeur unique partout */
+  --rayon-sm: 2px;
+  --rayon-md: 6px;
+  --rayon-lg: 12px;
+
+  /* Interligne — pas un token de couleur, mais dépend du thème (voir bloc sombre) */
+  --interligne-corps: 1.55;
+}
+
+/* Thème sombre — préférence système. Recalcul des contrastes, pas une inversion :
+   surfaces resserrées, accent éclairci pour rester lisible sur fond profond,
+   interligne du corps majoré (texte clair sur fond sombre demande plus d'air). */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fond: oklch(0.15 0.014 25);
+    --surface: oklch(0.20 0.018 25);
+    --trait: oklch(0.31 0.022 25);
+    --texte: oklch(0.94 0.010 25);
+    --texte-faible: oklch(0.74 0.018 25);
+    --accent: oklch(0.71 0.140 25);
+    --interligne-corps: 1.65;
+  }
+}
+
+/* Bascule explicite — doit gagner sur la préférence système */
+:root[data-theme="dark"] {
+  --fond: oklch(0.15 0.014 25);
+  --surface: oklch(0.20 0.018 25);
+  --trait: oklch(0.31 0.022 25);
+  --texte: oklch(0.94 0.010 25);
+  --texte-faible: oklch(0.74 0.018 25);
+  --accent: oklch(0.71 0.140 25);
+  --interligne-corps: 1.65;
+}
+
+:root[data-theme="light"] {
+  --fond: oklch(0.96 0.010 25);
+  --surface: oklch(0.93 0.014 25);
+  --trait: oklch(0.85 0.018 25);
+  --texte: oklch(0.20 0.022 25);
+  --texte-faible: oklch(0.44 0.022 25);
+  --accent: oklch(0.51 0.150 25);
+  --interligne-corps: 1.55;
+}

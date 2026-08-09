@@ -1,0 +1,170 @@
+{
+  "adaptateurs": [
+    {
+      "nom": "front-react",
+      "pan": "front",
+      "verdict": "SKIP"
+    },
+    {
+      "nom": "api-fastapi",
+      "pan": "api",
+      "verdict": "PASS"
+    },
+    {
+      "nom": "data-sql",
+      "pan": "data",
+      "verdict": "SKIP"
+    },
+    {
+      "nom": "migrations-sql",
+      "pan": "migrations",
+      "verdict": "SKIP"
+    },
+    {
+      "nom": "batch-python",
+      "pan": "batch",
+      "verdict": "SKIP"
+    },
+    {
+      "nom": "fichiers-python",
+      "pan": "fichiers",
+      "verdict": "SKIP"
+    },
+    {
+      "nom": "mutation-python",
+      "pan": "back",
+      "verdict": "PASS"
+    },
+    {
+      "nom": "securite-oracles",
+      "pan": "securite",
+      "verdict": "PASS"
+    },
+    {
+      "nom": "accessibilite-a11y",
+      "pan": "accessibilite",
+      "verdict": "SKIP"
+    },
+    {
+      "nom": "visuel-golden",
+      "pan": "visuel",
+      "verdict": "SKIP"
+    }
+  ],
+  "couverture_par_pan": {
+    "api": {
+      "inventorie": 8,
+      "exerce": 8,
+      "ratio": 1.0,
+      "seuil": 1.0,
+      "elements_non_exerces": []
+    }
+  },
+  "mutation": {
+    "back": {
+      "mutants_viables": 7,
+      "tues": 5,
+      "score": 0.7143,
+      "modules": [
+        "main.py"
+      ],
+      "survivants": [
+        "mutant:main.py:46:c->pass  #",
+        "mutant:main.py:101:i->pass  #"
+      ]
+    }
+  },
+  "pans_non_couverts": [
+    "front",
+    "data",
+    "migrations",
+    "batch",
+    "fichiers",
+    "accessibilite",
+    "visuel"
+  ],
+  "motifs_non_couverture": {
+    "front": "front : 0 elements INVENTORIES (0 routes, 0 elements interactifs) mais couverture non mesurable — suite e2e non executee",
+    "data": "data : schema reel non introspectable — divergence jugee sur le TEXTE des migrations",
+    "migrations": "migrations : schema reel non introspectable, effet non verifie",
+    "batch": "batch : 0 branches/rejets INVENTORIES mais couverture non mesurable — suite non executee sous sonde",
+    "fichiers": "couverture d exécution indisponible : suite rouge ou env absent",
+    "accessibilite": "aucune route",
+    "visuel": "front non servi : build absent, npm ou navigateur manquant"
+  },
+  "bandes_de_risque": {
+    "critique": 3,
+    "standard": 0,
+    "differe": 0,
+    "non_cote": 0
+  },
+  "findings": [
+    {
+      "id": "code:POST /api/liens=422",
+      "classe": "divergence",
+      "localisation": "C:\\dev\\digit-ai-forge-steering\\runs\\20260804-miniveille\\produit\\backend\\app\\main.py",
+      "message": "code emis par l application mais absent de sa declaration responses=",
+      "severite": "signale",
+      "risque": 60
+    },
+    {
+      "id": "mutant:main.py:46:c->pass  #",
+      "classe": "mutant-survivant",
+      "localisation": "C:\\dev\\digit-ai-forge-steering\\runs\\20260804-miniveille\\produit\\backend\\app\\main.py:46",
+      "message": "mutant c -> pass  # non tué : la suite reste verte",
+      "severite": "signale",
+      "risque": 45
+    },
+    {
+      "id": "mutant:main.py:101:i->pass  #",
+      "classe": "mutant-survivant",
+      "localisation": "C:\\dev\\digit-ai-forge-steering\\runs\\20260804-miniveille\\produit\\backend\\app\\main.py:101",
+      "message": "mutant i -> pass  # non tué : la suite reste verte",
+      "severite": "signale",
+      "risque": 45
+    }
+  ],
+  "non_juge": [
+    "accessibilite : le DOM est capture a l etat INITIAL de chaque route ; les etats atteints apres interaction (menu ouvert, modale, message d erreur) ne sont pas audites",
+    "accessibilite : perimetre du seul oracle structurel — ni audit axe-core complet, ni contraste, ni navigation clavier (limites propres de l oracle, reprises telles quelles)",
+    "accessibilite : sans compte configure (.env), les routes protegees redirigent vers la page publique — le nombre de PAGES DISTINCTES rendues le dit au rapport",
+    "api : un code emis pendant la suite est repute couvert ; la sonde ne verifie pas qu une ASSERTION porte sur lui — c est le role du second contre-oracle",
+    "aucune route",
+    "batch : 0 branches/rejets INVENTORIES mais couverture non mesurable — suite non executee sous sonde",
+    "batch : les branches sont dérivées de l AST du module ; une branche implicite (opérateur ternaire, court-circuit booléen) n est pas inventoriée séparément",
+    "batch : une branche dont le corps tient sur la MEME ligne que son test (`if x: y`) n est pas distinguable — les arcs de coverage.py vont de ligne a ligne, il n en existe aucun entre une ligne et elle-meme. Repli sur la couverture de ligne, moins precis",
+    "couverture d exécution indisponible : suite rouge ou env absent",
+    "data : inventaire VIDE — surface non enumerable sur ce projet",
+    "data : schema reel non introspectable — divergence jugee sur le TEXTE des migrations",
+    "data : sur SQLite les clés étrangères restent non attribuables (le moteur ne nomme pas la contrainte violée) ; l attribution complète exige un moteur qui les nomme, comme PostgreSQL",
+    "data : un index ou un trigger est réputé exercé si son instruction de création a été envoyée au moteur ; son EFFET (unicité réellement testée, trigger réellement déclenché) n est pas vérifié",
+    "fichiers : les chemins sont les branches du module de parsing ; une variante de format qui ne produit aucune branche dédiée (encodage géré par la bibliothèque) reste invisible",
+    "front : 0 elements INVENTORIES (0 routes, 0 elements interactifs) mais couverture non mesurable — suite e2e non executee",
+    "front : elements rendus dynamiquement sans data-testid statique (non inventoriables ici)",
+    "front : un element manipule pendant la suite est repute exerce ; la trace dit qu il a ete atteint, pas qu une ASSERTION porte sur son effet",
+    "front non servi : build absent, npm ou navigateur manquant",
+    "migrations : inventaire VIDE — surface non enumerable sur ce projet",
+    "migrations : l effet verifie est l EXISTENCE des objets nommes (tables, contraintes, index) apres application ; ni leur definition exacte, ni les donnees migrees",
+    "migrations : le rejeu est déduit d une seconde exécution de TOUTES les instructions de la section ; deux migrations rigoureusement identiques resteraient indiscernables",
+    "migrations : schema reel non introspectable, effet non verifie",
+    "mutation : les mutants équivalents ne sont pas détectés — un survivant peut être un mutant sémantiquement identique à l original",
+    "mutation : opérateurs arithmétiques, de comparaison, booléens, d appartenance, bornes numériques et suppression d instruction ; ni permutation d arguments, ni littéraux non numériques",
+    "risque : la criticité et le coût de détection tardive sont DÉCLARÉS par pan, pas mesurés — un projet dont les enjeux diffèrent doit redéclarer la table COTATION_PAN",
+    "risque : la probabilité de défaillance est approchée par le nombre de commits touchant le fichier ; hors dépôt git, elle retombe sur une valeur neutre",
+    "securite : aucun test d intrusion ni d authentification/autorisation au niveau metier",
+    "securite : le perimetre scanne est le dossier du projet analyse ; ni l historique git, ni l infrastructure declaree ailleurs (conteneurs, pipelines, secrets d execution)",
+    "securite : oracles reellement joues — sast, secrets, sca",
+    "securite/sast : analyse de flux (taint) inter-fichiers",
+    "securite/sast : faux négatifs des patterns indirects",
+    "securite/sast : logique métier",
+    "securite/sast : semgrep non installé — règles intégrées utilisées (couverture moindre)",
+    "securite/sca : dépendances transitives non épinglées (version inconnue → non interrogée)",
+    "securite/sca : vulnérabilités hors bases publiques",
+    "securite/secrets : gitleaks non installé — scanner intégré utilisé (couverture moindre)",
+    "securite/secrets : secrets dans l'historique git (scanner le dépôt, pas seulement le fichier)",
+    "securite/secrets : vulnérabilités de dépendances (SCA : pip-audit / npm audit / OSV)",
+    "visuel : le rendu compare est le DOM capture a l etat initial de chaque route, sans style externe charge depuis le serveur",
+    "visuel : un diff dit qu il y a changement, pas si le changement est VOULU — la decision reste humaine (limite propre de l oracle, reprise telle quelle)"
+  ],
+  "verdict": "PARTIEL"
+}

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MiniVeille — page témoin du système de marque</title>
+<style>
+/*
+ * tokens.css intégré tel quel (copie identique du fichier séparé) pour que
+ * cette page reste autonome : zéro CDN, zéro requête réseau, ouvrable seule.
+ */
+:root {
+  --fond: oklch(0.96 0.010 25);
+  --surface: oklch(0.93 0.014 25);
+  --trait: oklch(0.85 0.018 25);
+  --texte: oklch(0.20 0.022 25);
+  --texte-faible: oklch(0.44 0.022 25);
+  --accent: oklch(0.51 0.150 25);
+
+  --police-titre: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+  --police-corps: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+  --police-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  --texte-xs: 0.64rem;
+  --texte-sm: 0.8rem;
+  --texte-md: 1rem;
+  --texte-lg: 1.25rem;
+  --texte-xl: 1.5625rem;
+  --texte-2xl: 1.953rem;
+
+  --espace-xs: 4px;
+  --espace-sm: 8px;
+  --espace-md: 16px;
+  --espace-lg: 24px;
+  --espace-xl: 32px;
+  --espace-2xl: 48px;
+
+  --rayon-sm: 2px;
+  --rayon-md: 6px;
+  --rayon-lg: 12px;
+
+  --interligne-corps: 1.55;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fond: oklch(0.15 0.014 25);
+    --surface: oklch(0.20 0.018 25);
+    --trait: oklch(0.31 0.022 25);
+    --texte: oklch(0.94 0.010 25);
+    --texte-faible: oklch(0.74 0.018 25);
+    --accent: oklch(0.71 0.140 25);
+    --interligne-corps: 1.65;
+  }
+}
+
+:root[data-theme="dark"] {
+  --fond: oklch(0.15 0.014 25);
+  --surface: oklch(0.20 0.018 25);
+  --trait: oklch(0.31 0.022 25);
+  --texte: oklch(0.94 0.010 25);
+  --texte-faible: oklch(0.74 0.018 25);
+  --accent: oklch(0.71 0.140 25);
+  --interligne-corps: 1.65;
+}
+
+:root[data-theme="light"] {
+  --fond: oklch(0.96 0.010 25);
+  --surface: oklch(0.93 0.014 25);
+  --trait: oklch(0.85 0.018 25);
+  --texte: oklch(0.20 0.022 25);
+  --texte-faible: oklch(0.44 0.022 25);
+  --accent: oklch(0.51 0.150 25);
+  --interligne-corps: 1.55;
+}
+
+/* ── Base ─────────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; }
+
+html { color-scheme: light dark; }
+
+body {
+  margin: 0;
+  background: var(--fond);
+  color: var(--texte);
+  font-family: var(--police-corps);
+  font-size: var(--texte-md);
+  line-height: var(--interligne-corps);
+}
+
+.lien-evitement {
+  position: absolute;
+  left: var(--espace-sm);
+  top: -48px;
+  background: var(--surface);
+  color: var(--texte);
+  border: 1px solid var(--trait);
+  border-radius: var(--rayon-sm);
+  padding: var(--espace-sm) var(--espace-md);
+  font-family: var(--police-corps);
+  text-decoration: none;
+  transition: top 150ms ease;
+  z-index: 10;
+}
+.lien-evitement:focus { top: var(--espace-sm); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+h1, h2 {
+  font-family: var(--police-titre);
+  color: var(--texte);
+  margin: 0;
+}
+
+main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--espace-lg) var(--espace-md) var(--espace-2xl);
+  display: grid;
+  gap: var(--espace-xl);
+}
+
+.bloc {
+  background: var(--surface);
+  border: 1px solid var(--trait);
+  border-radius: var(--rayon-lg);
+  padding: var(--espace-lg);
+}
+
+.bloc h2 { font-size: var(--texte-lg); margin-bottom: var(--espace-md); }
+
+/* ── En-tête ──────────────────────────────────────────────────────────── */
+.entete {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--espace-xl) var(--espace-md) 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--espace-md);
+}
+
+.sur-titre {
+  margin: 0 0 var(--espace-xs);
+  font-family: var(--police-corps);
+  font-size: var(--texte-sm);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--texte-faible);
+}
+
+.entete h1 { font-size: var(--texte-2xl); }
+
+.sous-titre {
+  margin: var(--espace-xs) 0 0;
+  color: var(--texte-faible);
+  font-size: var(--texte-sm);
+  max-width: 46ch;
+}
+
+/* ── Boutons ──────────────────────────────────────────────────────────── */
+.bouton {
+  font-family: var(--police-corps);
+  font-size: var(--texte-sm);
+  min-height: 44px;
+  padding: var(--espace-sm) var(--espace-md);
+  border-radius: var(--rayon-md);
+  border: 1px solid var(--trait);
+  background: var(--surface);
+  color: var(--texte);
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.bouton:hover { border-color: var(--accent); }
+
+.bouton-fantome {
+  background: transparent;
+  border-color: var(--trait);
+  color: var(--texte-faible);
+  white-space: nowrap;
+}
+
+.bouton-primaire {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--fond);
+  font-weight: 600;
+}
+.bouton-primaire:hover { background: var(--texte); border-color: var(--texte); }
+
+.bouton-secondaire {
+  background: var(--fond);
+  color: var(--texte);
+}
+
+/* ── Formulaire ───────────────────────────────────────────────────────── */
+.formulaire {
+  display: grid;
+  gap: var(--espace-md);
+}
+
+.champ { display: grid; gap: var(--espace-xs); }
+
+.champ label {
+  font-size: var(--texte-sm);
+  color: var(--texte-faible);
+}
+
+.champ input {
+  font-family: var(--police-corps);
+  font-size: var(--texte-md);
+  min-height: 44px;
+  padding: var(--espace-sm) var(--espace-md);
+  border-radius: var(--rayon-md);
+  border: 1px solid var(--trait);
+  background: var(--fond);
+  color: var(--texte);
+}
+
+.message-erreur {
+  margin: 0;
+  padding: var(--espace-sm) var(--espace-md);
+  border: 1px solid var(--accent);
+  border-radius: var(--rayon-sm);
+  background: var(--fond);
+  color: var(--texte);
+  font-size: var(--texte-sm);
+}
+.message-erreur strong { color: var(--accent); }
+
+.formulaire .bouton-primaire { justify-self: start; }
+
+/* ── Filtres ──────────────────────────────────────────────────────────── */
+.filtres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-sm);
+}
+
+.puce {
+  font-family: var(--police-corps);
+  font-size: var(--texte-sm);
+  min-height: 44px;
+  padding: var(--espace-sm) var(--espace-md);
+  border-radius: var(--rayon-lg);
+  border: 1px solid var(--trait);
+  background: var(--fond);
+  color: var(--texte-faible);
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.puce:hover { border-color: var(--accent); color: var(--texte); }
+
+.puce-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--fond);
+}
+
+/* ── Liste de liens ───────────────────────────────────────────────────── */
+.entete-section {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--espace-md);
+  margin-bottom: var(--espace-md);
+}
+
+.compteur {
+  margin: 0;
+  font-family: var(--police-mono);
+  font-size: var(--texte-sm);
+  color: var(--texte-faible);
+}
+
+.liste-liens {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--espace-md);
+}
+
+.carte-lien {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espace-md);
+  padding: var(--espace-md);
+  border: 1px solid var(--trait);
+  border-radius: var(--rayon-md);
+  background: var(--fond);
+}
+
+.carte-lien-lue { opacity: 0.72; }
+
+.carte-lien-corps { min-width: 0; flex: 1 1 320px; }
+
+.carte-lien-titre {
+  margin: 0 0 var(--espace-xs);
+  font-size: var(--texte-md);
+  color: var(--texte);
+}
+
+.carte-lien-url {
+  margin: 0 0 var(--espace-sm);
+  font-family: var(--police-mono);
+  font-size: var(--texte-xs);
+  color: var(--texte-faible);
+  overflow-wrap: anywhere;
+}
+
+.etiquettes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-xs);
+}
+
+.etiquettes li {
+  font-size: var(--texte-xs);
+  padding: var(--espace-xs) var(--espace-sm);
+  border-radius: var(--rayon-sm);
+  border: 1px solid var(--trait);
+  color: var(--texte-faible);
+}
+
+.statut-lu {
+  margin: 0;
+  font-size: var(--texte-sm);
+  color: var(--texte-faible);
+  font-style: italic;
+}
+
+/* ── Table ────────────────────────────────────────────────────────────── */
+.table-scroll { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--texte-sm);
+}
+
+caption { text-align: left; color: var(--texte-faible); margin-bottom: var(--espace-sm); }
+
+th, td {
+  text-align: left;
+  padding: var(--espace-sm) var(--espace-md);
+  border-bottom: 1px solid var(--trait);
+  white-space: nowrap;
+}
+
+th {
+  font-family: var(--police-corps);
+  font-weight: 600;
+  color: var(--texte-faible);
+  font-size: var(--texte-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+td:first-child, td:nth-child(4) {
+  font-family: var(--police-mono);
+  color: var(--texte-faible);
+}
+
+/* ── Pied de page ─────────────────────────────────────────────────────── */
+.pied {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 var(--espace-md) var(--espace-xl);
+  color: var(--texte-faible);
+  font-size: var(--texte-xs);
+}
+
+/* ── Mobile ───────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .entete { flex-direction: column; align-items: flex-start; }
+  .carte-lien { flex-direction: column; align-items: stretch; }
+}
+
+/* ── Mouvement réduit ─────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+</style>
+</head>
+<body>
+<a class="lien-evitement" href="#contenu">Aller au contenu</a>
+
+<header class="entete">
+  <div>
+    <p class="sur-titre">Atelier de veille</p>
+    <h1>MiniVeille</h1>
+    <p class="sous-titre">Encre, papier, atelier — enregistre un lien, tague-le, retrouve-le.</p>
+  </div>
+  <button type="button" id="bouton-theme" class="bouton bouton-fantome" aria-pressed="false">
+    Passer en thème sombre
+  </button>
+</header>
+
+<main id="contenu">
+
+  <section class="bloc" aria-labelledby="titre-ajout">
+    <h2 id="titre-ajout">Enregistrer un lien</h2>
+    <form class="formulaire" novalidate>
+      <div class="champ">
+        <label for="champ-url">Adresse du lien</label>
+        <input id="champ-url" name="url" type="url" placeholder="https://exemple.fr/article" required>
+      </div>
+      <div class="champ">
+        <label for="champ-tags">Tags</label>
+        <input id="champ-tags" name="tags" type="text" aria-describedby="erreur-tags" placeholder="ia, veille, client-x">
+        <p class="message-erreur" id="erreur-tags"><strong>Erreur —</strong> ajoute au moins un tag pour retrouver ce lien plus tard.</p>
+      </div>
+      <button type="submit" class="bouton bouton-primaire">Enregistrer</button>
+    </form>
+  </section>
+
+  <section class="bloc" aria-labelledby="titre-filtre">
+    <h2 id="titre-filtre">Filtrer par tag</h2>
+    <div class="filtres" role="group" aria-label="Filtres par tag">
+      <button type="button" class="puce puce-active" aria-pressed="true">ia</button>
+      <button type="button" class="puce" aria-pressed="false">veille</button>
+      <button type="button" class="puce" aria-pressed="false">client-x</button>
+      <button type="button" class="puce" aria-pressed="false">outillage</button>
+    </div>
+  </section>
+
+  <section class="bloc" aria-labelledby="titre-liste">
+    <div class="entete-section">
+      <h2 id="titre-liste">Liens enregistrés</h2>
+      <p class="compteur">2 non lus</p>
+    </div>
+    <ul class="liste-liens">
+      <li class="carte-lien">
+        <div class="carte-lien-corps">
+          <p class="carte-lien-titre">L'essor des agents autonomes en entreprise</p>
+          <p class="carte-lien-url">forge-notes.example/agents-autonomes</p>
+          <ul class="etiquettes" aria-label="Tags">
+            <li>ia</li>
+            <li>veille</li>
+          </ul>
+        </div>
+        <button type="button" class="bouton bouton-secondaire">Marquer lu</button>
+      </li>
+      <li class="carte-lien carte-lien-lue">
+        <div class="carte-lien-corps">
+          <p class="carte-lien-titre">Cahier des charges type pour un audit IA</p>
+          <p class="carte-lien-url">client-x.example/cdc-audit</p>
+          <ul class="etiquettes" aria-label="Tags">
+            <li>client-x</li>
+          </ul>
+        </div>
+        <p class="statut-lu">Lu</p>
+      </li>
+      <li class="carte-lien">
+        <div class="carte-lien-corps">
+          <p class="carte-lien-titre">Comparatif d'outils de veille pour indépendants</p>
+          <p class="carte-lien-url">outils-pro.example/comparatif-veille</p>
+          <ul class="etiquettes" aria-label="Tags">
+            <li>outillage</li>
+            <li>veille</li>
+          </ul>
+        </div>
+        <button type="button" class="bouton bouton-secondaire">Marquer lu</button>
+      </li>
+    </ul>
+  </section>
+
+  <section class="bloc" aria-labelledby="titre-historique">
+    <h2 id="titre-historique">Historique récent</h2>
+    <div class="table-scroll">
+      <table>
+        <caption>Trois derniers liens enregistrés, tous tags confondus</caption>
+        <thead>
+          <tr>
+            <th scope="col">Lien</th>
+            <th scope="col">Tags</th>
+            <th scope="col">Statut</th>
+            <th scope="col">Enregistré le</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>forge-notes.example/agents-autonomes</td>
+            <td>ia, veille</td>
+            <td>Non lu</td>
+            <td>04/08/2026 09:12</td>
+          </tr>
+          <tr>
+            <td>client-x.example/cdc-audit</td>
+            <td>client-x</td>
+            <td>Lu</td>
+            <td>03/08/2026 18:47</td>
+          </tr>
+          <tr>
+            <td>outils-pro.example/comparatif-veille</td>
+            <td>outillage, veille</td>
+            <td>Non lu</td>
+            <td>03/08/2026 08:03</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<footer class="pied">
+  <p>MiniVeille — atelier personnel de veille. Palier MVP.</p>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var bouton = document.getElementById("bouton-theme");
+  var racine = document.documentElement;
+
+  function themeActuel() {
+    var force = racine.getAttribute("data-theme");
+    if (force) return force;
+    var preferSombre = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    return preferSombre ? "dark" : "light";
+  }
+
+  function libelle(theme) {
+    return theme === "dark" ? "Passer en thème clair" : "Passer en thème sombre";
+  }
+
+  function synchroniser() {
+    var theme = themeActuel();
+    bouton.textContent = libelle(theme);
+    bouton.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+  }
+
+  bouton.addEventListener("click", function () {
+    var suivant = themeActuel() === "dark" ? "light" : "dark";
+    racine.setAttribute("data-theme", suivant);
+    synchroniser();
+  });
+
+  synchroniser();
+})();
+</script>
+</body>
+</html>
