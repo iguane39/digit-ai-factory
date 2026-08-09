@@ -2,7 +2,7 @@
 
 **Autonome pour tout nouvel utilisateur** : rien n'est supposé installé. Créer un dossier vide
 pour le produit, y copier ce fichier (source :
-https://github.com/iguane39/digit-ai-forge-steering), ouvrir une session Claude Code dans ce
+https://github.com/iguane39/digit-ai-forge-pilot), ouvrir une session Claude Code dans ce
 dossier, coller le bloc rempli.
 
 ---
@@ -16,18 +16,18 @@ Phase 0 — outillage (ne suppose RIEN d'installé, quel que soit mon système) 
    node ≥ 18 ; uv ; python. S'il en manque, liste-les avec la commande d'installation
    adaptée à mon système, puis attends que je confirme.
 2. Localise la forge : $FORGE_ROOT s'il est défini, sinon cherche un dossier contenant
-   digit-ai-forge-steering parmi : le parent de ce projet, c:\dev, ~/.digit-ai-forge.
+   digit-ai-forge-pilot parmi : le parent de ce projet, c:\dev, ~/.digit-ai-forge.
    Si introuvable, installe-la :
-     gh repo clone iguane39/digit-ai-forge-steering ~/.digit-ai-forge/digit-ai-forge-steering
-     node ~/.digit-ai-forge/digit-ai-forge-steering/bootstrap.mjs
-   (bootstrap.mjs clone les 5 forges à côté du steering et vérifie leurs points d'entrée —
+     gh repo clone iguane39/digit-ai-forge-pilot ~/.digit-ai-forge/digit-ai-forge-pilot
+     node ~/.digit-ai-forge/digit-ai-forge-pilot/bootstrap.mjs
+   (bootstrap.mjs clone les 5 forges à côté du pilot et vérifie leurs points d'entrée —
    il doit finir sur « Poste prêt », sinon corrige ce qu'il signale avant de continuer.)
-3. Si la forge était déjà installée : mets-la à jour — `git pull --ff-only` dans le steering
+3. Si la forge était déjà installée : mets-la à jour — `git pull --ff-only` dans le pilot
    puis `node bootstrap.mjs --pull` (les correctifs des forges arrivent en continu ; un run
    démarre TOUJOURS sur les dernières versions, consignées au ledger).
 4. Retiens la racine comme FORGE_ROOT pour toute la session.
 
-Puis suis le CLAUDE.md du steering avec ce dossier comme projet produit :
+Puis suis le CLAUDE.md du pilot avec ce dossier comme projet produit :
 ledger et artefacts d'étapes sous forge\, code du produit à la racine.
 
 Brief :

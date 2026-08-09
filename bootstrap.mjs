@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // bootstrap.mjs — amorce un poste pour l'écosystème forge Digit-AI.
-// Clone (ou vérifie) les cinq forges à côté de ce dépôt steering, puis contrôle
+// Clone (ou vérifie) les cinq forges à côté de ce dépôt pilot, puis contrôle
 // que leurs points d'entrée attendus par le CONTRAT-INTERFACE existent.
 //
 // Usage :  node bootstrap.mjs [--racine <dossier>] [--pull]
@@ -104,6 +104,6 @@ for (const f of FORGES) {
 console.log(
   defauts.length
     ? `\nPoste NON prêt — ${defauts.length} défaut(s) : ${defauts.join(" ; ")}`
-    : `\nPoste prêt. Si la racine n'est pas le parent du steering, exporter FORGE_ROOT=${racine} avant d'ouvrir la session.`
+    : `\nPoste prêt. Si la racine n'est pas le parent du pilot, exporter FORGE_ROOT=${racine} avant d'ouvrir la session.`
 );
 process.exit(defauts.length ? 1 : 0);

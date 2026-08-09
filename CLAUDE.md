@@ -1,4 +1,4 @@
-# digit-ai-forge-steering — CLAUDE.md de pilotage
+# digit-ai-forge-pilot — CLAUDE.md de pilotage
 
 Tu es l'orchestrateur de l'écosystème forge Digit-AI. Ce dépôt est le **seul point de démarrage**
 pour créer un produit mobilisant les forges bout en bout :
@@ -7,10 +7,10 @@ Deux forges hors pipeline (ajoutées le 08/08) : **forge-seo** — audit/straté
 récurrente, uniquement sur mandat humain explicite (sa doctrine interdit le déclenchement
 automatique ; invocation : contrat §5) ; **forge-organization** — doctrine transverse des
 conventions (D-01→D-12). Gouvernance tranchée le 08/08 (décision humaine Q-B) :
-**organization organise, steering pilote** — organization est l'atelier amont qui inventorie
-et propose les conventions ; le steering décide, les encode (`REGLES-PROJET.md`) et les fait
+**organization organise, pilot pilote** — organization est l'atelier amont qui inventorie
+et propose les conventions ; le pilot décide, les encode (`REGLES-PROJET.md`) et les fait
 respecter (oracle conformité). Une proposition d'organization devient une règle par décision
-humaine au steering, jamais automatiquement.
+humaine au pilot, jamais automatiquement.
 
 **Résolution des chemins** : la racine des forges est `$FORGE_ROOT` si défini, sinon le dossier
 parent de ce dépôt (installation type : `~/.digit-ai-forge`, posée par la phase 0 de
@@ -20,7 +20,7 @@ d'abord `node bootstrap.mjs` (clone les cinq forges depuis `github.com/iguane39`
 leurs points d'entrée).
 
 **Fraîcheur des forges** : à l'ouverture de TOUT run, tirer les dernières versions —
-`git -C <steering> pull --ff-only` puis `node bootstrap.mjs --pull` — et consigner au ledger
+`git -C <pilot> pull --ff-only` puis `node bootstrap.mjs --pull` — et consigner au ledger
 (dans `run_open`) la version de chaque forge (`git -C <forge> log -1 --format=%h`). Un produit
 sait ainsi toujours avec quelles versions de forges il a été construit, et récupère les
 correctifs à chaque run.
@@ -68,7 +68,7 @@ dans le projet produit : artefacts d'orchestration sous `forge\`, code du produi
 
 1. **Ouvrir le run** : dans le projet produit, créer `forge\` (`ledger.jsonl` ouvert avec
    `run_open`, `BRIEF.md` avec le brief reçu, `etapes\`). Si `PROMPT-PRODUIT.md` n'est pas à la
-   racine du projet, l'y copier depuis le steering (auto-documentation et reprise). Écrivain
+   racine du projet, l'y copier depuis le pilot (auto-documentation et reprise). Écrivain
    unique du ledger : toi. Les chemins d'étapes ci-dessous se lisent `<projet>\forge\etapes\…`.
    **Socle projet** (`REGLES-PROJET.md`, décidé le 06/08) : créer `input\`, `output\`, `docs\`,
    le `.gitignore` socle (`.env`, `.venv/`, `__pycache__/`, `node_modules/`, `generated/`,
@@ -80,7 +80,7 @@ dans le projet produit : artefacts d'orchestration sous `forge\`, code du produi
    commit initial — commits locaux à chaque étape, **remote/push sur GO humain seulement**.
    Créer aussi `forge\retours\` avec une copie de `gabarits\RETOURS-FORGES.md` (le canal de
    retours du produit — règle 18).
-   **Valider** : `node <steering>\oracles\oracle-conformite-projet.mjs <projet>` → PASS exigé
+   **Valider** : `node <pilot>\oracles\oracle-conformite-projet.mjs <projet>` → PASS exigé
    avant l'étape 2 ; rejouer l'oracle avant `run_close`. Nommage : tout livrable copié dans
    `output\`/`docs\` porte `<Projet> - <Objet> - AAAAMMJJ<indice>` — **le nom du projet prime
    sur l'émetteur** (Q3-bis, décision humaine du 09/08) ; un livrable remplacé migre
@@ -144,7 +144,7 @@ dans le projet produit : artefacts d'orchestration sous `forge\`, code du produi
    (`type: retour`, `source: produit`, destinataire development). Verdict Refondre ou
    ≥ 1 bloquant → retour à development (boucle bornée partagée avec l'étape tests). Un écart
    voulu se consigne en hypothèse — la revue le classe « accepté », pas défaut.
-6. **Étape MEP** (portée par le steering — `ETAPE-MEP.md`) : Dockerfile/compose dans le produit,
+6. **Étape MEP** (portée par le pilot — `ETAPE-MEP.md`) : Dockerfile/compose dans le produit,
    déploiement **staging** réel, `ROLLBACK.md` testé une fois, oracle MEP M-1…M-5 exécuté
    (build, healthcheck ×3, smoke tests des exigences critiques contre l'instance servie,
    rollback prouvé, scan secrets de l'image). Puis générer `DOSSIER-MEP.md` et demander le
@@ -153,10 +153,10 @@ dans le projet produit : artefacts d'orchestration sous `forge\`, code du produi
 7. **Clore le run** : compiler les entrées `type: retour` du ledger en un **lot de retours** —
    `forge\retours\RETOURS-<AAAAMMJJ><indice>.md` + **sidecar `.tf.jsonl`** (candidatures SANS
    id, gabarit `gabarits\RETOURS-FORGES.md`) avec contrôle de complétude ledger↔lot — puis
-   **remise automatique** : copie des deux fichiers dans `<steering>\input\`. Ensuite
+   **remise automatique** : copie des deux fichiers dans `<pilot>\input\`. Ensuite
    `run_close` au ledger avec le bilan, et synthèse à l'humain. Hors run, toute
    inspection/incident produit son propre lot — un fichier par lot, jamais modifié après
-   remise. **À réception d'un sidecar dans `input\`** (côté steering) :
+   remise. **À réception d'un sidecar dans `input\`** (côté pilot) :
    `node todo\ingerer-lot.mjs <sidecar>` — validation atomique, ids frappés, tout en
    `candidat` (l'automatique s'arrête là : la décision reste humaine), oracle + vue régénérée.
 
@@ -194,7 +194,7 @@ conformité — jamais en masse silencieuse hors run). Son entrant inclut les lo
 
 ## Garde-fous (non négociables)
 
-- **Les projets produits sont autonomes.** Le steering n'intervient jamais dans un projet
+- **Les projets produits sont autonomes.** Le pilot n'intervient jamais dans un projet
   produit hors d'un run explicitement demandé — pas d'audit spontané, pas de correctif, pas de
   relance « pour vérifier ». Le pilote travaille seul ; ses retours reviennent par ses lots
   (`forge\retours\`) : **c'est le pilote qui forge la forge**, pas l'inverse. Un constat fait

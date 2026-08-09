@@ -5,14 +5,14 @@ C1 = `Old\` autorisé pour les livrables mais **jamais versionné** (ignoré par
 C2 = `git init` + **commits locaux par défaut** dès l'ouverture du run, remote/push sur GO
 humain ; C3 = le nommage daté ne s'applique jamais au code ; C4 = journaux d'oracles
 **versionnés** dans `forge\`.
-Application : phase 0 du prompt produit (P0), vérifications steering (S), et l'oracle
+Application : phase 0 du prompt produit (P0), vérifications pilot (S), et l'oracle
 exécutable `oracles\oracle-conformite-projet.mjs` (O) — chaque n° de règle est un n° de finding.
 Rattrapage des projets existants : au prochain run de version de chacun.
 
 Sources : inventaire exécuté sur 11 dépôts (6 forges, produit pilote MiniVeille, ASDMailManager2
 — produit forge réel —, ASDMailManager, AuxPortesDeLaBaie.com, Transcript, BeefProject).
 Annexe d'inventaire en fin de document. Mécanismes : **P0** = créé par la phase 0 du prompt
-produit · **S** = vérifié par le steering à l'ouverture de run · **O** = oracle conformité
+produit · **S** = vérifié par le pilot à l'ouverture de run · **O** = oracle conformité
 projet (2e mandat) · **G** = gate humain.
 
 ## A. Structure de dossiers
@@ -53,7 +53,7 @@ projet (2e mandat) · **G** = gate humain.
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
 | 13 | `.env.example` versionné et **exhaustif** : toutes les variables attendues — applicatives ET infra (ports, URLs, cible de déploiement, drapeaux `*_MODE_DEMO`) — valeurs par défaut sûres ou vides, en-tête « ne jamais renseigner de secret ici » | observée (design, tests, ASDMailManager, AuxPortesDeLaBaie — en-tête littéral constaté) | produits, nouveaux + rattrapage | P0+O | faible | **défaut** |
-| 14 | `.env` réel toujours gitignoré ; aucun secret committé, jamais | observée partout + loi steering existante | tous | O | nul | **défaut** (quasi-loi déjà) |
+| 14 | `.env` réel toujours gitignoré ; aucun secret committé, jamais | observée partout + loi pilot existante | tous | O | nul | **défaut** (quasi-loi déjà) |
 | 15 | Les variables que la forge ne peut pas renseigner (clés tierces, identifiants) portent un commentaire `# à fournir :` dans `.env.example` — elles alimentent directement les `non_testables[]` de l'étape qualif (RT-6) | générique, prolonge RT-6 | produits | P0+S | faible | **défaut** |
 
 ## F. Livrables et archivage
@@ -62,7 +62,7 @@ projet (2e mandat) · **G** = gate humain.
 |---|---|---|---|---|---|---|
 | 16 | Les rapports finaux destinés à l'humain (DOSSIER-MEP, PV, revues) sont **copiés** dans `output\` au nommage daté (n° 4) — l'original de travail reste sous `forge\etapes\` | cohérence avec `digit-ai-forge-agents/output/` | produits | S | faible | **défaut** |
 | 17 | Les journaux d'oracles (`*.oracles.json`, `*.oracles-historique.jsonl`) sont versionnés dans `forge\` (ce sont des preuves), ignorés partout ailleurs | observée : présents dans ASDMailManager2/forge/ | produits | P0 (.gitignore) | nul | option (conflit C4) |
-| 18 | `forge\retours\` existe (gabarit inclus) ; chaque lot de retours forges est un fichier `RETOURS-<AAAAMMJJ><indice>.md` — un fichier par lot, ids en séquence continue par produit, **jamais modifié après remise** ; remise = copie dans `input\` du steering | **mandat humain du 06/08** ; format éprouvé 2× (ASDMailManager2/forge/RETOURS-FORGES*.md) | produits, nouveaux + rattrapage | P0+S+O | faible | **adoptée** (décision 06/08) |
+| 18 | `forge\retours\` existe (gabarit inclus) ; chaque lot de retours forges est un fichier `RETOURS-<AAAAMMJJ><indice>.md` — un fichier par lot, ids en séquence continue par produit, **jamais modifié après remise** ; remise = copie dans `input\` du pilot | **mandat humain du 06/08** ; format éprouvé 2× (ASDMailManager2/forge/RETOURS-FORGES*.md) | produits, nouveaux + rattrapage | P0+S+O | faible | **adoptée** (décision 06/08) |
 
 ## Conflits à trancher (ta décision explicite)
 
@@ -71,7 +71,7 @@ projet (2e mandat) · **G** = gate humain.
   de lisibilité (les versions datées coexistent, `Old\` désencombre le dossier courant — git
   garde l'histoire de toute façon). Alternatives : (a) git seul partout, jamais d'`Old\` ;
   (b) la proposition ci-dessus ; (c) `Old\` seulement hors dépôts git. **Recommandé : (b).**
-- **C2 — n° 8 vs garde-fou actuel** : le CLAUDE.md steering dit aujourd'hui « création du dépôt
+- **C2 — n° 8 vs garde-fou actuel** : le CLAUDE.md pilot dit aujourd'hui « création du dépôt
   git du produit sur validation humaine ». La règle 8 inverserait : init + commits **locaux**
   par défaut (traçabilité dès la naissance), seuls remote/push restant sur ton GO. **Recommandé :
   adopter la règle 8** (le commit local est réversible, l'absence d'historique ne l'est pas).
@@ -83,7 +83,7 @@ projet (2e mandat) · **G** = gate humain.
 ## Après ta décision (2e mandat, non anticipé)
 
 Les règles retenues s'encoderont dans : la **phase 0 de PROMPT-PRODUIT.md** (création du socle
-P0), le **CLAUDE.md steering** (vérifications S, y compris rattrapage en run de version), et un
+P0), le **CLAUDE.md pilot** (vérifications S, y compris rattrapage en run de version), et un
 **oracle « conformité projet »** exécutable (contrôles O, binaires — le n° de règle devient le
 n° de finding). Rattrapage des projets existants : appliqué au prochain run de version de
 chaque produit, jamais en masse silencieuse.
@@ -94,7 +94,7 @@ chaque produit, jamais en masse silencieuse.
 
 | Dépôt | CLAUDE.md | README | .env.example | input\ | output\ | Old\ | git | fichiers datés |
 |---|---|---|---|---|---|---|---|---|
-| steering | ✔ | ✔ | — | ✔ | — | — | ✔ | 0 |
+| pilot | ✔ | ✔ | — | ✔ | — | — | ✔ | 0 |
 | conception | — | ✔ | — | — | — | — | ✔ | 2 |
 | design | — | ✔ | ✔ | ✔ | — | — | ✔ | 1 |
 | development | — | ✔ | — | ✔ | — | — | ✔ | 1 |
@@ -107,5 +107,5 @@ chaque produit, jamais en masse silencieuse.
 | BeefProject | — | — | — | ✔ | ✔ | — | — | 2 |
 
 `Old\` : une seule occurrence sur tout `c:\dev` (`OptimAssur/old`). CLAUDE.md : 13 occurrences
-sur `c:\dev` (11 projets maison + steering + inZM), zéro dans les produits forge. Nommage daté :
+sur `c:\dev` (11 projets maison + pilot + inZM), zéro dans les produits forge. Nommage daté :
 motif `<Marque> - <Objet> - AAAAMMJJ<lettre>` vérifié sur 25+ fichiers, exclusivement documentaires.

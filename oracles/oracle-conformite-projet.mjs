@@ -105,7 +105,7 @@ else ok("R-10", ".gitignore", "présent, .env ignoré");
 
 // R-11 — CLAUDE.md présent ET porteur de la table de routage forge (étendu le 06/08 :
 // sans elle, les sessions ad hoc contournent les forges — constaté sur le correctif v0.2.0)
-if (!existsSync(p("CLAUDE.md"))) ko("R-11", "CLAUDE.md", "absent — chaque produit naît avec son CLAUDE.md (gabarit steering)");
+if (!existsSync(p("CLAUDE.md"))) ko("R-11", "CLAUDE.md", "absent — chaque produit naît avec son CLAUDE.md (gabarit pilot)");
 else {
   const claude = readFileSync(p("CLAUDE.md"), "utf8");
   const manques = [];

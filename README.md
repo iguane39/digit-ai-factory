@@ -1,4 +1,4 @@
-# digit-ai-forge-steering
+# digit-ai-forge-pilot
 
 Projet de pilotage de l'écosystème forge Digit-AI. **Un seul point de démarrage** pour construire
 un produit en mobilisant les cinq forges bout en bout, et pour les améliorer par itérations
@@ -44,10 +44,10 @@ development ruff+pytest verts avec traçabilité exigences→tests 11/11, forge-
 ## Ce qui tourne en mode dégradé (déclaré, pas caché)
 
 Trois étapes sur quatre n'ont pas de point d'entrée natif chez leur forge : conception, design et
-development sont exécutées par le steering en appliquant leurs méthodes documentées, validées par
+development sont exécutées par le pilot en appliquant leurs méthodes documentées, validées par
 leurs oracles natifs (détail : [CONTRAT-INTERFACE.md](CONTRAT-INTERFACE.md) §5, dettes D-*).
 Seule l'étape tests est native (CLI `forge_tests`). L'étape MEP ([ETAPE-MEP.md](ETAPE-MEP.md))
-est portée par le steering lui-même : **staging autonome avec oracle exécuté, mise en production
+est portée par le pilot lui-même : **staging autonome avec oracle exécuté, mise en production
 uniquement sur GO humain**, donné sur un dossier de preuve généré (DOSSIER-MEP.md).
 
 ## Limites assumées
@@ -82,7 +82,7 @@ uniquement sur GO humain**, donné sur un dossier de preuve généré (DOSSIER-M
 
 ## Principes
 
-- **Le steering est le seul conducteur** : les forges se déclarent non-orchestrables ou
+- **Le pilot est le seul conducteur** : les forges se déclarent non-orchestrables ou
   s'ignorent entre elles ; l'enchaînement vit ici.
 - **Routage par modèle** : Fable pilote, Opus construit le complexe, Sonnet par défaut, Haiku
   pour le mécanique. Départ au moins cher plausible, escalade sur échec d'oracle, tout consigné.
