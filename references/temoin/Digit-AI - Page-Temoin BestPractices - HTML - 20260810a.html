@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digit-AI — Page-témoin best practices HTML · Forge Pilot</title>
+  <meta name="description" content="Page-témoin appliquant les patterns « adopter » du référentiel BEST-PRACTICES-HTML : KPI, badges, barres, tableau triable, légende, recherche.">
+  <meta name="theme-color" content="#2563EB">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --blue: #2563EB;
+      --bg: #FAFBFF;
+      --surface: #FFFFFF;
+      --card: #FFFFFF;
+      --ink: #0F172A;
+      --muted: #64748B;
+      --faint: #94A3B8;
+      --line: #E6EAF2;
+      --amber: #D97706; --amber-fill: #FFFBEB; --amber-line: #FDE9C8;
+      --teal:  #0E9488; --teal-fill:  #EFFDFB; --teal-line:  #C7F0EA;
+      --green: #15803D; --green-fill: #F2FCF5; --green-line: #CFEEDD;
+      --r: 12px; --r-sm: 8px;
+      --head: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
+      --annee-ref: "2026";
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.55; font-size: 16px; }
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px 64px; }
+
+    h1, h2, h3 { font-family: var(--head); font-weight: 800; color: var(--ink); line-height: 1.2; }
+    h1 { font-size: 2rem; margin: 0 0 .25em; }
+    h2 { font-size: 1.4rem; font-weight: 700; margin: 2em 0 .6em; }
+    h3 { font-size: 1.05rem; font-weight: 700; margin: 1.4em 0 .4em; }
+    p { margin: 0 0 1em; }
+    a { color: var(--blue); }
+    code { font-family: var(--mono); font-size: .9em; }
+
+    /* B1 — Header sticky (marque + sous-titre + méta-ligne) */
+    header.doc { position: sticky; top: 0; z-index: 10; background: var(--bg);
+      border-bottom: 2px solid var(--blue); padding: 20px 0 14px; margin-bottom: 8px; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand .logo { width: 26px; height: 26px; border-radius: 7px; background: var(--blue); }
+    .eyebrow { color: var(--muted); font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; margin: 0; }
+    .sub { color: var(--muted); margin: .2em 0 0; }
+    .meta-line { color: var(--muted); font-size: .8rem; margin: .5em 0 0; }
+
+    /* B2 — Grille de KPI */
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 18px 0 8px; }
+    .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: flex; flex-direction: column; gap: 4px; }
+    .kpi-label { font-family: var(--sans); color: var(--muted); font-size: .8rem; }
+    .kpi-value { font-family: var(--head); font-weight: 800; font-size: 1.6rem; color: var(--ink); }
+    .kpi-hint { color: var(--muted); font-size: .75rem; }
+
+    /* B4 / D5 — Badges de statut (pastille + libellé, couleur jamais seule) */
+    /* Texte en --ink (contraste garanti) ; la couleur sémantique est portée par la pastille + la bordure + le libellé */
+    .badge { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; font-weight: 600;
+      color: var(--ink); padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line); }
+    .badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--_dot, var(--muted)); }
+    .badge.ok  { --_dot: var(--green); background: var(--green-fill); border-color: var(--green-line); }
+    .badge.part{ --_dot: var(--amber); background: var(--amber-fill); border-color: var(--amber-line); }
+    .badge.info{ --_dot: var(--teal);  background: var(--teal-fill);  border-color: var(--teal-line); }
+
+    /* B5 — Barre de progression */
+    .bar { display: inline-block; vertical-align: middle; background: var(--line); border-radius: 999px; height: 8px; overflow: hidden; min-width: 120px; }
+    .bar .fill { display: block; height: 100%; width: var(--val); background: var(--blue); border-radius: 999px; }
+
+    /* B7 — Légende */
+    .legend { display: flex; flex-wrap: wrap; gap: 16px; margin: 12px 0; padding: 0; list-style: none; }
+    .leg-item { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: .85rem; }
+    .leg-swatch { width: 12px; height: 12px; border-radius: 4px; border: 1px solid var(--line); }
+
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 20px 24px; margin: 16px 0; }
+
+    /* B13 — Toolbar de filtres + compteur */
+    .toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 16px 0 8px; }
+    .toolbar input[type="search"] { font-family: var(--sans); font-size: .9rem; padding: 8px 12px;
+      border: 1px solid var(--line); border-radius: var(--r-sm); min-width: 220px; color: var(--ink); background: var(--surface); }
+    .toolbar input:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+    .count { color: var(--muted); font-size: .85rem; }
+
+    /* B6 — Tableau de données triable, thead sticky */
+    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    caption { text-align: left; color: var(--muted); font-size: .85rem; padding: 6px 0; }
+    /* Sticky thead réservé aux tableaux dans un conteneur à hauteur bornée (scroll interne) ;
+       hors de ce cas, il se peint par-dessus le contenu → non sticky ici. */
+    thead th { background: var(--surface); text-align: left;
+      font-family: var(--head); font-weight: 700; color: var(--ink); border-bottom: 2px solid var(--line);
+      padding: 10px 12px; cursor: pointer; user-select: none; }
+    thead th:focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; }
+    tbody td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    tbody tr:hover { background: var(--bg); }
+    .num { font-family: var(--mono); text-align: right; }
+    mark { background: #FEF08A; color: inherit; padding: 0 1px; border-radius: 2px; }
+
+    footer.doc { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: .85rem; }
+
+    /* E1 — Responsive */
+    @media (max-width: 900px) {
+      .kpis { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .wrap { padding: 0 16px 48px; }
+      h1 { font-size: 1.6rem; }
+      /* B6 responsive — repli en cartes empilées (pas de défilement horizontal) */
+      table, tbody, tr, td { display: block; width: 100%; }
+      thead { display: none; }
+      caption { display: block; }
+      tbody tr { border: 1px solid var(--line); border-radius: var(--r-sm); padding: 8px 10px; margin: 10px 0; }
+      tbody td { border: none; padding: 5px 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+      tbody td::before { content: attr(data-label); font-weight: 700; color: var(--muted); font-size: .78rem; }
+      .num { text-align: right; }
+      .bar { min-width: 0; flex: 1; max-width: 60%; }
+    }
+
+    /* E2 — Respect du mouvement réduit */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+
+    /* F5 / F1 / F2 — Export PDF */
+    @page { size: A4; margin: 18mm 16mm; }
+    @page :first { margin-top: 22mm; }
+    @media print {
+      body { background: #FFFFFF; }
+      header.doc { position: static; }
+      .wrap { max-width: none; padding: 0; }
+      .card, .kpi, tr { break-inside: avoid; page-break-inside: avoid; }
+      .toolbar { display: none; } /* interactif : masqué à l'impression */
+      thead th { position: static; cursor: auto; }
+      a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .85em; color: var(--muted); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- B1 -->
+    <header class="doc">
+      <div class="brand"><span class="logo" aria-hidden="true"></span>
+        <p class="eyebrow">Digit-AI · Forge Pilot · Page-témoin</p></div>
+      <p class="sub">Application des patterns « adopter » du référentiel best practices HTML</p>
+      <p class="meta-line">Version 20260810a · 10 août 2026 · source de vérité : <code>references/BEST-PRACTICES-HTML.md</code></p>
+    </header>
+
+    <main>
+      <h1>Patterns HTML réutilisables — démonstration chartée</h1>
+      <p>Cette page applique, en tokens <code>:root</code> canoniques, les patterns validés
+        « adopter » extraits des livrables réels. Le contenu essentiel (le tableau) existe en
+        HTML statique : la page reste lisible sans JavaScript.</p>
+
+      <!-- B2 -->
+      <section aria-labelledby="kpi-h">
+        <h2 id="kpi-h">Chiffres-clés</h2>
+        <div class="kpis">
+          <div class="kpi"><span class="kpi-label">Patterns catalogués</span><span class="kpi-value">34</span><span class="kpi-hint">2 fichiers sources</span></div>
+          <div class="kpi"><span class="kpi-label">Adopter</span><span class="kpi-value">20</span><span class="kpi-hint">conformes charte</span></div>
+          <div class="kpi"><span class="kpi-label">Adapter</span><span class="kpi-value">10</span><span class="kpi-hint">a11y / tokens / PDF</span></div>
+          <div class="kpi"><span class="kpi-label">Rejeter</span><span class="kpi-value">4</span><span class="kpi-hint">contre-exemples</span></div>
+        </div>
+      </section>
+
+      <!-- B7 -->
+      <section aria-labelledby="leg-h">
+        <h2 id="leg-h">Verdicts</h2>
+        <ul class="legend">
+          <li class="leg-item"><span class="leg-swatch" style="background:var(--green-fill);border-color:var(--green-line)"></span> Adopter — réutilisable tel quel</li>
+          <li class="leg-item"><span class="leg-swatch" style="background:var(--amber-fill);border-color:var(--amber-line)"></span> Adapter — à retravailler</li>
+          <li class="leg-item"><span class="leg-swatch" style="background:var(--teal-fill);border-color:var(--teal-line)"></span> Info / socle</li>
+        </ul>
+      </section>
+
+      <!-- B13 + B6 -->
+      <section aria-labelledby="tab-h">
+        <h2 id="tab-h">Inventaire des patterns</h2>
+        <div class="toolbar">
+          <label for="q" class="count">Filtrer :</label>
+          <input type="search" id="q" placeholder="ex. badge, tableau, print…" aria-label="Filtrer les patterns">
+          <span class="count" id="count" aria-live="polite" role="status"></span>
+        </div>
+        <div class="card" style="padding:0;overflow-x:auto">
+          <table id="tbl">
+            <caption>Extrait — cliquer un en-tête pour trier. Score = maturité charte.</caption>
+            <thead>
+              <tr>
+                <th data-sort="str" scope="col">ID</th>
+                <th data-sort="str" scope="col">Pattern</th>
+                <th data-sort="str" scope="col">Catégorie</th>
+                <th data-sort="str" scope="col">Verdict</th>
+                <th data-sort="num" scope="col">Score</th>
+                <th scope="col">Maturité</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td data-label="ID">B2</td><td data-label="Pattern">Grille de KPI</td><td data-label="Catégorie">Composant</td><td data-label="Verdict"><span class="badge ok">Adopter</span></td><td class="num" data-label="Score">95</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:95%"></span></span></td></tr>
+              <tr><td data-label="ID">B4</td><td data-label="Pattern">Badges de statut</td><td data-label="Catégorie">Composant</td><td data-label="Verdict"><span class="badge ok">Adopter</span></td><td class="num" data-label="Score">92</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:92%"></span></span></td></tr>
+              <tr><td data-label="ID">B6</td><td data-label="Pattern">Tableau triable</td><td data-label="Catégorie">Composant</td><td data-label="Verdict"><span class="badge ok">Adopter</span></td><td class="num" data-label="Score">90</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:90%"></span></span></td></tr>
+              <tr><td data-label="ID">C1</td><td data-label="Pattern">escapeHtml sur données</td><td data-label="Catégorie">JS</td><td data-label="Verdict"><span class="badge ok">Adopter</span></td><td class="num" data-label="Score">98</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:98%"></span></span></td></tr>
+              <tr><td data-label="ID">B8</td><td data-label="Pattern">Drawer latéral</td><td data-label="Catégorie">Composant</td><td data-label="Verdict"><span class="badge part">Adapter</span></td><td class="num" data-label="Score">60</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:60%"></span></span></td></tr>
+              <tr><td data-label="ID">B11</td><td data-label="Pattern">Tooltip personnalisé</td><td data-label="Catégorie">Composant</td><td data-label="Verdict"><span class="badge part">Adapter</span></td><td class="num" data-label="Score">55</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:55%"></span></span></td></tr>
+              <tr><td data-label="ID">D4</td><td data-label="Pattern">Fonts chartées Roboto/DM Sans</td><td data-label="Catégorie">Style</td><td data-label="Verdict"><span class="badge info">Socle</span></td><td class="num" data-label="Score">100</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:100%"></span></span></td></tr>
+              <tr><td data-label="ID">E2</td><td data-label="Pattern">prefers-reduced-motion</td><td data-label="Catégorie">Responsive</td><td data-label="Verdict"><span class="badge ok">Adopter</span></td><td class="num" data-label="Score">88</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:88%"></span></span></td></tr>
+              <tr><td data-label="ID">F1</td><td data-label="Pattern">@media print</td><td data-label="Catégorie">Print</td><td data-label="Verdict"><span class="badge ok">Adopter</span></td><td class="num" data-label="Score">94</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:94%"></span></span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="doc">
+      Digit-AI — Forge Pilot · Page-témoin best practices HTML · 2026
+    </footer>
+  </div>
+
+  <script>
+    // C1 — échappement obligatoire avant toute injection de donnée
+    const escapeHtml = s => String(s).replace(/[&<>"']/g,
+      c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    const tbl = document.getElementById('tbl');
+    const rows = Array.from(tbl.tBodies[0].rows);
+    const countEl = document.getElementById('count');
+    const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+    // B13 — filtre + compteur (aria-live), dégradation gracieuse (données déjà en statique)
+    function applyFilter(q) {
+      const nq = norm(q.trim());
+      let shown = 0;
+      for (const r of rows) {
+        const hit = !nq || norm(r.textContent).includes(nq);
+        r.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      }
+      countEl.textContent = shown + ' / ' + rows.length + ' pattern' + (shown > 1 ? 's' : '');
+    }
+    document.getElementById('q').addEventListener('input', e => applyFilter(escapeHtml(e.target.value)));
+    applyFilter('');
+
+    // B6 — tri au clic sur en-tête
+    const ths = tbl.tHead.rows[0].cells;
+    Array.from(ths).forEach((th, i) => {
+      if (!th.dataset.sort) return;
+      th.tabIndex = 0;
+      const sort = () => {
+        const asc = th.dataset.dir !== 'asc';
+        Array.from(ths).forEach(t => delete t.dataset.dir);
+        th.dataset.dir = asc ? 'asc' : 'desc';
+        const num = th.dataset.sort === 'num';
+        rows.sort((a, b) => {
+          const x = a.cells[i].textContent.trim(), y = b.cells[i].textContent.trim();
+          return (num ? (parseFloat(x) - parseFloat(y)) : x.localeCompare(y, 'fr')) * (asc ? 1 : -1);
+        });
+        const body = tbl.tBodies[0];
+        rows.forEach(r => body.appendChild(r));
+      };
+      th.addEventListener('click', sort);
+      th.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); sort(); } });
+    });
+  </script>
+</body>
+</html>
