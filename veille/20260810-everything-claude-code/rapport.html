@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digit-AI — Rapport de veille · Everything Claude Code</title>
+  <meta name="description" content="Analyse et reporting du dépôt Everything Claude Code (affaan-m) pour l'amélioration des forges Digit-AI.">
+  <meta name="theme-color" content="#2563EB">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --blue: #2563EB; --bg: #FAFBFF; --surface: #FFFFFF; --card: #FFFFFF;
+      --ink: #0F172A; --muted: #64748B; --faint: #94A3B8; --line: #E6EAF2;
+      --amber: #D97706; --amber-fill: #FFFBEB; --amber-line: #FDE9C8;
+      --teal:  #0E9488; --teal-fill:  #EFFDFB; --teal-line:  #C7F0EA;
+      --green: #15803D; --green-fill: #F2FCF5; --green-line: #CFEEDD;
+      --red:   #B91C1C; --red-fill:   #FEF2F2; --red-line:   #F6D5D5;
+      --r: 12px; --r-sm: 8px;
+      --head: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
+      --annee-ref: "2026";
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.55; font-size: 16px; }
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px 64px; }
+    h1, h2, h3 { font-family: var(--head); font-weight: 800; color: var(--ink); line-height: 1.2; }
+    h1 { font-size: 2rem; margin: 0 0 .25em; }
+    h2 { font-size: 1.4rem; font-weight: 700; margin: 2em 0 .6em; }
+    h3 { font-size: 1.05rem; font-weight: 700; margin: 1.4em 0 .4em; }
+    p { margin: 0 0 1em; } a { color: var(--blue); } code { font-family: var(--mono); font-size: .9em; }
+
+    header.doc { border-bottom: 2px solid var(--blue); padding: 20px 0 14px; margin-bottom: 8px; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand .logo { width: 26px; height: 26px; border-radius: 7px; background: var(--blue); }
+    .eyebrow { color: var(--muted); font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; margin: 0; }
+    .sub { color: var(--muted); margin: .2em 0 0; }
+    .meta-line { color: var(--muted); font-size: .8rem; margin: .5em 0 0; }
+
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 18px 0 8px; }
+    .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: flex; flex-direction: column; gap: 4px; }
+    .kpi-label { color: var(--muted); font-size: .8rem; }
+    .kpi-value { font-family: var(--head); font-weight: 800; font-size: 1.6rem; }
+    .kpi-hint { color: var(--muted); font-size: .75rem; }
+
+    .badge { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; font-weight: 600;
+      color: var(--ink); padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line); }
+    .badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--_dot, var(--muted)); }
+    .badge.ok   { --_dot: var(--green); background: var(--green-fill); border-color: var(--green-line); }
+    .badge.wait { --_dot: var(--amber); background: var(--amber-fill); border-color: var(--amber-line); }
+    .badge.no   { --_dot: var(--red);   background: var(--red-fill);   border-color: var(--red-line); }
+    .badge.info { --_dot: var(--teal);  background: var(--teal-fill);  border-color: var(--teal-line); }
+
+    .conf { display: inline-block; min-width: 96px; }
+    .bar { display: inline-block; vertical-align: middle; background: var(--line); border-radius: 999px; height: 8px; overflow: hidden; min-width: 90px; }
+    .bar .fill { display: block; height: 100%; width: var(--val); background: var(--blue); border-radius: 999px; }
+
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 20px 24px; margin: 16px 0; }
+    .card.warn { background: var(--amber-fill); border-color: var(--amber-line); }
+
+    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    caption { text-align: left; color: var(--muted); font-size: .85rem; padding: 6px 0; }
+    thead th { background: var(--surface); text-align: left; font-family: var(--head); font-weight: 700; color: var(--ink); border-bottom: 2px solid var(--line); padding: 10px 12px; }
+    tbody td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    tbody tr:hover { background: var(--bg); }
+
+    footer.doc { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: .85rem; }
+
+    @media (max-width: 900px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) {
+      .wrap { padding: 0 16px 48px; } h1 { font-size: 1.6rem; }
+      table, tbody, tr, td { display: block; width: 100%; } thead { display: none; } caption { display: block; }
+      tbody tr { border: 1px solid var(--line); border-radius: var(--r-sm); padding: 8px 10px; margin: 10px 0; }
+      tbody td { border: none; padding: 5px 0; display: flex; justify-content: space-between; gap: 12px; }
+      tbody td::before { content: attr(data-label); font-weight: 700; color: var(--muted); font-size: .78rem; }
+      .bar { min-width: 0; flex: 1; max-width: 55%; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+    @page { size: A4; margin: 18mm 16mm; }
+    @page :first { margin-top: 22mm; }
+    @media print {
+      body { background: #FFFFFF; }
+      .wrap { max-width: none; padding: 0; }
+      .card, .kpi, tr { break-inside: avoid; page-break-inside: avoid; }
+      a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .85em; color: var(--muted); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="doc">
+      <div class="brand"><span class="logo" aria-hidden="true"></span>
+        <p class="eyebrow">Digit-AI · Forge Pilot · Veille propositions</p></div>
+      <p class="sub">repo — Everything Claude Code (<code>affaan-m/everything-claude-code</code>)</p>
+      <p class="meta-line">Étudié le 2026-08-10 · dossier <code>veille/20260810-everything-claude-code/</code> · verdict global :
+        <span class="badge ok">Adopter des éléments</span></p>
+    </header>
+
+    <main>
+      <h1>Everything Claude Code</h1>
+      <p>Dépôt open-source (MIT) du vainqueur du hackathon Anthropic × Forum Ventures : une collection
+        « environnement complet » d'agents, skills, commandes, rules, hooks et MCP. Étudié en lecture
+        seule. Conclusion : notre <code>forge-agents</code> a déjà l'essentiel (gates, ledgers,
+        oracles, defs YAML à arbitre) ; <strong>trois raffinements</strong> sont nets et ont été
+        appliqués, la machinerie exécutable (install/hooks) est volontairement écartée.</p>
+
+      <section aria-labelledby="kpi-h">
+        <h2 id="kpi-h">Chiffres-clés</h2>
+        <div class="kpis">
+          <div class="kpi"><span class="kpi-label">Patterns d'archi. relevés</span><span class="kpi-value">4</span><span class="kpi-hint">lecture seule du repo v2.2.0</span></div>
+          <div class="kpi"><span class="kpi-label">Retenu</span><span class="kpi-value">3</span><span class="kpi-hint">appliqués à forge-agents</span></div>
+          <div class="kpi"><span class="kpi-label">À évaluer</span><span class="kpi-value">1</span><span class="kpi-hint">déjà partiellement couvert</span></div>
+          <div class="kpi"><span class="kpi-label">Écarté</span><span class="kpi-value">1</span><span class="kpi-hint">machinerie exécutable</span></div>
+        </div>
+      </section>
+
+      <section aria-labelledby="verif-h">
+        <h2 id="verif-h">Vérification (réel / promotionnel / non confirmé)</h2>
+        <div class="card" style="padding:0;overflow-x:auto">
+          <table>
+            <caption>Affirmations confrontées à une recherche web réelle.</caption>
+            <thead><tr><th scope="col">Élément annoncé</th><th scope="col">Vérification</th><th scope="col">Statut</th></tr></thead>
+            <tbody>
+              <tr>
+                <td data-label="Élément">Dépôt réel, vainqueur hackathon Anthropic, licence MIT</td>
+                <td data-label="Vérification"><code>github.com/affaan-m/everything-claude-code</code>, Affaan Mustafa, hackathon Anthropic × Forum Ventures — confirmé</td>
+                <td data-label="Statut"><span class="badge ok">réel</span></td>
+              </tr>
+              <tr>
+                <td data-label="Élément">« 28 subagents / 119 skills / 60 commandes »</td>
+                <td data-label="Vérification">Chiffres incohérents selon les sources (13/40+, 48/183…) ; version clonée v2.2.0 = 67 agents / ~460 fichiers skills / 122 rules</td>
+                <td data-label="Statut"><span class="badge wait">à nuancer</span></td>
+              </tr>
+              <tr>
+                <td data-label="Élément">« 1282 tests, 98 % coverage, research-first, battle-tested »</td>
+                <td data-label="Vérification">Plausible mais non re-vérifié dans le repo pendant l'étude</td>
+                <td data-label="Statut"><span class="badge no">non confirmé</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section aria-labelledby="route-h">
+        <h2 id="route-h">Routage vers les forges &amp; deltas</h2>
+        <div class="card" style="padding:0;overflow-x:auto">
+          <table>
+            <caption>Confiance = fiabilité de la source (0–1). Ici les 3 retenus ont été appliqués sur mandat, validés par oracle.</caption>
+            <thead><tr><th scope="col">Idée / pattern</th><th scope="col">Forge</th><th scope="col">Verdict</th><th scope="col">Confiance</th><th scope="col">Delta (statut)</th></tr></thead>
+            <tbody>
+              <tr>
+                <td data-label="Idée">Valider les <code>defs</code> par un oracle transversal (graphe <code>de:</code>/<code>vers:</code>)</td>
+                <td data-label="Forge">forge-agents</td>
+                <td data-label="Verdict"><span class="badge ok">retenu</span></td>
+                <td data-label="Confiance"><span class="conf"><span class="bar" role="img" aria-label="confiance 0.8"><span class="fill" style="--val:80%"></span></span></span></td>
+                <td data-label="Delta">P1 — <code>oracle-defs.mjs</code> + fixtures + self-test (10 PASS). <span class="badge ok">réalisé</span></td>
+              </tr>
+              <tr>
+                <td data-label="Idée">Rubrique d'éval à preuve obligatoire + read-only + « ne pas refaire »</td>
+                <td data-label="Forge">forge-agents (contre-expertise)</td>
+                <td data-label="Verdict"><span class="badge ok">retenu</span></td>
+                <td data-label="Confiance"><span class="conf"><span class="bar" role="img" aria-label="confiance 0.75"><span class="fill" style="--val:75%"></span></span></span></td>
+                <td data-label="Delta">P2 — <code>regime-de-preuve.md</code> (périmètre d'exécution). <span class="badge ok">réalisé</span></td>
+              </tr>
+              <tr>
+                <td data-label="Idée">Champ <code>provenance{confidence}</code> sur capacité importée</td>
+                <td data-label="Forge">forge-agents</td>
+                <td data-label="Verdict"><span class="badge ok">retenu</span></td>
+                <td data-label="Confiance"><span class="conf"><span class="bar" role="img" aria-label="confiance 0.7"><span class="fill" style="--val:70%"></span></span></span></td>
+                <td data-label="Delta">P3 — champ optionnel au compilateur (fail-closed) + doc. <span class="badge ok">réalisé</span></td>
+              </tr>
+              <tr>
+                <td data-label="Idée">Rules <code>common/</code> + par-langage chargées à la demande</td>
+                <td data-label="Forge">forge-agents / doctrine</td>
+                <td data-label="Verdict"><span class="badge wait">à évaluer</span></td>
+                <td data-label="Confiance"><span class="conf"><span class="bar" role="img" aria-label="confiance 0.5"><span class="fill" style="--val:50%"></span></span></span></td>
+                <td data-label="Delta">Déjà partiellement couvert (references chargées à l'ouverture d'étape). —</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section aria-labelledby="secu-h">
+        <h2 id="secu-h">Réserve de sécurité &amp; gouvernance</h2>
+        <div class="card warn">
+          <p><strong>Idées d'architecture, jamais la machinerie.</strong> Le dépôt s'installe par des
+            scripts et des hooks qui exécutent du code et capturent des données — hors doctrine. On en
+            extrait des patterns de conception, jamais l'outillage. Repo cloné en lecture seule, aucun
+            script lancé.</p>
+          <ul style="margin:0">
+            <li>Installeurs et hooks « PreToolUse » = code tiers exécuté à chaque action.</li>
+            <li>Capture de secrets, d'approbations et de l'usage d'outils = collecte de données.</li>
+            <li>Doctrine forge : entrants jamais exécutés, aucune API tierce payante hors Claude,
+              fichiers d'environnement jamais transmis.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section aria-labelledby="src-h">
+        <h2 id="src-h">Sources</h2>
+        <ul>
+          <li>Dépôt étudié : <a href="https://github.com/affaan-m/everything-claude-code">github.com/affaan-m/everything-claude-code</a> (v2.2.0, MIT)</li>
+          <li>Évaluation tierce : <a href="https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/docs/resource-evaluations/015-everything-claude-code-github-repo.md">claude-code-ultimate-guide — resource evaluation</a></li>
+          <li>Étude détaillée : <code>references/ETUDE-EVERYTHING-CLAUDE-CODE.md</code> (pilot)</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="doc">
+      Digit-AI — Forge Pilot · Veille propositions · Everything Claude Code · 2026
+    </footer>
+  </div>
+</body>
+</html>
