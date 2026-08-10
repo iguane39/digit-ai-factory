@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digit-AI — Rapport de veille · {{PROPOSITION}}</title>
+  <meta name="description" content="Analyse et reporting d'une proposition (plugin / skill / repo) pour l'amélioration des forges Digit-AI.">
+  <meta name="theme-color" content="#2563EB">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --blue: #2563EB; --bg: #FAFBFF; --surface: #FFFFFF; --card: #FFFFFF;
+      --ink: #0F172A; --muted: #64748B; --faint: #94A3B8; --line: #E6EAF2;
+      --amber: #D97706; --amber-fill: #FFFBEB; --amber-line: #FDE9C8;
+      --teal:  #0E9488; --teal-fill:  #EFFDFB; --teal-line:  #C7F0EA;
+      --green: #15803D; --green-fill: #F2FCF5; --green-line: #CFEEDD;
+      --red:   #B91C1C; --red-fill:   #FEF2F2; --red-line:   #F6D5D5;
+      --r: 12px; --r-sm: 8px;
+      --head: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
+      --annee-ref: "2026";
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.55; font-size: 16px; }
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px 64px; }
+    h1, h2, h3 { font-family: var(--head); font-weight: 800; color: var(--ink); line-height: 1.2; }
+    h1 { font-size: 2rem; margin: 0 0 .25em; }
+    h2 { font-size: 1.4rem; font-weight: 700; margin: 2em 0 .6em; }
+    h3 { font-size: 1.05rem; font-weight: 700; margin: 1.4em 0 .4em; }
+    p { margin: 0 0 1em; } a { color: var(--blue); } code { font-family: var(--mono); font-size: .9em; }
+
+    header.doc { border-bottom: 2px solid var(--blue); padding: 20px 0 14px; margin-bottom: 8px; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand .logo { width: 26px; height: 26px; border-radius: 7px; background: var(--blue); }
+    .eyebrow { color: var(--muted); font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; margin: 0; }
+    .sub { color: var(--muted); margin: .2em 0 0; }
+    .meta-line { color: var(--muted); font-size: .8rem; margin: .5em 0 0; }
+
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 18px 0 8px; }
+    .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: flex; flex-direction: column; gap: 4px; }
+    .kpi-label { color: var(--muted); font-size: .8rem; }
+    .kpi-value { font-family: var(--head); font-weight: 800; font-size: 1.6rem; }
+    .kpi-hint { color: var(--muted); font-size: .75rem; }
+
+    /* Badges : texte --ink, couleur sémantique via pastille + bordure + libellé */
+    .badge { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; font-weight: 600;
+      color: var(--ink); padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line); }
+    .badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--_dot, var(--muted)); }
+    .badge.ok   { --_dot: var(--green); background: var(--green-fill); border-color: var(--green-line); }
+    .badge.wait { --_dot: var(--amber); background: var(--amber-fill); border-color: var(--amber-line); }
+    .badge.no   { --_dot: var(--red);   background: var(--red-fill);   border-color: var(--red-line); }
+    .badge.info { --_dot: var(--teal);  background: var(--teal-fill);  border-color: var(--teal-line); }
+
+    .conf { display: inline-block; min-width: 96px; }
+    .bar { display: inline-block; vertical-align: middle; background: var(--line); border-radius: 999px; height: 8px; overflow: hidden; min-width: 90px; }
+    .bar .fill { display: block; height: 100%; width: var(--val); background: var(--blue); border-radius: 999px; }
+
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 20px 24px; margin: 16px 0; }
+    .card.warn { background: var(--amber-fill); border-color: var(--amber-line); }
+
+    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    caption { text-align: left; color: var(--muted); font-size: .85rem; padding: 6px 0; }
+    thead th { background: var(--surface); text-align: left; font-family: var(--head); font-weight: 700; color: var(--ink); border-bottom: 2px solid var(--line); padding: 10px 12px; }
+    tbody td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    tbody tr:hover { background: var(--bg); }
+
+    footer.doc { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: .85rem; }
+
+    @media (max-width: 900px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) {
+      .wrap { padding: 0 16px 48px; } h1 { font-size: 1.6rem; }
+      table, tbody, tr, td { display: block; width: 100%; } thead { display: none; } caption { display: block; }
+      tbody tr { border: 1px solid var(--line); border-radius: var(--r-sm); padding: 8px 10px; margin: 10px 0; }
+      tbody td { border: none; padding: 5px 0; display: flex; justify-content: space-between; gap: 12px; }
+      tbody td::before { content: attr(data-label); font-weight: 700; color: var(--muted); font-size: .78rem; }
+      .bar { min-width: 0; flex: 1; max-width: 55%; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+    @page { size: A4; margin: 18mm 16mm; }
+    @page :first { margin-top: 22mm; }
+    @media print {
+      body { background: #FFFFFF; }
+      .wrap { max-width: none; padding: 0; }
+      .card, .kpi, tr { break-inside: avoid; page-break-inside: avoid; }
+      a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .85em; color: var(--muted); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="doc">
+      <div class="brand"><span class="logo" aria-hidden="true"></span>
+        <p class="eyebrow">Digit-AI · Forge Pilot · Veille propositions</p></div>
+      <p class="sub">{{TYPE : plugin | skill | repo}} — {{PROPOSITION : nom}}</p>
+      <p class="meta-line">Étudié le {{AAAA-MM-JJ}} · dossier <code>veille/{{AAAAMMJJ}}-{{slug}}/</code> · verdict global :
+        <span class="badge {{ok|wait|no}}">{{Adopter des éléments | À évaluer | Écarter}}</span></p>
+    </header>
+
+    <main>
+      <h1>{{Nom de la proposition}}</h1>
+      <p>{{Résumé en 2-3 lignes : ce que la proposition prétend apporter, et la conclusion de fond.}}</p>
+
+      <section aria-labelledby="kpi-h">
+        <h2 id="kpi-h">Chiffres-clés</h2>
+        <div class="kpis">
+          <div class="kpi"><span class="kpi-label">Idées extraites</span><span class="kpi-value">{{N}}</span><span class="kpi-hint">{{source(s)}}</span></div>
+          <div class="kpi"><span class="kpi-label">Retenu</span><span class="kpi-value">{{N}}</span><span class="kpi-hint">conformes doctrine</span></div>
+          <div class="kpi"><span class="kpi-label">À évaluer</span><span class="kpi-value">{{N}}</span><span class="kpi-hint">à qualifier</span></div>
+          <div class="kpi"><span class="kpi-label">Écarté</span><span class="kpi-value">{{N}}</span><span class="kpi-hint">hors-cadre / non fiable</span></div>
+        </div>
+      </section>
+
+      <section aria-labelledby="verif-h">
+        <h2 id="verif-h">Vérification (réel / promotionnel / non confirmé)</h2>
+        <div class="card" style="padding:0;overflow-x:auto">
+          <table>
+            <caption>Chaque affirmation de la proposition, confrontée à une vérification.</caption>
+            <thead><tr><th scope="col">Élément annoncé</th><th scope="col">Vérification</th><th scope="col">Statut</th></tr></thead>
+            <tbody>
+              <tr>
+                <td data-label="Élément">{{Ce que la proposition annonce}}</td>
+                <td data-label="Vérification">{{Ce que la recherche/exécution établit}}</td>
+                <td data-label="Statut"><span class="badge ok">{{réel}}</span></td>
+              </tr>
+              <tr>
+                <td data-label="Élément">{{…}}</td>
+                <td data-label="Vérification">{{…}}</td>
+                <td data-label="Statut"><span class="badge no">{{non confirmé}}</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section aria-labelledby="route-h">
+        <h2 id="route-h">Routage vers les forges &amp; deltas candidats</h2>
+        <div class="card" style="padding:0;overflow-x:auto">
+          <table>
+            <caption>Confiance = fiabilité de la source (0–1). Deltas <strong>candidats</strong> — non appliqués sans GO.</caption>
+            <thead><tr><th scope="col">Idée</th><th scope="col">Forge impactée</th><th scope="col">Verdict</th><th scope="col">Confiance</th><th scope="col">Delta candidat</th></tr></thead>
+            <tbody>
+              <tr>
+                <td data-label="Idée">{{idée actionnable}}</td>
+                <td data-label="Forge">{{forge-design | digit-ai-page-html | forge-agents | forge-seo | …}}</td>
+                <td data-label="Verdict"><span class="badge ok">retenu</span></td>
+                <td data-label="Confiance"><span class="conf"><span class="bar" role="img" aria-label="confiance 0.7"><span class="fill" style="--val:70%"></span></span></span></td>
+                <td data-label="Delta">{{ce qui serait versé + oracle de validation}}</td>
+              </tr>
+              <tr>
+                <td data-label="Idée">{{…}}</td>
+                <td data-label="Forge">{{…}}</td>
+                <td data-label="Verdict"><span class="badge wait">à évaluer</span></td>
+                <td data-label="Confiance"><span class="conf"><span class="bar" role="img" aria-label="confiance 0.3"><span class="fill" style="--val:30%"></span></span></span></td>
+                <td data-label="Delta">{{—}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section aria-labelledby="secu-h">
+        <h2 id="secu-h">Réserve de sécurité &amp; gouvernance</h2>
+        <div class="card warn">
+          <p style="margin:0">{{Ce qu'on prend = idées d'architecture ; ce qu'on ne prend pas = machinerie exécutable. Rappels : entrants = données jamais exécutées ; aucune API tierce payante hors Claude ; <code>.env</code> jamais transmis ; deltas appliqués seulement après GO humain et validés par l'oracle de la forge cible.}}</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="src-h">
+        <h2 id="src-h">Sources</h2>
+        <ul>
+          <li>{{Dépôt / URL vérifiée}}</li>
+          <li>{{Source secondaire}}</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="doc">
+      Digit-AI — Forge Pilot · Veille propositions · Gabarit <code>rapport-veille.gabarit.html</code> · 2026
+    </footer>
+  </div>
+</body>
+</html>
