@@ -158,6 +158,34 @@ Encodé : socle créé à l'ouverture de run (CLAUDE.md étape 1), rattrapage en
 version, et `oracles\oracle-conformite-projet.mjs` (self-test double sens 3/3 ; preuve terrain :
 8 findings nommés sur Produit-12, dont l'absence de git).
 
+## Campagne du 10/08/2026 — santé des transverses (C1-C5, mandat humain direct)
+
+Source : diagnostic read-only des 3 skills transverses (question humaine « faut-il une passe
+Opus 5 ? » → réponse : non aux réécritures, oui aux défauts mesurés). Baseline : forge-agents
+10/10, page-html 28/28, **quality-oracles 123 ✅ / 9 ❌**. Cinq corrections mandatées « fais
+les 5 », toutes vérifiées par self-test avant push :
+
+- **C1 · portabilité Windows de la résolution Python** (8 des 9 échecs) : `which` (Unix),
+  `python3` (nom Unix) et l'alias Microsoft Store combinés. Nouveau `lib/python.mjs`
+  (validation fonctionnelle : seul un interpréteur qui exécute `import sys` est retenu),
+  branché sur oracle-pptx, oracle-charte-pptx-semantique, oracle-programme-formation et le
+  runner de fixtures du self-test. quality-oracles : **PASS (133 contrôles)**.
+- **C2 · oracle-motion écrit** (le 9ᵉ échec — entrée de registre sans exécutant) : R1-R7
+  dérivées de review-animations (E. Kowalski, MIT), fixtures rouge/verte, câblé au self-test
+  design (**7 oracles, 45 règles**) et à `run-oracles-design`.
+- **C3 · divergences installé/source résorbées** : quality-oracles (l'installé avait 16
+  oracles, la source 46) et page-html resynchronisés — source forge-agents = canonique.
+- **C4 · durcissement UTF-8 stdout généralisé** (crash cp1252 sur ✅/①-⑤/— constaté 4× dans
+  la journée) : garde `reconfigure("utf-8")` posée sur oracle-a11y, oracle-visual-diff,
+  check_html, self_test (render_page déjà fait le matin).
+- **C5 · génération de modèles épinglée** au CONTRAT-INTERFACE §4 : famille Claude 5
+  (Fable 5 / Opus 5 / Sonnet 5 / Haiku 4.5), datée, avec rappel que tout saut de génération
+  re-teste l'a priori de routage (§4 bis) au lieu de le reconduire.
+
+Verdict final : 4 self-tests verts (133 + 10 + 28 + 45 contrôles/règles). Leçon d'écosystème :
+les défauts venaient de l'environnement (Windows) et d'une dette de registre — pas du modèle
+qui a écrit le code ; les oracles restent le seul juge de correction.
+
 ## 06/08/2026 — revue graphique d'implémentation (nouvelle capacité)
 
 Sur proposition humaine validée : forge-design intervient désormais AUSSI en aval — mode
