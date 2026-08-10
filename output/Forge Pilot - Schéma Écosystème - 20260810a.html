@@ -16,6 +16,7 @@
     --c-coral-bg: #fee2e2; --c-coral-fg: #b91c1c; --c-coral-stroke: #fca5a5;
     --c-amber-bg: #fef3c7; --c-amber-fg: #92400e; --c-amber-stroke: #fcd34d;
     --c-gray-bg: #f1f3f7; --c-gray-fg: #374151; --c-gray-stroke: #cbd5e1;
+    --c-green-bg: #dcfce7; --c-green-fg: #14532d; --c-green-stroke: #86efac;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { background: var(--bg); color: var(--ink); font-family: var(--font-body); -webkit-font-smoothing: antialiased; line-height: 1.55; }
@@ -57,6 +58,8 @@
   .svg-c-amber text { fill: var(--c-amber-fg); }
   .svg-c-gray rect { fill: var(--c-gray-bg); stroke: var(--c-gray-stroke); stroke-width: 1.4; }
   .svg-c-gray text { fill: var(--c-gray-fg); }
+  .svg-c-green rect { fill: var(--c-green-bg); stroke: var(--c-green-stroke); stroke-width: 1.4; }
+  .svg-c-green text { fill: var(--c-green-fg); }
   .svg-frame { fill: none; stroke-width: 1.2; stroke-dasharray: 4 4; }
   .p-band { fill: var(--pastille); }
   .p-band-purple { stroke: var(--c-purple-fg); stroke-width: 0.8; }
@@ -98,14 +101,14 @@
 
   <header class="header">
     <div class="eyebrow">Forge Pilot — Architecture de l'écosystème</div>
-    <h1>Huit forges, <span class="accent">un seul point de départ</span></h1>
+    <h1>Neuf forges, <span class="accent">un seul point de départ</span></h1>
     <p class="lede">Le rôle de chaque forge et leurs interactions : le pilot orchestre le pipeline de fabrication
     (conception → design → development → tests → MEP), les forges transverses outillent l'ensemble, et les produits
     — autonomes — renvoient leurs retours qui améliorent les forges en continu. Survoler chaque élément pour le détail.</p>
     <div class="meta">
-      <span><b>Version</b> V1c · 9 août 2026</span>
+      <span><b>Version</b> V1d · 10 août 2026</span>
       <span><b>Type de livrable</b> Schéma d'architecture</span>
-      <span><b>Périmètre</b> 8 forges · pipeline · boucles de retours</span>
+      <span><b>Périmètre</b> 9 forges · pipeline · boucles de retours</span>
     </div>
   </header>
 
@@ -118,11 +121,11 @@
 
     <div class="diagram-wrap">
       <svg viewBox="0 0 1500 1240" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="diag1-title diag1-desc">
-        <title id="diag1-title">Architecture de l'écosystème forge Digit-AI : huit forges, leur pipeline et leurs boucles de retours.</title>
+        <title id="diag1-title">Architecture de l'écosystème forge Digit-AI : neuf forges, leur pipeline et leurs boucles de retours.</title>
         <desc id="diag1-desc">Schéma en cinq bandes horizontales. En haut, les entrants : le brief produit et l'humain décideur.
         Au centre, la forge-pilot orchestre cinq composants de pilotage. En dessous, le pipeline de fabrication en cinq étapes,
-        de la conception à la mise en production, chaque étape validée par ses oracles. Plus bas, trois forges transverses :
-        agents, organization et seo. En bas, les projets produits autonomes et cinq boucles numérotées qui relient les couches :
+        de la conception à la mise en production, chaque étape validée par ses oracles. Plus bas, quatre forges transverses :
+        agents, organization, audit et seo. En bas, les projets produits autonomes et cinq boucles numérotées qui relient les couches :
         lots de retours, campagnes d'amélioration, décisions humaines, revue graphique et fraîcheur des versions.</desc>
 
         <defs>
@@ -319,33 +322,42 @@
         <text data-overlap-ok="" x="32" y="760" class="svg-tband t-slate" style="font-size:9.5px">4 · Forges transverses</text>
 
         <g class="svg-c-purple">
-          <title>forge-agents | Rôle : la fabrique d'agents et l'atelier des outils partagés | Héberge les sources vivantes : `quality-oracles` (33+ oracles), `experts-forge`, `digit-ai-page-html` (socle HTML + règles de lisibilité L1-L11) | Le contrat de ledger (append-only, seq, verrou concurrent) sert tous les runs | Skill méta : compile des agents spécialisés sous gates anti-serial-collapse</title>
-          <rect data-overlap-ok="" x="40" y="778" width="450" height="84" rx="8"/>
-          <text data-overlap-ok="" x="265" y="800" text-anchor="middle" class="svg-th" style="font-size:12.5px">forge-agents</text>
-          <text data-overlap-ok="" x="265" y="818" text-anchor="middle" class="svg-ts">atelier des outils partagés : oracles, experts, socle HTML, ledger</text>
-          <text data-overlap-ok="" x="265" y="836" text-anchor="middle" class="svg-ts">contrat append-only + verrou · agents compilés sous gates</text>
-          <text data-overlap-ok="" x="265" y="852" text-anchor="middle" class="svg-tlabel">quality-oracles · digit-ai-page-html · L1-L11</text>
+          <title>forge-agents | Rôle : la fabrique d'agents et l'atelier des outils partagés | Héberge les sources vivantes : `quality-oracles` (33+ oracles), `experts-forge`, `digit-ai-page-html` (socle HTML + règles de lisibilité L1-L11) | Le contrat de ledger (append-only, seq, verrou concurrent) sert tous les runs | Skill méta : compile des agents spécialisés sous gates anti-serial-collapse | oracle-defs : cohérence du graphe des définitions d'agents</title>
+          <rect data-overlap-ok="" x="40" y="778" width="340" height="84" rx="8"/>
+          <text data-overlap-ok="" x="210" y="800" text-anchor="middle" class="svg-th" style="font-size:12.5px">forge-agents</text>
+          <text data-overlap-ok="" x="210" y="818" text-anchor="middle" class="svg-ts">outils partagés : oracles, experts, socle HTML</text>
+          <text data-overlap-ok="" x="210" y="836" text-anchor="middle" class="svg-ts">ledger append-only · agents sous gates</text>
+          <text data-overlap-ok="" x="210" y="852" text-anchor="middle" class="svg-tlabel">quality-oracles · digit-ai-page-html</text>
         </g>
 
         <g class="svg-c-amber">
           <title>forge-organization | Rôle : l'atelier des conventions — « organization organise, le pilot pilote » | Inventorie l'existant (52 dossiers), propose les décisions D-01→D-12 (nommage, arborescence, archivage) | Une proposition ne devient règle que par décision humaine au pilot, jamais automatiquement | Chantier ouvert : le vérificateur machine des conventions (Phase 3)</title>
-          <rect data-overlap-ok="" x="510" y="778" width="450" height="84" rx="8"/>
-          <text data-overlap-ok="" x="735" y="800" text-anchor="middle" class="svg-th" style="font-size:12.5px">forge-organization</text>
-          <text data-overlap-ok="" x="735" y="818" text-anchor="middle" class="svg-ts">doctrine des conventions : elle organise, le pilot décide et encode</text>
-          <text data-overlap-ok="" x="735" y="836" text-anchor="middle" class="svg-ts">inventaire de l'existant · décisions D-01→D-12 proposées</text>
-          <text data-overlap-ok="" x="735" y="852" text-anchor="middle" class="svg-tlabel">propositions → REGLES-PROJET (décision humaine)</text>
+          <rect data-overlap-ok="" x="400" y="778" width="340" height="84" rx="8"/>
+          <text data-overlap-ok="" x="570" y="800" text-anchor="middle" class="svg-th" style="font-size:12.5px">forge-organization</text>
+          <text data-overlap-ok="" x="570" y="818" text-anchor="middle" class="svg-ts">doctrine des conventions</text>
+          <text data-overlap-ok="" x="570" y="836" text-anchor="middle" class="svg-ts">elle organise · le pilot décide et encode</text>
+          <text data-overlap-ok="" x="570" y="852" text-anchor="middle" class="svg-tlabel">décisions D-01→D-12 · décision humaine</text>
+        </g>
+
+        <g class="svg-c-green">
+          <title>forge-audit | Rôle : auditer la gouvernance POC-to-Prod d'un produit ou d'un SI, sur mandat | Produit générique AuditCore en marque blanche : 65 ADRs, 162 contrôles, 17 dimensions | Séparation stricte produit / tenant : le cœur (submodule pinné) ne connaît aucune donnée client, l'espace d'engagement porte les tenants | Transverse : sert la MEP et les revues d'architecture — un audit commence par un mandat humain</title>
+          <rect data-overlap-ok="" x="760" y="778" width="340" height="84" rx="8"/>
+          <text data-overlap-ok="" x="930" y="800" text-anchor="middle" class="svg-th" style="font-size:12.5px">forge-audit</text>
+          <text data-overlap-ok="" x="930" y="818" text-anchor="middle" class="svg-ts">audit &amp; gouvernance POC-to-Prod · sur mandat</text>
+          <text data-overlap-ok="" x="930" y="836" text-anchor="middle" class="svg-ts">AuditCore : 65 ADRs · 162 contrôles · 17 dim.</text>
+          <text data-overlap-ok="" x="930" y="852" text-anchor="middle" class="svg-tlabel">produit marque blanche + tenant · séparé</text>
         </g>
 
         <g class="svg-c-teal">
           <title>forge-seo | Rôle : audit et stratégie SEO — post-MEP, récurrente, facturée | Grille de 87 nœuds, garde-fous anti-hallucination, niveaux de preuve T1-T4 affichés | L'étude vit CHEZ le client (`seo\`), la forge ne garde aucune donnée | Refuse tout déclenchement automatique : un audit commence par un mandat humain | Runs de suivi : diff de snapshots — ce que le client achète au second audit</title>
-          <rect data-overlap-ok="" x="980" y="778" width="480" height="84" rx="8"/>
-          <text data-overlap-ok="" x="1220" y="800" text-anchor="middle" class="svg-th" style="font-size:12.5px">forge-seo</text>
-          <text data-overlap-ok="" x="1220" y="818" text-anchor="middle" class="svg-ts">audit &amp; stratégie SEO · post-MEP · récurrente · sur mandat humain</text>
-          <text data-overlap-ok="" x="1220" y="836" text-anchor="middle" class="svg-ts">87 nœuds · preuves T1-T4 · l'étude vit chez le client</text>
-          <text data-overlap-ok="" x="1220" y="852" text-anchor="middle" class="svg-tlabel">rapports lisibles : règle d'or du lecteur naïf</text>
+          <rect data-overlap-ok="" x="1120" y="778" width="340" height="84" rx="8"/>
+          <text data-overlap-ok="" x="1290" y="800" text-anchor="middle" class="svg-th" style="font-size:12.5px">forge-seo</text>
+          <text data-overlap-ok="" x="1290" y="818" text-anchor="middle" class="svg-ts">audit &amp; stratégie SEO · post-MEP · sur mandat</text>
+          <text data-overlap-ok="" x="1290" y="836" text-anchor="middle" class="svg-ts">87 nœuds · preuves T1-T4 · étude chez le client</text>
+          <text data-overlap-ok="" x="1290" y="852" text-anchor="middle" class="svg-tlabel">règle d'or du lecteur naïf</text>
         </g>
 
-        <line data-overlap-ok="" x1="265" y1="880" x2="265" y2="946" class="svg-arr-dashed"><title>Socle et outillage hérités | Tout produit naît avec le socle des règles, le routage forge obligatoire et le canal de retours</title></line>
+        <line data-overlap-ok="" x1="210" y1="880" x2="210" y2="946" class="svg-arr-dashed"><title>Socle et outillage hérités | Tout produit naît avec le socle des règles, le routage forge obligatoire et le canal de retours</title></line>
 
         <!-- ===== BANDE 5 · PRODUITS + BOUCLES ===== -->
         <rect data-overlap-ok="" x="20" y="926" width="620" height="22" rx="6" class="p-band p-band-gray"/>
@@ -420,6 +432,8 @@
           <text data-overlap-ok="" x="372" y="11" class="svg-ts" style="font-size:11px">Production · gate</text>
           <rect data-overlap-ok="" x="510" y="0" width="14" height="14" rx="3" fill="var(--c-teal-bg)" stroke="var(--c-teal-fg)"/>
           <text data-overlap-ok="" x="532" y="11" class="svg-ts" style="font-size:11px">Post-MEP</text>
+          <rect data-overlap-ok="" x="650" y="0" width="14" height="14" rx="3" fill="var(--c-green-bg)" stroke="var(--c-green-fg)"/>
+          <text data-overlap-ok="" x="672" y="11" class="svg-ts" style="font-size:11px">Audit · gouvernance</text>
         </g>
         <g transform="translate(40, 1216)">
           <rect data-overlap-ok="" x="0" y="0" width="14" height="14" rx="3" fill="var(--c-amber-bg)" stroke="var(--c-amber-fg)"/>

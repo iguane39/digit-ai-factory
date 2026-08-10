@@ -1,4 +1,4 @@
-# Inventaire des cinq forges — 2026-08-04
+# Inventaire des huit forges — 2026-08-04 · màj 2026-08-10 (+forge-audit)
 
 Synthèse issue de cinq explorations exhaustives (une par projet, fichiers cités vérifiés sur disque).
 Chaque forge est décrite selon : rôle, point d'entrée réel, entrées, sorties, oracles, maturité, manques pour l'orchestration.
@@ -172,6 +172,23 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
   pilot (17 règles décidées le 06/08) couvrent le même domaine par deux sources — candidat
   de réconciliation consigné au backlog.
 
+## 8. digit-ai-forge-audit — `c:\dev\digit-ai-forge-audit` *(ajoutée le 10/08)*
+
+- **Rôle** : **audit & gouvernance POC-to-Prod**, transverse et sur mandat humain. Produit
+  générique **AuditCore** en marque blanche (65 ADRs, 162 contrôles, 17 dimensions), séparé de
+  l'espace d'engagement client. Sert la MEP et les revues d'architecture, jamais en déclenchement
+  automatique.
+- **Architecture produit / tenant** : le cœur `auditcore/` est un **submodule pinné** (dépôt privé
+  `digit-ai-forge-auditcore`, historique neuf, zéro mention tenant) ; ce dépôt-ci est l'espace
+  d'engagement (`input/`, `output/`, `tenants/client-a/`, docs) qui **consomme** le produit épinglé.
+  Un second submodule Azure `input/architecture-governance` apporte le référentiel amont.
+- **Point d'entrée** : le clone shallow du pilot ne peuple pas les submodules → preuve bootstrap =
+  `.gitmodules` (câblage). L'exécution réelle des contrôles vit dans `auditcore/`, à initialiser
+  séparément. Deux CI vertes (produit + tenant, iso-parité).
+- **Maturité** : split physique produit/tenant réalisé le 15/07, dépôt renommé `digit-ai-forge-audit`
+  le 10/08. **Exploration exhaustive au standard des autres forges encore à mener** (entrées,
+  sorties, oracles à détailler lors d'un run dédié).
+
 ## Lecture transverse pour le pilot
 
 | Forge | Point d'entrée machine | Oracles exécutables | A déjà produit un livrable réel |
@@ -183,6 +200,7 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
 | agents | non (conversationnel) | oui (gates + admission) | oui (propale P4, au 2e run) |
 | seo *(08/08)* | **oui** (CLI Python, exit 0/1) | oui (validate 9/9 + 5/5, refus de rapport partiel) | **oui** (mission client complète) |
 | organization *(08/08)* | non (conversationnel) | partiel (1 oracle vérifié, pas de self-test projet) | oui (doctrine + composant) |
+| audit *(10/08)* | via submodule `auditcore/` (non peuplé au clone shallow) | à détailler (contrôles dans auditcore) | **oui** (engagement Client-A, 2 CI vertes) |
 
 Trois conséquences d'architecture :
 1. **Le pilot est le seul conducteur légitime** — Conception l'interdit chez elle, Development l'ignore,
