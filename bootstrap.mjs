@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // bootstrap.mjs — amorce un poste pour l'écosystème forge Digit-AI.
-// Clone (ou vérifie) les cinq forges à côté de ce dépôt pilot, puis contrôle
+// Clone (ou vérifie) les forges à côté de ce dépôt pilot, puis contrôle
 // que leurs points d'entrée attendus par le CONTRAT-INTERFACE existent.
 //
 // Usage :  node bootstrap.mjs [--racine <dossier>] [--pull]
@@ -25,6 +25,10 @@ const FORGES = [
   { nom: "digit-ai-forge-agents", preuve: ".claude/skills/forge-agents/SKILL.md" },
   { nom: "digit-ai-forge-seo", preuve: "scripts/validate.py" },
   { nom: "digit-ai-forge-organization", preuve: "output/composant-filtres-tableau/oracle-filtres-tableau.mjs" },
+  // forge-audit : audit & gouvernance POC-to-Prod. Le cœur produit (AuditCore) vit dans le
+  // submodule `auditcore/` (non peuplé par le clone shallow) ; la preuve est donc le câblage
+  // submodule du dépôt d'engagement, garanti présent dans le clone principal.
+  { nom: "digit-ai-forge-audit", preuve: ".gitmodules" },
 ];
 
 const args = process.argv.slice(2);
