@@ -112,6 +112,13 @@ table de correspondance + contrôle de version de grille (seo, TF-0048). Une for
 | Production standard (documents d'étape, exigences, tokens, tests simples) | Sonnet | **défaut** |
 | Tâches mécaniques (extraction, reformatage, vérifications simples) | Haiku | quand la tâche est purement mécanique |
 
+**Génération courante** (épinglée le 2026-08-10, à réviser à chaque changement de famille) :
+les rôles ci-dessus se résolvent sur la **famille Claude 5** — Fable 5 (`claude-fable-5`),
+Opus 5 (`claude-opus-5`), Sonnet 5 (`claude-sonnet-5`) — et Haiku 4.5 (`claude-haiku-4-5`).
+Un saut de génération **renforce la règle de challenge** : les capacités montent, donc les
+tâches jadis « Opus » redeviennent candidates Sonnet — re-tester l'a priori au premier run
+(§4 bis), ne jamais reconduire l'ancienne table par habitude.
+
 **Règle de challenge** : toute tâche part sur le modèle le moins cher plausible. Escalade vers le
 modèle supérieur **uniquement** sur échec d'un oracle ou d'un critère d'acceptation, consignée au
 ledger (`escalade_modele`, avec la raison). Une affectation qui réussit du premier coup au niveau
