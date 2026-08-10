@@ -158,6 +158,31 @@ Encodé : socle créé à l'ouverture de run (CLAUDE.md étape 1), rattrapage en
 version, et `oracles\oracle-conformite-projet.mjs` (self-test double sens 3/3 ; preuve terrain :
 8 findings nommés sur Produit-12, dont l'absence de git).
 
+## Campagne du 10/08/2026 (soir) — ouverture publique de l'écosystème (mandat humain)
+
+Décision humaine : toutes les forges publiques sous MIT, « comme development », avec
+chantiers d'assainissement en amont. Réalisé :
+
+- **7 forges publiées telles quelles** après balayage (0 secret, 0 `.env` d'historique) :
+  pilot, conception, design, development (déjà publique), tests, seo, organization —
+  LICENSE MIT « Copyright (c) 2026 Digit-AI » partout.
+- **forge-agents : chantier d'assainissement puis publication.** Bundle privé archivé hors
+  dépôt ; artefacts d'engagement retirés de l'index mais conservés sur disque (`input/` avec
+  CDC client et propales, `p4/`, `defs-p4/`, `output/`, `.queue/`, ledgers, 5 agents compilés
+  d'engagement — tous ignorés par git) ; corpus/fiches experts **anonymisés** (secteur et
+  techno conservés, noms clients retirés) ; règle appliquée : *nom seul toléré (déjà public
+  au pilot) · nom + détail d'engagement anonymisé · document d'engagement retiré*.
+  **Historique neuf** (1 commit, auteur gmail) — précédent maison auditcore (RAF-029).
+  Self-tests au vert avant push : 10/10 · 133 · 28/28. → PUBLIC + MIT.
+- **audit : la séparation produit/tenant fait la décision** (doctrine
+  `SEPARATION-PRODUIT-TENANT`) : **auditcore** (produit marque blanche, 0 mention tenant
+  vérifié, 0 secret) → **PUBLIC + MIT** ; `digit-ai-forge-audit` (espace d'engagement Client-A,
+  189 fichiers client, submodules privés) → **reste privé**, par conception.
+
+État final : **9 dépôts publics MIT** (8 forges + auditcore), 1 privé (engagement audit).
+Post-condition : le clone de `digit-ai-forge-audit` par `bootstrap.mjs` reste réservé aux
+postes authentifiés — comportement voulu.
+
 ## Campagne du 10/08/2026 — santé des transverses (C1-C5, mandat humain direct)
 
 Source : diagnostic read-only des 3 skills transverses (question humaine « faut-il une passe
