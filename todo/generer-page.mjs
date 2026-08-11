@@ -22,6 +22,33 @@ const SRC = join(ICI, "TODO.jsonl"), ARC = join(ICI, "TODO-ARCHIVE.jsonl"), OUT 
 const lire = (f) => (existsSync(f) ? readFileSync(f, "utf8").split("\n").filter((l) => l.trim()).map((l) => JSON.parse(l)) : []);
 const esc = (s) => String(s ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 
+// L11 : un littéral de langage cité dans un texte (None, null…) se rend en <code> —
+// c'est un jeton technique discuté, pas une fuite de producteur (TF-0089).
+const escLit = (s) => esc(s).replace(
+  /(^|[\s(«:;,—–-])(null|NULL|None|NONE|undefined|NaN|nil)(?=$|[\s)».;,:!?—–-])/g,
+  "$1<code>$2</code>");
+
+// L12 : une énumération « : (1) … ; (2) … ; (3) … » séquentielle se rend en VRAIE liste
+// ordonnée, pas en prose à points-virgules. Marqueurs exigés : précédés de : ou ;,
+// numérotés 1..n — une référence isolée « proposition (2) » ne déclenche rien (TF-0089).
+const rendContenu = (brut) => {
+  const t = escLit(brut);
+  const seq = [...t.matchAll(/([:;])\s*\((\d+)\)\s+/g)];
+  if (seq.length < 2 || !seq.every((x, i) => Number(x[2]) === i + 1)) return `<p>${t}</p>`;
+  const intro = t.slice(0, seq[0].index + 1);
+  const items = seq.map((x, i) =>
+    t.slice(x.index + x[0].length, i + 1 < seq.length ? seq[i + 1].index : undefined).replace(/\s*[;.]\s*$/, ""));
+  // Un item qui enchaîne lui-même ≥ 3 clauses au point-virgule redevient de la prose-tableau
+  // (L12) : la première clause porte l'item, les suivantes descendent en sous-liste.
+  const li = (s) => {
+    const clauses = s.split(/\s+;\s+/);
+    return clauses.length >= 3
+      ? `${clauses[0]}<ul>${clauses.slice(1).map((c) => `<li>${c}</li>`).join("")}</ul>`
+      : s;
+  };
+  return `<p>${intro}</p><ol>${items.map((s) => `<li>${li(s)}</li>`).join("")}</ol>`;
+};
+
 const etats = new Map(); let tsMax = "";
 for (const e of lire(SRC)) {
   if (e.ts > tsMax) tsMax = e.ts;
@@ -46,25 +73,31 @@ const compte = (s) => [...etats.values()].filter((e) => e.statut === s).length;
 let sections = "";
 for (const forge of [...parForge.keys()].sort()) {
   const items = parForge.get(forge).sort((a, b) => ORDRE.indexOf(a.statut) - ORDRE.indexOf(b.statut) || b.score.valeur - a.score.valeur);
-  const lignes = items.map((e) => `
+  const lignes = items.map((e) => {
+    const meta = `<p class="meta">Demandeur : ${esc(e.demandeur)} · ${esc(e.date_demande)} · gain ${e.score.gain} × preuve ${e.score.preuve} ÷ effort ${e.score.effort}${e.preuve_du_cout ? ` · <strong>payé en réel</strong> — ${escLit(e.preuve_du_cout)}` : ""}${e.commentaire_humain ? `<br>Commentaire précédent : ${esc(e.commentaire_humain)}` : ""}</p>`;
+    // L9 : un dépliant qui cache moins de 200 caractères n'a rien à cacher — afficher en place.
+    const cacheTxt = `${e.contenu} ${e.demandeur} ${e.date_demande} ${e.preuve_du_cout || ""} ${e.commentaire_humain || ""}`;
+    const corps = cacheTxt.length < 200
+      ? `<strong>${esc(e.titre)}</strong>${rendContenu(e.contenu)}${meta}`
+      : `<details><summary><strong>${esc(e.titre)}</strong></summary>
+              ${rendContenu(e.contenu)}
+              ${meta}
+            </details>`;
+    return `
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="${e.id}" aria-label="Décider ${e.id}"${e.statut !== "candidat" ? " disabled" : ""}></td>
           <td class="c-id"><code>${e.id}</code></td>
           <td><span class="statut s-${e.statut}">${e.statut}</span></td>
           <td class="c-score">${e.score.valeur}</td>
-          <td>
-            <details><summary><strong>${esc(e.titre)}</strong></summary>
-              <p>${esc(e.contenu)}</p>
-              <p class="meta">Demandeur : ${esc(e.demandeur)} · ${esc(e.date_demande)} · gain ${e.score.gain} × preuve ${e.score.preuve} ÷ effort ${e.score.effort}${e.preuve_du_cout ? ` · <strong>payé en réel</strong> — ${esc(e.preuve_du_cout)}` : ""}${e.commentaire_humain ? `<br>Commentaire précédent : ${esc(e.commentaire_humain)}` : ""}</p>
-            </details>
-          </td>
+          <td>${corps}</td>
           <td class="c-comm"><textarea class="commentaire" data-id="${e.id}" rows="1" aria-label="Commentaire ${e.id}" placeholder="commentaire…"></textarea></td>
-        </tr>`).join("");
+        </tr>`;
+  }).join("");
   sections += `
     <section>
-      <h2 id="${esc(forge).replace(/[^a-z-]/g, "")}">${esc(forge)} <span class="badge">${items.length}</span></h2>
+      <h2 id="${esc(forge).replace(/[^a-z-]/g, "")}">${esc(forge)} <span class="badge" title="${items.length} item(s) actifs ciblant ${esc(forge)}">${items.length}</span></h2>
       <div class="scroll"><table data-filterable>
-        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>${lignes}
         </tbody>
       </table></div>
@@ -124,6 +157,7 @@ const html = `<!DOCTYPE html>
       <h1>TODO-FORGE — registre d'amélioration</h1>
       <p class="meta">${etats.size} actifs (candidat ${compte("candidat")} · décidé ${compte("decide")} · en cours ${compte("en_cours")} · corrigé ${compte("corrige")} · écarté ${compte("ecarte")}) · ${nbArchives} archivés · sceau source <code>${sceau}</code> · dernier événement ${esc(tsMax)}</p>
       <p>Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au pilot — il sera appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
+      <p class="meta" id="note-score">La colonne « score » = <strong>valeur</strong> de l'item, calculée <code>gain × preuve ÷ effort</code> (composantes visibles dans le détail de chaque ligne) ; chaque table est triée statut puis score décroissant.</p>
     </header>
     <div class="barre">
       <button id="exporter" type="button">Exporter les décisions</button>

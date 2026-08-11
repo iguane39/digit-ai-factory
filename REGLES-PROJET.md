@@ -20,7 +20,7 @@ projet (2e mandat) · **G** = gate humain.
 | n° | Règle (binaire) | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
 | 1 | `input\` existe à la racine ; tout entrant fourni par l'humain y vit | observée 7/11 (forges, Produit-12, Transcript…) | tous projets, nouveaux + rattrapage | P0+O | nul | **défaut** |
-| 2 | `output\` existe ; tout livrable généré destiné à l'humain y vit (rapports, PV, exports) | observée 3/11 (`digit-ai-forge-agents/output/`, Transcript, BeefProject) | tous, nouveaux + rattrapage | P0+O | nul | **défaut** |
+| 2 | `output\` existe ; tout livrable généré destiné à l'humain y vit (rapports, PV, exports). **Précision D-06 (adoptée 11/08, TF-0084)** : un document *normatif* (doctrine, gabarit, registre) n'est pas une sortie — il vit à la racine ou dans `docs\`, avec son `Old\` à côté, jamais sous `output\` | observée 3/11 (`digit-ai-forge-agents/output/`, Transcript, BeefProject) ; précision : D-06 organization | tous, nouveaux + rattrapage | P0+O | nul | **défaut** |
 | 3 | `docs\` pour la documentation pérenne du produit (hors run) | observée 3/11 (development, tests, Produit-02) | produits, nouveaux | P0 | nul | option |
 | — | `forge\` (ledger, étapes) : **déjà acté** au contrat d'interface §2, pour mémoire | Produit-12/forge/ | — | — | — | déjà appliqué |
 
@@ -30,6 +30,7 @@ projet (2e mandat) · **G** = gate humain.
 |---|---|---|---|---|---|---|
 | 4 | Tout livrable documentaire est nommé `<Projet> - <Objet> - AAAAMMJJ<indice>.<ext>` — **le nom du PROJET prime sur l'émetteur** (Q3-bis tranchée par l'humain le 09/08 : « Produit-02 - Audit SEO - … », plus jamais « Digit-AI - … » en tête). Les fichiers historiques ne sont pas renommés | convention historique observée avec préfixe émetteur ; **décision humaine du 09/08** la corrige | **livrables uniquement** (input\, output\, docs\) — JAMAIS le code (conflit C3) | S+O | faible | **défaut** |
 | 5 | L'indice est une lettre (a, b, c…) par itération du même jour ; une nouvelle version = un **nouveau fichier daté**, jamais d'écrasement | observée (`20260721b` → `20260721d`, `revue.md`/`revue-v2`) | livrables uniquement | S+O | faible | **défaut** |
+| 25 | Le `<Type>` du nom de tout livrable daté (2ᵉ segment, 1ᵉʳ mot) **figure au registre des types** (`registre-types.json` d'organization, comparaison insensible casse/accents) — un type nouveau s'ajoute au registre dans un commit motivé (D-04), jamais improvisé dans un nom. Registre lu en dépôt frère ; poste non équipé → non jugeable, pas FAIL | **D-04 organization (décidée 08/08), encodée 11/08 (TF-0084)** — registre 1.1.0, 29 types, complété sur usage réel | produits, nouveaux + rattrapage | O | nul | **défaut** |
 
 ## C. Versions et git
 
@@ -53,13 +54,19 @@ projet (2e mandat) · **G** = gate humain.
 **Principe directeur** : les fichiers de `docs\projet\` sont des **vues pour humains et agents** —
 chacun **déclare sa source de vérité** (frontmatter YAML : `role`, `sources_de_verite`,
 `verifie_le`) et ne la duplique jamais ; toute valeur volatile est datée ; **aucun secret,
-jamais** (R-14 inchangée — dépôts au régime public). Déclencheurs de mise à jour : chaque étape
-de run actualise ses fichiers (design/development → TECHNOS, MEP → COMPOSANTS-OPS…), vérification
-à la clôture et à l'ouverture des runs de version (rattrapage : mécanisme existant).
+jamais** (R-14 inchangée — dépôts au régime public).
+
+**Producteur d'étape (TF-0086, constat du run MEP Produit-11)** : la CRÉATION du socle appartient à
+l'**ouverture du run** — squelette des 6 fichiers copié depuis `gabarits\docs-projet\`,
+frontmatter renseigné (phase 0 / rattrapage de run de version). Chaque étape actualise ensuite
+ses fichiers (conception → FONCTIONNEL, design/development → TECHNOS, MEP → COMPOSANTS-OPS…)
+et la **clôture exécute `oracle-conformite-projet` — un FAIL R-20 bloque la clôture**. Produit
+importé (dépôt repris) : rattrapage explicite à l'ouverture de son premier run de version —
+socle créé depuis l'état constaté, `.env.example` reconstruit (R-13) avant que R-22 ne juge.
 
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
-| 20 | `docs\projet\` complet : `TECHNOS.md` (technologies + versions + liens, ancrées lockfiles), `COMPOSANTS-OPS.md` (hiérarchie/noms/types/IDs/URLs/IPs des composants déployés — depuis `ops etat`/plans/DOSSIER-MEP, instanciations datées, placeholders si dépôt public), `PARAMETRAGE.md` (signification des variables, URLs/ports par environnement — staging/prod en placeholders), `ACCES-TEST.md` (profils + comptes de démo locale), `COMMANDES.md` (install, dev, test, build, deploy staging, rollback, seed démo — blocs exécutables) ; chaque fichier ouvre par un frontmatter YAML (`role`, `sources_de_verite`, `verifie_le`). Noms **fixes** — documents vivants exemptés du nommage daté R-4 (ce ne sont pas des livrables). Autres fichiers admis seulement s'ils servent l'automatisation ou l'onboarding ET n'existent pas déjà sous forme machine (sinon renvoi) | manque constaté : les runs de version redécouvrent tout | produits, nouveaux + rattrapage | P0+O | faible | **défaut** |
+| 20 | `docs\projet\` complet — **6 fichiers** : `TECHNOS.md` (technologies + versions + liens, ancrées lockfiles), `COMPOSANTS-OPS.md` (hiérarchie/noms/types/IDs/URLs/IPs des composants déployés — depuis `ops etat`/plans/DOSSIER-MEP, instanciations datées, placeholders si dépôt public), `PARAMETRAGE.md` (signification des variables, URLs/ports par environnement — hébergés en placeholders), `ACCES-TEST.md` (profils + comptes de démo locale), `COMMANDES.md` (install, dev, test, build, deploy qualif, rollback, seed démo — blocs exécutables), `FONCTIONNEL.md` (**TF-0087** : ce que fait le produit et pour qui — rôles, objets métier et cycle de vie, parcours, règles de gestion, exclusions assumées ; vue d'`EXIGENCES.json` quand il existe, sinon rédigé du code et daté) ; chaque fichier ouvre par un frontmatter YAML (`role`, `sources_de_verite`, `verifie_le`). Noms **fixes** — documents vivants exemptés du nommage daté R-4 (ce ne sont pas des livrables). Autres fichiers admis seulement s'ils servent l'automatisation ou l'onboarding ET n'existent pas déjà sous forme machine (sinon renvoi) | manque constaté : les runs de version redécouvrent tout ; FONCTIONNEL : demande humaine en clôture du run Produit-11 | produits, nouveaux + rattrapage | P0+O | faible | **défaut** |
 | 21 | Fraîcheur TECHNOS : chaque `nom@version` du frontmatter `versions:` de `TECHNOS.md` correspond aux lockfiles/manifestes du produit (`package-lock.json`, `pyproject.toml`…) — une version divergente = FAIL | loi 4 : une donnée volatile est une donnée | produits | O | nul | **défaut** |
 | 22 | Parité PARAMETRAGE ↔ `.env.example` : les noms de variables déclarés dans le frontmatter `variables:` de `PARAMETRAGE.md` et ceux de `.env.example` (R-13, qui reste la liste qui fait foi) sont identiques | double vérité interdite | produits | O | nul | **défaut** |
 | 23 | `ACCES-TEST.md` : en-tête dur littéral « comptes de démonstration locale — jamais valides hors MODE_DEMO » présent, comptes créés par seed derrière drapeau `MODE_DEMO` (loi 2), **zéro motif de secret réel** (motifs d'oracle-secrets) ; tout accès d'environnement réel = référence `# à fournir :` (R-15 → non_testables) | R-14 + loi 2 + régime public | produits | O | nul | **défaut** |
@@ -92,13 +99,13 @@ n'est encodé sans décision, rien de décidé n'est laissé sans encodage trac�
 | D-xx (organization, décidées 08-09/08) | Encodage corpus | État |
 |---|---|---|
 | D-01 `output/` ≠ artefacts de build | règle 2 (`dist/` hors périmètre : pas un livrable) | encodée |
-| D-02 indice obligatoire + archivage `Old\` sans effacement | règles 5 et 7 | encodée — reste ouvert : emplacement/graphies de `Old` (→ TF-0084) |
+| D-02 indice obligatoire + archivage `Old\` sans effacement | règles 5 et 7 | encodée — soldée 11/08 (TF-0084) : emplacement = même dossier (règle 7 existante), graphie = `Old` (D-02) ; migration des 4 graphies terrain au prochain run de version de chacun |
 | D-03 préfixe = nom du projet (Q3-bis) | règle 4 | **encodée — cas d'école du circuit** |
-| D-04 taxonomie des types, registre `registre-types.json` | aucune règle corpus | en attente de décision pilot : opposable aux produits ? (→ TF-0084) |
+| D-04 taxonomie des types, registre `registre-types.json` | **règle 25** (oracle, lecture seule du registre) | **encodée 11/08 (TF-0084)** — registre 1.1.0 complété sur usage réel (29 types) |
 | D-05 `CLAUDE.md` point d'entrée, compléments référencés | règle 11 + gabarit `CLAUDE-PRODUIT.md` | encodée |
-| D-06 `input/` = fourni par l'humain · `output/` = ce qui sort | règles 1 et 2 | encodée — la précision « la doctrine n'est pas une sortie » reste une proposition (→ TF-0084) |
+| D-06 `input/` = fourni par l'humain · `output/` = ce qui sort | règles 1 et 2 | encodée — précision « la doctrine n'est pas une sortie » **adoptée au corpus 11/08 (TF-0084)**, portée au périmètre de la règle 2 |
 | D-07 artefacts de traçabilité : patron optionnel | non-obligation explicite | sans objet |
-| D-08→D-11 livrable HTML sortant : charte + autonomie + généré | mécanisme livrable, pas socle projet : `references\BEST-PRACTICES-HTML.md` + socle `digit-ai-page-html` + recette `check_html`/`render_page` (loi qualité) | couvertes — **défaut constaté** : le contrôle réseau exécutable annoncé par D-10 est absent de `check_html.py` (→ TF-0085) |
+| D-08→D-11 livrable HTML sortant : charte + autonomie + généré | mécanisme livrable, pas socle projet : `references\BEST-PRACTICES-HTML.md` + socle `digit-ai-page-html` + recette `check_html`/`render_page` (loi qualité) | couvertes — défaut D-10 **corrigé 11/08 (TF-0085)** : contrôle A1 exécuté dans `check_html.py` (self-test 30/30), vrai positif corrigé sur le boilerplate même |
 | D-12 composant partagé : inliner, jamais installer en douce | garde-fou pilot « aucune écriture dans les dépôts frères hors mandat » | encodée |
 | D-13 le circuit lui-même | CLAUDE.md pilot, ligne de gouvernance Q-B | encodée |
 | D-14 `forge-steering` → `forge-pilot` | répercuté partout (bootstrap, README, schéma) | constatée |

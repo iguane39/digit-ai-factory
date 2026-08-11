@@ -49,8 +49,9 @@
   <div class="wrap">
     <header>
       <h1>TODO-FORGE — registre d'amélioration</h1>
-      <p class="meta">90 actifs (candidat 32 · décidé 0 · en cours 0 · corrigé 58 · écarté 0) · 0 archivés · sceau source <code>2cc64d7cc1cb</code> · dernier événement 2026-08-11T11:41:49Z</p>
+      <p class="meta">90 actifs (candidat 27 · décidé 0 · en cours 0 · corrigé 63 · écarté 0) · 0 archivés · sceau source <code>392822a9a48b</code> · dernier événement 2026-08-11T12:02:07Z</p>
       <p>Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au pilot — il sera appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
+      <p class="meta" id="note-score">La colonne « score » = <strong>valeur</strong> de l'item, calculée <code>gain × preuve ÷ effort</code> (composantes visibles dans le détail de chaque ligne) ; chaque table est triée statut puis score décroissant.</p>
     </header>
     <div class="barre">
       <button id="exporter" type="button">Exporter les décisions</button>
@@ -58,42 +59,35 @@
     </div>
     <main>
     <section>
-      <h2 id="nouvelle">(nouvelle) <span class="badge">1</span></h2>
+      <h2 id="nouvelle">(nouvelle) <span class="badge" title="1 item(s) actifs ciblant (nouvelle)">1</span></h2>
       <div class="scroll"><table data-filterable>
-        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0041" aria-label="Décider TF-0041"></td>
           <td class="c-id"><code>TF-0041</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">0.4</td>
-          <td>
-            <details><summary><strong>forge-contenu — à re-proposer sur preuve</strong></summary>
-              <p>Candidate FAIBLE : trou plausible (roadmap SEO sans producteur de contenu, voix MARQUE.md) mais jamais payé par un run. Attendre un lot qui le réclame.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 5</p>
-            </details>
-          </td>
+          <td><strong>forge-contenu — à re-proposer sur preuve</strong><p>Candidate FAIBLE : trou plausible (roadmap SEO sans producteur de contenu, voix MARQUE.md) mais jamais payé par un run. Attendre un lot qui le réclame.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 5</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0041" rows="1" aria-label="Commentaire TF-0041" placeholder="commentaire…"></textarea></td>
         </tr>
         </tbody>
       </table></div>
     </section>
     <section>
-      <h2 id="agents">agents <span class="badge">17</span></h2>
+      <h2 id="agents">agents <span class="badge" title="17 item(s) actifs ciblant agents">17</span></h2>
       <div class="scroll"><table data-filterable>
-        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0077" aria-label="Décider TF-0077"></td>
           <td class="c-id"><code>TF-0077</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">4</td>
-          <td>
-            <details><summary><strong>render_page.py : UnicodeEncodeError cp1252 à l'impression du rapport JSON sans PYTHONUTF8=1</strong></summary>
+          <td><details><summary><strong>render_page.py : UnicodeEncodeError cp1252 à l'impression du rapport JSON sans PYTHONUTF8=1</strong></summary>
               <p>Sur poste Windows en cp1252, l'impression du JSON de rapport plante sans PYTHONUTF8=1 (contourné à la main dans toutes les invocations). Même famille que RT-8 de forge-tests (déjà corrigée là-bas) : forcer l'encodage de sortie dans le script.</p>
               <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 2 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — plantage reproduit ; PYTHONUTF8=1 requis dans chaque invocation du 09/08</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0077" rows="1" aria-label="Commentaire TF-0077" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -101,12 +95,10 @@
           <td class="c-id"><code>TF-0066</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>render_page V3 : même biais de mesure que V7 sur les rangées d'éléments de largeurs variables</strong></summary>
+          <td><details><summary><strong>render_page V3 : même biais de mesure que V7 sur les rangées d'éléments de largeurs variables</strong></summary>
               <p>V3 trie les lefts, donc mesure largeur + gouttière et produit des faux positifs sur une rangée d'éléments de largeurs différentes. Même correctif que V7 (TF-0059) : mesurer l'espace entre les boîtes.</p>
               <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 2 × preuve 1 ÷ effort 1 · <strong>payé en réel</strong> — biais démontré sur V7 (40 faux avertissements), même mécanique</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0066" rows="1" aria-label="Commentaire TF-0066" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -114,12 +106,10 @@
           <td class="c-id"><code>TF-0069</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>oracle-filtres-tableau sans entrée au manifest : ses fixtures ne sont jamais rejouées</strong></summary>
+          <td><details><summary><strong>oracle-filtres-tableau sans entrée au manifest : ses fixtures ne sont jamais rejouées</strong></summary>
               <p>Les fixtures filtres-verte.html/filtres-rouge.html existent mais le self-test ne les joue pas — l'oracle n'a pas sa preuve P1. Travail inachevé de la session du 08/08, entré sous git par la réconciliation 740ec6c.</p>
               <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 2 × preuve 1 ÷ effort 1 · <strong>payé en réel</strong> — un oracle au registre sans preuve à double sens contredit la doctrine du registre</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0069" rows="1" aria-label="Commentaire TF-0069" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -127,12 +117,10 @@
           <td class="c-id"><code>TF-0067</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">1.5</td>
-          <td>
-            <details><summary><strong>exemple-reference (digit-ai-schemas) : V4 ×450 au rendu, probable faux positif de masse sur SVG</strong></summary>
+          <td><details><summary><strong>exemple-reference (digit-ai-schemas) : V4 ×450 au rendu, probable faux positif de masse sur SVG</strong></summary>
               <p>Au rendu : V4 ×450 chevauchements (à instruire — vraisemblablement rect×text SVG, à rapprocher de RD-1 et de l'exemption data-overlap-ok du schéma pilot du 09/08), V2 ×21 contrastes, L2 ×2 (p.lede/p.section-intro bridés à 820 px), L6 sans sommaire. Préexistants à TF-0060.</p>
               <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 3 × preuve 1 ÷ effort 2 · <strong>payé en réel</strong> — le même faux positif de masse a coûté une itération complète au schéma pilot du 09/08</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0067" rows="1" aria-label="Commentaire TF-0067" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -140,12 +128,7 @@
           <td class="c-id"><code>TF-0025</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">1</td>
-          <td>
-            <details><summary><strong>Statuer sur le skill méta dormant</strong></summary>
-              <p>Compilation d'agents + gates G1-G3 : aucun run depuis le 24/07 ; un run réel ou une dormance assumée documentée.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 3</p>
-            </details>
-          </td>
+          <td><strong>Statuer sur le skill méta dormant</strong><p>Compilation d'agents + gates G1-G3 : aucun run depuis le 24/07 ; un run réel ou une dormance assumée documentée.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 3</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0025" rows="1" aria-label="Commentaire TF-0025" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -153,12 +136,10 @@
           <td class="c-id"><code>TF-0068</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">1</td>
-          <td>
-            <details><summary><strong>Self-test quality-oracles : 24 dossiers .tmp-niv-* fuient dans fixtures/</strong></summary>
+          <td><details><summary><strong>Self-test quality-oracles : 24 dossiers .tmp-niv-* fuient dans fixtures/</strong></summary>
               <p>Le finally{rmSync} de la preuve §6 fuit quand le process est tué en cours de run — 24 dossiers résiduels constatés dans l'installation. Nettoyage + écriture des dossiers temporaires hors de fixtures/ (tmpdir).</p>
               <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 1 × preuve 1 ÷ effort 1 · <strong>payé en réel</strong> — 24 dossiers résiduels mesurés</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0068" rows="1" aria-label="Commentaire TF-0068" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -166,12 +147,10 @@
           <td class="c-id"><code>TF-0071</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">1</td>
-          <td>
-            <details><summary><strong>profils/generique.json sans bloc nommage : le domaine reste en SKIP permanent hors Digit-AI/Q3-bis</strong></summary>
+          <td><details><summary><strong>profils/generique.json sans bloc nommage : le domaine reste en SKIP permanent hors Digit-AI/Q3-bis</strong></summary>
               <p>Après la correction du profil digit-ai (Q3-bis, campagne 09/08), le profil générique ne porte toujours aucun bloc nommage — SKIP motivé permanent. À décider : convention générique minimale ou SKIP assumé documenté.</p>
               <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 1 × preuve 1 ÷ effort 1 · <strong>payé en réel</strong> — domaine non contrôlé sur tout projet hors convention</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0071" rows="1" aria-label="Commentaire TF-0071" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -179,12 +158,7 @@
           <td class="c-id"><code>TF-0021</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">6</td>
-          <td>
-            <details><summary><strong>Régression CRLF digit-ai-page-html/SKILL.md</strong></summary>
-              <p>Seul SKILL.md en CRLF (repo + installation) : casse le parsing du frontmatter.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — 2 échecs réels du self-test quality-oracles constatés le 08/08</p>
-            </details>
-          </td>
+          <td><strong>Régression CRLF digit-ai-page-html/SKILL.md</strong><p>Seul SKILL.md en CRLF (repo + installation) : casse le parsing du frontmatter.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — 2 échecs réels du self-test quality-oracles constatés le 08/08</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0021" rows="1" aria-label="Commentaire TF-0021" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -192,12 +166,10 @@
           <td class="c-id"><code>TF-0057</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">6</td>
-          <td>
-            <details><summary><strong>find-in-page.js : même classe pour le conteneur de recherche et le surlignage</strong></summary>
+          <td><details><summary><strong>find-in-page.js : même classe pour le conteneur de recherche et le surlignage</strong></summary>
               <p>L'asset du socle documente un conteneur class='find' et produit des &lt;mark class='find'&gt;. Un livrable qui style son conteneur en display:flex style donc aussi ses surlignages, qui deviennent des boîtes de bloc et coupent les mots. Mesuré au navigateur sur le rapport SEO : le « s » de « clics » atterrissait 606 px avant la fin du « clic » surligné. La règle mark.find, de spécificité supérieure, ne pouvait pas gagner puisqu'elle ne déclarait pas display. Correctif proposé : nommer la classe du surlignage dans l'asset (mark.dai-hl) et lui faire porter un jeu défensif complet (display:inline; padding:0; margin:0). Un composant du socle ne doit pas dépendre du CSS que l'appelant n'écrira pas.</p>
               <p class="meta">Demandeur : campagne-fiches-html-20260809 · 2026-08-09 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — défaut visible en production sur un rapport client ; écart mesuré 606 px, ramené à 0 px</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0057" rows="1" aria-label="Commentaire TF-0057" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -205,12 +177,10 @@
           <td class="c-id"><code>TF-0060</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">4.5</td>
-          <td>
-            <details><summary><strong>digit-ai-schemas : l'exemple de reference viole 25 fois les regles du socle, dont 7 fois une regle anterieure</strong></summary>
+          <td><details><summary><strong>digit-ai-schemas : l'exemple de reference viole 25 fois les regles du socle, dont 7 fois une regle anterieure</strong></summary>
               <p>L'extension de check_html.py aux regles L1-L10 fait apparaitre une dette dans un skill voisin : assets/exemple-reference.html de digit-ai-schemas rend 18 echecs L3 (badges « Nouveau » et assimiles sans aucune legende : ni title, ni aria-label, ni legende visible) et 7 echecs L4 (tables de 8 lignes ou plus sans data-filterable). Les 7 echecs L4 ne sont PAS nouveaux : le composant de filtres est declare obligatoire au socle depuis le 08/08, l'asset ne s'y est jamais conforme — c'est le controle qui manquait, pas la regle. Aucun de ces 25 constats n'est un faux positif. Hors perimetre du mandat de la campagne (socle + forge-seo + organization) : signale, non corrige, pour ne pas refactorer un skill voisin sans decision.</p>
               <p class="meta">Demandeur : campagne-fiches-html-20260809 · 2026-08-09 · gain 3 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — 25 echecs sur l'asset de reference d'un skill de production, dont 7 sur une regle en vigueur depuis le 08/08</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0060" rows="1" aria-label="Commentaire TF-0060" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -218,12 +188,10 @@
           <td class="c-id"><code>TF-0058</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">4</td>
-          <td>
-            <details><summary><strong>render_page.py écrit ses PNG dans le dossier du fichier audité</strong></summary>
+          <td><details><summary><strong>render_page.py écrit ses PNG dans le dossier du fichier audité</strong></summary>
               <p>Auditer le rapport client a déposé 12 PNG dans seo/livrables/ du projet — le dossier même que le client reçoit. Nettoyés à la main après coup. Correctif proposé : option --out &lt;dossier&gt; avec un défaut hors du dossier audité (sous-dossier .oracles/ ou scratchpad de session).</p>
               <p class="meta">Demandeur : campagne-fiches-html-20260809 · 2026-08-09 · gain 2 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — 12 fichiers d'oracle déposés dans un dossier de livrables client</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0058" rows="1" aria-label="Commentaire TF-0058" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -231,12 +199,10 @@
           <td class="c-id"><code>TF-0085</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">3</td>
-          <td>
-            <details><summary><strong>D-10 : le contrôle réseau exécutable annoncé n'existe pas dans la recette HTML</strong></summary>
+          <td><details><summary><strong>D-10 : le contrôle réseau exécutable annoncé n'existe pas dans la recette HTML</strong></summary>
               <p>La décision D-10 (08/08, humaine) impose l'autonomie totale des livrables HTML sortants (aucun CDN, aucune police distante, aucun appel réseau — confidentialité, durabilité, lecture hors ligne) et ANNONCE sa vérification : « recherche de motif dans le fichier produit — aucune occurrence de http://, https://, //cdn, @import url( hors attributs documentaires. Contrôle exécutable, pas déclaratif. » Constat du 11/08 : check_html.py ne contient AUCUN de ces motifs (grep → 0) — le ✓ d'autonomie est aujourd'hui déclaratif, exactement ce que D-10 interdit. Proposition : ajouter la règle à check_charte() (FAIL bloquant, liste d'exclusions pour les attributs documentaires type xmlns/DOCTYPE/liens visibles en texte) + fixtures rouge/verte + self-test, dans le skill digit-ai-page-html (maison mère : forge-design).</p>
               <p class="meta">Demandeur : TF-0039 (traçabilité du circuit D-13) · 2026-08-11 · gain 3 × preuve 3 ÷ effort 1 · <strong>payé en réel</strong> — un livrable client avec un appel CDN passerait la recette aujourd'hui ; les trois motifs de D-10 (traçage des lectures, CDN disparu à 2 ans, proxy d'entreprise) restent des risques réels non gardés</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0085" rows="1" aria-label="Commentaire TF-0085" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -244,12 +210,10 @@
           <td class="c-id"><code>TF-0024</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">2.7</td>
-          <td>
-            <details><summary><strong>Script de sync/diff repo ↔ ~/.claude</strong></summary>
+          <td><details><summary><strong>Script de sync/diff repo ↔ ~/.claude</strong></summary>
               <p>Dérive prouvée dans les deux sens (registre 2.6.1 versionné vs 2.9.1 exécuté) : le repo n'est plus la source de ce qui s'exécute.</p>
               <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 3 · <strong>payé en réel</strong> — Constatée deux fois (05/08 et 08/08), dans les deux directions</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0024" rows="1" aria-label="Commentaire TF-0024" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -257,12 +221,7 @@
           <td class="c-id"><code>TF-0011</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>Enregistrer les 4 oracles au registre quality-oracles</strong></summary>
-              <p>R-C4 : invisibles pour tout ré-audit externe via le registre central.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p>
-            </details>
-          </td>
+          <td><strong>Enregistrer les 4 oracles au registre quality-oracles</strong><p>R-C4 : invisibles pour tout ré-audit externe via le registre central.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0011" rows="1" aria-label="Commentaire TF-0011" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -270,12 +229,7 @@
           <td class="c-id"><code>TF-0022</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>Committer le travail du 08/08 (file-candidats, gabarit A0)</strong></summary>
-              <p>Usage réel de l'atelier non versionné — risque de perte.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p>
-            </details>
-          </td>
+          <td><strong>Committer le travail du 08/08 (file-candidats, gabarit A0)</strong><p>Usage réel de l'atelier non versionné — risque de perte.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0022" rows="1" aria-label="Commentaire TF-0022" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -283,12 +237,10 @@
           <td class="c-id"><code>TF-0059</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>render_page V7 : 288 avertissements de rythme vertical noient le signal V1/V4</strong></summary>
+          <td><details><summary><strong>render_page V7 : 288 avertissements de rythme vertical noient le signal V1/V4</strong></summary>
               <p>Sur un document dense de 465 Ko, V7 rend 288 avertissements dont l'écrasante majorité sont des suites de paragraphes de longueurs différentes — c'est-à-dire de la prose normale. Le signal utile (débordements V1, chevauchements V4) devient illisible : il a fallu écrire un script d'agrégation pour lire le verdict. Correctif proposé : exclure du calcul V7 les suites de &lt;p&gt; en flux de prose, ou plafonner le nombre d'avertissements par conteneur. Un oracle qui produit 288 lignes de bruit n'est pas lu, donc ne protège plus.</p>
               <p class="meta">Demandeur : campagne-fiches-html-20260809 · 2026-08-09 · gain 2 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — 288 avertissements V7 contre 8 constats bloquants réels sur le même run</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0059" rows="1" aria-label="Commentaire TF-0059" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -296,33 +248,26 @@
           <td class="c-id"><code>TF-0023</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">1.5</td>
-          <td>
-            <details><summary><strong>Réparer le self-test de l'installation (6 échecs)</strong></summary>
-              <p>visual/green préexistant, notebooklm sans frontmatter, data-quality-auditor déclaré ok mais absent.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 2</p>
-            </details>
-          </td>
+          <td><strong>Réparer le self-test de l'installation (6 échecs)</strong><p>visual/green préexistant, notebooklm sans frontmatter, data-quality-auditor déclaré ok mais absent.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 2</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0023" rows="1" aria-label="Commentaire TF-0023" placeholder="commentaire…"></textarea></td>
         </tr>
         </tbody>
       </table></div>
     </section>
     <section>
-      <h2 id="conception">conception <span class="badge">5</span></h2>
+      <h2 id="conception">conception <span class="badge" title="5 item(s) actifs ciblant conception">5</span></h2>
       <div class="scroll"><table data-filterable>
-        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0070" aria-label="Décider TF-0070"></td>
           <td class="c-id"><code>TF-0070</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>oracle-surface : la fixture verte de conception échoue au seuil par défaut depuis le registre central</strong></summary>
+          <td><details><summary><strong>oracle-surface : la fixture verte de conception échoue au seuil par défaut depuis le registre central</strong></summary>
               <p>Le self-test de forge-conception l'invoque en --seuil 80 (voulu, pour exercer SANS_OBJET) mais un opérateur passant la fixture verte par le registre (seuil 95) lit un FAIL surprenant (83,3 %). Soit une fixture verte au seuil par défaut, soit le seuil porté par le registre.</p>
               <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 2 × preuve 1 ÷ effort 1 · <strong>payé en réel</strong> — constaté à l'enregistrement des 4 oracles au registre</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0070" rows="1" aria-label="Commentaire TF-0070" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -330,12 +275,7 @@
           <td class="c-id"><code>TF-0013</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">1.5</td>
-          <td>
-            <details><summary><strong>Exercer MISSION.md sur un run réel</strong></summary>
-              <p>La vue vers la SaaS Forge n'a aucun usage constaté (orpheline).</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 2</p>
-            </details>
-          </td>
+          <td><strong>Exercer MISSION.md sur un run réel</strong><p>La vue vers la SaaS Forge n'a aucun usage constaté (orpheline).</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 2</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0013" rows="1" aria-label="Commentaire TF-0013" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -343,12 +283,7 @@
           <td class="c-id"><code>TF-0012</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>Installer les 4 skills sous ~/.claude/skills</strong></summary>
-              <p>Chaîne invocable seulement en copiant les SKILL.md à la main.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p>
-            </details>
-          </td>
+          <td><strong>Installer les 4 skills sous ~/.claude/skills</strong><p>Chaîne invocable seulement en copiant les SKILL.md à la main.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0012" rows="1" aria-label="Commentaire TF-0012" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -356,12 +291,7 @@
           <td class="c-id"><code>TF-0014</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">1.5</td>
-          <td>
-            <details><summary><strong>Manifeste + protocole machine « bloqué sous seuil »</strong></summary>
-              <p>R-C3 : le dernier manque d'invocabilité — l'état questions a/b/c n'est pas distinguable mécaniquement de « produit ».</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 2</p>
-            </details>
-          </td>
+          <td><strong>Manifeste + protocole machine « bloqué sous seuil »</strong><p>R-C3 : le dernier manque d'invocabilité — l'état questions a/b/c n'est pas distinguable mécaniquement de « produit ».</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 2</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0014" rows="1" aria-label="Commentaire TF-0014" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -369,54 +299,42 @@
           <td class="c-id"><code>TF-0015</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">1</td>
-          <td>
-            <details><summary><strong>Coder E7-E9 (EARS/ISO 29148) dans oracle-exigences</strong></summary>
-              <p>L'étude P-10 d'organization reste à l'état d'étude ; 3 contrôles proposés, zéro exécutable.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 3</p>
-            </details>
-          </td>
+          <td><strong>Coder E7-E9 (EARS/ISO 29148) dans oracle-exigences</strong><p>L'étude P-10 d'organization reste à l'état d'étude ; 3 contrôles proposés, zéro exécutable.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 3</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0015" rows="1" aria-label="Commentaire TF-0015" placeholder="commentaire…"></textarea></td>
         </tr>
         </tbody>
       </table></div>
     </section>
     <section>
-      <h2 id="datanouvelle">data (nouvelle) <span class="badge">1</span></h2>
+      <h2 id="datanouvelle">data (nouvelle) <span class="badge" title="1 item(s) actifs ciblant data (nouvelle)">1</span></h2>
       <div class="scroll"><table data-filterable>
-        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0083" aria-label="Décider TF-0083" disabled></td>
           <td class="c-id"><code>TF-0083</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">3</td>
-          <td>
-            <details><summary><strong>forge-data — révision de l'écartement du 08/08 sur preuve REX (admission rejouée)</strong></summary>
+          <td><details><summary><strong>forge-data — révision de l'écartement du 08/08 sur preuve REX (admission rejouée)</strong></summary>
               <p>Test d'admission : trou allégué = aucune discipline data outillée dans les runs (lineage exigible, reporting sourcé, profiling composé) ; preuve = REX réel OracleClient-D (playbook lineage, rétro-doc architecture, openmetadata). NOTE DE GOUVERNANCE : forge-data avait été écartée nominativement à la revue du 08/08 — le présent mandat humain REVOIT cette décision sur preuve nouvelle. Phases : 1 non-recouvrement à verdict (sortie honnête « extension suffit » possible) ; 2 REX anonymisé zéro-client ; 3 standards gouvernés ; 4 v0 aux niveaux des 3 barres validées (OpenLineage/tracer, Great Expectations/profiler, dbt-core/restituer — registre la-barre 11/08) ; 5 intégrations écosystème.</p>
               <p class="meta">Demandeur : prompt réécrit L99 + barre (pré-vol) du 11/08 · 2026-08-11 · gain 4 × preuve 3 ÷ effort 4 · <strong>payé en réel</strong> — REX OracleClient-D : lineage et rétro-doc faits à la main, non réutilisables ; aucun oracle de lineage/restitution dans l'écosystème</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0083" rows="1" aria-label="Commentaire TF-0083" placeholder="commentaire…"></textarea></td>
         </tr>
         </tbody>
       </table></div>
     </section>
     <section>
-      <h2 id="design">design <span class="badge">6</span></h2>
+      <h2 id="design">design <span class="badge" title="6 item(s) actifs ciblant design">6</span></h2>
       <div class="scroll"><table data-filterable>
-        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0017" aria-label="Décider TF-0017"></td>
           <td class="c-id"><code>TF-0017</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">4</td>
-          <td>
-            <details><summary><strong>Committer le chantier oracle-motion</strong></summary>
-              <p>Complet, testé, vert — 22 fichiers non committés : un clone livre 6 oracles, le poste en exécute 7. À faire par SA session (chantier concurrent vivant).</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 1</p>
-            </details>
-          </td>
+          <td><strong>Committer le chantier oracle-motion</strong><p>Complet, testé, vert — 22 fichiers non committés : un clone livre 6 oracles, le poste en exécute 7. À faire par SA session (chantier concurrent vivant).</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 1</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0017" rows="1" aria-label="Commentaire TF-0017" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -424,12 +342,7 @@
           <td class="c-id"><code>TF-0016</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>Rebuild + commit dist/*.skill</strong></summary>
-              <p>Les .skill packagés sont périmés de 4 évolutions fonctionnelles.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p>
-            </details>
-          </td>
+          <td><strong>Rebuild + commit dist/*.skill</strong><p>Les .skill packagés sont périmés de 4 évolutions fonctionnelles.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0016" rows="1" aria-label="Commentaire TF-0016" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -437,12 +350,7 @@
           <td class="c-id"><code>TF-0019</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">1.5</td>
-          <td>
-            <details><summary><strong>Premier appel réel Gemini (lever R-D3)</strong></summary>
-              <p>NÉCESSITE UN GO HUMAIN EXPLICITE : API payante (garde-fou steering). Le juge (oracle-images) existe, le producteur n'a jamais appelé.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 2</p>
-            </details>
-          </td>
+          <td><strong>Premier appel réel Gemini (lever R-D3)</strong><p>NÉCESSITE UN GO HUMAIN EXPLICITE : API payante (garde-fou steering). Le juge (oracle-images) existe, le producteur n'a jamais appelé.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 2</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0019" rows="1" aria-label="Commentaire TF-0019" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -450,12 +358,7 @@
           <td class="c-id"><code>TF-0020</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">1</td>
-          <td>
-            <details><summary><strong>Producteur d'images complet</strong></summary>
-              <p>Générer réellement les visuels des maquettes, jugés par oracle-images I1-I6 existant.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 4</p>
-            </details>
-          </td>
+          <td><strong>Producteur d'images complet</strong><p>Générer réellement les visuels des maquettes, jugés par oracle-images I1-I6 existant.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 4</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0020" rows="1" aria-label="Commentaire TF-0020" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -463,12 +366,10 @@
           <td class="c-id"><code>TF-0079</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">6</td>
-          <td>
-            <details><summary><strong>oracle-tokens T4 contredisait la doctrine du thème clair — sombre rendu optionnel</strong></summary>
+          <td><details><summary><strong>oracle-tokens T4 contredisait la doctrine du thème clair — sombre rendu optionnel</strong></summary>
               <p>T4 (forge-design, consommé via le registre quality-oracles) exigeait clair ET sombre : chaque fiche claire était poussée vers un sombre que personne n'a demandé (le schéma écosystème du pilot a dû embarquer 3 blocs sombres pour passer). Or la doctrine du socle digit-ai-page-html est le thème clair, confirmée par directive humaine du 09/08 : « les fiches HTML doivent être en thème clair. » Correctif : clair seul conforme (finding info) ; dès qu'un sombre est déclaré, parité complète et contrastes des deux thèmes restent bloquants.</p>
               <p class="meta">Demandeur : humain · 2026-08-09 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — 3 blocs sombres imposés au schéma du 09/08 pour satisfaire un contrat que la doctrine contredit</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0079" rows="1" aria-label="Commentaire TF-0079" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -476,33 +377,23 @@
           <td class="c-id"><code>TF-0018</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">1</td>
-          <td>
-            <details><summary><strong>Installer les 4 skills verbes</strong></summary>
-              <p>Non déclenchables par nom sur le poste.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 2</p>
-            </details>
-          </td>
+          <td><strong>Installer les 4 skills verbes</strong><p>Non déclenchables par nom sur le poste.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 2</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0018" rows="1" aria-label="Commentaire TF-0018" placeholder="commentaire…"></textarea></td>
         </tr>
         </tbody>
       </table></div>
     </section>
     <section>
-      <h2 id="development">development <span class="badge">4</span></h2>
+      <h2 id="development">development <span class="badge" title="4 item(s) actifs ciblant development">4</span></h2>
       <div class="scroll"><table data-filterable>
-        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0008" aria-label="Décider TF-0008"></td>
           <td class="c-id"><code>TF-0008</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">4</td>
-          <td>
-            <details><summary><strong>Arbitrage D-V3 : l'amont officiel</strong></summary>
-              <p>EXIGENCES.json/verbe 4 de conception vs BMAD : deux amonts concurrents, tranchés à la main à chaque run.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Décision re-payée à chaque produit construit</p>
-            </details>
-          </td>
+          <td><strong>Arbitrage D-V3 : l'amont officiel</strong><p>EXIGENCES.json/verbe 4 de conception vs BMAD : deux amonts concurrents, tranchés à la main à chaque run.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Décision re-payée à chaque produit construit</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0008" rows="1" aria-label="Commentaire TF-0008" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -510,12 +401,7 @@
           <td class="c-id"><code>TF-0007</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">3</td>
-          <td>
-            <details><summary><strong>Source unique des disciplines de livrable</strong></summary>
-              <p>Le run-playbook fait foi ; le CLAUDE.md steering pointe au lieu de copier (deux copies de prose aujourd'hui).</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 1</p>
-            </details>
-          </td>
+          <td><strong>Source unique des disciplines de livrable</strong><p>Le run-playbook fait foi ; le CLAUDE.md steering pointe au lieu de copier (deux copies de prose aujourd'hui).</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 1</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0007" rows="1" aria-label="Commentaire TF-0007" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -523,12 +409,10 @@
           <td class="c-id"><code>TF-0010</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">2.7</td>
-          <td>
-            <details><summary><strong>Gates de livrable exécutables</strong></summary>
+          <td><details><summary><strong>Gates de livrable exécutables</strong></summary>
               <p>Traçabilité E-xxx (grep 100 %), marqueurs démo, affordances (délégué au pan interface) : la doctrine RV-1/3/4 devient oracle.</p>
               <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 3 · <strong>payé en réel</strong> — 3 défauts sortis en production v0.1.0</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0010" rows="1" aria-label="Commentaire TF-0010" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -536,75 +420,67 @@
           <td class="c-id"><code>TF-0009</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">2.5</td>
-          <td>
-            <details><summary><strong>HumanGate déléguable + dogfooding</strong></summary>
+          <td><details><summary><strong>HumanGate déléguable + dogfooding</strong></summary>
               <p>Le conductor est maintenu (décision Q-A 08/08) : lui donner un HumanGate déléguable et une exécution réelle bout en bout.</p>
               <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 5 × preuve 2 ÷ effort 4 · <strong>payé en réel</strong> — D-V1 payée à chaque étape 4 en mode dégradé</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0009" rows="1" aria-label="Commentaire TF-0009" placeholder="commentaire…"></textarea></td>
         </tr>
         </tbody>
       </table></div>
     </section>
     <section>
-      <h2 id="ops">ops <span class="badge">1</span></h2>
+      <h2 id="ops">ops <span class="badge" title="1 item(s) actifs ciblant ops">1</span></h2>
       <div class="scroll"><table data-filterable>
-        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0081" aria-label="Décider TF-0081" disabled></td>
           <td class="c-id"><code>TF-0081</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">4</td>
-          <td>
-            <details><summary><strong>Extension cloud de forge-ops — expertises + plans : Railway, GCP, Azure, AWS</strong></summary>
+          <td><details><summary><strong>Extension cloud de forge-ops — expertises + plans : Railway, GCP, Azure, AWS</strong></summary>
               <p>Rattaché à D-P1. Deux artefacts, deux régimes de preuve : 4 fiches expert (experts-forge, admission oracle-judge, service canonique par cible, placeholders) + mode plan-first dans ops.mjs (plans déterministes 4 phases dont rollback, oracle O-5, self-test hors-ligne zéro credential). Exécution réelle = run MEP sur GO humain, consignée par cible.</p>
               <p class="meta">Demandeur : prompt réécrit L99 du 11/08 · 2026-08-11 · gain 4 × preuve 3 ÷ effort 3 · <strong>payé en réel</strong> — D-P1 : v0 cible locale seulement ; cas réel Railway (ASD) déployé artisanalement</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0081" rows="1" aria-label="Commentaire TF-0081" placeholder="commentaire…"></textarea></td>
         </tr>
         </tbody>
       </table></div>
     </section>
     <section>
-      <h2 id="opsnouvelle">ops (nouvelle) <span class="badge">1</span></h2>
+      <h2 id="opsnouvelle">ops (nouvelle) <span class="badge" title="1 item(s) actifs ciblant ops (nouvelle)">1</span></h2>
       <div class="scroll"><table data-filterable>
-        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0040" aria-label="Décider TF-0040" disabled></td>
           <td class="c-id"><code>TF-0040</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>Créer forge-ops (exploitation)</strong></summary>
+          <td><details><summary><strong>Créer forge-ops (exploitation)</strong></summary>
               <p>ADMISE au test : MEP sans forge, déploiement ASD artisanal, qualif sans instances outillées, canal production sans instrument. Verbes : déployer, exploiter, restaurer.</p>
               <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 5 × preuve 2 ÷ effort 5 · <strong>payé en réel</strong> — MEP portée par le steering faute de forge ; déploiement Railway artisanal</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0040" rows="1" aria-label="Commentaire TF-0040" placeholder="commentaire…"></textarea></td>
         </tr>
         </tbody>
       </table></div>
     </section>
     <section>
-      <h2 id="organization">organization <span class="badge">8</span></h2>
+      <h2 id="organization">organization <span class="badge" title="8 item(s) actifs ciblant organization">8</span></h2>
       <div class="scroll"><table data-filterable>
-        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0076" aria-label="Décider TF-0076"></td>
           <td class="c-id"><code>TF-0076</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">4</td>
-          <td>
-            <details><summary><strong>Contrôle de fraîcheur du gabarit A0 : la version de socle déclarée n'est vérifiée par rien</strong></summary>
+          <td><details><summary><strong>Contrôle de fraîcheur du gabarit A0 : la version de socle déclarée n'est vérifiée par rien</strong></summary>
               <p>Depuis TF-0061 le gabarit déclare la version du socle sur laquelle il est aligné (SKILL.md 1.6.0) — mais rien ne compare cette déclaration à la version installée. Un contrôle mécanique (déclaré vs lu) rendrait la dérive bruyante au lieu de découverte (elle a coûté 4 itérations de retard).</p>
               <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 2 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — dérive de 4 itérations constatée avant TF-0061</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0076" rows="1" aria-label="Commentaire TF-0076" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -612,12 +488,10 @@
           <td class="c-id"><code>TF-0052</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">3</td>
-          <td>
-            <details><summary><strong>Trancher les 3 arbitrages « Leviers de qualité générique » (organization)</strong></summary>
+          <td><details><summary><strong>Trancher les 3 arbitrages « Leviers de qualité générique » (organization)</strong></summary>
               <p>Le doc de conception d'organization (08/08) attend 3 décisions A/B/C : capture déterministe des règles, chargement de spec amont, hook PostToolUse. Chemin le plus court vers un harnais actif au-delà du seul hook C6 (mesuré : 1 hook actif, 3 gates et 8 agents compilés dormants). Métrique : mécanismes actifs vs dormants. Protocole : décision humaine + 1 essai du levier retenu.</p>
               <p class="meta">Demandeur : steering · 2026-08-09 · gain 3 × preuve 1 ÷ effort 1</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0052" rows="1" aria-label="Commentaire TF-0052" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -625,12 +499,10 @@
           <td class="c-id"><code>TF-0075</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">1</td>
-          <td>
-            <details><summary><strong>Types Revue, Proposition, Schéma absents du registre des types (employés dans pilot/output)</strong></summary>
+          <td><details><summary><strong>Types Revue, Proposition, Schéma absents du registre des types (employés dans pilot/output)</strong></summary>
               <p>D-04 veut qu'un type nouveau soit ajouté au registre plutôt qu'improvisé. Trois types employés par le pilot n'y figurent pas. Ajout au registre-types.json d'organization avec premier exemplaire.</p>
               <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 1 × preuve 1 ÷ effort 1 · <strong>payé en réel</strong> — 3 types improvisés mesurés au corpus</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0075" rows="1" aria-label="Commentaire TF-0075" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -638,12 +510,10 @@
           <td class="c-id"><code>TF-0061</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">6</td>
-          <td>
-            <details><summary><strong>Aligner le gabarit A0 (organization) sur L1(b), L2-au-rendu et le nommage Q3-bis</strong></summary>
+          <td><details><summary><strong>Aligner le gabarit A0 (organization) sur L1(b), L2-au-rendu et le nommage Q3-bis</strong></summary>
               <p>Dérive référentiel↔implémentation signalée à l'itération 3 : le gabarit A0 20260809b décrit L2 dans son ancienne formulation (prose bornée — la doctrine fausse retirée du socle) et ne porte ni L1(b) ni la mesure au rendu ; son nommage reste au motif émetteur. À reprendre dans le chantier CLAUDE.md/alignement d'organization (TF-0031), conformément à « organization organise, steering pilote ».</p>
               <p class="meta">Demandeur : steering · 2026-08-09 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — la même dérive a déjà été payée 2 fois (skills install↔repo, disciplines dupliquées)</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0061" rows="1" aria-label="Commentaire TF-0061" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -651,12 +521,10 @@
           <td class="c-id"><code>TF-0031</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">3</td>
-          <td>
-            <details><summary><strong>CLAUDE.md + trancher Q3-bis</strong></summary>
+          <td><details><summary><strong>CLAUDE.md + trancher Q3-bis</strong></summary>
               <p>Point d'entrée encodant la décision Q-B (organization organise, steering pilote). Q3-bis (préfixe projet/émetteur) = DÉCISION HUMAINE requise, débloque la Phase 3.</p>
               <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 1<br>Commentaire précédent : 2026-08-09 : Q3-bis TRANCHÉE par l'humain — le nom du PROJET prime sur l'émetteur dans le nommage des livrables (règle 4 mise à jour au steering ; organization à aligner via cet item)</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0031" rows="1" aria-label="Commentaire TF-0031" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -664,12 +532,7 @@
           <td class="c-id"><code>TF-0032</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>Se conformer à sa propre doctrine</strong></summary>
-              <p>Doctrine dans output/ (D-06), en-tête version c réparé (auto-violation D-02 fraîche), committer la version c.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p>
-            </details>
-          </td>
+          <td><strong>Se conformer à sa propre doctrine</strong><p>Doctrine dans output/ (D-06), en-tête version c réparé (auto-violation D-02 fraîche), committer la version c.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0032" rows="1" aria-label="Commentaire TF-0032" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -677,12 +540,7 @@
           <td class="c-id"><code>TF-0033</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">1</td>
-          <td>
-            <details><summary><strong>Le registre des types devient un fichier</strong></summary>
-              <p>D-04 le promet ; il n'existe qu'en tableau dans un document.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 2</p>
-            </details>
-          </td>
+          <td><strong>Le registre des types devient un fichier</strong><p>D-04 le promet ; il n'existe qu'en tableau dans un document.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 2</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0033" rows="1" aria-label="Commentaire TF-0033" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -690,124 +548,59 @@
           <td class="c-id"><code>TF-0034</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">1</td>
-          <td>
-            <details><summary><strong>Phase 3 : vérificateur machine des conventions</strong></summary>
-              <p>D-02/03/04/06 mécanisables sur le stock existant. Dépend de TF-0031 (Q3-bis).</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 4</p>
-            </details>
-          </td>
+          <td><strong>Phase 3 : vérificateur machine des conventions</strong><p>D-02/03/04/06 mécanisables sur le stock existant. Dépend de TF-0031 (Q3-bis).</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 4</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0034" rows="1" aria-label="Commentaire TF-0034" placeholder="commentaire…"></textarea></td>
         </tr>
         </tbody>
       </table></div>
     </section>
     <section>
-      <h2 id="pilot">pilot <span class="badge">20</span></h2>
+      <h2 id="pilot">pilot <span class="badge" title="20 item(s) actifs ciblant pilot">20</span></h2>
       <div class="scroll"><table data-filterable>
-        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
-        <tr>
-          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0088" aria-label="Décider TF-0088"></td>
-          <td class="c-id"><code>TF-0088</code></td>
-          <td><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score">9</td>
-          <td>
-            <details><summary><strong>R-21 est aveugle dès que les lockfiles ne sont pas à la racine, et ignore yarn.lock — la fraîcheur des versions n'est jamais jugée sur un dépôt multi-composants</strong></summary>
-              <p>oracle-conformite-projet.mjs cherche les lockfiles UNIQUEMENT à la racine du projet, dans une liste fermée : package-lock.json, pyproject.toml, poetry.lock, uv.lock, requirements.txt, Cargo.lock, go.sum, composer.lock, Gemfile.lock. Deux angles morts, constatés par exécution le 11/08 sur Produit-11 : (1) yarn.lock N'EST PAS dans la liste, alors que Yarn est utilisé tel quel par le produit (frontend/yarn.lock, `yarn install --frozen-lockfile` dans le Dockerfile ET dans la pipeline) ; (2) la recherche ne descend pas d'un niveau, or la disposition front/ + back/ est la norme, pas l'exception. Résultat sur Produit-11 : verdict SANS_OBJET « aucun lockfile/manifeste à la racine — fraîcheur non jugeable », alors que le produit a bel et bien frontend/yarn.lock (25 versions résolues) et azure/backend-requirements.txt (15 versions épinglées) — soit 25 versions déclarées dans TECHNOS.md que R-21 laisse passer sans les confronter à quoi que ce soit. La règle est marquée « défaut » et son mécanisme « O » (oracle) : elle est aujourd'hui structurellement incapable de FAIL sur ce type de dépôt, donc de tenir la loi 4 qu'elle invoque. Proposition : (a) ajouter yarn.lock, pnpm-lock.yaml et bun.lockb à la liste ; (b) chercher les lockfiles en descendant de 2 niveaux au plus, en excluant node_modules/.venv/dist/build ; (c) accepter les manifestes épinglés hors nom canonique quand ils sont référencés par un Dockerfile (ici azure/backend-requirements.txt) — à défaut, exiger que sources_de_verite du frontmatter TECHNOS liste les fichiers à confronter et les lire depuis là, ce qui est plus simple et déjà déclaré par le gabarit ; (d) ne plus rendre SANS_OBJET quand des versions SONT déclarées mais qu'aucune source n'est trouvée : c'est un FAIL de configuration, pas une absence d'objet — le silence actuel ressemble à un succès.</p>
-              <p class="meta">Demandeur : run-mep-bav2 (11/08) · 2026-08-11 · gain 3 × preuve 3 ÷ effort 1 · <strong>payé en réel</strong> — sur Produit-11, 25 versions déclarées dans TECHNOS.md n'ont été confrontées aux lockfiles par AUCUN oracle — la vérification a dû être refaite à la main pendant le run ; tout dépôt front+back (la disposition la plus courante) est dans le même cas, ce qui vide R-21 de son effet là où elle sert le plus</p>
-            </details>
-          </td>
-          <td class="c-comm"><textarea class="commentaire" data-id="TF-0088" rows="1" aria-label="Commentaire TF-0088" placeholder="commentaire…"></textarea></td>
-        </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0065" aria-label="Décider TF-0065"></td>
           <td class="c-id"><code>TF-0065</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">6</td>
-          <td>
-            <details><summary><strong>Le hook qualité sème ses journaux .oracles* dans tout dépôt édité — à canaliser une fois pour toutes</strong></summary>
+          <td><details><summary><strong>Le hook qualité sème ses journaux .oracles* dans tout dépôt édité — à canaliser une fois pour toutes</strong></summary>
               <p>Chaque édition de .md par une session outillée dépose &lt;fichier&gt;.oracles.json, .oracles-cache.json, .oracles-historique.jsonl à côté. Trois campagnes du 09/08 (tests, development, conception) ont dû nettoyer à la main ; agents et organization ont gitignoré localement. Généraliser : motifs au .gitignore socle de toutes les forges ET des projets produits (REGLES-PROJET R-10), ou écriture des sidecars hors dépôt (scratchpad), en préservant les journaux versionnés voulus (C4).</p>
               <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — 2 commits pollués défaits par git reset pendant la campagne agents ; nettoyage manuel ×3 campagnes</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0065" rows="1" aria-label="Commentaire TF-0065" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0087" aria-label="Décider TF-0087"></td>
-          <td class="c-id"><code>TF-0087</code></td>
-          <td><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score">6</td>
-          <td>
-            <details><summary><strong>Socle docs\projet\ : aucun fichier ne décrit le FONCTIONNEL du produit — le socle est intégralement technique</strong></summary>
-              <p>Les 5 fichiers de R-20 décrivent la machine (technos, composants déployés, variables, comptes de test, commandes) et jamais CE QUE FAIT le produit ni POUR QUI. Un agent qui ouvre un run de version, ou un humain qui reprend le produit, n'a aucune vue de référence du métier : objets métier et leur cycle de vie, parcours utilisateurs, rôles et droits, règles de gestion, cas limites assumés. Il doit le reconstituer en lisant le code — exactement le coût que R-20 cherche à supprimer. Constat sur Produit-11 (11/08) : le run a dû rétro-lire standalone_backend.py et les endpoints c13s pour comprendre qu'il s'agit d'annonces de locaux vacants avec alertes, import en masse et rôles admin ; rien de tout cela n'est écrit nulle part. Proposition : ajouter FONCTIONNEL.md au socle R-20, même régime que les autres (nom fixe, frontmatter YAML role / sources_de_verite / verifie_le, aucune duplication de la source de vérité, aucun secret), avec un contenu cadré : à quoi sert le produit en une phrase, utilisateurs et rôles, objets métier et leur cycle de vie, parcours principaux, règles de gestion structurantes, ce que le produit ne fait volontairement pas. Source de vérité naturelle : le référentiel EXIGENCES.json quand il existe (forge-conception) — FONCTIONNEL.md en est la vue lisible, pas un doublon ; pour un produit importé sans référentiel, il est rédigé depuis le code et daté comme toute valeur volatile.</p>
-              <p class="meta">Demandeur : run-mep-bav2 (11/08) · 2026-08-11 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — sur Produit-11, la compréhension du métier a été reconstituée par lecture du code pendant le run MEP ; ce coût se repaiera à chaque run de version et à chaque reprise par un tiers, alors que le socle documentaire existe précisément pour l'éviter</p>
-            </details>
-          </td>
-          <td class="c-comm"><textarea class="commentaire" data-id="TF-0087" rows="1" aria-label="Commentaire TF-0087" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0086" aria-label="Décider TF-0086"></td>
-          <td class="c-id"><code>TF-0086</code></td>
-          <td><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score">4.5</td>
-          <td>
-            <details><summary><strong>R-20 : le socle documentaire docs\projet\ n'est produit par aucune étape — un run se clôt sans lui, sans que rien ne le signale</strong></summary>
-              <p>R-20 (décidée le 11/08, TF-0082) exige de tout produit un docs\projet\ complet : TECHNOS.md, COMPOSANTS-OPS.md, PARAMETRAGE.md, ACCES-TEST.md, COMMANDES.md, chacun ouvert par un frontmatter YAML (role, sources_de_verite, verifie_le). Constat du run MEP Produit-11 (11/08) : la règle énonce QUI met à jour quoi (« design/development -&gt; TECHNOS, MEP -&gt; COMPOSANTS-OPS ») mais AUCUNE étape ne porte la CRÉATION du socle, et aucun oracle ne le vérifie à la clôture. Résultat concret : le run a produit 1 fichier sur 5 (COMPOSANTS-OPS.md), et même celui-là sans le frontmatter exigé — l'écart n'a été vu que parce que l'humain l'a signalé. R-21 (fraîcheur TECHNOS) et R-22 (parité PARAMETRAGE &lt;-&gt; .env.example) sont inapplicables tant que les fichiers n'existent pas : deux règles marquées « défaut » qui ne peuvent structurellement rien juger. Proposition : (1) rattacher la création du socle à une étape nommée (ouverture de run pour le squelette + frontmatter, chaque étape actualisant ses fichiers) ; (2) étendre oracle-conformite-projet.mjs pour juger la présence des 5 fichiers ET de leur frontmatter, en FAIL bloquant à la clôture ; (3) fournir les 5 gabarits dans gabarits\ pour que la génération ne soit pas réinventée à chaque run ; (4) traiter le cas des produits importés (Produit-11 : dépôt repris, sans .env.example — R-13 —, donc R-22 injugeable) par un mode rattrapage explicite. --- MISE À JOUR 11/08 (même session, après inspection du dépôt pilot) : les propositions (2) étendre oracle-conformite-projet.mjs et (3) fournir les gabarits sont DÉJÀ FAITES et présentes dans l'arbre de travail du pilot, non committées à cette heure : oracles/oracle-conformite-projet.mjs juge R-20 (5 fichiers + frontmatter role/sources_de_verite/verifie_le), R-21 (versions ↔ lockfiles) et R-22 (parité PARAMETRAGE ↔ .env.example), et gabarits/docs-projet/ contient les 5 gabarits. Restent ouverts : (1) rattacher la CRÉATION du socle à une étape nommée — c'est le trou qui a produit le constat, l'oracle sait juger mais aucune étape ne produit — et (4) le mode rattrapage des produits importés. Le constat d'origine reste vrai et daté : le run MEP Produit-11 s'est clos avec 1 fichier sur 5 sans qu'aucun oracle ne soit joué à la clôture.</p>
-              <p class="meta">Demandeur : run-mep-bav2 (11/08) · 2026-08-11 · gain 3 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — le run MEP Produit-11 s'est clos avec 4 fichiers sur 5 manquants sans aucun signal d'oracle ; le motif même de R-20 (« les runs de version redécouvrent tout ») est donc intact pour ce produit — la prochaine reprise repartira de zéro sur les technos, le paramétrage, les commandes et les accès de test</p>
-            </details>
-          </td>
-          <td class="c-comm"><textarea class="commentaire" data-id="TF-0086" rows="1" aria-label="Commentaire TF-0086" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0062" aria-label="Décider TF-0062"></td>
           <td class="c-id"><code>TF-0062</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>Rattrapage du renommage pilot chez les produits et missions</strong></summary>
+          <td><details><summary><strong>Rattrapage du renommage pilot chez les produits et missions</strong></summary>
               <p>Produit-12 (PROMPT-PRODUIT, CLAUDE.md, lots) et les missions référencent encore digit-ai-forge-steering en chemins absolus. La jonction c:/dev/digit-ai-forge-steering vers digit-ai-forge-pilot assure la compatibilité — NE PAS la supprimer avant ce rattrapage. À faire au prochain run de version de chaque produit (gouvernance : produits autonomes). Inclut le renommage physique du dossier (workspace verrouillé pendant la session : mv + inversion de la jonction, commande fournie).</p>
               <p class="meta">Demandeur : pilot · 2026-08-09 · gain 2 × preuve 1 ÷ effort 1</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0062" rows="1" aria-label="Commentaire TF-0062" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
-          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0084" aria-label="Décider TF-0084"></td>
-          <td class="c-id"><code>TF-0084</code></td>
-          <td><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>Trois propositions organization en attente de décision pilot (circuit D-13)</strong></summary>
-              <p>Relevées en traçant le circuit (TF-0039), routées ici au lieu d'être encodées en douce — le pas 3 du circuit est humain, sans raccourci. À trancher : (1) D-06 précision « la doctrine n'est pas une sortie » — un document normatif de forge vit à sa racine, pas dans output/ ; l'adopter au corpus ? (2) D-02 reste ouvert — Old\ à la racine du projet ou par dossier concerné, et harmonisation des 4 graphies observées (Old/old/archives/archive-v1) ; (3) D-04 — le registre des types (registre-types.json, 23 types, chez organization) devient-il opposable aux produits (l'oracle de conformité lirait le fichier d'un dépôt frère) ou reste-t-il interne aux forges ?</p>
-              <p class="meta">Demandeur : TF-0039 (traçabilité du circuit D-13) · 2026-08-11 · gain 2 × preuve 3 ÷ effort 1 · <strong>payé en réel</strong> — REGLES-PROJET §G : trois lignes de la matrice portent « en attente de décision pilot » — tant qu'elles y restent, la règle du corpus et la doctrine d'organization peuvent diverger sans que personne ne le voie</p>
-            </details>
-          </td>
-          <td class="c-comm"><textarea class="commentaire" data-id="TF-0084" rows="1" aria-label="Commentaire TF-0084" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0089" aria-label="Décider TF-0089"></td>
-          <td class="c-id"><code>TF-0089</code></td>
-          <td><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>TODO.html : 49 constats de lisibilité à la recette (générateur à réviser)</strong></summary>
-              <p>La recette complète du 11/08 (check_html patché A1) relève 49 FAIL de lisibilité sur la page du registre — AUCUN A1 (la page est autonome) : L3 badges de compteur sans légende (×12) et colonne « score » triée sans formule publiée (×12), L9 dépliants sous 200 caractères à afficher en place (×23), L11 littéral « None » rendu tel quel (×1), L12 énumération en prose (×1). Producteur : todo/generer-page.mjs — corriger le générateur, jamais la page (D-11). Proposition : title/aria-label sur les badges, note de calcul du score référencée par aria-describedby, seuil d'inlining des details courts, valeur absente rendue « — », liste à puces pour l'énumération.</p>
-              <p class="meta">Demandeur : recette anti-régression TF-0085 (11/08) · 2026-08-11 · gain 2 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — la page vitrine du registre viole 4 règles de lisibilité que la forge impose à tous les livrables — se conformer à sa propre doctrine (précédent D-05 : organization)</p>
-            </details>
-          </td>
-          <td class="c-comm"><textarea class="commentaire" data-id="TF-0089" rows="1" aria-label="Commentaire TF-0089" placeholder="commentaire…"></textarea></td>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0088" aria-label="Décider TF-0088" disabled></td>
+          <td class="c-id"><code>TF-0088</code></td>
+          <td><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score">9</td>
+          <td><details><summary><strong>R-21 est aveugle dès que les lockfiles ne sont pas à la racine, et ignore yarn.lock — la fraîcheur des versions n'est jamais jugée sur un dépôt multi-composants</strong></summary>
+              <p>oracle-conformite-projet.mjs cherche les lockfiles UNIQUEMENT à la racine du projet, dans une liste fermée : package-lock.json, pyproject.toml, poetry.lock, uv.lock, requirements.txt, Cargo.lock, go.sum, composer.lock, Gemfile.lock. Deux angles morts, constatés par exécution le 11/08 sur Produit-11 :</p><ol><li>yarn.lock N'EST PAS dans la liste, alors que Yarn est utilisé tel quel par le produit (frontend/yarn.lock, `yarn install --frozen-lockfile` dans le Dockerfile ET dans la pipeline) </li><li>la recherche ne descend pas d'un niveau, or la disposition front/ + back/ est la norme, pas l'exception. Résultat sur Produit-11 : verdict SANS_OBJET « aucun lockfile/manifeste à la racine — fraîcheur non jugeable », alors que le produit a bel et bien frontend/yarn.lock (25 versions résolues) et azure/backend-requirements.txt (15 versions épinglées) — soit 25 versions déclarées dans TECHNOS.md que R-21 laisse passer sans les confronter à quoi que ce soit. La règle est marquée « défaut » et son mécanisme « O » (oracle) : elle est aujourd'hui structurellement incapable de FAIL sur ce type de dépôt, donc de tenir la loi 4 qu'elle invoque. Proposition : (a) ajouter yarn.lock, pnpm-lock.yaml et bun.lockb à la liste<ul><li>(b) chercher les lockfiles en descendant de 2 niveaux au plus, en excluant node_modules/.venv/dist/build</li><li>(c) accepter les manifestes épinglés hors nom canonique quand ils sont référencés par un Dockerfile (ici azure/backend-requirements.txt) — à défaut, exiger que sources_de_verite du frontmatter TECHNOS liste les fichiers à confronter et les lire depuis là, ce qui est plus simple et déjà déclaré par le gabarit</li><li>(d) ne plus rendre SANS_OBJET quand des versions SONT déclarées mais qu'aucune source n'est trouvée : c'est un FAIL de configuration, pas une absence d'objet — le silence actuel ressemble à un succès</li></ul></li></ol>
+              <p class="meta">Demandeur : run-mep-bav2 (11/08) · 2026-08-11 · gain 3 × preuve 3 ÷ effort 1 · <strong>payé en réel</strong> — sur Produit-11, 25 versions déclarées dans TECHNOS.md n'ont été confrontées aux lockfiles par AUCUN oracle — la vérification a dû être refaite à la main pendant le run ; tout dépôt front+back (la disposition la plus courante) est dans le même cas, ce qui vide R-21 de son effet là où elle sert le plus</p>
+            </details></td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0088" rows="1" aria-label="Commentaire TF-0088" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0050" aria-label="Décider TF-0050" disabled></td>
           <td class="c-id"><code>TF-0050</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">6</td>
-          <td>
-            <details><summary><strong>Gabarit d'agent de campagne — contraintes standard mutualisées</strong></summary>
+          <td><details><summary><strong>Gabarit d'agent de campagne — contraintes standard mutualisées</strong></summary>
               <p>~25 prompts de campagne rédigés à la main cette semaine, répétant chacun ~3 Ko de contraintes identiques (langue, chirurgie, push interdit, commits, vérifications natives, lecture seule, format de retour) — 75 Ko réécrits, et un oubli = un incident potentiel. Mécanisme : gabarits/AGENT-CAMPAGNE.md ; le prompt d'un agent devient gabarit + delta spécifique. Métrique : taille du prompt spécifique (attendu -60 %), zéro omission. Protocole : comparaison à la prochaine campagne multi-agents.</p>
               <p class="meta">Demandeur : steering · 2026-08-09 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — ~25 prompts × ~3 Ko de contraintes dupliquées relevés sur la semaine</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0050" rows="1" aria-label="Commentaire TF-0050" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -815,25 +608,40 @@
           <td class="c-id"><code>TF-0080</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">6</td>
-          <td>
-            <details><summary><strong>Oracle d'exhaustivité de l'écosystème (matrice forges × surfaces)</strong></summary>
+          <td><details><summary><strong>Oracle d'exhaustivité de l'écosystème (matrice forges × surfaces)</strong></summary>
               <p>Trou réel constaté par contrôle humain : fiche forge-audit jamais créée à l'enregistrement de la forge (10/08) — l'intégration d'une forge se faisait à la main, sans contrôle. Créer oracles/oracle-ecosysteme.mjs : la liste FORGES de bootstrap.mjs (source unique) est exigée sur 7 surfaces (fiches, INVENTAIRE, CONTRAT, CLAUDE.md, schéma, README, compte du schéma).</p>
               <p class="meta">Demandeur : controle-humain-20260811 · 2026-08-11 · gain 4 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — 3 trous réels le 11/08 : fiche forge-audit absente, forge-audit hors noyau, README à « cinq forges »</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0080" rows="1" aria-label="Commentaire TF-0080" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0087" aria-label="Décider TF-0087" disabled></td>
+          <td class="c-id"><code>TF-0087</code></td>
+          <td><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score">6</td>
+          <td><details><summary><strong>Socle docs\projet\ : aucun fichier ne décrit le FONCTIONNEL du produit — le socle est intégralement technique</strong></summary>
+              <p>Les 5 fichiers de R-20 décrivent la machine (technos, composants déployés, variables, comptes de test, commandes) et jamais CE QUE FAIT le produit ni POUR QUI. Un agent qui ouvre un run de version, ou un humain qui reprend le produit, n'a aucune vue de référence du métier : objets métier et leur cycle de vie, parcours utilisateurs, rôles et droits, règles de gestion, cas limites assumés. Il doit le reconstituer en lisant le code — exactement le coût que R-20 cherche à supprimer. Constat sur Produit-11 (11/08) : le run a dû rétro-lire standalone_backend.py et les endpoints c13s pour comprendre qu'il s'agit d'annonces de locaux vacants avec alertes, import en masse et rôles admin ; rien de tout cela n'est écrit nulle part. Proposition : ajouter FONCTIONNEL.md au socle R-20, même régime que les autres (nom fixe, frontmatter YAML role / sources_de_verite / verifie_le, aucune duplication de la source de vérité, aucun secret), avec un contenu cadré : à quoi sert le produit en une phrase, utilisateurs et rôles, objets métier et leur cycle de vie, parcours principaux, règles de gestion structurantes, ce que le produit ne fait volontairement pas. Source de vérité naturelle : le référentiel EXIGENCES.json quand il existe (forge-conception) — FONCTIONNEL.md en est la vue lisible, pas un doublon ; pour un produit importé sans référentiel, il est rédigé depuis le code et daté comme toute valeur volatile.</p>
+              <p class="meta">Demandeur : run-mep-bav2 (11/08) · 2026-08-11 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — sur Produit-11, la compréhension du métier a été reconstituée par lecture du code pendant le run MEP ; ce coût se repaiera à chaque run de version et à chaque reprise par un tiers, alors que le socle documentaire existe précisément pour l'éviter</p>
+            </details></td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0087" rows="1" aria-label="Commentaire TF-0087" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0086" aria-label="Décider TF-0086" disabled></td>
+          <td class="c-id"><code>TF-0086</code></td>
+          <td><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score">4.5</td>
+          <td><details><summary><strong>R-20 : le socle documentaire docs\projet\ n'est produit par aucune étape — un run se clôt sans lui, sans que rien ne le signale</strong></summary>
+              <p>R-20 (décidée le 11/08, TF-0082) exige de tout produit un docs\projet\ complet : TECHNOS.md, COMPOSANTS-OPS.md, PARAMETRAGE.md, ACCES-TEST.md, COMMANDES.md, chacun ouvert par un frontmatter YAML (role, sources_de_verite, verifie_le). Constat du run MEP Produit-11 (11/08) : la règle énonce QUI met à jour quoi (« design/development -&gt; TECHNOS, MEP -&gt; COMPOSANTS-OPS ») mais AUCUNE étape ne porte la CRÉATION du socle, et aucun oracle ne le vérifie à la clôture. Résultat concret : le run a produit 1 fichier sur 5 (COMPOSANTS-OPS.md), et même celui-là sans le frontmatter exigé — l'écart n'a été vu que parce que l'humain l'a signalé. R-21 (fraîcheur TECHNOS) et R-22 (parité PARAMETRAGE &lt;-&gt; .env.example) sont inapplicables tant que les fichiers n'existent pas : deux règles marquées « défaut » qui ne peuvent structurellement rien juger. Proposition : (1) rattacher la création du socle à une étape nommée (ouverture de run pour le squelette + frontmatter, chaque étape actualisant ses fichiers) ; (2) étendre oracle-conformite-projet.mjs pour juger la présence des 5 fichiers ET de leur frontmatter, en FAIL bloquant à la clôture ; (3) fournir les 5 gabarits dans gabarits\ pour que la génération ne soit pas réinventée à chaque run ; (4) traiter le cas des produits importés (Produit-11 : dépôt repris, sans .env.example — R-13 —, donc R-22 injugeable) par un mode rattrapage explicite. --- MISE À JOUR 11/08 (même session, après inspection du dépôt pilot) : les propositions (2) étendre oracle-conformite-projet.mjs et (3) fournir les gabarits sont DÉJÀ FAITES et présentes dans l'arbre de travail du pilot, non committées à cette heure : oracles/oracle-conformite-projet.mjs juge R-20 (5 fichiers + frontmatter role/sources_de_verite/verifie_le), R-21 (versions ↔ lockfiles) et R-22 (parité PARAMETRAGE ↔ .env.example), et gabarits/docs-projet/ contient les 5 gabarits. Restent ouverts : (1) rattacher la CRÉATION du socle à une étape nommée — c'est le trou qui a produit le constat, l'oracle sait juger mais aucune étape ne produit — et (4) le mode rattrapage des produits importés. Le constat d'origine reste vrai et daté : le run MEP Produit-11 s'est clos avec 1 fichier sur 5 sans qu'aucun oracle ne soit joué à la clôture.</p>
+              <p class="meta">Demandeur : run-mep-bav2 (11/08) · 2026-08-11 · gain 3 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — le run MEP Produit-11 s'est clos avec 4 fichiers sur 5 manquants sans aucun signal d'oracle ; le motif même de R-20 (« les runs de version redécouvrent tout ») est donc intact pour ce produit — la prochaine reprise repartira de zéro sur les technos, le paramétrage, les commandes et les accès de test</p>
+            </details></td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0086" rows="1" aria-label="Commentaire TF-0086" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0035" aria-label="Décider TF-0035" disabled></td>
           <td class="c-id"><code>TF-0035</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">4</td>
-          <td>
-            <details><summary><strong>versions_forges/run_precedent réellement consignés</strong></summary>
-              <p>Promis au contrat §3, absents des 76 entrées du ledger du produit réel — + contrôle d'oracle.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — 0/76 entrées sur ASD malgré 2 versions livrées</p>
-            </details>
-          </td>
+          <td><strong>versions_forges/run_precedent réellement consignés</strong><p>Promis au contrat §3, absents des 76 entrées du ledger du produit réel — + contrôle d'oracle.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — 0/76 entrées sur ASD malgré 2 versions livrées</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0035" rows="1" aria-label="Commentaire TF-0035" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -841,12 +649,7 @@
           <td class="c-id"><code>TF-0036</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">3</td>
-          <td>
-            <details><summary><strong>Archive du run pilote sous git</strong></summary>
-              <p>runs/ est gitignoré : la preuve fondatrice du README n'est qu'un dossier disque.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 1</p>
-            </details>
-          </td>
+          <td><strong>Archive du run pilote sous git</strong><p>runs/ est gitignoré : la preuve fondatrice du README n'est qu'un dossier disque.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 1</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0036" rows="1" aria-label="Commentaire TF-0036" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -854,12 +657,10 @@
           <td class="c-id"><code>TF-0049</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">3</td>
-          <td>
-            <details><summary><strong>TODO-FORGE : l'écriture directe contourne l'écrivain unique — la détecter par oracle</strong></summary>
+          <td><details><summary><strong>TODO-FORGE : l'écriture directe contourne l'écrivain unique — la détecter par oracle</strong></summary>
               <p>Constaté le 08/08 au soir : la session de mission seo (run-seo-produit-02-20260808) a appendé 7 créations (TF-0042..0048) directement dans todo/TODO.jsonl, sans sidecar ni événement ingestion — le circuit de remise venait d'être construit et n'était pas encore connu d'elle. Les items sont valides (candidat, ids séquentiels) mais la traçabilité d'ingestion manque. Proposition : règle d'oracle « toute création postérieure au seed dont le demandeur n'est pas le steering doit être couverte par un événement ingestion » + rappel de la remise par sidecar dans les gabarits (fait le 08/08).</p>
               <p class="meta">Demandeur : steering · 2026-08-08 · gain 3 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — 7 créations sans trace d'ingestion dans le registre réel</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0049" rows="1" aria-label="Commentaire TF-0049" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -867,12 +668,10 @@
           <td class="c-id"><code>TF-0051</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">3</td>
-          <td>
-            <details><summary><strong>Protocole de mesure du routage Sonnet/Opus</strong></summary>
+          <td><details><summary><strong>Protocole de mesure du routage Sonnet/Opus</strong></summary>
               <p>Zéro escalade et zéro donnée comparative sur ~25 affectations de modèle en 2 produits réels (RA-2 cité). Mécanisme : sur la prochaine campagne à ≥ 2 tranches comparables, A→Sonnet / B→Opus, tokens/passes/verdicts au ledger ; escalade_modele consigné systématiquement même « aucune ». Métrique : coût par tranche à qualité égale (recette verte). Protocole : 1 campagne instrumentée.</p>
               <p class="meta">Demandeur : steering · 2026-08-09 · gain 3 × preuve 1 ÷ effort 1</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0051" rows="1" aria-label="Commentaire TF-0051" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -880,12 +679,10 @@
           <td class="c-id"><code>TF-0053</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">3</td>
-          <td>
-            <details><summary><strong>CLAUDE.md steering découpé en références à la demande (mécanisme de TF-0037)</strong></summary>
+          <td><details><summary><strong>CLAUDE.md steering découpé en références à la demande (mécanisme de TF-0037)</strong></summary>
               <p>17 278 octets, ×3,8 en 5 jours (mesuré au git) ; socle de session 77 Ko. Mécanisme : noyau ≤ 6 Ko (lois, garde-fous, routage) + references/ chargées à l'étape — le pattern SKILL.md éprouvé par les forges. Métrique : octets du noyau. Protocole : wc -c + un run de non-régression. Lié à TF-0037 et TF-0007.</p>
               <p class="meta">Demandeur : steering · 2026-08-09 · gain 3 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — trajectoire CLAUDE.md 4590→17278 octets mesurée sur git</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0053" rows="1" aria-label="Commentaire TF-0053" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -893,12 +690,10 @@
           <td class="c-id"><code>TF-0090</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">3</td>
-          <td>
-            <details><summary><strong>Convention d'URLs par environnement : &lt;nom-appli&gt;-{dev|qualif|production}.&lt;domaine&gt;</strong></summary>
+          <td><details><summary><strong>Convention d'URLs par environnement : &lt;nom-appli&gt;-{dev|qualif|production}.&lt;domaine&gt;</strong></summary>
               <p>Décision humaine directe (message du 11/08) : les URLs des applications/projets/sites sont préfixées &lt;nom-appli&gt;-dev/qualif/production.&lt;domaine&gt; — ex. https://produit-02-production.up.railway.app. Encodage : R-24 au REGLES-PROJET §E (le staging outillé de l'étape MEP se nomme qualif dans les URLs ; local et hôtes non applicatifs hors périmètre) ; oracle-conformite-projet R-24 exécutable sur la table « URLs &amp; ports par environnement » de PARAMETRAGE.md (placeholders non jugés, findings localisants) ; gabarit PARAMETRAGE à 4 environnements (locale/dev/qualif/production) portant le motif.</p>
               <p class="meta">Demandeur : humain (message direct du 11/08) · 2026-08-11 · gain 3 × preuve 3 ÷ effort 1 · <strong>payé en réel</strong> — sans convention, chaque déploiement invente son hôte — l'environnement d'une URL devient indevinable et les checklists MEP ne peuvent pas la vérifier mécaniquement</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0090" rows="1" aria-label="Commentaire TF-0090" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -906,25 +701,40 @@
           <td class="c-id"><code>TF-0082</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">2.7</td>
-          <td>
-            <details><summary><strong>Socle documentaire produit docs\projet\ — règles R-20..R-23</strong></summary>
+          <td><details><summary><strong>Socle documentaire produit docs\projet\ — règles R-20..R-23</strong></summary>
               <p>Tout produit conserve des vues MD ancrées sur sources de vérité : TECHNOS (versions ⊆ lockfiles), COMPOSANTS-OPS (depuis ops etat/plans/DOSSIER-MEP, daté), PARAMETRAGE (parité .env.example), ACCES-TEST (comptes de DÉMO LOCALE derrière MODE_DEMO, zéro secret — R-14 inchangée), COMMANDES (exécutions canoniques). Frontmatter YAML machine-lisible ; encodage : règles socle + oracle-conformite (double sens) + gabarits.</p>
               <p class="meta">Demandeur : prompt réécrit L99 du 11/08 · 2026-08-11 · gain 4 × preuve 2 ÷ effort 3 · <strong>payé en réel</strong> — aucun produit n'a d'état des lieux standardisé ; les runs de version redécouvrent technos/config/accès à chaque ouverture</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0082" rows="1" aria-label="Commentaire TF-0082" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0084" aria-label="Décider TF-0084" disabled></td>
+          <td class="c-id"><code>TF-0084</code></td>
+          <td><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score">2</td>
+          <td><details><summary><strong>Trois propositions organization en attente de décision pilot (circuit D-13)</strong></summary>
+              <p>arbitrages d'exécution consignés : D-06 précision adoptée au corpus (périmètre R-2 précisé) ; D-02 emplacement déjà tranché par R-7 existante (Old du même dossier) + graphie Old (D-02), migration terrain au prochain run de version de chaque projet ; D-04 encodé en règle nouvelle (types au registre d'organization, lecture seule)</p>
+              <p class="meta">Demandeur : TF-0039 (traçabilité du circuit D-13) · 2026-08-11 · gain 2 × preuve 3 ÷ effort 1 · <strong>payé en réel</strong> — REGLES-PROJET §G : trois lignes de la matrice portent « en attente de décision pilot » — tant qu'elles y restent, la règle du corpus et la doctrine d'organization peuvent diverger sans que personne ne le voie</p>
+            </details></td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0084" rows="1" aria-label="Commentaire TF-0084" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0089" aria-label="Décider TF-0089" disabled></td>
+          <td class="c-id"><code>TF-0089</code></td>
+          <td><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score">2</td>
+          <td><details><summary><strong>TODO.html : 49 constats de lisibilité à la recette (générateur à réviser)</strong></summary>
+              <p>La recette complète du 11/08 (check_html patché A1) relève 49 FAIL de lisibilité sur la page du registre — AUCUN A1 (la page est autonome) : L3 badges de compteur sans légende (×12) et colonne « score » triée sans formule publiée (×12), L9 dépliants sous 200 caractères à afficher en place (×23), L11 littéral « <code>None</code> » rendu tel quel (×1), L12 énumération en prose (×1). Producteur : todo/generer-page.mjs — corriger le générateur, jamais la page (D-11). Proposition : title/aria-label sur les badges, note de calcul du score référencée par aria-describedby, seuil d'inlining des details courts, valeur absente rendue « — », liste à puces pour l'énumération.</p>
+              <p class="meta">Demandeur : recette anti-régression TF-0085 (11/08) · 2026-08-11 · gain 2 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — la page vitrine du registre viole 4 règles de lisibilité que la forge impose à tous les livrables — se conformer à sa propre doctrine (précédent D-05 : organization)</p>
+            </details></td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0089" rows="1" aria-label="Commentaire TF-0089" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0037" aria-label="Décider TF-0037" disabled></td>
           <td class="c-id"><code>TF-0037</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">1.5</td>
-          <td>
-            <details><summary><strong>Plafond de taille CLAUDE.md + alerte</strong></summary>
-              <p>×3,4 en 4 jours sans borne — un CLAUDE.md obèse se lit mal en session.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 2</p>
-            </details>
-          </td>
+          <td><strong>Plafond de taille CLAUDE.md + alerte</strong><p>×3,4 en 4 jours sans borne — un CLAUDE.md obèse se lit mal en session.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 2</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0037" rows="1" aria-label="Commentaire TF-0037" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -932,12 +742,7 @@
           <td class="c-id"><code>TF-0038</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">1.3</td>
-          <td>
-            <details><summary><strong>Exercer une vraie reprise de run interrompu</strong></summary>
-              <p>La reprise idempotente est promise au contrat et n'a jamais été testée.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 3</p>
-            </details>
-          </td>
+          <td><strong>Exercer une vraie reprise de run interrompu</strong><p>La reprise idempotente est promise au contrat et n'a jamais été testée.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 3</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0038" rows="1" aria-label="Commentaire TF-0038" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -945,12 +750,7 @@
           <td class="c-id"><code>TF-0039</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">1</td>
-          <td>
-            <details><summary><strong>Circuit organization→steering opérationnel</strong></summary>
-              <p>Chaque proposition D-xx passe le circuit décision→REGLES-PROJET→oracle (aboutissement de Q-B). Dépend de TF-0031/TF-0034.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 3</p>
-            </details>
-          </td>
+          <td><strong>Circuit organization→steering opérationnel</strong><p>Chaque proposition D-xx passe le circuit décision→REGLES-PROJET→oracle (aboutissement de Q-B). Dépend de TF-0031/TF-0034.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 3</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0039" rows="1" aria-label="Commentaire TF-0039" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -958,33 +758,29 @@
           <td class="c-id"><code>TF-0054</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">1</td>
-          <td>
-            <details><summary><strong>Baseline d'audit packagée par forge</strong></summary>
+          <td><details><summary><strong>Baseline d'audit packagée par forge</strong></summary>
               <p>À la revue du 08/08, 8 agents d'audit ont chacun relu ~32 Ko de baseline commune (INVENTAIRE + BOUCLE). Mécanisme : après chaque audit, la fiche par forge est stockée (output/fiches/&lt;forge&gt;.md) ; l'audit suivant reçoit LA fiche seule. Métrique : tokens par agent d'audit (baseline actuelle 53-100 k). Protocole : prochaine revue comparée.</p>
               <p class="meta">Demandeur : steering · 2026-08-09 · gain 2 × preuve 1 ÷ effort 2</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0054" rows="1" aria-label="Commentaire TF-0054" placeholder="commentaire…"></textarea></td>
         </tr>
         </tbody>
       </table></div>
     </section>
     <section>
-      <h2 id="seo">seo <span class="badge">17</span></h2>
+      <h2 id="seo">seo <span class="badge" title="17 item(s) actifs ciblant seo">17</span></h2>
       <div class="scroll"><table data-filterable>
-        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0074" aria-label="Décider TF-0074"></td>
           <td class="c-id"><code>TF-0074</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>etat.json : etape_courante et statuts d'étapes ne sont mis à jour par aucun script de la forge seo</strong></summary>
+          <td><details><summary><strong>etat.json : etape_courante et statuts d'étapes ne sont mis à jour par aucun script de la forge seo</strong></summary>
               <p>C'est ce que faisait etat-maj.py chez la mission (non rapatrié par TF-0030 car partiellement couvert par livrables.py). Un --etape sur livrables.py fermerait le trou proprement.</p>
               <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 2 × preuve 1 ÷ effort 1 · <strong>payé en réel</strong> — trou constaté au rapatriement des moteurs (TF-0030)</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0074" rows="1" aria-label="Commentaire TF-0074" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -992,12 +788,10 @@
           <td class="c-id"><code>TF-0072</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">1.5</td>
-          <td>
-            <details><summary><strong>forge-seo : l'empreinte de grille dépend des fins de ligne — un clone Linux déclarerait toutes les études périmées</strong></summary>
+          <td><details><summary><strong>forge-seo : l'empreinte de grille dépend des fins de ligne — un clone Linux déclarerait toutes les études périmées</strong></summary>
               <p>version_grille() hache les octets bruts ; la grille est stockée LF, lue CRLF sur Windows. L'empreinte figée dans la mission réelle (3d0af44aae9a) est celle du poste Windows. Normaliser le hachage exige une migration déclarée au registre correspondances-grille (TF-0048) — jamais un changement silencieux.</p>
               <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 3 × preuve 1 ÷ effort 2 · <strong>payé en réel</strong> — portabilité cassée par construction, constatée à l'implémentation de TF-0048</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0072" rows="1" aria-label="Commentaire TF-0072" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1005,12 +799,10 @@
           <td class="c-id"><code>TF-0073</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">1</td>
-          <td>
-            <details><summary><strong>Rapatrier la production du CSV d'actions scoré (livrables-gen.py de la mission) — complément de TF-0056</strong></summary>
+          <td><details><summary><strong>Rapatrier la production du CSV d'actions scoré (livrables-gen.py de la mission) — complément de TF-0056</strong></summary>
               <p>livrables-gen.py (mission, 488 l.) porte la partie généralisable du calcul (gain × confiance) / effort et l'écriture du CSV d'actions. La forge contrôle désormais ce CSV (TF-0056) sans savoir le produire rempli. Même séparation que TF-0030 : la mécanique à la forge, la matière chez la mission.</p>
               <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 2 × preuve 1 ÷ effort 2 · <strong>payé en réel</strong> — le BOM du CSV réel trahit déjà un producteur hors forge</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0073" rows="1" aria-label="Commentaire TF-0073" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1018,12 +810,10 @@
           <td class="c-id"><code>TF-0042</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">10</td>
-          <td>
-            <details><summary><strong>livrables.py : dette() écrit noeud_id en chaîne, le schéma exige un entier</strong></summary>
+          <td><details><summary><strong>livrables.py : dette() écrit noeud_id en chaîne, le schéma exige un entier</strong></summary>
               <p>scripts/livrables.py ligne 102 reprend n[&quot;id&quot;] tel que lu par front_matter(), donc une chaîne, là où snapshot.schema.json impose un integer. La fonction noeuds_snapshot() évite le même piège ligne 75 par un int(n[&quot;id&quot;]) explicite, commentaire à l'appui — la correction n'a pas été reportée à dette(). Conséquence : le snapshot est jugé non conforme et RIEN n'est écrit, donc toute étude comportant au moins un nœud hors périmètre est bloquée. C'est-à-dire toute étude réelle. Correctif : int(n[&quot;id&quot;]) ligne 102.</p>
               <p class="meta">Demandeur : run-seo-produit-02-20260808 · 2026-08-08 · gain 5 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — Pipeline officiel bloqué sur la mission livrée : 11 écarts au schéma, aucun livrable écrit. Contourné à la main pour produire le rapport.</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0042" rows="1" aria-label="Commentaire TF-0042" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1031,12 +821,10 @@
           <td class="c-id"><code>TF-0043</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">8</td>
-          <td>
-            <details><summary><strong>crawler.py ne lit pas sitemap.xml : l'inventaire du site est celui du graphe de liens</strong></summary>
+          <td><details><summary><strong>crawler.py ne lit pas sitemap.xml : l'inventaire du site est celui du graphe de liens</strong></summary>
               <p>scripts/crawler.py lit robots.txt uniquement pour les permissions (rp.can_fetch) et n'en exploite jamais la directive Sitemap. L'ensemble connus[] n'est alimenté que par les liens suivis. urls_decouvertes ne mesure donc pas les URLs du site mais les URLs atteignables en navigant. Sur la mission : 79 annoncées, 286 déclarées au sitemap. Correctif : une requête sur sitemap.xml, amorcer connus[] avec ses URLs.</p>
               <p class="meta">Demandeur : run-seo-produit-02-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — Sur produit-02.fr le crawler annonce 79 URLs découvertes ; le sitemap en déclare 286, soit 73 % du site absent de l'inventaire.</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0043" rows="1" aria-label="Commentaire TF-0043" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1044,12 +832,10 @@
           <td class="c-id"><code>TF-0044</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">8</td>
-          <td>
-            <details><summary><strong>crawler.py : la métrique pages_orphelines ne peut structurellement pas être non nulle</strong></summary>
+          <td><details><summary><strong>crawler.py : la métrique pages_orphelines ne peut structurellement pas être non nulle</strong></summary>
               <p>scripts/crawler.py ligne 231 : orphelines = pages du crawl avec _entrants_tous == 0 et profondeur_clic &gt; 0. Or une page n'entre dans l'ensemble crawlé que parce qu'un lien y menait : la condition est insatisfiable. Le contrôle ne peut pas échouer, donc il ne prouve rien, et il affiche un zéro rassurant. Sur la mission, le rapport annonce « pages orphelines : 0 » là où 208 pages sur 286 ne reçoivent aucun lien entrant. Correctif : définir l'orpheline comme URL DÉCLARÉE (sitemap) sans lien entrant après crawl — ce qui suppose l'item sitemap ci-dessus.</p>
               <p class="meta">Demandeur : run-seo-produit-02-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — « pages orphelines : 0 » affiché sur un site à 208 orphelines, découvertes seulement en confrontant sitemap et graphe de liens hors outil.</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0044" rows="1" aria-label="Commentaire TF-0044" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1057,12 +843,10 @@
           <td class="c-id"><code>TF-0045</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">6</td>
-          <td>
-            <details><summary><strong>rapport_html.py lit actions-*.csv sans dialecte : un CSV en points-virgules sort en n/d</strong></summary>
-              <p>csv.DictReader(f) est appelé sans argument delimiter, donc en virgule. Un CSV point-virgule — séparateur par défaut d'Excel en locale française — est lu comme un champ unique par ligne : toutes les colonnes tombent à None et le rapport imprime « n/d » sur l'intégralité du tableau d'actions, sans le moindre avertissement. Correctif : csv.Sniffer, ou refus explicite si l'en-tête attendu n'est pas reconnu.</p>
+          <td><details><summary><strong>rapport_html.py lit actions-*.csv sans dialecte : un CSV en points-virgules sort en n/d</strong></summary>
+              <p>csv.DictReader(f) est appelé sans argument delimiter, donc en virgule. Un CSV point-virgule — séparateur par défaut d'Excel en locale française — est lu comme un champ unique par ligne : toutes les colonnes tombent à <code>None</code> et le rapport imprime « n/d » sur l'intégralité du tableau d'actions, sans le moindre avertissement. Correctif : csv.Sniffer, ou refus explicite si l'en-tête attendu n'est pas reconnu.</p>
               <p class="meta">Demandeur : run-seo-produit-02-20260808 · 2026-08-08 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — 10 actions sorties intégralement en « n/d » dans une version du rapport, qui se présentait par ailleurs comme complète.</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0045" rows="1" aria-label="Commentaire TF-0045" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1070,12 +854,10 @@
           <td class="c-id"><code>TF-0056</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">6</td>
-          <td>
-            <details><summary><strong>validate.py ne contrôle aucune cohérence référentielle entre actions-*.csv et la grille</strong></summary>
+          <td><details><summary><strong>validate.py ne contrôle aucune cohérence référentielle entre actions-*.csv et la grille</strong></summary>
               <p>Un noeuds_couverts pointant sur un id inexistant, ou d'un type incompatible avec les clés du manifeste, passe sans un mot. C'est ce qui a rendu le défaut de rattachement invisible pendant tout un run. Correctif proposé : contrôle 7 de validate.py --mission — tout id cité par noeuds_couverts existe dans le manifeste, et le taux de rattachement effectif est non nul sur un CSV non vide. Un rattachement à 0 % est un échec, pas une donnée.</p>
               <p class="meta">Demandeur : campagne-fiches-html-20260809 · 2026-08-09 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — le défaut de rattachement a traversé la génération de 8 versions du rapport sans être signalé</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0056" rows="1" aria-label="Commentaire TF-0056" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1083,12 +865,10 @@
           <td class="c-id"><code>TF-0048</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">4</td>
-          <td>
-            <details><summary><strong>Une évolution de la grille sans table de correspondance réassigne silencieusement les constats</strong></summary>
+          <td><details><summary><strong>Une évolution de la grille sans table de correspondance réassigne silencieusement les constats</strong></summary>
               <p>Le passage de 82 à 87 nœuds a déplacé 14 nœuds d'identifiant. Une étude ouverte sur l'ancienne grille et reprise par id écrit chaque constat dans le mauvais nœud, sans aucune alerte : validate.py contrôle la présence et le front-matter, jamais la cohérence entre le contenu et la question d'audit. Le garde-fou ajouté au rapport (refus si la couverture est incomplète) attrape les nœuds MANQUANTS, pas les nœuds mal remplis. Correctif : publier une table de correspondance versionnée entre empreintes de grille, et un mode migration qui apparie par (branche, nœud) et non par id.</p>
               <p class="meta">Demandeur : run-seo-produit-02-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — 9 fiches sur 13 reprises se sont révélées assignées au mauvais nœud — performance serveur dans Canonical, données structurées dans Performance, GA4 dans Génération De Pages. Détecté par recoupement manuel, aucun outil ne le signalait.</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0048" rows="1" aria-label="Commentaire TF-0048" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1096,12 +876,10 @@
           <td class="c-id"><code>TF-0055</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">4</td>
-          <td>
-            <details><summary><strong>front_matter() rend des chaînes : aucune action n'était rattachée à son nœud, en silence</strong></summary>
+          <td><details><summary><strong>front_matter() rend des chaînes : aucune action n'était rattachée à son nœud, en silence</strong></summary>
               <p>collecter() fait {**n, **fm} : fm['id'] (chaîne) écrase l'entier du manifeste. noeuds_couverts étant lu en entiers, le rattachement action → nœud renvoyait systématiquement une liste vide. Rien n'échouait : le rapport se générait, complet et faux — « Nœuds couverts : — » sur les 10 actions, branche « — » donc regroupement par branche sans objet, et le blocage principal retombant sur l'ordre de la grille, c'est-à-dire le défaut que TF-0047 corrige. Corrigé au point d'appel (int(n['id'])), mais c'est la TROISIÈME occurrence de la famille (TF-0042 dans dette(), un int() défensif déjà présent dans noeuds_snapshot()). Correctif de fond : typer front_matter() depuis le manifeste — id entier, booléens, listes — au lieu d'exiger un int() de chaque consommateur.</p>
               <p class="meta">Demandeur : campagne-fiches-html-20260809 · 2026-08-09 · gain 4 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — 0 action sur 10 rattachée à un nœud sur la mission livrée ; détecté en relisant le rendu, aucun contrôle ne le signalait</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0055" rows="1" aria-label="Commentaire TF-0055" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1109,12 +887,7 @@
           <td class="c-id"><code>TF-0028</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">3</td>
-          <td>
-            <details><summary><strong>validate --mission contrôle schema_version</strong></summary>
-              <p>Dérive 1.0.0/1.1.0 réelle sur la mission Produit-02, invisible machine (le contrôle 4 vérifie autre chose).</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Observée sur la mission réelle livrée</p>
-            </details>
-          </td>
+          <td><strong>validate --mission contrôle schema_version</strong><p>Dérive 1.0.0/1.1.0 réelle sur la mission Produit-02, invisible machine (le contrôle 4 vérifie autre chose).</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Observée sur la mission réelle livrée</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0028" rows="1" aria-label="Commentaire TF-0028" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1122,12 +895,10 @@
           <td class="c-id"><code>TF-0046</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">3</td>
-          <td>
-            <details><summary><strong>rapport_html.py échappe le markdown des fiches au lieu de le rendre</strong></summary>
+          <td><details><summary><strong>rapport_html.py échappe le markdown des fiches au lieu de le rendre</strong></summary>
               <p>Le corps des fiches est inséré via esc() sans conversion. Or les fiches sont des fichiers .md et le référentiel lui-même y met du markdown (les en-têtes générés contiennent du gras dans critere_verdict). Les tableaux de preuve sortent en soupe de barres verticales, le gras en astérisques. Deux issues : convertir un sous-ensemble sûr (gras, code, tableaux), ou documenter que les fiches s'écrivent en prose — mais alors retirer le markdown des gabarits de la grille.</p>
               <p class="meta">Demandeur : run-seo-produit-02-20260808 · 2026-08-08 · gain 3 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Tableaux de preuve illisibles dans le rapport ; fiches réécrites en prose et convertisseur de tableaux développé côté mission pour contourner.</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0046" rows="1" aria-label="Commentaire TF-0046" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1135,12 +906,7 @@
           <td class="c-id"><code>TF-0026</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>--json sur validate.py</strong></summary>
-              <p>Seule sortie machine manquante d'une forge par ailleurs très invocable.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p>
-            </details>
-          </td>
+          <td><strong>--json sur validate.py</strong><p>Seule sortie machine manquante d'une forge par ailleurs très invocable.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0026" rows="1" aria-label="Commentaire TF-0026" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1148,12 +914,7 @@
           <td class="c-id"><code>TF-0027</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>Trancher le working tree en cours</strong></summary>
-              <p>gabarit_html.py +575/-207 non committé + 2 fichiers orphelins. À faire par SA session si vivante.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p>
-            </details>
-          </td>
+          <td><strong>Trancher le working tree en cours</strong><p>gabarit_html.py +575/-207 non committé + 2 fichiers orphelins. À faire par SA session si vivante.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0027" rows="1" aria-label="Commentaire TF-0027" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1161,12 +922,10 @@
           <td class="c-id"><code>TF-0047</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>Le « blocage principal » de la synthèse est choisi par l'ordre de la grille, pas par la gravité</strong></summary>
+          <td><details><summary><strong>Le « blocage principal » de la synthèse est choisi par l'ordre de la grille, pas par la gravité</strong></summary>
               <p>bloc_synthese() prend faibles[0], soit le premier nœud non conforme dans l'ordre du manifeste, et publie son interprétation comme blocage principal du rapport. L'ordre de la grille est thématique, pas hiérarchique : le nœud 2 passe systématiquement devant des constats bien plus lourds situés plus loin. En prime, l'interprétation d'une fiche est rédigée pour son contexte et peut renvoyer à « cette fiche » ou à une action non encore présentée. Correctif : choisir sur un critère explicite — gravité, ou nœud le plus cité par les actions retenues — ou prévoir un champ dédié dans le snapshot.</p>
               <p class="meta">Demandeur : run-seo-produit-02-20260808 · 2026-08-08 · gain 2 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Sur la mission, le blocage affiché n'était pas le principal, et le texte repris renvoyait à « cette fiche » et à une action non encore introduite.</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0047" rows="1" aria-label="Commentaire TF-0047" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1174,12 +933,7 @@
           <td class="c-id"><code>TF-0029</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">1</td>
-          <td>
-            <details><summary><strong>Générateurs des 3 livrables manquants</strong></summary>
-              <p>audit.md, roadmap, dette-instrumentation : 3 des 5 livrables contractuels sans producteur.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 4</p>
-            </details>
-          </td>
+          <td><strong>Générateurs des 3 livrables manquants</strong><p>audit.md, roadmap, dette-instrumentation : 3 des 5 livrables contractuels sans producteur.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 4</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0029" rows="1" aria-label="Commentaire TF-0029" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1187,33 +941,29 @@
           <td class="c-id"><code>TF-0030</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">0.8</td>
-          <td>
-            <details><summary><strong>Généraliser les moteurs ad hoc des missions</strong></summary>
+          <td><details><summary><strong>Généraliser les moteurs ad hoc des missions</strong></summary>
               <p>fiches87.py etc. vivent chez la mission avec chemins en dur — non réutilisables.</p>
               <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 4<br>Commentaire précédent : 2026-08-09 : volet crawl SOLDÉ (crawler généralisé dans la forge) — restent les autres moteurs ad hoc (fiches87, livrables-gen…)</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0030" rows="1" aria-label="Commentaire TF-0030" placeholder="commentaire…"></textarea></td>
         </tr>
         </tbody>
       </table></div>
     </section>
     <section>
-      <h2 id="tests">tests <span class="badge">9</span></h2>
+      <h2 id="tests">tests <span class="badge" title="9 item(s) actifs ciblant tests">9</span></h2>
       <div class="scroll"><table data-filterable>
-        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0064" aria-label="Décider TF-0064"></td>
           <td class="c-id"><code>TF-0064</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">6</td>
-          <td>
-            <details><summary><strong>forge-tests : 27 erreurs ruff préexistantes dont une syntaxe invalide en Python 3.11</strong></summary>
+          <td><details><summary><strong>forge-tests : 27 erreurs ruff préexistantes dont une syntaxe invalide en Python 3.11</strong></summary>
               <p>ruff check sort 27 erreurs, aucune sur les lignes de la campagne. La plus sérieuse : adaptateurs/front.py:107, backslash dans une f-string — invalide en 3.11 alors que requires-python déclare &gt;=3.11 (le poste tourne en 3.12) : le dépôt ne s'exécute pas sur la version minimale qu'il déclare. Aussi : E501 ×3, B007.</p>
               <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — incompatibilité mesurée avec la version Python minimale déclarée</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0064" rows="1" aria-label="Commentaire TF-0064" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1221,12 +971,10 @@
           <td class="c-id"><code>TF-0003</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">4</td>
-          <td>
-            <details><summary><strong>Audit complet sur projet libre (MiniVeille)</strong></summary>
+          <td><details><summary><strong>Audit complet sur projet libre (MiniVeille)</strong></summary>
               <p>Mutation totale + cahiers + dashboard + actions[] sur un projet figé : première preuve terrain propre des livrables du 07/08.</p>
               <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Audit ASD du 07/08 déclaré dégradé (produit en travaux pendant l'audit)</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0003" rows="1" aria-label="Commentaire TF-0003" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1234,12 +982,10 @@
           <td class="c-id"><code>TF-0063</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">4</td>
-          <td>
-            <details><summary><strong>Le dashboard de forge-tests ne tient plus les règles L1-L12 du socle HTML</strong></summary>
+          <td><details><summary><strong>Le dashboard de forge-tests ne tient plus les règles L1-L12 du socle HTML</strong></summary>
               <p>check_html (registre 2.10.0) sort code 1 sur le dashboard généré : L3 colonne « sévérité » sans formule publiée ni aria-describedby, L4 six tables de 8 à 115 lignes sans data-filterable, L6 sans sommaire. C'est l'unique échec de la recette S-01 (préexistant à la campagne du 09/08). Dérive skill↔forge : le socle a gagné L1-L12, le générateur livrables/dashboard.py n'a pas suivi.</p>
               <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 4 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — S-01 NON TENU sur le dépôt depuis l'évolution du socle — la recette entière est rouge</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0063" rows="1" aria-label="Commentaire TF-0063" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1247,12 +993,10 @@
           <td class="c-id"><code>TF-0078</code></td>
           <td><span class="statut s-candidat">candidat</span></td>
           <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>Registre de dette forge-tests : poser les premières fermetures ok sur preuve (0 sur 90)</strong></summary>
+          <td><details><summary><strong>Registre de dette forge-tests : poser les premières fermetures ok sur preuve (0 sur 90)</strong></summary>
               <p>Le mécanisme existe depuis TF-0002/0004 (ok exige une preuve nommée, retiree pour les énoncés disparus). Aucune des 90 dettes n'est fermée — l'arbitrage des premières fermetures est un acte humain outillé (proposer un lot de candidats ok avec leur preuve, décision humaine).</p>
               <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 2 × preuve 1 ÷ effort 1 · <strong>payé en réel</strong> — 27 fausses résolutions historiques requalifiées retiree — le registre ne prouve encore aucune fermeture</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0078" rows="1" aria-label="Commentaire TF-0078" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1260,12 +1004,10 @@
           <td class="c-id"><code>TF-0001</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">8</td>
-          <td>
-            <details><summary><strong>RT-13 : champs manquants dérivés du pan</strong></summary>
+          <td><details><summary><strong>RT-13 : champs manquants dérivés du pan</strong></summary>
               <p>Un pan SKIP n'emprunte plus FORGE_TESTS_QUALIF_URL au domaine acces : chaque adaptateur publie son CHAMPS_REQUIS propre.</p>
               <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — 16 actions manuelle_utilisateur fausses au rapport ASD du 07/08</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0001" rows="1" aria-label="Commentaire TF-0001" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1273,12 +1015,7 @@
           <td class="c-id"><code>TF-0002</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">3</td>
-          <td>
-            <details><summary><strong>Contrôle sync registre-dette ↔ code en recette</strong></summary>
-              <p>dette.regenerer en mode vérification, exit 1 si divergence entre le registre committé et le code.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 1</p>
-            </details>
-          </td>
+          <td><strong>Contrôle sync registre-dette ↔ code en recette</strong><p>dette.regenerer en mode vérification, exit 1 si divergence entre le registre committé et le code.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 1</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0002" rows="1" aria-label="Commentaire TF-0002" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1286,12 +1023,10 @@
           <td class="c-id"><code>TF-0004</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">2</td>
-          <td>
-            <details><summary><strong>Sémantique du registre de dette</strong></summary>
+          <td><details><summary><strong>Sémantique du registre de dette</strong></summary>
               <p>Identifiant stable découplé de l'énoncé ; statut ok exigeant une preuve (test/recette). Aujourd'hui : resolue = énoncé disparu, 0 vraie fermeture sur 89.</p>
               <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 2 · <strong>payé en réel</strong> — Indicateur « 27 résolues » publié à l'inventaire steering sur une base non vérifiée</p>
-            </details>
-          </td>
+            </details></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0004" rows="1" aria-label="Commentaire TF-0004" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1299,12 +1034,7 @@
           <td class="c-id"><code>TF-0005</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">0.7</td>
-          <td>
-            <details><summary><strong>Sélecteur de recette --section</strong></summary>
-              <p>La recette monolithique coûte 3 min 22 à chaque itération, même pour un correctif d'une ligne.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 3 · <strong>payé en réel</strong> — Coût mesuré à chaque itération de campagne</p>
-            </details>
-          </td>
+          <td><strong>Sélecteur de recette --section</strong><p>La recette monolithique coûte 3 min 22 à chaque itération, même pour un correctif d'une ligne.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 3 · <strong>payé en réel</strong> — Coût mesuré à chaque itération de campagne</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0005" rows="1" aria-label="Commentaire TF-0005" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
@@ -1312,12 +1042,7 @@
           <td class="c-id"><code>TF-0006</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
           <td class="c-score">0.6</td>
-          <td>
-            <details><summary><strong>Suite unitaire propre de forge-tests</strong></summary>
-              <p>Dette assumée déclarée au README depuis l'origine ; la recette est le seul filet.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 5</p>
-            </details>
-          </td>
+          <td><strong>Suite unitaire propre de forge-tests</strong><p>Dette assumée déclarée au README depuis l'origine ; la recette est le seul filet.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 5</p></td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0006" rows="1" aria-label="Commentaire TF-0006" placeholder="commentaire…"></textarea></td>
         </tr>
         </tbody>
@@ -1329,7 +1054,7 @@
   <script>
   (function () {
     "use strict";
-    var SCEAU = "2cc64d7cc1cb";
+    var SCEAU = "392822a9a48b";
     var cle = function (id, type) { return "todo-forge:" + SCEAU + ":" + id + ":" + type; };
     var coches = document.querySelectorAll("input.decider");
     var comms = document.querySelectorAll("textarea.commentaire");

@@ -22,8 +22,18 @@ commit initial — commits locaux à chaque étape, **remote/push sur GO humain 
 Créer aussi `forge\retours\` avec une copie de `gabarits\RETOURS-FORGES.md` (le canal de
 retours du produit — règle 18).
 
+**Socle documentaire `docs\projet\` (R-20, TF-0086 — la création appartient à l'ouverture)** :
+copier les **6 gabarits** de `gabarits\docs-projet\` (TECHNOS, COMPOSANTS-OPS, PARAMETRAGE,
+ACCES-TEST, COMMANDES, FONCTIONNEL), renseigner chaque frontmatter (`role`,
+`sources_de_verite`, `verifie_le`) et ce qui est déjà connaissable. Chaque étape actualise
+ensuite SES fichiers : conception → FONCTIONNEL (vue d'`EXIGENCES.json`) · design/development
+→ TECHNOS (ancré lockfiles, R-21) et COMMANDES · MEP → COMPOSANTS-OPS, PARAMETRAGE (URLs
+d'environnement au motif R-24) et ACCES-TEST. Produit importé : rattrapage explicite à
+l'ouverture (socle créé depuis l'état constaté, `.env.example` reconstruit avant R-22).
+
 **Valider** : `node <pilot>\oracles\oracle-conformite-projet.mjs <projet>` → PASS exigé avant
-l'étape 2 ; rejouer l'oracle avant `run_close`. Nommage : tout livrable copié dans
+l'étape 2 ; rejouer l'oracle avant `run_close` — **un FAIL R-20 (socle incomplet) bloque la
+clôture** (TF-0086 : un run s'était clos à 1 fichier sur 5 sans signal). Nommage : tout livrable copié dans
 `output\`/`docs\` porte `<Projet> - <Objet> - AAAAMMJJ<indice>` — **le nom du projet prime
 sur l'émetteur** (Q3-bis, décision humaine du 09/08) ; un livrable remplacé migre dans `Old\`
 (jamais versionné) ; le code, lui, n'est jamais daté — git est son seul magasin.
