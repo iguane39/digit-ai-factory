@@ -49,7 +49,7 @@
   <div class="wrap">
     <header>
       <h1>TODO-FORGE — registre d'amélioration</h1>
-      <p class="meta">81 actifs (candidat 27 · décidé 0 · en cours 2 · corrigé 52 · écarté 0) · 0 archivés · sceau source <code>5930f74898fe</code> · dernier événement 2026-08-11T07:54:10Z</p>
+      <p class="meta">82 actifs (candidat 27 · décidé 0 · en cours 2 · corrigé 53 · écarté 0) · 0 archivés · sceau source <code>35f787aacafd</code> · dernier événement 2026-08-11T08:26:29Z</p>
       <p>Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au pilot — il sera appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
     </header>
     <div class="barre">
@@ -668,7 +668,7 @@
       </table></div>
     </section>
     <section>
-      <h2 id="pilot">pilot <span class="badge">12</span></h2>
+      <h2 id="pilot">pilot <span class="badge">13</span></h2>
       <div class="scroll"><table data-filterable>
         <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
@@ -788,6 +788,19 @@
             </details>
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0053" rows="1" aria-label="Commentaire TF-0053" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0082" aria-label="Décider TF-0082" disabled></td>
+          <td class="c-id"><code>TF-0082</code></td>
+          <td><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score">2.7</td>
+          <td>
+            <details><summary><strong>Socle documentaire produit docs\projet\ — règles R-20..R-23</strong></summary>
+              <p>Tout produit conserve des vues MD ancrées sur sources de vérité : TECHNOS (versions ⊆ lockfiles), COMPOSANTS-OPS (depuis ops etat/plans/DOSSIER-MEP, daté), PARAMETRAGE (parité .env.example), ACCES-TEST (comptes de DÉMO LOCALE derrière MODE_DEMO, zéro secret — R-14 inchangée), COMMANDES (exécutions canoniques). Frontmatter YAML machine-lisible ; encodage : règles socle + oracle-conformite (double sens) + gabarits.</p>
+              <p class="meta">Demandeur : prompt réécrit L99 du 11/08 · 2026-08-11 · gain 4 × preuve 2 ÷ effort 3 · <strong>payé en réel</strong> — aucun produit n'a d'état des lieux standardisé ; les runs de version redécouvrent technos/config/accès à chaque ouverture</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0082" rows="1" aria-label="Commentaire TF-0082" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0037" aria-label="Décider TF-0037" disabled></td>
@@ -1212,7 +1225,7 @@
   <script>
   (function () {
     "use strict";
-    var SCEAU = "5930f74898fe";
+    var SCEAU = "35f787aacafd";
     var cle = function (id, type) { return "todo-forge:" + SCEAU + ":" + id + ":" + type; };
     var coches = document.querySelectorAll("input.decider");
     var comms = document.querySelectorAll("textarea.commentaire");

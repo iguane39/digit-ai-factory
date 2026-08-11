@@ -11,8 +11,8 @@ dossier, coller le bloc rempli.
 Nouveau produit via la forge Digit-AI. Le run vit ICI, dans ce projet.
 
 Phase 0 — outillage (ne suppose RIEN d'installé, quel que soit mon système) :
-1. Vérifie les prérequis : git ; gh AUTHENTIFIÉ (les dépôts de la forge sont privés sous
-   github.com/iguane39 — sans accès à ce compte, arrête-toi et dis-moi quoi demander) ;
+1. Vérifie les prérequis : git ; gh (les forges sont publiques sous github.com/iguane39
+   depuis le 10/08 — gh authentifié n'est requis que pour les dépôts d'engagement privés) ;
    node ≥ 18 ; uv ; python. S'il en manque, liste-les avec la commande d'installation
    adaptée à mon système, puis attends que je confirme.
 2. Localise la forge : $FORGE_ROOT s'il est défini, sinon cherche un dossier contenant

@@ -48,6 +48,22 @@ projet (2e mandat) · **G** = gate humain.
 | 11 | Chaque produit naît avec un `CLAUDE.md` d'après `gabarits\CLAUDE-PRODUIT.md`, **section « Routage forge » remplie** (verdict tests → forge_tests, évolution → run de version, déploiement → MEP ; boucle intérieure libre) — étendue le 06/08 : sans routage, les sessions ad hoc contournent les forges (constaté sur le correctif v0.2.0) | observée 11 projets maison ; absente du produit forge réel | produits, nouveaux + rattrapage | P0+O | faible | **défaut** |
 | 12 | Chaque produit naît avec un `README.md` minimal : une phrase de quoi, 2 commandes de démarrage, lien CLAUDE.md | observée 8/11 ; absente d'ASDMailManager2 | produits, nouveaux + rattrapage | P0+O | faible | **défaut** |
 
+### D bis. Socle documentaire `docs\projet\` (R-20..R-23 — décision humaine du 11/08, TF-0082)
+
+**Principe directeur** : les fichiers de `docs\projet\` sont des **vues pour humains et agents** —
+chacun **déclare sa source de vérité** (frontmatter YAML : `role`, `sources_de_verite`,
+`verifie_le`) et ne la duplique jamais ; toute valeur volatile est datée ; **aucun secret,
+jamais** (R-14 inchangée — dépôts au régime public). Déclencheurs de mise à jour : chaque étape
+de run actualise ses fichiers (design/development → TECHNOS, MEP → COMPOSANTS-OPS…), vérification
+à la clôture et à l'ouverture des runs de version (rattrapage : mécanisme existant).
+
+| n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
+|---|---|---|---|---|---|---|
+| 20 | `docs\projet\` complet : `TECHNOS.md` (technologies + versions + liens, ancrées lockfiles), `COMPOSANTS-OPS.md` (hiérarchie/noms/types/IDs/URLs/IPs des composants déployés — depuis `ops etat`/plans/DOSSIER-MEP, instanciations datées, placeholders si dépôt public), `PARAMETRAGE.md` (signification des variables, URLs/ports par environnement — staging/prod en placeholders), `ACCES-TEST.md` (profils + comptes de démo locale), `COMMANDES.md` (install, dev, test, build, deploy staging, rollback, seed démo — blocs exécutables) ; chaque fichier ouvre par un frontmatter YAML (`role`, `sources_de_verite`, `verifie_le`). Noms **fixes** — documents vivants exemptés du nommage daté R-4 (ce ne sont pas des livrables). Autres fichiers admis seulement s'ils servent l'automatisation ou l'onboarding ET n'existent pas déjà sous forme machine (sinon renvoi) | manque constaté : les runs de version redécouvrent tout | produits, nouveaux + rattrapage | P0+O | faible | **défaut** |
+| 21 | Fraîcheur TECHNOS : chaque `nom@version` du frontmatter `versions:` de `TECHNOS.md` correspond aux lockfiles/manifestes du produit (`package-lock.json`, `pyproject.toml`…) — une version divergente = FAIL | loi 4 : une donnée volatile est une donnée | produits | O | nul | **défaut** |
+| 22 | Parité PARAMETRAGE ↔ `.env.example` : les noms de variables déclarés dans le frontmatter `variables:` de `PARAMETRAGE.md` et ceux de `.env.example` (R-13, qui reste la liste qui fait foi) sont identiques | double vérité interdite | produits | O | nul | **défaut** |
+| 23 | `ACCES-TEST.md` : en-tête dur littéral « comptes de démonstration locale — jamais valides hors MODE_DEMO » présent, comptes créés par seed derrière drapeau `MODE_DEMO` (loi 2), **zéro motif de secret réel** (motifs d'oracle-secrets) ; tout accès d'environnement réel = référence `# à fournir :` (R-15 → non_testables) | R-14 + loi 2 + régime public | produits | O | nul | **défaut** |
+
 ## E. Environnements et configuration
 
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |

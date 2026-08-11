@@ -81,8 +81,8 @@ uniquement sur GO humain**, donné sur un dossier de preuve généré (DOSSIER-M
 | `INVENTAIRE.md` | état réel des forges (points d'entrée, oracles, manques) |
 | `CONTRAT-INTERFACE.md` | format d'invocation, ledger, routage par modèle, dette d'intégration |
 | `ETAPE-MEP.md` | la 5e étape : staging outillé par **forge-ops** (O-1…O-4), oracle MEP, gate GO production |
-| `REGLES-PROJET.md` | les 17 règles de socle projet (décidées le 06/08) |
-| `oracles\` | `oracle-conformite-projet.mjs` (17 règles) · `oracle-claude-md.mjs` (noyau ≤ 6 Ko) · `oracle-ecosysteme.mjs` (exhaustivité forges × surfaces) — chacun avec self-test double sens |
+| `REGLES-PROJET.md` | les 23 règles de socle projet (R-1..R-19 des 06-10/08, R-20..R-23 socle documentaire du 11/08) |
+| `oracles\` | `oracle-conformite-projet.mjs` (23 règles) · `oracle-claude-md.mjs` (noyau ≤ 6 Ko) · `oracle-ecosysteme.mjs` (exhaustivité forges × surfaces) — chacun avec self-test double sens |
 | `gabarits\` | gabarits du CLAUDE.md produit (routage forge obligatoire) et des lots de retours |
 | `todo\` | **TODO-FORGE** : registre structuré des améliorations (JSONL source + vue générée + oracle + archive) |
 | `BOUCLE-AMELIORATION.md` | amélioration des forges (bornée, gated humain) + backlog de retours |
