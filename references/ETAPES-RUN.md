@@ -22,13 +22,18 @@ commit initial — commits locaux à chaque étape, **remote/push sur GO humain 
 Créer aussi `forge\retours\` avec une copie de `gabarits\RETOURS-FORGES.md` (le canal de
 retours du produit — règle 18).
 
-**Socle documentaire `docs\projet\` (R-20, TF-0086 — la création appartient à l'ouverture)** :
-copier les **6 gabarits** de `gabarits\docs-projet\` (TECHNOS, COMPOSANTS-OPS, PARAMETRAGE,
-ACCES-TEST, COMMANDES, FONCTIONNEL), renseigner chaque frontmatter (`role`,
-`sources_de_verite`, `verifie_le`) et ce qui est déjà connaissable. Chaque étape actualise
-ensuite SES fichiers : conception → FONCTIONNEL (vue d'`EXIGENCES.json`) · design/development
-→ TECHNOS (ancré lockfiles, R-21) et COMMANDES · MEP → COMPOSANTS-OPS, PARAMETRAGE (URLs
-d'environnement au motif R-24) et ACCES-TEST. Produit importé : rattrapage explicite à
+**Socle documentaire `docs\projet\` (R-20, TF-0086/TF-0091 — la création appartient à
+l'ouverture)** : copier les **8 gabarits** de `gabarits\docs-projet\` (TECHNOS,
+COMPOSANTS-OPS, PARAMETRAGE, ACCES-TEST, COMMANDES, FONCTIONNEL, ARCHITECTURE,
+MODELE-DONNEES), renseigner chaque frontmatter (`role`, `sources_de_verite`, `verifie_le`)
+et ce qui est déjà connaissable, puis générer les 2 projections :
+`node <pilot>\scripts\generer-architecture.mjs docs\projet\ARCHITECTURE.md` et
+`node <pilot>\scripts\generer-modele-donnees.mjs docs\projet\MODELE-DONNEES.md` (vues
+JAMAIS éditées à la main — R-20 exige leur présence). Chaque étape actualise ensuite SES
+fichiers : conception → FONCTIONNEL (vue d'`EXIGENCES.json`) · design/development → TECHNOS
+(ancré lockfiles, R-21), ARCHITECTURE et COMMANDES · development → MODELE-DONNEES **depuis
+le schéma réel** (provenance par table, R-26) · MEP → COMPOSANTS-OPS, PARAMETRAGE (URLs au
+motif R-24) et ACCES-TEST — toute édition d'une source régénère sa vue. Produit importé : rattrapage explicite à
 l'ouverture (socle créé depuis l'état constaté, `.env.example` reconstruit avant R-22).
 
 **Valider** : `node <pilot>\oracles\oracle-conformite-projet.mjs <projet>` → PASS exigé avant
