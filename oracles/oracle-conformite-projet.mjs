@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 /**
  * oracle-conformite-projet.mjs — vérifie qu'un projet produit respecte REGLES-PROJET.md
- * (25 règles — R-1..R-19 du 06-10/08, R-20..R-23 socle documentaire du 11/08 TF-0082,
- * R-24 URLs d'environnement du 11/08 TF-0090, R-25 types au registre du 11/08 TF-0084).
- * Node pur, zéro dépendance, lecture seule (le registre des types d'organization est LU,
- * jamais écrit).
+ * (26 règles — R-1..R-19 du 06-10/08, R-20..R-23 socle documentaire du 11/08 TF-0082,
+ * R-24 URLs d'environnement du 11/08 TF-0090, R-25 types au registre du 11/08 TF-0084,
+ * R-26 modèle de données ancré au schéma réel du 11/08 TF-0091 — socle à 8 fichiers
+ * + projections HTML générées). Node pur, zéro dépendance, lecture seule (le registre
+ * des types d'organization est LU, jamais écrit).
  *
  * Usage : node oracle-conformite-projet.mjs <racine-du-projet>
  * Sortie : JSON sur stdout — { oracle, version, cible, verdict, findings[], non_juge[] }
@@ -217,7 +218,8 @@ else {
 
 // ---- D bis · Socle documentaire docs\projet\ (R-20..R-23 — TF-0082, 11/08) ----
 const dp = p("docs", "projet");
-const FICHIERS_DP = ["TECHNOS.md", "COMPOSANTS-OPS.md", "PARAMETRAGE.md", "ACCES-TEST.md", "COMMANDES.md", "FONCTIONNEL.md"]; // FONCTIONNEL : TF-0087 (la vue métier manquait — tout était technique)
+const FICHIERS_DP = ["TECHNOS.md", "COMPOSANTS-OPS.md", "PARAMETRAGE.md", "ACCES-TEST.md", "COMMANDES.md", "FONCTIONNEL.md", "ARCHITECTURE.md", "MODELE-DONNEES.md"]; // FONCTIONNEL : TF-0087 · ARCHITECTURE + MODELE-DONNEES : TF-0091 (sources MD des vues générées)
+const PROJECTIONS_DP = ["ARCHITECTURE.html", "MODELE-DONNEES.html"]; // vues générées, jamais saisies (scripts du pilot)
 const frontmatter = (texte) => { const m = texte.match(/^---\r?\n([\s\S]*?)\r?\n---/); return m ? m[1] : null; };
 if (!existsSync(dp)) ko("R-20", "docs\\projet\\", "dossier absent — socle documentaire du produit (TECHNOS, COMPOSANTS-OPS, PARAMETRAGE, ACCES-TEST, COMMANDES)");
 else {
@@ -230,7 +232,10 @@ else {
       ko("R-20", `docs\\projet\\${f}`, "frontmatter YAML incomplet — role, sources_de_verite et verifie_le requis (contrat machine)"); ok20 = false;
     }
   }
-  if (ok20) ok("R-20", "docs\\projet\\", "5 fichiers présents, frontmatter machine complet");
+  for (const f of PROJECTIONS_DP) {
+    if (!existsSync(join(dp, f))) { ko("R-20", `docs\\projet\\${f}`, "projection générée manquante — régénérer via les scripts du pilot (generer-architecture / generer-modele-donnees)"); ok20 = false; }
+  }
+  if (ok20) ok("R-20", "docs\\projet\\", `${FICHIERS_DP.length} fichiers + ${PROJECTIONS_DP.length} projections présents, frontmatter machine complet`);
 
   // R-21 · fraîcheur TECHNOS ↔ lockfiles (loi 4 : une donnée volatile est une donnée)
   const tp = join(dp, "TECHNOS.md");
@@ -303,6 +308,40 @@ else {
     }
   }
 
+  // R-26 · modèle de données ancré au schéma réel (TF-0091) : chaque table déclarée dans
+  // MODELE-DONNEES.md porte une provenance (fichier/dossier de schéma) qui EXISTE et qui
+  // CONTIENT le nom de la table — jamais rédigé de mémoire (loi 4). Exemption explicite :
+  // « sans objet — aucune persistance ». Placeholders {…} de squelette : non jugés.
+  const mdp = join(dp, "MODELE-DONNEES.md");
+  if (existsSync(mdp)) {
+    const t = readFileSync(mdp, "utf8");
+    if (/sans objet — aucune persistance/i.test(t)) so("R-26", "MODELE-DONNEES.md : « sans objet — aucune persistance » (exemption explicite)");
+    else {
+      const blocs = [...t.matchAll(/^## Table : (.+)$/gm)];
+      const reels = blocs.filter((m) => !/[{}]/.test(m[1]));
+      if (!blocs.length) ko("R-26", "docs\\projet\\MODELE-DONNEES.md", "ni table déclarée (## Table : …) ni exemption « sans objet — aucune persistance »");
+      else if (!reels.length) so("R-26", "MODELE-DONNEES.md : squelette en placeholders — ancrage non jugeable");
+      else {
+        let ok26 = true;
+        for (const m of reels) {
+          const nom = m[1].trim();
+          const fin = blocs.find((b) => b.index > m.index)?.index ?? t.length;
+          const prov = (t.slice(m.index, fin).match(/^- provenance\s*:\s*(.+)$/m) || [])[1]?.trim();
+          if (!prov || /[{}]/.test(prov)) { ko("R-26", `MODELE-DONNEES.md · table ${nom}`, "provenance absente ou en placeholder — chaque table déclare le fichier de schéma d'où elle se lit"); ok26 = false; continue; }
+          const chemin = p(prov);
+          if (!existsSync(chemin)) { ko("R-26", `MODELE-DONNEES.md · table ${nom}`, `provenance introuvable : ${prov}`); ok26 = false; continue; }
+          const contenus = statSync(chemin).isDirectory()
+            ? [...fichiers(chemin)].map((f) => readFileSync(f, "utf8"))
+            : [readFileSync(chemin, "utf8")];
+          if (!contenus.some((c) => c.toLowerCase().includes(nom.toLowerCase()))) {
+            ko("R-26", `MODELE-DONNEES.md · table ${nom}`, `table introuvable dans sa provenance ${prov} — le modèle a divergé du schéma réel (ou a été rédigé de mémoire)`); ok26 = false;
+          }
+        }
+        if (ok26) ok("R-26", "docs\\projet\\MODELE-DONNEES.md", `${reels.length} table(s) ancrée(s) à leur schéma de provenance`);
+      }
+    }
+  }
+
   // R-23 · ACCES-TEST : démo locale seulement, zéro secret (R-14 + loi 2)
   const ap = join(dp, "ACCES-TEST.md");
   if (existsSync(ap)) {
@@ -326,6 +365,7 @@ const nonJuge = [
   "R-21 : correspondance nom+version par inclusion textuelle dans les lockfiles — pas de résolution sémantique de graphes de dépendances",
   "R-23 : motifs de secrets forts uniquement — un mot de passe réaliste inventé sans motif connu passe (revue humaine + gitleaks en CI)",
   "R-24 : seules les URLs http(s) des lignes d'environnement de PARAMETRAGE.md sont jugées — URLs documentaires du corps et hôtes sans schéma (BDD) hors périmètre ; la correspondance <nom-appli> ↔ nom réel du produit reste une revue humaine",
+  "R-26 : ancrage par inclusion textuelle du nom de table dans la provenance — la complétude INVERSE (toute table du DDL figure au doc) et l'exactitude des colonnes ne sont pas jugées (revue de schéma) ; la fraîcheur des projections HTML n'est pas datée (régénération = discipline d'étape)",
 ];
 
 const echecs = findings.filter((f) => f.statut === "FAIL").length;

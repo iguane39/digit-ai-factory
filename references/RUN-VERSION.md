@@ -15,9 +15,11 @@ conformité — jamais en masse silencieuse hors run). Son entrant inclut les lo
 
 **Produit importé** (dépôt repris, jamais passé par un run — TF-0086) : le rattrapage est un
 mode explicite, pas un correctif au fil de l'eau — créer `docs\projet\` complet depuis
-`gabarits\docs-projet\` (6 fichiers ; FONCTIONNEL rédigé depuis le code, chaque affirmation
-datée), reconstruire `.env.example` depuis le code (R-13) AVANT que R-22 ne juge la parité,
-puis dérouler l'oracle. Consigné au ledger comme `rattrapage_import`.
+`gabarits\docs-projet\` (8 fichiers ; FONCTIONNEL rédigé depuis le code, chaque affirmation
+datée ; MODELE-DONNEES **extrait du schéma réel constaté** — migrations/ORM/DDL cités en
+provenance, R-26 —, ARCHITECTURE relevée de l'arborescence et des flux observés, puis les
+2 vues régénérées), reconstruire `.env.example` depuis le code (R-13) AVANT que R-22 ne juge
+la parité, puis dérouler l'oracle. Consigné au ledger comme `rattrapage_import`.
 
 Étapes rejouées **en delta** :
 - **conception** : exigences nouvelles/modifiées dans `EXIGENCES.json` (ids retirés via

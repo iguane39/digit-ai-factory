@@ -6,7 +6,7 @@
  * dossier temporaire (git réel inclus) — rien n'est écrit dans le dépôt.
  */
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -62,6 +62,20 @@ writeFileSync(join(verte, "docs", "projet", "COMMANDES.md"),
   '---\nrole: commandes\nsources_de_verite: [package.json]\nverifie_le: 2026-08-11\n---\n# Commandes\n```bash\nnpm ci\n```\n');
 writeFileSync(join(verte, "docs", "projet", "FONCTIONNEL.md"), // TF-0087 : la vue métier fait partie du socle
   '---\nrole: vue fonctionnelle\nsources_de_verite: [forge/EXIGENCES.json]\nverifie_le: 2026-08-11\n---\n# Fonctionnel\nGère des annonces de démonstration pour des visiteurs anonymes.\n');
+// TF-0091 : couples source→vue ARCHITECTURE et MODELE-DONNEES ; le modèle s'ancre au
+// schéma RÉEL (migrations/001_init.sql contient les deux tables → R-26 verte)
+mkdirSync(join(verte, "migrations"), { recursive: true });
+writeFileSync(join(verte, "migrations", "001_init.sql"),
+  "CREATE TABLE annonces (id uuid PRIMARY KEY, titre text NOT NULL, auteur_id uuid NOT NULL);\nCREATE TABLE utilisateurs (id uuid PRIMARY KEY, email text NOT NULL UNIQUE);\n");
+writeFileSync(join(verte, "docs", "projet", "ARCHITECTURE.md"),
+  "---\nrole: architecture technique\nsources_de_verite: [docker-compose.yml]\nverifie_le: 2026-08-11\n---\n# Architecture — Test\n\n## Vue d'ensemble\n\nUn front parle à une api qui persiste en bdd.\n\n## Composant : api\n\n- role: règles métier\n- techno: FastAPI\n\n## Composant : bdd\n\n- role: persistance\n- techno: PostgreSQL 16\n\n## Flux\n\n| De | Vers | Protocole | Mode | Donnée portée |\n|---|---|---|---|---|\n| api | bdd | SQL | synchrone | objets métier |\n");
+writeFileSync(join(verte, "docs", "projet", "MODELE-DONNEES.md"),
+  "---\nrole: modèle de données\nsources_de_verite: [migrations/001_init.sql]\nverifie_le: 2026-08-11\n---\n# Modèle de données — Test\n\n## Table : annonces\n\n- role: un local vacant publié\n- provenance: migrations/001_init.sql\n\n| Colonne | Type | Nullable | Clé |\n|---|---|---|---|\n| id | uuid | non | PK |\n| auteur_id | uuid | non | FK |\n\nLiens sortants :\n\n| Colonne | Cible | Cardinalité |\n|---|---|---|\n| auteur_id | utilisateurs.id | n-1 |\n\n## Table : utilisateurs\n\n- role: un compte\n- provenance: migrations/001_init.sql\n\n| Colonne | Type | Nullable | Clé |\n|---|---|---|---|\n| id | uuid | non | PK |\n");
+// les projections sont GÉNÉRÉES par les scripts réels du pilot — jamais écrites à la main
+const scripts = join(dirname(fileURLToPath(import.meta.url)), "..", "scripts");
+const genere = (script, cible) => sh("node", [join(scripts, script), join(verte, "docs", "projet", cible)], verte);
+genere("generer-architecture.mjs", "ARCHITECTURE.md");
+genere("generer-modele-donnees.mjs", "MODELE-DONNEES.md");
 // TF-0088 : lockfile HORS racine (monorepo) — R-21 doit le trouver et y vérifier left-pad
 mkdirSync(join(verte, "frontend"), { recursive: true });
 writeFileSync(join(verte, "frontend", "yarn.lock"), 'left-pad@^1.3.0:\n  version "1.3.0"\n');
@@ -76,6 +90,16 @@ check("verte : projet conforme → PASS exit 0", () => {
   if (exit !== 0) throw new Error(`exit ${exit}, findings FAIL : ${JSON.stringify(rapport.findings.filter((f) => f.statut === "FAIL"))}`);
   if (rapport.verdict !== "PASS") throw new Error("verdict != PASS");
   if (!rapport.non_juge.length) throw new Error("non_juge vide — un oracle sans limites déclarées ne juge rien");
+});
+
+check("verte : générateurs déterministes (2 exécutions = HTML identiques)", () => {
+  const lireHtml = (n) => readFileSync(join(verte, "docs", "projet", n), "utf8");
+  const avant = [lireHtml("ARCHITECTURE.html"), lireHtml("MODELE-DONNEES.html")];
+  genere("generer-architecture.mjs", "ARCHITECTURE.md");
+  genere("generer-modele-donnees.mjs", "MODELE-DONNEES.md");
+  const apres = [lireHtml("ARCHITECTURE.html"), lireHtml("MODELE-DONNEES.html")];
+  if (avant[0] !== apres[0] || avant[1] !== apres[1]) throw new Error("HTML différents entre deux générations sur la même source");
+  if (/https?:\/\/(?!www\.w3\.org)/.test(apres[0] + apres[1])) throw new Error("URL réseau détectée dans une vue générée (A1)");
 });
 
 // ---- fixture ROUGE : défauts plantés, chaque règle dure doit se déclencher -------------------
@@ -128,13 +152,15 @@ writeFileSync(join(rougeDocs, "docs", "projet", "PARAMETRAGE.md"),
 writeFileSync(join(rougeDocs, "docs", "projet", "ACCES-TEST.md"),
   '---\nrole: acces\nsources_de_verite: [seed]\nverifie_le: 2026-08-11\n---\n# Accès\naws_key = "AKIAIOSFODNN7EXAMPLE"\n'); // R-23 : en-tête absent + motif AKIA
 writeFileSync(join(rougeDocs, "docs", "projet", "COMMANDES.md"), "# sans frontmatter\n"); // R-20 : frontmatter incomplet
+writeFileSync(join(rougeDocs, "docs", "projet", "MODELE-DONNEES.md"), // R-26 : table fantôme — provenance inexistante
+  "---\nrole: modèle\nsources_de_verite: [migrations/absente.sql]\nverifie_le: 2026-08-11\n---\n# Modèle\n\n## Table : fantome\n\n- role: n'existe nulle part\n- provenance: migrations/absente.sql\n\n| Colonne | Type | Nullable | Clé |\n|---|---|---|---|\n| id | uuid | non | PK |\n");
 
 
-check("rouge-docs : R-20..R-24 se déclenchent, localisantes", () => {
+check("rouge-docs : R-20..R-24 + R-26 se déclenchent, localisantes", () => {
   const { exit, rapport } = lance(rougeDocs);
   if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
   const declenchees = new Set(rapport.findings.filter((f) => f.statut === "FAIL").map((f) => f.regle));
-  for (const attendue of ["R-20", "R-21", "R-22", "R-23", "R-24"])
+  for (const attendue of ["R-20", "R-21", "R-22", "R-23", "R-24", "R-26"])
     if (!declenchees.has(attendue)) throw new Error(`règle ${attendue} non déclenchée sur rouge-docs`);
   const r24 = rapport.findings.filter((f) => f.regle === "R-24" && f.statut === "FAIL");
   if (r24.length !== 2) throw new Error(`R-24 : 2 constats attendus (sans préfixe + staging), ${r24.length} obtenu(s)`);

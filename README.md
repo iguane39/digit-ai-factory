@@ -77,7 +77,7 @@ node bootstrap.mjs, fin « Poste prêt » exigée ; sinon git pull --ff-only +
 node bootstrap.mjs --pull). Retiens la racine.
 Avant d'ouvrir le run : demande-moi EN UNE QUESTION l'objet de l'évolution ou
 de la remédiation — ne suppose jamais. Puis lis references\RUN-VERSION.md du
-pilot et déroule : rattrapage du socle d'abord (25 règles + docs\projet\),
+pilot et déroule : rattrapage du socle d'abord (26 règles + docs\projet\),
 delta par étape, tests TOUJOURS en entier, ledger chaîné (run_precedent).
 Rien ne se corrige hors run.
 ```
@@ -193,8 +193,8 @@ uniquement sur GO humain**, donné sur un dossier de preuve généré (DOSSIER-M
 | `INVENTAIRE.md` | état réel des forges (points d'entrée, oracles, manques) |
 | `CONTRAT-INTERFACE.md` | format d'invocation, ledger, routage par modèle, dette d'intégration |
 | `ETAPE-MEP.md` | la 5e étape : staging outillé par **forge-ops** (O-1…O-4), oracle MEP, gate GO production |
-| `REGLES-PROJET.md` | les 25 règles de socle projet (R-1..R-19 des 06-10/08, R-20..R-23 socle documentaire dont FONCTIONNEL, R-24 URLs d'environnement, R-25 types au registre — 11/08) |
-| `oracles\` | `oracle-conformite-projet.mjs` (25 règles) · `oracle-claude-md.mjs` (noyau ≤ 6 Ko) · `oracle-ecosysteme.mjs` (exhaustivité forges × surfaces) — chacun avec self-test double sens |
+| `REGLES-PROJET.md` | les 26 règles de socle projet (R-1..R-19 des 06-10/08, R-20..R-23 socle documentaire à 8 fichiers + 2 vues générées, R-24 URLs d'environnement, R-25 types au registre, R-26 modèle ancré au schéma réel — 11/08) |
+| `oracles\` | `oracle-conformite-projet.mjs` (26 règles) · `oracle-claude-md.mjs` (noyau ≤ 6 Ko) · `oracle-ecosysteme.mjs` (exhaustivité forges × surfaces) — chacun avec self-test double sens |
 | `gabarits\` | gabarits du CLAUDE.md produit (routage forge obligatoire) et des lots de retours |
 | `todo\` | **TODO-FORGE** : registre structuré des améliorations (JSONL source + vue générée + oracle + archive) |
 | `BOUCLE-AMELIORATION.md` | amélioration des forges (bornée, gated humain) + backlog de retours |
