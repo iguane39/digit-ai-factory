@@ -20,16 +20,17 @@ prouver.
 Créer un dossier vide pour le nouveau produit, y **copier [PROMPT-PRODUIT.md](PROMPT-PRODUIT.md)**
 (depuis ce dépôt GitHub — c'est le seul fichier nécessaire au départ), ouvrir une session
 Claude Code **dans ce nouveau dossier** et coller le prompt rempli. Le prompt est autonome pour
-tout nouvel utilisateur : sa phase 0 vérifie les prérequis (git, `gh` authentifié avec accès aux
-dépôts privés `iguane39`, node ≥ 18, uv, python), localise la forge ou **l'installe depuis
+tout nouvel utilisateur : sa phase 0 vérifie les prérequis (git, node ≥ 18, uv, python — les
+forges sont publiques depuis le 10/08, `gh` authentifié n'est requis que pour les dépôts
+d'engagement privés), localise la forge ou **l'installe depuis
 GitHub** (`~/.digit-ai-forge` par défaut, via `bootstrap.mjs`), puis le run entier — ledger,
 artefacts d'étapes, code — vit dans le projet produit.
 
 **Amorçage manuel** (équivalent de la phase 0) : cloner ce dépôt puis `node bootstrap.mjs` —
-vérifie les prérequis, clone les cinq forges en dépôts frères (`core.longpaths` activé : les
+vérifie les prérequis, clone les neuf forges en dépôts frères (`core.longpaths` activé : les
 noms de fichiers des forges dépassent MAX_PATH sinon) et contrôle leurs points d'entrée.
 Options : `--racine <dossier>` (+ `FORGE_ROOT` en session), `--pull` pour mettre à jour.
-Testé : amorçage réel d'un répertoire vierge, 5/5 clonées, exit 0.
+Testé : amorçage réel d'un répertoire vierge, toutes forges clonées et preuves vérifiées, exit 0.
 
 L'orchestrateur (piloté par [CLAUDE.md](CLAUDE.md)) déroule cinq étapes :
 
@@ -42,6 +43,81 @@ conception ──► design ──► development ──► tests ──► MEP
 
 Chaque étape est validée par des **oracles exécutés** — jamais par confiance. Chaque run vit sous
 `runs\<AAAAMMJJ>-<slug>\` avec son ledger JSONL (état, reprise idempotente, audit).
+
+## Prompts d'usage — un par situation
+
+La règle ne change jamais : **la session Claude Code s'ouvre dans le dossier du produit**
+(jamais dans le pilot), et c'est le routage forge du `CLAUDE.md` produit qui fait le reste.
+Copier le bloc, remplacer les `<…>`.
+
+### 1 · Lancer un nouveau produit
+
+Copier [PROMPT-PRODUIT.md](PROMPT-PRODUIT.md) dans un dossier vide et coller le bloc rempli —
+c'est le seul cas où le prompt est un fichier. Les 7 champs (problème, cible, job, palier, ton,
+contraintes, cible de déploiement) suffisent ; la phase 0 installe tout.
+
+### 2 · Faire évoluer ou remédier un produit existant (run de version)
+
+```
+Run de version via la forge Digit-AI — le run vit ici, dans ce projet.
+Objet : <l'évolution ou la remédiation demandée, en une phrase>.
+Applique references\RUN-VERSION.md du pilot : rattrapage du socle d'abord
+(23 règles + docs\projet\), puis delta par étape (conception si le besoin
+change, design si l'interface change, development sous gates), tests TOUJOURS
+en entier, ledger chaîné (run_precedent). Rien ne se corrige hors run.
+```
+
+### 3 · Tester et corriger (audit + boucle de fermeture)
+
+```
+Audite ce produit par forge-tests puis ferme les écarts — jamais sur parole.
+1. uv run python -m forge_tests . --json  (surface énumérée depuis le code,
+   12 pans, mutation) ;
+2. boucle de fermeture BORNÉE : corrige → re-audite, 3 cycles maximum,
+   G-2 absolue — au-delà, livre le rapport avec les écarts résiduels et les
+   actions[] classées (IA / dev / utilisateur) ;
+3. les verdicts et le dashboard entrent au ledger ; aucun ✓ sans oracle exécuté.
+```
+
+### 4 · Revoir le design d'une implémentation (mode aval)
+
+```
+Revue graphique d'implémentation via forge-design (mode critique aval) :
+juge le produit RENDU contre sa promesse design — tokens.css respectés,
+écrans/états conformes à la maquette, un CTA = une cible, voix de MARQUE.md.
+Exécute les oracles (run-oracles-design.mjs + render_page.py : le rendu se
+mesure en pixels, pas dans le CSS), inspecte les PNG, et verse chaque écart
+ancré au ledger comme retour consommable par development. Verdict + top
+corrections priorisées impact×effort.
+```
+
+### 5 · Déployer en staging puis en production (MEP outillée forge-ops)
+
+```
+Ouvre l'étape MEP de ce produit (ETAPE-MEP.md du pilot).
+Cible du brief : <locale | railway | gcp | azure | aws>.
+1. node <ops>\scripts\ops.mjs plan <cible> <build> --sortie plan.json puis
+   oracle O-5 (PASS exigé) — le plan porte des placeholders, jamais de credential ;
+2. staging réel : déploiement, healthcheck, rollback PROUVÉ (O-1…O-4) ;
+3. dossier MEP complet (M-1…M-5) et mise à jour docs\projet\COMPOSANTS-OPS.md ;
+4. la production attend mon GO explicite — prépare le dossier de preuve, ne
+   déploie pas.
+```
+
+### 6 · Auditer le SEO d'un produit en ligne (post-MEP, sur mandat)
+
+```
+Mandat d'audit SEO pour <domaine> — mission via forge-seo.
+python <seo>\scripts
+ew_mission.py --projet <produit> --client <client>
+--domaine <domaine> --modele <modele>, puis déroule seo\METHODE.md (87 nœuds,
+preuves T1-T4 affichées, garde-fous anti-hallucination). L'étude vit ICI, chez
+le produit ; validate.py et rapport_html.py --verifier avant toute remise.
+```
+
+Deux garde-fous transverses : une amélioration des **forges** ne se lance jamais depuis un
+produit (elle passe par un lot de retours `forgeetours\`, ingéré au registre TF du pilot,
+puis « décide TF-xxxx ») ; et tout livrable n'est accepté que sur verdict d'oracle exécuté.
 
 ## Ce qui est prouvé aujourd'hui
 
