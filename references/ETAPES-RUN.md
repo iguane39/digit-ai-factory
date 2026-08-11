@@ -88,6 +88,12 @@ volatiles en base éditables datées sourcées.
 **Valider** (gates rejoués) : `ruff check` + `pytest` au vert sur le produit ; chaque
 exigence MVP a ≥ 1 test qui la cite par son id (gate grep 100 %).
 
+> **Process longs — toutes étapes (TF-0094)** : tout traitement dépassant ~2 minutes
+> (mutation, rendu, scan, migrations, déploiement, génération d'images) émet son
+> avancement **toutes les 3 minutes** au format `gabarits\AVANCEMENT-PROCESS.md`
+> (tableau 8 champs + `<run>/avancement.jsonl` ; émetteurs `scripts\avancement.*`).
+> Un process long muet est en défaut de contrat.
+
 ## 5. Étape tests (mode natif)
 
 `uv run python -m forge_tests <racine-produit> --json` depuis
