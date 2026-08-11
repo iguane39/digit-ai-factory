@@ -89,20 +89,20 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>14d7780b50f5</code> · dernier événement 2026-08-11T13:54:28Z</p>
+      <p class="meta">sceau <code>9ea845debe08</code> · dernier événement 2026-08-11T14:09:54Z</p>
       <button id="exporter" type="button">Exporter les décisions</button>
       <span id="bilan" aria-live="polite">0 coché · 0 commentaire</span>
     </header>
     <p>Seul le <strong>reste-à-faire</strong> vit ici — les items clos partent à l'archive (<code>node todo\archiver.mjs</code>). Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au pilot — appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
     <p class="meta" id="note-score">La colonne « score » = <strong>valeur</strong> de l'item, calculée <code>gain × preuve ÷ effort</code> (composantes visibles dans le détail de chaque ligne) ; tri par défaut : statut puis score décroissant, ou au clic sur les en-têtes fléchés.</p>
     <div class="kpis">
-      <div class="kpi" title="2 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">2</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
+      <div class="kpi" title="3 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">3</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
       <div class="kpi" title="0 item(s) décidés dont les travaux ne sont pas ouverts"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts</span></div>
       <div class="kpi" title="1 campagne(s) ouvertes au registre"><span class="kpi-label">En cours</span><span class="kpi-value">1</span><span class="kpi-hint">campagnes ouvertes au registre</span></div>
       <div class="kpi" title="89 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">89</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende"><span class="leg-item"><span class="leg-swatch" style="background:var(--surface)"></span>candidat</span><span class="leg-item"><span class="leg-swatch" style="background:var(--teal-fill)"></span>décidé</span><span class="leg-item"><span class="leg-swatch" style="background:var(--amber-fill)"></span>en cours</span></p>
-    <nav class="toc" aria-label="Sommaire"><a href="#design"><strong>design</strong> <span class="toc-d">2 item(s) reste-à-faire ciblant design</span></a><a href="#seo"><strong>seo</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant seo</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#design"><strong>design</strong> <span class="toc-d">2 item(s) reste-à-faire ciblant design</span></a><a href="#seo"><strong>seo</strong> <span class="toc-d">2 item(s) reste-à-faire ciblant seo</span></a></nav>
     <main>
     <section id="design">
       <h2>design <span class="badge" title="2 item(s) actifs ciblant design">2</span></h2>
@@ -131,8 +131,8 @@
       </table></div>
     </section>
     <section id="seo">
-      <h2>seo <span class="badge" title="1 item(s) actifs ciblant seo">1</span></h2>
-      <p class="ch-apprend meta">Ce chapitre liste les 1 item(s) du reste-à-faire dont la cible est seo : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
+      <h2>seo <span class="badge" title="2 item(s) actifs ciblant seo">2</span></h2>
+      <p class="ch-apprend meta">Ce chapitre liste les 2 item(s) du reste-à-faire dont la cible est seo : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
       <div class="scroll"><table data-filterable>
         <caption class="sr-only">Reste-à-faire ciblant seo — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
         <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
@@ -148,6 +148,17 @@
             </details></td>
           <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0073" rows="1" aria-label="Commentaire TF-0073" placeholder="commentaire…"></textarea></td>
         </tr>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0093" aria-label="Décider TF-0093"></td>
+          <td class="c-id" data-th="id"><code>TF-0093</code></td>
+          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score" data-th="score">3</td>
+          <td data-th="item"><details><summary><strong>GEO : l acces des crawlers IA n est audite nulle part dans la grille</strong></summary>
+              <p>Constat d evaluation du 11/08 : la branche 11-GEO couvre les 5 piliers consensuels (entites, marque, citations, contenu utile, presence dans les reponses IA) mais AUCUN noeud n audite l ACCES des agents des moteurs generatifs au site — robots.txt vis-a-vis des user-agents IA (GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended...), distinction consciente entrainement vs recherche, et blocages CDN/WAF. Un site qui bloque ces agents (souvent par defaut de configuration ou par un reglage anti-bot) est structurellement absent des reponses IA, quels que soient ses efforts sur les 5 noeuds existants — le prerequis n est pas juge. Mesurable statiquement (robots.txt + en-tetes) et via logs quand fournis (le noeud 06-technique/03-logs-serveur existe deja). Proposition : 1 noeud nouveau en branche GEO via le mecanisme d evolution de grille (TF-0048 : correspondances declarees, 87-&gt;88), source_requise crawl + logs si fournis, verdict binaire par agent avec la decision du proprietaire consignee (bloquer l entrainement est un CHOIX legitime — l audit constate et fait decider, il n impose pas). Veille associee, hors noeud : llms.txt reste un standard emergent non consomme officiellement par les moteurs majeurs a date — son absence de la grille est conforme au garde-fou 4 (ne pas reciter des tactiques non confirmees) ; a re-evaluer par verification web datee a chaque run.</p>
+              <p class="meta">Demandeur : evaluation GEO du 11/08 (question humaine) · 2026-08-11 · gain 3 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — le prerequis de toute la branche GEO (etre accessible aux agents IA) n est pas juge : un blocage par defaut rendrait les 5 noeuds existants non-interpretables sans que l audit le voie</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0093" rows="1" aria-label="Commentaire TF-0093" placeholder="commentaire…"></textarea></td>
+        </tr>
         </tbody>
       </table></div>
     </section>
@@ -157,7 +168,7 @@
   <script>
   (function () {
     "use strict";
-    var SCEAU = "14d7780b50f5";
+    var SCEAU = "9ea845debe08";
     var cle = function (id, type) { return "todo-forge:" + SCEAU + ":" + id + ":" + type; };
     var coches = document.querySelectorAll("input.decider");
     var comms = document.querySelectorAll("textarea.commentaire");
