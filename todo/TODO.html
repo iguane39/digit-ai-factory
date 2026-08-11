@@ -89,16 +89,16 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>0229237e00f8</code> · dernier événement 2026-08-11T14:21:52Z</p>
+      <p class="meta">sceau <code>042901c89fb9</code> · dernier événement 2026-08-11T14:35:12Z</p>
       <button id="exporter" type="button">Exporter les décisions</button>
       <span id="bilan" aria-live="polite">0 coché · 0 commentaire</span>
     </header>
     <p>Seul le <strong>reste-à-faire</strong> vit ici — les items clos partent à l'archive (<code>node todo\archiver.mjs</code>). Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au pilot — appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
     <p class="meta" id="note-score">La colonne « score » = <strong>valeur</strong> de l'item, calculée <code>gain × preuve ÷ effort</code> (composantes visibles dans le détail de chaque ligne) ; tri par défaut : statut puis score décroissant, ou au clic sur les en-têtes fléchés.</p>
     <div class="kpis">
-      <div class="kpi" title="4 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">4</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
+      <div class="kpi" title="2 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">2</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
       <div class="kpi" title="0 item(s) décidés dont les travaux ne sont pas ouverts"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts</span></div>
-      <div class="kpi" title="1 campagne(s) ouvertes au registre"><span class="kpi-label">En cours</span><span class="kpi-value">1</span><span class="kpi-hint">campagnes ouvertes au registre</span></div>
+      <div class="kpi" title="3 campagne(s) ouvertes au registre"><span class="kpi-label">En cours</span><span class="kpi-value">3</span><span class="kpi-hint">campagnes ouvertes au registre</span></div>
       <div class="kpi" title="90 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">90</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende"><span class="leg-item"><span class="leg-swatch" style="background:var(--surface)"></span>candidat</span><span class="leg-item"><span class="leg-swatch" style="background:var(--teal-fill)"></span>décidé</span><span class="leg-item"><span class="leg-swatch" style="background:var(--amber-fill)"></span>en cours</span></p>
@@ -112,17 +112,17 @@
         <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0019" aria-label="Décider TF-0019"></td>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0019" aria-label="Décider TF-0019" disabled></td>
           <td class="c-id" data-th="id"><code>TF-0019</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td data-th="statut"><span class="statut s-en_cours">en_cours</span></td>
           <td class="c-score" data-th="score">1.5</td>
           <td data-th="item"><strong>Premier appel réel Gemini (lever R-D3)</strong><p>NÉCESSITE UN GO HUMAIN EXPLICITE : API payante (garde-fou steering). Le juge (oracle-images) existe, le producteur n'a jamais appelé.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 2</p></td>
           <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0019" rows="1" aria-label="Commentaire TF-0019" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0020" aria-label="Décider TF-0020"></td>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0020" aria-label="Décider TF-0020" disabled></td>
           <td class="c-id" data-th="id"><code>TF-0020</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td data-th="statut"><span class="statut s-en_cours">en_cours</span></td>
           <td class="c-score" data-th="score">1</td>
           <td data-th="item"><strong>Producteur d'images complet</strong><p>Générer réellement les visuels des maquettes, jugés par oracle-images I1-I6 existant.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 4</p></td>
           <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0020" rows="1" aria-label="Commentaire TF-0020" placeholder="commentaire…"></textarea></td>
@@ -189,7 +189,7 @@
   <script>
   (function () {
     "use strict";
-    var SCEAU = "0229237e00f8";
+    var SCEAU = "042901c89fb9";
     var cle = function (id, type) { return "todo-forge:" + SCEAU + ":" + id + ":" + type; };
     var coches = document.querySelectorAll("input.decider");
     var comms = document.querySelectorAll("textarea.commentaire");
