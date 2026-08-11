@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=3e3dfcb914f0 archive=e3b0c44298fc · dernier événement: 2026-08-11T07:11:12Z -->
+     sceaux: actifs=c948f0574706 archive=e3b0c44298fc · dernier événement: 2026-08-11T08:30:00Z -->
 
-**79 actifs** (candidat 27 · décidé 0 · en cours 2 · corrigé 50 · écarté 0) · **0 archivés**.
+**80 actifs** (candidat 27 · décidé 0 · en cours 2 · corrigé 51 · écarté 0) · **0 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -90,6 +90,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0065 | candidat | 6 | Le hook qualité sème ses journaux .oracles* dans tout dépôt édité — à canaliser une fois pour toutes | **oui** — 2 commits pollués défaits par git reset pendant la campagne agents ; nettoyage manuel ×3 campagnes |
 | TF-0062 | candidat | 2 | Rattrapage du renommage pilot chez les produits et missions | non |
 | TF-0050 | corrige | 6 | Gabarit d'agent de campagne — contraintes standard mutualisées | **oui** — ~25 prompts × ~3 Ko de contraintes dupliquées relevés sur la semaine |
+| TF-0080 | corrige | 6 | Oracle d'exhaustivité de l'écosystème (matrice forges × surfaces) | **oui** — 3 trous réels le 11/08 : fiche forge-audit absente, forge-audit hors noyau, README à « cinq forges » |
 | TF-0035 | corrige | 4 | versions_forges/run_precedent réellement consignés | **oui** — 0/76 entrées sur ASD malgré 2 versions livrées |
 | TF-0036 | corrige | 3 | Archive du run pilote sous git | non |
 | TF-0049 | corrige | 3 | TODO-FORGE : l'écriture directe contourne l'écrivain unique — la détecter par oracle | **oui** — 7 créations sans trace d'ingestion dans le registre réel |
