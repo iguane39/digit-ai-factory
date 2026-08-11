@@ -32,6 +32,9 @@ const FORGES = [
   // forge-ops : exploitation (déployer/exploiter/restaurer) — outille l'étape MEP du pilot
   // (TF-0040). La preuve est son self-test, qui rejoue un déploiement réel local + rollback.
   { nom: "digit-ai-forge-ops", preuve: "oracles/self-test.mjs" },
+  // forge-data : discipline de la donnée (profiler/tracer/restituer) aux niveaux des barres
+  // OpenLineage/Great Expectations/dbt (TF-0083, révision tracée de l'écartement du 08/08).
+  { nom: "digit-ai-forge-data", preuve: "oracles/self-test.mjs" },
 ];
 
 const args = process.argv.slice(2);

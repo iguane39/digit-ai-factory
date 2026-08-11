@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=35f787aacafd archive=e3b0c44298fc · dernier événement: 2026-08-11T08:26:29Z -->
+     sceaux: actifs=ff196697575b archive=e3b0c44298fc · dernier événement: 2026-08-11T09:39:34Z -->
 
-**82 actifs** (candidat 27 · décidé 0 · en cours 2 · corrigé 53 · écarté 0) · **0 archivés**.
+**83 actifs** (candidat 27 · décidé 0 · en cours 2 · corrigé 54 · écarté 0) · **0 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -43,6 +43,12 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0012 | corrige | 2 | Installer les 4 skills sous ~/.claude/skills | non |
 | TF-0014 | corrige | 1.5 | Manifeste + protocole machine « bloqué sous seuil » | non |
 | TF-0015 | corrige | 1 | Coder E7-E9 (EARS/ISO 29148) dans oracle-exigences | non |
+
+## data (nouvelle)
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0083 | corrige | 3 | forge-data — révision de l'écartement du 08/08 sur preuve REX (admission rejouée) | **oui** — REX OracleClient-D : lineage et rétro-doc faits à la main, non réutilisables ; aucun oracle de lineage/restitution dans l'écosystème |
 
 ## design
 
