@@ -1,18 +1,11 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=32fe56da61c3 archive=504dabdc9a23 · dernier événement: 2026-08-11T14:43:20Z -->
+     sceaux: actifs=c2e5c1c448f3 archive=b2b74a535d60 · dernier événement: 2026-08-11T14:21:52Z -->
 
-**5 actifs** (candidat 2 · décidé 0 · en cours 3 · corrigé 0 · écarté 0) · **91 archivés**.
+**3 actifs** (candidat 2 · décidé 0 · en cours 1 · corrigé 0 · écarté 0) · **93 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
-
-## design
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0019 | en_cours | 1.5 | Premier appel réel Gemini (lever R-D3) | non |
-| TF-0020 | en_cours | 1 | Producteur d'images complet | non |
 
 ## pilot
 
