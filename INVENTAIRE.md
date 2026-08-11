@@ -172,22 +172,23 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
   pilot (17 règles décidées le 06/08) couvrent le même domaine par deux sources — candidat
   de réconciliation consigné au backlog.
 
-## 8. digit-ai-forge-audit — `c:\dev\digit-ai-forge-audit` *(ajoutée le 10/08)*
+## 8. digit-ai-forge-audit — `c:\dev\digit-ai-forge-audit` *(ajoutée le 10/08 · renommage 11/08)*
 
-- **Rôle** : **audit & gouvernance POC-to-Prod**, transverse et sur mandat humain. Produit
-  générique **AuditCore** en marque blanche (65 ADRs, 162 contrôles, 17 dimensions), séparé de
-  l'espace d'engagement client. Sert la MEP et les revues d'architecture, jamais en déclenchement
-  automatique.
-- **Architecture produit / tenant** : le cœur `auditcore/` est un **submodule pinné** (dépôt privé
-  `digit-ai-forge-auditcore`, historique neuf, zéro mention tenant) ; ce dépôt-ci est l'espace
-  d'engagement (`input/`, `output/`, `tenants/client-a/`, docs) qui **consomme** le produit épinglé.
-  Un second submodule Azure `input/architecture-governance` apporte le référentiel amont.
-- **Point d'entrée** : le clone shallow du pilot ne peuple pas les submodules → preuve bootstrap =
-  `.gitmodules` (câblage). L'exécution réelle des contrôles vit dans `auditcore/`, à initialiser
-  séparément. Deux CI vertes (produit + tenant, iso-parité).
-- **Maturité** : split physique produit/tenant réalisé le 15/07, dépôt renommé `digit-ai-forge-audit`
-  le 10/08. **Exploration exhaustive au standard des autres forges encore à mener** (entrées,
-  sorties, oracles à détailler lors d'un run dédié).
+- **Rôle** : **audit & gouvernance POC-to-Prod**, transverse et sur mandat humain. C'est le
+  **produit AuditCore** en marque blanche (65 ADRs, 162 contrôles, 17 dimensions) — dépôt
+  **public MIT** (ex `digit-ai-forge-auditcore`, renommé le 11/08). Sert la MEP et les revues
+  d'architecture, jamais en déclenchement automatique.
+- **Architecture produit / tenant** : ce dépôt ne connaît **aucune donnée client** (gate lint N0,
+  vérifié : 0 mention tenant). Les engagements vivent dans des dépôts privés dédiés qui le
+  consomment en **submodule pinné** — ex. `digit-ai-forge-audit_client-a` (privé : `input/`,
+  `output/`, `tenants/client-a/`, docs, + submodule Azure `architecture-governance`).
+- **Point d'entrée** : référentiels dans `core/` (adr, controls, dimensions, `invariants.json` =
+  preuve bootstrap), oracles dans `oracles/` (`smoke-parcours.mjs`,
+  `verifier-couverture-fonctionnelle.mjs`), profils dans `profiles/`. Deux CI vertes
+  (produit + tenant, iso-parité).
+- **Maturité** : split physique produit/tenant réalisé le 15/07 ; nommage stabilisé le 11/08
+  (produit = `audit`, engagement = `audit_client-a`). **Exploration exhaustive au standard des
+  autres forges encore à mener** (entrées, sorties, oracles à détailler lors d'un run dédié).
 
 ## Lecture transverse pour le pilot
 
