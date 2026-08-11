@@ -60,6 +60,13 @@ writeFileSync(join(verte, "docs", "projet", "ACCES-TEST.md"),
   '---\nrole: acces de test\nsources_de_verite: ["seed MODE_DEMO"]\nverifie_le: 2026-08-11\n---\n# Accès\n> comptes de démonstration locale — jamais valides hors MODE_DEMO\n\n| admin | admin@demo.local | demo-admin |\n');
 writeFileSync(join(verte, "docs", "projet", "COMMANDES.md"),
   '---\nrole: commandes\nsources_de_verite: [package.json]\nverifie_le: 2026-08-11\n---\n# Commandes\n```bash\nnpm ci\n```\n');
+writeFileSync(join(verte, "docs", "projet", "FONCTIONNEL.md"), // TF-0087 : la vue métier fait partie du socle
+  '---\nrole: vue fonctionnelle\nsources_de_verite: [forge/EXIGENCES.json]\nverifie_le: 2026-08-11\n---\n# Fonctionnel\nGère des annonces de démonstration pour des visiteurs anonymes.\n');
+// TF-0088 : lockfile HORS racine (monorepo) — R-21 doit le trouver et y vérifier left-pad
+mkdirSync(join(verte, "frontend"), { recursive: true });
+writeFileSync(join(verte, "frontend", "yarn.lock"), 'left-pad@^1.3.0:\n  version "1.3.0"\n');
+writeFileSync(join(verte, "docs", "projet", "TECHNOS.md"),
+  '---\nrole: technos\nsources_de_verite: [package-lock.json, frontend/yarn.lock]\nverifie_le: 2026-08-11\nversions:\n  express: "5.1.0"\n  left-pad: "1.3.0"\n---\n# Technos\n');
 sh("git", ["init", "-q", "-b", "main"], verte);
 sh("git", ["-c", "user.email=t@t", "-c", "user.name=t", "add", "-A"], verte);
 sh("git", ["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "feat: socle initial du produit"], verte);
@@ -75,6 +82,7 @@ check("verte : projet conforme → PASS exit 0", () => {
 const rouge = mkdtempSync(join(tmpdir(), "conf-rouge-"));
 mkdirSync(join(rouge, "output", "Old"), { recursive: true });      // R-1 (input absent), R-3 (docs absent)
 writeFileSync(join(rouge, "output", "rapport-final.md"), "x\n");    // R-4 : livrable non daté
+writeFileSync(join(rouge, "output", "Produit - Grimoire Néant - 20260811a.md"), "x\n"); // R-25 : type improvisé (daté correct → R-4 muette dessus)
 writeFileSync(join(rouge, "output", "Old", "vieux - 20260101a.py"), "x = 1\n"); // R-6 : code sous Old
 writeFileSync(join(rouge, "main - 20260806a.py"), "x = 1\n");       // R-6 : code daté
 writeFileSync(join(rouge, "CLAUDE.md"), "# Produit\njuste des commandes pytest\n"); // R-11 : présent SANS routage forge
@@ -90,7 +98,7 @@ check("rouge : chaque règle attendue se déclenche, FAIL exit 1", () => {
   const { exit, rapport } = lance(rouge);
   if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
   const declenchees = new Set(rapport.findings.filter((f) => f.statut === "FAIL").map((f) => f.regle));
-  for (const attendue of ["R-1", "R-3", "R-4", "R-6", "R-7", "R-8", "R-10", "R-11", "R-12", "R-13", "R-18", "R-19"])
+  for (const attendue of ["R-1", "R-3", "R-4", "R-6", "R-7", "R-8", "R-10", "R-11", "R-12", "R-13", "R-18", "R-19", "R-25"])
     if (!declenchees.has(attendue)) throw new Error(`règle ${attendue} non déclenchée sur la fixture rouge`);
 });
 

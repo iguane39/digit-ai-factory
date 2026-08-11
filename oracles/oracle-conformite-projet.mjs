@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 /**
  * oracle-conformite-projet.mjs — vérifie qu'un projet produit respecte REGLES-PROJET.md
- * (24 règles — R-1..R-19 du 06-10/08, R-20..R-23 socle documentaire du 11/08 TF-0082,
- * R-24 URLs d'environnement du 11/08 TF-0090). Node pur, zéro dépendance, lecture seule.
+ * (25 règles — R-1..R-19 du 06-10/08, R-20..R-23 socle documentaire du 11/08 TF-0082,
+ * R-24 URLs d'environnement du 11/08 TF-0090, R-25 types au registre du 11/08 TF-0084).
+ * Node pur, zéro dépendance, lecture seule (le registre des types d'organization est LU,
+ * jamais écrit).
  *
  * Usage : node oracle-conformite-projet.mjs <racine-du-projet>
  * Sortie : JSON sur stdout — { oracle, version, cible, verdict, findings[], non_juge[] }
@@ -10,8 +12,9 @@
  * Exit : 0 = PASS · 1 = FAIL · 2 = l'oracle n'a pas pu juger.
  */
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { join, basename, relative } from "node:path";
+import { join, basename, relative, dirname } from "node:path";
 import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
 const cible = process.argv[2];
 if (!cible || !existsSync(cible)) {
@@ -67,6 +70,42 @@ for (const d of ["output", "docs"]) {
   }
 }
 if (r4) ok("R-4", "output/, docs/", "livrables au nommage daté (ou aucun livrable)");
+
+// R-25 — le <Type> de tout livrable daté figure au registre des types (D-04 organization,
+// encodé le 11/08 TF-0084). Le type est le premier mot du 2e segment ; comparaison
+// insensible à la casse et aux accents (contrat du registre). Registre lu chez la forge
+// organization (dépôt frère du pilot, $FORGE_ROOT sinon parent) — lecture seule.
+const normeType = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const racineForges = process.env.FORGE_ROOT || join(dirname(fileURLToPath(import.meta.url)), "..", "..");
+const registreTypes = join(racineForges, "digit-ai-forge-organization", "registre-types.json");
+if (!existsSync(registreTypes)) so("R-25", "registre-types.json d'organization introuvable — types non jugeables (poste non équipé ? node bootstrap.mjs)");
+else {
+  let admis;
+  try {
+    const reg = JSON.parse(readFileSync(registreTypes, "utf8"));
+    admis = new Set(reg.types.flatMap((t) => [t.type, ...(t.alias || [])]).map(normeType));
+  } catch { admis = null; }
+  if (!admis) so("R-25", "registre-types.json illisible — types non jugeables");
+  else {
+    let r25 = true, vus = 0;
+    for (const d of ["output", "docs"]) {
+      for (const f of fichiers(p(d))) {
+        const nom = basename(f);
+        const ext = nom.split(".").pop().toLowerCase();
+        if (EXCLUS_NOMMAGE.has(nom) || !EXT_LIVRABLE.has(ext) || /\/Old\//i.test("/" + rel(f))) continue;
+        if (/^docs[\/]projet[\/]/.test(rel(f)) || !MOTIF_DATE.test(nom)) continue;
+        const segs = nom.split(" - ");
+        if (segs.length < 3) continue; // pas de segment type — déjà R-4
+        vus++;
+        const type = segs[1].split(" ")[0];
+        if (!admis.has(normeType(type))) {
+          ko("R-25", rel(f), `type « ${type} » absent du registre des types — un type nouveau s'ajoute au registre d'organization (commit motivé, D-04), jamais improvisé dans un nom`); r25 = false;
+        }
+      }
+    }
+    if (r25) vus ? ok("R-25", "output/, docs/", `${vus} livrable(s) daté(s) au type admis`) : so("R-25", "aucun livrable daté à typer");
+  }
+}
 
 // R-6 — code : jamais de copie datée, jamais dans Old\
 let r6 = true;
@@ -178,7 +217,7 @@ else {
 
 // ---- D bis · Socle documentaire docs\projet\ (R-20..R-23 — TF-0082, 11/08) ----
 const dp = p("docs", "projet");
-const FICHIERS_DP = ["TECHNOS.md", "COMPOSANTS-OPS.md", "PARAMETRAGE.md", "ACCES-TEST.md", "COMMANDES.md"];
+const FICHIERS_DP = ["TECHNOS.md", "COMPOSANTS-OPS.md", "PARAMETRAGE.md", "ACCES-TEST.md", "COMMANDES.md", "FONCTIONNEL.md"]; // FONCTIONNEL : TF-0087 (la vue métier manquait — tout était technique)
 const frontmatter = (texte) => { const m = texte.match(/^---\r?\n([\s\S]*?)\r?\n---/); return m ? m[1] : null; };
 if (!existsSync(dp)) ko("R-20", "docs\\projet\\", "dossier absent — socle documentaire du produit (TECHNOS, COMPOSANTS-OPS, PARAMETRAGE, ACCES-TEST, COMMANDES)");
 else {
@@ -203,10 +242,12 @@ else {
       const m = l.match(/^[ \t]+([\w@\/.–-]+)\s*:\s*"([^"]+)"/);
       if (m && !m[1].startsWith("#")) paires.push([m[1], m[2]]);
     }
-    const locks = ["package-lock.json", "pyproject.toml", "poetry.lock", "uv.lock", "requirements.txt", "Cargo.lock", "go.sum", "composer.lock", "Gemfile.lock"]
-      .map((n) => p(n)).filter(existsSync).map((f) => readFileSync(f, "utf8"));
+    // TF-0088 : lockfiles cherchés dans TOUT l'arbre (monorepo : frontend/yarn.lock…),
+    // plus seulement à la racine ; yarn.lock et pnpm-lock.yaml rejoignent la liste.
+    const NOMS_LOCK = new Set(["package-lock.json", "yarn.lock", "pnpm-lock.yaml", "pyproject.toml", "poetry.lock", "uv.lock", "requirements.txt", "Cargo.lock", "go.sum", "composer.lock", "Gemfile.lock"]);
+    const locks = [...fichiers(cible)].filter((f) => NOMS_LOCK.has(basename(f))).map((f) => readFileSync(f, "utf8"));
     if (!paires.length) so("R-21", "TECHNOS.md sans bloc versions: renseigné — fraîcheur non jugeable (déclarer les versions clés)");
-    else if (!locks.length) so("R-21", "aucun lockfile/manifeste à la racine — fraîcheur non jugeable");
+    else if (!locks.length) so("R-21", "aucun lockfile/manifeste dans l'arbre du projet — fraîcheur non jugeable");
     else {
       let ok21 = true;
       for (const [nom, ver] of paires) {

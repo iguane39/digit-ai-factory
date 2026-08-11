@@ -13,6 +13,12 @@ projet, chaque FAIL corrigé (c'est ainsi que les produits antérieurs aux règl
 conformité — jamais en masse silencieuse hors run). Son entrant inclut les lots de
 `forge\retours\` non encore traités.
 
+**Produit importé** (dépôt repris, jamais passé par un run — TF-0086) : le rattrapage est un
+mode explicite, pas un correctif au fil de l'eau — créer `docs\projet\` complet depuis
+`gabarits\docs-projet\` (6 fichiers ; FONCTIONNEL rédigé depuis le code, chaque affirmation
+datée), reconstruire `.env.example` depuis le code (R-13) AVANT que R-22 ne juge la parité,
+puis dérouler l'oracle. Consigné au ledger comme `rattrapage_import`.
+
 Étapes rejouées **en delta** :
 - **conception** : exigences nouvelles/modifiées dans `EXIGENCES.json` (ids retirés via
   `identifiants_retires`, jamais réaffectés), oracles rejoués sur le référentiel entier ;
