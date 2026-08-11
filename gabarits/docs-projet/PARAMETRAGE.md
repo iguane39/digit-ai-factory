@@ -22,8 +22,14 @@ variables:
 
 ## URLs & ports par environnement
 
+> **R-24 (décision du 11/08)** : tout hôte applicatif hébergé est préfixé
+> `<nom-appli>-<env>.` avec env ∈ {`dev`, `qualif`, `production`} — ex.
+> `https://produit-02-production.up.railway.app`. Le staging outillé de
+> l'étape MEP s'appelle **qualif** dans les URLs. Local et BDD hors périmètre.
+
 | Environnement | Front | Back/API | BDD | Notes |
 |---|---|---|---|---|
 | locale | {http://localhost:5173} | {http://localhost:8080} | {localhost:5432} | valeurs réelles OK (locales) |
-| staging | {<URL_FRONT_STAGING>} | {<URL_API_STAGING>} | {<HOTE_BDD_STAGING>} | placeholders — résolus par l'environnement du run |
-| production | {<URL_FRONT_PROD>} | {<URL_API_PROD>} | {<HOTE_BDD_PROD>} | placeholders — GO humain requis |
+| dev | {https://<nom-appli>-dev.<domaine>} | {https://<nom-appli>-api-dev.<domaine>} | {<HOTE_BDD_DEV>} | placeholders tant que non déployé |
+| qualif | {https://<nom-appli>-qualif.<domaine>} | {https://<nom-appli>-api-qualif.<domaine>} | {<HOTE_BDD_QUALIF>} | staging de l'étape MEP (O-1…O-4) |
+| production | {https://<nom-appli>-production.<domaine>} | {https://<nom-appli>-api-production.<domaine>} | {<HOTE_BDD_PROD>} | placeholders — GO humain requis |

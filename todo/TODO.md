@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=65f666eb754f archive=e3b0c44298fc · dernier événement: 2026-08-11T10:06:02Z -->
+     sceaux: actifs=2cc64d7cc1cb archive=e3b0c44298fc · dernier événement: 2026-08-11T11:41:49Z -->
 
-**85 actifs** (candidat 29 · décidé 0 · en cours 0 · corrigé 56 · écarté 0) · **0 archivés**.
+**90 actifs** (candidat 32 · décidé 0 · en cours 0 · corrigé 58 · écarté 0) · **0 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -28,6 +28,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0057 | corrige | 6 | find-in-page.js : même classe pour le conteneur de recherche et le surlignage | **oui** — défaut visible en production sur un rapport client ; écart mesuré 606 px, ramené à 0 px |
 | TF-0060 | corrige | 4.5 | digit-ai-schemas : l'exemple de reference viole 25 fois les regles du socle, dont 7 fois une regle anterieure | **oui** — 25 echecs sur l'asset de reference d'un skill de production, dont 7 sur une regle en vigueur depuis le 08/08 |
 | TF-0058 | corrige | 4 | render_page.py écrit ses PNG dans le dossier du fichier audité | **oui** — 12 fichiers d'oracle déposés dans un dossier de livrables client |
+| TF-0085 | corrige | 3 | D-10 : le contrôle réseau exécutable annoncé n'existe pas dans la recette HTML | **oui** — un livrable client avec un appel CDN passerait la recette aujourd'hui ; les trois motifs de D-10 (traçage des lectures, CDN disparu à 2 ans, proxy d'entreprise) restent des risques réels non gardés |
 | TF-0024 | corrige | 2.7 | Script de sync/diff repo ↔ ~/.claude | **oui** — Constatée deux fois (05/08 et 08/08), dans les deux directions |
 | TF-0011 | corrige | 2 | Enregistrer les 4 oracles au registre quality-oracles | non |
 | TF-0022 | corrige | 2 | Committer le travail du 08/08 (file-candidats, gabarit A0) | non |
@@ -55,7 +56,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0017 | candidat | 4 | Committer le chantier oracle-motion | non |
-| TF-0085 | candidat | 3 | D-10 : le contrôle réseau exécutable annoncé n'existe pas dans la recette HTML | **oui** — un livrable client avec un appel CDN passerait la recette aujourd'hui ; les trois motifs de D-10 (traçage des lectures, CDN disparu à 2 ans, proxy d'entreprise) restent des risques réels non gardés |
 | TF-0016 | candidat | 2 | Rebuild + commit dist/*.skill | non |
 | TF-0019 | candidat | 1.5 | Premier appel réel Gemini (lever R-D3) | non |
 | TF-0020 | candidat | 1 | Producteur d'images complet | non |
@@ -100,9 +100,13 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0088 | candidat | 9 | R-21 est aveugle dès que les lockfiles ne sont pas à la racine, et ignore yarn.lock — la fraîcheur des versions n'est jamais jugée sur un dépôt multi-composants | **oui** — sur Produit-11, 25 versions déclarées dans TECHNOS.md n'ont été confrontées aux lockfiles par AUCUN oracle — la vérification a dû être refaite à la main pendant le run ; tout dépôt front+back (la disposition la plus courante) est dans le même cas, ce qui vide R-21 de son effet là où elle sert le plus |
 | TF-0065 | candidat | 6 | Le hook qualité sème ses journaux .oracles* dans tout dépôt édité — à canaliser une fois pour toutes | **oui** — 2 commits pollués défaits par git reset pendant la campagne agents ; nettoyage manuel ×3 campagnes |
+| TF-0087 | candidat | 6 | Socle docs\projet\ : aucun fichier ne décrit le FONCTIONNEL du produit — le socle est intégralement technique | **oui** — sur Produit-11, la compréhension du métier a été reconstituée par lecture du code pendant le run MEP ; ce coût se repaiera à chaque run de version et à chaque reprise par un tiers, alors que le socle documentaire existe précisément pour l'éviter |
+| TF-0086 | candidat | 4.5 | R-20 : le socle documentaire docs\projet\ n'est produit par aucune étape — un run se clôt sans lui, sans que rien ne le signale | **oui** — le run MEP Produit-11 s'est clos avec 4 fichiers sur 5 manquants sans aucun signal d'oracle ; le motif même de R-20 (« les runs de version redécouvrent tout ») est donc intact pour ce produit — la prochaine reprise repartira de zéro sur les technos, le paramétrage, les commandes et les accès de test |
 | TF-0062 | candidat | 2 | Rattrapage du renommage pilot chez les produits et missions | non |
 | TF-0084 | candidat | 2 | Trois propositions organization en attente de décision pilot (circuit D-13) | **oui** — REGLES-PROJET §G : trois lignes de la matrice portent « en attente de décision pilot » — tant qu'elles y restent, la règle du corpus et la doctrine d'organization peuvent diverger sans que personne ne le voie |
+| TF-0089 | candidat | 2 | TODO.html : 49 constats de lisibilité à la recette (générateur à réviser) | **oui** — la page vitrine du registre viole 4 règles de lisibilité que la forge impose à tous les livrables — se conformer à sa propre doctrine (précédent D-05 : organization) |
 | TF-0050 | corrige | 6 | Gabarit d'agent de campagne — contraintes standard mutualisées | **oui** — ~25 prompts × ~3 Ko de contraintes dupliquées relevés sur la semaine |
 | TF-0080 | corrige | 6 | Oracle d'exhaustivité de l'écosystème (matrice forges × surfaces) | **oui** — 3 trous réels le 11/08 : fiche forge-audit absente, forge-audit hors noyau, README à « cinq forges » |
 | TF-0035 | corrige | 4 | versions_forges/run_precedent réellement consignés | **oui** — 0/76 entrées sur ASD malgré 2 versions livrées |
@@ -110,6 +114,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0049 | corrige | 3 | TODO-FORGE : l'écriture directe contourne l'écrivain unique — la détecter par oracle | **oui** — 7 créations sans trace d'ingestion dans le registre réel |
 | TF-0051 | corrige | 3 | Protocole de mesure du routage Sonnet/Opus | non |
 | TF-0053 | corrige | 3 | CLAUDE.md steering découpé en références à la demande (mécanisme de TF-0037) | **oui** — trajectoire CLAUDE.md 4590→17278 octets mesurée sur git |
+| TF-0090 | corrige | 3 | Convention d'URLs par environnement : <nom-appli>-{dev|qualif|production}.<domaine> | **oui** — sans convention, chaque déploiement invente son hôte — l'environnement d'une URL devient indevinable et les checklists MEP ne peuvent pas la vérifier mécaniquement |
 | TF-0082 | corrige | 2.7 | Socle documentaire produit docs\projet\ — règles R-20..R-23 | **oui** — aucun produit n'a d'état des lieux standardisé ; les runs de version redécouvrent technos/config/accès à chaque ouverture |
 | TF-0037 | corrige | 1.5 | Plafond de taille CLAUDE.md + alerte | non |
 | TF-0038 | corrige | 1.3 | Exercer une vraie reprise de run interrompu | non |

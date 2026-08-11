@@ -50,7 +50,12 @@ writeFileSync(join(verte, "docs", "projet", "TECHNOS.md"),
 writeFileSync(join(verte, "docs", "projet", "COMPOSANTS-OPS.md"),
   '---\nrole: composants\nsources_de_verite: ["ops.mjs etat"]\nverifie_le: 2026-08-11\n---\n# Composants\n');
 writeFileSync(join(verte, "docs", "projet", "PARAMETRAGE.md"),
-  '---\nrole: parametrage\nsources_de_verite: [.env.example]\nverifie_le: 2026-08-11\nvariables:\n  - PORT\n  - API_TIERCE_CLE\n---\n# Paramétrage\n');
+  '---\nrole: parametrage\nsources_de_verite: [.env.example]\nverifie_le: 2026-08-11\nvariables:\n  - PORT\n  - API_TIERCE_CLE\n---\n# Paramétrage\n\n' +
+  '## URLs & ports par environnement\n\n' + // R-24 verte : hôtes <appli>-{env}, locale et placeholders hors périmètre
+  '| Environnement | Front | Back/API | BDD | Notes |\n|---|---|---|---|---|\n' +
+  '| locale | http://localhost:5173 | http://localhost:8080 | localhost:5432 | réel local OK |\n' +
+  '| qualif | https://demoapp-qualif.up.railway.app | https://demoapp-api-qualif.up.railway.app | <HOTE_BDD_QUALIF> | staging de la MEP |\n' +
+  '| production | https://demoapp-production.up.railway.app | {<URL_API_PROD>} | <HOTE_BDD_PROD> | GO humain |\n');
 writeFileSync(join(verte, "docs", "projet", "ACCES-TEST.md"),
   '---\nrole: acces de test\nsources_de_verite: ["seed MODE_DEMO"]\nverifie_le: 2026-08-11\n---\n# Accès\n> comptes de démonstration locale — jamais valides hors MODE_DEMO\n\n| admin | admin@demo.local | demo-admin |\n');
 writeFileSync(join(verte, "docs", "projet", "COMMANDES.md"),
@@ -107,18 +112,24 @@ writeFileSync(join(rougeDocs, "package-lock.json"), '{ "express": { "version": "
 writeFileSync(join(rougeDocs, "docs", "projet", "TECHNOS.md"),
   '---\nrole: technos\nsources_de_verite: [package-lock.json]\nverifie_le: 2026-08-11\nversions:\n  express: "4.18.0"\n---\n# Technos périmées\n'); // R-21
 writeFileSync(join(rougeDocs, "docs", "projet", "PARAMETRAGE.md"),
-  '---\nrole: parametrage\nsources_de_verite: [.env.example]\nverifie_le: 2026-08-11\nvariables:\n  - PORT\n---\n# Paramétrage\n'); // R-22 : PORT documenté, absent de .env.example
+  '---\nrole: parametrage\nsources_de_verite: [.env.example]\nverifie_le: 2026-08-11\nvariables:\n  - PORT\n---\n# Paramétrage\n\n' + // R-22 : PORT documenté, absent de .env.example
+  '## URLs & ports par environnement\n\n' + // R-24 : hôte sans préfixe d'env + « staging » au lieu de qualif
+  '| Environnement | Front | Notes |\n|---|---|---|\n' +
+  '| staging | https://demoapp-staging.up.railway.app | mauvais vocabulaire |\n' +
+  '| production | https://demoapp.up.railway.app | aucun préfixe |\n');
 writeFileSync(join(rougeDocs, "docs", "projet", "ACCES-TEST.md"),
   '---\nrole: acces\nsources_de_verite: [seed]\nverifie_le: 2026-08-11\n---\n# Accès\naws_key = "AKIAIOSFODNN7EXAMPLE"\n'); // R-23 : en-tête absent + motif AKIA
 writeFileSync(join(rougeDocs, "docs", "projet", "COMMANDES.md"), "# sans frontmatter\n"); // R-20 : frontmatter incomplet
 
 
-check("rouge-docs : R-20..R-23 se déclenchent, localisantes", () => {
+check("rouge-docs : R-20..R-24 se déclenchent, localisantes", () => {
   const { exit, rapport } = lance(rougeDocs);
   if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
   const declenchees = new Set(rapport.findings.filter((f) => f.statut === "FAIL").map((f) => f.regle));
-  for (const attendue of ["R-20", "R-21", "R-22", "R-23"])
+  for (const attendue of ["R-20", "R-21", "R-22", "R-23", "R-24"])
     if (!declenchees.has(attendue)) throw new Error(`règle ${attendue} non déclenchée sur rouge-docs`);
+  const r24 = rapport.findings.filter((f) => f.regle === "R-24" && f.statut === "FAIL");
+  if (r24.length !== 2) throw new Error(`R-24 : 2 constats attendus (sans préfixe + staging), ${r24.length} obtenu(s)`);
   for (const f of rapport.findings) if (!f.ou || !f.message) throw new Error(`finding ${f.regle} sans localisation`);
 });
 
