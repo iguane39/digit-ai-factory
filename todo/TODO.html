@@ -49,7 +49,7 @@
   <div class="wrap">
     <header>
       <h1>TODO-FORGE — registre d'amélioration</h1>
-      <p class="meta">83 actifs (candidat 27 · décidé 0 · en cours 2 · corrigé 54 · écarté 0) · 0 archivés · sceau source <code>ff196697575b</code> · dernier événement 2026-08-11T09:39:34Z</p>
+      <p class="meta">85 actifs (candidat 29 · décidé 0 · en cours 0 · corrigé 56 · écarté 0) · 0 archivés · sceau source <code>65f666eb754f</code> · dernier événement 2026-08-11T10:06:02Z</p>
       <p>Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au pilot — il sera appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
     </header>
     <div class="barre">
@@ -389,7 +389,7 @@
       </table></div>
     </section>
     <section>
-      <h2 id="design">design <span class="badge">6</span></h2>
+      <h2 id="design">design <span class="badge">7</span></h2>
       <div class="scroll"><table data-filterable>
         <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
@@ -405,6 +405,19 @@
             </details>
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0017" rows="1" aria-label="Commentaire TF-0017" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0085" aria-label="Décider TF-0085"></td>
+          <td class="c-id"><code>TF-0085</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">3</td>
+          <td>
+            <details><summary><strong>D-10 : le contrôle réseau exécutable annoncé n'existe pas dans la recette HTML</strong></summary>
+              <p>La décision D-10 (08/08, humaine) impose l'autonomie totale des livrables HTML sortants (aucun CDN, aucune police distante, aucun appel réseau — confidentialité, durabilité, lecture hors ligne) et ANNONCE sa vérification : « recherche de motif dans le fichier produit — aucune occurrence de http://, https://, //cdn, @import url( hors attributs documentaires. Contrôle exécutable, pas déclaratif. » Constat du 11/08 : check_html.py ne contient AUCUN de ces motifs (grep → 0) — le ✓ d'autonomie est aujourd'hui déclaratif, exactement ce que D-10 interdit. Proposition : ajouter la règle à check_charte() (FAIL bloquant, liste d'exclusions pour les attributs documentaires type xmlns/DOCTYPE/liens visibles en texte) + fixtures rouge/verte + self-test, dans le skill digit-ai-page-html (maison mère : forge-design).</p>
+              <p class="meta">Demandeur : TF-0039 (traçabilité du circuit D-13) · 2026-08-11 · gain 3 × preuve 3 ÷ effort 1 · <strong>payé en réel</strong> — un livrable client avec un appel CDN passerait la recette aujourd'hui ; les trois motifs de D-10 (traçage des lectures, CDN disparu à 2 ans, proxy d'entreprise) restent des risques réels non gardés</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0085" rows="1" aria-label="Commentaire TF-0085" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0016" aria-label="Décider TF-0016"></td>
@@ -689,7 +702,7 @@
       </table></div>
     </section>
     <section>
-      <h2 id="pilot">pilot <span class="badge">13</span></h2>
+      <h2 id="pilot">pilot <span class="badge">15</span></h2>
       <div class="scroll"><table data-filterable>
         <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
@@ -718,6 +731,19 @@
             </details>
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0062" rows="1" aria-label="Commentaire TF-0062" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0084" aria-label="Décider TF-0084"></td>
+          <td class="c-id"><code>TF-0084</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">2</td>
+          <td>
+            <details><summary><strong>Trois propositions organization en attente de décision pilot (circuit D-13)</strong></summary>
+              <p>Relevées en traçant le circuit (TF-0039), routées ici au lieu d'être encodées en douce — le pas 3 du circuit est humain, sans raccourci. À trancher : (1) D-06 précision « la doctrine n'est pas une sortie » — un document normatif de forge vit à sa racine, pas dans output/ ; l'adopter au corpus ? (2) D-02 reste ouvert — Old\ à la racine du projet ou par dossier concerné, et harmonisation des 4 graphies observées (Old/old/archives/archive-v1) ; (3) D-04 — le registre des types (registre-types.json, 23 types, chez organization) devient-il opposable aux produits (l'oracle de conformité lirait le fichier d'un dépôt frère) ou reste-t-il interne aux forges ?</p>
+              <p class="meta">Demandeur : TF-0039 (traçabilité du circuit D-13) · 2026-08-11 · gain 2 × preuve 3 ÷ effort 1 · <strong>payé en réel</strong> — REGLES-PROJET §G : trois lignes de la matrice portent « en attente de décision pilot » — tant qu'elles y restent, la règle du corpus et la doctrine d'organization peuvent diverger sans que personne ne le voie</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0084" rows="1" aria-label="Commentaire TF-0084" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0050" aria-label="Décider TF-0050" disabled></td>
@@ -850,6 +876,19 @@
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0038" rows="1" aria-label="Commentaire TF-0038" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0039" aria-label="Décider TF-0039" disabled></td>
+          <td class="c-id"><code>TF-0039</code></td>
+          <td><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score">1</td>
+          <td>
+            <details><summary><strong>Circuit organization→steering opérationnel</strong></summary>
+              <p>Chaque proposition D-xx passe le circuit décision→REGLES-PROJET→oracle (aboutissement de Q-B). Dépend de TF-0031/TF-0034.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 3</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0039" rows="1" aria-label="Commentaire TF-0039" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0054" aria-label="Décider TF-0054" disabled></td>
           <td class="c-id"><code>TF-0054</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
@@ -870,19 +909,6 @@
       <div class="scroll"><table data-filterable>
         <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
-        <tr>
-          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0029" aria-label="Décider TF-0029" disabled></td>
-          <td class="c-id"><code>TF-0029</code></td>
-          <td><span class="statut s-en_cours">en_cours</span></td>
-          <td class="c-score">1</td>
-          <td>
-            <details><summary><strong>Générateurs des 3 livrables manquants</strong></summary>
-              <p>audit.md, roadmap, dette-instrumentation : 3 des 5 livrables contractuels sans producteur.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 4</p>
-            </details>
-          </td>
-          <td class="c-comm"><textarea class="commentaire" data-id="TF-0029" rows="1" aria-label="Commentaire TF-0029" placeholder="commentaire…"></textarea></td>
-        </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0074" aria-label="Décider TF-0074"></td>
           <td class="c-id"><code>TF-0074</code></td>
@@ -1079,6 +1105,19 @@
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0047" rows="1" aria-label="Commentaire TF-0047" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0029" aria-label="Décider TF-0029" disabled></td>
+          <td class="c-id"><code>TF-0029</code></td>
+          <td><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score">1</td>
+          <td>
+            <details><summary><strong>Générateurs des 3 livrables manquants</strong></summary>
+              <p>audit.md, roadmap, dette-instrumentation : 3 des 5 livrables contractuels sans producteur.</p>
+              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 4</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0029" rows="1" aria-label="Commentaire TF-0029" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0030" aria-label="Décider TF-0030" disabled></td>
           <td class="c-id"><code>TF-0030</code></td>
           <td><span class="statut s-corrige">corrige</span></td>
@@ -1090,27 +1129,6 @@
             </details>
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0030" rows="1" aria-label="Commentaire TF-0030" placeholder="commentaire…"></textarea></td>
-        </tr>
-        </tbody>
-      </table></div>
-    </section>
-    <section>
-      <h2 id="steering">steering <span class="badge">1</span></h2>
-      <div class="scroll"><table data-filterable>
-        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
-        <tbody>
-        <tr>
-          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0039" aria-label="Décider TF-0039" disabled></td>
-          <td class="c-id"><code>TF-0039</code></td>
-          <td><span class="statut s-en_cours">en_cours</span></td>
-          <td class="c-score">1</td>
-          <td>
-            <details><summary><strong>Circuit organization→steering opérationnel</strong></summary>
-              <p>Chaque proposition D-xx passe le circuit décision→REGLES-PROJET→oracle (aboutissement de Q-B). Dépend de TF-0031/TF-0034.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 3</p>
-            </details>
-          </td>
-          <td class="c-comm"><textarea class="commentaire" data-id="TF-0039" rows="1" aria-label="Commentaire TF-0039" placeholder="commentaire…"></textarea></td>
         </tr>
         </tbody>
       </table></div>
@@ -1246,7 +1264,7 @@
   <script>
   (function () {
     "use strict";
-    var SCEAU = "ff196697575b";
+    var SCEAU = "65f666eb754f";
     var cle = function (id, type) { return "todo-forge:" + SCEAU + ":" + id + ":" + type; };
     var coches = document.querySelectorAll("input.decider");
     var comms = document.querySelectorAll("textarea.commentaire");

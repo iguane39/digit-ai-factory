@@ -80,6 +80,31 @@ de run actualise ses fichiers (design/development → TECHNOS, MEP → COMPOSANT
 | 17 | Les journaux d'oracles (`*.oracles.json`, `*.oracles-historique.jsonl`) sont versionnés dans `forge\` (ce sont des preuves), ignorés partout ailleurs | observée : présents dans Produit-12/forge/ | produits | P0 (.gitignore) | nul | option (conflit C4) |
 | 18 | `forge\retours\` existe (gabarit inclus) ; chaque lot de retours forges est un fichier `RETOURS-<AAAAMMJJ><indice>.md` — un fichier par lot, ids en séquence continue par produit, **jamais modifié après remise** ; remise = copie dans `input\` du pilot | **mandat humain du 06/08** ; format éprouvé 2× (Produit-12/forge/RETOURS-FORGES*.md) | produits, nouveaux + rattrapage | P0+S+O | faible | **adoptée** (décision 06/08) |
 
+## G. Circuit des conventions (D-13) — traçabilité organization → pilot
+
+Aboutissement de Q-B (TF-0039, constat du 11/08). Le circuit — proposition `D-xx` chez
+organization → remise au pilot → **décision humaine** → encodage ici + oracle — a été
+traversé en réel une première fois : **D-03/Q3-bis → règle 4 → oracle de conformité**
+(les deux documents se référencent). État de chaque proposition, sans raccourci : rien
+n'est encodé sans décision, rien de décidé n'est laissé sans encodage tracé.
+
+| D-xx (organization, décidées 08-09/08) | Encodage corpus | État |
+|---|---|---|
+| D-01 `output/` ≠ artefacts de build | règle 2 (`dist/` hors périmètre : pas un livrable) | encodée |
+| D-02 indice obligatoire + archivage `Old\` sans effacement | règles 5 et 7 | encodée — reste ouvert : emplacement/graphies de `Old` (→ TF-0084) |
+| D-03 préfixe = nom du projet (Q3-bis) | règle 4 | **encodée — cas d'école du circuit** |
+| D-04 taxonomie des types, registre `registre-types.json` | aucune règle corpus | en attente de décision pilot : opposable aux produits ? (→ TF-0084) |
+| D-05 `CLAUDE.md` point d'entrée, compléments référencés | règle 11 + gabarit `CLAUDE-PRODUIT.md` | encodée |
+| D-06 `input/` = fourni par l'humain · `output/` = ce qui sort | règles 1 et 2 | encodée — la précision « la doctrine n'est pas une sortie » reste une proposition (→ TF-0084) |
+| D-07 artefacts de traçabilité : patron optionnel | non-obligation explicite | sans objet |
+| D-08→D-11 livrable HTML sortant : charte + autonomie + généré | mécanisme livrable, pas socle projet : `references\BEST-PRACTICES-HTML.md` + socle `digit-ai-page-html` + recette `check_html`/`render_page` (loi qualité) | couvertes — **défaut constaté** : le contrôle réseau exécutable annoncé par D-10 est absent de `check_html.py` (→ TF-0085) |
+| D-12 composant partagé : inliner, jamais installer en douce | garde-fou pilot « aucune écriture dans les dépôts frères hors mandat » | encodée |
+| D-13 le circuit lui-même | CLAUDE.md pilot, ligne de gouvernance Q-B | encodée |
+| D-14 `forge-steering` → `forge-pilot` | répercuté partout (bootstrap, README, schéma) | constatée |
+
+Q4 (conventions internes aux fichiers) reste ouverte **côté organization** — pas une
+décision pilot tant qu'aucune proposition n'est remise.
+
 ## Conflits à trancher (ta décision explicite)
 
 - **C1 — `Old\` vs git (n° 6/7)** : deux magasins de versions divergent toujours. Proposition :
