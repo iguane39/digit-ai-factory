@@ -32,6 +32,13 @@ diagnostic au rapport. Si la vérification native est elle-même défaillante, l
 preuve : une fixture verte qui PASSE et une fixture rouge qui ÉCHOUE pour la bonne
 raison. Une règle sans fixture rouge n'est pas prouvée.
 
+**Avancement des tranches longues (TF-0094).** Toute tranche dépassant ~2 minutes émet
+son avancement toutes les 3 minutes au format `gabarits\AVANCEMENT-PROCESS.md` du pilot :
+tableau 8 champs (heures de démarrage et de reporting, réalisé, en cours, RAF, restant
+estimé sur cadence MESURÉE, total prévu, fin prévue avec glissement dit) — émetteurs
+prêts `scripts\avancement.py` / `.mjs`. Une unité qui occupe plus d'une fenêtre se
+sous-découpe (avancement interne nommé). Un process long muet est en défaut de contrat.
+
 **Git.** Commits locaux, un commit par item corrigé (ou par groupe cohérent annoncé),
 message en français décrivant l'effet (pas la mécanique), id TF-xxxx cité dans le corps.
 **JAMAIS de push, jamais de remote, jamais de tag** — la publication est une décision

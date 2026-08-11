@@ -144,6 +144,17 @@ comparative — un a priori jamais confronté. Protocole, appliqué à toute cam
 Première campagne instrumentée : boucle TODO du 09/08 (7 tranches, répartition Opus/Sonnet,
 relevés au journal `BOUCLE-AMELIORATION.md`).
 
+### 4 ter. Avancement des process longs (TF-0094, décidé le 11/08)
+
+Tout process dépassant ~2 minutes (mutation, rendu, scan, migrations, MEP, génération
+d'images, campagne) publie son avancement **toutes les 3 minutes** — démarrage, fenêtres,
+fin — au format de `gabarits\AVANCEMENT-PROCESS.md` : tableau de 8 champs pour l'humain
+(heure de démarrage, heure du reporting, réalisé, en cours, RAF, temps restant estimé sur
+cadence MESURÉE, temps total prévu, heure de fin prévue avec glissement dit) + ligne JSON
+dans `<run>/avancement.jsonl`. Une unité qui occupe plus d'une fenêtre se **sous-découpe**
+(avancement interne nommé). Émetteurs prêts : `scripts\avancement.py` / `avancement.mjs`.
+**Un process long muet est en défaut de contrat.**
+
 ## 5. Table de routage réelle et dette d'intégration
 
 Racine des chemins : `$FORGE_ROOT`, sinon le parent du dépôt pilot (`c:\dev` sur le poste

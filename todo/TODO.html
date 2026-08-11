@@ -89,7 +89,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>c2e5c1c448f3</code> · dernier événement 2026-08-11T14:21:52Z</p>
+      <p class="meta">sceau <code>ec06ffeb898b</code> · dernier événement 2026-08-11T15:01:06Z</p>
       <button id="exporter" type="button">Exporter les décisions</button>
       <span id="bilan" aria-live="polite">0 coché · 0 commentaire</span>
     </header>
@@ -99,14 +99,14 @@
       <div class="kpi" title="2 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">2</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
       <div class="kpi" title="0 item(s) décidés dont les travaux ne sont pas ouverts"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts</span></div>
       <div class="kpi" title="1 campagne(s) ouvertes au registre"><span class="kpi-label">En cours</span><span class="kpi-value">1</span><span class="kpi-hint">campagnes ouvertes au registre</span></div>
-      <div class="kpi" title="92 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">92</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
+      <div class="kpi" title="93 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">93</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende"><span class="leg-item"><span class="leg-swatch" style="background:var(--surface)"></span>candidat</span><span class="leg-item"><span class="leg-swatch" style="background:var(--teal-fill)"></span>décidé</span><span class="leg-item"><span class="leg-swatch" style="background:var(--amber-fill)"></span>en cours</span></p>
-    <nav class="toc" aria-label="Sommaire"><a href="#pilot"><strong>pilot</strong> <span class="toc-d">2 item(s) reste-à-faire ciblant pilot</span></a><a href="#seo"><strong>seo</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant seo</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#pilot"><strong>pilot</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant pilot</span></a><a href="#seo"><strong>seo</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant seo</span></a><a href="#tests"><strong>tests</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant tests</span></a></nav>
     <main>
     <section id="pilot">
-      <h2>pilot <span class="badge" title="2 item(s) actifs ciblant pilot">2</span></h2>
-      <p class="ch-apprend meta">Ce chapitre liste les 2 item(s) du reste-à-faire dont la cible est pilot : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
+      <h2>pilot <span class="badge" title="1 item(s) actifs ciblant pilot">1</span></h2>
+      <p class="ch-apprend meta">Ce chapitre liste les 1 item(s) du reste-à-faire dont la cible est pilot : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
       <div class="scroll"><table data-filterable>
         <caption class="sr-only">Reste-à-faire ciblant pilot — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
         <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
@@ -121,17 +121,6 @@
               <p class="meta">Demandeur : TF-0093 (exécution du 11/08) · 2026-08-11 · gain 3 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — sans socle, chaque produit repasse par l'audit seo pour découvrir le même écart — le nœud 58 le détecterait produit par produit au lieu d'être réglé une fois à la naissance</p>
             </details></td>
           <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0095" rows="1" aria-label="Commentaire TF-0095" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0094" aria-label="Décider TF-0094"></td>
-          <td class="c-id" data-th="id"><code>TF-0094</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">2.7</td>
-          <td data-th="item"><details><summary><strong>Avancement obligatoire de tout process long : réalisé / en cours / RAF / ETA, émis toutes les 2 à 5 min</strong></summary>
-              <p>Aucun traitement long de la forge n'émet de signal d'avancement avant sa terminaison : forge_tests bufferise stdout et n'écrit son rapport qu'à la fin, et il n'est pas seul — build, génération d'images, scan seo, rejeu de migrations, MEP ont le même silence. L'opérateur attend sans savoir s'il reste 2 minutes ou 30 heures, et ne peut donc pas décider d'abandonner à temps. EXIGENCE : tout process dépassant ~2 min publie un flux d'avancement normalisé, toutes les 2 à 5 min, sur stderr ET dans &lt;run&gt;/avancement.jsonl (le fichier survit à la session, stderr sert l'humain qui regarde). Six champs obligatoires, jamais agrégés en un pourcentage seul : realise (unités traitées, nommées), en_cours (l'unité courante, nommée), raf (unités restantes), temps_restant_estime, temps_total_prevu, heure_fin_prevue. L'unité est déclarée par le process lui-même (module muté, écran rendu, nœud scanné, fichier migré) — le noyau n'en connaît aucune, exactement comme pour les pans. Règle dure : un process long qui ne publie pas son avancement est en défaut de contrat, au même titre qu'un adaptateur qui ne sait pas énumérer sa surface. Corollaire de la doctrine « on nomme, on n'agrège pas » appliquée au temps : un « 43 % » sans unité courante ne permet ni de diagnostiquer un blocage ni d'estimer une fin.</p>
-              <p class="meta">Demandeur : audit-approval2-20260811 · 2026-08-11 · gain 4 × preuve 2 ÷ effort 3 · <strong>payé en réel</strong> — payé en réel le 11/08 sur Approval2 : 10 min d'attente aveugle, puis diagnostic obtenu seulement en inspectant l'arbre de processus Windows et le fichier muté en vol — la mutation en était au 1er module sur 70 et le run demandait &gt;30 h, sans que rien ne l'ait signalé</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0094" rows="1" aria-label="Commentaire TF-0094" placeholder="commentaire…"></textarea></td>
         </tr>
         </tbody>
       </table></div>
@@ -157,13 +146,34 @@
         </tbody>
       </table></div>
     </section>
+    <section id="tests">
+      <h2>tests <span class="badge" title="1 item(s) actifs ciblant tests">1</span></h2>
+      <p class="ch-apprend meta">Ce chapitre liste les 1 item(s) du reste-à-faire dont la cible est tests : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
+      <div class="scroll"><table data-filterable>
+        <caption class="sr-only">Reste-à-faire ciblant tests — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
+        <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0096" aria-label="Décider TF-0096"></td>
+          <td class="c-id" data-th="id"><code>TF-0096</code></td>
+          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score" data-th="score">3</td>
+          <td data-th="item"><details><summary><strong>forge-tests : flux d'avancement natif dans l'exécution (mutation, pans) — l'offenseur d'origine</strong></summary>
+              <p>TF-0094 a encodé la convention (gabarit pilot AVANCEMENT-PROCESS, émetteurs prêts scripts/avancement.py|.mjs) — reste l'instrumentation NATIVE du process qui a déclenché la demande : forge_tests bufferise stdout et n'émet rien avant la fin. À câbler dans la boucle d'exécution (mutation par module avec sous-découpe par lot de mutants, pans longs) : consommer scripts/avancement.py du pilot ou porter l'équivalent dans le dépôt (D-12 : copie avec provenance si le pilot n'est pas garanti présent), émission 3 min sur stderr + &lt;cible&gt;/forge/avancement.jsonl. Preuve attendue : un run réel sur banc-vert montrant démarrage + ≥ 1 fenêtre + final.</p>
+              <p class="meta">Demandeur : TF-0094 (exécution du 11/08) · 2026-08-11 · gain 3 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — le run Approval2 du 11/08 : ~45 min de mutation sans un signal — l'opérateur a dû reconstruire l'avancement à la main depuis les logs</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0096" rows="1" aria-label="Commentaire TF-0096" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
     </main>
     <footer>Vue générée par <code>todo/generer-page.mjs</code> — ne pas éditer. Source unique : <code>todo/TODO.jsonl</code>. Détail d'un item : <code>grep '"id":"TF-xxxx"' todo/TODO.jsonl</code>.</footer>
   </div>
   <script>
   (function () {
     "use strict";
-    var SCEAU = "c2e5c1c448f3";
+    var SCEAU = "ec06ffeb898b";
     var cle = function (id, type) { return "todo-forge:" + SCEAU + ":" + id + ":" + type; };
     var coches = document.querySelectorAll("input.decider");
     var comms = document.querySelectorAll("textarea.commentaire");
