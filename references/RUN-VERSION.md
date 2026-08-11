@@ -8,7 +8,10 @@ premier produit réel). Entrant : les retours consignés au ledger du run préc�
 l'entrée du run N+1 — même projet, nouveau `run_open` chaîné (champ `run_precedent`,
 contrôle R-19 de l'oracle de conformité).
 
-Le run de version commence par le **rattrapage du socle** : `oracle-conformite-projet` sur le
+Au rattrapage, corriger aussi les **références `digit-ai-forge-steering`** (chemins absolus
+de PROMPT-PRODUIT/CLAUDE.md/lots antérieurs au renommage du 09/08) vers `digit-ai-forge-pilot`
+— TF-0062 ; la jonction de compatibilité ne se supprime qu'une fois tous les produits du poste
+rattrapés. Le run de version commence par le **rattrapage du socle** : `oracle-conformite-projet` sur le
 projet, chaque FAIL corrigé (c'est ainsi que les produits antérieurs aux règles se mettent en
 conformité — jamais en masse silencieuse hors run). Son entrant inclut les lots de
 `forge\retours\` non encore traités.

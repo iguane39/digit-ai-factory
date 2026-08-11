@@ -40,7 +40,7 @@ projet (2e mandat) · **G** = gate humain.
 | 7 | Quand un livrable documentaire est remplacé par une version plus récente, l'ancien migre dans `Old\` du même dossier (lisibilité du dossier courant — pas un magasin de versions) | **citée par toi** ; observée 1/30+ (`OptimAssur/old`) | livrables uniquement | S+O | faible | option (conflit C1) |
 | 8 | Tout nouveau produit est `git init` à l'ouverture du run, avec commit initial + commits par étape (le **push/remote reste sur ton GO**) | gap constaté : Produit-12 sans git | produits, nouveaux | P0 | nul | **défaut** (conflit C2) |
 | 9 | Commits en Conventional Commits français | observée (development 116 commits, campagnes forges) | tous dépôts git | S | nul | **défaut** |
-| 10 | `.gitignore` socle dès la création : `.env`, `.venv/`, `__pycache__/`, `node_modules/`, `generated/`, artefacts de build | observée (9/11) | tous | P0+O | nul | **défaut** |
+| 10 | `.gitignore` socle dès la création : `.env`, `.venv/`, `__pycache__/`, `node_modules/`, `generated/`, artefacts de build, **sidecars d'oracles** `*.oracles.json` / `*.oracles-cache.json` / `*.oracles-historique.jsonl` (TF-0065 — les preuves VOULUES restent versionnées sous `forge\`, exception `!forge/**`, décision C4) | observée (9/11) ; sidecars : 3 campagnes polluées | tous | P0+O | nul | **défaut** |
 
 ## D. Documentation du produit
 
