@@ -49,7 +49,7 @@
   <div class="wrap">
     <header>
       <h1>TODO-FORGE — registre d'amélioration</h1>
-      <p class="meta">82 actifs (candidat 27 · décidé 0 · en cours 2 · corrigé 53 · écarté 0) · 0 archivés · sceau source <code>35f787aacafd</code> · dernier événement 2026-08-11T08:26:29Z</p>
+      <p class="meta">83 actifs (candidat 27 · décidé 0 · en cours 2 · corrigé 54 · écarté 0) · 0 archivés · sceau source <code>ff196697575b</code> · dernier événement 2026-08-11T09:39:34Z</p>
       <p>Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au pilot — il sera appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
     </header>
     <div class="barre">
@@ -363,6 +363,27 @@
             </details>
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0015" rows="1" aria-label="Commentaire TF-0015" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section>
+      <h2 id="datanouvelle">data (nouvelle) <span class="badge">1</span></h2>
+      <div class="scroll"><table data-filterable>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0083" aria-label="Décider TF-0083" disabled></td>
+          <td class="c-id"><code>TF-0083</code></td>
+          <td><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score">3</td>
+          <td>
+            <details><summary><strong>forge-data — révision de l'écartement du 08/08 sur preuve REX (admission rejouée)</strong></summary>
+              <p>Test d'admission : trou allégué = aucune discipline data outillée dans les runs (lineage exigible, reporting sourcé, profiling composé) ; preuve = REX réel OracleAltaix (playbook lineage, rétro-doc architecture, openmetadata). NOTE DE GOUVERNANCE : forge-data avait été écartée nominativement à la revue du 08/08 — le présent mandat humain REVOIT cette décision sur preuve nouvelle. Phases : 1 non-recouvrement à verdict (sortie honnête « extension suffit » possible) ; 2 REX anonymisé zéro-client ; 3 standards gouvernés ; 4 v0 aux niveaux des 3 barres validées (OpenLineage/tracer, Great Expectations/profiler, dbt-core/restituer — registre la-barre 11/08) ; 5 intégrations écosystème.</p>
+              <p class="meta">Demandeur : prompt réécrit L99 + barre (pré-vol) du 11/08 · 2026-08-11 · gain 4 × preuve 3 ÷ effort 4 · <strong>payé en réel</strong> — REX OracleAltaix : lineage et rétro-doc faits à la main, non réutilisables ; aucun oracle de lineage/restitution dans l'écosystème</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0083" rows="1" aria-label="Commentaire TF-0083" placeholder="commentaire…"></textarea></td>
         </tr>
         </tbody>
       </table></div>
@@ -1225,7 +1246,7 @@
   <script>
   (function () {
     "use strict";
-    var SCEAU = "35f787aacafd";
+    var SCEAU = "ff196697575b";
     var cle = function (id, type) { return "todo-forge:" + SCEAU + ":" + id + ":" + type; };
     var coches = document.querySelectorAll("input.decider");
     var comms = document.querySelectorAll("textarea.commentaire");

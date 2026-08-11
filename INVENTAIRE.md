@@ -1,4 +1,4 @@
-# Inventaire des neuf forges — 2026-08-04 · màj 2026-08-11 (+forge-audit, +forge-ops)
+# Inventaire des dix forges — 2026-08-04 · màj 2026-08-11 (+audit, +ops, +data)
 
 Synthèse issue de cinq explorations exhaustives (une par projet, fichiers cités vérifiés sur disque).
 Chaque forge est décrite selon : rôle, point d'entrée réel, entrées, sorties, oracles, maturité, manques pour l'orchestration.
@@ -207,6 +207,28 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
   mais cible locale/staging fichiers seulement — D-P1 : cibles cloud (Railway, VPS) à outiller ;
   D-P2 : jamais d'invocation produit-direct.
 
+## 10. digit-ai-forge-data — `c:\dev\digit-ai-forge-data` *(créée le 11/08, TF-0083 — révision tracée de l'écartement du 08/08)*
+
+- **Rôle** : **discipline de la donnée** des runs — la qualité en assertions exécutables
+  (**profiler**), le lineage déclaré complet (**tracer**), les chiffres ancrés à leurs
+  sources (**restituer**). Trois oracles au niveau de trois barres validées (registre
+  la-barre) : Great Expectations, OpenLineage, dbt-core.
+- **Frontière (verdict de non-recouvrement, phase 1 TF-0083)** : composition stricte — le
+  profiling de datasets reste à `data-quality-auditor` (appelé), la police des montants
+  documentaires à `oracle-claims`, la couverture du pan data produit à forge-tests, la
+  gouvernance d'architecture à forge-audit. Le trou unique comblé : **aucun outil de
+  lineage exigible n'existait**.
+- **Point d'entrée réel** : `node oracles/oracle-{profiler,tracer,restituer}.mjs <artefact>`
+  (contrat JSON, exit 0/1/2, non_juge) ; formats maison `forge-data/assertions@1` et
+  `forge-data/lineage@1` ; rapports à frontmatter `chiffres:` + `lineage_ref:`.
+- **Fond de savoir** : `references/REX-DATA.md` — 12 patterns de rétro-ingénierie et de
+  lineage issus d'un chantier réel, anonymisés (zéro client, vérifié par grep), avec portée
+  générique/contingente ; `references/STANDARDS-DATA.md` — standards retenus/écartés sourcés.
+- **Maturité** : v0 née exercée — self-test double sens **15 PASS** (fixtures synthétiques
+  uniquement). Dettes : D-D1 grain dataset (colonne→colonne hors v0) ; D-D2 véracité
+  runtime du lineage déclaré non capturée (niveau 3 hors v0) ; premier run produit à
+  consigner ici.
+
 ## Lecture transverse pour le pilot
 
 | Forge | Point d'entrée machine | Oracles exécutables | A déjà produit un livrable réel |
@@ -220,6 +242,7 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
 | organization *(08/08)* | non (conversationnel) | partiel (1 oracle vérifié, pas de self-test projet) | oui (doctrine + composant) |
 | audit *(10/08)* | via submodule `auditcore/` (non peuplé au clone shallow) | à détailler (contrôles dans auditcore) | **oui** (engagement Nhood, 2 CI vertes) |
 | ops *(11/08)* | **oui** (CLI `ops.mjs`, exit 0/1 ; oracle O-1…O-4 exit 0/1/2) | **oui** (self-test 14 PASS, déploiement réel rejoué) | **oui** (fixture d'acceptation : staging local + rollback prouvé) |
+| data *(11/08)* | **oui** (3 oracles CLI, exit 0/1/2) | **oui** (self-test double sens 15 PASS) | non (v0 neuve — REX réel anonymisé comme fond) |
 
 Trois conséquences d'architecture :
 1. **Le pilot est le seul conducteur légitime** — Conception l'interdit chez elle, Development l'ignore,

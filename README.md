@@ -1,15 +1,17 @@
 # digit-ai-forge-pilot
 
 Projet de pilotage de l'écosystème forge Digit-AI. **Un seul point de démarrage** pour construire
-un produit en mobilisant les neuf forges bout en bout, et pour les améliorer par itérations
+un produit en mobilisant les dix forges bout en bout, et pour les améliorer par itérations
 bornées.
 
-**Les neuf forges** — pipeline : [forge-conception](https://github.com/iguane39/digit-ai-forge-conception) ·
+**Les dix forges** — pipeline : [forge-conception](https://github.com/iguane39/digit-ai-forge-conception) ·
 [forge-design](https://github.com/iguane39/digit-ai-forge-design) ·
 [forge-development](https://github.com/iguane39/digit-ai-forge-development) ·
 [forge-tests](https://github.com/iguane39/digit-ai-forge-tests) — transverses :
 [forge-agents](https://github.com/iguane39/digit-ai-forge-agents) (outils partagés) ·
-[forge-ops](https://github.com/iguane39/digit-ai-forge-ops) (exploitation, outille la MEP) — sur
+[forge-ops](https://github.com/iguane39/digit-ai-forge-ops) (exploitation, outille la MEP) ·
+[forge-data](https://github.com/iguane39/digit-ai-forge-data) (discipline de la donnée : lineage,
+qualité, restitution sourcée) — sur
 mandat humain : [forge-audit](https://github.com/iguane39/digit-ai-forge-audit) (gouvernance
 POC-to-Prod) · [forge-seo](https://github.com/iguane39/digit-ai-forge-seo) (post-MEP) ·
 [forge-organization](https://github.com/iguane39/digit-ai-forge-organization) (conventions). Règle d'affichage de ce README : il ne promet rien que le ledger d'un run ne puisse
@@ -27,7 +29,7 @@ GitHub** (`~/.digit-ai-forge` par défaut, via `bootstrap.mjs`), puis le run ent
 artefacts d'étapes, code — vit dans le projet produit.
 
 **Amorçage manuel** (équivalent de la phase 0) : cloner ce dépôt puis `node bootstrap.mjs` —
-vérifie les prérequis, clone les neuf forges en dépôts frères (`core.longpaths` activé : les
+vérifie les prérequis, clone les dix forges en dépôts frères (`core.longpaths` activé : les
 noms de fichiers des forges dépassent MAX_PATH sinon) et contrôle leurs points d'entrée.
 Options : `--racine <dossier>` (+ `FORGE_ROOT` en session), `--pull` pour mettre à jour.
 Testé : amorçage réel d'un répertoire vierge, toutes forges clonées et preuves vérifiées, exit 0.
