@@ -49,7 +49,7 @@
   <div class="wrap">
     <header>
       <h1>TODO-FORGE — registre d'amélioration</h1>
-      <p class="meta">85 actifs (candidat 29 · décidé 0 · en cours 0 · corrigé 56 · écarté 0) · 0 archivés · sceau source <code>65f666eb754f</code> · dernier événement 2026-08-11T10:06:02Z</p>
+      <p class="meta">90 actifs (candidat 32 · décidé 0 · en cours 0 · corrigé 58 · écarté 0) · 0 archivés · sceau source <code>2cc64d7cc1cb</code> · dernier événement 2026-08-11T11:41:49Z</p>
       <p>Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au pilot — il sera appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
     </header>
     <div class="barre">
@@ -79,7 +79,7 @@
       </table></div>
     </section>
     <section>
-      <h2 id="agents">agents <span class="badge">16</span></h2>
+      <h2 id="agents">agents <span class="badge">17</span></h2>
       <div class="scroll"><table data-filterable>
         <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
@@ -225,6 +225,19 @@
             </details>
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0058" rows="1" aria-label="Commentaire TF-0058" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0085" aria-label="Décider TF-0085" disabled></td>
+          <td class="c-id"><code>TF-0085</code></td>
+          <td><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score">3</td>
+          <td>
+            <details><summary><strong>D-10 : le contrôle réseau exécutable annoncé n'existe pas dans la recette HTML</strong></summary>
+              <p>La décision D-10 (08/08, humaine) impose l'autonomie totale des livrables HTML sortants (aucun CDN, aucune police distante, aucun appel réseau — confidentialité, durabilité, lecture hors ligne) et ANNONCE sa vérification : « recherche de motif dans le fichier produit — aucune occurrence de http://, https://, //cdn, @import url( hors attributs documentaires. Contrôle exécutable, pas déclaratif. » Constat du 11/08 : check_html.py ne contient AUCUN de ces motifs (grep → 0) — le ✓ d'autonomie est aujourd'hui déclaratif, exactement ce que D-10 interdit. Proposition : ajouter la règle à check_charte() (FAIL bloquant, liste d'exclusions pour les attributs documentaires type xmlns/DOCTYPE/liens visibles en texte) + fixtures rouge/verte + self-test, dans le skill digit-ai-page-html (maison mère : forge-design).</p>
+              <p class="meta">Demandeur : TF-0039 (traçabilité du circuit D-13) · 2026-08-11 · gain 3 × preuve 3 ÷ effort 1 · <strong>payé en réel</strong> — un livrable client avec un appel CDN passerait la recette aujourd'hui ; les trois motifs de D-10 (traçage des lectures, CDN disparu à 2 ans, proxy d'entreprise) restent des risques réels non gardés</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0085" rows="1" aria-label="Commentaire TF-0085" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0024" aria-label="Décider TF-0024" disabled></td>
@@ -389,7 +402,7 @@
       </table></div>
     </section>
     <section>
-      <h2 id="design">design <span class="badge">7</span></h2>
+      <h2 id="design">design <span class="badge">6</span></h2>
       <div class="scroll"><table data-filterable>
         <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
@@ -405,19 +418,6 @@
             </details>
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0017" rows="1" aria-label="Commentaire TF-0017" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0085" aria-label="Décider TF-0085"></td>
-          <td class="c-id"><code>TF-0085</code></td>
-          <td><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score">3</td>
-          <td>
-            <details><summary><strong>D-10 : le contrôle réseau exécutable annoncé n'existe pas dans la recette HTML</strong></summary>
-              <p>La décision D-10 (08/08, humaine) impose l'autonomie totale des livrables HTML sortants (aucun CDN, aucune police distante, aucun appel réseau — confidentialité, durabilité, lecture hors ligne) et ANNONCE sa vérification : « recherche de motif dans le fichier produit — aucune occurrence de http://, https://, //cdn, @import url( hors attributs documentaires. Contrôle exécutable, pas déclaratif. » Constat du 11/08 : check_html.py ne contient AUCUN de ces motifs (grep → 0) — le ✓ d'autonomie est aujourd'hui déclaratif, exactement ce que D-10 interdit. Proposition : ajouter la règle à check_charte() (FAIL bloquant, liste d'exclusions pour les attributs documentaires type xmlns/DOCTYPE/liens visibles en texte) + fixtures rouge/verte + self-test, dans le skill digit-ai-page-html (maison mère : forge-design).</p>
-              <p class="meta">Demandeur : TF-0039 (traçabilité du circuit D-13) · 2026-08-11 · gain 3 × preuve 3 ÷ effort 1 · <strong>payé en réel</strong> — un livrable client avec un appel CDN passerait la recette aujourd'hui ; les trois motifs de D-10 (traçage des lectures, CDN disparu à 2 ans, proxy d'entreprise) restent des risques réels non gardés</p>
-            </details>
-          </td>
-          <td class="c-comm"><textarea class="commentaire" data-id="TF-0085" rows="1" aria-label="Commentaire TF-0085" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0016" aria-label="Décider TF-0016"></td>
@@ -702,10 +702,23 @@
       </table></div>
     </section>
     <section>
-      <h2 id="pilot">pilot <span class="badge">15</span></h2>
+      <h2 id="pilot">pilot <span class="badge">20</span></h2>
       <div class="scroll"><table data-filterable>
         <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0088" aria-label="Décider TF-0088"></td>
+          <td class="c-id"><code>TF-0088</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">9</td>
+          <td>
+            <details><summary><strong>R-21 est aveugle dès que les lockfiles ne sont pas à la racine, et ignore yarn.lock — la fraîcheur des versions n'est jamais jugée sur un dépôt multi-composants</strong></summary>
+              <p>oracle-conformite-projet.mjs cherche les lockfiles UNIQUEMENT à la racine du projet, dans une liste fermée : package-lock.json, pyproject.toml, poetry.lock, uv.lock, requirements.txt, Cargo.lock, go.sum, composer.lock, Gemfile.lock. Deux angles morts, constatés par exécution le 11/08 sur BAV2 : (1) yarn.lock N'EST PAS dans la liste, alors que Yarn est utilisé tel quel par le produit (frontend/yarn.lock, `yarn install --frozen-lockfile` dans le Dockerfile ET dans la pipeline) ; (2) la recherche ne descend pas d'un niveau, or la disposition front/ + back/ est la norme, pas l'exception. Résultat sur BAV2 : verdict SANS_OBJET « aucun lockfile/manifeste à la racine — fraîcheur non jugeable », alors que le produit a bel et bien frontend/yarn.lock (25 versions résolues) et azure/backend-requirements.txt (15 versions épinglées) — soit 25 versions déclarées dans TECHNOS.md que R-21 laisse passer sans les confronter à quoi que ce soit. La règle est marquée « défaut » et son mécanisme « O » (oracle) : elle est aujourd'hui structurellement incapable de FAIL sur ce type de dépôt, donc de tenir la loi 4 qu'elle invoque. Proposition : (a) ajouter yarn.lock, pnpm-lock.yaml et bun.lockb à la liste ; (b) chercher les lockfiles en descendant de 2 niveaux au plus, en excluant node_modules/.venv/dist/build ; (c) accepter les manifestes épinglés hors nom canonique quand ils sont référencés par un Dockerfile (ici azure/backend-requirements.txt) — à défaut, exiger que sources_de_verite du frontmatter TECHNOS liste les fichiers à confronter et les lire depuis là, ce qui est plus simple et déjà déclaré par le gabarit ; (d) ne plus rendre SANS_OBJET quand des versions SONT déclarées mais qu'aucune source n'est trouvée : c'est un FAIL de configuration, pas une absence d'objet — le silence actuel ressemble à un succès.</p>
+              <p class="meta">Demandeur : run-mep-bav2 (11/08) · 2026-08-11 · gain 3 × preuve 3 ÷ effort 1 · <strong>payé en réel</strong> — sur BAV2, 25 versions déclarées dans TECHNOS.md n'ont été confrontées aux lockfiles par AUCUN oracle — la vérification a dû être refaite à la main pendant le run ; tout dépôt front+back (la disposition la plus courante) est dans le même cas, ce qui vide R-21 de son effet là où elle sert le plus</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0088" rows="1" aria-label="Commentaire TF-0088" placeholder="commentaire…"></textarea></td>
+        </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0065" aria-label="Décider TF-0065"></td>
           <td class="c-id"><code>TF-0065</code></td>
@@ -718,6 +731,32 @@
             </details>
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0065" rows="1" aria-label="Commentaire TF-0065" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0087" aria-label="Décider TF-0087"></td>
+          <td class="c-id"><code>TF-0087</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">6</td>
+          <td>
+            <details><summary><strong>Socle docs\projet\ : aucun fichier ne décrit le FONCTIONNEL du produit — le socle est intégralement technique</strong></summary>
+              <p>Les 5 fichiers de R-20 décrivent la machine (technos, composants déployés, variables, comptes de test, commandes) et jamais CE QUE FAIT le produit ni POUR QUI. Un agent qui ouvre un run de version, ou un humain qui reprend le produit, n'a aucune vue de référence du métier : objets métier et leur cycle de vie, parcours utilisateurs, rôles et droits, règles de gestion, cas limites assumés. Il doit le reconstituer en lisant le code — exactement le coût que R-20 cherche à supprimer. Constat sur BAV2 (11/08) : le run a dû rétro-lire standalone_backend.py et les endpoints c13s pour comprendre qu'il s'agit d'annonces de locaux vacants avec alertes, import en masse et rôles admin ; rien de tout cela n'est écrit nulle part. Proposition : ajouter FONCTIONNEL.md au socle R-20, même régime que les autres (nom fixe, frontmatter YAML role / sources_de_verite / verifie_le, aucune duplication de la source de vérité, aucun secret), avec un contenu cadré : à quoi sert le produit en une phrase, utilisateurs et rôles, objets métier et leur cycle de vie, parcours principaux, règles de gestion structurantes, ce que le produit ne fait volontairement pas. Source de vérité naturelle : le référentiel EXIGENCES.json quand il existe (forge-conception) — FONCTIONNEL.md en est la vue lisible, pas un doublon ; pour un produit importé sans référentiel, il est rédigé depuis le code et daté comme toute valeur volatile.</p>
+              <p class="meta">Demandeur : run-mep-bav2 (11/08) · 2026-08-11 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — sur BAV2, la compréhension du métier a été reconstituée par lecture du code pendant le run MEP ; ce coût se repaiera à chaque run de version et à chaque reprise par un tiers, alors que le socle documentaire existe précisément pour l'éviter</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0087" rows="1" aria-label="Commentaire TF-0087" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0086" aria-label="Décider TF-0086"></td>
+          <td class="c-id"><code>TF-0086</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">4.5</td>
+          <td>
+            <details><summary><strong>R-20 : le socle documentaire docs\projet\ n'est produit par aucune étape — un run se clôt sans lui, sans que rien ne le signale</strong></summary>
+              <p>R-20 (décidée le 11/08, TF-0082) exige de tout produit un docs\projet\ complet : TECHNOS.md, COMPOSANTS-OPS.md, PARAMETRAGE.md, ACCES-TEST.md, COMMANDES.md, chacun ouvert par un frontmatter YAML (role, sources_de_verite, verifie_le). Constat du run MEP BAV2 (11/08) : la règle énonce QUI met à jour quoi (« design/development -&gt; TECHNOS, MEP -&gt; COMPOSANTS-OPS ») mais AUCUNE étape ne porte la CRÉATION du socle, et aucun oracle ne le vérifie à la clôture. Résultat concret : le run a produit 1 fichier sur 5 (COMPOSANTS-OPS.md), et même celui-là sans le frontmatter exigé — l'écart n'a été vu que parce que l'humain l'a signalé. R-21 (fraîcheur TECHNOS) et R-22 (parité PARAMETRAGE &lt;-&gt; .env.example) sont inapplicables tant que les fichiers n'existent pas : deux règles marquées « défaut » qui ne peuvent structurellement rien juger. Proposition : (1) rattacher la création du socle à une étape nommée (ouverture de run pour le squelette + frontmatter, chaque étape actualisant ses fichiers) ; (2) étendre oracle-conformite-projet.mjs pour juger la présence des 5 fichiers ET de leur frontmatter, en FAIL bloquant à la clôture ; (3) fournir les 5 gabarits dans gabarits\ pour que la génération ne soit pas réinventée à chaque run ; (4) traiter le cas des produits importés (BAV2 : dépôt repris, sans .env.example — R-13 —, donc R-22 injugeable) par un mode rattrapage explicite. --- MISE À JOUR 11/08 (même session, après inspection du dépôt pilot) : les propositions (2) étendre oracle-conformite-projet.mjs et (3) fournir les gabarits sont DÉJÀ FAITES et présentes dans l'arbre de travail du pilot, non committées à cette heure : oracles/oracle-conformite-projet.mjs juge R-20 (5 fichiers + frontmatter role/sources_de_verite/verifie_le), R-21 (versions ↔ lockfiles) et R-22 (parité PARAMETRAGE ↔ .env.example), et gabarits/docs-projet/ contient les 5 gabarits. Restent ouverts : (1) rattacher la CRÉATION du socle à une étape nommée — c'est le trou qui a produit le constat, l'oracle sait juger mais aucune étape ne produit — et (4) le mode rattrapage des produits importés. Le constat d'origine reste vrai et daté : le run MEP BAV2 s'est clos avec 1 fichier sur 5 sans qu'aucun oracle ne soit joué à la clôture.</p>
+              <p class="meta">Demandeur : run-mep-bav2 (11/08) · 2026-08-11 · gain 3 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — le run MEP BAV2 s'est clos avec 4 fichiers sur 5 manquants sans aucun signal d'oracle ; le motif même de R-20 (« les runs de version redécouvrent tout ») est donc intact pour ce produit — la prochaine reprise repartira de zéro sur les technos, le paramétrage, les commandes et les accès de test</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0086" rows="1" aria-label="Commentaire TF-0086" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0062" aria-label="Décider TF-0062"></td>
@@ -744,6 +783,19 @@
             </details>
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0084" rows="1" aria-label="Commentaire TF-0084" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0089" aria-label="Décider TF-0089"></td>
+          <td class="c-id"><code>TF-0089</code></td>
+          <td><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score">2</td>
+          <td>
+            <details><summary><strong>TODO.html : 49 constats de lisibilité à la recette (générateur à réviser)</strong></summary>
+              <p>La recette complète du 11/08 (check_html patché A1) relève 49 FAIL de lisibilité sur la page du registre — AUCUN A1 (la page est autonome) : L3 badges de compteur sans légende (×12) et colonne « score » triée sans formule publiée (×12), L9 dépliants sous 200 caractères à afficher en place (×23), L11 littéral « None » rendu tel quel (×1), L12 énumération en prose (×1). Producteur : todo/generer-page.mjs — corriger le générateur, jamais la page (D-11). Proposition : title/aria-label sur les badges, note de calcul du score référencée par aria-describedby, seuil d'inlining des details courts, valeur absente rendue « — », liste à puces pour l'énumération.</p>
+              <p class="meta">Demandeur : recette anti-régression TF-0085 (11/08) · 2026-08-11 · gain 2 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — la page vitrine du registre viole 4 règles de lisibilité que la forge impose à tous les livrables — se conformer à sa propre doctrine (précédent D-05 : organization)</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0089" rows="1" aria-label="Commentaire TF-0089" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0050" aria-label="Décider TF-0050" disabled></td>
@@ -835,6 +887,19 @@
             </details>
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0053" rows="1" aria-label="Commentaire TF-0053" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0090" aria-label="Décider TF-0090" disabled></td>
+          <td class="c-id"><code>TF-0090</code></td>
+          <td><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score">3</td>
+          <td>
+            <details><summary><strong>Convention d'URLs par environnement : &lt;nom-appli&gt;-{dev|qualif|production}.&lt;domaine&gt;</strong></summary>
+              <p>Décision humaine directe (message du 11/08) : les URLs des applications/projets/sites sont préfixées &lt;nom-appli&gt;-dev/qualif/production.&lt;domaine&gt; — ex. https://auxportesdelabaie-production.up.railway.app. Encodage : R-24 au REGLES-PROJET §E (le staging outillé de l'étape MEP se nomme qualif dans les URLs ; local et hôtes non applicatifs hors périmètre) ; oracle-conformite-projet R-24 exécutable sur la table « URLs &amp; ports par environnement » de PARAMETRAGE.md (placeholders non jugés, findings localisants) ; gabarit PARAMETRAGE à 4 environnements (locale/dev/qualif/production) portant le motif.</p>
+              <p class="meta">Demandeur : humain (message direct du 11/08) · 2026-08-11 · gain 3 × preuve 3 ÷ effort 1 · <strong>payé en réel</strong> — sans convention, chaque déploiement invente son hôte — l'environnement d'une URL devient indevinable et les checklists MEP ne peuvent pas la vérifier mécaniquement</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0090" rows="1" aria-label="Commentaire TF-0090" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0082" aria-label="Décider TF-0082" disabled></td>
@@ -1264,7 +1329,7 @@
   <script>
   (function () {
     "use strict";
-    var SCEAU = "65f666eb754f";
+    var SCEAU = "2cc64d7cc1cb";
     var cle = function (id, type) { return "todo-forge:" + SCEAU + ":" + id + ":" + type; };
     var coches = document.querySelectorAll("input.decider");
     var comms = document.querySelectorAll("textarea.commentaire");

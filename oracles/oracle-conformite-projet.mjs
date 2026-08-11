@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
  * oracle-conformite-projet.mjs — vérifie qu'un projet produit respecte REGLES-PROJET.md
- * (23 règles — R-1..R-19 du 06-10/08, R-20..R-23 socle documentaire du 11/08 TF-0082). Node pur, zéro dépendance, lecture seule.
+ * (24 règles — R-1..R-19 du 06-10/08, R-20..R-23 socle documentaire du 11/08 TF-0082,
+ * R-24 URLs d'environnement du 11/08 TF-0090). Node pur, zéro dépendance, lecture seule.
  *
  * Usage : node oracle-conformite-projet.mjs <racine-du-projet>
  * Sortie : JSON sur stdout — { oracle, version, cible, verdict, findings[], non_juge[] }
@@ -232,6 +233,35 @@ else {
     if (!manqueDoc.length && !manqueEnv.length) ok("R-22", "docs\\projet\\PARAMETRAGE.md", `parité tenue (${env.size} variable(s))`);
   }
 
+  // R-24 · URLs d'application par environnement : hôte préfixé <nom-appli>-{dev|qualif|production}
+  // (décision humaine du 11/08, TF-0090 — ex. auxportesdelabaie-production.up.railway.app).
+  // Jugées : les URLs http(s) des lignes dev/qualif/staging/production de la table
+  // « URLs & ports par environnement » de PARAMETRAGE.md. Placeholders <…>/{…} et ligne
+  // locale non jugés ; hôtes sans schéma (BDD host:port) non jugés — pas des URLs d'appli.
+  if (existsSync(pp)) {
+    const corps = readFileSync(pp, "utf8");
+    const lignes = corps.split(/\r?\n/).filter((l) => /^\|\s*(dev|qualif|staging|production|prod)\b/i.test(l.trim()));
+    if (!lignes.length) so("R-24", "PARAMETRAGE.md sans table d'environnements hébergés — URLs non jugeables");
+    else {
+      let ok24 = true, jugees = 0;
+      for (const l of lignes) {
+        const env = l.trim().match(/^\|\s*(\w+)/)[1].toLowerCase();
+        for (const [url] of l.matchAll(/https?:\/\/[^\s|)>}\]]+/g)) {
+          if (/[<>{}]/.test(url)) continue; // placeholder
+          jugees++;
+          const hote = url.replace(/^https?:\/\//, "").split(/[/:]/)[0];
+          const label = hote.split(".")[0];
+          if (!/-(dev|qualif|production)$/.test(label)) {
+            ko("R-24", "docs\\projet\\PARAMETRAGE.md", `URL ${env} « ${url.slice(0, 70)} » : le premier label d'hôte doit finir par -dev, -qualif ou -production (« ${label} » constaté)`); ok24 = false;
+          } else if (env === "staging" && !label.endsWith("-qualif")) {
+            ko("R-24", "docs\\projet\\PARAMETRAGE.md", `ligne staging : l'environnement de l'étape MEP se nomme qualif dans les URLs (« ${label} » constaté)`); ok24 = false;
+          }
+        }
+      }
+      if (ok24) jugees ? ok("R-24", "docs\\projet\\PARAMETRAGE.md", `${jugees} URL(s) d'environnement au motif <appli>-{dev|qualif|production}`) : so("R-24", "environnements hébergés en placeholders — URLs réelles non encore posées");
+    }
+  }
+
   // R-23 · ACCES-TEST : démo locale seulement, zéro secret (R-14 + loi 2)
   const ap = join(dp, "ACCES-TEST.md");
   if (existsSync(ap)) {
@@ -254,6 +284,7 @@ const nonJuge = [
   "seule la PRÉSENCE de CLAUDE.md/README est jugée, pas la pertinence de leur contenu",
   "R-21 : correspondance nom+version par inclusion textuelle dans les lockfiles — pas de résolution sémantique de graphes de dépendances",
   "R-23 : motifs de secrets forts uniquement — un mot de passe réaliste inventé sans motif connu passe (revue humaine + gitleaks en CI)",
+  "R-24 : seules les URLs http(s) des lignes d'environnement de PARAMETRAGE.md sont jugées — URLs documentaires du corps et hôtes sans schéma (BDD) hors périmètre ; la correspondance <nom-appli> ↔ nom réel du produit reste une revue humaine",
 ];
 
 const echecs = findings.filter((f) => f.statut === "FAIL").length;
