@@ -1,4 +1,4 @@
-# Inventaire des huit forges — 2026-08-04 · màj 2026-08-10 (+forge-audit)
+# Inventaire des neuf forges — 2026-08-04 · màj 2026-08-11 (+forge-audit, +forge-ops)
 
 Synthèse issue de cinq explorations exhaustives (une par projet, fichiers cités vérifiés sur disque).
 Chaque forge est décrite selon : rôle, point d'entrée réel, entrées, sorties, oracles, maturité, manques pour l'orchestration.
@@ -190,6 +190,23 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
   (produit = `audit`, engagement = `audit_nhood`). **Exploration exhaustive au standard des
   autres forges encore à mener** (entrées, sorties, oracles à détailler lors d'un run dédié).
 
+## 9. digit-ai-forge-ops — `c:\dev\digit-ai-forge-ops` *(créée le 11/08, TF-0040)*
+
+- **Rôle** : **exploitation** — déployer, exploiter, restaurer. Forge transverse qui **outille
+  l'étape MEP du pilot** : gestes (`ops.mjs` : healthcheck avant bascule, `COURANT` atomique,
+  `journal.jsonl` au contrat ledger) + verdicts (`oracle-ops` O-1…O-4) consommés par M-1…M-5.
+  Elle ne décide jamais : GO production humain, orchestration au pilot, invocation par le
+  pilot uniquement.
+- **Point d'entrée réel** : `node scripts/ops.mjs deployer|restaurer|etat <cible>` et
+  `node oracles/oracle-ops.mjs <cible> --json-only` (contrat JSON, exit 0/1/2, non_juge).
+- **Oracles** : O-1 pointeur sain · O-2 healthcheck rejoué (exécution réelle) · O-3 journal
+  intègre (seq croissant depuis 1) · O-4 rollback prouvable (aucune release citée purgée,
+  pointeur ↔ histoire cohérents). Self-test **à preuve par le geste** : déploiement réel local
+  v1→v2 + rollback + 4 défauts types refusés — 14 PASS.
+- **Maturité** : v0 née outillée et exercée (contrairement au syndrome « aucun livrable réel »)
+  mais cible locale/staging fichiers seulement — D-P1 : cibles cloud (Railway, VPS) à outiller ;
+  D-P2 : jamais d'invocation produit-direct.
+
 ## Lecture transverse pour le pilot
 
 | Forge | Point d'entrée machine | Oracles exécutables | A déjà produit un livrable réel |
@@ -202,6 +219,7 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
 | seo *(08/08)* | **oui** (CLI Python, exit 0/1) | oui (validate 9/9 + 5/5, refus de rapport partiel) | **oui** (mission client complète) |
 | organization *(08/08)* | non (conversationnel) | partiel (1 oracle vérifié, pas de self-test projet) | oui (doctrine + composant) |
 | audit *(10/08)* | via submodule `auditcore/` (non peuplé au clone shallow) | à détailler (contrôles dans auditcore) | **oui** (engagement Nhood, 2 CI vertes) |
+| ops *(11/08)* | **oui** (CLI `ops.mjs`, exit 0/1 ; oracle O-1…O-4 exit 0/1/2) | **oui** (self-test 14 PASS, déploiement réel rejoué) | **oui** (fixture d'acceptation : staging local + rollback prouvé) |
 
 Trois conséquences d'architecture :
 1. **Le pilot est le seul conducteur légitime** — Conception l'interdit chez elle, Development l'ignore,

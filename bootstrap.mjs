@@ -29,6 +29,9 @@ const FORGES = [
   // renommé le 11/08). Les référentiels vivent dans core/ (adr, controls, dimensions).
   // L'espace d'engagement client (`digit-ai-forge-audit_nhood`, privé) est hors bootstrap.
   { nom: "digit-ai-forge-audit", preuve: "core/invariants.json" },
+  // forge-ops : exploitation (déployer/exploiter/restaurer) — outille l'étape MEP du pilot
+  // (TF-0040). La preuve est son self-test, qui rejoue un déploiement réel local + rollback.
+  { nom: "digit-ai-forge-ops", preuve: "oracles/self-test.mjs" },
 ];
 
 const args = process.argv.slice(2);

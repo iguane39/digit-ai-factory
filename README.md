@@ -68,9 +68,9 @@ uniquement sur GO humain**, donné sur un dossier de preuve généré (DOSSIER-M
 |---|---|
 | `CLAUDE.md` | l'orchestrateur — instructions de pilotage de la session (5 étapes) |
 | `PROMPT-PRODUIT.md` | modèle du point d'entrée — à copier à la racine de chaque projet produit |
-| `INVENTAIRE.md` | état réel des cinq forges (points d'entrée, oracles, manques) |
+| `INVENTAIRE.md` | état réel des forges (points d'entrée, oracles, manques) |
 | `CONTRAT-INTERFACE.md` | format d'invocation, ledger, routage par modèle, dette d'intégration |
-| `ETAPE-MEP.md` | la 5e étape : déploiement staging, oracle MEP, gate GO production |
+| `ETAPE-MEP.md` | la 5e étape : staging outillé par **forge-ops** (O-1…O-4), oracle MEP, gate GO production |
 | `REGLES-PROJET.md` | les 17 règles de socle projet (décidées le 06/08) |
 | `oracles\` | `oracle-conformite-projet.mjs` (17 règles, exit 0/1/2) + self-test double sens |
 | `gabarits\` | gabarits du CLAUDE.md produit (routage forge obligatoire) et des lots de retours |

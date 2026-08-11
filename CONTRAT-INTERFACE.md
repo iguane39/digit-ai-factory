@@ -148,8 +148,8 @@ relevés au journal `BOUCLE-AMELIORATION.md`).
 
 Racine des chemins : `$FORGE_ROOT`, sinon le parent du dépôt pilot (`c:\dev` sur le poste
 d'origine). Amorçage d'un poste : `node bootstrap.mjs [--racine <dossier>] [--pull]` — clone les
-cinq forges (dépôts privés `github.com/iguane39`, `gh` authentifié requis) et vérifie les points
-d'entrée listés ci-dessous.
+forges (`github.com/iguane39`, `gh` authentifié requis pour les dépôts privés) et vérifie
+les points d'entrée listés ci-dessous.
 
 | Étape | Point d'entrée utilisé | Mode | Dette (écart au contrat) |
 |---|---|---|---|
@@ -158,6 +158,7 @@ d'entrée listés ci-dessous.
 | Development | construction directe par agent (méthode du run-playbook lue comme spec), gates rejoués : `ruff check` + `pytest` sur le produit | degrade | D-V1 : `conductor` inutilisable en headless (HITL fermés, `NotImplementedError`, exit toujours 0) ; D-V2 : ~~volet design soldé le 07/08~~ (`generer-design-md.mjs` produit le `design/DESIGN.md` linté par le gate — PASS vérifié) ; reste le volet conception (EXIGENCES.json → `_bmad-output/`) ; D-V3 : recouvrement BMAD/Conception et gates/Tests non arbitré |
 | Tests | `uv run python -m forge_tests <racine-produit> --json` (capture stdout) | **natif** | D-T1 : exit 3 (PARTIEL) traité comme acceptable documenté ; D-T2 : rapport non persisté → le pilot le persiste lui-même ; D-T3 : crash timeout / G-1 lecture-seule non corrigés (correctifs en attente de feu vert côté forge-tests) ; D-T4 : `--generer` + `--json` incompatibles sur stdout |
 | Agents (transverse) | ledger contract + `compile-agent-def.mjs` si des agents dédiés sont justifiés ; sinon Agent tool du harnais | degrade | D-A1 : composition conversationnelle par doctrine ; D-A2 : `ledger.mjs` sans verrou → règle écrivain unique ; D-A3 : gates G1-G3 inactifs hors session dédiée |
+| Ops (transverse, outille la MEP — 11/08) | dépôt `digit-ai-forge-ops` — verbes : `node <ops>\scripts\ops.mjs deployer\|restaurer\|etat <cible>` ; verdicts : `node <ops>\oracles\oracle-ops.mjs <cible> --json-only` (O-1…O-4, consommés par M-1…M-5) ; preuve : `oracles/self-test.mjs` rejoue un déploiement réel local + rollback | **natif** | D-P1 : v0 cible locale/staging (fichiers) — cibles cloud (Railway, VPS) à outiller ; D-P2 : invocation par le pilot uniquement, jamais par les produits en direct |
 | SEO (post-MEP, récurrente — 08/08) | CLI natif : `python <seo>\scripts\new_mission.py --projet <produit> --client … --domaine … --modele …` puis méthode `seo\METHODE.md` déroulée en session ; contrôles `validate.py [--mission]` (exit 0/1) ; rapport `rapport_html.py --verifier`. **Jamais de déclenchement automatique** (doctrine de la forge : un audit commence par une commande explicite — mandat humain requis) | natif (scaffold/validation/rendu) + degrade (analyse des 87 nœuds en session) | D-S1 : 3 livrables sur 5 sans générateur ; D-S2 : snapshot non validé contre son schéma (dérive 1.0.0/1.1.0) ; D-S3 : pas de sortie --json ; D-S4 : moteurs d'étapes ad hoc chez la mission, non généralisés |
 | Organization (doctrine transverse — 08/08) | conversationnel — les documents (Inventaire, Décisions D-01→D-12) sont les entrées ; oracle `output\composant-filtres-tableau\oracle-filtres-tableau.mjs` exécutable | degrade | D-O1 : aucun point d'entrée (viole sa propre D-05) ; D-O2 : décisions en prose, pas de `conventions.json` ni vérificateur (Phase 3 non faite) ; D-O3 : recouvrement D-01→D-12 ↔ REGLES-PROJET.md du pilot à réconcilier ; D-O4 : 3 questions ouvertes (Q3, Q3-bis, Q4) |
 
