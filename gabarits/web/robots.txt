@@ -1,0 +1,17 @@
+# robots.txt — socle produit forge Digit-AI (R-27, décision humaine du 11/08/2026)
+#
+# POSTURE PAR DÉFAUT : les agents des moteurs génératifs sont AUTORISÉS — un site
+# invisible des réponses IA perd la surface de découverte qui monte (nœud 58 de la
+# grille forge-seo). Bloquer un agent est un CHOIX légitime, mais c'est une DÉCISION :
+# elle se consigne ICI MÊME, datée et motivée, en commentaire au-dessus de sa règle —
+# jamais un réglage anti-bot par défaut.
+#
+# Exemple de blocage consigné (l'entraînement se distingue de la recherche) :
+#   # Décision du AAAA-MM-JJ (<qui>) : contenu propriétaire hors corpus d'entraînement.
+#   # User-agent: Google-Extended
+#   # Disallow: /
+
+User-agent: *
+Allow: /
+
+Sitemap: /sitemap.xml

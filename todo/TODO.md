@@ -1,17 +1,11 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=ec06ffeb898b archive=3f6e5cd58943 · dernier événement: 2026-08-11T15:01:06Z -->
+     sceaux: actifs=19181b91d860 archive=3eb4a8fa16f9 · dernier événement: 2026-08-11T15:04:54.363Z -->
 
-**3 actifs** (candidat 2 · décidé 0 · en cours 1 · corrigé 0 · écarté 0) · **94 archivés**.
+**4 actifs** (candidat 3 · décidé 0 · en cours 1 · corrigé 0 · écarté 0) · **96 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
-
-## pilot
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0095 | candidat | 3 | Côté produits : robots.txt ouvert aux agents IA par défaut + llms.txt généré au socle web | **oui** — sans socle, chaque produit repasse par l'audit seo pour découvrir le même écart — le nœud 58 le détecterait produit par produit au lieu d'être réglé une fois à la naissance |
 
 ## seo
 
@@ -23,7 +17,9 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0096 | candidat | 3 | forge-tests : flux d'avancement natif dans l'exécution (mutation, pans) — l'offenseur d'origine | **oui** — le run Produit-01 du 11/08 : ~45 min de mutation sans un signal — l'opérateur a dû reconstruire l'avancement à la main depuis les logs |
+| TF-0097 | candidat | 4 | forge-tests suppose une arborescence au lieu de lire la configuration que le projet déclare — deux pans rendus non mesurables à tort | **oui** — payé en réel le 11/08 : deux pans sur douze déclarés non mesurables à tort, avec un motif affirmant l'inexistence d'artefacts que l'audit venait de faire tourner |
+| TF-0098 | candidat | 3 | forge-tests lance `npx playwright test` sans vérifier qu'une config Playwright existe — « suite e2e en échec » au lieu de « aucune suite e2e » | **oui** — payé en réel le 11/08 : l'action rendue au rapport envoyait réparer une suite qui n'existe pas, en affirmant qu'elle est rouge |
+| TF-0099 | candidat | 3 | Le scan de secrets n'est pas borné aux sources du produit — 11 « fuites » toutes situées dans des dépendances | **oui** — payé en réel le 11/08 : 3 findings bloquants du pan securite sur 3 n'accusent aucune ligne du produit audité |
 
 ---
 Détail d'un item : `grep '"id":"TF-xxxx"' todo/TODO.jsonl` (tous ses événements). Archive : même commande sur TODO-ARCHIVE.jsonl.

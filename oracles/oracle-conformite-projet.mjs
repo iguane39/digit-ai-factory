@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
  * oracle-conformite-projet.mjs — vérifie qu'un projet produit respecte REGLES-PROJET.md
- * (26 règles — R-1..R-19 du 06-10/08, R-20..R-23 socle documentaire du 11/08 TF-0082,
+ * (27 règles — R-1..R-19 du 06-10/08, R-20..R-23 socle documentaire du 11/08 TF-0082,
  * R-24 URLs d'environnement du 11/08 TF-0090, R-25 types au registre du 11/08 TF-0084,
- * R-26 modèle de données ancré au schéma réel du 11/08 TF-0091 — socle à 8 fichiers
+ * R-26 modèle de données ancré au schéma réel du 11/08 TF-0091, R-27 surface web née
+ * ouverte aux agents IA du 11/08 TF-0095 — socle à 8 fichiers
  * + projections HTML générées). Node pur, zéro dépendance, lecture seule (le registre
  * des types d'organization est LU, jamais écrit).
  *
@@ -105,6 +106,39 @@ else {
       }
     }
     if (r25) vus ? ok("R-25", "output/, docs/", `${vus} livrable(s) daté(s) au type admis`) : so("R-25", "aucun livrable daté à typer");
+  }
+}
+
+// R-27 — surface web née ouverte aux agents IA (TF-0095, pendant produit du nœud 58 seo) :
+// un robots.txt présent n'interdit AUCUN agent IA de recherche sans ligne de décision
+// consignée (commentaire « décision » à moins de 3 lignes au-dessus du User-agent) ;
+// llms.txt vit à côté. Aucun robots.txt = surface web non déclarée → SANS_OBJET.
+{
+  const AGENTS_IA = ["GPTBot", "OAI-SearchBot", "ClaudeBot", "PerplexityBot", "Google-Extended", "ChatGPT-User", "Claude-Web"];
+  const robots = [...fichiers(cible)].filter((f) => basename(f).toLowerCase() === "robots.txt");
+  if (!robots.length) so("R-27", "aucun robots.txt — surface web non déclarée, agents IA non jugeables");
+  else {
+    let ok27 = true;
+    for (const rb of robots) {
+      const lignes = readFileSync(rb, "utf8").split(/\r?\n/);
+      let uaCourant = null, uaLigne = 0;
+      lignes.forEach((l, i) => {
+        const mUA = l.match(/^\s*User-agent\s*:\s*(.+?)\s*$/i);
+        if (mUA) { uaCourant = mUA[1]; uaLigne = i; return; }
+        const mDis = l.match(/^\s*Disallow\s*:\s*(\S+)/i);
+        if (mDis && uaCourant && AGENTS_IA.some((a) => uaCourant.toLowerCase() === a.toLowerCase())) {
+          const avant = lignes.slice(Math.max(0, uaLigne - 3), uaLigne).join(" ");
+          if (!/d[ée]cision/i.test(avant)) {
+            ko("R-27", `${rel(rb)}:${i + 1}`, `agent IA « ${uaCourant} » bloqué sans décision consignée — la posture par défaut est AUTORISÉ ; bloquer se décide, se date et se motive dans le fichier`); ok27 = false;
+          }
+        }
+      });
+      const llms = join(dirname(rb), "llms.txt");
+      if (!existsSync(llms)) {
+        ko("R-27", rel(rb), "robots.txt sans llms.txt à côté — la carte du site pour les moteurs génératifs fait partie du socle web (gabarits\\web\\llms.txt)"); ok27 = false;
+      }
+    }
+    if (ok27) ok("R-27", robots.map(rel).join(", "), `${robots.length} robots.txt ouverts aux agents IA (ou blocages consignés), llms.txt présent(s)`);
   }
 }
 
@@ -366,6 +400,7 @@ const nonJuge = [
   "R-23 : motifs de secrets forts uniquement — un mot de passe réaliste inventé sans motif connu passe (revue humaine + gitleaks en CI)",
   "R-24 : seules les URLs http(s) des lignes d'environnement de PARAMETRAGE.md sont jugées — URLs documentaires du corps et hôtes sans schéma (BDD) hors périmètre ; la correspondance <nom-appli> ↔ nom réel du produit reste une revue humaine",
   "R-26 : ancrage par inclusion textuelle du nom de table dans la provenance — la complétude INVERSE (toute table du DDL figure au doc) et l'exactitude des colonnes ne sont pas jugées (revue de schéma) ; la fraîcheur des projections HTML n'est pas datée (régénération = discipline d'étape)",
+  "R-27 : jugé seulement si un robots.txt existe (surface web non déclarée = SANS_OBJET) ; blocages CDN/WAF et cohérence llms.txt ↔ sitemap hors périmètre statique (nœud 58 forge-seo au run)",
 ];
 
 const echecs = findings.filter((f) => f.statut === "FAIL").length;

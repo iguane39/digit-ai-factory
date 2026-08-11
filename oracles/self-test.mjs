@@ -41,6 +41,11 @@ writeFileSync(join(verte, "forge", "ledger.jsonl"), [
   JSON.stringify({ type: "run_open", ts: "2026-08-10T08:00:00Z", run_precedent: "run-20260809", versions_forges: { conception: "951d46e" } }),
 ].join("\n") + "\n"); // R-19 verte : versions_forges partout + chaînage du run de version
 writeFileSync(join(verte, "app.py"), "print('produit')\n");
+// R-27 verte : surface web ouverte aux agents IA + llms.txt à côté (un blocage CONSIGNÉ
+// reste conforme — la décision datée au-dessus de la règle)
+writeFileSync(join(verte, "robots.txt"),
+  "# décision du 2026-08-11 (humain) : contenu propriétaire hors corpus d'entraînement\nUser-agent: Google-Extended\nDisallow: /\n\nUser-agent: *\nAllow: /\n");
+writeFileSync(join(verte, "llms.txt"), "# Produit test\n> Gère des annonces de démonstration.\n\n## Pages principales\n- [Accueil](/): liste des annonces\n");
 
 // R-20..R-23 verte : docs\projet\ complet, versions = lockfile, parité env, ACCES démo
 mkdirSync(join(verte, "docs", "projet"), { recursive: true });
@@ -107,6 +112,7 @@ const rouge = mkdtempSync(join(tmpdir(), "conf-rouge-"));
 mkdirSync(join(rouge, "output", "Old"), { recursive: true });      // R-1 (input absent), R-3 (docs absent)
 writeFileSync(join(rouge, "output", "rapport-final.md"), "x\n");    // R-4 : livrable non daté
 writeFileSync(join(rouge, "output", "Produit - Grimoire Néant - 20260811a.md"), "x\n"); // R-25 : type improvisé (daté correct → R-4 muette dessus)
+writeFileSync(join(rouge, "robots.txt"), "User-agent: GPTBot\nDisallow: /\n\nUser-agent: *\nAllow: /\n"); // R-27 : agent IA bloqué SANS décision consignée + llms.txt absent
 writeFileSync(join(rouge, "output", "Old", "vieux - 20260101a.py"), "x = 1\n"); // R-6 : code sous Old
 writeFileSync(join(rouge, "main - 20260806a.py"), "x = 1\n");       // R-6 : code daté
 writeFileSync(join(rouge, "CLAUDE.md"), "# Produit\njuste des commandes pytest\n"); // R-11 : présent SANS routage forge
@@ -122,7 +128,7 @@ check("rouge : chaque règle attendue se déclenche, FAIL exit 1", () => {
   const { exit, rapport } = lance(rouge);
   if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
   const declenchees = new Set(rapport.findings.filter((f) => f.statut === "FAIL").map((f) => f.regle));
-  for (const attendue of ["R-1", "R-3", "R-4", "R-6", "R-7", "R-8", "R-10", "R-11", "R-12", "R-13", "R-18", "R-19", "R-25"])
+  for (const attendue of ["R-1", "R-3", "R-4", "R-6", "R-7", "R-8", "R-10", "R-11", "R-12", "R-13", "R-18", "R-19", "R-25", "R-27"])
     if (!declenchees.has(attendue)) throw new Error(`règle ${attendue} non déclenchée sur la fixture rouge`);
 });
 

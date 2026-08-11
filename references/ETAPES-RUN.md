@@ -33,7 +33,9 @@ JAMAIS éditées à la main — R-20 exige leur présence). Chaque étape actual
 fichiers : conception → FONCTIONNEL (vue d'`EXIGENCES.json`) · design/development → TECHNOS
 (ancré lockfiles, R-21), ARCHITECTURE et COMMANDES · development → MODELE-DONNEES **depuis
 le schéma réel** (provenance par table, R-26) · MEP → COMPOSANTS-OPS, PARAMETRAGE (URLs au
-motif R-24) et ACCES-TEST — toute édition d'une source régénère sa vue. Produit importé : rattrapage explicite à
+motif R-24) et ACCES-TEST — toute édition d'une source régénère sa vue. Produit à surface web : copier aussi `gabarits\web\robots.txt` (agents IA autorisés par
+défaut — bloquer se décide et se consigne dans le fichier) et `gabarits\web\llms.txt`
+(carte tenue par development/MEP, R-27). Produit importé : rattrapage explicite à
 l'ouverture (socle créé depuis l'état constaté, `.env.example` reconstruit avant R-22).
 
 **Valider** : `node <pilot>\oracles\oracle-conformite-projet.mjs <projet>` → PASS exigé avant
