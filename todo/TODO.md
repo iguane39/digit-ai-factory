@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=5930f74898fe archive=e3b0c44298fc · dernier événement: 2026-08-11T07:54:10Z -->
+     sceaux: actifs=35f787aacafd archive=e3b0c44298fc · dernier événement: 2026-08-11T08:26:29Z -->
 
-**81 actifs** (candidat 27 · décidé 0 · en cours 2 · corrigé 52 · écarté 0) · **0 archivés**.
+**82 actifs** (candidat 27 · décidé 0 · en cours 2 · corrigé 53 · écarté 0) · **0 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -102,6 +102,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0049 | corrige | 3 | TODO-FORGE : l'écriture directe contourne l'écrivain unique — la détecter par oracle | **oui** — 7 créations sans trace d'ingestion dans le registre réel |
 | TF-0051 | corrige | 3 | Protocole de mesure du routage Sonnet/Opus | non |
 | TF-0053 | corrige | 3 | CLAUDE.md steering découpé en références à la demande (mécanisme de TF-0037) | **oui** — trajectoire CLAUDE.md 4590→17278 octets mesurée sur git |
+| TF-0082 | corrige | 2.7 | Socle documentaire produit docs\projet\ — règles R-20..R-23 | **oui** — aucun produit n'a d'état des lieux standardisé ; les runs de version redécouvrent technos/config/accès à chaque ouverture |
 | TF-0037 | corrige | 1.5 | Plafond de taille CLAUDE.md + alerte | non |
 | TF-0038 | corrige | 1.3 | Exercer une vraie reprise de run interrompu | non |
 | TF-0054 | corrige | 1 | Baseline d'audit packagée par forge | non |

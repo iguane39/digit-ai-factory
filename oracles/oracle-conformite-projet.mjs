@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * oracle-conformite-projet.mjs — vérifie qu'un projet produit respecte REGLES-PROJET.md
- * (17 règles décidées le 2026-08-06). Node pur, zéro dépendance, lecture seule.
+ * (23 règles — R-1..R-19 du 06-10/08, R-20..R-23 socle documentaire du 11/08 TF-0082). Node pur, zéro dépendance, lecture seule.
  *
  * Usage : node oracle-conformite-projet.mjs <racine-du-projet>
  * Sortie : JSON sur stdout — { oracle, version, cible, verdict, findings[], non_juge[] }
@@ -61,6 +61,7 @@ for (const d of ["output", "docs"]) {
     const nom = basename(f);
     const ext = nom.split(".").pop().toLowerCase();
     if (EXCLUS_NOMMAGE.has(nom) || !EXT_LIVRABLE.has(ext) || /\/Old\//i.test("/" + rel(f))) continue;
+    if (/^docs[\/]projet[\/]/.test(rel(f))) continue; // socle documentaire R-20 : documents vivants à noms fixes, pas des livrables datés
     if (!MOTIF_DATE.test(nom)) { ko("R-4", rel(f), "livrable sans nommage « <Marque> - <Objet> - AAAAMMJJ<indice> »"); r4 = false; }
   }
 }
@@ -173,11 +174,86 @@ else {
   }
 }
 
+
+// ---- D bis · Socle documentaire docs\projet\ (R-20..R-23 — TF-0082, 11/08) ----
+const dp = p("docs", "projet");
+const FICHIERS_DP = ["TECHNOS.md", "COMPOSANTS-OPS.md", "PARAMETRAGE.md", "ACCES-TEST.md", "COMMANDES.md"];
+const frontmatter = (texte) => { const m = texte.match(/^---\r?\n([\s\S]*?)\r?\n---/); return m ? m[1] : null; };
+if (!existsSync(dp)) ko("R-20", "docs\\projet\\", "dossier absent — socle documentaire du produit (TECHNOS, COMPOSANTS-OPS, PARAMETRAGE, ACCES-TEST, COMMANDES)");
+else {
+  let ok20 = true;
+  for (const f of FICHIERS_DP) {
+    const fp = join(dp, f);
+    if (!existsSync(fp)) { ko("R-20", `docs\\projet\\${f}`, "fichier manquant"); ok20 = false; continue; }
+    const front = frontmatter(readFileSync(fp, "utf8"));
+    if (!front || !/^role\s*:/m.test(front) || !/^sources_de_verite\s*:/m.test(front) || !/^verifie_le\s*:/m.test(front)) {
+      ko("R-20", `docs\\projet\\${f}`, "frontmatter YAML incomplet — role, sources_de_verite et verifie_le requis (contrat machine)"); ok20 = false;
+    }
+  }
+  if (ok20) ok("R-20", "docs\\projet\\", "5 fichiers présents, frontmatter machine complet");
+
+  // R-21 · fraîcheur TECHNOS ↔ lockfiles (loi 4 : une donnée volatile est une donnée)
+  const tp = join(dp, "TECHNOS.md");
+  if (existsSync(tp)) {
+    const front = frontmatter(readFileSync(tp, "utf8")) || "";
+    const bloc = front.match(/^versions\s*:\s*\r?\n((?:[ \t]+.+\r?\n?)*)/m);
+    const paires = [];
+    if (bloc) for (const l of bloc[1].split(/\r?\n/)) {
+      const m = l.match(/^[ \t]+([\w@\/.–-]+)\s*:\s*"([^"]+)"/);
+      if (m && !m[1].startsWith("#")) paires.push([m[1], m[2]]);
+    }
+    const locks = ["package-lock.json", "pyproject.toml", "poetry.lock", "uv.lock", "requirements.txt", "Cargo.lock", "go.sum", "composer.lock", "Gemfile.lock"]
+      .map((n) => p(n)).filter(existsSync).map((f) => readFileSync(f, "utf8"));
+    if (!paires.length) so("R-21", "TECHNOS.md sans bloc versions: renseigné — fraîcheur non jugeable (déclarer les versions clés)");
+    else if (!locks.length) so("R-21", "aucun lockfile/manifeste à la racine — fraîcheur non jugeable");
+    else {
+      let ok21 = true;
+      for (const [nom, ver] of paires) {
+        if (!locks.some((t) => t.includes(nom) && t.includes(ver))) {
+          ko("R-21", "docs\\projet\\TECHNOS.md", `${nom}@${ver} introuvable dans les lockfiles — la vue a divergé de sa source de vérité`); ok21 = false;
+        }
+      }
+      if (ok21) ok("R-21", "docs\\projet\\TECHNOS.md", `${paires.length} version(s) conformes aux lockfiles`);
+    }
+  }
+
+  // R-22 · parité PARAMETRAGE ↔ .env.example (la liste qui fait foi reste R-13)
+  const pp = join(dp, "PARAMETRAGE.md");
+  if (existsSync(pp) && envEx) {
+    const front = frontmatter(readFileSync(pp, "utf8")) || "";
+    const bloc = front.match(/^variables\s*:\s*\r?\n((?:[ \t]+-\s+.+\r?\n?)*)/m);
+    const doc = new Set();
+    if (bloc) for (const l of bloc[1].split(/\r?\n/)) { const m = l.match(/-\s+([A-Z][A-Z0-9_]*)/); if (m) doc.add(m[1]); }
+    const env = new Set([...readFileSync(envEx, "utf8").matchAll(/^([A-Z][A-Z0-9_]*)=/gm)].map((m) => m[1]));
+    const manqueDoc = [...env].filter((v) => !doc.has(v));
+    const manqueEnv = [...doc].filter((v) => !env.has(v));
+    if (manqueDoc.length) ko("R-22", "docs\\projet\\PARAMETRAGE.md", `variable(s) de .env.example non documentée(s) : ${manqueDoc.join(", ")}`);
+    if (manqueEnv.length) ko("R-22", "docs\\projet\\PARAMETRAGE.md", `variable(s) documentée(s) absente(s) de .env.example : ${manqueEnv.join(", ")}`);
+    if (!manqueDoc.length && !manqueEnv.length) ok("R-22", "docs\\projet\\PARAMETRAGE.md", `parité tenue (${env.size} variable(s))`);
+  }
+
+  // R-23 · ACCES-TEST : démo locale seulement, zéro secret (R-14 + loi 2)
+  const ap = join(dp, "ACCES-TEST.md");
+  if (existsSync(ap)) {
+    const t = readFileSync(ap, "utf8");
+    let ok23 = true;
+    if (!t.includes("comptes de démonstration locale — jamais valides hors MODE_DEMO")) {
+      ko("R-23", "docs\\projet\\ACCES-TEST.md", "en-tête dur absent : « comptes de démonstration locale — jamais valides hors MODE_DEMO »"); ok23 = false;
+    }
+    if (/AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{20,}|gho_[A-Za-z0-9]{20,}|sk-[a-zA-Z0-9]{20,}|BEGIN [A-Z ]*PRIVATE KEY|xox[bpors]-/.test(t)) {
+      ko("R-23", "docs\\projet\\ACCES-TEST.md", "motif de secret réel détecté — aucun secret, jamais (R-14) ; les accès réels sont des références « # à fournir : »"); ok23 = false;
+    }
+    if (ok23) ok("R-23", "docs\\projet\\ACCES-TEST.md", "en-tête démo-locale présent, aucun motif de secret");
+  }
+}
+
 const nonJuge = [
   "R-5 (pas d'écrasement de version) : invisible statiquement — jugé par revue de diff",
   "R-15 (marqueurs « à fournir » exhaustifs) : l'oracle ne sait pas quelles variables sont tierces",
   "input\\ non jugé en nommage : les entrants humains arrivent tels quels",
   "seule la PRÉSENCE de CLAUDE.md/README est jugée, pas la pertinence de leur contenu",
+  "R-21 : correspondance nom+version par inclusion textuelle dans les lockfiles — pas de résolution sémantique de graphes de dépendances",
+  "R-23 : motifs de secrets forts uniquement — un mot de passe réaliste inventé sans motif connu passe (revue humaine + gitleaks en CI)",
 ];
 
 const echecs = findings.filter((f) => f.statut === "FAIL").length;

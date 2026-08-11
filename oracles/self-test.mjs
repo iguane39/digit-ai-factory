@@ -41,6 +41,20 @@ writeFileSync(join(verte, "forge", "ledger.jsonl"), [
   JSON.stringify({ type: "run_open", ts: "2026-08-10T08:00:00Z", run_precedent: "run-20260809", versions_forges: { conception: "951d46e" } }),
 ].join("\n") + "\n"); // R-19 verte : versions_forges partout + chaînage du run de version
 writeFileSync(join(verte, "app.py"), "print('produit')\n");
+
+// R-20..R-23 verte : docs\projet\ complet, versions = lockfile, parité env, ACCES démo
+mkdirSync(join(verte, "docs", "projet"), { recursive: true });
+writeFileSync(join(verte, "package-lock.json"), JSON.stringify({ packages: { "node_modules/express": { version: "5.1.0" } } }, null, 1).replace('"version": "5.1.0"', '"express"\n   : { "version": "5.1.0" }') + "\n"); // contient "express" et "5.1.0"
+writeFileSync(join(verte, "docs", "projet", "TECHNOS.md"),
+  '---\nrole: technos\nsources_de_verite: [package-lock.json]\nverifie_le: 2026-08-11\nversions:\n  express: "5.1.0"\n---\n# Technos\n');
+writeFileSync(join(verte, "docs", "projet", "COMPOSANTS-OPS.md"),
+  '---\nrole: composants\nsources_de_verite: ["ops.mjs etat"]\nverifie_le: 2026-08-11\n---\n# Composants\n');
+writeFileSync(join(verte, "docs", "projet", "PARAMETRAGE.md"),
+  '---\nrole: parametrage\nsources_de_verite: [.env.example]\nverifie_le: 2026-08-11\nvariables:\n  - PORT\n  - API_TIERCE_CLE\n---\n# Paramétrage\n');
+writeFileSync(join(verte, "docs", "projet", "ACCES-TEST.md"),
+  '---\nrole: acces de test\nsources_de_verite: ["seed MODE_DEMO"]\nverifie_le: 2026-08-11\n---\n# Accès\n> comptes de démonstration locale — jamais valides hors MODE_DEMO\n\n| admin | admin@demo.local | demo-admin |\n');
+writeFileSync(join(verte, "docs", "projet", "COMMANDES.md"),
+  '---\nrole: commandes\nsources_de_verite: [package.json]\nverifie_le: 2026-08-11\n---\n# Commandes\n```bash\nnpm ci\n```\n');
 sh("git", ["init", "-q", "-b", "main"], verte);
 sh("git", ["-c", "user.email=t@t", "-c", "user.name=t", "add", "-A"], verte);
 sh("git", ["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "feat: socle initial du produit"], verte);
@@ -64,6 +78,7 @@ writeFileSync(join(rouge, "forge", "ledger.jsonl"), [
   JSON.stringify({ type: "run_open", ts: "2026-08-09T08:00:00Z" }),               // R-19 : sans versions_forges
   JSON.stringify({ type: "run_open", ts: "2026-08-10T08:00:00Z", versions_forges: { conception: "x" } }), // R-19 : version sans run_precedent
 ].join("\n") + "\n");
+
 // pas de .gitignore → R-7 (Old non ignoré) + R-10 ; pas de git → R-8 ; pas de README → R-12 ; pas d'env.example → R-13
 
 check("rouge : chaque règle attendue se déclenche, FAIL exit 1", () => {
@@ -79,6 +94,34 @@ check("rouge : les findings sont localisants (jamais « quelque part »)", () =>
   for (const f of rapport.findings) if (!f.ou || !f.message) throw new Error(`finding ${f.regle} sans localisation ou message`);
 });
 
-for (const d of [verte, rouge]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+
+// ---- fixture ROUGE-DOCS : défauts du socle documentaire R-20..R-23 (fixture dédiée :
+// la rouge principale doit garder docs\ absent pour continuer de prouver R-3) ----
+const rougeDocs = mkdtempSync(join(tmpdir(), "conf-rouge-docs-"));
+// R-20..R-23 rouge : COMPOSANTS-OPS manquant (R-20), version divergente (R-21),
+// parité rompue (R-22 — .env.example présent mais VIDE : R-13 reste déclenchée),
+// ACCES sans en-tête + faux AKIA (R-23)
+mkdirSync(join(rougeDocs, "docs", "projet"), { recursive: true });
+writeFileSync(join(rougeDocs, ".env.example"), "# ne jamais renseigner de secret ici\n"); // 0 variable → R-13 toujours FAIL
+writeFileSync(join(rougeDocs, "package-lock.json"), '{ "express": { "version": "5.1.0" } }\n');
+writeFileSync(join(rougeDocs, "docs", "projet", "TECHNOS.md"),
+  '---\nrole: technos\nsources_de_verite: [package-lock.json]\nverifie_le: 2026-08-11\nversions:\n  express: "4.18.0"\n---\n# Technos périmées\n'); // R-21
+writeFileSync(join(rougeDocs, "docs", "projet", "PARAMETRAGE.md"),
+  '---\nrole: parametrage\nsources_de_verite: [.env.example]\nverifie_le: 2026-08-11\nvariables:\n  - PORT\n---\n# Paramétrage\n'); // R-22 : PORT documenté, absent de .env.example
+writeFileSync(join(rougeDocs, "docs", "projet", "ACCES-TEST.md"),
+  '---\nrole: acces\nsources_de_verite: [seed]\nverifie_le: 2026-08-11\n---\n# Accès\naws_key = "AKIAIOSFODNN7EXAMPLE"\n'); // R-23 : en-tête absent + motif AKIA
+writeFileSync(join(rougeDocs, "docs", "projet", "COMMANDES.md"), "# sans frontmatter\n"); // R-20 : frontmatter incomplet
+
+
+check("rouge-docs : R-20..R-23 se déclenchent, localisantes", () => {
+  const { exit, rapport } = lance(rougeDocs);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const declenchees = new Set(rapport.findings.filter((f) => f.statut === "FAIL").map((f) => f.regle));
+  for (const attendue of ["R-20", "R-21", "R-22", "R-23"])
+    if (!declenchees.has(attendue)) throw new Error(`règle ${attendue} non déclenchée sur rouge-docs`);
+  for (const f of rapport.findings) if (!f.ou || !f.message) throw new Error(`finding ${f.regle} sans localisation`);
+});
+
+for (const d of [verte, rouge, rougeDocs]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 console.log(`\nSelf-test conformité projet : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
