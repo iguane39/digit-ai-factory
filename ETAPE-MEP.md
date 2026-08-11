@@ -2,10 +2,25 @@
 
 Version 1.0.0 — 2026-08-04
 
-Aucune forge ne déploie (development s'arrête volontairement à « PR-ready, jamais mergé »).
-La capacité MEP est donc **portée par le pilot** — aucune modification des dépôts frères.
+Development s'arrête volontairement à « PR-ready, jamais mergé ». L'étape MEP est **portée
+par le pilot** et **outillée par forge-ops** (TF-0040, 11/08) : la forge fournit les gestes
+(déployer, restaurer, journal) et leurs verdicts O-1…O-4 — le pilot orchestre, l'oracle
+M-1…M-5 ci-dessous reste la seule vérité de l'étape, et la production reste sur **GO humain**.
 Principe : **le staging est autonome, la production est sur GO humain.** La confiance du client
 final se fabrique par un dossier de preuve, pas par l'absence de gate.
+
+## 0 bis. Outillage forge-ops (articulation)
+
+| Qui | Fait quoi |
+|---|---|
+| forge-ops | `ops.mjs deployer <build> <cible>` (healthcheck **avant** bascule, `COURANT` atomique), `restaurer` (rollback re-vérifié puis journalisé), `journal.jsonl` append-only |
+| oracle-ops (O-1…O-4) | pointeur sain, healthcheck rejoué, journal intègre, rollback prouvable — verdicts versés au dossier MEP |
+| pilot (cette étape) | orchestre les gestes, exécute M-1…M-5 (qui consomme O-1…O-4 comme preuves), assemble `DOSSIER-MEP.md` |
+| humain | **GO production** — incompressible, jamais délégué à un oracle |
+
+forge-ops ne duplique pas M-1…M-5 et n'est jamais invoquée par un produit en direct.
+Le test de rollback exigé au §2.3 s'exécute désormais par `ops.mjs restaurer` (geste réel
+journalisé), plus par une procédure manuelle ad hoc.
 
 ## 1. Entrée de l'étape
 

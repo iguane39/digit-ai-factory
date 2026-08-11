@@ -1,6 +1,6 @@
 # Étude — Everything Claude Code (2026-08-10)
 
-Notes d'archive. Étude détaillée complète : [`references/ETUDE-EVERYTHING-CLAUDE-CODE.md`](../../references/ETUDE-EVERYTHING-CLAUDE-CODE.md).
+Notes d'archive. Étude détaillée complète : [`ETUDE-EVERYTHING-CLAUDE-CODE.md`](../ETUDE-EVERYTHING-CLAUDE-CODE.md).
 
 - **Proposition** : dépôt `affaan-m/everything-claude-code` (v2.2.0, MIT), vainqueur hackathon
   Anthropic × Forum Ventures. Cloné **en lecture seule** (88 Mo, 3454 fichiers), rien exécuté.

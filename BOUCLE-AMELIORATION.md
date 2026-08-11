@@ -158,6 +158,25 @@ Encodé : socle créé à l'ouverture de run (CLAUDE.md étape 1), rattrapage en
 version, et `oracles\oracle-conformite-projet.mjs` (self-test double sens 3/3 ; preuve terrain :
 8 findings nommés sur Produit-12, dont l'absence de git).
 
+## Campagne du 11/08/2026 — création de forge-ops (TF-0040 décidé → corrigé)
+
+Mandat humain : prompt réécrit L99 lancé (« Je décide TF-0040 »), tracé au registre. La 9ᵉ
+forge comble le dernier trou prouvé du pipeline : la MEP portée à la main, déploiement
+artisanal. **Preuve par le geste dès la v0** : le self-test rejoue un déploiement réel local
+(v1→v2), un rollback effectif et le refus des 4 défauts types — 14 PASS (2 itérations de
+boucle sur 3 : un faux positif O4 corrigé — être sur la plus ancienne release après
+restauration est un état sain).
+
+Livré : dépôt `digit-ai-forge-ops` (ops.mjs — healthcheck AVANT bascule, COURANT atomique,
+journal au contrat ledger ; oracle-ops O-1…O-4 ; frontières écrites : la forge outille, le
+pilot décide, l'humain donne le GO, M-1…M-5 jamais dupliqué). Les 8 documents pilot mis en
+cohérence, chacun sous son oracle : bootstrap (9 forges, exit 0), CLAUDE.md dégraissé
+6182→6056 octets (oracle PASS — et 4 docs de veille déménagés de `references\` vers
+`veille\`, orphelins N3 résolus), CONTRAT-INTERFACE §5 (Ops **natif**, dettes D-P1 cibles
+cloud / D-P2 garde-fou produit-direct), ETAPE-MEP §0 bis (articulation gestes/verdicts),
+INVENTAIRE §9, fiches/forge-ops.md, README, schéma V1e « Dix forges » (nœud ops + lien
+outillage MEP, check+render PASS, PNG inspecté). TF-0040 clos avec gains constatés.
+
 ## Campagne du 10/08/2026 (soir) — ouverture publique de l'écosystème (mandat humain)
 
 Décision humaine : toutes les forges publiques sous MIT, « comme development », avec

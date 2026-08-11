@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=6730865fc419 archive=e3b0c44298fc · dernier événement: 2026-08-09T15:30:04Z -->
+     sceaux: actifs=3e3dfcb914f0 archive=e3b0c44298fc · dernier événement: 2026-08-11T07:11:12Z -->
 
-**79 actifs** (candidat 28 · décidé 0 · en cours 2 · corrigé 49 · écarté 0) · **0 archivés**.
+**79 actifs** (candidat 27 · décidé 0 · en cours 2 · corrigé 50 · écarté 0) · **0 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,7 +11,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0040 | candidat | 2 | Créer forge-ops (exploitation) | **oui** — MEP portée par le steering faute de forge ; déploiement Railway artisanal |
 | TF-0041 | candidat | 0.4 | forge-contenu — à re-proposer sur preuve | non |
 
 ## agents
@@ -64,6 +63,12 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0007 | corrige | 3 | Source unique des disciplines de livrable | non |
 | TF-0010 | corrige | 2.7 | Gates de livrable exécutables | **oui** — 3 défauts sortis en production v0.1.0 |
 | TF-0009 | corrige | 2.5 | HumanGate déléguable + dogfooding | **oui** — D-V1 payée à chaque étape 4 en mode dégradé |
+
+## ops (nouvelle)
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0040 | corrige | 2 | Créer forge-ops (exploitation) | **oui** — MEP portée par le steering faute de forge ; déploiement Railway artisanal |
 
 ## organization
 

@@ -7,8 +7,8 @@ routage par forge, **fiabilité chiffrée (confiance 0-1)**, deltas **candidats*
 « idées, pas machinerie », validation par oracle.
 
 Ce document est le **how**. Les études archivées vivent dans `veille/AAAAMMJJ-<slug>/` (voir
-[veille/README.md](../veille/README.md)). Le gabarit de rapport :
-[veille/_gabarit/rapport-veille.gabarit.html](../veille/_gabarit/rapport-veille.gabarit.html).
+[README.md](README.md)). Le gabarit de rapport :
+[_gabarit/rapport-veille.gabarit.html](_gabarit/rapport-veille.gabarit.html).
 
 ---
 

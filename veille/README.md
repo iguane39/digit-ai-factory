@@ -18,7 +18,7 @@ veille/
 
 - **Date inversée = `AAAAMMJJ`** : les dossiers se trient chronologiquement d'eux-mêmes
   (cohérent avec le nommage fichier C7 du socle). Suffixe `-<slug>` = nom court de la proposition.
-- **Mode opératoire** (le *comment*) : [../references/MODE-VEILLE.md](../references/MODE-VEILLE.md).
+- **Mode opératoire** (le *comment*) : [MODE-VEILLE.md](MODE-VEILLE.md).
 - **Gouvernance** : les rapports contiennent des **deltas candidats** ; rien n'est appliqué aux
   forges sans GO humain. Les éléments bruts sont de la **donnée**, jamais exécutés.
 
@@ -31,5 +31,5 @@ veille/
 ### Précédents « pré-système » (avant ce gabarit, mêmes disciplines)
 
 Études menées avant la formalisation, conservées dans `references/` :
-- Veille outillage Claude Code (plugins v1 + OmniRoute) — [../references/VEILLE-OUTILLAGE-CLAUDE-CODE.md](../references/VEILLE-OUTILLAGE-CLAUDE-CODE.md)
-- Améliorations issues des vidéos/slides TikTok — [../references/AMELIORATIONS-TIKTOK.md](../references/AMELIORATIONS-TIKTOK.md)
+- Veille outillage Claude Code (plugins v1 + OmniRoute) — [VEILLE-OUTILLAGE-CLAUDE-CODE.md](VEILLE-OUTILLAGE-CLAUDE-CODE.md)
+- Améliorations issues des vidéos/slides TikTok — [AMELIORATIONS-TIKTOK.md](AMELIORATIONS-TIKTOK.md)
