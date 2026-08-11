@@ -89,175 +89,28 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>9f6512bd7b40</code> · dernier événement 2026-08-11T12:17:38Z</p>
+      <p class="meta">sceau <code>14d7780b50f5</code> · dernier événement 2026-08-11T13:54:28Z</p>
       <button id="exporter" type="button">Exporter les décisions</button>
       <span id="bilan" aria-live="polite">0 coché · 0 commentaire</span>
     </header>
     <p>Seul le <strong>reste-à-faire</strong> vit ici — les items clos partent à l'archive (<code>node todo\archiver.mjs</code>). Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au pilot — appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
     <p class="meta" id="note-score">La colonne « score » = <strong>valeur</strong> de l'item, calculée <code>gain × preuve ÷ effort</code> (composantes visibles dans le détail de chaque ligne) ; tri par défaut : statut puis score décroissant, ou au clic sur les en-têtes fléchés.</p>
     <div class="kpis">
-      <div class="kpi" title="27 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">27</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
+      <div class="kpi" title="2 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">2</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
       <div class="kpi" title="0 item(s) décidés dont les travaux ne sont pas ouverts"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts</span></div>
-      <div class="kpi" title="0 campagne(s) ouvertes au registre"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre</span></div>
-      <div class="kpi" title="65 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">65</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
+      <div class="kpi" title="1 campagne(s) ouvertes au registre"><span class="kpi-label">En cours</span><span class="kpi-value">1</span><span class="kpi-hint">campagnes ouvertes au registre</span></div>
+      <div class="kpi" title="89 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">89</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende"><span class="leg-item"><span class="leg-swatch" style="background:var(--surface)"></span>candidat</span><span class="leg-item"><span class="leg-swatch" style="background:var(--teal-fill)"></span>décidé</span><span class="leg-item"><span class="leg-swatch" style="background:var(--amber-fill)"></span>en cours</span></p>
-    <nav class="toc" aria-label="Sommaire"><a href="#agents"><strong>agents</strong> <span class="toc-d">7 item(s) reste-à-faire ciblant agents</span></a><a href="#conception"><strong>conception</strong> <span class="toc-d">2 item(s) reste-à-faire ciblant conception</span></a><a href="#contenunouvelle"><strong>contenu (nouvelle)</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant contenu (nouvelle)</span></a><a href="#design"><strong>design</strong> <span class="toc-d">4 item(s) reste-à-faire ciblant design</span></a><a href="#development"><strong>development</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant development</span></a><a href="#organization"><strong>organization</strong> <span class="toc-d">3 item(s) reste-à-faire ciblant organization</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">2 item(s) reste-à-faire ciblant pilot</span></a><a href="#seo"><strong>seo</strong> <span class="toc-d">3 item(s) reste-à-faire ciblant seo</span></a><a href="#tests"><strong>tests</strong> <span class="toc-d">4 item(s) reste-à-faire ciblant tests</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#design"><strong>design</strong> <span class="toc-d">2 item(s) reste-à-faire ciblant design</span></a><a href="#seo"><strong>seo</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant seo</span></a></nav>
     <main>
-    <section id="agents">
-      <h2>agents <span class="badge" title="7 item(s) actifs ciblant agents">7</span></h2>
-      <p class="ch-apprend meta">Ce chapitre liste les 7 item(s) du reste-à-faire dont la cible est agents : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
-      <div class="scroll"><table data-filterable>
-        <caption class="sr-only">Reste-à-faire ciblant agents — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
-        <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
-        <tbody>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0077" aria-label="Décider TF-0077"></td>
-          <td class="c-id" data-th="id"><code>TF-0077</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">4</td>
-          <td data-th="item"><details><summary><strong>render_page.py : UnicodeEncodeError cp1252 à l'impression du rapport JSON sans PYTHONUTF8=1</strong></summary>
-              <p>Sur poste Windows en cp1252, l'impression du JSON de rapport plante sans PYTHONUTF8=1 (contourné à la main dans toutes les invocations). Même famille que RT-8 de forge-tests (déjà corrigée là-bas) : forcer l'encodage de sortie dans le script.</p>
-              <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 2 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — plantage reproduit ; PYTHONUTF8=1 requis dans chaque invocation du 09/08</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0077" rows="1" aria-label="Commentaire TF-0077" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0066" aria-label="Décider TF-0066"></td>
-          <td class="c-id" data-th="id"><code>TF-0066</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">2</td>
-          <td data-th="item"><details><summary><strong>render_page V3 : même biais de mesure que V7 sur les rangées d'éléments de largeurs variables</strong></summary>
-              <p>V3 trie les lefts, donc mesure largeur + gouttière et produit des faux positifs sur une rangée d'éléments de largeurs différentes. Même correctif que V7 (TF-0059) : mesurer l'espace entre les boîtes.</p>
-              <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 2 × preuve 1 ÷ effort 1 · <strong>payé en réel</strong> — biais démontré sur V7 (40 faux avertissements), même mécanique</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0066" rows="1" aria-label="Commentaire TF-0066" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0069" aria-label="Décider TF-0069"></td>
-          <td class="c-id" data-th="id"><code>TF-0069</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">2</td>
-          <td data-th="item"><details><summary><strong>oracle-filtres-tableau sans entrée au manifest : ses fixtures ne sont jamais rejouées</strong></summary>
-              <p>Les fixtures filtres-verte.html/filtres-rouge.html existent mais le self-test ne les joue pas — l'oracle n'a pas sa preuve P1. Travail inachevé de la session du 08/08, entré sous git par la réconciliation 740ec6c.</p>
-              <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 2 × preuve 1 ÷ effort 1 · <strong>payé en réel</strong> — un oracle au registre sans preuve à double sens contredit la doctrine du registre</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0069" rows="1" aria-label="Commentaire TF-0069" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0067" aria-label="Décider TF-0067"></td>
-          <td class="c-id" data-th="id"><code>TF-0067</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">1.5</td>
-          <td data-th="item"><details><summary><strong>exemple-reference (digit-ai-schemas) : V4 ×450 au rendu, probable faux positif de masse sur SVG</strong></summary>
-              <p>Au rendu : V4 ×450 chevauchements (à instruire — vraisemblablement rect×text SVG, à rapprocher de RD-1 et de l'exemption data-overlap-ok du schéma pilot du 09/08), V2 ×21 contrastes, L2 ×2 (p.lede/p.section-intro bridés à 820 px), L6 sans sommaire. Préexistants à TF-0060.</p>
-              <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 3 × preuve 1 ÷ effort 2 · <strong>payé en réel</strong> — le même faux positif de masse a coûté une itération complète au schéma pilot du 09/08</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0067" rows="1" aria-label="Commentaire TF-0067" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0025" aria-label="Décider TF-0025"></td>
-          <td class="c-id" data-th="id"><code>TF-0025</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">1</td>
-          <td data-th="item"><strong>Statuer sur le skill méta dormant</strong><p>Compilation d'agents + gates G1-G3 : aucun run depuis le 24/07 ; un run réel ou une dormance assumée documentée.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 3</p></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0025" rows="1" aria-label="Commentaire TF-0025" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0068" aria-label="Décider TF-0068"></td>
-          <td class="c-id" data-th="id"><code>TF-0068</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">1</td>
-          <td data-th="item"><details><summary><strong>Self-test quality-oracles : 24 dossiers .tmp-niv-* fuient dans fixtures/</strong></summary>
-              <p>Le finally{rmSync} de la preuve §6 fuit quand le process est tué en cours de run — 24 dossiers résiduels constatés dans l'installation. Nettoyage + écriture des dossiers temporaires hors de fixtures/ (tmpdir).</p>
-              <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 1 × preuve 1 ÷ effort 1 · <strong>payé en réel</strong> — 24 dossiers résiduels mesurés</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0068" rows="1" aria-label="Commentaire TF-0068" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0071" aria-label="Décider TF-0071"></td>
-          <td class="c-id" data-th="id"><code>TF-0071</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">1</td>
-          <td data-th="item"><details><summary><strong>profils/generique.json sans bloc nommage : le domaine reste en SKIP permanent hors Digit-AI/Q3-bis</strong></summary>
-              <p>Après la correction du profil digit-ai (Q3-bis, campagne 09/08), le profil générique ne porte toujours aucun bloc nommage — SKIP motivé permanent. À décider : convention générique minimale ou SKIP assumé documenté.</p>
-              <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 1 × preuve 1 ÷ effort 1 · <strong>payé en réel</strong> — domaine non contrôlé sur tout projet hors convention</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0071" rows="1" aria-label="Commentaire TF-0071" placeholder="commentaire…"></textarea></td>
-        </tr>
-        </tbody>
-      </table></div>
-    </section>
-    <section id="conception">
-      <h2>conception <span class="badge" title="2 item(s) actifs ciblant conception">2</span></h2>
-      <p class="ch-apprend meta">Ce chapitre liste les 2 item(s) du reste-à-faire dont la cible est conception : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
-      <div class="scroll"><table data-filterable>
-        <caption class="sr-only">Reste-à-faire ciblant conception — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
-        <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
-        <tbody>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0070" aria-label="Décider TF-0070"></td>
-          <td class="c-id" data-th="id"><code>TF-0070</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">2</td>
-          <td data-th="item"><details><summary><strong>oracle-surface : la fixture verte de conception échoue au seuil par défaut depuis le registre central</strong></summary>
-              <p>Le self-test de forge-conception l'invoque en --seuil 80 (voulu, pour exercer SANS_OBJET) mais un opérateur passant la fixture verte par le registre (seuil 95) lit un FAIL surprenant (83,3 %). Soit une fixture verte au seuil par défaut, soit le seuil porté par le registre.</p>
-              <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 2 × preuve 1 ÷ effort 1 · <strong>payé en réel</strong> — constaté à l'enregistrement des 4 oracles au registre</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0070" rows="1" aria-label="Commentaire TF-0070" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0013" aria-label="Décider TF-0013"></td>
-          <td class="c-id" data-th="id"><code>TF-0013</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">1.5</td>
-          <td data-th="item"><strong>Exercer MISSION.md sur un run réel</strong><p>La vue vers la SaaS Forge n'a aucun usage constaté (orpheline).</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 3 × preuve 1 ÷ effort 2</p></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0013" rows="1" aria-label="Commentaire TF-0013" placeholder="commentaire…"></textarea></td>
-        </tr>
-        </tbody>
-      </table></div>
-    </section>
-    <section id="contenunouvelle">
-      <h2>contenu (nouvelle) <span class="badge" title="1 item(s) actifs ciblant contenu (nouvelle)">1</span></h2>
-      <p class="ch-apprend meta">Ce chapitre liste les 1 item(s) du reste-à-faire dont la cible est contenu (nouvelle) : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
-      <div class="scroll"><table data-filterable>
-        <caption class="sr-only">Reste-à-faire ciblant contenu (nouvelle) — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
-        <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
-        <tbody>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0041" aria-label="Décider TF-0041"></td>
-          <td class="c-id" data-th="id"><code>TF-0041</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">0.4</td>
-          <td data-th="item"><strong>forge-contenu — à re-proposer sur preuve</strong><p>Candidate FAIBLE : trou plausible (roadmap SEO sans producteur de contenu, voix MARQUE.md) mais jamais payé par un run. Attendre un lot qui le réclame.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 5</p></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0041" rows="1" aria-label="Commentaire TF-0041" placeholder="commentaire…"></textarea></td>
-        </tr>
-        </tbody>
-      </table></div>
-    </section>
     <section id="design">
-      <h2>design <span class="badge" title="4 item(s) actifs ciblant design">4</span></h2>
-      <p class="ch-apprend meta">Ce chapitre liste les 4 item(s) du reste-à-faire dont la cible est design : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
+      <h2>design <span class="badge" title="2 item(s) actifs ciblant design">2</span></h2>
+      <p class="ch-apprend meta">Ce chapitre liste les 2 item(s) du reste-à-faire dont la cible est design : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
       <div class="scroll"><table data-filterable>
         <caption class="sr-only">Reste-à-faire ciblant design — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
         <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0017" aria-label="Décider TF-0017"></td>
-          <td class="c-id" data-th="id"><code>TF-0017</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">4</td>
-          <td data-th="item"><strong>Committer le chantier oracle-motion</strong><p>Complet, testé, vert — 22 fichiers non committés : un clone livre 6 oracles, le poste en exécute 7. À faire par SA session (chantier concurrent vivant).</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 1 ÷ effort 1</p></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0017" rows="1" aria-label="Commentaire TF-0017" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0016" aria-label="Décider TF-0016"></td>
-          <td class="c-id" data-th="id"><code>TF-0016</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">2</td>
-          <td data-th="item"><strong>Rebuild + commit dist/*.skill</strong><p>Les .skill packagés sont périmés de 4 évolutions fonctionnelles.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 2 × preuve 1 ÷ effort 1</p></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0016" rows="1" aria-label="Commentaire TF-0016" placeholder="commentaire…"></textarea></td>
-        </tr>
         <tr>
           <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0019" aria-label="Décider TF-0019"></td>
           <td class="c-id" data-th="id"><code>TF-0019</code></td>
@@ -277,132 +130,17 @@
         </tbody>
       </table></div>
     </section>
-    <section id="development">
-      <h2>development <span class="badge" title="1 item(s) actifs ciblant development">1</span></h2>
-      <p class="ch-apprend meta">Ce chapitre liste les 1 item(s) du reste-à-faire dont la cible est development : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
-      <div class="scroll"><table data-filterable>
-        <caption class="sr-only">Reste-à-faire ciblant development — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
-        <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
-        <tbody>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0008" aria-label="Décider TF-0008"></td>
-          <td class="c-id" data-th="id"><code>TF-0008</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">4</td>
-          <td data-th="item"><strong>Arbitrage D-V3 : l'amont officiel</strong><p>EXIGENCES.json/verbe 4 de conception vs BMAD : deux amonts concurrents, tranchés à la main à chaque run.</p><p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Décision re-payée à chaque produit construit</p></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0008" rows="1" aria-label="Commentaire TF-0008" placeholder="commentaire…"></textarea></td>
-        </tr>
-        </tbody>
-      </table></div>
-    </section>
-    <section id="organization">
-      <h2>organization <span class="badge" title="3 item(s) actifs ciblant organization">3</span></h2>
-      <p class="ch-apprend meta">Ce chapitre liste les 3 item(s) du reste-à-faire dont la cible est organization : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
-      <div class="scroll"><table data-filterable>
-        <caption class="sr-only">Reste-à-faire ciblant organization — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
-        <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
-        <tbody>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0076" aria-label="Décider TF-0076"></td>
-          <td class="c-id" data-th="id"><code>TF-0076</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">4</td>
-          <td data-th="item"><details><summary><strong>Contrôle de fraîcheur du gabarit A0 : la version de socle déclarée n'est vérifiée par rien</strong></summary>
-              <p>Depuis TF-0061 le gabarit déclare la version du socle sur laquelle il est aligné (SKILL.md 1.6.0) — mais rien ne compare cette déclaration à la version installée. Un contrôle mécanique (déclaré vs lu) rendrait la dérive bruyante au lieu de découverte (elle a coûté 4 itérations de retard).</p>
-              <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 2 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — dérive de 4 itérations constatée avant TF-0061</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0076" rows="1" aria-label="Commentaire TF-0076" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0052" aria-label="Décider TF-0052"></td>
-          <td class="c-id" data-th="id"><code>TF-0052</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">3</td>
-          <td data-th="item"><details><summary><strong>Trancher les 3 arbitrages « Leviers de qualité générique » (organization)</strong></summary>
-              <p>Le doc de conception d'organization (08/08) attend 3 décisions A/B/C : capture déterministe des règles, chargement de spec amont, hook PostToolUse. Chemin le plus court vers un harnais actif au-delà du seul hook C6 (mesuré : 1 hook actif, 3 gates et 8 agents compilés dormants). Métrique : mécanismes actifs vs dormants. Protocole : décision humaine + 1 essai du levier retenu.</p>
-              <p class="meta">Demandeur : steering · 2026-08-09 · gain 3 × preuve 1 ÷ effort 1</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0052" rows="1" aria-label="Commentaire TF-0052" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0075" aria-label="Décider TF-0075"></td>
-          <td class="c-id" data-th="id"><code>TF-0075</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">1</td>
-          <td data-th="item"><details><summary><strong>Types Revue, Proposition, Schéma absents du registre des types (employés dans pilot/output)</strong></summary>
-              <p>D-04 veut qu'un type nouveau soit ajouté au registre plutôt qu'improvisé. Trois types employés par le pilot n'y figurent pas. Ajout au registre-types.json d'organization avec premier exemplaire.</p>
-              <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 1 × preuve 1 ÷ effort 1 · <strong>payé en réel</strong> — 3 types improvisés mesurés au corpus</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0075" rows="1" aria-label="Commentaire TF-0075" placeholder="commentaire…"></textarea></td>
-        </tr>
-        </tbody>
-      </table></div>
-    </section>
-    <section id="pilot">
-      <h2>pilot <span class="badge" title="2 item(s) actifs ciblant pilot">2</span></h2>
-      <p class="ch-apprend meta">Ce chapitre liste les 2 item(s) du reste-à-faire dont la cible est pilot : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
-      <div class="scroll"><table data-filterable>
-        <caption class="sr-only">Reste-à-faire ciblant pilot — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
-        <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
-        <tbody>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0065" aria-label="Décider TF-0065"></td>
-          <td class="c-id" data-th="id"><code>TF-0065</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">6</td>
-          <td data-th="item"><details><summary><strong>Le hook qualité sème ses journaux .oracles* dans tout dépôt édité — à canaliser une fois pour toutes</strong></summary>
-              <p>Chaque édition de .md par une session outillée dépose &lt;fichier&gt;.oracles.json, .oracles-cache.json, .oracles-historique.jsonl à côté. Trois campagnes du 09/08 (tests, development, conception) ont dû nettoyer à la main ; agents et organization ont gitignoré localement. Généraliser : motifs au .gitignore socle de toutes les forges ET des projets produits (REGLES-PROJET R-10), ou écriture des sidecars hors dépôt (scratchpad), en préservant les journaux versionnés voulus (C4).</p>
-              <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — 2 commits pollués défaits par git reset pendant la campagne agents ; nettoyage manuel ×3 campagnes</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0065" rows="1" aria-label="Commentaire TF-0065" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0062" aria-label="Décider TF-0062"></td>
-          <td class="c-id" data-th="id"><code>TF-0062</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">2</td>
-          <td data-th="item"><details><summary><strong>Rattrapage du renommage pilot chez les produits et missions</strong></summary>
-              <p>ASDMailManager2 (PROMPT-PRODUIT, CLAUDE.md, lots) et les missions référencent encore digit-ai-forge-steering en chemins absolus. La jonction c:/dev/digit-ai-forge-steering vers digit-ai-forge-pilot assure la compatibilité — NE PAS la supprimer avant ce rattrapage. À faire au prochain run de version de chaque produit (gouvernance : produits autonomes). Inclut le renommage physique du dossier (workspace verrouillé pendant la session : mv + inversion de la jonction, commande fournie).</p>
-              <p class="meta">Demandeur : pilot · 2026-08-09 · gain 2 × preuve 1 ÷ effort 1</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0062" rows="1" aria-label="Commentaire TF-0062" placeholder="commentaire…"></textarea></td>
-        </tr>
-        </tbody>
-      </table></div>
-    </section>
     <section id="seo">
-      <h2>seo <span class="badge" title="3 item(s) actifs ciblant seo">3</span></h2>
-      <p class="ch-apprend meta">Ce chapitre liste les 3 item(s) du reste-à-faire dont la cible est seo : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
+      <h2>seo <span class="badge" title="1 item(s) actifs ciblant seo">1</span></h2>
+      <p class="ch-apprend meta">Ce chapitre liste les 1 item(s) du reste-à-faire dont la cible est seo : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
       <div class="scroll"><table data-filterable>
         <caption class="sr-only">Reste-à-faire ciblant seo — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
         <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0074" aria-label="Décider TF-0074"></td>
-          <td class="c-id" data-th="id"><code>TF-0074</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">2</td>
-          <td data-th="item"><details><summary><strong>etat.json : etape_courante et statuts d'étapes ne sont mis à jour par aucun script de la forge seo</strong></summary>
-              <p>C'est ce que faisait etat-maj.py chez la mission (non rapatrié par TF-0030 car partiellement couvert par livrables.py). Un --etape sur livrables.py fermerait le trou proprement.</p>
-              <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 2 × preuve 1 ÷ effort 1 · <strong>payé en réel</strong> — trou constaté au rapatriement des moteurs (TF-0030)</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0074" rows="1" aria-label="Commentaire TF-0074" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0072" aria-label="Décider TF-0072"></td>
-          <td class="c-id" data-th="id"><code>TF-0072</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">1.5</td>
-          <td data-th="item"><details><summary><strong>forge-seo : l'empreinte de grille dépend des fins de ligne — un clone Linux déclarerait toutes les études périmées</strong></summary>
-              <p>version_grille() hache les octets bruts ; la grille est stockée LF, lue CRLF sur Windows. L'empreinte figée dans la mission réelle (3d0af44aae9a) est celle du poste Windows. Normaliser le hachage exige une migration déclarée au registre correspondances-grille (TF-0048) — jamais un changement silencieux.</p>
-              <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 3 × preuve 1 ÷ effort 2 · <strong>payé en réel</strong> — portabilité cassée par construction, constatée à l'implémentation de TF-0048</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0072" rows="1" aria-label="Commentaire TF-0072" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0073" aria-label="Décider TF-0073"></td>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0073" aria-label="Décider TF-0073" disabled></td>
           <td class="c-id" data-th="id"><code>TF-0073</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td data-th="statut"><span class="statut s-en_cours">en_cours</span></td>
           <td class="c-score" data-th="score">1</td>
           <td data-th="item"><details><summary><strong>Rapatrier la production du CSV d'actions scoré (livrables-gen.py de la mission) — complément de TF-0056</strong></summary>
               <p>livrables-gen.py (mission, 488 l.) porte la partie généralisable du calcul (gain × confiance) / effort et l'écriture du CSV d'actions. La forge contrôle désormais ce CSV (TF-0056) sans savoir le produire rempli. Même séparation que TF-0030 : la mécanique à la forge, la matière chez la mission.</p>
@@ -413,67 +151,13 @@
         </tbody>
       </table></div>
     </section>
-    <section id="tests">
-      <h2>tests <span class="badge" title="4 item(s) actifs ciblant tests">4</span></h2>
-      <p class="ch-apprend meta">Ce chapitre liste les 4 item(s) du reste-à-faire dont la cible est tests : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
-      <div class="scroll"><table data-filterable>
-        <caption class="sr-only">Reste-à-faire ciblant tests — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
-        <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
-        <tbody>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0064" aria-label="Décider TF-0064"></td>
-          <td class="c-id" data-th="id"><code>TF-0064</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">6</td>
-          <td data-th="item"><details><summary><strong>forge-tests : 27 erreurs ruff préexistantes dont une syntaxe invalide en Python 3.11</strong></summary>
-              <p>ruff check sort 27 erreurs, aucune sur les lignes de la campagne. La plus sérieuse : adaptateurs/front.py:107, backslash dans une f-string — invalide en 3.11 alors que requires-python déclare &gt;=3.11 (le poste tourne en 3.12) : le dépôt ne s'exécute pas sur la version minimale qu'il déclare. Aussi : E501 ×3, B007.</p>
-              <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — incompatibilité mesurée avec la version Python minimale déclarée</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0064" rows="1" aria-label="Commentaire TF-0064" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0003" aria-label="Décider TF-0003"></td>
-          <td class="c-id" data-th="id"><code>TF-0003</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">4</td>
-          <td data-th="item"><details><summary><strong>Audit complet sur projet libre (MiniVeille)</strong></summary>
-              <p>Mutation totale + cahiers + dashboard + actions[] sur un projet figé : première preuve terrain propre des livrables du 07/08.</p>
-              <p class="meta">Demandeur : revue-ecosysteme-20260808 · 2026-08-08 · gain 4 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — Audit ASD du 07/08 déclaré dégradé (produit en travaux pendant l'audit)</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0003" rows="1" aria-label="Commentaire TF-0003" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0063" aria-label="Décider TF-0063"></td>
-          <td class="c-id" data-th="id"><code>TF-0063</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">4</td>
-          <td data-th="item"><details><summary><strong>Le dashboard de forge-tests ne tient plus les règles L1-L12 du socle HTML</strong></summary>
-              <p>check_html (registre 2.10.0) sort code 1 sur le dashboard généré : L3 colonne « sévérité » sans formule publiée ni aria-describedby, L4 six tables de 8 à 115 lignes sans data-filterable, L6 sans sommaire. C'est l'unique échec de la recette S-01 (préexistant à la campagne du 09/08). Dérive skill↔forge : le socle a gagné L1-L12, le générateur livrables/dashboard.py n'a pas suivi.</p>
-              <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 4 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — S-01 NON TENU sur le dépôt depuis l'évolution du socle — la recette entière est rouge</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0063" rows="1" aria-label="Commentaire TF-0063" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0078" aria-label="Décider TF-0078"></td>
-          <td class="c-id" data-th="id"><code>TF-0078</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">2</td>
-          <td data-th="item"><details><summary><strong>Registre de dette forge-tests : poser les premières fermetures ok sur preuve (0 sur 90)</strong></summary>
-              <p>Le mécanisme existe depuis TF-0002/0004 (ok exige une preuve nommée, retiree pour les énoncés disparus). Aucune des 90 dettes n'est fermée — l'arbitrage des premières fermetures est un acte humain outillé (proposer un lot de candidats ok avec leur preuve, décision humaine).</p>
-              <p class="meta">Demandeur : campagne-todo-20260809 · 2026-08-09 · gain 2 × preuve 1 ÷ effort 1 · <strong>payé en réel</strong> — 27 fausses résolutions historiques requalifiées retiree — le registre ne prouve encore aucune fermeture</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0078" rows="1" aria-label="Commentaire TF-0078" placeholder="commentaire…"></textarea></td>
-        </tr>
-        </tbody>
-      </table></div>
-    </section>
     </main>
     <footer>Vue générée par <code>todo/generer-page.mjs</code> — ne pas éditer. Source unique : <code>todo/TODO.jsonl</code>. Détail d'un item : <code>grep '"id":"TF-xxxx"' todo/TODO.jsonl</code>.</footer>
   </div>
   <script>
   (function () {
     "use strict";
-    var SCEAU = "9f6512bd7b40";
+    var SCEAU = "14d7780b50f5";
     var cle = function (id, type) { return "todo-forge:" + SCEAU + ":" + id + ":" + type; };
     var coches = document.querySelectorAll("input.decider");
     var comms = document.querySelectorAll("textarea.commentaire");

@@ -13,7 +13,7 @@ Les chemins d'étapes se lisent `<projet>\forge\etapes\…`.
 
 **Socle projet** (`REGLES-PROJET.md`, décidé le 06/08) : créer `input\`, `output\`, `docs\`,
 le `.gitignore` socle (`.env`, `.venv/`, `__pycache__/`, `node_modules/`, `generated/`,
-`Old/`), `.env.example` (toutes variables attendues, applicatives + infra, tierces marquées
+`Old/`, sidecars d'oracles `*.oracles*.json[l]` avec exception `!forge/**` — TF-0065/C4), `.env.example` (toutes variables attendues, applicatives + infra, tierces marquées
 `# à fournir :`), le `CLAUDE.md` du produit **d'après `gabarits\CLAUDE-PRODUIT.md`** (la
 section « Routage forge » est obligatoire et remplie : c'est elle qui garantit que les
 sessions ad hoc dans le produit passent par les forges pour tout verdict — tests, évolution,
