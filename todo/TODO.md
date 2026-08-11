@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=ff196697575b archive=e3b0c44298fc · dernier événement: 2026-08-11T09:39:34Z -->
+     sceaux: actifs=65f666eb754f archive=e3b0c44298fc · dernier événement: 2026-08-11T10:06:02Z -->
 
-**83 actifs** (candidat 27 · décidé 0 · en cours 2 · corrigé 54 · écarté 0) · **0 archivés**.
+**85 actifs** (candidat 29 · décidé 0 · en cours 0 · corrigé 56 · écarté 0) · **0 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -55,6 +55,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0017 | candidat | 4 | Committer le chantier oracle-motion | non |
+| TF-0085 | candidat | 3 | D-10 : le contrôle réseau exécutable annoncé n'existe pas dans la recette HTML | **oui** — un livrable client avec un appel CDN passerait la recette aujourd'hui ; les trois motifs de D-10 (traçage des lectures, CDN disparu à 2 ans, proxy d'entreprise) restent des risques réels non gardés |
 | TF-0016 | candidat | 2 | Rebuild + commit dist/*.skill | non |
 | TF-0019 | candidat | 1.5 | Premier appel réel Gemini (lever R-D3) | non |
 | TF-0020 | candidat | 1 | Producteur d'images complet | non |
@@ -101,6 +102,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-0065 | candidat | 6 | Le hook qualité sème ses journaux .oracles* dans tout dépôt édité — à canaliser une fois pour toutes | **oui** — 2 commits pollués défaits par git reset pendant la campagne agents ; nettoyage manuel ×3 campagnes |
 | TF-0062 | candidat | 2 | Rattrapage du renommage pilot chez les produits et missions | non |
+| TF-0084 | candidat | 2 | Trois propositions organization en attente de décision pilot (circuit D-13) | **oui** — REGLES-PROJET §G : trois lignes de la matrice portent « en attente de décision pilot » — tant qu'elles y restent, la règle du corpus et la doctrine d'organization peuvent diverger sans que personne ne le voie |
 | TF-0050 | corrige | 6 | Gabarit d'agent de campagne — contraintes standard mutualisées | **oui** — ~25 prompts × ~3 Ko de contraintes dupliquées relevés sur la semaine |
 | TF-0080 | corrige | 6 | Oracle d'exhaustivité de l'écosystème (matrice forges × surfaces) | **oui** — 3 trous réels le 11/08 : fiche forge-audit absente, forge-audit hors noyau, README à « cinq forges » |
 | TF-0035 | corrige | 4 | versions_forges/run_precedent réellement consignés | **oui** — 0/76 entrées sur ASD malgré 2 versions livrées |
@@ -111,13 +113,13 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0082 | corrige | 2.7 | Socle documentaire produit docs\projet\ — règles R-20..R-23 | **oui** — aucun produit n'a d'état des lieux standardisé ; les runs de version redécouvrent technos/config/accès à chaque ouverture |
 | TF-0037 | corrige | 1.5 | Plafond de taille CLAUDE.md + alerte | non |
 | TF-0038 | corrige | 1.3 | Exercer une vraie reprise de run interrompu | non |
+| TF-0039 | corrige | 1 | Circuit organization→steering opérationnel | non |
 | TF-0054 | corrige | 1 | Baseline d'audit packagée par forge | non |
 
 ## seo
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0029 | en_cours | 1 | Générateurs des 3 livrables manquants | non |
 | TF-0074 | candidat | 2 | etat.json : etape_courante et statuts d'étapes ne sont mis à jour par aucun script de la forge seo | **oui** — trou constaté au rapatriement des moteurs (TF-0030) |
 | TF-0072 | candidat | 1.5 | forge-seo : l'empreinte de grille dépend des fins de ligne — un clone Linux déclarerait toutes les études périmées | **oui** — portabilité cassée par construction, constatée à l'implémentation de TF-0048 |
 | TF-0073 | candidat | 1 | Rapatrier la production du CSV d'actions scoré (livrables-gen.py de la mission) — complément de TF-0056 | **oui** — le BOM du CSV réel trahit déjà un producteur hors forge |
@@ -133,13 +135,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0026 | corrige | 2 | --json sur validate.py | non |
 | TF-0027 | corrige | 2 | Trancher le working tree en cours | non |
 | TF-0047 | corrige | 2 | Le « blocage principal » de la synthèse est choisi par l'ordre de la grille, pas par la gravité | **oui** — Sur la mission, le blocage affiché n'était pas le principal, et le texte repris renvoyait à « cette fiche » et à une action non encore introduite. |
+| TF-0029 | corrige | 1 | Générateurs des 3 livrables manquants | non |
 | TF-0030 | corrige | 0.8 | Généraliser les moteurs ad hoc des missions | non |
-
-## steering
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0039 | en_cours | 1 | Circuit organization→steering opérationnel | non |
 
 ## tests
 
