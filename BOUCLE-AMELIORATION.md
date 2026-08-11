@@ -180,8 +180,18 @@ chantiers d'assainissement en amont. Réalisé :
   189 fichiers client, submodules privés) → **reste privé**, par conception.
 
 État final : **9 dépôts publics MIT** (8 forges + auditcore), 1 privé (engagement audit).
-Post-condition : le clone de `digit-ai-forge-audit` par `bootstrap.mjs` reste réservé aux
-postes authentifiés — comportement voulu.
+
+**Post-scriptum 11/08 — nommage stabilisé** (décision humaine) : le produit prend le nom
+canonique — `digit-ai-forge-auditcore` → **`digit-ai-forge-audit`** (public MIT) ; l'espace
+d'engagement → **`digit-ai-forge-audit_nhood`** (privé). Recâblé partout : `.gitmodules` de
+l'engagement, remotes locaux, clone du produit en `c:\dev\digit-ai-forge-audit`, preuve
+bootstrap = `core/invariants.json`. Le bootstrap équipe désormais les postes avec le produit
+public ; les engagements restent hors bootstrap.
+
+**Post-scriptum 11/08 bis — identité** : historiques des 10 dépôts réécrits en
+`iguane39@gmail.com` uniquement (l'email d'engagement traînait en config locale du dépôt
+audit et dans les commits antérieurs) ; protection de branche development levée puis remise
+à l'identique ; tag auditcore migré ; pin submodule recalé.
 
 ## Campagne du 10/08/2026 — santé des transverses (C1-C5, mandat humain direct)
 

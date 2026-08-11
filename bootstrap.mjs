@@ -25,10 +25,10 @@ const FORGES = [
   { nom: "digit-ai-forge-agents", preuve: ".claude/skills/forge-agents/SKILL.md" },
   { nom: "digit-ai-forge-seo", preuve: "scripts/validate.py" },
   { nom: "digit-ai-forge-organization", preuve: "output/composant-filtres-tableau/oracle-filtres-tableau.mjs" },
-  // forge-audit : audit & gouvernance POC-to-Prod. Le cœur produit (AuditCore) vit dans le
-  // submodule `auditcore/` (non peuplé par le clone shallow) ; la preuve est donc le câblage
-  // submodule du dépôt d'engagement, garanti présent dans le clone principal.
-  { nom: "digit-ai-forge-audit", preuve: ".gitmodules" },
+  // forge-audit : le PRODUIT AuditCore (public, marque blanche — ex `digit-ai-forge-auditcore`,
+  // renommé le 11/08). Les référentiels vivent dans core/ (adr, controls, dimensions).
+  // L'espace d'engagement client (`digit-ai-forge-audit_nhood`, privé) est hors bootstrap.
+  { nom: "digit-ai-forge-audit", preuve: "core/invariants.json" },
 ];
 
 const args = process.argv.slice(2);
