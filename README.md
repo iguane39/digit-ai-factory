@@ -85,18 +85,28 @@ Rien ne se corrige hors run.
 ### 3 · Tester et corriger
 
 ```
-Audit forge-tests de CE projet puis fermeture des écarts — jamais sur parole.
+Cycle de tests COMPLET de CE projet via forge-tests — stratégie, cas de
+tests, jeux de données, exécution, corrections ; jamais sur parole.
 Phase 0 : localise la forge ($FORGE_ROOT, sinon parent du projet, c:\dev,
 ~/.digit-ai-forge ; introuvable → git clone
 https://github.com/iguane39/digit-ai-forge-pilot dans ~/.digit-ai-forge puis
 node bootstrap.mjs, fin « Poste prêt » exigée ; sinon git pull --ff-only +
 node bootstrap.mjs --pull). Rien à me demander : la cible est ce dossier.
-Puis : depuis <racine>\digit-ai-forge-tests, lance
-uv run python -m forge_tests <ce projet> --json (12 pans, surface énumérée
-depuis le code) ; boucle de fermeture BORNÉE : corrige → re-audite, 3 cycles
+Puis, depuis digit-ai-forge-tests sous la racine de la forge, lance
+uv run python -m forge_tests sur CE projet avec : --json ; --sortie vers
+forge\rapport-tests.json du projet ; --generer et --livrables vers un
+dossier frère proposition-tests, HORS du projet (G-1).
+La STRATÉGIE, c'est le rapport : surface énumérée depuis le code, 12 pans,
+risques scorés, seuils opposables. Les CAS DE TESTS : cahiers fonctionnels
+et techniques dérivés + cas générés — déposés en PROPOSITION hors du projet
+(G-1), leur adoption passe par moi ou par la boucle, jamais en douce. Le
+JEU DE DONNÉES est synthétique — jamais une donnée réelle. L'EXÉCUTION est
+la suite réelle sous couverture ET mutation. Les CORRECTIONS sortent en
+boucle de fermeture BORNÉE : corrige → re-audite (--reprendre), 3 cycles
 maximum, G-2 absolue — au-delà, livre le rapport avec écarts résiduels et
-actions[] classées (IA / dev / utilisateur). Verdicts persistés au ledger ;
-aucun ✓ sans oracle exécuté.
+actions[] classées (IA / dev / utilisateur). Dashboard avec --precedent
+pour la tendance entre deux audits. Verdicts persistés au ledger ; aucun ✓
+sans oracle exécuté.
 ```
 
 ### 4 · Revoir le design d'une implémentation
