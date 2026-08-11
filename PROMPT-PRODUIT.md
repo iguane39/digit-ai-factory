@@ -20,7 +20,7 @@ Phase 0 — outillage (ne suppose RIEN d'installé, quel que soit mon système) 
    Si introuvable, installe-la :
      gh repo clone iguane39/digit-ai-forge-pilot ~/.digit-ai-forge/digit-ai-forge-pilot
      node ~/.digit-ai-forge/digit-ai-forge-pilot/bootstrap.mjs
-   (bootstrap.mjs clone les 5 forges à côté du pilot et vérifie leurs points d'entrée —
+   (bootstrap.mjs clone les forges à côté du pilot et vérifie leurs points d'entrée —
    il doit finir sur « Poste prêt », sinon corrige ce qu'il signale avant de continuer.)
 3. Si la forge était déjà installée : mets-la à jour — `git pull --ff-only` dans le pilot
    puis `node bootstrap.mjs --pull` (les correctifs des forges arrivent en continu ; un run

@@ -44,75 +44,109 @@ conception ──► design ──► development ──► tests ──► MEP
 Chaque étape est validée par des **oracles exécutés** — jamais par confiance. Chaque run vit sous
 `runs\<AAAAMMJJ>-<slug>\` avec son ledger JSONL (état, reprise idempotente, audit).
 
-## Prompts d'usage — un par situation
+## Prompts d'usage — un par situation, copier-coller strict
 
-La règle ne change jamais : **la session Claude Code s'ouvre dans le dossier du produit**
-(jamais dans le pilot), et c'est le routage forge du `CLAUDE.md` produit qui fait le reste.
-Copier le bloc, remplacer les `<…>`.
+Chaque bloc se colle **tel quel** dans une session Claude Code ouverte **dans le dossier du
+produit** — zéro modification, aucun nom à insérer : le prompt localise la forge tout seul
+(ou l'installe depuis GitHub), prend CE dossier comme produit, et **demande en session, en une
+seule question**, ce qui dépend du cas. Le seul cas à fichier reste le lancement (n° 1).
+
+Le préambule commun à tous les blocs :
+
+> **Phase 0** — localise la forge (ne suppose rien d'installé) : `$FORGE_ROOT` si défini, sinon
+> cherche `digit-ai-forge-pilot` dans le parent de ce projet, `c:\dev`, `~/.digit-ai-forge` ;
+> introuvable → `git clone https://github.com/iguane39/digit-ai-forge-pilot` dans
+> `~/.digit-ai-forge` puis `node bootstrap.mjs` (doit finir « Poste prêt ») ; déjà là →
+> `git pull --ff-only` dans le pilot puis `node bootstrap.mjs --pull`. Retiens la racine.
 
 ### 1 · Lancer un nouveau produit
 
-Copier [PROMPT-PRODUIT.md](PROMPT-PRODUIT.md) dans un dossier vide et coller le bloc rempli —
-c'est le seul cas où le prompt est un fichier. Les 7 champs (problème, cible, job, palier, ton,
-contraintes, cible de déploiement) suffisent ; la phase 0 installe tout.
+Copier [PROMPT-PRODUIT.md](PROMPT-PRODUIT.md) dans un dossier vide et coller son bloc : sa
+phase 0 est la même, et ses 7 champs de brief sont le seul formulaire de tout l'écosystème.
 
-### 2 · Faire évoluer ou remédier un produit existant (run de version)
-
-```
-Run de version via la forge Digit-AI — le run vit ici, dans ce projet.
-Objet : <l'évolution ou la remédiation demandée, en une phrase>.
-Applique references\RUN-VERSION.md du pilot : rattrapage du socle d'abord
-(23 règles + docs\projet\), puis delta par étape (conception si le besoin
-change, design si l'interface change, development sous gates), tests TOUJOURS
-en entier, ledger chaîné (run_precedent). Rien ne se corrige hors run.
-```
-
-### 3 · Tester et corriger (audit + boucle de fermeture)
+### 2 · Faire évoluer ou remédier un produit existant
 
 ```
-Audite ce produit par forge-tests puis ferme les écarts — jamais sur parole.
-1. uv run python -m forge_tests . --json  (surface énumérée depuis le code,
-   12 pans, mutation) ;
-2. boucle de fermeture BORNÉE : corrige → re-audite, 3 cycles maximum,
-   G-2 absolue — au-delà, livre le rapport avec les écarts résiduels et les
-   actions[] classées (IA / dev / utilisateur) ;
-3. les verdicts et le dashboard entrent au ledger ; aucun ✓ sans oracle exécuté.
+Run de version via la forge Digit-AI — le run vit ICI, dans ce projet.
+Phase 0 : localise la forge ($FORGE_ROOT, sinon parent du projet, c:\dev,
+~/.digit-ai-forge ; introuvable → git clone
+https://github.com/iguane39/digit-ai-forge-pilot dans ~/.digit-ai-forge puis
+node bootstrap.mjs, fin « Poste prêt » exigée ; sinon git pull --ff-only +
+node bootstrap.mjs --pull). Retiens la racine.
+Avant d'ouvrir le run : demande-moi EN UNE QUESTION l'objet de l'évolution ou
+de la remédiation — ne suppose jamais. Puis lis references\RUN-VERSION.md du
+pilot et déroule : rattrapage du socle d'abord (23 règles + docs\projet\),
+delta par étape, tests TOUJOURS en entier, ledger chaîné (run_precedent).
+Rien ne se corrige hors run.
 ```
 
-### 4 · Revoir le design d'une implémentation (mode aval)
+### 3 · Tester et corriger
 
 ```
-Revue graphique d'implémentation via forge-design (mode critique aval) :
-juge le produit RENDU contre sa promesse design — tokens.css respectés,
-écrans/états conformes à la maquette, un CTA = une cible, voix de MARQUE.md.
-Exécute les oracles (run-oracles-design.mjs + render_page.py : le rendu se
-mesure en pixels, pas dans le CSS), inspecte les PNG, et verse chaque écart
-ancré au ledger comme retour consommable par development. Verdict + top
-corrections priorisées impact×effort.
+Audit forge-tests de CE projet puis fermeture des écarts — jamais sur parole.
+Phase 0 : localise la forge ($FORGE_ROOT, sinon parent du projet, c:\dev,
+~/.digit-ai-forge ; introuvable → git clone
+https://github.com/iguane39/digit-ai-forge-pilot dans ~/.digit-ai-forge puis
+node bootstrap.mjs, fin « Poste prêt » exigée ; sinon git pull --ff-only +
+node bootstrap.mjs --pull). Rien à me demander : la cible est ce dossier.
+Puis : depuis <racine>\digit-ai-forge-tests, lance
+uv run python -m forge_tests <ce projet> --json (12 pans, surface énumérée
+depuis le code) ; boucle de fermeture BORNÉE : corrige → re-audite, 3 cycles
+maximum, G-2 absolue — au-delà, livre le rapport avec écarts résiduels et
+actions[] classées (IA / dev / utilisateur). Verdicts persistés au ledger ;
+aucun ✓ sans oracle exécuté.
 ```
 
-### 5 · Déployer en staging puis en production (MEP outillée forge-ops)
+### 4 · Revoir le design d'une implémentation
 
 ```
-Ouvre l'étape MEP de ce produit (ETAPE-MEP.md du pilot).
-Cible du brief : <locale | railway | gcp | azure | aws>.
-1. node <ops>\scripts\ops.mjs plan <cible> <build> --sortie plan.json puis
-   oracle O-5 (PASS exigé) — le plan porte des placeholders, jamais de credential ;
-2. staging réel : déploiement, healthcheck, rollback PROUVÉ (O-1…O-4) ;
-3. dossier MEP complet (M-1…M-5) et mise à jour docs\projet\COMPOSANTS-OPS.md ;
-4. la production attend mon GO explicite — prépare le dossier de preuve, ne
-   déploie pas.
+Revue graphique d'implémentation de CE projet (forge-design, mode critique
+aval). Phase 0 : localise la forge ($FORGE_ROOT, sinon parent du projet,
+c:\dev, ~/.digit-ai-forge ; introuvable → git clone
+https://github.com/iguane39/digit-ai-forge-pilot dans ~/.digit-ai-forge puis
+node bootstrap.mjs, fin « Poste prêt » exigée ; sinon git pull --ff-only +
+node bootstrap.mjs --pull).
+Puis : juge le produit RENDU contre sa promesse design — les tokens.css,
+DESIGN.md et MARQUE.md de CE projet s'ils existent (absents → dis-le et
+demande-moi en une question contre quelle référence juger). Exécute les
+oracles de <racine>\digit-ai-forge-design (run-oracles-design.mjs) et
+render_page.py du socle HTML — le rendu se mesure en pixels, pas dans le
+CSS — inspecte les PNG, et verse chaque écart ancré au ledger comme retour
+consommable par development. Verdict + top corrections impact×effort.
 ```
 
-### 6 · Auditer le SEO d'un produit en ligne (post-MEP, sur mandat)
+### 5 · Déployer en staging puis préparer la production
 
 ```
-Mandat d'audit SEO pour <domaine> — mission via forge-seo.
-python <seo>\scripts
-ew_mission.py --projet <produit> --client <client>
---domaine <domaine> --modele <modele>, puis déroule seo\METHODE.md (87 nœuds,
-preuves T1-T4 affichées, garde-fous anti-hallucination). L'étude vit ICI, chez
-le produit ; validate.py et rapport_html.py --verifier avant toute remise.
+Étape MEP de CE projet, outillée forge-ops. Phase 0 : localise la forge
+($FORGE_ROOT, sinon parent du projet, c:\dev, ~/.digit-ai-forge ;
+introuvable → git clone https://github.com/iguane39/digit-ai-forge-pilot
+dans ~/.digit-ai-forge puis node bootstrap.mjs, fin « Poste prêt » exigée ;
+sinon git pull --ff-only + node bootstrap.mjs --pull).
+Puis lis ETAPE-MEP.md du pilot. La cible de déploiement : lis-la dans le
+brief ou docs\projet\PARAMETRAGE.md de ce projet ; absente → demande-la-moi
+EN UNE QUESTION (locale | railway | gcp | azure | aws). Ensuite :
+plan via <racine>\digit-ai-forge-ops (ops.mjs plan + oracle O-5 PASS — le
+plan porte des placeholders, jamais de credential) ; staging réel avec
+healthcheck et rollback PROUVÉ (O-1…O-4) ; dossier M-1…M-5 complet ; mise à
+jour de docs\projet\COMPOSANTS-OPS.md. La production attend mon GO explicite
+sur dossier de preuve — ne déploie pas.
+```
+
+### 6 · Auditer le SEO d'un produit en ligne
+
+```
+Mandat d'audit SEO via forge-seo — ce message vaut mandat, la mission vit
+ICI, chez le produit. Phase 0 : localise la forge ($FORGE_ROOT, sinon parent
+du projet, c:\dev, ~/.digit-ai-forge ; introuvable → git clone
+https://github.com/iguane39/digit-ai-forge-pilot dans ~/.digit-ai-forge puis
+node bootstrap.mjs, fin « Poste prêt » exigée ; sinon git pull --ff-only +
+node bootstrap.mjs --pull).
+Le domaine à auditer : détecte-le depuis ce projet (config, docs\projet\,
+README) ; introuvable ou ambigu → demande-le-moi EN UNE QUESTION, avec le nom
+du client. Puis scaffold via <racine>\digit-ai-forge-seo\scriptsnew_mission.py, déroule seo\METHODE.md (87 nœuds, preuves T1-T4 affichées,
+garde-fous anti-hallucination), et valide avant toute remise : validate.py
+(exit 0 exigé) puis rapport_html.py --verifier.
 ```
 
 Deux garde-fous transverses : une amélioration des **forges** ne se lance jamais depuis un
