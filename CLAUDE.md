@@ -38,7 +38,7 @@ décision est humaine, la clôture exige les gains constatés. Candidature exter
 `CONTRAT-INTERFACE.md` (invocation, ledger, routage §4, mesure §4 bis, référentiels à
 identifiants §3 bis), `ETAPE-MEP.md`, `BOUCLE-AMELIORATION.md` (journal des campagnes),
 `HYPOTHESES.md` (en ajouter, jamais en taire), `fiches\<forge>.md` (baselines d'audit),
-`references\BEST-PRACTICES-HTML.md` (patterns HTML).
+`references\BEST-PRACTICES-HTML.md`.
 
 ## Lancement d'un run
 
@@ -54,7 +54,7 @@ session s'ouvre dans le projet produit, jamais ici. Le run vit dans le projet pr
 5. **Tests** — audit forge-tests + boucle de fermeture bornée (≤ 3 cycles, G-2 absolue) ;
    **5 bis** en parallèle : revue graphique d'implémentation (forge-design, mode aval) ;
 6. **MEP** — staging outillé par **forge-ops** (O-1…O-4), oracle M-1…M-5,
-   `DOSSIER-MEP.md`, **GO humain obligatoire** ;
+   `DOSSIER-MEP.md`, **GO humain** ;
 7. **Clore** — lot de retours + sidecar remis à `<pilot>\input\`, `run_close`, synthèse.
 
 **Mode opératoire détaillé : `references\ETAPES-RUN.md`** (charger à l'ouverture de
