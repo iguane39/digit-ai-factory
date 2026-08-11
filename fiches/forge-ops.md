@@ -17,5 +17,11 @@ locale/staging fichiers (`releases/` + `COURANT` + `journal.jsonl`) ; les cibles
 (Railway, VPS, conteneur distant) restent à outiller — le trou TF-0040 « déploiement Railway
 artisanal » n est comblé que pour le geste, pas pour la cible d origine. **D-P2** — aucun
 garde-fou machine n empêche un produit d invoquer `ops.mjs` en direct (frontière doctrinale,
-non outillée). Pas encore de run MEP réel passé par la forge (créée ce jour) — premier run
-à consigner ici.
+non outillée). Pas encore de run MEP réel passé par la forge — premier run à consigner ici.
+
+**Delta 11/08 (TF-0081)** : D-P1 amendée — mode **plan** livré (railway, gcp Cloud Run,
+azure Container Apps, aws App Runner) : plans déterministes 4 phases (rollback exigé),
+oracle **O-5**, self-test 24 PASS hors-ligne zéro credential ; chaque cible adossée à sa
+**fiche expert admise** (experts-forge : ops-railway/gcp/azure/aws, verdicts MATERIEL 5/5,
+oracle-judge `claude -p`). Dette résiduelle : **exécution réelle à consigner par cible**
+(premier run MEP authentifié, GO humain) — le plan prouvé devient geste prouvé à ce moment-là.

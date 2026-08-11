@@ -49,7 +49,7 @@
   <div class="wrap">
     <header>
       <h1>TODO-FORGE — registre d'amélioration</h1>
-      <p class="meta">80 actifs (candidat 27 · décidé 0 · en cours 2 · corrigé 51 · écarté 0) · 0 archivés · sceau source <code>392c18ff0967</code> · dernier événement 2026-08-11T07:26:14Z</p>
+      <p class="meta">81 actifs (candidat 27 · décidé 0 · en cours 2 · corrigé 52 · écarté 0) · 0 archivés · sceau source <code>5930f74898fe</code> · dernier événement 2026-08-11T07:54:10Z</p>
       <p>Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au pilot — il sera appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
     </header>
     <div class="barre">
@@ -509,6 +509,27 @@
             </details>
           </td>
           <td class="c-comm"><textarea class="commentaire" data-id="TF-0009" rows="1" aria-label="Commentaire TF-0009" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section>
+      <h2 id="ops">ops <span class="badge">1</span></h2>
+      <div class="scroll"><table data-filterable>
+        <thead><tr><th scope="col">✓</th><th scope="col">id</th><th scope="col">statut</th><th scope="col">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche"><input type="checkbox" class="decider" data-id="TF-0081" aria-label="Décider TF-0081" disabled></td>
+          <td class="c-id"><code>TF-0081</code></td>
+          <td><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score">4</td>
+          <td>
+            <details><summary><strong>Extension cloud de forge-ops — expertises + plans : Railway, GCP, Azure, AWS</strong></summary>
+              <p>Rattaché à D-P1. Deux artefacts, deux régimes de preuve : 4 fiches expert (experts-forge, admission oracle-judge, service canonique par cible, placeholders) + mode plan-first dans ops.mjs (plans déterministes 4 phases dont rollback, oracle O-5, self-test hors-ligne zéro credential). Exécution réelle = run MEP sur GO humain, consignée par cible.</p>
+              <p class="meta">Demandeur : prompt réécrit L99 du 11/08 · 2026-08-11 · gain 4 × preuve 3 ÷ effort 3 · <strong>payé en réel</strong> — D-P1 : v0 cible locale seulement ; cas réel Railway (ASD) déployé artisanalement</p>
+            </details>
+          </td>
+          <td class="c-comm"><textarea class="commentaire" data-id="TF-0081" rows="1" aria-label="Commentaire TF-0081" placeholder="commentaire…"></textarea></td>
         </tr>
         </tbody>
       </table></div>
@@ -1191,7 +1212,7 @@
   <script>
   (function () {
     "use strict";
-    var SCEAU = "392c18ff0967";
+    var SCEAU = "5930f74898fe";
     var cle = function (id, type) { return "todo-forge:" + SCEAU + ":" + id + ":" + type; };
     var coches = document.querySelectorAll("input.decider");
     var comms = document.querySelectorAll("textarea.commentaire");

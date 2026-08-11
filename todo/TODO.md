@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=392c18ff0967 archive=e3b0c44298fc · dernier événement: 2026-08-11T07:26:14Z -->
+     sceaux: actifs=5930f74898fe archive=e3b0c44298fc · dernier événement: 2026-08-11T07:54:10Z -->
 
-**80 actifs** (candidat 27 · décidé 0 · en cours 2 · corrigé 51 · écarté 0) · **0 archivés**.
+**81 actifs** (candidat 27 · décidé 0 · en cours 2 · corrigé 52 · écarté 0) · **0 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -63,6 +63,12 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0007 | corrige | 3 | Source unique des disciplines de livrable | non |
 | TF-0010 | corrige | 2.7 | Gates de livrable exécutables | **oui** — 3 défauts sortis en production v0.1.0 |
 | TF-0009 | corrige | 2.5 | HumanGate déléguable + dogfooding | **oui** — D-V1 payée à chaque étape 4 en mode dégradé |
+
+## ops
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0081 | corrige | 4 | Extension cloud de forge-ops — expertises + plans : Railway, GCP, Azure, AWS | **oui** — D-P1 : v0 cible locale seulement ; cas réel Railway (ASD) déployé artisanalement |
 
 ## ops (nouvelle)
 
