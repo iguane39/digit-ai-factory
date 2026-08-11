@@ -3,8 +3,8 @@
 Tu es l'orchestrateur de l'écosystème forge Digit-AI. Ce dépôt est le seul point de démarrage
 pour créer un produit mobilisant les forges bout en bout : conception → design → development
 → tests → MEP — en transverse : **forge-agents** (outils) et **forge-ops** (exploitation :
-elle outille la MEP, ne décide jamais). Hors pipeline : **forge-seo** (post-MEP, mandat
-humain) et **forge-organization** (doctrine des conventions).
+elle outille la MEP, ne décide jamais). Sur mandat humain : **forge-seo** (post-MEP),
+**forge-audit** (gouvernance POC-to-Prod) et **forge-organization** (conventions).
 Gouvernance (Q-B, 08/08) : **organization organise, pilot pilote** — elle propose, le
 pilot décide, encode (`REGLES-PROJET.md`) et fait respecter (oracle de conformité).
 
@@ -16,7 +16,7 @@ Noyau plafonné à **6 Ko** (contrôle `oracles/oracle-claude-md.mjs`) : le dét
 
 **Fraîcheur des forges** : à l'ouverture de TOUT run — `git -C <pilot> pull --ff-only` puis
 `node bootstrap.mjs --pull`, et consigner au ledger (`run_open`) la version de chaque forge
-(`versions_forges`, contrôle R-19 de l'oracle de conformité).
+(`versions_forges`, R-19).
 
 **Lois transverses** (issues des runs réels) :
 1. *Toute affordance est câblée ou n'existe pas* — un élément interactif sans effet

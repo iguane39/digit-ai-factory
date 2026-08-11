@@ -1,8 +1,18 @@
 # digit-ai-forge-pilot
 
 Projet de pilotage de l'écosystème forge Digit-AI. **Un seul point de démarrage** pour construire
-un produit en mobilisant les cinq forges bout en bout, et pour les améliorer par itérations
-bornées. Règle d'affichage de ce README : il ne promet rien que le ledger d'un run ne puisse
+un produit en mobilisant les neuf forges bout en bout, et pour les améliorer par itérations
+bornées.
+
+**Les neuf forges** — pipeline : [forge-conception](https://github.com/iguane39/digit-ai-forge-conception) ·
+[forge-design](https://github.com/iguane39/digit-ai-forge-design) ·
+[forge-development](https://github.com/iguane39/digit-ai-forge-development) ·
+[forge-tests](https://github.com/iguane39/digit-ai-forge-tests) — transverses :
+[forge-agents](https://github.com/iguane39/digit-ai-forge-agents) (outils partagés) ·
+[forge-ops](https://github.com/iguane39/digit-ai-forge-ops) (exploitation, outille la MEP) — sur
+mandat humain : [forge-audit](https://github.com/iguane39/digit-ai-forge-audit) (gouvernance
+POC-to-Prod) · [forge-seo](https://github.com/iguane39/digit-ai-forge-seo) (post-MEP) ·
+[forge-organization](https://github.com/iguane39/digit-ai-forge-organization) (conventions). Règle d'affichage de ce README : il ne promet rien que le ledger d'un run ne puisse
 prouver.
 
 ## Démarrer un produit
