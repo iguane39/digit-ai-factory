@@ -652,3 +652,12 @@ anti-subjectivité : 0/5. Deux candidatures aval (lot des sidecars : règle d'or
 forge-design ; versement boilerplate + règle check_html — le toggle mort est prouvé
 invisible au check_html actuel). Tranche Sonnet 170 k / 76 outils / 15 min + noyau par le
 pilot ; escalade : aucune.
+
+**TF-0133/0134 clos (12/08, nuit — aval R-30 complet)** : oracle-bascule natif chez
+forge-design (`9e46ee9`, 48→52 règles, 4 rouges à écart unique — zèle conforme au gabarit)
+et S-G1 versé au skill digit-ai-page-html (`6e8c891` chez forge-agents, source vivante +
+copie installée synchronisées, check_html 30→33 avec règle G1 « bascule morte »). La chaîne
+R-30 est fermée de bout en bout : règle → pattern → boilerplate natif → deux oracles
+(design + socle) → fixtures prouvées. Tranches Sonnet 153 k/48/11,6 min et 135 k/63/8,8 min,
+escalade : aucune. Rappel des sondages pilot : 52 règles et 33/33 rejoués, toggle mort FAIL,
+diff source↔installé vide.
