@@ -75,7 +75,7 @@
 |---|---|---|---|---|---|---|
 | cat-aud-01 | **Référentiel d'audit POC-to-Prod** | auditer la gouvernance et l'architecture de mon produit vers la production | `core\ (adr, controls, dimensions, invariants.json) — dépôt public MIT, marque blanche AuditCore` | deux CI vertes (produit + tenant, iso-parité) ; gate N0 zéro donnée client vérifié ; comptages vérifiés sur README audit le 12/08 | prouve | production |
 | cat-aud-02 | **Oracles d'audit** | vérifier mécaniquement parcours et couverture fonctionnelle | `node oracles\smoke-parcours.mjs · node oracles\verifier-couverture-fonctionnelle.mjs` | exécutés en CI (produit + tenant) | prouve | production |
-| cat-aud-03 | **Engagement d'audit par tenant** | mener un engagement client isolé consommant le référentiel | `dépôt d'engagement privé (ex. digit-ai-forge-audit_client-a) — sur mandat humain` | engagement Client-A réel, 2 CI vertes | prouve | production |
+| cat-aud-03 | **Engagement d'audit par tenant** | mener un engagement client isolé consommant le référentiel | `dépôt d'engagement privé par client, consommant le produit en submodule pinné — sur mandat humain` | un engagement client réel complet, 2 CI vertes (produit + engagement, iso-parité) | prouve | production |
 
 ## forge-seo (sur mandat) — 5 services
 

@@ -487,3 +487,46 @@ dix forges clonées, preuves vérifiées, fin **« Poste prêt »**, exit 0. Con
 d'idempotence : la phase 0 de la même session sur poste équipé (`git pull --ff-only` +
 `bootstrap --pull`) a fini « Poste prêt » sans erreur. Les deux critères décisifs du contrat
 sont PASS ; la parité GitHub suivra le push (décision humaine).
+
+## 12/08/2026 (suite) — mandat global : push, lot D appliqué, 16 items TODO exécutés
+
+**Mandat humain** : « Pousse sur github, go par forge lot D, puis exécute les éléments de la
+TODO. » Pilot poussé (`45f883a`) ; lot D appliqué et poussé sur les dix forges (GO par forge) ;
+15 items construits en 10 campagnes parallèles + TF-0113 par le pilot ; TF-0073 resté
+`en_cours` (la mission source est absente du poste — entrant humain requis) ; TF-0111/0112
+restés `candidat` (périmètre de nouvelles forges à trancher).
+
+**Routage instrumenté (§4 bis)** — 10 tranches, TOUTES Sonnet (a priori issu de la campagne
+mesurée du 09/08), items de construction complexe compris :
+
+| Tranche | Items | Tokens | Outils | Durée | Verdict |
+|---|---|---|---|---|---|
+| data | 1 (3 sous) | 105 k | 57 | 8 min | vert |
+| ops | 1 (3 sous) | 141 k | 54 | 14 min | vert |
+| seo | 2 | 174 k | 96 | 16 min | vert (TF-0073 non clos, motivé) |
+| conception | 1 (3 sous) | 203 k | 95 | 21 min | vert |
+| agents | 1 (3 sous) | 213 k | 98 | 21 min | vert |
+| development | 1 (3 sous) | 195 k | 118 | 23 min | vert |
+| organization | 1 (3 sous) | 212 k | 140 | 24 min | vert |
+| audit | 1 (4 sous) | 249 k | 171 | 28 min | vert |
+| tests | 5 | 322 k | 144 | 33 min | vert |
+| design | 1 (3 sous) | 264 k | 133 | 34 min | vert |
+
+`escalade_modele` : **aucune** sur 10 tranches — Sonnet 5 tient la construction complexe
+(gates, oracles, formats) au premier coup ; le tableau §4 est confirmé dans sa version
+challengée. Chaque rapport vérifié par **sondage pilot** (self-tests et suites rejoués, commits
+et arbres inspectés) avant clôture — verdicts consignés aux événements `corrige`.
+
+**Incidents du jour** : (1) le lot D avait introduit le nom d'un tenant réel dans le README
+public d'audit (gate N0 rouge) — détecté par la campagne audit, corrigé à la source
+(catalogue anonymisé, vues régénérées, commit `5c95d6b` chez audit, N0 revenu à 0 finding) ;
+(2) une session tierce travaille forge-tests en parallèle — ses fichiers préservés, un bug
+G-1 dans sa version en cours consigné en candidature ; (3) 7 constats de campagne ingérés en
+candidatures (lot `b3e32cb3b6bf`) : CRLF conception, généralisation fraîcheur (3 dérives de
+plus), G-1 mutation tiers, dashboard NULL, gates jq fail-open, .queue non versionné,
+mutation 61,1 % à durcir.
+
+**Bilan registre** : 15 `corrige` (TF-0097→0110, 0113), 1 `en_cours` (TF-0073), 9 `candidat`
+(dont TF-0111/0112 et les 7 nouveaux) ; oracle R1-R10 PASS, vue et page régénérées (sceau
+06a3a32f3c10). Push des campagnes forges : décidé par le mandat de ce jour, effectué après
+vérification par sondage.
