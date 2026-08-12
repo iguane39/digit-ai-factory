@@ -89,14 +89,14 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>6f8a60b9ff26</code> · dernier événement 2026-08-12T10:00:56.160Z</p>
+      <p class="meta">sceau <code>5457b2dd2341</code> · dernier événement 2026-08-12T10:30:23Z</p>
       <button id="exporter" type="button">Exporter les décisions</button>
       <span id="bilan" aria-live="polite">0 coché · 0 commentaire</span>
     </header>
     <p>Seul le <strong>reste-à-faire</strong> vit ici — les items clos partent à l'archive (<code>node todo\archiver.mjs</code>). Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au pilot — appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
     <p class="meta" id="note-score">La colonne « score » = <strong>valeur</strong> de l'item, calculée <code>gain × preuve ÷ effort</code> (composantes visibles dans le détail de chaque ligne) ; tri par défaut : statut puis score décroissant, ou au clic sur les en-têtes fléchés.</p>
     <div class="kpis">
-      <div class="kpi" title="3 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">3</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
+      <div class="kpi" title="0 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">0</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
       <div class="kpi" title="0 item(s) décidés dont les travaux ne sont pas ouverts"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts</span></div>
       <div class="kpi" title="0 campagne(s) ouvertes au registre"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre</span></div>
       <div class="kpi" title="95 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">95</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -324,9 +324,9 @@
         <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0124" aria-label="Décider TF-0124"></td>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0124" aria-label="Décider TF-0124" disabled></td>
           <td class="c-id" data-th="id"><code>TF-0124</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td data-th="statut"><span class="statut s-corrige">corrige</span></td>
           <td class="c-score" data-th="score">6</td>
           <td data-th="item"><details><summary><strong>Profils produit website/webapp/mobile : référentiels versionnés du pilot consommés par les forges — pas de nouvelles forges</strong></summary>
               <p>Verdict de l'étude du 12/08 (§2) : les trois candidats forment UN axe « type de produit », pas trois métiers — leurs verbes sont des qualificatifs des verbes existants, la part vérifiable machine est déjà outillée gratuitement (axe-core/WCAG 2.2-EAA, PageSpeed-CrUX : LCP&lt;2,5s INP&lt;200ms CLS&lt;0,1, Lighthouse PWA, validations automatiques des stores) et le reste est du savoir périssable à cycle court (HIG Liquid Glass iOS 26, Material 3 Expressive 05/2025) — loi transverse n° 4 et précédent BEST-PRACTICES-HTML. Construire : profils\{website,webapp,mobile}.md au pilot — frontmatter (version, challenge_date, sources datées), 3 sections par profil : standards machine (norme·seuil·oracle gratuit), savoir périssable daté-sourcé, mapping de consommation (ACCUEIL routage, conception typologie, design règles/tokens, development .forge/profile.toml et targets/, tests pans/seuils). Fraîcheur par claims (oracle-fraicheur-doc v2). Clause de réveil mobile : réévaluation OBLIGATOIRE en forge au premier brief produit mobile natif (toolchain stores/signing — seul trou réel, mais rien à exercer aujourd'hui).</p>
@@ -335,9 +335,9 @@
           <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0124" rows="1" aria-label="Commentaire TF-0124" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0123" aria-label="Décider TF-0123"></td>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0123" aria-label="Décider TF-0123" disabled></td>
           <td class="c-id" data-th="id"><code>TF-0123</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td data-th="statut"><span class="statut s-corrige">corrige</span></td>
           <td class="c-score" data-th="score">4.5</td>
           <td data-th="item"><details><summary><strong>Nouvelle forge : sécurité du produit web livré (proposition : digit-ai-forge-websec) — verbes outillés prouvés, échéance CRA 09/2026</strong></summary>
               <p>Verdict de l'étude d'opportunité du 12/08 (output\20260812-etude-opportunite-forges.md §1) : forge dédiée recommandée, modèle forge-seo (sur mandat, pré-MEP en gate optionnel consommé par M-1…M-5, post-MEP récurrente à livrable différentiel). Non-recouvrement prouvé contre 5 surfaces (pan securite de forge-tests = secrets seulement ; gate anti-patterns development = statique code ; audit 02-identity-sec = déclaratif ; agents-security = outillage agentique, pas le produit ; ops = rien). V0 née exercée : oracle-exposition (headers/TLS/CSP maison — l'API Mozilla Observatory a disparu en 2024, l'oracle maison est plus fiable), oracle-sca (enveloppe osv-scanner/npm audit/pip-audit, verdict machine), référentiel ASVS 5.0 niveau L1 versionné (challenge_date), fixtures double sens ; DAST ZAP en v1. Barres candidates à qualifier via la-barre : ASVS 5.0.0 ; chaîne ZAP+osv-scanner+gitleaks. Nom à trancher par l'humain (websec évite la collision de sens avec agents-security) ; délimitation croisée à afficher dans les deux README.</p>
@@ -346,9 +346,9 @@
           <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0123" rows="1" aria-label="Commentaire TF-0123" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0125" aria-label="Décider TF-0125"></td>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0125" aria-label="Décider TF-0125" disabled></td>
           <td class="c-id" data-th="id"><code>TF-0125</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td data-th="statut"><span class="statut s-corrige">corrige</span></td>
           <td class="c-score" data-th="score">4</td>
           <td data-th="item"><details><summary><strong>R-28 : critère d'admission d'une nouvelle forge — verbes outillés + née exercée + cadence propre + surfaces le jour même ; un corpus sans verbe = référentiel</strong></summary>
               <p>Verdict transverse de l'étude du 12/08 (§4) : encoder dans REGLES-PROJET.md le critère qui a départagé les 4 candidats. R-28 proposée : une forge naît si et seulement si (1) ≥ 2 verbes outillés exécutables inexistants ailleurs, prouvés par un verdict de non-recouvrement écrit citant le catalogue ; (2) v0 née exercée (oracles propres, self-test double sens, fixtures synthétiques) ; (3) cadence/mandat propres qui la distinguent d'une extension ; (4) intégration des 8 surfaces écosystème le même jour (oracle-ecosysteme fait foi). Un corpus de savoir sans verbe outillé = référentiel versionné (frontmatter daté-sourcé, fraîcheur par claims), jamais une forge. Fixture de validation : appliqué aux 4 candidats de l'étude, le critère redonne exactement les verdicts rendus (1 forge, 3 profils). Encodage : REGLES-PROJET.md + contrôle dans oracle-conformite ou oracle-ecosysteme si mécanisable (présence du verdict de non-recouvrement dans le dossier de naissance).</p>
@@ -550,7 +550,7 @@
   <script>
   (function () {
     "use strict";
-    var SCEAU = "6f8a60b9ff26";
+    var SCEAU = "5457b2dd2341";
     var cle = function (id, type) { return "todo-forge:" + SCEAU + ":" + id + ":" + type; };
     var coches = document.querySelectorAll("input.decider");
     var comms = document.querySelectorAll("textarea.commentaire");

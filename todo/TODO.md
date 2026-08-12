@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=6f8a60b9ff26 archive=3eb4a8fa16f9 · dernier événement: 2026-08-12T10:00:56.160Z -->
+     sceaux: actifs=5457b2dd2341 archive=3eb4a8fa16f9 · dernier événement: 2026-08-12T10:30:23Z -->
 
-**30 actifs** (candidat 3 · décidé 0 · en cours 0 · corrigé 27 · écarté 0) · **96 archivés**.
+**30 actifs** (candidat 0 · décidé 0 · en cours 0 · corrigé 30 · écarté 0) · **96 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -63,9 +63,9 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0124 | candidat | 6 | Profils produit website/webapp/mobile : référentiels versionnés du pilot consommés par les forges — pas de nouvelles forges | **oui** — aujourd'hui le savoir par type de produit est implicite (development suppose la webapp SaaS, design porte M1-M6 sans profil déclaré) : chaque run le redécouvre en session — un profil daté-sourcé le rend routable par ACCUEIL et challengeable en fraîcheur |
-| TF-0123 | candidat | 4.5 | Nouvelle forge : sécurité du produit web livré (proposition : digit-ai-forge-websec) — verbes outillés prouvés, échéance CRA 09/2026 | **oui** — aucun service de l'écosystème ne juge l'exposition runtime ni les dépendances vulnérables d'un produit livré ; le CRA rend le signalement obligatoire dès le 11/09/2026 — chaque MEP d'ici là part sans contrat de sécurité vérifiable |
-| TF-0125 | candidat | 4 | R-28 : critère d'admission d'une nouvelle forge — verbes outillés + née exercée + cadence propre + surfaces le jour même ; un corpus sans verbe = référentiel | **oui** — sans critère encodé, chaque proposition de forge rejoue le débat de zéro et le risque de forge-corpus (matrice type × étape) reste ouvert — 4 candidatures en un jour l'ont prouvé |
+| TF-0124 | corrige | 6 | Profils produit website/webapp/mobile : référentiels versionnés du pilot consommés par les forges — pas de nouvelles forges | **oui** — aujourd'hui le savoir par type de produit est implicite (development suppose la webapp SaaS, design porte M1-M6 sans profil déclaré) : chaque run le redécouvre en session — un profil daté-sourcé le rend routable par ACCUEIL et challengeable en fraîcheur |
+| TF-0123 | corrige | 4.5 | Nouvelle forge : sécurité du produit web livré (proposition : digit-ai-forge-websec) — verbes outillés prouvés, échéance CRA 09/2026 | **oui** — aucun service de l'écosystème ne juge l'exposition runtime ni les dépendances vulnérables d'un produit livré ; le CRA rend le signalement obligatoire dès le 11/09/2026 — chaque MEP d'ici là part sans contrat de sécurité vérifiable |
+| TF-0125 | corrige | 4 | R-28 : critère d'admission d'une nouvelle forge — verbes outillés + née exercée + cadence propre + surfaces le jour même ; un corpus sans verbe = référentiel | **oui** — sans critère encodé, chaque proposition de forge rejoue le débat de zéro et le risque de forge-corpus (matrice type × étape) reste ouvert — 4 candidatures en un jour l'ont prouvé |
 | TF-0113 | corrige | 3 | Fraîcheur documentaire : INVENTAIRE.md et fiches dérivent du réel (3 écarts constatés en une campagne) — oracle de fraîcheur transverse à instruire | **oui** — cette campagne a failli publier deux comptages faux dans le catalogue public (corrigés in extremis sur vérification) ; toute décision de routage prise sur l'INVENTAIRE périmé hérite de l'erreur |
 | TF-0115 | corrige | 3 | Généraliser oracle-fraicheur-doc par fichier de claims — 3 dérives documentaires supplémentaires trouvées en une seule campagne | **oui** — 4 dérives en 2 campagnes le même jour : la documentation ment plus vite que les oracles ne vérifient — chaque dérive coûte une ré-enquête ou publie du faux |
 | TF-0111 | corrige | 1 | Nouvelle forge candidate : sécurité agentique (scan des tool calls, fixtures rouges d'attaques, red-teaming des agents compilés) | **oui** — le mode unattended de development et les campagnes multi-agents du pilot exécutent des tool calls sans aucune inspection — un skill ou un entrant compromis a aujourd'hui le champ libre jusqu'au garde-fou git |

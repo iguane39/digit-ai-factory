@@ -5,10 +5,10 @@
 > puis déroule [references/ACCUEIL.md](references/ACCUEIL.md). N'improvise pas.
 
 Projet de pilotage de l'écosystème forge Digit-AI. **Un seul point de démarrage** pour construire
-un produit en mobilisant les douze forges bout en bout, et pour les améliorer par itérations
+un produit en mobilisant les treize forges bout en bout, et pour les améliorer par itérations
 bornées.
 
-**Les douze forges** — pipeline : [forge-conception](https://github.com/iguane39/digit-ai-forge-conception) ·
+**Les treize forges** — pipeline : [forge-conception](https://github.com/iguane39/digit-ai-forge-conception) ·
 [forge-design](https://github.com/iguane39/digit-ai-forge-design) ·
 [forge-development](https://github.com/iguane39/digit-ai-forge-development) ·
 [forge-tests](https://github.com/iguane39/digit-ai-forge-tests) — transverses :
@@ -22,7 +22,9 @@ mandat humain : [forge-audit](https://github.com/iguane39/digit-ai-forge-audit) 
 POC-to-Prod) · [forge-seo](https://github.com/iguane39/digit-ai-forge-seo) (post-MEP) ·
 [forge-organization](https://github.com/iguane39/digit-ai-forge-organization) (conventions) ·
 [forge-agents-security](https://github.com/iguane39/digit-ai-forge-agents-security) (sécurité
-agentique — le juge ne vit pas chez le jugé). Règle d'affichage de ce README : il ne promet
+agentique — le juge ne vit pas chez le jugé) ·
+[forge-websec](https://github.com/iguane39/digit-ai-forge-websec) (sécurité du produit web
+livré — exposition, dépendances, contrat ASVS). Règle d'affichage de ce README : il ne promet
 rien que le ledger d'un run ne puisse prouver.
 
 ## Démarrer un produit
@@ -37,7 +39,7 @@ GitHub** (`~/.digit-ai-forge` par défaut, via `bootstrap.mjs`), puis le run ent
 artefacts d'étapes, code — vit dans le projet produit.
 
 **Amorçage manuel** (équivalent de la phase 0) : cloner ce dépôt puis `node bootstrap.mjs` —
-vérifie les prérequis, clone les douze forges en dépôts frères (`core.longpaths` activé : les
+vérifie les prérequis, clone les treize forges en dépôts frères (`core.longpaths` activé : les
 noms de fichiers des forges dépassent MAX_PATH sinon) et contrôle leurs points d'entrée.
 Options : `--racine <dossier>` (+ `FORGE_ROOT` en session), `--pull` pour mettre à jour.
 Testé : amorçage réel d'un répertoire vierge, toutes forges clonées et preuves vérifiées, exit 0.
@@ -58,7 +60,7 @@ Chaque étape est validée par des **oracles exécutés** — jamais par confian
 
 <!-- CATALOGUE:DEBUT — section générée par catalogues/generer-vues.mjs, ne pas éditer -->
 
-Ce que chaque forge sait faire aujourd'hui — extrait de la source unique [catalogues/catalogue.jsonl](catalogues/catalogue.jsonl) (v1.3.0, 2026-08-12), détail complet : [catalogues/CATALOGUES.md](catalogues/CATALOGUES.md). **prouvé** = preuve exécutée (oracle, CLI, run réel) ; *déclaré* = méthode documentée seulement.
+Ce que chaque forge sait faire aujourd'hui — extrait de la source unique [catalogues/catalogue.jsonl](catalogues/catalogue.jsonl) (v1.4.0, 2026-08-12), détail complet : [catalogues/CATALOGUES.md](catalogues/CATALOGUES.md). **prouvé** = preuve exécutée (oracle, CLI, run réel) ; *déclaré* = méthode documentée seulement.
 
 - **forge-conception** (pipeline) : **Qualifier l'entrant** · **Énumérer la surface** · **Rédiger les exigences** · **Dériver les vues aval** · **Valider les exigences (oracles)** · **Constitution projet** · **Cycle delta (évolution d'un référentiel scellé)**
 - **forge-design** (pipeline) : **Système de marque** · **Studio de direction** · **Améliorer le design (maquette)** · *Critiquer le design (amont et aval) (déclaré)* · **Valider le design (oracles)** · **Générer les visuels** · **Tokens DTCG (source → dérivé)** · **Baseline de régression visuelle**
@@ -72,6 +74,7 @@ Ce que chaque forge sait faire aujourd'hui — extrait de la source unique [cata
 - **forge-seo** (sur mandat) : **Créer une mission d'audit SEO** · **Dérouler l'audit 87 nœuds** · **Valider forge et mission** · **Rapport HTML vérifié** · *Runs de suivi récurrents (déclaré)* · **Instrumentation de crawl avancée** · **Scorer et écrire le CSV d'actions**
 - **forge-organization** (sur mandat) : **Doctrine des conventions** · **Composant filtres-tableau** · *Études normatives (déclaré)* · **Gate de conventions packagé**
 - **forge-agents-security** (sur mandat) : **Scanner un agent (statique)** · **Scanner les appels d'outils (dynamique)**
+- **forge-websec** (sur mandat) : **Juger l'exposition runtime** · **Scanner les dépendances vulnérables (SCA)** · *Tenir un contrat de sécurité ASVS L1 (déclaré)*
 
 <!-- CATALOGUE:FIN -->
 

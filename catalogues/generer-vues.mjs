@@ -16,11 +16,12 @@ const README = join(RACINE, "README.md");
 const MARQUE_DEBUT = "<!-- CATALOGUE:DEBUT — section générée par catalogues/generer-vues.mjs, ne pas éditer -->";
 const MARQUE_FIN = "<!-- CATALOGUE:FIN -->";
 
-const ORDRE_FORGES = ["conception", "design", "development", "tests", "agents", "ops", "data", "observability", "audit", "seo", "organization", "agents-security"];
+const ORDRE_FORGES = ["conception", "design", "development", "tests", "agents", "ops", "data", "observability", "audit", "seo", "organization", "agents-security", "websec"];
 const FAMILLES = {
   conception: "pipeline", design: "pipeline", development: "pipeline", tests: "pipeline",
   agents: "transverse", ops: "transverse", data: "transverse", observability: "transverse",
   audit: "sur mandat", seo: "sur mandat", organization: "sur mandat", "agents-security": "sur mandat",
+  websec: "sur mandat",
 };
 
 export function lireCatalogue(chemin = SOURCE) {

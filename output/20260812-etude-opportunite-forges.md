@@ -185,3 +185,30 @@ Citations de recouvrement : vérifiées sur `catalogues\catalogue.jsonl` v1.3.0,
 CLI forge-tests (`--pans`), arborescence `core/adr-en/` d'audit, `references\BEST-PRACTICES-
 HTML.md`. Aucune construction : `git status` des 12 forges inchangé, aucun dépôt créé.
 Candidatures issues de l'étude : voir sidecar ingéré au registre (3 candidatures).
+
+---
+
+## 5. Extension (mandat du 12/08 soir) — pertinence d'autres profils produit
+
+Recherche dédiée (Sonnet, 44 k tokens, 8 sources datées, 9 candidats — dont un ajouté au
+brief : chatbot/agent conversationnel). **Verdict : aucun profil supplémentaire à créer
+maintenant** — même les plus probables restent des extensions vérifiables de website/webapp
+sans premier client réel.
+
+| Candidat | Probabilité d'entrée au pipeline | Verdict |
+|---|---|---|
+| api-headless | forte (l'API FastAPI existe déjà comme sous-produit) | **profil au premier brief** (OpenAPI 3.1 + Spectral + Schemathesis — standards machine prêts) |
+| e-commerce | forte | **profil au premier brief** (PCI DSS 4.0.1 opposable depuis le 31/03/2025 — 6.4.3 scripts/SRI, 11.6.1 altération paiement — mesurable par scan ; extension du profil website) |
+| chatbot / agent conversationnel | moyenne à forte | **profil au premier brief, avec vigilance** : le contrat de canal relève du profil, mais l'évaluation de qualité conversationnelle serait un **verbe nouveau** (candidat forge, critère R-28) |
+| extension-navigateur | moyenne | profil au premier brief (Manifest V3 = schéma vérifiable, MV2 mort en 2026) |
+| desktop (Electron/Tauri) | faible-moyenne | profil au premier brief **seulement avec** l'outillage signature/notarisation (delta forge-ops, verbes absents aujourd'hui) |
+| dashboard-data/BI | forte | **rien** — couvert par le profil webapp (+ checklist accessibilité dataviz : axe-core ne couvre que 30-40 % des défauts) |
+| cli-outil · jeu-web | faible | rien — hors client type, ad hoc sur mandat |
+| iot-embarqué | faible | **hors périmètre** (hardware, certifications CE/FCC — hors capacité logicielle de tout l'écosystème) |
+
+**Critère générique qui émerge** (à verser au LISEZMOI des profils) : un type de produit
+mérite un profil **au premier brief** quand ses standards sont mesurables machine ET
+consommables par les forges existantes sans verbe exécutable nouveau ; il bascule vers une
+**forge** (R-28) quand une capacité de jugement/exécution inexistante ailleurs devient le
+goulot (évaluer une conversation, signer/notariser un binaire). Le premier brief réel sert
+de test de cette frontière — jamais l'anticipation.

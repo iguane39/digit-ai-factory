@@ -1,7 +1,7 @@
 # Catalogues de services des forges — vue générée
 
-> **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.3.0, 2026-08-12) — ne jamais éditer ce fichier.
-> 64 services · 55 prouvés · 9 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
+> **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.4.0, 2026-08-12) — ne jamais éditer ce fichier.
+> 67 services · 57 prouvés · 10 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
 
 ## forge-conception (pipeline) — 7 services
 
@@ -126,6 +126,14 @@
 |---|---|---|---|---|---|---|
 | cat-sec-01 | **Scanner un agent (statique)** | vérifier qu'un agent défini ne porte pas de capacités dangereuses | `node oracles\oracle-scan-agentdef.mjs <def>` | TF-0111 (12/08) : self-test double sens 24 PASS rejoué pilot ; 20 fixtures synthétiques | prouve | experimental |
 | cat-sec-02 | **Scanner les appels d'outils (dynamique)** | détecter les patterns d'attaque dans un journal d'exécution d'agent | `node oracles\oracle-scan-toolcalls.mjs <journal.jsonl> --perimetre <racine>` | TF-0111 (12/08) : chaque pattern prouvé rouge avec son cas légitime voisin vert (faux positifs mesurés) | prouve | experimental |
+
+## forge-websec (sur mandat) — 3 services
+
+| id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
+|---|---|---|---|---|---|---|
+| cat-wsc-01 | **Juger l'exposition runtime** | savoir si mon produit servi expose une configuration dangereuse | `node scripts\capturer.mjs <url> <capture.json> puis node oracles\oracle-exposition.mjs <capture.json>` | TF-0123 (12/08) : self-test 23 PASS rejoué pilot, 15 cas exposition déterministes | prouve | experimental |
+| cat-wsc-02 | **Scanner les dépendances vulnérables (SCA)** | savoir si mes dépendances portent des CVE connues, avec seuils | `node oracles\oracle-sca.mjs <racine-produit> [--seuils f.json]` | TF-0123 (12/08) : sens rouge démontré sur CVE réelles (lodash 4.17.15, django 1.4), rejoué pilot | prouve | experimental |
+| cat-wsc-03 | **Tenir un contrat de sécurité ASVS L1** | m'engager sur un niveau de sécurité vérifiable et daté | `referentiels\asvs-l1.md (frontmatter challenge_date)` | référentiel curé sur le texte source OWASP — vérification partiellement outillée, le reste en revue humaine | declare | experimental |
 
 ---
 
