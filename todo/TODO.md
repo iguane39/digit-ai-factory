@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=884e59768c43 archive=3eb4a8fa16f9 · dernier événement: 2026-08-12T11:46:48Z -->
+     sceaux: actifs=3c61f06348f6 archive=3eb4a8fa16f9 · dernier événement: 2026-08-12T11:58:22Z -->
 
-**31 actifs** (candidat 0 · décidé 0 · en cours 0 · corrigé 31 · écarté 0) · **96 archivés**.
+**35 actifs** (candidat 3 · décidé 0 · en cours 0 · corrigé 32 · écarté 0) · **96 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -63,10 +63,14 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0128 | candidat | 9 | R-21 est aveugle dès que les lockfiles ne sont pas à la racine, et ignore yarn.lock — la fraîcheur des versions n'est jamais jugée sur un dépôt multi-composants | **oui** — sur BAV2, 25 versions déclarées dans TECHNOS.md n'ont été confrontées aux lockfiles par AUCUN oracle — la vérification a dû être refaite à la main pendant le run ; tout dépôt front+back (la disposition la plus courante) est dans le même cas, ce qui vide R-21 de son effet là où elle sert le plus |
+| TF-0130 | candidat | 6 | Socle docs\projet\ : aucun fichier ne décrit le FONCTIONNEL du produit — le socle est intégralement technique | **oui** — sur BAV2, la compréhension du métier a été reconstituée par lecture du code pendant le run MEP ; ce coût se repaiera à chaque run de version et à chaque reprise par un tiers, alors que le socle documentaire existe précisément pour l'éviter |
+| TF-0129 | candidat | 4.5 | R-20 : le socle documentaire docs\projet\ n'est produit par aucune étape — un run se clôt sans lui, sans que rien ne le signale | **oui** — le run MEP BAV2 s'est clos avec 4 fichiers sur 5 manquants sans aucun signal d'oracle ; le motif même de R-20 (« les runs de version redécouvrent tout ») est donc intact pour ce produit — la prochaine reprise repartira de zéro sur les technos, le paramétrage, les commandes et les accès de test |
 | TF-0124 | corrige | 6 | Profils produit website/webapp/mobile : référentiels versionnés du pilot consommés par les forges — pas de nouvelles forges | **oui** — aujourd'hui le savoir par type de produit est implicite (development suppose la webapp SaaS, design porte M1-M6 sans profil déclaré) : chaque run le redécouvre en session — un profil daté-sourcé le rend routable par ACCUEIL et challengeable en fraîcheur |
 | TF-0123 | corrige | 4.5 | Nouvelle forge : sécurité du produit web livré (proposition : digit-ai-forge-websec) — verbes outillés prouvés, échéance CRA 09/2026 | **oui** — aucun service de l'écosystème ne juge l'exposition runtime ni les dépendances vulnérables d'un produit livré ; le CRA rend le signalement obligatoire dès le 11/09/2026 — chaque MEP d'ici là part sans contrat de sécurité vérifiable |
 | TF-0125 | corrige | 4 | R-28 : critère d'admission d'une nouvelle forge — verbes outillés + née exercée + cadence propre + surfaces le jour même ; un corpus sans verbe = référentiel | **oui** — sans critère encodé, chaque proposition de forge rejoue le débat de zéro et le risque de forge-corpus (matrice type × étape) reste ouvert — 4 candidatures en un jour l'ont prouvé |
 | TF-0126 | corrige | 4 | Profils produit vague 2 : api-headless, e-commerce, extension-navigateur, desktop — création anticipée sur mandat humain | **oui** — quatre types de produit à probabilité forte/moyenne d'entrée au pipeline n'ont ni standards routables ni mapping — le premier brief de chacun redécouvrirait tout en session |
+| TF-0127 | corrige | 4 | Profil produit chatbot/agent conversationnel — dernier de la liste d'attente, avec frontière R-28 explicite | **oui** — demande PME croissante (support/FAQ) et capacité interne réelle ; sans profil, le premier brief improviserait les contrats de canal et les garde-fous LLM |
 | TF-0113 | corrige | 3 | Fraîcheur documentaire : INVENTAIRE.md et fiches dérivent du réel (3 écarts constatés en une campagne) — oracle de fraîcheur transverse à instruire | **oui** — cette campagne a failli publier deux comptages faux dans le catalogue public (corrigés in extremis sur vérification) ; toute décision de routage prise sur l'INVENTAIRE périmé hérite de l'erreur |
 | TF-0115 | corrige | 3 | Généraliser oracle-fraicheur-doc par fichier de claims — 3 dérives documentaires supplémentaires trouvées en une seule campagne | **oui** — 4 dérives en 2 campagnes le même jour : la documentation ment plus vite que les oracles ne vérifient — chaque dérive coûte une ré-enquête ou publie du faux |
 | TF-0111 | corrige | 1 | Nouvelle forge candidate : sécurité agentique (scan des tool calls, fixtures rouges d'attaques, red-teaming des agents compilés) | **oui** — le mode unattended de development et les campagnes multi-agents du pilot exécutent des tool calls sans aucune inspection — un skill ou un entrant compromis a aujourd'hui le champ libre jusqu'au garde-fou git |
