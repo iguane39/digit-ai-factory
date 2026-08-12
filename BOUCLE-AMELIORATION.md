@@ -723,3 +723,25 @@ Databricks traité à part (lakehouse + lineage colonne Unity Catalog → traduc
 artefact payant). Connecteur live refusé (garde-fou paiement — première dépendance externe
 payante de l'écosystème sinon). 3 candidatures (lot 18e202a0ce8e). Recherche Sonnet 68 k /
 17 outils / 2,8 min, 8+ sources datées ; escalade aucune ; zéro écriture dans forge-data.
+
+## 12/08/2026 (nuit) — « fais tout » : 4 candidats exécutés, registre soldé à 0
+
+**Mandat humain** : exécuter les 4 candidats actifs. Deux agents, dépôts disjoints, tous
+vérifiés par sondage pilot ; catalogue v1.5.0 (69 services).
+
+- **TF-0138** (tests, `e92cc12`) — banc-vert : les 26 bloquants n'étaient PAS un banc sale
+  mais le **pan front qui sur-signalait** (trace:off légitime lue « 0 % couverture » au lieu
+  de « non mesurable »). Corrigé → banc-vert 0 bloquant, et **banc-rouge détecte D-01 sur son
+  vrai signal (7/25) au lieu d'un faux total (0/25)** : la détection d'avant était accidentelle.
+  `recette --section corpus` = **OK corpus** (rouge=FAIL 16/16, vert=PASS), pytest 128.
+- **TF-0139** (data, `6068fad`) — verbe **importer** : DDL exporté → brouillon assertions/contrat,
+  round-trip prouvé (passe les oracles existants), self-test 30→36. Un verbe transverse, pas
+  4 spécialisations (verdict de l'étude tenu).
+- **TF-0140** (data, `6371987`) — 4 **profils-moteur** (référentiels datés-sourcés) ; anticipation
+  tracée au LISEZMOI (mandat « fais tout », dérogation assumée à « au premier run »).
+- **TF-0141** (data, `85a8934`) — **traducteur Unity Catalog → lineage@1**, self-test 36→41,
+  validé sur fixture synthétique (marqué ; export réel = workspace payant, reste utilisateur).
+
+Routage §4 bis : forge-data 177 k/76 outils/17 min ; banc-vert 149 k/104/20 min ; escalade
+aucune. **Registre : 0 actif** (142 archivés) — pour la 1re fois depuis l'ouverture du TODO,
+plus rien en attente ni en cours.
