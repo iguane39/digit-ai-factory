@@ -22,8 +22,8 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
   mais sans protocole machine.
 - **Sorties** : `EXIGENCES.json` (schéma complet + fixtures verte/rouge), vues MD avec en-tête `source-sha256`
   (mécanisme de régénérabilité vérifié réel).
-- **Oracles** : la partie la plus mûre. 5 oracles Node zéro dépendance (`oracles/oracle-{exigences,tracabilite,surface,claims,etat}.mjs`),
-  20 règles (comptage README forge, vérifié le 12/08 — TF-0113), contrat JSON + exit 0/1/2, self-test à double sens (fixture verte PASS, rouge FAIL sur chaque règle).
+- **Oracles** : la partie la plus mûre. 8 oracles Node zéro dépendance (`oracles/oracle-{exigences,tracabilite,surface,claims,etat,ears,constitution,delta}.mjs`),
+  30 règles (TF-0101 du 12/08 : +EARS, +constitution, +cycle delta), contrat JSON + exit 0/1/2, self-test à double sens (fixture verte PASS, rouge FAIL sur chaque règle).
 - **Maturité** : prototype cohérent sur son noyau, chaîne incomplète (3 verbes/4), aucun livrable réel jamais produit,
   pas de git, tout écrit en 26 min le 04/08/2026. Lien mort : `redige-les-exigences/references/formulation.md` absent.
 - **Manques orchestration** : pas de README/CLAUDE.md/manifeste ; pas de runner bout en bout (par doctrine) ;
@@ -177,8 +177,8 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
 ## 8. digit-ai-forge-audit — `c:\dev\digit-ai-forge-audit` *(ajoutée le 10/08 · renommage 11/08)*
 
 - **Rôle** : **audit & gouvernance POC-to-Prod**, transverse et sur mandat humain. C'est le
-  **produit AuditCore** en marque blanche (73 ADR MADR sur 10 domaines, 169 contrôles CTL-Dxx-nn,
-  17 dimensions — comptages README forge, vérifiés le 12/08, TF-0113) — dépôt
+  **produit AuditCore** en marque blanche (75 ADR MADR sur 10 domaines dont D17 gouvernance IA, 175 contrôles CTL-Dxx-nn,
+  18 dimensions — TF-0110 du 12/08, comptages vérifiés contre le README forge) — dépôt
   **public MIT** (ex `digit-ai-forge-auditcore`, renommé le 11/08). Sert la MEP et les revues
   d'architecture, jamais en déclenchement automatique.
 - **Architecture produit / tenant** : ce dépôt ne connaît **aucune donnée client** (gate lint N0,
