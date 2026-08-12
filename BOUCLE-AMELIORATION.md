@@ -436,3 +436,46 @@ dépôts cibles.
 **Bilan registre** : 48 `corrige` (dont les 5 de la veille), 28 `candidat`, 2 `en_cours` ;
 oracle R1-R10 PASS, self-tests TODO 18/18 et conformité 3/3, vue et page régénérées
 (sceau 82c9248684ef).
+
+## 12/08/2026 — campagne « catalogues de services & prompts d'usage » (mandat humain de session)
+
+**Mandat** : message humain du 12/08 (prompt de campagne passé au crible L99 puis barré —
+3 barres validées au registre la-barre : Backstage descriptor format pour le catalogue,
+standard AGENTS.md pour la surface d'entrée agent, rustup.rs pour les prompts deux lignes).
+
+**Livrables** : `catalogues\catalogue.jsonl` (source unique, 42 services / 10 forges, 33
+prouvés / 9 déclarés, champs cycle_de_vie + challenge_date, comptages vérifiés sur pièces) ·
+vues générées `catalogues\CATALOGUES.md` + section README (`generer-vues.mjs`, --check) ·
+`oracles\oracle-catalogues.mjs` (K1-K7, self-test double sens 5/5) · `AGENTS.md` + en-tête
+agent du README (phase 0 idempotente) · `references\ACCUEIL.md` (protocole d'accueil 7 étapes,
+accord explicite avant exécution, 2 tours de correction max) · section « Prompts d'usage »
+réécrite au format deux lignes (0-6, PROMPT-PRODUIT.md rétrogradé en voie optionnelle à
+fichier) · coquilles README corrigées (scripts\new_mission.py, forge\retours\) · **lot D en
+proposition** : `output\20260812-catalogues-readmes-forges\` (10 sections README de forge,
+AUCUNE écriture dans les dépôts frères — application forge par forge sur GO humain).
+
+**Challenge état de l'art (A3)** : 4 agents Sonnet en parallèle, ≥ 3 sources datées par forge,
+constats convergents (le marché 2026 est passé du one-shot au continu ; standards gagnants
+gratuits et inspectables). 13 candidatures ingérées (lot `dd28b8a70c37`, sidecar +
+`ingerer-lot.mjs`) dont 2 nouvelles forges candidates (sécurité agentique, observabilité
+continue) et 1 constat de dérive documentaire (INVENTAIRE vs réel : options CLI forge-tests,
+5/20 oracles-règles conception, 73/169 ADR-contrôles audit).
+
+**Routage instrumenté (§4 bis)** — 4 tranches équivalentes (challenge par forge), toutes Sonnet :
+
+| Tranche | Modèle | Tokens | Outils | Durée | Verdict |
+|---|---|---|---|---|---|
+| conception+organization+audit | Sonnet | 76 k | 19 | 2,9 min | vert |
+| design+development | Sonnet | 73 k | 22 | 2,5 min | vert |
+| tests+seo | Sonnet | 97 k | 26 | 3,5 min | vert |
+| agents+ops+data | Sonnet | 61 k | 20 | 3,1 min | vert |
+
+`escalade_modele` : **aucune** (4/4 vertes au premier coup — l'a priori « recherche/synthèse
+= Sonnet » tient). Construction (catalogue, oracle, ACCUEIL, README) : pilot en session.
+
+**Vérifications natives** : oracle-catalogues self-test 5/5 puis réel PASS (K1-K7) ·
+generer-vues --check PASS · oracle-claude-md PASS (noyau recompressé à 6 143 octets après
+citation d'ACCUEIL.md) · oracle-ecosysteme PASS · oracle-todo R1-R10 PASS · self-test TODO
+18/18. État préexistant du working tree : 2 événements TODO non commités de la session du
+11/08 (TF-0100 + ingestion) — embarqués dans ce commit, ils appartiennent au registre ;
+entrants `input\` non liés laissés intacts. Test à froid : consigné à l'entrée suivante.
