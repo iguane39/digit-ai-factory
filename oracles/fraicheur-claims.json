@@ -1,0 +1,42 @@
+{
+  "schema": "pilot/fraicheur-claims@1",
+  "regle": "chaque claim confronte une affirmation comptable d'un document de pilotage à une sonde exécutable sur la source ; l'ajout d'un claim suit toute dérive constatée (TF-0113/TF-0115)",
+  "claims": [
+    {
+      "id": "conception-oracles",
+      "doc": "INVENTAIRE.md",
+      "extraire": "(\\d+) oracles Node zéro dépendance \\(`oracles/oracle-\\{exigences",
+      "sonde": { "type": "compter_fichiers", "depot": "digit-ai-forge-conception", "dossier": "oracles", "prefixe": "oracle-", "suffixe": ".mjs" }
+    },
+    {
+      "id": "design-oracles",
+      "doc": "INVENTAIRE.md",
+      "extraire": "(\\d+) oracles Node, \\d+ règles \\(slop",
+      "sonde": { "type": "compter_fichiers", "depot": "digit-ai-forge-design", "dossier": "oracles", "prefixe": "oracle-", "suffixe": ".mjs" }
+    },
+    {
+      "id": "data-oracles",
+      "doc": "INVENTAIRE.md",
+      "extraire": "(\\d+) oracles CLI, exit 0/1/2",
+      "sonde": { "type": "compter_fichiers", "depot": "digit-ai-forge-data", "dossier": "oracles", "prefixe": "oracle-", "suffixe": ".mjs" }
+    },
+    {
+      "id": "audit-adr",
+      "doc": "INVENTAIRE.md",
+      "extraire": "(\\d+) ADR MADR",
+      "sonde": { "type": "extraire_doc", "depot": "digit-ai-forge-audit", "fichier": "README.md", "motif": "(\\d+) ADR" }
+    },
+    {
+      "id": "audit-controles",
+      "doc": "INVENTAIRE.md",
+      "extraire": "(\\d+) contrôles CTL",
+      "sonde": { "type": "extraire_doc", "depot": "digit-ai-forge-audit", "fichier": "README.md", "motif": "(\\d+) contrôles" }
+    },
+    {
+      "id": "tests-option-sortie",
+      "doc": "INVENTAIRE.md",
+      "interdit": "aucune option `?--sortie`?",
+      "sonde": { "type": "grep_sources", "depot": "digit-ai-forge-tests", "dossier": "forge_tests", "motif": "\"--sortie\"" }
+    }
+  ]
+}
