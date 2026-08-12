@@ -672,3 +672,16 @@ sombre S-G1 câblée (oracle-bascule forge-design PASS), et double vérification
 check_html PASS, render_page PASS en clair ET en sombre forcé (AA tenu dans les deux thèmes,
 2 défauts de contraste `--faint`/accents-sur-fill trouvés et corrigés pendant la fabrication).
 Le flux d'export (appliquer-export.mjs) devient orphelin — laissé en place, non supprimé.
+
+**TF-0132/0135 clos (12/08) — les deux derniers candidats** : forge-tests corrigée sur deux
+faux verdicts de la famille des correctifs du matin. TF-0135 (`5977168`) : l'analyse des
+gardes lit tous les modules du paquet (plus le seul main.py), un handler non résolu dégrade
+en non_juge au lieu d'un bloquant faux — fixture Approval2 : 2 bloquants faux → 0. TF-0132
+(`4e108b2`) : `--trace on` n'est plus forcé (var FORGE_TESTS_PLAYWRIGHT_TRACE + config projet
+respectée), « trace indisponible » distingué de « suite e2e rouge ». Sondage pilot : pytest
+123 vert, recette divergences 18 cas, banc-vert identique à adba38c (mutant d'un timeout shell
+restauré par l'agent avant tout commit — transparence). Tranche Sonnet 214 k / 89 outils /
+24 min, escalade : aucune. **Défaut préexistant surfacé** en candidature (lot 6973bf33629b) :
+recette section corpus rouge sur D-01 (suite e2e banc-rouge, getByTestId non visible) —
+reproduit avant/après par git stash, donc antérieur ; à instruire (fixture ou env du poste).
+Registre : 38+... items du jour archivés, actifs = 1 (ce nouveau candidat D-01).

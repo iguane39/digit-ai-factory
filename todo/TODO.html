@@ -113,7 +113,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>286768c0bb56</code> · dernier événement 2026-08-12T12:56:39.304Z</p>
+      <p class="meta">sceau <code>9622d9e75d98</code> · dernier événement 2026-08-12T14:44:52.960Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -121,10 +121,10 @@
     </header>
     <p>Seul le <strong>reste-à-faire</strong> vit ici — les items clos partent à l'archive (<code>node todo\archiver.mjs</code>). Chaque item est détaillé en puces, avec sa date de création, sa priorité de traitement (dérivée du score) et son impact sur la forge concernée. La décision reste humaine et se prend hors de cette page (« décide TF-xxxx »).</p>
     <div class="kpis">
-      <div class="kpi" title="2 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">2</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
+      <div class="kpi" title="1 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">1</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
       <div class="kpi" title="0 item(s) décidés dont les travaux ne sont pas ouverts"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts</span></div>
       <div class="kpi" title="0 campagne(s) ouvertes au registre"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre</span></div>
-      <div class="kpi" title="133 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">133</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
+      <div class="kpi" title="135 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">135</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende">
       <span class="leg-item"><span class="leg-swatch" style="background:var(--blue)"></span>candidat</span>
@@ -132,42 +132,26 @@
       <span class="leg-item"><span class="leg-swatch" style="background:var(--amber)"></span>en cours</span>
       <span class="leg-item">Priorité <strong>Haute</strong> ≥ 5 · <strong>Moyenne</strong> 3-4 · <strong>Basse</strong> &lt; 3 (score = gain × preuve ÷ effort, ×2 si payé en réel)</span>
     </p>
-    <nav class="toc" aria-label="Sommaire"><a href="#tests"><strong>tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#tests"><strong>tests</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="tests">
-      <h2>tests <span class="badge" title="2 item(s) actifs ciblant tests">2</span></h2>
+      <h2>tests <span class="badge" title="1 item(s) actifs ciblant tests">1</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>tests</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0135">
+        <article class="card s-candidat" id="item-TF-0136">
           <header class="card-head">
-            <code class="tf-id">TF-0135</code>
+            <code class="tf-id">TF-0136</code>
             <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 5)">Priorité Haute</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">L'analyse des gardes ne lit QUE main.py : tout code 400/409 déclaré par un projet à routeurs devient une divergence BLOQUANTE fausse</h3>
-          <div class="card-detail"><p class="lead">api.py l.228-232 : `source = cible / &quot;backend&quot; / &quot;app&quot; / &quot;main.py&quot;` puis `par_fonction = codes_par_fonction(source)` et `table = handlers(source)`.</p><ul class="puces"><li>L'analyse RT-9 des gardes ne regarde donc QUE main.py. Or l'organisation normale d'une application FastAPI est un APIRouter par module, monté par include_router : sur Approval2, main.py porte 1 décorateur et 7 include_router, tandis que les 22 routes réelles vivent dans app/api/routes_*.py. La table des handlers est structurellement VIDE, `fonction` vaut <code>None</code>, `gardes` vaut l'ensemble vide, et la condition `code in (400, 409) and code not in gardes` est vraie pour TOUT 400/409 déclaré. Constaté le 12/08 : trois findings BLOQUANTS « code 409 declare pour &lt;route&gt; mais aucune garde de ?() ne le leve » — le `?` du message est la trace même de l'échec de résolution. Vérifié sur pièces que les trois handlers lèvent bien le 409 dans leur PROPRE corps : routes_admin.py l.79 (admin_revoke), l.117 (admin_reassign), routes_demandes.py l.166 (send). Aucune des trois n'utilise de helper : c'est la forme que RT-9 déclare pourtant reconnaître. CONSÉQUENCE PERVERSE, et c'est le vrai coût : le mécanisme PUNIT le projet qui documente ses codes d'erreur. Approval2 ne portait AUCUN `responses=` avant cet audit (0 code 4xx au schéma)</li><li>les déclarer pour résorber 25 divergences `signale` en a créé 3 BLOQUANTES. Un projet qui suit le conseil de l'auditeur voit son verdict empirer. CORRECTIF ATTENDU : construire la table des handlers et l'index des gardes sur TOUS les modules sources de l'application (a minima backend/app/**/*.py, ou en suivant les include_router depuis main.py), et non sur le seul main.py. Tant que ce n'est pas fait, ne pas émettre le finding en BLOQUANT quand la fonction n'a pas pu être résolue — un `?()` au message signale que l'auditeur n'a rien pu lire, pas que le projet a tort</li></ul></div>
+          <h3 class="card-titre">Recette forge-tests : la section corpus rate D-01 (front) — suite e2e du banc-rouge en échec réel sur getByTestId('lien-connexion')</h3>
+          <div class="card-detail"><p class="lead">Constaté le 12/08 pendant la campagne TF-0132/0135 (hors de ses deux items) : recette/verifier_corpus.py --section corpus échoue sur D-01 (pan front) — la suite e2e de fixtures/banc-rouge échoue réellement, page.getByTestId('lien-connexion') n'est jamais visible.</p><ul class="puces"><li>Reproduit à l'IDENTIQUE avec le code d'avant ET d'après les correctifs TF-0132/0135 (vérifié par git stash) : défaut PRÉEXISTANT, sans lien avec ces correctifs</li><li>Cause probable : un serveur de dev qui ne sert pas la bonne page sur ce poste (env), ou une fixture front du banc-rouge à réparer</li><li>À instruire : soit corriger la fixture/le harnais de service du banc, soit — si c'est un défaut d'environnement du poste — le documenter pour que la recette ne soit pas rouge à tort</li><li>Ne bloque pas les autres sections (divergences OK 18 cas, pytest 123)</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-08-12</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 5 — gain 5 × preuve 2 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur tests</dt><dd>payé en réel le 12/08 : déclarer les codes d'erreur au schéma OpenAPI — le correctif que l'audit lui-même réclamait — a fait apparaître 3 divergences bloquantes fausses sur un code inchangé</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">audit-approval2-20260812</dd></div>
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0132">
-          <header class="card-head">
-            <code class="tf-id">TF-0132</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">Pan front : « --trace on » forcé en dur, et une trace indisponible se lit « votre suite e2e est rouge »</h3>
-          <div class="card-detail"><p class="lead">execution.py l.388 lance `npx playwright test --trace on --reporter=line` : le drapeau de trace est IMPOSÉ, et la trace est la seule source de ce que le pan juge atteint.</p><ul class="puces"><li>Deux conséquences, constatées le 12/08 sur Approval2</li><li>LE VERDICT CONFOND DEUX CAUSES. Sur ce poste Windows, l'écriture de l'archive de trace ne rend jamais la main : le corps de chaque test se déroule INTÉGRALEMENT (les six étapes de connexion journalisées passent, la session est écrite sur disque) puis le test sort en « Test timeout of 60000ms exceeded ». Mesuré : la même suite passe 10/10 en 7,2 s avec --trace=off, et échoue à 100 % avec --trace=on — reproduit avec DEUX navigateurs distincts (Chromium 1234 réutilisé, et channel:chrome) et avec un --output hors du projet, ce qui écarte le navigateur et le dossier de sortie. Le pan conclura « la suite e2e s'est terminée en échec » sur une suite entièrement verte : c'est un faux négatif de la même famille que TF-0098, mais produit cette fois par une option que la forge impose elle-même</li><li>L'OPTION ÉCRASE CELLE DU PROJET. Un projet qui a réglé `trace` dans son playwright.config.ts (par exemple `retain-on-failure`, précisément pour contourner ce blocage) voit son choix ignoré. CORRECTIF ATTENDU : distinguer au rapport « suite e2e ROUGE » de « TRACE INDISPONIBLE » — si le code de sortie est non nul ET qu'aucun fichier de trace n'a été produit, le motif doit nommer la trace, pas accuser la suite ; et prévoir une variable (FORGE_TESTS_PLAYWRIGHT_TRACE) pour laisser le projet imposer son mode, le pan déclarant alors en non_juge que la couverture front n'est pas mesurable sans trace</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-12</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 4 × preuve 2 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur tests</dt><dd>payé en réel le 12/08 : le pan front a dû être EXCLU du run d'audit final pour ne pas produire un « suite e2e en échec » sur une suite verte de bout en bout</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">audit-approval2-20260812</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 2 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur tests</dt><dd>la recette du banc ne peut pas prononcer S-01 vert tant que D-01 est rouge — le banc de démonstration de la forge, censé prouver la détection, est lui-même en échec sur ce poste</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">campagne-tf0132-0135 (12/08)</dd></div>
           </dl>
         </article>
       </div>
