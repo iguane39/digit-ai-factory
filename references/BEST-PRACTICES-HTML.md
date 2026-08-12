@@ -118,6 +118,26 @@ puis dédoublonnage des patterns et confrontation de chacun à la charte
 | F4 | **Absence totale d'a11y** (aucun `role/aria/alt`) | F1 | 0 attribut a11y | **rejeter** | Contre-exemple : un catalogue interactif sans a11y est un défaut. |
 | F5 | `@page` (marges, page de garde, pied `counter(page)`) | — | **absent des deux sources** | **adopter** | Écart identifié : à **ajouter** (aucune source ne le fait). Voir bonnes-pratiques §6. |
 
+## G — Thème sombre (pattern normatif R-30)
+
+Pattern **non extrait de F1/F2** (ni l'un ni l'autre n'en a — écart déjà relevé) : décision
+humaine directe du 12/08 (TF-0131, `REGLES-PROJET.md` §J). Obligatoire sur tout HTML autonome
+livré, pas un candidat « adopter/adapter » comme les patterns extraits — un standard.
+
+| ID | Nom | Source | Repère | Verdict | Règle d'application |
+|---|---|---|---|---|---|
+| G1 | Bascule thème sombre en en-tête, `data-theme` sur `:root`, tokens dérivés | R-30 (TF-0131) | `.theme-toggle`, `:root[data-theme="dark"]` | **adopter (obligatoire)** | Voir snippet S-G1 : câblée, persistée, `prefers-color-scheme` à la première visite, AA dans les deux thèmes, impression toujours claire. |
+
+**Preuve exécutée** (double sens, `references\temoin\`) :
+
+| Fixture | Rôle | Défaut testé |
+|---|---|---|
+| `Digit-AI - Page-Temoin Bascule-Sombre-Verte - HTML - 20260812a.html` | verte | Conforme R-30 : clair par défaut, bascule câblée et persistée, palette sombre dérivée, AA tenu dans les deux thèmes, impression forcée claire. |
+| `Digit-AI - Page-Temoin Bascule-Sombre-Rouge - HTML - 20260812a.html` | rouge | Contraste sombre insuffisant (`--muted`/`--faint` trop proches de `--bg` sombre) — échoue sur V2 de `render_page.py`. Démarre volontairement en sombre (attribut `data-theme="dark"` figé dans le HTML, commenté) : c'est la seule façon de soumettre l'état sombre à un oracle de rendu statique qui ne simule aucun clic — le pattern livrable normatif, lui, reste clair par défaut (S-G1). |
+
+Preuves d'exécution (sorties `render_page.py` / `check_html.py`) : voir § Preuves d'exécution R-30
+en fin de fichier.
+
 ---
 
 ## Delta proposé vers le skill `digit-ai-page-html` (candidat — non appliqué)
@@ -131,6 +151,11 @@ puis dédoublonnage des patterns et confrontation de chacun à la charte
 3. **`escapeHtml` (C1)** : déjà en §7, mais y ajouter le snippet S-C1 canonique.
 4. **Contre-exemples D2/D3/F4** : candidats à `references/anti-patterns.md` (hex en dur, pile de
    police sans DM Sans, composant interactif sans a11y).
+5. **Pattern S-G1 (bascule sombre, R-30)** : versement vers `boilerplate.html` (le bouton
+   devient un composant du gabarit, plus une pièce rapportée) et mécanisation d'un contrôle
+   dans `check_html.py` (bouton `.theme-toggle` sans `data-theme` sur `:root` ni script de
+   câblage = FAIL — aujourd'hui vérifié seulement par lecture humaine + `render_page.py`
+   sur fixture figée, pas par une règle dédiée du script).
 
 ---
 
@@ -179,10 +204,125 @@ const escapeHtml = s => String(s).replace(/[&<>"']/g,
 }
 ```
 
+**S-G1 — Bascule thème sombre (pattern canonique R-30, autonome, zéro dépendance)**
+
+Quatre morceaux à coller tels quels : (1) le script d'initialisation, **avant** le `<style>`,
+au tout début de `<head>`, pour poser `data-theme` avant la première peinture (zéro flash) ;
+(2) les tokens sombres, ajoutés à la suite du bloc `:root` clair de la charte ; (3) le bouton,
+dans l'en-tête du document ; (4) le script de câblage, en fin de `<body>`.
+
+*1 — Initialisation (avant `<style>`, choix persisté sinon `prefers-color-scheme`).
+Volontairement sans `defer`/`async` : différer peindrait d'abord le thème par défaut
+du CSS puis re-peindrait en sombre — c'est justement le flash que ce script évite
+(avertissement générique « script bloquant en head » de `check_html.py` : exception
+assumée ici, documentée dans les fixtures.)*
+```html
+<script>
+(function () {
+  var stocke = localStorage.getItem('digitai-theme');
+  var theme = stocke || (window.matchMedia &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+```
+
+*2 — Tokens sombres (dérivés mécaniquement des tokens clairs — une source, deux
+projections : `bg`/`surface` s'assombrissent vers une base marine, `ink`/`muted`/`faint`
+s'éclaircissent en dégradé inverse, `line` reste un filet proche du fond, chaque accent
+sémantique éclaircit sa teinte de base pour rester lisible sur fond sombre et assombrit son
+`-fill`/`-line` en griffe basse de la même teinte)*
+```css
+:root[data-theme="dark"] {
+  --bg: #0B1220; --surface: #121B2E; --card: #121B2E;
+  --ink: #EEF2F8; --muted: #A9B4C4; --faint: #7C8AA0; --line: #263248;
+  --blue: #7DA2F5;
+  --amber: #FBBF6D; --amber-fill: #2B2210; --amber-line: #4A3A18;
+  --teal:  #5FE6D6; --teal-fill:  #0E2A27; --teal-line:  #164E48;
+  --green: #7BE0A0; --green-fill: #0F2A1B; --green-line: #1C4A30;
+}
+/* Impression toujours claire (R-30.2), quel que soit le thème affiché à l'écran. */
+@media print {
+  :root, :root[data-theme="dark"] {
+    --bg:#FFFFFF; --surface:#FFFFFF; --card:#FFFFFF; --ink:#0F172A;
+    --muted:#64748B; --faint:#94A3B8; --line:#E6EAF2; --blue:#2563EB;
+    --amber:#D97706; --amber-fill:#FFFBEB; --amber-line:#FDE9C8;
+    --teal:#0E9488;  --teal-fill:#EFFDFB;  --teal-line:#C7F0EA;
+    --green:#15803D; --green-fill:#F2FCF5; --green-line:#CFEEDD;
+  }
+  .theme-toggle { display: none; }
+}
+```
+
+*3 — Bouton (en-tête, haut à droite par défaut — geler la géométrie fine aux
+tokens `--r-sm`/`--line` du gabarit qui l'accueille)*
+```html
+<header class="doc" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+  <div>
+    <p class="eyebrow">Digit-AI · {TypeDoc}</p>
+    <h1>{Titre du livrable}</h1>
+  </div>
+  <button id="theme-toggle" class="theme-toggle" type="button"
+          aria-label="Bascule thème sombre" aria-pressed="false">
+    <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>
+    </svg>
+    <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <circle cx="12" cy="12" r="4.5"/>
+      <path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"
+            stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </button>
+</header>
+```
+```css
+.theme-toggle{appearance:none;border:1px solid var(--line);background:var(--surface);
+  color:var(--ink);border-radius:999px;width:36px;height:36px;flex:none;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center}
+.theme-toggle:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.theme-toggle .icon-sun{display:none}
+:root[data-theme="dark"] .theme-toggle .icon-moon{display:none}
+:root[data-theme="dark"] .theme-toggle .icon-sun{display:inline}
+```
+
+*4 — Câblage (fin de `<body>` : persistance + `aria-pressed`, aucune bascule muette)*
+```html
+<script>
+(function () {
+  var bouton = document.getElementById('theme-toggle');
+  var racine = document.documentElement;
+  function appliquer(theme) {
+    racine.setAttribute('data-theme', theme);
+    localStorage.setItem('digitai-theme', theme);
+    bouton.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+  }
+  bouton.setAttribute('aria-pressed', racine.getAttribute('data-theme') === 'dark' ? 'true' : 'false');
+  bouton.addEventListener('click', function () {
+    appliquer(racine.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+})();
+</script>
+```
+
 ---
+
+## Preuves d'exécution R-30 (fixtures double sens, `references\temoin\`)
+
+Rendues avec `render_page.py` (`--widths 1440`) et auditées avec `check_html.py` — sorties
+datées, à recalculer si le pattern S-G1 change (jamais recopiées d'une campagne à l'autre).
+
+| Fixture | `render_page.py` | `check_html.py` |
+|---|---|---|
+| verte (clair, par défaut) | **PASS** — 0 défaut bloquant à 1440px | PASS |
+| rouge (sombre figé, palette délibérément insuffisante) | **FAIL** — V2 contraste : `--faint`/`--muted` sous le seuil AA sur `--bg` sombre | PASS (le défaut est spécifique à R-30, hors périmètre des règles charte/lisibilité génériques de `check_html.py` — candidature de mécanisation notée en Delta) |
+
+`render_page.py` ne simule aucun clic : la preuve du thème sombre s'obtient en figeant
+`data-theme="dark"` dans le HTML rendu (documenté dans chaque fixture concernée), jamais en
+changeant le pattern livrable (qui reste clair par défaut, S-G1 point 1).
 
 ## Changelog
 
 | Date | Version | Changement |
 |---|---|---|
 | 2026-08-10 | a | Création. Extraction F1 (Catalogue ADR) + F2 (Rapport Audit) ; 5 catégories A–F, 34 patterns tagués adopter/adapter/rejeter ; delta candidat + 5 snippets chartés. Page-témoin passée aux oracles `check_html.py` + `render_page.py`. |
+| 2026-08-12 | b | R-30 (TF-0131, décision humaine) : catégorie G — pattern normatif obligatoire de bascule thème sombre (S-G1), tokens sombres dérivés + impression forcée claire. Deux fixtures double sens sous `references\temoin\` (verte PASS, rouge FAIL mesuré sur contraste V2). Delta candidat n°5 vers `boilerplate.html`/`check_html.py`. |

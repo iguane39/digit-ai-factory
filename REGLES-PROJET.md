@@ -169,6 +169,34 @@ Mécanisme : S (vérification pilot à l'ouverture de run). Contrôle exécutabl
 `oracle-conformite-projet` (portée transverse aux prompts et rapports, pas au socle
 d'un projet produit) — reste de TF-0131, à mécaniser si un gap se constate en run réel.
 
+## J. Thème clair et bascule sombre câblée (règle 30 — décidée le 12/08, TF-0131)
+
+Décision humaine directe du 12/08 (TF-0131), prolonge C4 (light theme systématique,
+socle `digit-ai-page-html`) : le thème clair reste le défaut confirmé, une bascule
+sombre devient obligatoire sur tout HTML autonome livré.
+
+**R-30.**
+1. Périmètre : tout HTML autonome livré — pages produit et livrables documentaires du
+   socle `digit-ai-page-html`. Thème clair par défaut (confirme C4, ne le remplace pas).
+2. Bascule sombre en zone d'en-tête (position par défaut : haut à droite, géométrie
+   fine tenue par les tokens et gabarits du socle HTML) : câblée — une bascule sans
+   effet observable est un défaut (loi transverse n° 1) ; choix persisté en
+   `localStorage` ; `prefers-color-scheme` honoré à la première visite en l'absence de
+   choix persisté, le bouton prime ensuite sur `prefers-color-scheme` ; palette sombre
+   dérivée mécaniquement des tokens clairs — une source, deux projections, jamais une
+   seconde charte ; contraste AA tenu dans les deux thèmes ; l'impression
+   (`@media print`) reste toujours en thème clair, quel que soit le thème affiché à
+   l'écran au moment de l'impression.
+3. Révocation par projet : consignée dans le frontmatter de `docs\projet\PARAMETRAGE.md`
+   — une exception non consignée par écrit n'existe pas ; un contrôle rendu
+   SANS_OBJET porte toujours son motif ; aucune neutralisation silencieuse.
+
+Surface d'application encodée : `references\BEST-PRACTICES-HTML.md` (pattern de
+référence HTML/CSS/JS + deux fixtures preuves, double sens). Mécanisme : S + pattern
+référencé depuis tout run produisant du HTML. Contrôle exécutable : reste de TF-0131 —
+candidature vers `check_html.py` du skill `digit-ai-page-html` (hors périmètre
+d'écriture de cette campagne, à porter par mandat).
+
 ## Conflits à trancher (ta décision explicite)
 
 - **C1 — `Old\` vs git (n° 6/7)** : deux magasins de versions divergent toujours. Proposition :

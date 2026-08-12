@@ -46,7 +46,8 @@ Boucle intérieure (libre, sans verdict) : `<commandes locales : pytest, ruff, s
   Commits français — locaux par défaut, push sur GO humain ; socle documentaire R-20..R-23,
   types des livrables au registre d'organization R-25, URLs d'environnement
   `<appli>-{dev|qualif|production}` R-24 ; voie automatisée par défaut dans toute démarche
-  proposée, actions restantes classées IA/développeur/utilisateur R-29).
+  proposée, actions restantes classées IA/développeur/utilisateur R-29 ; tout HTML
+  autonome livré porte un thème clair par défaut et une bascule sombre câblée R-30).
 - `docs\projet\` (R-20) : TECHNOS, COMPOSANTS-OPS, PARAMETRAGE, ACCES-TEST, COMMANDES,
   FONCTIONNEL, ARCHITECTURE, MODELE-DONNEES (+ vues ARCHITECTURE.html et MODELE-DONNEES.html
   générées par les scripts du pilot, jamais éditées) — vues à sources de vérité déclarées
