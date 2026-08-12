@@ -143,6 +143,32 @@ Contrôle exécutable : périmètre écosystème (pas socle produit) → R-28 ne
 forges et `oracle-ecosysteme` ; la mécanisation du point 1 (verdict de non-recouvrement
 exigé dans la fiche de naissance) est consignée comme reste de TF-0125.
 
+## I. « L'IA fait, l'humain décide » (règle 29 — décidée le 12/08, TF-0131)
+
+Décision humaine directe du 12/08 (TF-0131) : une pratique déjà vécue en session mais
+jamais encodée — chaque run ré-arbitrait au cas par cas ce qui revient à l'IA et ce qui
+revient à l'utilisateur, sans critère écrit.
+
+**R-29.**
+1. Toute démarche proposée à l'utilisateur (accueil, plans d'étape, dossiers MEP)
+   présente PAR DÉFAUT la voie automatisée. Toute action laissée à l'utilisateur porte
+   sa justification écrite, parmi trois motifs seulement : un secret à fournir, une
+   décision de goût, un GO de gouvernance. Une action sans l'un de ces trois motifs
+   reste à l'IA.
+2. Tout rapport remis à l'humain classe les actions restantes en trois catégories : IA,
+   développeur, utilisateur — reprise du format `actions[]` de forge-tests, généralisé
+   hors de ce seul contexte.
+3. Les propositions d'outils ou de services tiers sont admises, marquées « en option ».
+   L'exécution d'un service tiers payant exige un GO humain préalable — le garde-fou
+   « aucune API tierce payante hors modèles Claude » prime toujours sur R-29. Les gates
+   déjà en place (GO production, mandats humains) priment toujours sur R-29.
+
+Surfaces d'application encodées : `references\ACCUEIL.md` étape 5 (démarche proposée),
+`gabarits\AGENT-CAMPAGNE.md` (rapport final des agents de campagne).
+Mécanisme : S (vérification pilot à l'ouverture de run). Contrôle exécutable : hors
+`oracle-conformite-projet` (portée transverse aux prompts et rapports, pas au socle
+d'un projet produit) — reste de TF-0131, à mécaniser si un gap se constate en run réel.
+
 ## Conflits à trancher (ta décision explicite)
 
 - **C1 — `Old\` vs git (n° 6/7)** : deux magasins de versions divergent toujours. Proposition :

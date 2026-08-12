@@ -61,7 +61,9 @@ corrections_realisees: <ce qui a changé, fichiers cités chemin:ligne>
 preuve: <sortie de vérification native, avant/après mesuré>
 gains_constates: <effet mesurable, chiffré si possible — exigé pour corrige>
 commit: <sha court> (local, non poussé)
-restes: <ce qui manque, constats hors périmètre, candidatures nouvelles>
+restes: <ce qui manque — classé IA / développeur / utilisateur (R-29, REGLES-PROJET.md
+  §I ; format actions[] de forge-tests généralisé), constats hors périmètre,
+  candidatures nouvelles>
 ```
 
 En tête de rapport : version de départ du dépôt (`git log -1 --format=%h` avant tes
