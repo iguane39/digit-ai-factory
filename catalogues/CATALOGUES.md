@@ -1,7 +1,7 @@
 # Catalogues de services des forges — vue générée
 
-> **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.2.0, 2026-08-12) — ne jamais éditer ce fichier.
-> 59 services · 51 prouvés · 8 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
+> **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.3.0, 2026-08-12) — ne jamais éditer ce fichier.
+> 64 services · 55 prouvés · 9 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
 
 ## forge-conception (pipeline) — 7 services
 
@@ -82,6 +82,14 @@
 | cat-dat-04 | **Fonds de savoir data** | réutiliser les patterns éprouvés de rétro-ingénierie et de lineage | `references\ du dépôt data (lecture)` | documents anonymisés (zéro client vérifié par grep) — savoir, pas d'exécutable | declare | experimental |
 | cat-dat-05 | **Contractualiser (data contract)** | sceller l'accord producteur↔consommateur en contrat vérifiable machine | `node oracles\oracle-contractualiser.mjs <contrat.json>` | TF-0108 (12/08) : fixtures double sens, self-test 30 PASS rejoué pilot ; ODCS statué « retenu » dans STANDARDS-DATA | prouve | experimental |
 
+## forge-observability (transverse) — 3 services
+
+| id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
+|---|---|---|---|---|---|---|
+| cat-obs-01 | **Observer (plans → snapshots)** | surveiller entre les runs ce que l'écosystème ne vérifie qu'en one-shot | `node scripts\observer.mjs <plan.json>` | TF-0112 (12/08) : self-test double sens 30 PASS rejoué pilot | prouve | experimental |
+| cat-obs-02 | **Détecter la dérive** | être alerté quand quelque chose a changé depuis le dernier passage | `node scripts\derive.mjs <snapshots.jsonl>` | TF-0112 (12/08) : régressions data et tests prouvées sur fixtures (faux oracle à état PASS→FAIL) | prouve | experimental |
+| cat-obs-03 | **Veille citation IA** | suivre la présence d'un domaine dans les réponses génératives | `veille-ia\METHODE.md (méthode manuelle documentée)` | méthode documentée seule — automatisation écartée en v0 avec raisons datées (API payantes, non-reproductibilité) | declare | experimental |
+
 ## forge-audit (sur mandat) — 4 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
@@ -111,6 +119,13 @@
 | cat-org-02 | **Composant filtres-tableau** | réutiliser un composant de filtres de tableau vérifié | `node output\composant-filtres-tableau\oracle-filtres-tableau.mjs` | oracle vérifié dans les deux sens (fixtures rouge/verte) | prouve | experimental |
 | cat-org-03 | **Études normatives** | ancrer les pratiques sur les normes du métier | `conversationnel` | étude documentée — contrôles proposés non implémentés | declare | experimental |
 | cat-org-04 | **Gate de conventions packagé** | vérifier les conventions en pre-commit/CI sans dépendre de la forge | `node output\gate-conventions\gate-conventions.mjs [--staged]` | TF-0109 (12/08) : self-test 6/6 + 2 robustesse, rejoué pilot ; PROPOSÉ aux dépôts, jamais déployé d'office | prouve | experimental |
+
+## forge-agents-security (sur mandat) — 2 services
+
+| id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
+|---|---|---|---|---|---|---|
+| cat-sec-01 | **Scanner un agent (statique)** | vérifier qu'un agent défini ne porte pas de capacités dangereuses | `node oracles\oracle-scan-agentdef.mjs <def>` | TF-0111 (12/08) : self-test double sens 24 PASS rejoué pilot ; 20 fixtures synthétiques | prouve | experimental |
+| cat-sec-02 | **Scanner les appels d'outils (dynamique)** | détecter les patterns d'attaque dans un journal d'exécution d'agent | `node oracles\oracle-scan-toolcalls.mjs <journal.jsonl> --perimetre <racine>` | TF-0111 (12/08) : chaque pattern prouvé rouge avec son cas légitime voisin vert (faux positifs mesurés) | prouve | experimental |
 
 ---
 

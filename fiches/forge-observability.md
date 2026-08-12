@@ -1,0 +1,21 @@
+# Fiche d audit — forge-observability
+
+Baseline d audit par forge (TF-0054) : cette fiche remplace la relecture de la baseline
+commune par agent d audit. MISE À JOUR à chaque audit — dernière mise à jour : 2026-08-12
+(création, TF-0112 — décision humaine : forge unique, trois volets sur un socle commun).
+
+### forge-observability — self-test 30/30, née exercée sur fixtures synthétiques (12/08)
+
+Delta : dépôt neuf (v0), public GitHub, MIT. Raison d être : tout l écosystème vérifie
+one-shot ; elle surveille ENTRE les runs. Forces : socle déclaratif
+`forge-observability/plan@1` (sondes commande / oracle_externe / rapport_json / manuel,
+cadences et seuils déclarés) · `scripts\observer.mjs` (snapshots JSONL append-only, seq
+croissant — contrat ledger, exit 0/1/2) · `scripts\derive.mjs` (dérives entre snapshots :
+seuils max/min/max_delta, régression de verdict PASS→FAIL, hausse de findings, disparition
+de sonde bloquante, intégrité du ledger) · volet data et volet tests prouvés sur fixtures
+(faux oracle à état PASS→FAIL) · veille citation IA **déclarée** sans fausse automatisation
+(`veille-ia\METHODE.md`, raisons datées). Faiblesses / dettes : pas de scheduler interne
+(cadence documentaire) ; pas d alerting (le FAIL de derive est le signal) ; comparaison de
+sondes par nom (renommage = disparition+apparition) ; chemins d oracles externes paramétrés
+mais composition jamais exercée sur un oracle réel de forge-data — premier plan réel à
+consigner ici.

@@ -5,21 +5,25 @@
 > puis déroule [references/ACCUEIL.md](references/ACCUEIL.md). N'improvise pas.
 
 Projet de pilotage de l'écosystème forge Digit-AI. **Un seul point de démarrage** pour construire
-un produit en mobilisant les dix forges bout en bout, et pour les améliorer par itérations
+un produit en mobilisant les douze forges bout en bout, et pour les améliorer par itérations
 bornées.
 
-**Les dix forges** — pipeline : [forge-conception](https://github.com/iguane39/digit-ai-forge-conception) ·
+**Les douze forges** — pipeline : [forge-conception](https://github.com/iguane39/digit-ai-forge-conception) ·
 [forge-design](https://github.com/iguane39/digit-ai-forge-design) ·
 [forge-development](https://github.com/iguane39/digit-ai-forge-development) ·
 [forge-tests](https://github.com/iguane39/digit-ai-forge-tests) — transverses :
 [forge-agents](https://github.com/iguane39/digit-ai-forge-agents) (outils partagés) ·
 [forge-ops](https://github.com/iguane39/digit-ai-forge-ops) (exploitation, outille la MEP) ·
 [forge-data](https://github.com/iguane39/digit-ai-forge-data) (discipline de la donnée : lineage,
-qualité, restitution sourcée) — sur
+qualité, restitution sourcée) ·
+[forge-observability](https://github.com/iguane39/digit-ai-forge-observability) (surveillance
+continue entre les runs) — sur
 mandat humain : [forge-audit](https://github.com/iguane39/digit-ai-forge-audit) (gouvernance
 POC-to-Prod) · [forge-seo](https://github.com/iguane39/digit-ai-forge-seo) (post-MEP) ·
-[forge-organization](https://github.com/iguane39/digit-ai-forge-organization) (conventions). Règle d'affichage de ce README : il ne promet rien que le ledger d'un run ne puisse
-prouver.
+[forge-organization](https://github.com/iguane39/digit-ai-forge-organization) (conventions) ·
+[forge-agents-security](https://github.com/iguane39/digit-ai-forge-agents-security) (sécurité
+agentique — le juge ne vit pas chez le jugé). Règle d'affichage de ce README : il ne promet
+rien que le ledger d'un run ne puisse prouver.
 
 ## Démarrer un produit
 
@@ -33,7 +37,7 @@ GitHub** (`~/.digit-ai-forge` par défaut, via `bootstrap.mjs`), puis le run ent
 artefacts d'étapes, code — vit dans le projet produit.
 
 **Amorçage manuel** (équivalent de la phase 0) : cloner ce dépôt puis `node bootstrap.mjs` —
-vérifie les prérequis, clone les dix forges en dépôts frères (`core.longpaths` activé : les
+vérifie les prérequis, clone les douze forges en dépôts frères (`core.longpaths` activé : les
 noms de fichiers des forges dépassent MAX_PATH sinon) et contrôle leurs points d'entrée.
 Options : `--racine <dossier>` (+ `FORGE_ROOT` en session), `--pull` pour mettre à jour.
 Testé : amorçage réel d'un répertoire vierge, toutes forges clonées et preuves vérifiées, exit 0.
@@ -54,7 +58,7 @@ Chaque étape est validée par des **oracles exécutés** — jamais par confian
 
 <!-- CATALOGUE:DEBUT — section générée par catalogues/generer-vues.mjs, ne pas éditer -->
 
-Ce que chaque forge sait faire aujourd'hui — extrait de la source unique [catalogues/catalogue.jsonl](catalogues/catalogue.jsonl) (v1.2.0, 2026-08-12), détail complet : [catalogues/CATALOGUES.md](catalogues/CATALOGUES.md). **prouvé** = preuve exécutée (oracle, CLI, run réel) ; *déclaré* = méthode documentée seulement.
+Ce que chaque forge sait faire aujourd'hui — extrait de la source unique [catalogues/catalogue.jsonl](catalogues/catalogue.jsonl) (v1.3.0, 2026-08-12), détail complet : [catalogues/CATALOGUES.md](catalogues/CATALOGUES.md). **prouvé** = preuve exécutée (oracle, CLI, run réel) ; *déclaré* = méthode documentée seulement.
 
 - **forge-conception** (pipeline) : **Qualifier l'entrant** · **Énumérer la surface** · **Rédiger les exigences** · **Dériver les vues aval** · **Valider les exigences (oracles)** · **Constitution projet** · **Cycle delta (évolution d'un référentiel scellé)**
 - **forge-design** (pipeline) : **Système de marque** · **Studio de direction** · **Améliorer le design (maquette)** · *Critiquer le design (amont et aval) (déclaré)* · **Valider le design (oracles)** · **Générer les visuels** · **Tokens DTCG (source → dérivé)** · **Baseline de régression visuelle**
@@ -63,9 +67,11 @@ Ce que chaque forge sait faire aujourd'hui — extrait de la source unique [cata
 - **forge-agents** (transverse) : **Fabriquer des agents spécialisés** · **Ledger de run vérifiable** · **Atelier des skills qualité** · **Projection OTLP GenAI du ledger** · **Oracle agent-evals** · **Gate budget G0**
 - **forge-ops** (transverse) : **Déployer, restaurer, état** · **Verdicts d'exploitation O-1…O-4** · **Plans cloud plan-first** · **Canary local simulé** · **Drift O-6 et verdict rollback SLO**
 - **forge-data** (transverse) : **Profiler (qualité en assertions)** · **Tracer (lineage exigible)** · **Restituer (chiffres sourcés)** · *Fonds de savoir data (déclaré)* · **Contractualiser (data contract)**
+- **forge-observability** (transverse) : **Observer (plans → snapshots)** · **Détecter la dérive** · *Veille citation IA (déclaré)*
 - **forge-audit** (sur mandat) : **Référentiel d'audit POC-to-Prod** · **Oracles d'audit** · **Engagement d'audit par tenant** · **Policy-as-code (démonstrateur OPA)**
 - **forge-seo** (sur mandat) : **Créer une mission d'audit SEO** · **Dérouler l'audit 87 nœuds** · **Valider forge et mission** · **Rapport HTML vérifié** · *Runs de suivi récurrents (déclaré)* · **Instrumentation de crawl avancée** · **Scorer et écrire le CSV d'actions**
 - **forge-organization** (sur mandat) : **Doctrine des conventions** · **Composant filtres-tableau** · *Études normatives (déclaré)* · **Gate de conventions packagé**
+- **forge-agents-security** (sur mandat) : **Scanner un agent (statique)** · **Scanner les appels d'outils (dynamique)**
 
 <!-- CATALOGUE:FIN -->
 

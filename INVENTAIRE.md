@@ -1,4 +1,4 @@
-# Inventaire des dix forges — 2026-08-04 · màj 2026-08-12 (fraîcheur TF-0113 : comptages conception/audit, options CLI tests)
+# Inventaire des douze forges — 2026-08-04 · màj 2026-08-12 (TF-0113 fraîcheur ; TF-0111/0112 : +agents-security, +observability)
 
 Synthèse issue de cinq explorations exhaustives (une par projet, fichiers cités vérifiés sur disque).
 Chaque forge est décrite selon : rôle, point d'entrée réel, entrées, sorties, oracles, maturité, manques pour l'orchestration.
@@ -234,6 +234,35 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
   runtime du lineage déclaré non capturée (niveau 3 hors v0) ; premier run produit à
   consigner ici.
 
+## 11. digit-ai-forge-agents-security — `c:\dev\digit-ai-forge-agents-security` *(créée le 12/08, TF-0111)*
+
+- **Rôle** : **sécurité agentique**, transverse et sur mandat humain — scan statique des
+  `agent.def`/subagents compilés (CAP-1..4 : capacités dangereuses, outils hors référentiel,
+  permissions larges, motifs d'exfiltration) et scan dynamique des journaux d'appels d'outils
+  (TC-1..5 : exfiltration deny-by-default, destruction, secrets, payloads encodés, écriture
+  hors périmètre). **Forge dédiée par décision humaine du 12/08 : le juge ne vit pas chez le
+  jugé** (séparée de forge-agents qu'elle scanne).
+- **Point d'entrée réel** : `node oracles\oracle-scan-agentdef.mjs <def>` ·
+  `node oracles\oracle-scan-toolcalls.mjs <journal.jsonl> --perimetre <racine>` (fail-closed,
+  contrat JSON, exit 0/1/2) ; format de journal documenté (`references\FORMAT-JOURNAL.md`).
+- **Maturité** : v0 née exercée — self-test double sens **24 PASS** (20 fixtures, chaque règle
+  avec son cas légitime voisin). Limites v0 consignées : lexicale (pas de sandbox, pas de
+  sémantique, pas de red-teaming automatisé), référentiel d'outils manuel.
+
+## 12. digit-ai-forge-observability — `c:\dev\digit-ai-forge-observability` *(créée le 12/08, TF-0112)*
+
+- **Rôle** : **observabilité continue** — surveiller ENTRE les runs ce que tout le reste de
+  l'écosystème ne vérifie qu'en one-shot. Socle déclaratif `plan-observation@1` (sondes
+  commande / oracle_externe / rapport_json / manuel), snapshots JSONL append-only, détection
+  de dérive (seuils, régression de verdict, disparition de sonde). Trois volets : data
+  (prouvé sur fixture), tests (prouvé), veille citation IA (**déclaré**, méthode manuelle
+  documentée). Elle observe et alerte, ne corrige jamais.
+- **Point d'entrée réel** : `node scripts\observer.mjs <plan.json>` ·
+  `node scripts\derive.mjs <snapshots.jsonl>` (contrats JSON, exit 0/1/2).
+- **Maturité** : v0 née exercée — self-test double sens **30 PASS**. Dettes : pas de
+  scheduler ni d'alerting (le FAIL est le signal), composition avec un oracle réel de
+  forge-data à exercer au premier plan réel.
+
 ## Lecture transverse pour le pilot
 
 | Forge | Point d'entrée machine | Oracles exécutables | A déjà produit un livrable réel |
@@ -248,6 +277,8 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
 | audit *(10/08)* | via submodule `auditcore/` (non peuplé au clone shallow) | à détailler (contrôles dans auditcore) | **oui** (engagement Nhood, 2 CI vertes) |
 | ops *(11/08)* | **oui** (CLI `ops.mjs`, exit 0/1 ; oracle O-1…O-4 exit 0/1/2) | **oui** (self-test 14 PASS, déploiement réel rejoué) | **oui** (fixture d'acceptation : staging local + rollback prouvé) |
 | data *(11/08)* | **oui** (4 oracles CLI, exit 0/1/2) | **oui** (self-test double sens 30 PASS, 12/08) | non (v0 neuve — REX réel anonymisé comme fond) |
+| agents-security *(12/08)* | **oui** (2 oracles CLI, exit 0/1/2, fail-closed) | **oui** (self-test double sens 24 PASS) | non (v0 neuve — fixtures synthétiques) |
+| observability *(12/08)* | **oui** (observer/derive CLI, exit 0/1/2) | **oui** (self-test double sens 30 PASS) | non (v0 neuve — fixtures synthétiques) |
 
 Trois conséquences d'architecture :
 1. **Le pilot est le seul conducteur légitime** — Conception l'interdit chez elle, Development l'ignore,
