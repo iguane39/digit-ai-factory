@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=06a3a32f3c10 archive=3eb4a8fa16f9 · dernier événement: 2026-08-12T07:55:50Z -->
+     sceaux: actifs=12e72674a0c9 archive=3eb4a8fa16f9 · dernier événement: 2026-08-12T08:35:34Z -->
 
-**25 actifs** (candidat 9 · décidé 0 · en cours 1 · corrigé 15 · écarté 0) · **96 archivés**.
+**26 actifs** (candidat 10 · décidé 0 · en cours 0 · corrigé 16 · écarté 0) · **96 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -72,8 +72,9 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0073 | en_cours | 1 | Rapatrier la production du CSV d'actions scoré (livrables-gen.py de la mission) — complément de TF-0056 | **oui** — le BOM du CSV réel trahit déjà un producteur hors forge |
+| TF-0121 | candidat | 6 | forge-seo : scoring.md écrit « quick win » (espace) là où snapshot.schema.json exige « quick-win » — la prose contredit le seul contrat contrôlé | **oui** — le vocabulaire est contrôlé à l'écriture depuis TF-0073 : chaque mission rédigée d'après la prose actuelle échouera au premier passage de scorer_actions.py |
 | TF-0105 | corrige | 4.5 | SEO : rendu JavaScript optionnel au crawl (Playwright), extraction JSON-LD automatisée, collecte CrUX outillée et ventilation du trafic des crawlers IA | **oui** — sur tout site JS-heavy, l'audit actuel sous-mesure structurellement deux nœuds sans le signaler — risque direct sur un livrable client facturé ; la collecte CWV manuelle n'est pas reproductible d'un auditeur à l'autre |
+| TF-0073 | corrige | 1 | Rapatrier la production du CSV d'actions scoré (livrables-gen.py de la mission) — complément de TF-0056 | **oui** — le BOM du CSV réel trahit déjà un producteur hors forge |
 
 ## tests
 
