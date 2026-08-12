@@ -48,7 +48,7 @@ le pilot et les forges sont des dépendances en lecture.
 | L'utilisateur veut… | Situation | Références qui font foi |
 |---|---|---|
 | créer un produit | run complet (5 étapes) | `PROMPT-PRODUIT.md` (brief 7 champs), `ETAPES-RUN.md` |
-| concevoir pour un type de produit précis | profil produit | `profils\{website,webapp,mobile}.md` — standards machine, savoir daté, mapping par forge |
+| concevoir pour un type de produit précis | profil produit | `profils\` (7 profils — voir `profils\LISEZMOI.md`) — standards machine, savoir daté, mapping par forge |
 | faire évoluer / remédier | run de version | `RUN-VERSION.md` (socle d'abord, delta ensuite, tests en entier) |
 | tester et corriger | cycle forge-tests | CLI `forge_tests` (--json --sortie ; --generer/--livrables HORS projet, G-1) ; boucle bornée 3 cycles, G-2 absolue |
 | revoir le design rendu | revue aval (étape 5 bis) | oracles design + `render_page.py` — le rendu se juge en pixels |
