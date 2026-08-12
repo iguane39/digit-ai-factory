@@ -89,20 +89,20 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>12e72674a0c9</code> · dernier événement 2026-08-12T08:35:34Z</p>
+      <p class="meta">sceau <code>045007880bae</code> · dernier événement 2026-08-12T09:29:04Z</p>
       <button id="exporter" type="button">Exporter les décisions</button>
       <span id="bilan" aria-live="polite">0 coché · 0 commentaire</span>
     </header>
     <p>Seul le <strong>reste-à-faire</strong> vit ici — les items clos partent à l'archive (<code>node todo\archiver.mjs</code>). Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au pilot — appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
     <p class="meta" id="note-score">La colonne « score » = <strong>valeur</strong> de l'item, calculée <code>gain × preuve ÷ effort</code> (composantes visibles dans le détail de chaque ligne) ; tri par défaut : statut puis score décroissant, ou au clic sur les en-têtes fléchés.</p>
     <div class="kpis">
-      <div class="kpi" title="10 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">10</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
+      <div class="kpi" title="0 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">0</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
       <div class="kpi" title="0 item(s) décidés dont les travaux ne sont pas ouverts"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts</span></div>
       <div class="kpi" title="0 campagne(s) ouvertes au registre"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre</span></div>
       <div class="kpi" title="95 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">95</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende"><span class="leg-item"><span class="leg-swatch" style="background:var(--surface)"></span>candidat</span><span class="leg-item"><span class="leg-swatch" style="background:var(--teal-fill)"></span>décidé</span><span class="leg-item"><span class="leg-swatch" style="background:var(--amber-fill)"></span>en cours</span></p>
-    <nav class="toc" aria-label="Sommaire"><a href="#agents"><strong>agents</strong> <span class="toc-d">3 item(s) reste-à-faire ciblant agents</span></a><a href="#audit"><strong>audit</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant audit</span></a><a href="#conception"><strong>conception</strong> <span class="toc-d">2 item(s) reste-à-faire ciblant conception</span></a><a href="#data"><strong>data</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant data</span></a><a href="#design"><strong>design</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant design</span></a><a href="#development"><strong>development</strong> <span class="toc-d">2 item(s) reste-à-faire ciblant development</span></a><a href="#ops"><strong>ops</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant ops</span></a><a href="#organization"><strong>organization</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant organization</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">4 item(s) reste-à-faire ciblant pilot</span></a><a href="#seo"><strong>seo</strong> <span class="toc-d">3 item(s) reste-à-faire ciblant seo</span></a><a href="#tests"><strong>tests</strong> <span class="toc-d">7 item(s) reste-à-faire ciblant tests</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#agents"><strong>agents</strong> <span class="toc-d">3 item(s) reste-à-faire ciblant agents</span></a><a href="#audit"><strong>audit</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant audit</span></a><a href="#conception"><strong>conception</strong> <span class="toc-d">2 item(s) reste-à-faire ciblant conception</span></a><a href="#data"><strong>data</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant data</span></a><a href="#design"><strong>design</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant design</span></a><a href="#development"><strong>development</strong> <span class="toc-d">2 item(s) reste-à-faire ciblant development</span></a><a href="#ops"><strong>ops</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant ops</span></a><a href="#organization"><strong>organization</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant organization</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">4 item(s) reste-à-faire ciblant pilot</span></a><a href="#seo"><strong>seo</strong> <span class="toc-d">3 item(s) reste-à-faire ciblant seo</span></a><a href="#tests"><strong>tests</strong> <span class="toc-d">8 item(s) reste-à-faire ciblant tests</span></a></nav>
     <main>
     <section id="agents">
       <h2>agents <span class="badge" title="3 item(s) actifs ciblant agents">3</span></h2>
@@ -112,9 +112,9 @@
         <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0118" aria-label="Décider TF-0118"></td>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0118" aria-label="Décider TF-0118" disabled></td>
           <td class="c-id" data-th="id"><code>TF-0118</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td data-th="statut"><span class="statut s-corrige">corrige</span></td>
           <td class="c-score" data-th="score">9</td>
           <td data-th="item"><details><summary><strong>forge-agents : gates G1-G3 en fail-open quand jq est absent — le garde-fou s'efface exactement quand l'environnement est dégradé</strong></summary>
               <p>Constaté en exécution le 12/08 : sur un poste sans jq, g1-block-direct.sh sort en exit 0 malgré des erreurs « jq: command not found » — un ticket parallel passe sans contrôle. G0 (budget, nouveau) a été conçu fail-closed (grep/sed purs ; refus explicite si jq manque et qu'un budget est déclaré) : appliquer la même discipline à G1/G2/G3 (réécriture sans jq ou refus explicite), avec fixtures rouges « jq absent ». Sécurité de l'orchestration multi-agents en jeu.</p>
@@ -123,9 +123,9 @@
           <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0118" rows="1" aria-label="Commentaire TF-0118" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0119" aria-label="Décider TF-0119"></td>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0119" aria-label="Décider TF-0119" disabled></td>
           <td class="c-id" data-th="id"><code>TF-0119</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td data-th="statut"><span class="statut s-corrige">corrige</span></td>
           <td class="c-score" data-th="score">9</td>
           <td data-th="item"><details><summary><strong>forge-agents : .queue/ n'a jamais été versionné — les gates G0-G3 (hooks de sécurité) ne vivent que sur le poste</strong></summary>
               <p>Vérifié le 12/08 : git log --diff-filter=A --all -- .queue → 0 résultat ; .gitignore:24 exclut tout .queue/. Conséquence : les hooks de gates (g0-budget.sh, g1-g3) ne sont capturés par aucun commit — un clone neuf n'a AUCUN gate actif, sans le savoir. Scinder le .gitignore : versionner .queue/gates/*.sh (code) tout en excluant .queue/tickets|state|receipts (données d'engagement). Le self-test-gate-budget SKIP proprement sur clone nu, mais SKIP n'est pas une protection.</p>
@@ -176,9 +176,9 @@
         <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0114" aria-label="Décider TF-0114"></td>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0114" aria-label="Décider TF-0114" disabled></td>
           <td class="c-id" data-th="id"><code>TF-0114</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td data-th="statut"><span class="statut s-corrige">corrige</span></td>
           <td class="c-score" data-th="score">6</td>
           <td data-th="item"><details><summary><strong>Conception : self-test structurellement rouge sur poste Windows — le SHA-256 de la fixture verte diverge par conversion CRLF (core.autocrlf)</strong></summary>
               <p>oracle-tracabilite T3 échoue sur oracles/fixtures/verte/ : le SHA embarqué dans CADRAGE-DESIGN.md correspond au contenu LF, mais core.autocrlf=true convertit EXIGENCES.json en CRLF au checkout (84012012a80b… vs 533f934f08d0…, prouvé par recalcul direct des deux variantes). Préexistant à la campagne du 12/08 (fixture intacte depuis le commit de départ, prouvé par git diff vide). Pistes : normaliser via .gitattributes (eol=lf sur les fixtures), ou calculer le SHA après normalisation LF dans l'oracle — trancher et fixer, sinon tout self-test conception sur poste Windows reste rouge pour une raison étrangère au contenu.</p>
@@ -250,9 +250,9 @@
         <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0120" aria-label="Décider TF-0120"></td>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0120" aria-label="Décider TF-0120" disabled></td>
           <td class="c-id" data-th="id"><code>TF-0120</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td data-th="statut"><span class="statut s-corrige">corrige</span></td>
           <td class="c-score" data-th="score">3</td>
           <td data-th="item"><details><summary><strong>forge-development : score de mutation du conductor à 61,1 % — renforcer les tests puis rendre le job mutation bloquant</strong></summary>
               <p>Première mesure réelle (Docker, mutmut 3.7.0, scope sandbox.py + ai_antipatterns_gate.py) : 223 tués / 142 survivants / 365 = 61,1 %, sous le seuil documenté de 75 %. Le job CI est volontairement en continue-on-error (bloquer d'emblée aurait cassé le double gate sur un score connu-insuffisant sans consentement humain). À faire : analyser les survivants (beaucoup sont des mutations de littéraux regex peu discriminantes — les exclure ou documenter l'équivalence), renforcer les tests là où la lacune est réelle, étendre only_mutate au reste de conductor/, puis basculer le job en bloquant.</p>
@@ -324,39 +324,6 @@
         <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0115" aria-label="Décider TF-0115"></td>
-          <td class="c-id" data-th="id"><code>TF-0115</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">3</td>
-          <td data-th="item"><details><summary><strong>Généraliser oracle-fraicheur-doc par fichier de claims — 3 dérives documentaires supplémentaires trouvées en une seule campagne</strong></summary>
-              <p>Les campagnes du 12/08 ont trouvé 3 nouvelles dérives du type TF-0113 :</p><ol><li>conception corpus/pratiques.csv marque P-10 « todo » alors qu'oracle-exigences cite déjà l'étude P-10 comme source d'E7-E9 </li><li>design README documente 5 oracles alors qu'oracle-motion.mjs existe et est verrouillé au self-test (8 réels désormais) </li><li>audit : pack EN controls-core-v1.en.json resté à 169 contrôles après passage à 175 (avertissement à chaque assemblage) et cache config/tenants/exemple/merged.json non régénéré. La v0 d'oracle-fraicheur-doc (F1-F3, sondes codées en dur) doit se généraliser : fichier de claims déclaratif (affirmation → source → sonde) couvrant INVENTAIRE, fiches et README des forges, exécuté à chaque campagne</li></ol>
-              <p class="meta">Demandeur : campagne-todo (12/08) · 2026-08-12 · gain 2 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — 4 dérives en 2 campagnes le même jour : la documentation ment plus vite que les oracles ne vérifient — chaque dérive coûte une ré-enquête ou publie du faux</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0115" rows="1" aria-label="Commentaire TF-0115" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0111" aria-label="Décider TF-0111"></td>
-          <td class="c-id" data-th="id"><code>TF-0111</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">1</td>
-          <td data-th="item"><details><summary><strong>Nouvelle forge candidate : sécurité agentique (scan des tool calls, fixtures rouges d'attaques, red-teaming des agents compilés)</strong></summary>
-              <p>Aucune forge ne couvre la sécurité RUNTIME des agents : les gates G1-G3 de forge-agents sont anti-serial-collapse (structurels), les 33 oracles jugent des livrables — rien n'inspecte les invocations d'outils produites en exécution (patterns d'exfiltration, injection via skill, contournement de bac à sable). Le paysage 2026 a basculé : attaque étatique quasi-autonome documentée par Anthropic (80-90 % de l'exécution tactique portée par l'agent), scanners dédiés (Agent-Scan, MCP Safety Scanner). Périmètre proposé : scanner statique+dynamique des agent.def et tool calls, fixtures rouges d'attaques connues (chaîne d'admission au standard forge-agents), politique de moindre capacité vérifiable. Alternative moins lourde : extension de l'atelier qualité de forge-agents plutôt que forge dédiée — à trancher en décision humaine.</p>
-              <p class="meta">Demandeur : campagne-catalogues (12/08) · 2026-08-12 · gain 3 × preuve 1 ÷ effort 3 · <strong>payé en réel</strong> — le mode unattended de development et les campagnes multi-agents du pilot exécutent des tool calls sans aucune inspection — un skill ou un entrant compromis a aujourd'hui le champ libre jusqu'au garde-fou git</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0111" rows="1" aria-label="Commentaire TF-0111" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0112" aria-label="Décider TF-0112"></td>
-          <td class="c-id" data-th="id"><code>TF-0112</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">1</td>
-          <td data-th="item"><details><summary><strong>Nouvelle forge candidate : observabilité continue (dérive data, revue par commit, veille citation IA) — le trou transverse « one-shot vs continu »</strong></summary>
-              <p>Constat convergent des 4 rapports A3 : tout l'écosystème vérifie à froid/one-shot (audit forge-tests ponctuel, healthcheck one-shot, assertions data à l'instant T, audit SEO complet) alors que le marché 2026 traite le CONTINU comme une couche distincte : monitoring de dérive data (fraîcheur/volumétrie/distribution — Soda Core, YAML SodaCL, gratuit), revue à chaque commit (JiTTests/always-on reviewer), suivi de citation dans les réponses génératives (GEO/AEO, croissance +42,8 %/an du trafic crawlers IA). Trois périmètres regroupables en une forge « observabilité continue » ou à instruire séparément (data-observabilite, revue-continue, veille-ia) — le rythme d'exécution (par commit/par jour vs par run) change la nature de l'outil, ce qui justifie une forge distincte plutôt que des extensions. Décision humaine attendue sur le découpage.</p>
-              <p class="meta">Demandeur : campagne-catalogues (12/08) · 2026-08-12 · gain 3 × preuve 1 ÷ effort 3 · <strong>payé en réel</strong> — entre deux runs, personne ne regarde : une dérive de données, une régression de tests ou une chute de visibilité IA ne se découvre qu'au run suivant — des semaines plus tard sur un produit en production</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0112" rows="1" aria-label="Commentaire TF-0112" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
           <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0113" aria-label="Décider TF-0113" disabled></td>
           <td class="c-id" data-th="id"><code>TF-0113</code></td>
           <td data-th="statut"><span class="statut s-corrige">corrige</span></td>
@@ -366,6 +333,39 @@
               <p class="meta">Demandeur : campagne-catalogues (12/08) · 2026-08-12 · gain 2 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — cette campagne a failli publier deux comptages faux dans le catalogue public (corrigés in extremis sur vérification) ; toute décision de routage prise sur l'INVENTAIRE périmé hérite de l'erreur</p>
             </details></td>
           <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0113" rows="1" aria-label="Commentaire TF-0113" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0115" aria-label="Décider TF-0115" disabled></td>
+          <td class="c-id" data-th="id"><code>TF-0115</code></td>
+          <td data-th="statut"><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score" data-th="score">3</td>
+          <td data-th="item"><details><summary><strong>Généraliser oracle-fraicheur-doc par fichier de claims — 3 dérives documentaires supplémentaires trouvées en une seule campagne</strong></summary>
+              <p>Les campagnes du 12/08 ont trouvé 3 nouvelles dérives du type TF-0113 :</p><ol><li>conception corpus/pratiques.csv marque P-10 « todo » alors qu'oracle-exigences cite déjà l'étude P-10 comme source d'E7-E9 </li><li>design README documente 5 oracles alors qu'oracle-motion.mjs existe et est verrouillé au self-test (8 réels désormais) </li><li>audit : pack EN controls-core-v1.en.json resté à 169 contrôles après passage à 175 (avertissement à chaque assemblage) et cache config/tenants/exemple/merged.json non régénéré. La v0 d'oracle-fraicheur-doc (F1-F3, sondes codées en dur) doit se généraliser : fichier de claims déclaratif (affirmation → source → sonde) couvrant INVENTAIRE, fiches et README des forges, exécuté à chaque campagne</li></ol>
+              <p class="meta">Demandeur : campagne-todo (12/08) · 2026-08-12 · gain 2 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — 4 dérives en 2 campagnes le même jour : la documentation ment plus vite que les oracles ne vérifient — chaque dérive coûte une ré-enquête ou publie du faux</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0115" rows="1" aria-label="Commentaire TF-0115" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0111" aria-label="Décider TF-0111" disabled></td>
+          <td class="c-id" data-th="id"><code>TF-0111</code></td>
+          <td data-th="statut"><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score" data-th="score">1</td>
+          <td data-th="item"><details><summary><strong>Nouvelle forge candidate : sécurité agentique (scan des tool calls, fixtures rouges d'attaques, red-teaming des agents compilés)</strong></summary>
+              <p>Aucune forge ne couvre la sécurité RUNTIME des agents : les gates G1-G3 de forge-agents sont anti-serial-collapse (structurels), les 33 oracles jugent des livrables — rien n'inspecte les invocations d'outils produites en exécution (patterns d'exfiltration, injection via skill, contournement de bac à sable). Le paysage 2026 a basculé : attaque étatique quasi-autonome documentée par Anthropic (80-90 % de l'exécution tactique portée par l'agent), scanners dédiés (Agent-Scan, MCP Safety Scanner). Périmètre proposé : scanner statique+dynamique des agent.def et tool calls, fixtures rouges d'attaques connues (chaîne d'admission au standard forge-agents), politique de moindre capacité vérifiable. Alternative moins lourde : extension de l'atelier qualité de forge-agents plutôt que forge dédiée — à trancher en décision humaine.</p>
+              <p class="meta">Demandeur : campagne-catalogues (12/08) · 2026-08-12 · gain 3 × preuve 1 ÷ effort 3 · <strong>payé en réel</strong> — le mode unattended de development et les campagnes multi-agents du pilot exécutent des tool calls sans aucune inspection — un skill ou un entrant compromis a aujourd'hui le champ libre jusqu'au garde-fou git</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0111" rows="1" aria-label="Commentaire TF-0111" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0112" aria-label="Décider TF-0112" disabled></td>
+          <td class="c-id" data-th="id"><code>TF-0112</code></td>
+          <td data-th="statut"><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score" data-th="score">1</td>
+          <td data-th="item"><details><summary><strong>Nouvelle forge candidate : observabilité continue (dérive data, revue par commit, veille citation IA) — le trou transverse « one-shot vs continu »</strong></summary>
+              <p>Constat convergent des 4 rapports A3 : tout l'écosystème vérifie à froid/one-shot (audit forge-tests ponctuel, healthcheck one-shot, assertions data à l'instant T, audit SEO complet) alors que le marché 2026 traite le CONTINU comme une couche distincte : monitoring de dérive data (fraîcheur/volumétrie/distribution — Soda Core, YAML SodaCL, gratuit), revue à chaque commit (JiTTests/always-on reviewer), suivi de citation dans les réponses génératives (GEO/AEO, croissance +42,8 %/an du trafic crawlers IA). Trois périmètres regroupables en une forge « observabilité continue » ou à instruire séparément (data-observabilite, revue-continue, veille-ia) — le rythme d'exécution (par commit/par jour vs par run) change la nature de l'outil, ce qui justifie une forge distincte plutôt que des extensions. Décision humaine attendue sur le découpage.</p>
+              <p class="meta">Demandeur : campagne-catalogues (12/08) · 2026-08-12 · gain 3 × preuve 1 ÷ effort 3 · <strong>payé en réel</strong> — entre deux runs, personne ne regarde : une dérive de données, une régression de tests ou une chute de visibilité IA ne se découvre qu'au run suivant — des semaines plus tard sur un produit en production</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0112" rows="1" aria-label="Commentaire TF-0112" placeholder="commentaire…"></textarea></td>
         </tr>
         </tbody>
       </table></div>
@@ -378,9 +378,9 @@
         <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0121" aria-label="Décider TF-0121"></td>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0121" aria-label="Décider TF-0121" disabled></td>
           <td class="c-id" data-th="id"><code>TF-0121</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td data-th="statut"><span class="statut s-corrige">corrige</span></td>
           <td class="c-score" data-th="score">6</td>
           <td data-th="item"><details><summary><strong>forge-seo : scoring.md écrit « quick win » (espace) là où snapshot.schema.json exige « quick-win » — la prose contredit le seul contrat contrôlé</strong></summary>
               <p>referentiel/scoring.md (~l.96) utilise l'étiquette d'horizon « quick win » avec espace, alors que referentiel/snapshot.schema.json — le contrat mécaniquement validé, désormais aussi appliqué par scorer_actions.py (TF-0073) — exige « quick-win » avec trait d'union. Un rédacteur de mission qui suit la prose produit un contenu rejeté par l'outillage. Corriger la prose (et balayer scoring.md pour d'autres étiquettes divergentes du schéma) ; idéalement, générer les listes de vocabulaire de la doc depuis le schéma (discipline déclaré → généré).</p>
@@ -414,16 +414,16 @@
       </table></div>
     </section>
     <section id="tests">
-      <h2>tests <span class="badge" title="7 item(s) actifs ciblant tests">7</span></h2>
-      <p class="ch-apprend meta">Ce chapitre liste les 7 item(s) du reste-à-faire dont la cible est tests : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
+      <h2>tests <span class="badge" title="8 item(s) actifs ciblant tests">8</span></h2>
+      <p class="ch-apprend meta">Ce chapitre liste les 8 item(s) du reste-à-faire dont la cible est tests : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
       <div class="scroll"><table data-filterable>
         <caption class="sr-only">Reste-à-faire ciblant tests — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
         <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0116" aria-label="Décider TF-0116"></td>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0116" aria-label="Décider TF-0116" disabled></td>
           <td class="c-id" data-th="id"><code>TF-0116</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td data-th="statut"><span class="statut s-corrige">corrige</span></td>
           <td class="c-score" data-th="score">9</td>
           <td data-th="item"><details><summary><strong>forge-tests : bug G-1 dans la version en cours d'édition de mutation.py (session tierce) — mutant non restauré après audit</strong></summary>
               <p>Constat isolé par la campagne du 12/08 : avec la version en cours d'édition (non commitée, session tierce) de forge_tests/adaptateurs/mutation.py + disposition.paquet_sources, la recette laisse fixtures/banc-rouge/backend/app/calcul.py altéré après l'audit mutation (TAUX_TAXE resté à 1.20). Le même appel sur le mutation.py de HEAD, rejoué deux fois, ne laisse AUCUNE altération — la cause est dans la découverte dynamique du paquet de sources en cours d'écriture. Fixture restaurée aussitôt (git checkout --). À instruire quand la session tierce aura commité : la restauration de mutant doit être garantie par un try/finally sur la copie d'origine, et la recette devrait vérifier l'empreinte du banc après audit (défaut type à ajouter).</p>
@@ -432,15 +432,26 @@
           <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0116" rows="1" aria-label="Commentaire TF-0116" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0117" aria-label="Décider TF-0117"></td>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0117" aria-label="Décider TF-0117" disabled></td>
           <td class="c-id" data-th="id"><code>TF-0117</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td data-th="statut"><span class="statut s-corrige">corrige</span></td>
           <td class="c-score" data-th="score">6</td>
           <td data-th="item"><details><summary><strong>forge-tests : dashboard du banc-rouge en échec check_html — « NULL » littéral ×24 dans les cellules d'un tableau</strong></summary>
               <p>check_html.py échoue sur le dashboard généré du banc-rouge : littéral de langage <code>NULL</code> répété 24 fois dans des cellules de tableau (une valeur absente doit s'afficher en état vide explicite, pas en littéral technique — loi transverse n° 3). Préexistant : reproduit à l'identique avec les fichiers de la campagne remis à HEAD (stash de vérification). À corriger dans le générateur de dashboard (--livrables).</p>
               <p class="meta">Demandeur : campagne-todo (12/08) · 2026-08-12 · gain 2 × preuve 3 ÷ effort 1 · <strong>payé en réel</strong> — le dashboard est un livrable client du cycle de tests : 24 « <code>NULL</code> » à l'écran sur le banc de démonstration même de la forge</p>
             </details></td>
           <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0117" rows="1" aria-label="Commentaire TF-0117" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0122" aria-label="Décider TF-0122" disabled></td>
+          <td class="c-id" data-th="id"><code>TF-0122</code></td>
+          <td data-th="statut"><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score" data-th="score">5</td>
+          <td data-th="item"><details><summary><strong>RÉGRESSION du correctif TF-0100 : une route non concrétisable fait tomber l'audit ENTIER (exit 2, aucun rapport) au lieu de sortir en non_juge</strong></summary>
+              <p>Constat du 12/08 sur Approval2, run --livrables : exit 2, verdict ERREUR, AUCUN rapport produit — les douze pans perdus. Trace : `Page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL — navigating to &quot;http://127.0.0.1:55420*&quot;`. La route en cause est le `*` attrape-tout de react-router (App.tsx l.99), désormais RECONNU grâce au correctif TF-0100 (commit 5505ee9) — le faux négatif est corrigé, mais il s'est transformé en panne totale. DEUX DÉFAUTS DISTINCTS, et le second est le vrai. (1) CONCRÉTISATION INCOMPLÈTE — accessibilite.py l.142 et l.177 font `concret = route.replace(&quot;:id&quot;, &quot;1&quot;)` : seul le paramètre littéralement nommé `:id` est substitué. Le `*` de react-router produit une URL invalide ; un `:slug`, `:demandeId` ou `:userId` naviguerait vers une URL contenant le deux-points littéral, soit une 404 imputée au produit. (2) ABSENCE D'ISOLATION — l.143 le `page.goto` n'est protégé par aucun try/except (contrairement à visuel.py l.179 qui en a un) : une seule route innavigable propage l'exception jusqu'au noyau et avorte le run. C'est l'inverse exact de la doctrine « on nomme, on n'agrège pas » : l'élément aurait dû sortir NOMMÉ en non_juge, l'audit continuer, et les onze autres pans être rendus. Un auditeur qui meurt sur un cas qu'il ne sait pas traiter ne rend aucun service ; il en rend un négatif, puisqu'il détruit aussi les mesures qu'il avait déjà faites. CORRECTIF ATTENDU : (a) écarter les routes non navigables (`*`, `/*`) en les déclarant en non_juge avec leur motif, et substituer TOUT segment `:&lt;nom&gt;` et non le seul `:id` ; (b) envelopper chaque navigation de route pour qu'un échec soit un élément non jugé et jamais une fin de run — la règle vaut pour tous les adaptateurs qui pilotent un navigateur.</p>
+              <p class="meta">Demandeur : audit-approval2-20260812 · 2026-08-12 · gain 5 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — payé en réel le 12/08 : ~50 min d'audit perdues et ZÉRO livrable produit, sur un projet dont les onze autres pans étaient mesurables — la régression coûte plus cher que le faux négatif qu'elle corrige</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0122" rows="1" aria-label="Commentaire TF-0122" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0104" aria-label="Décider TF-0104" disabled></td>
@@ -506,7 +517,7 @@
   <script>
   (function () {
     "use strict";
-    var SCEAU = "12e72674a0c9";
+    var SCEAU = "045007880bae";
     var cle = function (id, type) { return "todo-forge:" + SCEAU + ":" + id + ":" + type; };
     var coches = document.querySelectorAll("input.decider");
     var comms = document.querySelectorAll("textarea.commentaire");
