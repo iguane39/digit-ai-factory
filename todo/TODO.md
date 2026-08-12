@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=12e72674a0c9 archive=3eb4a8fa16f9 · dernier événement: 2026-08-12T08:35:34Z -->
+     sceaux: actifs=045007880bae archive=3eb4a8fa16f9 · dernier événement: 2026-08-12T09:29:04Z -->
 
-**26 actifs** (candidat 10 · décidé 0 · en cours 0 · corrigé 16 · écarté 0) · **96 archivés**.
+**27 actifs** (candidat 0 · décidé 0 · en cours 0 · corrigé 27 · écarté 0) · **96 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,8 +11,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0118 | candidat | 9 | forge-agents : gates G1-G3 en fail-open quand jq est absent — le garde-fou s'efface exactement quand l'environnement est dégradé | **oui** — un gate qui laisse passer en environnement dégradé est pire qu'aucun gate : il donne l'illusion du contrôle — l'anti-serial-collapse ne protège actuellement que les postes bien équipés |
-| TF-0119 | candidat | 9 | forge-agents : .queue/ n'a jamais été versionné — les gates G0-G3 (hooks de sécurité) ne vivent que sur le poste | **oui** — les gates anti-serial-collapse et budget sont documentés comme actifs mais n'existent sur aucun poste équipé par bootstrap — la protection annoncée au catalogue est fantôme hors du poste d'origine |
+| TF-0118 | corrige | 9 | forge-agents : gates G1-G3 en fail-open quand jq est absent — le garde-fou s'efface exactement quand l'environnement est dégradé | **oui** — un gate qui laisse passer en environnement dégradé est pire qu'aucun gate : il donne l'illusion du contrôle — l'anti-serial-collapse ne protège actuellement que les postes bien équipés |
+| TF-0119 | corrige | 9 | forge-agents : .queue/ n'a jamais été versionné — les gates G0-G3 (hooks de sécurité) ne vivent que sur le poste | **oui** — les gates anti-serial-collapse et budget sont documentés comme actifs mais n'existent sur aucun poste équipé par bootstrap — la protection annoncée au catalogue est fantôme hors du poste d'origine |
 | TF-0106 | corrige | 2 | Agents : projection OTLP GenAI du ledger, budget gate avant appel modèle et oracle d'évals LLM-as-judge sur fixtures de régression | **oui** — les mesures de routage §4 bis se font aujourd'hui à la main depuis les relevés du harnais ; sans evals versionnées, une régression de qualité d'un agent ne se détecte qu'à l'incident |
 
 ## audit
@@ -25,7 +25,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0114 | candidat | 6 | Conception : self-test structurellement rouge sur poste Windows — le SHA-256 de la fixture verte diverge par conversion CRLF (core.autocrlf) | **oui** — le self-test annonce SELF-TEST ROUGE — 1 anomalie sur un poste Windows standard : tout agent qui l'exécute doit ré-enquêter la fausse alerte, et un vrai défaut T3 serait noyé |
+| TF-0114 | corrige | 6 | Conception : self-test structurellement rouge sur poste Windows — le SHA-256 de la fixture verte diverge par conversion CRLF (core.autocrlf) | **oui** — le self-test annonce SELF-TEST ROUGE — 1 anomalie sur un poste Windows standard : tout agent qui l'exécute doit ré-enquêter la fausse alerte, et un vrai défaut T3 serait noyé |
 | TF-0101 | corrige | 3 | Conception : scoring EARS par patron strict, « constitution » projet et deltas OpenSpec pour les runs de version | **oui** — chaque exigence mal formée passe le gate binaire actuel et se paie en aval (tests intraçables, under-build détecté tard) ; le run de version rattrape le socle à la main faute de deltas outillés |
 
 ## data
@@ -44,7 +44,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0120 | candidat | 3 | forge-development : score de mutation du conductor à 61,1 % — renforcer les tests puis rendre le job mutation bloquant | **oui** — 39 % des mutants survivent à une suite de 337 tests verts : la couverture actuelle donne une confiance partiellement illusoire sur le code du conducteur lui-même |
+| TF-0120 | corrige | 3 | forge-development : score de mutation du conductor à 61,1 % — renforcer les tests puis rendre le job mutation bloquant | **oui** — 39 % des mutants survivent à une suite de 337 tests verts : la couverture actuelle donne une confiance partiellement illusoire sur le code du conducteur lui-même |
 | TF-0103 | corrige | 2 | Development : isolation sandbox du mode unattended, score de mutation au gate, et contrôles CI spécifiques au code généré par IA | **oui** — un agent à effets réels non isolé peut endommager le poste (incidents 2026 documentés) ; une suite verte à couverture haute mais mutation faible laisse passer du code IA faux — le coût se paie au premier produit client |
 
 ## ops
@@ -63,16 +63,16 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0115 | candidat | 3 | Généraliser oracle-fraicheur-doc par fichier de claims — 3 dérives documentaires supplémentaires trouvées en une seule campagne | **oui** — 4 dérives en 2 campagnes le même jour : la documentation ment plus vite que les oracles ne vérifient — chaque dérive coûte une ré-enquête ou publie du faux |
-| TF-0111 | candidat | 1 | Nouvelle forge candidate : sécurité agentique (scan des tool calls, fixtures rouges d'attaques, red-teaming des agents compilés) | **oui** — le mode unattended de development et les campagnes multi-agents du pilot exécutent des tool calls sans aucune inspection — un skill ou un entrant compromis a aujourd'hui le champ libre jusqu'au garde-fou git |
-| TF-0112 | candidat | 1 | Nouvelle forge candidate : observabilité continue (dérive data, revue par commit, veille citation IA) — le trou transverse « one-shot vs continu » | **oui** — entre deux runs, personne ne regarde : une dérive de données, une régression de tests ou une chute de visibilité IA ne se découvre qu'au run suivant — des semaines plus tard sur un produit en production |
 | TF-0113 | corrige | 3 | Fraîcheur documentaire : INVENTAIRE.md et fiches dérivent du réel (3 écarts constatés en une campagne) — oracle de fraîcheur transverse à instruire | **oui** — cette campagne a failli publier deux comptages faux dans le catalogue public (corrigés in extremis sur vérification) ; toute décision de routage prise sur l'INVENTAIRE périmé hérite de l'erreur |
+| TF-0115 | corrige | 3 | Généraliser oracle-fraicheur-doc par fichier de claims — 3 dérives documentaires supplémentaires trouvées en une seule campagne | **oui** — 4 dérives en 2 campagnes le même jour : la documentation ment plus vite que les oracles ne vérifient — chaque dérive coûte une ré-enquête ou publie du faux |
+| TF-0111 | corrige | 1 | Nouvelle forge candidate : sécurité agentique (scan des tool calls, fixtures rouges d'attaques, red-teaming des agents compilés) | **oui** — le mode unattended de development et les campagnes multi-agents du pilot exécutent des tool calls sans aucune inspection — un skill ou un entrant compromis a aujourd'hui le champ libre jusqu'au garde-fou git |
+| TF-0112 | corrige | 1 | Nouvelle forge candidate : observabilité continue (dérive data, revue par commit, veille citation IA) — le trou transverse « one-shot vs continu » | **oui** — entre deux runs, personne ne regarde : une dérive de données, une régression de tests ou une chute de visibilité IA ne se découvre qu'au run suivant — des semaines plus tard sur un produit en production |
 
 ## seo
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0121 | candidat | 6 | forge-seo : scoring.md écrit « quick win » (espace) là où snapshot.schema.json exige « quick-win » — la prose contredit le seul contrat contrôlé | **oui** — le vocabulaire est contrôlé à l'écriture depuis TF-0073 : chaque mission rédigée d'après la prose actuelle échouera au premier passage de scorer_actions.py |
+| TF-0121 | corrige | 6 | forge-seo : scoring.md écrit « quick win » (espace) là où snapshot.schema.json exige « quick-win » — la prose contredit le seul contrat contrôlé | **oui** — le vocabulaire est contrôlé à l'écriture depuis TF-0073 : chaque mission rédigée d'après la prose actuelle échouera au premier passage de scorer_actions.py |
 | TF-0105 | corrige | 4.5 | SEO : rendu JavaScript optionnel au crawl (Playwright), extraction JSON-LD automatisée, collecte CrUX outillée et ventilation du trafic des crawlers IA | **oui** — sur tout site JS-heavy, l'audit actuel sous-mesure structurellement deux nœuds sans le signaler — risque direct sur un livrable client facturé ; la collecte CWV manuelle n'est pas reproductible d'un auditeur à l'autre |
 | TF-0073 | corrige | 1 | Rapatrier la production du CSV d'actions scoré (livrables-gen.py de la mission) — complément de TF-0056 | **oui** — le BOM du CSV réel trahit déjà un producteur hors forge |
 
@@ -80,8 +80,9 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0116 | candidat | 9 | forge-tests : bug G-1 dans la version en cours d'édition de mutation.py (session tierce) — mutant non restauré après audit | **oui** — un mutant non restauré corrompt silencieusement le banc : tous les audits suivants mesurent un corpus faux — c'est un G-1 (le juge altère ce qu'il juge) |
-| TF-0117 | candidat | 6 | forge-tests : dashboard du banc-rouge en échec check_html — « NULL » littéral ×24 dans les cellules d'un tableau | **oui** — le dashboard est un livrable client du cycle de tests : 24 « NULL » à l'écran sur le banc de démonstration même de la forge |
+| TF-0116 | corrige | 9 | forge-tests : bug G-1 dans la version en cours d'édition de mutation.py (session tierce) — mutant non restauré après audit | **oui** — un mutant non restauré corrompt silencieusement le banc : tous les audits suivants mesurent un corpus faux — c'est un G-1 (le juge altère ce qu'il juge) |
+| TF-0117 | corrige | 6 | forge-tests : dashboard du banc-rouge en échec check_html — « NULL » littéral ×24 dans les cellules d'un tableau | **oui** — le dashboard est un livrable client du cycle de tests : 24 « NULL » à l'écran sur le banc de démonstration même de la forge |
+| TF-0122 | corrige | 5 | RÉGRESSION du correctif TF-0100 : une route non concrétisable fait tomber l'audit ENTIER (exit 2, aucun rapport) au lieu de sortir en non_juge | **oui** — payé en réel le 12/08 : ~50 min d'audit perdues et ZÉRO livrable produit, sur un projet dont les onze autres pans étaient mesurables — la régression coûte plus cher que le faux négatif qu'elle corrige |
 | TF-0104 | corrige | 4.5 | Tests : sélection par diff de code (test impact analysis), détection de flaky tests, squelettes property-based en proposition et échantillonnage de mutation piloté par le risque | **oui** — un audit complet coûte des dizaines de minutes là où un diff n'exige que quelques tests ; un flaky non détecté rend le verdict mutation non reproductible — le juge devient lui-même non fiable |
 | TF-0097 | corrige | 4 | forge-tests suppose une arborescence au lieu de lire la configuration que le projet déclare — deux pans rendus non mesurables à tort | **oui** — payé en réel le 11/08 : deux pans sur douze déclarés non mesurables à tort, avec un motif affirmant l'inexistence d'artefacts que l'audit venait de faire tourner |
 | TF-0098 | corrige | 3 | forge-tests lance `npx playwright test` sans vérifier qu'une config Playwright existe — « suite e2e en échec » au lieu de « aucune suite e2e » | **oui** — payé en réel le 11/08 : l'action rendue au rapport envoyait réparer une suite qui n'existe pas, en affirmant qu'elle est rouge |

@@ -537,3 +537,42 @@ vocabulaires contrôlés, UTF-8 sans BOM, 17/17 + bout-en-bout 8/8, zéro trace 
 pilot, dépôt public). Catalogue v1.2.0 (59 services, +cat-seo-07). 1 candidature nouvelle
 (scoring.md « quick win » vs schéma « quick-win », lot 7c041a2cefa5). Tranche Sonnet, 173 k
 tokens, 62 outils, 11 min, verte — escalade : aucune.
+
+## 12/08/2026 (soir) — mandat « Implémente les 10 candidats » : 11 items clos, l'écosystème passe à douze forges
+
+**Mandat humain** : « Implémente les 10 candidats », complété en session par trois décisions
+de structure (forge dédiée `digit-ai-forge-agents-security`, forge unique
+`digit-ai-forge-observability`, dépôts GitHub publics immédiats). TF-0122 — régression du
+correctif TF-0100 constatée en cours de journée — a été inclus au mandat sur décision pilot
+tracée (réparer sa propre régression relève du mandat qui l'a produite). 11 items clos.
+
+**Deux forges nées et publiées** : agents-security (scan statique CAP-1..4 + dynamique
+TC-1..5 fail-closed, 24 PASS) et observability (plans déclaratifs, snapshots append-only,
+dérive — 30 PASS). Intégration écosystème complète en un commit (`bafc30a`) : bootstrap,
+fiches, INVENTAIRE, CONTRAT §5, noyau (recompressé, 6 138 o), README, **schéma V12
+« Treize forges »** (édition chirurgicale sur copie, rendu render_page PASS + inspection
+visuelle — deux chevauchements introduits par le décalage détectés par l'oracle et corrigés),
+catalogue v1.3.0 (64 services). oracle-ecosysteme PASS 12/12.
+
+**Routage instrumenté (§4 bis)** — 8 tranches, zéro escalade :
+
+| Tranche | Modèle | Tokens | Outils | Durée | Verdict |
+|---|---|---|---|---|---|
+| seo TF-0121 | **Haiku** | 85 k | 35 | 2,6 min | vert (1re tranche Haiku — l'a priori « mécanique » tient) |
+| conception TF-0114 | Sonnet | 102 k | 50 | 7,5 min | vert |
+| agents-security TF-0111 (construction) | Sonnet | 134 k | 59 | 9,8 min | vert |
+| observability TF-0112 (construction) | Sonnet | 137 k | 46 | 9,8 min | vert |
+| agents TF-0118/0119 | Sonnet | 136 k | 71 | 14,6 min | vert |
+| development TF-0120 | Sonnet | 272 k | 100 | 26 min | vert |
+| tests TF-0122/0117/0116 | Sonnet | 288 k | 116 | ~78 min (3 reprises — l'agent s'endormait sur sa recette d'arrière-plan, relancé 2×) | vert |
+| pilot TF-0115 + intégration + schéma | Fable (session) | — | — | — | vert |
+
+**Faits saillants** : TF-0120 mesuré et non estimé (61,1 % → 94,25 % de mutation, Docker ×2,
+job CI bloquant) ; TF-0115 a détecté le jour même deux dérives documentaires nées des
+campagnes du matin ; TF-0122 avait coûté ~50 min sur Produit-01 (audit entier perdu) — fermé
+avec reproduction du cas réel ; la session tierce sur forge-tests a été intégralement
+préservée (diff identique début/fin de campagne), le try/finally de mutation.py reste
+suspendu à son commit (reste explicite de TF-0116).
+
+**Bilan registre** : 27 corrigés au total ce 12/08, 0 en cours, 0 candidat — la TODO est
+vide. Oracle R1-R10 PASS. Pushes : pilot + les 12 forges (dont les 2 créations GitHub).
