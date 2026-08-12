@@ -617,3 +617,12 @@ iot/jeu/cli hors périmètre ; critère générique versé au LISEZMOI des profi
 88 k/37/4,5 min · étude autres profils Sonnet 44 k/5/1,9 min · R-28 + intégration + schéma :
 pilot. Escalade : aucune. Sondages : self-tests rejoués, périmètres d'écriture inspectés
 (l'agent profils a similairement signalé et préservé les fichiers de session vivante).
+
+**TF-0126 clos (12/08, nuit)** : profils produit vague 2 (api-headless, e-commerce,
+extension-navigateur, desktop) sur mandat humain anticipant le « premier brief » — commit
+`46b0df0`, sources rafraîchies en recherche (OpenAPI 3.2.0, MV2/Chrome 138, Authenticode
+15 mois), section « Trou d'outillage » de desktop (delta forge-ops documenté, jamais
+improvisé). 7 profils actifs, chatbot seul en attente (vigilance R-28). Tranche Sonnet
+94 k / 47 outils / 5 min, escalade : aucune. Incident de process consigné : deux événements
+registre à id null écrits par le pilot (script sans garde) puis retirés avant commit —
+l'oracle R1-R10 les avait signalés ; garde ajoutée au geste (assert sur l'id).
