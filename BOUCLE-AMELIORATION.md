@@ -685,3 +685,14 @@ restauré par l'agent avant tout commit — transparence). Tranche Sonnet 214 k 
 recette section corpus rouge sur D-01 (suite e2e banc-rouge, getByTestId non visible) —
 reproduit avant/après par git stash, donc antérieur ; à instruire (fixture ou env du poste).
 Registre : 38+... items du jour archivés, actifs = 1 (ce nouveau candidat D-01).
+
+**TF-0136 clos (12/08) — D-01 : ce n'était pas un bug de la forge**. Cause racine prouvée :
+le port 4173 (défaut vite preview) était tenu par un `vite preview` d'Approval2 (PID 60184),
+et `reuseExistingServer:true` faisait tester SILENCIEUSEMENT la mauvaise appli — d'où le
+testid `lien-connexion` introuvable. Corrigé (`91b80fc`) : reuseExistingServer→false sur les
+deux bancs (échec fort + fin de la contamination croisée rouge↔vert), motif `_PORT_OCCUPE`
+prioritaire dans execution.py (« port occupé par un AUTRE processus » — jamais confondu avec
+« trace indisponible » TF-0132 ni « suite rouge »), 3 tests. pytest 123→126. Le vert de
+surface de la recette reste conditionné à la libération du port par l'humain (process d'un
+autre produit — garde-fou : non tué). Candidature déposée (lot 7768d224fe52) : migrer les
+bancs vers un port moins commun. Tranche Sonnet 135 k / 86 outils / 19 min, escalade : aucune.
