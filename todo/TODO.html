@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digit-AI — TODO-FORGE · Reste à faire — V20260811</title>
+  <title>Digit-AI — TODO-FORGE · Reste à faire — V20260812</title>
   <meta name="description" content="Reste-à-faire du registre TODO-FORGE : candidats à décider, décidés, en cours — décisions et commentaires à exporter pour le pilot.">
   <meta name="theme-color" content="#2563EB">
   <meta name="color-scheme" content="light">
@@ -89,24 +89,235 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>19181b91d860</code> · dernier événement 2026-08-11T15:04:54.363Z</p>
+      <p class="meta">sceau <code>8dffcc7e4731</code> · dernier événement 2026-08-12T06:52:47.897Z</p>
       <button id="exporter" type="button">Exporter les décisions</button>
       <span id="bilan" aria-live="polite">0 coché · 0 commentaire</span>
     </header>
     <p>Seul le <strong>reste-à-faire</strong> vit ici — les items clos partent à l'archive (<code>node todo\archiver.mjs</code>). Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au pilot — appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
     <p class="meta" id="note-score">La colonne « score » = <strong>valeur</strong> de l'item, calculée <code>gain × preuve ÷ effort</code> (composantes visibles dans le détail de chaque ligne) ; tri par défaut : statut puis score décroissant, ou au clic sur les en-têtes fléchés.</p>
     <div class="kpis">
-      <div class="kpi" title="3 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">3</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
+      <div class="kpi" title="17 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">17</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
       <div class="kpi" title="0 item(s) décidés dont les travaux ne sont pas ouverts"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts</span></div>
       <div class="kpi" title="1 campagne(s) ouvertes au registre"><span class="kpi-label">En cours</span><span class="kpi-value">1</span><span class="kpi-hint">campagnes ouvertes au registre</span></div>
       <div class="kpi" title="95 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">95</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende"><span class="leg-item"><span class="leg-swatch" style="background:var(--surface)"></span>candidat</span><span class="leg-item"><span class="leg-swatch" style="background:var(--teal-fill)"></span>décidé</span><span class="leg-item"><span class="leg-swatch" style="background:var(--amber-fill)"></span>en cours</span></p>
-    <nav class="toc" aria-label="Sommaire"><a href="#seo"><strong>seo</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant seo</span></a><a href="#tests"><strong>tests</strong> <span class="toc-d">3 item(s) reste-à-faire ciblant tests</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#agents"><strong>agents</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant agents</span></a><a href="#audit"><strong>audit</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant audit</span></a><a href="#conception"><strong>conception</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant conception</span></a><a href="#data"><strong>data</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant data</span></a><a href="#design"><strong>design</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant design</span></a><a href="#development"><strong>development</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant development</span></a><a href="#ops"><strong>ops</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant ops</span></a><a href="#organization"><strong>organization</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant organization</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">3 item(s) reste-à-faire ciblant pilot</span></a><a href="#seo"><strong>seo</strong> <span class="toc-d">2 item(s) reste-à-faire ciblant seo</span></a><a href="#tests"><strong>tests</strong> <span class="toc-d">5 item(s) reste-à-faire ciblant tests</span></a></nav>
     <main>
+    <section id="agents">
+      <h2>agents <span class="badge" title="1 item(s) actifs ciblant agents">1</span></h2>
+      <p class="ch-apprend meta">Ce chapitre liste les 1 item(s) du reste-à-faire dont la cible est agents : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
+      <div class="scroll"><table data-filterable>
+        <caption class="sr-only">Reste-à-faire ciblant agents — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
+        <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0106" aria-label="Décider TF-0106"></td>
+          <td class="c-id" data-th="id"><code>TF-0106</code></td>
+          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score" data-th="score">2</td>
+          <td data-th="item"><details><summary><strong>Agents : projection OTLP GenAI du ledger, budget gate avant appel modèle et oracle d'évals LLM-as-judge sur fixtures de régression</strong></summary>
+              <p>(1) Le ledger JSONL reste la bonne source de vérité (append-only) mais est un îlot : projeter chaque run en spans OpenTelemetry conformes aux GenAI Semantic Conventions (adoptées AWS/Azure/GCP/Datadog, et émises nativement par Claude Code) le rendrait lisible par tout backend d'observabilité — projection dérivée, format source inchangé. (2) Les gates G1-G3 sont structurels ; la pratique 2026 ajoute un budget gate (coût/tokens vérifiés avant tout appel). (3) Les 33 oracles jugent la conformité structurelle, pas la qualité sémantique des sorties d'agents : un oracle « agent-evals » (modèle juge distinct de l'exécutant, fixtures de régression versionnées, esprit Braintrust/Langfuse mais interne et gratuit) comblerait ce trou en restant dans la garde-fou zéro API payante.</p>
+              <p class="meta">Demandeur : campagne-catalogues (12/08) · 2026-08-12 · gain 2 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — les mesures de routage §4 bis se font aujourd'hui à la main depuis les relevés du harnais ; sans evals versionnées, une régression de qualité d'un agent ne se détecte qu'à l'incident</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0106" rows="1" aria-label="Commentaire TF-0106" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section id="audit">
+      <h2>audit <span class="badge" title="1 item(s) actifs ciblant audit">1</span></h2>
+      <p class="ch-apprend meta">Ce chapitre liste les 1 item(s) du reste-à-faire dont la cible est audit : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
+      <div class="scroll"><table data-filterable>
+        <caption class="sr-only">Reste-à-faire ciblant audit — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
+        <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0110" aria-label="Décider TF-0110"></td>
+          <td class="c-id" data-th="id"><code>TF-0110</code></td>
+          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score" data-th="score">2</td>
+          <td data-th="item"><details><summary><strong>Audit : dimension « gouvernance IA » (ISO 42001 / NIST AI RMF / EU AI Act), policy-as-code OPA sur un sous-ensemble des 169 contrôles, FinOps 2026 et pilier soutenabilité</strong></summary>
+              <p>(1) Les 17 dimensions ne couvrent pas le risque des systèmes IA/agents (dérive de modèle, human-in-the-loop, documentation de conformité EU AI Act — 2026 est l'année charnière) alors que l'écosystème audité ET l'auditeur sont pilotés par agents : point aveugle entier, pas une amélioration incrémentale. (2) Les contrôles CTL-Dxx-nn sont déclaratifs : une couche OPA/Rego + Conftest en transformerait un sous-ensemble en gate CI exécuté sur l'IaC réelle — alignement direct avec « oracle exécuté, jamais confiance ». (3) L'ADR0107 coûts est antérieur à la refonte FinOps Framework 2025/2026 (Scopes, maturité Crawl/Walk/Run par capability) — à réaligner. (4) Aucun domaine soutenabilité alors que les Well-Architected 2026 (AWS/Azure/GCP) en font un pilier de plein rang.</p>
+              <p class="meta">Demandeur : campagne-catalogues (12/08) · 2026-08-12 · gain 3 × preuve 2 ÷ effort 3 · <strong>payé en réel</strong> — un engagement client 2026 qui demande la conformité EU AI Act ne trouve aujourd'hui aucune dimension pour l'instruire ; les contrôles non exécutables se vérifient à l'œil — coût de revue et risque d'écart à chaque engagement</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0110" rows="1" aria-label="Commentaire TF-0110" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section id="conception">
+      <h2>conception <span class="badge" title="1 item(s) actifs ciblant conception">1</span></h2>
+      <p class="ch-apprend meta">Ce chapitre liste les 1 item(s) du reste-à-faire dont la cible est conception : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
+      <div class="scroll"><table data-filterable>
+        <caption class="sr-only">Reste-à-faire ciblant conception — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
+        <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0101" aria-label="Décider TF-0101"></td>
+          <td class="c-id" data-th="id"><code>TF-0101</code></td>
+          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score" data-th="score">3</td>
+          <td data-th="item"><details><summary><strong>Conception : scoring EARS par patron strict, « constitution » projet et deltas OpenSpec pour les runs de version</strong></summary>
+              <p>Trois écarts à l'état de l'art du requirements engineering 2026 :</p><ol><li>la validation actuelle (oracle-exigences, règles E7-E9) est un contrôle post-hoc binaire là où la référence (Jama Connect Advisor, Polarion Copilot 25.12) note chaque exigence contre les 5 patrons EARS stricts (ubiquitous, event-driven, state-driven, optional, unwanted) et propose des reformulations — une brique locale et déterministe (Node pur, zéro API payante) est faisable </li><li>pas d'équivalent du constitution.md de GitHub Spec Kit : les invariants non négociables du projet ne sont pas séparés d'EXIGENCES.json </li><li>pas de cycle delta propose/apply/archive façon OpenSpec pour faire évoluer un référentiel existant — directement utile au run de version (RUN-VERSION.md) que la forge n'outille pas</li></ol>
+              <p class="meta">Demandeur : campagne-catalogues (12/08) · 2026-08-12 · gain 3 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — chaque exigence mal formée passe le gate binaire actuel et se paie en aval (tests intraçables, under-build détecté tard) ; le run de version rattrape le socle à la main faute de deltas outillés</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0101" rows="1" aria-label="Commentaire TF-0101" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section id="data">
+      <h2>data <span class="badge" title="1 item(s) actifs ciblant data">1</span></h2>
+      <p class="ch-apprend meta">Ce chapitre liste les 1 item(s) du reste-à-faire dont la cible est data : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
+      <div class="scroll"><table data-filterable>
+        <caption class="sr-only">Reste-à-faire ciblant data — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
+        <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0108" aria-label="Décider TF-0108"></td>
+          <td class="c-id" data-th="id"><code>TF-0108</code></td>
+          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score" data-th="score">2</td>
+          <td data-th="item"><details><summary><strong>Data : 4e verbe « contractualiser » (data contracts ODCS v3.1), lineage au grain colonne et pont natif entre lineage@1 et les facets qualité OpenLineage</strong></summary>
+              <p>(1) STANDARDS-DATA.md écarte « Data Mesh » comme paradigme organisationnel mais ne statue pas sur les data contracts ODCS (Bitol/Linux Foundation, v3.1.0) — qui sont une discipline de run inspectable (YAML exécutable : schéma, SLA, propriétaire, versionnage) et le standard de facto 2026 de l'accord producteur↔consommateur ; aucun des 3 verbes ne couvre ce trou : ajouter « contractualiser » avec barre ODCS. (2) lineage@1 s'arrête au grain dataset (D-D1 assumée) alors qu'OpenLineage documente nativement le niveau colonne — requis pour que « restituer » trace un chiffre jusqu'à sa colonne source. (3) tracer et profiler sont cloisonnés côté formats alors qu'OpenLineage offre le pont natif (facet dataQualityAssertions) : l'exploiter éviterait un format de jointure maison.</p>
+              <p class="meta">Demandeur : campagne-catalogues (12/08) · 2026-08-12 · gain 2 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — sans contrat, tout écart producteur/consommateur se découvre à l'exécution chez le consommateur ; sans grain colonne, un chiffre restitué reste traçable seulement jusqu'au fichier — insuffisant pour l'audit d'un chiffre contesté</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0108" rows="1" aria-label="Commentaire TF-0108" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section id="design">
+      <h2>design <span class="badge" title="1 item(s) actifs ciblant design">1</span></h2>
+      <p class="ch-apprend meta">Ce chapitre liste les 1 item(s) du reste-à-faire dont la cible est design : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
+      <div class="scroll"><table data-filterable>
+        <caption class="sr-only">Reste-à-faire ciblant design — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
+        <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0102" aria-label="Décider TF-0102"></td>
+          <td class="c-id" data-th="id"><code>TF-0102</code></td>
+          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score" data-th="score">3</td>
+          <td data-th="item"><details><summary><strong>Design : pipeline tokens DTCG-first (tokens.css dérivé, plus source), baseline de régression visuelle versionnée et studio-de-direction enfin exercé</strong></summary>
+              <p>(1) Le format W3C DTCG a atteint sa première version stable le 28/10/2025 : tokens.css devrait devenir une SORTIE dérivée d'un .tokens.json DTCG (transformé Style Dictionary v4), ouvrant l'interopérabilité Figma Variables / multi-plateformes — aujourd'hui les tokens sont des custom properties CSS sans source pivot. (2) render_page.py juge le rendu en run ponctuel sans baseline versionnée ni historique — la référence (Chromatic/Percy) maintient des captures approuvées comparées à chaque changement. (3) studio-de-direction est un service fantôme (déclaré, jamais exercé) : l'outiller avec 2-3 variantes réellement rendues (le producteur d'images existe désormais, TF-0019/0020) et un oracle de divergence perceptuelle, ou le retirer du catalogue.</p>
+              <p class="meta">Demandeur : campagne-catalogues (12/08) · 2026-08-12 · gain 3 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — sans baseline, chaque revue graphique repart de zéro et une régression visuelle entre deux runs est indétectable ; sans DTCG, aucun pont outillé entre maquette, Figma et code — extraction manuelle à chaque marque</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0102" rows="1" aria-label="Commentaire TF-0102" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section id="development">
+      <h2>development <span class="badge" title="1 item(s) actifs ciblant development">1</span></h2>
+      <p class="ch-apprend meta">Ce chapitre liste les 1 item(s) du reste-à-faire dont la cible est development : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
+      <div class="scroll"><table data-filterable>
+        <caption class="sr-only">Reste-à-faire ciblant development — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
+        <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0103" aria-label="Décider TF-0103"></td>
+          <td class="c-id" data-th="id"><code>TF-0103</code></td>
+          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score" data-th="score">2</td>
+          <td data-th="item"><details><summary><strong>Development : isolation sandbox du mode unattended, score de mutation au gate, et contrôles CI spécifiques au code généré par IA</strong></summary>
+              <p>(1) Le mode « effets réels » (CONDUCTOR_ENABLE_REAL_BAD etc.) n'a aucune isolation processus (microVM/devcontainer) alors que Docker Sandboxes (30/01/2026) et la doc sécurité Claude Code en font le prérequis d'un agent autonome — les garde-fous actuels sont uniquement git. (2) Le double gate (ruff, mypy, pytest, design lint) mesure la couverture, pas la force des tests : la pratique 2026 pour le code IA ajoute un score de mutation (~75 %+, mutmut) — cohérent avec ce que forge-tests sait déjà mesurer. (3) Contrôles anti-patterns IA absents du gate : imports fantômes hors manifeste de dépendances, secrets en dur, autorisation des nouvelles routes. Écart de fond : conductor CLI reste inutilisable headless (D-V1) alors que l'exécution CI sans supervision est le standard des outils spec-driven 2026.</p>
+              <p class="meta">Demandeur : campagne-catalogues (12/08) · 2026-08-12 · gain 3 × preuve 2 ÷ effort 3 · <strong>payé en réel</strong> — un agent à effets réels non isolé peut endommager le poste (incidents 2026 documentés) ; une suite verte à couverture haute mais mutation faible laisse passer du code IA faux — le coût se paie au premier produit client</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0103" rows="1" aria-label="Commentaire TF-0103" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section id="ops">
+      <h2>ops <span class="badge" title="1 item(s) actifs ciblant ops">1</span></h2>
+      <p class="ch-apprend meta">Ce chapitre liste les 1 item(s) du reste-à-faire dont la cible est ops : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
+      <div class="scroll"><table data-filterable>
+        <caption class="sr-only">Reste-à-faire ciblant ops — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
+        <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0107" aria-label="Décider TF-0107"></td>
+          <td class="c-id" data-th="id"><code>TF-0107</code></td>
+          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score" data-th="score">2</td>
+          <td data-th="item"><details><summary><strong>Ops : canary local simulé, oracle O-6 de drift déclaré↔constaté et verdict « rollback recommandé » à seuils SLO fixés par l'humain</strong></summary>
+              <p>(1) La bascule actuelle est tout-ou-rien (healthcheck one-shot puis COURANT) ; le standard 2026 est progressif (1 %→5 %→100 %) avec analyse continue — un mode canary simulé dans ops.mjs préparerait la marche vers Argo Rollouts/Flagger sans cible k8s. (2) Rien ne compare l'état déclaré (plan.json) à l'état constaté après déploiement réel : un oracle O-6 « drift » fermerait le trou (les outils IaC 2026 détectent le changement manuel en moins de 6 h). (3) Le rollback est exclusivement manuel : un verdict « rollback recommandé » déclenché par seuils SLO préréglés par l'humain (latence, taux d'erreur, fenêtre post-bascule) réduirait le MTTR (-65 % rapporté) SANS violer la doctrine « ops outille, ne décide jamais » — le seuil est humain, l'exécution reste sur ordre.</p>
+              <p class="meta">Demandeur : campagne-catalogues (12/08) · 2026-08-12 · gain 2 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — O-2 ne rejoue le healthcheck qu'une fois : une dégradation qui apparaît 2 minutes après bascule n'est vue par personne jusqu'à l'utilisateur ; premier run MEP cloud (D-P1) exposé</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0107" rows="1" aria-label="Commentaire TF-0107" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section id="organization">
+      <h2>organization <span class="badge" title="1 item(s) actifs ciblant organization">1</span></h2>
+      <p class="ch-apprend meta">Ce chapitre liste les 1 item(s) du reste-à-faire dont la cible est organization : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
+      <div class="scroll"><table data-filterable>
+        <caption class="sr-only">Reste-à-faire ciblant organization — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
+        <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0109" aria-label="Décider TF-0109"></td>
+          <td class="c-id" data-th="id"><code>TF-0109</code></td>
+          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score" data-th="score">3</td>
+          <td data-th="item"><details><summary><strong>Organization : mécaniser les 8 décisions sans oracle, convertir D-01→D-12 au format MADR et packager un gate de conventions invocable en PR</strong></summary>
+              <p>(1) oracle-conventions.mjs ne mécanise que D-02, D-03, D-04, D-06 : les 8 autres décisions restent en prose invérifiable — l'écart le plus direct entre la doctrine annoncée et le vérifiable (la Phase 3 « vérificateur de conventions » n'a jamais démarré, D-O2). (2) Les décisions vivent en Markdown plat sans statut/contexte/conséquences/id stable : le format MADR est la pratique 2026 précisément pour que les agents IA ne « refactorent pas la raison » d'une décision — et forge-audit l'applique déjà (73 ADR MADR) : incohérence entre les deux forges de gouvernance. (3) Packager un gate de conventions type danger.js/conform, PROPOSÉ aux dépôts (jamais déployé unilatéralement — garde-fou pilot).</p>
+              <p class="meta">Demandeur : campagne-catalogues (12/08) · 2026-08-12 · gain 2 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — 8 décisions sur 12 ne peuvent ni PASS ni FAIL : la doctrine est déclarative là où la loi du pilot exige l'oracle exécuté ; le recouvrement D-01→D-12 ↔ REGLES-PROJET.md (D-O3) reste irréconciliable tant que les décisions n'ont pas d'ids stables</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0109" rows="1" aria-label="Commentaire TF-0109" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section id="pilot">
+      <h2>pilot <span class="badge" title="3 item(s) actifs ciblant pilot">3</span></h2>
+      <p class="ch-apprend meta">Ce chapitre liste les 3 item(s) du reste-à-faire dont la cible est pilot : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
+      <div class="scroll"><table data-filterable>
+        <caption class="sr-only">Reste-à-faire ciblant pilot — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
+        <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0113" aria-label="Décider TF-0113"></td>
+          <td class="c-id" data-th="id"><code>TF-0113</code></td>
+          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score" data-th="score">3</td>
+          <td data-th="item"><details><summary><strong>Fraîcheur documentaire : INVENTAIRE.md et fiches dérivent du réel (3 écarts constatés en une campagne) — oracle de fraîcheur transverse à instruire</strong></summary>
+              <p>Trois dérives constatées sur pièces le 12/08 :</p><ol><li>INVENTAIRE.md §4 affirme « aucune option --sortie » pour forge-tests alors que la CLI expose --sortie, --livrables, --precedent, --reprendre (ajoutées par la campagne du 09/08 — l'inventaire n'a pas suivi) </li><li>« 4 oracles, 14 règles » pour conception alors que le README de la forge dit 5 oracles, 20 règles (oracle-etat.mjs ajouté) </li><li>« 65 ADRs, 162 contrôles » pour audit alors que le dépôt en compte 73 et 169. La documentation de pilotage dérive plus vite que le code qu'elle décrit. Piste : oracle de fraîcheur qui confronte les comptages/options citées par INVENTAIRE.md et les fiches aux sources vérifiables (README des forges, --help des CLI), exécuté à chaque campagne — même esprit que K7 de oracle-catalogues.mjs, étendu à l'inventaire</li></ol>
+              <p class="meta">Demandeur : campagne-catalogues (12/08) · 2026-08-12 · gain 2 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — cette campagne a failli publier deux comptages faux dans le catalogue public (corrigés in extremis sur vérification) ; toute décision de routage prise sur l'INVENTAIRE périmé hérite de l'erreur</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0113" rows="1" aria-label="Commentaire TF-0113" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0111" aria-label="Décider TF-0111"></td>
+          <td class="c-id" data-th="id"><code>TF-0111</code></td>
+          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score" data-th="score">1</td>
+          <td data-th="item"><details><summary><strong>Nouvelle forge candidate : sécurité agentique (scan des tool calls, fixtures rouges d'attaques, red-teaming des agents compilés)</strong></summary>
+              <p>Aucune forge ne couvre la sécurité RUNTIME des agents : les gates G1-G3 de forge-agents sont anti-serial-collapse (structurels), les 33 oracles jugent des livrables — rien n'inspecte les invocations d'outils produites en exécution (patterns d'exfiltration, injection via skill, contournement de bac à sable). Le paysage 2026 a basculé : attaque étatique quasi-autonome documentée par Anthropic (80-90 % de l'exécution tactique portée par l'agent), scanners dédiés (Agent-Scan, MCP Safety Scanner). Périmètre proposé : scanner statique+dynamique des agent.def et tool calls, fixtures rouges d'attaques connues (chaîne d'admission au standard forge-agents), politique de moindre capacité vérifiable. Alternative moins lourde : extension de l'atelier qualité de forge-agents plutôt que forge dédiée — à trancher en décision humaine.</p>
+              <p class="meta">Demandeur : campagne-catalogues (12/08) · 2026-08-12 · gain 3 × preuve 1 ÷ effort 3 · <strong>payé en réel</strong> — le mode unattended de development et les campagnes multi-agents du pilot exécutent des tool calls sans aucune inspection — un skill ou un entrant compromis a aujourd'hui le champ libre jusqu'au garde-fou git</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0111" rows="1" aria-label="Commentaire TF-0111" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0112" aria-label="Décider TF-0112"></td>
+          <td class="c-id" data-th="id"><code>TF-0112</code></td>
+          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score" data-th="score">1</td>
+          <td data-th="item"><details><summary><strong>Nouvelle forge candidate : observabilité continue (dérive data, revue par commit, veille citation IA) — le trou transverse « one-shot vs continu »</strong></summary>
+              <p>Constat convergent des 4 rapports A3 : tout l'écosystème vérifie à froid/one-shot (audit forge-tests ponctuel, healthcheck one-shot, assertions data à l'instant T, audit SEO complet) alors que le marché 2026 traite le CONTINU comme une couche distincte : monitoring de dérive data (fraîcheur/volumétrie/distribution — Soda Core, YAML SodaCL, gratuit), revue à chaque commit (JiTTests/always-on reviewer), suivi de citation dans les réponses génératives (GEO/AEO, croissance +42,8 %/an du trafic crawlers IA). Trois périmètres regroupables en une forge « observabilité continue » ou à instruire séparément (data-observabilite, revue-continue, veille-ia) — le rythme d'exécution (par commit/par jour vs par run) change la nature de l'outil, ce qui justifie une forge distincte plutôt que des extensions. Décision humaine attendue sur le découpage.</p>
+              <p class="meta">Demandeur : campagne-catalogues (12/08) · 2026-08-12 · gain 3 × preuve 1 ÷ effort 3 · <strong>payé en réel</strong> — entre deux runs, personne ne regarde : une dérive de données, une régression de tests ou une chute de visibilité IA ne se découvre qu'au run suivant — des semaines plus tard sur un produit en production</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0112" rows="1" aria-label="Commentaire TF-0112" placeholder="commentaire…"></textarea></td>
+        </tr>
+        </tbody>
+      </table></div>
+    </section>
     <section id="seo">
-      <h2>seo <span class="badge" title="1 item(s) actifs ciblant seo">1</span></h2>
-      <p class="ch-apprend meta">Ce chapitre liste les 1 item(s) du reste-à-faire dont la cible est seo : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
+      <h2>seo <span class="badge" title="2 item(s) actifs ciblant seo">2</span></h2>
+      <p class="ch-apprend meta">Ce chapitre liste les 2 item(s) du reste-à-faire dont la cible est seo : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
       <div class="scroll"><table data-filterable>
         <caption class="sr-only">Reste-à-faire ciblant seo — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
         <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
@@ -122,16 +333,38 @@
             </details></td>
           <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0073" rows="1" aria-label="Commentaire TF-0073" placeholder="commentaire…"></textarea></td>
         </tr>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0105" aria-label="Décider TF-0105"></td>
+          <td class="c-id" data-th="id"><code>TF-0105</code></td>
+          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score" data-th="score">4.5</td>
+          <td data-th="item"><details><summary><strong>SEO : rendu JavaScript optionnel au crawl (Playwright), extraction JSON-LD automatisée, collecte CrUX outillée et ventilation du trafic des crawlers IA</strong></summary>
+              <p>Quatre trous d'instrumentation, la méthode restant saine : (1) crawler.py déclare lui-même (l.13, 359-362) l'absence de rendu JS — sur un site SPA, les nœuds 27 (Crawl) et 32 (Schema) mesurent un DOM tronqué sans pouvoir le distinguer d'un site pauvre ; Playwright est déjà dans l'écosystème (forge-tests, digit-ai-page-html) : un flag --rendu-js suffit. (2) Aucune extraction application/ld+json au crawl : le nœud 32 reste à méthode manuelle là où la référence combine extraction auto + Schema Markup Validator. (3) Le nœud 31 (Performance) n'appelle pas l'API CrUX (publique, gratuite) : collecte manuelle, variance entre auditeurs. (4) Les nœuds 29/58 ne ventilent pas le volume par agent IA nommé (GPTBot 12 %, ClaudeBot 9,2 % du trafic bot mondial — Cloudflare Radar 2026).</p>
+              <p class="meta">Demandeur : campagne-catalogues (12/08) · 2026-08-12 · gain 3 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — sur tout site JS-heavy, l'audit actuel sous-mesure structurellement deux nœuds sans le signaler — risque direct sur un livrable client facturé ; la collecte CWV manuelle n'est pas reproductible d'un auditeur à l'autre</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0105" rows="1" aria-label="Commentaire TF-0105" placeholder="commentaire…"></textarea></td>
+        </tr>
         </tbody>
       </table></div>
     </section>
     <section id="tests">
-      <h2>tests <span class="badge" title="3 item(s) actifs ciblant tests">3</span></h2>
-      <p class="ch-apprend meta">Ce chapitre liste les 3 item(s) du reste-à-faire dont la cible est tests : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
+      <h2>tests <span class="badge" title="5 item(s) actifs ciblant tests">5</span></h2>
+      <p class="ch-apprend meta">Ce chapitre liste les 5 item(s) du reste-à-faire dont la cible est tests : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
       <div class="scroll"><table data-filterable>
         <caption class="sr-only">Reste-à-faire ciblant tests — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
         <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0104" aria-label="Décider TF-0104"></td>
+          <td class="c-id" data-th="id"><code>TF-0104</code></td>
+          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score" data-th="score">4.5</td>
+          <td data-th="item"><details><summary><strong>Tests : sélection par diff de code (test impact analysis), détection de flaky tests, squelettes property-based en proposition et échantillonnage de mutation piloté par le risque</strong></summary>
+              <p>Quatre trous d'outillage vs l'état de l'art 2026 :</p><ol><li>--reprendre rejoue par pan, jamais par diff de commit — la pratique JiTTests (Meta) sélectionne au grain du test à partir du changement </li><li>aucun rejeu multiple pour isoler la non-déterminisme : un test flaky fausse silencieusement le score de mutation </li><li>le générateur G-1 ne propose pas de squelettes Hypothesis/fast-check pour les fonctions pures à forte combinatoire </li><li>l'échantillonnage de mutation (FORGE_TESTS_MUTANTS_PAR_MODULE=3) est régulier alors que la forge possède déjà un scoring de risque git qu'elle n'utilise pas pour orienter les mutants vers les modules à risque. À documenter aussi : le seuil mutation_globale 0,70 est sous la cible marché 2026 (~0,80) — choix de compromis à assumer explicitement ou à relever</li></ol>
+              <p class="meta">Demandeur : campagne-catalogues (12/08) · 2026-08-12 · gain 3 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — un audit complet coûte des dizaines de minutes là où un diff n'exige que quelques tests ; un flaky non détecté rend le verdict mutation non reproductible — le juge devient lui-même non fiable</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0104" rows="1" aria-label="Commentaire TF-0104" placeholder="commentaire…"></textarea></td>
+        </tr>
         <tr>
           <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0097" aria-label="Décider TF-0097"></td>
           <td class="c-id" data-th="id"><code>TF-0097</code></td>
@@ -165,6 +398,17 @@
             </details></td>
           <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0099" rows="1" aria-label="Commentaire TF-0099" placeholder="commentaire…"></textarea></td>
         </tr>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0100" aria-label="Décider TF-0100"></td>
+          <td class="c-id" data-th="id"><code>TF-0100</code></td>
+          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score" data-th="score">2.7</td>
+          <td data-th="item"><details><summary><strong>Routage react-router non reconnu : 8 routes réelles inventoriées à zéro, trois pans emportés en cascade, et le motif du SKIP nomme la mauvaise cause</strong></summary>
+              <p>Même loi que TF-0097, appliquée au front, avec un aggravant. Constat du 11/08 sur Produit-01 : le pan front inventorie 0 route. Or le produit en déclare HUIT en react-router dans frontend/src/App.tsx lignes 75-100 (/callback, /, /admin, /demandes, /demandes/new, /demandes/:id, /demandes/:id/review, *). L'adaptateur ne lit que frontend/src/routes.jsx ou la convention TanStack frontend/src/routes/**.tsx — react-router, l'un des routeurs React les plus répandus, n'est pas reconnu. CASCADE : la surface front à zéro emporte accessibilite (« aucune route », rien à rendre donc rien à juger) et visuel. Trois pans sur douze non mesurés à cause d'une seule convention non lue. AGGRAVANT — le motif ment sur la cause : visuel.analyser() sort SKIP dès que capturer() ne rend rien, avec le texte « front non servi : build absent, npm ou navigateur manquant » (visuel.py ligne 145). Vérifié sur pièces le 11/08 : frontend/dist/index.html existe (build de 13:37), npx et node sont dans le PATH, et trois versions de Chromium sont installées sous ms-playwright. Les trois causes nommées sont fausses ; la vraie est « zéro route inventoriée ». L'opérateur est envoyé vérifier trois choses qui vont bien, et ne peut pas trouver. CORRECTIF ATTENDU : reconnaître les &lt;Route path=&quot;…&quot;&gt; de react-router (et, plus généralement, dériver les routes du code plutôt que d'un fichier au nom conventionnel) ; et faire porter au SKIP la cause CONSTATÉE — distinguer « aucune route à capturer » de « front non servi », qui n'appellent pas le même travail.</p>
+              <p class="meta">Demandeur : audit-produit-01-20260811 · 2026-08-11 · gain 4 × preuve 2 ÷ effort 3 · <strong>payé en réel</strong> — payé en réel le 11/08 : trois pans sur douze non mesurés sur les deux cycles, et un motif de SKIP qui a envoyé chercher un build, un npm et un navigateur tous les trois présents</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0100" rows="1" aria-label="Commentaire TF-0100" placeholder="commentaire…"></textarea></td>
+        </tr>
         </tbody>
       </table></div>
     </section>
@@ -174,7 +418,7 @@
   <script>
   (function () {
     "use strict";
-    var SCEAU = "19181b91d860";
+    var SCEAU = "8dffcc7e4731";
     var cle = function (id, type) { return "todo-forge:" + SCEAU + ":" + id + ":" + type; };
     var coches = document.querySelectorAll("input.decider");
     var comms = document.querySelectorAll("textarea.commentaire");

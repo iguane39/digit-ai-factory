@@ -41,9 +41,9 @@ identifiants §3 bis), `ETAPE-MEP.md`, `BOUCLE-AMELIORATION.md` (journal des cam
 
 ## Lancement d'un run
 
-Point d'entrée unique : `PROMPT-PRODUIT.md`, **copié à la racine du projet produit** — la
-session s'ouvre dans le projet produit, jamais ici. Le run vit dans le projet produit
-(artefacts sous `forge\`, code à la racine). Séquence :
+Entrée : prompt d'usage du README → `references\ACCUEIL.md` (intention → catalogues →
+accord → run) ; `PROMPT-PRODUIT.md` : voie fichier. La session s'ouvre chez le produit,
+jamais ici ; le run y vit (`forge\`, code à la racine). Séquence :
 
 1. **Ouvrir le run** — socle projet + git local + oracle de conformité PASS ;
 2. **Conception** — 4 verbes → `EXIGENCES.json` scellé, 4 oracles verts ;
