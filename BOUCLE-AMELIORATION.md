@@ -576,3 +576,27 @@ suspendu à son commit (reste explicite de TF-0116).
 
 **Bilan registre** : 27 corrigés au total ce 12/08, 0 en cours, 0 candidat — la TODO est
 vide. Oracle R1-R10 PASS. Pushes : pilot + les 12 forges (dont les 2 créations GitHub).
+
+## 12/08/2026 (nuit) — étude d'opportunité : 4 forges candidates → 1 forge, 3 profils, 1 règle
+
+**Mandat humain** : analyse d'opportunité (cybersecurity, website, webapp, mobile) — analyse
+seulement, prompt barré/L99 au préalable. Livrable :
+`output\20260812-etude-opportunite-forges.md` (grille : partition → non-recouvrement cité
+contre le catalogue v1.3.0 → état de l'art sourcé → options tranchées → coût).
+
+**Verdicts** : cybersecurity → **forge dédiée recommandée** (modèle seo ; trou prouvé sur
+5 surfaces citées ; ASVS 5.0 comme contrat ; échéance externe CRA 11/09/2026) ·
+website/webapp/mobile → **un seul axe « type de produit »**, servi par des
+**profils-référentiels du pilot** (loi n° 4 + précédent BEST-PRACTICES-HTML ; la part
+machine est déjà outillée gratuitement — axe-core, CrUX, Lighthouse, validations stores) ;
+clause de réveil mobile natif au premier brief réel · **R-28 proposée** (critère d'admission
+d'une forge : verbes outillés + née exercée + cadence propre + surfaces le jour même ; un
+corpus sans verbe = référentiel) — sa fixture de validation : appliquée aux 4 candidats,
+elle redonne les verdicts rendus.
+
+**Instrumentation (§4 bis)** : 2 tranches recherche Sonnet (55 k/12 outils/1,6 min ;
+57 k/16 outils/1,6 min), 20 sources datées au total, escalade : aucune ; synthèse et
+non-recouvrement : pilot (citations vérifiées sur pièces). Zéro construction : git status
+des 12 forges inchangé, aucun dépôt créé. 3 candidatures ingérées (lot `0f1d020d1f60`) —
+la décision reste humaine : nom de la forge cyber (« websec » proposé), GO des profils,
+encodage R-28.
