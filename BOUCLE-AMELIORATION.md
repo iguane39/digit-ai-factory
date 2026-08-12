@@ -530,3 +530,10 @@ mutation 61,1 % à durcir.
 (dont TF-0111/0112 et les 7 nouveaux) ; oracle R1-R10 PASS, vue et page régénérées (sceau
 06a3a32f3c10). Push des campagnes forges : décidé par le mandat de ce jour, effectué après
 vérification par sondage.
+
+**TF-0073 clos (12/08, fin de journée)** : `livrables-gen.py` remis par l'humain en `input\`,
+généralisé en `scripts\scorer_actions.py` chez forge-seo (`bc7341d`) — score recalculé,
+vocabulaires contrôlés, UTF-8 sans BOM, 17/17 + bout-en-bout 8/8, zéro trace client (grep
+pilot, dépôt public). Catalogue v1.2.0 (59 services, +cat-seo-07). 1 candidature nouvelle
+(scoring.md « quick win » vs schéma « quick-win », lot 7c041a2cefa5). Tranche Sonnet, 173 k
+tokens, 62 outils, 11 min, verte — escalade : aucune.
