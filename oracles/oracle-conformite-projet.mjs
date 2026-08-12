@@ -51,6 +51,29 @@ function* fichiers(dossier, prof = 0) {
 }
 const rel = (f) => relative(cible, f).replaceAll("\\", "/");
 
+// TF-0128 : recherche dédiée des lockfiles — 2 niveaux de descente au plus (racine, puis
+// deux sous-niveaux), exclusions node_modules/.venv/dist/build (distincte de `fichiers()`,
+// utilisée ailleurs à profondeur 6 pour les livrables).
+const IGNORES_LOCK = new Set(["node_modules", ".venv", "dist", "build"]);
+function* fichiersLock(dossier, prof = 0) {
+  if (prof > 2 || !existsSync(dossier)) return;
+  for (const e of readdirSync(dossier)) {
+    if (IGNORES_LOCK.has(e)) continue;
+    const chemin = join(dossier, e);
+    const st = statSync(chemin);
+    if (st.isDirectory()) yield* fichiersLock(chemin, prof + 1);
+    else yield chemin;
+  }
+}
+
+// TF-0128(c) : sources_de_verite du frontmatter peut lister un manifeste épinglé hors nom
+// canonique (ex. azure/backend-requirements.txt) — lu en priorité, sans contrainte de nom.
+const sourcesDeVerite = (front) => {
+  const m = front.match(/^sources_de_verite\s*:\s*\[([^\]]*)\]/m);
+  if (!m) return [];
+  return m[1].split(",").map((s) => s.trim().replace(/^["']|["']$/g, "")).filter(Boolean);
+};
+
 // R-1..R-3 — structure
 for (const [n, d] of [["R-1", "input"], ["R-2", "output"], ["R-3", "docs"]])
   existsSync(p(d)) ? ok(n, d + "/", "présent") : ko(n, d + "/", `dossier ${d}\\ absent de la racine`);
@@ -281,12 +304,24 @@ else {
       const m = l.match(/^[ \t]+([\w@\/.–-]+)\s*:\s*"([^"]+)"/);
       if (m && !m[1].startsWith("#")) paires.push([m[1], m[2]]);
     }
-    // TF-0088 : lockfiles cherchés dans TOUT l'arbre (monorepo : frontend/yarn.lock…),
-    // plus seulement à la racine ; yarn.lock et pnpm-lock.yaml rejoignent la liste.
-    const NOMS_LOCK = new Set(["package-lock.json", "yarn.lock", "pnpm-lock.yaml", "pyproject.toml", "poetry.lock", "uv.lock", "requirements.txt", "Cargo.lock", "go.sum", "composer.lock", "Gemfile.lock"]);
-    const locks = [...fichiers(cible)].filter((f) => NOMS_LOCK.has(basename(f))).map((f) => readFileSync(f, "utf8"));
+    // TF-0088 puis TF-0128(a)(b) : lockfiles cherchés sur 2 niveaux de descente au plus
+    // (monorepo : frontend/yarn.lock…), exclusions node_modules/.venv/dist/build ; yarn.lock,
+    // pnpm-lock.yaml et bun.lockb rejoignent la liste des noms canoniques.
+    const NOMS_LOCK = new Set(["package-lock.json", "yarn.lock", "pnpm-lock.yaml", "bun.lockb", "pyproject.toml", "poetry.lock", "uv.lock", "requirements.txt", "Cargo.lock", "go.sum", "composer.lock", "Gemfile.lock"]);
+    // TF-0128(c) : sources_de_verite déclarées lues en priorité, même sous un nom non
+    // canonique (ex. azure/backend-requirements.txt) — le frontmatter les a déjà listées.
+    const sourcesDeclarees = sourcesDeVerite(front)
+      .map((s) => p(s))
+      .filter((f) => existsSync(f) && statSync(f).isFile());
+    const locks = [
+      ...sourcesDeclarees.map((f) => readFileSync(f, "utf8")),
+      ...[...fichiersLock(cible)].filter((f) => NOMS_LOCK.has(basename(f))).map((f) => readFileSync(f, "utf8")),
+    ];
     if (!paires.length) so("R-21", "TECHNOS.md sans bloc versions: renseigné — fraîcheur non jugeable (déclarer les versions clés)");
-    else if (!locks.length) so("R-21", "aucun lockfile/manifeste dans l'arbre du projet — fraîcheur non jugeable");
+    // TF-0128(d) : des versions SONT déclarées mais aucune source n'a pu les confronter —
+    // FAIL de configuration, jamais SANS_OBJET (le silence ressemblait à un succès, cas
+    // réel BAV2 : 25 versions jamais confrontées).
+    else if (!locks.length) ko("R-21", "docs\\projet\\TECHNOS.md", `${paires.length} version(s) déclarée(s) mais aucun lockfile/manifeste trouvé (arbre sur 2 niveaux, ni sources_de_verite résolvable) — FAIL de configuration, pas une absence d'objet`);
     else {
       let ok21 = true;
       for (const [nom, ver] of paires) {
@@ -396,7 +431,7 @@ const nonJuge = [
   "R-15 (marqueurs « à fournir » exhaustifs) : l'oracle ne sait pas quelles variables sont tierces",
   "input\\ non jugé en nommage : les entrants humains arrivent tels quels",
   "seule la PRÉSENCE de CLAUDE.md/README est jugée, pas la pertinence de leur contenu",
-  "R-21 : correspondance nom+version par inclusion textuelle dans les lockfiles — pas de résolution sémantique de graphes de dépendances",
+  "R-21 : correspondance nom+version par inclusion textuelle dans les lockfiles — pas de résolution sémantique de graphes de dépendances ; recherche bornée à 2 niveaux de descente (hors sources_de_verite déclarées, lues où qu'elles soient) — un lockfile plus profond que 2 niveaux et non déclaré reste invisible",
   "R-23 : motifs de secrets forts uniquement — un mot de passe réaliste inventé sans motif connu passe (revue humaine + gitleaks en CI)",
   "R-24 : seules les URLs http(s) des lignes d'environnement de PARAMETRAGE.md sont jugées — URLs documentaires du corps et hôtes sans schéma (BDD) hors périmètre ; la correspondance <nom-appli> ↔ nom réel du produit reste une revue humaine",
   "R-26 : ancrage par inclusion textuelle du nom de table dans la provenance — la complétude INVERSE (toute table du DDL figure au doc) et l'exactitude des colonnes ne sont pas jugées (revue de schéma) ; la fraîcheur des projections HTML n'est pas datée (régénération = discipline d'étape)",
