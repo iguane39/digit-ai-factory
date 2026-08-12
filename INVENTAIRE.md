@@ -44,8 +44,8 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
   `ton` et `contraintes reprises` comme **non dérivables** → point de reprise humain structurel.
 - **Sorties** : produites « là où l'agent travaille » — aucune convention d'emplacement, aucun ledger de run
   (pourtant exigé par `studio-de-direction/references/run.md` sans chemin ni format).
-- **Oracles** : 5 oracles Node, 34 règles (slop S1-S10, tokens T1-T6, mobile M1-M6, images I1-I6, corpus C1-C6),
-  self-test exécuté au vert le 04/08 (« 5 oracles, 34 règles verrouillées »), corpus 123 entrées toutes sourcées.
+- **Oracles** : 8 oracles Node, 48 règles (slop S1-S10, tokens T1-T6, mobile M1-M6, images I1-I6, corpus C1-C6,
+  motion, DTCG D1-D3, baseline B1-B3 — TF-0102 du 12/08), self-test rejoué au vert le 12/08, corpus 123+ entrées sourcées.
 - **Maturité** : couche qualité niveau production ; couche produit en chantier — git sans aucun commit, `dist/`
   désynchronisé des oracles, **3 critères bloquants sans exécutant** (C1 `render_page.py` absent du poste,
   C6 `oracle-claims` et C7 `oracle-nommage` non pointés), producteur d'images Gemini spécifié mais non implémenté,
@@ -214,16 +214,18 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
 
 - **Rôle** : **discipline de la donnée** des runs — la qualité en assertions exécutables
   (**profiler**), le lineage déclaré complet (**tracer**), les chiffres ancrés à leurs
-  sources (**restituer**). Trois oracles au niveau de trois barres validées (registre
-  la-barre) : Great Expectations, OpenLineage, dbt-core.
+  sources (**restituer**), l'accord producteur↔consommateur scellé (**contractualiser**,
+  TF-0108 du 12/08). Quatre oracles au niveau de quatre barres/standards (registre
+  la-barre) : Great Expectations, OpenLineage (grain colonne), dbt-core, ODCS v3.1.
 - **Frontière (verdict de non-recouvrement, phase 1 TF-0083)** : composition stricte — le
   profiling de datasets reste à `data-quality-auditor` (appelé), la police des montants
   documentaires à `oracle-claims`, la couverture du pan data produit à forge-tests, la
   gouvernance d'architecture à forge-audit. Le trou unique comblé : **aucun outil de
   lineage exigible n'existait**.
-- **Point d'entrée réel** : `node oracles/oracle-{profiler,tracer,restituer}.mjs <artefact>`
-  (contrat JSON, exit 0/1/2, non_juge) ; formats maison `forge-data/assertions@1` et
-  `forge-data/lineage@1` ; rapports à frontmatter `chiffres:` + `lineage_ref:`.
+- **Point d'entrée réel** : `node oracles/oracle-{profiler,tracer,restituer,contractualiser}.mjs <artefact>`
+  (contrat JSON, exit 0/1/2, non_juge) ; formats maison `forge-data/assertions@1`,
+  `forge-data/lineage@1` (grain colonne optionnel) et `forge-data/contrat@1` ;
+  rapports à frontmatter `chiffres:` + `lineage_ref:`.
 - **Fond de savoir** : `references/REX-DATA.md` — 12 patterns de rétro-ingénierie et de
   lineage issus d'un chantier réel, anonymisés (zéro client, vérifié par grep), avec portée
   générique/contingente ; `references/STANDARDS-DATA.md` — standards retenus/écartés sourcés.
@@ -245,7 +247,7 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
 | organization *(08/08)* | non (conversationnel) | partiel (1 oracle vérifié, pas de self-test projet) | oui (doctrine + composant) |
 | audit *(10/08)* | via submodule `auditcore/` (non peuplé au clone shallow) | à détailler (contrôles dans auditcore) | **oui** (engagement Client-A, 2 CI vertes) |
 | ops *(11/08)* | **oui** (CLI `ops.mjs`, exit 0/1 ; oracle O-1…O-4 exit 0/1/2) | **oui** (self-test 14 PASS, déploiement réel rejoué) | **oui** (fixture d'acceptation : staging local + rollback prouvé) |
-| data *(11/08)* | **oui** (3 oracles CLI, exit 0/1/2) | **oui** (self-test double sens 15 PASS) | non (v0 neuve — REX réel anonymisé comme fond) |
+| data *(11/08)* | **oui** (4 oracles CLI, exit 0/1/2) | **oui** (self-test double sens 30 PASS, 12/08) | non (v0 neuve — REX réel anonymisé comme fond) |
 
 Trois conséquences d'architecture :
 1. **Le pilot est le seul conducteur légitime** — Conception l'interdit chez elle, Development l'ignore,
