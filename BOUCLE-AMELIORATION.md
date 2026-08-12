@@ -707,3 +707,19 @@ sans mutant résiduel sur disque (vérifié), versée en candidature séparée (
 à ventiler par pan et diagnostiquer). Je n'ai pas maquillé : mandat de migration rempli,
 recette toujours rouge pour une cause nouvelle et nommée. Fait par le pilot en direct (change
 chirurgical à 2 lignes × 4 fichiers, sous mandat explicite), vérif pytest 126 + recette réelle.
+
+## 12/08/2026 — étude d'opportunité « spécialisations forge-data par moteur »
+
+**Mandat humain** (prompt barré L99) : pertinence de 4 spécialisations forge-data (Databricks,
+Oracle, Postgres, Azure SQL). Analyse seulement — `output\20260812-etude-forge-data-moteurs.md`.
+
+**Verdict** : NE PAS créer 4 spécialisations. Grille R-28 : les formats de forge-data
+(assertions@1/contrat@1/lineage@1) sont agnostiques du moteur et jugent des artefacts, jamais
+une connexion. Le seul trou réel n'est pas par moteur mais **un verbe d'import unique**
+(`importer` : parser un schéma EXPORTÉ → brouillon d'assertions/contrat, zéro connexion,
+Postgres-first car seul artefact 100 % libre pour la fixture). Le « par moteur » est du
+**dialecte** = profils-moteur versionnés (loi n° 4, créés au premier run réel, pas d'avance).
+Databricks traité à part (lakehouse + lineage colonne Unity Catalog → traducteur B différé,
+artefact payant). Connecteur live refusé (garde-fou paiement — première dépendance externe
+payante de l'écosystème sinon). 3 candidatures (lot 18e202a0ce8e). Recherche Sonnet 68 k /
+17 outils / 2,8 min, 8+ sources datées ; escalade aucune ; zéro écriture dans forge-data.
