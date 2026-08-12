@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=286768c0bb56 archive=7dc34b9e2932 · dernier événement: 2026-08-12T12:56:39.304Z -->
+     sceaux: actifs=9622d9e75d98 archive=466962dfb36e · dernier événement: 2026-08-12T14:44:52.960Z -->
 
-**2 actifs** (candidat 2 · décidé 0 · en cours 0 · corrigé 0 · écarté 0) · **134 archivés**.
+**1 actifs** (candidat 1 · décidé 0 · en cours 0 · corrigé 0 · écarté 0) · **136 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,8 +11,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0135 | candidat | 5 | L'analyse des gardes ne lit QUE main.py : tout code 400/409 déclaré par un projet à routeurs devient une divergence BLOQUANTE fausse | **oui** — payé en réel le 12/08 : déclarer les codes d'erreur au schéma OpenAPI — le correctif que l'audit lui-même réclamait — a fait apparaître 3 divergences bloquantes fausses sur un code inchangé |
-| TF-0132 | candidat | 4 | Pan front : « --trace on » forcé en dur, et une trace indisponible se lit « votre suite e2e est rouge » | **oui** — payé en réel le 12/08 : le pan front a dû être EXCLU du run d'audit final pour ne pas produire un « suite e2e en échec » sur une suite verte de bout en bout |
+| TF-0136 | candidat | 3 | Recette forge-tests : la section corpus rate D-01 (front) — suite e2e du banc-rouge en échec réel sur getByTestId('lien-connexion') | **oui** — la recette du banc ne peut pas prononcer S-01 vert tant que D-01 est rouge — le banc de démonstration de la forge, censé prouver la détection, est lui-même en échec sur ce poste |
 
 ---
 Détail d'un item : `grep '"id":"TF-xxxx"' todo/TODO.jsonl` (tous ses événements). Archive : même commande sur TODO-ARCHIVE.jsonl.
