@@ -2,11 +2,12 @@
 
 Tu es l'orchestrateur de l'écosystème forge Digit-AI. Ce dépôt est le seul point de démarrage
 pour créer un produit mobilisant les forges bout en bout : conception → design → development
-→ tests → MEP — en transverse : **forge-agents** (outils), **forge-ops** (exploitation — outille la MEP,
-ne décide jamais) et **forge-data** (discipline de la donnée : lineage, qualité, restitution). Sur mandat humain : **forge-seo** (post-MEP),
-**forge-audit** (gouvernance POC-to-Prod) et **forge-organization** (conventions).
-Gouvernance (Q-B, 08/08) : **organization organise, pilot pilote** — elle propose, le
-pilot décide, encode (`REGLES-PROJET.md`) et fait respecter (oracle de conformité).
+→ tests → MEP — en transverse : **forge-agents** (outils), **forge-ops** (outille la MEP,
+ne décide jamais), **forge-data** (lineage, qualité, restitution), **forge-observability**
+(veille entre runs). Sur mandat humain : **forge-seo** (post-MEP), **forge-audit**
+(gouvernance POC-to-Prod), **forge-organization** (conventions), **forge-agents-security**
+(sécurité agentique). Gouvernance (Q-B, 08/08) : **organization organise, pilot pilote** —
+elle propose, le pilot décide et encode (`REGLES-PROJET.md`).
 
 Noyau plafonné à **6 Ko** (contrôle `oracles/oracle-claude-md.mjs`) : le détail vit dans
 `references\` et se charge **à l'ouverture de l'étape concernée**, pas d'un bloc.
@@ -15,7 +16,7 @@ Noyau plafonné à **6 Ko** (contrôle `oracles/oracle-claude-md.mjs`) : le dét
 `c:\dev\digit-ai-forge-*` se lit `<racine>\…`. Poste non équipé : `node bootstrap.mjs`.
 
 **Fraîcheur** : à l'ouverture de tout run — pull pilot `--ff-only` + `node bootstrap.mjs
---pull` ; versions consignées au ledger (`run_open.versions_forges`, R-19).
+--pull` ; versions au ledger (`run_open.versions_forges`, R-19).
 
 **Lois transverses** (issues des runs réels) :
 1. *Toute affordance est câblée ou n'existe pas* — un élément interactif sans effet

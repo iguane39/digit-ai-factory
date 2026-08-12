@@ -35,6 +35,10 @@ const FORGES = [
   // forge-data : discipline de la donnée (profiler/tracer/restituer) aux niveaux des barres
   // OpenLineage/Great Expectations/dbt (TF-0083, révision tracée de l'écartement du 08/08).
   { nom: "digit-ai-forge-data", preuve: "oracles/self-test.mjs" },
+  // forge-agents-security : sécurité agentique (TF-0111, 12/08) — le juge ne vit pas chez le jugé.
+  { nom: "digit-ai-forge-agents-security", preuve: "oracles/self-test.mjs" },
+  // forge-observability : observabilité continue entre les runs (TF-0112, 12/08).
+  { nom: "digit-ai-forge-observability", preuve: "oracles/self-test.mjs" },
 ];
 
 const args = process.argv.slice(2);
