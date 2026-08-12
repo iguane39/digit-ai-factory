@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=2d57f6ca593b archive=3eb4a8fa16f9 · dernier événement: 2026-08-12T12:48:49Z -->
+     sceaux: actifs=ac5bcf56aad2 archive=3eb4a8fa16f9 · dernier événement: 2026-08-12T13:04:25Z -->
 
-**39 actifs** (candidat 3 · décidé 0 · en cours 0 · corrigé 34 · écarté 2) · **96 archivés**.
+**40 actifs** (candidat 2 · décidé 0 · en cours 0 · corrigé 36 · écarté 2) · **96 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -38,7 +38,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0133 | candidat | 6 | forge-design : règle d'oracle « bascule sombre » — présente, câblée, AA dans les deux thèmes (aval R-30) | **oui** — sans règle native, chaque revue graphique devra re-vérifier la bascule à la main — et un toggle mort passerait les 48 règles actuelles sans FAIL |
+| TF-0133 | corrige | 6 | forge-design : règle d'oracle « bascule sombre » — présente, câblée, AA dans les deux thèmes (aval R-30) | **oui** — sans règle native, chaque revue graphique devra re-vérifier la bascule à la main — et un toggle mort passerait les 48 règles actuelles sans FAIL |
 | TF-0102 | corrige | 3 | Design : pipeline tokens DTCG-first (tokens.css dérivé, plus source), baseline de régression visuelle versionnée et studio-de-direction enfin exercé | **oui** — sans baseline, chaque revue graphique repart de zéro et une régression visuelle entre deux runs est indétectable ; sans DTCG, aucun pont outillé entre maquette, Figma et code — extraction manuelle à chaque marque |
 
 ## development
@@ -64,9 +64,9 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0134 | candidat | 6 | Skill digit-ai-page-html : verser le pattern S-G1 (bascule sombre) au boilerplate + règle check_html « toggle mort = FAIL » (aval R-30) | **oui** — tant que le boilerplate ignore S-G1, chaque page naît non conforme R-30 et se rattrape après coup ; et check_html donne un PASS trompeur sur un toggle mort |
 | TF-0128 | corrige | 9 | R-21 est aveugle dès que les lockfiles ne sont pas à la racine, et ignore yarn.lock — la fraîcheur des versions n'est jamais jugée sur un dépôt multi-composants | **oui** — sur Produit-11, 25 versions déclarées dans TECHNOS.md n'ont été confrontées aux lockfiles par AUCUN oracle — la vérification a dû être refaite à la main pendant le run ; tout dépôt front+back (la disposition la plus courante) est dans le même cas, ce qui vide R-21 de son effet là où elle sert le plus |
 | TF-0124 | corrige | 6 | Profils produit website/webapp/mobile : référentiels versionnés du pilot consommés par les forges — pas de nouvelles forges | **oui** — aujourd'hui le savoir par type de produit est implicite (development suppose la webapp SaaS, design porte M1-M6 sans profil déclaré) : chaque run le redécouvre en session — un profil daté-sourcé le rend routable par ACCUEIL et challengeable en fraîcheur |
+| TF-0134 | corrige | 6 | Skill digit-ai-page-html : verser le pattern S-G1 (bascule sombre) au boilerplate + règle check_html « toggle mort = FAIL » (aval R-30) | **oui** — tant que le boilerplate ignore S-G1, chaque page naît non conforme R-30 et se rattrape après coup ; et check_html donne un PASS trompeur sur un toggle mort |
 | TF-0123 | corrige | 4.5 | Nouvelle forge : sécurité du produit web livré (proposition : digit-ai-forge-websec) — verbes outillés prouvés, échéance CRA 09/2026 | **oui** — aucun service de l'écosystème ne juge l'exposition runtime ni les dépendances vulnérables d'un produit livré ; le CRA rend le signalement obligatoire dès le 11/09/2026 — chaque MEP d'ici là part sans contrat de sécurité vérifiable |
 | TF-0125 | corrige | 4 | R-28 : critère d'admission d'une nouvelle forge — verbes outillés + née exercée + cadence propre + surfaces le jour même ; un corpus sans verbe = référentiel | **oui** — sans critère encodé, chaque proposition de forge rejoue le débat de zéro et le risque de forge-corpus (matrice type × étape) reste ouvert — 4 candidatures en un jour l'ont prouvé |
 | TF-0126 | corrige | 4 | Profils produit vague 2 : api-headless, e-commerce, extension-navigateur, desktop — création anticipée sur mandat humain | **oui** — quatre types de produit à probabilité forte/moyenne d'entrée au pipeline n'ont ni standards routables ni mapping — le premier brief de chacun redécouvrirait tout en session |
@@ -91,6 +91,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0135 | candidat | 5 | L'analyse des gardes ne lit QUE main.py : tout code 400/409 déclaré par un projet à routeurs devient une divergence BLOQUANTE fausse | **oui** — payé en réel le 12/08 : déclarer les codes d'erreur au schéma OpenAPI — le correctif que l'audit lui-même réclamait — a fait apparaître 3 divergences bloquantes fausses sur un code inchangé |
 | TF-0132 | candidat | 4 | Pan front : « --trace on » forcé en dur, et une trace indisponible se lit « votre suite e2e est rouge » | **oui** — payé en réel le 12/08 : le pan front a dû être EXCLU du run d'audit final pour ne pas produire un « suite e2e en échec » sur une suite verte de bout en bout |
 | TF-0116 | corrige | 9 | forge-tests : bug G-1 dans la version en cours d'édition de mutation.py (session tierce) — mutant non restauré après audit | **oui** — un mutant non restauré corrompt silencieusement le banc : tous les audits suivants mesurent un corpus faux — c'est un G-1 (le juge altère ce qu'il juge) |
 | TF-0117 | corrige | 6 | forge-tests : dashboard du banc-rouge en échec check_html — « NULL » littéral ×24 dans les cellules d'un tableau | **oui** — le dashboard est un livrable client du cycle de tests : 24 « NULL » à l'écran sur le banc de démonstration même de la forge |
