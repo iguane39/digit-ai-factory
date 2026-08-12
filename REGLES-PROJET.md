@@ -117,6 +117,32 @@ n'est encodé sans décision, rien de décidé n'est laissé sans encodage trac�
 Q4 (conventions internes aux fichiers) reste ouverte **côté organization** — pas une
 décision pilot tant qu'aucune proposition n'est remise.
 
+## H. Admission d'une nouvelle forge (règle 28 — décidée le 12/08, TF-0125)
+
+Issue de l'étude d'opportunité du 12/08 (`output\20260812-etude-opportunite-forges.md`),
+qui a départagé 4 candidatures avec ce critère (fixture de validation : appliqué aux 4,
+il redonne les verdicts rendus — 1 forge, 3 profils).
+
+**R-28.** Une forge naît si et seulement si :
+1. elle porte **≥ 2 verbes outillés exécutables** qui n'existent dans aucune forge —
+   prouvé par un **verdict de non-recouvrement écrit** citant le catalogue de services ;
+2. sa v0 naît **exercée** : oracles propres à self-test double sens, fixtures synthétiques
+   (précédents : forge-data TF-0083, agents-security/observability TF-0111/0112) ;
+3. elle a une **cadence ou un mandat propres** qui la distinguent d'une extension d'une
+   forge existante ;
+4. son intégration des surfaces écosystème (bootstrap, fiche, INVENTAIRE, CONTRAT,
+   noyau, README, schéma, catalogue) est livrée **le jour même** — `oracle-ecosysteme`
+   fait foi.
+
+**Corollaire** : un corpus de savoir sans verbe outillé est un **référentiel versionné**
+(frontmatter daté-sourcé, fraîcheur par claims — `profils\`, `references\`), jamais une
+forge (loi transverse n° 4).
+
+Contrôle exécutable : périmètre écosystème (pas socle produit) → R-28 ne rentre pas dans
+`oracle-conformite-projet` ; les points 2 et 4 sont déjà tenus par les self-tests des
+forges et `oracle-ecosysteme` ; la mécanisation du point 1 (verdict de non-recouvrement
+exigé dans la fiche de naissance) est consignée comme reste de TF-0125.
+
 ## Conflits à trancher (ta décision explicite)
 
 - **C1 — `Old\` vs git (n° 6/7)** : deux magasins de versions divergent toujours. Proposition :
