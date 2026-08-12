@@ -633,3 +633,12 @@ stats non primaires (halucination « 71-89 % ») : le doute marqué plutôt que 
 affirmé. Au passage : les 2 sidecars dormants d'`input\` (r21-lockfiles du 11/08,
 socle-docs-projet) enfin ingérés (lots `d00b0a9043fe`, `731c8f3e7856` — 3 candidatures,
 décision humaine). Tranche Sonnet 83 k / 35 outils / 4,5 min, escalade : aucune.
+
+**TF-0128/0129/0130 traités (12/08, nuit)** : R-21 réécrite (`b507ff6` — monorepos vus,
+sources_de_verite lues, versions sans source = FAIL ; self-test 5→6 PASS, fixture rouge
+reproduisant Produit-11). TF-0129 et TF-0130 **écartés en doublons** : les sidecars du 11/08
+décrivaient des défauts corrigés le jour même (TF-0086/0087/0091) — l'agent l'a prouvé par
+lecture directe au lieu de re-livrer, et l'ingestion du 12/08 n'avait pas détecté le
+recouvrement. Leçon consignée : **vérifier le recouvrement avec l'archive avant d'ingérer
+un sidecar dormant** (candidature possible : contrôle de similarité à l'ingestion).
+Tranche Sonnet 136 k / 46 outils / 8 min, escalade : aucune.
