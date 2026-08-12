@@ -84,8 +84,14 @@ genere("generer-modele-donnees.mjs", "MODELE-DONNEES.md");
 // TF-0088 : lockfile HORS racine (monorepo) — R-21 doit le trouver et y vérifier left-pad
 mkdirSync(join(verte, "frontend"), { recursive: true });
 writeFileSync(join(verte, "frontend", "yarn.lock"), 'left-pad@^1.3.0:\n  version "1.3.0"\n');
+// TF-0128(a) : bun.lockb rejoint la liste des noms canoniques, retrouvé par le scan seul.
+writeFileSync(join(verte, "bun.lockb"), 'esbuild@0.21.0\n');
+// TF-0128(c) : manifeste épinglé HORS nom canonique (cas réel Produit-11 : azure/backend-requirements.txt) —
+// non trouvable par le scan (nom pas dans NOMS_LOCK), lu uniquement parce que sources_de_verite le déclare.
+mkdirSync(join(verte, "azure"), { recursive: true });
+writeFileSync(join(verte, "azure", "backend-requirements.txt"), "Flask==3.0.3\n");
 writeFileSync(join(verte, "docs", "projet", "TECHNOS.md"),
-  '---\nrole: technos\nsources_de_verite: [package-lock.json, frontend/yarn.lock]\nverifie_le: 2026-08-11\nversions:\n  express: "5.1.0"\n  left-pad: "1.3.0"\n---\n# Technos\n');
+  '---\nrole: technos\nsources_de_verite: [package-lock.json, frontend/yarn.lock, azure/backend-requirements.txt]\nverifie_le: 2026-08-11\nversions:\n  express: "5.1.0"\n  left-pad: "1.3.0"\n  esbuild: "0.21.0"\n  Flask: "3.0.3"\n---\n# Technos\n');
 sh("git", ["init", "-q", "-b", "main"], verte);
 sh("git", ["-c", "user.email=t@t", "-c", "user.name=t", "add", "-A"], verte);
 sh("git", ["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "feat: socle initial du produit"], verte);
@@ -173,6 +179,29 @@ check("rouge-docs : R-20..R-24 + R-26 se déclenchent, localisantes", () => {
   for (const f of rapport.findings) if (!f.ou || !f.message) throw new Error(`finding ${f.regle} sans localisation`);
 });
 
-for (const d of [verte, rouge, rougeDocs]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+// ---- fixture ROUGE-LOCK (TF-0128) : reproduit le cas réel Produit-11 — des versions SONT
+// déclarées dans TECHNOS.md mais aucune source ne les confronte : ni dans les 2 niveaux de
+// descente autorisés (un décoy à 3 niveaux, hors périmètre, ne compte pas), ni dans un
+// dossier exclu (node_modules), ni via sources_de_verite (chemin déclaré introuvable).
+// Avant TF-0128 ce cas rendait SANS_OBJET — un silence qui ressemblait à un succès. ----
+const rougeLock = mkdtempSync(join(tmpdir(), "conf-rouge-lock-"));
+mkdirSync(join(rougeLock, "docs", "projet"), { recursive: true });
+mkdirSync(join(rougeLock, "node_modules", "django-decoy"), { recursive: true }); // exclu (b)
+writeFileSync(join(rougeLock, "node_modules", "django-decoy", "package-lock.json"), 'django "5.0.6"\n');
+mkdirSync(join(rougeLock, "niveau1", "niveau2", "niveau3"), { recursive: true }); // 3 niveaux : hors périmètre (b)
+writeFileSync(join(rougeLock, "niveau1", "niveau2", "niveau3", "package-lock.json"), 'django "5.0.6"\n');
+writeFileSync(join(rougeLock, "docs", "projet", "TECHNOS.md"),
+  '---\nrole: technos\nsources_de_verite: [chemin/qui-n-existe-pas.txt]\nverifie_le: 2026-08-11\nversions:\n  django: "5.0.6"\n---\n# Technos\n');
+
+check("rouge-lock : versions déclarées sans source atteignable → FAIL R-21, jamais SANS_OBJET", () => {
+  const { exit, rapport } = lance(rougeLock);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const r21 = rapport.findings.filter((f) => f.regle === "R-21");
+  if (r21.length !== 1) throw new Error(`R-21 : 1 constat attendu, ${r21.length} obtenu(s)`);
+  if (r21[0].statut !== "FAIL") throw new Error(`R-21 statut ${r21[0].statut} — attendu FAIL (décoys node_modules et 3 niveaux doivent rester invisibles, sources_de_verite introuvable)`);
+  if (!r21[0].ou || !r21[0].message) throw new Error("R-21 sans localisation ou message");
+});
+
+for (const d of [verte, rouge, rougeDocs, rougeLock]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 console.log(`\nSelf-test conformité projet : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
