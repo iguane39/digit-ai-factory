@@ -1,4 +1,4 @@
-# Inventaire des douze forges — 2026-08-04 · màj 2026-08-12 (TF-0113 fraîcheur ; TF-0111/0112 : +agents-security, +observability)
+# Inventaire des treize forges — 2026-08-04 · màj 2026-08-12 (TF-0113 fraîcheur ; TF-0111/0112/0123 : +agents-security, +observability, +websec)
 
 Synthèse issue de cinq explorations exhaustives (une par projet, fichiers cités vérifiés sur disque).
 Chaque forge est décrite selon : rôle, point d'entrée réel, entrées, sorties, oracles, maturité, manques pour l'orchestration.
@@ -263,6 +263,20 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
   scheduler ni d'alerting (le FAIL est le signal), composition avec un oracle réel de
   forge-data à exercer au premier plan réel.
 
+## 13. digit-ai-forge-websec — `c:\dev\digit-ai-forge-websec` *(créée le 12/08, TF-0123)*
+
+- **Rôle** : **sécurité du produit web livré**, sur mandat humain (modèle forge-seo) — gate
+  optionnel pré-MEP (consommé par M-1…M-5) et récurrence différentielle post-MEP. Exposition
+  runtime (headers/TLS/CSP/cookies), dépendances vulnérables (SCA), contrat ASVS 5.0.0 L1.
+  **Délimitation** : le produit livré ici, l'outillage agentique chez forge-agents-security.
+- **Point d'entrée réel** : `node scripts\capturer.mjs <url> <sortie.json>` puis
+  `node oracles\oracle-exposition.mjs <capture.json>` (EX-1..EX-11) ·
+  `node oracles\oracle-sca.mjs <racine-produit> [--seuils f.json]` (npm audit / pip-audit
+  enveloppés, SKIP motivé si outillage absent) — contrats JSON, exit 0/1/2.
+- **Maturité** : v0 née exercée — self-test double sens **23 PASS**, sens rouge SCA démontré
+  sur CVE réelles (lodash 4.17.15, django 1.4). Dettes : DAST (ZAP) en v1 ; osv-scanner non
+  enveloppé ; 9 chapitres ASVS L1 non curés (listés) ; jamais exercée sur produit réel.
+
 ## Lecture transverse pour le pilot
 
 | Forge | Point d'entrée machine | Oracles exécutables | A déjà produit un livrable réel |
@@ -279,6 +293,7 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
 | data *(11/08)* | **oui** (4 oracles CLI, exit 0/1/2) | **oui** (self-test double sens 30 PASS, 12/08) | non (v0 neuve — REX réel anonymisé comme fond) |
 | agents-security *(12/08)* | **oui** (2 oracles CLI, exit 0/1/2, fail-closed) | **oui** (self-test double sens 24 PASS) | non (v0 neuve — fixtures synthétiques) |
 | observability *(12/08)* | **oui** (observer/derive CLI, exit 0/1/2) | **oui** (self-test double sens 30 PASS) | non (v0 neuve — fixtures synthétiques) |
+| websec *(12/08)* | **oui** (capturer + 2 oracles CLI, exit 0/1/2) | **oui** (self-test 23 PASS, rouge sur CVE réelles) | non (v0 neuve — fixtures + captures synthétiques) |
 
 Trois conséquences d'architecture :
 1. **Le pilot est le seul conducteur légitime** — Conception l'interdit chez elle, Development l'ignore,

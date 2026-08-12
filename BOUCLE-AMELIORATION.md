@@ -600,3 +600,20 @@ non-recouvrement : pilot (citations vérifiées sur pièces). Zéro construction
 des 12 forges inchangé, aucun dépôt créé. 3 candidatures ingérées (lot `0f1d020d1f60`) —
 la décision reste humaine : nom de la forge cyber (« websec » proposé), GO des profils,
 encodage R-28.
+
+## 12/08/2026 (nuit, suite) — mandat « fais 1, 2 & 3 » : websec née, profils produit livrés, R-28 encodée
+
+**Mandat humain** : exécution des 3 candidatures de l'étude + étude des autres profils.
+TF-0123 : **forge-websec** née exercée (23 PASS, sens rouge sur CVE réelles) et publiée —
+l'écosystème passe à **treize forges** (schéma V13 « Quatorze forges », oracle-ecosysteme
+13/13, catalogue v1.4.0 à 67 services). TF-0124 : profils\{website,webapp,mobile} +
+doctrine, routés par ACCUEIL. TF-0125 : R-28 encodée (section H) — sa fixture : les 4
+candidatures du jour redonnent leurs verdicts. **Étude « autres profils »** versée au
+rapport §5 : aucun de plus maintenant, 5 « au premier brief » (api-headless, e-commerce,
+extension-navigateur, desktop, chatbot — vigilance verbe nouveau), dashboard couvert,
+iot/jeu/cli hors périmètre ; critère générique versé au LISEZMOI des profils.
+
+**Routage (§4 bis)** : websec construction Sonnet 200 k/83 outils/19 min · profils Sonnet
+88 k/37/4,5 min · étude autres profils Sonnet 44 k/5/1,9 min · R-28 + intégration + schéma :
+pilot. Escalade : aucune. Sondages : self-tests rejoués, périmètres d'écriture inspectés
+(l'agent profils a similairement signalé et préservé les fichiers de session vivante).

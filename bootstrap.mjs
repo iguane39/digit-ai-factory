@@ -39,6 +39,8 @@ const FORGES = [
   { nom: "digit-ai-forge-agents-security", preuve: "oracles/self-test.mjs" },
   // forge-observability : observabilité continue entre les runs (TF-0112, 12/08).
   { nom: "digit-ai-forge-observability", preuve: "oracles/self-test.mjs" },
+  // forge-websec : sécurité du produit web livré (TF-0123, 12/08) — distincte d'agents-security (outillage IA).
+  { nom: "digit-ai-forge-websec", preuve: "oracles/self-test.mjs" },
 ];
 
 const args = process.argv.slice(2);
