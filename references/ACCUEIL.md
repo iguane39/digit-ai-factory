@@ -27,9 +27,11 @@ le pilot et les forges sont des dépendances en lecture.
    statut tel quel : un service **déclaré** est annoncé comme non prouvé.
 
 5. **Proposer la démarche.** Un workflow ordonné des services adéquats (numéroté, avec le
-   livrable de chaque pas et son oracle de validation), puis les services complémentaires
-   pertinents, clairement marqués **« en option »** — jamais mélangés au parcours
-   principal.
+   livrable de chaque pas et son oracle de validation) — **la voie automatisée est le
+   défaut de chaque pas (R-29)** ; toute action renvoyée à l'utilisateur porte sa
+   justification en une ligne, parmi trois motifs seulement : secret à fournir, décision
+   de goût, GO de gouvernance. Les services complémentaires s'affichent ensuite,
+   clairement marqués **« en option »** — jamais mélangés au parcours principal.
 
 6. **Attendre l'accord explicite.** Poser la question fermée : « Je lance cette démarche ?
    (oui / corriger) ». **Aucune exécution avant l'accord.** Si l'utilisateur corrige :
