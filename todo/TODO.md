@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=146f405ad0bb archive=3eb4a8fa16f9 · dernier événement: 2026-08-12T12:13:53Z -->
+     sceaux: actifs=2d57f6ca593b archive=3eb4a8fa16f9 · dernier événement: 2026-08-12T12:48:49Z -->
 
-**35 actifs** (candidat 0 · décidé 0 · en cours 0 · corrigé 33 · écarté 2) · **96 archivés**.
+**39 actifs** (candidat 3 · décidé 0 · en cours 0 · corrigé 34 · écarté 2) · **96 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -38,6 +38,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0133 | candidat | 6 | forge-design : règle d'oracle « bascule sombre » — présente, câblée, AA dans les deux thèmes (aval R-30) | **oui** — sans règle native, chaque revue graphique devra re-vérifier la bascule à la main — et un toggle mort passerait les 48 règles actuelles sans FAIL |
 | TF-0102 | corrige | 3 | Design : pipeline tokens DTCG-first (tokens.css dérivé, plus source), baseline de régression visuelle versionnée et studio-de-direction enfin exercé | **oui** — sans baseline, chaque revue graphique repart de zéro et une régression visuelle entre deux runs est indétectable ; sans DTCG, aucun pont outillé entre maquette, Figma et code — extraction manuelle à chaque marque |
 
 ## development
@@ -63,6 +64,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0134 | candidat | 6 | Skill digit-ai-page-html : verser le pattern S-G1 (bascule sombre) au boilerplate + règle check_html « toggle mort = FAIL » (aval R-30) | **oui** — tant que le boilerplate ignore S-G1, chaque page naît non conforme R-30 et se rattrape après coup ; et check_html donne un PASS trompeur sur un toggle mort |
 | TF-0128 | corrige | 9 | R-21 est aveugle dès que les lockfiles ne sont pas à la racine, et ignore yarn.lock — la fraîcheur des versions n'est jamais jugée sur un dépôt multi-composants | **oui** — sur Produit-11, 25 versions déclarées dans TECHNOS.md n'ont été confrontées aux lockfiles par AUCUN oracle — la vérification a dû être refaite à la main pendant le run ; tout dépôt front+back (la disposition la plus courante) est dans le même cas, ce qui vide R-21 de son effet là où elle sert le plus |
 | TF-0124 | corrige | 6 | Profils produit website/webapp/mobile : référentiels versionnés du pilot consommés par les forges — pas de nouvelles forges | **oui** — aujourd'hui le savoir par type de produit est implicite (development suppose la webapp SaaS, design porte M1-M6 sans profil déclaré) : chaque run le redécouvre en session — un profil daté-sourcé le rend routable par ACCUEIL et challengeable en fraîcheur |
 | TF-0123 | corrige | 4.5 | Nouvelle forge : sécurité du produit web livré (proposition : digit-ai-forge-websec) — verbes outillés prouvés, échéance CRA 09/2026 | **oui** — aucun service de l'écosystème ne juge l'exposition runtime ni les dépendances vulnérables d'un produit livré ; le CRA rend le signalement obligatoire dès le 11/09/2026 — chaque MEP d'ici là part sans contrat de sécurité vérifiable |
@@ -71,6 +73,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0127 | corrige | 4 | Profil produit chatbot/agent conversationnel — dernier de la liste d'attente, avec frontière R-28 explicite | **oui** — demande PME croissante (support/FAQ) et capacité interne réelle ; sans profil, le premier brief improviserait les contrats de canal et les garde-fous LLM |
 | TF-0113 | corrige | 3 | Fraîcheur documentaire : INVENTAIRE.md et fiches dérivent du réel (3 écarts constatés en une campagne) — oracle de fraîcheur transverse à instruire | **oui** — cette campagne a failli publier deux comptages faux dans le catalogue public (corrigés in extremis sur vérification) ; toute décision de routage prise sur l'INVENTAIRE périmé hérite de l'erreur |
 | TF-0115 | corrige | 3 | Généraliser oracle-fraicheur-doc par fichier de claims — 3 dérives documentaires supplémentaires trouvées en une seule campagne | **oui** — 4 dérives en 2 campagnes le même jour : la documentation ment plus vite que les oracles ne vérifient — chaque dérive coûte une ré-enquête ou publie du faux |
+| TF-0131 | corrige | 3 | R-29 « l'IA fait, l'humain décide » et R-30 « thème clair + bascule sombre câblée » — décision humaine du 12/08, encodage et outillage | **oui** — « l'IA fait » est vécu mais nulle part encodé (chaque session ré-arbitre) ; un toggle non spécifié produirait des défauts AA en série sur tous les livrables HTML à venir |
 | TF-0111 | corrige | 1 | Nouvelle forge candidate : sécurité agentique (scan des tool calls, fixtures rouges d'attaques, red-teaming des agents compilés) | **oui** — le mode unattended de development et les campagnes multi-agents du pilot exécutent des tool calls sans aucune inspection — un skill ou un entrant compromis a aujourd'hui le champ libre jusqu'au garde-fou git |
 | TF-0112 | corrige | 1 | Nouvelle forge candidate : observabilité continue (dérive data, revue par commit, veille citation IA) — le trou transverse « one-shot vs continu » | **oui** — entre deux runs, personne ne regarde : une dérive de données, une régression de tests ou une chute de visibilité IA ne se découvre qu'au run suivant — des semaines plus tard sur un produit en production |
 | TF-0130 | ecarte | 6 | Socle docs\projet\ : aucun fichier ne décrit le FONCTIONNEL du produit — le socle est intégralement technique | **oui** — sur Produit-11, la compréhension du métier a été reconstituée par lecture du code pendant le run MEP ; ce coût se repaiera à chaque run de version et à chaque reprise par un tiers, alors que le socle documentaire existe précisément pour l'éviter |
@@ -88,6 +91,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0132 | candidat | 4 | Pan front : « --trace on » forcé en dur, et une trace indisponible se lit « votre suite e2e est rouge » | **oui** — payé en réel le 12/08 : le pan front a dû être EXCLU du run d'audit final pour ne pas produire un « suite e2e en échec » sur une suite verte de bout en bout |
 | TF-0116 | corrige | 9 | forge-tests : bug G-1 dans la version en cours d'édition de mutation.py (session tierce) — mutant non restauré après audit | **oui** — un mutant non restauré corrompt silencieusement le banc : tous les audits suivants mesurent un corpus faux — c'est un G-1 (le juge altère ce qu'il juge) |
 | TF-0117 | corrige | 6 | forge-tests : dashboard du banc-rouge en échec check_html — « NULL » littéral ×24 dans les cellules d'un tableau | **oui** — le dashboard est un livrable client du cycle de tests : 24 « NULL » à l'écran sur le banc de démonstration même de la forge |
 | TF-0122 | corrige | 5 | RÉGRESSION du correctif TF-0100 : une route non concrétisable fait tomber l'audit ENTIER (exit 2, aucun rapport) au lieu de sortir en non_juge | **oui** — payé en réel le 12/08 : ~50 min d'audit perdues et ZÉRO livrable produit, sur un projet dont les onze autres pans étaient mesurables — la régression coûte plus cher que le faux négatif qu'elle corrige |
