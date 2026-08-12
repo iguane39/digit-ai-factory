@@ -54,18 +54,18 @@ Chaque étape est validée par des **oracles exécutés** — jamais par confian
 
 <!-- CATALOGUE:DEBUT — section générée par catalogues/generer-vues.mjs, ne pas éditer -->
 
-Ce que chaque forge sait faire aujourd'hui — extrait de la source unique [catalogues/catalogue.jsonl](catalogues/catalogue.jsonl) (v1.0.0, 2026-08-12), détail complet : [catalogues/CATALOGUES.md](catalogues/CATALOGUES.md). **prouvé** = preuve exécutée (oracle, CLI, run réel) ; *déclaré* = méthode documentée seulement.
+Ce que chaque forge sait faire aujourd'hui — extrait de la source unique [catalogues/catalogue.jsonl](catalogues/catalogue.jsonl) (v1.1.0, 2026-08-12), détail complet : [catalogues/CATALOGUES.md](catalogues/CATALOGUES.md). **prouvé** = preuve exécutée (oracle, CLI, run réel) ; *déclaré* = méthode documentée seulement.
 
-- **forge-conception** (pipeline) : **Qualifier l'entrant** · **Énumérer la surface** · **Rédiger les exigences** · **Dériver les vues aval** · **Valider les exigences (oracles)**
-- **forge-design** (pipeline) : **Système de marque** · *Studio de direction (déclaré)* · **Améliorer le design (maquette)** · *Critiquer le design (amont et aval) (déclaré)* · **Valider le design (oracles)** · **Générer les visuels**
-- **forge-development** (pipeline) : **Construire le produit sous gates** · **Double gate code + design** · *Gate spec (under/over-build) (déclaré)* · *Conductor bout en bout (CLI) (déclaré)* · **Générer DESIGN.md linté**
-- **forge-tests** (pipeline) : **Auditer une suite de tests** · **Générer des cas de tests en proposition** · **Livrables de tests dérivés** · **Tendance et reprise ciblée** · *Inventaire sans exécution (déclaré)*
-- **forge-agents** (transverse) : **Fabriquer des agents spécialisés** · **Ledger de run vérifiable** · **Atelier des skills qualité**
-- **forge-ops** (transverse) : **Déployer, restaurer, état** · **Verdicts d'exploitation O-1…O-4** · **Plans cloud plan-first**
-- **forge-data** (transverse) : **Profiler (qualité en assertions)** · **Tracer (lineage exigible)** · **Restituer (chiffres sourcés)** · *Fonds de savoir data (déclaré)*
-- **forge-audit** (sur mandat) : **Référentiel d'audit POC-to-Prod** · **Oracles d'audit** · **Engagement d'audit par tenant**
-- **forge-seo** (sur mandat) : **Créer une mission d'audit SEO** · **Dérouler l'audit 87 nœuds** · **Valider forge et mission** · **Rapport HTML vérifié** · *Runs de suivi récurrents (déclaré)*
-- **forge-organization** (sur mandat) : *Doctrine des conventions (déclaré)* · **Composant filtres-tableau** · *Études normatives (déclaré)*
+- **forge-conception** (pipeline) : **Qualifier l'entrant** · **Énumérer la surface** · **Rédiger les exigences** · **Dériver les vues aval** · **Valider les exigences (oracles)** · **Constitution projet** · **Cycle delta (évolution d'un référentiel scellé)**
+- **forge-design** (pipeline) : **Système de marque** · **Studio de direction** · **Améliorer le design (maquette)** · *Critiquer le design (amont et aval) (déclaré)* · **Valider le design (oracles)** · **Générer les visuels** · **Tokens DTCG (source → dérivé)** · **Baseline de régression visuelle**
+- **forge-development** (pipeline) : **Construire le produit sous gates** · **Double gate code + design** · *Gate spec (under/over-build) (déclaré)* · *Conductor bout en bout (CLI) (déclaré)* · **Générer DESIGN.md linté** · **Gate anti-patterns IA** · **Gate de mutation (3e métrique)**
+- **forge-tests** (pipeline) : **Auditer une suite de tests** · **Générer des cas de tests en proposition** · **Livrables de tests dérivés** · **Tendance et reprise ciblée** · *Inventaire sans exécution (déclaré)* · *Impact par diff, flaky, propriétés, mutation par risque (déclaré)*
+- **forge-agents** (transverse) : **Fabriquer des agents spécialisés** · **Ledger de run vérifiable** · **Atelier des skills qualité** · **Projection OTLP GenAI du ledger** · **Oracle agent-evals** · **Gate budget G0**
+- **forge-ops** (transverse) : **Déployer, restaurer, état** · **Verdicts d'exploitation O-1…O-4** · **Plans cloud plan-first** · **Canary local simulé** · **Drift O-6 et verdict rollback SLO**
+- **forge-data** (transverse) : **Profiler (qualité en assertions)** · **Tracer (lineage exigible)** · **Restituer (chiffres sourcés)** · *Fonds de savoir data (déclaré)* · **Contractualiser (data contract)**
+- **forge-audit** (sur mandat) : **Référentiel d'audit POC-to-Prod** · **Oracles d'audit** · **Engagement d'audit par tenant** · **Policy-as-code (démonstrateur OPA)**
+- **forge-seo** (sur mandat) : **Créer une mission d'audit SEO** · **Dérouler l'audit 87 nœuds** · **Valider forge et mission** · **Rapport HTML vérifié** · *Runs de suivi récurrents (déclaré)* · **Instrumentation de crawl avancée**
+- **forge-organization** (sur mandat) : **Doctrine des conventions** · **Composant filtres-tableau** · *Études normatives (déclaré)* · **Gate de conventions packagé**
 
 <!-- CATALOGUE:FIN -->
 
