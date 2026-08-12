@@ -1,7 +1,7 @@
 # Catalogues de services des forges — vue générée
 
-> **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.4.0, 2026-08-12) — ne jamais éditer ce fichier.
-> 67 services · 57 prouvés · 10 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
+> **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.5.0, 2026-08-12) — ne jamais éditer ce fichier.
+> 69 services · 59 prouvés · 10 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
 
 ## forge-conception (pipeline) — 7 services
 
@@ -72,7 +72,7 @@
 | cat-ops-04 | **Canary local simulé** | basculer progressivement avec critère de promotion explicite | `node scripts\ops.mjs canary <build> <cible> [--seuils f.json]` | TF-0107 (12/08) : promotion ET dégradation au palier 25 % prouvées au self-test (45 PASS rejoué pilot) | prouve | experimental |
 | cat-ops-05 | **Drift O-6 et verdict rollback SLO** | détecter la dérive déclaré↔constaté et savoir quand recommander un retour arrière | `node oracles\oracle-ops.mjs --drift <f> <cible> · --verdict-rollback <mesures> --seuils <f>` | TF-0107 (12/08) : 3 classes de dérive invisibles à O1-O4, chacune PASS-avant/FAIL-après au self-test | prouve | experimental |
 
-## forge-data (transverse) — 5 services
+## forge-data (transverse) — 7 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -81,6 +81,8 @@
 | cat-dat-03 | **Restituer (chiffres sourcés)** | garantir que tout chiffre restitué est ancré à sa source | `node oracles\oracle-restituer.mjs <rapport.md>` | self-test 15 PASS ; barre dbt-core (registre la-barre) | prouve | experimental |
 | cat-dat-04 | **Fonds de savoir data** | réutiliser les patterns éprouvés de rétro-ingénierie et de lineage | `references\ du dépôt data (lecture)` | documents anonymisés (zéro client vérifié par grep) — savoir, pas d'exécutable | declare | experimental |
 | cat-dat-05 | **Contractualiser (data contract)** | sceller l'accord producteur↔consommateur en contrat vérifiable machine | `node oracles\oracle-contractualiser.mjs <contrat.json>` | TF-0108 (12/08) : fixtures double sens, self-test 30 PASS rejoué pilot ; ODCS statué « retenu » dans STANDARDS-DATA | prouve | experimental |
+| cat-dat-06 | **Importer un schéma exporté** | dériver un brouillon d'assertions et de contrat depuis le schéma exporté de ma base | `node scripts\importer.mjs <schema.sql>` | TF-0139 (12/08) : round-trip prouvé — le brouillon PASSE oracle-profiler/oracle-contractualiser ; self-test 30→36 PASS, rejoué pilot ; jamais de connexion (fichier seul) | prouve | experimental |
+| cat-dat-07 | **Traduire un lineage Unity Catalog** | convertir le lineage colonne natif de Databricks en lineage exigible par la forge | `node scripts	raduire-unity-catalog.mjs <export.json>` | TF-0141 (12/08) : round-trip prouvé (oracle-tracer PASS), self-test 36→41 ; VALIDÉ SUR FIXTURE SYNTHÉTIQUE (aucun workspace payant) ; export incohérent → refus | prouve | experimental |
 
 ## forge-observability (transverse) — 3 services
 
