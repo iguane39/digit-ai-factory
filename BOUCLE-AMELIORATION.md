@@ -626,3 +626,10 @@ improvisé). 7 profils actifs, chatbot seul en attente (vigilance R-28). Tranche
 94 k / 47 outils / 5 min, escalade : aucune. Incident de process consigné : deux événements
 registre à id null écrits par le pilot (script sans garde) puis retirés avant commit —
 l'oracle R1-R10 les avait signalés ; garde ajoutée au geste (assert sur l'id).
+
+**TF-0127 clos (12/08, nuit)** : profil chatbot livré (`4d2ec60`, 9 sources datées, section
+Frontière R-28) — **8 profils actifs, liste d'attente vide**. L'agent a refusé de citer des
+stats non primaires (halucination « 71-89 % ») : le doute marqué plutôt que le chiffre
+affirmé. Au passage : les 2 sidecars dormants d'`input\` (r21-lockfiles du 11/08,
+socle-docs-projet) enfin ingérés (lots `d00b0a9043fe`, `731c8f3e7856` — 3 candidatures,
+décision humaine). Tranche Sonnet 83 k / 35 outils / 4,5 min, escalade : aucune.
