@@ -89,14 +89,14 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>3c61f06348f6</code> · dernier événement 2026-08-12T11:58:22Z</p>
+      <p class="meta">sceau <code>146f405ad0bb</code> · dernier événement 2026-08-12T12:13:53Z</p>
       <button id="exporter" type="button">Exporter les décisions</button>
       <span id="bilan" aria-live="polite">0 coché · 0 commentaire</span>
     </header>
     <p>Seul le <strong>reste-à-faire</strong> vit ici — les items clos partent à l'archive (<code>node todo\archiver.mjs</code>). Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au pilot — appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
     <p class="meta" id="note-score">La colonne « score » = <strong>valeur</strong> de l'item, calculée <code>gain × preuve ÷ effort</code> (composantes visibles dans le détail de chaque ligne) ; tri par défaut : statut puis score décroissant, ou au clic sur les en-têtes fléchés.</p>
     <div class="kpis">
-      <div class="kpi" title="3 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">3</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
+      <div class="kpi" title="0 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">0</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
       <div class="kpi" title="0 item(s) décidés dont les travaux ne sont pas ouverts"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts</span></div>
       <div class="kpi" title="0 campagne(s) ouvertes au registre"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre</span></div>
       <div class="kpi" title="95 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">95</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -324,37 +324,15 @@
         <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
         <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0128" aria-label="Décider TF-0128"></td>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0128" aria-label="Décider TF-0128" disabled></td>
           <td class="c-id" data-th="id"><code>TF-0128</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td data-th="statut"><span class="statut s-corrige">corrige</span></td>
           <td class="c-score" data-th="score">9</td>
           <td data-th="item"><details><summary><strong>R-21 est aveugle dès que les lockfiles ne sont pas à la racine, et ignore yarn.lock — la fraîcheur des versions n'est jamais jugée sur un dépôt multi-composants</strong></summary>
               <p>oracle-conformite-projet.mjs cherche les lockfiles UNIQUEMENT à la racine du projet, dans une liste fermée : package-lock.json, pyproject.toml, poetry.lock, uv.lock, requirements.txt, Cargo.lock, go.sum, composer.lock, Gemfile.lock. Deux angles morts, constatés par exécution le 11/08 sur BAV2 :</p><ol><li>yarn.lock N'EST PAS dans la liste, alors que Yarn est utilisé tel quel par le produit (frontend/yarn.lock, `yarn install --frozen-lockfile` dans le Dockerfile ET dans la pipeline) </li><li>la recherche ne descend pas d'un niveau, or la disposition front/ + back/ est la norme, pas l'exception. Résultat sur BAV2 : verdict SANS_OBJET « aucun lockfile/manifeste à la racine — fraîcheur non jugeable », alors que le produit a bel et bien frontend/yarn.lock (25 versions résolues) et azure/backend-requirements.txt (15 versions épinglées) — soit 25 versions déclarées dans TECHNOS.md que R-21 laisse passer sans les confronter à quoi que ce soit. La règle est marquée « défaut » et son mécanisme « O » (oracle) : elle est aujourd'hui structurellement incapable de FAIL sur ce type de dépôt, donc de tenir la loi 4 qu'elle invoque. Proposition : (a) ajouter yarn.lock, pnpm-lock.yaml et bun.lockb à la liste<ul><li>(b) chercher les lockfiles en descendant de 2 niveaux au plus, en excluant node_modules/.venv/dist/build</li><li>(c) accepter les manifestes épinglés hors nom canonique quand ils sont référencés par un Dockerfile (ici azure/backend-requirements.txt) — à défaut, exiger que sources_de_verite du frontmatter TECHNOS liste les fichiers à confronter et les lire depuis là, ce qui est plus simple et déjà déclaré par le gabarit</li><li>(d) ne plus rendre SANS_OBJET quand des versions SONT déclarées mais qu'aucune source n'est trouvée : c'est un FAIL de configuration, pas une absence d'objet — le silence actuel ressemble à un succès</li></ul></li></ol>
               <p class="meta">Demandeur : run-mep-bav2 (11/08) · 2026-08-11 · gain 3 × preuve 3 ÷ effort 1 · <strong>payé en réel</strong> — sur BAV2, 25 versions déclarées dans TECHNOS.md n'ont été confrontées aux lockfiles par AUCUN oracle — la vérification a dû être refaite à la main pendant le run ; tout dépôt front+back (la disposition la plus courante) est dans le même cas, ce qui vide R-21 de son effet là où elle sert le plus</p>
             </details></td>
           <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0128" rows="1" aria-label="Commentaire TF-0128" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0130" aria-label="Décider TF-0130"></td>
-          <td class="c-id" data-th="id"><code>TF-0130</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">6</td>
-          <td data-th="item"><details><summary><strong>Socle docs\projet\ : aucun fichier ne décrit le FONCTIONNEL du produit — le socle est intégralement technique</strong></summary>
-              <p>Les 5 fichiers de R-20 décrivent la machine (technos, composants déployés, variables, comptes de test, commandes) et jamais CE QUE FAIT le produit ni POUR QUI. Un agent qui ouvre un run de version, ou un humain qui reprend le produit, n'a aucune vue de référence du métier : objets métier et leur cycle de vie, parcours utilisateurs, rôles et droits, règles de gestion, cas limites assumés. Il doit le reconstituer en lisant le code — exactement le coût que R-20 cherche à supprimer. Constat sur BAV2 (11/08) : le run a dû rétro-lire standalone_backend.py et les endpoints c13s pour comprendre qu'il s'agit d'annonces de locaux vacants avec alertes, import en masse et rôles admin ; rien de tout cela n'est écrit nulle part. Proposition : ajouter FONCTIONNEL.md au socle R-20, même régime que les autres (nom fixe, frontmatter YAML role / sources_de_verite / verifie_le, aucune duplication de la source de vérité, aucun secret), avec un contenu cadré : à quoi sert le produit en une phrase, utilisateurs et rôles, objets métier et leur cycle de vie, parcours principaux, règles de gestion structurantes, ce que le produit ne fait volontairement pas. Source de vérité naturelle : le référentiel EXIGENCES.json quand il existe (forge-conception) — FONCTIONNEL.md en est la vue lisible, pas un doublon ; pour un produit importé sans référentiel, il est rédigé depuis le code et daté comme toute valeur volatile.</p>
-              <p class="meta">Demandeur : run-mep-bav2 (11/08) · 2026-08-11 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — sur BAV2, la compréhension du métier a été reconstituée par lecture du code pendant le run MEP ; ce coût se repaiera à chaque run de version et à chaque reprise par un tiers, alors que le socle documentaire existe précisément pour l'éviter</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0130" rows="1" aria-label="Commentaire TF-0130" placeholder="commentaire…"></textarea></td>
-        </tr>
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0129" aria-label="Décider TF-0129"></td>
-          <td class="c-id" data-th="id"><code>TF-0129</code></td>
-          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
-          <td class="c-score" data-th="score">4.5</td>
-          <td data-th="item"><details><summary><strong>R-20 : le socle documentaire docs\projet\ n'est produit par aucune étape — un run se clôt sans lui, sans que rien ne le signale</strong></summary>
-              <p>R-20 (décidée le 11/08, TF-0082) exige de tout produit un docs\projet\ complet : TECHNOS.md, COMPOSANTS-OPS.md, PARAMETRAGE.md, ACCES-TEST.md, COMMANDES.md, chacun ouvert par un frontmatter YAML (role, sources_de_verite, verifie_le). Constat du run MEP BAV2 (11/08) : la règle énonce QUI met à jour quoi (« design/development -&gt; TECHNOS, MEP -&gt; COMPOSANTS-OPS ») mais AUCUNE étape ne porte la CRÉATION du socle, et aucun oracle ne le vérifie à la clôture. Résultat concret : le run a produit 1 fichier sur 5 (COMPOSANTS-OPS.md), et même celui-là sans le frontmatter exigé — l'écart n'a été vu que parce que l'humain l'a signalé. R-21 (fraîcheur TECHNOS) et R-22 (parité PARAMETRAGE &lt;-&gt; .env.example) sont inapplicables tant que les fichiers n'existent pas : deux règles marquées « défaut » qui ne peuvent structurellement rien juger. Proposition :</p><ol><li>rattacher la création du socle à une étape nommée (ouverture de run pour le squelette + frontmatter, chaque étape actualisant ses fichiers) </li><li>étendre oracle-conformite-projet.mjs pour juger la présence des 5 fichiers ET de leur frontmatter, en FAIL bloquant à la clôture </li><li>fournir les 5 gabarits dans gabarits\ pour que la génération ne soit pas réinventée à chaque run </li><li>traiter le cas des produits importés (BAV2 : dépôt repris, sans .env.example — R-13 —, donc R-22 injugeable) par un mode rattrapage explicite</li></ol>
-              <p class="meta">Demandeur : run-mep-bav2 (11/08) · 2026-08-11 · gain 3 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — le run MEP BAV2 s'est clos avec 4 fichiers sur 5 manquants sans aucun signal d'oracle ; le motif même de R-20 (« les runs de version redécouvrent tout ») est donc intact pour ce produit — la prochaine reprise repartira de zéro sur les technos, le paramétrage, les commandes et les accès de test</p>
-            </details></td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0129" rows="1" aria-label="Commentaire TF-0129" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0124" aria-label="Décider TF-0124" disabled></td>
@@ -454,6 +432,28 @@
               <p class="meta">Demandeur : campagne-catalogues (12/08) · 2026-08-12 · gain 3 × preuve 1 ÷ effort 3 · <strong>payé en réel</strong> — entre deux runs, personne ne regarde : une dérive de données, une régression de tests ou une chute de visibilité IA ne se découvre qu'au run suivant — des semaines plus tard sur un produit en production</p>
             </details></td>
           <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0112" rows="1" aria-label="Commentaire TF-0112" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0130" aria-label="Décider TF-0130" disabled></td>
+          <td class="c-id" data-th="id"><code>TF-0130</code></td>
+          <td data-th="statut"><span class="statut s-ecarte">ecarte</span></td>
+          <td class="c-score" data-th="score">6</td>
+          <td data-th="item"><details><summary><strong>Socle docs\projet\ : aucun fichier ne décrit le FONCTIONNEL du produit — le socle est intégralement technique</strong></summary>
+              <p>Les 5 fichiers de R-20 décrivent la machine (technos, composants déployés, variables, comptes de test, commandes) et jamais CE QUE FAIT le produit ni POUR QUI. Un agent qui ouvre un run de version, ou un humain qui reprend le produit, n'a aucune vue de référence du métier : objets métier et leur cycle de vie, parcours utilisateurs, rôles et droits, règles de gestion, cas limites assumés. Il doit le reconstituer en lisant le code — exactement le coût que R-20 cherche à supprimer. Constat sur BAV2 (11/08) : le run a dû rétro-lire standalone_backend.py et les endpoints c13s pour comprendre qu'il s'agit d'annonces de locaux vacants avec alertes, import en masse et rôles admin ; rien de tout cela n'est écrit nulle part. Proposition : ajouter FONCTIONNEL.md au socle R-20, même régime que les autres (nom fixe, frontmatter YAML role / sources_de_verite / verifie_le, aucune duplication de la source de vérité, aucun secret), avec un contenu cadré : à quoi sert le produit en une phrase, utilisateurs et rôles, objets métier et leur cycle de vie, parcours principaux, règles de gestion structurantes, ce que le produit ne fait volontairement pas. Source de vérité naturelle : le référentiel EXIGENCES.json quand il existe (forge-conception) — FONCTIONNEL.md en est la vue lisible, pas un doublon ; pour un produit importé sans référentiel, il est rédigé depuis le code et daté comme toute valeur volatile.</p>
+              <p class="meta">Demandeur : run-mep-bav2 (11/08) · 2026-08-11 · gain 3 × preuve 2 ÷ effort 1 · <strong>payé en réel</strong> — sur BAV2, la compréhension du métier a été reconstituée par lecture du code pendant le run MEP ; ce coût se repaiera à chaque run de version et à chaque reprise par un tiers, alors que le socle documentaire existe précisément pour l'éviter</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0130" rows="1" aria-label="Commentaire TF-0130" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0129" aria-label="Décider TF-0129" disabled></td>
+          <td class="c-id" data-th="id"><code>TF-0129</code></td>
+          <td data-th="statut"><span class="statut s-ecarte">ecarte</span></td>
+          <td class="c-score" data-th="score">4.5</td>
+          <td data-th="item"><details><summary><strong>R-20 : le socle documentaire docs\projet\ n'est produit par aucune étape — un run se clôt sans lui, sans que rien ne le signale</strong></summary>
+              <p>R-20 (décidée le 11/08, TF-0082) exige de tout produit un docs\projet\ complet : TECHNOS.md, COMPOSANTS-OPS.md, PARAMETRAGE.md, ACCES-TEST.md, COMMANDES.md, chacun ouvert par un frontmatter YAML (role, sources_de_verite, verifie_le). Constat du run MEP BAV2 (11/08) : la règle énonce QUI met à jour quoi (« design/development -&gt; TECHNOS, MEP -&gt; COMPOSANTS-OPS ») mais AUCUNE étape ne porte la CRÉATION du socle, et aucun oracle ne le vérifie à la clôture. Résultat concret : le run a produit 1 fichier sur 5 (COMPOSANTS-OPS.md), et même celui-là sans le frontmatter exigé — l'écart n'a été vu que parce que l'humain l'a signalé. R-21 (fraîcheur TECHNOS) et R-22 (parité PARAMETRAGE &lt;-&gt; .env.example) sont inapplicables tant que les fichiers n'existent pas : deux règles marquées « défaut » qui ne peuvent structurellement rien juger. Proposition :</p><ol><li>rattacher la création du socle à une étape nommée (ouverture de run pour le squelette + frontmatter, chaque étape actualisant ses fichiers) </li><li>étendre oracle-conformite-projet.mjs pour juger la présence des 5 fichiers ET de leur frontmatter, en FAIL bloquant à la clôture </li><li>fournir les 5 gabarits dans gabarits\ pour que la génération ne soit pas réinventée à chaque run </li><li>traiter le cas des produits importés (BAV2 : dépôt repris, sans .env.example — R-13 —, donc R-22 injugeable) par un mode rattrapage explicite</li></ol>
+              <p class="meta">Demandeur : run-mep-bav2 (11/08) · 2026-08-11 · gain 3 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — le run MEP BAV2 s'est clos avec 4 fichiers sur 5 manquants sans aucun signal d'oracle ; le motif même de R-20 (« les runs de version redécouvrent tout ») est donc intact pour ce produit — la prochaine reprise repartira de zéro sur les technos, le paramétrage, les commandes et les accès de test</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0129" rows="1" aria-label="Commentaire TF-0129" placeholder="commentaire…"></textarea></td>
         </tr>
         </tbody>
       </table></div>
@@ -605,7 +605,7 @@
   <script>
   (function () {
     "use strict";
-    var SCEAU = "3c61f06348f6";
+    var SCEAU = "146f405ad0bb";
     var cle = function (id, type) { return "todo-forge:" + SCEAU + ":" + id + ":" + type; };
     var coches = document.querySelectorAll("input.decider");
     var comms = document.querySelectorAll("textarea.commentaire");
