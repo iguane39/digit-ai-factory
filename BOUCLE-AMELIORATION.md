@@ -696,3 +696,14 @@ prioritaire dans execution.py (« port occupé par un AUTRE processus » — jam
 surface de la recette reste conditionné à la libération du port par l'humain (process d'un
 autre produit — garde-fou : non tué). Candidature déposée (lot 7768d224fe52) : migrer les
 bancs vers un port moins commun. Tranche Sonnet 135 k / 86 outils / 19 min, escalade : aucune.
+
+**TF-0137 clos (12/08) — ports dédiés + une révélation**. Bancs migrés hors du 4173 par
+défaut (rouge 41733, vert 41743, `91a12be`) : classe de collision éliminée, contamination
+rouge↔vert supprimée, et **D-01 résolu sur le fond** — la recette corpus voit enfin le banc
+rouge servir sa propre appli (16/16 défauts, plus le blocage getByTestId d'Produit-01). MAIS
+la correction a **révélé** ce que la collision masquait : `recette --section corpus` reste
+ECHEC car le banc-VERT (témoin propre) sort 26 bloquants (attendu 0) — condition réelle,
+sans mutant résiduel sur disque (vérifié), versée en candidature séparée (lot dcfdd2ff23a3,
+à ventiler par pan et diagnostiquer). Je n'ai pas maquillé : mandat de migration rempli,
+recette toujours rouge pour une cause nouvelle et nommée. Fait par le pilot en direct (change
+chirurgical à 2 lignes × 4 fichiers, sous mandat explicite), vérif pytest 126 + recette réelle.

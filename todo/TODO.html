@@ -113,7 +113,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>2b13720b06b8</code> · dernier événement 2026-08-12T15:07:26.223Z</p>
+      <p class="meta">sceau <code>7de40ee49e0d</code> · dernier événement 2026-08-12T15:23:30.274Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -124,7 +124,7 @@
       <div class="kpi" title="1 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">1</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
       <div class="kpi" title="0 item(s) décidés dont les travaux ne sont pas ouverts"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts</span></div>
       <div class="kpi" title="0 campagne(s) ouvertes au registre"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre</span></div>
-      <div class="kpi" title="136 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">136</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
+      <div class="kpi" title="137 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">137</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende">
       <span class="leg-item"><span class="leg-swatch" style="background:var(--blue)"></span>candidat</span>
@@ -138,20 +138,20 @@
       <h2>tests <span class="badge" title="1 item(s) actifs ciblant tests">1</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>tests</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0137">
+        <article class="card s-candidat" id="item-TF-0138">
           <header class="card-head">
-            <code class="tf-id">TF-0137</code>
+            <code class="tf-id">TF-0138</code>
             <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">Bancs forge-tests : migrer les fixtures hors du port vite preview par défaut (4173) pour réduire les collisions</h3>
-          <div class="card-detail"><p class="lead">Constaté en instruisant TF-0136 : les deux bancs (banc-rouge, banc-vert) servent leur front sur le port 4173 — le défaut de `vite preview`, donc le plus probable à entrer en collision sur un poste de dev chargé (c'est exactement ce qui a causé D-01 : Produit-01 l'occupait).</p><ul class="puces"><li>reuseExistingServer est désormais à false (Playwright échoue fort au lieu de tester la mauvaise appli) et le motif « port occupé » est nommé au rapport — la classe de défaut ne ment plus</li><li>Reste à réduire sa FRÉQUENCE : donner aux bancs un port dédié peu commun (ex. 41733) dans leurs playwright.config, et/ou port 0 (auto) si le harnais sait lire l'URL effective</li><li>Chirurgical, sans changer la logique de détection</li></ul></div>
+          <h3 class="card-titre">Banc-vert : 26 findings bloquants révélés une fois servi sur son propre port (masqués tant qu'il testait Produit-01) — à ventiler et diagnostiquer</h3>
+          <div class="card-detail"><p class="lead">Découvert en instruisant TF-0137 : depuis que banc-vert est servi sur son port dédié (41743) et non plus sur 4173 (où il testait silencieusement Produit-01), `recette --section corpus` rend banc-rouge 16/16 (bon) MAIS banc-vert 26 finding(s) BLOQUANT(s) — attendu 0 (le banc vert est le témoin PROPRE, il doit passer sans bloquant).</p><ul class="puces"><li>La recette ne liste individuellement que les défauts du banc rouge : les 26 du vert ne sont pas ventilés par pan dans la sortie. Vérifié : aucun mutant résiduel sur disque (git status propre hors les 4 fichiers de port</li><li>app/main.py du banc-vert identique à HEAD), la ligne `mutant:app/main.py:18:0-&gt;1` est la mutation transitoire normale (signalé non bloquant). Donc les 26 sont une condition RÉELLE du banc-vert, masquée jusqu'ici par la collision de port — soit le banc-vert a régressé (fixtures/tests à réparer), soit un pan sur-signale sur ce banc. À instruire : lancer `uv run python -m forge_tests fixtures/banc-vert --json` (ou le pan par pan), ventiler les 26 par pan, décider fixture-à-réparer vs faux-positif d'audit. Bloque S-01 vert de la recette tant que non résolu</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-08-12</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 1 × preuve 2 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur tests</dt><dd>le port par défaut de vite est le plus susceptible d'être déjà pris ; tant qu'il n'est pas changé, D-01 récidivera dès qu'un autre produit sert un front en local</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">campagne-tf0136 (12/08)</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 3 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur tests</dt><dd>le banc vert est le TÉMOIN qui prouve que la forge ne crie pas au loup sur un projet sain ; tant qu'il porte 26 bloquants, la recette ne peut pas prononcer S-01 et la garantie « zéro faux positif sur du sain » n'est pas tenue</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">campagne-tf0137 (12/08)</dd></div>
           </dl>
         </article>
       </div>
