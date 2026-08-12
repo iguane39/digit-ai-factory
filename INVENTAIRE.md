@@ -1,4 +1,4 @@
-# Inventaire des dix forges — 2026-08-04 · màj 2026-08-11 (+audit, +ops, +data)
+# Inventaire des dix forges — 2026-08-04 · màj 2026-08-12 (fraîcheur TF-0113 : comptages conception/audit, options CLI tests)
 
 Synthèse issue de cinq explorations exhaustives (une par projet, fichiers cités vérifiés sur disque).
 Chaque forge est décrite selon : rôle, point d'entrée réel, entrées, sorties, oracles, maturité, manques pour l'orchestration.
@@ -22,8 +22,8 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
   mais sans protocole machine.
 - **Sorties** : `EXIGENCES.json` (schéma complet + fixtures verte/rouge), vues MD avec en-tête `source-sha256`
   (mécanisme de régénérabilité vérifié réel).
-- **Oracles** : la partie la plus mûre. 4 oracles Node zéro dépendance (`oracles/oracle-{exigences,tracabilite,surface,claims}.mjs`),
-  14 règles, contrat JSON + exit 0/1/2, self-test à double sens (fixture verte PASS, rouge FAIL sur chaque règle).
+- **Oracles** : la partie la plus mûre. 5 oracles Node zéro dépendance (`oracles/oracle-{exigences,tracabilite,surface,claims,etat}.mjs`),
+  20 règles (comptage README forge, vérifié le 12/08 — TF-0113), contrat JSON + exit 0/1/2, self-test à double sens (fixture verte PASS, rouge FAIL sur chaque règle).
 - **Maturité** : prototype cohérent sur son noyau, chaîne incomplète (3 verbes/4), aucun livrable réel jamais produit,
   pas de git, tout écrit en 26 min le 04/08/2026. Lien mort : `redige-les-exigences/references/formulation.md` absent.
 - **Manques orchestration** : pas de README/CLAUDE.md/manifeste ; pas de runner bout en bout (par doctrine) ;
@@ -94,8 +94,10 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
 - **Entrées** : racine d'un projet (structure attendue `backend/` FastAPI + `.venv`, `frontend/` React/Playwright) ;
   env `FORGE_TESTS_BASE_URL/API_URL/LOGIN/PASSWORD`, `FORGE_TESTS_SANS_EXECUTION=1` (mode inventaire seul),
   `FORGE_TESTS_ORACLES`. Dépendance en dur vers `~/.claude/skills/quality-oracles/scripts` (3 adaptateurs).
-- **Sorties** : rapport JSON **sur stdout uniquement** (aucune option `--sortie` ; `--generer --json` pollue le flux
-  → stdout non parsable) ; cas générés en dossier de proposition + `non-generables.json` ; `registre-dette.json`
+- **Sorties** : rapport JSON sur stdout **et persistable** (`--sortie <fichier>`, à l'identique de stdout — ajoutée
+  par la campagne du 09/08 ; vérifié CLI le 12/08, TF-0113) ; `--livrables <dossier>` (cahiers fonctionnel/technique,
+  jeu de données synthétique, dashboard HTML — HORS projet, G-1) ; `--precedent` (tendance) et `--reprendre`
+  (rejeu des pans non verts) ; cas générés en dossier de proposition + `non-generables.json` ; `registre-dette.json`
   (53 entrées : 27 résolues, 20 assumées, 6 todo).
 - **Oracles** : seuils par pan codés (api/data/migrations/fichiers 1.0, front/batch 0.90, mutation 0.70),
   cotation de risque criticité×probabilité(mesurée git)×coût, bancs jumeaux rouge/vert avec recette par exécution
@@ -175,7 +177,8 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
 ## 8. digit-ai-forge-audit — `c:\dev\digit-ai-forge-audit` *(ajoutée le 10/08 · renommage 11/08)*
 
 - **Rôle** : **audit & gouvernance POC-to-Prod**, transverse et sur mandat humain. C'est le
-  **produit AuditCore** en marque blanche (65 ADRs, 162 contrôles, 17 dimensions) — dépôt
+  **produit AuditCore** en marque blanche (73 ADR MADR sur 10 domaines, 169 contrôles CTL-Dxx-nn,
+  17 dimensions — comptages README forge, vérifiés le 12/08, TF-0113) — dépôt
   **public MIT** (ex `digit-ai-forge-auditcore`, renommé le 11/08). Sert la MEP et les revues
   d'architecture, jamais en déclenchement automatique.
 - **Architecture produit / tenant** : ce dépôt ne connaît **aucune donnée client** (gate lint N0,
