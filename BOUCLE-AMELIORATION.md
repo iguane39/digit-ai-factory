@@ -661,3 +661,14 @@ R-30 est fermée de bout en bout : règle → pattern → boilerplate natif → 
 (design + socle) → fixtures prouvées. Tranches Sonnet 153 k/48/11,6 min et 135 k/63/8,8 min,
 escalade : aucune. Rappel des sondages pilot : 52 règles et 33/33 rejoués, toggle mort FAIL,
 diff source↔installé vide.
+
+**Refonte TODO.html (12/08, mandat humain)** : `generer-page.mjs` réécrit — largeur portée à
+75-100 % (`min(94vw,1680px)`), items en **cartes détaillées à puces** (constat + proposition
+découpée), ajout de la **date de création**, d'une **priorité de traitement** (dérivée du
+score : Haute ≥5 / Moyenne 3-4 / Basse <3) et de l'**impact sur la forge** (coût constaté) ;
+colonnes « décider » (cases) et « commentaire » **supprimées** — la vue devient lecture seule,
+la décision se prend en session. Premier livrable HTML conforme R-30 de bout en bout : bascule
+sombre S-G1 câblée (oracle-bascule forge-design PASS), et double vérification au rendu —
+check_html PASS, render_page PASS en clair ET en sombre forcé (AA tenu dans les deux thèmes,
+2 défauts de contraste `--faint`/accents-sur-fill trouvés et corrigés pendant la fabrication).
+Le flux d'export (appliquer-export.mjs) devient orphelin — laissé en place, non supprimé.

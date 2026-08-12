@@ -1,20 +1,23 @@
 #!/usr/bin/env node
 /**
- * generer-page.mjs — génère todo/TODO.html : la vue INTERACTIVE du registre TODO-FORGE.
- * Consultation (filtres par table), cases à cocher « décider », commentaires libres, et
- * EXPORT JSON à remettre au pilot (traité par appliquer-export.mjs → maj du registre).
+ * generer-page.mjs — génère todo/TODO.html : la vue de CONSULTATION du reste-à-faire.
  *
  * Vue générée à source unique (TODO.jsonl) — NE PAS ÉDITER LE HTML. Déterministe : deux
  * générations sur le même registre produisent le même fichier (horodatage = ts max des
- * événements ; l'heure d'export, elle, est prise au clic, côté navigateur).
- * Autonome : zéro réseau (polices en repli système, composant filtres inline avec provenance).
- * Charte digit-ai-page-html : tokens du boilerplate, Roboto titres / DM Sans corps, light.
- * Les cases et commentaires persistent en localStorage (clé par id) — l'export est la remise.
+ * événements ; aucun Date.now dans la sortie).
+ *
+ * Mise en page (refonte 12/08, mandat humain) : cartes larges (75-100 % de la largeur),
+ * chaque item détaillé en PUCES, avec date de création, priorité de traitement (dérivée du
+ * score) et impact sur la forge concernée (le coût constaté). Les colonnes « décider » et
+ * « commentaire » ont été retirées (décisions prises hors page) — la vue est en lecture seule.
+ *
+ * Autonome : zéro réseau (polices en repli système). Charte digit-ai-page-html : tokens du
+ * boilerplate, Roboto titres / DM Sans corps. R-30 : thème CLAIR par défaut + bascule sombre
+ * câblée en en-tête (pattern S-G1, persistée, prefers-color-scheme 1re visite, print clair).
  */
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
-import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -28,26 +31,38 @@ const escLit = (s) => esc(s).replace(
   /(^|[\s(«:;,—–-])(null|NULL|None|NONE|undefined|NaN|nil)(?=$|[\s)».;,:!?—–-])/g,
   "$1<code>$2</code>");
 
-// L12 : une énumération « : (1) … ; (2) … ; (3) … » séquentielle se rend en VRAIE liste
-// ordonnée, pas en prose à points-virgules. Marqueurs exigés : précédés de : ou ;,
-// numérotés 1..n — une référence isolée « proposition (2) » ne déclenche rien (TF-0089).
-const rendContenu = (brut) => {
-  const t = escLit(brut);
-  const seq = [...t.matchAll(/([:;])\s*\((\d+)\)\s+/g)];
-  if (seq.length < 2 || !seq.every((x, i) => Number(x[2]) === i + 1)) return `<p>${t}</p>`;
-  const intro = t.slice(0, seq[0].index + 1);
-  const items = seq.map((x, i) =>
-    t.slice(x.index + x[0].length, i + 1 < seq.length ? seq[i + 1].index : undefined).replace(/\s*[;.]\s*$/, ""));
-  // Un item qui enchaîne lui-même ≥ 3 clauses au point-virgule redevient de la prose-tableau
-  // (L12) : la première clause porte l'item, les suivantes descendent en sous-liste.
-  const li = (s) => {
-    const clauses = s.split(/\s+;\s+/);
-    return clauses.length >= 3
-      ? `${clauses[0]}<ul>${clauses.slice(1).map((c) => `<li>${c}</li>`).join("")}</ul>`
-      : s;
-  };
-  return `<p>${intro}</p><ol>${items.map((s) => `<li>${li(s)}</li>`).join("")}</ol>`;
+// Détail en puces (mandat 12/08) : sépare le constat de la proposition, puis découpe la
+// proposition en vraies puces — énumération (a)/(1) d'abord, sinon points-virgules, sinon
+// phrases. Un item sans structure reste un simple paragraphe (jamais de puce artificielle).
+const puce = (s) => `<li>${s.trim().replace(/^[)\s.;,]+/, "").replace(/\s*[;.]\s*$/, "")}</li>`;
+const rendDetail = (brut) => {
+  const t = escLit(brut).trim();
+  const m = t.match(/^([\s\S]*?)\b(Propositions?|Pistes?|Correctifs?)\s*:\s*([\s\S]*)$/);
+  let lead, corps, labelProp = false;
+  if (m && m[1].trim().length >= 20) { lead = m[1].trim(); corps = m[3].trim(); labelProp = true; }
+  else {
+    const i = t.indexOf(". ");
+    if (i > 40 && i < t.length - 40) { lead = t.slice(0, i + 1).trim(); corps = t.slice(i + 1).trim(); }
+    else { lead = t; corps = ""; }
+  }
+  let items = [];
+  if (corps) {
+    const enums = corps.split(/\s*\((?:[a-z]|\d{1,2})\)\s*/).map((s) => s.trim()).filter(Boolean);
+    if (enums.length >= 2) items = enums;
+    else {
+      const semi = corps.split(/\s+;\s+/).map((s) => s.trim()).filter(Boolean);
+      items = semi.length >= 2 ? semi : corps.split(/(?<=\.)\s+(?=[A-ZÀ-Þ])/).map((s) => s.trim()).filter((s) => s.length > 15);
+    }
+  }
+  const leadHtml = lead ? `<p class="lead">${lead}</p>` : "";
+  const listHtml = items.length
+    ? `${labelProp ? `<p class="detail-label">Proposition</p>` : ""}<ul class="puces">${items.map(puce).join("")}</ul>`
+    : "";
+  return leadHtml + listHtml || `<p class="lead">${t}</p>`;
 };
+
+// Priorité de traitement dérivée de la valeur du score (gain × preuve ÷ effort, ×2 payé réel).
+const prio = (v) => (v >= 5 ? { k: "haute", l: "Haute" } : v >= 3 ? { k: "moyenne", l: "Moyenne" } : { k: "basse", l: "Basse" });
 
 const etats = new Map(); let tsMax = "";
 for (const e of lire(SRC)) {
@@ -57,10 +72,6 @@ for (const e of lire(SRC)) {
 }
 const sceau = createHash("sha256").update(readFileSync(SRC)).digest("hex").slice(0, 12);
 const nbArchives = new Set(lire(ARC).filter((e) => e.id).map((e) => e.id)).size;
-
-// Composant filtres maison (D-12), inliné avec provenance — jamais de réseau.
-const filtresSrc = join(homedir(), ".claude", "skills", "digit-ai-page-html", "assets", "table-filters.js");
-const filtresJs = existsSync(filtresSrc) ? readFileSync(filtresSrc, "utf8") : "";
 
 const parForge = new Map();
 for (const e of etats.values()) {
@@ -73,124 +84,145 @@ const compte = (s) => [...etats.values()].filter((e) => e.statut === s).length;
 let sections = "";
 for (const forge of [...parForge.keys()].sort()) {
   const items = parForge.get(forge).sort((a, b) => ORDRE.indexOf(a.statut) - ORDRE.indexOf(b.statut) || b.score.valeur - a.score.valeur);
-  const lignes = items.map((e) => {
-    const meta = `<p class="meta">Demandeur : ${esc(e.demandeur)} · ${esc(e.date_demande)} · gain ${e.score.gain} × preuve ${e.score.preuve} ÷ effort ${e.score.effort}${e.preuve_du_cout ? ` · <strong>payé en réel</strong> — ${escLit(e.preuve_du_cout)}` : ""}${e.commentaire_humain ? `<br>Commentaire précédent : ${esc(e.commentaire_humain)}` : ""}</p>`;
-    // L9 : un dépliant qui cache moins de 200 caractères n'a rien à cacher — afficher en place.
-    const cacheTxt = `${e.contenu} ${e.demandeur} ${e.date_demande} ${e.preuve_du_cout || ""} ${e.commentaire_humain || ""}`;
-    const corps = cacheTxt.length < 200
-      ? `<strong>${esc(e.titre)}</strong>${rendContenu(e.contenu)}${meta}`
-      : `<details><summary><strong>${esc(e.titre)}</strong></summary>
-              ${rendContenu(e.contenu)}
-              ${meta}
-            </details>`;
+  const cartes = items.map((e) => {
+    const p = prio(e.score.valeur);
+    const reel = e.preuve_du_cout ? `<span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>` : "";
     return `
-        <tr>
-          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="${e.id}" aria-label="Décider ${e.id}"${e.statut !== "candidat" ? " disabled" : ""}></td>
-          <td class="c-id" data-th="id"><code>${e.id}</code></td>
-          <td data-th="statut"><span class="statut s-${e.statut}">${e.statut}</span></td>
-          <td class="c-score" data-th="score">${e.score.valeur}</td>
-          <td data-th="item">${corps}</td>
-          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="${e.id}" rows="1" aria-label="Commentaire ${e.id}" placeholder="commentaire…"></textarea></td>
-        </tr>`;
+        <article class="card s-${e.statut}" id="item-${e.id}">
+          <header class="card-head">
+            <code class="tf-id">${e.id}</code>
+            <span class="statut s-${e.statut}">${e.statut}</span>
+            <span class="chip prio p-${p.k}" title="priorité dérivée du score (valeur ${e.score.valeur})">Priorité ${p.l}</span>
+            ${reel}
+          </header>
+          <h3 class="card-titre">${esc(e.titre)}</h3>
+          <div class="card-detail">${rendDetail(e.contenu)}</div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>${esc(e.date_demande)}</dd></div>
+            <div><dt>Priorité</dt><dd>${p.l} <span class="meta-sub">(score ${e.score.valeur} — gain ${e.score.gain} × preuve ${e.score.preuve} ÷ effort ${e.score.effort})</span></dd></div>
+            <div class="impact"><dt>Impact sur ${esc(forge)}</dt><dd>${e.preuve_du_cout ? escLit(e.preuve_du_cout) : "<span class=\"meta-sub\">non chiffré</span>"}</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">${esc(e.demandeur)}</dd></div>
+          </dl>
+        </article>`;
   }).join("");
   sections += `
     <section id="${esc(forge).replace(/[^a-z-]/g, "")}">
       <h2>${esc(forge)} <span class="badge" title="${items.length} item(s) actifs ciblant ${esc(forge)}">${items.length}</span></h2>
-      <p class="ch-apprend meta">Ce chapitre liste les ${items.length} item(s) du reste-à-faire dont la cible est ${esc(forge)} : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
-      <div class="scroll"><table data-filterable>
-        <caption class="sr-only">Reste-à-faire ciblant ${esc(forge)} — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
-        <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
-        <tbody>${lignes}
-        </tbody>
-      </table></div>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>${esc(forge)}</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">${cartes}
+      </div>
     </section>`;
 }
 
 const html = `<!DOCTYPE html>
 <html lang="fr">
 <head>
+<!-- S-G1 (1/4, R-30) — pose data-theme avant la 1re peinture (zéro flash). Choix persisté
+     sinon prefers-color-scheme à la 1re visite. Sans defer (le WARN « script bloquant en
+     head » de check_html est l'exception assumée qui évite le flash). -->
+<script>
+(function () {
+  var s = localStorage.getItem('digitai-theme');
+  document.documentElement.setAttribute('data-theme',
+    s || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+})();
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Digit-AI — TODO-FORGE · Reste à faire — V${esc(tsMax.slice(0, 10).replaceAll("-", ""))}</title>
-  <meta name="description" content="Reste-à-faire du registre TODO-FORGE : candidats à décider, décidés, en cours — décisions et commentaires à exporter pour le pilot.">
+  <meta name="description" content="Reste-à-faire du registre TODO-FORGE : candidats à décider, décidés, en cours — détaillés en puces, avec date de création, priorité de traitement et impact sur la forge concernée.">
   <meta name="theme-color" content="#2563EB">
-  <meta name="color-scheme" content="light">
+  <meta name="color-scheme" content="light dark">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3C/svg%3E">
   <style>
     :root {
-      --blue:#2563EB; --bg:#FAFBFF; --surface:#FFFFFF; --ink:#0F172A; --muted:#64748B;
-      --line:#E6EAF2; --amber:#B45309; --amber-fill:#FFFBEB; --teal:#0E9488; --teal-fill:#EFFDFB;
-      --green:#15803D; --green-fill:#F2FCF5; --r:12px; --r-sm:8px;
+      --blue:#2563EB; --bg:#FAFBFF; --surface:#FFFFFF; --card:#FFFFFF; --ink:#0F172A;
+      --muted:#64748B; --faint:#94A3B8; --line:#E6EAF2;
+      --amber:#D97706; --amber-fill:#FFFBEB; --amber-line:#FDE9C8;
+      --teal:#0E9488; --teal-fill:#EFFDFB; --teal-line:#C7F0EA;
+      --green:#15803D; --green-fill:#F2FCF5; --green-line:#CFEEDD;
+      --r:12px; --r-sm:8px;
       --head:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;
       --sans:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
       --mono:"JetBrains Mono",ui-monospace,"Consolas",monospace;
     }
+    /* S-G1 (2/4, R-30) — tokens sombres : une source, deux projections. */
+    :root[data-theme="dark"] {
+      --bg:#0B1220; --surface:#121B2E; --card:#121B2E; --ink:#EEF2F8;
+      --muted:#A9B4C4; --faint:#7C8AA0; --line:#263248; --blue:#7DA2F5;
+      --amber:#FBBF6D; --amber-fill:#2B2210; --amber-line:#4A3A18;
+      --teal:#5FE6D6; --teal-fill:#0E2A27; --teal-line:#164E48;
+      --green:#7BE0A0; --green-fill:#0F2A1B; --green-line:#1C4A30;
+    }
     *{box-sizing:border-box} html{-webkit-text-size-adjust:100%}
     body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:16px}
-    .wrap{max-width:1100px;margin:0 auto;padding:32px 24px 64px}
-    h1,h2{font-family:var(--head);font-weight:800;line-height:1.2} h1{font-size:1.8rem;margin:0 0 .25em}
-    h2{font-size:1.25rem;font-weight:700;margin:1.6em 0 .5em}
+    .wrap{width:min(94vw,1680px);margin:0 auto;padding:0 4px 64px}
+    h1,h2,h3{font-family:var(--head);line-height:1.25}
+    h2{font-size:1.3rem;font-weight:800;margin:1.8em 0 .2em}
     code{font-family:var(--mono);font-size:.9em}
     .meta{color:var(--muted);font-size:.85rem;margin:.4em 0 0}
-    td .meta,td details p,td li{overflow-wrap:anywhere} /* jetons longs (ids, chemins) : jamais de débordement V1 */
-    .badge{font-family:var(--mono);font-size:.75rem;color:var(--muted);font-weight:400}
-    .scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
-    table{border-collapse:collapse;width:100%;font-size:.92rem}
-    th{font-family:var(--head);font-weight:700;text-align:left;padding:10px 12px;border-bottom:2px solid var(--line);background:var(--surface)}
-    td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
-    tr:last-child td{border-bottom:none}
-    .c-coche,.c-id,.c-score{white-space:nowrap} .c-comm{min-width:180px}
-    .statut{font-family:var(--mono);font-size:.78rem;padding:2px 8px;border-radius:999px;border:1px solid var(--line)}
-    .s-candidat{background:var(--surface)} .s-decide{background:var(--teal-fill);color:var(--teal)}
-    .s-en_cours{background:var(--amber-fill);color:var(--amber)} .s-corrige{background:var(--green-fill);color:var(--green)}
-    details summary{cursor:pointer} details p{margin:.5em 0 0}
-    textarea.commentaire{width:100%;font-family:var(--sans);font-size:.88rem;border:1px solid var(--line);border-radius:var(--r-sm);padding:6px 8px;resize:vertical;background:var(--surface);color:var(--ink)}
-    input.decider{width:18px;height:18px;accent-color:var(--blue)}
-    /* B1 — header sticky (marque · méta · toolbar B13), tokens seulement */
-    .entete{position:sticky;top:0;z-index:6;background:var(--bg);border-bottom:1px solid var(--line);padding:14px 0 10px;display:flex;gap:16px;align-items:baseline;flex-wrap:wrap}
-    .entete h1{margin:0;font-size:1.35rem}
-    .entete .meta{margin:0;flex:1 1 260px}
-    button#exporter{font-family:var(--head);font-weight:700;font-size:.95rem;background:var(--blue);color:#fff;border:none;border-radius:var(--r-sm);padding:10px 18px;cursor:pointer;min-height:44px}
-    button#exporter:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible,a:focus-visible,th[data-sort]:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
-    #bilan{color:var(--muted);font-size:.9rem}
-    /* B2 — bande KPI */
-    .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0 6px}
+    .meta-sub{color:var(--muted);font-weight:400;font-size:.9em}
+    .badge{font-family:var(--mono);font-size:.8rem;color:var(--muted);font-weight:400}
+    a{color:var(--blue)}
+    /* en-tête sticky : marque + bascule sombre (S-G1 3/4) */
+    .entete{position:sticky;top:0;z-index:6;background:var(--bg);border-bottom:1px solid var(--line);
+      padding:14px 0 10px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+    .entete h1{margin:0;font-size:1.35rem;font-weight:800;flex:1 1 260px}
+    .entete .meta{margin:0}
+    .theme-toggle{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+      border-radius:var(--r-sm);width:44px;height:44px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+    .theme-toggle:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+    .theme-toggle .icon-sun{display:none} :root[data-theme="dark"] .theme-toggle .icon-moon{display:none}
+    :root[data-theme="dark"] .theme-toggle .icon-sun{display:inline}
+    /* bande KPI */
+    .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:18px 0 6px}
     .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:4px;break-inside:avoid}
-    .kpi-label{color:var(--muted);font-size:.8rem}
-    .kpi-value{font-family:var(--head);font-weight:800;font-size:1.6rem;color:var(--ink)}
+    .kpi-label{color:var(--muted);font-size:.8rem} .kpi-value{font-family:var(--head);font-weight:800;font-size:1.6rem}
     .kpi-hint{color:var(--muted);font-size:.75rem}
-    /* B7 — légende des statuts (swatch + libellé, la couleur jamais seule) */
-    .legende{display:flex;gap:16px;flex-wrap:wrap;margin:6px 0 0;color:var(--muted);font-size:.85rem}
+    .legende{display:flex;gap:16px;flex-wrap:wrap;margin:8px 0 0;color:var(--muted);font-size:.85rem}
     .leg-item{display:inline-flex;align-items:center;gap:6px}
     .leg-swatch{width:12px;height:12px;border-radius:3px;border:1px solid var(--line);display:inline-block}
-    /* sommaire */
-    nav.toc{margin:14px 0 0;font-size:.9rem}
-    nav.toc a{color:var(--blue);text-decoration:none;margin-right:14px}
-    nav.toc a:hover{text-decoration:underline}
+    nav.toc{margin:14px 0 0;font-size:.9rem} nav.toc a{text-decoration:none;margin-right:14px} nav.toc a:hover{text-decoration:underline}
     .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-    /* B6 — thead sticky dans le conteneur + tri au clic */
-    .scroll{max-height:70vh;overflow:auto}
-    thead th{position:sticky;top:0;z-index:2}
-    th[data-sort]{cursor:pointer;user-select:none}
-    th[data-sort]::after{content:" ↕";color:var(--muted);font-weight:400}
-    th[data-sort="asc"]::after{content:" ↑"} th[data-sort="desc"]::after{content:" ↓"}
-    section{break-inside:avoid-page}
-    footer{margin-top:40px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:16px}
-    @media (max-width:900px){.wrap{padding:16px 12px 48px} .entete h1{font-size:1.15rem} table{font-size:.85rem} td,th{padding:6px 8px} .c-comm{min-width:120px}
-      thead th{position:static} .scroll{max-height:none}}
-    /* ≤ 640px : la table se replie en cartes empilées (V1 : rien ne déborde du viewport) —
-       les libellés de colonne viennent de data-th, l'en-tête sort du flux visuel */
-    @media (max-width:640px){
-      thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
-      table,tbody,tr,td{display:block;width:100%}
-      tr{border-bottom:2px solid var(--line);padding:8px 0}
-      td{border-bottom:none;padding:4px 12px;display:flex;gap:10px;align-items:baseline}
-      td::before{content:attr(data-th);font-family:var(--head);font-weight:700;color:var(--muted);min-width:86px;flex:0 0 86px}
-      .c-coche,.c-id,.c-score{white-space:normal} .c-comm{min-width:0}
-    }
-    @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+    /* cartes */
+    .cartes{display:flex;flex-direction:column;gap:16px;margin-top:10px}
+    .card{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--faint);
+      border-radius:var(--r);padding:18px 20px;break-inside:avoid}
+    .card.s-candidat{border-left-color:var(--blue)} .card.s-decide{border-left-color:var(--teal)}
+    .card.s-en_cours{border-left-color:var(--amber)} .card.s-corrige{border-left-color:var(--green)}
+    .card-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .tf-id{font-family:var(--mono);font-size:.85rem;color:var(--muted)}
+    .card-titre{font-size:1.08rem;font-weight:700;margin:.5em 0 .3em}
+    /* chips : texte en --ink (AA garanti dans les 2 thèmes) ; la couleur passe par le fond
+       teinté + la bordure d'accent, jamais par le texte seul (petit corps < 4.5:1 sinon). */
+    .statut,.chip{font-family:var(--mono);font-size:.74rem;padding:2px 9px;border-radius:999px;border:1px solid var(--line);white-space:nowrap;color:var(--ink)}
+    .s-candidat{background:var(--surface)} .s-decide{background:var(--teal-fill);border-color:var(--teal-line)}
+    .s-en_cours{background:var(--amber-fill);border-color:var(--amber-line)} .s-corrige{background:var(--green-fill);border-color:var(--green-line)}
+    .prio.p-haute{background:var(--amber-fill);border-color:var(--amber-line)}
+    .prio.p-moyenne{background:var(--teal-fill);border-color:var(--teal-line)}
+    .prio.p-basse{background:var(--surface);color:var(--muted)}
+    .chip.reel{background:var(--surface);color:var(--muted)}
+    .card-detail .lead{margin:.2em 0 .4em}
+    .detail-label{font-family:var(--head);font-weight:700;font-size:.82rem;color:var(--muted);margin:.6em 0 .2em;text-transform:uppercase;letter-spacing:.03em}
+    .puces{margin:.2em 0 .4em;padding-left:1.2em} .puces li{margin:.28em 0}
+    .card-detail,.card-detail li,.card-meta dd{overflow-wrap:anywhere}
+    .card-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 20px;margin:14px 0 0;padding-top:12px;border-top:1px solid var(--line)}
+    .card-meta .impact{grid-column:1/-1}
+    .card-meta dt{font-family:var(--head);font-weight:700;font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+    .card-meta dd{margin:.2em 0 0;font-size:.92rem}
+    footer{margin-top:44px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:16px}
+    @media (max-width:640px){.wrap{width:auto;padding:0 12px 48px} .entete h1{font-size:1.1rem} .card{padding:14px}}
+    @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
     @page{margin:14mm}
-    @media print{.entete,textarea,.decider,nav.toc{display:none} .scroll{max-height:none;overflow:visible} tr,section .kpi{break-inside:avoid}}
+    /* S-G1 (2/4 suite, R-30.2) — impression toujours claire, quel que soit le thème écran */
+    @media print{
+      :root,:root[data-theme="dark"]{
+        --bg:#FFFFFF;--surface:#FFFFFF;--card:#FFFFFF;--ink:#0F172A;--muted:#64748B;--faint:#94A3B8;--line:#E6EAF2;--blue:#2563EB;
+        --amber:#D97706;--amber-fill:#FFFBEB;--amber-line:#FDE9C8;--teal:#0E9488;--teal-fill:#EFFDFB;--teal-line:#C7F0EA;--green:#15803D;--green-fill:#F2FCF5;--green-line:#CFEEDD;
+      }
+      body{background:#fff} .entete{position:static} .theme-toggle,nav.toc{display:none}
+      .card{break-inside:avoid} a[href^="http"]::after{content:" (" attr(href) ")";font-size:.85em;color:var(--muted)}
+    }
   </style>
 </head>
 <body>
@@ -198,88 +230,47 @@ const html = `<!DOCTYPE html>
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
       <p class="meta">sceau <code>${sceau}</code> · dernier événement ${esc(tsMax)}</p>
-      <button id="exporter" type="button">Exporter les décisions</button>
-      <span id="bilan" aria-live="polite">0 coché · 0 commentaire</span>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
+        <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+        <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
     </header>
-    <p>Seul le <strong>reste-à-faire</strong> vit ici — les items clos partent à l'archive (<code>node todo\\archiver.mjs</code>). Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au pilot — appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
-    <p class="meta" id="note-score">La colonne « score » = <strong>valeur</strong> de l'item, calculée <code>gain × preuve ÷ effort</code> (composantes visibles dans le détail de chaque ligne) ; tri par défaut : statut puis score décroissant, ou au clic sur les en-têtes fléchés.</p>
+    <p>Seul le <strong>reste-à-faire</strong> vit ici — les items clos partent à l'archive (<code>node todo\\archiver.mjs</code>). Chaque item est détaillé en puces, avec sa date de création, sa priorité de traitement (dérivée du score) et son impact sur la forge concernée. La décision reste humaine et se prend hors de cette page (« décide TF-xxxx »).</p>
     <div class="kpis">
       <div class="kpi" title="${compte("candidat")} candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">${compte("candidat")}</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
       <div class="kpi" title="${compte("decide")} item(s) décidés dont les travaux ne sont pas ouverts"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">${compte("decide")}</span><span class="kpi-hint">mandat donné, travaux non ouverts</span></div>
       <div class="kpi" title="${compte("en_cours")} campagne(s) ouvertes au registre"><span class="kpi-label">En cours</span><span class="kpi-value">${compte("en_cours")}</span><span class="kpi-hint">campagnes ouvertes au registre</span></div>
       <div class="kpi" title="${nbArchives} item(s) clos déplacés vers todo\\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">${nbArchives}</span><span class="kpi-hint">hors vue — <code>todo\\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
-    <p class="legende"><span class="leg-item"><span class="leg-swatch" style="background:var(--surface)"></span>candidat</span><span class="leg-item"><span class="leg-swatch" style="background:var(--teal-fill)"></span>décidé</span><span class="leg-item"><span class="leg-swatch" style="background:var(--amber-fill)"></span>en cours</span></p>
-    <nav class="toc" aria-label="Sommaire">${[...parForge.keys()].sort().map((f) => `<a href="#${esc(f).replace(/[^a-z-]/g, "")}"><strong>${esc(f)}</strong> <span class="toc-d">${parForge.get(f).length} item(s) reste-à-faire ciblant ${esc(f)}</span></a>`).join("")}</nav>
+    <p class="legende">
+      <span class="leg-item"><span class="leg-swatch" style="background:var(--blue)"></span>candidat</span>
+      <span class="leg-item"><span class="leg-swatch" style="background:var(--teal)"></span>décidé</span>
+      <span class="leg-item"><span class="leg-swatch" style="background:var(--amber)"></span>en cours</span>
+      <span class="leg-item">Priorité <strong>Haute</strong> ≥ 5 · <strong>Moyenne</strong> 3-4 · <strong>Basse</strong> &lt; 3 (score = gain × preuve ÷ effort, ×2 si payé en réel)</span>
+    </p>
+    <nav class="toc" aria-label="Sommaire">${[...parForge.keys()].sort().map((f) => `<a href="#${esc(f).replace(/[^a-z-]/g, "")}"><strong>${esc(f)}</strong> <span class="toc-d">${parForge.get(f).length} item(s) reste-à-faire</span></a>`).join("")}</nav>
     <main>${sections}
     </main>
-    <footer>Vue générée par <code>todo/generer-page.mjs</code> — ne pas éditer. Source unique : <code>todo/TODO.jsonl</code>. Détail d'un item : <code>grep '"id":"TF-xxxx"' todo/TODO.jsonl</code>.</footer>
+    <footer>Vue générée par <code>todo/generer-page.mjs</code> — ne pas éditer. Source unique : <code>todo/TODO.jsonl</code>. Détail brut d'un item : <code>grep '"id":"TF-xxxx"' todo/TODO.jsonl</code>.</footer>
   </div>
+  <!-- S-G1 (4/4, R-30) — câblage : persistance + aria-pressed, aucune bascule muette -->
   <script>
   (function () {
-    "use strict";
-    var SCEAU = "${sceau}";
-    var cle = function (id, type) { return "todo-forge:" + SCEAU + ":" + id + ":" + type; };
-    var coches = document.querySelectorAll("input.decider");
-    var comms = document.querySelectorAll("textarea.commentaire");
-    function bilan() {
-      var c = 0, k = 0;
-      coches.forEach(function (x) { if (x.checked) c++; });
-      comms.forEach(function (x) { if (x.value.trim()) k++; });
-      document.getElementById("bilan").textContent = c + " coché(s) · " + k + " commentaire(s)";
+    var bouton = document.getElementById('theme-toggle');
+    var racine = document.documentElement;
+    function appliquer(theme) {
+      racine.setAttribute('data-theme', theme);
+      localStorage.setItem('digitai-theme', theme);
+      bouton.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
     }
-    coches.forEach(function (x) {
-      try { x.checked = localStorage.getItem(cle(x.dataset.id, "d")) === "1"; } catch (e) {}
-      x.addEventListener("change", function () { try { localStorage.setItem(cle(x.dataset.id, "d"), x.checked ? "1" : "0"); } catch (e) {} bilan(); });
+    bouton.setAttribute('aria-pressed', racine.getAttribute('data-theme') === 'dark' ? 'true' : 'false');
+    bouton.addEventListener('click', function () {
+      appliquer(racine.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
     });
-    comms.forEach(function (x) {
-      try { x.value = localStorage.getItem(cle(x.dataset.id, "c")) || ""; } catch (e) {}
-      x.addEventListener("input", function () { try { localStorage.setItem(cle(x.dataset.id, "c"), x.value); } catch (e) {} bilan(); });
-    });
-    // B6 — tri au clic (et Entrée) sur les en-têtes fléchés ; numérique si la colonne l'est
-    document.querySelectorAll("th[data-sort]").forEach(function (th) {
-      var tri = function () {
-        var table = th.closest("table"), tbody = table.querySelector("tbody");
-        var idx = Array.prototype.indexOf.call(th.parentNode.children, th);
-        var sens = th.getAttribute("data-sort") === "asc" ? "desc" : "asc";
-        table.querySelectorAll("th[data-sort]").forEach(function (x) { x.setAttribute("data-sort", ""); });
-        th.setAttribute("data-sort", sens);
-        var lignes = Array.prototype.slice.call(tbody.querySelectorAll("tr"));
-        lignes.sort(function (a, b) {
-          var va = a.children[idx].textContent.trim(), vb = b.children[idx].textContent.trim();
-          var na = parseFloat(va.replace(",", ".")), nb = parseFloat(vb.replace(",", "."));
-          var r = (!isNaN(na) && !isNaN(nb)) ? na - nb : va.localeCompare(vb, "fr");
-          return sens === "asc" ? r : -r;
-        });
-        lignes.forEach(function (l) { tbody.appendChild(l); });
-      };
-      th.addEventListener("click", tri);
-      th.addEventListener("keydown", function (ev) { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); tri(); } });
-    });
-    document.getElementById("exporter").addEventListener("click", function () {
-      var decisions = [];
-      var parId = {};
-      comms.forEach(function (x) { parId[x.dataset.id] = { commentaire: x.value.trim() }; });
-      coches.forEach(function (x) { (parId[x.dataset.id] = parId[x.dataset.id] || {}).decider = x.checked; });
-      Object.keys(parId).sort().forEach(function (id) {
-        var d = parId[id];
-        if (d.decider || d.commentaire) decisions.push({ id: id, decider: !!d.decider, commentaire: d.commentaire || null });
-      });
-      var contenu = JSON.stringify({ schema: 1, type: "decisions-todo-forge", sceau_source: SCEAU, exporte_le: new Date().toISOString(), decisions: decisions }, null, 1);
-      var a = document.createElement("a");
-      a.href = URL.createObjectURL(new Blob([contenu], { type: "application/json" }));
-      a.download = "TF-decisions-" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + ".json";
-      a.click(); URL.revokeObjectURL(a.href);
-    });
-    bilan();
   })();
-  </script>
-  <script>
-  /* Composant filtres maison — inliné depuis ~/.claude/skills/digit-ai-page-html/assets/table-filters.js (provenance D-12, zéro réseau) */
-${filtresJs}
   </script>
 </body>
 </html>
 `;
 writeFileSync(OUT, html);
-console.log(`TODO.html générée — ${etats.size} items, ${parForge.size} forges (sceau ${sceau}, filtres ${filtresJs ? "inlinés" : "ABSENTS"})`);
+console.log(`TODO.html générée — ${etats.size} items, ${parForge.size} forges (sceau ${sceau}, cartes + bascule R-30)`);
