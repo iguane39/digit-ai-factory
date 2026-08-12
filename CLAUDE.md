@@ -27,17 +27,19 @@ Noyau plafonné à **6 Ko** (contrôle `oracles/oracle-claude-md.mjs`) : le dét
    vides) est proposée d'office et s'écarte explicitement, jamais par omission.
 4. *Une donnée volatile est une donnée, pas du code* — catalogues et référentiels
    périssables vivent en base, éditables, datés et sourcés.
+5. *L'IA fait, l'humain décide* — la voie automatisée est le défaut ; toute action laissée
+   à l'humain porte sa justification ; dépenses et gates restent humains (R-29).
 
-**TODO-FORGE** (`todo\`) : registre des améliorations — source unique `TODO.jsonl` (écrivain
-unique : toi), vue `TODO.md`, page `TODO.html`, oracle R1-R10. Tout entre en `candidat`, la
-décision est humaine, la clôture exige les gains constatés. Candidature externe = sidecar +
-`ingerer-lot.mjs` (écriture directe détectée, R10). Mode opératoire :
-`references\TODO-FORGE.md` ; consulter à l'ouverture de tout run.
+**TODO-FORGE** (`todo\`) : registre des améliorations — source unique `TODO.jsonl`
+(écrivain unique : toi), vues `TODO.md`/`.html`, oracle R1-R10. Tout entre en `candidat`,
+décision humaine, clôture sur gains constatés. Candidature externe = sidecar +
+`ingerer-lot.mjs` (R10). Mode opératoire : `references\TODO-FORGE.md` ; consulter à
+l'ouverture de tout run.
 
 **Documents de référence** (avant tout run) : `INVENTAIRE.md` (état des forges),
 `CONTRAT-INTERFACE.md` (invocation, ledger, routage §4, mesure §4 bis, référentiels à
 identifiants §3 bis), `ETAPE-MEP.md`, `BOUCLE-AMELIORATION.md` (journal des campagnes),
-`HYPOTHESES.md` (en ajouter, jamais en taire), `fiches\<forge>.md` (baselines d'audit),
+`HYPOTHESES.md`, `fiches\<forge>.md` (baselines d'audit),
 `references\BEST-PRACTICES-HTML.md`.
 
 ## Lancement d'un run
@@ -68,11 +70,9 @@ exigences→tests 100 % · ledger vérifié.
 ## Parallélisme et agents
 
 Étapes séquentielles ; parallélisme seulement entre tâches indépendantes d'une même
-étape (Agent tool). Routage par modèle et protocole de mesure :
-`CONTRAT-INTERFACE.md` §4 et §4 bis — défaut Sonnet, mécanique Haiku, construction complexe
-Opus, pilotage Fable ; toute escalade consignée avec sa raison, « aucune » compris. Les
-campagnes d'amélioration utilisent `gabarits\AGENT-CAMPAGNE.md` (contraintes standard,
-TF-0050) : prompt = gabarit + delta spécifique.
+étape. Routage et mesure : `CONTRAT-INTERFACE.md` §4 et §4 bis — défaut Sonnet, mécanique
+Haiku, construction complexe Opus, pilotage Fable ; escalades consignées, « aucune »
+compris. Campagnes : `gabarits\AGENT-CAMPAGNE.md` (TF-0050), gabarit + delta.
 
 ## Garde-fous (non négociables)
 
