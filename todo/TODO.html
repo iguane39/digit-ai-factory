@@ -89,20 +89,20 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>146f405ad0bb</code> · dernier événement 2026-08-12T12:13:53Z</p>
+      <p class="meta">sceau <code>2d57f6ca593b</code> · dernier événement 2026-08-12T12:48:49Z</p>
       <button id="exporter" type="button">Exporter les décisions</button>
       <span id="bilan" aria-live="polite">0 coché · 0 commentaire</span>
     </header>
     <p>Seul le <strong>reste-à-faire</strong> vit ici — les items clos partent à l'archive (<code>node todo\archiver.mjs</code>). Coche les items à <strong>décider</strong> (candidats seulement), commente librement, puis <strong>Exporter</strong> : remets le fichier téléchargé au pilot — appliqué par <code>appliquer-export.mjs</code> (décisions tracées, commentaires conservés). Cases et commentaires persistent dans ce navigateur jusqu'à l'export.</p>
     <p class="meta" id="note-score">La colonne « score » = <strong>valeur</strong> de l'item, calculée <code>gain × preuve ÷ effort</code> (composantes visibles dans le détail de chaque ligne) ; tri par défaut : statut puis score décroissant, ou au clic sur les en-têtes fléchés.</p>
     <div class="kpis">
-      <div class="kpi" title="0 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">0</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
+      <div class="kpi" title="3 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">3</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
       <div class="kpi" title="0 item(s) décidés dont les travaux ne sont pas ouverts"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts</span></div>
       <div class="kpi" title="0 campagne(s) ouvertes au registre"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre</span></div>
       <div class="kpi" title="95 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">95</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende"><span class="leg-item"><span class="leg-swatch" style="background:var(--surface)"></span>candidat</span><span class="leg-item"><span class="leg-swatch" style="background:var(--teal-fill)"></span>décidé</span><span class="leg-item"><span class="leg-swatch" style="background:var(--amber-fill)"></span>en cours</span></p>
-    <nav class="toc" aria-label="Sommaire"><a href="#agents"><strong>agents</strong> <span class="toc-d">3 item(s) reste-à-faire ciblant agents</span></a><a href="#audit"><strong>audit</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant audit</span></a><a href="#conception"><strong>conception</strong> <span class="toc-d">2 item(s) reste-à-faire ciblant conception</span></a><a href="#data"><strong>data</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant data</span></a><a href="#design"><strong>design</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant design</span></a><a href="#development"><strong>development</strong> <span class="toc-d">2 item(s) reste-à-faire ciblant development</span></a><a href="#ops"><strong>ops</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant ops</span></a><a href="#organization"><strong>organization</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant organization</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">12 item(s) reste-à-faire ciblant pilot</span></a><a href="#seo"><strong>seo</strong> <span class="toc-d">3 item(s) reste-à-faire ciblant seo</span></a><a href="#tests"><strong>tests</strong> <span class="toc-d">8 item(s) reste-à-faire ciblant tests</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#agents"><strong>agents</strong> <span class="toc-d">3 item(s) reste-à-faire ciblant agents</span></a><a href="#audit"><strong>audit</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant audit</span></a><a href="#conception"><strong>conception</strong> <span class="toc-d">2 item(s) reste-à-faire ciblant conception</span></a><a href="#data"><strong>data</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant data</span></a><a href="#design"><strong>design</strong> <span class="toc-d">2 item(s) reste-à-faire ciblant design</span></a><a href="#development"><strong>development</strong> <span class="toc-d">2 item(s) reste-à-faire ciblant development</span></a><a href="#ops"><strong>ops</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant ops</span></a><a href="#organization"><strong>organization</strong> <span class="toc-d">1 item(s) reste-à-faire ciblant organization</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">14 item(s) reste-à-faire ciblant pilot</span></a><a href="#seo"><strong>seo</strong> <span class="toc-d">3 item(s) reste-à-faire ciblant seo</span></a><a href="#tests"><strong>tests</strong> <span class="toc-d">9 item(s) reste-à-faire ciblant tests</span></a></nav>
     <main>
     <section id="agents">
       <h2>agents <span class="badge" title="3 item(s) actifs ciblant agents">3</span></h2>
@@ -222,12 +222,23 @@
       </table></div>
     </section>
     <section id="design">
-      <h2>design <span class="badge" title="1 item(s) actifs ciblant design">1</span></h2>
-      <p class="ch-apprend meta">Ce chapitre liste les 1 item(s) du reste-à-faire dont la cible est design : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
+      <h2>design <span class="badge" title="2 item(s) actifs ciblant design">2</span></h2>
+      <p class="ch-apprend meta">Ce chapitre liste les 2 item(s) du reste-à-faire dont la cible est design : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
       <div class="scroll"><table data-filterable>
         <caption class="sr-only">Reste-à-faire ciblant design — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
         <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0133" aria-label="Décider TF-0133"></td>
+          <td class="c-id" data-th="id"><code>TF-0133</code></td>
+          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score" data-th="score">6</td>
+          <td data-th="item"><details><summary><strong>forge-design : règle d'oracle « bascule sombre » — présente, câblée, AA dans les deux thèmes (aval R-30)</strong></summary>
+              <p>R-30 (décidée le 12/08, REGLES-PROJET §J) impose la bascule sombre câblée sur tout HTML autonome livré. La vérification vit aujourd'hui au pattern S-G1 de BEST-PRACTICES-HTML (fixtures verte/rouge prouvées par render_page — la rouge échoue à 1,51:1). À porter chez forge-design en règle d'oracle native : bouton de bascule présent en zone d'en-tête ET câblé (data-theme change au clic — loi n° 1), contraste AA tenu dans les deux thèmes (render_page mesure déjà 2 thèmes depuis TF-0102), persistance localStorage déclarée. Fixtures : reprendre les deux pages témoins du pilot (references\temoin\...Bascule-Sombre-{Verte,Rouge}...).</p>
+              <p class="meta">Demandeur : campagne-r29-r30 (12/08) · 2026-08-12 · gain 2 × preuve 3 ÷ effort 1 · <strong>payé en réel</strong> — sans règle native, chaque revue graphique devra re-vérifier la bascule à la main — et un toggle mort passerait les 48 règles actuelles sans FAIL</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0133" rows="1" aria-label="Commentaire TF-0133" placeholder="commentaire…"></textarea></td>
+        </tr>
         <tr>
           <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0102" aria-label="Décider TF-0102" disabled></td>
           <td class="c-id" data-th="id"><code>TF-0102</code></td>
@@ -317,12 +328,23 @@
       </table></div>
     </section>
     <section id="pilot">
-      <h2>pilot <span class="badge" title="12 item(s) actifs ciblant pilot">12</span></h2>
-      <p class="ch-apprend meta">Ce chapitre liste les 12 item(s) du reste-à-faire dont la cible est pilot : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
+      <h2>pilot <span class="badge" title="14 item(s) actifs ciblant pilot">14</span></h2>
+      <p class="ch-apprend meta">Ce chapitre liste les 14 item(s) du reste-à-faire dont la cible est pilot : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
       <div class="scroll"><table data-filterable>
         <caption class="sr-only">Reste-à-faire ciblant pilot — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
         <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0134" aria-label="Décider TF-0134"></td>
+          <td class="c-id" data-th="id"><code>TF-0134</code></td>
+          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score" data-th="score">6</td>
+          <td data-th="item"><details><summary><strong>Skill digit-ai-page-html : verser le pattern S-G1 (bascule sombre) au boilerplate + règle check_html « toggle mort = FAIL » (aval R-30)</strong></summary>
+              <p>Deux versements au skill socle (écriture sous mandat humain uniquement — c'est l'objet de cette candidature) :</p><ol><li>le snippet S-G1 de BEST-PRACTICES-HTML (init sans FOUC, tokens sombres dérivés, bouton haut-droite aria-pressed, localStorage, prefers-color-scheme première visite, print forcé clair) entre dans boilerplate.html pour que toute page nouvelle naisse conforme R-30 </li><li>check_html.py gagne une règle : bouton .theme-toggle présent sans script de câblage data-theme = FAIL (constat du 12/08 : le défaut R-30 est invisible au périmètre générique actuel de check_html — la fixture rouge y passe PASS). Fixtures double sens : les deux pages témoins du pilot</li></ol>
+              <p class="meta">Demandeur : campagne-r29-r30 (12/08) · 2026-08-12 · gain 2 × preuve 3 ÷ effort 1 · <strong>payé en réel</strong> — tant que le boilerplate ignore S-G1, chaque page naît non conforme R-30 et se rattrape après coup ; et check_html donne un PASS trompeur sur un toggle mort</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0134" rows="1" aria-label="Commentaire TF-0134" placeholder="commentaire…"></textarea></td>
+        </tr>
         <tr>
           <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0128" aria-label="Décider TF-0128" disabled></td>
           <td class="c-id" data-th="id"><code>TF-0128</code></td>
@@ -410,6 +432,17 @@
               <p class="meta">Demandeur : campagne-todo (12/08) · 2026-08-12 · gain 2 × preuve 3 ÷ effort 2 · <strong>payé en réel</strong> — 4 dérives en 2 campagnes le même jour : la documentation ment plus vite que les oracles ne vérifient — chaque dérive coûte une ré-enquête ou publie du faux</p>
             </details></td>
           <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0115" rows="1" aria-label="Commentaire TF-0115" placeholder="commentaire…"></textarea></td>
+        </tr>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0131" aria-label="Décider TF-0131" disabled></td>
+          <td class="c-id" data-th="id"><code>TF-0131</code></td>
+          <td data-th="statut"><span class="statut s-corrige">corrige</span></td>
+          <td class="c-score" data-th="score">3</td>
+          <td data-th="item"><details><summary><strong>R-29 « l'IA fait, l'humain décide » et R-30 « thème clair + bascule sombre câblée » — décision humaine du 12/08, encodage et outillage</strong></summary>
+              <p>Décision humaine directe (mandat du 12/08 nuit, prompt passé au crible L99). R-29 : la voie automatisée est le défaut dans toute démarche proposée ; toute action laissée à l'utilisateur porte sa justification ; les rapports classent les actions restantes en IA/développeur/utilisateur (format actions[] de forge-tests généralisé) ; propositions d'outils tiers admises en option, exécution payante gatée GO humain, gates existants priment. R-30 : thème clair par défaut confirmé (charte existante), bascule sombre obligatoire en zone d'en-tête sur tout HTML autonome livré — câblée (loi n° 1), persistée (localStorage), prefers-color-scheme honoré à la première visite, palette sombre dérivée mécaniquement des tokens, AA dans les deux thèmes, print clair ; révocation par projet consignée dans docs\projet\PARAMETRAGE.md. Surfaces : REGLES-PROJET, ACCUEIL §5, gabarits AGENT-CAMPAGNE/CLAUDE-PRODUIT, BEST-PRACTICES-HTML (pattern + fixtures double sens prouvées par render_page/check_html), tentative loi transverse n° 5 au noyau sous budget 6 Ko ; candidatures vers forge-design (règle d'oracle bascule) et versement skill digit-ai-page-html.</p>
+              <p class="meta">Demandeur : humain (12/08 nuit) · 2026-08-12 · gain 3 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — « l'IA fait » est vécu mais nulle part encodé (chaque session ré-arbitre) ; un toggle non spécifié produirait des défauts AA en série sur tous les livrables HTML à venir</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0131" rows="1" aria-label="Commentaire TF-0131" placeholder="commentaire…"></textarea></td>
         </tr>
         <tr>
           <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0111" aria-label="Décider TF-0111" disabled></td>
@@ -502,12 +535,23 @@
       </table></div>
     </section>
     <section id="tests">
-      <h2>tests <span class="badge" title="8 item(s) actifs ciblant tests">8</span></h2>
-      <p class="ch-apprend meta">Ce chapitre liste les 8 item(s) du reste-à-faire dont la cible est tests : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
+      <h2>tests <span class="badge" title="9 item(s) actifs ciblant tests">9</span></h2>
+      <p class="ch-apprend meta">Ce chapitre liste les 9 item(s) du reste-à-faire dont la cible est tests : cocher pour décider (candidats), commenter pour préciser — le score ordonne par valeur attendue.</p>
       <div class="scroll"><table data-filterable>
         <caption class="sr-only">Reste-à-faire ciblant tests — colonnes : décision (case), identifiant, statut, score, item dépliable, commentaire libre. Tri au clic sur les en-têtes fléchés.</caption>
         <thead><tr><th scope="col">✓</th><th scope="col" data-sort tabindex="0">id</th><th scope="col" data-sort tabindex="0">statut</th><th scope="col" data-sort tabindex="0" aria-describedby="note-score">score</th><th scope="col">item</th><th scope="col">commentaire</th></tr></thead>
         <tbody>
+        <tr>
+          <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0132" aria-label="Décider TF-0132"></td>
+          <td class="c-id" data-th="id"><code>TF-0132</code></td>
+          <td data-th="statut"><span class="statut s-candidat">candidat</span></td>
+          <td class="c-score" data-th="score">4</td>
+          <td data-th="item"><details><summary><strong>Pan front : « --trace on » forcé en dur, et une trace indisponible se lit « votre suite e2e est rouge »</strong></summary>
+              <p>execution.py l.388 lance `npx playwright test --trace on --reporter=line` : le drapeau de trace est IMPOSÉ, et la trace est la seule source de ce que le pan juge atteint. Deux conséquences, constatées le 12/08 sur Approval2. (1) LE VERDICT CONFOND DEUX CAUSES. Sur ce poste Windows, l'écriture de l'archive de trace ne rend jamais la main : le corps de chaque test se déroule INTÉGRALEMENT (les six étapes de connexion journalisées passent, la session est écrite sur disque) puis le test sort en « Test timeout of 60000ms exceeded ». Mesuré : la même suite passe 10/10 en 7,2 s avec --trace=off, et échoue à 100 % avec --trace=on — reproduit avec DEUX navigateurs distincts (Chromium 1234 réutilisé, et channel:chrome) et avec un --output hors du projet, ce qui écarte le navigateur et le dossier de sortie. Le pan conclura « la suite e2e s'est terminée en échec » sur une suite entièrement verte : c'est un faux négatif de la même famille que TF-0098, mais produit cette fois par une option que la forge impose elle-même. (2) L'OPTION ÉCRASE CELLE DU PROJET. Un projet qui a réglé `trace` dans son playwright.config.ts (par exemple `retain-on-failure`, précisément pour contourner ce blocage) voit son choix ignoré. CORRECTIF ATTENDU : distinguer au rapport « suite e2e ROUGE » de « TRACE INDISPONIBLE » — si le code de sortie est non nul ET qu'aucun fichier de trace n'a été produit, le motif doit nommer la trace, pas accuser la suite ; et prévoir une variable (FORGE_TESTS_PLAYWRIGHT_TRACE) pour laisser le projet imposer son mode, le pan déclarant alors en non_juge que la couverture front n'est pas mesurable sans trace.</p>
+              <p class="meta">Demandeur : audit-approval2-20260812 · 2026-08-12 · gain 4 × preuve 2 ÷ effort 2 · <strong>payé en réel</strong> — payé en réel le 12/08 : le pan front a dû être EXCLU du run d'audit final pour ne pas produire un « suite e2e en échec » sur une suite verte de bout en bout</p>
+            </details></td>
+          <td class="c-comm" data-th="commentaire"><textarea class="commentaire" data-id="TF-0132" rows="1" aria-label="Commentaire TF-0132" placeholder="commentaire…"></textarea></td>
+        </tr>
         <tr>
           <td class="c-coche" data-th="décider"><input type="checkbox" class="decider" data-id="TF-0116" aria-label="Décider TF-0116" disabled></td>
           <td class="c-id" data-th="id"><code>TF-0116</code></td>
@@ -605,7 +649,7 @@
   <script>
   (function () {
     "use strict";
-    var SCEAU = "146f405ad0bb";
+    var SCEAU = "2d57f6ca593b";
     var cle = function (id, type) { return "todo-forge:" + SCEAU + ":" + id + ":" + type; };
     var coches = document.querySelectorAll("input.decider");
     var comms = document.querySelectorAll("textarea.commentaire");

@@ -642,3 +642,13 @@ lecture directe au lieu de re-livrer, et l'ingestion du 12/08 n'avait pas détec
 recouvrement. Leçon consignée : **vérifier le recouvrement avec l'archive avant d'ingérer
 un sidecar dormant** (candidature possible : contrôle de similarité à l'ingestion).
 Tranche Sonnet 136 k / 46 outils / 8 min, escalade : aucune.
+
+**TF-0131 clos (12/08, nuit)** : R-29 « l'IA fait, l'humain décide » (loi transverse n° 5 au
+noyau — 6 100 octets après compression — + §I de REGLES-PROJET + ACCUEIL §5 + gabarits) et
+R-30 « thème clair + bascule sombre câblée » (§J + pattern S-G1 au BEST-PRACTICES, fixtures
+témoins prouvées : verte PASS — un défaut L2 réel corrigé pendant la fabrication —, rouge
+FAIL contraste 1,51:1, sombre forcé PASS AA, print clair vérifié Playwright). Grep
+anti-subjectivité : 0/5. Deux candidatures aval (lot des sidecars : règle d'oracle
+forge-design ; versement boilerplate + règle check_html — le toggle mort est prouvé
+invisible au check_html actuel). Tranche Sonnet 170 k / 76 outils / 15 min + noyau par le
+pilot ; escalade : aucune.
