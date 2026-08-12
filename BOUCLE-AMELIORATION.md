@@ -479,3 +479,11 @@ citation d'ACCUEIL.md) · oracle-ecosysteme PASS · oracle-todo R1-R10 PASS · s
 18/18. État préexistant du working tree : 2 événements TODO non commités de la session du
 11/08 (TF-0100 + ingestion) — embarqués dans ce commit, ils appartiennent au registre ;
 entrants `input\` non liés laissés intacts. Test à froid : consigné à l'entrée suivante.
+
+**Test à froid (12/08, complément au commit 4d3b1bf)** : clone du pilot (état commité) dans
+un répertoire vierge du scratchpad — AGENTS.md, references\ACCUEIL.md et
+catalogues\catalogue.jsonl présents au clone — puis `node bootstrap.mjs --racine <vierge>` :
+dix forges clonées, preuves vérifiées, fin **« Poste prêt »**, exit 0. Contre-épreuve
+d'idempotence : la phase 0 de la même session sur poste équipé (`git pull --ff-only` +
+`bootstrap --pull`) a fini « Poste prêt » sans erreur. Les deux critères décisifs du contrat
+sont PASS ; la parité GitHub suivra le push (décision humaine).
