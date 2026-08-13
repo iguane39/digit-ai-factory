@@ -1,0 +1,16 @@
+{
+  "cycle": 1,
+  "verdict": "PARTIEL",
+  "triplet": { "couverture": 0.62, "passage": 0.80, "mutation": 0.30 },
+  "seuils": { "couverture": 1.0, "passage": 1.0, "mutation": 0.70 },
+  "findings": [
+    { "id": "back/form-non-exerce", "pan": "back", "classe": "element-non-exerce", "message": "route /form jamais atteinte" },
+    { "id": "back/mutant-12", "pan": "back", "classe": "mutant-survivant", "message": "mutant 12 survit à la suite" },
+    { "id": "api/route-racine", "pan": "api", "classe": "element-non-exerce", "message": "route / jamais atteinte" }
+  ],
+  "actions": [
+    { "finding_ref": "back/form-non-exerce", "categorie": "manuelle_dev", "etape_cible": "tests-suite", "attendu": "ajouter un cas qui exerce le formulaire" },
+    { "finding_ref": "back/mutant-12", "categorie": "auto_ia", "etape_cible": "tests-suite", "attendu": "renforcer l'assertion qui laisse survivre le mutant 12" },
+    { "finding_ref": "api/route-racine", "categorie": "manuelle_dev", "etape_cible": "tests-suite", "attendu": "ajouter un cas qui exerce la route racine" }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "cycle": 3,
+  "verdict": "PASS",
+  "triplet": { "couverture": 1.0, "passage": 1.0, "mutation": 0.74 },
+  "seuils": { "couverture": 1.0, "passage": 1.0, "mutation": 0.70 },
+  "findings": [],
+  "actions": []
+}

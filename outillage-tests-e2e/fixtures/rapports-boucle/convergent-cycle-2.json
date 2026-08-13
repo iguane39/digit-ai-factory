@@ -1,0 +1,14 @@
+{
+  "cycle": 2,
+  "verdict": "PARTIEL",
+  "triplet": { "couverture": 0.90, "passage": 0.95, "mutation": 0.55 },
+  "seuils": { "couverture": 1.0, "passage": 1.0, "mutation": 0.70 },
+  "findings": [
+    { "id": "api/route-racine", "pan": "api", "classe": "element-non-exerce", "message": "route / jamais atteinte" },
+    { "id": "back/mutant-40", "pan": "back", "classe": "mutant-survivant", "message": "mutant 40 survit à la suite" }
+  ],
+  "actions": [
+    { "finding_ref": "api/route-racine", "categorie": "manuelle_dev", "etape_cible": "tests-suite", "attendu": "ajouter un cas qui exerce la route racine" },
+    { "finding_ref": "back/mutant-40", "categorie": "auto_ia", "etape_cible": "tests-suite", "attendu": "renforcer l'assertion qui laisse survivre le mutant 40" }
+  ]
+}
