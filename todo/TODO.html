@@ -113,7 +113,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>dc4b46f8f189</code> · dernier événement 2026-08-13T07:31:56.168Z</p>
+      <p class="meta">sceau <code>00dfc46e8108</code> · dernier événement 2026-08-13T07:44:14.088Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -121,7 +121,7 @@
     </header>
     <p>Seul le <strong>reste-à-faire</strong> vit ici — les items clos partent à l'archive (<code>node todo\archiver.mjs</code>). Chaque item est détaillé en puces, avec sa date de création, sa priorité de traitement (dérivée du score) et son impact sur la forge concernée. La décision reste humaine et se prend hors de cette page (« décide TF-xxxx »).</p>
     <div class="kpis">
-      <div class="kpi" title="2 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">2</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
+      <div class="kpi" title="3 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">3</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
       <div class="kpi" title="0 item(s) décidés dont les travaux ne sont pas ouverts"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts</span></div>
       <div class="kpi" title="0 campagne(s) ouvertes au registre"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre</span></div>
       <div class="kpi" title="146 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">146</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -132,8 +132,30 @@
       <span class="leg-item"><span class="leg-swatch" style="background:var(--amber)"></span>en cours</span>
       <span class="leg-item">Priorité <strong>Haute</strong> ≥ 5 · <strong>Moyenne</strong> 3-4 · <strong>Basse</strong> &lt; 3 (score = gain × preuve ÷ effort, ×2 si payé en réel)</span>
     </p>
-    <nav class="toc" aria-label="Sommaire"><a href="#pilot"><strong>pilot</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#tests"><strong>tests</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#organization"><strong>organization</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#tests"><strong>tests</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
     <main>
+    <section id="organization">
+      <h2>organization <span class="badge" title="1 item(s) actifs ciblant organization">1</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>organization</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0149">
+          <header class="card-head">
+            <code class="tf-id">TF-0149</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Encoder le rangement d'output\ en convention transverse (familles numérotées + old\) et trancher old\ vs Old\ (D-06)</h3>
+          <div class="card-detail"><p class="lead">Le mandat humain du 13/08 a appliqué à l'écosystème la méthode de rangement d'output\ constatée chez forge-audit_nhood : dossiers de familles numérotés 01-, 02-…, une seule version de chaque livrable à la racine du dossier, versions antérieures dans un sous-dossier old\, noms de fichiers inchangés.</p><ul class="puces"><li>Appliqué le 13/08 : pilot (5 familles + LISEZMOI de mapping), agents (01-pv, 02-skills), design (01-pages-temoins), organization (01-etudes, 02-composants), seo (01-decisions, 02-veille) — audit_nhood déjà conforme, produit Approval2 sans objet (output racine vide). Deux restes à trancher par convention (forge-organization, gardienne des D-xx) :</li><li>ENCODER la méthode comme convention transverse (une D-xx : nommage des dossiers de familles, numérotation, règle « une version à la racine, antérieures dans le sous-dossier de versions », LISEZMOI de mapping obligatoire quand des références antérieures existent) pour que les prochains livrables naissent rangés au lieu d'être re-rangés par campagne</li><li>TRANCHER la casse et la portée du dossier de versions : le mandat du 13/08 et audit_nhood disent old\, mais D-06 (organization) dit « versions antérieures dans le Old/ de cette racine » et gabarits\CLAUDE-PRODUIT.md du pilot dit « Old\ jamais versionné » — trois écritures pour la même notion, dont une avec une règle git divergente (jamais versionné vs versionné : les old\ du 13/08 SONT suivis par git chez pilot/design/organization/seo). Une seule graphie et une seule règle de versionnement doivent rester</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-13</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 2 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur organization</dt><dd>la divergence est constatée sur pièces : trois documents normatifs écrivent la même notion de trois façons (old\ / Old/ / Old\ non versionné) et le rangement du 13/08 a dû choisir sans convention ; sans D-xx, chaque prochaine campagne ou produit re-choisira, et les output\ divergeront à nouveau (c'est exactement ce que le mandat du 13/08 a dû rattraper sur 5 dépôts)</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">mandat-rangement-output-13-08</dd></div>
+          </dl>
+        </article>
+      </div>
+    </section>
     <section id="pilot">
       <h2>pilot <span class="badge" title="1 item(s) actifs ciblant pilot">1</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
