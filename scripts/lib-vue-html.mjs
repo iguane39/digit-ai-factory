@@ -84,7 +84,8 @@ export function coquille({ titre, description, front, svg, corpsHtml, source }) 
       --mono:"JetBrains Mono",ui-monospace,"Consolas",monospace}
     *{box-sizing:border-box} html{-webkit-text-size-adjust:100%}
     body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:16px}
-    .wrap{max-width:min(92vw,1680px);margin:0 auto;padding:32px 24px 64px}
+    /* 75-100 % de la fenêtre, toujours : 92vw en dessous de 1826px, plafond confort 1680px, plancher 75vw au-delà */
+    .wrap{max-width:clamp(75vw,1680px,92vw);margin:0 auto;padding:32px 24px 64px}
     /* la prose vit dans une colonne à sa mesure (L2) — tables et figures y défilent en interne */
     .colonne{max-width:75ch;margin:0 auto}
     h1,h2,h3{font-family:var(--head);font-weight:800;line-height:1.2}

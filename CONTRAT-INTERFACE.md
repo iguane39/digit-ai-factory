@@ -72,6 +72,27 @@ Le produit naît directement chez lui — aucune promotion à faire. Création d
 push : sur validation humaine uniquement. (Historique : le run pilote du 04/08 vit encore sous
 `pilot\runs\` — convention antérieure, conservée comme archive.)
 
+### 2 bis. Gabarits HTML des forges : conformité pré-génération (décision humaine 13/08)
+
+Les règles HTML évoluent (R-30 thème clair + bascule, E4 largeur 75-100 %, standard H
+listes) ; un gabarit embarqué dans une forge peut dériver silencieusement — constaté le 13/08
+sur le dashboard de forge-tests (sombre par défaut, largeur 1180 px : gabarit jamais repassé
+aux règles après leurs annonces). D'où le contrat :
+
+- **Chaque forge est responsable de ses gabarits.** Toute forge qui génère des fichiers HTML
+  attendus par le projet (ex : forge-tests → dashboard de résultats) **vérifie ses gabarits
+  contre les règles courantes avant exécution et génération** — source unique des règles :
+  skill `digit-ai-page-html` (`check_html.py`, exécuté, jamais jugé de tête) + patterns
+  normatifs de `references\BEST-PRACTICES-HTML.md` (E4, G1, H).
+- **Dérive constatée → proposition TODO au pilot.** La génération n'est pas bloquée (le run
+  reste borné) : le run consigne le verdict au ledger (`oracles_verdict`) et **le projet émet
+  une candidature TODO** (sidecar `.tf.jsonl` remis à `<pilot>\input\`, règle 18) demandant la
+  remise à niveau du gabarit **dans la forge propriétaire**. La correction effective reste une
+  campagne mandatée (boucle d'amélioration) — jamais une écriture sauvage dans la forge depuis
+  un run.
+- Le pilot tient le registre : candidature ingérée (`ingerer-lot.mjs`), décision humaine,
+  clôture sur gains constatés.
+
 ## 3. Ledger
 
 Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/ledger.mjs`

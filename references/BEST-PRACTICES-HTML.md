@@ -107,6 +107,7 @@ puis dédoublonnage des patterns et confrontation de chacun à la charte
 | E1 | Breakpoint unique `@media(max-width:900px)` | F1, F2 | `@media(max-width:900px)` | **adopter** | Au moins un breakpoint confort ; empiler les grilles en 1 colonne. |
 | E2 | `@media (prefers-reduced-motion: reduce)` | F2 | neutralise transitions/animations | **adopter** | **Manque au boilerplate du skill** → candidat delta. Voir snippet S-E2. |
 | E3 | Mises en page Grid/Flex fluides | F1, F2 | `grid-template`, `display:flex` | **adopter** | Éviter les hauteurs fixes qui cassent en multi-page PDF. |
+| E4 | Conteneur principal à **75-100 % de la fenêtre** | décision humaine 13/08 | `--w: clamp(75vw, 1680px, 92vw)` | **adopter (obligatoire)** | Tout HTML généré occupe 75 à 100 % de la largeur de la page à toute taille de fenêtre : token canonique `clamp(75vw, 1680px, 92vw)` (92 % sous ~1826 px, plafond confort 1680 px, plancher 75 vw au-delà). Jamais de plafond px nu (`max-width:1000px`). La prose reste bornée en `ch` (`--prose`) : c'est le conteneur qui s'élargit, pas la ligne de texte (L2). |
 
 ## F — Accessibilité & print
 
@@ -140,6 +141,26 @@ en fin de fichier.
 
 ---
 
+## H — Pages à listes : filtres, recherche, KPIs cliquables (pattern normatif)
+
+Décision humaine directe du 13/08 (même statut que G — un standard, pas un candidat) : tout
+HTML généré présentant une **liste parcourue** (tableau de données, cartes répétées, catalogue)
+propose les trois affordances ci-dessous. Modèle de référence : le catalogue ADR (source F1),
+dropdowns « Type (5) / Criticité (4) » avec Tous/Aucun, champ « Rechercher (titre, décision,
+source, ADR…) » et bouton « Réinitialiser les filtres ». Loi transverse 1 : chaque affordance
+est **câblée** — un filtre qui ne filtre pas est un défaut.
+
+| ID | Nom | Source | Repère | Verdict | Règle d'application |
+|---|---|---|---|---|---|
+| H1 | Filtres multi-sélection par colonne catégorielle (Tous / Aucun, compteur) | F1 | B9 ; `table-filters.js` du skill | **adopter (obligatoire)** | Dès 8 lignes/entrées (seuil L4 du skill) : un dropdown par dimension catégorielle, libellé « Nom (n) », boutons Tous/Aucun. Exemption : `data-filterable="off"` **+** motif. |
+| H2 | Recherche plein texte + « Réinitialiser les filtres » | F1 | `input[type="search"]` ; `find-in-page.js` du skill | **adopter (obligatoire)** | Insensible aux accents, sur les champs porteurs (titre, contenu, id…). Le bouton de réinitialisation rétablit filtres **et** recherche ; compteur de résultats en `aria-live="polite"` (B13). |
+| H3 | KPIs cliquables filtrant la liste | F1 + demande 13/08 | B2 + `role="button"`, `aria-pressed` | **adopter (obligatoire)** | Tout KPI qui compte des éléments **affichés dans la page** filtre la liste sur son sous-ensemble au clic (re-clic = tout réafficher ; accessible clavier). Un KPI comptant des éléments **hors page** (archives…) ne se rend pas cliquable et dit où vivent ses éléments (L3). |
+
+Contrat amont : les forges propriétaires de gabarits vérifient E4/G1/H **avant génération**
+(`CONTRAT-INTERFACE.md` §2 bis) ; dérive constatée → candidature TODO au pilot.
+
+---
+
 ## Delta proposé vers le skill `digit-ai-page-html` (candidat — non appliqué)
 
 > Ne rien écrire dans le skill sans GO humain. Ci-dessous, ce qui mériterait d'y être versé.
@@ -156,6 +177,10 @@ en fin de fichier.
    dans `check_html.py` (bouton `.theme-toggle` sans `data-theme` sur `:root` ni script de
    câblage = FAIL — aujourd'hui vérifié seulement par lecture humaine + `render_page.py`
    sur fixture figée, pas par une règle dédiée du script).
+6. **Standard H (listes : filtres + recherche + KPIs cliquables)** : mécaniser dans
+   `check_html.py` (règle L13 à fixtures double sens — page à liste ≥ 8 entrées sans
+   recherche ni KPI câblé = FAIL) et verser un composant `kpi-filter.js` charté à côté de
+   `table-filters.js`/`find-in-page.js`.
 
 ---
 
@@ -326,3 +351,4 @@ changeant le pattern livrable (qui reste clair par défaut, S-G1 point 1).
 |---|---|---|
 | 2026-08-10 | a | Création. Extraction F1 (Catalogue ADR) + F2 (Rapport Audit) ; 5 catégories A–F, 34 patterns tagués adopter/adapter/rejeter ; delta candidat + 5 snippets chartés. Page-témoin passée aux oracles `check_html.py` + `render_page.py`. |
 | 2026-08-12 | b | R-30 (TF-0131, décision humaine) : catégorie G — pattern normatif obligatoire de bascule thème sombre (S-G1), tokens sombres dérivés + impression forcée claire. Deux fixtures double sens sous `references\temoin\` (verte PASS, rouge FAIL mesuré sur contraste V2). Delta candidat n°5 vers `boilerplate.html`/`check_html.py`. |
+| 2026-08-13 | c | E4 (décision humaine) : conteneur à 75-100 % de la fenêtre, token `clamp(75vw,1680px,92vw)` — appliqué sur ordre humain direct jusqu'au skill (`boilerplate.html`, durcissement L2 de `check_html.py`, self-test 33/33). Catégorie H (décision humaine) : standard listes — filtres H1, recherche H2, KPIs cliquables H3. Contrat §2 bis : conformité pré-génération des gabarits HTML par forge propriétaire. Delta candidat n°6 (L13 + `kpi-filter.js`). |

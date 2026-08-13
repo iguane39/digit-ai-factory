@@ -40,7 +40,8 @@
     }
     *{box-sizing:border-box} html{-webkit-text-size-adjust:100%}
     body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:16px}
-    .wrap{width:min(94vw,1680px);margin:0 auto;padding:0 4px 64px}
+    /* 75-100 % de la fenêtre, toujours : 94vw sous ~1787px, plafond confort 1680px, plancher 75vw au-delà */
+    .wrap{width:clamp(75vw,1680px,94vw);margin:0 auto;padding:0 4px 64px}
     h1,h2,h3{font-family:var(--head);line-height:1.25}
     h2{font-size:1.3rem;font-weight:800;margin:1.8em 0 .2em}
     code{font-family:var(--mono);font-size:.9em}
@@ -63,6 +64,26 @@
     .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:4px;break-inside:avoid}
     .kpi-label{color:var(--muted);font-size:.8rem} .kpi-value{font-family:var(--head);font-weight:800;font-size:1.6rem}
     .kpi-hint{color:var(--muted);font-size:.75rem}
+    /* H3 — KPI cliquable : filtre les cartes par statut (re-clic = tout réafficher) */
+    button.kpi{font:inherit;text-align:left;cursor:pointer;appearance:none}
+    button.kpi[aria-pressed="true"]{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+    button.kpi:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+    /* H1/H2 — barre d'outils : recherche + dropdowns multi-sélection + réinitialisation + compteur */
+    .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0 0}
+    .toolbar input[type="search"]{flex:1 1 320px;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:9px 12px}
+    .toolbar input[type="search"]:focus-visible{outline:3px solid var(--blue);outline-offset:1px}
+    .dropdown{position:relative}
+    .dd-btn{font:inherit;font-weight:600;color:var(--blue);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:8px 12px;cursor:pointer}
+    .dd-btn:focus-visible,.dd-panel button:focus-visible,#reinit:focus-visible,.lien-btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+    .dd-panel{position:absolute;top:calc(100% + 6px);left:0;z-index:7;min-width:220px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);box-shadow:0 8px 24px rgba(15,23,42,.14);padding:10px 12px}
+    .dd-actions{display:flex;gap:14px;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:8px}
+    .dd-actions button{font:inherit;font-weight:600;color:var(--blue);background:none;border:none;cursor:pointer;padding:2px 4px}
+    .dd-panel label{display:flex;gap:8px;align-items:center;padding:5px 2px;cursor:pointer}
+    #reinit{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:8px 12px;cursor:pointer}
+    .compteur{color:var(--muted);font-size:.85rem}
+    .masque{display:none}
+    .etat-vide{background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);padding:18px 20px;color:var(--muted);margin-top:14px}
+    .lien-btn{font:inherit;color:var(--blue);background:none;border:none;cursor:pointer;text-decoration:underline;padding:0}
     .legende{display:flex;gap:16px;flex-wrap:wrap;margin:8px 0 0;color:var(--muted);font-size:.85rem}
     .leg-item{display:inline-flex;align-items:center;gap:6px}
     .leg-swatch{width:12px;height:12px;border-radius:3px;border:1px solid var(--line);display:inline-block}
@@ -104,7 +125,9 @@
         --bg:#FFFFFF;--surface:#FFFFFF;--card:#FFFFFF;--ink:#0F172A;--muted:#64748B;--faint:#94A3B8;--line:#E6EAF2;--blue:#2563EB;
         --amber:#D97706;--amber-fill:#FFFBEB;--amber-line:#FDE9C8;--teal:#0E9488;--teal-fill:#EFFDFB;--teal-line:#C7F0EA;--green:#15803D;--green-fill:#F2FCF5;--green-line:#CFEEDD;
       }
-      body{background:#fff} .entete{position:static} .theme-toggle,nav.toc{display:none}
+      body{background:#fff} .entete{position:static} .theme-toggle,nav.toc,.toolbar{display:none}
+      /* le papier montre tout : les filtres écran ne masquent rien à l'impression */
+      article.card.masque,main>section.masque{display:block}
       .card{break-inside:avoid} a[href^="http"]::after{content:" (" attr(href) ")";font-size:.85em;color:var(--muted)}
     }
   </style>
@@ -113,18 +136,20 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>4de4aaa3fea0</code> · dernier événement 2026-08-13T08:17:36.502Z</p>
+      <p class="meta">sceau <code>8c1bf61f050d</code> · dernier événement 2026-08-13T13:42:44.443Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       </button>
     </header>
     <p>Seul le <strong>reste-à-faire</strong> vit ici — les items clos partent à l'archive (<code>node todo\archiver.mjs</code>). Chaque item est détaillé en puces, avec sa date de création, sa priorité de traitement (dérivée du score) et son impact sur la forge concernée. La décision reste humaine et se prend hors de cette page (« décide TF-xxxx »).</p>
+    <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
+         « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <div class="kpi" title="2 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">2</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
-      <div class="kpi" title="0 item(s) décidés dont les travaux ne sont pas ouverts"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts</span></div>
-      <div class="kpi" title="0 campagne(s) ouvertes au registre"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre</span></div>
-      <div class="kpi" title="149 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">149</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="9 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">9</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
+      <div class="kpi" title="150 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">150</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende">
       <span class="leg-item"><span class="leg-swatch" style="background:var(--blue)"></span>candidat</span>
@@ -132,13 +157,62 @@
       <span class="leg-item"><span class="leg-swatch" style="background:var(--amber)"></span>en cours</span>
       <span class="leg-item">Priorité <strong>Haute</strong> ≥ 5 · <strong>Moyenne</strong> 3-4 · <strong>Basse</strong> &lt; 3 (score = gain × preuve ÷ effort, ×2 si payé en réel)</span>
     </p>
-    <nav class="toc" aria-label="Sommaire"><a href="#organization"><strong>organization</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
+    <!-- H1/H2 — filtres, recherche (insensible aux accents), réinitialisation, compteur aria-live -->
+    <div class="toolbar" role="search" aria-label="Filtrer le reste-à-faire">
+      <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
+      
+      <div class="dropdown" data-dim="forge">
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">3</span>) <span aria-hidden="true">▾</span></button>
+        <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
+          <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
+          <label><input type="checkbox" value="forge-tests" checked> forge-tests</label>
+          <label><input type="checkbox" value="organization" checked> organization</label>
+          <label><input type="checkbox" value="pilot" checked> pilot</label>
+        </div>
+      </div>
+      
+      <div class="dropdown" data-dim="prio">
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">3</span>) <span aria-hidden="true">▾</span></button>
+        <div class="dd-panel" id="dd-prio" role="group" aria-label="Filtre Priorité" hidden>
+          <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
+          <label><input type="checkbox" value="haute" checked> Haute</label>
+          <label><input type="checkbox" value="moyenne" checked> Moyenne</label>
+          <label><input type="checkbox" value="basse" checked> Basse</label>
+        </div>
+      </div>
+      <button id="reinit" type="button">Réinitialiser les filtres</button>
+      <span id="compteur" class="compteur" aria-live="polite">9 / 9 item(s) affichés</span>
+    </div>
+    <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
+    <nav class="toc" aria-label="Sommaire"><a href="#forge-tests"><strong>forge-tests</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#organization"><strong>organization</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">7 item(s) reste-à-faire</span></a></nav>
     <main>
+    <section id="forge-tests">
+      <h2>forge-tests <span class="badge" title="1 item(s) actifs ciblant forge-tests">1</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>forge-tests</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0159" data-forge="forge-tests" data-statut="candidat" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0159</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Tendance du dashboard forge-tests : historiser au-delà de n-1 (multi-runs) avec points cliquables</h3>
+          <div class="card-detail"><p class="lead">La tendance du dashboard compare deux rapports (--precedent) : deux points, pas un historique. La barre de la campagne TF-0153 (Allure Report, registre la-barre) historise les tendances multi-runs et chaque point mène aux éléments qu'il compte.</p><p class="detail-label">Proposition</p><ul class="puces"><li>accepter une LISTE de rapports antérieurs (--precedent répétable ou un dossier d'historique versionné à côté des livrables)</li><li>rendre la tendance en séquence datée (un point par rapport, sha à l'appui)</li><li>chaque point cliquable vers le détail de son rapport ou, à défaut, l'écart nommé</li><li>conserver la règle actuelle en repli (2 points) quand un seul précédent existe — comportement documenté dans la page (note déjà présente). S'appuie sur la discipline existante : totaux republiés data-total, contrôle controler(), déterminisme</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-13</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 2 × preuve 2 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur forge-tests</dt><dd>sans historique, la progression d'un produit sur 3 audits et plus n'est lisible nulle part — chaque campagne de fermeture perd la vue d'ensemble que la barre fixe comme niveau</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">campagne TF-0153 (13/08)</dd></div>
+          </dl>
+        </article>
+      </div>
+    </section>
     <section id="organization">
       <h2>organization <span class="badge" title="1 item(s) actifs ciblant organization">1</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>organization</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0150">
+        <article class="card s-candidat" id="item-TF-0150" data-forge="organization" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0150</code>
             <span class="statut s-candidat">candidat</span>
@@ -157,10 +231,10 @@
       </div>
     </section>
     <section id="pilot">
-      <h2>pilot <span class="badge" title="1 item(s) actifs ciblant pilot">1</span></h2>
+      <h2>pilot <span class="badge" title="7 item(s) actifs ciblant pilot">7</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0151">
+        <article class="card s-candidat" id="item-TF-0151" data-forge="pilot" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0151</code>
             <span class="statut s-candidat">candidat</span>
@@ -174,6 +248,102 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur pilot</dt><dd>la dérive registre↔source a coûté une recette rouge non vue pendant une campagne ; le gabarit qui cadre toutes les campagnes ne prévient pas la classe entière de ce défaut</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">campagne-todos (13/08, TF-0148)</dd></div>
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0152" data-forge="pilot" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0152</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Pages veille et témoin BestPractices : défauts check_html.py préexistants (L3/L4/L5) révélés au passage de la règle largeur 75-100 %</h3>
+          <div class="card-detail"><p class="lead">Constat fait en passant lors de l'encodage de la règle E4 (13/08, conteneur à 75-100 % de la fenêtre) : check_html.py exécuté sur les pages modifiées sort des échecs SANS RAPPORT avec la largeur, préexistants. (1) veille\_gabarit\rapport-veille.gabarit.html et veille\20260810-everything-claude-code\rapport.html : L3 badges de statut sans légende (« retenu », « réalisé », « à évaluer » — title/aria-label/légende visible attendus) ; avertissements G1 (aucune bascule sombre) et L6 (aucun sommaire). (2) references\temoin\Digit-AI - Page-Temoin BestPractices - HTML - 20260810a.html : L4 table « tbl » de 9 lignes sans data-filterable (filtre obligatoire dès 8 lignes) et L5 mark{padding:0 1px} (surlignage qui détache la partie surlignée du mot). Ces pages sont antérieures aux règles L (nées le 12/08) et n'ont jamais été repassées à l'oracle depuis.</p><p class="detail-label">Proposition</p><ul class="puces"><li>mise en conformité chirurgicale des trois fichiers (légendes sur badges, data-filterable ou exemption motivée, padding du mark à zéro), G1 sur le gabarit veille (les rapports futurs l'hériteront), et repasser check_html.py + render_page.py jusqu'au PASS</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-13</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>le gabarit veille propage ses défauts à chaque rapport de veille futur (badges illisibles hors contexte, pas de bascule sombre) ; le témoin BestPractices est cité comme modèle par BEST-PRACTICES-HTML.md alors qu'il échoue à l'oracle du skill qu'il illustre — un témoin non conforme enseigne le défaut</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">session pilot (13/08, encodage règle largeur E4)</dd></div>
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0156" data-forge="pilot" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0156</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">R-31 — généraliser le critère d'admission R-28 à TOUT objet durable (forge, skill, référentiel, règle, profil), R-28 devenant son cas particulier « forge »</h3>
+          <div class="card-detail"><p class="lead">R-28 (REGLES-PROJET.md §H, l.127-141) ne tranche que la naissance d'une FORGE, alors que les quatre dossiers d'opportunité déjà instruits ont tranché des créations de référentiels (profils produit, profils-moteur), de verbes (`importer`), de consignes (restitution) et de règles — avec le même raisonnement, sans règle écrite. L'étude du 13/08 a dû réappliquer le corollaire R-28 (« un corpus de savoir sans verbe outillé est un référentiel versionné, jamais une forge ») par SYMÉTRIE pour trancher le cas d'un skill : le raisonnement tient, mais il n'est opposable nulle part.</p><p class="detail-label">Proposition</p><ul class="puces"><li>R-31 dans REGLES-PROJET.md — un objet durable nouveau (forge, skill, gabarit exécutable, oracle, profil, référentiel) naît selon le même test qu'une forge :</li><li>≥ 1 verbe outillé exécutable absent partout ailleurs, prouvé par un verdict de non-recouvrement écrit et cité (≥ 2 pour une forge, seuil R-28 conservé)</li><li>né exercé (oracle/self-test double sens)</li><li>cadence ou mandat propres</li><li>surfaces d'intégration livrées le jour même. Corollaire conservé et étendu : sans verbe outillé, c'est un référentiel versionné — jamais une forge NI un skill. Fixture de validation : R-31 appliquée aux 4 dossiers du 12-13/08 + à l'étude du 13/08 redonne les 5 verdicts rendus (forge websec · profils produit · verbe `importer` + profils-moteur · personas écartés · NO-GO skill Opportunité)</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-13</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>constaté sur pièces le 13/08 : pour trancher la création d'un skill, l'étude a dû raisonner par symétrie avec R-28 faute de règle couvrant les objets non-forge — le précédent existe donc déjà, non encodé, et sera re-improvisé au prochain cas</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">etude-opportunite-outillage-13-08 (mandat humain du 13/08)</dd></div>
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0157" data-forge="pilot" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0157</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Champ `motif_ecart` obligatoire à la transition vers `ecarte` — fermer la perte structurelle de la mémoire des refus</h3>
+          <div class="card-detail"><p class="lead">Vérifié sur pièces le 13/08 : R5 autorise candidat→ecarte, decide→ecarte, en_cours→ecarte, et R7 n'exige des champs de clôture QUE pour `corrige` (gains_constates, corrections_realisees, date_correction — todo\oracle-todo.mjs l.11-14, l.87-91).</p><ul class="puces"><li>Un item écarté ne conserve donc AUCUNE trace structurée de la raison de son écart : seul BOUCLE-AMELIORATION.md en garde une trace narrative, non requêtable et non liée à l'id. Conséquence : rien n'empêche la réouverture d'une idée déjà tranchée, et le coût de la re-instruction est payé à chaque fois. Proposition (campagne pilot, effort faible) :</li><li>étendre R7 — clôture en `ecarte` exige `motif_ecart` (texte) + `date_decision` + `decideur`, symétrique de ce que R6 impose déjà à candidat→decide</li><li>ajouter le champ à la projection de ingerer-lot.mjs et aux vues générées (TODO.md/.html)</li><li>fixtures double sens dans todo\self-test.mjs (écart sans motif → FAIL). Aucun item existant n'est en `ecarte` aujourd'hui : le changement est rétro-compatible sans reprise de données</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-13</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>trou prouvé par lecture de l'oracle (aucune exigence sur `ecarte`) ; effet non encore constaté puisque aucun item n'est en `ecarte` à ce jour — la parade est posée avant le premier écart, pas après</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">etude-opportunite-outillage-13-08 (mandat humain du 13/08)</dd></div>
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0158" data-forge="pilot" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0158</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">S-G1 : « prefers-color-scheme à la 1re visite » contredit « clair par défaut » vécu — trancher le standard pour tous les livrables</h3>
+          <div class="card-detail"><p class="lead">Constat de la campagne TF-0153 (13/08) : le dashboard forge-tests suivait déjà prefers-color-scheme (tokens sombres sur :root:not([data-theme=&quot;clair&quot;])) — c'est exactement ce comportement, conforme à la lettre de S-G1 (« prefers-color-scheme à la première visite »), qui a produit le retour humain « thème sombre par défaut » : sur un OS sombre, le livrable s'ouvre sombre. La campagne a tranché pour le dashboard : CLAIR PAR DÉFAUT STRICT (le sombre est un choix du lecteur, persisté ; l'impression reste claire). Mais TODO.html du pilot, le boilerplate du skill digit-ai-page-html et les témoins suivent encore prefers-color-scheme à la 1re visite : le même retour humain les frappera sur un poste sombre.</p><p class="detail-label">Proposition</p><ul class="puces"><li>trancher le standard — soit S-G1 passe à « clair par défaut strict, sombre uniquement par bascule persistée » pour tous les LIVRABLES QUI CIRCULENT (recommandé : un livrable doit s'ouvrir identique chez tous ses lecteurs), soit prefers-color-scheme reste pour les pages de consultation interne (TODO.html) et le standard distingue les deux familles</li><li>Encoder la décision dans REGLES-PROJET (amendement R-30), le skill (S-G1, boilerplate, check_html G1) et BEST-PRACTICES §G, avec fixtures</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-13</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>le même standard S-G1 appliqué à la lettre a déjà coûté un retour humain sur un livrable réel ; chaque page livrée à un lecteur en OS sombre reproduira la plainte tant que le standard n'est pas tranché</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">campagne TF-0153 (13/08)</dd></div>
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0154" data-forge="pilot" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0154</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Généraliser le contrôle pré-génération des gabarits HTML (§2 bis) à toutes les forges qui en portent — inventaire, passage aux oracles, câblage, sidecar TODO automatique</h3>
+          <div class="card-detail"><p class="lead">Le contrat §2 bis (13/08) rend chaque forge responsable de la conformité de ses gabarits HTML avant génération ; forge-tests a sa candidature dédiée, mais l'inventaire des autres porteurs de gabarits n'existe pas.</p><ul class="puces"><li>Proposition (campagne transverse mandatée) :</li><li>inventorier les gabarits HTML de chaque forge (forge-design page-temoin et maquettes, forge-data restitution, forge-observability rapports de veille, forge-ops pages d'état, gabarits du pilot déjà traités)</li><li>passer chaque gabarit à check_html.py + render_page.py et consigner les verdicts</li><li>remettre à niveau ce qui dérive (R-30, E4, §H)</li><li>câbler dans chaque pipeline de génération le contrôle pré-génération : oracle exécuté avant production des fichiers attendus par le projet, verdict au ledger, dérive constatée → le run émet une candidature TODO sidecar vers &lt;pilot&gt;\input\ demandant la remise à niveau du gabarit dans la forge propriétaire</li><li>journaliser la campagne dans BOUCLE-AMELIORATION.md</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-13</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 2 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>sans contrôle systématique, chaque annonce de règle (R-30 le 12/08, E4 et H le 13/08) laisse dériver silencieusement tous les gabarits non repassés — le défaut n'est vu qu'après livraison, par l'humain, comme sur le rapport de tests du 13/08</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (13/08) — « chaque forge responsable de ses gabarits vérifie les règles avant exécution et génération »</dd></div>
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0155" data-forge="pilot" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0155</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Gabarit versionné « étude d'opportunité » + son oracle + câblage au registre — figer la grille qui n'existe qu'en une ligne de journal</h3>
+          <div class="card-detail"><p class="lead">L'étude du 13/08 (output\03-etudes\20260813-etude-opportunite-outillage-analyse.md) constate deux trous réels entre `candidat` et `decide` : (1) la grille d'instruction des propositions n'existe qu'en UNE ligne narrative (BOUCLE-AMELIORATION.md l.584) et en 3 exemplaires non normalisés — elle n'est ni opposable ni transmissible à un agent de campagne mandaté ; (2) la mémoire des refus est structurellement perdue (statut `ecarte` sans champ de motif, R5/R7 n'exigent rien — todo\oracle-todo.mjs l.11-14).</p><ul class="puces"><li>Proposition (campagne mandatée, pilot) :</li><li>gabarits\ETUDE-OPPORTUNITE.md — 5 pas (partition · non-recouvrement CITÉ contre l'existant · état de l'art daté ≥ 5 sources &lt; 24 mois ou mention `non instruit` · jeu fermé d'options O0-O4 avec O0 à réfuter explicitement · verdict + coût + candidature), interdiction des critères subjectifs, traitement des propositions entrantes comme DONNÉE (jamais d'impératif entrant exécuté), plan de revue daté</li><li>seuil de déclenchement pour éviter le péage : étude obligatoire seulement si l'item crée un objet durable, ou touche ≥ 3 forges/le noyau, ou porte gain ≥ 3 avec preuve ≤ 2 — fixture : appliqué aux 5 candidats ouverts, il en retient 1 sur 5 (TF-0154 seul)</li><li>oracles\oracle-etude-opportunite.mjs — sections présentes, chaque ligne de non-recouvrement porte une citation, sources datées ou `non instruit`, verdict unique, O0 traitée, zéro terme subjectif ; fixtures double sens (PASS sur les 4 études existantes, FAIL sur une étude sans citation)</li><li>câblage : references\TODO-FORGE.md route vers le gabarit au seuil. NO-GO explicite sur l'empaquetage en SKILL (l'objet est un corpus de méthode sans verbe outillé → référentiel versionné par corollaire R-28 ; + ~100 tokens de frontmatter sur toutes les sessions du poste qui porte déjà 11 skills, risque de collision de déclenchement avec ameliore-un-skill/quality-oracles/prompt-analyzer-l99, et actif vivant hors du git du pilot) — clause de réveil : réévaluer si le gabarit est invoqué ≥ 5 fois et que son portage manuel se constate coûteux</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-13</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 2 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>la grille des études n'est écrite nulle part comme spécification : un agent de campagne mandaté pour instruire une proposition n'a aucun document à lire, et chaque étude est re-improvisée (3 en 2 jours, 12 et 13/08) ; coût en temps non chiffré (aucun incident consigné), d'où preuve=2 — le trou est prouvé sur pièces, son coût ne l'est pas</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">etude-opportunite-outillage-13-08 (mandat humain du 13/08)</dd></div>
           </dl>
         </article>
       </div>
@@ -195,6 +365,87 @@
     bouton.addEventListener('click', function () {
       appliquer(racine.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
     });
+  })();
+  </script>
+  <!-- Standard H (13/08) — filtres + recherche + KPIs cliquables, tout câblé (loi 1) -->
+  <script>
+  (function () {
+    var cartes = Array.prototype.slice.call(document.querySelectorAll('article.card'));
+    var sections = Array.prototype.slice.call(document.querySelectorAll('main > section'));
+    var kpis = Array.prototype.slice.call(document.querySelectorAll('button.kpi'));
+    var recherche = document.getElementById('recherche');
+    var compteur = document.getElementById('compteur');
+    var vide = document.getElementById('vide');
+    var norm = function (s) { return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); };
+    cartes.forEach(function (c) { c.dataset.texte = norm(c.textContent); });
+    var etatKpi = null;
+    function coches(dim) {
+      var set = {};
+      document.querySelectorAll('#dd-' + dim + ' input:checked').forEach(function (i) { set[i.value] = true; });
+      return set;
+    }
+    function majDd(dim) {
+      var n = document.querySelectorAll('#dd-' + dim + ' input:checked').length;
+      document.querySelector('[data-dim="' + dim + '"] .dd-n').textContent = n;
+    }
+    function fermerPanneaux() {
+      document.querySelectorAll('.dd-panel').forEach(function (p) { p.hidden = true; });
+      document.querySelectorAll('.dd-btn').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+    }
+    function appliquer() {
+      var q = norm(recherche.value.trim());
+      var forges = coches('forge'), prios = coches('prio');
+      var visibles = 0;
+      cartes.forEach(function (c) {
+        var ok = (!etatKpi || c.dataset.statut === etatKpi)
+          && !!forges[c.dataset.forge] && !!prios[c.dataset.prio]
+          && (!q || c.dataset.texte.indexOf(q) !== -1);
+        c.classList.toggle('masque', !ok);
+        if (ok) visibles++;
+      });
+      sections.forEach(function (s) {
+        s.classList.toggle('masque', s.querySelectorAll('article.card:not(.masque)').length === 0);
+      });
+      compteur.textContent = visibles + ' / ' + cartes.length + ' item(s) affichés';
+      vide.hidden = visibles !== 0;
+      majDd('forge'); majDd('prio');
+    }
+    kpis.forEach(function (k) {
+      k.addEventListener('click', function () {
+        etatKpi = etatKpi === k.dataset.statut ? null : k.dataset.statut;
+        kpis.forEach(function (a) { a.setAttribute('aria-pressed', a.dataset.statut === etatKpi ? 'true' : 'false'); });
+        appliquer();
+      });
+    });
+    document.querySelectorAll('.dropdown').forEach(function (d) {
+      var btn = d.querySelector('.dd-btn'), panel = d.querySelector('.dd-panel');
+      btn.addEventListener('click', function () {
+        var etaitOuvert = !panel.hidden;
+        fermerPanneaux();
+        if (!etaitOuvert) { panel.hidden = false; btn.setAttribute('aria-expanded', 'true'); }
+      });
+      d.addEventListener('click', function (ev) {
+        var act = ev.target.getAttribute && ev.target.getAttribute('data-act');
+        if (act) panel.querySelectorAll('input').forEach(function (i) { i.checked = act === 'tous'; });
+        if (act || ev.target.tagName === 'INPUT') appliquer();
+      });
+    });
+    document.addEventListener('click', function (ev) {
+      if (!ev.target.closest('.dropdown')) fermerPanneaux();
+    });
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape') fermerPanneaux();
+    });
+    recherche.addEventListener('input', appliquer);
+    function reinitialiser() {
+      recherche.value = '';
+      etatKpi = null;
+      kpis.forEach(function (a) { a.setAttribute('aria-pressed', 'false'); });
+      document.querySelectorAll('.dd-panel input').forEach(function (i) { i.checked = true; });
+      appliquer();
+    }
+    document.getElementById('reinit').addEventListener('click', reinitialiser);
+    document.getElementById('vide-reinit').addEventListener('click', reinitialiser);
   })();
   </script>
 </body>

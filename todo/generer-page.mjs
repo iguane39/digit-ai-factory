@@ -14,6 +14,12 @@
  * Autonome : zéro réseau (polices en repli système). Charte digit-ai-page-html : tokens du
  * boilerplate, Roboto titres / DM Sans corps. R-30 : thème CLAIR par défaut + bascule sombre
  * câblée en en-tête (pattern S-G1, persistée, prefers-color-scheme 1re visite, print clair).
+ *
+ * Standard H (13/08, BEST-PRACTICES-HTML.md §H) : page à liste → filtres multi-sélection
+ * Forge/Priorité (Tous/Aucun), recherche plein texte insensible aux accents + « Réinitialiser
+ * les filtres » + compteur aria-live, KPIs cliquables filtrant les cartes par statut. Le KPI
+ * « Clos » n'est PAS cliquable : ses éléments vivent à l'archive, hors page (H3). Tout est
+ * viewer-only : à l'impression, filtres masqués et cartes toutes visibles.
  */
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
@@ -88,7 +94,7 @@ for (const forge of [...parForge.keys()].sort()) {
     const p = prio(e.score.valeur);
     const reel = e.preuve_du_cout ? `<span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>` : "";
     return `
-        <article class="card s-${e.statut}" id="item-${e.id}">
+        <article class="card s-${e.statut}" id="item-${e.id}" data-forge="${esc(forge)}" data-statut="${e.statut}" data-prio="${p.k}">
           <header class="card-head">
             <code class="tf-id">${e.id}</code>
             <span class="statut s-${e.statut}">${e.statut}</span>
@@ -113,6 +119,21 @@ for (const forge of [...parForge.keys()].sort()) {
       </div>
     </section>`;
 }
+
+// H1 — dropdowns multi-sélection (Tous / Aucun), un par dimension catégorielle.
+const FORGES = [...parForge.keys()].sort();
+const LPRIO = { haute: "Haute", moyenne: "Moyenne", basse: "Basse" };
+const PRIOS = ["haute", "moyenne", "basse"]
+  .filter((k) => [...etats.values()].some((e) => prio(e.score.valeur).k === k))
+  .map((k) => ({ v: k, l: LPRIO[k] }));
+const dd = (dim, label, options) => `
+      <div class="dropdown" data-dim="${dim}">
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-${dim}">${label} (<span class="dd-n">${options.length}</span>) <span aria-hidden="true">▾</span></button>
+        <div class="dd-panel" id="dd-${dim}" role="group" aria-label="Filtre ${label}" hidden>
+          <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
+          ${options.map((o) => `<label><input type="checkbox" value="${esc(o.v)}" checked> ${esc(o.l)}</label>`).join("\n          ")}
+        </div>
+      </div>`;
 
 const html = `<!DOCTYPE html>
 <html lang="fr">
@@ -156,7 +177,8 @@ const html = `<!DOCTYPE html>
     }
     *{box-sizing:border-box} html{-webkit-text-size-adjust:100%}
     body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:16px}
-    .wrap{width:min(94vw,1680px);margin:0 auto;padding:0 4px 64px}
+    /* 75-100 % de la fenêtre, toujours : 94vw sous ~1787px, plafond confort 1680px, plancher 75vw au-delà */
+    .wrap{width:clamp(75vw,1680px,94vw);margin:0 auto;padding:0 4px 64px}
     h1,h2,h3{font-family:var(--head);line-height:1.25}
     h2{font-size:1.3rem;font-weight:800;margin:1.8em 0 .2em}
     code{font-family:var(--mono);font-size:.9em}
@@ -179,6 +201,26 @@ const html = `<!DOCTYPE html>
     .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:4px;break-inside:avoid}
     .kpi-label{color:var(--muted);font-size:.8rem} .kpi-value{font-family:var(--head);font-weight:800;font-size:1.6rem}
     .kpi-hint{color:var(--muted);font-size:.75rem}
+    /* H3 — KPI cliquable : filtre les cartes par statut (re-clic = tout réafficher) */
+    button.kpi{font:inherit;text-align:left;cursor:pointer;appearance:none}
+    button.kpi[aria-pressed="true"]{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+    button.kpi:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+    /* H1/H2 — barre d'outils : recherche + dropdowns multi-sélection + réinitialisation + compteur */
+    .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0 0}
+    .toolbar input[type="search"]{flex:1 1 320px;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:9px 12px}
+    .toolbar input[type="search"]:focus-visible{outline:3px solid var(--blue);outline-offset:1px}
+    .dropdown{position:relative}
+    .dd-btn{font:inherit;font-weight:600;color:var(--blue);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:8px 12px;cursor:pointer}
+    .dd-btn:focus-visible,.dd-panel button:focus-visible,#reinit:focus-visible,.lien-btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+    .dd-panel{position:absolute;top:calc(100% + 6px);left:0;z-index:7;min-width:220px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);box-shadow:0 8px 24px rgba(15,23,42,.14);padding:10px 12px}
+    .dd-actions{display:flex;gap:14px;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:8px}
+    .dd-actions button{font:inherit;font-weight:600;color:var(--blue);background:none;border:none;cursor:pointer;padding:2px 4px}
+    .dd-panel label{display:flex;gap:8px;align-items:center;padding:5px 2px;cursor:pointer}
+    #reinit{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:8px 12px;cursor:pointer}
+    .compteur{color:var(--muted);font-size:.85rem}
+    .masque{display:none}
+    .etat-vide{background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);padding:18px 20px;color:var(--muted);margin-top:14px}
+    .lien-btn{font:inherit;color:var(--blue);background:none;border:none;cursor:pointer;text-decoration:underline;padding:0}
     .legende{display:flex;gap:16px;flex-wrap:wrap;margin:8px 0 0;color:var(--muted);font-size:.85rem}
     .leg-item{display:inline-flex;align-items:center;gap:6px}
     .leg-swatch{width:12px;height:12px;border-radius:3px;border:1px solid var(--line);display:inline-block}
@@ -220,7 +262,9 @@ const html = `<!DOCTYPE html>
         --bg:#FFFFFF;--surface:#FFFFFF;--card:#FFFFFF;--ink:#0F172A;--muted:#64748B;--faint:#94A3B8;--line:#E6EAF2;--blue:#2563EB;
         --amber:#D97706;--amber-fill:#FFFBEB;--amber-line:#FDE9C8;--teal:#0E9488;--teal-fill:#EFFDFB;--teal-line:#C7F0EA;--green:#15803D;--green-fill:#F2FCF5;--green-line:#CFEEDD;
       }
-      body{background:#fff} .entete{position:static} .theme-toggle,nav.toc{display:none}
+      body{background:#fff} .entete{position:static} .theme-toggle,nav.toc,.toolbar{display:none}
+      /* le papier montre tout : les filtres écran ne masquent rien à l'impression */
+      article.card.masque,main>section.masque{display:block}
       .card{break-inside:avoid} a[href^="http"]::after{content:" (" attr(href) ")";font-size:.85em;color:var(--muted)}
     }
   </style>
@@ -236,11 +280,13 @@ const html = `<!DOCTYPE html>
       </button>
     </header>
     <p>Seul le <strong>reste-à-faire</strong> vit ici — les items clos partent à l'archive (<code>node todo\\archiver.mjs</code>). Chaque item est détaillé en puces, avec sa date de création, sa priorité de traitement (dérivée du score) et son impact sur la forge concernée. La décision reste humaine et se prend hors de cette page (« décide TF-xxxx »).</p>
+    <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
+         « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <div class="kpi" title="${compte("candidat")} candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">${compte("candidat")}</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
-      <div class="kpi" title="${compte("decide")} item(s) décidés dont les travaux ne sont pas ouverts"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">${compte("decide")}</span><span class="kpi-hint">mandat donné, travaux non ouverts</span></div>
-      <div class="kpi" title="${compte("en_cours")} campagne(s) ouvertes au registre"><span class="kpi-label">En cours</span><span class="kpi-value">${compte("en_cours")}</span><span class="kpi-hint">campagnes ouvertes au registre</span></div>
-      <div class="kpi" title="${nbArchives} item(s) clos déplacés vers todo\\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">${nbArchives}</span><span class="kpi-hint">hors vue — <code>todo\\TODO-ARCHIVE.jsonl</code></span></div>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="${compte("candidat")} candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">${compte("candidat")}</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="${compte("decide")} item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">${compte("decide")}</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="${compte("en_cours")} campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">${compte("en_cours")}</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
+      <div class="kpi" title="${nbArchives} item(s) clos déplacés vers todo\\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">${nbArchives}</span><span class="kpi-hint">hors vue — <code>todo\\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende">
       <span class="leg-item"><span class="leg-swatch" style="background:var(--blue)"></span>candidat</span>
@@ -248,6 +294,15 @@ const html = `<!DOCTYPE html>
       <span class="leg-item"><span class="leg-swatch" style="background:var(--amber)"></span>en cours</span>
       <span class="leg-item">Priorité <strong>Haute</strong> ≥ 5 · <strong>Moyenne</strong> 3-4 · <strong>Basse</strong> &lt; 3 (score = gain × preuve ÷ effort, ×2 si payé en réel)</span>
     </p>
+    <!-- H1/H2 — filtres, recherche (insensible aux accents), réinitialisation, compteur aria-live -->
+    <div class="toolbar" role="search" aria-label="Filtrer le reste-à-faire">
+      <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
+      ${dd("forge", "Forge", FORGES.map((f) => ({ v: f, l: f })))}
+      ${dd("prio", "Priorité", PRIOS)}
+      <button id="reinit" type="button">Réinitialiser les filtres</button>
+      <span id="compteur" class="compteur" aria-live="polite">${etats.size} / ${etats.size} item(s) affichés</span>
+    </div>
+    <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
     <nav class="toc" aria-label="Sommaire">${[...parForge.keys()].sort().map((f) => `<a href="#${esc(f).replace(/[^a-z-]/g, "")}"><strong>${esc(f)}</strong> <span class="toc-d">${parForge.get(f).length} item(s) reste-à-faire</span></a>`).join("")}</nav>
     <main>${sections}
     </main>
@@ -267,6 +322,87 @@ const html = `<!DOCTYPE html>
     bouton.addEventListener('click', function () {
       appliquer(racine.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
     });
+  })();
+  </script>
+  <!-- Standard H (13/08) — filtres + recherche + KPIs cliquables, tout câblé (loi 1) -->
+  <script>
+  (function () {
+    var cartes = Array.prototype.slice.call(document.querySelectorAll('article.card'));
+    var sections = Array.prototype.slice.call(document.querySelectorAll('main > section'));
+    var kpis = Array.prototype.slice.call(document.querySelectorAll('button.kpi'));
+    var recherche = document.getElementById('recherche');
+    var compteur = document.getElementById('compteur');
+    var vide = document.getElementById('vide');
+    var norm = function (s) { return s.toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g, ''); };
+    cartes.forEach(function (c) { c.dataset.texte = norm(c.textContent); });
+    var etatKpi = null;
+    function coches(dim) {
+      var set = {};
+      document.querySelectorAll('#dd-' + dim + ' input:checked').forEach(function (i) { set[i.value] = true; });
+      return set;
+    }
+    function majDd(dim) {
+      var n = document.querySelectorAll('#dd-' + dim + ' input:checked').length;
+      document.querySelector('[data-dim="' + dim + '"] .dd-n').textContent = n;
+    }
+    function fermerPanneaux() {
+      document.querySelectorAll('.dd-panel').forEach(function (p) { p.hidden = true; });
+      document.querySelectorAll('.dd-btn').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+    }
+    function appliquer() {
+      var q = norm(recherche.value.trim());
+      var forges = coches('forge'), prios = coches('prio');
+      var visibles = 0;
+      cartes.forEach(function (c) {
+        var ok = (!etatKpi || c.dataset.statut === etatKpi)
+          && !!forges[c.dataset.forge] && !!prios[c.dataset.prio]
+          && (!q || c.dataset.texte.indexOf(q) !== -1);
+        c.classList.toggle('masque', !ok);
+        if (ok) visibles++;
+      });
+      sections.forEach(function (s) {
+        s.classList.toggle('masque', s.querySelectorAll('article.card:not(.masque)').length === 0);
+      });
+      compteur.textContent = visibles + ' / ' + cartes.length + ' item(s) affichés';
+      vide.hidden = visibles !== 0;
+      majDd('forge'); majDd('prio');
+    }
+    kpis.forEach(function (k) {
+      k.addEventListener('click', function () {
+        etatKpi = etatKpi === k.dataset.statut ? null : k.dataset.statut;
+        kpis.forEach(function (a) { a.setAttribute('aria-pressed', a.dataset.statut === etatKpi ? 'true' : 'false'); });
+        appliquer();
+      });
+    });
+    document.querySelectorAll('.dropdown').forEach(function (d) {
+      var btn = d.querySelector('.dd-btn'), panel = d.querySelector('.dd-panel');
+      btn.addEventListener('click', function () {
+        var etaitOuvert = !panel.hidden;
+        fermerPanneaux();
+        if (!etaitOuvert) { panel.hidden = false; btn.setAttribute('aria-expanded', 'true'); }
+      });
+      d.addEventListener('click', function (ev) {
+        var act = ev.target.getAttribute && ev.target.getAttribute('data-act');
+        if (act) panel.querySelectorAll('input').forEach(function (i) { i.checked = act === 'tous'; });
+        if (act || ev.target.tagName === 'INPUT') appliquer();
+      });
+    });
+    document.addEventListener('click', function (ev) {
+      if (!ev.target.closest('.dropdown')) fermerPanneaux();
+    });
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape') fermerPanneaux();
+    });
+    recherche.addEventListener('input', appliquer);
+    function reinitialiser() {
+      recherche.value = '';
+      etatKpi = null;
+      kpis.forEach(function (a) { a.setAttribute('aria-pressed', 'false'); });
+      document.querySelectorAll('.dd-panel input').forEach(function (i) { i.checked = true; });
+      appliquer();
+    }
+    document.getElementById('reinit').addEventListener('click', reinitialiser);
+    document.getElementById('vide-reinit').addEventListener('click', reinitialiser);
   })();
   </script>
 </body>
