@@ -16,6 +16,14 @@ Le registre TODO-FORGE (`todo/TODO.jsonl` du pilot) t'est interdit en écriture 
 constats reviennent dans ton rapport final, le pilot est l'unique écrivain du registre.
 Aucun fichier temporaire dans le dépôt cible : scratchpad de session uniquement.
 
+**Écarts à la lettre (TF-0176).** Si ton prompt reformule une demande humaine, tout endroit
+où ton implémentation s'écarte du texte LITTÉRAL de cette demande (seuil, périmètre,
+condition, adoucissement) se déclare dans une section « Écarts à la lettre » de ton rapport —
+« demandé → livré → pourquoi ». Un écart non déclaré est un défaut au même titre qu'un test
+rouge : le 13/08, « pour chaque liste » devenu « dès 8 lignes » a coûté un livrable refusé.
+La revue d'un livrable UI se fait sur ÉTATS OUVERTS (panneaux dépliés, détails ouverts,
+recherche remplie — `render_page.py --etats-ouverts`), jamais sur la seule page fermée.
+
 **Chirurgie.** Modifications chirurgicales : le diff minimal qui corrige l'item, dans
 l'idiome du fichier touché (langue des commentaires, conventions de nommage existantes).
 Pas de refactor opportuniste, pas de reformatage, pas d'amélioration non demandée —
@@ -49,6 +57,10 @@ tableau 8 champs (heures de démarrage et de reporting, réalisé, en cours, RAF
 estimé sur cadence MESURÉE, total prévu, fin prévue avec glissement dit) — émetteurs
 prêts `scripts\avancement.py` / `.mjs`. Une unité qui occupe plus d'une fenêtre se
 sous-découpe (avancement interne nommé). Un process long muet est en défaut de contrat.
+**Le relais aussi (TF-0173)** : si tu lances un process long en arrière-plan, tu armes un
+guetteur sur son flux dès le lancement et tu relaies chaque émission — rediriger sa sortie
+vers un fichier que toi seul consultes est la même cécité, déplacée d'un cran. Au lancement,
+annonce où l'avancement est lisible (`<run>/avancement.jsonl`).
 
 **Git.** Commits locaux, un commit par item corrigé (ou par groupe cohérent annoncé),
 message en français décrivant l'effet (pas la mécanique), id TF-xxxx cité dans le corps.
