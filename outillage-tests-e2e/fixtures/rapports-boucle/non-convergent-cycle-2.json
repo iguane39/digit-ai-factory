@@ -1,0 +1,12 @@
+{
+  "cycle": 2,
+  "verdict": "PARTIEL",
+  "triplet": { "couverture": 0.85, "passage": 0.90, "mutation": 0.45 },
+  "seuils": { "couverture": 1.0, "passage": 1.0, "mutation": 0.70 },
+  "findings": [
+    { "id": "design/golden-accueil", "pan": "visuel", "classe": "regression-visuelle", "message": "capture accueil diverge toujours du golden, arbitrage humain requis" }
+  ],
+  "actions": [
+    { "finding_ref": "design/golden-accueil", "categorie": "manuelle_utilisateur", "etape_cible": "design", "attendu": "ARBITRER le rendu : valider le nouveau golden ou corriger le rendu" }
+  ]
+}
