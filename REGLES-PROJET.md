@@ -103,7 +103,7 @@ n'est encodé sans décision, rien de décidé n'est laissé sans encodage trac�
 | D-xx (organization, décidées 08-09/08) | Encodage corpus | État |
 |---|---|---|
 | D-01 `output/` ≠ artefacts de build | règle 2 (`dist/` hors périmètre : pas un livrable) | encodée |
-| D-02 indice obligatoire + archivage `Old\` sans effacement | règles 5 et 7 | encodée — soldée 11/08 (TF-0084) : emplacement = même dossier (règle 7 existante), graphie = `Old` (D-02) ; migration des 4 graphies terrain au prochain run de version de chacun |
+| D-02 indice obligatoire + archivage `Old\` sans effacement | règles 5 et 7 | encodée — soldée 11/08 (TF-0084) ; **casse alignée 13/08 (D-15/TF-0149)** : la graphie qui prévaut pour `output\` est désormais `old\` **minuscule** (état de fait des 6 dépôts) — `Old` reste le fait d'époque, non réécrit |
 | D-03 préfixe = nom du projet (Q3-bis) | règle 4 | **encodée — cas d'école du circuit** |
 | D-04 taxonomie des types, registre `registre-types.json` | **règle 25** (oracle, lecture seule du registre) | **encodée 11/08 (TF-0084)** — registre 1.1.0 complété sur usage réel (29 types) |
 | D-05 `CLAUDE.md` point d'entrée, compléments référencés | règle 11 + gabarit `CLAUDE-PRODUIT.md` | encodée |
@@ -113,6 +113,7 @@ n'est encodé sans décision, rien de décidé n'est laissé sans encodage trac�
 | D-12 composant partagé : inliner, jamais installer en douce | garde-fou pilot « aucune écriture dans les dépôts frères hors mandat » | encodée |
 | D-13 le circuit lui-même | CLAUDE.md pilot, ligne de gouvernance Q-B | encodée |
 | D-14 `forge-steering` → `forge-pilot` | répercuté partout (bootstrap, README, schéma) | constatée |
+| D-15 rangement `output\` en familles numérotées (`01-…`, une version courante à la racine, versions antérieures dans `old\` **minuscule**, `LISEZMOI.md` de mapping obligatoire si références antérieures) | appliqué le 13/08 (pilot 5 familles, agents/design/organization/seo) ; casse `old\` **tranchée par l'humain le 13/08** (alignement sur l'état de fait, supersède la graphie `Old` de D-02 pour `output\`) | **encodée 13/08 (TF-0149)** — mécanisation de D-15 dans `oracle-conventions` = candidat |
 
 Q4 (conventions internes aux fichiers) reste ouverte **côté organization** — pas une
 décision pilot tant qu'aucune proposition n'est remise.
