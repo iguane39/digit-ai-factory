@@ -157,8 +157,14 @@ est **câblée** — un filtre qui ne filtre pas est un défaut.
 | H2 | Recherche plein texte + « Réinitialiser les filtres » | F1 | `input[type="search"]` ; `find-in-page.js` du skill | **adopter (obligatoire)** | Insensible aux accents, sur les champs porteurs (titre, contenu, id…). Le bouton de réinitialisation rétablit filtres **et** recherche ; compteur de résultats en `aria-live="polite"` (B13). |
 | H3 | KPIs cliquables filtrant la liste | F1 + demande 13/08 | B2 + `role="button"`, `aria-pressed` | **adopter (obligatoire)** | Tout KPI qui compte des éléments **affichés dans la page** filtre la liste sur son sous-ensemble au clic (re-clic = tout réafficher ; accessible clavier). Un KPI comptant des éléments **hors page** (archives…) ne se rend pas cliquable et dit où vivent ses éléments (L3). |
 
+| H4 | Synthèse à fait nouveau — jamais une redite | refus humain du 13/08 (TF-0176) | colonne « lecture », chapeaux | **adopter (obligatoire)** | Toute phrase de synthèse générée cite **au moins un fait absent des autres colonnes** (le constat au plus fort risque, le motif d'un non-testé…) — une synthèse qui ne fait que reformuler des chiffres déjà affichés ne se génère pas. Mécanisation : candidature L13 (delta n°6). |
+| H5 | Composant livré avec son habillage | refus humain du 13/08 (TF-0176) | `table-filters.css` jumeau de `table-filters.js` | **adopter (obligatoire)** | Un composant injecté sans CSS sort en rendu brut navigateur chez TOUS ses hôtes. Le CSS charté (tokens `:root`, deux thèmes, `@media print`) s'inline avec le JS ; l'état OUVERT passe V2/V4 (`render_page.py --etats-ouverts`). |
+
 Contrat amont : les forges propriétaires de gabarits vérifient E4/G1/H **avant génération**
-(`CONTRAT-INTERFACE.md` §2 bis) ; dérive constatée → candidature TODO au pilot.
+(`CONTRAT-INTERFACE.md` §2 bis) ; dérive constatée → candidature TODO au pilot. **Revue
+aval (TF-0176)** : un livrable UI se juge sur **états ouverts** — panneaux dépliés, détails
+ouverts, recherche remplie (`--etats-ouverts`) — et l'acceptation d'une campagne de retours
+joint **une capture par retour**, jamais un verdict textuel seul.
 
 ---
 
