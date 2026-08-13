@@ -17,7 +17,7 @@
  * non_juge : qualité du contenu des mentions (une citation vide passerait E2-E6) ;
  * existence des dépôts GitHub distants (réseau) ; fraîcheur des clones locaux (bootstrap --pull).
  */
-import { readFileSync, existsSync, readdirSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -63,13 +63,26 @@ for (const [regle, fichier] of [["E2", "INVENTAIRE.md"], ["E3", "CONTRAT-INTERFA
     : ok(regle, `${fichier} : ${forges.length}/${forges.length} forges présentes`);
 }
 
-// E5 · dernier schéma écosystème (tri par nom = tri chronologique, convention datée)
+// E5 · dernier schéma écosystème (tri par nom = tri chronologique, convention datée).
+// output\ peut être organisé en sous-dossiers (ex. 02-schema-ecosysteme\) : on cherche le
+// schéma courant à la racine ET dans les sous-dossiers immédiats, en excluant old\ et .oracles\.
 const out = join(racine, "output");
-const schemas = existsSync(out) ? readdirSync(out).filter(n => /^Forge Pilot - Schéma Écosystème - .*\.html$/.test(n)).sort() : [];
-if (!schemas.length) ko("E5", "aucun schéma écosystème dans output\\");
+const RE_SCHEMA = /^Forge Pilot - Schéma Écosystème - .*\.html$/;
+const schemas = [];
+if (existsSync(out)) {
+  for (const n of readdirSync(out)) {
+    const p = join(out, n);
+    if (RE_SCHEMA.test(n)) { schemas.push({ nom: n, chemin: p }); continue; }
+    if (statSync(p).isDirectory() && !/^(old|\.oracles)$/i.test(n))
+      for (const m of readdirSync(p))
+        if (RE_SCHEMA.test(m)) schemas.push({ nom: m, chemin: join(p, m) });
+  }
+}
+schemas.sort((a, b) => a.nom.localeCompare(b.nom));
+if (!schemas.length) ko("E5", "aucun schéma écosystème dans output\\ (ni ses sous-dossiers)");
 else {
-  const dernier = schemas[schemas.length - 1];
-  const txt = readFileSync(join(out, dernier), "utf8").toLowerCase();
+  const dernier = schemas[schemas.length - 1].nom;
+  const txt = readFileSync(schemas[schemas.length - 1].chemin, "utf8").toLowerCase();
   const absentes = forges.filter(f => !souple(txt, f));
   absentes.length
     ? absentes.forEach(f => ko("E5", `forge « ${f} » absente du schéma ${dernier}`))
