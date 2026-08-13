@@ -106,7 +106,8 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
 - Types utilisés par le pilot : `run_open`, `etape_open`, `invocation`, `oracles_verdict`,
   `escalade_modele`, `question_humain`, `reponse_humain` (dont le GO production de l'étape MEP),
   `etape_close`, `retour` (alimente la boucle d'amélioration ; champ `source` :
-  `forge | produit | production`), `run_close`.
+  `forge | produit | production`), `relais_arme` (process long en arrière-plan : chemin
+  guetté + ts — TF-0173, §4 ter), `run_close`.
 - `run_open` porte les **versions des forges** utilisées (`versions_forges: {<forge>: <sha court>}`,
   relevées après le pull d'ouverture) et, pour un run de version, `run_precedent: <run-id>` —
   le ledger du run N est l'entrée du run N+1 (cf. CLAUDE.md « Run de version »).
@@ -176,6 +177,22 @@ cadence MESURÉE, temps total prévu, heure de fin prévue avec glissement dit) 
 dans `<run>/avancement.jsonl`. Une unité qui occupe plus d'une fenêtre se **sous-découpe**
 (avancement interne nommé). Émetteurs prêts : `scripts\avancement.py` / `avancement.mjs`.
 **Un process long muet est en défaut de contrat.**
+
+**Le RELAIS est sous le même contrat (TF-0173, décidé le 13/08).** TF-0094 contraint
+l'émetteur ; le 13/08, quatre audits de 25-40 min parfaitement conformes sont restés
+invisibles parce que l'orchestrateur avait redirigé stderr vers un fichier qu'il consultait
+sans le relayer — un process bavard redevenu muet là où ça compte : pour l'humain qui
+attend et doit pouvoir abandonner. D'où :
+- un process long se lance sous **l'une des DEUX formes seulement** : (a) au premier plan,
+  ses émissions traversant vers l'humain ; (b) en arrière-plan **avec un guetteur armé dès
+  le lancement** sur son flux d'avancement, chaque émission relayée telle quelle.
+  **Rediriger la sortie d'un process long sans armer de guetteur est un défaut de contrat**
+  au même titre qu'un process muet — la même cécité, déplacée d'un cran ;
+- au lancement, l'orchestrateur **annonce où l'avancement est lisible**
+  (`<run>/avancement.jsonl`) — l'humain ne dépend pas du bon vouloir du relais ;
+- traçabilité : l'orchestrateur consigne au ledger un événement **`relais_arme`**
+  `{chemin_guette, ts}` au lancement de tout process long en arrière-plan — vérifiable
+  comme le reste du ledger (l'option mesurable de TF-0173).
 
 ## 5. Table de routage réelle et dette d'intégration
 

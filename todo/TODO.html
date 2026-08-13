@@ -14,7 +14,7 @@
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digit-AI — TODO-FORGE · Reste à faire — V20260813</title>
+  <title>Digit-AI — TODO-FORGE · Reste à faire — V</title>
   <meta name="description" content="Reste-à-faire du registre TODO-FORGE : candidats à décider, décidés, en cours — détaillés en puces, avec date de création, priorité de traitement et impact sur la forge concernée.">
   <meta name="theme-color" content="#2563EB">
   <meta name="color-scheme" content="light dark">
@@ -138,7 +138,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>798dabc1eec2</code> · dernier événement 2026-08-13T14:51:56.673Z</p>
+      <p class="meta">sceau <code>e3b0c44298fc</code> · dernier événement </p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -148,10 +148,10 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="2 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">2</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="0 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">0</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
-      <div class="kpi" title="172 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">172</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
+      <div class="kpi" title="176 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">176</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende">
       <span class="leg-item"><span class="leg-swatch" style="background:var(--blue)"></span>candidat</span>
@@ -164,80 +164,26 @@
       <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
       
       <div class="dropdown" data-dim="forge">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">2</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">0</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
-          <label><input type="checkbox" value="design" checked> design</label>
-          <label><input type="checkbox" value="digit-ai-forge-pilot" checked> digit-ai-forge-pilot</label>
+          
         </div>
       </div>
       
       <div class="dropdown" data-dim="prio">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">2</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">0</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-prio" role="group" aria-label="Filtre Priorité" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
-          <label><input type="checkbox" value="moyenne" checked> Moyenne</label>
-          <label><input type="checkbox" value="basse" checked> Basse</label>
+          
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">2 / 2 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">0 / 0 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#design"><strong>design</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-pilot"><strong>digit-ai-forge-pilot</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"></nav>
     <main>
-    <section id="design">
-      <h2>design <span class="badge" title="1 item(s) actifs ciblant design">1</span></h2>
-      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>design</strong> — trié par statut puis priorité décroissante.</p>
-      <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0174" data-forge="design" data-statut="candidat" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0174</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">Maquette forge-design : routage SPA par hash invisible à L8 — trancher entre marquage d'exemption au skill et ids posés au montage</h3>
-          <div class="card-detail"><p class="lead">Constat TF-0154 (inventaire des gabarits HTML, 13/08) : demo\maquette.template.html de forge-design échoue à check_html sur L8 (« lien interne vers une ancre inexistante : #composants, #etats, #mobile ») alors que la navigation est CÂBLÉE — routage SPA par hash (registre de vues JS, aria-current posé au changement, vérifié lignes 314-319 et 595-596).</p><ul class="puces"><li>Les maquettes générées (rendus\maquette.html, Maquette Bailleur 20260804a) portent le même faux positif. Deux issues possibles, à trancher entre forge-design et le skill digit-ai-page-html :</li><li>convention de marquage d'exemption lue par L8 (ex. un lien porteur de data-nav est un lien de ROUTAGE, jugé par le câblage JS — au skill d'ajouter la règle, avec fixture double sens SPA câblée verte / SPA morte rouge)</li><li>le routeur pose l'id de la vue montée sur le conteneur (ids réels, L8 muet, zéro changement au skill). L'option</li><li>est plus juste (elle distingue routage câblé et ancre morte), l'option</li><li>plus locale. Au passage : avertissements h1→h3 et absence de bascule sombre (R-30) sur le même gabarit, à traiter dans la même campagne</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-13</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 2 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur design</dt><dd>tout gate aval R-32 sur une maquette design sortira FAIL L8 à tort tant que le cas SPA n'est pas tranché — le faux positif bloquerait des livrables sains</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">campagne TF-0154 (13/08, inventaire §2 bis)</dd></div>
-            
-          </dl>
-        </article>
-      </div>
-    </section>
-    <section id="digit-ai-forge-pilot">
-      <h2>digit-ai-forge-pilot <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-pilot">1</span></h2>
-      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-pilot</strong> — trié par statut puis priorité décroissante.</p>
-      <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0173" data-forge="digit-ai-forge-pilot" data-statut="candidat" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0173</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">TF-0094 contraint l EMETTEUR, pas le RELAIS : un avancement conforme peut n arriver a personne</h3>
-          <div class="card-detail"><p class="lead">FAIT MESURE (13/08/2026, run Produit-11) : quatre audits forge-tests de 25 a 40 minutes se sont deroules sans que l humain voie UNE SEULE emission d avancement, alors que l emetteur etait parfaitement conforme a TF-0094 — tableau a 8 champs sur stderr toutes les 3 min ET append dans &lt;run&gt;/avancement.jsonl.</p><ul class="puces"><li>La cause n est pas l emetteur mais l ORCHESTRATEUR : la commande avait ete lancee en arriere-plan avec `2&gt;/tmp/audit.txt`, et l orchestrateur consultait ce fichier pour son propre pilotage sans jamais en relayer le contenu. Un process bavard est ainsi redevenu muet du point de vue ou cela compte : celui de l humain qui attend et qui doit pouvoir decider d abandonner. C est l humain qui a du le demander (« il n est pas sense y avoir un affichage de l avancement progressif toutes les 3 minutes ? ») pour que le relais soit branche.
-
-CE QUE LA REGLE NE DIT PAS : TF-0094 (archive, applique) specifie l emission — « publie un flux d avancement normalise, toutes les 2 a 5 min, sur stderr ET dans &lt;run&gt;/avancement.jsonl (le fichier survit a la session, stderr sert l humain qui regarde) ». La formule « stderr sert l humain qui regarde » suppose un humain qui regarde stderr. Des que l orchestrateur redirige, personne ne regarde, et rien dans la regle ne l en empeche ni ne l oblige a relayer. TF-0096 (archive) a corrige l emetteur de forge-tests. Aucun des deux ne porte sur le relais. Cette candidature ne les duplique donc pas : elle ferme le maillon aval — verifie contre TODO.jsonl (23 ids) et TODO-ARCHIVE.jsonl avant depot, conformement a l intake.
-
-EXIGENCE PROPOSEE : lancer un process long sous l une des DEUX formes seulement, et jamais une troisieme</li><li>au premier plan, ses emissions traversant directement vers l humain</li><li>en arriere-plan AVEC un guetteur arme sur son flux d avancement des le lancement, chaque emission etant relayee telle quelle. Rediriger la sortie d un process long sans armer de guetteur devient un DEFAUT DE CONTRAT au meme titre qu un process muet — c est la meme cecite, deplacee d un cran. Corollaire a ecrire : au lancement, l orchestrateur annonce ou l avancement est lisible (&lt;run&gt;/avancement.jsonl), pour que l humain ne depende pas du bon vouloir du relais.
-
-VERIFIABILITE (le point faible a instruire) : `&lt;run&gt;/avancement.jsonl` prouve que l emission a eu lieu, pas qu elle a ete relayee. Deux pistes, sans preference : soit l orchestrateur consigne au ledger un evenement `relais_arme` portant le chemin guette et l heure — verifiable par un oracle au meme titre que le reste du ledger ; soit la regle se contente d interdire la redirection silencieuse, et l ecart se constate a la lecture de la session. La premiere est mesurable, la seconde est gratuite</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-13</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-pilot</dt><dd>quatre attentes de 25 a 40 min sans aucun signal visible, sur un emetteur pourtant conforme ; l humain n avait aucun moyen de decider d abandonner, et a du reclamer le relais lui-meme</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-11</dd></div>
-            
-          </dl>
-        </article>
-      </div>
-    </section>
     </main>
     <footer>Vue générée par <code>todo/generer-page.mjs</code> — ne pas éditer. Source unique : <code>todo/TODO.jsonl</code>. Détail brut d'un item : <code>grep '"id":"TF-xxxx"' todo/TODO.jsonl</code>.</footer>
   </div>

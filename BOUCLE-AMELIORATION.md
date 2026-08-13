@@ -884,3 +884,24 @@ S-01 TENU, `<link>` jugé au lieu d''être banni — affiné, pas affaibli). Pre
 8/8 (mesure) · recette forge-tests S-01 TENU · oracles K PASS (cat-dat-08) · noyau PASS.
 Boucles bornées tenues (max 3 itérations, thème `<link>` compris). Routage : pilotage Fable,
 aucune escalade. Registre : 22 clos archivés, 2 actifs (TF-0173 autre session, TF-0174).
+
+## 13/08/2026 (nuit) — Post-mortem du refus + dashboard v2 : « ok, fais tout » (4 items, registre à zéro)
+
+Le dashboard v1.8.0, tous oracles verts, avait été REFUSÉ par son destinataire sur six points
+de lisibilité — post-mortem instruit sur pièces (affaiblissement silencieux « chaque liste »
+→ « ≥ 8 lignes » ; oracles de présence, pas de lecture ; revue sur état FERMÉ ; composant
+D-12 livré sans CSS ; synthèse-redite structurelle). **TF-0176** ferme les quatre chemins :
+« Écarts à la lettre » (L99 Ch8 §5 bis + AGENT-CAMPAGNE), revue sur états OUVERTS
+(`render_page --etats-ouverts`), composant avec son CSS jumeau (H5), synthèse à fait nouveau
+(H4). **TF-0175** (forge-tests `44c2609`) livre la v2 : panneau de filtres charté, lecture
+reconstruite depuis les findings, colonnes non joués/non testables, outillage par CHAPITRE,
+libellés d'éléments dérivés (24 motifs), détail en ligne pleine largeur — **acceptation
+10/10 sur le livrable Produit-11 `20260813d`, une capture d'état ouvert par retour** ; recette
+12/12 S-01 TENU, pytest 154. **TF-0174** : L8 exempte le routage SPA câblé (`data-nav` +
+script, fixtures double sens) et le comptage h1 ignore les gabarits JS — la maquette design
+est innocentée ; source forge-agents synchronisée (`0ff49b5`). **TF-0173** : le RELAIS d'un
+process long est sous contrat (§4 ter : guetteur armé ou premier plan, `relais_arme` au
+ledger) — appliqué séance tenante. Trois incidents attrapés par les gates pendant la
+campagne même : « NOT NULL » hors garde L11 (pytest), balise en toutes lettres dans un
+commentaire CSS (famille RA-1, avalait le body au comptage h1), fenêtre de garde 80 car.
+(garde posé au plus près du libellé). Registre : **0 actif, 179 archivés**.
