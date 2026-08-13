@@ -9,7 +9,7 @@ sources:
   - "Apple HIG — refonte visuelle « Liquid Glass », iOS 26 (2025-2026)"
   - "Google Material 3 Expressive — 05/2025"
   - "Parts de marché cross-platform mobile — Flutter ~46 %, React Native ~35-42 %, Kotlin Multiplatform en croissance (mesure 02/2026, volatile)"
-  - "étude d'opportunité forges — output\\20260812-etude-opportunite-forges.md (12/08/2026), §2, 13 sources datées"
+  - "étude d'opportunité forges — output\\03-etudes\\20260812-etude-opportunite-forges.md (12/08/2026), §2, 13 sources datées"
 ---
 
 # Profil produit — mobile

@@ -6,7 +6,7 @@ sources:
   - "Chrome — Manifest V2 désactivé par défaut depuis Chrome 138 (07/2025) ; retrait définitif du Chrome Web Store le 31/08/2026"
   - "Chrome for Developers — calendrier de dépréciation Manifest V2 (drapeaux développeur fermés le 28/07/2026)"
   - "web-ext (Mozilla) — outil CLI officiel de lint/build/run des WebExtensions, dépendance addons-linter maintenue en 2026"
-  - "étude d'opportunité forges — output\\20260812-etude-opportunite-forges.md (12/08/2026), §5"
+  - "étude d'opportunité forges — output\\03-etudes\\20260812-etude-opportunite-forges.md (12/08/2026), §5"
 ---
 
 # Profil produit — extension-navigateur

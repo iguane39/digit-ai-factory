@@ -119,7 +119,7 @@ décision pilot tant qu'aucune proposition n'est remise.
 
 ## H. Admission d'une nouvelle forge (règle 28 — décidée le 12/08, TF-0125)
 
-Issue de l'étude d'opportunité du 12/08 (`output\20260812-etude-opportunite-forges.md`),
+Issue de l'étude d'opportunité du 12/08 (`output\03-etudes\20260812-etude-opportunite-forges.md`),
 qui a départagé 4 candidatures avec ce critère (fixture de validation : appliqué aux 4,
 il redonne les verdicts rendus — 1 forge, 3 profils).
 

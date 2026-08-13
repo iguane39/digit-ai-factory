@@ -6,7 +6,7 @@ sources:
   - "WCAG 2.2 — W3C Recommandation ; échéance EAA (European Accessibility Act) passée le 28/06/2025"
   - "Core Web Vitals — web.dev / CrUX ; seuils LCP<2,5s / INP<200ms / CLS<0,1 au 75e percentile terrain"
   - "RGESN v2 — référentiel général d'écoconception de services numériques, 05/2024"
-  - "étude d'opportunité forges — output\\20260812-etude-opportunite-forges.md (12/08/2026), §2, 13 sources datées"
+  - "étude d'opportunité forges — output\\03-etudes\\20260812-etude-opportunite-forges.md (12/08/2026), §2, 13 sources datées"
 ---
 
 # Profil produit — website
