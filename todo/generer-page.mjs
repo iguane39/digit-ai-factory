@@ -108,6 +108,7 @@ for (const forge of [...parForge.keys()].sort()) {
             <div><dt>Priorité</dt><dd>${p.l} <span class="meta-sub">(score ${e.score.valeur} — gain ${e.score.gain} × preuve ${e.score.preuve} ÷ effort ${e.score.effort})</span></dd></div>
             <div class="impact"><dt>Impact sur ${esc(forge)}</dt><dd>${e.preuve_du_cout ? escLit(e.preuve_du_cout) : "<span class=\"meta-sub\">non chiffré</span>"}</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">${esc(e.demandeur)}</dd></div>
+            ${e.motif_ecart ? `<div class="impact"><dt>Motif d'écart (TF-0157)</dt><dd>${escLit(e.motif_ecart)}</dd></div>` : ""}
           </dl>
         </article>`;
   }).join("");
@@ -138,14 +139,15 @@ const dd = (dim, label, options) => `
 const html = `<!DOCTYPE html>
 <html lang="fr">
 <head>
-<!-- S-G1 (1/4, R-30) — pose data-theme avant la 1re peinture (zéro flash). Choix persisté
-     sinon prefers-color-scheme à la 1re visite. Sans defer (le WARN « script bloquant en
-     head » de check_html est l'exception assumée qui évite le flash). -->
+<!-- S-G1 (1/4, R-30 amendé TF-0158 le 13/08) — pose data-theme avant la 1re peinture (zéro
+     flash). CLAIR PAR DÉFAUT STRICT : l'auto-sombre hérité de l'OS est retiré (retour humain
+     du 13/08) ; le sombre est un choix du lecteur, persisté. Sans defer (le WARN « script
+     bloquant en head » de check_html est l'exception assumée qui évite le flash). -->
 <script>
 (function () {
-  var s = localStorage.getItem('digitai-theme');
-  document.documentElement.setAttribute('data-theme',
-    s || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+  var s = null;
+  try { s = localStorage.getItem('digitai-theme'); } catch (e) {}
+  document.documentElement.setAttribute('data-theme', s === 'dark' ? 'dark' : 'light');
 })();
 </script>
   <meta charset="UTF-8">
@@ -154,7 +156,8 @@ const html = `<!DOCTYPE html>
   <meta name="description" content="Reste-à-faire du registre TODO-FORGE : candidats à décider, décidés, en cours — détaillés en puces, avec date de création, priorité de traitement et impact sur la forge concernée.">
   <meta name="theme-color" content="#2563EB">
   <meta name="color-scheme" content="light dark">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3C/svg%3E">
+  <!-- Favicon-lettre (13/08) : « F » = Forge (projet). -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3Ctext x='32' y='44' font-family='Segoe UI,Roboto,sans-serif' font-size='38' font-weight='700' fill='white' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
   <style>
     :root {
       --blue:#2563EB; --bg:#FAFBFF; --surface:#FFFFFF; --card:#FFFFFF; --ink:#0F172A;

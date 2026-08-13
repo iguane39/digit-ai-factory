@@ -32,6 +32,17 @@ diagnostic au rapport. Si la vérification native est elle-même défaillante, l
 preuve : une fixture verte qui PASSE et une fixture rouge qui ÉCHOUE pour la bonne
 raison. Une règle sans fixture rouge n'est pas prouvée.
 
+**Registres dérivés (TF-0151).** Si tu as modifié une SOURCE d'un registre ou d'une vue
+généré(e), relance son régénérateur et commite le régénéré DANS LE MÊME COMMIT — un
+registre qui dérive de sa source ment silencieusement pendant toute une campagne
+(incident TF-0148 : recette rouge une campagne entière). Régénérateurs connus par dépôt :
+forge-tests → `python -m forge_tests.dette` (sources : `NON_JUGE` de tout module,
+`invariants.py`) ; pilot → `node todo\generer-vue.mjs` + `node todo\generer-page.mjs`
+(source : TODO.jsonl), `node catalogues\generer-vues.mjs` (source : catalogues) ;
+organization → registres sous `conventions\` (voir son README). Contrôle de dérive :
+relance le régénérateur AVANT de clore — un diff non vide = une source modifiée sans
+régénération, à corriger avant le rapport.
+
 **Avancement des tranches longues (TF-0094).** Toute tranche dépassant ~2 minutes émet
 son avancement toutes les 3 minutes au format `gabarits\AVANCEMENT-PROCESS.md` du pilot :
 tableau 8 champs (heures de démarrage et de reporting, réalisé, en cours, RAF, restant

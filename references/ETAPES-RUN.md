@@ -140,12 +140,15 @@ sans GO, clore en `pret_production_en_attente_GO` (état de succès).
 ## 7. Clore le run
 
 Compiler les entrées `type: retour` du ledger en un **lot de retours** —
-`forge\retours\RETOURS-<AAAAMMJJ><indice>.md` + **sidecar `.tf.jsonl`** (candidatures SANS
-id, gabarit `gabarits\RETOURS-FORGES.md`) avec contrôle de complétude ledger↔lot — puis
-**remise automatique** : copie des deux fichiers dans `<pilot>\input\`. Ensuite `run_close`
+`forge\retours\<projet> - RETOURS - <AAAAMMJJ><indice>.md` + **sidecar `.tf.jsonl`** homonyme
+(candidatures SANS id, gabarit `gabarits\RETOURS-FORGES.md` ; le préfixe projet est
+obligatoire, décision 13/08) avec contrôle de complétude ledger↔lot — puis
+**remise automatique** : copie des deux fichiers dans `<pilot>\input\00-retours\`. Ensuite `run_close`
 au ledger avec le bilan, et synthèse à l'humain. Hors run, toute inspection/incident produit
 son propre lot — un fichier par lot, jamais modifié après remise. **À réception d'un sidecar
-dans `input\`** (côté pilot) : `node todo\ingerer-lot.mjs <sidecar>` — validation atomique,
+dans `input\00-retours\`** (côté pilot) : le confronter d'abord au registre ET à l'archive
+(un lot déjà traité par un autre canal part en `old\` sans ingestion), puis
+`node todo\ingerer-lot.mjs <sidecar>` — validation atomique,
 ids frappés, tout en `candidat` (l'automatique s'arrête là : la décision reste humaine),
 oracle + vue régénérée.
 

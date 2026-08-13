@@ -86,7 +86,8 @@ aux règles après leurs annonces). D'où le contrat :
   normatifs de `references\BEST-PRACTICES-HTML.md` (E4, G1, H).
 - **Dérive constatée → proposition TODO au pilot.** La génération n'est pas bloquée (le run
   reste borné) : le run consigne le verdict au ledger (`oracles_verdict`) et **le projet émet
-  une candidature TODO** (sidecar `.tf.jsonl` remis à `<pilot>\input\`, règle 18) demandant la
+  une candidature TODO** (sidecar `.tf.jsonl` remis à `<pilot>\input\01-candidatures\`,
+  règle 18) demandant la
   remise à niveau du gabarit **dans la forge propriétaire**. La correction effective reste une
   campagne mandatée (boucle d'amélioration) — jamais une écriture sauvage dans la forge depuis
   un run.

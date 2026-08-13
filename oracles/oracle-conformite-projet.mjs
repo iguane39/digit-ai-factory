@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 /**
  * oracle-conformite-projet.mjs — vérifie qu'un projet produit respecte REGLES-PROJET.md
- * (27 règles — R-1..R-19 du 06-10/08, R-20..R-23 socle documentaire du 11/08 TF-0082,
+ * (28 règles — R-1..R-19 du 06-10/08, R-20..R-23 socle documentaire du 11/08 TF-0082,
  * R-24 URLs d'environnement du 11/08 TF-0090, R-25 types au registre du 11/08 TF-0084,
  * R-26 modèle de données ancré au schéma réel du 11/08 TF-0091, R-27 surface web née
  * ouverte aux agents IA du 11/08 TF-0095 — socle à 8 fichiers
- * + projections HTML générées). Node pur, zéro dépendance, lecture seule (le registre
- * des types d'organization est LU, jamais écrit).
+ * + projections HTML générées, R-32 gate aval des livrables HTML du 13/08 RV-4 ;
+ * R-7 inversée le 13/08 par TF-0150 : old\ versionné). Node pur, zéro dépendance,
+ * lecture seule (le registre des types d'organization est LU, jamais écrit).
  *
  * Usage : node oracle-conformite-projet.mjs <racine-du-projet>
  * Sortie : JSON sur stdout — { oracle, version, cible, verdict, findings[], non_juge[] }
@@ -176,12 +177,40 @@ for (const f of fichiers(cible)) {
 }
 if (r6) ok("R-6", "*", "aucune copie datée de code, aucun code sous Old\\");
 
-// R-7 — Old\ jamais versionné (C1)
+// R-7 — old\ VERSIONNÉ (C1 amendé le 13/08, TF-0150 : git garde l'histoire du rangement ;
+// l'ancien arbitrage « jamais versionné » est caduc). Un old\ gitignoré retire des
+// livrables déjà commités — c'est désormais LUI le défaut.
 const gitignore = existsSync(p(".gitignore")) ? readFileSync(p(".gitignore"), "utf8") : "";
 const oldExiste = [...fichiers(cible)].some((f) => /(^|\/)[Oo]ld\//.test("/" + rel(f)));
-if (!oldExiste) so("R-7", "aucun dossier Old\\ dans le projet");
-else if (/^[Oo]ld\/$/m.test(gitignore) || /(^|\n)\*{0,2}\/?[Oo]ld\/(\n|$)/.test(gitignore)) ok("R-7", ".gitignore", "Old\\ présent et ignoré par git (C1)");
-else ko("R-7", ".gitignore", "des dossiers Old\\ existent mais ne sont pas ignorés par git (décision C1 : Old pas dans git)");
+if (!oldExiste) so("R-7", "aucun dossier old\\ dans le projet");
+else if (/^[Oo]ld\/$/m.test(gitignore) || /(^|\n)\*{0,2}\/?[Oo]ld\/(\n|$)/.test(gitignore))
+  ko("R-7", ".gitignore", "old\\ est ignoré par git — C1 amendé (TF-0150, 13/08) : old\\ est un rangement de lisibilité VERSIONNÉ ; retirer la ligne du .gitignore");
+else ok("R-7", ".gitignore", "old\\ présent et versionné (C1 amendé TF-0150)");
+
+// R-32 — gate AVAL des livrables HTML (13/08, retour Produit-10 RV-4) : tout .html d'output\
+// (hors old\) a son journal d'oracles sous forge\oracles\<basename>.json — la preuve que
+// check_html.py ET render_page.py ont été exécutés avant remise. Le §2 bis du contrat
+// couvre l'amont (gabarits des forges) ; sans R-32, un HTML écrit à la main ou par un
+// gabarit non forgé sort sans jamais être mesuré (constaté : 31+21 bloquants livrés).
+{
+  const htmls = [...fichiers(p("output"))].filter(
+    (f) => f.endsWith(".html") && !/(^|\/)old\//.test("/" + rel(f))
+  );
+  if (!htmls.length) so("R-32", "aucun livrable HTML dans output\\");
+  else {
+    let ok32 = true;
+    for (const f of htmls) {
+      const journal = p("forge", "oracles", basename(f, ".html") + ".json");
+      if (!existsSync(journal)) {
+        ko("R-32", rel(f), "livrable HTML sans journal d'oracles (attendu : forge\\oracles\\" +
+          basename(f, ".html") + ".json) — exécuter check_html.py + render_page.py avant " +
+          "remise et consigner les verdicts (règle R-32, gate aval)");
+        ok32 = false;
+      }
+    }
+    if (ok32) ok("R-32", "output/*.html", `${htmls.length} livrable(s) HTML avec journal d'oracles sous forge\\oracles\\`);
+  }
+}
 
 // R-8 — git initialisé (C2)
 aGit ? ok("R-8", ".git/", "dépôt git présent") : ko("R-8", ".git/", "pas de dépôt git — git init + commit initial exigés dès l'ouverture du run (C2)");

@@ -1,7 +1,10 @@
 # Règles projet — DÉCIDÉES le 2026-08-06
 
 **Les 17 règles sont adoptées** (décision humaine du 06/08). Arbitrages des conflits :
-C1 = `Old\` autorisé pour les livrables mais **jamais versionné** (ignoré par git) ;
+C1 = `old\` (minuscule — graphie D-15) autorisé pour les livrables et **VERSIONNÉ**
+(amendement humain du 13/08, TF-0150 : le rangement fait partie de l'histoire que git
+garde ; re-gitignorer retirerait des livrables déjà commités — l'ancien arbitrage
+« jamais versionné » est caduc, le CODE reste hors old\ par la règle 6) ;
 C2 = `git init` + **commits locaux par défaut** dès l'ouverture du run, remote/push sur GO
 humain ; C3 = le nommage daté ne s'applique jamais au code ; C4 = journaux d'oracles
 **versionnés** dans `forge\`.
@@ -28,7 +31,7 @@ projet (2e mandat) · **G** = gate humain.
 
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
-| 4 | Tout livrable documentaire est nommé `<Projet> - <Objet> - AAAAMMJJ<indice>.<ext>` — **le nom du PROJET prime sur l'émetteur** (Q3-bis tranchée par l'humain le 09/08 : « Produit-02 - Audit SEO - … », plus jamais « Digit-AI - … » en tête). Les fichiers historiques ne sont pas renommés | convention historique observée avec préfixe émetteur ; **décision humaine du 09/08** la corrige | **livrables uniquement** (input\, output\, docs\) — JAMAIS le code (conflit C3) | S+O | faible | **défaut** |
+| 4 | Tout livrable documentaire est nommé `<Projet> - <Objet> - AAAAMMJJ<indice>.<ext>` — **le nom du PROJET prime sur l'émetteur** (Q3-bis tranchée par l'humain le 09/08 : « Produit-02 - Audit SEO - … », plus jamais « Digit-AI - … » en tête). Les fichiers historiques ne sont pas renommés. **Alinéa RV-2 (Produit-10, 13/08)** : quand un ENTRANT exige un autre nommage pour le livrable, le nommage du pilot **prime** ; la correspondance entre le nom exigé et le nom produit est consignée au ledger (champ `note_nommage`) — jamais d'arbitrage silencieux | convention historique observée avec préfixe émetteur ; **décision humaine du 09/08** la corrige ; alinéa : retour Produit-10 RV-2 (conflit vécu, arbitré au ledger seq 1) | **livrables uniquement** (input\, output\, docs\) — JAMAIS le code (conflit C3) | S+O | faible | **défaut** |
 | 5 | L'indice est une lettre (a, b, c…) par itération du même jour ; une nouvelle version = un **nouveau fichier daté**, jamais d'écrasement | observée (`20260721b` → `20260721d`, `revue.md`/`revue-v2`) | livrables uniquement | S+O | faible | **défaut** |
 | 25 | Le `<Type>` du nom de tout livrable daté (2ᵉ segment, 1ᵉʳ mot) **figure au registre des types** (`registre-types.json` d'organization, comparaison insensible casse/accents) — un type nouveau s'ajoute au registre dans un commit motivé (D-04), jamais improvisé dans un nom. Registre lu en dépôt frère ; poste non équipé → non jugeable, pas FAIL | **D-04 organization (décidée 08/08), encodée 11/08 (TF-0084)** — registre 1.1.0, 29 types, complété sur usage réel | produits, nouveaux + rattrapage | O | nul | **défaut** |
 
@@ -90,7 +93,7 @@ socle créé depuis l'état constaté, `.env.example` reconstruit (R-13) avant q
 |---|---|---|---|---|---|---|
 | 16 | Les rapports finaux destinés à l'humain (DOSSIER-MEP, PV, revues) sont **copiés** dans `output\` au nommage daté (n° 4) — l'original de travail reste sous `forge\etapes\` | cohérence avec `digit-ai-forge-agents/output/` | produits | S | faible | **défaut** |
 | 17 | Les journaux d'oracles (`*.oracles.json`, `*.oracles-historique.jsonl`) sont versionnés dans `forge\` (ce sont des preuves), ignorés partout ailleurs | observée : présents dans Produit-12/forge/ | produits | P0 (.gitignore) | nul | option (conflit C4) |
-| 18 | `forge\retours\` existe (gabarit inclus) ; chaque lot de retours forges est un fichier `RETOURS-<AAAAMMJJ><indice>.md` — un fichier par lot, ids en séquence continue par produit, **jamais modifié après remise** ; remise = copie dans `input\` du pilot | **mandat humain du 06/08** ; format éprouvé 2× (Produit-12/forge/RETOURS-FORGES*.md) | produits, nouveaux + rattrapage | P0+S+O | faible | **adoptée** (décision 06/08) |
+| 18 | `forge\retours\` existe (gabarit inclus) ; chaque lot de retours forges est un fichier `<projet> - RETOURS - <AAAAMMJJ><indice>.md` (+ sidecar `.tf.jsonl` homonyme) — **le préfixe projet est obligatoire** (décision 13/08 : les lots de tous les projets cohabitent chez le pilot, le nom dit qui retourne quoi), un fichier par lot, ids en séquence continue par produit, **jamais modifié après remise** ; remise = copie dans `input\00-retours\` du pilot (après ingestion, la paire part en `old\`) | **mandat humain du 06/08**, préfixe + famille 00-retours **13/08** ; format éprouvé (Produit-12, Produit-10) | produits, nouveaux + rattrapage | P0+S+O | faible | **adoptée** (décisions 06/08 et 13/08) |
 
 ## G. Circuit des conventions (D-13) — traçabilité organization → pilot
 
@@ -182,8 +185,11 @@ sombre devient obligatoire sur tout HTML autonome livré.
 2. Bascule sombre en zone d'en-tête (position par défaut : haut à droite, géométrie
    fine tenue par les tokens et gabarits du socle HTML) : câblée — une bascule sans
    effet observable est un défaut (loi transverse n° 1) ; choix persisté en
-   `localStorage` ; `prefers-color-scheme` honoré à la première visite en l'absence de
-   choix persisté, le bouton prime ensuite sur `prefers-color-scheme` ; palette sombre
+   `localStorage`. **Amendement TF-0158 (13/08) : clair par défaut STRICT** — l'héritage
+   `prefers-color-scheme` à la première visite est RETIRÉ (appliqué à la lettre, il a
+   produit le retour humain du 13/08 « thème sombre par défaut » sur un livrable réel :
+   un livrable circule et doit s'ouvrir identique chez tous ses lecteurs) ; le sombre
+   est un choix explicite du lecteur, persisté ; palette sombre
    dérivée mécaniquement des tokens clairs — une source, deux projections, jamais une
    seconde charte ; contraste AA tenu dans les deux thèmes ; l'impression
    (`@media print`) reste toujours en thème clair, quel que soit le thème affiché à
@@ -198,13 +204,47 @@ référencé depuis tout run produisant du HTML. Contrôle exécutable : reste d
 candidature vers `check_html.py` du skill `digit-ai-page-html` (hors périmètre
 d'écriture de cette campagne, à porter par mandat).
 
+## K. Admission de tout objet durable (règle 31 — décidée le 13/08, TF-0156)
+
+Généralise R-28 : les dossiers d'opportunité du 12-13/08 ont tranché des naissances de
+référentiels, de verbes, de consignes et de règles avec le même raisonnement que R-28,
+appliqué par symétrie — le raisonnement tenait, il n'était opposable nulle part.
+
+**R-31.** Un objet durable nouveau (forge, skill, gabarit exécutable, oracle, profil,
+référentiel) naît selon le même test qu'une forge, R-28 devenant son cas particulier :
+1. **≥ 1 verbe outillé exécutable** absent partout ailleurs, prouvé par un **verdict de
+   non-recouvrement écrit et cité** (≥ 2 pour une forge — seuil R-28 conservé) ;
+2. il naît **exercé** : oracle ou self-test à double sens dès la v0 ;
+3. il a une **cadence ou un mandat propres** ;
+4. ses **surfaces d'intégration** sont livrées le jour même.
+
+**Corollaire (conservé et étendu)** : sans verbe outillé, c'est un **référentiel
+versionné** (frontmatter daté-sourcé, fraîcheur par claims) — jamais une forge NI un
+skill. Fixture de validation : R-31 rejouée sur les 5 verdicts rendus du 12-13/08
+(forge websec · profils produit · verbe `importer` + profils-moteur · personas écartés ·
+NO-GO skill Opportunité) redonne les 5 verdicts — aucun ne bascule.
+
+## L. Gate aval des livrables HTML (règle 32 — décidée le 13/08, retour Produit-10 RV-4)
+
+Constat : un livrable HTML (`Client-A - Rapport Client-C - Mapping… - 20260812c.html`) est
+sorti avec 31 bloquants `check_html` + 21 bloquants V2 `render_page` — aucun gate ne
+l'avait mesuré. Le §2 bis du contrat couvre l'AMONT (gabarits des forges) ; R-32 couvre
+l'AVAL (tout HTML déposé en sortie).
+
+**R-32.** Tout fichier `.html` déposé dans `output\` (ou remis à un client) passe
+`check_html.py` **et** `render_page.py` avant remise ; le verdict est consigné en
+journal d'oracle sous `forge\` (versionné, décision C4). Un `.html` d'`output\` sans
+journal d'oracle correspondant est un défaut. Mécanisme : O — contrôle R-32 de
+`oracle-conformite-projet.mjs` (présence du journal ; le contenu du verdict reste
+porté par le journal lui-même).
+
 ## Conflits à trancher (ta décision explicite)
 
-- **C1 — `Old\` vs git (n° 6/7)** : deux magasins de versions divergent toujours. Proposition :
-  git seul pour le code (n° 6) ; `Old\` réservé aux **livrables documentaires** comme rangement
-  de lisibilité (les versions datées coexistent, `Old\` désencombre le dossier courant — git
-  garde l'histoire de toute façon). Alternatives : (a) git seul partout, jamais d'`Old\` ;
-  (b) la proposition ci-dessus ; (c) `Old\` seulement hors dépôts git. **Recommandé : (b).**
+- **C1 — `old\` vs git (n° 6/7)** : **TRANCHÉ le 13/08 (TF-0150)** — `old\` (minuscule,
+  D-15) réservé aux livrables documentaires comme rangement de lisibilité, et **versionné**
+  (git garde l'histoire du rangement comme du reste ; re-gitignorer retirerait des
+  livrables déjà commités). Le code, lui, n'a que git (règle 6). L'historique du conflit
+  reste ci-dessous pour mémoire.
 - **C2 — n° 8 vs garde-fou actuel** : le CLAUDE.md pilot dit aujourd'hui « création du dépôt
   git du produit sur validation humaine ». La règle 8 inverserait : init + commits **locaux**
   par défaut (traçabilité dès la naissance), seuls remote/push restant sur ton GO. **Recommandé :
