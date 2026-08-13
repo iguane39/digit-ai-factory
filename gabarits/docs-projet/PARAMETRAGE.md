@@ -2,8 +2,11 @@
 role: signification de la configuration — miroir structuré de .env.example (R-20/R-22)
 sources_de_verite: [.env.example]
 verifie_le: {AAAA-MM-JJ}
+# exactement les noms de .env.example — l'oracle R-22 vérifie la parité. Le commentaire vit
+# AU-DESSUS de la clé : R-22 lit les entrées « - NOM » immédiatement après `variables:`, un
+# commentaire intercalé vidait la liste lue (RV-3, constaté sur SCC_ALX le 13/08 : 7 fausses
+# variables « non documentées »).
 variables:
-  # exactement les noms de .env.example — l'oracle R-22 vérifie la parité
   - {PORT}
   - {DATABASE_URL}
 ---

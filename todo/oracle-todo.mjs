@@ -11,7 +11,9 @@
  *  R5  transitions de statut légales : candidat→decide|ecarte · decide→en_cours|corrige|ecarte
  *      · en_cours→corrige|ecarte · corrige→archive · ecarte→archive
  *  R6  candidat→decide exige decideur + date_decision (la décision est humaine, tracée)
- *  R7  clôture en corrige exige gains_constates + corrections_realisees + date_correction
+ *  R7  clôture en corrige exige gains_constates + corrections_realisees + date_correction ;
+ *      clôture en ecarte exige motif_ecart + decideur + date_decision (TF-0157, 13/08 —
+ *      la mémoire des refus est structurée, une idée déjà tranchée ne se re-paye pas)
  *  R8  l'archive ne contient que des items dont l'état final est archive
  *  R9  ts non décroissants par id
  *  R10 toute creation issue d'une session externe (demandeur préfixé run-, produit- ou mission-)
@@ -45,6 +47,7 @@ function lire(fichier) {
 }
 
 const SEUIL_R10 = "2026-08-09T00:00:00Z";
+const SEUIL_R7_ECART = "2026-08-13T00:00:00Z"; // naissance de TF-0157
 const RE_EXTERNE = /^(run|produit|mission)-/;
 
 function replier(evenements, ou) {
@@ -89,6 +92,15 @@ function replier(evenements, ou) {
           const fusion = { ...etat, ...e };
           for (const champ of ["gains_constates", "corrections_realisees", "date_correction"])
             if (!fusion[champ]) ko("R7", e.id, `clôture en corrige sans ${champ}`);
+        }
+        // TF-0157 (13/08) : un écart sans motif structuré est une mémoire perdue — la
+        // ré-instruction se re-paye à chaque réouverture. Symétrique de R6 pour decide.
+        // Datée comme R10 : les 5 écarts antérieurs (TF-0003/13/41 du 11/08, TF-0129/130
+        // du 12/08) précèdent la règle — constat consigné, jamais réécrits.
+        if (e.statut === "ecarte" && e.ts >= SEUIL_R7_ECART) {
+          const fusion = { ...etat, ...e };
+          for (const champ of ["motif_ecart", "decideur", "date_decision"])
+            if (!fusion[champ]) ko("R7", e.id, `clôture en ecarte sans ${champ} (TF-0157)`);
         }
       }
       Object.assign(etat, e);

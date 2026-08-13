@@ -856,3 +856,31 @@ itérations (L3 → thèmes/D-12 → badges tendance), bornée tenue. Candidats 
 (trancher S-G1 : prefers-color-scheme vs clair vécu), TF-0159 (tendance multi-runs, barre
 B3). Routage : pilotage Fable, aucune escalade ; artefact d'encodage PowerShell sur l'oracle
 détecté et neutralisé (5 faux FAIL, page innocentée).
+
+## 13/08/2026 (soir) — Mandat global : retours SCC_ALX + TODO + input\ + favicon (22 items clos)
+
+Mandat humain à six volets. **input\ réorganisé** sur le modèle d''output\ : pilot (5 familles,
+`00-retours\` avec **préfixe projet obligatoire**, LISEZMOI + mapping) et 6 forges sœurs
+(audit_nhood : exemption motivée, fichiers référencés par nom dans auditcore) ; convention
+encodée (règle 18 amendée, CLAUDE.md, gabarit RETOURS-FORGES, ETAPES-RUN, TODO-FORGE).
+**Incident d''intake détecté et réparé** : 32 doublons créés par ingestion aveugle de sidecars
+déjà traités par d''autres canaux — retirés à la seconde, garde « confronter au registre ET à
+l''archive avant d''ingérer » encodée. **Favicon-lettre systématisé** (G2) : boilerplate skill,
+TODO.html (F), veille (F), lib-vue-html (paramétré), dashboard forge-tests (lettre du produit).
+**Retours SCC_ALX ingérés (TF-0160→0172) et tous implémentés** : forge-data `fc5ddce` (RD-1
+faux positif [c:id], RD-2 messages P2, RD-3 service cat-dat-08 porté du run réel — garde
+lecture-seule 8/8, RD-4 etat constate|propose) ; skill digit-ai-page-html (RA-1 </script>
+échappé + règle A1-bis à fixture, RA-3 indice, RA-4 barème par colonne, RA-2 seuil calibré ;
+**source forge-agents trouvée en retard et synchronisée** `655c757`, self-test 34/34) ; pilot
+(RV-1 RUN-MANDAT.md 3e voie, RV-2 alinéa R-4, RV-3 PARAMETRAGE, RV-4 **R-32 gate aval** +
+oracle + fixture, RV-5 réfuté sur pièce). **TODO mandatée close** : TF-0150 (C1 tranché
+versionné, R-7 inversée + fixtures), TF-0151 (registres dérivés au gabarit campagne), TF-0152
+(veille + témoin PASS, Google Fonts retirés ×3), TF-0154 (inventaire 7 forges, design → TF-0174
+L8/SPA), TF-0155 (gabarit + oracle étude d''opportunité E1-E7, self-test 2/2), TF-0156 (R-31
+admission objet durable), TF-0157 (motif_ecart, règle datée, 19/19), TF-0158 (**clair par
+défaut strict partout** — R-30 amendé), TF-0159 (tendance multi-runs `14731d4`, recette 12/12
+S-01 TENU, `<link>` jugé au lieu d''être banni — affiné, pas affaibli). Preuves : self-tests
+34/34 (skill ×2 emplacements) · 41/41 (data) · 19/19 (todo) · 6/6 (conformité) · 2/2 (étude) ·
+8/8 (mesure) · recette forge-tests S-01 TENU · oracles K PASS (cat-dat-08) · noyau PASS.
+Boucles bornées tenues (max 3 itérations, thème `<link>` compris). Routage : pilotage Fable,
+aucune escalade. Registre : 22 clos archivés, 2 actifs (TF-0173 autre session, TF-0174).

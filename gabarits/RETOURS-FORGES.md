@@ -1,24 +1,28 @@
 # Retours forges — <produit> — <AAAAMMJJ><indice>
 
 <!-- Gabarit du pilot (gabarits\RETOURS-FORGES.md). Un fichier = UN lot de retours.
-     Emplacement : forge\retours\RETOURS-<AAAAMMJJ><indice>.md dans le projet produit.
+     Emplacement : forge\retours\<projet> - RETOURS - <AAAAMMJJ><indice>.md dans le projet.
+     Le PRÉFIXE PROJET est obligatoire (décision humaine 13/08) : côté pilot, les lots de
+     tous les projets cohabitent dans input\00-retours\ — le nom dit qui retourne quoi.
      Un fichier remis ne se modifie JAMAIS — le lot suivant est un nouveau fichier daté. -->
 
 - **Contexte** : <clôture du run <run-id> | inspection production v<X> | incident | autre>
 - **Références ledger** : `forge\ledger.jsonl` seq <n, n…> (entrées `type: retour`)
-- **Remise au pilot** : copier ce fichier dans `<pilot>\input\` — l'original reste ici
-  (historique du produit). Statut : `a_remettre` → `remis le <date>` (seule édition autorisée
-  après coup : cette ligne de statut).
+- **Remise au pilot** : copier ce fichier (et son sidecar) dans `<pilot>\input\00-retours\` —
+  l'original reste ici (historique du produit). Statut : `a_remettre` → `remis le <date>`
+  (seule édition autorisée après coup : cette ligne de statut).
 - **Statut** : a_remettre
 
 Convention de gravité : **bloquant** (a bloqué ou failli bloquer) · **majeur** (a coûté un
 aller-retour ou une découverte par lecture de code) · **mineur** (confort/précision).
 Si un retour se rapporte à un item du registre TODO-FORGE du pilot, citer son id
 (`TF-xxxx`) — chaque retour intégré recevra le sien. **Les forges aussi** peuvent déposer un
-lot avec ce gabarit, ciblant n'importe quelle autre forge (remise : `input\` du pilot).
+lot avec ce gabarit, ciblant n'importe quelle autre forge (remise : `input\00-retours\` du
+pilot, préfixé du nom de la forge émettrice).
 
 **Sidecar machine (obligatoire depuis le 08/08)** : à côté de ce lot, un fichier
-`RETOURS-<AAAAMMJJ><indice>.tf.jsonl` — une ligne JSON par élément visant une forge :
+`<projet> - RETOURS - <AAAAMMJJ><indice>.tf.jsonl` (même nom que le `.md`) — une ligne JSON
+par élément visant une forge :
 `{"schema":1, "titre":…, "contenu":…, "demandeur":"<produit ou forge>", "source":"<lot +
 seq ledger>", "date_demande":…, "forges_cibles_initiales":[…], "score":{gain,preuve,effort}
 si estimable, "preuve_du_cout":…}`. **JAMAIS d'id** : les ids TF sont frappés à l'ingestion

@@ -28,7 +28,8 @@ elle s'arrête et le dit.
 consigne immédiatement au ledger. À la clôture de tout run : compilation ledger → lot `.md`
 + **sidecar `.tf.jsonl`** (gabarit dans `forge\retours\`) avec contrôle de complétude — tout
 retour du ledger a sa candidature, sinon le run le déclare — puis **copie automatique des
-deux fichiers dans `<pilot>\input\`**. Le geste humain de remise disparaît ; la décision
+deux fichiers dans `<pilot>\input\00-retours\`** (nommés `<projet> - RETOURS - …`, le préfixe
+projet est obligatoire). Le geste humain de remise disparaît ; la décision
 humaine demeure (tout entre en candidat au registre TODO-FORGE).
 
 Boucle intérieure (libre, sans verdict) : `<commandes locales : pytest, ruff, serveur de dev…>`

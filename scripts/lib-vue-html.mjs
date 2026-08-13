@@ -63,8 +63,11 @@ export function mdVersHtml(corps) {
 }
 
 // Coquille chartée (tokens du socle, light, print, reduced-motion, favicon data:).
-export function coquille({ titre, description, front, svg, corpsHtml, source }) {
+export function coquille({ titre, description, front, svg, corpsHtml, source, lettre }) {
   const sceau = createHash("sha256").update(source).digest("hex").slice(0, 12);
+  // Favicon-lettre (13/08) : première lettre du produit (paramètre `lettre`), sinon celle
+  // du titre — jamais un carré anonyme.
+  const initiale = (lettre || (titre || "D").trim()[0] || "D").toUpperCase();
   return `<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -74,7 +77,7 @@ export function coquille({ titre, description, front, svg, corpsHtml, source }) 
   <meta name="description" content="${esc(description)}">
   <meta name="theme-color" content="#2563EB">
   <meta name="color-scheme" content="light">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3Ctext x='32' y='44' font-family='Segoe UI,Roboto,sans-serif' font-size='38' font-weight='700' fill='white' text-anchor='middle'%3E${initiale}%3C/text%3E%3C/svg%3E">
   <style>
     :root{--blue:#2563EB;--bg:#FAFBFF;--surface:#FFFFFF;--ink:#0F172A;--muted:#64748B;
       --faint:#94A3B8;--line:#E6EAF2;--teal:#0E9488;--teal-fill:#EFFDFB;--amber:#B45309;

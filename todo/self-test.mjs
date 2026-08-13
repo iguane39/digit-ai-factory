@@ -46,6 +46,8 @@ const rouges = [
   ["R5 : transition illégale candidat→corrige", [item({}), maj({ statut: "corrige", gains_constates: "g", corrections_realisees: "x", date_correction: "2026-08-08" })]],
   ["R6 : decide sans decideur", [item({}), maj({ statut: "decide" })]],
   ["R7 : corrige sans gains_constates", [item({}), maj({ statut: "decide", decideur: "h", date_decision: "2026-08-08" }), maj({ ts: "2026-08-08T12:00:00Z", statut: "corrige", corrections_realisees: "x", date_correction: "2026-08-08" })]],
+  // TF-0157 (13/08) : la mémoire des refus est structurée — un écart sans motif FAIL.
+  ["R7 : ecarte sans motif_ecart", [item({}), maj({ ts: "2026-08-13T12:00:00Z", statut: "ecarte", decideur: "h", date_decision: "2026-08-13" })]],
   ["R4 : creation hors statut candidat", [item({ statut: "decide" })]],
   ["R1 : ingestion sans lot_sha", [item({}), JSON.stringify({ ev: "ingestion", ts: "2026-08-10T10:00:01Z", creations: 0 })]],
   ["R10 : creation externe (run-*) sans ingestion — écriture directe", [item({ ts: "2026-08-10T10:00:00Z", demandeur: "run-produit-x-20260810" })]],
