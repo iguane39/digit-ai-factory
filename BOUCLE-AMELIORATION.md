@@ -745,3 +745,27 @@ vérifiés par sondage pilot ; catalogue v1.5.0 (69 services).
 Routage §4 bis : forge-data 177 k/76 outils/17 min ; banc-vert 149 k/104/20 min ; escalade
 aucune. **Registre : 0 actif** (142 archivés) — pour la 1re fois depuis l'ouverture du TODO,
 plus rien en attente ni en cours.
+
+## 13/08/2026 — plan « stratégie de tests e2e complète et autonome-sous-gates » (insatisfaction BAV2)
+
+**Mandat humain** (prompt barré L99) : plan détaillé d'une stratégie de tests de bout en bout,
+complète et autonome, après un run BAV2 insatisfaisant. Livrable = plan (document) + candidatures :
+`output\20260813-plan-strategie-tests-e2e.md`.
+
+**Diagnostic BAV2 sur pièces** (rapport-tests.json, verdict PARTIEL) : forge-tests n'est pas
+cassée — elle CONSTATE correctement et donne le `pour_couvrir` de chaque pan. Les pans sont
+PARTIEL pour 3 familles de cause, aucune n'étant un bug de la forge : (a) environnement non
+préparé (node_modules absent → front/visuel ; front non servi), (b) contrat projet non renseigné
+(app ASGI absente → api inventaire vide), (c) surface absente/faible (pas de couche SQL → data/
+migrations ; mutation back 0,11 ≪ 0,70). Le trou : forge-tests nomme mais n'exécute pas les
+recettes, ne prépare pas l'environnement, ne génère pas les cas, ne boucle pas.
+
+**Plan** : 8 phases (préparation env → analyse/cible → génération de cas exécutables → volumétrie
+seedée par cas → exécution + rapport test-par-test → plan d'action classé R-29 → boucle bornée
+≤3 à ÉTAT TERMINAL MESURÉ (jamais « jusqu'au vert » — banni, réfuté partout) → autonomie/GO
+humain → feuille de route R-28). Trois acteurs séparés (tests audite/génère/exécute · development
+remédie le produit sous run · pilot orchestre). Trois mesures distinctes (couverture ≠ passage ≠
+mutation). Anti-triche (mutation + « aucun ✓ sans oracle »). 5 candidatures (lot 3ab9c56ce738) :
+harnais d'environnement, générateur de cas exécutables, volumétrie seedée par cas, orchestrateur
+de boucle (pilot), rapport test-par-test. Recherche/diagnostic : pilot (Fable) sur pièces ;
+aucune écriture hors pilot (git status forges + BAV2 inchangés).
