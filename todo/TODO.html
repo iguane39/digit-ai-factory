@@ -113,7 +113,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>2e8b01609e9e</code> · dernier événement 2026-08-13T07:03:34.891Z</p>
+      <p class="meta">sceau <code>dc4b46f8f189</code> · dernier événement 2026-08-13T07:31:56.168Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -121,10 +121,10 @@
     </header>
     <p>Seul le <strong>reste-à-faire</strong> vit ici — les items clos partent à l'archive (<code>node todo\archiver.mjs</code>). Chaque item est détaillé en puces, avec sa date de création, sa priorité de traitement (dérivée du score) et son impact sur la forge concernée. La décision reste humaine et se prend hors de cette page (« décide TF-xxxx »).</p>
     <div class="kpis">
-      <div class="kpi" title="5 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">5</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
+      <div class="kpi" title="2 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">2</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
       <div class="kpi" title="0 item(s) décidés dont les travaux ne sont pas ouverts"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts</span></div>
       <div class="kpi" title="0 campagne(s) ouvertes au registre"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre</span></div>
-      <div class="kpi" title="141 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">141</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
+      <div class="kpi" title="146 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">146</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende">
       <span class="leg-item"><span class="leg-swatch" style="background:var(--blue)"></span>candidat</span>
@@ -132,96 +132,48 @@
       <span class="leg-item"><span class="leg-swatch" style="background:var(--amber)"></span>en cours</span>
       <span class="leg-item">Priorité <strong>Haute</strong> ≥ 5 · <strong>Moyenne</strong> 3-4 · <strong>Basse</strong> &lt; 3 (score = gain × preuve ÷ effort, ×2 si payé en réel)</span>
     </p>
-    <nav class="toc" aria-label="Sommaire"><a href="#pilot"><strong>pilot</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#tests"><strong>tests</strong> <span class="toc-d">4 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#pilot"><strong>pilot</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#tests"><strong>tests</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="pilot">
       <h2>pilot <span class="badge" title="1 item(s) actifs ciblant pilot">1</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0145">
+        <article class="card s-candidat" id="item-TF-0147">
           <header class="card-head">
-            <code class="tf-id">TF-0145</code>
+            <code class="tf-id">TF-0147</code>
             <span class="statut s-candidat">candidat</span>
             <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">pilot : orchestrateur de boucle remédiation ↔ réexécution (tests audite/exécute · development remédie sous run · humain tranche), bornée ≤ 3, état terminal classé</h3>
-          <div class="card-detail"><p class="lead">Plan e2e du 13/08 (§4 phases 5-6, §2). Le cœur de l'autonomie : un orchestrateur PORTÉ PAR LE PILOT qui boucle corriger → réexécuter (--reprendre, ne rejoue que le non-vert), en appelant forge-tests (audit/exécution) et forge-development (remédiation du CODE PRODUIT, sous run double gate) selon le classement R-29 (IA/development/humain). BORNÉ ≤ N cycles (défaut 3, G-2 absolue — jamais assouplir un seuil ni skip pour faire vert, la mutation garde les tests honnêtes). ÉTAT TERMINAL (jamais « jusqu'au vert ») : soit cible atteinte (couverture/passage/mutation aux seuils, 0 écart), soit N cycles épuisés → livrer l'état mesuré + K écarts résiduels classés. Tranche la frontière autonomie/GO humain (vrai bug métier, golden visuel, renoncement à un pan, MEP). Non-recouvrement (R-28) : arbitre le recouvrement development/tests que l'INVENTAIRE signale non tranché ; aucune forge ne porte aujourd'hui cette boucle inter-forges bornée à état terminal classé.</p></div>
+          <h3 class="card-titre">Consigne de restitution versionnée pour les synthèses à l'humain — le seul delta positif de l'étude personas (pas de persona-juge)</h3>
+          <div class="card-detail"><p class="lead">L'étude d'opportunité personas du 13/08 (output/20260813-etude-personas-agents.md) conclut : personas NUISIBLES pour le pilot en juge (substitution du jugement incarné aux oracles exécutés, relance non bornée, tension R-29), INUTILES pour les sous-agents de campagne et les agents d'étape (le gabarit contractuel et la méthode outillée des forges portent déjà la constance ; littérature convergente Zheng/ACL-EMNLP-2024 et PRISM/2026 : effet nul à négatif sur l'exactitude). Le seul delta positif identifié est la POSTURE DE RESTITUTION à l'humain (synthèses de clôture, propositions de prochaines actions) : aujourd'hui non cadrée, forme variable d'un run à l'autre.</p><p class="detail-label">Proposition</p><ul class="puces"><li>une consigne de restitution comme référentiel versionné (gabarits/ ou references/, daté, éditable — loi n° 4), consommée par le pilot en clôture de run : règles de FORME uniquement, chacune vérifiable (décisions à prendre en premier, options fermées a/b/c, restes classés IA/développeur/utilisateur au format actions[] R-29, longueur max) — JAMAIS de critère de jugement (« exigeant », « satisfait ») : un persona ne remplace jamais un oracle</li><li>Validation avant généralisation : A/B sur 2 synthèses de clôture (avec/sans consigne) jugées sur ces critères binaires, conformément à la doctrine §4 bis (a priori confronté, jamais reconduit par habitude)</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-08-13</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 3 × preuve 2 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>aujourd'hui l'utilisateur doit lui-même enchaîner audit → correction → réaudit et décider quand s'arrêter ; sans orchestrateur borné à état terminal classé, « en autonomie jusqu'au vert » est soit infini soit tricheur</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">plan-strategie-tests-e2e (13/08)</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 2 × preuve 1 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>les synthèses de clôture et propositions de prochaines actions n'obéissent aujourd'hui à aucun format vérifiable — la forme varie d'un run à l'autre et le classement des restes (R-29) n'est garanti que par habitude ; coût non chiffré (aucun incident consigné), d'où preuve=1 et le passage par A/B avant toute généralisation</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">etude-personas-13-08</dd></div>
           </dl>
         </article>
       </div>
     </section>
     <section id="tests">
-      <h2>tests <span class="badge" title="4 item(s) actifs ciblant tests">4</span></h2>
+      <h2>tests <span class="badge" title="1 item(s) actifs ciblant tests">1</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>tests</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0142">
+        <article class="card s-candidat" id="item-TF-0148">
           <header class="card-head">
-            <code class="tf-id">TF-0142</code>
+            <code class="tf-id">TF-0148</code>
             <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">forge-tests + pilot : harnais de préparation d'environnement d'audit (installer deps, servir le front, renseigner le contrat projet) — le trou n° 1 de BAV2</h3>
-          <div class="card-detail"><p class="lead">Plan stratégie e2e du 13/08 (output\20260813-plan-strategie-tests-e2e.md §1, §4 phase 0).</p><ul class="puces"><li>Diagnostic BAV2 : 5 pans sur 8 non mesurables faute d'ENVIRONNEMENT préparé — frontend/node_modules absent (front, visuel non mesurables), app ASGI non déclarée dans .env.forge-tests (api inventaire VIDE), front non servi (visuel). forge-tests suppose aujourd'hui l'environnement prêt et sort PARTIEL sinon (frontière lecture seule G-1). Nouveau : un harnais (porté par le pilot/forge-ops, PAS forge-tests qui reste lecture seule) qui, avant l'audit, installe les dépendances (npm ci, uv sync), sert le front sur un port dédié (cf. TF-0137), renseigne/valide le contrat projet (FORGE_TESTS_APP, base URL, emplacements), et produit un contrat-audit.json + un healthcheck (front répond, back importable). Non-recouvrement : aucun service ne prépare l'environnement — forge-tests le CONSTATE (pour_couvrir) sans l'exécuter</li><li>forge-ops sert/déploie mais pour la MEP, pas pour l'audit. bloque_question si un secret/une instance manque (humain)</li></ul></div>
+          <h3 class="card-titre">Recette forge-tests : la section dette échoue (invariants-003/004 désynchronisés) — préexistant, prouvé par git stash</h3>
+          <div class="card-detail"><p class="lead">Constaté en instruisant TF-0143/0144/0146 (13/08) : `recette/verifier_corpus.py --section dette` sort en ECHEC (invariants-003 / invariants-004 désynchronisés), indépendamment des 3 correctifs — reproduit à l'identique sur le commit de départ 2b4cbeb par git stash, donc antérieur et sans lien.</p><ul class="puces"><li>À instruire : resynchroniser les invariants du registre de dette (forge_tests/dette.py / invariants.py) ou corriger le contrôle si c'est lui qui a dérivé</li><li>Ne bloque pas les autres sections (corpus OK, pytest 154)</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-08-13</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur tests</dt><dd>sur BAV2, la moitié des pans rendent « non mesurable » pour la seule raison que l'environnement n'est pas prêt — l'utilisateur reçoit un audit à trous là où une préparation automatique aurait rendu les pans mesurables</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">plan-strategie-tests-e2e (13/08)</dd></div>
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0146">
-          <header class="card-head">
-            <code class="tf-id">TF-0146</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-tests : rapport exhaustif test-par-test (PASSANT / NON-PASSANT / NON-EXÉCUTÉ + pourquoi + détail), au-delà de l'agrégat par pan</h3>
-          <div class="card-detail"><p class="lead">Plan e2e du 13/08 (§4 phase 4, §5). L'utilisateur veut « la liste et le détail de TOUS les tests exécutés ». Aujourd'hui le rapport agrège par pan (couverture_par_pan, findings, actions) mais ne liste pas chaque test individuel avec son verdict. Nouveau : une section où CHAQUE cas exécuté porte PASSANT / NON-PASSANT / NON-EXÉCUTÉ, avec le POURQUOI pour les deux derniers, le détail (message, localisation), et le triplet couverture/passage/mutation chiffré par pan — la matière du plan d'action (§5) et de la liste « ce qui attend l'humain ». Oracle : aucun test sans verdict motivé ; « aucun ✓ sans oracle » (un vert non couvert ou de mutation nulle est signalé). Non-recouvrement : le rapport actuel prouve la couverture agrégée, pas le verdict test-par-test.</p></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-13</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 2 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur tests</dt><dd>le grief explicite de l'utilisateur — « le rapport ne fournit pas la liste et le détail de tous les tests exécutés » — reste ouvert tant que le rapport agrège par pan sans descendre au test</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">plan-strategie-tests-e2e (13/08)</dd></div>
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0143">
-          <header class="card-head">
-            <code class="tf-id">TF-0143</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-tests : générateur de cas de tests EXÉCUTABLES par pan (nominal + limite + rejet), au-delà de la proposition actuelle</h3>
-          <div class="card-detail"><p class="lead">Plan e2e du 13/08 (§4 phase 2). Aujourd'hui --generer dépose des cas EN PROPOSITION ; le plan exige des cas qui COMPILENT/COLLECTENT réellement (un cas qui ne tourne pas n'est pas un cas) et couvrent, par élément de surface non exercé, le nominal + la limite + le rejet. Étendre le générateur : par pan (api routes, front interactions, data contraintes par violation, batch branches de rejet, fichiers chemins d'erreur), avec l'oracle « le cas généré est exécutable ». Reste hors périmètre du générateur : l'ADOPTION des cas dans le projet est une remédiation produit (development sous run), jamais forge-tests qui écrit dans le projet (G-1). Non-recouvrement : --generer existe mais ne garantit pas l'exécutabilité ni la triade nominal/limite/rejet par pan.</p></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-13</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 3 × preuve 2 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur tests</dt><dd>un audit qui dit « qualif 2/4 » sans fournir les 2 cas manquants exécutables laisse l'utilisateur écrire lui-même ce que la forge a déjà identifié comme manquant</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">plan-strategie-tests-e2e (13/08)</dd></div>
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0144">
-          <header class="card-head">
-            <code class="tf-id">TF-0144</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-tests : générateur de volumétrie de données seedé, synthétique, dimensionné PAR CAS, persisté hors projet et rejouable</h3>
-          <div class="card-detail"><p class="lead">Plan e2e du 13/08 (§4 phase 3). « Volumétrie suffisante » = chaque cas a SES données (pas « beaucoup »), SEEDÉE (même seed → même jeu, rejouable), SYNTHÉTIQUE (jamais de donnée réelle — garde-fou), PERSISTÉE hors projet (G-1), COMPLÉTABLE. Oracles : déterminisme, anonymat (grep zéro donnée réelle), suffisance (chaque cas adopté trouve ses données). Étend le jeu de données actuel de --livrables (aujourd'hui un jeu global, pas par-cas ni explicitement seedé). Non-recouvrement : le jeu synthétique existe mais n'est ni dimensionné par cas ni garanti déterministe/rejouable.</p></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-13</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 2 × preuve 2 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur tests</dt><dd>sans données par cas rejouables, un cas identifié reste non exécutable faute d'entrées, et un run ne se reproduit pas à l'identique — la confiance exige le déterminisme</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">plan-strategie-tests-e2e (13/08)</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur tests</dt><dd>la recette de la forge ne peut pas prononcer S-01 tant que la section dette est rouge — le registre de dette, source de vérité de ce qui reste à faire dans la forge, est désynchronisé de son contrôle</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">campagne-e2e-briques (13/08)</dd></div>
           </dl>
         </article>
       </div>

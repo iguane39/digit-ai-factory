@@ -80,7 +80,7 @@ le backlog, chaque forge vérifiée par sa recette native puis rejouée par l'or
 
 ## 08/08/2026 (soir) — Revue stratégique de l'écosystème (audit delta, 8 périmètres)
 
-Rapport : `output\Digit-AI - Revue Forge - Écosystème - 20260808a.md` — santé re-exécutée 8/8
+Rapport : `output-revues-et-propositions\Digit-AI - Revue Forge - Écosystème - 20260808a.md` — santé re-exécutée 8/8
 (sauf self-test quality-oracles : 3 échecs repo / 6 installation), modèle de scorage durable
 (GAIN×PREUVE÷EFFORT), test d'admission des nouvelles forges. **Top 10 scoré au rapport** —
 têtes : trancher le statut du conductor (10,0), RT-13 (8,0), régression CRLF SKILL.md (6,0),
@@ -581,7 +581,7 @@ vide. Oracle R1-R10 PASS. Pushes : pilot + les 12 forges (dont les 2 créations 
 
 **Mandat humain** : analyse d'opportunité (cybersecurity, website, webapp, mobile) — analyse
 seulement, prompt barré/L99 au préalable. Livrable :
-`output\20260812-etude-opportunite-forges.md` (grille : partition → non-recouvrement cité
+`output\03-etudes\20260812-etude-opportunite-forges.md` (grille : partition → non-recouvrement cité
 contre le catalogue v1.3.0 → état de l'art sourcé → options tranchées → coût).
 
 **Verdicts** : cybersecurity → **forge dédiée recommandée** (modèle seo ; trou prouvé sur
@@ -711,7 +711,7 @@ chirurgical à 2 lignes × 4 fichiers, sous mandat explicite), vérif pytest 126
 ## 12/08/2026 — étude d'opportunité « spécialisations forge-data par moteur »
 
 **Mandat humain** (prompt barré L99) : pertinence de 4 spécialisations forge-data (Databricks,
-Oracle, Postgres, Azure SQL). Analyse seulement — `output\20260812-etude-forge-data-moteurs.md`.
+Oracle, Postgres, Azure SQL). Analyse seulement — `output\03-etudes\20260812-etude-forge-data-moteurs.md`.
 
 **Verdict** : NE PAS créer 4 spécialisations. Grille R-28 : les formats de forge-data
 (assertions@1/contrat@1/lineage@1) sont agnostiques du moteur et jugent des artefacts, jamais
@@ -769,3 +769,29 @@ mutation). Anti-triche (mutation + « aucun ✓ sans oracle »). 5 candidatures 
 harnais d'environnement, générateur de cas exécutables, volumétrie seedée par cas, orchestrateur
 de boucle (pilot), rapport test-par-test. Recherche/diagnostic : pilot (Fable) sur pièces ;
 aucune écriture hors pilot (git status forges + BAV2 inchangés).
+
+## 13/08/2026 (suite) — « fais tout » : 5 briques v0 de la stratégie e2e construites
+
+**Mandat humain** : construire les 5 candidats du plan e2e. Deux agents, dépôts disjoints
+(forge-tests / pilot), tous vérifiés par sondage ; catalogue v1.6.0 (70 services).
+
+**Côté pilot** (`outillage-tests-e2e\`, nouveau dossier isolé) :
+- TF-0142 (`7e883b9`) **harnais d'environnement** — deps, port dédié libre, FORGE_TESTS_APP
+  dérivé, contrat-audit.json + healthcheck ; self-test 8/8. Le trou n° 1 de BAV2 outillé.
+- TF-0145 (`54db9e7`) **orchestrateur de boucle** — R-29, ≤ N cycles (G-2), état terminal
+  cible_atteinte|cycles_epuises, `garantirHonnetete()` qui LÈVE sur vert forcé ; self-test 7/7.
+  « Jusqu'au vert » devient un invariant vérifié par CODE.
+
+**Côté forge-tests** (pytest 128→154) :
+- TF-0143 (`4696f3b`) **cas collectables** — verifier_syntaxe + oracle _collectable (pytest
+  --collect-only) : le générateur prouve du collectable, plus seulement du plausible.
+- TF-0144 (`57ea83d`) **volumétrie par cas** — jeux_par_cas seedé/déterministe, accès opposable.
+- TF-0146 (`77f51f9`) **rapport test-par-test** — section essais (verdict motivé par test,
+  passant non couvert signalé) + lecteur JUnit zéro dépendance. Le grief explicite comblé.
+
+Tous les v0 sont nés EXERCÉS sur fixtures ; l'intégration e2e réelle (harnais→forge-tests→
+orchestrateur→development sur un vrai projet) est le **jalon suivant**, annoncé et non promis.
+Routage §4 bis : forge-tests 211 k/89 outils/20 min ; pilot 127 k/59/9 min ; escalade aucune.
+Défaut préexistant surfacé (lot dba05b5f348d) : recette --section dette ECHEC (invariants
+désynchronisés, prouvé antérieur). Registre : 2 candidats (dette + une restitution d'une autre
+session), 147 archivés.

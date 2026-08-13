@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=2e8b01609e9e archive=dddba6755869 · dernier événement: 2026-08-13T07:03:34.891Z -->
+     sceaux: actifs=dc4b46f8f189 archive=e0b33b386222 · dernier événement: 2026-08-13T07:31:56.168Z -->
 
-**5 actifs** (candidat 5 · décidé 0 · en cours 0 · corrigé 0 · écarté 0) · **142 archivés**.
+**2 actifs** (candidat 2 · décidé 0 · en cours 0 · corrigé 0 · écarté 0) · **147 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,16 +11,13 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0145 | candidat | 2 | pilot : orchestrateur de boucle remédiation ↔ réexécution (tests audite/exécute · development remédie sous run · humain tranche), bornée ≤ 3, état terminal classé | **oui** — aujourd'hui l'utilisateur doit lui-même enchaîner audit → correction → réaudit et décider quand s'arrêter ; sans orchestrateur borné à état terminal classé, « en autonomie jusqu'au vert » est soit infini soit tricheur |
+| TF-0147 | candidat | 2 | Consigne de restitution versionnée pour les synthèses à l'humain — le seul delta positif de l'étude personas (pas de persona-juge) | **oui** — les synthèses de clôture et propositions de prochaines actions n'obéissent aujourd'hui à aucun format vérifiable — la forme varie d'un run à l'autre et le classement des restes (R-29) n'est garanti que par habitude ; coût non chiffré (aucun incident consigné), d'où preuve=1 et le passage par A/B avant toute généralisation |
 
 ## tests
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0142 | candidat | 4.5 | forge-tests + pilot : harnais de préparation d'environnement d'audit (installer deps, servir le front, renseigner le contrat projet) — le trou n° 1 de BAV2 | **oui** — sur BAV2, la moitié des pans rendent « non mesurable » pour la seule raison que l'environnement n'est pas prêt — l'utilisateur reçoit un audit à trous là où une préparation automatique aurait rendu les pans mesurables |
-| TF-0146 | candidat | 3 | forge-tests : rapport exhaustif test-par-test (PASSANT / NON-PASSANT / NON-EXÉCUTÉ + pourquoi + détail), au-delà de l'agrégat par pan | **oui** — le grief explicite de l'utilisateur — « le rapport ne fournit pas la liste et le détail de tous les tests exécutés » — reste ouvert tant que le rapport agrège par pan sans descendre au test |
-| TF-0143 | candidat | 2 | forge-tests : générateur de cas de tests EXÉCUTABLES par pan (nominal + limite + rejet), au-delà de la proposition actuelle | **oui** — un audit qui dit « qualif 2/4 » sans fournir les 2 cas manquants exécutables laisse l'utilisateur écrire lui-même ce que la forge a déjà identifié comme manquant |
-| TF-0144 | candidat | 2 | forge-tests : générateur de volumétrie de données seedé, synthétique, dimensionné PAR CAS, persisté hors projet et rejouable | **oui** — sans données par cas rejouables, un cas identifié reste non exécutable faute d'entrées, et un run ne se reproduit pas à l'identique — la confiance exige le déterminisme |
+| TF-0148 | candidat | 6 | Recette forge-tests : la section dette échoue (invariants-003/004 désynchronisés) — préexistant, prouvé par git stash | **oui** — la recette de la forge ne peut pas prononcer S-01 tant que la section dette est rouge — le registre de dette, source de vérité de ce qui reste à faire dans la forge, est désynchronisé de son contrôle |
 
 ---
 Détail d'un item : `grep '"id":"TF-xxxx"' todo/TODO.jsonl` (tous ses événements). Archive : même commande sur TODO-ARCHIVE.jsonl.

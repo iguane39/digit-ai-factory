@@ -1,7 +1,7 @@
 # Catalogues de services des forges — vue générée
 
-> **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.5.0, 2026-08-12) — ne jamais éditer ce fichier.
-> 69 services · 59 prouvés · 10 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
+> **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.6.0, 2026-08-13) — ne jamais éditer ce fichier.
+> 70 services · 60 prouvés · 10 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
 
 ## forge-conception (pipeline) — 7 services
 
@@ -40,16 +40,18 @@
 | cat-dev-06 | **Gate anti-patterns IA** | bloquer imports fantômes, secrets en dur et routes sans auth avant merge | `conductor\gates\ai_antipatterns_gate.py` | TF-0103 (12/08) : 15 tests double sens, 0 faux positif sur conductor entier | prouve | experimental |
 | cat-dev-07 | **Gate de mutation (3e métrique)** | mesurer la force réelle de mes tests, pas seulement leur couverture | `conductor\gates\mutation_gate.py + job CI mutation` | TF-0103 (12/08) : mesure réelle Docker 61,1 % (223/365) — honnête, sous seuil, consignée | prouve | experimental |
 
-## forge-tests (pipeline) — 6 services
+## forge-tests (pipeline) — 7 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
 | cat-tst-01 | **Auditer une suite de tests** | savoir ce que mes tests couvrent vraiment et ce qui n'est pas exercé | `uv run python -m forge_tests <racine> --json [--sortie <fichier>]` | seule vraie CLI de l'écosystème ; run pilote 04/08 exit 3, couverture API 8/8 seuil 1.0, mutation 0.714 ≥ 0.70 | prouve | experimental |
-| cat-tst-02 | **Générer des cas de tests en proposition** | recevoir des cas de tests prêts à adopter, sans pollution de mon projet | `uv run python -m forge_tests <racine> --generer <dossier-proposition>` | CLI vérifiée le 12/08 (--generer documenté « jamais dans le projet ») | prouve | experimental |
-| cat-tst-03 | **Livrables de tests dérivés** | obtenir cahiers de tests, jeu de données synthétique et dashboard | `uv run python -m forge_tests <racine> --livrables <dossier-proposition>` | CLI vérifiée le 12/08 (option --livrables, régénérés à chaque audit) | prouve | experimental |
+| cat-tst-02 | **Générer des cas de tests en proposition** | recevoir des cas de tests prêts à adopter, sans pollution de mon projet | `uv run python -m forge_tests <racine> --generer <dossier-proposition>` | CLI vérifiée ; TF-0143 (13/08) : cas prouvés COLLECTABLES (pytest --collect-only), pas seulement plausibles — self-test/recette rejoués pilot | prouve | experimental |
+| cat-tst-03 | **Livrables de tests dérivés** | obtenir cahiers de tests, jeu de données synthétique et dashboard | `uv run python -m forge_tests <racine> --livrables <dossier-proposition>` | CLI vérifiée ; TF-0144 (13/08) : volumétrie dimensionnée PAR CAS, seedée/déterministe/synthétique — recette jeux+dashboard OK rejoués pilot | prouve | experimental |
 | cat-tst-04 | **Tendance et reprise ciblée** | comparer deux audits et ne rejouer que ce qui n'était pas vert | `uv run python -m forge_tests <racine> --precedent <r.json> \| --reprendre <r.json>` | CLI vérifiée le 12/08 (options --precedent et --reprendre documentées) | prouve | experimental |
 | cat-tst-05 | **Inventaire sans exécution** | cartographier la surface de test sans rien exécuter | `env FORGE_TESTS_SANS_EXECUTION=1 + CLI` | documenté (INVENTAIRE §4) — non exercé isolément sur cas réel | declare | experimental |
 | cat-tst-06 | **Impact par diff, flaky, propriétés, mutation par risque** | auditer moins mais juste : cibler par diff, isoler les flaky, proposer du property-based | `forge_tests\{impact,flaky,generateur_proprietes}.py · risque.repartir_mutants` | TF-0104 (12/08) : 14 tests dédiés dont 2 bout-en-bout git réel — CÂBLAGE CLI RESTANT (services non invocables par flag) | declare | experimental |
+| cat-tst-07 | **Rapport exhaustif test-par-test** | obtenir le verdict et le pourquoi de CHAQUE test, pas seulement un agrégat par pan | `forge_tests
+oyau.py (section essais) + forge_tests\junit.py` | TF-0146 (13/08) : 12 tests, self-test noyau vert, pytest 154 rejoué pilot ; v0 — branchement des adaptateurs (--junitxml → essais réels) = jalon d'intégration | prouve | experimental |
 
 ## forge-agents (transverse) — 6 services
 
@@ -118,9 +120,9 @@
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
 | cat-org-01 | **Doctrine des conventions** | disposer de conventions arbitrées pour tous les projets | `conversationnel — documents comme points d'accroche (proposés au pilot, qui encode dans REGLES-PROJET.md)` | oracle-conventions mécanise D-02/03/04/05/06/09/10 et déclare SANS_OBJET motivé les 5 restantes ; 12 décisions au format MADR (ids stables) ; PASS sur le dépôt lui-même (TF-0109, rejoué pilot) | prouve | experimental |
-| cat-org-02 | **Composant filtres-tableau** | réutiliser un composant de filtres de tableau vérifié | `node output\composant-filtres-tableau\oracle-filtres-tableau.mjs` | oracle vérifié dans les deux sens (fixtures rouge/verte) | prouve | experimental |
+| cat-org-02 | **Composant filtres-tableau** | réutiliser un composant de filtres de tableau vérifié | `node output-composants\composant-filtres-tableau\oracle-filtres-tableau.mjs` | oracle vérifié dans les deux sens (fixtures rouge/verte) | prouve | experimental |
 | cat-org-03 | **Études normatives** | ancrer les pratiques sur les normes du métier | `conversationnel` | étude documentée — contrôles proposés non implémentés | declare | experimental |
-| cat-org-04 | **Gate de conventions packagé** | vérifier les conventions en pre-commit/CI sans dépendre de la forge | `node output\gate-conventions\gate-conventions.mjs [--staged]` | TF-0109 (12/08) : self-test 6/6 + 2 robustesse, rejoué pilot ; PROPOSÉ aux dépôts, jamais déployé d'office | prouve | experimental |
+| cat-org-04 | **Gate de conventions packagé** | vérifier les conventions en pre-commit/CI sans dépendre de la forge | `node output-composants\gate-conventions\gate-conventions.mjs [--staged]` | TF-0109 (12/08) : self-test 6/6 + 2 robustesse, rejoué pilot ; PROPOSÉ aux dépôts, jamais déployé d'office | prouve | experimental |
 
 ## forge-agents-security (sur mandat) — 2 services
 
