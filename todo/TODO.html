@@ -113,7 +113,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>00dfc46e8108</code> · dernier événement 2026-08-13T07:44:14.088Z</p>
+      <p class="meta">sceau <code>4de4aaa3fea0</code> · dernier événement 2026-08-13T08:17:36.502Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -121,10 +121,10 @@
     </header>
     <p>Seul le <strong>reste-à-faire</strong> vit ici — les items clos partent à l'archive (<code>node todo\archiver.mjs</code>). Chaque item est détaillé en puces, avec sa date de création, sa priorité de traitement (dérivée du score) et son impact sur la forge concernée. La décision reste humaine et se prend hors de cette page (« décide TF-xxxx »).</p>
     <div class="kpis">
-      <div class="kpi" title="3 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">3</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
+      <div class="kpi" title="2 candidat(s) en attente de décision humaine"><span class="kpi-label">À décider</span><span class="kpi-value">2</span><span class="kpi-hint">candidats — la décision est humaine</span></div>
       <div class="kpi" title="0 item(s) décidés dont les travaux ne sont pas ouverts"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts</span></div>
       <div class="kpi" title="0 campagne(s) ouvertes au registre"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre</span></div>
-      <div class="kpi" title="146 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">146</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
+      <div class="kpi" title="149 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">149</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende">
       <span class="leg-item"><span class="leg-swatch" style="background:var(--blue)"></span>candidat</span>
@@ -132,26 +132,26 @@
       <span class="leg-item"><span class="leg-swatch" style="background:var(--amber)"></span>en cours</span>
       <span class="leg-item">Priorité <strong>Haute</strong> ≥ 5 · <strong>Moyenne</strong> 3-4 · <strong>Basse</strong> &lt; 3 (score = gain × preuve ÷ effort, ×2 si payé en réel)</span>
     </p>
-    <nav class="toc" aria-label="Sommaire"><a href="#organization"><strong>organization</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#tests"><strong>tests</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#organization"><strong>organization</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="organization">
       <h2>organization <span class="badge" title="1 item(s) actifs ciblant organization">1</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>organization</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0149">
+        <article class="card s-candidat" id="item-TF-0150">
           <header class="card-head">
-            <code class="tf-id">TF-0149</code>
+            <code class="tf-id">TF-0150</code>
             <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">Encoder le rangement d'output\ en convention transverse (familles numérotées + old\) et trancher old\ vs Old\ (D-06)</h3>
-          <div class="card-detail"><p class="lead">Le mandat humain du 13/08 a appliqué à l'écosystème la méthode de rangement d'output\ constatée chez forge-audit_client-a : dossiers de familles numérotés 01-, 02-…, une seule version de chaque livrable à la racine du dossier, versions antérieures dans un sous-dossier old\, noms de fichiers inchangés.</p><ul class="puces"><li>Appliqué le 13/08 : pilot (5 familles + LISEZMOI de mapping), agents (01-pv, 02-skills), design (01-pages-temoins), organization (01-etudes, 02-composants), seo (01-decisions, 02-veille) — audit_client-a déjà conforme, produit Produit-01 sans objet (output racine vide). Deux restes à trancher par convention (forge-organization, gardienne des D-xx) :</li><li>ENCODER la méthode comme convention transverse (une D-xx : nommage des dossiers de familles, numérotation, règle « une version à la racine, antérieures dans le sous-dossier de versions », LISEZMOI de mapping obligatoire quand des références antérieures existent) pour que les prochains livrables naissent rangés au lieu d'être re-rangés par campagne</li><li>TRANCHER la casse et la portée du dossier de versions : le mandat du 13/08 et audit_client-a disent old\, mais D-06 (organization) dit « versions antérieures dans le Old/ de cette racine » et gabarits\CLAUDE-PRODUIT.md du pilot dit « Old\ jamais versionné » — trois écritures pour la même notion, dont une avec une règle git divergente (jamais versionné vs versionné : les old\ du 13/08 SONT suivis par git chez pilot/design/organization/seo). Une seule graphie et une seule règle de versionnement doivent rester</li></ul></div>
+          <h3 class="card-titre">Trancher le VERSIONNEMENT de old\ : C1 disait « jamais versionné » mais les old\ posés le 13/08 sont suivis par git — divergence à résoudre</h3>
+          <div class="card-detail"><p class="lead">D-15 (TF-0149) a tranché la GRAPHIE (old\ minuscule) mais PAS le versionnement.</p><ul class="puces"><li>Divergence sur pièces :</li><li>l'arbitrage C1 de REGLES-PROJET dit « Old\ autorisé pour les livrables mais JAMAIS versionné (ignoré par git) »</li><li>gabarits\CLAUDE-PRODUIT.md dit « Old\ jamais versionné »</li><li>MAIS la réorg du 13/08 a posé des old\ qui SONT suivis par git (pilot/design/organization/seo, commités). Trois documents, deux règles opposées. À trancher par convention (forge-organization D-xx puis encodage pilot) : soit old\ d'output\ est VERSIONNÉ (rangement de lisibilité dont git garde l'histoire — cohérent avec l'état de fait, alors amender C1 + CLAUDE-PRODUIT) ; soit old\ est GITIGNORÉ (fidèle à C1, alors ajouter old/ au .gitignore et retirer les old\ suivis). Recommandation à instruire : versionné (git garde l'histoire de toute façon, et re-gitignorer retirerait des livrables déjà commités). Distinct de la règle 6 (le CODE n'a que git, jamais d'old\)</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-08-13</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 2 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur organization</dt><dd>la divergence est constatée sur pièces : trois documents normatifs écrivent la même notion de trois façons (old\ / Old/ / Old\ non versionné) et le rangement du 13/08 a dû choisir sans convention ; sans D-xx, chaque prochaine campagne ou produit re-choisira, et les output\ divergeront à nouveau (c'est exactement ce que le mandat du 13/08 a dû rattraper sur 5 dépôts)</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">mandat-rangement-output-13-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur organization</dt><dd>trois documents normatifs énoncent deux règles opposées sur le versionnement de old\ — une session qui suit C1 gitignore, une qui suit l'état de fait commite : incohérence garantie au prochain rangement</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">campagne-todos (13/08)</dd></div>
           </dl>
         </article>
       </div>
@@ -160,42 +160,20 @@
       <h2>pilot <span class="badge" title="1 item(s) actifs ciblant pilot">1</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0147">
+        <article class="card s-candidat" id="item-TF-0151">
           <header class="card-head">
-            <code class="tf-id">TF-0147</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">Consigne de restitution versionnée pour les synthèses à l'humain — le seul delta positif de l'étude personas (pas de persona-juge)</h3>
-          <div class="card-detail"><p class="lead">L'étude d'opportunité personas du 13/08 (output/20260813-etude-personas-agents.md) conclut : personas NUISIBLES pour le pilot en juge (substitution du jugement incarné aux oracles exécutés, relance non bornée, tension R-29), INUTILES pour les sous-agents de campagne et les agents d'étape (le gabarit contractuel et la méthode outillée des forges portent déjà la constance ; littérature convergente Zheng/ACL-EMNLP-2024 et PRISM/2026 : effet nul à négatif sur l'exactitude). Le seul delta positif identifié est la POSTURE DE RESTITUTION à l'humain (synthèses de clôture, propositions de prochaines actions) : aujourd'hui non cadrée, forme variable d'un run à l'autre.</p><p class="detail-label">Proposition</p><ul class="puces"><li>une consigne de restitution comme référentiel versionné (gabarits/ ou references/, daté, éditable — loi n° 4), consommée par le pilot en clôture de run : règles de FORME uniquement, chacune vérifiable (décisions à prendre en premier, options fermées a/b/c, restes classés IA/développeur/utilisateur au format actions[] R-29, longueur max) — JAMAIS de critère de jugement (« exigeant », « satisfait ») : un persona ne remplace jamais un oracle</li><li>Validation avant généralisation : A/B sur 2 synthèses de clôture (avec/sans consigne) jugées sur ces critères binaires, conformément à la doctrine §4 bis (a priori confronté, jamais reconduit par habitude)</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-13</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 2 × preuve 1 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>les synthèses de clôture et propositions de prochaines actions n'obéissent aujourd'hui à aucun format vérifiable — la forme varie d'un run à l'autre et le classement des restes (R-29) n'est garanti que par habitude ; coût non chiffré (aucun incident consigné), d'où preuve=1 et le passage par A/B avant toute généralisation</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">etude-personas-13-08</dd></div>
-          </dl>
-        </article>
-      </div>
-    </section>
-    <section id="tests">
-      <h2>tests <span class="badge" title="1 item(s) actifs ciblant tests">1</span></h2>
-      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>tests</strong> — trié par statut puis priorité décroissante.</p>
-      <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0148">
-          <header class="card-head">
-            <code class="tf-id">TF-0148</code>
+            <code class="tf-id">TF-0151</code>
             <span class="statut s-candidat">candidat</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">Recette forge-tests : la section dette échoue (invariants-003/004 désynchronisés) — préexistant, prouvé par git stash</h3>
-          <div class="card-detail"><p class="lead">Constaté en instruisant TF-0143/0144/0146 (13/08) : `recette/verifier_corpus.py --section dette` sort en ECHEC (invariants-003 / invariants-004 désynchronisés), indépendamment des 3 correctifs — reproduit à l'identique sur le commit de départ 2b4cbeb par git stash, donc antérieur et sans lien.</p><ul class="puces"><li>À instruire : resynchroniser les invariants du registre de dette (forge_tests/dette.py / invariants.py) ou corriger le contrôle si c'est lui qui a dérivé</li><li>Ne bloque pas les autres sections (corpus OK, pytest 154)</li></ul></div>
+          <h3 class="card-titre">Gabarit AGENT-CAMPAGNE : rappeler de régénérer les registres DÉRIVÉS du code après toute modification de leurs sources</h3>
+          <div class="card-detail"><p class="lead">Constat de TF-0148 : TF-0135 (12/08) a modifié forge_tests/invariants.py (source du registre de dette) sans relancer python -m forge_tests.dette → registre-dette.json a dérivé du code, la recette --section dette est restée rouge une campagne entière avant d'être vue. Classe PROCESS (ni IA/dev/utilisateur). Un registre est DÉRIVÉ quand une régénération le reconstruit depuis le code (registre-dette de forge-tests ; potentiellement d'autres : vues générées, catalogues).</p><p class="detail-label">Proposition</p><ul class="puces"><li>ajouter à gabarits\AGENT-CAMPAGNE.md une ligne de checklist de vérification native — « si tu as modifié une SOURCE d'un registre/vue généré</li><li>relance son régénérateur et commite le régénéré » — et lister les régénérateurs connus par forge (forge-tests : python -m forge_tests.dette ; pilot : generer-vues, generer-vue/page todo). Idéalement, un contrôle qui détecte la dérive (le régénérateur produit un diff = la source a changé sans régénération)</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-08-13</dd></div>
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur tests</dt><dd>la recette de la forge ne peut pas prononcer S-01 tant que la section dette est rouge — le registre de dette, source de vérité de ce qui reste à faire dans la forge, est désynchronisé de son contrôle</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">campagne-e2e-briques (13/08)</dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>la dérive registre↔source a coûté une recette rouge non vue pendant une campagne ; le gabarit qui cadre toutes les campagnes ne prévient pas la classe entière de ce défaut</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">campagne-todos (13/08, TF-0148)</dd></div>
           </dl>
         </article>
       </div>

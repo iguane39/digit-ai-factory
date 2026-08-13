@@ -821,3 +821,16 @@ projets produits. Constat sur pièces : **forge-audit_client-a appliquait déjà
   garde-fou « projets autonomes »).
 - Candidat remis : encoder la méthode en convention transverse (organization) et trancher
   `old\` (mandat + audit_client-a) vs `Old\` (D-06, CLAUDE-PRODUIT).
+
+## 13/08/2026 (suite) — « Implémente les TODOs » : 3 items clos
+
+TF-0147 (`145b803`) : consigne de restitution `gabarits\RESTITUTION.md` — forme seule, pas de
+persona-juge (seul delta positif de l'étude personas). TF-0148 (`68725ea`) : registre de dette
+resynchronisé — cause racine prouvée (TF-0135 avait modifié invariants.py sans régénérer le
+registre) ; **la recette forge-tests passe S-01 TENU pour la 1re fois** (12/12 sections). TF-0149
+(org `bc27652` + pilot `b8c8e62`) : D-15 encode le rangement output\ en familles numérotées,
+casse `old\` minuscule tranchée par l'humain. Deux décisions non tranchées versées en
+candidatures plutôt qu'écrasées : versionnement de old\ (C1 vs état de fait, lot 1dd9cefdde51)
+et rappel de régénération des registres dérivés au gabarit de campagne (process). Deux agents
+Sonnet (tests, organization) + pilot ; escalade aucune ; sondages rejoués (recette S-01 TENU,
+self-test conventions 10/10, oracle noyau PASS).
