@@ -7,11 +7,9 @@
   <meta name="description" content="Page-témoin appliquant les patterns « adopter » du référentiel BEST-PRACTICES-HTML : KPI, badges, barres, tableau triable, légende, recherche.">
   <meta name="theme-color" content="#2563EB">
   <meta name="color-scheme" content="light">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3Ctext x='32' y='44' font-family='Segoe UI,Roboto,sans-serif' font-size='38' font-weight='700' fill='white' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- A1/D-10 (TF-0152, 13/08) : liens Google Fonts RETIRÉS — replis système des tokens. -->
 
   <style>
     :root {
@@ -102,7 +100,8 @@
     tbody td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
     tbody tr:hover { background: var(--bg); }
     .num { font-family: var(--mono); text-align: right; }
-    mark { background: #FEF08A; color: inherit; padding: 0 1px; border-radius: 2px; }
+    /* L5 (TF-0152) : zéro padding horizontal — un espacement détacherait la partie surlignée du mot. */
+    mark { background: #FEF08A; color: inherit; padding: 0; border-radius: 2px; }
 
     footer.doc { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: .85rem; }
 
@@ -163,10 +162,10 @@
       <section aria-labelledby="kpi-h">
         <h2 id="kpi-h">Chiffres-clés</h2>
         <div class="kpis">
-          <div class="kpi"><span class="kpi-label">Patterns catalogués</span><span class="kpi-value">34</span><span class="kpi-hint">2 fichiers sources</span></div>
-          <div class="kpi"><span class="kpi-label">Adopter</span><span class="kpi-value">20</span><span class="kpi-hint">conformes charte</span></div>
-          <div class="kpi"><span class="kpi-label">Adapter</span><span class="kpi-value">10</span><span class="kpi-hint">a11y / tokens / PDF</span></div>
-          <div class="kpi"><span class="kpi-label">Rejeter</span><span class="kpi-value">4</span><span class="kpi-hint">contre-exemples</span></div>
+          <div class="kpi" title="patterns extraits des deux sources de référence"><span class="kpi-label">Patterns catalogués</span><span class="kpi-value">34</span><span class="kpi-hint">2 fichiers sources</span></div>
+          <div class="kpi" title="patterns conformes charte, réutilisables tels quels"><span class="kpi-label">Adopter</span><span class="kpi-value">20</span><span class="kpi-hint">conformes charte</span></div>
+          <div class="kpi" title="patterns à retravailler avant réemploi"><span class="kpi-label">Adapter</span><span class="kpi-value">10</span><span class="kpi-hint">a11y / tokens / PDF</span></div>
+          <div class="kpi" title="contre-exemples documentés — à ne jamais reproduire"><span class="kpi-label">Rejeter</span><span class="kpi-value">4</span><span class="kpi-hint">contre-exemples</span></div>
         </div>
       </section>
 
@@ -189,7 +188,8 @@
           <span class="count" id="count" aria-live="polite" role="status"></span>
         </div>
         <div class="card" style="padding:0;overflow-x:auto">
-          <table id="tbl">
+          <p id="note-score" class="kpi-hint">Score = conformité du pattern à la charte du socle, sur 100 — barème : 90+ réutilisable tel quel, 70-89 à adapter, &lt; 70 contre-exemple. Jugé par les oracles du skill, pas à l'œil.</p>
+          <table id="tbl" data-filterable="off" data-filterable-reason="page-témoin de patterns : la table illustre les snippets S-B5/S-B6, le composant de filtres D-12 vit au skill et s'audite par ses propres fixtures — l'embarquer ici ferait du témoin un second exemplaire à maintenir">
             <caption>Extrait — cliquer un en-tête pour trier. Score = maturité charte.</caption>
             <thead>
               <tr>
@@ -197,20 +197,20 @@
                 <th data-sort="str" scope="col">Pattern</th>
                 <th data-sort="str" scope="col">Catégorie</th>
                 <th data-sort="str" scope="col">Verdict</th>
-                <th data-sort="num" scope="col">Score</th>
+                <th data-sort="num" scope="col" aria-describedby="note-score">Score</th>
                 <th scope="col">Maturité</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td data-label="ID">B2</td><td data-label="Pattern">Grille de KPI</td><td data-label="Catégorie">Composant</td><td data-label="Verdict"><span class="badge ok">Adopter</span></td><td class="num" data-label="Score">95</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:95%"></span></span></td></tr>
-              <tr><td data-label="ID">B4</td><td data-label="Pattern">Badges de statut</td><td data-label="Catégorie">Composant</td><td data-label="Verdict"><span class="badge ok">Adopter</span></td><td class="num" data-label="Score">92</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:92%"></span></span></td></tr>
-              <tr><td data-label="ID">B6</td><td data-label="Pattern">Tableau triable</td><td data-label="Catégorie">Composant</td><td data-label="Verdict"><span class="badge ok">Adopter</span></td><td class="num" data-label="Score">90</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:90%"></span></span></td></tr>
-              <tr><td data-label="ID">C1</td><td data-label="Pattern">escapeHtml sur données</td><td data-label="Catégorie">JS</td><td data-label="Verdict"><span class="badge ok">Adopter</span></td><td class="num" data-label="Score">98</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:98%"></span></span></td></tr>
-              <tr><td data-label="ID">B8</td><td data-label="Pattern">Drawer latéral</td><td data-label="Catégorie">Composant</td><td data-label="Verdict"><span class="badge part">Adapter</span></td><td class="num" data-label="Score">60</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:60%"></span></span></td></tr>
-              <tr><td data-label="ID">B11</td><td data-label="Pattern">Tooltip personnalisé</td><td data-label="Catégorie">Composant</td><td data-label="Verdict"><span class="badge part">Adapter</span></td><td class="num" data-label="Score">55</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:55%"></span></span></td></tr>
-              <tr><td data-label="ID">D4</td><td data-label="Pattern">Fonts chartées Roboto/DM Sans</td><td data-label="Catégorie">Style</td><td data-label="Verdict"><span class="badge info">Socle</span></td><td class="num" data-label="Score">100</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:100%"></span></span></td></tr>
-              <tr><td data-label="ID">E2</td><td data-label="Pattern">prefers-reduced-motion</td><td data-label="Catégorie">Responsive</td><td data-label="Verdict"><span class="badge ok">Adopter</span></td><td class="num" data-label="Score">88</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:88%"></span></span></td></tr>
-              <tr><td data-label="ID">F1</td><td data-label="Pattern">@media print</td><td data-label="Catégorie">Print</td><td data-label="Verdict"><span class="badge ok">Adopter</span></td><td class="num" data-label="Score">94</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:94%"></span></span></td></tr>
+              <tr><td data-label="ID">B2</td><td data-label="Pattern">Grille de KPI</td><td data-label="Catégorie">Composant</td><td data-label="Verdict"><span class="badge ok" title="verdict : réutilisable tel quel, conforme charte">Adopter</span></td><td class="num" data-label="Score">95</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:95%"></span></span></td></tr>
+              <tr><td data-label="ID">B4</td><td data-label="Pattern">Badges de statut</td><td data-label="Catégorie">Composant</td><td data-label="Verdict"><span class="badge ok" title="verdict : réutilisable tel quel, conforme charte">Adopter</span></td><td class="num" data-label="Score">92</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:92%"></span></span></td></tr>
+              <tr><td data-label="ID">B6</td><td data-label="Pattern">Tableau triable</td><td data-label="Catégorie">Composant</td><td data-label="Verdict"><span class="badge ok" title="verdict : réutilisable tel quel, conforme charte">Adopter</span></td><td class="num" data-label="Score">90</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:90%"></span></span></td></tr>
+              <tr><td data-label="ID">C1</td><td data-label="Pattern">escapeHtml sur données</td><td data-label="Catégorie">JS</td><td data-label="Verdict"><span class="badge ok" title="verdict : réutilisable tel quel, conforme charte">Adopter</span></td><td class="num" data-label="Score">98</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:98%"></span></span></td></tr>
+              <tr><td data-label="ID">B8</td><td data-label="Pattern">Drawer latéral</td><td data-label="Catégorie">Composant</td><td data-label="Verdict"><span class="badge part" title="statut : partiel — à adapter avant réemploi">Adapter</span></td><td class="num" data-label="Score">60</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:60%"></span></span></td></tr>
+              <tr><td data-label="ID">B11</td><td data-label="Pattern">Tooltip personnalisé</td><td data-label="Catégorie">Composant</td><td data-label="Verdict"><span class="badge part" title="statut : partiel — à adapter avant réemploi">Adapter</span></td><td class="num" data-label="Score">55</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:55%"></span></span></td></tr>
+              <tr><td data-label="ID">D4</td><td data-label="Pattern">Fonts chartées Roboto/DM Sans</td><td data-label="Catégorie">Style</td><td data-label="Verdict"><span class="badge info" title="statut : information — élément du socle, ni verdict ni alerte">Socle</span></td><td class="num" data-label="Score">100</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:100%"></span></span></td></tr>
+              <tr><td data-label="ID">E2</td><td data-label="Pattern">prefers-reduced-motion</td><td data-label="Catégorie">Responsive</td><td data-label="Verdict"><span class="badge ok" title="verdict : réutilisable tel quel, conforme charte">Adopter</span></td><td class="num" data-label="Score">88</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:88%"></span></span></td></tr>
+              <tr><td data-label="ID">F1</td><td data-label="Pattern">@media print</td><td data-label="Catégorie">Print</td><td data-label="Verdict"><span class="badge ok" title="verdict : réutilisable tel quel, conforme charte">Adopter</span></td><td class="num" data-label="Score">94</td><td data-label="Maturité"><span class="bar"><span class="fill" style="--val:94%"></span></span></td></tr>
             </tbody>
           </table>
         </div>

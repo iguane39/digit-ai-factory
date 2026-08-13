@@ -32,7 +32,8 @@ writeFileSync(join(verte, "CLAUDE.md"),
 writeFileSync(join(verte, "README.md"), "# Produit\nDémarrage : 2 commandes.\n");
 writeFileSync(join(verte, ".env.example"), "# ne jamais renseigner de secret ici\nPORT=8000\nAPI_TIERCE_CLE= # à fournir :\n");
 writeFileSync(join(verte, ".env"), "PORT=8000\n");
-writeFileSync(join(verte, ".gitignore"), ".env\n.venv/\n__pycache__/\nnode_modules/\ngenerated/\nOld/\n");
+// C1 amendé (TF-0150, 13/08) : old\ versionné — la fixture verte ne l'ignore PLUS.
+writeFileSync(join(verte, ".gitignore"), ".env\n.venv/\n__pycache__/\nnode_modules/\ngenerated/\n");
 writeFileSync(join(verte, "output", "Digit-AI - Rapport Test - 20260806a.md"), "rapport\n");
 writeFileSync(join(verte, "forge", "audit.oracles.json"), "{}\n");
 writeFileSync(join(verte, "forge", "ledger.jsonl"), [
@@ -118,6 +119,7 @@ const rouge = mkdtempSync(join(tmpdir(), "conf-rouge-"));
 mkdirSync(join(rouge, "output", "Old"), { recursive: true });      // R-1 (input absent), R-3 (docs absent)
 writeFileSync(join(rouge, "output", "rapport-final.md"), "x\n");    // R-4 : livrable non daté
 writeFileSync(join(rouge, "output", "Produit - Grimoire Néant - 20260811a.md"), "x\n"); // R-25 : type improvisé (daté correct → R-4 muette dessus)
+writeFileSync(join(rouge, "output", "Produit - Rapport Fantome - 20260813a.html"), "<html></html>\n"); // R-32 : HTML livré sans journal d'oracles sous forge\oracles\
 writeFileSync(join(rouge, "robots.txt"), "User-agent: GPTBot\nDisallow: /\n\nUser-agent: *\nAllow: /\n"); // R-27 : agent IA bloqué SANS décision consignée + llms.txt absent
 writeFileSync(join(rouge, "output", "Old", "vieux - 20260101a.py"), "x = 1\n"); // R-6 : code sous Old
 writeFileSync(join(rouge, "main - 20260806a.py"), "x = 1\n");       // R-6 : code daté
@@ -128,13 +130,16 @@ writeFileSync(join(rouge, "forge", "ledger.jsonl"), [
   JSON.stringify({ type: "run_open", ts: "2026-08-10T08:00:00Z", versions_forges: { conception: "x" } }), // R-19 : version sans run_precedent
 ].join("\n") + "\n");
 
-// pas de .gitignore → R-7 (Old non ignoré) + R-10 ; pas de git → R-8 ; pas de README → R-12 ; pas d'env.example → R-13
+// R-7 INVERSÉE (TF-0150, 13/08) : old\ doit être VERSIONNÉ — le défaut est désormais un
+// old\ gitignoré. Ce .gitignore minimal le plante, ET reste insuffisant pour le socle
+// (R-10 : .env/.venv/… absents). Pas de git → R-8 ; pas de README → R-12 ; pas d'env.example → R-13.
+writeFileSync(join(rouge, ".gitignore"), "Old/\n");
 
 check("rouge : chaque règle attendue se déclenche, FAIL exit 1", () => {
   const { exit, rapport } = lance(rouge);
   if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
   const declenchees = new Set(rapport.findings.filter((f) => f.statut === "FAIL").map((f) => f.regle));
-  for (const attendue of ["R-1", "R-3", "R-4", "R-6", "R-7", "R-8", "R-10", "R-11", "R-12", "R-13", "R-18", "R-19", "R-25", "R-27"])
+  for (const attendue of ["R-1", "R-3", "R-4", "R-6", "R-7", "R-8", "R-10", "R-11", "R-12", "R-13", "R-18", "R-19", "R-25", "R-27", "R-32"])
     if (!declenchees.has(attendue)) throw new Error(`règle ${attendue} non déclenchée sur la fixture rouge`);
 });
 

@@ -6,12 +6,19 @@
   <title>Digit-AI — Rapport de veille · Everything Claude Code</title>
   <meta name="description" content="Analyse et reporting du dépôt Everything Claude Code (affaan-m) pour l'amélioration des forges Digit-AI.">
   <meta name="theme-color" content="#2563EB">
-  <meta name="color-scheme" content="light">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3C/svg%3E">
+  <meta name="color-scheme" content="light dark">
+  <!-- Favicon-lettre (13/08) : « F » = Forge Pilot. -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3Ctext x='32' y='44' font-family='Segoe UI,Roboto,sans-serif' font-size='38' font-weight='700' fill='white' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- A1/D-10 (TF-0152, 13/08) : liens Google Fonts RETIRÉS — livrable autonome. -->
+  <!-- S-G1 (1/4, R-30 amendé TF-0158) : clair par défaut STRICT, choix sombre persisté. -->
+  <script>
+  (function () {
+    var s = null;
+    try { s = localStorage.getItem('digitai-theme'); } catch (e) {}
+    document.documentElement.setAttribute('data-theme', s === 'dark' ? 'dark' : 'light');
+  })();
+  </script>
 
   <style>
     :root {
@@ -27,6 +34,19 @@
       --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
       --annee-ref: "2026";
     }
+    /* S-G1 (2/4) — tokens sombres : une source, deux projections. */
+    :root[data-theme="dark"] {
+      --bg: #0B1220; --surface: #121B2E; --card: #121B2E;
+      --ink: #EEF2F8; --muted: #A9B4C4; --faint: #7C8AA0; --line: #263248;
+      --blue: #7DA2F5;
+      --amber: #FBBF6D; --amber-fill: #2B2210; --amber-line: #4A3A18;
+      --teal:  #5FE6D6; --teal-fill:  #0E2A27; --teal-line:  #164E48;
+      --green: #7BE0A0; --green-fill: #0F2A1B; --green-line: #1C4A30;
+      --red:   #F08C8C; --red-fill:   #2C1414; --red-line:   #5A2222;
+    }
+    .theme-toggle { font: inherit; font-size: .85rem; border: 1px solid var(--line);
+      background: var(--surface); color: var(--ink); border-radius: 999px;
+      padding: 4px 14px; cursor: pointer; float: right; }
     * { box-sizing: border-box; }
     html { -webkit-text-size-adjust: 100%; }
     body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.55; font-size: 16px; }
@@ -87,6 +107,16 @@
     @page { size: A4; margin: 18mm 16mm; }
     @page :first { margin-top: 22mm; }
     @media print {
+      /* S-G1 : le papier est TOUJOURS clair, même si le lecteur avait choisi le sombre. */
+      :root, :root[data-theme="dark"] {
+        --blue: #2563EB; --bg: #FAFBFF; --surface: #FFFFFF; --card: #FFFFFF;
+        --ink: #0F172A; --muted: #64748B; --faint: #94A3B8; --line: #E6EAF2;
+        --amber: #D97706; --amber-fill: #FFFBEB; --amber-line: #FDE9C8;
+        --teal:  #0E9488; --teal-fill:  #EFFDFB; --teal-line:  #C7F0EA;
+        --green: #15803D; --green-fill: #F2FCF5; --green-line: #CFEEDD;
+        --red:   #B91C1C; --red-fill:   #FEF2F2; --red-line:   #F6D5D5;
+      }
+      .theme-toggle { display: none; }
       body { background: #FFFFFF; }
       .wrap { max-width: none; padding: 0; }
       .card, .kpi, tr { break-inside: avoid; page-break-inside: avoid; }
@@ -97,11 +127,12 @@
 <body>
   <div class="wrap">
     <header class="doc">
+      <button type="button" id="bascule-theme" class="theme-toggle" aria-pressed="false">Thème sombre</button>
       <div class="brand"><span class="logo" aria-hidden="true"></span>
         <p class="eyebrow">Digit-AI · Forge Pilot · Veille propositions</p></div>
       <p class="sub">repo — Everything Claude Code (<code>affaan-m/everything-claude-code</code>)</p>
       <p class="meta-line">Étudié le 2026-08-10 · dossier <code>veille/20260810-everything-claude-code/</code> · verdict global :
-        <span class="badge ok">Adopter des éléments</span></p>
+        <span class="badge ok" title="verdict favorable : vérifié / retenu / réalisé">Adopter des éléments</span></p>
     </header>
 
     <main>
@@ -115,10 +146,10 @@
       <section aria-labelledby="kpi-h">
         <h2 id="kpi-h">Chiffres-clés</h2>
         <div class="kpis">
-          <div class="kpi"><span class="kpi-label">Patterns d'archi. relevés</span><span class="kpi-value">4</span><span class="kpi-hint">lecture seule du repo v2.2.0</span></div>
-          <div class="kpi"><span class="kpi-label">Retenu</span><span class="kpi-value">3</span><span class="kpi-hint">appliqués à forge-agents</span></div>
-          <div class="kpi"><span class="kpi-label">À évaluer</span><span class="kpi-value">1</span><span class="kpi-hint">déjà partiellement couvert</span></div>
-          <div class="kpi"><span class="kpi-label">Écarté</span><span class="kpi-value">1</span><span class="kpi-hint">machinerie exécutable</span></div>
+          <div class="kpi" title="nombre de patterns d'architecture relevés dans le dépôt étudié"><span class="kpi-label">Patterns d'archi. relevés</span><span class="kpi-value">4</span><span class="kpi-hint">lecture seule du repo v2.2.0</span></div>
+          <div class="kpi" title="propositions retenues et appliquées à la forge ciblée"><span class="kpi-label">Retenu</span><span class="kpi-value">3</span><span class="kpi-hint">appliqués à forge-agents</span></div>
+          <div class="kpi" title="propositions à instruire avant décision"><span class="kpi-label">À évaluer</span><span class="kpi-value">1</span><span class="kpi-hint">déjà partiellement couvert</span></div>
+          <div class="kpi" title="propositions écartées avec motif (ici : machinerie exécutable hors doctrine)"><span class="kpi-label">Écarté</span><span class="kpi-value">1</span><span class="kpi-hint">machinerie exécutable</span></div>
         </div>
       </section>
 
@@ -132,17 +163,17 @@
               <tr>
                 <td data-label="Élément">Dépôt réel, vainqueur hackathon Anthropic, licence MIT</td>
                 <td data-label="Vérification"><code>github.com/affaan-m/everything-claude-code</code>, Affaan Mustafa, hackathon Anthropic × Forum Ventures — confirmé</td>
-                <td data-label="Statut"><span class="badge ok">réel</span></td>
+                <td data-label="Statut"><span class="badge ok" title="verdict favorable : vérifié / retenu / réalisé">réel</span></td>
               </tr>
               <tr>
                 <td data-label="Élément">« 28 subagents / 119 skills / 60 commandes »</td>
                 <td data-label="Vérification">Chiffres incohérents selon les sources (13/40+, 48/183…) ; version clonée v2.2.0 = 67 agents / ~460 fichiers skills / 122 rules</td>
-                <td data-label="Statut"><span class="badge wait">à nuancer</span></td>
+                <td data-label="Statut"><span class="badge wait" title="en attente : à évaluer ou à nuancer avant décision">à nuancer</span></td>
               </tr>
               <tr>
                 <td data-label="Élément">« 1282 tests, 98 % coverage, research-first, battle-tested »</td>
                 <td data-label="Vérification">Plausible mais non re-vérifié dans le repo pendant l'étude</td>
-                <td data-label="Statut"><span class="badge no">non confirmé</span></td>
+                <td data-label="Statut"><span class="badge no" title="défavorable ou non confirmé — ne pas s'y fier sans vérification">non confirmé</span></td>
               </tr>
             </tbody>
           </table>
@@ -159,28 +190,28 @@
               <tr>
                 <td data-label="Idée">Valider les <code>defs</code> par un oracle transversal (graphe <code>de:</code>/<code>vers:</code>)</td>
                 <td data-label="Forge">forge-agents</td>
-                <td data-label="Verdict"><span class="badge ok">retenu</span></td>
+                <td data-label="Verdict"><span class="badge ok" title="verdict favorable : vérifié / retenu / réalisé">retenu</span></td>
                 <td data-label="Confiance"><span class="conf"><span class="bar" role="img" aria-label="confiance 0.8"><span class="fill" style="--val:80%"></span></span></span></td>
-                <td data-label="Delta">P1 — <code>oracle-defs.mjs</code> + fixtures + self-test (10 PASS). <span class="badge ok">réalisé</span></td>
+                <td data-label="Delta">P1 — <code>oracle-defs.mjs</code> + fixtures + self-test (10 PASS). <span class="badge ok" title="verdict favorable : vérifié / retenu / réalisé">réalisé</span></td>
               </tr>
               <tr>
                 <td data-label="Idée">Rubrique d'éval à preuve obligatoire + read-only + « ne pas refaire »</td>
                 <td data-label="Forge">forge-agents (contre-expertise)</td>
-                <td data-label="Verdict"><span class="badge ok">retenu</span></td>
+                <td data-label="Verdict"><span class="badge ok" title="verdict favorable : vérifié / retenu / réalisé">retenu</span></td>
                 <td data-label="Confiance"><span class="conf"><span class="bar" role="img" aria-label="confiance 0.75"><span class="fill" style="--val:75%"></span></span></span></td>
-                <td data-label="Delta">P2 — <code>regime-de-preuve.md</code> (périmètre d'exécution). <span class="badge ok">réalisé</span></td>
+                <td data-label="Delta">P2 — <code>regime-de-preuve.md</code> (périmètre d'exécution). <span class="badge ok" title="verdict favorable : vérifié / retenu / réalisé">réalisé</span></td>
               </tr>
               <tr>
                 <td data-label="Idée">Champ <code>provenance{confidence}</code> sur capacité importée</td>
                 <td data-label="Forge">forge-agents</td>
-                <td data-label="Verdict"><span class="badge ok">retenu</span></td>
+                <td data-label="Verdict"><span class="badge ok" title="verdict favorable : vérifié / retenu / réalisé">retenu</span></td>
                 <td data-label="Confiance"><span class="conf"><span class="bar" role="img" aria-label="confiance 0.7"><span class="fill" style="--val:70%"></span></span></span></td>
-                <td data-label="Delta">P3 — champ optionnel au compilateur (fail-closed) + doc. <span class="badge ok">réalisé</span></td>
+                <td data-label="Delta">P3 — champ optionnel au compilateur (fail-closed) + doc. <span class="badge ok" title="verdict favorable : vérifié / retenu / réalisé">réalisé</span></td>
               </tr>
               <tr>
                 <td data-label="Idée">Rules <code>common/</code> + par-langage chargées à la demande</td>
                 <td data-label="Forge">forge-agents / doctrine</td>
-                <td data-label="Verdict"><span class="badge wait">à évaluer</span></td>
+                <td data-label="Verdict"><span class="badge wait" title="en attente : à évaluer ou à nuancer avant décision">à évaluer</span></td>
                 <td data-label="Confiance"><span class="conf"><span class="bar" role="img" aria-label="confiance 0.5"><span class="fill" style="--val:50%"></span></span></span></td>
                 <td data-label="Delta">Déjà partiellement couvert (references chargées à l'ouverture d'étape). —</td>
               </tr>
@@ -219,5 +250,22 @@
       Digit-AI — Forge Pilot · Veille propositions · Everything Claude Code · 2026
     </footer>
   </div>
+  <!-- S-G1 (4/4) — câblage : persistance + aria-pressed, aucune bascule muette. -->
+  <script>
+  (function () {
+    var bouton = document.getElementById('bascule-theme');
+    var racine = document.documentElement;
+    function appliquer(theme) {
+      racine.setAttribute('data-theme', theme);
+      try { localStorage.setItem('digitai-theme', theme); } catch (e) {}
+      bouton.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+      bouton.textContent = theme === 'dark' ? 'Thème clair' : 'Thème sombre';
+    }
+    bouton.setAttribute('aria-pressed', racine.getAttribute('data-theme') === 'dark' ? 'true' : 'false');
+    bouton.addEventListener('click', function () {
+      appliquer(racine.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+  })();
+  </script>
 </body>
 </html>

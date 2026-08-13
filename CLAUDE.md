@@ -57,15 +57,16 @@ jamais ici ; le run y vit (`forge\`, code à la racine). Séquence :
    **5 bis** en parallèle : revue graphique d'implémentation (forge-design, mode aval) ;
 6. **MEP** — staging outillé par **forge-ops** (O-1…O-4), oracle M-1…M-5,
    `DOSSIER-MEP.md`, **GO humain** ;
-7. **Clore** — lot de retours + sidecar remis à `<pilot>\input\`, `run_close`, synthèse.
+7. **Clore** — lot `<projet> - RETOURS - …` + sidecar remis à `<pilot>\input\00-retours\`,
+   `run_close`, synthèse.
 
 **Mode opératoire détaillé : `references\ETAPES-RUN.md`** (charger à l'ouverture de
 l'étape). Contrat « prêt client » (seuls critères, tous mesurables) : oracles 1-3 verts ·
 forge-tests exit 0/3 seuils tenus · oracle MEP 5/5 · dossier MEP complet · traçabilité
 exigences→tests 100 % · ledger vérifié.
 
-**Run de version** (produit existant) : jamais improvisé — rattrapage du socle, delta par
-étape, tests toujours en entier. Détail : `references\RUN-VERSION.md`.
+**Run de version** : jamais improvisé — `references\RUN-VERSION.md` (socle, delta, tests
+entiers). **Mandat transverse** (livrable = document) : `references\RUN-MANDAT.md`.
 
 ## Parallélisme et agents
 
