@@ -1,0 +1,8 @@
+{
+  "name": "demo-front",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "preview": "vite preview"
+  }
+}
