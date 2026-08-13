@@ -834,3 +834,25 @@ candidatures plutôt qu'écrasées : versionnement de old\ (C1 vs état de fait,
 et rappel de régénération des registres dérivés au gabarit de campagne (process). Deux agents
 Sonnet (tests, organization) + pilot ; escalade aucune ; sondages rejoués (recette S-01 TENU,
 self-test conventions 10/10, oracle noyau PASS).
+
+## 13/08/2026 (suite) — Campagne TF-0153 : le dashboard de tests devient l'interface de décision
+
+Mandat humain direct (« vas y » sur prompt L99 + barre), périmètre étendu par cahier de
+retours Produit-11 (13 constats A1-A13, tous vérifiés sur pièce, glossaire validé à la gate).
+Barre : Allure Report (démo publique, test d'existence PASS, registre la-barre).
+**forge-tests `47e8950`** (branche locale `campagne/tf-0153-dashboard`, jamais poussée) :
+gabarit dashboard réécrit — clair par défaut STRICT (l'auto-sombre OS, conforme à la lettre
+de S-G1, était la cause du retour humain) ; synthèse par pan ; tuiles-KPI cliquables
+(filtre + ancre + delta) ; seuils et tendance expliqués (glossaire.py, ids gelés §3 bis) ;
+grille commune (picto+libellé, « Passé — aucun constat », tooltips, chapeau non-rattachés) ;
+tables outillées (recherche/tri/réinit/compteur) ; **D-12 enfin initialisé** (affordance
+morte depuis l'origine) ; plan de rejeu auto_ia borné G-3 ; détail de cas dépliable ≤ 2 clics
+(dérivation des cahiers, mêmes références) ; contrôle pré-génération §2 bis à chaque
+génération (sidecar TODO sur dérive). Preuves exécutées : recette **12/12, S-01 TENU**
+(assertions thèmes évoluées avec le mandat, 3 contrôles au lieu d'1) ; check_html PASS sans
+avertissement ; render_page PASS ×3 largeurs ; **oracle de câblage Playwright 20/20** sur le
+livrable réel ; dashboard Produit-11 `20260813b` régénéré en proposition (G-1). Boucle : 3
+itérations (L3 → thèmes/D-12 → badges tendance), bornée tenue. Candidats remis : TF-0158
+(trancher S-G1 : prefers-color-scheme vs clair vécu), TF-0159 (tendance multi-runs, barre
+B3). Routage : pilotage Fable, aucune escalade ; artefact d'encodage PowerShell sur l'oracle
+détecté et neutralisé (5 faux FAIL, page innocentée).
