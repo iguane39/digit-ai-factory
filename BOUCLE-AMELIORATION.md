@@ -451,7 +451,7 @@ agent du README (phase 0 idempotente) · `references\ACCUEIL.md` (protocole d'ac
 accord explicite avant exécution, 2 tours de correction max) · section « Prompts d'usage »
 réécrite au format deux lignes (0-6, PROMPT-PRODUIT.md rétrogradé en voie optionnelle à
 fichier) · coquilles README corrigées (scripts\new_mission.py, forge\retours\) · **lot D en
-proposition** : `output\20260812-catalogues-readmes-forges\` (10 sections README de forge,
+proposition** : `output\05-catalogues-readmes-forges\` (10 sections README de forge,
 AUCUNE écriture dans les dépôts frères — application forge par forge sur GO humain).
 
 **Challenge état de l'art (A3)** : 4 agents Sonnet en parallèle, ≥ 3 sources datées par forge,
@@ -750,7 +750,7 @@ plus rien en attente ni en cours.
 
 **Mandat humain** (prompt barré L99) : plan détaillé d'une stratégie de tests de bout en bout,
 complète et autonome, après un run Produit-11 insatisfaisant. Livrable = plan (document) + candidatures :
-`output\20260813-plan-strategie-tests-e2e.md`.
+`output\04-plans\20260813-plan-strategie-tests-e2e.md`.
 
 **Diagnostic Produit-11 sur pièces** (rapport-tests.json, verdict PARTIEL) : forge-tests n'est pas
 cassée — elle CONSTATE correctement et donne le `pour_couvrir` de chaque pan. Les pans sont
@@ -795,3 +795,29 @@ Routage §4 bis : forge-tests 211 k/89 outils/20 min ; pilot 127 k/59/9 min ; es
 Défaut préexistant surfacé (lot dba05b5f348d) : recette --section dette ECHEC (invariants
 désynchronisés, prouvé antérieur). Registre : 2 candidats (dette + une restitution d'une autre
 session), 147 archivés.
+
+## 13/08/2026 (suite) — mandat « rangement output » : dossiers numérotés + old\, écosystème entier
+
+Mandat humain : ranger les fichiers des forges dans `output\` en dossiers numérotés
+(01-, 02-…), une seule version à la racine, antérieures dans `old\` — même méthode chez les
+projets produits. Constat sur pièces : **forge-audit_client-a appliquait déjà la méthode**
+(01-…07- + `old\`) — elle devient le modèle de l'écosystème.
+
+- **pilot** : 5 familles — `01-revues-et-propositions`, `02-schema-ecosysteme` (+ `old\` :
+  3 versions antérieures du schéma + rendus `.oracles`), `03-etudes`, `04-plans`,
+  `05-catalogues-readmes-forges` ; `output\LISEZMOI.md` (structure + mapping anciens chemins,
+  le registre TODO n'étant jamais réécrit) ; références réécrites : profils ×8,
+  REGLES-PROJET, CONTRAT-INTERFACE, CATALOGUES, bootstrap.mjs, outillage-tests-e2e.
+  **Collision constatée avec la session « fais tout »** (commits `7e883b9`→`2f2d320` tombés
+  pendant le rangement, catalogue régénéré v1.6.0 sur l'ancien chemin) — résolue par
+  convergence : v1.6.0 versé dans `05-`, ancien chemin supprimé.
+- **forges** : agents `01-pv`/`02-skills` (`output\` non versionné → mv simple) ; design
+  `01-pages-temoins` (`1b0d769`) ; organization `01-etudes`/`02-composants` + README
+  (`6fecff3`) — **preuves exécutées après déplacement** : gate-conventions PASS, oracle
+  filtres-tableau fixtures rouge FAIL / verte PASS ; seo `01-decisions`/`02-veille` + README
+  (`d684909`). Commits locaux, jamais poussés.
+- **sans action** : audit_client-a (déjà conforme, modèle d'origine) ; produit Produit-01
+  (`output\` racine vide, `audit\output\` déjà numéroté `00 -`, arbre en session vivante —
+  garde-fou « projets autonomes »).
+- Candidat remis : encoder la méthode en convention transverse (organization) et trancher
+  `old\` (mandat + audit_client-a) vs `Old\` (D-06, CLAUDE-PRODUIT).

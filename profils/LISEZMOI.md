@@ -5,7 +5,7 @@
 2. Il ne porte aucun verbe outillé nouveau : il **qualifie** un entrant déjà couvert par les
    forges existantes (design, development, tests, seo) et pointe leurs oracles gratuits.
 3. Huit profils à ce jour, un seul axe « type de produit » : `website.md`, `webapp.md`,
-   `mobile.md` (vague 1, étude `output\20260812-etude-opportunite-forges.md` §0) puis
+   `mobile.md` (vague 1, étude `output\03-etudes\20260812-etude-opportunite-forges.md` §0) puis
    `api-headless.md`, `e-commerce.md`, `extension-navigateur.md`, `desktop.md` (vague 2,
    mandat humain du 12/08 soir, TF-0126, anticipant leur premier brief — §5 de l'étude)
    puis `chatbot.md` (vague 3, mandat humain du 12/08 nuit « insère aussi chatbot »,

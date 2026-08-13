@@ -8,7 +8,7 @@ sources:
   - "Spectral (Stoplight) — linter OpenAPI open source, ruleset intégré spectral:oas, gate CI via --fail-severity"
   - "Schemathesis 4.x — tests de contrat par génération de propriétés (moteur Hypothesis, cœur Rust), 2026"
   - "oasdiff — détection de breaking changes OpenAPI open source, action GitHub gratuite"
-  - "étude d'opportunité forges — output\\20260812-etude-opportunite-forges.md (12/08/2026), §5"
+  - "étude d'opportunité forges — output\\03-etudes\\20260812-etude-opportunite-forges.md (12/08/2026), §5"
 ---
 
 # Profil produit — api-headless

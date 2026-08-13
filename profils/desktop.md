@@ -7,7 +7,7 @@ sources:
   - "Apple — notarisation obligatoire pour toute distribution hors Mac App Store depuis macOS 10.15 Catalina ; tout binaire signé Developer ID construit après le 01/06/2019 doit être notarisé"
   - "Doyensec — bâtir un auto-updater Electron sûr : vérification de signature atomique, séparation des clés dev/prod (02/2026)"
   - "Tauri v2 — plugin updater : paire de clés de signature dédiée, clé privée jamais versionnée (documentation officielle, 2025)"
-  - "étude d'opportunité forges — output\\20260812-etude-opportunite-forges.md (12/08/2026), §5"
+  - "étude d'opportunité forges — output\\03-etudes\\20260812-etude-opportunite-forges.md (12/08/2026), §5"
 ---
 
 # Profil produit — desktop

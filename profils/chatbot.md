@@ -11,7 +11,7 @@ sources:
   - "Meta Graph API — garantie de disponibilité de 2 ans par version ; v19.0 dépréciée 02/2025, v20.0 dépréciée 05/2025 (sources croisées Ayrshare/Singhamandeep, 2026) ; API On-Premises WhatsApp retirée 10/2025, seule la Cloud API reste supportée"
   - "CNIL — recommandations sur le développement des systèmes d'IA, intégrant le règlement européen IA adopté été 2024 ; approche sectorielle en construction (cnil.fr, consulté 12/08/2026)"
   - "forge-agents — cat-agt-05 Oracle agent-evals, TF-0106 (12/08/2026) : fixtures double sens au self-test, juge distinct de l'exécutant — catalogues\\CATALOGUES.md"
-  - "étude d'opportunité forges — output\\20260812-etude-opportunite-forges.md (12/08/2026), §5"
+  - "étude d'opportunité forges — output\\03-etudes\\20260812-etude-opportunite-forges.md (12/08/2026), §5"
 ---
 
 # Profil produit — chatbot / agent conversationnel

@@ -1,6 +1,6 @@
 # outillage-tests-e2e
 
-Deux briques v0 issues du plan `output\20260813-plan-strategie-tests-e2e.md` (mandat humain du
+Deux briques v0 issues du plan `output\04-plans\20260813-plan-strategie-tests-e2e.md` (mandat humain du
 13/08/2026, TF-0142 et TF-0145). Node zéro dépendance (stdlib uniquement). Chaque brique est née
 **exercée sur fixtures** — l'intégration réelle avec forge-tests/forge-development est un jalon
 ultérieur, pas cette livraison.
