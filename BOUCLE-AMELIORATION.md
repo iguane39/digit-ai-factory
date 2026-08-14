@@ -985,3 +985,28 @@ attrapée en relecture (« Vos 8 actions » n'en montrait qu'une → regroupemen
 en sortie** : les messages du rapport BAV2 du matin restent sans accents (donnée mesurée
 avant correctif — le dashboard rend le rapport, il ne le réécrit pas) ; visibles corrigés
 au prochain audit. Registre : TF-0185 créé→corrigé→archivé, oracle PASS, 0 actif.
+
+## 14/08/2026 (soir) — Mandat transverse : Pentest & OWASP dans l'écosystème (étude, verdict O2)
+
+Mandat humain cadré par `prompt-analyzer-l99` (appel de skill RV-6), exécuté en voie
+`RUN-MANDAT.md` — livrable = document, pas de conception/design/MEP. **Écart de voie déclaré**
+: le pilot n'a pas de `forge\` ni de ledger propre (les mandats internes se tracent ici et au
+registre TODO) — les pas 1-2 de RUN-MANDAT supposent un projet ; la preuve cadrée d'avance
+reste la même (`oracle-etude-opportunite`, E1-E7). Livrable :
+`output\03-etudes\20260814-etude-opportunite-pentest-owasp.md`, **oracle PASS 7/7** (11 lignes
+de non-recouvrement toutes citées, 15 sources datées, jeu fermé O0-O4, verdict unique, plan de
+revue au 2026-11-14). **Constat central** : « Penetration Tests & OWASP » n'est pas un sujet
+mais six (exigences ASVS · méthode WSTG · surface IA · DAST · pentest manuel · gouvernance), et
+OWASP est **déjà entré** dans l'écosystème le 12/08 — ASVS 5.0.0 L1 curé chez websec, LLM Top
+10 cité au profil chatbot. L'intégration à faire est donc un branchement et quatre deltas, pas
+une création. **Trou réel mesuré** : WSTG à **0 occurrence** sur les 14 dépôts. **Verdict O2**
+(deltas ciblés) — O1 « forge-pentest dédiée » réfutée par la règle 31 : le recouvrement avec
+forge-websec est établi par citation (décision du 12/08), pas supposé ; O4 (service tiers)
+écartée par garde-fou d'écosystème. **Six garde-fous dual-use** posés en tête de l'étude
+(périmètre écrit, jamais de tiers, instance dédiée, pas d'évasion de détection, secrets
+cloisonnés, voie sur mandat) — le point 6 est une exception explicite et motivée à la loi
+transverse n°5. Cinq candidatures émises en `candidat`, **aucune décision prise** :
+TF-0186 (WSTG curé), TF-0187 (oracle DAST/ZAP, lève D-W1), TF-0188 (corpus d'injection LLM01),
+TF-0189 (règle 33 + branchement ASVS aux étapes — valeur 9,0, la plus haute), TF-0190 (mapping
+ADR↔ASVS). Décisions réservées à l'humain et posées comme telles : ordre des campagnes,
+verdict websec **bloquant** ou non au gate MEP, gabarit d'autorisation offensive.
