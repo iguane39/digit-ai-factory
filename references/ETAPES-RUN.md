@@ -98,6 +98,43 @@ exigence MVP a ≥ 1 test qui la cite par son id (gate grep 100 %).
 
 ## 5. Étape tests (mode natif)
 
+**5.0 — Smoke de frontière DÉPLOYÉE, avant toute mesure** *(RP-1, lot COMPTA du 14/08 —
+obligatoire dès qu'une URL de production ou de staging est déclarée au produit)*.
+
+Constat qui l'impose, et il est net : le run `20260814-tests-fournisseur-a` s'est conclu « boucle close,
+pans mesurables au vert » **pendant que le login de production était en impasse totale** —
+`GET /` → 303 vers `/.auth/login/aad` → 404. Mort depuis le premier déploiement, vu par aucun
+test, découvert par l'humain **en cliquant, minutes après la clôture**. L'oracle MEP (M-1…M-5)
+porte ce regard *à la mise en production* ; rien ne le portait en cycle de tests
+post-déploiement. Un produit déjà en ligne était donc audité **sans que personne ne regarde ce
+que voit son visiteur**.
+
+Quatre contrôles, **sans identité**, joués sur l'instance déployée et consignés au ledger :
+
+1. **santé** — la racine et l'endpoint de santé répondent ;
+2. **chaîne d'entrée** — depuis la racine, suivre les redirections et exiger qu'elles
+   aboutissent à une **mire identifiable** (200 + marqueur de contenu). Une chaîne qui finit en
+   404, en boucle ou sur une trace technique est un défaut **bloquant** : la porte est murée ;
+3. **en-têtes de sécurité** — verdict `forge-websec` sur l'origine déployée (R-33) ;
+4. **surface d'exposition** — la documentation d'API (`/docs`, `/openapi.json`) est fermée si
+   le produit ne l'expose pas volontairement.
+
+Outillage réel, tout en lecture (aucune exécution active — R-33 ne s'applique donc pas) :
+
+```
+FORGE_TESTS_QUALIF_URL=<url-deployee>   # pans qualif : 1 et 2, sans identifiants
+node scripts\capturer.mjs <url> --sortie <capture.json> --suivre-redirections
+node oracles\oracle-exposition.mjs <capture.json>          # 3 (EX-1…EX-11)
+```
+
+depuis `<racine>\digit-ai-forge-websec`. La chaîne de redirections se lit **dans la capture**
+(`--suivre-redirections`), qui donne aussi le contrôle 4 sur `/docs`. Verdicts au ledger en
+`oracles_verdict`, l'URL auditée nommée.
+
+Le smoke ne remplace pas l'audit : il regarde la **frontière**, là où l'audit regarde
+l'intérieur. Un produit dont le smoke échoue ne « passe » pas au vert parce que ses pans
+internes sont mesurés — le constat de frontière est porté au rapport et au dossier.
+
 `uv run python -m forge_tests <racine-produit> --json` depuis
 `<racine>\digit-ai-forge-tests`, stdout capturé et persisté dans
 `etapes\tests\rapport-forge-tests.json`. Exit 0 = PASS, 3 = PARTIEL acceptable (consigner les
