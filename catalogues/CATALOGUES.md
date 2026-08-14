@@ -1,7 +1,7 @@
 # Catalogues de services des forges — vue générée
 
 > **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.6.0, 2026-08-13) — ne jamais éditer ce fichier.
-> 76 services · 63 prouvés · 13 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
+> 80 services · 66 prouvés · 14 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
 
 ## forge-conception (pipeline) — 7 services
 
@@ -15,7 +15,7 @@
 | cat-con-06 | **Constitution projet** | séparer mes invariants non négociables du référentiel qui évolue | `node oracles\oracle-constitution.mjs <CONSTITUTION.md>` | TF-0101 (12/08) : fixtures double sens, self-test vert, rejoué pilot | prouve | experimental |
 | cat-con-07 | **Cycle delta (évolution d'un référentiel scellé)** | faire évoluer EXIGENCES.json par deltas proposés, appliqués, archivés | `node oracles\oracle-delta.mjs <delta> --referentiel <exigences> · node scripts\delta.mjs appliquer\|archiver` | TF-0101 (12/08) : recette 16/16 — un delta refusé n'altère jamais le référentiel (empreinte prouvée) | prouve | experimental |
 
-## forge-design (pipeline) — 8 services
+## forge-design (pipeline) — 9 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -27,6 +27,7 @@
 | cat-des-06 | **Générer les visuels** | produire les images et visuels réels de mes maquettes | `producteur d'images (Gemini) — spécifié chez design, exercé via le pilot` | TF-0019/0020 clos le 12/08 — trois visuels réels jugés PASS (commits pilot) | prouve | experimental |
 | cat-des-07 | **Tokens DTCG (source → dérivé)** | faire des tokens une source W3C interopérable, jamais éditée en CSS | `node scripts\generer-tokens-css.mjs · node oracles\oracle-dtcg.mjs <tokens.json> <css>` | TF-0102 (12/08) : 66 déclarations iso à l'ancien fichier main, PASS production, self-test 48 règles rejoué pilot | prouve | experimental |
 | cat-des-08 | **Baseline de régression visuelle** | détecter toute régression visuelle contre une référence approuvée versionnée | `node oracles\oracle-baseline.mjs [approuver\|juger]` | TF-0102 (12/08) : 0,0000 % conforme / 17,3 % divergent mesurés ; approbation post-FAIL refusée | prouve | experimental |
+| cat-des-09 | **Contrôler la généricité d'une interface (règles importées)** | vérifier mécaniquement ce qui, dans un rendu, trahit une interface faite par défaut | `node oracles\oracle-taste.mjs <page.html>` | TF-0199 (14/08) : règles extraites d'une source externe MIT (consultée le 14/08), self-test 13 oracles / 56 règles. TA1/TA2 rétrogradées APRÈS mesure : la borne de saturation condamnait toute palette OKLCH du corpus, et la source se contredit (son propre accent recommandé viole sa règle) | prouve | experimental |
 
 ## forge-development (pipeline) — 7 services
 
@@ -130,20 +131,23 @@ oyau.py (section essais) + forge_tests\junit.py` | TF-0146 (13/08) : 12 tests, s
 | cat-org-03 | **Études normatives** | ancrer les pratiques sur les normes du métier | `conversationnel` | étude documentée — contrôles proposés non implémentés | declare | experimental |
 | cat-org-04 | **Gate de conventions packagé** | vérifier les conventions en pre-commit/CI sans dépendre de la forge | `node output\gate-conventions\gate-conventions.mjs [--staged]` | TF-0109 (12/08) : self-test 6/6 + 2 robustesse, rejoué pilot ; PROPOSÉ aux dépôts, jamais déployé d'office | prouve | experimental |
 
-## forge-agents-security (sur mandat) — 2 services
+## forge-agents-security (sur mandat) — 3 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
 | cat-sec-01 | **Scanner un agent (statique)** | vérifier qu'un agent défini ne porte pas de capacités dangereuses | `node oracles\oracle-scan-agentdef.mjs <def>` | TF-0111 (12/08) : self-test double sens 24 PASS rejoué pilot ; 20 fixtures synthétiques | prouve | experimental |
 | cat-sec-02 | **Scanner les appels d'outils (dynamique)** | détecter les patterns d'attaque dans un journal d'exécution d'agent | `node oracles\oracle-scan-toolcalls.mjs <journal.jsonl> --perimetre <racine>` | TF-0111 (12/08) : chaque pattern prouvé rouge avec son cas légitime voisin vert (faux positifs mesurés) | prouve | experimental |
+| cat-asc-03 | **Rejouer un corpus d'injection de prompt** | savoir si une charge d'injection a TRAVERSÉ jusqu'à un acte de mon agent | `node oracles\oracle-corpus-injection.mjs <cible>` | TF-0188 (14/08) : self-test 38 PASS (24 avant), dont 2 voisins légitimes qui NE déclenchent pas. Rejeu PASSIF sur artefact : aucun modèle sollicité, donc la résistance d'un système vivant n'est pas mesurée | prouve | experimental |
 
-## forge-websec (sur mandat) — 3 services
+## forge-websec (sur mandat) — 5 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
 | cat-wsc-01 | **Juger l'exposition runtime** | savoir si mon produit servi expose une configuration dangereuse | `node scripts\capturer.mjs <url> <capture.json> puis node oracles\oracle-exposition.mjs <capture.json>` | TF-0123 (12/08) : self-test 23 PASS rejoué pilot, 15 cas exposition déterministes | prouve | experimental |
 | cat-wsc-02 | **Scanner les dépendances vulnérables (SCA)** | savoir si mes dépendances portent des CVE connues, avec seuils | `node oracles\oracle-sca.mjs <racine-produit> [--seuils f.json]` | TF-0123 (12/08) : sens rouge démontré sur CVE réelles (lodash 4.17.15, django 1.4), rejoué pilot | prouve | experimental |
 | cat-wsc-03 | **Tenir un contrat de sécurité ASVS L1** | m'engager sur un niveau de sécurité vérifiable et daté | `referentiels\asvs-l1.md (frontmatter challenge_date)` | référentiel curé sur le texte source OWASP — vérification partiellement outillée, le reste en revue humaine | declare | experimental |
+| cat-wsc-04 | **Méthode de test de sécurité (WSTG curé)** | savoir COMMENT vérifier une exigence de sécurité, cas par cas | `referentiels\wstg-cas.md` | TF-0186 (14/08) : curation sur le sommaire WSTG 4.2, énumération datée et à recouper au dépôt source — 20 des 28 cas restent manuels, 5 seulement rendus par un oracle exécuté | declare | experimental |
+| cat-wsc-05 | **Scanner dynamiquement (DAST, sur mandat)** | faire exécuter un scan actif contre une cible que j'ai le droit de tester | `node oracles\oracle-dast.mjs --cible <url> --autorisation <fichier.json>` | TF-0187 (14/08) : 7 verrous cumulatifs, self-test 36 PASS ; garde-fou rejoué au pilot (cible non listée -> FAIL « rien n'a été émis », sans autorisation -> FAIL). Exécution ZAP réelle NON prouvée : binaire absent du poste — D-W1 requalifiée, pas close | prouve | experimental |
 
 ---
 
