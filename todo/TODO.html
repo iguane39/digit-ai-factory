@@ -138,7 +138,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>de1efd1315a3</code> · dernier événement 2026-08-14T13:11:26Z</p>
+      <p class="meta">sceau <code>f648cedc7510</code> · dernier événement 2026-08-14T13:50:51Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -151,7 +151,7 @@
       <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="2 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">2</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
-      <div class="kpi" title="212 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">212</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
+      <div class="kpi" title="219 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">219</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende">
       <span class="leg-item"><span class="leg-swatch" style="background:var(--blue)"></span>candidat</span>
@@ -164,11 +164,10 @@
       <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
       
       <div class="dropdown" data-dim="forge">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">2</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">1</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
-          <label><input type="checkbox" value="forge-tests" checked> forge-tests</label>
-          <label><input type="checkbox" value="forge-websec" checked> forge-websec</label>
+          <label><input type="checkbox" value="forge-audit" checked> forge-audit</label>
         </div>
       </div>
       
@@ -183,50 +182,44 @@
       <span id="compteur" class="compteur" aria-live="polite">2 / 2 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#forge-tests"><strong>forge-tests</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-websec"><strong>forge-websec</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#forge-audit"><strong>forge-audit</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a></nav>
     <main>
-    <section id="forge-tests">
-      <h2>forge-tests <span class="badge" title="1 item(s) actifs ciblant forge-tests">1</span></h2>
-      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>forge-tests</strong> — trié par statut puis priorité décroissante.</p>
+    <section id="forge-audit">
+      <h2>forge-audit <span class="badge" title="2 item(s) actifs ciblant forge-audit">2</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>forge-audit</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0212" data-forge="forge-tests" data-statut="candidat" data-prio="moyenne">
+        <article class="card s-candidat" id="item-TF-0220" data-forge="forge-audit" data-statut="candidat" data-prio="moyenne">
           <header class="card-head">
-            <code class="tf-id">TF-0212</code>
+            <code class="tf-id">TF-0220</code>
             <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">forge-tests : treize findings pour un seul defaut, rien ne les regroupe par cause</h3>
-          <div class="card-detail"><p class="lead">[RT-17, gravité majeur déclarée par le produit] PREUVE : le dashboard affiche « KO 13 » la ou il y a UN probleme, cote auditeur.</p><ul class="puces"><li>Le classement par risque est sature par 13 occurrences d une meme cause a risque 27, et chaque element en defaut engendre 4 cas derives — 52 propositions issues d un seul angle mort</li><li>La cle de regroupement est dans les donnees : les 6 messages affordance-sans-effet sont identiques au caractere pres — PROPOSITION ESQUISSÉE : un finding, N occurrences enumerees, un risque porte une fois</li></ul></div>
+          <h3 class="card-titre">forge-audit : le pack EN ne peut pas etre regenere — core\controls-en\ n'a pas de D17</h3>
+          <div class="card-detail"><p class="lead">Constat du 14/08 en corrigeant les citations ASVS : `assemble-core.mjs` REFUSE d'emettre le pack anglais (« corpus EN incomplet, 1 dimension manquante, 169/175 controles ») parce que `core\controls-en\` s'arrete a D16 alors que D17 existe depuis le 12/08 (TF-0110).</p><ul class="puces"><li>Consequence immediate : toute correction d'une SOURCE EN diverge de son PACK, et la divergence n'est pas resorbable par regeneration — c'est le cas depuis aujourd'hui pour `controls-en\D02.json` (corrige en V7) face a `controls-core-v1.en.json` (reste en V3)</li><li>Editer le pack a la main est interdit (il est genere)</li><li>Blocage a lever EN AMONT : traduire D17 dans `core\controls-en\`</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-08-14</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 3 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur forge-tests</dt><dd>le dashboard affiche « KO 13 » la ou il y a UN probleme, cote auditeur. Le classement par risque est sature par 13 occurrences d une meme cause a risque 27, et chaque element en defaut engendre 4 cas derives — 52 propositions issues d un seul angle mort. La cle de regroupement est dans les donnees :</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-11</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur forge-audit</dt><dd>le corpus anglais est fige depuis le 12/08 et toute correction FR/EN creuse l'ecart ; un pack qui ne peut plus etre regenere cesse d'etre derive</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du mandat point 6)</dd></div>
             
           </dl>
         </article>
-      </div>
-    </section>
-    <section id="forge-websec">
-      <h2>forge-websec <span class="badge" title="1 item(s) actifs ciblant forge-websec">1</span></h2>
-      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>forge-websec</strong> — trié par statut puis priorité décroissante.</p>
-      <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0206" data-forge="forge-websec" data-statut="candidat" data-prio="moyenne">
+        <article class="card s-candidat" id="item-TF-0221" data-forge="forge-audit" data-statut="candidat" data-prio="moyenne">
           <header class="card-head">
-            <code class="tf-id">TF-0206</code>
+            <code class="tf-id">TF-0221</code>
             <span class="statut s-candidat">candidat</span>
             <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">forge-websec : prouver l'execution reelle du DAST sur un poste equipe de ZAP</h3>
-          <div class="card-detail"><p class="lead">TF-0187 a livre l'enveloppe, ses 7 verrous fail-closed et son self-test (36 PASS), mais ZAP est absent du poste : la branche d'EXECUTION n'a jamais tourne.</p><ul class="puces"><li>Elle est declaree non prouvee dans le README, le CLAUDE.md et le `non_juge` de l'oracle — aucune promesse de couverture</li><li>La dette D-W1 du CONTRAT par.4 est donc REQUALIFIEE (« DAST outille, execution a prouver ») et non close</li><li>A faire sur un poste equipe, avec une cible de recette autorisee par ecrit (regle 33)</li></ul></div>
+          <h3 class="card-titre">forge-audit : trancher la question normative — le corpus cite-t-il ASVS 4.0.3 ou 5.0.0 ?</h3>
+          <div class="card-detail"><p class="lead">Question laissee ouverte par le mandat du 14/08 et qui commande les 19 citations non corrigees.</p><ul class="puces"><li>Deux voies exclusives</li><li>MIGRER vers 5.0.0 : les 3 corrections faites vont dans ce sens (elles rendent la mention « ASVS 5.0 » vraie), mais 19 citations restent a instruire une par une — 8 de classe B ou le fichier officiel donne plusieurs cibles ou une suppression, 4 fausses dans les DEUX versions (defaut de fond, revue d'architecture), 4 a numero nu sans preuve de version</li><li>RETABLIR « ASVS 4.0.3 » : le corpus redevient vrai d'un coup, les 3 corrections sont a annuler, et l'ecosysteme cite alors une version que websec n'utilise pas (il juge sur 5.0.0). Le cout de</li><li>est la divergence gouvernance/execution ; celui de</li><li>est 19 instructions. A trancher par l'humain — ce n'est pas un choix technique</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-08-14</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 2 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur forge-websec</dt><dd>un oracle dont la branche principale n'a jamais tourne peut passer son self-test et echouer au premier usage reel</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constats en passant des mandats du 14/08 — constat =&gt; candidat, jamais correction spontanee)</dd></div>
-            <div class="impact"><dt>Motif d'écart (TF-0157)</dt><dd>reste CANDIDAT : l'execution reelle du DAST exige un poste equipe de ZAP, absent ici. L'enveloppe, ses 7 verrous et son self-test sont livres (TF-0187) ; la branche d'execution n'a jamais tourne et rien ne pretend le contraire.</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 3 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur forge-audit</dt><dd>19 citations restent fausses ou ambigues tant que la question n'est pas tranchee, et le mapping gouvernance/execution construit le 14/08 en herite</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (question normative levee par le mandat point 6)</dd></div>
+            
           </dl>
         </article>
       </div>

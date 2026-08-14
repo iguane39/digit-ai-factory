@@ -278,7 +278,35 @@ n'est repris par personne.
    modifie jamais le produit testé (G-1 transposé).
 
 Mécanisme : porté par l'oracle DAST de forge-websec, **fail-closed** — l'oracle refuse de
-s'exécuter si la cible n'est pas déclarée autorisée.
+s'exécuter si la cible n'est pas déclarée autorisée. **Exécution prouvée le 14/08 (TF-0206)** :
+ZAP 2.17.0, passe passive sur instance autorisée, trois alertes réelles, garde-fou rejoué.
+
+**R-33 bis — le verdict websec au gate MEP : PRÉSENT, non bloquant, paramétrable
+(décision humaine du 14/08).** Le verdict de sécurité est produit et porté au dossier de MEP
+dès maintenant ; il **n'interdit pas** la mise en production. Un produit qui n'en porte aucun
+a un **manque déclaré**, pas un refus. Le passage au bloquant se fait par un **paramètre
+unique et versionné**, sans retoucher la règle :
+
+```toml
+# docs\projet\PARAMETRAGE.md — frontmatter du produit
+[gates]
+websec_bloquant = false   # défaut de l'écosystème au 14/08
+```
+
+Quand il passe à `true`, un verdict websec absent ou FAIL bloque le GO — et le passage se
+consigne comme toute décision (qui, quand, sur quel constat). Deux raisons de ne pas l'armer
+d'office : aucun produit n'a encore de verdict websec de bout en bout, et armer un gate que
+personne n'a exercé le ferait désarmer au premier faux positif — un gate qu'on apprend à
+contourner ne protège plus rien.
+
+**R-33 ter — l'admission d'un skill tiers passe par le scan, en avertissement d'abord.** Tout
+skill venu de l'extérieur passe `oracle-scan-agentdef.mjs` (CAP-1..4) **avant** admission au
+sens de la règle 31 ; le verdict est **consigné et non bloquant** au 14/08, avec le même
+interrupteur (`[gates] admission_skill_bloquante = false`). Motif de ne pas l'armer tout de
+suite : l'oracle n'a jamais scanné un skill tiers réel — l'armer sur une population non
+mesurée produirait des refus qu'on lèverait à la main, c'est-à-dire un gate mort. Motif de
+l'armer bientôt : sur 3 984 skills publics audités en 2026-02, **1 467 portent un défaut et 76
+une charge malveillante confirmée**.
 
 ## N. Un pan d'audit qui DÉPENSE est sur mandat (règle 34 — 14/08, TF-0202)
 
@@ -292,6 +320,28 @@ défaut : il s'active explicitement (`--pans <nom>`), sous plafond de dépense (
 forge-agents), et le rapport publie ce qu'il a consommé. Corollaire opposable : **un audit
 lancé sans option ne coûte rien** — c'est ce qui permet de le rejouer sans arbitrage. Un pan
 qui dépense sans ces trois conditions est un défaut d'auditeur, pas une fonctionnalité.
+
+**Seuils du volet stabilité (décision du 14/08)** — aucune source primaire ne les normalise
+(constat de l'étude du 14/08 : le vocabulaire est stabilisé, les chiffres ne le sont pas). Ils
+sont donc un **choix de l'écosystème, déclaré comme tel et publié au rapport**, jamais présenté
+comme une norme : **5 rejeux** par cas et **stabilité exigée à 100 %** (toute variation de
+réponse à entrée identique est un constat). Le fondement du rejeu, lui, est mesuré et non
+choisi : à température 0, 1 000 complétions produisent 80 sorties distinctes — un run unique
+ne mesure rien. Ces deux nombres se révisent sur mesure, pas sur opinion.
+
+**Outillage tiers du volet stabilité : ouvert, sous conditions (O4 de l'étude).** Envelopper un
+outil libre à verdict machine (promptfoo, DeepEval, Inspect AI — tous libres et gatables) est
+**autorisé**, à trois conditions : l'enveloppe reste **paramétrable** (jamais un outil codé en
+dur — la plateforme Evals d'OpenAI s'arrête le 2026-11-30 et Ragas n'a pas publié depuis
+2026-01), l'outil n'est **jamais installé par l'oracle**, et son absence donne un **SKIP
+motivé** — exactement la discipline d'`oracle-sca` et d'`oracle-dast`.
+
+**Skill tiers en exécution : NON, et ce n'est pas un report.** L'option O2 de l'étude
+taste-skill (vendorer un skill externe pour l'exécuter) reste **fermée** tant que la réserve A1
+n'est pas levée : ce skill prescrit des ressources chargées par le réseau que `check_html.py`
+refuse en FAIL bloquant. Admettre un objet qui prescrit ce que l'écosystème interdit mettrait
+deux règles en contradiction chez le constructeur. La voie ouverte reste la **barre** (importer
+un niveau) et l'**extraction attribuée** des règles compatibles — toutes deux livrées.
 
 ## Conflits à trancher (ta décision explicite)
 
