@@ -37,7 +37,9 @@ const aGit = existsSync(p(".git"));
 const MOTIF_DATE = / - \d{8}[a-z]?\.[\w.]+$/;
 const EXT_CODE = new Set(["py", "js", "mjs", "cjs", "ts", "tsx", "jsx", "go", "rs", "java", "rb", "php", "cs"]);
 const EXT_LIVRABLE = new Set(["md", "pdf", "html", "pptx", "docx", "xlsx", "zip", "png", "svg"]);
-const EXCLUS_NOMMAGE = new Set(["README.md", "CLAUDE.md", "index.md"]);
+// LISEZMOI.md : index de dossier, pas un livrable daté (convention des familles numérotées
+// d'`output\`/`input\`, 13/08). Ajouté avec `.oracles\` ci-dessous — TF-0197, 14/08.
+const EXCLUS_NOMMAGE = new Set(["README.md", "CLAUDE.md", "index.md", "LISEZMOI.md"]);
 const IGNORES_PARCOURS = new Set([".git", ".venv", "node_modules", "__pycache__", "generated", "dist", ".claude"]);
 
 function* fichiers(dossier, prof = 0) {
@@ -91,7 +93,20 @@ for (const d of ["output", "docs"]) {
     const nom = basename(f);
     const ext = nom.split(".").pop().toLowerCase();
     if (EXCLUS_NOMMAGE.has(nom) || !EXT_LIVRABLE.has(ext) || /\/Old\//i.test("/" + rel(f))) continue;
+    // `.oracles\` : captures produites PAR `render_page.py` à côté de la page auditée — ce
+    // sont des pièces de preuve d'oracle, pas des livrables remis. Les nommer R-4 reviendrait
+    // à dater un journal (TF-0197).
+    if (/[\/]\.oracles[\/]/.test("/" + rel(f))) continue;
     if (/^docs[\/]projet[\/]/.test(rel(f))) continue; // socle documentaire R-20 : documents vivants à noms fixes, pas des livrables datés
+    // TF-0197 (14/08) : le gabarit d'étude du pilot PRESCRIT lui-même « output\03-etudes\
+    // <AAAAMMJJ>-etude-<objet>.md » (gabarits\ETUDE-OPPORTUNITE.md l.6) — date en tête, pour
+    // que le dossier se lise dans l'ordre chronologique. Deux textes du pilot se
+    // contredisaient : les 5 études sortaient en FAIL R-4 sans qu'aucune soit fautive. Le
+    // nommage y reste CONTRAINT, mais par son propre motif : un préfixe daté obligatoire.
+    if (/^output[\/]03-etudes[\/]/.test(rel(f))) {
+      if (!/^\d{8}-/.test(nom)) { ko("R-4", rel(f), "étude sans préfixe daté « AAAAMMJJ-… » (gabarits\\ETUDE-OPPORTUNITE.md)"); r4 = false; }
+      continue;
+    }
     if (!MOTIF_DATE.test(nom)) { ko("R-4", rel(f), "livrable sans nommage « <Marque> - <Objet> - AAAAMMJJ<indice> »"); r4 = false; }
   }
 }

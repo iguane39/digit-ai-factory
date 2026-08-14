@@ -122,6 +122,14 @@ requalifié — un échec résistant = retour consigné avec diagnostic. Les ite
 et `manuelle_utilisateur` sont listés avec leur attendu détaillé (dashboard, onglet Actions)
 — l'objectif : maximiser l'auto-traité, ne laisser en manuel que l'irréductible.
 
+**Sécurité du produit livré (R-33, 14/08)** : les exigences ASVS curées de forge-websec
+s'opposent dès la *conception* (profil `webapp`), la méthode de test s'exécute *ici*, et le
+verdict websec est produit au *gate MEP*. Toute exécution **active** (DAST, fuzzing, injection
+réelle, intrusion) est une voie **sur mandat humain**, jamais automatique — six garde-fous
+exigibles avant exécution, détaillés en `REGLES-PROJET.md` §M. Même discipline pour la
+dépense (R-34, §N) : un pan qui appelle un modèle payant s'active explicitement, sous plafond,
+et publie ce qu'il a consommé — un audit lancé sans option ne coûte rien.
+
 ## 5 bis. Revue graphique d'implémentation (en PARALLÈLE de l'étape tests)
 
 Regards indépendants : la fonction pour tests, la forme ici. Mode « critique

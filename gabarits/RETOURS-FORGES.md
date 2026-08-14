@@ -28,6 +28,14 @@ seq ledger>", "date_demande":…, "forges_cibles_initiales":[…], "score":{gain
 si estimable, "preuve_du_cout":…}`. **JAMAIS d'id** : les ids TF sont frappés à l'ingestion
 par le pilot. Le sidecar est ce qui rend la remontée automatique — le `.md` reste la
 lecture humaine.
+
+**Sidecar hors format (TF-0196, 14/08)** : `ingerer-lot.mjs` rejette le lot ENTIER, motif par
+motif, et le registre reste intact — c'est voulu, un rejet atomique vaut mieux qu'une
+candidature mal formée. Côté pilot, `todo\normaliser-lot.mjs <sidecar>` convertit la forme
+« lot de retours » (`reference`, `gravite`, `preuve`, `proposition`) vers ce contrat et écrit
+un **dérivé** `.normalise.tf.jsonl` — l'original reçu n'est jamais modifié. Il **refuse** deux
+choses plutôt que de les deviner : un titre où aucune forge n'est nommée (la cible ne se
+devine pas — écrire « `<forge>` : … » en tête du titre), et un retour sans preuve.
 **Ids uniques par produit** : préfixe par forge (RT/RC/RD/RV/RA/RS) + numéro **jamais
 réutilisé** — continuer la séquence des lots précédents du même produit.
 

@@ -240,6 +240,48 @@ journal d'oracle correspondant est un défaut. Mécanisme : O — contrôle R-32
 `oracle-conformite-projet.mjs` (présence du journal ; le contenu du verdict reste
 porté par le journal lui-même).
 
+## M. Sécurité offensive — sur mandat, jamais dans la voie automatique (règle 33 — 14/08, TF-0189)
+
+Constat de l'étude du 14/08 (`output\03-etudes\20260814-etude-opportunite-pentest-owasp.md`) :
+forge-websec porte un contrat ASVS 5.0.0 L1 depuis le 12/08 que **rien ne branche au cycle**
+(dette D-W3 : « jamais exercée sur produit réel ») — un produit franchit M-1…M-5 sans qu'aucune
+exigence de sécurité lui soit opposée. Et le pentest manuel, exclu par websec (README §Limites),
+n'est repris par personne.
+
+**R-33.** Deux volets indissociables.
+
+1. **Branchement de l'existant** — les exigences ASVS curées s'opposent à l'étape *conception*
+   (le profil `webapp` les pointe déjà), la méthode de test s'exécute à l'étape *tests*, et le
+   verdict websec est produit au *gate MEP*. Un produit web dont aucun verdict websec n'est au
+   dossier de MEP porte un manque déclaré, pas un silence. *(Le caractère bloquant ou non de ce
+   verdict au gate reste une décision humaine ouverte — cf. l'étude, §5.)*
+2. **Voie offensive sur mandat** — toute exécution de sécurité **active** (DAST, fuzzing,
+   injection réelle, test d'intrusion) est une **voie sur mandat humain, jamais la voie
+   automatique d'un run**. C'est l'exception explicite et motivée à la loi transverse n°5
+   (« la voie automatisée est le défaut ») : une capacité à double usage ne s'exerce pas par
+   défaut. Six garde-fous, tous exigibles avant exécution : périmètre autorisé **par écrit**
+   (cible nommée, fenêtre datée, autorisation consignée au ledger) · jamais sur un tiers ·
+   instance dédiée, jamais la production servant des utilisateurs réels sans autorisation
+   distincte · aucune technique d'évasion de la journalisation ou de la détection · identifiants
+   de test cloisonnés et révoqués à la clôture, `.env` jamais transmis · l'outil observe, il ne
+   modifie jamais le produit testé (G-1 transposé).
+
+Mécanisme : porté par l'oracle DAST de forge-websec, **fail-closed** — l'oracle refuse de
+s'exécuter si la cible n'est pas déclarée autorisée.
+
+## N. Un pan d'audit qui DÉPENSE est sur mandat (règle 34 — 14/08, TF-0202)
+
+Constat de l'étude du 14/08 sur les tests de prompts : un pan qui appelle un modèle pour
+mesurer (stabilité d'une réponse, jugement sémantique) engage une **dépense** à chaque audit.
+La règle 29 pose que « dépenses et gates restent humains » ; elle n'était pas exécutable au
+niveau du pan.
+
+**R-34.** Un pan d'audit qui appelle un modèle payant n'entre **jamais** dans la voie par
+défaut : il s'active explicitement (`--pans <nom>`), sous plafond de dépense (gate budget G0 de
+forge-agents), et le rapport publie ce qu'il a consommé. Corollaire opposable : **un audit
+lancé sans option ne coûte rien** — c'est ce qui permet de le rejouer sans arbitrage. Un pan
+qui dépense sans ces trois conditions est un défaut d'auditeur, pas une fonctionnalité.
+
 ## Conflits à trancher (ta décision explicite)
 
 - **C1 — `old\` vs git (n° 6/7)** : **TRANCHÉ le 13/08 (TF-0150)** — `old\` (minuscule,
