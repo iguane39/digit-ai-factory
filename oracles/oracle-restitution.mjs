@@ -58,6 +58,28 @@ const _CHIFFRES = /(\d+\s*\/\s*\d+|\d+\s*%|\d+\s+(test|finding|r[èe]gle|cas|ite
 const _LOCALISATEURS = /(`[^`]+`|\.(md|json|mjs|py|html|jsonl)\b|\b[a-f0-9]{7,40}\b)/;
 const preuve = (s) => _JETONS.test(s) || _CHIFFRES.test(s) || _LOCALISATEURS.test(s);
 
+// Une puce Markdown se POURSUIT sur les lignes suivantes quand elle dépasse la largeur. Juger
+// ligne par ligne dénonçait donc une puce dont la preuve tombait sur la continuation — faux
+// positif constaté le 14/08 en jugeant l'oracle sur sa propre restitution. On reconstitue la
+// puce LOGIQUE : la puce, plus toutes les lignes qui la continuent (indentées, non-puces).
+function puces(texte) {
+  const sortie = [];
+  let courante = null;
+  for (const ligne of texte.split("\n")) {
+    if (/^\s*[-*]\s+\S/.test(ligne)) {
+      if (courante !== null) sortie.push(courante);
+      courante = ligne;
+    } else if (courante !== null && /^\s+\S/.test(ligne)) {
+      courante += " " + ligne.trim();
+    } else if (courante !== null) {
+      sortie.push(courante);
+      courante = null;
+    }
+  }
+  if (courante !== null) sortie.push(courante);
+  return sortie;
+}
+
 function bloc(texte, motif) {
   const m = texte.match(motif);
   if (!m) return null;
@@ -103,16 +125,16 @@ function juger(texte) {
 
   // S5 — chaque non-traité porte un motif
   const bNonTraite = bloc(texte, BLOCS[4][0]) || "";
-  const puces = bNonTraite.split("\n").filter((l) => /^\s*[-*]\s+\S/.test(l));
-  if (!puces.length) {
+  const lignesNonTraite = puces(bNonTraite);
+  if (!lignesNonTraite.length) {
     MOTIFS_ABSENCE.test(bNonTraite)
       ? ok("S5", "rien de non traité — déclaré explicitement")
       : ko("S5", "bloc « non traité » vide et muet : ni élément, ni déclaration d'absence");
   } else {
-    const sansMotif = puces.filter((l) => !/(motif|parce que|car\b|faute de|bloqu|hors mandat|[ée]cart|:\s*\S)/i.test(l));
+    const sansMotif = lignesNonTraite.filter((l) => !/(motif|parce que|car\b|faute de|bloqu|hors mandat|[ée]cart|:\s*\S)/i.test(l));
     sansMotif.length
       ? ko("S5", `${sansMotif.length} élément(s) non traité(s) SANS motif — un reste sans motif est un silence`)
-      : ok("S5", `${puces.length} élément(s) non traité(s), tous motivés`);
+      : ok("S5", `${lignesNonTraite.length} élément(s) non traité(s), tous motivés`);
   }
 
   // S6 — prochaines actions : acteur ET ordre justifié
@@ -133,8 +155,7 @@ function juger(texte) {
     : ok("S7", "profondeur de puces tenue (2 niveaux au plus)");
 
   // S8 — pas de ✓ sans preuve dans la même puce
-  const nus = texte.split("\n").filter((l) => {
-    if (!/^\s*[-*]\s/.test(l)) return false;
+  const nus = puces(texte).filter((l) => {
     if (!/(✓|\bfait\b|\btermin[ée]|\bsold[ée]|\bclos\b)/i.test(l)) return false;
     return !preuve(l);
   });
