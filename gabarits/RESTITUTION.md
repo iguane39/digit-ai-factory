@@ -1,6 +1,9 @@
 # Consigne de restitution — le message de fin de traitement
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 2.0.0, 14/08/2026**. Il régit
+Référentiel versionné (loi n° 4, daté-éditable) — **version 2.0.0, 14/08/2026, ADOPTÉE telle
+quelle par décision humaine du 14/08** (option (a) : les 8 blocs restent, l'oracle reste
+**informatif** et non bloquant tant qu'on ne l'a pas vu tenir sur plusieurs clôtures réelles).
+Il régit
 **tout message de fin de traitement**, quelle que soit la forge et quel que soit le projet :
 clôture de run, fin de campagne, fin de mandat, synthèse remise à l'humain, et le bloc final
 qu'une CLI ou une recette imprime au terminal.
