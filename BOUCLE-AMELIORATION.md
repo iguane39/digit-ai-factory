@@ -1213,3 +1213,53 @@ déterminisme des cahiers tombait. **S-01 NON TENU**, cause corrigée, S-01 repa
 pytest **276**, recette **S-01 TENU** (banc rouge 19/19, banc vert 0 bloquant, 13 pans),
 self-tests rejoués au pilot (agents-security 48, audit 55/55 + 18 dimensions). Registre :
 9 archivés, **2 actifs**.
+
+## 14/08/2026 (nuit) — Mandat en 7 points : lot COMPTA, ZAP installé, gates paramétrables
+
+**Lot COMPTA** (produit FastAPI/Jinja2 à **racine plate**) — cinq retours, tous soldés. Le
+bloquant **RT-2** : l'ancre `backend\` était en dur dans trois modules, **7 pans perdus** sur
+une disposition répandue. La racine est désormais **découverte** — ordre figé, indices
+déclarés, et surtout la décision se **publie** : un choix implicite qui varie d'un projet à
+l'autre serait pire que l'ancre en dur. **RT-4** : `forge\` — le dossier de run du *pilot* —
+polluait l'inventaire du pan `interface` avec les livrables archivés du cycle précédent ;
+pollution mesurée et reproduite (2 éléments avec le correctif, 12 puis 22 sans, **croissante à
+chaque cycle**). **RT-1** : le garde-fou anti-fuite refusait la configuration que le README
+documente ; règle écrite, comparaison **par segments** — le faux positif « ora**CLE**s contient
+CLE » disparaît au passage. **RT-3** : a11y et visuel ne sont plus aveugles aux apps
+server-rendered, avec une troisième condition ajoutée exprès — *un dossier vide reste SKIP, il
+ne prouve pas qu'il n'y a rien à rendre, il prouve qu'on n'a rien regardé*.
+
+**Le résidu que j'ai dû fermer moi-même** : mon correctif de racine rendait `mutation.py`
+**pire qu'avant** — ancre divergente, `ValueError`, exit 2, **rapport entier perdu** là où il y
+avait un SKIP. Un correctif qui aggrave le cas qu'il vise n'en est pas un. Fermé, plus la même
+classe de défaut sur un interpréteur injouable.
+
+**ZAP installé et le DAST réellement exécuté** (TF-0206, **D-W1 close**). L'installation native
+a été refusée par une élévation impossible ; voie **Docker** ajoutée à l'oracle — c'est ainsi
+qu'il tourne en intégration. Scan réel : ZAP 2.17.0, passe passive sur instance de recette
+**autorisée par mandat écrit**, trois alertes *medium* authentiques, garde-fou rejoué dans le
+même souffle. **Deux défauts trouvés en utilisant l'outil pour de vrai** : un BOM faisait
+rejeter le mandat (or Windows en met partout), et une variable déclarée-injouable se rabattait
+sur Docker — un poste où l'image traîne aurait scanné pour de vrai, self-test compris.
+
+**Gates paramétrables (décision humaine : traiter sans bloquer)** — **R-33 bis** : le verdict
+websec est **présent au gate MEP et non bloquant**, armable par `[gates] websec_bloquant`.
+**R-33 ter** : le scan d'admission d'un skill tiers, même schéma. Motif écrit dans les deux
+cas : *armer un gate que personne n'a exercé le ferait désarmer au premier faux positif*.
+S'ajoutent les **seuils du volet stabilité** (5 rejeux, 100 % — un choix de l'écosystème, dit
+comme tel), **O4 ouvert** sous trois conditions, **O2 fermé** (un objet qui prescrit ce que
+l'écosystème interdit ne s'admet pas), et la **barre taste-skill validée** avec son écart
+déclaré : le pas 5 s'est fait par mandat de liste, pas en tour dédié.
+
+**forge-audit** — et c'est le résultat le plus instructif : **la classe A n'était pas
+mécanique**. En 5.0.0, titres et contenus de chapitre ont bougé **indépendamment** ; renuméroter
+par identité de titre fabrique des citations *vraies par le titre, fausses par le contenu*. 3
+corrigées sur 22 sous double contrôle, **19 refusées avec leur preuve** — dont `CTL-D02-06`, où
+le libellé « Configuration » était exact mais où les en-têtes HTTP ont **quitté** ce chapitre.
+**TF-0212 écarté** (sa cause a été traitée, critère de réouverture écrit). **D-D2 périmée**,
+**D-D3 requalifiée**, fiche design remise au niveau.
+
+**Preuves** : recette **S-01 TENU** (19/19, banc vert 0 bloquant, 13 pans), pytest **365**,
+self-test websec 36, batterie audit verte. **Deux constats en passant** consignés : le pack EN
+de forge-audit ne peut plus être régénéré faute de D17 traduit (TF-0220), et la question
+normative « le corpus cite-t-il 4.0.3 ou 5.0.0 ? » commande les 19 citations restantes (TF-0221).
