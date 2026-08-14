@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=c793e867761d archive=086d12d19408 · dernier événement: 2026-08-14T09:20:27Z -->
+     sceaux: actifs=7617c6c0e44c archive=610fb0723376 · dernier événement: 2026-08-14T09:41:59Z -->
 
-**5 actifs** (candidat 5 · décidé 0 · en cours 0 · corrigé 0 · écarté 0) · **186 archivés**.
+**6 actifs** (candidat 6 · décidé 0 · en cours 0 · corrigé 0 · écarté 0) · **191 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -12,6 +12,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0189 | candidat | 9 | pilot — règle 33 « sécurité offensive sur mandat » + branchement ASVS/WSTG aux étapes du run | **oui** — l'écosystème porte un contrat de sécurité que rien ne branche : il est payé et non opposé |
+| TF-0196 | candidat | 6 | Sidecar de retours : le schéma émis par les produits ne passe pas l'ingesteur R10 — normalisation à la main à chaque lot | **oui** — le lot a exigé une normalisation manuelle avant ingestion ; tout lot produit émis au même format la réclamera |
 
 ## forge-agents-security
 
