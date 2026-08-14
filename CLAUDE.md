@@ -58,7 +58,7 @@ jamais ici ; le run y vit (`forge\`, code à la racine). Séquence :
 6. **MEP** — staging outillé par **forge-ops** (O-1…O-4), oracle M-1…M-5,
    `DOSSIER-MEP.md`, **GO humain** ;
 7. **Clore** — lot `<projet> - RETOURS - …` + sidecar remis à `<pilot>\input\00-retours\`,
-   `run_close`, synthèse.
+   `run_close`, synthèse (`gabarits\RESTITUTION.md`).
 
 **Mode opératoire détaillé : `references\ETAPES-RUN.md`** (charger à l'ouverture de
 l'étape). Contrat « prêt client » (seuls critères, tous mesurables) : oracles 1-3 verts ·
