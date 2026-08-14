@@ -14,7 +14,7 @@
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digit-AI — TODO-FORGE · Reste à faire — V</title>
+  <title>Digit-AI — TODO-FORGE · Reste à faire — V20260814</title>
   <meta name="description" content="Reste-à-faire du registre TODO-FORGE : candidats à décider, décidés, en cours — détaillés en puces, avec date de création, priorité de traitement et impact sur la forge concernée.">
   <meta name="theme-color" content="#2563EB">
   <meta name="color-scheme" content="light dark">
@@ -138,7 +138,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>e3b0c44298fc</code> · dernier événement </p>
+      <p class="meta">sceau <code>c793e867761d</code> · dernier événement 2026-08-14T09:20:27Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -148,7 +148,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="0 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">0</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="5 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">5</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="185 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">185</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -164,26 +164,140 @@
       <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
       
       <div class="dropdown" data-dim="forge">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">0</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">4</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
-          
+          <label><input type="checkbox" value="digit-ai-forge-pilot" checked> digit-ai-forge-pilot</label>
+          <label><input type="checkbox" value="forge-agents-security" checked> forge-agents-security</label>
+          <label><input type="checkbox" value="forge-audit" checked> forge-audit</label>
+          <label><input type="checkbox" value="forge-websec" checked> forge-websec</label>
         </div>
       </div>
       
       <div class="dropdown" data-dim="prio">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">0</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">3</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-prio" role="group" aria-label="Filtre Priorité" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
-          
+          <label><input type="checkbox" value="haute" checked> Haute</label>
+          <label><input type="checkbox" value="moyenne" checked> Moyenne</label>
+          <label><input type="checkbox" value="basse" checked> Basse</label>
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">0 / 0 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">5 / 5 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-pilot"><strong>digit-ai-forge-pilot</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-agents-security"><strong>forge-agents-security</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-audit"><strong>forge-audit</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-websec"><strong>forge-websec</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a></nav>
     <main>
+    <section id="digit-ai-forge-pilot">
+      <h2>digit-ai-forge-pilot <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-pilot">1</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-pilot</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0189" data-forge="digit-ai-forge-pilot" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0189</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot — règle 33 « sécurité offensive sur mandat » + branchement ASVS/WSTG aux étapes du run</h3>
+          <div class="card-detail"><p class="lead">Partitions P1 et P6 de l'étude du 14/08. Deux manques distincts. (1) Branchement : le contrat ASVS existe depuis le 12/08 mais rien ne l'oppose au cycle — dette D-W3 « jamais exercée sur produit réel » ; un produit franchit M-1..M-5 sans qu'aucune exigence ASVS lui soit opposée. À encoder : ASVS en exigences (conception, le profil webapp le pointe déjà), cahier WSTG à l'étape tests, verdict websec au gate MEP. (2) Règle 33 (REGLES-PROJET §M) : la voie offensive est une voie SUR MANDAT, jamais la voie automatique — exception explicite et motivée à la loi transverse n°5, avec les six garde-fous dual-use. Décision humaine réservée : rendre le verdict websec BLOQUANT au gate MEP.</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-14</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-pilot</dt><dd>l'écosystème porte un contrat de sécurité que rien ne branche : il est payé et non opposé</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">mandat humain du 14/08 — « sujets de Penetration Tests &amp; OWASP à traiter »</dd></div>
+            
+          </dl>
+        </article>
+      </div>
+    </section>
+    <section id="forge-agents-security">
+      <h2>forge-agents-security <span class="badge" title="1 item(s) actifs ciblant forge-agents-security">1</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>forge-agents-security</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0188" data-forge="forge-agents-security" data-statut="candidat" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0188</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-agents-security — corpus d'injection versionné + mapping LLM Top 10 : l'exigence LLM01 est déclarée sans vérificateur</h3>
+          <div class="card-detail"><p class="lead">Partition P3 de l'étude du 14/08. `profils\chatbot.md` EXIGE la résistance à LLM01 (injection de prompt, en tête du LLM Top 10 2025 pour la 2e édition consécutive) et constate dans la même page qu'« aucun oracle gratuit générique » ne la mesure. La forge déclare de son côté la dette « pas de red-teaming automatisé ». Construire un corpus versionné de payloads (direct et indirect via contenu récupéré/RAG) rejouable, et mapper CAP-1..4 / TC-1..5 vers le LLM Top 10 et le modèle agentique OWASP (Agentic AI: Threats and Mitigations). Méthode : GenAI Red Teaming Guide (2025-01).</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-14</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 3 × preuve 2 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur forge-agents-security</dt><dd>une exigence de profil sans oracle est une exigence qui ne tient pas — elle passe le gate sans être opposée</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">mandat humain du 14/08 — « sujets de Penetration Tests &amp; OWASP à traiter »</dd></div>
+            
+          </dl>
+        </article>
+      </div>
+    </section>
+    <section id="forge-audit">
+      <h2>forge-audit <span class="badge" title="1 item(s) actifs ciblant forge-audit">1</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>forge-audit</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0190" data-forge="forge-audit" data-statut="candidat" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0190</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-audit — mapping ADR &lt;-&gt; ASVS : la gouvernance et l'exécution citent des référentiels disjoints</h3>
+          <div class="card-detail"><p class="lead">Partition P6 de l'étude du 14/08. ADR0505 (2026-07-11, standards OWASP SAMM — Verification) EXIGE des scans intégrés en CI et ADR0208 une analyse de menaces avant exposition ; côté exécution, websec juge sur ASVS 5.0.0. Les deux niveaux ne citent pas le même référentiel : un contrôle d'audit ne sait pas quel oracle le prouve, et un verdict d'oracle ne sait pas quel contrôle il sert. Mapper les contrôles dérivés (CTL-*) vers les identifiants ASVS.</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-14</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 2 × preuve 2 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur forge-audit</dt><dd>sans mapping, la conformité se déclare deux fois et se prouve zéro</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">mandat humain du 14/08 — « sujets de Penetration Tests &amp; OWASP à traiter »</dd></div>
+            
+          </dl>
+        </article>
+      </div>
+    </section>
+    <section id="forge-websec">
+      <h2>forge-websec <span class="badge" title="2 item(s) actifs ciblant forge-websec">2</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>forge-websec</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0186" data-forge="forge-websec" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0186</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-websec — référentiel WSTG curé : la méthode de test de sécurité, absente à 0 occurrence de l'écosystème</h3>
+          <div class="card-detail"><p class="lead">Partition P2 de l'étude du 14/08. WSTG (OWASP Web Security Testing Guide 4.2, stable depuis 2020-12, v5.0 non publiée) n'apparaît dans AUCUN des 14 dépôts — chaque campagne de sécurité ré-improvise ses cas de test. Construire `referentiels\wstg-cas.md` sur le modèle exact d'`asvs-l1.md` : sous-ensemble curé, cité jamais recopié (CC BY-SA 4.0), chaque cas rattaché à l'exigence ASVS qu'il vérifie, chapitres non curés listés explicitement. Livrable de run : cahier de tests de sécurité dérivé, au statut de PROPOSITION (G-1).</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-14</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 2 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur forge-websec</dt><dd>le contrat ASVS de websec dit QUOI exiger et rien ne dit COMMENT le vérifier — le cas de test est réinventé à chaque campagne</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">mandat humain du 14/08 — « sujets de Penetration Tests &amp; OWASP à traiter »</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0187" data-forge="forge-websec" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0187</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-websec — oracle-dast.mjs enveloppant ZAP : lève la dette D-W1, seule brique offensive automatisable</h3>
+          <div class="card-detail"><p class="lead">Partition P4 de l'étude du 14/08. Dette D-W1 déjà consignée par la forge (README §Limites : « Pas de DAST… OWASP ZAP est consigné en v1 ») et au CONTRAT-INTERFACE §4. ZAP est activement maintenu (blog 2026-06-02) avec Automation Framework et verdict par code de sortie. Envelopper sur le modèle d'oracle-sca.mjs : seuils, SKIP motivé jamais silencieux, et `--cible` FAIL-CLOSED refusant toute cible non déclarée autorisée. Soumis aux six garde-fous dual-use de l'étude (périmètre écrit, instance dédiée, jamais de tiers, pas d'évasion de détection, secrets cloisonnés, voie sur mandat).</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-14</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 3 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur forge-websec</dt><dd>aucune vérification active n'existe : la forge ne juge que la configuration et les dépendances, jamais le comportement de l'application servie</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">mandat humain du 14/08 — « sujets de Penetration Tests &amp; OWASP à traiter »</dd></div>
+            
+          </dl>
+        </article>
+      </div>
+    </section>
     </main>
     <footer>Vue générée par <code>todo/generer-page.mjs</code> — ne pas éditer. Source unique : <code>todo/TODO.jsonl</code>. Détail brut d'un item : <code>grep '"id":"TF-xxxx"' todo/TODO.jsonl</code>.</footer>
   </div>
