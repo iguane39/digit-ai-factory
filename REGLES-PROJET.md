@@ -201,9 +201,10 @@ sombre devient obligatoire sur tout HTML autonome livré.
 
 Surface d'application encodée : `references\BEST-PRACTICES-HTML.md` (pattern de
 référence HTML/CSS/JS + deux fixtures preuves, double sens). Mécanisme : S + pattern
-référencé depuis tout run produisant du HTML. Contrôle exécutable : reste de TF-0131 —
-candidature vers `check_html.py` du skill `digit-ai-page-html` (hors périmètre
-d'écriture de cette campagne, à porter par mandat).
+référencé depuis tout run produisant du HTML. **Contrôle exécutable : soldé** — la règle
+G1 de `check_html.py` (skill `digit-ai-page-html`) tient le contrôle depuis les campagnes
+des 12-13/08 : bascule présente non câblée = FAIL bloquant, absence totale = avertissement
+(rendu figé légitime), fixtures g1-* à double sens au self-test.
 
 ## K. Admission de tout objet durable (règle 31 — décidée le 13/08, TF-0156)
 

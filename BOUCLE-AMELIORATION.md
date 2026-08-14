@@ -932,3 +932,28 @@ candidature de veille TF-0184 (candidat, décision humaine — jamais de veille 
 silencieuse) ; paquet `prompt-analyzer-l99 (5).skill` → old (la source forge-agents fait
 foi). Sources synchronisées (14 fichiers skill + copie D-12 forge-tests re-bannérisée),
 pytest forge-tests 154. Registre : **1 actif (TF-0184), 183 archivés**.
+
+## 14/08/2026 (suite) — « Supprime A2, puis fais C, D & E » : dettes d'intégration soldées ou arbitrées
+
+**Écart déclaré d'entrée** : D et E sont des triages EXÉCUTÉS avec verdicts documentés — pas
+la levée en code de chaque dette (une levée = une campagne) ; l'écart est dit ligne à ligne.
+**A2** : 9 captures Design supprimées (traitées par l'humain hors pilot). **C — resync doc** :
+deltas n°1-6 de BEST-PRACTICES-HTML tous constatés soldés dans la source (section réécrite
+« TOUS SOLDÉS », chaque item barré avec sa preuve) ; R-30 §J « contrôle exécutable » soldé
+(G1 vit dans check_html). **D — table §5 du CONTRAT** : 8 skills conception/design installés
+au poste (D-C3/D-D1 soldées) ; **runner `run-oracles-conception.mjs` + `manifeste.json`
+créés** (D-C1 soldée, double sens prouvé : fixture verte PASS / rouge FAIL, jamais PASS par
+défaut) ; audits sur code : D-D4, D-T2, D-T3, D-T4 étaient déjà résolues (citations l.184
+`--sortie`, TimeoutExpired attrapé visuel.py l.110, stderr routé « stdout JSON PUR » l.260) ;
+D-T1 requalifiée assumée (contrat de sortie, pas un défaut) ; D-V3 **arbitrée sur mandat
+délégué** : Conception fait foi pour les exigences, gates BMAD = pré-commit, forge-tests =
+audit indépendant — recouvrement voulu ; D-V1/D-A1..A3 assumées ; D-D2 campagne à mandater ;
+D-D3 **bloquée par garde-fou** (aucune API tierce payante → décision humaine d'outillage).
+**E — registre de dette forge-tests instruit** : les 43 `todo` étaient des limites déclarées
+(NON_JUGE du code) ; 38 instruites en `assume` avec note datée par famille (limites
+constitutives : dérivation par la forme, contrôle statique, gardes telles qu'implémentées,
+G-1 du pan qualif…) ; **5 gardées en `todo`** comme vraies pistes : états a11y
+post-interaction, surface sous compte, webServer qui écrit dans l'arbre (tension G-1),
+générateur Front/Batch/Fichiers, routes post-action. Régénération `python -m
+forge_tests.dette` : 61 assume · 27 retiree · 5 todo, statuts et notes préservés par id ;
+recette S-01 rejouée. Publication : **v1.10.0** sur les 14 forges.
