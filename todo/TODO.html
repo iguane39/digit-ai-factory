@@ -14,7 +14,7 @@
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digit-AI — TODO-FORGE · Reste à faire — V20260814</title>
+  <title>Digit-AI — TODO-FORGE · Reste à faire — V</title>
   <meta name="description" content="Reste-à-faire du registre TODO-FORGE : candidats à décider, décidés, en cours — détaillés en puces, avec date de création, priorité de traitement et impact sur la forge concernée.">
   <meta name="theme-color" content="#2563EB">
   <meta name="color-scheme" content="light dark">
@@ -138,7 +138,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>dc83e1eca19b</code> · dernier événement 2026-08-14T06:56:33.807Z</p>
+      <p class="meta">sceau <code>e3b0c44298fc</code> · dernier événement </p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -148,10 +148,10 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="1 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">1</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="0 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">0</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
-      <div class="kpi" title="183 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">183</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
+      <div class="kpi" title="184 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">184</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende">
       <span class="leg-item"><span class="leg-swatch" style="background:var(--blue)"></span>candidat</span>
@@ -164,49 +164,26 @@
       <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
       
       <div class="dropdown" data-dim="forge">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">1</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">0</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
-          <label><input type="checkbox" value="design" checked> design</label>
+          
         </div>
       </div>
       
       <div class="dropdown" data-dim="prio">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">1</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">0</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-prio" role="group" aria-label="Filtre Priorité" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
-          <label><input type="checkbox" value="basse" checked> Basse</label>
+          
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">1 / 1 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">0 / 0 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#design"><strong>design</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"></nav>
     <main>
-    <section id="design">
-      <h2>design <span class="badge" title="1 item(s) actifs ciblant design">1</span></h2>
-      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>design</strong> — trié par statut puis priorité décroissante.</p>
-      <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0184" data-forge="design" data-statut="candidat" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0184</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">Veille à mener : carrousel « Claude Code Web Design Genius » (AI Slacker) + 5 vidéos TikTok — entrant design déposé le 10/08, instruit le 14/08</h3>
-          <div class="card-detail"><p class="lead">Entrant humain rangé sous input\03-entrants-media\Tiktok vidéos\ : 9 captures d'un carrousel social de 10 diapos « How to Turn Claude Code Into a Web Design Genius — the 3-step workflow that kills generic AI websites » (créateur AI Slacker, contenu marqué généré par IA) + 5 vidéos mp4 (Download.mp4 à Download (4).mp4). Nature : proposition de MÉTHODE design pour Claude Code — exactement le périmètre du pipeline veille\ (gabarit rapport-veille, verdict adopter/à évaluer/écarter). Instruction du 14/08 : la diapo 1 lue confirme la nature (workflow anti « AI slop » en 3 pas, maquette d'exemple soignée) ; les 8 autres captures sont lisibles par session ; les 5 vidéos NE SONT PAS lisibles par l'agent (mp4 sans transcription) — une veille complète exige soit leur visionnage humain, soit leurs transcriptions déposées en entrant.</p><p class="detail-label">Proposition</p><ul class="puces"><li>run de veille standard (dossier veille\20260814-claude-code-web-design-genius\, gabarit rapport-veille v2 clair strict) sur les 9 captures + transcriptions si fournies</li><li>confronter à forge-design (studio de direction, maquette.template) et BEST-PRACTICES</li><li>verdict par élément avec preuve</li><li>écarter explicitement ce qui est du marketing sans mécanique. À NE PAS faire sans mandat : appliquer directement des recettes d'un carrousel promotionnel à la doctrine design</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-14</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 2 × preuve 1 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur design</dt><dd>l'entrant dort depuis le 10/08 faute d'instruction ; sans candidature, il resterait invisible au registre — et une veille improvisée sans les vidéos serait partielle sans le dire</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (dépôt du 10/08) ; instruction : session pilot 14/08</dd></div>
-            
-          </dl>
-        </article>
-      </div>
-    </section>
     </main>
     <footer>Vue générée par <code>todo/generer-page.mjs</code> — ne pas éditer. Source unique : <code>todo/TODO.jsonl</code>. Détail brut d'un item : <code>grep '"id":"TF-xxxx"' todo/TODO.jsonl</code>.</footer>
   </div>
