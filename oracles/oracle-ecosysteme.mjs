@@ -53,6 +53,24 @@ for (const f of forges) {
     : ko("E1", `fiche baseline ABSENTE : fiches\\forge-${f}.md`);
 }
 
+// E8 · verdict de non-recouvrement dans la fiche de NAISSANCE (mécanisation du point 1 de
+// R-28/R-31 — reste de TF-0125, encodé le 14/08). Les 14 forges nées AVANT la règle sont
+// en antériorité déclarée ; toute forge nouvelle doit porter dans sa fiche un verdict de
+// non-recouvrement écrit (le mot « non-recouvrement » avec citation de l'existant).
+const ANTERIORITE_R28 = new Set([
+  "agents", "agents-security", "audit", "audit_nhood", "conception", "data", "design",
+  "development", "observability", "ops", "organization", "seo", "tests", "websec",
+]);
+for (const f of forges.filter((f) => !ANTERIORITE_R28.has(f))) {
+  const fiche = join(racine, "fiches", `forge-${f}.md`);
+  const txt = existsSync(fiche) ? readFileSync(fiche, "utf8").toLowerCase() : "";
+  txt.includes("non-recouvrement")
+    ? ok("E8", `fiche forge-${f} : verdict de non-recouvrement présent (R-28.1/R-31)`)
+    : ko("E8", `forge-${f} née après R-31 sans verdict de non-recouvrement écrit dans sa ` +
+        "fiche — le point 1 de R-28/R-31 exige un verdict CITÉ contre le catalogue, " +
+        "jamais un « n'existe pas ailleurs » implicite");
+}
+
 // E2-E4 · documents à correspondance souple (étapes et lignes de table au nom nu)
 for (const [regle, fichier] of [["E2", "INVENTAIRE.md"], ["E3", "CONTRAT-INTERFACE.md"], ["E4", "CLAUDE.md"]]) {
   const txt = lire(fichier);

@@ -905,3 +905,30 @@ ledger) — appliqué séance tenante. Trois incidents attrapés par les gates p
 campagne même : « NOT NULL » hors garde L11 (pytest), balise en toutes lettres dans un
 commentaire CSS (famille RA-1, avalait le body au comptage h1), fenêtre de garde 80 car.
 (garde posé au plus près du libellé). Registre : **0 actif, 179 archivés**.
+
+## 14/08/2026 — Lot c SCC_ALX + fonds de tiroir : « ok, fais tout » (7 items clos, 1 candidat neuf)
+
+**Écart déclaré d''entrée** (gate TF-0176 appliqué à soi-même) : « tout » = lot c + delta n°6
++ restes mécanisables + entrants — PAS la résolution des dettes d''intégration du CONTRAT §5
+(D-C1…D-P2), chacune exigeant sa campagne mandatée ; triage : D-T1/T2/T4 et D-D4 sont des
+candidats bon marché pour une prochaine campagne forge-tests/design ; D-V1 (conductor
+headless) et D-V3 (arbitrage BMAD) sont structurels ; D-C3/D-D1 (skills non installés)
+relèvent du poste. **Lot c ingéré** (garde anti-doublons exécutée, 2 faux positifs levés,
+TF-0177→0183) et implémenté en entier : lexique d''invocation AU NOYAU (arbitrage tranché :
+trim des garde-fous, détail versé dans ACCUEIL — noyau 6110/6144 PASS) ; ACCUEIL pas 4 +
+catalogue complété (cat-agt-07..11, K PASS) ; **la-barre admise dans forge-agents** (R-31
+rejoué, test_existence PASS depuis la source) ; tri opt-in au composant D-12 (RA-5, détails
+transportés) ; piège du th documenté (RA-6) ; **tests d''interactions au socle** (RA-7 :
+méthode + 2 scripts éprouvés portés) ; champ `dimension` au contrat de la barre (RB-1).
+**Delta n°6 soldé** : règle L13 (liste ≥ 8 lignes sans recherche statique = FAIL ; KPI morts
+= avertissement, écart déclaré) + composant kpi-filter.js + fixture rouge — self-test skill
+**37/37**, 4 fixtures mises au standard, non-régression vérifiée sur 4 livrables réels
+(TODO.html re-généré : son sommaire vide à 0 actif a été attrapé par L6 — l''oracle a jugé
+la vue périmée, pas un faux positif). **R-28.1 mécanisé** : règle E8 d''oracle-ecosysteme
+(antériorité des 14 déclarée), self-test 7/7 ; R-29 : report maintenu, sa condition (« si un
+gap se constate en run réel ») n''est pas remplie. **Entrants instruits** : le dossier TikTok
+est un carrousel « Claude Code Web Design Genius » + 5 vidéos (illisibles par l''agent) →
+candidature de veille TF-0184 (candidat, décision humaine — jamais de veille partielle
+silencieuse) ; paquet `prompt-analyzer-l99 (5).skill` → old (la source forge-agents fait
+foi). Sources synchronisées (14 fichiers skill + copie D-12 forge-tests re-bannérisée),
+pytest forge-tests 154. Registre : **1 actif (TF-0184), 183 archivés**.

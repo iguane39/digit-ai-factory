@@ -24,8 +24,12 @@ function construire(base, { ficheAlpha = true, readmeComplet = true, compte = 3 
   mkdirSync(join(base, "output"), { recursive: true });
   writeFileSync(join(base, "bootstrap.mjs"),
     'const FORGES = [\n  { nom: "digit-ai-forge-alpha", preuve: "x" },\n  { nom: "digit-ai-forge-beta", preuve: "y" },\n];\n');
-  if (ficheAlpha) writeFileSync(join(base, "fiches", "forge-alpha.md"), "# fiche alpha\n");
-  writeFileSync(join(base, "fiches", "forge-beta.md"), "# fiche beta\n");
+  // E8 (R-28.1/R-31, 14/08) : les forges de fixture sont « nées après la règle » — leurs
+  // fiches portent le verdict de non-recouvrement exigé pour rester vertes sur E8.
+  if (ficheAlpha) writeFileSync(join(base, "fiches", "forge-alpha.md"),
+    "# fiche alpha\n\nNon-recouvrement : aucun service du catalogue ne couvre alpha (vérifié, cité).\n");
+  writeFileSync(join(base, "fiches", "forge-beta.md"),
+    "# fiche beta\n\nNon-recouvrement : aucun service du catalogue ne couvre beta (vérifié, cité).\n");
   writeFileSync(join(base, "INVENTAIRE.md"), "## forge-alpha\n## forge-beta\n");
   writeFileSync(join(base, "CONTRAT-INTERFACE.md"), "| Alpha | x |\n| Beta | y |\n");
   writeFileSync(join(base, "CLAUDE.md"), "pipeline : alpha → beta\n");
@@ -52,13 +56,17 @@ construire(rouge, { ficheAlpha: false, readmeComplet: false, compte: 9 });
 const r = lance(rouge);
 check("rouge · exit 1", () => { if (r.exit !== 1) throw new Error(`exit ${r.exit}`); });
 check("rouge · verdict FAIL", () => { if (r.r.verdict !== "FAIL") throw new Error(r.r.verdict); });
-check("rouge · E1, E6 et E7 déclenchées (et seulement elles)", () => {
+check("rouge · E1, E6, E7 et E8 déclenchées (et seulement elles)", () => {
   const durs = [...new Set(r.r.findings.filter(x => x.statut === "FAIL").map(x => x.regle))].sort();
-  if (durs.join(",") !== "E1,E6,E7") throw new Error(`déclenchées : ${durs.join(",")}`);
+  // E8 depuis la mécanisation R-28.1 (14/08) : fiche absente = verdict de
+  // non-recouvrement illisible pour une forge née après la règle.
+  if (durs.join(",") !== "E1,E6,E7,E8") throw new Error(`déclenchées : ${durs.join(",")}`);
 });
 check("rouge · messages localisants", () => {
   const msgs = r.r.findings.filter(x => x.statut === "FAIL").map(x => x.message).join(" | ");
-  for (const attendu of ["forge-alpha.md", "forge-alpha", "9 forges"])
+  // fiche alpha ABSENTE → E8 se déclenche aussi (pas de verdict de non-recouvrement
+  // lisible) : attendu depuis la mécanisation R-28.1 du 14/08.
+  for (const attendu of ["forge-alpha.md", "forge-alpha", "9 forges", "non-recouvrement"])
     if (!msgs.includes(attendu)) throw new Error(`« ${attendu} » absent des messages`);
 });
 
