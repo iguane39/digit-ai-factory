@@ -1,7 +1,7 @@
 # Catalogues de services des forges — vue générée
 
 > **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.6.0, 2026-08-13) — ne jamais éditer ce fichier.
-> 71 services · 61 prouvés · 10 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
+> 76 services · 63 prouvés · 13 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
 
 ## forge-conception (pipeline) — 7 services
 
@@ -53,7 +53,7 @@
 | cat-tst-07 | **Rapport exhaustif test-par-test** | obtenir le verdict et le pourquoi de CHAQUE test, pas seulement un agrégat par pan | `forge_tests
 oyau.py (section essais) + forge_tests\junit.py` | TF-0146 (13/08) : 12 tests, self-test noyau vert, pytest 154 rejoué pilot ; v0 — branchement des adaptateurs (--junitxml → essais réels) = jalon d'intégration | prouve | experimental |
 
-## forge-agents (transverse) — 6 services
+## forge-agents (transverse) — 11 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -63,6 +63,11 @@ oyau.py (section essais) + forge_tests\junit.py` | TF-0146 (13/08) : 12 tests, s
 | cat-agt-04 | **Projection OTLP GenAI du ledger** | rendre mes runs lisibles par tout backend d'observabilité | `node .claude\skills\forge-agents\scripts\otlp-project.mjs <ledger>` | TF-0106 (12/08) : 0 span sur ledger corrompu (mesuré), self-test 17 PASS rejoué pilot | prouve | experimental |
 | cat-agt-05 | **Oracle agent-evals** | détecter la régression sémantique d'un agent entre versions | `node .claude\skills\forge-agents\scripts\oracle-agent-evals.mjs` | TF-0106 (12/08) : fixtures double sens au self-test, juge distinct de l'exécutant | prouve | experimental |
 | cat-agt-06 | **Gate budget G0** | plafonner les appels modèle d'un ticket avant l'appel, fail-closed | `.queue\gates\g0-budget.sh (hook PreToolUse)` | TF-0106 (12/08) : self-test 4 PASS + 2 SKIP motivés — ATTENTION : .queue non versionné (candidature ouverte) | prouve | experimental |
+| cat-agt-07 | **Analyser un prompt (L99)** | stress-tester un prompt en 8 couches (OODA noté, blindspots, premortem, wargame) et le réécrire avec contrat de sortie et écarts à la lettre | `skill prompt-analyzer-l99 — invocation : « Améliore le prompt… », « l99 », « analyse ce prompt »` | usages réels : campagne TF-0153 (13/08, score 34→91), run Produit-10 (5 défauts trouvés qu'une réécriture manuelle avait manqués) | prouve | production |
+| cat-agt-08 | **Améliorer un skill existant** | diagnostiquer, noter (grille 7 dimensions /5) et corriger un skill sans régression de déclenchement | `skill ameliore-un-skill — invocation : « améliore/audite/durcis ce skill »` | déclaré au catalogue le 14/08 (RV-7) — skill exposé et documenté, usage réel à consigner au premier mandat | declare | experimental |
+| cat-agt-09 | **Contre-expertise d'un livrable** | faire contre-expertiser un livrable par un second regard indépendant du producteur | `skill contre-expertise` | déclaré au catalogue le 14/08 (RV-7) — usage réel à consigner | declare | experimental |
+| cat-agt-10 | **Fiches expert du domaine** | mobiliser ou rédiger une fiche d'expertise versionnée (experts-forge / write-an-expert) | `skills experts-forge et write-an-expert` | déclaré au catalogue le 14/08 (RV-7) — fiches\ du pilot en sont les consommatrices | declare | experimental |
+| cat-agt-11 | **Fixer la barre d'un livrable** | trouver, prouver (test d'existence exécuté) et décomposer la référence externe qui fixe le niveau d'un livrable — pré-vol d'un prompt ou en ligne d'une boucle | `skill la-barre — invocation : « barre… » en tête de message ; registre : references\registre-barres.md` | usages réels : pré-vol TF-0083 (11/08, 3 barres data), campagne catalogues (12/08), TF-0153 (13/08, barre Allure), run Produit-10 (13/08 : protocole tenu intégralement, arrêt au pas 5, garde anti-gameable exercé) | prouve | production |
 
 ## forge-ops (transverse) — 5 services
 
