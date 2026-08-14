@@ -144,8 +144,9 @@ forge (loi transverse n° 4).
 
 Contrôle exécutable : périmètre écosystème (pas socle produit) → R-28 ne rentre pas dans
 `oracle-conformite-projet` ; les points 2 et 4 sont déjà tenus par les self-tests des
-forges et `oracle-ecosysteme` ; la mécanisation du point 1 (verdict de non-recouvrement
-exigé dans la fiche de naissance) est consignée comme reste de TF-0125.
+forges et `oracle-ecosysteme` ; **le point 1 est mécanisé depuis le 14/08** : règle E8
+d'`oracle-ecosysteme` — toute forge née après R-31 porte un verdict de non-recouvrement
+écrit dans sa fiche (les 14 forges antérieures sont en antériorité déclarée), self-test 7/7.
 
 ## I. « L'IA fait, l'humain décide » (règle 29 — décidée le 12/08, TF-0131)
 
