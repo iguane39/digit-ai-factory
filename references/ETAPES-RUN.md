@@ -131,6 +131,14 @@ exigibles avant exécution, détaillés en `REGLES-PROJET.md` §M. Même discipl
 dépense (R-34, §N) : un pan qui appelle un modèle payant s'active explicitement, sous plafond,
 et publie ce qu'il a consommé — un audit lancé sans option ne coûte rien.
 
+**Message de fin de traitement (v2, 14/08)** : toute clôture — de run, de campagne, de mandat —
+suit `gabarits\RESTITUTION.md` : huit blocs dans l'ordre, **aucun ne disparaît** (un bloc vide
+se dit en une ligne), en-tête **horodaté à l'heure près**, décisions en tête et en choix
+fermés, non traités **avec leur motif**, risques avec leur signal, prochaines actions par
+acteur ET par ordre justifié. Contrôle exécuté : `node oracles\oracle-restitution.mjs
+<synthese.md>` (S1-S8, self-test double sens). Une CLI ou une recette en tient la forme
+dégradée : horodatage · verdict · restes classés.
+
 ## 5 bis. Revue graphique d'implémentation (en PARALLÈLE de l'étape tests)
 
 Regards indépendants : la fonction pour tests, la forme ici. Mode « critique

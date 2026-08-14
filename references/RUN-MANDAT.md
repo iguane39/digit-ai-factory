@@ -36,7 +36,8 @@ MEP — et le run SCC_ALX a dû improviser ce que cette page encode désormais.
    se corrige ou se déclare (boucle bornée ≤ 3, G-2 : jamais d'assouplissement).
 5. **Clore** — livrable nommé R-4 dans `output\` (journal d'oracles sous
    `forge\oracles\` — R-32 pour le HTML), lot `<projet> - RETOURS - AAAAMMJJ<i>.md` +
-   sidecar remis à `<pilot>\input\00-retours\`, `run_close`, synthèse.
+   sidecar remis à `<pilot>\input\00-retours\`, `run_close`, synthèse **au format
+   `gabarits\RESTITUTION.md`** (8 blocs, horodatée, jugée par `oracle-restitution.mjs`).
 
 ## Ce qui ne s'applique PAS (et ne se singe pas)
 
