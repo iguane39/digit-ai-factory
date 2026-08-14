@@ -1010,3 +1010,34 @@ TF-0186 (WSTG curé), TF-0187 (oracle DAST/ZAP, lève D-W1), TF-0188 (corpus d'i
 TF-0189 (règle 33 + branchement ASVS aux étapes — valeur 9,0, la plus haute), TF-0190 (mapping
 ADR↔ASVS). Décisions réservées à l'humain et posées comme telles : ordre des campagnes,
 verdict websec **bloquant** ou non au gate MEP, gabarit d'autorisation offensive.
+
+## 14/08/2026 (soir) — « Traite tout » : lot BAV2 20260814a (RT-9…RT-13) intégralement soldé
+
+Lot déposé par le produit dans `input\00-retours\`, découvert parce qu'un `git add -A` l'avait
+happé dans le commit de l'étude OWASP (signalé à l'humain, rien de perdu). **Ingestion sous
+garde** : (1) l'ingesteur a **rejeté le sidecar en bloc** — rejet atomique, registre intact, 6
+motifs par ligne : le produit émet `{reference, gravite, preuve, proposition}` là où R10
+prescrit `{schema:1, contenu, demandeur, source, date_demande, forges_cibles_initiales}` ; le
+lot était aussi nommé sans préfixe projet. Normalisation faite côté pilot **sans toucher
+l'original reçu** (dérivé `.normalise.tf.jsonl`, l'original renommé au format R-4) ; la
+friction devient TF-0196 (candidat, deux voies à trancher). (2) **Garde anti-doublon exécutée**
+contre registre + archive : 3 correspondances instruites et levées — TF-0122 (route qui faisait
+TOMBER l'audit ≠ route jamais appariée), TF-0143 (qui déclarait l'adoption **hors** de son
+périmètre), TF-0185 (qui n'avait traité qu'un tiers de RT-12). **Les cinq soldés** :
+**RT-11** `front.motif_de_route()` templatise la route déclarée avant appariement (`:param` →
+un segment, `*` → le reste) — le faux négatif était garanti sur toute SPA ; **RT-9/RT-10**
+`output`, `old`, `Old`, `.oracles` sortent de l'inventaire du pan interface, qui auditait les
+dashboards produits par forge-tests elle-même (6 → 27 éléments sans qu'une ligne de gabarit
+change) ; **RT-12** vocabulaire (« Proposition (non adoptée) » pour un cas dérivé, « Non
+exercé » pour l'état d'élément — identifiants gelés, seule la couche d'affichage bouge) et
+**constat porteur** rattaché à la source (`surface._rattacher_porteurs`) : le 401 de l'écran
+s'affiche enfin sous le constat du formulaire qu'il explique ; **RT-13** module `adoption.py`
+— le projet déclare ses cas adoptés dans `forge/cas-adoptes.jsonl`, la déclaration est
+**vérifiée** (test introuvable → adoption refusée avec motif), et l'exhaustivité du cahier
+devient un solde qui descend. **Écart à la lettre déclaré** : RT-10 demandait l'exclusion pour
+« interface, securite, visuel » ; elle ne s'applique qu'à `interface` — exclure `output\` du
+scan de secrets créerait un angle mort (un secret commis dans un livrable est un vrai secret),
+et `visuel` ne parcourt aucun fichier. **Preuves** : 10 tests neufs (`tests/test_lot_bav2_
+20260814a.py`), pytest **164 verts**, livrable BAV2 `20260814f` régénéré, check_html PASS,
+capture d'état ouvert relue. RT-9 et RT-11 ne sont **pas re-mesurés sur BAV2** : l'inventaire
+se fait à l'audit, qui est un run du produit, pas une campagne de forge — dit, pas tu.
