@@ -53,7 +53,7 @@ jamais ici ; le run y vit (`forge\`, code à la racine). Séquence :
 3. **Design** — `systeme-de-marque` → tokens + `DESIGN.md` (+ maquette si UI), oracles ;
 4. **Development** — produit construit sous gates (source unique des disciplines :
    `docs\run-playbook.md` de forge-development — TF-0007) ;
-5. **Tests** — audit forge-tests + boucle de fermeture bornée (≤ 3 cycles, G-2 absolue) ;
+5. **Tests** — audit forge-tests + boucle de fermeture bornée (≤ 5 cycles, G-2 absolue) ;
    **5 bis** en parallèle : revue graphique d'implémentation (forge-design, mode aval) ;
 6. **MEP** — staging outillé par **forge-ops** (O-1…O-4), oracle M-1…M-5,
    `DOSSIER-MEP.md`, **GO humain** ;
