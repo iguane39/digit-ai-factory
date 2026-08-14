@@ -1041,3 +1041,15 @@ et `visuel` ne parcourt aucun fichier. **Preuves** : 10 tests neufs (`tests/test
 20260814a.py`), pytest **164 verts**, livrable BAV2 `20260814f` régénéré, check_html PASS,
 capture d'état ouvert relue. RT-9 et RT-11 ne sont **pas re-mesurés sur BAV2** : l'inventaire
 se fait à l'audit, qui est un run du produit, pas une campagne de forge — dit, pas tu.
+
+**Confirmations positives du lot** (elles paient des campagnes antérieures) : l'axe de
+dérivation des cahiers a fait trouver un défaut que ni la mutation, ni 56 tests e2e, ni trois
+audits n'avaient vu (`ErrorBoundary` monté sans enfants, donc garde-fou mort) — c'est
+l'argument le plus fort en faveur des cahiers dérivés ; les identifiants de cas sont
+**déterministes** (74 éléments communs entre deux audits, 0 identifiant changé), ce qui est
+exactement la condition qui rend RT-13 réalisable ; **§4 ter (TF-0173, décidé la veille) tient
+à l'usage** — guetteur armé, six émissions de 3 minutes arrivées à l'humain, `avancement.jsonl`
+concordant ; le pan `data` est passé de 1/36 à 35/36 en deux campagnes du produit. Deux
+constats en passant consignés en candidats, jamais corrigés d'office : **TF-0196** (schéma des
+sidecars produits) et **TF-0197** (le gabarit d'étude prescrit un nommage que la règle R-4
+refuse — 5 études sur 5 en FAIL, dont 4 antérieures : contradiction dormante, pas régression).
