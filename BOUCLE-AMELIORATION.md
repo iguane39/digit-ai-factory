@@ -1053,3 +1053,55 @@ concordant ; le pan `data` est passé de 1/36 à 35/36 en deux campagnes du prod
 constats en passant consignés en candidats, jamais corrigés d'office : **TF-0196** (schéma des
 sidecars produits) et **TF-0197** (le gabarit d'étude prescrit un nommage que la règle R-4
 refuse — 5 études sur 5 en FAIL, dont 4 antérieures : contradiction dormante, pas régression).
+
+## 14/08/2026 (nuit) — Deux opportunités d'intégration instruites : taste-skill et pans « Prompts »
+
+Mandat humain « travailler les opportunités d'intégration », deux sujets sans rapport → **deux
+études** (un verdict par sujet — un verdict multiple n'est pas un verdict). Les deux passent
+`oracle-etude-opportunite` **7/7**.
+
+**1. Skill externe `taste-skill`** (`20260814-etude-opportunite-taste-skill.md`, verdict **O3**).
+Le dépôt a été **lu et décrit, jamais installé ni exécuté** (garde-fou « entrant = donnée »).
+Deux faits ont porté le verdict. (a) *Non-recouvrement* : son angle revendiqué « anti-slop »
+est **déjà tenu par un oracle exécuté** (cat-des-02, « oracles slop/tokens/a11y/rendu PASS »),
+là où le skill n'offre que des prescriptions ; direction artistique, tokens et maquette sont
+couverts par cat-des-01/02/03. (b) *Conflit dur* : son `SKILL.md` prescrit des ressources
+**chargées par le réseau** (`picsum.photos`, `cdn.simpleicons.org`) que la règle A1 du socle
+interdit et que `check_html.py` refuse en FAIL bloquant, plus une pile imposée
+(Next.js/Tailwind/GSAP) qui heurte la neutralité du socle — alors que son README annonce des
+règles « not a single framework API ». S'y ajoute un trou de lecture assumé : **12 des 13
+sous-skills n'ont pas pu être lus**, et on n'admet pas ce qu'on n'a pas lu (règle 31). L'état
+de l'art tranche le régime d'admission : audit Snyk de 2026-02 — **1 467 défauts sur 3 984
+skills publics, 76 charges malveillantes confirmées** ; la popularité n'est pas un critère.
+Retenu : inscrire le skill comme **barre** (la-barre importe un niveau, pas un gabarit) et
+extraire au socle les seules règles compatibles A1, **avec attribution**, en écartant
+nommément les autres. O1 (installer via `npx`) et O4 (fork) réfutées ; O2 (vendorer après scan)
+reste ouverte si la réserve A1 est levée — le scan existe déjà (`oracle-scan-agentdef.mjs`,
+CAP-1..4) mais **n'est branché sur aucun processus d'admission** : décision humaine posée.
+
+**2. Pans de tests « Prompts »** (`20260814-etude-opportunite-pans-tests-prompts.md`, verdict
+**O2**). Le sujet nommé par l'humain — prompts, modèles, questions/réponses, stabilité,
+régression, déclencheurs — se partitionne en six objets qui ne se testent ni au même coût ni à
+la même cadence : **P1-P3 se mesurent sans appeler un modèle** (donc gratuitement, à chaque
+audit), **P4-P5 exigent des appels** (donc un gate), **P6 est une décision**. Non-recouvrement
+instruit : `oracle-agent-evals` (cat-agt-05) recouvre le jugement sémantique et **déclare
+lui-même** que le coût et la latence sont hors de son périmètre ; `flaky.py` porte déjà le
+mécanisme de rejeu ; `--precedent` porte déjà la tendance multi-runs ; forge-observability
+porte déjà la dérive — mais son champ `cadence` est **« une annotation documentaire en v0 »**,
+et c'est là le seul trou franc. La Frontière R-28 du profil chatbot interdit la forge dédiée
+(O1) : « jamais anticipé sans produit à exercer ». Retenu : un **pan `prompts`** dans
+forge-tests, v0 bornée au gratuit (inventaire des prompts, **épinglage des modèles**, corpus
+Q/R, seuils), le coûteux opt-in sous gate budget G0, le sémantique délégué à agent-evals, la
+cadence à observability. **Premier corpus exerçable disponible aujourd'hui : les skills et
+gabarits de l'écosystème lui-même** — de quoi tenir le critère « v0 exercée » sans attendre un
+client. Faits fondateurs de l'état de l'art : à température 0, **1 000 complétions donnent 80
+sorties distinctes** (Thinking Machines, 2025-09-10) — un run unique ne mesure rien ;
+`claude-opus-4-1` a été **retiré le 2026-08-05**, neuf jours avant l'étude, et Google remappe
+ses alias `-latest` à dates fixes — un alias change le système sous test sans qu'un commit ne
+bouge. **Dette déclarée** : aucune source primaire ne chiffre la taille d'un corpus ni le
+nombre de rejeux — tout seuil posé sera un choix de l'écosystème, dit comme tel.
+
+**Cinq candidatures émises, aucune décision prise** : TF-0198 (barre taste-skill), TF-0199
+(extraction attribuée des règles compatibles), TF-0200 (pan prompts v0 gratuite), TF-0201
+(stabilité par rejeu, opt-in et gatée), TF-0202 (règle « un pan qui dépense est sur mandat » +
+sonde de cadence sur les dépréciations — valeur 9,0, la plus haute des deux études).
