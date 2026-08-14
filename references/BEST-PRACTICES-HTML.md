@@ -168,26 +168,21 @@ joint **une capture par retour**, jamais un verdict textuel seul.
 
 ---
 
-## Delta proposé vers le skill `digit-ai-page-html` (candidat — non appliqué)
+## Delta vers le skill `digit-ai-page-html` — TOUS SOLDÉS (resync du 14/08)
 
-> Ne rien écrire dans le skill sans GO humain. Ci-dessous, ce qui mériterait d'y être versé.
+> Section historique : les six deltas candidats accumulés depuis le 10/08 sont versés au
+> skill, chacun vérifié sur pièce le 14/08. Aucun delta ouvert à ce jour — tout nouveau
+> delta s'ajoute ci-dessous en « candidat » daté.
 
-1. **`prefers-reduced-motion`** (E2) : ajouter au `boilerplate.html` et en 🟡 dans
-   bonnes-pratiques §5 — actuellement absent.
-2. **Composants réutilisables** (B2 KPI, B4 badges, B5 barres, B7 légende, B13 toolbar+compteur) :
-   candidats à une future page `references/composants.md` du skill, chacun charté + testé oracle.
-3. **`escapeHtml` (C1)** : déjà en §7, mais y ajouter le snippet S-C1 canonique.
-4. **Contre-exemples D2/D3/F4** : candidats à `references/anti-patterns.md` (hex en dur, pile de
-   police sans DM Sans, composant interactif sans a11y).
-5. **Pattern S-G1 (bascule sombre, R-30)** : versement vers `boilerplate.html` (le bouton
-   devient un composant du gabarit, plus une pièce rapportée) et mécanisation d'un contrôle
-   dans `check_html.py` (bouton `.theme-toggle` sans `data-theme` sur `:root` ni script de
-   câblage = FAIL — aujourd'hui vérifié seulement par lecture humaine + `render_page.py`
-   sur fixture figée, pas par une règle dédiée du script).
-6. **Standard H (listes : filtres + recherche + KPIs cliquables)** : mécaniser dans
-   `check_html.py` (règle L13 à fixtures double sens — page à liste ≥ 8 entrées sans
-   recherche ni KPI câblé = FAIL) et verser un composant `kpi-filter.js` charté à côté de
-   `table-filters.js`/`find-in-page.js`.
+1. ~~`prefers-reduced-motion` (E2)~~ **soldé** — présent au `boilerplate.html` (vérifié 14/08).
+2. ~~Composants réutilisables~~ **soldé** — `references/composants.md` existe (8 composants,
+   dont tableau repliable calibré RA-2 et KPI cliquables).
+3. ~~`escapeHtml` S-C1~~ **soldé** — snippet dans bonnes-pratiques §7 (vérifié 14/08).
+4. ~~Contre-exemples D2/D3/F4~~ **soldé** — `references/anti-patterns.md` les porte (vérifié 14/08).
+5. ~~Pattern S-G1~~ **soldé** — boilerplate l'embarque (clair STRICT depuis TF-0158) et
+   `check_html.py` tient le contrôle G1 (bascule morte = FAIL, fixtures g1-* double sens).
+6. ~~Standard H / L13 + `kpi-filter.js`~~ **soldé le 14/08** — règle L13 (recherche statique
+   dès 8 lignes = FAIL, KPI morts = avertissement) + composant `kpi-filter.js`, self-test 37/37.
 
 ---
 
