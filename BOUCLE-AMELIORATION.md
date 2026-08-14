@@ -1157,3 +1157,59 @@ TF-0205 (les citations « ASVS 5.0 » du corpus audit emploient la numérotation
 fichiers, réserve de méthode inscrite), TF-0206 (l'exécution réelle du DAST reste à prouver sur
 poste équipé), TF-0207 (5 catégories du LLM Top 10 non couvertes, dont une à portée gratuite).
 Registre : 13 archivés, **4 actifs**.
+
+## 14/08/2026 (soir) — Règle NA + trois lots de retours + les TODOs : 9 items clos
+
+**Règle humaine neuve** : « les pans qui n'ont pas de périmètre dans un projet doivent
+ressortir en **Non Applicable (NA)**, puisqu'il n'y a rien à tester ». Elle corrige une
+conséquence que j'avais signalée le matin même (un projet sans prompt sortait PARTIEL).
+Implémentée **sans casser la garde historique contre l'absence silencieuse** : NA exige une
+**preuve positive** d'absence fournie par l'adaptateur, jamais déduite d'un inventaire vide —
+un inventaire vide sans preuve reste un SKIP, parce qu'il prouve seulement que l'adaptateur
+n'a rien su énumérer. Les pans NA sortent du calcul de couverture mais restent **nommés** au
+rapport (`pans_sans_objet`). Preuves câblées pour front, batch, fichiers et interface.
+
+**Trois lots ingérés** — et le normaliseur TF-0196, écrit l'après-midi, a payé le jour même :
+trois conversions à la main évitées, aucun rejet. Garde anti-doublon exécutée, 6 correspondances
+levées comme faux positifs.
+
+**Les six retours, dont cinq soldés.** **RT-14** (bloquant) : le pan `data` fabriquait une
+contrainte fantôme `IF` à partir de `DROP CONSTRAINT IF EXISTS` — **l'idiome que le pan
+`migrations` exige** ; conflit interne à la forge, un projet ne pouvait satisfaire les deux. Le
+correctif a révélé **trois défauts pour un** : contrainte fantôme, index fantôme, et surtout
+`CREATE TABLE IF NOT EXISTS` qui n'entrait aucune table — le pan était aveugle, pas seulement
+menteur. Le même fantôme existait dans `migrations.py` : mesuré `['IF']` avant, `['ck_montant',
+'factures', 'ix_factures']` après. **RT-16** (bloquant) : garde de précondition sur `qualif`,
+qui produisait 13 findings sur le produit (39 % du rapport) en photographiant six fois l'écran
+de connexion qu'il n'avait pas franchi. Critère strict — une seule route saine écarte la garde,
+et une route dont on ne sait rien l'écarte aussi : **l'ignorance ne se convertit jamais en
+constat**. **RT-18** : canal de déclaration projet→auditeur, avec **contre-preuve obligatoire**
+et sans jamais supprimer le finding (il sort du décompte opposable et reste rendu, refus et
+péremptions compris — sinon le canal serait un bouton « faire taire »). Un seul mécanisme
+couvre RT-18, **RT-15** et renvoie à `adoption.py` pour RT-13. **RT-9-bis** : soldé par la
+règle NA — après l'exclusion des artefacts du matin, l'inventaire du pan `interface` tombait à
+0 sur une SPA et sortait « surface non énumérable » ; il accusait là où il n'y a rien.
+**RV-9** : la règle R-30 était déjà juste depuis TF-0158 — c'est le **pattern** qui la
+contredisait, snippet S-G1 et **fixture VERTE de l'oracle G1** suivant encore
+`prefers-color-scheme`. La preuve de conformité démontrait le comportement interdit.
+
+**Non fait, et dit** : **RT-17** (regrouper les findings par cause racine) reste `candidat`.
+RT-16 dissout son cas motivant — les 13 findings disparaissent à la source —, et le faire
+proprement touche la structure du rapport et les attentes de recette : c'est une campagne, pas
+une fin de session. **TF-0206** reste candidat : l'exécution réelle du DAST exige un poste
+équipé de ZAP.
+
+**Les TODOs** : CI de forge-audit remise au vert (fixtures alignées sur `dimensions.yaml`, le
+vérificateur non touché — c'est lui qui avait raison) ; **constat ASVS CONFIRMÉ à la source**
+(4.0.3 a 14 chapitres, 5.0.0 en a 17, et le corpus ne cite que V1..V14) avec document de
+correspondance livré et **correction de masse délibérément non faite** — trois classes
+distinctes, dont des citations fausses dans les *deux* versions ; LLM10 mesurée chez
+agents-security (TC-6/7/8), avec le bon pivot : *ce qui est dénoncé n'est pas le volume, c'est
+l'absence de borne*, et la borne déclarée est **vérifiée, jamais crue**.
+
+**Ma régression, attrapée par la recette** : j'avais inséré l'application des déclarations
+APRÈS le calcul du sceau — deux runs du même audit ne scellaient plus le même document, et le
+déterminisme des cahiers tombait. **S-01 NON TENU**, cause corrigée, S-01 repassé. Preuves :
+pytest **276**, recette **S-01 TENU** (banc rouge 19/19, banc vert 0 bloquant, 13 pans),
+self-tests rejoués au pilot (agents-security 48, audit 55/55 + 18 dimensions). Registre :
+9 archivés, **2 actifs**.

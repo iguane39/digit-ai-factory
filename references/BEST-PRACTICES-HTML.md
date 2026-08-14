@@ -238,7 +238,11 @@ au tout début de `<head>`, pour poser `data-theme` avant la première peinture 
 (2) les tokens sombres, ajoutés à la suite du bloc `:root` clair de la charte ; (3) le bouton,
 dans l'en-tête du document ; (4) le script de câblage, en fin de `<body>`.
 
-*1 — Initialisation (avant `<style>`, choix persisté sinon `prefers-color-scheme`).
+*1 — Initialisation (avant `<style>`) : **choix persisté du lecteur, sinon CLAIR — la
+préférence système n'est PAS suivie** (RV-9, 14/08). Le snippet suivait encore
+`prefers-color-scheme` alors que R-30 l'avait retiré le 13/08 : le pattern de référence
+contredisait sa propre règle, et deux livrables du même socle pouvaient s'ouvrir
+différemment sur le même poste.
 Volontairement sans `defer`/`async` : différer peindrait d'abord le thème par défaut
 du CSS puis re-peindrait en sombre — c'est justement le flash que ce script évite
 (avertissement générique « script bloquant en head » de `check_html.py` : exception
@@ -247,8 +251,10 @@ assumée ici, documentée dans les fixtures.)*
 <script>
 (function () {
   var stocke = localStorage.getItem('digitai-theme');
-  var theme = stocke || (window.matchMedia &&
-    window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  /* Clair TOUJOURS par défaut : `prefers-color-scheme` n'est PAS suivi (R-30 amendée
+     TF-0158, contradiction du pattern levée par RV-9 le 14/08). Le sombre est un choix
+     explicite du lecteur, persisté — jamais un héritage du poste. */
+  var theme = stocke === 'dark' ? 'dark' : 'light';
   document.documentElement.setAttribute('data-theme', theme);
 })();
 </script>
