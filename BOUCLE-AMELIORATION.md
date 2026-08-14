@@ -957,3 +957,31 @@ post-interaction, surface sous compte, webServer qui écrit dans l'arbre (tensio
 générateur Front/Batch/Fichiers, routes post-action. Régénération `python -m
 forge_tests.dette` : 61 assume · 27 retiree · 5 todo, statuts et notes préservés par id ;
 recette S-01 rejouée. Publication : **v1.10.0** sur les 14 forges.
+
+## 14/08/2026 (après-midi) — Dashboard v3 : retours humains sur BAV2 20260814a (TF-0185)
+
+Mandat direct (6 points + question boucle). **Écart déclaré d'entrée** : la boucle auto_ia
+est un mécanisme de RUN — la forge n'écrit jamais dans la suite du projet (G-1), c'est
+l'agent du run qui l'applique ; encodée en doctrine (noyau : boucle ≤ 5 cycles ; ETAPES-RUN
+§5 : extensible à 7 si chaque cycle réduit strictement le reste d'auto_ia — l'ancienne borne
+de 3 laissait des automatisables au rapport final), et le dashboard DIT désormais si elle a
+tourné et pourquoi il reste des auto_ia (sur BAV2 : 19, toutes en « Suite de tests »,
+mesure one-shot). **Livré dans forge-tests** : `surface.py` — un élément qu'un finding nomme
+passe en état KO (le « Non joué » porteur de constat du 14a était illisible) ;
+`libelles.py` neuf — libellés + OBJECTIFS du test dérivés de la forme, partagés
+dashboard/cahiers ; `cahiers.py` — cas contextualisés (gestes par balise : soumettre le
+formulaire ≠ activer le bouton ; attendu/préconditions nomment écran et élément ; constat
+d'audit rappelé au cas nominal) ; `actions.py` — textes structurés, l'action configuration
+reformulée (quoi → pourquoi → obtenu, champs en fin) ; 12 adaptateurs — 33 chaînes
+accentuées (agent, pytest 154 verts) ; `dashboard.py` — synthèse de famille en tête des
+onglets 2/3, chapitres repliables (details.pli + ouvrir/fermer tout, dépliés à
+l'impression), KPIs d'état cliquables par chapitre, colonne « objectif du test », constat
+qui explique le POURQUOI du non-joué, onglet Non joués outillé quel que soit le volume,
+actions « à vous » regroupées et structurées Quoi/Pourquoi/Vous obtiendrez, 4 règles de
+pré-génération neuves. **Preuves** : BAV2 `20260814b` régénéré — §2 bis PASS, check_html
+PASS, render_page PASS, 9 captures états ouverts RELUES (gate TF-0176) dont une itération
+attrapée en relecture (« Vos 8 actions » n'en montrait qu'une → regroupement annoncé
+« en 5 points », pour_couvrir des pans restitués) ; recette **S-01 TENU**. **Écart déclaré
+en sortie** : les messages du rapport BAV2 du matin restent sans accents (donnée mesurée
+avant correctif — le dashboard rend le rapport, il ne le réécrit pas) ; visibles corrigés
+au prochain audit. Registre : TF-0185 créé→corrigé→archivé, oracle PASS, 0 actif.
