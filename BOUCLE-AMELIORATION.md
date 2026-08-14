@@ -1105,3 +1105,55 @@ nombre de rejeux — tout seuil posé sera un choix de l'écosystème, dit comme
 (extraction attribuée des règles compatibles), TF-0200 (pan prompts v0 gratuite), TF-0201
 (stabilité par rejeu, opt-in et gatée), TF-0202 (règle « un pan qui dépense est sur mandat » +
 sonde de cadence sur les dépréciations — valeur 9,0, la plus haute des deux études).
+
+## 14/08/2026 (nuit) — « Fais la TODO » : 13 items clos, 5 forges touchées
+
+**Précision humaine décisive en ouverture** : « pour les triggers, il s'agirait d'un produit
+trigger, l'enclenchement de batch à implémenter et/ou tester ». J'avais lu « cadence de rejeu
+des évaluations » ; le sujet est l'**enclenchement des lots du produit**. TF-0202 requalifié,
+**TF-0203** créé et traité en premier.
+
+**TF-0203 — les déclencheurs entrent dans le pan `batch`.** Le pan mesurait l'intérieur du
+traitement en supposant qu'il démarre ; un déclencheur est une **affordance** au sens de la loi
+transverse n°1 — déclaré en configuration mais pointant vers une cible inexistante, il est
+l'équivalent serveur du bouton sans gestionnaire. Découverte statique (cron de CI, crontab,
+timer systemd, décorateurs de planification, tâches de file, `__main__`), trois constats
+(`trigger-non-cable`, `cron-invalide`, `job-sans-declencheur`), jugeables **sans exécuter la
+suite**. Choix déclaré : les déclencheurs ne comptent pas dans la surface du pan — les y mettre
+ferait tomber le taux pour une raison qui n'est pas un trou de test.
+
+**Règles neuves.** **R-33** (§M) sécurité offensive : branchement de l'ASVS aux étapes +
+exécution active **sur mandat**, exception explicite et motivée à la loi transverse n°5, six
+garde-fous. **R-34** (§N) : un pan qui **dépense** n'entre jamais dans la voie par défaut —
+corollaire opposable, *un audit lancé sans option ne coûte rien*. R-34 a mordu le jour même :
+le volet exécuté de TF-0201 a été écarté sur son fondement.
+
+**Livré ailleurs** : WSTG curé (28 cas rattachés à l'ASVS) et **oracle DAST à 7 verrous
+fail-closed** chez websec (self-test 23→36) ; **corpus d'injection** de 34 charges + mapping
+LLM Top 10 chez agents-security (24→38, dont deux *voisins légitimes* qui ne déclenchent pas) ;
+**barre** taste-skill inscrite en `statut: todo` (une barre ne s'auto-valide pas) et
+**oracle-taste** chez design (52→56 règles) ; **mapping ADR↔ASVS** chez audit (28
+rattachements, deux trous déclarés) ; **pan `prompts`** v0 gratuite chez tests (pytest
+176→210).
+
+**Trois choses qui font la valeur de cette campagne, et qui sont des échecs assumés.**
+(1) *TA1/TA2 rétrogradées après mesure* : codées d'abord en règles dures, elles se sont avérées
+mensongères sur les artefacts réels — la borne de saturation condamnait toute palette OKLCH du
+corpus, et la source amont **se contredit** (son propre accent recommandé viole sa règle). La
+mesure était exacte, l'interprétation ne l'était pas. (2) *Ma propre régression* : le premier
+commit TF-0203 livrait le contrôle sans doter les bancs, le banc vert sortait bloquant —
+attrapée en chemin et corrigée **à la cause**, jamais par assouplissement d'assertion.
+(3) *H-16* : le défaut de déclencheur était détecté par le pan mais déclaré dans aucune entrée
+du corpus de recette — un défaut détecté hors contrat n'est pas un défaut couvert.
+
+**Preuves** : recette **S-01 TENU**, banc rouge **19/19 défauts détectés**, banc vert 0
+bloquant, 0 pan non couvert · pytest **210** · self-tests rejoués AU PILOT et non crus sur
+parole (websec 36, agents-security 38, design 13 oracles/56 règles) · garde-fou DAST rejoué en
+direct (refus fail-closed, « rien n'a été émis ») · catalogue PASS, 4 services neufs.
+
+**Quatre constats en passant, consignés en candidats et jamais corrigés d'office** : TF-0204
+(une étape de CI de forge-audit est rouge sur `main` depuis le 12/08 — dérive de fixture),
+TF-0205 (les citations « ASVS 5.0 » du corpus audit emploient la numérotation 4.0.x — 44
+fichiers, réserve de méthode inscrite), TF-0206 (l'exécution réelle du DAST reste à prouver sur
+poste équipé), TF-0207 (5 catégories du LLM Top 10 non couvertes, dont une à portée gratuite).
+Registre : 13 archivés, **4 actifs**.
