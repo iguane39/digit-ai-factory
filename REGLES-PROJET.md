@@ -199,6 +199,17 @@ sombre devient obligatoire sur tout HTML autonome livré.
    — une exception non consignée par écrit n'existe pas ; un contrôle rendu
    SANS_OBJET porte toujours son motif ; aucune neutralisation silencieuse.
 
+**Amendement RV-9 (14/08, lot SCC_ALX)** — le retour signalait R-30 comme « incohérente ».
+Vérification faite : la RÈGLE était déjà juste depuis TF-0158 ; c'est le **pattern de
+référence** qui la contredisait — le snippet S-G1 que les implémenteurs copient, et **la
+fixture VERTE de l'oracle G1**, suivaient encore `prefers-color-scheme`. La preuve de
+conformité démontrait donc le comportement interdit, ce qui explique que « deux livrables du
+même socle puissent s'ouvrir différemment sur le même poste ». Les deux sont alignés. S'y
+ajoute `<meta name="color-scheme">` : figé à `light dark`, le navigateur peignait ses propres
+surfaces (ascenseurs, contrôles) en sombre sur un corps clair — il **suit** désormais le thème
+effectif, juste dans les deux états. Le retrait de la bascule, lui, n'est PAS demandé et n'a
+pas été fait : il contredirait le point 2.
+
 Surface d'application encodée : `references\BEST-PRACTICES-HTML.md` (pattern de
 référence HTML/CSS/JS + deux fixtures preuves, double sens). Mécanisme : S + pattern
 référencé depuis tout run produisant du HTML. **Contrôle exécutable : soldé** — la règle
