@@ -1,12 +1,13 @@
 ---
 profil: website
-version: 1.0.0
+version: 1.1.0
 challenge_date: 2026-08-12
 sources:
   - "WCAG 2.2 — W3C Recommandation ; échéance EAA (European Accessibility Act) passée le 28/06/2025"
   - "Core Web Vitals — web.dev / CrUX ; seuils LCP<2,5s / INP<200ms / CLS<0,1 au 75e percentile terrain"
   - "RGESN v2 — référentiel général d'écoconception de services numériques, 05/2024"
   - "étude d'opportunité forges — output\\03-etudes\\20260812-etude-opportunite-forges.md (12/08/2026), §2, 13 sources datées"
+  - "TF-0236 — qualité graphique par défaut : étude output\\03-etudes\\20260815-etude-opportunite-qualite-graphique.md (15/08/2026)"
 ---
 
 # Profil produit — website
@@ -24,6 +25,9 @@ officiels ; le reste est du savoir périssable capitalisé ici (loi transverse n
 | Core Web Vitals | LCP < 2,5 s · INP < 200 ms · CLS < 0,1, mesurés au 75e percentile CrUX (terrain) | PageSpeed Insights / Lighthouse |
 | RGESN v2 (05/2024) | grille d'écoconception (poids de page, requêtes, DOM) | EcoIndex (score A→G) |
 | SEO technique | indexabilité, balisage, Core Web Vitals terrain | Search Console (données réelles) + Lighthouse (audit ponctuel) |
+| Direction artistique dérivée (loi n° 6) | `tokens.css` + `DESIGN.md` motivés par l'expérience client visée (`systeme-de-marque`), dérivation consignée — jamais un template | revue 5 bis (`critique-le-design`) sur la consignation ; gate étape 3 d'`ETAPES-RUN.md` |
+| Généricité du rendu (loi n° 6) | zéro règle dure déclenchée — l'interface ne trahit pas un rendu par défaut | `oracle-taste.mjs` (forge-design, `cat-des-09`) |
+| Régression visuelle (loi n° 6) | baseline approuvée à l'étape 3, jugée à toute évolution et en 5 bis | `oracle-baseline.mjs` (forge-design, `cat-des-08`) |
 
 ## 2. Savoir périssable daté-sourcé
 

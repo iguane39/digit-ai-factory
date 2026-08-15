@@ -1,6 +1,6 @@
 ---
 profil: e-commerce
-version: 1.0.0
+version: 1.1.0
 challenge_date: 2026-08-12
 sources:
   - "PCI DSS v4.0.1 — publiée 11/06/2024 (révision limitée de v4.0, aucune exigence ajoutée/retirée)"
@@ -9,6 +9,7 @@ sources:
   - "schema.org Product — vocabulaire stable, validé par le Rich Results Test de Google"
   - "profil website — profils\\website.md (WCAG 2.2, Core Web Vitals, RGESN v2) — ce profil l'étend, ne le remplace pas"
   - "étude d'opportunité forges — output\\03-etudes\\20260812-etude-opportunite-forges.md (12/08/2026), §5"
+  - "TF-0236 — qualité graphique par défaut : étude output\\03-etudes\\20260815-etude-opportunite-qualite-graphique.md (15/08/2026)"
 ---
 
 # Profil produit — e-commerce
@@ -33,6 +34,9 @@ des données carte.
 | schema.org/Product | balisage structuré valide (nom, prix, disponibilité) | Rich Results Test (Google, gratuit) |
 | Consentement RGPD | bandeau de consentement avant tout traceur non essentiel, opt-in explicite | audit manuel (aucun oracle gratuit de conformité RGPD identifié — écart noté) |
 | CWV commerce | hérité du profil website : LCP < 2,5 s · INP < 200 ms · CLS < 0,1 (terrain, 75e percentile) — vigilance accrue sur les pages produit/panier, plus lourdes | PageSpeed Insights / Lighthouse |
+| Direction artistique dérivée (loi n° 6) | `tokens.css` + `DESIGN.md` motivés par l'expérience client visée (`systeme-de-marque`), dérivation consignée — jamais un template | revue 5 bis (`critique-le-design`) sur la consignation ; gate étape 3 d'`ETAPES-RUN.md` |
+| Généricité du rendu (loi n° 6) | zéro règle dure déclenchée — l'interface ne trahit pas un rendu par défaut | `oracle-taste.mjs` (forge-design, `cat-des-09`) |
+| Régression visuelle (loi n° 6) | baseline approuvée à l'étape 3, jugée à toute évolution et en 5 bis | `oracle-baseline.mjs` (forge-design, `cat-des-08`) |
 
 ## 2. Savoir périssable daté-sourcé
 

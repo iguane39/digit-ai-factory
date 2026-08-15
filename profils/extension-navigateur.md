@@ -1,12 +1,13 @@
 ---
 profil: extension-navigateur
-version: 1.0.0
+version: 1.1.0
 challenge_date: 2026-08-12
 sources:
   - "Chrome — Manifest V2 désactivé par défaut depuis Chrome 138 (07/2025) ; retrait définitif du Chrome Web Store le 31/08/2026"
   - "Chrome for Developers — calendrier de dépréciation Manifest V2 (drapeaux développeur fermés le 28/07/2026)"
   - "web-ext (Mozilla) — outil CLI officiel de lint/build/run des WebExtensions, dépendance addons-linter maintenue en 2026"
   - "étude d'opportunité forges — output\\03-etudes\\20260812-etude-opportunite-forges.md (12/08/2026), §5"
+  - "TF-0236 — qualité graphique par défaut : étude output\\03-etudes\\20260815-etude-opportunite-qualite-graphique.md (15/08/2026)"
 ---
 
 # Profil produit — extension-navigateur
@@ -30,6 +31,9 @@ finale par le store.
 | CSP de l'extension | pas de code distant (`remote code` interdit en MV3), CSP restrictive déclarée dans le manifeste | `web-ext lint` + revue du champ `content_security_policy` |
 | Service workers | non persistants (remplacent les background pages de MV2), pas d'état supposé permanent en mémoire | revue de code + `web-ext lint` (détecte les patterns MV2 résiduels) |
 | Réseau | `declarativeNetRequest` à la place du `webRequest` bloquant (retiré en MV3) | revue de code (aucun oracle automatique de détection d'usage résiduel identifié — écart noté) |
+| Direction artistique dérivée (loi n° 6) | `tokens.css` + `DESIGN.md` motivés par l'expérience client visée (`systeme-de-marque`), dérivation consignée — jamais un template | revue 5 bis (`critique-le-design`) sur la consignation ; gate étape 3 d'`ETAPES-RUN.md` |
+| Généricité du rendu (loi n° 6) | zéro règle dure déclenchée — l'interface ne trahit pas un rendu par défaut | `oracle-taste.mjs` (forge-design, `cat-des-09`) |
+| Régression visuelle (loi n° 6) | baseline approuvée à l'étape 3, jugée à toute évolution et en 5 bis | `oracle-baseline.mjs` (forge-design, `cat-des-08`) |
 
 ## 2. Savoir périssable daté-sourcé
 
