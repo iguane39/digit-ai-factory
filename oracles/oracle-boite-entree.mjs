@@ -94,7 +94,25 @@ function ingestions(registre) {
   return { parSha: parShaSet, parNom };
 }
 
-function juger(repertoire, registre) {
+// Les dépôts d'insatisfaction déjà entrés au registre du circuit (TF-0287), par nom de
+// fichier ET par dossier — le registre porte l'un ou l'autre selon la voie de dépôt.
+function depotsInsatisfaction(registreIns) {
+  const vus = new Set();
+  if (!existsSync(registreIns)) return vus;
+  for (const ligne of readFileSync(registreIns, "utf8").split("\n")) {
+    if (!ligne.trim()) continue;
+    let e; try { e = JSON.parse(ligne); } catch { continue; }
+    if (e.ev !== "depot") continue;
+    for (const champ of [e.dossier, e.fichier]) {
+      if (champ) vus.add(String(champ).split(/[\\/]/).filter(Boolean).pop());
+    }
+  }
+  return vus;
+}
+
+const PREFIXE_INS = "INSATISFACTION - ";
+
+function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfactions", "REGISTRE.jsonl")) {
   const findings = [];
   if (!existsSync(repertoire)) {
     return { verdict: "SKIP", findings, motif: `répertoire absent : ${repertoire}` };
@@ -126,10 +144,25 @@ function juger(repertoire, registre) {
   }
 
   for (const nom of fichiers.filter((f) => f.endsWith(".md"))) {
+    // Un dépôt d'insatisfaction n'a PAS de sidecar, et c'est voulu (TF-0287) : l'humain
+    // dépose une phrase et des captures, l'instruction produira le reste. B3 le
+    // réclamerait à tort — le circuit naîtrait avec son propre faux positif, la maladie
+    // même que l'étude 20260815e documente. B4 prend le relais ci-dessous.
+    if (nom.startsWith(PREFIXE_INS)) continue;
     const base = nom.slice(0, -3);
     if (sidecars.some((s) => s.startsWith(base))) continue;
     findings.push({ regle: "B3", statut: "FAIL", ou: nom,
       message: "lot remis SANS sidecar — aucun canal ne peut l'ingérer, il est invisible par construction (`node todo\\normaliser-lot.mjs` ou sidecar à réclamer au produit)" });
+  }
+
+  // B4 (TF-0287) — un dépôt d'insatisfaction qui n'est pas entré au registre du circuit
+  // n'est vu par personne : même maladie que B1, autre canal. Ce qui est exigé n'est pas
+  // un sidecar, c'est un identifiant INS et une instruction à venir.
+  const deposes = depotsInsatisfaction(registreIns);
+  for (const nom of fichiers.filter((f) => f.startsWith(PREFIXE_INS) && f.endsWith(".md"))) {
+    if (deposes.has(nom) || deposes.has(nom.slice(0, -3))) continue;
+    findings.push({ regle: "B4", statut: "FAIL", ou: nom,
+      message: "insatisfaction déposée JAMAIS entrée au registre — elle n'a ni identifiant INS, ni instruction, et un « toujours pas » ne pourra se rattacher à rien (`insatisfactions\\REGISTRE.jsonl`, événement depot)" });
   }
 
   const vues = new Set(findings.map((f) => f.regle));
@@ -218,6 +251,26 @@ function selfTest() {
   writeFileSync(legacy, legacyContenu + '{"titre":"ajoute"}\r\n');
   r = juger(boite, reg);
   cas.push(["HÉRIT — rouge : édition réelle d'un lot hérité détectée", r.findings.some((f) => f.regle === "B2" && f.statut === "FAIL" && f.ou === "LEGACY - RETOURS - 20260101a.tf.jsonl"), r.verdict]);
+
+  // B4 (TF-0287) : un dépôt d'insatisfaction n'a pas de sidecar — B3 doit se taire, B4
+  // doit exiger l'entrée au registre du circuit. Les deux sens sont prouvés ici.
+  const regIns = join(base, "REGISTRE-INS.jsonl");
+  const depotIns = join(boite, "INSATISFACTION - site - 20260101a.md");
+  writeFileSync(depotIns, "le menu est compresse\n");
+  writeFileSync(regIns, "");
+  r = juger(boite, reg, regIns);
+  const surIns = (f) => f.ou === "INSATISFACTION - site - 20260101a.md";
+  cas.push(["B4    — insatisfaction déposée, jamais au registre",
+    r.findings.some((f) => f.regle === "B4" && f.statut === "FAIL" && surIns(f)), r.verdict]);
+  cas.push(["B4 bis— B3 se TAIT sur un dépôt d'insatisfaction (pas de sidecar : c'est voulu)",
+    !r.findings.some((f) => f.regle === "B3" && surIns(f)), r.verdict]);
+  writeFileSync(regIns, JSON.stringify({
+    ev: "depot", ts: "2026-01-01T10:00:00Z", id: "INS-0001", produit: "site",
+    fichier: "INSATISFACTION - site - 20260101a.md", resume: "le menu est compresse",
+  }) + "\n");
+  r = juger(boite, reg, regIns);
+  cas.push(["B4    — vert : dépôt entré au registre, plus rien à dire",
+    !r.findings.some((f) => f.statut === "FAIL" && surIns(f)), r.verdict]);
 
   let ok = 0;
   for (const [nom, tenu, verdict] of cas) {

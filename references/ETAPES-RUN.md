@@ -176,8 +176,17 @@ internes sont mesurés — le constat de frontière est porté au rapport et au 
 `<racine>\digit-ai-forge-tests`, stdout capturé et persisté dans
 `etapes\tests\rapport-forge-tests.json`. Exit 0 = PASS, 3 = PARTIEL acceptable (consigner les
 pans non couverts), 1 = FAIL → boucle de fermeture. Ajouter `--livrables
-etapes\tests\livrables\` : cahiers de tests (fonctionnel, technique) + jeux de données
-synthétiques + dashboard HTML — copiés datés dans `output\` (règle 16).
+<dossier HORS du projet audité>` — par exemple
+`<racine>\digit-ai-forge-tests\output\<projet>-livrables\` : cahiers de tests
+(fonctionnel, technique) + jeux de données synthétiques + dashboard HTML, **puis copiés
+datés dans `output\` du produit** (règle 16), ce qui est un geste explicite et non un
+effet de bord de l'audit.
+
+**Corrigé le 15/08 (TF-0271)** : cette ligne prescrivait `etapes\tests\livrables\`, chemin
+qui — résolu depuis la racine produit — tombe DANS le projet audité. La garde **G-1** le
+refuse (l'auditeur n'écrit pas chez l'audité) et le refuse désormais **bruyamment**
+(message terminal + code de sortie 4, distinct des erreurs de génération). La prescription
+fabriquait donc le refus à chaque run qui la suivait — deux exécutions perdues le 15/08.
 
 **Boucle de fermeture bornée** : chaque item `actions[]` du rapport porte son `etape_cible` ;
 router les `auto_ia` — `development` (code, câblage), `tests-suite` (cas générés à adopter,
