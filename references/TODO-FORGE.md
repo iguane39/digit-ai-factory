@@ -51,3 +51,30 @@ cases à décider + commentaires, export appliqué par `appliquer-export.mjs`). 
 
 Consulter le registre à l'ouverture de tout run. `BOUCLE-AMELIORATION.md` reste le journal
 narratif : il référence les ids TF, il ne duplique plus les listes.
+
+## Insatisfactions — l'autre registre, et pourquoi il est séparé (TF-0287, 15/08)
+
+Une **insatisfaction** n'est pas une amélioration : elle se **rouvre** (« ça ne va
+toujours pas »), elle porte un délai dépôt→release, et son instruction est un dossier à
+six blocs. Ce cycle de vie n'entre pas dans TF (candidat → décidé → corrigé → archivé) :
+forcer l'un dans l'autre aurait déformé les deux (étude 20260815d, option O3 écartée).
+
+- **Dépôt** : l'humain écrit UNE phrase et dépose ses captures — `gabarits\INSATISFACTION.md`,
+  nommé `INSATISFACTION - <produit|a-identifier> - AAAAMMJJ<lettre>.md`, dans le canal des
+  lots (`<produit>\forge\retours\` ou `<pilot>\input\00-retours\`). **Aucun sidecar exigé
+  de lui** : c'est l'instruction qui le produira. Il n'écrit **jamais** le protocole.
+- **Registre** : `insatisfactions\REGISTRE.jsonl` (écrivain unique : toi) — événements
+  `depot` · `reouverture` · `instruction` · `cloture` ; vue `REGISTRE.md` générée.
+- **Instruction** : `gabarits\AGENT-INSATISFACTION.md` (= AGENT-CAMPAGNE + les six blocs :
+  reproduction aux conditions réelles · cause racine produit · **gates en défaut vérifiés,
+  jamais présumés** (inexistant / aveugle / jamais joué — R-35) · solutions par
+  destinataire · correctif et release par la voie du produit sous décision humaine ·
+  retours forge en lot standard).
+- **Contrôles** : `oracle-insatisfactions.mjs` (I1-I4 — il **publie aussi la mesure** :
+  réouvertures et délai) et `oracle-boite-entree.mjs` **B4** (un dépôt jamais entré au
+  registre est dénoncé ; B3 se tait sur ces fichiers, l'absence de sidecar y est voulue).
+- **La mesure** : réouvertures par dossier, **cible zéro**. Un compteur qui monte accuse
+  l'instruction, pas les forges.
+
+Les constats d'une instruction reviennent au registre TF par la voie normale (candidats,
+décision humaine) : les deux registres se parlent, ils ne se confondent pas.

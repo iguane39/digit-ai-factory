@@ -401,6 +401,42 @@ en revue aval, la dimension D8 de `critique-le-design` (étape 5 bis). Producteu
 migrés à la naissance de la règle : forge-seo (e80e078). Les autres forges productrices
 migrent par campagnes mandatées (P4), chacune journalisée.
 
+## Q. Toucher une UI engage les verdicts de la forge, run ou pas (règle 37 — 15/08, TF-0285)
+
+Le cas fondateur, mesuré le 15/08 : sur `produit-07` — produit **legacy**, jamais né sous
+la doctrine — une session ad hoc ajoute une pastille de langue au header. Contrôles joués :
+un crawl HTTP (401 routes en 200) et des greps de présence de liens. Résultat en
+production : **le menu français compressé**, chevauchant le logo. Les contrôles n'étaient
+pas absents ; ils testaient la **modification**, jamais l'**expérience**.
+
+Pourquoi le trou existait : le routage forge d'un produit vit dans son `CLAUDE.md`, posé
+**à sa naissance sous la doctrine** (`ETAPES-RUN.md` §1 : « la section "Routage forge" est
+obligatoire et remplie : c'est elle qui garantit que les sessions ad hoc dans le produit
+passent par les forges pour tout verdict »). Un legacy n'a jamais reçu ce fichier : le gate
+n'a pas été retiré, **il n'a jamais été posé**.
+
+**R-37.** Toute session qui modifie l'**interface** d'un produit — forgé ou non, dans un run
+ou hors run — rejoue avant de livrer, au minimum :
+1. le **rendu en pixels** des pages touchées, avant ET après (débordements, chevauchements,
+   retours à la ligne nouveaux) — le rendu se juge en pixels, pas en présence de liens ;
+2. si le produit sert plusieurs langues, le **verdict de parité** (routes, navigation,
+   langue du contenu) sur les pages touchées ;
+3. et, **au premier contact** avec un produit legacy, le rattrapage de la seule section
+   « Routage forge » de son `CLAUDE.md` (pas le socle entier — c'est l'appelant durable qui
+   manquait, il se pose une fois et sert ensuite toutes les sessions).
+
+**Appelant (R-35)** : la règle est portée par le pilot (ici) et **rendue tenable par un
+geste court** — le CLI de rendu comparatif de forge-design (TF-0286, `cat-des-*`) : une
+commande, avant/après, verdict machine. Une règle de vérification visuelle qui coûte plus
+qu'une commande n'est pas tenue hors run — c'est le constat du 15/08, pas une prédiction.
+Côté détection, R-37 s'appuie sur les pans interface (composants React inclus, TF-0283) et
+i18n (TF-0284) de forge-tests.
+
+**Écart** : possible et explicite (une modification qui ne touche aucun rendu se déclare
+telle), jamais par omission — loi transverse n° 3. `organization` peut porter cette règle
+à son catalogue de conventions ; sa force opposable vit ici (« organization organise, pilot
+pilote »).
+
 ## Conflits à trancher (ta décision explicite)
 
 - **C1 — `old\` vs git (n° 6/7)** : **TRANCHÉ le 13/08 (TF-0150)** — `old\` (minuscule,
