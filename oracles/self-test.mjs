@@ -201,6 +201,78 @@ check("rouge-docs : R-20..R-24 + R-26 se déclenchent, localisantes", () => {
   for (const f of rapport.findings) if (!f.ou || !f.message) throw new Error(`finding ${f.regle} sans localisation`);
 });
 
+// ---- fixture ROUGE-R24 (TF-0267) : le cas réel du 15/08 — l'URL de la ligne QUALIF portait
+// un suffixe `-recette-production` (doublon d'environnement) et l'oracle rendait PASS, parce
+// qu'il ne jugeait que la PRÉSENCE d'un suffixe connu, jamais son accord avec la ligne.
+// Aggravant : le run avait documenté l'écart EN PROSE au lieu de corriger, sans aucun signal.
+// Les trois cas sont plantés ensemble : doublon, suffixe discordant, prose d'écart. ----------
+const rougeR24 = mkdtempSync(join(tmpdir(), "conf-rouge-r24-"));
+mkdirSync(join(rougeR24, "docs", "projet"), { recursive: true });
+writeFileSync(join(rougeR24, "docs", "projet", "PARAMETRAGE.md"),
+  '---\nrole: parametrage\nsources_de_verite: [.env.example]\nverifie_le: 2026-08-15\nvariables:\n  - PORT\n---\n# Paramétrage\n\n' +
+  '## URLs & ports par environnement\n\n' +
+  '| Environnement | Front | Notes |\n|---|---|---|\n' +
+  '| qualif | https://brasserie-du-lac-recette-production.up.railway.app | doublon service+environnement |\n' +
+  '| production | https://brasserie-du-lac-qualif.up.railway.app | suffixe discordant avec sa ligne |\n\n' +
+  "> Note : écart connu sur la convention de nommage R-24, à renommer plus tard.\n");
+
+check("rouge-R24 : doublon + suffixe discordant + écart en prose → 3 constats R-24", () => {
+  const { exit, rapport } = lance(rougeR24);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const r24 = rapport.findings.filter((f) => f.regle === "R-24" && f.statut === "FAIL");
+  if (r24.length !== 3) throw new Error(`R-24 : 3 constats attendus (doublon, discordance, prose), ${r24.length} obtenu(s) : ${JSON.stringify(r24.map((f) => f.message))}`);
+  if (!r24.some((f) => /doublon d'environnement/.test(f.message))) throw new Error("le doublon -recette-production n'est pas constaté — c'est le défaut parti en livraison le 15/08");
+  if (!r24.some((f) => /suffixe discordant/.test(f.message))) throw new Error("le suffixe -qualif sur la ligne production n'est pas constaté");
+  if (!r24.some((f) => /EN PROSE/.test(f.message))) throw new Error("l'écart documenté en prose ne signale rien — c'est l'aggravant du 15/08");
+});
+
+// ---- fixture VERTE-R24 (TF-0267) : l'écart s'accepte, mais UNIQUEMENT en champ structuré —
+// et le doublon, lui, reste un défaut même déclaré : un hôte qui porte deux environnements se
+// contredit, aucune décision ne le rend cohérent. -------------------------------------------
+const ecartR24 = mkdtempSync(join(tmpdir(), "conf-ecart-r24-"));
+mkdirSync(join(ecartR24, "docs", "projet"), { recursive: true });
+const paramEcart = (lignes) =>
+  '---\nrole: parametrage\nsources_de_verite: [.env.example]\nverifie_le: 2026-08-15\nvariables:\n  - PORT\n' +
+  'ecarts_r24:\n  - url: https://ancienhote-legacy.up.railway.app\n    environnement: qualif\n' +
+  '    motif: domaine créé avant la convention, renommage planifié au prochain run de version\n' +
+  '    decide_le: 2026-08-15\n  - url: https://brasserie-du-lac-recette-production.up.railway.app\n' +
+  '    environnement: qualif\n    motif: tentative d\'excuser un doublon — ne doit JAMAIS être acceptée\n' +
+  '    decide_le: 2026-08-15\n---\n# Paramétrage\n\n## URLs & ports par environnement\n\n' +
+  '| Environnement | Front | Notes |\n|---|---|---|\n' + lignes;
+
+writeFileSync(join(ecartR24, "docs", "projet", "PARAMETRAGE.md"),
+  paramEcart('| qualif | https://ancienhote-legacy.up.railway.app | écart déclaré en frontmatter |\n' +
+             '| production | https://demoapp-production.up.railway.app | conforme |\n'));
+check("écart-R24 : écart déclaré en champ structuré → plus de FAIL sur cette URL", () => {
+  const { rapport } = lance(ecartR24);
+  const r24 = rapport.findings.filter((f) => f.regle === "R-24" && f.statut === "FAIL");
+  if (r24.length) throw new Error(`écart structuré non pris en compte : ${JSON.stringify(r24.map((f) => f.message))}`);
+  const pass24 = rapport.findings.find((f) => f.regle === "R-24" && f.statut === "PASS");
+  if (!pass24 || !/écart\(s\) déclaré\(s\) en champ structuré/.test(pass24.message)) throw new Error("l'écart accepté n'est pas dit au verdict — une exemption muette est indistinguable d'une absence de règle");
+});
+
+writeFileSync(join(ecartR24, "docs", "projet", "PARAMETRAGE.md"),
+  paramEcart('| qualif | https://brasserie-du-lac-recette-production.up.railway.app | doublon pourtant déclaré |\n'));
+check("écart-R24 : un DOUBLON déclaré en champ structuré reste un défaut", () => {
+  const { exit, rapport } = lance(ecartR24);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1 — un doublon n'est jamais excusable`);
+  const r24 = rapport.findings.filter((f) => f.regle === "R-24" && f.statut === "FAIL");
+  if (!r24.some((f) => /doublon d'environnement/.test(f.message))) throw new Error("le doublon a été excusé par un écart déclaré — il ne doit jamais l'être");
+});
+
+// Un écart INCOMPLET (motif ou date manquants) n'est pas un écart : la déclaration doit être
+// opposable, pas décorative.
+writeFileSync(join(ecartR24, "docs", "projet", "PARAMETRAGE.md"),
+  '---\nrole: parametrage\nsources_de_verite: [.env.example]\nverifie_le: 2026-08-15\nvariables:\n  - PORT\n' +
+  'ecarts_r24:\n  - url: https://ancienhote-legacy.up.railway.app\n    environnement: qualif\n---\n' +
+  '# Paramétrage\n\n## URLs & ports par environnement\n\n| Environnement | Front | Notes |\n|---|---|---|\n' +
+  '| qualif | https://ancienhote-legacy.up.railway.app | écart déclaré sans motif ni date |\n');
+check("écart-R24 : un écart sans motif ni date n'excuse rien", () => {
+  const { exit, rapport } = lance(ecartR24);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1 — un écart incomplet n'est pas un écart`);
+  if (!rapport.findings.some((f) => f.regle === "R-24" && f.statut === "FAIL")) throw new Error("l'écart incomplet a été accepté");
+});
+
 // ---- fixture ROUGE-LOCK (TF-0128) : reproduit le cas réel BAV2 — des versions SONT
 // déclarées dans TECHNOS.md mais aucune source ne les confronte : ni dans les 2 niveaux de
 // descente autorisés (un décoy à 3 niveaux, hors périmètre, ne compte pas), ni dans un
@@ -224,6 +296,6 @@ check("rouge-lock : versions déclarées sans source atteignable → FAIL R-21, 
   if (!r21[0].ou || !r21[0].message) throw new Error("R-21 sans localisation ou message");
 });
 
-for (const d of [verte, rouge, rougeDocs, rougeLock]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+for (const d of [verte, rouge, rougeDocs, rougeLock, rougeR24, ecartR24]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 console.log(`\nSelf-test conformité projet : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
