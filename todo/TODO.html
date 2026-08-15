@@ -138,7 +138,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>f58a33311af3</code> · dernier événement 2026-08-15T15:12:23Z</p>
+      <p class="meta">sceau <code>014e3de28e25</code> · dernier événement 2026-08-15T15:13:46.130Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -148,7 +148,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="1 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">1</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="8 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">8</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="251 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">251</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -164,26 +164,174 @@
       <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
       
       <div class="dropdown" data-dim="forge">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">1</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">5</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
+          <label><input type="checkbox" value="digit-ai-forge-conception" checked> digit-ai-forge-conception</label>
+          <label><input type="checkbox" value="digit-ai-forge-ops" checked> digit-ai-forge-ops</label>
+          <label><input type="checkbox" value="digit-ai-forge-pilot" checked> digit-ai-forge-pilot</label>
+          <label><input type="checkbox" value="digit-ai-forge-tests" checked> digit-ai-forge-tests</label>
           <label><input type="checkbox" value="pilot" checked> pilot</label>
         </div>
       </div>
       
       <div class="dropdown" data-dim="prio">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">1</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">2</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-prio" role="group" aria-label="Filtre Priorité" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
           <label><input type="checkbox" value="haute" checked> Haute</label>
+          <label><input type="checkbox" value="moyenne" checked> Moyenne</label>
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">1 / 1 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">8 / 8 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#pilot"><strong>pilot</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-pilot"><strong>digit-ai-forge-pilot</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
     <main>
+    <section id="digit-ai-forge-conception">
+      <h2>digit-ai-forge-conception <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-conception">1</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-conception</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0255" data-forge="digit-ai-forge-conception" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0255</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">run-oracles-conception : NON_JUGE quand l artefact d entree d un sous-oracle n existe pas</h3>
+          <div class="card-detail"><p class="lead">Apres le seul verbe redige-les-exigences, constitution/delta/etat echouent structurellement (CONSTITUTION.md/DELTA.json/ETAT.json absents) et l agrege sort exit 1 alors que les 5 oracles applicables sont PASS.</p><ul class="puces"><li>Le contrat du runner declare pourtant des NON_JUGE</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-15</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>verdict agrege inutilisable en l etat : l orchestrateur a du rejouer les 5 oracles un a un pour prononcer l etape</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">BdL</dd></div>
+            
+          </dl>
+        </article>
+      </div>
+    </section>
+    <section id="digit-ai-forge-ops">
+      <h2>digit-ai-forge-ops <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-ops">1</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-ops</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0258" data-forge="digit-ai-forge-ops" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0258</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">fiche expert-ops-railway : 4 pieges du premier deploiement reel (D-P1 railway soldee)</h3>
+          <div class="card-detail"><p class="lead">(a) startCommand execute SANS shell : $PORT litteral -&gt; crash-loop ; port en dur ou CMD d image.</p><ul class="puces"><li>edge public ET healthcheck parlent IPv4 au conteneur : uvicorn --host :: (v6-only) = connection refused ; bind 0.0.0.0</li><li>volume monte root : image non-root doit poser RAILWAY_RUN_UID=0 ou aligner l UID</li><li>le CLI ne montre pas les logs runtime d un deploiement echoue ; l API GraphQL deploymentLogs/httpLogs (upstreamErrors) oui. A verser a experts-forge/fiches/expert-ops-railway.md et au plan O-5 de forge-ops</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-15</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-ops</dt><dd>8 tentatives de deploiement (succes a la 8e), 2 mandats humains intermedaires, ~1h30 de diagnostic dont l essentiel evitable avec ces 4 faits en fiche</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">BdL</dd></div>
+            
+          </dl>
+        </article>
+      </div>
+    </section>
+    <section id="digit-ai-forge-pilot">
+      <h2>digit-ai-forge-pilot <span class="badge" title="2 item(s) actifs ciblant digit-ai-forge-pilot">2</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-pilot</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0253" data-forge="digit-ai-forge-pilot" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0253</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">oracle-boite-entree : normaliser les fins de ligne avant hachage (faux positifs CRLF apres checkout git)</h3>
+          <div class="card-detail"><p class="lead">La migration git de la boite pilot-&gt;steering a converti LF-&gt;CRLF : 12 findings B1/B2 FAIL pour zero edition reelle.</p><ul class="puces"><li>Preuve : sha256 apres normalisation LF == sha du registre, verifie sidecar par sidecar</li><li>Proposer : normalisation LF dans empreinte(), ou .gitattributes input/** text eol=lf au depot porteur de la boite</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-15</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-pilot</dt><dd>ouverture de run suspendue R-35, 12 faux findings, ~30 min de diagnostic et remediation manuelle sha-verifiee</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">BdL</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0254" data-forge="digit-ai-forge-pilot" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0254</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">oracle-skills : option --appliquer --purger (orphelins de la copie installee)</h3>
+          <div class="card-detail"><p class="lead">--appliquer copie source-&gt;copie mais laisse les fichiers en trop (sauvegardes .avant-*, lockfiles generes, fixtures locales) : K2 reste FAIL apres application.</p><ul class="puces"><li>11 orphelins sur 3 skills constates</li><li>Proposer --purger avec deplacement en quarantaine, jamais de suppression seche</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-15</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-pilot</dt><dd>2 passages d oracle supplementaires et un nettoyage manuel en pleine ouverture de run</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">BdL</dd></div>
+            
+          </dl>
+        </article>
+      </div>
+    </section>
+    <section id="digit-ai-forge-tests">
+      <h2>digit-ai-forge-tests <span class="badge" title="3 item(s) actifs ciblant digit-ai-forge-tests">3</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-tests</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0256" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0256</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : adaptateurs migrations/data aveugles sur disposition racine plate</h3>
+          <div class="card-detail"><p class="lead">adaptateurs/{migrations,data}.py cherchent &lt;cible&gt;/backend/migrations en dur alors que disposition.py (TF-0216) sait decouvrir la racine plate.</p><ul class="puces"><li>Sur un produit a migrations/ racine, les pans data/migrations ne voient pas les .sql : 37 tests de violation de contraintes reels existaient sans etre credites par le pan</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-15</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>2 pans non mesures sur les 5 audits du run malgre une surface data reelle (10 tables, contraintes nommees, migrations Up/Down testees)</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">BdL</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0257" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0257</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : pan prompts en Larsen — exclure forge/ et les rapports de l auditeur de l inventaire</h3>
+          <div class="card-detail"><p class="lead">Etage 1 : l inventaire prompts scanne forge/ (ledger, contestations) et compte l alias de l orchestrateur comme modele du produit.</p><ul class="puces"><li>Etage 2 : les rapports d audit persistes (rapport-*.json, exiges par ETAPES-RUN) sont re-inventories au run suivant — l audit ne converge jamais sans contestation. 4 alias fantomes, 5 contestations necessaires sur un produit strictement sans LLM</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-15</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>3 cycles de boucle consommes par le seul pan prompts, generation des livrables bloquee par un finding critique fantome</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">BdL</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0259" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0259</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : message terminal explicite au refus G-1 de --livrables</h3>
+          <div class="card-detail"><p class="lead">Un --livrables pointe dans le projet audite est refuse (G-1, voulu) en exit 2 mais sans motif lisible en queue de sortie.</p><ul class="puces"><li>Proposer un message terminal « G-1 : livrables HORS projet requis » et un exit code distinct des erreurs de generation</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-15</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 1 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>2 executions completes d audit perdues (~5 min) avant diagnostic</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">BdL</dd></div>
+            
+          </dl>
+        </article>
+      </div>
+    </section>
     <section id="pilot">
       <h2>pilot <span class="badge" title="1 item(s) actifs ciblant pilot">1</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
