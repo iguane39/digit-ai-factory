@@ -108,3 +108,20 @@ elle s'écrit EN FICHIER (`output\04-plans\` ou dossier de campagne), passe
 verdict — jamais un message improvisé. Côté agent : ton rapport final porte au minimum
 l'en-tête horodaté, le verdict factuel en une ligne, le traité AVEC preuves, le non-traité
 AVEC motifs, et les écarts à la lettre (forme dégradée admise, structure jamais).
+## Avancement des campagnes longues (TF-0252 — convention TF-0094)
+
+Tout agent dont la campagne peut dépasser ~2 minutes ÉMET son avancement vers la
+session principale (outil SendMessage, destinataire « main ») :
+
+- **quand** : au démarrage (plan des chantiers + durée prévue), à chaque frontière de
+  chantier, et dès que ~3 minutes se sont écoulées depuis la dernière émission —
+  l'horloge se RELÈVE (une commande date entre deux outils), jamais devinée ;
+- **quoi** : la forme dégradée d'`AVANCEMENT-PROCESS.md` — heure de démarrage · heure
+  d'émission · réalisé (chantiers finis, avec leur preuve) · en cours (chantier + une
+  sous-unité mesurable : fichier, cas de test, compteur) · RAF nommé · fin prévue,
+  glissement dit ;
+- **sous-découpe** : une unité qui occupe plus d'une fenêtre se découpe en sous-unités
+  nommées — deux émissions identiques sont indistinguables d'un blocage ;
+- **côté pilot** : chaque émission reçue est RELAYÉE à l'humain immédiatement, sans
+  réécriture. Le silence au-delà d'une fenêtre est un défaut de contrat (TF-0094),
+  jamais une économie.
