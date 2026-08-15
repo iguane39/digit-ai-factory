@@ -1387,3 +1387,26 @@ d'écarts sont CALCULÉS, pas rédigés.
 chantier 4 — repris par message avec son contexte, travail sur disque intact, aucun
 re-travail. **Registre** : 14 items clos archivés sur la journée, 1 actif restant
 (TF-0247, candidat — décision humaine).
+## Campagne du 15/08/2026 (4e vague) — TF-0247, micro-restes, scellage v1.16.0
+
+**TF-0247 (seo@6d19641, produit@0bb711c, agent Opus)** — trouvaille structurelle : l'empreinte
+de grille hache `grille-noeuds.md`, pas le manifeste dérivé — la correction est passée par
+la SOURCE puis régénération (`scaffold.py --force`). Trois renvois corrigés et vérifiés au
+sens, entrée de correspondances **a18e7e10aab6 → 0adef2177300** (0 renumérotation), mission
+migrée par l'outil TF-0240, 9/12 citations de fiches appliquées, snapshots d'époque intacts.
+La fiche 44 gagne deux corrections de plus (rang du référent touristique VÉRIFIÉ : 4e du
+canal ; « aucun annuaire » corrigé — TripAdvisor 5 sessions) et la réserve d'hôtes IA tombe
+par **vérification web datée du 15/08** (fait notable consigné : le canal GA4 natif
+« AI Assistant » du 13/05/2026 ne capte ni Perplexity ni Copilot — ce qui explique la
+répartition Referral/AI de l'export). Rapport `20260815d` : « nœud 74 » = 0 occurrence
+(grep rejoué), tous contrôles verts. Résidu : **TF-0248** (la plage machine-seo cite un
+membre « Mesure » sans contrepartie — arbitrage de CONTENU de grille, pas de transposition).
+
+**Micro-restes** — tests@13000f0 : fastapi au groupe dev (**467 passed, 0 skipped** — les
+preuves FastAPI tournent partout) et `verifier_corpus` : un ruff introuvable est un ÉCHEC
+nommé avec origine et remède, plus jamais « aucune sortie » (prouvé sur 3 contextes).
+audit@a8a07bd : convention sidecars TF-0065 alignée.
+
+**Scellage** : tags **v1.16.0** synchronisés sur l'écosystème (convention constatée : v1.15.0
+partout), poussés avec les branches. Registre en fin de journée : **1 actif** (TF-0248,
+candidat), 247 archivés.
