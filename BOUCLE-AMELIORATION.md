@@ -1348,3 +1348,42 @@ bilingues — vu sur le kit AuditCore en anglais).
 la mission SEO à réinstruire (journal de mission) ; 6 pytest pré-existants forge-tests ;
 unification du compteur `data-tf-count-for` vs script maison (forge-tests) ; revues D8
 (RL-2/6/7) au premier run.
+## Campagne du 15/08/2026 (3e vague) — « fais tout », second tour : socle, correctifs, réinstruction
+
+**Socle digit-ai-page-html (agents@b0931bb)** — deux arbitrages rendus : **TF-0233** (un
+conteneur-valeur couvert par le descendant qui porte la légende — fini le double échec L3
+pour un chiffre) et **TF-0241** (la langue se déclare : non-fr assumé = avertissement,
+absent = échec). Self-test 43/43, non-régression maquette PASS, installé ≡ versionné.
+
+**TF-0242 (design@0cb55ab)** — cause racine : import hors du dossier du skill, invisible à
+la sync. La lib devient canonique DANS le skill, l'ancienne place n'est qu'un ré-export —
+zéro copie qui puisse diverger. **TF-0245 (ops@13aa2fc)** — `path.resolve()` une fois à
+l'entrée CLI ; self-test rouge sur le symptôme exact (45/3) puis vert (48/0).
+
+**Réinstruction nœud 44 (produit@07b9a8e, agent Opus)** — la donnée existait : 85 sessions
+IA sur 1 825 référentes (4,66 %, GA4 487 j), verdict conforme, réserves dites (liste
+d'hôtes non rafraîchie web ; constat descriptif préexistant FAUX sur l'office de tourisme —
+107 sessions, consigné, pas réécrit). 17 citations transposées, **12 laissées pour cause
+réelle** : écrites sur une grille à 82 nœuds, antérieure aux migrations connues — le +1 du
+journal aurait encodé des renvois faux ; valeurs commandées par le sens consignées.
+Rapport `20260815c`, tous contrôles verts. Constat : **TF-0247** (le manifeste porte 3
+citations périmées — et sa correction change l'empreinte de grille : à outiller, pas à
+improviser).
+
+**forge-tests (4 commits, 2551e66→0a7c78c) + organization@8aa948f** — la trouvaille de la
+vague : **les 6 pytest rouges depuis des jours étaient TF-0243** (le `.env` du dépôt
+servait une instance vivante aux tests qui exigeaient le silence) — zéro test modifié, le
+correctif les rend verts. TF-0244 : `app.openapi()` fait foi, 11 cas dont les deux angles
+morts reproduits. TF-0246 : **admission** D-04 (Cahier/Dashboard/Jeu, registre v1.2.0) —
+renommer aurait rendu indiscernables deux artefacts distincts. G5 : marqueur posé, compteurs
+discrets par table (lacune réelle comblée), l'écrivain reste unique par construction.
+pytest **467 passed 0 échec**, ruff clean, preuve socle exit 0, S-01 13/13.
+
+**Revue D8 exécutée** (`output\01-revues-et-propositions\…Revue D8…20260815a.md`) :
+4/5 × 3 artefacts, aucun red flag, tous les écarts déclarés — et les trois manifestes
+d'écarts sont CALCULÉS, pas rédigés.
+
+**Interruption réelle** : l'agent forge-tests est tombé sur la limite de session en plein
+chantier 4 — repris par message avec son contexte, travail sur disque intact, aucun
+re-travail. **Registre** : 14 items clos archivés sur la journée, 1 actif restant
+(TF-0247, candidat — décision humaine).
