@@ -1263,3 +1263,45 @@ le libellé « Configuration » était exact mais où les en-têtes HTTP ont **q
 self-test websec 36, batterie audit verte. **Deux constats en passant** consignés : le pack EN
 de forge-audit ne peut plus être régénéré faute de D17 traduit (TF-0220), et la question
 normative « le corpus cite-t-il 4.0.3 ou 5.0.0 ? » commande les 19 citations restantes (TF-0221).
+
+## Campagne du 15/08/2026 — restitution lisible (TF-0235, mandat humain direct)
+
+**Origine** : constat humain du 15/08 sur les dashboards HTML des forges (rapport SEO
+AuxPortesDeLaBaie 20260809k en cas de référence : 491 Ko monopage, 0 graphique, KPIs sans
+lecture), instruit par analyse L99 du prompt puis mandat « committe et implémente tout ».
+Étude d'opportunité 20260815a (E1-E7 PASS, verdict O2) avant décision — le péage TF-0155
+a été payé, pas contourné.
+
+**forge-design (afa0439)** : `REFERENTIEL-RESTITUTION.md` — familles rapport/suivi/registre,
+7 lecteurs types, règles RL-1..RL-10 chacune avec son lecteur et son contrôle ;
+`gabarits\gabarit-restitution.html` (13 PASS profil digit-ai) ; `oracle-restitution.mjs`
+(RL-1/3/4/9/10, fixtures double sens, self-test 14 oracles / 61 règles vert) ; dimension
+**D8 « Lecture de données »** dans critique-le-design v1.2.0. Injection au registre global
+quality-oracles **v2.11.0** — périmètre déclaratif `data-restitution`, SKIP motivé sinon.
+
+**forge-seo (e80e078)** : doctrine portée dans le GÉNÉRATEUR (D-11 respectée — jamais le
+fichier), agent dédié routé **Opus** (escalade : construction complexe, 2 700 lignes Python
+sous tests). 6 vues naviguées avec carte de migration en dur (un chapitre sans vue de
+destination fait échouer la génération), KPI complets, 2 figures interrogatives, chemins
+par lecteur, manifeste d'écarts calculé. Rapport AuxPortesDeLaBaie régénéré (72636cd,
+produit) : verifier 11/11, oracle-restitution PASS rejoué par le pilot, check_html PASS,
+**iso-contenu prouvé mécaniquement** (11 chapitres, 8 tableaux à lignes identiques,
+10 actions, 42 nœuds, 56 dépliants). Dette de charte levée au passage : 149 espacements
+4pt, couleurs littérales éliminées, contraste corrigé. Ancien 20260809k intact (sha256),
+archivé en `Old\` par D-02.
+
+**Leçon de campagne** : le socle portait déjà L6/L7/L10 (annonces de sommaire, chapeaux,
+exemples de lecture) — la doctrine ne les a pas dupliqués, elle les cite. Le seul conflit
+inter-référentiels rencontré : interstice dataviz 2 px contre échelle 4pt — tranché à 4 px.
+
+**Constats en passant** (consignés, jamais corrigés spontanément) : TF-0239 (budget 120 s
+du runner tué par oracle-claims sur 506 Ko — PASS en 7 min hors runner), TF-0240 (aucune
+voie de migration d'une mission auditée vers une grille renumérotée — la régénération a
+exigé un worktree épinglé à 84d05c2). En cours de campagne, l'agent a aussi trouvé la
+boîte d'entrée non vide et ingéré par la voie régulière la candidature
+`qualite-graphique-par-defaut` (TF-0236..TF-0238, sidecar rangé en `old\`).
+
+**Reste ouvert (décisions humaines)** : gouvernance de la règle opposable (REGLES-PROJET
+vs contrat forge-design) ; ordre de migration des autres forges productrices (P4 : tests,
+audit, data, observability) ; TF-0236..TF-0240 à décider ; push des dépôts (tout est en
+commits locaux).
