@@ -10,8 +10,9 @@ l'étape concernée, pas d'un bloc.
 décidée le 15/08) :
 
 ```
-node oracles\self-tests.mjs          # les 8 oracles savent-ils encore ECHOUER ? (I1)
+node oracles\self-tests.mjs          # les oracles savent-ils encore ECHOUER ? (I1)
 node oracles\oracle-boite-entree.mjs # un lot est-il arrivé sans être pris ? (B1-B3)
+node oracles\oracle-skills.mjs       # les skills exécutés = les skills versionnés ? (K1-K5)
 ```
 
 Verdicts portés au ledger en `oracles_verdict`. La suspension n'est pas un excès de zèle :
@@ -24,6 +25,15 @@ l'appelle : il fallait y penser, oracle par oracle. Dès son premier passage, le
 trouvé que **`oracle-claude-md` — le gardien du plafond du noyau — n'avait aucun self-test**,
 donc n'avait jamais été vu refuser quoi que ce soit. Le second existe parce qu'un lot de
 5 candidatures est resté dans `input\00-retours\` sans être ingéré, découvert par hasard.
+
+Le troisième existe parce qu'un skill vit en **deux exemplaires** — la source versionnée dans
+une forge, et la copie sous `~\.claude\skills\` qui est celle que la session invoque. Mesure du
+15/08 : sur 20 skills versionnés, **4 divergeaient et 5 n'étaient pas installés du tout**. Neuf
+sur vingt n'étaient donc pas ce que le dépôt croyait livrer, dont `quality-oracles`, cité comme
+loi transversale. Une règle corrigée dans un dépôt et absente de la copie installée n'a
+strictement aucun effet. `--appliquer` remet à niveau ; il **refuse** d'écraser une copie plus
+récente que sa source (K5) — le jour de son écriture, `prompt-analyzer-l99` installé était en
+2.2.0 quand le dépôt en était à 2.1.0, et une synchronisation naïve aurait détruit une version.
 
 Dans le projet produit, créer `forge\` (`ledger.jsonl` ouvert avec `run_open`, `BRIEF.md` avec
 le brief reçu, `etapes\`). Si `PROMPT-PRODUIT.md` n'est pas à la racine du projet, l'y copier
