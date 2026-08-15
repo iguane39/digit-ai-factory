@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Étude SEO — produit-02.fr — maquette de refonte</title>
+<style>
+  :root{
+    --bg:#F6F8FB; --surface:#FDFDFF; --ink:#1E293B; --ink-2:#55627A; --ink-3:#667082;
+    --ligne:#E3E8F0; --accent:#2563EB; --accent-soft:#DBEAFE; --accent-pale:#EFF4FE;
+    --alerte:#B45309; --alerte-soft:#FEF3E2; --alerte-bord:#F0D9B8; --alerte-ink:#7A4A08;
+    --ok:#15803D; --ok-soft:#E8F5EC; --r:12px;
+    --font-titres:"Roboto","Segoe UI",system-ui,sans-serif;
+    --font-corps:"DM Sans","Segoe UI",system-ui,sans-serif;
+    --font-mono:"JetBrains Mono",Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--font-corps)}
+  h1,h2,h3{font-family:var(--font-titres);line-height:1.25;margin:0}
+  a{color:var(--accent)}
+  .page{max-width:min(92vw,1120px);margin:0 auto;padding:24px 0 60px}
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .ico{width:14px;height:14px;vertical-align:-2px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  /* ---- bandeau ---- */
+  header.bandeau{display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;justify-content:space-between;margin-bottom:8px}
+  .bandeau h1{font-size:1.45rem}
+  .bandeau .meta{color:var(--ink-2);font-size:.85rem}
+  .maquette-note{background:var(--alerte-soft);border:1px solid var(--alerte-bord);border-radius:var(--r);
+    padding:8px 16px;font-size:.85rem;color:var(--alerte-ink);margin-bottom:16px}
+
+  /* ---- navigation par vues (sommaire) ---- */
+  nav.vues{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;position:sticky;top:0;
+    background:var(--bg);padding:calc(12px + env(safe-area-inset-top)) 0 12px;z-index:5;border-bottom:1px solid var(--ligne)}
+  nav.vues a{display:inline-flex;flex-direction:column;align-items:flex-start;justify-content:center;
+    min-height:44px;border:1px solid var(--ligne);background:var(--surface);color:var(--ink-2);
+    border-radius:16px;padding:4px 16px;font:600 .86rem/1.3 var(--font-corps);cursor:pointer;text-decoration:none}
+  nav.vues a .toc-d{font-size:.72rem;font-weight:500;color:var(--ink-2)}
+  nav.vues a[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+  nav.vues a[aria-selected="true"] .toc-d{color:var(--surface)}
+  nav.vues a:hover:not([aria-selected="true"]){border-color:var(--accent);color:var(--accent)}
+  @media (orientation: landscape) and (max-height:520px){
+    nav.vues{position:static;padding:12px 0}
+  }
+
+  section.vue{display:none}
+  section.vue.active{display:block}
+  .objectif{color:var(--ink-2);font-size:.95rem;margin:4px 0 20px}
+
+  /* ---- verdict ---- */
+  .verdict{display:flex;gap:16px;align-items:flex-start;background:var(--surface);
+    border:1px solid var(--ligne);border-radius:var(--r);padding:16px;margin-bottom:16px}
+  .verdict .badge{flex:none;display:inline-flex;align-items:center;gap:8px;background:var(--alerte-soft);
+    color:var(--alerte);border-radius:8px;padding:4px 12px;font-weight:700;font-size:.8rem;white-space:nowrap}
+  .verdict p{margin:0;font-size:.97rem}
+
+  /* ---- KPIs (composant RL-3 : définition · valeur · repère · action) ---- */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:20px}
+  .kpi{background:var(--surface);border:1px solid var(--ligne);border-radius:var(--r);padding:16px;
+    display:flex;flex-direction:column;gap:8px}
+  .kpi .k-label{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+  .kpi .k-valeur{font-family:var(--font-titres);font-size:1.9rem;font-weight:700;line-height:1.1}
+  .kpi .k-valeur small{font-size:.95rem;font-weight:500;color:var(--ink-2)}
+  .kpi .kpi-d{font-size:.82rem;color:var(--ink-2)}
+  .kpi .k-repere{font-size:.82rem;color:var(--ink);background:var(--accent-pale);border-radius:8px;padding:8px}
+  .kpi .k-action{font-size:.82rem;margin-top:auto}
+
+  /* ---- graphiques ---- */
+  .graphes{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;margin-bottom:20px}
+  figure.graphe{background:var(--surface);border:1px solid var(--ligne);border-radius:var(--r);
+    padding:16px;margin:0;min-width:0}
+  figure.graphe figcaption{font-weight:700;font-size:.95rem;margin-bottom:4px}
+  figure.graphe .sous{font-size:.82rem;color:var(--ink-2);margin-bottom:16px}
+  .barre-ligne{display:grid;grid-template-columns:96px 1fr 52px;gap:12px;align-items:center;margin-bottom:8px}
+  .barre-ligne .b-nom{font-size:.84rem;color:var(--ink-2);text-align:right}
+  .barre-piste{position:relative;height:22px;min-width:0}
+  .barre{position:absolute;inset:0 auto 0 0;border-radius:4px;min-width:2px}
+  .barre.pleine{background:var(--accent)}
+  .barre.projetee{background:var(--accent-soft);border:1.5px dashed var(--accent)}
+  .barre-val{font-size:.84rem;font-weight:700;color:var(--ink);white-space:nowrap}
+  .empile{display:flex;height:30px;border-radius:6px;overflow:hidden;gap:4px;background:var(--bg)}
+  .seg{position:relative;min-width:3px}
+  .seg.instruits{background:var(--accent)}
+  .seg.nonmes{background:var(--alerte)}
+  .seg.horsportee{background:repeating-linear-gradient(45deg,var(--ligne) 0 5px,var(--bg) 5px 10px);border:1px solid var(--ligne)}
+  .empile-legende{display:flex;flex-wrap:wrap;gap:16px;margin-top:8px;font-size:.84rem;color:var(--ink-2)}
+  .empile-legende b{color:var(--ink)}
+  .puce{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+  .puce.p-instruits{background:var(--accent)}
+  .puce.p-nonmes{background:var(--alerte)}
+  .puce.p-horsportee{background:repeating-linear-gradient(45deg,var(--ligne) 0 4px,var(--bg) 4px 8px);border:1px solid var(--ligne)}
+
+  /* ---- top 3 actions + chemins ---- */
+  .deux-col{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-bottom:20px}
+  @media (max-width:860px){.deux-col{grid-template-columns:1fr}}
+  .carte{background:var(--surface);border:1px solid var(--ligne);border-radius:var(--r);padding:16px}
+  .carte h3{font-size:1rem;margin-bottom:8px}
+  ol.top3{margin:0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:12px}
+  ol.top3 li{display:flex;gap:12px;align-items:flex-start;font-size:.9rem}
+  ol.top3 .aid{flex:none;background:var(--accent);color:var(--surface);border-radius:8px;padding:4px 8px;font-weight:700;font-size:.8rem}
+  ol.top3 .gain{color:var(--ink-2);font-size:.8rem}
+  .chemins{display:flex;flex-direction:column;gap:12px}
+  .chemin{font-size:.88rem;padding:12px;background:var(--accent-pale);border-radius:8px}
+  .chemin b{display:block}
+
+  /* ---- tableau exploitable (RL-5) : tri + filtres par colonne + recherche ---- */
+  .filtres{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:12px;font-size:.84rem}
+  .filtres label{display:flex;flex-direction:column;gap:4px;color:var(--ink-2);font-weight:600}
+  .filtres select,.filtres input{border:1px solid var(--ligne);border-radius:8px;background:var(--surface);
+    color:var(--ink);font:inherit;padding:8px 12px;min-height:44px}
+  .filtres .f-compte{color:var(--ink-2);padding-bottom:12px}
+  .table-defile{overflow-x:auto;background:var(--surface);border:1px solid var(--ligne);border-radius:var(--r)}
+  table{border-collapse:collapse;width:100%;font-size:.88rem}
+  th,td{padding:12px;text-align:left;border-bottom:1px solid var(--ligne);vertical-align:top}
+  th{font-size:.74rem;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);cursor:pointer;
+    user-select:none;white-space:nowrap;background:var(--surface);position:sticky;top:0}
+  th .fleche .h,th .fleche .b{opacity:.55}
+  th[data-dir="asc"] .fleche .h{opacity:1;stroke-width:3}
+  th[data-dir="asc"] .fleche .b{opacity:.2}
+  th[data-dir="desc"] .fleche .b{opacity:1;stroke-width:3}
+  th[data-dir="desc"] .fleche .h{opacity:.2}
+  td.num,th.num{text-align:right}
+  tr[data-tf-hidden]{display:none}
+  .jauge{display:inline-block;font-family:var(--font-mono);letter-spacing:1px;color:var(--accent)}
+  .note-table{font-size:.8rem;color:var(--ink-2);margin-top:12px}
+  .exemple-lecture{font-size:.88rem;background:var(--accent-pale);border-radius:8px;padding:12px;margin:0 0 12px}
+
+  /* ---- squelettes V3-V6 ---- */
+  .squelette{background:var(--surface);border:1px dashed var(--ink-3);border-radius:var(--r);padding:20px}
+  .squelette ul{margin:8px 0 0;padding-left:20px;font-size:.9rem;color:var(--ink-2)}
+  .squelette .marque{display:inline-block;background:var(--bg);border:1px solid var(--ligne);
+    border-radius:6px;padding:4px 8px;font-size:.75rem;font-weight:700;color:var(--ink-2);margin-bottom:8px}
+
+  /* ---- manifeste d'écarts (RL-10) ---- */
+  footer.ecarts{margin-top:32px;border-top:1px solid var(--ligne);padding-top:16px;font-size:.82rem;color:var(--ink-2)}
+  footer.ecarts h2{font-size:.9rem;color:var(--ink);margin-bottom:8px}
+  footer.ecarts ul{margin:0;padding-left:20px}
+
+  /* ---- infobulle ---- */
+  #bulle{position:fixed;pointer-events:none;background:var(--ink);color:var(--surface);border-radius:8px;
+    padding:8px 12px;font-size:.8rem;max-width:260px;opacity:0;transition:opacity .12s;z-index:20}
+
+  /* ---- mobile : reflow du tableau en cartes ---- */
+  @media (max-width:768px){
+    .barre-ligne{grid-template-columns:78px 1fr 48px}
+    #actions thead{display:none}
+    #actions, #actions tbody, #actions tr, #actions td{display:block;width:100%}
+    #actions tr{border-bottom:1px solid var(--ligne);padding:12px 0}
+    #actions tr[data-tf-hidden]{display:none}
+    #actions td{border:none;padding:4px 12px;text-align:left}
+    #actions td.num{text-align:left}
+    #actions td::before{content:attr(data-th) " : ";font-weight:700;color:var(--ink-3);
+      font-size:.74rem;text-transform:uppercase;letter-spacing:.05em}
+    #actions td:first-child::before{content:""}
+    #actions td:first-child{font-size:1rem}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{transition:none !important;animation:none !important;scroll-behavior:auto !important}
+  }
+
+  /* ---- print : toutes les vues à plat, contrôles masqués, filtres neutralisés ---- */
+  @media print{
+    body{background:var(--surface)}
+    nav.vues,.filtres,#bulle,.maquette-note{display:none}
+    section.vue{display:block !important;break-inside:avoid-page;margin-bottom:16px}
+    section.vue::before{content:"";display:block;border-top:1px solid var(--ligne);margin-bottom:12px}
+    tr[data-tf-hidden]{display:table-row !important}
+    .table-defile{overflow:visible}
+    a{color:var(--ink);text-decoration:none}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="bandeau">
+  <h1>Étude SEO — produit-02.fr</h1>
+  <span class="meta">run 20260809k · crawl du 08/08/2026 · Search Console 07/04/2025 → 06/08/2026 (487 jours)</span>
+</header>
+<p class="maquette-note"><strong>Maquette de refonte</strong> — proposition du 15/08/2026, données réelles
+extraites du rapport d'origine. Les vues « Synthèse » et « Plan d'action » sont fonctionnelles ;
+les vues 3 à 6 sont des squelettes déclarés (voir le manifeste d'écarts en pied de page).</p>
+
+<nav class="vues" role="tablist" aria-label="Sommaire">
+  <a href="#v1" role="tab" aria-selected="true" data-vue="v1">1 · Synthèse<span class="toc-d">l'état du site et les gestes clés</span></a>
+  <a href="#v2" role="tab" aria-selected="false" data-vue="v2">2 · Plan d'action<span class="toc-d">les 10 actions, tri et filtres</span></a>
+  <a href="#v3" role="tab" aria-selected="false" data-vue="v3">3 · Constats<span class="toc-d">15 points faibles, 7 points forts</span></a>
+  <a href="#v4" role="tab" aria-selected="false" data-vue="v4">4 · Grille<span class="toc-d">les 87 nœuds d'audit, un par un</span></a>
+  <a href="#v5" role="tab" aria-selected="false" data-vue="v5">5 · Données<span class="toc-d">requêtes et pages vues par Google</span></a>
+  <a href="#v6" role="tab" aria-selected="false" data-vue="v6">6 · Méthode<span class="toc-d">barèmes, limites, traçabilité</span></a>
+</nav>
+
+<main>
+<!-- ================= V1 · SYNTHÈSE ================= -->
+<section class="vue active" id="v1">
+  <h2 class="sr-only">Synthèse</h2>
+  <p class="objectif ch-apprend">Ce que cette vue vous apprend : <b>l'état réel du site, ce qu'il vous coûte, et les trois gestes qui comptent — en un écran.</b></p>
+
+  <div class="verdict">
+    <span class="badge" aria-describedby="verdict-texte"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.5 20h19Z"/><path d="M12 10v4.5"/><path d="M12 17.6v.2"/></svg>À redresser</span>
+    <p id="verdict-texte"><b>Le site n'est pas en règle sur ses fondamentaux</b> : le sitemap est le seul chemin d'accès à 73 %
+    du site, 208 pages sur 286 sont orphelines et 202 pages ne génèrent aucun clic. La visibilité n'est
+    ni produite ni mesurée (maturité 1/5). <b>Un plan de 10 actions chiffrées y répond</b> — les trois
+    premières ci-dessous.</p>
+  </div>
+
+  <div class="kpis">
+    <article class="kpi">
+      <span class="k-label">Couverture de l'audit</span>
+      <span class="k-valeur" aria-describedby="kr1">67 <small>/ 87 nœuds</small></span>
+      <span class="kpi-d">Part des questions d'audit de la grille effectivement instruites sur ce site.</span>
+      <span class="k-repere" id="kr1">13 nœuds non mesurables faute d'instrumentation, 7 hors portée du modèle — le rapport dit aussi ce qu'il ne peut pas dire.</span>
+      <a class="k-action" href="#v6" data-va="v6">→ Dette d'instrumentation (vue 6)</a>
+    </article>
+    <article class="kpi">
+      <span class="k-label">Maturité « machine SEO »</span>
+      <span class="k-valeur" aria-describedby="kr2">1 <small>/ 5</small></span>
+      <span class="kpi-d">Capacité du site à produire ET mesurer sa visibilité (nœud 87).</span>
+      <span class="k-repere" id="kr2">Barème 1 à 5 — cran 1 : aucun dispositif, on ne publie pas pour le SEO et on ne mesure pas ; cran 5 : pilotage continu chiffré. Chaque cran gagné se constate, pas se déclare.</span>
+      <a class="k-action" href="#v2" data-va="v2">→ A7 : poser la mesure (vue 2)</a>
+    </article>
+    <article class="kpi">
+      <span class="k-label">Trafic organique actuel</span>
+      <span class="k-valeur" aria-describedby="kr3">2 514 <small>clics / an</small></span>
+      <span class="kpi-d">Clics organiques annuels constatés (Search Console), pour 123 000 impressions.</span>
+      <span class="k-repere" id="kr3">CTR 2,04 % : le site est vu mais pas cliqué — le premier levier est le libellé des résultats, pas la position.</span>
+      <a class="k-action" href="#v2" data-va="v2">→ A1 : titles &amp; méta-descriptions (vue 2)</a>
+    </article>
+    <article class="kpi">
+      <span class="k-label">Cible 12 mois</span>
+      <span class="k-valeur" aria-describedby="kr4">3 200–3 940 <small>clics / an</small></span>
+      <span class="kpi-d">Conventions de travail : CTR porté à 2,6 % (borne basse) ou 3,2 % (borne haute), à impressions constantes, aucun gain de position supposé.</span>
+      <span class="k-repere" id="kr4">+686 à +1 426 clics. Si le CTR ne bouge pas au premier run de suivi, la borne basse n'est pas atteinte : c'est l'hypothèse à surveiller.</span>
+      <a class="k-action" href="#v6" data-va="v6">→ D'où viennent ces bornes (vue 6)</a>
+    </article>
+  </div>
+
+  <div class="graphes">
+    <figure class="graphe">
+      <figcaption>Sur quoi ce rapport s'appuie-t-il ?</figcaption>
+      <p class="sous">87 nœuds d'audit : 67 instruits (verdict rendu, preuve à l'appui), 13 non mesurables (la donnée manque), 7 hors portée du modèle.</p>
+      <div class="empile" role="img" aria-label="67 nœuds instruits, 13 non mesurables, 7 hors portée du modèle">
+        <div class="seg instruits" style="flex:67" data-bulle="67 nœuds instruits — verdict rendu, preuve à l'appui"></div>
+        <div class="seg nonmes" style="flex:13" data-bulle="13 nœuds non mesurables — la donnée manque (dette d'instrumentation, vue 6)"></div>
+        <div class="seg horsportee" style="flex:7" data-bulle="7 nœuds hors portée du modèle — assumé, détaillé vue 6"></div>
+      </div>
+      <div class="empile-legende" aria-hidden="true">
+        <span><span class="puce p-instruits"></span><b>67</b> instruits</span>
+        <span><span class="puce p-nonmes"></span><b>13</b> non mesurables</span>
+        <span><span class="puce p-horsportee"></span><b>7</b> hors portée</span>
+      </div>
+    </figure>
+    <figure class="graphe">
+      <figcaption>Où peut aller le trafic en 12 mois ?</figcaption>
+      <p class="sous">Clics organiques annuels — constaté (barre pleine) et bornes visées (pointillé : conventions de CTR, pas des mesures).</p>
+      <div class="barre-ligne"><span class="b-nom">Aujourd'hui</span>
+        <div class="barre-piste"><div class="barre pleine" style="width:58%" data-bulle="2 514 clics/an constatés — CTR 2,04 % pour 123 000 impressions"></div></div>
+        <span class="barre-val">2 514</span></div>
+      <div class="barre-ligne"><span class="b-nom">Borne basse</span>
+        <div class="barre-piste"><div class="barre projetee" style="width:74%" data-bulle="3 200 clics/an si le CTR atteint 2,6 % — convention de travail, pas une mesure"></div></div>
+        <span class="barre-val">3 200</span></div>
+      <div class="barre-ligne"><span class="b-nom">Borne haute</span>
+        <div class="barre-piste"><div class="barre projetee" style="width:91%" data-bulle="3 940 clics/an si le CTR atteint 3,2 % — convention de travail, pas une mesure"></div></div>
+        <span class="barre-val">3 940</span></div>
+    </figure>
+  </div>
+
+  <div class="deux-col">
+    <div class="carte">
+      <h3>Les 3 actions qui comptent (par gain décroissant)</h3>
+      <ol class="top3">
+        <li><span class="aid" aria-hidden="true">A8</span><span>Table de correspondance d'URLs et redirections 301 avant la bascule de domaine
+          <span class="gain">gain 5/5 — lève un blocage structurel · mesurable sous 30 j</span></span></li>
+        <li><span class="aid" aria-hidden="true">A1</span><span>Réécrire les 79 balises title et 78 méta-descriptions dupliquées
+          <span class="gain">gain 4/5 — trafic global · quick-win, mesurable sous 28 j</span></span></li>
+        <li><span class="aid" aria-hidden="true">A9</span><span>Reconnecter les 208 pages orphelines par des liens contextuels, purger le sitemap
+          <span class="gain">gain 4/5 — trafic global · mesurable sous 90 j</span></span></li>
+      </ol>
+      <p class="note-table"><a href="#v2" data-va="v2">→ Les 10 actions, triables et filtrables (vue 2)</a></p>
+    </div>
+    <div class="carte">
+      <h3>Par où commencer, selon qui vous êtes</h3>
+      <div class="chemins">
+        <div class="chemin"><b>Propriétaire du site</b> Restez sur cette vue, puis <a href="#v2" data-va="v2">le plan d'action</a> pour décider quoi engager.</div>
+        <div class="chemin"><b>Webmaster / agence</b> Directement <a href="#v2" data-va="v2">le plan d'action</a>, puis <a href="#v3" data-va="v3">les constats</a> pour le détail technique.</div>
+        <div class="chemin"><b>Consultant SEO</b> <a href="#v6" data-va="v6">La méthode</a> d'abord, puis <a href="#v4" data-va="v4">la grille des 87 nœuds</a> et leurs preuves.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= V2 · PLAN D'ACTION ================= -->
+<section class="vue" id="v2">
+  <h2 class="sr-only">Plan d'action</h2>
+  <p class="objectif ch-apprend">Ce que cette vue vous apprend : <b>les 10 actions du plan, ce que chacune rapporte et coûte — cliquez un en-tête pour trier, combinez les filtres pour cibler.</b></p>
+
+  <p class="exemple-lecture"><b>Exemple de lecture :</b> A8 porte un gain 5 sur 5 pour un effort 3 sur 5 —
+  elle lève un blocage dont dépendent d'autres actions, son effet est mesurable sous 30 jours :
+  c'est l'action à engager en premier.</p>
+
+  <div class="filtres" role="group" aria-label="Filtres du plan d'action">
+    <label>Gain
+      <select id="f-gain"><option value="">Tous</option><option>5</option><option>4</option><option>3</option><option>2</option><option value="—">non extrait</option></select></label>
+    <label>Effort
+      <select id="f-effort"><option value="">Tous</option><option>2</option><option>3</option><option value="—">non extrait</option></select></label>
+    <label>Mesurable sous
+      <select id="f-jours"><option value="">Tous</option><option value="28">28 jours</option><option value="30">30 jours</option><option value="90">90 jours</option><option value="—">non extrait</option></select></label>
+    <label>Recherche
+      <input type="search" id="f-txt" placeholder="filtrer les intitulés…"></label>
+    <span class="f-compte" id="f-compte" data-tf-count-for="actions" aria-live="polite">10 actions sur 10 affichées</span>
+  </div>
+
+  <div class="table-defile">
+    <table id="actions" data-filterable>
+      <thead><tr>
+        <th data-tri="txt" scope="col">Action <span class="fleche"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path class="h" d="m7 9 5-5 5 5"/><path class="b" d="m7 15 5 5 5-5"/></svg></span></th>
+        <th scope="col">Intitulé</th>
+        <th class="num" data-tri="num" scope="col">Gain /5 <span class="fleche"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path class="h" d="m7 9 5-5 5 5"/><path class="b" d="m7 15 5 5 5-5"/></svg></span></th>
+        <th class="num" data-tri="num" scope="col">Effort /5 <span class="fleche"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path class="h" d="m7 9 5-5 5 5"/><path class="b" d="m7 15 5 5 5-5"/></svg></span></th>
+        <th class="num" data-tri="num" scope="col">Mesurable sous <span class="fleche"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path class="h" d="m7 9 5-5 5 5"/><path class="b" d="m7 15 5 5 5-5"/></svg></span></th>
+      </tr></thead>
+      <tbody>
+        <tr data-gain="5" data-effort="3" data-jours="30"><td data-th="Action"><b>A8</b></td><td data-th="Intitulé">Établir la table de correspondance d'URLs de l'ancien vers le nouveau site, et les redirections 301, avant la bascule de domaine</td><td class="num" data-th="Gain sur 5"><span class="jauge" aria-describedby="bareme-gain">▮▮▮▮▮</span> 5</td><td class="num" data-th="Effort sur 5">3</td><td class="num" data-th="Mesurable sous">30 j</td></tr>
+        <tr data-gain="4" data-effort="2" data-jours="28"><td data-th="Action"><b>A1</b></td><td data-th="Intitulé">Réécrire les 79 balises title et les 78 méta-descriptions dupliquées — marque, nom du gîte et commune dans chaque title</td><td class="num" data-th="Gain sur 5"><span class="jauge" aria-describedby="bareme-gain">▮▮▮▮</span> 4</td><td class="num" data-th="Effort sur 5">2</td><td class="num" data-th="Mesurable sous">28 j</td></tr>
+        <tr data-gain="4" data-effort="—" data-jours="90"><td data-th="Action"><b>A9</b></td><td data-th="Intitulé">Reconnecter les 208 pages orphelines par des liens contextuels depuis les fiches de gîte, et retirer /checkout, /paypal-checkout et /order-confirmation du sitemap</td><td class="num" data-th="Gain sur 5"><span class="jauge" aria-describedby="bareme-gain">▮▮▮▮</span> 4</td><td class="num" data-th="Effort sur 5">—</td><td class="num" data-th="Mesurable sous">90 j</td></tr>
+        <tr data-gain="4" data-effort="3" data-jours="—"><td data-th="Action"><b>A2</b></td><td data-th="Intitulé">Créer 4 pages de destination géolocalisées et saisonnières</td><td class="num" data-th="Gain sur 5"><span class="jauge" aria-describedby="bareme-gain">▮▮▮▮</span> 4</td><td class="num" data-th="Effort sur 5">3</td><td class="num" data-th="Mesurable sous">—</td></tr>
+        <tr data-gain="3" data-effort="—" data-jours="90"><td data-th="Action"><b>A10</b></td><td data-th="Intitulé">Réclamer les 4 fiches tierces — TripAdvisor, gites.fr, annu-hotel, ville-data — et mettre en place la sollicitation d'avis</td><td class="num" data-th="Gain sur 5"><span class="jauge" aria-describedby="bareme-gain">▮▮▮</span> 3</td><td class="num" data-th="Effort sur 5">—</td><td class="num" data-th="Mesurable sous">90 j</td></tr>
+        <tr data-gain="2" data-effort="—" data-jours="30"><td data-th="Action"><b>A5</b></td><td data-th="Intitulé">Poser une balise canonique auto-référente sur chaque page, et arbitrer le doublon /normandie/gites contre /contact/gites</td><td class="num" data-th="Gain sur 5"><span class="jauge" aria-describedby="bareme-gain">▮▮</span> 2</td><td class="num" data-th="Effort sur 5">—</td><td class="num" data-th="Mesurable sous">30 j</td></tr>
+        <tr data-gain="2" data-effort="—" data-jours="90"><td data-th="Action"><b>A4</b></td><td data-th="Intitulé">Déployer les données structurées LodgingBusiness et Accommodation, les sameAs vers les fiches tierces, et les balises Open Graph</td><td class="num" data-th="Gain sur 5"><span class="jauge" aria-describedby="bareme-gain">▮▮</span> 2</td><td class="num" data-th="Effort sur 5">—</td><td class="num" data-th="Mesurable sous">90 j</td></tr>
+        <tr data-gain="—" data-effort="—" data-jours="—"><td data-th="Action"><b>A3</b></td><td data-th="Intitulé">Consolider les pages de moins de 300 mots : fusionner inclus, options, tarifs, réservation et informations en une fiche unique par gîte</td><td class="num" data-th="Gain sur 5">—</td><td class="num" data-th="Effort sur 5">—</td><td class="num" data-th="Mesurable sous">—</td></tr>
+        <tr data-gain="—" data-effort="—" data-jours="—"><td data-th="Action"><b>A6</b></td><td data-th="Intitulé">Publier un llms.txt et une page de questions-réponses factuelle : accès, capacités, équipements, saisons, distances</td><td class="num" data-th="Gain sur 5">—</td><td class="num" data-th="Effort sur 5">—</td><td class="num" data-th="Mesurable sous">—</td></tr>
+        <tr data-gain="—" data-effort="—" data-jours="—"><td data-th="Action"><b>A7</b></td><td data-th="Intitulé">Configurer l'événement de réservation dans GA4, transmettre l'identifiant Beds24, et arbitrer la campagne de mesure</td><td class="num" data-th="Gain sur 5">—</td><td class="num" data-th="Effort sur 5">—</td><td class="num" data-th="Mesurable sous">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note-table" id="bareme-gain">Gain sur 5, barème du rapport d'origine : 1 = effet marginal · 3 = effet mesurable sur le trafic
+  ou la conversion d'un gabarit · 5 = lève un blocage structurel dont dépendent d'autres actions. Effort sur 5 :
+  1 = moins d'une demi-journée · 5 = chantier de plus d'un mois. « — » = valeur non extraite dans cette maquette
+  (la refonte réelle reprend 100 % des valeurs, détails par action inclus).</p>
+</section>
+
+<!-- ================= V3-V6 · SQUELETTES ================= -->
+<section class="vue" id="v3">
+  <h2 class="sr-only">Constats</h2>
+  <p class="objectif ch-apprend">Ce que cette vue vous apprend : <b>ce qui a été trouvé sur le site, ce que chaque constat change pour vous, et l'action qui y répond.</b></p>
+  <div class="squelette"><span class="marque">SQUELETTE — non maquetté</span>
+    <p>Reprend intégralement le chapitre 3 de l'original (« L'existant ») : <b>15 points faibles</b> (du plus
+    attaqué par le plan au moins attaqué) et <b>7 points forts</b>, chacun au pattern
+    <i>constat (avec sa donnée) → ce que ça change → action qui y répond</i>, preuves et relevés repliés à la demande.</p>
+    <ul><li>Exemple réel (T1 · Indexation/Sitemap) : 286 URLs déclarées, 78 navigables, 208 orphelines, 0 lastmod → le sitemap sert de substitut au maillage → A8, A9.</li></ul>
+  </div>
+</section>
+
+<section class="vue" id="v4">
+  <h2 class="sr-only">Couverture de la grille</h2>
+  <p class="objectif ch-apprend">Ce que cette vue vous apprend : <b>le sort de chacun des 87 nœuds de la grille d'audit — instruit, non mesurable ou hors portée, avec sa preuve.</b></p>
+  <div class="squelette"><span class="marque">SQUELETTE — non maquetté</span>
+    <p>Reprend intégralement le chapitre 9 (« Couverture de la grille ») : tableau des 87 nœuds avec question
+    d'audit, critère de verdict, statut et preuve — <b>tri par colonne, filtres par statut et par thème,
+    recherche</b> (87 lignes &gt; 50 → recherche obligatoire, règle RL-5).</p>
+  </div>
+</section>
+
+<section class="vue" id="v5">
+  <h2 class="sr-only">Données analysées</h2>
+  <p class="objectif ch-apprend">Ce que cette vue vous apprend : <b>les requêtes et les pages telles que Search Console les voit, avec les limites de la donnée affichées à côté de la donnée.</b></p>
+  <div class="squelette"><span class="marque">SQUELETTE — non maquetté</span>
+    <p>Reprend intégralement les chapitres 7 (« Requêtes et résultats ») et 8 (« Pages analysées ») en tableaux
+    outillés. Les limites de la donnée restent affichées à côté de la donnée (l'onglet Requêtes plafonne à
+    1 000 lignes et couvre 28 % des clics — affiché en tête de tableau, pas en note de bas de page).</p>
+  </div>
+</section>
+
+<section class="vue" id="v6">
+  <h2 class="sr-only">Méthode et traçabilité</h2>
+  <p class="objectif ch-apprend">Ce que cette vue vous apprend : <b>comment ce rapport juge — barèmes, formule de score, dette d'instrumentation — et ce qu'il ne peut pas dire.</b></p>
+  <div class="squelette"><span class="marque">SQUELETTE — non maquetté</span>
+    <p>Reprend intégralement les chapitres 10 (« Dette d'instrumentation ») et 11 (« Méthode et traçabilité »),
+    plus les barèmes aujourd'hui répétés dans le corps : nœud, score = (gain × confiance) ÷ effort, barèmes de
+    maturité / gain / effort / confiance, régimes d'automatisation, « ce que ce rapport ne peut pas dire ».
+    Le contenu générique vit ici <b>une fois</b> (règle RL-7) — le reste du rapport y renvoie.</p>
+  </div>
+</section>
+</main>
+
+<footer class="ecarts">
+  <h2>Manifeste d'écarts de cette maquette (règle RL-10 — un écart se déclare, jamais par omission)</h2>
+  <ul>
+    <li>Vues 3 à 6 : squelettes déclarés — architecture et inventaire posés, contenu non migré.</li>
+    <li>Tableau des actions : gains/efforts/échéances partiellement extraits (« — ») ; aucune valeur inventée.</li>
+    <li>Encart « depuis le run précédent » non maquetté (chapitre 2 de l'original → vue 1 dans la cible).</li>
+    <li>Filtres de colonne : implémentation allégée du contrat DigitAITableFilters, embarquée dans la page —
+      la refonte réelle branche le composant complet de forge-organization (panneaux par colonne,
+      bascules Tous/Aucun, recherche accent-insensible).</li>
+    <li>Polices : piles système (fichier autonome hors ligne) — la refonte réelle applique la charte du socle.</li>
+  </ul>
+</footer>
+
+</div>
+<div id="bulle" role="status"></div>
+
+<script>
+(function(){
+  "use strict";
+  /* ---- navigation par vues (sommaire, routeur à ancres) ---- */
+  var onglets = document.querySelectorAll("nav.vues a");
+  function montre(id){
+    document.querySelectorAll("section.vue").forEach(function(s){ s.classList.toggle("active", s.id === id); });
+    onglets.forEach(function(b){ b.setAttribute("aria-selected", String(b.dataset.vue === id)); });
+    if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
+    window.scrollTo({top:0});
+  }
+  onglets.forEach(function(b){
+    b.addEventListener("click", function(e){ e.preventDefault(); montre(b.dataset.vue); });
+  });
+  document.querySelectorAll("[data-va]").forEach(function(a){
+    a.addEventListener("click", function(e){ e.preventDefault(); montre(a.dataset.va); });
+  });
+  if (/^#v[1-6]$/.test(location.hash)) montre(location.hash.slice(1));
+
+  /* ---- tri du tableau des actions ---- */
+  var table = document.getElementById("actions"), corps = table.tBodies[0];
+  table.querySelectorAll("th[data-tri]").forEach(function(th){
+    var idx = Array.prototype.indexOf.call(th.parentNode.children, th), asc = true;
+    th.addEventListener("click", function(){
+      var lignes = Array.prototype.slice.call(corps.rows);
+      lignes.sort(function(a, b){
+        var ta = a.cells[idx].textContent.trim(), tb = b.cells[idx].textContent.trim();
+        if (th.dataset.tri === "num"){
+          var na = parseFloat(ta.replace(/[^\d.]/g, "")), nb = parseFloat(tb.replace(/[^\d.]/g, ""));
+          if (isNaN(na)) return 1; if (isNaN(nb)) return -1;   /* « — » toujours en fin */
+          return asc ? na - nb : nb - na;
+        }
+        return asc ? ta.localeCompare(tb, "fr") : tb.localeCompare(ta, "fr");
+      });
+      lignes.forEach(function(l){ corps.appendChild(l); });
+      table.querySelectorAll("th[data-tri]").forEach(function(t){ t.removeAttribute("data-dir"); });
+      th.setAttribute("data-dir", asc ? "asc" : "desc");
+      asc = !asc;
+    });
+  });
+
+  /* ---- filtres par colonne (contrat DigitAITableFilters, implémentation allégée embarquée :
+         combinaison ET entre colonnes, recherche accent-insensible, compteur data-tf-count-for,
+         lignes masquées via data-tf-hidden réaffichées à l'impression) ---- */
+  window.DigitAITableFilters = {
+    initAll: function(){
+      var selGain = document.getElementById("f-gain"), selEffort = document.getElementById("f-effort"),
+          selJours = document.getElementById("f-jours"), champTxt = document.getElementById("f-txt"),
+          compte = document.querySelector('[data-tf-count-for="actions"]');
+      function normalise(s){ return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
+      function applique(){
+        var vGain = selGain.value, vEffort = selEffort.value, vJours = selJours.value,
+            vTxt = normalise(champTxt.value.trim()), visibles = 0;
+        Array.prototype.forEach.call(corps.rows, function(l){
+          var ok = (!vGain || l.dataset.gain === vGain) &&
+                   (!vEffort || l.dataset.effort === vEffort) &&
+                   (!vJours || l.dataset.jours === vJours) &&
+                   (!vTxt || normalise(l.textContent).indexOf(vTxt) !== -1);
+          if (ok) { l.removeAttribute("data-tf-hidden"); visibles++; }
+          else l.setAttribute("data-tf-hidden", "");
+        });
+        compte.textContent = visibles + (visibles > 1 ? " actions sur 10 affichées" : " action sur 10 affichée");
+      }
+      [selGain, selEffort, selJours].forEach(function(s){ s.addEventListener("change", applique); });
+      champTxt.addEventListener("input", applique);
+    }
+  };
+  DigitAITableFilters.initAll();
+
+  /* ---- infobulles des graphiques ---- */
+  var bulle = document.getElementById("bulle");
+  document.querySelectorAll("[data-bulle]").forEach(function(el){
+    el.addEventListener("mousemove", function(e){
+      bulle.textContent = el.dataset.bulle;
+      bulle.style.left = Math.min(e.clientX + 14, window.innerWidth - 280) + "px";
+      bulle.style.top = (e.clientY + 14) + "px";
+      bulle.style.opacity = "1";
+    });
+    el.addEventListener("mouseleave", function(){ bulle.style.opacity = "0"; });
+  });
+})();
+</script>
+</body>
+</html>
