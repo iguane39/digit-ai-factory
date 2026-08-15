@@ -60,7 +60,7 @@ Chaque étape est validée par des **oracles exécutés** — jamais par confian
 
 <!-- CATALOGUE:DEBUT — section générée par catalogues/generer-vues.mjs, ne pas éditer -->
 
-Ce que chaque forge sait faire aujourd'hui — extrait de la source unique [catalogues/catalogue.jsonl](catalogues/catalogue.jsonl) (v1.6.0, 2026-08-13), détail complet : [catalogues/CATALOGUES.md](catalogues/CATALOGUES.md). **prouvé** = preuve exécutée (oracle, CLI, run réel) ; *déclaré* = méthode documentée seulement.
+Ce que chaque forge sait faire aujourd'hui — extrait de la source unique [catalogues/catalogue.jsonl](catalogues/catalogue.jsonl) (v1.6.1, 2026-08-15), détail complet : [catalogues/CATALOGUES.md](catalogues/CATALOGUES.md). **prouvé** = preuve exécutée (oracle, CLI, run réel) ; *déclaré* = méthode documentée seulement.
 
 - **forge-conception** (pipeline) : **Qualifier l'entrant** · **Énumérer la surface** · **Rédiger les exigences** · **Dériver les vues aval** · **Valider les exigences (oracles)** · **Constitution projet** · **Cycle delta (évolution d'un référentiel scellé)**
 - **forge-design** (pipeline) : **Système de marque** · **Studio de direction** · **Améliorer le design (maquette)** · *Critiquer le design (amont et aval) (déclaré)* · **Valider le design (oracles)** · **Générer les visuels** · **Tokens DTCG (source → dérivé)** · **Baseline de régression visuelle** · **Contrôler la généricité d'une interface (règles importées)**
