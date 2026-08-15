@@ -138,7 +138,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>ea3b9e4e0564</code> · dernier événement 2026-08-15T13:28:03Z</p>
+      <p class="meta">sceau <code>4938477e7eed</code> · dernier événement 2026-08-15T14:33:44Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -148,7 +148,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="1 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">1</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="3 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">3</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="247 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">247</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -164,25 +164,27 @@
       <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
       
       <div class="dropdown" data-dim="forge">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">1</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">2</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
           <label><input type="checkbox" value="digit-ai-forge-seo" checked> digit-ai-forge-seo</label>
+          <label><input type="checkbox" value="pilot" checked> pilot</label>
         </div>
       </div>
       
       <div class="dropdown" data-dim="prio">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">1</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">2</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-prio" role="group" aria-label="Filtre Priorité" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
+          <label><input type="checkbox" value="haute" checked> Haute</label>
           <label><input type="checkbox" value="moyenne" checked> Moyenne</label>
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">1 / 1 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">3 / 3 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-seo"><strong>digit-ai-forge-seo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-seo"><strong>digit-ai-forge-seo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-forge-seo">
       <h2>digit-ai-forge-seo <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-seo">1</span></h2>
@@ -201,6 +203,46 @@
             <div><dt>Créé le</dt><dd>2026-08-15</dd></div>
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-seo</dt><dd>seule citation non résolue du balayage exhaustif — toutes les autres résolvent vers un nœud cohérent par leur titre</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant — constat =&gt; candidat, jamais correction spontanee)</dd></div>
+            
+          </dl>
+        </article>
+      </div>
+    </section>
+    <section id="pilot">
+      <h2>pilot <span class="badge" title="2 item(s) actifs ciblant pilot">2</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0249" data-forge="pilot" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0249</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 16)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Restitution v2 : aucun appelant ne la charge pour les fins de campagne/mandat en session pilot — le défaut que la v2 corrigeait pour les runs s’est reproduit un cran au-dessus</h3>
+          <div class="card-detail"><p class="lead">Constat humain du 15/08 en fin de journée : les synthèses de campagne de la session pilot n’ont pas suivi RESTITUTION.md v2 (8 blocs) alors que la consigne régit « tout message de fin de traitement ». Cause mécanique, pas d’ignorance du fichier : la consigne est citée au pas 7 d’ETAPES-RUN (clôture de RUN produit) et dans la séquence de run du noyau, mais AUCUN appelant ne la nomme sur le chemin campagne/mandat (la section Campagnes du noyau cite AGENT-CAMPAGne.MD, pas RESTITUTION.md) — et l’oracle S1-S8 juge un FICHIER synthese.md, jamais un message de chat. C’est mot pour mot le défaut que la v2 dit avoir corrigé pour la v1 (« une convention qu’aucun run ne charge ne s’applique pas : elle décore ») reproduit à l’étage campagne, et R-35 en manque : le contrôle existe sans appelant sur ce chemin.</p><p class="detail-label">Proposition</p><ul class="puces"><li>citer RESTITUTION.md dans la section Campagnes du noyau et dans AGENT-CAMPAGNE.md</li><li>exiger la synthèse de campagne EN FICHIER (output/) jugé par l’oracle avant affichage</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-15</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 16 — gain 4 × preuve 4 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>toutes les synthèses de la journée du 15/08 (4 vagues de campagnes) rendues hors format malgré une consigne adoptée la veille — constaté par l’humain, pas par un oracle : le contrôle n’avait pas d’appelant</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain — remarque du 15/08 (« le format d’affichage des résultats d’un prompt n’est toujours pas respecté, pourquoi ? »)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0250" data-forge="pilot" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0250</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Collision de noms : oracle-restitution.mjs existe dans le pilot (forme du message, S1-S8) ET dans forge-design (doctrine RL) — deux contrats différents sous un même nom</h3>
+          <div class="card-detail"><p class="lead">Constat en passant du diagnostic TF-0249 : la campagne TF-0235 du 15/08 a créé oracles/oracle-restitution.mjs dans forge-design (règles RL-1/3/4/9/10, pages data-restitution) alors que le pilot portait déjà oracles/oracle-restitution.mjs (règles S1-S8, forme du message de fin de traitement, consigne du 14/08). Deux oracles, deux objets, un seul nom — une invocation de mémoire ou une doc ambiguë exécutera le mauvais.</p><p class="detail-label">Proposition</p><ul class="puces"><li>renommer l’un des deux (ex. pilot → oracle-synthese.mjs, en suivant les renvois : RESTITUTION.md §Contrôle, self-tests, ETAPES-RUN pas 7) avec entrée au registre concerné</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-15</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>collision constatée sur pièce : deux fichiers homonymes aux contrats disjoints, créés à un jour d’intervalle, dont l’un par la session qui n’avait pas vu l’autre</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant — constat =&gt; candidat, jamais correction spontanee)</dd></div>
             
           </dl>
