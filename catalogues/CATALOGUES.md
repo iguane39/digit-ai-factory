@@ -1,6 +1,6 @@
 # Catalogues de services des forges — vue générée
 
-> **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.6.0, 2026-08-13) — ne jamais éditer ce fichier.
+> **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.6.1, 2026-08-15) — ne jamais éditer ce fichier.
 > 80 services · 66 prouvés · 14 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
 
 ## forge-conception (pipeline) — 7 services
@@ -114,7 +114,7 @@ oyau.py (section essais) + forge_tests\junit.py` | TF-0146 (13/08) : 12 tests, s
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
-| cat-seo-01 | **Créer une mission d'audit SEO** | ouvrir une étude SEO outillée chez mon produit | `python scripts\new_mission.py (CLI stdlib)` | mission réelle complète livrée (produit-02.fr) | prouve | production |
+| cat-seo-01 | **Créer une mission d'audit SEO** | ouvrir une étude SEO outillée pour mon site — l'étude vit dans le dossier du projet hôte | `python scripts\new_mission.py (CLI stdlib)` | mission réelle complète livrée (produit-02.fr) | prouve | production |
 | cat-seo-02 | **Dérouler l'audit 87 nœuds** | auditer mon site en ligne sur toute la grille, preuves à l'appui | `seo\METHODE.md déroulée en session (mandat humain requis — jamais de déclenchement automatique)` | mission réelle : 67 nœuds mesurés / 20 hors périmètre, HTML 6e itération, CSV 24 colonnes | prouve | production |
 | cat-seo-03 | **Valider forge et mission** | vérifier mécaniquement l'intégrité de la forge et d'une mission | `python scripts\validate.py [--mission <chemin>]` | exécuté 9/9 (forge) et 5/5 (mission réelle) | prouve | production |
 | cat-seo-04 | **Rapport HTML vérifié** | recevoir un rapport d'audit autonome et contrôlé avant remise | `python scripts\rapport_html.py --verifier` | rapport client réel livré (6e itération), contrôles exécutés | prouve | production |
