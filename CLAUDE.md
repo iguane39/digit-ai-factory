@@ -9,8 +9,8 @@ ne décide jamais), **forge-data** (lineage, qualité, restitution), **forge-obs
 agentique), **forge-websec** (sécurité du produit livré). Gouvernance : **organization
 organise, pilot pilote** — elle propose, le pilot décide et encode (`REGLES-PROJET.md`).
 
-Noyau plafonné à **6 Ko** (contrôle `oracles/oracle-claude-md.mjs`) : le détail vit dans
-`references\` et se charge **à l'ouverture de l'étape concernée**, pas d'un bloc.
+Noyau plafonné à **6 Ko** (`oracle-claude-md.mjs`) : le détail vit dans `references\`,
+chargé **à l'ouverture de l'étape concernée**, pas d'un bloc.
 
 **Chemins** : racine des forges = `$FORGE_ROOT`, sinon le parent de ce dépôt ;
 `c:\dev\digit-ai-forge-*` se lit `<racine>\…`. Poste non équipé : `node bootstrap.mjs`.
@@ -34,7 +34,7 @@ Noyau plafonné à **6 Ko** (contrôle `oracles/oracle-claude-md.mjs`) : le dét
 (écrivain unique : toi), vues `TODO.md`/`.html`, oracle R1-R10. Tout entre en `candidat`,
 décision humaine, clôture sur gains constatés. Candidature externe = sidecar +
 `ingerer-lot.mjs` (R10). Mode opératoire : `references\TODO-FORGE.md` ; consulter à
-l'ouverture de tout run.
+l'ouverture de tout run avec `oracle-boite-entree`.
 
 **Documents de référence** (avant tout run) : `INVENTAIRE.md` (état des forges),
 `CONTRAT-INTERFACE.md` (invocation, ledger, routage §4, mesure §4 bis, référentiels à
