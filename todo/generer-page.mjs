@@ -33,9 +33,22 @@ const esc = (s) => String(s ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt
 
 // L11 : un littéral de langage cité dans un texte (None, null…) se rend en <code> —
 // c'est un jeton technique discuté, pas une fuite de producteur (TF-0089).
-const escLit = (s) => esc(s).replace(
-  /(^|[\s(«:;,—–-])(null|NULL|None|NONE|undefined|NaN|nil)(?=$|[\s)».;,:!?—–-])/g,
-  "$1<code>$2</code>");
+//
+// L14 (15/08, en instruisant TF-0227) : le même geste vaut pour les motifs de gabarit.
+// Le registre décrit des défauts, donc il CITE la plomberie qu'il dénonce — la carte de
+// TF-0227 parle des marqueurs `[c:id]`, et la page se retrouvait accusée de laisser fuiter
+// ce qu'elle documente. Un jeton technique en prose appartient à `<code>` : c'est vrai
+// typographiquement avant d'être commode pour l'oracle, et c'est la distinction que
+// forge-data a tranchée le 14/08 (TF-0160, vérifiée sur 213 chiffres) — une mention n'est
+// pas une fuite. Corriger l'ÉMETTEUR plutôt qu'exempter la page : une exemption globale
+// aurait aussi couvert une vraie fuite le jour où il y en aurait une.
+const escLit = (s) => esc(s)
+  .replace(
+    /(^|[\s(«:;,—–-])(null|NULL|None|NONE|undefined|NaN|nil)(?=$|[\s)».;,:!?—–-])/g,
+    "$1<code>$2</code>")
+  .replace(
+    /(^|[\s(«:;,—–-])(\[[a-zA-Z]{1,6}:[^\]\s]{1,48}\]|\{\{[^}\n]{0,40}\}\}|\$\{[^}\n]{0,40}\}|%\([\w-]{1,24}\)[sdifr]|%[sdifr]|lorem ipsum)(?=$|[\s)».;,:!?—–-])/gi,
+    "$1<code>$2</code>");
 
 // Détail en puces (mandat 12/08) : sépare le constat de la proposition, puis découpe la
 // proposition en vraies puces — énumération (a)/(1) d'abord, sinon points-virgules, sinon

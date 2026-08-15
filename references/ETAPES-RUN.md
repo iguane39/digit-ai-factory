@@ -6,16 +6,21 @@ l'étape concernée, pas d'un bloc.
 
 ## 1. Ouvrir le run
 
-**Avant tout — prouver les outils du pilot, puis regarder la boîte** (deux commandes, quelques
-secondes) :
+**Avant tout — deux commandes, quelques secondes, et un échec SUSPEND l'ouverture** (R-35,
+décidée le 15/08) :
 
 ```
 node oracles\self-tests.mjs          # les 8 oracles savent-ils encore ECHOUER ? (I1)
 node oracles\oracle-boite-entree.mjs # un lot est-il arrivé sans être pris ? (B1-B3)
 ```
 
+Verdicts portés au ledger en `oracles_verdict`. La suspension n'est pas un excès de zèle :
+des oracles qui ne savent plus refuser ne peuvent rien juger de ce qui suit, et un lot non
+pris fausse tout ce qu'on croit savoir du reste-à-faire — on ouvrirait un run en croyant
+connaître le travail en attente.
+
 Le premier existe parce que chaque oracle portait sa recette à double sens sans que rien ne
-l'appelle : il a fallu y penser, oracle par oracle. Dès son premier passage, le 15/08, il a
+l'appelle : il fallait y penser, oracle par oracle. Dès son premier passage, le 15/08, il a
 trouvé que **`oracle-claude-md` — le gardien du plafond du noyau — n'avait aucun self-test**,
 donc n'avait jamais été vu refuser quoi que ce soit. Le second existe parce qu'un lot de
 5 candidatures est resté dans `input\00-retours\` sans être ingéré, découvert par hasard.
