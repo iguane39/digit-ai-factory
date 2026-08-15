@@ -138,7 +138,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>51adfd135c54</code> · dernier événement 2026-08-15T07:19:03.603Z</p>
+      <p class="meta">sceau <code>7258e03afa05</code> · dernier événement 2026-08-15T07:56:09Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -148,10 +148,10 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="4 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">4</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="1 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">1</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
-      <div class="kpi" title="228 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">228</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
+      <div class="kpi" title="232 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">232</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende">
       <span class="leg-item"><span class="leg-swatch" style="background:var(--blue)"></span>candidat</span>
@@ -172,88 +172,36 @@
       </div>
       
       <div class="dropdown" data-dim="prio">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">2</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">1</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-prio" role="group" aria-label="Filtre Priorité" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
-          <label><input type="checkbox" value="haute" checked> Haute</label>
           <label><input type="checkbox" value="moyenne" checked> Moyenne</label>
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">4 / 4 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">1 / 1 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">4 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-forge-agents">
-      <h2>digit-ai-forge-agents <span class="badge" title="4 item(s) actifs ciblant digit-ai-forge-agents">4</span></h2>
+      <h2>digit-ai-forge-agents <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-agents">1</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-agents</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0228" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
+        <article class="card s-candidat" id="item-TF-0233" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="moyenne">
           <header class="card-head">
-            <code class="tf-id">TF-0228</code>
+            <code class="tf-id">TF-0233</code>
             <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3.5)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">digit-ai-forge-agents : check_html avertit contre le script que le pattern S-G1 du meme socle EXIGE en &lt;head&gt;</h3>
-          <div class="card-detail"><p class="lead">check_html.py (lignes 325-328) avertit « Script bloquant dans &lt;head&gt; (utiliser defer ou placer en fin de body) » pour tout &lt;script&gt; de &lt;head&gt; sans defer ni async. Or le pattern S-G1 du meme socle impose un script d'initialisation de theme AVANT &lt;style&gt;, precisement pour poser data-theme avant la premiere peinture : defer produirait le flash que le pattern evite. Consequence mesuree : les quatre livrables HTML de ce projet portent cet avertissement a chaque execution depuis le 13/08, sans correctif possible sans violer S-G1. Un avertissement permanent et inevitable cesse d'etre lu — et c'est dans ce bruit que le defaut de marqueurs visibles est passe.</p><p class="detail-label">Proposition</p><ul class="puces"><li>exempter l'initialisation de theme par attribut declaratif (data-theme-init) ou par reconnaissance du snippet S-G1</li><li>tout autre script bloquant en &lt;head&gt; reste signale</li></ul></div>
+          <h3 class="card-titre">socle HTML : L3 signale le CONTENEUR d'une valeur alors que la legende est portee par le nombre qu'il contient</h3>
+          <div class="card-detail"><p class="lead">Constat en passant du 15/08, en instruisant TF-0231, et VERIFIE ANTERIEUR a la correction (rejoue sur la version stashee : meme echec).</p><ul class="puces"><li>Un &lt;div class=&quot;kpi&quot;&gt; dont le &lt;span class=&quot;stat&quot;&gt; porte aria-describedby vers une legende valide echoue quand meme : le conteneur est lui-meme une « valeur » (classe kpi dans CL_VALEUR) et reclame SA propre legende</li><li>Deux echecs L3 pour un seul chiffre, dont un que le lecteur ne peut pas satisfaire autrement qu'en dupliquant la legende</li><li>C'est la meme famille de bruit que TF-0228, corrige le jour meme : un avertissement inevitable cesse d'etre lu, puis couvre les autres</li><li>Non corrige de ma propre initiative : decider qu'un noeud-valeur dont un DESCENDANT porte la legende est couvert est un arbitrage, pas un correctif — il faut trancher si la legende doit etre atteignable depuis le noeud le plus externe ou depuis n'importe lequel</li></ul></div>
           <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-14</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>quatre livrables x une dizaine d'executions d'oracle = un avertissement toujours present, jamais actionnable, qui a servi de bruit de fond a un vrai defaut. Verifie dans le code de l'oracle et dans le pattern, non deduit.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">SCC_ALX</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0229" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0229</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-forge-agents : la clause d'echappement de L13 n'est pas mecanisee — son message promet une porte qui n'existe pas</h3>
-          <div class="card-detail"><p class="lead">Le message de L13 dit « un KPI d'elements hors page LE DIT », mais le code (check_html.py, lignes 622-627) ne teste que l'absence de data-kpi-filtre : il n'existe aucun moyen declaratif de le dire. Preuve : les six indicateurs du rapport 20260814c portent chacun une legende .kpi-d qui nomme le chapitre ou vivent leurs elements (« demonstration au chapitre 3 », « tableau au chapitre 1 ») et les six sont signales quand meme.</p><p class="detail-label">Proposition</p><ul class="puces"><li>accepter un attribut declaratif (data-kpi-hors-page=&quot;&lt;motif&gt;&quot;), ou considerer une legende .kpi-d non vide comme la declaration que le message annonce deja</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-14</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>avertissement non actionnable a chaque rejeu, sur un document qui satisfait deja l'esprit de la regle. Aucun contournement possible sans rendre cliquables des indicateurs qui comptent des elements absents de la page — ce qui serait une affordance mensongere.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">SCC_ALX</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0230" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0230</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-forge-agents : TF-0058 archive comme corrige ne l'est qu'a moitie — render_page ecrit toujours ses PNG dans le dossier du fichier audite par defaut</h3>
-          <div class="card-detail"><p class="lead">L'item TF-0058 (« render_page.py ecrit ses PNG dans le dossier du fichier audite ») est archive avec le statut corrige. L'option --out &lt;dossier&gt; existe bien et fonctionne — verifiee sur ce run. Mais le DEFAUT est inchange : appele sans --out, render_page.py a depose cinq PNG, soit 25 Mo, dans output\.oracles\ du projet, c'est-a-dire dans le dossier des livrables, qu'il a fallu deplacer a la main vers forge\etapes\renders\. Le motif d'origine de l'item — des PNG dans le dossier meme que le destinataire recoit — se reproduit donc a l'identique.</p><p class="detail-label">Proposition</p><ul class="puces"><li>defaut hors du dossier audite, ou refus d'ecrire la sans --out explicite</li><li>A rapprocher de TF-0058 plutot que de creer un doublon</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-14</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>25 Mo dans le dossier des livrables, decouverts au rangement demande par l'humain ; deplacement manuel puis realignement des journaux R-32 qui pointaient les anciens chemins. output est passe de 26 Mo a 1,2 Mo apres deplacement.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">SCC_ALX</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0231" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0231</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-forge-agents : arbitrer la portee de L3 (TF-0170) — barème lié exigé sur des valeurs d'INDICATEUR, pas seulement de cellule de tableau</h3>
-          <div class="card-detail"><p class="lead">Reconstat sur TF-0170, encore candidat, dans un cas que l'item ne prevoit pas : L3 a exige un bareme lie sur deux valeurs d'indicateur (« 9 / 85 » et « 8 / 12 » dans une grille de KPI), et non sur des cellules de tableau.</p><ul class="puces"><li>Deux FAIL bloquants a la premiere emission du rapport 20260814c</li><li>Contournement retenu : un bareme dedie #bareme-ecart cite par aria-describedby — qui a d'ailleurs ameliore le document</li><li>Question a trancher : la regle vaut -elle pour tout N / M de la page, ou pour les seules cellules de tableau ? En l'etat, tout ratio affiche dans un indicateur devient un FAIL surprise</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-14</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 1 × preuve 3 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>deux FAIL bloquants a l'emission, resolus par l'ajout d'un bareme et d'un aria-describedby ; un aller-retour d'emission complet. Message d'oracle cite dans le journal R-32 du livrable.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">SCC_ALX</dd></div>
+            <div><dt>Créé le</dt><dd>2026-08-15</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3.5 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>reproduit sur montage minimal et confirme anterieur par rejeu sur la version d'avant correction : un KPI correctement legende produit tout de meme un echec L3 sur son conteneur</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant — constat =&gt; candidat, jamais correction spontanee)</dd></div>
             
           </dl>
         </article>
