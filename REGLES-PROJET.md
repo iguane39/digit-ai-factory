@@ -364,11 +364,17 @@ appelant nommé n'est pas livré : il est en dette, et se déclare comme tel.
 
 Deux corollaires opposables :
 
-1. **À l'ouverture de tout run**, `node oracles\self-tests.mjs` et `node
-   oracles\oracle-boite-entree.mjs` sont joués et leurs verdicts portés au ledger en
-   `oracles_verdict` (pas 1 de `references\ETAPES-RUN.md`). Un échec **suspend l'ouverture** :
-   des oracles qui ne savent plus refuser ne peuvent rien juger de ce qui suit, et un lot non
-   pris fausse tout ce qu'on croit savoir du reste-à-faire.
+1. **À l'ouverture de tout run**, `node oracles\self-tests.mjs`, `node
+   oracles\oracle-boite-entree.mjs` et `node oracles\oracle-skills.mjs` sont joués et leurs
+   verdicts portés au ledger en `oracles_verdict` (pas 1 de `references\ETAPES-RUN.md`). Un
+   échec **suspend l'ouverture** : des oracles qui ne savent plus refuser ne peuvent rien juger
+   de ce qui suit, un lot non pris fausse tout ce qu'on croit savoir du reste-à-faire, et un
+   skill divergent fait exécuter autre chose que ce que le dépôt versionne.
+
+   *Corollaire du corollaire, appris le 15/08* : un applicateur ne présume **jamais** du sens
+   de la dérive. La copie installée n'est pas toujours celle qui est en retard — `--appliquer`
+   refuse d'écraser une version par une plus ancienne (K5), sinon « synchroniser » détruit du
+   travail.
 2. **Invariant I1** — un oracle sans recette à double sens est un **échec** de l'agrégateur,
    jamais un silence. Sans cela, ajouter un oracle non testé serait la façon la plus simple de
    faire baisser le compte d'échecs.
