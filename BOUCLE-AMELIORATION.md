@@ -1448,3 +1448,53 @@ TF-0273 (trace crux.py), TF-0274 (tests forge-seo invisibles de pytest). Lots Bd
 (TF-0267..0269) ingérés par la voie régulière.
 
 **Registre en fin de vague : 8 candidats actifs, 266 archivés.**
+## Campagne du 15/08/2026 (6e vague) — « fais toute la todo avec le a » : 21 items, 4 campagnes, le circuit de l'insatisfaction
+
+**Deux études de lot avant décision** (TF-0155 payé) : 20260815e *le coût du faux positif*
+(TF-0275..0282, verdict O2 — périmètre corrigé, **sévérité jamais touchée**, fixture rouge
+exigée pour chacune) et 20260815f *ce que personne ne juge* (TF-0283..0286, verdict O3).
+Les deux PASS 7/7.
+
+**Le circuit de l'insatisfaction (TF-0287, option (a))** — construit en 3 pas : registre
+`insatisfactions\REGISTRE.jsonl` + `oracle-insatisfactions` (I1-I4) qui **juge ET publie
+la mesure** ; **B4** à la boîte d'entrée, avec la précaution qui compte — **B3 se tait** sur
+ces dépôts, l'absence de sidecar y étant voulue (le circuit ne naît pas avec son propre faux
+positif, maladie que l'étude du soir documente) ; gabarits de dépôt (une phrase, l'humain
+n'écrit **jamais** le protocole) et d'instruction (six blocs) ; appelants nommés.
+**INS-0001 instruit en lecture seule a trouvé ce que le signalement ne disait pas** : le menu
+anglais complet EXISTE dans la source (`HeaderEn.tsx`, 8 entrées, 36 liens, utilisé par
+36/36 pages EN) — l'écart vit au **déploiement**. Sans le bloc (b), le correctif aurait porté
+sur du code déjà correct, et un troisième « toujours pas » aurait suivi. La compression
+française, elle, a sa cause datée : `LangSwitch` posé en zone CTA (`Header.tsx:169-171`).
+Le produit n'a **ni git, ni CLAUDE.md, ni forge/** — le gate n'a pas été retiré, il n'a jamais
+été posé : c'est exactement ce que **R-37** encode (`REGLES-PROJET` §Q), avec sa commande
+citée (`rendu-comparatif.mjs`, TF-0286).
+
+**Quatre campagnes en parallèle, toutes rendues en 26 à 36 min** — et, pour la première fois,
+**visibles** : 20+ émissions d'avancement relayées en direct (TF-0252 en service).
+· **design@ed58292→5679119** : banc 14 oracles/61 règles → **19/67**. La preuve la plus
+parlante de la journée : sur la fixture verte de T5, l'oracle non corrigé sortait 3 FAIL
+fantômes **et ne voyait pas la vraie paire** — un faux positif ne se contente pas de crier au
+loup, il cache le loup. · **tests (2 campagnes, 8 commits)** : pytest 502 → **568 verts**,
+S-01 TENU ; le pan interface lit enfin les composants React (**les 4 liens fautifs réels
+attrapés 4 sur 4, et exactement 4**) ; le **pan i18n existe** — le multilingue passe de 0
+contrôle dans tout l'écosystème à 3. · **ops/agents/seo/pilot (7 commits)** : R-24 juge le
+suffixe (le défaut parti en livraison est désormais rouge), recette seo en une commande
+(10 vérifications / 147 cas), hook C7 cesse de juger les fragments Jinja.
+
+**Ce que les campagnes ont REFUSÉ de faire** — et qui vaut autant que ce qu'elles ont fait :
+preuve `oracle-skills` déclarée **non tenue avec diagnostic** plutôt que contournée ; exit 1
+de `crux.py` **conservé contre la lettre** du brief (« une clé gratuite en deux commandes
+n'est pas une donnée hors de portée ») ; constante `NON_JUGE` **non touchée** parce qu'une
+session parallèle éditait le registre dérivé ; et deux règles **ajoutées** au pan React,
+déclarées en écart — parce que la lettre du mandat n'attrapait que 3 des 4 liens réels.
+
+**Vérifié par le pilot lui-même** : les 8 « divergences » d'`oracle-skills` sur
+`experts-forge` étaient **6 sidecars gitignorés** et 2 réelles (mon travail de l'après-midi,
+synchronisé depuis). D'où **TF-0289** (K2 compare du bruit et tronque son message à 4) et
+surtout **TF-0290** : *le hook C7 qui bloque toute écriture de livrable n'était versionné
+nulle part* — 15 dépôts balayés, zéro résultat ; le gate le plus joué de la journée n'avait
+ni source, ni self-test, ni contrôle d'intégrité, et `K1-K5` ne regarde que les skills.
+
+**Registre en fin de vague : 21 items archivés (287 au total), 8 candidats actifs**, tous nés
+des campagnes de ce soir.
