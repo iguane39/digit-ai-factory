@@ -1305,3 +1305,46 @@ boîte d'entrée non vide et ingéré par la voie régulière la candidature
 vs contrat forge-design) ; ordre de migration des autres forges productrices (P4 : tests,
 audit, data, observability) ; TF-0236..TF-0240 à décider ; push des dépôts (tout est en
 commits locaux).
+## Campagne du 15/08/2026 (2e vague) — « fais tout » : lot qualité graphique, migrations P4, outillage
+
+**Mandat global humain** (« vas y, fais tout ») sur les restes de la campagne restitution.
+
+**Lot qualité graphique (TF-0236..0238, candidature d'une autre session ingérée en cours de
+1re vague)** — étude d'opportunité 20260815b (E1-E7 PASS, verdict O3), puis les trois étages :
+**loi transverse n° 6** au noyau (« un rendu générique est un défaut, pas un goût »), financée
+par compression à sens constant (6 143 → 6 070 / 6 144 octets, oracle-claude-md PASS) ;
+**gates par défaut** aux étapes 3 et 5 bis d'`ETAPES-RUN.md` (DA dérivée de l'expérience
+client consignée dans DESIGN.md, oracle-taste, baseline) ; **lignes standard** dans les
+7 profils UI v1.1.0 (les 6 nommés + mobile, proposé d'office par la loi n° 3).
+
+**Gouvernance tranchée (mandat)** : la compétence restitution vit chez forge-design, la
+**règle opposable R-36** vit au pilot (`REGLES-PROJET.md` §P), appelant nommé (R-35) :
+registre quality-oracles + D8 en 5 bis.
+
+**TF-0239** — `timeout_ms` 600000 sur les oracles claims (le runner le supportait, l'entrée
+manquait) : le rapport SEO passe **CONFORME 13 PASS 0 échec**, claims compris. Leçon K2/K5
+au passage : l'injection faite côté copie installée a été silencieusement restaurée par le
+synchroniseur — reportée dans la **source versionnée** (agents@76d9e59), oracle-skills PASS.
+
+**TF-0240 (agent Opus)** — `migrer_mission.py` + 25 tests : renumérotation aux 4 emplacements
+structurés, table croisée contre le diff du manifeste (zéro écart), refus si perte, journal
+de migration, prose signalée jamais réécrite. Mission AuxPortesDeLaBaie migrée grille 88,
+rapport **20260815b** régénéré depuis HEAD (seo@2f88af4, produit@f888c2a). Trouvé au passage :
+« nœud 87 » en dur désignait la Machine SEO devenue 88 — lu du manifeste désormais.
+
+**P4 (agents Opus, en parallèle)** — **forge-tests@fcf2e30** : dashboard famille « suivi »,
+KPI complets, figures conditionnées à la donnée réelle (pas de tendance sans `--precedent` :
+écart déclaré), preuve socle+restitution exit 0, pytest 430 passed (6 échecs pré-existants
+hors périmètre, inchangés), 0 jeton perdu. **forge-audit@8dceac3** : 7 vues, filtres vendorés
+composables, batterie 63/63, check_html passé de **53 défauts à 0**, verifier-rapport exit 0
+sur 3 rendus + kit standalone, 3 valeurs de fixture GAGNÉES (dont un constat orphelin
+désormais déclaré au manifeste). **data / observability : sans objet** — aucun producteur
+HTML ; la doctrine s'y appliquera à la naissance (écart déclaré ici, loi n° 3).
+
+**Constat en passant** : TF-0241 (socle : `lang="fr"` en dur, mur pour les livrables
+bilingues — vu sur le kit AuditCore en anglais).
+
+**Reste ouvert** : décisions humaines sur TF-0233, TF-0241 et le lot D-D ingéré ; nœud 44 de
+la mission SEO à réinstruire (journal de mission) ; 6 pytest pré-existants forge-tests ;
+unification du compteur `data-tf-count-for` vs script maison (forge-tests) ; revues D8
+(RL-2/6/7) au premier run.

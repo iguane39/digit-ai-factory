@@ -379,6 +379,28 @@ Deux corollaires opposables :
    jamais un silence. Sans cela, ajouter un oracle non testé serait la façon la plus simple de
    faire baisser le compte d'échecs.
 
+## P. La restitution se conçoit pour ses lecteurs (règle 36 — 15/08, TF-0235)
+
+Le cas fondateur : le rapport SEO d'AuxPortesDeLaBaie (20260809k) — conforme au socle,
+illisible pour ses lecteurs. 491 Ko sur une page, zéro graphique, des KPIs sans lecture :
+la conformité de la PAGE ne dit rien du travail qu'elle fait auprès de qui la lit.
+La compétence vit chez **forge-design** (`REFERENTIEL-RESTITUTION.md` : familles
+rapport/suivi/registre, lecteurs types, règles RL-1..RL-10, gabarit consommable) ; la
+règle opposable vit **ici** — arbitrage de gouvernance du 15/08 (mandat global) :
+« organization organise, pilot pilote » vaut aussi pour design — la forge outille,
+le pilot impose.
+
+**R-36.** Tout livrable HTML de restitution (rapport d'audit, dashboard de suivi,
+registre-outil) **déclare sa famille** (`data-restitution="rapport|suivi|registre"`) et
+**passe `oracle-restitution`** (forge-design). Une page de restitution qui ne se déclare
+pas est un écart à déclarer en revue de campagne — jamais un silence (loi n° 3).
+
+**Appelant (R-35)** : le registre global quality-oracles v2.11.0 (gate C7 à l'écriture,
+C6 à la diffusion — déclenchement par contenu `data-restitution`, SKIP motivé sinon) ;
+en revue aval, la dimension D8 de `critique-le-design` (étape 5 bis). Producteurs déjà
+migrés à la naissance de la règle : forge-seo (e80e078). Les autres forges productrices
+migrent par campagnes mandatées (P4), chacune journalisée.
+
 ## Conflits à trancher (ta décision explicite)
 
 - **C1 — `old\` vs git (n° 6/7)** : **TRANCHÉ le 13/08 (TF-0150)** — `old\` (minuscule,
