@@ -50,8 +50,15 @@ const NON_JUGE = [
 const SUFFIXE_SIDECAR = ".tf.jsonl";
 const SUFFIXE_NORMALISE = ".normalise.tf.jsonl";
 
+// Fins de ligne normalisées en LF AVANT hachage (TF-0253) : git peut réécrire un sidecar en
+// CRLF au checkout (core.autocrlf) sans qu'aucun octet de contenu n'ait changé. Une empreinte
+// prise sur les octets bruts diverge alors de celle consignée à l'ingestion (LF), et B1/B2
+// signalent un travail non pris ou édité là où rien n'a bougé — 12 faux positifs constatés le
+// 14/08 pour zéro édition réelle. Normaliser ici rend la comparaison indifférente à la fin de
+// ligne, tout en laissant B2 détecter une VRAIE édition (le contenu normalisé diffère toujours).
 function empreinte(chemin) {
-  return createHash("sha256").update(readFileSync(chemin, "utf8")).digest("hex");
+  const brut = readFileSync(chemin, "utf8").replace(/\r\n/g, "\n");
+  return createHash("sha256").update(brut).digest("hex");
 }
 
 /** Les ingestions déjà consignées, par empreinte ET par nom de fichier. */
@@ -164,6 +171,24 @@ function selfTest() {
   writeFileSync(join(boite, "ORPHELIN - RETOURS - 20260101a.md"), "# lot sans sidecar\n");
   r = juger(boite, reg);
   cas.push(["B3    — lot sans sidecar", r.findings.some((f) => f.regle === "B3" && f.statut === "FAIL"), r.verdict]);
+
+  // CRLF (TF-0253) : un sidecar ingéré en LF, réécrit en CRLF par git au checkout — contenu
+  // inchangé. VERT attendu : la normalisation avant hachage ne doit PAS lever B1/B2.
+  const crlfContenu = '{"titre":"a"}\n{"titre":"b"}\n';
+  const crlf = join(boite, "CRLF - RETOURS - 20260101a.tf.jsonl");
+  writeFileSync(crlf, crlfContenu);
+  writeFileSync(reg, readFileSync(reg, "utf8") + JSON.stringify({
+    ev: "ingestion", lot_sha: empreinte(crlf), fichier: "CRLF - RETOURS - 20260101a.tf.jsonl",
+  }) + "\n");
+  writeFileSync(crlf, crlfContenu.replace(/\n/g, "\r\n")); // git réécrit en CRLF, contenu identique
+  r = juger(boite, reg);
+  cas.push(["CRLF  — vert : réécrit en CRLF, contenu identique", !r.findings.some((f) => f.statut === "FAIL" && f.ou === "CRLF - RETOURS - 20260101a.tf.jsonl"), r.verdict]);
+
+  // Contre-épreuve rouge : sous la même réécriture CRLF, une VRAIE édition doit rester détectée
+  // (la normalisation neutralise la fin de ligne, jamais un octet de contenu différent).
+  writeFileSync(crlf, crlfContenu.replace(/\n/g, "\r\n") + '{"titre":"ajoute apres coup"}\r\n');
+  r = juger(boite, reg);
+  cas.push(["CRLF  — rouge : édition réelle sous CRLF toujours détectée", r.findings.some((f) => f.regle === "B2" && f.statut === "FAIL" && f.ou === "CRLF - RETOURS - 20260101a.tf.jsonl"), r.verdict]);
 
   let ok = 0;
   for (const [nom, tenu, verdict] of cas) {
