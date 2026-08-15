@@ -37,7 +37,7 @@ MEP — et le run Produit-10 a dû improviser ce que cette page encode désormai
 5. **Clore** — livrable nommé R-4 dans `output\` (journal d'oracles sous
    `forge\oracles\` — R-32 pour le HTML), lot `<projet> - RETOURS - AAAAMMJJ<i>.md` +
    sidecar remis à `<pilot>\input\00-retours\`, `run_close`, synthèse **au format
-   `gabarits\RESTITUTION.md`** (8 blocs, horodatée, jugée par `oracle-restitution.mjs`).
+   `gabarits\RESTITUTION.md`** (8 blocs, horodatée, jugée par `oracle-synthese.mjs`).
 
 ## Ce qui ne s'applique PAS (et ne se singe pas)
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * oracle-restitution.mjs — juge la FORME d'un message de fin de traitement contre
+ * oracle-synthese.mjs — juge la FORME d'un message de fin de traitement contre
  * `gabarits\RESTITUTION.md` v2 (14/08/2026).
  *
  * Pourquoi un oracle : la v1 de la consigne disait « sa tenue se vérifie à la relecture ».
@@ -22,8 +22,8 @@
  *   S7  aucune profondeur de puce au-delà de 2 niveaux ;
  *   S8  aucun ✓ / « fait » sans preuve citée dans la même puce (verdict, compteur, chemin).
  *
- * Usage : node oracle-restitution.mjs <synthese.md>   → verdict JSON
- *         node oracle-restitution.mjs --self-test     → fixtures double sens
+ * Usage : node oracle-synthese.mjs <synthese.md>   → verdict JSON
+ *         node oracle-synthese.mjs --self-test     → fixtures double sens
  * Exit : 0 PASS · 1 FAIL · 2 non jugeable.
  */
 import { existsSync, readFileSync, writeFileSync, mkdtempSync } from "node:fs";
@@ -228,13 +228,13 @@ Aucun écart : la demande a été suivie à la lettre.
 }
 
 if (!arg || !existsSync(arg)) {
-  console.log(JSON.stringify({ oracle: "oracle-restitution", verdict: "ERREUR", message: "synthèse introuvable — usage : node oracle-restitution.mjs <synthese.md> | --self-test" }));
+  console.log(JSON.stringify({ oracle: "oracle-synthese", verdict: "ERREUR", message: "synthèse introuvable — usage : node oracle-synthese.mjs <synthese.md> | --self-test" }));
   process.exit(2);
 }
 const findings = juger(readFileSync(arg, "utf8"));
 const verdict = verdictDe(findings);
 console.log(JSON.stringify({
-  oracle: "oracle-restitution",
+  oracle: "oracle-synthese",
   version: "1.0.0",
   cible: arg,
   verdict,
