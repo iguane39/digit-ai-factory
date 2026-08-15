@@ -99,3 +99,12 @@ Le pilot vérifie par sondage, écrit les événements du registre (corrige avec
 gains_constates, ou retour en non-clos), régénère la vue et la page, et journalise la
 campagne dans BOUCLE-AMELIORATION.md. Tu n'as donc PAS à écrire ces artefacts — ton
 rapport est ta seule interface de sortie.
+
+## Synthèse de fin de campagne (TF-0249, consigne RESTITUTION v2.1)
+
+La synthèse de TOUTE campagne suit `gabarits\RESTITUTION.md` (8 blocs). Côté pilot :
+elle s'écrit EN FICHIER (`output\04-plans\` ou dossier de campagne), passe
+`node oracles\oracle-synthese.mjs <fichier>` et ne s'affiche à l'humain qu'après
+verdict — jamais un message improvisé. Côté agent : ton rapport final porte au minimum
+l'en-tête horodaté, le verdict factuel en une ligne, le traité AVEC preuves, le non-traité
+AVEC motifs, et les écarts à la lettre (forme dégradée admise, structure jamais).

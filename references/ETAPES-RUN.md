@@ -209,7 +209,7 @@ et publie ce qu'il a consommé — un audit lancé sans option ne coûte rien.
 suit `gabarits\RESTITUTION.md` : huit blocs dans l'ordre, **aucun ne disparaît** (un bloc vide
 se dit en une ligne), en-tête **horodaté à l'heure près**, décisions en tête et en choix
 fermés, non traités **avec leur motif**, risques avec leur signal, prochaines actions par
-acteur ET par ordre justifié. Contrôle exécuté : `node oracles\oracle-restitution.mjs
+acteur ET par ordre justifié. Contrôle exécuté : `node oracles\oracle-synthese.mjs
 <synthese.md>` (S1-S8, self-test double sens). Une CLI ou une recette en tient la forme
 dégradée : horodatage · verdict · restes classés.
 
