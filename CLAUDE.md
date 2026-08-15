@@ -63,7 +63,7 @@ jamais ici ; le run y vit (`forge\`, code à la racine). Séquence :
    `run_close`, synthèse (`gabarits\RESTITUTION.md`).
 
 **Mode opératoire détaillé : `references\ETAPES-RUN.md`** (charger à l'étape). Contrat
-« prêt client » (seuls critères, tous mesurables) : oracles 1-3 verts ·
+« prêt client » (critères mesurables) : oracles 1-3 verts ·
 forge-tests exit 0/3 seuils tenus · oracle MEP 5/5 · dossier MEP complet · traçabilité
 exigences→tests 100 % · ledger vérifié.
 
@@ -75,7 +75,8 @@ entiers). **Mandat transverse** (livrable = document) : `references\RUN-MANDAT.m
 Étapes séquentielles ; parallélisme seulement entre tâches indépendantes d'une même
 étape. Routage et mesure : `CONTRAT-INTERFACE.md` §4 et §4 bis — défaut Sonnet, mécanique
 Haiku, construction complexe Opus, pilotage Fable ; escalades consignées, « aucune »
-compris. Campagnes : `gabarits\AGENT-CAMPAGNE.md` (TF-0050), gabarit + delta.
+compris. Campagnes : `gabarits\AGENT-CAMPAGNE.md` (TF-0050), gabarit + delta ; synthèse
+de fin EN FICHIER, jugée avant affichage (`gabarits\RESTITUTION.md`).
 
 ## Garde-fous (détail : `references\ACCUEIL.md`)
 

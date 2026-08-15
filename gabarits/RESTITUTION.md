@@ -1,6 +1,6 @@
 # Consigne de restitution — le message de fin de traitement
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 2.0.0, 14/08/2026, ADOPTÉE telle
+Référentiel versionné (loi n° 4, daté-éditable) — **version 2.1.0, 15/08/2026** (TF-0249 : appelants nommés, synthèse EN FICHIER jugée avant affichage ; TF-0250 : oracle renommé `oracle-synthese`) — **v2.0.0 du 14/08 ADOPTÉE telle
 quelle par décision humaine du 14/08** (option (a) : les 8 blocs restent, l'oracle reste
 **informatif** et non bloquant tant qu'on ne l'a pas vu tenir sur plusieurs clôtures réelles).
 Il régit
@@ -136,6 +136,13 @@ risques et traces relèvent de la restitution écrite, pas d'une sortie machine 
 
 ## Contrôle
 
-**Exécuté** : `node oracles\oracle-restitution.mjs <synthese.md>` — règles S1-S8 binaires,
+**Exécuté** : `node oracles\oracle-synthese.mjs <synthese.md>` — règles S1-S8 binaires,
 fixtures double sens au self-test. Une restitution qui viole une règle est un défaut de forme,
 signalé comme tel et corrigeable. Mise à jour = nouvelle version + date.
+
+**Appelants (R-35, TF-0249)** — la consigne est chargée et JOUÉE, jamais laissée à la
+mémoire : clôture de run (pas 7, `ETAPES-RUN.md`) · fin de campagne (`AGENT-CAMPAGNE.md`
+§Synthèse) · fin de mandat (`RUN-MANDAT.md`) · noyau §Parallélisme. Dans tous les cas la
+synthèse s'écrit EN FICHIER (`output\` du pilot ou `forge\` du produit), passe
+`oracle-synthese` et ne s'affiche qu'après son verdict — un message de chat ne passe
+devant aucun contrôle, un fichier si.
