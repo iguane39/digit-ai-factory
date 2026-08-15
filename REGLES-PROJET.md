@@ -343,6 +343,36 @@ refuse en FAIL bloquant. Admettre un objet qui prescrit ce que l'écosystème in
 deux règles en contradiction chez le constructeur. La voie ouverte reste la **barre** (importer
 un niveau) et l'**extraction attribuée** des règles compatibles — toutes deux livrées.
 
+## O. Un contrôle qui existe sans être joué n'existe pas (règle 35 — 15/08, TF-0232)
+
+Trois occurrences en deux jours, même maladie sous trois visages :
+
+- la consigne `RESTITUTION.md` v1 — écrite, **citée par aucun run**, donc jamais appliquée ;
+- `ruff` dans forge-tests — configuré, rendant 21 erreurs, **appelé par aucun pas de recette** ;
+- les self-tests des oracles du pilot — huit recettes à double sens, **jouées par rien**. Le
+  jour où un agrégateur les a lancées, il a trouvé que `oracle-claude-md`, gardien du plafond
+  du noyau depuis TF-0037, **n'avait aucun self-test** : il n'avait jamais été vu refuser quoi
+  que ce soit.
+
+Le point commun n'est pas la négligence, c'est la **forme de la règle** : « il faut penser à
+le lancer » n'est pas un mécanisme. Un contrôle sans appelant est une décoration, et une
+décoration donne la même assurance qu'un garde-fou sans en avoir la propriété.
+
+**R-35.** Tout contrôle livré (oracle, linter, self-test, recette) désigne **son appelant** au
+moment où il est écrit — un pas de recette, une étape de run, un gate. Un contrôle sans
+appelant nommé n'est pas livré : il est en dette, et se déclare comme tel.
+
+Deux corollaires opposables :
+
+1. **À l'ouverture de tout run**, `node oracles\self-tests.mjs` et `node
+   oracles\oracle-boite-entree.mjs` sont joués et leurs verdicts portés au ledger en
+   `oracles_verdict` (pas 1 de `references\ETAPES-RUN.md`). Un échec **suspend l'ouverture** :
+   des oracles qui ne savent plus refuser ne peuvent rien juger de ce qui suit, et un lot non
+   pris fausse tout ce qu'on croit savoir du reste-à-faire.
+2. **Invariant I1** — un oracle sans recette à double sens est un **échec** de l'agrégateur,
+   jamais un silence. Sans cela, ajouter un oracle non testé serait la façon la plus simple de
+   faire baisser le compte d'échecs.
+
 ## Conflits à trancher (ta décision explicite)
 
 - **C1 — `old\` vs git (n° 6/7)** : **TRANCHÉ le 13/08 (TF-0150)** — `old\` (minuscule,
