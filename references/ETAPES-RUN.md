@@ -6,6 +6,20 @@ l'étape concernée, pas d'un bloc.
 
 ## 1. Ouvrir le run
 
+**Avant tout — prouver les outils du pilot, puis regarder la boîte** (deux commandes, quelques
+secondes) :
+
+```
+node oracles\self-tests.mjs          # les 8 oracles savent-ils encore ECHOUER ? (I1)
+node oracles\oracle-boite-entree.mjs # un lot est-il arrivé sans être pris ? (B1-B3)
+```
+
+Le premier existe parce que chaque oracle portait sa recette à double sens sans que rien ne
+l'appelle : il a fallu y penser, oracle par oracle. Dès son premier passage, le 15/08, il a
+trouvé que **`oracle-claude-md` — le gardien du plafond du noyau — n'avait aucun self-test**,
+donc n'avait jamais été vu refuser quoi que ce soit. Le second existe parce qu'un lot de
+5 candidatures est resté dans `input\00-retours\` sans être ingéré, découvert par hasard.
+
 Dans le projet produit, créer `forge\` (`ledger.jsonl` ouvert avec `run_open`, `BRIEF.md` avec
 le brief reçu, `etapes\`). Si `PROMPT-PRODUIT.md` n'est pas à la racine du projet, l'y copier
 depuis le pilot (auto-documentation et reprise). Écrivain unique du ledger : l'orchestrateur.
