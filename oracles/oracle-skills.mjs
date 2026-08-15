@@ -29,12 +29,19 @@
  *
  * Usage : node oracle-skills.mjs [--racine <dossier des forges>] [--installes <dossier>]
  *         node oracle-skills.mjs --appliquer   # copie source → installé (K1 et K2 seulement)
+ *         node oracle-skills.mjs --purger      # orphelins de la copie → quarantaine datée (K2)
  *         node oracle-skills.mjs --self-test
  * Exit : 0 PASS · 1 FAIL · 2 non jugeable.
+ *
+ * --purger (TF-0254). `--appliquer` copie la source VERS la copie installée, il ne touche
+ * jamais à ce que la copie contient EN PLUS (sauvegardes `.avant-*`, lockfiles générés à
+ * l'usage, fixtures locales d'un run) : 11 orphelins constatés sur 3 skills après application,
+ * K2 restait FAIL. `--purger` déplace ces orphelins sous `<installes>\.quarantaine\<horodatage>\
+ * <skill>\` — un déplacement, jamais une suppression sèche — et le liste au verdict (`purge`).
  */
 import {
   existsSync, readFileSync, readdirSync, statSync, mkdirSync, copyFileSync, writeFileSync,
-  mkdtempSync,
+  mkdtempSync, renameSync,
 } from "node:fs";
 import { dirname, join, resolve, relative } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -128,18 +135,30 @@ function memeContenu(a, b) {
   return texte(x) === texte(y);
 }
 
-function ecarts(src, dst) {
+/** Écarts structurés : manquants (à copier), divergents (contenu différent), orphelins (en
+ *  trop dans la copie — ni versionnés, ni à copier, à purger). */
+function analyserEcarts(src, dst) {
   const fs_src = fichiers(src);
   const fs_dst = existsSync(dst) ? fichiers(dst) : [];
   const set_dst = new Set(fs_dst);
-  const differents = [];
-  for (const f of fs_src) {
-    if (!set_dst.has(f)) { differents.push(`${f} (absent de la copie)`); continue; }
-    if (!memeContenu(join(src, f), join(dst, f))) differents.push(f);
-  }
   const set_src = new Set(fs_src);
-  for (const f of fs_dst) if (!set_src.has(f)) differents.push(`${f} (en trop dans la copie)`);
-  return differents;
+  const manquants = [];
+  const divergents = [];
+  for (const f of fs_src) {
+    if (!set_dst.has(f)) { manquants.push(f); continue; }
+    if (!memeContenu(join(src, f), join(dst, f))) divergents.push(f);
+  }
+  const orphelins = fs_dst.filter((f) => !set_src.has(f));
+  return { manquants, divergents, orphelins };
+}
+
+function ecarts(src, dst) {
+  const { manquants, divergents, orphelins } = analyserEcarts(src, dst);
+  return [
+    ...manquants.map((f) => `${f} (absent de la copie)`),
+    ...divergents,
+    ...orphelins.map((f) => `${f} (en trop dans la copie)`),
+  ];
 }
 
 function copier(src, dst) {
@@ -150,13 +169,37 @@ function copier(src, dst) {
   }
 }
 
-function juger(racine, installes, appliquer = false) {
+/** Horodatage de quarantaine — à la seconde, pour que deux purges le même jour ne collisionnent
+ *  pas. Jamais devinée : lue sur l'horloge au moment de l'appel. */
+function horodatageQuarantaine() {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+}
+
+/** Déplace (jamais ne supprime) les fichiers orphelins de `dst` sous une quarantaine datée. */
+function purgerOrphelins(dst, nom, orphelins, racineQuarantaine, horodatage) {
+  const deplaces = [];
+  for (const f of orphelins) {
+    const source = join(dst, f);
+    const cible = join(racineQuarantaine, horodatage, nom, f);
+    mkdirSync(dirname(cible), { recursive: true });
+    renameSync(source, cible);
+    deplaces.push(f);
+  }
+  return deplaces;
+}
+
+function juger(racine, installes, appliquer = false, purger = false) {
   const findings = [];
   const par_nom = sources(racine);
   if (par_nom.size === 0) {
     return { verdict: "SKIP", findings, motif: `aucune source de skill sous ${racine}` };
   }
   const applique = [];
+  const purge = [];
+  const racineQuarantaine = join(installes, ".quarantaine");
+  const horodatage = horodatageQuarantaine();
 
   // K3 d'abord : sans source unique, K1 et K2 n'ont pas de sens pour ce nom.
   const ambigus = new Set();
@@ -182,7 +225,22 @@ function juger(racine, installes, appliquer = false) {
       });
       continue;
     }
-    const diff = ecarts(src, dst);
+    let { manquants, divergents, orphelins } = analyserEcarts(src, dst);
+
+    // --purger : les orphelins ne sont ni copiés par --appliquer ni un défaut de contenu — ce
+    // sont des fichiers que la copie installée porte EN PLUS (sauvegarde, lockfile, fixture
+    // locale). On les déplace, jamais on ne les efface, et ils sortent du calcul de l'écart.
+    if (purger && orphelins.length) {
+      const deplaces = purgerOrphelins(dst, nom, orphelins, racineQuarantaine, horodatage);
+      purge.push(`${nom} : ${deplaces.length} orphelin(s) mis en quarantaine sous ${relative(installes, join(racineQuarantaine, horodatage, nom))} (${deplaces.join(", ")})`);
+      orphelins = [];
+    }
+
+    const diff = [
+      ...manquants.map((f) => `${f} (absent de la copie)`),
+      ...divergents,
+      ...orphelins.map((f) => `${f} (en trop dans la copie)`),
+    ];
     if (diff.length) {
       // K5 — GARDE-FOU, et il a servi le jour même de son écriture. `prompt-analyzer-l99`
       // installé était en 2.2.0 quand la source du dépôt en était à 2.1.0 : un
@@ -228,6 +286,7 @@ function juger(racine, installes, appliquer = false) {
     verdict: findings.some((f) => f.statut === "FAIL") ? "FAIL" : "PASS",
     findings,
     applique: appliquer ? applique : undefined,
+    purge: purger ? purge : undefined,
   };
 }
 
@@ -307,6 +366,38 @@ function selfTest() {
   cas.push(["      — une sauvegarde .bak n'est pas un écart",
             !r.findings.some((f) => f.regle === "K2" && f.statut === "FAIL" && f.ou === "alpha")]);
 
+  // --purger (TF-0254) : `--appliquer` copie la source vers la copie mais ne touche jamais aux
+  // orphelins que la copie porte EN PLUS (sauvegarde `.avant-*`, lockfile généré, fixture
+  // locale) — 11 constatés sur 3 skills le 15/08, K2 restait FAIL après application.
+  poser(join(src, "delta", "SKILL.md"), "# delta\n");
+  poser(join(inst, "delta", "SKILL.md"), "# delta\n");
+  poser(join(inst, "delta", "SKILL.md.avant-purge"), "# delta ancienne\n"); // sauvegarde orpheline
+  poser(join(inst, "delta", "package-lock.json"), "{}\n"); // lockfile jamais versionné
+  r = juger(racine, inst);
+  cas.push(["K2    — orphelins dans la copie installée", echoue(r, "K2")]);
+
+  // Rouge : --appliquer SEUL ne purge rien, les orphelins restent, K2 reste FAIL.
+  juger(racine, inst, true);
+  r = juger(racine, inst);
+  cas.push(["      — --appliquer seul laisse les orphelins (rouge)",
+            echoue(r, "K2")
+            && existsSync(join(inst, "delta", "package-lock.json"))
+            && existsSync(join(inst, "delta", "SKILL.md.avant-purge"))]);
+
+  // Vert : --purger déplace les orphelins en quarantaine datée — jamais de suppression —
+  // et K2 repasse au vert.
+  const rPurge = juger(racine, inst, false, true);
+  r = juger(racine, inst);
+  cas.push(["      — --purger déplace les orphelins, K2 repasse au vert", !echoue(r, "K2")]);
+  cas.push(["      — les orphelins ne sont pas supprimés du disque, seulement déplacés",
+            !existsSync(join(inst, "delta", "package-lock.json"))
+            && !existsSync(join(inst, "delta", "SKILL.md.avant-purge"))
+            && (rPurge.purge || []).some((m) => m.includes("delta") && m.includes("package-lock.json"))]);
+  const quarantaine = join(inst, ".quarantaine");
+  const retrouve = existsSync(quarantaine)
+    && readdirSync(quarantaine, { recursive: true }).some((f) => String(f).includes("package-lock.json"));
+  cas.push(["      — les fichiers purgés sont retrouvables sous .quarantaine", retrouve]);
+
   // K4 : un skill personnel est déclaré, jamais mis en échec.
   poser(join(inst, "perso", "SKILL.md"), "# perso\n");
   r = juger(racine, inst);
@@ -334,9 +425,10 @@ const lire = (drapeau, defaut) => {
 const racine = lire("--racine", racineForges());
 const installes = lire("--installes", join(homedir(), ".claude", "skills"));
 const appliquer = args.includes("--appliquer");
+const purger = args.includes("--purger");
 
-const { verdict, findings, motif, applique } = juger(racine, installes, appliquer);
+const { verdict, findings, motif, applique, purge } = juger(racine, installes, appliquer, purger);
 process.stdout.write(JSON.stringify(
-  { oracle: ORACLE, version: VERSION, racine, installes, verdict, motif, applique, findings, non_juge: NON_JUGE },
+  { oracle: ORACLE, version: VERSION, racine, installes, verdict, motif, applique, purge, findings, non_juge: NON_JUGE },
   null, 1) + "\n");
 process.exit(verdict === "FAIL" ? 1 : verdict === "SKIP" ? 2 : 0);
