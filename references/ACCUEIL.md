@@ -61,6 +61,7 @@ le pilot et les forges sont des dépendances en lecture.
 | tester et corriger | cycle forge-tests | CLI `forge_tests` (--json --sortie ; --generer/--livrables HORS projet, G-1) ; boucle bornée 3 cycles, G-2 absolue |
 | revoir le design rendu | revue aval (étape 5 bis) | oracles design + `render_page.py` — le rendu se juge en pixels |
 | déployer | étape MEP | `ETAPE-MEP.md`, forge-ops O-1…O-5, GO humain sur dossier de preuve |
+| signaler que quelque chose ne va pas | circuit de l'insatisfaction (dépôt en une phrase) | `gabarits\INSATISFACTION.md` — instruction automatique à six blocs (`AGENT-INSATISFACTION.md`), réouvertures comptées, cible zéro |
 | auditer le SEO d'un site en ligne | mission forge-seo (mandat) | `new_mission.py`, `METHODE.md`, `validate.py` exit 0 exigé |
 | auditer la gouvernance | forge-audit (mandat) | référentiel `core\`, engagement par tenant |
 | discipliner ses données | forge-data | oracles profiler / tracer / restituer |
