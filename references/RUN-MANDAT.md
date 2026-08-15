@@ -8,9 +8,19 @@ MEP — et le run Produit-10 a dû improviser ce que cette page encode désormai
 
 ## Ce que le socle exige quand même (invariant, jamais négocié)
 
-1. **Socle projet complet** : `input\`/`output\`/`docs\`/`forge\`, git local dès
-   l'ouverture, `oracle-conformite-projet.mjs` PASS — un mandat transverse vit dans un
-   projet conforme comme les autres (R-1…R-27, R-32).
+1. **Socle du RUN complet** : `input\`/`output\`/`docs\`/`forge\`, git local dès
+   l'ouverture — et TOUT ce que le mandat produit est conforme (nommage R-4 des
+   livrables, journaux d'oracles R-32, ledger).
+   **Sur un projet né sous la doctrine** : `oracle-conformite-projet.mjs` PASS, comme
+   les autres. **Sur un existant antérieur à la doctrine (TF-0266, amendé le 15/08)** :
+   l'oracle se JOUE quand même (R-35 — son verdict est l'état des lieux, consigné au
+   ledger en `oracles_verdict`), mais un FAIL portant sur des fichiers ANTÉRIEURS au
+   mandat ne bloque pas le run : les constats partent en **écarts déclarés au ledger**
+   (liste, jamais un total anonyme). Le rattrapage du projet entier est une décision du
+   propriétaire du projet, pas un préalable du mandat — exiger l'inverse contredisait
+   le garde-fou « le pilot n'intervient jamais dans un produit hors d'un run demandé »
+   (constaté le 15/08 : 206 constats R-4 sur des fichiers antérieurs, un renommage de
+   28 fichiers imposé pour un mandat d'audit SEO).
 2. **Ledger dès l'ouverture** : `run_open` avec `versions_forges` (R-19), une entrée
    `invocation` par service de forge mobilisé, `oracles_verdict` pour chaque oracle
    exécuté, `retour` pour chaque friction, `run_close` au bilan.
@@ -49,6 +59,7 @@ MEP — et le run Produit-10 a dû improviser ce que cette page encode désormai
   gate humain est celui que le mandat déclare.
 - Pas de boucle de fermeture forge-tests — les oracles du domaine tiennent ce rôle.
 
-Contrat « prêt à remettre » (tous mesurables) : conformité projet PASS · oracles du
-domaine PASS (ou écarts déclarés) · traçabilité des chiffres 100 % · ledger vérifié ·
-lot de retours remis.
+Contrat « prêt à remettre » (tous mesurables) : conformité JOUÉE — PASS sur projet né
+sous la doctrine, verdict consigné + écarts antérieurs déclarés sur existant (TF-0266) ·
+livrables du RUN conformes (R-4, R-32) · oracles du domaine PASS (ou écarts déclarés) ·
+traçabilité des chiffres 100 % · ledger vérifié · lot de retours remis.
