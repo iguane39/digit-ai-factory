@@ -1410,3 +1410,41 @@ audit@a8a07bd : convention sidecars TF-0065 alignée.
 **Scellage** : tags **v1.16.0** synchronisés sur l'écosystème (convention constatée : v1.15.0
 partout), poussés avec les branches. Registre en fin de journée : **1 actif** (TF-0248,
 candidat), 247 archivés.
+## Campagne du 15/08/2026 (5e vague) — « traite les todo et retours » : 14 items, 3 campagnes, l'avancement en service
+
+**Première vague sous le §Avancement (TF-0252)** : les trois agents ont émis 12 relais
+d'avancement en ~20 minutes — plans, frontières de chantier, cadences mesurées, glissements
+dits — tous relayés à l'humain en direct. La convention TF-0094 a enfin un chemin vivant.
+
+**Lot BdL (TF-0253..0259, décision directe sous seuil)** — pilot@682d283/2974faf/d909cad :
+CRLF normalisé avant hachage (boîte), `--purger` en quarantaine datée (skills), R-25 cite
+les types admis et suggère le plus proche. conception@bf27bd6 : la cause réelle de TF-0255
+était dans l'APPELANT (le runner passait EXIGENCES.json aux oracles qui jugent des voisins).
+ops@dc60643 + agents@055d952 : les 4 pièges Railway au plan O-5 et au corpus de la fiche
+experte (structure d'admission intacte). tests@78eebcc/11878d9/4e1ad86 : racine plate vue
+par migrations/data (7 rouges→11 verts), Larsen du pan prompts coupé par SIGNATURE (10
+rouges→13 verts, convergence en assertion), refus G-1 bruyant — cause racine inattendue :
+le motif EXISTAIT, le buffering stdout l'enfouissait ligne 24/69. pytest **502 passed**.
+
+**Lot leçons d'audit réel (TF-0260..0266, étude 20260815c PASS, verdict O2)** —
+seo@bd23a9e→7bb3671 (+84989c8) : balisage par paires avec témoin naïf conservé en fixture,
+crawl tronqué ⇒ **refus au lieu de chiffre** (le mode d'échec 89/10 devient impossible),
+écart sitemap/liens en PREMIÈRE clé de synthèse, nœud Performance requalifié non-mesure
+sans relevé CrUX (bloqué à l'écriture ET à l'oracle, facteur 55 du cas fondateur),
+agents_ia dégrade en verdict motivé tracé ; cat-seo-06 dit ses dépendances (catalogue
+v1.6.2). 138 cas verts, grille hachée intacte. Pilot : RUN-MANDAT amendé (TF-0266 — socle
+du RUN vs conformité du projet entier, écarts antérieurs déclarés au ledger, contradiction
+avec le garde-fou d'autonomie levée).
+
+**Défaut trouvé et corrigé en vol** : le complément TF-0253 — la normalisation a créé le
+faux positif INVERSE sur une ingestion d'hier (sha consigné sur octets bruts CRLF, fichier
+identique bit à bit à son commit) ; l'oracle accepte désormais l'une ou l'autre forme,
+fixtures héritage vert/rouge, banc 9/9.
+
+**Consignés en candidats (jamais corrigés spontanément)** : TF-0270 (code mort
+_repli_textuel), TF-0271 (ETAPES-RUN prescrit un --livrables DANS le projet — source
+probable des deux exécutions perdues), TF-0272 (dette NON_JUGE à requalifier assume),
+TF-0273 (trace crux.py), TF-0274 (tests forge-seo invisibles de pytest). Lots BdL-b
+(TF-0267..0269) ingérés par la voie régulière.
+
+**Registre en fin de vague : 8 candidats actifs, 266 archivés.**
