@@ -435,27 +435,91 @@ else {
   // Jugées : les URLs http(s) des lignes dev/qualif/staging/production de la table
   // « URLs & ports par environnement » de PARAMETRAGE.md. Placeholders <…>/{…} et ligne
   // locale non jugés ; hôtes sans schéma (BDD host:port) non jugés — pas des URLs d'appli.
+  //
+  // TF-0267 (15/08) : le suffixe était jugé « présent », jamais « juste ». Une URL
+  // `<appli>-recette-production.up.railway.app` posée sur la ligne QUALIF passait donc PASS
+  // — c'est l'humain qui a relevé le défaut après livraison. Trois durcissements, à sévérité
+  // inchangée (le périmètre était faux, pas la règle) :
+  //   (a) le suffixe doit CORRESPONDRE à l'environnement de la ligne — dev→-dev,
+  //       qualif/staging→-qualif, production/prod→-production ;
+  //   (b) un DOUBLON d'environnement (`-recette-production`, `-qualif-production`…) est
+  //       TOUJOURS un défaut : un hôte qui se contredit n'est jamais acceptable, et aucun
+  //       écart déclaré ne l'excuse ;
+  //   (c) un écart s'accepte UNIQUEMENT en champ structuré du frontmatter (`ecarts_r24`,
+  //       4 champs requis), JAMAIS en prose : le run du 15/08 avait documenté l'écart en
+  //       note de tableau, et rien n'avait signalé quoi que ce soit.
+  const ENV_LIGNE = { dev: "dev", qualif: "qualif", staging: "qualif", production: "production", prod: "production" };
+  // Vocabulaire d'environnement reconnu pour détecter un doublon : au-delà des trois noms
+  // canoniques, les mots que les équipes emploient réellement (« recette », « preprod »…).
+  // Vocabulaire volontairement borné : « demo », « test » ou « sandbox » sont aussi des noms
+  // d'applications (`demoapp-production` est légitime), les inclure fabriquerait des faux
+  // positifs. Un mot d'environnement hors de cette liste ne sera pas vu comme un doublon —
+  // limite déclarée au non_juge.
+  const MOTS_ENV = ["dev", "qualif", "qualification", "recette", "staging", "preprod", "prod", "production", "uat"];
+  /** Écarts R-24 déclarés en champ STRUCTURÉ du frontmatter — jamais en prose.
+   *  Forme attendue (les 4 champs sont requis, un écart incomplet n'existe pas) :
+   *    ecarts_r24:
+   *      - url: https://…
+   *        environnement: qualif
+   *        motif: domaine créé avant la convention, renommage planifié
+   *        decide_le: 2026-08-15                                                          */
+  const ecartsR24 = (front) => {
+    const bloc = (front || "").match(/^ecarts_r24\s*:\s*\r?\n((?:[ \t]+.+\r?\n?)*)/m);
+    if (!bloc) return [];
+    const out = [];
+    for (const l of bloc[1].split(/\r?\n/)) {
+      const debut = l.match(/^[ \t]+-\s*url\s*:\s*(\S+)/);
+      if (debut) { out.push({ url: debut[1] }); continue; }
+      const champ = l.match(/^[ \t]+(environnement|motif|decide_le)\s*:\s*(.+?)\s*$/);
+      if (champ && out.length) out[out.length - 1][champ[1]] = champ[2];
+    }
+    return out.filter((e) => e.url && e.environnement && e.motif && e.decide_le);
+  };
   if (existsSync(pp)) {
     const corps = readFileSync(pp, "utf8");
+    const front24 = frontmatter(corps) || "";
+    const declares = ecartsR24(front24);
     const lignes = corps.split(/\r?\n/).filter((l) => /^\|\s*(dev|qualif|staging|production|prod)\b/i.test(l.trim()));
     if (!lignes.length) so("R-24", "PARAMETRAGE.md sans table d'environnements hébergés — URLs non jugeables");
     else {
-      let ok24 = true, jugees = 0;
+      let ok24 = true, jugees = 0, excuses = 0;
       for (const l of lignes) {
         const env = l.trim().match(/^\|\s*(\w+)/)[1].toLowerCase();
+        const attendu = ENV_LIGNE[env];
         for (const [url] of l.matchAll(/https?:\/\/[^\s|)>}\]]+/g)) {
           if (/[<>{}]/.test(url)) continue; // placeholder
           jugees++;
           const hote = url.replace(/^https?:\/\//, "").split(/[/:]/)[0];
           const label = hote.split(".")[0];
+          const morceaux = label.split("-");
+          // (b) doublon d'environnement — jugé AVANT tout, et jamais excusable.
+          const queue = morceaux.slice(-2).map((m) => m.toLowerCase());
+          if (queue.length === 2 && MOTS_ENV.includes(queue[0]) && MOTS_ENV.includes(queue[1])) {
+            ko("R-24", "docs\\projet\\PARAMETRAGE.md", `URL ${env} « ${url.slice(0, 70)} » : doublon d'environnement dans l'hôte (« -${queue[0]}-${queue[1]} ») — un hôte qui porte deux environnements se contredit ; aucun écart déclaré ne l'excuse`); ok24 = false;
+            continue;
+          }
+          const excuse = declares.find((e) => e.url === url || e.url === url.replace(/\/+$/, ""));
           if (!/-(dev|qualif|production)$/.test(label)) {
+            if (excuse) { excuses++; continue; }
             ko("R-24", "docs\\projet\\PARAMETRAGE.md", `URL ${env} « ${url.slice(0, 70)} » : le premier label d'hôte doit finir par -dev, -qualif ou -production (« ${label} » constaté)`); ok24 = false;
-          } else if (env === "staging" && !label.endsWith("-qualif")) {
-            ko("R-24", "docs\\projet\\PARAMETRAGE.md", `ligne staging : l'environnement de l'étape MEP se nomme qualif dans les URLs (« ${label} » constaté)`); ok24 = false;
+          } else if (attendu && !label.endsWith(`-${attendu}`)) {
+            // (a) le suffixe est présent mais ment sur l'environnement de sa ligne.
+            if (excuse) { excuses++; continue; }
+            ko("R-24", "docs\\projet\\PARAMETRAGE.md", `URL ${env} « ${url.slice(0, 70)} » : suffixe discordant — la ligne ${env} exige « -${attendu} » (« ${label} » constaté)${env === "staging" ? " ; l'environnement de l'étape MEP se nomme qualif dans les URLs" : ""}`); ok24 = false;
           }
         }
       }
-      if (ok24) jugees ? ok("R-24", "docs\\projet\\PARAMETRAGE.md", `${jugees} URL(s) d'environnement au motif <appli>-{dev|qualif|production}`) : so("R-24", "environnements hébergés en placeholders — URLs réelles non encore posées");
+      // (c) l'aggravant du 15/08 : l'écart documenté EN PROSE, sans champ structuré, ne
+      // signalait rien. Une prose d'écart sans déclaration structurée est désormais un défaut.
+      if (!declares.length) {
+        const prose = corps.split(/\r?\n/).find((l) =>
+          /(écart|ecart|dérogation|derogation|exception|non[- ]conforme|à renommer|a renommer)/i.test(l)
+          && /(R-24|convention de nommage|suffixe|nommage)/i.test(l));
+        if (prose) {
+          ko("R-24", "docs\\projet\\PARAMETRAGE.md", `écart de nommage documenté EN PROSE (« ${prose.trim().slice(0, 80)} ») sans champ structuré — un écart s'accepte en frontmatter \`ecarts_r24\` (url, environnement, motif, decide_le), jamais en note : le 15/08 la prose n'a rien signalé et l'URL fausse est partie en livraison`); ok24 = false;
+        }
+      }
+      if (ok24) jugees ? ok("R-24", "docs\\projet\\PARAMETRAGE.md", `${jugees} URL(s) d'environnement au motif <appli>-{dev|qualif|production}, suffixe accordé à sa ligne${excuses ? ` (${excuses} écart(s) déclaré(s) en champ structuré)` : ""}`) : so("R-24", "environnements hébergés en placeholders — URLs réelles non encore posées");
     }
   }
 
@@ -515,7 +579,9 @@ const nonJuge = [
   "seule la PRÉSENCE de CLAUDE.md/README est jugée, pas la pertinence de leur contenu",
   "R-21 : correspondance nom+version par inclusion textuelle dans les lockfiles — pas de résolution sémantique de graphes de dépendances ; recherche bornée à 2 niveaux de descente (hors sources_de_verite déclarées, lues où qu'elles soient) — un lockfile plus profond que 2 niveaux et non déclaré reste invisible",
   "R-23 : motifs de secrets forts uniquement — un mot de passe réaliste inventé sans motif connu passe (revue humaine + gitleaks en CI)",
-  "R-24 : seules les URLs http(s) des lignes d'environnement de PARAMETRAGE.md sont jugées — URLs documentaires du corps et hôtes sans schéma (BDD) hors périmètre ; la correspondance <nom-appli> ↔ nom réel du produit reste une revue humaine",
+  "R-24 : seules les URLs http(s) des lignes d'environnement de PARAMETRAGE.md sont jugées — URLs documentaires du corps et hôtes sans schéma (BDD) hors périmètre ; la correspondance <nom-appli> ↔ nom réel du produit reste une revue humaine (le SUFFIXE d'environnement, lui, est jugé mécaniquement depuis TF-0267 : accord avec la ligne, et doublon toujours en défaut)",
+  "R-24 (TF-0267) : le doublon d'environnement n'est vu que sur un vocabulaire borné (dev, qualif, qualification, recette, staging, preprod, prod, production, uat) — un mot d'environnement maison passera ; « demo », « test » et « sandbox » en sont volontairement absents, ce sont aussi des noms d'applications",
+  "R-24 (TF-0267) : la prose d'écart n'est détectée que sur un vocabulaire explicite (écart, dérogation, exception, non conforme, à renommer) croisé avec R-24/nommage/suffixe — un écart raconté en d'autres mots ne sera pas vu ; c'est le champ structuré `ecarts_r24` qui fait foi, pas la détection de prose",
   "R-26 : ancrage par inclusion textuelle du nom de table dans la provenance — la complétude INVERSE (toute table du DDL figure au doc) et l'exactitude des colonnes ne sont pas jugées (revue de schéma) ; la fraîcheur des projections HTML n'est pas datée (régénération = discipline d'étape)",
   "R-27 : jugé seulement si un robots.txt existe (surface web non déclarée = SANS_OBJET) ; blocages CDN/WAF et cohérence llms.txt ↔ sitemap hors périmètre statique (nœud 58 forge-seo au run)",
 ];
