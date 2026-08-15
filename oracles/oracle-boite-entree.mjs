@@ -61,6 +61,20 @@ function empreinte(chemin) {
   return createHash("sha256").update(brut).digest("hex");
 }
 
+// Compatibilité TF-0253 : les ingestions ANTÉRIEURES à la normalisation ont consigné le
+// sha des octets BRUTS (CRLF compris). Sans cette forme, la migration créait le faux
+// positif inverse — constaté le 15/08 sur `SCC_ALX - RETOURS - 20260814b` : fichier
+// identique bit à bit à son commit, B2 levé quand même. Un fichier est donc couvert si
+// SON empreinte normalisée OU son empreinte brute est au registre — une vraie édition
+// ne matche ni l'une ni l'autre.
+function empreinteBrute(chemin) {
+  return createHash("sha256").update(readFileSync(chemin, "utf8")).digest("hex");
+}
+
+function couvert(parSha, chemin) {
+  return parSha.has(empreinte(chemin)) || parSha.has(empreinteBrute(chemin));
+}
+
 /** Les ingestions déjà consignées, par empreinte ET par nom de fichier. */
 function ingestions(registre) {
   const archive = join(dirname(registre), "TODO-ARCHIVE.jsonl");
@@ -92,15 +106,14 @@ function juger(repertoire, registre) {
   const sidecars = fichiers.filter((f) => f.endsWith(SUFFIXE_SIDECAR));
 
   for (const nom of sidecars) {
-    const sha = empreinte(join(repertoire, nom));
-    if (parSha.has(sha)) continue;
+    if (couvert(parSha, join(repertoire, nom))) continue;
 
     // Un sidecar BRUT au format produit se normalise avant ingestion : c'est le dérivé qui
     // porte l'empreinte consignée. Le brut est donc couvert par son normalisé — sans quoi
     // l'oracle réclamerait éternellement l'ingestion d'un fichier dont le travail est fait.
     if (!nom.endsWith(SUFFIXE_NORMALISE)) {
       const derive = nom.slice(0, -SUFFIXE_SIDECAR.length) + SUFFIXE_NORMALISE;
-      if (sidecars.includes(derive) && parSha.has(empreinte(join(repertoire, derive)))) continue;
+      if (sidecars.includes(derive) && couvert(parSha, join(repertoire, derive))) continue;
     }
 
     findings.push(
@@ -189,6 +202,22 @@ function selfTest() {
   writeFileSync(crlf, crlfContenu.replace(/\n/g, "\r\n") + '{"titre":"ajoute apres coup"}\r\n');
   r = juger(boite, reg);
   cas.push(["CRLF  — rouge : édition réelle sous CRLF toujours détectée", r.findings.some((f) => f.regle === "B2" && f.statut === "FAIL" && f.ou === "CRLF - RETOURS - 20260101a.tf.jsonl"), r.verdict]);
+
+  // Héritage (complément TF-0253, cas réel du 15/08) : une ingestion d'AVANT la
+  // normalisation a consigné le sha des octets bruts d'un fichier CRLF. VERT attendu
+  // tant que le fichier n'a pas bougé ; une vraie édition reste ROUGE (aucune des deux
+  // formes ne matche plus).
+  const legacyContenu = '{"titre":"legacy"}\r\n';
+  const legacy = join(boite, "LEGACY - RETOURS - 20260101a.tf.jsonl");
+  writeFileSync(legacy, legacyContenu);
+  writeFileSync(reg, readFileSync(reg, "utf8") + JSON.stringify({
+    ev: "ingestion", lot_sha: empreinteBrute(legacy), fichier: "LEGACY - RETOURS - 20260101a.tf.jsonl",
+  }) + "\n");
+  r = juger(boite, reg);
+  cas.push(["HÉRIT — vert : sha brut d'avant TF-0253, fichier intact", !r.findings.some((f) => f.statut === "FAIL" && f.ou === "LEGACY - RETOURS - 20260101a.tf.jsonl"), r.verdict]);
+  writeFileSync(legacy, legacyContenu + '{"titre":"ajoute"}\r\n');
+  r = juger(boite, reg);
+  cas.push(["HÉRIT — rouge : édition réelle d'un lot hérité détectée", r.findings.some((f) => f.regle === "B2" && f.statut === "FAIL" && f.ou === "LEGACY - RETOURS - 20260101a.tf.jsonl"), r.verdict]);
 
   let ok = 0;
   for (const [nom, tenu, verdict] of cas) {

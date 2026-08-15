@@ -1,6 +1,6 @@
 # Catalogues de services des forges — vue générée
 
-> **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.6.1, 2026-08-15) — ne jamais éditer ce fichier.
+> **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.6.2, 2026-08-15) — ne jamais éditer ce fichier.
 > 80 services · 66 prouvés · 14 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
 
 ## forge-conception (pipeline) — 7 services
@@ -119,7 +119,7 @@ oyau.py (section essais) + forge_tests\junit.py` | TF-0146 (13/08) : 12 tests, s
 | cat-seo-03 | **Valider forge et mission** | vérifier mécaniquement l'intégrité de la forge et d'une mission | `python scripts\validate.py [--mission <chemin>]` | exécuté 9/9 (forge) et 5/5 (mission réelle) | prouve | production |
 | cat-seo-04 | **Rapport HTML vérifié** | recevoir un rapport d'audit autonome et contrôlé avant remise | `python scripts\rapport_html.py --verifier` | rapport client réel livré (6e itération), contrôles exécutés | prouve | production |
 | cat-seo-05 | **Runs de suivi récurrents** | suivre l'évolution SEO d'un site entre deux audits | `méthode documentée (récurrence post-MEP)` | jamais exercé — un seul run réel à ce jour ; snapshot en dérive de schéma (D-S2) | declare | experimental |
-| cat-seo-06 | **Instrumentation de crawl avancée** | mesurer aussi les sites JS, le balisage, les CWV terrain et les crawlers IA | `python scripts\{crawler.py --rendu-js, crux.py, agents_ia.py}` | TF-0105 (12/08) : 22 tests de preuve + validate 12/12 rejoué pilot ; intégration rapport en restes | prouve | experimental |
+| cat-seo-06 | **Instrumentation de crawl avancée** | mesurer aussi les sites JS, le balisage, les CWV terrain (clé CrUX gratuite requise — sinon nœud 31 non mesuré) et les crawlers IA (journaux serveur requis, accès souvent exceptionnel — sinon verdict non mesurable motivé, nœud 58 jugé sur robots.txt/llms.txt seuls) | `python scripts\{crawler.py --rendu-js, crux.py, agents_ia.py}` | TF-0105 (12/08) : 22 tests de preuve + validate 12/12 rejoué pilot ; intégration rapport en restes | prouve | experimental |
 | cat-seo-07 | **Scorer et écrire le CSV d'actions** | transformer les actions rédigées de la mission en CSV scoré, trié et contrôlé | `python scripts\scorer_actions.py --mission <chemin>` | TF-0073 (12/08) : 17/17 preuves double sens + bout-en-bout réel 8/8, rejoués par le pilot | prouve | experimental |
 
 ## forge-organization (sur mandat) — 4 services
