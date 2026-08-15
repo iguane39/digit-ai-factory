@@ -36,3 +36,21 @@ variables:
 | dev | {https://<nom-appli>-dev.<domaine>} | {https://<nom-appli>-api-dev.<domaine>} | {<HOTE_BDD_DEV>} | placeholders tant que non déployé |
 | qualif | {https://<nom-appli>-qualif.<domaine>} | {https://<nom-appli>-api-qualif.<domaine>} | {<HOTE_BDD_QUALIF>} | staging de l'étape MEP (O-1…O-4) |
 | production | {https://<nom-appli>-production.<domaine>} | {https://<nom-appli>-api-production.<domaine>} | {<HOTE_BDD_PROD>} | placeholders — GO humain requis |
+
+### Un écart à R-24 se déclare en CHAMP, jamais en prose (TF-0267, 15/08)
+
+Depuis le 15/08, `oracle-conformite-projet` **juge le suffixe** : accord suffixe ↔ ligne
+(dev→`-dev`, qualif et staging→`-qualif`, production et prod→`-production`), et un
+**doublon d'environnement** (`…-recette-production`) est un défaut **toujours**, jamais
+excusable. Un écart légitime se déclare dans le frontmatter — une phrase de prose ne vaut
+plus déclaration et devient elle-même un constat (c'était l'aggravant du cas fondateur :
+l'écart avait été documenté en prose, l'oracle avait rendu PASS, et le défaut est parti
+en livraison) :
+
+```yaml
+ecarts_r24:
+  - url: https://exemple-recette.up.railway.app
+    environnement: qualif          # la ligne du tableau ci-dessus
+    motif: hôte historique du client, renommage planifié au prochain jalon
+    decide_le: 2026-08-15          # les 4 champs sont requis, un écart incomplet est sans effet
+```

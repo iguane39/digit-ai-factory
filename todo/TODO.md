@@ -1,78 +1,29 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=7aef08082aa4 archive=88c26045fb6e · dernier événement: 2026-08-15T18:03:16Z -->
+     sceaux: actifs=4505654a1706 archive=d269505f05d3 · dernier événement: 2026-08-15T18:28:35Z -->
 
-**22 actifs** (candidat 1 · décidé 0 · en cours 18 · corrigé 3 · écarté 0) · **267 archivés**.
+**8 actifs** (candidat 8 · décidé 0 · en cours 0 · corrigé 0 · écarté 0) · **288 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
-
-## design
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0286 | en_cours | 2 | design : CLI de rendu comparatif léger pour correctif ad hoc (avant/après, breakpoints, une commande) | **oui** — un wrap de texte de menu visible par n'importe quel œil humain a atteint la production |
-
-## digit-ai-forge-agents
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0282 | en_cours | 1 | forge-agents : le hook quality-oracles juge les fragments Jinja comme pages autonomes | **oui** — contournement d'outillage pour 9 templates + 1 retour d'ecriture bloquee |
-
-## digit-ai-forge-design
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0275 | en_cours | 1 | forge-design : check_maquette C2/C15 scannent le JS inline (Motion vendore = faux positif bloquant) | **oui** — 2 rebuilds de la maquette + contournement base64 du vendored officiel |
-| TF-0276 | en_cours | 1 | forge-design : oracle-tokens T5 produit cartesien texte-*/fond-* sans co-occurrence | **oui** — renommage de 5 tokens hors convention + perte du controle T5 sur les paires contextuelles |
-| TF-0277 | en_cours | 1 | forge-design : oracle-images I5/I6 supposent des images generees | **oui** — 18 entrees de manifeste remplies de champs sans objet |
-| TF-0278 | en_cours | 1 | forge-design : run-oracles-design rapporte render_page FAIL avec findings vides | **oui** — 1 aller-retour de diagnostic (lancement manuel de render_page sur 2 themes) |
-
-## digit-ai-forge-ops
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0269 | en_cours | 6 | fiche expert-ops-railway : domaines generes, renommage API-only, origine publique en variable (complement R6 lot 20260815a) | **oui** — un renommage de domaine a l aveugle (CLI muet), retrouve par exploration API ; a capitaliser pour ne plus le payer |
-| TF-0281 | en_cours | 1 | forge-ops : oracle-ops O-2 casse avec une cible relative | **oui** — 4 diagnostics dont une copie instrumentee de l'oracle avant de trouver la cause |
-
-## digit-ai-forge-pilot
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0267 | en_cours | 6 | oracle-conformite-projet : juger mecaniquement le suffixe d environnement des URLs R-24 | **oui** — defaut de nommage livre et presente a l humain, un renommage de domaine + une mise a jour documentaire apres cloture |
-
-## digit-ai-forge-seo
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0273 | en_cours | 8 | forge-seo : crux.py sans clé sort en 1 sans écrire de trace — symétriser avec le non-mesurable tracé d’agents_ia | **oui** — asymétrie constatée sur pièce entre deux volets du même service cat-seo-06 |
-| TF-0274 | en_cours | 6 | forge-seo : les six test_*.py sont des scripts à main() invisibles de pytest — un runner unique éviterait l’oubli | **oui** — 10 vérifications lancées une à une par les campagnes du 15/08 — chaque brief a dû les énumérer, et rien n’attrape un fichier de test oublié |
 
 ## digit-ai-forge-tests
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0268 | en_cours | 4.5 | forge-tests pan qualif : confronter les URLs auto-referentes des pages servies a l origine auditee | **oui** — defaut SEO reel (canonique localhost) livre en recette malgre 5 audits verts ; decouvert par ricochet d un renommage de domaine, corrige en run de version (26 tests ajoutes cote produit) |
-| TF-0270 | en_cours | 4 | forge-tests : data._repli_textuel est du code mort ancré sur backend/tests | **oui** — fonction jamais appelée, vérifiée au balayage de la campagne — zéro effet observable aujourd’hui, piège si rebranchée telle quelle |
-| TF-0272 | en_cours | 4 | forge-tests : requalifier en « assume » l’entrée NON_JUGE du pan prompts (exclusion forge/ déclarée) | **oui** — contrat du registre de dette : un énoncé neuf entre en todo tant qu’un humain ne l’a pas requalifié — l’entrée restera comptée en dette ouverte à chaque run |
-| TF-0279 | en_cours | 1 | forge-tests : ids de findings SAST instables, contestation impossible | **oui** — 2 actions manuelle_dev incompressibles au rapport final malgre contestation legitime |
-| TF-0280 | en_cours | 1 | forge-tests : le vendored de tests n'est pas exclu du pan securite | **oui** — 114 contestations a rediger pour un actif tiers d'outillage |
+| TF-0292 | candidat | 8 | forge-tests : promouvoir en NON_JUGE de module les deux limites déclarées en non_juge de sortie (registre de dette) | **oui** — deux limites réelles du pan qualif et du pan sécurité restent hors du registre de dette, qui est précisément l’endroit où les limites se comptent |
+| TF-0294 | candidat | 6 | La recette prononce S-01 sur un arbre qui bouge — échecs fantômes indiscernables d’une vraie régression | **oui** — deux faux « S-01 NON TENU » en une soirée, dont un qui a coûté une instruction complète avant d’être écarté |
 | TF-0288 | candidat | 5.3 | Écart source ↔ production : aucun contrôle ne compare ce qui est SERVI à ce qui est versionné | **oui** — mesuré sur INS-0001 : la cause évidente était fausse ; sans instruction, le correctif aurait porté sur du code déjà correct |
+| TF-0291 | candidat | 4 | forge-tests s’auto-accuse sur ses propres bancs d’essai — cousin du Larsen déjà corrigé pour le pan prompts | **oui** — 5 constats mesurés sur la forge elle-même, dont 3 sur des fixtures que le dépôt assume comme idiome |
+| TF-0293 | candidat | 4 | Le pan i18n est prouvé par pytest et ses bancs, mais absent du corpus de recette S-01 | **oui** — un pan neuf entre en service sans entrée au corpus qui prononce S-01 — la recette du dépôt ne le mesure pas |
+| TF-0295 | candidat | 2.7 | Affinements du pan i18n et du contrôle de destinations React (quatre limites déclarées) | **oui** — quatre frontières mesurées et déclarées au non_juge du pan neuf, chacune correspondant à un cas réel possible |
 
 ## pilot
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0271 | corrige | 12 | pilot : ETAPES-RUN prescrit un --livrables DANS le projet audité — que G-1 refuse (désormais bruyamment, exit 4) | **oui** — deux exécutions perdues le 15/08 sur un refus G-1 dont le motif était enfoui — la prescription du pilot fabrique le refus à chaque run qui la suit |
-| TF-0285 | corrige | 7.5 | pilot/organization : règle « produit legacy touché = verdicts forge » — le correctif ad hoc hors run n'a aucun gate | **oui** — 2 mises en production défectueuses le même jour sur le site vitrine principal du cabinet |
-| TF-0287 | corrige | 4 | Circuit de l’insatisfaction : de la phrase brute à la version corrigée — dépôt une-phrase, instruction six blocs, réouvertures comptées | **oui** — l’exemplaire réel porte ~60 mots de protocole manuscrit et une réouverture non comptée (« toujours pas ») — le coût que le circuit supprime, mesurable dès le premier dossier |
-
-## tests
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0283 | en_cours | 4 | tests : étendre le pan interface aux composants React/JSX — les liens cassés des Header/Footer Next sont invisibles | **oui** — 4 liens faux livrés en production, signalés par l'humain, deux allers-retours de correction |
-| TF-0284 | en_cours | 4 | tests : créer un pan i18n — parité de routes, parité de navigation et langue du contenu par locale | **oui** — version anglaise annoncée en prod avec un menu au tiers et du contenu français sur 9 pages ; détecté par le client, pas par l'outillage |
+| TF-0289 | candidat | 12 | oracle-skills K2 compare les sidecars d’oracles — artefacts gitignorés et régénérables, comptés comme divergences | **oui** — mesuré : 8 divergences annoncées chez experts-forge dont 2 réelles, 12 chez ameliore-le-design dont 8 réelles — et le message tronque à 4, donc le vrai défaut peut ne pas être affiché |
+| TF-0290 | candidat | 8 | Le hook C7 qui bloque toute écriture de livrable n’était versionné nulle part — il ne vivait qu’en copie installée | **oui** — le gate le plus souvent joué de la journée (5 blocages réels) n’avait ni source versionnée, ni self-test, ni contrôle d’intégrité — le seul mécanisme qui aurait pu le voir (K1-K5) ne regarde que les skills |
 
 ---
 Détail d'un item : `grep '"id":"TF-xxxx"' todo/TODO.jsonl` (tous ses événements). Archive : même commande sur TODO-ARCHIVE.jsonl.
