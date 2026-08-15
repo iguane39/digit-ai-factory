@@ -426,9 +426,17 @@ ou hors run — rejoue avant de livrer, au minimum :
    manquait, il se pose une fois et sert ensuite toutes les sessions).
 
 **Appelant (R-35)** : la règle est portée par le pilot (ici) et **rendue tenable par un
-geste court** — le CLI de rendu comparatif de forge-design (TF-0286, `cat-des-*`) : une
-commande, avant/après, verdict machine. Une règle de vérification visuelle qui coûte plus
-qu'une commande n'est pas tenue hors run — c'est le constat du 15/08, pas une prédiction.
+geste court** — une seule commande, avant/après, verdict machine (forge-design, TF-0286) :
+
+```
+node oracles\rendu-comparatif.mjs --avant <fichier|url> --apres <fichier|url> [--zone <sélecteur>]
+```
+
+exit **0** aucun constat dur nouveau · **1** régression de rendu · **2** indéterminé
+(outillage de capture absent → SKIP motivé, jamais une capture maison). Il ne signale que
+les constats **nouveaux** — ce qui est réparé est compté et affiché, jamais porté au débit.
+Une règle de vérification visuelle qui coûte plus qu'une commande n'est pas tenue hors run
+— c'est le constat du 15/08, pas une prédiction.
 Côté détection, R-37 s'appuie sur les pans interface (composants React inclus, TF-0283) et
 i18n (TF-0284) de forge-tests.
 
