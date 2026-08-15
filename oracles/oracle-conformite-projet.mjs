@@ -117,14 +117,46 @@ if (r4) ok("R-4", "output/, docs/", "livrables au nommage daté (ou aucun livrab
 // insensible à la casse et aux accents (contrat du registre). Registre lu chez la forge
 // organization (dépôt frère du pilot, $FORGE_ROOT sinon parent) — lecture seule.
 const normeType = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+// TF-0265 : R-25 rendait son verdict SANS jamais dire quels types SONT admis — jusqu'à 10
+// constats après coup, chacun laissant deviner le registre. distanceLevenshtein + plusProche
+// donnent au message ce qu'un humain ferait à sa place : la liste, et la correction probable.
+function distanceLevenshtein(a, b) {
+  const m = a.length, n = b.length;
+  const d = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+  for (let i = 0; i <= m; i++) d[i][0] = i;
+  for (let j = 0; j <= n; j++) d[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      d[i][j] = a[i - 1] === b[j - 1]
+        ? d[i - 1][j - 1]
+        : 1 + Math.min(d[i - 1][j - 1], d[i - 1][j], d[i][j - 1]);
+    }
+  }
+  return d[m][n];
+}
+/** Le type admis le plus proche (distance simple, sur formes normalisées), ou null si aucun
+ *  n'est raisonnablement proche (seuil : au plus 40 % de la longueur du type saisi). */
+function plusProche(type, typesAffiches) {
+  const cible = normeType(type);
+  let meilleur = null, meilleureDist = Infinity;
+  for (const t of typesAffiches) {
+    const dist = distanceLevenshtein(cible, normeType(t));
+    if (dist < meilleureDist) { meilleureDist = dist; meilleur = t; }
+  }
+  const seuil = Math.max(1, Math.ceil(cible.length * 0.4));
+  return meilleur && meilleureDist <= seuil ? { type: meilleur, distance: meilleureDist } : null;
+}
+
 const racineForges = process.env.FORGE_ROOT || join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const registreTypes = join(racineForges, "digit-ai-forge-organization", "registre-types.json");
 if (!existsSync(registreTypes)) so("R-25", "registre-types.json d'organization introuvable — types non jugeables (poste non équipé ? node bootstrap.mjs)");
 else {
-  let admis;
+  let admis, typesAffiches;
   try {
     const reg = JSON.parse(readFileSync(registreTypes, "utf8"));
     admis = new Set(reg.types.flatMap((t) => [t.type, ...(t.alias || [])]).map(normeType));
+    // Formes canoniques (jamais les alias) pour l'affichage : lisibles, une seule par type.
+    typesAffiches = reg.types.map((t) => t.type).sort((a, b) => a.localeCompare(b, "fr"));
   } catch { admis = null; }
   if (!admis) so("R-25", "registre-types.json illisible — types non jugeables");
   else {
@@ -140,7 +172,13 @@ else {
         vus++;
         const type = segs[1].split(" ")[0];
         if (!admis.has(normeType(type))) {
-          ko("R-25", rel(f), `type « ${type} » absent du registre des types — un type nouveau s'ajoute au registre d'organization (commit motivé, D-04), jamais improvisé dans un nom`); r25 = false;
+          const suggestion = plusProche(type, typesAffiches);
+          ko("R-25", rel(f),
+            `type « ${type} » absent du registre des types` +
+            (suggestion ? ` — vouliez-vous dire « ${suggestion.type} » (distance ${suggestion.distance}) ?` : "") +
+            ` — types admis : ${typesAffiches.join(", ")}` +
+            " — un type nouveau s'ajoute au registre d'organization (commit motivé, D-04), jamais improvisé dans un nom");
+          r25 = false;
         }
       }
     }

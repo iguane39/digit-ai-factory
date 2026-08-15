@@ -119,6 +119,7 @@ const rouge = mkdtempSync(join(tmpdir(), "conf-rouge-"));
 mkdirSync(join(rouge, "output", "Old"), { recursive: true });      // R-1 (input absent), R-3 (docs absent)
 writeFileSync(join(rouge, "output", "rapport-final.md"), "x\n");    // R-4 : livrable non daté
 writeFileSync(join(rouge, "output", "Produit - Grimoire Néant - 20260811a.md"), "x\n"); // R-25 : type improvisé (daté correct → R-4 muette dessus)
+writeFileSync(join(rouge, "output", "Produit - Raport Fantome - 20260812a.md"), "x\n"); // R-25 (TF-0265) : typo proche d'un type admis (« Rapport »)
 writeFileSync(join(rouge, "output", "Produit - Rapport Fantome - 20260813a.html"), "<html></html>\n"); // R-32 : HTML livré sans journal d'oracles sous forge\oracles\
 writeFileSync(join(rouge, "robots.txt"), "User-agent: GPTBot\nDisallow: /\n\nUser-agent: *\nAllow: /\n"); // R-27 : agent IA bloqué SANS décision consignée + llms.txt absent
 writeFileSync(join(rouge, "output", "Old", "vieux - 20260101a.py"), "x = 1\n"); // R-6 : code sous Old
@@ -146,6 +147,22 @@ check("rouge : chaque règle attendue se déclenche, FAIL exit 1", () => {
 check("rouge : les findings sont localisants (jamais « quelque part »)", () => {
   const { rapport } = lance(rouge);
   for (const f of rapport.findings) if (!f.ou || !f.message) throw new Error(`finding ${f.regle} sans localisation ou message`);
+});
+
+check("rouge : R-25 cite les types admis et propose le plus proche (TF-0265)", () => {
+  const { rapport } = lance(rouge);
+  const r25 = rapport.findings.filter((f) => f.regle === "R-25" && f.statut === "FAIL");
+  const surTypo = r25.find((f) => f.ou.includes("Raport"));
+  const surLoin = r25.find((f) => f.ou.includes("Grimoire"));
+  if (!surTypo) throw new Error("finding R-25 sur « Raport » introuvable");
+  if (!/vouliez-vous dire.*Rapport.*distance 1/.test(surTypo.message))
+    throw new Error(`typo proche non suggérée : ${surTypo.message}`);
+  if (!surLoin) throw new Error("finding R-25 sur « Grimoire » introuvable");
+  if (/vouliez-vous dire/.test(surLoin.message))
+    throw new Error(`un type sans proximité réelle ne doit pas suggérer à tort : ${surLoin.message}`);
+  for (const f of [surTypo, surLoin])
+    if (!f.message.includes("types admis :") || !f.message.includes("Rapport") || !f.message.includes("Étude"))
+      throw new Error(`liste des types admis absente ou incomplète : ${f.message}`);
 });
 
 
