@@ -1,6 +1,6 @@
 ---
 profil: chatbot
-version: 1.0.0
+version: 1.1.0
 challenge_date: 2026-08-12
 sources:
   - "Meta for Developers — fenêtre de service WhatsApp (24 h depuis le dernier message entrant), catégories de template Marketing/Utility/Authentication ; bascule tarifaire annoncée pour 2026 (Utility et messages de service facturés dans la fenêtre 24 h à partir du 01/10/2026, nouvelle catégorie « Meta Business AI Agent » facturée au jeton dès le 01/08/2026 — Blueticks, Wati, Qiscus, ActiveCampaign, convergents, 2026)"
@@ -12,6 +12,7 @@ sources:
   - "CNIL — recommandations sur le développement des systèmes d'IA, intégrant le règlement européen IA adopté été 2024 ; approche sectorielle en construction (cnil.fr, consulté 12/08/2026)"
   - "forge-agents — cat-agt-05 Oracle agent-evals, TF-0106 (12/08/2026) : fixtures double sens au self-test, juge distinct de l'exécutant — catalogues\\CATALOGUES.md"
   - "étude d'opportunité forges — output\\03-etudes\\20260812-etude-opportunite-forges.md (12/08/2026), §5"
+  - "TF-0236 — qualité graphique par défaut : étude output\\03-etudes\\20260815-etude-opportunite-qualite-graphique.md (15/08/2026)"
 ---
 
 # Profil produit — chatbot / agent conversationnel
@@ -58,6 +59,9 @@ exercer, même précédent que `profils\mobile.md` et `profils\desktop.md`.
 | OWASP LLM01:2025 — injection de prompt | résistance mesurée à un corpus versionné de payloads d'injection (direct et indirect via contenu récupéré/RAG) | aucun oracle gratuit générique — `oracle-agent-evals` (forge-agents) est la brique la plus proche pour rejouer un corpus versionné, insuffisante seule (cf. Frontière R-28) |
 | Rate limiting Microsoft Teams Bot Framework | backoff sur HTTP 429 Too Many Requests ; conversation reference stockée plutôt que recréée à chaque envoi proactif | test d'intégration simulant un 429 et vérifiant le backoff — pas d'oracle packagé |
 | Traçabilité RGPD conversationnelle | base légale déclarée par cas d'usage (contrat, obligation légale, intérêt légitime ou consentement selon le contexte), durée de conservation bornée et affichée, droits des personnes exerçables | audit manuel — aucun oracle gratuit de conformité RGPD identifié (même écart constaté dans `profils\e-commerce.md`) |
+| Direction artistique dérivée (loi n° 6) | `tokens.css` + `DESIGN.md` motivés par l'expérience client visée (`systeme-de-marque`), dérivation consignée — jamais un template | revue 5 bis (`critique-le-design`) sur la consignation ; gate étape 3 d'`ETAPES-RUN.md` |
+| Généricité du rendu (loi n° 6) | zéro règle dure déclenchée — l'interface ne trahit pas un rendu par défaut | `oracle-taste.mjs` (forge-design, `cat-des-09`) |
+| Régression visuelle (loi n° 6) | baseline approuvée à l'étape 3, jugée à toute évolution et en 5 bis | `oracle-baseline.mjs` (forge-design, `cat-des-08`) |
 
 ## 2. Savoir périssable daté-sourcé
 

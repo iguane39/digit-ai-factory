@@ -1,6 +1,6 @@
 ---
 profil: desktop
-version: 1.0.0
+version: 1.1.0
 challenge_date: 2026-08-12
 sources:
   - "CA/Browser Forum — validité maximale des certificats de signature de code Windows réduite de 39 à 15 mois (460 jours) à partir du 01/03/2026"
@@ -8,6 +8,7 @@ sources:
   - "Doyensec — bâtir un auto-updater Electron sûr : vérification de signature atomique, séparation des clés dev/prod (02/2026)"
   - "Tauri v2 — plugin updater : paire de clés de signature dédiée, clé privée jamais versionnée (documentation officielle, 2025)"
   - "étude d'opportunité forges — output\\03-etudes\\20260812-etude-opportunite-forges.md (12/08/2026), §5"
+  - "TF-0236 — qualité graphique par défaut : étude output\\03-etudes\\20260815-etude-opportunite-qualite-graphique.md (15/08/2026)"
 ---
 
 # Profil produit — desktop
@@ -39,6 +40,9 @@ improvisation en session.
 | Notarisation macOS | obligatoire pour toute distribution hors Mac App Store ; binaire signé Developer ID + ticket de notarisation valide | `spctl --assess` / `stapler validate` (outils Apple, gratuits) — idem, aucun oracle CI packagé |
 | CSP de webview (Electron/Tauri) | pas de `nodeIntegration` exposé au contenu distant, CSP restrictive sur la fenêtre applicative | revue de code (aucun oracle gratuit automatisé identifié pour ce périmètre précis) |
 | Auto-update sécurisé | vérification de signature atomique avant application de la mise à jour, clés dev/prod séparées | revue de code contre les pratiques documentées (Doyensec 02/2026, plugin updater Tauri) — pas d'oracle automatisé |
+| Direction artistique dérivée (loi n° 6) | `tokens.css` + `DESIGN.md` motivés par l'expérience client visée (`systeme-de-marque`), dérivation consignée — jamais un template | revue 5 bis (`critique-le-design`) sur la consignation ; gate étape 3 d'`ETAPES-RUN.md` |
+| Généricité du rendu (loi n° 6) | zéro règle dure déclenchée — l'interface ne trahit pas un rendu par défaut | `oracle-taste.mjs` (forge-design, `cat-des-09`) |
+| Régression visuelle (loi n° 6) | baseline approuvée à l'étape 3, jugée à toute évolution et en 5 bis | `oracle-baseline.mjs` (forge-design, `cat-des-08`) |
 
 ## 2. Savoir périssable daté-sourcé
 

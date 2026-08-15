@@ -96,8 +96,16 @@ consolidée, régénérée à toute évolution) puis, si le produit a une UI, `a
 (→ maquette HTML autonome). Champs `ton` et `contraintes reprises` non dérivables → question
 humaine si absents du brief.
 
+**Gates par défaut (loi n° 6, TF-0237)** — sans décision humaine ajoutée (R-29) :
+(a) la DA est **dérivée de l'expérience client visée** (formulée au brief ou reformulée à
+l'accueil), et la dérivation est **consignée dans `DESIGN.md`** — chaque choix graphique
+structurant motivé par cette expérience, jamais par défaut d'outillage ; (b) **généricité** :
+`node <design>\oracles\oracle-taste.mjs <html>` PASS exigé (`cat-des-09`) ; (c) **baseline
+visuelle** posée : `node <design>\oracles\oracle-baseline.mjs approuver` (`cat-des-08`).
+Écart assumé possible mais explicite, jamais par omission (loi n° 3).
+
 **Valider** : `node <design>\oracles\run-oracles-design.mjs <html> --tokens <tokens.css>
---json-only`.
+--json-only`, plus les gates (b) et (c) ci-dessus.
 
 ## 4. Étape development (mode dégradé — `conductor` inutilisable en headless, dette D-V1)
 
@@ -215,6 +223,10 @@ SA promesse design (tokens du run, écrans/états, CTA, rendu 2 thèmes, voix). 
 `source: produit`, destinataire development). Verdict Refondre ou ≥ 1 bloquant → retour à
 development (boucle bornée partagée avec l'étape tests). Un écart voulu se consigne en
 hypothèse — la revue le classe « accepté », pas défaut.
+
+**Gate généricité rejoué (loi n° 6, TF-0237)** : `oracle-taste.mjs` PASS sur le rendu
+implémenté — le rendu se juge en pixels, pas sur la maquette seule ; la baseline
+(`oracle-baseline.mjs juger`) détecte toute dérive depuis l'approbation de l'étape 3.
 
 ## 6. Étape MEP (portée par le pilot — `ETAPE-MEP.md`)
 

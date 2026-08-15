@@ -1,6 +1,6 @@
 ---
 profil: mobile
-version: 1.0.0
+version: 1.1.0
 challenge_date: 2026-08-12
 sources:
   - "Android — target API level 36 obligatoire en Play Console au 31/08/2026 (rejet automatique au-delà)"
@@ -10,6 +10,7 @@ sources:
   - "Google Material 3 Expressive — 05/2025"
   - "Parts de marché cross-platform mobile — Flutter ~46 %, React Native ~35-42 %, Kotlin Multiplatform en croissance (mesure 02/2026, volatile)"
   - "étude d'opportunité forges — output\\03-etudes\\20260812-etude-opportunite-forges.md (12/08/2026), §2, 13 sources datées"
+  - "TF-0236 — qualité graphique par défaut : étude output\\03-etudes\\20260815-etude-opportunite-qualite-graphique.md (15/08/2026)"
 ---
 
 # Profil produit — mobile
@@ -34,6 +35,9 @@ réveil**.
 | Apple — Privacy Manifest | présence + déclarations exactes des API sensibles utilisées | App Store Connect (rejet automatique à la soumission) |
 | Cible tactile | 24×24 px (WCAG 2.5.8, web mobile) / 48 dp (Material, natif) — un seul critère, deux échelles | axe-core (web mobile) ; contrôle manuel côté natif (aucun oracle gratuit identifié) |
 | Viewport mobile | meta viewport correct, aucun contenu hors écran | Lighthouse (audit mobile) |
+| Direction artistique dérivée (loi n° 6) | `tokens.css` + `DESIGN.md` motivés par l'expérience client visée (`systeme-de-marque`), dérivation consignée — jamais un template | revue 5 bis (`critique-le-design`) sur la consignation ; gate étape 3 d'`ETAPES-RUN.md` |
+| Généricité du rendu (loi n° 6) | zéro règle dure déclenchée — l'interface ne trahit pas un rendu par défaut | `oracle-taste.mjs` (forge-design, `cat-des-09`) |
+| Régression visuelle (loi n° 6) | baseline approuvée à l'étape 3, jugée à toute évolution et en 5 bis | `oracle-baseline.mjs` (forge-design, `cat-des-08`) |
 
 ## 2. Savoir périssable daté-sourcé
 
