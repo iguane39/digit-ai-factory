@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=ee8fde5189ac archive=b770d2621930 · dernier événement: 2026-08-15T07:19:03.603Z -->
+     sceaux: actifs=ab2ffb3f14be archive=192d6a8b8ad7 · dernier événement: 2026-08-15T07:31:20Z -->
 
-**6 actifs** (candidat 6 · décidé 0 · en cours 0 · corrigé 0 · écarté 0) · **226 archivés**.
+**6 actifs** (candidat 6 · décidé 0 · en cours 0 · corrigé 0 · écarté 0) · **227 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -17,11 +17,11 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0230 | candidat | 6 | digit-ai-forge-agents : TF-0058 archive comme corrige ne l'est qu'a moitie — render_page ecrit toujours ses PNG dans le dossier du fichier audite par defaut | **oui** — 25 Mo dans le dossier des livrables, decouverts au rangement demande par l'humain ; deplacement manuel puis realignement des journaux R-32 qui pointaient les anciens chemins. output est passe de 26 Mo a 1,2 Mo apres deplacement. |
 | TF-0231 | candidat | 3 | digit-ai-forge-agents : arbitrer la portee de L3 (TF-0170) — barème lié exigé sur des valeurs d'INDICATEUR, pas seulement de cellule de tableau | **oui** — deux FAIL bloquants a l'emission, resolus par l'ajout d'un bareme et d'un aria-describedby ; un aller-retour d'emission complet. Message d'oracle cite dans le journal R-32 du livrable. |
 
-## digit-ai-forge-tests
+## digit-ai-forge-pilot
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0226 | candidat | 3 | forge-tests : ruff est configure mais aucun pas de la recette ne l'execute — 18 depassements dorment | **oui** — mesure au 14/08 : ruff rend 19 erreurs et aucun des 13 pas de recette ne l appelle — le controle existe sur le disque, pas dans le processus |
+| TF-0232 | candidat | 5 | pilot : les self-tests des oracles n'etaient joues par rien — et oracle-claude-md n'en avait aucun | **oui** — mesure le 15/08 : 8 oracles, 8 recettes a double sens, 0 execution automatique ; le gardien du plafond du noyau n'avait jamais ete prouve capable d'echouer |
 
 ---
 Détail d'un item : `grep '"id":"TF-xxxx"' todo/TODO.jsonl` (tous ses événements). Archive : même commande sur TODO-ARCHIVE.jsonl.

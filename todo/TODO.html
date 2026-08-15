@@ -14,7 +14,7 @@
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digit-AI — TODO-FORGE · Reste à faire — V20260814</title>
+  <title>Digit-AI — TODO-FORGE · Reste à faire — V20260815</title>
   <meta name="description" content="Reste-à-faire du registre TODO-FORGE : candidats à décider, décidés, en cours — détaillés en puces, avec date de création, priorité de traitement et impact sur la forge concernée.">
   <meta name="theme-color" content="#2563EB">
   <meta name="color-scheme" content="light dark">
@@ -138,7 +138,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>6fd69e2a60d4</code> · dernier événement 2026-08-14T14:52:57Z</p>
+      <p class="meta">sceau <code>ab2ffb3f14be</code> · dernier événement 2026-08-15T07:31:20Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -148,10 +148,10 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="1 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">1</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="6 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">6</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
-      <div class="kpi" title="225 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">225</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
+      <div class="kpi" title="226 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">226</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende">
       <span class="leg-item"><span class="leg-swatch" style="background:var(--blue)"></span>candidat</span>
@@ -164,44 +164,137 @@
       <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
       
       <div class="dropdown" data-dim="forge">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">1</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">2</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
-          <label><input type="checkbox" value="digit-ai-forge-tests" checked> digit-ai-forge-tests</label>
+          <label><input type="checkbox" value="digit-ai-forge-agents" checked> digit-ai-forge-agents</label>
+          <label><input type="checkbox" value="digit-ai-forge-pilot" checked> digit-ai-forge-pilot</label>
         </div>
       </div>
       
       <div class="dropdown" data-dim="prio">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">1</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">2</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-prio" role="group" aria-label="Filtre Priorité" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
+          <label><input type="checkbox" value="haute" checked> Haute</label>
           <label><input type="checkbox" value="moyenne" checked> Moyenne</label>
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">1 / 1 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">6 / 6 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-pilot"><strong>digit-ai-forge-pilot</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
     <main>
-    <section id="digit-ai-forge-tests">
-      <h2>digit-ai-forge-tests <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-tests">1</span></h2>
-      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-tests</strong> — trié par statut puis priorité décroissante.</p>
+    <section id="digit-ai-forge-agents">
+      <h2>digit-ai-forge-agents <span class="badge" title="5 item(s) actifs ciblant digit-ai-forge-agents">5</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-agents</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0226" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
+        <article class="card s-candidat" id="item-TF-0227" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
           <header class="card-head">
-            <code class="tf-id">TF-0226</code>
+            <code class="tf-id">TF-0227</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-forge-agents : aucun oracle du socle ne lit le TEXTE RENDU — une convention de balisage fuitee traverse tous les gates</h3>
+          <div class="card-detail"><p class="lead">Le livrable « Produit-10 - Rapport mapping Bronze al2 vers Silver Client-A - 20260814b.html » portait 71 occurrences de marqueurs de citation [c:id] affiches en clair dans ses phrases (« 85 [c:ec-sources] sources ALX », « 258 [c:ec-claims] lignes de tableau »). Ce meme livrable etait PASS a check_html.py, PASS a render_page.py sur cinq largeurs, et PASS a un test d'interactions de 24 controles. Le defaut a ete trouve a l'oeil par l'humain, capture d'ecran a l'appui. Cause cote produit : [c:id] est la convention de restitution du Markdown, lue par oracle-restituer de forge-data ; l'emetteur HTML partageait le meme modele et ne la retirait pas. Les oracles du socle jugent la structure, le contraste, le debordement et les affordances — aucun ne regarde les PHRASES.</p><p class="detail-label">Proposition</p><ul class="puces"><li>une regle de motif de gabarit dans le texte visible, cherchant dans le texte hors balises, scripts et styles une liste courte de motifs qui n'ont rien a y faire ([c:...], {{...}}, ${...}, %s, TODO, FIXME, lorem ipsum), avec exemption motivee par attribut</li><li>Cout faible : une expression par motif sur le texte que l'oracle extrait deja</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-14</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un livrable diffuse montrait sa plomberie ; correction en aval = retrait des marqueurs a l'emission, ajout d'une annexe de 213 lignes pour ne pas perdre la tracabilite, un L10 rattrape au passage, un controle et une seconde fixture rouge ecrits, et un rejeu complet des cinq oracles. Comptage verifie fichier par fichier : 71 occurrences dans 20260814b, zero dans 20260813a — la chaine v1 emettait depuis un modele sans marqueurs.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-10</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0228" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0228</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-forge-agents : check_html avertit contre le script que le pattern S-G1 du meme socle EXIGE en &lt;head&gt;</h3>
+          <div class="card-detail"><p class="lead">check_html.py (lignes 325-328) avertit « Script bloquant dans &lt;head&gt; (utiliser defer ou placer en fin de body) » pour tout &lt;script&gt; de &lt;head&gt; sans defer ni async. Or le pattern S-G1 du meme socle impose un script d'initialisation de theme AVANT &lt;style&gt;, precisement pour poser data-theme avant la premiere peinture : defer produirait le flash que le pattern evite. Consequence mesuree : les quatre livrables HTML de ce projet portent cet avertissement a chaque execution depuis le 13/08, sans correctif possible sans violer S-G1. Un avertissement permanent et inevitable cesse d'etre lu — et c'est dans ce bruit que le defaut de marqueurs visibles est passe.</p><p class="detail-label">Proposition</p><ul class="puces"><li>exempter l'initialisation de theme par attribut declaratif (data-theme-init) ou par reconnaissance du snippet S-G1</li><li>tout autre script bloquant en &lt;head&gt; reste signale</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-14</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>quatre livrables x une dizaine d'executions d'oracle = un avertissement toujours present, jamais actionnable, qui a servi de bruit de fond a un vrai defaut. Verifie dans le code de l'oracle et dans le pattern, non deduit.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-10</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0229" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0229</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-forge-agents : la clause d'echappement de L13 n'est pas mecanisee — son message promet une porte qui n'existe pas</h3>
+          <div class="card-detail"><p class="lead">Le message de L13 dit « un KPI d'elements hors page LE DIT », mais le code (check_html.py, lignes 622-627) ne teste que l'absence de data-kpi-filtre : il n'existe aucun moyen declaratif de le dire. Preuve : les six indicateurs du rapport 20260814c portent chacun une legende .kpi-d qui nomme le chapitre ou vivent leurs elements (« demonstration au chapitre 3 », « tableau au chapitre 1 ») et les six sont signales quand meme.</p><p class="detail-label">Proposition</p><ul class="puces"><li>accepter un attribut declaratif (data-kpi-hors-page=&quot;&lt;motif&gt;&quot;), ou considerer une legende .kpi-d non vide comme la declaration que le message annonce deja</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-14</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>avertissement non actionnable a chaque rejeu, sur un document qui satisfait deja l'esprit de la regle. Aucun contournement possible sans rendre cliquables des indicateurs qui comptent des elements absents de la page — ce qui serait une affordance mensongere.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-10</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0230" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0230</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-forge-agents : TF-0058 archive comme corrige ne l'est qu'a moitie — render_page ecrit toujours ses PNG dans le dossier du fichier audite par defaut</h3>
+          <div class="card-detail"><p class="lead">L'item TF-0058 (« render_page.py ecrit ses PNG dans le dossier du fichier audite ») est archive avec le statut corrige. L'option --out &lt;dossier&gt; existe bien et fonctionne — verifiee sur ce run. Mais le DEFAUT est inchange : appele sans --out, render_page.py a depose cinq PNG, soit 25 Mo, dans output\.oracles\ du projet, c'est-a-dire dans le dossier des livrables, qu'il a fallu deplacer a la main vers forge\etapes\renders\. Le motif d'origine de l'item — des PNG dans le dossier meme que le destinataire recoit — se reproduit donc a l'identique.</p><p class="detail-label">Proposition</p><ul class="puces"><li>defaut hors du dossier audite, ou refus d'ecrire la sans --out explicite</li><li>A rapprocher de TF-0058 plutot que de creer un doublon</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-14</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>25 Mo dans le dossier des livrables, decouverts au rangement demande par l'humain ; deplacement manuel puis realignement des journaux R-32 qui pointaient les anciens chemins. output est passe de 26 Mo a 1,2 Mo apres deplacement.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-10</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0231" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0231</code>
             <span class="statut s-candidat">candidat</span>
             <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">forge-tests : ruff est configure mais aucun pas de la recette ne l'execute — 18 depassements dorment</h3>
-          <div class="card-detail"><p class="lead">Constat en passant du 14/08 (travaux TF-0222..TF-0225) : 'ruff check forge_tests/ tests/' rend 19 erreurs, dont 18 PREEXISTANTES (E501 dans dashboard.py x8, cahiers.py x2, execution.py, generateur_proprietes.py, 3 fichiers de tests ; I001 et F401 dans test_tf_0104 et test_tf_0200).</p><ul class="puces"><li>La 19e venait d'etre introduite par le pilot et a ete corrigee sur-le-champ. Le point n'est pas les lignes longues : c'est que les 13 pas de recette/verifier_corpus.py n'appellent JAMAIS ruff. Un linter que rien ne joue n'est pas un garde-fou, c'est une decoration — meme classe de defaut que la consigne RESTITUTION v1, citee par aucun run et donc jamais appliquee. Deux options :</li><li>ajouter un pas de recette 'lint' — mais solder les 18 d'abord, sinon le pas nait rouge et sera desarme</li><li>retirer la configuration ruff, honnete mais on perd un outil deja ecrit</li></ul></div>
+          <h3 class="card-titre">digit-ai-forge-agents : arbitrer la portee de L3 (TF-0170) — barème lié exigé sur des valeurs d'INDICATEUR, pas seulement de cellule de tableau</h3>
+          <div class="card-detail"><p class="lead">Reconstat sur TF-0170, encore candidat, dans un cas que l'item ne prevoit pas : L3 a exige un bareme lie sur deux valeurs d'indicateur (« 9 / 85 » et « 8 / 12 » dans une grille de KPI), et non sur des cellules de tableau.</p><ul class="puces"><li>Deux FAIL bloquants a la premiere emission du rapport 20260814c</li><li>Contournement retenu : un bareme dedie #bareme-ecart cite par aria-describedby — qui a d'ailleurs ameliore le document</li><li>Question a trancher : la regle vaut -elle pour tout N / M de la page, ou pour les seules cellules de tableau ? En l'etat, tout ratio affiche dans un indicateur devient un FAIL surprise</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-08-14</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 2 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>mesure au 14/08 : ruff rend 19 erreurs et aucun des 13 pas de recette ne l appelle — le controle existe sur le disque, pas dans le processus</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant — constat =&gt; candidat, jamais correction spontanee)</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 1 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>deux FAIL bloquants a l'emission, resolus par l'ajout d'un bareme et d'un aria-describedby ; un aller-retour d'emission complet. Message d'oracle cite dans le journal R-32 du livrable.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-10</dd></div>
+            
+          </dl>
+        </article>
+      </div>
+    </section>
+    <section id="digit-ai-forge-pilot">
+      <h2>digit-ai-forge-pilot <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-pilot">1</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-pilot</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0232" data-forge="digit-ai-forge-pilot" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0232</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : les self-tests des oracles n'etaient joues par rien — et oracle-claude-md n'en avait aucun</h3>
+          <div class="card-detail"><p class="lead">Constat du 15/08, en cablant oracle-boite-entree : chaque oracle du pilot porte sa recette a double sens et RIEN ne l'appelait — il fallait y penser, oracle par oracle.</p><ul class="puces"><li>Troisieme occurrence de la meme maladie en deux jours (consigne RESTITUTION citee par aucun run</li><li>ruff configure et joue par aucun pas de recette). Corrige dans la foulee parce que je venais d'ajouter un self-test de plus a la pile dormante : oracles\self-tests.mjs joue les 8 en un pas, avec l'invariant I1 (un oracle sans recette est un ECHEC, pas un silence — sinon ajouter un oracle non teste serait la facon la plus simple de faire baisser le compte d'echecs). Ce qu'il a trouve des son premier passage : oracle-claude-md, gardien du plafond de 6 Ko du noyau depuis TF-0037, n'avait AUCUN self-test — jamais vu refuser quoi que ce soit. Il en a un desormais (6/6, borne prouvee des deux cotes, refus franc si CLAUDE.md est absent). Entre au registre en CANDIDAT malgre la correction : la decision qui reste humaine est de savoir si ce pas doit devenir opposable a l'ouverture de tout run (il y est cite au pas 1 de ETAPES-RUN) ou rester un outil de campagne</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-15</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 5 — gain 3 × preuve 4 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-pilot</dt><dd>mesure le 15/08 : 8 oracles, 8 recettes a double sens, 0 execution automatique ; le gardien du plafond du noyau n'avait jamais ete prouve capable d'echouer</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant — constat =&gt; candidat)</dd></div>
             
           </dl>
         </article>
