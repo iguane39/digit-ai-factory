@@ -45,6 +45,10 @@ const FORGES = [
   "forge-agents-security", "forge-agents", "forge-audit", "forge-conception", "forge-data",
   "forge-design", "forge-development", "forge-observability", "forge-ops", "forge-organization",
   "forge-seo", "forge-tests", "forge-websec", "digit-ai-forge-pilot", "pilot",
+  // Phase expand du renommage factory (fenêtre A, étude 20260817i) : les DEUX noms sont
+  // acceptés tant qu'un lot antérieur peut arriver ; retirer l'ancien est le DERNIER geste
+  // de la séquence (classe c. de l'énumération), jamais le premier.
+  "digit-ai-factory", "factory",
 ];
 // Gravité déclarée par le produit -> `gain`. L'effort n'est PAS dérivé : il est décidé.
 const GAIN = { bloquant: 3, majeur: 3, mineur: 1 };
