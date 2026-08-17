@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * oracle-skills.mjs — les skills qui S'EXÉCUTENT sont-ils ceux que les dépôts VERSIONNENT ?
+ * oracle-skills.mjs — les skills et hooks qui S'EXÉCUTENT sont-ils ceux que les dépôts VERSIONNENT ?
  *
  * Pourquoi il existe. Un skill vit en deux exemplaires : la source, versionnée dans une forge,
  * et la copie installée sous `~/.claude/skills/`, qui est celle que la session invoque
@@ -21,6 +21,22 @@
  *       appartient à l'humain, l'oracle n'a pas à en juger ;
  *   K5  une copie installée EN AVANCE sur sa source (version déclarée plus haute) interdit
  *       l'application : c'est le dépôt qui est en retard, pas la copie.
+ *   K6  même contrat pour les HOOKS (`<forge>\.claude\hooks\` → `~\.claude\hooks\`) : divergence
+ *       en échec, hook installé sans source versionnée déclaré et non jugé (comme K4), copie en
+ *       avance protégée (comme K5).
+ *
+ * K6 (TF-0290). Le gate C7 `qo-gate-write.mjs` — celui qui bloque l'écriture de TOUT livrable,
+ * cinq blocages réels dans la seule journée du 15/08 — ne vivait qu'en copie installée : aucune
+ * forge ne le versionnait, donc aucune correction n'était traçable ni rejouable, et un effacement
+ * de `~\.claude` l'aurait détruit en silence. Le trou était invisible PAR CONSTRUCTION : K1-K5 ne
+ * regardent que les skills. Un hook est un fichier, pas un dossier : K6 compare fichier à fichier.
+ *
+ * Ce qui est EXCLU du diff (TF-0289), et déclaré comme tel au verdict : les sidecars d'oracles
+ * (`*.oracles*.json[l]`, convention TF-0065 « hors dépôt ») et les artefacts d'atelier. Mesure du
+ * 15/08 : K2 annonçait « 8 fichier(s) » chez experts-forge dont 2 vrais, « 12 » chez
+ * ameliore-le-design dont 8 vrais — et le message tronquait à 4, donc le vrai défaut pouvait ne
+ * pas être affiché du tout. Un contrôle qui noie sa trouvaille dans son propre bruit ne trouve
+ * rien : les divergences de CONTENU sont désormais listées ENTIÈREMENT, en tête.
  *
  * Ce qu'il ne juge PAS : le contenu d'un skill, sa qualité, son opportunité. Et il ne peut pas
  * EMPÊCHER une édition de la copie installée — il la voit au run suivant, il ne la verrouille
@@ -28,7 +44,8 @@
  * dépôts vers un seul dossier, des jonctions qui cassent au premier déplacement de dépôt.
  *
  * Usage : node oracle-skills.mjs [--racine <dossier des forges>] [--installes <dossier>]
- *         node oracle-skills.mjs --appliquer   # copie source → installé (K1 et K2 seulement)
+ *                               [--installes-hooks <dossier>]
+ *         node oracle-skills.mjs --appliquer   # copie source → installé (K1, K2 et K6)
  *         node oracle-skills.mjs --purger      # orphelins de la copie → quarantaine datée (K2)
  *         node oracle-skills.mjs --self-test
  * Exit : 0 PASS · 1 FAIL · 2 non jugeable.
@@ -47,7 +64,7 @@ import { dirname, join, resolve, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir, tmpdir } from "node:os";
 
-const VERSION = "1.0.0";
+const VERSION = "1.1.0"; // 1.1.0 : K6 (hooks, TF-0290) et exclusion déclarée des sidecars (TF-0289)
 const ORACLE = "oracle-skills";
 const ICI = dirname(fileURLToPath(import.meta.url));
 
@@ -58,14 +75,32 @@ const IGNORES = new Set(["__pycache__", ".oracles", ".pytest_cache", "node_modul
 // faire dans un dépôt et ne sont pas non plus un défaut de la copie : on ne les compare pas, et
 // surtout on ne les EFFACE pas — c'est un fichier de l'humain, pas un artefact de la forge.
 const IGNORE_MOTIF = /\.bak(?:[-.]\w+)?$/i;
+// Sidecars d'oracles (TF-0289). Le hook C7 dépose à côté de chaque fichier jugé son cache, son
+// journal et son historique — `SKILL.md.oracles.json`, `.oracles-cache.json`,
+// `_oracles-journal-historique.jsonl`. Convention TF-0065 : ils vivent HORS dépôt, sont
+// régénérables, et ne sont jamais exécutés. Les comparer faisait diverger deux copies identiques
+// dès qu'un oracle avait tourné d'un seul côté : 6 des 8 « divergences » annoncées chez
+// experts-forge le 15/08. Le séparateur autorisé devant `oracles` est `.` ou `_`, JAMAIS `-` :
+// `references/registre-oracles.json` est un référentiel versionné, pas un sidecar, et une
+// divergence dessus doit rester un échec (fixture rouge dédiée).
+const SIDECAR_ORACLES = /[._]oracles[\w-]*\.jsonl?$/i;
+// Ce que le diff écarte, en une phrase — reprise TELLE QUELLE dans le verdict : une exclusion
+// muette est un mensonge par omission, l'oracle doit dire ce qu'il ne regarde pas.
+const LIBELLE_EXCLUS = "hors sidecars d'oracles (*.oracles*.json[l], convention TF-0065) et artefacts d'atelier (__pycache__, .venv, node_modules, .pytest_cache, .bak) : gitignorés, régénérables, jamais exécutés";
 // Deux conventions de chemin coexistent : forge-agents publie sous `.claude/skills/`,
 // conception et design sous `skills/`. Les deux sont lues — imposer l'une des deux serait un
 // autre chantier, et l'oracle n'a pas à trancher une convention pour pouvoir mesurer.
 const SOUS_CHEMINS = [join(".claude", "skills"), "skills"];
+// Les hooks n'ont qu'une convention : `<forge>\.claude\hooks\`, à côté du `settings.json` qui les
+// câble. Une seule est lue — inventer la seconde avant qu'elle existe serait deviner.
+const SOUS_CHEMIN_HOOKS = join(".claude", "hooks");
 
 const NON_JUGE = [
   "le CONTENU d'un skill, sa qualité, son opportunité — cet oracle compare deux copies, il ne lit pas",
   "les skills personnels de l'humain (sans source versionnée) : déclarés par K4, jamais jugés",
+  "les hooks installés sans source versionnée : déclarés par K6, jamais jugés (même contrat que K4)",
+  `les sidecars d'oracles et les artefacts d'atelier : le diff de K2 et K6 est calculé ${LIBELLE_EXCLUS} (TF-0289)`,
+  "un hook sans version déclarée ne peut pas bénéficier de la protection « en avance » : la comparaison de versions demande qu'elle soit écrite des DEUX côtés (même limite que K5 pour un skill sans frontmatter)",
   "une édition FUTURE de la copie installée — l'oracle la verra au run suivant, il ne la verrouille pas",
 ];
 
@@ -97,12 +132,43 @@ function sources(racine) {
   return par_nom;
 }
 
+/** Toutes les sources de hooks versionnées : chemin relatif au dossier de hooks -> [chemins].
+ *  Un hook est un FICHIER (`qo-gate-write.mjs`), pas un dossier : la clé est son chemin relatif,
+ *  ce qui couvre aussi un éventuel sous-dossier sans avoir à le prévoir. */
+function sourcesHooks(racine) {
+  const par_nom = new Map();
+  if (!existsSync(racine)) return par_nom;
+  for (const depot of readdirSync(racine, { withFileTypes: true })) {
+    if (!depot.isDirectory() || !depot.name.startsWith("digit-ai-forge-")) continue;
+    const base = join(racine, depot.name, SOUS_CHEMIN_HOOKS);
+    if (!existsSync(base)) continue;
+    for (const rel of fichiers(base)) {
+      if (!par_nom.has(rel)) par_nom.set(rel, []);
+      par_nom.get(rel).push(join(base, rel));
+    }
+  }
+  return par_nom;
+}
+
+/** Version déclarée dans un texte : frontmatter `version: "1.2.3"` d'un SKILL.md, ou
+ *  `const VERSION = "1.2.3"` d'un script de hook. Rien d'autre — un « v1.2 » en prose n'est pas
+ *  une déclaration, et deviner ferait de K5/K6 un garde-fou qui se déclenche au hasard. */
+function versionDeclaree(texte) {
+  const m = texte.match(
+    /^\s*(?:\/\/\s*|#\s*|\*\s*)?(?:(?:export\s+)?(?:const|let|var)\s+)?version\s*[:=]\s*["']?v?([\d]+(?:\.[\d]+)*)/im);
+  return m ? m[1] : null;
+}
+
 /** Version déclarée en frontmatter du SKILL.md, si elle existe. */
 function version(dossier) {
   const f = join(dossier, "SKILL.md");
   if (!existsSync(f)) return null;
-  const m = readFileSync(f, "utf8").match(/^\s*version:\s*"?([\d]+(?:\.[\d]+)*)"?/m);
-  return m ? m[1] : null;
+  return versionDeclaree(readFileSync(f, "utf8"));
+}
+
+/** Version déclarée dans un fichier de hook, si elle existe. */
+function versionFichier(f) {
+  return existsSync(f) ? versionDeclaree(readFileSync(f, "utf8")) : null;
 }
 
 /** -1, 0, 1 — comparaison numérique segment par segment (« 2.10.0 » > « 2.9.0 »). */
@@ -118,7 +184,7 @@ function comparerVersions(a, b) {
 function fichiers(dossier, prefixe = "") {
   const out = [];
   for (const e of readdirSync(dossier, { withFileTypes: true })) {
-    if (IGNORES.has(e.name) || IGNORE_MOTIF.test(e.name)) continue;
+    if (IGNORES.has(e.name) || IGNORE_MOTIF.test(e.name) || SIDECAR_ORACLES.test(e.name)) continue;
     const rel = prefixe ? `${prefixe}/${e.name}` : e.name;
     if (e.isDirectory()) out.push(...fichiers(join(dossier, e.name), rel));
     else out.push(rel);
@@ -152,13 +218,34 @@ function analyserEcarts(src, dst) {
   return { manquants, divergents, orphelins };
 }
 
-function ecarts(src, dst) {
-  const { manquants, divergents, orphelins } = analyserEcarts(src, dst);
-  return [
-    ...manquants.map((f) => `${f} (absent de la copie)`),
-    ...divergents,
-    ...orphelins.map((f) => `${f} (en trop dans la copie)`),
-  ];
+/** Écart RACONTÉ (TF-0289) : combien, de quelle nature, et lesquels.
+ *
+ *  L'ancienne forme concaténait les trois natures puis tronquait à 4 — donc quand un skill portait
+ *  6 fichiers absents et 2 vraies divergences de contenu, le message affichait 4 absents et
+ *  passait les deux divergences sous silence. Le défaut que K2 existe pour trouver était le seul
+ *  à ne pas être montré. Les divergences de CONTENU passent donc en tête et ne sont JAMAIS
+ *  tronquées ; les manquants et les orphelins, qui se résument par un compte, sont plafonnés.
+ */
+const PLAFOND_LISTE = 4;
+function decrireEcart({ manquants, divergents, orphelins }) {
+  const total = manquants.length + divergents.length + orphelins.length;
+  const borner = (liste, suffixe) => (liste.length > PLAFOND_LISTE
+    ? [...liste.slice(0, PLAFOND_LISTE).map((f) => `${f} ${suffixe}`), `et ${liste.length - PLAFOND_LISTE} autre(s) ${suffixe}`]
+    : liste.map((f) => `${f} ${suffixe}`));
+  const nature = [
+    divergents.length ? `${divergents.length} divergence(s) de contenu` : null,
+    manquants.length ? `${manquants.length} absent(s) de la copie` : null,
+    orphelins.length ? `${orphelins.length} en trop dans la copie` : null,
+  ].filter(Boolean).join(", ");
+  return {
+    total,
+    nature,
+    liste: [
+      ...divergents, // jamais tronqués : c'est la trouvaille
+      ...borner(manquants, "(absent de la copie)"),
+      ...borner(orphelins, "(en trop dans la copie)"),
+    ].join(", "),
+  };
 }
 
 function copier(src, dst) {
@@ -190,11 +277,97 @@ function purgerOrphelins(dst, nom, orphelins, racineQuarantaine, horodatage) {
   return deplaces;
 }
 
-function juger(racine, installes, appliquer = false, purger = false) {
+/** K6 (TF-0290) — les HOOKS installés sont-ils ceux que les forges versionnent ?
+ *
+ *  Même contrat que K1/K2/K4/K5 pour les skills, transposé au fichier : divergence en échec en
+ *  disant QUEL fichier et QUELLE copie s'exécute, copie en avance protégée, hook installé sans
+ *  source versionnée déclaré et non jugé (il appartient à l'humain), hook versionné non installé
+ *  déclaré aussi — installer un hook est un acte humain, `--appliquer` le pose sur demande.
+ *  Pas de purge ici : un fichier installé sans source n'est pas un orphelin d'un dossier de
+ *  skill, c'est peut-être le hook personnel de l'humain. On ne déplace pas ce qu'on ne juge pas.
+ *  Écrit dans `findings` et `applique` du jugement principal.
+ */
+function jugerHooks(racine, installes, appliquer, findings, applique) {
+  const par_nom = sourcesHooks(racine);
+  const poses = existsSync(installes) ? fichiers(installes) : [];
+  const set_poses = new Set(poses);
+  const personnels = poses.filter((rel) => !par_nom.has(rel));
+  const absents = [];
+  let compares = 0;
+  let echec = false;
+
+  for (const [rel, chemins] of [...par_nom].sort()) {
+    const src = chemins[0];
+    const dst = join(installes, rel);
+    if (chemins.length > 1) {
+      // Même raison que K3 : sans source unique, il n'y a rien à comparer et surtout rien à
+      // appliquer — `--appliquer` prendrait la première venue, c'est-à-dire arbitrerait en
+      // silence un conflit entre deux forges.
+      echec = true;
+      findings.push({
+        regle: "K6", statut: "FAIL", ou: rel,
+        message: `hook revendiqué par ${chemins.length} sources (${chemins.map((c) => relative(racine, c)).join(", ")}) — « la » source n'existe pas, la copie installée ne peut pas être arbitrée`,
+      });
+      continue;
+    }
+    if (!set_poses.has(rel)) {
+      if (appliquer) {
+        mkdirSync(dirname(dst), { recursive: true });
+        copyFileSync(src, dst);
+        applique.push(`hook ${rel} (installé)`);
+        continue;
+      }
+      absents.push(`${rel} (source : ${relative(racine, src)})`);
+      continue;
+    }
+    compares += 1;
+    if (memeContenu(src, dst)) continue;
+    // Protection K5 transposée : une copie installée qui déclare une version PLUS HAUTE est en
+    // avance, et l'écraser détruirait du travail au nom de la synchronisation.
+    const vs = versionFichier(src), vd = versionFichier(dst);
+    if (vs && vd && comparerVersions(vd, vs) > 0) {
+      echec = true;
+      findings.push({
+        regle: "K6", statut: "FAIL", ou: rel,
+        message: `la copie installée du hook est EN AVANCE (${vd} > ${vs}) — protection K5 : \`--appliquer\` refuse d'écraser une version par une plus ancienne, c'est la SOURCE qui doit être mise à jour d'abord`,
+      });
+      continue;
+    }
+    if (appliquer) { copyFileSync(src, dst); applique.push(`hook ${rel} (remis à niveau)`); continue; }
+    echec = true;
+    findings.push({
+      regle: "K6", statut: "FAIL", ou: rel,
+      message: `la copie installée ${join(installes, rel)} DIVERGE de sa source ${relative(racine, src)} — c'est la COPIE INSTALLÉE qui s'exécute à chaque outil, la version versionnée n'a aucun effet (\`--appliquer\` pour la remettre à niveau) · diff calculé ${LIBELLE_EXCLUS}`,
+    });
+  }
+
+  // Déclarations — toujours émises, échec ou pas : ce qui n'est pas jugé doit être DIT, sinon
+  // l'absence de verdict se lit comme une absence de sujet (c'est ainsi que le gate C7 est resté
+  // invisible jusqu'au 15/08).
+  const declarations = [];
+  if (compares) declarations.push(`${compares} hook(s) installé(s) comparé(s) à leur source versionnée`);
+  else declarations.push(`aucun hook installé sous ${installes} — rien à comparer`);
+  if (personnels.length) declarations.push(`${personnels.length} hook(s) installé(s) sans source versionnée, déclarés et non jugés : ${personnels.join(", ")}`);
+  if (absents.length) declarations.push(`${absents.length} hook(s) versionné(s) NON installé(s), déclarés — poser un hook est un acte humain (\`--appliquer\` l'installe) : ${absents.join(", ")}`);
+  findings.push({
+    regle: "K6", statut: "PASS", ou: "(déclarations)",
+    message: echec
+      ? `${declarations.join(" · ")} — voir les échecs K6 ci-dessus pour les divergences`
+      : `${declarations.join(" · ")} — aucune divergence`,
+  });
+}
+
+function juger(racine, installes, appliquer = false, purger = false,
+               installesHooks = join(dirname(installes), "hooks")) {
   const findings = [];
   const par_nom = sources(racine);
   if (par_nom.size === 0) {
-    return { verdict: "SKIP", findings, motif: `aucune source de skill sous ${racine}` };
+    // Ni skills, ni hooks : sans forge sous cette racine il n'y a rien à comparer, et le dire
+    // vaut mieux que de rendre un PASS sur K6 seul — un non-jugement muet se lit comme un vert.
+    return {
+      verdict: "SKIP", findings,
+      motif: `aucune source de skill sous ${racine} — les hooks ne sont pas jugés non plus (K6 sans racine de forges n'a rien à comparer)`,
+    };
   }
   const applique = [];
   const purge = [];
@@ -236,12 +409,8 @@ function juger(racine, installes, appliquer = false, purger = false) {
       orphelins = [];
     }
 
-    const diff = [
-      ...manquants.map((f) => `${f} (absent de la copie)`),
-      ...divergents,
-      ...orphelins.map((f) => `${f} (en trop dans la copie)`),
-    ];
-    if (diff.length) {
+    const diff = decrireEcart({ manquants, divergents, orphelins });
+    if (diff.total) {
       // K5 — GARDE-FOU, et il a servi le jour même de son écriture. `prompt-analyzer-l99`
       // installé était en 2.2.0 quand la source du dépôt en était à 2.1.0 : un
       // `--appliquer` naïf aurait ÉCRASÉ une version par une plus ancienne, c'est-à-dire
@@ -255,13 +424,16 @@ function juger(racine, installes, appliquer = false, purger = false) {
         });
         continue;
       }
-      if (appliquer) { copier(src, dst); applique.push(`${nom} (${diff.length} fichier(s) remis à niveau)`); continue; }
+      if (appliquer) { copier(src, dst); applique.push(`${nom} (${diff.total} fichier(s) remis à niveau)`); continue; }
       findings.push({
         regle: "K2", statut: "FAIL", ou: nom,
-        message: `la copie installée DIVERGE de ${relative(racine, src)} sur ${diff.length} fichier(s) : ${diff.slice(0, 4).join(", ")}${diff.length > 4 ? "…" : ""} — c'est la copie qui s'exécute`,
+        message: `la copie installée DIVERGE de ${relative(racine, src)} sur ${diff.total} fichier(s) — ${diff.nature} : ${diff.liste} — c'est la copie qui s'exécute · diff calculé ${LIBELLE_EXCLUS}`,
       });
     }
   }
+
+  // K6 : les hooks, même contrat que les skills (TF-0290).
+  jugerHooks(racine, installesHooks, appliquer, findings, applique);
 
   // K4 : ce qui est installé sans source versionnée appartient à l'humain. Déclaré, pas jugé.
   const personnels = listeSkills(installes).filter((n) => !par_nom.has(n));
@@ -270,7 +442,7 @@ function juger(racine, installes, appliquer = false, purger = false) {
   const total = par_nom.size;
   for (const [regle, message] of [
     ["K1", `${total} skill(s) versionné(s), tous installés`],
-    ["K2", "chaque copie installée est identique à sa source"],
+    ["K2", `chaque copie installée est identique à sa source (${LIBELLE_EXCLUS})`],
     ["K3", "aucun nom de skill revendiqué par deux forges"],
     ["K5", "aucune copie installée en avance sur sa source"],
   ]) if (!vues.has(regle)) findings.push({ regle, statut: "PASS", message });
@@ -405,6 +577,152 @@ function selfTest() {
             !r.findings.some((f) => f.regle === "K4" && f.statut === "FAIL")
             && r.findings.some((f) => f.regle === "K4" && /perso/.test(f.message))]);
 
+  // ---- TF-0289 : les sidecars d'oracles ne sont pas des divergences, et les VRAIES ne sont plus
+  // tronquées. Base neuve : les cas précédents laissent volontairement un doublon K3 derrière eux,
+  // donc plus aucun verdict global vert n'y est possible.
+  const base2 = mkdtempSync(join(tmpdir(), "skills-sidecars-"));
+  const racine2 = join(base2, "forges");
+  const inst2 = join(base2, ".claude", "skills");
+  const src2 = join(racine2, "digit-ai-forge-agents", ".claude", "skills");
+  poser(join(src2, "sigma", "SKILL.md"), "# sigma\n");
+  poser(join(src2, "sigma", "references", "registre-oracles.json"), '{"oracles":[]}\n');
+  poser(join(inst2, "sigma", "SKILL.md"), "# sigma\n");
+  poser(join(inst2, "sigma", "references", "registre-oracles.json"), '{"oracles":[]}\n');
+  // Sidecars du hook C7 déposés du SEUL côté où un oracle a tourné — cas réel des 15 fichiers
+  // trouvés sous experts-forge, contre-expertise et write-an-expert le 15/08.
+  poser(join(inst2, "sigma", "SKILL.md.oracles.json"), '{"verdict":"PASS"}\n');
+  poser(join(inst2, "sigma", "SKILL.md.oracles-cache.json"), "{}\n");
+  poser(join(inst2, "sigma", ".oracles-cache.json"), "{}\n");
+  poser(join(inst2, "sigma", "_oracles-journal-historique.jsonl"), "{}\n");
+  poser(join(inst2, "sigma", "references", "regles.md.oracles-historique.jsonl"), "{}\n");
+  poser(join(inst2, "sigma", "__pycache__", "x.pyc"), "octets\n");
+  r = juger(racine2, inst2);
+  cas.push(["K2    — sidecars d'oracles et __pycache__ ne sont pas des écarts (TF-0289)",
+            r.verdict === "PASS"]);
+
+  // Rouge : une VRAIE divergence de contenu reste détectée sous le bruit des sidecars.
+  writeFileSync(join(inst2, "sigma", "SKILL.md"), "# sigma trafique dans la copie\n");
+  r = juger(racine2, inst2);
+  const k2 = r.findings.find((f) => f.regle === "K2" && f.statut === "FAIL");
+  cas.push(["K2    — une vraie divergence de SKILL.md reste détectée",
+            Boolean(k2) && k2.message.includes("1 divergence(s) de contenu : SKILL.md")]);
+  cas.push(["K2    — le verdict DÉCLARE ce qu'il exclut (message ET non_juge)",
+            Boolean(k2) && /sidecars d'oracles/.test(k2.message)
+            && NON_JUGE.some((l) => /sidecars d'oracles/.test(l))]);
+
+  // Garde-fou du motif : `references/registre-oracles.json` est un référentiel VERSIONNÉ, pas un
+  // sidecar — le séparateur `-` ne doit pas ouvrir l'exclusion, sinon TF-0289 rendrait aveugle
+  // exactement là où K2 sert.
+  writeFileSync(join(inst2, "sigma", "SKILL.md"), "# sigma\n");
+  writeFileSync(join(inst2, "sigma", "references", "registre-oracles.json"), '{"oracles":["trafique"]}\n');
+  r = juger(racine2, inst2);
+  const k2b = r.findings.find((f) => f.regle === "K2" && f.statut === "FAIL");
+  cas.push(["K2    — `registre-oracles.json` n'est PAS un sidecar : sa divergence échoue",
+            Boolean(k2b) && /references\/registre-oracles\.json/.test(k2b.message)]);
+
+  // Troncature : 6 vraies divergences de contenu + 6 fichiers absents de la copie. L'ancienne
+  // forme listait les absents d'abord puis coupait à 4 — les 6 divergences pouvaient n'apparaître
+  // NULLE PART, c'est-à-dire le défaut cherché rendu invisible par le message même qui l'annonce.
+  for (let i = 1; i <= 6; i += 1) {
+    poser(join(src2, "sigma", "scripts", `d${i}.mjs`), `export const n = ${i};\n`);
+    poser(join(inst2, "sigma", "scripts", `d${i}.mjs`), `export const n = ${i * 10};\n`);
+    poser(join(src2, "sigma", "absents", `a${i}.md`), `# a${i}\n`);
+  }
+  r = juger(racine2, inst2);
+  const k2c = r.findings.find((f) => f.regle === "K2" && f.statut === "FAIL");
+  cas.push(["K2    — les 6 vraies divergences sont TOUTES visibles, jamais tronquées",
+            Boolean(k2c) && [1, 2, 3, 4, 5, 6].every((i) => k2c.message.includes(`scripts/d${i}.mjs`))]);
+  cas.push(["K2    — les absents restent plafonnés et COMPTÉS, pas listés à l'infini",
+            Boolean(k2c) && /et 2 autre\(s\) \(absent de la copie\)/.test(k2c.message)]);
+
+  // ---- TF-0290 : K6, les HOOKS. Le gate C7 `qo-gate-write.mjs` a bloqué cinq écritures le 15/08
+  // sans qu'aucune forge le versionne — et K1-K5 ne pouvaient pas le voir : ils ne regardent que
+  // les skills. Un hook est un fichier : la comparaison se fait fichier à fichier.
+  const base3 = mkdtempSync(join(tmpdir(), "hooks-"));
+  const racine3 = join(base3, "forges");
+  const inst3 = join(base3, ".claude", "skills");
+  const instH = join(base3, ".claude", "hooks");
+  const src3 = join(racine3, "digit-ai-forge-agents", ".claude", "skills");
+  const srcH = join(racine3, "digit-ai-forge-agents", ".claude", "hooks");
+  const hook = (v, corps) => `#!/usr/bin/env node\nconst VERSION = "${v}";\n// ${corps}\n`;
+  poser(join(src3, "omega", "SKILL.md"), "# omega\n");
+  poser(join(inst3, "omega", "SKILL.md"), "# omega\n");
+  poser(join(srcH, "qo-gate-write.mjs"), hook("1.0.0", "gate C7"));
+  poser(join(instH, "qo-gate-write.mjs"), hook("1.0.0", "gate C7"));
+  r = juger(racine3, inst3, false, false, instH);
+  cas.push(["K6    — hook installé identique à sa source versionnée",
+            r.verdict === "PASS"
+            && r.findings.some((f) => f.regle === "K6" && /1 hook\(s\) installé\(s\) comparé/.test(f.message))]);
+
+  // Rouge : la copie installée a été éditée — c'est ELLE que le harnais exécute à chaque outil.
+  writeFileSync(join(instH, "qo-gate-write.mjs"), hook("1.0.0", "gate C7 trafique en local"));
+  r = juger(racine3, inst3, false, false, instH);
+  const k6 = r.findings.find((f) => f.regle === "K6" && f.statut === "FAIL");
+  cas.push(["K6    — hook installé divergent de sa source", Boolean(k6)]);
+  cas.push(["K6    — le verdict nomme le FICHIER et dit quelle copie s'exécute",
+            Boolean(k6) && k6.message.includes("qo-gate-write.mjs")
+            && /COPIE INSTALLÉE qui s'exécute/.test(k6.message)]);
+  juger(racine3, inst3, true, false, instH);
+  r = juger(racine3, inst3, false, false, instH);
+  cas.push(["K6    — --appliquer remet le hook à niveau",
+            !r.findings.some((f) => f.regle === "K6" && f.statut === "FAIL")
+            && readFileSync(join(instH, "qo-gate-write.mjs"), "utf8")
+               === readFileSync(join(srcH, "qo-gate-write.mjs"), "utf8")]);
+
+  // Un hook installé SANS source versionnée appartient à l'humain : déclaré, jamais mis en échec
+  // (même contrat que K4 pour un skill personnel).
+  poser(join(instH, "mon-hook-perso.mjs"), "// hook de l'humain\n");
+  r = juger(racine3, inst3, false, false, instH);
+  cas.push(["K6    — hook sans source versionnée : déclaré, non jugé",
+            r.verdict === "PASS"
+            && r.findings.some((f) => f.regle === "K6" && /mon-hook-perso\.mjs/.test(f.message))]);
+
+  // TF-0289 vaut aussi pour K6 : un sidecar déposé à côté d'un hook n'est pas un écart.
+  poser(join(instH, "qo-gate-write.mjs.oracles-cache.json"), "{}\n");
+  r = juger(racine3, inst3, false, false, instH);
+  cas.push(["K6    — un sidecar d'oracle à côté d'un hook n'est pas un écart",
+            r.verdict === "PASS"
+            && !r.findings.some((f) => f.regle === "K6" && /oracles-cache/.test(f.message))]);
+
+  // Protection K5 transposée : la copie installée déclare une version PLUS HAUTE — l'écraser
+  // détruirait du travail au nom de la synchronisation. Les deux sens comptent.
+  poser(join(srcH, "qo-gate.mjs"), hook("1.0.0", "gate C6"));
+  poser(join(instH, "qo-gate.mjs"), hook("2.3.0", "gate C6 ameliore sur le poste"));
+  r = juger(racine3, inst3, false, false, instH);
+  cas.push(["K6    — copie installée d'un hook EN AVANCE sur sa source",
+            r.findings.some((f) => f.regle === "K6" && f.statut === "FAIL" && /EN AVANCE/.test(f.message))]);
+  const avantH = readFileSync(join(instH, "qo-gate.mjs"), "utf8");
+  juger(racine3, inst3, true, false, instH);
+  cas.push(["K6 bis— --appliquer n'écrase PAS un hook installé plus récent",
+            readFileSync(join(instH, "qo-gate.mjs"), "utf8") === avantH]);
+  poser(join(srcH, "qo-gate.mjs"), hook("3.0.0", "gate C6 refondu au dépôt"));
+  juger(racine3, inst3, true, false, instH);
+  cas.push(["K6 ter— source de hook en avance : l'application se fait",
+            /3\.0\.0/.test(readFileSync(join(instH, "qo-gate.mjs"), "utf8"))]);
+
+  // Hook versionné mais JAMAIS installé : déclaré, pas mis en échec — poser un hook est un acte
+  // humain (il faut aussi le câbler dans settings.json). `--appliquer` le pose sur demande.
+  poser(join(srcH, "gates", "g0-budget.sh"), "#!/bin/bash\nexit 0\n");
+  r = juger(racine3, inst3, false, false, instH);
+  cas.push(["K6    — hook versionné non installé : déclaré, jamais en silence",
+            r.verdict === "PASS"
+            && r.findings.some((f) => f.regle === "K6" && /NON installé\(s\)/.test(f.message)
+                                      && /g0-budget\.sh/.test(f.message))]);
+  juger(racine3, inst3, true, false, instH);
+  cas.push(["K6    — --appliquer installe le hook versionné absent",
+            existsSync(join(instH, "gates", "g0-budget.sh"))]);
+
+  // Deux forges revendiquent le même hook : `--appliquer` ne tranche pas (même raison que K3).
+  poser(join(racine3, "digit-ai-forge-tests", ".claude", "hooks", "qo-gate-write.mjs"),
+        hook("1.0.0", "autre gate, autre forge"));
+  r = juger(racine3, inst3, false, false, instH);
+  cas.push(["K6    — même nom de hook dans deux forges : la source n'existe pas",
+            r.findings.some((f) => f.regle === "K6" && f.statut === "FAIL" && /2 sources/.test(f.message))]);
+  const avantD = readFileSync(join(instH, "qo-gate-write.mjs"), "utf8");
+  juger(racine3, inst3, true, false, instH);
+  cas.push(["K6 bis— --appliquer n'arbitre pas un hook revendiqué deux fois",
+            readFileSync(join(instH, "qo-gate-write.mjs"), "utf8") === avantD]);
+
   let bons = 0;
   for (const [nom, tenu] of cas) {
     console.log(`  [${tenu ? "OK    " : "ECHEC "}] ${nom}`);
@@ -424,11 +742,14 @@ const lire = (drapeau, defaut) => {
 };
 const racine = lire("--racine", racineForges());
 const installes = lire("--installes", join(homedir(), ".claude", "skills"));
+// Les hooks installés sont le frère du dossier des skills (`~\.claude\hooks`) — déduit plutôt que
+// redemandé, pour qu'un `--installes` de test emmène ses hooks avec lui.
+const installes_hooks = lire("--installes-hooks", join(dirname(installes), "hooks"));
 const appliquer = args.includes("--appliquer");
 const purger = args.includes("--purger");
 
-const { verdict, findings, motif, applique, purge } = juger(racine, installes, appliquer, purger);
+const { verdict, findings, motif, applique, purge } = juger(racine, installes, appliquer, purger, installes_hooks);
 process.stdout.write(JSON.stringify(
-  { oracle: ORACLE, version: VERSION, racine, installes, verdict, motif, applique, purge, findings, non_juge: NON_JUGE },
+  { oracle: ORACLE, version: VERSION, racine, installes, installes_hooks, verdict, motif, applique, purge, findings, non_juge: NON_JUGE },
   null, 1) + "\n");
 process.exit(verdict === "FAIL" ? 1 : verdict === "SKIP" ? 2 : 0);
