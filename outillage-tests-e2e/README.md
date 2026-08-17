@@ -35,8 +35,11 @@ Orchestrateur de boucle remédiation ↔ réexécution (plan §4 phases 5-6), po
 classe les actions au format R-29 (`categorie` ∈ `auto_ia` / `manuelle_dev` /
 `manuelle_utilisateur`, aligné sur `forge_tests/actions.py`), applique/déclenche les actions
 IA/development (appels **injectés**, documentés — jamais exécutés en dur ici), réexécute, et
-mesure la tendance du triplet couverture/passage/mutation. **Borné ≤ N cycles (défaut 3, G-2
-absolue)**.
+mesure la tendance du triplet couverture/passage/mutation. **Borné ≤ N cycles (défaut ≤ 5,
+extensible à 7 si chaque cycle réduit strictement le reste — aligné sur `ETAPES-RUN.md`,
+mandat du 14/08 ; l'ancien défaut de 3 divergeait de la doctrine ; G-2 absolue)**.
+*Dette R-35 nommée (TF-0351)* : cet orchestrateur n'a aujourd'hui AUCUN appelant — son
+câblage est conditionné à TF-0340/0341 (cycle de vie d'instance).
 
 État terminal, jamais « jusqu'au vert » : soit `cible_atteinte` (triplet aux seuils, 0 écart),
 soit `cycles_epuises` à N — l'état mesuré est rendu avec les écarts résiduels classés par

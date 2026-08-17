@@ -175,7 +175,8 @@ internes sont mesurés — le constat de frontière est porté au rapport et au 
 `uv run python -m forge_tests <racine-produit> --json` depuis
 `<racine>\digit-ai-forge-tests`, stdout capturé et persisté dans
 `etapes\tests\rapport-forge-tests.json`. Exit 0 = PASS, 3 = PARTIEL acceptable (consigner les
-pans non couverts), 1 = FAIL → boucle de fermeture. Ajouter `--livrables
+pans non couverts), 1 = FAIL → boucle de fermeture, 4 = refus G-1 (`--livrables` pointerait
+DANS le projet audité — corriger le chemin, jamais contourner). Ajouter `--livrables
 <dossier HORS du projet audité>` — par exemple
 `<racine>\digit-ai-forge-tests\output\<projet>-livrables\` : cahiers de tests
 (fonctionnel, technique) + jeux de données synthétiques + dashboard HTML, **puis copiés
@@ -189,9 +190,9 @@ refuse (l'auditeur n'écrit pas chez l'audité) et le refuse désormais **bruyam
 fabriquait donc le refus à chaque run qui la suivait — deux exécutions perdues le 15/08.
 
 **Boucle de fermeture bornée** : chaque item `actions[]` du rapport porte son `etape_cible` ;
-router les `auto_ia` — `development` (code, câblage), `tests-suite` (cas générés à adopter,
-assertions, jeux de données — exécuté sous les gates de development, sur propositions de la
-forge), `design` (état/écran manquant à la promesse → artefacts design puis delta
+router les `auto_ia` — `development` (code, câblage), `tests-suite` (cas générés À ADOPTER
+ET EXÉCUTER — R-40 : trois états seulement, adopté/`non_testable` motivé/écarté par décision
+nommée ; exécuté sous les gates de development), `design` (état/écran manquant à la promesse → artefacts design puis delta
 development), `mep-config` (variable, peuplement — jamais dans le code), `forge` (défaut de
 l'AUDITEUR → sort de la boucle produit, part au lot de retours — on ne corrige jamais le
 produit pour contourner un bug de la forge). Chaque cycle se clôt par un RE-AUDIT COMPLET.
@@ -204,6 +205,10 @@ configuration absente). Garde G-2 absolue : jamais d'assertion assouplie ni de s
 requalifié — un échec résistant = retour consigné avec diagnostic. Les items `manuelle_dev`
 et `manuelle_utilisateur` sont listés avec leur attendu détaillé (dashboard, onglet Actions)
 — l'objectif : maximiser l'auto-traité, ne laisser en manuel que l'irréductible.
+**La boucle ne se clôt pas sur un solde d'adoption non nul (R-40)** :
+`node oracles\oracle-adoption-tests.mjs <racine-produit>` rend PASS (solde nul par les trois
+issues — les deux issues non-adoption se déclarent dans `forge\cas-ecartes.jsonl`) ou
+SANS_OBJET motivé ; un FAIL est un reste-à-faire de la boucle, jamais un livrable clos.
 
 **Sécurité du produit livré (R-33, 14/08)** : les exigences ASVS curées de forge-websec
 s'opposent dès la *conception* (profil `webapp`), la méthode de test s'exécute *ici*, et le
