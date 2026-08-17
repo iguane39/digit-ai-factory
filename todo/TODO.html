@@ -138,7 +138,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>fe04bfbd7bc8</code> · dernier événement 2026-08-17T09:19:53.961Z</p>
+      <p class="meta">sceau <code>88926a24713a</code> · dernier événement 2026-08-17T09:34:20Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -148,9 +148,9 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="13 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">13</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="9 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">9</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="4 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">4</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="303 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">303</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende">
@@ -265,10 +265,10 @@
       <h2>digit-ai-forge-tests <span class="badge" title="8 item(s) actifs ciblant digit-ai-forge-tests">8</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-tests</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0313" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="haute">
+        <article class="card s-en_cours" id="item-TF-0313" data-forge="digit-ai-forge-tests" data-statut="en_cours" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0313</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-en_cours">en_cours</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -282,10 +282,10 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0315" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="haute">
+        <article class="card s-en_cours" id="item-TF-0315" data-forge="digit-ai-forge-tests" data-statut="en_cours" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0315</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-en_cours">en_cours</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -296,6 +296,40 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>le rapport prescrit trois gestes de configuration deja accomplis et tait la cause reelle ; sans lecture du code source du pan, la panne est inattribuable</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">bourse-aux-vacants</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-en_cours" id="item-TF-0314" data-forge="digit-ai-forge-tests" data-statut="en_cours" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0314</code>
+            <span class="statut s-en_cours">en_cours</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : la provenance de session du pan qualif est DEDUITE de la configuration et jamais CONSTATEE — le rapport affirme une session qui n existe pas</h3>
+          <div class="card-detail"><p class="lead">Dans le MEME rapport, non_juge[0] annonce « PROVENANCE DE SESSION — session ouverte PAR LA FORGE elle-meme, en rejouant la mire formulaire avec FORGE_TESTS_QUALIF_LOGIN ; ce que le pan voit est exactement ce que ce compte voit », et non_juge[1] dit « aucune mire de connexion trouvee ».</p><ul class="puces"><li>Les deux phrases se contredisent, et c est la premiere qui se lit en tete. provenance_session() (qualif.py:212) ne consulte que le dictionnaire de configuration : elle ne peut structurellement pas savoir si la session a ete ouverte, elle se contente de constater qu un login et un mot de passe ont ete fournis</li><li>C est exactement l exigence que TF-0222 a posee pour les sessions CAPTUREES — une session fournie et pourtant refusee doit etre dite refusee, avec le geste de reparation « recapturer » — mais elle n a pas ete etendue au cas du formulaire rejoue</li><li>CORRECTIF ATTENDU : faire dependre la phrase de provenance du RESULTAT de _connecter (session ouverte / tentee et echouee / aucune), et CONSTATER l ouverture — au moins un cookie de session pose, ou une route protegee qui rend son marqueur — plutot que la deduire d un clic emis</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>un rapport d audit affirme, en tete de ses declarations, une identite d execution fausse ; deux lignes contradictoires cohabitent dans le meme champ non_juge</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">bourse-aux-vacants</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-en_cours" id="item-TF-0316" data-forge="digit-ai-forge-tests" data-statut="en_cours" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0316</code>
+            <span class="statut s-en_cours">en_cours</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">tests : le pan qualif n accepte qu UNE session et son ratio ne declare pas qu un seul role a ete visite</h3>
+          <div class="card-detail"><p class="lead">FORGE_TESTS_QUALIF_STORAGE_STATE est un chemin unique — Path(str(config['storage_state'])) puis options['storage_state'] = str(fichier) dans forge_tests/adaptateurs/qualif.py l.270-282 : un seul storageState, un seul contexte navigateur, donc une seule identite pour tout le parcours.</p><ul class="puces"><li>Sur Approval2 le pan a rendu 8/8 ratio 1,00 ZERO finding (ledger seq 28) avec le compte unique mock-user@example.com. Or le produit reserve trois surfaces par role : la console d administration (/admin derriere RequireAdmin), l ecran de revue et decision (reserve aux approbateurs de la demande) et la vue en lecture seule du destinataire en copie. Aucune n a ete parcourue sous son role propre et le rapport ne le dit pas : ratio 1,00 se lit 'tout est couvert'. Le pan sait deja declarer la NATURE de la session (anonyme / fournie / mire, l.216-254) — il ne declare pas la COUVERTURE PAR ROLE, seule dimension qui compte pour un produit dont le domaine est l autorisation multi-acteurs. Aggravant discret : une route repondant 403 a cette identite est indistinguable, dans le ratio, d une route saine. CE N EST PAS un faux negatif : la garde RT-16/TF-0211 fonctionne et le pan n a rien impute a tort au produit. CORRECTIF ATTENDU, deux niveaux :</li><li>declarer — ajouter au rapport '1 session exercee : les routes refusees ou invisibles a cette identite ne sont pas jugees', et sortir les 401/403/redirections d autorisation en issue DISTINCTE d un succes plutot que fondues dans le ratio</li><li>mesurer — accepter N sessions etiquetees (FORGE_TESTS_QUALIF_STORAGE_STATES = liste role=chemin), rejouer le parcours par profil, rendre une couverture par role. La non-destructivite (aucun clic emis) n est pas remise en cause : lire plus de surfaces, pas agir. Le niveau</li><li>cree un contrat de configuration durable et relEve donc de l etude d opportunite TF-0155 avant decision</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>verdict 'pan qualif 8/8 ratio 1,00 ZERO finding' du 12/08 lu comme une couverture complete alors que 3 surfaces reservees par role n avaient jamais ete visitees ; ecart decouvert 5 jours plus tard par une question humaine, non par l outil</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Approval2</dd></div>
             
           </dl>
         </article>
@@ -330,40 +364,6 @@
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>un faux positif sur le contrôle né avant-hier coûterait sa crédibilité avant son premier vrai cas — la maladie documentée par l'étude 20260815e</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0314" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0314</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-tests : la provenance de session du pan qualif est DEDUITE de la configuration et jamais CONSTATEE — le rapport affirme une session qui n existe pas</h3>
-          <div class="card-detail"><p class="lead">Dans le MEME rapport, non_juge[0] annonce « PROVENANCE DE SESSION — session ouverte PAR LA FORGE elle-meme, en rejouant la mire formulaire avec FORGE_TESTS_QUALIF_LOGIN ; ce que le pan voit est exactement ce que ce compte voit », et non_juge[1] dit « aucune mire de connexion trouvee ».</p><ul class="puces"><li>Les deux phrases se contredisent, et c est la premiere qui se lit en tete. provenance_session() (qualif.py:212) ne consulte que le dictionnaire de configuration : elle ne peut structurellement pas savoir si la session a ete ouverte, elle se contente de constater qu un login et un mot de passe ont ete fournis</li><li>C est exactement l exigence que TF-0222 a posee pour les sessions CAPTUREES — une session fournie et pourtant refusee doit etre dite refusee, avec le geste de reparation « recapturer » — mais elle n a pas ete etendue au cas du formulaire rejoue</li><li>CORRECTIF ATTENDU : faire dependre la phrase de provenance du RESULTAT de _connecter (session ouverte / tentee et echouee / aucune), et CONSTATER l ouverture — au moins un cookie de session pose, ou une route protegee qui rend son marqueur — plutot que la deduire d un clic emis</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>un rapport d audit affirme, en tete de ses declarations, une identite d execution fausse ; deux lignes contradictoires cohabitent dans le meme champ non_juge</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">bourse-aux-vacants</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0316" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0316</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">tests : le pan qualif n accepte qu UNE session et son ratio ne declare pas qu un seul role a ete visite</h3>
-          <div class="card-detail"><p class="lead">FORGE_TESTS_QUALIF_STORAGE_STATE est un chemin unique — Path(str(config['storage_state'])) puis options['storage_state'] = str(fichier) dans forge_tests/adaptateurs/qualif.py l.270-282 : un seul storageState, un seul contexte navigateur, donc une seule identite pour tout le parcours.</p><ul class="puces"><li>Sur Approval2 le pan a rendu 8/8 ratio 1,00 ZERO finding (ledger seq 28) avec le compte unique mock-user@example.com. Or le produit reserve trois surfaces par role : la console d administration (/admin derriere RequireAdmin), l ecran de revue et decision (reserve aux approbateurs de la demande) et la vue en lecture seule du destinataire en copie. Aucune n a ete parcourue sous son role propre et le rapport ne le dit pas : ratio 1,00 se lit 'tout est couvert'. Le pan sait deja declarer la NATURE de la session (anonyme / fournie / mire, l.216-254) — il ne declare pas la COUVERTURE PAR ROLE, seule dimension qui compte pour un produit dont le domaine est l autorisation multi-acteurs. Aggravant discret : une route repondant 403 a cette identite est indistinguable, dans le ratio, d une route saine. CE N EST PAS un faux negatif : la garde RT-16/TF-0211 fonctionne et le pan n a rien impute a tort au produit. CORRECTIF ATTENDU, deux niveaux :</li><li>declarer — ajouter au rapport '1 session exercee : les routes refusees ou invisibles a cette identite ne sont pas jugees', et sortir les 401/403/redirections d autorisation en issue DISTINCTE d un succes plutot que fondues dans le ratio</li><li>mesurer — accepter N sessions etiquetees (FORGE_TESTS_QUALIF_STORAGE_STATES = liste role=chemin), rejouer le parcours par profil, rendre une couverture par role. La non-destructivite (aucun clic emis) n est pas remise en cause : lire plus de surfaces, pas agir. Le niveau</li><li>cree un contrat de configuration durable et relEve donc de l etude d opportunite TF-0155 avant decision</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>verdict 'pan qualif 8/8 ratio 1,00 ZERO finding' du 12/08 lu comme une couverture complete alors que 3 surfaces reservees par role n avaient jamais ete visitees ; ecart decouvert 5 jours plus tard par une question humaine, non par l outil</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Approval2</dd></div>
             
           </dl>
         </article>
