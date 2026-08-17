@@ -27,6 +27,8 @@
  *   K7  le CÂBLAGE d'un hook versionné — déclaré, JAMAIS en échec : `<forge>\.claude\settings.json`
  *       dit ce que la forge attend, `~\.claude\settings.json` dit ce qui s'exécute vraiment ;
  *       l'écart est nommé avec la commande qui le poserait.
+ *   K8  une entrée de câblage INSTALLÉE pointe-t-elle un FICHIER QUI EXISTE — déclaré, JAMAIS en
+ *       échec, même gouvernance que K7 : un câblage vers un chemin mort se lit « câblé ».
  *
  * K6 (TF-0290). Le gate C7 `qo-gate-write.mjs` — celui qui bloque l'écriture de TOUT livrable,
  * cinq blocages réels dans la seule journée du 15/08 — ne vivait qu'en copie installée : aucune
@@ -48,6 +50,21 @@
  * décision n'est pas prise, et un gate qu'on apprend à contourner ne protège plus rien (précédent
  * R-33 bis). K7 rend PASS avec ses constats en clair, et `non_juge` dit pourquoi il ne bloque pas.
  * Le passage de K7 en bloquant sera une décision humaine, pas une décision d'oracle.
+ *
+ * K8 (TF-0305). K7 confronte deux CÂBLAGES ; il ne vérifie pas que la commande câblée pointe un
+ * fichier qui EXISTE. Or une entrée dont la commande désigne un chemin mort — hook désinstallé,
+ * chemin recopié de travers, sous-dossier aplati — se lit « câblée » dans le settings installé :
+ * exactement la même assurance qu'un gate vivant, sans aucune de ses propriétés. C'est la maladie
+ * du câblage absent, un cran plus loin, et K7 seul ne peut pas la voir. K8 résout donc la commande
+ * de chaque entrée installée que K7 confronte, et déclare celles dont le fichier n'existe NI au
+ * chemin résolu, NI en copie installée, NI en source versionnée.
+ *
+ * Prudence de K8, et pourquoi elle est constitutive. Un `settings.json` porte des lignes de SHELL,
+ * pas des chemins : `bash .queue/gates/g0-budget.sh` se résout depuis le dossier de la session,
+ * `CMD=$(python3 -c …) ; …` n'a pas de fichier lisible. Deviner produirait des « chemins morts »
+ * faux, et une trouvaille noyée dans ses propres faux positifs ne trouve plus rien (leçon TF-0289).
+ * K8 ne juge donc que ce qui se résout par LECTURE SEULE — chemin absolu, `~`, variables
+ * d'environnement présentes — et DÉCLARE tout le reste non jugé, en disant pourquoi.
  *
  * Ce que K7 ne touche pas. `--appliquer` n'écrit JAMAIS dans le `settings.json` installé : poser un
  * câblage est un acte humain. Et le settings installé PORTE des entrées personnelles (hooks de
@@ -87,7 +104,7 @@ import { basename, dirname, join, resolve, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir, tmpdir } from "node:os";
 
-const VERSION = "1.2.0"; // 1.2.0 : K7 (câblage des hooks, déclaratif — TF-0297)
+const VERSION = "1.3.0"; // 1.3.0 : K8 (le câblage installé pointe-t-il un fichier qui existe — TF-0305)
 const ORACLE = "oracle-skills";
 const ICI = dirname(fileURLToPath(import.meta.url));
 
@@ -137,6 +154,11 @@ const NON_JUGE = [
   "un câblage versionné qui référence un script HORS `<forge>\\.claude\\hooks\\` (ex. `.queue/gates/*.sh`) : il est de portée PROJET, chargé par le harnais quand la session s'ouvre dans ce dépôt, le settings utilisateur n'a pas à le porter — K7 ne confronte que les hooks dont une forge versionne le fichier",
   "K7 confronte sur le NOM du fichier de hook, pas sur le chemin complet : la copie installée vit ailleurs que sa source, comparer les chemins ne dirait rien. Conséquence assumée et déclarée : deux scripts homonymes dans deux arborescences se confondraient — un constat de trop, jamais un blocage",
   "`--appliquer` n'écrit JAMAIS dans le `settings.json` installé : il pose le FICHIER d'un hook (K6), il ne le câble pas",
+  "l'EXISTENCE du fichier câblé (K8) est DÉCLARÉE, jamais mise en échec : même gouvernance que K7 — cet oracle s'ouvre à tout run (R-35), réparer un câblage engage toutes les sessions du poste (R-29), et un FAIL y suspendrait l'ouverture",
+  "une commande installée que K8 ne sait pas résoudre par LECTURE SEULE est déclarée non jugée, jamais devinée : commande shell composée (sous-shell, opérateur, redirection), chemin relatif à la session (câblage de portée projet), variable d'environnement absente de l'environnement de l'oracle. Un faux « chemin mort » coûterait plus que le vrai ne rapporte",
+  "K8 ne juge que les entrées de câblage INSTALLÉES que K7 confronte déjà (celles dont la commande nomme un hook versionné) : le câblage personnel de l'humain n'est ni résolu, ni listé, ni compté (même prudence que K4)",
+  "K8 ne juge pas ce que le fichier câblé CONTIENT, ni s'il est exécutable, ni si son interpréteur est installé : il répond à une seule question, le fichier existe-t-il",
+  "`--appliquer` n'installe ni ne câble rien au titre de K8 : un chemin mort se répare à la main (R-29)",
 ];
 
 function racineForges() {
@@ -439,6 +461,103 @@ function resumerCommande(commande) {
   return plat.length > PLAFOND_COMMANDE ? `${plat.slice(0, PLAFOND_COMMANDE)}…` : plat;
 }
 
+// K8 — ce qui rend une commande NON RÉSOLUBLE par lecture seule. Un sous-shell, un opérateur ou
+// une redirection veut dire que le fichier réellement exécuté dépend d'une exécution : on ne le
+// devine pas (cas réel : le hook `graphify` de forge-audit_client-a, 800 caractères de shell).
+const OPERATEURS_SHELL = /\$\(|`|\|\||&&|[|;]|>>|[<>]/;
+// Extensions par lesquelles un script de hook se reconnaît. Le jeton qui en porte une est le
+// FICHIER exécuté — pas l'interpréteur (`node`, `bash`, `C:\…\node.exe`) ni un drapeau.
+const EXTENSIONS_SCRIPT = /\.(?:mjs|cjs|js|ts|sh|bash|py|ps1|bat|cmd)$/i;
+
+/** Le jeton d'une commande qui désigne le FICHIER exécuté, ou `null` si la lecture ne le donne pas.
+ *  Les guillemets sont respectés (un chemin peut porter une espace) et les drapeaux écartés. */
+function jetonScript(commande) {
+  const nus = (commande.match(/"[^"]*"|'[^']*'|\S+/g) || [])
+    .map((j) => j.replace(/^["']|["']$/g, ""))
+    .filter((j) => j && !j.startsWith("-"));
+  return nus.find((j) => EXTENSIONS_SCRIPT.test(j))
+      || nus.find((j) => /[\\/]/.test(j) && !j.includes("="))
+      || null;
+}
+
+/** Résolution PRUDENTE d'une commande vers un chemin absolu : `{ chemin }` ou `{ indecidable }`.
+ *  Ce qui est résolu : `~`, `$VAR`, `${VAR}`, `%VAR%` présentes dans l'environnement, chemin déjà
+ *  absolu. Tout le reste rend un motif, qui sera DÉCLARÉ — jamais un verdict deviné. */
+function resoudreChemin(commande) {
+  if (OPERATEURS_SHELL.test(commande)) {
+    return { indecidable: "commande shell composée (sous-shell, opérateur ou redirection) — le fichier réellement exécuté ne se lit pas" };
+  }
+  const jeton = jetonScript(commande);
+  if (!jeton) return { indecidable: "aucun chemin de fichier lisible dans la commande" };
+  let manquante = null;
+  const chemin = jeton
+    .replace(/^~(?=$|[\\/])/, homedir())
+    .replace(/\$\{(\w+)\}|\$(\w+)|%(\w+)%/g, (jetonVar, accolade, dollar, pourcent) => {
+      const nom = accolade || dollar || pourcent;
+      const valeur = process.env[nom];
+      if (!valeur) { manquante = nom; return jetonVar; }
+      return valeur;
+    });
+  if (manquante) {
+    return { indecidable: `variable d'environnement \`${manquante}\` absente de l'environnement de l'oracle — le chemin ne se résout pas sans la deviner` };
+  }
+  if (!/^(?:[A-Za-z]:[\\/]|[\\/])/.test(chemin)) {
+    return { indecidable: `chemin relatif « ${jeton} » — il se résout depuis le dossier de la session, que l'oracle ne connaît pas (câblage de portée projet)` };
+  }
+  return { chemin };
+}
+
+/** Queue de chemin après `.claude\hooks\`, sinon le nom du fichier. C'est la clé de RÉ-ANCRAGE :
+ *  un `--installes-hooks` peut déplacer la copie que l'oracle regarde, et `~` ne pointerait pas là. */
+function queueHook(chemin) {
+  const plat = chemin.replace(/\\/g, "/");
+  const m = plat.match(/\.claude\/hooks\/(.+)$/i);
+  return m ? m[1] : basename(plat);
+}
+
+/** OÙ vit le fichier câblé — `null` s'il ne vit NULLE PART. Trois questions, la première verte
+ *  suffit : le chemin résolu tel quel, la copie installée ré-ancrée, la source versionnée. */
+function ouVitLeFichierCable(chemin, installesHooks, hooks) {
+  if (existsSync(chemin)) return "chemin résolu";
+  const queue = queueHook(chemin);
+  if (existsSync(join(installesHooks, queue))) return "copie installée";
+  if (hooks.has(queue)) return "source versionnée";
+  return null;
+}
+
+/** K8 (TF-0305) — les entrées de câblage INSTALLÉES que K7 confronte pointent-elles un fichier qui
+ *  EXISTE ? Déclaratif par construction, comme K7 (voir `non_juge`) : n'émet que des findings PASS,
+ *  n'écrit rien, ne répare rien. Un chemin mort se répare à la main (R-29). */
+function jugerCheminsCables(confrontees, installesHooks, hooks, installe, appliquer, findings) {
+  const declarations = [];
+  if (installe.erreur) {
+    declarations.push(`câblage installé ${installe.erreur} — aucune commande installée à résoudre`);
+  } else if (confrontees.length === 0) {
+    declarations.push("aucune entrée de câblage installée confrontée par K7 — aucun fichier à résoudre (le câblage personnel n'est pas résolu : il n'est pas jugé)");
+  } else {
+    const morts = [], vivants = [], indecidables = [];
+    for (const e of confrontees) {
+      const ou = e.matcher ? `${e.evenement}, matcher « ${e.matcher} »` : e.evenement;
+      const r = resoudreChemin(e.commande);
+      if (r.indecidable) {
+        indecidables.push(`${ou} « ${resumerCommande(e.commande)} » : ${r.indecidable}`);
+        continue;
+      }
+      const vit = ouVitLeFichierCable(r.chemin, installesHooks, hooks);
+      if (vit) { vivants.push(`${basename(r.chemin)} (${vit})`); continue; }
+      morts.push(`${ou} → ${r.chemin} INTROUVABLE — ni à ce chemin, ni en copie installée sous ${installesHooks}, ni en source versionnée par une forge (commande « ${resumerCommande(e.commande)} »)`);
+    }
+    if (vivants.length) declarations.push(`${vivants.length} câblage(s) installé(s) dont le fichier exécuté EXISTE : ${vivants.join(", ")}`);
+    if (morts.length) declarations.push(`${morts.length} CÂBLAGE(S) VERS UN CHEMIN MORT — l'entrée se lit « câblée » et le hook ne s'exécutera JAMAIS (loi transverse n°1 : même maladie que le câblage absent, un cran plus loin) : ${morts.join(" ; ")}`);
+    if (indecidables.length) declarations.push(`${indecidables.length} commande(s) installée(s) NON RÉSOLUE(S) par lecture seule, déclarées et non jugées : ${indecidables.join(" ; ")}`);
+  }
+  if (appliquer) declarations.push("`--appliquer` n'a rien installé ni câblé au titre de K8 : un chemin mort se répare à la main (R-29)");
+  findings.push({
+    regle: "K8", statut: "PASS", ou: "(déclarations)",
+    message: `${declarations.join(" · ")} — K8 DÉCLARE, il ne met jamais en échec (même gouvernance que K7, voir non_juge)`,
+  });
+}
+
 /** K7 (TF-0297) — un hook versionné est-il CÂBLÉ ?
  *
  *  K6 compare deux copies d'un fichier ; K7 compare deux CÂBLAGES. Un hook dont la copie installée
@@ -449,11 +568,17 @@ function resumerCommande(commande) {
  *  raison de gouvernance (R-35, R-29, R-33 bis). N'écrit jamais dans le settings installé, même
  *  sous `--appliquer` : câbler est un acte humain.
  */
-function jugerCablage(racine, fichierSettings, appliquer, findings) {
+function jugerCablage(racine, fichierSettings, installesHooks, appliquer, findings) {
   const hooks = sourcesHooks(racine);
   const attendus = cablagesVersionnes(racine);
   const installe = lireCablages(fichierSettings);
   const declarations = [];
+  // Les entrées INSTALLÉES que la confrontation a touchées — le périmètre exact de K8 (TF-0305).
+  // Dédoublonnées : une même entrée peut nommer deux hooks versionnés, elle ne se résout qu'une fois.
+  const confrontees = new Map();
+  const confronter = (entrees) => {
+    for (const e of entrees) confrontees.set([e.evenement, e.matcher, e.commande].join("\u0000"), e);
+  };
   if (attendus.illisibles.length) {
     declarations.push(`${attendus.illisibles.length} settings.json versionné(s) non exploitable(s), déclarés : ${attendus.illisibles.join(" ; ")}`);
   }
@@ -469,6 +594,7 @@ function jugerCablage(racine, fichierSettings, appliquer, findings) {
       const decl = attendus.entrees.filter((e) => e.commande.includes(nom));
       const pose = (installe.entrees || []).filter((e) => e.commande.includes(nom));
       if (decl.length && installe.erreur) continue; // confrontation non concluante, dite plus bas
+      confronter(pose);
       if (decl.length && pose.length) { cables += 1; continue; }
       if (decl.length) {
         const d = decl[0];
@@ -500,6 +626,8 @@ function jugerCablage(racine, fichierSettings, appliquer, findings) {
     regle: "K7", statut: "PASS", ou: "(déclarations)",
     message: `${declarations.join(" · ")} — K7 DÉCLARE, il ne met jamais en échec (voir non_juge)`,
   });
+  // K8 : un câblage confronté par K7 pointe-t-il un fichier qui EXISTE ? (TF-0305)
+  jugerCheminsCables([...confrontees.values()], installesHooks, hooks, installe, appliquer, findings);
 }
 
 function juger(racine, installes, appliquer = false, purger = false,
@@ -512,7 +640,7 @@ function juger(racine, installes, appliquer = false, purger = false,
     // vaut mieux que de rendre un PASS sur K6 seul — un non-jugement muet se lit comme un vert.
     return {
       verdict: "SKIP", findings,
-      motif: `aucune source de skill sous ${racine} — les hooks et leur câblage ne sont pas jugés non plus (K6 et K7 sans racine de forges n'ont rien à comparer)`,
+      motif: `aucune source de skill sous ${racine} — les hooks et leur câblage ne sont pas jugés non plus (K6, K7 et K8 sans racine de forges n'ont rien à comparer)`,
     };
   }
   const applique = [];
@@ -580,8 +708,9 @@ function juger(racine, installes, appliquer = false, purger = false,
 
   // K6 : les hooks, même contrat que les skills (TF-0290).
   jugerHooks(racine, installesHooks, appliquer, findings, applique);
-  // K7 : leur CÂBLAGE — déclaré, jamais en échec (TF-0297).
-  jugerCablage(racine, settingsInstalle, appliquer, findings);
+  // K7 : leur CÂBLAGE — déclaré, jamais en échec (TF-0297). K8 y est adossé : le câblage installé
+  // pointe-t-il un fichier qui existe (TF-0305) — même gouvernance déclarative.
+  jugerCablage(racine, settingsInstalle, installesHooks, appliquer, findings);
 
   // K4 : ce qui est installé sans source versionnée appartient à l'humain. Déclaré, pas jugé.
   const personnels = listeSkills(installes).filter((n) => !par_nom.has(n));
@@ -971,6 +1100,143 @@ function selfTest() {
   cas.push(["K7    — settings.json versionné illisible : déclaré, l'oracle ne plante pas",
             r.verdict === "PASS" && Boolean(k7) && /non exploitable/.test(k7.message)
             && k7.message.includes("digit-ai-forge-agents")]);
+
+  // ---- TF-0305 : K8, l'EXISTENCE du fichier câblé. Une entrée installée vers un chemin mort se lit
+  // « câblée » chez K7 — même assurance qu'un gate vivant, aucune de ses propriétés. K8 est
+  // déclaratif comme K7 : chaque cas vérifie donc AUSSI que le verdict reste PASS.
+  const base5 = mkdtempSync(join(tmpdir(), "chemins-"));
+  const racine5 = join(base5, "forges");
+  const inst5 = join(base5, ".claude", "skills");
+  const instH5 = join(base5, ".claude", "hooks");
+  const settings5 = join(base5, ".claude", "settings.json"); // le câblage INSTALLÉ
+  const src5 = join(racine5, "digit-ai-forge-agents", ".claude", "skills");
+  const srcH5 = join(racine5, "digit-ai-forge-agents", ".claude", "hooks");
+  const settingsV5 = join(racine5, "digit-ai-forge-agents", ".claude", "settings.json"); // VERSIONNÉ
+  const k8de = (r) => r.findings.find((f) => f.regle === "K8");
+  const enUrl = (p) => p.replace(/\\/g, "/"); // une commande de settings.json s'écrit avec des /
+  // Entrée personnelle de l'humain, câblée vers un chemin MORT : elle ne doit apparaître dans aucun
+  // message de K8 — le settings personnel n'est ni résolu, ni listé, ni compté (prudence de K4).
+  const CMD_PERSO_MORTE = "node C:/nulle-part/mon-tableau-de-bord-perso.mjs";
+  poser(join(src5, "lambda", "SKILL.md"), "# lambda\n");
+  poser(join(inst5, "lambda", "SKILL.md"), "# lambda\n");
+  poser(join(srcH5, "qo-gate-write.mjs"), hook("1.0.0", "gate C7"));
+  poser(join(instH5, "qo-gate-write.mjs"), hook("1.0.0", "gate C7"));
+  poser(settingsV5, cablage(["node ~/.claude/hooks/qo-gate-write.mjs --niveau note"]));
+  // Une seule variable change d'un cas à l'autre : la commande INSTALLÉE. Le reste du décor est
+  // identique — c'est ce qui rend la paire vert/rouge comparable.
+  const jugerK8 = (installee) => {
+    poser(settings5, cablage([CMD_PERSO_MORTE, installee]));
+    return juger(racine5, inst5, false, false, instH5, settings5);
+  };
+
+  // Vert : le câblage installé pointe le fichier réellement posé.
+  r = jugerK8(`node ${enUrl(join(instH5, "qo-gate-write.mjs"))} --niveau note`);
+  let k8 = k8de(r);
+  cas.push(["K8    — câblage installé vers un fichier PRÉSENT : aucun chemin mort",
+            r.verdict === "PASS" && Boolean(k8) && k8.statut === "PASS"
+            && /1 câblage\(s\) installé\(s\) dont le fichier exécuté EXISTE/.test(k8.message)
+            && !/CHEMIN MORT/.test(k8.message)]);
+  cas.push(["K8    — le câblage PERSONNEL de l'humain n'est ni résolu ni listé, mort ou vif",
+            Boolean(k8) && !k8.message.includes("mon-tableau-de-bord-perso")]);
+
+  // Rouge (déclaratif) : la MÊME entrée, un chemin recopié de travers — le sous-dossier n'existe ni
+  // en copie installée, ni en source versionnée. C'est le trou de TF-0305, dans les deux sens.
+  const chemin_mort = enUrl(join(instH5, "legacy", "qo-gate-write.mjs"));
+  r = jugerK8(`node ${chemin_mort} --niveau note`);
+  k8 = k8de(r);
+  cas.push(["K8    — câblage installé vers un CHEMIN MORT : déclaré, le hook ne s'exécutera jamais",
+            Boolean(k8) && /CÂBLAGE\(S\) VERS UN CHEMIN MORT/.test(k8.message)
+            && k8.message.includes(chemin_mort)]);
+  cas.push(["K8    — le constat dit les TROIS endroits regardés (chemin, copie, source)",
+            Boolean(k8) && /ni à ce chemin, ni en copie installée sous .+, ni en source versionnée/.test(k8.message)]);
+  cas.push(["K8    — K7 lit cette même entrée « câblée » : exactement le trou que K8 comble",
+            /ET câblé/.test(k7de(r).message)]);
+  cas.push(["K8    — DÉCLARATIF : chemin mort, et le verdict reste PASS (R-35, R-33 bis)",
+            r.verdict === "PASS"
+            && !r.findings.some((f) => f.regle === "K8" && f.statut !== "PASS")]);
+
+  // Preuve inverse (mutant) : le MÊME câblage, mot pour mot, avec le fichier posé à ce chemin —
+  // plus rien à déclarer. Sans elle, « déclare tout » passerait pour « détecte les chemins morts ».
+  poser(join(instH5, "legacy", "qo-gate-write.mjs"), hook("1.0.0", "gate C7 rangé sous legacy/"));
+  r = juger(racine5, inst5, false, false, instH5, settings5);
+  k8 = k8de(r);
+  cas.push(["K8    — le MÊME câblage, fichier posé : plus aucun chemin mort (preuve inverse)",
+            r.verdict === "PASS" && Boolean(k8) && !/CHEMIN MORT/.test(k8.message)
+            && /dont le fichier exécuté EXISTE/.test(k8.message)]);
+
+  // `~` est résolu, et la queue de chemin RÉ-ANCRÉE sur le dossier de hooks que l'oracle regarde :
+  // sans ce ré-ancrage, tout `--installes-hooks` déplacé lirait « mort » à tort.
+  r = jugerK8("node ~/.claude/hooks/qo-gate-write.mjs --niveau note");
+  k8 = k8de(r);
+  cas.push(["K8    — `~` résolu et queue ré-ancrée sur le dossier de hooks regardé",
+            r.verdict === "PASS" && Boolean(k8) && !/CHEMIN MORT/.test(k8.message)
+            && /\((?:copie installée|chemin résolu)\)/.test(k8.message)]);
+
+  // Variable d'environnement présente : résolue. Absente : NON JUGÉE — jamais devinée.
+  process.env.PILOT_TEST_HOOKS_K8 = instH5;
+  r = jugerK8("node %PILOT_TEST_HOOKS_K8%/qo-gate-write.mjs");
+  k8 = k8de(r);
+  cas.push(["K8    — variable d'environnement présente : le chemin est résolu",
+            r.verdict === "PASS" && Boolean(k8) && !/CHEMIN MORT/.test(k8.message)
+            && /dont le fichier exécuté EXISTE/.test(k8.message)]);
+  r = jugerK8("node $PILOT_TEST_ABSENTE_K8/qo-gate-write.mjs");
+  k8 = k8de(r);
+  cas.push(["K8    — variable absente : non résolue, DÉCLARÉE, jamais devinée morte",
+            r.verdict === "PASS" && Boolean(k8) && !/CHEMIN MORT/.test(k8.message)
+            && /NON RÉSOLUE\(S\)/.test(k8.message)
+            && k8.message.includes("PILOT_TEST_ABSENTE_K8")]);
+
+  // Chemin relatif : il se résout depuis le dossier de la session, que l'oracle ne connaît pas.
+  // Cas réel — le settings versionné de forge-agents écrit `node .claude/hooks/qo-gate-write.mjs`.
+  r = jugerK8("node .claude/hooks/qo-gate-write.mjs");
+  k8 = k8de(r);
+  cas.push(["K8    — chemin relatif à la session : non jugé, motif déclaré",
+            r.verdict === "PASS" && Boolean(k8) && !/CHEMIN MORT/.test(k8.message)
+            && /chemin relatif/.test(k8.message)]);
+
+  // Commande shell composée : le fichier exécuté dépend d'une exécution. Cas réel — le hook
+  // `graphify` de forge-audit_client-a, 800 caractères de shell avec sous-shell et `case`.
+  r = jugerK8('CMD=$(cat x) ; node ~/.claude/hooks/qo-gate-write.mjs || true');
+  k8 = k8de(r);
+  cas.push(["K8    — commande shell composée : non jugée, motif déclaré",
+            r.verdict === "PASS" && Boolean(k8) && !/CHEMIN MORT/.test(k8.message)
+            && /commande shell composée/.test(k8.message)]);
+
+  // Fichier non posé mais VERSIONNÉ par une forge : ce n'est pas un chemin mort au sens de K8 —
+  // K6 le déclare déjà « versionné non installé », et K8 ne redit pas ce qui est déjà dit.
+  poser(join(srcH5, "gates", "g9-controle.sh"), "#!/bin/bash\nexit 0\n");
+  r = jugerK8("bash ~/.claude/hooks/gates/g9-controle.sh");
+  k8 = k8de(r);
+  cas.push(["K8    — fichier absent du poste mais versionné : vivant, pas mort",
+            r.verdict === "PASS" && Boolean(k8) && !/CHEMIN MORT/.test(k8.message)
+            && /g9-controle\.sh \(source versionnée\)/.test(k8.message)]);
+
+  // Aucune entrée installée confrontée par K7 (état réel du poste au 17/08) : K8 le DIT, au lieu de
+  // rendre un vert muet qui se lirait comme « tous les câblages sont vivants ».
+  poser(settings5, cablage([CMD_PERSO_MORTE]));
+  r = juger(racine5, inst5, false, false, instH5, settings5);
+  k8 = k8de(r);
+  cas.push(["K8    — aucune entrée confrontée : dit, et non passé sous silence",
+            r.verdict === "PASS" && Boolean(k8) && /aucune entrée de câblage installée confrontée/.test(k8.message)
+            && !k8.message.includes("mon-tableau-de-bord-perso")]);
+
+  // Settings installé absent : rien à résoudre, et K8 ne l'invente pas.
+  r = juger(racine5, inst5, false, false, instH5, join(base5, ".claude", "settings-absent.json"));
+  k8 = k8de(r);
+  cas.push(["K8    — câblage installé absent : aucune commande à résoudre, dit",
+            r.verdict === "PASS" && Boolean(k8) && /aucune commande installée à résoudre/.test(k8.message)
+            && !/CHEMIN MORT/.test(k8.message)]);
+
+  // `--appliquer` n'installe ni ne câble rien au titre de K8 : réparer un câblage engage toutes les
+  // sessions du poste (R-29). Vérifié à l'octet sur le settings, et sur le fichier manquant.
+  const chemin_mort2 = enUrl(join(instH5, "jamais-pose", "qo-gate-write.mjs"));
+  jugerK8(`node ${chemin_mort2}`);
+  const avantS5 = readFileSync(settings5);
+  const rApp5 = juger(racine5, inst5, true, false, instH5, settings5);
+  cas.push(["K8    — --appliquer ne pose pas le fichier manquant et ne recâble rien (R-29)",
+            readFileSync(settings5).equals(avantS5) && !existsSync(chemin_mort2)
+            && /CHEMIN MORT/.test(k8de(rApp5).message)
+            && /n'a rien installé ni câblé au titre de K8/.test(k8de(rApp5).message)]);
 
   let bons = 0;
   for (const [nom, tenu] of cas) {
