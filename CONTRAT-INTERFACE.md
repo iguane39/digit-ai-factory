@@ -111,6 +111,15 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
 - `run_open` porte les **versions des forges** utilisées (`versions_forges: {<forge>: <sha court>}`,
   relevées après le pull d'ouverture) et, pour un run de version, `run_precedent: <run-id>` —
   le ledger du run N est l'entrée du run N+1 (cf. CLAUDE.md « Run de version »).
+  **Forme canonique des clés (TF-0320, 17/08)** : les 14 noms de dépôt COMPLETS
+  (`digit-ai-forge-pilot`, `digit-ai-forge-conception`, …) — mesuré sur pièces : Approval2
+  portait 5 clés en noms courts et SCC_ALX 14 clés complètes, les deux PASS, aucun diff
+  machine calculable entre deux runs. Une clé courte est un écart R-19.
+  **Diff de doctrine à l'ouverture (TF-0320)** : sur un run de version, jouer
+  `git -C <pilot> diff --stat <sha versions_forges du run_precedent> -- REGLES-PROJET.md
+  gabarits references` et porter le relevé au ledger (`type: oracles_verdict`,
+  `oracle: diff-doctrine`) — la mise à jour transporte ainsi la consigne, pas
+  seulement le code ; un relevé vide se consigne (« aucune règle modifiée »).
   Contrôle exécutable : R-19 de `oracles/oracle-conformite-projet.mjs` (TF-0035).
 
 ### 3 bis. Référentiels à identifiants : évolution sous table de correspondance (TF-0048)
