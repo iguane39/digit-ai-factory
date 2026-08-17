@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=88926a24713a archive=fee5b8362725 · dernier événement: 2026-08-17T09:34:20Z -->
+     sceaux: actifs=349ce79d3f6f archive=5f4480f7633e · dernier événement: 2026-08-17T10:13:48Z -->
 
-**13 actifs** (candidat 9 · décidé 0 · en cours 4 · corrigé 0 · écarté 0) · **304 archivés**.
+**10 actifs** (candidat 10 · décidé 0 · en cours 0 · corrigé 0 · écarté 0) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -20,14 +20,11 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0313 | en_cours | 9 | forge-tests : le pan qualif lit la mire a domcontentloaded — sur une SPA le formulaire n existe pas encore, et le pan conclut qu il n y a pas de mire | **oui** — pan qualif inexploitable sur toute SPA malgre un compte valide : 0 element inventorie contre 91 une fois la session injectee par un autre canal ; le motif publie envoie l operateur corriger une configuration deja correcte |
-| TF-0315 | en_cours | 9 | forge-tests : champs_requis du pan qualif demande de fournir ce qui est deja fourni — « pas de compte » et « compte fourni, connexion echouee » sont indiscernables | **oui** — le rapport prescrit trois gestes de configuration deja accomplis et tait la cause reelle ; sans lecture du code source du pan, la panne est inattribuable |
-| TF-0314 | en_cours | 4.5 | forge-tests : la provenance de session du pan qualif est DEDUITE de la configuration et jamais CONSTATEE — le rapport affirme une session qui n existe pas | **oui** — un rapport d audit affirme, en tete de ses declarations, une identite d execution fausse ; deux lignes contradictoires cohabitent dans le meme champ non_juge |
-| TF-0316 | en_cours | 4.5 | tests : le pan qualif n accepte qu UNE session et son ratio ne declare pas qu un seul role a ete visite | **oui** — verdict 'pan qualif 8/8 ratio 1,00 ZERO finding' du 12/08 lu comme une couverture complete alors que 3 surfaces reservees par role n avaient jamais ete visitees ; ecart decouvert 5 jours plus tard par une question humaine, non par l outil |
 | TF-0309 | candidat | 6 | forge-tests : schema_obtenu rend None sans motif propre quand le conteneur manque sur son seul chemin | **oui** — le seul chemin conteneur encore capable de se taire — la maladie que TF-0299 vient d'éradiquer partout ailleurs |
 | TF-0312 | candidat | 4.5 | forge-tests : l'écart servi↔versionné compare des espaces de clés différents quand aucune locale n'est déclarée — fausse accusation possible | **oui** — un faux positif sur le contrôle né avant-hier coûterait sa crédibilité avant son premier vrai cas — la maladie documentée par l'étude 20260815e |
 | TF-0310 | candidat | 4 | forge-tests : le préfixe de corpus de H-13 (interface:) apparie AUSSI le constat de H-20 — filtrer sur la classe du finding | **oui** — un corpus dont une entrée peut être couverte par le défaut d'une autre mesure moins que ce qu'il affiche |
 | TF-0311 | candidat | 4 | forge-tests : deux comptes périmés au README (« 19/19 des défauts », « chacun des 16 défauts plantés ») — le corpus est à 23 | **oui** — un lecteur du README croit à un corpus de 19 quand la recette en mesure 23 — la doc dément l'outil |
+| TF-0317 | candidat | 3 | Affinements de la couverture par rôle du pan qualif (deux limites déclarées) | **oui** — un produit dont les refus passent par une page d'erreur maison garderait ses refus fondus dans le ratio — le silence exact que TF-0316 vient de fermer pour 401/403 |
 
 ## pilot
 
