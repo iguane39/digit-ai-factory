@@ -1,29 +1,37 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=0832eee60431 archive=f922f162ab37 · dernier événement: 2026-08-17T07:20:02Z -->
+     sceaux: actifs=396b8154e34a archive=cdda120396ac · dernier événement: 2026-08-17T08:14:46Z -->
 
-**8 actifs** (candidat 0 · décidé 0 · en cours 8 · corrigé 0 · écarté 0) · **288 archivés**.
+**6 actifs** (candidat 6 · décidé 0 · en cours 0 · corrigé 0 · écarté 0) · **296 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
+
+## digit-ai-forge-agents
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0296 | candidat | 8 | forge-agents : 13 sidecars d'oracles COMMITTÉS dans .claude/skills — la convention TF-0065 les veut hors dépôt | **oui** — le bruit versionné a masqué le défaut TF-0289 pendant deux jours : K2 vert à tort, le contrôle disait l'inverse du réel |
+
+## digit-ai-forge-ops
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0298 | candidat | 6 | forge-ops : canary ne scelle pas d'empreinte — une cible promue par canary reste SKIP permanent sur O-7 | **oui** — un SKIP permanent sur la voie canary est un trou déclaré aujourd'hui, silencieux le jour où canary devient la voie courante |
 
 ## digit-ai-forge-tests
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0292 | en_cours | 8 | forge-tests : promouvoir en NON_JUGE de module les deux limites déclarées en non_juge de sortie (registre de dette) | **oui** — deux limites réelles du pan qualif et du pan sécurité restent hors du registre de dette, qui est précisément l’endroit où les limites se comptent |
-| TF-0294 | en_cours | 6 | La recette prononce S-01 sur un arbre qui bouge — échecs fantômes indiscernables d’une vraie régression | **oui** — deux faux « S-01 NON TENU » en une soirée, dont un qui a coûté une instruction complète avant d’être écarté |
-| TF-0288 | en_cours | 5.3 | Écart source ↔ production : aucun contrôle ne compare ce qui est SERVI à ce qui est versionné | **oui** — mesuré sur INS-0001 : la cause évidente était fausse ; sans instruction, le correctif aurait porté sur du code déjà correct |
-| TF-0291 | en_cours | 4 | forge-tests s’auto-accuse sur ses propres bancs d’essai — cousin du Larsen déjà corrigé pour le pan prompts | **oui** — 5 constats mesurés sur la forge elle-même, dont 3 sur des fixtures que le dépôt assume comme idiome |
-| TF-0293 | en_cours | 4 | Le pan i18n est prouvé par pytest et ses bancs, mais absent du corpus de recette S-01 | **oui** — un pan neuf entre en service sans entrée au corpus qui prononce S-01 — la recette du dépôt ne le mesure pas |
-| TF-0295 | en_cours | 2.7 | Affinements du pan i18n et du contrôle de destinations React (quatre limites déclarées) | **oui** — quatre frontières mesurées et déclarées au non_juge du pan neuf, chacune correspondant à un cas réel possible |
+| TF-0299 | candidat | 6 | forge-tests : la recette ne DIT pas que le conteneur est la cause — 10 [MANQUE] indiscernables d'une régression | **oui** — ~5 minutes de diagnostic consommées en pleine campagne, et sans agent vigilant un faux « S-01 NON TENU » de plus |
+| TF-0300 | candidat | 3 | forge-tests : entrée de corpus H-20 prouvant la branche FAIL de l'écart servi ↔ versionné en recette | **oui** — un contrôle dont la recette ne prouve que les branches vertes repose sur pytest seul pour sa branche accusatrice — exactement l'écart que TF-0293 vient de fermer pour le pan i18n |
+| TF-0301 | candidat | 3 | forge-tests : un test du pan i18n passe trivialement — l'assertion ne discrimine rien sur un banc sans finding | **oui** — un test vert qui ne discrimine rien vaut un contrôle jamais joué (R-35) : il rassure sans prouver |
 
 ## pilot
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0289 | en_cours | 12 | oracle-skills K2 compare les sidecars d’oracles — artefacts gitignorés et régénérables, comptés comme divergences | **oui** — mesuré : 8 divergences annoncées chez experts-forge dont 2 réelles, 12 chez ameliore-le-design dont 8 réelles — et le message tronque à 4, donc le vrai défaut peut ne pas être affiché |
-| TF-0290 | en_cours | 8 | Le hook C7 qui bloque toute écriture de livrable n’était versionné nulle part — il ne vivait qu’en copie installée | **oui** — le gate le plus souvent joué de la journée (5 blocages réels) n’avait ni source versionnée, ni self-test, ni contrôle d’intégrité — le seul mécanisme qui aurait pu le voir (K1-K5) ne regarde que les skills |
+| TF-0297 | candidat | 6 | oracle-skills : K6 juge l'INTÉGRITÉ d'un hook, pas son CÂBLAGE — un hook sain jamais référencé ne s'exécute jamais | **oui** — le gate le plus joué de l'écosystème ne bloque plus rien depuis une date inconnue, et seul un agent parti vérifier autre chose l'a vu |
 
 ---
 Détail d'un item : `grep '"id":"TF-xxxx"' todo/TODO.jsonl` (tous ses événements). Archive : même commande sur TODO-ARCHIVE.jsonl.
