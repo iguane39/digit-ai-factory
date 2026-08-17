@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=cea38a5e5d64 archive=9f205b231527 · dernier événement: 2026-08-17T12:40:35Z -->
+     sceaux: actifs=ad7b5da7ec94 archive=9f205b231527 · dernier événement: 2026-08-17T12:44:28.482Z -->
 
-**32 actifs** (candidat 15 · décidé 0 · en cours 0 · corrigé 16 · écarté 1) · **308 archivés**.
+**34 actifs** (candidat 17 · décidé 0 · en cours 0 · corrigé 16 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -32,6 +32,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0333 | candidat | 4.5 | Écart servi↔versionné : une locale promise par la source et jamais servie n'est JAMAIS comparée — PASS sans mesure | **oui** — un produit qui cesse de servir /en entier passerait le contrôle né pour attraper exactement cette famille d'écarts |
+| TF-0341 | candidat | 4.5 | forge-tests : une instance laissee debout est indiscernable d une instance fraiche — l audit peut mesurer un code qui n est plus celui du depot et le publier comme courant | **oui** — fenetre de 2 h 25 pendant laquelle tout audit relance aurait mesure un code anterieur au correctif D-14 et publie ses chiffres comme courants, sans qu aucun signal ne distingue l instance perimee d une instance fraiche |
+| TF-0340 | candidat | 3 | forge-tests : le cycle de vie de l instance servie n appartient a personne — montee pour l audit, jamais demontee, et le rapport ne dit pas ce qu il laisse debout | **oui** — 3 conteneurs et un reseau laisses en service 2 h 25 apres la fin de l audit, tenant trois ports, jusqu a intervention humaine ; aucune mention au rapport |
 | TF-0334 | candidat | 2 | forge-tests : comptes périmés restants au README (treize adaptateurs pour 14, onze pans pour 14) et classes de corpus en littéraux | **oui** — la doc dément l'outil sur deux comptes de plus, et le verrou len(CORPUS) de TF-0311 ne les couvre pas (hors corpus) |
 | TF-0309 | corrige | 6 | forge-tests : schema_obtenu rend None sans motif propre quand le conteneur manque sur son seul chemin | **oui** — le seul chemin conteneur encore capable de se taire — la maladie que TF-0299 vient d'éradiquer partout ailleurs |
 | TF-0312 | corrige | 4.5 | forge-tests : l'écart servi↔versionné compare des espaces de clés différents quand aucune locale n'est déclarée — fausse accusation possible | **oui** — un faux positif sur le contrôle né avant-hier coûterait sa crédibilité avant son premier vrai cas — la maladie documentée par l'étude 20260815e |
