@@ -1644,3 +1644,33 @@ registre actif jusqu'à résolution. Constat récurrent de la vague, deux fois p
 instruction : des DÉCLARATIONS de conformité fausses (D-14 « répercuté partout »,
 TODO-FORGE prescrivant un dispositif retiré) — R-35 vaut pour les déclarations comme
 pour les contrôles (TF-0332, TF-0328).
+
+## Campagne du 17/08/2026 (5e vague) — le prompt réécrit L99 exécuté : familles nommées, R-40, page d'archive, fenêtre A du renommage factory
+
+**Le circuit a d'abord avalé trois lots frais** (Produit-01 c/d — recette multi-profils,
+matrice des droits exécutable, pièges à faux vert, définition de fin de la boucle de
+correction : TF-0342..0345, TF-0352/0353 — tous convergents avec le poste 4 du mandat).
+
+**Les cinq postes du prompt réécrit** (analyse L99, écarts validés poste par poste) :
+· **TF-0347/0348** — R-39 encodée + **D-16 cataloguée chez organization sous mandat**
+(les noms de familles `XX-audit`/`XX-tests` conventionnés, numéro local attribué à la
+création et JAMAIS renuméroté — leçon TF-0339) ; `docs\projet\` intact, l'analyse ayant
+chiffré que le numéroter mettait tous les produits en FAIL. · **TF-0349** — la voie
+« proposition de tests » est MORTE trois fois : R-40 §T (trois états), le cahier porte
+son CONTRAT et son SOLDE (forge-tests, pytest 821, S-01 TENU), et l'oracle
+`oracle-adoption-tests` (12/12, agrégateur 11/11) — premier tir réel : **FAIL 1065/0 sur
+Produit-11**, le cas fondateur attrapé ; catalogue requalifié à la SOURCE pour que la
+régénération ne rouvre pas la voie. · **TF-0350** — les 307 TODO archivés ont leur page
+de recherche (check_html 0 échec, « renommage » retrouve TF-0062 avec ses 5 jalons ;
+self-test todo 19 → 32). · **TF-0346** — gate n°1 franchi par l'humain
+(**digit-ai-factory**, les 6 sites hors motif payés en connaissance de cause, étude de
+séquencement 20260817i PASS 7/7) ; **fenêtre A exécutée** : dette D-14 SOLDÉE (TF-0332 —
+le corpus ne porte plus d'affirmation de conformité fausse), mesure P0 figée (25/11),
+table §3 bis écrite (ids `pilot/*@1` GELÉS), liste blanche en phase expand. **Gate n°2
+armé : `gh repo rename` appartient à l'humain seul.**
+
+**Incident de la vague** : les 4 agents de la première salve sont tombés sur la limite
+de session (reset 18:40) — reprise sans perte : l'étude de séquencement était écrite (un
+seul défaut de forme), la page d'archive finie jusqu'à ses self-tests, les deux
+campagnes R-40 relancées et rendues vertes. Deux défauts réels tués par les fixtures
+rouges des campagnes elles-mêmes (nom vide, chapitre vide flatté).
