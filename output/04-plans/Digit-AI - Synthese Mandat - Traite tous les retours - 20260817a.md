@@ -16,7 +16,7 @@ dette 143 sans écart) ; les 14 paires de lots classées en `old\`, boîte d'ent
 
 ## Décisions attendues de l'humain
 
-- **10 candidats actifs** (TF-0304..0312 + TF-0317) : (a) « traite les todo » à nouveau
+- **10 candidats actifs** (TF-0304..0312 + TF-0325, d'abord frappé TF-0317 puis renuméroté au merge — une session parallèle avait pris TF-0317..0324) : (a) « traite les todo » à nouveau
   (~30-40 min ; TF-0304 et TF-0312 d'abord) ; (b) item par item ; (c) laisser — défaut.
 - **Toujours pendantes, reprises des synthèses du jour** : retrait de la page publiée
   (`claude.ai/code/artifact/7d535fbf-…`, fuite vivante) · câblage du gate C7 (TF-0304
@@ -66,13 +66,13 @@ rapports antérieurs ne bougent pas, prouvé par test).
   - signal : une couverture par rôle incohérente avec les refus observés ;
   - parade : dette déclarée au registre (qualif-navigateur-007/008) et dite au rapport.
 - les refus via page d'erreur maison (hors 401/403/redirection) restent fondus ;
-  - signal : un produit à /erreur/403 sans refus détecté ; parade : TF-0317 ouvert.
+  - signal : un produit à /erreur/403 sans refus détecté ; parade : TF-0325 ouvert.
 
 ## Prochaines actions — ordonnées, et par acteur
 
 - D'abord `manuelle_utilisateur` — les trois pendantes (retrait de la page publiée en
   premier : c'est la seule fuite encore vivante), puis le sort des 10 candidats.
-- Ensuite `auto_ia` — sur ton mandat : router TF-0304..0312 + TF-0317 (TF-0312 tôt).
+- Ensuite `auto_ia` — sur ton mandat : router TF-0304..0312 + TF-0325 (TF-0312 tôt).
 - Enfin `manuelle_dev` — redéployer digit-ai.fr et clore INS-0001.
 
 ## Traces
