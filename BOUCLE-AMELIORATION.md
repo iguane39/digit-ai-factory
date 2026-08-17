@@ -1573,3 +1573,33 @@ tuées ; K7 nomme l'état du poste : le câblage de qo-gate-write n'est décrit 
 (TF-0304..0312), tous nés des campagnes — dont le défaut latent du contrôle né la veille
 (TF-0312), trouvé par la campagne qui le mettait en recette : la boucle se mord la queue
 dans le bon sens.
+
+## Campagne du 17/08/2026 (3e vague) — « traite tous les retours » : le pan qualif cesse d'être aveugle aux SPA et muet sur les rôles
+
+**La question du mandat a d'abord reçu sa preuve** : cartographie exécutée lot par lot —
+les 14 lots de `input\00-retours` étaient TOUS ingérés et TOUS leurs items archivés, sauf
+les 4 nés des deux lots arrivés en fin de matinée (TF-0313..0316, tous pan qualif).
+Une étude avant décision (TF-0155 payé) : 20260817c *couverture par rôle* (PASS 7/7,
+verdict O3 — déclarer d'abord, mesurer ensuite, la déclaration restant vraie quel que
+soit N).
+
+**Une campagne, un dépôt, 58 minutes** — tests@053141d→26b6d96 (4 commits) : pytest 656 →
+**721**, dette 140 → 143, S-01 TENU 13/13 sur arbre stable (262 fichiers empreintés).
+· La mire d'une SPA est **attendue** (10 s/route), plus jamais déclarée absente avant
+d'exister — le cas BAV2 passe de « 0 élément, compte valide accusé » à 91 éléments
+inventoriés. · La provenance de session se **constate** (cookie posé, mire qui rend la
+main) : la contradiction du 17/08 (« session ouverte » + « aucune mire » dans le même
+non_juge) est rejouée en test et rendue impossible. · « Pas de compte » et « compte
+fourni, connexion échouée » ne se confondent plus (3e état, motif = TENTÉ + ARRÊT).
+· Le pan **dit combien d'identités ont parcouru** et en accepte plusieurs : refus
+d'autorisation (401/403 ET redirections — la forme qui comptait pour un succès) en issue
+distincte HORS ratio, N storage states étiquetés, un contexte par rôle, couverture par
+rôle au rapport — le « 8/8 ratio 1,00 » d'Approval2 ne peut plus se lire « tout est
+couvert ».
+
+**Clôture du circuit des lots** : les 14 paires (md + sidecar) sont en
+`input\00-retours\old\`, boîte d'entrée PASS — la racine ne porte plus que ce qui
+attend d'être pris, c'est-à-dire rien.
+
+**Registre en fin de vague : 4 items archivés (308 au total), 10 candidats actifs**
+(TF-0304..0312 + TF-0317, affinements du niveau rôle — patron TF-0295).
