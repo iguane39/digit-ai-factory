@@ -369,7 +369,8 @@ Deux corollaires opposables :
    verdicts portés au ledger en `oracles_verdict` (pas 1 de `references\ETAPES-RUN.md`). Un
    échec **suspend l'ouverture** : des oracles qui ne savent plus refuser ne peuvent rien juger
    de ce qui suit, un lot non pris fausse tout ce qu'on croit savoir du reste-à-faire, et un
-   skill divergent fait exécuter autre chose que ce que le dépôt versionne.
+   skill — ou un hook (K6, TF-0290) — divergent fait exécuter autre chose que ce que le
+   dépôt versionne.
 
    *Corollaire du corollaire, appris le 15/08* : un applicateur ne présume **jamais** du sens
    de la dérive. La copie installée n'est pas toujours celle qui est en retard — `--appliquer`

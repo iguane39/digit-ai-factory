@@ -12,7 +12,7 @@ décidée le 15/08) :
 ```
 node oracles\self-tests.mjs          # les oracles savent-ils encore ECHOUER ? (I1)
 node oracles\oracle-boite-entree.mjs # un lot est-il arrivé sans être pris ? (B1-B3)
-node oracles\oracle-skills.mjs       # les skills exécutés = les skills versionnés ? (K1-K5)
+node oracles\oracle-skills.mjs       # skills ET hooks exécutés = versionnés ? (K1-K6, TF-0290)
 ```
 
 Verdicts portés au ledger en `oracles_verdict`. La suspension n'est pas un excès de zèle :
