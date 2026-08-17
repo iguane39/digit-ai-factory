@@ -124,9 +124,13 @@ const IGNORE_MOTIF = /\.bak(?:[-.]\w+)?$/i;
 // `references/registre-oracles.json` est un référentiel versionné, pas un sidecar, et une
 // divergence dessus doit rester un échec (fixture rouge dédiée).
 const SIDECAR_ORACLES = /[._]oracles[\w-]*\.jsonl?$/i;
+// Journaux d'usage (complément TF-0306, 17/08) : `_routages-journal*.jsonl` est APPENDU à
+// l'exécution dans CHAQUE copie (route-experts.mjs:52) — les deux divergent structurellement
+// et sync-skills l'ignore à raison. Le comparer rendrait K2 rouge à toute ouverture de run.
+const JOURNAUX_USAGE = /^_routages-journal[\w-]*\.jsonl$/i;
 // Ce que le diff écarte, en une phrase — reprise TELLE QUELLE dans le verdict : une exclusion
 // muette est un mensonge par omission, l'oracle doit dire ce qu'il ne regarde pas.
-const LIBELLE_EXCLUS = "hors sidecars d'oracles (*.oracles*.json[l], convention TF-0065) et artefacts d'atelier (__pycache__, .venv, node_modules, .pytest_cache, .bak) : gitignorés, régénérables, jamais exécutés";
+const LIBELLE_EXCLUS = "hors sidecars d'oracles (*.oracles*.json[l], convention TF-0065), journaux d'usage (_routages-journal*.jsonl, TF-0306) et artefacts d'atelier (__pycache__, .venv, node_modules, .pytest_cache, .bak) : gitignorés, régénérables, jamais exécutés";
 // Deux conventions de chemin coexistent : forge-agents publie sous `.claude/skills/`,
 // conception et design sous `skills/`. Les deux sont lues — imposer l'une des deux serait un
 // autre chantier, et l'oracle n'a pas à trancher une convention pour pouvoir mesurer.
@@ -241,7 +245,7 @@ function comparerVersions(a, b) {
 function fichiers(dossier, prefixe = "") {
   const out = [];
   for (const e of readdirSync(dossier, { withFileTypes: true })) {
-    if (IGNORES.has(e.name) || IGNORE_MOTIF.test(e.name) || SIDECAR_ORACLES.test(e.name)) continue;
+    if (IGNORES.has(e.name) || IGNORE_MOTIF.test(e.name) || SIDECAR_ORACLES.test(e.name) || JOURNAUX_USAGE.test(e.name)) continue;
     const rel = prefixe ? `${prefixe}/${e.name}` : e.name;
     if (e.isDirectory()) out.push(...fichiers(join(dossier, e.name), rel));
     else out.push(rel);
@@ -873,9 +877,15 @@ function selfTest() {
   poser(join(inst2, "sigma", "_oracles-journal-historique.jsonl"), "{}\n");
   poser(join(inst2, "sigma", "references", "regles.md.oracles-historique.jsonl"), "{}\n");
   poser(join(inst2, "sigma", "__pycache__", "x.pyc"), "octets\n");
+  // Journal d'usage APPENDU des deux côtés avec des contenus différents (complément TF-0306) :
+  // structurellement divergent, jamais un écart.
+  poser(join(src2, "sigma", "_routages-journal.jsonl"), '{"usage":1}\n');
+  poser(join(inst2, "sigma", "_routages-journal.jsonl"), '{"usage":1}\n{"usage":2}\n');
   r = juger(racine2, inst2);
   cas.push(["K2    — sidecars d'oracles et __pycache__ ne sont pas des écarts (TF-0289)",
             r.verdict === "PASS"]);
+  cas.push(["K2    — un journal d'usage divergent n'est pas un écart (TF-0306)",
+            r.verdict === "PASS" && NON_JUGE.some((l) => /_routages-journal/.test(l))]);
 
   // Rouge : une VRAIE divergence de contenu reste détectée sous le bruit des sidecars.
   writeFileSync(join(inst2, "sigma", "SKILL.md"), "# sigma trafique dans la copie\n");
