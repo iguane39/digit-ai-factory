@@ -9,6 +9,14 @@
  * R-7 inversée le 13/08 par TF-0150 : old\ versionné). Node pur, zéro dépendance,
  * lecture seule (le registre des types d'organization est LU, jamais écrit).
  *
+ * Campagne du 17/08 — trois volets neufs, tous à fixture double sens dans `self-test.mjs` :
+ *  · R-2 gagne la LOCALISATION (TF-0319) : un artefact MARQUÉ destinataire-humain qui vit hors
+ *    d'`output\`/`docs\` est un constat ; ce qui n'est pas marqué n'est JAMAIS jugé ;
+ *  · R-19 gagne la FORME des clés `versions_forges` (TF-0320) : noms de dépôt COMPLETS, jugés
+ *    à partir du 2026-08-17 seulement — l'existant reste une antériorité déclarée ;
+ *  · R-20 gagne le couple `TODO-PRODUIT.md` → `.html` (TF-0318, volet LECTURE seul), tenu en
+ *    PARITÉ par sceau sha256 ; source absente = SANS_OBJET motivé, jamais un défaut de produit.
+ *
  * Usage : node oracle-conformite-projet.mjs <racine-du-projet>
  * Sortie : JSON sur stdout — { oracle, version, cible, verdict, findings[], non_juge[] }
  *          finding = { regle: "R-<n>", statut: PASS|FAIL|SANS_OBJET, ou, message }
@@ -17,6 +25,7 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, basename, relative, dirname } from "node:path";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 const cible = process.argv[2];
@@ -77,9 +86,83 @@ const sourcesDeVerite = (front) => {
   return m[1].split(",").map((s) => s.trim().replace(/^["']|["']$/g, "")).filter(Boolean);
 };
 
+// Frontmatter YAML en tête de document — remonté ici (TF-0319) : la marque de destinataire
+// s'y lit, et R-20..R-26 s'en servent plus bas. Une seule définition, deux usages.
+const frontmatter = (texte) => { const m = texte.match(/^---\r?\n([\s\S]*?)\r?\n---/); return m ? m[1] : null; };
+
+// ---- TF-0319 (verdict O3 du 17/08) · la frontière « livrable pour humain » se DÉCLARE ----
+// Ce qui n'est PAS marqué n'est JAMAIS jugé. C'est le verrou que `oracle-conventions.mjs`
+// d'organization avait documenté en SANS_OBJET D-01 (« distinguer les deux suppose de lire le
+// CONTENU du dossier, pas son chemin — non mécanisable depuis un balayage de noms ») : un
+// contrôle par MOTIF DE NOM a donc déjà été refusé en connaissance de cause, et le rouvrir
+// condamnerait les entrants d'`input\`, les fixtures et les documents normatifs que D-06 place
+// explicitement à la racine. La marque lève le verrou sans deviner le contenu d'un fichier.
+//
+// Deux canaux de marquage, et deux seulement :
+//   1. le document se marque lui-même — `destinataire: humain` en frontmatter YAML (.md), ou
+//      `<meta name="destinataire" content="humain">` pour un .html (son en-tête tient lieu de
+//      frontmatter) ;
+//   2. le ledger l'annonce — champ `livrable_attendu` d'un événement, DÉJÀ en service
+//      (`_Client-A\Produit-10\forge\ledger.jsonl` seq 1 le porte depuis le 13/08).
+const MARQUE_MD = /^destinataire\s*:\s*humain\s*$/im;
+const MARQUE_HTML = /<meta\s+name=["']destinataire["']\s+content=["']humain["']\s*\/?>/i;
+/** Zones OÙ LA MARQUE NE SE JUGE PAS — chacune avec son motif, jamais un silence :
+ *  `input\` = entrant, donc donnée qui arrive telle quelle (même doctrine que le non_juge de
+ *  R-4) · `gabarits\`/`fixtures\` = porteurs d'une FORME marquée, pas des livrables remis (une
+ *  fixture rouge doit pouvoir violer la règle qu'elle prouve) · `old\` = archive gelée, jamais
+ *  renommée (NON_JUGE d'`oracle-conventions`) · `.oracles\` = pièces de preuve d'oracle. */
+const horsJugementMarque = (r) =>
+  /^(input|gabarits)\//i.test(r) || /(^|\/)(old|fixtures?|\.oracles)\//i.test(r);
+/** Zones de dépôt CONFORMES : `output\` (règle 2) et `docs\` (précision D-06 — un document
+ *  normatif n'est pas une sortie et vit à la racine ou dans `docs\`). */
+const zoneDeDepot = (r) => /^(output|docs)\//i.test(r);
+const marqueHumain = (chemin, nom) => {
+  const ext = nom.split(".").pop().toLowerCase();
+  if (ext !== "md" && ext !== "html") return false;
+  let t;
+  try { t = readFileSync(chemin, "utf8"); } catch { return false; }
+  if (ext === "html") return MARQUE_HTML.test(t.slice(0, 4096));
+  const front = frontmatter(t);
+  return !!front && MARQUE_MD.test(front);
+};
+
 // R-1..R-3 — structure
 for (const [n, d] of [["R-1", "input"], ["R-2", "output"], ["R-3", "docs"]])
   existsSync(p(d)) ? ok(n, d + "/", "présent") : ko(n, d + "/", `dossier ${d}\\ absent de la racine`);
+
+// R-2 (suite) · LOCALISATION du livrable marqué — TF-0319. R-2 jugeait la PRÉSENCE du dossier
+// et jamais la localisation d'un livrable : un rapport laissé sous `forge\etapes\` laissait
+// R-2 en PASS. Le constat est localisant (fichier + canal de marquage + où il est dû).
+{
+  const constats = [];
+  let marques = 0;
+  for (const f of fichiers(cible)) {
+    const r = rel(f);
+    if (horsJugementMarque(r) || !marqueHumain(f, basename(f))) continue;
+    marques++;
+    if (!zoneDeDepot(r)) constats.push({ ou: r, canal: "frontmatter « destinataire: humain »" });
+  }
+  const lg = p("forge", "ledger.jsonl");
+  if (existsSync(lg)) for (const l of readFileSync(lg, "utf8").split("\n")) {
+    if (!l.trim()) continue;
+    let e;
+    try { e = JSON.parse(l); } catch { continue; }
+    const att = typeof e.livrable_attendu === "string" ? e.livrable_attendu.trim() : "";
+    if (!att) continue;
+    marques++;
+    const chemin = att.replaceAll("\\", "/").replace(/^\.\//, "");
+    if (!zoneDeDepot(chemin)) constats.push({ ou: `forge/ledger.jsonl → ${chemin}`, canal: "champ « livrable_attendu » du ledger" });
+  }
+  if (constats.length) for (const c of constats)
+    ko("R-2", c.ou, `livrable marqué pour l'humain (${c.canal}) hors de output\\ — règle 2 : ` +
+      "« tout livrable généré destiné à l'humain y vit ». Trois issues, aucune muette : le " +
+      "déposer dans output\\ ; retirer la marque si c'est un document NORMATIF (doctrine, " +
+      "gabarit, registre — précision D-06 : il vit à la racine ou dans docs\\) ; ou porter la " +
+      "marque sur la COPIE remise et non sur l'original de travail (règle 16 : l'original " +
+      "reste sous forge\\etapes\\, c'est la copie datée qui est marquée et déposée)");
+  else if (marques) ok("R-2", "output/, docs/", `${marques} artefact(s) marqué(s) destinataire-humain, tous rangés dans output\\ ou docs\\`);
+  else so("R-2", "aucun artefact marqué destinataire-humain (ni frontmatter, ni livrable_attendu au ledger) — la frontière se DÉCLARE : ce qui n'est pas marqué n'est jamais jugé (TF-0319)");
+}
 
 // R-18 — canal de retours forges (mandat du 06/08 : chaque projet prépare ses lots de retours)
 existsSync(p("forge", "retours"))
@@ -332,6 +415,19 @@ else {
 // R-19 — versions_forges consignées au ledger (contrat §3, TF-0035) : chaque run_open porte
 // versions_forges (objet non vide — avec quelles forges le produit a été construit) ; tout
 // run_open ultérieur au premier (run de version) porte run_precedent (chaînage des runs).
+//
+// TF-0320 (17/08) : s'y ajoute la FORME des clés. RÉTROACTIVITÉ, choix explicite — l'existant
+// historique ne se réécrit PAS : les deux ledgers mesurés (Produit-01 du 11/08, Produit-10 du
+// 13/08) restent des antériorités déclarées, sur le modèle d'ANTERIORITE_R28 dans
+// `oracle-ecosysteme.mjs`. Seuls les run_open ouverts À PARTIR du jour où la doctrine a été
+// encodée au contrat sont jugés sur la forme — c'est le PROCHAIN run_open qui est opposable,
+// et la politique d'entrée en vigueur de `REGLES-PROJET.md` l.13 (« au prochain run de version
+// de chacun ») est ainsi tenue au lieu d'être contredite.
+const DOCTRINE_CLES_COMPLETES = "2026-08-17";
+const RE_CLE_DEPOT = /^digit-ai-forge-[a-z0-9_-]+$/;
+/** Nom de dépôt complet attendu pour une clé courte (« conception » → « digit-ai-forge-conception ») ;
+ *  les préfixes partiels déjà présents ne sont pas redoublés. */
+const cleCanonique = (cle) => "digit-ai-forge-" + String(cle).toLowerCase().replace(/^digit-ai-/, "").replace(/^forge-/, "");
 const ledgerF = p("forge", "ledger.jsonl");
 if (!existsSync(ledgerF)) so("R-19", "pas de forge\\ledger.jsonl (aucun run ouvert)");
 else {
@@ -340,17 +436,34 @@ else {
   }).filter((e) => e && (e.type === "run_open" || e.ev === "run_open"));
   if (!opens.length) ko("R-19", "forge/ledger.jsonl", "ledger présent mais aucun run_open — le ledger s'ouvre par run_open");
   else {
-    let r19 = true;
+    let r19 = true, anteriorites = 0, jugesSurForme = 0;
     opens.forEach((o, i) => {
       const v = o.versions_forges;
       if (!v || typeof v !== "object" || !Object.keys(v).length) {
         ko("R-19", `forge/ledger.jsonl (run_open #${i + 1})`, "run_open sans versions_forges — consigner la version de chaque forge (contrat §3, fraîcheur)"); r19 = false;
-      }
+      } else if (String(o.ts || "") >= DOCTRINE_CLES_COMPLETES) {
+        // TF-0320 (17/08) : la forme CANONIQUE des clés est le nom de dépôt COMPLET
+        // (CONTRAT-INTERFACE.md §3). Mesuré sur pièces le 17/08 : Produit-01 portait 5 clés en
+        // noms courts (« conception », « design »…), Produit-10 14 clés complètes — les DEUX
+        // rendaient PASS, et aucun diff de versions n'était calculable d'un run à l'autre.
+        // R-19 jugeait la présence d'un point de comparaison, jamais sa comparabilité.
+        jugesSurForme++;
+        for (const cle of Object.keys(v)) {
+          if (RE_CLE_DEPOT.test(cle)) continue;
+          ko("R-19", `forge/ledger.jsonl (run_open #${i + 1})`,
+            `versions_forges : clé « ${cle} » en nom court — la forme canonique est le nom de ` +
+            `dépôt COMPLET, attendu « ${cleCanonique(cle)} » (CONTRAT-INTERFACE.md §3, TF-0320) ; ` +
+            "deux conventions de clés ont cohabité en PASS jusqu'au 17/08, ce qui rendait le " +
+            "diff de versions incalculable entre deux runs"); r19 = false;
+        }
+      } else anteriorites++;
       if (i > 0 && !o.run_precedent) {
         ko("R-19", `forge/ledger.jsonl (run_open #${i + 1})`, "run de version sans run_precedent — les runs se chaînent"); r19 = false;
       }
     });
-    if (r19) ok("R-19", "forge/ledger.jsonl", `${opens.length} run_open avec versions_forges${opens.length > 1 ? " et chaînage run_precedent" : ""}`);
+    if (r19) ok("R-19", "forge/ledger.jsonl", `${opens.length} run_open avec versions_forges${opens.length > 1 ? " et chaînage run_precedent" : ""}` +
+      (jugesSurForme ? `, dont ${jugesSurForme} au nom de dépôt complet (TF-0320)` : "") +
+      (anteriorites ? ` — ${anteriorites} run_open antérieur(s) au ${DOCTRINE_CLES_COMPLETES} en antériorité déclarée sur la forme des clés (jamais réécrits)` : ""));
   }
 }
 
@@ -359,7 +472,6 @@ else {
 const dp = p("docs", "projet");
 const FICHIERS_DP = ["TECHNOS.md", "COMPOSANTS-OPS.md", "PARAMETRAGE.md", "ACCES-TEST.md", "COMMANDES.md", "FONCTIONNEL.md", "ARCHITECTURE.md", "MODELE-DONNEES.md"]; // FONCTIONNEL : TF-0087 · ARCHITECTURE + MODELE-DONNEES : TF-0091 (sources MD des vues générées)
 const PROJECTIONS_DP = ["ARCHITECTURE.html", "MODELE-DONNEES.html"]; // vues générées, jamais saisies (scripts du pilot)
-const frontmatter = (texte) => { const m = texte.match(/^---\r?\n([\s\S]*?)\r?\n---/); return m ? m[1] : null; };
 if (!existsSync(dp)) ko("R-20", "docs\\projet\\", "dossier absent — socle documentaire du produit (TECHNOS, COMPOSANTS-OPS, PARAMETRAGE, ACCES-TEST, COMMANDES)");
 else {
   let ok20 = true;
@@ -557,6 +669,41 @@ else {
     }
   }
 
+  // R-20 (suite) · TODO-PRODUIT : reste-à-faire et décisions attendues du produit, au patron
+  // « source MD versionnée → projection HTML générée » (TF-0318, verdict O3 du 17/08 — volet
+  // LECTURE seul : aucune saisie, aucun bouton d'envoi, aucun dossier écouté).
+  //
+  // Le couple n'est PAS exigé : les produits nés avant le 17/08 ne l'auront qu'à leur prochain
+  // run de version (dette déclarée par l'étude, précisément pour qu'un oracle ne la lise pas
+  // comme un défaut de produit). Absence de source = SANS_OBJET motivé, jamais FAIL.
+  //
+  // En revanche, dès que la source EXISTE, la projection est tenue — et tenue plus fermement que
+  // ses deux sœurs : `ARCHITECTURE.html` et `MODELE-DONNEES.html` ne sont jugées qu'en PRÉSENCE
+  // (le non_juge de R-26 le dit : « la fraîcheur des projections HTML n'est pas datée »). Ici la
+  // PARITÉ est vérifiée par le sceau : le générateur scelle le sha256 de sa source dans la page,
+  // donc une page régénérée depuis une autre version se dénonce elle-même. Une vue périmée qui
+  // ressemble à une vue fraîche est le mensonge silencieux que TF-0151 a déjà payé.
+  const tdp = join(dp, "TODO-PRODUIT.md");
+  if (!existsSync(tdp)) so("R-20", "docs\\projet\\TODO-PRODUIT.md absent — reste-à-faire et décisions attendues du produit non projetés (TF-0318, 17/08) : dette déclarée pour les produits nés avant cette date, à créer au prochain run de version depuis gabarits\\docs-projet\\TODO-PRODUIT.md ; ce n'est pas un défaut de produit");
+  else {
+    // Même normalisation que le générateur : BOM retiré avant hachage, sinon la même source
+    // rendrait deux empreintes selon l'outil Windows qui l'a écrite.
+    const source = readFileSync(tdp, "utf8").replace(/^\uFEFF/, "");
+    const front = frontmatter(source);
+    const attendu = createHash("sha256").update(source).digest("hex").slice(0, 12);
+    const proj = join(dp, "TODO-PRODUIT.html");
+    let okTdp = true;
+    if (!front || !/^role\s*:/m.test(front) || !/^sources_de_verite\s*:/m.test(front) || !/^verifie_le\s*:/m.test(front)) {
+      ko("R-20", "docs\\projet\\TODO-PRODUIT.md", "frontmatter YAML incomplet — role, sources_de_verite et verifie_le requis (contrat machine du socle) ; un BOM en tête de fichier suffit à rendre le frontmatter illisible (Set-Content/Out-File en posent un par défaut)"); okTdp = false;
+    }
+    if (!existsSync(proj)) {
+      ko("R-20", "docs\\projet\\TODO-PRODUIT.html", "projection générée manquante alors que sa source existe — régénérer via node <pilot>\\todo\\generer-todo-produit.mjs docs\\projet\\TODO-PRODUIT.md (la vue n'est JAMAIS éditée à la main)"); okTdp = false;
+    } else if (!readFileSync(proj, "utf8").includes(attendu)) {
+      ko("R-20", "docs\\projet\\TODO-PRODUIT.html", `projection PÉRIMÉE — le sceau de la source (${attendu}) est absent de la page : la source a changé sans que la vue soit régénérée. Rejouer node <pilot>\\todo\\generer-todo-produit.mjs docs\\projet\\TODO-PRODUIT.md`); okTdp = false;
+    }
+    if (okTdp) ok("R-20", "docs\\projet\\TODO-PRODUIT.md → .html", `couple source→projection à parité (sceau ${attendu}), frontmatter machine complet`);
+  }
+
   // R-23 · ACCES-TEST : démo locale seulement, zéro secret (R-14 + loi 2)
   const ap = join(dp, "ACCES-TEST.md");
   if (existsSync(ap)) {
@@ -584,6 +731,9 @@ const nonJuge = [
   "R-24 (TF-0267) : la prose d'écart n'est détectée que sur un vocabulaire explicite (écart, dérogation, exception, non conforme, à renommer) croisé avec R-24/nommage/suffixe — un écart raconté en d'autres mots ne sera pas vu ; c'est le champ structuré `ecarts_r24` qui fait foi, pas la détection de prose",
   "R-26 : ancrage par inclusion textuelle du nom de table dans la provenance — la complétude INVERSE (toute table du DDL figure au doc) et l'exactitude des colonnes ne sont pas jugées (revue de schéma) ; la fraîcheur des projections HTML n'est pas datée (régénération = discipline d'étape)",
   "R-27 : jugé seulement si un robots.txt existe (surface web non déclarée = SANS_OBJET) ; blocages CDN/WAF et cohérence llms.txt ↔ sitemap hors périmètre statique (nœud 58 forge-seo au run)",
+  "R-2 localisation (TF-0319) : seul ce qui est MARQUÉ est jugé — un producteur qui oublie de marquer son livrable y échappe (faux négatif ASSUMÉ, mesuré à la revue du 17/09 par le rapport entre livrables marqués et livrables déposés) ; la JUSTESSE du marquage relève de la relecture, pas d'un contrôle de forme ; `input\\`, `gabarits\\`, `fixtures\\`, `old\\` et `.oracles\\` sont hors jugement par motif déclaré ; la marque est attendue sur la COPIE remise, pas sur l'original de travail de `forge\\etapes\\` (règle 16) — l'oracle ne rapproche pas un original de sa copie",
+  "R-2 localisation (TF-0319) : la structure INTERNE d'`output\\` (familles numérotées uniques, une seule version courante par famille, graphie `old\\`, LISEZMOI.md de correspondance — D-15 al. a à e) n'est PAS jugée ici : sa mécanisation vit chez `oracle-conventions.mjs` d'organization et reste suspendue à un mandat humain d'écriture dans ce dépôt frère",
+  "R-19 forme des clés (TF-0320) : seule la FORME des clés `versions_forges` est jugée, pas leur COMPLÉTUDE — un run_open qui ne relève que 5 forges sur 14 en noms complets reste PASS (Produit-01 en portait 5) ; un run_open sans `ts` n'est pas jugé sur la forme (pas de date, pas d'entrée en vigueur opposable) ; les run_open antérieurs au 2026-08-17 sont des antériorités déclarées, jamais réécrites",
 ];
 
 const echecs = findings.filter((f) => f.statut === "FAIL").length;

@@ -296,6 +296,200 @@ check("rouge-lock : versions déclarées sans source atteignable → FAIL R-21, 
   if (!r21[0].ou || !r21[0].message) throw new Error("R-21 sans localisation ou message");
 });
 
-for (const d of [verte, rouge, rougeDocs, rougeLock, rougeR24, ecartR24]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+// ---- fixtures R-2 LOCALISATION (TF-0319, verdict O3 du 17/08) : la frontière « livrable pour
+// humain » se DÉCLARE. Deux canaux de marquage (frontmatter du document, `livrable_attendu` du
+// ledger) et un invariant non négociable : ce qui n'est PAS marqué n'est JAMAIS jugé — c'est le
+// verrou SANS_OBJET D-01 d'`oracle-conventions.mjs` (« distinguer les deux suppose de lire le
+// CONTENU du dossier, pas son chemin ») que l'option O2 rouvrait au prix de faux positifs. -----
+const MARQUE_HUMAIN = "---\nrole: rapport de campagne\ndestinataire: humain\nverifie_le: 2026-08-17\n---\n\n# Rapport\n";
+const SANS_MARQUE = "---\nrole: doctrine du produit\nverifie_le: 2026-08-17\n---\n\n# Doctrine\n";
+const ecrireDans = (base, chemin, contenu) => {
+  const abs = join(base, ...chemin.split("/"));
+  mkdirSync(dirname(abs), { recursive: true });
+  writeFileSync(abs, contenu);
+};
+
+const rougeR2 = mkdtempSync(join(tmpdir(), "conf-rouge-r2-"));
+// (1) marqué sous forge\etapes\ — le cas exact que R-2 laissait PASSER : « un rapport laissé
+//     sous forge\etapes\ laisse R-2 en PASS » (non-recouvrement de l'étude, l.56)
+ecrireDans(rougeR2, "forge/etapes/RAPPORT-REVUE.md", MARQUE_HUMAIN);
+// (2) marqué en .html à la racine — l'en-tête tient lieu de frontmatter
+ecrireDans(rougeR2, "Digit-AI - Rapport Racine - 20260817a.html",
+  '<!DOCTYPE html>\n<html lang="fr"><head><meta name="destinataire" content="humain"><title>x</title></head><body>x</body></html>\n');
+// (3) le ledger ANNONCE un livrable hors output\ (canal `livrable_attendu`, déjà en service)
+ecrireDans(rougeR2, "forge/ledger.jsonl",
+  JSON.stringify({ type: "run_open", ts: "2026-08-17T08:00:00Z", versions_forges: { "digit-ai-forge-pilot": "e0ffc25" }, livrable_attendu: "forge/etapes/RAPPORT-REVUE.md" }) + "\n");
+// PIÈGES DE FAUX POSITIFS — tous doivent rester MUETS : un livrable DATÉ mais non marqué
+// (c'est le contrôle par motif de nom, refusé en connaissance de cause), et quatre marqués en
+// zones hors jugement par motif déclaré (entrant, porteurs de FORME, archive gelée).
+ecrireDans(rougeR2, "Digit-AI - Rapport Date Non Marque - 20260804a.md", SANS_MARQUE);
+ecrireDans(rougeR2, "input/Client - Rapport Entrant - 20260817a.md", MARQUE_HUMAIN);
+ecrireDans(rougeR2, "gabarits/RESTITUTION.md", MARQUE_HUMAIN);
+ecrireDans(rougeR2, "output/Old/Digit-AI - Rapport Ancien - 20260801a.md", MARQUE_HUMAIN);
+ecrireDans(rougeR2, "tests/fixtures/violation-voulue.md", MARQUE_HUMAIN);
+
+check("rouge-R2 : 3 constats de localisation (frontmatter .md, .html, livrable_attendu)", () => {
+  const { exit, rapport } = lance(rougeR2);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const r2 = rapport.findings.filter((f) => f.regle === "R-2" && f.statut === "FAIL");
+  if (r2.length !== 3) throw new Error(`3 constats R-2 attendus, ${r2.length} obtenu(s) : ${JSON.stringify(r2.map((f) => f.ou))}`);
+  const ou = r2.map((f) => f.ou).join(" | ");
+  for (const attendu of ["forge/etapes/RAPPORT-REVUE.md", "Digit-AI - Rapport Racine - 20260817a.html", "forge/ledger.jsonl → forge/etapes/RAPPORT-REVUE.md"])
+    if (!ou.includes(attendu)) throw new Error(`« ${attendu} » non localisé : ${ou}`);
+  // le constat doit dire les TROIS issues, dont celle de la règle 16 (marquer la copie remise)
+  if (!r2.every((f) => /output\\/.test(f.message) && /D-06/.test(f.message) && /règle 16/.test(f.message)))
+    throw new Error("un constat qui ne dit pas quoi faire renvoie le lecteur à la devinette");
+});
+
+check("rouge-R2 : ce qui n'est PAS marqué n'est JAMAIS jugé (verrou D-01, zéro faux positif)", () => {
+  const { rapport } = lance(rougeR2);
+  const r2 = rapport.findings.filter((f) => f.regle === "R-2").map((f) => `${f.ou} ${f.message}`).join(" | ");
+  for (const piege of ["Date Non Marque", "input/", "gabarits/", "Old/", "fixtures/"])
+    if (r2.includes(piege)) throw new Error(`« ${piege} » jugé — c'est le faux positif que l'option O2 rouvrait et qu'oracle-conventions avait refusé (SANS_OBJET D-01)`);
+});
+
+// VERTE-R2 : les deux canaux de marquage, rangés — `output\` (règle 2) et `docs\` (D-06).
+const verteR2 = mkdtempSync(join(tmpdir(), "conf-verte-r2-"));
+ecrireDans(verteR2, "output/03-etudes/20260817-etude-rangement.md", MARQUE_HUMAIN);
+ecrireDans(verteR2, "docs/projet/NOTE-NORMATIVE.md", MARQUE_HUMAIN);
+ecrireDans(verteR2, "forge/ledger.jsonl",
+  JSON.stringify({ type: "run_open", ts: "2026-08-17T08:00:00Z", versions_forges: { "digit-ai-forge-pilot": "e0ffc25" }, livrable_attendu: "output/03-etudes/20260817-etude-rangement.md" }) + "\n");
+check("verte-R2 : livrables marqués rangés → PASS R-2 qui DIT combien il en a vu", () => {
+  const { rapport } = lance(verteR2);
+  const r2 = rapport.findings.filter((f) => f.regle === "R-2");
+  if (r2.some((f) => f.statut === "FAIL")) throw new Error(`FAIL inattendu : ${JSON.stringify(r2.filter((f) => f.statut === "FAIL").map((f) => f.ou))}`);
+  const pass = r2.find((f) => f.statut === "PASS" && /artefact\(s\) marqué\(s\) destinataire-humain/.test(f.message));
+  if (!pass) throw new Error("le verdict ne compte pas les artefacts marqués — un contrôle muet est indistinguable d'une absence de règle");
+  if (!/^3 /.test(pass.message)) throw new Error(`3 artefacts marqués attendus (md output, md docs, livrable_attendu), message : ${pass.message}`);
+});
+
+// ---- fixtures R-19 FORME DES CLÉS (TF-0320, verdict O1 du 17/08) : la forme canonique de
+// `versions_forges` est le nom de dépôt COMPLET (CONTRAT-INTERFACE.md §3). Mesuré sur pièces :
+// Produit-01 portait 5 clés courtes, Produit-10 14 complètes, les DEUX en PASS — aucun diff de
+// versions n'était calculable. RÉTROACTIVITÉ : l'existant ne se réécrit pas, seuls les run_open
+// du 2026-08-17 et après sont jugés sur la forme (`REGLES-PROJET.md` l.13). ------------------
+const rougeR19 = mkdtempSync(join(tmpdir(), "conf-rouge-r19-"));
+ecrireDans(rougeR19, "forge/ledger.jsonl", [
+  // ANTÉRIORITÉ : 5 clés courtes, mais run_open du 11/08 — jamais réécrit, jamais jugé sur la forme
+  JSON.stringify({ type: "run_open", ts: "2026-08-11T08:00:00Z", versions_forges: { conception: "aabc448", design: "d74c957", development: "c177c6a", tests: "18c3947", agents: "c650ae5" } }),
+  // JUGÉ : le run_open d'après la doctrine, avec les mêmes 5 clés courtes → 5 constats
+  JSON.stringify({ type: "run_open", ts: "2026-08-18T08:00:00Z", run_precedent: "run-20260811", versions_forges: { conception: "aabc448", design: "d74c957", development: "c177c6a", tests: "18c3947", agents: "c650ae5" } }),
+].join("\n") + "\n");
+check("rouge-R19 : 5 clés courtes après le 17/08 → 5 constats nommant la clé et sa forme attendue", () => {
+  const { exit, rapport } = lance(rougeR19);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const formes = rapport.findings.filter((f) => f.regle === "R-19" && f.statut === "FAIL" && /nom court/.test(f.message));
+  if (formes.length !== 5) throw new Error(`5 constats de forme attendus, ${formes.length} obtenu(s) : ${JSON.stringify(formes.map((f) => f.message))}`);
+  const msgs = formes.map((f) => f.message).join(" | ");
+  for (const cle of ["conception", "design", "development", "tests", "agents"]) {
+    if (!msgs.includes(`clé « ${cle} »`)) throw new Error(`la clé « ${cle} » n'est pas nommée`);
+    if (!msgs.includes(`« digit-ai-forge-${cle} »`)) throw new Error(`la forme attendue « digit-ai-forge-${cle} » n'est pas donnée`);
+  }
+  // rétroactivité : le run_open du 11/08 porte les MÊMES clés courtes et ne doit produire aucun constat
+  if (formes.some((f) => f.ou.includes("#1"))) throw new Error("le run_open antérieur au 17/08 a été jugé sur la forme — l'existant historique ne se réécrit pas");
+});
+
+// VERTE-R19 : les 14 noms de dépôt complets, sur un run_open postérieur à la doctrine.
+const verteR19 = mkdtempSync(join(tmpdir(), "conf-verte-r19-"));
+const CLES_14 = ["pilot", "conception", "design", "development", "tests", "agents", "organization",
+  "data", "ops", "observability", "audit", "seo", "agents-security", "websec"];
+ecrireDans(verteR19, "forge/ledger.jsonl",
+  JSON.stringify({ type: "run_open", ts: "2026-08-18T08:00:00Z",
+    versions_forges: Object.fromEntries(CLES_14.map((c, i) => [`digit-ai-forge-${c}`, `sha${String(i).padStart(4, "0")}`])) }) + "\n");
+check("verte-R19 : 14 clés au nom de dépôt complet → PASS, et le verdict le DIT", () => {
+  const { rapport } = lance(verteR19);
+  const r19 = rapport.findings.filter((f) => f.regle === "R-19");
+  if (r19.some((f) => f.statut === "FAIL")) throw new Error(`FAIL inattendu : ${JSON.stringify(r19.filter((f) => f.statut === "FAIL").map((f) => f.message))}`);
+  if (!r19.some((f) => f.statut === "PASS" && /au nom de dépôt complet/.test(f.message)))
+    throw new Error("la forme tenue n'est pas dite au verdict — une exigence muette est indistinguable d'une absence de règle");
+});
+
+// ---- fixtures R-20 TODO-PRODUIT (TF-0318, verdict O3 du 17/08 — volet LECTURE seul) : le
+// couple « source MD versionnée → projection HTML générée », au patron déjà tenu par R-20 pour
+// ARCHITECTURE et MODELE-DONNEES. Trois états à prouver, dont l'ABSENCE : les produits nés avant
+// le 17/08 n'auront la page qu'à leur prochain run de version, et un oracle ne doit pas lire
+// cette dette déclarée comme un défaut de produit. -------------------------------------------
+const gabaritTdp = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "gabarits", "docs-projet", "TODO-PRODUIT.md"), "utf8");
+const genererTdp = (base) => sh("node", [join(dirname(fileURLToPath(import.meta.url)), "..", "todo", "generer-todo-produit.mjs"),
+  join(base, "docs", "projet", "TODO-PRODUIT.md")], base);
+
+// (a) SOURCE ABSENTE → SANS_OBJET motivé, jamais FAIL (la dette déclarée de l'étude).
+check("R-20/TODO-PRODUIT : source absente → SANS_OBJET motivé, jamais un FAIL de produit", () => {
+  const { rapport } = lance(rougeDocs); // fixture sans TODO-PRODUIT.md
+  const f = rapport.findings.find((x) => x.regle === "R-20" && /TODO-PRODUIT\.md absent/.test(x.message));
+  if (!f) throw new Error("aucun finding sur l'absence de TODO-PRODUIT.md — un contrôle qui ne se prononce pas n'existe pas");
+  if (f.statut !== "SANS_OBJET") throw new Error(`statut ${f.statut} — attendu SANS_OBJET : la dette est déclarée, pas imputée au produit`);
+  if (!/prochain run de version/.test(f.message)) throw new Error("le motif du SANS_OBJET ne dit pas quand la dette se solde");
+});
+
+// (b) VERTE : source + projection régénérée par le VRAI générateur → parité tenue.
+const verteTdp = mkdtempSync(join(tmpdir(), "conf-verte-tdp-"));
+ecrireDans(verteTdp, "docs/projet/TODO-PRODUIT.md", gabaritTdp);
+genererTdp(verteTdp);
+check("verte-TODO-PRODUIT : couple source→projection à parité (sceau), frontmatter machine complet", () => {
+  const { rapport } = lance(verteTdp);
+  const f = rapport.findings.filter((x) => x.regle === "R-20" && /TODO-PRODUIT/.test(x.ou || "") );
+  const pass = f.find((x) => x.statut === "PASS" && /à parité \(sceau /.test(x.message));
+  if (!pass) throw new Error(`parité non constatée : ${JSON.stringify(f.map((x) => [x.statut, x.message]))}`);
+  // Le gabarit porte `destinataire: humain` et vit sous docs\ : zone de dépôt conforme (D-06),
+  // donc la LOCALISATION de R-2 ne doit rien dire dessus — les deux règles neuves du 17/08 ne se
+  // contredisent pas. (Le FAIL R-2 « dossier output\ absent » de cette fixture minimale, lui,
+  // reste attendu : c'est la règle de PRÉSENCE, une autre question.)
+  const loc = rapport.findings.filter((x) => x.regle === "R-2" && x.statut === "FAIL" && /livrable marqué pour l'humain/.test(x.message));
+  if (loc.length) throw new Error(`R-2 accuse un document marqué qui vit pourtant dans docs\\ : ${JSON.stringify(loc.map((x) => x.ou))}`);
+  const paireMarquee = rapport.findings.find((x) => x.regle === "R-2" && x.statut === "PASS" && /artefact\(s\) marqué\(s\)/.test(x.message));
+  if (!paireMarquee || !/^2 /.test(paireMarquee.message))
+    throw new Error(`la source ET sa projection doivent être vues marquées et conformes (2 attendus) : ${paireMarquee?.message}`);
+});
+
+check("verte-TODO-PRODUIT : générateur déterministe (2 exécutions = HTML identique)", () => {
+  const lu = () => readFileSync(join(verteTdp, "docs", "projet", "TODO-PRODUIT.html"), "utf8");
+  const avant = lu();
+  genererTdp(verteTdp);
+  const apres = lu();
+  if (avant !== apres) throw new Error("HTML différent entre deux générations sur la même source");
+  if (/https?:\/\/(?!www\.w3\.org)/.test(apres)) throw new Error("URL réseau détectée dans une vue générée (A1)");
+  // R-30 : clair par défaut STRICT + bascule CÂBLÉE (une bascule sans effet est un défaut, loi 1)
+  if (/prefers-color-scheme:\s*dark/.test(apres)) throw new Error("auto-sombre hérité de l'OS — retiré par l'amendement TF-0158");
+  for (const attendu of ['id="theme-toggle"', "localStorage.setItem('digitai-theme'", "addEventListener('click'", 'data-theme="dark"'])
+    if (!apres.includes(attendu)) throw new Error(`bascule R-30 non câblée : « ${attendu} » absent`);
+  // RV-9 (14/08) : `color-scheme` FIGÉ à « light dark » faisait peindre au navigateur ses propres
+  // surfaces en sombre sur un corps clair. Il doit SUIVRE le thème effectif — donc porté par les
+  // deux blocs de tokens, jamais figé dans un <meta>.
+  // (les commentaires HTML sont retirés d'abord : la page DOCUMENTE l'anti-pattern, elle ne le porte pas)
+  if (/<meta\s+name="color-scheme"/i.test(apres.replace(/<!--[\s\S]*?-->/g, "")))
+    throw new Error("color-scheme figé dans un <meta> — défaut relevé par RV-9 : il doit suivre le thème effectif");
+  if (!/:root\{color-scheme:light/.test(apres) || !/:root\[data-theme="dark"\]\{color-scheme:dark/.test(apres))
+    throw new Error("color-scheme absent des blocs de tokens — les surfaces du navigateur ne suivraient pas le thème (RV-9)");
+  // volet ÉCRITURE refusé par le verdict O3 : la page ne doit porter AUCUNE surface de saisie
+  if (/<(input|textarea|form|button[^>]*type="submit")/i.test(apres.replace(/<button id="theme-toggle"[\s\S]*?<\/button>/, "")))
+    throw new Error("surface de saisie dans une page déclarée en lecture seule — la moitié ÉCRITURE est refusée en l'état (LLM01)");
+});
+
+// (c) ROUGE : la source a changé, la projection n'a pas été régénérée → sceau périmé.
+const rougeTdp = mkdtempSync(join(tmpdir(), "conf-rouge-tdp-"));
+ecrireDans(rougeTdp, "docs/projet/TODO-PRODUIT.md", gabaritTdp);
+genererTdp(rougeTdp);
+writeFileSync(join(rougeTdp, "docs", "projet", "TODO-PRODUIT.md"),
+  gabaritTdp.replace("verifie_le: {AAAA-MM-JJ}", "verifie_le: 2026-08-18")); // source modifiée, vue NON régénérée
+check("rouge-TODO-PRODUIT : source modifiée sans régénération → projection PÉRIMÉE dénoncée", () => {
+  const { exit, rapport } = lance(rougeTdp);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1 — une vue périmée qui ressemble à une vue fraîche est le mensonge de TF-0151`);
+  const f = rapport.findings.find((x) => x.regle === "R-20" && /PÉRIMÉE/.test(x.message));
+  if (!f) throw new Error(`péremption non détectée : ${JSON.stringify(rapport.findings.filter((x) => x.regle === "R-20").map((x) => x.message))}`);
+  if (!/generer-todo-produit\.mjs/.test(f.message)) throw new Error("le constat ne dit pas quelle commande rejouer");
+});
+
+// (d) ROUGE : projection absente alors que la source existe → couple rompu.
+const rougeTdpNu = mkdtempSync(join(tmpdir(), "conf-rouge-tdp-nu-"));
+ecrireDans(rougeTdpNu, "docs/projet/TODO-PRODUIT.md", gabaritTdp);
+check("rouge-TODO-PRODUIT : source sans projection → couple rompu, constat localisant", () => {
+  const { exit, rapport } = lance(rougeTdpNu);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const f = rapport.findings.find((x) => x.regle === "R-20" && /projection générée manquante alors que sa source existe/.test(x.message));
+  if (!f || f.ou !== "docs\\projet\\TODO-PRODUIT.html") throw new Error(`constat absent ou non localisant : ${JSON.stringify(f)}`);
+});
+
+for (const d of [verte, rouge, rougeDocs, rougeLock, rougeR24, ecartR24, rougeR2, verteR2, rougeR19, verteR19, verteTdp, rougeTdp, rougeTdpNu]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 console.log(`\nSelf-test conformité projet : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
