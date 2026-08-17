@@ -48,7 +48,11 @@ Boucle intérieure (libre, sans verdict) : `<commandes locales : pytest, ruff, s
   types des livrables au registre d'organization R-25, URLs d'environnement
   `<appli>-{dev|qualif|production}` R-24 ; voie automatisée par défaut dans toute démarche
   proposée, actions restantes classées IA/développeur/utilisateur R-29 ; tout HTML
-  autonome livré porte un thème clair par défaut et une bascule sombre câblée R-30).
+  autonome livré porte un thème clair par défaut et une bascule sombre câblée R-30 ;
+  **aucun livrable publié sur un service hébergé** — artifact, page web, partage cloud —
+  **sans GO humain préalable consigné** : un livrable est un fichier autoportant sur
+  disque, chez le produit, et le retrait d'une publication fautive est un geste humain
+  consigné R-38).
 - `docs\projet\` (R-20) : TECHNOS, COMPOSANTS-OPS, PARAMETRAGE, ACCES-TEST, COMMANDES,
   FONCTIONNEL, ARCHITECTURE, MODELE-DONNEES (+ vues ARCHITECTURE.html et MODELE-DONNEES.html
   générées par les scripts du pilot, jamais éditées) — vues à sources de vérité déclarées

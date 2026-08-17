@@ -446,6 +446,38 @@ telle), jamais par omission — loi transverse n° 3. `organization` peut porter
 à son catalogue de conventions ; sa force opposable vit ici (« organization organise, pilot
 pilote »).
 
+## R. Aucun livrable ne se publie sur un service hébergé sans GO humain (règle 38 — 17/08, TF-0302)
+
+Le cas fondateur, sur pièces (lot `Approval2 - RETOURS - 20260817a`, RG-07 bloquant) : un
+rapport d'écarts citant **deux écarts de sécurité exploitables** (antivirus `fake`, `/docs`
+ouverts) a été rendu à la fois comme fichier local et comme **page hébergée hors du poste**
+(URL claude.ai/code/artifact/…, 17/08), avant toute validation humaine. Aucune règle écrite
+ne l'interdisait : G-1 et R-32 cadrent l'EMPLACEMENT et la FORME des livrables sur le poste,
+le garde-fou git ne couvre que le push — la publication n'a enfreint aucun texte, **c'est
+exactement le défaut**. Étude : `output\03-etudes\20260817-etude-opportunite-publication-livrables.md`
+(verdict O3).
+
+**R-38.**
+1. **Aucun livrable de produit** (rapport, note de synthèse, kit, dashboard, maquette —
+   tout fichier destiné à l'humain ou au client) **ne passe par un outil de publication
+   hébergée** (artifact, page web, pastebin, partage cloud) **sans GO humain préalable et
+   consigné**. Un livrable est un **fichier autoportant sur disque**, à l'emplacement du
+   produit. Publier EST une sortie du poste : une page « privée par défaut » peut être
+   mise en cache ou indexée — la réversibilité n'est jamais garantie.
+2. **Le retrait n'est pas outillé** (constat du 17/08, option O4 de l'étude — aucun verbe
+   machine de suppression) : toute publication fautive se retire **à la main dans
+   l'interface du service**, et le retrait se consigne (qui, quand, URL) comme toute
+   décision. Une publication non retirable se déclare au ledger en écart, jamais en silence.
+3. Périmètre : livrables des produits ET du pilot ; les pages dont la publication est la
+   FINALITÉ décidée du produit (site public en MEP) suivent leur voie normale (gates MEP,
+   GO humain) — R-38 vise le canal de COMMODITÉ, pas la mise en production.
+
+**Appelants (R-35)** : le garde-fou du noyau (`CLAUDE.md` §Garde-fous) et
+`gabarits\CLAUDE-PRODUIT.md` §Conventions (toute session produit le charge) ; la FORME
+autoportante est mécanisée par `check_html.py` étendu (TF-0303 — un fichier écrit pour un
+hôte qui fournit `<head>` est détectable : ni doctype, ni charset) ; le gate C7 à
+l'écriture reste le point de contrôle amont (réinstallation : décision humaine pendante).
+
 ## Conflits à trancher (ta décision explicite)
 
 - **C1 — `old\` vs git (n° 6/7)** : **TRANCHÉ le 13/08 (TF-0150)** — `old\` (minuscule,
