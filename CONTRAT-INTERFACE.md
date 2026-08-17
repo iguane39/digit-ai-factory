@@ -111,8 +111,10 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
 - `run_open` porte les **versions des forges** utilisées (`versions_forges: {<forge>: <sha court>}`,
   relevées après le pull d'ouverture) et, pour un run de version, `run_precedent: <run-id>` —
   le ledger du run N est l'entrée du run N+1 (cf. CLAUDE.md « Run de version »).
-  **Forme canonique des clés (TF-0320, 17/08)** : les 14 noms de dépôt COMPLETS
-  (`digit-ai-forge-pilot`, `digit-ai-forge-conception`, …) — mesuré sur pièces : Produit-01
+  **Forme canonique des clés (TF-0320, 17/08 ; renommage factory 17/08 soir)** : les 14
+  noms de dépôt COMPLETS — `digit-ai-factory` (le pilot, seule exception nommée au motif
+  `digit-ai-forge-*` depuis son renommage, table : `references\CORRESPONDANCE-RENOMMAGE-FACTORY.md`)
+  et `digit-ai-forge-<forge>` pour les 13 forges — mesuré sur pièces : Produit-01
   portait 5 clés en noms courts et Produit-10 14 clés complètes, les deux PASS, aucun diff
   machine calculable entre deux runs. Une clé courte est un écart R-19.
   **Diff de doctrine à l'ouverture (TF-0320)** : sur un run de version, jouer
