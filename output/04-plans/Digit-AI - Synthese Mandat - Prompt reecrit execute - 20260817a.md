@@ -20,12 +20,19 @@ tir réel FAIL 1065/0 sur Produit-11 ; 3 lots ingérés (8 candidatures TF-0342.
 
 ## Décisions attendues de l'humain
 
-- **GATE n°2 du renommage — à toi seul** :
-  `gh repo rename digit-ai-factory --repo iguane39/digit-ai-forge-pilot --yes` — puis
-  dis-moi « renommé » et j'exécute la fenêtre B (25 sites de prose en un lot, les 6 sites
-  du motif, remotes, oracles rejoués) puis la C (mandat 14 forges). Ne JAMAIS recréer un
-  dépôt à l'ancien nom (les redirections mourraient). Par défaut : rien ne bouge, la
-  fenêtre A reste réversible.
+- **GATE n°2 du renommage — à toi seul, en choix fermé** :
+  - (a) franchir maintenant : `gh repo rename digit-ai-factory --repo
+    iguane39/digit-ai-forge-pilot --yes`, puis me dire « renommé » — j'exécute la
+    fenêtre B le jour même (25 sites de prose en un lot, les 6 sites du motif, remotes,
+    oracles rejoués) puis la C (mandat 14 forges) ; coût : une session ; exclut de
+    laisser dériver la mesure P0 ;
+  - (b) différer à date : TF-0346 se déclare suspendu à la revue du 24/08, la fenêtre A
+    reste réversible ; coût : la prose du corpus dérive (+33 occurrences mesurées en
+    11 commits d'une seule journée) et la mesure P0 devra être refigée ;
+  - recommandation : (a) — la fenêtre A est fraîche, la mesure est figée aujourd'hui.
+  - Par défaut (rien décidé) : (b) s'applique à la revue du 24/08.
+  Dans tous les cas : ne JAMAIS recréer un dépôt à l'ancien nom (les redirections
+  GitHub mourraient définitivement).
 - **Toujours pendantes** : retrait de la page publiée (`claude.ai/code/artifact/7d535fbf-…`) ·
   câblage C7 au poste (chemin ABSOLU — TF-0337) · `assume` sur les 2 dettes TF-0292.
 - **12 candidats neufs** (TF-0342..0345, 0352/0353 des lots · TF-0351, 0354..0357 des
@@ -46,7 +53,7 @@ tir réel FAIL 1065/0 sur Produit-11 ; 3 lots ingérés (8 candidatures TF-0342.
 - TF-0350 — TODO-ARCHIVE.html (307 items, recherche plein texte côté client, R-30
   strict, check_html 0 échec) — critère littéral prouvé : « renommage » → 12 items dont
   TF-0062 et ses 5 jalons ; TF-0317 prouvé par fixture post-archivage ;
-- TF-0346 fenêtre A (pilot@c6d6e25) — TF-0332 clos (D-14 : « répercuté partout » corrigé
+- TF-0346 fenêtre A (pilot@c6d6e25) — TF-0332 corrigé (D-14 : « répercuté partout » rectifié
   sur pièces, RUN-VERSION reformulé en fait daté, doctrine « pas de jonction ») ; mesure
   P0 figée au gate n°1 : 25 occurrences / 11 fichiers, classes justifiées énumérées ;
   table §3 bis écrite (`references\CORRESPONDANCE-RENOMMAGE-FACTORY.md`, ids gelés) ;
@@ -62,8 +69,8 @@ tir réel FAIL 1065/0 sur Produit-11 ; 3 lots ingérés (8 candidatures TF-0342.
 - les 12 candidats neufs — motif : tout entre en candidat, décision humaine ;
 - l'archivage des corrigés — motif : fail-closed R10 inchangé (lot Run-Delivery,
   TF-0324 bloqué à condition écrite) ;
-- le rattrapage des produits (cahiers non soldés, porteurs caducs) — motif : R-37 al. 3,
-  au prochain run de chacun.
+- le rattrapage des produits (cahiers au reste-à-faire non nul, porteurs caducs) —
+  motif : R-37 al. 3, au prochain run de chacun.
 
 ## Écarts à la lettre
 
@@ -82,8 +89,8 @@ convention de chemin en service — TF-0354 les porte).
     réouverture) ; parade : la fenêtre B le referme au signal, ou TF-0346 se déclare
     suspendu à la revue du 24/08 si le gate n'est pas franchi.
 - le solde d'adoption ne compte pas les éléments non couverts déclarés par le rapport
-  (TF-0355) ; signal : solde 0 avec N non couverts ; parade : candidature ouverte, les
-  deux colonnes coexistent déjà au tableau.
+  (`TF-0355`) ; signal : un cahier à 0 cas en attente ET N éléments non couverts ;
+  parade : candidature ouverte, les deux colonnes coexistent déjà au tableau de tête.
 
 ## Prochaines actions — ordonnées, et par acteur
 
@@ -93,8 +100,8 @@ convention de chemin en service — TF-0354 les porte).
 - Ensuite `auto_ia` — sur ton signal « renommé » : fenêtre B le jour même, fenêtre C en
   mandat de campagne ; sinon, prochaine vague : les 6 candidats tests (TF-0342..0345,
   0352/0353) ensemble — ils forment la suite naturelle de R-40.
-- Enfin `manuelle_dev` — Produit-11 : solder les 1065 (l'oracle et le cahier montrent le
-  chemin) au prochain run du produit.
+- Enfin `manuelle_dev` — Produit-11 : ramener les 1065 cas à zéro par les trois issues R-40
+  (l'oracle et le cahier montrent le chemin) au prochain run du produit.
 
 ## Traces
 
