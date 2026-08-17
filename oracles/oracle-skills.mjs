@@ -24,12 +24,35 @@
  *   K6  même contrat pour les HOOKS (`<forge>\.claude\hooks\` → `~\.claude\hooks\`) : divergence
  *       en échec, hook installé sans source versionnée déclaré et non jugé (comme K4), copie en
  *       avance protégée (comme K5).
+ *   K7  le CÂBLAGE d'un hook versionné — déclaré, JAMAIS en échec : `<forge>\.claude\settings.json`
+ *       dit ce que la forge attend, `~\.claude\settings.json` dit ce qui s'exécute vraiment ;
+ *       l'écart est nommé avec la commande qui le poserait.
  *
  * K6 (TF-0290). Le gate C7 `qo-gate-write.mjs` — celui qui bloque l'écriture de TOUT livrable,
  * cinq blocages réels dans la seule journée du 15/08 — ne vivait qu'en copie installée : aucune
  * forge ne le versionnait, donc aucune correction n'était traçable ni rejouable, et un effacement
  * de `~\.claude` l'aurait détruit en silence. Le trou était invisible PAR CONSTRUCTION : K1-K5 ne
  * regardent que les skills. Un hook est un fichier, pas un dossier : K6 compare fichier à fichier.
+ *
+ * K7 (TF-0297). K6 juge l'INTÉGRITÉ d'un hook installé, pas son CÂBLAGE : un hook sain, copie
+ * conforme à sa source, mais qu'aucun `settings.json` ne référence ne s'exécute JAMAIS. C'est la
+ * loi transverse n°1 appliquée aux hooks — toute affordance est câblée ou n'existe pas. État réel
+ * du poste au 17/08, découvert en livrant K6 : ce même `qo-gate-write.mjs` est désormais versionné
+ * chez forge-agents, mais ni installé ni câblé — et rien ne le disait. K7 confronte les deux
+ * câblages, celui que les forges DÉCRIVENT et celui qui S'EXÉCUTE, et rend l'écart lisible.
+ *
+ * Pourquoi K7 est DÉCLARATIF et jamais FAIL. Cet oracle se joue à l'ouverture de TOUT run (R-35) :
+ * un FAIL y suspend l'ouverture. Or l'état actuel — C7 versionné, non câblé — est une décision
+ * humaine PENDANTE : câbler un hook engage toutes les sessions du poste (R-29, dépenses et gates
+ * restent humains). Un K7 bloquant briquerait donc toutes les ouvertures de run tant que cette
+ * décision n'est pas prise, et un gate qu'on apprend à contourner ne protège plus rien (précédent
+ * R-33 bis). K7 rend PASS avec ses constats en clair, et `non_juge` dit pourquoi il ne bloque pas.
+ * Le passage de K7 en bloquant sera une décision humaine, pas une décision d'oracle.
+ *
+ * Ce que K7 ne touche pas. `--appliquer` n'écrit JAMAIS dans le `settings.json` installé : poser un
+ * câblage est un acte humain. Et le settings installé PORTE des entrées personnelles (hooks de
+ * tableau de bord, réglages) : elles ne sont ni jugées, ni listées, ni comptées — même prudence que
+ * K4. Seul le câblage ATTENDU par les forges est confronté.
  *
  * Ce qui est EXCLU du diff (TF-0289), et déclaré comme tel au verdict : les sidecars d'oracles
  * (`*.oracles*.json[l]`, convention TF-0065 « hors dépôt ») et les artefacts d'atelier. Mesure du
@@ -44,7 +67,7 @@
  * dépôts vers un seul dossier, des jonctions qui cassent au premier déplacement de dépôt.
  *
  * Usage : node oracle-skills.mjs [--racine <dossier des forges>] [--installes <dossier>]
- *                               [--installes-hooks <dossier>]
+ *                               [--installes-hooks <dossier>] [--settings-installe <fichier>]
  *         node oracle-skills.mjs --appliquer   # copie source → installé (K1, K2 et K6)
  *         node oracle-skills.mjs --purger      # orphelins de la copie → quarantaine datée (K2)
  *         node oracle-skills.mjs --self-test
@@ -60,11 +83,11 @@ import {
   existsSync, readFileSync, readdirSync, statSync, mkdirSync, copyFileSync, writeFileSync,
   mkdtempSync, renameSync,
 } from "node:fs";
-import { dirname, join, resolve, relative } from "node:path";
+import { basename, dirname, join, resolve, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir, tmpdir } from "node:os";
 
-const VERSION = "1.1.0"; // 1.1.0 : K6 (hooks, TF-0290) et exclusion déclarée des sidecars (TF-0289)
+const VERSION = "1.2.0"; // 1.2.0 : K7 (câblage des hooks, déclaratif — TF-0297)
 const ORACLE = "oracle-skills";
 const ICI = dirname(fileURLToPath(import.meta.url));
 
@@ -94,6 +117,13 @@ const SOUS_CHEMINS = [join(".claude", "skills"), "skills"];
 // Les hooks n'ont qu'une convention : `<forge>\.claude\hooks\`, à côté du `settings.json` qui les
 // câble. Une seule est lue — inventer la seconde avant qu'elle existe serait deviner.
 const SOUS_CHEMIN_HOOKS = join(".claude", "hooks");
+// Le câblage d'un hook (K7) : `<forge>\.claude\settings.json` versionné dit ce que la forge
+// ATTEND, `~\.claude\settings.json` dit ce qui s'exécute. Même dossier que les hooks, à côté
+// d'eux — c'est le fichier que le harnais lit, pas une convention inventée ici.
+const SOUS_CHEMIN_SETTINGS = join(".claude", "settings.json");
+// Une commande de hook peut faire 2 Ko (une ligne de shell avec du Python embarqué). Le NOM du
+// hook est la trouvaille, la commande n'est qu'un indice de recopie : elle se résume.
+const PLAFOND_COMMANDE = 160;
 
 const NON_JUGE = [
   "le CONTENU d'un skill, sa qualité, son opportunité — cet oracle compare deux copies, il ne lit pas",
@@ -102,6 +132,11 @@ const NON_JUGE = [
   `les sidecars d'oracles et les artefacts d'atelier : le diff de K2 et K6 est calculé ${LIBELLE_EXCLUS} (TF-0289)`,
   "un hook sans version déclarée ne peut pas bénéficier de la protection « en avance » : la comparaison de versions demande qu'elle soit écrite des DEUX côtés (même limite que K5 pour un skill sans frontmatter)",
   "une édition FUTURE de la copie installée — l'oracle la verra au run suivant, il ne la verrouille pas",
+  "le CÂBLAGE des hooks (K7) est DÉCLARÉ, jamais mis en échec : cet oracle s'ouvre à tout run (R-35) et un FAIL y suspend l'ouverture, alors que câbler un hook engage toutes les sessions du poste — c'est une décision humaine (R-29). Bloquer sur une décision pendante briquerait toutes les ouvertures, et un gate qu'on apprend à contourner ne protège plus rien (R-33 bis). Le passage de K7 en bloquant est une décision humaine, pas une décision d'oracle",
+  "les entrées PERSONNELLES du `settings.json` installé (tableau de bord, réglages, hooks de l'humain) : ni jugées, ni listées, ni comptées — seul le câblage attendu par les forges est confronté (même prudence que K4)",
+  "un câblage versionné qui référence un script HORS `<forge>\\.claude\\hooks\\` (ex. `.queue/gates/*.sh`) : il est de portée PROJET, chargé par le harnais quand la session s'ouvre dans ce dépôt, le settings utilisateur n'a pas à le porter — K7 ne confronte que les hooks dont une forge versionne le fichier",
+  "K7 confronte sur le NOM du fichier de hook, pas sur le chemin complet : la copie installée vit ailleurs que sa source, comparer les chemins ne dirait rien. Conséquence assumée et déclarée : deux scripts homonymes dans deux arborescences se confondraient — un constat de trop, jamais un blocage",
+  "`--appliquer` n'écrit JAMAIS dans le `settings.json` installé : il pose le FICHIER d'un hook (K6), il ne le câble pas",
 ];
 
 function racineForges() {
@@ -357,8 +392,119 @@ function jugerHooks(racine, installes, appliquer, findings, applique) {
   });
 }
 
+/** Les entrées de hook d'un `settings.json` — `{ erreur }` si le fichier manque ou ne se lit pas.
+ *
+ *  Forme lue (celle du harnais) : `hooks: { <Événement>: [ { matcher?, hooks: [ { command } ] } ] }`.
+ *  Tout est défensif : un settings.json est un fichier que l'humain édite à la main, et un oracle
+ *  qui plante sur une virgule en trop ne dit plus rien du tout — il déclare, il ne casse pas.
+ */
+function lireCablages(fichier) {
+  if (!fichier || !existsSync(fichier)) return { erreur: `absent (${fichier})` };
+  let brut;
+  try { brut = JSON.parse(readFileSync(fichier, "utf8")); }
+  catch (e) { return { erreur: `illisible (${e.message})` }; }
+  const entrees = [];
+  const hooks = brut && typeof brut === "object" ? brut.hooks : null;
+  if (hooks && typeof hooks === "object") {
+    for (const [evenement, groupes] of Object.entries(hooks)) {
+      for (const groupe of Array.isArray(groupes) ? groupes : []) {
+        const matcher = groupe && typeof groupe.matcher === "string" ? groupe.matcher : null;
+        for (const h of Array.isArray(groupe?.hooks) ? groupe.hooks : []) {
+          if (h && typeof h.command === "string") entrees.push({ evenement, matcher, commande: h.command });
+        }
+      }
+    }
+  }
+  return { entrees };
+}
+
+/** Le câblage ATTENDU par les forges : toutes les entrées des `settings.json` versionnés. */
+function cablagesVersionnes(racine) {
+  const entrees = [];
+  const illisibles = [];
+  if (!existsSync(racine)) return { entrees, illisibles };
+  for (const depot of readdirSync(racine, { withFileTypes: true })) {
+    if (!depot.isDirectory() || !depot.name.startsWith("digit-ai-forge-")) continue;
+    const f = join(racine, depot.name, SOUS_CHEMIN_SETTINGS);
+    if (!existsSync(f)) continue;
+    const lu = lireCablages(f);
+    if (lu.erreur) { illisibles.push(`${depot.name} : ${lu.erreur}`); continue; }
+    for (const e of lu.entrees) entrees.push({ ...e, forge: depot.name });
+  }
+  return { entrees, illisibles };
+}
+
+function resumerCommande(commande) {
+  const plat = commande.replace(/\s+/g, " ").trim();
+  return plat.length > PLAFOND_COMMANDE ? `${plat.slice(0, PLAFOND_COMMANDE)}…` : plat;
+}
+
+/** K7 (TF-0297) — un hook versionné est-il CÂBLÉ ?
+ *
+ *  K6 compare deux copies d'un fichier ; K7 compare deux CÂBLAGES. Un hook dont la copie installée
+ *  est parfaite mais qu'aucun `settings.json` ne référence ne s'exécute jamais : c'est un gate mort
+ *  qui se lit comme un gate sain (loi transverse n°1).
+ *
+ *  DÉCLARATIF PAR CONSTRUCTION : ce jugement n'émet que des findings PASS. Voir `non_juge` pour la
+ *  raison de gouvernance (R-35, R-29, R-33 bis). N'écrit jamais dans le settings installé, même
+ *  sous `--appliquer` : câbler est un acte humain.
+ */
+function jugerCablage(racine, fichierSettings, appliquer, findings) {
+  const hooks = sourcesHooks(racine);
+  const attendus = cablagesVersionnes(racine);
+  const installe = lireCablages(fichierSettings);
+  const declarations = [];
+  if (attendus.illisibles.length) {
+    declarations.push(`${attendus.illisibles.length} settings.json versionné(s) non exploitable(s), déclarés : ${attendus.illisibles.join(" ; ")}`);
+  }
+
+  if (hooks.size === 0) {
+    declarations.push(`aucun hook versionné sous ${racine} — aucun câblage à confronter`);
+  } else {
+    // Confrontation par NOM de fichier : la source vit dans une forge, la copie installée ailleurs.
+    const manquants = [], nulle_part = [], hors_source = [];
+    let cables = 0;
+    for (const [rel, chemins] of [...hooks].sort()) {
+      const nom = basename(rel);
+      const decl = attendus.entrees.filter((e) => e.commande.includes(nom));
+      const pose = (installe.entrees || []).filter((e) => e.commande.includes(nom));
+      if (decl.length && installe.erreur) continue; // confrontation non concluante, dite plus bas
+      if (decl.length && pose.length) { cables += 1; continue; }
+      if (decl.length) {
+        const d = decl[0];
+        const ou = [d.evenement, d.matcher ? `matcher « ${d.matcher} »` : null].filter(Boolean).join(", ");
+        manquants.push(`${nom} — attendu par ${d.forge} (settings versionné : ${ou}) commande « ${resumerCommande(d.commande)} », ABSENT du câblage installé : reporter cette entrée dans ${fichierSettings}`);
+        continue;
+      }
+      if (pose.length) {
+        hors_source.push(`${nom} (source : ${relative(racine, chemins[0])})`);
+        continue;
+      }
+      if (!installe.erreur) nulle_part.push(`${nom} (source : ${relative(racine, chemins[0])})`);
+    }
+    if (installe.erreur) {
+      declarations.push(`câblage installé ${installe.erreur} — la confrontation n'est pas concluante : ${hooks.size} hook(s) versionné(s) ne peuvent être ni confirmés câblés ni déclarés non câblés`);
+    } else {
+      if (cables) declarations.push(`${cables} hook(s) versionné(s) attendu(s) par une forge ET câblé(s) dans le settings installé`);
+      if (manquants.length) declarations.push(`${manquants.length} CÂBLAGE(S) MANQUANT(S) — le hook est versionné et attendu, mais rien ne l'exécute (loi transverse n°1) : ${manquants.join(" ; ")}`);
+      if (nulle_part.length) declarations.push(`${nulle_part.length} hook(s) versionné(s) dont le câblage n'est décrit NULLE PART — ni dans un settings.json versionné, ni dans le câblage installé : ${nulle_part.join(", ")} — un gate versionné que rien n'appelle ne s'exécute jamais (décrire l'entrée attendue dans le settings.json versionné de sa forge la rendrait recâblable)`);
+      if (hors_source.length) declarations.push(`${hors_source.length} hook(s) câblé(s) dans le settings installé sans qu'aucun settings.json versionné le décrive — le câblage existe mais n'est pas reproductible depuis les dépôts : ${hors_source.join(", ")}`);
+      if (!cables && !manquants.length && !nulle_part.length && !hors_source.length) {
+        declarations.push(`${hooks.size} hook(s) versionné(s), aucun écart de câblage`);
+      }
+    }
+  }
+  declarations.push("le câblage personnel de l'humain n'est ni listé ni compté (même prudence que K4)");
+  if (appliquer) declarations.push(`\`--appliquer\` n'a PAS touché ${fichierSettings} : câbler un hook est un acte humain (R-29)`);
+  findings.push({
+    regle: "K7", statut: "PASS", ou: "(déclarations)",
+    message: `${declarations.join(" · ")} — K7 DÉCLARE, il ne met jamais en échec (voir non_juge)`,
+  });
+}
+
 function juger(racine, installes, appliquer = false, purger = false,
-               installesHooks = join(dirname(installes), "hooks")) {
+               installesHooks = join(dirname(installes), "hooks"),
+               settingsInstalle = join(dirname(installes), "settings.json")) {
   const findings = [];
   const par_nom = sources(racine);
   if (par_nom.size === 0) {
@@ -366,7 +512,7 @@ function juger(racine, installes, appliquer = false, purger = false,
     // vaut mieux que de rendre un PASS sur K6 seul — un non-jugement muet se lit comme un vert.
     return {
       verdict: "SKIP", findings,
-      motif: `aucune source de skill sous ${racine} — les hooks ne sont pas jugés non plus (K6 sans racine de forges n'a rien à comparer)`,
+      motif: `aucune source de skill sous ${racine} — les hooks et leur câblage ne sont pas jugés non plus (K6 et K7 sans racine de forges n'ont rien à comparer)`,
     };
   }
   const applique = [];
@@ -434,6 +580,8 @@ function juger(racine, installes, appliquer = false, purger = false,
 
   // K6 : les hooks, même contrat que les skills (TF-0290).
   jugerHooks(racine, installesHooks, appliquer, findings, applique);
+  // K7 : leur CÂBLAGE — déclaré, jamais en échec (TF-0297).
+  jugerCablage(racine, settingsInstalle, appliquer, findings);
 
   // K4 : ce qui est installé sans source versionnée appartient à l'humain. Déclaré, pas jugé.
   const personnels = listeSkills(installes).filter((n) => !par_nom.has(n));
@@ -723,6 +871,107 @@ function selfTest() {
   cas.push(["K6 bis— --appliquer n'arbitre pas un hook revendiqué deux fois",
             readFileSync(join(instH, "qo-gate-write.mjs"), "utf8") === avantD]);
 
+  // ---- TF-0297 : K7, le CÂBLAGE. Un hook dont la copie installée est parfaite mais qu'aucun
+  // `settings.json` ne référence ne s'exécute JAMAIS (loi transverse n°1). K7 est DÉCLARATIF par
+  // construction — chaque cas vérifie donc AUSSI que le verdict reste PASS : un K7 bloquant
+  // briquerait toutes les ouvertures de run sur une décision humaine pendante (R-35, R-33 bis).
+  const base4 = mkdtempSync(join(tmpdir(), "cablage-"));
+  const racine4 = join(base4, "forges");
+  const inst4 = join(base4, ".claude", "skills");
+  const instH4 = join(base4, ".claude", "hooks");
+  const settings4 = join(base4, ".claude", "settings.json"); // le câblage INSTALLÉ
+  const src4 = join(racine4, "digit-ai-forge-agents", ".claude", "skills");
+  const srcH4 = join(racine4, "digit-ai-forge-agents", ".claude", "hooks");
+  const settingsV4 = join(racine4, "digit-ai-forge-agents", ".claude", "settings.json"); // VERSIONNÉ
+  const cablage = (commandes) => JSON.stringify(
+    { hooks: { PostToolUse: [{ matcher: "Write|Edit", hooks: commandes.map((c) => ({ type: "command", command: c })) }] } },
+    null, 1);
+  // Entrée personnelle de l'humain : elle vit dans le settings installé et ne référence AUCUN hook
+  // versionné. Elle ne doit apparaître dans aucun message — ni jugée, ni listée, ni comptée.
+  const CMD_PERSO = 'node -e "tableau-de-bord-perso"';
+  const k7de = (r) => r.findings.find((f) => f.regle === "K7");
+  poser(join(src4, "kappa", "SKILL.md"), "# kappa\n");
+  poser(join(inst4, "kappa", "SKILL.md"), "# kappa\n");
+  poser(join(srcH4, "qo-gate-write.mjs"), hook("1.0.0", "gate C7"));
+  poser(join(instH4, "qo-gate-write.mjs"), hook("1.0.0", "gate C7"));
+  // Le settings versionné déclare le gate C7 ET un gate de portée PROJET (`.queue/gates/…`, cas
+  // réel de forge-agents) : ce dernier n'est pas un hook versionné sous `.claude\hooks\`, il est
+  // chargé quand la session s'ouvre dans le dépôt — K7 n'a pas à le réclamer au poste.
+  poser(settingsV4, cablage(["node ~/.claude/hooks/qo-gate-write.mjs --niveau note",
+                             "bash .queue/gates/g0-budget.sh"]));
+  poser(settings4, cablage(["node C:/Users/humain/.claude/hooks/qo-gate-write.mjs --niveau note",
+                            CMD_PERSO]));
+
+  r = juger(racine4, inst4, false, false, instH4, settings4);
+  let k7 = k7de(r);
+  cas.push(["K7    — hook versionné, attendu par sa forge ET câblé : aucun écart",
+            r.verdict === "PASS" && Boolean(k7) && k7.statut === "PASS"
+            && /1 hook\(s\) versionné\(s\) attendu\(s\) par une forge ET câblé/.test(k7.message)
+            && !/CÂBLAGE\(S\) MANQUANT/.test(k7.message)]);
+  cas.push(["K7    — le câblage PERSONNEL de l'humain n'est ni listé ni compté",
+            Boolean(k7) && !k7.message.includes("tableau-de-bord-perso")]);
+  cas.push(["K7    — un câblage de portée PROJET n'est pas réclamé au poste",
+            Boolean(k7) && !/g0-budget/.test(k7.message)]);
+
+  // Rouge (déclaratif) : le câblage installé perd l'entrée du gate C7 — c'est l'état réel du poste
+  // au 17/08. Le hook est versionné, attendu, sain… et rien ne l'exécute.
+  poser(settings4, cablage([CMD_PERSO]));
+  r = juger(racine4, inst4, false, false, instH4, settings4);
+  k7 = k7de(r);
+  cas.push(["K7    — hook versionné et attendu, ABSENT du câblage installé : déclaré",
+            Boolean(k7) && /CÂBLAGE\(S\) MANQUANT\(S\)/.test(k7.message)
+            && k7.message.includes("qo-gate-write.mjs")]);
+  cas.push(["K7    — le constat nomme la commande et le geste qui la poserait",
+            Boolean(k7) && k7.message.includes("--niveau note")
+            && k7.message.includes(settings4)]);
+  cas.push(["K7    — DÉCLARATIF : câblage manquant, et le verdict reste PASS (R-35, R-33 bis)",
+            r.verdict === "PASS"
+            && !r.findings.some((f) => f.regle === "K7" && f.statut !== "PASS")]);
+
+  // Hook versionné dont le câblage n'est décrit NULLE PART — ni settings versionné, ni installé.
+  poser(join(srcH4, "qo-gate.mjs"), hook("1.0.0", "gate C6"));
+  r = juger(racine4, inst4, false, false, instH4, settings4);
+  k7 = k7de(r);
+  cas.push(["K7    — hook versionné dont le câblage n'est décrit NULLE PART",
+            r.verdict === "PASS" && Boolean(k7) && /NULLE PART/.test(k7.message)
+            && /qo-gate\.mjs \(source/.test(k7.message)]);
+
+  // Câblé au poste sans qu'aucun settings versionné le décrive : le câblage existe mais n'est pas
+  // reproductible depuis les dépôts — l'effacement du settings installé le perdrait sans trace.
+  poser(join(srcH4, "hook-maison.mjs"), hook("1.0.0", "hook maison"));
+  poser(settings4, cablage([CMD_PERSO, "node ~/.claude/hooks/hook-maison.mjs"]));
+  r = juger(racine4, inst4, false, false, instH4, settings4);
+  k7 = k7de(r);
+  cas.push(["K7    — câblé au poste sans description versionnée : déclaré, non reproductible",
+            r.verdict === "PASS" && Boolean(k7)
+            && /sans qu'aucun settings\.json versionné le décrive/.test(k7.message)
+            && k7.message.includes("hook-maison.mjs")]);
+
+  // `--appliquer` pose des FICHIERS de hook, il ne CÂBLE rien : câbler engage toutes les sessions
+  // du poste, c'est un acte humain (R-29). Vérifié à l'octet.
+  const avantS = readFileSync(settings4);
+  const rApp = juger(racine4, inst4, true, false, instH4, settings4);
+  cas.push(["K7    — --appliquer ne touche JAMAIS au settings installé (R-29)",
+            readFileSync(settings4).equals(avantS)
+            && /n'a PAS touché/.test(k7de(rApp).message)]);
+
+  // Settings installé absent : K7 ne peut ni confirmer ni infirmer un câblage — il le DIT, au lieu
+  // de déclarer à tort que tout est décâblé.
+  r = juger(racine4, inst4, false, false, instH4, join(base4, ".claude", "settings-absent.json"));
+  k7 = k7de(r);
+  cas.push(["K7    — câblage installé absent : confrontation non concluante, dite et non devinée",
+            r.verdict === "PASS" && Boolean(k7) && /absent/.test(k7.message)
+            && /n'est pas concluante/.test(k7.message)
+            && !/CÂBLAGE\(S\) MANQUANT/.test(k7.message)]);
+
+  // Un settings.json versionné cassé à la main ne fait pas planter l'oracle : il est déclaré.
+  poser(settingsV4, "{ hooks: pas du json,\n");
+  r = juger(racine4, inst4, false, false, instH4, settings4);
+  k7 = k7de(r);
+  cas.push(["K7    — settings.json versionné illisible : déclaré, l'oracle ne plante pas",
+            r.verdict === "PASS" && Boolean(k7) && /non exploitable/.test(k7.message)
+            && k7.message.includes("digit-ai-forge-agents")]);
+
   let bons = 0;
   for (const [nom, tenu] of cas) {
     console.log(`  [${tenu ? "OK    " : "ECHEC "}] ${nom}`);
@@ -745,11 +994,14 @@ const installes = lire("--installes", join(homedir(), ".claude", "skills"));
 // Les hooks installés sont le frère du dossier des skills (`~\.claude\hooks`) — déduit plutôt que
 // redemandé, pour qu'un `--installes` de test emmène ses hooks avec lui.
 const installes_hooks = lire("--installes-hooks", join(dirname(installes), "hooks"));
+// Le câblage installé est le frère des deux autres (`~\.claude\settings.json`) — même déduction.
+const settings_installe = lire("--settings-installe", join(dirname(installes), "settings.json"));
 const appliquer = args.includes("--appliquer");
 const purger = args.includes("--purger");
 
-const { verdict, findings, motif, applique, purge } = juger(racine, installes, appliquer, purger, installes_hooks);
+const { verdict, findings, motif, applique, purge } = juger(
+  racine, installes, appliquer, purger, installes_hooks, settings_installe);
 process.stdout.write(JSON.stringify(
-  { oracle: ORACLE, version: VERSION, racine, installes, installes_hooks, verdict, motif, applique, purge, findings, non_juge: NON_JUGE },
+  { oracle: ORACLE, version: VERSION, racine, installes, installes_hooks, settings_installe, verdict, motif, applique, purge, findings, non_juge: NON_JUGE },
   null, 1) + "\n");
 process.exit(verdict === "FAIL" ? 1 : verdict === "SKIP" ? 2 : 0);
