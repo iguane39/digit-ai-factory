@@ -1602,4 +1602,5 @@ couvert ».
 attend d'être pris, c'est-à-dire rien.
 
 **Registre en fin de vague : 4 items archivés (308 au total), 10 candidats actifs**
-(TF-0304..0312 + TF-0317, affinements du niveau rôle — patron TF-0295).
+(TF-0304..0312 + TF-0325, affinements du niveau rôle — patron TF-0295 ; d'abord frappé
+TF-0317, renuméroté au merge : une session parallèle du 16/08 avait pris TF-0317..0324).
