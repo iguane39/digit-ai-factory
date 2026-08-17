@@ -138,7 +138,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>396b8154e34a</code> · dernier événement 2026-08-17T08:14:46Z</p>
+      <p class="meta">sceau <code>f0aaef783a71</code> · dernier événement 2026-08-17T08:42:34Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -148,9 +148,9 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="6 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">6</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="0 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">0</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="8 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">8</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="295 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">295</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende">
@@ -164,11 +164,12 @@
       <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
       
       <div class="dropdown" data-dim="forge">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">4</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">5</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
           <label><input type="checkbox" value="digit-ai-forge-agents" checked> digit-ai-forge-agents</label>
           <label><input type="checkbox" value="digit-ai-forge-ops" checked> digit-ai-forge-ops</label>
+          <label><input type="checkbox" value="digit-ai-forge-pilot" checked> digit-ai-forge-pilot</label>
           <label><input type="checkbox" value="digit-ai-forge-tests" checked> digit-ai-forge-tests</label>
           <label><input type="checkbox" value="pilot" checked> pilot</label>
         </div>
@@ -183,19 +184,19 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">6 / 6 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">8 / 8 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-pilot"><strong>digit-ai-forge-pilot</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-forge-agents">
       <h2>digit-ai-forge-agents <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-agents">1</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-agents</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0296" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
+        <article class="card s-en_cours" id="item-TF-0296" data-forge="digit-ai-forge-agents" data-statut="en_cours" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0296</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-en_cours">en_cours</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -215,10 +216,10 @@
       <h2>digit-ai-forge-ops <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-ops">1</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-ops</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0298" data-forge="digit-ai-forge-ops" data-statut="candidat" data-prio="haute">
+        <article class="card s-en_cours" id="item-TF-0298" data-forge="digit-ai-forge-ops" data-statut="en_cours" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0298</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-en_cours">en_cours</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -234,14 +235,54 @@
         </article>
       </div>
     </section>
+    <section id="digit-ai-forge-pilot">
+      <h2>digit-ai-forge-pilot <span class="badge" title="2 item(s) actifs ciblant digit-ai-forge-pilot">2</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-pilot</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <article class="card s-en_cours" id="item-TF-0302" data-forge="digit-ai-forge-pilot" data-statut="en_cours" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0302</code>
+            <span class="statut s-en_cours">en_cours</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : interdire la publication d un livrable de produit sur un service heberge externe (regle de doctrine absente du socle)</h3>
+          <div class="card-detail"><p class="lead">Un rapport d ecarts de perimetre a ete rendu a la fois comme fichier local et comme page hebergee hors du poste (URL claude.ai/code/artifact/7d535fbf-f5b0-4004-8ca8-c0e8d9a456a8, publiee le 17/08), avant toute validation humaine.</p><ul class="puces"><li>Le livrable cite des chemins de code, deux ecarts de securite exploitables en l etat (antivirus 'fake' et /docs ouverts en cible Azure faute de variables Terraform) et des extraits de configuration. Aucune regle du socle ne l interdit : REGLES-PROJET.md et ETAPES-RUN.md cadrent l EMPLACEMENT des livrables sur le poste (G-1, hors racine auditee) mais sont muets sur la publication externe</li><li>BEST-PRACTICES-HTML.md normalise la FORME du HTML livre sans jamais statuer sur son CANAL. La publication a donc ete faite sans enfreindre aucune regle ecrite : c est exactement le defaut. EXIGENCE ATTENDUE : poser au niveau du noyau et de gabarits/CLAUDE-PRODUIT.md qu aucun livrable (rapport, note de synthese, kit, dashboard, maquette) ne passe par un outil de publication hebergee — un livrable est un fichier autoportant sur disque, a l emplacement du produit. Corollaire a ecrire : le retrait de ce qui a deja ete publie n est pas outille aujourd hui</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-pilot</dt><dd>livrable d audit contenant deux ecarts de securite non corriges publie hors du poste avant validation humaine ; aucun moyen outille de le retirer</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Approval2</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-en_cours" id="item-TF-0303" data-forge="digit-ai-forge-pilot" data-statut="en_cours" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0303</code>
+            <span class="statut s-en_cours">en_cours</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : mecaniser l autoportance d un HTML livre — le chemin de publication hebergee produit un fichier sans doctype, charset ni viewport (A1/A3/A4 et R-30 en defaut)</h3>
+          <div class="card-detail"><p class="lead">Quand un livrable HTML est ecrit pour une publication hebergee, l hote fournit doctype, html, head et body au moment de la publication : le fichier ecrit sur disque n en a AUCUN.</p><ul class="puces"><li>Constate sur pieces avant correction sur audit/output/00 - Rapport d audit/Nhood - APR - Ecarts Perimetre CDC - 20260817a.html : ni &lt;!doctype html&gt;, ni &lt;html lang=fr&gt;, ni &lt;meta charset&gt;, ni &lt;meta name=viewport&gt;. Trois regles de references/BEST-PRACTICES-HTML.md violees d un coup : A1 (tout livrable reste auto-portant), A3 (charset puis viewport en tete de head, charset dans les 1024 premiers octets), A4 (title porteur de marque + scope + version + date : le titre valait 'Ecarts Approval V1', sans marque ni indice de version). Consequence mesurable sur un rapport redige en francais : sans declaration d encodage l affichage depend de la devinette du navigateur. R-30/G1 etait aussi en defaut : theme sombre cable sur prefers-color-scheme — precisement le mecanisme retire le 13/08 (TF-0158) et dont la contradiction a ete levee par RV-9 le 14/08, clair par defaut STRICT — sans bascule, sans persistance, sans bloc d impression claire. Corrige sur le livrable Approval2 (doctype, html lang, charset+viewport, titre A4, favicon data: URI, data-theme seul, bascule cablee S-G1, @media print clair, @page) mais le defaut est dans le chemin de production, pas dans ce fichier. CORRECTIF ATTENDU : un oracle (oracle-livrable-html.mjs, ou extension de check_html.py) qui refuse un HTML livre si doctype, html lang, charset dans les 1024 premiers octets, viewport, titre au motif A4, favicon data: ou bascule R-30 manquent, et si une seule src/href sort en reseau</li><li>self-test a double sens comme les fixtures temoin R-30</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-pilot</dt><dd>livrable reecrit apres coup (head complet, palette sombre basculee de prefers-color-scheme vers data-theme, bascule et bloc impression ajoutes) ; 4 regles ecrites du socle violees sans qu aucun controle ne le signale</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Approval2</dd></div>
+            
+          </dl>
+        </article>
+      </div>
+    </section>
     <section id="digit-ai-forge-tests">
       <h2>digit-ai-forge-tests <span class="badge" title="3 item(s) actifs ciblant digit-ai-forge-tests">3</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-tests</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0299" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="haute">
+        <article class="card s-en_cours" id="item-TF-0299" data-forge="digit-ai-forge-tests" data-statut="en_cours" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0299</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-en_cours">en_cours</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -255,10 +296,10 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0300" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
+        <article class="card s-en_cours" id="item-TF-0300" data-forge="digit-ai-forge-tests" data-statut="en_cours" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0300</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-en_cours">en_cours</span>
             <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -272,10 +313,10 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0301" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
+        <article class="card s-en_cours" id="item-TF-0301" data-forge="digit-ai-forge-tests" data-statut="en_cours" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0301</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-en_cours">en_cours</span>
             <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -295,10 +336,10 @@
       <h2>pilot <span class="badge" title="1 item(s) actifs ciblant pilot">1</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0297" data-forge="pilot" data-statut="candidat" data-prio="haute">
+        <article class="card s-en_cours" id="item-TF-0297" data-forge="pilot" data-statut="en_cours" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0297</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-en_cours">en_cours</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
