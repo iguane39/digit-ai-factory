@@ -1,17 +1,17 @@
-# AGENTS.md — digit-ai-forge-pilot
+# AGENTS.md — digit-ai-factory
 
 Instructions pour tout agent IA qui n'a que l'URL de ce dépôt. Suis-les dans l'ordre,
 n'improvise rien.
 
 ## Phase 0 — installer ou mettre à jour (idempotente)
 
-Localise `digit-ai-forge-pilot` dans cet ordre : `$FORGE_ROOT` s'il est défini, sinon le
+Localise `digit-ai-factory` dans cet ordre : `$FORGE_ROOT` s'il est défini, sinon le
 parent du dossier courant, sinon `c:\dev`, sinon `~/.digit-ai-forge`.
 
 - **Introuvable** → installe :
   ```
-  git clone https://github.com/iguane39/digit-ai-forge-pilot ~/.digit-ai-forge/digit-ai-forge-pilot
-  cd ~/.digit-ai-forge/digit-ai-forge-pilot && node bootstrap.mjs
+  git clone https://github.com/iguane39/digit-ai-factory ~/.digit-ai-forge/digit-ai-factory
+  cd ~/.digit-ai-forge/digit-ai-factory && node bootstrap.mjs
   ```
 - **Déjà présent** → mets à jour :
   ```
