@@ -138,7 +138,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>f0aaef783a71</code> · dernier événement 2026-08-17T08:42:34Z</p>
+      <p class="meta">sceau <code>db035428b5ef</code> · dernier événement 2026-08-17T09:16:13Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -148,10 +148,10 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="0 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">0</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="9 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">9</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="8 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">8</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
-      <div class="kpi" title="295 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">295</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
+      <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
+      <div class="kpi" title="303 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">303</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende">
       <span class="leg-item"><span class="leg-swatch" style="background:var(--blue)"></span>candidat</span>
@@ -164,12 +164,10 @@
       <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
       
       <div class="dropdown" data-dim="forge">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">5</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">3</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
           <label><input type="checkbox" value="digit-ai-forge-agents" checked> digit-ai-forge-agents</label>
-          <label><input type="checkbox" value="digit-ai-forge-ops" checked> digit-ai-forge-ops</label>
-          <label><input type="checkbox" value="digit-ai-forge-pilot" checked> digit-ai-forge-pilot</label>
           <label><input type="checkbox" value="digit-ai-forge-tests" checked> digit-ai-forge-tests</label>
           <label><input type="checkbox" value="pilot" checked> pilot</label>
         </div>
@@ -184,148 +182,153 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">8 / 8 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">9 / 9 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-pilot"><strong>digit-ai-forge-pilot</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">4 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">4 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-forge-agents">
-      <h2>digit-ai-forge-agents <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-agents">1</span></h2>
+      <h2>digit-ai-forge-agents <span class="badge" title="4 item(s) actifs ciblant digit-ai-forge-agents">4</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-agents</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-en_cours" id="item-TF-0296" data-forge="digit-ai-forge-agents" data-statut="en_cours" data-prio="haute">
+        <article class="card s-candidat" id="item-TF-0304" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
           <header class="card-head">
-            <code class="tf-id">TF-0296</code>
-            <span class="statut s-en_cours">en_cours</span>
+            <code class="tf-id">TF-0304</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-agents : déclarer le câblage de qo-gate-write.mjs dans le settings.json versionné de la forge</h3>
+          <div class="card-detail"><p class="lead">Mesuré par K7 (TF-0297) : digit-ai-forge-agents/.claude/settings.json ne déclare PAS qo-gate-write.mjs (seulement des gates .queue/gates/*.sh) — le câblage du gate C7 n'est décrit nulle part, donc irreproductible depuis les dépôts.</p><ul class="puces"><li>Ajouter l'entrée PostToolUse attendue au settings versionné : K7 passerait du constat « décrit NULLE PART » au constat actionnable « câblage manquant, voici l'entrée à reporter », et le poste redeviendrait recâblable d'une commande</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12 — gain 3 × preuve 4 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>le gate C7 est mort sur ce poste depuis une date inconnue et AUCUN dépôt ne dit comment le recâbler — la moitié durable du trou que K7 déclare à chaque run</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0306" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0306</code>
+            <span class="statut s-candidat">candidat</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">forge-agents : 13 sidecars d'oracles COMMITTÉS dans .claude/skills — la convention TF-0065 les veut hors dépôt</h3>
-          <div class="card-detail"><p class="lead">Constat de la campagne TF-0289 : git ls-files liste 13 sidecars dans digit-ai-forge-agents/.claude/skills/ (write-an-expert/.oracles-cache.json, contre-expertise/_oracles-journal*.json[l], 6 sous quality-oracles/fixtures/) alors que TF-0065 les gitignore par convention.</p><ul class="puces"><li>C'est précisément pourquoi K2 était vert malgré TF-0289 : le bruit avait été VERSIONNÉ au lieu d'être exclu</li><li>À dégager du suivi git côté forge-agents (en préservant les fixtures VOULUES, à distinguer des artefacts échappés)</li></ul></div>
+          <h3 class="card-titre">forge-agents : _routages-journal.jsonl d'experts-forge est un journal d'exécution TRACKÉ que son self-test salit</h3>
+          <div class="card-detail"><p class="lead">Mesuré pendant la campagne TF-0296 : le simple lancement de self-test-routage.mjs ajoute 8 lignes à .claude/skills/experts-forge/_routages-journal.jsonl (route-experts.mjs:52 l'append), fichier suivi par git — même famille que les 13 sidecars retirés, hors des 13 nommés donc non touché (chirurgie).</p><ul class="puces"><li>À dégager du suivi et couvrir par le motif .gitignore adéquat</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>le bruit versionné a masqué le défaut TF-0289 pendant deux jours : K2 vert à tort, le contrôle disait l'inverse du réel</dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>chaque exécution du self-test crée un diff parasite — le prochain commit pressé l'embarque et le bruit K2 renaît</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 — constat =&gt; candidat)</dd></div>
             
           </dl>
         </article>
-      </div>
-    </section>
-    <section id="digit-ai-forge-ops">
-      <h2>digit-ai-forge-ops <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-ops">1</span></h2>
-      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-ops</strong> — trié par statut puis priorité décroissante.</p>
-      <div class="cartes">
-        <article class="card s-en_cours" id="item-TF-0298" data-forge="digit-ai-forge-ops" data-statut="en_cours" data-prio="haute">
+        <article class="card s-candidat" id="item-TF-0307" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="moyenne">
           <header class="card-head">
-            <code class="tf-id">TF-0298</code>
-            <span class="statut s-en_cours">en_cours</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <code class="tf-id">TF-0307</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">forge-ops : canary ne scelle pas d'empreinte — une cible promue par canary reste SKIP permanent sur O-7</h3>
-          <div class="card-detail"><p class="lead">Constat de la campagne TF-0288 volet prévention : seul deployer scelle empreintes/&lt;release&gt;.json ; une cible dont la release courante a été promue par la voie canary n'a pas de manifeste, donc O-7 sort SKIP à vie sur elle.</p><ul class="puces"><li>Le prompt de campagne citait littéralement deployer|restaurer|etat — extension naturelle, hors périmètre déclaré</li><li>À faire : sceller au même point du cycle canary (après healthcheck, avant promotion)</li></ul></div>
+          <h3 class="card-titre">check_html : check_autonomie extrait les &lt;style&gt; sans retirer les commentaires HTML — faux positif A1 latent</h3>
+          <div class="card-detail"><p class="lead">Constat de la campagne TF-0303 : un commentaire HTML citant url(https://…) avant un &lt;style&gt; produirait un faux positif A1 (défaut latent préexistant, buté 3 fois pendant la campagne — gabarit écrivant &lt;style&gt; en commentaire, fixtures citant &lt;html&gt; ou &lt;link rel=icon&gt; en commentaire).</p><ul class="puces"><li>Les contrôles NEUFS sont protégés par _sans_commentaires() (check_html.py:283-297)</li><li>l'appliquer aussi à check_autonomie, avec fixture double sens</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-ops</dt><dd>un SKIP permanent sur la voie canary est un trou déclaré aujourd'hui, silencieux le jour où canary devient la voie courante</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>trois collisions réelles en une seule campagne sur le mécanisme non protégé — la quatrième sera chez un utilisateur</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 — constat =&gt; candidat)</dd></div>
             
           </dl>
         </article>
-      </div>
-    </section>
-    <section id="digit-ai-forge-pilot">
-      <h2>digit-ai-forge-pilot <span class="badge" title="2 item(s) actifs ciblant digit-ai-forge-pilot">2</span></h2>
-      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-pilot</strong> — trié par statut puis priorité décroissante.</p>
-      <div class="cartes">
-        <article class="card s-en_cours" id="item-TF-0302" data-forge="digit-ai-forge-pilot" data-statut="en_cours" data-prio="haute">
+        <article class="card s-candidat" id="item-TF-0308" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="moyenne">
           <header class="card-head">
-            <code class="tf-id">TF-0302</code>
-            <span class="statut s-en_cours">en_cours</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
+            <code class="tf-id">TF-0308</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">pilot : interdire la publication d un livrable de produit sur un service heberge externe (regle de doctrine absente du socle)</h3>
-          <div class="card-detail"><p class="lead">Un rapport d ecarts de perimetre a ete rendu a la fois comme fichier local et comme page hebergee hors du poste (URL claude.ai/code/artifact/7d535fbf-f5b0-4004-8ca8-c0e8d9a456a8, publiee le 17/08), avant toute validation humaine.</p><ul class="puces"><li>Le livrable cite des chemins de code, deux ecarts de securite exploitables en l etat (antivirus 'fake' et /docs ouverts en cible Azure faute de variables Terraform) et des extraits de configuration. Aucune regle du socle ne l interdit : REGLES-PROJET.md et ETAPES-RUN.md cadrent l EMPLACEMENT des livrables sur le poste (G-1, hors racine auditee) mais sont muets sur la publication externe</li><li>BEST-PRACTICES-HTML.md normalise la FORME du HTML livre sans jamais statuer sur son CANAL. La publication a donc ete faite sans enfreindre aucune regle ecrite : c est exactement le defaut. EXIGENCE ATTENDUE : poser au niveau du noyau et de gabarits/CLAUDE-PRODUIT.md qu aucun livrable (rapport, note de synthese, kit, dashboard, maquette) ne passe par un outil de publication hebergee — un livrable est un fichier autoportant sur disque, a l emplacement du produit. Corollaire a ecrire : le retrait de ce qui a deja ete publie n est pas outille aujourd hui</li></ul></div>
+          <h3 class="card-titre">forge-agents : 6 gabarits de digit-ai-schemas plus rouges sous les règles TF-0303 — conformité ou exemption déclarée, à trancher</h3>
+          <div class="card-detail"><p class="lead">Les contrôles neufs de check_html.py condamnent davantage les gabarits à <code>{{PLACEHOLDER}}</code> de digit-ai-schemas/assets/ (exemple-reference 1→3, template-modele-donnees 1→3, template-multi-bandes 1→3, template-flux-temporel 7→12, template-tableau-de-bord 8→12, template-topologie 7→12 échecs) ; trois étaient DÉJÀ rouges avant la campagne (doctype, :root, h1, @media print).</p><ul class="puces"><li>Ce sont des gabarits non auto-portants PAR CONCEPTION</li><li>Décision attendue : les mettre en conformité, ou déclarer une exemption pour l'arbre assets/ d'un skill (une exemption non consignée n'existe pas — R-30 §3)</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-pilot</dt><dd>livrable d audit contenant deux ecarts de securite non corriges publie hors du poste avant validation humaine ; aucun moyen outille de le retirer</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Approval2</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-en_cours" id="item-TF-0303" data-forge="digit-ai-forge-pilot" data-statut="en_cours" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0303</code>
-            <span class="statut s-en_cours">en_cours</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : mecaniser l autoportance d un HTML livre — le chemin de publication hebergee produit un fichier sans doctype, charset ni viewport (A1/A3/A4 et R-30 en defaut)</h3>
-          <div class="card-detail"><p class="lead">Quand un livrable HTML est ecrit pour une publication hebergee, l hote fournit doctype, html, head et body au moment de la publication : le fichier ecrit sur disque n en a AUCUN.</p><ul class="puces"><li>Constate sur pieces avant correction sur audit/output/00 - Rapport d audit/Nhood - APR - Ecarts Perimetre CDC - 20260817a.html : ni &lt;!doctype html&gt;, ni &lt;html lang=fr&gt;, ni &lt;meta charset&gt;, ni &lt;meta name=viewport&gt;. Trois regles de references/BEST-PRACTICES-HTML.md violees d un coup : A1 (tout livrable reste auto-portant), A3 (charset puis viewport en tete de head, charset dans les 1024 premiers octets), A4 (title porteur de marque + scope + version + date : le titre valait 'Ecarts Approval V1', sans marque ni indice de version). Consequence mesurable sur un rapport redige en francais : sans declaration d encodage l affichage depend de la devinette du navigateur. R-30/G1 etait aussi en defaut : theme sombre cable sur prefers-color-scheme — precisement le mecanisme retire le 13/08 (TF-0158) et dont la contradiction a ete levee par RV-9 le 14/08, clair par defaut STRICT — sans bascule, sans persistance, sans bloc d impression claire. Corrige sur le livrable Approval2 (doctype, html lang, charset+viewport, titre A4, favicon data: URI, data-theme seul, bascule cablee S-G1, @media print clair, @page) mais le defaut est dans le chemin de production, pas dans ce fichier. CORRECTIF ATTENDU : un oracle (oracle-livrable-html.mjs, ou extension de check_html.py) qui refuse un HTML livre si doctype, html lang, charset dans les 1024 premiers octets, viewport, titre au motif A4, favicon data: ou bascule R-30 manquent, et si une seule src/href sort en reseau</li><li>self-test a double sens comme les fixtures temoin R-30</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-pilot</dt><dd>livrable reecrit apres coup (head complet, palette sombre basculee de prefers-color-scheme vers data-theme, bascule et bloc impression ajoutes) ; 4 regles ecrites du socle violees sans qu aucun controle ne le signale</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Approval2</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>des gabarits rouges à l'oracle de leur propre socle fabriquent le bruit permanent que TF-0228 a coûté cher à éteindre</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 — constat =&gt; candidat)</dd></div>
             
           </dl>
         </article>
       </div>
     </section>
     <section id="digit-ai-forge-tests">
-      <h2>digit-ai-forge-tests <span class="badge" title="3 item(s) actifs ciblant digit-ai-forge-tests">3</span></h2>
+      <h2>digit-ai-forge-tests <span class="badge" title="4 item(s) actifs ciblant digit-ai-forge-tests">4</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-tests</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-en_cours" id="item-TF-0299" data-forge="digit-ai-forge-tests" data-statut="en_cours" data-prio="haute">
+        <article class="card s-candidat" id="item-TF-0309" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="haute">
           <header class="card-head">
-            <code class="tf-id">TF-0299</code>
-            <span class="statut s-en_cours">en_cours</span>
+            <code class="tf-id">TF-0309</code>
+            <span class="statut s-candidat">candidat</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">forge-tests : la recette ne DIT pas que le conteneur est la cause — 10 [MANQUE] indiscernables d'une régression</h3>
-          <div class="card-detail"><p class="lead">Vécu le 17/08 pendant la campagne : Docker Desktop arrêté → la suite backend des bancs sort en code 1 (docker.errors.DockerException) → les pans api/data/migrations/fichiers/back n'ont aucune couverture → 10 défauts du corpus en [MANQUE] (12/22).</p><ul class="puces"><li>Le lecteur voit 10 [MANQUE] et doit DÉDUIRE le démon absent — même symptôme que TF-0233</li><li>La section lint déclare déjà un ruff introuvable comme tel (TF-0226) : appliquer le même idiome — une section dont le préalable d'environnement manque le déclare (« conteneur indisponible : N défauts non mesurables »), au lieu de ressembler à une régression</li></ul></div>
+          <h3 class="card-titre">forge-tests : schema_obtenu rend None sans motif propre quand le conteneur manque sur son seul chemin</h3>
+          <div class="card-detail"><p class="lead">Reste déclaré de TF-0299 : execution.py:schema_obtenu (rejeu des migrations sur base neuve, également par conteneur) rend <code>None</code> sans déclarer de motif — couvert aujourd'hui par le motif du domaine backend, mais un préalable absent sur CE seul chemin resterait muet.</p><ul class="puces"><li>Lui donner le même marqueur PREALABLE_ABSENT</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 3 × preuve 4 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>~5 minutes de diagnostic consommées en pleine campagne, et sans agent vigilant un faux « S-01 NON TENU » de plus</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>le seul chemin conteneur encore capable de se taire — la maladie que TF-0299 vient d'éradiquer partout ailleurs</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 — constat =&gt; candidat)</dd></div>
             
           </dl>
         </article>
-        <article class="card s-en_cours" id="item-TF-0300" data-forge="digit-ai-forge-tests" data-statut="en_cours" data-prio="moyenne">
+        <article class="card s-candidat" id="item-TF-0312" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
           <header class="card-head">
-            <code class="tf-id">TF-0300</code>
-            <span class="statut s-en_cours">en_cours</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <code class="tf-id">TF-0312</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">forge-tests : entrée de corpus H-20 prouvant la branche FAIL de l'écart servi ↔ versionné en recette</h3>
-          <div class="card-detail"><p class="lead">La campagne TF-0288 a prouvé la branche FAIL par 13 tests pytest et les branches PASS/SKIP en recette sur les deux bancs ; une entrée H-20 exigerait de planter une divergence servi/source dans le banc rouge (composant source promettant une entrée que dist/ ne sert pas), pour que la recette S-01 mesure aussi la branche qui accuse.</p><ul class="puces"><li>Hors de la lettre de la campagne, déclaré en reste</li></ul></div>
+          <h3 class="card-titre">forge-tests : l'écart servi↔versionné compare des espaces de clés différents quand aucune locale n'est déclarée — fausse accusation possible</h3>
+          <div class="card-detail"><p class="lead">Défaut latent de TF-0288 trouvé pendant la campagne TF-0300 : quand l'arborescence source ne déclare AUCUNE locale et que le build servi en sert une, la source promet /en/tarifs quand le servi est délocalisé en /tarifs — le contrôle accuserait un déploiement CORRECT de 3 entrées manquantes (reproduit pendant l'étude ; ne se déclenche sur aucun des deux bancs aujourd'hui).</p><ul class="puces"><li>Aligner les espaces de clés ou suspendre le jugement quand les locales ne sont ni littérales ni configurées — cohérent avec la suspension TF-0295</li><li></li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 2 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>un contrôle dont la recette ne prouve que les branches vertes repose sur pytest seul pour sa branche accusatrice — exactement l'écart que TF-0293 vient de fermer pour le pan i18n</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>un faux positif sur le contrôle né avant-hier coûterait sa crédibilité avant son premier vrai cas — la maladie documentée par l'étude 20260815e</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 — constat =&gt; candidat)</dd></div>
             
           </dl>
         </article>
-        <article class="card s-en_cours" id="item-TF-0301" data-forge="digit-ai-forge-tests" data-statut="en_cours" data-prio="moyenne">
+        <article class="card s-candidat" id="item-TF-0310" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
           <header class="card-head">
-            <code class="tf-id">TF-0301</code>
-            <span class="statut s-en_cours">en_cours</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <code class="tf-id">TF-0310</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">forge-tests : un test du pan i18n passe trivialement — l'assertion ne discrimine rien sur un banc sans finding</h3>
-          <div class="card-detail"><p class="lead">Constat hors périmètre de la campagne du 17/08 : tests/test_tf_0284_i18n.py::test_vert_la_locale_par_defaut_n_est_jamais_jugee_sur_sa_langue asserte « aucun message ne contient FRANÇAIS » sur le banc vert — qui n'a AUCUN finding : l'assertion est vraie à vide, le test ne prouve pas ce que son nom promet.</p><ul class="puces"><li>Lui donner une fixture où la locale par défaut a du contenu jugeable et vérifier qu'elle n'est PAS jugée</li></ul></div>
+          <h3 class="card-titre">forge-tests : le préfixe de corpus de H-13 (interface:) apparie AUSSI le constat de H-20 — filtrer sur la classe du finding</h3>
+          <div class="card-detail"><p class="lead">Constat déclaré en commentaire du corpus par la campagne TF-0300 : H-13 (affordances inertes, préfixe interface:) apparie aussi interface:ecart-servi: — les 6 affordances du banc rouge couvrent H-13 aujourd'hui, mais un préfixe qui déborde reste un préfixe qui déborde : une entrée pourrait passer [DETECTE] sur le mauvais défaut.</p><ul class="puces"><li>Remède esquissé : apparier sur la classe du finding ou exclusion dans _findings — change le contrat des entrées de corpus, d'où l'item dédié</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 1 × preuve 3 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>un test vert qui ne discrimine rien vaut un contrôle jamais joué (R-35) : il rassure sans prouver</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>un corpus dont une entrée peut être couverte par le défaut d'une autre mesure moins que ce qu'il affiche</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0311" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0311</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : deux comptes périmés au README (« 19/19 des défauts », « chacun des 16 défauts plantés ») — le corpus est à 23</h3>
+          <div class="card-detail"><p class="lead">Constat hors périmètre de la campagne TF-0300 : le README porte deux comptes préexistants périmés depuis que le corpus est passé à 22 puis 23 défauts.</p><ul class="puces"><li>Une donnée volatile dupliquée en prose (loi 4) : corriger, ou remplacer par une référence au compte vivant</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 1 × preuve 4 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>un lecteur du README croit à un corpus de 19 quand la recette en mesure 23 — la doc dément l'outil</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 — constat =&gt; candidat)</dd></div>
             
           </dl>
@@ -336,19 +339,19 @@
       <h2>pilot <span class="badge" title="1 item(s) actifs ciblant pilot">1</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-en_cours" id="item-TF-0297" data-forge="pilot" data-statut="en_cours" data-prio="haute">
+        <article class="card s-candidat" id="item-TF-0305" data-forge="pilot" data-statut="candidat" data-prio="moyenne">
           <header class="card-head">
-            <code class="tf-id">TF-0297</code>
-            <span class="statut s-en_cours">en_cours</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <code class="tf-id">TF-0305</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">oracle-skills : K6 juge l'INTÉGRITÉ d'un hook, pas son CÂBLAGE — un hook sain jamais référencé ne s'exécute jamais</h3>
-          <div class="card-detail"><p class="lead">Constat de la campagne TF-0290, et état réel du poste au 17/08 : ~/.claude/hooks n'existe pas et ~/.claude/settings.json ne référence plus aucun gate qo-gate — le gate C7 (5 blocages réels le 15/08) est versionné mais ni installé ni câblé, et K6 le DÉCLARE sans le juger. C'est la loi transverse n°1 (toute affordance est câblée ou n'existe pas) appliquée aux hooks : un contrôle d'intégrité qui ne dit rien du câblage laisse un gate mort passer pour un gate en retard d'installation.</p><p class="detail-label">Proposition</p><ul class="puces"><li>une règle K7 (ou extension K6) qui lit les settings.json versionnés des forges et compare au settings.json installé — divergence de câblage déclarée, avec la même prudence que K4/K5</li></ul></div>
+          <h3 class="card-titre">oracle-skills : K7 ne vérifie pas qu'une commande câblée pointe un fichier qui EXISTE</h3>
+          <div class="card-detail"><p class="lead">Constat de la campagne K7 : un câblage installé vers un chemin mort se lit « câblé » — le hook ne s'exécutera jamais, même maladie que le câblage absent, un cran plus loin.</p><ul class="puces"><li>Croisement K6 × K7 possible : pour chaque entrée câblée, vérifier que la commande résout vers un fichier présent (installé ou versionné), constat déclaratif comme le reste de K7</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 3 × preuve 4 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>le gate le plus joué de l'écosystème ne bloque plus rien depuis une date inconnue, et seul un agent parti vérifier autre chose l'a vu</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 2 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>un câblage vers un chemin mort donne exactement la même assurance qu'un gate câblé, sans en avoir aucune propriété</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 — constat =&gt; candidat)</dd></div>
             
           </dl>

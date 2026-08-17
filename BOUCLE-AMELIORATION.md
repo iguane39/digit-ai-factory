@@ -1536,3 +1536,40 @@ pourquoi K2 était vert à tort) ; Docker arrêté = 10 [MANQUE] muets à la rec
 
 **Registre en fin de vague : 8 items archivés (296 au total), 6 candidats actifs**
 (TF-0296..0301), tous nés des campagnes du jour.
+
+## Campagne du 17/08/2026 (2e vague) — « traite les TODOs à faire » : 8 items, 4 campagnes + doctrine, R-38 née d'un lot du matin
+
+**La boîte d'entrée a fait son travail en direct** : B1 FAIL à l'ouverture — le lot
+`Approval2 - RETOURS - 20260817a` était arrivé PENDANT la première vague. Deux retours
+sérieux : **RG-07 bloquant** — un rapport d'écarts citant deux failles de sécurité
+exploitables publié sur un hébergement externe AVANT toute validation humaine, sans
+enfreindre aucune règle écrite (« c'est exactement le défaut ») ; RG-08 — le même chemin
+produit du HTML non autoportant (A1/A3/A4/R-30 violées, zéro contrôle joué). Ingéré
+(TF-0302/0303), étudié (20260817b PASS 7/7, verdict O3 : règle + mécanisation + appelant
+nommé), décidé sous mandat.
+
+**La doctrine, par le pilot lui-même** : **R-38** (§R) — aucun livrable de produit sur un
+service de publication hébergée sans GO humain préalable consigné ; le retrait d'une
+publication fautive est un geste humain consigné. Encodée au noyau, en §R et au gabarit
+produit — et en passant, **FAIL N1 préexistant réparé** : le noyau hérité du pull pesait
+6235 octets > 6144 ; dégraissé à 6133 sans perdre une règle (descripteurs seuls).
+
+**Quatre campagnes en parallèle, une par dépôt, rendues en 6 à 30 min** :
+· **tests@053141d (3 commits)** : pytest 637 → **656**, corpus 22 → **23** (H-20 : la
+branche qui ACCUSE l'écart servi↔versionné entre en recette), S-01 TENU 13/13 rejoué. Un
+préalable d'environnement absent se DIT désormais (10 [MANQUE] muets → [NON MESURABLE]
+motivés, S-01 NON PRONONCÉ exit 3 — jamais un faux NON TENU) ; un test trivialement vert
+prouvé tel PAR MUTATION puis rendu discriminant. · **agents@8ec054a (2 commits)** : les
+13 sidecars committés retirés du suivi (chacun tracé à son écrivain ; le dépôt versionnait
+ce que son propre outil de synchro refuse de copier), et `check_html.py` +5 contrôles —
+le fichier fautif d'Approval2 déclencherait **11 échecs au lieu de 0** ; la règle a
+condamné la référence du socle elle-même (charset au 1613e octet du boilerplate, corrigé).
+· **ops@1c4387d** : la voie canary scelle son empreinte — plus de SKIP à vie sur O-7
+(self-test 63 → 68). · **pilot@945f102** : **K7** — le câblage des hooks devient visible
+sans jamais bloquer (déclaratif par construction, précédent R-33 bis) ; 4 mutations
+tuées ; K7 nomme l'état du poste : le câblage de qo-gate-write n'est décrit NULLE PART.
+
+**Registre en fin de vague : 8 items archivés (304 au total), 9 candidats actifs**
+(TF-0304..0312), tous nés des campagnes — dont le défaut latent du contrôle né la veille
+(TF-0312), trouvé par la campagne qui le mettait en recette : la boucle se mord la queue
+dans le bon sens.
