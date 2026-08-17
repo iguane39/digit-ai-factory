@@ -173,6 +173,158 @@ check("vue : 2 générations identiques (sha256) sur le registre réel", () => {
   if (a !== b) throw new Error("vue non déterministe");
 });
 
+// ---- page de recherche des items CLOS (TF-0350) --------------------------------------------
+// Cinq contrôles, chacun à DOUBLE SENS : la fixture verte passe, et une fixture rouge à défaut
+// planté échoue pour la bonne raison. Un contrôle dont la version rouge passe aussi ne prouve
+// rien — c'est ce que la fixture témoin de RV-9 avait appris à ses dépens.
+const genArchive = join(ICI, "generer-archive.mjs");
+const genererArchive = (src, out) => execFileSync("node", [genArchive, src, out], { encoding: "utf8" });
+const shaFic = (f) => createHash("sha256").update(readFileSync(f)).digest("hex");
+const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+// Simulation fidèle de la recherche côté client : une carte = un `textContent` normalisé, et
+// `indexOf` dessus. Tester la recherche sans navigateur exige de reproduire son entrée, pas de
+// se contenter d'un `includes` sur le fichier entier — qui passerait sur n'importe quel octet.
+const cartesDe = (html) => [...html.matchAll(/<article class="card [^>]*id="item-(TF-\d+)"[\s\S]*?<\/article>/g)]
+  .map((m) => ({ id: m[1], texte: norm(m[0].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ")) }));
+const chercher = (html, q) => cartesDe(html).filter((c) => c.texte.includes(norm(q))).map((c) => c.id);
+// A1 — ce qui ÉMET une requête, c'est un `src`/`href`/`url()` sortant, pas une adresse CITÉE en
+// prose : l'archive contient l'histoire d'items qui parlent d'URL de staging, et les censurer
+// falsifierait le registre. Le namespace SVG du favicon `data:` n'est pas une requête.
+const emettrices = (html) => [...html.matchAll(/(?:\bsrc|\bhref)\s*=\s*"(https?:\/\/[^"]*)"|url\(\s*['"]?(https?:\/\/[^'")\s]*)/gi)]
+  .map((m) => m[1] || m[2]).filter((u) => !u.startsWith("http://www.w3.org/"));
+const sceauDe = (html) => (html.match(/sceau <code>([0-9a-f]{12})<\/code>/) || [])[1];
+
+// Fixture VERTE : une histoire complète et légale, du candidat à l'archive.
+const arcV = join(T, "archive-verte.jsonl");
+writeFileSync(arcV, [
+  item({ titre: "Rattrapage du renommage dans les gabarits de lot", contenu: "Les gabarits citent l'ancien nom du dépôt ; à corriger au prochain run de version." }),
+  maj({ statut: "decide", decideur: "humain — mandat de fixture du 08/08", date_decision: "2026-08-08" }),
+  maj({ ts: "2026-08-08T12:00:00Z", statut: "en_cours" }),
+  maj({ ts: "2026-08-08T13:00:00Z", statut: "corrige", date_correction: "2026-08-08", forges_cibles_reelles: ["tests"],
+    version_forge_corrigee: "tests@abc1234", corrections_realisees: "Gabarits repris, ancien nom retiré des trois fichiers.",
+    gains_constates: "Plus aucune citation de l'ancien nom : 3 occurrences avant, 0 après." }),
+  JSON.stringify({ ev: "maj", ts: "2026-08-08T14:00:00Z", id: "TF-9001", statut: "archive" }),
+].join("\n") + "\n");
+const pageV = join(T, "archive-verte.html");
+genererArchive(arcV, pageV);
+const htmlV = readFileSync(pageV, "utf8");
+
+check("archive verte : les jalons de l'item clos sont TOUS rendus (création → décision → clôture → archivage)", () => {
+  const c = cartesDe(htmlV).find((x) => x.id === "TF-9001");
+  if (!c) throw new Error("l'item archivé n'a pas de carte");
+  for (const attendu of ["creation", "decision", "travaux ouverts", "cloture", "archivage", "mandat de fixture", "0 apres", "abc1234"])
+    if (!c.texte.includes(attendu)) throw new Error(`jalon ou champ d'histoire absent : « ${attendu} »`);
+  if (!/data-statut="corrige"/.test(htmlV)) throw new Error("statut FINAL non dérivé : « archive » écrase corrige|ecarte, la page devient infiltrable");
+});
+
+check("archive : génération déterministe — 2 générations sur la même source donnent le même octet", () => {
+  const a = join(T, "det-a.html"), b = join(T, "det-b.html");
+  genererArchive(join(ICI, "TODO-ARCHIVE.jsonl"), a);
+  genererArchive(join(ICI, "TODO-ARCHIVE.jsonl"), b);
+  if (shaFic(a) !== shaFic(b)) throw new Error("page non déterministe sur l'archive réelle");
+});
+
+check("archive rouge (déterminisme) : deux sources différentes → sha différents (le contrôle discrimine)", () => {
+  const c = join(T, "det-c.html");
+  genererArchive(arcV, c);
+  if (shaFic(c) === shaFic(join(T, "det-a.html"))) throw new Error("le contrôle de déterminisme est tautologique — il passerait sur n'importe quoi");
+});
+
+check("archive : un item connu de l'archive RÉELLE est retrouvé par la recherche plein texte", () => {
+  const reel = join(T, "reel.html");
+  genererArchive(join(ICI, "TODO-ARCHIVE.jsonl"), reel);
+  const h = readFileSync(reel, "utf8");
+  if (cartesDe(h).length < 100) throw new Error(`${cartesDe(h).length} cartes — l'archive réelle en porte 300+`);
+  if (!chercher(h, "renommage").includes("TF-0062")) throw new Error("TF-0062 introuvable par « renommage »");
+});
+
+check("archive rouge (recherche) : un terme absent ne retourne RIEN — le chercheur n'est pas toujours-vrai", () => {
+  if (chercher(htmlV, "zzzintrouvablezzz").length !== 0) throw new Error("la recherche retourne des résultats pour un terme absent");
+});
+
+// Critère d'acceptation littéral de TF-0350 (mandat du 17/08). TF-0317 était encore ACTIF au
+// moment de la campagne (corrige, non archivé — archiver.mjs abandonne fail-closed sur R10) :
+// le cas assemble donc son histoire là où elle vit — actif ou archive — et vaut avant comme
+// après l'archivage. Ce que le critère exige, c'est que la page le retrouve, pas que le
+// registre soit dans un état donné.
+check("archive : critère TF-0350 — « renommage » retrouve TF-0062 ET TF-0317 avec leur histoire complète", () => {
+  const tous = [...readFileSync(join(ICI, "TODO-ARCHIVE.jsonl"), "utf8").split("\n"), ...readFileSync(join(ICI, "TODO.jsonl"), "utf8").split("\n")]
+    .filter((l) => l.trim()).map((l) => ({ brut: l, ...JSON.parse(l) }));
+  const lignes = [];
+  for (const id of ["TF-0062", "TF-0317"]) {
+    const ev = tous.filter((e) => e.id === id);
+    if (!ev.length) throw new Error(`${id} introuvable dans les deux registres`);
+    lignes.push(...ev.map((e) => e.brut));
+    // un item encore actif n'a pas sa transition d'archivage : archiver.mjs la posera
+    if (!ev.some((e) => e.statut === "archive")) lignes.push(JSON.stringify({ ev: "maj", ts: "2026-08-17T23:59:59Z", id, statut: "archive" }));
+  }
+  const src = join(T, "critere.jsonl"), out = join(T, "critere.html");
+  writeFileSync(src, lignes.join("\n") + "\n");
+  genererArchive(src, out);
+  const h = readFileSync(out, "utf8"), trouves = chercher(h, "renommage");
+  for (const id of ["TF-0062", "TF-0317"]) {
+    if (!trouves.includes(id)) throw new Error(`« renommage » ne retrouve pas ${id}`);
+    const c = cartesDe(h).find((x) => x.id === id);
+    for (const jalon of ["creation", "decision", "cloture", "archivage"])
+      if (!c.texte.includes(jalon)) throw new Error(`${id} : histoire incomplète, jalon « ${jalon} » absent`);
+    if (!/decideur/.test(c.texte)) throw new Error(`${id} : décideur absent de l'histoire`);
+    if (!/gains constates/.test(c.texte)) throw new Error(`${id} : gains constatés absents de l'histoire`);
+  }
+});
+
+// Loi transverse n°3 : une recherche sans résultat le DIT. L'état vide est câblé (il nomme le
+// terme cherché) et sa réinitialisation aussi — un état vide sans issue est un cul-de-sac.
+const controleEtatVide = (h) => {
+  if (!/id="vide"[^>]*class="etat-vide"/.test(h)) throw new Error("aucun état vide dans la page");
+  if (!/id="vide-reinit"/.test(h) || !h.includes("getElementById('vide-reinit').addEventListener")) throw new Error("état vide sans issue câblée");
+  if (!h.includes("vide.hidden = visibles !== 0")) throw new Error("état vide jamais montré — affordance non câblée (loi 1)");
+  if (!h.includes("videQuoi.textContent")) throw new Error("état vide muet : il ne nomme pas ce qui a été cherché (loi 3)");
+};
+check("archive : état vide explicite, câblé et parlant (loi 3)", () => controleEtatVide(htmlV));
+check("archive rouge (état vide) : une page dont l'état vide est retiré est REFUSÉE", () => {
+  const mutile = htmlV.replace(/<p id="vide"[\s\S]*?<\/p>/, "");
+  try { controleEtatVide(mutile); } catch (e) { return; }
+  throw new Error("le contrôle d'état vide ne détecte pas son absence");
+});
+
+check("archive : autonome (A1) — aucune référence réseau émettrice dans la page", () => {
+  const u = emettrices(htmlV);
+  if (u.length) throw new Error(`${u.length} référence(s) réseau : ${u.slice(0, 3).join(", ")}`);
+  if (!/href="data:image\/svg\+xml,/.test(htmlV)) throw new Error("favicon non embarqué en data: URI (A2)");
+});
+check("archive rouge (A1) : une image distante injectée est DÉTECTÉE", () => {
+  const pollue = htmlV.replace("<body>", '<body><img src="https://exemple.test/pixel.png" alt="">');
+  if (emettrices(pollue).length !== 1) throw new Error("le contrôle A1 ne voit pas une requête réseau injectée");
+});
+
+check("archive : le sceau de fraîcheur CHANGE quand la source change (page périmée détectable)", () => {
+  const src2 = join(T, "archive-bougee.jsonl"), page2 = join(T, "archive-bougee.html");
+  writeFileSync(src2, readFileSync(arcV, "utf8")
+    + JSON.stringify({ ev: "maj", ts: "2026-08-08T15:00:00Z", id: "TF-9001", statut: "archive" }) + "\n");
+  genererArchive(src2, page2);
+  const s1 = sceauDe(htmlV), s2 = sceauDe(readFileSync(page2, "utf8"));
+  if (!s1 || !s2) throw new Error("sceau absent de la page — une page périmée serait indétectable");
+  if (s1 === s2) throw new Error("sceau inchangé alors que la source a bougé");
+});
+check("archive rouge (sceau) : source INCHANGÉE → sceau identique (le sceau n'est pas aléatoire)", () => {
+  const page3 = join(T, "archive-bis.html");
+  genererArchive(arcV, page3);
+  if (sceauDe(readFileSync(page3, "utf8")) !== sceauDe(htmlV)) throw new Error("sceau instable à source constante");
+});
+
+// R-30 : clair par défaut STRICT, bascule câblée et persistée, impression claire — et le
+// `color-scheme` porté par les tokens, jamais figé dans un <meta> (amendement RV-9 du 14/08 ;
+// generer-page.mjs porte encore ce <meta> fautif, generer-archive.mjs ne le recopie pas).
+check("archive : charte R-30 tenue et défaut RV-9 non recopié", () => {
+  if (/prefers-color-scheme:\s*dark/.test(htmlV)) throw new Error("auto-sombre hérité de l'OS — retiré par l'amendement TF-0158");
+  for (const attendu of ['id="theme-toggle"', "localStorage.setItem('digitai-theme'", 'data-theme="dark"', "@media print"])
+    if (!htmlV.includes(attendu)) throw new Error(`bascule ou impression R-30 non câblée : « ${attendu} » absent`);
+  if (/<meta\s+name="color-scheme"/i.test(htmlV.replace(/<!--[\s\S]*?-->/g, "")))
+    throw new Error("color-scheme figé dans un <meta> — défaut RV-9 recopié de generer-page.mjs");
+  if (!/:root \{\s*\n\s*color-scheme:light/.test(htmlV) || !/:root\[data-theme="dark"\] \{\s*\n\s*color-scheme:dark/.test(htmlV))
+    throw new Error("color-scheme absent des blocs de tokens — les surfaces du navigateur ne suivraient pas le thème (RV-9)");
+});
+
 rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 console.log(`\nSelf-test TODO-FORGE : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
