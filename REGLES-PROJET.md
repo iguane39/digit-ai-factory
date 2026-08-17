@@ -35,6 +35,19 @@ projet (2e mandat) · **G** = gate humain.
 | 5 | L'indice est une lettre (a, b, c…) par itération du même jour ; une nouvelle version = un **nouveau fichier daté**, jamais d'écrasement | observée (`20260721b` → `20260721d`, `revue.md`/`revue-v2`) | livrables uniquement | S+O | faible | **défaut** |
 | 25 | Le `<Type>` du nom de tout livrable daté (2ᵉ segment, 1ᵉʳ mot) **figure au registre des types** (`registre-types.json` d'organization, comparaison insensible casse/accents) — un type nouveau s'ajoute au registre dans un commit motivé (D-04), jamais improvisé dans un nom. Registre lu en dépôt frère ; poste non équipé → non jugeable, pas FAIL | **D-04 organization (décidée 08/08), encodée 11/08 (TF-0084)** — registre 1.1.0, 29 types, complété sur usage réel | produits, nouveaux + rattrapage | O | nul | **défaut** |
 
+**Alinéa paramétrage (TF-0322, décidé le 17/08 — étude 20260817f, verdict O1 : refus
+instruit d'un système de paramètres).** Trois classes de conventions ne se négocient pas,
+chacune pour un motif mesuré : les **identifiants stables** (ids TF, ids de schéma §3 bis —
+un id renuméroté casse toute traçabilité), le **motif daté des livrables** (règle 4 — 19 lots
+de 9 produits cohabitent dans une seule boîte d'entrée parce que le nom dit qui retourne
+quoi), les **familles d'`output\`** (D-15 — le seul conflit de graphie de l'histoire s'est
+réglé par alignement, zéro re-migration). Ce qui EST paramétrable existe déjà et se déclare :
+le bloc `nommage` des profils `quality-oracles` (prefixe, libelle, declencheur, regex — jugé
+par `oracle-nommage.mjs`, SKIP motivé sans profil, TF-0071) et l'alinéa RV-2 de la règle 4
+(un entrant qui exige un autre nommage : le pilot prime, correspondance au ledger). Un
+demandeur reçoit une voie, pas un mur ; critère de réouverture : un deuxième conflit de
+préférence réel consigné au ledger.
+
 ## C. Versions et git
 
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
@@ -369,8 +382,8 @@ Deux corollaires opposables :
    verdicts portés au ledger en `oracles_verdict` (pas 1 de `references\ETAPES-RUN.md`). Un
    échec **suspend l'ouverture** : des oracles qui ne savent plus refuser ne peuvent rien juger
    de ce qui suit, un lot non pris fausse tout ce qu'on croit savoir du reste-à-faire, et un
-   skill — ou un hook (K6, TF-0290) — divergent fait exécuter autre chose que ce que le
-   dépôt versionne.
+   skill — ou un hook (K6-K8, TF-0290/0297/0305 : intégrité, câblage, existence du fichier
+   câblé) — divergent fait exécuter autre chose que ce que le dépôt versionne.
 
    *Corollaire du corollaire, appris le 15/08* : un applicateur ne présume **jamais** du sens
    de la dérive. La copie installée n'est pas toujours celle qui est en retard — `--appliquer`

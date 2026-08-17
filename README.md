@@ -4,7 +4,7 @@
 > (`git clone` + `node bootstrap.mjs`, fin « Poste prêt » exigée), mets-le à jour sinon,
 > puis déroule [references/ACCUEIL.md](references/ACCUEIL.md). N'improvise pas.
 
-Projet de pilotage de l'écosystème forge Digit-AI. **Un seul point de démarrage** pour construire
+La **factory** de l'écosystème forge Digit-AI — son projet de pilotage. **Un seul point de démarrage** pour construire
 un produit en mobilisant les treize forges bout en bout, et pour les améliorer par itérations
 bornées.
 

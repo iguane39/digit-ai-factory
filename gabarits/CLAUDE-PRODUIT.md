@@ -43,7 +43,8 @@ Boucle intérieure (libre, sans verdict) : `<commandes locales : pytest, ruff, s
 ## Conventions locales
 
 - Socle projet : règles `REGLES-PROJET.md` du pilot (nommage daté des livrables dans
-  `output\`/`docs\`, `Old\` jamais versionné, `.env` jamais committé, commits Conventional
+  `output\`/`docs\`, `old\` VERSIONNÉ pour les livrables documentaires — le code, lui,
+  n'a que git, jamais de copie datée (C1/TF-0150, 13/08) —, `.env` jamais committé, commits Conventional
   Commits français — locaux par défaut, push sur GO humain ; socle documentaire R-20..R-23,
   types des livrables au registre d'organization R-25, URLs d'environnement
   `<appli>-{dev|qualif|production}` R-24 ; voie automatisée par défaut dans toute démarche
