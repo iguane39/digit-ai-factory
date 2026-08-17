@@ -491,6 +491,30 @@ autoportante est mécanisée par `check_html.py` étendu (TF-0303 — un fichier
 hôte qui fournit `<head>` est détectable : ni doctype, ni charset) ; le gate C7 à
 l'écriture reste le point de contrôle amont (réinstallation : décision humaine pendante).
 
+## S. Familles nommées et numérotation stable — output\ et docs\ (règle 39 — 17/08, TF-0347/0348)
+
+Mandat humain direct du 17/08 (prompt analysé L99, écarts validés poste par poste).
+Convention cataloguée chez organization le même jour : **D-16** (registre des noms
+canoniques de familles — `XX-audit`, `XX-tests` au départ).
+
+**R-39.**
+1. **Noms de familles transverses conventionnés** : les documents d'un audit vivent dans
+   une famille `XX-audit` d'`output\`, les documents de stratégie et d'exécution de tests
+   dans `XX-tests` — le NOM vient du registre D-16 (identique partout), le NUMÉRO est
+   local au dépôt.
+2. **Numérotation stable** : le numéro s'attribue à la création (premier numéro libre du
+   dépôt) et ne se renumérote JAMAIS — un renumérotage casse les chemins portés par les
+   registres à événements figés (cas réel TF-0339). Le `LISEZMOI.md` (D-15 al. e)
+   documente, il ne se substitue pas à la stabilité.
+3. **Extension à `docs\`** : les documents pérennes HORS socle `docs\projet\` se rangent
+   dans des sous-dossiers thématiques numérotés de `docs\` (`01-…`, `02-…`), mêmes règles.
+   **`docs\projet\` est INTOUCHÉ** : ses 8 fichiers à noms fixes (R-20) alimentent
+   générateurs et oracles — les numéroter exigerait une étude, jamais une improvisation.
+
+**Appelant (R-35)** : revue de clôture de run (R-4/D-15 déjà jouées par
+`oracle-conformite-projet`) ; la mécanisation des familles (D-15 + D-16 ensemble) reste
+la dette déclarée par D-15 elle-même — candidature de mécanisation au registre.
+
 ## Conflits à trancher (ta décision explicite)
 
 - **C1 — `old\` vs git (n° 6/7)** : **TRANCHÉ le 13/08 (TF-0150)** — `old\` (minuscule,
