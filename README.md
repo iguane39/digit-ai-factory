@@ -1,4 +1,4 @@
-# digit-ai-forge-pilot
+# digit-ai-factory
 
 > **Agent IA** : suis [AGENTS.md](AGENTS.md) — installe ce dépôt s'il est absent
 > (`git clone` + `node bootstrap.mjs`, fin « Poste prêt » exigée), mets-le à jour sinon,
@@ -92,7 +92,7 @@ répondre en improvisant depuis le README distant.
 ### 0 · Accueil générique — dire ce qu'on veut
 
 ```
-Utilise https://github.com/iguane39/digit-ai-forge-pilot pour <intention>.
+Utilise https://github.com/iguane39/digit-ai-factory pour <intention>.
 Installe-le localement si absent, puis suis son protocole d'accueil — sans l'improviser.
 ```
 
@@ -102,7 +102,7 @@ Installe-le localement si absent, puis suis son protocole d'accueil — sans l'i
 ### 1 · Lancer un nouveau produit
 
 ```
-Utilise https://github.com/iguane39/digit-ai-forge-pilot pour lancer un nouveau produit dans CE dossier.
+Utilise https://github.com/iguane39/digit-ai-factory pour lancer un nouveau produit dans CE dossier.
 Installe-le localement si absent, puis suis son protocole d'accueil — sans l'improviser.
 ```
 
@@ -113,35 +113,35 @@ fichier, et il est désormais optionnel.
 ### 2 · Faire évoluer ou remédier un produit existant
 
 ```
-Utilise https://github.com/iguane39/digit-ai-forge-pilot pour faire évoluer ou remédier LE produit de CE dossier (run de version).
+Utilise https://github.com/iguane39/digit-ai-factory pour faire évoluer ou remédier LE produit de CE dossier (run de version).
 Installe-le localement si absent, puis suis son protocole d'accueil — sans l'improviser.
 ```
 
 ### 3 · Tester et corriger
 
 ```
-Utilise https://github.com/iguane39/digit-ai-forge-pilot pour exécuter un cycle de tests COMPLET de CE projet — stratégie, cas, jeux de données, exécution, corrections.
+Utilise https://github.com/iguane39/digit-ai-factory pour exécuter un cycle de tests COMPLET de CE projet — stratégie, cas, jeux de données, exécution, corrections.
 Installe-le localement si absent, puis suis son protocole d'accueil — sans l'improviser.
 ```
 
 ### 4 · Revoir le design d'une implémentation
 
 ```
-Utilise https://github.com/iguane39/digit-ai-forge-pilot pour une revue graphique du produit RENDU de CE projet contre sa promesse design.
+Utilise https://github.com/iguane39/digit-ai-factory pour une revue graphique du produit RENDU de CE projet contre sa promesse design.
 Installe-le localement si absent, puis suis son protocole d'accueil — sans l'improviser.
 ```
 
 ### 5 · Déployer en staging puis préparer la production
 
 ```
-Utilise https://github.com/iguane39/digit-ai-forge-pilot pour déployer CE projet en staging et préparer la production (MEP).
+Utilise https://github.com/iguane39/digit-ai-factory pour déployer CE projet en staging et préparer la production (MEP).
 Installe-le localement si absent, puis suis son protocole d'accueil — sans l'improviser.
 ```
 
 ### 6 · Auditer le SEO d'un produit en ligne
 
 ```
-Utilise https://github.com/iguane39/digit-ai-forge-pilot pour auditer le SEO du produit en ligne de CE projet — ce message vaut mandat.
+Utilise https://github.com/iguane39/digit-ai-factory pour auditer le SEO du produit en ligne de CE projet — ce message vaut mandat.
 Installe-le localement si absent, puis suis son protocole d'accueil — sans l'improviser.
 ```
 

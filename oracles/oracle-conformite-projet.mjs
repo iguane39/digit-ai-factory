@@ -424,10 +424,15 @@ else {
 // et la politique d'entrée en vigueur de `REGLES-PROJET.md` l.13 (« au prochain run de version
 // de chacun ») est ainsi tenue au lieu d'être contredite.
 const DOCTRINE_CLES_COMPLETES = "2026-08-17";
-const RE_CLE_DEPOT = /^digit-ai-forge-[a-z0-9_-]+$/;
-/** Nom de dépôt complet attendu pour une clé courte (« conception » → « digit-ai-forge-conception ») ;
- *  les préfixes partiels déjà présents ne sont pas redoublés. */
-const cleCanonique = (cle) => "digit-ai-forge-" + String(cle).toLowerCase().replace(/^digit-ai-/, "").replace(/^forge-/, "");
+// Le pilot est la seule exception nommée au motif depuis son renommage en digit-ai-factory
+// (17/08 soir, gate humain — table : references\CORRESPONDANCE-RENOMMAGE-FACTORY.md).
+const RE_CLE_DEPOT = /^(digit-ai-forge-[a-z0-9_-]+|digit-ai-factory)$/;
+/** Nom de dépôt complet attendu pour une clé courte (« conception » → « digit-ai-forge-conception »,
+ *  « pilot »/« factory » → « digit-ai-factory ») ; les préfixes partiels ne sont pas redoublés. */
+const cleCanonique = (cle) => {
+  const brut = String(cle).toLowerCase().replace(/^digit-ai-/, "").replace(/^forge-/, "");
+  return (brut === "pilot" || brut === "factory") ? "digit-ai-factory" : "digit-ai-forge-" + brut;
+};
 const ledgerF = p("forge", "ledger.jsonl");
 if (!existsSync(ledgerF)) so("R-19", "pas de forge\\ledger.jsonl (aucun run ouvert)");
 else {

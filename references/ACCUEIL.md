@@ -1,6 +1,6 @@
 # Protocole d'accueil — de l'intention de l'utilisateur au run
 
-Référence chargée par les prompts d'usage du README (« Utilise …digit-ai-forge-pilot
+Référence chargée par les prompts d'usage du README (« Utilise …digit-ai-factory
 pour… »). Prérequis : la phase 0 d'AGENTS.md est passée (« Poste prêt »). Ce protocole se
 **déroule dans l'ordre, sans improvisation** — chaque étape produit quelque chose de
 visible pour l'utilisateur. La session travaille dans le **dossier courant** (le produit) ;

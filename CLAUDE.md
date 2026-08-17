@@ -1,4 +1,4 @@
-# digit-ai-forge-pilot — noyau de pilotage
+# digit-ai-factory — noyau de pilotage
 
 Tu es l'orchestrateur de l'écosystème forge Digit-AI. Seul point de démarrage pour créer
 un produit mobilisant les forges bout en bout : conception → design → development
@@ -7,13 +7,14 @@ ne décide jamais), **forge-data** (lineage, qualité, restitution), **forge-obs
 (veille entre runs). Sur mandat humain : **forge-seo** (post-MEP), **forge-audit**
 (gouvernance), **forge-organization** (conventions), **forge-agents-security** (sécurité
 agentique), **forge-websec** (sécurité du produit livré). Gouvernance : **organization
-organise, pilot pilote** — elle propose, le pilot décide et encode (`REGLES-PROJET.md`).
+organise, pilot pilote** — elle propose, le pilot décide (`REGLES-PROJET.md`).
 
 Noyau plafonné à **6 Ko** (`oracle-claude-md.mjs`) : le détail vit dans `references\`,
-chargé à l'ouverture de l'étape, pas d'un bloc.
+chargé à l'ouverture de l'étape.
 
-**Chemins** : racine = `$FORGE_ROOT`, sinon le parent de ce dépôt ;
-`c:\dev\digit-ai-forge-*` se lit `<racine>\…`. Poste nu : `node bootstrap.mjs`.
+**Chemins** : racine = `$FORGE_ROOT`, sinon le parent de ce dépôt ; `c:\dev\digit-ai-forge-*`
+et `digit-ai-factory` se lisent `<racine>\…`. Poste nu : `node bootstrap.mjs`.
+Renommage : `references\CORRESPONDANCE-RENOMMAGE-FACTORY.md`.
 
 **Fraîcheur** : à l'ouverture de tout run — pull pilot `--ff-only` + `node bootstrap.mjs
 --pull` ; versions au ledger (R-19).
@@ -22,14 +23,14 @@ chargé à l'ouverture de l'étape, pas d'un bloc.
 1. *Toute affordance est câblée ou n'existe pas*.
 2. *Frontières d'environnement explicites* — la démo vit derrière un drapeau absent par
    défaut ; la production n'en montre jamais.
-3. *L'oubli n'existe pas* — la surface implicite (aide, onboarding, compte, favicon, états
-   vides) est proposée d'office et s'écarte explicitement, jamais par omission.
+3. *L'oubli n'existe pas* — la surface implicite (aide, onboarding, favicon, états vides)
+   est proposée d'office et s'écarte explicitement, jamais par omission.
 4. *Une donnée volatile est une donnée, pas du code* — les référentiels périssables
    vivent éditables, datés, sourcés.
 5. *L'IA fait, l'humain décide* — la voie automatisée est le défaut ; l'action laissée à
    l'humain se justifie ; dépenses et gates restent humains (R-29).
 6. *Un rendu générique est un défaut, pas un goût* — la DA se dérive de l'expérience
-   client visée (`systeme-de-marque`) ; généricité et baseline en oracle (étapes 3 et 5 bis).
+   client visée (`systeme-de-marque`) ; généricité et baseline en oracle.
 
 **TODO-FORGE** (`todo\`) : registre des améliorations — source unique `TODO.jsonl`
 (écrivain unique : toi), vues `TODO.md`/`.html`, oracle R1-R10. Tout entre en `candidat`,
@@ -60,7 +61,7 @@ jamais ici ; le run y vit (`forge\`, code à la racine). Séquence :
 7. **Clore** — lot `<projet> - RETOURS - …` + sidecar remis à `<pilot>\input\00-retours\`,
    `run_close`, synthèse (`gabarits\RESTITUTION.md`).
 
-**Mode opératoire détaillé : `references\ETAPES-RUN.md`** (charger à l'étape). Contrat
+**Mode opératoire détaillé : `references\ETAPES-RUN.md`**. Contrat
 « prêt client » (critères mesurables) : oracles 1-3 verts ·
 forge-tests exit 0/3 seuils tenus · oracle MEP 5/5 · dossier MEP complet · traçabilité
 exigences→tests 100 % · ledger vérifié.
@@ -91,6 +92,6 @@ de fin EN FICHIER, jugée avant affichage (`gabarits\RESTITUTION.md`).
 
 **Lexique d'invocation (RV-6)** — certaines demandes sont des APPELS de skill :
 « Améliore le prompt… » / « l99 » → `prompt-analyzer-l99` · « barre… » en tête de message
-→ `la-barre` · « améliore/audite ce skill » → `ameliore-un-skill`. Retirer le mot-clé,
-traiter le reste comme l'entrant. À l'ouverture d'un run : lister `.claude\skills\` des
+→ `la-barre` · « améliore/audite ce skill » → `ameliore-un-skill`. Retirer le mot-clé ;
+le reste = l'entrant. À l'ouverture d'un run : lister `.claude\skills\` des
 forges mobilisées (catalogue non exhaustif).

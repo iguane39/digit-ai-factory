@@ -1,4 +1,4 @@
-# Fiche d audit — forge-pilot (ex-steering)
+# Fiche d audit — digit-ai-factory (ex-forge-pilot, ex-steering)
 
 Baseline d audit par forge (TF-0054) : cette fiche remplace la relecture des ~32 Ko de
 baseline commune (INVENTAIRE + BOUCLE) par agent d audit. Elle est MISE À JOUR à chaque

@@ -318,7 +318,7 @@ ecrireDans(rougeR2, "Digit-AI - Rapport Racine - 20260817a.html",
   '<!DOCTYPE html>\n<html lang="fr"><head><meta name="destinataire" content="humain"><title>x</title></head><body>x</body></html>\n');
 // (3) le ledger ANNONCE un livrable hors output\ (canal `livrable_attendu`, déjà en service)
 ecrireDans(rougeR2, "forge/ledger.jsonl",
-  JSON.stringify({ type: "run_open", ts: "2026-08-17T08:00:00Z", versions_forges: { "digit-ai-forge-pilot": "e0ffc25" }, livrable_attendu: "forge/etapes/RAPPORT-REVUE.md" }) + "\n");
+  JSON.stringify({ type: "run_open", ts: "2026-08-17T08:00:00Z", versions_forges: { "digit-ai-factory": "e0ffc25" }, livrable_attendu: "forge/etapes/RAPPORT-REVUE.md" }) + "\n");
 // PIÈGES DE FAUX POSITIFS — tous doivent rester MUETS : un livrable DATÉ mais non marqué
 // (c'est le contrôle par motif de nom, refusé en connaissance de cause), et quatre marqués en
 // zones hors jugement par motif déclaré (entrant, porteurs de FORME, archive gelée).
@@ -353,7 +353,7 @@ const verteR2 = mkdtempSync(join(tmpdir(), "conf-verte-r2-"));
 ecrireDans(verteR2, "output/03-etudes/20260817-etude-rangement.md", MARQUE_HUMAIN);
 ecrireDans(verteR2, "docs/projet/NOTE-NORMATIVE.md", MARQUE_HUMAIN);
 ecrireDans(verteR2, "forge/ledger.jsonl",
-  JSON.stringify({ type: "run_open", ts: "2026-08-17T08:00:00Z", versions_forges: { "digit-ai-forge-pilot": "e0ffc25" }, livrable_attendu: "output/03-etudes/20260817-etude-rangement.md" }) + "\n");
+  JSON.stringify({ type: "run_open", ts: "2026-08-17T08:00:00Z", versions_forges: { "digit-ai-factory": "e0ffc25" }, livrable_attendu: "output/03-etudes/20260817-etude-rangement.md" }) + "\n");
 check("verte-R2 : livrables marqués rangés → PASS R-2 qui DIT combien il en a vu", () => {
   const { rapport } = lance(verteR2);
   const r2 = rapport.findings.filter((f) => f.regle === "R-2");
