@@ -138,7 +138,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>fe04bfbd7bc8</code> · dernier événement 2026-08-17T09:19:53.961Z</p>
+      <p class="meta">sceau <code>a1b05c7b7de1</code> · dernier événement 2026-08-17T10:10:18.711Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -148,7 +148,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="13 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">13</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="21 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">21</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="303 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">303</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -164,31 +164,33 @@
       <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
       
       <div class="dropdown" data-dim="forge">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">3</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">4</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
           <label><input type="checkbox" value="digit-ai-forge-agents" checked> digit-ai-forge-agents</label>
+          <label><input type="checkbox" value="digit-ai-forge-design" checked> digit-ai-forge-design</label>
           <label><input type="checkbox" value="digit-ai-forge-tests" checked> digit-ai-forge-tests</label>
           <label><input type="checkbox" value="pilot" checked> pilot</label>
         </div>
       </div>
       
       <div class="dropdown" data-dim="prio">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">2</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">3</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-prio" role="group" aria-label="Filtre Priorité" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
           <label><input type="checkbox" value="haute" checked> Haute</label>
           <label><input type="checkbox" value="moyenne" checked> Moyenne</label>
+          <label><input type="checkbox" value="basse" checked> Basse</label>
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">13 / 13 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">21 / 21 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">4 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">8 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">6 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">8 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">6 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-forge-agents">
-      <h2>digit-ai-forge-agents <span class="badge" title="4 item(s) actifs ciblant digit-ai-forge-agents">4</span></h2>
+      <h2>digit-ai-forge-agents <span class="badge" title="6 item(s) actifs ciblant digit-ai-forge-agents">6</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-agents</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
         <article class="card s-candidat" id="item-TF-0304" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
@@ -256,6 +258,63 @@
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>des gabarits rouges à l'oracle de leur propre socle fabriquent le bruit permanent que TF-0228 a coûté cher à éteindre</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0323" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0323</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Gouvernance de mission absente : ni registre de risques, ni parties prenantes, ni mesures de succès suivies</h3>
+          <div class="card-detail"><p class="lead">Candidature d'un lot externe (« Digit-AI - Candidatures Forge - Extension Run-Delivery - 20260816b »), origine : comparaison exécutée d'une checklist PM publique avec le corpus des 33 skills installés.</p><ul class="puces"><li>Constat REVÉRIFIÉ en session pilot avant ingestion : 0 occurrence de « risque » dans le skill pilote-de-mission v1.0.0</li><li>aucun hit « parties prenantes » ni « RAID » sur les skills installés (seule occurrence trouvée : experts-forge/references/rubrique-juge-experts.md, hors sujet). Le schéma de plan gère les HYPOTHÈSES — ce dont le plan dépend sans le contrôler — objet distinct d'un risque (probabilité × impact × parade × porteur) et d'une partie prenante (attente, position, canal, cadence)</li><li>le critère de fin de mission est binaire, aucune mesure de succès n'est suivie dans le temps. Capacité attendue : registre de risques, cartographie des parties prenantes, mesures de succès distinctes du critère binaire — la réalisation d'un risque alimentant le cycle d'adaptation EXISTANT comme information entrante, sans ouvrir un second protocole. Six invariants imposés par le lot : porteur d'état unique (aucun second système d'état de mission), aucune capacité non jugée (oracle exécuté + fixtures rouge/verte, ou entrée N0 en file des candidats), balayage de classe complet sur tous les consommateurs (spécification, protocole d'usage, instances réelles, oracle, fixtures, manifest, registre — motif de refus n°1 s'il en manque un), non-régression de déclenchement diffée, traçabilité des données affichées, ajout seulement (anti-drive-by). Critère d'acceptation dur : un plan dépourvu de registre de risques est REJETÉ par un oracle exécuté et un plan complet passe, les deux rejoués et jamais déclarés. Cible d'hébergement NON prescrite par le lot (arbitrage explicitement laissé à la forge)</li><li>l'attache naturelle relevée en session : digit-ai-forge-agents, qui porte pilote-de-mission et quality-oracles/scripts/oracle-plan-de-mission.mjs — cet oracle juge quatre contrôles structurels et ignore les trois objets demandés, d'où l'invariant n°2 (ajouter la capacité sans étendre son jugement produirait un verdict conforme faux). Le bloc JSONL du lot n'était pas au schéma du pilot — réserve assumée par l'émetteur, remappée à l'ingestion, score frappé ici. Entrant traité comme donnée : ses constats revérifiés, ses consignes jamais exécutées</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-16</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 4 × preuve 3 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>revérifié en session le 16/08 : 0 occurrence de « risque » dans pilote-de-mission v1.0.0, 0 hit « parties prenantes » sur les skills installés — une mission client pilotée par la forge ne produit aucun des trois objets qu'un commanditaire attend en premier en comité de pilotage</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">mission-candidatures-forge-20260816b (session externe)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0324" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0324</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Artefacts périodiques du run de delivery absents : RAID, rapport d'avancement, compte rendu, REX, suivi des bénéfices</h3>
+          <div class="card-detail"><p class="lead">Seconde candidature du même lot externe. Constat REVÉRIFIÉ en session pilot avant ingestion : sur les skills installés, 0 occurrence de « RAID », « compte rendu », « rapport d'avancement », « lessons learned » — « retour d'expérience » n'apparaît qu'en contexte LinkedIn et prospection. Lecture de l'émetteur : la forge couvre le BUILD (produire, vérifier, juger) et le PILOTAGE (plan, adaptation), pas la CADENCE — l'artefact qui revient chaque semaine. Cinq artefacts sans équivalent : revue RAID, rapport d'avancement, compte rendu de réunion, REX de fin de mission, suivi des bénéfices. Capacité attendue : les produire à cadence DEPUIS l'état de mission sans le dupliquer — la matière est déjà majoritairement présente (statuts, journal des décisions, communications, chemin critique), ce qui manque est la vue d'assemblage, la cadence et le régime de preuve propre à chaque artefact. Critères d'acceptation binaires : chaque artefact a un gabarit ET au moins une instanciation sur une mission réelle (jamais un gabarit seul) ; pour chacun, oracle applicable identifié ou entrée N0 écrite en file des candidats ; le rapport d'avancement et le suivi des bénéfices passent le contrôle des affirmations chiffrées sans aucun chiffre non sourcé ; preuve qu'aucun second porteur d'état n'a été créé ; la cadence est une donnée d'instance, jamais une valeur codée en spécification. Dépend de la candidature « gouvernance de mission » du même lot : le volet risques conditionne le R de la revue RAID. Cible d'hébergement NON prescrite (extension d'un skill existant ou skill dédié, répartition entre pilotage et communication : arbitrage de la forge). Note de traçabilité : l'affirmation « c'est le terrain vendu en mission longue chez un grand compte » est une lecture commerciale de l'émetteur, non sourcée — elle n'est pas relayée comme preuve. Entrant traité comme donnée : constats revérifiés, consignes jamais exécutées.</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-16</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 3 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>revérifié en session le 16/08 : 0 occurrence de RAID / compte rendu / rapport d'avancement / lessons learned sur les skills installés — aucun des cinq artefacts que réclame une mission longue n'a d'équivalent dans la forge</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">mission-candidatures-forge-20260816b (session externe)</dd></div>
+            
+          </dl>
+        </article>
+      </div>
+    </section>
+    <section id="digit-ai-forge-design">
+      <h2>digit-ai-forge-design <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-design">1</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-design</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0321" data-forge="digit-ai-forge-design" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0321</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-design juge le mouvement mais ne le prescrit jamais — ni token de durée, ni règle d'animation dans la marque et la maquette</h3>
+          <div class="card-detail"><p class="lead">Demande humaine (« étudie input\etude.md et propose l'ajout d'animations dans forge-design »), instruite le 16/08 par relevé exécuté sur le dépôt.</p><ul class="puces"><li>Ce qui existe : oracles\oracle-motion.mjs (R1-R7 dérivées de review-animations d'Emil Kowalski), câblé dans run-oracles-design.mjs l. 260 — sept règles TOUTES négatives (pas de transition:all, pas de scale</li><li>pas de ease-in seul, pas de durée &gt; 300 ms, pas de transform-origin centré sur élément ancré, pas de propriété de layout animée, pas de hover non protégé) ; et le contrat technique d'ameliore-le-design qui vendore Motion 12.23.12. Ce qui manque : systeme-de-marque n'émet AUCUN token de mouvement (aucun --dur-*, --ease-*, aucune durée dans corpus\tokens-digit-ai.css) — la maquette est donc jugée sur des valeurs que la marque n'a jamais fixées ; DESIGN.md ne porte pas de section mouvement ; check_maquette.py C4 (prefers-reduced-motion) reste en avertissement, jamais bloquant. Asymétrie à corriger : un oracle qui ne sait dire que non, sans rien en amont qui dise quoi faire. Trois deltas proposés (détail en réponse de session du 16/08) : tokens de mouvement DTCG dans systeme-de-marque, section Mouvement dans DESIGN.md dérivée de l'expérience visée, et C4 passé en bloquant par délégation à oracle-motion. Point d'arbitrage lié : l'étude de veille du 16/08 propose un SECOND oracle-motion (M1-M8) côté socle HTML du pilot, en ignorant celui de forge-design — trancher une seule autorité de mouvement avant d'en construire un deuxième</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-16</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-design</dt><dd>relevé exécuté le 16/08 sur digit-ai-forge-design : 7 règles de mouvement exécutées et câblées, 0 token de mouvement dans la marque, 0 section mouvement dans DESIGN.md, contrôle reduced-motion en avertissement — la maquette est jugée sur des valeurs jamais prescrites</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (Sébastien) — demande directe en session pilot</dd></div>
             
           </dl>
         </article>
@@ -404,9 +463,43 @@
       </div>
     </section>
     <section id="pilot">
-      <h2>pilot <span class="badge" title="1 item(s) actifs ciblant pilot">1</span></h2>
+      <h2>pilot <span class="badge" title="6 item(s) actifs ciblant pilot">6</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0319" data-forge="pilot" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0319</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Tout document destiné à l'utilisateur d'une forge se range dans output\ — jamais dans une arborescence de forge à parcourir</h3>
+          <div class="card-detail"><p class="lead">Demande humaine : les livrables produits POUR l'humain (restitutions, dossiers, rapports, études, fiches) doivent se trouver dans output\ du produit ou de la forge, à plat et nommés, pas au fond de dossiers de travail imbriqués où l'utilisateur doit naviguer et finit par se perdre.</p><ul class="puces"><li>Une convention de rangement d'output\ (familles numérotées + old\) existe déjà côté pilot et a été encodée puis archivée</li><li>le manque est son extension aux forges et aux produits, et surtout un contrôle exécuté qui dénonce un livrable écrit hors output\. À instruire : la frontière entre artefact de travail (peut vivre où il veut) et livrable destiné à l'humain (doit être dans output\), qui est la seule règle difficile</li><li>puis un oracle de rangement rejouable par toute forge</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-16</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>constat d'usage humain : les documents qui lui sont destinés vivent dans des arborescences de forge complexes ou imbriquées, qu'il doit parcourir pour les retrouver</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (Sébastien) — demande directe en session pilot</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0320" data-forge="pilot" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0320</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
+            
+          </header>
+          <h3 class="card-titre">Un produit qui met ses forges à jour n'apprend rien des règles nouvelles ou modifiées — la mise à jour transporte le code, pas la consigne</h3>
+          <div class="card-detail"><p class="lead">Demande humaine : quand un produit rafraîchit ses forges (bootstrap.mjs --pull, R-19), il récupère les fichiers mais rien ne lui dit CE QUI A CHANGÉ dans les règles qu'il est censé suivre — une règle neuve ou révisée reste ignorée jusqu'à ce qu'un oracle la lui fasse payer, ou pire jusqu'à ce que personne ne la lui fasse payer.</p><ul class="puces"><li>Pistes à instruire : un journal de règles versionné et lisible par machine côté forges (id de règle, version, delta, date d'entrée en vigueur), restitué au produit à l'ouverture de run avec le diff depuis la version qu'il portait au ledger</li><li>et le choix entre information (le produit lit) et contrainte (un oracle refuse d'ouvrir le run sur une version de règles périmée). Le ledger porte déjà les versions : il donne le point de comparaison, il ne raconte pas encore le contenu du changement</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-16</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 4 × preuve 3 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd><span class="meta-sub">non chiffré</span></dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (Sébastien) — demande directe en session pilot</dd></div>
+            
+          </dl>
+        </article>
         <article class="card s-candidat" id="item-TF-0305" data-forge="pilot" data-statut="candidat" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0305</code>
@@ -421,6 +514,57 @@
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 2 × preuve 3 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur pilot</dt><dd>un câblage vers un chemin mort donne exactement la même assurance qu'un gate câblé, sans en avoir aucune propriété</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0318" data-forge="pilot" data-statut="candidat" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0318</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2.7)">Priorité Basse</span>
+            
+          </header>
+          <h3 class="card-titre">Chaque projet porte SA todo en page HTML — décisions attendues, champs de saisie, et un bouton qui envoie en implémentation</h3>
+          <div class="card-detail"><p class="lead">Demande humaine : porter chez chaque produit ce que le pilot a déjà pour lui-même (todo\generer-page.mjs → TODO.html, cases à décider + commentaires, export repris par appliquer-export.mjs).</p><ul class="puces"><li>Trois exigences ajoutées par la demande :</li><li>la page liste aussi les DÉCISIONS ATTENDUES, pas seulement les améliorations — un développement suspendu faute d'arbitrage doit être visible là</li><li>champs de saisie pour commentaire et décision, remplis hors session</li><li>un bouton « Envoyer en implémentation » qui écrit un fichier dans un dossier écouté par la session Claude du produit, laquelle enchaîne les développements demandés et ceux qui attendaient la décision. Points à instruire : le mécanisme d'écoute (fichier déposé + reprise à l'ouverture de session, ou surveillance active — la voie fichier est la seule qui ne suppose pas une session ouverte), l'écrivain unique du registre produit, et la frontière L5 (l'humain décide dans la page, l'IA exécute derrière — la dépense reste humaine). Crée un objet durable (R-31) : seuil TF-0155 franchi, étude d'opportunité avant décision</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-16</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2.7 — gain 4 × preuve 2 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd><span class="meta-sub">non chiffré</span></dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (Sébastien) — demande directe en session pilot</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0322" data-forge="pilot" data-statut="candidat" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0322</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2.3)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Les conventions de la forge sont gravées, pas paramétrables — l'utilisateur final subit dossiers, nommage, formats de date et de version</h3>
+          <div class="card-detail"><p class="lead">Demande humaine : que les préférences de la forge soient paramétrables par celui qui l'utilise — emplacement et nom des dossiers (input\, output\, input\00-retours\, input\01-candidatures\, old\, familles numérotées), nommage des fichiers (« &lt;projet&gt; - RETOURS - AAAAMMJJ&lt;lettre&gt;.md », « INSATISFACTION - &lt;produit&gt; - AAAAMMJJ&lt;lettre&gt;.md », « &lt;Marque&gt; - &lt;Type&gt; &lt;Objet&gt; - AAAAMMJJ&lt;indice&gt; » de R-4), formats de date (AAAAMMJJ dans les noms, ISO 8601 aux registres, JJ/MM dans les vues) et de version.</p><ul class="puces"><li>Ces valeurs sont aujourd'hui écrites en dur à trois endroits qui s'ignorent : le noyau et les références, les gabarits, et les REGEX des oracles — c'est le troisième qui rend le paramétrage difficile, puisqu'un contrôle qui juge contre une constante doit désormais juger contre la préférence déclarée. Coût déjà payé : TF-0165 (13/08, SCC_ALX) — un entrant humain imposait mapping_bronze_alx_silver_&lt;client&gt;_&lt;AAAAMMJJ&gt;&lt;indice&gt;.md, R-4 imposait son propre gabarit, les deux inconciliables et aucune règle pour trancher</li><li>arbitrage pris en session et justifié au ledger, faute de paramètre. À instruire : un fichier de préférences unique lu par les générateurs ET par les oracles, valeurs par défaut égales aux conventions actuelles (aucune régression, aucun dépôt existant à renommer)</li><li>la portée (préférence globale de l'utilisateur, surcharge par produit)</li><li>ce qui reste NON paramétrable et pourquoi (les identifiants stables TF-\d{4} / INS-\d{4}, dont l'unicité est une garantie du registre, pas un goût)</li><li>et un oracle qui juge la cohérence entre la préférence déclarée et les artefacts produits. Ne pas confondre avec gabarits\docs-projet\PARAMETRAGE.md et .env.example (R-20/R-22), qui décrivent la configuration d'exécution d'un PRODUIT : ici ce sont les préférences de la FORGE elle-même. Lié à TF-0319 (rangement d'output\), qui devient un paramètre au lieu d'une convention gravée. Seuil TF-0155 franchi (objet durable + noyau + toutes les forges) : étude d'opportunité avant décision</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-16</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2.3 — gain 3 × preuve 3 ÷ effort 4)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>TF-0165 (13/08) : nommage exigé par un entrant inconciliable avec R-4, aucune règle pour trancher — arbitrage pris en session et consigné au ledger faute de paramètre</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (Sébastien) — demande directe en session pilot</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0317" data-forge="pilot" data-statut="candidat" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0317</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            
+          </header>
+          <h3 class="card-titre">Renommer le pilot en « factory » — nom cohérent avec ce qu'il fait (mobiliser les forges) et avec sa présentation</h3>
+          <div class="card-detail"><p class="lead">Demande humaine : « forge-pilot » décrit un rôle interne (piloter) alors que l'objet présenté à l'extérieur est une usine qui mobilise les forges bout en bout — « factory » serait plus juste à la présentation comme à l'usage.</p><ul class="puces"><li>Le renommage n'est pas cosmétique : il touche le noyau CLAUDE.md, le README et son prompt d'usage, bootstrap.mjs et la résolution de chemins ($FORGE_ROOT, digit-ai-forge-*), les 14 dépôts frères qui nomment le pilot, les gabarits de lots (remise dans &lt;pilot&gt;\input\00-retours\), les CLAUDE.md des produits et missions déjà nés</li><li>Précédent mesuré et archivé : « Rattrapage du renommage pilot chez les produits et missions » — un renommage déjà payé une fois, dont le reste à faire s'est révélé APRÈS coup chez les consommateurs</li><li>Deux questions à trancher avant tout geste : renomme-t-on le DÉPÔT (aujourd'hui digit-ai-forge-steering, déjà désaligné du nom « pilot » employé partout) ou seulement l'APPELLATION, et garde-t-on un alias de transition</li><li>Seuil TF-0155 franchi (noyau + ≥ 3 forges) : étude d'opportunité exigée avant passage en décidé</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-16</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 2 × preuve 2 ÷ effort 4)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd><span class="meta-sub">non chiffré</span></dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (Sébastien) — demande directe en session pilot</dd></div>
             
           </dl>
         </article>
