@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=afba815d8f13 archive=9f205b231527 · dernier événement: 2026-08-17T17:06:10Z -->
+     sceaux: actifs=40a6fbd96474 archive=9f205b231527 · dernier événement: 2026-08-17T17:49:27Z -->
 
-**50 actifs** (candidat 27 · décidé 0 · en cours 1 · corrigé 21 · écarté 1) · **308 archivés**.
+**51 actifs** (candidat 28 · décidé 0 · en cours 0 · corrigé 22 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -53,10 +53,10 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0346 | en_cours | 1 | Renommer le pilot en digit-ai-factory — RÉOUVERTURE de TF-0317, décision humaine assumée contre le verdict O2 du 20260817h | **oui** — décision humaine d'identité — le coût du statu quo reste non mesuré (étude 20260817h), l'humain paie le renommage en connaissance de cause |
 | TF-0327 | candidat | 12 | RV-9 n'est pas refermé : la fixture témoin de la bascule sombre démontre ENCORE le comportement interdit | **oui** — deux livrables du même socle peuvent encore s'ouvrir différemment sur le même poste — le symptôme exact que RV-9 prétendait avoir soldé |
 | TF-0328 | candidat | 8 | appliquer-export.mjs est orphelin et TODO-FORGE.md prescrit un dispositif retiré le 12/08 | **oui** — un item de registre entier (TF-0318) a été instruit sur une prémisse que la doc du pilot affirmait et que le code démentait |
 | TF-0356 | candidat | 8 | generer-page.mjs : TODO.html échoue L11 — esc() au lieu d'escLit() sur les titres (« None » non traité) | **oui** — la vue courante du registre échoue à l'oracle du socle pendant que la vue d'archive née hier le passe — le patron neuf a déjà dépassé l'ancien |
+| TF-0358 | candidat | 8 | Hygiène post-renommage : dossier local à renommer hors session, dénominateur « 14 frères » de l'étude, sous-chemin périmé websec | **oui** — un critère de revue à dénominateur faux se vérifierait « tenu » sur un compte qui ne l'est pas — la famille de défauts que TF-0332 vient de solder |
 | TF-0331 | candidat | 6 | Le marquage destinataire: humain doit naître dans les gabarits — sans porteurs, R-2/E9 est un faux négatif volontaire | **oui** — la règle est livrée et prouvée à zéro faux positif, mais elle ne verra rien tant qu'aucun document ne naît marqué |
 | TF-0337 | candidat | 6 | oracle-skills : le conseil de réparation de K7 propose une commande RELATIVE — reportée telle quelle, elle ne résoudrait rien | **oui** — l'humain qui suit le conseil au pied de la lettre câblerait un hook que K8 déclarerait aussitôt mort |
 | TF-0329 | candidat | 4 | Instruire l'admission de digit-ai-queue — le mécanisme de tickets demandé par TF-0318 existe sur le poste et le corpus l'ignore | **oui** — l'écosystème a instruit et refusé un mécanisme dont un exemplaire éprouvé dort à côté de lui — le trou est de connaissance, pas technique |
@@ -75,6 +75,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0347 | corrige | 3 | docs\ : sous-dossiers thématiques numérotés (01-, 02-…) — docs\projet\ reste INTACT (noms fixes R-20) | **oui** — demande humaine directe — le coût évité est celui déjà payé par output\ avant D-15 : des documents pérennes introuvables dans des arborescences non conventionnées |
 | TF-0318 | corrige | 2.7 | Chaque projet porte SA todo en page HTML — décisions attendues, champs de saisie, et un bouton qui envoie en implémentation | non |
 | TF-0317 | corrige | 1 | Renommer le pilot en « factory » — nom cohérent avec ce qu'il fait (mobiliser les forges) et avec sa présentation | non |
+| TF-0346 | corrige | 1 | Renommer le pilot en digit-ai-factory — RÉOUVERTURE de TF-0317, décision humaine assumée contre le verdict O2 du 20260817h | **oui** — décision humaine d'identité — le coût du statu quo reste non mesuré (étude 20260817h), l'humain paie le renommage en connaissance de cause |
 | TF-0322 | ecarte | 2.3 | Les conventions de la forge sont gravées, pas paramétrables — l'utilisateur final subit dossiers, nommage, formats de date et de version | **oui** — TF-0165 (13/08) : nommage exigé par un entrant inconciliable avec R-4, aucune règle pour trancher — arbitrage pris en session et consigné au ledger faute de paramètre |
 
 ---
