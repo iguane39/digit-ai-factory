@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=f0aaef783a71 archive=cdda120396ac · dernier événement: 2026-08-17T08:42:34Z -->
+     sceaux: actifs=db035428b5ef archive=fee5b8362725 · dernier événement: 2026-08-17T09:16:13Z -->
 
-**8 actifs** (candidat 0 · décidé 0 · en cours 8 · corrigé 0 · écarté 0) · **296 archivés**.
+**9 actifs** (candidat 9 · décidé 0 · en cours 0 · corrigé 0 · écarté 0) · **304 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,34 +11,25 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0296 | en_cours | 8 | forge-agents : 13 sidecars d'oracles COMMITTÉS dans .claude/skills — la convention TF-0065 les veut hors dépôt | **oui** — le bruit versionné a masqué le défaut TF-0289 pendant deux jours : K2 vert à tort, le contrôle disait l'inverse du réel |
-
-## digit-ai-forge-ops
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0298 | en_cours | 6 | forge-ops : canary ne scelle pas d'empreinte — une cible promue par canary reste SKIP permanent sur O-7 | **oui** — un SKIP permanent sur la voie canary est un trou déclaré aujourd'hui, silencieux le jour où canary devient la voie courante |
-
-## digit-ai-forge-pilot
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0302 | en_cours | 9 | pilot : interdire la publication d un livrable de produit sur un service heberge externe (regle de doctrine absente du socle) | **oui** — livrable d audit contenant deux ecarts de securite non corriges publie hors du poste avant validation humaine ; aucun moyen outille de le retirer |
-| TF-0303 | en_cours | 4.5 | pilot : mecaniser l autoportance d un HTML livre — le chemin de publication hebergee produit un fichier sans doctype, charset ni viewport (A1/A3/A4 et R-30 en defaut) | **oui** — livrable reecrit apres coup (head complet, palette sombre basculee de prefers-color-scheme vers data-theme, bascule et bloc impression ajoutes) ; 4 regles ecrites du socle violees sans qu aucun controle ne le signale |
+| TF-0304 | candidat | 12 | forge-agents : déclarer le câblage de qo-gate-write.mjs dans le settings.json versionné de la forge | **oui** — le gate C7 est mort sur ce poste depuis une date inconnue et AUCUN dépôt ne dit comment le recâbler — la moitié durable du trou que K7 déclare à chaque run |
+| TF-0306 | candidat | 8 | forge-agents : _routages-journal.jsonl d'experts-forge est un journal d'exécution TRACKÉ que son self-test salit | **oui** — chaque exécution du self-test crée un diff parasite — le prochain commit pressé l'embarque et le bruit K2 renaît |
+| TF-0307 | candidat | 4 | check_html : check_autonomie extrait les <style> sans retirer les commentaires HTML — faux positif A1 latent | **oui** — trois collisions réelles en une seule campagne sur le mécanisme non protégé — la quatrième sera chez un utilisateur |
+| TF-0308 | candidat | 4 | forge-agents : 6 gabarits de digit-ai-schemas plus rouges sous les règles TF-0303 — conformité ou exemption déclarée, à trancher | **oui** — des gabarits rouges à l'oracle de leur propre socle fabriquent le bruit permanent que TF-0228 a coûté cher à éteindre |
 
 ## digit-ai-forge-tests
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0299 | en_cours | 6 | forge-tests : la recette ne DIT pas que le conteneur est la cause — 10 [MANQUE] indiscernables d'une régression | **oui** — ~5 minutes de diagnostic consommées en pleine campagne, et sans agent vigilant un faux « S-01 NON TENU » de plus |
-| TF-0300 | en_cours | 3 | forge-tests : entrée de corpus H-20 prouvant la branche FAIL de l'écart servi ↔ versionné en recette | **oui** — un contrôle dont la recette ne prouve que les branches vertes repose sur pytest seul pour sa branche accusatrice — exactement l'écart que TF-0293 vient de fermer pour le pan i18n |
-| TF-0301 | en_cours | 3 | forge-tests : un test du pan i18n passe trivialement — l'assertion ne discrimine rien sur un banc sans finding | **oui** — un test vert qui ne discrimine rien vaut un contrôle jamais joué (R-35) : il rassure sans prouver |
+| TF-0309 | candidat | 6 | forge-tests : schema_obtenu rend None sans motif propre quand le conteneur manque sur son seul chemin | **oui** — le seul chemin conteneur encore capable de se taire — la maladie que TF-0299 vient d'éradiquer partout ailleurs |
+| TF-0312 | candidat | 4.5 | forge-tests : l'écart servi↔versionné compare des espaces de clés différents quand aucune locale n'est déclarée — fausse accusation possible | **oui** — un faux positif sur le contrôle né avant-hier coûterait sa crédibilité avant son premier vrai cas — la maladie documentée par l'étude 20260815e |
+| TF-0310 | candidat | 4 | forge-tests : le préfixe de corpus de H-13 (interface:) apparie AUSSI le constat de H-20 — filtrer sur la classe du finding | **oui** — un corpus dont une entrée peut être couverte par le défaut d'une autre mesure moins que ce qu'il affiche |
+| TF-0311 | candidat | 4 | forge-tests : deux comptes périmés au README (« 19/19 des défauts », « chacun des 16 défauts plantés ») — le corpus est à 23 | **oui** — un lecteur du README croit à un corpus de 19 quand la recette en mesure 23 — la doc dément l'outil |
 
 ## pilot
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0297 | en_cours | 6 | oracle-skills : K6 juge l'INTÉGRITÉ d'un hook, pas son CÂBLAGE — un hook sain jamais référencé ne s'exécute jamais | **oui** — le gate le plus joué de l'écosystème ne bloque plus rien depuis une date inconnue, et seul un agent parti vérifier autre chose l'a vu |
+| TF-0305 | candidat | 3 | oracle-skills : K7 ne vérifie pas qu'une commande câblée pointe un fichier qui EXISTE | **oui** — un câblage vers un chemin mort donne exactement la même assurance qu'un gate câblé, sans en avoir aucune propriété |
 
 ---
 Détail d'un item : `grep '"id":"TF-xxxx"' todo/TODO.jsonl` (tous ses événements). Archive : même commande sur TODO-ARCHIVE.jsonl.
