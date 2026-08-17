@@ -128,7 +128,7 @@ n'est encodé sans décision, rien de décidé n'est laissé sans encodage trac�
 | D-08→D-11 livrable HTML sortant : charte + autonomie + généré | mécanisme livrable, pas socle projet : `references\BEST-PRACTICES-HTML.md` + socle `digit-ai-page-html` + recette `check_html`/`render_page` (loi qualité) | couvertes — défaut D-10 **corrigé 11/08 (TF-0085)** : contrôle A1 exécuté dans `check_html.py` (self-test 30/30), vrai positif corrigé sur le boilerplate même |
 | D-12 composant partagé : inliner, jamais installer en douce | garde-fou pilot « aucune écriture dans les dépôts frères hors mandat » | encodée |
 | D-13 le circuit lui-même | CLAUDE.md pilot, ligne de gouvernance Q-B | encodée |
-| D-14 `forge-steering` → `forge-pilot` | répercuté partout (bootstrap, README, schéma) | constatée |
+| D-14 `forge-steering` → `forge-pilot` | répercuté sur les surfaces VIVANTES (bootstrap, README, schéma) — **corrigé le 17/08 (TF-0332)** : « répercuté partout » était faux, 26 occurrences de `forge-steering` subsistent (histoire, archives, faits d'époque — jamais réécrites, classe a. de l'énumération 20260817i) ; TF-0062 fut archivé sans `gains_constates` ni `corrections_realisees`, et la jonction que son texte ordonnait de conserver a disparu avant preuve — dette de traçabilité soldée par cette ligne et par la fenêtre A du renommage factory | constatée, **soldée en traçabilité 17/08** |
 | D-15 rangement `output\` en familles numérotées (`01-…`, une version courante à la racine, versions antérieures dans `old\` **minuscule**, `LISEZMOI.md` de mapping obligatoire si références antérieures) | appliqué le 13/08 (pilot 5 familles, agents/design/organization/seo) ; casse `old\` **tranchée par l'humain le 13/08** (alignement sur l'état de fait, supersède la graphie `Old` de D-02 pour `output\`) | **encodée 13/08 (TF-0149)** — mécanisation de D-15 dans `oracle-conventions` = candidat |
 
 Q4 (conventions internes aux fichiers) reste ouverte **côté organization** — pas une
@@ -540,10 +540,14 @@ verts, mutation 0,90).
 3. **L'e2e déclare le cycle de vie de son instance** (monter/démonter, ce qui reste
    debout est publié) — la règle s'arme pleinement à la résolution de TF-0340/0341.
 
-**Appelants (R-35)** : le pas de l'étape 5 (`ETAPES-RUN.md`) et le contrat « prêt
-client » (traçabilité exigences→tests 100 % s'entend désormais en cas EXÉCUTÉS) ; le
-contrat d'adoption `forge\cas-adoptes.jsonl` (existant, forge-tests) rend le solde
-calculable — sa mécanisation en oracle est portée par la campagne TF-0349. Dette
+**Appelants (R-35)** : le pas de l'étape 5 (`ETAPES-RUN.md` — la boucle ne se clôt pas
+sur un solde non nul) et le contrat « prêt client » (traçabilité exigences→tests 100 %
+s'entend désormais en cas EXÉCUTÉS) ; **mécanisé** : `oracles\oracle-adoption-tests.mjs
+<racine-produit>` (A1-A5, self-test 12/12, antériorités < 17/08 jamais jugées — premier
+tir réel : 1065/0 sur Produit-11). Les deux issues non-adoption se déclarent dans le sidecar
+`<produit>\forge\cas-ecartes.jsonl` — `{"cas","statut":"non_testable","champs_requis":[…]}`
+ou `{"cas","statut":"ecarte","qui","quand","pourquoi"}` — à côté du `cas-adoptes.jsonl`
+de forge-tests (les y mélanger serait refusé ligne à ligne par adoption.py). Dette
 NOMMÉE : `orchestrer-boucle.mjs` sans appelant (TF-0351, conditionné à TF-0340/0341).
 
 ## Conflits à trancher (ta décision explicite)
