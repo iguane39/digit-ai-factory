@@ -1498,3 +1498,41 @@ ni source, ni self-test, ni contrôle d'intégrité, et `K1-K5` ne regarde que l
 
 **Registre en fin de vague : 21 items archivés (287 au total), 8 candidats actifs**, tous nés
 des campagnes de ce soir.
+
+## Campagne du 17/08/2026 — « traite tous les retours et tous les todos » : 8 items, 3 campagnes, l'écart servi ↔ versionné fermé
+
+**Boîte d'entrée prouvée vide à l'ouverture** (B1-B3 PASS, 18 sidecars tous ingérés) ; la seule
+candidature en attente (`candidature-trous-detection-site-principal`) était un **doublon déjà
+traité** — ses 4 items sont TF-0283..0286, corrigés le 15/08 — partie en `old\` sans ingestion
+(la confrontation registre + archive AVANT ingestion, leçon du 13/08, a payé). À l'ouverture
+aussi : `oracle-skills` FAIL K2 — deux skills design en retard sur leur source fraîchement
+tirée, synchronisés par `--appliquer` (K5 garantissant le sens), PASS rejoué.
+
+**Une étude avant décision** (TF-0155 payé) : 20260817a *écart servi ↔ versionné* (TF-0288,
+PASS 7/7, verdict **O3** — détection chez tests, prévention chez ops, chaque volet dans le
+domaine de sa forge). Les 7 autres items : sous le seuil, décision directe sur mandat global.
+
+**Trois campagnes en parallèle, une par dépôt** (leçon TF-0294 : jamais deux sur le même
+arbre), rendues en 6 à 46 min. · **tests@b701948→fda3a29 (6 commits)** : pytest 568 →
+**637 verts**, S-01 TENU 13/13 sur arbre stable, corpus 19 → **22** défauts (le pan i18n
+entre enfin dans la seule vérification qui prononce S-01), registre de dette 127 → 140.
+La recette **refuse désormais de conclure sur un arbre qui bouge** (TF-0294, exit 2) ; le
+pan sécurité cesse de s'auto-accuser (7 → 0 constats, contrepartie prouvée : un vrai secret
+reste détecté) ; les 4 limites du 15/08 levées — dont une **trouvaille** : sur le patron même
+d'INS-0001, l'ancien code accusait un logo CORRECT vers `/en`. · **ops@b431ffb→da8d375** :
+`deployer` scelle une empreinte sha256 par release, **O-7** la compare au déployé (self-test
+54 → 63). · **pilot@d973c7d** : K2 sans bruit de sidecars (50 % de faux positifs supprimés
+sur les mesures du 15/08), troncature corrigée, et **K6 : les hooks entrent sous contrôle
+d'intégrité** — fixtures prouvées par MUTATION (3 mutants tués : 34/37, 35/37, 32/37).
+
+**TF-0288 fermé en entier** : le cas fondateur d'INS-0001 rejoué en fixture — 8 entrées
+promises, 3 servies → FAIL nommant les 5 manquantes et prescrivant le REDÉPLOIEMENT, « ne
+PAS toucher au code » : exactement le diagnostic que l'instruction avait dû trouver à la main.
+
+**Ce que la vague a trouvé sans le chercher** : le gate C7 est versionné mais **ni installé
+ni câblé** sur ce poste (`~/.claude/hooks` absent, settings sans qo-gate) — K6 le déclare,
+la décision est humaine ; 13 sidecars d'oracles **committés** chez forge-agents (c'est
+pourquoi K2 était vert à tort) ; Docker arrêté = 10 [MANQUE] muets à la recette (TF-0299).
+
+**Registre en fin de vague : 8 items archivés (296 au total), 6 candidats actifs**
+(TF-0296..0301), tous nés des campagnes du jour.
