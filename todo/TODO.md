@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=d80cf4e88584 archive=9f205b231527 · dernier événement: 2026-08-17T12:11:15Z -->
+     sceaux: actifs=cea38a5e5d64 archive=9f205b231527 · dernier événement: 2026-08-17T12:40:35Z -->
 
-**19 actifs** (candidat 2 · décidé 0 · en cours 14 · corrigé 2 · écarté 1) · **308 archivés**.
+**32 actifs** (candidat 15 · décidé 0 · en cours 0 · corrigé 16 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,38 +11,51 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0304 | en_cours | 12 | forge-agents : déclarer le câblage de qo-gate-write.mjs dans le settings.json versionné de la forge | **oui** — le gate C7 est mort sur ce poste depuis une date inconnue et AUCUN dépôt ne dit comment le recâbler — la moitié durable du trou que K7 déclare à chaque run |
-| TF-0306 | en_cours | 8 | forge-agents : _routages-journal.jsonl d'experts-forge est un journal d'exécution TRACKÉ que son self-test salit | **oui** — chaque exécution du self-test crée un diff parasite — le prochain commit pressé l'embarque et le bruit K2 renaît |
-| TF-0307 | en_cours | 4 | check_html : check_autonomie extrait les <style> sans retirer les commentaires HTML — faux positif A1 latent | **oui** — trois collisions réelles en une seule campagne sur le mécanisme non protégé — la quatrième sera chez un utilisateur |
-| TF-0308 | en_cours | 4 | forge-agents : 6 gabarits de digit-ai-schemas plus rouges sous les règles TF-0303 — conformité ou exemption déclarée, à trancher | **oui** — des gabarits rouges à l'oracle de leur propre socle fabriquent le bruit permanent que TF-0228 a coûté cher à éteindre |
-| TF-0323 | en_cours | 4 | Gouvernance de mission absente : ni registre de risques, ni parties prenantes, ni mesures de succès suivies | **oui** — revérifié en session le 16/08 : 0 occurrence de « risque » dans pilote-de-mission v1.0.0, 0 hit « parties prenantes » sur les skills installés — une mission client pilotée par la forge ne produit aucun des trois objets qu'un commanditaire attend en premier en comité de pilotage |
 | TF-0326 | candidat | 6 | Le skill pilote-de-mission n'est versionné dans AUCUN dépôt — la forge juge un artefact dont elle ne possède ni la spécification ni les instances | **oui** — des candidatures externes s'appuient sur le contenu d'un skill que personne ne peut ouvrir — le registre a failli décider sur une preuve invérifiable |
+| TF-0336 | candidat | 4 | forge-agents, hygiène post-campagnes : .bak versionnés, versions-livrees périmé, famille L des gabarits, polices embarquées | **oui** — deux .bak suivis par git divergent déjà de leurs sources — la maladie des sidecars committés (TF-0296), au stade précoce |
 | TF-0324 | candidat | 3 | Artefacts périodiques du run de delivery absents : RAID, rapport d'avancement, compte rendu, REX, suivi des bénéfices | **oui** — revérifié en session le 16/08 : 0 occurrence de RAID / compte rendu / rapport d'avancement / lessons learned sur les skills installés — aucun des cinq artefacts que réclame une mission longue n'a d'équivalent dans la forge |
+| TF-0304 | corrige | 12 | forge-agents : déclarer le câblage de qo-gate-write.mjs dans le settings.json versionné de la forge | **oui** — le gate C7 est mort sur ce poste depuis une date inconnue et AUCUN dépôt ne dit comment le recâbler — la moitié durable du trou que K7 déclare à chaque run |
+| TF-0306 | corrige | 8 | forge-agents : _routages-journal.jsonl d'experts-forge est un journal d'exécution TRACKÉ que son self-test salit | **oui** — chaque exécution du self-test crée un diff parasite — le prochain commit pressé l'embarque et le bruit K2 renaît |
+| TF-0307 | corrige | 4 | check_html : check_autonomie extrait les <style> sans retirer les commentaires HTML — faux positif A1 latent | **oui** — trois collisions réelles en une seule campagne sur le mécanisme non protégé — la quatrième sera chez un utilisateur |
+| TF-0308 | corrige | 4 | forge-agents : 6 gabarits de digit-ai-schemas plus rouges sous les règles TF-0303 — conformité ou exemption déclarée, à trancher | **oui** — des gabarits rouges à l'oracle de leur propre socle fabriquent le bruit permanent que TF-0228 a coûté cher à éteindre |
+| TF-0323 | corrige | 4 | Gouvernance de mission absente : ni registre de risques, ni parties prenantes, ni mesures de succès suivies | **oui** — revérifié en session le 16/08 : 0 occurrence de « risque » dans pilote-de-mission v1.0.0, 0 hit « parties prenantes » sur les skills installés — une mission client pilotée par la forge ne produit aucun des trois objets qu'un commanditaire attend en premier en comité de pilotage |
 
 ## digit-ai-forge-design
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0321 | en_cours | 4.5 | forge-design juge le mouvement mais ne le prescrit jamais — ni token de durée, ni règle d'animation dans la marque et la maquette | **oui** — relevé exécuté le 16/08 sur digit-ai-forge-design : 7 règles de mouvement exécutées et câblées, 0 token de mouvement dans la marque, 0 section mouvement dans DESIGN.md, contrôle reduced-motion en avertissement — la maquette est jugée sur des valeurs jamais prescrites |
+| TF-0335 | candidat | 4 | forge-design, mise en cohérence post-TF-0321 : registre, fixtures R10, démos, self-test du générateur | **oui** — une autorité de mouvement à deux têtes potentielles et des démos qui contredisent l'oracle — le bruit de fond que TF-0228 a appris à éteindre |
+| TF-0321 | corrige | 4.5 | forge-design juge le mouvement mais ne le prescrit jamais — ni token de durée, ni règle d'animation dans la marque et la maquette | **oui** — relevé exécuté le 16/08 sur digit-ai-forge-design : 7 règles de mouvement exécutées et câblées, 0 token de mouvement dans la marque, 0 section mouvement dans DESIGN.md, contrôle reduced-motion en avertissement — la maquette est jugée sur des valeurs jamais prescrites |
 
 ## digit-ai-forge-tests
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0309 | en_cours | 6 | forge-tests : schema_obtenu rend None sans motif propre quand le conteneur manque sur son seul chemin | **oui** — le seul chemin conteneur encore capable de se taire — la maladie que TF-0299 vient d'éradiquer partout ailleurs |
-| TF-0312 | en_cours | 4.5 | forge-tests : l'écart servi↔versionné compare des espaces de clés différents quand aucune locale n'est déclarée — fausse accusation possible | **oui** — un faux positif sur le contrôle né avant-hier coûterait sa crédibilité avant son premier vrai cas — la maladie documentée par l'étude 20260815e |
-| TF-0310 | en_cours | 4 | forge-tests : le préfixe de corpus de H-13 (interface:) apparie AUSSI le constat de H-20 — filtrer sur la classe du finding | **oui** — un corpus dont une entrée peut être couverte par le défaut d'une autre mesure moins que ce qu'il affiche |
-| TF-0311 | en_cours | 4 | forge-tests : deux comptes périmés au README (« 19/19 des défauts », « chacun des 16 défauts plantés ») — le corpus est à 23 | **oui** — un lecteur du README croit à un corpus de 19 quand la recette en mesure 23 — la doc dément l'outil |
-| TF-0325 | en_cours | 3 | Affinements de la couverture par rôle du pan qualif (deux limites déclarées) | **oui** — un produit dont les refus passent par une page d'erreur maison garderait ses refus fondus dans le ratio — le silence exact que TF-0316 vient de fermer pour 401/403 |
+| TF-0333 | candidat | 4.5 | Écart servi↔versionné : une locale promise par la source et jamais servie n'est JAMAIS comparée — PASS sans mesure | **oui** — un produit qui cesse de servir /en entier passerait le contrôle né pour attraper exactement cette famille d'écarts |
+| TF-0334 | candidat | 2 | forge-tests : comptes périmés restants au README (treize adaptateurs pour 14, onze pans pour 14) et classes de corpus en littéraux | **oui** — la doc dément l'outil sur deux comptes de plus, et le verrou len(CORPUS) de TF-0311 ne les couvre pas (hors corpus) |
+| TF-0309 | corrige | 6 | forge-tests : schema_obtenu rend None sans motif propre quand le conteneur manque sur son seul chemin | **oui** — le seul chemin conteneur encore capable de se taire — la maladie que TF-0299 vient d'éradiquer partout ailleurs |
+| TF-0312 | corrige | 4.5 | forge-tests : l'écart servi↔versionné compare des espaces de clés différents quand aucune locale n'est déclarée — fausse accusation possible | **oui** — un faux positif sur le contrôle né avant-hier coûterait sa crédibilité avant son premier vrai cas — la maladie documentée par l'étude 20260815e |
+| TF-0310 | corrige | 4 | forge-tests : le préfixe de corpus de H-13 (interface:) apparie AUSSI le constat de H-20 — filtrer sur la classe du finding | **oui** — un corpus dont une entrée peut être couverte par le défaut d'une autre mesure moins que ce qu'il affiche |
+| TF-0311 | corrige | 4 | forge-tests : deux comptes périmés au README (« 19/19 des défauts », « chacun des 16 défauts plantés ») — le corpus est à 23 | **oui** — un lecteur du README croit à un corpus de 19 quand la recette en mesure 23 — la doc dément l'outil |
+| TF-0325 | corrige | 3 | Affinements de la couverture par rôle du pan qualif (deux limites déclarées) | **oui** — un produit dont les refus passent par une page d'erreur maison garderait ses refus fondus dans le ratio — le silence exact que TF-0316 vient de fermer pour 401/403 |
 
 ## pilot
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0319 | en_cours | 4.5 | Tout document destiné à l'utilisateur d'une forge se range dans output\ — jamais dans une arborescence de forge à parcourir | **oui** — constat d'usage humain : les documents qui lui sont destinés vivent dans des arborescences de forge complexes ou imbriquées, qu'il doit parcourir pour les retrouver |
-| TF-0320 | en_cours | 4 | Un produit qui met ses forges à jour n'apprend rien des règles nouvelles ou modifiées — la mise à jour transporte le code, pas la consigne | non |
-| TF-0318 | en_cours | 2.7 | Chaque projet porte SA todo en page HTML — décisions attendues, champs de saisie, et un bouton qui envoie en implémentation | non |
+| TF-0327 | candidat | 12 | RV-9 n'est pas refermé : la fixture témoin de la bascule sombre démontre ENCORE le comportement interdit | **oui** — deux livrables du même socle peuvent encore s'ouvrir différemment sur le même poste — le symptôme exact que RV-9 prétendait avoir soldé |
+| TF-0328 | candidat | 8 | appliquer-export.mjs est orphelin et TODO-FORGE.md prescrit un dispositif retiré le 12/08 | **oui** — un item de registre entier (TF-0318) a été instruit sur une prémisse que la doc du pilot affirmait et que le code démentait |
+| TF-0332 | candidat | 8 | Solder la dette de traçabilité D-14 : trois affirmations de conformité fausses au corpus | **oui** — deux études du même après-midi ont buté sur des déclarations de conformité fausses — le coût de recherche se paie à chaque instruction |
+| TF-0331 | candidat | 6 | Le marquage destinataire: humain doit naître dans les gabarits — sans porteurs, R-2/E9 est un faux négatif volontaire | **oui** — la règle est livrée et prouvée à zéro faux positif, mais elle ne verra rien tant qu'aucun document ne naît marqué |
+| TF-0337 | candidat | 6 | oracle-skills : le conseil de réparation de K7 propose une commande RELATIVE — reportée telle quelle, elle ne résoudrait rien | **oui** — l'humain qui suit le conseil au pied de la lettre câblerait un hook que K8 déclarerait aussitôt mort |
+| TF-0329 | candidat | 4 | Instruire l'admission de digit-ai-queue — le mécanisme de tickets demandé par TF-0318 existe sur le poste et le corpus l'ignore | **oui** — l'écosystème a instruit et refusé un mécanisme dont un exemplaire éprouvé dort à côté de lui — le trou est de connaissance, pas technique |
+| TF-0330 | candidat | 4 | 4 produits sur 5 n'ont pas de forge/QUESTIONS.md — un arbitrage en attente y est invisible | **oui** — un développement suspendu faute d'arbitrage est invisible pour 4 produits sur 5 — le coût que TF-0318 voulait traiter |
+| TF-0339 | candidat | 4 | L'output du pilot est en écart D-15 : deux familles en collision de numéro et un LISEZMOI incomplet | **oui** — le propre output du gardien de la convention la viole — chaque étude qui le cite en coût d'O0 le re-paiera jusqu'à correction |
+| TF-0338 | candidat | 3 | Fraîcheur d'ARCHITECTURE.html et MODELE-DONNEES.html non jugée — étendre le sceau sha256 de TODO-PRODUIT, avec mesure préalable | **oui** — une vue générée qui ment est pire qu'une vue absente : elle porte l'autorité du généré sans sa fraîcheur |
+| TF-0319 | corrige | 4.5 | Tout document destiné à l'utilisateur d'une forge se range dans output\ — jamais dans une arborescence de forge à parcourir | **oui** — constat d'usage humain : les documents qui lui sont destinés vivent dans des arborescences de forge complexes ou imbriquées, qu'il doit parcourir pour les retrouver |
+| TF-0320 | corrige | 4 | Un produit qui met ses forges à jour n'apprend rien des règles nouvelles ou modifiées — la mise à jour transporte le code, pas la consigne | non |
 | TF-0305 | corrige | 3 | oracle-skills : K7 ne vérifie pas qu'une commande câblée pointe un fichier qui EXISTE | **oui** — un câblage vers un chemin mort donne exactement la même assurance qu'un gate câblé, sans en avoir aucune propriété |
+| TF-0318 | corrige | 2.7 | Chaque projet porte SA todo en page HTML — décisions attendues, champs de saisie, et un bouton qui envoie en implémentation | non |
 | TF-0317 | corrige | 1 | Renommer le pilot en « factory » — nom cohérent avec ce qu'il fait (mobiliser les forges) et avec sa présentation | non |
 | TF-0322 | ecarte | 2.3 | Les conventions de la forge sont gravées, pas paramétrables — l'utilisateur final subit dossiers, nommage, formats de date et de version | **oui** — TF-0165 (13/08) : nommage exigé par un entrant inconciliable avec R-4, aucune règle pour trancher — arbitrage pris en session et consigné au ledger faute de paramètre |
 

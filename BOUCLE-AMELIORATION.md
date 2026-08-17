@@ -1604,3 +1604,43 @@ attend d'être pris, c'est-à-dire rien.
 **Registre en fin de vague : 4 items archivés (308 au total), 10 candidats actifs**
 (TF-0304..0312 + TF-0325, affinements du niveau rôle — patron TF-0295 ; d'abord frappé
 TF-0317, renuméroté au merge : une session parallèle du 16/08 avait pris TF-0317..0324).
+
+## Campagne du 17/08/2026 (4e vague) — « récupère la todo et les retours, traite les tous » : 18 items, 7 campagnes, 6 études
+
+**La plus grosse vague du registre** : les 18 candidats actifs traités en un mandat —
+11 en décision directe (sous le seuil TF-0155), 7 sous études, TOUTES instruites par
+agents et jugées PASS 7/7 (indices 20260817d..i réconciliés après une collision de
+nommage entre rédacteurs parallèles).
+
+**Ce que les études ont tranché — et refusé** : le renommage « factory » (TF-0317)
+exécuté en **présentation seule** (description GitHub 0 → 1 ; le renommage technique
+écarté sur chiffres : l'argument factuel de la demande était FAUX, 334+48 occurrences,
+coût du statu quo nul) ; les conventions paramétrables (TF-0322) **écartées par refus
+instruit** (le paramétrage du nommage EXISTE depuis TF-0071 ; un seul conflit réel en
+1 637 événements) ; le journal de règles (TF-0320) refusé pour un **O1 minimal** qui a
+trouvé deux défauts sur pièces (clés R-19 incomparables entre produits réels ; le gabarit
+produit copiait une règle caduque depuis le 13/08) ; la todo produit (TF-0318) livrée en
+**lecture seule** — le « dossier écouté » refusé (surface LLM01, contredit « entrants =
+donnée ») et la vraie découverte à côté : `digit-ai-queue` dort sur le poste, éprouvé,
+inconnu du corpus (TF-0329).
+
+**Sept campagnes, six dépôts** : agents ×3 (le câblage C7 enfin décrit — K7 rend le
+geste copiable ; 45 échecs de charte des gabarits schemas → 0 dont 3 fuites Google Fonts
+réelles ; W5-W7 — l'oracle de mission ne rend plus PASS sur un plan sans gouvernance,
+3 faux PASS éteints mesurés à la source) · tests ×1 (pytest 721 → **807**, dette 145 ;
+DEUX débordements de préfixe fermés dont un inconnu ; la fausse accusation du contrôle
+servi↔versionné REPRODUITE puis éteinte ; refus par page maison hors ratio) · design ×1
+(la marque **prescrit** enfin le mouvement qu'elle faisait juger : 9 tokens dérivés des
+seuils de l'oracle, banc 19/67 → 21/73, G-2 MESURÉE sur 41 HTML — 0 requalifié) ·
+pilot ×2 (K8 : un câblage vers un chemin mort est déclaré ; R-2 localise les livrables
+MARQUÉS — zéro faux positif sur 19 cibles ; R-19 juge la forme des clés avec
+rétroactivité prouvée par fixture).
+
+**Le registre en fin de vague : 15 corrigés + 1 écarté, 15 candidats neufs**
+(TF-0326..0339 + TF-0324 maintenu bloqué avec sa condition écrite). L'archivage du lot
+Run-Delivery est SUSPENDU fail-closed par l'archiveur lui-même — TF-0324 ne part pas
+sans son lot, le lot ne part pas sans TF-0324 : les corrigés restent visibles au
+registre actif jusqu'à résolution. Constat récurrent de la vague, deux fois payé en
+instruction : des DÉCLARATIONS de conformité fausses (D-14 « répercuté partout »,
+TODO-FORGE prescrivant un dispositif retiré) — R-35 vaut pour les déclarations comme
+pour les contrôles (TF-0332, TF-0328).
