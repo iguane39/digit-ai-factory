@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=1421f3fc7aee archive=9f205b231527 · dernier événement: 2026-08-17T13:47:55Z -->
+     sceaux: actifs=4b8749c12450 archive=9f205b231527 · dernier événement: 2026-08-17T14:00:34Z -->
 
-**43 actifs** (candidat 23 · décidé 0 · en cours 3 · corrigé 16 · écarté 1) · **308 archivés**.
+**44 actifs** (candidat 23 · décidé 0 · en cours 2 · corrigé 18 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -49,9 +49,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0348 | en_cours | 6 | output\ : les documents d'un audit vivent dans une famille XX-audit — nom de famille au registre organization, numéro local stable | **oui** — demande humaine directe — sans nom de famille conventionné, XX-audit sera 03- ici et 07- là et la recherche inter-produits redevient manuelle |
 | TF-0350 | en_cours | 4.5 | Une page HTML des TODO archivés — retrouver et chercher dans les 300+ items clos | **oui** — demande humaine directe — 320 items archivés ne sont aujourd'hui interrogeables que par grep, un canal illisible pour l'humain qui décide |
-| TF-0347 | en_cours | 3 | docs\ : sous-dossiers thématiques numérotés (01-, 02-…) — docs\projet\ reste INTACT (noms fixes R-20) | **oui** — demande humaine directe — le coût évité est celui déjà payé par output\ avant D-15 : des documents pérennes introuvables dans des arborescences non conventionnées |
+| TF-0349 | en_cours | 4 | output\ : famille XX-tests, et la voie « proposition de tests » est FERMÉE — tout test proposé est mis en œuvre de bout en bout, sous les bornes existantes | **oui** — demande humaine directe — une proposition de tests non exécutée est un contrôle jamais joué (R-35) livré au client comme s'il protégeait |
 | TF-0327 | candidat | 12 | RV-9 n'est pas refermé : la fixture témoin de la bascule sombre démontre ENCORE le comportement interdit | **oui** — deux livrables du même socle peuvent encore s'ouvrir différemment sur le même poste — le symptôme exact que RV-9 prétendait avoir soldé |
 | TF-0328 | candidat | 8 | appliquer-export.mjs est orphelin et TODO-FORGE.md prescrit un dispositif retiré le 12/08 | **oui** — un item de registre entier (TF-0318) a été instruit sur une prémisse que la doc du pilot affirmait et que le code démentait |
 | TF-0332 | candidat | 8 | Solder la dette de traçabilité D-14 : trois affirmations de conformité fausses au corpus | **oui** — deux études du même après-midi ont buté sur des déclarations de conformité fausses — le coût de recherche se paie à chaque instruction |
@@ -60,12 +59,14 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0329 | candidat | 4 | Instruire l'admission de digit-ai-queue — le mécanisme de tickets demandé par TF-0318 existe sur le poste et le corpus l'ignore | **oui** — l'écosystème a instruit et refusé un mécanisme dont un exemplaire éprouvé dort à côté de lui — le trou est de connaissance, pas technique |
 | TF-0330 | candidat | 4 | 4 produits sur 5 n'ont pas de forge/QUESTIONS.md — un arbitrage en attente y est invisible | **oui** — un développement suspendu faute d'arbitrage est invisible pour 4 produits sur 5 — le coût que TF-0318 voulait traiter |
 | TF-0339 | candidat | 4 | L'output du pilot est en écart D-15 : deux familles en collision de numéro et un LISEZMOI incomplet | **oui** — le propre output du gardien de la convention la viole — chaque étude qui le cite en coût d'O0 le re-paiera jusqu'à correction |
-| TF-0349 | candidat | 4 | output\ : famille XX-tests, et la voie « proposition de tests » est FERMÉE — tout test proposé est mis en œuvre de bout en bout, sous les bornes existantes | **oui** — demande humaine directe — une proposition de tests non exécutée est un contrôle jamais joué (R-35) livré au client comme s'il protégeait |
+| TF-0351 | candidat | 4 | orchestrer-boucle.mjs (13/08) n'a AUCUN appelant — dette R-35 vivante dans le pilot, câblage conditionné à TF-0340/0341 | **oui** — un outil livré il y a 4 jours pour la finalité exacte du mandat du jour était introuvable par lui — l'étude l'a exhumé par grep, pas par le corpus |
 | TF-0338 | candidat | 3 | Fraîcheur d'ARCHITECTURE.html et MODELE-DONNEES.html non jugée — étendre le sceau sha256 de TODO-PRODUIT, avec mesure préalable | **oui** — une vue générée qui ment est pire qu'une vue absente : elle porte l'autorité du généré sans sa fraîcheur |
 | TF-0346 | candidat | 1 | Renommer le pilot en digit-ai-factory — RÉOUVERTURE de TF-0317, décision humaine assumée contre le verdict O2 du 20260817h | **oui** — décision humaine d'identité — le coût du statu quo reste non mesuré (étude 20260817h), l'humain paie le renommage en connaissance de cause |
+| TF-0348 | corrige | 6 | output\ : les documents d'un audit vivent dans une famille XX-audit — nom de famille au registre organization, numéro local stable | **oui** — demande humaine directe — sans nom de famille conventionné, XX-audit sera 03- ici et 07- là et la recherche inter-produits redevient manuelle |
 | TF-0319 | corrige | 4.5 | Tout document destiné à l'utilisateur d'une forge se range dans output\ — jamais dans une arborescence de forge à parcourir | **oui** — constat d'usage humain : les documents qui lui sont destinés vivent dans des arborescences de forge complexes ou imbriquées, qu'il doit parcourir pour les retrouver |
 | TF-0320 | corrige | 4 | Un produit qui met ses forges à jour n'apprend rien des règles nouvelles ou modifiées — la mise à jour transporte le code, pas la consigne | non |
 | TF-0305 | corrige | 3 | oracle-skills : K7 ne vérifie pas qu'une commande câblée pointe un fichier qui EXISTE | **oui** — un câblage vers un chemin mort donne exactement la même assurance qu'un gate câblé, sans en avoir aucune propriété |
+| TF-0347 | corrige | 3 | docs\ : sous-dossiers thématiques numérotés (01-, 02-…) — docs\projet\ reste INTACT (noms fixes R-20) | **oui** — demande humaine directe — le coût évité est celui déjà payé par output\ avant D-15 : des documents pérennes introuvables dans des arborescences non conventionnées |
 | TF-0318 | corrige | 2.7 | Chaque projet porte SA todo en page HTML — décisions attendues, champs de saisie, et un bouton qui envoie en implémentation | non |
 | TF-0317 | corrige | 1 | Renommer le pilot en « factory » — nom cohérent avec ce qu'il fait (mobiliser les forges) et avec sa présentation | non |
 | TF-0322 | ecarte | 2.3 | Les conventions de la forge sont gravées, pas paramétrables — l'utilisateur final subit dossiers, nommage, formats de date et de version | **oui** — TF-0165 (13/08) : nommage exigé par un entrant inconciliable avec R-4, aucune règle pour trancher — arbitrage pris en session et consigné au ledger faute de paramètre |
