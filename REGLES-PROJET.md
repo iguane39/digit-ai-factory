@@ -515,6 +515,37 @@ canoniques de familles — `XX-audit`, `XX-tests` au départ).
 `oracle-conformite-projet`) ; la mécanisation des familles (D-15 + D-16 ensemble) reste
 la dette déclarée par D-15 elle-même — candidature de mécanisation au registre.
 
+## T. Un test proposé s'exécute — la voie « proposition de tests » est fermée (règle 40 — 17/08, TF-0349)
+
+Mandat humain direct du 17/08 ; étude `output\03-etudes\20260817-etude-opportunite-tests-bout-en-bout.md`
+(verdict O3). Le coût, mesuré sur pièces le jour même : des « Cahiers de tests » qui se
+déclarent eux-mêmes proposition, soldes réels **971 cas dérivés / 0 adopté** (BAV2) et
+**680 / 0** (COMPTA) — des contrôles jamais joués livrés comme s'ils protégeaient (R-35).
+La forme cible existe déjà : le rapport d'exécution STRATEGIE-E2E de BAV2 (69 tests
+verts, mutation 0,90).
+
+**R-40.**
+1. **Trois états seulement** pour tout cas de test dérivé : **adopté et exécuté** ·
+   **`non_testable` motivé** (idiome RT-6 : `champs_requis[]` nommés — il se répare en
+   fournissant, pas en écrivant) · **écarté par décision humaine nommée** (qui, quand,
+   pourquoi). L'état « proposition » n'est plus un état terminal : un cahier remis dont
+   le solde `dérivés − adoptés − non_testables − écartés` n'est pas nul porte un
+   reste-à-faire, jamais un livrable clos.
+2. **La chaîne s'exécute de bout en bout** — cas de tests, jeux de données, exécution
+   réelle, rapport d'exécution dans la famille `XX-tests` d'`output\` (R-39), corrections
+   sous les gates existants : boucle de fermeture ≤ 5 cycles, G-2 absolue, G-1
+   (l'auditeur ne modifie pas le produit — les correctifs passent par la voie du
+   produit), dépenses et GO humains inchangés (R-29). Les cahiers de travail restent
+   sous `forge\etapes\`, seul le rapport d'exécution est un livrable d'`output\`.
+3. **L'e2e déclare le cycle de vie de son instance** (monter/démonter, ce qui reste
+   debout est publié) — la règle s'arme pleinement à la résolution de TF-0340/0341.
+
+**Appelants (R-35)** : le pas de l'étape 5 (`ETAPES-RUN.md`) et le contrat « prêt
+client » (traçabilité exigences→tests 100 % s'entend désormais en cas EXÉCUTÉS) ; le
+contrat d'adoption `forge\cas-adoptes.jsonl` (existant, forge-tests) rend le solde
+calculable — sa mécanisation en oracle est portée par la campagne TF-0349. Dette
+NOMMÉE : `orchestrer-boucle.mjs` sans appelant (TF-0351, conditionné à TF-0340/0341).
+
 ## Conflits à trancher (ta décision explicite)
 
 - **C1 — `old\` vs git (n° 6/7)** : **TRANCHÉ le 13/08 (TF-0150)** — `old\` (minuscule,
