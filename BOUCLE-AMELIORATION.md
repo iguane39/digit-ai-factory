@@ -1674,3 +1674,29 @@ de session (reset 18:40) — reprise sans perte : l'étude de séquencement éta
 seul défaut de forme), la page d'archive finie jusqu'à ses self-tests, les deux
 campagnes R-40 relancées et rendues vertes. Deux défauts réels tués par les fixtures
 rouges des campagnes elles-mêmes (nom vide, chapitre vide flatté).
+
+## 17/08/2026 (soir) — LE DÉPÔT S'APPELLE digit-ai-factory (D-17, TF-0346)
+
+Les deux gates humains francs le même soir : n°1 « digit-ai-factory » (les 6 sites hors
+motif payés en connaissance de cause — l'alternative digit-ai-forge-factory coûtait 0),
+n°2 « a : renomme » (geste `gh repo rename` délégué explicitement). La séquence O1 de
+l'étude 20260817i exécutée entière en une soirée :
+
+**A** — la dette D-14 SOLDÉE d'abord (TF-0332 : « répercuté partout » était faux, le
+corpus le dit maintenant ; RUN-VERSION reformulé en fait daté ; doctrine « pas de
+jonction — un chemin périmé échoue fort ») ; mesure P0 figée (25 occurrences / 11
+fichiers) ; table §3 bis écrite AVANT tout geste (ids `pilot/*@1` gelés). **B** — GitHub
+renommé (redirections actives, l'ancien nom ne sera JAMAIS réutilisé), 19 sites de prose
+en un lot contigu, les 6 sites du motif payés (`RE_CLE_DEPOT` accepte l'exception nommée,
+raccourci du noyau réécrit sous plafond — 6130 octets), D-17 cataloguée chez organization.
+**C** — 14 dépôts frères en 22 minutes : 51 occurrences → 35 basculées, **16 justifiées
+une à une, 0 silence** ; l'arbitrage du soir : le CLAUDE.md d'organization reçoit une
+section datée JUMELLE (le fait d'époque du 09/08 intact, le nom courant dit — loi n°3
+dans les deux sens). 14 self-tests verts avant et après, 13 dépôts poussés.
+
+**Critères de fin, tous exécutés** : poste nu = « Poste prêt » exit 0 sur clone du
+nouveau nom · grep 0 hors classes · 8 oracles du pilot verts (le claim design-oracles a
+attrapé en chemin une vraie dérive d'INVENTAIRE, 9 → 11) · clôture TF-0346 AVEC gains —
+l'inverse exact de TF-0062, et c'était le but : un renommage qui se prouve au lieu de
+s'affirmer. Restes datés : dossier local à renommer hors session vivante, dénominateur
+« 14 frères » de l'étude à corriger à la revue du 24/08 (TF-0358).
