@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=ad7b5da7ec94 archive=9f205b231527 · dernier événement: 2026-08-17T12:44:28.482Z -->
+     sceaux: actifs=1421f3fc7aee archive=9f205b231527 · dernier événement: 2026-08-17T13:47:55Z -->
 
-**34 actifs** (candidat 17 · décidé 0 · en cours 0 · corrigé 16 · écarté 1) · **308 archivés**.
+**43 actifs** (candidat 23 · décidé 0 · en cours 3 · corrigé 16 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -31,9 +31,13 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0343 | candidat | 9 | tests : la matrice des droits doit etre un artefact EXECUTABLE cellule par cellule, avec xfail strict pour les cellules non tenues | **oui** — 2 lignes de la matrice des droits conformes par construction mais prouvees par aucun test, et 2 cases non tenues par le produit, invisibles dans une suite organisee par service |
+| TF-0345 | candidat | 6 | tests : une donnee de test partagee se reference et se valide a la generation, elle ne se recopie pas d un spec a l autre | **oui** — 4 tests e2e en timeout et un diagnostic egare vers la chaine de conversion, pour 80 caracteres perdus dans la recopie d un litteral base64 |
 | TF-0333 | candidat | 4.5 | Écart servi↔versionné : une locale promise par la source et jamais servie n'est JAMAIS comparée — PASS sans mesure | **oui** — un produit qui cesse de servir /en entier passerait le contrôle né pour attraper exactement cette famille d'écarts |
 | TF-0341 | candidat | 4.5 | forge-tests : une instance laissee debout est indiscernable d une instance fraiche — l audit peut mesurer un code qui n est plus celui du depot et le publier comme courant | **oui** — fenetre de 2 h 25 pendant laquelle tout audit relance aurait mesure un code anterieur au correctif D-14 et publie ses chiffres comme courants, sans qu aucun signal ne distingue l instance perimee d une instance fraiche |
+| TF-0344 | candidat | 4.5 | tests : trois pieges a faux vert a interdire et si possible a mecaniser — absence sans presence, motif satisfait par le declencheur, cellule mutante sur objet partage | **oui** — instabilite 1 run sur 2 sur la suite e2e, 30 s de timeout par assertion vacante (3,6 min -> 36 s apres correction), et un faux vert dormant depuis le 12/08 dans un spec deja livre |
 | TF-0340 | candidat | 3 | forge-tests : le cycle de vie de l instance servie n appartient a personne — montee pour l audit, jamais demontee, et le rapport ne dit pas ce qu il laisse debout | **oui** — 3 conteneurs et un reseau laisses en service 2 h 25 apres la fin de l audit, tenant trois ports, jusqu a intervention humaine ; aucune mention au rapport |
+| TF-0342 | candidat | 3 | tests : exiger une recette MULTI-PROFILS des qu un produit declare des roles — un produit a roles n est pas verifiable sous une identite unique | **oui** — audit 12 pans declare vert le 12/08 sur le seul cas degenere ; 1 defaut produit et 2 defauts d ergonomie decouverts des la premiere recette multi-profils, 5 jours plus tard et hors outillage |
 | TF-0334 | candidat | 2 | forge-tests : comptes périmés restants au README (treize adaptateurs pour 14, onze pans pour 14) et classes de corpus en littéraux | **oui** — la doc dément l'outil sur deux comptes de plus, et le verrou len(CORPUS) de TF-0311 ne les couvre pas (hors corpus) |
 | TF-0309 | corrige | 6 | forge-tests : schema_obtenu rend None sans motif propre quand le conteneur manque sur son seul chemin | **oui** — le seul chemin conteneur encore capable de se taire — la maladie que TF-0299 vient d'éradiquer partout ailleurs |
 | TF-0312 | corrige | 4.5 | forge-tests : l'écart servi↔versionné compare des espaces de clés différents quand aucune locale n'est déclarée — fausse accusation possible | **oui** — un faux positif sur le contrôle né avant-hier coûterait sa crédibilité avant son premier vrai cas — la maladie documentée par l'étude 20260815e |
@@ -45,6 +49,9 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0348 | en_cours | 6 | output\ : les documents d'un audit vivent dans une famille XX-audit — nom de famille au registre organization, numéro local stable | **oui** — demande humaine directe — sans nom de famille conventionné, XX-audit sera 03- ici et 07- là et la recherche inter-produits redevient manuelle |
+| TF-0350 | en_cours | 4.5 | Une page HTML des TODO archivés — retrouver et chercher dans les 300+ items clos | **oui** — demande humaine directe — 320 items archivés ne sont aujourd'hui interrogeables que par grep, un canal illisible pour l'humain qui décide |
+| TF-0347 | en_cours | 3 | docs\ : sous-dossiers thématiques numérotés (01-, 02-…) — docs\projet\ reste INTACT (noms fixes R-20) | **oui** — demande humaine directe — le coût évité est celui déjà payé par output\ avant D-15 : des documents pérennes introuvables dans des arborescences non conventionnées |
 | TF-0327 | candidat | 12 | RV-9 n'est pas refermé : la fixture témoin de la bascule sombre démontre ENCORE le comportement interdit | **oui** — deux livrables du même socle peuvent encore s'ouvrir différemment sur le même poste — le symptôme exact que RV-9 prétendait avoir soldé |
 | TF-0328 | candidat | 8 | appliquer-export.mjs est orphelin et TODO-FORGE.md prescrit un dispositif retiré le 12/08 | **oui** — un item de registre entier (TF-0318) a été instruit sur une prémisse que la doc du pilot affirmait et que le code démentait |
 | TF-0332 | candidat | 8 | Solder la dette de traçabilité D-14 : trois affirmations de conformité fausses au corpus | **oui** — deux études du même après-midi ont buté sur des déclarations de conformité fausses — le coût de recherche se paie à chaque instruction |
@@ -53,7 +60,9 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0329 | candidat | 4 | Instruire l'admission de digit-ai-queue — le mécanisme de tickets demandé par TF-0318 existe sur le poste et le corpus l'ignore | **oui** — l'écosystème a instruit et refusé un mécanisme dont un exemplaire éprouvé dort à côté de lui — le trou est de connaissance, pas technique |
 | TF-0330 | candidat | 4 | 4 produits sur 5 n'ont pas de forge/QUESTIONS.md — un arbitrage en attente y est invisible | **oui** — un développement suspendu faute d'arbitrage est invisible pour 4 produits sur 5 — le coût que TF-0318 voulait traiter |
 | TF-0339 | candidat | 4 | L'output du pilot est en écart D-15 : deux familles en collision de numéro et un LISEZMOI incomplet | **oui** — le propre output du gardien de la convention la viole — chaque étude qui le cite en coût d'O0 le re-paiera jusqu'à correction |
+| TF-0349 | candidat | 4 | output\ : famille XX-tests, et la voie « proposition de tests » est FERMÉE — tout test proposé est mis en œuvre de bout en bout, sous les bornes existantes | **oui** — demande humaine directe — une proposition de tests non exécutée est un contrôle jamais joué (R-35) livré au client comme s'il protégeait |
 | TF-0338 | candidat | 3 | Fraîcheur d'ARCHITECTURE.html et MODELE-DONNEES.html non jugée — étendre le sceau sha256 de TODO-PRODUIT, avec mesure préalable | **oui** — une vue générée qui ment est pire qu'une vue absente : elle porte l'autorité du généré sans sa fraîcheur |
+| TF-0346 | candidat | 1 | Renommer le pilot en digit-ai-factory — RÉOUVERTURE de TF-0317, décision humaine assumée contre le verdict O2 du 20260817h | **oui** — décision humaine d'identité — le coût du statu quo reste non mesuré (étude 20260817h), l'humain paie le renommage en connaissance de cause |
 | TF-0319 | corrige | 4.5 | Tout document destiné à l'utilisateur d'une forge se range dans output\ — jamais dans une arborescence de forge à parcourir | **oui** — constat d'usage humain : les documents qui lui sont destinés vivent dans des arborescences de forge complexes ou imbriquées, qu'il doit parcourir pour les retrouver |
 | TF-0320 | corrige | 4 | Un produit qui met ses forges à jour n'apprend rien des règles nouvelles ou modifiées — la mise à jour transporte le code, pas la consigne | non |
 | TF-0305 | corrige | 3 | oracle-skills : K7 ne vérifie pas qu'une commande câblée pointe un fichier qui EXISTE | **oui** — un câblage vers un chemin mort donne exactement la même assurance qu'un gate câblé, sans en avoir aucune propriété |
