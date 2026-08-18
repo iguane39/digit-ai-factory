@@ -139,7 +139,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>039d6095fe44</code> · dernier événement 2026-08-18T12:40:00Z</p>
+      <p class="meta">sceau <code>5cfa2c6550dc</code> · dernier événement 2026-08-18T14:20:00Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -165,11 +165,12 @@
       <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
       
       <div class="dropdown" data-dim="forge">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">4</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">5</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
           <label><input type="checkbox" value="digit-ai-forge-agents" checked> digit-ai-forge-agents</label>
           <label><input type="checkbox" value="digit-ai-forge-design" checked> digit-ai-forge-design</label>
+          <label><input type="checkbox" value="digit-ai-forge-development" checked> digit-ai-forge-development</label>
           <label><input type="checkbox" value="digit-ai-forge-tests" checked> digit-ai-forge-tests</label>
           <label><input type="checkbox" value="pilot" checked> pilot</label>
         </div>
@@ -185,32 +186,15 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">55 / 55 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">57 / 57 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">9 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">17 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">26 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">9 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-development"><strong>digit-ai-forge-development</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">17 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">27 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-forge-agents">
       <h2>digit-ai-forge-agents <span class="badge" title="9 item(s) actifs ciblant digit-ai-forge-agents">9</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-agents</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0362" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0362</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">oracle-etat-forge : un skill présent au dépôt mais ABSENT du manifeste n'est jamais regardé par F1 — le silence est du bon côté</h3>
-          <div class="card-detail"><p class="lead">Constaté en passant en soldant TF-0336 le 18/08.</p><ul class="puces"><li>F1 parcourt les entrées du MANIFESTE et vérifie que chaque skill déclaré est monté à la bonne version</li><li>La direction inverse n'existe pas : un skill présent dans `.claude/skills/` du dépôt et absent de `versions-livrees.json` ne produit AUCUN constat</li><li>Cas réel mesuré le 18/08 : `la-barre` était dans cette situation — livré, monté, jamais regardé</li><li>Il a été trouvé non par l'oracle mais par le générateur `maj-versions-livrees.mjs` écrit ce jour-là, qui compare les deux ensembles</li><li>Le défaut est le patron habituel : un contrôle qui itère sur une liste ne voit jamais ce qui n'y est pas (même famille que TF-0333 côté forge-tests, où la boucle n'itérait que sur les locales servies)</li><li>À instruire : F1-bis « skill du dépôt absent du manifeste », et le choix entre constat bloquant et avertissement — le manifeste décrit ce qui est LIVRÉ, et tout skill du dépôt n'a pas vocation à l'être</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-18</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un skill livré et monté est resté hors de tout contrôle de version sans que rien ne le signale ; il a fallu écrire un second outil pour s'en apercevoir</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant de la boucle du 18/08 — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
         <article class="card s-candidat" id="item-TF-0324" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0324</code>
@@ -259,6 +243,23 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>chaque exécution du self-test crée un diff parasite — le prochain commit pressé l'embarque et le bruit K2 renaît</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0362" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0362</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">oracle-etat-forge : un skill présent au dépôt mais ABSENT du manifeste n'est jamais regardé par F1 — le silence est du bon côté</h3>
+          <div class="card-detail"><p class="lead">Constaté en passant en soldant TF-0336 le 18/08.</p><ul class="puces"><li>F1 parcourt les entrées du MANIFESTE et vérifie que chaque skill déclaré est monté à la bonne version</li><li>La direction inverse n'existe pas : un skill présent dans `.claude/skills/` du dépôt et absent de `versions-livrees.json` ne produit AUCUN constat</li><li>Cas réel mesuré le 18/08 : `la-barre` était dans cette situation — livré, monté, jamais regardé</li><li>Il a été trouvé non par l'oracle mais par le générateur `maj-versions-livrees.mjs` écrit ce jour-là, qui compare les deux ensembles</li><li>Le défaut est le patron habituel : un contrôle qui itère sur une liste ne voit jamais ce qui n'y est pas (même famille que TF-0333 côté forge-tests, où la boucle n'itérait que sur les locales servies)</li><li>À instruire : F1-bis « skill du dépôt absent du manifeste », et le choix entre constat bloquant et avertissement — le manifeste décrit ce qui est LIVRÉ, et tout skill du dépôt n'a pas vocation à l'être</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-18</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un skill livré et monté est resté hors de tout contrôle de version sans que rien ne le signale ; il a fallu écrire un second outil pour s'en apercevoir</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant de la boucle du 18/08 — constat =&gt; candidat)</dd></div>
             
           </dl>
         </article>
@@ -353,10 +354,10 @@
       <h2>digit-ai-forge-design <span class="badge" title="3 item(s) actifs ciblant digit-ai-forge-design">3</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-design</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0361" data-forge="digit-ai-forge-design" data-statut="candidat" data-prio="haute">
+        <article class="card s-corrige" id="item-TF-0361" data-forge="digit-ai-forge-design" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0361</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-corrige">corrige</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -401,6 +402,29 @@
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-design</dt><dd>une autorité de mouvement à deux têtes potentielles et des démos qui contredisent l'oracle — le bruit de fond que TF-0228 a appris à éteindre</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+      </div>
+    </section>
+    <section id="digit-ai-forge-development">
+      <h2>digit-ai-forge-development <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-development">1</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-development</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0363" data-forge="digit-ai-forge-development" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0363</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-development n'a aucun point d'entrée pour une ACTION unitaire — la boucle de correction ne peut router qu'un run de remédiation sur le produit entier</h3>
+          <div class="card-detail"><p class="lead">Constaté le 18/08 en câblant la boucle de correction (TF-0360, option O3), et vérifié sur pièces : `conductor/__main__.py` n'expose qu'une sous-commande, `run &lt;idea&gt;`, avec `--mode greenfield|brownfield`, `--repo`, `--intent remediation|complement|both`.</p><ul class="puces"><li>Aucune option ne désigne une action ni un constat</li><li>C'est cohérent avec ce que la forge EST — un accélérateur idée-vers-SaaS — mais cela crée un écart de GRANULARITÉ avec le contrat R-29 : le rapport de forge-tests classe des `actions[]` unitaires portant chacune son `etape_cible`, et `development` en est une cible</li><li>Router une action `manuelle_dev` revient donc aujourd'hui à déclencher un run de remédiation sur le PRODUIT ENTIER, dont l'intention est dérivée du libellé du constat</li><li>Le mapping n'est pas un-pour-un, et le câblage du pilot le DÉCLARE (champ `granularite` de `declencherDevelopment`) plutôt que de le masquer</li><li>Coût du statu quo : une boucle qui, pour un bouton inerte, relance une remédiation de produit — ou qui n'ose pas la lancer, ce qui est le comportement actuel (l'appel est PRÉPARÉ, jamais joué sans décision humaine)</li><li>À instruire chez forge-development : une entrée qui prend un constat ou un lot d'actions, ou la déclaration explicite que la granularité d'action n'est pas de son ressort — auquel cas c'est le contrat d'interface R-29 qui doit cesser de désigner `development` comme cible d'une action unitaire</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-18</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 3 × preuve 4 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-development</dt><dd>le câblage écrit le matin du 18/08 INVENTAIT un `conductor --action &lt;ref&gt;` qui n'existe pas — l'écart de granularité est assez peu visible pour qu'on fabrique l'interface manquante sans s'en apercevoir, et le test qui l'a rattrapé n'existait pas non plus</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (retour sortant de la campagne du 18/08 — constat =&gt; candidat)</dd></div>
             
           </dl>
         </article>
@@ -702,9 +726,26 @@
       </div>
     </section>
     <section id="pilot">
-      <h2>pilot <span class="badge" title="26 item(s) actifs ciblant pilot">26</span></h2>
+      <h2>pilot <span class="badge" title="27 item(s) actifs ciblant pilot">27</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0364" data-forge="pilot" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0364</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Aucun canal pour la REMISE d'un artefact manquant — l'archive de pilote-de-mission est arrivée à plat dans input/, sans sidecar ni nommage</h3>
+          <div class="card-detail"><p class="lead">Constaté le 18/08. Le registre a demandé à l'humain un objet introuvable (TF-0326) ; il l'a remis en déposant `input/pilote-de-mission.skill`. Le dépôt a parfaitement fonctionné — l'objet est arrivé, il a été scanné, versionné — mais il est arrivé HORS de tout canal déclaré : `input/00-retours/` est le canal des LOTS (règle 18, sidecar `.tf.jsonl` obligatoire, oracle B1-B3), `input/01-candidatures/` celui des candidatures hors lot. Ni l'un ni l'autre ne décrit la remise d'un ARTEFACT que la forge réclame. Conséquences mesurables : `oracle-boite-entree` ne voit pas ce fichier (B3 ne juge que les `.md` sans sidecar), aucun nommage R-4 ne s'applique, et rien ne dit à quel item la remise répond — ici c'est la conversation qui a fait le lien, pas un artefact. Le prochain cas se reperdra si la session change. À instruire : un canal `input/03-artefacts/` avec une convention minimale (nom, item de rattachement, provenance déclarée) et une règle d'oracle qui dénonce un dépôt orphelin — ou la décision explicite que ce cas reste conversationnel, auquel cas la dire, car pour l'instant elle n'est écrite nulle part.</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-18</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 2 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>un artefact réclamé par le registre est arrivé dans un dossier qu'aucun oracle ne regarde et qu'aucune convention ne décrit ; le lien entre la remise et l'item qui la réclamait n'existe que dans une conversation</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (retour sortant de la campagne du 18/08 — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
         <article class="card s-corrige" id="item-TF-0327" data-forge="pilot" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0327</code>

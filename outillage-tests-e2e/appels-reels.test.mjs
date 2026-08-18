@@ -130,12 +130,38 @@ cas("le tour est DÉRIVÉ du rapport — un chiffre saisi deux fois diverge", ()
 console.log("\nles appels — la forme, et le refus de prétendre");
 
 cas("declencherDevelopment ne PRÉTEND jamais avoir joué (loi 5)", () => {
-  const r = declencherDevelopment({ finding_ref: "H-13" });
+  const r = declencherDevelopment({ finding_ref: "H-13", produit: "C:/dev/un-produit" });
   assert.equal(r.joue, false);
   assert.match(r.motif, /gates|absente/);
   assert.equal(r.commande.binaire, "uv");
-  assert.ok(r.commande.args.includes("conductor"));
-  assert.ok(r.commande.args.includes("H-13"), "l'action est portée dans la commande rendue");
+});
+
+cas("la commande est celle qui EXISTE — `conductor run`, pas un `--action` inventé", () => {
+  // Vérifié le 18/08 dans conductor/__main__.py : une seule sous-commande, `run`, prenant une
+  // intention en texte libre. La première version de ce fichier inventait `--action <ref>`.
+  const r = declencherDevelopment({ attendu: "corriger le 403 de l export", produit: "C:/x" });
+  const a = r.commande.args;
+
+  assert.deepEqual(a.slice(0, 3), ["run", "conductor", "run"]);
+  assert.ok(!a.includes("--action"), "aucune option inventée");
+  assert.ok(a.includes("--mode") && a[a.indexOf("--mode") + 1] === "brownfield");
+  assert.ok(a.includes("--intent") && a[a.indexOf("--intent") + 1] === "remediation");
+  assert.ok(a.includes("--repo") && a[a.indexOf("--repo") + 1] === "C:/x");
+  assert.ok(a.includes("corriger le 403 de l export"), "l intention est dérivée du constat");
+});
+
+cas("la GRANULARITÉ réelle est déclarée, pas maquillée en mapping un-pour-un", () => {
+  const r = declencherDevelopment({ finding_ref: "H-13", produit: "C:/x" });
+
+  assert.match(r.granularite, /produit entier/);
+  assert.match(r.granularite, /pas un-pour-un/);
+});
+
+cas("sans produit, l'appel est REFUSÉ — un greenfield fabriquerait un projet neuf", () => {
+  const r = declencherDevelopment({ finding_ref: "H-13" });
+
+  assert.equal(r.joue, false);
+  assert.match(r.motif, /greenfield/);
 });
 
 cas("la racine des forges suit la règle du noyau (FORGE_ROOT, sinon le parent)", () => {
