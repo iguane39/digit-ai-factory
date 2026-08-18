@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=039c0022d252 archive=9f205b231527 · dernier événement: 2026-08-18T18:10:00Z -->
+     sceaux: actifs=2eeb5f841d36 archive=9f205b231527 · dernier événement: 2026-08-18T19:30:00Z -->
 
-**70 actifs** (candidat 5 · décidé 0 · en cours 0 · corrigé 64 · écarté 1) · **308 archivés**.
+**75 actifs** (candidat 5 · décidé 0 · en cours 1 · corrigé 68 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,7 +11,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0324 | candidat | 3 | Artefacts périodiques du run de delivery absents : RAID, rapport d'avancement, compte rendu, REX, suivi des bénéfices | **oui** — revérifié en session le 16/08 : 0 occurrence de RAID / compte rendu / rapport d'avancement / lessons learned sur les skills installés — aucun des cinq artefacts que réclame une mission longue n'a d'équivalent dans la forge |
+| TF-0324 | en_cours | 3 | Artefacts périodiques du run de delivery absents : RAID, rapport d'avancement, compte rendu, REX, suivi des bénéfices | **oui** — revérifié en session le 16/08 : 0 occurrence de RAID / compte rendu / rapport d'avancement / lessons learned sur les skills installés — aucun des cinq artefacts que réclame une mission longue n'a d'équivalent dans la forge |
+| TF-0382 | candidat | 6 | forge-agents, render_page : la liste des debordements V1 est tronquee a 16 sans que rien ne le dise | **oui** — il a fallu compter les colonnes des 19 tableaux du livrable et rapprocher l'ordre du DOM de la liste rendue pour etablir que deux tableaux de meme gabarit n'avaient pas ete regardes. Le rapport lu au premier degre disait « 16 debordements », soit un chiffre qui n'est ni un compte ni une borne annoncee. |
 | TF-0304 | corrige | 12 | forge-agents : déclarer le câblage de qo-gate-write.mjs dans le settings.json versionné de la forge | **oui** — le gate C7 est mort sur ce poste depuis une date inconnue et AUCUN dépôt ne dit comment le recâbler — la moitié durable du trou que K7 déclare à chaque run |
 | TF-0366 | corrige | 9 | un verdict d'oracle archive ne dit pas sous quel jeu de regles il a ete rendu | **oui** — 1 aller-retour de diagnostic : A3 tombe sur les 5 fichiers HTML du projet, gabarit compris, ce qui a d'abord fait soupconner un defaut de la chaine d'emission avant que la comparaison avec le journal du 14/08 n'etablisse qu'il s'agissait d'une regle nouvelle. |
 | TF-0306 | corrige | 8 | forge-agents : _routages-journal.jsonl d'experts-forge est un journal d'exécution TRACKÉ que son self-test salit | **oui** — chaque exécution du self-test crée un diff parasite — le prochain commit pressé l'embarque et le bruit K2 renaît |
@@ -28,8 +29,15 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0376 | candidat | 4.5 | conception : deux sujets d exigences manquent systematiquement — propagation d etat asynchrone et cycle de vie de session — et ils concentrent les anomalies les plus couteuses | **oui** — 5 des 12 lacunes de specification du cahier Approval tiennent a ces deux seuls sujets, dont la rubrique 20 qualifiee « bug critique » par la recette et la perte de brouillon a l expiration de session (rubriques 27, 28) |
-| TF-0374 | candidat | 3 | conception : un retour d usage (lot d anomalies de recette) n entre dans AUCUNE des cinq categories d entrant, et aucun chemin ne le traite | **oui** — traitement integralement manuel du 18/08 : 1271 lignes x 16 sections croisees sans aucun oracle jouable, 49 rubriques classees, 9 contradictions et 3 regressions trouvees a la main, dont backend/tests/test_decision_lock.py:26 qui echouera des l implementation de la rubrique 35 |
+| TF-0376 | corrige | 4.5 | conception : deux sujets d exigences manquent systematiquement — propagation d etat asynchrone et cycle de vie de session — et ils concentrent les anomalies les plus couteuses | **oui** — 5 des 12 lacunes de specification du cahier Approval tiennent a ces deux seuls sujets, dont la rubrique 20 qualifiee « bug critique » par la recette et la perte de brouillon a l expiration de session (rubriques 27, 28) |
+| TF-0374 | corrige | 3 | conception : un retour d usage (lot d anomalies de recette) n entre dans AUCUNE des cinq categories d entrant, et aucun chemin ne le traite | **oui** — traitement integralement manuel du 18/08 : 1271 lignes x 16 sections croisees sans aucun oracle jouable, 49 rubriques classees, 9 contradictions et 3 regressions trouvees a la main, dont backend/tests/test_decision_lock.py:26 qui echouera des l implementation de la rubrique 35 |
+
+## digit-ai-forge-data
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0379 | candidat | 6 | forge-data, oracle-restituer : le non_juge renvoie a un oracle qui n'existe nulle part dans le parc | **oui** — recherche complete du parc (3 depots, plus une recherche par nom sous C:\dev) pour etablir qu'un outil nomme dans un non_juge n'existe pas — temps perdu a chercher, et pire, cinq jours de run passes en croyant la famille couverte par un outil que personne n'a jamais joue ici. |
+| TF-0378 | candidat | 4.5 | forge-data, oracle-restituer : un nombre ecrit en prose SANS marqueur n'est juge par aucune regle | **oui** — un chiffre faux publie sur DEUX versions successives d'un livrable (20260818d et 20260818e), sous PASS de l'oracle cense ancrer les chiffres ; correction en un aller-retour complet — regeneration du rapport, deux controles ajoutes a la batterie du projet (T12 verifie desormais que la somme des etats fait le nombre de cibles confrontees et que le corps annonce ce nombre-la) et un commit de rattrapage. |
 
 ## digit-ai-forge-design
 
@@ -43,18 +51,20 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0375 | candidat | 4.5 | development : cat-dev-03 (gate spec under/over-build) couvrait 24 des 49 anomalies de la recette Approval, et c est le gate JAMAIS demontre sur produit reel | **oui** — 24 des 49 rubriques de la recette du 18/08 relevent litteralement de l intention de cat-dev-03 ; le catalogue lui-meme declare ce gate jamais demontre sur produit reel (statut declare, cycle experimental) |
+| TF-0375 | corrige | 4.5 | development : cat-dev-03 (gate spec under/over-build) couvrait 24 des 49 anomalies de la recette Approval, et c est le gate JAMAIS demontre sur produit reel | **oui** — 24 des 49 rubriques de la recette du 18/08 relevent litteralement de l intention de cat-dev-03 ; le catalogue lui-meme declare ce gate jamais demontre sur produit reel (statut declare, cycle experimental) |
 
 ## digit-ai-forge-organization
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0377 | candidat | 3 | organization : le nom de fichier d un referentiel et sa version interne peuvent diverger — l ecart a failli produire un arbitrage faux sur Approval | **oui** — ambiguite portee a l humain comme risque de reouverture des 31 ecarts fermes par 7fc01f3, levee seulement par la lecture du pied de page du document ; la meme confusion est deja inscrite dans le message du commit 7fc01f3 |
+| TF-0377 | corrige | 3 | organization : le nom de fichier d un referentiel et sa version interne peuvent diverger — l ecart a failli produire un arbitrage faux sur Approval | **oui** — ambiguite portee a l humain comme risque de reouverture des 31 ecarts fermes par 7fc01f3, levee seulement par la lecture du pied de page du document ; la meme confusion est deja inscrite dans le message du commit 7fc01f3 |
 
 ## digit-ai-forge-tests
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0380 | candidat | 4.5 | forge-tests : l'inventaire ne distingue pas les ENTRANTS des artefacts produits — un pan peut etre couvert a 100 % sur des fichiers recus | **oui** — lecture manuelle du rapport JSON puis recomptage des ancres par git show a la revision auditee pour etablir d'ou venaient les 15 elements — le rapport ne le dit qu'en clef d'identifiant, jamais en synthese. Sans ce recomptage, la ligne « interface 15/15 ratio 1,0 » se lisait comme une couverture des livrables du projet. |
+| TF-0381 | candidat | 3 | forge-tests : une action manuelle utilisateur est emise pour des pans que le rapport declare lui-meme a zero element | **oui** — trois actions categorie manuelle_utilisateur emises sur un projet qui n'a ni api, ni back, ni batch — soit trois demandes de configuration adressees a un humain pour des pans que le rapport declare a zero element deux champs plus haut. |
 | TF-0343 | corrige | 9 | tests : la matrice des droits doit etre un artefact EXECUTABLE cellule par cellule, avec xfail strict pour les cellules non tenues | **oui** — 2 lignes de la matrice des droits conformes par construction mais prouvees par aucun test, et 2 cases non tenues par le produit, invisibles dans une suite organisee par service |
 | TF-0352 | corrige | 9 | tests : « executer la strategie de tests » doit inclure la CORRECTION des anomalies remontees et le REJEU jusqu a extinction — definition de fin a ecrire | **oui** — campagne du 12/08 close conforme avec 121 findings et produit inchange ; la meme strategie executee avec obligation de traiter a ferme 4 anomalies produit et 3 faux verts, dont un dormant depuis cette campagne |
 | TF-0371 | corrige | 9 | forge-tests : rien ne confronte ce que le code APPELLE a ce que l instance SERT — ni les routes, ni les ressources | **oui** — une fonction produit entierement morte en production (notifications push, deux routes en 404) et l absence totale d image sur 1 249 annonces, tenues par deux 404 lisibles sans authentification, non vues par six campagnes d audit entre le 11 et le 18/08 |

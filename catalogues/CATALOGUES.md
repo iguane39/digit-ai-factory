@@ -35,7 +35,7 @@
 |---|---|---|---|---|---|---|
 | cat-dev-01 | **Construire le produit sous gates** | transformer mes exigences et mon design en produit qui fonctionne | `méthode du run-playbook appliquée par agent (mode degrade) ; gates rejoués : ruff check + pytest` | run pilote 04/08 — ruff+pytest verts, traçabilité 11/11 | prouve | experimental |
 | cat-dev-02 | **Double gate code + design** | garantir que rien ne passe sans vérification code ET design | `.github\workflows\double-gate.yml + conductor\gates\design_gate.py` | CI verte, 266 tests, ratio tests/code ~0,91 — INVENTAIRE §3 | prouve | production |
-| cat-dev-03 | **Gate spec (under/over-build)** | détecter ce que le code sous-livre ou sur-livre par rapport à la spec | `conductor (gate spec), remédiation bornée à 3` | testé par la suite de la forge (fakes) — jamais démontré sur produit réel | declare | experimental |
+| cat-dev-03 | **Gate spec (under/over-build)** | détecter ce que le code sous-livre ou sur-livre par rapport à la spec | `conductor (gate spec), remédiation bornée à 3` | TF-0375 (18/08) : corpus RÉEL Approval porté en banc double sens — 4 sous-livrés bloquent, 2 sur-livrés vus sans bloquer, 12 évolutions de doctrine NON transformées en écarts ; et les **trois chemins qui rendaient un succès sans avoir jugé** sont supprimés (reviewer par défaut, juge muet, registre non écrit). Reste non démontré : que le juge LIT bien le cahier — demande un run réel, empêché par D-V1 | declare | experimental |
 | cat-dev-04 | **Conductor bout en bout (CLI)** | lancer « idée → SaaS » en une commande | `uv run --project <forge> python -m conductor run "<idée>"` | inutilisable en headless (HITL fermés, NotImplementedError sans opt-in, exit toujours 0) — D-V1 | declare | experimental |
 | cat-dev-05 | **Générer DESIGN.md linté** | produire le document design du produit accepté par le gate | `generer-design-md.mjs (D-V2 soldée le 07/08)` | PASS vérifié le 07/08 (CONTRAT-INTERFACE §5) | prouve | experimental |
 | cat-dev-06 | **Gate anti-patterns IA** | bloquer imports fantômes, secrets en dur et routes sans auth avant merge | `conductor\gates\ai_antipatterns_gate.py` | TF-0103 (12/08) : 15 tests double sens, 0 faux positif sur conductor entier | prouve | experimental |
@@ -54,7 +54,7 @@
 | cat-tst-07 | **Rapport exhaustif test-par-test** | obtenir le verdict et le pourquoi de CHAQUE test, pas seulement un agrégat par pan | `forge_tests
 oyau.py (section essais) + forge_tests\junit.py` | TF-0146 (13/08) : 12 tests, self-test noyau vert, pytest 154 rejoué pilot ; v0 — branchement des adaptateurs (--junitxml → essais réels) = jalon d'intégration | prouve | experimental |
 
-## forge-agents (transverse) — 11 services
+## forge-agents (transverse) — 12 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -69,6 +69,8 @@ oyau.py (section essais) + forge_tests\junit.py` | TF-0146 (13/08) : 12 tests, s
 | cat-agt-09 | **Contre-expertise d'un livrable** | faire contre-expertiser un livrable par un second regard indépendant du producteur | `skill contre-expertise` | déclaré au catalogue le 14/08 (RV-7) — usage réel à consigner | declare | experimental |
 | cat-agt-10 | **Fiches expert du domaine** | mobiliser ou rédiger une fiche d'expertise versionnée (experts-forge / write-an-expert) | `skills experts-forge et write-an-expert` | déclaré au catalogue le 14/08 (RV-7) — fiches\ du pilot en sont les consommatrices | declare | experimental |
 | cat-agt-11 | **Fixer la barre d'un livrable** | trouver, prouver (test d'existence exécuté) et décomposer la référence externe qui fixe le niveau d'un livrable — pré-vol d'un prompt ou en ligne d'une boucle | `skill la-barre — invocation : « barre… » en tête de message ; registre : references\registre-barres.md` | usages réels : pré-vol TF-0083 (11/08, 3 barres data), campagne catalogues (12/08), TF-0153 (13/08, barre Allure), run Produit-10 (13/08 : protocole tenu intégralement, arrêt au pas 5, garde anti-gameable exercé) | prouve | production |
+
+| cat-agt-12 | **Tenir la cadence d'une mission** | savoir si mes cinq artefacts périodiques (revue RAID, avancement, compte rendu, REX, suivi des bénéfices) sont à jour au regard de la cadence déclarée | `node .claude\skills\quality-oracles\scripts\oracle-cadence-de-mission.mjs <MISSION.md> [--aujourdhui AAAA-MM-JJ]` · table normative : `pilote-de-mission\references\artefacts-de-cadence.md` | TF-0324 (18/08) : C1-C5, fixtures double sens jouées au self-test (144 → 147 contrôles) avec quatre sources réelles sur le disque ; C5 itère sur les cinq artefacts ATTENDUS, jamais sur ceux déclarés. Reste ouvert : aucune instanciation sur mission réelle — aucune n'est instrumentée dans les dépôts | declare | experimental |
 
 ## forge-ops (transverse) — 5 services
 
