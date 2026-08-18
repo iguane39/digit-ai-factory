@@ -164,6 +164,47 @@ check("R-26 bis : la même projection, source restaurée → PASS (le FAIL ci-de
   if (!f26.length || f26[0].statut !== "PASS") throw new Error(`statut ${f26[0] && f26[0].statut} — attendu PASS à parité rétablie`);
 });
 
+// TF-0373 — R-11 bis, les référentiels DÉCLARÉS. Trois sens joués, parce qu'un avertissement
+// rendu quoi qu'il arrive et un avertissement jamais rendu se ressemblent : le premier ne
+// distingue rien, le second ne garde rien. Et le milieu compte autant que les bords — c'est lui
+// qui vérifie que le manquant est NOMMÉ, pas qu'on redemande les trois en bloc.
+check("R-11 bis : aucune section « Référentiels » → avertissement au non_juge, JAMAIS un FAIL (TF-0373)", () => {
+  const { exit, rapport } = lance(verte);
+  const avert = rapport.non_juge.filter((l) => /R-11 bis/.test(l));
+  if (!avert.length) throw new Error("aucun avertissement R-11 bis — la question ne serait posée par rien");
+  if (!/au vert CONTRE QUOI/.test(avert[0])) throw new Error("l'avertissement ne dit pas le coût du silence");
+  if (exit !== 0 || rapport.verdict !== "PASS") throw new Error("un référentiel absent est un fait du produit, pas une faute du run — jamais un échec");
+  if (rapport.findings.some((f) => f.regle === "R-11 bis")) throw new Error("R-11 bis ne doit pas produire de finding tant que rien n'est déclaré");
+});
+
+check("R-11 bis : section présente mais incomplète → le manquant est NOMMÉ (TF-0373)", () => {
+  const chemin = join(verte, "CLAUDE.md");
+  const avant = readFileSync(chemin, "utf8");
+  try {
+    writeFileSync(chemin, avant + "## Référentiels" + NL_TEST + "- exigences : forge/EXIGENCES.json" + NL_TEST + "- anomalies : absent — aucun gestionnaire de tickets côté client" + NL_TEST);
+    const { rapport } = lance(verte);
+    const avert = rapport.non_juge.filter((l) => /R-11 bis/.test(l));
+    if (!avert.length) throw new Error("section incomplète non signalée");
+    if (!/contrat/.test(avert[0])) throw new Error(`le manquant n'est pas nommé : ${avert[0]}`);
+    if (/exigences|anomalies/.test(avert[0])) throw new Error(`ce qui EST déclaré est redemandé à tort : ${avert[0]}`);
+  } finally {
+    writeFileSync(chemin, avant);
+  }
+});
+
+check("R-11 bis : les trois déclarés — dont « absent » motivé — → PASS (TF-0373)", () => {
+  const chemin = join(verte, "CLAUDE.md");
+  const avant = readFileSync(chemin, "utf8");
+  try {
+    writeFileSync(chemin, avant + "## Référentiels" + NL_TEST + "- exigences : forge/EXIGENCES.json" + NL_TEST + "- anomalies : absent — aucun gestionnaire de tickets côté client" + NL_TEST + "- contrat d'interface : docs/projet/API.md" + NL_TEST);
+    const { rapport } = lance(verte);
+    const f = rapport.findings.filter((x) => x.regle === "R-11 bis");
+    if (!f.length || f[0].statut !== "PASS") throw new Error(`statut ${f[0] && f[0].statut} — attendu PASS quand les trois sont déclarés`);
+    if (rapport.non_juge.some((l) => /R-11 bis/.test(l))) throw new Error("l'avertissement subsiste alors que la question est répondue — il ne distinguerait rien");
+  } finally {
+    writeFileSync(chemin, avant);
+  }
+});
 // ---- fixture ROUGE : défauts plantés, chaque règle dure doit se déclencher -------------------
 const rouge = mkdtempSync(join(tmpdir(), "conf-rouge-"));
 mkdirSync(join(rouge, "output", "Old"), { recursive: true });      // R-1 (input absent), R-3 (docs absent)
