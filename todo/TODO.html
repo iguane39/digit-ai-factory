@@ -139,7 +139,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>91c3959d2283</code> · dernier événement 2026-08-18T06:08:56Z</p>
+      <p class="meta">sceau <code>1132772042e0</code> · dernier événement 2026-08-18T06:58:25Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -149,8 +149,8 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="2 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">2</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="17 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">17</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="3 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">3</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="14 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">14</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="307 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">307</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
@@ -185,10 +185,10 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">52 / 52 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">53 / 53 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">8 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">17 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">25 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">8 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">17 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">26 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-forge-agents">
       <h2>digit-ai-forge-agents <span class="badge" title="8 item(s) actifs ciblant digit-ai-forge-agents">8</span></h2>
@@ -444,23 +444,6 @@
             
           </dl>
         </article>
-        <article class="card s-decide" id="item-TF-0341" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0341</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-tests : une instance laissee debout est indiscernable d une instance fraiche — l audit peut mesurer un code qui n est plus celui du depot et le publier comme courant</h3>
-          <div class="card-detail"><p class="lead">Suite directe du precedent, et c est la moitie grave.</p><ul class="puces"><li>MESURE LE 17/08 SUR BAV2 : la topologie auditee a ete batie a 10:47 depuis l arbre de travail d alors</li><li>le correctif D-14 (src/02_get_advert.py) a ete ecrit APRES. Entre 11:30 et 13:55, l instance servait donc un code ANTERIEUR au correctif, et rien ne l aurait signale — ni l instance, ni le rapport. Un audit relance dans cette fenetre aurait mesure l ancien code et publie ses chiffres comme l etat courant du produit. Le risque n est pas la memoire du poste, c est de MESURER AUTRE CHOSE QUE CE QU ON CROIT, sans aucun signal. La forge connait deja cette classe et sait la nommer : TF-0288 confronte le SERVI au VERSIONNE sur les liens d un &lt;nav&gt;, et son cas fondateur est exactement celui-la — un code juste, un servi qui a derive, deux « toujours pas » avant que quiconque regarde le bon terme. Sa propre recette porte un second temoin de la meme famille : « le 17/08, Docker Desktop arrete a rendu 10 defauts du corpus en [MANQUE] (12/22) » — l etat de l environnement change silencieusement ce qui est mesure. CORRECTIF ATTENDU : generaliser le terme de comparaison de TF-0288 de la page a L INSTANCE ENTIERE — relever de quoi l instance auditee a ete batie (empreinte des images, commit, horodatage de build) et le confronter a l arbre de travail audite. Trois issues DECLAREES, comme pour TF-0288 : concordant</li><li>divergent, avec l ecart nomme et la phrase qui compte (ce n est pas le code qui est en retard, c est l instance)</li><li>non determinable, en disant LEQUEL des deux termes manque. Le scellement d empreinte existe deja cote forge-ops pour les deploiements (TF-0288, volet prevention) : il y a probablement un mecanisme a reprendre plutot qu a ecrire</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>fenetre de 2 h 25 pendant laquelle tout audit relance aurait mesure un code anterieur au correctif D-14 et publie ses chiffres comme courants, sans qu aucun signal ne distingue l instance perimee d une instance fraiche</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">bourse-aux-vacants</dd></div>
-            
-          </dl>
-        </article>
         <article class="card s-decide" id="item-TF-0344" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0344</code>
@@ -509,23 +492,6 @@
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>la voie est fermée en doctrine, au catalogue, au cahier et à l'oracle — mais le générateur la rouvre en commentaire à chaque lecture de son code</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 soir — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-decide" id="item-TF-0340" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0340</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-tests : le cycle de vie de l instance servie n appartient a personne — montee pour l audit, jamais demontee, et le rapport ne dit pas ce qu il laisse debout</h3>
-          <div class="card-detail"><p class="lead">Quatre pans (front, qualif, accessibilite, visuel) exigent une instance SERVIE.</p><ul class="puces"><li>Le POUR_COUVRIR du pan qualif dit « servir une instance PEUPLEE du produit et declarer son URL » : le montage est delegue au projet — bon partage, lui seul sait ce que peuple veut dire chez lui — mais le demontage n est delegue a personne, et aucune ligne du rapport ne mentionne ce qui reste en service apres l audit. MESURE LE 17/08 SUR BAV2 : `node e2e/preparer.mjs` monte 3 conteneurs et un reseau (environ 4 min a froid)</li><li>l audit se termine a 11:30</li><li>les conteneurs tiennent les ports 8091, 8092 et 5544 jusqu a 13:55, soit 2 h 25 sans le moindre usage, jusqu a ce qu un humain s en etonne. CONSEQUENCE AU-DELA DE L ENCOMBREMENT : les ports sont pris, donc un second projet audite sur le meme poste — ou un second run du meme projet — se heurte a une instance qu il n a pas montee, sans aucun moyen de savoir si elle est la sienne. CORRECTIF ATTENDU : un contrat de cycle de vie DECLARE PAR LE PROJET (deux commandes, monter et demonter) et une regle en une phrase — la forge demonte ce qu elle a monte, et publie ce qu elle laisse debout quand elle ne l a pas monte. C est la doctrine deja tenue partout ailleurs dans cette forge : un SKIP muet est pire qu un SKIP declare</li><li>une instance laissee en service sans le dire est de la meme famille</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 2 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>3 conteneurs et un reseau laisses en service 2 h 25 apres la fin de l audit, tenant trois ports, jusqu a intervention humaine ; aucune mention au rapport</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">bourse-aux-vacants</dd></div>
             
           </dl>
         </article>
@@ -614,6 +580,23 @@
             
           </dl>
         </article>
+        <article class="card s-corrige" id="item-TF-0341" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0341</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : une instance laissee debout est indiscernable d une instance fraiche — l audit peut mesurer un code qui n est plus celui du depot et le publier comme courant</h3>
+          <div class="card-detail"><p class="lead">Suite directe du precedent, et c est la moitie grave.</p><ul class="puces"><li>MESURE LE 17/08 SUR BAV2 : la topologie auditee a ete batie a 10:47 depuis l arbre de travail d alors</li><li>le correctif D-14 (src/02_get_advert.py) a ete ecrit APRES. Entre 11:30 et 13:55, l instance servait donc un code ANTERIEUR au correctif, et rien ne l aurait signale — ni l instance, ni le rapport. Un audit relance dans cette fenetre aurait mesure l ancien code et publie ses chiffres comme l etat courant du produit. Le risque n est pas la memoire du poste, c est de MESURER AUTRE CHOSE QUE CE QU ON CROIT, sans aucun signal. La forge connait deja cette classe et sait la nommer : TF-0288 confronte le SERVI au VERSIONNE sur les liens d un &lt;nav&gt;, et son cas fondateur est exactement celui-la — un code juste, un servi qui a derive, deux « toujours pas » avant que quiconque regarde le bon terme. Sa propre recette porte un second temoin de la meme famille : « le 17/08, Docker Desktop arrete a rendu 10 defauts du corpus en [MANQUE] (12/22) » — l etat de l environnement change silencieusement ce qui est mesure. CORRECTIF ATTENDU : generaliser le terme de comparaison de TF-0288 de la page a L INSTANCE ENTIERE — relever de quoi l instance auditee a ete batie (empreinte des images, commit, horodatage de build) et le confronter a l arbre de travail audite. Trois issues DECLAREES, comme pour TF-0288 : concordant</li><li>divergent, avec l ecart nomme et la phrase qui compte (ce n est pas le code qui est en retard, c est l instance)</li><li>non determinable, en disant LEQUEL des deux termes manque. Le scellement d empreinte existe deja cote forge-ops pour les deploiements (TF-0288, volet prevention) : il y a probablement un mecanisme a reprendre plutot qu a ecrire</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>fenetre de 2 h 25 pendant laquelle tout audit relance aurait mesure un code anterieur au correctif D-14 et publie ses chiffres comme courants, sans qu aucun signal ne distingue l instance perimee d une instance fraiche</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">bourse-aux-vacants</dd></div>
+            
+          </dl>
+        </article>
         <article class="card s-corrige" id="item-TF-0310" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0310</code>
@@ -665,10 +648,27 @@
             
           </dl>
         </article>
+        <article class="card s-corrige" id="item-TF-0340" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0340</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : le cycle de vie de l instance servie n appartient a personne — montee pour l audit, jamais demontee, et le rapport ne dit pas ce qu il laisse debout</h3>
+          <div class="card-detail"><p class="lead">Quatre pans (front, qualif, accessibilite, visuel) exigent une instance SERVIE.</p><ul class="puces"><li>Le POUR_COUVRIR du pan qualif dit « servir une instance PEUPLEE du produit et declarer son URL » : le montage est delegue au projet — bon partage, lui seul sait ce que peuple veut dire chez lui — mais le demontage n est delegue a personne, et aucune ligne du rapport ne mentionne ce qui reste en service apres l audit. MESURE LE 17/08 SUR BAV2 : `node e2e/preparer.mjs` monte 3 conteneurs et un reseau (environ 4 min a froid)</li><li>l audit se termine a 11:30</li><li>les conteneurs tiennent les ports 8091, 8092 et 5544 jusqu a 13:55, soit 2 h 25 sans le moindre usage, jusqu a ce qu un humain s en etonne. CONSEQUENCE AU-DELA DE L ENCOMBREMENT : les ports sont pris, donc un second projet audite sur le meme poste — ou un second run du meme projet — se heurte a une instance qu il n a pas montee, sans aucun moyen de savoir si elle est la sienne. CORRECTIF ATTENDU : un contrat de cycle de vie DECLARE PAR LE PROJET (deux commandes, monter et demonter) et une regle en une phrase — la forge demonte ce qu elle a monte, et publie ce qu elle laisse debout quand elle ne l a pas monte. C est la doctrine deja tenue partout ailleurs dans cette forge : un SKIP muet est pire qu un SKIP declare</li><li>une instance laissee en service sans le dire est de la meme famille</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 2 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>3 conteneurs et un reseau laisses en service 2 h 25 apres la fin de l audit, tenant trois ports, jusqu a intervention humaine ; aucune mention au rapport</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">bourse-aux-vacants</dd></div>
+            
+          </dl>
+        </article>
       </div>
     </section>
     <section id="pilot">
-      <h2>pilot <span class="badge" title="25 item(s) actifs ciblant pilot">25</span></h2>
+      <h2>pilot <span class="badge" title="26 item(s) actifs ciblant pilot">26</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
         <article class="card s-decide" id="item-TF-0358" data-forge="pilot" data-statut="decide" data-prio="haute">
@@ -688,23 +688,6 @@
             
           </dl>
         </article>
-        <article class="card s-decide" id="item-TF-0351" data-forge="pilot" data-statut="decide" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0351</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">orchestrer-boucle.mjs (13/08) n'a AUCUN appelant — dette R-35 vivante dans le pilot, câblage conditionné à TF-0340/0341</h3>
-          <div class="card-detail"><p class="lead">Constat de l'étude tests-bout-en-bout (20260817) : outillage-tests-e2e/orchestrer-boucle.mjs, livré le 13/08 pour exactement la finalité de TF-0349, n'est cité par rien (grep : zéro appelant hors journal) et ses tests échappent à l'invariant I1 de self-tests.mjs.</p><ul class="puces"><li>Décision de l'étude : le câblage complet (option O4, 3-5 j sur 3 dépôts) est CONDITIONNÉ à la résolution de TF-0340/0341 (cycle de vie d'instance) — en attendant, la dette est NOMMÉE ici plutôt que tue</li><li>À trancher quand TF-0340/0341 seront traités : câbler, ou retirer l'outil</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 3 × preuve 4 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>un outil livré il y a 4 jours pour la finalité exacte du mandat du jour était introuvable par lui — l'étude l'a exhumé par grep, pas par le corpus</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat d'étude — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
         <article class="card s-candidat" id="item-TF-0329" data-forge="pilot" data-statut="candidat" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0329</code>
@@ -719,6 +702,29 @@
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 4 × preuve 3 ÷ effort 3)</span></dd></div>
             <div class="impact"><dt>Impact sur pilot</dt><dd>l'écosystème a instruit et refusé un mécanisme dont un exemplaire éprouvé dort à côté de lui — le trou est de connaissance, pas technique</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0360" data-forge="pilot" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0360</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Câbler orchestrer-boucle.mjs en appelant réel de forge-tests et forge-development (option O4, condition levée)</h3>
+          <div class="card-detail"><p class="lead">Second temps de l'arbitrage TF-0351 du 18/08, nommé ici pour être exigible plutôt que resté en intention dans un README.
+
+Ce qui est déjà fait : les tests de `outillage-tests-e2e\` sont joués par la recette du pilot (invariant I2 posé le 18/08 — 7/7 et 8/8, verts et joués par personne jusque-là), et la condition que l'étude 20260817 posait est LEVÉE : TF-0340/0341 sont clos le 18/08 (`forge_tests/instance.py` — contrat de montage/démontage déclaré par le projet, provenance de l'instance confrontée à l'arbre de travail auditée avec ses trois issues).</p><ul class="puces"><li>L'arbitrage rendu est CÂBLER, non retirer : l'outil sert une finalité désormais atteignable.
+
+Ce qui reste, et pourquoi ce n'est pas un geste de campagne : l'intégration réelle en appelant de forge-tests et forge-development — l'étude la chiffre à 3-5 jours sur TROIS dépôts (pilot, forge-tests, forge-development). Elle suppose de décider qui pilote la boucle de correction (le pilot orchestre, ou forge-tests porte la boucle et le pilot lit son rapport), et ce choix engage le contrat d'interface entre trois forges — exactement le genre d'arbitrage que R-29 laisse à l'humain et que TF-0155 fait instruire avant de décider.
+
+À instruire donc, pas à improviser. Deux points de vigilance relevés en posant I2 :</li><li>`orchestrer-boucle.mjs` ne câble aujourd'hui aucun appel réel — son README le déclare — donc le câblage est un développement, pas un branchement</li><li>la boucle de correction bornée existe déjà en doctrine côté pilot (≤ 5 cycles, G-2 absolue) et côté forge-tests dans les candidatures TF-0352/0353 : câbler sans les avoir traités ferait naître deux boucles concurrentes. L'ordre suggéré est donc TF-0352/0353 d'abord, ce câblage ensuite</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-18</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 4 ÷ effort 4)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>**oui** — l'outil est livré depuis le 13/08 pour la finalité exacte du mandat du 17/08 et l'étude a dû l'exhumer par `grep` plutôt que par le corpus ; tant qu'il n'a aucun appelant, chaque campagne qui a besoin de cette boucle la réécrit ou s'en passe, et la dette R-35 reste vivante dans le pilot</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (arbitrage TF-0351 du 18/08 — second temps nommé =&gt; candidat)</dd></div>
             
           </dl>
         </article>
@@ -963,6 +969,23 @@ La famille est plus large que le catalogue : tout contrôle « vue générée ==
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 4 × preuve 3 ÷ effort 3)</span></dd></div>
             <div class="impact"><dt>Impact sur pilot</dt><dd>demande humaine directe — une proposition de tests non exécutée est un contrôle jamais joué (R-35) livré au client comme s'il protégeait</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain — mandat direct du 17/08 (prompt réécrit L99, écarts validés poste par poste)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0351" data-forge="pilot" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0351</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">orchestrer-boucle.mjs (13/08) n'a AUCUN appelant — dette R-35 vivante dans le pilot, câblage conditionné à TF-0340/0341</h3>
+          <div class="card-detail"><p class="lead">Constat de l'étude tests-bout-en-bout (20260817) : outillage-tests-e2e/orchestrer-boucle.mjs, livré le 13/08 pour exactement la finalité de TF-0349, n'est cité par rien (grep : zéro appelant hors journal) et ses tests échappent à l'invariant I1 de self-tests.mjs.</p><ul class="puces"><li>Décision de l'étude : le câblage complet (option O4, 3-5 j sur 3 dépôts) est CONDITIONNÉ à la résolution de TF-0340/0341 (cycle de vie d'instance) — en attendant, la dette est NOMMÉE ici plutôt que tue</li><li>À trancher quand TF-0340/0341 seront traités : câbler, ou retirer l'outil</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 3 × preuve 4 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>un outil livré il y a 4 jours pour la finalité exacte du mandat du jour était introuvable par lui — l'étude l'a exhumé par grep, pas par le corpus</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat d'étude — constat =&gt; candidat)</dd></div>
             
           </dl>
         </article>
