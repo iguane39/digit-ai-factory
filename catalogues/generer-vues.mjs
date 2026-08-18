@@ -89,6 +89,16 @@ export function genererSectionReadme({ meta, services }) {
   return L.join("\n");
 }
 
+// Fins de ligne normalisées AVANT comparaison (TF-0359, idiome TF-0253) : avec
+// core.autocrlf=true — le défaut de l'installateur Git for Windows, ni le dépôt ni
+// l'utilisateur ne l'ont demandé — le checkout pose des CRLF sur des vues que ce
+// générateur émet en LF. La comparaison au byte accusait alors une désynchronisation que
+// le contenu démentait (`git diff --ignore-cr-at-eol` vide), sur TOUT clone Windows et
+// sans qu'aucune régénération ne puisse la solder durablement. Comparer normalisé rend le
+// verdict indifférent à la fin de ligne, sans rien masquer : une vraie dérive de contenu
+// diffère toujours après normalisation.
+const normLf = (s) => s.split("\r\n").join("\n");
+
 export function injecterSectionReadme(contenuReadme, section) {
   const debut = contenuReadme.indexOf(MARQUE_DEBUT);
   const fin = contenuReadme.indexOf(MARQUE_FIN);
@@ -108,9 +118,9 @@ function principal() {
     const ecarts = [];
     let vueActuelle = "";
     try { vueActuelle = readFileSync(VUE_MD, "utf8"); } catch { ecarts.push("CATALOGUES.md absent"); }
-    if (vueActuelle && vueActuelle !== vueComplete) ecarts.push("CATALOGUES.md diverge de la source");
+    if (vueActuelle && normLf(vueActuelle) !== normLf(vueComplete)) ecarts.push("CATALOGUES.md diverge de la source");
     if (readmeAttendu === null) ecarts.push("marqueurs CATALOGUE absents du README");
-    else if (readmeAttendu !== readmeActuel) ecarts.push("section README diverge de la source");
+    else if (normLf(readmeAttendu) !== normLf(readmeActuel)) ecarts.push("section README diverge de la source");
     if (ecarts.length) {
       console.error(`[check] FAIL : ${ecarts.join(" ; ")}`);
       process.exit(1);
@@ -123,7 +133,7 @@ function principal() {
   console.log(`[ok] ${VUE_MD} régénéré`);
   if (readmeAttendu === null) {
     console.error("[attention] marqueurs CATALOGUE absents du README — section non injectée");
-  } else if (readmeAttendu !== readmeActuel) {
+  } else if (normLf(readmeAttendu) !== normLf(readmeActuel)) {
     writeFileSync(README, readmeAttendu, "utf8");
     console.log("[ok] section CATALOGUE du README régénérée");
   } else {

@@ -28,7 +28,14 @@ const archive = join(dirname(registre), "TODO-ARCHIVE.jsonl");
 if (!sidecarPath || !existsSync(sidecarPath)) { console.error("usage : ingerer-lot.mjs <sidecar.tf.jsonl> [--registre <TODO.jsonl>]"); process.exit(2); }
 
 const contenu = readFileSync(sidecarPath, "utf8");
-const lotSha = createHash("sha256").update(contenu).digest("hex");
+// Empreinte NORMALISEE en LF (idiome TF-0253, etendu par TF-0359) : avec core.autocrlf=true,
+// git repose un sidecar en CRLF au checkout sans qu'un octet de contenu ait bouge. Une
+// empreinte prise sur les octets bruts ne reconnait alors plus le lot deja ingere, et
+// l'idempotence tombe : le meme lot recree ses candidatures en doublon — l'incident du
+// 13/08 (32 doublons) par un autre chemin. La forme brute reste acceptee en lecture pour
+// les ingestions ANTERIEURES a cette normalisation, jamais ecrite pour les nouvelles.
+const lotSha = createHash("sha256").update(contenu.split("\r\n").join("\n")).digest("hex");
+const lotShaBrut = createHash("sha256").update(contenu).digest("hex");
 const lignes = contenu.split("\n").filter((l) => l.trim());
 
 // ---- validation intégrale AVANT toute écriture (rejet atomique) ----------------------------
@@ -52,7 +59,7 @@ if (motifs.length) {
 // ---- idempotence : lot déjà ingéré ? ------------------------------------------------------
 const lireEv = (f) => (existsSync(f) ? readFileSync(f, "utf8").split("\n").filter((l) => l.trim()).map((l) => JSON.parse(l)) : []);
 const evenements = lireEv(registre);
-if (evenements.some((e) => e.ev === "ingestion" && e.lot_sha === lotSha)) {
+if (evenements.some((e) => e.ev === "ingestion" && (e.lot_sha === lotSha || e.lot_sha === lotShaBrut))) {
   console.log(`[DÉJÀ INGÉRÉ] empreinte ${lotSha.slice(0, 12)} — 0 création (idempotence)`);
   process.exit(0);
 }
