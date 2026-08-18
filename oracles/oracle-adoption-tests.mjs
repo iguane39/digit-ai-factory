@@ -28,8 +28,16 @@
  *                                        {"cas": …, "statut": "ecarte",
  *                                         "qui": "…", "quand": "…", "pourquoi": "…"}
  *         sidecar des DEUX AUTRES issues de R-40. R-40 ne nommait aucun fichier pour elles ;
- *         il n'entrent pas dans `cas-adoptes.jsonl`, dont `adoption.py` refuserait chaque
- *         ligne sans `test` (l.74-78) — les mélanger aurait fabriqué du bruit de refus.
+ *         les mélanger à l'adoption aurait fabriqué du bruit de refus.
+ *         RECTIFICATIF du 18/08 (TF-0354) : la justification écrite ici — « `adoption.py`
+ *         refuserait chaque ligne sans `test` » — était FAUSSE. `adoption.py` lit au
+ *         contraire les deux autres formes AVANT le contrôle du test cité, et le commente
+ *         explicitement. Le motif de la séparation reste bon (un fichier, une nature de
+ *         déclaration, et A2 le fait respecter), mais il ne s'appuie plus sur un
+ *         comportement que l'autre outil n'a pas. Symétriquement, forge-tests LIT désormais
+ *         `cas-ecartes.jsonl` : sans cela, un produit qui suivait cette règle voyait ses
+ *         déclarations invisibles là-bas et son solde ne descendait jamais — bien faire
+ *         était puni.
  *         Un `non_testable` sans `champs_requis[]` reprend l'idiome RT-6 : il se répare en
  *         FOURNISSANT, pas en écrivant un test — donc sans champs, il n'est pas motivé.
  *

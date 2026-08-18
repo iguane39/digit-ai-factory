@@ -64,13 +64,27 @@ function exigerAucunOrphelin(rapport, cycle) {
 // Cible et honnêteté du verdict
 // ---------------------------------------------------------------------------------------------
 
-/** Triplet aux seuils ET zéro écart résiduel — les deux conditions, jamais l'une sans l'autre. */
+/** Triplet aux seuils ET zéro écart résiduel — les deux conditions, jamais l'une sans l'autre.
+ *
+ * TF-0360 (option O3) — ce n'est plus le SEUL juge. Depuis TF-0352/0353, forge-tests PORTE la
+ * définition de fin d'une campagne (cinq points, section `boucle` de chaque rapport) et le
+ * pilot ne la recalcule pas : quand la section est là, elle a le dernier mot. Le triplet reste
+ * une condition NÉCESSAIRE — un rapport peut être « campagne terminée » sur ses cinq points et
+ * porter encore un écart résiduel classé ; on ne déclare pas vert dans ce cas. Les deux
+ * juges s'ajoutent, ils ne se remplacent pas.
+ */
 export function cibleAtteinte(rapport) {
   const triplet = rapport.triplet || {};
   const seuils = rapport.seuils || {};
   const seuilsTenus = Object.keys(seuils).every((cle) => (triplet[cle] ?? 0) >= seuils[cle]);
   const ecarts = (rapport.actions || []).length;
-  return seuilsTenus && ecarts === 0;
+  if (!(seuilsTenus && ecarts === 0)) return false;
+  const boucle = rapport.boucle;
+  // Section absente = rapport d'une forge-tests antérieure au 18/08 : on ne devine pas un
+  // verdict qu'elle n'a pas rendu, on retombe sur le seul juge disponible (comportement
+  // d'avant, inchangé pour les fixtures et les rapports existants).
+  if (!boucle || typeof boucle !== "object" || !boucle.statut) return true;
+  return boucle.statut === "terminee";
 }
 
 /**
