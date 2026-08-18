@@ -106,6 +106,30 @@ check("ingestion idempotente : ré-ingérer le même lot → 0 création, regist
   if (shaReg() !== avant) throw new Error("le registre a changé");
 });
 
+// TF-0359 — l'idempotence doit survivre a un CHECKOUT, pas seulement a une re-execution.
+// Avec core.autocrlf=true (defaut systeme de Git for Windows), git repose le sidecar en CRLF
+// sans qu'un octet de contenu ait bouge : l'empreinte brute ne reconnaissait plus le lot et
+// le meme travail rentrait deux fois. Double sens : le lot en CRLF est reconnu (verte), et
+// un lot au contenu REELLEMENT different ne l'est pas (rouge) — sans quoi on aurait pu tout
+// faire passer en rendant la comparaison aveugle.
+check("ingestion idempotente aux fins de ligne : le MEME lot en CRLF → 0 création", () => {
+  const crlf = join(T, "lot-crlf.tf.jsonl");
+  writeFileSync(crlf, readFileSync(side, "utf8").split("\n").join("\r\n"));
+  const avant = shaReg();
+  const sortie = execFileSync("node", [ingerer, crlf, "--registre", regT], { encoding: "utf8" });
+  if (!sortie.includes("DÉJÀ INGÉRÉ")) throw new Error("le même lot réécrit en CRLF a été ré-ingéré — doublons (TF-0359)");
+  if (shaReg() !== avant) throw new Error("le registre a changé");
+});
+
+check("ingestion rouge (fins de ligne) : un lot au contenu DIFFÉRENT en CRLF est bien ingéré", () => {
+  const autre = join(T, "lot-autre-crlf.tf.jsonl");
+  writeFileSync(autre, (cand({ titre: "friction Z, jamais vue" }) + "\n").split("\n").join("\r\n"));
+  const avant = shaReg();
+  const sortie = execFileSync("node", [ingerer, autre, "--registre", regT], { encoding: "utf8" });
+  if (sortie.includes("DÉJÀ INGÉRÉ")) throw new Error("un lot NEUF confondu avec un ancien — la normalisation est devenue aveugle");
+  if (shaReg() === avant) throw new Error("le registre n'a pas bougé alors qu'une candidature neuve entrait");
+});
+
 check("ingestion rouge : 1 ligne invalide → rejet ATOMIQUE motivé, registre intact", () => {
   const mauvais = join(T, "mauvais.tf.jsonl");
   writeFileSync(mauvais, [cand({}), cand({ titre: undefined })].join("\n") + "\n");

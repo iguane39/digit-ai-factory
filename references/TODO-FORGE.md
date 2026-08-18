@@ -7,8 +7,9 @@ Le registre structuré des améliorations vit dans `todo\` : source unique `TODO
 (jamais éditée), archive `TODO-ARCHIVE.jsonl` (ids jamais réutilisés), `oracle-todo.mjs`
 (R1-R10) à faire passer après toute écriture.
 
-**Gouvernance** : tout entre en `candidat` ; seul un mandat humain (« décide TF-xxxx », un
-export de TODO.html appliqué, ou un mandat global explicite) passe en `decide` — le décideur
+**Gouvernance** : tout entre en `candidat` ; seul un mandat humain (« décide TF-xxxx », un lot de
+décisions appliqué par `todo\appliquer-export.mjs` — format `TF-decisions-*.json`, produit
+par l'humain et non plus par la page (TF-0328) — ou un mandat global explicite) passe en `decide` — le décideur
 et la date sont tracés (R6). Transitions : candidat→decide→en_cours→corrige|ecarte→archive.
 Clôture `corrige` : `gains_constates`, `corrections_realisees`, `date_correction` exigés (R7).
 
@@ -45,8 +46,10 @@ preuve ≤ 2**, l'instruire via `gabarits\ETUDE-OPPORTUNITE.md` (livrable :
 
 **À chaque campagne** : mettre à jour les items (date_correction, corrections_realisees,
 **gains_constates exigés à la clôture**, version_forge_corrigee, produits_beneficiaires) puis
-régénérer la vue **et la page** (`generer-page.mjs` → `TODO.html`, consultation humaine :
-cases à décider + commentaires, export appliqué par `appliquer-export.mjs`). Le self-test
+régénérer la vue **et la page** (`generer-page.mjs` → `TODO.html`, consultation humaine en
+LECTURE SEULE : les cases à décider et les commentaires ont été retirés le 12/08 sous mandat
+humain, les décisions se prenant hors page — cette prescription a survécu six jours à son objet,
+et TF-0318 a été instruit dessus ; TF-0328). Le self-test
 (`node todo\self-test.mjs`, fixtures à double sens) après toute évolution de l'outillage.
 
 Consulter le registre à l'ouverture de tout run. `BOUCLE-AMELIORATION.md` reste le journal

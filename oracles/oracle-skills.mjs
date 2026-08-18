@@ -484,6 +484,20 @@ function jetonScript(commande) {
       || null;
 }
 
+/** TF-0337 — REANCRE le chemin de script d'une commande sur un fichier absolu connu.
+ *  Un settings VERSIONNÉ porte sa commande en relatif : c'est l'idiome correct pour un gate de
+ *  portée PROJET, chargé quand la session s'ouvre dans ce dépôt. Recopiée telle quelle dans le
+ *  settings UTILISATEUR, la même commande ne se résout depuis aucun dossier fiable — et
+ *  `resoudreChemin` (K8) la déclarerait aussitôt « chemin relatif ». Conseiller le report sans
+ *  réancrer revenait donc à faire câbler un hook que l'oracle voisin déclare mort.
+ *  Rend `null` quand il n'y a rien à réancrer (commande déjà absolue ou ancrée `~`, ou illisible). */
+function commandeReancree(commande, fichierAbsolu) {
+  const jeton = jetonScript(commande);
+  if (!jeton) return null;
+  if (/^(?:[A-Za-z]:[\/]|[\/]|~)/.test(jeton)) return null;
+  return commande.replace(jeton, fichierAbsolu);
+}
+
 /** Résolution PRUDENTE d'une commande vers un chemin absolu : `{ chemin }` ou `{ indecidable }`.
  *  Ce qui est résolu : `~`, `$VAR`, `${VAR}`, `%VAR%` présentes dans l'environnement, chemin déjà
  *  absolu. Tout le reste rend un motif, qui sera DÉCLARÉ — jamais un verdict deviné. */
@@ -603,7 +617,11 @@ function jugerCablage(racine, fichierSettings, installesHooks, appliquer, findin
       if (decl.length) {
         const d = decl[0];
         const ou = [d.evenement, d.matcher ? `matcher « ${d.matcher} »` : null].filter(Boolean).join(", ");
-        manquants.push(`${nom} — attendu par ${d.forge} (settings versionné : ${ou}) commande « ${resumerCommande(d.commande)} », ABSENT du câblage installé : reporter cette entrée dans ${fichierSettings}`);
+        const reancree = commandeReancree(d.commande, chemins[0]);
+        const conseil = reancree
+          ? `reporter cette entrée dans ${fichierSettings} en y portant la commande RÉANCRÉE « ${resumerCommande(reancree)} » — la commande versionnée est RELATIVE (idiome correct pour un gate de portée projet) et ne se résoudrait, dans le settings utilisateur, depuis aucun dossier fiable : K8 la déclarerait « chemin relatif », donc un câblage mort (TF-0337)`
+          : `reporter cette entrée dans ${fichierSettings}`;
+        manquants.push(`${nom} — attendu par ${d.forge} (settings versionné : ${ou}) commande « ${resumerCommande(d.commande)} », ABSENT du câblage installé : ${conseil}`);
         continue;
       }
       if (pose.length) {
@@ -1063,6 +1081,31 @@ function selfTest() {
   cas.push(["K7    — le constat nomme la commande et le geste qui la poserait",
             Boolean(k7) && k7.message.includes("--niveau note")
             && k7.message.includes(settings4)]);
+  // TF-0337 — la fixture ci-dessus déclare sa commande avec `~`, DÉJÀ ancrée : rien à réancrer,
+  // et le conseil doit rester nu. C'est la contre-épreuve du cas suivant.
+  cas.push(["K7    — commande versionnée déjà ancrée (~) : le conseil ne réancre rien (TF-0337)",
+            Boolean(k7) && !/RÉANCRÉE/.test(k7.message)]);
+
+  // Le cas RÉEL de TF-0337 : le settings versionné porte la commande en RELATIF (idiome correct
+  // d'un gate de portée projet). Recopiée telle quelle dans le settings UTILISATEUR, elle ne se
+  // résout depuis aucun dossier fiable — K8 la déclarerait « chemin relatif ». Le conseil doit
+  // donc porter la commande réancrée sur le fichier versionné, chemin absolu.
+  poser(settingsV4, cablage(["node .claude/hooks/qo-gate-write.mjs --niveau note",
+                             "bash .queue/gates/g0-budget.sh"]));
+  r = juger(racine4, inst4, false, false, instH4, settings4);
+  k7 = k7de(r);
+  cas.push(["K7    — commande versionnée RELATIVE : le conseil porte la commande RÉANCRÉE, chemin absolu (TF-0337)",
+            Boolean(k7) && /RÉANCRÉE/.test(k7.message)
+            && /RÉANCRÉE « [^»]*qo-gate-write\.mjs/.test(k7.message)
+            && /RÉANCRÉE « node (?:[A-Za-z]:[\\/]|[\\/])/.test(k7.message)]);
+  cas.push(["K7    — et il DIT pourquoi : recopiée nue, K8 la déclarerait morte (TF-0337)",
+            Boolean(k7) && /K8 la déclarerait/.test(k7.message)]);
+  // On rétablit la fixture ancrée pour les cas qui suivent.
+  poser(settingsV4, cablage(["node ~/.claude/hooks/qo-gate-write.mjs --niveau note",
+                             "bash .queue/gates/g0-budget.sh"]));
+  r = juger(racine4, inst4, false, false, instH4, settings4);
+  k7 = k7de(r);
+
   cas.push(["K7    — DÉCLARATIF : câblage manquant, et le verdict reste PASS (R-35, R-33 bis)",
             r.verdict === "PASS"
             && !r.findings.some((f) => f.regle === "K7" && f.statut !== "PASS")]);
