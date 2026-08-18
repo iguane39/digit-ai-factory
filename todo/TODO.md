@@ -1,16 +1,25 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=5cfa2c6550dc archive=9f205b231527 · dernier événement: 2026-08-18T14:20:00Z -->
+     sceaux: actifs=c0a5a68f2ab0 archive=9f205b231527 · dernier événement: 2026-08-18T15:00:00Z -->
 
-**57 actifs** (candidat 3 · décidé 0 · en cours 0 · corrigé 53 · écarté 1) · **308 archivés**.
+**61 actifs** (candidat 7 · décidé 0 · en cours 0 · corrigé 53 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
+
+## digit-ai-factory
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0367 | candidat | 6 | le renommage du depot pilot casse en silence les chemins ecrits dans les CLAUDE.md consommateurs | **oui** — 3 appels d'outil pour retrouver le depot : listage de C:\dev, inspection de digit-ai-forge-pilot_old, puis verification par git log que digit-ai-factory etait bien le depot courant (commit du 18/08 contre 17/08 pour _old). |
 
 ## digit-ai-forge-agents
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0366 | candidat | 9 | un verdict d'oracle archive ne dit pas sous quel jeu de regles il a ete rendu | **oui** — 1 aller-retour de diagnostic : A3 tombe sur les 5 fichiers HTML du projet, gabarit compris, ce qui a d'abord fait soupconner un defaut de la chaine d'emission avant que la comparaison avec le journal du 14/08 n'etablisse qu'il s'agissait d'une regle nouvelle. |
+| TF-0368 | candidat | 6 | reconstat RA-11 : l'avertissement « script bloquant dans <head> » avait une cause reelle | **oui** — l'avertissement portait sur les 4 livrables HTML du projet a chaque execution depuis le 13/08 ; il a disparu d'un seul deplacement de deux balises meta. |
+| TF-0365 | candidat | 4.5 | render_page : une page tres haute rend l'outil muet au lieu de le declarer incompetent | **oui** — 45 lignes de scripts/mesurer_debordement.py ecrites dans le projet produit pour mesurer la seule regle BLOQUANTE (V1) que la capture empechait de juger ; travail integralement reutilisable donc integralement duplique au prochain run. Plus 6 executions perdues en expiration a 280 s chacune. |
 | TF-0324 | candidat | 3 | Artefacts périodiques du run de delivery absents : RAID, rapport d'avancement, compte rendu, REX, suivi des bénéfices | **oui** — revérifié en session le 16/08 : 0 occurrence de RAID / compte rendu / rapport d'avancement / lessons learned sur les skills installés — aucun des cinq artefacts que réclame une mission longue n'a d'équivalent dans la forge |
 | TF-0304 | corrige | 12 | forge-agents : déclarer le câblage de qo-gate-write.mjs dans le settings.json versionné de la forge | **oui** — le gate C7 est mort sur ce poste depuis une date inconnue et AUCUN dépôt ne dit comment le recâbler — la moitié durable du trou que K7 déclare à chaque run |
 | TF-0306 | corrige | 8 | forge-agents : _routages-journal.jsonl d'experts-forge est un journal d'exécution TRACKÉ que son self-test salit | **oui** — chaque exécution du self-test crée un diff parasite — le prochain commit pressé l'embarque et le bruit K2 renaît |
