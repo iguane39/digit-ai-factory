@@ -139,7 +139,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>3be6530bd2eb</code> · dernier événement 2026-08-18T16:50:00Z</p>
+      <p class="meta">sceau <code>ded6d8c15557</code> · dernier événement 2026-08-18T18:10:00Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -149,7 +149,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="6 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">6</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="1 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">1</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="307 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">307</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -165,10 +165,9 @@
       <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
       
       <div class="dropdown" data-dim="forge">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">5</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">4</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
-          <label><input type="checkbox" value="digit-ai-factory" checked> digit-ai-factory</label>
           <label><input type="checkbox" value="digit-ai-forge-agents" checked> digit-ai-forge-agents</label>
           <label><input type="checkbox" value="digit-ai-forge-design" checked> digit-ai-forge-design</label>
           <label><input type="checkbox" value="digit-ai-forge-tests" checked> digit-ai-forge-tests</label>
@@ -189,31 +188,8 @@
       <span id="compteur" class="compteur" aria-live="polite">66 / 66 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">12 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">21 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">29 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">12 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">21 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">30 item(s) reste-à-faire</span></a></nav>
     <main>
-    <section id="digit-ai-factory">
-      <h2>digit-ai-factory <span class="badge" title="1 item(s) actifs ciblant digit-ai-factory">1</span></h2>
-      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-factory</strong> — trié par statut puis priorité décroissante.</p>
-      <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0373" data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0373</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">factory : l ouverture de run ne demande jamais ce que le client sait deja de ses defauts — une campagne peut se clore « au vert » a cote d un lot d anomalies ouvertes</h3>
-          <div class="card-detail"><p class="lead">CE QUE run_open CONSIGNE AUJOURD HUI, verifie sur le ledger de Produit-11 (seq 1, et les cinq ouvertures suivantes) : run_id, objet, projet, versions_forges, bootstrap.</p><ul class="puces"><li>RIEN sur les ENTREES DE CONNAISSANCE du produit : ni referentiel d exigences, ni liste d anomalies, ni source de tickets. CONSEQUENCE MESUREE : treize anomalies clients vivaient dans Azure Boards (Client-A-DevOps / APP-IA) depuis le 29/07</li><li>six campagnes ont tourne entre le 11 et le 18/08</li><li>aucune n a su qu elles existaient, et le sujet n est apparu que le 18/08 parce qu un humain a colle une URL de board dans une conversation. Le defaut n est PAS que la forge ne les ait pas trouvees — cinq relevent d exclusions ecrites et legitimes (photos, courriel, push, traitement d alertes, rendu visuel, section 6 de la strategie) — c est que LEUR ABSENCE N A JAMAIS ETE UN TERME DECLARE DE LA MESURE, alors que la doctrine de cette factory est precisement qu un SKIP muet est pire qu un SKIP declare. CORRECTIF ATTENDU : ajouter a la phase 0 une DECLARATION DES REFERENTIELS DISPONIBLES, sur le modele de ce que le cahier fait deja en tete — exigences, anomalies, contrat d interface — chacun declare present avec son chemin, ou declare absent. Trois effets, tous gratuits : le run_open du ledger porte la trace de ce sur quoi on ne pouvait pas s appuyer</li><li>le rapport de fin cesse de pouvoir dire « au vert » sans dire « au vert CONTRE QUOI »</li><li>et le jour ou un projet en branche un, la boucle se referme d elle-meme. La question n a besoin d etre posee qu une fois par produit. A traiter avec la candidature FORGE_TESTS_ANOMALIES : ce sont les deux moities du meme trou</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-18</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>six campagnes d audit ouvertes sans qu aucune ne demande la liste des defauts deja connus du client ; 13 anomalies ouvertes depuis le 29/07 restees hors de toute mesure et hors de tout livrable</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-11</dd></div>
-            
-          </dl>
-        </article>
-      </div>
-    </section>
     <section id="digit-ai-forge-agents">
       <h2>digit-ai-forge-agents <span class="badge" title="12 item(s) actifs ciblant digit-ai-forge-agents">12</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-agents</strong> — trié par statut puis priorité décroissante.</p>
@@ -231,7 +207,7 @@
             <div><dt>Créé le</dt><dd>2026-08-16</dd></div>
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 3 ÷ effort 3)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>revérifié en session le 16/08 : 0 occurrence de RAID / compte rendu / rapport d'avancement / lessons learned sur les skills installés — aucun des cinq artefacts que réclame une mission longue n'a d'équivalent dans la forge</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (troisieme verification du 18/08)</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (livraison partielle du critere n 2, mandat « fais les 6 ouverts »)</dd></div>
             
           </dl>
         </article>
@@ -485,74 +461,6 @@
       <h2>digit-ai-forge-tests <span class="badge" title="21 item(s) actifs ciblant digit-ai-forge-tests">21</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-tests</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0371" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0371</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-tests : rien ne confronte ce que le code APPELLE a ce que l instance SERT — ni les routes, ni les ressources</h3>
-          <div class="card-detail"><p class="lead">DEUX DEFAUTS MESURES EN DIRECT LE 18/08 sur l instance dev, qu aucun parcours ne pouvait voir.</p><ul class="puces"><li>Le blueprint alerts/08_push_subscriptions.py n est pas dans endpoint_modules de l hote deploye (azure/standalone_backend.py:487) : GET /api/c13s/vapid/public-key et GET /api/c13s/push-subscriptions rendent 404, alors que le front appelle les deux (services.ts:515, notificationUtils.ts:71). Toute une fonction est morte en production — anomalie 9858 du board APP-IA, ouverte le 29/07. Cause seconde et independante : VITE_VAPID_PUBLIC n est jamais passe au build (azure/frontend.Dockerfile ne le declare pas, la pipeline ne le passe pas)</li><li>La feuille servie /assets/AdvertCard-BKnn2WVw.css porte url(src/assets/images/placeholder-image.jpg), resolue par le navigateur en /assets/src/assets/images/placeholder-image.jpg -&gt; 404, et le fichier n est pas dans le build : aucune des 1 249 annonces n a d image de repli — anomalie 9875. CE N EST PAS RT-1 / RT-2 SOUS UN AUTRE NOM : les deux controles proposes ne franchissent aucune mire — la feuille a ete lue et son 404 obtenu SANS AUTHENTIFICATION, en trois appels fetch. CORRECTIF ATTENDU : generaliser le comparateur de ecart_servi_versionne (TF-0288, forge_tests/adaptateurs/interface.py:1016) a deux paires de termes de plus, avec les memes trois issues declarees —</li><li>ROUTES APPELEES / ROUTES SERVIES : les appels client sont litteraux et lisibles statiquement, une route appelee qui rend 404 est un FAIL nomme</li><li>RESSOURCES REFERENCEES / RESSOURCES SERVIES : lire les url() du CSS construit et les src/href du HTML servi, resoudre, demander, nommer tout ce qui n est pas 200. C est la TROISIEME generalisation demandee du meme comparateur (RT-23 demandait deja de le porter de la page a l instance entiere) : il y a probablement un mecanisme unique a en tirer plutot que trois. VERIFICATION PREALABLE : aucune lecture des url() d une feuille servie nulle part dans digit-ai-forge-tests</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-18</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>une fonction produit entierement morte en production (notifications push, deux routes en 404) et l absence totale d image sur 1 249 annonces, tenues par deux 404 lisibles sans authentification, non vues par six campagnes d audit entre le 11 et le 18/08</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (lien posé à l'ingestion du lot Produit-11 20260818a)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0369" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0369</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-tests : rien ne verifie que ce que le produit accepte d ecrire est ce qu il relit — deux defauts servis dans le perimetre couvert</h3>
-          <div class="card-detail"><p class="lead">CLASSE : le produit repond 200 et range autre chose.</p><ul class="puces"><li>Ni la couverture, ni la mutation (0,90 sur ce produit), ni un parcours ne la voient — le parcours passe parce que le produit fait ce que le parcours regarde. DEUX DEFAUTS MESURES SUR Produit-11, tous deux DANS le perimetre couvert (parcours 6 « alertes », 69 tests verts)</li><li>alerts.created_at porte `default=datetime.now(timezone.utc)` (backend/src/alerts/models_alerts.py:38) : l appel est evalue UNE fois au chargement du module, donc toute alerte est datee de l instant de demarrage du conteneur. Le rapport terrain mesure l ecart — board Azure DevOps Client-A-DevOps/APP-IA anomalie 9870, ouverte le 30/07 : « alerte creee le 29/07, enregistree au 24/07 », cinq jours, exactement l age du processus. Meme defaut sur push_subscriptions.created_at (l.225)</li><li>POST /alerts ecrase email_notifications a False EN DUR (backend/src/alerts/07_alerts.py:206) alors que l ecran envoie le choix de l utilisateur (CreateAlertModal:155) : la case cochee disparait sans un mot. POURQUOI INVISIBLE : le parcours 6 relit les CRITERES de l alerte, jamais ses scalaires ; et une valeur figee reste COHERENTE AVEC ELLE-MEME tant qu on n observe qu une occurrence. Sur le poste local le processus vient de naitre : l ecart serait de quelques secondes, invisible meme en regardant. CORRECTIF ATTENDU : un axe de cas derive ALLER-RETOUR, derivable sans specification puisque la surface est deja inventoriee — pour chaque route d ecriture, un cas « ce que je viens d ecrire, je le relis CHAMP PAR CHAMP », et pour un champ temporel la comparaison se fait A L HORLOGE, jamais a lui-meme. VERIFICATION PREALABLE : recherche dans digit-ai-forge-tests hors .venv — aucun mecanisme de relecture-apres-ecriture</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-18</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>deux defauts produit servis en dev et non vus par six campagnes d audit, dont un qui annule silencieusement le choix de l utilisateur (email des alertes) et un qui date toutes les alertes de l instant de demarrage du conteneur — ecart de 5 jours constate par l utilisateur (anomalie 9870)</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-11</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0372" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0372</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-tests : le cahier derive n a qu un seul terme de comparaison externe possible (EXIGENCES.json) — donc en pratique aucun ; une liste d anomalies serait disponible</h3>
-          <div class="card-detail"><p class="lead">Le sceau de tous les cahiers de Produit-11 porte `exigences_source: (absent)` et la ligne « les cas sont derives de la SEULE SURFACE inventoriee ».</p><ul class="puces"><li>C est honnete et declare — c est meme la limite fondatrice que forge_tests/invariants.py enonce lui-meme : « on extrait l invariant TEL QU IMPLEMENTE, pas tel que voulu</li><li>si la garde est fausse, le cas genere confirmera le bug au lieu de le reveler ». MAIS un referentiel d exigences est rare, alors qu une LISTE D ANOMALIES OUVERTES existe sur presque tout produit vivant. Sur celui-ci elle existait : 13 anomalies dans Azure Boards (Client-A-DevOps / APP-IA / board « APP-IA Team / Stories »), ouvertes les 29 et 30/07, priorites 1 a 3. COUT MESURE DE LEUR ABSENCE : six campagnes d audit entre le 11 et le 18/08, 131 entrees au ledger, verdict PARTIEL — et pas une ligne, dans aucun rapport, aucun cahier, aucun ledger, ne mentionne un seul de ces treize identifiants. Au 18/08, huit sont toujours servies, dont quatre visibles par n importe quel utilisateur a chaque ecran. Le recouvrement fortuit qui a eu lieu (D-5, D-6, D-7 recoupent les anomalies 9871 et 9857) prouve la valeur du controle sans le rendre fiable : il tenait au hasard de la sequence de test. CORRECTIF ATTENDU : REEMPLOYER la mecanique de forge_tests/livrables/exigences.py, pas en ecrire une seconde. Ce module calcule deja le rattachement declare ou lexical avec sa provenance, et — c est la partie qui compte — « la reciproque, que personne ne regarde jamais : les exigences qu AUCUN cas ne touche ». Un second referentiel FORGE_TESTS_ANOMALIES (JSONL : id, titre, statut, priorite), alimente par le projet depuis son gestionnaire de tickets, passerait dans la meme moulinette et rendrait le chapitre qui manque : « anomalies declarees : couverte par tel cas / non couverte, motif ». Le refus deja en place vaudrait tel quel — un chemin declare et introuvable est un refus, pas un silence</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-18</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>13 anomalies clients ouvertes depuis le 29/07 dans Azure Boards, six campagnes d audit passees a cote sans qu aucun livrable ne les nomme, 8 encore servies au 18/08 dont 4 visibles a chaque ecran</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-11</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0370" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0370</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-tests : les controles de donnees cherchent le vide, jamais le faux — 11 annonces a 0,0 passent les cinq invariants du parc</h3>
-          <div class="card-detail"><p class="lead">Le second etage (recette sur instance servie, STRATEGIE-E2E section 12.4) a etabli l ecart E-2 — 5 annonces sans commune — en testant `city-insee-code === null`.</p><ul class="puces"><li>Or 11 annonces sur 1 249 portent latitude=0 et longitude=0, soit le point (0,0) du golfe de Guinee, AU LARGE DE L AFRIQUE. C est l anomalie 9873 du board Client-A-DevOps/APP-IA, priorite 1, ouverte le 30/07 : « des annonces sont localisees dans la mer bordant l Afrique ». Les 11 lignes ont ete relues en direct le 18/08 sur l instance dev, adresses francaises reelles a l appui (#4860 501 BD DE WESTPHALIE Barentin 76360, #5370 2 RUE JACQUELINE AURIOL Fleville-devant-Nancy, #5595 ZAC Rennes...). ELLES PASSENT LES CINQ INVARIANTS du parc (frontend/tests/recette/05-integrite-du-parc.spec.ts) : cle metier presente, unique, a la bonne forme, code INSEE a cinq caracteres, coordonnees PRESENTES. Le repli COALESCE(ads.latitude, ST_Y(cities.centroid)) ne joue pas non plus : 0 n est pas <code>NULL</code>. La mesure a donc trouve le voisin immediat — le champ vide — et manque le champ faux, qui est le cas rapporte par l utilisateur. CORRECTIF ATTENDU : un second controle par champ inventorie, jumeau du premier — PRESENT puis PLAUSIBLE. Le domaine n est pas a deviner dans la plupart des cas : il est deja declare dans le schema que la forge lit (marshmallow validate.Range / OneOf, ici AdvertSchema)</li><li>pour les grandeurs qui n en portent pas, un domaine declare par le projet vaut mieux que rien. Trois issues comme ailleurs : conforme</li><li>hors domaine, AVEC LES LIGNES NOMMEES</li><li>domaine non declarable, en le disant. VERIFICATION PREALABLE : aucun controle de domaine sur une valeur de donnees dans digit-ai-forge-tests (les occurrences de « plausible » relevent de la purete de fonction et de la revue)</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-18</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 2 × preuve 3 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>11 annonces sur 1 249 placees dans le golfe de Guinee, signalees par l utilisateur le 30/07 en priorite 1, toujours servies le 18/08, et passant l integralite des invariants de parc de la recette</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (lien posé à l'ingestion du lot Produit-11 20260818a)</dd></div>
-            
-          </dl>
-        </article>
         <article class="card s-corrige" id="item-TF-0343" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0343</code>
@@ -584,6 +492,23 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>campagne du 12/08 close conforme avec 121 findings et produit inchange ; la meme strategie executee avec obligation de traiter a ferme 4 anomalies produit et 3 faux verts, dont un dormant depuis cette campagne</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-01</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0371" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0371</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : rien ne confronte ce que le code APPELLE a ce que l instance SERT — ni les routes, ni les ressources</h3>
+          <div class="card-detail"><p class="lead">DEUX DEFAUTS MESURES EN DIRECT LE 18/08 sur l instance dev, qu aucun parcours ne pouvait voir.</p><ul class="puces"><li>Le blueprint alerts/08_push_subscriptions.py n est pas dans endpoint_modules de l hote deploye (azure/standalone_backend.py:487) : GET /api/c13s/vapid/public-key et GET /api/c13s/push-subscriptions rendent 404, alors que le front appelle les deux (services.ts:515, notificationUtils.ts:71). Toute une fonction est morte en production — anomalie 9858 du board APP-IA, ouverte le 29/07. Cause seconde et independante : VITE_VAPID_PUBLIC n est jamais passe au build (azure/frontend.Dockerfile ne le declare pas, la pipeline ne le passe pas)</li><li>La feuille servie /assets/AdvertCard-BKnn2WVw.css porte url(src/assets/images/placeholder-image.jpg), resolue par le navigateur en /assets/src/assets/images/placeholder-image.jpg -&gt; 404, et le fichier n est pas dans le build : aucune des 1 249 annonces n a d image de repli — anomalie 9875. CE N EST PAS RT-1 / RT-2 SOUS UN AUTRE NOM : les deux controles proposes ne franchissent aucune mire — la feuille a ete lue et son 404 obtenu SANS AUTHENTIFICATION, en trois appels fetch. CORRECTIF ATTENDU : generaliser le comparateur de ecart_servi_versionne (TF-0288, forge_tests/adaptateurs/interface.py:1016) a deux paires de termes de plus, avec les memes trois issues declarees —</li><li>ROUTES APPELEES / ROUTES SERVIES : les appels client sont litteraux et lisibles statiquement, une route appelee qui rend 404 est un FAIL nomme</li><li>RESSOURCES REFERENCEES / RESSOURCES SERVIES : lire les url() du CSS construit et les src/href du HTML servi, resoudre, demander, nommer tout ce qui n est pas 200. C est la TROISIEME generalisation demandee du meme comparateur (RT-23 demandait deja de le porter de la page a l instance entiere) : il y a probablement un mecanisme unique a en tirer plutot que trois. VERIFICATION PREALABLE : aucune lecture des url() d une feuille servie nulle part dans digit-ai-forge-tests</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-18</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>une fonction produit entierement morte en production (notifications push, deux routes en 404) et l absence totale d image sur 1 249 annonces, tenues par deux 404 lisibles sans authentification, non vues par six campagnes d audit entre le 11 et le 18/08</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (lien posé à l'ingestion du lot Produit-11 20260818a)</dd></div>
             
           </dl>
         </article>
@@ -703,6 +628,40 @@
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>le tour 3 de la campagne du 17/08 n a revele qu une anomalie, une course, invisible a un premier essai vert : une cloture au tour 2 l aurait livree</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-01</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0369" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0369</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : rien ne verifie que ce que le produit accepte d ecrire est ce qu il relit — deux defauts servis dans le perimetre couvert</h3>
+          <div class="card-detail"><p class="lead">CLASSE : le produit repond 200 et range autre chose.</p><ul class="puces"><li>Ni la couverture, ni la mutation (0,90 sur ce produit), ni un parcours ne la voient — le parcours passe parce que le produit fait ce que le parcours regarde. DEUX DEFAUTS MESURES SUR Produit-11, tous deux DANS le perimetre couvert (parcours 6 « alertes », 69 tests verts)</li><li>alerts.created_at porte `default=datetime.now(timezone.utc)` (backend/src/alerts/models_alerts.py:38) : l appel est evalue UNE fois au chargement du module, donc toute alerte est datee de l instant de demarrage du conteneur. Le rapport terrain mesure l ecart — board Azure DevOps Client-A-DevOps/APP-IA anomalie 9870, ouverte le 30/07 : « alerte creee le 29/07, enregistree au 24/07 », cinq jours, exactement l age du processus. Meme defaut sur push_subscriptions.created_at (l.225)</li><li>POST /alerts ecrase email_notifications a False EN DUR (backend/src/alerts/07_alerts.py:206) alors que l ecran envoie le choix de l utilisateur (CreateAlertModal:155) : la case cochee disparait sans un mot. POURQUOI INVISIBLE : le parcours 6 relit les CRITERES de l alerte, jamais ses scalaires ; et une valeur figee reste COHERENTE AVEC ELLE-MEME tant qu on n observe qu une occurrence. Sur le poste local le processus vient de naitre : l ecart serait de quelques secondes, invisible meme en regardant. CORRECTIF ATTENDU : un axe de cas derive ALLER-RETOUR, derivable sans specification puisque la surface est deja inventoriee — pour chaque route d ecriture, un cas « ce que je viens d ecrire, je le relis CHAMP PAR CHAMP », et pour un champ temporel la comparaison se fait A L HORLOGE, jamais a lui-meme. VERIFICATION PREALABLE : recherche dans digit-ai-forge-tests hors .venv — aucun mecanisme de relecture-apres-ecriture</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-18</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>deux defauts produit servis en dev et non vus par six campagnes d audit, dont un qui annule silencieusement le choix de l utilisateur (email des alertes) et un qui date toutes les alertes de l instant de demarrage du conteneur — ecart de 5 jours constate par l utilisateur (anomalie 9870)</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-11</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0372" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0372</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : le cahier derive n a qu un seul terme de comparaison externe possible (EXIGENCES.json) — donc en pratique aucun ; une liste d anomalies serait disponible</h3>
+          <div class="card-detail"><p class="lead">Le sceau de tous les cahiers de Produit-11 porte `exigences_source: (absent)` et la ligne « les cas sont derives de la SEULE SURFACE inventoriee ».</p><ul class="puces"><li>C est honnete et declare — c est meme la limite fondatrice que forge_tests/invariants.py enonce lui-meme : « on extrait l invariant TEL QU IMPLEMENTE, pas tel que voulu</li><li>si la garde est fausse, le cas genere confirmera le bug au lieu de le reveler ». MAIS un referentiel d exigences est rare, alors qu une LISTE D ANOMALIES OUVERTES existe sur presque tout produit vivant. Sur celui-ci elle existait : 13 anomalies dans Azure Boards (Client-A-DevOps / APP-IA / board « APP-IA Team / Stories »), ouvertes les 29 et 30/07, priorites 1 a 3. COUT MESURE DE LEUR ABSENCE : six campagnes d audit entre le 11 et le 18/08, 131 entrees au ledger, verdict PARTIEL — et pas une ligne, dans aucun rapport, aucun cahier, aucun ledger, ne mentionne un seul de ces treize identifiants. Au 18/08, huit sont toujours servies, dont quatre visibles par n importe quel utilisateur a chaque ecran. Le recouvrement fortuit qui a eu lieu (D-5, D-6, D-7 recoupent les anomalies 9871 et 9857) prouve la valeur du controle sans le rendre fiable : il tenait au hasard de la sequence de test. CORRECTIF ATTENDU : REEMPLOYER la mecanique de forge_tests/livrables/exigences.py, pas en ecrire une seconde. Ce module calcule deja le rattachement declare ou lexical avec sa provenance, et — c est la partie qui compte — « la reciproque, que personne ne regarde jamais : les exigences qu AUCUN cas ne touche ». Un second referentiel FORGE_TESTS_ANOMALIES (JSONL : id, titre, statut, priorite), alimente par le projet depuis son gestionnaire de tickets, passerait dans la meme moulinette et rendrait le chapitre qui manque : « anomalies declarees : couverte par tel cas / non couverte, motif ». Le refus deja en place vaudrait tel quel — un chemin declare et introuvable est un refus, pas un silence</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-18</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>13 anomalies clients ouvertes depuis le 29/07 dans Azure Boards, six campagnes d audit passees a cote sans qu aucun livrable ne les nomme, 8 encore servies au 18/08 dont 4 visibles a chaque ecran</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-11</dd></div>
             
           </dl>
         </article>
@@ -842,10 +801,27 @@
             
           </dl>
         </article>
+        <article class="card s-corrige" id="item-TF-0370" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0370</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : les controles de donnees cherchent le vide, jamais le faux — 11 annonces a 0,0 passent les cinq invariants du parc</h3>
+          <div class="card-detail"><p class="lead">Le second etage (recette sur instance servie, STRATEGIE-E2E section 12.4) a etabli l ecart E-2 — 5 annonces sans commune — en testant `city-insee-code === null`.</p><ul class="puces"><li>Or 11 annonces sur 1 249 portent latitude=0 et longitude=0, soit le point (0,0) du golfe de Guinee, AU LARGE DE L AFRIQUE. C est l anomalie 9873 du board Client-A-DevOps/APP-IA, priorite 1, ouverte le 30/07 : « des annonces sont localisees dans la mer bordant l Afrique ». Les 11 lignes ont ete relues en direct le 18/08 sur l instance dev, adresses francaises reelles a l appui (#4860 501 BD DE WESTPHALIE Barentin 76360, #5370 2 RUE JACQUELINE AURIOL Fleville-devant-Nancy, #5595 ZAC Rennes...). ELLES PASSENT LES CINQ INVARIANTS du parc (frontend/tests/recette/05-integrite-du-parc.spec.ts) : cle metier presente, unique, a la bonne forme, code INSEE a cinq caracteres, coordonnees PRESENTES. Le repli COALESCE(ads.latitude, ST_Y(cities.centroid)) ne joue pas non plus : 0 n est pas <code>NULL</code>. La mesure a donc trouve le voisin immediat — le champ vide — et manque le champ faux, qui est le cas rapporte par l utilisateur. CORRECTIF ATTENDU : un second controle par champ inventorie, jumeau du premier — PRESENT puis PLAUSIBLE. Le domaine n est pas a deviner dans la plupart des cas : il est deja declare dans le schema que la forge lit (marshmallow validate.Range / OneOf, ici AdvertSchema)</li><li>pour les grandeurs qui n en portent pas, un domaine declare par le projet vaut mieux que rien. Trois issues comme ailleurs : conforme</li><li>hors domaine, AVEC LES LIGNES NOMMEES</li><li>domaine non declarable, en le disant. VERIFICATION PREALABLE : aucun controle de domaine sur une valeur de donnees dans digit-ai-forge-tests (les occurrences de « plausible » relevent de la purete de fonction et de la revue)</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-18</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 2 × preuve 3 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>11 annonces sur 1 249 placees dans le golfe de Guinee, signalees par l utilisateur le 30/07 en priorite 1, toujours servies le 18/08, et passant l integralite des invariants de parc de la recette</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (lien posé à l'ingestion du lot Produit-11 20260818a)</dd></div>
+            
+          </dl>
+        </article>
       </div>
     </section>
     <section id="pilot">
-      <h2>pilot <span class="badge" title="29 item(s) actifs ciblant pilot">29</span></h2>
+      <h2>pilot <span class="badge" title="30 item(s) actifs ciblant pilot">30</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
         <article class="card s-corrige" id="item-TF-0327" data-forge="pilot" data-statut="corrige" data-prio="haute">
@@ -1021,6 +997,23 @@ La famille est plus large que le catalogue : tout contrôle « vue générée ==
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur pilot</dt><dd>3 appels d'outil pour retrouver le depot : listage de C:\dev, inspection de digit-ai-forge-pilot_old, puis verification par git log que digit-ai-factory etait bien le depot courant (commit du 18/08 contre 17/08 pour _old).</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (lien posé à l'ingestion du lot Produit-10 20260818a)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0373" data-forge="pilot" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0373</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">factory : l ouverture de run ne demande jamais ce que le client sait deja de ses defauts — une campagne peut se clore « au vert » a cote d un lot d anomalies ouvertes</h3>
+          <div class="card-detail"><p class="lead">CE QUE run_open CONSIGNE AUJOURD HUI, verifie sur le ledger de Produit-11 (seq 1, et les cinq ouvertures suivantes) : run_id, objet, projet, versions_forges, bootstrap.</p><ul class="puces"><li>RIEN sur les ENTREES DE CONNAISSANCE du produit : ni referentiel d exigences, ni liste d anomalies, ni source de tickets. CONSEQUENCE MESUREE : treize anomalies clients vivaient dans Azure Boards (Client-A-DevOps / APP-IA) depuis le 29/07</li><li>six campagnes ont tourne entre le 11 et le 18/08</li><li>aucune n a su qu elles existaient, et le sujet n est apparu que le 18/08 parce qu un humain a colle une URL de board dans une conversation. Le defaut n est PAS que la forge ne les ait pas trouvees — cinq relevent d exclusions ecrites et legitimes (photos, courriel, push, traitement d alertes, rendu visuel, section 6 de la strategie) — c est que LEUR ABSENCE N A JAMAIS ETE UN TERME DECLARE DE LA MESURE, alors que la doctrine de cette factory est precisement qu un SKIP muet est pire qu un SKIP declare. CORRECTIF ATTENDU : ajouter a la phase 0 une DECLARATION DES REFERENTIELS DISPONIBLES, sur le modele de ce que le cahier fait deja en tete — exigences, anomalies, contrat d interface — chacun declare present avec son chemin, ou declare absent. Trois effets, tous gratuits : le run_open du ledger porte la trace de ce sur quoi on ne pouvait pas s appuyer</li><li>le rapport de fin cesse de pouvoir dire « au vert » sans dire « au vert CONTRE QUOI »</li><li>et le jour ou un projet en branche un, la boucle se referme d elle-meme. La question n a besoin d etre posee qu une fois par produit. A traiter avec la candidature FORGE_TESTS_ANOMALIES : ce sont les deux moities du meme trou</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-18</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>six campagnes d audit ouvertes sans qu aucune ne demande la liste des defauts deja connus du client ; 13 anomalies ouvertes depuis le 29/07 restees hors de toute mesure et hors de tout livrable</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-11</dd></div>
             
           </dl>
         </article>
