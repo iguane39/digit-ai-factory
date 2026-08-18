@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=ded6d8c15557 archive=9f205b231527 · dernier événement: 2026-08-18T18:10:00Z -->
+     sceaux: actifs=039c0022d252 archive=9f205b231527 · dernier événement: 2026-08-18T18:10:00Z -->
 
-**66 actifs** (candidat 1 · décidé 0 · en cours 0 · corrigé 64 · écarté 1) · **308 archivés**.
+**70 actifs** (candidat 5 · décidé 0 · en cours 0 · corrigé 64 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -24,6 +24,13 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0323 | corrige | 4 | Gouvernance de mission absente : ni registre de risques, ni parties prenantes, ni mesures de succès suivies | **oui** — revérifié en session le 16/08 : 0 occurrence de « risque » dans pilote-de-mission v1.0.0, 0 hit « parties prenantes » sur les skills installés — une mission client pilotée par la forge ne produit aucun des trois objets qu'un commanditaire attend en premier en comité de pilotage |
 | TF-0336 | corrige | 4 | forge-agents, hygiène post-campagnes : .bak versionnés, versions-livrees périmé, famille L des gabarits, polices embarquées | **oui** — deux .bak suivis par git divergent déjà de leurs sources — la maladie des sidecars committés (TF-0296), au stade précoce |
 
+## digit-ai-forge-conception
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0376 | candidat | 4.5 | conception : deux sujets d exigences manquent systematiquement — propagation d etat asynchrone et cycle de vie de session — et ils concentrent les anomalies les plus couteuses | **oui** — 5 des 12 lacunes de specification du cahier Approval tiennent a ces deux seuls sujets, dont la rubrique 20 qualifiee « bug critique » par la recette et la perte de brouillon a l expiration de session (rubriques 27, 28) |
+| TF-0374 | candidat | 3 | conception : un retour d usage (lot d anomalies de recette) n entre dans AUCUNE des cinq categories d entrant, et aucun chemin ne le traite | **oui** — traitement integralement manuel du 18/08 : 1271 lignes x 16 sections croisees sans aucun oracle jouable, 49 rubriques classees, 9 contradictions et 3 regressions trouvees a la main, dont backend/tests/test_decision_lock.py:26 qui echouera des l implementation de la rubrique 35 |
+
 ## digit-ai-forge-design
 
 | id | statut | score | titre | payé en réel |
@@ -31,6 +38,18 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0361 | corrige | 8 | forge-design : la maquette de démo n'a ni bouton de bascule ni persistance de thème — oracle-bascule FAIL, pré-existant | **oui** — la maquette qui sert de vitrine au socle échoue à un oracle du même socle, et elle l'échoue depuis assez longtemps pour que personne ne le sache — le rejeu sur la version antérieure donne le même FAIL |
 | TF-0321 | corrige | 4.5 | forge-design juge le mouvement mais ne le prescrit jamais — ni token de durée, ni règle d'animation dans la marque et la maquette | **oui** — relevé exécuté le 16/08 sur digit-ai-forge-design : 7 règles de mouvement exécutées et câblées, 0 token de mouvement dans la marque, 0 section mouvement dans DESIGN.md, contrôle reduced-motion en avertissement — la maquette est jugée sur des valeurs jamais prescrites |
 | TF-0335 | corrige | 4 | forge-design, mise en cohérence post-TF-0321 : registre, fixtures R10, démos, self-test du générateur | **oui** — une autorité de mouvement à deux têtes potentielles et des démos qui contredisent l'oracle — le bruit de fond que TF-0228 a appris à éteindre |
+
+## digit-ai-forge-development
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0375 | candidat | 4.5 | development : cat-dev-03 (gate spec under/over-build) couvrait 24 des 49 anomalies de la recette Approval, et c est le gate JAMAIS demontre sur produit reel | **oui** — 24 des 49 rubriques de la recette du 18/08 relevent litteralement de l intention de cat-dev-03 ; le catalogue lui-meme declare ce gate jamais demontre sur produit reel (statut declare, cycle experimental) |
+
+## digit-ai-forge-organization
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0377 | candidat | 3 | organization : le nom de fichier d un referentiel et sa version interne peuvent diverger — l ecart a failli produire un arbitrage faux sur Approval | **oui** — ambiguite portee a l humain comme risque de reouverture des 31 ecarts fermes par 7fc01f3, levee seulement par la lecture du pied de page du document ; la meme confusion est deja inscrite dans le message du commit 7fc01f3 |
 
 ## digit-ai-forge-tests
 
