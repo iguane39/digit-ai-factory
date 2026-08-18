@@ -17,11 +17,11 @@
   <title>Digit-AI — TODO-FORGE · Reste à faire — V20260817</title>
   <meta name="description" content="Reste-à-faire du registre TODO-FORGE : candidats à décider, décidés, en cours — détaillés en puces, avec date de création, priorité de traitement et impact sur la forge concernée.">
   <meta name="theme-color" content="#2563EB">
-  <meta name="color-scheme" content="light dark">
   <!-- Favicon-lettre (13/08) : « F » = Forge (projet). -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3Ctext x='32' y='44' font-family='Segoe UI,Roboto,sans-serif' font-size='38' font-weight='700' fill='white' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
   <style>
     :root {
+      color-scheme:light;
       --blue:#2563EB; --bg:#FAFBFF; --surface:#FFFFFF; --card:#FFFFFF; --ink:#0F172A;
       --muted:#64748B; --faint:#94A3B8; --line:#E6EAF2;
       --amber:#D97706; --amber-fill:#FFFBEB; --amber-line:#FDE9C8;
@@ -34,6 +34,7 @@
     }
     /* S-G1 (2/4, R-30) — tokens sombres : une source, deux projections. */
     :root[data-theme="dark"] {
+      color-scheme:dark;
       --bg:#0B1220; --surface:#121B2E; --card:#121B2E; --ink:#EEF2F8;
       --muted:#A9B4C4; --faint:#7C8AA0; --line:#263248; --blue:#7DA2F5;
       --amber:#FBBF6D; --amber-fill:#2B2210; --amber-line:#4A3A18;
@@ -138,7 +139,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>40a6fbd96474</code> · dernier événement 2026-08-17T17:49:27Z</p>
+      <p class="meta">sceau <code>29fae236149f</code> · dernier événement 2026-08-17T23:08:20Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -148,8 +149,8 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="28 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">28</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="2 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">2</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="24 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">24</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="307 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">307</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
@@ -184,19 +185,19 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">51 / 51 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">52 / 52 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">8 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">17 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">24 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">8 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">17 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">25 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-forge-agents">
       <h2>digit-ai-forge-agents <span class="badge" title="8 item(s) actifs ciblant digit-ai-forge-agents">8</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-agents</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0326" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
+        <article class="card s-decide" id="item-TF-0326" data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0326</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -210,10 +211,10 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0336" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="moyenne">
+        <article class="card s-decide" id="item-TF-0336" data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0336</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -335,10 +336,10 @@
       <h2>digit-ai-forge-design <span class="badge" title="2 item(s) actifs ciblant digit-ai-forge-design">2</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-design</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0335" data-forge="digit-ai-forge-design" data-statut="candidat" data-prio="moyenne">
+        <article class="card s-decide" id="item-TF-0335" data-forge="digit-ai-forge-design" data-statut="decide" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0335</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -375,10 +376,10 @@
       <h2>digit-ai-forge-tests <span class="badge" title="17 item(s) actifs ciblant digit-ai-forge-tests">17</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-tests</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0343" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="haute">
+        <article class="card s-decide" id="item-TF-0343" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0343</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -392,10 +393,10 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0352" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="haute">
+        <article class="card s-decide" id="item-TF-0352" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0352</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -409,10 +410,10 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0345" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="haute">
+        <article class="card s-decide" id="item-TF-0345" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0345</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -426,10 +427,10 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0333" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
+        <article class="card s-decide" id="item-TF-0333" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0333</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -443,10 +444,10 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0341" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
+        <article class="card s-decide" id="item-TF-0341" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0341</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -460,10 +461,10 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0344" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
+        <article class="card s-decide" id="item-TF-0344" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0344</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -477,10 +478,10 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0353" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
+        <article class="card s-decide" id="item-TF-0353" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0353</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -494,10 +495,10 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0354" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
+        <article class="card s-decide" id="item-TF-0354" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0354</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -511,10 +512,10 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0340" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
+        <article class="card s-decide" id="item-TF-0340" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0340</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -528,10 +529,10 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0342" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
+        <article class="card s-decide" id="item-TF-0342" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0342</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -545,10 +546,10 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0355" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
+        <article class="card s-decide" id="item-TF-0355" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0355</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -562,10 +563,10 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0334" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="basse">
+        <article class="card s-decide" id="item-TF-0334" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0334</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -586,7 +587,7 @@
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">forge-tests : schema_obtenu rend None sans motif propre quand le conteneur manque sur son seul chemin</h3>
+          <h3 class="card-titre">forge-tests : schema_obtenu rend <code>None</code> sans motif propre quand le conteneur manque sur son seul chemin</h3>
           <div class="card-detail"><p class="lead">Reste déclaré de TF-0299 : execution.py:schema_obtenu (rejeu des migrations sur base neuve, également par conteneur) rend <code>None</code> sans déclarer de motif — couvert aujourd'hui par le motif du domaine backend, mais un préalable absent sur CE seul chemin resterait muet.</p><ul class="puces"><li>Lui donner le même marqueur PREALABLE_ABSENT</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
@@ -667,30 +668,13 @@
       </div>
     </section>
     <section id="pilot">
-      <h2>pilot <span class="badge" title="24 item(s) actifs ciblant pilot">24</span></h2>
+      <h2>pilot <span class="badge" title="25 item(s) actifs ciblant pilot">25</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0327" data-forge="pilot" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0327</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">RV-9 n'est pas refermé : la fixture témoin de la bascule sombre démontre ENCORE le comportement interdit</h3>
-          <div class="card-detail"><p class="lead">Constat de la campagne pilot du 17/08 : references/temoin/...Bascule-Sombre-Verte...20260812a.html suit toujours prefers-color-scheme (l.12 matchMedia) et sa meta description annonce « prefers-color-scheme honoré » — alors que l'amendement RV-9 (14/08) affirme que le snippet ET la fixture verte « sont alignés ».</p><ul class="puces"><li>La preuve de conformité de référence démontre le comportement que R-30/TF-0158 interdit — l'incident RV-9 exactement, non refermé 3 jours plus tard</li><li>Même famille : todo/generer-page.mjs l.171 porte le meta color-scheme figé « light dark » que RV-9 déclare fautif</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12 — gain 3 × preuve 4 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>deux livrables du même socle peuvent encore s'ouvrir différemment sur le même poste — le symptôme exact que RV-9 prétendait avoir soldé</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0328" data-forge="pilot" data-statut="candidat" data-prio="haute">
+        <article class="card s-decide" id="item-TF-0328" data-forge="pilot" data-statut="decide" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0328</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -704,27 +688,10 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0356" data-forge="pilot" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0356</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">generer-page.mjs : TODO.html échoue L11 — esc() au lieu d'escLit() sur les titres (« None » non traité)</h3>
-          <div class="card-detail"><p class="lead">Constat de la campagne TF-0350 : todo/TODO.html échoue check_html sur L11 (« <code>None</code> » non traité dans le titre de la carte TF-0309) — generer-page.mjs échappe les titres avec esc() là où generer-archive.mjs applique escLit() et ne reproduit pas le défaut.</p><ul class="puces"><li>Aligner generer-page sur le patron du cadet, et jouer check_html sur TODO.html au self-test todo (il n'y est pas)</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>la vue courante du registre échoue à l'oracle du socle pendant que la vue d'archive née hier le passe — le patron neuf a déjà dépassé l'ancien</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 soir — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0358" data-forge="pilot" data-statut="candidat" data-prio="haute">
+        <article class="card s-decide" id="item-TF-0358" data-forge="pilot" data-statut="decide" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0358</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -738,10 +705,10 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0331" data-forge="pilot" data-statut="candidat" data-prio="haute">
+        <article class="card s-decide" id="item-TF-0331" data-forge="pilot" data-statut="decide" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0331</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -755,10 +722,10 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0337" data-forge="pilot" data-statut="candidat" data-prio="haute">
+        <article class="card s-decide" id="item-TF-0337" data-forge="pilot" data-statut="decide" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0337</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -768,6 +735,97 @@
             <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur pilot</dt><dd>l'humain qui suit le conseil au pied de la lettre câblerait un hook que K8 déclarerait aussitôt mort</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-decide" id="item-TF-0359" data-forge="pilot" data-statut="decide" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0359</code>
+            <span class="statut s-decide">decide</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Les vues générées sont jugées divergentes pour leurs seules fins de ligne — K6 est structurellement rouge sur tout clone Windows</h3>
+          <div class="card-detail"><p class="lead">Mesuré ce jour sur un clone NEUF de digit-ai-factory : oracle-catalogues rend FAIL sur K6 (« CATALOGUES.md diverge de la source ; section README diverge de la source ») alors qu'aucun contenu ne diverge — `git diff --ignore-cr-at-eol` est VIDE.</p><ul class="puces"><li>La divergence tient aux seuls CR de fin de ligne.
+
+Mécanisme, vérifié pas à pas :</li><li>`core.autocrlf` vaut `true` dans la config SYSTÈME de Git for Windows — ni le dépôt ni l'utilisateur ne l'ont demandé, c'est le défaut de l'installateur</li><li>les blobs versionnés de `catalogues/CATALOGUES.md` et de `README.md` portent des CRLF</li><li>`catalogues/generer-vues.mjs` émet des LF (`L.join(&quot;\n&quot;)`) et compare en `--check` par égalité de chaînes stricte (`vueActuelle !== vueComplete`). Le checkout pose donc des CRLF sur le disque, le générateur attend des LF, et l'égalité stricte échoue sans qu'aucune vue ne soit périmée.
+
+Conséquences : l'oracle accuse une désynchronisation qui n'existe pas, et il le refera à CHAQUE clone — la régénération le fait taire sur ce poste (fait ce jour, K6 repassé PASS) mais laisse deux fichiers en modification git dont le diff n'est que des CR, ce qui déplace le bruit du verdict vers l'arbre de travail. Le dépôt n'a pas de `.gitattributes`.
+
+La famille est plus large que le catalogue : tout contrôle « vue générée == source » par égalité d'octets est exposé (sceau de TODO.md, TODO-PRODUIT, et l'extension du sceau visée par TF-0338 sur ARCHITECTURE.html / MODELE-DONNEES.html). Deux voies à trancher : poser un `.gitattributes` (`* text=auto eol=lf`) et renormaliser le dépôt — geste unique, durable, qui touche tous les fichiers ; ou normaliser les fins de ligne dans la comparaison des générateurs et des oracles — geste local et répété, qui laisse le dépôt mixte. À instruire avant décision : la seconde voie n'empêche pas un diff parasite au commit, la première est un objet durable au sens R-31</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 4 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>**oui** — mesuré ce jour sur un clone neuf : K6 rend FAIL pendant que `git diff --ignore-cr-at-eol` est vide, donc l'oracle accuse une divergence que le contenu dément ; un lecteur du verdict conclut à une vue périmée et régénère pour rien, et le geste de silence produit à son tour deux fichiers modifiés dont le diff n'est que des CR</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant de la session du 17/08 soir — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-decide" id="item-TF-0330" data-forge="pilot" data-statut="decide" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0330</code>
+            <span class="statut s-decide">decide</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">4 produits sur 5 n'ont pas de forge/QUESTIONS.md — un arbitrage en attente y est invisible</h3>
+          <div class="card-detail"><p class="lead">Mesure de l'étude todo-produit : CONTRAT-INTERFACE l.60 prescrit forge/QUESTIONS.md, un seul produit sur les 5 porteurs d'un arbre forge/ l'a (Cockpit IA).</p><ul class="puces"><li>Le gain réel de TF-0318 (visibilité des décisions en attente) dépend de ce porteur — rattrapage au prochain run de version de chacun (règle existante), ou geste court à définir</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>un développement suspendu faute d'arbitrage est invisible pour 4 produits sur 5 — le coût que TF-0318 voulait traiter</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-decide" id="item-TF-0339" data-forge="pilot" data-statut="decide" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0339</code>
+            <span class="statut s-decide">decide</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">L'output du pilot est en écart D-15 : deux familles en collision de numéro et un LISEZMOI incomplet</h3>
+          <div class="card-detail"><p class="lead">Constat des études rangement-output (20260817d) et campagne vague 2 : output/05-catalogues-readmes-forges/ et output/05-insatisfactions/ portent le même numéro de famille, et LISEZMOI.md ne cite pas 05-insatisfactions.</p><ul class="puces"><li>E9 ne le juge pas (le pilot est hors périmètre bootstrap — délibéré, sinon l'oracle d'ouverture FAIL aujourd'hui)</li><li>À résoudre en PRÉSERVANT les chemins portés par insatisfactions/REGISTRE.jsonl (le dossier d'INS-0001 y est pointé — un renommage nu casserait le registre)</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>le propre output du gardien de la convention la viole — chaque étude qui le cite en coût d'O0 le re-paiera jusqu'à correction</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-decide" id="item-TF-0351" data-forge="pilot" data-statut="decide" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0351</code>
+            <span class="statut s-decide">decide</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">orchestrer-boucle.mjs (13/08) n'a AUCUN appelant — dette R-35 vivante dans le pilot, câblage conditionné à TF-0340/0341</h3>
+          <div class="card-detail"><p class="lead">Constat de l'étude tests-bout-en-bout (20260817) : outillage-tests-e2e/orchestrer-boucle.mjs, livré le 13/08 pour exactement la finalité de TF-0349, n'est cité par rien (grep : zéro appelant hors journal) et ses tests échappent à l'invariant I1 de self-tests.mjs.</p><ul class="puces"><li>Décision de l'étude : le câblage complet (option O4, 3-5 j sur 3 dépôts) est CONDITIONNÉ à la résolution de TF-0340/0341 (cycle de vie d'instance) — en attendant, la dette est NOMMÉE ici plutôt que tue</li><li>À trancher quand TF-0340/0341 seront traités : câbler, ou retirer l'outil</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 3 × preuve 4 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>un outil livré il y a 4 jours pour la finalité exacte du mandat du jour était introuvable par lui — l'étude l'a exhumé par grep, pas par le corpus</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat d'étude — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-decide" id="item-TF-0338" data-forge="pilot" data-statut="decide" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0338</code>
+            <span class="statut s-decide">decide</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Fraîcheur d'ARCHITECTURE.html et MODELE-DONNEES.html non jugée — étendre le sceau sha256 de TODO-PRODUIT, avec mesure préalable</h3>
+          <div class="card-detail"><p class="lead">Reste de la campagne TF-0318 : les deux projections sœurs ne sont jugées qu'en PRÉSENCE (non_juge de R-26 le dit) — une vue périmée passe.</p><ul class="puces"><li>Le mécanisme de sceau livré pour TODO-PRODUIT s'y étendrait à l'identique, MAIS le durcissement pourrait faire FAIL des produits réels sur des vues périmées : mesurer d'abord, décider ensuite (le patron rétroactivité de R-19 s'applique)</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 2 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>une vue générée qui ment est pire qu'une vue absente : elle porte l'autorité du généré sans sa fraîcheur</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
             
           </dl>
@@ -789,88 +847,20 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0330" data-forge="pilot" data-statut="candidat" data-prio="moyenne">
+        <article class="card s-corrige" id="item-TF-0327" data-forge="pilot" data-statut="corrige" data-prio="haute">
           <header class="card-head">
-            <code class="tf-id">TF-0330</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
+            <code class="tf-id">TF-0327</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">4 produits sur 5 n'ont pas de forge/QUESTIONS.md — un arbitrage en attente y est invisible</h3>
-          <div class="card-detail"><p class="lead">Mesure de l'étude todo-produit : CONTRAT-INTERFACE l.60 prescrit forge/QUESTIONS.md, un seul produit sur les 5 porteurs d'un arbre forge/ l'a (Cockpit IA).</p><ul class="puces"><li>Le gain réel de TF-0318 (visibilité des décisions en attente) dépend de ce porteur — rattrapage au prochain run de version de chacun (règle existante), ou geste court à définir</li></ul></div>
+          <h3 class="card-titre">RV-9 n'est pas refermé : la fixture témoin de la bascule sombre démontre ENCORE le comportement interdit</h3>
+          <div class="card-detail"><p class="lead">Constat de la campagne pilot du 17/08 : references/temoin/...Bascule-Sombre-Verte...20260812a.html suit toujours prefers-color-scheme (l.12 matchMedia) et sa meta description annonce « prefers-color-scheme honoré » — alors que l'amendement RV-9 (14/08) affirme que le snippet ET la fixture verte « sont alignés ».</p><ul class="puces"><li>La preuve de conformité de référence démontre le comportement que R-30/TF-0158 interdit — l'incident RV-9 exactement, non refermé 3 jours plus tard</li><li>Même famille : todo/generer-page.mjs l.171 porte le meta color-scheme figé « light dark » que RV-9 déclare fautif</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>un développement suspendu faute d'arbitrage est invisible pour 4 produits sur 5 — le coût que TF-0318 voulait traiter</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12 — gain 3 × preuve 4 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>deux livrables du même socle peuvent encore s'ouvrir différemment sur le même poste — le symptôme exact que RV-9 prétendait avoir soldé</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0339" data-forge="pilot" data-statut="candidat" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0339</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">L'output du pilot est en écart D-15 : deux familles en collision de numéro et un LISEZMOI incomplet</h3>
-          <div class="card-detail"><p class="lead">Constat des études rangement-output (20260817d) et campagne vague 2 : output/05-catalogues-readmes-forges/ et output/05-insatisfactions/ portent le même numéro de famille, et LISEZMOI.md ne cite pas 05-insatisfactions.</p><ul class="puces"><li>E9 ne le juge pas (le pilot est hors périmètre bootstrap — délibéré, sinon l'oracle d'ouverture FAIL aujourd'hui)</li><li>À résoudre en PRÉSERVANT les chemins portés par insatisfactions/REGISTRE.jsonl (le dossier d'INS-0001 y est pointé — un renommage nu casserait le registre)</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>le propre output du gardien de la convention la viole — chaque étude qui le cite en coût d'O0 le re-paiera jusqu'à correction</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0351" data-forge="pilot" data-statut="candidat" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0351</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">orchestrer-boucle.mjs (13/08) n'a AUCUN appelant — dette R-35 vivante dans le pilot, câblage conditionné à TF-0340/0341</h3>
-          <div class="card-detail"><p class="lead">Constat de l'étude tests-bout-en-bout (20260817) : outillage-tests-e2e/orchestrer-boucle.mjs, livré le 13/08 pour exactement la finalité de TF-0349, n'est cité par rien (grep : zéro appelant hors journal) et ses tests échappent à l'invariant I1 de self-tests.mjs.</p><ul class="puces"><li>Décision de l'étude : le câblage complet (option O4, 3-5 j sur 3 dépôts) est CONDITIONNÉ à la résolution de TF-0340/0341 (cycle de vie d'instance) — en attendant, la dette est NOMMÉE ici plutôt que tue</li><li>À trancher quand TF-0340/0341 seront traités : câbler, ou retirer l'outil</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 3 × preuve 4 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>un outil livré il y a 4 jours pour la finalité exacte du mandat du jour était introuvable par lui — l'étude l'a exhumé par grep, pas par le corpus</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat d'étude — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0338" data-forge="pilot" data-statut="candidat" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0338</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">Fraîcheur d'ARCHITECTURE.html et MODELE-DONNEES.html non jugée — étendre le sceau sha256 de TODO-PRODUIT, avec mesure préalable</h3>
-          <div class="card-detail"><p class="lead">Reste de la campagne TF-0318 : les deux projections sœurs ne sont jugées qu'en PRÉSENCE (non_juge de R-26 le dit) — une vue périmée passe.</p><ul class="puces"><li>Le mécanisme de sceau livré pour TODO-PRODUIT s'y étendrait à l'identique, MAIS le durcissement pourrait faire FAIL des produits réels sur des vues périmées : mesurer d'abord, décider ensuite (le patron rétroactivité de R-19 s'applique)</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 2 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>une vue générée qui ment est pire qu'une vue absente : elle porte l'autorité du généré sans sa fraîcheur</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0357" data-forge="pilot" data-statut="candidat" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0357</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">Oracles du pilot : deux vocabulaires pour l'exit 2 — SKIP (insatisfactions, boite-entree) vs SANS_OBJET (conformite, adoption)</h3>
-          <div class="card-detail"><p class="lead">Constat de la campagne oracle-adoption : pour le même code de sortie 2, l'enveloppe des oracles du pilot écrit SKIP chez les uns et SANS_OBJET chez les autres.</p><ul class="puces"><li>Un consommateur qui filtre sur le libellé rate la moitié des cas</li><li>Harmoniser (un seul terme au niveau enveloppe, l'autre admis au niveau finding), avec fixtures — et déclarer le choix au registre des oracles</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 1 × preuve 4 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>quatre oracles nés en trois jours ont déjà bifurqué en deux dialectes — le cinquième choisira au hasard</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 soir — constat =&gt; candidat)</dd></div>
             
           </dl>
         </article>
@@ -888,6 +878,23 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur pilot</dt><dd>deux études du même après-midi ont buté sur des déclarations de conformité fausses — le coût de recherche se paie à chaque instruction</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0356" data-forge="pilot" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0356</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">generer-page.mjs : TODO.html échoue L11 — esc() au lieu d'escLit() sur les titres (« <code>None</code> » non traité)</h3>
+          <div class="card-detail"><p class="lead">Constat de la campagne TF-0350 : todo/TODO.html échoue check_html sur L11 (« <code>None</code> » non traité dans le titre de la carte TF-0309) — generer-page.mjs échappe les titres avec esc() là où generer-archive.mjs applique escLit() et ne reproduit pas le défaut.</p><ul class="puces"><li>Aligner generer-page sur le patron du cadet, et jouer check_html sur TODO.html au self-test todo (il n'y est pas)</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>la vue courante du registre échoue à l'oracle du socle pendant que la vue d'archive née hier le passe — le patron neuf a déjà dépassé l'ancien</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 soir — constat =&gt; candidat)</dd></div>
             
           </dl>
         </article>
@@ -1024,6 +1031,23 @@
             <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2.7 — gain 4 × preuve 2 ÷ effort 3)</span></dd></div>
             <div class="impact"><dt>Impact sur pilot</dt><dd><span class="meta-sub">non chiffré</span></dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (Sébastien) — demande directe en session pilot</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0357" data-forge="pilot" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0357</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Oracles du pilot : deux vocabulaires pour l'exit 2 — SKIP (insatisfactions, boite-entree) vs SANS_OBJET (conformite, adoption)</h3>
+          <div class="card-detail"><p class="lead">Constat de la campagne oracle-adoption : pour le même code de sortie 2, l'enveloppe des oracles du pilot écrit SKIP chez les uns et SANS_OBJET chez les autres.</p><ul class="puces"><li>Un consommateur qui filtre sur le libellé rate la moitié des cas</li><li>Harmoniser (un seul terme au niveau enveloppe, l'autre admis au niveau finding), avec fixtures — et déclarer le choix au registre des oracles</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 1 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>quatre oracles nés en trois jours ont déjà bifurqué en deux dialectes — le cinquième choisira au hasard</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 soir — constat =&gt; candidat)</dd></div>
             
           </dl>
         </article>

@@ -33,9 +33,16 @@
  *         Un `non_testable` sans `champs_requis[]` reprend l'idiome RT-6 : il se répare en
  *         FOURNISSANT, pas en écrivant un test — donc sans champs, il n'est pas motivé.
  *
+ * Vocabulaire de sortie (TF-0357, harmonisé le 18/08) — un terme par NIVEAU, jamais deux
+ * dialectes pour le même exit 2 : au niveau ENVELOPPE le verdict est `SKIP` (comme
+ * oracle-boite-entree, oracle-insatisfactions et oracle-skills) ; au niveau FINDING le statut
+ * est `SANS_OBJET` (comme oracle-conformite-projet, oracle-ecosysteme, oracle-fraicheur-doc).
+ * Un consommateur qui filtre sur le libellé n'a donc plus qu'un mot à connaître par niveau.
+ * Exit inchangé : 0 PASS · 1 FAIL · 2 SKIP.
+ *
  * Règles (chacune binaire) :
  *   A1  inventaire — les cahiers dérivés sont trouvés sous la cible ; aucun cahier jugeable
- *       = SANS_OBJET MOTIVÉ, jamais un PASS silencieux ;
+ *       = SKIP MOTIVÉ à l'enveloppe, jamais un PASS silencieux ;
  *   A2  contrat d'adoption — un cahier qui porte des cas dérivés sans contrat d'adoption
  *       lisible est en défaut (c'est le cas réel « 971 / 0 ») ; une adoption dont le test cité
  *       est introuvable est REFUSÉE et nommée ; une déclaration d'écartement fourvoyée dans
@@ -240,7 +247,7 @@ function juger(cible) {
   const echantillon = (liste, n = 5) => liste.slice(0, n).join(", ") + (liste.length > n ? ` … et ${liste.length - n} autre(s)` : "");
 
   if (!existsSync(cible)) {
-    return { verdict: "SANS_OBJET", findings, mesure: null,
+    return { verdict: "SKIP", findings, mesure: null,
       motif: `cible introuvable : ${cible} — usage : node oracle-adoption-tests.mjs <racine-projet>` };
   }
 
@@ -257,11 +264,11 @@ function juger(cible) {
     so("A5", `${anteriorites.length} cahier(s) antérieur(s) au ${DOCTRINE_R40} en antériorité DÉCLARÉE, jamais jugée — rattrapage au prochain run de ce produit (R-37 al. 3) : ${echantillon(anteriorites.map((c) => `${c.nom} (${c.date || "date illisible"}, ${c.refs.length} cas)`), 3)}`);
   }
   if (!tous.length) {
-    return { verdict: "SANS_OBJET", findings, racine, mesure: { cahiers: 0, anteriorites: 0 },
+    return { verdict: "SKIP", findings, racine, mesure: { cahiers: 0, anteriorites: 0 },
       motif: `aucun cahier de tests dérivé sous ${cible} — R-40 s'applique aux cas DÉRIVÉS par forge-tests ; sans cahier, il n'y a pas de solde à opposer (et non : pas de solde nul)` };
   }
   if (!juges.length) {
-    return { verdict: "SANS_OBJET", findings, racine,
+    return { verdict: "SKIP", findings, racine,
       mesure: { cahiers: tous.length, anteriorites: anteriorites.length, juges: 0 },
       motif: `${tous.length} cahier(s) trouvé(s), tous ANTÉRIEURS au ${DOCTRINE_R40} : antériorités déclarées, jamais jugées — R-40 s'oppose au prochain cahier dérivé, l'existant ne se réécrit pas` };
   }
@@ -460,14 +467,17 @@ function selfTest() {
   r = juger(projet("vert-anteriorite", {
     cahiers: [{ date: "2026-08-14", refs: Array.from({ length: 9 }, (_, i) => prop(`F1-0001-${i + 1}`)) }],
   }));
-  cas.push(["A5    — contre-épreuve : les 9 mêmes cas datés du 14/08 → SANS_OBJET, jamais FAIL",
-    r.verdict === "SANS_OBJET" && !r.findings.some((f) => f.statut === "FAIL")
+  // Enveloppe SKIP, finding SANS_OBJET (TF-0357) : le cas doit tenir les DEUX niveaux à la
+  // fois — c'est la seule forme qui prouve que l'harmonisation n'a pas simplement renommé
+  // partout, mais bien séparé les deux vocabulaires par niveau.
+  cas.push(["A5    — contre-épreuve : les 9 mêmes cas datés du 14/08 → enveloppe SKIP + finding SANS_OBJET, jamais FAIL",
+    r.verdict === "SKIP" && !r.findings.some((f) => f.statut === "FAIL")
       && r.findings.some((f) => f.regle === "A5" && f.statut === "SANS_OBJET"), r.verdict]);
 
-  // ── vert A1 · aucun cahier : SANS_OBJET MOTIVÉ, jamais un PASS silencieux ─────────
+  // ── vert A1 · aucun cahier : SKIP MOTIVÉ, jamais un PASS silencieux ───────────────
   r = juger(projet("vert-sans-cahier", {}));
-  cas.push(["A1    — aucun cahier dérivé : SANS_OBJET motivé (pas un solde nul)",
-    r.verdict === "SANS_OBJET" && /aucun cahier de tests dérivé/.test(r.motif || ""), r.verdict]);
+  cas.push(["A1    — aucun cahier dérivé : SKIP motivé (pas un solde nul)",
+    r.verdict === "SKIP" && /aucun cahier de tests dérivé/.test(r.motif || ""), r.verdict]);
 
   // ── vert · forme réelle de BAV2 : cahiers hors produit, contrat un cran plus bas ──
   r = juger(projet("vert-forme-bav2", {
@@ -495,7 +505,7 @@ if (args.includes("--self-test")) process.exit(selfTest());
 const cible = args.find((a) => !a.startsWith("--"));
 if (!cible) {
   process.stdout.write(JSON.stringify({
-    oracle: "oracle-adoption-tests", version: "1.0.0", verdict: "SANS_OBJET",
+    oracle: "oracle-adoption-tests", version: "1.1.0", verdict: "SKIP",
     motif: "aucune cible : usage — node oracle-adoption-tests.mjs <racine-projet> | --self-test",
     findings: [], non_juge: NON_JUGE,
   }, null, 2) + "\n");

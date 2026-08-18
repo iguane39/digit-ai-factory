@@ -12,8 +12,10 @@
  * « commentaire » ont été retirées (décisions prises hors page) — la vue est en lecture seule.
  *
  * Autonome : zéro réseau (polices en repli système). Charte digit-ai-page-html : tokens du
- * boilerplate, Roboto titres / DM Sans corps. R-30 : thème CLAIR par défaut + bascule sombre
- * câblée en en-tête (pattern S-G1, persistée, prefers-color-scheme 1re visite, print clair).
+ * boilerplate, Roboto titres / DM Sans corps. R-30 : thème CLAIR par défaut STRICT + bascule
+ * sombre câblée en en-tête (pattern S-G1, persistée, print clair). L'auto-sombre hérité de
+ * l'OS est retiré (amendement TF-0158) et `color-scheme` vit dans les tokens, jamais figé
+ * dans un <meta> — la doctrine RV-9, que ce commentaire annonçait à l'envers jusqu'au 18/08.
  *
  * Standard H (13/08, BEST-PRACTICES-HTML.md §H) : page à liste → filtres multi-sélection
  * Forge/Priorité (Tous/Aucun), recherche plein texte insensible aux accents + « Réinitialiser
@@ -114,7 +116,7 @@ for (const forge of [...parForge.keys()].sort()) {
             <span class="chip prio p-${p.k}" title="priorité dérivée du score (valeur ${e.score.valeur})">Priorité ${p.l}</span>
             ${reel}
           </header>
-          <h3 class="card-titre">${esc(e.titre)}</h3>
+          <h3 class="card-titre">${escLit(e.titre)}</h3>
           <div class="card-detail">${rendDetail(e.contenu)}</div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>${esc(e.date_demande)}</dd></div>
@@ -168,11 +170,11 @@ const html = `<!DOCTYPE html>
   <title>Digit-AI — TODO-FORGE · Reste à faire — V${esc(tsMax.slice(0, 10).replaceAll("-", ""))}</title>
   <meta name="description" content="Reste-à-faire du registre TODO-FORGE : candidats à décider, décidés, en cours — détaillés en puces, avec date de création, priorité de traitement et impact sur la forge concernée.">
   <meta name="theme-color" content="#2563EB">
-  <meta name="color-scheme" content="light dark">
   <!-- Favicon-lettre (13/08) : « F » = Forge (projet). -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3Ctext x='32' y='44' font-family='Segoe UI,Roboto,sans-serif' font-size='38' font-weight='700' fill='white' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
   <style>
     :root {
+      color-scheme:light;
       --blue:#2563EB; --bg:#FAFBFF; --surface:#FFFFFF; --card:#FFFFFF; --ink:#0F172A;
       --muted:#64748B; --faint:#94A3B8; --line:#E6EAF2;
       --amber:#D97706; --amber-fill:#FFFBEB; --amber-line:#FDE9C8;
@@ -185,6 +187,7 @@ const html = `<!DOCTYPE html>
     }
     /* S-G1 (2/4, R-30) — tokens sombres : une source, deux projections. */
     :root[data-theme="dark"] {
+      color-scheme:dark;
       --bg:#0B1220; --surface:#121B2E; --card:#121B2E; --ink:#EEF2F8;
       --muted:#A9B4C4; --faint:#7C8AA0; --line:#263248; --blue:#7DA2F5;
       --amber:#FBBF6D; --amber-fill:#2B2210; --amber-line:#4A3A18;
