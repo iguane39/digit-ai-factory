@@ -1,11 +1,17 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=aed554b60551 archive=9f205b231527 · dernier événement: 2026-08-18T16:30:00Z -->
+     sceaux: actifs=3be6530bd2eb archive=9f205b231527 · dernier événement: 2026-08-18T16:50:00Z -->
 
-**61 actifs** (candidat 1 · décidé 0 · en cours 0 · corrigé 59 · écarté 1) · **308 archivés**.
+**66 actifs** (candidat 6 · décidé 0 · en cours 0 · corrigé 59 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
+
+## digit-ai-factory
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0373 | candidat | 6 | factory : l ouverture de run ne demande jamais ce que le client sait deja de ses defauts — une campagne peut se clore « au vert » a cote d un lot d anomalies ouvertes | **oui** — six campagnes d audit ouvertes sans qu aucune ne demande la liste des defauts deja connus du client ; 13 anomalies ouvertes depuis le 29/07 restees hors de toute mesure et hors de tout livrable |
 
 ## digit-ai-forge-agents
 
@@ -36,6 +42,10 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0371 | candidat | 9 | forge-tests : rien ne confronte ce que le code APPELLE a ce que l instance SERT — ni les routes, ni les ressources | **oui** — une fonction produit entierement morte en production (notifications push, deux routes en 404) et l absence totale d image sur 1 249 annonces, tenues par deux 404 lisibles sans authentification, non vues par six campagnes d audit entre le 11 et le 18/08 |
+| TF-0369 | candidat | 4.5 | forge-tests : rien ne verifie que ce que le produit accepte d ecrire est ce qu il relit — deux defauts servis dans le perimetre couvert | **oui** — deux defauts produit servis en dev et non vus par six campagnes d audit, dont un qui annule silencieusement le choix de l utilisateur (email des alertes) et un qui date toutes les alertes de l instant de demarrage du conteneur — ecart de 5 jours constate par l utilisateur (anomalie 9870) |
+| TF-0372 | candidat | 4.5 | forge-tests : le cahier derive n a qu un seul terme de comparaison externe possible (EXIGENCES.json) — donc en pratique aucun ; une liste d anomalies serait disponible | **oui** — 13 anomalies clients ouvertes depuis le 29/07 dans Azure Boards, six campagnes d audit passees a cote sans qu aucun livrable ne les nomme, 8 encore servies au 18/08 dont 4 visibles a chaque ecran |
+| TF-0370 | candidat | 2 | forge-tests : les controles de donnees cherchent le vide, jamais le faux — 11 annonces a 0,0 passent les cinq invariants du parc | **oui** — 11 annonces sur 1 249 placees dans le golfe de Guinee, signalees par l utilisateur le 30/07 en priorite 1, toujours servies le 18/08, et passant l integralite des invariants de parc de la recette |
 | TF-0343 | corrige | 9 | tests : la matrice des droits doit etre un artefact EXECUTABLE cellule par cellule, avec xfail strict pour les cellules non tenues | **oui** — 2 lignes de la matrice des droits conformes par construction mais prouvees par aucun test, et 2 cases non tenues par le produit, invisibles dans une suite organisee par service |
 | TF-0352 | corrige | 9 | tests : « executer la strategie de tests » doit inclure la CORRECTION des anomalies remontees et le REJEU jusqu a extinction — definition de fin a ecrire | **oui** — campagne du 12/08 close conforme avec 121 findings et produit inchange ; la meme strategie executee avec obligation de traiter a ferme 4 anomalies produit et 3 faux verts, dont un dormant depuis cette campagne |
 | TF-0309 | corrige | 6 | forge-tests : schema_obtenu rend None sans motif propre quand le conteneur manque sur son seul chemin | **oui** — le seul chemin conteneur encore capable de se taire — la maladie que TF-0299 vient d'éradiquer partout ailleurs |
