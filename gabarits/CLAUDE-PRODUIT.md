@@ -64,6 +64,23 @@ Boucle intérieure (libre, sans verdict) : `<commandes locales : pytest, ruff, s
   `MODE_DEMO`, jamais de secret.
 - `<conventions spécifiques au produit>`
 
+## Référentiels
+
+Ce sur quoi la mesure peut — ou ne peut PAS — s'appuyer. **Une réponse par ligne, et « absent »
+est une réponse valide** : ce qui est refusé est le silence. Rempli UNE FOIS à l'ouverture du
+premier run ; le `run_open` du ledger le recopie (TF-0373).
+
+| référentiel | état | ce qu'il donne à la mesure |
+|---|---|---|
+| **exigences** | `<chemin>` ou `absent — <motif>` | le seul terme de comparaison EXTERNE des cas dérivés ; sans lui, un cas généré sur une garde fausse CONFIRME le bug au lieu de le révéler |
+| **anomalies** | `<chemin>` ou `absent — <motif>` | ce que le CLIENT sait déjà de ses défauts (export JSONL de son gestionnaire de tickets, `FORGE_TESTS_ANOMALIES`) |
+| **contrat_interface** | `<chemin>` ou `absent — <motif>` | ce que le produit promet à ses appelants (OpenAPI, schéma, cahier) |
+
+*Pourquoi cette section existe* : treize anomalies clients ont vécu trois semaines dans un board
+pendant que six campagnes d'audit tournaient sans savoir qu'elles existaient. Le défaut n'était
+pas de ne pas les avoir trouvées — c'était que **leur absence n'ait jamais été un terme déclaré
+de la mesure**. Un rapport ne peut pas dire « au vert » sans dire **« au vert CONTRE QUOI »**.
+
 ## Reprise
 
 Forge : `<FORGE_ROOT>` (sinon relire `PROMPT-PRODUIT.md`, phase 0). Le ledger
@@ -96,4 +113,5 @@ process.exit(c.length?2:1)}console.log(c[0])"
 
 Deux candidats indiscernables ne se tranchent **jamais en silence** : la commande sort en
 échec et demande `PILOT_ROOT`. Référence exécutable et son `non_juge` :
-`<PILOT_ROOT>\oraclesesoudre-pilot.mjs [--json]`.
+`<PILOT_ROOT>\oracles
+esoudre-pilot.mjs [--json]`.

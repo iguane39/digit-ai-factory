@@ -108,6 +108,20 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   `etape_close`, `retour` (alimente la boucle d'amélioration ; champ `source` :
   `forge | produit | production`), `relais_arme` (process long en arrière-plan : chemin
   guetté + ts — TF-0173, §4 ter), `run_close`.
+- **`run_open` porte aussi les RÉFÉRENTIELS DISPONIBLES (`referentiels`, TF-0373 — 18/08)**, et
+  c'est une déclaration, pas une option : pour chacun — `exigences`, `anomalies`,
+  `contrat_interface` — soit son **chemin**, soit `absent` avec son motif. Rien de plus.
+  *Le coût du silence, mesuré* : treize anomalies clients vivaient dans un board depuis le 29/07 ;
+  six campagnes ont tourné entre le 11 et le 18/08 ; aucune n'a su qu'elles existaient, et le
+  sujet n'est apparu que parce qu'un humain a collé une URL dans une conversation. **Le défaut
+  n'est pas que la forge ne les ait pas trouvées** — cinq relèvent d'exclusions écrites et
+  légitimes — c'est que **leur absence n'a jamais été un TERME DÉCLARÉ de la mesure**, alors que
+  la doctrine de cette factory est qu'un SKIP muet est pire qu'un SKIP déclaré.
+  Trois effets, tous gratuits : le ledger porte la trace de ce sur quoi on ne pouvait pas
+  s'appuyer ; le rapport de fin cesse de pouvoir dire « au vert » sans dire « au vert CONTRE
+  QUOI » ; et le jour où un projet en branche un, la boucle se referme d'elle-même. La question
+  ne se pose **qu'une fois par produit** : la réponse vit au `CLAUDE.md` du projet, le run la
+  recopie. Contrôle : R-11 bis d'`oracle-conformite-projet`.
 - `run_open` porte les **versions des forges** utilisées (`versions_forges: {<forge>: <sha court>}`,
   relevées après le pull d'ouverture) et, pour un run de version, `run_precedent: <run-id>` —
   le ledger du run N est l'entrée du run N+1 (cf. CLAUDE.md « Run de version »).
@@ -225,7 +239,7 @@ les points d'entrée listés ci-dessous.
 | Observability (transverse, entre les runs — 12/08, TF-0112) | dépôt `digit-ai-forge-observability` — verbes : `node <obs>\scripts\observer.mjs <plan.json>` · `node <obs>\scripts\derive.mjs <snapshots.jsonl>` (contrat JSON, exit 0/1/2, plan `plan-observation@1`) ; preuve : `oracles/self-test.mjs` 30 PASS | **natif** | D-OB1 : pas de scheduler ni d'alerting (le FAIL de derive est le signal) ; D-OB2 : volet veille IA déclaré (méthode manuelle) ; composition oracle réel forge-data à exercer |
 | Websec (sur mandat, pré-MEP en gate + post-MEP différentielle — 12/08, TF-0123) | dépôt `digit-ai-forge-websec` — capture : `node <ws>\scripts\capturer.mjs <url> <sortie.json>` ; verdicts : `node <ws>\oracles\oracle-exposition.mjs <capture.json>` (EX-1..EX-11) · `node <ws>\oracles\oracle-sca.mjs <racine> [--seuils]` (npm audit/pip-audit enveloppés, SKIP motivé) ; contrat : `referentiels\asvs-l1.md` (ASVS 5.0.0 L1, 32 exigences) ; preuve : self-test 23 PASS | **natif** | D-W1 : DAST (ZAP) et osv-scanner en v1 ; D-W2 : 9 chapitres ASVS L1 non curés (listés) ; D-W3 : jamais exercée sur produit réel — premier mandat à consigner |
 | SEO (post-MEP, récurrente — 08/08) | CLI natif : `python <seo>\scripts\new_mission.py --projet <produit> --client … --domaine … --modele …` puis méthode `seo\METHODE.md` déroulée en session ; contrôles `validate.py [--mission]` (exit 0/1) ; rapport `rapport_html.py --verifier`. **Jamais de déclenchement automatique** (doctrine de la forge : un audit commence par une commande explicite — mandat humain requis) | natif (scaffold/validation/rendu) + degrade (analyse des 87 nœuds en session) | D-S1 : 3 livrables sur 5 sans générateur ; D-S2 : snapshot non validé contre son schéma (dérive 1.0.0/1.1.0) ; D-S3 : pas de sortie --json ; D-S4 : moteurs d'étapes ad hoc chez la mission, non généralisés |
-| Organization (doctrine transverse — 08/08) | conversationnel — les documents (Inventaire, Décisions D-01→D-12) sont les entrées ; oracle `output-composants\composant-filtres-tableau\oracle-filtres-tableau.mjs` exécutable | degrade | D-O1 : aucun point d'entrée (viole sa propre D-05) ; D-O2 : décisions en prose, pas de `conventions.json` ni vérificateur (Phase 3 non faite) ; D-O3 : recouvrement D-01→D-12 ↔ REGLES-PROJET.md du pilot à réconcilier ; D-O4 : 3 questions ouvertes (Q3, Q3-bis, Q4) |
+| Organization (doctrine transverse — 08/08) | conversationnel — les documents (Inventaire, Décisions D-01→D-12) sont les entrées ; oracle `output\02-composants\composant-filtres-tableau\oracle-filtres-tableau.mjs` exécutable | degrade | D-O1 : aucun point d'entrée (viole sa propre D-05) ; D-O2 : décisions en prose, pas de `conventions.json` ni vérificateur (Phase 3 non faite) ; D-O3 : recouvrement D-01→D-12 ↔ REGLES-PROJET.md du pilot à réconcilier ; D-O4 : 3 questions ouvertes (Q3, Q3-bis, Q4) |
 
 Chaque entrée de dette est reprise dans `BOUCLE-AMELIORATION.md` comme retour candidat.
 

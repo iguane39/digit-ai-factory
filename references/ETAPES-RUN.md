@@ -35,6 +35,26 @@ strictement aucun effet. `--appliquer` remet à niveau ; il **refuse** d'écrase
 récente que sa source (K5) — le jour de son écriture, `prompt-analyzer-l99` installé était en
 2.2.0 quand le dépôt en était à 2.1.0, et une synchronisation naïve aurait détruit une version.
 
+**DÉCLARER LES RÉFÉRENTIELS DISPONIBLES (TF-0373, 18/08)** — une fois par produit, avant tout.
+Pour chacun des trois, soit son chemin, soit `absent` avec son motif ; le `run_open` du ledger le
+porte en `referentiels` :
+
+| référentiel | ce qu'il donne à la mesure | où il vit d'habitude |
+|---|---|---|
+| `exigences` | le terme de comparaison EXTERNE des cas dérivés | `EXIGENCES.json` (`FORGE_TESTS_EXIGENCES`) |
+| `anomalies` | ce que le CLIENT sait déjà de ses défauts | export JSONL du gestionnaire de tickets (`FORGE_TESTS_ANOMALIES`) |
+| `contrat_interface` | ce que le produit promet à ses appelants | OpenAPI, schéma, cahier |
+
+*Pourquoi c'est un pas d'ouverture et pas une option* : treize anomalies clients vivaient dans un
+board depuis le 29/07 ; six campagnes ont tourné entre le 11 et le 18/08 ; **aucune n'a su qu'elles
+existaient**, et le sujet n'est apparu que parce qu'un humain a collé une URL dans une
+conversation. Le défaut n'est pas que la forge ne les ait pas trouvées — cinq relevaient
+d'exclusions écrites et légitimes — c'est que **leur absence n'a jamais été un terme DÉCLARÉ de la
+mesure**. Un SKIP muet est pire qu'un SKIP déclaré, et c'est la doctrine de cette factory partout
+ailleurs. Conséquence directe : le rapport de fin ne peut plus dire « au vert » sans dire **« au
+vert CONTRE QUOI »**. La question ne se pose qu'une fois par produit — la réponse vit à son
+`CLAUDE.md`, le run la recopie — et elle est tenue par **R-11 bis** d'`oracle-conformite-projet`.
+
 Dans le projet produit, créer `forge\` (`ledger.jsonl` ouvert avec `run_open`, `BRIEF.md` avec
 le brief reçu, `etapes\`). Si `PROMPT-PRODUIT.md` n'est pas à la racine du projet, l'y copier
 depuis le pilot (auto-documentation et reprise). Écrivain unique du ledger : l'orchestrateur.
