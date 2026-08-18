@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=da9b7f03a106 archive=9f205b231527 · dernier événement: 2026-08-18T12:00:00Z -->
+     sceaux: actifs=ce748084237b archive=9f205b231527 · dernier événement: 2026-08-18T12:30:00Z -->
 
-**53 actifs** (candidat 1 · décidé 0 · en cours 0 · corrigé 51 · écarté 1) · **308 archivés**.
+**55 actifs** (candidat 3 · décidé 0 · en cours 0 · corrigé 51 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,6 +11,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0362 | candidat | 8 | oracle-etat-forge : un skill présent au dépôt mais ABSENT du manifeste n'est jamais regardé par F1 — le silence est du bon côté | **oui** — un skill livré et monté est resté hors de tout contrôle de version sans que rien ne le signale ; il a fallu écrire un second outil pour s'en apercevoir |
 | TF-0324 | candidat | 3 | Artefacts périodiques du run de delivery absents : RAID, rapport d'avancement, compte rendu, REX, suivi des bénéfices | **oui** — revérifié en session le 16/08 : 0 occurrence de RAID / compte rendu / rapport d'avancement / lessons learned sur les skills installés — aucun des cinq artefacts que réclame une mission longue n'a d'équivalent dans la forge |
 | TF-0304 | corrige | 12 | forge-agents : déclarer le câblage de qo-gate-write.mjs dans le settings.json versionné de la forge | **oui** — le gate C7 est mort sur ce poste depuis une date inconnue et AUCUN dépôt ne dit comment le recâbler — la moitié durable du trou que K7 déclare à chaque run |
 | TF-0306 | corrige | 8 | forge-agents : _routages-journal.jsonl d'experts-forge est un journal d'exécution TRACKÉ que son self-test salit | **oui** — chaque exécution du self-test crée un diff parasite — le prochain commit pressé l'embarque et le bruit K2 renaît |
@@ -24,6 +25,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0361 | candidat | 8 | forge-design : la maquette de démo n'a ni bouton de bascule ni persistance de thème — oracle-bascule FAIL, pré-existant | **oui** — la maquette qui sert de vitrine au socle échoue à un oracle du même socle, et elle l'échoue depuis assez longtemps pour que personne ne le sache — le rejeu sur la version antérieure donne le même FAIL |
 | TF-0321 | corrige | 4.5 | forge-design juge le mouvement mais ne le prescrit jamais — ni token de durée, ni règle d'animation dans la marque et la maquette | **oui** — relevé exécuté le 16/08 sur digit-ai-forge-design : 7 règles de mouvement exécutées et câblées, 0 token de mouvement dans la marque, 0 section mouvement dans DESIGN.md, contrôle reduced-motion en avertissement — la maquette est jugée sur des valeurs jamais prescrites |
 | TF-0335 | corrige | 4 | forge-design, mise en cohérence post-TF-0321 : registre, fixtures R10, démos, self-test du générateur | **oui** — une autorité de mouvement à deux têtes potentielles et des démos qui contredisent l'oracle — le bruit de fond que TF-0228 a appris à éteindre |
 
