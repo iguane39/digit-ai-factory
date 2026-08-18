@@ -189,6 +189,18 @@ refuse (l'auditeur n'écrit pas chez l'audité) et le refuse désormais **bruyam
 (message terminal + code de sortie 4, distinct des erreurs de génération). La prescription
 fabriquait donc le refus à chaque run qui la suivait — deux exécutions perdues le 15/08.
 
+**Qui décide que la campagne est TERMINÉE : forge-tests, pas le pilot (TF-0360, 18/08).**
+Depuis TF-0352/0353, `forge_tests/boucle.py` porte la définition de fin — cinq points
+opposables (portes en exit 0 · aucun `xfail` sans arbitrage humain daté · suite verte sur
+N ≥ 2 passages consécutifs · chaque anomalie corrigée ou portée en écart assumé et ÉCRIT ·
+dernier tour REJOUÉ APRÈS son dernier correctif) — et chaque rapport la publie dans sa section
+`boucle`. **Le pilot LIT ce verdict, il ne le recalcule pas** : la forge qui prescrit une règle
+est celle qui la juge. Le journal de tours est tenu par le pilot chez le PRODUIT
+(`forge\journal-boucle.jsonl`) : c'est sa campagne. Câblage :
+`outillage-tests-e2e\appels-reels.mjs`. La borne ci-dessous reste au pilot — c'est un plafond
+de DÉPENSE (loi 5), jamais un critère de fin : on peut s'arrêter avant la fin, on ne peut pas
+décider que c'est fini.
+
 **Boucle de fermeture bornée** : chaque item `actions[]` du rapport porte son `etape_cible` ;
 router les `auto_ia` — `development` (code, câblage), `tests-suite` (cas générés À ADOPTER
 ET EXÉCUTER — R-40 : trois états seulement, adopté/`non_testable` motivé/écarté par décision
