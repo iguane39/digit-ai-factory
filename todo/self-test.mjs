@@ -6,7 +6,7 @@
  * Fixtures en dossier temporaire — rien n'est écrit dans le dépôt.
  */
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, writeFileSync, rmSync, readFileSync } from "node:fs";
+import { mkdtempSync, writeFileSync, rmSync, readFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -323,6 +323,67 @@ check("archive : charte R-30 tenue et défaut RV-9 non recopié", () => {
     throw new Error("color-scheme figé dans un <meta> — défaut RV-9 recopié de generer-page.mjs");
   if (!/:root \{\s*\n\s*color-scheme:light/.test(htmlV) || !/:root\[data-theme="dark"\] \{\s*\n\s*color-scheme:dark/.test(htmlV))
     throw new Error("color-scheme absent des blocs de tokens — les surfaces du navigateur ne suivraient pas le thème (RV-9)");
+});
+
+// ---- L11 : la page COURANTE passe l'oracle du socle HTML (TF-0356, 18/08) -------------------
+// Le défaut corrigé ce jour — esc() au lieu de escLit() sur les titres, « None » rendu nu dans
+// la carte de TF-0309 — n'était visible d'AUCUN contrôle d'ici : check_html vit chez
+// forge-agents et personne ne le jouait sur TODO.html. La vue d'archive, née la veille, passait
+// déjà : le cadet avait dépassé l'aîné sans que rien ne le dise. Double sens obligatoire — un
+// vert seul ne prouverait que l'absence de littéral dans le registre du jour, pas le contrôle.
+const RACINE = process.env.FORGE_ROOT ?? join(ICI, "..", "..");
+const checkHtml = join(RACINE, "digit-ai-forge-agents", ".claude", "skills", "digit-ai-page-html", "scripts", "check_html.py");
+const jouerCheckHtml = (fichier) => {
+  try { execFileSync("python", [checkHtml, fichier], { encoding: "utf8", stdio: "pipe" }); return { code: 0, sortie: "" }; }
+  catch (e) { return { code: e.status ?? -1, sortie: String(e.stdout || "") + String(e.stderr || "") }; }
+};
+
+check("page courante : TODO.html passe check_html (socle HTML)", () => {
+  // Absence = FAIL, jamais SKIP : un gate qu'on ne sait pas jouer n'en est pas un (R-35).
+  if (!existsSync(checkHtml)) throw new Error(`check_html introuvable (${checkHtml}) — gate injouable, donc en défaut`);
+  const r = jouerCheckHtml(join(ICI, "TODO.html"));
+  if (r.code !== 0) throw new Error(`check_html FAIL sur la page courante : ${r.sortie.trim().slice(0, 300)}`);
+});
+
+check("page rouge : un littéral nu réinjecté dans un titre est bien dénoncé par L11", () => {
+  if (!existsSync(checkHtml)) throw new Error(`check_html introuvable (${checkHtml}) — gate injouable, donc en défaut`);
+  const html = readFileSync(join(ICI, "TODO.html"), "utf8");
+  const injecte = html.replace(/<h3 class="card-titre">/, '<h3 class="card-titre">valeur None non traitée — ');
+  if (injecte === html) throw new Error("fixture rouge non plantée — aucun titre de carte dans la page");
+  const rouge = join(T, "page-rouge.html");
+  writeFileSync(rouge, injecte);
+  const r = jouerCheckHtml(rouge);
+  if (r.code === 0) throw new Error("check_html PASSE sur la fixture rouge — le vert ci-dessus ne prouve rien");
+  if (!/L11/.test(r.sortie)) throw new Error(`échec obtenu, mais pas sur L11 : ${r.sortie.trim().slice(0, 200)}`);
+});
+
+// ---- R-30 / RV-9 sur la page COURANTE (TF-0327, 18/08) -------------------------------------
+// Le contrôle R-30 n'existait que pour la page d'archive : generer-page.mjs a donc porté le
+// `<meta name="color-scheme">` que RV-9 déclare fautif pendant 4 jours sans que rien ne le
+// dise, pendant que le cadet, lui, était jugé. Symétrie posée ici.
+check("page courante : R-30 tenue (clair strict, color-scheme dans les tokens, pas de <meta>)", () => {
+  const html = readFileSync(join(ICI, "TODO.html"), "utf8");
+  if (/prefers-color-scheme:\s*dark/.test(html))
+    throw new Error("auto-sombre hérité de l'OS — retiré par l'amendement TF-0158");
+  if (/<meta\s+name="color-scheme"/i.test(html.replace(/<!--[\s\S]*?-->/g, "")))
+    throw new Error("color-scheme figé dans un <meta> — défaut RV-9");
+  if (!/:root \{\s*\n\s*color-scheme:light/.test(html) || !/:root\[data-theme="dark"\] \{\s*\n\s*color-scheme:dark/.test(html))
+    throw new Error("color-scheme absent des blocs de tokens — les surfaces du navigateur ne suivraient pas le thème (RV-9)");
+  for (const attendu of ['id="theme-toggle"', "localStorage.setItem('digitai-theme'", 'data-theme="dark"', "@media print"])
+    if (!html.includes(attendu)) throw new Error(`bascule ou impression R-30 non câblée : « ${attendu} » absent`);
+});
+
+// La fixture VERTE est la preuve de conformité de référence : si elle démontre le comportement
+// interdit, toute revue qui s'y adosse valide l'inverse de la règle (incident TF-0327).
+check("fixture témoin verte : elle démontre bien R-30, et non son contraire", () => {
+  const f = join(ICI, "..", "references", "temoin", "Digit-AI - Page-Temoin Bascule-Sombre-Verte - HTML - 20260812a.html");
+  if (!existsSync(f)) throw new Error(`fixture témoin introuvable (${f})`);
+  const html = readFileSync(f, "utf8");
+  if (/matchMedia/.test(html)) throw new Error("la fixture verte suit encore prefers-color-scheme — elle démontre l'interdit");
+  if (/<meta\s+name="color-scheme"/i.test(html.replace(/<!--[\s\S]*?-->/g, "")))
+    throw new Error("color-scheme figé dans un <meta> — défaut RV-9 dans la preuve de référence");
+  if (/prefers-color-scheme honoré/.test(html))
+    throw new Error("la description annonce encore « prefers-color-scheme honoré » — la fixture ment sur ce qu'elle prouve");
 });
 
 rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });

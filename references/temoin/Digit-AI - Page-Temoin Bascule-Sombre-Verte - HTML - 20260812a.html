@@ -2,27 +2,28 @@
 <html lang="fr">
 <head>
 <!-- S-G1 (1/4) — initialisation AVANT le <style> : pose data-theme avant la première
-     peinture (zéro flash). Choix persisté sinon prefers-color-scheme à la première visite.
+     peinture (zéro flash). CLAIR PAR DÉFAUT STRICT : seul un choix persisté par le lecteur
+     ouvre en sombre ; l'auto-sombre hérité de l'OS est retiré (amendement RV-9 / TF-0158 du
+     13-14/08 — cette fixture le démontrait ENCORE le 17/08, TF-0327).
      Volontairement SANS defer/async : un script différé peindrait d'abord le thème par
      défaut du CSS puis re-peindrait en sombre, c'est le flash que ce script évite. -->
 <script>
 (function () {
-  var stocke = localStorage.getItem('digitai-theme');
-  var theme = stocke || (window.matchMedia &&
-    window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-  document.documentElement.setAttribute('data-theme', theme);
+  var stocke = null;
+  try { stocke = localStorage.getItem('digitai-theme'); } catch (e) {}
+  document.documentElement.setAttribute('data-theme', stocke === 'dark' ? 'dark' : 'light');
 })();
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digit-AI — Page-témoin bascule thème sombre (verte) · Forge Pilot</title>
-  <meta name="description" content="Fixture verte R-30 : bascule sombre câblée, persistée, prefers-color-scheme honoré, palette sombre dérivée, contraste AA tenu dans les deux thèmes, impression forcée claire.">
+  <title>Digit-AI — Page-témoin bascule thème sombre (verte) · Forge Pilot — 20260812a</title>
+  <meta name="description" content="Fixture verte R-30 : bascule sombre câblée, persistée, clair par défaut strict (l'auto-sombre de l'OS est retiré), palette sombre dérivée, contraste AA tenu dans les deux thèmes, impression forcée claire.">
   <meta name="theme-color" content="#2563EB">
-  <meta name="color-scheme" content="light dark">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3C/svg%3E">
 
   <style>
     :root {
+      color-scheme: light;
       --blue: #2563EB;
       --bg: #FAFBFF;
       --surface: #FFFFFF;
@@ -48,6 +49,7 @@
        sémantique éclaircit sa teinte de base (lisible sur fond sombre) et assombrit
        son -fill/-line en griffe basse de la même teinte. */
     :root[data-theme="dark"] {
+      color-scheme: dark;
       --bg: #0B1220; --surface: #121B2E; --card: #121B2E;
       --ink: #EEF2F8; --muted: #A9B4C4; --faint: #7C8AA0; --line: #263248;
       --blue: #7DA2F5;
