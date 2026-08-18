@@ -1,30 +1,24 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=bc68130c33fb archive=9f205b231527 · dernier événement: 2026-08-18T15:20:00Z -->
+     sceaux: actifs=aed554b60551 archive=9f205b231527 · dernier événement: 2026-08-18T16:30:00Z -->
 
-**61 actifs** (candidat 5 · décidé 0 · en cours 0 · corrigé 55 · écarté 1) · **308 archivés**.
+**61 actifs** (candidat 1 · décidé 0 · en cours 0 · corrigé 59 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
-
-## digit-ai-factory
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0367 | candidat | 6 | le renommage du depot pilot casse en silence les chemins ecrits dans les CLAUDE.md consommateurs | **oui** — 3 appels d'outil pour retrouver le depot : listage de C:\dev, inspection de digit-ai-forge-pilot_old, puis verification par git log que digit-ai-factory etait bien le depot courant (commit du 18/08 contre 17/08 pour _old). |
 
 ## digit-ai-forge-agents
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0366 | candidat | 9 | un verdict d'oracle archive ne dit pas sous quel jeu de regles il a ete rendu | **oui** — 1 aller-retour de diagnostic : A3 tombe sur les 5 fichiers HTML du projet, gabarit compris, ce qui a d'abord fait soupconner un defaut de la chaine d'emission avant que la comparaison avec le journal du 14/08 n'etablisse qu'il s'agissait d'une regle nouvelle. |
-| TF-0368 | candidat | 6 | reconstat RA-11 : l'avertissement « script bloquant dans <head> » avait une cause reelle | **oui** — l'avertissement portait sur les 4 livrables HTML du projet a chaque execution depuis le 13/08 ; il a disparu d'un seul deplacement de deux balises meta. |
-| TF-0365 | candidat | 4.5 | render_page : une page tres haute rend l'outil muet au lieu de le declarer incompetent | **oui** — 45 lignes de scripts/mesurer_debordement.py ecrites dans le projet produit pour mesurer la seule regle BLOQUANTE (V1) que la capture empechait de juger ; travail integralement reutilisable donc integralement duplique au prochain run. Plus 6 executions perdues en expiration a 280 s chacune. |
 | TF-0324 | candidat | 3 | Artefacts périodiques du run de delivery absents : RAID, rapport d'avancement, compte rendu, REX, suivi des bénéfices | **oui** — revérifié en session le 16/08 : 0 occurrence de RAID / compte rendu / rapport d'avancement / lessons learned sur les skills installés — aucun des cinq artefacts que réclame une mission longue n'a d'équivalent dans la forge |
 | TF-0304 | corrige | 12 | forge-agents : déclarer le câblage de qo-gate-write.mjs dans le settings.json versionné de la forge | **oui** — le gate C7 est mort sur ce poste depuis une date inconnue et AUCUN dépôt ne dit comment le recâbler — la moitié durable du trou que K7 déclare à chaque run |
+| TF-0366 | corrige | 9 | un verdict d'oracle archive ne dit pas sous quel jeu de regles il a ete rendu | **oui** — 1 aller-retour de diagnostic : A3 tombe sur les 5 fichiers HTML du projet, gabarit compris, ce qui a d'abord fait soupconner un defaut de la chaine d'emission avant que la comparaison avec le journal du 14/08 n'etablisse qu'il s'agissait d'une regle nouvelle. |
 | TF-0306 | corrige | 8 | forge-agents : _routages-journal.jsonl d'experts-forge est un journal d'exécution TRACKÉ que son self-test salit | **oui** — chaque exécution du self-test crée un diff parasite — le prochain commit pressé l'embarque et le bruit K2 renaît |
 | TF-0362 | corrige | 8 | oracle-etat-forge : un skill présent au dépôt mais ABSENT du manifeste n'est jamais regardé par F1 — le silence est du bon côté | **oui** — un skill livré et monté est resté hors de tout contrôle de version sans que rien ne le signale ; il a fallu écrire un second outil pour s'en apercevoir |
 | TF-0326 | corrige | 6 | Le skill pilote-de-mission n'est versionné dans AUCUN dépôt — la forge juge un artefact dont elle ne possède ni la spécification ni les instances | **oui** — des candidatures externes s'appuient sur le contenu d'un skill que personne ne peut ouvrir — le registre a failli décider sur une preuve invérifiable |
+| TF-0368 | corrige | 6 | reconstat RA-11 : l'avertissement « script bloquant dans <head> » avait une cause reelle | **oui** — l'avertissement portait sur les 4 livrables HTML du projet a chaque execution depuis le 13/08 ; il a disparu d'un seul deplacement de deux balises meta. |
+| TF-0365 | corrige | 4.5 | render_page : une page tres haute rend l'outil muet au lieu de le declarer incompetent | **oui** — 45 lignes de scripts/mesurer_debordement.py ecrites dans le projet produit pour mesurer la seule regle BLOQUANTE (V1) que la capture empechait de juger ; travail integralement reutilisable donc integralement duplique au prochain run. Plus 6 executions perdues en expiration a 280 s chacune. |
 | TF-0307 | corrige | 4 | check_html : check_autonomie extrait les <style> sans retirer les commentaires HTML — faux positif A1 latent | **oui** — trois collisions réelles en une seule campagne sur le mécanisme non protégé — la quatrième sera chez un utilisateur |
 | TF-0308 | corrige | 4 | forge-agents : 6 gabarits de digit-ai-schemas plus rouges sous les règles TF-0303 — conformité ou exemption déclarée, à trancher | **oui** — des gabarits rouges à l'oracle de leur propre socle fabriquent le bruit permanent que TF-0228 a coûté cher à éteindre |
 | TF-0323 | corrige | 4 | Gouvernance de mission absente : ni registre de risques, ni parties prenantes, ni mesures de succès suivies | **oui** — revérifié en session le 16/08 : 0 occurrence de « risque » dans pilote-de-mission v1.0.0, 0 hit « parties prenantes » sur les skills installés — une mission client pilotée par la forge ne produit aucun des trois objets qu'un commanditaire attend en premier en comité de pilotage |
@@ -73,6 +67,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0337 | corrige | 6 | oracle-skills : le conseil de réparation de K7 propose une commande RELATIVE — reportée telle quelle, elle ne résoudrait rien | **oui** — l'humain qui suit le conseil au pied de la lettre câblerait un hook que K8 déclarerait aussitôt mort |
 | TF-0348 | corrige | 6 | output\ : les documents d'un audit vivent dans une famille XX-audit — nom de famille au registre organization, numéro local stable | **oui** — demande humaine directe — sans nom de famille conventionné, XX-audit sera 03- ici et 07- là et la recherche inter-produits redevient manuelle |
 | TF-0359 | corrige | 6 | Les vues générées sont jugées divergentes pour leurs seules fins de ligne — K6 est structurellement rouge sur tout clone Windows | **oui** — **oui** — mesuré ce jour sur un clone neuf : K6 rend FAIL pendant que `git diff --ignore-cr-at-eol` est vide, donc l'oracle accuse une divergence que le contenu dément ; un lecteur du verdict conclut à une vue périmée et régénère pour rien, et le geste de silence produit à son tour deux fichiers modifiés dont le diff n'est que des CR |
+| TF-0367 | corrige | 6 | le renommage du depot pilot casse en silence les chemins ecrits dans les CLAUDE.md consommateurs | **oui** — 3 appels d'outil pour retrouver le depot : listage de C:\dev, inspection de digit-ai-forge-pilot_old, puis verification par git log que digit-ai-factory etait bien le depot courant (commit du 18/08 contre 17/08 pour _old). |
 | TF-0319 | corrige | 4.5 | Tout document destiné à l'utilisateur d'une forge se range dans output\ — jamais dans une arborescence de forge à parcourir | **oui** — constat d'usage humain : les documents qui lui sont destinés vivent dans des arborescences de forge complexes ou imbriquées, qu'il doit parcourir pour les retrouver |
 | TF-0350 | corrige | 4.5 | Une page HTML des TODO archivés — retrouver et chercher dans les 300+ items clos | **oui** — demande humaine directe — 320 items archivés ne sont aujourd'hui interrogeables que par grep, un canal illisible pour l'humain qui décide |
 | TF-0320 | corrige | 4 | Un produit qui met ses forges à jour n'apprend rien des règles nouvelles ou modifiées — la mise à jour transporte le code, pas la consigne | non |
