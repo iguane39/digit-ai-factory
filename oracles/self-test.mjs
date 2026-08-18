@@ -24,6 +24,7 @@ let pass = 0, fail = 0;
 const check = (nom, fn) => { try { fn(); console.log(`  [PASS] ${nom}`); pass++; } catch (e) { console.error(`  [FAIL] ${nom} — ${e.message}`); fail++; } };
 
 // ---- fixture VERTE : projet conforme aux 17 règles ------------------------------------------
+const NL_TEST = String.fromCharCode(10);
 const verte = mkdtempSync(join(tmpdir(), "conf-verte-"));
 for (const d of ["input", "output", "docs", "forge", "forge/retours", "output/Old"]) mkdirSync(join(verte, d), { recursive: true });
 writeFileSync(join(verte, "forge", "retours", "RETOURS-FORGES.md"), "gabarit\n");
@@ -104,6 +105,29 @@ check("verte : projet conforme → PASS exit 0", () => {
   if (!rapport.non_juge.length) throw new Error("non_juge vide — un oracle sans limites déclarées ne juge rien");
 });
 
+// TF-0330 — `forge\QUESTIONS.md` était prescrit par le contrat et jugé par RIEN. Double sens :
+// absent, il est DÉCLARÉ et jamais mis en échec (une dette antérieure aux produits ne doit pas
+// suspendre leur ouverture) ; présent, il est constaté PASS. Sans la seconde moitié, le
+// « SANS_OBJET » aurait pu être rendu quoi qu'il arrive — un silence qui ressemble à un succès.
+check("R-18 bis : forge/QUESTIONS.md absent → SANS_OBJET motivé, JAMAIS un FAIL (TF-0330)", () => {
+  const { rapport } = lance(verte);
+  const f18 = rapport.findings.filter((f) => f.regle === "R-18" && /QUESTIONS/.test(String(f.ou) + " " + String(f.message)));
+  if (!f18.length) throw new Error("aucun finding R-18 sur QUESTIONS.md — la prescription resterait jugée par rien");
+  if (f18[0].statut !== "SANS_OBJET") throw new Error(`statut ${f18[0].statut} — attendu SANS_OBJET`);
+  if (!/prochain run de version/.test(f18[0].message)) throw new Error("le motif ne dit pas quand la dette se solde");
+});
+
+check("R-18 bis : forge/QUESTIONS.md présent → constaté PASS (TF-0330)", () => {
+  writeFileSync(join(verte, "forge", "QUESTIONS.md"), "# Questions en attente\n\n- aucune\n");
+  try {
+    const { rapport } = lance(verte);
+    const f18 = rapport.findings.filter((f) => f.regle === "R-18" && /QUESTIONS/.test(String(f.ou) + " " + String(f.message)));
+    if (!f18.length || f18[0].statut !== "PASS") throw new Error(`statut ${f18[0] && f18[0].statut} — attendu PASS quand le fichier existe`);
+  } finally {
+    rmSync(join(verte, "forge", "QUESTIONS.md"), { force: true });
+  }
+});
+
 check("verte : générateurs déterministes (2 exécutions = HTML identiques)", () => {
   const lireHtml = (n) => readFileSync(join(verte, "docs", "projet", n), "utf8");
   const avant = [lireHtml("ARCHITECTURE.html"), lireHtml("MODELE-DONNEES.html")];
@@ -112,6 +136,32 @@ check("verte : générateurs déterministes (2 exécutions = HTML identiques)", 
   const apres = [lireHtml("ARCHITECTURE.html"), lireHtml("MODELE-DONNEES.html")];
   if (avant[0] !== apres[0] || avant[1] !== apres[1]) throw new Error("HTML différents entre deux générations sur la même source");
   if (/https?:\/\/(?!www\.w3\.org)/.test(apres[0] + apres[1])) throw new Error("URL réseau détectée dans une vue générée (A1)");
+});
+
+// TF-0338 — la FRAÎCHEUR des deux projections sœurs. Double sens strict : la fixture verte
+// vient d'être générée, donc à parité (PASS ci-dessus) ; ici on touche la SOURCE sans
+// régénérer, ce qui est exactement l'état qu'une vue périmée présente — même nom, même
+// apparence, autorité du généré sans sa fraîcheur. Sans cette moitié rouge, un R-26 bis
+// toujours PASS aurait été indistinguable d'un contrôle absent.
+check("R-26 bis : projection périmée (source modifiée sans régénération) → FAIL (TF-0338)", () => {
+  const md = join(verte, "docs", "projet", "ARCHITECTURE.md");
+  const avant = readFileSync(md, "utf8");
+  try {
+    writeFileSync(md, avant + NL_TEST + "## Ajout après génération" + NL_TEST);
+    const { rapport } = lance(verte);
+    const f26 = rapport.findings.filter((f) => f.regle === "R-26" && /ARCHITECTURE\.html/.test(String(f.ou)));
+    if (!f26.length) throw new Error("aucun finding R-26 sur ARCHITECTURE.html — la fraîcheur resterait non jugée");
+    if (f26[0].statut !== "FAIL") throw new Error(`statut ${f26[0].statut} — une projection périmée doit ÉCHOUER`);
+    if (!/PERIMEE/.test(f26[0].message)) throw new Error("le motif ne nomme pas la péremption");
+  } finally {
+    writeFileSync(md, avant);
+  }
+});
+
+check("R-26 bis : la même projection, source restaurée → PASS (le FAIL ci-dessus n'est pas systématique)", () => {
+  const { rapport } = lance(verte);
+  const f26 = rapport.findings.filter((f) => f.regle === "R-26" && /ARCHITECTURE\.html/.test(String(f.ou)));
+  if (!f26.length || f26[0].statut !== "PASS") throw new Error(`statut ${f26[0] && f26[0].statut} — attendu PASS à parité rétablie`);
 });
 
 // ---- fixture ROUGE : défauts plantés, chaque règle dure doit se déclencher -------------------

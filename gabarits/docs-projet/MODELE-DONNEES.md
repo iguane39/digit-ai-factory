@@ -1,5 +1,6 @@
 ---
 role: modèle de données — tables, colonnes, liens, ancré au schéma réel (R-20/R-26, TF-0091)
+destinataire: humain
 sources_de_verite: ["{migrations/}", "{app/models.py}"]
 verifie_le: {AAAA-MM-JJ}
 ---

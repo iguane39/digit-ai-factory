@@ -1,5 +1,6 @@
 ---
 role: profils d'accès et comptes de démonstration LOCALE (R-20/R-23)
+destinataire: humain
 sources_de_verite: ["script de seed (MODE_DEMO)", ".env.example (références # à fournir :)"]
 verifie_le: {AAAA-MM-JJ}
 drapeau_demo: MODE_DEMO

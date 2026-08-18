@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=1c88cb8cf983 archive=9f205b231527 · dernier événement: 2026-08-18T05:57:34Z -->
+     sceaux: actifs=91c3959d2283 archive=9f205b231527 · dernier événement: 2026-08-18T06:08:56Z -->
 
-**52 actifs** (candidat 2 · décidé 20 · en cours 0 · corrigé 29 · écarté 1) · **308 archivés**.
+**52 actifs** (candidat 2 · décidé 17 · en cours 0 · corrigé 32 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -54,24 +54,24 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0358 | decide | 8 | Hygiène post-renommage : dossier local à renommer hors session, dénominateur « 14 frères » de l'étude, sous-chemin périmé websec | **oui** — un critère de revue à dénominateur faux se vérifierait « tenu » sur un compte qui ne l'est pas — la famille de défauts que TF-0332 vient de solder |
-| TF-0331 | decide | 6 | Le marquage destinataire: humain doit naître dans les gabarits — sans porteurs, R-2/E9 est un faux négatif volontaire | **oui** — la règle est livrée et prouvée à zéro faux positif, mais elle ne verra rien tant qu'aucun document ne naît marqué |
-| TF-0330 | decide | 4 | 4 produits sur 5 n'ont pas de forge/QUESTIONS.md — un arbitrage en attente y est invisible | **oui** — un développement suspendu faute d'arbitrage est invisible pour 4 produits sur 5 — le coût que TF-0318 voulait traiter |
 | TF-0351 | decide | 4 | orchestrer-boucle.mjs (13/08) n'a AUCUN appelant — dette R-35 vivante dans le pilot, câblage conditionné à TF-0340/0341 | **oui** — un outil livré il y a 4 jours pour la finalité exacte du mandat du jour était introuvable par lui — l'étude l'a exhumé par grep, pas par le corpus |
-| TF-0338 | decide | 3 | Fraîcheur d'ARCHITECTURE.html et MODELE-DONNEES.html non jugée — étendre le sceau sha256 de TODO-PRODUIT, avec mesure préalable | **oui** — une vue générée qui ment est pire qu'une vue absente : elle porte l'autorité du généré sans sa fraîcheur |
 | TF-0329 | candidat | 4 | Instruire l'admission de digit-ai-queue — le mécanisme de tickets demandé par TF-0318 existe sur le poste et le corpus l'ignore | **oui** — l'écosystème a instruit et refusé un mécanisme dont un exemplaire éprouvé dort à côté de lui — le trou est de connaissance, pas technique |
 | TF-0327 | corrige | 12 | RV-9 n'est pas refermé : la fixture témoin de la bascule sombre démontre ENCORE le comportement interdit | **oui** — deux livrables du même socle peuvent encore s'ouvrir différemment sur le même poste — le symptôme exact que RV-9 prétendait avoir soldé |
 | TF-0328 | corrige | 8 | appliquer-export.mjs est orphelin et TODO-FORGE.md prescrit un dispositif retiré le 12/08 | **oui** — un item de registre entier (TF-0318) a été instruit sur une prémisse que la doc du pilot affirmait et que le code démentait |
 | TF-0332 | corrige | 8 | Solder la dette de traçabilité D-14 : trois affirmations de conformité fausses au corpus | **oui** — deux études du même après-midi ont buté sur des déclarations de conformité fausses — le coût de recherche se paie à chaque instruction |
 | TF-0356 | corrige | 8 | generer-page.mjs : TODO.html échoue L11 — esc() au lieu d'escLit() sur les titres (« None » non traité) | **oui** — la vue courante du registre échoue à l'oracle du socle pendant que la vue d'archive née hier le passe — le patron neuf a déjà dépassé l'ancien |
+| TF-0331 | corrige | 6 | Le marquage destinataire: humain doit naître dans les gabarits — sans porteurs, R-2/E9 est un faux négatif volontaire | **oui** — la règle est livrée et prouvée à zéro faux positif, mais elle ne verra rien tant qu'aucun document ne naît marqué |
 | TF-0337 | corrige | 6 | oracle-skills : le conseil de réparation de K7 propose une commande RELATIVE — reportée telle quelle, elle ne résoudrait rien | **oui** — l'humain qui suit le conseil au pied de la lettre câblerait un hook que K8 déclarerait aussitôt mort |
 | TF-0348 | corrige | 6 | output\ : les documents d'un audit vivent dans une famille XX-audit — nom de famille au registre organization, numéro local stable | **oui** — demande humaine directe — sans nom de famille conventionné, XX-audit sera 03- ici et 07- là et la recherche inter-produits redevient manuelle |
 | TF-0359 | corrige | 6 | Les vues générées sont jugées divergentes pour leurs seules fins de ligne — K6 est structurellement rouge sur tout clone Windows | **oui** — **oui** — mesuré ce jour sur un clone neuf : K6 rend FAIL pendant que `git diff --ignore-cr-at-eol` est vide, donc l'oracle accuse une divergence que le contenu dément ; un lecteur du verdict conclut à une vue périmée et régénère pour rien, et le geste de silence produit à son tour deux fichiers modifiés dont le diff n'est que des CR |
 | TF-0319 | corrige | 4.5 | Tout document destiné à l'utilisateur d'une forge se range dans output\ — jamais dans une arborescence de forge à parcourir | **oui** — constat d'usage humain : les documents qui lui sont destinés vivent dans des arborescences de forge complexes ou imbriquées, qu'il doit parcourir pour les retrouver |
 | TF-0350 | corrige | 4.5 | Une page HTML des TODO archivés — retrouver et chercher dans les 300+ items clos | **oui** — demande humaine directe — 320 items archivés ne sont aujourd'hui interrogeables que par grep, un canal illisible pour l'humain qui décide |
 | TF-0320 | corrige | 4 | Un produit qui met ses forges à jour n'apprend rien des règles nouvelles ou modifiées — la mise à jour transporte le code, pas la consigne | non |
+| TF-0330 | corrige | 4 | 4 produits sur 5 n'ont pas de forge/QUESTIONS.md — un arbitrage en attente y est invisible | **oui** — un développement suspendu faute d'arbitrage est invisible pour 4 produits sur 5 — le coût que TF-0318 voulait traiter |
 | TF-0339 | corrige | 4 | L'output du pilot est en écart D-15 : deux familles en collision de numéro et un LISEZMOI incomplet | **oui** — le propre output du gardien de la convention la viole — chaque étude qui le cite en coût d'O0 le re-paiera jusqu'à correction |
 | TF-0349 | corrige | 4 | output\ : famille XX-tests, et la voie « proposition de tests » est FERMÉE — tout test proposé est mis en œuvre de bout en bout, sous les bornes existantes | **oui** — demande humaine directe — une proposition de tests non exécutée est un contrôle jamais joué (R-35) livré au client comme s'il protégeait |
 | TF-0305 | corrige | 3 | oracle-skills : K7 ne vérifie pas qu'une commande câblée pointe un fichier qui EXISTE | **oui** — un câblage vers un chemin mort donne exactement la même assurance qu'un gate câblé, sans en avoir aucune propriété |
+| TF-0338 | corrige | 3 | Fraîcheur d'ARCHITECTURE.html et MODELE-DONNEES.html non jugée — étendre le sceau sha256 de TODO-PRODUIT, avec mesure préalable | **oui** — une vue générée qui ment est pire qu'une vue absente : elle porte l'autorité du généré sans sa fraîcheur |
 | TF-0347 | corrige | 3 | docs\ : sous-dossiers thématiques numérotés (01-, 02-…) — docs\projet\ reste INTACT (noms fixes R-20) | **oui** — demande humaine directe — le coût évité est celui déjà payé par output\ avant D-15 : des documents pérennes introuvables dans des arborescences non conventionnées |
 | TF-0318 | corrige | 2.7 | Chaque projet porte SA todo en page HTML — décisions attendues, champs de saisie, et un bouton qui envoie en implémentation | non |
 | TF-0357 | corrige | 2 | Oracles du pilot : deux vocabulaires pour l'exit 2 — SKIP (insatisfactions, boite-entree) vs SANS_OBJET (conformite, adoption) | **oui** — quatre oracles nés en trois jours ont déjà bifurqué en deux dialectes — le cinquième choisira au hasard |

@@ -1,5 +1,6 @@
 ---
 role: architecture technique — structure logique, flux, choix (R-20, TF-0091)
+destinataire: humain
 sources_de_verite: ["{arborescence du code}", "{docker-compose.yml}", forge/EXIGENCES.json]
 verifie_le: {AAAA-MM-JJ}
 ---

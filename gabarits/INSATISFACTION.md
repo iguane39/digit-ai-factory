@@ -6,6 +6,11 @@ langue:         # si le défaut dépend de la langue servie
 largeur:        # si c'est visuel : la largeur de fenêtre de ta capture
 ---
 
+<!-- Ce gabarit NE porte PAS `destinataire: humain`, et c'est un choix (TF-0331, 18/08) :
+     un dépôt d'insatisfaction est une ENTRÉE écrite PAR l'humain, pas un livrable qui lui est
+     destiné. Le marquer inverserait le sens de la frontière que R-2/E9 juge. Ce qui est
+     marqué, c'est le dossier d'INSTRUCTION produit en retour. -->
+
 # Insatisfaction — <ce qui ne va pas, en une ligne>
 
 <Ta phrase. Une seule suffit. Écris-la comme tu la dirais.>

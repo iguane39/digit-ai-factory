@@ -1,3 +1,8 @@
+---
+role: instruction d'un candidat entre `candidat` et `decide` (TF-0155)
+destinataire: humain
+---
+
 # Étude d'opportunité — <objet> — <AAAAMMJJ><indice>
 
 <!-- Gabarit du pilot (gabarits\ETUDE-OPPORTUNITE.md, TF-0155). Fige la grille d'instruction
