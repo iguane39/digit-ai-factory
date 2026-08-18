@@ -112,6 +112,43 @@ function depotsInsatisfaction(registreIns) {
 
 const PREFIXE_INS = "INSATISFACTION - ";
 
+// TF-0364 (18/08/2026) — le canal de REMISE D'ARTEFACT. Le registre réclame parfois un objet
+// que la forge n'a pas : le 18/08, TF-0326 a demandé le skill `pilote-de-mission`, introuvable
+// dans les 15 dépôts. L'humain l'a remis en déposant un `.skill` à plat dans `input\` — et ça
+// a marché, parce qu'une session était là pour faire le lien. Rien dans les fichiers ne relie
+// la remise à l'item qui la réclamait : `oracle-boite-entree` ne voyait pas ce fichier (B3 ne
+// juge que les `.md`), aucun nommage ne s'appliquait, et le lien n'existait que dans une
+// conversation. Fermer la session le perdait.
+//
+// Le canal est donc nommé, et le partage des rôles suit celui des insatisfactions (TF-0287) :
+// **l'humain dépose le fichier, il n'écrit AUCUN protocole**. C'est le pilot qui, en traitant
+// la remise, écrit le sidecar `<fichier>.remise.json` — `{ "repond_a": "TF-xxxx", "provenance":
+// "…", "date": "AAAA-MM-JJ" }`. B5 dénonce la remise qui n'a pas reçu ce sidecar : un artefact
+// arrivé et non rattaché est un travail que la prochaine session ne saura pas relier.
+const CANAL_ARTEFACTS = "03-artefacts";
+const SUFFIXE_REMISE = ".remise.json";
+
+function remisesOrphelines(repertoire) {
+  if (!existsSync(repertoire)) return [];
+  const fichiers = readdirSync(repertoire, { withFileTypes: true })
+    .filter((d) => d.isFile()).map((d) => d.name);
+  const orphelines = [];
+  for (const nom of fichiers) {
+    if (nom.endsWith(SUFFIXE_REMISE) || nom === "LISEZMOI.md") continue;
+    const sidecar = nom + SUFFIXE_REMISE;
+    if (!fichiers.includes(sidecar)) { orphelines.push({ nom, motif: "aucun sidecar" }); continue; }
+    let decl;
+    try { decl = JSON.parse(readFileSync(join(repertoire, sidecar), "utf8")); }
+    catch { orphelines.push({ nom, motif: `${sidecar} illisible` }); continue; }
+    const manquants = ["repond_a", "provenance", "date"].filter((c) => !String(decl[c] || "").trim());
+    if (manquants.length) orphelines.push({ nom, motif: `${sidecar} sans ${manquants.join(", ")}` });
+    else if (!/^TF-\d{4}$/.test(String(decl.repond_a).trim())) {
+      orphelines.push({ nom, motif: `repond_a « ${decl.repond_a} » n'est pas un id TF-xxxx` });
+    }
+  }
+  return orphelines;
+}
+
 function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfactions", "REGISTRE.jsonl")) {
   const findings = [];
   if (!existsSync(repertoire)) {
@@ -165,11 +202,24 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
       message: "insatisfaction déposée JAMAIS entrée au registre — elle n'a ni identifiant INS, ni instruction, et un « toujours pas » ne pourra se rattacher à rien (`insatisfactions\\REGISTRE.jsonl`, événement depot)" });
   }
 
+  // B5 (TF-0364) — une remise d'artefact non rattachée à son item. Le répertoire est frère de
+  // celui des lots : on le juge depuis le même passage, sinon il faudrait s'en souvenir.
+  const canal = join(repertoire, "..", CANAL_ARTEFACTS);
+  for (const { nom, motif } of remisesOrphelines(canal)) {
+    findings.push({ regle: "B5", statut: "FAIL", ou: nom,
+      message: `remise d'artefact NON RATTACHÉE (${motif}) — un objet réclamé par le registre `
+        + `est arrivé sans que rien ne dise à quel item il répond : la prochaine session verra `
+        + `un fichier orphelin. Écrire ${nom}${SUFFIXE_REMISE} avec repond_a / provenance / date` });
+  }
+
   const vues = new Set(findings.map((f) => f.regle));
   for (const [regle, message] of [
     ["B1", `${sidecars.length} sidecar(s) présent(s), tous ingérés`],
     ["B2", "aucun sidecar édité après ingestion"],
     ["B3", "aucun lot sans sidecar"],
+    ["B5", existsSync(canal)
+      ? "toute remise d'artefact est rattachée à son item"
+      : `aucune remise à juger (canal ${CANAL_ARTEFACTS} absent)`],
   ]) {
     if (!vues.has(regle)) findings.push({ regle, statut: "PASS", message });
   }
@@ -271,6 +321,41 @@ function selfTest() {
   r = juger(boite, reg, regIns);
   cas.push(["B4    — vert : dépôt entré au registre, plus rien à dire",
     !r.findings.some((f) => f.statut === "FAIL" && surIns(f)), r.verdict]);
+
+  // B5 (TF-0364) : une remise d'artefact non rattachée à son item. Cinq sens, parce que les
+  // cinq façons de rater le rattachement se ressemblent et qu'une seule prouverait peu.
+  const artefacts = join(base, CANAL_ARTEFACTS);
+  mkdirSync(artefacts);
+  const surB5 = (f, nom) => f.regle === "B5" && f.statut === "FAIL" && f.ou === nom;
+
+  writeFileSync(join(artefacts, "un-skill.skill"), "PK-archive-factice");
+  r = juger(boite, reg, regIns);
+  cas.push(["B5    — artefact remis SANS sidecar de remise",
+    surB5(r.findings.find((f) => f.regle === "B5") || {}, "un-skill.skill"), r.verdict]);
+
+  writeFileSync(join(artefacts, "un-skill.skill" + SUFFIXE_REMISE), "{ pas du JSON");
+  r = juger(boite, reg, regIns);
+  cas.push(["B5    — sidecar de remise ILLISIBLE (un contrôle ne se désarme pas en le cassant)",
+    r.findings.some((f) => surB5(f, "un-skill.skill") && /illisible/.test(f.message)), r.verdict]);
+
+  writeFileSync(join(artefacts, "un-skill.skill" + SUFFIXE_REMISE),
+    JSON.stringify({ repond_a: "TF-0326", date: "2026-01-01" }));
+  r = juger(boite, reg, regIns);
+  cas.push(["B5    — champ manquant NOMMÉ (provenance), jamais un « mal formé » anonyme",
+    r.findings.some((f) => surB5(f, "un-skill.skill") && /provenance/.test(f.message)), r.verdict]);
+
+  writeFileSync(join(artefacts, "un-skill.skill" + SUFFIXE_REMISE),
+    JSON.stringify({ repond_a: "le ticket de Sébastien", provenance: "x", date: "2026-01-01" }));
+  r = juger(boite, reg, regIns);
+  cas.push(["B5    — `repond_a` qui n'est pas un id TF-xxxx : rattachement invérifiable",
+    r.findings.some((f) => surB5(f, "un-skill.skill") && /TF-xxxx/.test(f.message)), r.verdict]);
+
+  writeFileSync(join(artefacts, "un-skill.skill" + SUFFIXE_REMISE),
+    JSON.stringify({ repond_a: "TF-0326", provenance: "remis par l humain", date: "2026-01-01" }));
+  writeFileSync(join(artefacts, "LISEZMOI.md"), "# notice du canal");
+  r = juger(boite, reg, regIns);
+  cas.push(["B5    — vert : remise rattachée, et la NOTICE du canal n'est pas une remise",
+    !r.findings.some((f) => f.regle === "B5" && f.statut === "FAIL"), r.verdict]);
 
   let ok = 0;
   for (const [nom, tenu, verdict] of cas) {

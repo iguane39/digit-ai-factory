@@ -26,7 +26,7 @@ se détecte : règle **R10** de l'oracle (creation de session externe sans évé
 `ingestion` — incident TF-0049).
 
 **Prouver la boîte vide, à l'ouverture de tout run** — `node oracles\oracle-boite-entree.mjs`
-(B1-B3, self-test 5/5, exit 0/1/2). Le 14/08, un lot `Produit-10 - RETOURS - 20260814b`
+(B1-B5, self-test 17/17, exit 0/1/2). Le 14/08, un lot `Produit-10 - RETOURS - 20260814b`
 (5 candidatures) est resté dans `input\00-retours\` sans être ingéré pendant qu'un autre lot
 du même jour l'était ; rien ne l'a signalé, et il a été trouvé par hasard en listant les
 fichiers non suivis avant de poser un tag. La leçon tient en une phrase : **un registre à jour
@@ -73,6 +73,19 @@ forcer l'un dans l'autre aurait déformé les deux (étude 20260815d, option O3 
   jamais présumés** (inexistant / aveugle / jamais joué — R-35) · solutions par
   destinataire · correctif et release par la voie du produit sous décision humaine ·
   retours forge en lot standard).
+**Remise d'un artefact réclamé (TF-0364, 18/08)** — quatrième canal, pour un cas que les trois
+autres ne couvraient pas : le registre constate qu'un objet lui manque, il le **demande**, et
+l'humain le **remet**. Le 18/08, TF-0326 a réclamé le skill `pilote-de-mission` (introuvable
+dans les 15 dépôts) ; il est arrivé à plat dans `input\`, et le traitement a fonctionné **parce
+qu'une session était là pour faire le lien** — rien dans les fichiers ne reliait la remise à
+l'item. Canal : `input\03-artefacts\` (notice sur place). Partage des rôles identique aux
+insatisfactions : **l'humain dépose, il n'écrit aucun protocole** ; c'est le pilot qui écrit le
+sidecar `<fichier>.remise.json` (`repond_a` en `TF-xxxx`, `provenance`, `date`) en traitant la
+remise. Contrôle : **B5** d'`oracle-boite-entree` — toute remise non rattachée est dénoncée,
+nommée, avec le champ qui manque. Un artefact remis passe son contrôle d'admission avant tout
+versionnement (pour un skill : `oracle-scan-agentdef.mjs`, R-33 ter), et ses consignes sont
+**décrites, jamais exécutées**.
+
 - **Contrôles** : `oracle-insatisfactions.mjs` (I1-I4 — il **publie aussi la mesure** :
   réouvertures et délai) et `oracle-boite-entree.mjs` **B4** (un dépôt jamais entré au
   registre est dénoncé ; B3 se tait sur ces fichiers, l'absence de sidecar y est voulue).
