@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=039d6095fe44 archive=9f205b231527 · dernier événement: 2026-08-18T12:40:00Z -->
+     sceaux: actifs=5cfa2c6550dc archive=9f205b231527 · dernier événement: 2026-08-18T14:20:00Z -->
 
-**55 actifs** (candidat 3 · décidé 0 · en cours 0 · corrigé 51 · écarté 1) · **308 archivés**.
+**57 actifs** (candidat 3 · décidé 0 · en cours 0 · corrigé 53 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,10 +11,10 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0362 | candidat | 8 | oracle-etat-forge : un skill présent au dépôt mais ABSENT du manifeste n'est jamais regardé par F1 — le silence est du bon côté | **oui** — un skill livré et monté est resté hors de tout contrôle de version sans que rien ne le signale ; il a fallu écrire un second outil pour s'en apercevoir |
 | TF-0324 | candidat | 3 | Artefacts périodiques du run de delivery absents : RAID, rapport d'avancement, compte rendu, REX, suivi des bénéfices | **oui** — revérifié en session le 16/08 : 0 occurrence de RAID / compte rendu / rapport d'avancement / lessons learned sur les skills installés — aucun des cinq artefacts que réclame une mission longue n'a d'équivalent dans la forge |
 | TF-0304 | corrige | 12 | forge-agents : déclarer le câblage de qo-gate-write.mjs dans le settings.json versionné de la forge | **oui** — le gate C7 est mort sur ce poste depuis une date inconnue et AUCUN dépôt ne dit comment le recâbler — la moitié durable du trou que K7 déclare à chaque run |
 | TF-0306 | corrige | 8 | forge-agents : _routages-journal.jsonl d'experts-forge est un journal d'exécution TRACKÉ que son self-test salit | **oui** — chaque exécution du self-test crée un diff parasite — le prochain commit pressé l'embarque et le bruit K2 renaît |
+| TF-0362 | corrige | 8 | oracle-etat-forge : un skill présent au dépôt mais ABSENT du manifeste n'est jamais regardé par F1 — le silence est du bon côté | **oui** — un skill livré et monté est resté hors de tout contrôle de version sans que rien ne le signale ; il a fallu écrire un second outil pour s'en apercevoir |
 | TF-0326 | corrige | 6 | Le skill pilote-de-mission n'est versionné dans AUCUN dépôt — la forge juge un artefact dont elle ne possède ni la spécification ni les instances | **oui** — des candidatures externes s'appuient sur le contenu d'un skill que personne ne peut ouvrir — le registre a failli décider sur une preuve invérifiable |
 | TF-0307 | corrige | 4 | check_html : check_autonomie extrait les <style> sans retirer les commentaires HTML — faux positif A1 latent | **oui** — trois collisions réelles en une seule campagne sur le mécanisme non protégé — la quatrième sera chez un utilisateur |
 | TF-0308 | corrige | 4 | forge-agents : 6 gabarits de digit-ai-schemas plus rouges sous les règles TF-0303 — conformité ou exemption déclarée, à trancher | **oui** — des gabarits rouges à l'oracle de leur propre socle fabriquent le bruit permanent que TF-0228 a coûté cher à éteindre |
@@ -25,9 +25,15 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0361 | candidat | 8 | forge-design : la maquette de démo n'a ni bouton de bascule ni persistance de thème — oracle-bascule FAIL, pré-existant | **oui** — la maquette qui sert de vitrine au socle échoue à un oracle du même socle, et elle l'échoue depuis assez longtemps pour que personne ne le sache — le rejeu sur la version antérieure donne le même FAIL |
+| TF-0361 | corrige | 8 | forge-design : la maquette de démo n'a ni bouton de bascule ni persistance de thème — oracle-bascule FAIL, pré-existant | **oui** — la maquette qui sert de vitrine au socle échoue à un oracle du même socle, et elle l'échoue depuis assez longtemps pour que personne ne le sache — le rejeu sur la version antérieure donne le même FAIL |
 | TF-0321 | corrige | 4.5 | forge-design juge le mouvement mais ne le prescrit jamais — ni token de durée, ni règle d'animation dans la marque et la maquette | **oui** — relevé exécuté le 16/08 sur digit-ai-forge-design : 7 règles de mouvement exécutées et câblées, 0 token de mouvement dans la marque, 0 section mouvement dans DESIGN.md, contrôle reduced-motion en avertissement — la maquette est jugée sur des valeurs jamais prescrites |
 | TF-0335 | corrige | 4 | forge-design, mise en cohérence post-TF-0321 : registre, fixtures R10, démos, self-test du générateur | **oui** — une autorité de mouvement à deux têtes potentielles et des démos qui contredisent l'oracle — le bruit de fond que TF-0228 a appris à éteindre |
+
+## digit-ai-forge-development
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0363 | candidat | 4 | forge-development n'a aucun point d'entrée pour une ACTION unitaire — la boucle de correction ne peut router qu'un run de remédiation sur le produit entier | **oui** — le câblage écrit le matin du 18/08 INVENTAIT un `conductor --action <ref>` qui n'existe pas — l'écart de granularité est assez peu visible pour qu'on fabrique l'interface manquante sans s'en apercevoir, et le test qui l'a rattrapé n'existait pas non plus |
 
 ## digit-ai-forge-tests
 
@@ -55,6 +61,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0364 | candidat | 3 | Aucun canal pour la REMISE d'un artefact manquant — l'archive de pilote-de-mission est arrivée à plat dans input/, sans sidecar ni nommage | **oui** — un artefact réclamé par le registre est arrivé dans un dossier qu'aucun oracle ne regarde et qu'aucune convention ne décrit ; le lien entre la remise et l'item qui la réclamait n'existe que dans une conversation |
 | TF-0327 | corrige | 12 | RV-9 n'est pas refermé : la fixture témoin de la bascule sombre démontre ENCORE le comportement interdit | **oui** — deux livrables du même socle peuvent encore s'ouvrir différemment sur le même poste — le symptôme exact que RV-9 prétendait avoir soldé |
 | TF-0328 | corrige | 8 | appliquer-export.mjs est orphelin et TODO-FORGE.md prescrit un dispositif retiré le 12/08 | **oui** — un item de registre entier (TF-0318) a été instruit sur une prémisse que la doc du pilot affirmait et que le code démentait |
 | TF-0332 | corrige | 8 | Solder la dette de traçabilité D-14 : trois affirmations de conformité fausses au corpus | **oui** — deux études du même après-midi ont buté sur des déclarations de conformité fausses — le coût de recherche se paie à chaque instruction |
