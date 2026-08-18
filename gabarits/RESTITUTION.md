@@ -1,5 +1,12 @@
 # Consigne de restitution — le message de fin de traitement
 
+**Marquage du fichier de synthèse (TF-0331, 18/08)** : la synthèse remise à l'humain naît
+avec `destinataire: humain` en frontmatter YAML. La localisation R-2/E9 ne juge que ce qui
+est MARQUÉ — sans porteur, la règle est un faux négatif volontaire : elle est livrée,
+prouvée à zéro faux positif, et ne voit rien. Le marquage a été vérifié toléré par
+`oracle-synthese` (S1-S8) sur une synthèse réelle PASS avant d'être prescrit ici.
+Cette consigne, elle, ne se marque PAS : c'est un référentiel normatif, pas un livrable.
+
 Référentiel versionné (loi n° 4, daté-éditable) — **version 2.1.0, 15/08/2026** (TF-0249 : appelants nommés, synthèse EN FICHIER jugée avant affichage ; TF-0250 : oracle renommé `oracle-synthese`) — **v2.0.0 du 14/08 ADOPTÉE telle
 quelle par décision humaine du 14/08** (option (a) : les 8 blocs restent, l'oracle reste
 **informatif** et non bloquant tant qu'on ne l'a pas vu tenir sur plusieurs clôtures réelles).

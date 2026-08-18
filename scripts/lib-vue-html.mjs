@@ -64,7 +64,12 @@ export function mdVersHtml(corps) {
 
 // Coquille chartée (tokens du socle, light, print, reduced-motion, favicon data:).
 export function coquille({ titre, description, front, svg, corpsHtml, source, lettre }) {
-  const sceau = createHash("sha256").update(source).digest("hex").slice(0, 12);
+  // Fins de ligne normalisees AVANT le sceau (TF-0359, etendu par TF-0338) : la comparaison
+  // de parite est DIFFEREE — scellee ici, verifiee plus tard, possiblement apres un checkout
+  // qui a reecrit la source en CRLF. Mesure du 18/08 sur le seul produit du poste portant ces
+  // deux projections : MODELE-DONNEES.md y vit en CRLF, donc brut != normalise — sans cette
+  // normalisation, la parite ne pouvait pas etre durcie sans accuser une page fraiche.
+  const sceau = createHash("sha256").update(String(source).split("\r\n").join("\n")).digest("hex").slice(0, 12);
   // Favicon-lettre (13/08) : première lettre du produit (paramètre `lettre`), sinon celle
   // du titre — jamais un carré anonyme.
   const initiale = (lettre || (titre || "D").trim()[0] || "D").toUpperCase();

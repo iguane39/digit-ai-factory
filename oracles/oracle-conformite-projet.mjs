@@ -169,6 +169,18 @@ existsSync(p("forge", "retours"))
   ? ok("R-18", "forge/retours/", "canal de retours présent")
   : ko("R-18", "forge/retours/", "dossier forge\\retours\\ absent — les retours vers les forges n'ont pas de canal");
 
+// R-18 bis — canal des QUESTIONS en attente (TF-0330, 18/08). `CONTRAT-INTERFACE.md` prescrit
+// `forge\QUESTIONS.md` depuis l'origine ; AUCUN oracle ne le regardait — une prescription sans
+// contrôle, le motif exact de R-35. Mesure du 18/08 : aucun des produits porteurs d'un arbre
+// `forge\` sur ce poste ne le porte. Conséquence concrète, celle que TF-0318 voulait traiter :
+// un développement suspendu faute d'arbitrage est INVISIBLE, il ne vit que dans la mémoire de la
+// session qui l'a suspendu. Déclaré en SANS_OBJET motivé et jamais en FAIL, comme R-20 pour
+// TODO-PRODUIT : le fichier se crée au prochain run de version (règle existante), et un FAIL
+// aujourd'hui suspendrait l'ouverture de tous les produits pour une dette qui les précède.
+existsSync(p("forge", "QUESTIONS.md"))
+  ? ok("R-18", "forge/QUESTIONS.md", "canal des questions en attente présent — un arbitrage suspendu y est visible hors session")
+  : so("R-18", "forge\\QUESTIONS.md absent — les arbitrages en attente ne sont visibles nulle part hors de la session qui les a posés (`CONTRAT-INTERFACE.md` le prescrit, TF-0330) : dette DÉCLARÉE, à créer au prochain run de version de ce produit ; ce n'est pas un défaut de produit");
+
 // R-4 — nommage daté des livrables (output/ et docs/ ; input/ non jugé : entrants humains)
 let r4 = true;
 for (const d of ["output", "docs"]) {
@@ -670,6 +682,29 @@ else {
           }
         }
         if (ok26) ok("R-26", "docs\\projet\\MODELE-DONNEES.md", `${reels.length} table(s) ancrée(s) à leur schéma de provenance`);
+
+  // R-26 bis — FRAICHEUR des deux projections soeurs (TF-0338, 18/08). Elles n'etaient jugees
+  // qu'en PRESENCE, et le non_juge de R-26 le disait lui-meme : « la fraicheur des projections
+  // HTML n'est pas datee ». Une vue generee qui ment est pire qu'une vue absente — elle porte
+  // l'autorite du genere sans sa fraicheur. Le mecanisme de sceau livre pour TODO-PRODUIT
+  // s'etend ici a l'identique. MESURE PREALABLE, exigee par l'item avant tout durcissement
+  // (patron de retroactivite R-19) : sur le seul produit du poste portant ces deux
+  // projections, les DEUX sont fraiches — le durcissement ne fait donc FAIL aucun produit
+  // existant. La forme est DUALE (normalise OU brut, TF-0359) parce que cette meme mesure a
+  // montre que MODELE-DONNEES y est scelle sur la forme brute, sa source vivant en CRLF.
+  for (const nom of PROJECTIONS_DP) {
+    const srcMd = join(dp, nom.replace(/\.html$/, ".md"));
+    const page = join(dp, nom);
+    if (!existsSync(srcMd) || !existsSync(page)) continue; // la PRESENCE est deja jugee par R-20
+    const texte = readFileSync(srcMd, "utf8").replace(/^\uFEFF/, "");
+    const attendu = createHash("sha256").update(texte.split("\r\n").join("\n")).digest("hex").slice(0, 12);
+    const attenduBrut = createHash("sha256").update(texte).digest("hex").slice(0, 12);
+    const rendu = readFileSync(page, "utf8");
+    const scelle = (rendu.match(/Sceau source <code>([0-9a-f]{12})<\/code>/i) || [])[1];
+    if (!scelle) so("R-26", `docs\\projet\\${nom} sans sceau de source — page anterieure au mecanisme de sceau : fraicheur non jugeable, regeneration au prochain run de version de ce produit`);
+    else if (scelle === attendu || scelle === attenduBrut) ok("R-26", `docs\\projet\\${nom}`, `projection a PARITE avec sa source (sceau ${scelle})`);
+    else ko("R-26", `docs\\projet\\${nom}`, `projection PERIMEE — la page scelle ${scelle}, la source rend ${attendu} : la vue porte l'autorite du genere sans sa fraicheur (regenerer via le script du pilot, la source Markdown fait foi)`);
+  }
       }
     }
   }
@@ -739,7 +774,7 @@ const nonJuge = [
   "R-24 : seules les URLs http(s) des lignes d'environnement de PARAMETRAGE.md sont jugées — URLs documentaires du corps et hôtes sans schéma (BDD) hors périmètre ; la correspondance <nom-appli> ↔ nom réel du produit reste une revue humaine (le SUFFIXE d'environnement, lui, est jugé mécaniquement depuis TF-0267 : accord avec la ligne, et doublon toujours en défaut)",
   "R-24 (TF-0267) : le doublon d'environnement n'est vu que sur un vocabulaire borné (dev, qualif, qualification, recette, staging, preprod, prod, production, uat) — un mot d'environnement maison passera ; « demo », « test » et « sandbox » en sont volontairement absents, ce sont aussi des noms d'applications",
   "R-24 (TF-0267) : la prose d'écart n'est détectée que sur un vocabulaire explicite (écart, dérogation, exception, non conforme, à renommer) croisé avec R-24/nommage/suffixe — un écart raconté en d'autres mots ne sera pas vu ; c'est le champ structuré `ecarts_r24` qui fait foi, pas la détection de prose",
-  "R-26 : ancrage par inclusion textuelle du nom de table dans la provenance — la complétude INVERSE (toute table du DDL figure au doc) et l'exactitude des colonnes ne sont pas jugées (revue de schéma) ; la fraîcheur des projections HTML n'est pas datée (régénération = discipline d'étape)",
+  "R-26 : ancrage par inclusion textuelle du nom de table dans la provenance — la complétude INVERSE (toute table du DDL figure au doc) et l'exactitude des colonnes ne sont pas jugées (revue de schéma) ; la fraîcheur des projections HTML EST jugée depuis le 18/08 (R-26 bis, sceau de source, TF-0338) — ce qui reste hors jugement est la fraîcheur d'une page ANTÉRIEURE au mécanisme de sceau : elle est déclarée, jamais mise en échec",
   "R-27 : jugé seulement si un robots.txt existe (surface web non déclarée = SANS_OBJET) ; blocages CDN/WAF et cohérence llms.txt ↔ sitemap hors périmètre statique (nœud 58 forge-seo au run)",
   "R-2 localisation (TF-0319) : seul ce qui est MARQUÉ est jugé — un producteur qui oublie de marquer son livrable y échappe (faux négatif ASSUMÉ, mesuré à la revue du 17/09 par le rapport entre livrables marqués et livrables déposés) ; la JUSTESSE du marquage relève de la relecture, pas d'un contrôle de forme ; `input\\`, `gabarits\\`, `fixtures\\`, `old\\` et `.oracles\\` sont hors jugement par motif déclaré ; la marque est attendue sur la COPIE remise, pas sur l'original de travail de `forge\\etapes\\` (règle 16) — l'oracle ne rapproche pas un original de sa copie",
   "R-2 localisation (TF-0319) : la structure INTERNE d'`output\\` (familles numérotées uniques, une seule version courante par famille, graphie `old\\`, LISEZMOI.md de correspondance — D-15 al. a à e) n'est PAS jugée ici : sa mécanisation vit chez `oracle-conventions.mjs` d'organization et reste suspendue à un mandat humain d'écriture dans ce dépôt frère",
