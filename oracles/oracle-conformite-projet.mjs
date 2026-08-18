@@ -458,6 +458,36 @@ else {
     ? ko("R-11", "CLAUDE.md", `présent mais sans routage forge complet — manque : ${manques.join(", ")}`)
     : ok("R-11", "CLAUDE.md", "présent, table de routage forge complète");
 }
+
+// R-11 bis — LES RÉFÉRENTIELS DISPONIBLES, déclarés (TF-0373, 18/08). Coût du silence, mesuré :
+// treize anomalies clients vivaient dans un board depuis le 29/07, six campagnes ont tourné
+// entre le 11 et le 18/08, AUCUNE n'a su qu'elles existaient — et le sujet n'est apparu que
+// parce qu'un humain a collé une URL dans une conversation. Le défaut n'est pas que la forge ne
+// les ait pas trouvées (cinq relevaient d'exclusions écrites et légitimes) : c'est que leur
+// absence n'a jamais été un TERME DÉCLARÉ de la mesure, alors qu'un SKIP muet est pire qu'un
+// SKIP déclaré partout ailleurs dans cette factory.
+//
+// AVERTISSEMENT au `non_juge`, pas échec — pour la même raison que R-32 bis : un produit qui
+// n'a pas encore répondu n'a rien fait de mal, la question est neuve. Et « absent » est une
+// réponse VALIDE : ce qui est refusé est le silence, pas l'absence de référentiel.
+{
+  const claudeMd = existsSync(p("CLAUDE.md")) ? readFileSync(p("CLAUDE.md"), "utf8") : "";
+  const attendus = ["exigences", "anomalies", "contrat"];
+  const bloc = (claudeMd.match(/##\s*R[ée]f[ée]rentiels[^#]*/i) || [""])[0] || "";
+  if (!bloc.trim()) {
+    antecedences.push(
+      "R-11 bis — aucune section « Référentiels » au CLAUDE.md du produit : ce sur quoi la mesure ne pouvait PAS s appuyer n est pas déclaré. Pour chacun — exigences, anomalies, contrat — son chemin, ou `absent` avec son motif. La question ne se pose qu une fois par produit, et sans elle un rapport peut dire « au vert » sans dire « au vert CONTRE QUOI »");
+  } else {
+    const manquants = attendus.filter((mot) => !new RegExp(mot, "i").test(bloc));
+    if (manquants.length) {
+      antecedences.push(
+        `R-11 bis — section « Référentiels » présente mais incomplète : ${manquants.join(", ")} non déclaré(s). « absent » est une réponse valide ; le silence n en est pas une`);
+    } else {
+      ok("R-11 bis", "CLAUDE.md", "les trois référentiels sont déclarés (chemin ou « absent » motivé)");
+    }
+  }
+}
+
 existsSync(p("README.md")) ? ok("R-12", "README.md", "présent") : ko("R-12", "README.md", "absent");
 
 // R-13 — .env.example exhaustif (présence + ≥ 1 variable)
