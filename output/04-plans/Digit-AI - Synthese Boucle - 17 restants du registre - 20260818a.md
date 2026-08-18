@@ -19,7 +19,11 @@ destinataire: humain
 
 Trois décisions, chacune en choix fermé. Le travail est livré dans les trois cas : ce qui se décide ici est la suite, pas un déblocage.
 
-- **D1 — `pilote-de-mission` (TF-0326) : existe-t-il ailleurs ?** Recherche exhaustive faite sur ce poste : 16 fichiers le mentionnent, zéro ne le contient.
+- **D1 — `pilote-de-mission` (TF-0326) : existe-t-il ailleurs ? — TRANCHÉE le 18/08, branche (a).** L'objet a été remis (`input/pilote-de-mission.skill`), versionné chez forge-agents en v1.0.0, scan R-33 ter PASS. La preuve amont se confirme sur pièces : 0 occurrence de « risque », « RAID », « rapport d'avancement » dans ses 4 fichiers. **Reste une décision fille** — installer ou non le skill sous `~/.claude/skills` :
+  - **(a)** ne pas l'installer (état actuel). *Coût* : nul. *Exclut* : son usage en session sur ce poste, et sa présence au manifeste (F1 ne le regarde pas).
+  - **(b)** l'installer. *Coût* : nul. *Exclut* : rien — mais il porte des déclencheurs sur des tournures courantes (« pilote la mission », « fais le plan de », « où en est-on ») qui s'armeraient dans **toutes** vos sessions.
+  - **Recommandation : (a)** tant que vous n'avez pas de mission à piloter depuis ce poste — armer un skill est une décision, pas un effet de bord d'un versionnement (R-29).
+  - **Si rien n'est décidé** : (a) s'applique, le skill reste versionné et dormant.
   - **(a)** vous le retrouvez (autre poste, autre compte, espace claude.ai) → il est versionné chez sa forge, TF-0324 se débloque de moitié. *Coût* : une remise du fichier. *Exclut* : rien.
   - **(b)** il n'existe plus → les mentions vivantes se requalifient en « inspiration non versionnée » et TF-0323/TF-0324 se réinstruisent sur des mesures faites ailleurs. *Coût* : une passe de requalification. *Exclut* : la preuve amont du lot Run-Delivery, définitivement.
   - **Recommandation : (a) d'abord, une recherche de 5 minutes de votre côté** — (b) est irréversible et coûte deux réinstructions.
@@ -66,7 +70,7 @@ Trois décisions, chacune en choix fermé. Le travail est livré dans les trois 
 
 ## 5. Non traité — avec son motif
 
-- **TF-0324, les cinq artefacts de cadence de mission** — *motif* : dépendance à une décision humaine et à une donnée absente. Son critère d'acceptation n°1 exige « au moins une instanciation sur une mission réelle, jamais un gabarit seul » ; vérifié ce jour, aucune mission réelle n'existe dans les dépôts. Le livrer aujourd'hui violerait son propre critère. Condition de déblocage écrite au registre : une mission réelle instrumentée **et** un porteur d'état versionné (suspendu à D1).
+- **TF-0324, les cinq artefacts de cadence de mission** — *motif* : dépendance à une donnée absente. **Mise à jour du 18/08** : une des deux conditions est LEVÉE — le porteur d'état versionné existe désormais (`pilote-de-mission` v1.0.0, dont les blocs 1 et 7 sont l'état à dériver sans le dupliquer). Il reste la première, inchangée. Son critère d'acceptation n°1 exige « au moins une instanciation sur une mission réelle, jamais un gabarit seul » ; vérifié ce jour, aucune mission réelle n'existe dans les dépôts. Le livrer aujourd'hui violerait son propre critère. Condition de déblocage écrite au registre : une mission réelle instrumentée **et** un porteur d'état versionné (suspendu à D1).
 - **Le bout-en-bout réel de la boucle TF-0360** — *motif* : impossible à prouver ici. Les tests couvrent la frontière et les refus ; un audit complet en test prendrait des minutes et dépendrait d'un démon de conteneurs absent de ce poste.
 - **Section `corpus` de la recette forge-tests** — *motif* : bloqué par un prérequis d'environnement. Démon de conteneurs injoignable : 9 défauts non mesurables. Un dixième, H-06, sort `[MANQUE]` — **vérifié pré-existant** par rejeu de l'adaptateur `batch` depuis le commit antérieur à la campagne, mêmes fixtures, même résultat.
 - **Injection de l'entrée `oracle-motion` au registre installé de `quality-oracles`** — *motif* : bloqué par un garde-fou. Écrire dans une copie installée depuis un dépôt recréerait la divergence que TF-0290 dénonce. L'entrée à jour est prête dans `registre-entrees.md`, l'injection est un geste de poste.
