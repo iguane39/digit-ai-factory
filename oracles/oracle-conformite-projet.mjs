@@ -695,7 +695,12 @@ else {
     // rendrait deux empreintes selon l'outil Windows qui l'a écrite.
     const source = readFileSync(tdp, "utf8").replace(/^\uFEFF/, "");
     const front = frontmatter(source);
-    const attendu = createHash("sha256").update(source).digest("hex").slice(0, 12);
+    // Deux formes acceptees (TF-0359) : le sceau NORMALISE en LF — celui que le generateur
+    // scelle depuis le 18/08 — et le sceau BRUT des pages scellees avant. Une page vraiment
+    // perimee ne matche ni l'une ni l'autre ; sans le repli, la normalisation aurait accuse
+    // toutes les pages existantes le jour de sa mise en service.
+    const attendu = createHash("sha256").update(source.split("\r\n").join("\n")).digest("hex").slice(0, 12);
+    const attenduBrut = createHash("sha256").update(source).digest("hex").slice(0, 12);
     const proj = join(dp, "TODO-PRODUIT.html");
     let okTdp = true;
     if (!front || !/^role\s*:/m.test(front) || !/^sources_de_verite\s*:/m.test(front) || !/^verifie_le\s*:/m.test(front)) {
@@ -703,7 +708,7 @@ else {
     }
     if (!existsSync(proj)) {
       ko("R-20", "docs\\projet\\TODO-PRODUIT.html", "projection générée manquante alors que sa source existe — régénérer via node <pilot>\\todo\\generer-todo-produit.mjs docs\\projet\\TODO-PRODUIT.md (la vue n'est JAMAIS éditée à la main)"); okTdp = false;
-    } else if (!readFileSync(proj, "utf8").includes(attendu)) {
+    } else if (!(() => { const p = readFileSync(proj, "utf8"); return p.includes(attendu) || p.includes(attenduBrut); })()) {
       ko("R-20", "docs\\projet\\TODO-PRODUIT.html", `projection PÉRIMÉE — le sceau de la source (${attendu}) est absent de la page : la source a changé sans que la vue soit régénérée. Rejouer node <pilot>\\todo\\generer-todo-produit.mjs docs\\projet\\TODO-PRODUIT.md`); okTdp = false;
     }
     if (okTdp) ok("R-20", "docs\\projet\\TODO-PRODUIT.md → .html", `couple source→projection à parité (sceau ${attendu}), frontmatter machine complet`);

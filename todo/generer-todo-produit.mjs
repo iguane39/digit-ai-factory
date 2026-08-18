@@ -48,7 +48,12 @@ if (!src || !existsSync(src)) {
 // source rendrait deux empreintes selon l'outil qui l'a écrite.
 const texte = readFileSync(src, "utf8").replace(/^\uFEFF/, "");
 const { front, corps } = lireSource(texte);
-const sceau = createHash("sha256").update(texte).digest("hex").slice(0, 12);
+// Fins de ligne normalisees AVANT le sceau, pour la meme raison que le BOM ci-dessus
+// (TF-0359) : la comparaison de parite est DIFFEREE — le sceau est scelle ici, verifie
+// plus tard, possiblement apres un checkout qui a reecrit la source en CRLF. Sans cela,
+// une page fraiche se declare perimee, et une vue accusee a tort coute la confiance
+// qu'un sceau existe pour donner.
+const sceau = createHash("sha256").update(texte.split("\r\n").join("\n")).digest("hex").slice(0, 12);
 const titre = (corps.match(/^# (.+)$/m) || [null, "Reste à faire"])[1].trim();
 
 // Lignes RÉELLES d'une table de section : les en-têtes, les séparateurs et les lignes de
