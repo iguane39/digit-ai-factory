@@ -68,3 +68,32 @@ Boucle intérieure (libre, sans verdict) : `<commandes locales : pytest, ruff, s
 
 Forge : `<FORGE_ROOT>` (sinon relire `PROMPT-PRODUIT.md`, phase 0). Le ledger
 `forge\ledger.jsonl` porte l'état exact ; les étapes closes ne se rejouent pas.
+
+**Le pilot se désigne `<PILOT_ROOT>`, JAMAIS par le nom de son dépôt** (TF-0367, 18/08). Le
+renommage du 17/08 a cassé en silence les `CLAUDE.md` qui écrivaient
+`<FORGE_ROOT>\digit-ai-forge-pilot\…` : commande introuvable, aucun alias, aucune note — et
+deux copies mises de côté (`_old`, `_vide`) portent un oracle **d'apparence valide**, dont
+celui de `_old` aurait rendu un verdict plausible sous un jeu de règles périmé. Le nom du dépôt
+du pilot n'est donc plus une information qu'un produit doit connaître. Résolution en phase 0,
+dans cet ordre :
+
+1. `$PILOT_ROOT` s'il est posé — l'humain a le dernier mot ;
+2. sinon, le frère de `<FORGE_ROOT>` qui porte la **signature** du pilot :
+   `oracles\oracle-conformite-projet.mjs` **ET** `todo\TODO.jsonl` **ET** `todo\oracle-todo.mjs`
+   **ET** `REGLES-PROJET.md` **ET** `CONTRAT-INTERFACE.md`, et qui ne porte **pas** de
+   `PERIME.md` à sa racine.
+
+```bash
+# sans connaître le nom du dépôt — à jouer depuis la racine du produit
+node -e "const{existsSync:e,readdirSync:r}=require('fs'),{join:j}=require('path');
+const R=process.env.FORGE_ROOT||'..';const S=['oracles/oracle-conformite-projet.mjs',
+'todo/TODO.jsonl','todo/oracle-todo.mjs','REGLES-PROJET.md','CONTRAT-INTERFACE.md'];
+const c=r(R,{withFileTypes:true}).filter(d=>d.isDirectory()).map(d=>j(R,d.name))
+.filter(p=>!e(j(p,'PERIME.md'))&&S.every(f=>e(j(p,f))));
+if(c.length!==1){console.error('pilot NON RESOLU : '+c.length+' candidat(s) — poser PILOT_ROOT');
+process.exit(c.length?2:1)}console.log(c[0])"
+```
+
+Deux candidats indiscernables ne se tranchent **jamais en silence** : la commande sort en
+échec et demande `PILOT_ROOT`. Référence exécutable et son `non_juge` :
+`<PILOT_ROOT>\oraclesesoudre-pilot.mjs [--json]`.
