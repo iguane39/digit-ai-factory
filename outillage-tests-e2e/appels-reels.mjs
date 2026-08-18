@@ -108,63 +108,64 @@ function lireRapport(r, quoi) {
 }
 
 /**
- * `declencherDevelopment` — l'appel vers forge-development pour une action `manuelle_dev`.
+ * `declencherDevelopment` — l'ordre de construction pour une action `manuelle_dev`.
  *
- * DÉCLARÉ NON AUTOMATIQUE, et c'est un choix, pas un manque. Un run development engage des
- * gates HITL et une dépense ; la loi 5 les laisse à l'humain. Cette fonction PRÉPARE donc
- * l'appel — elle en rend la commande exacte, vérifie que l'entrée existe réellement, et refuse
- * de prétendre l'avoir joué. `executer: true` la joue, sur décision de l'appelant.
+ * TF-0363, et c'est un correctif de ce fichier par lui-même. Ses deux premières versions,
+ * écrites le 18/08, appelaient `conductor` : la première en inventant une option `--action`
+ * qui n'existe pas, la seconde en construisant un `conductor run … --mode brownfield` correct
+ * mais **adressé au mauvais outil**. La réponse était déjà écrite, dans le contrat du pilot :
  *
- * LA COMMANDE EST CELLE QUI EXISTE, vérifiée le 18/08 dans `conductor/__main__.py` — et il a
- * fallu la vérifier : la première version de ce fichier, écrite le matin même, inventait un
- * `conductor --action <ref>` qui n'existe pas. `conductor` n'a qu'un sous-commande `run`,
- * prenant une INTENTION en texte libre, plus `--mode brownfield --repo <produit>` et
- * `--intent remediation`. C'est un accélérateur d'idée-vers-SaaS, pas un exécuteur d'action
- * unitaire — la granularité de forge-development n'est PAS celle d'un `actions[]` de rapport.
+ *   `CONTRAT-INTERFACE.md` §4, ligne Development — point d'entrée utilisé : « **construction
+ *   directe par agent** (méthode du run-playbook lue comme spec), gates rejoués : `ruff check`
+ *   + `pytest` sur le produit ». Dette D-V1, **assumée le 14/08** : « `conductor` inutilisable
+ *   en headless — la construction directe par agent EST le mode de travail réel et prouvé ;
+ *   conductor ne se répare que si un besoin HITL réapparaît. »
  *
- * Conséquence, déclarée plutôt que masquée : le routage d'une action `manuelle_dev` vers
- * forge-development est un appel de REMÉDIATION sur le produit entier, dont l'intention est
- * dérivée du constat. Ce n'est pas un mapping un-pour-un, et prétendre le contraire aurait
- * fabriqué une interface. Le champ `granularite` du retour le dit à l'appelant.
+ * Il n'y a donc **aucun sous-processus à lancer**, et ce n'est pas un manque : c'est le mode
+ * dégradé ASSUMÉ du contrat. Écrire un appel `conductor` ici aurait recréé le patron que la
+ * décision du 14/08 a retiré, et un appel qui échoue en headless aurait fait passer une
+ * décision d'architecture pour une panne.
+ *
+ * Ce que cette fonction rend donc : un **ordre de construction** que l'agent constructeur lit
+ * — le constat, le produit, les gates à rejouer, et la frontière de ce qu'il peut toucher. La
+ * boucle ne le joue pas ; elle le prépare, le journalise, et s'arrête là où le contrat
+ * s'arrête. La différence avec les deux versions précédentes n'est pas cosmétique : elle est
+ * la différence entre « la forge n'a pas d'entrée » (faux) et « l'entrée est une session, pas
+ * un binaire » (vrai, et daté).
  */
-export function declencherDevelopment(action, { racine = racineForges(), executer = false } = {}) {
-  const forgeDev = join(racine, "digit-ai-forge-development", "digit-ai-forge-development");
+export function declencherDevelopment(action, { racine = racineForges() } = {}) {
   const constat = String(action?.attendu || action?.finding_ref || action?.id || "").trim();
   const produit = action?.produit ? String(action.produit) : null;
-  const commande = {
-    binaire: "uv",
-    args: [
-      "run", "conductor", "run", constat || "remediation d un constat d audit",
-      "--mode", "brownfield", "--intent", "remediation",
-      ...(produit ? ["--repo", produit] : []),
-    ],
-    cwd: forgeDev,
+  const playbook = join(racine, "digit-ai-forge-development", "docs", "run-playbook.md");
+  const ordre = {
+    constat: constat || "(constat non nommé par l'action)",
+    finding_ref: action?.finding_ref || action?.id || null,
+    produit,
+    etape_cible: "development",
+    // Le contrat les nomme, on ne les invente pas ici.
+    gates: ["ruff check", "pytest"],
+    spec: playbook,
+    spec_lisible: existsSync(playbook),
+    frontiere: "modifications chirurgicales dans le PRODUIT désigné ; jamais dans une forge, "
+      + "jamais d'assouplissement de seuil ni d'assertion (G-2 absolue)",
   };
-  const granularite = "run de REMÉDIATION sur le produit entier — `conductor` ne prend pas "
-    + "d'action unitaire ; l'intention est dérivée du constat, le mapping n'est pas un-pour-un";
-  if (!existsSync(forgeDev)) {
-    return { joue: false, motif: `forge-development absente de ${forgeDev}`, commande, granularite };
-  }
   if (!produit) {
     return {
       joue: false,
-      motif: "aucun `produit` sur l'action — sans `--repo`, `conductor` partirait en greenfield "
-        + "et fabriquerait un projet neuf au lieu de remédier à celui-ci. Refus.",
-      commande,
-      granularite,
+      ordre,
+      motif: "aucun `produit` sur l'action — un ordre de construction sans cible désignée est "
+        + "inexécutable, et le deviner reviendrait à choisir où écrire du code",
     };
   }
-  if (!executer) {
-    return {
-      joue: false,
-      motif: "action `manuelle_dev` PRÉPARÉE, pas jouée — un run development engage des gates "
-        + "HITL et une dépense (loi 5). Rejouer avec `executer: true` sur décision humaine.",
-      commande,
-      granularite,
-    };
-  }
-  const r = lancer(commande.binaire, commande.args, { cwd: commande.cwd });
-  return { joue: true, exit: r.status, stdout: (r.stdout || "").slice(0, 4000), commande, granularite };
+  return {
+    joue: false,
+    ordre,
+    motif: "ordre de construction PRÉPARÉ, et il n'y a rien à lancer : le contrat du pilot "
+      + "(CONTRAT-INTERFACE §4, dette D-V1 assumée le 14/08) désigne la construction DIRECTE "
+      + "PAR AGENT comme point d'entrée de development — `conductor` y est déclaré inutilisable "
+      + "en headless. L'exécution est une session, pas un sous-processus"
+      + (ordre.spec_lisible ? "" : ` ; ATTENTION : le playbook cité est introuvable (${playbook})`),
+  };
 }
 
 /**

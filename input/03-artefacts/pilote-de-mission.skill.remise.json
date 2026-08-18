@@ -1,0 +1,15 @@
+{
+  "repond_a": "TF-0326",
+  "provenance": "archive détenue par l'humain (Sébastien), remise le 18/08/2026 en réponse à la décision D1 de la synthèse de boucle « les 17 restants du registre » — l'objet était introuvable dans les 15 dépôts de c:\\dev et dans les 24 skills installés",
+  "date": "2026-08-18",
+  "forme": "archive ZIP, 5402 octets, 4 fichiers",
+  "admission": "oracle-scan-agentdef.mjs sur pilote-de-mission/SKILL.md -> PASS, aucun défaut sur CAP-1..4 (R-33 ter, joué AVANT versionnement)",
+  "empreintes_sha256_16": {
+    "pilote-de-mission/SKILL.md": "167d7a5f18ccc3f0",
+    "pilote-de-mission/references/schema-de-plan.md": "9a9220df33413341",
+    "pilote-de-mission/references/protocole-adaptation.md": "488eb16526dec563",
+    "pilote-de-mission/references/instanciations-types.md": "a0d4ce2b7d889085"
+  },
+  "verse_dans": "digit-ai-forge-agents/.claude/skills/pilote-de-mission/ (commit a1e506c), installé au poste le 18/08 sous ~/.claude/skills/ (oracle-skills K1)",
+  "note": "Remise RÉTRO-RATTACHÉE le 18/08 : le fichier est arrivé avant que ce canal existe, à plat dans input\\. Ce sidecar est écrit par le pilot, pas par l'humain — TF-0364 pose que l'humain dépose et n'écrit aucun protocole. C'est le premier cas du canal, et il est réel plutôt que fixture."
+}

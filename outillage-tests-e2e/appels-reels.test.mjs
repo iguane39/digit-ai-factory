@@ -129,39 +129,61 @@ cas("le tour est DÉRIVÉ du rapport — un chiffre saisi deux fois diverge", ()
 
 console.log("\nles appels — la forme, et le refus de prétendre");
 
-cas("declencherDevelopment ne PRÉTEND jamais avoir joué (loi 5)", () => {
+cas("declencherDevelopment ne lance RIEN — et c'est le contrat, pas un manque", () => {
+  // TF-0363 : `CONTRAT-INTERFACE` §4 ligne Development désigne la CONSTRUCTION DIRECTE PAR
+  // AGENT, et déclare `conductor` inutilisable en headless (dette D-V1, assumée le 14/08).
   const r = declencherDevelopment({ finding_ref: "H-13", produit: "C:/dev/un-produit" });
+
   assert.equal(r.joue, false);
-  assert.match(r.motif, /gates|absente/);
-  assert.equal(r.commande.binaire, "uv");
+  assert.match(r.motif, /construction DIRECTE PAR AGENT/);
+  assert.match(r.motif, /D-V1/, "le motif cite la dette qui l'a décidé, il ne l'affirme pas");
 });
 
-cas("la commande est celle qui EXISTE — `conductor run`, pas un `--action` inventé", () => {
-  // Vérifié le 18/08 dans conductor/__main__.py : une seule sous-commande, `run`, prenant une
-  // intention en texte libre. La première version de ce fichier inventait `--action <ref>`.
-  const r = declencherDevelopment({ attendu: "corriger le 403 de l export", produit: "C:/x" });
-  const a = r.commande.args;
+cas("aucun appel à `conductor` ne subsiste dans le module", () => {
+  // Le verrou du correctif : deux versions de ce fichier ont appelé conductor, l'une avec une
+  // option inventée. Un test qui vérifie l'absence du NOM est le seul qui attrape la récidive.
+  const source = readFileSync(new URL("./appels-reels.mjs", import.meta.url), "utf8");
+  // Le motif du refus CITE `conductor` en prose — c'est voulu, il explique pourquoi on ne
+  // l'appelle pas. Ce qu'on traque est le jeton COMMANDE : `"conductor"` entre guillemets,
+  // la forme sous laquelle il entrerait dans un tableau d'arguments.
+  const guillemet = String.fromCharCode(34) + "conductor" + String.fromCharCode(34);
+  const apostrophe = String.fromCharCode(39) + "conductor" + String.fromCharCode(39);
+  const jeton = [guillemet, apostrophe];
+  const appels = source.split(String.fromCharCode(10))
+    .filter((l) => jeton.some((j) => l.includes(j)));
 
-  assert.deepEqual(a.slice(0, 3), ["run", "conductor", "run"]);
-  assert.ok(!a.includes("--action"), "aucune option inventée");
-  assert.ok(a.includes("--mode") && a[a.indexOf("--mode") + 1] === "brownfield");
-  assert.ok(a.includes("--intent") && a[a.indexOf("--intent") + 1] === "remediation");
-  assert.ok(a.includes("--repo") && a[a.indexOf("--repo") + 1] === "C:/x");
-  assert.ok(a.includes("corriger le 403 de l export"), "l intention est dérivée du constat");
+  assert.deepEqual(appels, [], "conductor ne doit apparaître qu'en prose, pas en appel");
+
+  // Second sens : le motif du refus contient bien le mot en PROSE, et le verrou l ignore.
+  assert.ok(source.includes("`conductor` y est déclaré inutilisable"),
+    "la prose qui explique le refus doit rester lisible dans le module");
+  // Et il attraperait un vrai appel : la forme traquée est celle d un argument de commande.
+  const faux = ['    args: ["run", ' + guillemet + ', "--mode"],'].join("");
+  assert.ok(jeton.some((j) => faux.includes(j)),
+    "le motif du verrou doit reconnaître un conductor passé en argument");
 });
 
-cas("la GRANULARITÉ réelle est déclarée, pas maquillée en mapping un-pour-un", () => {
+cas("l'ordre de construction porte les gates du CONTRAT, pas des gates inventés", () => {
   const r = declencherDevelopment({ finding_ref: "H-13", produit: "C:/x" });
 
-  assert.match(r.granularite, /produit entier/);
-  assert.match(r.granularite, /pas un-pour-un/);
+  assert.deepEqual(r.ordre.gates, ["ruff check", "pytest"]);
+  assert.equal(r.ordre.etape_cible, "development");
+  assert.match(r.ordre.spec, /run-playbook\.md$/, "la spec est le playbook, source unique (TF-0007)");
+  assert.match(r.ordre.frontiere, /G-2 absolue/);
 });
 
-cas("sans produit, l'appel est REFUSÉ — un greenfield fabriquerait un projet neuf", () => {
+cas("un playbook introuvable est DIT, jamais supposé lisible", () => {
+  const r = declencherDevelopment({ finding_ref: "H-13", produit: "C:/x" }, { racine: "Z:/vide" });
+
+  assert.equal(r.ordre.spec_lisible, false);
+  assert.match(r.motif, /playbook cité est introuvable/);
+});
+
+cas("sans produit, l'ordre est REFUSÉ — deviner la cible serait choisir où écrire du code", () => {
   const r = declencherDevelopment({ finding_ref: "H-13" });
 
   assert.equal(r.joue, false);
-  assert.match(r.motif, /greenfield/);
+  assert.match(r.motif, /sans cible désignée/);
 });
 
 cas("la racine des forges suit la règle du noyau (FORGE_ROOT, sinon le parent)", () => {
