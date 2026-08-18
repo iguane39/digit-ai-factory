@@ -10,6 +10,8 @@ Les trois autres canaux ne couvrent pas ce cas, et c'est pour ça que celui-ci e
 | `00-retours\` | un produit ou une forge **remonte du vécu** | un lot `.md` **et** son sidecar `.tf.jsonl` (règle 18) |
 | `01-candidatures\` | une **proposition** d'amélioration hors lot | un sidecar ingérable |
 | `02-entrants-html\` | un **document** entrant à traiter | rien de particulier |
+| `05-entrants-media\` | un **média** fourni comme matière | rien de particulier |
+| `04-outillage\` | un **script ou paquet** fourni, à instruire avant tout usage | rien — mais rien ne s exécute avant instruction |
 | **`03-artefacts\`** | **une pièce que la forge a déclarée manquante** | **rien — vous déposez le fichier** |
 
 ## Vous déposez, vous n'écrivez pas de protocole
