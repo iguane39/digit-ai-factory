@@ -39,6 +39,29 @@ const ok = (regle, ou, message) => findings.push({ regle, statut: "PASS", ou, me
 const ko = (regle, ou, message) => findings.push({ regle, statut: "FAIL", ou, message });
 const so = (regle, message) => findings.push({ regle, statut: "SANS_OBJET", ou: "-", message });
 
+// TF-0366 (18/08) — antécédences de jeu de règles, déclarées au `non_juge` plutôt qu'en échec.
+// Raison : le livrable n'a rien fait de mal, c'est la RÈGLE qui a bougé. Transformer une
+// évolution de règle en défaut de produit ferait rejouer tout l'historique à chaque ajout, et
+// un gate qu'on apprend à contourner ne protège plus rien (R-33 bis). Même doctrine que
+// TF-0266 pour les fichiers antérieurs à un mandat : liste nommée, jamais un total anonyme.
+const antecedences = [];
+
+/** Empreinte du jeu de règles de `check_html.py`, lue à la source. SKIP motivé si python manque. */
+function empreinteReglesHtml() {
+  const foyer = process.env.USERPROFILE || process.env.HOME || "";
+  const script = join(foyer, ".claude", "skills", "digit-ai-page-html", "scripts", "check_html.py");
+  if (!existsSync(script)) return { motif: `check_html.py introuvable (${script})` };
+  for (const bin of ["python", "python3", "py"]) {
+    const r = spawnSync(bin, [script, "--version-regles"], { encoding: "utf8" });
+    if (r.error || r.status !== 0) continue;
+    try {
+      const lu = JSON.parse((r.stdout || "").trim());
+      if (lu && lu.empreinte) return lu;
+    } catch { /* interpréteur trouvé, sortie illisible : on essaie le suivant */ }
+  }
+  return { motif: "aucun interpréteur python n'a pu rendre --version-regles" };
+}
+
 const p = (...seg) => join(cible, ...seg);
 const git = (...args) => spawnSync("git", ["-C", cible, ...args], { encoding: "utf8" });
 const aGit = existsSync(p(".git"));
@@ -357,6 +380,48 @@ else ok("R-7", ".gitignore", "old\\ présent et versionné (C1 amendé TF-0150)"
       }
     }
     if (ok32) ok("R-32", "output/*.html", `${htmls.length} livrable(s) HTML avec journal d'oracles sous forge\\oracles\\`);
+
+    // R-32 bis (TF-0366) — un journal existe, mais SOUS QUELLES RÈGLES ? Le 18/08, la règle
+    // A3 met en échec un livrable DÉCLARÉ PASS le 14/08 et rejoué à l'identique : le fichier
+    // n'a pas changé, la règle est postérieure. Le journal affirmait un PASS qui n'était plus
+    // vrai, et rien ne permettait de le savoir sans tout rejouer.
+    const courante = empreinteReglesHtml();
+    if (!courante.empreinte) {
+      antecedences.push(`R-32 bis non joué : ${courante.motif} — l'antériorité d'un journal reste indécidable`);
+    } else {
+      const perimes = [];
+      let sans = 0;
+      let lus = 0;
+      for (const f of htmls) {
+        const journal = p("forge", "oracles", basename(f, ".html") + ".json");
+        if (!existsSync(journal)) continue;
+        lus += 1;
+        const vue = readFileSync(journal, "utf8").match(/"empreinte"[^"]*"([0-9a-f]{6,})"/);
+        if (!vue) { sans += 1; continue; }
+        if (vue[1] !== courante.empreinte) perimes.push(`${rel(f)} (journal ${vue[1]})`);
+      }
+      if (perimes.length) {
+        antecedences.push(
+          `R-32 bis — ${perimes.length} journal(aux) rendu(s) sous un JEU DE RÈGLES ANTÉRIEUR ` +
+          `(courant ${courante.empreinte}, ${courante.nombre} règles) : ${perimes.join(" · ")}. ` +
+          "Le livrable n'a pas changé, la règle a bougé : rejouer check_html.py pour savoir si " +
+          "le PASS tient encore, et ne pas lire ces journaux comme des verdicts courants");
+      } else if (sans) {
+        antecedences.push(
+          `R-32 bis — ${sans} journal(aux) SANS empreinte de règles, antérieurs à TF-0366 ` +
+          "(18/08) : leur verdict n'est pas datable en jeu de règles ; le prochain passage de " +
+          "check_html.py l'inscrira");
+      } else if (lus) {
+        ok("R-32 bis", "output/*.html",
+          `journaux rendus sous le jeu de règles courant (${courante.empreinte}, ` +
+          `${courante.nombre} règles)`);
+      } else {
+        // Aucun journal lu : R-32 l'a déjà dit en échec. Prononcer un PASS ici serait le
+        // faux confort exact que cet item ferme — « rendus sous le jeu courant » sur zéro
+        // journal. Défaut trouvé dans ce correctif même, en le jouant sur un projet réel.
+        so("R-32 bis", "aucun journal d'oracles à dater en jeu de règles — R-32 l'a déjà dit");
+      }
+    }
   }
 }
 
@@ -765,6 +830,7 @@ else {
 }
 
 const nonJuge = [
+  ...antecedences,
   "R-5 (pas d'écrasement de version) : invisible statiquement — jugé par revue de diff",
   "R-15 (marqueurs « à fournir » exhaustifs) : l'oracle ne sait pas quelles variables sont tierces",
   "input\\ non jugé en nommage : les entrants humains arrivent tels quels",

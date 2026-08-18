@@ -70,11 +70,27 @@ for (const nom of oracles) {
 // decouverte est faite sur le DISQUE et non sur une liste : une liste ecrite a la main aurait
 // laisse invisible le prochain fichier ajoute, ce qui est precisement le defaut d origine.
 const RACINE = join(ICI, "..");
-const ZONES_TESTS = ["outillage-tests-e2e"];
-for (const zone of ZONES_TESTS) {
+
+// TF-0367 (18/08) — la découverte était sur le disque DANS la zone, mais la LISTE DES ZONES
+// était écrite à la main. Le commentaire ci-dessus dit exactement pourquoi c'est un défaut
+// (« une liste écrite à la main aurait laissé invisible le prochain fichier ajouté ») — et il
+// le disait en étant une liste, un cran plus haut. Constaté en ajoutant
+// `oracles/resoudre-pilot.test.mjs` : vert, et joué par personne. Même classe que TF-0362
+// (F1 qui n'itère que sur le manifeste) et TF-0333 (la boucle qui n'itère que sur le servi) :
+// un contrôle qui parcourt une liste ne voit jamais ce qui n'y est pas.
+//
+// Les zones sont donc DÉCOUVERTES : tout dossier de premier niveau du dépôt, plus la racine
+// elle-même. `node_modules` et les artefacts d'atelier sont exclus nommément — pas devinés.
+const HORS_ZONE = new Set([".git", "node_modules", ".venv", "__pycache__", ".oracles", "old"]);
+const zonesTests = ["."];
+for (const d of readdirSync(RACINE, { withFileTypes: true })) {
+  if (d.isDirectory() && !HORS_ZONE.has(d.name)) zonesTests.push(d.name);
+}
+for (const zone of zonesTests) {
   let fichiers = [];
-  try { fichiers = readdirSync(join(RACINE, zone)).filter((f) => f.endsWith(".test.mjs")).sort(); }
-  catch { continue; }
+  try {
+    fichiers = readdirSync(join(RACINE, zone)).filter((f) => f.endsWith(".test.mjs")).sort();
+  } catch { continue; }
   for (const nom of fichiers) {
     const r = spawnSync(process.execPath, [join(RACINE, zone, nom)], { encoding: "utf8" });
     const lignes = (r.stdout || "").trim().split("\n").filter((l) => l.trim());
