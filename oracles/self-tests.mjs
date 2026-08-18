@@ -18,6 +18,12 @@
  * sans quoi ajouter un oracle non testé serait la façon la plus simple de faire baisser le
  * compte d'échecs.
  *
+ * INVARIANT (I2, TF-0351 du 18/08) : tout `*.test.mjs` du dépôt est JOUÉ ici. I1 ne regardait
+ * que `oracles\` — les tests de `outillage-tests-e2e\` étaient donc verts et joués par
+ * personne, exactement la dette R-35 que l'agrégateur existe pour éteindre. Le trou n'était pas
+ * dans la règle mais dans son périmètre : un fichier de test qu'aucun pas ne lance est du même
+ * ordre qu'un oracle sans recette, et se signale de la même façon.
+ *
  * Usage : node oracles\self-tests.mjs        → exit 0 si tout passe, 1 sinon.
  */
 import { execFileSync, spawnSync } from "node:child_process";
@@ -60,6 +66,27 @@ for (const nom of oracles) {
   });
 }
 
+// I2 — les fichiers de test hors `oracles\`, joues ici plutot que par personne. La
+// decouverte est faite sur le DISQUE et non sur une liste : une liste ecrite a la main aurait
+// laisse invisible le prochain fichier ajoute, ce qui est precisement le defaut d origine.
+const RACINE = join(ICI, "..");
+const ZONES_TESTS = ["outillage-tests-e2e"];
+for (const zone of ZONES_TESTS) {
+  let fichiers = [];
+  try { fichiers = readdirSync(join(RACINE, zone)).filter((f) => f.endsWith(".test.mjs")).sort(); }
+  catch { continue; }
+  for (const nom of fichiers) {
+    const r = spawnSync(process.execPath, [join(RACINE, zone, nom)], { encoding: "utf8" });
+    const lignes = (r.stdout || "").trim().split("\n").filter((l) => l.trim());
+    resultats.push({
+      nom: `${zone}/${nom}`,
+      statut: r.status === 0 ? "OK" : "ECHEC",
+      detail: (lignes[lignes.length - 1] || r.stderr?.split("\n")[0] || "aucune sortie").slice(0, 72),
+      via: "I2 (fichier de test du dépôt)",
+    });
+  }
+}
+
 console.log("=".repeat(78));
 console.log("  Self-tests des oracles du pilot");
 console.log("=".repeat(78));
@@ -72,6 +99,6 @@ console.log("=".repeat(78));
 console.log(
   echecs.length
     ? `  ${echecs.length}/${resultats.length} oracle(s) en défaut : ${echecs.map((r) => r.nom).join(", ")}`
-    : `  ${resultats.length}/${resultats.length} oracles : recette à double sens jouée et verte`,
+    : `  ${resultats.length}/${resultats.length} recettes jouées et vertes (oracles + fichiers de test du dépôt, I1 et I2)`,
 );
 process.exit(echecs.length ? 1 : 0);

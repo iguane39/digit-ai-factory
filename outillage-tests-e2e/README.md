@@ -29,6 +29,28 @@ Statut `pret` (exit 0) ou `bloque_question` (exit 3) — un projet sans app dét
 `--executer` lance réellement `npm ci` / `uv sync` (mode documenté ; le self-test ne l'exécute
 jamais, il le prouve par un exécuteur mock injecté).
 
+## Arbitrage du 18/08 — la condition est levée, ce qui reste est nommé (TF-0351)
+
+Ce dossier portait une dette R-35 vivante : `orchestrer-boucle.mjs`, livré le 13/08 pour la
+finalité exacte de TF-0349, n'avait **aucun appelant** — l'étude 20260817 l'a exhumé par
+`grep`, pas par le corpus — et ses tests n'étaient joués par personne (l'invariant I1 de
+`oracles\self-tests.mjs` ne regardait que `oracles\`).
+
+L'étude conditionnait le câblage complet (option O4, 3-5 j sur 3 dépôts) à la résolution de
+TF-0340/0341, cycle de vie de l'instance servie. **Ces deux items sont clos le 18/08**
+(`forge_tests/instance.py` : contrat de montage/démontage déclaré, provenance de l'instance
+confrontée à l'arbre de travail). La condition est donc levée, et l'arbitrage est **câbler**,
+non retirer : l'outil sert une finalité qui est maintenant atteignable.
+
+Deux temps, séparés pour ne pas maquiller le second en premier :
+
+1. **fait le 18/08** — les tests de ce dossier entrent dans la recette du pilot par le nouvel
+   invariant **I2** : tout `*.test.mjs` du dépôt est joué. Un test vert que rien ne lance
+   n'était pas un garde-fou ;
+2. **reste à faire, et c'est une candidature au registre, plus une intention** : l'intégration
+   réelle en appelant de forge-tests et forge-development (O4). Elle touche trois dépôts et ne
+   s'improvise pas dans une campagne — la nommer au registre est ce qui la rend exigible.
+
 ## TF-0145 — `orchestrer-boucle.mjs`
 
 Orchestrateur de boucle remédiation ↔ réexécution (plan §4 phases 5-6), porté par le pilot :
