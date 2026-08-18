@@ -47,9 +47,42 @@ Deux temps, séparés pour ne pas maquiller le second en premier :
 1. **fait le 18/08** — les tests de ce dossier entrent dans la recette du pilot par le nouvel
    invariant **I2** : tout `*.test.mjs` du dépôt est joué. Un test vert que rien ne lance
    n'était pas un garde-fou ;
-2. **reste à faire, et c'est une candidature au registre, plus une intention** : l'intégration
-   réelle en appelant de forge-tests et forge-development (O4). Elle touche trois dépôts et ne
-   s'improvise pas dans une campagne — la nommer au registre est ce qui la rend exigible.
+2. **fait le 18/08 aussi, après instruction** — l'intégration réelle, sous la forme que
+   l'étude `output-etudes60818-etude-opportunite-cablage-orchestrer-boucle.md` a retenue
+   (verdict **O3**, candidature TF-0360). Voir la section suivante.
+
+## Le câblage réel, et la frontière qu'il tient (TF-0360, 18/08)
+
+`appels-reels.mjs` est l'appelant qui manquait. Il ne réécrit rien de la boucle : il fournit
+les trois fonctions que `orchestrer-boucle.mjs` attendait — `auditer`, `reprendre`,
+`declencherDevelopment` — plus le journal de tours.
+
+**La frontière, et c'est tout l'arbitrage** :
+
+| Qui | Quoi | Pourquoi lui |
+|---|---|---|
+| **forge-tests** | la DÉFINITION DE FIN d'une campagne (`forge_tests/boucle.py`, TF-0352/0353) — cinq points, publiés dans la section `boucle` de chaque rapport | la forge qui PRESCRIT une règle est celle qui la JUGE (même principe que le mouvement chez forge-design, TF-0335) |
+| **le pilot** | LIRE ce verdict, router les actions par leur `etape_cible`, tenir le journal chez le produit | il orchestre, il ne juge pas la fin |
+| **le pilot** | la borne ≤ N cycles | c'est un plafond de **dépense** (loi 5), jamais un critère de fin — on peut s'arrêter avant la fin, on ne peut pas décider que c'est fini |
+
+Trois refus explicites, chacun vérifié par un test :
+
+- `cibleAtteinte` **ne recalcule aucun** des cinq points : quand la section `boucle` est là,
+  elle a le dernier mot. Un rapport au triplet vert dont forge-tests dit `en_cours` **n'est pas
+  vert** ;
+- section `boucle` absente (forge-tests antérieure au 18/08) → on ne **devine** pas un verdict
+  qu'elle n'a pas rendu : la lecture le DIT, et la boucle retombe sur son seul plafond ;
+- `declencherDevelopment` ne **prétend jamais** avoir joué : un run development engage des
+  gates et une dépense, il rend la commande exacte et attend une décision (`executer: true`).
+
+Le journal de boucle est écrit **chez le produit** (`forge/journal-boucle.jsonl`) : c'est sa
+campagne, et le journal doit lui survivre. Chaque tour en est **dérivé** du rapport plutôt que
+compté à la main — un chiffre saisi deux fois diverge.
+
+*Ce qui reste hors de ce câblage, et se déclare* : aucune campagne réelle n'a encore été close
+par cette voie. Les tests prouvent la frontière et les refus, pas un bout-en-bout — lancer un
+audit complet en test prendrait des minutes et dépendrait d'un démon de conteneurs. C'est le
+premier fait que le plan de revue du 2026-09-15 confrontera.
 
 ## TF-0145 — `orchestrer-boucle.mjs`
 
@@ -60,8 +93,8 @@ IA/development (appels **injectés**, documentés — jamais exécutés en dur i
 mesure la tendance du triplet couverture/passage/mutation. **Borné ≤ N cycles (défaut ≤ 5,
 extensible à 7 si chaque cycle réduit strictement le reste — aligné sur `ETAPES-RUN.md`,
 mandat du 14/08 ; l'ancien défaut de 3 divergeait de la doctrine ; G-2 absolue)**.
-*Dette R-35 nommée (TF-0351)* : cet orchestrateur n'a aujourd'hui AUCUN appelant — son
-câblage est conditionné à TF-0340/0341 (cycle de vie d'instance).
+*Dette R-35 SOLDÉE le 18/08 (TF-0360)* : cet orchestrateur a désormais un appelant réel,
+`appels-reels.mjs`, et sa condition (TF-0340/0341, cycle de vie d'instance) est levée.
 
 État terminal, jamais « jusqu'au vert » : soit `cible_atteinte` (triplet aux seuils, 0 écart),
 soit `cycles_epuises` à N — l'état mesuré est rendu avec les écarts résiduels classés par
@@ -72,9 +105,10 @@ node outillage-tests-e2e/orchestrer-boucle.mjs \
   --rapport-initial <rapport1.json> --sequence <rapport2.json,rapport3.json> [--n-max 3] [--json]
 ```
 
-`auditer`/`reprendre`/`declencherDevelopment` sont **injectés** par l'appelant ; ce fichier ne
-câble aucun appel réel à forge-tests ou forge-development — c'est le jalon d'intégration
-ultérieur. La CLI ci-dessus ne rejoue qu'une séquence de fixtures.
+`auditer`/`reprendre`/`declencherDevelopment` restent **injectés** par l'appelant — ce fichier
+n'appelle toujours rien lui-même, et c'est voulu : il reste jouable sur fixtures. Les appels
+réels vivent dans `appels-reels.mjs` (TF-0360), à côté. La CLI ci-dessus ne rejoue qu'une
+séquence de fixtures.
 
 ## Fixtures (`fixtures/`)
 

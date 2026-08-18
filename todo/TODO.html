@@ -139,7 +139,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>1132772042e0</code> · dernier événement 2026-08-18T06:58:25Z</p>
+      <p class="meta">sceau <code>da9b7f03a106</code> · dernier événement 2026-08-18T12:00:00Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -149,8 +149,8 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="3 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">3</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="14 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">14</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="1 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">1</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="307 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">307</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
@@ -194,40 +194,6 @@
       <h2>digit-ai-forge-agents <span class="badge" title="8 item(s) actifs ciblant digit-ai-forge-agents">8</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-agents</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-decide" id="item-TF-0326" data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0326</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">Le skill pilote-de-mission n'est versionné dans AUCUN dépôt — la forge juge un artefact dont elle ne possède ni la spécification ni les instances</h3>
-          <div class="card-detail"><p class="lead">Découverte de l'étude cadence-de-mission (17/08), vérifiée : aucun répertoire pilote-de-mission sur c:\dev (12 skills en dépôts) ni dans ~\.claude\skills (24 installés) — 11 fichiers le MENTIONNENT, zéro ne le CONTIENT.</p><ul class="puces"><li>La preuve amont du lot Run-Delivery (« 0 occurrence de risque dans pilote-de-mission v1.0.0 ») n'est pas rejouable : l'objet n'existe nulle part où l'écosystème regarde</li><li>Même maladie que TF-0290 (hook C7 en copie installée seule) et que K4 la déclare pour les skills sans source — sauf qu'ici même la copie installée est absente</li><li>À instruire : retrouver l'objet (autre poste ? autre compte ?), le versionner chez sa forge, ou constater qu'il n'a jamais existé et corriger les 11 mentions</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 3 × preuve 4 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>des candidatures externes s'appuient sur le contenu d'un skill que personne ne peut ouvrir — le registre a failli décider sur une preuve invérifiable</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (découverte d'étude — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-decide" id="item-TF-0336" data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0336</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-agents, hygiène post-campagnes : .bak versionnés, versions-livrees périmé, famille L des gabarits, polices embarquées</h3>
-          <div class="card-detail"><p class="lead">Restes des campagnes du 17/08 : registre-oracles.json.bak et manifest.json.bak VERSIONNÉS à côté de leurs sources (une seconde source qui diverge — le .bak porte déjà l'ancien libellé) ; versions-livrees.json annonce 2.6.1/2.6.0 pour un réel 2.7.0/2.12.0 (dérive préexistante que F1 relèverait) ; sync-skills IGNORE_FICHIER ne couvre pas .bak-&lt;date&gt; (un SKILL.md.bak-20260407 installé traîne) ; sous --regles tout les gabarits schemas restent rouges famille L (surtout L11 sur les <code>{{PLACEHOLDER}}</code>) — trancher conformité/exemption comme TF-0308 l'a fait pour la charte ; embarquer les WOFF2 en @font-face data: rendrait les gabarits fidèles hors poste équipé.</p></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>deux .bak suivis par git divergent déjà de leurs sources — la maladie des sidecars committés (TF-0296), au stade précoce</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
         <article class="card s-candidat" id="item-TF-0324" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0324</code>
@@ -276,6 +242,23 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>chaque exécution du self-test crée un diff parasite — le prochain commit pressé l'embarque et le bruit K2 renaît</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0326" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0326</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Le skill pilote-de-mission n'est versionné dans AUCUN dépôt — la forge juge un artefact dont elle ne possède ni la spécification ni les instances</h3>
+          <div class="card-detail"><p class="lead">Découverte de l'étude cadence-de-mission (17/08), vérifiée : aucun répertoire pilote-de-mission sur c:\dev (12 skills en dépôts) ni dans ~\.claude\skills (24 installés) — 11 fichiers le MENTIONNENT, zéro ne le CONTIENT.</p><ul class="puces"><li>La preuve amont du lot Run-Delivery (« 0 occurrence de risque dans pilote-de-mission v1.0.0 ») n'est pas rejouable : l'objet n'existe nulle part où l'écosystème regarde</li><li>Même maladie que TF-0290 (hook C7 en copie installée seule) et que K4 la déclare pour les skills sans source — sauf qu'ici même la copie installée est absente</li><li>À instruire : retrouver l'objet (autre poste ? autre compte ?), le versionner chez sa forge, ou constater qu'il n'a jamais existé et corriger les 11 mentions</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 3 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>des candidatures externes s'appuient sur le contenu d'un skill que personne ne peut ouvrir — le registre a failli décider sur une preuve invérifiable</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (découverte d'étude — constat =&gt; candidat)</dd></div>
             
           </dl>
         </article>
@@ -330,29 +313,29 @@
             
           </dl>
         </article>
+        <article class="card s-corrige" id="item-TF-0336" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0336</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-agents, hygiène post-campagnes : .bak versionnés, versions-livrees périmé, famille L des gabarits, polices embarquées</h3>
+          <div class="card-detail"><p class="lead">Restes des campagnes du 17/08 : registre-oracles.json.bak et manifest.json.bak VERSIONNÉS à côté de leurs sources (une seconde source qui diverge — le .bak porte déjà l'ancien libellé) ; versions-livrees.json annonce 2.6.1/2.6.0 pour un réel 2.7.0/2.12.0 (dérive préexistante que F1 relèverait) ; sync-skills IGNORE_FICHIER ne couvre pas .bak-&lt;date&gt; (un SKILL.md.bak-20260407 installé traîne) ; sous --regles tout les gabarits schemas restent rouges famille L (surtout L11 sur les <code>{{PLACEHOLDER}}</code>) — trancher conformité/exemption comme TF-0308 l'a fait pour la charte ; embarquer les WOFF2 en @font-face data: rendrait les gabarits fidèles hors poste équipé.</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>deux .bak suivis par git divergent déjà de leurs sources — la maladie des sidecars committés (TF-0296), au stade précoce</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
       </div>
     </section>
     <section id="digit-ai-forge-design">
       <h2>digit-ai-forge-design <span class="badge" title="2 item(s) actifs ciblant digit-ai-forge-design">2</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-design</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-decide" id="item-TF-0335" data-forge="digit-ai-forge-design" data-statut="decide" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0335</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-design, mise en cohérence post-TF-0321 : registre, fixtures R10, démos, self-test du générateur</h3>
-          <div class="card-detail"><p class="lead">Restes déclarés de la campagne TF-0321 : oracle-motion absent du registre quality-oracles (et l'arbitrage d'autorité à formaliser : forge-design porte désormais les 10 règles prescrites ET jugées — le second oracle-motion M1-M8 proposé côté socle le 16/08 n'a plus d'objet) ; 2 fixtures mono-oracle passeraient FAIL sur R10 seule (bloc de révocation de 3 lignes proposé, pas imposé — G-2) ; les 4 maquettes de demo/ FAIL sur R7, défaut préexistant mesuré identique avant/après (la forge livre en démo ce que son oracle refuse) ; generer-design-md.mjs sans self-test ; vendor/README documente duration: 0.4 au-dessus du plafond prescrit.</p></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-design</dt><dd>une autorité de mouvement à deux têtes potentielles et des démos qui contredisent l'oracle — le bruit de fond que TF-0228 a appris à éteindre</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
         <article class="card s-corrige" id="item-TF-0321" data-forge="digit-ai-forge-design" data-statut="corrige" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0321</code>
@@ -370,16 +353,33 @@
             
           </dl>
         </article>
+        <article class="card s-corrige" id="item-TF-0335" data-forge="digit-ai-forge-design" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0335</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-design, mise en cohérence post-TF-0321 : registre, fixtures R10, démos, self-test du générateur</h3>
+          <div class="card-detail"><p class="lead">Restes déclarés de la campagne TF-0321 : oracle-motion absent du registre quality-oracles (et l'arbitrage d'autorité à formaliser : forge-design porte désormais les 10 règles prescrites ET jugées — le second oracle-motion M1-M8 proposé côté socle le 16/08 n'a plus d'objet) ; 2 fixtures mono-oracle passeraient FAIL sur R10 seule (bloc de révocation de 3 lignes proposé, pas imposé — G-2) ; les 4 maquettes de demo/ FAIL sur R7, défaut préexistant mesuré identique avant/après (la forge livre en démo ce que son oracle refuse) ; generer-design-md.mjs sans self-test ; vendor/README documente duration: 0.4 au-dessus du plafond prescrit.</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-design</dt><dd>une autorité de mouvement à deux têtes potentielles et des démos qui contredisent l'oracle — le bruit de fond que TF-0228 a appris à éteindre</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
       </div>
     </section>
     <section id="digit-ai-forge-tests">
       <h2>digit-ai-forge-tests <span class="badge" title="17 item(s) actifs ciblant digit-ai-forge-tests">17</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-tests</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-decide" id="item-TF-0343" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="haute">
+        <article class="card s-corrige" id="item-TF-0343" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0343</code>
-            <span class="statut s-decide">decide</span>
+            <span class="statut s-corrige">corrige</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -393,10 +393,10 @@
             
           </dl>
         </article>
-        <article class="card s-decide" id="item-TF-0352" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="haute">
+        <article class="card s-corrige" id="item-TF-0352" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0352</code>
-            <span class="statut s-decide">decide</span>
+            <span class="statut s-corrige">corrige</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -407,142 +407,6 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>campagne du 12/08 close conforme avec 121 findings et produit inchange ; la meme strategie executee avec obligation de traiter a ferme 4 anomalies produit et 3 faux verts, dont un dormant depuis cette campagne</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-01</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-decide" id="item-TF-0345" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0345</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">tests : une donnee de test partagee se reference et se valide a la generation, elle ne se recopie pas d un spec a l autre</h3>
-          <div class="card-detail"><p class="lead">Le PNG de reference des parcours e2e (3316 caracteres base64) etait recopie dans chaque spec.</p><ul class="puces"><li>En le reprenant pour la suite inter-profils le 17/08, 80 caracteres ont saute : le fichier gardait sa signature PNG et une taille plausible, mais le worker sortait 'broken data stream when reading image file' et l envoi restait bloque — quatre tests en timeout pour une cause invisible a la lecture du diff, et un temps de diagnostic non negligeable puisque le symptome (Send jamais active) pointe vers la conversion, pas vers la donnee</li><li>REGLE ATTENDUE : une donnee de test partagee se REFERENCE (un module dedie, importe), elle ne se recopie pas</li><li>Et si elle est generee, la VALIDER a la generation plutot que de faire confiance au litteral : sur Produit-01 le module est desormais ecrit par un script qui ouvre l image et verifie ses dimensions avant d ecrire, et les deux specs l importent</li><li>Candidat a mecaniser dans une revue de tests : detecter deux litteraux longs quasi identiques entre fichiers de tests</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>4 tests e2e en timeout et un diagnostic egare vers la chaine de conversion, pour 80 caracteres perdus dans la recopie d un litteral base64</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-01</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-decide" id="item-TF-0333" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0333</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">Écart servi↔versionné : une locale promise par la source et jamais servie n'est JAMAIS comparée — PASS sans mesure</h3>
-          <div class="card-detail"><p class="lead">Constat de la campagne TF-0312 en écrivant les fixtures : la boucle itère sur les locales SERVIES — une locale que la source promet et que le servi ne sert pas du tout sort en PASS sur une promesse jamais confrontée.</p><ul class="puces"><li>Symétrique exact du cas fondateur (là c'était le servi qui manquait des entrées</li><li>ici c'est une locale entière)</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>un produit qui cesse de servir /en entier passerait le contrôle né pour attraper exactement cette famille d'écarts</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-decide" id="item-TF-0344" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0344</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">tests : trois pieges a faux vert a interdire et si possible a mecaniser — absence sans presence, motif satisfait par le declencheur, cellule mutante sur objet partage</h3>
-          <div class="card-detail"><p class="lead">Trois faux verts rencontres le meme jour sur la meme campagne, aucun detecte par un oracle.</p><ul class="puces"><li>ASSERTION D ABSENCE SANS PREUVE DE PRESENCE : toHaveCount</li><li>passe sur une page encore en chargement ; le test du passage de main sequentiel etait vert en isolation et rouge en execution complete, pour cette seule raison. Regle : toute assertion d ABSENCE est precedee d une assertion de PRESENCE sur le meme ecran</li><li>MOTIF SATISFAIT PAR LE DECLENCHEUR : getByText(/Refused|Refus/i) matche le BOUTON 'Refuse' ; l assertion 'le refus est enregistre' passait donc AVANT toute decision, supprimant la barriere de synchronisation entre profils — instabilite un run sur deux et 30 s de timeout par occurrence. Mesure apres correction : suite complete 3,6 min -&gt; 36 s, trois passages verts consecutifs. Le meme defaut dormait dans un spec anterieur, vert depuis le 12/08. Regle : aucun motif d assertion ne doit pouvoir etre satisfait par le declencheur de l action qu il verifie. C est la plus rentable des trois et elle est DETECTABLE STATIQUEMENT (un motif d assertion qui est un prefixe du libelle clique dans le meme test)</li><li>CELLULE MUTANTE SUR OBJET PARTAGE : dans la matrice des droits, l approbation reussie du profil N faisait avancer le circuit et ouvrait le tour du profil N+1, qui rendait 201 au lieu de 409 — faux echec. Regle : toute cellule dont le succes mute l etat exige un objet neuf</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>instabilite 1 run sur 2 sur la suite e2e, 30 s de timeout par assertion vacante (3,6 min -&gt; 36 s apres correction), et un faux vert dormant depuis le 12/08 dans un spec deja livre</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-01</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-decide" id="item-TF-0353" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0353</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">tests : la boucle de correction n est ni comptee ni tracee — rien n empeche de clore sur un tour non rejoue</h3>
-          <div class="card-detail"><p class="lead">Le ledger d une campagne porte les findings du DERNIER rapport, pas l histoire des tours.</p><ul class="puces"><li>On ne peut donc pas distinguer « 0 anomalie parce que tout est traite » de « 0 anomalie parce qu on n a pas rejoue apres le dernier correctif » : les deux s ecrivent pareil</li><li>Sur la campagne du 17/08, le tour 3 n a produit qu UNE anomalie — mais c etait une course (une action sans barriere de synchronisation avant observation depuis un autre profil), la classe la plus couteuse a retrouver plus tard</li><li>Clore au tour 2 l aurait laissee passer avec une suite pourtant verte au premier essai</li><li>CORRECTIF ATTENDU : exiger un JOURNAL DE BOUCLE par campagne — un tour = (anomalies entrantes, corrigees, nouvellement revelees, restantes) — et interdire la cloture si le dernier tour n a pas ete rejoue APRES son dernier correctif</li><li>Mecanisable simplement : un oracle compare l horodatage du dernier correctif a celui du dernier run de suite et refuse la cloture si l ordre est inverse</li><li>Le compteur de tours dit aussi quand s arreter pour de bonnes raisons : une campagne qui ne converge pas (tour N proche du tour N-1) est un signal a remonter, pas un echec a masquer</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>le tour 3 de la campagne du 17/08 n a revele qu une anomalie, une course, invisible a un premier essai vert : une cloture au tour 2 l aurait livree</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-01</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-decide" id="item-TF-0354" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0354</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-tests : requalifications résiduelles de la voie « proposition » — generateur.py, convention &lt;dossier-proposition&gt;, encart Adoption du cahier</h3>
-          <div class="card-detail"><p class="lead">Trois restes déclarés par la campagne TF-0349 : generateur.py:73 dit encore « Un cas généré est une PROPOSITION » (cité par l'étude comme « exactement le trou », hors périmètre littéral des 4 items) ; le nom d'argument &lt;dossier-proposition&gt; est une convention de chemin en service chez les produits (renommage = casse d'appels, à séquencer) ; l'encart « Adoption (RT-13) » du cahier généré n'offre au lecteur qu'une seule des trois issues R-40 — mentionner le sidecar cas-ecartes.jsonl à côté de cas-adoptes.jsonl.</p></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>la voie est fermée en doctrine, au catalogue, au cahier et à l'oracle — mais le générateur la rouvre en commentaire à chaque lecture de son code</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 soir — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-decide" id="item-TF-0342" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0342</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">tests : exiger une recette MULTI-PROFILS des qu un produit declare des roles — un produit a roles n est pas verifiable sous une identite unique</h3>
-          <div class="card-detail"><p class="lead">Produit-01 a passe un audit 12 pans le 12/08 avec 'pan qualif 8/8 ratio 1,00 ZERO finding' et 'suite e2e 10/10 verte', le tout sous UNE identite qui se designait elle-meme approbateur.</p><ul class="puces"><li>Le cas NOMINAL du cahier — un approbateur decide, le suivant est sollicite — n avait donc jamais ete execute, et le role 'en copie' n etait exerce par aucun test. Le trou n a pas ete trouve par l outillage mais par une question humaine cinq jours plus tard. MESURE APRES CORRECTION (17/08) : la seule recette inter-profils a revele un DEFAUT PRODUIT reel — l ecran de revue propose 'Approuver'/'Refuser' a un approbateur dont le tour n est pas venu en circuit sequentiel (canDecide ne verifie pas le tour, ReviewScreen.tsx</li><li>le serveur refuse bien en 409, mais l IHM invite a une action vouee au rejet) — plus deux defauts d ergonomie. Tous invisibles a une suite mono-identite PAR CONSTRUCTION. EXIGENCE ATTENDUE : faire de la recette multi-profils une exigence de socle des qu un produit declare des roles — autant d identites outillees que de roles, un storageState par profil, et au moins un test ou deux identites COEXISTENT pour observer ce qu un profil voit pendant qu un autre agit. Livre sur Produit-01 comme preuve de faisabilite : 5 identites, 15 tests backend de matrice des droits, 5 tests e2e inter-profils, backend exit 0 et e2e 20/20 sur trois passages consecutifs. Cree un objet durable (socle de pile de test) : relEve de l etude d opportunite TF-0155</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 3 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>audit 12 pans declare vert le 12/08 sur le seul cas degenere ; 1 defaut produit et 2 defauts d ergonomie decouverts des la premiere recette multi-profils, 5 jours plus tard et hors outillage</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-01</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-decide" id="item-TF-0355" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0355</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-tests : un élément non_testable déclaré PAR LE RAPPORT n'entre pas au solde — « solde 0 » peut coexister avec 8 non couverts</h3>
-          <div class="card-detail"><p class="lead">Constat hors périmètre de la campagne TF-0349 : un élément déclaré non_testable par le rapport d'audit ne produit aucun cas dérivé et sort en « non couvert » — il n'entre donc pas au solde d'adoption.</p><ul class="puces"><li>Un cahier peut afficher solde 0 ET 8 éléments non couverts, les deux colonnes coexistent au tableau de tête mais RIEN n'oppose le second chiffre</li><li>À instruire : le contrat « prêt client » doit-il opposer les deux ?</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 2 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>le solde nul peut redevenir un faux confort exactement là où R-40 vient de tuer le précédent</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 soir — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-decide" id="item-TF-0334" data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0334</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-tests : comptes périmés restants au README (treize adaptateurs pour 14, onze pans pour 14) et classes de corpus en littéraux</h3>
-          <div class="card-detail"><p class="lead">Deux restes de la campagne TF-0310/0311 : (a) le README porte encore deux comptes de la même maladie que TF-0311, hors des deux que l'item nommait ; (b) les 23 classes du contrat de corpus sont des littéraux — un renommage de classe sort son entrée en [MANQUE] (bruyant donc voulu) mais coûte un diagnostic ; dériver des constantes exposées des adaptateurs (seule interface.CLASSE_ECART_SERVI existe) fermerait la classe.</p></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 1 × preuve 4 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>la doc dément l'outil sur deux comptes de plus, et le verrou len(CORPUS) de TF-0311 ne les couvre pas (hors corpus)</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
             
           </dl>
         </article>
@@ -563,6 +427,23 @@
             
           </dl>
         </article>
+        <article class="card s-corrige" id="item-TF-0345" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0345</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">tests : une donnee de test partagee se reference et se valide a la generation, elle ne se recopie pas d un spec a l autre</h3>
+          <div class="card-detail"><p class="lead">Le PNG de reference des parcours e2e (3316 caracteres base64) etait recopie dans chaque spec.</p><ul class="puces"><li>En le reprenant pour la suite inter-profils le 17/08, 80 caracteres ont saute : le fichier gardait sa signature PNG et une taille plausible, mais le worker sortait 'broken data stream when reading image file' et l envoi restait bloque — quatre tests en timeout pour une cause invisible a la lecture du diff, et un temps de diagnostic non negligeable puisque le symptome (Send jamais active) pointe vers la conversion, pas vers la donnee</li><li>REGLE ATTENDUE : une donnee de test partagee se REFERENCE (un module dedie, importe), elle ne se recopie pas</li><li>Et si elle est generee, la VALIDER a la generation plutot que de faire confiance au litteral : sur Produit-01 le module est desormais ecrit par un script qui ouvre l image et verifie ses dimensions avant d ecrire, et les deux specs l importent</li><li>Candidat a mecaniser dans une revue de tests : detecter deux litteraux longs quasi identiques entre fichiers de tests</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>4 tests e2e en timeout et un diagnostic egare vers la chaine de conversion, pour 80 caracteres perdus dans la recopie d un litteral base64</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-01</dd></div>
+            
+          </dl>
+        </article>
         <article class="card s-corrige" id="item-TF-0312" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0312</code>
@@ -580,6 +461,23 @@
             
           </dl>
         </article>
+        <article class="card s-corrige" id="item-TF-0333" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0333</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Écart servi↔versionné : une locale promise par la source et jamais servie n'est JAMAIS comparée — PASS sans mesure</h3>
+          <div class="card-detail"><p class="lead">Constat de la campagne TF-0312 en écrivant les fixtures : la boucle itère sur les locales SERVIES — une locale que la source promet et que le servi ne sert pas du tout sort en PASS sur une promesse jamais confrontée.</p><ul class="puces"><li>Symétrique exact du cas fondateur (là c'était le servi qui manquait des entrées</li><li>ici c'est une locale entière)</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>un produit qui cesse de servir /en entier passerait le contrôle né pour attraper exactement cette famille d'écarts</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
         <article class="card s-corrige" id="item-TF-0341" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0341</code>
@@ -594,6 +492,40 @@
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>fenetre de 2 h 25 pendant laquelle tout audit relance aurait mesure un code anterieur au correctif D-14 et publie ses chiffres comme courants, sans qu aucun signal ne distingue l instance perimee d une instance fraiche</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-11</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0344" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0344</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">tests : trois pieges a faux vert a interdire et si possible a mecaniser — absence sans presence, motif satisfait par le declencheur, cellule mutante sur objet partage</h3>
+          <div class="card-detail"><p class="lead">Trois faux verts rencontres le meme jour sur la meme campagne, aucun detecte par un oracle.</p><ul class="puces"><li>ASSERTION D ABSENCE SANS PREUVE DE PRESENCE : toHaveCount</li><li>passe sur une page encore en chargement ; le test du passage de main sequentiel etait vert en isolation et rouge en execution complete, pour cette seule raison. Regle : toute assertion d ABSENCE est precedee d une assertion de PRESENCE sur le meme ecran</li><li>MOTIF SATISFAIT PAR LE DECLENCHEUR : getByText(/Refused|Refus/i) matche le BOUTON 'Refuse' ; l assertion 'le refus est enregistre' passait donc AVANT toute decision, supprimant la barriere de synchronisation entre profils — instabilite un run sur deux et 30 s de timeout par occurrence. Mesure apres correction : suite complete 3,6 min -&gt; 36 s, trois passages verts consecutifs. Le meme defaut dormait dans un spec anterieur, vert depuis le 12/08. Regle : aucun motif d assertion ne doit pouvoir etre satisfait par le declencheur de l action qu il verifie. C est la plus rentable des trois et elle est DETECTABLE STATIQUEMENT (un motif d assertion qui est un prefixe du libelle clique dans le meme test)</li><li>CELLULE MUTANTE SUR OBJET PARTAGE : dans la matrice des droits, l approbation reussie du profil N faisait avancer le circuit et ouvrait le tour du profil N+1, qui rendait 201 au lieu de 409 — faux echec. Regle : toute cellule dont le succes mute l etat exige un objet neuf</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>instabilite 1 run sur 2 sur la suite e2e, 30 s de timeout par assertion vacante (3,6 min -&gt; 36 s apres correction), et un faux vert dormant depuis le 12/08 dans un spec deja livre</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-01</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0353" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0353</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">tests : la boucle de correction n est ni comptee ni tracee — rien n empeche de clore sur un tour non rejoue</h3>
+          <div class="card-detail"><p class="lead">Le ledger d une campagne porte les findings du DERNIER rapport, pas l histoire des tours.</p><ul class="puces"><li>On ne peut donc pas distinguer « 0 anomalie parce que tout est traite » de « 0 anomalie parce qu on n a pas rejoue apres le dernier correctif » : les deux s ecrivent pareil</li><li>Sur la campagne du 17/08, le tour 3 n a produit qu UNE anomalie — mais c etait une course (une action sans barriere de synchronisation avant observation depuis un autre profil), la classe la plus couteuse a retrouver plus tard</li><li>Clore au tour 2 l aurait laissee passer avec une suite pourtant verte au premier essai</li><li>CORRECTIF ATTENDU : exiger un JOURNAL DE BOUCLE par campagne — un tour = (anomalies entrantes, corrigees, nouvellement revelees, restantes) — et interdire la cloture si le dernier tour n a pas ete rejoue APRES son dernier correctif</li><li>Mecanisable simplement : un oracle compare l horodatage du dernier correctif a celui du dernier run de suite et refuse la cloture si l ordre est inverse</li><li>Le compteur de tours dit aussi quand s arreter pour de bonnes raisons : une campagne qui ne converge pas (tour N proche du tour N-1) est un signal a remonter, pas un echec a masquer</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>le tour 3 de la campagne du 17/08 n a revele qu une anomalie, une course, invisible a un premier essai vert : une cloture au tour 2 l aurait livree</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-01</dd></div>
             
           </dl>
         </article>
@@ -631,6 +563,23 @@
             
           </dl>
         </article>
+        <article class="card s-corrige" id="item-TF-0354" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0354</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : requalifications résiduelles de la voie « proposition » — generateur.py, convention &lt;dossier-proposition&gt;, encart Adoption du cahier</h3>
+          <div class="card-detail"><p class="lead">Trois restes déclarés par la campagne TF-0349 : generateur.py:73 dit encore « Un cas généré est une PROPOSITION » (cité par l'étude comme « exactement le trou », hors périmètre littéral des 4 items) ; le nom d'argument &lt;dossier-proposition&gt; est une convention de chemin en service chez les produits (renommage = casse d'appels, à séquencer) ; l'encart « Adoption (RT-13) » du cahier généré n'offre au lecteur qu'une seule des trois issues R-40 — mentionner le sidecar cas-ecartes.jsonl à côté de cas-adoptes.jsonl.</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>la voie est fermée en doctrine, au catalogue, au cahier et à l'oracle — mais le générateur la rouvre en commentaire à chaque lecture de son code</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 soir — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
         <article class="card s-corrige" id="item-TF-0325" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0325</code>
@@ -665,69 +614,63 @@
             
           </dl>
         </article>
+        <article class="card s-corrige" id="item-TF-0342" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0342</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">tests : exiger une recette MULTI-PROFILS des qu un produit declare des roles — un produit a roles n est pas verifiable sous une identite unique</h3>
+          <div class="card-detail"><p class="lead">Produit-01 a passe un audit 12 pans le 12/08 avec 'pan qualif 8/8 ratio 1,00 ZERO finding' et 'suite e2e 10/10 verte', le tout sous UNE identite qui se designait elle-meme approbateur.</p><ul class="puces"><li>Le cas NOMINAL du cahier — un approbateur decide, le suivant est sollicite — n avait donc jamais ete execute, et le role 'en copie' n etait exerce par aucun test. Le trou n a pas ete trouve par l outillage mais par une question humaine cinq jours plus tard. MESURE APRES CORRECTION (17/08) : la seule recette inter-profils a revele un DEFAUT PRODUIT reel — l ecran de revue propose 'Approuver'/'Refuser' a un approbateur dont le tour n est pas venu en circuit sequentiel (canDecide ne verifie pas le tour, ReviewScreen.tsx</li><li>le serveur refuse bien en 409, mais l IHM invite a une action vouee au rejet) — plus deux defauts d ergonomie. Tous invisibles a une suite mono-identite PAR CONSTRUCTION. EXIGENCE ATTENDUE : faire de la recette multi-profils une exigence de socle des qu un produit declare des roles — autant d identites outillees que de roles, un storageState par profil, et au moins un test ou deux identites COEXISTENT pour observer ce qu un profil voit pendant qu un autre agit. Livre sur Produit-01 comme preuve de faisabilite : 5 identites, 15 tests backend de matrice des droits, 5 tests e2e inter-profils, backend exit 0 et e2e 20/20 sur trois passages consecutifs. Cree un objet durable (socle de pile de test) : relEve de l etude d opportunite TF-0155</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 3 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>audit 12 pans declare vert le 12/08 sur le seul cas degenere ; 1 defaut produit et 2 defauts d ergonomie decouverts des la premiere recette multi-profils, 5 jours plus tard et hors outillage</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-01</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0355" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0355</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : un élément non_testable déclaré PAR LE RAPPORT n'entre pas au solde — « solde 0 » peut coexister avec 8 non couverts</h3>
+          <div class="card-detail"><p class="lead">Constat hors périmètre de la campagne TF-0349 : un élément déclaré non_testable par le rapport d'audit ne produit aucun cas dérivé et sort en « non couvert » — il n'entre donc pas au solde d'adoption.</p><ul class="puces"><li>Un cahier peut afficher solde 0 ET 8 éléments non couverts, les deux colonnes coexistent au tableau de tête mais RIEN n'oppose le second chiffre</li><li>À instruire : le contrat « prêt client » doit-il opposer les deux ?</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 2 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>le solde nul peut redevenir un faux confort exactement là où R-40 vient de tuer le précédent</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 soir — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0334" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0334</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : comptes périmés restants au README (treize adaptateurs pour 14, onze pans pour 14) et classes de corpus en littéraux</h3>
+          <div class="card-detail"><p class="lead">Deux restes de la campagne TF-0310/0311 : (a) le README porte encore deux comptes de la même maladie que TF-0311, hors des deux que l'item nommait ; (b) les 23 classes du contrat de corpus sont des littéraux — un renommage de classe sort son entrée en [MANQUE] (bruyant donc voulu) mais coûte un diagnostic ; dériver des constantes exposées des adaptateurs (seule interface.CLASSE_ECART_SERVI existe) fermerait la classe.</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 1 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>la doc dément l'outil sur deux comptes de plus, et le verrou len(CORPUS) de TF-0311 ne les couvre pas (hors corpus)</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
       </div>
     </section>
     <section id="pilot">
       <h2>pilot <span class="badge" title="26 item(s) actifs ciblant pilot">26</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-decide" id="item-TF-0358" data-forge="pilot" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0358</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">Hygiène post-renommage : dossier local à renommer hors session, dénominateur « 14 frères » de l'étude, sous-chemin périmé websec</h3>
-          <div class="card-detail"><p class="lead">Trois restes de la fenêtre C : (1) le dossier local c:\dev\digit-ai-forge-pilot se renomme en digit-ai-factory À LA FERMETURE de la session vivante qui l'occupe (bootstrap résout par dirname — zéro casse mécanique mesurée, mais le CLAUDE.md annonce déjà le nom) ; (2) l'étude 20260817i écrit « 14 entrées » pour la liste FORGES du bootstrap qui en compte 13 (+ audit_client-a hors bootstrap) — corriger le dénominateur AVANT la revue du 24/08, sinon son critère n°3 se vérifie contre un compte faux (l'étude est un livrable daté : la correction se porte à la revue, pas dans le fichier) ; (3) websec README l.5 : sous-chemin d'étude périmé indépendamment du renommage (output/ → output/03-etudes/).</p></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>un critère de revue à dénominateur faux se vérifierait « tenu » sur un compte qui ne l'est pas — la famille de défauts que TF-0332 vient de solder</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (restes de la fenêtre C — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0329" data-forge="pilot" data-statut="candidat" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0329</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">Instruire l'admission de digit-ai-queue — le mécanisme de tickets demandé par TF-0318 existe sur le poste et le corpus l'ignore</h3>
-          <div class="card-detail"><p class="lead">Découverte de l'étude todo-produit : c:/dev/digit-ai-queue (git, 15 commits du 16/07, 5 tickets réels bouclés) porte déjà dossier écouté, cycle 4 états dont attente-input, claim=commit=lock, « un ticket peut restreindre les permissions, jamais les élargir », validation humaine finale, câblage PreToolUse débogué — git grep digit-ai-queue dans le pilot : AUCUN résultat.</p><ul class="puces"><li>À instruire au sens R-31/R-33 ter (scan oracle-scan-agentdef avant admission) : c'est la voie de la moitié ÉCRITURE refusée de TF-0318</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 4 × preuve 3 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>l'écosystème a instruit et refusé un mécanisme dont un exemplaire éprouvé dort à côté de lui — le trou est de connaissance, pas technique</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0360" data-forge="pilot" data-statut="candidat" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0360</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">Câbler orchestrer-boucle.mjs en appelant réel de forge-tests et forge-development (option O4, condition levée)</h3>
-          <div class="card-detail"><p class="lead">Second temps de l'arbitrage TF-0351 du 18/08, nommé ici pour être exigible plutôt que resté en intention dans un README.
-
-Ce qui est déjà fait : les tests de `outillage-tests-e2e\` sont joués par la recette du pilot (invariant I2 posé le 18/08 — 7/7 et 8/8, verts et joués par personne jusque-là), et la condition que l'étude 20260817 posait est LEVÉE : TF-0340/0341 sont clos le 18/08 (`forge_tests/instance.py` — contrat de montage/démontage déclaré par le projet, provenance de l'instance confrontée à l'arbre de travail auditée avec ses trois issues).</p><ul class="puces"><li>L'arbitrage rendu est CÂBLER, non retirer : l'outil sert une finalité désormais atteignable.
-
-Ce qui reste, et pourquoi ce n'est pas un geste de campagne : l'intégration réelle en appelant de forge-tests et forge-development — l'étude la chiffre à 3-5 jours sur TROIS dépôts (pilot, forge-tests, forge-development). Elle suppose de décider qui pilote la boucle de correction (le pilot orchestre, ou forge-tests porte la boucle et le pilot lit son rapport), et ce choix engage le contrat d'interface entre trois forges — exactement le genre d'arbitrage que R-29 laisse à l'humain et que TF-0155 fait instruire avant de décider.
-
-À instruire donc, pas à improviser. Deux points de vigilance relevés en posant I2 :</li><li>`orchestrer-boucle.mjs` ne câble aujourd'hui aucun appel réel — son README le déclare — donc le câblage est un développement, pas un branchement</li><li>la boucle de correction bornée existe déjà en doctrine côté pilot (≤ 5 cycles, G-2 absolue) et côté forge-tests dans les candidatures TF-0352/0353 : câbler sans les avoir traités ferait naître deux boucles concurrentes. L'ordre suggéré est donc TF-0352/0353 d'abord, ce câblage ensuite</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-18</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 4 ÷ effort 4)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>**oui** — l'outil est livré depuis le 13/08 pour la finalité exacte du mandat du 17/08 et l'étude a dû l'exhumer par `grep` plutôt que par le corpus ; tant qu'il n'a aucun appelant, chaque campagne qui a besoin de cette boucle la réécrit ou s'en passe, et la dette R-35 reste vivante dans le pilot</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (arbitrage TF-0351 du 18/08 — second temps nommé =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
         <article class="card s-corrige" id="item-TF-0327" data-forge="pilot" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0327</code>
@@ -793,6 +736,23 @@ Ce qui reste, et pourquoi ce n'est pas un geste de campagne : l'intégration ré
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur pilot</dt><dd>la vue courante du registre échoue à l'oracle du socle pendant que la vue d'archive née hier le passe — le patron neuf a déjà dépassé l'ancien</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 soir — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0358" data-forge="pilot" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0358</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Hygiène post-renommage : dossier local à renommer hors session, dénominateur « 14 frères » de l'étude, sous-chemin périmé websec</h3>
+          <div class="card-detail"><p class="lead">Trois restes de la fenêtre C : (1) le dossier local c:\dev\digit-ai-forge-pilot se renomme en digit-ai-factory À LA FERMETURE de la session vivante qui l'occupe (bootstrap résout par dirname — zéro casse mécanique mesurée, mais le CLAUDE.md annonce déjà le nom) ; (2) l'étude 20260817i écrit « 14 entrées » pour la liste FORGES du bootstrap qui en compte 13 (+ audit_client-a hors bootstrap) — corriger le dénominateur AVANT la revue du 24/08, sinon son critère n°3 se vérifie contre un compte faux (l'étude est un livrable daté : la correction se porte à la revue, pas dans le fichier) ; (3) websec README l.5 : sous-chemin d'étude périmé indépendamment du renommage (output/ → output/03-etudes/).</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>un critère de revue à dénominateur faux se vérifierait « tenu » sur un compte qui ne l'est pas — la famille de défauts que TF-0332 vient de solder</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (restes de la fenêtre C — constat =&gt; candidat)</dd></div>
             
           </dl>
         </article>
@@ -921,6 +881,23 @@ La famille est plus large que le catalogue : tout contrôle « vue générée ==
             
           </dl>
         </article>
+        <article class="card s-corrige" id="item-TF-0329" data-forge="pilot" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0329</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Instruire l'admission de digit-ai-queue — le mécanisme de tickets demandé par TF-0318 existe sur le poste et le corpus l'ignore</h3>
+          <div class="card-detail"><p class="lead">Découverte de l'étude todo-produit : c:/dev/digit-ai-queue (git, 15 commits du 16/07, 5 tickets réels bouclés) porte déjà dossier écouté, cycle 4 états dont attente-input, claim=commit=lock, « un ticket peut restreindre les permissions, jamais les élargir », validation humaine finale, câblage PreToolUse débogué — git grep digit-ai-queue dans le pilot : AUCUN résultat.</p><ul class="puces"><li>À instruire au sens R-31/R-33 ter (scan oracle-scan-agentdef avant admission) : c'est la voie de la moitié ÉCRITURE refusée de TF-0318</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-17</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 4 × preuve 3 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>l'écosystème a instruit et refusé un mécanisme dont un exemplaire éprouvé dort à côté de lui — le trou est de connaissance, pas technique</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
         <article class="card s-corrige" id="item-TF-0330" data-forge="pilot" data-statut="corrige" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0330</code>
@@ -1037,6 +1014,29 @@ La famille est plus large que le catalogue : tout contrôle « vue générée ==
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 2 × preuve 3 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur pilot</dt><dd>demande humaine directe — le coût évité est celui déjà payé par output\ avant D-15 : des documents pérennes introuvables dans des arborescences non conventionnées</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain — mandat direct du 17/08 (prompt réécrit L99, écarts validés poste par poste)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0360" data-forge="pilot" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0360</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Câbler orchestrer-boucle.mjs en appelant réel de forge-tests et forge-development (option O4, condition levée)</h3>
+          <div class="card-detail"><p class="lead">Second temps de l'arbitrage TF-0351 du 18/08, nommé ici pour être exigible plutôt que resté en intention dans un README.
+
+Ce qui est déjà fait : les tests de `outillage-tests-e2e\` sont joués par la recette du pilot (invariant I2 posé le 18/08 — 7/7 et 8/8, verts et joués par personne jusque-là), et la condition que l'étude 20260817 posait est LEVÉE : TF-0340/0341 sont clos le 18/08 (`forge_tests/instance.py` — contrat de montage/démontage déclaré par le projet, provenance de l'instance confrontée à l'arbre de travail auditée avec ses trois issues).</p><ul class="puces"><li>L'arbitrage rendu est CÂBLER, non retirer : l'outil sert une finalité désormais atteignable.
+
+Ce qui reste, et pourquoi ce n'est pas un geste de campagne : l'intégration réelle en appelant de forge-tests et forge-development — l'étude la chiffre à 3-5 jours sur TROIS dépôts (pilot, forge-tests, forge-development). Elle suppose de décider qui pilote la boucle de correction (le pilot orchestre, ou forge-tests porte la boucle et le pilot lit son rapport), et ce choix engage le contrat d'interface entre trois forges — exactement le genre d'arbitrage que R-29 laisse à l'humain et que TF-0155 fait instruire avant de décider.
+
+À instruire donc, pas à improviser. Deux points de vigilance relevés en posant I2 :</li><li>`orchestrer-boucle.mjs` ne câble aujourd'hui aucun appel réel — son README le déclare — donc le câblage est un développement, pas un branchement</li><li>la boucle de correction bornée existe déjà en doctrine côté pilot (≤ 5 cycles, G-2 absolue) et côté forge-tests dans les candidatures TF-0352/0353 : câbler sans les avoir traités ferait naître deux boucles concurrentes. L'ordre suggéré est donc TF-0352/0353 d'abord, ce câblage ensuite</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-18</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 4 ÷ effort 4)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>**oui** — l'outil est livré depuis le 13/08 pour la finalité exacte du mandat du 17/08 et l'étude a dû l'exhumer par `grep` plutôt que par le corpus ; tant qu'il n'a aucun appelant, chaque campagne qui a besoin de cette boucle la réécrit ou s'en passe, et la dette R-35 reste vivante dans le pilot</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (arbitrage TF-0351 du 18/08 — second temps nommé =&gt; candidat)</dd></div>
             
           </dl>
         </article>
