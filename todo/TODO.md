@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=c0a5a68f2ab0 archive=9f205b231527 · dernier événement: 2026-08-18T15:00:00Z -->
+     sceaux: actifs=bc68130c33fb archive=9f205b231527 · dernier événement: 2026-08-18T15:20:00Z -->
 
-**61 actifs** (candidat 7 · décidé 0 · en cours 0 · corrigé 53 · écarté 1) · **308 archivés**.
+**61 actifs** (candidat 5 · décidé 0 · en cours 0 · corrigé 55 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -38,12 +38,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0321 | corrige | 4.5 | forge-design juge le mouvement mais ne le prescrit jamais — ni token de durée, ni règle d'animation dans la marque et la maquette | **oui** — relevé exécuté le 16/08 sur digit-ai-forge-design : 7 règles de mouvement exécutées et câblées, 0 token de mouvement dans la marque, 0 section mouvement dans DESIGN.md, contrôle reduced-motion en avertissement — la maquette est jugée sur des valeurs jamais prescrites |
 | TF-0335 | corrige | 4 | forge-design, mise en cohérence post-TF-0321 : registre, fixtures R10, démos, self-test du générateur | **oui** — une autorité de mouvement à deux têtes potentielles et des démos qui contredisent l'oracle — le bruit de fond que TF-0228 a appris à éteindre |
 
-## digit-ai-forge-development
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0363 | candidat | 4 | forge-development n'a aucun point d'entrée pour une ACTION unitaire — la boucle de correction ne peut router qu'un run de remédiation sur le produit entier | **oui** — le câblage écrit le matin du 18/08 INVENTAIT un `conductor --action <ref>` qui n'existe pas — l'écart de granularité est assez peu visible pour qu'on fabrique l'interface manquante sans s'en apercevoir, et le test qui l'a rattrapé n'existait pas non plus |
-
 ## digit-ai-forge-tests
 
 | id | statut | score | titre | payé en réel |
@@ -70,7 +64,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0364 | candidat | 3 | Aucun canal pour la REMISE d'un artefact manquant — l'archive de pilote-de-mission est arrivée à plat dans input/, sans sidecar ni nommage | **oui** — un artefact réclamé par le registre est arrivé dans un dossier qu'aucun oracle ne regarde et qu'aucune convention ne décrit ; le lien entre la remise et l'item qui la réclamait n'existe que dans une conversation |
 | TF-0327 | corrige | 12 | RV-9 n'est pas refermé : la fixture témoin de la bascule sombre démontre ENCORE le comportement interdit | **oui** — deux livrables du même socle peuvent encore s'ouvrir différemment sur le même poste — le symptôme exact que RV-9 prétendait avoir soldé |
 | TF-0328 | corrige | 8 | appliquer-export.mjs est orphelin et TODO-FORGE.md prescrit un dispositif retiré le 12/08 | **oui** — un item de registre entier (TF-0318) a été instruit sur une prémisse que la doc du pilot affirmait et que le code démentait |
 | TF-0332 | corrige | 8 | Solder la dette de traçabilité D-14 : trois affirmations de conformité fausses au corpus | **oui** — deux études du même après-midi ont buté sur des déclarations de conformité fausses — le coût de recherche se paie à chaque instruction |
@@ -88,10 +81,12 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0339 | corrige | 4 | L'output du pilot est en écart D-15 : deux familles en collision de numéro et un LISEZMOI incomplet | **oui** — le propre output du gardien de la convention la viole — chaque étude qui le cite en coût d'O0 le re-paiera jusqu'à correction |
 | TF-0349 | corrige | 4 | output\ : famille XX-tests, et la voie « proposition de tests » est FERMÉE — tout test proposé est mis en œuvre de bout en bout, sous les bornes existantes | **oui** — demande humaine directe — une proposition de tests non exécutée est un contrôle jamais joué (R-35) livré au client comme s'il protégeait |
 | TF-0351 | corrige | 4 | orchestrer-boucle.mjs (13/08) n'a AUCUN appelant — dette R-35 vivante dans le pilot, câblage conditionné à TF-0340/0341 | **oui** — un outil livré il y a 4 jours pour la finalité exacte du mandat du jour était introuvable par lui — l'étude l'a exhumé par grep, pas par le corpus |
+| TF-0363 | corrige | 4 | forge-development n'a aucun point d'entrée pour une ACTION unitaire — la boucle de correction ne peut router qu'un run de remédiation sur le produit entier | **oui** — le câblage écrit le matin du 18/08 INVENTAIT un `conductor --action <ref>` qui n'existe pas — l'écart de granularité est assez peu visible pour qu'on fabrique l'interface manquante sans s'en apercevoir, et le test qui l'a rattrapé n'existait pas non plus |
 | TF-0305 | corrige | 3 | oracle-skills : K7 ne vérifie pas qu'une commande câblée pointe un fichier qui EXISTE | **oui** — un câblage vers un chemin mort donne exactement la même assurance qu'un gate câblé, sans en avoir aucune propriété |
 | TF-0338 | corrige | 3 | Fraîcheur d'ARCHITECTURE.html et MODELE-DONNEES.html non jugée — étendre le sceau sha256 de TODO-PRODUIT, avec mesure préalable | **oui** — une vue générée qui ment est pire qu'une vue absente : elle porte l'autorité du généré sans sa fraîcheur |
 | TF-0347 | corrige | 3 | docs\ : sous-dossiers thématiques numérotés (01-, 02-…) — docs\projet\ reste INTACT (noms fixes R-20) | **oui** — demande humaine directe — le coût évité est celui déjà payé par output\ avant D-15 : des documents pérennes introuvables dans des arborescences non conventionnées |
 | TF-0360 | corrige | 3 | Câbler orchestrer-boucle.mjs en appelant réel de forge-tests et forge-development (option O4, condition levée) | **oui** — **oui** — l'outil est livré depuis le 13/08 pour la finalité exacte du mandat du 17/08 et l'étude a dû l'exhumer par `grep` plutôt que par le corpus ; tant qu'il n'a aucun appelant, chaque campagne qui a besoin de cette boucle la réécrit ou s'en passe, et la dette R-35 reste vivante dans le pilot |
+| TF-0364 | corrige | 3 | Aucun canal pour la REMISE d'un artefact manquant — l'archive de pilote-de-mission est arrivée à plat dans input/, sans sidecar ni nommage | **oui** — un artefact réclamé par le registre est arrivé dans un dossier qu'aucun oracle ne regarde et qu'aucune convention ne décrit ; le lien entre la remise et l'item qui la réclamait n'existe que dans une conversation |
 | TF-0318 | corrige | 2.7 | Chaque projet porte SA todo en page HTML — décisions attendues, champs de saisie, et un bouton qui envoie en implémentation | non |
 | TF-0357 | corrige | 2 | Oracles du pilot : deux vocabulaires pour l'exit 2 — SKIP (insatisfactions, boite-entree) vs SANS_OBJET (conformite, adoption) | **oui** — quatre oracles nés en trois jours ont déjà bifurqué en deux dialectes — le cinquième choisira au hasard |
 | TF-0317 | corrige | 1 | Renommer le pilot en « factory » — nom cohérent avec ce qu'il fait (mobiliser les forges) et avec sa présentation | non |
