@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=db08a8414a7e archive=9f205b231527 · dernier événement: 2026-08-19T18:04:04.011Z -->
+     sceaux: actifs=6b44c7857b10 archive=9f205b231527 · dernier événement: 2026-08-19T18:08:50Z -->
 
-**87 actifs** (candidat 6 · décidé 0 · en cours 1 · corrigé 79 · écarté 1) · **308 archivés**.
+**87 actifs** (candidat 2 · décidé 0 · en cours 1 · corrigé 83 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -36,7 +36,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0392 | candidat | 6 | forge-audit : `npm test` répond « no test specified » alors que la CI joue les vraies preuves — point d'entrée de preuve trompeur | **oui** — vécu en revue le 19/08 : la revue elle-même a d'abord conclu « suite absente » avant d'aller lire ci.yml — chaque futur opérateur paiera la même détour, ou pire, s'arrêtera au faux constat |
+| TF-0392 | corrige | 6 | forge-audit : `npm test` répond « no test specified » alors que la CI joue les vraies preuves — point d'entrée de preuve trompeur | **oui** — vécu en revue le 19/08 : la revue elle-même a d'abord conclu « suite absente » avant d'aller lire ci.yml — chaque futur opérateur paiera la même détour, ou pire, s'arrêtera au faux constat |
 
 ## digit-ai-forge-conception
 
@@ -58,7 +58,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0393 | candidat | 12 | forge-design : 3 baselines de régression visuelle non versionnées — le verrou TF-0102 ne survit pas à un clone pour 3 produits réels | **oui** — constaté sur pièces le 19/08 : 3 produits réels dont la référence visuelle n'existe que sur un poste — toute régression visuelle sur ces produits passerait un clone sans être vue, ce qui est exactement ce que TF-0102 a payé pour empêcher |
+| TF-0393 | corrige | 12 | forge-design : 3 baselines de régression visuelle non versionnées — le verrou TF-0102 ne survit pas à un clone pour 3 produits réels | **oui** — constaté sur pièces le 19/08 : 3 produits réels dont la référence visuelle n'existe que sur un poste — toute régression visuelle sur ces produits passerait un clone sans être vue, ce qui est exactement ce que TF-0102 a payé pour empêcher |
 | TF-0361 | corrige | 8 | forge-design : la maquette de démo n'a ni bouton de bascule ni persistance de thème — oracle-bascule FAIL, pré-existant | **oui** — la maquette qui sert de vitrine au socle échoue à un oracle du même socle, et elle l'échoue depuis assez longtemps pour que personne ne le sache — le rejeu sur la version antérieure donne le même FAIL |
 | TF-0321 | corrige | 4.5 | forge-design juge le mouvement mais ne le prescrit jamais — ni token de durée, ni règle d'animation dans la marque et la maquette | **oui** — relevé exécuté le 16/08 sur digit-ai-forge-design : 7 règles de mouvement exécutées et câblées, 0 token de mouvement dans la marque, 0 section mouvement dans DESIGN.md, contrôle reduced-motion en avertissement — la maquette est jugée sur des valeurs jamais prescrites |
 | TF-0335 | corrige | 4 | forge-design, mise en cohérence post-TF-0321 : registre, fixtures R10, démos, self-test du générateur | **oui** — une autorité de mouvement à deux têtes potentielles et des démos qui contredisent l'oracle — le bruit de fond que TF-0228 a appris à éteindre |
@@ -109,13 +109,12 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0391 | candidat | 8 | Reconstat : la dérive versionné↔installé des skills revit à grande échelle — oracle-skills K2 FAIL sur 10 skills/17, et personne ne l'exécute en cadence | **oui** — mesuré par exécution le 19/08 : 10 skills/17 divergent — ce qui s'exécute au poste n'est plus ce que les dépôts versionnent, sur les verbes du pipeline eux-mêmes (qualifier, énumérer, rédiger, dériver) ; le coût a déjà été payé une fois (item archivé), le re-payer prouve que la fermeture précédente n'a pas fermé le mécanisme |
-| TF-0394 | candidat | 6 | Registre TF : deux sessions pilot parallèles frappent les mêmes ids depuis la même base — l'écrivain unique n'est unique que par session | **oui** — payé le 19/08 : une résolution de fusion manuelle sur le fichier le plus critique du pilot (append-only), 14 lignes renumérotées à la main, et un commit publié (digit-ai-forge-conception@cab6654) qui cite pour toujours des ids devenus autres — la prochaine collision touchera peut-être des clôtures croisées, plus chères qu'une renumérotation |
 | TF-0327 | corrige | 12 | RV-9 n'est pas refermé : la fixture témoin de la bascule sombre démontre ENCORE le comportement interdit | **oui** — deux livrables du même socle peuvent encore s'ouvrir différemment sur le même poste — le symptôme exact que RV-9 prétendait avoir soldé |
 | TF-0328 | corrige | 8 | appliquer-export.mjs est orphelin et TODO-FORGE.md prescrit un dispositif retiré le 12/08 | **oui** — un item de registre entier (TF-0318) a été instruit sur une prémisse que la doc du pilot affirmait et que le code démentait |
 | TF-0332 | corrige | 8 | Solder la dette de traçabilité D-14 : trois affirmations de conformité fausses au corpus | **oui** — deux études du même après-midi ont buté sur des déclarations de conformité fausses — le coût de recherche se paie à chaque instruction |
 | TF-0356 | corrige | 8 | generer-page.mjs : TODO.html échoue L11 — esc() au lieu d'escLit() sur les titres (« None » non traité) | **oui** — la vue courante du registre échoue à l'oracle du socle pendant que la vue d'archive née hier le passe — le patron neuf a déjà dépassé l'ancien |
 | TF-0358 | corrige | 8 | Hygiène post-renommage : dossier local à renommer hors session, dénominateur « 14 frères » de l'étude, sous-chemin périmé websec | **oui** — un critère de revue à dénominateur faux se vérifierait « tenu » sur un compte qui ne l'est pas — la famille de défauts que TF-0332 vient de solder |
+| TF-0391 | corrige | 8 | Reconstat : la dérive versionné↔installé des skills revit à grande échelle — oracle-skills K2 FAIL sur 10 skills/17, et personne ne l'exécute en cadence | **oui** — mesuré par exécution le 19/08 : 10 skills/17 divergent — ce qui s'exécute au poste n'est plus ce que les dépôts versionnent, sur les verbes du pipeline eux-mêmes (qualifier, énumérer, rédiger, dériver) ; le coût a déjà été payé une fois (item archivé), le re-payer prouve que la fermeture précédente n'a pas fermé le mécanisme |
 | TF-0331 | corrige | 6 | Le marquage destinataire: humain doit naître dans les gabarits — sans porteurs, R-2/E9 est un faux négatif volontaire | **oui** — la règle est livrée et prouvée à zéro faux positif, mais elle ne verra rien tant qu'aucun document ne naît marqué |
 | TF-0337 | corrige | 6 | oracle-skills : le conseil de réparation de K7 propose une commande RELATIVE — reportée telle quelle, elle ne résoudrait rien | **oui** — l'humain qui suit le conseil au pied de la lettre câblerait un hook que K8 déclarerait aussitôt mort |
 | TF-0348 | corrige | 6 | output\ : les documents d'un audit vivent dans une famille XX-audit — nom de famille au registre organization, numéro local stable | **oui** — demande humaine directe — sans nom de famille conventionné, XX-audit sera 03- ici et 07- là et la recherche inter-produits redevient manuelle |
@@ -123,6 +122,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0367 | corrige | 6 | le renommage du depot pilot casse en silence les chemins ecrits dans les CLAUDE.md consommateurs | **oui** — 3 appels d'outil pour retrouver le depot : listage de C:\dev, inspection de digit-ai-forge-pilot_old, puis verification par git log que digit-ai-factory etait bien le depot courant (commit du 18/08 contre 17/08 pour _old). |
 | TF-0373 | corrige | 6 | factory : l ouverture de run ne demande jamais ce que le client sait deja de ses defauts — une campagne peut se clore « au vert » a cote d un lot d anomalies ouvertes | **oui** — six campagnes d audit ouvertes sans qu aucune ne demande la liste des defauts deja connus du client ; 13 anomalies ouvertes depuis le 29/07 restees hors de toute mesure et hors de tout livrable |
 | TF-0390 | corrige | 6 | forge-seo renommée forge-seo-geo : le nom dit les deux périmètres (SEO + GEO) que la grille couvrait déjà | **oui** — constaté sur pièces le 19/08 : la grille porte 6 nœuds GEO (53-58) et le routage de veille disait déjà « SEO/GEO » — un nom qui ne dit que la moitié du périmètre fait rater le routage d'une demande GEO entrante et sous-vend la capacité en contexte commercial |
+| TF-0394 | corrige | 6 | Registre TF : deux sessions pilot parallèles frappent les mêmes ids depuis la même base — l'écrivain unique n'est unique que par session | **oui** — payé le 19/08 : une résolution de fusion manuelle sur le fichier le plus critique du pilot (append-only), 14 lignes renumérotées à la main, et un commit publié (digit-ai-forge-conception@cab6654) qui cite pour toujours des ids devenus autres — la prochaine collision touchera peut-être des clôtures croisées, plus chères qu'une renumérotation |
 | TF-0319 | corrige | 4.5 | Tout document destiné à l'utilisateur d'une forge se range dans output\ — jamais dans une arborescence de forge à parcourir | **oui** — constat d'usage humain : les documents qui lui sont destinés vivent dans des arborescences de forge complexes ou imbriquées, qu'il doit parcourir pour les retrouver |
 | TF-0350 | corrige | 4.5 | Une page HTML des TODO archivés — retrouver et chercher dans les 300+ items clos | **oui** — demande humaine directe — 320 items archivés ne sont aujourd'hui interrogeables que par grep, un canal illisible pour l'humain qui décide |
 | TF-0320 | corrige | 4 | Un produit qui met ses forges à jour n'apprend rien des règles nouvelles ou modifiées — la mise à jour transporte le code, pas la consigne | non |
