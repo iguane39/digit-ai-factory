@@ -108,6 +108,17 @@ elle s'écrit EN FICHIER (`output\04-plans\` ou dossier de campagne), passe
 verdict — jamais un message improvisé. Côté agent : ton rapport final porte au minimum
 l'en-tête horodaté, le verdict factuel en une ligne, le traité AVEC preuves, le non-traité
 AVEC motifs, et les écarts à la lettre (forme dégradée admise, structure jamais).
+## Gate de propagation des skills (TF-0391, revue du 19/08)
+
+Toute campagne ou session qui MODIFIE un skill VERSIONNÉ (dans un dépôt de forge)
+termine par `node oracles\oracle-skills.mjs` rejoué. Un FAIL K2 sur un skill touché par
+la campagne se règle DANS la même session : `--appliquer` (copie source → installé) sur
+décision humaine explicite — jamais silencieusement, jamais reporté. Motif : la dérive
+versionné↔installé a été payée DEUX fois (item archivé « 9 skills sur 20 », puis
+reconstat du 19/08 : 10/17 — dont 2 dérives créées le jour même par une session
+disciplinée, preuve que sans gate le trou est mécanique). Un skill modifié côté forge et
+non propagé fait mentir le poste : ce qui s'exécute n'est plus ce qui est versionné.
+
 ## Avancement des campagnes longues (TF-0252 — convention TF-0094)
 
 Tout agent dont la campagne peut dépasser ~2 minutes ÉMET son avancement vers la

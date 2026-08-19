@@ -1751,3 +1751,18 @@ bootstrap, oracle nœud 58, MODE-VEILLE, gabarits web, fiche renommée), **alias
 Faits d'époque intacts : registre, études, D-08/D-09, archives de la forge
 (`prompts/PHASE-A`, sidecars d'oracles, snapshot d'audit du 08/08). Forge commitée
 (`digit-ai-forge-seo-geo@55f76c8`), TF-0390 clos au registre.
+
+## 19/08/2026 (nuit) — les 4 constats de la revue mis en œuvre le jour même (TF-0391..0394 clos)
+
+GO humain « a puis b puis mets en œuvre ». **TF-0391** : propagation `--appliquer`
+exécutée (K2 : FAIL 10/17 → **PASS 8/8**) + gate encodé à `AGENT-CAMPAGNE.md` — toute
+campagne qui touche un skill versionné rejoue oracle-skills et propage dans la même
+session, sur décision humaine. **TF-0392** : `npm test` de forge-audit câblé sur les
+preuves réelles (`digit-ai-forge-audit@2550e17`, exit 0 rejoué). **TF-0393** : les 3
+baselines orphelines versionnées (`digit-ai-forge-design@096b5fa`, réserve déclarée :
+validation visuelle du propriétaire restante). **TF-0394** : préflight anti-collision
+dans `ingerer-lot.mjs` (fetch + refus motivé si le registre distant a avancé,
+`--sans-fetch` assumé) — prouvé 3 sens sur dépôts git éphémères par
+`preflight-collision.test.mjs`, harnais du pilot **18/18** (I2 l'a découvert seul).
+Limite déclarée : deux sessions simultanées non poussées restent une course possible —
+le cas réellement payé le 19/08 est, lui, fermé.
