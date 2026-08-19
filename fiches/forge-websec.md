@@ -1,7 +1,7 @@
 # Fiche d audit — forge-websec
 
 Baseline d audit par forge (TF-0054) : cette fiche remplace la relecture de la baseline
-commune par agent d audit. MISE À JOUR à chaque audit — dernière mise à jour : 2026-08-12
+commune par agent d audit. MISE À JOUR à chaque audit — dernière mise à jour : 2026-08-19
 (création, TF-0123 — étude d opportunité du 12/08, verdict forge dédiée, modèle forge-seo).
 
 ### forge-websec — self-test 23/23, née exercée avec sens rouge sur vraies CVE (12/08)
@@ -19,3 +19,10 @@ non curés listés explicitement. Faiblesses / dettes : pas de DAST en v0 (ZAP c
 osv-scanner non enveloppé (absent du poste) ; sonde de chemins exposés (.git) en v1 ;
 récurrence différentielle post-MEP documentée mais jamais exercée sur produit réel —
 premier mandat à consigner ici.
+
+### Annotation — revue écosystème 20260819 (preuves rejouées le 19/08)
+
+Preuve rejouée : self-test → **34 PASS, 0 FAIL, 2 SKIP motivés** (outillage/réseau du
+poste — déclarés, non comptés). Depuis la fiche : D-W1 close (branche DAST réellement
+exécutée, TF-0206), méthode WSTG curée (TF-0186/0187), chemin d'étude du README réparé
+(TF-0358). Aucun constat nouveau.

@@ -1,7 +1,7 @@
 # Fiche d audit — forge-observability
 
 Baseline d audit par forge (TF-0054) : cette fiche remplace la relecture de la baseline
-commune par agent d audit. MISE À JOUR à chaque audit — dernière mise à jour : 2026-08-12
+commune par agent d audit. MISE À JOUR à chaque audit — dernière mise à jour : 2026-08-19
 (création, TF-0112 — décision humaine : forge unique, trois volets sur un socle commun).
 
 ### forge-observability — self-test 30/30, née exercée sur fixtures synthétiques (12/08)
@@ -19,3 +19,10 @@ de sonde bloquante, intégrité du ledger) · volet data et volet tests prouvés
 sondes par nom (renommage = disparition+apparition) ; chemins d oracles externes paramétrés
 mais composition jamais exercée sur un oracle réel de forge-data — premier plan réel à
 consigner ici.
+
+### Annotation — revue écosystème 20260819 (preuves rejouées le 19/08)
+
+Preuve rejouée : self-test → **30 PASS, 0 FAIL**. 7 commits depuis le 08/08 dont 5
+mécaniques (catalogue, renommage) : la forge la moins exercée de l'écosystème — « Veille
+citation IA » reste déclarée, aucun run réel au delta. Aucun constat nouveau (l'état est
+celui de la fiche, simplement plus vieux).
