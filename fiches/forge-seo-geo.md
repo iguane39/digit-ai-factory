@@ -1,4 +1,4 @@
-# Fiche d audit — forge-seo
+# Fiche d audit — forge-seo-geo (ex forge-seo, renommée le 19/08/2026 — le volet GEO, nœuds 53-58, entre au nom)
 
 Baseline d audit par forge (TF-0054) : cette fiche remplace la relecture des ~32 Ko de
 baseline commune (INVENTAIRE + BOUCLE) par agent d audit. Elle est MISE À JOUR à chaque

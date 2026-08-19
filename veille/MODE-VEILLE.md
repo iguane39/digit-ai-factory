@@ -30,7 +30,7 @@ Ce document est le **how**. Les études archivées vivent dans `veille/AAAAMMJJ-
 > 3. **Extraction & routage.** Liste les idées/patterns **distincts et actionnables**. Pour
 >    chacune, désigne la **forge impactée** selon sa nature : design/tokens/anti-slop →
 >    `digit-ai-forge-design` ; page/composant/charte HTML → skill `digit-ai-page-html` ; agents/
->    skills/hooks/workflow → `forge-agents` / `forge-development` ; SEO/GEO → `forge-seo`. Une
+>    skills/hooks/workflow → `forge-agents` / `forge-development` ; SEO/GEO → `forge-seo-geo`. Une
 >    idée sans forge claire = « hors périmètre ».
 > 4. **Fiabilité chiffrée.** Attribue à chaque idée une **confiance ∈ [0,1]** (source AI-générée
 >    ou affiliée → basse) et un verdict `retenu` / `à évaluer` / `écarté`. Rejette le générique

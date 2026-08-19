@@ -4,7 +4,7 @@
 > docs/projet/FONCTIONNEL.md, jamais une autre formulation (une seule vérité).}
 
 Fichier llms.txt — adopté par décision humaine du 11/08/2026 (R-27, nœud 58 de la
-grille forge-seo) : la carte du site pour les agents des moteurs génératifs.
+grille forge-seo-geo) : la carte du site pour les agents des moteurs génératifs.
 Tenu par l'étape development/MEP, cohérent avec le sitemap — un lien mort ici est
 un défaut au même titre qu'un lien mort du sitemap.
 

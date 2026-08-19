@@ -2,7 +2,7 @@
 #
 # POSTURE PAR DÉFAUT : les agents des moteurs génératifs sont AUTORISÉS — un site
 # invisible des réponses IA perd la surface de découverte qui monte (nœud 58 de la
-# grille forge-seo). Bloquer un agent est un CHOIX légitime, mais c'est une DÉCISION :
+# grille forge-seo-geo). Bloquer un agent est un CHOIX légitime, mais c'est une DÉCISION :
 # elle se consigne ICI MÊME, datée et motivée, en commentaire au-dessus de sa règle —
 # jamais un réglage anti-bot par défaut.
 #
