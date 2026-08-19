@@ -1,11 +1,17 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=fc806acfa8d5 archive=9f205b231527 · dernier événement: 2026-08-19T11:35:00Z -->
+     sceaux: actifs=217e993466ff archive=9f205b231527 · dernier événement: 2026-08-19T14:00:00Z -->
 
-**77 actifs** (candidat 1 · décidé 0 · en cours 1 · corrigé 74 · écarté 1) · **308 archivés**.
+**78 actifs** (candidat 2 · décidé 0 · en cours 1 · corrigé 74 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
+
+## digit-ai-factory
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0385 | candidat | 9 | noyau + forge-agents : l'événement `oracles_verdict` n'a AUCUNE forme canonique — six formes de champs pour huit entrées d'un même ledger, donc aucun calcul possible de ce qui a tourné | **oui** — six formes de champs pour huit entrées du même type dans le même fichier, mesurées le 19/08 ; aucun calcul machine possible de ce qui a tourné sur un run ; et le vérificateur de ledger ne lit aucun payload, donc ne pouvait pas le voir. 57 oracles sur 76 (75 %) ne sont derrière aucun mécanisme qui constaterait leur absence |
 
 ## digit-ai-forge-agents
 
