@@ -1700,3 +1700,39 @@ attrapé en chemin une vraie dérive d'INVENTAIRE, 9 → 11) · clôture TF-0346
 l'inverse exact de TF-0062, et c'était le but : un renommage qui se prouve au lieu de
 s'affirmer. Restes datés : dossier local à renommer hors session vivante, dénominateur
 « 14 frères » de l'étude à corriger à la revue du 24/08 (TF-0358).
+## 19/08/2026 — trois études d'opportunité exécutées, trois GO : rétro-modèle, vues par profil, run de conseil
+
+Mandat humain du 19/08 (prompt réécrit L99, validé « vas » puis « fais les 3 ») : instruire
+rétro-engineering, rétro-documentation et « forge-consulting ». **Trois études au gabarit
+TF-0155, trois PASS oracle 7/7 en première passe** (`output\03-etudes\20260819-*.md`), et un
+résultat commun : **aucune 14e forge** — le nom « forge-consulting » n'a pas survécu à
+l'instruction (>80 % de délégation vers l'existant, preuve 1, profil type des projets
+agentiques annulés).
+
+**Construit sur les trois GO (TF-0388/0389/0386, décidés le 19/08)** :
+
+*Note de renumérotation (collision de sessions, 19/08 soir)* : deux sessions pilot ont
+frappé des ids en parallèle depuis la même base `fabf0cd` — celle-ci avait frappé
+TF-0384/0385 (rétro-modèle, vues) et TF-0383 (lot 20260818a), l'autre a publié d'abord
+TF-0383/0384/0385 (i18n, collecteur de dette, oracles_verdict). À la fusion, les ids de
+CETTE session ont été renumérotés : **TF-0383→0387, TF-0384→0388, TF-0385→0389** ;
+TF-0386 (run conseil) inchangé. Le commit `digit-ai-forge-conception@cab6654`, poussé
+avant la fusion, cite les anciens numéros dans son message — la correspondance fait foi
+ici et au registre.
+
+**A — rétro-modèle** (forge-conception) : mode « modèle complet » du verbe 1 —
+`references\retro-modele.md` + gabarit, `oracle-retro-modele.mjs` (RM1-RM5 : 8 sections,
+ancre par affirmation, confrontation ≥ 5 rejouée, hors-de-portée non vide, lecture seule
+déclarée), fixtures double sens. **B — vues par profil** (forge-conception) : 2e famille de
+vues de `derive-les-vues` — jeu fermé po/csm/utilisateur, scellées SHA-256 (péremption),
+ancres `[RM-xxx]` résolues, `oracle-vues-profil.mjs` (VP1-VP4), fixtures double sens.
+Self-test conception rejoué : **10 oracles, 42 règles, VERT**. **C — run de conseil**
+(pilot) : 4e voie d'exécution `references\RUN-CONSEIL.md` (C1→C5, l'existant orchestré,
+chaque lot GO sort comme entrant de build), gabarits `DIAGNOSTIC-EXPLOITATION.md` et
+`DEMARCHE-ROI.md`, `oracle-livrable-conseil.mjs` (LC1-LC5, self-test 4/4 : diag et ROI,
+double sens), routage « conseil » ajouté à ACCUEIL.
+
+Catalogue v1.7.0 : cat-con-08 et cat-con-09, vues régénérées, `--check` PASS. Registre :
+oracle-todo PASS. Restes datés : premier run réel de chacun des trois verbes à consigner
+(plans de revue 2026-09-19 et 2026-10-01 — clause de retrait du run de conseil si aucune
+mission réelle) ; clôture `corrige` des trois TF au commit.
