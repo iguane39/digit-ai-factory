@@ -1,11 +1,17 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=45d2a757a9a8 archive=9f205b231527 · dernier événement: 2026-08-19T16:00:00Z -->
+     sceaux: actifs=5c555ea07bd8 archive=9f205b231527 · dernier événement: 2026-08-19T17:25:15Z -->
 
-**78 actifs** (candidat 1 · décidé 0 · en cours 1 · corrigé 75 · écarté 1) · **308 archivés**.
+**82 actifs** (candidat 2 · décidé 0 · en cours 1 · corrigé 78 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
+
+## conception
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0387 | candidat | 9 | conception : oracle-ears détecte ses déclencheurs sans frontière de mot — « ressource » réveille le détecteur d'authentification | **oui** — 1 exigence reformulée pour contourner un faux positif ; tout référentiel employant le mot « ressource » déclenchera EA5 à tort |
 
 ## digit-ai-forge-agents
 
@@ -32,6 +38,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-0376 | corrige | 4.5 | conception : deux sujets d exigences manquent systematiquement — propagation d etat asynchrone et cycle de vie de session — et ils concentrent les anomalies les plus couteuses | **oui** — 5 des 12 lacunes de specification du cahier Approval tiennent a ces deux seuls sujets, dont la rubrique 20 qualifiee « bug critique » par la recette et la perte de brouillon a l expiration de session (rubriques 27, 28) |
 | TF-0374 | corrige | 3 | conception : un retour d usage (lot d anomalies de recette) n entre dans AUCUNE des cinq categories d entrant, et aucun chemin ne le traite | **oui** — traitement integralement manuel du 18/08 : 1271 lignes x 16 sections croisees sans aucun oracle jouable, 49 rubriques classees, 9 contradictions et 3 regressions trouvees a la main, dont backend/tests/test_decision_lock.py:26 qui echouera des l implementation de la rubrique 35 |
+| TF-0388 | corrige | 2.7 | Service « rétro-modèle » : reconstruire un modèle vérifiable (fonctionnel + technique + paramétrage + data + services) d'un projet existant, par extension de qualifie-l-entrant | **oui** — aucun incident consigné (insatisfactions\REGISTRE.jsonl : 0 occurrence rétro, grep 19/08) — la preuve est la demande humaine directe plus le trou constaté sur pièces : un projet tiers dont on veut la compréhension SANS lancer une conception n'a aucun point d'entrée dans l'écosystème, et chaque reprise réelle improviserait l'acquisition sans régime de preuve |
+| TF-0389 | corrige | 2 | Couche « vues par profil » : décliner le rétro-modèle en documentations par audience (PO, PM, commercial, CSM, utilisateur…), avec oracle de fidélité au modèle | **oui** — constaté sur pièces le 19/08 : 8 audiences sur 10 sans vue, sans gabarit, sans oracle — toute documentation non-développeur s'écrit aujourd'hui à la main, sans source unique ni régime de preuve, et diverge du produit à sa première évolution |
 
 ## digit-ai-forge-data
 
@@ -121,6 +129,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0364 | corrige | 3 | Aucun canal pour la REMISE d'un artefact manquant — l'archive de pilote-de-mission est arrivée à plat dans input/, sans sidecar ni nommage | **oui** — un artefact réclamé par le registre est arrivé dans un dossier qu'aucun oracle ne regarde et qu'aucune convention ne décrit ; le lien entre la remise et l'item qui la réclamait n'existe que dans une conversation |
 | TF-0318 | corrige | 2.7 | Chaque projet porte SA todo en page HTML — décisions attendues, champs de saisie, et un bouton qui envoie en implémentation | non |
 | TF-0357 | corrige | 2 | Oracles du pilot : deux vocabulaires pour l'exit 2 — SKIP (insatisfactions, boite-entree) vs SANS_OBJET (conformite, adoption) | **oui** — quatre oracles nés en trois jours ont déjà bifurqué en deux dialectes — le cinquième choisira au hasard |
+| TF-0386 | corrige | 1.5 | Run type « conseil » au pilot : orchestrer une mission de conseil (diagnostic → recommandation → lotissement/ROI → remise aux forges) avec l'existant — aucune nouvelle forge | **oui** — aucune facture payée : 0 candidat et 0 insatisfaction « conseil » aux registres (grep 19/08) — le coût instruit est prospectif : une demande de conseil arrivant à l'accueil aujourd'hui n'a aucune situation de routage et serait improvisée, en contradiction avec la règle « N'improvise pas » du README ; preuve 1 assumée et affichée, clause de retrait au plan de revue |
 | TF-0317 | corrige | 1 | Renommer le pilot en « factory » — nom cohérent avec ce qu'il fait (mobiliser les forges) et avec sa présentation | non |
 | TF-0346 | corrige | 1 | Renommer le pilot en digit-ai-factory — RÉOUVERTURE de TF-0317, décision humaine assumée contre le verdict O2 du 20260817h | **oui** — décision humaine d'identité — le coût du statu quo reste non mesuré (étude 20260817h), l'humain paie le renommage en connaissance de cause |
 | TF-0322 | ecarte | 2.3 | Les conventions de la forge sont gravées, pas paramétrables — l'utilisateur final subit dossiers, nommage, formats de date et de version | **oui** — TF-0165 (13/08) : nommage exigé par un entrant inconciliable avec R-4, aucune règle pour trancher — arbitrage pris en session et consigné au ledger faute de paramètre |
