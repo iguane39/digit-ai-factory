@@ -2,7 +2,7 @@
 
 Baseline d audit par forge (TF-0054) : cette fiche remplace la relecture des ~32 Ko de
 baseline commune (INVENTAIRE + BOUCLE) par agent d audit. Elle est MISE À JOUR à chaque
-audit (l agent la reçoit seule, la rend annotée) — dernière mise à jour : 2026-08-08
+audit (l agent la reçoit seule, la rend annotée) — dernière mise à jour : 2026-08-19
 (revue écosystème 20260808a, source de l extraction initiale).
 
 ### forge-development — santé ruff 0 + mypy strict 98 fichiers + 285 tests (08/08)
@@ -13,3 +13,11 @@ décroche du flux d'apprentissage** (lot 03 : zéro item pour lui) · discipline
 inexécutables dans son propre moteur (payé en prod v0.1.0) · loi de livrable en double copie
 sans source unique · D-V1 payée à chaque run · **conductor = actif dormant sur pièces** (aucun
 appelant, 2 produits réels construits sans lui).
+
+### Annotation — revue écosystème 20260819 (preuves rejouées le 19/08)
+
+Preuves rejouées : `ruff check` → **All checks passed** · `pytest` → **381 passed,
+1 skipped** (fiche : 285 tests — la suite a grandi ; mutation conductor 94,25 % au delta,
+TF-0120). « Le maillon décroche du flux d'apprentissage » se tempère : TF-0363 (action
+unitaire) et TF-0375 (cat-dev-03 muet au vert) traités les 18-19/08. Conductor : câblage
+décidé (TF-0360, ordre TF-0352/0353 d'abord). Aucun constat nouveau.

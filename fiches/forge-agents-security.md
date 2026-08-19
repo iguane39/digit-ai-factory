@@ -1,7 +1,7 @@
 # Fiche d audit — forge-agents-security
 
 Baseline d audit par forge (TF-0054) : cette fiche remplace la relecture de la baseline
-commune par agent d audit. MISE À JOUR à chaque audit — dernière mise à jour : 2026-08-12
+commune par agent d audit. MISE À JOUR à chaque audit — dernière mise à jour : 2026-08-19
 (création, TF-0111 — décision humaine : forge dédiée, « le juge ne vit pas chez le jugé »).
 
 ### forge-agents-security — self-test 24/24, née exercée sur fixtures synthétiques (12/08)
@@ -18,3 +18,9 @@ dettes : v0 lexicale (pas de sandbox d exécution, pas d analyse sémantique, pa
 red-teaming automatisé, pas de scan runtime branché sur le harnais — consignées README
 §Limites) ; référentiel d outils tenu à la main ; aucun agent réel encore scanné en
 production — premier scan à consigner ici.
+
+### Annotation — revue écosystème 20260819 (preuves rejouées le 19/08)
+
+Preuve rejouée : self-test → **48 PASS, 0 FAIL**. Depuis la fiche : corpus d'injection
+versionné + mapping OWASP LLM Top 10 (TF-0188), LLM10 mesurée (TF-0207). Aucun constat
+nouveau.
