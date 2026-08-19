@@ -41,7 +41,7 @@
 | cat-dev-06 | **Gate anti-patterns IA** | bloquer imports fantômes, secrets en dur et routes sans auth avant merge | `conductor\gates\ai_antipatterns_gate.py` | TF-0103 (12/08) : 15 tests double sens, 0 faux positif sur conductor entier | prouve | experimental |
 | cat-dev-07 | **Gate de mutation (3e métrique)** | mesurer la force réelle de mes tests, pas seulement leur couverture | `conductor\gates\mutation_gate.py + job CI mutation` | TF-0103 (12/08) : mesure réelle Docker 61,1 % (223/365) — honnête, sous seuil, consignée | prouve | experimental |
 
-## forge-tests (pipeline) — 7 services
+## forge-tests (pipeline) — 8 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -52,6 +52,7 @@
 | cat-tst-05 | **Inventaire sans exécution** | cartographier la surface de test sans rien exécuter | `env FORGE_TESTS_SANS_EXECUTION=1 + CLI` | documenté (INVENTAIRE §4) — non exercé isolément sur cas réel | declare | experimental |
 | cat-tst-06 | **Impact par diff, flaky, propriétés, mutation par risque** | auditer moins mais juste : cibler par diff, isoler les flaky, proposer du property-based | `forge_tests\{impact,flaky,generateur_proprietes}.py · risque.repartir_mutants` | TF-0104 (12/08) : 14 tests dédiés dont 2 bout-en-bout git réel — CÂBLAGE CLI RESTANT (services non invocables par flag) | declare | experimental |
 | cat-tst-07 | **Rapport exhaustif test-par-test** | obtenir le verdict et le pourquoi de CHAQUE test, pas seulement un agrégat par pan | `forge_tests
+| cat-tst-08 | **Juger un catalogue de traductions** | savoir si mes traductions sont COMPLÈTES, si leurs paramètres sont intacts et si mes libellés d'action sont constants — sans attendre un build servi | `forge_tests\catalogue_i18n.py`, câblé au pan `i18n` (aucun modèle appelé) | TF-0383 (19/08) : sur un produit client livré, le pan rendait SKIP / 0 finding et rend FAIL / 5 findings nommés — 150 clés manquantes sur 245 pour 5 des 7 locales déclarées, servies par le repli sans le dire. 19 tests double sens ; **la JUSTESSE d'une traduction est déclarée non jugée** | prouve | experimental |
 oyau.py (section essais) + forge_tests\junit.py` | TF-0146 (13/08) : 12 tests, self-test noyau vert, pytest 154 rejoué pilot ; v0 — branchement des adaptateurs (--junitxml → essais réels) = jalon d'intégration | prouve | experimental |
 
 ## forge-agents (transverse) — 12 services
