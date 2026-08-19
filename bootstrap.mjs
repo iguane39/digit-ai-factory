@@ -23,7 +23,7 @@ const FORGES = [
   { nom: "digit-ai-forge-development", preuve: "digit-ai-forge-development/pyproject.toml" },
   { nom: "digit-ai-forge-tests", preuve: "forge_tests/__main__.py" },
   { nom: "digit-ai-forge-agents", preuve: ".claude/skills/forge-agents/SKILL.md" },
-  { nom: "digit-ai-forge-seo", preuve: "scripts/validate.py" },
+  { nom: "digit-ai-forge-seo-geo", preuve: "scripts/validate.py" },
   { nom: "digit-ai-forge-organization", preuve: "output/02-composants/composant-filtres-tableau/oracle-filtres-tableau.mjs" },
   // forge-audit : le PRODUIT AuditCore (public, marque blanche — ex `digit-ai-forge-auditcore`,
   // renommé le 11/08). Les référentiels vivent dans core/ (adr, controls, dimensions).

@@ -19,7 +19,7 @@ qualité, restitution sourcée) ·
 [forge-observability](https://github.com/iguane39/digit-ai-forge-observability) (surveillance
 continue entre les runs) — sur
 mandat humain : [forge-audit](https://github.com/iguane39/digit-ai-forge-audit) (gouvernance
-POC-to-Prod) · [forge-seo](https://github.com/iguane39/digit-ai-forge-seo) (post-MEP) ·
+POC-to-Prod) · [forge-seo-geo](https://github.com/iguane39/digit-ai-forge-seo-geo) (post-MEP) ·
 [forge-organization](https://github.com/iguane39/digit-ai-forge-organization) (conventions) ·
 [forge-agents-security](https://github.com/iguane39/digit-ai-forge-agents-security) (sécurité
 agentique — le juge ne vit pas chez le jugé) ·
@@ -60,7 +60,7 @@ Chaque étape est validée par des **oracles exécutés** — jamais par confian
 
 <!-- CATALOGUE:DEBUT — section générée par catalogues/generer-vues.mjs, ne pas éditer -->
 
-Ce que chaque forge sait faire aujourd'hui — extrait de la source unique [catalogues/catalogue.jsonl](catalogues/catalogue.jsonl) (v1.7.0, 2026-08-19), détail complet : [catalogues/CATALOGUES.md](catalogues/CATALOGUES.md). **prouvé** = preuve exécutée (oracle, CLI, run réel) ; *déclaré* = méthode documentée seulement.
+Ce que chaque forge sait faire aujourd'hui — extrait de la source unique [catalogues/catalogue.jsonl](catalogues/catalogue.jsonl) (v1.8.0, 2026-08-19), détail complet : [catalogues/CATALOGUES.md](catalogues/CATALOGUES.md). **prouvé** = preuve exécutée (oracle, CLI, run réel) ; *déclaré* = méthode documentée seulement.
 
 - **forge-conception** (pipeline) : **Qualifier l'entrant** · **Énumérer la surface** · **Rédiger les exigences** · **Dériver les vues aval** · **Valider les exigences (oracles)** · **Constitution projet** · **Cycle delta (évolution d'un référentiel scellé)** · **Rétro-modèle d'un projet existant** · **Vues par profil (PO, CSM, utilisateur)**
 - **forge-design** (pipeline) : **Système de marque** · **Studio de direction** · **Améliorer le design (maquette)** · *Critiquer le design (amont et aval) (déclaré)* · **Valider le design (oracles)** · **Générer les visuels** · **Tokens DTCG (source → dérivé)** · **Baseline de régression visuelle** · **Contrôler la généricité d'une interface (règles importées)**
@@ -71,7 +71,7 @@ Ce que chaque forge sait faire aujourd'hui — extrait de la source unique [cata
 - **forge-data** (transverse) : **Profiler (qualité en assertions)** · **Tracer (lineage exigible)** · **Restituer (chiffres sourcés)** · *Fonds de savoir data (déclaré)* · **Contractualiser (data contract)** · **Importer un schéma exporté** · **Traduire un lineage Unity Catalog** · **Mesurer une base connectée**
 - **forge-observability** (transverse) : **Observer (plans → snapshots)** · **Détecter la dérive** · *Veille citation IA (déclaré)*
 - **forge-audit** (sur mandat) : **Référentiel d'audit POC-to-Prod** · **Oracles d'audit** · **Engagement d'audit par tenant** · **Policy-as-code (démonstrateur OPA)**
-- **forge-seo** (sur mandat) : **Créer une mission d'audit SEO** · **Dérouler l'audit 87 nœuds** · **Valider forge et mission** · **Rapport HTML vérifié** · *Runs de suivi récurrents (déclaré)* · **Instrumentation de crawl avancée** · **Scorer et écrire le CSV d'actions**
+- **forge-seo-geo** (sur mandat) : **Créer une mission d'audit SEO** · **Dérouler l'audit 87 nœuds** · **Valider forge et mission** · **Rapport HTML vérifié** · *Runs de suivi récurrents (déclaré)* · **Instrumentation de crawl avancée** · **Scorer et écrire le CSV d'actions**
 - **forge-organization** (sur mandat) : **Doctrine des conventions** · **Composant filtres-tableau** · *Études normatives (déclaré)* · **Gate de conventions packagé**
 - **forge-agents-security** (sur mandat) : **Scanner un agent (statique)** · **Scanner les appels d'outils (dynamique)** · **Rejouer un corpus d'injection de prompt**
 - **forge-websec** (sur mandat) : **Juger l'exposition runtime** · **Scanner les dépendances vulnérables (SCA)** · *Tenir un contrat de sécurité ASVS L1 (déclaré)* · *Méthode de test de sécurité (WSTG curé) (déclaré)* · **Scanner dynamiquement (DAST, sur mandat)**

@@ -2,7 +2,7 @@
 
 Troisième voie d'exécution (avec `ETAPES-RUN.md` et `RUN-VERSION.md`), née du retour RV-1
 du run SCC_ALX (13/08/2026) : un mandat forge-data (analyse de mapping), forge-audit
-(gouvernance), forge-seo (audit post-MEP) ou tout mandat dont le livrable est un
+(gouvernance), forge-seo-geo (audit post-MEP) ou tout mandat dont le livrable est un
 **document ou un verdict** n'a ni conception à 4 verbes, ni design, ni development, ni
 MEP — et le run SCC_ALX a dû improviser ce que cette page encode désormais.
 
