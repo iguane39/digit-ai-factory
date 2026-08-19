@@ -108,6 +108,38 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   `etape_close`, `retour` (alimente la boucle d'amélioration ; champ `source` :
   `forge | produit | production`), `relais_arme` (process long en arrière-plan : chemin
   guetté + ts — TF-0173, §4 ter), `run_close`.
+- **`oracles_verdict` a une FORME CANONIQUE (TF-0385 — 19/08)**, et `run_open` déclare sous
+  quelle version le ledger est écrit (`schema_ledger: "1.0"`). L'entrée porte au minimum :
+
+  | Champ | Contenu |
+  |---|---|
+  | `oracle` | le **nom** de l'oracle qui a rendu le verdict (`oracle-conformite-projet`, `render_page.py`, `diff-doctrine`…) |
+  | `verdict` | `PASS` \| `FAIL` \| `SKIP` \| `NA` \| `PARTIEL` — un relevé sans verdict n'est pas un verdict |
+  | `cible` | l'artefact jugé (chemin ou périmètre) |
+  | `journal` | le journal d'oracles produit, quand il existe (R-32) |
+  | `regles_empreinte` | l'empreinte du jeu de règles appliqué, quand l'oracle en publie une (R-32 bis) |
+
+  Tout autre champ reste libre : un run consigne ce qu'il a besoin de consigner. **Un relevé qui
+  porte plusieurs oracles produit plusieurs entrées**, une par oracle — c'est la condition pour
+  que la liste des oracles qui ont tourné soit CALCULABLE.
+
+  *Le coût du silence, mesuré le 19/08* : **huit** entrées `oracles_verdict` d'un même ledger
+  réel portaient **six formes de champs différentes** — deux avec `oracle` et `verdict` au
+  singulier, six avec un `oracles` imbriqué sans verdict de premier niveau, plus des champs
+  improvisés à chaque fois. Conséquence : **on ne pouvait pas calculer par machine ce qui avait
+  tourné sur un run**, donc aucun juge de l'enclenchement n'avait d'entrée. Le type était nommé
+  ici depuis l'origine ; sa forme ne l'était nulle part, sauf pour un cas unique
+  (`oracle: diff-doctrine`, TF-0320) — le précédent existait, il n'avait jamais été généralisé.
+
+  **Contrôle exécutable** : `node ledger.mjs verify <ledger.jsonl>` refuse une entrée
+  `oracles_verdict` sans `oracle` ni `verdict`, **en nommant le champ manquant et pourquoi il est
+  dû**. **Antériorité déclarée** (modèle de R-32 bis) : la forme n'est exigée que si `run_open`
+  porte `schema_ledger` — sans ce champ, le ledger précède le schéma, ses entrées sortent
+  `[NON VÉRIFIÉ]` avec le remède, et **ne sont jamais mises en échec**. Les trois ledgers du parc
+  mesurés le 19/08 échoueraient tous, et un contrôle qui met en échec tout l'existant se fait
+  désactiver (R-33 bis) : **on ne juge que ce qui s'est déclaré jugeable, et on ne réécrit jamais
+  un ledger existant**.
+
 - **`run_open` porte aussi les RÉFÉRENTIELS DISPONIBLES (`referentiels`, TF-0373 — 18/08)**, et
   c'est une déclaration, pas une option : pour chacun — `exigences`, `anomalies`,
   `contrat_interface` — soit son **chemin**, soit `absent` avec son motif. Rien de plus.

@@ -1,17 +1,11 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=217e993466ff archive=9f205b231527 · dernier événement: 2026-08-19T14:00:00Z -->
+     sceaux: actifs=45d2a757a9a8 archive=9f205b231527 · dernier événement: 2026-08-19T16:00:00Z -->
 
-**78 actifs** (candidat 2 · décidé 0 · en cours 1 · corrigé 74 · écarté 1) · **308 archivés**.
+**78 actifs** (candidat 1 · décidé 0 · en cours 1 · corrigé 75 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
-
-## digit-ai-factory
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0385 | candidat | 9 | noyau + forge-agents : l'événement `oracles_verdict` n'a AUCUNE forme canonique — six formes de champs pour huit entrées d'un même ledger, donc aucun calcul possible de ce qui a tourné | **oui** — six formes de champs pour huit entrées du même type dans le même fichier, mesurées le 19/08 ; aucun calcul machine possible de ce qui a tourné sur un run ; et le vérificateur de ledger ne lit aucun payload, donc ne pouvait pas le voir. 57 oracles sur 76 (75 %) ne sont derrière aucun mécanisme qui constaterait leur absence |
 
 ## digit-ai-forge-agents
 
@@ -20,6 +14,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0324 | en_cours | 3 | Artefacts périodiques du run de delivery absents : RAID, rapport d'avancement, compte rendu, REX, suivi des bénéfices | **oui** — revérifié en session le 16/08 : 0 occurrence de RAID / compte rendu / rapport d'avancement / lessons learned sur les skills installés — aucun des cinq artefacts que réclame une mission longue n'a d'équivalent dans la forge |
 | TF-0304 | corrige | 12 | forge-agents : déclarer le câblage de qo-gate-write.mjs dans le settings.json versionné de la forge | **oui** — le gate C7 est mort sur ce poste depuis une date inconnue et AUCUN dépôt ne dit comment le recâbler — la moitié durable du trou que K7 déclare à chaque run |
 | TF-0366 | corrige | 9 | un verdict d'oracle archive ne dit pas sous quel jeu de regles il a ete rendu | **oui** — 1 aller-retour de diagnostic : A3 tombe sur les 5 fichiers HTML du projet, gabarit compris, ce qui a d'abord fait soupconner un defaut de la chaine d'emission avant que la comparaison avec le journal du 14/08 n'etablisse qu'il s'agissait d'une regle nouvelle. |
+| TF-0385 | corrige | 9 | noyau + forge-agents : l'événement `oracles_verdict` n'a AUCUNE forme canonique — six formes de champs pour huit entrées d'un même ledger, donc aucun calcul possible de ce qui a tourné | **oui** — six formes de champs pour huit entrées du même type dans le même fichier, mesurées le 19/08 ; aucun calcul machine possible de ce qui a tourné sur un run ; et le vérificateur de ledger ne lit aucun payload, donc ne pouvait pas le voir. 57 oracles sur 76 (75 %) ne sont derrière aucun mécanisme qui constaterait leur absence |
 | TF-0306 | corrige | 8 | forge-agents : _routages-journal.jsonl d'experts-forge est un journal d'exécution TRACKÉ que son self-test salit | **oui** — chaque exécution du self-test crée un diff parasite — le prochain commit pressé l'embarque et le bruit K2 renaît |
 | TF-0362 | corrige | 8 | oracle-etat-forge : un skill présent au dépôt mais ABSENT du manifeste n'est jamais regardé par F1 — le silence est du bon côté | **oui** — un skill livré et monté est resté hors de tout contrôle de version sans que rien ne le signale ; il a fallu écrire un second outil pour s'en apercevoir |
 | TF-0326 | corrige | 6 | Le skill pilote-de-mission n'est versionné dans AUCUN dépôt — la forge juge un artefact dont elle ne possède ni la spécification ni les instances | **oui** — des candidatures externes s'appuient sur le contenu d'un skill que personne ne peut ouvrir — le registre a failli décider sur une preuve invérifiable |

@@ -35,6 +35,20 @@ strictement aucun effet. `--appliquer` remet à niveau ; il **refuse** d'écrase
 récente que sa source (K5) — le jour de son écriture, `prompt-analyzer-l99` installé était en
 2.2.0 quand le dépôt en était à 2.1.0, et une synchronisation naïve aurait détruit une version.
 
+**DÉCLARER LE SCHÉMA DU LEDGER (TF-0385, 19/08)** — un champ au `run_open`, et il commande la
+suite : `schema_ledger: "1.0"`. Sans lui, le ledger est réputé **antérieur au schéma** et
+`ledger.mjs verify` ne juge pas la forme de ses entrées — il le DIT (`[NON VÉRIFIÉ]`), il ne le
+tait pas, et il ne met rien en échec. Avec lui, chaque `oracles_verdict` doit porter son `oracle`
+et son `verdict` (forme canonique : `CONTRAT-INTERFACE.md` §3).
+
+*Pourquoi ce champ existe* : le 19/08, **huit** entrées `oracles_verdict` d'un même ledger réel
+portaient **six formes de champs différentes**. La liste des oracles qui avaient tourné n'était
+donc pas calculable, et aucun juge de l'enclenchement n'avait d'entrée. Le champ ne sert pas à
+documenter : il sert à rendre un fait **opposable**.
+
+*Un relevé qui porte plusieurs oracles produit plusieurs entrées*, une par oracle. C'est le prix
+de la calculabilité, et il est bas.
+
 **DÉCLARER LES RÉFÉRENTIELS DISPONIBLES (TF-0373, 18/08)** — une fois par produit, avant tout.
 Pour chacun des trois, soit son chemin, soit `absent` avec son motif ; le `run_open` du ledger le
 porte en `referentiels` :
