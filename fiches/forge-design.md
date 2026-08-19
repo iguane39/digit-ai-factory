@@ -1,7 +1,7 @@
 # Fiche d audit — forge-design
 
 Baseline d audit par forge (TF-0054) : cette fiche remplace la relecture de la baseline
-commune par agent d audit. MISE À JOUR à chaque audit — dernière mise à jour : 2026-08-14
+commune par agent d audit. MISE À JOUR à chaque audit — dernière mise à jour : 2026-08-19
 (point 7 du mandat : les deux dettes D-D2/D-D3 du contrat §5 instruites, fiche périmée depuis
 le 08/08 remise au niveau).
 
@@ -21,3 +21,12 @@ feu vert de coût API (D-D3, décision humaine) · le mode **aval** de `critique
 (étape 5 bis, produit vs promesse) reste **documenté et jamais exercé sur produit réel** —
 premier run à consigner ici · `dist\` à revérifier (périmé de 4 évolutions au 08/08, non
 recontrôlé depuis).
+
+### Annotation — revue écosystème 20260819 (preuves rejouées le 19/08)
+
+Preuve rejouée : self-test → **VERT, 21 oracles / 73 règles** (fiche : 13/56 — la forge a
+grandi). Périmée : « working tree vide » — 3 dossiers `baseline/` NON SUIVIS
+(digit-desk-accueil, digit-desk-accueil-produit, landing) alors que la baseline est un
+artefact VERSIONNÉ par contrat (TF-0102, `maquette-bailleur` l'est) : ces verrous de
+régression visuelle ne survivent pas à un clone. → candidature `revue-20260819-design`.
+D-D3 (producteur d'images local) et le mode aval de critique-le-design restent en l'état.
