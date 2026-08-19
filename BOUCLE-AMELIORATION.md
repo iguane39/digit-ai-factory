@@ -1736,3 +1736,18 @@ Catalogue v1.7.0 : cat-con-08 et cat-con-09, vues régénérées, `--check` PASS
 oracle-todo PASS. Restes datés : premier run réel de chacun des trois verbes à consigner
 (plans de revue 2026-09-19 et 2026-10-01 — clause de retrait du run de conseil si aucune
 mission réelle) ; clôture `corrige` des trois TF au commit.
+
+## 19/08/2026 (soir) — forge-seo devient forge-seo-geo : le nom rejoint la grille (TF-0390)
+
+Mandat humain direct. Constat préalable, vérifié sur pièces : le volet **GEO existait
+déjà** — grille §11 « GEO — volet TRANSVERSAL » (nœuds 53-58), routage de veille
+« SEO/GEO → forge-seo », nœud 58 cité par `oracle-conformite-projet`. Seul le nom ne
+disait que la moitié du périmètre. Méthode D-17 rejouée : **mesure d'abord** (36 fichiers
+porteurs, classés vivant vs fait d'époque), GitHub renommé avec redirection, dossier et
+remote basculés, normatif bascule (README, CLAUDE, ACCUEIL, RUN-MANDAT, INVENTAIRE,
+bootstrap, oracle nœud 58, MODE-VEILLE, gabarits web, fiche renommée), **alias
+`forge-seo` conservé** dans `normaliser-lot.mjs` pour les lots antérieurs, catalogue
+**v1.8.0** (clé `seo`→`seo-geo`, **ids cat-seo-\* gelés** — §3 bis, `--check` PASS).
+Faits d'époque intacts : registre, études, D-08/D-09, archives de la forge
+(`prompts/PHASE-A`, sidecars d'oracles, snapshot d'audit du 08/08). Forge commitée
+(`digit-ai-forge-seo-geo@55f76c8`), TF-0390 clos au registre.

@@ -17,7 +17,7 @@ le pilot et les forges sont des dépendances en lecture.
    jargon forge. C'est la version que l'utilisateur doit pouvoir corriger d'un mot.
 
 3. **Identifier les forges impliquées.** Depuis l'intention, nommer les forges mobilisées
-   et pourquoi, en une ligne chacune. Rappels de périmètre : forge-seo, forge-audit et
+   et pourquoi, en une ligne chacune. Rappels de périmètre : forge-seo-geo, forge-audit et
    forge-organization n'interviennent que sur mandat humain ; forge-ops outille la MEP et
    ne décide jamais.
 
@@ -45,7 +45,7 @@ le pilot et les forges sont des dépendances en lecture.
 7. **Exécuter bout en bout.** Quatre voies : `references\ETAPES-RUN.md` (nouveau produit
    ou produit sans socle), `references\RUN-VERSION.md` (produit existant — rattrapage du
    socle, delta par étape, tests toujours en entier), `references\RUN-MANDAT.md`
-   (**mandat transverse** — forge-data, forge-audit, forge-seo… : le livrable est un
+   (**mandat transverse** — forge-data, forge-audit, forge-seo-geo… : le livrable est un
    document ou un verdict, pas un logiciel ; ni conception, ni design, ni MEP — RV-1,
    Produit-10 13/08), ou `references\RUN-CONSEIL.md` (**mission de conseil** — diagnostic,
    recommandations, lotissement/ROI : le livrable est une trajectoire multi-lots dont
@@ -65,7 +65,7 @@ le pilot et les forges sont des dépendances en lecture.
 | revoir le design rendu | revue aval (étape 5 bis) | oracles design + `render_page.py` — le rendu se juge en pixels |
 | déployer | étape MEP | `ETAPE-MEP.md`, forge-ops O-1…O-5, GO humain sur dossier de preuve |
 | signaler que quelque chose ne va pas | circuit de l'insatisfaction (dépôt en une phrase) | `gabarits\INSATISFACTION.md` — instruction automatique à six blocs (`AGENT-INSATISFACTION.md`), réouvertures comptées, cible zéro |
-| auditer le SEO d'un site en ligne | mission forge-seo (mandat) | `new_mission.py`, `METHODE.md`, `validate.py` exit 0 exigé |
+| auditer le SEO et le GEO d’un site en ligne | mission forge-seo-geo (mandat) | `new_mission.py`, `METHODE.md`, `validate.py` exit 0 exigé |
 | auditer la gouvernance | forge-audit (mandat) | référentiel `core\`, engagement par tenant |
 | discipliner ses données | forge-data | oracles profiler / tracer / restituer |
 

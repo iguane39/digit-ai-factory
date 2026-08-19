@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=5c555ea07bd8 archive=9f205b231527 · dernier événement: 2026-08-19T17:25:15Z -->
+     sceaux: actifs=a589fd1e86b7 archive=9f205b231527 · dernier événement: 2026-08-19T17:35:07Z -->
 
-**82 actifs** (candidat 2 · décidé 0 · en cours 1 · corrigé 78 · écarté 1) · **308 archivés**.
+**83 actifs** (candidat 2 · décidé 0 · en cours 1 · corrigé 79 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -113,6 +113,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0359 | corrige | 6 | Les vues générées sont jugées divergentes pour leurs seules fins de ligne — K6 est structurellement rouge sur tout clone Windows | **oui** — **oui** — mesuré ce jour sur un clone neuf : K6 rend FAIL pendant que `git diff --ignore-cr-at-eol` est vide, donc l'oracle accuse une divergence que le contenu dément ; un lecteur du verdict conclut à une vue périmée et régénère pour rien, et le geste de silence produit à son tour deux fichiers modifiés dont le diff n'est que des CR |
 | TF-0367 | corrige | 6 | le renommage du depot pilot casse en silence les chemins ecrits dans les CLAUDE.md consommateurs | **oui** — 3 appels d'outil pour retrouver le depot : listage de C:\dev, inspection de digit-ai-forge-pilot_old, puis verification par git log que digit-ai-factory etait bien le depot courant (commit du 18/08 contre 17/08 pour _old). |
 | TF-0373 | corrige | 6 | factory : l ouverture de run ne demande jamais ce que le client sait deja de ses defauts — une campagne peut se clore « au vert » a cote d un lot d anomalies ouvertes | **oui** — six campagnes d audit ouvertes sans qu aucune ne demande la liste des defauts deja connus du client ; 13 anomalies ouvertes depuis le 29/07 restees hors de toute mesure et hors de tout livrable |
+| TF-0390 | corrige | 6 | forge-seo renommée forge-seo-geo : le nom dit les deux périmètres (SEO + GEO) que la grille couvrait déjà | **oui** — constaté sur pièces le 19/08 : la grille porte 6 nœuds GEO (53-58) et le routage de veille disait déjà « SEO/GEO » — un nom qui ne dit que la moitié du périmètre fait rater le routage d'une demande GEO entrante et sous-vend la capacité en contexte commercial |
 | TF-0319 | corrige | 4.5 | Tout document destiné à l'utilisateur d'une forge se range dans output\ — jamais dans une arborescence de forge à parcourir | **oui** — constat d'usage humain : les documents qui lui sont destinés vivent dans des arborescences de forge complexes ou imbriquées, qu'il doit parcourir pour les retrouver |
 | TF-0350 | corrige | 4.5 | Une page HTML des TODO archivés — retrouver et chercher dans les 300+ items clos | **oui** — demande humaine directe — 320 items archivés ne sont aujourd'hui interrogeables que par grep, un canal illisible pour l'humain qui décide |
 | TF-0320 | corrige | 4 | Un produit qui met ses forges à jour n'apprend rien des règles nouvelles ou modifiées — la mise à jour transporte le code, pas la consigne | non |

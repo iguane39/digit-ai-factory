@@ -135,7 +135,7 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
 
 ---
 
-## 6. digit-ai-forge-seo — `c:\dev\digit-ai-forge-seo` *(ajoutée le 08/08)*
+## 6. digit-ai-forge-seo-geo — `c:\dev\digit-ai-forge-seo-geo` *(ajoutée le 08/08)*
 
 - **Rôle** : audit et stratégie SEO — grille de 17 branches / 87 nœuds, scoring, 7 garde-fous
   anti-hallucination. **Post-MEP et récurrente** (runs de suivi avec diff de snapshots),
@@ -266,7 +266,7 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
 
 ## 13. digit-ai-forge-websec — `c:\dev\digit-ai-forge-websec` *(créée le 12/08, TF-0123)*
 
-- **Rôle** : **sécurité du produit web livré**, sur mandat humain (modèle forge-seo) — gate
+- **Rôle** : **sécurité du produit web livré**, sur mandat humain (modèle forge-seo-geo) — gate
   optionnel pré-MEP (consommé par M-1…M-5) et récurrence différentielle post-MEP. Exposition
   runtime (headers/TLS/CSP/cookies), dépendances vulnérables (SCA), contrat ASVS 5.0.0 L1.
   **Délimitation** : le produit livré ici, l'outillage agentique chez forge-agents-security.

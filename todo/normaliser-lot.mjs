@@ -44,7 +44,7 @@ const destination = iSortie > 0
 const FORGES = [
   "forge-agents-security", "forge-agents", "forge-audit", "forge-conception", "forge-data",
   "forge-design", "forge-development", "forge-observability", "forge-ops", "forge-organization",
-  "forge-seo", "forge-tests", "forge-websec", "digit-ai-forge-pilot", "pilot",
+  "forge-seo", "forge-seo-geo", "forge-tests", "forge-websec", "digit-ai-forge-pilot", "pilot",
   // Phase expand du renommage factory (fenêtre A, étude 20260817i) : les DEUX noms sont
   // acceptés tant qu'un lot antérieur peut arriver ; retirer l'ancien est le DERNIER geste
   // de la séquence (classe c. de l'énumération), jamais le premier.
