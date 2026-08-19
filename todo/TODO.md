@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=bcbe55cacbf4 archive=9f205b231527 · dernier événement: 2026-08-18T20:40:00Z -->
+     sceaux: actifs=94c0780c379f archive=9f205b231527 · dernier événement: 2026-08-19T09:30:00Z -->
 
-**75 actifs** (candidat 0 · décidé 0 · en cours 1 · corrigé 73 · écarté 1) · **308 archivés**.
+**76 actifs** (candidat 1 · décidé 0 · en cours 1 · corrigé 73 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -63,6 +63,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0383 | candidat | 4.5 | forge-tests : le pan i18n lit le BUILD SERVI et jamais le catalogue de chaînes — 61 % d'interface non traduite sur 5 locales d'un produit livré, invisible au juge | **oui** — 750 chaînes absentes servies en français par le repli sur un produit client livré (150 clés manquantes × 5 locales, sur 245), mesurées le 19/08 et invisibles au pan i18n par construction ; plus trois défauts du même sujet déjà payés en production sur produit-07 (1 route sur 201 sans équivalent, menu à 4 entrées contre 9 non détecté depuis juin, 9 pages sur 200 servies en français sous /en) et INS-0001 toujours ouverte |
 | TF-0343 | corrige | 9 | tests : la matrice des droits doit etre un artefact EXECUTABLE cellule par cellule, avec xfail strict pour les cellules non tenues | **oui** — 2 lignes de la matrice des droits conformes par construction mais prouvees par aucun test, et 2 cases non tenues par le produit, invisibles dans une suite organisee par service |
 | TF-0352 | corrige | 9 | tests : « executer la strategie de tests » doit inclure la CORRECTION des anomalies remontees et le REJEU jusqu a extinction — definition de fin a ecrire | **oui** — campagne du 12/08 close conforme avec 121 findings et produit inchange ; la meme strategie executee avec obligation de traiter a ferme 4 anomalies produit et 3 faux verts, dont un dormant depuis cette campagne |
 | TF-0371 | corrige | 9 | forge-tests : rien ne confronte ce que le code APPELLE a ce que l instance SERT — ni les routes, ni les ressources | **oui** — une fonction produit entierement morte en production (notifications push, deux routes en 404) et l absence totale d image sur 1 249 annonces, tenues par deux 404 lisibles sans authentification, non vues par six campagnes d audit entre le 11 et le 18/08 |
