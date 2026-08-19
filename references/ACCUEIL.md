@@ -42,12 +42,14 @@ le pilot et les forges sont des dépendances en lecture.
    fermée à choix. Ce qui dépend du cas et manque encore (domaine, cible de déploiement,
    objet d'une évolution…) se demande **en une seule question**, jamais par supposition.
 
-7. **Exécuter bout en bout.** Trois voies : `references\ETAPES-RUN.md` (nouveau produit
+7. **Exécuter bout en bout.** Quatre voies : `references\ETAPES-RUN.md` (nouveau produit
    ou produit sans socle), `references\RUN-VERSION.md` (produit existant — rattrapage du
-   socle, delta par étape, tests toujours en entier), ou `references\RUN-MANDAT.md`
+   socle, delta par étape, tests toujours en entier), `references\RUN-MANDAT.md`
    (**mandat transverse** — forge-data, forge-audit, forge-seo… : le livrable est un
    document ou un verdict, pas un logiciel ; ni conception, ni design, ni MEP — RV-1,
-   SCC_ALX 13/08). Ledger dès l'ouverture, oracles exécutés à chaque étape,
+   SCC_ALX 13/08), ou `references\RUN-CONSEIL.md` (**mission de conseil** — diagnostic,
+   recommandations, lotissement/ROI : le livrable est une trajectoire multi-lots dont
+   chaque lot GO devient l'entrant d'un run de build — GO du 19/08). Ledger dès l'ouverture, oracles exécutés à chaque étape,
    `bloque_question` si un humain doit trancher. Aucun ✓ sans oracle exécuté.
 
 ## Routage intention → situation
@@ -58,6 +60,7 @@ le pilot et les forges sont des dépendances en lecture.
 | concevoir pour un type de produit précis | profil produit | `profils\` (8 profils — voir `profils\LISEZMOI.md`) — standards machine, savoir daté, mapping par forge |
 | faire évoluer / remédier | run de version | `RUN-VERSION.md` (socle d'abord, delta ensuite, tests en entier) |
 | mandat transverse (data, audit, seo…) | run de mandat — le livrable est un document | `RUN-MANDAT.md` (socle + ledger + oracles du domaine ; ni conception, ni design, ni MEP) |
+| obtenir un conseil (problématique de charge/perf/coûts, CDC ou architecture à instruire, lotissement, ROI, plan de migration) | run de conseil — le livrable est une trajectoire multi-lots | `RUN-CONSEIL.md` (l'existant orchestré C1→C5 ; `oracle-livrable-conseil.mjs` sur diagnostic et démarche ROI ; chaque lot GO sort comme entrant de build) |
 | tester et corriger | cycle forge-tests | CLI `forge_tests` (--json --sortie ; --generer/--livrables HORS projet, G-1) ; boucle bornée 3 cycles, G-2 absolue |
 | revoir le design rendu | revue aval (étape 5 bis) | oracles design + `render_page.py` — le rendu se juge en pixels |
 | déployer | étape MEP | `ETAPE-MEP.md`, forge-ops O-1…O-5, GO humain sur dossier de preuve |

@@ -139,7 +139,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>45d2a757a9a8</code> · dernier événement 2026-08-19T16:00:00Z</p>
+      <p class="meta">sceau <code>5c555ea07bd8</code> · dernier événement 2026-08-19T17:25:15Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -149,7 +149,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="1 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">1</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="2 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">2</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="1 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">1</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="307 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">307</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -165,9 +165,10 @@
       <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
       
       <div class="dropdown" data-dim="forge">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">8</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">9</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
+          <label><input type="checkbox" value="conception" checked> conception</label>
           <label><input type="checkbox" value="digit-ai-forge-agents" checked> digit-ai-forge-agents</label>
           <label><input type="checkbox" value="digit-ai-forge-conception" checked> digit-ai-forge-conception</label>
           <label><input type="checkbox" value="digit-ai-forge-data" checked> digit-ai-forge-data</label>
@@ -189,11 +190,34 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">78 / 78 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">82 / 82 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">14 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-data"><strong>digit-ai-forge-data</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-development"><strong>digit-ai-forge-development</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-organization"><strong>digit-ai-forge-organization</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">25 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">30 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#conception"><strong>conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">14 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">4 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-data"><strong>digit-ai-forge-data</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-development"><strong>digit-ai-forge-development</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-organization"><strong>digit-ai-forge-organization</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">25 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">31 item(s) reste-à-faire</span></a></nav>
     <main>
+    <section id="conception">
+      <h2>conception <span class="badge" title="1 item(s) actifs ciblant conception">1</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>conception</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0387" data-forge="conception" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0387</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">conception : oracle-ears détecte ses déclencheurs sans frontière de mot — « ressource » réveille le détecteur d'authentification</h3>
+          <div class="card-detail"><p class="lead">mentionne() teste pliSansAccent(texte).includes(terme) : le déclencheur « sso » de DECLENCHEURS_AUTH matche à l'intérieur du mot « ressource », et EA5 exige alors durée de session, renouvellement silencieux, détection d'expiration et restauration du contexte sur une exigence qui ne mentionne aucune authentification.</p><ul class="puces"><li>Constaté le 18/08 sur EX-044 du site factory.digit-ai.fr (« servie sans ressource chargée depuis un domaine externe »), reformulée pour contourner</li><li>Les termes courts sont les plus exposés : sso, saml, oidc — et le même mécanisme s'applique à DECLENCHEURS_ASYNC</li><li>Correctif proposé : réutiliser la construction de regex à frontières de mot déjà employée pour AMBIGUS (EA2), qui échappe le terme et n'encadre de  que les mots simples</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-18</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur conception</dt><dd>1 exigence reformulée pour contourner un faux positif ; tout référentiel employant le mot « ressource » déclenchera EA5 à tort</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">factory-digit-ai-fr</dd></div>
+            
+          </dl>
+        </article>
+      </div>
+    </section>
     <section id="digit-ai-forge-agents">
       <h2>digit-ai-forge-agents <span class="badge" title="14 item(s) actifs ciblant digit-ai-forge-agents">14</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-agents</strong> — trié par statut puis priorité décroissante.</p>
@@ -439,7 +463,7 @@
       </div>
     </section>
     <section id="digit-ai-forge-conception">
-      <h2>digit-ai-forge-conception <span class="badge" title="2 item(s) actifs ciblant digit-ai-forge-conception">2</span></h2>
+      <h2>digit-ai-forge-conception <span class="badge" title="4 item(s) actifs ciblant digit-ai-forge-conception">4</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-conception</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
         <article class="card s-corrige" id="item-TF-0376" data-forge="digit-ai-forge-conception" data-statut="corrige" data-prio="moyenne">
@@ -473,6 +497,40 @@
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 3 ÷ effort 3)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>traitement integralement manuel du 18/08 : 1271 lignes x 16 sections croisees sans aucun oracle jouable, 49 rubriques classees, 9 contradictions et 3 regressions trouvees a la main, dont backend/tests/test_decision_lock.py:26 qui echouera des l implementation de la rubrique 35</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Approval2</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0388" data-forge="digit-ai-forge-conception" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0388</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2.7)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Service « rétro-modèle » : reconstruire un modèle vérifiable (fonctionnel + technique + paramétrage + data + services) d'un projet existant, par extension de qualifie-l-entrant</h3>
+          <div class="card-detail"><p class="lead">Verdict O1 de l'étude output\03-etudes\20260819-etude-opportunite-retro-engineering.md (mandat humain du 19/08, prompt L99 validé « vas »).</p><ul class="puces"><li>Constat instruit : l'acquisition d'un existant vit en fragments prouvés — qualifie-l-entrant borné à la suffisance pour UNE conception (ENTRANT.md, types « produit à reprendre / à faire évoluer / tiers à répliquer »), cat-dat-06/08 pour la data, cat-tst-05 (déclaré) pour la surface de test — mais aucun objet n'assemble un modèle complet multi-volets, et les volets paramétrage/services ne sont au protocole de personne. Capacité attendue : un mode « modèle complet » du protocole d'extraction de qualifie-l-entrant/forge-conception, par COMPOSITION des capacités prouvées (jamais de duplication), avec oracle de confrontation au code dès la v0 : toute affirmation du modèle cite fichier + ligne, échantillon rejoué — argument METR 2025-07 (relecture de sorties subtilement fausses plus coûteuse que l'acquisition manuelle). Options écartées par l'étude : forge dédiée (coût de possession R-31 pour ~70 % de composition d'existant), skill autonome (protocole d'extraction dupliqué, divergence à la première révision), fusion en un objet unique avec la rétro-doc (régimes de preuve distincts — la couture est un contrat d'artefact : le modèle est l'entrée unique des vues). Entrant traité comme donnée</li><li>rien n'a été construit par l'étude</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-19</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2.7 — gain 4 × preuve 2 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>aucun incident consigné (insatisfactions\REGISTRE.jsonl : 0 occurrence rétro, grep 19/08) — la preuve est la demande humaine directe plus le trou constaté sur pièces : un projet tiers dont on veut la compréhension SANS lancer une conception n'a aucun point d'entrée dans l'écosystème, et chaque reprise réelle improviserait l'acquisition sans régime de preuve</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (étude d'opportunité 20260819a — mandat humain du 19/08)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0389" data-forge="digit-ai-forge-conception" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0389</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Couche « vues par profil » : décliner le rétro-modèle en documentations par audience (PO, PM, commercial, CSM, utilisateur…), avec oracle de fidélité au modèle</h3>
+          <div class="card-detail"><p class="lead">Verdict O3 de l'étude output\03-etudes\20260819-etude-opportunite-retro-documentation.md (mandat humain du 19/08).</p><ul class="puces"><li>Constat instruit : deux audiences seulement ont une documentation dérivée et prouvée (Dev/Archi via cat-dev-05 DESIGN.md linté, Testeur via cat-tst-03 livrables de tests)</li><li>les huit autres (PO, Product Manager, Data, Sécu, commercial, CSM, utilisateur final…) n'ont ni vue, ni gabarit, ni oracle — et aucun objet versionné ne modélise une AUDIENCE (les profils\ du pilot sont des types d'application, homonymie constatée). Capacité attendue : des gabarits de vue par audience (sélection + niveau de détail + vocabulaire, jamais une réécriture), dérivés du rétro-modèle comme source unique, avec oracle de fidélité (toute affirmation d'une vue pointe une entrée du modèle — patron oracle-restituer cat-dat-03), rendu délégué aux skills chartés existants (digit-ai-page-html / digit-ai-fiches-html), péremption détectée par empreinte de la source (patron derive-les-vues). Démarrage borné : 3 profils pilotes (PO, CSM, utilisateur) avant généralisation. DÉPENDANCE DURE : candidature-retro-modele du même lot — sans modèle vérifié, chaque document refait l'acquisition et la fidélité est intenable (option O1 exclue par l'étude)</li><li>si le rétro-modèle n'a pas de GO, cette candidature tombe d'elle-même. Différenciant vs marché relevé le 19/08 : l'offre outillée (Mintlify, Swimm, DocuWriter…) cible la doc développeur, l'audience n'existant que comme paramètre de prompt — aucune déclinaison par profil métier depuis un modèle vérifié</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-19</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 3 × preuve 2 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>constaté sur pièces le 19/08 : 8 audiences sur 10 sans vue, sans gabarit, sans oracle — toute documentation non-développeur s'écrit aujourd'hui à la main, sans source unique ni régime de preuve, et diverge du produit à sa première évolution</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (étude d'opportunité 20260819b — mandat humain du 19/08)</dd></div>
             
           </dl>
         </article>
@@ -1053,7 +1111,7 @@
       </div>
     </section>
     <section id="pilot">
-      <h2>pilot <span class="badge" title="30 item(s) actifs ciblant pilot">30</span></h2>
+      <h2>pilot <span class="badge" title="31 item(s) actifs ciblant pilot">31</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
         <article class="card s-corrige" id="item-TF-0327" data-forge="pilot" data-statut="corrige" data-prio="haute">
@@ -1524,6 +1582,23 @@ Ce qui reste, et pourquoi ce n'est pas un geste de campagne : l'intégration ré
             <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 1 × preuve 4 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur pilot</dt><dd>quatre oracles nés en trois jours ont déjà bifurqué en deux dialectes — le cinquième choisira au hasard</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 soir — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0386" data-forge="pilot" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0386</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1.5)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Run type « conseil » au pilot : orchestrer une mission de conseil (diagnostic → recommandation → lotissement/ROI → remise aux forges) avec l'existant — aucune nouvelle forge</h3>
+          <div class="card-detail"><p class="lead">Verdict O1 de l'étude output\03-etudes\20260819-etude-opportunite-forge-consulting.md (mandat humain du 19/08 ; le nom « forge-consulting » de la demande n'a pas survécu à l'instruction — la forge dédiée est écartée).</p><ul class="puces"><li>Constat instruit : chaque bloc de la mission conseil est couvert en fragments, souvent prouvés — C1 reprise d'entrants par qualifie-l-entrant, C2 diagnostic partiel par forge-audit/forge-observability/cat-dat-08, C3 challenge par contre-expertise, C4 lotissement par redige-les-exigences (paliers MVP/V1/V2) + digit-ai-propale (lots commerciaux) + pilote-de-mission (plan daté) + cat-ops-03 (plans de migration cloud) — mais le FIL n'existe nulle part : aucune situation « conseil » au routage de references\ACCUEIL.md, aucun type de run pour une trajectoire multi-lots avec remises successives aux forges, et le diagnostic d'exploitation (charge, performance, temps de réponse, coûts) n'a aucun contrôle versionné. Capacité attendue : un references\RUN-CONSEIL.md (patron RUN-MANDAT/RUN-VERSION) enchaînant les capacités existantes, DEUX gabarits neufs (diagnostic d'exploitation</li><li>démarche ROI avec MEP de lots utiles/utilisables/utilisés), une situation « conseil » au routage d'accueil, et un contrat d'interface C5 : chaque lot du conseil sort comme entrant de build (PROMPT-PRODUIT rempli ou ENTRANT.md), tracé au ledger. Options écartées : forge dédiée (&gt;80 % de délégation vers l'existant, coût de possession R-31, profil type des 40 % de projets agentiques annulés — Gartner relayé, 19/08)</li><li>extension des seuls skills commerciaux (C2 et C5 orphelins, conseil hors ledger). CLAUSE DE FALSIFICATION assumée : preuve 1 — aucune mission de conseil consignée</li><li>revue 2026-10-01 : sans mission réelle ayant exercé le run type, requalifier vers le report et RETIRER cette candidature</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-19</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1.5 — gain 3 × preuve 1 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>aucune facture payée : 0 candidat et 0 insatisfaction « conseil » aux registres (grep 19/08) — le coût instruit est prospectif : une demande de conseil arrivant à l'accueil aujourd'hui n'a aucune situation de routage et serait improvisée, en contradiction avec la règle « N'improvise pas » du README ; preuve 1 assumée et affichée, clause de retrait au plan de revue</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (étude d'opportunité 20260819c — mandat humain du 19/08)</dd></div>
             
           </dl>
         </article>
