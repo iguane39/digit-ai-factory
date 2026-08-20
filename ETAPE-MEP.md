@@ -59,6 +59,14 @@ la mécanique complète (tags, volumes, arrêt/redémarrage, healthchecks) est e
 substitution de version ne l'est pas. Preuve dégradée acceptée, **déclarée comme telle** au
 dossier de MEP.
 
+**Produit public français** (RF-6, lot SCC-FR 20260820a ; étude RGAA 20260820a) : RGAA 4.1 /
+WCAG AA y est une **obligation légale**, et le parc ne mesure aujourd'hui ni le contraste (mesure
+existante non câblée : `render_page.py` V2), ni la navigation clavier, ni les états ouverts.
+Tant que ce trou tient, le dossier de MEP d'un produit public porte un **écart déclaré au GO
+humain** : « conformité RGAA non mesurée — audit humain à budgéter, déclaration d'accessibilité
+à produire ». « Prêt client » ne se prononce jamais sur une conformité légale non mesurée en la
+taisant.
+
 ## 3 bis. Qualif populée (avant le GO — demande utilisateur RT-6/RS-7)
 
 Entre le staging technique et le GO, une **version de qualification populée de données** est
