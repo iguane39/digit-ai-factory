@@ -8,3 +8,6 @@ runs/**/produit/
 *.oracles-cache.json
 *.oracles-historique.jsonl
 !runs/**/*.oracles.json
+
+# journal des verdicts des hooks (R-44) : etat de poste, jamais versionne
+.claude/hooks-journal.jsonl
