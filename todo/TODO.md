@@ -1,17 +1,17 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=6b44c7857b10 archive=9f205b231527 · dernier événement: 2026-08-19T18:08:50Z -->
+     sceaux: actifs=943f4e3ce76f archive=9f205b231527 · dernier événement: 2026-08-20T16:30:00Z -->
 
-**87 actifs** (candidat 2 · décidé 0 · en cours 1 · corrigé 83 · écarté 1) · **308 archivés**.
+**100 actifs** (candidat 11 · décidé 0 · en cours 1 · corrigé 87 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
-## conception
+## digit-ai-factory
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0387 | candidat | 9 | conception : oracle-ears détecte ses déclencheurs sans frontière de mot — « ressource » réveille le détecteur d'authentification | **oui** — 1 exigence reformulée pour contourner un faux positif ; tout référentiel employant le mot « ressource » déclenchera EA5 à tort |
+| TF-0407 | candidat | 9 | pilot : la conversation est la seule surface de restitution sans doctrine d'audience — profil d'interlocuteur déclaré + ouverture commanditaire + règle S9 | **oui** — le retour lui-même, émis par le seul lecteur des restitutions — il n'existe pas de mesure plus directe qu'un destinataire disant qu'une partie ne lui parvient pas |
 
 ## digit-ai-forge-agents
 
@@ -42,6 +42,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0387 | corrige | 9 | conception : oracle-ears détecte ses déclencheurs sans frontière de mot — « ressource » réveille le détecteur d'authentification | **oui** — 1 exigence reformulée pour contourner un faux positif ; tout référentiel employant le mot « ressource » déclenchera EA5 à tort |
 | TF-0376 | corrige | 4.5 | conception : deux sujets d exigences manquent systematiquement — propagation d etat asynchrone et cycle de vie de session — et ils concentrent les anomalies les plus couteuses | **oui** — 5 des 12 lacunes de specification du cahier Approval tiennent a ces deux seuls sujets, dont la rubrique 20 qualifiee « bug critique » par la recette et la perte de brouillon a l expiration de session (rubriques 27, 28) |
 | TF-0374 | corrige | 3 | conception : un retour d usage (lot d anomalies de recette) n entre dans AUCUNE des cinq categories d entrant, et aucun chemin ne le traite | **oui** — traitement integralement manuel du 18/08 : 1271 lignes x 16 sections croisees sans aucun oracle jouable, 49 rubriques classees, 9 contradictions et 3 regressions trouvees a la main, dont backend/tests/test_decision_lock.py:26 qui echouera des l implementation de la rubrique 35 |
 | TF-0388 | corrige | 2.7 | Service « rétro-modèle » : reconstruire un modèle vérifiable (fonctionnel + technique + paramétrage + data + services) d'un projet existant, par extension de qualifie-l-entrant | **oui** — aucun incident consigné (insatisfactions\REGISTRE.jsonl : 0 occurrence rétro, grep 19/08) — la preuve est la demande humaine directe plus le trou constaté sur pièces : un projet tiers dont on veut la compréhension SANS lancer une conception n'a aucun point d'entrée dans l'écosystème, et chaque reprise réelle improviserait l'acquisition sans régime de preuve |
@@ -67,6 +68,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0406 | candidat | 6 | forge-development : le contrat d'entree expose une decision que le code ecrase (briques t0 forcees en build), et une cible de scaffold unique qu'il ne declare pas | **oui** — cadrage.py, catalog.py:T0_BRICKS/_merge_t0, scaffold.py:TEMPLATE_REF, targets/ — lus en depot public le 19/08 (fait rapporte, non reconstate au poste : depot non clone) |
 | TF-0375 | corrige | 4.5 | development : cat-dev-03 (gate spec under/over-build) couvrait 24 des 49 anomalies de la recette Approval, et c est le gate JAMAIS demontre sur produit reel | **oui** — 24 des 49 rubriques de la recette du 18/08 relevent litteralement de l intention de cat-dev-03 ; le catalogue lui-meme declare ce gate jamais demontre sur produit reel (statut declare, cycle experimental) |
 
 ## digit-ai-forge-organization
@@ -80,6 +82,10 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0384 | candidat | 6 | forge-tests : le collecteur de dette lit une LISTE DE MODULES ECRITE A LA MAIN — huit limites declarees n entraient au registre d aucun domaine | **oui** — 8 limites declarees dans un module neuf, absentes du registre de dette jusqu a ce qu un humain y pense — et le contrôle de synchronisation du registre ne le voyait pas, puisqu il compare le registre a ce que le COLLECTEUR rend, non a ce que le code declare |
+| TF-0401 | candidat | 4.5 | forge-tests : le manifeste opposable .forge\profile.toml (P-18) n'est lu par aucun code — les racines d'execution sont en dur, et une arborescence back/ + front/ n'est pas vue | **oui** — 7 localisations de code citees et relues le 20/08 ; la doctrine (docs) decrit une cascade que le code ne joue pas |
+| TF-0402 | candidat | 3 | forge-tests : un seuil BLOQUANT sans porteur hors Python — mutation_globale 0,70 cite Stryker (outil JS) qui n'est cable nulle part | **oui** — seuils.py:49-58 + mutation.py:47-51 relus le 20/08 ; la justification du seuil cite un outil que rien ne joue |
+| TF-0403 | candidat | 3 | forge-tests : le pan api exige un objet ASGI importable la ou il n'a besoin que d'une surface — un back Node/Koa est hors mesure sur le chiffre que le run pilote met en avant | **oui** — api.py:20-24, execution.py:407 relus le 20/08 ; recoupe TF-0381 clos la veille sur la distinction constate/presume |
+| TF-0405 | candidat | 3 | forge-tests : la parite de routes/menus du pan i18n reste conditionnee a un build ARBORESCENT — Next.js standalone + ISR n'en emet pas, exactement la stack visee | **oui** — i18n.py:46-51 et 61 relus le 20/08, apres le correctif TF-0383 de la veille — la moitie build-servi reste aveugle aux stacks SSR/ISR |
 | TF-0343 | corrige | 9 | tests : la matrice des droits doit etre un artefact EXECUTABLE cellule par cellule, avec xfail strict pour les cellules non tenues | **oui** — 2 lignes de la matrice des droits conformes par construction mais prouvees par aucun test, et 2 cases non tenues par le produit, invisibles dans une suite organisee par service |
 | TF-0352 | corrige | 9 | tests : « executer la strategie de tests » doit inclure la CORRECTION des anomalies remontees et le REJEU jusqu a extinction — definition de fin a ecrire | **oui** — campagne du 12/08 close conforme avec 121 findings et produit inchange ; la meme strategie executee avec obligation de traiter a ferme 4 anomalies produit et 3 faux verts, dont un dormant depuis cette campagne |
 | TF-0371 | corrige | 9 | forge-tests : rien ne confronte ce que le code APPELLE a ce que l instance SERT — ni les routes, ni les ressources | **oui** — une fonction produit entierement morte en production (notifications push, deux routes en 404) et l absence totale d image sur 1 249 annonces, tenues par deux 404 lisibles sans authentification, non vues par six campagnes d audit entre le 11 et le 18/08 |
@@ -102,13 +108,28 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0342 | corrige | 3 | tests : exiger une recette MULTI-PROFILS des qu un produit declare des roles — un produit a roles n est pas verifiable sous une identite unique | **oui** — audit 12 pans declare vert le 12/08 sur le seul cas degenere ; 1 defaut produit et 2 defauts d ergonomie decouverts des la premiere recette multi-profils, 5 jours plus tard et hors outillage |
 | TF-0355 | corrige | 3 | forge-tests : un élément non_testable déclaré PAR LE RAPPORT n'entre pas au solde — « solde 0 » peut coexister avec 8 non couverts | **oui** — le solde nul peut redevenir un faux confort exactement là où R-40 vient de tuer le précédent |
 | TF-0381 | corrige | 3 | forge-tests : une action manuelle utilisateur est emise pour des pans que le rapport declare lui-meme a zero element | **oui** — trois actions categorie manuelle_utilisateur emises sur un projet qui n'a ni api, ni back, ni batch — soit trois demandes de configuration adressees a un humain pour des pans que le rapport declare a zero element deux champs plus haut. |
+| TF-0404 | corrige | 3 | parc entier : RGAA 4.1 / WCAG AA est une OBLIGATION LEGALE pour un site public francais, et aucun oracle du parc ne la mesure — le non_juge du pan accessibilite ne le dit meme pas | **oui** — NON_JUGE du pan accessibilite relu le 20/08 ; recherche « contraste » sur le parc : une seule occurrence, et c'est un libelle d'action manuelle ; obligation legale RGAA 4.1 pour tout site public francais |
 | TF-0334 | corrige | 2 | forge-tests : comptes périmés restants au README (treize adaptateurs pour 14, onze pans pour 14) et classes de corpus en littéraux | **oui** — la doc dément l'outil sur deux comptes de plus, et le verrou len(CORPUS) de TF-0311 ne les couvre pas (hors corpus) |
 | TF-0370 | corrige | 2 | forge-tests : les controles de donnees cherchent le vide, jamais le faux — 11 annonces a 0,0 passent les cinq invariants du parc | **oui** — 11 annonces sur 1 249 placees dans le golfe de Guinee, signalees par l utilisateur le 30/07 en priorite 1, toujours servies le 18/08, et passant l integralite des invariants de parc de la recette |
+
+## forge-conception
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0397 | candidat | 1 | forge-conception : une spec qui delegue un geste d identite doit trancher sa PORTEE, sans quoi le comportement le plus large est herite en silence | **oui** — Un aller-retour complet porteur -> diagnostic -> correctif -> redeploiement, pour une decision qui tenait en une ligne de spec au moment de la bascule. |
+
+## forge-tests
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0395 | candidat | 1 | forge-tests : la couverture organisee par mode d authentification rend invisible une regression d un mode a l autre | **oui** — Trois jours de production avec une fonction d interface absente, non detectee par 68 parcours verts ; decouverte par capture d ecran du porteur le 19/08, correctif et redeploiement le 20/08. |
+| TF-0396 | candidat | 1 | forge-tests : un parcours qui affirme la presence d un element laisse passer un element qui en fait trop | **oui** — Un defaut visible par tout utilisateur (deconnexion du compte Microsoft entier au lieu de l application) livre en production et couvert par un parcours vert ecrit specifiquement pour cette zone. |
 
 ## pilot
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0398 | candidat | 1 | pilot : un pipeline qui cree une ressource hors IaC laisse l infrastructure decrire un environnement qui n existe pas, et un controle de securite inerte | **oui** — Defense en profondeur inactive en production pendant trois jours sans aucun signal, et risque avere de coupure d acces : un terraform apply lance dans cet etat aurait efface AAD_CLIENT_SECRET et COCKPIT_ADMINS. |
 | TF-0327 | corrige | 12 | RV-9 n'est pas refermé : la fixture témoin de la bascule sombre démontre ENCORE le comportement interdit | **oui** — deux livrables du même socle peuvent encore s'ouvrir différemment sur le même poste — le symptôme exact que RV-9 prétendait avoir soldé |
 | TF-0328 | corrige | 8 | appliquer-export.mjs est orphelin et TODO-FORGE.md prescrit un dispositif retiré le 12/08 | **oui** — un item de registre entier (TF-0318) a été instruit sur une prémisse que la doc du pilot affirmait et que le code démentait |
 | TF-0332 | corrige | 8 | Solder la dette de traçabilité D-14 : trois affirmations de conformité fausses au corpus | **oui** — deux études du même après-midi ont buté sur des déclarations de conformité fausses — le coût de recherche se paie à chaque instruction |
@@ -123,8 +144,10 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0373 | corrige | 6 | factory : l ouverture de run ne demande jamais ce que le client sait deja de ses defauts — une campagne peut se clore « au vert » a cote d un lot d anomalies ouvertes | **oui** — six campagnes d audit ouvertes sans qu aucune ne demande la liste des defauts deja connus du client ; 13 anomalies ouvertes depuis le 29/07 restees hors de toute mesure et hors de tout livrable |
 | TF-0390 | corrige | 6 | forge-seo renommée forge-seo-geo : le nom dit les deux périmètres (SEO + GEO) que la grille couvrait déjà | **oui** — constaté sur pièces le 19/08 : la grille porte 6 nœuds GEO (53-58) et le routage de veille disait déjà « SEO/GEO » — un nom qui ne dit que la moitié du périmètre fait rater le routage d'une demande GEO entrante et sous-vend la capacité en contexte commercial |
 | TF-0394 | corrige | 6 | Registre TF : deux sessions pilot parallèles frappent les mêmes ids depuis la même base — l'écrivain unique n'est unique que par session | **oui** — payé le 19/08 : une résolution de fusion manuelle sur le fichier le plus critique du pilot (append-only), 14 lignes renumérotées à la main, et un commit publié (digit-ai-forge-conception@cab6654) qui cite pour toujours des ids devenus autres — la prochaine collision touchera peut-être des clôtures croisées, plus chères qu'une renumérotation |
+| TF-0400 | corrige | 6 | pilot : deux passages du socle sont perimes et se contredisent, et aucune regle de preseance entre sources n'est ecrite | **oui** — deux contradictions datees et localisees (README:166, INVENTAIRE:68-70), verifiees au code public le 19-20/08 ; un document de parc sans date de verification est indiscernable d'un document a jour |
 | TF-0319 | corrige | 4.5 | Tout document destiné à l'utilisateur d'une forge se range dans output\ — jamais dans une arborescence de forge à parcourir | **oui** — constat d'usage humain : les documents qui lui sont destinés vivent dans des arborescences de forge complexes ou imbriquées, qu'il doit parcourir pour les retrouver |
 | TF-0350 | corrige | 4.5 | Une page HTML des TODO archivés — retrouver et chercher dans les 300+ items clos | **oui** — demande humaine directe — 320 items archivés ne sont aujourd'hui interrogeables que par grep, un canal illisible pour l'humain qui décide |
+| TF-0399 | corrige | 4.5 | pilot : les gates de l'etape development sont mono-ecosysteme Python, et le socle ne declare aucune voie de sortie — un produit JS/TS ne peut clore l'etape que par un ecart ecrit | **oui** — recherche du 20/08 sur HEAD 7a8fe7c : profile.toml = 0 occurrence dans les 4 documents du socle ; le seul mecanisme de sortie est loge dans le seul composant ecarte (D-V1) |
 | TF-0320 | corrige | 4 | Un produit qui met ses forges à jour n'apprend rien des règles nouvelles ou modifiées — la mise à jour transporte le code, pas la consigne | non |
 | TF-0329 | corrige | 4 | Instruire l'admission de digit-ai-queue — le mécanisme de tickets demandé par TF-0318 existe sur le poste et le corpus l'ignore | **oui** — l'écosystème a instruit et refusé un mécanisme dont un exemplaire éprouvé dort à côté de lui — le trou est de connaissance, pas technique |
 | TF-0330 | corrige | 4 | 4 produits sur 5 n'ont pas de forge/QUESTIONS.md — un arbitrage en attente y est invisible | **oui** — un développement suspendu faute d'arbitrage est invisible pour 4 produits sur 5 — le coût que TF-0318 voulait traiter |

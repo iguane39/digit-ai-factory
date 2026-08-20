@@ -14,7 +14,7 @@
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digit-AI — TODO-FORGE · Reste à faire — V20260819</title>
+  <title>Digit-AI — TODO-FORGE · Reste à faire — V20260820</title>
   <meta name="description" content="Reste-à-faire du registre TODO-FORGE : candidats à décider, décidés, en cours — détaillés en puces, avec date de création, priorité de traitement et impact sur la forge concernée.">
   <meta name="theme-color" content="#2563EB">
   <!-- Favicon-lettre (13/08) : « F » = Forge (projet). -->
@@ -139,7 +139,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>6b44c7857b10</code> · dernier événement 2026-08-19T18:08:50Z</p>
+      <p class="meta">sceau <code>943f4e3ce76f</code> · dernier événement 2026-08-20T16:30:00Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -149,7 +149,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="2 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">2</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="11 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">11</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="1 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">1</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="307 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">307</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -165,10 +165,10 @@
       <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
       
       <div class="dropdown" data-dim="forge">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">10</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">12</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
-          <label><input type="checkbox" value="conception" checked> conception</label>
+          <label><input type="checkbox" value="digit-ai-factory" checked> digit-ai-factory</label>
           <label><input type="checkbox" value="digit-ai-forge-agents" checked> digit-ai-forge-agents</label>
           <label><input type="checkbox" value="digit-ai-forge-audit" checked> digit-ai-forge-audit</label>
           <label><input type="checkbox" value="digit-ai-forge-conception" checked> digit-ai-forge-conception</label>
@@ -177,6 +177,8 @@
           <label><input type="checkbox" value="digit-ai-forge-development" checked> digit-ai-forge-development</label>
           <label><input type="checkbox" value="digit-ai-forge-organization" checked> digit-ai-forge-organization</label>
           <label><input type="checkbox" value="digit-ai-forge-tests" checked> digit-ai-forge-tests</label>
+          <label><input type="checkbox" value="forge-conception" checked> forge-conception</label>
+          <label><input type="checkbox" value="forge-tests" checked> forge-tests</label>
           <label><input type="checkbox" value="pilot" checked> pilot</label>
         </div>
       </div>
@@ -191,29 +193,29 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">87 / 87 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">100 / 100 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#conception"><strong>conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">14 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">4 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-data"><strong>digit-ai-forge-data</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">4 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-development"><strong>digit-ai-forge-development</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-organization"><strong>digit-ai-forge-organization</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">25 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">34 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">14 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-data"><strong>digit-ai-forge-data</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">4 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-development"><strong>digit-ai-forge-development</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-organization"><strong>digit-ai-forge-organization</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">30 item(s) reste-à-faire</span></a><a href="#forge-conception"><strong>forge-conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-tests"><strong>forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">37 item(s) reste-à-faire</span></a></nav>
     <main>
-    <section id="conception">
-      <h2>conception <span class="badge" title="1 item(s) actifs ciblant conception">1</span></h2>
-      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>conception</strong> — trié par statut puis priorité décroissante.</p>
+    <section id="digit-ai-factory">
+      <h2>digit-ai-factory <span class="badge" title="1 item(s) actifs ciblant digit-ai-factory">1</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-factory</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0387" data-forge="conception" data-statut="candidat" data-prio="haute">
+        <article class="card s-candidat" id="item-TF-0407" data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
           <header class="card-head">
-            <code class="tf-id">TF-0387</code>
+            <code class="tf-id">TF-0407</code>
             <span class="statut s-candidat">candidat</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">conception : oracle-ears détecte ses déclencheurs sans frontière de mot — « ressource » réveille le détecteur d'authentification</h3>
-          <div class="card-detail"><p class="lead">mentionne() teste pliSansAccent(texte).includes(terme) : le déclencheur « sso » de DECLENCHEURS_AUTH matche à l'intérieur du mot « ressource », et EA5 exige alors durée de session, renouvellement silencieux, détection d'expiration et restauration du contexte sur une exigence qui ne mentionne aucune authentification.</p><ul class="puces"><li>Constaté le 18/08 sur EX-044 du site factory.produit-07 (« servie sans ressource chargée depuis un domaine externe »), reformulée pour contourner</li><li>Les termes courts sont les plus exposés : sso, saml, oidc — et le même mécanisme s'applique à DECLENCHEURS_ASYNC</li><li>Correctif proposé : réutiliser la construction de regex à frontières de mot déjà employée pour AMBIGUS (EA2), qui échappe le terme et n'encadre de  que les mots simples</li></ul></div>
+          <h3 class="card-titre">pilot : la conversation est la seule surface de restitution sans doctrine d'audience — profil d'interlocuteur déclaré + ouverture commanditaire + règle S9</h3>
+          <div class="card-detail"><p class="lead">Retour humain direct du 20/08, qui est la mesure elle-même : « ton interlocuteur peut être pas assez technique pour comprendre tout ce que tu remontes » — émis par l'unique lecteur des restitutions.</p><ul class="puces"><li>Une information remontée et non comprise a le même effet qu'une information tue, avec le coût de lecture en plus ; et les décisions humaines (GO, arbitrages) se prennent alors sur la partie comprise, pas sur la partie dite. L'ÉCOSYSTÈME A DÉJÀ TRANCHÉ TROIS FOIS « une audience, une forme » : rapports (REFERENTIEL-RESTITUTION, lecteurs types dont « commanditaire novice du domaine », règles RL contrôlées), documentation (TF-0389, vues par profil), page du registre (vocabulaire par niveau, d850f88). La conversation est la seule surface restée sans doctrine — et c'est celle que le retour vise. VERDICT O1 de l'étude 20260820b (E1-E7 PASS) : transposer, pas inventer. Trois gestes :</li><li>le niveau et les attentes de l'interlocuteur se DÉCLARENT une fois (mémoire de session — fait le 20/08 — et CLAUDE.md produit quand l'interlocuteur diffère)</li><li>gabarits/RESTITUTION.md gagne la règle transposée de RL-1/RL-7 : toute restitution s'ouvre par une synthèse en langage commanditaire — l'état, ce que ça change, ce qui est attendu — AVANT le détail technique, un terme technique y portant sa glose</li><li>oracle-synthese gagne S9 : la synthèse d'ouverture existe, sans identifiant nu ni chemin sans glose. GARDE-FOU CENTRAL : on ordonne, on ne supprime JAMAIS — identifiants, preuves et chemins restent après la synthèse ; une restitution agréable et invérifiable serait pire que l'état actuel. Écartées : O2 (deux restitutions par sujet = second porteur), O3 (indice de lisibilité = heuristique bruyante, différée), O4 (variantes par audience en conversation = coût sans destinataire, le mécanisme restant juste pour les docs)</li></ul></div>
           <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-18</dd></div>
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur conception</dt><dd>1 exigence reformulée pour contourner un faux positif ; tout référentiel employant le mot « ressource » déclenchera EA5 à tort</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">factory-digit-ai-fr</dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>le retour lui-même, émis par le seul lecteur des restitutions — il n'existe pas de mesure plus directe qu'un destinataire disant qu'une partie ne lui parvient pas</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (Sébastien) — retour direct du 20/08, « travaille l'opportunité »</dd></div>
             
           </dl>
         </article>
@@ -487,9 +489,26 @@
       </div>
     </section>
     <section id="digit-ai-forge-conception">
-      <h2>digit-ai-forge-conception <span class="badge" title="4 item(s) actifs ciblant digit-ai-forge-conception">4</span></h2>
+      <h2>digit-ai-forge-conception <span class="badge" title="5 item(s) actifs ciblant digit-ai-forge-conception">5</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-conception</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
+        <article class="card s-corrige" id="item-TF-0387" data-forge="digit-ai-forge-conception" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0387</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">conception : oracle-ears détecte ses déclencheurs sans frontière de mot — « ressource » réveille le détecteur d'authentification</h3>
+          <div class="card-detail"><p class="lead">mentionne() teste pliSansAccent(texte).includes(terme) : le déclencheur « sso » de DECLENCHEURS_AUTH matche à l'intérieur du mot « ressource », et EA5 exige alors durée de session, renouvellement silencieux, détection d'expiration et restauration du contexte sur une exigence qui ne mentionne aucune authentification.</p><ul class="puces"><li>Constaté le 18/08 sur EX-044 du site factory.produit-07 (« servie sans ressource chargée depuis un domaine externe »), reformulée pour contourner</li><li>Les termes courts sont les plus exposés : sso, saml, oidc — et le même mécanisme s'applique à DECLENCHEURS_ASYNC</li><li>Correctif proposé : réutiliser la construction de regex à frontières de mot déjà employée pour AMBIGUS (EA2), qui échappe le terme et n'encadre de  que les mots simples</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-18</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>1 exigence reformulée pour contourner un faux positif ; tout référentiel employant le mot « ressource » déclenchera EA5 à tort</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">factory-digit-ai-fr</dd></div>
+            
+          </dl>
+        </article>
         <article class="card s-corrige" id="item-TF-0376" data-forge="digit-ai-forge-conception" data-statut="corrige" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0376</code>
@@ -675,9 +694,26 @@
       </div>
     </section>
     <section id="digit-ai-forge-development">
-      <h2>digit-ai-forge-development <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-development">1</span></h2>
+      <h2>digit-ai-forge-development <span class="badge" title="2 item(s) actifs ciblant digit-ai-forge-development">2</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-development</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0406" data-forge="digit-ai-forge-development" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0406</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-development : le contrat d'entree expose une decision que le code ecrase (briques t0 forcees en build), et une cible de scaffold unique qu'il ne declare pas</h3>
+          <div class="card-detail"><p class="lead">cadrer() (conductor/cadrage.py) accepte bricks: [{name, decision: build|buy|skip}] — mais multi-tenancy, rbac et auth-sso sont FORCEES en build et non desactivables (catalog.py:T0_BRICKS, _merge_t0).</p><ul class="puces"><li>Pour une vitrine sans espace connecte (ADR-03/Q-05 : redirection simple, aucune auth cote site), les trois sont sans objet : conflit de contrat, a remonter jamais contourner. Second point du meme ordre : scaffold.py:TEMPLATE_REF = gh:fastapi/full-stack-fastapi-template, et targets/ ne contient que fastapi-saas — une seule cible de scaffold, qu'un produit Next.js/Strapi n'apprend qu'en lisant le code. PROPOSITION : rendre les briques t0 decidables en skip AVEC MOTIF — le champ decision existe deja, il suffit de cesser de l'ecraser</li><li>et declarer la mono-cible au contrat d'entree plutot qu'au seul code. Un contrat qui accepte un argument sans effet coute plus cher qu'un contrat qui le refuse</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-development</dt><dd>cadrage.py, catalog.py:T0_BRICKS/_merge_t0, scaffold.py:TEMPLATE_REF, targets/ — lus en depot public le 19/08 (fait rapporte, non reconstate au poste : depot non clone)</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit Produit-09 (lot 20260820a remis SANS sidecar — transcrit par le pilot le 20/08, ligne a ligne depuis le .md ; scores estimes par le transcripteur)</dd></div>
+            
+          </dl>
+        </article>
         <article class="card s-corrige" id="item-TF-0375" data-forge="digit-ai-forge-development" data-statut="corrige" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0375</code>
@@ -721,7 +757,7 @@
       </div>
     </section>
     <section id="digit-ai-forge-tests">
-      <h2>digit-ai-forge-tests <span class="badge" title="25 item(s) actifs ciblant digit-ai-forge-tests">25</span></h2>
+      <h2>digit-ai-forge-tests <span class="badge" title="30 item(s) actifs ciblant digit-ai-forge-tests">30</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-tests</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
         <article class="card s-candidat" id="item-TF-0384" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="haute">
@@ -738,6 +774,74 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>8 limites declarees dans un module neuf, absentes du registre de dette jusqu a ce qu un humain y pense — et le contrôle de synchronisation du registre ne le voyait pas, puisqu il compare le registre a ce que le COLLECTEUR rend, non a ce que le code declare</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant, livraison de TF-0383 le 19/08)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0401" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0401</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : le manifeste opposable .forge\profile.toml (P-18) n'est lu par aucun code — les racines d'execution sont en dur, et une arborescence back/ + front/ n'est pas vue</h3>
+          <div class="card-detail"><p class="lead">HEAD 7d3ca37, releve du 20/08 : profile.toml = 0 occurrence dans le code (--include=*.py) ; il ne vit que dans docs\ qui DECRIT pourtant la cascade manifeste → profil cure → inference.</p><ul class="puces"><li>resolve_profile, select_onramp, detect_stack = 0 occurrence aussi. Ce qui decide reellement : disposition.py:94 _ORDRE_CANDIDATS = (&quot;backend&quot;, &quot;.&quot;), disposition.py:155, execution.py:138 et 498 (banc / &quot;frontend&quot;). SCC.FR est back/ + front/ : non vu, quel que soit le manifeste livre. Le pilot presente P-18 comme primant sur toute detection</li><li>l'auditeur ne le lit pas. PROPOSITION : lire le manifeste comme branche 1 de la cascade, et DANS TOUS LES CAS publier au rapport la racine retenue et le motif du repli — aujourd'hui un audit peut mesurer un dossier vide et rendre un verdict d'apparence normale. A traiter en premier : sans racine juste, les retours suivants mesurent le vide</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>7 localisations de code citees et relues le 20/08 ; la doctrine (docs) decrit une cascade que le code ne joue pas</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit Produit-09 (lot 20260820a remis SANS sidecar — transcrit par le pilot le 20/08, ligne a ligne depuis le .md ; scores estimes par le transcripteur)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0402" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0402</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : un seuil BLOQUANT sans porteur hors Python — mutation_globale 0,70 cite Stryker (outil JS) qui n'est cable nulle part</h3>
+          <div class="card-detail"><p class="lead">seuils.py:49-58 : mutation_globale = 0,70, severite bloquant, porte sur le pan back.</p><ul class="puces"><li>adaptateurs/mutation.py:47-51 exige un environnement Python (backend/.venv) et des sources sous backend/</li><li>Sur un back Strapi (Node), le pan est en SKIP PAR CONSTRUCTION et le seuil bloquant ne porte sur rien — alors que sa justification cite Stryker, l'outil JS, cable nulle part</li><li>PROPOSITION : soit un pan mutation JS (Stryker — le seuil est deja ecrit pour lui), soit declarer le seuil sans porteur dans l'ecosysteme mesure, et le dire au rapport</li><li>Un seuil bloquant qui ne porte sur rien est, au dashboard, indiscernable d'un seuil tenu : la pire des deux formes de silence</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 2 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>seuils.py:49-58 + mutation.py:47-51 relus le 20/08 ; la justification du seuil cite un outil que rien ne joue</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit Produit-09 (lot 20260820a remis SANS sidecar — transcrit par le pilot le 20/08, ligne a ligne depuis le .md ; scores estimes par le transcripteur)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0403" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0403</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : le pan api exige un objet ASGI importable la ou il n'a besoin que d'une surface — un back Node/Koa est hors mesure sur le chiffre que le run pilote met en avant</h3>
+          <div class="card-detail"><p class="lead">adaptateurs/api.py:20-24 + CHAMPS_REQUIS = (&quot;FORGE_TESTS_APP&quot;,) : il faut declarer l'application ASGI (module:attribut).</p><ul class="puces"><li>execution.py:407 attache l'extraction OpenAPI au domaine backend Python. Strapi est Node/Koa : le pan qui porte la couverture de surface API (chapitre T1) est hors mesure — l'un des deux chiffres du run pilote du 04/08 (8/8 au seuil 1.0). PROPOSITION : une sonde HTTP sur instance servie (schema OpenAPI exporte ou routes declarees — accessibilite sait deja faire via FORGE_TESTS_QUALIF_ROUTES)</li><li>le pan compare des routes et des codes, la provenance lui est indifferente. A defaut, que le motif de SKIP distingue « ecosysteme non couvert » de « configuration manquante » : les deux ne se traitent pas pareil (meme reproche que Produit-10 RA-19 / TF-0381, par un autre chemin)</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 2 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>api.py:20-24, execution.py:407 relus le 20/08 ; recoupe TF-0381 clos la veille sur la distinction constate/presume</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit Produit-09 (lot 20260820a remis SANS sidecar — transcrit par le pilot le 20/08, ligne a ligne depuis le .md ; scores estimes par le transcripteur)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0405" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0405</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : la parite de routes/menus du pan i18n reste conditionnee a un build ARBORESCENT — Next.js standalone + ISR n'en emet pas, exactement la stack visee</h3>
+          <div class="card-detail"><p class="lead">Constate au code le 20/08 : _findings_catalogue (TF-0383) juge desormais le catalogue source — le correctif est la, et il compte.</p><ul class="puces"><li>Mais POUR_COUVRIR (i18n.py:46-51) et CHAMPS_REQUIS = FORGE_TESTS_I18N_BUILD conditionnent toujours la parite de ROUTES et de MENUS a un dossier de build (out/, dist/, _site/), le pan « ne lisant AUCUN site distant »</li><li>Next.js en output standalone + ISR n'emet pas cette arborescence — exactement la stack de SCC.FR, et exactement les defauts que ce pan est ecrit pour attraper (EX-09/NF-22)</li><li>PROPOSITION : accepter une racine servie (FORGE_TESTS_BASE_URL, deja employee par accessibilite) comme source alternative des routes, par crawl des liens</li><li>A defaut, ecrire dans POUR_COUVRIR que les rendus serveur/ISR sont hors champ : ce serait une decision, pas une decouverte au premier run</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 2 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>i18n.py:46-51 et 61 relus le 20/08, apres le correctif TF-0383 de la veille — la moitie build-servi reste aveugle aux stacks SSR/ISR</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit Produit-09 (lot 20260820a remis SANS sidecar — transcrit par le pilot le 20/08, ligne a ligne depuis le .md ; scores estimes par le transcripteur)</dd></div>
             
           </dl>
         </article>
@@ -1115,6 +1219,23 @@
             
           </dl>
         </article>
+        <article class="card s-corrige" id="item-TF-0404" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0404</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">parc entier : RGAA 4.1 / WCAG AA est une OBLIGATION LEGALE pour un site public francais, et aucun oracle du parc ne la mesure — le non_juge du pan accessibilite ne le dit meme pas</h3>
+          <div class="card-detail"><p class="lead">SCC.FR est un site public francais : RGAA 4.1 y est une obligation (NF-18 : 100 % des criteres applicables, plancher projet 95 % ; NF-19 : contraste &gt;= 4,5:1, navigation clavier complete).</p><ul class="puces"><li>Or adaptateurs/accessibilite.py NON_JUGE exclut NOMMEMENT « ni audit axe-core complet, ni contraste, ni navigation clavier », et le DOM est capture a l'etat INITIAL de chaque route (ni menu ouvert, ni modale, ni message d'erreur). Recherche du parc le 20/08 : aucun autre pan ne les reprend — la seule autre occurrence de « contraste » est un libelle d'action manuelle (livrables/libelles.py:131), une delegation a l'humain, pas une mesure. Et les cinq livrables legaux (declaration d'accessibilite avec taux, schema pluriannuel, plan d'action annuel, mecanisme de signalement, voie de recours) ne sont produits par AUCUNE forge. PROPOSITION en trois temps :</li><li>le moins cher — que le non_juge dise que la famille n'est couverte par aucun oracle du parc (mot pour mot le reproche de RA-17 / TF-0379 sur oracle-calculs)</li><li>cote pilot, instruire l'ecart au dossier MEP — « pret client » ne devrait pas se prononcer sur une conformite legale non mesuree</li><li>a terme un pan accessibilite-complet (axe-core + contraste + clavier, sur etats ouverts). En attendant, l'audit RGAA reste un livrable humain externe a budgeter</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 3 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>NON_JUGE du pan accessibilite relu le 20/08 ; recherche « contraste » sur le parc : une seule occurrence, et c'est un libelle d'action manuelle ; obligation legale RGAA 4.1 pour tout site public francais</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit Produit-09 (lot 20260820a remis SANS sidecar — transcrit par le pilot le 20/08, ligne a ligne depuis le .md ; scores estimes par le transcripteur)</dd></div>
+            
+          </dl>
+        </article>
         <article class="card s-corrige" id="item-TF-0334" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0334</code>
@@ -1151,10 +1272,90 @@
         </article>
       </div>
     </section>
+    <section id="forge-conception">
+      <h2>forge-conception <span class="badge" title="1 item(s) actifs ciblant forge-conception">1</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>forge-conception</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0397" data-forge="forge-conception" data-statut="candidat" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0397</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-conception : une spec qui delegue un geste d identite doit trancher sa PORTEE, sans quoi le comportement le plus large est herite en silence</h3>
+          <div class="card-detail"><p class="lead">CLASSE : deleguer un geste a un fournisseur (identite, paiement, notification) c est choisir OU IL S ARRETE.</p><ul class="puces"><li>Le defaut d un fournisseur est toujours le plus large, et l omission vaut adoption. PREUVE MESUREE : la spec de bascule EasyAuth (ledger seq 69-75) a correctement decide de deleguer les ecrans d identite a Entra, mais n a nulle part decide ou s arrete la deconnexion. Le produit a appele /.auth/logout, qui purge la session App Service PUIS enchaine sur le point de deconnexion d Entra : sortir du Cockpit fermait la session Microsoft du navigateur, Outlook et Teams compris. Constate en production par le porteur le 20/08/2026, corrige le jour meme. PROPOSITION : rubrique obligatoire « portee » dans l artefact de conception pour tout geste delegue a un fournisseur d identite (connexion, deconnexion, revocation, changement de compte), tranchee parmi trois niveaux nommes : session applicative seule</li><li>session du fournisseur sur cet appareil</li><li>comptes federes. Une spec de delegation sans ce champ est incomplete, et le self-test de la forge peut l exiger</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur forge-conception</dt><dd>Un aller-retour complet porteur -&gt; diagnostic -&gt; correctif -&gt; redeploiement, pour une decision qui tenait en une ligne de spec au moment de la bascule.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">client-a-cockpit-ia</dd></div>
+            
+          </dl>
+        </article>
+      </div>
+    </section>
+    <section id="forge-tests">
+      <h2>forge-tests <span class="badge" title="2 item(s) actifs ciblant forge-tests">2</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>forge-tests</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0395" data-forge="forge-tests" data-statut="candidat" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0395</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : la couverture organisee par mode d authentification rend invisible une regression d un mode a l autre</h3>
+          <div class="card-detail"><p class="lead">CLASSE : quand une famille de suites paralleles couvre les variantes d un meme comportement (ici les modes d authentification), chaque suite affirme ce que son auteur avait en tete.</p><ul class="puces"><li>Rien ne demande a une suite ce que sa suite soeur affirmait et qu elle a omis</li><li>PREUVE MESUREE sur client-a-cockpit-ia : la bascule EasyAuth du 17/08/2026 a produit e2e/easyauth/ (13 parcours : entree, roles, refus) sans reprendre l assertion que e2e/profils/connexion-profils.spec.ts:205 portait deja (« la deconnexion referme reellement la session »)</li><li>Le bouton de deconnexion, conditionne a ssoConfigure() dans src/components/app-header.tsx, a donc disparu de l environnement deploye — ou aucune des cinq variables du SSO applicatif n est posee — pendant trois jours, sous 68 parcours verts, jusqu a ce que le porteur le constate a l ecran</li><li>PROPOSITION : produire un catalogue d invariants partage, execute par chaque membre de la famille, et signaler comme trou de couverture toute assertion presente dans une suite soeur et absente ici</li><li>Comparaison inter-suites, pas metrique supplementaire</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur forge-tests</dt><dd>Trois jours de production avec une fonction d interface absente, non detectee par 68 parcours verts ; decouverte par capture d ecran du porteur le 19/08, correctif et redeploiement le 20/08.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">client-a-cockpit-ia</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-candidat" id="item-TF-0396" data-forge="forge-tests" data-statut="candidat" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0396</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : un parcours qui affirme la presence d un element laisse passer un element qui en fait trop</h3>
+          <div class="card-detail"><p class="lead">CLASSE : une assertion de PRESENCE (le lien existe) ou de prefixe (contains) ne dit rien de la PORTEE de l action declenchee.</p><ul class="puces"><li>PREUVE, et elle vient de notre propre correctif : le parcours ecrit le 19/08 pour couvrir la classe precedente affirmait expect(location).toContain(&quot;/.auth/logout&quot;). Il etait VERT sur le comportement defectueux, /.auth/logout (deconnexion complete, qui ferme le compte Microsoft du navigateur, messagerie comprise) et /.auth/logout/complete (deconnexion de l application seule) partageant ce prefixe. Le defaut n a pas ete trouve par le test ecrit pour lui, mais par un humain qui a clique. PROPOSITION : exiger une assertion de cible EXACTE (egalite, ou appartenance a un ensemble enumere) des qu un parcours affirme un lien, une action ou une redirection</li><li>refuser un contains sur un chemin dont un prefixe est lui-meme un chemin valide de l application. Verifiable statiquement sur les fichiers de parcours, sans execution</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur forge-tests</dt><dd>Un defaut visible par tout utilisateur (deconnexion du compte Microsoft entier au lieu de l application) livre en production et couvert par un parcours vert ecrit specifiquement pour cette zone.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">client-a-cockpit-ia</dd></div>
+            
+          </dl>
+        </article>
+      </div>
+    </section>
     <section id="pilot">
-      <h2>pilot <span class="badge" title="34 item(s) actifs ciblant pilot">34</span></h2>
+      <h2>pilot <span class="badge" title="37 item(s) actifs ciblant pilot">37</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0398" data-forge="pilot" data-statut="candidat" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0398</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : un pipeline qui cree une ressource hors IaC laisse l infrastructure decrire un environnement qui n existe pas, et un controle de securite inerte</h3>
+          <div class="card-detail"><p class="lead">CLASSE : quand un pipeline cree une ressource dont l IaC a besoin (identifiant d application, secret, cle) sans lui rendre cet identifiant, l IaC decrit un environnement different de celui qui est servi — et l ecart ne se voit nulle part.</p><ul class="puces"><li>PREUVE MESUREE sur cockpit-ia-d1 le 19/08/2026 : EasyAuth actif cote plateforme (clientId 4f0167c7-eba6-4179-a416-c61fcb9a35ac, redirection vers Entra verifiee), mais app settings SANS COCKPIT_EASYAUTH ni AZURE_TENANT_ID, le module Terraform ne les ecrivant que si client_id_entra lui est fourni. Deux consequences : l application ne tenait que par le repli WEBSITE_AUTH_ENABLED, prevu comme filet et non comme configuration nominale ; et le controle de tenant du decodeur de principal etait INERTE faute d AZURE_TENANT_ID, alors qu un parcours e2e (« un principal d un AUTRE tenant est refuse ») l affirme actif — un test vert attestait d un controle absent de la cible. PROPOSITION, deux gestes a l etape MEP :</li><li>tout pipeline qui cree une ressource rend son identifiant a l IaC (variable, tfvars, sortie consommee)</li><li>verification d ecart post-deploiement comparant les reglages SERVIS a ceux qu exige le mode declare, en echec si un reglage de securite manque. Pendant exact du retour seq 72 (le processus a-t-il redemarre ?), deja admis</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>Defense en profondeur inactive en production pendant trois jours sans aucun signal, et risque avere de coupure d acces : un terraform apply lance dans cet etat aurait efface AAD_CLIENT_SECRET et COCKPIT_ADMINS.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">client-a-cockpit-ia</dd></div>
+            
+          </dl>
+        </article>
         <article class="card s-corrige" id="item-TF-0327" data-forge="pilot" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0327</code>
@@ -1399,6 +1600,23 @@ La famille est plus large que le catalogue : tout contrôle « vue générée ==
             
           </dl>
         </article>
+        <article class="card s-corrige" id="item-TF-0400" data-forge="pilot" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0400</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : deux passages du socle sont perimes et se contredisent, et aucune regle de preseance entre sources n'est ecrite</h3>
+          <div class="card-detail"><p class="lead">(a) README.md:166 « trois etapes sur quatre n'ont pas de point d'entree natif » — invalide par CONTRAT-INTERFACE §5 relu au 14/08 (conception : run-oracles-conception.mjs + 4 skills ; design : 4 skills + run-oracles-design.mjs).</p><ul class="puces"><li>(b) INVENTAIRE.md:68-70 sur le conductor « main() retourne toujours 0, aucune sortie machine » alors que conductor/__main__.py ecrit _forge-output/run-report.json et rend 0/1/2 (lecture publique 691e9cd du 19/08)</li><li>Trois sources coexistent sans hierarchie declaree — le dossier produit a du la poser lui-meme : code lu &gt; CONTRAT-INTERFACE §5 &gt; README/INVENTAIRE</li><li>PROPOSITION : corriger les deux passages, ecrire la preseance une fois pour toutes, et porter un verifie_le en frontmatter de README et INVENTAIRE, sur le patron R-20 deja impose aux produits</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>deux contradictions datees et localisees (README:166, INVENTAIRE:68-70), verifiees au code public le 19-20/08 ; un document de parc sans date de verification est indiscernable d'un document a jour</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit Produit-09 (lot 20260820a remis SANS sidecar — transcrit par le pilot le 20/08, ligne a ligne depuis le .md ; scores estimes par le transcripteur)</dd></div>
+            
+          </dl>
+        </article>
         <article class="card s-corrige" id="item-TF-0319" data-forge="pilot" data-statut="corrige" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0319</code>
@@ -1430,6 +1648,23 @@ La famille est plus large que le catalogue : tout contrôle « vue générée ==
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur pilot</dt><dd>demande humaine directe — 320 items archivés ne sont aujourd'hui interrogeables que par grep, un canal illisible pour l'humain qui décide</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain — mandat direct du 17/08 (prompt réécrit L99, écarts validés poste par poste)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0399" data-forge="pilot" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0399</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : les gates de l'etape development sont mono-ecosysteme Python, et le socle ne declare aucune voie de sortie — un produit JS/TS ne peut clore l'etape que par un ecart ecrit</h3>
+          <div class="card-detail"><p class="lead">ETAPES-RUN.md:161 prescrit « ruff check + pytest au vert » ; les disciplines du meme §4 nomment app.main.app, une couche SQL observable, des migrations +migrate.</p><ul class="puces"><li>SCC.FR est Next.js (TS) + Strapi (JS) : les deux commandes sont sans objet. Le mecanisme opposable existe — le manifeste .forge\profile.toml (P-18) — mais il n'est PAS dans le socle : 0 occurrence dans README, CONTRAT-INTERFACE, ETAPES-RUN et REGLES-PROJET (releve du 20/08 sur HEAD 7a8fe7c)</li><li>sa seule mention du depot est INVENTAIRE.md:72, comme entree du conductor — le composant que le contrat declare inutilisable en headless (D-V1). PROPOSITION du lot : nommer profile.toml dans ETAPES-RUN §4 comme voie declaree de substitution des gates, table minimale par ecosysteme (Node : npm run lint / npm test / npm run build), et porter au ledger le couple (gate prescrit, gate reellement joue)</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>recherche du 20/08 sur HEAD 7a8fe7c : profile.toml = 0 occurrence dans les 4 documents du socle ; le seul mecanisme de sortie est loge dans le seul composant ecarte (D-V1)</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit Produit-09 (lot 20260820a remis SANS sidecar — transcrit par le pilot le 20/08, ligne a ligne depuis le .md ; scores estimes par le transcripteur)</dd></div>
             
           </dl>
         </article>
