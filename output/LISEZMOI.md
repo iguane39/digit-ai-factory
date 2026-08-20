@@ -8,7 +8,7 @@ Le nom des fichiers ne change jamais (`<Projet> - <Objet> - AAAAMMJJ<indice>`, r
 | Dossier | Famille | Contenu |
 |---|---|---|
 | `01-revues-et-propositions\` | Revues et propositions d'écosystème | Revue Écosystème 20260808a (+ sidecars `.oracles*`), Proposition Tuyauterie cognitive 20260809a |
-| `02-schema-ecosysteme\` | Schéma d'écosystème (HTML) | version courante : `20260812b.html` ; `old\` : 20260810a.png, 20260811h.html, 20260812a.html + `.oracles\` (rendus 20260811h) |
+| `02-schema-ecosysteme\` | Schéma d'écosystème (HTML) | version courante : `20260820a.html` (V14, forge-seo-geo — TF-0412) ; `old\` : 20260810a.png, 20260811h.html, 20260812a.html, 20260812b.html, 20260813a.html + `.oracles\` (rendus 20260811h) |
 | `03-etudes\` | Études d'opportunité | opportunité forges (12/08), forge-data × moteurs (12/08), personas agents (13/08) |
 | `04-plans\` | Plans stratégiques | stratégie tests e2e (13/08) |
 | `05-catalogues-readmes-forges\` | Sections catalogue proposées aux README des forges | 13 sections + LISEZMOI (générées depuis `catalogues\catalogue.jsonl`) |

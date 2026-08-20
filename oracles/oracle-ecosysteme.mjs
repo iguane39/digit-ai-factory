@@ -66,9 +66,12 @@ for (const f of forges) {
 // R-28/R-31 — reste de TF-0125, encodé le 14/08). Les 14 forges nées AVANT la règle sont
 // en antériorité déclarée ; toute forge nouvelle doit porter dans sa fiche un verdict de
 // non-recouvrement écrit (le mot « non-recouvrement » avec citation de l'existant).
+// TF-0412 (20/08) : `seo` y figure sous son nom courant `seo-geo` (renommage du 19/08,
+// TF-0390) — même forge, née le 08/08 donc avant R-31 ; une clé périmée la faisait passer
+// pour une forge NOUVELLE et exigeait d'elle un verdict que son antériorité lui épargne.
 const ANTERIORITE_R28 = new Set([
   "agents", "agents-security", "audit", "audit_client-a", "conception", "data", "design",
-  "development", "observability", "ops", "organization", "seo", "tests", "websec",
+  "development", "observability", "ops", "organization", "seo-geo", "tests", "websec",
 ]);
 for (const f of forges.filter((f) => !ANTERIORITE_R28.has(f))) {
   const fiche = join(racine, "fiches", `forge-${f}.md`);
