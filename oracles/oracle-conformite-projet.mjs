@@ -461,6 +461,23 @@ else {
     : ok("R-11", "CLAUDE.md", "présent, table de routage forge complète");
 }
 
+// R-43 — PRÉCÉDENCE de la factory (mandat humain du 20/08) : le CLAUDE.md du produit porte la
+// clause « quand la factory est impliquée, ses règles priment » (gabarits\CLAUDE-PRODUIT.md), et
+// les hooks de la factory sont installés chez le produit (R-44 : .claude\settings.json +
+// forge\hooks\factory.mjs) — sans eux, la précédence est un vœu : aucun gate ne la joue.
+{
+  const claude = existsSync(p("CLAUDE.md")) ? readFileSync(p("CLAUDE.md"), "utf8") : "";
+  const manques = [];
+  if (!/pr[ée]c[ée]dence/i.test(claude) || !/R-43/.test(claude)) manques.push("clause de précédence (R-43) au CLAUDE.md");
+  const reglages = p(".claude/settings.json");
+  if (!existsSync(reglages)) manques.push(".claude/settings.json (gabarits\\settings-produit.json)");
+  else if (!/forge\/hooks\/factory\.mjs/.test(readFileSync(reglages, "utf8"))) manques.push("hooks de la factory dans .claude/settings.json");
+  if (!existsSync(p("forge/hooks/factory.mjs"))) manques.push("forge/hooks/factory.mjs (gabarits\\hooks-factory.mjs)");
+  manques.length
+    ? ko("R-43", "CLAUDE.md / .claude", `précédence de la factory non câblée — manque : ${manques.join(", ")} (socle d'ouverture, ETAPES-RUN)`)
+    : ok("R-43", "CLAUDE.md / .claude", "clause de précédence présente, hooks de la factory installés");
+}
+
 // R-11 bis — LES RÉFÉRENTIELS DISPONIBLES, déclarés (TF-0373, 18/08). Coût du silence, mesuré :
 // treize anomalies clients vivaient dans un board depuis le 29/07, six campagnes ont tourné
 // entre le 11 et le 18/08, AUCUNE n'a su qu'elles existaient — et le sujet n'est apparu que

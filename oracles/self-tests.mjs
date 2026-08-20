@@ -130,6 +130,12 @@ const ETAT_DU_PARC = [
     motif: "dérive versionné↔installé des skills",
     remede: "node oracles\\oracle-skills.mjs --appliquer (décision humaine, TF-0391)",
   },
+  {
+    // R-44 (20/08) : un README par dossier d'input\ et output\, présent, à jour, rédigé.
+    nom: "oracle-readme-dossiers.mjs",
+    motif: "README d'input\\ et output\\ absents, périmés ou non rédigés",
+    remede: "node scripts\\readme-dossiers.mjs, puis rédiger le bloc ROLE des README signalés",
+  },
 ];
 for (const { nom, remede } of ETAT_DU_PARC) {
   const r = spawnSync(process.execPath, [join(ICI, nom)], { encoding: "utf8" });
