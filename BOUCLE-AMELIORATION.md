@@ -1766,3 +1766,23 @@ dans `ingerer-lot.mjs` (fetch + refus motivé si le registre distant a avancé,
 `preflight-collision.test.mjs`, harnais du pilot **18/18** (I2 l'a découvert seul).
 Limite déclarée : deux sessions simultanées non poussées restent une course possible —
 le cas réellement payé le 19/08 est, lui, fermé.
+
+## 20/08/2026 (soir) — « Poste prêt » redevient une preuve : bootstrap v2 (TF-0416)
+
+Mandat humain : « assure-toi qu'un utilisateur récupère toujours toutes les forges, à la
+dernière version — j'ai l'impression que ça ne fonctionne pas bien ». L'impression était
+juste, et mesurable : poste vierge amorcé « prêt » SANS AUCUN skill exécutable (K1) ;
+poste réel K2 rouge à chaque `--pull` (le pull met à jour les dépôts, jamais la copie
+installée — TF-0391, TF-0414 l'avaient payé) ; pilot jamais mis à jour par bootstrap ;
+« mis à jour » = pull sans erreur, « déjà présent » = exit 0 à N commits de retard, sans
+version affichée ; renommage seo→seo-geo → doublon ; `gh` bloquant sur forges publiques.
+**bootstrap v2** : pilot d'abord (relance de soi si changé), mesure fetch + retard/avance
++ `describe --tags` par dépôt, alias renommés sur place, clone git https, skills propagés
+par `--pull` (la décision R-29 est le geste lui-même), défauts toujours avec remède,
+table des 14 versions. Recette `bootstrap.test.mjs` (13 bare éphémères, 7 contrôles,
+liste lue dans bootstrap.mjs). Docs AGENTS / PROMPT-PRODUIT / README alignées.
+Constat en passant → candidat : `oracle-claude-md` compte les octets CRLF (6194 vs 6096
+LF) — classe TF-0359. Note de dates : les libellés « 19/08 » de la session du 20/08 (études
+20260819*, `date_*` des TF-0388/0389/0386/0390…0394) sont décalés d'un jour — les `ts`
+machine sont justes ; décalage consigné ici et dans les textes de clôture, histoire non
+réécrite (le schéma `rectification_horodatage` ne couvre que les `ts`, R11).
