@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=3e5ad1e4e8d5 archive=9f205b231527 · dernier événement: 2026-08-20T18:21:00Z -->
+     sceaux: actifs=4a67087eee64 archive=9f205b231527 · dernier événement: 2026-08-20T18:21:00Z -->
 
-**106 actifs** (candidat 3 · décidé 0 · en cours 1 · corrigé 101 · écarté 1) · **308 archivés**.
+**107 actifs** (candidat 4 · décidé 0 · en cours 1 · corrigé 101 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,6 +11,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0414 | candidat | 9 | re-reconstat à 24 h : oracle-skills K2 FAIL sur 9 skills — le gate de propagation posé par TF-0391 n'a pas tenu un jour | **oui** — les oracles HTML de la session du jour ont été joués depuis une copie divergente de sa source versionnée — un verdict rendu par un outil que le dépôt ne connaît pas ; et la famille en est à sa troisième occurrence en trois semaines, dont la deuxième moins de 24 h après le gate censé l'éteindre. |
 | TF-0413 | candidat | 6 | pilot : les horodatages écrits À LA MAIN dans TODO.jsonl sont en avance de 2 h 40 à 7 h 30 sur l'heure réelle — le registre ne peut mesurer aucune durée | **oui** — dix événements de clôture sur six jours portent une heure fausse de 3 h à 7 h 30 ; le premier calcul de durée fait sur ce registre — cadence de traitement d'un lot, délai de décision — sortira faux sans qu'aucun contrôle ne le dise, et R-42 vient précisément d'être posée sur les ledgers pour cette classe de défaut, sans équivalent ici. |
 | TF-0407 | corrige | 9 | pilot : la conversation est la seule surface de restitution sans doctrine d'audience — profil d'interlocuteur déclaré + ouverture commanditaire + règle S9 | **oui** — le retour lui-même, émis par le seul lecteur des restitutions — il n'existe pas de mesure plus directe qu'un destinataire disant qu'une partie ne lui parvient pas |
 | TF-0411 | corrige | 9 | pilot : l'intégrité du ledger n'était exigée qu'au contrat « prêt client » — R-42 la juge là où le ledger est déjà lu | **oui** — deux écarts d'intégrité ont vécu trois jours dans un ledger réel, publiés dans git, alors que l'oracle de conformité lisait ce même fichier à chaque run. |
