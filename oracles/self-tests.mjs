@@ -24,6 +24,15 @@
  * dans la règle mais dans son périmètre : un fichier de test qu'aucun pas ne lance est du même
  * ordre qu'un oracle sans recette, et se signale de la même façon.
  *
+ * INVARIANT (I4, TF-0414 du 20/08) : les oracles d'ÉTAT sont joués sur le PARC RÉEL, pas
+ * seulement sur leurs fixtures. `oracle-skills` avait un `--self-test` vert à 68/68 pendant
+ * que l'oracle lui-même échouait sur 9 skills : la copie INSTALLÉE divergeait de sa source
+ * versionnée, et c'est la copie qui s'exécute. Une recette prouve qu'une règle SAIT échouer ;
+ * elle ne dit rien de l'état du monde. Troisième occurrence de cette famille en trois semaines
+ * (item d'origine archivé, TF-0391 le 19/08, TF-0414 le 20/08), dont deux APRÈS le gate écrit
+ * en gabarit — un paragraphe de doctrine ne s'exécute pas, un pas de recette si.
+ * SKIP (exit 2) vaut succès : sur un poste sans les dépôts frères, il n'y a rien à juger.
+ *
  * Usage : node oracles\self-tests.mjs        → exit 0 si tout passe, 1 sinon.
  */
 import { execFileSync, spawnSync } from "node:child_process";
@@ -89,7 +98,15 @@ for (const d of readdirSync(RACINE, { withFileTypes: true })) {
 for (const zone of zonesTests) {
   let fichiers = [];
   try {
-    fichiers = readdirSync(join(RACINE, zone)).filter((f) => f.endsWith(".test.mjs")).sort();
+    // I2 bis (TF-0413, 20/08) : le MOTIF était aussi étroit que la liste des zones l'avait
+    // été (TF-0367). `todo\self-test.mjs` — 38 contrôles verts sur le registre — n'était joué
+    // par PERSONNE : il ne finit pas en `.test.mjs`, donc I2 ne le voyait pas, et il ne vit
+    // pas sous `oracles\`, donc I1 non plus. Un fichier de recette invisible aux deux
+    // invariants est exactement ce que cet agrégateur existe pour éteindre. Les self-tests DE
+    // `oracles\` restent hors de ce motif : ils sont déjà joués par I1 (via `DEDIES`), et
+    // `self-tests.mjs` s'y appellerait lui-même.
+    const motif = (f) => f.endsWith(".test.mjs") || (zone !== "oracles" && /^self-test.*\.mjs$/.test(f));
+    fichiers = readdirSync(join(RACINE, zone)).filter(motif).sort();
   } catch { continue; }
   for (const nom of fichiers) {
     const r = spawnSync(process.execPath, [join(RACINE, zone, nom)], { encoding: "utf8" });
@@ -101,6 +118,33 @@ for (const zone of zonesTests) {
       via: "I2 (fichier de test du dépôt)",
     });
   }
+}
+
+// I4 — oracles d'ÉTAT, joués sur le parc réel. La liste est COURTE et écrite : elle ne se
+// devine pas, puisque la plupart des oracles du pilot jugent un artefact qu'on leur passe et
+// non un état permanent. Chaque entrée dit son motif et le geste de remise en état — un
+// verdict rouge qui n'indique pas quoi faire se contourne au lieu de se corriger.
+const ETAT_DU_PARC = [
+  {
+    nom: "oracle-skills.mjs",
+    motif: "dérive versionné↔installé des skills",
+    remede: "node oracles\\oracle-skills.mjs --appliquer (décision humaine, TF-0391)",
+  },
+];
+for (const { nom, remede } of ETAT_DU_PARC) {
+  const r = spawnSync(process.execPath, [join(ICI, nom)], { encoding: "utf8" });
+  let verdict = null;
+  try { verdict = JSON.parse(r.stdout || "{}").verdict; } catch { /* sortie non JSON : le code de retour tranche */ }
+  // 0 PASS · 2 non jugeable (dépôts frères absents) → succès. 1 FAIL → échec, avec le remède.
+  const ok = r.status === 0 || r.status === 2;
+  resultats.push({
+    nom: `${nom} (parc réel)`,
+    statut: ok ? "OK" : "ECHEC",
+    detail: ok
+      ? `I4 — ${verdict || "sans verdict lisible"} sur le parc`
+      : `I4 — ${verdict || "FAIL"} sur le parc · remède : ${remede}`,
+    via: "I4 (oracle d'état)",
+  });
 }
 
 console.log("=".repeat(78));
@@ -115,6 +159,6 @@ console.log("=".repeat(78));
 console.log(
   echecs.length
     ? `  ${echecs.length}/${resultats.length} oracle(s) en défaut : ${echecs.map((r) => r.nom).join(", ")}`
-    : `  ${resultats.length}/${resultats.length} recettes jouées et vertes (oracles + fichiers de test du dépôt, I1 et I2)`,
+    : `  ${resultats.length}/${resultats.length} recettes jouées et vertes (oracles, fichiers de test du dépôt, état du parc — I1, I2 et I4)`,
 );
 process.exit(echecs.length ? 1 : 0);

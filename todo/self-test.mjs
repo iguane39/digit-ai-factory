@@ -64,6 +64,129 @@ for (const [nom, lignes] of rouges) {
   });
 }
 
+// ── R9 bis (TF-0413) : RECTIFICATION DÉCLARÉE d'un horodatage, patron R-42/TF-0410 ──────
+// Le fait : 123 événements du registre portaient un ts composé à la main, en avance de 92 à
+// 449 min sur le commit qui les a publiés — au point qu'un écrit HONNÊTE du même jour devenait
+// « décroissant » au sens de R9 et se voyait refuser. On ne réécrit pas : on déclare, et
+// l'écart reste imprimé.
+const rectifier = (entrees) => JSON.stringify({
+  ev: "rectification_horodatage", ts: "2026-08-08T14:00:00Z", motif: "recette", entrees,
+});
+const DECROISSANT = [
+  item({ ts: "2026-08-08T18:00:00Z" }), // creation au ts gonflé
+  maj({ ts: "2026-08-08T12:00:00Z", statut: "decide", decideur: "h", date_decision: "2026-08-08" }),
+];
+
+const r9rouge = join(T, "R9-rouge.jsonl");
+writeFileSync(r9rouge, DECROISSANT.join("\n") + "\n");
+check("rouge R9 : ts décroissant NON déclaré → FAIL", () => {
+  const r = lance(r9rouge);
+  if (r === 0) throw new Error("aurait dû échouer");
+  if (!r.sortie.includes('"R9"')) throw new Error("règle R9 absente des findings");
+});
+
+const r9verte = join(T, "R9bis-verte.jsonl");
+writeFileSync(r9verte, [...DECROISSANT, rectifier([{
+  id: "TF-9001", ts_consigne: "2026-08-08T18:00:00Z",
+  ts_reel_estime: "2026-08-08T11:00:00Z", cause: "ts composé à la main",
+}])].join("\n") + "\n");
+check("verte R9 bis : écart COUVERT par déclaration → PASS, et le verdict l'IMPRIME [RECTIFIÉ]", () => {
+  const r = lance(r9verte);
+  if (r !== 0) throw new Error("exit " + r.code + " : " + r.sortie.slice(0, 240));
+  const sortie = execFileSync("node", [oracle, r9verte, join(T, "vide.jsonl")], { encoding: "utf8" });
+  if (!sortie.includes("[RECTIFIÉ]"))
+    throw new Error("l'écart rectifié a DISPARU du rapport — il doit cesser de bloquer, jamais de se voir");
+});
+
+const r9avance = join(T, "R9bis-avance.jsonl");
+writeFileSync(r9avance, [DECROISSANT[0], rectifier([{
+  id: "TF-9001", ts_consigne: "2026-08-08T12:00:00Z",
+  ts_reel_estime: "2026-08-08T11:00:00Z", cause: "dédouanement d'avance",
+}]), DECROISSANT[1]].join("\n") + "\n");
+check("rouge R9 bis : la déclaration ne couvre PAS ce qui la suit — pas de dédouanement d'avance", () => {
+  const r = lance(r9avance);
+  if (r === 0) throw new Error("une rectification a couvert un événement POSTÉRIEUR");
+  if (!/sans cible ANTÉRIEURE/.test(r.sortie)) throw new Error("le motif du refus n'est pas dit");
+});
+
+const r9incomplete = join(T, "R9bis-incomplete.jsonl");
+writeFileSync(r9incomplete, [...DECROISSANT, rectifier([{
+  id: "TF-9001", ts_consigne: "2026-08-08T18:00:00Z", ts_reel_estime: "2026-08-08T11:00:00Z",
+}])].join("\n") + "\n");
+check("rouge R9 bis : déclaration sans cause → écart, jamais une couverture", () => {
+  const r = lance(r9incomplete);
+  if (r === 0) throw new Error("une déclaration incomplète a couvert l'écart");
+  if (!/rectification incomplète/.test(r.sortie)) throw new Error("le champ manquant n'est pas nommé");
+});
+
+const r9menteur = join(T, "R9bis-menteur.jsonl");
+writeFileSync(r9menteur, [...DECROISSANT, rectifier([{
+  id: "TF-9001", ts_consigne: "2026-08-08T19:59:59Z",
+  ts_reel_estime: "2026-08-08T11:00:00Z", cause: "ts_consigne qui ne colle à rien",
+}])].join("\n") + "\n");
+check("rouge R9 bis : un ts_consigne qui ne colle à AUCUN ts de l'id ne couvre rien", () => {
+  const r = lance(r9menteur);
+  if (r === 0) throw new Error("une déclaration menteuse a couvert l'écart");
+  if (!/sans cible ANTÉRIEURE/.test(r.sortie)) throw new Error("le motif du refus n'est pas dit");
+});
+
+// Un drapeau lu comme un chemin faisait rendre un PASS sur un registre VIDE — faux vert
+// trouvé en câblant --rectifications, et verrouillé ici.
+check("un DRAPEAU n'est pas un chemin — --rectifications ne fait pas juger un registre vide", () => {
+  let brut = "";
+  try { brut = execFileSync("node", [oracle, "--rectifications"], { encoding: "utf8" }); }
+  catch (e) { brut = String(e.stdout || ""); }
+  if (/0 item\(s\) actif\(s\)/.test(brut))
+    throw new Error("le drapeau a été lu comme un chemin — verdict rendu sur un registre vide");
+});
+
+// ── R11 (TF-0413, 20/08) : un ts qui n'est pas encore arrivé n'a pas été mesuré ──────────
+// Les deux sens se jouent SOUS UN SEUIL DE RECETTE (TODO_SEUIL_R11), sans quoi le sens vert
+// serait indémontrable tant que l'horloge réelle n'a pas dépassé le seuil de naissance de la
+// règle : il faut un ts À LA FOIS au-dessus du seuil ET dans le passé. Le seuil de recette
+// est posé loin derrière (2020) ; c'est la seule chose que la surcharge change.
+const SEUIL_RECETTE = "2020-01-01T00:00:00Z";
+const lanceAvecSeuil = (actifs) => {
+  try {
+    execFileSync("node", [oracle, actifs, join(dirname(actifs), "vide.jsonl")],
+      { encoding: "utf8", env: { ...process.env, TODO_SEUIL_R11: SEUIL_RECETTE } });
+    return 0;
+  } catch (e) { return { code: e.status, sortie: String(e.stdout || "") }; }
+};
+const isoDecale = (ms) => new Date(Date.now() + ms).toISOString();
+
+const r11rouge = join(T, "R11-rouge.jsonl");
+writeFileSync(r11rouge, item({ ts: isoDecale(6 * 3600 * 1000) }) + "\n");
+check("rouge R11 : ts à +6 h de l'heure d'exécution → FAIL, avance nommée en minutes", () => {
+  const r = lanceAvecSeuil(r11rouge);
+  if (r === 0) throw new Error("aurait dû échouer — un ts au futur a passé");
+  if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1`);
+  if (!r.sortie.includes('"R11"')) throw new Error("règle R11 absente des findings");
+  if (!/postérieur à l'heure d'exécution de \d+ min/.test(r.sortie))
+    throw new Error("le constat ne CHIFFRE pas l'avance — un rapport qui ne mesure pas se discute");
+});
+
+const r11verte = join(T, "R11-verte.jsonl");
+writeFileSync(r11verte, item({ ts: isoDecale(-3600 * 1000) }) + "\n");
+check("verte R11 : ts au passé, pourtant AU-DESSUS du seuil jugé → PASS (la règle ne juge que l'avance)", () => {
+  const r = lanceAvecSeuil(r11verte);
+  if (r !== 0) throw new Error(`exit ${r.code} : ${r.sortie.slice(0, 240)}`);
+});
+
+const r11tolerance = join(T, "R11-tolerance.jsonl");
+writeFileSync(r11tolerance, item({ ts: isoDecale(60 * 1000) }) + "\n");
+check("verte R11 : ts à +60 s → PASS, la tolérance d'horloge (120 s) n'est pas une licence", () => {
+  const r = lanceAvecSeuil(r11tolerance);
+  if (r !== 0) throw new Error(`exit ${r.code} : ${r.sortie.slice(0, 240)}`);
+});
+
+check("R11 : une surcharge de seuil est ANNONCÉE au verdict — jamais une extinction discrète", () => {
+  const r = lanceAvecSeuil(r11rouge);
+  if (r === 0) throw new Error("fixture rouge devenue verte");
+  if (!r.sortie.includes("seuil SURCHARGÉ par TODO_SEUIL_R11"))
+    throw new Error("le verdict ne dit pas qu'il a été rendu sous un seuil de recette");
+});
+
 // R10 verte : la même creation externe, couverte par son ingestion → PASS
 const r10verte = join(T, "R10-verte.jsonl");
 writeFileSync(r10verte, [
