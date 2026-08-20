@@ -483,7 +483,7 @@ check("rouge-R19 : 5 clés courtes après le 17/08 → 5 constats nommant la cl�
 // VERTE-R19 : les 14 noms de dépôt complets, sur un run_open postérieur à la doctrine.
 const verteR19 = mkdtempSync(join(tmpdir(), "conf-verte-r19-"));
 const CLES_14 = ["pilot", "conception", "design", "development", "tests", "agents", "organization",
-  "data", "ops", "observability", "audit", "seo", "agents-security", "websec"];
+  "data", "ops", "observability", "audit", "seo-geo", "agents-security", "websec"];
 ecrireDans(verteR19, "forge/ledger.jsonl",
   JSON.stringify({ type: "run_open", ts: "2026-08-18T08:00:00Z",
     versions_forges: Object.fromEntries(CLES_14.map((c, i) => [`digit-ai-forge-${c}`, `sha${String(i).padStart(4, "0")}`])) }) + "\n");

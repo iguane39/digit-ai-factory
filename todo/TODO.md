@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=96595a3db718 archive=9f205b231527 · dernier événement: 2026-08-20T18:21:00Z -->
+     sceaux: actifs=3e5ad1e4e8d5 archive=9f205b231527 · dernier événement: 2026-08-20T18:21:00Z -->
 
-**104 actifs** (candidat 2 · décidé 0 · en cours 1 · corrigé 100 · écarté 1) · **308 archivés**.
+**106 actifs** (candidat 3 · décidé 0 · en cours 1 · corrigé 101 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,9 +11,11 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0413 | candidat | 6 | pilot : les horodatages écrits À LA MAIN dans TODO.jsonl sont en avance de 2 h 40 à 7 h 30 sur l'heure réelle — le registre ne peut mesurer aucune durée | **oui** — dix événements de clôture sur six jours portent une heure fausse de 3 h à 7 h 30 ; le premier calcul de durée fait sur ce registre — cadence de traitement d'un lot, délai de décision — sortira faux sans qu'aucun contrôle ne le dise, et R-42 vient précisément d'être posée sur les ledgers pour cette classe de défaut, sans équivalent ici. |
 | TF-0407 | corrige | 9 | pilot : la conversation est la seule surface de restitution sans doctrine d'audience — profil d'interlocuteur déclaré + ouverture commanditaire + règle S9 | **oui** — le retour lui-même, émis par le seul lecteur des restitutions — il n'existe pas de mesure plus directe qu'un destinataire disant qu'une partie ne lui parvient pas |
 | TF-0411 | corrige | 9 | pilot : l'intégrité du ledger n'était exigée qu'au contrat « prêt client » — R-42 la juge là où le ledger est déjà lu | **oui** — deux écarts d'intégrité ont vécu trois jours dans un ledger réel, publiés dans git, alors que l'oracle de conformité lisait ce même fichier à chaque run. |
 | TF-0408 | corrige | 6 | pilot : la règle « jamais de jours, complexité × durée » était restée locale au rapport d'audit — généralisée aux études et restitutions, contrôles E8/S10 | **oui** — la restitution fautive elle-même : trois estimations en jours émises quelques heures après que la règle a été câblée au rapport d'audit — la doctrine sans porteur mécanique ne survit pas à la surface suivante |
+| TF-0412 | corrige | 6 | pilot : le renommage forge-seo → forge-seo-geo (TF-0390) a été clos sur UN oracle joué sur trois — cinq contrôles rouges pendant 24 h | **oui** — cinq contrôles rouges ont vécu 24 h dans le dépôt, publiés dans git (e51f1aa, 19/08 19:35) et traversés par deux sessions de travail qui ont commité six fois par-dessus sans les voir — un oracle rouge en permanence est un oracle qu'on cesse de lire, la maladie que TF-0228 a coûté cher à éteindre. |
 
 ## digit-ai-forge-agents
 
