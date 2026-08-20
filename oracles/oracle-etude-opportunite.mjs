@@ -12,7 +12,10 @@
  *   E4 jeu fermé O0-O4 : O0 présente et traitée (réfutée ou retenue), aucune option O5+ ;
  *   E5 verdict UNIQUE (« Option retenue : » suivie d'une seule option) ;
  *   E6 zéro terme subjectif nu (élégant, moderne, séduisant, prometteur sans mesure) ;
- *   E7 plan de revue daté (AAAA-MM-JJ ou AAAAMMJJ).
+ *   E7 plan de revue daté (AAAA-MM-JJ ou AAAAMMJJ) ;
+ *   E8 aucun effort chiffré en JOURS sur une ligne de coût/estimation (TF-0408, 20/08 :
+ *      avec l'IA un nombre de jours n'a pas de sens — complexité simple|moyen|complexe|
+ *      très complexe × durée court|moyen|long|très long, comme au rapport d'audit).
  *
  * Usage : node oracle-etude-opportunite.mjs <etude.md>        → verdict JSON
  *         node oracle-etude-opportunite.mjs --self-test       → fixtures double sens
@@ -92,6 +95,16 @@ function juger(texte) {
     ? ok("E7", "plan de revue daté")
     : ko("E7", "plan de revue absent ou non daté — un verdict sans rendez-vous avec les faits ne se corrige jamais");
 
+  // E8 — l'effort ne se chiffre pas en jours (TF-0408) : sur toute ligne portant un
+  // marqueur de coût/estimation, une unité « j / jours / j-h » chiffrée est un défaut.
+  // Les FAITS datés (« trois jours de production », préavis 60 jours) vivent hors de ces
+  // lignes et ne sont pas jugés — la règle vise l'ESTIMATION, pas la mesure.
+  const lignesCout = texte.split("\n").filter((l) => /co[uû]t|estimation|effort estimé|charge estimée/i.test(l));
+  const enJours = lignesCout.filter((l) => /(?:\d+(?:[.,]\d+)?|½)\s*(?:à\s*\d+(?:[.,]\d+)?\s*)?j(?:ours?)?\b|jours?[- ]hommes?/i.test(l));
+  enJours.length
+    ? ko("E8", `${enJours.length} ligne(s) de coût chiffrée(s) en JOURS — avec l'IA un nombre de jours n'a pas de sens : complexité (simple|moyen|complexe|très complexe) × durée (court|moyen|long|très long). Ex. : ${enJours[0].trim().slice(0, 90)}`)
+    : ok("E8", "aucune estimation en jours — l effort parle en complexité × durée");
+
   return findings;
 }
 
@@ -117,12 +130,13 @@ Deux sous-questions : A (grille), B (mémoire des refus).
 Sources : ADR (2025-03-01) · RFC (2025-06-11) · DACI (2026-01-08) · gabarit X (2025-11-30) · revue Y (2026-05-02).
 ## 4. Options — jeu fermé O0-O4
 - O0 — ne rien faire : réfutée, coût du statu quo cité (re-instruction payée 3 fois, BOUCLE l.584).
-- O1 — gabarit + oracle.
+- O1 — gabarit + oracle. Coût : complexité moyen · durée court ; dette nulle.
 ## 5. Verdict
 - Option retenue : O1.
 - Plan de revue : 2026-09-13.
 `;
-  const rouge = verte.replace("registre-oracles.md §3 « aucun oracle d'étude »", " "); // citation vidée
+  const rouge = verte.replace("registre-oracles.md §3 « aucun oracle d'étude »", " ") // citation vidée
+    .replace("Coût : complexité moyen · durée court ; dette nulle.", "Coût : 2-3 j."); // estimation en jours
   writeFileSync(join(dir, "verte.md"), verte, "utf8");
   writeFileSync(join(dir, "rouge.md"), rouge, "utf8");
   const moi = fileURLToPath(import.meta.url);
@@ -131,8 +145,11 @@ Sources : ADR (2025-03-01) · RFC (2025-06-11) · DACI (2026-01-08) · gabarit X
   const casse = [];
   if (rv.status !== 0) casse.push("la fixture VERTE ne passe pas : " + rv.stdout);
   if (rr.status !== 1) casse.push("la fixture ROUGE (citation vidée) ne FAIL pas");
-  else if (!/"E2"[^}]*FAIL/.test(rr.stdout)) casse.push("la rouge échoue mais pas sur E2");
-  console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ") : "Self-test étude d'opportunité : 2/2 PASS (verte PASS, rouge FAIL sur E2)");
+  else {
+    if (!/"E2"[^}]*FAIL/.test(rr.stdout)) casse.push("la rouge échoue mais pas sur E2");
+    if (!/"E8"[^}]*FAIL/.test(rr.stdout)) casse.push("la rouge (coût en jours) échoue mais pas sur E8");
+  }
+  console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ") : "Self-test étude d'opportunité : 2/2 PASS (verte PASS, rouge FAIL sur E2 et E8)");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -144,7 +161,7 @@ const findings = juger(readFileSync(arg, "utf8"));
 const verdict = verdictDe(findings);
 console.log(JSON.stringify({
   oracle: "oracle-etude-opportunite",
-  version: "1.0.0",
+  version: "1.1.0",
   cible: arg,
   verdict,
   findings,

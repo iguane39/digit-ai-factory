@@ -7,7 +7,7 @@ prouvée à zéro faux positif, et ne voit rien. Le marquage a été vérifié t
 `oracle-synthese` (S1-S8) sur une synthèse réelle PASS avant d'être prescrit ici.
 Cette consigne, elle, ne se marque PAS : c'est un référentiel normatif, pas un livrable.
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 2.2.0, 20/08/2026** (TF-0407 : bloc 0 « synthèse d'ouverture », règle S9) — précédente : 2.1.0 du 15/08 (TF-0249 : appelants nommés, synthèse EN FICHIER jugée avant affichage ; TF-0250 : oracle renommé `oracle-synthese`) — **v2.0.0 du 14/08 ADOPTÉE telle
+Référentiel versionné (loi n° 4, daté-éditable) — **version 2.3.0, 20/08/2026** (TF-0407 : bloc 0 « synthèse d'ouverture », règle S9 ; TF-0408 : effort en complexité × durée, jamais en jours, règles S10/E8) — précédente : 2.1.0 du 15/08 (TF-0249 : appelants nommés, synthèse EN FICHIER jugée avant affichage ; TF-0250 : oracle renommé `oracle-synthese`) — **v2.0.0 du 14/08 ADOPTÉE telle
 quelle par décision humaine du 14/08** (option (a) : les 8 blocs restent, l'oracle reste
 **informatif** et non bloquant tant qu'on ne l'a pas vu tenir sur plusieurs clôtures réelles).
 Il régit
@@ -41,7 +41,7 @@ et une information remontée et non comprise a le même effet qu'une information
 coût de lecture en plus. **On ordonne, on ne supprime jamais** : identifiants, preuves et
 chemins restent dans les blocs 1 à 8, intacts — une restitution agréable et invérifiable serait
 pire que l'état antérieur (doctrine RL-1/RL-7 des rapports, transposée ; contrôle : S9
-d'`oracle-synthese`, double sens au self-test).
+d'`oracle-synthese`, double sens au self-test). **Et partout dans la restitution comme dans les études : l'effort ne se chiffre JAMAIS en jours** (TF-0408, retour humain du 20/08 : « je croyais qu'on ne parlait plus de jours ») — il parle en **complexité** (simple | moyen | complexe | très complexe) **× durée** (court | moyen | long | très long), l'échelle du rapport d'audit ; les FAITS mesurés (« trois jours de production ») restent des faits. Contrôles : S10 ici, E8 aux études.
 
 Huit blocs ensuite. **Aucun ne disparaît** : un bloc sans contenu se réduit à **une ligne qui le dit**
 (« aucun risque identifié », « rien n'attend de décision »). C'est la loi transverse n° 3 —
