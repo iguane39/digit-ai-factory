@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 /**
  * oracle-conformite-projet.mjs — vérifie qu'un projet produit respecte REGLES-PROJET.md
- * (28 règles — R-1..R-19 du 06-10/08, R-20..R-23 socle documentaire du 11/08 TF-0082,
+ * (29 règles — R-1..R-19 du 06-10/08, R-20..R-23 socle documentaire du 11/08 TF-0082,
  * R-24 URLs d'environnement du 11/08 TF-0090, R-25 types au registre du 11/08 TF-0084,
  * R-26 modèle de données ancré au schéma réel du 11/08 TF-0091, R-27 surface web née
  * ouverte aux agents IA du 11/08 TF-0095 — socle à 8 fichiers
  * + projections HTML générées, R-32 gate aval des livrables HTML du 13/08 RV-4 ;
- * R-7 inversée le 13/08 par TF-0150 : old\ versionné). Node pur, zéro dépendance,
+ * R-7 inversée le 13/08 par TF-0150 : old\ versionné ; R-42 INTÉGRITÉ du ledger du
+ * 20/08 TF-0411 — le contrôle existait dans `ledger.mjs verify` et n'était câblé à aucun
+ * déclencheur : ici il se joue là où le ledger est DÉJÀ lu). Node pur, zéro dépendance,
  * lecture seule (le registre des types d'organization est LU, jamais écrit).
  *
  * Campagne du 17/08 — trois volets neufs, tous à fixture double sens dans `self-test.mjs` :
@@ -579,6 +581,72 @@ else {
   }
 }
 
+
+// R-42 — INTÉGRITÉ du ledger (TF-0411, 20/08) : `seq` strictement croissant depuis 1,
+// horodatages non décroissants, première entrée `run_open`. Le contrôle EXISTAIT depuis
+// l'origine (`ledger.mjs verify`, contrat §3) et n'était câblé à aucun déclencheur : il
+// n'apparaissait qu'au contrat « prêt client », en fin de run. Mesuré le 20/08 sur
+// Produit-11 : deux horodatages en recul dans 138 entrées, publiés dans git, et le
+// SECOND invisible parce que le vérificateur s'arrêtait au premier. Ici on ACCUMULE.
+//
+// Rectification déclarée : une entrée ultérieure `type: rectification_horodatage` portant
+// `entrees: [{seq, ts_consigne, ts_reel_estime, cause}]` couvre des seq NOMMÉS et ANTÉRIEURS
+// à elle. L'écart reste IMPRIMÉ (statut PASS, message « [RECTIFIÉ] ») — l'histoire ne se
+// réécrit pas, elle se rectifie par ajout. Un écart non déclaré reste FAIL.
+if (!existsSync(ledgerF)) so("R-42", "pas de forge\\ledger.jsonl — aucune intégrité à juger");
+else {
+  const lignes = readFileSync(ledgerF, "utf8").split("\n").filter((l) => l.trim());
+  const entrees = lignes.map((l, i) => {
+    try { return { n: i + 1, e: JSON.parse(l) }; } catch { return { n: i + 1, e: null }; }
+  });
+  const illisibles = entrees.filter((x) => !x.e).map((x) => x.n);
+  // Les seq rectifiés : déclarés par une entrée de rectification, et seulement en amont d'elle.
+  const rectifies = new Map();
+  for (const { e } of entrees) {
+    if (!e || (e.type || e.ev) !== "rectification_horodatage") continue;
+    for (const d of (Array.isArray(e.entrees) ? e.entrees : [])) {
+      const seq = Number(d && d.seq);
+      if (Number.isFinite(seq) && (!Number.isFinite(Number(e.seq)) || seq < Number(e.seq))) {
+        rectifies.set(seq, String((d && d.cause) || "cause non dite"));
+      }
+    }
+  }
+  const ecarts = [], notes = [];
+  let avecSeq = 0;
+  if (illisibles.length) ecarts.push(`ligne(s) JSON illisible(s) : ${illisibles.slice(0, 5).join(", ")}${illisibles.length > 5 ? " …" : ""}`);
+  const lues = entrees.filter((x) => x.e).map((x) => x.e);
+  if (lues.length) {
+    const premier = lues[0];
+    if ((premier.type || premier.ev) !== "run_open") ecarts.push(`première entrée de type « ${premier.type || premier.ev || "?"} » — run_open exigé (contrat §3)`);
+    let seqAttendu = 1, tsMax = "";
+    for (const e of lues) {
+      const seq = Number(e.seq);
+      if (Number.isFinite(seq)) {
+        avecSeq++;
+        if (seq !== seqAttendu) ecarts.push(`seq ${seq} là où ${seqAttendu} était attendu — append-only rompu`);
+        seqAttendu = seq + 1;
+      }
+      const ts = String(e.ts || "");
+      if (ts && tsMax && ts < tsMax) {
+        const quoi = `seq ${Number.isFinite(seq) ? seq : "?"} : horodatage décroissant (${ts} après ${tsMax})`;
+        if (rectifies.has(seq)) notes.push(`[RECTIFIÉ] ${quoi} — ${rectifies.get(seq)}`);
+        else ecarts.push(quoi);
+      }
+      if (ts > tsMax) tsMax = ts;
+    }
+  }
+  if (lues.length && !avecSeq) notes.push("aucune entree ne porte SEQ — la continuite d append n est PAS jugeable sur ce ledger (le contrat 3 l exige ; anteriorite, jamais reecrite) : seuls les horodatages et l ouverture le sont");
+  const rectifiesNonVus = [...rectifies.keys()].filter((seq) => !notes.some((n) => n.includes(`seq ${seq} :`)));
+  if (rectifiesNonVus.length) notes.push(`rectification(s) sans écart correspondant : seq ${rectifiesNonVus.join(", ")} — une rectification qui ne rectifie rien se retire`);
+  if (ecarts.length) {
+    ko("R-42", "forge/ledger.jsonl", `intégrité rompue — ${ecarts.length} écart(s) : ${ecarts.slice(0, 6).join(" · ")}${ecarts.length > 6 ? " …" : ""}` +
+      (notes.length ? ` (par ailleurs : ${notes.join(" · ")})` : "") +
+      ". L'histoire ne se réécrit pas : ajouter une entrée `type: rectification_horodatage` nommant les seq, le ts consigné, le ts réel estimé et la cause");
+  } else {
+    ok("R-42", "forge/ledger.jsonl", `intégrité tenue sur ${lues.length} entrée(s) — seq continu, horodatages non décroissants, ouverture par run_open` +
+      (notes.length ? ` ; ${notes.join(" · ")}` : ""));
+  }
+}
 
 // ---- D bis · Socle documentaire docs\projet\ (R-20..R-23 — TF-0082, 11/08) ----
 const dp = p("docs", "projet");
