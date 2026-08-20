@@ -5,7 +5,21 @@ Référence chargée à la demande depuis le noyau `CLAUDE.md` (TF-0053).
 Le registre structuré des améliorations vit dans `todo\` : source unique `TODO.jsonl`
 (événements `creation`/`maj`/`ingestion`, écrivain unique : le pilot), vue générée `TODO.md`
 (jamais éditée), archive `TODO-ARCHIVE.jsonl` (ids jamais réutilisés), `oracle-todo.mjs`
-(R1-R10) à faire passer après toute écriture.
+(R1-R11) à faire passer après toute écriture.
+
+**Écrire au registre : `node todo\journaliser.mjs --fichier <evenements.json>`** (TF-0413,
+20/08). Les événements y entrent **sans `ts`** — l'outil le STAMPE. Il refuse tout événement
+qui en porte un, sans rien écrire, et il ANNULE son écriture (fichier repris à l'octet près)
+si `oracle-todo` passait avant et échoue après. `--essai` montre ce qui serait écrit.
+*Pourquoi c'est un outil et pas une consigne* : les `ts` composés à la main étaient en avance
+de 2 h 40 à 7 h 30 sur l'heure réelle — dix clôtures sur six jours, aucune en retard, pendant
+que les événements écrits par `ingerer-lot.mjs` collaient au commit à la minute. Une heure
+qu'on écrit soi-même est une heure qu'on invente ; aucune durée n'était calculable au registre.
+**R11** constate le défaut (un `ts` postérieur à l'heure d'exécution est un FAIL, tolérance
+d'horloge de 2 min, antériorité déclarée en deçà du 20/08 18:30 Z) ; `journaliser.mjs` en
+supprime la cause. L'heure d'un fait RAPPORTÉ (décision d'hier, correction d'avant-hier) est
+une donnée : `date_decision`, `date_correction` — jamais `ts`, qui est l'heure de
+consignation.
 
 **Gouvernance** : tout entre en `candidat` ; seul un mandat humain (« décide TF-xxxx », un lot de
 décisions appliqué par `todo\appliquer-export.mjs` — format `TF-decisions-*.json`, produit
