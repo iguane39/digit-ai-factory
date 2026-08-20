@@ -1,125 +1,267 @@
 #!/usr/bin/env node
-// bootstrap.mjs — amorce un poste pour l'écosystème forge Digit-AI.
-// Clone (ou vérifie) les forges à côté de ce dépôt pilot, puis contrôle
-// que leurs points d'entrée attendus par le CONTRAT-INTERFACE existent.
+// bootstrap.mjs — amorce ou met à jour un poste pour l'écosystème forge Digit-AI.
 //
-// Usage :  node bootstrap.mjs [--racine <dossier>] [--pull]
-//   --racine  racine d'installation (défaut : $FORGE_ROOT, sinon le parent de ce dépôt)
-//   --pull    met à jour (git pull --ff-only) les forges déjà présentes
+// v2 (20/08/2026, revue « dernières versions ») — « Poste prêt » veut désormais dire, et
+// prouve par exécution : le pilot ET les treize forges sont présents, chacun À JOUR de son
+// origin (mesuré : retard/avance en commits, version affichée), et les skills installés sont
+// ceux que les forges versionnent. Avant : « mis à jour » signifiait « pull sans erreur »,
+// « déjà présent » valait « prêt » à 50 commits de retard, le pilot n'était pas mis à jour,
+// les skills jamais installés ni propagés (K1 rouge sur poste vierge, K2 rouge après chaque
+// pull), un dépôt renommé se dupliquait, et gh bloquait des forges devenues publiques.
 //
-// Prérequis bloquants : git, gh authentifié (dépôts privés github.com/iguane39).
+// Usage :  node bootstrap.mjs [--racine <dossier>] [--pull] [--sans-skills] [--sans-pilot]
+//   --racine      racine d'installation (défaut : $FORGE_ROOT, sinon le parent de ce dépôt)
+//   --pull        met à jour (git pull --ff-only) le pilot puis les forges présentes, et
+//                 propage les skills versionnés vers la copie installée (oracle-skills
+//                 --appliquer) — lancer --pull EST la décision humaine de propagation (R-29)
+//   --sans-skills ne juge ni ne propage les skills (recette sur dépôts factices)
+//   --sans-pilot  ne touche pas au dépôt pilot courant (recette)
+// Env :  BOOTSTRAP_SOURCE        base des dépôts (défaut https://github.com/iguane39)
+//        FORGE_SKILLS_INSTALLES  dossier des skills installés (défaut ~/.claude/skills)
+//
+// Sans --pull, le poste est seulement MESURÉ : un dépôt en retard est un DÉFAUT dont le
+// remède est nommé (--pull). Un skill installé en écart est un DÉFAUT dont le remède est
+// nommé (--pull). Rien n'est « prêt » par omission.
+// Prérequis bloquants : git, node >= 18. gh n'est plus requis (forges publiques depuis le
+// 10/08 ; gh reste utile aux dépôts d'engagement privés, hors bootstrap).
 // Contrat de sortie : rapport sur stdout, exit 0 = poste prêt, 1 = au moins un défaut.
 
 import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync, renameSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
-const COMPTE = "iguane39";
+const MOI = fileURLToPath(import.meta.url);
+const SOURCE = (process.env.BOOTSTRAP_SOURCE || "https://github.com/iguane39").replace(/\/+$/, "");
 const FORGES = [
   { nom: "digit-ai-forge-conception", preuve: "oracles/self-test.mjs" },
   { nom: "digit-ai-forge-design", preuve: "oracles/run-oracles-design.mjs" },
   { nom: "digit-ai-forge-development", preuve: "digit-ai-forge-development/pyproject.toml" },
   { nom: "digit-ai-forge-tests", preuve: "forge_tests/__main__.py" },
   { nom: "digit-ai-forge-agents", preuve: ".claude/skills/forge-agents/SKILL.md" },
-  { nom: "digit-ai-forge-seo-geo", preuve: "scripts/validate.py" },
+  // forge-seo-geo : ex forge-seo, renommée le 20/08 (TF-0390) — le volet GEO entre au nom.
+  { nom: "digit-ai-forge-seo-geo", preuve: "scripts/validate.py", alias: ["digit-ai-forge-seo"] },
   { nom: "digit-ai-forge-organization", preuve: "output/02-composants/composant-filtres-tableau/oracle-filtres-tableau.mjs" },
   // forge-audit : le PRODUIT AuditCore (public, marque blanche — ex `digit-ai-forge-auditcore`,
-  // renommé le 11/08). Les référentiels vivent dans core/ (adr, controls, dimensions).
-  // L'espace d'engagement client (`digit-ai-forge-audit_nhood`, privé) est hors bootstrap.
-  { nom: "digit-ai-forge-audit", preuve: "core/invariants.json" },
-  // forge-ops : exploitation (déployer/exploiter/restaurer) — outille l'étape MEP du pilot
-  // (TF-0040). La preuve est son self-test, qui rejoue un déploiement réel local + rollback.
+  // renommé le 11/08). L'espace d'engagement client (`digit-ai-forge-audit_nhood`, privé) est hors bootstrap.
+  { nom: "digit-ai-forge-audit", preuve: "core/invariants.json", alias: ["digit-ai-forge-auditcore"] },
+  // forge-ops : exploitation — outille l'étape MEP du pilot (TF-0040).
   { nom: "digit-ai-forge-ops", preuve: "oracles/self-test.mjs" },
-  // forge-data : discipline de la donnée (profiler/tracer/restituer) aux niveaux des barres
-  // OpenLineage/Great Expectations/dbt (TF-0083, révision tracée de l'écartement du 08/08).
+  // forge-data : discipline de la donnée (TF-0083).
   { nom: "digit-ai-forge-data", preuve: "oracles/self-test.mjs" },
-  // forge-agents-security : sécurité agentique (TF-0111, 12/08) — le juge ne vit pas chez le jugé.
+  // forge-agents-security : sécurité agentique (TF-0111) — le juge ne vit pas chez le jugé.
   { nom: "digit-ai-forge-agents-security", preuve: "oracles/self-test.mjs" },
-  // forge-observability : observabilité continue entre les runs (TF-0112, 12/08).
+  // forge-observability : observabilité continue entre les runs (TF-0112).
   { nom: "digit-ai-forge-observability", preuve: "oracles/self-test.mjs" },
-  // forge-websec : sécurité du produit web livré (TF-0123, 12/08) — distincte d'agents-security (outillage IA).
+  // forge-websec : sécurité du produit web livré (TF-0123).
   { nom: "digit-ai-forge-websec", preuve: "oracles/self-test.mjs" },
 ];
 
 const args = process.argv.slice(2);
 const pull = args.includes("--pull");
+const sansSkills = args.includes("--sans-skills");
+const sansPilot = args.includes("--sans-pilot");
 const iRacine = args.indexOf("--racine");
-const racine = resolve(
-  iRacine >= 0 ? args[iRacine + 1] : process.env.FORGE_ROOT || dirname(ICI)
-);
+const racine = resolve(iRacine >= 0 ? args[iRacine + 1] : process.env.FORGE_ROOT || dirname(ICI));
+const SKILLS_INSTALLES = process.env.FORGE_SKILLS_INSTALLES || join(homedir(), ".claude", "skills");
 
-const run = (cmd, argv, cwd) =>
-  spawnSync(cmd, argv, { cwd, encoding: "utf-8", shell: process.platform === "win32" });
+const run = (cmd, argv, cwd) => {
+  const r = spawnSync(cmd, argv, { cwd, encoding: "utf-8", windowsHide: true });
+  if (r.error) return { status: 127, stdout: "", stderr: String(r.error.message || r.error) };
+  return { status: r.status ?? 1, stdout: r.stdout || "", stderr: r.stderr || "" };
+};
+const git = (cwd, ...argv) => run("git", argv, cwd);
+const sortie = (r) => (r.stdout || "").trim();
 
 const defauts = [];
+const averts = [];
+const versions = [];
 const ligne = (statut, msg) => console.log(`[${statut}] ${msg}`);
+const defaut = (msg, remede) => { ligne("DEFAUT", `${msg} — remède : ${remede}`); defauts.push(msg); };
 
 console.log(`Amorçage forge — racine : ${racine}\n`);
 
-// 1. Prérequis
-for (const [cmd, argv, bloquant] of [
-  ["git", ["--version"], true],
-  ["gh", ["auth", "status"], true],
-  ["uv", ["--version"], false],
-  ["python", ["--version"], false],
-]) {
-  const r = run(cmd, argv);
-  const ok = r.status === 0;
-  ligne(ok ? "ok" : bloquant ? "DEFAUT" : "avert", `${cmd} ${ok ? "disponible" : "indisponible"}`);
-  if (!ok && bloquant) defauts.push(`prérequis bloquant absent : ${cmd}`);
-  if (!ok && !bloquant)
-    console.log(`        (requis plus tard : uv/python pour l'étape tests — pas pour cloner)`);
-}
-if (defauts.length) {
-  console.log(`\nPoste NON prêt — ${defauts.length} défaut(s).`);
-  process.exit(1);
+// 1. Prérequis ------------------------------------------------------------------------------
+{
+  const majeur = Number(process.versions.node.split(".")[0]);
+  if (majeur >= 18) ligne("ok", `node ${process.versions.node}`);
+  else defaut(`node ${process.versions.node} trop ancien`, "installer node >= 18");
+  const g = run("git", ["--version"]);
+  if (g.status === 0) ligne("ok", sortie(g));
+  else defaut("git indisponible", "installer git et le mettre dans le PATH");
+  for (const [cmd, argv, note] of [
+    ["gh", ["auth", "status"], "requis seulement pour les dépôts d'engagement privés"],
+    ["uv", ["--version"], "requis plus tard pour l'étape tests"],
+    ["python", ["--version"], "requis plus tard pour l'étape tests"],
+  ]) {
+    const r = run(cmd, argv);
+    if (r.status === 0) ligne("ok", `${cmd} disponible`);
+    else { ligne("avert", `${cmd} indisponible (${note})`); averts.push(cmd); }
+  }
+  if (defauts.length) { console.log(`\nPoste NON prêt — ${defauts.length} défaut(s).`); process.exit(1); }
 }
 
-// 2. Clonage / vérification des cinq forges
-console.log("");
-for (const f of FORGES) {
-  const dest = join(racine, f.nom);
-  if (existsSync(join(dest, ".git"))) {
-    if (pull) {
-      const r = run("git", ["pull", "--ff-only"], dest);
-      if (r.status === 0) ligne("ok", `${f.nom} — présent, mis à jour`);
-      else {
-        ligne("DEFAUT", `${f.nom} — pull impossible : ${(r.stderr || "").trim().slice(0, 120)}`);
-        defauts.push(`${f.nom} : pull en échec`);
-      }
-    } else ligne("ok", `${f.nom} — déjà présent (utiliser --pull pour mettre à jour)`);
-  } else if (existsSync(dest)) {
-    ligne("DEFAUT", `${f.nom} — le dossier existe SANS dépôt git : à résoudre à la main`);
-    defauts.push(`${f.nom} : dossier non-git existant`);
+// 2. État d'un dépôt : version, retard/avance sur origin, propreté ---------------------------
+function etatDepot(dest) {
+  const e = { fetch: false, branche: "", version: "", sha: "", date: "", retard: null, avance: null, propre: true };
+  e.branche = sortie(git(dest, "rev-parse", "--abbrev-ref", "HEAD")) || "HEAD";
+  e.sha = sortie(git(dest, "rev-parse", "--short", "HEAD"));
+  e.version = sortie(git(dest, "describe", "--tags", "--always")) || e.sha;
+  e.date = sortie(git(dest, "log", "-1", "--format=%cs"));
+  e.propre = sortie(git(dest, "status", "--porcelain")) === "";
+  const f = git(dest, "fetch", "--quiet", "origin");
+  e.fetch = f.status === 0;
+  if (e.fetch && git(dest, "rev-parse", "--verify", "--quiet", `origin/${e.branche}`).status === 0) {
+    e.retard = Number(sortie(git(dest, "rev-list", "--count", `HEAD..origin/${e.branche}`)));
+    e.avance = Number(sortie(git(dest, "rev-list", "--count", `origin/${e.branche}..HEAD`)));
+  }
+  return e;
+}
+const decrire = (e) => {
+  if (!e.fetch) return "origin injoignable (hors ligne ?) — fraîcheur NON vérifiée";
+  if (e.retard === null) return `branche ${e.branche} sans amont origin — fraîcheur non mesurable`;
+  if (e.retard === 0 && e.avance === 0) return "à jour";
+  if (e.retard > 0 && e.avance > 0) return `DIVERGÉ (${e.avance} devant, ${e.retard} derrière)`;
+  if (e.retard > 0) return `en retard de ${e.retard} commit(s)`;
+  return `en avance de ${e.avance} commit(s) (travail local non poussé)`;
+};
+
+// Juge un dépôt présent : le met à jour si --pull, sinon le mesure. Enregistre sa version.
+function traiterPresent(nom, dest) {
+  let e = etatDepot(dest);
+  if (pull && e.fetch && e.retard > 0 && e.avance === 0) {
+    const p = git(dest, "pull", "--ff-only", "--quiet");
+    if (p.status === 0) { e = etatDepot(dest); ligne("ok", `${nom} — mis à jour (${e.version}, ${decrire(e)})`); }
+    else defaut(`${nom} — pull impossible : ${(p.stderr || "").trim().split("\n")[0].slice(0, 120)}`,
+      "git status dans le dépôt, résoudre (stash/commit), relancer --pull");
+  } else if (e.fetch && e.retard > 0 && e.avance > 0) {
+    defaut(`${nom} — ${decrire(e)}`, "rebase ou merge à la main dans le dépôt (ff-only refusé par construction)");
+  } else if (e.fetch && e.retard > 0) {
+    defaut(`${nom} — ${decrire(e)} (${e.version})`, "node bootstrap.mjs --pull");
   } else {
-    // core.longpaths : les forges portent des noms de fichiers longs (convention
-    // "Digit-AI - ... - AAAAMMJJx.md") qui dépassent MAX_PATH sous Windows dès que
-    // la racine est un peu profonde. Constaté au premier test de ce script.
-    const r = run("gh", ["repo", "clone", `${COMPTE}/${f.nom}`, dest, "--", "-c", "core.longpaths=true"]);
-    if (r.status === 0) ligne("ok", `${f.nom} — cloné`);
-    else {
-      ligne("DEFAUT", `${f.nom} — clone en échec : ${(r.stderr || "").trim().slice(0, 120)}`);
-      defauts.push(`${f.nom} : clone en échec`);
-    }
+    const s = e.fetch ? "ok" : "avert";
+    ligne(s, `${nom} — présent, ${decrire(e)} (${e.version})`);
+    if (!e.fetch) averts.push(`${nom} hors ligne`);
+  }
+  if (!e.propre) ligne("avert", `${nom} — modifications locales non committées (le pull --ff-only les tolère tant qu'elles ne touchent pas les fichiers mis à jour)`);
+  versions.push({ nom, version: e.version, sha: e.sha, date: e.date, etat: decrire(e) });
+  return e;
+}
+
+// 3. Le pilot lui-même : mis à jour AVANT les forges (sa liste de forges peut avoir changé) --
+console.log("");
+if (!sansPilot) {
+  const empreinteAvant = createHash("sha256").update(readFileSync(MOI)).digest("hex");
+  if (existsSync(join(ICI, ".git"))) traiterPresent("digit-ai-factory (pilot)", ICI);
+  else ligne("avert", "digit-ai-factory (pilot) — pas un dépôt git : fraîcheur du pilot non vérifiable");
+  const empreinteApres = createHash("sha256").update(readFileSync(MOI)).digest("hex");
+  if (empreinteAvant !== empreinteApres && !process.env.BOOTSTRAP_RELANCE) {
+    // Ce script vient d'être mis à jour par son propre pull : le reste doit s'exécuter avec la
+    // version neuve (liste de forges, règles), pas avec celle chargée en mémoire.
+    console.log("\n[relance] bootstrap.mjs a changé pendant la mise à jour du pilot — relance avec la version neuve.\n");
+    const r = spawnSync(process.execPath, [MOI, ...args], { stdio: "inherit", env: { ...process.env, BOOTSTRAP_RELANCE: "1" } });
+    process.exit(r.status ?? 1);
   }
 }
 
-// 3. Preuves de points d'entrée (contrat d'interface)
+// 4. Les forges : renommage hérité, clone, mesure ou mise à jour ----------------------------
+console.log("");
+for (const f of FORGES) {
+  const dest = join(racine, f.nom);
+  // Renommage hérité (ex : digit-ai-forge-seo → -seo-geo) : un dossier à l'ancien nom dont
+  // l'origin est bien CE dépôt est renommé sur place et pointé sur le nouveau nom — jamais
+  // dupliqué, jamais laissé orphelin.
+  if (!existsSync(join(dest, ".git"))) {
+    for (const ancien of f.alias || []) {
+      const vieux = join(racine, ancien);
+      if (!existsSync(join(vieux, ".git"))) continue;
+      const url = sortie(git(vieux, "remote", "get-url", "origin"));
+      // Séparateur `/` OU `\` : une origin locale sous Windows s'écrit avec des antislashs.
+      if (!new RegExp(`[\\\\/](${ancien}|${f.nom})(\\.git)?$`).test(url)) continue;
+      try {
+        renameSync(vieux, dest);
+        git(dest, "remote", "set-url", "origin", `${SOURCE}/${f.nom}.git`);
+        ligne("ok", `${f.nom} — dossier hérité « ${ancien} » renommé et pointé sur ${f.nom} (aucun doublon)`);
+      } catch (e) {
+        defaut(`${f.nom} — dossier hérité « ${ancien} » non renommable : ${e.code || e.message}`,
+          `fermer ce qui tient le dossier, puis : ren ${ancien} ${f.nom} · git remote set-url origin ${SOURCE}/${f.nom}.git`);
+      }
+      break;
+    }
+  }
+  if (existsSync(join(dest, ".git"))) {
+    traiterPresent(f.nom, dest);
+  } else if (existsSync(dest)) {
+    defaut(`${f.nom} — le dossier existe SANS dépôt git`, "le déplacer ou le supprimer, puis relancer");
+  } else {
+    // core.longpaths : les forges portent des noms de fichiers longs (convention
+    // "Digit-AI - ... - AAAAMMJJx.md") qui dépassent MAX_PATH sous Windows.
+    const r = git(racine, "clone", "--quiet", "-c", "core.longpaths=true", `${SOURCE}/${f.nom}.git`, dest);
+    if (r.status === 0) {
+      const e = etatDepot(dest);
+      ligne("ok", `${f.nom} — cloné (${e.version})`);
+      versions.push({ nom: f.nom, version: e.version, sha: e.sha, date: e.date, etat: "cloné" });
+    } else defaut(`${f.nom} — clone en échec : ${(r.stderr || "").trim().split("\n")[0].slice(0, 120)}`,
+      `vérifier l'accès à ${SOURCE}/${f.nom}.git`);
+  }
+}
+
+// 5. Preuves de points d'entrée (contrat d'interface) ---------------------------------------
 console.log("");
 for (const f of FORGES) {
   const p = join(racine, f.nom, f.preuve);
   if (existsSync(p)) ligne("ok", `preuve ${f.nom} : ${f.preuve}`);
+  else defaut(`preuve absente : ${f.nom}/${f.preuve}`, "dépôt incomplet ou contrat d'interface changé — relancer --pull, sinon signaler");
+}
+
+// 6. Skills : ce qui s'exécute au poste doit être ce que les forges versionnent --------------
+// (K1 : skill versionné absent de la copie installée · K2 : copie divergente). oracle-skills
+// NOMME son remède ; --pull l'applique : la dérive versionné↔installé a été payée trois fois
+// (archive « 9 skills sur 20 », TF-0391, TF-0414) parce qu'aucun geste de mise à jour ne la
+// propageait. Sans --pull : mesure seule, défaut nommé.
+console.log("");
+if (sansSkills) ligne("avert", "skills non jugés (--sans-skills)");
+else {
+  const oracle = join(ICI, "oracles", "oracle-skills.mjs");
+  if (!existsSync(oracle)) ligne("avert", "oracles/oracle-skills.mjs absent — skills non jugés");
   else {
-    ligne("DEFAUT", `preuve absente : ${f.nom}/${f.preuve}`);
-    defauts.push(`${f.nom} : point d'entrée ${f.preuve} introuvable`);
+    const juger = (appliquer) => {
+      const argv = [oracle, "--racine", racine, "--installes", SKILLS_INSTALLES];
+      if (appliquer) argv.push("--appliquer");
+      const r = run(process.execPath, argv, ICI);
+      let rapport = {};
+      try { rapport = JSON.parse(r.stdout); } catch { /* sortie non JSON : jugée par le code de retour */ }
+      const echecs = (rapport.findings || []).filter((x) => x.statut === "FAIL");
+      return { code: r.status, verdict: rapport.verdict, echecs };
+    };
+    let v = juger(false);
+    if (v.code === 2) ligne("avert", `skills — non jugeables : ${v.verdict || "SKIP"} (aucun skill versionné trouvé sous la racine ?)`);
+    else if (v.code === 0) ligne("ok", `skills installés = skills versionnés (${SKILLS_INSTALLES})`);
+    else if (pull) {
+      const a = juger(true);
+      v = juger(false);
+      if (v.code === 0) ligne("ok", `skills propagés vers ${SKILLS_INSTALLES} (oracle-skills --appliquer, décision portée par --pull) — rejeu PASS`);
+      else defaut(`skills — ${v.echecs.length} règle(s) encore en échec après propagation : ${[...new Set(v.echecs.map((x) => x.regle))].join(", ")}`,
+        `node oracles/oracle-skills.mjs --racine "${racine}" (le verdict nomme le remède ; --purger si des orphelins subsistent)`);
+      if (a.code === 2) averts.push("propagation SKIP");
+    } else {
+      const regles = [...new Set(v.echecs.map((x) => x.regle))].join(", ");
+      defaut(`skills installés en écart avec les forges (${v.echecs.length} règle(s) : ${regles})`, "node bootstrap.mjs --pull");
+    }
   }
 }
 
+// 7. Bilan : versions, puis verdict ----------------------------------------------------------
+if (versions.length) {
+  console.log("\nVersions au poste :");
+  for (const v of versions) console.log(`  ${v.nom.padEnd(34)} ${String(v.version).padEnd(22)} ${v.sha.padEnd(8)} ${v.date}  ${v.etat}`);
+}
 console.log(
   defauts.length
-    ? `\nPoste NON prêt — ${defauts.length} défaut(s) : ${defauts.join(" ; ")}`
-    : `\nPoste prêt. Si la racine n'est pas le parent du pilot, exporter FORGE_ROOT=${racine} avant d'ouvrir la session.`
+    ? `\nPoste NON prêt — ${defauts.length} défaut(s), chacun avec son remède ci-dessus.`
+    : `\nPoste prêt — présent, à jour, skills alignés${averts.length ? ` (${averts.length} avertissement(s) non bloquant(s))` : ""}. Si la racine n'est pas le parent du pilot, exporter FORGE_ROOT=${racine} avant d'ouvrir la session.`
 );
 process.exit(defauts.length ? 1 : 0);
