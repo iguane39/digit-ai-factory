@@ -334,3 +334,5 @@ Les seuls critères — tous mesurables, aucun « optimal »/« confiance » : o
 1-3 verts · forge-tests exit 0 ou 3 avec seuils de couverture et de mutation tenus sur les
 pans mesurés · oracle MEP 5/5 en staging · `DOSSIER-MEP.md` complet · traçabilité exigences
 MVP → tests 100 % · ledger vérifié par `ledger.mjs verify`.
+
+*L'intégrité du ledger ne s'attend plus jusqu'ici* (R-42, TF-0411, 20/08) : `oracle-conformite-projet` la juge à CHAQUE exécution, donc dès le pas 1 — seq continu, horodatages non décroissants, ouverture par `run_open`. Un défaut historique se **rectifie par ajout** (entrée `type: rectification_horodatage` nommant les `seq`, le `ts` consigné, le `ts` réel estimé et la cause) : l'écart reste imprimé en `[RECTIFIÉ]`, jamais effacé. Ce critère de fin de run est donc devenu une garde d'ouverture — un ledger rompu se voit avant d'avoir coûté un run entier.
