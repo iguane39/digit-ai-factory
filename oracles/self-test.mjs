@@ -495,6 +495,62 @@ check("verte-R19 : 14 clés au nom de dépôt complet → PASS, et le verdict le
     throw new Error("la forme tenue n'est pas dite au verdict — une exigence muette est indistinguable d'une absence de règle");
 });
 
+// ---- fixtures R-42 INTÉGRITÉ du ledger (TF-0411, 20/08) : le contrôle existait dans
+// `ledger.mjs verify` et n'était joué nulle part. Trois états à prouver — dont le fail-fast :
+// un vérificateur qui s'arrête au premier écart a laissé un second défaut invisible trois
+// jours sur un ledger réel de 138 entrées. -----------------------------------------------------
+const LEDGER_2_ECARTS = [
+  { seq: 1, ts: "2026-08-17T08:00:00Z", type: "run_open", versions_forges: { "digit-ai-factory": "abc1234" } },
+  { seq: 2, ts: "2026-08-17T13:30:00Z", type: "maj" },
+  { seq: 3, ts: "2026-08-17T10:05:00Z", type: "mise_en_production" },   // recul de 3 h 25
+  { seq: 4, ts: "2026-08-18T18:15:00Z", type: "correction" },
+  { seq: 5, ts: "2026-08-18T16:45:00Z", type: "mise_en_production" },   // recul de 1 h 30
+].map((e) => JSON.stringify(e)).join(NL_TEST) + NL_TEST;
+
+const rougeR42 = mkdtempSync(join(tmpdir(), "conf-rouge-r42-"));
+ecrireDans(rougeR42, "forge/ledger.jsonl", LEDGER_2_ECARTS);
+check("rouge-R42 : DEUX horodatages en recul → les DEUX nommés (anti-fail-fast)", () => {
+  const { exit, rapport } = lance(rougeR42);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const f = rapport.findings.find((x) => x.regle === "R-42" && x.statut === "FAIL");
+  if (!f) throw new Error("aucun FAIL R-42 — l'intégrité resterait non jugée là où le ledger est déjà lu");
+  if (!/seq 3 : horodatage décroissant/.test(f.message) || !/seq 5 : horodatage décroissant/.test(f.message))
+    throw new Error(`les deux écarts ne sont pas nommés : ${f.message}`);
+  if (!/2026-08-17T10:05:00Z après 2026-08-17T13:30:00Z/.test(f.message))
+    throw new Error("le constat ne nomme pas les DEUX horodatages — « décroissant » sans les valeurs n'est pas corrigeable");
+  if (!/rectification_horodatage/.test(f.message))
+    throw new Error("le constat ne dit pas comment se rectifie un ledger — l'histoire ne se réécrit pas, elle s'ajoute");
+});
+
+const verteR42 = mkdtempSync(join(tmpdir(), "conf-verte-r42-"));
+ecrireDans(verteR42, "forge/ledger.jsonl", LEDGER_2_ECARTS +
+  JSON.stringify({ seq: 6, ts: "2026-08-20T17:00:00Z", type: "rectification_horodatage",
+    entrees: [
+      { seq: 3, ts_consigne: "2026-08-17T10:05:00Z", ts_reel_estime: "2026-08-17T21:00:00Z", cause: "horodatée à l'heure de l'ACTION déployée, pas de la consignation" },
+      { seq: 5, ts_consigne: "2026-08-18T16:45:00Z", ts_reel_estime: "2026-08-18T18:30:00Z", cause: "même cause, même rédacteur" },
+    ] }) + NL_TEST);
+check("verte-R42 : les deux écarts RECTIFIÉS par déclaration → PASS, et l'écart reste IMPRIMÉ", () => {
+  const { rapport } = lance(verteR42);
+  const r42 = rapport.findings.filter((x) => x.regle === "R-42");
+  if (r42.some((x) => x.statut === "FAIL")) throw new Error(`FAIL inattendu : ${JSON.stringify(r42.filter((x) => x.statut === "FAIL").map((x) => x.message))}`);
+  const f = r42.find((x) => x.statut === "PASS");
+  if (!f) throw new Error("aucun PASS R-42 après rectification déclarée");
+  if ((f.message.match(/\[RECTIFIÉ\]/g) || []).length !== 2)
+    throw new Error(`les deux rectifications ne sont pas imprimées : ${f.message} — une rectification silencieuse serait une réécriture`);
+});
+
+const partielR42 = mkdtempSync(join(tmpdir(), "conf-partiel-r42-"));
+ecrireDans(partielR42, "forge/ledger.jsonl", LEDGER_2_ECARTS +
+  JSON.stringify({ seq: 6, ts: "2026-08-20T17:00:00Z", type: "rectification_horodatage",
+    entrees: [{ seq: 3, ts_consigne: "2026-08-17T10:05:00Z", ts_reel_estime: "2026-08-17T21:00:00Z", cause: "heure d'action" }] }) + NL_TEST);
+check("partiel-R42 : rectifier UN écart sur deux ne blanchit pas l'autre", () => {
+  const { exit, rapport } = lance(partielR42);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1 — une rectification partielle qui passerait serait une amnistie générale`);
+  const f = rapport.findings.find((x) => x.regle === "R-42" && x.statut === "FAIL");
+  if (!f || !/seq 5 : horodatage décroissant/.test(f.message)) throw new Error(`l'écart non déclaré n'est plus dénoncé : ${f && f.message}`);
+  if (!/\[RECTIFIÉ\].*seq 3/.test(f.message)) throw new Error("l'écart rectifié n'est plus imprimé alors qu'il reste un fait");
+});
+
 // ---- fixtures R-20 TODO-PRODUIT (TF-0318, verdict O3 du 17/08 — volet LECTURE seul) : le
 // couple « source MD versionnée → projection HTML générée », au patron déjà tenu par R-20 pour
 // ARCHITECTURE et MODELE-DONNEES. Trois états à prouver, dont l'ABSENCE : les produits nés avant
@@ -581,6 +637,6 @@ check("rouge-TODO-PRODUIT : source sans projection → couple rompu, constat loc
   if (!f || f.ou !== "docs\\projet\\TODO-PRODUIT.html") throw new Error(`constat absent ou non localisant : ${JSON.stringify(f)}`);
 });
 
-for (const d of [verte, rouge, rougeDocs, rougeLock, rougeR24, ecartR24, rougeR2, verteR2, rougeR19, verteR19, verteTdp, rougeTdp, rougeTdpNu]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+for (const d of [verte, rouge, rougeDocs, rougeLock, rougeR24, ecartR24, rougeR2, verteR2, rougeR19, verteR19, rougeR42, verteR42, partielR42, verteTdp, rougeTdp, rougeTdpNu]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 console.log(`\nSelf-test conformité projet : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
