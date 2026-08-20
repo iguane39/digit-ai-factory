@@ -49,7 +49,7 @@ explicite `état de l'art : non instruit` avec son motif. Jamais d'entre-deux.>
 ## 5. Verdict
 
 - **Option retenue** : <une seule — un verdict multiple n'est pas un verdict>.
-- **Coût** : <effort, tokens, dette>.
+- **Coût** : <complexité : simple | moyen | complexe | très complexe · durée : court | moyen | long | très long ; tokens, dette>. Jamais en jours (TF-0408, 20/08 : avec l'IA un nombre de jours n'a pas de sens — même échelle que le rapport d'audit ; E8 le tient).
 - **Candidature(s) émise(s)** : <sidecar 01-candidatures ou décision directe si mandatée>.
 - **Plan de revue** : <date à laquelle le verdict sera confronté aux faits>.
 

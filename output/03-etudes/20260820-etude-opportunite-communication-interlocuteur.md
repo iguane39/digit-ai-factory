@@ -87,7 +87,7 @@ session (profil utilisateur) et au `CLAUDE.md` d'un produit quand l'interlocuteu
 s'ouvre par une synthèse en langage commanditaire** — l'état, ce que ça change, ce qui est
 attendu de vous — avant le détail technique ; un terme technique dans cette partie porte sa
 glose. (c) `oracle-synthese` gagne une règle S9 : la synthèse d'ouverture existe et ne contient
-ni identifiant nu ni chemin de fichier sans glose. *Coût* : ≤ 1 j. *Ce qu'elle exclut* : la
+ni identifiant nu ni chemin de fichier sans glose. *Coût* : complexité simple · durée court. *Ce qu'elle exclut* : la
 mesure de lisibilité — S9 vérifie une structure, pas une compréhension.
 
 **O2 — deux restitutions par sujet** (une technique, une commanditaire). *Ce qu'elle exclut* :
@@ -117,7 +117,7 @@ coexistent. **Écartée pour la conversation, confirmée pour les docs.**
   que c'est celle que le retour vise. La solution n'est pas d'inventer : c'est de **transposer
   RL-1/RL-7 à la restitution conversationnelle**, sans rien perdre (on ordonne, on n'enlève
   pas), et de déclarer l'interlocuteur une fois plutôt que de le deviner à chaque message.
-- **Coût** : ≤ 1 j (gabarit + règle S9 + profil). Aucun euro.
+- **Coût** : complexité simple · durée court (gabarit + règle S9 + profil). Aucun euro.
 - **Ce que le verdict NE dit pas** : que la compréhension devienne mesurable. S9 contrôle une
   structure (la synthèse d'ouverture existe, sans jargon nu) ; la compréhension réelle reste
   jugée par le lecteur, et le signal qui compte restera ses retours — comme celui-ci.
