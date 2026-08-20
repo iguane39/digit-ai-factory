@@ -42,11 +42,16 @@ d'engagement privés), localise la forge ou **l'installe depuis
 GitHub** (`~/.digit-ai-forge` par défaut, via `bootstrap.mjs`), puis le run entier — ledger,
 artefacts d'étapes, code — vit dans le projet produit.
 
-**Amorçage manuel** (équivalent de la phase 0) : cloner ce dépôt puis `node bootstrap.mjs` —
-vérifie les prérequis, clone les treize forges en dépôts frères (`core.longpaths` activé : les
-noms de fichiers des forges dépassent MAX_PATH sinon) et contrôle leurs points d'entrée.
-Options : `--racine <dossier>` (+ `FORGE_ROOT` en session), `--pull` pour mettre à jour.
-Testé : amorçage réel d'un répertoire vierge, toutes forges clonées et preuves vérifiées, exit 0.
+**Amorçage manuel** (équivalent de la phase 0) : cloner ce dépôt puis `node bootstrap.mjs --pull`
+— vérifie les prérequis (git, node ≥ 18 ; `gh` facultatif), met à jour **le pilot lui-même**,
+clone ou met à jour les treize forges en dépôts frères (`core.longpaths` activé : les noms de
+fichiers des forges dépassent MAX_PATH sinon), renomme sur place un dossier hérité d'un ancien
+nom, **propage les skills versionnés vers `~/.claude/skills`**, contrôle les points d'entrée et
+**affiche la version de chaque dépôt** (tag, sha, date, retard sur origin). Il ne dit
+« Poste prêt » que si tout est présent, **à jour** et aligné ; sans `--pull` il mesure
+seulement, et chaque défaut porte son remède. Options : `--racine <dossier>` (+ `FORGE_ROOT`
+en session). Testé : amorçage réel d'un répertoire vierge (13 clones, 60 Mo, exit 0) et
+recette `bootstrap.test.mjs` sur dépôts factices (retard, renommage, preuve absente).
 
 L'orchestrateur (piloté par [CLAUDE.md](CLAUDE.md)) déroule cinq étapes :
 

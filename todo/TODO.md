@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=dbd77811164f archive=9f205b231527 · dernier événement: 2026-08-20T18:21:00Z -->
+     sceaux: actifs=656a4e241c5b archive=9f205b231527 · dernier événement: 2026-08-20T18:41:23.947Z -->
 
-**108 actifs** (candidat 0 · décidé 0 · en cours 1 · corrigé 106 · écarté 1) · **308 archivés**.
+**110 actifs** (candidat 1 · décidé 0 · en cours 1 · corrigé 107 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -137,12 +137,14 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0417 | candidat | 8 | oracle-claude-md : le plafond de 6 Ko est mesuré en octets BRUTS — un checkout CRLF (autocrlf Windows) fait FAIL un noyau de 6096 octets LF | **oui** — mesuré le 20/08 : verdict FAIL sur un noyau conforme — un contributeur Windows raccourcirait le noyau pour rien, ou apprendrait à ignorer un oracle rouge, ce qui est pire |
 | TF-0327 | corrige | 12 | RV-9 n'est pas refermé : la fixture témoin de la bascule sombre démontre ENCORE le comportement interdit | **oui** — deux livrables du même socle peuvent encore s'ouvrir différemment sur le même poste — le symptôme exact que RV-9 prétendait avoir soldé |
 | TF-0328 | corrige | 8 | appliquer-export.mjs est orphelin et TODO-FORGE.md prescrit un dispositif retiré le 12/08 | **oui** — un item de registre entier (TF-0318) a été instruit sur une prémisse que la doc du pilot affirmait et que le code démentait |
 | TF-0332 | corrige | 8 | Solder la dette de traçabilité D-14 : trois affirmations de conformité fausses au corpus | **oui** — deux études du même après-midi ont buté sur des déclarations de conformité fausses — le coût de recherche se paie à chaque instruction |
 | TF-0356 | corrige | 8 | generer-page.mjs : TODO.html échoue L11 — esc() au lieu d'escLit() sur les titres (« None » non traité) | **oui** — la vue courante du registre échoue à l'oracle du socle pendant que la vue d'archive née hier le passe — le patron neuf a déjà dépassé l'ancien |
 | TF-0358 | corrige | 8 | Hygiène post-renommage : dossier local à renommer hors session, dénominateur « 14 frères » de l'étude, sous-chemin périmé websec | **oui** — un critère de revue à dénominateur faux se vérifierait « tenu » sur un compte qui ne l'est pas — la famille de défauts que TF-0332 vient de solder |
 | TF-0391 | corrige | 8 | Reconstat : la dérive versionné↔installé des skills revit à grande échelle — oracle-skills K2 FAIL sur 10 skills/17, et personne ne l'exécute en cadence | **oui** — mesuré par exécution le 19/08 : 10 skills/17 divergent — ce qui s'exécute au poste n'est plus ce que les dépôts versionnent, sur les verbes du pipeline eux-mêmes (qualifier, énumérer, rédiger, dériver) ; le coût a déjà été payé une fois (item archivé), le re-payer prouve que la fermeture précédente n'a pas fermé le mécanisme |
+| TF-0416 | corrige | 6.7 | bootstrap : « Poste prêt » ne garantissait ni la dernière version ni les skills — le pilot non mis à jour, les forges jamais mesurées, les skills jamais installés ni propagés, les renommages dupliqués, gh bloquant | **oui** — mesuré le 20/08 : un poste vierge amorcé « Poste prêt » n'avait AUCUN skill exécutable (K1 FAIL) ; sur le poste réel, K2 rouge sur 5 skills immédiatement après un --pull réussi — la promesse « un run démarre TOUJOURS sur les dernières versions » était tenue pour les dépôts et fausse pour ce qui s'exécute ; l'humain l'a senti avant que l'outillage ne le dise |
 | TF-0331 | corrige | 6 | Le marquage destinataire: humain doit naître dans les gabarits — sans porteurs, R-2/E9 est un faux négatif volontaire | **oui** — la règle est livrée et prouvée à zéro faux positif, mais elle ne verra rien tant qu'aucun document ne naît marqué |
 | TF-0337 | corrige | 6 | oracle-skills : le conseil de réparation de K7 propose une commande RELATIVE — reportée telle quelle, elle ne résoudrait rien | **oui** — l'humain qui suit le conseil au pied de la lettre câblerait un hook que K8 déclarerait aussitôt mort |
 | TF-0348 | corrige | 6 | output\ : les documents d'un audit vivent dans une famille XX-audit — nom de famille au registre organization, numéro local stable | **oui** — demande humaine directe — sans nom de famille conventionné, XX-audit sera 03- ici et 07- là et la recherche inter-produits redevient manuelle |

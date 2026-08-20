@@ -11,17 +11,21 @@ parent du dossier courant, sinon `c:\dev`, sinon `~/.digit-ai-forge`.
 - **Introuvable** → installe :
   ```
   git clone https://github.com/iguane39/digit-ai-factory ~/.digit-ai-forge/digit-ai-factory
-  cd ~/.digit-ai-forge/digit-ai-factory && node bootstrap.mjs
+  cd ~/.digit-ai-forge/digit-ai-factory && node bootstrap.mjs --pull
   ```
 - **Déjà présent** → mets à jour :
   ```
-  git pull --ff-only && node bootstrap.mjs --pull
+  node bootstrap.mjs --pull
   ```
 
-`bootstrap.mjs` vérifie les prérequis (git, node ≥ 18, uv, python), clone ou met à jour
-les dix forges en dépôts frères et contrôle leurs points d'entrée. Il doit finir par
-**« Poste prêt »** — sinon, corrige ce qu'il signale avant de continuer. Retiens la
-racine des forges qu'il affiche.
+`bootstrap.mjs --pull` vérifie les prérequis (git, node ≥ 18 ; gh facultatif — les forges
+sont publiques), met à jour **le pilot lui-même** (et se relance s'il a changé), clone ou
+met à jour les **treize forges** en dépôts frères, renomme sur place un dossier hérité
+d'un ancien nom, **propage les skills versionnés** vers `~/.claude/skills`, contrôle les
+points d'entrée et **affiche la version de chaque dépôt** (tag, sha, date, retard). Il ne
+dit **« Poste prêt »** que si tout est présent, à jour et aligné — sinon chaque défaut
+porte son remède : applique-le avant de continuer. Sans `--pull`, il mesure seulement.
+Retiens la racine des forges qu'il affiche.
 
 ## Ensuite — le protocole d'accueil
 

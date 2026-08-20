@@ -18,12 +18,15 @@ Phase 0 — outillage (ne suppose RIEN d'installé, quel que soit mon système) 
 2. Localise la forge : $FORGE_ROOT s'il est défini, sinon cherche un dossier contenant
    digit-ai-factory parmi : le parent de ce projet, c:\dev, ~/.digit-ai-forge.
    Si introuvable, installe-la :
-     gh repo clone iguane39/digit-ai-factory ~/.digit-ai-forge/digit-ai-factory
-     node ~/.digit-ai-forge/digit-ai-factory/bootstrap.mjs
-   (bootstrap.mjs clone les forges à côté du pilot et vérifie leurs points d'entrée —
-   il doit finir sur « Poste prêt », sinon corrige ce qu'il signale avant de continuer.)
-3. Si la forge était déjà installée : mets-la à jour — `git pull --ff-only` dans le pilot
-   puis `node bootstrap.mjs --pull` (les correctifs des forges arrivent en continu ; un run
+     git clone https://github.com/iguane39/digit-ai-factory ~/.digit-ai-forge/digit-ai-factory
+     node ~/.digit-ai-forge/digit-ai-factory/bootstrap.mjs --pull
+   (bootstrap.mjs clone les treize forges à côté du pilot, installe leurs skills dans
+   ~/.claude/skills, vérifie leurs points d'entrée et affiche les versions — il doit finir
+   sur « Poste prêt », sinon chaque défaut porte son remède : applique-le avant de continuer.)
+3. Si la forge était déjà installée : mets-la à jour — `node bootstrap.mjs --pull` dans le
+   pilot (il met à jour le pilot lui-même, puis les treize forges, puis propage les skills
+   versionnés vers la copie installée ; il affiche la version de chaque dépôt et ne dit
+   « Poste prêt » que si tout est À JOUR — les correctifs arrivent en continu ; un run
    démarre TOUJOURS sur les dernières versions, consignées au ledger).
 4. Retiens la racine comme FORGE_ROOT pour toute la session.
 
