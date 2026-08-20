@@ -139,7 +139,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>41198d91f419</code> · dernier événement 2026-08-20T18:21:00Z</p>
+      <p class="meta">sceau <code>dbd77811164f</code> · dernier événement 2026-08-20T18:21:00Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -149,7 +149,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="1 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">1</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="0 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">0</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="1 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">1</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="307 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">307</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -879,23 +879,6 @@
       <h2>digit-ai-forge-tests <span class="badge" title="31 item(s) actifs ciblant digit-ai-forge-tests">31</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-tests</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0409" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0409</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-tests + forge-design : l'accessibilité RGAA AA se mesure enfin — contraste câblé (O3), focus prescrit (O4)</h3>
-          <div class="card-detail"><p class="lead">Verdict O2→O3→O4 de l'étude RGAA 20260820a.</p><ul class="puces"><li>O2 (déclarer le trou) était clos le 20/08 matin. Reste les deux temps qui MESURENT. O3, forge-tests : render_page.py V2 (luminance WCAG sur les styles réellement rendus) existe, a déjà tourné contre des écrans produits le 11/08, et n'est câblée comme pan de forge-tests NULLE PART — elle ne tourne que si quelqu'un y pense</li><li>plus un pan clavier/focus, aujourd'hui couvert par AUCUN oracle du parc. O4, forge-design : le contrat de tokens ne prescrit AUCUN token de focus alors que le gabarit de démo en consomme déjà un et que le DESIGN.md généré affirme « états focus visibles au clavier »</li><li>le refus à la génération ne lit que le thème clair et n'oppose aucun seuil au contraste d'interface (3:1, GL03)</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>SCC.FR, produit public français, est en étape 0 avec une obligation légale que rien ne mesure ; et cinq critères a11y du corpus de forge-design (GL02/03/04/05/37) étaient sourcés WCAG sans aucun exécutant — du référentiel dormant.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (Sébastien) — mandat du 20/08 (« vas y »)</dd></div>
-            
-          </dl>
-        </article>
         <article class="card s-corrige" id="item-TF-0343" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0343</code>
@@ -944,6 +927,23 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>une fonction produit entierement morte en production (notifications push, deux routes en 404) et l absence totale d image sur 1 249 annonces, tenues par deux 404 lisibles sans authentification, non vues par six campagnes d audit entre le 11 et le 18/08</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (lien posé à l'ingestion du lot Produit-11 20260818a)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0409" data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0409</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests + forge-design : l'accessibilité RGAA AA se mesure enfin — contraste câblé (O3), focus prescrit (O4)</h3>
+          <div class="card-detail"><p class="lead">Verdict O2→O3→O4 de l'étude RGAA 20260820a.</p><ul class="puces"><li>O2 (déclarer le trou) était clos le 20/08 matin. Reste les deux temps qui MESURENT. O3, forge-tests : render_page.py V2 (luminance WCAG sur les styles réellement rendus) existe, a déjà tourné contre des écrans produits le 11/08, et n'est câblée comme pan de forge-tests NULLE PART — elle ne tourne que si quelqu'un y pense</li><li>plus un pan clavier/focus, aujourd'hui couvert par AUCUN oracle du parc. O4, forge-design : le contrat de tokens ne prescrit AUCUN token de focus alors que le gabarit de démo en consomme déjà un et que le DESIGN.md généré affirme « états focus visibles au clavier »</li><li>le refus à la génération ne lit que le thème clair et n'oppose aucun seuil au contraste d'interface (3:1, GL03)</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>SCC.FR, produit public français, est en étape 0 avec une obligation légale que rien ne mesure ; et cinq critères a11y du corpus de forge-design (GL02/03/04/05/37) étaient sourcés WCAG sans aucun exécutant — du référentiel dormant.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (Sébastien) — mandat du 20/08 (« vas y »)</dd></div>
             
           </dl>
         </article>

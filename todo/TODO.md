@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=41198d91f419 archive=9f205b231527 · dernier événement: 2026-08-20T18:21:00Z -->
+     sceaux: actifs=dbd77811164f archive=9f205b231527 · dernier événement: 2026-08-20T18:21:00Z -->
 
-**108 actifs** (candidat 1 · décidé 0 · en cours 1 · corrigé 105 · écarté 1) · **308 archivés**.
+**108 actifs** (candidat 0 · décidé 0 · en cours 1 · corrigé 106 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -88,10 +88,10 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0409 | candidat | 9 | forge-tests + forge-design : l'accessibilité RGAA AA se mesure enfin — contraste câblé (O3), focus prescrit (O4) | **oui** — SCC.FR, produit public français, est en étape 0 avec une obligation légale que rien ne mesure ; et cinq critères a11y du corpus de forge-design (GL02/03/04/05/37) étaient sourcés WCAG sans aucun exécutant — du référentiel dormant. |
 | TF-0343 | corrige | 9 | tests : la matrice des droits doit etre un artefact EXECUTABLE cellule par cellule, avec xfail strict pour les cellules non tenues | **oui** — 2 lignes de la matrice des droits conformes par construction mais prouvees par aucun test, et 2 cases non tenues par le produit, invisibles dans une suite organisee par service |
 | TF-0352 | corrige | 9 | tests : « executer la strategie de tests » doit inclure la CORRECTION des anomalies remontees et le REJEU jusqu a extinction — definition de fin a ecrire | **oui** — campagne du 12/08 close conforme avec 121 findings et produit inchange ; la meme strategie executee avec obligation de traiter a ferme 4 anomalies produit et 3 faux verts, dont un dormant depuis cette campagne |
 | TF-0371 | corrige | 9 | forge-tests : rien ne confronte ce que le code APPELLE a ce que l instance SERT — ni les routes, ni les ressources | **oui** — une fonction produit entierement morte en production (notifications push, deux routes en 404) et l absence totale d image sur 1 249 annonces, tenues par deux 404 lisibles sans authentification, non vues par six campagnes d audit entre le 11 et le 18/08 |
+| TF-0409 | corrige | 9 | forge-tests + forge-design : l'accessibilité RGAA AA se mesure enfin — contraste câblé (O3), focus prescrit (O4) | **oui** — SCC.FR, produit public français, est en étape 0 avec une obligation légale que rien ne mesure ; et cinq critères a11y du corpus de forge-design (GL02/03/04/05/37) étaient sourcés WCAG sans aucun exécutant — du référentiel dormant. |
 | TF-0309 | corrige | 6 | forge-tests : schema_obtenu rend None sans motif propre quand le conteneur manque sur son seul chemin | **oui** — le seul chemin conteneur encore capable de se taire — la maladie que TF-0299 vient d'éradiquer partout ailleurs |
 | TF-0345 | corrige | 6 | tests : une donnee de test partagee se reference et se valide a la generation, elle ne se recopie pas d un spec a l autre | **oui** — 4 tests e2e en timeout et un diagnostic egare vers la chaine de conversion, pour 80 caracteres perdus dans la recopie d un litteral base64 |
 | TF-0384 | corrige | 6 | forge-tests : le collecteur de dette lit une LISTE DE MODULES ECRITE A LA MAIN — huit limites declarees n entraient au registre d aucun domaine | **oui** — 8 limites declarees dans un module neuf, absentes du registre de dette jusqu a ce qu un humain y pense — et le contrôle de synchronisation du registre ne le voyait pas, puisqu il compare le registre a ce que le COLLECTEUR rend, non a ce que le code declare |
