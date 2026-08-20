@@ -100,20 +100,20 @@ câblée. (b) Le contrat « prêt client » et le dossier MEP portent l'écart :
 public français, la conformité RGAA non mesurée est un **écart déclaré au GO humain**, jamais un
 silence. (c) La liste de surface implicite d'`enumere-la-surface` gagne les **cinq livrables
 légaux** (déclaration d'accessibilité, schéma pluriannuel, plan d'action annuel, signalement,
-recours) — proposés d'office pour tout site public, écartés explicitement sinon. *Coût* : ≤ 1 j,
+recours) — proposés d'office pour tout site public, écartés explicitement sinon. *Coût* : complexité simple · durée court ;
 aucun code de mesure. *Ce qu'elle exclut* : rien — elle rend le trou visible et arrêtable.
 
 **O3 — le pan de mesure** (retenue, second temps). Câbler `render_page` V2 (contraste) dans la
 chaîne d'audit produit ; écrire le pan axe-core + navigation clavier sous Playwright (déjà
 dépendance), axe-core **vendorisé** (aucun CDN au runtime) ; étendre la capture aux **états
 ouverts** (menu, modale, erreur) — la limite « DOM à l'état INITIAL » est déclarée depuis
-l'origine et RF-6 la cite. *Coût* : 3-5 j. *Ce qu'elle exclut* : le verdict légal — le pan rend
+l'origine et RF-6 la cite. *Coût* : complexité complexe · durée long. *Ce qu'elle exclut* : le verdict légal — le pan rend
 des **mesures**, l'audit humain rend la **déclaration**.
 
 **O4 — un pan « design accessible » chez forge-design** (tokens de contraste vérifiés à la
 source, focus visible dans le système de marque). *Ce qu'elle apporte* : attraper le défaut
 **avant** le produit — un token de couleur au contraste insuffisant est un défaut de charte, pas
-de page. *Coût* : 1-2 j, extension d'`oracle-tokens`. **Retenue comme troisième temps**,
+de page. *Coût* : complexité moyen · durée moyen, extension d'`oracle-tokens`. **Retenue comme troisième temps**,
 conditionnée au constat d'O3 : sans mesure aval, une règle amont ne se vérifie pas.
 
 ## 5. Verdict
@@ -126,7 +126,7 @@ conditionnée au constat d'O3 : sans mesure aval, une règle amont ne se vérifi
   existe déjà, débranchée** — la câbler vaut mieux que l'écrire. La réponse à « forge-design,
   voire forge-tests ? » est : **forge-tests mesure, forge-design prévient, le pilot bloque** —
   trois rôles, pas un choix entre forges.
-- **Coût** : O2 ≤ 1 j · O3 3-5 j · O4 1-2 j. Aucun euro, aucun service tiers (axe-core local et
+- **Coût** : O2 simple·court · O3 complexe·long · O4 moyen·moyen (échelle du rapport d'audit, TF-0408). Aucun euro, aucun service tiers (axe-core local et
   vendorisé).
 - **Ce que le verdict NE dit pas** : qu'un verdict RGAA machine existera. Le pan rendra des
   mesures et le dénominateur ; la **déclaration légale reste un audit humain à budgéter**, que

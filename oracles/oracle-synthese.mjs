@@ -26,6 +26,9 @@
  *       (TF-0407, retour humain du 20/08 : « ton interlocuteur peut être pas assez
  *       technique pour comprendre tout ce que tu remontes »). Le détail vérifiable vient
  *       APRÈS — on ordonne, on ne supprime jamais.
+ *   S10 aucun effort chiffré en JOURS sur une ligne de coût/estimation (TF-0408, 20/08 :
+ *       avec l'IA un nombre de jours n'a pas de sens — complexité × durée, échelle du
+ *       rapport d'audit). Les faits mesurés hors ligne de coût ne sont pas jugés.
  *
  * Usage : node oracle-synthese.mjs <synthese.md>   → verdict JSON
  *         node oracle-synthese.mjs --self-test     → fixtures double sens
@@ -198,6 +201,16 @@ function juger(texte) {
     ok("S9", `synthèse d'ouverture en langage commanditaire (${mots} mots, sans identifiant nu)`);
   }
 
+  // S10 (TF-0408) — l'effort parle en complexité × durée, jamais en jours : sur toute
+  // ligne portant un marqueur de coût/estimation, une unité « j / jours / j-h » chiffrée
+  // est un défaut. Même règle qu'E8 côté études — la restitution est l'autre surface où
+  // une estimation se glisse.
+  const lignesCout = texte.split("\n").filter((l) => /co[uû]t|estimation|effort estimé|charge estimée/i.test(l));
+  const enJours = lignesCout.filter((l) => /(?:\d+(?:[.,]\d+)?|½)\s*(?:à\s*\d+(?:[.,]\d+)?\s*)?j(?:ours?)?\b|jours?[- ]hommes?/i.test(l));
+  enJours.length
+    ? ko("S10", `${enJours.length} ligne(s) de coût chiffrée(s) en JOURS — complexité (simple|moyen|complexe|très complexe) × durée (court|moyen|long|très long). Ex. : ${enJours[0].trim().slice(0, 90)}`)
+    : ok("S10", "aucune estimation en jours — l effort parle en complexité × durée");
+
   return findings;
 }
 
@@ -218,6 +231,8 @@ Campagne · forge-tests · terminée le 2026-08-14 à 15h48 (Europe/Paris) · du
 
 ## 2. Verdict
 Recette S-01 TENU — 19/19 défauts détectés au banc rouge, pytest 365.
+
+Coût de la reprise proposée : complexité moyen · durée court.
 
 ## 3. Décisions attendues
 - Pousser et taguer la version ?
@@ -248,6 +263,7 @@ Aucun écart : la demande a été suivie à la lettre.
     .replace(/\n\nLe contrôle complet[\s\S]*?ci-dessous\./, "")  // S9 : plus d ouverture
     .replace("terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot.", "terminée aujourd'hui.")
     .replace("- Regroupement par cause racine : motif — sa cause est traitée, critère de réouverture écrit.", "- Regroupement par cause racine")
+    .replace("Coût de la reprise proposée : complexité moyen · durée court.", "Coût de la reprise proposée : 2-3 j.")
     .replace("Recette S-01 TENU — 19/19 défauts détectés au banc rouge, pytest 365.", "Tout s'est bien passé.");
   writeFileSync(join(dir, "verte.md"), verte, "utf8");
   writeFileSync(join(dir, "rouge.md"), rouge, "utf8");
@@ -258,13 +274,13 @@ Aucun écart : la demande a été suivie à la lettre.
   if (rv.status !== 0) casse.push("la fixture VERTE ne passe pas : " + rv.stdout);
   if (rr.status !== 1) casse.push("la fixture ROUGE ne FAIL pas");
   else {
-    for (const regle of ["S2", "S3", "S5", "S9"]) {
+    for (const regle of ["S2", "S3", "S5", "S9", "S10"]) {
       if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
     }
   }
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 2/2 PASS (verte PASS ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente)");
+    : "Self-test restitution : 2/2 PASS (verte PASS ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours)");
   process.exit(casse.length ? 1 : 0);
 }
 

@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=10175385f517 archive=9f205b231527 · dernier événement: 2026-08-20T17:10:30Z -->
+     sceaux: actifs=39228f6e9831 archive=9f205b231527 · dernier événement: 2026-08-20T17:32:00Z -->
 
-**100 actifs** (candidat 0 · décidé 0 · en cours 1 · corrigé 98 · écarté 1) · **308 archivés**.
+**101 actifs** (candidat 0 · décidé 0 · en cours 1 · corrigé 99 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -12,6 +12,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0407 | corrige | 9 | pilot : la conversation est la seule surface de restitution sans doctrine d'audience — profil d'interlocuteur déclaré + ouverture commanditaire + règle S9 | **oui** — le retour lui-même, émis par le seul lecteur des restitutions — il n'existe pas de mesure plus directe qu'un destinataire disant qu'une partie ne lui parvient pas |
+| TF-0408 | corrige | 6 | pilot : la règle « jamais de jours, complexité × durée » était restée locale au rapport d'audit — généralisée aux études et restitutions, contrôles E8/S10 | **oui** — la restitution fautive elle-même : trois estimations en jours émises quelques heures après que la règle a été câblée au rapport d'audit — la doctrine sans porteur mécanique ne survit pas à la surface suivante |
 
 ## digit-ai-forge-agents
 

@@ -35,7 +35,7 @@ tranchée quitte la table et rejoint le journal du run.
 
 | Id | Question | Options (a/b/c) | Ce qui est bloqué | Coût de l'attente | Depuis |
 |---|---|---|---|---|---|
-| {Q-01} | {la question, en une phrase qui se répond} | {a) … · b) … · c) …} | {étape development — écran de validation} | {1 j de développement en attente} | {AAAA-MM-JJ} |
+| {Q-01} | {la question, en une phrase qui se répond} | {a) … · b) … · c) …} | {étape development — écran de validation} | {développement bloqué — durée d'attente : court} | {AAAA-MM-JJ} |
 
 ## Améliorations
 
