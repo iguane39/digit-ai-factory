@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=39228f6e9831 archive=9f205b231527 · dernier événement: 2026-08-20T17:32:00Z -->
+     sceaux: actifs=96595a3db718 archive=9f205b231527 · dernier événement: 2026-08-20T18:21:00Z -->
 
-**101 actifs** (candidat 0 · décidé 0 · en cours 1 · corrigé 99 · écarté 1) · **308 archivés**.
+**104 actifs** (candidat 2 · décidé 0 · en cours 1 · corrigé 100 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -12,6 +12,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0407 | corrige | 9 | pilot : la conversation est la seule surface de restitution sans doctrine d'audience — profil d'interlocuteur déclaré + ouverture commanditaire + règle S9 | **oui** — le retour lui-même, émis par le seul lecteur des restitutions — il n'existe pas de mesure plus directe qu'un destinataire disant qu'une partie ne lui parvient pas |
+| TF-0411 | corrige | 9 | pilot : l'intégrité du ledger n'était exigée qu'au contrat « prêt client » — R-42 la juge là où le ledger est déjà lu | **oui** — deux écarts d'intégrité ont vécu trois jours dans un ledger réel, publiés dans git, alors que l'oracle de conformité lisait ce même fichier à chaque run. |
 | TF-0408 | corrige | 6 | pilot : la règle « jamais de jours, complexité × durée » était restée locale au rapport d'audit — généralisée aux études et restitutions, contrôles E8/S10 | **oui** — la restitution fautive elle-même : trois estimations en jours émises quelques heures après que la règle a été câblée au rapport d'audit — la doctrine sans porteur mécanique ne survit pas à la surface suivante |
 
 ## digit-ai-forge-agents
@@ -19,6 +20,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0324 | en_cours | 3 | Artefacts périodiques du run de delivery absents : RAID, rapport d'avancement, compte rendu, REX, suivi des bénéfices | **oui** — revérifié en session le 16/08 : 0 occurrence de RAID / compte rendu / rapport d'avancement / lessons learned sur les skills installés — aucun des cinq artefacts que réclame une mission longue n'a d'équivalent dans la forge |
+| TF-0410 | candidat | 9 | forge-agents : le vérificateur de ledger s'arrêtait au premier écart, et l'écriture ne gardait rien | **oui** — un défaut connu depuis le 19/08 en masquait un second de même classe : le fail-fast transforme un rapport d'intégrité en rapport du premier problème. |
 | TF-0304 | corrige | 12 | forge-agents : déclarer le câblage de qo-gate-write.mjs dans le settings.json versionné de la forge | **oui** — le gate C7 est mort sur ce poste depuis une date inconnue et AUCUN dépôt ne dit comment le recâbler — la moitié durable du trou que K7 déclare à chaque run |
 | TF-0366 | corrige | 9 | un verdict d'oracle archive ne dit pas sous quel jeu de regles il a ete rendu | **oui** — 1 aller-retour de diagnostic : A3 tombe sur les 5 fichiers HTML du projet, gabarit compris, ce qui a d'abord fait soupconner un defaut de la chaine d'emission avant que la comparaison avec le journal du 14/08 n'etablisse qu'il s'agissait d'une regle nouvelle. |
 | TF-0385 | corrige | 9 | noyau + forge-agents : l'événement `oracles_verdict` n'a AUCUNE forme canonique — six formes de champs pour huit entrées d'un même ledger, donc aucun calcul possible de ce qui a tourné | **oui** — six formes de champs pour huit entrées du même type dans le même fichier, mesurées le 19/08 ; aucun calcul machine possible de ce qui a tourné sur un run ; et le vérificateur de ledger ne lit aucun payload, donc ne pouvait pas le voir. 57 oracles sur 76 (75 %) ne sont derrière aucun mécanisme qui constaterait leur absence |
@@ -82,6 +84,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0409 | candidat | 9 | forge-tests + forge-design : l'accessibilité RGAA AA se mesure enfin — contraste câblé (O3), focus prescrit (O4) | **oui** — SCC.FR, produit public français, est en étape 0 avec une obligation légale que rien ne mesure ; et cinq critères a11y du corpus de forge-design (GL02/03/04/05/37) étaient sourcés WCAG sans aucun exécutant — du référentiel dormant. |
 | TF-0343 | corrige | 9 | tests : la matrice des droits doit etre un artefact EXECUTABLE cellule par cellule, avec xfail strict pour les cellules non tenues | **oui** — 2 lignes de la matrice des droits conformes par construction mais prouvees par aucun test, et 2 cases non tenues par le produit, invisibles dans une suite organisee par service |
 | TF-0352 | corrige | 9 | tests : « executer la strategie de tests » doit inclure la CORRECTION des anomalies remontees et le REJEU jusqu a extinction — definition de fin a ecrire | **oui** — campagne du 12/08 close conforme avec 121 findings et produit inchange ; la meme strategie executee avec obligation de traiter a ferme 4 anomalies produit et 3 faux verts, dont un dormant depuis cette campagne |
 | TF-0371 | corrige | 9 | forge-tests : rien ne confronte ce que le code APPELLE a ce que l instance SERT — ni les routes, ni les ressources | **oui** — une fonction produit entierement morte en production (notifications push, deux routes en 404) et l absence totale d image sur 1 249 annonces, tenues par deux 404 lisibles sans authentification, non vues par six campagnes d audit entre le 11 et le 18/08 |

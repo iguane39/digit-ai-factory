@@ -592,6 +592,31 @@ pas encore — c'est le patron de la règle dormante que R-35 dénonce. Borne : 
 **2026-11-17**, si aucun des trois invariants n'a servi à trancher une question réelle, ils se
 **retirent** plutôt que de dormir.
 
+## V. L'intégrité du ledger se juge là où le ledger s'ouvre (règle 42 — 20/08, TF-0411)
+
+**R-42.** Tout oracle du pilot qui LIT un ledger en juge d'abord l'**intégrité** : `seq`
+strictement croissant depuis 1, horodatages **non décroissants**, première entrée `run_open`.
+Un écart non déclaré est un **FAIL** ; un écart couvert par une entrée ultérieure de
+**rectification déclarée** (`type: rectification_horodatage`, qui nomme les `seq`, le `ts`
+consigné, le `ts` réel estimé et la cause) reste **imprimé** au rapport en `[RECTIFIÉ]` — jamais
+effacé, jamais silencieux. **L'histoire ne se réécrit pas** : on rectifie par ajout.
+
+*Le fait qui la fait naître.* Le contrôle d'intégrité existait depuis l'origine
+(`ledger.mjs verify`, contrat d'interface §3) et n'était **câblé à aucun déclencheur** : il
+n'apparaissait qu'au contrat « prêt client », en fin de run. Résultat mesuré le 20/08 sur
+`bourse-aux-vacants` : deux horodatages en recul (une mise en production journalisée 3 h 25
+avant l'entrée qui la précède, une autre 1 h 30 avant), dans un ledger de 138 entrées, publiées
+dans l'historique git — et la seconde **invisible** parce que le vérificateur s'arrêtait au
+premier écart. C'est l'exemple canonique de R-35 : un contrôle qui existe sans être joué
+n'existe pas.
+
+**Ce que la règle n'exige PAS.** Elle ne réclame pas un chaînage cryptographique (aucun ledger
+du parc n'en porte, et l'ajouter réécrirait l'histoire) ; elle ne juge pas la VÉRACITÉ des
+horodatages, seulement leur cohérence d'ordre — un `ts` faux mais croissant reste hors de
+portée, et se déclare. Corollaire d'outillage, déjà appliqué : l'écriture refuse un `ts`
+antérieur au dernier (l'heure de l'ACTION appartient au payload, pas au champ d'entrée), et la
+vérification **accumule** les écarts au lieu de s'arrêter au premier.
+
 ## Conflits à trancher (ta décision explicite)
 
 - **C1 — `old\` vs git (n° 6/7)** : **TRANCHÉ le 13/08 (TF-0150)** — `old\` (minuscule,
