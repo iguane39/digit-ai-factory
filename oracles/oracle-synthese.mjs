@@ -20,7 +20,12 @@
  *   S5  chaque élément « non traité » porte un motif (la ligne n'est jamais seule) ;
  *   S6  les prochaines actions portent leurs deux classements : acteur ET ordre justifié ;
  *   S7  aucune profondeur de puce au-delà de 2 niveaux ;
- *   S8  aucun ✓ / « fait » sans preuve citée dans la même puce (verdict, compteur, chemin).
+ *   S8  aucun ✓ / « fait » sans preuve citée dans la même puce (verdict, compteur, chemin) ;
+ *   S9  une SYNTHÈSE D'OUVERTURE en langage commanditaire précède le bloc 1 : l'état, ce
+ *       que ça change, ce qui est attendu — SANS identifiant nu, chemin de fichier ni code
+ *       (TF-0407, retour humain du 20/08 : « ton interlocuteur peut être pas assez
+ *       technique pour comprendre tout ce que tu remontes »). Le détail vérifiable vient
+ *       APRÈS — on ordonne, on ne supprime jamais.
  *
  * Usage : node oracle-synthese.mjs <synthese.md>   → verdict JSON
  *         node oracle-synthese.mjs --self-test     → fixtures double sens
@@ -163,6 +168,36 @@ function juger(texte) {
     ? ko("S8", `${nus.length} affirmation(s) « fait » sans preuve citée — un ✓ sans oracle exécuté n'est pas un ✓`)
     : ok("S8", "chaque élément déclaré fait porte sa preuve");
 
+  // S9 (TF-0407) — la synthèse d'ouverture, en langage commanditaire. Le retour qui l'a fait
+  // naître est la mesure elle-même : le destinataire unique des restitutions dit qu'une partie
+  // ne lui parvient pas — et une information remontée et non comprise a le même effet qu'une
+  // information tue, avec le coût de lecture en plus. La règle est binaire : entre le titre et
+  // le premier bloc, un paragraphe de prose d'au moins vingt mots, SANS identifiant TF nu, sans
+  // chemin de fichier, sans span de code, sans sha. Le détail vérifiable ne disparaît pas : il
+  // vient APRÈS — on ordonne, on ne supprime jamais (doctrine RL-1/RL-7 des rapports,
+  // transposée à la conversation, la seule surface qui restait sans doctrine d'audience).
+  const premierBloc = texte.search(/(^|\n)#{2,4}\s/);
+  const ouverture = (premierBloc > 0 ? texte.slice(0, premierBloc) : "")
+    .replace(/^#[^\n]*\n/, "")           // le titre H1 n est pas la synthese
+    .replace(/^---[\s\S]*?---\s*/, "")  // le frontmatter non plus
+    .trim();
+  const mots = ouverture.split(/\s+/).filter(Boolean).length;
+  const techniques = [
+    [/\bTF-\d{3,4}\b/, "identifiant TF nu"],
+    [/[\w-]+\.(?:md|mjs|py|json|jsonl|html|toml)\b/, "chemin ou nom de fichier"],
+    [/`[^`]+`/, "span de code"],
+    [/\b[a-f0-9]{7,40}\b/, "sha"],
+  ].filter(([motif]) => motif.test(ouverture)).map(([, quoi]) => quoi);
+  if (mots < 20) {
+    ko("S9", `synthèse d'ouverture absente ou trop courte (${mots} mot(s) avant le premier bloc) — ` +
+      "l'état, ce que ça change et ce qui est attendu se disent en langage commanditaire AVANT le détail");
+  } else if (techniques.length) {
+    ko("S9", `la synthèse d'ouverture porte du vocabulaire technique nu (${techniques.join(", ")}) — ` +
+      "ces éléments vont APRÈS, dans les blocs : on ordonne, on ne supprime jamais");
+  } else {
+    ok("S9", `synthèse d'ouverture en langage commanditaire (${mots} mots, sans identifiant nu)`);
+  }
+
   return findings;
 }
 
@@ -172,6 +207,11 @@ const arg = process.argv[2];
 if (arg === "--self-test") {
   const dir = mkdtempSync(join(tmpdir(), "restitution-"));
   const verte = `# Restitution — campagne de test
+
+Le contrôle complet de la forge de tests est terminé et tout est au vert : chaque défaut que
+nous avions volontairement planté a bien été détecté, ce qui prouve que la surveillance
+fonctionne. Rien n'attend de correction ; la seule chose attendue de vous est la décision de
+publication ci-dessous.
 
 ## 1. En-tête
 Campagne · forge-tests · terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot.
@@ -205,6 +245,7 @@ Aucun écart : la demande a été suivie à la lettre.
 `;
   // Rouge : trois violations distinctes et indépendantes.
   const rouge = verte
+    .replace(/\n\nLe contrôle complet[\s\S]*?ci-dessous\./, "")  // S9 : plus d ouverture
     .replace("terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot.", "terminée aujourd'hui.")
     .replace("- Regroupement par cause racine : motif — sa cause est traitée, critère de réouverture écrit.", "- Regroupement par cause racine")
     .replace("Recette S-01 TENU — 19/19 défauts détectés au banc rouge, pytest 365.", "Tout s'est bien passé.");
@@ -217,13 +258,13 @@ Aucun écart : la demande a été suivie à la lettre.
   if (rv.status !== 0) casse.push("la fixture VERTE ne passe pas : " + rv.stdout);
   if (rr.status !== 1) casse.push("la fixture ROUGE ne FAIL pas");
   else {
-    for (const regle of ["S2", "S3", "S5"]) {
+    for (const regle of ["S2", "S3", "S5", "S9"]) {
       if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
     }
   }
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 2/2 PASS (verte PASS ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif)");
+    : "Self-test restitution : 2/2 PASS (verte PASS ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente)");
   process.exit(casse.length ? 1 : 0);
 }
 
