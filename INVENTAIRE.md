@@ -1,4 +1,8 @@
-# Inventaire des treize forges — 2026-08-04 · màj 2026-08-12 (TF-0113 fraîcheur ; TF-0111/0112/0123 : +agents-security, +observability, +websec)
+---
+verifie_le: 2026-08-20
+---
+
+# Inventaire des treize forges — 2026-08-04 · màj 2026-08-12 · vérifié le 2026-08-20 (RF-2 : passage conductor corrigé ; préséance : le code lu prime, puis CONTRAT-INTERFACE §5, puis ce document) (TF-0113 fraîcheur ; TF-0111/0112/0123 : +agents-security, +observability, +websec)
 
 Synthèse issue de cinq explorations exhaustives (une par projet, fichiers cités vérifiés sur disque).
 Chaque forge est décrite selon : rôle, point d'entrée réel, entrées, sorties, oracles, maturité, manques pour l'orchestration.
@@ -22,7 +26,7 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
   mais sans protocole machine.
 - **Sorties** : `EXIGENCES.json` (schéma complet + fixtures verte/rouge), vues MD avec en-tête `source-sha256`
   (mécanisme de régénérabilité vérifié réel).
-- **Oracles** : la partie la plus mûre. 8 oracles Node zéro dépendance (`oracles/oracle-{exigences,tracabilite,surface,claims,etat,ears,constitution,delta}.mjs`),
+- **Oracles** : la partie la plus mûre. 10 oracles Node zéro dépendance (`oracles/oracle-{exigences,tracabilite,surface,claims,etat,ears,constitution,delta,retro-modele,vues-profil}.mjs` — les deux derniers ajoutés le 19/08, TF-0388/0389),
   30 règles (TF-0101 du 12/08 : +EARS, +constitution, +cycle delta), contrat JSON + exit 0/1/2, self-test à double sens (fixture verte PASS, rouge FAIL sur chaque règle).
 - **Maturité** : prototype cohérent sur son noyau, chaîne incomplète (3 verbes/4), aucun livrable réel jamais produit,
   pas de git, tout écrit en 26 min le 04/08/2026. Lien mort : `redige-les-exigences/references/formulation.md` absent.
@@ -65,8 +69,11 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
   `uv run --project <FORGE> python -m conductor run "<idée>" [--mode] [--repo] [--intent]` — mais :
   3 arrêts humains HITL non contournables par conception (`ManualGate.approve()` retourne toujours `False`
   en headless), `DefaultBadRunner` lève `NotImplementedError` sans opt-in env
-  (`CONDUCTOR_USE_CLAUDE_ANALYZER/ENABLE_REAL_BMAD/ENABLE_SPEC_REVIEW/ENABLE_REAL_BAD`), et `main()` retourne
-  toujours 0 — **aucune sortie machine** (le `SprintReport` est jeté).
+  (`CONDUCTOR_USE_CLAUDE_ANALYZER/ENABLE_REAL_BMAD/ENABLE_SPEC_REVIEW/ENABLE_REAL_BAD`), ; `main()` écrit une **sortie
+  machine** (`_forge-output/run-report.json`, y compris en pause HITL ou en échec) et rend des
+  codes de sortie distincts (OK / HITL en attente / erreur) — *corrigé le 20/08 (RF-2) : ce
+  passage du 12/08 disait « aucune sortie machine, SprintReport jeté », invalidé au code
+  (`conductor/__main__.py`, HEAD 691e9cd)*.
 - **Entrées** : idée en une phrase + mode + repo ; manifeste optionnel `.forge/profile.toml` du projet cible
   (prime toute détection, décision P-18) ; artefacts BMAD attendus à `_bmad-output/planning-artifacts/`
   (PRD.md, architecture.md, epics.md) sinon `HitlPending`.

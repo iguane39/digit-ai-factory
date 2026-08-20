@@ -1,3 +1,7 @@
+---
+verifie_le: 2026-08-20
+---
+
 # digit-ai-factory
 
 > **Agent IA** : suis [AGENTS.md](AGENTS.md) — installe ce dépôt s'il est absent
@@ -163,9 +167,19 @@ development ruff+pytest verts avec traçabilité exigences→tests 11/11, forge-
 
 ## Ce qui tourne en mode dégradé (déclaré, pas caché)
 
-Trois étapes sur quatre n'ont pas de point d'entrée natif chez leur forge : conception, design et
-development sont exécutées par le pilot en appliquant leurs méthodes documentées, validées par
-leurs oracles natifs (détail : [CONTRAT-INTERFACE.md](CONTRAT-INTERFACE.md) §5, dettes D-*).
+<!-- RF-2 (lot Produit-09, 20/08/2026) : ce paragraphe disait « trois étapes sur quatre n'ont pas
+     de point d'entrée natif », invalidé depuis le 14/08 par les runners de conception et de
+     design. Un produit a dû poser lui-même la préséance entre sources — elle est écrite
+     ci-dessous, une fois pour toutes. -->
+**Préséance entre sources quand elles se contredisent** : le code lu fait foi, puis
+[CONTRAT-INTERFACE.md](CONTRAT-INTERFACE.md) §5, puis ce README et [INVENTAIRE.md](INVENTAIRE.md)
+— deux documents de synthèse, datés par leur `verifie_le`, jamais des contrats.
+
+Une étape sur quatre n'a pas de point d'entrée natif chez sa forge : **development** est exécutée
+par le pilot en appliquant les méthodes documentées de la forge (le conductor reste inutilisable
+en headless — dette D-V1). **Conception** et **design** ont leur point d'entrée natif depuis le
+14/08 (`run-oracles-conception.mjs`, `run-oracles-design.mjs`), validés par leurs oracles
+(détail : [CONTRAT-INTERFACE.md](CONTRAT-INTERFACE.md) §5, dettes D-*).
 Seule l'étape tests est native (CLI `forge_tests`). L'étape MEP ([ETAPE-MEP.md](ETAPE-MEP.md))
 est portée par le pilot lui-même : **staging autonome avec oracle exécuté, mise en production
 uniquement sur GO humain**, donné sur un dossier de preuve généré (DOSSIER-MEP.md).

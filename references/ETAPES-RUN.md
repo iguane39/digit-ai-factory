@@ -158,8 +158,25 @@ README de forge-tests) ; **disciplines de livrable** (lois 1, 2, 4) : zéro él�
 sans effet, artefacts de démonstration derrière `*_MODE_DEMO` absent par défaut, données
 volatiles en base éditables datées sourcées.
 
-**Valider** (gates rejoués) : `ruff check` + `pytest` au vert sur le produit ; chaque
+**Valider** (gates rejoués) : les gates de l'écosystème du produit au vert ; chaque
 exigence MVP a ≥ 1 test qui la cite par son id (gate grep 100 %).
+
+**Gates par écosystème (RF-1, lot Produit-09 20260820a)** — la version précédente prescrivait
+`ruff check` + `pytest` sans voie de sortie : un produit JS/TS ne pouvait clore l'étape que par
+un écart écrit, à chaque fois, par chaque produit. La voie déclarée est le **manifeste du
+produit `.forge\profile.toml` (P-18)** : quand il déclare les gates, il **prime** ; sinon la
+table par défaut s'applique :
+
+| Écosystème | Gates de validation |
+|---|---|
+| Python | `ruff check` + `pytest` |
+| Node/TS (Next.js, Strapi…) | `npm run lint` + `npm test` + `npm run build` |
+| autre | à déclarer dans `.forge\profile.toml` — sans manifeste ni ligne ici, l'étape ne se clôt que par écart déclaré |
+
+Le ledger porte le couple **(gate prescrit, gate réellement joué)** dans l'`oracles_verdict` de
+l'étape : un gate substitué en silence serait un verdict sans référence. *Limite déclarée* :
+forge-tests ne lit pas encore ce manifeste (RF-3, même lot) — la table ci-dessus gouverne les
+gates de l'étape development, pas la racine d'exécution de l'audit.
 
 > **Process longs — toutes étapes (TF-0094)** : tout traitement dépassant ~2 minutes
 > (mutation, rendu, scan, migrations, déploiement, génération d'images) émet son
