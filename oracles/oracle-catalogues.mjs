@@ -21,7 +21,9 @@ const ICI = dirname(fileURLToPath(import.meta.url));
 const CHAMPS = ["id", "forge", "nom", "intention", "entrees", "sorties", "point_entree", "preuve", "statut", "cycle_de_vie", "challenge_date"];
 const STATUTS = new Set(["prouve", "declare"]);
 const CYCLES = new Set(["experimental", "production", "deprecated"]);
-const DIX_FORGES = ["conception", "design", "development", "tests", "agents", "ops", "data", "audit", "seo", "organization"];
+// TF-0412 (20/08) : `seo` renommée `seo-geo` le 19/08 (TF-0390) — la clé suit le nom courant
+// de la forge, le fait de couverture est inchangé. Une clé périmée ici rend K5 rouge en permanence.
+const DIX_FORGES = ["conception", "design", "development", "tests", "agents", "ops", "data", "audit", "seo-geo", "organization"];
 
 /** Valide un fichier catalogue (règles K1-K5). forgesAttendues paramétrable pour le self-test. */
 export function validerCatalogue(chemin, forgesAttendues = DIX_FORGES) {
