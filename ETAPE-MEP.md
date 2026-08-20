@@ -83,6 +83,31 @@ déployée et auditée comme l'application réelle :
 
 Le résultat qualif (couverture, non-testables soldés) entre au dossier de MEP.
 
+## 3 ter. Ressources créées hors IaC, et l'écart de réglages servis (TF-0398, 20/08)
+
+*Le fait mesuré (cockpit-ia-d1, 19/08)* : EasyAuth actif côté plateforme, mais les app settings
+sans `COCKPIT_EASYAUTH` ni `AZURE_TENANT_ID` — le module Terraform ne les écrivait que si
+`client_id_entra` lui était fourni, et le pipeline qui avait créé l'App Registration ne lui
+avait jamais rendu cet identifiant. Conséquences : l'application tenait sur un REPLI prévu
+comme filet ; le contrôle de tenant du décodeur était INERTE alors qu'un parcours e2e
+l'affirmait actif — **un test vert attestait d'un contrôle absent de la cible** ; et un
+`terraform apply` lancé dans cet état aurait effacé deux réglages de production.
+
+Deux prescriptions, dès cette étape :
+
+1. **Tout pipeline qui crée une ressource dont l'IaC a besoin lui REND son identifiant**
+   (variable, tfvars, sortie consommée). Une ressource créée et non rendue laisse l'IaC décrire
+   un environnement qui n'existe pas — et l'écart ne se voit nulle part.
+2. **Vérification d'écart post-déploiement** : comparer les réglages SERVIS à ceux qu'exige le
+   mode déclaré, en échec si un réglage de sécurité manque. C'est le pendant exact du contrôle
+   « le processus a-t-il redémarré ? » déjà admis — le déploiement dit ce qu'il a fait, la
+   vérification dit ce qui est SERVI.
+
+*Mécanisation* : la liste des réglages exigés par mode est une donnée du PRODUIT (son IaC la
+porte) — le contrôle s'exécute donc au run du produit, l'étape MEP exige ici qu'il EXISTE et
+que son verdict soit au ledger (`oracles_verdict`). Un produit sans ce contrôle le déclare en
+écart au dossier de MEP, jamais en silence.
+
 ## 4. Le gate — GO humain (incompressible)
 
 La mise en **production** exige un GO humain explicite, donné sur `DOSSIER-MEP.md`, qui contient :
