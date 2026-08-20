@@ -1786,3 +1786,32 @@ LF) — classe TF-0359. Note de dates : les libellés « 19/08 » de la session 
 20260819*, `date_*` des TF-0388/0389/0386/0390…0394) sont décalés d'un jour — les `ts`
 machine sont justes ; décalage consigné ici et dans les textes de clôture, histoire non
 réécrite (le schéma `rectification_horodatage` ne couvre que les `ts`, R11).
+
+## 20/08/2026 (nuit) — une consigne s'exécute ou décore : R-43 précédence, R-44 hooks, README vivants (TF-0417..0420 clos)
+
+Mandat humain en trois points : (1) « les règles de la factory au-dessus de celles du
+projet quand la factory est impliquée » ; (2) « un README dans chaque dossier d'input et
+output, à jour à chaque modification » ; (3) « plusieurs règles ne sont toujours pas
+appliquées — format de sortie, mises à jour des forges, indices sur les décisions et
+prochaines actions — à retravailler pour s'assurer que c'est exécuté ». Le diagnostic du
+(3) tient en deux faits : `RESTITUTION.md` déclarait son oracle **« informatif et non
+bloquant »** depuis le 14/08, et le pilot n'avait **aucun `.claude\settings.json`** — zéro
+hook. Une règle sans mécanisme ne s'applique pas, même à une session qui la connaît (la
+session du jour l'a prouvé sur elle-même).
+
+**R-43** (§W) : précédence de la factory — clause au `CLAUDE-PRODUIT.md`, ligne au noyau,
+contrôle dans `oracle-conformite-projet` (clause + hooks installés), recette 31 PASS
+double sens. **R-44** (§X) : `.claude\settings.json` du pilot — hook `Stop`
+(`hook-restitution.mjs` : le message final d'un tour de travail est jugé par
+`oracle-synthese`, refus motivé, une réécriture, journal), hook `SessionStart`
+(`hook-ouverture.mjs` : `bootstrap --pull` joué, README vérifiés, gates dits), hook
+`PostToolUse` (README régénérés) ; côté produit `gabarits\settings-produit.json` +
+`hooks-factory.mjs` (lanceur qui résout le pilot, stdin compris, dit quand il saute), socle
+ETAPES-RUN ; `RESTITUTION.md` **2.4.0 : bloquant**. **README vivants** :
+`scripts\readme-dossiers.mjs` — 19 dossiers, rôle rédigé et préservé, table
+déterministe (dates de commit), `--check`, `oracle-readme-dossiers` en I4. **TF-0417** :
+`oracle-claude-md` compte en LF (le noyau, comprimé pour loger R-43/R-44, tient à 6135).
+Recette du pilot **25/25** (I1, I2, I4) ; `hook-restitution.test.mjs` 4/4 ; hook
+d'ouverture joué en réel : « Poste prêt ». Limite déclarée : les hooks s'activent à
+l'ouverture de session — la session qui les a écrits ne les a pas encore subis ; la
+prochaine, si.

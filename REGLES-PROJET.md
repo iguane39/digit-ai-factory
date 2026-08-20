@@ -662,3 +662,49 @@ chaque produit, jamais en masse silencieuse.
 `Old\` : une seule occurrence sur tout `c:\dev` (`OptimAssur/old`). CLAUDE.md : 13 occurrences
 sur `c:\dev` (11 projets maison + pilot + inZM), zéro dans les produits forge. Nommage daté :
 motif `<Marque> - <Objet> - AAAAMMJJ<lettre>` vérifié sur 25+ fichiers, exclusivement documentaires.
+
+## W. Quand la factory est impliquée, ses règles priment (règle 43 — 20/08, mandat humain)
+
+Constat : un produit porte son `CLAUDE.md`, ses conventions, parfois ses propres
+garde-fous ; une session ouverte chez lui lit ces règles EN PREMIER et celles de la
+factory ensuite — quand elle les lit. Rien ne disait lesquelles l'emportent en cas de
+conflit, et le silence tranchait pour le projet, par proximité.
+
+**R-43.** Quand la factory est impliquée — run (produit, version, mandat, conseil),
+campagne, ou toute session qui mobilise une forge — **les règles de la factory priment sur
+celles du projet** : `REGLES-PROJET.md`, `CLAUDE.md` du pilot et les références chargées
+l'emportent sur le `CLAUDE.md` du produit et ses conventions locales. Un projet peut
+**renforcer** une règle de la factory (seuil plus strict, gate supplémentaire), jamais
+l'assouplir ni la contourner. Tout conflit se tranche en faveur de la factory et se
+consigne au ledger (`type: conflit_regles`, les deux règles citées) — un conflit répété
+est un candidat au registre, pas une exception locale. Surface : la clause de précédence
+du `gabarits\CLAUDE-PRODUIT.md` (obligatoire, vérifiée par `oracle-conformite-projet`
+R-43) et les hooks de la factory installés chez le produit (R-44).
+
+## X. Une consigne s'exécute ou décore : hooks de restitution, de fraîcheur, de README (règle 44 — 20/08, mandat humain)
+
+Constat humain du 20/08 : « plusieurs règles ne sont toujours pas appliquées — le format
+de sortie, les mises à jour des forges, les indices sur les décisions et prochaines
+actions ». Les trois existaient par écrit : `RESTITUTION.md` depuis le 13/08 (oracle
+« informatif, non bloquant » depuis le 14/08), Fraîcheur au noyau, R-29 pour les
+actions. Aucune n'avait d'exécutant : le pilot n'avait pas un seul hook.
+
+**R-44.** Trois gates câblés, dans `.claude\settings.json` du pilot et — via
+`gabarits\settings-produit.json` + `forge\hooks\factory.mjs` — de chaque produit :
+1. **Restitution bloquante** (`oracles\hook-restitution.mjs`, hook `Stop`) : tout message
+   final d'un tour de TRAVAIL (≥ 1 écriture ou ≥ 4 commandes) est jugé par `oracle-synthese`
+   (S1-S10 : bloc 0, 8 blocs, décisions en options (a)/(b)/(c), actions par acteur et
+   ordonnées, preuves, motifs, effort hors jours) ; un FAIL refuse l'arrêt et renvoie les
+   règles en défaut ; une seule réécriture est imposée (anti-boucle), le verdict est
+   journalisé (`.claude\hooks-journal.jsonl`). `RESTITUTION.md` passe en **2.4.0 :
+   bloquant**.
+2. **Fraîcheur exécutée** (`oracles\hook-ouverture.mjs`, hook `SessionStart`) :
+   `bootstrap.mjs --pull` joué à l'ouverture et à la reprise — pilot, treize forges,
+   skills, versions affichées — et les gates actifs dits à l'assistant.
+3. **README vivants** (`scripts\readme-dossiers.mjs`, hook `PostToolUse` +
+   `oracle-readme-dossiers` en recette I4) : chaque dossier d'`input\` et d'`output\`
+   porte un `README.md` — rôle rédigé à la main et préservé, table régénérée à chaque
+   ajout, modification ou suppression, déterministe (dates de commit, jamais d'horodatage
+   de génération). Absent, périmé ou non rédigé = défaut nommé.
+Un gate qui ne peut pas jouer (pilot absent du poste, transcript illisible) le DIT et
+laisse passer — jamais en silence, jamais en bloquant le produit.

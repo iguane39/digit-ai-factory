@@ -83,7 +83,11 @@ sessions ad hoc dans le produit passent par les forges pour tout verdict — tes
 déploiement — la boucle intérieure restant libre), le `README.md`, puis `git init -b main` +
 commit initial — commits locaux à chaque étape, **remote/push sur GO humain seulement**.
 Créer aussi `forge\retours\` avec une copie de `gabarits\RETOURS-FORGES.md` (le canal de
-retours du produit — règle 18).
+retours du produit — règle 18). Copier enfin `gabarits\settings-produit.json` →
+`.claude\settings.json` et `gabarits\hooks-factory.mjs` → `forge\hooks\factory.mjs` (R-44 :
+les hooks de la factory — fraîcheur à l'ouverture, restitution jugée à chaque fin de tour de
+travail — sont actifs dès la première session du produit) ; la clause de **précédence**
+du `CLAUDE.md` produit (R-43) et ces hooks sont vérifiés par `oracle-conformite-projet`.
 
 **Socle documentaire `docs\projet\` (R-20, TF-0086/TF-0091 — la création appartient à
 l'ouverture)** : copier les **8 gabarits** de `gabarits\docs-projet\` (TECHNOS,

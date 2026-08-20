@@ -43,6 +43,15 @@ writeFileSync(join(verte, "forge", "ledger.jsonl"), [
   JSON.stringify({ type: "run_open", ts: "2026-08-10T08:00:00Z", run_precedent: "run-20260809", versions_forges: { conception: "951d46e" } }),
 ].join("\n") + "\n"); // R-19 verte : versions_forges partout + chaînage du run de version
 writeFileSync(join(verte, "app.py"), "print('produit')\n");
+// R-43 verte (20/08) : clause de précédence au CLAUDE.md + hooks de la factory installés
+// (settings + lanceur) — la précédence n'est pas un vœu, un gate la joue.
+writeFileSync(join(verte, "CLAUDE.md"), readFileSync(join(verte, "CLAUDE.md"), "utf8") +
+  "\n## Précédence (R-43)\nQuand la factory est impliquée, ses règles priment sur celles du projet.\n");
+mkdirSync(join(verte, ".claude"), { recursive: true });
+writeFileSync(join(verte, ".claude", "settings.json"),
+  JSON.stringify({ hooks: { Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }] } }) + "\n");
+mkdirSync(join(verte, "forge", "hooks"), { recursive: true });
+writeFileSync(join(verte, "forge", "hooks", "factory.mjs"), "// lanceur des hooks de la factory (gabarits/hooks-factory.mjs)\n");
 // R-27 verte : surface web ouverte aux agents IA + llms.txt à côté (un blocage CONSIGNÉ
 // reste conforme — la décision datée au-dessus de la règle)
 writeFileSync(join(verte, "robots.txt"),
@@ -231,7 +240,7 @@ check("rouge : chaque règle attendue se déclenche, FAIL exit 1", () => {
   const { exit, rapport } = lance(rouge);
   if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
   const declenchees = new Set(rapport.findings.filter((f) => f.statut === "FAIL").map((f) => f.regle));
-  for (const attendue of ["R-1", "R-3", "R-4", "R-6", "R-7", "R-8", "R-10", "R-11", "R-12", "R-13", "R-18", "R-19", "R-25", "R-27", "R-32"])
+  for (const attendue of ["R-1", "R-3", "R-4", "R-6", "R-7", "R-8", "R-10", "R-11", "R-12", "R-13", "R-18", "R-19", "R-25", "R-27", "R-32", "R-43"])
     if (!declenchees.has(attendue)) throw new Error(`règle ${attendue} non déclenchée sur la fixture rouge`);
 });
 

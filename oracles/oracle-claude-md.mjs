@@ -30,7 +30,10 @@ function juger(racine) {
     ko("N1", "CLAUDE.md absent");
     return findings;
   }
-  const taille = statSync(noyau).size;
+  // TF-0417 (20/08) : octets comptés APRÈS normalisation CRLF→LF — sur un checkout Windows
+  // (core.autocrlf) le même noyau pesait 98 octets de plus et le verdict dépendait du poste,
+  // pas du contenu (idiome TF-0253/TF-0359 : le contenu se juge en LF).
+  const taille = Buffer.byteLength(readFileSync(noyau, "utf8").split("\r\n").join("\n"), "utf8");
   taille <= PLAFOND
     ? ok("N1", `noyau ${taille} octets ≤ ${PLAFOND}`)
     : ko("N1", `noyau ${taille} octets > plafond ${PLAFOND} — déplacer le détail vers references\\`);

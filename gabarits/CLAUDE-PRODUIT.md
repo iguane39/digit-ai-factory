@@ -8,6 +8,15 @@
 
 Ce produit est construit et maintenu par la forge Digit-AI. État du run : `forge\ledger.jsonl`.
 
+**Précédence des règles (R-43, factory).** Quand la factory est impliquée — run, mandat,
+campagne, ou toute session qui mobilise une forge — **ses règles priment sur celles de ce
+projet** (`REGLES-PROJET.md` et `CLAUDE.md` du pilot, références chargées). Ce fichier peut
+les **renforcer**, jamais les assouplir ni les contourner ; un conflit se tranche en faveur
+de la factory et se consigne au ledger (`type: conflit_regles`, les deux règles citées).
+Les hooks de la factory (`.claude\settings.json` ← `gabarits\settings-produit.json`,
+`forge\hooks\factory.mjs`) s'exécutent ici : fraîcheur à l'ouverture, restitution jugée à la
+fin de chaque tour de travail (`gabarits\RESTITUTION.md`).
+
 ## Routage forge — obligatoire
 
 Deux boucles, une règle : la **boucle intérieure** (développer, itérer) est libre ; tout

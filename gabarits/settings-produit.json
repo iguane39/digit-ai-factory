@@ -1,0 +1,20 @@
+{
+  "_commentaire": "Gabarit du pilot (gabarits\\settings-produit.json, R-44) : copié en .claude\\settings.json de chaque produit à l'ouverture du run, avec gabarits\\hooks-factory.mjs copié en forge\\hooks\\factory.mjs. Les hooks de la factory s'exécutent dans le produit : fraîcheur à l'ouverture, restitution jugée à la fin de chaque tour de travail. Vérifié par oracle-conformite-projet (R-43).",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          { "type": "command", "command": "node forge/hooks/factory.mjs ouverture --sans-readme", "timeout": 240 }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node forge/hooks/factory.mjs restitution", "timeout": 60 }
+        ]
+      }
+    ]
+  }
+}
