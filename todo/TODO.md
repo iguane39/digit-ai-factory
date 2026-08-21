@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=f889ded73197 archive=9f205b231527 · dernier événement: 2026-08-21T12:47:43.144Z -->
+     sceaux: actifs=62e3683a66ad archive=9f205b231527 · dernier événement: 2026-08-21T13:02:53.123Z -->
 
-**147 actifs** (candidat 1 · décidé 0 · en cours 1 · corrigé 144 · écarté 1) · **308 archivés**.
+**147 actifs** (candidat 0 · décidé 0 · en cours 1 · corrigé 145 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,7 +11,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0454 | candidat | 6 | pilot : forge-audit porte DOUZE gabarits de livrables, dix sont absents du catalogue de la bibliothèque | **oui** — TF-0453 a coûté deux gabarits écrits en doublon pour DEUX de ces douze familles ; les dix autres portent le même risque, et il se paiera à la première demande de gabarit qui les concerne. |
 | TF-0443 | corrige | 20 | pilot : oracle-boite-entree est rouge par construction depuis le passage aux README de dossier — il ne peut plus prouver que la boite est vide | **oui** — le gate d'ouverture de tout run rend FAIL sur un depot sain : il ne distingue plus une boite vide d'une boite pleine, et la seule facon de continuer est de l'ignorer — ce qui rend au 14/08 la situation qu'il avait ete ecrit pour clore |
 | TF-0407 | corrige | 9 | pilot : la conversation est la seule surface de restitution sans doctrine d'audience — profil d'interlocuteur déclaré + ouverture commanditaire + règle S9 | **oui** — le retour lui-même, émis par le seul lecteur des restitutions — il n'existe pas de mesure plus directe qu'un destinataire disant qu'une partie ne lui parvient pas |
 | TF-0411 | corrige | 9 | pilot : l'intégrité du ledger n'était exigée qu'au contrat « prêt client » — R-42 la juge là où le ledger est déjà lu | **oui** — deux écarts d'intégrité ont vécu trois jours dans un ledger réel, publiés dans git, alors que l'oracle de conformité lisait ce même fichier à chaque run. |
@@ -24,6 +23,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0413 | corrige | 6 | pilot : les horodatages écrits À LA MAIN dans TODO.jsonl sont en avance de 2 h 40 à 7 h 30 sur l'heure réelle — le registre ne peut mesurer aucune durée | **oui** — dix événements de clôture sur six jours portent une heure fausse de 3 h à 7 h 30 ; le premier calcul de durée fait sur ce registre — cadence de traitement d'un lot, délai de décision — sortira faux sans qu'aucun contrôle ne le dise, et R-42 vient précisément d'être posée sur les ledgers pour cette classe de défaut, sans équivalent ici. |
 | TF-0451 | corrige | 6 | pilot : les README de dossier se périment À CHAQUE COMMIT — la recette est rouge juste après avoir été verte | **oui** — trois régénérations en une seule session de travail, chacune suivie d'un arbre sale à recommiter ; et le geste devient un réflexe — la prochaine fois que RD2 signalera un README réellement mal rédigé, il sera régénéré sans être lu. |
 | TF-0452 | corrige | 6 | pilot : deux familles de livrables manquaient à la bibliothèque — dossier d'exploitation (DEX) et dossier d'architecture technique (DAT) | **oui** — quatre runbooks d'exploitation et un dossier d'architecture technique produits par les projets, aucun normé — chaque projet a réinventé sa structure ; et un document de compléments de DAT de 281 lignes existait sans que rien ne le rende réutilisable. |
+| TF-0454 | corrige | 6 | pilot : forge-audit porte DOUZE gabarits de livrables, dix sont absents du catalogue de la bibliothèque | **oui** — TF-0453 a coûté deux gabarits écrits en doublon pour DEUX de ces douze familles ; les dix autres portent le même risque, et il se paiera à la première demande de gabarit qui les concerne. |
 | TF-0448 | corrige | 5.3 | pilot : un livrable produit par un run n'est jamais propose a la factory comme modele reutilisable — le canal de capitalisation n'existe qu'en ENTREE | **oui** — le couple source-jugee / rendu-genere de ce livrable a ete concu integralement pendant le run — heuristique de largeurs, repli en cartes, chapeaux, exemples de lecture — alors que trois livrables de meme nature existent deja dans l'ecosysteme ; sans canal sortant, le quatrieme le refera |
 
 ## digit-ai-forge-agents
