@@ -39,6 +39,16 @@ TODO.jsonl par une autre session est **interdite** — toute candidature passe p
 se détecte : règle **R10** de l'oracle (creation de session externe sans événement
 `ingestion` — incident TF-0049).
 
+**Ce qu’un lot n'a PAS remonté se déclare (R-45, 21/08).** Tout lot daté du 21/08 ou après
+porte une section « Remarques restées au produit » : chaque remarque que le produit a corrigée
+chez lui sans la remonter y figure avec son **verdict de généralisation** — non généralisable et
+pourquoi, ou généralisable et alors REMONTÉE. Aucun lot n'en a ? Il l'écrit. Câblé aux deux
+bouts : `ingerer-lot.mjs` REFUSE le lot (rejet atomique) et `oracle-boite-entree` **B6** le
+constate. *Ce qui se perd dans un tri silencieux n'est pas le défaut : c'est sa CLASSE* — largeur
+de lecture, tableaux illisibles au mobile, états vides absents ont tous commencé comme « un
+défaut de ce livrable-là ». La justesse du verdict n'est PAS jugée : un raisonnement écrit peut
+être faux et se corrige, un raisonnement absent est perdu pour tout le monde.
+
 **Prouver la boîte vide, à l'ouverture de tout run** — `node oracles\oracle-boite-entree.mjs`
 (B1-B5, self-test 17/17, exit 0/1/2). Le 14/08, un lot `SCC_ALX - RETOURS - 20260814b`
 (5 candidatures) est resté dans `input\00-retours\` sans être ingéré pendant qu'un autre lot

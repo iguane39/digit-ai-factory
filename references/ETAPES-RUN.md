@@ -319,6 +319,23 @@ sans GO, clore en `pret_production_en_attente_GO` (état de succès).
 
 ## 7. Clore le run
 
+**Le canal de capitalisation est SORTANT aussi (TF-0448, R-45 bis — 21/08).** À la clôture, le
+run ne remonte pas que ses retours : il **propose à la factory les livrables dont la FORME est
+réutilisable**. Le geste : déposer le couple *source jugée + rendu généré* dans
+`<pilot>\input\02-entrants-html\` (le rôle du dossier le couvre déjà) et en faire une
+candidature — la décision d'en tirer un gabarit reste humaine, comme pour tout candidat. La
+bibliothèque qui les reçoit vit dans `gabarits\documents\` (catalogue, doctrine transverse
+D1-D7, `oracle-gabarits-documents`) ; une famille déjà au catalogue en statut `a_extraire` se
+complète, elle ne se double pas.
+
+*Pourquoi ce pas existe.* Le canal de capitalisation n'existait qu'en ENTRÉE : `gabarits\` ne
+contenait que des gabarits écrits, aucun dérivé d'un livrable réel, et l'étape 7 ne remontait
+que le lot de retours. Mesuré le 21/08 : le couple source/rendu d'un diagnostic a été conçu
+intégralement pendant son run — heuristique de largeurs, repli en cartes, chapeaux, exemples de
+lecture — alors que **trois livrables de même nature existaient déjà** dans l'écosystème, dont
+un gabarit complet et barré produit par un autre projet le 13/08. Sans canal sortant, le
+quatrième le referait.
+
 Compiler les entrées `type: retour` du ledger en un **lot de retours** —
 `forge\retours\<projet> - RETOURS - <AAAAMMJJ><indice>.md` + **sidecar `.tf.jsonl`** homonyme
 (candidatures SANS id, gabarit `gabarits\RETOURS-FORGES.md` ; le préfixe projet est

@@ -21,6 +21,12 @@
  *       son ingestion : le registre et le fichier ne disent plus la même chose ;
  *   B3  un lot `*.md` sans aucun sidecar est ingérable par aucun canal — invisible par
  *       construction, quel que soit le soin qu'on met à regarder la boîte.
+ *   B6  (R-45, 21/08) un lot daté du 21/08 ou après DIT ce qu'il n'a pas remonté : section
+ *       « Remarques restées au produit » présente, et sous elle un verdict de généralisation
+ *       par remarque — ou la phrase déclarant qu'aucune n'est restée. Ce qu'un produit corrige
+ *       chez lui sans le remonter emporte la CLASSE du défaut avec lui. B6 CONSTATE ce qui
+ *       attend dans la boîte ; `ingerer-lot.mjs` REFUSE à l'entrée — les deux se cumulent,
+ *       un lot ingéré part en old et B6 ne le voit plus.
  *
  * Ce qu'il ne juge PAS : la valeur des candidatures, la justesse d'un retour, l'opportunité
  * de les traiter. Il dit qu'un travail est arrivé et n'a pas été pris, jamais s'il le mérite.
@@ -33,7 +39,7 @@
  * Exit : 0 PASS · 1 FAIL · 2 non jugeable.
  */
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, readdirSync, mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
@@ -125,6 +131,17 @@ const PREFIXE_INS = "INSATISFACTION - ";
 // la remise, écrit le sidecar `<fichier>.remise.json` — `{ "repond_a": "TF-xxxx", "provenance":
 // "…", "date": "AAAA-MM-JJ" }`. B5 dénonce la remise qui n'a pas reçu ce sidecar : un artefact
 // arrivé et non rattaché est un travail que la prochaine session ne saura pas relier.
+// Notices de dossier — ce qui EXPLIQUE un canal, jamais ce qui y est remis. Deux noms
+// coexistent et c'est un fait, pas un choix : `LISEZMOI.md` est le nom historique, écrit à la
+// main ; `README.md` est DÉPOSÉ dans chaque sous-dossier d'`input\` par
+// `scripts\readme-dossiers.mjs` (hook PostToolUse, commit 63af797). Le jour où le second est
+// apparu, B3 et B5 l'ont pris pour un lot sans sidecar : l'oracle que le noyau exige à
+// l'ouverture de TOUT run est sorti en FAIL quoi qu'il arrive — et un gate toujours rouge
+// cesse d'être lu, ce que B1-B5 existaient précisément pour empêcher (TF-0443, RA-5 du lot
+// Bibliotheque-Video-IA-Ceetrus 20260821b ; incident fondateur du 14/08).
+// La liste est une DONNÉE : un nom de notice de plus s'ajoute ici, pas dans une condition.
+const NOTICES_DE_DOSSIER = new Set(["LISEZMOI.md", "README.md"]);
+
 const CANAL_ARTEFACTS = "03-artefacts";
 const SUFFIXE_REMISE = ".remise.json";
 
@@ -134,7 +151,7 @@ function remisesOrphelines(repertoire) {
     .filter((d) => d.isFile()).map((d) => d.name);
   const orphelines = [];
   for (const nom of fichiers) {
-    if (nom.endsWith(SUFFIXE_REMISE) || nom === "LISEZMOI.md") continue;
+    if (nom.endsWith(SUFFIXE_REMISE) || NOTICES_DE_DOSSIER.has(nom)) continue;
     const sidecar = nom + SUFFIXE_REMISE;
     if (!fichiers.includes(sidecar)) { orphelines.push({ nom, motif: "aucun sidecar" }); continue; }
     let decl;
@@ -186,10 +203,61 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
     // réclamerait à tort — le circuit naîtrait avec son propre faux positif, la maladie
     // même que l'étude 20260815e documente. B4 prend le relais ci-dessous.
     if (nom.startsWith(PREFIXE_INS)) continue;
+    // Une notice de dossier n'est pas un lot : elle explique le canal, elle n'y est pas remise.
+    if (NOTICES_DE_DOSSIER.has(nom)) continue;
     const base = nom.slice(0, -3);
     if (sidecars.some((s) => s.startsWith(base))) continue;
     findings.push({ regle: "B3", statut: "FAIL", ou: nom,
       message: "lot remis SANS sidecar — aucun canal ne peut l'ingérer, il est invisible par construction (`node todo\\normaliser-lot.mjs` ou sidecar à réclamer au produit)" });
+  }
+
+  // B6 (R-45, 21/08) — un lot remis DIT ce qu'il n'a pas remonté.
+  //
+  // Le fait qui la fait naître : un lot du 20/08 écrivait « Le lot ne remonte pas ces défauts,
+  // qui appartiennent au produit ». Le tri était honnête, le raisonnement juste — et invisible.
+  // Les défauts de forme les plus coûteux de l'écosystème (largeur de lecture, tableaux
+  // illisibles au mobile, états vides absents) ont tous commencé leur vie comme « un défaut de
+  // ce livrable-là ». Ce qui se perd n'est pas le défaut, c'est sa CLASSE.
+  //
+  // Ce que B6 exige : la section « Remarques restées au produit », et sous elle soit un verdict
+  // de généralisation par remarque, soit la phrase qui déclare qu'il n'y en a aucune. Une
+  // section vide se lit comme un oubli, et l'omission ne vaut pas décision.
+  //
+  // Ce que B6 NE juge PAS : la JUSTESSE du verdict. Qu'une remarque soit vraiment non
+  // généralisable relève d'un jugement, pas d'une mesure — l'oracle exige que le raisonnement
+  // soit ÉCRIT, jamais qu'il soit bon.
+  //
+  // Entrée en vigueur DATÉE, comme R10 : les lots antérieurs au seuil sont une antériorité
+  // déclarée. Un contrôle qui met en échec tout l'existant se fait désactiver (R-33 bis).
+  const SEUIL_B6 = "20260821";
+  const RE_DATE_LOT = /(\d{8})[a-z]?\.md$/i;
+  const SECTION_B6 = /^##\s+Remarques\s+rest[ée]es?\s+au\s+produit\s*$/im;
+  const VERDICT_B6 = /g[ée]n[ée]ralisab/i;
+  const AUCUNE_B6 = /aucune\s+remarque\s+n['’]est\s+rest[ée]e?\s+au\s+produit/i;
+  let b6 = true;
+  for (const nom of fichiers.filter((f) => f.endsWith(".md"))) {
+    if (nom.startsWith(PREFIXE_INS) || NOTICES_DE_DOSSIER.has(nom)) continue;
+    const date = RE_DATE_LOT.exec(nom);
+    if (!date || date[1] < SEUIL_B6) continue; // antériorité déclarée
+    let texte = "";
+    try { texte = readFileSync(join(repertoire, nom), "utf8"); } catch { continue; }
+    if (!SECTION_B6.test(texte)) {
+      findings.push({ regle: "B6", statut: "FAIL", ou: nom,
+        message: "lot sans section « Remarques restées au produit » — ce qu'un produit corrige chez lui sans le remonter emporte la CLASSE du défaut avec lui (gabarit `gabarits\\RETOURS-FORGES.md`, R-45)" });
+      b6 = false;
+      continue;
+    }
+    const corps = texte.split(SECTION_B6)[1] || "";
+    const suite = corps.split(/^## /m)[0] || "";
+    if (!VERDICT_B6.test(suite) && !AUCUNE_B6.test(suite)) {
+      findings.push({ regle: "B6", statut: "FAIL", ou: nom,
+        message: "section « Remarques restées au produit » présente mais SANS verdict de généralisation, ni déclaration qu'aucune remarque n'est restée — une section vide se lit comme un oubli, l'omission ne vaut pas décision (R-45)" });
+      b6 = false;
+    }
+  }
+  if (b6 && fichiers.some((f) => f.endsWith(".md") && RE_DATE_LOT.test(f) && RE_DATE_LOT.exec(f)[1] >= SEUIL_B6)) {
+    findings.push({ regle: "B6", statut: "PASS", ou: "-",
+      message: "tout lot postérieur au 21/08 déclare ce qu'il n'a pas remonté" });
   }
 
   // B4 (TF-0287) — un dépôt d'insatisfaction qui n'est pas entré au registre du circuit
@@ -301,6 +369,61 @@ function selfTest() {
   writeFileSync(legacy, legacyContenu + '{"titre":"ajoute"}\r\n');
   r = juger(boite, reg);
   cas.push(["HÉRIT — rouge : édition réelle d'un lot hérité détectée", r.findings.some((f) => f.regle === "B2" && f.statut === "FAIL" && f.ou === "LEGACY - RETOURS - 20260101a.tf.jsonl"), r.verdict]);
+
+  // TF-0443 (RA-5, 21/08) — la NOTICE générée d'un dossier n'est pas un lot. `README.md` est
+  // déposé dans chaque sous-dossier d'`input\` par `scripts\readme-dossiers.mjs` ; le jour où
+  // il est apparu, B3 et B5 l'ont pris pour un lot sans sidecar et l'oracle est devenu rouge
+  // par construction. Les deux sens sont prouvés ici : la notice passe, un VRAI lot sans
+  // sidecar échoue toujours — sans quoi le correctif aurait pu éteindre la règle.
+  const notice = join(boite, "README.md");
+  writeFileSync(notice, "# 00-retours — lots de retours des produits\n");
+  r = juger(boite, reg);
+  cas.push(["B3 ter— la notice générée README.md n'est PAS un lot sans sidecar",
+    !r.findings.some((f) => f.ou === "README.md"), r.verdict]);
+
+  const lotNu = join(boite, "VRAI - RETOURS - 20260101z.md");
+  writeFileSync(lotNu, "# lot sans sidecar, malgré la notice présente\n");
+  r = juger(boite, reg);
+  cas.push(["B3 quater— un VRAI lot sans sidecar échoue toujours, notice ou pas",
+    r.findings.some((f) => f.regle === "B3" && f.statut === "FAIL" && f.ou === "VRAI - RETOURS - 20260101z.md"),
+    r.verdict]);
+  rmSync(lotNu);
+  rmSync(notice);
+
+  // B6 (R-45, 21/08) — un lot remis DIT ce qu'il n'a pas remonté. Les deux bornes sont prouvées
+  // avec les deux sens : sans elles, la règle mettrait en échec tout lot déjà remis.
+  const lotNeuf = join(boite, "PROD - RETOURS - 20260821a.md");
+  const sidecarNeuf = join(boite, "PROD - RETOURS - 20260821a.tf.jsonl");
+  writeFileSync(sidecarNeuf, '{"titre":"x"}\n');
+  writeFileSync(reg, readFileSync(reg, "utf8") + JSON.stringify({
+    ev: "ingestion", lot_sha: empreinte(sidecarNeuf), fichier: "PROD - RETOURS - 20260821a.tf.jsonl",
+  }) + "\n");
+  writeFileSync(lotNeuf, "# lot\n\n## pilot\n\ntable\n");
+  r = juger(boite, reg);
+  cas.push(["B6    — lot du 21/08 sans section « Remarques restées au produit »",
+    r.findings.some((f) => f.regle === "B6" && f.statut === "FAIL"), r.verdict]);
+
+  writeFileSync(lotNeuf, "# lot\n\n## Remarques restées au produit\n\n(rien)\n");
+  r = juger(boite, reg);
+  cas.push(["B6 bis— section présente mais SANS verdict : une section vide se lit comme un oubli",
+    r.findings.some((f) => f.regle === "B6" && f.statut === "FAIL"), r.verdict]);
+
+  writeFileSync(lotNeuf, "# lot\n\n## Remarques restées au produit\n\nAucune remarque n'est restée au produit — vérifié le 2026-08-21.\n");
+  r = juger(boite, reg);
+  cas.push(["B6 ter— déclaration explicite qu'aucune remarque n'est restée : PASS",
+    !r.findings.some((f) => f.regle === "B6" && f.statut === "FAIL"), r.verdict]);
+
+  const lotAncien = join(boite, "PROD - RETOURS - 20260819a.md");
+  const sidecarAncien = join(boite, "PROD - RETOURS - 20260819a.tf.jsonl");
+  writeFileSync(sidecarAncien, '{"titre":"x"}\n');
+  writeFileSync(reg, readFileSync(reg, "utf8") + JSON.stringify({
+    ev: "ingestion", lot_sha: empreinte(sidecarAncien), fichier: "PROD - RETOURS - 20260819a.tf.jsonl",
+  }) + "\n");
+  writeFileSync(lotAncien, "# lot ancien, sans la section\n");
+  r = juger(boite, reg);
+  cas.push(["B6 quater— lot ANTÉRIEUR au seuil : antériorité déclarée, jamais réécrite (R-33 bis)",
+    !r.findings.some((f) => f.regle === "B6" && f.ou === "PROD - RETOURS - 20260819a.md"), r.verdict]);
+  rmSync(lotNeuf); rmSync(sidecarNeuf); rmSync(lotAncien); rmSync(sidecarAncien);
 
   // B4 (TF-0287) : un dépôt d'insatisfaction n'a pas de sidecar — B3 doit se taire, B4
   // doit exiger l'entrée au registre du circuit. Les deux sens sont prouvés ici.
