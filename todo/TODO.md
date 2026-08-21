@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=6505d160e164 archive=9f205b231527 · dernier événement: 2026-08-21T12:38:23.011Z -->
+     sceaux: actifs=f889ded73197 archive=9f205b231527 · dernier événement: 2026-08-21T12:47:43.144Z -->
 
-**145 actifs** (candidat 0 · décidé 0 · en cours 1 · corrigé 143 · écarté 1) · **308 archivés**.
+**147 actifs** (candidat 1 · décidé 0 · en cours 1 · corrigé 144 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,11 +11,13 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0454 | candidat | 6 | pilot : forge-audit porte DOUZE gabarits de livrables, dix sont absents du catalogue de la bibliothèque | **oui** — TF-0453 a coûté deux gabarits écrits en doublon pour DEUX de ces douze familles ; les dix autres portent le même risque, et il se paiera à la première demande de gabarit qui les concerne. |
 | TF-0443 | corrige | 20 | pilot : oracle-boite-entree est rouge par construction depuis le passage aux README de dossier — il ne peut plus prouver que la boite est vide | **oui** — le gate d'ouverture de tout run rend FAIL sur un depot sain : il ne distingue plus une boite vide d'une boite pleine, et la seule facon de continuer est de l'ignorer — ce qui rend au 14/08 la situation qu'il avait ete ecrit pour clore |
 | TF-0407 | corrige | 9 | pilot : la conversation est la seule surface de restitution sans doctrine d'audience — profil d'interlocuteur déclaré + ouverture commanditaire + règle S9 | **oui** — le retour lui-même, émis par le seul lecteur des restitutions — il n'existe pas de mesure plus directe qu'un destinataire disant qu'une partie ne lui parvient pas |
 | TF-0411 | corrige | 9 | pilot : l'intégrité du ledger n'était exigée qu'au contrat « prêt client » — R-42 la juge là où le ledger est déjà lu | **oui** — deux écarts d'intégrité ont vécu trois jours dans un ledger réel, publiés dans git, alors que l'oracle de conformité lisait ce même fichier à chaque run. |
 | TF-0414 | corrige | 9 | re-reconstat à 24 h : oracle-skills K2 FAIL sur 9 skills — le gate de propagation posé par TF-0391 n'a pas tenu un jour | **oui** — les oracles HTML de la session du jour ont été joués depuis une copie divergente de sa source versionnée — un verdict rendu par un outil que le dépôt ne connaît pas ; et la famille en est à sa troisième occurrence en trois semaines, dont la deuxième moins de 24 h après le gate censé l'éteindre. |
 | TF-0449 | corrige | 9 | pilot : ce qu'un lot n'a PAS remonté n'était écrit nulle part — R-45, le verdict de généralisation devient dû | **oui** — trois classes de défaut de forme retrouvées dans les retours des deux derniers jours ont chacune commencé comme un défaut local ; la largeur de lecture a coûté deux ouvertures d'item à huit jours d'intervalle, dont une clôture en « réfuté » qui s'est révélée fausse. |
+| TF-0453 | corrige | 9 | pilot : deux familles de la bibliothèque étaient des DOUBLONS — un balayage qui ne regarde que les SORTIES conclut toujours qu'il manque un gabarit | **oui** — deux gabarits écrits à la main en doublon d'une forme déjà outillée, inscrits au catalogue en statut `ok`, et une demande humaine formulée pour les COMPLÉTER en HTML — c'est-à-dire pour aggraver le doublon d'un troisième texte. Sans la vérification, la bibliothèque aurait porté deux formes concurrentes de documents que forge-audit génère et vérifie déjà. |
 | TF-0441 | corrige | 8 | pilot : la doctrine E4/L2 du referentiel BEST-PRACTICES-HTML produit un resultat refuse par un lecteur humain — trois textes coexistent sans hierarchie sur la largeur de lecture | **oui** — un arbitrage non ecrit a coute deux remontees et une cloture fausse en huit jours ; le cout unitaire est faible mais il se paie a chaque page HTML produite par l'ecosysteme, et il se paie desormais aussi en credibilite aupres du lecteur qui remonte deux fois le meme defaut |
 | TF-0408 | corrige | 6 | pilot : la règle « jamais de jours, complexité × durée » était restée locale au rapport d'audit — généralisée aux études et restitutions, contrôles E8/S10 | **oui** — la restitution fautive elle-même : trois estimations en jours émises quelques heures après que la règle a été câblée au rapport d'audit — la doctrine sans porteur mécanique ne survit pas à la surface suivante |
 | TF-0412 | corrige | 6 | pilot : le renommage forge-seo → forge-seo-geo (TF-0390) a été clos sur UN oracle joué sur trois — cinq contrôles rouges pendant 24 h | **oui** — cinq contrôles rouges ont vécu 24 h dans le dépôt, publiés dans git (e51f1aa, 19/08 19:35) et traversés par deux sessions de travail qui ont commité six fois par-dessus sans les voir — un oracle rouge en permanence est un oracle qu'on cesse de lire, la maladie que TF-0228 a coûté cher à éteindre. |
