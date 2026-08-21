@@ -109,6 +109,28 @@ puis dédoublonnage des patterns et confrontation de chacun à la charte
 | E3 | Mises en page Grid/Flex fluides | F1, F2 | `grid-template`, `display:flex` | **adopter** | Éviter les hauteurs fixes qui cassent en multi-page PDF. |
 | E4 | Conteneur principal à **75-100 % de la fenêtre**, et la prose le REMPLIT | décision humaine 13/08, arbitrage 21/08 | `--w: clamp(75vw, 1680px, 92vw)` · `.chap.lire` | **adopter (obligatoire)** | Tout HTML généré occupe 75 à 100 % de la largeur de la page à toute taille de fenêtre : token canonique `clamp(75vw, 1680px, 92vw)` (92 % sous ~1826 px, plafond confort 1680 px, plancher 75 vw au-delà). Jamais de plafond px nu (`max-width:1000px`). **La mesure de lecture est portée par le CONTENEUR, jamais par le paragraphe** : c'est le CHAPITRE qu'on rétrécit (`.chap.lire`, ~1 080 px centrés), et le texte le remplit. *Arbitrage du 21/08 (TF-0441), et ce qu'il remplace* : ce texte prescrivait « la prose reste bornée en `ch` (`--prose`) : c'est le conteneur qui s'élargit, pas la ligne de texte ». Trois textes coexistaient alors sans hiérarchie — E4 (prose bornée), L2-rendu (bloc ≥ 85 % de la largeur offerte) et le boilerplate (bride sur le `<p>`, forme que L2 interdit) — et chaque run refaisait l'arbitrage. Ce que ça donnait, mesuré : 647 px de texte pour 1 130 px de conteneur à 1 280 px de fenêtre, soit la moitié de la page vide à droite, **refusée par le lecteur humain** le 21/08 sur un livrable remis. Le boilerplate a tranché le premier (TF-0421, `p, li` sans bride, `.chap.lire` / `.chap.duo` nommés) ; ce référentiel dit désormais la même chose, et il n'y a plus qu'un texte. **Un item réfuté sur un artefact outillé se clôt sur le VERDICT de l'oracle, jamais sur la citation de cette ligne** (R-35) : c'est cette substitution qui a laissé TF-0172 se rouvrir huit jours plus tard. |
 
+**Structure du propos (TF-0447, 21/08).** Les règles de lisibilité couvrent la troncature, les
+légendes, le barème, le sommaire, les chapeaux — **pas la mise en forme d'un raisonnement**.
+Retour humain du 21/08 : « pour les textes longs, favorise les puces et sous-puces pour
+organiser les idées, sujets ou actions / décisions ». Le repère est mécanique : *un paragraphe
+qui ÉNUMÈRE est une liste écrite en prose* — marqueurs « (a) (b) (c) », annonce chiffrée
+(« trois conséquences »), série de propositions séparées par des points-virgules sur plus de
+trois lignes. Deux niveaux au plus, une idée par puce. La borne compte autant que la règle : un
+raisonnement qui ENCHAÎNE se lit mieux en prose, le découper casse le lien logique. Mesuré sur
+la reprise d'un livrable réel : 71 listes et 243 puces, les deux oracles restant PASS — la
+conversion ne coûte rien aux contrôles et change la lisibilité. Détail et snippets :
+`digit-ai-page-html/references/bonnes-pratiques.md`.
+
+**Tableaux (TF-0442, TF-0444, TF-0445, TF-0446, 21/08).** Quatre acquis du socle, à connaître
+avant de produire une page à tableaux : le repli en cartes est au boilerplate (seuil 900 px) ;
+`<colgroup>` est de nouveau utilisable, l'oracle ne le compte plus comme un chevauchement ; les
+largeurs de colonnes se DÉRIVENT du contenu (§6 bis des composants) et non d'une grille
+régulière ; et **S1** refuse un tableau dont une ligne n'a pas le nombre de cellules de son
+en-tête — défaut invisible aux deux autres oracles, qui a rendu une demi-page blanche sous un
+`|` non échappé. *Un conteneur `overflow-x: auto` ne fait pas passer un tableau* : sous le socle
+à jour il ne déborde plus, il s'écrase à un caractère par colonne, et aucune règle ne le voit
+encore.
+
 **Gabarits de livrables.** Les formes de documents que la factory propose aux projets —
 rapport de données, diagnostic, rapport d'audit, fiche sécurité — vivent dans
 `gabaritsdocuments` (catalogue, doctrine transverse D1-D7, oracle `oracle-gabarits-documents`).
