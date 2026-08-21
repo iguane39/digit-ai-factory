@@ -45,11 +45,42 @@ réutilisé** — continuer la séquence des lots précédents du même produit.
 
 <Une phrase de contexte : ce que le run/l'usage a coûté ou révélé sur cette forge.>
 
-| id | Gravité | Retour (fait observé, avec preuve : fichier, message, mesure) | Proposition esquissée |
-|---|---|---|---|
-| <RX-n> | <gravité> | <le fait, pas l'opinion> | <piste, jamais obligatoire> |
+| id | Gravité | Portée | Retour (fait observé, avec preuve : fichier, message, mesure) | Proposition esquissée |
+|---|---|---|---|---|
+| <RX-n> | <gravité> | <générique | produit+générique> | <le fait, pas l'opinion> | <piste, jamais obligatoire> |
+
+**Portée** (R-45, 21/08) : *générique* — le défaut vaut pour tout projet employant la forge ;
+*produit+générique* — le produit l'a corrigé chez lui ET la classe vaut ailleurs. Une remarque
+de portée purement PRODUIT ne figure pas ici : elle va en section « Remarques restées au
+produit », avec son verdict de généralisation.
 
 <répéter la section par forge concernée — y compris `pilot` pour les auto-retours>
+
+## Remarques restées au produit
+
+<!-- SECTION OBLIGATOIRE depuis le 21/08/2026 (règle R-45, mandat humain). Elle est vérifiée
+     par `oracle-boite-entree` B6 et refusée à l'ingestion si elle manque. -->
+
+Ce que le produit a corrigé chez lui et **n'a pas remonté** — parce que le défaut lui semblait
+propre à son code, à ses données, à son client. Chacune porte un **verdict de généralisation** :
+*rien de généralisable, parce que…*, ou *généralisable → et le retour est alors REMONTÉ
+ci-dessus, pas seulement mentionné ici*.
+
+*Pourquoi cette section existe.* Un lot du 20/08 disait, mot pour mot : « Le lot ne remonte pas
+ces défauts, qui appartiennent au produit. » Le tri était honnête et le raisonnement juste ;
+il était surtout **invisible**. Les défauts de forme les plus coûteux de l'écosystème — largeur
+de lecture, tableaux illisibles au mobile, états vides absents — ont tous commencé leur vie
+comme « un défaut de ce livrable-là ». Ce qui se perd n'est pas le défaut : c'est la **classe**
+du défaut. Une remarque écartée sans verdict écrit est une leçon qu'aucune session ne
+retrouvera.
+
+| Remarque (chez le produit) | Corrigée comment | Généralisable ? | Verdict |
+|---|---|---|---|
+| <ce qui a été constaté> | <le correctif local> | <non \| oui> | <le motif, en une phrase — si oui, l'id de la remarque remontée ci-dessus> |
+
+**Si aucune remarque n'est restée au produit**, l'écrire : « Aucune remarque n'est restée au
+produit sur ce lot — vérifié par <qui>, le <date>. » Une section vide se lit comme un oubli,
+et l'omission ne vaut pas décision.
 
 ## Confirmations positives
 
