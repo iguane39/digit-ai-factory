@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=1e2018d1756a archive=9f205b231527 · dernier événement: 2026-08-21T08:42:12.200Z -->
+     sceaux: actifs=bc3088a16cc1 archive=9f205b231527 · dernier événement: 2026-08-21T12:14:32.989Z -->
 
-**144 actifs** (candidat 0 · décidé 0 · en cours 1 · corrigé 142 · écarté 1) · **308 archivés**.
+**145 actifs** (candidat 0 · décidé 0 · en cours 1 · corrigé 143 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -21,6 +21,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0412 | corrige | 6 | pilot : le renommage forge-seo → forge-seo-geo (TF-0390) a été clos sur UN oracle joué sur trois — cinq contrôles rouges pendant 24 h | **oui** — cinq contrôles rouges ont vécu 24 h dans le dépôt, publiés dans git (e51f1aa, 19/08 19:35) et traversés par deux sessions de travail qui ont commité six fois par-dessus sans les voir — un oracle rouge en permanence est un oracle qu'on cesse de lire, la maladie que TF-0228 a coûté cher à éteindre. |
 | TF-0413 | corrige | 6 | pilot : les horodatages écrits À LA MAIN dans TODO.jsonl sont en avance de 2 h 40 à 7 h 30 sur l'heure réelle — le registre ne peut mesurer aucune durée | **oui** — dix événements de clôture sur six jours portent une heure fausse de 3 h à 7 h 30 ; le premier calcul de durée fait sur ce registre — cadence de traitement d'un lot, délai de décision — sortira faux sans qu'aucun contrôle ne le dise, et R-42 vient précisément d'être posée sur les ledgers pour cette classe de défaut, sans équivalent ici. |
 | TF-0451 | corrige | 6 | pilot : les README de dossier se périment À CHAQUE COMMIT — la recette est rouge juste après avoir été verte | **oui** — trois régénérations en une seule session de travail, chacune suivie d'un arbre sale à recommiter ; et le geste devient un réflexe — la prochaine fois que RD2 signalera un README réellement mal rédigé, il sera régénéré sans être lu. |
+| TF-0452 | corrige | 6 | pilot : deux familles de livrables manquaient à la bibliothèque — dossier d'exploitation (DEX) et dossier d'architecture technique (DAT) | **oui** — quatre runbooks d'exploitation et un dossier d'architecture technique produits par les projets, aucun normé — chaque projet a réinventé sa structure ; et un document de compléments de DAT de 281 lignes existait sans que rien ne le rende réutilisable. |
 | TF-0448 | corrige | 5.3 | pilot : un livrable produit par un run n'est jamais propose a la factory comme modele reutilisable — le canal de capitalisation n'existe qu'en ENTREE | **oui** — le couple source-jugee / rendu-genere de ce livrable a ete concu integralement pendant le run — heuristique de largeurs, repli en cartes, chapeaux, exemples de lecture — alors que trois livrables de meme nature existent deja dans l'ecosysteme ; sans canal sortant, le quatrieme le refera |
 
 ## digit-ai-forge-agents
