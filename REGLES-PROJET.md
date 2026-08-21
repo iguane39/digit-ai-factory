@@ -639,6 +639,31 @@ pour tout le monde. Deux bornes l'empêchent de mettre l'existant en échec (R-3
 s'applique qu'aux lots datés du **21/08/2026 ou après**, et qu'aux sidecars flanqués d'un `.md`
 homonyme — une candidature hors lot n'a pas de lot, donc rien à déclarer.
 
+**R-46.** Un lot de retours **DIT ce que ses documents ont coûté au gabarit**. Pour chaque
+document produit à partir d'un gabarit de `gabarits\documents\`, le lot porte en section
+« Retours sur les documents produits » : le **couple `gabarit` + `version_du_gabarit`** que le
+document affiche en en-tête, ce qui a **manqué**, ce qui a **gêné le lecteur** (un fait rapporté,
+pas une intuition d'auteur), ce qui a été **ajouté à la main**, et la **portée**. Un lot dont
+aucun document ne vient d'un gabarit le **déclare**. Câblé aux deux bouts, comme R-45 :
+`todo\ingerer-lot.mjs` REFUSE le lot (rejet atomique) et `oracle-boite-entree` **B7** le
+constate. Le fil est prescrit en amont par **G8** de `oracle-gabarits-documents` : tout gabarit
+en statut `ok` fait porter son id de famille et sa version aux documents qui en sortent.
+
+*Le fait qui la fait naître.* Les quatre premières familles de la bibliothèque ont été extraites
+en relevant ce que les projets **refaisaient à la main** — un gabarit de rapport de données barré
+par un projet le 13/08, des runbooks réinventés quatre fois, un document de compléments de DAT de
+281 lignes. Cette matière n'est arrivée que parce qu'on est allé la chercher, une fois, à la main.
+Rien ne la fait remonter en continu : le canal de retours existant parle des FORGES (outillage) et
+jamais des DOCUMENTS. Un gabarit ne vieillit pas en s'usant — il vieillit parce que la réalité des
+projets le dépasse et que personne ne le dit.
+
+**Ce que R-46 n'exige PAS.** Elle ne juge pas la VALEUR du retour : qu'un manque signalé mérite de
+changer le gabarit est une décision humaine au registre, jamais une mesure d'oracle. Elle
+n'impose rien aux familles `porte_ailleurs` — leur forme appartient à une autre forge, qui a ses
+propres conventions, et la leur imposer recréerait le doublon que ce statut évite (TF-0453). Deux
+bornes contre R-33 bis : elle ne s'applique qu'aux lots datés du **22/08/2026 ou après**, et
+qu'aux sidecars flanqués d'un `.md` homonyme.
+
 ## Conflits à trancher (ta décision explicite)
 
 - **C1 — `old\` vs git (n° 6/7)** : **TRANCHÉ le 13/08 (TF-0150)** — `old\` (minuscule,

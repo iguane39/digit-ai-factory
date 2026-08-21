@@ -24,6 +24,11 @@
  *      le projet. Motifs cherchés : noms de clients du parc, adresses, identifiants Azure
  *  G6  toute règle de doctrine citée par une famille (D1…Dn) est définie dans `README.md` —
  *      une règle citée et non définie est une référence morte
+ *  G8  tout gabarit en statut `ok` PRESCRIT le fil de traçabilité — son id de famille et une
+ *      version — sans quoi un retour sur un document produit n'est rattachable à rien. Le
+ *      lecteur qui trouve un manque ne peut le remonter utilement que s'il peut dire de QUEL
+ *      gabarit et de QUELLE version le document vient ; sinon le retour dit « il manquait une
+ *      section » et personne ne sait à quoi l'appliquer (R-46, 21/08).
  *  G7  les emplacements à remplir suivent la convention du socle `{…}` et jamais `{{…}}` :
  *      L11 de `check_html.py` refuse la seconde forme, un squelette qui la porte est rouge
  *      à l'oracle de son propre domaine (mesuré le 21/08 en écrivant le premier squelette)
@@ -159,6 +164,27 @@ function juger(racineGabarits) {
     }
     if (/\{\{/.test(texte)) { ko("G7", relatif, "emplacement en `{{…}}` — convention du socle : `{…}` (L11 de check_html.py refuse la double accolade)"); g7 = false; }
   }
+
+  // G8 — le fil de traçabilité, exigé des seuls gabarits `ok` : une famille `a_extraire` n'a
+  // pas de gabarit à juger, une famille `porte_ailleurs` suit la convention de la forge qui la
+  // porte, et lui imposer la nôtre serait re-créer le doublon que `porte_ailleurs` évite.
+  let g8 = true;
+  for (const f of familles.filter((x) => x.statut === "ok")) {
+    for (const cle of ["gabarit", "squelette"]) {
+      const chemin = f[cle];
+      if (!chemin) continue;
+      const abs = join(racineDepot, chemin);
+      if (!existsSync(abs)) continue; // G3 le dit déjà
+      const texte = readFileSync(abs, "utf8");
+      const porteId = texte.includes(f.id);
+      const porteVersion = /version[_ ]du[_ ]gabarit/i.test(texte);
+      if (porteId && porteVersion) continue;
+      const manque = [!porteId && `son id de famille (${f.id})`, !porteVersion && "une version du gabarit"].filter(Boolean);
+      ko("G8", `${chemin}`, `gabarit \`ok\` sans fil de traçabilité — il ne prescrit pas ${manque.join(" ni ")}. Un document produit sans ce couple rend tout retour inexploitable : « il manquait une section » ne se rattache à rien`);
+      g8 = false;
+    }
+  }
+  if (g8) ok("G8", "tout gabarit `ok` prescrit son id de famille et sa version — un retour reste rattachable");
   if (g5) ok("G5", `${fichiersGabarits.length} gabarit(s) sans donnée client dans leur corps`);
   if (g7) ok("G7", "emplacements à la convention du socle `{…}`");
 
@@ -177,7 +203,9 @@ function selfTest() {
     statut: "ok", gabarit: "gabarits/documents/fx/GABARIT.md", squelette: null,
     sources: ["source réelle"], regles: ["D1"], oracles: ["check_html.py"], preuve: "P", ...sur,
   });
-  const ecrire = (lignes, gabarit = "# G\n\n## Structure\n\nun {emplacement}\n") => {
+  // Le gabarit par défaut porte le fil de traçabilité (G8) : la fixture VERTE doit représenter
+  // une bibliothèque CONFORME, sinon elle cesse de prouver ce que l'oracle exige.
+  const ecrire = (lignes, gabarit = "# G\n\n## Structure\n\ngabarit: gd-x · version du gabarit 1.0.0\n\nun {emplacement}\n") => {
     mkdirSync(join(docs, "fx"), { recursive: true });
     writeFileSync(join(docs, "fx", "GABARIT.md"), gabarit, "utf8");
     writeFileSync(join(docs, "README.md"), "| **D1** | Largeur utile | fait |\n", "utf8");
@@ -226,6 +254,30 @@ function selfTest() {
   r = juger(gab);
   cas.push(["G7     — emplacement en double accolade (refusé par L11 du socle)", r.findings.some((f) => f.regle === "G7" && f.statut === "FAIL"), r.verdict]);
 
+
+  // G8 (R-46) — le fil de traçabilité, dans les deux sens, plus la BORNE. Une famille qui n'est
+  // pas `ok` n'a pas de gabarit à juger, et lui imposer notre convention recréerait exactement
+  // le doublon que `porte_ailleurs` évite (TF-0453).
+  ecrire([famille()], "# G\n\n## Structure\n\ngabarit: gd-x · version du gabarit 1.0.0\n\nun {emplacement}\n");
+  r = juger(gab);
+  cas.push(["verte G8— le gabarit prescrit son id ET sa version",
+    !r.findings.some((f) => f.regle === "G8" && f.statut === "FAIL"), r.verdict]);
+
+  ecrire([famille()], "# G\n\n## Structure\n\ngd-x, mais aucune version\n\nun {emplacement}\n");
+  r = juger(gab);
+  cas.push(["G8     — id présent, VERSION absente : un retour ne sait pas à quelle version l'appliquer",
+    r.findings.some((f) => f.regle === "G8" && f.statut === "FAIL"), r.verdict]);
+
+  ecrire([famille()], "# G\n\n## Structure\n\nversion du gabarit 1.0.0, mais aucun id\n\nun {emplacement}\n");
+  r = juger(gab);
+  cas.push(["G8 bis — version présente, ID absent : le retour ne sait pas à quelle FAMILLE l'appliquer",
+    r.findings.some((f) => f.regle === "G8" && f.statut === "FAIL"), r.verdict]);
+
+  ecrire([famille({ statut: "porte_ailleurs", gabarit: null, regles: [], oracles: [] })], "# G\n\n## Structure\n\nrien\n");
+  r = juger(gab);
+  cas.push(["G8 ter — une famille porte_ailleurs n'est PAS jugée sur notre convention (borne)",
+    !r.findings.some((f) => f.regle === "G8" && f.statut === "FAIL"), r.verdict]);
+
   rmSync(base, { recursive: true, force: true });
   const echecs = cas.filter(([, ok]) => !ok);
   for (const [nom, ok, verdict] of cas) console.log(`  [${ok ? "OK    " : "ECHEC "}] ${nom} (verdict ${verdict})`);
@@ -244,6 +296,7 @@ process.stdout.write(JSON.stringify({
     "la QUALITÉ d'un gabarit — qu'il produise un bon document relève de la relecture humaine et des oracles du domaine, jamais de celui-ci",
     "les documents PRODUITS à partir des gabarits : ils se jugent par l'oracle de leur domaine (check_html.py ET render_page.py pour un HTML), nommé famille par famille au catalogue",
     "G5 ne cherche que des motifs DÉCLARÉS (noms de clients du parc, courriels, GUID) — une donnée client d'une autre forme passerait ; la relecture reste due avant publication",
+    "G8 juge que le gabarit PRESCRIT le couple, jamais qu'un document produit le PORTE — un projet qui retire la ligne à l'usage sort du périmètre de cet oracle ; c'est le retour lui-même qui le dira, en ne pouvant pas nommer sa source",
     "l'exhaustivité du recensement des familles : le catalogue liste ce qui a été relevé le 21/08, pas ce qui existe (les familles manquantes se remontent en candidat)",
   ],
 }, null, 1) + "\n");

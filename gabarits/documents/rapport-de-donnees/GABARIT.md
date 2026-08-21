@@ -24,7 +24,15 @@ ce qu'on en conclut, ce qui reste à décider, d'où viennent les chiffres.
 > **Périmètre** {ce qui est couvert, et ce qui ne l'est pas}
 > **Sources** {jeux de données, dates d'extraction, volumes}
 > **Établi le** {date} · **Méthode** {comment les mesures ont été faites}
+> **Gabarit** gd-rapport-donnees · **Version du gabarit** 1.0.0
 ```
+**`gabarit` et `version_du_gabarit` sont dus** — c'est le fil qui rend un retour exploitable.
+Un lecteur qui trouve un manque dans ce document ne peut le remonter utilement que s'il peut dire
+DE QUEL gabarit et de QUELLE version il vient : sans ce couple, le retour dit « il manquait une
+section » et personne ne sait à quoi l'appliquer. Voir la boucle de retour en fin de gabarit.
+
+Valeurs pour cette famille : `gabarit: gd-rapport-donnees` · `version_du_gabarit: 1.0.0`.
+
 
 Le périmètre **dit ce qu'il exclut**. Un périmètre qui n'énumère que ce qu'il couvre laisse le
 lecteur supposer le reste.
@@ -88,3 +96,22 @@ Un rapport de données dont les chiffres ne se rejouent pas est une opinion.
    contraste, chevauchements. **Les deux** : le premier ne mesure rien de ce que voit le second
    (D7).
 3. Aucun `{…}` restant dans le document remis.
+
+## Après la remise — ce que la factory attend de vous
+
+Ce gabarit s'améliore par vos retours, et **par eux seuls**. À la clôture du run, la section
+« Retours sur les documents produits » de votre lot (`gabarits\RETOURS-FORGES.md`) attend
+quatre choses, dans cet ordre d'utilité :
+
+1. **Ce qu'il a fallu ajouter à la main.** C'est le signal le plus fort : ce que vous avez écrit
+   hors gabarit est presque toujours une section que le gabarit devrait porter.
+2. **Ce qui a gêné le LECTEUR** — un destinataire qui a demandé deux fois la même information,
+   qui a cherché une section ailleurs, qui a refusé une mise en page. Un fait rapporté, pas une
+   appréciation d'auteur.
+3. **Ce qui a manqué** : section absente, champ non prévu, cas que le gabarit n'anticipe pas.
+4. **La portée** : propre à votre projet, ou valable pour la famille. Dans le doute, remontez —
+   le tri se fait mieux au registre qu'en silence.
+
+Reportez le couple `gabarit: gd-rapport-donnees` et `version_du_gabarit` tel qu'il figure en en-tête de
+votre document : c'est lui qui rend le retour applicable. Sans lui, « il manquait une section »
+ne se rattache à aucune famille et à aucune version (R-46).
