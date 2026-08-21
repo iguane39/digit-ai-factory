@@ -139,7 +139,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>6505d160e164</code> · dernier événement 2026-08-21T12:38:23.011Z</p>
+      <p class="meta">sceau <code>f889ded73197</code> · dernier événement 2026-08-21T12:47:43.144Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -149,7 +149,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="0 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">0</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="1 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">1</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="1 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">1</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="307 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">307</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -193,15 +193,32 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">145 / 145 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">147 / 147 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">12 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">38 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-data"><strong>digit-ai-forge-data</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">7 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-development"><strong>digit-ai-forge-development</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-organization"><strong>digit-ai-forge-organization</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">31 item(s) reste-à-faire</span></a><a href="#forge-conception"><strong>forge-conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-tests"><strong>forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">43 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">14 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">38 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-data"><strong>digit-ai-forge-data</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">7 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-development"><strong>digit-ai-forge-development</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-organization"><strong>digit-ai-forge-organization</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">31 item(s) reste-à-faire</span></a><a href="#forge-conception"><strong>forge-conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-tests"><strong>forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">43 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-factory">
-      <h2>digit-ai-factory <span class="badge" title="12 item(s) actifs ciblant digit-ai-factory">12</span></h2>
+      <h2>digit-ai-factory <span class="badge" title="14 item(s) actifs ciblant digit-ai-factory">14</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-factory</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0454" data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0454</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : forge-audit porte DOUZE gabarits de livrables, dix sont absents du catalogue de la bibliothèque</h3>
+          <div class="card-detail"><p class="lead">Relevé le 21/08 en instruisant TF-0453. `digit-ai-forge-audit/deliverables/templates/` contient douze gabarits de documents livrables, plusieurs en version française ET anglaise, chacun adossé à un outil de production dans `tools/` : banc de preuves, checklist GO-prod, fiche sécurité, matrice de traçabilité, méthodologie, modèle de maturité, plan de remédiation, présentation à l'autorité de décision, rapport d'audit, registre des risques, synthèse exécutive, tableau de bord post-remédiation. Deux viennent d'entrer au catalogue en `porte_ailleurs` (TF-0453) ; les DIX autres n'y figurent pas. Or la bibliothèque a pour raison d'être d'être l'INDEX où un projet trouve la forme de son livrable : dix familles outillées et invisibles au catalogue, c'est dix fois le risque que TF-0453 vient de corriger. Le travail est mécanique et sans écriture de gabarit — une ligne de catalogue par famille, avec son chemin de gabarit, son générateur et son oracle. Ce qu'il demande d'honnête : ouvrir chacun des dix pour écrire un `quand_l_employer` et une `preuve` qui ne soient pas devinés.</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-21</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>TF-0453 a coûté deux gabarits écrits en doublon pour DEUX de ces douze familles ; les dix autres portent le même risque, et il se paiera à la première demande de gabarit qui les concerne.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (Sébastien) — constat en passant du 21/08</dd></div>
+            
+          </dl>
+        </article>
         <article class="card s-corrige" id="item-TF-0443" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0443</code>
@@ -284,6 +301,23 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>trois classes de défaut de forme retrouvées dans les retours des deux derniers jours ont chacune commencé comme un défaut local ; la largeur de lecture a coûté deux ouvertures d'item à huit jours d'intervalle, dont une clôture en « réfuté » qui s'est révélée fausse.</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (Sébastien) — mandat du 21/08 : « vois les retours non récupérés et si des éléments génériques peuvent en être extraits ; applique également cette règle pour les futurs retours à venir »</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0453" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0453</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : deux familles de la bibliothèque étaient des DOUBLONS — un balayage qui ne regarde que les SORTIES conclut toujours qu'il manque un gabarit</h3>
+          <div class="card-detail"><p class="lead">Découvert le 21/08 en instruisant une demande humaine qui demandait l'inverse de ce qu'il fallait faire.</p><ul class="puces"><li>Les familles `gd-fiche-securite` et `gd-rapport-audit` avaient été inscrites la veille en statut `ok`, avec un GABARIT.md écrit à la main, sur la foi d'un balayage du corpus : douze fiches de sécurité chez un produit, huit rapports d'audit entre le 12 et le 20/08 — une réutilisation massive, donc une famille prouvée. Vérifié sur pièces : `digit-ai-forge-audit` porte, pour CHACUNE des deux, le gabarit source (`deliverables/templates/fiche-securite.template.md`, 82 lignes, et `rapport-audit.template.md`, 114 lignes), sa version ANGLAISE, le générateur (`tools/build-fiche.mjs`, `tools/build-rapport.mjs` + `rapport-engine.mjs`), l'assemblage dans le kit livré (`build-kit.mjs`) et l'oracle de rendu (`tools/verifier-rapport-html.mjs`). Mieux : `build-fiche.mjs` SANS données rend exactement le squelette HTML à compléter — l'objet même que la bibliothèque s'apprêtait à recopier. Le « modèle canonique » de 347 Ko trouvé chez le tenant n'est pas un gabarit, c'est la SORTIE d'un moteur, avec quatre scripts embarqués. La cause est nette et elle est généralisable : le verdict de non-recouvrement du 21/08 a confronté les deux familles aux documents du PILOT (ARCHITECTURE.md, COMPOSANTS-OPS.md, DOSSIER-MEP.md) et aux LIVRABLES PRODUITS du corpus — jamais aux `deliverables/templates/` des forges. Une forme peut être massivement réutilisée ET déjà outillée</li><li>les deux faits ne s'excluent pas, et c'est le second qui décide</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-21</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>deux gabarits écrits à la main en doublon d'une forme déjà outillée, inscrits au catalogue en statut `ok`, et une demande humaine formulée pour les COMPLÉTER en HTML — c'est-à-dire pour aggraver le doublon d'un troisième texte. Sans la vérification, la bibliothèque aurait porté deux formes concurrentes de documents que forge-audit génère et vérifie déjà.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (Sébastien) — demande du 21/08 : « il existe déjà des modèles de document html pour fiche de sécurité et rapport audit, ajoute les dans ta bibliothèque »</dd></div>
             
           </dl>
         </article>
