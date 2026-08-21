@@ -136,7 +136,11 @@ check("un DRAPEAU n'est pas un chemin — --rectifications ne fait pas juger un 
   let brut = "";
   try { brut = execFileSync("node", [oracle, "--rectifications"], { encoding: "utf8" }); }
   catch (e) { brut = String(e.stdout || ""); }
-  if (/0 item\(s\) actif\(s\)/.test(brut))
+  // Frontière de CHIFFRE, pas de mot (21/08) : `\b0 item` n'existe pas entre « 3 » et « 0 »,
+  // et la recette a viré au rouge le jour où le registre a atteint 130 actifs — « 130 item(s)
+  // actif(s) » contient « 0 item(s) actif(s) ». Même classe que TF-0387 (oracle-ears) : un
+  // motif sans frontière accuse son voisin. Le test doit dire ZÉRO, pas « se termine par 0 ».
+  if (/(?<![0-9])0 item\(s\) actif\(s\)/.test(brut))
     throw new Error("le drapeau a été lu comme un chemin — verdict rendu sur un registre vide");
 });
 
