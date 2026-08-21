@@ -14,7 +14,7 @@
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digit-AI — TODO-FORGE · Reste à faire — V20260820</title>
+  <title>Digit-AI — TODO-FORGE · Reste à faire — V20260821</title>
   <meta name="description" content="Reste-à-faire du registre TODO-FORGE : candidats à décider, décidés, en cours — détaillés en puces, avec date de création, priorité de traitement et impact sur la forge concernée.">
   <meta name="theme-color" content="#2563EB">
   <!-- Favicon-lettre (13/08) : « F » = Forge (projet). -->
@@ -139,7 +139,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>48a631b5ec58</code> · dernier événement 2026-08-20T20:01:34.693Z</p>
+      <p class="meta">sceau <code>0a01187c8c77</code> · dernier événement 2026-08-21T05:32:54.732Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -149,7 +149,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="0 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">0</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="1 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">1</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="1 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">1</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="307 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">307</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -193,10 +193,10 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">113 / 113 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">131 / 131 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">6 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">16 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-data"><strong>digit-ai-forge-data</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">4 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-development"><strong>digit-ai-forge-development</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-organization"><strong>digit-ai-forge-organization</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">31 item(s) reste-à-faire</span></a><a href="#forge-conception"><strong>forge-conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-tests"><strong>forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">42 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">6 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">30 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-data"><strong>digit-ai-forge-data</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">7 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-development"><strong>digit-ai-forge-development</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-organization"><strong>digit-ai-forge-organization</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">31 item(s) reste-à-faire</span></a><a href="#forge-conception"><strong>forge-conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-tests"><strong>forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">43 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-factory">
       <h2>digit-ai-factory <span class="badge" title="6 item(s) actifs ciblant digit-ai-factory">6</span></h2>
@@ -307,7 +307,7 @@
       </div>
     </section>
     <section id="digit-ai-forge-agents">
-      <h2>digit-ai-forge-agents <span class="badge" title="16 item(s) actifs ciblant digit-ai-forge-agents">16</span></h2>
+      <h2>digit-ai-forge-agents <span class="badge" title="30 item(s) actifs ciblant digit-ai-forge-agents">30</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-agents</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
         <article class="card s-en_cours" id="item-TF-0324" data-forge="digit-ai-forge-agents" data-statut="en_cours" data-prio="moyenne">
@@ -327,6 +327,57 @@
             
           </dl>
         </article>
+        <article class="card s-corrige" id="item-TF-0429" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0429</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 25)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-design : table-filters.js n expose aucun rappel apres filtrage et son instance n est pas enveloppable — tout traitement post-filtrage passe par un MutationObserver</h3>
+          <div class="card-detail"><p class="lead">FAIT : init() retourne { appliquer, fermerTout }, mais toutes les interactions internes (cases a cocher, boutons Tous et Aucun, recherche) appellent la fonction `appliquer` CAPTUREE DANS LA FERMETURE, jamais instance.appliquer.</p><ul class="puces"><li>Envelopper l instance est donc silencieusement sans effet : le code s execute au premier appel manuel puis plus jamais. CONSTATE EN PRODUCTION : le message « aucun resultat » etait insere dans le DOM (textContent et colSpan corrects) mais restait hidden:true apres un clic sur Aucun, faute de recalcul. Invisible aux tests unitaires, visible seulement a l usage. Contournement retenu : MutationObserver sur data-tf-hidden avec garde de reentrance. PROPOSITION : accepter opts.apresFiltrage(table, visibles, total) dans init() et l appeler a la fin de la fonction interne appliquer — une ligne, retrocompatible</li><li>ou appeler instance.appliquer plutot que la fonction locale</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 25 — gain 5 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Une demi-heure de deverminage sur un comportement silencieux, puis un MutationObserver a maintenir dans le livrable ; le defaut sous-jacent (RD-7) avait ete signale par le client.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0433" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0433</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 15)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-design : collision de vocabulaire — la classe .note (remarque) est dans CL_SCORE de check_html (note chiffree), et L3 exige un bareme sur un encadre de texte</h3>
+          <div class="card-detail"><p class="lead">FAIT : check_html.py definit CL_SCORE = {sc, score, note, jauge}.</p><ul class="puces"><li>Une carte class=&quot;card note&quot; (note au sens de remarque, usage francais courant) declenche : « L3 valeur sans bareme lie : Des jalons internes pour prouver plus tot — aria-describedby vers la legende attendu ». Le message parle d un bareme pour un titre de paragraphe : incomprehensible sans lire le code de l oracle, ce qu il a fallu faire. Contournement : renommer en .card.encadre. PROPOSITION :</li><li>restreindre la detection aux classes non ambigues (sc, score, jauge) et n accepter note que combinee a un chiffre dans le contenu</li><li>faire dire au message ce qui a declenche la regle (« la classe note est lue comme une note chiffree »). Et reserver/documenter .card.note comme classe d encadre dans le socle, puisque c est le nom auquel tout le monde pense</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 15 — gain 3 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Une lecture du code source de l oracle pour comprendre un message ; un renommage de classe dans le livrable.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0422" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0422</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-design : la revue de lecture n est ni obligatoire ni outillee — largeurs par defaut 1280/768/390 sans 1920, pas de capture par section, aucun gabarit de consignation</h3>
+          <div class="card-detail"><p class="lead">FAIT : render_page.py rend 1280/768/390 par defaut ; le defaut de colonne etroite n apparait qu a partir de ~1 600 px ; les PNG sont produits « a inspecter » mais rien n impose de lire la page, et le run a declare PASS sur le texte de l oracle.</p><ul class="puces"><li>lisibilite.md dit que la revue de lecture est a la charge de l orchestrateur — sans la rendre obligatoire. PROPOSITION :</li><li>1920 dans les largeurs par defaut des pages</li><li>option --sections &lt;selecteur&gt; produisant une capture par section (ici par [role=tabpanel])</li><li>etape obligatoire « revue de lecture : captures lues, constats consignes dans REVUE.md » dans le workflow auditer de SKILL.md, avec gabarit (largeur · constat · suite)</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>La version a est sortie verte ; le defaut a ete vu par le client, pas par le run. La version b a du ecrire son propre script de captures par onglet (shots.py).</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
+            
+          </dl>
+        </article>
         <article class="card s-corrige" id="item-TF-0304" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0304</code>
@@ -341,6 +392,108 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12 — gain 3 × preuve 4 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>le gate C7 est mort sur ce poste depuis une date inconnue et AUCUN dépôt ne dit comment le recâbler — la moitié durable du trou que K7 déclare à chaque run</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0423" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0423</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-design : L6/L7/L10 de check_html se satisfont d une conformite mecanique — 12 chapeaux identiques de remplissage, paragraphe reclasse en chapeau, « Mode d emploi » en double, tous PASS</h3>
+          <div class="card-detail"><p class="lead">FAIT (version 20260820a, toutes regles L PASS) : 12 chapeaux identiques au mot pres (« Ce chapitre apporte les elements annonces par son titre… ») ajoutes pour passer L7 ; un paragraphe existant reclasse .ch-apprend (graisse 500) ; « Mode d emploi : … » deux fois dans un meme chapitre (L10 compte, ne deduplique pas) ; une legende expliquant une legende.</p><ul class="puces"><li>Chaque ajout venait d un script de correction optimisant l oracle. PROPOSITION : L7 FAIL si chapeau identique dans &gt;= 2 chapitres, ou motif de remplissage (lexique ferme), ou &gt; N mots</li><li>L10 FAIL si deux .exemple-lecture dans un meme chapitre</li><li>doctrine ecrite dans lisibilite.md : un chapeau est une phrase ecrite, jamais generee. FIXTURE ROUGE : la version a</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Reecriture manuelle de 40 chapeaux en version b ; defaut vu par le client (premier paragraphe en gras, phrases en double).</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0424" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0424</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-design : data-overlap-ok est une convention de fait non documentee dans conventions-communes.md, et V4 de render_page l exige sur chaque noeud SVG</h3>
+          <div class="card-detail"><p class="lead">FAIT : assets/exemple-reference.html porte data-overlap-ok sur chaque g, rect, text, circle ; conventions-communes.md ne le mentionne pas ; render_page.py V4 FAIL sur tout noeud (rect + text superposes par construction).</p><ul class="puces"><li>Une passe entiere a ete consacree a poser l attribut sur 7 figures apres l avoir deduit de l exemple. PROPOSITION : documenter</li><li>mieux, V4 ignore les superpositions internes a un &lt;g&gt; porteur d un &lt;title&gt; et ne juge que les chevauchements entre noeuds et entre noeud et fleche</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 2 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Une passe de correction sur 7 SVG (REVUE.md version a, ligne render_page --selector).</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0428" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0428</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-agents : run-oracles.mjs ecrit .oracles.json, .oracles-cache.json et .oracles-historique.jsonl a cote du livrable dans output/ — contraire a la doctrine TF-0230 que render_page applique deja</h3>
+          <div class="card-detail"><p class="lead">FAIT : apres execution sur output/v2-architecture-cible/rapport/&lt;fichier&gt;.html, trois journaux sont apparus dans le dossier de livraison ; deplaces a la main dans _oracles/ a deux reprises.</p><ul class="puces"><li>render_page.py, lui, refuse d ecrire des captures sous output/, old/, dist/</li><li>PROPOSITION : meme regle — sous un arbre de livraison, journaliser dans un dossier frere hors livraison (_oracles/) ou dans le temporaire nomme, et l annoncer en fin d execution</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 2 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Deux deplacements manuels ; risque de livrer des journaux internes au client.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0430" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0430</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-design : aucun etat vide dans table-filters — un filtre qui ne laisse rien produit un tableau sans un mot, reduit a quelques pixels</h3>
+          <div class="card-detail"><p class="lead">FAIT : le composant masque les lignes et met le compteur a zero, mais n ecrit rien dans le corps du tableau, qui devient un cadre de quelques pixels coince entre l en-tete et la legende.</p><ul class="puces"><li>Defaut RELEVE PAR LE CLIENT sur le livrable : « le fait de cliquer sur aucun casse completement l affichage avec une barre verticale minuscule, inutilisable »</li><li>Le compteur passe pourtant a « 0 ligne sur 66 » en rouge : l information existe mais elle est hors du regard du lecteur, qui regarde le tableau</li><li>PROPOSITION : une ligne d etat vide fournie, inseree et retiree par le composant, libelle par defaut surchargeable (data-tf-vide), plus un bouton « tout reafficher » — la seule action voulue a ce moment</li><li>FIXTURE ROUGE : un tableau filtrable dont on decoche toutes les valeurs</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Retour client explicite sur le livrable ; correction ecrite a la main dans la page, dependante de RD-6.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0431" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0431</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-design : le panneau de filtre deborde de tout conteneur a overflow-x auto — ascenseur horizontal, et panneau coupe sur les dernieres colonnes</h3>
+          <div class="card-detail"><p class="lead">FAIT : le composant positionne son panneau en position:absolute; left:0 dans le th, alors que composants.md prescrit d envelopper les tableaux larges dans un conteneur overflow-x:auto.</p><ul class="puces"><li>Les deux se contredisent : le panneau ouvert CREE un ascenseur horizontal (defaut releve par le client : « fait apparaitre un ascenseur horizontal, peu disgracieux »), et pour les dernieres colonnes il sort du cadre visible</li><li>Contournement retenu : left:auto; right:0 sur les deux dernieres colonnes, plus une classe basculee en JS qui passe le conteneur en overflow:visible tant qu un panneau est ouvert</li><li>PROPOSITION : le composant choisit son cote d ouverture selon la place mesuree, et neutralise le rognage de son conteneur defilant pendant l ouverture, retabli a la fermeture</li><li>Une dizaine de lignes, contre une reinvention par page</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Retour client explicite ; deux correctifs CSS et un handler JS ecrits dans le livrable.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0434" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0434</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-design : L8 « lien interne muet » n indique pas la sortie la plus simple et traite un identifiant du document comme un libelle insuffisant</h3>
+          <div class="card-detail"><p class="lead">FAIT : 22 echecs sur ce livrable, tous de la forme « L8 lien interne muet : H5 vers #q-h5 — libelle de 8 caracteres nommant la cible, ou title/aria-label de 12 caracteres ».</p><ul class="puces"><li>Le cas est legitime : un renvoi vers une question ouverte ou un chapitre numerote s ecrit H5 ou 1.5 parce que c est ainsi que le document les nomme partout ailleurs</li><li>l allonger nuirait a la lecture. La sortie existe (un title) mais le message la presente en second rang et ne dit pas qu un title court suffit. PROPOSITION : reformuler en « ajoutez un title decrivant la cible (au moins 12 caracteres) — le libelle visible peut rester court », et distinguer le cas d un libelle qui est un IDENTIFIANT du document (H5, E2, 1.5, ADR 0022) : il n est pas muet pour son lecteur, il est elliptique pour un lecteur d ecran</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 2 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>115 attributs title ajoutes par script apres interpretation du message.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
             
           </dl>
         </article>
@@ -412,6 +565,23 @@
             
           </dl>
         </article>
+        <article class="card s-corrige" id="item-TF-0421" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0421</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8.3)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-design : L2-rendu de render_page contredit la mesure de lecture du boilerplate — le contournement (width au lieu de max-width) passe l oracle et produit une colonne a 40 % de la fenetre</h3>
+          <div class="card-detail"><p class="lead">CLASSE : une regle contournable en un mot-cle CSS dont le contournement est indetectable par elle.</p><ul class="puces"><li>FAIT : render_page.py L2 mesure un bloc de texte en retirant max-width et exige &gt;= 85 % de la largeur offerte</li><li>le boilerplate prescrit une mesure de lecture --prose (~70-75 ch). Sur une page a onglets pleine largeur, toute mesure posee en max-width FAIL L2. Resolution constatee en run : .prose { width: min(75ch, 100%) } — L2 passe, et a 1 800 px le texte occupe ~40 % de la fenetre (version 20260820a, livree verte, refusee par le client). PROPOSITION : L2 mesure la largeur de lecture absolue contre une bande toleree (55-90 ch OU &gt;= 85 % du conteneur) quelle que soit la propriete CSS</li><li>le boilerplate livre deux gabarits de chapitre nommes : conteneur de lecture (.chap.lire, ~1 080 px) et duo (.chap.duo, grille 7/5 texte + encart utile, repli &lt; 1 100 px). FIXTURE ROUGE : output/v2-architecture-cible/rapport/old/…20260820a.html a 1 920 px doit FAIL</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8.3 — gain 5 × preuve 5 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Un aller-retour client avec question de confiance (« comment est-ce possible ? ») ; recomposition complete des 8 onglets (40 chapitres) le jour meme ; REVUE.md §1 de la version b.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
+            
+          </dl>
+        </article>
         <article class="card s-corrige" id="item-TF-0306" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0306</code>
@@ -443,6 +613,40 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un skill livré et monté est resté hors de tout contrôle de version sans que rien ne le signale ; il a fallu écrire un second outil pour s'en apercevoir</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant de la boucle du 18/08 — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0435" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0435</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 7.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-design : aucun controle ne verifie qu un glyphe employe en content CSS existe dans la pile de repli declaree — un chevron s affiche en tofu sur mobile</h3>
+          <div class="card-detail"><p class="lead">FAIT : le chevron des lignes depliables etait ecrit content: &quot;\25B6&quot; (triangle plein).</p><ul class="puces"><li>Tous les oracles passent : check_html PASS, render_page PASS aux quatre largeurs, run-oracles sans ecart sur ce point</li><li>A la lecture des captures MOBILES, le glyphe s affiche en tofu — la pile de repli mono (Consolas, faute de JetBrains Mono) n a pas ce caractere</li><li>Il a fallu l oeil humain pour le voir, et le remplacer par le chevron simple U+203A</li><li>A noter : le socle lui-meme emploie les triangles U+25B8 et U+25BE dans ses exemples de details/summary, avec le meme risque</li><li>PROPOSITION : controle statique bon marche — lister les caracteres employes en content: CSS hors du plan multilingue de base, et AVERTIR quand ils sortent d une liste blanche de glyphes reputes presents (chevrons simples, guillemets, tirets, puces)</li><li>Pas un FAIL : un « verifiez ce glyphe sur un poste sans vos polices »</li><li>Corriger les exemples du socle par la meme occasion</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 7.5 — gain 3 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Defaut visible en production sur mobile, trouve uniquement par la revue de lecture des captures.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0432" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0432</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.7)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-design : pas de composant « ligne de tableau depliable » au catalogue, alors que table-filters connait deja la convention data-detail</h3>
+          <div class="card-detail"><p class="lead">FAIT : table-filters.js exclut explicitement tr[data-detail] de son comptage — la convention est connue du CONSOMMATEUR mais aucun composant ne la PRODUIT.</p><ul class="puces"><li>Ce livrable a du ecrire de zero : balisage (bouton aria-expanded + aria-controls, ligne tr.det[hidden] avec colspan), style du chevron, bascule, ouverture forcee a l impression, synchronisation avec le filtrage (RD-6), et depliage automatique quand une ancre vise une ligne fermee</li><li>Environ 40 lignes de JS et 20 de CSS, pour 99 lignes depliables dans ce seul livrable</li><li>PROPOSITION : composant au catalogue sur le modele de table-filters.js, avec son oracle : tout bouton vise une ligne existante, toute ligne de detail a un bouton, le colspan couvre toutes les colonnes, le contenu est visible a l impression — ce sont exactement les controles que le livrable a du ecrire dans son script d assemblage</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>99 lignes depliables dans un seul livrable ; ~60 lignes de code ecrites a la main et quatre controles d integrite ajoutes a l assembleur.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
             
           </dl>
         </article>
@@ -579,6 +783,40 @@
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>deux .bak suivis par git divergent déjà de leurs sources — la maladie des sidecars committés (TF-0296), au stade précoce</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant des campagnes du 17/08 après-midi — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0425" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0425</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-design : aucun composant « onglets accessibles » dans composants.md — tablist/tab/tabpanel, clavier, #hash, impression de tous les panneaux ecrits a la main</h3>
+          <div class="card-detail"><p class="lead">FAIT : ~50 lignes de JS + CSS ecrites pour le rapport (roles WAI-ARIA, fleches, Home/End, hash qui ouvre le bon onglet, liens de sommaire inter-onglets, impression de tous les panneaux malgre hidden).</p><ul class="puces"><li>Un second rapport a onglets le reecrira</li><li>PROPOSITION : composant au catalogue sur le modele de table-filters.js, avec oracle : tout role=tab a un aria-controls resolu, tout panneau est imprime</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Code present dans le rapport livre (3 blocs &lt;script&gt;), reutilisable tel quel.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0437" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0437</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-agents : le budget DOM d oracle-perf ne distingue pas les noeuds d interface des noeuds de contenu embarque ou replie</h3>
+          <div class="card-detail"><p class="lead">FAIT : oracle-perf avertit au-dela de 6 000 noeuds ; ce livrable en compte 7 174, dont une part importante vient des 99 lignes de detail repliees et des 12 sources embarquees — c est-a-dire de la valeur ajoutee demandee par le client, pas d une inflation de balisage.</p><ul class="puces"><li>L avertissement reste juste sur le fond mais ne permet pas de distinguer « page mal construite » de « page riche assumee », alors que les corrections different du tout au tout. PROPOSITION : publier la metrique en deux temps dans le message — noeuds totaux, et noeuds hors zones repliees ou citees. Le seuil peut rester unique</li><li>c est le diagnostic qui gagne a separer les deux</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Avertissement a arbitrer a chaque run sur un livrable dont la richesse est demandee ; ecart R4 de la revue.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
             
           </dl>
         </article>
@@ -739,9 +977,26 @@
       </div>
     </section>
     <section id="digit-ai-forge-design">
-      <h2>digit-ai-forge-design <span class="badge" title="4 item(s) actifs ciblant digit-ai-forge-design">4</span></h2>
+      <h2>digit-ai-forge-design <span class="badge" title="7 item(s) actifs ciblant digit-ai-forge-design">7</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-design</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
+        <article class="card s-corrige" id="item-TF-0426" data-forge="digit-ai-forge-design" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0426</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 15)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-agents : oracle-slop S4 FAIL sur #FFFFFF que la charte Digit-AI impose (--surface) — faux positif permanent sur toute page conforme</h3>
+          <div class="card-detail"><p class="lead">FAIT : --surface: #FFFFFF est prescrit par charte-et-tokens.md et le boilerplate ; S4 le signale comme « couleur pure : teinter vers la hue de marque » ; deux fois aujourd hui (versions a et b) le run a ecrit « ecart documente, charte prime ».</p><ul class="puces"><li>Le registre note deja le conflit comme ouvert. Un echec permanent n est plus lu. PROPOSITION : S4 sensible au profil — sous profil digit-ai, les valeurs exactes des tokens de la charte sont exemptees (liste fermee)</li><li>le boilerplate devient fixture verte de S4</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 15 — gain 3 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-design</dt><dd>Verdict NON CONFORME a chaque run sur un livrable conforme a la charte ; ligne R1 des deux REVUE.md.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
+            
+          </dl>
+        </article>
         <article class="card s-corrige" id="item-TF-0393" data-forge="digit-ai-forge-design" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0393</code>
@@ -759,6 +1014,23 @@
             
           </dl>
         </article>
+        <article class="card s-corrige" id="item-TF-0436" data-forge="digit-ai-forge-design" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0436</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-agents : oracle-slop analyse le texte du document sans distinguer le contenu CITE de l interface produite — un caractere present dans une source citee verbatim est signale comme emoji d interface</h3>
+          <div class="card-detail"><p class="lead">FAIT : ce livrable embarque douze documents sources en texte integral dans des blocs &lt;details&gt;&lt;pre&gt;, par exigence d autoportance (un rapport qui renvoie a des fichiers du depot perd ses sources des qu il part par courriel).</p><ul class="puces"><li>L oracle signale alors « emoji ↔ dans l interface : utiliser une icone SVG dessinee ». Le caractere vient du registre des decisions, phrase « mapping contexte↔provider ». LE CORRIGER REVIENDRAIT A FALSIFIER UNE CITATION : c est le seul ecart du lot qu il est interdit de corriger. Meme mecanique attendue sur toute page embarquant des extraits de code ou de correspondance. PROPOSITION : exclure de l analyse « interface » les zones marquees comme du contenu cite (&lt;pre&gt;, &lt;code&gt;, &lt;blockquote&gt;, ou un attribut data-cite), comme le fait deja la famille lisibilite pour certains controles</li><li>a defaut un motif d exemption etroit et declare sur la seule famille emoji. Principe : un oracle de forme ne doit pas juger un texte que le livrable n a pas ecrit</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-design</dt><dd>Ecart R3 non corrigeable inscrit dans la revue du livrable ; se reproduira sur toute page embarquant ses sources.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
+            
+          </dl>
+        </article>
         <article class="card s-corrige" id="item-TF-0361" data-forge="digit-ai-forge-design" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0361</code>
@@ -773,6 +1045,23 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-design</dt><dd>la maquette qui sert de vitrine au socle échoue à un oracle du même socle, et elle l'échoue depuis assez longtemps pour que personne ne le sache — le rejeu sur la version antérieure donne le même FAIL</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant de la boucle du 18/08 — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0427" data-forge="digit-ai-forge-design" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0427</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-agents : oracle-tokens T5 juge des paires de tokens jamais realisees (« --ink sur --blue, texte herite de l ambiance ») alors que --blue ne sert qu en fond decoratif sans texte</h3>
+          <div class="card-detail"><p class="lead">FAIT : T5 croise chaque token de couleur avec chaque token de fond ; sur le rapport, --blue et --muted ne portent aucun texte (barres de repartition, pastilles de badge), ce que V2 de render_page confirme (contraste PASS sur tout texte reel).</p><ul class="puces"><li>PROPOSITION : T5 ne juge que les paires realisees — au rendu, fond calcule × couleur calculee par element avec texte</li><li>ou en statique, seulement les paires declarees --x-fill/--x-fg et --surface/--ink. Fixture verte : composants.md</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-20</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 3 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-design</dt><dd>Ligne R2 des deux REVUE.md ; second faux positif permanent du meme run.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
             
           </dl>
         </article>
@@ -1472,9 +1761,26 @@
       </div>
     </section>
     <section id="pilot">
-      <h2>pilot <span class="badge" title="42 item(s) actifs ciblant pilot">42</span></h2>
+      <h2>pilot <span class="badge" title="43 item(s) actifs ciblant pilot">43</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
+        <article class="card s-candidat" id="item-TF-0438" data-forge="pilot" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0438</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Recette TODO-FORGE : un motif « 0 item(s) actif(s) » sans frontière de CHIFFRE a viré au rouge le jour où le registre a atteint 130 actifs</h3>
+          <div class="card-detail"><p class="lead">Constat en passant du 21/08 (mandat « traite tous les retours et les todos »), trouvé par la recette elle-même : `todo/self-test.mjs` vérifiait qu'un drapeau n'est pas lu comme un chemin en cherchant « 0 item(s) actif(s) » dans la sortie de `oracle-todo --rectifications` — motif qui matche AUSSI « 130 item(s) actif(s) », puisque 130 se termine par 0.</p><ul class="puces"><li>Le test est passé au rouge sans qu'aucun code jugé n'ait changé : c'est le NOMBRE D'ACTIFS qui a franchi 130 en ingérant les lots Produit-05. Corrigé le jour même : `(?&lt;![0-9])0 item\(s\) actif\(s\)` — le test dit ZÉRO, plus « se termine par zéro »</li><li>recette rejouée 48 PASS / 0 FAIL, harnais du pilot 25/25. CLASSE, et c'est le motif de cette candidature : même famille que TF-0387 (oracle-ears détecte ses déclencheurs sans frontière de mot — « ressource » réveille le détecteur d'authentification), et le piège est ici plus sournois parce que `\b` ne le corrige PAS (entre « 3 » et « 0 » il n'y a pas de frontière de mot). À instruire : un balayage des motifs de recette et d'oracle qui cherchent un nombre nu dans un texte, avec la garde `(?&lt;![0-9])`/`(?![0-9])` quand le nombre est significatif — la question est de savoir combien d'autres attendent leur seuil</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-21</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 3 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>payé le 21/08 : une recette rouge sans changement de code jugé, diagnostiquée en lisant la sortie — un faux rouge coûte la confiance dans le harnais aussi sûrement qu'un faux vert coûte la couverture ; et le même piège vit peut-être dans d'autres motifs numériques non gardés</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du 21/08 — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
         <article class="card s-corrige" id="item-TF-0327" data-forge="pilot" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0327</code>

@@ -1815,3 +1815,31 @@ Recette du pilot **25/25** (I1, I2, I4) ; `hook-restitution.test.mjs` 4/4 ; hook
 d'ouverture joué en réel : « Poste prêt ». Limite déclarée : les hooks s'activent à
 l'ouverture de session — la session qui les a écrits ne les a pas encore subis ; la
 prochaine, si.
+
+## 21/08/2026 — « traite tous les retours et les todos » : lots Produit-05 20260820a/b, 17 items clos le jour même
+
+Mandat humain du 21/08, après synchro GitHub (`v1.17.20` poussé) et correction des README
+(rôle du sous-dossier dans la colonne, accents des chemins git). Inventaire net : **un seul
+todo ouvert** (TF-0324, en cours — critère restant = une mission réelle, pas une action) et
+**deux lots non ingérés** : Produit-05 20260820a/b, 17 retours d'un rapport client sorti vert à
+tous les oracles et **illisible à l'ouverture** (colonne à 40 % d'un écran de 1 800 px,
+chapeaux identiques, panneau de filtre coupé). Ingérés en TF-0421…0437, décidés et traités :
+re-routage forge à l'instruction — les « RD » visaient forge-design, les fichiers vivent
+chez **forge-agents** (`digit-ai-page-html`, `digit-ai-schemas`, `quality-oracles`) ;
+`oracle-slop`/`oracle-tokens` chez **forge-design** ; le composant filtres re-synchronisé
+chez **organization** (les deux copies divergeaient de 460 lignes — la source est le skill).
+
+**forge-agents@9f8fbbf** : L2 jugé quelle que soit la propriété + gabarits `.chap.lire` /
+`.chap.duo` (le boilerplate portait la contradiction) ; 1920 par défaut, `--sections`,
+**revue de lecture obligatoire** (`REVUE.md`) ; L7/L10 refusent le remplissage et les
+doublons ; V4 ignore l'intérieur des groupes titrés ; composants **onglets** (L16) et
+**ligne dépliable** (L17) ; filtres : `apresFiltrage`, état vide, côté d'ouverture ; L3
+« note » désambiguïsé ; L8 identifiants ; **L15** glyphes (avertissement) ; perf en deux
+comptes ; run-oracles hors livraison. Self-test **77/77** (16 fixtures neuves), quality-oracles
+**152**. **forge-design@0aa2706** : S4 exempte les tokens de charte, S6 ignore le contenu cité,
+T5 dégrade en avertissement les paires présumées — **24 oracles / 76 règles**.
+**forge-organization@c4f1061** : composant synchronisé, `INSTALLATION.md` dit la source.
+Skills propagés (K2 PASS). Un gate C7 a levé en passant deux défauts préexistants du
+boilerplate (focus non prescrit, `#FFFFFF` en dur) — corrigés. Restes : TF-0324 attend une
+mission réelle ; les fixtures L15 ont coûté deux passes (échappement `\25B6` interprété en
+octal par le générateur — la recette l'a vu).

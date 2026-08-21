@@ -16,6 +16,7 @@ Candidatures hors lot de retours : `candidature-*.tf.jsonl`, `revue-*.tf.jsonl`,
 |---|---|---|---|---|
 | [`old\`](old/README.md) | dossier (16 fichiers) | — | 2026-08-20 | Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — archive figée, jamais ré-ingérée. |
 | `candidature-bootstrap-dernieres-versions.tf.jsonl` | fichier | 2,9 Ko | 2026-08-20 | 1 ligne(s) JSONL |
+| `candidature-frontiere-chiffre-recette-todo.tf.jsonl` | fichier | 2,1 Ko | non versionné | 1 ligne(s) JSONL |
 | `candidature-oracle-claude-md-crlf.tf.jsonl` | fichier | 1,6 Ko | 2026-08-20 | 1 ligne(s) JSONL |
 | `candidature-regles-executees.tf.jsonl` | fichier | 5,1 Ko | 2026-08-20 | 3 ligne(s) JSONL |
 | `candidature-renommage-seo-geo.tf.jsonl` | fichier | 2,3 Ko | 2026-08-19 | 1 ligne(s) JSONL |
@@ -31,4 +32,4 @@ Candidatures hors lot de retours : `candidature-*.tf.jsonl`, `revue-*.tf.jsonl`,
 | `revue-20260819-pilot.normalise.tf.jsonl` | fichier | 2,1 Ko | 2026-08-19 | 1 ligne(s) JSONL |
 | `revue-20260819-pilot.tf.jsonl` | fichier | 2,1 Ko | 2026-08-19 | 1 ligne(s) JSONL |
 
-_15 fichier(s), 1 sous-dossier(s)_
+_16 fichier(s), 1 sous-dossier(s)_
