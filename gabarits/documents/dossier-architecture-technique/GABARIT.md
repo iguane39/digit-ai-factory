@@ -47,6 +47,7 @@ role: dossier d'architecture technique — la structure, les décisions, et l'é
 destinataire: comité d'architecture / client / repreneur
 sources_de_verite: ["docs\projet\ARCHITECTURE.md", "docs\projet\COMPOSANTS-OPS.md", "{registre ADR}"]
 verifie_le: {AAAA-MM-JJ}
+gabarit: gd-dossier-architecture
 version_du_gabarit: 1.0.0
 etat_decrit: {existant | cible | existant et cible}
 ---
@@ -175,3 +176,22 @@ distinguer « pas concerné » de « pas rempli », et il tranchera au pire.
 2. Rendu HTML jugé par `check_html.py` **et** `render_page.py --widths 1280,768,390` (D7).
 3. Le nombre d'ADR annoncé en tête, s'il l'est, égale le nombre de lignes de la section 5.
 4. Aucun `{…}` restant.
+
+## Après la remise — ce que la factory attend de vous
+
+Ce gabarit s'améliore par vos retours, et **par eux seuls**. À la clôture du run, la section
+« Retours sur les documents produits » de votre lot (`gabarits\RETOURS-FORGES.md`) attend
+quatre choses, dans cet ordre d'utilité :
+
+1. **Ce qu'il a fallu ajouter à la main.** C'est le signal le plus fort : ce que vous avez écrit
+   hors gabarit est presque toujours une section que le gabarit devrait porter.
+2. **Ce qui a gêné le LECTEUR** — un destinataire qui a demandé deux fois la même information,
+   qui a cherché une section ailleurs, qui a refusé une mise en page. Un fait rapporté, pas une
+   appréciation d'auteur.
+3. **Ce qui a manqué** : section absente, champ non prévu, cas que le gabarit n'anticipe pas.
+4. **La portée** : propre à votre projet, ou valable pour la famille. Dans le doute, remontez —
+   le tri se fait mieux au registre qu'en silence.
+
+Reportez le couple `gabarit: gd-dossier-architecture` et `version_du_gabarit` tel qu'il figure en en-tête de
+votre document : c'est lui qui rend le retour applicable. Sans lui, « il manquait une section »
+ne se rattache à aucune famille et à aucune version (R-46).

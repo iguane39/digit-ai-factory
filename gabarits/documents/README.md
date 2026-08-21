@@ -37,6 +37,29 @@ Un gabarit est un **squelette déclaré**, jamais la copie d'un livrable client 
 c'est aussi ce que l'oracle vérifie (G5).
 
 ## S'en servir
+### La boucle de retour — comment cette bibliothèque s'améliore
+
+Un gabarit ne vieillit pas en s'usant : il vieillit parce que la réalité des projets le dépasse
+et que personne ne le dit. La boucle tient en trois pièces, et elle est **câblée**, pas
+recommandée :
+
+| Pièce | Où | Ce qu'elle fait |
+|---|---|---|
+| **Le fil** | l'en-tête de chaque document produit | il porte `gabarit` (id de famille) et `version_du_gabarit`. Sans ce couple, « il manquait une section » ne se rattache à rien. Exigé des gabarits par **G8** |
+| **La demande** | `gabarits\RETOURS-FORGES.md`, section « Retours sur les documents produits » | quatre colonnes, par ordre d'utilité : ce qui a été **ajouté à la main**, ce qui a **gêné le lecteur**, ce qui a **manqué**, la **portée** |
+| **Le refus** | `ingerer-lot.mjs` et **B7** de `oracle-boite-entree` | un lot du 22/08 ou après qui ne porte pas la section est refusé à l'ingestion, registre intact (R-46) |
+
+**Le signal le plus fort est « ajouté à la main ».** Ce qu'un projet écrit hors gabarit est
+presque toujours une section que le gabarit devrait porter — c'est exactement ainsi que les
+quatre premières familles ont été extraites, en relevant ce que les projets refaisaient. La
+différence est qu'on l'a fait une fois, à la main, en balayant le corpus ; désormais la matière
+arrive avec chaque lot.
+
+Ce que la boucle NE fait pas : décider. Un manque signalé devient un candidat au registre, et
+c'est un humain qui tranche s'il change le gabarit — un oracle mesure une présence, jamais une
+valeur.
+
+
 
 1. Choisir la famille dans `catalogue.jsonl` (champ `famille`, `quand_l_employer`).
 2. Copier le dossier de la famille chez le projet, dans son `output\` (nommage D-15 :
