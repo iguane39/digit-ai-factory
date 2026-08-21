@@ -1843,3 +1843,25 @@ Skills propagés (K2 PASS). Un gate C7 a levé en passant deux défauts préexis
 boilerplate (focus non prescrit, `#FFFFFF` en dur) — corrigés. Restes : TF-0324 attend une
 mission réelle ; les fixtures L15 ont coûté deux passes (échappement `\25B6` interprété en
 octal par le générateur — la recette l'a vu).
+
+## 21/08/2026 (suite) — TF-0438 : le balayage des motifs numériques, et une justification fausse rectifiée
+
+GO humain « fais a ». Balayage des 14 dépôts par un outil écrit pour ça
+(`scripts\balayer-motifs-numeriques.mjs`) : 67 motifs relevés (20 au pilot, 47 aux forges),
+**six** méritaient la garde. Le seul défaut RÉEL hors du cas d'origine est chez forge-design :
+`oracle-mobile` M3 comptait `bottom: 0.5rem` comme une barre collée au bord — faux positif sur
+toute page qui décale sa barre. Trois assertions de forge-audit (`/listing/1` + `500`, `404` à
+l'affirmation comme à la négation, `back 4/4`, `viewBox="0 0 460`) et une du pilot (`seq 3`)
+suivent. Les identifiants à largeur fixe (`TF-0394`, `D-06`, `D09`, `L11`) sont **laissés**, et
+le motif de l'exemption est écrit dans l'outil : sans cette borne, le balayage serait du bruit.
+
+**Rectification, et c'est le fait le plus utile de la journée** : la justification écrite la
+veille — « `\b` ne corrige pas ce cas » — est **fausse**. Vérifié par exécution : `/\b0 item/`
+ne matche pas « 130 item » (pas de frontière de mot entre « 3 » et « 0 »). `\b` aurait suffi
+pour le cas d'origine ; il échoue seulement quand le voisin est un **séparateur**
+(`bottom: 0.5rem`) — ce qui est exactement le défaut n° 2 trouvé par le balayage, et ce qui
+sauve la garde `(?![0-9.])`. Le commentaire du correctif, l'outil et ce journal portent la
+rectification ; l'affirmation fausse reste dans l'histoire du commit `1a35b6f`, qui ne se
+réécrit pas. La recette du balayeur tient désormais **six faits de garde par exécution** plutôt
+que par une phrase : c'est ce qui manquait. Recettes : pilot **26/26**, forge-design 24 oracles
+/ 76 règles, forge-audit **61 tests / 0 échec**.

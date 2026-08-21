@@ -136,10 +136,14 @@ check("un DRAPEAU n'est pas un chemin — --rectifications ne fait pas juger un 
   let brut = "";
   try { brut = execFileSync("node", [oracle, "--rectifications"], { encoding: "utf8" }); }
   catch (e) { brut = String(e.stdout || ""); }
-  // Frontière de CHIFFRE, pas de mot (21/08) : `\b0 item` n'existe pas entre « 3 » et « 0 »,
-  // et la recette a viré au rouge le jour où le registre a atteint 130 actifs — « 130 item(s)
-  // actif(s) » contient « 0 item(s) actif(s) ». Même classe que TF-0387 (oracle-ears) : un
-  // motif sans frontière accuse son voisin. Le test doit dire ZÉRO, pas « se termine par 0 ».
+  // Garde de chiffre (21/08, TF-0438) : le motif était NU (`0 item(s) actif(s)`) et la recette
+  // a viré au rouge le jour où le registre a atteint 130 actifs — « 130 item(s) actif(s) »
+  // contient « 0 item(s) actif(s) ». Même classe que TF-0387 : un motif sans garde accuse son
+  // voisin. RECTIFICATION du 21/08 : la première rédaction de ce commentaire affirmait que
+  // `\b` ne corrigeait pas ce cas — c'est FAUX, vérifié par exécution (`/\b0 item/` ne matche
+  // pas « 130 item » : entre « 3 » et « 0 » il n'y a pas de frontière de mot). `\b` aurait
+  // suffi ICI. `(?<![0-9])` est retenu parce qu'il est explicite et qu'il reste juste là où
+  // `\b` échoue : quand le voisin est un séparateur (« bottom: 0 » matché dans « 0.5rem »).
   if (/(?<![0-9])0 item\(s\) actif\(s\)/.test(brut))
     throw new Error("le drapeau a été lu comme un chemin — verdict rendu sur un registre vide");
 });
