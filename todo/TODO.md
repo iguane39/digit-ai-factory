@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=0a01187c8c77 archive=9f205b231527 · dernier événement: 2026-08-21T05:32:54.732Z -->
+     sceaux: actifs=34f21c339f5e archive=9f205b231527 · dernier événement: 2026-08-21T06:12:01.970Z -->
 
-**131 actifs** (candidat 1 · décidé 0 · en cours 1 · corrigé 128 · écarté 1) · **308 archivés**.
+**131 actifs** (candidat 0 · décidé 0 · en cours 1 · corrigé 129 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -154,7 +154,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0438 | candidat | 6 | Recette TODO-FORGE : un motif « 0 item(s) actif(s) » sans frontière de CHIFFRE a viré au rouge le jour où le registre a atteint 130 actifs | **oui** — payé le 21/08 : une recette rouge sans changement de code jugé, diagnostiquée en lisant la sortie — un faux rouge coûte la confiance dans le harnais aussi sûrement qu'un faux vert coûte la couverture ; et le même piège vit peut-être dans d'autres motifs numériques non gardés |
 | TF-0327 | corrige | 12 | RV-9 n'est pas refermé : la fixture témoin de la bascule sombre démontre ENCORE le comportement interdit | **oui** — deux livrables du même socle peuvent encore s'ouvrir différemment sur le même poste — le symptôme exact que RV-9 prétendait avoir soldé |
 | TF-0328 | corrige | 8 | appliquer-export.mjs est orphelin et TODO-FORGE.md prescrit un dispositif retiré le 12/08 | **oui** — un item de registre entier (TF-0318) a été instruit sur une prémisse que la doc du pilot affirmait et que le code démentait |
 | TF-0332 | corrige | 8 | Solder la dette de traçabilité D-14 : trois affirmations de conformité fausses au corpus | **oui** — deux études du même après-midi ont buté sur des déclarations de conformité fausses — le coût de recherche se paie à chaque instruction |
@@ -174,6 +173,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0394 | corrige | 6 | Registre TF : deux sessions pilot parallèles frappent les mêmes ids depuis la même base — l'écrivain unique n'est unique que par session | **oui** — payé le 19/08 : une résolution de fusion manuelle sur le fichier le plus critique du pilot (append-only), 14 lignes renumérotées à la main, et un commit publié (digit-ai-forge-conception@cab6654) qui cite pour toujours des ids devenus autres — la prochaine collision touchera peut-être des clôtures croisées, plus chères qu'une renumérotation |
 | TF-0400 | corrige | 6 | pilot : deux passages du socle sont perimes et se contredisent, et aucune regle de preseance entre sources n'est ecrite | **oui** — deux contradictions datees et localisees (README:166, INVENTAIRE:68-70), verifiees au code public le 19-20/08 ; un document de parc sans date de verification est indiscernable d'un document a jour |
 | TF-0418 | corrige | 6 | R-43 : quand la factory est impliquée, ses règles priment sur celles du projet — clause de précédence au CLAUDE.md produit, vérifiée par oracle-conformite-projet | **oui** — constaté par l'humain le 20/08 : des règles de la factory restent lettre morte dans les sessions produit ; sans précédence écrite et vérifiée, chaque CLAUDE.md produit peut les neutraliser sans que personne ne le voie |
+| TF-0438 | corrige | 6 | Recette TODO-FORGE : un motif « 0 item(s) actif(s) » sans frontière de CHIFFRE a viré au rouge le jour où le registre a atteint 130 actifs | **oui** — payé le 21/08 : une recette rouge sans changement de code jugé, diagnostiquée en lisant la sortie — un faux rouge coûte la confiance dans le harnais aussi sûrement qu'un faux vert coûte la couverture ; et le même piège vit peut-être dans d'autres motifs numériques non gardés |
 | TF-0319 | corrige | 4.5 | Tout document destiné à l'utilisateur d'une forge se range dans output\ — jamais dans une arborescence de forge à parcourir | **oui** — constat d'usage humain : les documents qui lui sont destinés vivent dans des arborescences de forge complexes ou imbriquées, qu'il doit parcourir pour les retrouver |
 | TF-0350 | corrige | 4.5 | Une page HTML des TODO archivés — retrouver et chercher dans les 300+ items clos | **oui** — demande humaine directe — 320 items archivés ne sont aujourd'hui interrogeables que par grep, un canal illisible pour l'humain qui décide |
 | TF-0399 | corrige | 4.5 | pilot : les gates de l'etape development sont mono-ecosysteme Python, et le socle ne declare aucune voie de sortie — un produit JS/TS ne peut clore l'etape que par un ecart ecrit | **oui** — recherche du 20/08 sur HEAD 7a8fe7c : profile.toml = 0 occurrence dans les 4 documents du socle ; le seul mecanisme de sortie est loge dans le seul composant ecarte (D-V1) |

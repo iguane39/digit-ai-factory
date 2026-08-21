@@ -557,7 +557,9 @@ check("partiel-R42 : rectifier UN écart sur deux ne blanchit pas l'autre", () =
   if (exit !== 1) throw new Error(`exit ${exit} attendu 1 — une rectification partielle qui passerait serait une amnistie générale`);
   const f = rapport.findings.find((x) => x.regle === "R-42" && x.statut === "FAIL");
   if (!f || !/seq 5 : horodatage décroissant/.test(f.message)) throw new Error(`l'écart non déclaré n'est plus dénoncé : ${f && f.message}`);
-  if (!/\[RECTIFIÉ\].*seq 3/.test(f.message)) throw new Error("l'écart rectifié n'est plus imprimé alors qu'il reste un fait");
+  // Garde de chiffre (TF-0438, 21/08) : « seq 3 » nu matcherait « seq 30 » sur un ledger plus
+  // long — le test dirait vrai pour le mauvais écart.
+  if (!/\[RECTIFIÉ\].*seq 3(?![0-9])/.test(f.message)) throw new Error("l'écart rectifié n'est plus imprimé alors qu'il reste un fait");
 });
 
 // ---- fixtures R-20 TODO-PRODUIT (TF-0318, verdict O3 du 17/08 — volet LECTURE seul) : le
