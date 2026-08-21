@@ -177,7 +177,33 @@ function* dossiers(dir) {
 
 const dates = datesCommit();
 const defauts = [];
+// TF-0451 (21/08) — la colonne « Dernier commit » se périme à CHAQUE COMMIT : commiter un
+// fichier change sa date, donc la table de son README, donc `--check` sort « périmé »
+// immédiatement après un commit qui venait de passer la recette. Observé trois fois de suite
+// en une session : régénérer, commiter, la recette vire au rouge, régénérer… Le rouge était
+// VRAI et inévitable, ce qui est pire qu'un faux positif — il apprend à régénérer par réflexe
+// sans lire, et le jour où la table signalera un vrai manque, personne ne la lira.
+//
+// Le remède garde l'information et retire le cycle : ce qui FAIT DÉFAUT est la STRUCTURE
+// (fichiers apparus, disparus, renommés, rôle non rédigé) ; une divergence portant sur les
+// SEULES dates de commit devient un avertissement — la table gagne à être rafraîchie, elle
+// n'est pas fausse. `--check` reste rouge sur ce qui compte, et `--strict` restaure
+// l'égalité stricte pour qui veut l'exiger.
+const STRICT = args.includes("--strict");
+// La colonne « Dernier commit » est la 4e cellule d une ligne de table. On la neutralise
+// QUELLE QUE SOIT sa valeur — date ISO ou « non versionné » — sinon un fichier qui vient
+// d entrer sous git rendrait la table périmée sans que sa structure ait bougé.
+// La colonne « Dernier commit » est la 4e cellule d'une ligne de table. On la neutralise
+// QUELLE QUE SOIT sa valeur — date ISO ou « non versionné » — sinon un fichier qui vient
+// d'entrer sous git rendrait la table périmée alors que sa STRUCTURE n'a pas bougé.
+const SANS_DATES = (t) => t.split(String.fromCharCode(10)).map((l) => {
+  if (!l.startsWith("|")) return l;
+  const c = l.split("|");
+  if (c.length > 5) c[4] = " — ";
+  return c.join("|");
+}).join(String.fromCharCode(10));
 const ecrits = [];
+const rafraichir = [];
 for (const racine of RACINES) {
   const abs = join(BASE, racine);
   if (!existsSync(abs)) { defauts.push(`${racine}\\ : racine absente`); continue; }
@@ -188,12 +214,19 @@ for (const racine of RACINES) {
     const courant = existsSync(readme) ? readFileSync(readme, "utf8").split("\r\n").join("\n") : null;
     if (role === PLACEHOLDER) defauts.push(`${affiche(rel)}README.md : rôle non rédigé`);
     if (courant === texte) continue;
-    if (CHECK) defauts.push(courant === null ? `${affiche(rel)}README.md : absent` : `${affiche(rel)}README.md : périmé (le dossier a changé)`);
+    if (CHECK) {
+      if (courant === null) defauts.push(`${affiche(rel)}README.md : absent`);
+      else if (!STRICT && SANS_DATES(courant) === SANS_DATES(texte)) rafraichir.push(affiche(rel) + "README.md");
+      else defauts.push(`${affiche(rel)}README.md : périmé (le dossier a changé)`);
+    }
     else { writeFileSync(readme, texte, "utf8"); ecrits.push(affiche(rel) + "README.md"); }
   }
 }
 
 if (!SILENCIEUX && ecrits.length) console.log(`README régénérés (${ecrits.length}) : ${ecrits.join(" · ")}`);
+if (!SILENCIEUX && rafraichir.length) console.log(
+  `[check] ${rafraichir.length} README à rafraîchir (dates de commit seules, structure inchangée) : ` +
+  `${rafraichir.join(" · ")} — avertissement, pas un défaut (TF-0451)`);
 if (!SILENCIEUX && !ecrits.length && !CHECK) console.log("README à jour, rien à régénérer");
 if (defauts.length) {
   console.error(`[readme-dossiers] ${defauts.length} défaut(s) :\n  - ${defauts.join("\n  - ")}`);
