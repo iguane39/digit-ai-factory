@@ -65,7 +65,9 @@ const affiche = (p) => p.split("/").join("\\") + "\\";
 // Dates de dernier commit : UN seul appel git pour tout l'arbre (pas un par fichier).
 function datesCommit() {
   const dates = new Map();
-  const r = spawnSync("git", ["-C", BASE, "log", "--format=@%cs", "--name-only", "--", ...RACINES], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  // core.quotepath=false : sans lui, git échappe les accents des chemins (« \303\211 ») et un
+  // dossier « Schéma Écosystème » passait pour « non versionné ».
+  const r = spawnSync("git", ["-C", BASE, "-c", "core.quotepath=false", "log", "--format=@%cs", "--name-only", "--", ...RACINES], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
   if (r.status !== 0) return dates;
   let courante = "";
   for (const l of r.stdout.split(/\r?\n/)) {
@@ -78,7 +80,7 @@ function datesCommit() {
 // Fichiers IGNORÉS par git (sidecars, caches) : présents sur un poste, absents d'un clone — les
 // lister rendrait le README périmé partout ailleurs qu'ici. Un seul appel git, jamais un par entrée.
 function ignores() {
-  const r = spawnSync("git", ["-C", BASE, "ls-files", "--others", "--ignored", "--exclude-standard", "--", ...RACINES], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  const r = spawnSync("git", ["-C", BASE, "-c", "core.quotepath=false", "ls-files", "--others", "--ignored", "--exclude-standard", "--", ...RACINES], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
   return new Set(r.status === 0 ? r.stdout.split(/\r?\n/).filter(Boolean) : []);
 }
 const IGNORES = ignores();
@@ -148,7 +150,11 @@ function attendu(dir, rel, dates) {
     if (e.isDirectory()) {
       nd++;
       const n = compter(chemin);
-      lignes.push(`| [\`${e.name}\\\`](${e.name}/README.md) | dossier (${n} fichier${n > 1 ? "s" : ""}) | — | ${derniereDate(dates, relE) || "non versionné"} | sous-dossier — voir son README |`);
+      // Le rôle du sous-dossier (son README, sinon la table des rôles) : une ligne qui dit ce
+      // qu'il contient — « sous-dossier, voir son README » n'informait personne.
+      const roleSous = (roleExistant(join(chemin, "README.md")) || ROLES[relE] || "").replace(/\s+/g, " ");
+      const resume = roleSous && roleSous !== PLACEHOLDER ? roleSous.replace(/\*\*/g, "").slice(0, 160) + (roleSous.length > 160 ? "…" : "") : "rôle à rédiger dans son README";
+      lignes.push(`| [\`${e.name}\\\`](${e.name}/README.md) | dossier (${n} fichier${n > 1 ? "s" : ""}) | — | ${derniereDate(dates, relE) || "non versionné"} | ${resume.replace(/\|/g, "/")} |`);
     } else {
       nf++;
       const st = statSync(chemin);
