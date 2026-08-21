@@ -41,6 +41,15 @@ c'est aussi ce que l'oracle vérifie (G5).
 4. Juger le résultat par l'oracle du domaine (HTML : `check_html.py` **et** `render_page.py`
    du socle — les deux, le premier ne voit pas ce que le second mesure).
 
+**Avant de créer une famille, chercher le GÉNÉRATEUR — pas seulement les livrables produits.**
+Une forme peut être massivement réutilisée dans le corpus ET déjà outillée par une forge : douze
+fiches de sécurité et huit rapports d'audit ont été relevés comme preuve de réutilisation le
+21/08, alors que `digit-ai-forge-audit` portait déjà leur gabarit, leur générateur, leur oracle
+et leur version anglaise. Deux gabarits ont été écrits en doublon avant que le
+`deliverables/templates/` de la forge ne soit ouvert. La règle qui en sort : **un balayage qui
+ne regarde que les SORTIES conclut toujours qu'il manque un gabarit.** Le statut
+`porte_ailleurs` existe pour ce cas — la bibliothèque indexe et renvoie, elle ne réécrit pas.
+
 Une famille absente du catalogue se **remonte** (candidat TF), elle ne s'improvise pas. Une
 famille en statut `a_extraire` porte déjà ses sources : le travail d'extraction est identifié,
 il n'est pas encore fait — et le dire vaut mieux qu'une bibliothèque qui a l'air complète.
