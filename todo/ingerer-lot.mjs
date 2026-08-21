@@ -65,6 +65,46 @@ const lotSha = createHash("sha256").update(contenu.split("\r\n").join("\n")).dig
 const lotShaBrut = createHash("sha256").update(contenu).digest("hex");
 const lignes = contenu.split("\n").filter((l) => l.trim());
 
+// ---- R-45 (21/08) : un lot remis DIT ce qu'il n'a pas remonté ------------------------------
+// La règle vaut au moment où le lot ENTRE, pas seulement quand il attend dans la boîte : une
+// fois ingéré, il part en `old\` et `oracle-boite-entree` B6 ne le voit plus. Le constat et le
+// refus se cumulent — l'un détecte ce qui traîne, l'autre empêche d'entrer.
+//
+// Ce qui est exigé : la section « Remarques restées au produit » du gabarit, et sous elle un
+// verdict de généralisation, ou la phrase déclarant qu'aucune remarque n'est restée. Ce qui
+// n'est PAS jugé : la justesse du verdict — un raisonnement écrit peut être faux, un
+// raisonnement absent est perdu pour tout le monde.
+//
+// Portée : seuls les sidecars flanqués d'un `.md` homonyme sont concernés (une candidature
+// hors lot n'a pas de lot), et seuls ceux datés du 21/08 ou après (antériorité déclarée,
+// R-33 bis).
+{
+  const SEUIL_R45 = "20260821";
+  const date = /(\d{8})[a-z]?\.tf\.jsonl$/i.exec(sidecarPath.split("\\").join("/").split("/").pop() || "");
+  const lotMd = sidecarPath.replace(/\.normalise\.tf\.jsonl$/i, ".md").replace(/\.tf\.jsonl$/i, ".md");
+  if (date && date[1] >= SEUIL_R45 && existsSync(lotMd)) {
+    const texteLot = readFileSync(lotMd, "utf8");
+    const SECTION = /^##\s+Remarques\s+rest[ée]es?\s+au\s+produit\s*$/im;
+    if (!SECTION.test(texteLot)) {
+      console.error(
+        `[REJET ATOMIQUE] ${sidecarPath} — registre intact.\n` +
+        `  - le lot ${lotMd} n'a pas de section « Remarques restées au produit » (R-45).\n` +
+        "    Ce qu'un produit corrige chez lui sans le remonter emporte la CLASSE du défaut\n" +
+        "    avec lui. Gabarit : gabarits\\RETOURS-FORGES.md.");
+      process.exit(1);
+    }
+    const suite = (texteLot.split(SECTION)[1] || "").split(/^## /m)[0] || "";
+    if (!/g[ée]n[ée]ralisab/i.test(suite) && !/aucune\s+remarque\s+n['’]est\s+rest[ée]e?\s+au\s+produit/i.test(suite)) {
+      console.error(
+        `[REJET ATOMIQUE] ${sidecarPath} — registre intact.\n` +
+        `  - la section « Remarques restées au produit » de ${lotMd} ne porte ni verdict de\n` +
+        "    généralisation, ni la phrase déclarant qu'aucune remarque n'est restée au produit.\n" +
+        "    Une section vide se lit comme un oubli : l'omission ne vaut pas décision (R-45).");
+      process.exit(1);
+    }
+  }
+}
+
 // ---- validation intégrale AVANT toute écriture (rejet atomique) ----------------------------
 const motifs = [];
 const candidatures = lignes.map((l, i) => {

@@ -617,6 +617,28 @@ portée, et se déclare. Corollaire d'outillage, déjà appliqué : l'écriture 
 antérieur au dernier (l'heure de l'ACTION appartient au payload, pas au champ d'entrée), et la
 vérification **accumule** les écarts au lieu de s'arrêter au premier.
 
+**R-45.** Un lot de retours **DIT ce qu'il n'a pas remonté**. Toute remarque de portée jugée
+purement PRODUIT figure en section « Remarques restées au produit » du lot, avec son **verdict
+de généralisation** écrit — *non généralisable, parce que…*, ou *généralisable*, et alors elle
+est REMONTÉE, pas seulement mentionnée. Un lot sans remarque écartée le **déclare** en toutes
+lettres. Câblé aux deux bouts : `todo\ingerer-lot.mjs` REFUSE le lot (rejet atomique, registre
+intact) et `oracle-boite-entree` **B6** le constate sur ce qui attend dans la boîte.
+
+*Le fait qui la fait naître.* Un lot du 20/08 écrivait, mot pour mot : « Le lot ne remonte pas
+ces défauts, qui appartiennent au produit. » Le tri était honnête et le raisonnement juste ; il
+était surtout **invisible**. Les défauts de forme les plus coûteux de l'écosystème — largeur de
+lecture (TF-0172 le 13/08, reconstaté le 21/08 par un retour humain), tableaux illisibles au
+mobile (26 débordements mesurés), états vides absents — ont tous commencé leur vie comme « un
+défaut de ce livrable-là ». Ce qui se perd dans un tri silencieux n'est pas le défaut : c'est sa
+**CLASSE**, et elle se re-paye chez le projet suivant.
+
+**Ce que R-45 n'exige PAS.** Elle ne juge pas la JUSTESSE du verdict — qu'une remarque soit
+vraiment non généralisable est un jugement, pas une mesure. Elle exige que le raisonnement soit
+ÉCRIT : un raisonnement écrit peut être faux et se corrige ; un raisonnement absent est perdu
+pour tout le monde. Deux bornes l'empêchent de mettre l'existant en échec (R-33 bis) : elle ne
+s'applique qu'aux lots datés du **21/08/2026 ou après**, et qu'aux sidecars flanqués d'un `.md`
+homonyme — une candidature hors lot n'a pas de lot, donc rien à déclarer.
+
 ## Conflits à trancher (ta décision explicite)
 
 - **C1 — `old\` vs git (n° 6/7)** : **TRANCHÉ le 13/08 (TF-0150)** — `old\` (minuscule,
