@@ -57,10 +57,10 @@ Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés 
 | `factory-digit-ai-fr - RETOURS - 20260818a.tf.jsonl` | fichier | 1,3 Ko | 2026-08-20 | 1 ligne(s) JSONL |
 | `forge-digit-ai-fr - RETOURS - 20260815a.md` | fichier | 2,4 Ko | 2026-08-17 | Retours forges — forge-digit-ai-fr — 20260815a |
 | `forge-digit-ai-fr - RETOURS - 20260815a.tf.jsonl` | fichier | 3,7 Ko | 2026-08-17 | 5 ligne(s) JSONL |
-| `Hoopiz - RETOURS - 20260820a.md` | fichier | 13,0 Ko | non versionné | Retours forges — Hoopiz — 20260820a |
-| `Hoopiz - RETOURS - 20260820a.tf.jsonl` | fichier | 9,0 Ko | non versionné | 8 ligne(s) JSONL |
-| `Hoopiz - RETOURS - 20260820b.md` | fichier | 15,1 Ko | non versionné | Retours forges — Hoopiz — 20260820b |
-| `Hoopiz - RETOURS - 20260820b.tf.jsonl` | fichier | 12,2 Ko | non versionné | 9 ligne(s) JSONL |
+| `Hoopiz - RETOURS - 20260820a.md` | fichier | 13,0 Ko | 2026-08-21 | Retours forges — Hoopiz — 20260820a |
+| `Hoopiz - RETOURS - 20260820a.tf.jsonl` | fichier | 9,0 Ko | 2026-08-21 | 8 ligne(s) JSONL |
+| `Hoopiz - RETOURS - 20260820b.md` | fichier | 15,1 Ko | 2026-08-21 | Retours forges — Hoopiz — 20260820b |
+| `Hoopiz - RETOURS - 20260820b.tf.jsonl` | fichier | 12,2 Ko | 2026-08-21 | 9 ligne(s) JSONL |
 | `nhood-cockpit-ia - RETOURS - 20260820a.md` | fichier | 9,8 Ko | 2026-08-20 | Retours forges — nhood-cockpit-ia — 20260820a |
 | `nhood-cockpit-ia - RETOURS - 20260820a.tf.jsonl` | fichier | 6,5 Ko | 2026-08-20 | 4 ligne(s) JSONL |
 | `pilot-campagne-fiches-html - RETOURS - 20260809a.md` | fichier | 6,5 Ko | 2026-08-13 | Retours forges — campagne « fiches HTML lisibles » — 20260809a |
