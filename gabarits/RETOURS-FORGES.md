@@ -82,6 +82,39 @@ retrouvera.
 produit sur ce lot — vérifié par <qui>, le <date>. » Une section vide se lit comme un oubli,
 et l'omission ne vaut pas décision.
 
+## Retours sur les documents produits
+
+<!-- SECTION OBLIGATOIRE depuis le 22/08/2026 (règle R-46, mandat humain du 21/08). Vérifiée
+     par `oracle-boite-entree` B7 et refusée à l'ingestion si elle manque. -->
+
+Ce que la factory demande à chaque projet : **ce qui a manqué, gêné ou dû être ajouté à la main**
+dans les documents produits à partir d'un gabarit de `gabarits\documents\`. C'est le seul canal
+par lequel un gabarit s'améliore — un gabarit ne vieillit pas en s'usant, il vieillit parce que
+la réalité des projets le dépasse et que personne ne le dit.
+
+Reporter le couple **`gabarit` + `version_du_gabarit`** que le document porte dans son en-tête :
+sans lui, un retour dit « il manquait une section » et personne ne sait à quoi l'appliquer.
+
+| Document produit | Gabarit employé + version | Ce qui a manqué | Ce qui a GÊNÉ LE LECTEUR | Ajouté à la main | Portée |
+|---|---|---|---|---|---|
+| <nom du livrable remis> | <gd-xxx · 1.0.0> | <section absente, champ non prévu> | <ce que le destinataire a dit, pas ce qu'on suppose> | <ce qu'il a fallu écrire hors gabarit> | <générique \| ce projet seulement> |
+
+**Trois précisions qui font la valeur de ce retour** — sans elles, il n'est pas exploitable :
+
+- **« Ce qui a gêné le lecteur »** est un FAIT rapporté, pas une intuition d'auteur. Un
+  destinataire qui a demandé une information deux fois, qui a cherché une section ailleurs, ou
+  qui a refusé une mise en page : voilà de la matière. « On aurait pu mieux faire » n'en est pas.
+- **« Ajouté à la main »** est le signal le plus fort du lot. Ce qu'un projet a dû écrire hors
+  gabarit est, presque toujours, une section que le gabarit devrait porter — et c'est ainsi que
+  les quatre premières familles ont été extraites, en relevant ce que les projets refaisaient.
+- **La portée** se tranche ici comme partout (R-45) : ce qui est propre au projet reste chez lui,
+  ce qui vaut pour la famille remonte. Dans le doute, remonter — le tri se fait mieux au registre
+  qu'en silence.
+
+**Si aucun document n'a été produit depuis un gabarit de la bibliothèque**, l'écrire :
+« Aucun document produit depuis un gabarit de la bibliothèque sur ce lot. » Une section vide se
+lit comme un oubli, et l'omission ne vaut pas décision.
+
 ## Confirmations positives
 
 <Ce qui a TENU en conditions réelles — aussi précieux que les défauts : permet de clore les

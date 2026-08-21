@@ -260,6 +260,50 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
       message: "tout lot postérieur au 21/08 déclare ce qu'il n'a pas remonté" });
   }
 
+  // B7 (R-46, 22/08) — un lot remis DIT ce que ses documents ont coûté au gabarit.
+  //
+  // R-45 a rendu due la remontée de ce qu'un projet corrige CHEZ LUI. B7 est son pendant côté
+  // LIVRABLES : ce qui a manqué, gêné ou dû être ajouté à la main dans un document produit à
+  // partir d'un gabarit de la bibliothèque. C'est le seul canal par lequel un gabarit
+  // s'améliore — il ne vieillit pas en s'usant, il vieillit parce que la réalité des projets le
+  // dépasse et que personne ne le dit.
+  //
+  // Ce que B7 exige : la section « Retours sur les documents produits », et sous elle soit un
+  // retour portant le couple gabarit + version, soit la phrase déclarant qu'aucun document n'a
+  // été produit depuis un gabarit. Même patron que B6, et pour la même raison : une section
+  // vide se lit comme un oubli.
+  //
+  // Ce que B7 NE juge PAS : la valeur du retour. Qu'un manque signalé mérite de changer le
+  // gabarit est une décision humaine au registre, jamais une mesure d'oracle.
+  const SEUIL_B7 = "20260822";
+  const SECTION_B7 = /^##\s+Retours\s+sur\s+les\s+documents\s+produits\s*$/im;
+  const VERDICT_B7 = /gd-[a-z-]+|version[_ ]du[_ ]gabarit/i;
+  const AUCUN_B7 = /aucun\s+document\s+produit\s+depuis\s+un\s+gabarit/i;
+  let b7 = true;
+  for (const nom of fichiers.filter((f) => f.endsWith(".md"))) {
+    if (nom.startsWith(PREFIXE_INS) || NOTICES_DE_DOSSIER.has(nom)) continue;
+    const date = RE_DATE_LOT.exec(nom);
+    if (!date || date[1] < SEUIL_B7) continue; // antériorité déclarée
+    let texte = "";
+    try { texte = readFileSync(join(repertoire, nom), "utf8"); } catch { continue; }
+    if (!SECTION_B7.test(texte)) {
+      findings.push({ regle: "B7", statut: "FAIL", ou: nom,
+        message: "lot sans section « Retours sur les documents produits » — ce qu'un document a coûté au gabarit (section manquante, champ non prévu, ajout à la main) est le seul canal par lequel la bibliothèque s'améliore (gabarit `gabarits\\RETOURS-FORGES.md`, R-46)" });
+      b7 = false;
+      continue;
+    }
+    const suite = (texte.split(SECTION_B7)[1] || "").split(/^## /m)[0] || "";
+    if (!VERDICT_B7.test(suite) && !AUCUN_B7.test(suite)) {
+      findings.push({ regle: "B7", statut: "FAIL", ou: nom,
+        message: "section « Retours sur les documents produits » présente mais SANS retour rattaché à un gabarit (id `gd-…` ou version du gabarit), ni déclaration qu'aucun document n'en est issu — un retour qui ne nomme pas sa source ne s'applique à rien (R-46)" });
+      b7 = false;
+    }
+  }
+  if (b7 && fichiers.some((f) => f.endsWith(".md") && RE_DATE_LOT.test(f) && RE_DATE_LOT.exec(f)[1] >= SEUIL_B7)) {
+    findings.push({ regle: "B7", statut: "PASS", ou: "-",
+      message: "tout lot postérieur au 22/08 dit ce que ses documents ont coûté au gabarit" });
+  }
+
   // B4 (TF-0287) — un dépôt d'insatisfaction qui n'est pas entré au registre du circuit
   // n'est vu par personne : même maladie que B1, autre canal. Ce qui est exigé n'est pas
   // un sidecar, c'est un identifiant INS et une instruction à venir.
@@ -424,6 +468,49 @@ function selfTest() {
   cas.push(["B6 quater— lot ANTÉRIEUR au seuil : antériorité déclarée, jamais réécrite (R-33 bis)",
     !r.findings.some((f) => f.regle === "B6" && f.ou === "PROD - RETOURS - 20260819a.md"), r.verdict]);
   rmSync(lotNeuf); rmSync(sidecarNeuf); rmSync(lotAncien); rmSync(sidecarAncien);
+
+  // B7 (R-46, 22/08) — un lot dit ce que ses documents ont coûté au gabarit. Mêmes quatre sens
+  // que B6, et la même borne datée : un contrôle qui met l'existant en échec se fait désactiver.
+  const lotDoc = join(boite, "PROD - RETOURS - 20260822a.md");
+  const sidecarDoc = join(boite, "PROD - RETOURS - 20260822a.tf.jsonl");
+  writeFileSync(sidecarDoc, '{"titre":"x"}\n');
+  writeFileSync(reg, readFileSync(reg, "utf8") + JSON.stringify({
+    ev: "ingestion", lot_sha: empreinte(sidecarDoc), fichier: "PROD - RETOURS - 20260822a.tf.jsonl",
+  }) + "\n");
+  const AVEC_B6 = "\n\n## Remarques restées au produit\n\nAucune remarque n'est restée au produit — vérifié le 2026-08-22.\n";
+
+  writeFileSync(lotDoc, "# lot\n\n## pilot\n\ntable\n" + AVEC_B6);
+  r = juger(boite, reg);
+  cas.push(["B7    — lot du 22/08 sans section « Retours sur les documents produits »",
+    r.findings.some((f) => f.regle === "B7" && f.statut === "FAIL"), r.verdict]);
+
+  writeFileSync(lotDoc, "# lot\n" + AVEC_B6 + "\n## Retours sur les documents produits\n\n(rien)\n");
+  r = juger(boite, reg);
+  cas.push(["B7 bis— section présente mais SANS retour rattaché à un gabarit",
+    r.findings.some((f) => f.regle === "B7" && f.statut === "FAIL"), r.verdict]);
+
+  writeFileSync(lotDoc, "# lot\n" + AVEC_B6 + "\n## Retours sur les documents produits\n\nAucun document produit depuis un gabarit de la bibliothèque sur ce lot.\n");
+  r = juger(boite, reg);
+  cas.push(["B7 ter— déclaration explicite qu'aucun document n'en est issu : PASS",
+    !r.findings.some((f) => f.regle === "B7" && f.statut === "FAIL"), r.verdict]);
+
+  writeFileSync(lotDoc, "# lot\n" + AVEC_B6 + "\n## Retours sur les documents produits\n\n| Doc | Gabarit | Manque |\n|---|---|---|\n| DEX | gd-dossier-exploitation 1.0.0 | pas de section décommissionnement |\n");
+  r = juger(boite, reg);
+  cas.push(["B7 quater— un retour NOMMANT son gabarit (gd-…) : PASS",
+    !r.findings.some((f) => f.regle === "B7" && f.statut === "FAIL"), r.verdict]);
+
+  const lotAvant = join(boite, "PROD - RETOURS - 20260820z.md");
+  const sidecarAvant = join(boite, "PROD - RETOURS - 20260820z.tf.jsonl");
+  writeFileSync(sidecarAvant, '{"titre":"x"}\n');
+  writeFileSync(reg, readFileSync(reg, "utf8") + JSON.stringify({
+    ev: "ingestion", lot_sha: empreinte(sidecarAvant), fichier: "PROD - RETOURS - 20260820z.tf.jsonl",
+  }) + "\n");
+  writeFileSync(lotAvant, "# lot d'avant la règle, sans aucune des deux sections\n");
+  r = juger(boite, reg);
+  cas.push(["B7 quinquies— lot ANTÉRIEUR au seuil : antériorité déclarée (R-33 bis)",
+    !r.findings.some((f) => (f.regle === "B7" || f.regle === "B6") && f.ou === "PROD - RETOURS - 20260820z.md"),
+    r.verdict]);
+  rmSync(lotDoc); rmSync(sidecarDoc); rmSync(lotAvant); rmSync(sidecarAvant);
 
   // B4 (TF-0287) : un dépôt d'insatisfaction n'a pas de sidecar — B3 doit se taire, B4
   // doit exiger l'entrée au registre du circuit. Les deux sens sont prouvés ici.

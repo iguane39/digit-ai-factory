@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=62e3683a66ad archive=9f205b231527 · dernier événement: 2026-08-21T13:02:53.123Z -->
+     sceaux: actifs=8ad89110de5a archive=9f205b231527 · dernier événement: 2026-08-21T13:48:23.356Z -->
 
-**147 actifs** (candidat 0 · décidé 0 · en cours 1 · corrigé 145 · écarté 1) · **308 archivés**.
+**148 actifs** (candidat 0 · décidé 0 · en cours 1 · corrigé 146 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -24,6 +24,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0451 | corrige | 6 | pilot : les README de dossier se périment À CHAQUE COMMIT — la recette est rouge juste après avoir été verte | **oui** — trois régénérations en une seule session de travail, chacune suivie d'un arbre sale à recommiter ; et le geste devient un réflexe — la prochaine fois que RD2 signalera un README réellement mal rédigé, il sera régénéré sans être lu. |
 | TF-0452 | corrige | 6 | pilot : deux familles de livrables manquaient à la bibliothèque — dossier d'exploitation (DEX) et dossier d'architecture technique (DAT) | **oui** — quatre runbooks d'exploitation et un dossier d'architecture technique produits par les projets, aucun normé — chaque projet a réinventé sa structure ; et un document de compléments de DAT de 281 lignes existait sans que rien ne le rende réutilisable. |
 | TF-0454 | corrige | 6 | pilot : forge-audit porte DOUZE gabarits de livrables, dix sont absents du catalogue de la bibliothèque | **oui** — TF-0453 a coûté deux gabarits écrits en doublon pour DEUX de ces douze familles ; les dix autres portent le même risque, et il se paiera à la première demande de gabarit qui les concerne. |
+| TF-0455 | corrige | 6 | pilot : R-46 — rien ne faisait remonter ce qu'un DOCUMENT coûte à son gabarit ; le canal de retours ne parle que des forges | **oui** — quatre familles extraites par un balayage manuel du corpus les 20 et 21/08 ; sans canal, la cinquième demandera le même balayage, et les défauts d'usage des quatre premières ne remonteront jamais — un gabarit employé par trois projets et jamais critiqué est indiscernable d'un gabarit parfait. |
 | TF-0448 | corrige | 5.3 | pilot : un livrable produit par un run n'est jamais propose a la factory comme modele reutilisable — le canal de capitalisation n'existe qu'en ENTREE | **oui** — le couple source-jugee / rendu-genere de ce livrable a ete concu integralement pendant le run — heuristique de largeurs, repli en cartes, chapeaux, exemples de lecture — alors que trois livrables de meme nature existent deja dans l'ecosysteme ; sans canal sortant, le quatrieme le refera |
 
 ## digit-ai-forge-agents

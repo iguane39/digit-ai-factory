@@ -49,6 +49,18 @@ de lecture, tableaux illisibles au mobile, états vides absents ont tous commenc
 défaut de ce livrable-là ». La justesse du verdict n'est PAS jugée : un raisonnement écrit peut
 être faux et se corrige, un raisonnement absent est perdu pour tout le monde.
 
+**Ce qu'un document a coûté à son gabarit se déclare (R-46, 22/08).** Pendant de R-45, côté
+LIVRABLES. Tout lot daté du 22/08 ou après porte une section « Retours sur les documents
+produits » : pour chaque document tiré d'un gabarit de `gabarits\documents\`, le couple
+`gabarit` + `version_du_gabarit` qu'il affiche en en-tête, ce qui a manqué, ce qui a gêné le
+LECTEUR, ce qui a été ajouté à la main, et la portée. Aucun document issu d'un gabarit ? Le lot
+l'écrit. Câblé aux deux bouts — `ingerer-lot.mjs` REFUSE, `oracle-boite-entree` **B7**
+constate — et le fil est prescrit en amont par **G8** de `oracle-gabarits-documents`.
+*Pourquoi ce canal manquait* : celui qui existait parle des FORGES, jamais des DOCUMENTS. Les
+quatre premières familles de la bibliothèque ont été extraites en allant chercher à la main ce
+que les projets refaisaient — un gabarit barré par un projet, des runbooks réinventés quatre
+fois. Rien ne faisait remonter cette matière en continu.
+
 **Prouver la boîte vide, à l'ouverture de tout run** — `node oracles\oracle-boite-entree.mjs`
 (B1-B5, self-test 17/17, exit 0/1/2). Le 14/08, un lot `Produit-10 - RETOURS - 20260814b`
 (5 candidatures) est resté dans `input\00-retours\` sans être ingéré pendant qu'un autre lot

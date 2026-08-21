@@ -105,6 +105,44 @@ const lignes = contenu.split("\n").filter((l) => l.trim());
   }
 }
 
+// ---- R-46 (22/08) : un lot remis DIT ce que ses documents ont coûté au gabarit -------------
+// Pendant de R-45 côté LIVRABLES. R-45 demande ce que le projet a corrigé chez lui ; R-46
+// demande ce qui a manqué, gêné ou dû être ajouté à la main dans un document produit depuis un
+// gabarit de la bibliothèque. Un gabarit ne vieillit pas en s'usant : il vieillit parce que la
+// réalité des projets le dépasse et que personne ne le dit.
+//
+// Même architecture que R-45, et pour la même raison : le refus ferme la porte, `B7` constate ce
+// qui attend dans la boîte, et les deux se cumulent parce qu'un lot ingéré part en `old\`.
+{
+  const SEUIL_R46 = "20260822";
+  const dateR46 = /(\d{8})[a-z]?\.tf\.jsonl$/i.exec(sidecarPath.split("\\").join("/").split("/").pop() || "");
+  const lotMdR46 = sidecarPath.replace(/\.normalise\.tf\.jsonl$/i, ".md").replace(/\.tf\.jsonl$/i, ".md");
+  if (dateR46 && dateR46[1] >= SEUIL_R46 && existsSync(lotMdR46)) {
+    const texteLot = readFileSync(lotMdR46, "utf8");
+    const SECTION = /^##\s+Retours\s+sur\s+les\s+documents\s+produits\s*$/im;
+    if (!SECTION.test(texteLot)) {
+      console.error(
+        `[REJET ATOMIQUE] ${sidecarPath} — registre intact.\n` +
+        `  - le lot ${lotMdR46} n'a pas de section « Retours sur les documents produits » (R-46).\n` +
+        "    Ce qu'un document a coûté au gabarit — section manquante, champ non prévu, ajout à\n" +
+        "    la main — est le seul canal par lequel la bibliothèque s'améliore.\n" +
+        "    Gabarit : gabarits\\RETOURS-FORGES.md.");
+      process.exit(1);
+    }
+    const suite = (texteLot.split(SECTION)[1] || "").split(/^## /m)[0] || "";
+    if (!/gd-[a-z-]+|version[_ ]du[_ ]gabarit/i.test(suite)
+        && !/aucun\s+document\s+produit\s+depuis\s+un\s+gabarit/i.test(suite)) {
+      console.error(
+        `[REJET ATOMIQUE] ${sidecarPath} — registre intact.\n` +
+        `  - la section « Retours sur les documents produits » de ${lotMdR46} ne rattache aucun\n` +
+        "    retour à un gabarit (id `gd-…` ou version du gabarit), et ne déclare pas non plus\n" +
+        "    qu'aucun document n'en est issu. Un retour qui ne nomme pas sa source ne s'applique\n" +
+        "    à rien : « il manquait une section » ne se rattache à aucune famille (R-46).");
+      process.exit(1);
+    }
+  }
+}
+
 // ---- validation intégrale AVANT toute écriture (rejet atomique) ----------------------------
 const motifs = [];
 const candidatures = lignes.map((l, i) => {
