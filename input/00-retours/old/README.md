@@ -30,12 +30,12 @@ Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés 
 | `BdL - RETOURS - 20260815a.tf.jsonl` | fichier | 5,3 Ko | 2026-08-17 | 7 ligne(s) JSONL |
 | `BdL - RETOURS - 20260815b.md` | fichier | 3,1 Ko | 2026-08-17 | BdL — RETOURS — 20260815b |
 | `BdL - RETOURS - 20260815b.tf.jsonl` | fichier | 3,1 Ko | 2026-08-17 | 3 ligne(s) JSONL |
-| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260821a.md` | fichier | 7,6 Ko | non versionné | Retours forges — Bibliothèque vidéo IA Ceetrus — 20260821a |
-| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260821a.tf.jsonl` | fichier | 8,2 Ko | non versionné | 4 ligne(s) JSONL |
-| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260821b.md` | fichier | 3,2 Ko | non versionné | Retours forges — Bibliothèque vidéo IA Ceetrus — 20260821b |
-| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260821b.tf.jsonl` | fichier | 2,2 Ko | non versionné | 1 ligne(s) JSONL |
-| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260821c.md` | fichier | 9,2 Ko | non versionné | Retours forges — Bibliothèque vidéo IA Ceetrus — 20260821c |
-| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260821c.tf.jsonl` | fichier | 10,1 Ko | non versionné | 5 ligne(s) JSONL |
+| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260821a.md` | fichier | 7,6 Ko | 2026-08-21 | Retours forges — Bibliothèque vidéo IA Ceetrus — 20260821a |
+| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260821a.tf.jsonl` | fichier | 8,2 Ko | 2026-08-21 | 4 ligne(s) JSONL |
+| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260821b.md` | fichier | 3,2 Ko | 2026-08-21 | Retours forges — Bibliothèque vidéo IA Ceetrus — 20260821b |
+| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260821b.tf.jsonl` | fichier | 2,2 Ko | 2026-08-21 | 1 ligne(s) JSONL |
+| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260821c.md` | fichier | 9,2 Ko | 2026-08-21 | Retours forges — Bibliothèque vidéo IA Ceetrus — 20260821c |
+| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260821c.tf.jsonl` | fichier | 10,1 Ko | 2026-08-21 | 5 ligne(s) JSONL |
 | `bourse-aux-vacants - RETOURS - 20260814a.md` | fichier | 10,2 Ko | 2026-08-17 | Retours forges — bourse-aux-vacants — 20260814a |
 | `bourse-aux-vacants - RETOURS - 20260814a.normalise.tf.jsonl` | fichier | 6,2 Ko | 2026-08-17 | 5 ligne(s) JSONL |
 | `bourse-aux-vacants - RETOURS - 20260814a.tf.jsonl` | fichier | 3,9 Ko | 2026-08-17 | 5 ligne(s) JSONL |

@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=074da58c5b75 archive=9f205b231527 · dernier événement: 2026-08-21T08:01:09.425Z -->
+     sceaux: actifs=4571934ad405 archive=9f205b231527 · dernier événement: 2026-08-21T08:06:29.140Z -->
 
-**143 actifs** (candidat 7 · décidé 0 · en cours 1 · corrigé 134 · écarté 1) · **308 archivés**.
+**144 actifs** (candidat 8 · décidé 0 · en cours 1 · corrigé 134 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,6 +11,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0451 | candidat | 6 | pilot : les README de dossier se périment À CHAQUE COMMIT — la recette est rouge juste après avoir été verte | **oui** — trois régénérations en une seule session de travail, chacune suivie d'un arbre sale à recommiter ; et le geste devient un réflexe — la prochaine fois que RD2 signalera un README réellement mal rédigé, il sera régénéré sans être lu. |
 | TF-0443 | corrige | 20 | pilot : oracle-boite-entree est rouge par construction depuis le passage aux README de dossier — il ne peut plus prouver que la boite est vide | **oui** — le gate d'ouverture de tout run rend FAIL sur un depot sain : il ne distingue plus une boite vide d'une boite pleine, et la seule facon de continuer est de l'ignorer — ce qui rend au 14/08 la situation qu'il avait ete ecrit pour clore |
 | TF-0407 | corrige | 9 | pilot : la conversation est la seule surface de restitution sans doctrine d'audience — profil d'interlocuteur déclaré + ouverture commanditaire + règle S9 | **oui** — le retour lui-même, émis par le seul lecteur des restitutions — il n'existe pas de mesure plus directe qu'un destinataire disant qu'une partie ne lui parvient pas |
 | TF-0411 | corrige | 9 | pilot : l'intégrité du ledger n'était exigée qu'au contrat « prêt client » — R-42 la juge là où le ledger est déjà lu | **oui** — deux écarts d'intégrité ont vécu trois jours dans un ledger réel, publiés dans git, alors que l'oracle de conformité lisait ce même fichier à chaque run. |
