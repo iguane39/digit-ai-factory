@@ -15,8 +15,8 @@ Plans stratégiques, synthèses de mandat et de campagne (format `gabarits\RESTI
 | Élément | Type | Taille | Dernier commit | Titre / nature |
 |---|---|---|---|---|
 | `20260813-plan-strategie-tests-e2e.md` | fichier | 13,5 Ko | 2026-08-13 | Plan de mise en œuvre — stratégie de tests de bout en bout, complète et autonome-sous-gate |
-| `Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md` | fichier | 4,2 Ko | 2026-08-18 | Digit-AI — Note de migration : les chemins du pilot renommé — 20260818b |
-| `Digit-AI - Note Revue - Denominateur des freres - 20260818a.md` | fichier | 4,1 Ko | 2026-08-18 | Digit-AI — Note de revue : le dénominateur des « frères » — 20260818a |
+| `Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md` | fichier | 4,3 Ko | 2026-08-18 | Digit-AI — Note de migration : les chemins du pilot renommé — 20260818b |
+| `Digit-AI - Note Revue - Denominateur des freres - 20260818a.md` | fichier | 4,2 Ko | 2026-08-18 | Digit-AI — Note de revue : le dénominateur des « frères » — 20260818a |
 | `Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` | fichier | 3,2 Ko | 2026-08-17 | Plan de renommage `digit-ai-forge-pilot` → `digit-ai-factory` — fenêtre A exécutée, gate n |
 | `Digit-AI - Synthese Boucle - 17 restants du registre - 20260818a.md` | fichier | 13,3 Ko | 2026-08-18 | Digit-AI — Synthèse de boucle : les 17 restants du registre — 20260818a |
 | `Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md` | fichier | 3,7 Ko | 2026-08-15 | Synthèse de campagne — 4e mandat global « ok, fais tout » |
