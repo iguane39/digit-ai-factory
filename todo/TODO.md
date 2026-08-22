@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=94996d26e800 archive=54c0315cbe97 · dernier événement: 2026-08-22T15:11:34.886Z -->
+     sceaux: actifs=2cbc3fd118e2 archive=54c0315cbe97 · dernier événement: 2026-08-22T15:15:53.953Z -->
 
-**47 actifs** (candidat 24 · décidé 0 · en cours 1 · corrigé 22 · écarté 0) · **469 archivés**.
+**47 actifs** (candidat 23 · décidé 0 · en cours 1 · corrigé 23 · écarté 0) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -44,8 +44,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0505 | candidat | 10 | forge-audit : build-fiche.mjs ecrit par defaut DANS LE DEPOT DE LA FORGE (deliverables/generated/<tenant>/) — exactement le cas que TF-0319 interdit | **oui** — Chemin par defaut lu dans tools/build-fiche.mjs le 22/08 : deliverables/generated/<tenant>/fiche-securite.html, dans le depot de la forge — le cas nomme par TF-0319. Le livrable de ce produit a fini hors output\, corrige a la main. |
 | TF-0506 | candidat | 6.7 | forge-audit : la famille gd-fiche-securite declare deux formats (html, pdf) et la forge n en produit qu un — aucun outil HTML vers PDF n existe dans la forge | **oui** — Jeu de livrables remis incomplet : le commanditaire a du reclamer le PDF en second temps. Generateur PDF ecrit de zero cote produit, et premiere version piegee par un verrou de fichier Windows — ancien tirage revalide en croyant valider le nouveau. |
+| TF-0505 | corrige | 10 | forge-audit : build-fiche.mjs ecrit par defaut DANS LE DEPOT DE LA FORGE (deliverables/generated/<tenant>/) — exactement le cas que TF-0319 interdit | **oui** — Chemin par defaut lu dans tools/build-fiche.mjs le 22/08 : deliverables/generated/<tenant>/fiche-securite.html, dans le depot de la forge — le cas nomme par TF-0319. Le livrable de ce produit a fini hors output\, corrige a la main. |
 
 ## digit-ai-forge-conception
 
