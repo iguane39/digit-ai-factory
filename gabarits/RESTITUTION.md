@@ -4,10 +4,17 @@
 avec `destinataire: humain` en frontmatter YAML. La localisation R-2/E9 ne juge que ce qui
 est MARQUÉ — sans porteur, la règle est un faux négatif volontaire : elle est livrée,
 prouvée à zéro faux positif, et ne voit rien. Le marquage a été vérifié toléré par
-`oracle-synthese` (S1-S8 à l'époque, S1-S16 depuis la v2.8.0) sur une synthèse réelle PASS avant d'être prescrit ici.
+`oracle-synthese` (S1-S8 à l'époque, S1-S20 depuis la v2.9.0) sur une synthèse réelle PASS avant d'être prescrit ici.
 Cette consigne, elle, ne se marque PAS : c'est un référentiel normatif, pas un livrable.
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 2.8.0, 22/08/2026** (règle **S16** : une décision porte sa RECOMMANDATION et la SOURCE consultée d'où elle sort — une question dont la réponse est dans un document déjà fourni ne se pose pas) — 2.7.0 du 22/08 (règle **S15** : une décision RAPPELLE SON SUJET avant ses options — 25 mots au moins, sans identifiant nu ; retour humain du 22/08 « je ne peux pas me rappeler TF-0469 et vue portefeuille ») — 2.6.1 du 22/08 (`hors_mandat` ajoute au vocabulaire de S11 le jour meme, cf. section du bloc 8) — 2.6.0 du 22/08 (TF-0457 à TF-0461, retour humain du 22/08 sur la forme des listes de tâches : le bloc 8 cesse d'être une liste d'étiquettes — une action `auto_ia` non exécutée porte son motif (**S11**), une action laissée à l'humain porte sa raison d'impossibilité IA (**S12**), elle est exécutable telle quelle (**S13**), et elle porte un identifiant stable (**S14**). Les quatre entrent en **AVERTISSANTES** au sens de la v2.5.0 : une action sans motif rend la liste moins utile, jamais illisible — et le doublon d'affichage qu'un blocage provoque coûterait plus que le défaut qu'il dénonce. Elles se durciront quand le corpus sera propre, comme la v2.0.0 l'a fait avant elles) — précédente : **2.5.0, 22/08/2026** (retour humain
+Référentiel versionné (loi n° 4, daté-éditable) — **version 2.9.0, 22/08/2026** (mandat humain
+« traite tous les todos et retours » : cinq retours de forme du 22/08 traités d'un coup, tous
+mesurés sur la même session — **S17** un renvoi nomme son sujet et jamais une position ·
+**S18** les tableaux d'un même bloc portent le même en-tête · **S19** toute action dit ce qui se
+passe si elle n'est PAS faite, symétrique de S16 côté actions · **S20** le jargon des blocs 3 et 8
+porte sa glose, référentiel `gabarits\JARGON-A-GLOSER.json` · et le **bloc 8 se rend en TABLEAU**,
+l'acteur étant une colonne et non une section. S'y ajoute la correction du faux négatif de S9 sur
+son propre titre) — précédente : **2.8.0, 22/08/2026** (règle **S16** : une décision porte sa RECOMMANDATION et la SOURCE consultée d'où elle sort — une question dont la réponse est dans un document déjà fourni ne se pose pas) — 2.7.0 du 22/08 (règle **S15** : une décision RAPPELLE SON SUJET avant ses options — 25 mots au moins, sans identifiant nu ; retour humain du 22/08 « je ne peux pas me rappeler TF-0469 et vue portefeuille ») — 2.6.1 du 22/08 (`hors_mandat` ajoute au vocabulaire de S11 le jour meme, cf. section du bloc 8) — 2.6.0 du 22/08 (TF-0457 à TF-0461, retour humain du 22/08 sur la forme des listes de tâches : le bloc 8 cesse d'être une liste d'étiquettes — une action `auto_ia` non exécutée porte son motif (**S11**), une action laissée à l'humain porte sa raison d'impossibilité IA (**S12**), elle est exécutable telle quelle (**S13**), et elle porte un identifiant stable (**S14**). Les quatre entrent en **AVERTISSANTES** au sens de la v2.5.0 : une action sans motif rend la liste moins utile, jamais illisible — et le doublon d'affichage qu'un blocage provoque coûterait plus que le défaut qu'il dénonce. Elles se durciront quand le corpus sera propre, comme la v2.0.0 l'a fait avant elles) — précédente : **2.5.0, 22/08/2026** (retour humain
 « le prompt de résultat s'affiche 2 fois » : un hook `Stop` juge APRÈS l'affichage, donc chaque
 refus laissait la version rejetée à l'écran et faisait relire huit blocs. Le gate reste, il
 devient **proportionné** : **bloquantes S1, S3, S4, S6** — la restitution est inutilisable sans
@@ -165,7 +172,38 @@ porte trois choses, sinon ce n'est pas un risque mais une inquiétude :
   - le **signal** qui le rendrait visible (ce qu'on verrait le jour où il se réalise) ;
   - la **parade** ou l'acceptation déclarée.
 
-### 8. Prochaines actions — ordonnées, et par acteur
+### 8. Prochaines actions — UN TABLEAU, ordonné, l'acteur en colonne
+
+**La forme est un TABLEAU UNIQUE, et ce n'est plus un goût (S18, TF-0508, 22/08).** Le
+destinataire des restitutions l'a réclamé trois fois dans une seule session : « pourquoi tout
+n'est pas dans un seul tableau ? », puis « Revois complètement ta présentation », puis
+« tableau !! ». Trois phrases opposables en sortent :
+
+1. **L'ACTEUR est une COLONNE, jamais une section.** Découper en sections par acteur oblige le
+   lecteur à scanner N listes et à recoller mentalement pour obtenir le total — exactement le
+   coût que ce bloc existe pour supprimer.
+2. **L'ORDRE est le TRI.** Les actions exécutables par l'IA remontent en tête *par le tri*, ce
+   qui satisfait « tous les IAs en premier » sans casser la liste unique. Les deux exigences
+   n'étaient jamais en tension : elles étaient compatibles depuis le début, et c'est la lecture
+   « une section par acteur » qui était fautive.
+3. **Seul le CALENDRIER justifie plusieurs tableaux.** L'exception vient du lecteur lui-même —
+   « si plusieurs étapes, crée plusieurs tableaux » : un découpage par ÉTAPE, jamais par acteur.
+
+**Et la forme ne change pas d'un tour au suivant.** Cinq mises en page pour le même contenu ont
+été mesurées dans une seule session, dont un bloc portant quatre formes de tableau distinctes. Le
+coût n'est pas esthétique : à chaque changement, le lecteur RÉAPPREND la mise en page avant de
+pouvoir lire, et il perd la comparaison avec le message précédent — ce qui **annule le bénéfice
+de S14**. Une liste dont les colonnes changent ne se compare pas, même avec des identifiants
+stables. `oracle-synthese` tient la cohérence *intra*-document (deux en-têtes différents dans un
+même bloc = défaut) ; la stabilité d'un tour au suivant est déclarée en `non_juge` plutôt que
+faussement promise, faute de conserver l'état du tour précédent.
+
+La forme en puces reste admise — un bloc 8 à trois lignes ne gagne rien à devenir un tableau — et
+les deux formes sont jugées à l'identique : `oracle-synthese` lit **une ligne de tableau comme une
+action**, au même titre qu'une puce et ses sous-puces. Ce n'était pas le cas avant le 22/08, et le
+trou était béant : un bloc 8 rendu en tableau donnait zéro action à S11-S14, qui répondaient
+« aucune action concernée ». **Une règle qui se désactive au moment où l'on adopte la forme
+demandée est pire qu'une règle absente** — elle récompense le changement de forme par un vert.
 
 Deux classements simultanés, aucun des deux facultatif :
 
@@ -223,6 +261,57 @@ règle à corriger, pas à contourner.** C'est aussi le motif le plus facile à 
 une action que le mandat courant couvre, il contourne S11 au lieu de la satisfaire, et aucun
 oracle ne le voit — c'est déclaré en `non_juge` plutôt que passé sous silence.
 
+#### Une action dit ce qu'il en coûte de NE PAS la faire (S19, 22/08/2026)
+
+*La demande humaine était SYMÉTRIQUE, et le référentiel n'en couvrait qu'une moitié.* Elle disait,
+mot pour mot : **« fournir des actions claires, les impacts de ces actions, les recos sur ces
+actions, des décisions claires, les impacts de ces décisions, les recos des décisions »**. Au
+bloc 3, S15 et S16 tenaient déjà le sujet, la recommandation et sa source. Au bloc 8, S11 à S14
+tenaient le motif, la raison, l'exécutabilité et l'identifiant — et **aucune** n'exigeait la
+conséquence.
+
+Or c'est cette colonne qui rend la liste **arbitrable** : une liste de restes sans conséquences
+est un inventaire, pas un outil de décision. Mesuré à l'usage la même session : les tableaux
+portant une colonne « si on ne fait rien » ont été acceptés, ceux qui ne la portaient pas ont été
+redemandés.
+
+**Asymétrie assumée avec S16 : la RECOMMANDATION n'est pas exigée sur une action.** Une action
+n'offre pas toujours un choix, et l'imposer partout produirait du remplissage. Formes admises pour
+la conséquence : « si rien n'est fait », « si on ne le fait pas », « à défaut », « sinon : »,
+« impact si … ».
+
+#### Un renvoi nomme son SUJET, jamais une position (S17, 22/08/2026)
+
+*Fait mesuré sur pièce.* Une restitution renvoyait « préalable : ligne 8 (droit IAM) puis ligne 5
+(merge) ». Réponse du lecteur, mot pour mot : **« Que veut dire ligne 8 (droit IAM) puis ligne 5
+(merge). C'est incompréhensible. »** Les deux numéros avaient effectivement changé de sens entre
+deux messages, le tri par urgence ayant déplacé les lignes.
+
+C'est le pendant, au niveau du **RENVOI**, de ce que S14 corrige au niveau de l'**ITEM** : S14
+exige un identifiant stable *pour* l'action, mais rien n'interdisait de la **désigner** par sa
+position. **Un identifiant stable qui ne sert jamais à renvoyer ne sert à rien.** Un renvoi nomme
+donc le sujet ou son identifiant ; « ligne N », « point N », « item N » sont des défauts. Renvoyer
+à un **bloc** du gabarit reste licite : sa position est fixe, pas retriable.
+
+#### Le jargon des blocs 3 et 8 porte sa glose (S20, 22/08/2026)
+
+*Le retour est la mesure elle-même* : le lecteur a demandé DEUX FOIS l'explication du même point —
+« détaille 5 », puis « Explique 5 ». La première version employait « justificatif fédéré »,
+« identité system-assigned », « UAMI », « constat H2 », « filet » sans les gloser ; la seconde,
+écrite sans aucun de ces termes, a été **acceptée immédiatement**.
+
+Le raisonnement de S9 s'applique mot pour mot — *une information remontée et non comprise a le
+même effet qu'une information tue, avec le coût de lecture en plus* — mais **S9 ne juge que
+l'OUVERTURE**. Or c'est aux blocs qu'on EXÉCUTE que le coût est le plus élevé : un jargon au
+bloc 0 fait perdre le fil, **un jargon dans une action fait exécuter de travers, ou pas du tout**.
+
+Le référentiel est une **donnée** (loi n° 4), fermée, datée et sourcée :
+`gabarits\JARGON-A-GLOSER.json`. Une heuristique sur les sigles en majuscules aurait un taux de
+faux positifs rédhibitoire dans ce corpus, où la MAJUSCULE sert l'emphase — et un oracle qui crie
+sur « MESURE » et « AUCUNE » se fait désactiver dans la semaine. **La liste n'attrape que ce qui a
+réellement coûté un aller-retour**, et elle grossit par les retours, pas par la devinette : c'est
+la limite, elle est déclarée en `non_juge`.
+
 **Les vocabulaires sont fermés ET non accentués**, et ce n'est pas un détail de style : c'est ce
 qui les rend **comptables** (« combien d'actions restent humaines par `acces` ? ») et ce qui les
 empêche d'être déclenchés par hasard par de la prose française — « décision », « accès »,
@@ -266,8 +355,12 @@ appliquent pas non plus : elles jugent un fichier, et une CLI n'en écrit pas.
 
 ## Contrôle
 
-**Exécuté** : `node oracles\oracle-synthese.mjs <synthese.md>` — règles S1-S16 binaires,
-fixtures double sens au self-test. Une restitution qui viole une règle est un défaut de forme,
+**Exécuté** : `node oracles\oracle-synthese.mjs <synthese.md>` — règles S1-S20 binaires,
+fixtures double sens au self-test (la fixture rouge échoue sur 15 règles distinctes).
+**Proportionnalité (v2.5.0, inchangée)** : bloquantes S1, S3, S4, S6 ; tout le reste — S17 à S20
+comprises — entre en AVERTISSANTE, dit en une ligne sous la réponse et jamais réécrit. Une action
+sans conséquence rend la liste moins utile, jamais illisible ; les règles se durciront quand le
+corpus sera propre. Une restitution qui viole une règle est un défaut de forme,
 signalé comme tel et corrigeable. Mise à jour = nouvelle version + date.
 
 **Appelants (R-35, TF-0249)** — la consigne est chargée et JOUÉE, jamais laissée à la

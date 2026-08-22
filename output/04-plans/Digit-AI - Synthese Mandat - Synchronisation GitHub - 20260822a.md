@@ -2,7 +2,7 @@
 destinataire: humain
 ---
 
-# Digit-AI — Synthèse de mandat — Synchronisation GitHub — 22 août 2026, lot a
+# Digit-AI — Synthèse de mandat — Synchronisation GitHub — 20260822a
 
 La synchronisation demandée est faite : le dépôt de pilotage est désormais identique en local
 et chez l'hébergeur, et il ne reste plus aucune modification en attente. Les treize dépôts de
@@ -151,6 +151,8 @@ les autres candidatures en dernier, n'ayant aucun effet tant qu'elles ne sont pa
   - exécutable tel quel : lire l'entrée `TF-0503` dans `todo\TODO.md` (section `pilot`), puis
     répondre `(a)`, `(b)` ou `(c)` ; preuve de clôture : le champ `decideur` renseigné au
     registre.
+  - si rien n'est fait : l'état du dépôt reste sale après chaque ajout, et la huitième mesure
+    sera identique aux sept précédentes.
 - `manuelle_utilisateur` — **`TF-0513`** : décider de corriger le contrôle de restitution, qui
   refuse un document conforme à cause de son titre.
   - raison d'impossibilité IA : `decision` — modifier un oracle change ce que tout l'écosystème
@@ -158,6 +160,8 @@ les autres candidatures en dernier, n'ayant aucun effet tant qu'elles ne sont pa
   - exécutable tel quel : lire l'entrée `TF-0513` dans `todo\TODO.md` (section `pilot`), puis
     répondre `(a)` transposer les deux lignes, ou `(b)` un retrait indifférent à l'ordre ; preuve
     de clôture : `node oracles\oracle-synthese.mjs --self-test` vert après correction.
+  - si rien n'est fait : tout titre de livrable portant un code de lot continue de faire échouer
+    un document conforme devant un contrôle bloquant.
 - `manuelle_utilisateur` — **`TF-0504`**, **`TF-0505`**, **`TF-0506`** : décider du sort des
   trois candidatures issues du lot du produit Produit-04 (marque de destinataire dans
   les gabarits, destination par défaut du générateur de fiche, second format manquant).
@@ -166,9 +170,12 @@ les autres candidatures en dernier, n'ayant aucun effet tant qu'elles ne sont pa
   - exécutable tel quel : lire les trois entrées dans `todo\TODO.md`, sections `pilot` et
     `digit-ai-forge-audit` ; preuve de clôture : `statut` passé de `candidat` à `decide` ou
     `ecarte`, avec `decideur` et `date_decision`.
+  - si rien n'est fait : les trois défauts restent en place et le prochain livrable de la même
+    famille naîtra au même mauvais endroit, sans qu'aucun contrôle ne le voie.
 - `auto_ia` — action **neuve** : appliquer la correction retenue au générateur des fiches
   d'index une fois l'option choisie.
   - motif de non-exécution : `dependance_bloc_3` — attend la décision listée au bloc 3.
+  - si rien n'est fait : rien ne change, la décision restant le seul préalable.
 
 ## 9. Traces
 

@@ -76,6 +76,11 @@ export function juger(texte) {
 //   · AVERTISSEMENT — tout le reste (S2, S5, S7, S8, S9, S10) : dit en une ligne sous la
 //     réponse, journalisé, jamais réécrit. Une preuve manquante sur une puce ne vaut pas de
 //     faire relire huit blocs.
+//   · S17 à S20 (v2.9.0, 22/08) entrent en AVERTISSEMENT par le même raisonnement que S11-S14 :
+//     une action sans conséquence, un renvoi par position, deux formes de tableau ou un jargon nu
+//     rendent la liste moins utile, jamais illisible — et le doublon d'affichage qu'un blocage
+//     provoque coûterait plus que le défaut qu'il dénonce. Elles se durciront quand le corpus
+//     sera propre, comme la v2.0.0 l'a fait avant elles.
 //   · S11 à S14 (v2.6.0, 22/08) entrent en AVERTISSEMENT par le même raisonnement, et c'est
 //     délibéré : une action `auto_ia` sans motif, une action humaine sans sa raison ou sans son
 //     chemin rendent la liste MOINS UTILE, jamais illisible — le doublon d'affichage qu'un

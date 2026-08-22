@@ -1,0 +1,23 @@
+{
+  "format": "pilot/jargon-a-gloser@1",
+  "version": "1.0.0",
+  "date": "2026-08-22",
+  "source": "TF-0511 — retour humain du 22/08/2026 : le lecteur a demandé DEUX FOIS l'explication du même point (« détaille 5 », puis « Explique 5 »). La première explication employait « justificatif fédéré », « identité system-assigned », « UAMI », « constat H2 », « filet » sans les gloser ; la seconde, écrite sans aucun de ces termes, a été acceptée immédiatement.",
+  "pourquoi_une_donnee_et_pas_du_code": "Loi transverse n° 4 — une donnée volatile est une donnée, pas du code. Un référentiel de jargon se remplit à l'usage : chaque terme qu'un lecteur a dû faire expliquer entre ici, daté et sourcé. Le mettre en dur dans l'oracle obligerait à publier une version de l'oracle pour ajouter un mot.",
+  "pourquoi_une_liste_FERMEE_et_pas_une_heuristique": "Une heuristique sur les sigles en majuscules (« tout token de 2 à 8 capitales doit être glosé ») aurait un taux de faux positifs rédhibitoire dans ce corpus, où la MAJUSCULE sert l'emphase : MESURE, AUCUNE, PREUVE, EST, ZÉRO. Un oracle qui crie sur l'emphase se fait désactiver dans la semaine. Une liste fermée n'attrape que ce qui a réellement coûté un aller-retour — zéro faux positif par construction, et elle grossit par les retours.",
+  "regle": "Dans les blocs 3 et 8 d'une restitution, un terme de cette liste porte sa glose ADJACENTE — une parenthèse explicative qui suit le terme dans le même groupe (décision ou action). Sans glose, c'est un défaut de forme S20. Les blocs de PREUVE ne sont pas jugés : un identifiant technique y est à sa place.",
+  "termes": [
+    { "terme": "UAMI", "depuis": "2026-08-22", "vu_dans": "restitution du 22/08, bloc de détail d'un point de sécurité" },
+    { "terme": "system-assigned", "depuis": "2026-08-22", "vu_dans": "idem — « identité system-assigned »" },
+    { "terme": "justificatif fédéré", "depuis": "2026-08-22", "vu_dans": "idem" },
+    { "terme": "constat H2", "depuis": "2026-08-22", "vu_dans": "idem — renvoi à une nomenclature interne d'audit" },
+    { "terme": "sidecar", "depuis": "2026-08-22", "vu_dans": "vocabulaire courant du pilot pour le fichier `.tf.jsonl` qui accompagne un lot de retours — jamais glosé nulle part" },
+    { "terme": "sceau", "depuis": "2026-08-22", "vu_dans": "vues du registre — empreinte des items actifs" },
+    { "terme": "delta opposable", "depuis": "2026-08-22", "vu_dans": "vocabulaire des runs de version" },
+    { "terme": "gate", "depuis": "2026-08-22", "vu_dans": "vocabulaire de gouvernance du pilot (R-29) — passe pour transparent et ne l'est pas" }
+  ],
+  "non_juge": [
+    "la JUSTESSE d'une glose — l'oracle tient la présence d'une parenthèse après le terme, jamais qu'elle explique vraiment",
+    "le jargon HORS liste : un terme qui n'a encore coûté aucun aller-retour n'est pas détecté, et c'est le prix assumé du zéro faux positif. Le canal de croissance est le retour humain, pas la devinette."
+  ]
+}
