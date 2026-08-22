@@ -38,8 +38,8 @@ Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés 
 | `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260821c.tf.jsonl` | fichier | 10,1 Ko | 2026-08-21 | 5 ligne(s) JSONL |
 | `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260822a.md` | fichier | 14,2 Ko | 2026-08-22 | Retours forges — Bibliothèque vidéo IA Ceetrus — 20260822a |
 | `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260822a.tf.jsonl` | fichier | 13,7 Ko | 2026-08-22 | 6 ligne(s) JSONL |
-| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260822b.md` | fichier | 11,3 Ko | non versionné | Retours forges — Bibliothèque vidéo IA Ceetrus — 20260822b |
-| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260822b.tf.jsonl` | fichier | 11,0 Ko | non versionné | 6 ligne(s) JSONL |
+| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260822b.md` | fichier | 11,3 Ko | 2026-08-22 | Retours forges — Bibliothèque vidéo IA Ceetrus — 20260822b |
+| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260822b.tf.jsonl` | fichier | 11,0 Ko | 2026-08-22 | 6 ligne(s) JSONL |
 | `bourse-aux-vacants - RETOURS - 20260814a.md` | fichier | 10,2 Ko | 2026-08-17 | Retours forges — bourse-aux-vacants — 20260814a |
 | `bourse-aux-vacants - RETOURS - 20260814a.normalise.tf.jsonl` | fichier | 6,2 Ko | 2026-08-17 | 5 ligne(s) JSONL |
 | `bourse-aux-vacants - RETOURS - 20260814a.tf.jsonl` | fichier | 3,9 Ko | 2026-08-17 | 5 ligne(s) JSONL |
