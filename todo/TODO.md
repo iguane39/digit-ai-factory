@@ -1,11 +1,17 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=a6ab99d54499 archive=99370aa79320 · dernier événement: 2026-08-22T07:48:35.848Z -->
+     sceaux: actifs=a81170a695e8 archive=99370aa79320 · dernier événement: 2026-08-22T08:10:10.418Z -->
 
-**6 actifs** (candidat 3 · décidé 0 · en cours 2 · corrigé 1 · écarté 0) · **466 archivés**.
+**7 actifs** (candidat 3 · décidé 0 · en cours 2 · corrigé 2 · écarté 0) · **466 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
+
+## digit-ai-factory
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0472 | corrige | 20 | pilot : une DECISION du bloc 3 peut ne rappeler aucun contexte — S4 compte des options etiquetees, jamais ce qu'elles arbitrent (regle S15) | **oui** — le destinataire unique des restitutions a declare ne pas pouvoir identifier deux decisions sur deux qu'on lui demandait de trancher — un taux d'echec de 100 % sur le seul bloc que la consigne place EN TETE parce qu'il est le plus important |
 
 ## digit-ai-forge-agents
 

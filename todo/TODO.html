@@ -139,7 +139,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>a6ab99d54499</code> · dernier événement 2026-08-22T07:48:35.848Z</p>
+      <p class="meta">sceau <code>a81170a695e8</code> · dernier événement 2026-08-22T08:10:10.418Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -165,9 +165,10 @@
       <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
       
       <div class="dropdown" data-dim="forge">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">3</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">4</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
+          <label><input type="checkbox" value="digit-ai-factory" checked> digit-ai-factory</label>
           <label><input type="checkbox" value="digit-ai-forge-agents" checked> digit-ai-forge-agents</label>
           <label><input type="checkbox" value="digit-ai-forge-tests" checked> digit-ai-forge-tests</label>
           <label><input type="checkbox" value="pilot" checked> pilot</label>
@@ -183,11 +184,34 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">6 / 6 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">7 / 7 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a></nav>
     <main>
+    <section id="digit-ai-factory">
+      <h2>digit-ai-factory <span class="badge" title="1 item(s) actifs ciblant digit-ai-factory">1</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-factory</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <article class="card s-corrige" id="item-TF-0472" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0472</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 20)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : une DECISION du bloc 3 peut ne rappeler aucun contexte — S4 compte des options etiquetees, jamais ce qu'elles arbitrent (regle S15)</h3>
+          <div class="card-detail" data-cite><p class="lead">Retour humain du 22/08/2026, une heure apres la livraison de S11 a S14, mot pour mot : « dans tes prompts, rappelle le contexte des decisions a prendre, je ne peux pas me rappeler TF-0469 et vue portefeuille ».</p><ul class="puces"><li>Les deux exemples cites disent les deux moities du defaut :</li><li>un IDENTIFIANT ne designe rien pour qui ne l'a pas ecrit — TF-0469 est le nom que la chose porte au REGISTRE, et le registre n'est pas dans la tete du lecteur</li><li>un TITRE COURT est une etiquette, pas un sujet — « vue portefeuille » nomme sans rappeler. Mesure sur la piece : la restitution incriminee portait DEUX decisions et passait S4 — options etiquetees, cout, recommandation, option par defaut, tout y etait. S4 compte des options, elle ne regarde JAMAIS ce qu'elles arbitrent. La premiere decision portait un chapeau ecrit en jargon de session (recette, candidatures, lot ingere) ; la seconde portait un titre de quatre mots et rien d'autre. C'est exactement le defaut que S13 venait de corriger au bloc 8 — sauf qu'au bloc 3 il coute PLUS CHER : une action mal ecrite se re-demande, une decision mal ecrite se tranche quand meme, a l'aveugle, et personne ne saura qu'elle l'a ete. Correction : regle S15 — pour chaque decision du bloc 3, le texte AVANT la premiere option porte au moins 25 mots et aucun identifiant nu. C'est S9 (langage commanditaire du bloc 0) appliquee par DECISION. Difference assumee avec S9 : les chemins et spans de code restent toleres dans le chapeau d'une decision, la ou S9 les interdit — le sujet d'une decision EST parfois un fichier, et l'interdire ferait ecrire des periphrases. L'identifiant, lui, n'est jamais le sujet</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>le destinataire unique des restitutions a declare ne pas pouvoir identifier deux decisions sur deux qu'on lui demandait de trancher — un taux d'echec de 100 % sur le seul bloc que la consigne place EN TETE parce qu'il est le plus important</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-03 (retour humain direct du 22/08 sur la restitution qui venait de lui etre remise)</dd></div>
+            
+          </dl>
+        </article>
+      </div>
+    </section>
     <section id="digit-ai-forge-agents">
       <h2>digit-ai-forge-agents <span class="badge" title="2 item(s) actifs ciblant digit-ai-forge-agents">2</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-agents</strong> — trié par statut puis priorité décroissante.</p>

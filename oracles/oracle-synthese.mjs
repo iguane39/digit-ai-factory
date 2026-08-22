@@ -37,6 +37,10 @@
  *       libellé d'écran, dans le groupe de la puce (TF-0459) ;
  *   S14 toute action porte un identifiant stable, ou se déclare `neuve` (TF-0460) — sans
  *       identifiant, deux restitutions successives ne se comparent pas.
+ *   S15 toute décision du bloc 3 RAPPELLE SON SUJET avant ses options : ≥ 25 mots, sans
+ *       identifiant nu (22/08). Un identifiant ne désigne rien pour qui ne l'a pas écrit,
+ *       et un titre court est une étiquette — or une décision mal écrite se tranche quand
+ *       même, à l'aveugle. C'est S9 appliquée par décision.
  *
  * Usage : node oracle-synthese.mjs <synthese.md>   → verdict JSON
  *         node oracle-synthese.mjs --self-test     → fixtures double sens
@@ -305,6 +309,44 @@ function juger(texte) {
     "et la même ligne se re-sert d'une liste à l'autre.",
     "chaque action porte un identifiant stable ou se déclare neuve");
 
+  // ---- S15 (22/08) — une décision RAPPELLE SON SUJET, ou elle n'est pas décidable -----------
+  //
+  // Retour humain du 22/08, dans l'heure qui a suivi la livraison de S11-S14 : « dans tes
+  // prompts, rappelle le contexte des décisions à prendre, je ne peux pas me rappeler TF-0469 et
+  // vue portefeuille ». Les deux exemples cités disent les deux moitiés du défaut : un
+  // IDENTIFIANT (« TF-0469 ») ne désigne rien pour qui ne l'a pas écrit, et un TITRE COURT
+  // (« vue portefeuille ») n'est qu'une étiquette. Le bloc 3 avait exactement le défaut que S13
+  // venait de corriger au bloc 8 — sauf qu'au bloc 3 il coûte plus cher : une action mal écrite
+  // se re-demande, une DÉCISION mal écrite se tranche quand même, à l'aveugle.
+  //
+  // S4 ne voyait rien : elle compte des options étiquetées, jamais ce qu'elles arbitrent. La
+  // restitution qui a déclenché ce retour portait deux décisions, PASS S4 — la première avec un
+  // chapeau en jargon de session, la seconde avec un titre de quatre mots et rien d'autre.
+  //
+  // La règle est celle du bloc 0 (S9), appliquée par décision : un chapeau d'au moins 25 mots,
+  // avant la première option, SANS identifiant nu. Différence assumée avec S9 : les chemins et
+  // spans de code restent tolérés ici — le sujet d'une décision EST parfois un fichier, et
+  // l'interdire ferait écrire des périphrases. L'identifiant, lui, n'est jamais le sujet : il est
+  // le nom que la chose porte au registre, et le registre n'est pas dans la tête du lecteur.
+  const groupesDecisions = actionsGroupees(bDecisions)
+    .filter((g) => !MOTIFS_ABSENCE.test(g.replace(/^\s*[-*]\s+/, "").slice(0, 40)))
+    .filter((g) => /\(a\)/.test(g)); // sans option étiquetée, c'est S4 qui parle, pas S15
+  if (!groupesDecisions.length) {
+    ok("S15", "aucune décision à rappeler — bloc vide déclaré, ou choix fermé absent (S4)");
+  } else {
+    const chapeau = (g) => g.split("(a)")[0].replace(/^\s*[-*]\s+/, "").replace(/\*\*/g, "").trim();
+    const fautifs = groupesDecisions.filter((g) => {
+      const c = chapeau(g);
+      const mots = c.split(/\s+/).filter(Boolean).length;
+      return mots < 25 || ID_STABLE.test(c);
+    });
+    fautifs.length
+      ? ko("S15", `${fautifs.length} décision(s) sur ${groupesDecisions.length} sans rappel de leur sujet — un identifiant ne désigne rien pour qui ne l'a pas écrit, ` +
+          `et un titre court est une étiquette : avant les options, 25 mots au moins qui disent DE QUOI on parle, sans identifiant nu. ` +
+          `Ex. : ${chapeau(fautifs[0]).replace(/\s+/g, " ").slice(0, 110)}`)
+      : ok("S15", `${groupesDecisions.length} décision(s), chacune rappelant son sujet avant ses options`);
+  }
+
   return findings;
 }
 
@@ -329,7 +371,10 @@ Recette S-01 TENU — 19/19 défauts détectés au banc rouge, pytest 365.
 Coût de la reprise proposée : complexité moyen · durée court.
 
 ## 3. Décisions attendues
-- Pousser et taguer la version ?
+- Publier la version corrigée de la forge de tests ? Le banc rouge vient de tourner en entier :
+  chaque défaut planté volontairement a été détecté, donc la surveillance fonctionne et la
+  version est prête à sortir. Publier la rend visible aux autres projets ; ne pas publier la
+  laisse sur ce poste, et personne d'autre n'en profite tant qu'on attend.
   - (a) taguer v1.12.0 maintenant — recommandé, tout est prouvé ;
   - (b) attendre le prochain lot — coût : les 26 commits restent locaux.
   - sans décision : rien n'est publié.
@@ -368,7 +413,8 @@ Aucun écart : la demande a été suivie à la lettre.
     .replace("terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot.", "terminée aujourd'hui.")
     .replace("- Regroupement par cause racine : motif — sa cause est traitée, critère de réouverture écrit.", "- Regroupement par cause racine")
     .replace("Coût de la reprise proposée : complexité moyen · durée court.", "Coût de la reprise proposée : 2-3 j.")
-    .replace("Recette S-01 TENU — 19/19 défauts détectés au banc rouge, pytest 365.", "Tout s'est bien passé.");
+    .replace("Recette S-01 TENU — 19/19 défauts détectés au banc rouge, pytest 365.", "Tout s'est bien passé.")
+    .replace(/- Publier la version corrigée[\s\S]*?tant qu'on attend\./, "- Publier TF-0220 ?");
   writeFileSync(join(dir, "verte.md"), verte, "utf8");
   writeFileSync(join(dir, "rouge.md"), rouge, "utf8");
   const moi = fileURLToPath(import.meta.url);
@@ -378,13 +424,13 @@ Aucun écart : la demande a été suivie à la lettre.
   if (rv.status !== 0) casse.push("la fixture VERTE ne passe pas : " + rv.stdout);
   if (rr.status !== 1) casse.push("la fixture ROUGE ne FAIL pas");
   else {
-    for (const regle of ["S2", "S3", "S5", "S9", "S10", "S11", "S12", "S13", "S14"]) {
+    for (const regle of ["S2", "S3", "S5", "S9", "S10", "S11", "S12", "S13", "S14", "S15"]) {
       if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
     }
   }
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 2/2 PASS (verte PASS ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant)");
+    : "Self-test restitution : 2/2 PASS (verte PASS ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet)");
   process.exit(casse.length ? 1 : 0);
 }
 

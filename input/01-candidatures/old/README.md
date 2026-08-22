@@ -17,6 +17,7 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `candidature-cablage-orchestrer-boucle.tf.jsonl` | fichier | 2,6 Ko | 2026-08-18 | 1 ligne(s) JSONL |
 | `candidature-consigne-restitution.tf.jsonl` | fichier | 2,5 Ko | 2026-08-13 | 1 ligne(s) JSONL |
 | `candidature-convention-rangement-output.tf.jsonl` | fichier | 2,6 Ko | 2026-08-13 | 1 ligne(s) JSONL |
+| `candidature-decision-sans-rappel-de-son-sujet.tf.jsonl` | fichier | 2,6 Ko | non versionné | 1 ligne(s) JSONL |
 | `candidature-ecrivain-unique.tf.jsonl` | fichier | 1,0 Ko | 2026-08-13 | 1 ligne(s) JSONL |
 | `candidature-fins-de-ligne-vues-generees.tf.jsonl` | fichier | 2,8 Ko | 2026-08-18 | 1 ligne(s) JSONL |
 | `candidature-gabarit-a0.tf.jsonl` | fichier | 861 o | 2026-08-13 | 1 ligne(s) JSONL |
@@ -32,4 +33,4 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `Digit-AI - Candidatures Forge - Extension Run-Delivery - 20260816b.tf.jsonl` | fichier | 5,8 Ko | 2026-08-17 | 2 ligne(s) JSONL |
 | `proposition-tuyauterie.tf.jsonl` | fichier | 3,7 Ko | 2026-08-13 | 5 ligne(s) JSONL |
 
-_17 fichier(s), 0 sous-dossier(s)_
+_18 fichier(s), 0 sous-dossier(s)_
