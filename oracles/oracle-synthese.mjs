@@ -44,13 +44,30 @@
  *   S16 toute décision porte sa RECOMMANDATION et la SOURCE consultée d'où elle sort — ou la
  *       déclaration qu'aucune source disponible ne répond (22/08). Une question dont la
  *       réponse est dans un document déjà fourni ne se pose pas : elle se répond.
+ *   S17 un renvoi entre lignes nomme le SUJET ou son identifiant stable, JAMAIS une position
+ *       (TF-0507, 22/08) — « ligne 8 », « point 5 » désignent autre chose au message suivant,
+ *       la liste ayant été retriée. S14 exige un identifiant stable POUR l'item ; S17 exige
+ *       qu'on s'en serve POUR RENVOYER. Un identifiant qui ne sert jamais à renvoyer ne sert
+ *       à rien.
+ *   S18 les tableaux d'un même bloc portent le MÊME en-tête (TF-0509, 22/08) — cinq mises en
+ *       page pour le même contenu dans une seule session, dont un bloc à quatre formes de
+ *       tableau distinctes. Une liste dont les colonnes changent ne se compare pas, même avec
+ *       des identifiants stables : le bénéfice de S14 est annulé.
+ *   S19 toute action du bloc 8 dit CE QUI SE PASSE SI ELLE N'EST PAS FAITE (TF-0510, 22/08) —
+ *       symétrique de S16 côté actions. Une liste de restes sans conséquences est un
+ *       inventaire, pas un outil d'arbitrage : c'est cette colonne qui permet de choisir ce
+ *       qu'on laisse tomber.
+ *   S20 un terme du référentiel `gabarits\JARGON-A-GLOSER.json` employé aux blocs 3 ou 8
+ *       porte sa glose adjacente (TF-0511, 22/08) — S9 ne juge que l'OUVERTURE, or c'est aux
+ *       blocs qu'on EXÉCUTE que le jargon coûte le plus : un jargon au bloc 0 fait perdre le
+ *       fil, un jargon dans une action fait exécuter de travers ou pas du tout.
  *
  * Usage : node oracle-synthese.mjs <synthese.md>   → verdict JSON
  *         node oracle-synthese.mjs --self-test     → fixtures double sens
  * Exit : 0 PASS · 1 FAIL · 2 non jugeable.
  */
 import { existsSync, readFileSync, writeFileSync, mkdtempSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -107,13 +124,63 @@ function puces(texte) {
 // continuations et ses sous-puces. Juger la puce seule était le faux positif à ne pas
 // reproduire (TF-0459) — la doctrine dit deux niveaux au plus, et c'est précisément au second
 // que vivent le motif, le chemin et la commande. Grouper est donc la seule lecture juste.
+//
+// DEUXIÈME FORME, ajoutée le 22/08 (TF-0508) : la LIGNE DE TABLEAU. Le lecteur l'a réclamée
+// trois fois dans une seule session — « pourquoi tout n'est pas dans un seul tableau ? », puis
+// « Revois complètement ta présentation », puis « tableau !! ». Ne lire que les puces laissait
+// donc un TROU BÉANT : un bloc 8 rendu en tableau rendait zéro groupe, S11 à S14 répondaient
+// « aucune action concernée » et le bloc entier échappait au jugement. Une règle qui se
+// DÉSACTIVE au moment où l'on adopte la forme demandée est pire qu'une règle absente : elle
+// donne un vert en récompense du changement de forme.
 function actionsGroupees(texte) {
   const groupes = [];
   for (const ligne of texte.split("\n")) {
+    if (/^\s*\|/.test(ligne)) continue;            // les tableaux sont lus plus bas
     if (/^[-*]\s+\S/.test(ligne)) groupes.push(ligne);
     else if (groupes.length && /^\s+\S/.test(ligne)) groupes[groupes.length - 1] += " " + ligne.trim();
   }
-  return groupes;
+  return groupes.concat(lignesDeDonnees(texte));
+}
+
+// Les lignes de DONNÉES d'un tableau markdown : ni l'en-tête (1re ligne du tableau), ni le
+// séparateur `|---|`. Un bloc peut porter plusieurs tableaux — le compteur repart à zéro dès
+// qu'une ligne non-tableau les sépare.
+function lignesDeDonnees(texte) {
+  const sortie = [];
+  let rang = 0;
+  for (const l of texte.split("\n")) {
+    if (!/^\s*\|/.test(l)) { rang = 0; continue; }
+    rang++;
+    if (rang === 1) continue;                                    // en-tête
+    if (/^\s*\|[\s|:.-]*\|\s*$/.test(l)) continue;                 // séparateur
+    if (!l.replace(/[|\s]/g, "")) continue;                       // ligne vide
+    sortie.push(l.trim());
+  }
+  return sortie;
+}
+
+// Les EN-TÊTES de tableau d'un bloc, dans l'ordre : première ligne de chaque tableau.
+function entetesDeTableau(texte) {
+  const sortie = [];
+  let rang = 0;
+  for (const l of texte.split("\n")) {
+    if (!/^\s*\|/.test(l)) { rang = 0; continue; }
+    rang++;
+    if (rang === 1) sortie.push(l.trim().replace(/\s+/g, " ").toLowerCase());
+  }
+  return sortie;
+}
+
+// Le référentiel de jargon est une DONNÉE éditable et datée (loi n° 4) : son absence n'est pas
+// une erreur d'oracle, c'est un SANS OBJET dit à voix haute. Un oracle qui plante faute de
+// donnée annexe se fait retirer du chemin, et la règle meurt avec lui.
+function chargerJargon() {
+  const chemin = join(dirname(fileURLToPath(import.meta.url)), "..", "gabarits", "JARGON-A-GLOSER.json");
+  if (!existsSync(chemin)) return [];
+  try {
+    const d = JSON.parse(readFileSync(chemin, "utf8"));
+    return (d.termes || []).map((t) => t.terme).filter((t) => typeof t === "string" && t.length > 1);
+  } catch { return []; }
 }
 
 function bloc(texte, motif) {
@@ -191,8 +258,20 @@ function juger(texte) {
     : ok("S7", "profondeur de puces tenue (2 niveaux au plus)");
 
   // S8 — pas de ✓ sans preuve dans la même puce
+  //
+  // S19 (22/08) a introduit une tournure NÉGATIVE qui contient le mot « fait » : « si rien n'est
+  // fait », « si on ne le fait pas », « si elle n'est pas faite ». S8 y lisait une affirmation de
+  // fait sans preuve — faux positif constaté LE JOUR MÊME en jouant S19 sur une restitution
+  // réelle : quatre actions correctement conséquencées faisaient échouer S8. Une conséquence n'est
+  // pas un ✓, et une règle neuve qui met une règle ancienne en défaut sur du texte conforme est un
+  // défaut de la NOUVELLE, pas de l'ancienne. On retire donc la clause conditionnelle avant de
+  // chercher l'affirmation ; la preuve, elle, reste cherchée dans la puce ENTIÈRE.
+  const sansConditionnel = (l) => l
+    .replace(/\bsi\b[^.;]*?\bfaite?\b/gi, " ")
+    .replace(/\bne (?:le |la |les )?fait pas\b/gi, " ")
+    .replace(/\bnon fait\b/gi, " ");
   const nus = puces(texte).filter((l) => {
-    if (!/(✓|\bfait\b|\btermin[ée]|\bsold[ée]|\bclos\b)/i.test(l)) return false;
+    if (!/(✓|\bfait\b|\btermin[ée]|\bsold[ée]|\bclos\b)/i.test(sansConditionnel(l))) return false;
     return !preuve(l);
   });
   nus.length
@@ -207,11 +286,23 @@ function juger(texte) {
   // chemin de fichier, sans span de code, sans sha. Le détail vérifiable ne disparaît pas : il
   // vient APRÈS — on ordonne, on ne supprime jamais (doctrine RL-1/RL-7 des rapports,
   // transposée à la conversation, la seule surface qui restait sans doctrine d'audience).
+  // TF-0513 (22/08) — les deux retraits étaient ORDONNÉS et tous deux ancrés en `^` : titre
+  // d'abord, frontmatter ensuite. Or le gabarit PRESCRIT le frontmatter `destinataire: humain`
+  // depuis TF-0331, donc il vient EN PREMIER dans toute synthèse conforme : le retrait du titre
+  // ne matchait rien, et LE TITRE RESTAIT dans l'ouverture. S9 jugeait alors le H1 comme de la
+  // prose de bloc 0, et un titre daté selon la convention de nommage (« … — 20260822a ») s'y
+  // faisait lire comme un sha court. Deux règles prescrites par le MÊME gabarit se
+  // contredisaient, sur un document sans défaut et devant un hook `Stop` bloquant.
+  //
+  // Le remède ne réordonne pas : il boucle jusqu'à point fixe, donc il est INDIFFÉRENT à
+  // l'ordre — frontmatter puis titre, titre puis frontmatter, ou l'un sans l'autre.
   const premierBloc = texte.search(/(^|\n)#{2,4}\s/);
-  const ouverture = (premierBloc > 0 ? texte.slice(0, premierBloc) : "")
-    .replace(/^#[^\n]*\n/, "")           // le titre H1 n est pas la synthese
-    .replace(/^---[\s\S]*?---\s*/, "")  // le frontmatter non plus
-    .trim();
+  let ouverture = (premierBloc > 0 ? texte.slice(0, premierBloc) : "").trim();
+  for (let i = 0; i < 4; i++) {
+    const avant = ouverture;
+    ouverture = ouverture.replace(/^---[\s\S]*?\n---\s*/, "").replace(/^#[^\n]*\n?/, "").trim();
+    if (ouverture === avant) break;
+  }
   const mots = ouverture.split(/\s+/).filter(Boolean).length;
   const techniques = [
     [/\bTF-\d{3,4}\b/, "identifiant TF nu"],
@@ -311,6 +402,115 @@ function juger(texte) {
     "une action sans identifiant stable ni mention `neuve` : deux restitutions successives ne se comparent pas, " +
     "et la même ligne se re-sert d'une liste à l'autre.",
     "chaque action porte un identifiant stable ou se déclare neuve");
+
+  // ---- S19 (TF-0510, 22/08) — une action dit ce qui se passe si elle n'est PAS faite -------
+  //
+  // Demande humaine du 22/08, littérale et SYMÉTRIQUE : « fournir des actions claires, les
+  // impacts de ces actions, les recos sur ces actions, des décisions claires, les impacts de ces
+  // décisions, les recos des décisions ». Le référentiel n'en couvrait qu'une moitié : au bloc 3,
+  // S15 et S16 exigent le sujet, la recommandation et sa source ; au bloc 8, S11 à S14 exigent le
+  // motif, la raison, l'exécutabilité et l'identifiant — et AUCUNE n'exige la conséquence.
+  //
+  // Or c'est cette colonne qui rend la liste arbitrable : une liste de restes sans conséquences
+  // est un inventaire, pas un outil de décision. Constaté à l'usage la même session — les
+  // tableaux portant « si on ne fait rien » ont été acceptés, les autres redemandés.
+  //
+  // La RECOMMANDATION, elle, n'est pas exigée ici : une action n'offre pas toujours un choix, et
+  // l'imposer partout produirait du remplissage. C'est l'asymétrie assumée avec S16.
+  const CONSEQUENCE = /(si (?:rien |on )?(?:n(?:'|’)est|ne (?:le|la|les) fait|n(?:'|’)y a)|si (?:elle|il|ce) n(?:'|’)est pas (?:fait|trait|men|pris)|si non fait|sans (?:cette )?action|à défaut|conséquence si|impact si|sinon\s*[:,])/i;
+  juger8("S19", ACTEURS, (g) => CONSEQUENCE.test(g),
+    "une action sans ce qui se passe si elle N'EST PAS faite : la liste devient un inventaire au lieu " +
+    "d'un outil d'arbitrage — c'est cette colonne qui permet de choisir ce qu'on laisse tomber. " +
+    "Formes admises : « si rien n'est fait », « si on ne le fait pas », « à défaut », « sinon : », « impact si … ».",
+    "chaque action dit ce qu'il en coûte de ne pas la faire");
+
+  // ---- S18 (TF-0509, 22/08) — la forme ne change pas d'un tableau au suivant ----------------
+  //
+  // Mesure du 22/08 sur UNE session : au moins cinq mises en page pour le même contenu — prose
+  // mêlée de tableaux, trois sections par acteur, un tableau unique, six sections portant quatre
+  // formes de tableau distinctes, des fiches en prose, un tableau à nouveau. Le lecteur a tranché
+  // en trois mots (« tableau !! ») après avoir écrit « toujours pas claire, recommence » et
+  // « Revois complètement ta présentation ».
+  //
+  // Le coût n'est pas esthétique : à chaque changement de forme, le lecteur RÉAPPREND la mise en
+  // page avant de pouvoir lire, et il perd la comparaison avec le message précédent — ce qui
+  // annule le bénéfice de S14. Une liste dont les colonnes changent ne se compare pas, même avec
+  // des identifiants stables.
+  //
+  // CE QUI EST JUGÉ ICI, et pas plus : la cohérence INTRA-document, bloc par bloc. Un bloc qui
+  // porte deux tableaux d'en-têtes différents est un défaut — c'est exactement le cas mesuré
+  // (« six sections, quatre formes »). La stabilité d'un TOUR AU SUIVANT demanderait de garder
+  // l'état du tour précédent : elle est déclarée en `non_juge` plutôt que faussement promise.
+  const entetesIncoherents = [];
+  for (const [nom, bloc3ou8] of [["3", bDecisions], ["8", bActions]]) {
+    const e = [...new Set(entetesDeTableau(bloc3ou8))];
+    if (e.length > 1) entetesIncoherents.push(`bloc ${nom} : ${e.length} formes de tableau`);
+  }
+  entetesIncoherents.length
+    ? ko("S18", `${entetesIncoherents.join(" · ")} — une liste dont les colonnes changent ne se compare pas, ` +
+      "même avec des identifiants stables : le bénéfice de S14 est annulé. Un acteur est une COLONNE, pas une section.")
+    : ok("S18", "forme de tableau cohérente dans chaque bloc");
+
+  // ---- S17 (TF-0507, 22/08) — un renvoi nomme son sujet, jamais une position ----------------
+  //
+  // Fait mesuré sur pièce : une restitution renvoyait « préalable : ligne 8 (droit IAM) puis
+  // ligne 5 (merge) ». Réponse du lecteur, mot pour mot : « Que veut dire ligne 8 (droit IAM)
+  // puis ligne 5 (merge). C'est incompréhensible. » Vérification : les deux numéros avaient
+  // changé de sens entre deux messages, le tri par urgence ayant déplacé les lignes.
+  //
+  // C'est le pendant, au niveau du RENVOI, de ce que S14 corrige au niveau de l'ITEM. S14 exige
+  // un identifiant stable POUR l'action ; rien n'interdisait de la DÉSIGNER par sa position. Un
+  // identifiant stable qui ne sert jamais à renvoyer ne sert à rien.
+  //
+  // `bloc` est délibérément HORS du motif : « voir le bloc 3 » désigne une structure fixe du
+  // gabarit, pas une position dans une liste retriable.
+  const RENVOI_POSITION = /\b(lignes?|points?|items?|puces?|entrées?|numéros?)\s*(?:n[°o]\s*)?\d+/i;
+  const renvois = [bDecisions, bActions].flatMap((b) => b.split("\n")).filter((l) => RENVOI_POSITION.test(l));
+  renvois.length
+    ? ko("S17", `${renvois.length} renvoi(s) par POSITION dans les blocs 3 et 8 — la liste est retriée d'un ` +
+      `message au suivant, le numéro désigne alors autre chose. Nommer le sujet ou son identifiant stable. ` +
+      `Ex. : ${renvois[0].replace(/\s+/g, " ").trim().slice(0, 100)}`)
+    : ok("S17", "aucun renvoi par position — les renvois nomment leur sujet");
+
+  // ---- S20 (TF-0511, 22/08) — le jargon des blocs 3 et 8 porte sa glose --------------------
+  //
+  // Mesure du 22/08 : le lecteur a demandé DEUX FOIS l'explication du même point — « détaille 5 »,
+  // puis « Explique 5 ». La première version employait « justificatif fédéré », « identité
+  // system-assigned », « UAMI », « constat H2 », « filet » sans les gloser ; la seconde, écrite
+  // sans aucun de ces termes, a été acceptée immédiatement.
+  //
+  // Le raisonnement de S9 s'applique mot pour mot — « une information remontée et non comprise a
+  // le même effet qu'une information tue, avec le coût de lecture en plus » — mais S9 ne juge que
+  // l'OUVERTURE. Or c'est aux blocs qu'on EXÉCUTE que le coût est le plus élevé : un jargon au
+  // bloc 0 fait perdre le fil, un jargon dans une action fait exécuter de travers, ou pas du tout.
+  //
+  // Le référentiel est une DONNÉE (loi n° 4), fermée et datée : `gabarits\JARGON-A-GLOSER.json`.
+  // Une heuristique sur les sigles en majuscules aurait un taux de faux positifs rédhibitoire
+  // dans ce corpus, où la MAJUSCULE sert l'emphase — et un oracle qui crie sur l'emphase se fait
+  // désactiver dans la semaine. La liste n'attrape que ce qui a réellement coûté un aller-retour.
+  const jargon = chargerJargon();
+  if (!jargon.length) {
+    ok("S20", "référentiel de jargon absent ou vide — aucun terme à exiger (SANS OBJET, dit plutôt que tu)");
+  } else {
+    const nus = [];
+    for (const [nom, b] of [["3", bDecisions], ["8", bActions]]) {
+      for (const g of actionsGroupees(b)) {
+        const preuveInterne = /(preuve|source consult)/i.test(g);
+        for (const t of jargon) {
+          const re = new RegExp(`${t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*[(\u00ab]`, "i");
+          if (new RegExp(`\\b${t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(g) && !re.test(g) && !preuveInterne) {
+            nus.push(`bloc ${nom} : « ${t} »`);
+          }
+        }
+      }
+    }
+    const uniques = [...new Set(nus)];
+    uniques.length
+      ? ko("S20", `${uniques.length} terme(s) de jargon sans glose adjacente aux blocs 3/8 : ${uniques.slice(0, 4).join(" · ")} — ` +
+        "une information remontée et non comprise a le même effet qu'une information tue, avec le coût de lecture en plus. " +
+        "Glose = une parenthèse qui suit le terme dans le même groupe. Référentiel : `gabarits\\JARGON-A-GLOSER.json`.")
+      : ok("S20", `aucun terme de jargon nu aux blocs 3/8 (${jargon.length} terme(s) au référentiel)`);
+  }
 
   // ---- S15 (22/08) — une décision RAPPELLE SON SUJET, ou elle n'est pas décidable -----------
   //
@@ -431,18 +631,25 @@ Aucun écart : la demande a été suivie à la lettre.
 - d'abord TF-0220 (manuelle_dev) — parce qu'il débloque toute correction ultérieure du corpus.
   - pourquoi pas l'IA : decision — arbitrage normatif sur le seuil retenu ;
   - où : \`forge_tests\\corpus.py\`, puis relancer la recette S-01.
+  - si rien n'est fait : les corrections suivantes du corpus restent bloquées derrière celle-là.
 - ensuite TF-0221 (manuelle_utilisateur) — décision normative, impact sur 19 citations.
   - pourquoi pas l'IA : acces — le portail de publication n'est pas ouvert à l'agent ;
   - où : écran « Publier la version », bouton \`Publier\`.
+  - si rien n'est fait : les 19 citations continuent de pointer une version non publiée.
 - enfin TF-0222 (auto_ia) — regrouper les constats par cause racine.
   - motif de non-exécution : dependance_bloc_3 — attend la décision de publication ci-dessus.
+  - si rien n'est fait : les constats restent listés un par un, sans leur cause commune.
 `;
-  // Rouge : sept violations distinctes et indépendantes.
+  // Rouge : onze violations distinctes et indépendantes. Le bloc 8 porte DEUX tableaux de formes
+  // différentes en plus des puces — c'est la forme réclamée par le lecteur le 22/08, et c'est
+  // aussi celle qui rendait S11-S14 muettes avant TF-0508 : la fixture les tient désormais.
   const rouge = verte
     .replace(/## 8\. Prochaines actions[\s\S]*$/,
       "## 8. Prochaines actions\n" +
-      "- d'abord regrouper les constats (auto_ia) — parce que c'est le plus rentable.\n" +
-      "- ensuite publier la version (manuelle_dev) — parce que tout est prouvé.\n")
+      "- d'abord regrouper les constats (auto_ia) — parce que c'est le plus rentable, préalable : ligne 8 (droit IAM).\n" +
+      "- ensuite publier la version (manuelle_dev) — parce que tout est prouvé, il faut un UAMI.\n" +
+      "\n| id | acteur | action |\n|---|---|---|\n| A1 | manuelle_utilisateur | ouvrir le portail |\n" +
+      "\n| acteur | quoi |\n|---|---|\n| auto_ia | regrouper les constats |\n")
     .replace(/\n\nLe contrôle complet[\s\S]*?ci-dessous\./, "")  // S9 : plus d ouverture
     .replace("terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot.", "terminée aujourd'hui.")
     .replace("- Regroupement par cause racine : motif — sa cause est traitée, critère de réouverture écrit.", "- Regroupement par cause racine")
@@ -459,13 +666,14 @@ Aucun écart : la demande a été suivie à la lettre.
   if (rv.status !== 0) casse.push("la fixture VERTE ne passe pas : " + rv.stdout);
   if (rr.status !== 1) casse.push("la fixture ROUGE ne FAIL pas");
   else {
-    for (const regle of ["S2", "S3", "S5", "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16"]) {
+    for (const regle of ["S2", "S3", "S5", "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16",
+                         "S17", "S18", "S19", "S20"]) {
       if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
     }
   }
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 2/2 PASS (verte PASS ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée)");
+    : "Self-test restitution : 2/2 PASS (verte PASS ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose)");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -477,7 +685,7 @@ const findings = juger(readFileSync(arg, "utf8"));
 const verdict = verdictDe(findings);
 console.log(JSON.stringify({
   oracle: "oracle-synthese",
-  version: "1.1.0",
+  version: "1.2.0",
   cible: arg,
   verdict,
   findings,
@@ -485,6 +693,10 @@ console.log(JSON.stringify({
     "la JUSTESSE du verdict, la pertinence d'un risque, la sincérité d'un motif — cet oracle tient la forme opposable, jamais le fond",
     "la longueur de prose (≤ 400 mots) n'est pas mesurée ici : séparer récit et énumération demande une lecture, pas un compteur",
     "la SINCÉRITÉ d'un motif S11/S12 : `hors_mandat` apposé sur une action que le mandat courant couvre contourne S11 au lieu de la satisfaire, et aucun oracle ne peut le voir — seul un lecteur le peut",
+    "S18 ne juge que la cohérence INTRA-document : deux tableaux d'en-têtes différents dans un même bloc. La stabilité d'un TOUR AU SUIVANT — le vrai défaut mesuré le 22/08, cinq mises en page pour un même contenu — demanderait de conserver l'état du tour précédent ; elle est déclarée ici plutôt que faussement promise",
+    "S19 n'exige PAS de recommandation sur une action, à la différence de S16 sur une décision : une action n'offre pas toujours un choix, et l'exiger partout produirait du remplissage. L'asymétrie est voulue",
+    "S20 ne voit QUE les termes du référentiel `gabarits\\JARGON-A-GLOSER.json` : un jargon qui n'a encore coûté aucun aller-retour n'est pas détecté. C'est le prix assumé du zéro faux positif — dans ce corpus la MAJUSCULE sert l'emphase, et une heuristique sur les sigles crierait sur « MESURE » et « AUCUNE ». Le canal de croissance de la liste est le retour humain, pas la devinette",
+    "S20 ne juge pas la JUSTESSE d'une glose : la présence d'une parenthèse après le terme, jamais qu'elle explique vraiment",
   ],
 }, null, 1));
 process.exit(verdict === "PASS" ? 0 : 1);
