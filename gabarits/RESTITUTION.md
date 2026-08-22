@@ -355,22 +355,26 @@ appliquent pas non plus : elles jugent un fichier, et une CLI n'en écrit pas.
 
 ## Contrôle
 
-**Trois bornes de domaine, ecrites parce quelles ont ete trouvees en jouant les regles neuves
-sur une restitution reelle le 22/08** — et chaque fois le defaut etait celui de la regle NEUVE,
-jamais celui de lauteur :
+**Trois bornes de domaine, écrites parce qu'elles ont été trouvées en jouant les règles neuves
+sur une restitution RÉELLE, le 22/08** — et chaque fois le défaut était celui de la règle NEUVE,
+jamais celui de l'auteur :
 
-- **une ligne de tableau se juge AVEC son en-tete.** En forme de puce, le motif dune action vit
-  dans la puce ; en forme de TABLEAU, il vit dans la COLONNE. S19 refusait un tableau dont la
-  derniere colonne sappelait pourtant « si elle nest pas faite » : elle exigeait de recopier la
-  locution dans chacune des cinq cellules. Deux regles du meme jour se contredisaient — S18
-  prescrit le tableau, S19 le rendait impossible a satisfaire proprement ;
-- **S8 est bornee aux blocs qui AFFIRMENT** (verdict, traite, actions). Elle balayait le document
-  entier et mordait sur deux formes que ce gabarit PRESCRIT ailleurs : le bloc 6 (« vous avez
-  demande -> jai fait -> pourquoi », dont la preuve est le POURQUOI et jamais un verdict) et le
-  bloc 7, ou « un travail fait deux fois » naffirme rien. Les blocs 5, 6 et 7 parlent par
-  construction de ce qui na PAS ete fait : y chercher un ✓ sans preuve est une erreur de domaine ;
-- **S8 ignore la tournure conditionnelle de S19.** « si rien nest fait » contient le mot « fait »,
-  que S8 lisait comme une affirmation de completion sans preuve.
+- **une ligne de tableau se juge AVEC son en-tête.** En forme de puce, le motif d'une action vit
+  dans la puce ; en forme de TABLEAU — la forme réclamée trois fois par le lecteur — il vit dans
+  la COLONNE, donc dans l'en-tête. S19 refusait un tableau dont la dernière colonne s'appelait
+  pourtant « si elle n'est pas faite » : 5 actions sur 5, et elle exigeait de recopier la locution
+  dans chacune des cinq cellules. **Deux règles du même jour se contredisaient** — S18 prescrit le
+  tableau, S19 le rendait impossible à satisfaire proprement. Une règle qui force à recopier cinq
+  fois la même locution pousse au bruit, pas à la clarté ;
+- **S8 est bornée aux blocs qui AFFIRMENT** — verdict, traité, actions. Elle balayait le document
+  entier et mordait sur deux formes que ce gabarit PRESCRIT ailleurs : le bloc 6, dont la forme
+  « vous avez demandé → j'ai fait → pourquoi » est littéralement imposée et dont la preuve est le
+  POURQUOI, jamais un verdict d'oracle ; et le bloc 7, où « un travail fait deux fois » n'affirme
+  rien. Les blocs 5, 6 et 7 parlent PAR CONSTRUCTION de ce qui n'a pas été fait, de ce qui a
+  divergé et de ce qui pourrait casser : y chercher un ✓ sans preuve est une erreur de domaine.
+  **Un oracle qui refuse la formulation qu'un gabarit prescrit met le GABARIT en défaut** ;
+- **S8 ignore la tournure conditionnelle de S19.** « si rien n'est fait » contient le mot
+  « fait », que S8 lisait comme une affirmation de complétion sans preuve.
 
 **Exécuté** : `node oracles\oracle-synthese.mjs <synthese.md>` — règles S1-S20 binaires,
 fixtures double sens au self-test (la fixture rouge échoue sur 15 règles distinctes).
