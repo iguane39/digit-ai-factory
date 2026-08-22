@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=6184b864a809 archive=9f205b231527 · dernier événement: 2026-08-22T07:33:44.173Z -->
+     sceaux: actifs=f661ebdd6c1c archive=9f205b231527 · dernier événement: 2026-08-22T07:41:50.413Z -->
 
-**161 actifs** (candidat 5 · décidé 0 · en cours 2 · corrigé 153 · écarté 1) · **308 archivés**.
+**162 actifs** (candidat 6 · décidé 0 · en cours 2 · corrigé 153 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -182,6 +182,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0462 | en_cours | 4 | pilot : aucune vue PORTEFEUILLE n'existe, et la vue par produit n'est instanciee nulle part — le gabarit TODO-PRODUIT n'a jamais ete pose dans un seul produit | **oui** — une decision prise le 17/08 (TF-0318, vue du reste-a-faire hors session) n'a produit aucun fichier dans aucun produit cinq jours plus tard — le gabarit existe, la doctrine existe, et le developpeur qui devait en beneficier declare le 22/08 qu'il n'a pas de liste exploitable |
+| TF-0469 | candidat | 7.5 | pilot : la recette du pilot devient ROUGE parce qu'un CANDIDAT est ecrit en prose dense — un contributeur casse la recette de tous, et paie zero | **oui** — une recette poussee ROUGE sur main sans que rien ne l'ait signale a celui qui l'a rendue rouge, et un correctif impossible par la voie evidente puisque le texte fautif appartient a un lot deja ingere |
 | TF-0327 | corrige | 12 | RV-9 n'est pas refermé : la fixture témoin de la bascule sombre démontre ENCORE le comportement interdit | **oui** — deux livrables du même socle peuvent encore s'ouvrir différemment sur le même poste — le symptôme exact que RV-9 prétendait avoir soldé |
 | TF-0456 | corrige | 12 | README de dossier : la date d'un dossier incluait celle de son PROPRE README — chaque commit périmait le README du parent, l'arbre n'était jamais propre deux commandes de suite | **oui** — mesuré le 22/08 : après un commit de 8 README régénérés, 3 nouveaux README repassaient périmés sans qu'aucun contenu de dossier n'ait bougé — un dépôt qui ne peut pas rester propre apprend à ses lecteurs à ignorer git status, et c'est ce coût-là qui est payé à chaque commande |
 | TF-0468 | corrige | 10 | Le gate de restitution faisait afficher la réponse DEUX FOIS : un hook Stop juge après l'affichage, et la version refusée reste à l'écran | **oui** — payé par le destinataire des restitutions à chaque refus depuis le 20/08 : trois restitutions entières relues pour une puce sans preuve — et la version REFUSÉE reste visible, ce qui est l'inverse exact du but du gate (rendre lisible ce qui est remis) |
