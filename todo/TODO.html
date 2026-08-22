@@ -113,7 +113,14 @@
     .card-detail .lead{margin:.2em 0 .4em}
     .detail-label{font-family:var(--head);font-weight:700;font-size:.82rem;color:var(--muted);margin:.6em 0 .2em;text-transform:uppercase;letter-spacing:.03em}
     .puces{margin:.2em 0 .4em;padding-left:1.2em} .puces li{margin:.28em 0}
-    .card-detail,.card-detail li,.card-meta dd{overflow-wrap:anywhere}
+    /* TF-0492 (22/08) : sur de la PROSE, anywhere casse un mot en deux au milieu d une ligne
+       (« Utilisabl/e », « 231 occurrenc/es ») — trois fois signale par un client. break-word ne
+       coupe que ce qui ne tient pas, ce qui est le comportement voulu ici : le contenu des
+       candidatures est du francais, avec quelques chemins longs. La regle L19 du socle refuse
+       desormais anywhere sur un selecteur de prose, et elle a mordu sur CETTE page. */
+    .card-detail,.card-detail li,.card-meta dd{overflow-wrap:break-word}
+    /* Le code et les chemins, eux, ont besoin de casser n importe ou : la regle les exempte. */
+    .card-detail code,.card-detail pre{overflow-wrap:anywhere}
     .card-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 20px;margin:14px 0 0;padding-top:12px;border-top:1px solid var(--line)}
     .card-meta .impact{grid-column:1/-1}
     .card-meta dt{font-family:var(--head);font-weight:700;font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
@@ -139,7 +146,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>0568ae2e68c4</code> · dernier événement 2026-08-22T16:00:05.829Z</p>
+      <p class="meta">sceau <code>eeb70a27233e</code> · dernier événement 2026-08-22T16:16:29.223Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -149,7 +156,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="22 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">22</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="21 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">21</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="1 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">1</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="468 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">468</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -192,13 +199,19 @@
       <span id="compteur" class="compteur" aria-live="polite">50 / 50 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">9 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">19 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-seo-geo"><strong>digit-ai-forge-seo-geo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">10 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">10 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">19 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-seo-geo"><strong>digit-ai-forge-seo-geo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">9 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-factory">
-      <h2>digit-ai-factory <span class="badge" title="9 item(s) actifs ciblant digit-ai-factory">9</span></h2>
+      <h2>digit-ai-factory <span class="badge" title="10 item(s) actifs ciblant digit-ai-factory">10</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-factory</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-corrige" id="item-TF-0496" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0496" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0496</code>
             <span class="statut s-corrige">corrige</span>
@@ -215,7 +228,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0507" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0507" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0507</code>
             <span class="statut s-corrige">corrige</span>
@@ -232,7 +251,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0508" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0508" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0508</code>
             <span class="statut s-corrige">corrige</span>
@@ -249,7 +274,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0513" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0513" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0513</code>
             <span class="statut s-corrige">corrige</span>
@@ -266,7 +297,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0510" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0510" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0510</code>
             <span class="statut s-corrige">corrige</span>
@@ -283,7 +320,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0504" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0504" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0504</code>
             <span class="statut s-corrige">corrige</span>
@@ -300,7 +343,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0509" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0509" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0509</code>
             <span class="statut s-corrige">corrige</span>
@@ -317,7 +366,36 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0511" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0516" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0516</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">hook-restitution : un message CONFORME est refuse parce que le hook juge un AUTRE texte que celui affiche — le preambule d un tour, pas la restitution</h3>
+          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 22/08, sur un refus reel et reproduit sur piece.</p><ul class="puces"><li>Le hook Stop `oracles/hook-restitution.mjs` a refuse une restitution avec quatre echecs BLOQUANTS : S1 « bloc</li><li>absent</li><li>» sur LES HUIT blocs, puis S3, S4 et S6, qui decoulent tous de l absence de bloc. OR LE MESSAGE PORTAIT BIEN SES NEUF TITRES. La preuve est directe et rejouable : le texte EXACT du message a ete relu dans le transcript (10 710 caracteres, un seul bloc de texte, titres `### 1.` a `### 9.` presents) et passe a `oracle-synthese` — verdict PASS sur les 20 regles. Le message etait donc conforme ; c est ce que le HOOK A LU qui ne l etait pas. MECANISME. `analyserTranscript` retient `dernierTexte` = le dernier bloc de texte d un message assistant du tour. Le tour incrimine portait DEUX textes : un preambule d une phrase (116 caracteres, « Les apostrophes ont saute dans le texte insere au gabarit — je corrige »), puis la restitution. Un preambule d une phrase ne porte evidemment aucun des huit blocs, et il rend exactement les quatre echecs constates. Deux causes possibles, non departagees ici :</li><li>le transcript n avait pas encore recu la restitution quand le hook a lu le fichier — course d ecriture, et le dernier texte disponible etait le preambule</li><li>l ordre des entrees ne place pas la restitution en dernier dans tous les cas. CE QUE CA COUTE, et c est cher : le gate est BLOQUANT depuis la v2.4.0, donc un refus force a reecrire un message DEJA CONFORME — huit blocs relus pour rien, c est-a-dire exactement le cout que la v2.5.0 (proportionnalite des regles) existait pour supprimer. Pire : le motif affiche accuse l auteur (« tes huit blocs sont absents ») alors que l auteur les a ecrits. Un gate qui accuse a tort s apprend a contourner, et R-33 bis dit ce qu il en advient. TROIS VOIES, aucune tranchee :</li><li>juger la CONCATENATION de tous les blocs de texte du tour, et non le seul dernier — un preambule cesse alors de masquer la restitution, au prix de juger aussi le preambule</li><li>juger le PLUS LONG bloc de texte du tour, heuristique simple qui colle a l intention (une restitution est longue, un preambule court)</li><li>juger le dernier texte MAIS refuser de conclure quand il fait moins de N caracteres et ne porte aucun titre — declarer NON JUGEABLE plutot que FAIL, sur le modele des SKIP motives d oracle-sca. La voie</li><li>plus la voie</li><li>ont ma preference et je ne les prends pas : modifier le hook Stop change ce que TOUTES les sessions du poste subissent, et c est une decision humaine (R-29). CONTOURNEMENT EMPLOYE EN ATTENDANT, et il est lui-meme un cout a declarer : ne plus ecrire AUCUN texte avant la restitution dans un tour de travail. C est une contrainte de redaction imposee par un defaut d outil, pas par le gabarit</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>mesure le 22/08 : un refus BLOQUANT sur un message dont le texte exact rend PASS sur les 20 regles quand on le rejoue. Le motif affiche accuse l auteur d avoir omis les huit blocs alors qu ils sont ecrits. Contournement subi : interdiction de fait d ecrire une phrase avant la restitution dans un tour de travail.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du 22/08, pendant le mandat de traitement des todos — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0511" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0511</code>
             <span class="statut s-corrige">corrige</span>
@@ -334,7 +412,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0503" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0503" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0503</code>
             <span class="statut s-corrige">corrige</span>
@@ -357,7 +441,13 @@
       <h2>digit-ai-forge-agents <span class="badge" title="19 item(s) actifs ciblant digit-ai-forge-agents">19</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-agents</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-en_cours" id="item-TF-0324" data-forge="digit-ai-forge-agents" data-statut="en_cours" data-prio="moyenne">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-en_cours" id="item-TF-0324" data-cite data-forge="digit-ai-forge-agents" data-statut="en_cours" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0324</code>
             <span class="statut s-en_cours">en_cours</span>
@@ -374,7 +464,13 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0495" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0495" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0495</code>
             <span class="statut s-candidat">candidat</span>
@@ -391,7 +487,13 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0518" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0518" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0518</code>
             <span class="statut s-candidat">candidat</span>
@@ -408,7 +510,13 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0515" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0515" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0515</code>
             <span class="statut s-candidat">candidat</span>
@@ -425,7 +533,13 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0475" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="moyenne">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0475" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0475</code>
             <span class="statut s-candidat">candidat</span>
@@ -442,7 +556,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0484" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0484" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0484</code>
             <span class="statut s-corrige">corrige</span>
@@ -459,7 +579,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0485" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0485" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0485</code>
             <span class="statut s-corrige">corrige</span>
@@ -476,7 +602,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0488" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0488" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0488</code>
             <span class="statut s-corrige">corrige</span>
@@ -493,7 +625,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0499" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0499" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0499</code>
             <span class="statut s-corrige">corrige</span>
@@ -510,7 +648,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0486" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0486" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0486</code>
             <span class="statut s-corrige">corrige</span>
@@ -527,7 +671,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0487" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0487" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0487</code>
             <span class="statut s-corrige">corrige</span>
@@ -544,7 +694,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0492" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0492" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0492</code>
             <span class="statut s-corrige">corrige</span>
@@ -561,7 +717,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0501" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0501" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0501</code>
             <span class="statut s-corrige">corrige</span>
@@ -578,7 +740,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0517" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0517" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0517</code>
             <span class="statut s-corrige">corrige</span>
@@ -595,7 +763,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0490" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0490" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0490</code>
             <span class="statut s-corrige">corrige</span>
@@ -612,7 +786,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0497" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0497" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0497</code>
             <span class="statut s-corrige">corrige</span>
@@ -629,7 +809,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0478" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0478" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0478</code>
             <span class="statut s-corrige">corrige</span>
@@ -646,7 +832,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0500" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0500" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0500</code>
             <span class="statut s-corrige">corrige</span>
@@ -663,7 +855,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0323" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="moyenne">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0323" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0323</code>
             <span class="statut s-corrige">corrige</span>
@@ -686,7 +884,13 @@
       <h2>digit-ai-forge-audit <span class="badge" title="2 item(s) actifs ciblant digit-ai-forge-audit">2</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-audit</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0506" data-forge="digit-ai-forge-audit" data-statut="candidat" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0506" data-cite data-forge="digit-ai-forge-audit" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0506</code>
             <span class="statut s-candidat">candidat</span>
@@ -703,7 +907,13 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0505" data-forge="digit-ai-forge-audit" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0505" data-cite data-forge="digit-ai-forge-audit" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0505</code>
             <span class="statut s-corrige">corrige</span>
@@ -726,7 +936,13 @@
       <h2>digit-ai-forge-conception <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-conception">1</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-conception</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-corrige" id="item-TF-0498" data-forge="digit-ai-forge-conception" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0498" data-cite data-forge="digit-ai-forge-conception" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0498</code>
             <span class="statut s-corrige">corrige</span>
@@ -749,7 +965,13 @@
       <h2>digit-ai-forge-design <span class="badge" title="5 item(s) actifs ciblant digit-ai-forge-design">5</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-design</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0494" data-forge="digit-ai-forge-design" data-statut="candidat" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0494" data-cite data-forge="digit-ai-forge-design" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0494</code>
             <span class="statut s-candidat">candidat</span>
@@ -766,7 +988,13 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0491" data-forge="digit-ai-forge-design" data-statut="candidat" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0491" data-cite data-forge="digit-ai-forge-design" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0491</code>
             <span class="statut s-candidat">candidat</span>
@@ -783,7 +1011,13 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0493" data-forge="digit-ai-forge-design" data-statut="candidat" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0493" data-cite data-forge="digit-ai-forge-design" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0493</code>
             <span class="statut s-candidat">candidat</span>
@@ -800,7 +1034,13 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0483" data-forge="digit-ai-forge-design" data-statut="candidat" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0483" data-cite data-forge="digit-ai-forge-design" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0483</code>
             <span class="statut s-candidat">candidat</span>
@@ -817,7 +1057,13 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0489" data-forge="digit-ai-forge-design" data-statut="candidat" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0489" data-cite data-forge="digit-ai-forge-design" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0489</code>
             <span class="statut s-candidat">candidat</span>
@@ -840,7 +1086,13 @@
       <h2>digit-ai-forge-ops <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-ops">1</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-ops</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0482" data-forge="digit-ai-forge-ops" data-statut="candidat" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0482" data-cite data-forge="digit-ai-forge-ops" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0482</code>
             <span class="statut s-candidat">candidat</span>
@@ -863,7 +1115,13 @@
       <h2>digit-ai-forge-seo-geo <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-seo-geo">1</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-seo-geo</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0476" data-forge="digit-ai-forge-seo-geo" data-statut="candidat" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0476" data-cite data-forge="digit-ai-forge-seo-geo" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0476</code>
             <span class="statut s-candidat">candidat</span>
@@ -898,7 +1156,13 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
       <h2>digit-ai-forge-tests <span class="badge" title="2 item(s) actifs ciblant digit-ai-forge-tests">2</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-tests</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0470" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0470" data-cite data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0470</code>
             <span class="statut s-candidat">candidat</span>
@@ -915,7 +1179,13 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0480" data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0480" data-cite data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0480</code>
             <span class="statut s-candidat">candidat</span>
@@ -935,10 +1205,16 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
       </div>
     </section>
     <section id="pilot">
-      <h2>pilot <span class="badge" title="10 item(s) actifs ciblant pilot">10</span></h2>
+      <h2>pilot <span class="badge" title="9 item(s) actifs ciblant pilot">9</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0512" data-forge="pilot" data-statut="candidat" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0512" data-cite data-forge="pilot" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0512</code>
             <span class="statut s-candidat">candidat</span>
@@ -955,7 +1231,13 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0481" data-forge="pilot" data-statut="candidat" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0481" data-cite data-forge="pilot" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0481</code>
             <span class="statut s-candidat">candidat</span>
@@ -972,24 +1254,13 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0516" data-forge="pilot" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0516</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">hook-restitution : un message CONFORME est refuse parce que le hook juge un AUTRE texte que celui affiche — le preambule d un tour, pas la restitution</h3>
-          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 22/08, sur un refus reel et reproduit sur piece.</p><ul class="puces"><li>Le hook Stop `oracles/hook-restitution.mjs` a refuse une restitution avec quatre echecs BLOQUANTS : S1 « bloc</li><li>absent</li><li>» sur LES HUIT blocs, puis S3, S4 et S6, qui decoulent tous de l absence de bloc. OR LE MESSAGE PORTAIT BIEN SES NEUF TITRES. La preuve est directe et rejouable : le texte EXACT du message a ete relu dans le transcript (10 710 caracteres, un seul bloc de texte, titres `### 1.` a `### 9.` presents) et passe a `oracle-synthese` — verdict PASS sur les 20 regles. Le message etait donc conforme ; c est ce que le HOOK A LU qui ne l etait pas. MECANISME. `analyserTranscript` retient `dernierTexte` = le dernier bloc de texte d un message assistant du tour. Le tour incrimine portait DEUX textes : un preambule d une phrase (116 caracteres, « Les apostrophes ont saute dans le texte insere au gabarit — je corrige »), puis la restitution. Un preambule d une phrase ne porte evidemment aucun des huit blocs, et il rend exactement les quatre echecs constates. Deux causes possibles, non departagees ici :</li><li>le transcript n avait pas encore recu la restitution quand le hook a lu le fichier — course d ecriture, et le dernier texte disponible etait le preambule</li><li>l ordre des entrees ne place pas la restitution en dernier dans tous les cas. CE QUE CA COUTE, et c est cher : le gate est BLOQUANT depuis la v2.4.0, donc un refus force a reecrire un message DEJA CONFORME — huit blocs relus pour rien, c est-a-dire exactement le cout que la v2.5.0 (proportionnalite des regles) existait pour supprimer. Pire : le motif affiche accuse l auteur (« tes huit blocs sont absents ») alors que l auteur les a ecrits. Un gate qui accuse a tort s apprend a contourner, et R-33 bis dit ce qu il en advient. TROIS VOIES, aucune tranchee :</li><li>juger la CONCATENATION de tous les blocs de texte du tour, et non le seul dernier — un preambule cesse alors de masquer la restitution, au prix de juger aussi le preambule</li><li>juger le PLUS LONG bloc de texte du tour, heuristique simple qui colle a l intention (une restitution est longue, un preambule court)</li><li>juger le dernier texte MAIS refuser de conclure quand il fait moins de N caracteres et ne porte aucun titre — declarer NON JUGEABLE plutot que FAIL, sur le modele des SKIP motives d oracle-sca. La voie</li><li>plus la voie</li><li>ont ma preference et je ne les prends pas : modifier le hook Stop change ce que TOUTES les sessions du poste subissent, et c est une decision humaine (R-29). CONTOURNEMENT EMPLOYE EN ATTENDANT, et il est lui-meme un cout a declarer : ne plus ecrire AUCUN texte avant la restitution dans un tour de travail. C est une contrainte de redaction imposee par un defaut d outil, pas par le gabarit</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>mesure le 22/08 : un refus BLOQUANT sur un message dont le texte exact rend PASS sur les 20 regles quand on le rejoue. Le motif affiche accuse l auteur d avoir omis les huit blocs alors qu ils sont ecrits. Contournement subi : interdiction de fait d ecrire une phrase avant la restitution dans un tour de travail.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du 22/08, pendant le mandat de traitement des todos — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0479" data-forge="pilot" data-statut="candidat" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0479" data-cite data-forge="pilot" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0479</code>
             <span class="statut s-candidat">candidat</span>
@@ -1006,7 +1277,13 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0514" data-forge="pilot" data-statut="candidat" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0514" data-cite data-forge="pilot" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0514</code>
             <span class="statut s-candidat">candidat</span>
@@ -1023,7 +1300,13 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0474" data-forge="pilot" data-statut="candidat" data-prio="moyenne">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0474" data-cite data-forge="pilot" data-statut="candidat" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0474</code>
             <span class="statut s-candidat">candidat</span>
@@ -1040,7 +1323,13 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0473" data-forge="pilot" data-statut="candidat" data-prio="moyenne">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0473" data-cite data-forge="pilot" data-statut="candidat" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0473</code>
             <span class="statut s-candidat">candidat</span>
@@ -1057,7 +1346,13 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0477" data-forge="pilot" data-statut="candidat" data-prio="moyenne">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0477" data-cite data-forge="pilot" data-statut="candidat" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0477</code>
             <span class="statut s-candidat">candidat</span>
@@ -1074,7 +1369,13 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0471" data-forge="pilot" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0471" data-cite data-forge="pilot" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0471</code>
             <span class="statut s-corrige">corrige</span>
@@ -1091,7 +1392,13 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0502" data-forge="pilot" data-statut="corrige" data-prio="haute">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0502" data-cite data-forge="pilot" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0502</code>
             <span class="statut s-corrige">corrige</span>
