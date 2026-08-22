@@ -29,6 +29,11 @@
  *      lecteur qui trouve un manque ne peut le remonter utilement que s'il peut dire de QUEL
  *      gabarit et de QUELLE version le document vient ; sinon le retour dit « il manquait une
  *      section » et personne ne sait à quoi l'appliquer (R-46, 21/08).
+ *  G9  tout gabarit de LIVRABLE prescrit la marque de destinataire (`destinataire: humain`
+ *      en frontmatter pour un .md, `<meta name="destinataire" content="humain">` pour un
+ *      .html), ou déclare pourquoi il ne la porte pas (TF-0504, 22/08/2026). Sans marque en
+ *      AMONT, la règle R-2 d'`oracle-conformite-projet` est un faux négatif STRUCTUREL : elle
+ *      ne juge que ce qui est marqué, et rien ne posait la marque.
  *  G7  les emplacements à remplir suivent la convention du socle `{…}` et jamais `{{…}}` :
  *      L11 de `check_html.py` refuse la seconde forme, un squelette qui la porte est rouge
  *      à l'oracle de son propre domaine (mesuré le 21/08 en écrivant le premier squelette)
@@ -185,6 +190,75 @@ function juger(racineGabarits) {
     }
   }
   if (g8) ok("G8", "tout gabarit `ok` prescrit son id de famille et sa version — un retour reste rattachable");
+
+  // G9 (TF-0504, 22/08/2026) — LA MARQUE DE DESTINATAIRE SE POSE EN AMONT, OU ELLE NE SE POSE
+  // NULLE PART.
+  //
+  // `oracle-conformite-projet` déclare sa propre limite, mot pour mot : « seul ce qui est MARQUÉ
+  // est jugé — un producteur qui oublie de marquer son livrable y échappe (faux négatif ASSUMÉ,
+  // mesuré à la revue du 17/09 par le rapport entre livrables marqués et livrables déposés) ».
+  // La limite était donc connue et son ampleur prévue à la mesure.
+  //
+  // CE QUI NE L'ÉTAIT PAS : la marque n'était posée NULLE PART EN AMONT. Vérifié le 22/08 —
+  // `grep -ril destinataire` sur les gabarits et les outils de forge-audit : zéro occurrence ; le
+  // gabarit Nhood de la fiche sécurité (9 485 octets) : zéro occurrence ; cet oracle (G1-G8) :
+  // aucune règle n'exigeait la marque. Tout document produit depuis la bibliothèque naissait donc
+  // non marqué, donc INVISIBLE à R-2, donc rangeable n'importe où sans qu'aucun contrôle ne le
+  // dise. Preuve du coût : une fiche sécurité écrite à la racine du produit, hors `output\`, en
+  // violation de R-2 et R-39 — et aucun oracle ne pouvait le voir. Le défaut a été trouvé par
+  // relecture humaine, exactement ce que TF-0319 voulait supprimer.
+  //
+  // La revue du 17/09 aurait donc mesuré un ratio marqués/déposés proche de zéro SANS EN DONNER
+  // LA CAUSE, la cause n'étant pas chez les producteurs. On ferme la boucle à la SOURCE.
+  //
+  // L'ÉCHAPPATOIRE EST EXPLICITE ET NÉCESSAIRE : un gabarit NORMATIF n'est destiné à personne —
+  // c'est déjà la précision D-06, et `gabarits\INSATISFACTION.md` documente ce choix pour
+  // lui-même. Un gabarit peut donc déclarer `destinataire: aucun` avec son motif. Ce qui est
+  // refusé n'est pas l'absence de marque : c'est le SILENCE sur la marque.
+  // LA MARQUE JUGEE ICI EST EXACTEMENT CELLE QUE R-2 SAIT LIRE, et c'est le second faux negatif
+  // trouve en ecrivant la regle. `oracle-conformite-projet` cherche `destinataire: humain` (ou
+  // `content="humain"`) : une valeur de ROLE n'y suffit pas. Or deux gabarits portaient
+  // `destinataire: exploitant / astreinte` et `destinataire: comite d'architecture / client /
+  // repreneur` — donc un document ne d'eux restait INVISIBLE a R-2 malgre sa marque. Un premier
+  // jet de G9 les declarait conformes : il aurait ferme l'item en laissant le defaut entier.
+  //
+  // Le role du lecteur est une information utile, mais ce n'est pas la marque : il vit sous une
+  // cle distincte (`role_destinataire`). La marque, elle, repond a UNE question — ce document
+  // part-il chez un humain — et sa reponse est fermee.
+  const MARQUE_MD = /^\s*destinataire\s*:\s*humain\s*$/mi;
+  const MARQUE_HTML = /<meta\s+name=["']destinataire["']\s+content=["']humain["']/i;
+  // L'echappatoire NORMATIVE : un gabarit qui n'est destine a personne le declare (precision
+  // D-06, dont `gabarits\INSATISFACTION.md` fait deja usage pour lui-meme). Ce qui est refuse
+  // n'est pas l'absence de marque, c'est le SILENCE sur la marque.
+  const MARQUE_AUCUN = /^\s*destinataire\s*:\s*aucun\b/mi;
+  // ATTENTION AU FAUX NEGATIF, constate en ecrivant la regle : un premier jet acceptait TOUT
+  // fichier contenant le mot « destinataire », et `dossier-exploitation/SQUELETTE.html` passait
+  // alors grace a une legende de tableau — « Alertes et destinataires ». Une garde qui se
+  // satisfait d un mot dans une legende ne juge rien. On exige donc la FORME de la marque :
+  // `destinataire: <valeur>` en debut de ligne, ou l attribut `name="destinataire"` — ce second
+  // motif permet a un gabarit .md de PRESCRIRE la balise que sa copie .html devra porter.
+  const MARQUE_PRESCRITE = /name\s*=\s*["']destinataire["']\s+content\s*=\s*["']humain["']/i;
+  let g9 = true;
+  for (const f of familles.filter((x) => x.statut === "ok")) {
+    for (const cle of ["gabarit", "squelette"]) {
+      const chemin = f[cle];
+      if (!chemin) continue;
+      const abs = join(racineDepot, chemin);
+      if (!existsSync(abs)) continue; // G3 le dit déjà
+      const texte = readFileSync(abs, "utf8");
+      // Un gabarit PRESCRIT la marque : soit il la porte lui-même (et elle descend dans la copie),
+      // soit il l'écrit comme consigne à remplir. Les deux comptent — ce qui ne compte pas, c'est
+      // de n'en parler nulle part.
+      if (MARQUE_MD.test(texte) || MARQUE_HTML.test(texte) || MARQUE_AUCUN.test(texte)
+          || MARQUE_PRESCRITE.test(texte)) continue;
+      ko("G9", chemin, "gabarit de livrable SANS marque de destinataire ni déclaration de son absence — " +
+        "R-2 ne juge que ce qui est marqué, donc un document né de ce gabarit échappe au contrôle de localisation " +
+        "par construction, et pas par oubli du producteur. Poser `destinataire: humain` (frontmatter .md) ou " +
+        "`<meta name=\"destinataire\" content=\"humain\">` (.html) ; un gabarit normatif déclare `destinataire: aucun` avec son motif");
+      g9 = false;
+    }
+  }
+  if (g9) ok("G9", "tout gabarit `ok` prescrit sa marque de destinataire, ou déclare pourquoi il n'en porte pas");
   if (g5) ok("G5", `${fichiersGabarits.length} gabarit(s) sans donnée client dans leur corps`);
   if (g7) ok("G7", "emplacements à la convention du socle `{…}`");
 
@@ -203,9 +277,11 @@ function selfTest() {
     statut: "ok", gabarit: "gabarits/documents/fx/GABARIT.md", squelette: null,
     sources: ["source réelle"], regles: ["D1"], oracles: ["check_html.py"], preuve: "P", ...sur,
   });
-  // Le gabarit par défaut porte le fil de traçabilité (G8) : la fixture VERTE doit représenter
-  // une bibliothèque CONFORME, sinon elle cesse de prouver ce que l'oracle exige.
-  const ecrire = (lignes, gabarit = "# G\n\n## Structure\n\ngabarit: gd-x · version du gabarit 1.0.0\n\nun {emplacement}\n") => {
+  // Le gabarit par défaut porte le fil de traçabilité (G8) ET la marque de destinataire (G9) :
+  // la fixture VERTE doit représenter une bibliothèque CONFORME, sinon elle cesse de prouver ce
+  // que l'oracle exige. C'est la troisième fois que ce commentaire s'allonge, et c'est normal —
+  // une fixture verte est le contrat, elle grossit avec lui.
+  const ecrire = (lignes, gabarit = "# G\n\n## Structure\n\ndestinataire: humain\n\ngabarit: gd-x · version du gabarit 1.0.0\n\nun {emplacement}\n") => {
     mkdirSync(join(docs, "fx"), { recursive: true });
     writeFileSync(join(docs, "fx", "GABARIT.md"), gabarit, "utf8");
     writeFileSync(join(docs, "README.md"), "| **D1** | Largeur utile | fait |\n", "utf8");
@@ -240,6 +316,25 @@ function selfTest() {
   ecrire([famille({ regles: ["D1", "D99"] })]);
   r = juger(gab);
   cas.push(["G6     — règle citée et non définie au README", r.findings.some((f) => f.regle === "G6" && f.statut === "FAIL"), r.verdict]);
+
+  // G9 (TF-0504) — sens ROUGE : aucune mention de la marque. C'est le cas de TOUTE la
+  // bibliothèque avant le 22/08 : 7 gabarits `ok` sur 7, donc 100 %.
+  ecrire([famille()], "# G\n\n## Structure\n\ngabarit: gd-x · version du gabarit 1.0.0\n\nun {emplacement}\n");
+  r = juger(gab);
+  cas.push(["G9     — gabarit muet sur la marque de destinataire", r.findings.some((f) => f.regle === "G9" && f.statut === "FAIL"), r.verdict]);
+
+  // G9 bis — LE FAUX NÉGATIF À NE PAS REPRODUIRE, trouvé en écrivant la règle : une valeur de
+  // RÔLE n'est pas la marque. `destinataire: exploitant / astreinte` était présent sur deux
+  // gabarits réels, et R-2 ne sait lire que `humain` — un document né d'eux restait invisible.
+  ecrire([famille()], "# G\n\n## Structure\n\ndestinataire: exploitant / astreinte\n\ngabarit: gd-x · version du gabarit 1.0.0\n\nun {emplacement}\n");
+  r = juger(gab);
+  cas.push(["G9 bis — une valeur de RÔLE ne vaut pas la marque (R-2 ne lit que `humain`)", r.findings.some((f) => f.regle === "G9" && f.statut === "FAIL"), r.verdict]);
+
+  // G9 ter — LA BORNE : un gabarit NORMATIF n'est destiné à personne et le DÉCLARE (D-06).
+  // Ce qui est refusé n'est pas l'absence de marque, c'est le silence sur la marque.
+  ecrire([famille()], "# G\n\n## Structure\n\ndestinataire: aucun — référentiel normatif, pas un livrable\n\ngabarit: gd-x · version du gabarit 1.0.0\n\nun {emplacement}\n");
+  r = juger(gab);
+  cas.push(["G9 ter — l'absence DÉCLARÉE est acceptée (borne, D-06)", r.verdict === "PASS", r.verdict]);
 
   ecrire([famille()], "# G\n\n## Structure\n\nAudit mené chez Nhood pour Ceetrus.\n");
   r = juger(gab);

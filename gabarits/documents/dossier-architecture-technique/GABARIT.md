@@ -44,7 +44,8 @@ d'eux ne porte. Un DAT rédigé sans `ARCHITECTURE.md` sous les yeux est un DAT 
 ```
 ---
 role: dossier d'architecture technique — la structure, les décisions, et l'écart à la cible
-destinataire: comité d'architecture / client / repreneur
+destinataire: humain
+role_destinataire: comité d'architecture / client / repreneur
 sources_de_verite: ["docs\projet\ARCHITECTURE.md", "docs\projet\COMPOSANTS-OPS.md", "{registre ADR}"]
 verifie_le: {AAAA-MM-JJ}
 gabarit: gd-dossier-architecture
