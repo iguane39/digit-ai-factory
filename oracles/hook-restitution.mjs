@@ -41,7 +41,8 @@ export function analyserTranscript(texte) {
   let debut = -1;
   for (let i = entrees.length - 1; i >= 0; i--) if (estHumain(entrees[i])) { debut = i; break; }
   const tour = entrees.slice(debut + 1);
-  let ecritures = 0, commandes = 0, dernierTexte = "";
+  let ecritures = 0, commandes = 0;
+  const tousLesTextes = [];
   for (const e of tour) {
     if (e.type !== "assistant") continue;
     const blocs = contenu(e);
@@ -49,9 +50,37 @@ export function analyserTranscript(texte) {
       if (b.type === "tool_use") { if (ECRITURES.has(b.name)) ecritures++; else if (COMMANDES.has(b.name)) commandes++; }
     }
     const textes = blocs.filter((b) => b.type === "text").map((b) => b.text).join("\n").trim();
-    if (textes) dernierTexte = textes;
+    if (textes) tousLesTextes.push(textes);
   }
-  return { travail: ecritures >= 1 || commandes >= 4, ecritures, commandes, dernierTexte };
+  // TF-0516 (22/08/2026) — LE HOOK JUGEAIT UN AUTRE TEXTE QUE CELUI QUI PORTE LA RESTITUTION.
+  //
+  // Il retenait le DERNIER bloc de texte du tour. Or un tour de travail en porte souvent
+  // plusieurs : une phrase de préambule (« je corrige ceci »), puis la restitution. Mesuré le
+  // 22/08 sur un refus réel : quatre échecs BLOQUANTS, dont « les huit blocs sont absents » —
+  // alors que le message affiché portait ses neuf titres. Son texte exact, relu dans le
+  // transcript et rejoué, rend PASS sur les 20 règles. Ce qui avait été jugé était le préambule
+  // de 116 caractères.
+  //
+  // Ce que ça coûtait : le gate est BLOQUANT, donc le refus force à réécrire un message DÉJÀ
+  // CONFORME — huit blocs relus pour rien, exactement le coût que la v2.5.0 existait pour
+  // supprimer. Et le motif ACCUSE L'AUTEUR d'avoir omis ce qu'il a écrit. Un gate qui accuse à
+  // tort s'apprend à contourner (R-33 bis).
+  //
+  // REMÈDE : on juge le texte le PLUS LONG du tour, pas le dernier. Une restitution à neuf
+  // blocs n'est jamais le plus court texte d'un tour, et un préambule n'est jamais le plus
+  // long. Le vrai discriminant n'est ni la longueur absolue ni la présence de titres : c'est
+  // qu'un préambule n'est JAMAIS SEUL — il est suivi de la restitution dans le même tour.
+  //
+  // UNE SECONDE VOIE A ÉTÉ ÉCRITE PUIS RETIRÉE, et le dire évite de la reproposer : déclarer
+  // NON JUGEABLE un texte sans titre de section. Elle DÉSARMAIT LE GATE — un message hors
+  // format n'a pas de titres non plus, c'est même sa définition, et la recette l'a montré
+  // immédiatement (« travail + hors format → attendu block, obtenu null »). Un garde-fou qui
+  // s'annule sur le cas qu'il existe pour attraper est pire que pas de garde-fou.
+  const dernierTexte = tousLesTextes.length
+    ? tousLesTextes.reduce((a, b) => (b.length > a.length ? b : a))
+    : "";
+  return { travail: ecritures >= 1 || commandes >= 4, ecritures, commandes, dernierTexte,
+           textes: tousLesTextes.length };
 }
 
 export function juger(texte) {
@@ -94,7 +123,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const entree = lireStdin();
   const chemin = entree.transcript_path;
   if (!chemin || !existsSync(chemin)) process.exit(0); // rien à juger sans transcript
-  const { travail, ecritures, commandes, dernierTexte } = analyserTranscript(readFileSync(chemin, "utf8"));
+  const { travail, ecritures, commandes, dernierTexte, textes } = analyserTranscript(readFileSync(chemin, "utf8"));
   if (!travail || !dernierTexte) process.exit(0);
   const { code, fails } = juger(dernierTexte);
   const bloquants = fails.filter((f) => BLOQUANTES.has(f.regle));

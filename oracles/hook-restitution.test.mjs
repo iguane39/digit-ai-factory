@@ -5,6 +5,9 @@
  *   2. même transcript, `stop_hook_active` vrai (déjà refusé une fois) → laisse passer ;
  *   3. tour de TRAVAIL + message final conforme (oracle-synthese PASS) → laisse passer ;
  *   4. tour de LECTURE (Read/Grep seulement) + message libre → laisse passer, non jugé ;
+ *   6. (22/08, TF-0516) tour portant DEUX textes — un préambule puis la restitution conforme →
+ *      laisse passer : le hook juge le texte le PLUS LONG du tour, pas le dernier. Sans ce
+ *      remède, quatre échecs bloquants tombaient sur un message portant ses neuf titres.
  *   5. (22/08) message STRUCTURELLEMENT conforme mais portant un défaut de DÉTAIL (S8 : une
  *      puce « fait » sans preuve) → NE BLOQUE PAS, dit l'avertissement sous la réponse. C'est
  *      le retour humain du 22/08 : un hook `Stop` juge après l'affichage, donc chaque refus
@@ -72,6 +75,17 @@ const transcript = (texteFinal, outils) => [
   { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: texteFinal }] } },
 ].map((e) => JSON.stringify(e)).join("\n") + "\n";
 
+// TF-0516 (22/08) — un tour de travail porte souvent DEUX textes : une phrase de préambule, puis
+// la restitution. Le hook retenait le DERNIER et jugeait donc le préambule, ce qui rendait quatre
+// échecs bloquants sur un message conforme. Ce transcript reproduit la forme exacte.
+const transcriptAvecPreambule = (phraseApres, texteFinal, outils) => [
+  { type: "user", message: { role: "user", content: "fais la mise à jour" } },
+  { type: "assistant", message: { role: "assistant", content: outils.map((n) => ({ type: "tool_use", name: n, input: {} })) } },
+  { type: "user", message: { role: "user", content: [{ type: "tool_result", content: "ok" }] } },
+  { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: texteFinal }] } },
+  { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: phraseApres }] } },
+].map((e) => JSON.stringify(e)).join("\n") + "\n";
+
 const lancer = (nom, texte, outils, actif = false) => {
   const p = join(base, nom + ".jsonl");
   writeFileSync(p, transcript(texte, outils), "utf8");
@@ -90,6 +104,20 @@ try {
   const r1 = lancer("mauvais", MAUVAIS, ["Write", "Bash"]);
   if (r1.decision?.decision !== "block") echecs.push(`1 : travail + hors format → attendu block, obtenu ${JSON.stringify(r1.decision)} ${r1.stderr.slice(0, 120)}`);
   else if (!/S1/.test(r1.decision.reason)) echecs.push("1 : le refus ne nomme pas la règle S1 (blocs absents)");
+
+  // 6 (TF-0516) — un PRÉAMBULE devant une restitution conforme : le hook doit juger la
+  // restitution, pas le préambule. Sans le remède, ce cas rend quatre échecs bloquants dont
+  // « les huit blocs sont absents » — sur un message qui les porte tous.
+  {
+    const q = join(base, "preambule.jsonl");
+    writeFileSync(q, transcriptAvecPreambule(
+      "Les apostrophes ont sauté dans le texte inséré au gabarit — je corrige.", BON, ["Write", "Edit"]), "utf8");
+    const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8",
+      input: JSON.stringify({ session_id: "test", transcript_path: q, stop_hook_active: false }) });
+    let d = null;
+    try { d = JSON.parse(r.stdout || "null"); } catch { /* pas de JSON = laisse passer */ }
+    if (d !== null) echecs.push(`6 : préambule + restitution conforme → attendu laisser passer, obtenu ${JSON.stringify(d).slice(0, 200)}`);
+  }
 
   const r2 = lancer("mauvais-actif", MAUVAIS, ["Write"], true);
   if (r2.decision !== null) echecs.push("2 : stop_hook_active → attendu laisser passer (anti-boucle)");
@@ -117,4 +145,4 @@ try {
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error("hook-restitution : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log("hook-restitution : 5/5 — hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture (22/08)");
+console.log("hook-restitution : 6/6 — hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, préambule qui ne masque plus la restitution (TF-0516)");
