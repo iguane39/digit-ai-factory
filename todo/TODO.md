@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=8ad89110de5a archive=9f205b231527 · dernier événement: 2026-08-21T13:48:23.356Z -->
+     sceaux: actifs=1a5d5d4cc820 archive=9f205b231527 · dernier événement: 2026-08-22T07:11:01.023Z -->
 
-**148 actifs** (candidat 0 · décidé 0 · en cours 1 · corrigé 146 · écarté 1) · **308 archivés**.
+**149 actifs** (candidat 0 · décidé 0 · en cours 1 · corrigé 147 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -172,6 +172,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0327 | corrige | 12 | RV-9 n'est pas refermé : la fixture témoin de la bascule sombre démontre ENCORE le comportement interdit | **oui** — deux livrables du même socle peuvent encore s'ouvrir différemment sur le même poste — le symptôme exact que RV-9 prétendait avoir soldé |
+| TF-0456 | corrige | 12 | README de dossier : la date d'un dossier incluait celle de son PROPRE README — chaque commit périmait le README du parent, l'arbre n'était jamais propre deux commandes de suite | **oui** — mesuré le 22/08 : après un commit de 8 README régénérés, 3 nouveaux README repassaient périmés sans qu'aucun contenu de dossier n'ait bougé — un dépôt qui ne peut pas rester propre apprend à ses lecteurs à ignorer git status, et c'est ce coût-là qui est payé à chaque commande |
 | TF-0328 | corrige | 8 | appliquer-export.mjs est orphelin et TODO-FORGE.md prescrit un dispositif retiré le 12/08 | **oui** — un item de registre entier (TF-0318) a été instruit sur une prémisse que la doc du pilot affirmait et que le code démentait |
 | TF-0332 | corrige | 8 | Solder la dette de traçabilité D-14 : trois affirmations de conformité fausses au corpus | **oui** — deux études du même après-midi ont buté sur des déclarations de conformité fausses — le coût de recherche se paie à chaque instruction |
 | TF-0356 | corrige | 8 | generer-page.mjs : TODO.html échoue L11 — esc() au lieu d'escLit() sur les titres (« None » non traité) | **oui** — la vue courante du registre échoue à l'oracle du socle pendant que la vue d'archive née hier le passe — le patron neuf a déjà dépassé l'ancien |

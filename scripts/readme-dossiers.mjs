@@ -107,9 +107,17 @@ function nature(chemin) {
 }
 
 // Dernier commit d'un dossier = le plus récent de son contenu.
+// La date d'un dossier est celle de son CONTENU, jamais celle des README qui le décrivent
+// (22/08, suite de TF-0451) : sans cette exclusion, committer un README changeait la date du
+// dossier, ce qui périmait le README du PARENT — un cycle relancé par chaque commit, et un
+// arbre de travail jamais propre deux commandes de suite. Un README rapporte, il ne date pas.
 function derniereDate(dates, rel) {
   let max = "";
-  for (const [p, d] of dates) if ((p === rel || p.startsWith(rel + "/")) && d > max) max = d;
+  for (const [p, d] of dates) {
+    if (p !== rel && !p.startsWith(rel + "/")) continue;
+    if (p === "README.md" || p.endsWith("/README.md")) continue;
+    if (d > max) max = d;
+  }
   return max;
 }
 

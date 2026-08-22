@@ -14,7 +14,7 @@ Schéma d'écosystème des forges (HTML autoportant), régénéré à chaque cha
 
 | Élément | Type | Taille | Dernier commit | Titre / nature |
 |---|---|---|---|---|
-| [`old\`](old/README.md) | dossier (5 fichiers) | — | 2026-08-21 | Versions antérieures du schéma d'écosystème (PNG puis HTML) — figées, jamais modifiées. |
+| [`old\`](old/README.md) | dossier (5 fichiers) | — | 2026-08-20 | Versions antérieures du schéma d'écosystème (PNG puis HTML) — figées, jamais modifiées. |
 | `Forge Pilot - Schéma Écosystème - 20260820a.html` | fichier | 57,9 Ko | 2026-08-20 | Écosystème forge · Digit-AI — 20260820a |
 
 _1 fichier(s), 1 sous-dossier(s)_ · dossiers cachés (journaux machine, sans README) : `.oracles\`
