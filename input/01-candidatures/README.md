@@ -24,7 +24,7 @@ Candidatures hors lot de retours : `candidature-*.tf.jsonl`, `revue-*.tf.jsonl`,
 | `candidature-restitution-affichee-deux-fois.tf.jsonl` | fichier | 2,4 Ko | 2026-08-22 | 1 ligne(s) JSONL |
 | `candidature-retro-doc-profils.tf.jsonl` | fichier | 2,4 Ko | 2026-08-19 | 1 ligne(s) JSONL |
 | `candidature-retro-modele.tf.jsonl` | fichier | 2,3 Ko | 2026-08-19 | 1 ligne(s) JSONL |
-| `candidature-routes-declarees-i18n.tf.jsonl` | fichier | 2,4 Ko | non versionné | 1 ligne(s) JSONL |
+| `candidature-routes-declarees-i18n.tf.jsonl` | fichier | 2,4 Ko | 2026-08-22 | 1 ligne(s) JSONL |
 | `candidature-run-conseil.tf.jsonl` | fichier | 2,7 Ko | 2026-08-19 | 1 ligne(s) JSONL |
 | `revue-20260819-agents.normalise.tf.jsonl` | fichier | 2,3 Ko | 2026-08-19 | 1 ligne(s) JSONL |
 | `revue-20260819-agents.tf.jsonl` | fichier | 2,3 Ko | 2026-08-19 | 1 ligne(s) JSONL |
