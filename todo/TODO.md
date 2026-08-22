@@ -1,11 +1,17 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=1e14e1411698 archive=acf69e8da61a · dernier événement: 2026-08-22T09:26:19.839Z -->
+     sceaux: actifs=7d40c07156af archive=54c0315cbe97 · dernier événement: 2026-08-22T09:30:53.131Z -->
 
-**27 actifs** (candidat 23 · décidé 1 · en cours 1 · corrigé 2 · écarté 0) · **469 archivés**.
+**28 actifs** (candidat 23 · décidé 1 · en cours 1 · corrigé 3 · écarté 0) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
+
+## digit-ai-factory
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
 
 ## digit-ai-forge-agents
 
