@@ -4,10 +4,10 @@
 avec `destinataire: humain` en frontmatter YAML. La localisation R-2/E9 ne juge que ce qui
 est MARQUÉ — sans porteur, la règle est un faux négatif volontaire : elle est livrée,
 prouvée à zéro faux positif, et ne voit rien. Le marquage a été vérifié toléré par
-`oracle-synthese` (S1-S8 à l'époque, S1-S15 depuis la v2.7.0) sur une synthèse réelle PASS avant d'être prescrit ici.
+`oracle-synthese` (S1-S8 à l'époque, S1-S16 depuis la v2.8.0) sur une synthèse réelle PASS avant d'être prescrit ici.
 Cette consigne, elle, ne se marque PAS : c'est un référentiel normatif, pas un livrable.
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 2.7.0, 22/08/2026** (règle **S15** : une décision RAPPELLE SON SUJET avant ses options — 25 mots au moins, sans identifiant nu ; retour humain du 22/08 « je ne peux pas me rappeler TF-0469 et vue portefeuille ») — 2.6.1 du 22/08 (`hors_mandat` ajoute au vocabulaire de S11 le jour meme, cf. section du bloc 8) — 2.6.0 du 22/08 (TF-0457 à TF-0461, retour humain du 22/08 sur la forme des listes de tâches : le bloc 8 cesse d'être une liste d'étiquettes — une action `auto_ia` non exécutée porte son motif (**S11**), une action laissée à l'humain porte sa raison d'impossibilité IA (**S12**), elle est exécutable telle quelle (**S13**), et elle porte un identifiant stable (**S14**). Les quatre entrent en **AVERTISSANTES** au sens de la v2.5.0 : une action sans motif rend la liste moins utile, jamais illisible — et le doublon d'affichage qu'un blocage provoque coûterait plus que le défaut qu'il dénonce. Elles se durciront quand le corpus sera propre, comme la v2.0.0 l'a fait avant elles) — précédente : **2.5.0, 22/08/2026** (retour humain
+Référentiel versionné (loi n° 4, daté-éditable) — **version 2.8.0, 22/08/2026** (règle **S16** : une décision porte sa RECOMMANDATION et la SOURCE consultée d'où elle sort — une question dont la réponse est dans un document déjà fourni ne se pose pas) — 2.7.0 du 22/08 (règle **S15** : une décision RAPPELLE SON SUJET avant ses options — 25 mots au moins, sans identifiant nu ; retour humain du 22/08 « je ne peux pas me rappeler TF-0469 et vue portefeuille ») — 2.6.1 du 22/08 (`hors_mandat` ajoute au vocabulaire de S11 le jour meme, cf. section du bloc 8) — 2.6.0 du 22/08 (TF-0457 à TF-0461, retour humain du 22/08 sur la forme des listes de tâches : le bloc 8 cesse d'être une liste d'étiquettes — une action `auto_ia` non exécutée porte son motif (**S11**), une action laissée à l'humain porte sa raison d'impossibilité IA (**S12**), elle est exécutable telle quelle (**S13**), et elle porte un identifiant stable (**S14**). Les quatre entrent en **AVERTISSANTES** au sens de la v2.5.0 : une action sans motif rend la liste moins utile, jamais illisible — et le doublon d'affichage qu'un blocage provoque coûterait plus que le défaut qu'il dénonce. Elles se durciront quand le corpus sera propre, comme la v2.0.0 l'a fait avant elles) — précédente : **2.5.0, 22/08/2026** (retour humain
 « le prompt de résultat s'affiche 2 fois » : un hook `Stop` juge APRÈS l'affichage, donc chaque
 refus laissait la version rejetée à l'écran et faisait relire huit blocs. Le gate reste, il
 devient **proportionné** : **bloquantes S1, S3, S4, S6** — la restitution est inutilisable sans
@@ -79,11 +79,36 @@ S-01 TENU, 19/19 au banc rouge »*, jamais *« tout s'est bien passé »*.
 tranche, il ne rédige pas :
 
 - **le RAPPEL DU SUJET — au moins 25 mots, sans identifiant nu** (règle **S15**, v2.7.0) ;
+  - **la RECOMMANDATION, et la SOURCE consultée d'où elle sort** — ou la déclaration qu'aucune
+    source disponible ne répond (règle **S16**, v2.8.0) ;
   - les options `(a)` / `(b)` / `(c)`, chacune avec **son coût et ce qu'elle exclut** ;
   - la recommandation, **et pourquoi** ;
   - ce qui se passe si rien n'est décidé (l'option par défaut existe toujours — la nommer).
 
 Si rien n'attend l'humain : le dire en une ligne.
+
+#### Une question dont la réponse est dans les documents ne se pose pas (S16, 22/08/2026)
+
+*Retour humain du 22/08, sur une décision qui demandait de nommer un rôle* : **« tu aurais dû être
+en capacité de déduire son nom du dossier que j'ai fourni, pourquoi ne l'as-tu pas fait ? Fais en
+sorte que les prochaines fois, ce genre de questions soit répondu par l'IA automatiquement, au
+moins préconisé a minima. »** Le nom était à la **première ligne** du dossier de mise en
+production, fourni deux jours plus tôt.
+
+Le coût est **asymétrique**, et c'est ce qui rend la règle nécessaire : chercher coûte une seconde
+à l'agent, et ne pas chercher coûte au lecteur un aller-retour, plus la réouverture d'un document
+que l'agent avait déjà sous la main. C'est le même défaut que S13 corrige au bloc 8 — faire payer
+au lecteur un travail que l'agent pouvait faire — mais au bloc 3 il est le plus cher : **il
+transforme une lecture en arbitrage.**
+
+« Dérivable » ne se teste pas à la machine. Ce qui se teste, c'est la **trace d'avoir cherché** :
+
+- une décision **sans recommandation** est une question rendue telle quelle ;
+- une recommandation **sans source** est une opinion.
+
+Les deux sont exigées, et la source est un localisateur ordinaire — le document, le fichier, la
+ligne d'où sort la réponse proposée. Quand rien dans les pièces disponibles ne répond, **le dire
+explicitement** vaut source : c'est une information, pas un aveu.
 
 #### Pourquoi « une phrase » ne suffisait pas (S15, 22/08/2026)
 
@@ -241,7 +266,7 @@ appliquent pas non plus : elles jugent un fichier, et une CLI n'en écrit pas.
 
 ## Contrôle
 
-**Exécuté** : `node oracles\oracle-synthese.mjs <synthese.md>` — règles S1-S15 binaires,
+**Exécuté** : `node oracles\oracle-synthese.mjs <synthese.md>` — règles S1-S16 binaires,
 fixtures double sens au self-test. Une restitution qui viole une règle est un défaut de forme,
 signalé comme tel et corrigeable. Mise à jour = nouvelle version + date.
 

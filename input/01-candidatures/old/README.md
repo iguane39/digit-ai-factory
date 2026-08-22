@@ -27,6 +27,7 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `candidature-outillage-etude-opportunite.tf.jsonl` | fichier | 7,7 Ko | 2026-08-13 | 3 ligne(s) JSONL |
 | `candidature-pilot-entrants-20260822.tf.jsonl` | fichier | 5,9 Ko | 2026-08-22 | 2 ligne(s) JSONL |
 | `candidature-qualite-graphique-par-defaut.tf.jsonl` | fichier | 3,9 Ko | 2026-08-15 | 3 ligne(s) JSONL |
+| `candidature-question-deja-repondue.tf.jsonl` | fichier | 2,7 Ko | non versionné | 1 ligne(s) JSONL |
 | `candidature-r21-lockfiles.tf.jsonl` | fichier | 2,8 Ko | 2026-08-13 | 1 ligne(s) JSONL |
 | `candidature-rattrapage-pilot.tf.jsonl` | fichier | 783 o | 2026-08-13 | 1 ligne(s) JSONL |
 | `candidature-recette-rouge-par-la-prose-d-un-candidat.tf.jsonl` | fichier | 2,8 Ko | 2026-08-22 | 1 ligne(s) JSONL |
@@ -35,13 +36,13 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `candidature-trous-detection-site-principal.tf.jsonl` | fichier | 4,7 Ko | 2026-08-17 | 4 ligne(s) JSONL |
 | `candidature-valeur-recopiee-20260822.tf.jsonl` | fichier | 5,1 Ko | 2026-08-22 | 1 ligne(s) JSONL |
 | `candidature-vue-portefeuille-differee.tf.jsonl` | fichier | 2,7 Ko | 2026-08-22 | 1 ligne(s) JSONL |
-| `Digit-AI - Brief Forge - Fraîcheur des verdicts qualité - 20260822a.md` | fichier | 10,3 Ko | 2026-08-22 | Brief d'exécution — Fraîcheur des verdicts de `quality-oracles` |
+| `Digit-AI - Brief Forge - Fraîcheur des verdicts qualité - 20260822a.md` | fichier | 10,4 Ko | 2026-08-22 | Brief d'exécution — Fraîcheur des verdicts de `quality-oracles` |
 | `Digit-AI - Candidatures Forge - Extension Run-Delivery - 20260816b.md` | fichier | 9,6 Ko | 2026-08-17 | Candidatures forge — extension « run de delivery » |
 | `Digit-AI - Candidatures Forge - Extension Run-Delivery - 20260816b.tf.jsonl` | fichier | 5,8 Ko | 2026-08-17 | 2 ligne(s) JSONL |
 | `Digit-AI - Candidatures Forge - Frontmatter des skills - 20260822a.zip` | fichier | 5,4 Ko | 2026-08-22 | ZIP |
 | `Digit-AI - Forge Pilot - Candidature noeud 57 plan de mesure - 20260822f.zip` | fichier | 5,7 Ko | 2026-08-22 | ZIP |
 | `Digit-AI - Lot Candidature Forge - Valeur recopiee - 20260822b.zip` | fichier | 4,8 Ko | 2026-08-22 | ZIP |
-| `Digit-AI - Prompt Forge - Analyse d'un entrant factory - 20260822a.md` | fichier | 9,3 Ko | 2026-08-22 | Prompt d'analyse d'un entrant — digit-ai-factory |
+| `Digit-AI - Prompt Forge - Analyse d'un entrant factory - 20260822a.md` | fichier | 9,5 Ko | 2026-08-22 | Prompt d'analyse d'un entrant — digit-ai-factory |
 | `proposition-tuyauterie.tf.jsonl` | fichier | 3,7 Ko | 2026-08-13 | 5 ligne(s) JSONL |
 
-_29 fichier(s), 0 sous-dossier(s)_
+_30 fichier(s), 0 sous-dossier(s)_
