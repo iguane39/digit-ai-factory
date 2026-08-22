@@ -1,25 +1,17 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=813a3fa24890 archive=99370aa79320 · dernier événement: 2026-08-22T08:25:04.935Z -->
+     sceaux: actifs=171367af2df5 archive=acf69e8da61a · dernier événement: 2026-08-22T08:25:04.935Z -->
 
-**8 actifs** (candidat 3 · décidé 0 · en cours 1 · corrigé 4 · écarté 0) · **466 archivés**.
+**5 actifs** (candidat 3 · décidé 0 · en cours 1 · corrigé 1 · écarté 0) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
-
-## digit-ai-factory
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0472 | corrige | 20 | pilot : une DECISION du bloc 3 peut ne rappeler aucun contexte — S4 compte des options etiquetees, jamais ce qu'elles arbitrent (regle S15) | **oui** — le destinataire unique des restitutions a declare ne pas pouvoir identifier deux decisions sur deux qu'on lui demandait de trancher — un taux d'echec de 100 % sur le seul bloc que la consigne place EN TETE parce qu'il est le plus important |
-| TF-0462 | corrige | 4 | pilot : aucune vue PORTEFEUILLE n'existe, et la vue par produit n'est instanciee nulle part — le gabarit TODO-PRODUIT n'a jamais ete pose dans un seul produit | **oui** — une decision prise le 17/08 (TF-0318, vue du reste-a-faire hors session) n'a produit aucun fichier dans aucun produit cinq jours plus tard — le gabarit existe, la doctrine existe, et le developpeur qui devait en beneficier declare le 22/08 qu'il n'a pas de liste exploitable |
 
 ## digit-ai-forge-agents
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0324 | en_cours | 3 | Artefacts périodiques du run de delivery absents : RAID, rapport d'avancement, compte rendu, REX, suivi des bénéfices | **oui** — revérifié en session le 16/08 : 0 occurrence de RAID / compte rendu / rapport d'avancement / lessons learned sur les skills installés — aucun des cinq artefacts que réclame une mission longue n'a d'équivalent dans la forge |
-| TF-0469 | corrige | 7.5 | pilot : la recette du pilot devient ROUGE parce qu'un CANDIDAT est ecrit en prose dense — un contributeur casse la recette de tous, et paie zero | **oui** — une recette poussee ROUGE sur main sans que rien ne l'ait signale a celui qui l'a rendue rouge, et un correctif impossible par la voie evidente puisque le texte fautif appartient a un lot deja ingere |
 | TF-0323 | corrige | 4 | Gouvernance de mission absente : ni registre de risques, ni parties prenantes, ni mesures de succès suivies | **oui** — revérifié en session le 16/08 : 0 occurrence de « risque » dans pilote-de-mission v1.0.0, 0 hit « parties prenantes » sur les skills installés — une mission client pilotée par la forge ne produit aucun des trois objets qu'un commanditaire attend en premier en comité de pilotage |
 
 ## digit-ai-forge-tests

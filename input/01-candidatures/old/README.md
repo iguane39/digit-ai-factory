@@ -29,7 +29,7 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `candidature-relais-avancement.tf.jsonl` | fichier | 3,3 Ko | 2026-08-14 | 1 ligne(s) JSONL |
 | `candidature-socle-docs-projet.tf.jsonl` | fichier | 4,5 Ko | 2026-08-13 | 2 ligne(s) JSONL |
 | `candidature-trous-detection-site-principal.tf.jsonl` | fichier | 4,7 Ko | 2026-08-17 | 4 ligne(s) JSONL |
-| `candidature-vue-portefeuille-differee.tf.jsonl` | fichier | 2,7 Ko | non versionné | 1 ligne(s) JSONL |
+| `candidature-vue-portefeuille-differee.tf.jsonl` | fichier | 2,7 Ko | 2026-08-22 | 1 ligne(s) JSONL |
 | `Digit-AI - Candidatures Forge - Extension Run-Delivery - 20260816b.md` | fichier | 9,6 Ko | 2026-08-17 | Candidatures forge — extension « run de delivery » |
 | `Digit-AI - Candidatures Forge - Extension Run-Delivery - 20260816b.tf.jsonl` | fichier | 5,8 Ko | 2026-08-17 | 2 ligne(s) JSONL |
 | `proposition-tuyauterie.tf.jsonl` | fichier | 3,7 Ko | 2026-08-13 | 5 ligne(s) JSONL |
