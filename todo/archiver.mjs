@@ -22,6 +22,9 @@ import { fileURLToPath } from "node:url";
 const ICI = dirname(fileURLToPath(import.meta.url));
 const SRC = join(ICI, "TODO.jsonl"), ARC = join(ICI, "TODO-ARCHIVE.jsonl");
 const constat = process.argv.includes("--constat");
+// Items volontairement RETENUS malgré leur clôture, avec le motif : ils partiront quand leur
+// lot partira. Un silence ici se lirait « rien à archiver », ce qui est faux.
+const retenus = [];
 
 const lignes = readFileSync(SRC, "utf8").split("\n").filter((l) => l.trim());
 const evts = lignes.map((l, i) => ({ i, brut: l, ...JSON.parse(l) }));
@@ -57,11 +60,34 @@ for (const [i, ids] of couvertures) {
   // perdrait sa couverture R10 côté archive → abandon
   const externesOrphelins = lotEntierPart ? [] : partentDuLot.filter(estExterne);
   if (externesOrphelins.length) {
-    console.error(`ABANDON : l'ingestion ligne ${i + 1} resterait active alors que des créations EXTERNES de son lot partent à l'archive sans couverture R10 : ${externesOrphelins.join(", ")} — archiver le lot en entier ou pas du tout`);
-    process.exit(1);
+    // 22/08 — la protection R10 est juste, sa PORTÉE ne l'était pas : un seul lot partagé
+    // (un item clos, son voisin encore en cours) abandonnait l'archivage des 157 autres, et
+    // le registre actif restait noyé sous les items faits. Le lot concerné est désormais
+    // RETENU, le reste part. Un défaut n'emporte pas tout le traitement — même doctrine que
+    // le regroupement des constats ailleurs dans la forge.
+    for (const id of externesOrphelins) archivables.delete(id);
+    retenus.push(...externesOrphelins.map((id) => `${id} (lot de l'ingestion ligne ${i + 1} : un membre reste actif)`));
   }
 }
 
+// 22/08 — Une RECTIFICATION suit ses cibles. Elle déclare des écarts SUR DES ITEMS : laissée
+// dans l'actif alors que ses items partent, elle viole R9 (« rectification sans cible
+// ANTÉRIEURE ») et fait tomber le registre entier en FAIL — constaté au premier archivage réel.
+// Les entrées dont l'item part sont recopiées dans une rectification jumelle, placée avec eux ;
+// celles dont l'item reste demeurent dans l'actif. Aucun écart n'est perdu : chacun reste
+// imprimé du côté où vit son item.
+function scinderRectification(evenement, partId) {
+  if (evenement.ev !== "rectification_horodatage" || !Array.isArray(evenement.entrees)) return null;
+  const partent = evenement.entrees.filter((x) => partId.has(x.id));
+  const restent = evenement.entrees.filter((x) => !partId.has(x.id));
+  if (!partent.length) return null;
+  return { partent, restent };
+}
+
+if (retenus.length) {
+  console.log(retenus.length + " item(s) clos RETENUS (couverture R10 de leur lot) :");
+  for (const motif of retenus) console.log("  - " + motif);
+}
 if (constat) {
   console.log(`${archivables.size} item(s) archivable(s) : ${[...archivables].sort().join(", ")}`);
   process.exit(0);
