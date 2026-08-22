@@ -19,6 +19,11 @@ ce qu'on en conclut, ce qui reste à décider, d'où viennent les chiffres.
 ### 0 · En-tête
 
 ```
+---
+destinataire: humain
+role_destinataire: {qui lit ce rapport, et pour quelle décision}
+---
+
 # {Objet du rapport} — {Client} — {AAAAMMJJ<indice>}
 
 > **Périmètre** {ce qui est couvert, et ce qui ne l'est pas}
@@ -26,6 +31,8 @@ ce qu'on en conclut, ce qui reste à décider, d'où viennent les chiffres.
 > **Établi le** {date} · **Méthode** {comment les mesures ont été faites}
 > **Gabarit** gd-rapport-donnees · **Version du gabarit** 1.0.0
 ```
+**`destinataire` est dû, et il est LU PAR UN ORACLE** (TF-0504, 22/08/2026). `R-2` d'`oracle-conformite-projet` ne juge la localisation que des artefacts MARQUÉS : sans cette ligne, un document né de ce gabarit est invisible au contrôle — et c'est arrivé, une fiche écrite hors `output\` qu'aucun oracle ne pouvait voir, trouvée par relecture humaine. La valeur est FERMÉE : `humain` pour un livrable, `aucun` pour un document normatif. Le rôle du lecteur, lui, vit sous `role_destinataire` — utile, mais ce n'est pas la marque.
+
 **`gabarit` et `version_du_gabarit` sont dus** — c'est le fil qui rend un retour exploitable.
 Un lecteur qui trouve un manque dans ce document ne peut le remonter utilement que s'il peut dire
 DE QUEL gabarit et de QUELLE version il vient : sans ce couple, le retour dit « il manquait une
