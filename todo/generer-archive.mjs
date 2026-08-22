@@ -210,7 +210,7 @@ const rendCarte = (e) => {
             <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le ${esc((e.date_correction || e.ts).slice(0, 10))}</span>
           </header>
           <h3 class="card-titre">${escLit(e.titre)}</h3>
-          <div class="card-detail">${rendDetail(e.contenu)}</div>
+          <div class="card-detail" data-cite>${rendDetail(e.contenu)}</div>
           <details class="histoire"${volume < 200 ? " open" : ""}>
             <summary>Histoire de l'item — ${e.jalons.length} jalon(s), de la création à l'archivage</summary>
             <ol class="jalons">

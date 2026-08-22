@@ -117,7 +117,7 @@ for (const forge of [...parForge.keys()].sort()) {
             ${reel}
           </header>
           <h3 class="card-titre">${escLit(e.titre)}</h3>
-          <div class="card-detail">${rendDetail(e.contenu)}</div>
+          <div class="card-detail" data-cite>${rendDetail(e.contenu)}</div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>${esc(e.date_demande)}</dd></div>
             <div><dt>Priorité</dt><dd>${p.l} <span class="meta-sub">(score ${e.score.valeur} — gain ${e.score.gain} × preuve ${e.score.preuve} ÷ effort ${e.score.effort})</span></dd></div>

@@ -7,7 +7,13 @@ prouvée à zéro faux positif, et ne voit rien. Le marquage a été vérifié t
 `oracle-synthese` (S1-S8) sur une synthèse réelle PASS avant d'être prescrit ici.
 Cette consigne, elle, ne se marque PAS : c'est un référentiel normatif, pas un livrable.
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 2.4.0, 20/08/2026** (R-44 : l'oracle devient **BLOQUANT** par le hook `Stop` `oracles\hook-restitution.mjs` — tout message de fin de tour de travail est jugé avant d'être accepté ; décision humaine du 20/08 « à retravailler pour s'assurer que cela est bien exécuté », qui clôt le statut « informatif » de la v2.0.0) — précédente : 2.3.0 du 20/08 (TF-0407 : bloc 0 « synthèse d'ouverture », règle S9 ; TF-0408 : effort en complexité × durée, jamais en jours, règles S10/E8) — antérieure : 2.1.0 du 15/08 (TF-0249 : appelants nommés, synthèse EN FICHIER jugée avant affichage ; TF-0250 : oracle renommé `oracle-synthese`) — **v2.0.0 du 14/08 ADOPTÉE telle
+Référentiel versionné (loi n° 4, daté-éditable) — **version 2.5.0, 22/08/2026** (retour humain
+« le prompt de résultat s'affiche 2 fois » : un hook `Stop` juge APRÈS l'affichage, donc chaque
+refus laissait la version rejetée à l'écran et faisait relire huit blocs. Le gate reste, il
+devient **proportionné** : **bloquantes S1, S3, S4, S6** — la restitution est inutilisable sans
+elles ; **avertissantes S2, S5, S7, S8, S9, S10** — dites en une ligne sous la réponse,
+journalisées, jamais réécrites. Mesure qui a tranché : les trois refus en session réelle
+portaient tous sur S8, jamais sur la structure) — précédente : **2.4.0, 20/08/2026** (R-44 : l'oracle devient **BLOQUANT** par le hook `Stop` `oracles\hook-restitution.mjs` — tout message de fin de tour de travail est jugé avant d'être accepté ; décision humaine du 20/08 « à retravailler pour s'assurer que cela est bien exécuté », qui clôt le statut « informatif » de la v2.0.0) — précédente : 2.3.0 du 20/08 (TF-0407 : bloc 0 « synthèse d'ouverture », règle S9 ; TF-0408 : effort en complexité × durée, jamais en jours, règles S10/E8) — antérieure : 2.1.0 du 15/08 (TF-0249 : appelants nommés, synthèse EN FICHIER jugée avant affichage ; TF-0250 : oracle renommé `oracle-synthese`) — **v2.0.0 du 14/08 ADOPTÉE telle
 quelle par décision humaine du 14/08** (option (a) : les 8 blocs restent, l'oracle reste
 **informatif** et non bloquant tant qu'on ne l'a pas vu tenir sur plusieurs clôtures réelles).
 Il régit

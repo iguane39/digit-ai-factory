@@ -738,13 +738,21 @@ actions. Aucune n'avait d'exécutant : le pilot n'avait pas un seul hook.
 
 **R-44.** Trois gates câblés, dans `.claude\settings.json` du pilot et — via
 `gabarits\settings-produit.json` + `forge\hooks\factory.mjs` — de chaque produit :
-1. **Restitution bloquante** (`oracles\hook-restitution.mjs`, hook `Stop`) : tout message
+1. **Restitution gatée** (`oracles\hook-restitution.mjs`, hook `Stop`) : tout message
    final d'un tour de TRAVAIL (≥ 1 écriture ou ≥ 4 commandes) est jugé par `oracle-synthese`
    (S1-S10 : bloc 0, 8 blocs, décisions en options (a)/(b)/(c), actions par acteur et
    ordonnées, preuves, motifs, effort hors jours) ; un FAIL refuse l'arrêt et renvoie les
    règles en défaut ; une seule réécriture est imposée (anti-boucle), le verdict est
-   journalisé (`.claude\hooks-journal.jsonl`). `RESTITUTION.md` passe en **2.4.0 :
-   bloquant**.
+   journalisé (`.claude\hooks-journal.jsonl`).
+   **Amendement du 22/08 — proportionnalité (retour humain « le prompt de résultat s'affiche
+   2 fois »).** Un hook `Stop` juge APRÈS l'affichage : refuser force une réécriture, et la
+   version refusée RESTE à l'écran — le lecteur relit une restitution entière. Mesuré au
+   journal : les trois refus en session réelle portaient tous sur **S8** (une puce sans
+   preuve), jamais sur la structure. Deux sévérités désormais : **bloquantes S1, S3, S4, S6**
+   (blocs absents, verdict non factuel, décision sans choix fermé, actions non classées — la
+   restitution est inutilisable, le doublon est alors le moindre coût) ; **avertissantes S2,
+   S5, S7, S8, S9, S10** (dites en une ligne sous la réponse, journalisées, jamais réécrites).
+   `RESTITUTION.md` passe en **2.5.0**.
 2. **Fraîcheur exécutée** (`oracles\hook-ouverture.mjs`, hook `SessionStart`) :
    `bootstrap.mjs --pull` joué à l'ouverture et à la reprise — pilot, treize forges,
    skills, versions affichées — et les gates actifs dits à l'assistant.
