@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=034df961baba archive=54c0315cbe97 · dernier événement: 2026-08-22T15:53:02.480Z -->
+     sceaux: actifs=0568ae2e68c4 archive=54c0315cbe97 · dernier événement: 2026-08-22T16:00:05.829Z -->
 
-**50 actifs** (candidat 23 · décidé 0 · en cours 1 · corrigé 26 · écarté 0) · **469 archivés**.
+**50 actifs** (candidat 22 · décidé 0 · en cours 1 · corrigé 27 · écarté 0) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -39,6 +39,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0492 | corrige | 10 | forge-design : aucun controle ne detecte un mot coupe en deux au rendu (Utilisabl/e, Plateform/e, 231 occurrenc/es) | **oui** — Trois occurrences signalees par le client sur deux versions successives, dont une apres une correction incomplete. |
 | TF-0501 | corrige | 10 | forge-agents : run-oracles.mjs ecrit ses journaux DANS l arbre de livraison tout en imprimant qu il les ecrit hors livraison | **oui** — Le dossier se recree a chaque ecriture surveillee, y compris celle du lot de retours qui le signale ; le supprimer avant remise ne suffit donc pas. |
 | TF-0517 | corrige | 10 | forge-design : aucune regle de lisibilite n impose qu un identifiant porte son sens — L3 couvre les valeurs, L14 la plomberie, le troisieme cas est absent | **oui** — Retour direct du client en cours de session : quatre livrables et une restitution entiere illisibles sur ce point, jusqu a l interruption. |
+| TF-0490 | corrige | 8 | forge-design : confirmation de RD-12 — les exemples du socle emploient des glyphes absents des piles de repli declarees | **oui** — Meme defaut reproduit une seconde fois parce qu il vient de l exemple de reference. |
 | TF-0497 | corrige | 7.5 | quality-oracles : la garde TOCTOU (empreinte aux deux bords) est cablee mais NON couverte par recette — le seul mecanisme du lot dont les deux sens ne sont pas joues | **oui** — paye immediatement et mesurable : le self-test du skill passe de 152 a 156 controles, dont 4 pour ce lot — et 0 pour la garde TOCTOU. Sur les deux mecanismes livres, un seul est prouve. Le contrat de la maison est « aucun ✓ sans oracle execute » : ici le ✓ de la garde TOCTOU repose sur la lecture du code, pas sur une execution. |
 | TF-0478 | corrige | 6.7 | quality-oracles : un verdict ne dit pas SUR QUEL CONTENU il a ete rendu — un CONFORME cite en restitution vieillit en silence, ni re-verifiable ni invalidable | **oui** — MESURE le 22/08 sur le parc reel, et le resultat est total : sur les 2 journaux d'oracles confrontables a leur cible, 2 portent un verdict PASS rendu AVANT une modification de la cible (etude i18n : cible modifiee 5,9 min apres le verdict ; etude portefeuille : 1,5 min apres). Deux « PASS » sont donc citables aujourd'hui alors qu'ils ne portent plus sur le contenu present, et RIEN ne les distingue d'un verdict frais. Echantillon petit (2 journaux) — mais le taux de perime y est de 2/2, et le mecanisme est structurel, pas accidentel. |
 | TF-0500 | corrige | 6.7 | forge-design : la regle L2-rendu ne peut structurellement pas voir un texte ecrase en filet sur mobile — trois causes independantes | **oui** — Une famille entiere de defauts de mise en page non surveillee sous 1100 px, la ou les bascules de layout la rendent la plus probable. |
@@ -64,7 +65,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0494 | candidat | 15 | forge-design : le workflow auditer ne prescrit aucune tracabilite pour une demande client multiple | **oui** — Un point sur dix-sept perdu, decouvert par le client et non par la chaine de controle. |
 | TF-0491 | candidat | 12.5 | forge-design : aucun controle ne compare la largeur d un bloc de texte a celle de ses blocs freres — trois allers-retours client sur le meme defaut | **oui** — Trois allers-retours client sur un seul defaut, sur quatre versions livrees. |
 | TF-0493 | candidat | 8.3 | forge-design : le rendu ne couvre aucun etat d echec ou d interaction, et --etats-ouverts n y suffit pas | **oui** — Deux defauts d etat trouves par le client sur un seul livrable, tous deux reproductibles en deux clics. |
-| TF-0490 | candidat | 8 | forge-design : confirmation de RD-12 — les exemples du socle emploient des glyphes absents des piles de repli declarees | **oui** — Meme defaut reproduit une seconde fois parce qu il vient de l exemple de reference. |
 | TF-0483 | candidat | 6.7 | forge-design : rien n oblige a relever ce qui se fait de bien dans le domaine du produit avant de proposer une DA — les oracles jugent la discipline INTERNE, et une DA au vert complet a ete rejetee en bloc | **oui** — Un tour complet conception+design perdu sur factory.digit-ai.fr : DA au vert sur tous les oracles, rejetee integralement par le commanditaire, refaite avec releve externe et arbitrage humain sur captures. |
 | TF-0489 | candidat | 6.7 | forge-design : aucun composant « lecteur de source » au catalogue alors que la regle d autoportance impose d embarquer les sources citees | **oui** — 130 lignes de convertisseur ecrites a la main, plus la decouverte du seuil de DOM par essai ; besoin cree par une regle du socle lui-meme. |
 
