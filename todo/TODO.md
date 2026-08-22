@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=1e35433af3c2 archive=54c0315cbe97 · dernier événement: 2026-08-22T15:25:23.337Z -->
+     sceaux: actifs=39d5701ac47a archive=54c0315cbe97 · dernier événement: 2026-08-22T15:39:14.564Z -->
 
-**48 actifs** (candidat 24 · décidé 0 · en cours 1 · corrigé 23 · écarté 0) · **469 archivés**.
+**50 actifs** (candidat 26 · décidé 0 · en cours 1 · corrigé 23 · écarté 0) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -27,6 +27,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-0324 | en_cours | 3 | Artefacts périodiques du run de delivery absents : RAID, rapport d'avancement, compte rendu, REX, suivi des bénéfices | **oui** — revérifié en session le 16/08 : 0 occurrence de RAID / compte rendu / rapport d'avancement / lessons learned sur les skills installés — aucun des cinq artefacts que réclame une mission longue n'a d'équivalent dans la forge |
 | TF-0495 | candidat | 10 | forge-agents : aucune regle ne distingue « le contenu est present » de « le contenu est exploitable » | **oui** — Deux demandes explicites du client necessaires pour obtenir un contenu lisible, sur un livrable vert a tous les oracles. |
+| TF-0518 | candidat | 8.3 | forge-agents : un livrable Markdown ne recoit aucun controle de lisibilite — la famille L1-L17 est enfermee derriere une porte HTML | **oui** — Dix livrables Markdown remis a un client sans aucun controle de lisibilite ; le defaut qui en est ne a ete trouve par le client, pas par la chaine. |
 | TF-0515 | candidat | 7.5 | quality-oracles : le controle « §6 niveaux » du self-test depend d un navigateur sans tete et DEPASSE son timeout de 180 s sur un poste charge — la recette devient non deterministe | **oui** — mesure le 22/08 : le self-test sort en echec sur 1 controle sur 159 pour une cause d environnement, et le message rendu (« --json inexploitable ») accuse le format quand la cause est la duree — le diagnostic a demande de rejouer la commande avec le code d origine pour ecarter une regression du lot du jour. |
 | TF-0475 | candidat | 3 | agents, design : 18 des 20 champs de frontmatter d'un SKILL.md ne sont posés nulle part — isolation de contexte, cadrage du déclenchement et restriction d'outils ne sont câblés sur aucun des 17 skills | **oui** — mesuré et non payé sur pièce : 17 SKILL.md sur 17 à deux champs, 18 champs disponibles à zéro occurrence, dont les trois seuls mécanismes de la plateforme capables d'isoler un contexte, de cadrer un déclenchement et de restreindre un outil |
 | TF-0484 | corrige | 25 | forge-agents : run-oracles.mjs plante sur JSON_OUT non defini, n affiche jamais son verdict et retourne 1 sur un PASS — le hook d ecriture bloque alors toute ecriture | **oui** — Bloque le hook d ecriture de tout l ecosysteme : deux ecritures refusees sur des fichiers au verdict PASS pendant cette seule passe. |
@@ -61,6 +62,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0494 | candidat | 15 | forge-design : le workflow auditer ne prescrit aucune tracabilite pour une demande client multiple | **oui** — Un point sur dix-sept perdu, decouvert par le client et non par la chaine de controle. |
 | TF-0491 | candidat | 12.5 | forge-design : aucun controle ne compare la largeur d un bloc de texte a celle de ses blocs freres — trois allers-retours client sur le meme defaut | **oui** — Trois allers-retours client sur un seul defaut, sur quatre versions livrees. |
 | TF-0492 | candidat | 10 | forge-design : aucun controle ne detecte un mot coupe en deux au rendu (Utilisabl/e, Plateform/e, 231 occurrenc/es) | **oui** — Trois occurrences signalees par le client sur deux versions successives, dont une apres une correction incomplete. |
+| TF-0517 | candidat | 10 | forge-design : aucune regle de lisibilite n impose qu un identifiant porte son sens — L3 couvre les valeurs, L14 la plomberie, le troisieme cas est absent | **oui** — Retour direct du client en cours de session : quatre livrables et une restitution entiere illisibles sur ce point, jusqu a l interruption. |
 | TF-0493 | candidat | 8.3 | forge-design : le rendu ne couvre aucun etat d echec ou d interaction, et --etats-ouverts n y suffit pas | **oui** — Deux defauts d etat trouves par le client sur un seul livrable, tous deux reproductibles en deux clics. |
 | TF-0490 | candidat | 8 | forge-design : confirmation de RD-12 — les exemples du socle emploient des glyphes absents des piles de repli declarees | **oui** — Meme defaut reproduit une seconde fois parce qu il vient de l exemple de reference. |
 | TF-0483 | candidat | 6.7 | forge-design : rien n oblige a relever ce qui se fait de bien dans le domaine du produit avant de proposer une DA — les oracles jugent la discipline INTERNE, et une DA au vert complet a ete rejetee en bloc | **oui** — Un tour complet conception+design perdu sur factory.produit-07 : DA au vert sur tous les oracles, rejetee integralement par le commanditaire, refaite avec releve externe et arbitrage humain sur captures. |
