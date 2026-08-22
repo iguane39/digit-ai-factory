@@ -50,7 +50,8 @@
 | `20260819-etude-opportunite-retro-engineering.md` | fichier | 10,4 Ko | 2026-08-19 | Étude d'opportunité — rétro-engineering d'un ou plusieurs projets — 20260819a |
 | `20260820-etude-opportunite-communication-interlocuteur.md` | fichier | 10,6 Ko | 2026-08-20 | Étude d'opportunité — adapter la communication à l'interlocuteur — 20260820b |
 | `20260820-etude-opportunite-rgaa.md` | fichier | 13,0 Ko | 2026-08-20 | Étude d'opportunité — RGAA AA dans le parc : forge-design, forge-tests, et ce qui n'est pa |
+| `20260822-etude-opportunite-fraicheur-des-verdicts.md` | fichier | 13,8 Ko | non versionné | Étude d'opportunité — fraîcheur des verdicts d'oracles — 20260822b |
 | `20260822-etude-opportunite-troisieme-point-observation-i18n.md` | fichier | 8,2 Ko | 2026-08-22 | Étude d'opportunité — un troisième point d'observation pour le pan i18n — 20260822a |
 | `20260822-etude-opportunite-vue-portefeuille.md` | fichier | 8,6 Ko | 2026-08-22 | Étude d'opportunité — vue portefeuille du reste-à-faire — 20260822a |
 
-_38 fichier(s), 0 sous-dossier(s)_ · dossiers cachés (journaux machine, sans README) : `_oracles\`
+_39 fichier(s), 0 sous-dossier(s)_ · dossiers cachés (journaux machine, sans README) : `_oracles\`
