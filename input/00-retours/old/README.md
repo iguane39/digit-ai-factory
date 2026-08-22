@@ -75,8 +75,8 @@ Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés 
 | `Hoopiz - RETOURS - 20260821a.tf.jsonl` | fichier | 9,3 Ko | 2026-08-22 | 7 ligne(s) JSONL |
 | `Hoopiz - RETOURS - 20260822a.md` | fichier | 10,5 Ko | 2026-08-22 | Retours forges — Hoopiz — 20260822a |
 | `Hoopiz - RETOURS - 20260822a.tf.jsonl` | fichier | 6,9 Ko | 2026-08-22 | 5 ligne(s) JSONL |
-| `Hoopiz - RETOURS - 20260822b.md` | fichier | 9,5 Ko | non versionné | Retours forges — Hoopiz — 20260822b |
-| `Hoopiz - RETOURS - 20260822b.tf.jsonl` | fichier | 6,5 Ko | non versionné | 3 ligne(s) JSONL |
+| `Hoopiz - RETOURS - 20260822b.md` | fichier | 9,5 Ko | 2026-08-22 | Retours forges — Hoopiz — 20260822b |
+| `Hoopiz - RETOURS - 20260822b.tf.jsonl` | fichier | 6,5 Ko | 2026-08-22 | 3 ligne(s) JSONL |
 | `nhood-cockpit-ia - RETOURS - 20260820a.md` | fichier | 9,8 Ko | 2026-08-20 | Retours forges — nhood-cockpit-ia — 20260820a |
 | `nhood-cockpit-ia - RETOURS - 20260820a.tf.jsonl` | fichier | 6,5 Ko | 2026-08-20 | 4 ligne(s) JSONL |
 | `pilot-campagne-fiches-html - RETOURS - 20260809a.md` | fichier | 6,5 Ko | 2026-08-13 | Retours forges — campagne « fiches HTML lisibles » — 20260809a |

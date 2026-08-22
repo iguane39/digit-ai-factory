@@ -14,7 +14,7 @@ Candidatures hors lot de retours : `candidature-*.tf.jsonl`, `revue-*.tf.jsonl`,
 
 | Élément | Type | Taille | Dernier commit | Titre / nature |
 |---|---|---|---|---|
-| [`old\`](old/README.md) | dossier (32 fichiers) | — | 2026-08-22 | Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — archive figée, jamais ré-ingérée. |
+| [`old\`](old/README.md) | dossier (33 fichiers) | — | 2026-08-22 | Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — archive figée, jamais ré-ingérée. |
 | `candidature-bootstrap-dernieres-versions.tf.jsonl` | fichier | 2,9 Ko | 2026-08-20 | 1 ligne(s) JSONL |
 | `candidature-frontiere-chiffre-recette-todo.tf.jsonl` | fichier | 2,1 Ko | 2026-08-21 | 1 ligne(s) JSONL |
 | `candidature-oracle-claude-md-crlf.tf.jsonl` | fichier | 1,6 Ko | 2026-08-20 | 1 ligne(s) JSONL |
