@@ -4,7 +4,12 @@
  *   1. tour de TRAVAIL + message final hors format → {"decision":"block"} avec règles nommées ;
  *   2. même transcript, `stop_hook_active` vrai (déjà refusé une fois) → laisse passer ;
  *   3. tour de TRAVAIL + message final conforme (oracle-synthese PASS) → laisse passer ;
- *   4. tour de LECTURE (Read/Grep seulement) + message libre → laisse passer, non jugé.
+ *   4. tour de LECTURE (Read/Grep seulement) + message libre → laisse passer, non jugé ;
+ *   5. (22/08) message STRUCTURELLEMENT conforme mais portant un défaut de DÉTAIL (S8 : une
+ *      puce « fait » sans preuve) → NE BLOQUE PAS, dit l'avertissement sous la réponse. C'est
+ *      le retour humain du 22/08 : un hook `Stop` juge après l'affichage, donc chaque refus
+ *      laisse la version rejetée à l'écran et fait relire huit blocs pour une puce. Sans ce
+ *      cas, la proportionnalité du gate ne serait tenue par rien.
  * La conformité du message « bon » est établie par oracle-synthese lui-même (pas par le test).
  * Joué par oracles/self-tests.mjs (I2).
  */
@@ -86,8 +91,22 @@ try {
 
   const r4 = lancer("lecture", MAUVAIS, ["Read", "Grep"]);
   if (r4.decision !== null) echecs.push("4 : tour de lecture → attendu non jugé");
+
+  // 5 — défaut de DÉTAIL seul : la structure tient, une puce du bloc 4 perd sa preuve.
+  // S8 cherche un mot d'achèvement (« fait », « terminé », « clos », ✓) dans une puce SANS
+  // preuve : on retire la preuve de la seule puce du bloc 4 et on garde le mot.
+  const DETAIL = BON.replace(
+    "- bootstrap v2 livré — preuve : bootstrap.test.mjs 7/7, recette 22/22.",
+    "- la mise à jour du poste est terminée.");
+  const r5 = lancer("detail", DETAIL, ["Write", "Edit"]);
+  if (r5.decision?.decision === "block")
+    echecs.push(`5 : défaut de détail → bloqué à tort (le lecteur relirait tout pour une puce) : ${String(r5.decision.reason).slice(0, 120)}`);
+  else if (!r5.decision?.systemMessage)
+    echecs.push("5 : défaut de détail → ni blocage ni avertissement : le verdict serait muet");
+  else if (!/S8/.test(r5.decision.systemMessage))
+    echecs.push("5 : l'avertissement ne nomme pas la règle en cause");
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 200)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error("hook-restitution : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log("hook-restitution : 4/4 — hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée");
+console.log("hook-restitution : 5/5 — hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture (22/08)");

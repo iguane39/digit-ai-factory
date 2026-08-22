@@ -64,6 +64,20 @@ export function juger(texte) {
   return { code: r.status, fails: (rapport.findings || []).filter((x) => x.statut === "FAIL") };
 }
 
+// SÉVÉRITÉS (22/08, retour humain : « le prompt de résultat s'affiche 2 fois »). Un hook `Stop`
+// juge APRÈS l'affichage : refuser force une réécriture, et la version refusée RESTE à l'écran.
+// Le lecteur relit alors une restitution entière pour un défaut de détail — mesuré au journal :
+// les trois refus en session réelle portaient tous sur S8 (une puce sans preuve), jamais sur la
+// structure. Le gate reste, il devient proportionné :
+//   · BLOQUANT — la restitution est inutilisable sans ça : blocs absents (S1), verdict non
+//     factuel (S3), décision sans choix fermé (S4), actions non classées (S6). Le doublon est
+//     alors justifié : mieux vaut lire deux fois qu'agir sur une restitution qu'on ne peut pas
+//     utiliser.
+//   · AVERTISSEMENT — tout le reste (S2, S5, S7, S8, S9, S10) : dit en une ligne sous la
+//     réponse, journalisé, jamais réécrit. Une preuve manquante sur une puce ne vaut pas de
+//     faire relire huit blocs.
+const BLOQUANTES = new Set(["S1", "S3", "S4", "S6"]);
+
 const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md : bloc 0 « synthèse d'ouverture » en langage commanditaire (≥ 20 mots, sans identifiant, chemin ni sha — l'état, ce que ça change, ce qui est attendu du lecteur), puis les 8 blocs numérotés, aucun omis (un bloc vide se dit en une ligne) : 1 en-tête (quoi · sur quoi · date ET heure avec fuseau + durée · qui avec version) · 2 verdict en une ligne FACTUEL (un chiffre, un compteur) · 3 décisions attendues de l'humain, EN TÊTE, en choix fermé (a)/(b)/(c) avec coût, exclusion, recommandation et option par défaut — ou « rien n'attend de décision » · 4 traité, chaque puce avec sa preuve (oracle, verdict, chiffre) · 5 non traité, chaque puce avec son motif · 6 écarts à la lettre (« vous avez demandé → j'ai fait → pourquoi », ou « aucun écart ») · 7 risques (énoncé + signal + parade) · 8 prochaines actions classées par acteur (auto_ia / manuelle_dev / manuelle_utilisateur) ET par ordre justifié. Puces ≤ 2 niveaux. Effort en complexité × durée, jamais en jours.";
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
@@ -73,11 +87,31 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const { travail, ecritures, commandes, dernierTexte } = analyserTranscript(readFileSync(chemin, "utf8"));
   if (!travail || !dernierTexte) process.exit(0);
   const { code, fails } = juger(dernierTexte);
+  const bloquants = fails.filter((f) => BLOQUANTES.has(f.regle));
+  const avertissements = fails.filter((f) => !BLOQUANTES.has(f.regle));
   const journal = join(ICI, "..", ".claude", "hooks-journal.jsonl");
-  try { mkdirSync(dirname(journal), { recursive: true }); appendFileSync(journal, JSON.stringify({ ts: new Date().toISOString(), hook: "restitution", session: entree.session_id, ecritures, commandes, verdict: code === 0 ? "PASS" : "FAIL", regles: fails.map((f) => f.regle), deja_refuse: !!entree.stop_hook_active }) + "\n"); } catch { /* journal facultatif */ }
+  try {
+    mkdirSync(dirname(journal), { recursive: true });
+    appendFileSync(journal, JSON.stringify({
+      ts: new Date().toISOString(), hook: "restitution", session: entree.session_id, ecritures, commandes,
+      verdict: code === 0 ? "PASS" : (bloquants.length ? "FAIL" : "AVERTISSEMENT"),
+      regles: fails.map((f) => f.regle), bloquantes: bloquants.map((f) => f.regle),
+      deja_refuse: !!entree.stop_hook_active,
+    }) + "\n");
+  } catch { /* journal facultatif */ }
   if (code === 0) process.exit(0);
+  // Avertissements seuls : dits sous la réponse, jamais réécrits — pas de doublon à l'écran.
+  if (!bloquants.length) {
+    console.log(JSON.stringify({
+      systemMessage: `[restitution — R-44] avertissement${avertissements.length > 1 ? "s" : ""} non bloquant${avertissements.length > 1 ? "s" : ""} : ` +
+        avertissements.map((f) => `${f.regle} — ${f.message}`).join(" · ") +
+        " (structure conforme : rien n'est réécrit, le verdict est journalisé)",
+    }));
+    process.exit(0);
+  }
   if (entree.stop_hook_active) process.exit(0); // déjà refusé une fois : on ne boucle pas, le verdict est journalisé
-  const motifs = fails.map((f) => `${f.regle} — ${f.message}`).join("\n");
-  console.log(JSON.stringify({ decision: "block", reason: `[hook restitution — R-44] oracle-synthese FAIL sur ta réponse finale :\n${motifs}\n\n${RAPPEL}` }));
+  const motifs = bloquants.map((f) => `${f.regle} — ${f.message}`).join("\n");
+  const enPlus = avertissements.length ? `\n(à corriger au passage, non bloquant : ${avertissements.map((f) => f.regle).join(", ")})` : "";
+  console.log(JSON.stringify({ decision: "block", reason: `[hook restitution — R-44] oracle-synthese FAIL BLOQUANT sur ta réponse finale :\n${motifs}${enPlus}\n\n${RAPPEL}` }));
   process.exit(0);
 }

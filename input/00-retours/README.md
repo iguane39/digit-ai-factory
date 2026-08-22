@@ -14,6 +14,12 @@ Lots de retours des forges et des projets — `<projet> - RETOURS - AAAAMMJJ<i>.
 
 | Élément | Type | Taille | Dernier commit | Titre / nature |
 |---|---|---|---|---|
-| [`old\`](old/README.md) | dossier (79 fichiers) | — | 2026-08-21 | Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réé… |
+| [`old\`](old/README.md) | dossier (79 fichiers) | — | 2026-08-22 | Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réé… |
+| `digit-ai-fr - RETOURS - 20260822a.md` | fichier | 10,1 Ko | non versionné | Retours forges — digit-ai-fr — 20260822a |
+| `digit-ai-fr - RETOURS - 20260822a.tf.jsonl` | fichier | 10,2 Ko | non versionné | 5 ligne(s) JSONL |
+| `Hoopiz - RETOURS - 20260821a.md` | fichier | 11,3 Ko | non versionné | Retours forges — Hoopiz — 20260821a |
+| `Hoopiz - RETOURS - 20260821a.tf.jsonl` | fichier | 9,3 Ko | non versionné | 7 ligne(s) JSONL |
+| `Hoopiz - RETOURS - 20260822a.md` | fichier | 10,5 Ko | non versionné | Retours forges — Hoopiz — 20260822a |
+| `Hoopiz - RETOURS - 20260822a.tf.jsonl` | fichier | 6,9 Ko | non versionné | 5 ligne(s) JSONL |
 
-_0 fichier(s), 1 sous-dossier(s)_
+_6 fichier(s), 1 sous-dossier(s)_
