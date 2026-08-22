@@ -14,10 +14,12 @@ Lots de retours des forges et des projets — `<projet> - RETOURS - AAAAMMJJ<i>.
 
 | Élément | Type | Taille | Dernier commit | Titre / nature |
 |---|---|---|---|---|
-| [`old\`](old/README.md) | dossier (87 fichiers) | — | 2026-08-22 | Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réé… |
+| [`old\`](old/README.md) | dossier (89 fichiers) | — | 2026-08-22 | Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réé… |
+| `CalculatriceNhoodSCC - RETOURS - 20260822a.md` | fichier | 14,2 Ko | non versionné | Retours forges — CalculatriceNhoodSCC — 20260822a |
+| `CalculatriceNhoodSCC - RETOURS - 20260822a.tf.jsonl` | fichier | 8,3 Ko | non versionné | 3 ligne(s) JSONL |
 | `digit-ai-fr - RETOURS - 20260822b.md` | fichier | 6,7 Ko | 2026-08-22 | Retours forges — digit-ai-fr — 20260822b |
 | `digit-ai-fr - RETOURS - 20260822b.tf.jsonl` | fichier | 5,3 Ko | 2026-08-22 | 2 ligne(s) JSONL |
-| `factory-digit-ai-fr - RETOURS - 20260822b.md` | fichier | 7,0 Ko | 2026-08-22 | Retours forges — factory-digit-ai-fr — 20260822b |
+| `factory-digit-ai-fr - RETOURS - 20260822b.md` | fichier | 7,1 Ko | 2026-08-22 | Retours forges — factory-digit-ai-fr — 20260822b |
 | `factory-digit-ai-fr - RETOURS - 20260822b.tf.jsonl` | fichier | 5,0 Ko | 2026-08-22 | 2 ligne(s) JSONL |
 
-_4 fichier(s), 1 sous-dossier(s)_
+_6 fichier(s), 1 sous-dossier(s)_
