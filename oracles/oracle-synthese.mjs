@@ -139,7 +139,19 @@ function actionsGroupees(texte) {
     if (/^[-*]\s+\S/.test(ligne)) groupes.push(ligne);
     else if (groupes.length && /^\s+\S/.test(ligne)) groupes[groupes.length - 1] += " " + ligne.trim();
   }
-  return groupes.concat(lignesDeDonnees(texte));
+  // Une ligne de tableau se juge AVEC SON EN-TETE, et c'est la correction du 22/08 (second
+  // temps). En forme de PUCE, le motif d'une action vit dans la puce ; en forme de TABLEAU — la
+  // forme que le lecteur a réclamée trois fois — il vit dans la COLONNE, donc dans l'en-tête. Sans
+  // cette jonction, S19 refusait un tableau dont la dernière colonne s'appelait pourtant « si elle
+  // n'est pas faite » : la règle exigeait de recopier la locution dans chacune des cinq cellules.
+  //
+  // MESURÉ SUR LA RESTITUTION DE CE MANDAT MÊME, la première rendue au format tableau : 5 actions
+  // sur 5 refusées, alors que la colonne était là. Deux règles neuves du même jour se
+  // contredisaient — S18 prescrit le tableau, S19 le rendait impossible à satisfaire proprement.
+  // Une règle qui force à recopier la même locution cinq fois pousse au bruit, pas à la clarté.
+  const entetes = entetesDeTableau(texte);
+  const entete = entetes.length ? entetes[0] : "";
+  return groupes.concat(lignesDeDonnees(texte).map((l) => entete + " " + l));
 }
 
 // Les lignes de DONNÉES d'un tableau markdown : ni l'en-tête (1re ligne du tableau), ni le
@@ -269,8 +281,23 @@ function juger(texte) {
   const sansConditionnel = (l) => l
     .replace(/\bsi\b[^.;]*?\bfaite?\b/gi, " ")
     .replace(/\bne (?:le |la |les )?fait pas\b/gi, " ")
-    .replace(/\bnon fait\b/gi, " ");
-  const nus = puces(texte).filter((l) => {
+    .replace(/\bnon fait\b/gi, " ")
+    // Le bloc 6 est PRESCRIT sous la forme « vous avez demandé → j'ai fait → pourquoi ». S8 y
+    // lisait une affirmation de complétion sans preuve — sur la locution que le gabarit impose.
+    // Un oracle qui refuse la formulation qu'un gabarit prescrit met le gabarit en défaut, jamais
+    // l'auteur. La preuve d'un écart n'est pas un verdict d'oracle : c'est le « pourquoi ».
+    .replace(/\bj(?:'|’)ai (?:aussi |également )?fait\b/gi, " ")
+    .replace(/\bvous avez demandé\b/gi, " ");
+  // S8 EST BORNÉE AUX BLOCS QUI AFFIRMENT (22/08, second temps). Elle balayait le document
+  // entier, et elle mordait donc sur deux formes que le gabarit PRESCRIT ailleurs :
+  //   · bloc 6 — « vous avez demandé → j'ai fait → pourquoi » : la preuve d'un écart est le
+  //     POURQUOI, jamais un verdict d'oracle. « J'ai aussi clos la demande » y était refusé ;
+  //   · bloc 7 — un risque se dit en prose, et « un travail fait deux fois » n'affirme rien.
+  // Les blocs 5, 6 et 7 parlent par construction de ce qui n'a PAS été fait, de ce qui a divergé
+  // et de ce qui pourrait casser : y chercher un ✓ sans preuve est une erreur de domaine. S8 juge
+  // donc le verdict, le traité et les actions — là où la complétion se CLAIME.
+  const zonesAffirmantes = [bloc(texte, BLOCS[1][0]) || "", bloc(texte, BLOCS[3][0]) || "", bloc(texte, BLOCS[7][0]) || ""].join(String.fromCharCode(10));
+  const nus = puces(zonesAffirmantes).filter((l) => {
     if (!/(✓|\bfait\b|\btermin[ée]|\bsold[ée]|\bclos\b)/i.test(sansConditionnel(l))) return false;
     return !preuve(l);
   });

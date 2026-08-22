@@ -355,6 +355,23 @@ appliquent pas non plus : elles jugent un fichier, et une CLI n'en écrit pas.
 
 ## Contrôle
 
+**Trois bornes de domaine, ecrites parce quelles ont ete trouvees en jouant les regles neuves
+sur une restitution reelle le 22/08** — et chaque fois le defaut etait celui de la regle NEUVE,
+jamais celui de lauteur :
+
+- **une ligne de tableau se juge AVEC son en-tete.** En forme de puce, le motif dune action vit
+  dans la puce ; en forme de TABLEAU, il vit dans la COLONNE. S19 refusait un tableau dont la
+  derniere colonne sappelait pourtant « si elle nest pas faite » : elle exigeait de recopier la
+  locution dans chacune des cinq cellules. Deux regles du meme jour se contredisaient — S18
+  prescrit le tableau, S19 le rendait impossible a satisfaire proprement ;
+- **S8 est bornee aux blocs qui AFFIRMENT** (verdict, traite, actions). Elle balayait le document
+  entier et mordait sur deux formes que ce gabarit PRESCRIT ailleurs : le bloc 6 (« vous avez
+  demande -> jai fait -> pourquoi », dont la preuve est le POURQUOI et jamais un verdict) et le
+  bloc 7, ou « un travail fait deux fois » naffirme rien. Les blocs 5, 6 et 7 parlent par
+  construction de ce qui na PAS ete fait : y chercher un ✓ sans preuve est une erreur de domaine ;
+- **S8 ignore la tournure conditionnelle de S19.** « si rien nest fait » contient le mot « fait »,
+  que S8 lisait comme une affirmation de completion sans preuve.
+
 **Exécuté** : `node oracles\oracle-synthese.mjs <synthese.md>` — règles S1-S20 binaires,
 fixtures double sens au self-test (la fixture rouge échoue sur 15 règles distinctes).
 **Proportionnalité (v2.5.0, inchangée)** : bloquantes S1, S3, S4, S6 ; tout le reste — S17 à S20
