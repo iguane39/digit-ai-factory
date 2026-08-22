@@ -12,9 +12,8 @@ Scripts et paquets fournis par l'humain — à INSTRUIRE avant tout usage : un o
 
 ## Contenu
 
-| Élément | Type | Taille | Dernier commit | Titre / nature |
-|---|---|---|---|---|
-| [`old\`](old/README.md) | dossier (1 fichier) | — | 2026-08-14 | Outillage entrant déjà instruit, remplacé ou écarté — archive. |
-| `livrables-gen.py` | fichier | 29,9 Ko | 2026-08-13 | PY |
+| Élément | Type | Taille | Titre / nature |
+|---|---|---|---|
+| [`old\`](old/README.md) | dossier (2 fichiers) | — | Outillage entrant déjà instruit, remplacé ou écarté — archive. |
 
-_1 fichier(s), 1 sous-dossier(s)_
+_0 fichier(s), 1 sous-dossier(s)_

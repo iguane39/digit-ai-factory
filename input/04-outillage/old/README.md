@@ -12,8 +12,9 @@ Outillage entrant déjà instruit, remplacé ou écarté — archive.
 
 ## Contenu
 
-| Élément | Type | Taille | Dernier commit | Titre / nature |
-|---|---|---|---|---|
-| `prompt-analyzer-l99 (5).skill` | fichier | 8,4 Ko | 2026-08-14 | SKILL |
+| Élément | Type | Taille | Titre / nature |
+|---|---|---|---|
+| `livrables-gen.py` | fichier | 29,9 Ko | PY |
+| `prompt-analyzer-l99 (5).skill` | fichier | 8,4 Ko | SKILL |
 
-_1 fichier(s), 0 sous-dossier(s)_
+_2 fichier(s), 0 sous-dossier(s)_

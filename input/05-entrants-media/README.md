@@ -12,8 +12,8 @@ Médias fournis (captures, vidéos) en appui d'un retour ou d'une insatisfaction
 
 ## Contenu
 
-| Élément | Type | Taille | Dernier commit | Titre / nature |
-|---|---|---|---|---|
-| `LISEZMOI.md` | fichier | 1,1 Ko | 2026-08-18 | `input\05-entrants-media\` — médias fournis |
+| Élément | Type | Taille | Titre / nature |
+|---|---|---|---|
+| `LISEZMOI.md` | fichier | 1,1 Ko | `input\05-entrants-media\` — médias fournis |
 
 _1 fichier(s), 0 sous-dossier(s)_ · voir aussi `LISEZMOI.md` (conventions et correspondance des anciens chemins)

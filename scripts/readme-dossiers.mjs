@@ -7,9 +7,21 @@
  * Contrat :
  *   · le bloc RÔLE (entre <!-- ROLE:DEBUT --> et <!-- ROLE:FIN -->) se rédige à la main et
  *     est PRÉSERVÉ à chaque régénération ; un rôle non rédigé est un DÉFAUT (--check) ;
- *   · tout le reste est régénéré, DÉTERMINISTE : pas d'horodatage de génération, les dates
- *     sont celles du dernier commit git (stables d'un clone à l'autre), la table se régénère
- *     à chaque ajout, modification ou suppression — c'est le sens de « à jour ».
+ *   · tout le reste est régénéré, DÉTERMINISTE : pas d'horodatage de génération, AUCUNE DATE
+ *     de commit, la table se régénère à chaque ajout, modification ou suppression — c'est le
+ *     sens de « à jour ».
+ *
+ * PAS DE DATES, et c'est une DÉCISION (22/08/2026, TF-0503 tranché par le pilote humain :
+ * « pour la règle des README, ne fais pas de boucle sur les dates des fichiers et/ou dossiers
+ * pour ne pas faire grossir inutilement les traitements ou les changements »). La colonne
+ * « Dernier commit » coûtait deux choses et n'en rendait qu'une :
+ *   · un `git log --name-only` sur tout l'arbre à CHAQUE écriture de fichier (hook PostToolUse),
+ *     puis un balayage de cette table par dossier — un coût qui croît avec l'historique ;
+ *   · une table qui se périmait à chaque commit : le README annonçait « non versionné » pour le
+ *     fichier que le commit était en train de versionner, se régénérait après, et laissait
+ *     l'arbre sale juste après un commit qui venait de tout prendre (sept fois sur sept le
+ *     22/08). TF-0451 avait atténué l'EFFET (dérive de date = avertissement) ; retirer la
+ *     colonne supprime la CAUSE. La fraîcheur d'un fichier se lit dans git, qui la tient déjà.
  *
  * Usage : node scripts\readme-dossiers.mjs [--check] [--silencieux] [--base <dépôt>]
  *                                          [--racines input,output]
@@ -65,21 +77,6 @@ const EST_MACHINE = (nom) => nom.startsWith(".") || nom === "_oracles";
 const posix = (p) => p.split(sep).join("/");
 const affiche = (p) => p.split("/").join("\\") + "\\";
 
-// Dates de dernier commit : UN seul appel git pour tout l'arbre (pas un par fichier).
-function datesCommit() {
-  const dates = new Map();
-  // core.quotepath=false : sans lui, git échappe les accents des chemins (« \303\211 ») et un
-  // dossier « Schéma Écosystème » passait pour « non versionné ».
-  const r = spawnSync("git", ["-C", BASE, "-c", "core.quotepath=false", "log", "--format=@%cs", "--name-only", "--", ...RACINES], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
-  if (r.status !== 0) return dates;
-  let courante = "";
-  for (const l of r.stdout.split(/\r?\n/)) {
-    if (l.startsWith("@")) { courante = l.slice(1); continue; }
-    if (l.trim() && !dates.has(l)) dates.set(l, courante);
-  }
-  return dates;
-}
-
 // Fichiers IGNORÉS par git (sidecars, caches) : présents sur un poste, absents d'un clone — les
 // lister rendrait le README périmé partout ailleurs qu'ici. Un seul appel git, jamais un par entrée.
 function ignores() {
@@ -109,21 +106,6 @@ function nature(chemin) {
   return ext === chemin.toLowerCase() ? "fichier" : ext.toUpperCase();
 }
 
-// Dernier commit d'un dossier = le plus récent de son contenu.
-// La date d'un dossier est celle de son CONTENU, jamais celle des README qui le décrivent
-// (22/08, suite de TF-0451) : sans cette exclusion, committer un README changeait la date du
-// dossier, ce qui périmait le README du PARENT — un cycle relancé par chaque commit, et un
-// arbre de travail jamais propre deux commandes de suite. Un README rapporte, il ne date pas.
-function derniereDate(dates, rel) {
-  let max = "";
-  for (const [p, d] of dates) {
-    if (p !== rel && !p.startsWith(rel + "/")) continue;
-    if (p === "README.md" || p.endsWith("/README.md")) continue;
-    if (d > max) max = d;
-  }
-  return max;
-}
-
 function compter(dir) {
   let fichiers = 0;
   for (const e of readdirSync(dir, { withFileTypes: true })) {
@@ -142,7 +124,7 @@ function roleExistant(readme) {
   return role || null;
 }
 
-function attendu(dir, rel, dates) {
+function attendu(dir, rel) {
   const entrees = readdirSync(dir, { withFileTypes: true })
     .filter((e) => !EST_MACHINE(e.name) && e.name !== "README.md" && !estIgnore(rel + "/" + e.name))
     .sort((x, y) => (x.isDirectory() === y.isDirectory() ? x.name.localeCompare(y.name, "fr") : x.isDirectory() ? -1 : 1));
@@ -154,7 +136,7 @@ function attendu(dir, rel, dates) {
     "     se régénère à chaque ajout, modification ou suppression (hook PostToolUse, recette I4).",
     "     Ne pas éditer la table — modifier le dossier, relancer le script. -->", "",
     "## Rôle", "", MARQUE_DEBUT, role, MARQUE_FIN, "", "## Contenu", "",
-    "| Élément | Type | Taille | Dernier commit | Titre / nature |", "|---|---|---|---|---|");
+    "| Élément | Type | Taille | Titre / nature |", "|---|---|---|---|");
   let nf = 0, nd = 0;
   for (const e of entrees) {
     const chemin = join(dir, e.name), relE = rel + "/" + e.name;
@@ -165,14 +147,14 @@ function attendu(dir, rel, dates) {
       // qu'il contient — « sous-dossier, voir son README » n'informait personne.
       const roleSous = (roleExistant(join(chemin, "README.md")) || ROLES[relE] || "").replace(/\s+/g, " ");
       const resume = roleSous && roleSous !== PLACEHOLDER ? roleSous.replace(/\*\*/g, "").slice(0, 160) + (roleSous.length > 160 ? "…" : "") : "rôle à rédiger dans son README";
-      lignes.push(`| [\`${e.name}\\\`](${e.name}/README.md) | dossier (${n} fichier${n > 1 ? "s" : ""}) | — | ${derniereDate(dates, relE) || "non versionné"} | ${resume.replace(/\|/g, "/")} |`);
+      lignes.push(`| [\`${e.name}\\\`](${e.name}/README.md) | dossier (${n} fichier${n > 1 ? "s" : ""}) | — | ${resume.replace(/\|/g, "/")} |`);
     } else {
       nf++;
       const st = statSync(chemin);
-      lignes.push(`| \`${e.name}\` | fichier | ${taille(st.size)} | ${dates.get(relE) || "non versionné"} | ${nature(chemin).replace(/\|/g, "/")} |`);
+      lignes.push(`| \`${e.name}\` | fichier | ${taille(st.size)} | ${nature(chemin).replace(/\|/g, "/")} |`);
     }
   }
-  if (!entrees.length) lignes.push("| _(dossier vide)_ | | | | |");
+  if (!entrees.length) lignes.push("| _(dossier vide)_ | | | |");
   const notes = [`_${nf} fichier(s), ${nd} sous-dossier(s)_`];
   if (caches.length) notes.push(`dossiers cachés (journaux machine, sans README) : ${caches.map((c) => `\`${c}\\\``).join(", ")}`);
   if (existsSync(join(dir, "LISEZMOI.md"))) notes.push("voir aussi `LISEZMOI.md` (conventions et correspondance des anciens chemins)");
@@ -186,48 +168,32 @@ function* dossiers(dir) {
     if (e.isDirectory() && !EST_MACHINE(e.name)) yield* dossiers(join(dir, e.name));
 }
 
-const dates = datesCommit();
 const defauts = [];
-// TF-0451 (21/08) — la colonne « Dernier commit » se périme à CHAQUE COMMIT : commiter un
-// fichier change sa date, donc la table de son README, donc `--check` sort « périmé »
-// immédiatement après un commit qui venait de passer la recette. Observé trois fois de suite
-// en une session : régénérer, commiter, la recette vire au rouge, régénérer… Le rouge était
-// VRAI et inévitable, ce qui est pire qu'un faux positif — il apprend à régénérer par réflexe
-// sans lire, et le jour où la table signalera un vrai manque, personne ne la lira.
+// TF-0451 puis TF-0503 (21 et 22/08) : le même défaut deux fois. La table portait une colonne
+// « Dernier commit », donc chaque commit la périmait. TF-0451 avait atténué l'EFFET — une dérive
+// de date seule devenait un avertissement, jamais un défaut. Ça n'a pas suffi : l'arbre restait
+// sale après chaque commit d'AJOUT (sept fois sur sept le 22/08), parce que « non versionné »
+// devenait une date dès que le fichier entrait sous git, ce qui est une dérive de date que la
+// tolérance couvrait à `--check` mais que le hook réécrivait quand même.
 //
-// Le remède garde l'information et retire le cycle : ce qui FAIT DÉFAUT est la STRUCTURE
-// (fichiers apparus, disparus, renommés, rôle non rédigé) ; une divergence portant sur les
-// SEULES dates de commit devient un avertissement — la table gagne à être rafraîchie, elle
-// n'est pas fausse. `--check` reste rouge sur ce qui compte, et `--strict` restaure
-// l'égalité stricte pour qui veut l'exiger.
-const STRICT = args.includes("--strict");
-// La colonne « Dernier commit » est la 4e cellule d une ligne de table. On la neutralise
-// QUELLE QUE SOIT sa valeur — date ISO ou « non versionné » — sinon un fichier qui vient
-// d entrer sous git rendrait la table périmée sans que sa structure ait bougé.
-// La colonne « Dernier commit » est la 4e cellule d'une ligne de table. On la neutralise
-// QUELLE QUE SOIT sa valeur — date ISO ou « non versionné » — sinon un fichier qui vient
-// d'entrer sous git rendrait la table périmée alors que sa STRUCTURE n'a pas bougé.
-const SANS_DATES = (t) => t.split(String.fromCharCode(10)).map((l) => {
-  if (!l.startsWith("|")) return l;
-  const c = l.split("|");
-  if (c.length > 5) c[4] = " — ";
-  return c.join("|");
-}).join(String.fromCharCode(10));
+// La CAUSE est retirée par décision humaine du 22/08 : plus aucune date dans la table, donc plus
+// de `git log` sur l'arbre à chaque écriture, plus de balayage par dossier, et plus de tolérance
+// à maintenir. Ce qui fait DÉFAUT est ce qui l'a toujours été et rien d'autre : la STRUCTURE
+// (fichier apparu, disparu, renommé) et le RÔLE non rédigé. `--strict` disparaît avec la
+// tolérance qu'il servait à lever — un drapeau sans objet est une affordance morte.
 const ecrits = [];
-const rafraichir = [];
 for (const racine of RACINES) {
   const abs = join(BASE, racine);
   if (!existsSync(abs)) { defauts.push(`${racine}\\ : racine absente`); continue; }
   for (const dir of dossiers(abs)) {
     const rel = posix(relative(BASE, dir));
     const readme = join(dir, "README.md");
-    const { texte, role } = attendu(dir, rel, dates);
+    const { texte, role } = attendu(dir, rel);
     const courant = existsSync(readme) ? readFileSync(readme, "utf8").split("\r\n").join("\n") : null;
     if (role === PLACEHOLDER) defauts.push(`${affiche(rel)}README.md : rôle non rédigé`);
     if (courant === texte) continue;
     if (CHECK) {
       if (courant === null) defauts.push(`${affiche(rel)}README.md : absent`);
-      else if (!STRICT && SANS_DATES(courant) === SANS_DATES(texte)) rafraichir.push(affiche(rel) + "README.md");
       else defauts.push(`${affiche(rel)}README.md : périmé (le dossier a changé)`);
     }
     else { writeFileSync(readme, texte, "utf8"); ecrits.push(affiche(rel) + "README.md"); }
@@ -235,9 +201,6 @@ for (const racine of RACINES) {
 }
 
 if (!SILENCIEUX && ecrits.length) console.log(`README régénérés (${ecrits.length}) : ${ecrits.join(" · ")}`);
-if (!SILENCIEUX && rafraichir.length) console.log(
-  `[check] ${rafraichir.length} README à rafraîchir (dates de commit seules, structure inchangée) : ` +
-  `${rafraichir.join(" · ")} — avertissement, pas un défaut (TF-0451)`);
 if (!SILENCIEUX && !ecrits.length && !CHECK) console.log("README à jour, rien à régénérer");
 if (defauts.length) {
   console.error(`[readme-dossiers] ${defauts.length} défaut(s) :\n  - ${defauts.join("\n  - ")}`);

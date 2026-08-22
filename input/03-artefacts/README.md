@@ -12,10 +12,10 @@ Pièces que la forge a déclarées manquantes et que l'humain remet (TF-0364) �
 
 ## Contenu
 
-| Élément | Type | Taille | Dernier commit | Titre / nature |
-|---|---|---|---|---|
-| `LISEZMOI.md` | fichier | 2,7 Ko | 2026-08-18 | `input\03-artefacts\` — remise d'un artefact que la forge réclame |
-| `pilote-de-mission.skill` | fichier | 5,3 Ko | 2026-08-18 | SKILL |
-| `pilote-de-mission.skill.remise.json` | fichier | 1,3 Ko | 2026-08-18 | JSON |
+| Élément | Type | Taille | Titre / nature |
+|---|---|---|---|
+| `LISEZMOI.md` | fichier | 2,7 Ko | `input\03-artefacts\` — remise d'un artefact que la forge réclame |
+| `pilote-de-mission.skill` | fichier | 5,3 Ko | SKILL |
+| `pilote-de-mission.skill.remise.json` | fichier | 1,3 Ko | JSON |
 
 _3 fichier(s), 0 sous-dossier(s)_ · voir aussi `LISEZMOI.md` (conventions et correspondance des anciens chemins)
