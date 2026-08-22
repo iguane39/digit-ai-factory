@@ -14,6 +14,6 @@ Lots de retours des forges et des projets — `<projet> - RETOURS - AAAAMMJJ<i>.
 
 | Élément | Type | Taille | Dernier commit | Titre / nature |
 |---|---|---|---|---|
-| [`old\`](old/README.md) | dossier (77 fichiers) | — | 2026-08-21 | Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réé… |
+| [`old\`](old/README.md) | dossier (79 fichiers) | — | 2026-08-21 | Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réé… |
 
 _0 fichier(s), 1 sous-dossier(s)_

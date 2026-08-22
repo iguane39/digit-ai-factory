@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=1a5d5d4cc820 archive=9f205b231527 · dernier événement: 2026-08-22T07:11:01.023Z -->
+     sceaux: actifs=adbd585cf06d archive=9f205b231527 · dernier événement: 2026-08-22T07:15:03.909Z -->
 
-**149 actifs** (candidat 0 · décidé 0 · en cours 1 · corrigé 147 · écarté 1) · **308 archivés**.
+**155 actifs** (candidat 6 · décidé 0 · en cours 1 · corrigé 147 · écarté 1) · **308 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -171,6 +171,12 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0457 | candidat | 20 | pilot : auto_ia au bloc 8 est une ETIQUETTE et pas une obligation d'execution — la regle S6 ne juge que la PRESENCE d'un acteur, jamais que la part IA a ete faite | **oui** — 9 lignes auto_ia sur 15 renvoyees a un mandat humain sans que la restitution dise que c'est une gate de gouvernance — le lecteur unique des restitutions declare le 22/08 que sa liste est « trop longue, trop complexe » alors que 9 de ces lignes sont une seule et meme attente |
+| TF-0458 | candidat | 16 | pilot : une action laissee a l'humain ne porte jamais la raison de son impossibilite IA — la loi n.5 l'exige (« se justifie »), aucun controle ne la demande | **oui** — 23 actions attribuees a un humain dans les livrables du pilot, zero justification d'attribution — la loi qui l'exige est ecrite au noyau depuis l'origine et n'a jamais ete jouee une seule fois |
+| TF-0461 | candidat | 15 | pilot : TODO-PRODUIT.md et RESTITUTION paragraphe 8 se contredisent — pas de colonne acteur au gabarit produit, et une priorite DECLARATIVE la ou la restitution exige une priorite DERIVEE | **oui** — la contradiction est gratuite a corriger tant qu'aucun produit n'a instancie le gabarit — elle devient un chantier de rattrapage des le premier, et l'ecosysteme compte 14 emetteurs de lots |
+| TF-0459 | candidat | 8 | pilot : une ligne du bloc 8 n'est pas executable sans rouvrir le projet — le langage commanditaire est impose au TOUR (S9) et jamais a l'ACTION | **oui** — une action remise a l'humain qui exige de rouvrir le projet pour etre comprise annule le benefice de la restitution : le lecteur paie le rechargement de contexte que la synthese etait censee lui epargner, et il le paie sur 5 a 8 projets |
+| TF-0460 | candidat | 6 | pilot : rien ne relie une action d'une restitution a la suivante — sans id stable, le lecteur ne distingue pas ce qui est neuf de ce qui traine et relit tout | **oui** — zero synthese sur 13 ne relie ses actions a un identifiant stable — le seul mecanisme qui permettrait de ne pas re-servir la meme ligne au lecteur existe cote forge depuis le debut et n'a jamais ete transpose cote produit |
+| TF-0462 | candidat | 4 | pilot : aucune vue PORTEFEUILLE n'existe, et la vue par produit n'est instanciee nulle part — le gabarit TODO-PRODUIT n'a jamais ete pose dans un seul produit | **oui** — une decision prise le 17/08 (TF-0318, vue du reste-a-faire hors session) n'a produit aucun fichier dans aucun produit cinq jours plus tard — le gabarit existe, la doctrine existe, et le developpeur qui devait en beneficier declare le 22/08 qu'il n'a pas de liste exploitable |
 | TF-0327 | corrige | 12 | RV-9 n'est pas refermé : la fixture témoin de la bascule sombre démontre ENCORE le comportement interdit | **oui** — deux livrables du même socle peuvent encore s'ouvrir différemment sur le même poste — le symptôme exact que RV-9 prétendait avoir soldé |
 | TF-0456 | corrige | 12 | README de dossier : la date d'un dossier incluait celle de son PROPRE README — chaque commit périmait le README du parent, l'arbre n'était jamais propre deux commandes de suite | **oui** — mesuré le 22/08 : après un commit de 8 README régénérés, 3 nouveaux README repassaient périmés sans qu'aucun contenu de dossier n'ait bougé — un dépôt qui ne peut pas rester propre apprend à ses lecteurs à ignorer git status, et c'est ce coût-là qui est payé à chaque commande |
 | TF-0328 | corrige | 8 | appliquer-export.mjs est orphelin et TODO-FORGE.md prescrit un dispositif retiré le 12/08 | **oui** — un item de registre entier (TF-0318) a été instruit sur une prémisse que la doc du pilot affirmait et que le code démentait |
