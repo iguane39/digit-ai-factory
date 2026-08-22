@@ -76,6 +76,11 @@ export function juger(texte) {
 //   · AVERTISSEMENT — tout le reste (S2, S5, S7, S8, S9, S10) : dit en une ligne sous la
 //     réponse, journalisé, jamais réécrit. Une preuve manquante sur une puce ne vaut pas de
 //     faire relire huit blocs.
+//   · S11 à S14 (v2.6.0, 22/08) entrent en AVERTISSEMENT par le même raisonnement, et c'est
+//     délibéré : une action `auto_ia` sans motif, une action humaine sans sa raison ou sans son
+//     chemin rendent la liste MOINS UTILE, jamais illisible — le doublon d'affichage qu'un
+//     blocage provoque coûterait plus que le défaut qu'il dénonce. Elles se durciront quand le
+//     corpus sera propre, exactement comme la v2.0.0 est restée informative avant de bloquer.
 const BLOQUANTES = new Set(["S1", "S3", "S4", "S6"]);
 
 const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md : bloc 0 « synthèse d'ouverture » en langage commanditaire (≥ 20 mots, sans identifiant, chemin ni sha — l'état, ce que ça change, ce qui est attendu du lecteur), puis les 8 blocs numérotés, aucun omis (un bloc vide se dit en une ligne) : 1 en-tête (quoi · sur quoi · date ET heure avec fuseau + durée · qui avec version) · 2 verdict en une ligne FACTUEL (un chiffre, un compteur) · 3 décisions attendues de l'humain, EN TÊTE, en choix fermé (a)/(b)/(c) avec coût, exclusion, recommandation et option par défaut — ou « rien n'attend de décision » · 4 traité, chaque puce avec sa preuve (oracle, verdict, chiffre) · 5 non traité, chaque puce avec son motif · 6 écarts à la lettre (« vous avez demandé → j'ai fait → pourquoi », ou « aucun écart ») · 7 risques (énoncé + signal + parade) · 8 prochaines actions classées par acteur (auto_ia / manuelle_dev / manuelle_utilisateur) ET par ordre justifié. Puces ≤ 2 niveaux. Effort en complexité × durée, jamais en jours.";
