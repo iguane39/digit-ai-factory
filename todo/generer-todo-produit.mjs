@@ -66,17 +66,30 @@ const lignesDeTable = (titreSection) => {
   for (const l of bloc[1].split(/\r?\n/)) {
     if (!/^\s*\|/.test(l) || /^\s*\|[\s:|-]+\|?\s*$/.test(l)) continue;
     const c = l.trim().replace(/^\||\|$/g, "").split("|").map((x) => x.trim());
-    if (!c[0] || /^(id|écart|ecart)$/i.test(c[0]) || /[{}]/.test(c.join(" "))) continue;
+    if (!c[0] || /^(id|écart|ecart)$/i.test(c[0]) || /[{}]/.test(c.join(" "))) {
+      // La ligne d'EN-TÊTE est reconnue ici et CONSERVÉE : sans elle, les compteurs lisent les
+      // colonnes par position, et une colonne ajoutée au gabarit les décale en silence. C'est
+      // exactement ce qui est arrivé le 22/08 quand TF-0461 a inséré `Acteur`, `Pourquoi pas
+      // IA` et `Ordre` dans la table des améliorations : le compteur « à décider » lisait
+      // désormais la colonne « Pourquoi pas IA » et annonçait 0 sur une table qui en portait.
+      if (!out.entete && /^(id|écart|ecart)$/i.test(c[0])) out.entete = c;
+      continue;
+    }
     out.push(c);
   }
   return out;
 };
 
+// Index d'une colonne PAR SON EN-TÊTE, jamais par sa position. -1 si la table ne la porte pas :
+// un compteur qui ne trouve pas sa colonne annonce 0, il ne devine pas.
+const colonne = (table, nom) => (table.entete || []).findIndex((h) => new RegExp(nom, "i").test(h));
+
 const decisions = lignesDeTable("Décisions attendues");
 const ameliorations = lignesDeTable("Améliorations");
 const ecarts = lignesDeTable("Écarts assumés");
-const aDecider = ameliorations.filter((c) => /à décider|a decider/i.test(c[4] || "")).length;
-const enCours = ameliorations.filter((c) => /en cours/i.test(c[4] || "")).length;
+const iStatut = colonne(ameliorations, "^statut$");
+const aDecider = iStatut < 0 ? 0 : ameliorations.filter((c) => /à décider|a decider/i.test(c[iStatut] || "")).length;
+const enCours = iStatut < 0 ? 0 : ameliorations.filter((c) => /en cours/i.test(c[iStatut] || "")).length;
 
 // Loi transverse n° 3 : un état vide se DIT. Une page blanche est indistinguable d'une page
 // cassée, et laisse croire qu'il n'y a rien à faire alors que personne n'a rien renseigné.
