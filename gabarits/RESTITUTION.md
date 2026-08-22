@@ -4,10 +4,10 @@
 avec `destinataire: humain` en frontmatter YAML. La localisation R-2/E9 ne juge que ce qui
 est MARQUÉ — sans porteur, la règle est un faux négatif volontaire : elle est livrée,
 prouvée à zéro faux positif, et ne voit rien. Le marquage a été vérifié toléré par
-`oracle-synthese` (S1-S8 à l'époque, S1-S14 depuis la v2.5.0) sur une synthèse réelle PASS avant d'être prescrit ici.
+`oracle-synthese` (S1-S8 à l'époque, S1-S15 depuis la v2.7.0) sur une synthèse réelle PASS avant d'être prescrit ici.
 Cette consigne, elle, ne se marque PAS : c'est un référentiel normatif, pas un livrable.
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 2.6.1, 22/08/2026** (`hors_mandat` ajoute au vocabulaire de S11 le jour meme, cf. section du bloc 8) — 2.6.0 du 22/08 (TF-0457 à TF-0461, retour humain du 22/08 sur la forme des listes de tâches : le bloc 8 cesse d'être une liste d'étiquettes — une action `auto_ia` non exécutée porte son motif (**S11**), une action laissée à l'humain porte sa raison d'impossibilité IA (**S12**), elle est exécutable telle quelle (**S13**), et elle porte un identifiant stable (**S14**). Les quatre entrent en **AVERTISSANTES** au sens de la v2.5.0 : une action sans motif rend la liste moins utile, jamais illisible — et le doublon d'affichage qu'un blocage provoque coûterait plus que le défaut qu'il dénonce. Elles se durciront quand le corpus sera propre, comme la v2.0.0 l'a fait avant elles) — précédente : **2.5.0, 22/08/2026** (retour humain
+Référentiel versionné (loi n° 4, daté-éditable) — **version 2.7.0, 22/08/2026** (règle **S15** : une décision RAPPELLE SON SUJET avant ses options — 25 mots au moins, sans identifiant nu ; retour humain du 22/08 « je ne peux pas me rappeler TF-0469 et vue portefeuille ») — 2.6.1 du 22/08 (`hors_mandat` ajoute au vocabulaire de S11 le jour meme, cf. section du bloc 8) — 2.6.0 du 22/08 (TF-0457 à TF-0461, retour humain du 22/08 sur la forme des listes de tâches : le bloc 8 cesse d'être une liste d'étiquettes — une action `auto_ia` non exécutée porte son motif (**S11**), une action laissée à l'humain porte sa raison d'impossibilité IA (**S12**), elle est exécutable telle quelle (**S13**), et elle porte un identifiant stable (**S14**). Les quatre entrent en **AVERTISSANTES** au sens de la v2.5.0 : une action sans motif rend la liste moins utile, jamais illisible — et le doublon d'affichage qu'un blocage provoque coûterait plus que le défaut qu'il dénonce. Elles se durciront quand le corpus sera propre, comme la v2.0.0 l'a fait avant elles) — précédente : **2.5.0, 22/08/2026** (retour humain
 « le prompt de résultat s'affiche 2 fois » : un hook `Stop` juge APRÈS l'affichage, donc chaque
 refus laissait la version rejetée à l'écran et faisait relire huit blocs. Le gate reste, il
 devient **proportionné** : **bloquantes S1, S3, S4, S6** — la restitution est inutilisable sans
@@ -78,12 +78,34 @@ S-01 TENU, 19/19 au banc rouge »*, jamais *« tout s'est bien passé »*.
 **En tête, jamais en fin.** Chaque décision est présentée en **choix fermé** — l'humain
 tranche, il ne rédige pas :
 
-- l'objet de la décision, en une phrase ;
+- **le RAPPEL DU SUJET — au moins 25 mots, sans identifiant nu** (règle **S15**, v2.7.0) ;
   - les options `(a)` / `(b)` / `(c)`, chacune avec **son coût et ce qu'elle exclut** ;
   - la recommandation, **et pourquoi** ;
   - ce qui se passe si rien n'est décidé (l'option par défaut existe toujours — la nommer).
 
 Si rien n'attend l'humain : le dire en une ligne.
+
+#### Pourquoi « une phrase » ne suffisait pas (S15, 22/08/2026)
+
+*Le retour qui a fait naître cette règle est, là encore, la mesure elle-même.* Une heure après la
+livraison de S11 à S14, le destinataire des restitutions a écrit : **« dans tes prompts, rappelle
+le contexte des décisions à prendre, je ne peux pas me rappeler TF-0469 et vue portefeuille »**.
+Les deux exemples qu'il cite disent les deux moitiés du défaut :
+
+- **un identifiant ne désigne rien** pour qui ne l'a pas écrit — `TF-0469` est le nom que la
+  chose porte au registre, et le registre n'est pas dans la tête du lecteur ;
+- **un titre court est une étiquette**, pas un sujet — « vue portefeuille » nomme sans rappeler.
+
+La restitution incriminée portait deux décisions et passait **S4** : elle avait bien ses options
+étiquetées, leur coût, leur recommandation et son option par défaut. S4 compte des options, elle
+ne regarde jamais ce qu'elles arbitrent. C'était exactement le défaut que **S13** venait de
+corriger au bloc 8 — sauf qu'au bloc 3 il coûte plus cher : *une action mal écrite se re-demande,
+une **décision** mal écrite se tranche quand même, à l'aveugle.*
+
+La règle est celle du bloc 0 appliquée par décision, avec **une différence assumée** : les
+chemins et les spans de code restent tolérés dans le chapeau d'une décision, là où S9 les
+interdit. Le sujet d'une décision EST parfois un fichier, et l'interdire ferait écrire des
+périphrases. L'identifiant, lui, n'est jamais le sujet.
 
 ### 4. Traité — avec sa preuve
 
@@ -219,7 +241,7 @@ appliquent pas non plus : elles jugent un fichier, et une CLI n'en écrit pas.
 
 ## Contrôle
 
-**Exécuté** : `node oracles\oracle-synthese.mjs <synthese.md>` — règles S1-S14 binaires,
+**Exécuté** : `node oracles\oracle-synthese.mjs <synthese.md>` — règles S1-S15 binaires,
 fixtures double sens au self-test. Une restitution qui viole une règle est un défaut de forme,
 signalé comme tel et corrigeable. Mise à jour = nouvelle version + date.
 
