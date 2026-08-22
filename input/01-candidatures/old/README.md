@@ -23,9 +23,11 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `candidature-fins-de-ligne-vues-generees.tf.jsonl` | fichier | 2,8 Ko | 2026-08-18 | 1 ligne(s) JSONL |
 | `candidature-frontmatter-skills-20260822.tf.jsonl` | fichier | 5,6 Ko | 2026-08-22 | 1 ligne(s) JSONL |
 | `candidature-gabarit-a0.tf.jsonl` | fichier | 861 o | 2026-08-13 | 1 ligne(s) JSONL |
+| `candidature-mise-en-oeuvre-0478-20260822.tf.jsonl` | fichier | 4,7 Ko | non versionné | 2 ligne(s) JSONL |
 | `candidature-noeud-57-plan-mesure.tf.jsonl` | fichier | 7,1 Ko | 2026-08-22 | 1 ligne(s) JSONL |
 | `candidature-outillage-etude-opportunite.tf.jsonl` | fichier | 7,7 Ko | 2026-08-13 | 3 ligne(s) JSONL |
 | `candidature-pilot-entrants-20260822.tf.jsonl` | fichier | 5,9 Ko | 2026-08-22 | 2 ligne(s) JSONL |
+| `candidature-propagation-regles-produits-20260822.tf.jsonl` | fichier | 3,3 Ko | non versionné | 1 ligne(s) JSONL |
 | `candidature-qualite-graphique-par-defaut.tf.jsonl` | fichier | 3,9 Ko | 2026-08-15 | 3 ligne(s) JSONL |
 | `candidature-question-deja-repondue.tf.jsonl` | fichier | 2,7 Ko | 2026-08-22 | 1 ligne(s) JSONL |
 | `candidature-r21-lockfiles.tf.jsonl` | fichier | 2,8 Ko | 2026-08-13 | 1 ligne(s) JSONL |
@@ -45,4 +47,4 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `Digit-AI - Prompt Forge - Analyse d'un entrant factory - 20260822a.md` | fichier | 9,3 Ko | 2026-08-22 | Prompt d'analyse d'un entrant — digit-ai-factory |
 | `proposition-tuyauterie.tf.jsonl` | fichier | 3,7 Ko | 2026-08-13 | 5 ligne(s) JSONL |
 
-_30 fichier(s), 0 sous-dossier(s)_
+_32 fichier(s), 0 sous-dossier(s)_
