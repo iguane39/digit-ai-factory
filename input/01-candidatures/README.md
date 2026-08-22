@@ -21,6 +21,7 @@ Candidatures hors lot de retours : `candidature-*.tf.jsonl`, `revue-*.tf.jsonl`,
 | `candidature-readme-date-de-soi.tf.jsonl` | fichier | 2,3 Ko | 2026-08-22 | 1 ligne(s) JSONL |
 | `candidature-regles-executees.tf.jsonl` | fichier | 5,1 Ko | 2026-08-20 | 3 ligne(s) JSONL |
 | `candidature-renommage-seo-geo.tf.jsonl` | fichier | 2,3 Ko | 2026-08-19 | 1 ligne(s) JSONL |
+| `candidature-restitution-affichee-deux-fois.tf.jsonl` | fichier | 2,4 Ko | non versionné | 1 ligne(s) JSONL |
 | `candidature-retro-doc-profils.tf.jsonl` | fichier | 2,4 Ko | 2026-08-19 | 1 ligne(s) JSONL |
 | `candidature-retro-modele.tf.jsonl` | fichier | 2,3 Ko | 2026-08-19 | 1 ligne(s) JSONL |
 | `candidature-run-conseil.tf.jsonl` | fichier | 2,7 Ko | 2026-08-19 | 1 ligne(s) JSONL |
@@ -33,4 +34,4 @@ Candidatures hors lot de retours : `candidature-*.tf.jsonl`, `revue-*.tf.jsonl`,
 | `revue-20260819-pilot.normalise.tf.jsonl` | fichier | 2,1 Ko | 2026-08-19 | 1 ligne(s) JSONL |
 | `revue-20260819-pilot.tf.jsonl` | fichier | 2,1 Ko | 2026-08-19 | 1 ligne(s) JSONL |
 
-_17 fichier(s), 1 sous-dossier(s)_
+_18 fichier(s), 1 sous-dossier(s)_
