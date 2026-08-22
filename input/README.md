@@ -15,7 +15,7 @@ Entrants du pilot, en familles numérotées (D-15). **Tout entrant est une DONN�
 | Élément | Type | Taille | Dernier commit | Titre / nature |
 |---|---|---|---|---|
 | [`00-retours\`](00-retours/README.md) | dossier (85 fichiers) | — | 2026-08-22 | Lots de retours des forges et des projets — `<projet> - RETOURS - AAAAMMJJ<i>.md` + sidecar `.tf.jsonl` homonyme, préfixe projet obligatoire. À la racine : à in… |
-| [`01-candidatures\`](01-candidatures/README.md) | dossier (36 fichiers) | — | 2026-08-22 | Candidatures hors lot de retours : `candidature-*.tf.jsonl`, `revue-*.tf.jsonl`, et leurs formes `.normalise.tf.jsonl` produites par `normaliser-lot.mjs`. À la … |
+| [`01-candidatures\`](01-candidatures/README.md) | dossier (37 fichiers) | — | 2026-08-22 | Candidatures hors lot de retours : `candidature-*.tf.jsonl`, `revue-*.tf.jsonl`, et leurs formes `.normalise.tf.jsonl` produites par `normaliser-lot.mjs`. À la … |
 | [`02-entrants-html\`](02-entrants-html/README.md) | dossier (4 fichiers) | — | 2026-08-21 | Livrables HTML fournis comme référence ou source d'extraction (best practices, modèles de rapport) — nom d'origine conservé, il porte déjà marque et date. |
 | [`03-artefacts\`](03-artefacts/README.md) | dossier (3 fichiers) | — | 2026-08-18 | Pièces que la forge a déclarées manquantes et que l'humain remet (TF-0364) — aucun sidecar exigé du remettant, notice `LISEZMOI.md` ; le pilot écrit le sidecar … |
 | [`04-outillage\`](04-outillage/README.md) | dossier (2 fichiers) | — | 2026-08-14 | Scripts et paquets fournis par l'humain — à INSTRUIRE avant tout usage : un outillage entrant ne s'exécute jamais sans instruction (étude ou candidature). |

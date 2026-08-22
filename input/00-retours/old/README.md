@@ -59,6 +59,8 @@ Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés 
 | `COMPTA - Ventilation de facture SFR - RETOURS - 20260814b.md` | fichier | 4,8 Ko | 2026-08-17 | Retours forges — COMPTA - Ventilation de facture SFR — 20260814b |
 | `COMPTA - Ventilation de facture SFR - RETOURS - 20260814b.normalise.tf.jsonl` | fichier | 5,0 Ko | 2026-08-17 | 4 ligne(s) JSONL |
 | `COMPTA - Ventilation de facture SFR - RETOURS - 20260814b.tf.jsonl` | fichier | 5,0 Ko | 2026-08-17 | 4 ligne(s) JSONL |
+| `digit-ai-fr - RETOURS - 20260822a.md` | fichier | 10,1 Ko | non versionné | Retours forges — digit-ai-fr — 20260822a |
+| `digit-ai-fr - RETOURS - 20260822a.tf.jsonl` | fichier | 10,2 Ko | non versionné | 5 ligne(s) JSONL |
 | `digit-desk.fr - RETOURS - 20260815a.md` | fichier | 5,2 Ko | 2026-08-17 | Retours de run — digit-desk.fr, 15/08/2026 |
 | `digit-desk.fr - RETOURS - 20260815a.tf.jsonl` | fichier | 5,4 Ko | 2026-08-17 | 8 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20260818a.md` | fichier | 1,1 Ko | 2026-08-20 | Retours forges — factory-digit-ai-fr — 20260818a |
@@ -94,4 +96,4 @@ Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés 
 | `SCC-FR - RETOURS - 20260820a.md` | fichier | 16,9 Ko | 2026-08-20 | Retours forges — SCC-FR — 20260820a |
 | `SCC-FR - RETOURS - 20260820a.tf.jsonl` | fichier | 13,0 Ko | 2026-08-20 | 8 ligne(s) JSONL |
 
-_79 fichier(s), 0 sous-dossier(s)_
+_81 fichier(s), 0 sous-dossier(s)_

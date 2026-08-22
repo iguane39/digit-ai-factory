@@ -1880,3 +1880,31 @@ d'un dossier, il ne le date pas. Convergence vérifiée sur trois passes, `--che
 recette 5/5, harnais **30/30**. Écart déclaré : le mandat disait « synchronise », pas
 « corrige » — sans ce correctif la synchronisation n'était pas vérifiable deux commandes de
 suite, et la décision est tracée au registre.
+
+## 22/08/2026 — « traite tous les todos et retours » : le lot digit-ai-fr fermé, et deux sessions qui se croisent
+
+Mandat humain. Inventaire d'ouverture : 12 items ouverts, 3 lots de retours non ingérés, une
+recette rouge (la page du registre échouait L12 sur le CONTENU des candidatures — zone
+désormais déclarée citée, `data-cite`, doctrine TF-0436 étendue au socle HTML).
+
+**Traité et publié** — `forge-tests` : TF-0464 (le chrome partagé entre dans la parité :
+21 liens de pied contre 3 se lisaient **0 contre 0**, PASS silencieux) · TF-0466 (les
+métadonnées entrent dans la mesure de langue : 78 articles anglais portaient un tag français) ·
+TF-0465 + TF-0467 (la **présence** d'une chaîne déclarée est le constat, et `lang` tranche entre
+« non traduite » et « signalée » — un seul balayage, deux constats). `forge-agents` :
+`run-oracles` plantait sur `JSON_OUT` — **régression de mon correctif de la veille**, signalée
+par un lot Hoopiz refusé à l'ingestion avant d'être trouvée en session. `pilot` : dossiers
+machine `_oracles\` exclus du générateur de README.
+
+**Deux sessions en parallèle, et la leçon** : S11-S14 et les sévérités du hook ont été
+implémentées **deux fois**, par les deux sessions, le même jour. Au rebase, je me suis aligné
+sur la version publiée et j'ai abandonné la mienne — dont une étude portefeuille rendue
+caduque par des faits plus récents (quatre `TODO-PRODUIT.md` instanciés entre-temps, quand ma
+mesure disait zéro). Dix lignes de clôture visant les mauvais ids, produites par la
+renumérotation, ont été retirées avant publication. Le préflight anti-collision (TF-0394) a
+refusé trois ingestions et **a eu raison à chaque fois**.
+
+**Non traité, déclaré** : deux lots Hoopiz restent refusés par R-45 (rédigés avant la
+publication de la règle, sans chemin de propagation vers les produits — TF-0471, décision
+humaine due : affaiblir un gate décidé la veille sans mandat serait le geste que la discipline
+interdit).
