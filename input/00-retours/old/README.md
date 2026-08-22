@@ -85,6 +85,8 @@ Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés 
 | `Hoopiz - RETOURS - 20260822a.tf.jsonl` | fichier | 6,9 Ko | 5 ligne(s) JSONL |
 | `Hoopiz - RETOURS - 20260822b.md` | fichier | 9,5 Ko | Retours forges — Hoopiz — 20260822b |
 | `Hoopiz - RETOURS - 20260822b.tf.jsonl` | fichier | 6,5 Ko | 3 ligne(s) JSONL |
+| `Hoopiz - RETOURS - 20260822c.md` | fichier | 7,7 Ko | Retours forges — Hoopiz — 20260822c |
+| `Hoopiz - RETOURS - 20260822c.tf.jsonl` | fichier | 4,7 Ko | 2 ligne(s) JSONL |
 | `nhood-cockpit-ia - RETOURS - 20260820a.md` | fichier | 9,7 Ko | Retours forges — nhood-cockpit-ia — 20260820a |
 | `nhood-cockpit-ia - RETOURS - 20260820a.tf.jsonl` | fichier | 6,5 Ko | 4 ligne(s) JSONL |
 | `pilot-campagne-fiches-html - RETOURS - 20260809a.md` | fichier | 6,5 Ko | Retours forges — campagne « fiches HTML lisibles » — 20260809a |
@@ -110,4 +112,4 @@ Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés 
 | `SCC-FR - RETOURS - 20260820a.md` | fichier | 16,8 Ko | Retours forges — SCC-FR — 20260820a |
 | `SCC-FR - RETOURS - 20260820a.tf.jsonl` | fichier | 13,0 Ko | 8 ligne(s) JSONL |
 
-_95 fichier(s), 0 sous-dossier(s)_
+_97 fichier(s), 0 sous-dossier(s)_

@@ -14,8 +14,6 @@ Lots de retours des forges et des projets — `<projet> - RETOURS - AAAAMMJJ<i>.
 
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
-| [`old\`](old/README.md) | dossier (95 fichiers) | — | Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réé… |
-| `Hoopiz - RETOURS - 20260822c.md` | fichier | 7,7 Ko | Retours forges — Hoopiz — 20260822c |
-| `Hoopiz - RETOURS - 20260822c.tf.jsonl` | fichier | 4,7 Ko | 2 ligne(s) JSONL |
+| [`old\`](old/README.md) | dossier (97 fichiers) | — | Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réé… |
 
-_2 fichier(s), 1 sous-dossier(s)_
+_0 fichier(s), 1 sous-dossier(s)_
