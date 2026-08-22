@@ -1865,3 +1865,18 @@ rectification ; l'affirmation fausse reste dans l'histoire du commit `1a35b6f`, 
 réécrit pas. La recette du balayeur tient désormais **six faits de garde par exécution** plutôt
 que par une phrase : c'est ce qui manquait. Recettes : pilot **26/26**, forge-design 24 oracles
 / 76 règles, forge-audit **61 tests / 0 échec**.
+
+## 22/08/2026 — synchronisation : la cause qui empêchait l'arbre de rester propre (TF-0456)
+
+Mandat « synchronise avec github ». État constaté à l'ouverture : pilot et treize forges déjà
+à jour (une autre session avait poussé jusqu'à `v1.17.29`), arbres des forges tous propres.
+Restait un bruit : après chaque commit de README régénérés, `git status` redevenait sale.
+**Cause** — la date affichée pour un dossier était le maximum des dates de commit de son
+contenu, **README.md compris** : committer un README changeait la date de son dossier, ce qui
+périmait le README du parent, relancé par chaque commit touchant `input\` ou `output\`.
+TF-0451 avait traité la conséquence (divergence de dates = avertissement) ; la cause restait.
+Correctif d'une ligne : `derniereDate()` ignore les README — un README rapporte le contenu
+d'un dossier, il ne le date pas. Convergence vérifiée sur trois passes, `--check` PASS,
+recette 5/5, harnais **30/30**. Écart déclaré : le mandat disait « synchronise », pas
+« corrige » — sans ce correctif la synchronisation n'était pas vérifiable deux commandes de
+suite, et la décision est tracée au registre.

@@ -14,6 +14,6 @@ Dossiers d'instruction des insatisfactions (TF-0287) : un dossier `INS-XXXX\` pa
 
 | Élément | Type | Taille | Dernier commit | Titre / nature |
 |---|---|---|---|---|
-| [`INS-0001\`](INS-0001/README.md) | dossier (1 fichier) | — | 2026-08-20 | Instruction de l'insatisfaction INS-0001 (menus de digit-ai.fr) — `INSTRUCTION.md` à six blocs (`gabarits\AGENT-INSATISFACTION.md`) : reproduction, cause racine… |
+| [`INS-0001\`](INS-0001/README.md) | dossier (1 fichier) | — | 2026-08-15 | Instruction de l'insatisfaction INS-0001 (menus de digit-ai.fr) — `INSTRUCTION.md` à six blocs (`gabarits\AGENT-INSATISFACTION.md`) : reproduction, cause racine… |
 
 _0 fichier(s), 1 sous-dossier(s)_
