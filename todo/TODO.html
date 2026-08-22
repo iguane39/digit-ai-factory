@@ -139,7 +139,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>1e14e1411698</code> · dernier événement 2026-08-22T09:26:19.839Z</p>
+      <p class="meta">sceau <code>7d40c07156af</code> · dernier événement 2026-08-22T09:30:53.131Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -165,9 +165,10 @@
       <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
       
       <div class="dropdown" data-dim="forge">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">6</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">7</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
+          <label><input type="checkbox" value="digit-ai-factory" checked> digit-ai-factory</label>
           <label><input type="checkbox" value="digit-ai-forge-agents" checked> digit-ai-forge-agents</label>
           <label><input type="checkbox" value="digit-ai-forge-design" checked> digit-ai-forge-design</label>
           <label><input type="checkbox" value="digit-ai-forge-ops" checked> digit-ai-forge-ops</label>
@@ -186,11 +187,34 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">27 / 27 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">28 / 28 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">9 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">8 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-seo-geo"><strong>digit-ai-forge-seo-geo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">6 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">9 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">8 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-seo-geo"><strong>digit-ai-forge-seo-geo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">6 item(s) reste-à-faire</span></a></nav>
     <main>
+    <section id="digit-ai-factory">
+      <h2>digit-ai-factory <span class="badge" title="1 item(s) actifs ciblant digit-ai-factory">1</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-factory</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <article class="card s-corrige" id="item-TF-0496" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0496</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 25)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16)</h3>
+          <div class="card-detail" data-cite><p class="lead">Retour humain du 22/08/2026, sur une decision qui demandait de nommer un role au RACI d'un produit : « Tu aurais du etre en capacite de deduire son nom du CAB a jour que j'ai fourni, pourquoi ne l'as-tu pas fait ? Fais en sorte que les prochaines fois, ce genre de questions soit repondu par l'IA automatiquement, au moins preconise a minima.</p><ul class="puces"><li>» Verifie sur piece : le nom etait a la PREMIERE LIGNE du dossier de mise en production, fourni deux jours plus tot — « mlaune@client-a.com, porteur / mainteneur technique de l'application ». Le meme dossier portait aussi la reponse a une seconde decision posee dans la meme restitution (le contenu de la convention de service : disponibilite 99,5 %, severites S1 a S4, RTO 2 a 4 minutes), et une troisieme etait derivable des fichiers Terraform du depot. TROIS decisions sur six etaient donc deja repondues par des pieces que l'agent avait sous la main. Ce que les regles existantes ne voient pas : S4 compte des options etiquetees, S15 exige un rappel du sujet — aucune des deux ne demande si l'agent a CHERCHE la reponse avant de poser la question. Le cout est asymetrique, et c'est ce qui rend la regle necessaire : chercher coute une seconde a l'agent, ne pas chercher coute au lecteur un aller-retour PLUS la reouverture d'un document que l'agent avait deja. C'est le defaut que S13 corrige au bloc 8 — faire payer au lecteur un travail que l'agent pouvait faire — mais au bloc 3 il est plus cher, car il transforme une lecture en arbitrage. Correction : regle S16. « Derivable » ne se teste pas a la machine</li><li>ce qui se teste est la TRACE d'avoir cherche — chaque decision porte sa RECOMMANDATION, et soit un localisateur (le document consulte d'ou sort la reponse proposee), soit la declaration explicite qu'aucune source disponible ne repond. Une decision sans recommandation est une question rendue telle quelle</li><li>une recommandation sans source est une opinion</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 25 — gain 5 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-03 (retour humain direct du 22/08)</dd></div>
+            
+          </dl>
+        </article>
+      </div>
+    </section>
     <section id="digit-ai-forge-agents">
       <h2>digit-ai-forge-agents <span class="badge" title="9 item(s) actifs ciblant digit-ai-forge-agents">9</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-agents</strong> — trié par statut puis priorité décroissante.</p>

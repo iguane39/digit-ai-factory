@@ -41,6 +41,9 @@
  *       identifiant nu (22/08). Un identifiant ne désigne rien pour qui ne l'a pas écrit,
  *       et un titre court est une étiquette — or une décision mal écrite se tranche quand
  *       même, à l'aveugle. C'est S9 appliquée par décision.
+ *   S16 toute décision porte sa RECOMMANDATION et la SOURCE consultée d'où elle sort — ou la
+ *       déclaration qu'aucune source disponible ne répond (22/08). Une question dont la
+ *       réponse est dans un document déjà fourni ne se pose pas : elle se répond.
  *
  * Usage : node oracle-synthese.mjs <synthese.md>   → verdict JSON
  *         node oracle-synthese.mjs --self-test     → fixtures double sens
@@ -347,6 +350,37 @@ function juger(texte) {
       : ok("S15", `${groupesDecisions.length} décision(s), chacune rappelant son sujet avant ses options`);
   }
 
+  // ---- S16 (22/08) — une question dont la réponse est DANS les documents ne se pose pas nue ---
+  //
+  // Retour humain du 22/08, sur une décision qui demandait de nommer un rôle : « tu aurais dû
+  // être en capacité de déduire son nom du dossier que j'ai fourni, pourquoi ne l'as-tu pas
+  // fait ? Fais en sorte que les prochaines fois, ce genre de questions soit répondu par l'IA
+  // automatiquement, au moins préconisé a minima. » Le nom était à la PREMIÈRE LIGNE du dossier.
+  //
+  // Poser une question dont la réponse est sous la main a un coût asymétrique : elle coûte une
+  // seconde à l'agent et un aller-retour au lecteur, qui doit rouvrir un document que l'agent
+  // avait déjà. C'est le même défaut que S13 et S15 corrigent ailleurs — faire payer au lecteur
+  // un travail que l'agent pouvait faire — mais au bloc 3, il est le plus cher : il transforme
+  // une lecture en arbitrage.
+  //
+  // « Dérivable » ne se teste pas à la machine. Ce qui se teste, c'est la TRACE d'avoir cherché :
+  // chaque décision porte sa RECOMMANDATION, et soit un localisateur (le document consulté d'où
+  // sort la réponse proposée), soit la déclaration explicite qu'aucune source disponible ne
+  // répond. Une décision sans recommandation est une question rendue telle quelle ; une
+  // recommandation sans source est une opinion.
+  if (groupesDecisions.length) {
+    const RECO = /\brecommand|\bpréconis|\bpreconis|\bproposition\b/i;
+    const RIEN_NE_REPOND = /(aucune?\s+(source|document|pièce|piece)|rien\s+dans\s+les\s+documents|non\s+dérivable|non\s+derivable)/i;
+    const fautifs16 = groupesDecisions.filter((g) => !RECO.test(g) || !(_LOCALISATEURS.test(g) || RIEN_NE_REPOND.test(g)));
+    fautifs16.length
+      ? ko("S16", `${fautifs16.length} décision(s) sur ${groupesDecisions.length} posée(s) sans trace d'instruction — chacune porte sa RECOMMANDATION, ` +
+          `et soit la source consultée d'où elle sort, soit la déclaration qu'aucune source disponible ne répond. ` +
+          `Une question dont la réponse est dans un document déjà fourni ne se pose pas : elle se répond.`)
+      : ok("S16", `${groupesDecisions.length} décision(s), chacune recommandée et sourcée`);
+  } else {
+    ok("S16", "aucune décision à instruire");
+  }
+
   return findings;
 }
 
@@ -375,7 +409,7 @@ Coût de la reprise proposée : complexité moyen · durée court.
   chaque défaut planté volontairement a été détecté, donc la surveillance fonctionne et la
   version est prête à sortir. Publier la rend visible aux autres projets ; ne pas publier la
   laisse sur ce poste, et personne d'autre n'en profite tant qu'on attend.
-  - (a) taguer v1.12.0 maintenant — recommandé, tout est prouvé ;
+  - (a) taguer v1.12.0 maintenant — recommandé : le journal de recette \`recette-S01.md\` ne porte aucun défaut ouvert ;
   - (b) attendre le prochain lot — coût : les 26 commits restent locaux.
   - sans décision : rien n'est publié.
 
@@ -414,6 +448,7 @@ Aucun écart : la demande a été suivie à la lettre.
     .replace("- Regroupement par cause racine : motif — sa cause est traitée, critère de réouverture écrit.", "- Regroupement par cause racine")
     .replace("Coût de la reprise proposée : complexité moyen · durée court.", "Coût de la reprise proposée : 2-3 j.")
     .replace("Recette S-01 TENU — 19/19 défauts détectés au banc rouge, pytest 365.", "Tout s'est bien passé.")
+    .replace(/— recommandé[^;]*;/, "—")
     .replace(/- Publier la version corrigée[\s\S]*?tant qu'on attend\./, "- Publier TF-0220 ?");
   writeFileSync(join(dir, "verte.md"), verte, "utf8");
   writeFileSync(join(dir, "rouge.md"), rouge, "utf8");
@@ -424,13 +459,13 @@ Aucun écart : la demande a été suivie à la lettre.
   if (rv.status !== 0) casse.push("la fixture VERTE ne passe pas : " + rv.stdout);
   if (rr.status !== 1) casse.push("la fixture ROUGE ne FAIL pas");
   else {
-    for (const regle of ["S2", "S3", "S5", "S9", "S10", "S11", "S12", "S13", "S14", "S15"]) {
+    for (const regle of ["S2", "S3", "S5", "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16"]) {
       if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
     }
   }
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 2/2 PASS (verte PASS ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet)");
+    : "Self-test restitution : 2/2 PASS (verte PASS ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée)");
   process.exit(casse.length ? 1 : 0);
 }
 
