@@ -253,6 +253,35 @@ if (reglesDerogees.length) {
 nouvelles.push(JSON.stringify(evIngestion));
 appendFileSync(registre, nouvelles.join("\n") + "\n");
 
+// ---- POST-CONTRÔLE anti-collision (TF-0481, 22/08/2026) -----------------------------------
+// Le préflight de TF-0394 regarde AVANT d'écrire : il refuse quand le distant a déjà avancé. Il ne
+// peut rien contre la fenêtre qui s'ouvre PENDANT l'ingestion — deux sessions qui frappent les
+// mêmes numéros avant que l'une ait poussé. Cette fenêtre a été payée TROIS FOIS, dont deux le
+// 22/08 : cinq candidatures renumérotées le matin, un `TF-0514` frappé ici pendant qu'une autre
+// session publiait le sien le soir.
+//
+// Ce post-contrôle ne la ferme pas — il la RACCOURCIT, en la faisant voir tout de suite au lieu de
+// la découvrir à la main plus tard. Il ne peut pas échouer : l'écriture est faite, et annuler
+// ferait perdre le travail d'ingestion. Il AVERTIT, nomme les ids en cause, et donne la commande
+// qui répare. C'est la différence entre un défaut qu'on subit et un défaut qu'on voit.
+if (!process.argv.includes("--sans-fetch") && nouvelles.length > 1) {
+  const frappes = nouvelles.slice(0, -1).map((l) => { try { return JSON.parse(l).id; } catch { return null; } }).filter(Boolean);
+  try {
+    execFileSync("git", ["-C", todoDir, "fetch", "--quiet", "origin"], { stdio: "ignore", timeout: 20000 });
+    const distant = execFileSync("git", ["-C", todoDir, "show", "origin/main:todo/TODO.jsonl"], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+    const pris = frappes.filter((id) => distant.includes('"id":"' + id + '"'));
+    if (pris.length) {
+      console.error(`[COLLISION TF-0481] ${pris.length} id(s) frappé(s) ici sont DÉJÀ PRIS sur origin : ${pris.join(", ")}.\n` +
+        "  Une autre session les a publiés pendant cette ingestion — le préflight ne pouvait pas le voir, il regarde AVANT.\n" +
+        "  L'ingestion locale est écrite et n'est PAS annulée. Réparer avec, pour chaque id :\n" +
+        pris.map((id) => `    node todo\\renumeroter.mjs ${id} TF-XXXX --motif "collision avec une session parallèle le <date>"`).join("\n") +
+        "\n  Choisir XXXX au-delà du max des DEUX registres (local et origin), puis régénérer les vues.");
+    }
+  } catch {
+    console.error("[post-contrôle TF-0481] comparaison origin impossible (hors ligne ? remote absent ?) — collision inter-sessions NON vérifiée après écriture");
+  }
+}
+
 // ---- contrôles post-écriture ---------------------------------------------------------------
 execFileSync("node", [join(ICI, "oracle-todo.mjs"), registre, archive], { encoding: "utf8" });
 if (registre === resolve(join(ICI, "TODO.jsonl")))
