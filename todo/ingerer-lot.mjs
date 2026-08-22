@@ -25,7 +25,47 @@ const sidecarPath = process.argv[2];
 const iReg = process.argv.indexOf("--registre");
 const registre = resolve(iReg > 0 ? process.argv[iReg + 1] : join(ICI, "TODO.jsonl"));
 const archive = join(dirname(registre), "TODO-ARCHIVE.jsonl");
-if (!sidecarPath || !existsSync(sidecarPath)) { console.error("usage : ingerer-lot.mjs <sidecar.tf.jsonl> [--registre <TODO.jsonl>] [--sans-fetch]"); process.exit(2); }
+if (!sidecarPath || !existsSync(sidecarPath)) { console.error("usage : ingerer-lot.mjs <sidecar.tf.jsonl> [--registre <TODO.jsonl>] [--sans-fetch] [--derogation \"<motif>\"]"); process.exit(2); }
+
+// ---- dérogation TRACÉE aux règles de FORME du lot (décision humaine du 22/08, option b3) ---
+// Deux lots Produit-05 rédigés AVANT la publication de R-45 restaient hors du registre : la règle
+// se juge sur la date du NOM du lot, jamais sur ce que le produit pouvait savoir. L'arbitrage
+// humain a refusé d'amender R-45 — elle reste intacte, et elle a raison sur le fond — et a
+// retenu une dérogation tracée, cas par cas.
+//
+// Ce que la dérogation couvre : R-45 et R-46 SEULEMENT, les règles de FORME du lot remis.
+// Ce qu'elle ne couvre JAMAIS : la validation des candidatures (rejet atomique), l'unicité des
+// ids, l'idempotence, le préflight anti-collision. Une dérogation qui ouvrirait tout ne serait
+// pas une dérogation, ce serait un interrupteur.
+//
+// Ce qu'elle exige : un motif ÉCRIT et substantiel, consigné dans l'événement `ingestion` du
+// registre. Une dérogation sans motif est un contournement silencieux ; le seuil de longueur
+// ne mesure aucune qualité, il rend seulement le geste coûteux à poser sans réfléchir.
+const iDero = process.argv.indexOf("--derogation");
+const MOTIF_MIN = 30;
+let derogationMotif = null;
+if (iDero > 0) {
+  derogationMotif = (process.argv[iDero + 1] || "").trim();
+  if (!derogationMotif || derogationMotif.startsWith("--")) {
+    console.error("[REFUS] --derogation exige un motif écrit : ce qui est dérogé, pourquoi, et sur quelle décision.\n" +
+      "  Une dérogation sans motif ne se distingue pas d'un contournement.");
+    process.exit(2);
+  }
+  if (derogationMotif.length < MOTIF_MIN) {
+    console.error(`[REFUS] motif de dérogation trop court (${derogationMotif.length} caractères, minimum ${MOTIF_MIN}).\n` +
+      "  Le motif est la SEULE trace qui restera : il nomme la règle dérogée et la décision qui l'autorise.");
+    process.exit(2);
+  }
+}
+const reglesDerogees = [];
+// Rend true si la règle est dérogée — et le DIT, fort : un refus qui devient un passage se voit.
+const derogee = (regle, quoi) => {
+  if (!derogationMotif) return false;
+  reglesDerogees.push(regle);
+  console.error(`[DÉROGATION ${regle}] ${quoi}\n  motif : ${derogationMotif}\n` +
+    "  La règle reste INTACTE : ce lot passe, le suivant sera refusé de la même façon.");
+  return true;
+};
 
 // ---- préflight anti-collision inter-sessions (TF-0394, revue du 19/08) --------------------
 // Deux sessions pilot parallèles ont frappé les mêmes ids TF depuis la même base (19/08 :
@@ -86,21 +126,25 @@ const lignes = contenu.split("\n").filter((l) => l.trim());
     const texteLot = readFileSync(lotMd, "utf8");
     const SECTION = /^##\s+Remarques\s+rest[ée]es?\s+au\s+produit\s*$/im;
     if (!SECTION.test(texteLot)) {
-      console.error(
-        `[REJET ATOMIQUE] ${sidecarPath} — registre intact.\n` +
-        `  - le lot ${lotMd} n'a pas de section « Remarques restées au produit » (R-45).\n` +
-        "    Ce qu'un produit corrige chez lui sans le remonter emporte la CLASSE du défaut\n" +
-        "    avec lui. Gabarit : gabarits\\RETOURS-FORGES.md.");
-      process.exit(1);
+      if (!derogee("R-45", "le lot n'a pas de section « Remarques restées au produit »")) {
+        console.error(
+          `[REJET ATOMIQUE] ${sidecarPath} — registre intact.\n` +
+          `  - le lot ${lotMd} n'a pas de section « Remarques restées au produit » (R-45).\n` +
+          "    Ce qu'un produit corrige chez lui sans le remonter emporte la CLASSE du défaut\n" +
+          "    avec lui. Gabarit : gabarits\\RETOURS-FORGES.md.");
+        process.exit(1);
+      }
     }
     const suite = (texteLot.split(SECTION)[1] || "").split(/^## /m)[0] || "";
     if (!/g[ée]n[ée]ralisab/i.test(suite) && !/aucune\s+remarque\s+n['’]est\s+rest[ée]e?\s+au\s+produit/i.test(suite)) {
-      console.error(
-        `[REJET ATOMIQUE] ${sidecarPath} — registre intact.\n` +
-        `  - la section « Remarques restées au produit » de ${lotMd} ne porte ni verdict de\n` +
-        "    généralisation, ni la phrase déclarant qu'aucune remarque n'est restée au produit.\n" +
-        "    Une section vide se lit comme un oubli : l'omission ne vaut pas décision (R-45).");
-      process.exit(1);
+      if (!derogee("R-45", "la section « Remarques restées au produit » ne porte ni verdict ni déclaration")) {
+        console.error(
+          `[REJET ATOMIQUE] ${sidecarPath} — registre intact.\n` +
+          `  - la section « Remarques restées au produit » de ${lotMd} ne porte ni verdict de\n` +
+          "    généralisation, ni la phrase déclarant qu'aucune remarque n'est restée au produit.\n" +
+          "    Une section vide se lit comme un oubli : l'omission ne vaut pas décision (R-45).");
+        process.exit(1);
+      }
     }
   }
 }
@@ -121,24 +165,28 @@ const lignes = contenu.split("\n").filter((l) => l.trim());
     const texteLot = readFileSync(lotMdR46, "utf8");
     const SECTION = /^##\s+Retours\s+sur\s+les\s+documents\s+produits\s*$/im;
     if (!SECTION.test(texteLot)) {
-      console.error(
-        `[REJET ATOMIQUE] ${sidecarPath} — registre intact.\n` +
-        `  - le lot ${lotMdR46} n'a pas de section « Retours sur les documents produits » (R-46).\n` +
-        "    Ce qu'un document a coûté au gabarit — section manquante, champ non prévu, ajout à\n" +
-        "    la main — est le seul canal par lequel la bibliothèque s'améliore.\n" +
-        "    Gabarit : gabarits\\RETOURS-FORGES.md.");
-      process.exit(1);
+      if (!derogee("R-46", "le lot n'a pas de section « Retours sur les documents produits »")) {
+        console.error(
+          `[REJET ATOMIQUE] ${sidecarPath} — registre intact.\n` +
+          `  - le lot ${lotMdR46} n'a pas de section « Retours sur les documents produits » (R-46).\n` +
+          "    Ce qu'un document a coûté au gabarit — section manquante, champ non prévu, ajout à\n" +
+          "    la main — est le seul canal par lequel la bibliothèque s'améliore.\n" +
+          "    Gabarit : gabarits\\RETOURS-FORGES.md.");
+        process.exit(1);
+      }
     }
     const suite = (texteLot.split(SECTION)[1] || "").split(/^## /m)[0] || "";
     if (!/gd-[a-z-]+|version[_ ]du[_ ]gabarit/i.test(suite)
         && !/aucun\s+document\s+produit\s+depuis\s+un\s+gabarit/i.test(suite)) {
-      console.error(
-        `[REJET ATOMIQUE] ${sidecarPath} — registre intact.\n` +
-        `  - la section « Retours sur les documents produits » de ${lotMdR46} ne rattache aucun\n` +
-        "    retour à un gabarit (id `gd-…` ou version du gabarit), et ne déclare pas non plus\n" +
-        "    qu'aucun document n'en est issu. Un retour qui ne nomme pas sa source ne s'applique\n" +
-        "    à rien : « il manquait une section » ne se rattache à aucune famille (R-46).");
-      process.exit(1);
+      if (!derogee("R-46", "la section « Retours sur les documents produits » ne rattache aucun retour à un gabarit")) {
+        console.error(
+          `[REJET ATOMIQUE] ${sidecarPath} — registre intact.\n` +
+          `  - la section « Retours sur les documents produits » de ${lotMdR46} ne rattache aucun\n` +
+          "    retour à un gabarit (id `gd-…` ou version du gabarit), et ne déclare pas non plus\n" +
+          "    qu'aucun document n'en est issu. Un retour qui ne nomme pas sa source ne s'applique\n" +
+          "    à rien : « il manquait une section » ne se rattache à aucune famille (R-46).");
+        process.exit(1);
+      }
     }
   }
 }
@@ -187,7 +235,18 @@ const nouvelles = candidatures.map((c) => {
     gains_constates: null, version_forge_corrigee: null, produits_beneficiaires: null,
   });
 });
-nouvelles.push(JSON.stringify({ ev: "ingestion", ts, lot_sha: lotSha, fichier: String(sidecarPath), creations: nouvelles.length }));
+// La dérogation se CONSIGNE au registre, jamais seulement à l'écran : un lot entré par
+// dérogation doit rester reconnaissable des années plus tard, avec la règle contournée et le
+// motif. C'est le prix de b3 — la règle reste dure, le passage reste tracé.
+if (derogationMotif && !reglesDerogees.length) {
+  console.error("[AVERTISSEMENT] --derogation posé mais aucune règle de forme ne refusait ce lot —\n" +
+    "  dérogation inutile, non consignée. Une trace décorative brouille les vraies.");
+}
+const evIngestion = { ev: "ingestion", ts, lot_sha: lotSha, fichier: String(sidecarPath), creations: nouvelles.length };
+if (reglesDerogees.length) {
+  evIngestion.derogation = { regles: [...new Set(reglesDerogees)], motif: derogationMotif, decision: "humaine" };
+}
+nouvelles.push(JSON.stringify(evIngestion));
 appendFileSync(registre, nouvelles.join("\n") + "\n");
 
 // ---- contrôles post-écriture ---------------------------------------------------------------
