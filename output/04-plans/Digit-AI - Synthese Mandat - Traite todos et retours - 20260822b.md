@@ -123,6 +123,12 @@ recette du pilot **31/31**, `oracle-gabarits-documents` **G1-G9 PASS**, self-tes
   - détail : 10 pour la forge de design, 7 pour le pilote, 2 pour la forge de tests, et une
     chacune pour trois autres forges ; aucune n'attend une décision, elles sont plus loin dans la
     file. Seconde décision du bloc 3.
+- Le refus du hook de restitution sur cette synthèse même — **motif : écarté**.
+  - détail : le hook a rendu quatre échecs bloquants (« les huit blocs sont absents ») sur un
+    message dont le texte EXACT, relu dans le transcript et rejoué, rend PASS sur les 20 règles.
+    Le hook a jugé le préambule d’une phrase qui précédait la restitution, pas la restitution.
+    Versé au registre en candidature ; le contournement employé est de n’écrire aucun texte avant
+    la restitution, ce qui est une contrainte de rédaction imposée par un défaut d’outil.
 - La stabilité de forme d'une restitution **d'un tour au suivant** — **motif : impossible à
   prouver ici**.
   - détail : elle demanderait de conserver l'état du tour précédent ; seule la cohérence à
