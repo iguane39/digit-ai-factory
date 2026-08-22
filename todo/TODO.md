@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=7d40c07156af archive=54c0315cbe97 · dernier événement: 2026-08-22T09:30:53.131Z -->
+     sceaux: actifs=689f96772af0 archive=acf69e8da61a · dernier événement: 2026-08-22T11:43:44.728Z -->
 
-**28 actifs** (candidat 23 · décidé 1 · en cours 1 · corrigé 3 · écarté 0) · **469 archivés**.
+**30 actifs** (candidat 25 · décidé 0 · en cours 1 · corrigé 4 · écarté 0) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -18,14 +18,21 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0324 | en_cours | 3 | Artefacts périodiques du run de delivery absents : RAID, rapport d'avancement, compte rendu, REX, suivi des bénéfices | **oui** — revérifié en session le 16/08 : 0 occurrence de RAID / compte rendu / rapport d'avancement / lessons learned sur les skills installés — aucun des cinq artefacts que réclame une mission longue n'a d'équivalent dans la forge |
-| TF-0478 | decide | 6.7 | quality-oracles : un verdict ne dit pas SUR QUEL CONTENU il a ete rendu — un CONFORME cite en restitution vieillit en silence, ni re-verifiable ni invalidable | **oui** — MESURE le 22/08 sur le parc reel, et le resultat est total : sur les 2 journaux d'oracles confrontables a leur cible, 2 portent un verdict PASS rendu AVANT une modification de la cible (etude i18n : cible modifiee 5,9 min apres le verdict ; etude portefeuille : 1,5 min apres). Deux « PASS » sont donc citables aujourd'hui alors qu'ils ne portent plus sur le contenu present, et RIEN ne les distingue d'un verdict frais. Echantillon petit (2 journaux) — mais le taux de perime y est de 2/2, et le mecanisme est structurel, pas accidentel. |
 | TF-0484 | candidat | 25 | forge-agents : run-oracles.mjs plante sur JSON_OUT non defini, n affiche jamais son verdict et retourne 1 sur un PASS — le hook d ecriture bloque alors toute ecriture | **oui** — Bloque le hook d ecriture de tout l ecosysteme : deux ecritures refusees sur des fichiers au verdict PASS pendant cette seule passe. |
 | TF-0485 | candidat | 20 | forge-agents : oracle-claims analyse le JavaScript inline et lit la reference arriere $1 d une expression reguliere comme un montant en dollars | **oui** — FAIL bloquant sur un livrable conforme ; une demi-heure a remonter d un message pointant une accolade ouvrante jusqu a une expression reguliere. |
 | TF-0486 | candidat | 15 | forge-agents : oracle-claims analyse le CSS et lit les couleurs hexadecimales purement numeriques comme des nombres non sources | **oui** — FAIL sur des valeurs prescrites par la charte ; contournement contraire a la charte elle-meme. |
 | TF-0487 | candidat | 10 | forge-agents : confirmation de RA-4 sur un autre motif — les sources citees verbatim sont analysees comme du contenu propre au livrable | **oui** — Deuxieme occurrence du meme mecanisme en deux passes, sur un livrable dont l autoportance impose d embarquer ses sources. |
 | TF-0495 | candidat | 10 | forge-agents : aucune regle ne distingue « le contenu est present » de « le contenu est exploitable » | **oui** — Deux demandes explicites du client necessaires pour obtenir un contenu lisible, sur un livrable vert a tous les oracles. |
+| TF-0497 | candidat | 7.5 | quality-oracles : la garde TOCTOU (empreinte aux deux bords) est cablee mais NON couverte par recette — le seul mecanisme du lot dont les deux sens ne sont pas joues | **oui** — paye immediatement et mesurable : le self-test du skill passe de 152 a 156 controles, dont 4 pour ce lot — et 0 pour la garde TOCTOU. Sur les deux mecanismes livres, un seul est prouve. Le contrat de la maison est « aucun ✓ sans oracle execute » : ici le ✓ de la garde TOCTOU repose sur la lecture du code, pas sur une execution. |
 | TF-0475 | candidat | 3 | agents, design : 18 des 20 champs de frontmatter d'un SKILL.md ne sont posés nulle part — isolation de contexte, cadrage du déclenchement et restriction d'outils ne sont câblés sur aucun des 17 skills | **oui** — mesuré et non payé sur pièce : 17 SKILL.md sur 17 à deux champs, 18 champs disponibles à zéro occurrence, dont les trois seuls mécanismes de la plateforme capables d'isoler un contexte, de cadrer un déclenchement et de restreindre un outil |
+| TF-0478 | corrige | 6.7 | quality-oracles : un verdict ne dit pas SUR QUEL CONTENU il a ete rendu — un CONFORME cite en restitution vieillit en silence, ni re-verifiable ni invalidable | **oui** — MESURE le 22/08 sur le parc reel, et le resultat est total : sur les 2 journaux d'oracles confrontables a leur cible, 2 portent un verdict PASS rendu AVANT une modification de la cible (etude i18n : cible modifiee 5,9 min apres le verdict ; etude portefeuille : 1,5 min apres). Deux « PASS » sont donc citables aujourd'hui alors qu'ils ne portent plus sur le contenu present, et RIEN ne les distingue d'un verdict frais. Echantillon petit (2 journaux) — mais le taux de perime y est de 2/2, et le mecanisme est structurel, pas accidentel. |
 | TF-0323 | corrige | 4 | Gouvernance de mission absente : ni registre de risques, ni parties prenantes, ni mesures de succès suivies | **oui** — revérifié en session le 16/08 : 0 occurrence de « risque » dans pilote-de-mission v1.0.0, 0 hit « parties prenantes » sur les skills installés — une mission client pilotée par la forge ne produit aucun des trois objets qu'un commanditaire attend en premier en comité de pilotage |
+
+## digit-ai-forge-conception
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0498 | candidat | 15 | forge-conception : la description du skill `qualifie-l-entrant` depasse la limite de 1024 caracteres — le self-test de quality-oracles echoue sur le parc installe | **oui** — mesure le 22/08 : le self-test de quality-oracles sort en echec (1 echec) des qu'il est joue depuis la copie installee, alors qu'il rend 156 PASS et 0 echec depuis la source. Le meme harnais donne deux verdicts selon l'endroit d'ou on le joue — et c'est le verdict rouge qui correspond a l'usage reel. |
 
 ## digit-ai-forge-design
 
