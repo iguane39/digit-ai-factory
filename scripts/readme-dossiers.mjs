@@ -59,6 +59,9 @@ const ROLES = {
   "output/05-insatisfactions/INS-0001": "Instruction de l'insatisfaction INS-0001 (menus de produit-07) — `INSTRUCTION.md` à six blocs (`gabarits\\AGENT-INSATISFACTION.md`) : reproduction, cause racine, gates en défaut.",
 };
 
+// Dossiers MACHINE : journaux d'oracles (`.oracles\`, `_oracles\` — TF-0428) — régénérés à
+// chaque exécution, jamais lus par un humain. Comptés au README du parent, sans README propre.
+const EST_MACHINE = (nom) => nom.startsWith(".") || nom === "_oracles";
 const posix = (p) => p.split(sep).join("/");
 const affiche = (p) => p.split("/").join("\\") + "\\";
 
@@ -124,7 +127,7 @@ function derniereDate(dates, rel) {
 function compter(dir) {
   let fichiers = 0;
   for (const e of readdirSync(dir, { withFileTypes: true })) {
-    if (e.name.startsWith(".")) continue;
+    if (EST_MACHINE(e.name)) continue;
     if (e.isDirectory()) fichiers += compter(join(dir, e.name)); else if (e.name !== "README.md") fichiers++;
   }
   return fichiers;
@@ -141,9 +144,9 @@ function roleExistant(readme) {
 
 function attendu(dir, rel, dates) {
   const entrees = readdirSync(dir, { withFileTypes: true })
-    .filter((e) => !e.name.startsWith(".") && e.name !== "README.md" && !estIgnore(rel + "/" + e.name))
+    .filter((e) => !EST_MACHINE(e.name) && e.name !== "README.md" && !estIgnore(rel + "/" + e.name))
     .sort((x, y) => (x.isDirectory() === y.isDirectory() ? x.name.localeCompare(y.name, "fr") : x.isDirectory() ? -1 : 1));
-  const caches = readdirSync(dir, { withFileTypes: true }).filter((e) => e.name.startsWith(".") && e.isDirectory()).map((e) => e.name);
+  const caches = readdirSync(dir, { withFileTypes: true }).filter((e) => EST_MACHINE(e.name) && e.isDirectory()).map((e) => e.name);
   const role = roleExistant(join(dir, "README.md")) || ROLES[rel] || PLACEHOLDER;
   const lignes = [];
   lignes.push(`# ${affiche(rel)}`, "",
@@ -180,7 +183,7 @@ function attendu(dir, rel, dates) {
 function* dossiers(dir) {
   yield dir;
   for (const e of readdirSync(dir, { withFileTypes: true }))
-    if (e.isDirectory() && !e.name.startsWith(".")) yield* dossiers(join(dir, e.name));
+    if (e.isDirectory() && !EST_MACHINE(e.name)) yield* dossiers(join(dir, e.name));
 }
 
 const dates = datesCommit();
