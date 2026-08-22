@@ -21,6 +21,38 @@ supprime la cause. L'heure d'un fait RAPPORTÉ (décision d'hier, correction d'a
 une donnée : `date_decision`, `date_correction` — jamais `ts`, qui est l'heure de
 consignation.
 
+**Deux sessions, un seul compteur : ce qui est couvert et ce qui ne l'est pas** (TF-0394 puis
+TF-0481). Le préflight de `ingerer-lot.mjs` fait `git fetch` puis compare `HEAD..origin/main`
+sur les deux registres, et REFUSE l'ingestion si le distant a avancé — sinon les ids séquentiels
+repartiraient du mauvais maximum. C'est juste, et ça reste.
+
+Mais c'est un **check-then-act** : il regarde AVANT d'écrire. Il ne peut rien contre la fenêtre
+qui s'ouvre PENDANT l'ingestion — deux sessions qui frappent les mêmes numéros avant que l'une
+ait poussé. **Cette fenêtre a été payée trois fois** : une avant TF-0394, puis deux le 22/08 —
+cinq candidatures renumérotées le matin avec trois commits de rattrapage, et un `TF-0514` frappé
+pendant qu'une autre session publiait le sien le soir.
+
+Deux mécanismes s'y ajoutent, et **aucun des deux ne ferme la fenêtre** :
+
+- un **post-contrôle** après écriture : l'ingestion re-`fetch` et compare les ids qu'elle vient
+  de frapper à ceux d'`origin`. Il ne peut pas échouer — l'écriture est faite, annuler perdrait
+  le travail — mais il AVERTIT, nomme les ids en cause et donne la commande qui répare. La
+  fenêtre n'est pas fermée : elle cesse d'être découverte à la main, plus tard ;
+- **`node todo\renumeroter.mjs <ancien> <nouveau> --motif "…"`**, parce que le coût mesuré n'est
+  pas la collision mais la RENUMÉROTATION MANUELLE. L'outil REFUSE un motif de moins de
+  30 caractères, un id absent, et un id cible déjà pris — **archive comprise**, un numéro archivé
+  restant pris. Le motif s'annote dans le champ `source` de la création, à la suite de ce qui y
+  était : *un identifiant qui change sans que la raison soit lisible vaut moins qu'un identifiant
+  absent*, et l'histoire s'annote au lieu de se réécrire.
+
+**Les deux voies qui fermeraient vraiment la fenêtre sont écartées, et il vaut mieux dire
+pourquoi que les laisser croire possibles.** Frapper les ids AU PUSH suppose que tout l'aval
+(vues, oracle, TODO-PRODUIT) sache travailler sur des lots sans numéro : ce n'est pas un
+correctif, c'est un changement de modèle. Réserver un bloc atomiquement sur `origin`
+fonctionnerait — la mise à jour d'une référence git EST un compare-and-swap — mais elle exige de
+POUSSER pendant l'ingestion, et R-38 réserve le push au GO humain : un outil qui publie sans GO
+pour se protéger d'une collision échangerait un défaut contre une violation.
+
 **Gouvernance** : tout entre en `candidat` ; seul un mandat humain (« décide TF-xxxx », un lot de
 décisions appliqué par `todo\appliquer-export.mjs` — format `TF-decisions-*.json`, produit
 par l'humain et non plus par la page (TF-0328) — ou un mandat global explicite) passe en `decide` — le décideur
