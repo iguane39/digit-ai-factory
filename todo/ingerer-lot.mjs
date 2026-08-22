@@ -131,7 +131,11 @@ const lignes = contenu.split("\n").filter((l) => l.trim());
           `[REJET ATOMIQUE] ${sidecarPath} — registre intact.\n` +
           `  - le lot ${lotMd} n'a pas de section « Remarques restées au produit » (R-45).\n` +
           "    Ce qu'un produit corrige chez lui sans le remonter emporte la CLASSE du défaut\n" +
-          "    avec lui. Gabarit : gabarits\\RETOURS-FORGES.md.");
+          "    avec lui. Gabarit : gabarits\\RETOURS-FORGES.md.\n" +
+          "    CAUSE LA PLUS FREQUENTE (TF-0502, 22/08) : le produit ecrit avec une COPIE du\n" +
+          "    gabarit prise a la CREATION de son run et jamais rafraichie. Les deux sections y\n" +
+          "    sont entrees le 21/08 ; une copie plus ancienne ne les porte pas. Recopier\n" +
+          "    gabarits\\RETOURS-FORGES.md dans forge\\retours\\ du produit, puis reprendre le lot.");
         process.exit(1);
       }
     }

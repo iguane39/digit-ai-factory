@@ -22,7 +22,7 @@ Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés 
 | `Approval2 - RETOURS - 20260817c.tf.jsonl` | fichier | 7,5 Ko | 4 ligne(s) JSONL |
 | `Approval2 - RETOURS - 20260817d.md` | fichier | 6,9 Ko | Retours forges — Approval2 — 20260817d |
 | `Approval2 - RETOURS - 20260817d.tf.jsonl` | fichier | 4,0 Ko | 2 ligne(s) JSONL |
-| `Approval2 - RETOURS - 20260818a.md` | fichier | 13,6 Ko | Retours forges — Approval2 — 20260818a |
+| `Approval2 - RETOURS - 20260818a.md` | fichier | 13,7 Ko | Retours forges — Approval2 — 20260818a |
 | `Approval2 - RETOURS - 20260818a.tf.jsonl` | fichier | 10,0 Ko | 4 ligne(s) JSONL |
 | `AuxPortesDeLaBaie - RETOURS - 20260815a.md` | fichier | 7,0 Ko | Retours de run — audit SEO auxportesdelabaie.fr, 15/08/2026 |
 | `AuxPortesDeLaBaie - RETOURS - 20260815a.tf.jsonl` | fichier | 7,0 Ko | 7 ligne(s) JSONL |
@@ -30,15 +30,15 @@ Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés 
 | `BdL - RETOURS - 20260815a.tf.jsonl` | fichier | 5,3 Ko | 7 ligne(s) JSONL |
 | `BdL - RETOURS - 20260815b.md` | fichier | 3,1 Ko | BdL — RETOURS — 20260815b |
 | `BdL - RETOURS - 20260815b.tf.jsonl` | fichier | 3,1 Ko | 3 ligne(s) JSONL |
-| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260821a.md` | fichier | 7,6 Ko | Retours forges — Bibliothèque vidéo IA Ceetrus — 20260821a |
+| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260821a.md` | fichier | 7,7 Ko | Retours forges — Bibliothèque vidéo IA Ceetrus — 20260821a |
 | `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260821a.tf.jsonl` | fichier | 8,2 Ko | 4 ligne(s) JSONL |
 | `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260821b.md` | fichier | 3,2 Ko | Retours forges — Bibliothèque vidéo IA Ceetrus — 20260821b |
 | `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260821b.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
 | `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260821c.md` | fichier | 9,2 Ko | Retours forges — Bibliothèque vidéo IA Ceetrus — 20260821c |
 | `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260821c.tf.jsonl` | fichier | 10,1 Ko | 5 ligne(s) JSONL |
-| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260822a.md` | fichier | 14,2 Ko | Retours forges — Bibliothèque vidéo IA Ceetrus — 20260822a |
+| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260822a.md` | fichier | 14,3 Ko | Retours forges — Bibliothèque vidéo IA Ceetrus — 20260822a |
 | `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260822a.tf.jsonl` | fichier | 13,7 Ko | 6 ligne(s) JSONL |
-| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260822b.md` | fichier | 11,3 Ko | Retours forges — Bibliothèque vidéo IA Ceetrus — 20260822b |
+| `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260822b.md` | fichier | 11,4 Ko | Retours forges — Bibliothèque vidéo IA Ceetrus — 20260822b |
 | `Bibliotheque-Video-IA-Ceetrus - RETOURS - 20260822b.tf.jsonl` | fichier | 11,0 Ko | 6 ligne(s) JSONL |
 | `bourse-aux-vacants - RETOURS - 20260814a.md` | fichier | 10,2 Ko | Retours forges — bourse-aux-vacants — 20260814a |
 | `bourse-aux-vacants - RETOURS - 20260814a.normalise.tf.jsonl` | fichier | 6,2 Ko | 5 ligne(s) JSONL |
@@ -53,9 +53,9 @@ Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés 
 | `bourse-aux-vacants - RETOURS - 20260817a.tf.jsonl` | fichier | 5,4 Ko | 3 ligne(s) JSONL |
 | `bourse-aux-vacants - RETOURS - 20260817b.md` | fichier | 6,1 Ko | Retours forges — bourse-aux-vacants — 20260817b |
 | `bourse-aux-vacants - RETOURS - 20260817b.tf.jsonl` | fichier | 4,3 Ko | 2 ligne(s) JSONL |
-| `bourse-aux-vacants - RETOURS - 20260818a.md` | fichier | 14,5 Ko | Retours forges — bourse-aux-vacants — 20260818a |
+| `bourse-aux-vacants - RETOURS - 20260818a.md` | fichier | 14,6 Ko | Retours forges — bourse-aux-vacants — 20260818a |
 | `bourse-aux-vacants - RETOURS - 20260818a.tf.jsonl` | fichier | 12,2 Ko | 5 ligne(s) JSONL |
-| `CalculatriceNhoodSCC - RETOURS - 20260822a.md` | fichier | 14,2 Ko | Retours forges — CalculatriceNhoodSCC — 20260822a |
+| `CalculatriceNhoodSCC - RETOURS - 20260822a.md` | fichier | 14,3 Ko | Retours forges — CalculatriceNhoodSCC — 20260822a |
 | `CalculatriceNhoodSCC - RETOURS - 20260822a.tf.jsonl` | fichier | 8,3 Ko | 3 ligne(s) JSONL |
 | `COMPTA - Ventilation de facture SFR - RETOURS - 20260814a.md` | fichier | 5,6 Ko | Retours forges — COMPTA - Ventilation de facture SFR — 20260814a |
 | `COMPTA - Ventilation de facture SFR - RETOURS - 20260814a.normalise.tf.jsonl` | fichier | 5,3 Ko | 5 ligne(s) JSONL |
@@ -75,9 +75,9 @@ Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés 
 | `factory-digit-ai-fr - RETOURS - 20260822b.tf.jsonl` | fichier | 5,0 Ko | 2 ligne(s) JSONL |
 | `forge-digit-ai-fr - RETOURS - 20260815a.md` | fichier | 2,4 Ko | Retours forges — forge-digit-ai-fr — 20260815a |
 | `forge-digit-ai-fr - RETOURS - 20260815a.tf.jsonl` | fichier | 3,7 Ko | 5 ligne(s) JSONL |
-| `Hoopiz - RETOURS - 20260820a.md` | fichier | 13,1 Ko | Retours forges — Hoopiz — 20260820a |
+| `Hoopiz - RETOURS - 20260820a.md` | fichier | 13,0 Ko | Retours forges — Hoopiz — 20260820a |
 | `Hoopiz - RETOURS - 20260820a.tf.jsonl` | fichier | 9,0 Ko | 8 ligne(s) JSONL |
-| `Hoopiz - RETOURS - 20260820b.md` | fichier | 15,2 Ko | Retours forges — Hoopiz — 20260820b |
+| `Hoopiz - RETOURS - 20260820b.md` | fichier | 15,1 Ko | Retours forges — Hoopiz — 20260820b |
 | `Hoopiz - RETOURS - 20260820b.tf.jsonl` | fichier | 12,2 Ko | 9 ligne(s) JSONL |
 | `Hoopiz - RETOURS - 20260821a.md` | fichier | 11,3 Ko | Retours forges — Hoopiz — 20260821a |
 | `Hoopiz - RETOURS - 20260821a.tf.jsonl` | fichier | 9,3 Ko | 7 ligne(s) JSONL |
@@ -85,7 +85,7 @@ Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés 
 | `Hoopiz - RETOURS - 20260822a.tf.jsonl` | fichier | 6,9 Ko | 5 ligne(s) JSONL |
 | `Hoopiz - RETOURS - 20260822b.md` | fichier | 9,5 Ko | Retours forges — Hoopiz — 20260822b |
 | `Hoopiz - RETOURS - 20260822b.tf.jsonl` | fichier | 6,5 Ko | 3 ligne(s) JSONL |
-| `nhood-cockpit-ia - RETOURS - 20260820a.md` | fichier | 9,7 Ko | Retours forges — nhood-cockpit-ia — 20260820a |
+| `nhood-cockpit-ia - RETOURS - 20260820a.md` | fichier | 9,8 Ko | Retours forges — nhood-cockpit-ia — 20260820a |
 | `nhood-cockpit-ia - RETOURS - 20260820a.tf.jsonl` | fichier | 6,5 Ko | 4 ligne(s) JSONL |
 | `pilot-campagne-fiches-html - RETOURS - 20260809a.md` | fichier | 6,5 Ko | Retours forges — campagne « fiches HTML lisibles » — 20260809a |
 | `pilot-campagne-fiches-html - RETOURS - 20260809a.tf.jsonl` | fichier | 6,3 Ko | 6 ligne(s) JSONL |
@@ -107,7 +107,7 @@ Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés 
 | `SCC_ALX - RETOURS - 20260818a.tf.jsonl` | fichier | 5,8 Ko | 4 ligne(s) JSONL |
 | `SCC_ALX - RETOURS - 20260818b.md` | fichier | 14,9 Ko | Retours forges — SCC_ALX — 20260818b |
 | `SCC_ALX - RETOURS - 20260818b.tf.jsonl` | fichier | 9,4 Ko | 5 ligne(s) JSONL |
-| `SCC-FR - RETOURS - 20260820a.md` | fichier | 16,8 Ko | Retours forges — SCC-FR — 20260820a |
+| `SCC-FR - RETOURS - 20260820a.md` | fichier | 16,9 Ko | Retours forges — SCC-FR — 20260820a |
 | `SCC-FR - RETOURS - 20260820a.tf.jsonl` | fichier | 13,0 Ko | 8 ligne(s) JSONL |
 
 _95 fichier(s), 0 sous-dossier(s)_
