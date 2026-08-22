@@ -50,6 +50,6 @@
 | `20260819-etude-opportunite-retro-engineering.md` | fichier | 10,4 Ko | 2026-08-19 | Étude d'opportunité — rétro-engineering d'un ou plusieurs projets — 20260819a |
 | `20260820-etude-opportunite-communication-interlocuteur.md` | fichier | 10,4 Ko | 2026-08-20 | Étude d'opportunité — adapter la communication à l'interlocuteur — 20260820b |
 | `20260820-etude-opportunite-rgaa.md` | fichier | 12,9 Ko | 2026-08-20 | Étude d'opportunité — RGAA AA dans le parc : forge-design, forge-tests, et ce qui n'est pa |
-| `20260822-etude-opportunite-vue-portefeuille.md` | fichier | 8,6 Ko | non versionné | Étude d'opportunité — vue portefeuille du reste-à-faire — 20260822a |
+| `20260822-etude-opportunite-vue-portefeuille.md` | fichier | 8,6 Ko | 2026-08-22 | Étude d'opportunité — vue portefeuille du reste-à-faire — 20260822a |
 
 _37 fichier(s), 0 sous-dossier(s)_
