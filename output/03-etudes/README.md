@@ -38,17 +38,17 @@
 | `20260817-etude-opportunite-sequencement-factory.md` | fichier | 45,2 Ko | 2026-08-17 | Étude d'opportunité — séquencement du renommage `digit-ai-forge-pilot` → `digit-ai-factory |
 | `20260817-etude-opportunite-tests-bout-en-bout.md` | fichier | 27,5 Ko | 2026-08-17 | Étude d'opportunité — fermeture de la voie « proposition de tests » (TF-0349) — 20260817j |
 | `20260817-etude-opportunite-todo-produit.md` | fichier | 27,6 Ko | 2026-08-17 | Étude d'opportunité — la todo de chaque produit en page HTML — 20260817i |
-| `20260818-cartographie-oracles-cadence-de-mission.md` | fichier | 5,8 Ko | 2026-08-18 | Digit-AI — Cartographie des oracles : les cinq artefacts de cadence — 20260818a |
+| `20260818-cartographie-oracles-cadence-de-mission.md` | fichier | 5,7 Ko | 2026-08-18 | Digit-AI — Cartographie des oracles : les cinq artefacts de cadence — 20260818a |
 | `20260818-etude-opportunite-admission-digit-ai-queue.md` | fichier | 14,0 Ko | 2026-08-18 | Étude d'opportunité — admission de `digit-ai-queue` au corpus du pilot — 20260818a |
-| `20260818-etude-opportunite-cablage-orchestrer-boucle.md` | fichier | 12,5 Ko | 2026-08-18 | Étude d'opportunité — câbler `orchestrer-boucle.mjs` en appelant réel — 20260818b |
-| `20260818-etude-opportunite-memoire-partagee.md` | fichier | 25,7 Ko | 2026-08-19 | Étude d'opportunité — mémoire partagée à portées croisées prestataire / client — 20260819b |
-| `20260818-etude-opportunite-retour-usage-vers-delta.md` | fichier | 9,2 Ko | 2026-08-18 | Étude d'opportunité — retour d'usage → delta opposable — 20260818b |
+| `20260818-etude-opportunite-cablage-orchestrer-boucle.md` | fichier | 12,4 Ko | 2026-08-18 | Étude d'opportunité — câbler `orchestrer-boucle.mjs` en appelant réel — 20260818b |
+| `20260818-etude-opportunite-memoire-partagee.md` | fichier | 25,4 Ko | 2026-08-19 | Étude d'opportunité — mémoire partagée à portées croisées prestataire / client — 20260819b |
+| `20260818-etude-opportunite-retour-usage-vers-delta.md` | fichier | 9,1 Ko | 2026-08-18 | Étude d'opportunité — retour d'usage → delta opposable — 20260818b |
 | `20260819-etude-opportunite-forge-consulting.md` | fichier | 13,4 Ko | 2026-08-19 | Étude d'opportunité — « forge-consulting » (conseil de bout en bout) — 20260819c |
-| `20260819-etude-opportunite-meta-oracle-enclenchement.md` | fichier | 17,0 Ko | 2026-08-19 | Étude d'opportunité — juger que les oracles qui devaient s'enclencher se sont enclenchés — |
-| `20260819-etude-opportunite-module-de-traduction.md` | fichier | 16,5 Ko | 2026-08-19 | Étude d'opportunité — module de traduction adapté au contexte — 20260819a |
+| `20260819-etude-opportunite-meta-oracle-enclenchement.md` | fichier | 16,8 Ko | 2026-08-19 | Étude d'opportunité — juger que les oracles qui devaient s'enclencher se sont enclenchés — |
+| `20260819-etude-opportunite-module-de-traduction.md` | fichier | 16,3 Ko | 2026-08-19 | Étude d'opportunité — module de traduction adapté au contexte — 20260819a |
 | `20260819-etude-opportunite-retro-documentation.md` | fichier | 9,6 Ko | 2026-08-19 | Étude d'opportunité — rétro-documentation par profils — 20260819b |
 | `20260819-etude-opportunite-retro-engineering.md` | fichier | 10,4 Ko | 2026-08-19 | Étude d'opportunité — rétro-engineering d'un ou plusieurs projets — 20260819a |
-| `20260820-etude-opportunite-communication-interlocuteur.md` | fichier | 10,6 Ko | 2026-08-20 | Étude d'opportunité — adapter la communication à l'interlocuteur — 20260820b |
-| `20260820-etude-opportunite-rgaa.md` | fichier | 13,0 Ko | 2026-08-20 | Étude d'opportunité — RGAA AA dans le parc : forge-design, forge-tests, et ce qui n'est pa |
+| `20260820-etude-opportunite-communication-interlocuteur.md` | fichier | 10,4 Ko | 2026-08-20 | Étude d'opportunité — adapter la communication à l'interlocuteur — 20260820b |
+| `20260820-etude-opportunite-rgaa.md` | fichier | 12,9 Ko | 2026-08-20 | Étude d'opportunité — RGAA AA dans le parc : forge-design, forge-tests, et ce qui n'est pa |
 
 _36 fichier(s), 0 sous-dossier(s)_
