@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=fa7b0ebb5301 archive=54c0315cbe97 · dernier événement: 2026-08-22T13:36:04.427Z -->
+     sceaux: actifs=f8b7cca7787a archive=54c0315cbe97 · dernier événement: 2026-08-22T13:42:36.915Z -->
 
-**44 actifs** (candidat 39 · décidé 0 · en cours 1 · corrigé 4 · écarté 0) · **469 archivés**.
+**45 actifs** (candidat 40 · décidé 0 · en cours 1 · corrigé 4 · écarté 0) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -82,6 +82,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-0507 | candidat | 20 | pilot : un renvoi par NUMERO DE LIGNE designe autre chose au message suivant — la liste est renumerotee, S14 exige un id stable mais rien n'interdit de designer par la position (regle S17) | **oui** — le lecteur a du signaler lui-meme que deux renvois d'une meme phrase etaient incomprehensibles, et ils l'etaient reellement — les positions avaient change entre l'ecriture et la lecture |
 | TF-0508 | candidat | 20 | pilot : le classement par acteur rendu en SECTIONS SEPAREES detruit la liste unique — l'acteur est une colonne, l'ordre est le tri, et seul le calendrier justifie plusieurs tableaux | **oui** — deux rappels du lecteur sur la meme exigence, alors que les deux moities de sa demande etaient compatibles et que le referentiel ne le disait pas |
+| TF-0513 | candidat | 20 | oracle-synthese : une synthese CONFORME echoue S9 a cause de son propre titre — le frontmatter `destinataire: humain` que le gabarit PRESCRIT empeche le retrait du H1, et le code de lot du titre est alors lu comme un sha | **oui** — mesure le 22/08 : S9 FAIL « vocabulaire technique nu (sha) » sur une synthese sans defaut, le token fautif etant le code de lot 20260822a du titre ; le hook Stop etant bloquant depuis la v2.4.0, le refus tombe sur une restitution conforme. Apres renommage du titre en « 22 aout 2026, lot a », le meme fichier rend PASS S1-S16 — ce qui prouve que seul le titre etait en cause. |
 | TF-0510 | candidat | 16 | pilot : une ACTION ne porte ni son impact ni sa recommandation, alors qu'une DECISION les porte depuis S15 et S16 — la demande humaine etait symetrique, le referentiel n'en couvre qu'une moitie | **oui** — la moitie ACTIONS d'une demande humaine explicitement symetrique a ete livree sans son impact ni sa reco, alors que la moitie DECISIONS l'avait ete le matin meme |
 | TF-0512 | candidat | 15 | pilot : un retour arriere imprime dans un journal peut etre MASQUE par le moteur de pipeline — la precaution s'annule au moment precis ou elle sert | **oui** — une precaution deliberement conçue pour l'urgence, annulee par un masquage automatique, et decouverte par hasard en relisant le journal plutot qu'en ayant besoin de la commande |
 | TF-0504 | candidat | 12.5 | pilot : le faux negatif de R-2 n est pas un oubli de producteur, il est STRUCTUREL — aucun gabarit de la bibliotheque ne porte la marque destinataire qui declenche le jugement | **oui** — Fiche securite ecrite hors output\ le 22/08 en violation de R-2/R-39, six jours apres la correction de TF-0319 ; aucun oracle ne pouvait le voir faute de marque, defaut trouve par relecture humaine. Apres pose de la marque, oracle-conformite-projet rend R-2 PASS sur le meme depot. |
