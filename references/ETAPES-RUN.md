@@ -83,7 +83,12 @@ sessions ad hoc dans le produit passent par les forges pour tout verdict — tes
 déploiement — la boucle intérieure restant libre), le `README.md`, puis `git init -b main` +
 commit initial — commits locaux à chaque étape, **remote/push sur GO humain seulement**.
 Créer aussi `forge\retours\` avec une copie de `gabarits\RETOURS-FORGES.md` (le canal de
-retours du produit — règle 18). Copier enfin `gabarits\settings-produit.json` →
+retours du produit — règle 18) — et la **RECOPIER à chaque ouverture de run**, jamais
+seulement à la création. TF-0502 (22/08) : trois lots d'un même produit ont été refusés par
+R-45/R-46 en deux jours parce que le produit écrivait avec une copie du gabarit antérieure au
+21/08, date où les deux sections y sont entrées. La règle voyageait — elle est DANS le gabarit —
+mais la copie, elle, ne bougeait plus. Une copie prise une fois est une copie qui vieillit en
+silence. Copier enfin `gabarits\settings-produit.json` →
 `.claude\settings.json` et `gabarits\hooks-factory.mjs` → `forge\hooks\factory.mjs` (R-44 :
 les hooks de la factory — fraîcheur à l'ouverture, restitution jugée à chaque fin de tour de
 travail — sont actifs dès la première session du produit) ; la clause de **précédence**
