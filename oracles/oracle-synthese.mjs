@@ -254,7 +254,15 @@ function juger(texte) {
   // « présence » portent leur accent et ne matchent pas les jetons `decision`, `acces`,
   // `presence`. Un motif hors vocabulaire n'est pas un refus valide : c'est un candidat à
   // l'automatisation, à verser au registre.
-  const MOTIFS_IA = /\b(gate_gouvernance|dependance_bloc_3|garde_fou|borne_atteinte|dependance_externe)\b/;
+  const MOTIFS_IA = /\b(gate_gouvernance|dependance_bloc_3|garde_fou|borne_atteinte|dependance_externe|hors_mandat)\b/;
+  // `hors_mandat` a été AJOUTÉ dans l'heure qui a suivi l'écriture de S11, sur un cas réel : trois
+  // lots de retours sont arrivés dans la boîte d'entrée pendant le mandat du 22/08. Les ingérer
+  // est du ressort de l'IA, mais d'un AUTRE mandat. Aucun des cinq motifs d'origine ne le disait,
+  // et la seule issue était d'en choisir un faux ou de taire la ligne — c'est-à-dire exactement ce
+  // que S11 existe pour empêcher. Une règle qui force à mentir est une règle à corriger, pas à
+  // contourner. C'est aussi le motif le plus facile à ABUSER : apposé sur une action que le mandat
+  // courant couvre, il contourne S11 au lieu de la satisfaire, et aucun oracle ne le voit — c'est
+  // déclaré en `non_juge` plutôt que passé sous silence.
   const MOTIFS_HUMAIN = /\b(acces|decision|depense|presence|irreversible)\b/;
   const ID_STABLE = /\b[A-Z]{1,4}-\d{2,4}\b/;
   const DECLAREE_NEUVE = /\b(neuve|neuf|nouvelle|nouveau)\b/i;
@@ -277,7 +285,7 @@ function juger(texte) {
 
   juger8("S11", /\bauto_ia\b/, (g) => MOTIFS_IA.test(g),
     "une action `auto_ia` listée en RESTE sans motif de non-exécution : la voie automatisée est le défaut, " +
-    "donc ce qui n'a pas été fait se justifie. Vocabulaire : gate_gouvernance, dependance_bloc_3, garde_fou, borne_atteinte, dependance_externe.",
+    "donc ce qui n'a pas été fait se justifie. Vocabulaire : gate_gouvernance, dependance_bloc_3, garde_fou, borne_atteinte, dependance_externe, hors_mandat.",
     "chaque action `auto_ia` non exécutée porte son motif");
 
   juger8("S12", HUMAINS, (g) => MOTIFS_HUMAIN.test(g),
@@ -395,6 +403,7 @@ console.log(JSON.stringify({
   non_juge: [
     "la JUSTESSE du verdict, la pertinence d'un risque, la sincérité d'un motif — cet oracle tient la forme opposable, jamais le fond",
     "la longueur de prose (≤ 400 mots) n'est pas mesurée ici : séparer récit et énumération demande une lecture, pas un compteur",
+    "la SINCÉRITÉ d'un motif S11/S12 : `hors_mandat` apposé sur une action que le mandat courant couvre contourne S11 au lieu de la satisfaire, et aucun oracle ne peut le voir — seul un lecteur le peut",
   ],
 }, null, 1));
 process.exit(verdict === "PASS" ? 0 : 1);
