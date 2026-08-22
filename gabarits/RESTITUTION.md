@@ -7,7 +7,7 @@ prouvée à zéro faux positif, et ne voit rien. Le marquage a été vérifié t
 `oracle-synthese` (S1-S8 à l'époque, S1-S14 depuis la v2.5.0) sur une synthèse réelle PASS avant d'être prescrit ici.
 Cette consigne, elle, ne se marque PAS : c'est un référentiel normatif, pas un livrable.
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 2.6.0, 22/08/2026** (TF-0457 à TF-0461, retour humain du 22/08 sur la forme des listes de tâches : le bloc 8 cesse d'être une liste d'étiquettes — une action `auto_ia` non exécutée porte son motif (**S11**), une action laissée à l'humain porte sa raison d'impossibilité IA (**S12**), elle est exécutable telle quelle (**S13**), et elle porte un identifiant stable (**S14**). Les quatre entrent en **AVERTISSANTES** au sens de la v2.5.0 : une action sans motif rend la liste moins utile, jamais illisible — et le doublon d'affichage qu'un blocage provoque coûterait plus que le défaut qu'il dénonce. Elles se durciront quand le corpus sera propre, comme la v2.0.0 l'a fait avant elles) — précédente : **2.5.0, 22/08/2026** (retour humain
+Référentiel versionné (loi n° 4, daté-éditable) — **version 2.6.1, 22/08/2026** (`hors_mandat` ajoute au vocabulaire de S11 le jour meme, cf. section du bloc 8) — 2.6.0 du 22/08 (TF-0457 à TF-0461, retour humain du 22/08 sur la forme des listes de tâches : le bloc 8 cesse d'être une liste d'étiquettes — une action `auto_ia` non exécutée porte son motif (**S11**), une action laissée à l'humain porte sa raison d'impossibilité IA (**S12**), elle est exécutable telle quelle (**S13**), et elle porte un identifiant stable (**S14**). Les quatre entrent en **AVERTISSANTES** au sens de la v2.5.0 : une action sans motif rend la liste moins utile, jamais illisible — et le doublon d'affichage qu'un blocage provoque coûterait plus que le défaut qu'il dénonce. Elles se durciront quand le corpus sera propre, comme la v2.0.0 l'a fait avant elles) — précédente : **2.5.0, 22/08/2026** (retour humain
 « le prompt de résultat s'affiche 2 fois » : un hook `Stop` juge APRÈS l'affichage, donc chaque
 refus laissait la version rejetée à l'écran et faisait relire huit blocs. Le gate reste, il
 devient **proportionné** : **bloquantes S1, S3, S4, S6** — la restitution est inutilisable sans
@@ -148,7 +148,8 @@ portant un identifiant stable.
 - **Une action `auto_ia` est FAITE avant la restitution, ou porte son motif de non-exécution**
   (**S11**) — vocabulaire fermé : `gate_gouvernance` (R-29 : décision ou dépense) ·
   `dependance_bloc_3` (attend une décision listée au bloc 3) · `garde_fou` (nommé) ·
-  `borne_atteinte` (G-2) · `dependance_externe` (nommée). *L'effet recherché n'est pas de
+  `borne_atteinte` (G-2) · `dependance_externe` (nommée) · `hors_mandat` (du ressort de l'IA,
+  mais d'un AUTRE mandat — nommer lequel). *L'effet recherché n'est pas de
   gronder : c'est que neuf lignes qui disent toutes « donne-moi un mandat » se lisent comme
   **une** gate, et non comme neuf tâches.*
 - **Une action laissée à l'humain porte sa raison d'impossibilité IA** (**S12**) — vocabulaire
@@ -165,6 +166,15 @@ portant un identifiant stable.
   deux restitutions successives ne se comparent pas, et la même ligne se re-sert
   indéfiniment ; c'est le pendant, côté PRODUIT, de ce que TODO-FORGE tient depuis l'origine
   côté forge.*
+
+**`hors_mandat` a été ajouté dans l'heure qui a suivi l'écriture de S11**, sur un cas réel, et
+l'anecdote vaut règle : trois lots de retours sont arrivés dans la boîte d'entrée pendant le
+mandat du 22/08 ; les ingérer est du ressort de l'IA, mais d'un autre mandat. Aucun des cinq
+motifs d'origine ne le disait — la seule issue était d'en choisir un faux, ou de taire la ligne,
+c'est-à-dire exactement ce que S11 existe pour empêcher. **Une règle qui force à mentir est une
+règle à corriger, pas à contourner.** C'est aussi le motif le plus facile à abuser : apposé sur
+une action que le mandat courant couvre, il contourne S11 au lieu de la satisfaire, et aucun
+oracle ne le voit — c'est déclaré en `non_juge` plutôt que passé sous silence.
 
 **Les vocabulaires sont fermés ET non accentués**, et ce n'est pas un détail de style : c'est ce
 qui les rend **comptables** (« combien d'actions restent humaines par `acces` ? ») et ce qui les
