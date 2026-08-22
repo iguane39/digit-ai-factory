@@ -52,8 +52,11 @@ const BON = `La mise à jour demandée est en place et vérifiée : le poste rep
 - un poste hors ligne ne vérifie pas sa fraîcheur — signal : avertissement « origin injoignable » au rapport ; parade : le défaut est dit, jamais masqué.
 
 ## 8. Prochaines actions
-- auto_ia : 1. rejouer la recette au prochain démarrage (d'abord, parce que gratuit).
-- manuelle_utilisateur : 2. décider (a)/(b) ci-dessus (ensuite, parce que tout le reste en dépend).
+- auto_ia : 1. TF-0001 rejouer la recette au prochain démarrage (d'abord, parce que gratuit).
+  - motif de non-exécution : dependance_bloc_3 — attend la décision ci-dessus.
+- manuelle_utilisateur : 2. TF-0002 décider (a)/(b) ci-dessus (ensuite, parce que tout le reste en dépend).
+  - pourquoi pas l'IA : decision — arbitrage humain, R-29.
+  - où : répondre \`(a)\` ou \`(b)\` au bloc 3 de ce message.
 - manuelle_dev : aucune.
 `;
 

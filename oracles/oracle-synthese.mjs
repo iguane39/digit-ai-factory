@@ -29,6 +29,14 @@
  *   S10 aucun effort chiffré en JOURS sur une ligne de coût/estimation (TF-0408, 20/08 :
  *       avec l'IA un nombre de jours n'a pas de sens — complexité × durée, échelle du
  *       rapport d'audit). Les faits mesurés hors ligne de coût ne sont pas jugés.
+ *   S11 toute action `auto_ia` NON EXÉCUTÉE porte son motif de non-exécution, pris dans un
+ *       vocabulaire fermé (TF-0457) — sans quoi l'étiquette n'engage à rien ;
+ *   S12 toute action `manuelle_dev` / `manuelle_utilisateur` porte sa raison d'impossibilité
+ *       IA, vocabulaire fermé (TF-0458) — la loi transverse n° 5 l'exige depuis l'origine ;
+ *   S13 toute action laissée à l'humain est EXÉCUTABLE : un chemin, une commande ou un
+ *       libellé d'écran, dans le groupe de la puce (TF-0459) ;
+ *   S14 toute action porte un identifiant stable, ou se déclare `neuve` (TF-0460) — sans
+ *       identifiant, deux restitutions successives ne se comparent pas.
  *
  * Usage : node oracle-synthese.mjs <synthese.md>   → verdict JSON
  *         node oracle-synthese.mjs --self-test     → fixtures double sens
@@ -86,6 +94,19 @@ function puces(texte) {
   }
   if (courante !== null) sortie.push(courante);
   return sortie;
+}
+
+// Une ACTION du bloc 8 est une puce de premier niveau AVEC tout ce qui la suit : ses
+// continuations et ses sous-puces. Juger la puce seule était le faux positif à ne pas
+// reproduire (TF-0459) — la doctrine dit deux niveaux au plus, et c'est précisément au second
+// que vivent le motif, le chemin et la commande. Grouper est donc la seule lecture juste.
+function actionsGroupees(texte) {
+  const groupes = [];
+  for (const ligne of texte.split("\n")) {
+    if (/^[-*]\s+\S/.test(ligne)) groupes.push(ligne);
+    else if (groupes.length && /^\s+\S/.test(ligne)) groupes[groupes.length - 1] += " " + ligne.trim();
+  }
+  return groupes;
 }
 
 function bloc(texte, motif) {
@@ -211,6 +232,71 @@ function juger(texte) {
     ? ko("S10", `${enJours.length} ligne(s) de coût chiffrée(s) en JOURS — complexité (simple|moyen|complexe|très complexe) × durée (court|moyen|long|très long). Ex. : ${enJours[0].trim().slice(0, 90)}`)
     : ok("S10", "aucune estimation en jours — l effort parle en complexité × durée");
 
+  // ---- S11 à S14 (TF-0457..TF-0460, 22/08) — le bloc 8 cesse d'être une liste d'étiquettes --
+  //
+  // Retour humain du 22/08 : « la liste des tâches est trop longue, trop complexe, sans assez
+  // de détails sur les problèmes, les solutions possibles, menées par l'IA ou ne pouvant être
+  // traitées que par moi ». Instruit sur les fichiers, il ne demandait presque RIEN de neuf :
+  // les blocs 3 et 8 portaient déjà la doctrine, et la loi transverse n° 5 dit depuis l'origine
+  // « l'IA fait, l'humain décide — la voie automatisée est le DÉFAUT ; l'action laissée à
+  // l'humain se justifie ». Ce qui manquait n'était pas la règle mais son CONTRÔLE : S6 ne
+  // teste que la PRÉSENCE d'un nom d'acteur, jamais ce que cette étiquette engage.
+  //
+  // Mesuré le 22/08 sur les 13 synthèses à bloc 8 de `output\04-plans\` : 15 lignes `auto_ia`,
+  // dont 9 renvoyées à un mandat humain sans que rien ne le dise — le lecteur y lit neuf tâches
+  // là où il y a une seule gate de gouvernance ; 6 `manuelle_dev` et 17 `manuelle_utilisateur`,
+  // ZÉRO justification d'attribution ; ZÉRO identifiant d'action stable, donc aucune
+  // comparaison possible d'un tour au suivant, donc la même ligne re-servie indéfiniment.
+  //
+  // Les vocabulaires sont FERMÉS et NON ACCENTUÉS, et ce n'est pas un détail de style : c'est
+  // ce qui les rend comptables (« combien d'actions restent humaines par `acces` ? ») et ce qui
+  // les empêche d'être touchés par hasard par de la prose française — « décision », « accès »,
+  // « présence » portent leur accent et ne matchent pas les jetons `decision`, `acces`,
+  // `presence`. Un motif hors vocabulaire n'est pas un refus valide : c'est un candidat à
+  // l'automatisation, à verser au registre.
+  const MOTIFS_IA = /\b(gate_gouvernance|dependance_bloc_3|garde_fou|borne_atteinte|dependance_externe)\b/;
+  const MOTIFS_HUMAIN = /\b(acces|decision|depense|presence|irreversible)\b/;
+  const ID_STABLE = /\b[A-Z]{1,4}-\d{2,4}\b/;
+  const DECLAREE_NEUVE = /\b(neuve|neuf|nouvelle|nouveau)\b/i;
+  const ACTEURS = /\b(auto_ia|manuelle_dev|manuelle_utilisateur)\b/;
+  const HUMAINS = /\b(manuelle_dev|manuelle_utilisateur)\b/;
+
+  // Une action déclarée ABSENTE (« aucune action manuelle_utilisateur ») n'est pas une action :
+  // la loi transverse n° 3 exige qu'on la DISE, pas qu'on la justifie.
+  const groupes8 = actionsGroupees(bActions)
+    .filter((g) => !MOTIFS_ABSENCE.test(g.replace(/^\s*[-*]\s+/, "").slice(0, 40)));
+
+  const juger8 = (regle, cible, predicat, siKo, siOk) => {
+    const concernes = groupes8.filter((g) => cible.test(g));
+    if (!concernes.length) return ok(regle, `aucune action concernée — ${siOk}`);
+    const fautifs = concernes.filter((g) => !predicat(g));
+    fautifs.length
+      ? ko(regle, `${fautifs.length} action(s) sur ${concernes.length} — ${siKo} Ex. : ${fautifs[0].replace(/\s+/g, " ").trim().slice(0, 110)}`)
+      : ok(regle, `${concernes.length} action(s) concernée(s) — ${siOk}`);
+  };
+
+  juger8("S11", /\bauto_ia\b/, (g) => MOTIFS_IA.test(g),
+    "une action `auto_ia` listée en RESTE sans motif de non-exécution : la voie automatisée est le défaut, " +
+    "donc ce qui n'a pas été fait se justifie. Vocabulaire : gate_gouvernance, dependance_bloc_3, garde_fou, borne_atteinte, dependance_externe.",
+    "chaque action `auto_ia` non exécutée porte son motif");
+
+  juger8("S12", HUMAINS, (g) => MOTIFS_HUMAIN.test(g),
+    "une action laissée à l'humain sans raison d'impossibilité IA — loi transverse n° 5. " +
+    "Vocabulaire : acces, decision, depense, presence, irreversible (non accentués).",
+    "chaque action humaine porte sa raison d'impossibilité");
+
+  // Le nom d'acteur est retiré avant la mesure : `manuelle_dev` est lui-même un span de code, et
+  // le laisser rendrait la règle satisfaite par sa propre étiquette — la boucle la plus bête.
+  juger8("S13", HUMAINS, (g) => _LOCALISATEURS.test(g.replace(ACTEURS, " ").replace(/`?\b(auto_ia|manuelle_dev|manuelle_utilisateur)\b`?/g, " ")),
+    "une action laissée à l'humain sans chemin, commande ni libellé d'écran : le lecteur doit rouvrir le projet " +
+    "pour savoir ce qu'on lui demande — c'est le coût que cette règle existe pour supprimer.",
+    "chaque action humaine est exécutable telle quelle");
+
+  juger8("S14", ACTEURS, (g) => ID_STABLE.test(g) || DECLAREE_NEUVE.test(g),
+    "une action sans identifiant stable ni mention `neuve` : deux restitutions successives ne se comparent pas, " +
+    "et la même ligne se re-sert d'une liste à l'autre.",
+    "chaque action porte un identifiant stable ou se déclare neuve");
+
   return findings;
 }
 
@@ -256,10 +342,20 @@ Aucun écart : la demande a été suivie à la lettre.
 
 ## 8. Prochaines actions
 - d'abord TF-0220 (manuelle_dev) — parce qu'il débloque toute correction ultérieure du corpus.
+  - pourquoi pas l'IA : decision — arbitrage normatif sur le seuil retenu ;
+  - où : \`forge_tests\\corpus.py\`, puis relancer la recette S-01.
 - ensuite TF-0221 (manuelle_utilisateur) — décision normative, impact sur 19 citations.
+  - pourquoi pas l'IA : acces — le portail de publication n'est pas ouvert à l'agent ;
+  - où : écran « Publier la version », bouton \`Publier\`.
+- enfin TF-0222 (auto_ia) — regrouper les constats par cause racine.
+  - motif de non-exécution : dependance_bloc_3 — attend la décision de publication ci-dessus.
 `;
-  // Rouge : trois violations distinctes et indépendantes.
+  // Rouge : sept violations distinctes et indépendantes.
   const rouge = verte
+    .replace(/## 8\. Prochaines actions[\s\S]*$/,
+      "## 8. Prochaines actions\n" +
+      "- d'abord regrouper les constats (auto_ia) — parce que c'est le plus rentable.\n" +
+      "- ensuite publier la version (manuelle_dev) — parce que tout est prouvé.\n")
     .replace(/\n\nLe contrôle complet[\s\S]*?ci-dessous\./, "")  // S9 : plus d ouverture
     .replace("terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot.", "terminée aujourd'hui.")
     .replace("- Regroupement par cause racine : motif — sa cause est traitée, critère de réouverture écrit.", "- Regroupement par cause racine")
@@ -274,13 +370,13 @@ Aucun écart : la demande a été suivie à la lettre.
   if (rv.status !== 0) casse.push("la fixture VERTE ne passe pas : " + rv.stdout);
   if (rr.status !== 1) casse.push("la fixture ROUGE ne FAIL pas");
   else {
-    for (const regle of ["S2", "S3", "S5", "S9", "S10"]) {
+    for (const regle of ["S2", "S3", "S5", "S9", "S10", "S11", "S12", "S13", "S14"]) {
       if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
     }
   }
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 2/2 PASS (verte PASS ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours)");
+    : "Self-test restitution : 2/2 PASS (verte PASS ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant)");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -292,7 +388,7 @@ const findings = juger(readFileSync(arg, "utf8"));
 const verdict = verdictDe(findings);
 console.log(JSON.stringify({
   oracle: "oracle-synthese",
-  version: "1.0.0",
+  version: "1.1.0",
   cible: arg,
   verdict,
   findings,

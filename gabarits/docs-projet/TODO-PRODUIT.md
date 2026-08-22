@@ -43,9 +43,30 @@ Le reste-à-faire du produit : ce qui est décidé et non fait, ce qui est const
 Une amélioration qui touche une FORGE ne vit pas ici — elle part en lot de retours vers le
 pilot (`forge\retours\`), qui est l'écrivain unique de TODO-FORGE.
 
-| Id | Amélioration | Origine | Priorité | Statut | Preuve du coût |
-|---|---|---|---|---|---|
-| {A-01} | {ce qui manque et l'effet attendu} | {retour utilisateur du 17/08 · audit forge-tests · constat de run} | {haute / moyenne / basse} | {à décider / décidée / en cours} | {ce qui a été payé en réel, ou « aucune »} |
+| Id | Amélioration | Origine | Acteur | Pourquoi pas IA | Ordre (et sa clause) | Statut | Preuve du coût |
+|---|---|---|---|---|---|---|---|
+| {A-01} | {ce qui manque et l'effet attendu} | {retour utilisateur du 17/08 · audit forge-tests · constat de run} | {auto_ia \| manuelle_dev \| manuelle_utilisateur} | {acces \| decision \| depense \| presence \| irreversible — vide si auto_ia} | {1 — parce qu'il supprime N constats à la source} | {à décider / décidée / en cours} | {ce qui a été payé en réel, ou « aucune »} |
+
+**Trois colonnes ajoutées le 22/08/2026 (TF-0461), et pourquoi** — ce document était le seul que
+le développeur lit **hors session**, et c'était précisément celui qui perdait les deux
+informations qui lui servent : *qui peut le faire*, et *pourquoi dans cet ordre*.
+
+- **`Acteur`** reprend le **vocabulaire gelé** de `actions[]` (règle 29), le même qu'au bloc 8
+  de `gabarits\RESTITUTION.md`. Deux référentiels du même écrivain ne peuvent pas nommer
+  différemment la même chose : jusqu'au 22/08, l'un l'imposait et l'autre l'ignorait.
+- **`Pourquoi pas IA`** reprend le vocabulaire fermé de la règle **S12** — non accentué, donc
+  comptable. Vide pour une ligne `auto_ia`. *Une raison hors vocabulaire n'est pas un refus :
+  c'est un candidat à l'automatisation.*
+- **`Ordre`** remplace l'ancienne colonne `Priorité` (« haute / moyenne / basse »). La
+  restitution exige depuis la v2.0.0 une priorité **dérivée, jamais ressentie, justifiée en une
+  clause** : trois adjectifs au choix étaient l'exact contraire. L'ordre se dérive du score de
+  risque quand il existe, de l'ordre recommandé par un lot quand il y en a un, de l'effet de
+  levier mesuré sinon — et il porte sa clause dans la même cellule.
+
+**Le lien avec la restitution est à double sens (TF-0460)** : le bloc 8 d'une restitution cite
+l'`Id` de la ligne qu'il fait avancer (règle **S14**), et une action qui n'en a pas se déclare
+`neuve` — la restitution la crée alors ici. C'est ce qui permet à deux tours successifs de se
+comparer, et c'est la seule façon de ne pas re-servir la même ligne d'une liste à l'autre.
 
 ## Écarts assumés
 
