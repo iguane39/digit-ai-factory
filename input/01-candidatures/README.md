@@ -14,6 +14,6 @@ Candidatures hors lot de retours : `candidature-*.tf.jsonl`, `revue-*.tf.jsonl`,
 
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
-| [`old\`](old/README.md) | dossier (53 fichiers) | — | Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — archive figée, jamais ré-ingérée. |
+| [`old\`](old/README.md) | dossier (54 fichiers) | — | Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — archive figée, jamais ré-ingérée. |
 
 _0 fichier(s), 1 sous-dossier(s)_
