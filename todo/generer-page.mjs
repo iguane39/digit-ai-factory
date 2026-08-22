@@ -109,7 +109,13 @@ for (const forge of [...parForge.keys()].sort()) {
     const p = prio(e.score.valeur);
     const reel = e.preuve_du_cout ? `<span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>` : "";
     return `
-        <article class="card s-${e.statut}" id="item-${e.id}" data-forge="${esc(forge)}" data-statut="${e.statut}" data-prio="${p.k}">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-${e.statut}" id="item-${e.id}" data-cite data-forge="${esc(forge)}" data-statut="${e.statut}" data-prio="${p.k}">
           <header class="card-head">
             <code class="tf-id">${e.id}</code>
             <span class="statut s-${e.statut}">${e.statut}</span>
@@ -266,7 +272,14 @@ const html = `<!DOCTYPE html>
     .card-detail .lead{margin:.2em 0 .4em}
     .detail-label{font-family:var(--head);font-weight:700;font-size:.82rem;color:var(--muted);margin:.6em 0 .2em;text-transform:uppercase;letter-spacing:.03em}
     .puces{margin:.2em 0 .4em;padding-left:1.2em} .puces li{margin:.28em 0}
-    .card-detail,.card-detail li,.card-meta dd{overflow-wrap:anywhere}
+    /* TF-0492 (22/08) : sur de la PROSE, anywhere casse un mot en deux au milieu d une ligne
+       (« Utilisabl/e », « 231 occurrenc/es ») — trois fois signale par un client. break-word ne
+       coupe que ce qui ne tient pas, ce qui est le comportement voulu ici : le contenu des
+       candidatures est du francais, avec quelques chemins longs. La regle L19 du socle refuse
+       desormais anywhere sur un selecteur de prose, et elle a mordu sur CETTE page. */
+    .card-detail,.card-detail li,.card-meta dd{overflow-wrap:break-word}
+    /* Le code et les chemins, eux, ont besoin de casser n importe ou : la regle les exempte. */
+    .card-detail code,.card-detail pre{overflow-wrap:anywhere}
     .card-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 20px;margin:14px 0 0;padding-top:12px;border-top:1px solid var(--line)}
     .card-meta .impact{grid-column:1/-1}
     .card-meta dt{font-family:var(--head);font-weight:700;font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
