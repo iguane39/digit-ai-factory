@@ -24,6 +24,6 @@ Revues d'écosystème (fiches d'audit des forges rejouées, synthèse trans-forg
 | `Digit-AI - Revue Forge - Écosystème - 20260808a.md.oracles-cache.json` | fichier | 2 o | 2026-08-13 | JSON |
 | `Digit-AI - Revue Forge - Écosystème - 20260808a.md.oracles-historique.jsonl` | fichier | 153 o | 2026-08-13 | 1 ligne(s) JSONL |
 | `Digit-AI - Revue Forge - Écosystème - 20260808a.md.oracles.json` | fichier | 1,9 Ko | 2026-08-13 | JSON |
-| `Digit-AI - Revue Forge - Écosystème - 20260819a.md` | fichier | 6,1 Ko | 2026-08-19 | Digit-AI — Revue Forge — Écosystème — 20260819a |
+| `Digit-AI - Revue Forge - Écosystème - 20260819a.md` | fichier | 6,0 Ko | 2026-08-19 | Digit-AI — Revue Forge — Écosystème — 20260819a |
 
 _11 fichier(s), 0 sous-dossier(s)_ · dossiers cachés (journaux machine, sans README) : `.oracles\`
