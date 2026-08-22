@@ -32,7 +32,7 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `candidature-question-deja-repondue.tf.jsonl` | fichier | 2,7 Ko | 2026-08-22 | 1 ligne(s) JSONL |
 | `candidature-r21-lockfiles.tf.jsonl` | fichier | 2,8 Ko | 2026-08-13 | 1 ligne(s) JSONL |
 | `candidature-rattrapage-pilot.tf.jsonl` | fichier | 783 o | 2026-08-13 | 1 ligne(s) JSONL |
-| `candidature-readme-retard-dun-commit-20260822.tf.jsonl` | fichier | 2,5 Ko | non versionné | 1 ligne(s) JSONL |
+| `candidature-readme-retard-dun-commit-20260822.tf.jsonl` | fichier | 2,5 Ko | 2026-08-22 | 1 ligne(s) JSONL |
 | `candidature-recette-rouge-par-la-prose-d-un-candidat.tf.jsonl` | fichier | 2,8 Ko | 2026-08-22 | 1 ligne(s) JSONL |
 | `candidature-relais-avancement.tf.jsonl` | fichier | 3,3 Ko | 2026-08-14 | 1 ligne(s) JSONL |
 | `candidature-socle-docs-projet.tf.jsonl` | fichier | 4,5 Ko | 2026-08-13 | 2 ligne(s) JSONL |
