@@ -139,7 +139,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>70effbc98f6e</code> · dernier événement 2026-08-22T14:02:10.732Z</p>
+      <p class="meta">sceau <code>5ace7e705b62</code> · dernier événement 2026-08-22T13:07:45.998Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -149,7 +149,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="33 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">33</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="23 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">23</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="1 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">1</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="468 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">468</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -165,12 +165,11 @@
       <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
       
       <div class="dropdown" data-dim="forge">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">9</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">8</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
           <label><input type="checkbox" value="digit-ai-factory" checked> digit-ai-factory</label>
           <label><input type="checkbox" value="digit-ai-forge-agents" checked> digit-ai-forge-agents</label>
-          <label><input type="checkbox" value="digit-ai-forge-audit" checked> digit-ai-forge-audit</label>
           <label><input type="checkbox" value="digit-ai-forge-conception" checked> digit-ai-forge-conception</label>
           <label><input type="checkbox" value="digit-ai-forge-design" checked> digit-ai-forge-design</label>
           <label><input type="checkbox" value="digit-ai-forge-ops" checked> digit-ai-forge-ops</label>
@@ -189,13 +188,13 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">45 / 45 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">35 / 35 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">8 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">11 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">10 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-seo-geo"><strong>digit-ai-forge-seo-geo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">9 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">13 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">8 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-seo-geo"><strong>digit-ai-forge-seo-geo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">8 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-factory">
-      <h2>digit-ai-factory <span class="badge" title="8 item(s) actifs ciblant digit-ai-factory">8</span></h2>
+      <h2>digit-ai-factory <span class="badge" title="1 item(s) actifs ciblant digit-ai-factory">1</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-factory</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
         <article class="card s-corrige" id="item-TF-0496" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
@@ -215,129 +214,10 @@
             
           </dl>
         </article>
-        <article class="card s-corrige" id="item-TF-0507" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0507</code>
-            <span class="statut s-corrige">corrige</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 20)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : un renvoi par NUMERO DE LIGNE designe autre chose au message suivant — la liste est renumerotee, S14 exige un id stable mais rien n'interdit de designer par la position (regle S17)</h3>
-          <div class="card-detail" data-cite><p class="lead">Fait mesure le 22/08/2026 sur piece. Une restitution renvoyait « prealable : ligne 8 (droit IAM) puis ligne 5 (merge) ». Le lecteur a repondu mot pour mot : « Que veut dire ligne 8 (droit IAM) puis ligne 5 (merge). C'est incomprehensible. » Verification : les deux numeros avaient effectivement change de sens entre deux messages, le tri par urgence ayant deplace les lignes. Le renvoi pointait donc sur des sujets differents selon le message ou on le lisait. C'est le pendant, au niveau du RENVOI, de ce que S14 corrige au niveau de l'ITEM : S14 exige un identifiant stable POUR l'action, mais rien n'interdit de la DESIGNER par sa position dans la liste courante. Un identifiant stable qui n'est jamais employe pour renvoyer ne sert a rien. Correction : regle S17 — un renvoi entre lignes nomme le SUJET ou son identifiant stable, jamais une position. Testable mecaniquement : dans les blocs 3 et 8, un motif de la forme « ligne N », « point N », « n° N » est un defaut ; fixture rouge avec un renvoi positionnel, fixture verte avec le meme renvoi par identifiant.</p></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>le lecteur a du signaler lui-meme que deux renvois d'une meme phrase etaient incomprehensibles, et ils l'etaient reellement — les positions avaient change entre l'ecriture et la lecture</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-03 (retour humain direct du 22/08)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-corrige" id="item-TF-0508" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0508</code>
-            <span class="statut s-corrige">corrige</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 20)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : le classement par acteur rendu en SECTIONS SEPAREES detruit la liste unique — l'acteur est une colonne, l'ordre est le tri, et seul le calendrier justifie plusieurs tableaux</h3>
-          <div class="card-detail" data-cite><p class="lead">Mesure du 22/08/2026 : le lecteur a demande DEUX FOIS la meme chose.</p><ul class="puces"><li>D'abord « Pourquoi ma demande precedente d'avoir une liste claire et exhaustive n'est pas traitee ? Pourquoi tout n'est pas dans un seul tableau ? », puis « Et j'avais dit tous les IAs en premier qui peuvent etre faits</li><li>Si plusieurs etapes, cree plusieurs tableaux »</li><li>Cause : le paragraphe 8 de RESTITUTION.md dit « par acteur ET par ordre », et j'ai lu « une section par acteur »</li><li>Les deux exigences ne sont pas en tension — elles etaient compatibles depuis le debut : l'ACTEUR est une COLONNE, l'ORDRE est le TRI, et les actions executables par l'IA remontent en tete PAR LE TRI</li><li>Decouper en sections oblige le lecteur a scanner N listes et a recoller mentalement pour obtenir le total, ce qui est exactement le cout que le bloc 8 existe pour supprimer</li><li>Le lecteur a lui-meme donne la seule exception legitime : « si plusieurs etapes, cree plusieurs tableaux » — un decoupage par ETAPE DE CALENDRIER, jamais par acteur</li><li>Correction : l'ecrire au paragraphe 8 de RESTITUTION.md, en trois phrases opposables</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>deux rappels du lecteur sur la meme exigence, alors que les deux moities de sa demande etaient compatibles et que le referentiel ne le disait pas</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-03 (retour humain direct du 22/08)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-corrige" id="item-TF-0513" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0513</code>
-            <span class="statut s-corrige">corrige</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 20)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">oracle-synthese : une synthese CONFORME echoue S9 a cause de son propre titre — le frontmatter `destinataire: humain` que le gabarit PRESCRIT empeche le retrait du H1, et le code de lot du titre est alors lu comme un sha</h3>
-          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 22/08, mesure sur une synthese reelle.</p><ul class="puces"><li>oracles/oracle-synthese.mjs extrait la synthese d ouverture (bloc 0, regle S9) puis retire le titre et le frontmatter DANS CET ORDRE : .replace(/^#[^\n]*\n/, '') d abord, .replace(/^---[\s\S]*?---\s*/, '') ensuite. Les deux ancrages sont en ^ (debut de chaine). Quand le frontmatter PRECEDE le titre — ce qui est le cas de TOUTE synthese conforme, puisque gabarits\RESTITUTION.md prescrit `destinataire: humain` en frontmatter YAML depuis TF-0331 — le premier replace ne matche rien, le second retire le frontmatter, et LE TITRE RESTE DANS L OUVERTURE. S9 juge alors le H1 comme de la prose de bloc 0. MESURE : la synthese du mandat de synchronisation du 22/08, titree « ... — 20260822a » selon la convention de nommage des livrables du pilot, a rendu S9 FAIL avec le motif « vocabulaire technique nu (sha) » — le token fautif etant le code de lot 20260822a lui-meme, neuf caracteres de [a-f0-9] que le motif /\b[a-f0-9]{7,40}\b/ ne peut pas distinguer d un sha court. CE QUE CA COUTE : deux regles PRESCRITES par le meme gabarit se contredisent — marquer la synthese (TF-0331) et titrer selon la convention de datation rendent S9 mecaniquement faux ; et comme le hook Stop est BLOQUANT depuis la v2.4.0, le refus tombe sur une restitution qui n a aucun defaut. Le contournement est de renommer le titre, donc de PERDRE le code de lot en tete du document alors qu il reste dans le nom de fichier : deux noms pour un document, ce qui est exactement ce que la convention de datation existe pour eviter. DEUX VOIES, aucune tranchee :</li><li>inverser les deux replace — retirer le frontmatter AVANT le titre — c est une transposition de lignes, et la regle retrouve le comportement que son commentaire decrit deja (« le titre H1 n est pas la synthese »)</li><li>rendre les deux retraits independants de l ordre, par un seul passage qui consomme frontmatter et titre dans n importe quel ordre. La voie</li><li>suffit et je ne la prends pas : c est une modification d oracle, elle se decide. A NOTER : le faux positif ne concerne QUE le token sha ; les trois autres motifs de S9 (identifiant TF nu, nom de fichier, span de code) seraient tout aussi declenchables par un titre — un titre qui nomme un fichier ferait echouer S9 pour la meme raison</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>mesure le 22/08 : S9 FAIL « vocabulaire technique nu (sha) » sur une synthese sans defaut, le token fautif etant le code de lot 20260822a du titre ; le hook Stop etant bloquant depuis la v2.4.0, le refus tombe sur une restitution conforme. Apres renommage du titre en « 22 aout 2026, lot a », le meme fichier rend PASS S1-S16 — ce qui prouve que seul le titre etait en cause.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du 22/08, pendant le mandat de synchronisation — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-corrige" id="item-TF-0510" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0510</code>
-            <span class="statut s-corrige">corrige</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 16)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : une ACTION ne porte ni son impact ni sa recommandation, alors qu'une DECISION les porte depuis S15 et S16 — la demande humaine etait symetrique, le referentiel n'en couvre qu'une moitie</h3>
-          <div class="card-detail" data-cite><p class="lead">Demande litterale du lecteur le 22/08 : « fournir des actions claires, les impacts de ces actions, les recos sur ces actions, des decisions claires, les impacts de ces decisions, les recos des decisions ».</p><ul class="puces"><li>Les deux moities sont symetriques dans sa phrase. Le referentiel n'en couvre qu'une : au bloc 8, S11 exige le motif de non-execution, S12 la raison d'impossibilite, S13 l'executabilite, S14 l'identifiant stable — AUCUNE n'exige ce qui se passe SI L'ACTION N'EST PAS FAITE, ni ce que l'agent recommande. Or c'est precisement cette colonne qui permet d'arbitrer ce qu'on laisse tomber : une liste de restes sans consequences est un inventaire, pas un outil de decision. Constate a l'usage sur cette session : les tableaux qui portaient une colonne « si on ne fait rien » ont ete acceptes, ceux qui ne la portaient pas ont ete redemandes. Correction : regle S19, symetrique de S16 — toute action du bloc 8 porte ce qui se passe si elle n'est pas faite. La recommandation, elle, n'a de sens que quand l'action offre un choix</li><li>l'exiger partout produirait du remplissage</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 16 — gain 4 × preuve 4 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>la moitie ACTIONS d'une demande humaine explicitement symetrique a ete livree sans son impact ni sa reco, alors que la moitie DECISIONS l'avait ete le matin meme</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-03 (retour humain direct du 22/08)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-corrige" id="item-TF-0509" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0509</code>
-            <span class="statut s-corrige">corrige</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : la forme change d'un message au suivant — le lecteur reapprend la mise en page avant de pouvoir lire, et perd la comparaison avec le tour precedent</h3>
-          <div class="card-detail" data-cite><p class="lead">Mesure du 22/08/2026 sur une seule session : au moins CINQ mises en page differentes pour le meme contenu — prose melee de tableaux, puis trois sections par acteur, puis un tableau unique, puis six sections portant quatre formes de tableau distinctes, puis des fiches en prose, puis un tableau a nouveau.</p><ul class="puces"><li>Le lecteur a tranche en trois mots, « tableau !! », apres avoir deja ecrit « toujours pas claire, recommence » et « Revois completement ta presentation »</li><li>Le cout n'est pas esthetique : a chaque changement de forme, le lecteur REAPPREND la mise en page avant de pouvoir lire, et surtout il perd la possibilite de comparer avec le message precedent — ce qui annule le benefice de S14 (identifiants stables)</li><li>Une liste dont les colonnes changent ne se compare pas, meme si ses identifiants sont stables</li><li>Correction proposee : regle S18 — la restitution d'un meme sujet garde la MEME STRUCTURE DE COLONNES d'un tour au suivant</li><li>Testable en conservant, a cote de la synthese, l'empreinte des en-tetes de tableau du tour precedent : un changement d'en-tetes non declare est un defaut</li><li>Si ce controle est juge trop lourd, l'ecrire au moins comme regle de forme opposable au referentiel</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>cinq rappels du lecteur sur la seule forme, dans une seule session, apres la livraison de six regles qui tenaient deja le contenu</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-03 (retour humain direct du 22/08)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-corrige" id="item-TF-0511" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0511</code>
-            <span class="statut s-corrige">corrige</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : le langage commanditaire n'est exige qu'au bloc 0 (S9) — tout le reste peut etre ecrit en jargon, et l'a ete, au point qu'un meme point a du etre explique deux fois</h3>
-          <div class="card-detail" data-cite><p class="lead">Mesure du 22/08/2026 : le lecteur a demande DEUX FOIS l'explication du meme point — « detaille 5 », puis « Explique 5 ».</p><ul class="puces"><li>La premiere explication etait longue, structuree en tableaux, et employait « justificatif federe », « identite system-assigned », « UAMI », « constat H2 », « filet » sans les gloser</li><li>La seconde, ecrite sans aucun de ces termes et en partant de ce que fait le systeme du point de vue de l'utilisateur, a ete acceptee immediatement</li><li>Le raisonnement de S9 s'applique mot pour mot : « une information remontee et non comprise a le meme effet qu'une information tue, avec le cout de lecture en plus »</li><li>Mais S9 ne juge que l'OUVERTURE</li><li>Or c'est aux blocs 3 et 8 que le cout est le plus eleve, puisque ce sont eux qu'on EXECUTE : un jargon dans le bloc 0 fait perdre le fil, un jargon dans une action fait executer de travers ou pas du tout</li><li>Correction proposee : etendre la doctrine de S9 aux CELLULES DE SUJET des blocs 3 et 8 — un terme technique y porte sa glose d'une ligne, ou disparait</li><li>Controle possible : une liste fermee d'acronymes internes detectes hors des blocs de preuve sans glose adjacente</li><li>A defaut de controle, le poser comme regle de forme et l'exercer a la relecture</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 4 × preuve 4 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un meme sujet explique deux fois, la premiere version rejetee malgre sa structure — le jargon non glose a annule le benefice d'une explication par ailleurs complete</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-03 (retour humain direct du 22/08)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-corrige" id="item-TF-0503" data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0503</code>
-            <span class="statut s-corrige">corrige</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 5)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">Les README de dossiers restent en retard d'UN commit : la table affiche « non versionne » pour un fichier que le commit en cours est justement en train de versionner</h3>
-          <div class="card-detail" data-cite><p class="lead">Constat du 22/08, mesure sur les cinq commits de la journee.</p><ul class="puces"><li>`scripts\readme-dossiers.mjs` rend, pour chaque element du dossier, la date de son dernier commit — et « non versionne » quand git n'en connait aucun. Le README est donc regenere AVANT le commit, avec la mention « non versionne » ; le commit versionne le fichier ; et le README devient immediatement faux. Le hook PostToolUse le regenere alors, ce qui laisse l'arbre modifie APRES un commit qui vient de tout prendre. MESURE : sur les cinq commits du 22/08, cinq ont emporte des README (5, 4, 4, 11, 5 fichiers) et le dernier laisse encore 2 README modifies derriere lui. Le diff est toujours le meme motif : `| non versionne |` devient `| 2026-08-22 |`. CE N'EST PAS TF-0456, qui portait sur un autre mecanisme (le README se datait de LUI-MEME et ne convergeait jamais) : ici la convergence a lieu, mais en DEUX temps, et le second temps tombe apres le commit. Ce que ca coute : un arbre de travail jamais propre apres un commit d'ajout, donc un `git status` qui montre toujours du bruit — et c'est ainsi qu'une vraie modification oubliee passe inapercue au milieu de deux README generes. TROIS VOIES, aucune tranchee :</li><li>ne pas rendre l'etat git d'un fichier non versionne, ecrire une valeur stable (par exemple un tiret) tant que git n'en sait rien — la table cesse de dependre d'un etat qui change au commit</li><li>rendre `non versionne` pour TOUT fichier, c'est-a-dire retirer la colonne de date, ce qui perd une information utile</li><li>accepter le retard et le declarer au README lui-meme. La voie</li><li>a ma preference et je ne la prends pas : la colonne est une affordance de lecture, la modifier se decide</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 5 — gain 2 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>mesure le 22/08 : les 5 commits du jour ont emporte 5, 4, 4, 11 et 5 README ; apres le dernier push, l'arbre porte encore 2 README modifies dont le seul changement est « non versionne » remplace par « 2026-08-22 ». Aucun commit d'ajout ne laisse l'arbre propre.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du 22/08, apres le push autorise — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
       </div>
     </section>
     <section id="digit-ai-forge-agents">
-      <h2>digit-ai-forge-agents <span class="badge" title="11 item(s) actifs ciblant digit-ai-forge-agents">11</span></h2>
+      <h2>digit-ai-forge-agents <span class="badge" title="13 item(s) actifs ciblant digit-ai-forge-agents">13</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-agents</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
         <article class="card s-en_cours" id="item-TF-0324" data-forge="digit-ai-forge-agents" data-statut="en_cours" data-prio="moyenne">
@@ -442,40 +322,6 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0501" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0501</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-agents : run-oracles.mjs ecrit ses journaux DANS l arbre de livraison tout en imprimant qu il les ecrit hors livraison</h3>
-          <div class="card-detail" data-cite><p class="lead">FAIT : le code calcule `const dossierSidecars = fs.statSync(target).isFile() ? path.dirname(target) : target;` puis `const horsLivraison = sousLivraison(target) ? path.join(dossierSidecars, '_oracles') : <code>null</code>;`.</p><ul class="puces"><li>Pour une cible output/v2-architecture-cible/rapport/livrable.html, cela donne output/v2-architecture-cible/rapport/_oracles/ — un dossier FRERE du livrable, A L INTERIEUR du dossier que le client recoit</li><li>La variable s appelle pourtant horsLivraison, et la ligne 221 imprime « journaux d oracles ecrits HORS livraison (TF-0428) »</li><li>Le commentaire d intention n est pas tenu : « sous un arbre de LIVRAISON, aucun journal a cote du livrable — ce que le client recoit ne contient pas les traces de son audit »</li><li>DIVERGENCE AVEC LE PRECEDENT QU IL CITE : render_page.py (TF-0230), invoque comme « meme doctrine », ecrit dans un dossier temporaire NOMME hors de l arbre</li><li>MESURE : deux executions cette passe, deux fois _oracles/ cree dans le dossier de livraison, supprime a la main les deux fois</li><li>ET LE PHENOMENE N EST PAS LIMITE AUX LANCEMENTS MANUELS : l ecriture de ce lot de retours a fait apparaitre output/v2-architecture-cible/retours/_oracles/ avec trois fichiers (.oracles.json, -historique.jsonl, -cache.json) horodates a la seconde de l ecriture, alors qu aucun oracle n avait ete lance sur ce fichier — c est le HOOK D ECRITURE qui les depose</li><li>Le dossier se recree donc A CHAQUE ECRITURE SURVEILLEE, et le supprimer avant remise ne suffit pas : la remise elle-meme le fait revenir</li><li>Le correctif TF-0428 traite la cible du reproche (pas de sidecar colle au fichier) mais pas son motif (pas de trace d audit dans ce que le client recoit)</li><li>PROPOSITION : reprendre la regle de render_page.py — sous un segment de livraison, ecrire dans un dossier temporaire nomme</li><li>Et FAIRE PORTER AU MESSAGE CE QUE LE CODE FAIT REELLEMENT : un message qui affirme « HORS livraison » alors que le chemin est dans output/ empeche de voir le probleme, puisqu il repond d avance a la question qu on se poserait</li><li>Test de bout en bout : lancer sur une cible sous output/, verifier qu aucun fichier n y est cree</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Le dossier se recree a chaque ecriture surveillee, y compris celle du lot de retours qui le signale ; le supprimer avant remise ne suffit donc pas.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0497" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0497</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 7.5)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">quality-oracles : la garde TOCTOU (empreinte aux deux bords) est cablee mais NON couverte par recette — le seul mecanisme du lot dont les deux sens ne sont pas joues</h3>
-          <div class="card-detail" data-cite><p class="lead">Constat emis en mettant en oeuvre TF-0478 le 22/08, sur mon propre travail.</p><ul class="puces"><li>La mise en oeuvre pose DEUX mecanismes. Le premier — `--verifier-empreinte`, qui prononce la peremption d'un verdict deja rendu — est couvert par quatre cas joues et verts (empreinte scellee, FRAIS exit 0, PERIME exit 1, anteriorite exit 2). Le second — la capture de l'empreinte AUX DEUX BORDS du run, qui detecte qu'une cible a change PENDANT l'execution des oracles (D6 du brief, garde dite TOCTOU) — s'execute a chaque run mais N'EST JOUE PAR AUCUNE RECETTE. MOTIF TECHNIQUE, mesure et non suppose : provoquer la divergence de facon deterministe demande d'injecter un oracle qui MUTE sa cible, or `run-oracles.mjs` lit son registre en dur depuis `SKILLDIR/references/registre-oracles.json` et n'accepte aucun drapeau `--registre` ; les drapeaux existants (`--profil`, `--niveau`, `--no-cache`, `--json`) filtrent des oracles, ils n'en ajoutent pas. Provoquer la modification depuis un processus concurrent produirait une recette qui depend d'une course — donc une recette qui echouera au hasard, ce qui est pire qu'une recette absente. TROIS VOIES, aucune tranchee ici :</li><li>ouvrir un `--registre &lt;chemin&gt;` au lanceur, ce qui rend la garde testable et sert aussi a d'autres recettes, au prix d'une surface de plus</li><li>extraire la comparaison des deux bords dans `scripts/lib/` et la tester unitairement, sans toucher au lanceur</li><li>assumer la garde non couverte et le declarer au SKILL.md. La loi de la maison penche : « toute affordance est cablee ou n'existe pas » — celle-ci est cablee, mais rien ne prouve qu'elle fonctionne, et un mecanisme non joue se decouvre casse le jour ou il devait servir</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 7.5 — gain 3 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>paye immediatement et mesurable : le self-test du skill passe de 152 a 156 controles, dont 4 pour ce lot — et 0 pour la garde TOCTOU. Sur les deux mecanismes livres, un seul est prouve. Le contrat de la maison est « aucun ✓ sans oracle execute » : ici le ✓ de la garde TOCTOU repose sur la lecture du code, pas sur une execution.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat sur sa propre mise en oeuvre du 22/08 — l'honnetete du process exige de nommer ce qui n'est pas prouve)</dd></div>
-            
-          </dl>
-        </article>
         <article class="card s-candidat" id="item-TF-0475" data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0475</code>
@@ -493,6 +339,57 @@
             
           </dl>
         </article>
+        <article class="card s-corrige" id="item-TF-0499" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0499</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 20)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-design : le composant tableau repliable de composants.md met table en display:block sans sa legende, qui est alors reduite a une colonne d un mot</h3>
+          <div class="card-detail" data-cite><p class="lead">FAIT : l extrait de reference de references/composants.md section 6 declare, sous 640 px, `table, tbody, tr, td { display: block; width: 100% }` — alors que le meme extrait declare `caption { text-align: left; ...</p><ul class="puces"><li>}` juste au-dessus, donc une legende est bien attendue. Une caption dont le tableau parent passe en display:block recoit une BOITE DE TABLEAU ANONYME qui se reduit au contenu. MESURE sur fixture minimale (deux tableaux, meme viewport 390 px, meme legende de 108 caracteres) : extrait du socle -&gt; caption de 58,9 px de large pour 220 px de haut, soit une colonne d un mot</li><li>variante table.repli-cartes du boilerplate -&gt; 374 px de large pour 44 px de haut, correcte. LES DEUX IMPLEMENTATIONS DU MEME COMPOSANT, DANS LE MEME SKILL, DIVERGENT, ET UNE SEULE EST SAINE : le boilerplate ne met jamais `table` en display:block (il ne touche que thead, tr, td), donc sa legende reste dans une vraie boite de tableau. C est l extrait de REFERENCE, celui qu on copie, qui porte le defaut. CONSTATE SUR LIVRABLE REEL : quinze tableaux touches, sur toutes les versions depuis la premiere, jamais vu par aucun oracle ni par quatre passes de relecture client. PROPOSITION : ajouter `table &gt; caption { display: block; width: 100% }` a l extrait section 6 — une ligne. Et ALIGNER LES DEUX IMPLEMENTATIONS, ou dire laquelle fait foi : aujourd hui le lecteur qui copie l extrait obtient un defaut que le lecteur qui part du boilerplate n a pas</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Quinze tableaux d un livrable client illisibles en mobile pendant quatre versions ; trouve par la lecture, hors de portee des quatre oracles.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0501" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0501</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-agents : run-oracles.mjs ecrit ses journaux DANS l arbre de livraison tout en imprimant qu il les ecrit hors livraison</h3>
+          <div class="card-detail" data-cite><p class="lead">FAIT : le code calcule `const dossierSidecars = fs.statSync(target).isFile() ? path.dirname(target) : target;` puis `const horsLivraison = sousLivraison(target) ? path.join(dossierSidecars, '_oracles') : <code>null</code>;`.</p><ul class="puces"><li>Pour une cible output/v2-architecture-cible/rapport/livrable.html, cela donne output/v2-architecture-cible/rapport/_oracles/ — un dossier FRERE du livrable, A L INTERIEUR du dossier que le client recoit</li><li>La variable s appelle pourtant horsLivraison, et la ligne 221 imprime « journaux d oracles ecrits HORS livraison (TF-0428) »</li><li>Le commentaire d intention n est pas tenu : « sous un arbre de LIVRAISON, aucun journal a cote du livrable — ce que le client recoit ne contient pas les traces de son audit »</li><li>DIVERGENCE AVEC LE PRECEDENT QU IL CITE : render_page.py (TF-0230), invoque comme « meme doctrine », ecrit dans un dossier temporaire NOMME hors de l arbre</li><li>MESURE : deux executions cette passe, deux fois _oracles/ cree dans le dossier de livraison, supprime a la main les deux fois</li><li>ET LE PHENOMENE N EST PAS LIMITE AUX LANCEMENTS MANUELS : l ecriture de ce lot de retours a fait apparaitre output/v2-architecture-cible/retours/_oracles/ avec trois fichiers (.oracles.json, -historique.jsonl, -cache.json) horodates a la seconde de l ecriture, alors qu aucun oracle n avait ete lance sur ce fichier — c est le HOOK D ECRITURE qui les depose</li><li>Le dossier se recree donc A CHAQUE ECRITURE SURVEILLEE, et le supprimer avant remise ne suffit pas : la remise elle-meme le fait revenir</li><li>Le correctif TF-0428 traite la cible du reproche (pas de sidecar colle au fichier) mais pas son motif (pas de trace d audit dans ce que le client recoit)</li><li>PROPOSITION : reprendre la regle de render_page.py — sous un segment de livraison, ecrire dans un dossier temporaire nomme</li><li>Et FAIRE PORTER AU MESSAGE CE QUE LE CODE FAIT REELLEMENT : un message qui affirme « HORS livraison » alors que le chemin est dans output/ empeche de voir le probleme, puisqu il repond d avance a la question qu on se poserait</li><li>Test de bout en bout : lancer sur une cible sous output/, verifier qu aucun fichier n y est cree</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Le dossier se recree a chaque ecriture surveillee, y compris celle du lot de retours qui le signale ; le supprimer avant remise ne suffit donc pas.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0497" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0497</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 7.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">quality-oracles : la garde TOCTOU (empreinte aux deux bords) est cablee mais NON couverte par recette — le seul mecanisme du lot dont les deux sens ne sont pas joues</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat emis en mettant en oeuvre TF-0478 le 22/08, sur mon propre travail.</p><ul class="puces"><li>La mise en oeuvre pose DEUX mecanismes. Le premier — `--verifier-empreinte`, qui prononce la peremption d'un verdict deja rendu — est couvert par quatre cas joues et verts (empreinte scellee, FRAIS exit 0, PERIME exit 1, anteriorite exit 2). Le second — la capture de l'empreinte AUX DEUX BORDS du run, qui detecte qu'une cible a change PENDANT l'execution des oracles (D6 du brief, garde dite TOCTOU) — s'execute a chaque run mais N'EST JOUE PAR AUCUNE RECETTE. MOTIF TECHNIQUE, mesure et non suppose : provoquer la divergence de facon deterministe demande d'injecter un oracle qui MUTE sa cible, or `run-oracles.mjs` lit son registre en dur depuis `SKILLDIR/references/registre-oracles.json` et n'accepte aucun drapeau `--registre` ; les drapeaux existants (`--profil`, `--niveau`, `--no-cache`, `--json`) filtrent des oracles, ils n'en ajoutent pas. Provoquer la modification depuis un processus concurrent produirait une recette qui depend d'une course — donc une recette qui echouera au hasard, ce qui est pire qu'une recette absente. TROIS VOIES, aucune tranchee ici :</li><li>ouvrir un `--registre &lt;chemin&gt;` au lanceur, ce qui rend la garde testable et sert aussi a d'autres recettes, au prix d'une surface de plus</li><li>extraire la comparaison des deux bords dans `scripts/lib/` et la tester unitairement, sans toucher au lanceur</li><li>assumer la garde non couverte et le declarer au SKILL.md. La loi de la maison penche : « toute affordance est cablee ou n'existe pas » — celle-ci est cablee, mais rien ne prouve qu'elle fonctionne, et un mecanisme non joue se decouvre casse le jour ou il devait servir</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 7.5 — gain 3 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>paye immediatement et mesurable : le self-test du skill passe de 152 a 156 controles, dont 4 pour ce lot — et 0 pour la garde TOCTOU. Sur les deux mecanismes livres, un seul est prouve. Le contrat de la maison est « aucun ✓ sans oracle execute » : ici le ✓ de la garde TOCTOU repose sur la lecture du code, pas sur une execution.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat sur sa propre mise en oeuvre du 22/08 — l'honnetete du process exige de nommer ce qui n'est pas prouve)</dd></div>
+            
+          </dl>
+        </article>
         <article class="card s-corrige" id="item-TF-0478" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0478</code>
@@ -507,6 +404,23 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>MESURE le 22/08 sur le parc reel, et le resultat est total : sur les 2 journaux d'oracles confrontables a leur cible, 2 portent un verdict PASS rendu AVANT une modification de la cible (etude i18n : cible modifiee 5,9 min apres le verdict ; etude portefeuille : 1,5 min apres). Deux « PASS » sont donc citables aujourd'hui alors qu'ils ne portent plus sur le contenu present, et RIEN ne les distingue d'un verdict frais. Echantillon petit (2 journaux) — mais le taux de perime y est de 2/2, et le mecanisme est structurel, pas accidentel.</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (instruction d'un entrant du 22/08 — constat en passant =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0500" data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0500</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.7)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-design : la regle L2-rendu ne peut structurellement pas voir un texte ecrase en filet sur mobile — trois causes independantes</h3>
+          <div class="card-detail" data-cite><p class="lead">FAIT : L2-rendu existe pour attraper « du texte comprime la ou il y a de la place », et elle ne peut pas voir le defaut de legende decrit dans le retour precedent, pour trois raisons dont chacune suffit.</p><ul class="puces"><li>Sa collecte est querySelectorAll('p, dd, li, blockquote, .va, .prose') : caption n y figure pas</li><li>Meme ajoutee, elle serait ecartee par la ligne suivante, `if (el.closest('table') || el.closest('nav')) continue;` — une legende est TOUJOURS dans un tableau</li><li>L2_MIN_VIEWPORT = 1100 : la regle ne s execute pas sous 1100 px, or le defaut n existe QUE sous 640 px. Le commentaire justifie ce seuil (« sous cette largeur, une bride de lecture est sans effet visible »), ce qui est juste pour le defaut d origine — colonne etroite sur ecran large — mais laisse TOUTE LA FAMILLE « texte ecrase en filet » non surveillee en mobile, c est-a-dire la ou elle est la plus probable, puisque c est la que les mises en page basculent de table a block. PROPOSITION : ne pas supprimer le seuil de 1100 px, qui protege d un faux positif precis. Ajouter une VARIANTE MOBILE qui ne mesure pas une mesure de lecture mais un RAPPORT D ASPECT ANORMAL : un bloc de texte dont la largeur est inferieure a environ 25 % de celle de son conteneur ALORS QUE son contenu passe a la ligne a chaque mot est un defaut a toute largeur. Et retirer caption de l exclusion closest('table'), qui vise les cellules et non la legende</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Une famille entiere de defauts de mise en page non surveillee sous 1100 px, la ou les bascules de layout la rendent la plus probable.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
             
           </dl>
         </article>
@@ -529,54 +443,14 @@
         </article>
       </div>
     </section>
-    <section id="digit-ai-forge-audit">
-      <h2>digit-ai-forge-audit <span class="badge" title="2 item(s) actifs ciblant digit-ai-forge-audit">2</span></h2>
-      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-audit</strong> — trié par statut puis priorité décroissante.</p>
-      <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0505" data-forge="digit-ai-forge-audit" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0505</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-audit : build-fiche.mjs ecrit par defaut DANS LE DEPOT DE LA FORGE (deliverables/generated/&lt;tenant&gt;/) — exactement le cas que TF-0319 interdit</h3>
-          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 22/08 sur tools/build-fiche.mjs : la destination par defaut est calculee rel('deliverables','generated',&lt;tenant-slug&gt;,'fiche-securite.html'), c est-a-dire DANS LE DEPOT DE LA FORGE, sous une arborescence de travail.</p><ul class="puces"><li>TF-0319 nomme ce cas mot pour mot : « pas au fond de dossiers de travail imbriques ou l utilisateur doit naviguer et finit par se perdre ». Le generateur accepte bien --out, mais RIEN N EXIGE de s en servir, et le chemin par defaut est celui qui sera pris par defaut. S y ajoute que ni le gabarit ni le generateur ne posent la marque de destinataire (voir le retour pilot du meme lot) : le livrable nait AU MAUVAIS ENDROIT ET INVISIBLE au controle qui aurait pu le dire. A NOTER, PARCE QUE C EST LA MOITIE DU SUJET : la forge tient deja la bonne doctrine a cote — build-fiche.mjs refuse un rendu incomplet (« 0 placeholder exige avant diffusion ») et son en-tete interdit d editer les livrables produits a la main. La rigueur est la</li><li>c est la DESTINATION qui n en beneficie pas. PROPOSITION : le generateur prend la RACINE DU PRODUIT et resout lui-meme la famille XX-audit d output\ (R-39 al. 1-2 : nom au registre D-16, numero local stable), au lieu d un chemin par defaut dans la forge</li><li>--out reste pour les cas particuliers</li><li>la marque de destinataire est posee au rendu. Un livrable ainsi produit est conforme sans que personne ait a s en souvenir — c est la difference entre une regle ecrite et une regle tenue</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-audit</dt><dd>Chemin par defaut lu dans tools/build-fiche.mjs le 22/08 : deliverables/generated/&lt;tenant&gt;/fiche-securite.html, dans le depot de la forge — le cas nomme par TF-0319. Le livrable de ce produit a fini hors output\, corrige a la main.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-04</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0506" data-forge="digit-ai-forge-audit" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0506</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.7)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-audit : la famille gd-fiche-securite declare deux formats (html, pdf) et la forge n en produit qu un — aucun outil HTML vers PDF n existe dans la forge</h3>
-          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 22/08. Le catalogue de la bibliotheque declare pour gd-fiche-securite : formats [&quot;html&quot;,&quot;pdf&quot;]. build-fiche.mjs rend le HTML theme ; AUCUN OUTIL HTML VERS PDF N EXISTE DANS LA FORGE — verifie sur tools/ et oracles/ : la seule occurrence du mot est verifier-rapport-html.mjs:130, qui mentionne l export PDF pour dire qu un @media print mal fait le sortirait tronque. Le PDF est donc a la charge de chaque projet, avec TROIS CONSEQUENCES OBSERVEES ICI. (a) Le jeu de livrables a ete remis INCOMPLET et c est le COMMANDITAIRE qui a du demander le second format — le PDF est ce qui circule en piece jointe et ce qui s imprime, le HTML ce qui reste sur le poste. (b) Le generateur PDF a ete ecrit DE ZERO alors que le gabarit porte deja tout le travail difficile (@page{size:A4 portrait;margin:8mm}, hauteur dimensionnee par le contenu, overflow:visible) et que son commentaire ECR-08 dit avoir ete « regle contre l oracle de rendu (compte de pages du PDF A4), pas a l estime » : CET ORACLE DE RENDU N EST PAS DANS LA FORGE. (c) UN PIEGE REEL S EST REFERME : sous Windows, un PDF ouvert dans une visionneuse verrouille le fichier ; le navigateur echoue a l ecrire SANS LE DIRE, et le script a revalide l ANCIEN tirage en croyant valider le nouveau — le defaut n a ete vu qu en comparant l horodatage du fichier au ls. PROPOSITION : rendre les deux formats dans la MEME PASSE, ou echouer — un jeu incomplet ne se remet pas. Le rendu peut se faire sans dependance ni binaire embarque, par le moteur d impression du navigateur du poste (Edge sinon Chrome, en --headless=new --print-to-pdf --no-pdf-header-footer), la feuille de style du gabarit faisant foi pour les marges. TROIS GARDE-FOUS, tous eprouves ici : le format A4 et le nombre de pages RELUS DANS LE PDF PRODUIT (/MediaBox, /Type /Page) et non deduits de la commande ; la FRAICHEUR du fichier verifiee (posterieur au lancement, et non anterieur a sa source), c est ce qui attrape le verrou Windows ; et un SKIP MOTIVE si aucun navigateur n est present, jamais un PASS silencieux — c est deja la doctrine d oracle-sca de forge-websec. L oracle de rendu qu ECR-08 dit avoir employe meriterait d entrer dans la forge avec.</p></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-audit</dt><dd>Jeu de livrables remis incomplet : le commanditaire a du reclamer le PDF en second temps. Generateur PDF ecrit de zero cote produit, et premiere version piegee par un verrou de fichier Windows — ancien tirage revalide en croyant valider le nouveau.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-04</dd></div>
-            
-          </dl>
-        </article>
-      </div>
-    </section>
     <section id="digit-ai-forge-conception">
       <h2>digit-ai-forge-conception <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-conception">1</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-conception</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0498" data-forge="digit-ai-forge-conception" data-statut="candidat" data-prio="haute">
+        <article class="card s-corrige" id="item-TF-0498" data-forge="digit-ai-forge-conception" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0498</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-corrige">corrige</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 15)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -593,7 +467,7 @@
       </div>
     </section>
     <section id="digit-ai-forge-design">
-      <h2>digit-ai-forge-design <span class="badge" title="10 item(s) actifs ciblant digit-ai-forge-design">10</span></h2>
+      <h2>digit-ai-forge-design <span class="badge" title="8 item(s) actifs ciblant digit-ai-forge-design">8</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-design</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
         <article class="card s-candidat" id="item-TF-0488" data-forge="digit-ai-forge-design" data-statut="candidat" data-prio="haute">
@@ -609,23 +483,6 @@
             <div><dt>Créé le</dt><dd>2026-08-21</dd></div>
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-design</dt><dd>Six echecs bloquants simultanes sur du texte correct ; lecture du code source de l oracle necessaire pour comprendre la cause.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0499" data-forge="digit-ai-forge-design" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0499</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 20)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-design : le composant tableau repliable de composants.md met table en display:block sans sa legende, qui est alors reduite a une colonne d un mot</h3>
-          <div class="card-detail" data-cite><p class="lead">FAIT : l extrait de reference de references/composants.md section 6 declare, sous 640 px, `table, tbody, tr, td { display: block; width: 100% }` — alors que le meme extrait declare `caption { text-align: left; ...</p><ul class="puces"><li>}` juste au-dessus, donc une legende est bien attendue. Une caption dont le tableau parent passe en display:block recoit une BOITE DE TABLEAU ANONYME qui se reduit au contenu. MESURE sur fixture minimale (deux tableaux, meme viewport 390 px, meme legende de 108 caracteres) : extrait du socle -&gt; caption de 58,9 px de large pour 220 px de haut, soit une colonne d un mot</li><li>variante table.repli-cartes du boilerplate -&gt; 374 px de large pour 44 px de haut, correcte. LES DEUX IMPLEMENTATIONS DU MEME COMPOSANT, DANS LE MEME SKILL, DIVERGENT, ET UNE SEULE EST SAINE : le boilerplate ne met jamais `table` en display:block (il ne touche que thead, tr, td), donc sa legende reste dans une vraie boite de tableau. C est l extrait de REFERENCE, celui qu on copie, qui porte le defaut. CONSTATE SUR LIVRABLE REEL : quinze tableaux touches, sur toutes les versions depuis la premiere, jamais vu par aucun oracle ni par quatre passes de relecture client. PROPOSITION : ajouter `table &gt; caption { display: block; width: 100% }` a l extrait section 6 — une ligne. Et ALIGNER LES DEUX IMPLEMENTATIONS, ou dire laquelle fait foi : aujourd hui le lecteur qui copie l extrait obtient un defaut que le lecteur qui part du boilerplate n a pas</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-design</dt><dd>Quinze tableaux d un livrable client illisibles en mobile pendant quatre versions ; trouve par la lecture, hors de portee des quatre oracles.</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
             
           </dl>
@@ -749,23 +606,6 @@
             
           </dl>
         </article>
-        <article class="card s-candidat" id="item-TF-0500" data-forge="digit-ai-forge-design" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0500</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.7)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-design : la regle L2-rendu ne peut structurellement pas voir un texte ecrase en filet sur mobile — trois causes independantes</h3>
-          <div class="card-detail" data-cite><p class="lead">FAIT : L2-rendu existe pour attraper « du texte comprime la ou il y a de la place », et elle ne peut pas voir le defaut de legende decrit dans le retour precedent, pour trois raisons dont chacune suffit.</p><ul class="puces"><li>Sa collecte est querySelectorAll('p, dd, li, blockquote, .va, .prose') : caption n y figure pas</li><li>Meme ajoutee, elle serait ecartee par la ligne suivante, `if (el.closest('table') || el.closest('nav')) continue;` — une legende est TOUJOURS dans un tableau</li><li>L2_MIN_VIEWPORT = 1100 : la regle ne s execute pas sous 1100 px, or le defaut n existe QUE sous 640 px. Le commentaire justifie ce seuil (« sous cette largeur, une bride de lecture est sans effet visible »), ce qui est juste pour le defaut d origine — colonne etroite sur ecran large — mais laisse TOUTE LA FAMILLE « texte ecrase en filet » non surveillee en mobile, c est-a-dire la ou elle est la plus probable, puisque c est la que les mises en page basculent de table a block. PROPOSITION : ne pas supprimer le seuil de 1100 px, qui protege d un faux positif precis. Ajouter une VARIANTE MOBILE qui ne mesure pas une mesure de lecture mais un RAPPORT D ASPECT ANORMAL : un bloc de texte dont la largeur est inferieure a environ 25 % de celle de son conteneur ALORS QUE son contenu passe a la ligne a chaque mot est un defaut a toute largeur. Et retirer caption de l exclusion closest('table'), qui vise les cellules et non la legende</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-design</dt><dd>Une famille entiere de defauts de mise en page non surveillee sous 1100 px, la ou les bascules de layout la rendent la plus probable.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
-            
-          </dl>
-        </article>
       </div>
     </section>
     <section id="digit-ai-forge-ops">
@@ -867,43 +707,9 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
       </div>
     </section>
     <section id="pilot">
-      <h2>pilot <span class="badge" title="9 item(s) actifs ciblant pilot">9</span></h2>
+      <h2>pilot <span class="badge" title="8 item(s) actifs ciblant pilot">8</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <article class="card s-candidat" id="item-TF-0512" data-forge="pilot" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0512</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 15)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : un retour arriere imprime dans un journal peut etre MASQUE par le moteur de pipeline — la precaution s'annule au moment precis ou elle sert</h3>
-          <div class="card-detail" data-cite><p class="lead">Constate le 22/08/2026 sur un geste coupant reel.</p><ul class="puces"><li>Un mode de test conçu pour imprimer sa commande de retour arriere AVANT le geste risque — precaution voulue, pour que la restauration soit deja au journal si l'etape casse au milieu — a bien imprime la commande, mais avec l'URL de l'emetteur remplacee par « *** » : le moteur de pipeline a pris l'adresse du tenant pour un secret et l'a masquee</li><li>La commande imprimee est donc INUTILISABLE telle quelle, et elle l'est precisement dans le seul scenario ou on irait la chercher : l'urgence</li><li>Ce n'est pas propre a ce pipeline — tout secours imprime dans un journal est expose au meme effet, et le masquage est par nature imprevisible puisqu'il depend de ce que le moteur a appris a masquer</li><li>Correction proposee, au gabarit d'agent et aux consignes d'ops : un retour arriere ne se publie pas SEULEMENT dans un journal</li><li>L'ecrire aussi en artefact, ou le composer a partir de valeurs non masquees, et VERIFIER APRES COUP qu'il est lisible — une procedure de secours non testee a la lecture n'existe pas</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 15 — gain 3 × preuve 5 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>une precaution deliberement conçue pour l'urgence, annulee par un masquage automatique, et decouverte par hasard en relisant le journal plutot qu'en ayant besoin de la commande</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-03 (constat en passant du 22/08)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0504" data-forge="pilot" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0504</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : le faux negatif de R-2 n est pas un oubli de producteur, il est STRUCTUREL — aucun gabarit de la bibliotheque ne porte la marque destinataire qui declenche le jugement</h3>
-          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 22/08, six jours apres la correction de TF-0319 (corrige le 17/08, archive le 22/08 a 08:02) et une heure apres son archivage.</p><ul class="puces"><li>oracle-conformite-projet declare sa propre limite, mot pour mot : « seul ce qui est MARQUE est juge — un producteur qui oublie de marquer son livrable y echappe (faux negatif ASSUME, mesure a la revue du 17/09 par le rapport entre livrables marques et livrables deposes) ». La limite est donc connue et son ampleur prevue a la mesure. CE QUI NE L EST PAS : la marque n est posee NULLE PART EN AMONT. Verifie le 22/08 — grep -ril destinataire sur digit-ai-forge-audit/deliverables/templates/ et tools/ : ZERO occurrence ; le gabarit Client-A de la fiche securite (9485 octets) : ZERO occurrence ; oracle-gabarits-documents (G1-G7) : AUCUNE regle n exige la marque d un gabarit. CONSEQUENCE MESURABLE : tout document produit depuis la bibliotheque nait non marque, donc invisible a R-2, donc rangeable n importe ou sans qu aucun controle ne le dise. PREUVE DU COUT : la fiche securite a ete ecrite dans audit\ a la racine du produit, hors output\, en violation de R-2 et R-39, et AUCUN ORACLE NE POUVAIT LE VOIR — faute de marque, oracle-conformite-projet rendait SANS_OBJET sur R-2 et un verdict par ailleurs coherent. Le defaut a ete trouve par relecture humaine, exactement ce que TF-0319 voulait supprimer. La revue du 17/09 mesurera donc un ratio marques/deposes proche de zero SANS EN DONNER LA CAUSE, la cause n etant pas chez les producteurs. PROPOSITION : fermer la boucle a la SOURCE plutot qu a la mesure</li><li>G8 dans oracle-gabarits-documents — tout gabarit de livrable destine a l humain porte la marque (destinataire: humain en frontmatter pour un .md, &lt;meta name=&quot;destinataire&quot; content=&quot;humain&quot;&gt; pour un .html) ou declare pourquoi il ne la porte pas : un gabarit NORMATIF n est destine a personne, c est deja la precision D-06, et gabarits\INSATISFACTION.md documente explicitement ce choix pour lui-meme. La marque descend alors dans chaque document produit sans que le producteur ait a y penser</li><li>COROLLAIRE POUR LES GENERATEURS : un generateur qui rend un livrable pose la marque s il ne l herite pas du gabarit — c est une ligne, et c est ce qui a ete fait ici en correctif local</li><li>La mesure du 17/09 reste utile, mais elle mesurera alors un vrai taux d oubli et non l absence d un mecanisme</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>Fiche securite ecrite hors output\ le 22/08 en violation de R-2/R-39, six jours apres la correction de TF-0319 ; aucun oracle ne pouvait le voir faute de marque, defaut trouve par relecture humaine. Apres pose de la marque, oracle-conformite-projet rend R-2 PASS sur le meme depot.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-04</dd></div>
-            
-          </dl>
-        </article>
         <article class="card s-candidat" id="item-TF-0481" data-forge="pilot" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0481</code>
@@ -935,23 +741,6 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 7.5 — gain 3 × preuve 5 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur pilot</dt><dd>MESURE le 22/08 sur les deux registres : sur 473 items TF ecrits depuis l'origine, 2 seulement ont une veille pour source — 0,4 %, alors que la veille est un canal declare de l'ecosysteme et qu'elle a produit trois documents d'etude (ETUDE-EVERYTHING-CLAUDE-CODE, VEILLE-OUTILLAGE-CLAUDE-CODE, AMELIORATIONS-TIKTOK). Le canal existe, il produit, et sa production n'atteint pas le registre : c'est le dernier kilometre qui manque, pas la veille.</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (instruction d'un entrant du 22/08 — constat en passant =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
-        <article class="card s-candidat" id="item-TF-0502" data-forge="pilot" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0502</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.7)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">Deux derogations a R-45 en UN JOUR, dont une hors anteriorite : la propagation des regles du pilot vers les produits reste le manque, et le mecanisme de derogation est en train de devenir la voie normale</h3>
-          <div class="card-detail" data-cite><p class="lead">Constat du 22/08, emis en appliquant une decision humaine que j'avais recommande de NE PAS prendre — ce qui est precisement pourquoi il doit etre trace.</p><ul class="puces"><li>FAITS. Trois lots Produit-05 ont ete refuses par R-45/R-46 le 22/08 : 20260821a (7 candidatures), 20260822a</li><li>20260822b</li><li>Les deux premiers ont ete admis le matin par derogation tracee, sur un motif d'ANTERIORITE solide (rediges avant la publication de R-45 le 21/08). Le troisieme a ete admis l'apres-midi par une SECONDE derogation, et son motif ne peut pas etre l'anteriorite : date du 22/08, il est POSTERIEUR a la regle. Ce qui l'a fonde : le produit ne peut toujours pas connaitre R-45, et le lot portait un defaut majeur verifie sur pieces avant decision (RA-11, devenu TF-0501). CE QUI EST NOUVEAU DEPUIS TF-0320. TF-0320 est clos et archive ; son verdict O1 a livre le diff de doctrine a l'ouverture et la forme canonique des cles, et il a REFUSE explicitement trois constructions : journal de regles, blocage, regles en donnees. Le fait nouveau n'est pas que la propagation manque — c'etait connu — c'est que son absence se paie desormais en DEROGATIONS REPETEES a une regle de gate, ce qui est un cout d'une autre nature : le diff de doctrine informe la session pilot, il n'atteint pas la session PRODUIT qui redige le lot. Le refus des trois constructions a ete prononce sur des faits d'avant le 21/08, quand aucune regle de gate ne dependait de ce que le produit savait. R-45 et R-46 changent cette donnee : ce sont les premieres regles dont la VIOLATION par ignorance bloque un travail deja fait. CE QUE JE NE TRANCHE PAS, et c'est l'objet de la candidature : faut-il rouvrir l'une des trois constructions refusees par TF-0320 a la lumiere de ce fait nouveau, ou borner la derogation dans le temps (par exemple : une regle de gate ne s'applique qu'apres N jours de propagation constatee), ou accepter la derogation comme regime permanent et le dire ? La troisieme option a un cout qu'il faut nommer : une regle qu'on contourne deux fois en un jour n'est plus un gate, c'est une formalite, et le jour ou un lot merite vraiment d'etre refuse personne ne le verra</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>mesure le 22/08 sur le registre : 15 candidatures (7 + 5 + 3) n'ont pu entrer que par derogation, sur 3 lots d'un meme produit en 2 jours. Deux evenements `ingestion` portent desormais un champ `derogation` — soit 2 derogations en un seul jour, pour une regle publiee la veille. Le taux est de 3 lots derogeables sur 3 lots recus de ce produit : 100 %, ce qui ne decrit plus une exception mais un regime.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du 22/08, sur application d'une decision humaine contraire a la recommandation emise — le desaccord se trace, il ne se boude pas)</dd></div>
             
           </dl>
         </article>
@@ -1021,6 +810,40 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
             <div class="impact"><dt>Impact sur pilot</dt><dd>payé le 22/08 : douze candidatures de deux lots restent hors du registre, et l'une d'elles nommait un défaut BLOQUANT du lanceur d'oracles qui n'a été corrigé que parce que la session l'a rencontré par un autre chemin — un refus de forme a mis un fait de production hors de portée</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du 22/08, mandat « traite tous les todos et retours » — constat =&gt; candidat)</dd></div>
             
+          </dl>
+        </article>
+        <article class="card s-corrige" id="item-TF-0502" data-forge="pilot" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0502</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.7)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Deux derogations a R-45 en UN JOUR, dont une hors anteriorite : la propagation des regles du pilot vers les produits reste le manque, et le mecanisme de derogation est en train de devenir la voie normale</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat du 22/08, emis en appliquant une decision humaine que j'avais recommande de NE PAS prendre — ce qui est precisement pourquoi il doit etre trace.</p><ul class="puces"><li>FAITS. Trois lots Produit-05 ont ete refuses par R-45/R-46 le 22/08 : 20260821a (7 candidatures), 20260822a</li><li>20260822b</li><li>Les deux premiers ont ete admis le matin par derogation tracee, sur un motif d'ANTERIORITE solide (rediges avant la publication de R-45 le 21/08). Le troisieme a ete admis l'apres-midi par une SECONDE derogation, et son motif ne peut pas etre l'anteriorite : date du 22/08, il est POSTERIEUR a la regle. Ce qui l'a fonde : le produit ne peut toujours pas connaitre R-45, et le lot portait un defaut majeur verifie sur pieces avant decision (RA-11, devenu TF-0501). CE QUI EST NOUVEAU DEPUIS TF-0320. TF-0320 est clos et archive ; son verdict O1 a livre le diff de doctrine a l'ouverture et la forme canonique des cles, et il a REFUSE explicitement trois constructions : journal de regles, blocage, regles en donnees. Le fait nouveau n'est pas que la propagation manque — c'etait connu — c'est que son absence se paie desormais en DEROGATIONS REPETEES a une regle de gate, ce qui est un cout d'une autre nature : le diff de doctrine informe la session pilot, il n'atteint pas la session PRODUIT qui redige le lot. Le refus des trois constructions a ete prononce sur des faits d'avant le 21/08, quand aucune regle de gate ne dependait de ce que le produit savait. R-45 et R-46 changent cette donnee : ce sont les premieres regles dont la VIOLATION par ignorance bloque un travail deja fait. CE QUE JE NE TRANCHE PAS, et c'est l'objet de la candidature : faut-il rouvrir l'une des trois constructions refusees par TF-0320 a la lumiere de ce fait nouveau, ou borner la derogation dans le temps (par exemple : une regle de gate ne s'applique qu'apres N jours de propagation constatee), ou accepter la derogation comme regime permanent et le dire ? La troisieme option a un cout qu'il faut nommer : une regle qu'on contourne deux fois en un jour n'est plus un gate, c'est une formalite, et le jour ou un lot merite vraiment d'etre refuse personne ne le verra</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>mesure le 22/08 sur le registre : 15 candidatures (7 + 5 + 3) n'ont pu entrer que par derogation, sur 3 lots d'un meme produit en 2 jours. Deux evenements `ingestion` portent desormais un champ `derogation` — soit 2 derogations en un seul jour, pour une regle publiee la veille. Le taux est de 3 lots derogeables sur 3 lots recus de ce produit : 100 %, ce qui ne decrit plus une exception mais un regime.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du 22/08, sur application d'une decision humaine contraire a la recommandation emise — le desaccord se trace, il ne se boude pas)</dd></div>
+            
+          </dl>
+        </article>
+        <article class="card s-ecarte" id="item-TF-0503" data-forge="pilot" data-statut="ecarte" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0503</code>
+            <span class="statut s-ecarte">ecarte</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Les README de dossiers restent en retard d'UN commit : la table affiche « non versionne » pour un fichier que le commit en cours est justement en train de versionner</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat du 22/08, mesure sur les cinq commits de la journee.</p><ul class="puces"><li>`scripts\readme-dossiers.mjs` rend, pour chaque element du dossier, la date de son dernier commit — et « non versionne » quand git n'en connait aucun. Le README est donc regenere AVANT le commit, avec la mention « non versionne » ; le commit versionne le fichier ; et le README devient immediatement faux. Le hook PostToolUse le regenere alors, ce qui laisse l'arbre modifie APRES un commit qui vient de tout prendre. MESURE : sur les cinq commits du 22/08, cinq ont emporte des README (5, 4, 4, 11, 5 fichiers) et le dernier laisse encore 2 README modifies derriere lui. Le diff est toujours le meme motif : `| non versionne |` devient `| 2026-08-22 |`. CE N'EST PAS TF-0456, qui portait sur un autre mecanisme (le README se datait de LUI-MEME et ne convergeait jamais) : ici la convergence a lieu, mais en DEUX temps, et le second temps tombe apres le commit. Ce que ca coute : un arbre de travail jamais propre apres un commit d'ajout, donc un `git status` qui montre toujours du bruit — et c'est ainsi qu'une vraie modification oubliee passe inapercue au milieu de deux README generes. TROIS VOIES, aucune tranchee :</li><li>ne pas rendre l'etat git d'un fichier non versionne, ecrire une valeur stable (par exemple un tiret) tant que git n'en sait rien — la table cesse de dependre d'un etat qui change au commit</li><li>rendre `non versionne` pour TOUT fichier, c'est-a-dire retirer la colonne de date, ce qui perd une information utile</li><li>accepter le retard et le declarer au README lui-meme. La voie</li><li>a ma preference et je ne la prends pas : la colonne est une affordance de lecture, la modifier se decide</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 5 — gain 2 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>mesure le 22/08 : les 5 commits du jour ont emporte 5, 4, 4, 11 et 5 README ; apres le dernier push, l'arbre porte encore 2 README modifies dont le seul changement est « non versionne » remplace par « 2026-08-22 ». Aucun commit d'ajout ne laisse l'arbre propre.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du 22/08, apres le push autorise — constat =&gt; candidat)</dd></div>
+            <div class="impact"><dt>Motif d'écart (TF-0157)</dt><dd>ÉCARTÉ, et le défaut est d'abord dans mon instruction : l'item ne cite pas TF-0451 (« pilot : les README de dossier se périment à CHAQUE COMMIT — la recette est rouge juste après avoir été verte »), archivé, qui traite exactement ce mécanisme et l'a tranché le 21/08. Son remède est en place et lisible dans `scripts\readme-dossiers.mjs` : la colonne « Dernier commit » est neutralisée à la comparaison, une divergence portant sur les seules dates devient un avertissement, et `--strict` restaure l'égalité pour qui l'exige. Le résidu que j'ai mesuré — deux README modifiés après un commit — est le PRIX ASSUMÉ de cette décision, pas un défaut nouveau : le choix était de garder l'information de date plutôt que de supprimer la colonne. Mes trois voies rouvraient une décision de la veille sur la foi d'une mesure qui ne disait rien de neuf. Ce qui reste vrai et non traité par TF-0451 : l'arbre de travail n'est jamais propre après un commit d'ajout. C'est un inconfort, pas une perte d'information, et le corriger demanderait soit de supprimer la colonne (perte réelle), soit de régénérer après coup (un commit de plus à chaque fois). L'écart se déclare plutôt que de fabriquer un correctif à un problème déjà arbitré.</dd></div>
           </dl>
         </article>
       </div>

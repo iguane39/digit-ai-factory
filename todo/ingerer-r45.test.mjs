@@ -54,6 +54,12 @@ check("rouge — lot du 21/08 SANS la section : refusé, registre intact", () =>
   if (readFileSync(r.registre, "utf8").length !== 0) throw new Error("le registre a été touché malgré le refus");
 });
 
+check("le refus NOMME la cause probable et le geste exact — un refus sans remede se subit", () => {
+  const r = ingerer({ nomLot: "PROD - RETOURS - 20260821f", md: "# lot\n\n## pilot\n\ntable\n" });
+  if (!/copie du gabarit|COPIE du/i.test(r.sortie)) throw new Error("le refus ne dit pas la cause la plus frequente (TF-0502 : copie du gabarit jamais rafraichie)");
+  if (!/Recopier/i.test(r.sortie)) throw new Error("le refus ne dit pas le geste qui repare");
+});
+
 check("rouge — section PRÉSENTE mais vide : une section vide se lit comme un oubli", () => {
   const r = ingerer({ nomLot: "PROD - RETOURS - 20260821b", md: `# lot\n\n${SECTION}\n\n(rien)\n` });
   if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1`);
