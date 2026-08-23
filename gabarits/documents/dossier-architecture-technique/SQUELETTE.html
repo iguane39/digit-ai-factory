@@ -172,6 +172,19 @@
        ni trait d'union. Il reste sur ce qui n'est PAS de la prose et qui déborde vraiment :
        identifiants techniques, chemins, empreintes, adresses. */
     th code, td code, th a, td a { overflow-wrap: anywhere; }
+
+    /* Sommaire (L6) — le `nav.toc` était déclaré sans jamais être stylé : il se rendait en
+       liste numérotée nue, ce qu'aucun livrable Digit-AI ne fait. Forme alignée sur les
+       livrables réels du parc : deux colonnes, titre souligné en bloc, annonce en gris dessous.
+       Marquage attendu par entrée : <a href="#id"><span class="toc-t">…</span><span class="toc-d">…</span></a> */
+    .toc { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 24px; margin: 24px 0 32px; }
+    .toc h2 { margin-top: 0; }
+    .toc ol, .toc ul { columns: 2; column-gap: 32px; padding-left: 20px; }
+    .toc li { break-inside: avoid; max-width: none; margin-bottom: .6em; }
+    .toc a { text-decoration: none; }
+    .toc .toc-t { display: block; text-decoration: underline; }
+    .toc .toc-d { display: block; color: var(--muted); font-size: .84rem; }
+    @media (max-width: 760px) { .toc ol, .toc ul { columns: 1; } }
     th { font-family: var(--head); font-weight: 700; }
     @media (max-width: 900px) {
       .table-hote { overflow-x: visible; }
@@ -278,14 +291,14 @@
       <nav class="toc" aria-label="Sommaire">
         <h2>Sommaire</h2>
         <ol>
-          <li><a href="#objet">1 · Objet, périmètre et lecteurs — <span class="toc-d">pour quelle décision ce dossier est écrit</span></a></li>
-          <li><a href="#vue-logique">2 · Vue logique — par renvoi — <span class="toc-d">le système en un paragraphe, le détail ailleurs</span></a></li>
-          <li><a href="#composants">3 · Composants et instances — par renvoi — <span class="toc-d">ce dont le produit dépend, et qui ne lui appartient pas</span></a></li>
-          <li><a href="#trajectoire">4 · Trajectoire — de l'existant à la cible — <span class="toc-d">les écarts, leurs jalons et leurs porteurs</span></a></li>
-          <li><a href="#adr">5 · Décisions d'architecture (ADR) — <span class="toc-d">ce qui a été tranché, et ce qui a été écarté</span></a></li>
-          <li><a href="#securite">6 · Sécurité — <span class="toc-d">qui entre, jusqu'où, et ce qui protège les données</span></a></li>
-          <li><a href="#enf">7 · Exigences non fonctionnelles, et comment on les vérifie — <span class="toc-d">les cibles chiffrées et leur moyen de mesure</span></a></li>
-          <li><a href="#risques">8 · Hypothèses, risques et mesures — <span class="toc-d">ce qui n'est pas vérifié, et ce qui peut mal tourner</span></a></li>
+          <li><a href="#objet"><span class="toc-t">1 · Objet, périmètre et lecteurs</span><span class="toc-d">pour quelle décision ce dossier est écrit</span></a></li>
+          <li><a href="#vue-logique"><span class="toc-t">2 · Vue logique — par renvoi</span><span class="toc-d">le système en un paragraphe, le détail ailleurs</span></a></li>
+          <li><a href="#composants"><span class="toc-t">3 · Composants et instances — par renvoi</span><span class="toc-d">ce dont le produit dépend, et qui ne lui appartient pas</span></a></li>
+          <li><a href="#trajectoire"><span class="toc-t">4 · Trajectoire — de l'existant à la cible</span><span class="toc-d">les écarts, leurs jalons et leurs porteurs</span></a></li>
+          <li><a href="#adr"><span class="toc-t">5 · Décisions d'architecture (ADR)</span><span class="toc-d">ce qui a été tranché, et ce qui a été écarté</span></a></li>
+          <li><a href="#securite"><span class="toc-t">6 · Sécurité</span><span class="toc-d">qui entre, jusqu'où, et ce qui protège les données</span></a></li>
+          <li><a href="#enf"><span class="toc-t">7 · Exigences non fonctionnelles, et comment on les vérifie</span><span class="toc-d">les cibles chiffrées et leur moyen de mesure</span></a></li>
+          <li><a href="#risques"><span class="toc-t">8 · Hypothèses, risques et mesures</span><span class="toc-d">ce qui n'est pas vérifié, et ce qui peut mal tourner</span></a></li>
         </ol>
       </nav>
 
@@ -299,7 +312,7 @@
             <dt><strong>Sources de vérité</strong></dt><dd><code>docs\projet\ARCHITECTURE.md</code> · <code>docs\projet\COMPOSANTS-OPS.md</code> · {registre ADR}</dd>
             <dt><strong>Vérifié le</strong></dt><dd><strong>{AAAA-MM-JJ}</strong></dd>
             <dt><strong>Gabarit</strong></dt><dd>gd-dossier-architecture</dd>
-            <dt><strong>Version du gabarit</strong></dt><dd>1.0.1 — à reporter tel quel dans tout retour sur ce document</dd>
+            <dt><strong>Version du gabarit</strong></dt><dd>1.0.2 — à reporter tel quel dans tout retour sur ce document</dd>
             <dt><strong>État décrit</strong></dt><dd><strong>{existant | cible | existant et cible}</strong> — champ dû : un dossier qui ne le dit pas est inutilisable en migration</dd>
           </dl>
         </div>
