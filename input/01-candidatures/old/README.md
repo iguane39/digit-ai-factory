@@ -16,6 +16,7 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 |---|---|---|---|
 | `candidature-bootstrap-dernieres-versions.tf.jsonl` | fichier | 2,9 Ko | 1 ligne(s) JSONL |
 | `candidature-cablage-orchestrer-boucle.tf.jsonl` | fichier | 2,6 Ko | 1 ligne(s) JSONL |
+| `candidature-clone-doublon-pilot-20260823.tf.jsonl` | fichier | 3,5 Ko | 1 ligne(s) JSONL |
 | `candidature-consigne-restitution.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
 | `candidature-convention-rangement-output.tf.jsonl` | fichier | 2,6 Ko | 1 ligne(s) JSONL |
 | `candidature-decision-sans-rappel-de-son-sujet.tf.jsonl` | fichier | 2,6 Ko | 1 ligne(s) JSONL |
@@ -52,13 +53,13 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `candidature-trous-detection-site-principal.tf.jsonl` | fichier | 4,7 Ko | 4 ligne(s) JSONL |
 | `candidature-valeur-recopiee-20260822.tf.jsonl` | fichier | 5,1 Ko | 1 ligne(s) JSONL |
 | `candidature-vue-portefeuille-differee.tf.jsonl` | fichier | 2,7 Ko | 1 ligne(s) JSONL |
-| `Digit-AI - Brief Forge - Fraîcheur des verdicts qualité - 20260822a.md` | fichier | 10,4 Ko | Brief d'exécution — Fraîcheur des verdicts de `quality-oracles` |
+| `Digit-AI - Brief Forge - Fraîcheur des verdicts qualité - 20260822a.md` | fichier | 10,3 Ko | Brief d'exécution — Fraîcheur des verdicts de `quality-oracles` |
 | `Digit-AI - Candidatures Forge - Extension Run-Delivery - 20260816b.md` | fichier | 9,6 Ko | Candidatures forge — extension « run de delivery » |
 | `Digit-AI - Candidatures Forge - Extension Run-Delivery - 20260816b.tf.jsonl` | fichier | 5,8 Ko | 2 ligne(s) JSONL |
 | `Digit-AI - Candidatures Forge - Frontmatter des skills - 20260822a.zip` | fichier | 5,4 Ko | ZIP |
 | `Digit-AI - Forge Pilot - Candidature noeud 57 plan de mesure - 20260822f.zip` | fichier | 5,7 Ko | ZIP |
 | `Digit-AI - Lot Candidature Forge - Valeur recopiee - 20260822b.zip` | fichier | 4,8 Ko | ZIP |
-| `Digit-AI - Prompt Forge - Analyse d'un entrant factory - 20260822a.md` | fichier | 9,5 Ko | Prompt d'analyse d'un entrant — digit-ai-factory |
+| `Digit-AI - Prompt Forge - Analyse d'un entrant factory - 20260822a.md` | fichier | 9,3 Ko | Prompt d'analyse d'un entrant — digit-ai-factory |
 | `proposition-tuyauterie.tf.jsonl` | fichier | 3,7 Ko | 5 ligne(s) JSONL |
 | `revue-20260819-agents.normalise.tf.jsonl` | fichier | 2,3 Ko | 1 ligne(s) JSONL |
 | `revue-20260819-agents.tf.jsonl` | fichier | 2,3 Ko | 1 ligne(s) JSONL |
@@ -69,4 +70,4 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `revue-20260819-pilot.normalise.tf.jsonl` | fichier | 2,1 Ko | 1 ligne(s) JSONL |
 | `revue-20260819-pilot.tf.jsonl` | fichier | 2,1 Ko | 1 ligne(s) JSONL |
 
-_54 fichier(s), 0 sous-dossier(s)_
+_55 fichier(s), 0 sous-dossier(s)_

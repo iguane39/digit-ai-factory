@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=131c5be1426d archive=54c0315cbe97 · dernier événement: 2026-08-23T07:22:04.382Z -->
+     sceaux: actifs=4e81789525d8 archive=acf69e8da61a · dernier événement: 2026-08-23T07:50:53.370Z -->
 
-**56 actifs** (candidat 18 · décidé 0 · en cours 1 · corrigé 36 · écarté 1) · **469 archivés**.
+**57 actifs** (candidat 19 · décidé 0 · en cours 1 · corrigé 36 · écarté 1) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -92,6 +92,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0520 | candidat | 15 | pilot : les deux squelettes DAT et DEX livres le 21/08 ECHOUAIENT a l'oracle du socle, sur leur propre feuille de style | **oui** — deux gabarits publies en statut ok le 21/08 dont les squelettes echouaient a l'oracle du socle — decouvert au premier usage reel, deux jours plus tard |
+| TF-0525 | candidat | 15 | Un SECOND clone du pilot vit sur le poste sous son ancien nom (digit-ai-forge-steering_old) : registre TODO divergent, 88 commits de retard, et une candidature qu'il a fallu redecouvrir quatre jours plus tard | **oui** — paye et mesurable : une candidature ingeree le 18/08 dans le registre du clone n'a jamais atteint le registre vivant, et son sujet a du etre REDECOUVERT le 22/08 par un autre canal (TF-0482) — quatre jours d'ecart pour un travail deja fait. Le clone porte 88 commits de retard et 3 modifications locales non commitees ; `bootstrap.mjs --pull` ne le voit pas et ne le verra jamais, puisqu'il n'est pas dans sa liste. |
 | TF-0519 | candidat | 10 | produit-07 : l ancien hote forge.produit-07 NE RESOUT PLUS DU TOUT — le trafic qui le connait encore tombe dans le vide, et c est le gate neuf M-6 qui l a mesure | **oui** — mesure le 23/08 : forge.produit-07 rend ENOTFOUND, donc aucune redirection n est possible. Une erreur de resolution n est pas une page 404 — un lecteur conclut que le produit n existe plus, et un moteur retire les pages de l index sans transferer l anteriorite. L etat viole la regle ecrite le jour meme a ETAPE-MEP section 3 quater. |
 | TF-0521 | candidat | 10 | pilot : un composant DECLARE sans style est invisible aux DEUX oracles — le sommaire des squelettes se rendait en liste numerotee nue | **oui** — un sommaire — le premier element qu'un lecteur regarde — rendu en liste nue sur deux gabarits en statut ok, avec les deux oracles au vert. Signale par le destinataire humain, par aucun controle |
 | TF-0523 | candidat | 10 | pilot : rien ne detecte qu'un livrable a ete MODIFIE apres avoir ete juge, sans changer d'indice — la regle 5 existe et n'est cablee nulle part | **oui** — quatre etats successifs d'un livrable perdus, et le meme nom ayant designe quatre contenus — commis par un agent qui avait cite la meme regle une heure plus tot sur un autre objet |
