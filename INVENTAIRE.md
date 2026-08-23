@@ -48,9 +48,10 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
   `ton` et `contraintes reprises` comme **non dérivables** → point de reprise humain structurel.
 - **Sorties** : produites « là où l'agent travaille » — aucune convention d'emplacement, aucun ledger de run
   (pourtant exigé par `studio-de-direction/references/run.md` sans chemin ni format).
-- **Oracles** : 11 oracles Node, 73 règles (slop S1-S10, tokens T1-T6, mobile M1-M6, images I1-I6, corpus C1-C6,
+- **Oracles** : 12 oracles Node, 79 règles (slop S1-S10, tokens T1-T6, mobile M1-M6, images I1-I6, corpus C1-C6,
   motion R1-R10 — prescription ↔ jugement câblés le 17/08 (TF-0321) —, DTCG D1-D3, baseline B1-B3, bascule B-T1..B-T4,
-  rendu comparatif R-37/TF-0286), self-test rejoué au vert le 17/08 (« 21 oracles, 73 règles verrouillées »), corpus 123+ entrées sourcées.
+  rendu comparatif R-37/TF-0286, traçabilité d'une demande client D1-D3 — TF-0494, 22/08), self-test
+  rejoué au vert le 23/08 (« 25 oracles, 79 règles verrouillées »), corpus 123+ entrées sourcées.
 - **Maturité** : couche qualité niveau production ; couche produit en chantier — git sans aucun commit, `dist/`
   désynchronisé des oracles, **3 critères bloquants sans exécutant** (C1 `render_page.py` absent du poste,
   C6 `oracle-claims` et C7 `oracle-nommage` non pointés), producteur d'images Gemini spécifié mais non implémenté,

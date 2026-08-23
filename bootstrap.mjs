@@ -27,7 +27,7 @@
 // Contrat de sortie : rapport sur stdout, exit 0 = poste prêt, 1 = au moins un défaut.
 
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, renameSync } from "node:fs";
+import { existsSync, readFileSync, renameSync, readdirSync, statSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -206,6 +206,80 @@ for (const f of FORGES) {
       versions.push({ nom: f.nom, version: e.version, sha: e.sha, date: e.date, etat: "cloné" });
     } else defaut(`${f.nom} — clone en échec : ${(r.stderr || "").trim().split("\n")[0].slice(0, 120)}`,
       `vérifier l'accès à ${SOURCE}/${f.nom}.git`);
+  }
+}
+
+// 4 bis. LES DÉPÔTS QUE LA LISTE NE CONNAÎT PAS (TF-0525) ------------------------------------
+//
+// LE FAIT, mesuré le 23/08. Le balayage des dépôts de la racine a rendu QUINZE entrées là où
+// l'écosystème en compte quatorze. La quinzième est un SECOND CLONE DU PILOT, sous un ancien nom :
+// même `origin`, même dépôt, deux répertoires. Il est absent de la liste `FORGES`, donc `--pull` ne
+// le voit pas et ne le mettra JAMAIS à jour — il portait 110 commits de retard au moment de la
+// mesure, et son dernier commit local datait de quatre jours plus tôt.
+//
+// CE QU'UN CLONE MORT PIÈGE, et ce n'est pas théorique : quelqu'un y avait ingéré une candidature,
+// en croyant écrire dans le registre vivant. Le sujet a été redécouvert QUATRE JOURS PLUS TARD par
+// un lot de retours, et instruit une seconde fois. Rien n'était perdu — c'est le travail refait qui
+// a coûté.
+//
+// Le marqueur `PERIME.md` posé dans ce clone était NON VERSIONNÉ : un nouveau clone ne l'aurait pas.
+// Un avertissement qui ne survit pas au clonage n'avertit personne.
+//
+// CE QUI EST JUGÉ ICI, et pas plus : la racine porte-t-elle un répertoire git dont l'`origin` est
+// celui d'un dépôt DÉJÀ connu, ou un répertoire qui ressemble à une mise de côté (`_old`, `_vide`,
+// `_ancien`, `PERIME.md`) ? On le DIT, on ne le supprime pas : effacer un dépôt sur une heuristique
+// serait échanger un piège contre une perte.
+console.log("");
+{
+  const connus = new Map();          // origin normalisé -> nom du dépôt attendu
+  const attendus = new Set(FORGES.map((f) => f.nom));
+  attendus.add("digit-ai-factory");
+  const normaliser = (u) => (u || "").trim().replace(/\.git$/, "").replace(/\/+$/, "").toLowerCase();
+  const originDe = (d) => {
+    const r = git(d, "remote", "get-url", "origin");
+    return r.status === 0 ? normaliser(r.stdout) : null;
+  };
+  for (const nom of attendus) {
+    const d = join(racine, nom);
+    if (!existsSync(join(d, ".git"))) continue;
+    const o = originDe(d);
+    if (o) connus.set(o, nom);
+  }
+  let entrees = [];
+  try { entrees = readdirSync(racine, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name); }
+  catch { entrees = []; }
+  const suspects = [];
+  for (const nom of entrees) {
+    if (attendus.has(nom)) continue;
+    const d = join(racine, nom);
+    const estGit = existsSync(join(d, ".git"));
+    const perime = existsSync(join(d, "PERIME.md"));
+    const nommeMisDeCote = /(_old|_vide|_ancien|_backup|\.bak)$/i.test(nom);
+    if (!estGit) {
+      // Un répertoire NON git qui porte le nom d'un dépôt de l'écosystème est un piège aussi : on
+      // s'y installe en croyant être dans un dépôt, et rien n'y est versionné.
+      if (/^digit-ai/i.test(nom)) suspects.push({ nom, motif: "répertoire NON versionné portant un nom de l'écosystème — rien de ce qu'on y écrit n'est suivi" });
+      continue;
+    }
+    const o = originDe(d);
+    if (o && connus.has(o)) {
+      const retard = git(d, "rev-list", "--count", "HEAD..origin/main");
+      const n = retard.status === 0 ? (retard.stdout || "").trim() : "?";
+      suspects.push({
+        nom,
+        motif: `SECOND CLONE de ${connus.get(o)} (même origin) — ${n} commit(s) de retard, hors de la liste ` +
+          "des dépôts donc jamais mis à jour par --pull. Y travailler écrit dans un registre mort",
+      });
+      continue;
+    }
+    if (perime || nommeMisDeCote) {
+      suspects.push({ nom, motif: `mise de côté (${perime ? "PERIME.md présent" : "nom en _old/_vide"}) — ne rien y exécuter` });
+    }
+  }
+  if (!suspects.length) ligne("ok", `racine propre — aucun dépôt hors liste sous ${racine}`);
+  else for (const x of suspects) {
+    ligne("avert", `${x.nom} — ${x.motif}. Ne rien y exécuter ; supprimer un répertoire est un geste HUMAIN (R-29) — ce contrôle le déclare, il ne l'efface pas`);
+    averts.push(x.nom);
   }
 }
 
