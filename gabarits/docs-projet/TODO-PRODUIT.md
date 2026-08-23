@@ -39,6 +39,24 @@ tranchée quitte la table et rejoint le journal du run.
 
 ## Améliorations
 
+**TROIS NATURES, TROIS EMPLACEMENTS** — ce document en a trois, et la séparation n'est pas un
+rangement : c'est la condition pour qu'il reste lu.
+
+| Nature | Où elle vit | Ce qu'elle attend |
+|---|---|---|
+| Un reste à faire | « Améliorations », ci-dessous | qu'on le fasse |
+| Une décision déjà prise de ne PAS faire | « Écarts assumés » | qu'on la **redéclare** au prochain audit |
+| Une action suspendue à un événement extérieur | « Contraintes connues » | que la condition se produise — peut-être jamais |
+
+*Mesure du 23/08/2026 qui a créé la troisième section* : sur neuf lignes remises, le lecteur en a
+contesté **deux**, mot pour mot — « Oubli, sujet déjà évoqué et traité. Revois pourquoi tu le
+ressors encore » et « Non sujet, pourquoi cela sort ? ». Les deux lignes étaient correctement
+rédigées ; elles étaient **au mauvais endroit**. L'une était un écart décidé et consigné cinq jours
+plus tôt, qui portait encore le statut « à décider » — *un écart assumé est une décision prise : il
+se redéclare, il ne se re-propose pas*. L'autre attendait un changement d'origine des médias qui
+n'arrivera peut-être jamais. Sans les trois emplacements, un relevé grossit d'un tiers à chaque
+passage et perd la confiance de son lecteur, **qui cesse alors de l'ouvrir**.
+
 Le reste-à-faire du produit : ce qui est décidé et non fait, ce qui est constaté et non décidé.
 Une amélioration qui touche une FORGE ne vit pas ici — elle part en lot de retours vers le
 pilot (`forge\retours\`), qui est l'écrivain unique de TODO-FORGE.
@@ -76,3 +94,22 @@ redécouvre en incident. Vide se dit « aucun écart à ce jour », jamais par s
 | Écart | Motif | Décidé le | Revu le |
 |---|---|---|---|
 | {ce qu'on ne fait pas} | {pourquoi, en une phrase opposable} | {AAAA-MM-JJ} | {AAAA-MM-JJ} |
+
+## Contraintes connues — ce ne sont PAS des restes à faire
+
+Ce qui **attend une condition extérieure** : une action qui ne se déclenche que si un fait du monde
+change. Tant que la condition n'est pas réunie, il n'y a **rien à faire** — donc rien à proposer.
+Vide se dit « aucune contrainte connue à ce jour », jamais par silence (loi transverse n° 3).
+
+Une ligne d'ici n'a pas de statut, et c'est volontaire : un statut appelle une décision, et il n'y a
+pas de décision à prendre sur un événement qui ne s'est pas produit. Ce qu'elle porte à la place,
+c'est **la condition** — écrite assez précisément pour qu'on reconnaisse le jour où elle survient.
+
+| Contrainte | Condition de déclenchement | Ce qu'il faudra faire alors | Décision en vigueur |
+|---|---|---|---|
+| {ce qui est borné aujourd'hui} | {le fait du monde qui changerait la donne — observable, pas supposé} | {l'action, en une phrase} | {la décision close qui rend la contrainte acceptable, avec sa date} |
+
+**Contrôlé** (`oracle-conformite-projet`, R-20 nature des lignes, TF-0528) : une ligne
+conditionnelle logée dans « Améliorations » est un constat, et une ligne « à décider » qui redit un
+écart déjà assumé plus bas en est un autre. Ce que l'oracle ne voit pas est écrit à son `non_juge` —
+un écart reformulé de bout en bout lui échappe.

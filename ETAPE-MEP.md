@@ -5,7 +5,7 @@ Version 1.0.0 — 2026-08-04
 Development s'arrête volontairement à « PR-ready, jamais mergé ». L'étape MEP est **portée
 par le pilot** et **outillée par forge-ops** (TF-0040, 11/08) : la forge fournit les gestes
 (déployer, restaurer, journal) et leurs verdicts O-1…O-4 — le pilot orchestre, l'oracle
-M-1…M-5 ci-dessous reste la seule vérité de l'étape, et la production reste sur **GO humain**.
+M-1…M-7 ci-dessous reste la seule vérité de l'étape, et la production reste sur **GO humain**.
 Principe : **le staging est autonome, la production est sur GO humain.** La confiance du client
 final se fabrique par un dossier de preuve, pas par l'absence de gate.
 
@@ -17,6 +17,7 @@ Qui fait quoi, et surtout qui NE decide pas : ce tableau se lit par acteur, et l
 |---|---|
 | forge-ops | `ops.mjs deployer <build> <cible>` (healthcheck **avant** bascule, `COURANT` atomique), `restaurer` (rollback re-vérifié puis journalisé), `journal.jsonl` append-only |
 | oracle-ops (O-1…O-4) | pointeur sain, healthcheck rejoué, journal intègre, rollback prouvable — verdicts versés au dossier MEP |
+| oracle-ops (O-8, TF-0527) | tout travail PLANIFIÉ installé par la MEP est exerçable à la demande, câblé et distinct de sa cadence — consommé par M-7, § 3 quinquies |
 | pilot (cette étape) | orchestre les gestes, exécute M-1…M-5 (qui consomme O-1…O-4 comme preuves), assemble `DOSSIER-MEP.md` |
 | humain | **GO production** — incompressible, jamais délégué à un oracle |
 
@@ -89,6 +90,7 @@ Cinq controles, et pour chacun **la preuve exigee** — pas la case a cocher. Le
 | M-4 | Rollback | procédure de `ROLLBACK.md` exécutée une fois avec succès (retour N-1 + healthcheck 200 + retour N) **et RELUE après coup** : le fichier ne porte aucune valeur masquée (`***`, `[REDACTED]`) ni vide — §2 bis, TF-0512 |
 | M-5 | Propreté | aucun secret en clair dans l'image ni dans compose (scan des fichiers embarqués) |
 | M-6 | Hôte historique | **si et seulement si** le produit déclare un hôte historique : la CIBLE d'une redirection résout et répond AVANT que la redirection soit armée, et l'ANCIEN hôte est interrogé APRÈS déploiement (200, ou 301 vers un emplacement qui répond, chemin et requête préservés) — §3 quater, TF-0482 |
+| M-7 | Travail planifié | **si et seulement si** le produit embarque une définition planifiée (cron) : elle porte un mode d'exercice à la demande CÂBLÉ, distinct de sa cadence, et elle a été EXERCÉE une fois — verdict O-8 de forge-ops, § 3 quinquies, TF-0527 |
 
 Verdict au ledger (`oracles_verdict`, étape `mep`). Un contrôle rouge → retour à l'étape
 concernée (max 3 allers-retours, puis diagnostic — même règle que tests↔development).
@@ -139,6 +141,38 @@ quelque chose à juger serait pire que ne rien juger.
 
 **Contrôle exécutable** : `node scripts\verifier-bascule.mjs --historique <url> --cible <url>`
 — avant armement (`--avant`) ou après déploiement (`--apres`).
+
+## 3 quinquies. Un travail planifié s'exerce avant d'être déclaré en place (M-7, TF-0527, 23/08)
+
+**Ce qui a été mesuré.** Une définition de veille mensuelle venait d'être créée et enregistrée, et
+le relevé remis à l'humain annonçait « la veille est en place ». Son premier passage a rendu
+« Pas le premier lundi du mois — rien à faire » et s'est terminé **en succès**. Le script n'avait
+donc **jamais tourné sur un agent** : ni ses dépendances, ni son accès réseau, ni la présence de
+son interpréteur n'avaient été éprouvés. Le premier passage réel aurait eu lieu **quinze jours plus
+tard**, au moment précis où l'on compte dessus. Après ajout d'un paramètre d'exécution forcée
+— distinct de la cadence, qui n'a pas changé — le mécanisme a tourné pour de vrai : trois contrôles
+rendus, tous verts, en 40 secondes.
+
+**La doctrine, et elle existe déjà ailleurs.** Un ✓ sans oracle exécuté n'est pas un ✓ ; un
+mécanisme qui n'a jamais tourné n'est pas un mécanisme, c'est une **intention planifiée**. M-7
+n'est que cette phrase appliquée aux traitements différés. Elle vaut pour tout ce que la MEP
+installe et qui ne s'exécutera que plus tard : veille, purge, sauvegarde, rapport périodique.
+
+**Deux moitiés, et une seule est mécanisable.** Que le mode d'exercice **existe et soit câblé** se
+lit dans la définition — un paramètre déclaré mais jamais lu affiche une case à cocher qui ne fait
+rien, et vaut zéro. Qu'on s'en soit **servi** ne se lit pas dans un fichier : cela vit dans
+l'historique du système d'intégration. La déclaration `# exerce_le: AAAA-MM-JJ` en tête de
+définition porte ce fait, datée ; elle reste un avertissement et jamais un échec, parce qu'une
+définition antérieure au contrôle n'a rien fait de mal. Le dossier MEP, lui, cite le **numéro du
+passage forcé** : c'est la preuve, et elle est humaine à produire une seule fois.
+
+**Ce que M-7 ne fait pas** : il ne devine aucune planification. Un produit sans définition planifiée
+rend `SANS_OBJET`, jamais un échec — et les planifications posées **hors dépôt** (interface web du
+système d'intégration, tâche planifiée d'un serveur) ne laissent aucun fichier à lire : elles sont
+déclarées hors jugement, pas jugées vertes.
+
+**Contrôle exécutable** (chez forge-ops) :
+`node <ops>\oracles\oracle-ops.mjs <racine-du-produit> --planifie` — verdict O-8.
 
 ## 3 bis. Qualif populée (avant le GO — demande utilisateur RT-6/RS-7)
 

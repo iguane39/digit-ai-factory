@@ -598,6 +598,12 @@ check("verte-TODO-PRODUIT : couple source→projection à parité (sceau), front
   const paireMarquee = rapport.findings.find((x) => x.regle === "R-2" && x.statut === "PASS" && /artefact\(s\) marqué\(s\)/.test(x.message));
   if (!paireMarquee || !/^2 /.test(paireMarquee.message))
     throw new Error(`la source ET sa projection doivent être vues marquées et conformes (2 attendus) : ${paireMarquee?.message}`);
+  // TF-0528 : le gabarit porte les TROIS sections, donc la nature des lignes se prononce — et se
+  // prononce en PASS. Un gabarit qui ne satisferait pas le contrôle né avec lui mettrait l'un des
+  // deux en défaut ; ici c'est le même commit qui livre la règle et la forme qu'elle exige.
+  const nat = rapport.findings.find((x) => x.regle === "R-20" && /nature des lignes/.test(x.ou || ""));
+  if (!nat || nat.statut !== "PASS") throw new Error(`nature des lignes non constatée sur le gabarit : ${JSON.stringify(nat)}`);
+  if (!/Contraintes connues » présente/.test(nat.message)) throw new Error("le PASS ne dit pas ce qu'il a vu");
 });
 
 check("verte-TODO-PRODUIT : générateur déterministe (2 exécutions = HTML identique)", () => {
@@ -648,6 +654,114 @@ check("rouge-TODO-PRODUIT : source sans projection → couple rompu, constat loc
   if (!f || f.ou !== "docs\\projet\\TODO-PRODUIT.html") throw new Error(`constat absent ou non localisant : ${JSON.stringify(f)}`);
 });
 
-for (const d of [verte, rouge, rougeDocs, rougeLock, rougeR24, ecartR24, rougeR2, verteR2, rougeR19, verteR19, rougeR42, verteR42, partielR42, verteTdp, rougeTdp, rougeTdpNu]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+// ---- fixtures R-20 « nature des lignes » (TF-0528, 23/08) : TROIS NATURES, TROIS EMPLACEMENTS.
+// Le défaut rejoué est celui qui a été MESURÉ — deux lignes sur neuf contestées par le lecteur,
+// non pour leur rédaction mais pour leur emplacement. -----------------------------------------
+const TDP_NATURE = [
+  "---",
+  "role: reste-à-faire et décisions attendues du produit — vue pour humain, hors session",
+  "destinataire: humain",
+  "sources_de_verite: [forge/QUESTIONS.md]",
+  "verifie_le: 2026-08-24",
+  "---",
+  "",
+  "# Reste à faire — Bibliothèque de démonstration",
+  "",
+  "## Décisions attendues",
+  "",
+  "| Question | Pourquoi elle bloque | Décidée le |",
+  "|---|---|---|",
+  "| Ouvrir le portail aux agents ? | rien ne sort sans elle | - |",
+  "",
+  "## Améliorations",
+  "",
+  "| Id | Amélioration | Origine | Acteur | Pourquoi pas IA | Ordre (et sa clause) | Statut | Preuve du coût |",
+  "|---|---|---|---|---|---|---|---|",
+  "| A-01 | Ajouter la pagination au catalogue des vidéos | retour utilisateur du 21/08 | auto_ia |  | 1 — il supprime 4 constats à la source | à décider | aucune |",
+  "| A-02 | Élargir la politique de sécurité des médias si l'origine des fichiers change | audit du 20/08 | manuelle_dev | decision | 3 — dépend d'un fait extérieur | à décider | aucune |",
+  "| A-03 | Restreindre la portée large des droits d'annuaire du compte de service | audit du 18/08 | manuelle_utilisateur | acces | 2 — un accès de trop est un accès de trop | à décider | aucune |",
+  "| A-04 | Traduire les libellés du lecteur vidéo | retour utilisateur du 22/08 | auto_ia |  | 4 — confort de lecture | décidée | 1 cycle |",
+  "",
+  "## Écarts assumés",
+  "",
+  "| Écart | Motif | Décidé le | Revu le |",
+  "|---|---|---|---|",
+  "| La portée large des droits d'annuaire du compte de service reste en place | restreindre imposerait un ticket d'exploitation par environnement, pour un compte déjà cloisonné | 2026-08-18 | 2026-09-18 |",
+  "",
+  "## Contraintes connues — ce ne sont PAS des restes à faire",
+  "",
+  "| Contrainte | Condition de déclenchement | Ce qu'il faudra faire alors | Décision en vigueur |",
+  "|---|---|---|---|",
+  "| aucune contrainte connue à ce jour | - | - | - |",
+  "",
+].join("\n");
+
+const rougeTdpNature = mkdtempSync(join(tmpdir(), "conf-rouge-tdp-nature-"));
+ecrireDans(rougeTdpNature, "docs/projet/TODO-PRODUIT.md", TDP_NATURE);
+genererTdp(rougeTdpNature);
+check("rouge-nature : la ligne CONDITIONNELLE et l'ÉCART RE-PROPOSÉ sont dénoncés, la vraie amélioration NON", () => {
+  const { exit, rapport } = lance(rougeTdpNature);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const nat = rapport.findings.filter((x) => x.regle === "R-20" && x.statut === "FAIL" && /TODO-PRODUIT\.md ·/.test(x.ou || ""));
+  const surLigne = (id) => nat.find((x) => x.ou.endsWith(id));
+  const cond = surLigne("A-02");
+  if (!cond || !/CONDITIONNELLE/.test(cond.message)) throw new Error(`la ligne conditionnelle A-02 n'est pas dénoncée : ${JSON.stringify(nat.map((x) => x.ou))}`);
+  if (!/Contraintes connues/.test(cond.message)) throw new Error("le constat ne dit pas où la ligne doit aller");
+  const reserve = surLigne("A-03");
+  if (!reserve || !/ÉCART DÉJÀ ASSUMÉ/.test(reserve.message)) throw new Error(`l'écart re-proposé A-03 n'est pas dénoncé : ${JSON.stringify(nat.map((x) => [x.ou, x.message.slice(0, 60)]))}`);
+  if (!/2026-08-18/.test(reserve.message)) throw new Error("le constat ne dit pas QUAND l'écart avait été décidé — sans la date, le lecteur ne peut pas trancher");
+  // LE VERROU : A-01 est un VRAI reste à faire, « à décider » à bon droit, et A-04 est décidée.
+  // Un contrôle qui les accuserait rendrait la section inutilisable — c'est exactement ce que
+  // craint le seuil conservateur de quatre mots communs.
+  for (const innocent of ["A-01", "A-04"])
+    if (surLigne(innocent)) throw new Error(`faux positif sur ${innocent} : ${surLigne(innocent).message}`);
+});
+
+// SENS INVERSE de la MÊME fixture : les deux lignes remises à leur place → plus aucun constat.
+const verteTdpNature = mkdtempSync(join(tmpdir(), "conf-verte-tdp-nature-"));
+ecrireDans(verteTdpNature, "docs/projet/TODO-PRODUIT.md", TDP_NATURE
+  .replace("| A-02 | Élargir la politique de sécurité des médias si l'origine des fichiers change | audit du 20/08 | manuelle_dev | decision | 3 — dépend d'un fait extérieur | à décider | aucune |\n", "")
+  .replace("| A-03 | Restreindre la portée large des droits d'annuaire du compte de service | audit du 18/08 | manuelle_utilisateur | acces | 2 — un accès de trop est un accès de trop | à décider | aucune |\n", "")
+  .replace("| aucune contrainte connue à ce jour | - | - | - |",
+    "| La politique de sécurité des médias n'autorise que l'origine propre | l'origine des fichiers vidéo cesse d'être le stockage du produit | élargir la politique à la nouvelle origine, et la re-tester | sujet clos le 2026-08-21, l'origine ne change pas |"));
+genererTdp(verteTdpNature);
+check("verte-nature : les deux lignes remises à leur place → PASS qui DIT ce qu'il a compté", () => {
+  const { rapport } = lance(verteTdpNature);
+  const nat = rapport.findings.filter((x) => x.regle === "R-20" && /nature des lignes/.test(x.ou || ""));
+  const pass = nat.find((x) => x.statut === "PASS");
+  if (!pass) throw new Error(`aucun PASS sur la nature des lignes : ${JSON.stringify(rapport.findings.filter((x) => x.regle === "R-20").map((x) => [x.statut, x.ou]))}`);
+  if (!/2 amélioration\(s\) réelle\(s\)/.test(pass.message)) throw new Error(`le PASS ne compte pas juste : ${pass.message}`);
+  if (rapport.findings.some((x) => x.regle === "R-20" && x.statut === "FAIL" && /·/.test(x.ou || "")))
+    throw new Error("des constats de nature subsistent alors que les lignes sont bien rangées");
+});
+
+// (e) La SECTION ABSENTE : défaut si le document a été revu APRÈS l'entrée en vigueur, antériorité
+// déclarée sinon. Le signal de date vit DANS le fichier (`verifie_le`) — aucune boucle d'historique,
+// aucune date de système de fichiers (décision humaine du 23/08 sur le coût des traitements).
+const sansSection = TDP_NATURE.replace(/## Contraintes connues[\s\S]*$/, "");
+const rougeTdpSection = mkdtempSync(join(tmpdir(), "conf-rouge-tdp-section-"));
+ecrireDans(rougeTdpSection, "docs/projet/TODO-PRODUIT.md", sansSection);
+genererTdp(rougeTdpSection);
+check("rouge-nature : section « Contraintes connues » absente d'un document revu APRÈS le 23/08 → défaut", () => {
+  const { exit, rapport } = lance(rougeTdpSection);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const f = rapport.findings.find((x) => x.regle === "R-20" && x.statut === "FAIL" && /Contraintes connues/.test(x.message));
+  if (!f) throw new Error("absence de la troisième section non dénoncée");
+  if (!/2026-08-24/.test(f.message)) throw new Error("le constat ne dit pas SUR QUELLE DATE il s'appuie pour juger");
+  if (!/aucune contrainte connue à ce jour/.test(f.message)) throw new Error("le constat ne dit pas comment se déclare une section vide (loi n° 3)");
+});
+
+const antTdpSection = mkdtempSync(join(tmpdir(), "conf-ant-tdp-section-"));
+ecrireDans(antTdpSection, "docs/projet/TODO-PRODUIT.md", sansSection.replace("verifie_le: 2026-08-24", "verifie_le: 2026-08-20"));
+genererTdp(antTdpSection);
+check("antériorité-nature : le même document revu AVANT l'entrée en vigueur → non jugé, jamais accusé", () => {
+  const { rapport } = lance(antTdpSection);
+  if (rapport.findings.some((x) => x.regle === "R-20" && x.statut === "FAIL" && /Contraintes connues/.test(x.message)))
+    throw new Error("un document antérieur à la règle est mis en défaut — c'est la RÈGLE qui a bougé, pas le produit (TF-0366)");
+  const declare = (rapport.non_juge || []).find((x) => /nature des lignes.*verifie_le=2026-08-20/.test(x));
+  if (!declare) throw new Error("l'antériorité n'est pas DÉCLARÉE au non_juge — un contrôle qui se tait sans le dire est un contrôle absent");
+});
+
+for (const d of [verte, rouge, rougeDocs, rougeLock, rougeR24, ecartR24, rougeR2, verteR2, rougeR19, verteR19, rougeR42, verteR42, partielR42, verteTdp, rougeTdp, rougeTdpNu, rougeTdpNature, verteTdpNature, rougeTdpSection, antTdpSection]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 console.log(`\nSelf-test conformité projet : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
