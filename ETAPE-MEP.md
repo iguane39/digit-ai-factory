@@ -88,6 +88,7 @@ Cinq controles, et pour chacun **la preuve exigee** — pas la case a cocher. Le
 | M-3 | Smoke tests | ≥ 1 parcours rejoué par exigence MVP d'impact maximal (champ `cotation.impact` du référentiel `EXIGENCES.json` — toutes les ex æquo du niveau le plus élevé), exécutés **contre l'instance staging servie**, pas contre un TestClient |
 | M-4 | Rollback | procédure de `ROLLBACK.md` exécutée une fois avec succès (retour N-1 + healthcheck 200 + retour N) **et RELUE après coup** : le fichier ne porte aucune valeur masquée (`***`, `[REDACTED]`) ni vide — §2 bis, TF-0512 |
 | M-5 | Propreté | aucun secret en clair dans l'image ni dans compose (scan des fichiers embarqués) |
+| M-6 | Hôte historique | **si et seulement si** le produit déclare un hôte historique : la CIBLE d'une redirection résout et répond AVANT que la redirection soit armée, et l'ANCIEN hôte est interrogé APRÈS déploiement (200, ou 301 vers un emplacement qui répond, chemin et requête préservés) — §3 quater, TF-0482 |
 
 Verdict au ledger (`oracles_verdict`, étape `mep`). Un contrôle rouge → retour à l'étape
 concernée (max 3 allers-retours, puis diagnostic — même règle que tests↔development).
@@ -104,6 +105,40 @@ Tant que ce trou tient, le dossier de MEP d'un produit public porte un **écart 
 humain** : « conformité RGAA non mesurée — audit humain à budgéter, déclaration d'accessibilité
 à produire ». « Prêt client » ne se prononce jamais sur une conformité légale non mesurée en la
 taisant.
+
+## 3 quater. La bascule de domaine (M-6, TF-0482, 18/08 puis 22/08)
+
+*Incident réel du 18/08.* Le renommage d'un hôte a été livré avec une **redirection 301 dure** vers
+un domaine **qui ne résolvait pas encore**. Le site est devenu injoignable, rétabli en une vingtaine
+de secondes en conditionnant la redirection à un drapeau désarmé par défaut.
+
+**Pourquoi aucune porte n'a vu.** Les gates M-1…M-5 s'exercent contre **une seule base** — la
+NOUVELLE URL. L'ancienne n'est interrogée nulle part. Un déploiement qui la casse rend donc **un
+vert complet**, et c'est structurel : on ne peut pas voir ce qu'on n'interroge pas. Recherche faite
+le 22/08 sur les 479 items du registre : zéro candidature sur l'hôte sortant, la redirection ou le
+domaine historique — l'angle mort n'était pas connu, il était invisible.
+
+**Deux angles morts DISTINCTS, tous deux scriptables en une requête :**
+
+1. **Avant armement** — la CIBLE d'une redirection n'était pas vérifiée résolvante. Une cible qui ne
+   répond pas rend l'armement **bloquant**, pas déconseillé : armer un 301 vers un domaine muet, ce
+   n'est pas un risque pris, c'est une panne programmée.
+2. **Après déploiement** — l'hôte SORTANT n'était pas interrogé. On exige soit un 200, soit un 301
+   vers un emplacement **qui répond**, **chemin et requête préservés** : une redirection qui perd le
+   chemin renvoie tout le trafic profond sur l'accueil, et personne ne s'en plaint tout de suite.
+
+**Corollaire de doctrine, et c'est lui qui rend la porte utile plutôt que punitive** : une bascule de
+domaine se fait **EN DEUX TEMPS** — armer par drapeau, vérifier la cible, puis basculer. Le gate est
+ce qui rend les deux temps **obligatoires** plutôt que disciplinés. C'est exactement le remède qui a
+été improvisé le 18/08 sous incident ; M-6 le rend systématique.
+
+**Ce que M-6 ne fait pas** : il ne devine aucun hôte. Il s'exerce **si et seulement si** le produit
+DÉCLARE ses hôtes historiques — la forme existe déjà côté produit (`HOTES_HISTORIQUES`). Un produit
+sans hôte historique rend `SANS_OBJET`, jamais un échec : inventer une redirection pour avoir
+quelque chose à juger serait pire que ne rien juger.
+
+**Contrôle exécutable** : `node scripts\verifier-bascule.mjs --historique <url> --cible <url>`
+— avant armement (`--avant`) ou après déploiement (`--apres`).
 
 ## 3 bis. Qualif populée (avant le GO — demande utilisateur RT-6/RS-7)
 
