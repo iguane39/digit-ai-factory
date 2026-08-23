@@ -277,6 +277,12 @@ const html = `<!DOCTYPE html>
        coupe que ce qui ne tient pas, ce qui est le comportement voulu ici : le contenu des
        candidatures est du francais, avec quelques chemins longs. La regle L19 du socle refuse
        desormais anywhere sur un selecteur de prose, et elle a mordu sur CETTE page. */
+    /* L21 (TF-0521) : deux composants de la charte etaient DECLARES ici sans etre styles —
+       l'annonce de chapitre et le detail du sommaire. Ni l'oracle de marquage ni celui du rendu
+       ne pouvaient le voir : la classe existait, et rien ne debordait. C'est la regle ecrite ce
+       matin qui les a trouves, sur cette page. */
+    .ch-apprend{color:var(--muted);margin:.2em 0 1.1em}
+    .toc-d{color:var(--muted);font-weight:400}
     .card-detail,.card-detail li,.card-meta dd{overflow-wrap:break-word}
     /* Le code et les chemins, eux, ont besoin de casser n importe ou : la regle les exempte. */
     .card-detail code,.card-detail pre{overflow-wrap:anywhere}

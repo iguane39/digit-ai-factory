@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=c5b06b288513 archive=54c0315cbe97 · dernier événement: 2026-08-23T07:50:53.370Z -->
+     sceaux: actifs=b07396944fd1 archive=54c0315cbe97 · dernier événement: 2026-08-23T08:21:15.964Z -->
 
-**57 actifs** (candidat 19 · décidé 0 · en cours 1 · corrigé 36 · écarté 1) · **469 archivés**.
+**61 actifs** (candidat 23 · décidé 0 · en cours 1 · corrigé 36 · écarté 1) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -74,6 +74,13 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0489 | candidat | 6.7 | forge-design : aucun composant « lecteur de source » au catalogue alors que la regle d autoportance impose d embarquer les sources citees | **oui** — 130 lignes de convertisseur ecrites a la main, plus la decouverte du seuil de DOM par essai ; besoin cree par une regle du socle lui-meme. |
 | TF-0494 | corrige | 15 | forge-design : le workflow auditer ne prescrit aucune tracabilite pour une demande client multiple | **oui** — Un point sur dix-sept perdu, decouvert par le client et non par la chaine de controle. |
 
+## digit-ai-forge-ops
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0527 | candidat | 20 | ops : un travail PLANIFIE qu'on ne peut pas declencher a la demande n'est jamais prouve — il se decouvre casse au moment ou l'on compte dessus | **oui** — un mecanisme declare « en place » dans un releve remis a l'humain, qui n'avait jamais execute une seule ligne sur un agent |
+| TF-0529 | candidat | 15 | ops : une instance d'approbation FIGE la contrainte de separation des roles a sa creation — relacher le reglage ne debloque pas l'instance en attente | **oui** — une porte de deploiement laissee bloquee 26 heures, et une demi-heure de recherche pour etablir que le relachement du reglage ne s'applique pas retroactivement |
+
 ## digit-ai-forge-seo-geo
 
 | id | statut | score | titre | payé en réel |
@@ -91,6 +98,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0526 | candidat | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
+| TF-0528 | candidat | 20 | pilot : le reste-a-faire melange TROIS NATURES dans une seule table — un ecart assume et une contrainte conditionnelle ressortent indefiniment comme du travail en attente | **oui** — deux lignes sur neuf re-servies a un lecteur qui les avait deja tranchees, dont une decision consignee cinq jours plus tot au journal des decisions du produit |
 | TF-0520 | candidat | 15 | pilot : les deux squelettes DAT et DEX livres le 21/08 ECHOUAIENT a l'oracle du socle, sur leur propre feuille de style | **oui** — deux gabarits publies en statut ok le 21/08 dont les squelettes echouaient a l'oracle du socle — decouvert au premier usage reel, deux jours plus tard |
 | TF-0525 | candidat | 15 | Un SECOND clone du pilot vit sur le poste sous son ancien nom (digit-ai-forge-steering_old) : registre TODO divergent, 88 commits de retard, et une candidature qu'il a fallu redecouvrir quatre jours plus tard | **oui** — paye et mesurable : une candidature ingeree le 18/08 dans le registre du clone n'a jamais atteint le registre vivant, et son sujet a du etre REDECOUVERT le 22/08 par un autre canal (TF-0482) — quatre jours d'ecart pour un travail deja fait. Le clone porte 88 commits de retard et 3 modifications locales non commitees ; `bootstrap.mjs --pull` ne le voit pas et ne le verra jamais, puisqu'il n'est pas dans sa liste. |
 | TF-0519 | candidat | 10 | produit-07 : l ancien hote forge.produit-07 NE RESOUT PLUS DU TOUT — le trafic qui le connait encore tombe dans le vide, et c est le gate neuf M-6 qui l a mesure | **oui** — mesure le 23/08 : forge.produit-07 rend ENOTFOUND, donc aucune redirection n est possible. Une erreur de resolution n est pas une page 404 — un lecteur conclut que le produit n existe plus, et un moteur retire les pages de l index sans transferer l anteriorite. L etat viole la regle ecrite le jour meme a ETAPE-MEP section 3 quater. |
