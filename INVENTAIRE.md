@@ -318,7 +318,7 @@ mécanisme de tickets (TF-0318, moitié écriture) sans jamais le confronter à 
   consigné et non bloquant, comme la règle le prévoit ; les cinq limites que l'oracle déclare
   lui-même (v0 statique) sont reprises telles quelles — elles suffisent à une admission
   documentaire, pas à un câblage.
-- **Dans la liste des dépôts suivis depuis le 23/08/2026** (décision humaine, TF-0535) — et
+- **Dans la liste des dépôts suivis depuis le 23/08/2026** (décision humaine CONFIRMÉE le même jour, une fois la décision antérieure du 18/08 remontée au pilote — TF-0535) — et
   cette ligne disait exactement le contraire jusque-là : « le dépôt n'entre pas dans la liste
   `FORGES` de `bootstrap.mjs`… c'est voulu : on n'installe pas d'office un protocole qu'on
   n'exécute pas ». **Le raisonnement du 18/08 valait pour un poste qui ne l'a pas** ; il ne valait

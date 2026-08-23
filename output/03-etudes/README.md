@@ -39,7 +39,7 @@
 | `20260817-etude-opportunite-tests-bout-en-bout.md` | fichier | 27,5 Ko | Étude d'opportunité — fermeture de la voie « proposition de tests » (TF-0349) — 20260817j |
 | `20260817-etude-opportunite-todo-produit.md` | fichier | 27,6 Ko | Étude d'opportunité — la todo de chaque produit en page HTML — 20260817i |
 | `20260818-cartographie-oracles-cadence-de-mission.md` | fichier | 5,7 Ko | Digit-AI — Cartographie des oracles : les cinq artefacts de cadence — 20260818a |
-| `20260818-etude-opportunite-admission-digit-ai-queue.md` | fichier | 14,0 Ko | Étude d'opportunité — admission de `digit-ai-queue` au corpus du pilot — 20260818a |
+| `20260818-etude-opportunite-admission-digit-ai-queue.md` | fichier | 14,9 Ko | Étude d'opportunité — admission de `digit-ai-queue` au corpus du pilot — 20260818a |
 | `20260818-etude-opportunite-cablage-orchestrer-boucle.md` | fichier | 12,4 Ko | Étude d'opportunité — câbler `orchestrer-boucle.mjs` en appelant réel — 20260818b |
 | `20260818-etude-opportunite-memoire-partagee.md` | fichier | 25,4 Ko | Étude d'opportunité — mémoire partagée à portées croisées prestataire / client — 20260819b |
 | `20260818-etude-opportunite-retour-usage-vers-delta.md` | fichier | 9,1 Ko | Étude d'opportunité — retour d'usage → delta opposable — 20260818b |
