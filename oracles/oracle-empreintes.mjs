@@ -190,7 +190,16 @@ const depots = existsSync(racine)
         // du balayage par son nom (`_archive-…`, hors du motif `^digit-ai`) et bootstrap DÉCLARE
         // tout clone d'avant un renommage. Une exclusion nommée est le signe qu'une cause n'a
         // pas été traitée : elle vaut d'être relue à chaque fois qu'on en écrit une.
-        && !/_old$|_vide$|\.bundle$|_client-a$/.test(e.name))
+        // UNE SEULE EXCLUSION NOMMÉE SUBSISTE, ET SA CAUSE EST ÉCRITE (règle N-13) :
+        // `digit-ai-forge-audit_client-a` est l'espace d'engagement CLIENT — privé, hors bootstrap,
+        // et porteur de livrables et non d'outillage. Ce n'est pas une forge : le balayer
+        // rendrait des constats sur des artefacts remis, que personne ne peut plus corriger.
+        // Les alternatives `_old$`, `_vide$` et `.bundle$` ont été RETIRÉES le 23/08 : plus aucun
+        // répertoire du parc ne les portait, et une alternative sans cible est une règle morte
+        // qui donne l'illusion d'une protection. La convention qui les remplace est le PRÉFIXE
+        // `_archive-` (voir references/CONVENTION-DEPOTS-MIS-DE-COTE.md) : un dépôt mis de côté
+        // sort du motif `^digit-ai` par son NOM, une fois, au lieu d'être exclu dans chaque oracle.
+        && !/_client-a$/.test(e.name))
       .map((e) => e.name)
   : [];
 if (!depots.length) {

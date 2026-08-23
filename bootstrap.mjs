@@ -231,6 +231,15 @@ for (const f of FORGES) {
 // serait échanger un piège contre une perte.
 console.log("");
 {
+  // HORS PÉRIMÈTRE DÉCLARÉ, avec la cause de chacun (règle N-13). Un dépôt de l'écosystème que
+  // bootstrap ne suit PAS exprès se nomme ici, une fois — sinon le contrôle qui suit le signale à
+  // chaque ouverture, et un avertissement qui revient sans jamais rien vouloir dire s'apprend à
+  // être ignoré. C'est la mesure du 23/08 qui l'impose : la règle neuve rendait TROIS dépôts, dont
+  // deux volontaires et déjà documentés ailleurs. Une précision d'un sur trois n'est pas un contrôle.
+  const HORS_PERIMETRE = new Map([
+    ["digit-ai-forge-audit_client-a", "espace d'engagement CLIENT, privé et hors bootstrap — porte des livrables remis, pas de l'outillage"],
+    ["digit-ai - saas forge", "produit SaaS distinct, gouverné par son propre dépôt public — l'écosystème forge ne le pilote pas"],
+  ]);
   const connus = new Map();          // origin normalisé -> nom du dépôt attendu
   const attendus = new Set(FORGES.map((f) => f.nom));
   attendus.add("digit-ai-factory");
@@ -275,11 +284,19 @@ console.log("");
     const d = join(racine, nom);
     const estGit = existsSync(join(d, ".git"));
     const perime = existsSync(join(d, "PERIME.md"));
-    const nommeMisDeCote = /(_old|_vide|_ancien|_backup|\.bak)$/i.test(nom);
+    // `_archive-` est la convention du parc depuis le 23/08 (references/CONVENTION-DEPOTS-MIS-DE-COTE.md) :
+    // un dépôt mis de côté se RENOMME une fois, au lieu d'être exclu nommément dans chaque contrôle.
+    const nommeMisDeCote = /(_old|_vide|_ancien|_backup|\.bak)$/i.test(nom) || /^_archive-/i.test(nom);
     if (!estGit) {
+      // UN MARQUEUR POSÉ EXPRÈS SE LIT AVANT DE CRIER À L'ACCIDENT (23/08/2026). Cette branche
+      // passait avant toute lecture de `PERIME.md` : un répertoire tombé là par mégarde et une
+      // PIERRE TOMBALE posée délibérément recevaient le même verdict, « rien de ce qu'on y écrit
+      // n'est suivi ». Or l'un est un accident à corriger et l'autre un choix à respecter — les
+      // confondre apprend à ignorer les deux.
+      if (perime) suspects.push({ nom, motif: "mise de côté DÉCLARÉE (PERIME.md présent, répertoire non versionné) — pierre tombale, pas accident" });
       // Un répertoire NON git qui porte le nom d'un dépôt de l'écosystème est un piège aussi : on
       // s'y installe en croyant être dans un dépôt, et rien n'y est versionné.
-      if (/^digit-ai/i.test(nom)) suspects.push({ nom, motif: "répertoire NON versionné portant un nom de l'écosystème — rien de ce qu'on y écrit n'est suivi" });
+      else if (/^digit-ai/i.test(nom)) suspects.push({ nom, motif: "répertoire NON versionné portant un nom de l'écosystème — rien de ce qu'on y écrit n'est suivi" });
       continue;
     }
     const o = originDe(d);
@@ -294,7 +311,18 @@ console.log("");
       continue;
     }
     if (perime || nommeMisDeCote) {
-      suspects.push({ nom, motif: `mise de côté (${perime ? "PERIME.md présent" : "nom en _old/_vide"}) — ne rien y exécuter` });
+      suspects.push({ nom, motif: `mise de côté (${perime ? "PERIME.md présent" : "nom archivé ou en _old/_vide"}) — ne rien y exécuter` });
+      continue;
+    }
+    // LE TROISIÈME TROU DE CE MÊME BALAYAGE, trouvé le 23/08 en regardant la racine à l'œil : un
+    // dépôt qui porte un nom de l'écosystème, versionné, avec SON PROPRE origin — donc ni une forge
+    // de la liste, ni un second clone, ni une mise de côté. Il tombait entre toutes les branches et
+    // n'était déclaré NULLE PART. Mesuré : `digit-ai-queue` vit dans le parc depuis un moment, hors
+    // de toute vérification de fraîcheur, et rien ne l'avait jamais dit. Le contrôle ne tranche pas
+    // — il POSE la question, parce que la réponse (entrer dans la liste, ou être hors périmètre
+    // assumé) est une décision humaine.
+    if (/^digit-ai/i.test(nom) && !HORS_PERIMETRE.has(nom.toLowerCase())) {
+      suspects.push({ nom, motif: `dépôt de l'écosystème HORS LISTE avec son propre origin (${o || "origin illisible"}) — ni forge suivie, ni second clone, ni mise de côté : jamais vérifié par --pull. À inscrire dans la liste des forges, ou à déclarer hors périmètre` });
     }
   }
   if (!suspects.length) ligne("ok", `racine propre — aucun dépôt hors liste sous ${racine}`);
