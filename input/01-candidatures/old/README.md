@@ -19,6 +19,7 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `candidature-clone-doublon-pilot-20260823.tf.jsonl` | fichier | 3,5 Ko | 1 ligne(s) JSONL |
 | `candidature-consigne-restitution.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
 | `candidature-convention-rangement-output.tf.jsonl` | fichier | 2,6 Ko | 1 ligne(s) JSONL |
+| `candidature-couverture-par-exigence-20260823.tf.jsonl` | fichier | 3,8 Ko | 1 ligne(s) JSONL |
 | `candidature-decision-sans-rappel-de-son-sujet.tf.jsonl` | fichier | 2,6 Ko | 1 ligne(s) JSONL |
 | `candidature-ecrivain-unique.tf.jsonl` | fichier | 1,0 Ko | 1 ligne(s) JSONL |
 | `candidature-empreinte-format-partage.tf.jsonl` | fichier | 3,7 Ko | 1 ligne(s) JSONL |
@@ -70,4 +71,4 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `revue-20260819-pilot.normalise.tf.jsonl` | fichier | 2,1 Ko | 1 ligne(s) JSONL |
 | `revue-20260819-pilot.tf.jsonl` | fichier | 2,1 Ko | 1 ligne(s) JSONL |
 
-_55 fichier(s), 0 sous-dossier(s)_
+_56 fichier(s), 0 sous-dossier(s)_
