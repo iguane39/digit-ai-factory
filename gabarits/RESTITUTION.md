@@ -4,10 +4,14 @@
 avec `destinataire: humain` en frontmatter YAML. La localisation R-2/E9 ne juge que ce qui
 est MARQUÉ — sans porteur, la règle est un faux négatif volontaire : elle est livrée,
 prouvée à zéro faux positif, et ne voit rien. Le marquage a été vérifié toléré par
-`oracle-synthese` (S1-S8 à l'époque, S1-S20 depuis la v2.9.0) sur une synthèse réelle PASS avant d'être prescrit ici.
+`oracle-synthese` (S1-S8 à l'époque, S1-S21 depuis la v2.10.0) sur une synthèse réelle PASS avant d'être prescrit ici.
 Cette consigne, elle, ne se marque PAS : c'est un référentiel normatif, pas un livrable.
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 2.9.0, 22/08/2026** (mandat humain
+Référentiel versionné (loi n° 4, daté-éditable) — **version 2.10.0, 23/08/2026** (règle **S21**,
+second volet de S12 : un motif `acces` ou `presence` porte la TRACE MESURÉE de la tentative — un
+code de réponse, un message d'erreur, une sortie de commande. Le destinataire a contesté sept lignes
+sur neuf d'un relevé, dont plusieurs par « pourquoi ce n'est pas déjà fait par l'IA ») — précédente :
+**2.9.0, 22/08/2026** (mandat humain
 « traite tous les todos et retours » : cinq retours de forme du 22/08 traités d'un coup, tous
 mesurés sur la même session — **S17** un renvoi nomme son sujet et jamais une position ·
 **S18** les tableaux d'un même bloc portent le même en-tête · **S19** toute action dit ce qui se
@@ -312,6 +316,38 @@ sur « MESURE » et « AUCUNE » se fait désactiver dans la semaine. **La liste
 réellement coûté un aller-retour**, et elle grossit par les retours, pas par la devinette : c'est
 la limite, elle est déclarée en `non_juge`.
 
+#### Une impossibilité s'ÉPROUVE, elle ne s'affirme pas (S21, « S12 bis », 23/08/2026)
+
+*La mesure tient dans la COMPARAISON de deux cas du même relevé, traités différemment le même jour.*
+
+- **Cas honnête** — pour modifier une application d'authentification, l'appel a été **tenté et
+  mesuré** : `HTTP 403 Authorization_RequestDenied`, puis vérification que le compte ne porte aucun
+  rôle d'annuaire. L'attribution à l'humain était fondée, **et la trace le prouvait**.
+- **Cas fautif** — pour une porte d'approbation bloquée depuis 26 heures, le blocage a été
+  **affirmé** et le sujet renvoyé à l'humain… alors que la même classe de contrainte avait déjà été
+  levée **deux fois le jour même**, avec l'accord du destinataire. Le motif était vrai ;
+  **l'attribution était fausse.**
+
+**S12 ne peut pas voir la différence** : elle lit un jeton de vocabulaire fermé, pas une tentative.
+Le destinataire a contesté **sept lignes sur neuf** de ce relevé, dont plusieurs par « pourquoi ce
+n'est pas déjà fait par l'IA ». Le coût d'une attribution non éprouvée n'est donc pas théorique :
+c'est un aller-retour, et la confiance dans la liste entière.
+
+**S21 exige donc, DANS LE MÊME GROUPE DE PUCE, la trace mesurée de la tentative** — un code de
+réponse, un message d'erreur, une sortie de commande.
+
+**Portée volontairement étroite** : seuls `acces` et `presence` sont concernés. Ce sont les deux
+motifs qui affirment un **fait du monde**, donc les deux qui se mesurent. `decision`, `depense` et
+`irreversible` relèvent d'un arbitrage, et exiger d'« essayer » une décision n'aurait aucun sens —
+*ce qui laisse une attribution abusive sous `decision` invisible, et c'est la limite assumée.*
+
+**Un piège payé en écrivant la règle, et il vaut d'être connu** : le motif destiné aux codes
+techniques (`ENOTFOUND` et sa famille) avait été mis dans la même expression que les mots français,
+avec le drapeau insensible à la casse. Il matchait alors le mot « ecran ». La règle rendait PASS sur
+une action sans aucune trace : **elle était morte en croyant vivre**, et c'est le pire état pour un
+contrôle — il rassure au lieu de juger. Codes et mots vivent désormais dans deux expressions
+séparées.
+
 **Les vocabulaires sont fermés ET non accentués**, et ce n'est pas un détail de style : c'est ce
 qui les rend **comptables** (« combien d'actions restent humaines par `acces` ? ») et ce qui les
 empêche d'être déclenchés par hasard par de la prose française — « décision », « accès »,
@@ -376,8 +412,8 @@ jamais celui de l'auteur :
 - **S8 ignore la tournure conditionnelle de S19.** « si rien n'est fait » contient le mot
   « fait », que S8 lisait comme une affirmation de complétion sans preuve.
 
-**Exécuté** : `node oracles\oracle-synthese.mjs <synthese.md>` — règles S1-S20 binaires,
-fixtures double sens au self-test (la fixture rouge échoue sur 15 règles distinctes).
+**Exécuté** : `node oracles\oracle-synthese.mjs <synthese.md>` — règles S1-S21 binaires,
+fixtures double sens au self-test (la fixture rouge échoue sur 16 règles distinctes).
 **Proportionnalité (v2.5.0, inchangée)** : bloquantes S1, S3, S4, S6 ; tout le reste — S17 à S20
 comprises — entre en AVERTISSANTE, dit en une ligne sous la réponse et jamais réécrit. Une action
 sans conséquence rend la liste moins utile, jamais illisible ; les règles se durciront quand le

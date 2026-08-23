@@ -57,6 +57,10 @@
  *       symétrique de S16 côté actions. Une liste de restes sans conséquences est un
  *       inventaire, pas un outil d'arbitrage : c'est cette colonne qui permet de choisir ce
  *       qu'on laisse tomber.
+ *   S21 second volet de S12 (« S12 bis ») : un motif `acces` ou `presence` porte, DANS LE MÊME
+ *       GROUPE, la TRACE MESURÉE de la tentative — un code de réponse, un message d'erreur, une
+ *       sortie de commande (TF-0526, 23/08/2026). S12 lit un jeton de vocabulaire ; elle ne peut
+ *       pas voir la différence entre une impossibilité ÉPROUVÉE et une impossibilité SUPPOSÉE.
  *   S20 un terme du référentiel `gabarits\JARGON-A-GLOSER.json` employé aux blocs 3 ou 8
  *       porte sa glose adjacente (TF-0511, 22/08) — S9 ne juge que l'OUVERTURE, or c'est aux
  *       blocs qu'on EXÉCUTE que le jargon coûte le plus : un jargon au bloc 0 fait perdre le
@@ -430,6 +434,46 @@ function juger(texte) {
     "et la même ligne se re-sert d'une liste à l'autre.",
     "chaque action porte un identifiant stable ou se déclare neuve");
 
+  // ---- S21 (TF-0526, 23/08) — « acces » et « presence » se PROUVENT, ils ne s'affirment pas ---
+  //
+  // LA MESURE QUI A FAIT NAÎTRE LA RÈGLE tient dans la COMPARAISON de deux cas du même relevé,
+  // traités différemment le même jour.
+  //   · CAS HONNÊTE — pour modifier une application d'authentification : l'appel a été TENTÉ et
+  //     mesuré (« HTTP 403 Authorization_RequestDenied »), puis vérifié que le compte n'a aucun
+  //     rôle d'annuaire. L'attribution à l'humain était fondée, et la trace le prouvait.
+  //   · CAS FAUTIF — pour une porte d'approbation bloquée depuis 26 heures : le blocage a été
+  //     AFFIRMÉ et le sujet renvoyé à l'humain, alors que la même classe de contrainte avait déjà
+  //     été levée DEUX FOIS le jour même, avec l'accord du destinataire. Le motif « decision »
+  //     était vrai ; L'ATTRIBUTION ÉTAIT FAUSSE.
+  //
+  // S12 ne peut pas voir la différence : elle lit un jeton de vocabulaire fermé, pas une tentative.
+  // Le destinataire a contesté sept lignes sur neuf de ce relevé, dont plusieurs par « pourquoi ce
+  // n'est pas déjà fait par l'IA ». Le coût d'une attribution non éprouvée n'est donc pas
+  // théorique : c'est un aller-retour, et la confiance dans la liste entière.
+  //
+  // PORTÉE VOLONTAIREMENT ÉTROITE : seuls `acces` et `presence` sont concernés — ce sont les deux
+  // motifs qui affirment un FAIT DU MONDE, donc les deux qui se mesurent. `decision`, `depense` et
+  // `irreversible` relèvent d'un arbitrage, et exiger d'« essayer » une décision n'aurait aucun sens.
+  const MOTIFS_MESURABLES = /\b(acces|presence)\b/;
+  // La trace : un code de réponse, un message d'erreur, une sortie de commande. On exige un jeton
+  // de TENTATIVE **et** une preuve au sens de S8 — la fonction est déjà écrite, comme le lot le
+  // proposait. Les deux ensemble, parce qu'un chemin de fichier seul satisferait `preuve()` sans
+  // rien prouver d'une tentative.
+  // DEUX motifs, et la séparation n'est pas cosmétique : un CODE technique est sensible à la
+  // casse, un mot français ne l'est pas. Un premier jet mettait tout dans une seule expression
+  // avec le drapeau insensible, et le motif destiné aux codes du genre ENOTFOUND matchait alors
+  // le mot « ecran ». La règle rendait PASS sur une action sans aucune trace : elle était MORTE
+  // EN CROYANT VIVRE, et c'est le pire état pour un contrôle — il rassure au lieu de juger.
+  const TRACE_CODE = /(HTTP\s*\d{3}|\b\d{3}\s+(?:Forbidden|Unauthorized|Denied|Conflict)\b|\bE[A-Z]{4,}\b|Authorization_\w+)/;
+  const TRACE_MOT = /(exit\s*\d|permission denied|access denied|\btent[ée]e?s?\b|\bessay[ée]e?s?\b|\brefus[ée]e?s?\b|\bmesur[ée]e?s?\b)/i;
+  const TRACE_TENTATIVE = { test: (g) => TRACE_CODE.test(g) || TRACE_MOT.test(g) };
+  juger8("S21", MOTIFS_MESURABLES, (g) => TRACE_TENTATIVE.test(g) && preuve(g),
+    "un motif `acces` ou `presence` SANS trace mesurée de la tentative : l'impossibilité est affirmée, " +
+    "pas éprouvée. Ces deux motifs affirment un FAIT DU MONDE, donc ils se mesurent — un code de " +
+    "réponse, un message d'erreur, une sortie de commande, dans le même groupe de puce. " +
+    "`decision`, `depense` et `irreversible` relèvent d'un arbitrage et ne sont pas concernés.",
+    "chaque motif `acces`/`presence` porte la trace mesurée de sa tentative");
+
   // ---- S19 (TF-0510, 22/08) — une action dit ce qui se passe si elle n'est PAS faite -------
   //
   // Demande humaine du 22/08, littérale et SYMÉTRIQUE : « fournir des actions claires, les
@@ -660,7 +704,7 @@ Aucun écart : la demande a été suivie à la lettre.
   - où : \`forge_tests\\corpus.py\`, puis relancer la recette S-01.
   - si rien n'est fait : les corrections suivantes du corpus restent bloquées derrière celle-là.
 - ensuite TF-0221 (manuelle_utilisateur) — décision normative, impact sur 19 citations.
-  - pourquoi pas l'IA : acces — le portail de publication n'est pas ouvert à l'agent ;
+  - pourquoi pas l'IA : acces — publication TENTÉE le 14/08, \`HTTP 403 Authorization_RequestDenied\` ; le compte de l'agent ne porte aucun rôle sur le portail ;
   - où : écran « Publier la version », bouton \`Publier\`.
   - si rien n'est fait : les 19 citations continuent de pointer une version non publiée.
 - enfin TF-0222 (auto_ia) — regrouper les constats par cause racine.
@@ -675,6 +719,11 @@ Aucun écart : la demande a été suivie à la lettre.
       "## 8. Prochaines actions\n" +
       "- d'abord regrouper les constats (auto_ia) — parce que c'est le plus rentable, préalable : ligne 8 (droit IAM).\n" +
       "- ensuite publier la version (manuelle_dev) — parce que tout est prouvé, il faut un UAMI.\n" +
+      // S21 : un motif `acces` AFFIRMÉ, sans la moindre trace de tentative — c'est le cas fautif
+      // mesuré le 23/08, où un blocage a été affirmé alors que la même classe de contrainte avait
+      // déjà été levée deux fois le jour même. La ligne porte tout le reste (acteur, motif,
+      // localisateur, conséquence) : seule la TRACE manque, et c'est cela seul que S21 juge.
+      "- enfin ouvrir le portail (manuelle_utilisateur) — pourquoi pas l'IA : acces, le portail n'est pas ouvert a l'agent ; ou : `portail.html` ; si rien n'est fait : rien ne sort.\n" +
       "\n| id | acteur | action |\n|---|---|---|\n| A1 | manuelle_utilisateur | ouvrir le portail |\n" +
       "\n| acteur | quoi |\n|---|---|\n| auto_ia | regrouper les constats |\n")
     .replace(/\n\nLe contrôle complet[\s\S]*?ci-dessous\./, "")  // S9 : plus d ouverture
@@ -694,13 +743,13 @@ Aucun écart : la demande a été suivie à la lettre.
   if (rr.status !== 1) casse.push("la fixture ROUGE ne FAIL pas");
   else {
     for (const regle of ["S2", "S3", "S5", "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16",
-                         "S17", "S18", "S19", "S20"]) {
+                         "S17", "S18", "S19", "S20", "S21"]) {
       if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
     }
   }
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 2/2 PASS (verte PASS ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose)");
+    : "Self-test restitution : 2/2 PASS (verte PASS ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative)");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -724,6 +773,8 @@ console.log(JSON.stringify({
     "S19 n'exige PAS de recommandation sur une action, à la différence de S16 sur une décision : une action n'offre pas toujours un choix, et l'exiger partout produirait du remplissage. L'asymétrie est voulue",
     "S20 ne voit QUE les termes du référentiel `gabarits\\JARGON-A-GLOSER.json` : un jargon qui n'a encore coûté aucun aller-retour n'est pas détecté. C'est le prix assumé du zéro faux positif — dans ce corpus la MAJUSCULE sert l'emphase, et une heuristique sur les sigles crierait sur « MESURE » et « AUCUNE ». Le canal de croissance de la liste est le retour humain, pas la devinette",
     "S20 ne juge pas la JUSTESSE d'une glose : la présence d'une parenthèse après le terme, jamais qu'elle explique vraiment",
+    "S21 ne juge pas la SINCÉRITÉ d'une trace : un code de réponse recopié sans avoir été obtenu la satisfait. Elle rend le mensonge PLUS COÛTEUX — il faut inventer un code plausible — mais elle ne le rend pas impossible",
+    "S21 ne couvre PAS `decision`, `depense` ni `irreversible` : ces trois motifs relèvent d'un arbitrage, pas d'un fait du monde, et exiger d'« essayer » une décision n'aurait aucun sens. Une attribution abusive sous `decision` reste donc invisible — c'est la limite assumée, et c'est exactement le cas fautif qui a fait naître la règle",
   ],
 }, null, 1));
 process.exit(verdict === "PASS" ? 0 : 1);
