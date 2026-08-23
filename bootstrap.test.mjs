@@ -9,6 +9,7 @@
  *      exit 1, remède nommé (--pull) ; AVEC --pull : mise à jour, exit 0 ;
  *   3. dossier hérité à l'ancien nom (digit-ai-forge-seo, origin = ce dépôt) → renommé sur
  *      place vers digit-ai-forge-seo-geo, aucun doublon, exit 0 ;
+ *   3 ter. clone d'avant un RENOMMAGE (origin à l'ancien nom) → reconnu par la table d'alias ;
  *   4. preuve de point d'entrée absente → DÉFAUT, exit 1 ; restaurée → exit 0.
  * Le pilot courant et les skills du poste ne sont JAMAIS touchés (--sans-pilot --sans-skills).
  *
@@ -29,7 +30,11 @@ const git = (dir, ...a) => execFileSync("git", ["-C", dir, "-c", "user.email=t@t
 // Les treize noms et preuves sont LUS dans bootstrap.mjs : la recette ne tient pas sa
 // propre liste — une forge ajoutée là-bas est couverte ici sans un geste.
 const src = (await import("node:fs")).readFileSync(BOOTSTRAP, "utf8");
-const FORGES = [...src.matchAll(/\{\s*nom:\s*"([^"]+)",\s*preuve:\s*"([^"]+)"/g)].map((m) => ({ nom: m[1], preuve: m[2] }));
+// Les ALIAS sont lus ici aussi (TF-0533) : le cas 3 bis (d) en a besoin, et une recette qui
+// tiendrait sa propre liste d'alias divergerait de bootstrap.mjs au premier renommage.
+const FORGES = [...src.matchAll(/\{\s*nom:\s*"([^"]+)",\s*preuve:\s*"([^"]+)"(?:,\s*alias:\s*\[([^\]]*)\])?/g)]
+  .map((m) => ({ nom: m[1], preuve: m[2],
+    alias: (m[3] || "").split(",").map((a) => a.trim().replace(/^"|"$/g, "")).filter(Boolean) }));
 
 try {
   if (FORGES.length < 13) throw new Error(`liste de forges lue : ${FORGES.length} — attendu >= 13`);
@@ -99,6 +104,26 @@ try {
     attendre("répertoire non versionné signalé", lancer(), 0, /NON versionné/);
     rmSync(join(racine, "digit-ai-forge-fantome"), { recursive: true, force: true });
 
+    // (d) LE CAS QUI A ECHAPPE, ET IL A VECU (TF-0533, 23/08/2026) : un clone antérieur à un
+    //     RENOMMAGE. Son `origin` porte l'ANCIEN nom du dépôt — « …/digit-ai-forge-seo.git » face à
+    //     « …/digit-ai-forge-seo-geo.git ». La comparaison de chaînes échouait, le dossier n'était
+    //     ni un second clone, ni non versionné, ni nommé de côté : il était déclaré comme RIEN et
+    //     tout oracle de parc le comptait comme vivant. La table d'alias sert maintenant aussi ici.
+    {
+      const cible = FORGES.find((f) => (f.alias || []).length);
+      if (!cible) echecs.push("3 bis (d) : aucune forge à alias dans la liste lue");
+      else {
+        const ancien = cible.alias[0];
+        const clone = join(racine, ancien);
+        execFileSync("git", ["clone", "--quiet", join(racine, cible.nom), clone], { stdio: ["ignore", "pipe", "pipe"] });
+        // L'origin porte l'ANCIEN nom, comme chez quiconque a cloné avant le renommage.
+        git(clone, "remote", "set-url", "origin", join(bare, `${ancien}.git`));
+        attendre("clone d'avant renommage détecté par son ALIAS", lancer(), 0,
+          new RegExp(`${ancien} — SECOND CLONE de ${cible.nom}`));
+        rmSync(clone, { recursive: true, force: true });
+      }
+    }
+
     // (c) le contrôle NE SUPPRIME RIEN : un répertoire signalé est toujours là au tour suivant.
     //     Effacer un dépôt sur une heuristique échangerait un piège contre une perte.
     if (!existsSync(doublon)) echecs.push("3 bis : le contrôle a SUPPRIMÉ le doublon — il doit le déclarer, pas l'effacer");
@@ -119,4 +144,4 @@ try {
 }
 
 if (echecs.length) { console.error("bootstrap : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log(`bootstrap : 11/11 — vierge clone ${FORGES.length}/${FORGES.length}, retard refusé puis résorbé par --pull, alias renommé sans doublon, second clone et répertoire non versionné DÉCLARÉS sans être effacés (TF-0525), preuve absente refusée puis restaurée`);
+console.log(`bootstrap : 11/11 — vierge clone ${FORGES.length}/${FORGES.length}, retard refusé puis résorbé par --pull, alias renommé sans doublon, second clone et répertoire non versionné DÉCLARÉS sans être effacés (TF-0525), clone d'AVANT un renommage reconnu par sa table d'alias (TF-0533), preuve absente refusée puis restaurée`);

@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=c1cd042b09ab archive=54c0315cbe97 · dernier événement: 2026-08-23T15:23:35.706Z -->
+     sceaux: actifs=ac0b393fc13e archive=54c0315cbe97 · dernier événement: 2026-08-23T15:45:52.330Z -->
 
-**65 actifs** (candidat 1 · décidé 0 · en cours 0 · corrigé 61 · écarté 3) · **469 archivés**.
+**65 actifs** (candidat 0 · décidé 0 · en cours 0 · corrigé 62 · écarté 3) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -30,6 +30,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0516 | corrige | 10 | hook-restitution : un message CONFORME est refuse parce que le hook juge un AUTRE texte que celui affiche — le preambule d un tour, pas la restitution | **oui** — mesure le 22/08 : un refus BLOQUANT sur un message dont le texte exact rend PASS sur les 20 regles quand on le rejoue. Le motif affiche accuse l auteur d avoir omis les huit blocs alors qu ils sont ecrits. Contournement subi : interdiction de fait d ecrire une phrase avant la restitution dans un tour de travail. |
 | TF-0521 | corrige | 10 | pilot : un composant DECLARE sans style est invisible aux DEUX oracles — le sommaire des squelettes se rendait en liste numerotee nue | **oui** — un sommaire — le premier element qu'un lecteur regarde — rendu en liste nue sur deux gabarits en statut ok, avec les deux oracles au vert. Signale par le destinataire humain, par aucun controle |
 | TF-0523 | corrige | 10 | pilot : rien ne detecte qu'un livrable a ete MODIFIE apres avoir ete juge, sans changer d'indice — la regle 5 existe et n'est cablee nulle part | **oui** — quatre etats successifs d'un livrable perdus, et le meme nom ayant designe quatre contenus — commis par un agent qui avait cite la meme regle une heure plus tot sur un autre objet |
+| TF-0533 | corrige | 10 | Un clone PERIME du depot renomme en forge-seo-geo vit encore dans le parc, et les oracles de parc le comptent comme un depot vivant | **oui** — un push refuse en fast-forward, trois commits de retard, et un doublon compte dans « 16 depots » par tout oracle de parc — dont le survol qui a propose de signer un fichier de ce clone |
 | TF-0522 | corrige | 8.3 | pilot : un gabarit entre au catalogue en statut ok SANS avoir jamais produit une seule page — extraire une forme et savoir la rejouer sont deux choses | **oui** — deux familles publiees en ok le 21/08, deux defauts au premier usage le 23/08, dont un bloquant — le catalogue promettait une forme utilisable qui ne l'etait pas |
 | TF-0511 | corrige | 8 | pilot : le langage commanditaire n'est exige qu'au bloc 0 (S9) — tout le reste peut etre ecrit en jargon, et l'a ete, au point qu'un meme point a du etre explique deux fois | **oui** — un meme sujet explique deux fois, la premiere version rejetee malgre sa structure — le jargon non glose a annule le benefice d'une explication par ailleurs complete |
 | TF-0479 | corrige | 7.5 | veille : le prompt de veille ne debouche sur AUCUN canal d'entree au registre — ce qu'une veille trouve n'a pas de chemin norme vers une candidature | **oui** — MESURE le 22/08 sur les deux registres : sur 473 items TF ecrits depuis l'origine, 2 seulement ont une veille pour source — 0,4 %, alors que la veille est un canal declare de l'ecosysteme et qu'elle a produit trois documents d'etude (ETUDE-EVERYTHING-CLAUDE-CODE, VEILLE-OUTILLAGE-CLAUDE-CODE, AMELIORATIONS-TIKTOK). Le canal existe, il produit, et sa production n'atteint pas le registre : c'est le dernier kilometre qui manque, pas la veille. |
@@ -113,7 +114,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0533 | candidat | 10 | Un clone PERIME du depot renomme en forge-seo-geo vit encore dans le parc, et les oracles de parc le comptent comme un depot vivant | **oui** — un push refuse en fast-forward, trois commits de retard, et un doublon compte dans « 16 depots » par tout oracle de parc — dont le survol qui a propose de signer un fichier de ce clone |
 | TF-0471 | corrige | 10 | R-45 refuse des lots rédigés AVANT sa publication — deux lots Produit-05 bloqués à l'ingestion, dont un qui signalait un plantage réel du lanceur d'oracles | **oui** — payé le 22/08 : douze candidatures de deux lots restent hors du registre, et l'une d'elles nommait un défaut BLOQUANT du lanceur d'oracles qui n'a été corrigé que parce que la session l'a rencontré par un autre chemin — un refus de forme a mis un fait de production hors de portée |
 | TF-0502 | corrige | 6.7 | Deux derogations a R-45 en UN JOUR, dont une hors anteriorite : la propagation des regles du pilot vers les produits reste le manque, et le mecanisme de derogation est en train de devenir la voie normale | **oui** — mesure le 22/08 sur le registre : 15 candidatures (7 + 5 + 3) n'ont pu entrer que par derogation, sur 3 lots d'un meme produit en 2 jours. Deux evenements `ingestion` portent desormais un champ `derogation` — soit 2 derogations en un seul jour, pour une regle publiee la veille. Le taux est de 3 lots derogeables sur 3 lots recus de ce produit : 100 %, ce qui ne decrit plus une exception mais un regime. |
 

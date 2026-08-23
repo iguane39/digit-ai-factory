@@ -234,16 +234,37 @@ console.log("");
   const connus = new Map();          // origin normalisé -> nom du dépôt attendu
   const attendus = new Set(FORGES.map((f) => f.nom));
   attendus.add("digit-ai-factory");
-  const normaliser = (u) => (u || "").trim().replace(/\.git$/, "").replace(/\/+$/, "").toLowerCase();
+  // LE SEPARATEUR FAIT PARTIE DE LA NORMALISATION, et son absence rendait la comparaison
+  // fausse en silence : une origin ecrite « C:\\dev\\bare/depot.git » et une autre
+  // « C:\\dev\\bare\\depot.git » designent le MEME depot et ne se ressemblaient pas. Deux clones du
+  // meme depot, l un cite avec des barres obliques et l autre avec des antislashs, echappaient donc
+  // au controle du second clone. Trouve en jouant le cas du renommage (TF-0533).
+  const normaliser = (u) => (u || "").trim().replaceAll("\\", "/")
+    .replace(/\.git$/, "").replace(/\/+$/, "").toLowerCase();
   const originDe = (d) => {
     const r = git(d, "remote", "get-url", "origin");
     return r.status === 0 ? normaliser(r.stdout) : null;
   };
+  // LES ALIAS COMPTENT ICI, ET LEUR ABSENCE A COUTE UN DEPOT FANTOME (TF-0533, 23/08/2026).
+  // Ce balayage reconnaissait un second clone en comparant des CHAINES d'origin. Or l'origin d'un
+  // clone antérieur à un renommage porte l'ANCIEN nom : « …/digit-ai-forge-seo.git » face à
+  // « …/digit-ai-forge-seo-geo.git ». Deux chaînes différentes, donc aucun rapprochement — et le
+  // dossier tombait entre les trois branches de ce contrôle, déclaré comme RIEN. Mesuré : trois
+  // commits de retard, compté comme un dépôt vivant par tout oracle de parc, qui annonçait
+  // « 16 dépôts » pour 15 et lisait 26 fichiers de trop. Un oracle avait même été patché pour
+  // l'exclure LUI, nommément, plutôt que la cause soit traitée ici.
+  // La table d'alias existait déjà, à deux fonctions d'ici : elle sert maintenant AUSSI à
+  // reconnaître les origins. Un renommage futur est donc couvert sans un geste.
   for (const nom of attendus) {
     const d = join(racine, nom);
     if (!existsSync(join(d, ".git"))) continue;
     const o = originDe(d);
-    if (o) connus.set(o, nom);
+    if (!o) continue;
+    connus.set(o, nom);
+    const f = FORGES.find((x) => x.nom === nom);
+    for (const ancien of (f && f.alias) || []) {
+      connus.set(o.replace(/[^/]+$/, ancien.toLowerCase()), nom);
+    }
   }
   let entrees = [];
   try { entrees = readdirSync(racine, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name); }
