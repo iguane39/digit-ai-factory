@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=81b92b3102ab archive=54c0315cbe97 · dernier événement: 2026-08-23T15:05:50.061Z -->
+     sceaux: actifs=c1cd042b09ab archive=54c0315cbe97 · dernier événement: 2026-08-23T15:23:35.706Z -->
 
-**64 actifs** (candidat 0 · décidé 0 · en cours 0 · corrigé 61 · écarté 3) · **469 archivés**.
+**65 actifs** (candidat 1 · décidé 0 · en cours 0 · corrigé 61 · écarté 3) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -113,6 +113,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0533 | candidat | 10 | Un clone PERIME du depot renomme en forge-seo-geo vit encore dans le parc, et les oracles de parc le comptent comme un depot vivant | **oui** — un push refuse en fast-forward, trois commits de retard, et un doublon compte dans « 16 depots » par tout oracle de parc — dont le survol qui a propose de signer un fichier de ce clone |
 | TF-0471 | corrige | 10 | R-45 refuse des lots rédigés AVANT sa publication — deux lots Produit-05 bloqués à l'ingestion, dont un qui signalait un plantage réel du lanceur d'oracles | **oui** — payé le 22/08 : douze candidatures de deux lots restent hors du registre, et l'une d'elles nommait un défaut BLOQUANT du lanceur d'oracles qui n'a été corrigé que parce que la session l'a rencontré par un autre chemin — un refus de forme a mis un fait de production hors de portée |
 | TF-0502 | corrige | 6.7 | Deux derogations a R-45 en UN JOUR, dont une hors anteriorite : la propagation des regles du pilot vers les produits reste le manque, et le mecanisme de derogation est en train de devenir la voie normale | **oui** — mesure le 22/08 sur le registre : 15 candidatures (7 + 5 + 3) n'ont pu entrer que par derogation, sur 3 lots d'un meme produit en 2 jours. Deux evenements `ingestion` portent desormais un champ `derogation` — soit 2 derogations en un seul jour, pour une regle publiee la veille. Le taux est de 3 lots derogeables sur 3 lots recus de ce produit : 100 %, ce qui ne decrit plus une exception mais un regime. |
 

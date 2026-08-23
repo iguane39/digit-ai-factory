@@ -20,6 +20,14 @@
  *     choix ;
  *   · l'échappatoire déclarative `promesse-ok` sur la ligne.
  *
+ * LE NIVEAU DU VERDICT EST UN CHOIX HUMAIN DATÉ, pas un réglage par défaut (23/08/2026). La
+ * question a été posée avec ses deux options : armer la règle en gate bloquant maintenant, ou la
+ * laisser avertir jusqu'au SECOND vrai constat. Réponse : **elle avertit**. La raison tient à la
+ * doctrine maison — un contrôle passe en gate sur GAINS CONSTATÉS, et le gain constaté ne porte
+ * pour l'instant que sur un cas, `data-src-format` chez le socle. Ce commentaire existe pour que le
+ * choix ne soit pas re-débattu à chaque lecture, et pour dire ce qui le renverserait : *un deuxième
+ * vrai constat, et la règle passe bloquante* — c'est écrit ici, pas laissé au ressenti du jour.
+ *
  * Usage : node oracle-promesses.mjs [racine-des-forges] [--json] · --self-test
  * Exit : 0 = PASS (avertissements possibles) · 2 = SKIP motivé. Jamais 1 : la règle avertit.
  */
