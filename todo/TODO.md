@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=bc101019b16a archive=54c0315cbe97 · dernier événement: 2026-08-23T12:21:27.373Z -->
+     sceaux: actifs=cb9832e2559e archive=54c0315cbe97 · dernier événement: 2026-08-23T13:47:54.086Z -->
 
-**62 actifs** (candidat 0 · décidé 0 · en cours 0 · corrigé 59 · écarté 3) · **469 archivés**.
+**63 actifs** (candidat 0 · décidé 0 · en cours 0 · corrigé 60 · écarté 3) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -18,6 +18,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0508 | corrige | 20 | pilot : le classement par acteur rendu en SECTIONS SEPAREES detruit la liste unique — l'acteur est une colonne, l'ordre est le tri, et seul le calendrier justifie plusieurs tableaux | **oui** — deux rappels du lecteur sur la meme exigence, alors que les deux moities de sa demande etaient compatibles et que le referentiel ne le disait pas |
 | TF-0513 | corrige | 20 | oracle-synthese : une synthese CONFORME echoue S9 a cause de son propre titre — le frontmatter `destinataire: humain` que le gabarit PRESCRIT empeche le retrait du H1, et le code de lot du titre est alors lu comme un sha | **oui** — mesure le 22/08 : S9 FAIL « vocabulaire technique nu (sha) » sur une synthese sans defaut, le token fautif etant le code de lot 20260822a du titre ; le hook Stop etant bloquant depuis la v2.4.0, le refus tombe sur une restitution conforme. Apres renommage du titre en « 22 aout 2026, lot a », le meme fichier rend PASS S1-S16 — ce qui prouve que seul le titre etait en cause. |
 | TF-0528 | corrige | 20 | pilot : le reste-a-faire melange TROIS NATURES dans une seule table — un ecart assume et une contrainte conditionnelle ressortent indefiniment comme du travail en attente | **oui** — deux lignes sur neuf re-servies a un lecteur qui les avait deja tranchees, dont une decision consignee cinq jours plus tot au journal des decisions du produit |
+| TF-0531 | corrige | 20 | pilot : les deux derniers restes MECANISABLES du mandat n'avaient pas de controle — la forme des artefacts de cadence, et une mesure dont les familles sont jetees | **oui** — onze familles de constats mesurees sur chaque route servie et jetees, dont les debordements horizontaux qui avaient vecu deux mois en production ; et quatre gabarits dont la forme ne tenait que par relecture humaine |
 | TF-0510 | corrige | 16 | pilot : une ACTION ne porte ni son impact ni sa recommandation, alors qu'une DECISION les porte depuis S15 et S16 — la demande humaine etait symetrique, le referentiel n'en couvre qu'une moitie | **oui** — la moitie ACTIONS d'une demande humaine explicitement symetrique a ete livree sans son impact ni sa reco, alors que la moitie DECISIONS l'avait ete le matin meme |
 | TF-0512 | corrige | 15 | pilot : un retour arriere imprime dans un journal peut etre MASQUE par le moteur de pipeline — la precaution s'annule au moment precis ou elle sert | **oui** — une precaution deliberement conçue pour l'urgence, annulee par un masquage automatique, et decouverte par hasard en relisant le journal plutot qu'en ayant besoin de la commande |
 | TF-0520 | corrige | 15 | pilot : les deux squelettes DAT et DEX livres le 21/08 ECHOUAIENT a l'oracle du socle, sur leur propre feuille de style | **oui** — deux gabarits publies en statut ok le 21/08 dont les squelettes echouaient a l'oracle du socle — decouvert au premier usage reel, deux jours plus tard |

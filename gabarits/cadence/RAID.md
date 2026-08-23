@@ -28,7 +28,7 @@ jugements assumés ; ce qui ne l'est pas, c'est la parade — elle est décidée
 
 | # | Risque | Probabilité | Impact | Propriétaire | Relevé le | Parade décidée |
 |---|---|---|---|---|---|---|
-| R-01 | {ce qui pourrait arriver, en une phrase} | {faible \| moyenne \| forte} | {faible \| moyen \| fort} | {prénom nom} | {AAAA-MM-JJ} | {la parade, ou « aucune décidée » — le dire est une décision} |
+| {R-01} | {ce qui pourrait arriver, en une phrase} | {faible \| moyenne \| forte} | {faible \| moyen \| fort} | {prénom nom} | {AAAA-MM-JJ} | {la parade, ou « aucune décidée » — le dire est une décision} |
 
 ## Hypothèses — ce qu'on croit sans l'avoir vérifié
 
@@ -37,7 +37,7 @@ existe pour cela : sans date butoir, une hypothèse se découvre fausse au pire 
 
 | # | Hypothèse | Ce qui casse si elle est fausse | À valider avant | Propriétaire | Statut |
 |---|---|---|---|---|---|
-| H-01 | {ce qu'on suppose} | {la conséquence, concrète} | {AAAA-MM-JJ} | {prénom nom} | {ouverte \| validée le AAAA-MM-JJ \| infirmée le AAAA-MM-JJ} |
+| {H-01} | {ce qu'on suppose} | {la conséquence, concrète} | {AAAA-MM-JJ} | {prénom nom} | {ouverte \| validée le AAAA-MM-JJ \| infirmée le AAAA-MM-JJ} |
 
 ## Incidents — ce qui est déjà arrivé
 
@@ -46,7 +46,7 @@ MESURÉ, parce que c'est ce qui permettra d'estimer le suivant.
 
 | # | Incident | Constaté le | Effet mesuré | Propriétaire | État |
 |---|---|---|---|---|---|
-| I-01 | {ce qui s'est produit} | {AAAA-MM-JJ} | {la mesure, pas l'impression} | {prénom nom} | {ouvert \| clos le AAAA-MM-JJ} |
+| {I-01} | {ce qui s'est produit} | {AAAA-MM-JJ} | {la mesure, pas l'impression} | {prénom nom} | {ouvert \| clos le AAAA-MM-JJ} |
 
 ## Dépendances — ce qu'on attend de quelqu'un d'autre
 
@@ -55,7 +55,7 @@ relance est la plus révélatrice du tableau : une dépendance jamais relancée 
 
 | # | Dépendance | Attendue de | Attendue pour | Ce qui est bloqué sans elle | Relancée le |
 |---|---|---|---|---|---|
-| D-01 | {ce qu'on attend} | {qui, nommé} | {AAAA-MM-JJ} | {ce qui s'arrête, concrètement} | {AAAA-MM-JJ, ou « jamais » — et alors c'est un aveu} |
+| {D-01} | {ce qu'on attend} | {qui, nommé} | {AAAA-MM-JJ} | {ce qui s'arrête, concrètement} | {AAAA-MM-JJ, ou « jamais » — et alors c'est un aveu} |
 
 ## Ce qui n'est pas jugé par un oracle
 
