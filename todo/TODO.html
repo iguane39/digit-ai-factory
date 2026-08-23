@@ -14,7 +14,7 @@
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digit-AI — TODO-FORGE · Reste à faire — V20260822</title>
+  <title>Digit-AI — TODO-FORGE · Reste à faire — V20260823</title>
   <meta name="description" content="Reste-à-faire du registre TODO-FORGE : candidats à décider, décidés, en cours — détaillés en puces, avec date de création, priorité de traitement et impact sur la forge concernée.">
   <meta name="theme-color" content="#2563EB">
   <!-- Favicon-lettre (13/08) : « F » = Forge (projet). -->
@@ -146,7 +146,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>1f84246a1fe1</code> · dernier événement 2026-08-22T16:28:09.265Z</p>
+      <p class="meta">sceau <code>bc7258335f96</code> · dernier événement 2026-08-23T06:51:58.469Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -156,7 +156,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="18 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">18</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="15 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">15</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="1 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">1</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="468 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">468</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -539,75 +539,6 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0495" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0495</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-agents : aucune regle ne distingue « le contenu est present » de « le contenu est exploitable »</h3>
-          <div class="card-detail" data-cite><p class="lead">FAIT : le client a demande que les documents sources soient inclus dans le livrable autoportant.</p><ul class="puces"><li>Ils l ont ete — en blocs de texte brut, dont un de 67 Ko contenant une trentaine de tableaux Markdown. Tous les oracles passent : le contenu est la, la page est conforme, rien ne deborde. Il a fallu que le client ecrive « il faut pouvoir formater les MDs, sinon c est illisible », PUIS le redemande une seconde fois, pour qu un lecteur a deux vues soit produit. La regle L10 impose deja un mode d emploi aux tableaux longs : le principe existe, il ne couvre pas le contenu embarque. PROPOSITION : un bloc preformate au-dela d un seuil (4 Ko ou 80 lignes) doit offrir une alternative de lecture — mise en forme, sommaire, ou repli par sections — ou declarer pourquoi le texte brut fait foi (data-brut-fait-foi). Meme logique que data-filterable=off avec motif : ce qui est delibere se declare, ce qui est subi se corrige. Va de pair avec RD-14 du lot precedent, qui demande le composant</li><li>celui-ci demande la regle qui le rend obligatoire</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Deux demandes explicites du client necessaires pour obtenir un contenu lisible, sur un livrable vert a tous les oracles.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0518" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0518</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8.3)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-agents : un livrable Markdown ne recoit aucun controle de lisibilite — la famille L1-L17 est enfermee derriere une porte HTML</h3>
-          <div class="card-detail" data-cite><p class="lead">FAIT : le registre compte 48 domaines. MESURE sur un livrable reel (09-travaux-par-lot.md, 85 Ko, 297 entrees) : run-oracles juge QUATRE domaines — Format/livraison/versioning, Securite/secrets, Calculs/chiffres, Tracabilite des affirmations chiffrees — et en ecarte deux. Verdict 4 PASS, 2 SKIP. AUCUN domaine de lisibilite n est applique, ni ne peut l etre : les regles L1-L17 vivent dans check_html.py, qui ne s execute que sur du HTML. Or le MARKDOWN EST LE FORMAT DE LIVRAISON DOMINANT des runs d architecture et de conseil : ce projet remet dix documents Markdown et un seul HTML. CONSEQUENCE DIRECTE ET MESURABLE : le defaut decrit dans le retour jumeau (un identifiant sans son sens) s est produit DANS LES DOCUMENTS MARKDOWN, c est-a-dire exactement la ou aucun oracle ne regarde — et c est un humain qui l a trouve, comme pour le defaut fondateur de L14. PROPOSITION : enregistrer un domaine « Lisibilite d un document » applicable aux .md, portant le sous-ensemble des regles L INDEPENDANTES DU FORMAT DE RENDU : L3 (toute valeur porte sa legende), L7 (un chapitre ouvre par ce qu il apprend), L10 (un chapitre de donnees porte son mode d emploi), L12 (une enumeration de donnees n est pas une phrase), L14 (pas de plomberie dans le texte), plus la regle d identifiant proposee au retour jumeau. Les regles qui dependent du rendu — L1 texte tronque, L2 largeur, L5 surlignage, L15 glyphes — restent hors perimetre et doivent le dire. Le partage mecanique / revue de lecture deja ecrit dans lisibilite.md s applique tel quel : il n y a pas de doctrine a inventer, seulement une porte a ouvrir.</p></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8.3 — gain 5 × preuve 5 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Dix livrables Markdown remis a un client sans aucun controle de lisibilite ; le defaut qui en est ne a ete trouve par le client, pas par la chaine.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0515" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0515</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 7.5)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">quality-oracles : le controle « §6 niveaux » du self-test depend d un navigateur sans tete et DEPASSE son timeout de 180 s sur un poste charge — la recette devient non deterministe</h3>
-          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 22/08, pendant le mandat « traite tous les todos ».</p><ul class="puces"><li>Le self-test du skill quality-oracles rend « §6 : run-oracles --json inexploitable pour la preuve des niveaux » et sort en echec, alors que les 158 autres controles passent. CE N'EST PAS UNE REGRESSION DU LOT DU JOUR, et la verification est directe : la MEME commande, jouee avec le code d'ORIGINE remis par `git stash push` sur le seul fichier run-oracles.mjs, sort en TIMEOUT (exit 124 a 150 s) sur le meme poste. Le controle lance run-oracles sur un dossier contenant `fixtures/perf-red.html`, deux fois (niveau note, puis production) ; l'oracle de performance pilote un navigateur sans tete, et le poste portait 184 processus de navigateur au moment de la mesure. Le controle parse ensuite la sortie JSON : quand le lanceur est tue par le timeout de 180 s, stdout est tronque, le parse echoue, et le message rendu est « --json inexploitable » — c'est-a-dire un message qui accuse le FORMAT alors que la cause est la DUREE. CE QUE CA COUTE : le self-test d'un skill est le gate que tout run rejoue ; un gate qui echoue selon la charge du poste est un gate qu'on apprend a ignorer, et le jour ou il signalera une vraie regression, personne ne le lira. C'est nommement le defaut que R-33 bis existe pour empecher. TROIS VOIES, aucune tranchee :</li><li>le controle DECLARE son indisponibilite au lieu d echouer — SKIP motive « navigateur indisponible ou trop lent », sur le modele d oracle-sca de forge-websec, ce qui est deja la doctrine de la maison pour un outil externe absent</li><li>distinguer les deux causes dans le message — un timeout n est pas un JSON illisible, et confondre les deux a coute la moitie du temps de diagnostic ici</li><li>prouver les niveaux sans navigateur, sur une fixture dont le domaine exclu n est pas la performance. La voie</li><li>plus la voie</li><li>ont ma preference et je ne les prends pas : modifier un self-test de skill change ce que tout l ecosysteme rejoue, cela se decide</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 7.5 — gain 3 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>mesure le 22/08 : le self-test sort en echec sur 1 controle sur 159 pour une cause d environnement, et le message rendu (« --json inexploitable ») accuse le format quand la cause est la duree — le diagnostic a demande de rejouer la commande avec le code d origine pour ecarter une regression du lot du jour.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du 22/08, pendant le mandat de traitement des todos — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-candidat" id="item-TF-0475" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0475</code>
@@ -792,6 +723,29 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0495" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0495</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-agents : aucune regle ne distingue « le contenu est present » de « le contenu est exploitable »</h3>
+          <div class="card-detail" data-cite><p class="lead">FAIT : le client a demande que les documents sources soient inclus dans le livrable autoportant.</p><ul class="puces"><li>Ils l ont ete — en blocs de texte brut, dont un de 67 Ko contenant une trentaine de tableaux Markdown. Tous les oracles passent : le contenu est la, la page est conforme, rien ne deborde. Il a fallu que le client ecrive « il faut pouvoir formater les MDs, sinon c est illisible », PUIS le redemande une seconde fois, pour qu un lecteur a deux vues soit produit. La regle L10 impose deja un mode d emploi aux tableaux longs : le principe existe, il ne couvre pas le contenu embarque. PROPOSITION : un bloc preformate au-dela d un seuil (4 Ko ou 80 lignes) doit offrir une alternative de lecture — mise en forme, sommaire, ou repli par sections — ou declarer pourquoi le texte brut fait foi (data-brut-fait-foi). Meme logique que data-filterable=off avec motif : ce qui est delibere se declare, ce qui est subi se corrige. Va de pair avec RD-14 du lot precedent, qui demande le composant</li><li>celui-ci demande la regle qui le rend obligatoire</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Deux demandes explicites du client necessaires pour obtenir un contenu lisible, sur un livrable vert a tous les oracles.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-corrige" id="item-TF-0501" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0501</code>
@@ -828,6 +782,29 @@
             <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Retour direct du client en cours de session : quatre livrables et une restitution entiere illisibles sur ce point, jusqu a l interruption.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0518" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0518</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8.3)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-agents : un livrable Markdown ne recoit aucun controle de lisibilite — la famille L1-L17 est enfermee derriere une porte HTML</h3>
+          <div class="card-detail" data-cite><p class="lead">FAIT : le registre compte 48 domaines. MESURE sur un livrable reel (09-travaux-par-lot.md, 85 Ko, 297 entrees) : run-oracles juge QUATRE domaines — Format/livraison/versioning, Securite/secrets, Calculs/chiffres, Tracabilite des affirmations chiffrees — et en ecarte deux. Verdict 4 PASS, 2 SKIP. AUCUN domaine de lisibilite n est applique, ni ne peut l etre : les regles L1-L17 vivent dans check_html.py, qui ne s execute que sur du HTML. Or le MARKDOWN EST LE FORMAT DE LIVRAISON DOMINANT des runs d architecture et de conseil : ce projet remet dix documents Markdown et un seul HTML. CONSEQUENCE DIRECTE ET MESURABLE : le defaut decrit dans le retour jumeau (un identifiant sans son sens) s est produit DANS LES DOCUMENTS MARKDOWN, c est-a-dire exactement la ou aucun oracle ne regarde — et c est un humain qui l a trouve, comme pour le defaut fondateur de L14. PROPOSITION : enregistrer un domaine « Lisibilite d un document » applicable aux .md, portant le sous-ensemble des regles L INDEPENDANTES DU FORMAT DE RENDU : L3 (toute valeur porte sa legende), L7 (un chapitre ouvre par ce qu il apprend), L10 (un chapitre de donnees porte son mode d emploi), L12 (une enumeration de donnees n est pas une phrase), L14 (pas de plomberie dans le texte), plus la regle d identifiant proposee au retour jumeau. Les regles qui dependent du rendu — L1 texte tronque, L2 largeur, L5 surlignage, L15 glyphes — restent hors perimetre et doivent le dire. Le partage mecanique / revue de lecture deja ecrit dans lisibilite.md s applique tel quel : il n y a pas de doctrine a inventer, seulement une porte a ouvrir.</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8.3 — gain 5 × preuve 5 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Dix livrables Markdown remis a un client sans aucun controle de lisibilite ; le defaut qui en est ne a ete trouve par le client, pas par la chaine.</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
             
           </dl>
@@ -875,6 +852,29 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 7.5 — gain 3 × preuve 5 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>paye immediatement et mesurable : le self-test du skill passe de 152 a 156 controles, dont 4 pour ce lot — et 0 pour la garde TOCTOU. Sur les deux mecanismes livres, un seul est prouve. Le contrat de la maison est « aucun ✓ sans oracle execute » : ici le ✓ de la garde TOCTOU repose sur la lecture du code, pas sur une execution.</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat sur sa propre mise en oeuvre du 22/08 — l'honnetete du process exige de nommer ce qui n'est pas prouve)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0515" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0515</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 7.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">quality-oracles : le controle « §6 niveaux » du self-test depend d un navigateur sans tete et DEPASSE son timeout de 180 s sur un poste charge — la recette devient non deterministe</h3>
+          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 22/08, pendant le mandat « traite tous les todos ».</p><ul class="puces"><li>Le self-test du skill quality-oracles rend « §6 : run-oracles --json inexploitable pour la preuve des niveaux » et sort en echec, alors que les 158 autres controles passent. CE N'EST PAS UNE REGRESSION DU LOT DU JOUR, et la verification est directe : la MEME commande, jouee avec le code d'ORIGINE remis par `git stash push` sur le seul fichier run-oracles.mjs, sort en TIMEOUT (exit 124 a 150 s) sur le meme poste. Le controle lance run-oracles sur un dossier contenant `fixtures/perf-red.html`, deux fois (niveau note, puis production) ; l'oracle de performance pilote un navigateur sans tete, et le poste portait 184 processus de navigateur au moment de la mesure. Le controle parse ensuite la sortie JSON : quand le lanceur est tue par le timeout de 180 s, stdout est tronque, le parse echoue, et le message rendu est « --json inexploitable » — c'est-a-dire un message qui accuse le FORMAT alors que la cause est la DUREE. CE QUE CA COUTE : le self-test d'un skill est le gate que tout run rejoue ; un gate qui echoue selon la charge du poste est un gate qu'on apprend a ignorer, et le jour ou il signalera une vraie regression, personne ne le lira. C'est nommement le defaut que R-33 bis existe pour empecher. TROIS VOIES, aucune tranchee :</li><li>le controle DECLARE son indisponibilite au lieu d echouer — SKIP motive « navigateur indisponible ou trop lent », sur le modele d oracle-sca de forge-websec, ce qui est deja la doctrine de la maison pour un outil externe absent</li><li>distinguer les deux causes dans le message — un timeout n est pas un JSON illisible, et confondre les deux a coute la moitie du temps de diagnostic ici</li><li>prouver les niveaux sans navigateur, sur une fixture dont le domaine exclu n est pas la performance. La voie</li><li>plus la voie</li><li>ont ma preference et je ne les prends pas : modifier un self-test de skill change ce que tout l ecosysteme rejoue, cela se decide</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 7.5 — gain 3 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>mesure le 22/08 : le self-test sort en echec sur 1 controle sur 159 pour une cause d environnement, et le message rendu (« --json inexploitable ») accuse le format quand la cause est la duree — le diagnostic a demande de rejouer la commande avec le code d origine pour ecarter une regression du lot du jour.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du 22/08, pendant le mandat de traitement des todos — constat =&gt; candidat)</dd></div>
             
           </dl>
         </article>

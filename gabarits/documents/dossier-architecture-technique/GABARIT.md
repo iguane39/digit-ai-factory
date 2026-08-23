@@ -118,6 +118,8 @@ transit, cloisonnement) · **protection du réseau** (exposition, filtrage, poin
 
 ### 7 · Exigences non fonctionnelles, et comment on les vérifie
 
+Chaque exigence se lit sur DEUX colonnes : la cible chiffrée, et **la mesure qui la vérifie**. Une exigence sans mesure est un vœu — c'est la seule chose que cette section refuse.
+
 | Exigence | Cible chiffrée | Comment elle est mesurée | Constat |
 |---|---|---|---|
 
@@ -153,6 +155,8 @@ distinguer « pas concerné » de « pas rempli », et il tranchera au pire.
 | Compléments post-audit | un audit a produit des remédiations : elles se répondent dans un document **daté et distinct**, rattaché à chaque remédiation par son identifiant — c'est la forme qu'a prise la quatrième occurrence du corpus, et elle évite de réécrire le DAT à chaque campagne |
 
 ## Contrat de personnalisation
+
+Ce tableau dit ce qu'un projet peut adapter et ce qu'il ne touche pas. Il se lit en colonnes : à gauche le dû, au milieu le libre, à droite l'intangible.
 
 | Un projet **doit** | Un projet **peut** | Un projet **ne change pas** |
 |---|---|---|
