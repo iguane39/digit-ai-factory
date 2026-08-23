@@ -170,6 +170,29 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   seulement le code ; un relevé vide se consigne (« aucune règle modifiée »).
   Contrôle exécutable : R-19 de `oracles/oracle-conformite-projet.mjs` (TF-0035).
 
+### 3 quinquies. Le pilot n'ecrit pas chez un produit, et ce n'est plus une consigne (23/08/2026)
+
+Decision humaine du 23/08 : **« ne touche pas les produits, seuls les produits se modifient
+eux-memes »**. Le garde-fou existait dans `CLAUDE.md` depuis l'origine — « produits autonomes : le
+pilot n'y intervient que sur run demande » — et **rien ne l'executait**. Une consigne qu'aucun
+mecanisme ne tient se suit par discipline, c'est-a-dire qu'on finira par ne pas la suivre.
+
+Le mecanisme est une COMPARAISON D'ETAT, insensible a l'outil employe : a l'ouverture, l'etat de
+travail et le `HEAD` de chaque depot produit sont releves ; a la fin du tour, ils sont recompares.
+Une modification, un commit, un fichier neuf — par n'importe quelle voie, y compris un script lance
+en shell — se voit, et **le tour est bloque** tant que la restitution ne l'a pas declare. Un hook
+qui refuserait d'apres le chemin d'un outil d'ecriture ne verrait que `Write` et `Edit`, en laissant
+passer le cas le plus frequent : une garantie de facade, pire qu'une absence de garantie.
+
+L'echappatoire est **nommee, jamais devinee** : `FORGE_MANDAT_PRODUIT=<nom>` declare le produit sur
+lequel un run est demande — il est alors suivi et RAPPORTE, jamais bloque.
+
+**Ce que le pilot fait a la place** : il fournit les gabarits, les oracles et le kit
+d'instanciation (`gabarits\CLAUDE-PRODUIT.md`, `gabarits\settings-produit.json`,
+`gabarits\hooks-factory.mjs`), et il **verifie en lecture**. Un produit s'instancie lui-meme depuis
+ce kit, sur son propre run. **Controle** : `node oracles\hook-produits-intacts.mjs`, cable en
+`SessionStart` et en `Stop`, recette `7/7`.
+
 ### 3 quater. Une note documente la FORME d'un contrat, jamais sa VALEUR courante (TF-0477)
 
 Ce qui **bouge** — un compte, un haché, un identifiant, une date de dernier passage — vit dans le

@@ -26,9 +26,10 @@
  *       avance protégée (comme K5).
  *   K9  le RELEVÉ des champs de frontmatter des SKILL.md versionnés — déclaratif, JAMAIS en
  *       échec (TF-0475) : il dit quels champs le parc pose et lesquels il ne pose nulle part,
- *       dont les trois mécanismes d'isolation, de cadrage et de restriction d'outils. Écrire une
- *       clé que la plateforme ignorerait serait une affordance non câblée : le nom exact des
- *       champs appartient à sa documentation, donc le câblage reste une décision humaine.
+ *       pour les trois mécanismes d'isolation (`context`), de cadrage (`paths`) et de retrait
+ *       d'outil (`disallowed-tools`). Les noms sont VÉRIFIÉS contre la documentation de la
+ *       plateforme depuis le 23/08 — le premier jet en portait un qui n'existe pas, ce qui est
+ *       exactement le défaut que ce relevé existe pour ne pas commettre.
  *   K7  le CÂBLAGE d'un hook versionné — déclaré, JAMAIS en échec : `<forge>\.claude\settings.json`
  *       dit ce que la forge attend, `~\.claude\settings.json` dit ce qui s'exécute vraiment ;
  *       l'écart est nommé avec la commande qui le poserait.
@@ -676,7 +677,16 @@ function jugerCablage(racine, fichierSettings, installesHooks, appliquer, findin
  * candidature : combien de skills, combien de champs distincts, et lesquels manquent.
  */
 function relevePreambule(par_nom, findings) {
-  const CHAMPS_MECANIQUES = ["allowed-tools", "disable-model-invocation", "context", "isolation"];
+  // LES NOMS SONT VERIFIES contre la reference de frontmatter de Claude Code (consultee le
+  // 23/08/2026 sur autorisation humaine), et le premier jet en portait un qui N'EXISTE PAS :
+  // « isolation ». C'est la demonstration de ce que ce releve dit lui-meme — une cle non verifiee
+  // est un bouton qui ne fait rien. Trois mecanismes, trois champs reels :
+  const MECANISMES = [
+    ["paths", "cadrage du declenchement par motif de chemin"],
+    ["disallowed-tools", "retrait d'un outil du pool pendant qu'un skill est actif"],
+    ["context", "isolation de contexte (valeur `fork`)"],
+  ];
+  const CHAMPS_MECANIQUES = MECANISMES.map(([c]) => c);
   const parChamp = new Map();
   let lus = 0;
   for (const [nom, chemins] of [...par_nom].sort()) {
@@ -702,12 +712,14 @@ function relevePreambule(par_nom, findings) {
       [...parChamp].sort((a, b) => b[1].length - a[1].length)
         .map(([c, l]) => `${c} (${l.length})`).join(", ") +
       (absents.length
-        ? `. AUCUN skill ne porte ${absents.join(", ")} — les mécanismes d'isolation de contexte, ` +
-          "de cadrage du déclenchement et de restriction d'outils ne sont donc câblés nulle part. " +
-          "Ce relevé est un FAIT, pas un verdict : écrire une clé que la plateforme ignorerait " +
-          "serait une affordance non câblée, et le nom exact des champs appartient à sa " +
-          "documentation. Le câblage est une décision humaine informée (TF-0475)"
-        : ". les quatre champs mécaniques sont posés au moins une fois"),
+        ? ". MECANISME(S) NON CABLE(S) : " +
+          MECANISMES.filter(([c]) => absents.includes(c)).map(([c, quoi]) => `${quoi} (${c})`).join(" ; ") +
+          ". Ce relevé est un FAIT, pas un verdict — mais les noms de champs, eux, sont désormais " +
+          "VÉRIFIÉS contre la documentation de la plateforme (23/08/2026). Le cas `context: fork` " +
+          "attend une version : son compagnon `background: false`, qui rend le résultat DANS le " +
+          "tour, est donné pour v2.1.218 et le poste tourne en 2.1.169 — l'écrire aujourd'hui " +
+          "rendrait un verdict après la décision qu'il devait éclairer (TF-0475)"
+        : ". les trois mécanismes sont câblés au moins une fois"),
   });
 }
 
@@ -953,13 +965,14 @@ function selfTest() {
             k9().length === 1 && k9()[0].statut === "PASS"]);
   cas.push(["K9    — les champs posés sont COMPTÉS, et les mécanismes absents NOMMÉS",
             /name \(1\)/.test(k9()[0].message) && /allowed-tools/.test(k9()[0].message)]);
-  cas.push(["K9    — le relevé dit POURQUOI il ne juge pas : une clé ignorée serait une affordance non câblée",
-            /affordance non câblée/.test(k9()[0].message)]);
-  poser(join(srcK9, "beta", "SKILL.md"), "---\nname: beta\ndescription: un autre\nallowed-tools: Read, Grep\ncontext: isole\nisolation: worktree\ndisable-model-invocation: true\n---\n# beta\n");
-  poser(join(instK9, "beta", "SKILL.md"), "---\nname: beta\ndescription: un autre\nallowed-tools: Read, Grep\ncontext: isole\nisolation: worktree\ndisable-model-invocation: true\n---\n# beta\n");
+  cas.push(["K9    — le relevé dit que les noms de champs sont VÉRIFIÉS, et pourquoi `context` attend",
+            /VÉRIFIÉS contre la documentation/.test(k9()[0].message)
+            && /v2\.1\.218/.test(k9()[0].message)]);
+  poser(join(srcK9, "beta", "SKILL.md"), "---\nname: beta\ndescription: un autre\ndisallowed-tools: Write Edit\npaths: **/*.md\ncontext: fork\ndisable-model-invocation: true\n---\n# beta\n");
+  poser(join(instK9, "beta", "SKILL.md"), "---\nname: beta\ndescription: un autre\ndisallowed-tools: Write Edit\npaths: **/*.md\ncontext: fork\ndisable-model-invocation: true\n---\n# beta\n");
   rK9 = juger(racineK9, instK9);
-  cas.push(["K9    — dès qu'un skill porte les quatre champs, le relevé cesse de les réclamer",
-            k9().length === 1 && /les quatre champs mécaniques/.test(k9()[0].message)]);
+  cas.push(["K9    — dès qu'un skill porte les trois mécanismes, le relevé cesse de les réclamer",
+            k9().length === 1 && /les trois mécanismes sont câblés/.test(k9()[0].message)]);
   // Le nettoyage suit la convention du fichier : les autres fixtures laissent leur base au
   // temporaire, jugee sans importance. On fait pareil plutot que d'importer un outil de plus.
 

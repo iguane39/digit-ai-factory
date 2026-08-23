@@ -48,7 +48,16 @@ const DEDIES = {
   "oracle-ecosysteme.mjs": "self-test-ecosysteme.mjs",
 };
 
-const oracles = readdirSync(ICI).filter((f) => f.startsWith("oracle-") && f.endsWith(".mjs")).sort();
+// I1 bis (23/08, decision humaine « ne touche pas les produits ») : les HOOKS portant leur propre
+// recette entrent dans le meme invariant. Le motif `oracle-*` les laissait dehors — un hook
+// BLOQUANT non couvert est plus dangereux qu'un oracle non couvert, puisqu'il decide de la
+// poursuite d'un tour. Ceux qui n'ont pas de `--self-test` gardent leur fichier `.test.mjs`, joue
+// par I2.
+const oracles = readdirSync(ICI)
+  .filter((f) => (f.startsWith("oracle-") || f.startsWith("hook-")) && f.endsWith(".mjs")
+    && readFileSync(join(ICI, f), "utf8").includes('"--self-test"'))
+  .concat(readdirSync(ICI).filter((f) => f.startsWith("oracle-") && f.endsWith(".mjs")))
+  .filter((f, i, t) => t.indexOf(f) === i).sort();
 const resultats = [];
 
 for (const nom of oracles) {
@@ -129,6 +138,14 @@ const ETAT_DU_PARC = [
     nom: "oracle-skills.mjs",
     motif: "dérive versionné↔installé des skills",
     remede: "node oracles\\oracle-skills.mjs --appliquer (décision humaine, TF-0391)",
+  },
+  {
+    // 23/08 : UN CONTROLE STATIQUE NE REND PAS LA PAGE. Deux instances de gabarit livrees le matin
+    // etaient vertes au marquage et rouges au rendu, sur TROIS causes distinctes — contraste,
+    // largeur de lecture, chevauchements. Aucune n'est visible sans rendre la page.
+    nom: "../scripts/verifier-rendu-instances.mjs",
+    motif: "instance de gabarit verte au marquage et fautive au RENDU",
+    remede: "corriger la cause nommee par le verdict (contraste, largeur, chevauchement), puis rejouer",
   },
   {
     // TF-0474 (23/08) : la convention d'empreinte ne tient que si un site NON DECLARE se voit.
