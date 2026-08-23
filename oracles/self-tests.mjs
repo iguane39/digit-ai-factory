@@ -140,6 +140,24 @@ const ETAT_DU_PARC = [
     remede: "node oracles\\oracle-skills.mjs --appliquer (décision humaine, TF-0391)",
   },
   {
+    // TF-0530 / N-10 (23/08) : une mesure qui rend plusieurs familles est LUE en entier par la
+    // chaine de ses consommateurs. Le fait : trois familles bloquantes mesurees sur chaque route
+    // servie et JETEES, dont les debordements qui avaient vecu deux mois en production.
+    nom: "../scripts/verifier-familles-mesure.mjs",
+    motif: "famille de mesure produite et lue par personne, ou branche morte chez un consommateur",
+    remede: "lire la famille dans un consommateur, ajouter une branche par defaut, ou retirer la branche morte",
+  },
+  {
+    // TF-0324 (23/08) : la FORME des artefacts de cadence. Les gabarits vierges rendent SANS_OBJET
+    // — c'est voulu : la regle ne juge que ce qui est REMPLI. Le jour ou un artefact rempli entre
+    // dans le depot, il est juge sans que personne ait a y penser.
+    nom: "oracle-cadence.mjs",
+    motif: "artefact de cadence rempli sans proprietaire, sans date butoir ou sans consequence",
+    remede: "renseigner la cellule nommee par le verdict (proprietaire, date, relance, consequence)",
+    args: ["gabarits/cadence/RAID.md", "gabarits/cadence/COMPTE-RENDU.md",
+           "gabarits/cadence/REX.md", "gabarits/cadence/BENEFICES.md"],
+  },
+  {
     // 23/08 : UN CONTROLE STATIQUE NE REND PAS LA PAGE. Deux instances de gabarit livrees le matin
     // etaient vertes au marquage et rouges au rendu, sur TROIS causes distinctes — contraste,
     // largeur de lecture, chevauchements. Aucune n'est visible sans rendre la page.
@@ -163,8 +181,13 @@ const ETAT_DU_PARC = [
     remede: "node scripts\\readme-dossiers.mjs, puis rédiger le bloc ROLE des README signalés",
   },
 ];
-for (const { nom, remede } of ETAT_DU_PARC) {
-  const r = spawnSync(process.execPath, [join(ICI, nom)], { encoding: "utf8" });
+for (const { nom, remede, args: argsParc } of ETAT_DU_PARC) {
+  // Certains oracles d'etat jugent des ARTEFACTS nommes plutot qu'un parc entier : ils portent
+  // leur liste ici, une seule fois, au lieu de la deviner. Sans ce passage, l'oracle rendait
+  // SANS_OBJET faute de cible — un vert de complaisance, exactement ce que cet agregateur
+  // existe pour eteindre. Un chemin relatif se resout depuis la racine du pilot.
+  const cibles = (argsParc || []).map((c) => join(ICI, "..", c));
+  const r = spawnSync(process.execPath, [join(ICI, nom), ...cibles], { encoding: "utf8" });
   let verdict = null;
   try { verdict = JSON.parse(r.stdout || "{}").verdict; } catch { /* sortie non JSON : le code de retour tranche */ }
   // 0 PASS · 2 non jugeable (dépôts frères absents) → succès. 1 FAIL → échec, avec le remède.

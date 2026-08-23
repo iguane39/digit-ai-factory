@@ -36,19 +36,17 @@ date du fait.
 | N-7 | **Un mécanisme de scellement rejoint le registre.** Un format unique déclaré, et tout nouveau site de hachage entre dans la table ou devient un constat. | **Sept** items de la même classe traités un par un, dont **deux redécouvertes strictes** du même défaut — les fins de ligne, dans deux forges ; un chemin de scellement oublié, dans la même forge. | `oracle-empreintes` (E1, E2, E3) — `7/7` au self-test, `22` sites déclarés sur `15` dépôts ; il a attrapé **deux** sites créés le jour même, dont un par son propre auteur |
 | N-8 | **Un jeu de livrables est complet, ou la passe le dit.** Ce qu'un catalogue déclare se produit dans la même passe, et l'écart s'annonce avec un code distinct. | Un jeu remis **incomplet** : c'est le commanditaire qui a réclamé le second format, et le générateur a ensuite été réécrit de zéro côté produit. | `build-fiche.mjs` rend les deux formats en une passe (forge-audit) · `oracles/verifier-pdf.mjs` **relit** le tirage · `13` tests |
 | N-9 | **Ce qui est mesuré est relu dans l'artefact, jamais déduit de la commande.** Un code de retour 0 ne prouve pas qu'un octet a été écrit. | Un PDF verrouillé par une visionneuse : le navigateur a échoué **sans le dire**, et le script a revalidé l'ancien tirage en croyant valider le nouveau. Vu en comparant les horodatages. | `verifier-pdf.mjs` P1-P4, dont la **fraîcheur** (postérieur au lancement ET à sa source) — le seul contrôle qui attrape ce cas |
+| N-10 | **Une mesure qui rend plusieurs familles est lue en entier par la CHAÎNE de ses consommateurs.** Un consommateur pris seul peut n'en lire qu'une : ce qui compte est qu'aucune famille ne soit lue par personne. | Une mesure tournait sur les routes servies depuis le 20/08 et rendait douze familles ; **un seul appelant lisait le contraste, le reste était jeté** — dont les débordements horizontaux, qui avaient vécu deux mois en production. | `scripts/verifier-familles-mesure.mjs` (F1, F2, F3) — `6/6` au self-test, `12` familles produites, `4` consommateurs déclarés, toutes lues |
+| N-12 | **La forme d'un artefact de cadence est contrôlée, pas recommandée.** Propriétaire nommé, date butoir d'hypothèse, relance datée ou avouée, acteur du vocabulaire fermé, bénéfice mesuré des deux côtés, enseignement adossé à un fait. | Quatre gabarits livrés le 23/08 imposaient leur forme **en prose** — c'est-à-dire par discipline, ce que la campagne du jour a nommé neuf fois. | `oracle-cadence` (C1-C6) — `16/16` au self-test, joué à chaque recette sur les quatre gabarits |
 
-## Les deux règles qui n'ont pas encore de mécanisme
+*Le numéro `N-11` manque volontairement à cette table : c'est la seule règle encore sans mécanisme,
+et elle vit juste en dessous.*
 
-Elles sont écrites ici pour ne pas se perdre, et **déclarées sans contrôle** — c'est une dette, pas
-une omission.
+## La règle qui n'a pas encore de mécanisme
 
-- **N-10 · Une mesure qui rend plusieurs familles est lue en entier, ou son reste est déclaré.**
-  Le fait : une mesure tournait sur les routes servies depuis le 20/08 et rendait débordements,
-  chevauchements et largeurs **en même temps** que le contraste ; seul le contraste était lu, le
-  reste était **jeté**. Un consommateur de mesure doit avoir une branche par défaut qui rapporte
-  les familles qu'il ne connaît pas — c'est ce que fait déjà `rendu-comparatif` de forge-design, et
-  ce qu'aucun contrôle n'exige. *Candidat : comparer, par machine, les familles produites par la
-  mesure du socle aux familles consommées par chaque appelant.*
+Elle est écrite ici pour ne pas se perdre, et **déclarée sans contrôle** — c'est une dette, pas une
+omission. *N-10 a quitté cette section le 23/08 : son contrôle existe et tourne à chaque recette.*
+
 - **N-11 · Une affordance promise dans un commentaire est vérifiée.** Le fait : un commentaire
   annonçait « une infobulle par forme, aucun script » et aucune forme ne la portait ; un paramètre
   était déclaré et jamais lu ; une classe était employée sans une seule règle de style. Les deux
