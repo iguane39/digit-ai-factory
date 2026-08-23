@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=8582f8cb8ffd archive=54c0315cbe97 · dernier événement: 2026-08-23T07:06:18.085Z -->
+     sceaux: actifs=f2189eae0bbb archive=54c0315cbe97 · dernier événement: 2026-08-23T07:13:52.000Z -->
 
-**51 actifs** (candidat 14 · décidé 0 · en cours 1 · corrigé 35 · écarté 1) · **469 archivés**.
+**51 actifs** (candidat 13 · décidé 0 · en cours 1 · corrigé 36 · écarté 1) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -68,11 +68,11 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0494 | candidat | 15 | forge-design : le workflow auditer ne prescrit aucune tracabilite pour une demande client multiple | **oui** — Un point sur dix-sept perdu, decouvert par le client et non par la chaine de controle. |
 | TF-0491 | candidat | 12.5 | forge-design : aucun controle ne compare la largeur d un bloc de texte a celle de ses blocs freres — trois allers-retours client sur le meme defaut | **oui** — Trois allers-retours client sur un seul defaut, sur quatre versions livrees. |
 | TF-0493 | candidat | 8.3 | forge-design : le rendu ne couvre aucun etat d echec ou d interaction, et --etats-ouverts n y suffit pas | **oui** — Deux defauts d etat trouves par le client sur un seul livrable, tous deux reproductibles en deux clics. |
 | TF-0483 | candidat | 6.7 | forge-design : rien n oblige a relever ce qui se fait de bien dans le domaine du produit avant de proposer une DA — les oracles jugent la discipline INTERNE, et une DA au vert complet a ete rejetee en bloc | **oui** — Un tour complet conception+design perdu sur factory.produit-07 : DA au vert sur tous les oracles, rejetee integralement par le commanditaire, refaite avec releve externe et arbitrage humain sur captures. |
 | TF-0489 | candidat | 6.7 | forge-design : aucun composant « lecteur de source » au catalogue alors que la regle d autoportance impose d embarquer les sources citees | **oui** — 130 lignes de convertisseur ecrites a la main, plus la decouverte du seuil de DOM par essai ; besoin cree par une regle du socle lui-meme. |
+| TF-0494 | corrige | 15 | forge-design : le workflow auditer ne prescrit aucune tracabilite pour une demande client multiple | **oui** — Un point sur dix-sept perdu, decouvert par le client et non par la chaine de controle. |
 
 ## digit-ai-forge-seo-geo
 
