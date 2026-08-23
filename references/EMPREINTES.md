@@ -83,6 +83,7 @@ des emplacements lus par le contrôle, et les dépôts absents du poste — les 
 | pilot | `todo/ingerer-lot.mjs` | lot de retours ingéré (empreinte d'idempotence) | sceau de contenu normalisé LF |
 | pilot | `scripts/generer-avancement.mjs` | source du rapport d'avancement dérivé du registre (TF-0324) | sceau court (12 hex), normalisé LF |
 | pilot | `todo/self-test.mjs` | recette du registre : vérifie les sceaux qu'elle produit | usage de test, déclaré |
+| pilot | `oracles/hook-produits-intacts.mjs` | état de travail de chaque dépôt PRODUIT, relevé à l'ouverture et recomparé à la fin du tour | sceau court (12 hex) de l'état git |
 | pilot | `bootstrap.mjs` | divergence entre un skill versionné et sa copie installée (K2) | sha256 par fichier |
 | pilot | `todo/appliquer-export.mjs` | export du registre rendu à un tiers | sha256 du lot |
 | forge-seo-geo | `scripts/grille.py` · `scripts/gabarits.py` | empreinte de grille et registre d'évolutions (TF-0072) | sceau court dans le registre |

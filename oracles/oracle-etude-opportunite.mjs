@@ -85,7 +85,10 @@ function juger(texte) {
   else ok("E5", `verdict unique : ${retenues[0].slice(0, 70)}`);
 
   // E6 — termes subjectifs nus
-  const subjectifs = (texte.match(/\b(élégant|elegante?|moderne|séduisant|prometteur|intuitif)\b/gi) || []);
+  // TF-0474 bis (23/08) : `\b` est ASCII, donc `\b(élégant` ne matchait JAMAIS « élégant » et
+  // `séduisant` était mort lui aussi — la règle cherchait deux mots qu'elle ne pouvait pas voir.
+  // Trouvé par `oracle-pieges-regex` sur le parc. La borne connaît désormais les accents.
+  const subjectifs = (texte.match(/(?<![0-9A-Za-zÀ-ÿ])(élégant|elegante?|moderne|séduisant|prometteur|intuitif)(?![0-9A-Za-zÀ-ÿ])/gi) || []);
   subjectifs.length
     ? ko("E6", `terme(s) subjectif(s) sans mesure : ${[...new Set(subjectifs.map((s) => s.toLowerCase()))].join(", ")}`)
     : ok("E6", "aucun critère subjectif nu");

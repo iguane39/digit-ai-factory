@@ -291,7 +291,9 @@ function juger(texte) {
     // Un oracle qui refuse la formulation qu'un gabarit prescrit met le gabarit en défaut, jamais
     // l'auteur. La preuve d'un écart n'est pas un verdict d'oracle : c'est le « pourquoi ».
     .replace(/\bj(?:'|’)ai (?:aussi |également )?fait\b/gi, " ")
-    .replace(/\bvous avez demandé\b/gi, " ");
+    // `\b` après « demandé » ne matche jamais : la frontière ASCII ne voit pas le « é ». La
+    // tournure n'était donc pas retirée (trouvé par `oracle-pieges-regex`).
+    .replace(/(?<![0-9A-Za-zÀ-ÿ])vous avez demandé(?![0-9A-Za-zÀ-ÿ])/gi, " ");
   // S8 EST BORNÉE AUX BLOCS QUI AFFIRMENT (22/08, second temps). Elle balayait le document
   // entier, et elle mordait donc sur deux formes que le gabarit PRESCRIT ailleurs :
   //   · bloc 6 — « vous avez demandé → j'ai fait → pourquoi » : la preuve d'un écart est le

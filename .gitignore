@@ -11,3 +11,8 @@ runs/**/produit/
 
 # journal des verdicts des hooks (R-44) : etat de poste, jamais versionne
 .claude/hooks-journal.jsonl
+
+# Releve d'ouverture du garde-fou des produits (TF-0530) : c'est un ETAT DE POSTE, propre a une
+# session et a un parc local — le versionner ferait croire qu'il vaut pour un autre poste, et le
+# garde-fou comparerait alors deux realites differentes.
+.oracles/produits-au-demarrage.json

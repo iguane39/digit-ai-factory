@@ -100,6 +100,11 @@ et la **clôture exécute `oracle-conformite-projet` — un FAIL R-20 bloque la 
 importé (dépôt repris) : rattrapage explicite à l'ouverture de son premier run de version —
 socle créé depuis l'état constaté, `.env.example` reconstruit (R-13) avant que R-22 ne juge.
 
+**Les règles nées des défauts réellement payés vivent dans `references\REGLES-DE-NON-REPETITION.md`**
+(23/08/2026) — neuf règles génériques, chacune avec le mécanisme qui l'exécute et son compte, plus
+deux déclarées sans mécanisme. Le document existe parce qu'une classe de défaut sans règle se
+re-paie autant de fois qu'il y a de sites, et qu'une règle sans mécanisme est une consigne.
+
 **Un reste-à-faire porte TROIS NATURES, et elles ne vivent pas au même endroit** (TF-0528,
 23/08/2026). `TODO-PRODUIT.md` a trois sections, et la séparation n'est pas un rangement : c'est la
 condition pour que le document reste ouvert par son lecteur. Un **reste à faire** attend qu'on le
