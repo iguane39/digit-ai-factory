@@ -120,6 +120,17 @@ par cette option comme un préalable explicite, pas escamoté.
   de TF-0318, qu'aucun fait nouveau n'a renversé : la surface d'entrée non fiable reste ouverte
   et le mapping OWASP LLM01 de l'écosystème déclare sa couverture « partielle … ni modèle
   vivant ». O4 est prématurée par construction.
+- **Note datée du 23/08/2026 — ce verdict n'est PAS renversé, et il faut le dire précisément.**
+  Le dépôt est entré ce jour-là dans la liste des dépôts SUIVIS de `bootstrap.mjs`, sur décision
+  humaine confirmée (TF-0535). Cette entrée ne touche à aucun des quatre refus ci-dessous : elle
+  ne câble aucun hook, ne déclare aucun `QUEUE_DIR`, n'échange aucun ticket et n'écoute aucun
+  dossier. Elle vérifie **une seule chose** — que le dépôt présent sur le poste ne se périme pas
+  en silence. Ce qui a changé n'est donc pas le verdict d'admission, mais une conséquence que
+  l'inventaire en avait tirée (« hors bootstrap ») et qui ne tenait pas pour un poste où le dépôt
+  vit déjà : présent depuis le 2026-07-16, jamais mis à jour, absent du ledger, et nommé par
+  aucun contrôle jusqu'au 23/08. *Une admission documentaire sans vérification de fraîcheur
+  laisse l'objet admis hors de toute surveillance, ce qui est le contraire d'une admission.*
+
 - **Ce que le verdict REFUSE explicitement** : aucun hook n'est câblé, aucun `QUEUE_DIR` n'est
   déclaré, aucun ticket n'est échangé, aucun dossier n'est écouté par une session. L'admission
   est **documentaire et normative**, pas opérationnelle. Les deux invariants posés par TF-0318
