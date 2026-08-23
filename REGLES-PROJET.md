@@ -20,6 +20,8 @@ projet (2e mandat) · **G** = gate humain.
 
 ## A. Structure de dossiers
 
+Où vit quoi, à la racine d'un produit. Le tableau se lit par CHEMIN : la colonne de gauche nomme l'emplacement, celle de droite ce qu'on a le droit d'y mettre.
+
 | n° | Règle (binaire) | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
 | 1 | `input\` existe à la racine ; tout entrant fourni par l'humain y vit | observée 7/11 (forges, Produit-12, Transcript…) | tous projets, nouveaux + rattrapage | P0+O | nul | **défaut** |
@@ -29,10 +31,12 @@ projet (2e mandat) · **G** = gate humain.
 
 ## B. Nommage
 
+Comment un fichier s'appelle, et **ce que son nom promet**. Chaque ligne porte sa règle, la preuve qui l'a établie, et la sévérité d'un écart — c'est cette dernière colonne qui dit si on peut passer outre.
+
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
 | 4 | Tout livrable documentaire est nommé `<Projet> - <Objet> - AAAAMMJJ<indice>.<ext>` — **le nom du PROJET prime sur l'émetteur** (Q3-bis tranchée par l'humain le 09/08 : « Produit-02 - Audit SEO - … », plus jamais « Digit-AI - … » en tête). Les fichiers historiques ne sont pas renommés. **Alinéa RV-2 (Produit-10, 13/08)** : quand un ENTRANT exige un autre nommage pour le livrable, le nommage du pilot **prime** ; la correspondance entre le nom exigé et le nom produit est consignée au ledger (champ `note_nommage`) — jamais d'arbitrage silencieux | convention historique observée avec préfixe émetteur ; **décision humaine du 09/08** la corrige ; alinéa : retour Produit-10 RV-2 (conflit vécu, arbitré au ledger seq 1) | **livrables uniquement** (input\, output\, docs\) — JAMAIS le code (conflit C3) | S+O | faible | **défaut** |
-| 5 | L'indice est une lettre (a, b, c…) par itération du même jour ; une nouvelle version = un **nouveau fichier daté**, jamais d'écrasement | observée (`20260721b` → `20260721d`, `revue.md`/`revue-v2`) | livrables uniquement | S+O | faible | **défaut** |
+| 5 | L'indice est une lettre (a, b, c…) par itération du même jour ; une nouvelle version = un **nouveau fichier daté**, jamais d'écrasement — **CÂBLÉE depuis le 23/08** : `node scriptserifier-jugement.mjs <dossier>` compare l'empreinte d'un livrable à celle de son sceau, et refuse une modification à indice inchangé (TF-0523) | observée (`20260721b` → `20260721d`, `revue.md`/`revue-v2`), **et reproduite le 23/08 : le même fichier écrasé quatre fois, une heure après avoir signalé le même défaut ailleurs** | livrables uniquement | S+O | faible | **défaut** |
 | 25 | Le `<Type>` du nom de tout livrable daté (2ᵉ segment, 1ᵉʳ mot) **figure au registre des types** (`registre-types.json` d'organization, comparaison insensible casse/accents) — un type nouveau s'ajoute au registre dans un commit motivé (D-04), jamais improvisé dans un nom. Registre lu en dépôt frère ; poste non équipé → non jugeable, pas FAIL | **D-04 organization (décidée 08/08), encodée 11/08 (TF-0084)** — registre 1.1.0, 29 types, complété sur usage réel | produits, nouveaux + rattrapage | O | nul | **défaut** |
 
 **Alinéa paramétrage (TF-0322, décidé le 17/08 — étude 20260817f, verdict O1 : refus
@@ -48,7 +52,19 @@ par `oracle-nommage.mjs`, SKIP motivé sans profil, TF-0071) et l'alinéa RV-2 d
 demandeur reçoit une voie, pas un mur ; critère de réouverture : un deuxième conflit de
 préférence réel consigné au ledger.
 
+**Une règle non câblée ne s'applique pas, y compris à celui qui vient de la citer** (TF-0523,
+23/08/2026). La règle 5 existait, était écrite, et connue. Elle a été enfreinte QUATRE FOIS sur le
+même fichier — une heure après que le même défaut ait été signalé à la Factory sur un gabarit. Ce
+n'est pas un problème de mémoire : c'est qu'aucun mécanisme ne regardait.
+
+Le moment où un fichier cesse d'être un brouillon est identifiable : **celui où il passe ses oracles
+pour la première fois**. `verifier-jugement.mjs` y pose un sceau — l'empreinte du contenu jugé — et
+refuse ensuite tout écart à indice inchangé. Un livrable **non scellé** n'est pas en défaut : c'est
+un état, et il est déclaré. Exiger un sceau sur tout l'existant ferait désactiver le contrôle le
+jour de son arrivée.
 ## C. Versions et git
+
+Ce qui est versionné, quand, et sous quelle forme. Le tableau ne dit pas comment utiliser git : il dit ce qui, chez nous, doit s'y trouver.
 
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
@@ -59,6 +75,8 @@ préférence réel consigné au ledger.
 | 10 | `.gitignore` socle dès la création : `.env`, `.venv/`, `__pycache__/`, `node_modules/`, `generated/`, artefacts de build, **sidecars d'oracles** `*.oracles.json` / `*.oracles-cache.json` / `*.oracles-historique.jsonl` (TF-0065 — les preuves VOULUES restent versionnées sous `forge\`, exception `!forge/**`, décision C4) | observée (9/11) ; sidecars : 3 campagnes polluées | tous | P0+O | nul | **défaut** |
 
 ## D. Documentation du produit
+
+Les documents qu'un produit doit porter, et ce qui les rend opposables. Une ligne sans preuve dans la colonne du milieu est une intention, pas une règle.
 
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
@@ -91,6 +109,8 @@ socle créé depuis l'état constaté, `.env.example` reconstruit (R-13) avant q
 
 ## E. Environnements et configuration
 
+Ce qui distingue un environnement d'un autre, et ce qui ne doit jamais les traverser. La colonne de sévérité y est la plus importante du document : c'est là qu'un écart coûte le plus.
+
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
 | 13 | `.env.example` versionné et **exhaustif** : toutes les variables attendues — applicatives ET infra (ports, URLs, cible de déploiement, drapeaux `*_MODE_DEMO`) — valeurs par défaut sûres ou vides, en-tête « ne jamais renseigner de secret ici » | observée (design, tests, ASDMailManager, Produit-02 — en-tête littéral constaté) | produits, nouveaux + rattrapage | P0+O | faible | **défaut** |
@@ -102,6 +122,8 @@ socle créé depuis l'état constaté, `.env.example` reconstruit (R-13) avant q
 
 ## F. Livrables et archivage
 
+Ce qu'on remet, sous quel nom, et ce qu'on garde. Le tableau se lit du livrable vers sa trace : à droite, ce qui doit rester quand le livrable est parti.
+
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
 | 16 | Les rapports finaux destinés à l'humain (DOSSIER-MEP, PV, revues) sont **copiés** dans `output\` au nommage daté (n° 4) — l'original de travail reste sous `forge\etapes\` | cohérence avec `digit-ai-forge-agents/output/` | produits | S | faible | **défaut** |
@@ -109,6 +131,8 @@ socle créé depuis l'état constaté, `.env.example` reconstruit (R-13) avant q
 | 18 | `forge\retours\` existe (gabarit inclus) ; chaque lot de retours forges est un fichier `<projet> - RETOURS - <AAAAMMJJ><indice>.md` (+ sidecar `.tf.jsonl` homonyme) — **le préfixe projet est obligatoire** (décision 13/08 : les lots de tous les projets cohabitent chez le pilot, le nom dit qui retourne quoi), un fichier par lot, ids en séquence continue par produit, **jamais modifié après remise** ; remise = copie dans `input\00-retours\` du pilot (après ingestion, la paire part en `old\`) | **mandat humain du 06/08**, préfixe + famille 00-retours **13/08** ; format éprouvé (Produit-12, Produit-10) | produits, nouveaux + rattrapage | P0+S+O | faible | **adoptée** (décisions 06/08 et 13/08) |
 
 ## G. Circuit des conventions (D-13) — traçabilité organization → pilot
+
+Ce tableau se lit **par étape du circuit**, de haut en bas : chaque ligne dit qui propose, qui tranche, et où la trace se dépose. Il n'est pas trié par importance — l'ordre EST le circuit, et sauter une ligne saute une étape.
 
 Aboutissement de Q-B (TF-0039, constat du 11/08). Le circuit — proposition `D-xx` chez
 organization → remise au pilot → **décision humaine** → encodage ici + oracle — a été
@@ -691,6 +715,8 @@ chaque produit, jamais en masse silencieuse.
 ---
 
 ## Annexe — inventaire (preuves)
+
+Les pièces réelles sur lesquelles les règles ci-dessus ont été établies. Cette annexe ne prescrit rien : elle **montre** ce qui a été observé, pour qu'une règle puisse se contester sur pièces plutôt que d'autorité.
 
 | Dépôt | CLAUDE.md | README | .env.example | input\ | output\ | Old\ | git | fichiers datés |
 |---|---|---|---|---|---|---|---|---|

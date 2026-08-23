@@ -14,7 +14,7 @@ Livrables du pilot, en familles numérotées (D-15/D-16) : **une seule version �
 
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
-| [`01-revues-et-propositions\`](01-revues-et-propositions/README.md) | dossier (11 fichiers) | — | Revues d'écosystème (fiches d'audit des forges rejouées, synthèse trans-forges) et propositions de forge — rapports, maquettes HTML, notes ; un document par rev… |
+| [`01-revues-et-propositions\`](01-revues-et-propositions/README.md) | dossier (8 fichiers) | — | Revues d'écosystème (fiches d'audit des forges rejouées, synthèse trans-forges) et propositions de forge — rapports, maquettes HTML, notes ; un document par rev… |
 | [`02-schema-ecosysteme\`](02-schema-ecosysteme/README.md) | dossier (6 fichiers) | — | Schéma d'écosystème des forges (HTML autoportant), régénéré à chaque changement de périmètre (forge née, renommée) ; versions antérieures en `old\`. |
 | [`03-etudes\`](03-etudes/README.md) | dossier (39 fichiers) | — | Études d'opportunité au gabarit `gabarits\ETUDE-OPPORTUNITE.md` (jugées par `oracles\oracle-etude-opportunite.mjs`, sections + O0-O4 + verdict unique + plan de … |
 | [`04-plans\`](04-plans/README.md) | dossier (21 fichiers) | — | Plans stratégiques, synthèses de mandat et de campagne (format `gabarits\RESTITUTION.md`), notes de migration — livrables R-4 datés. |

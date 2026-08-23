@@ -73,6 +73,12 @@ const ROLES = {
 
 // Dossiers MACHINE : journaux d'oracles (`.oracles\`, `_oracles\` — TF-0428) — régénérés à
 // chaque exécution, jamais lus par un humain. Comptés au README du parent, sans README propre.
+// Les SIDECARS de contrôle ne sont pas du contenu : ils accompagnent un fichier et se lisent par
+// l'outil qui les écrit. Les lister doublerait chaque table et noierait les livrables (convention
+// TF-0065, étendue au sceau de jugement de TF-0523 — qui est VERSIONNÉ, contrairement à un cache :
+// un sceau non versionné ne survivrait pas au clonage, et n'avertirait donc personne).
+const EST_SIDECAR = (nom) => /\.(jugement|oracles|oracles-cache)\.json$/i.test(nom)
+  || /\.oracles-historique\.jsonl$/i.test(nom);
 const EST_MACHINE = (nom) => nom.startsWith(".") || nom === "_oracles";
 const posix = (p) => p.split(sep).join("/");
 const affiche = (p) => p.split("/").join("\\") + "\\";
@@ -110,7 +116,7 @@ function compter(dir) {
   let fichiers = 0;
   for (const e of readdirSync(dir, { withFileTypes: true })) {
     if (EST_MACHINE(e.name)) continue;
-    if (e.isDirectory()) fichiers += compter(join(dir, e.name)); else if (e.name !== "README.md") fichiers++;
+    if (e.isDirectory()) fichiers += compter(join(dir, e.name)); else if (e.name !== "README.md" && !EST_SIDECAR(e.name)) fichiers++;
   }
   return fichiers;
 }
@@ -126,7 +132,7 @@ function roleExistant(readme) {
 
 function attendu(dir, rel) {
   const entrees = readdirSync(dir, { withFileTypes: true })
-    .filter((e) => !EST_MACHINE(e.name) && e.name !== "README.md" && !estIgnore(rel + "/" + e.name))
+    .filter((e) => !EST_MACHINE(e.name) && !EST_SIDECAR(e.name) && e.name !== "README.md" && !estIgnore(rel + "/" + e.name))
     .sort((x, y) => (x.isDirectory() === y.isDirectory() ? x.name.localeCompare(y.name, "fr") : x.isDirectory() ? -1 : 1));
   const caches = readdirSync(dir, { withFileTypes: true }).filter((e) => EST_MACHINE(e.name) && e.isDirectory()).map((e) => e.name);
   const role = roleExistant(join(dir, "README.md")) || ROLES[rel] || PLACEHOLDER;
