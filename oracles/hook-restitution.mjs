@@ -42,15 +42,18 @@ export function analyserTranscript(texte) {
   for (let i = entrees.length - 1; i >= 0; i--) if (estHumain(entrees[i])) { debut = i; break; }
   const tour = entrees.slice(debut + 1);
   let ecritures = 0, commandes = 0;
+  // Chaque texte du tour, AVEC le nombre d'outils déjà vus à ce moment-là. C'est ce compteur qui
+  // permet de reconnaître un texte FINAL : rien ne l'a suivi.
   const tousLesTextes = [];
+  let outils = 0;
   for (const e of tour) {
     if (e.type !== "assistant") continue;
     const blocs = contenu(e);
-    for (const b of blocs) {
-      if (b.type === "tool_use") { if (ECRITURES.has(b.name)) ecritures++; else if (COMMANDES.has(b.name)) commandes++; }
-    }
     const textes = blocs.filter((b) => b.type === "text").map((b) => b.text).join("\n").trim();
-    if (textes) tousLesTextes.push(textes);
+    if (textes) tousLesTextes.push({ texte: textes, outilsAvant: outils });
+    for (const b of blocs) {
+      if (b.type === "tool_use") { outils++; if (ECRITURES.has(b.name)) ecritures++; else if (COMMANDES.has(b.name)) commandes++; }
+    }
   }
   // TF-0516 (22/08/2026) — LE HOOK JUGEAIT UN AUTRE TEXTE QUE CELUI QUI PORTE LA RESTITUTION.
   //
@@ -66,21 +69,33 @@ export function analyserTranscript(texte) {
   // supprimer. Et le motif ACCUSE L'AUTEUR d'avoir omis ce qu'il a écrit. Un gate qui accuse à
   // tort s'apprend à contourner (R-33 bis).
   //
-  // REMÈDE : on juge le texte le PLUS LONG du tour, pas le dernier. Une restitution à neuf
-  // blocs n'est jamais le plus court texte d'un tour, et un préambule n'est jamais le plus
-  // long. Le vrai discriminant n'est ni la longueur absolue ni la présence de titres : c'est
-  // qu'un préambule n'est JAMAIS SEUL — il est suivi de la restitution dans le même tour.
+  // REMÈDE, TROISIÈME ÉTAT — et les deux précédents valent d'être écrits, parce qu'ils disent
+  // pourquoi celui-ci est le bon.
   //
-  // UNE SECONDE VOIE A ÉTÉ ÉCRITE PUIS RETIRÉE, et le dire évite de la reproposer : déclarer
-  // NON JUGEABLE un texte sans titre de section. Elle DÉSARMAIT LE GATE — un message hors
-  // format n'a pas de titres non plus, c'est même sa définition, et la recette l'a montré
-  // immédiatement (« travail + hors format → attendu block, obtenu null »). Un garde-fou qui
-  // s'annule sur le cas qu'il existe pour attraper est pire que pas de garde-fou.
-  const dernierTexte = tousLesTextes.length
-    ? tousLesTextes.reduce((a, b) => (b.length > a.length ? b : a))
-    : "";
+  //   1. « le DERNIER texte du tour » : faux dès qu'une phrase suit la restitution.
+  //   2. « le texte le PLUS LONG du tour » : mieux, mais insuffisant. Mesuré le 23/08 sur un tour
+  //      réel de 24 écritures et 90 commandes, portant VINGT textes — des phrases de transition
+  //      entre les appels d'outils. Quand le hook lit le transcript avant que la restitution y
+  //      soit écrite, le plus long des textes présents est une de ces phrases : le hook a rendu
+  //      quatre échecs bloquants dont « les huit blocs sont absents », sur un message qui les
+  //      portait tous. Rejoué après coup, l'analyseur retrouvait la restitution — la preuve que
+  //      ce n'était pas le CHOIX du texte qui était faux, mais le MOMENT de la lecture.
+  //   3. Le vrai discriminant est SÉMANTIQUE, pas métrique : **un préambule est suivi d'appels
+  //      d'outils, un message FINAL ne l'est pas.** On juge donc le dernier texte qu'aucun outil
+  //      ne suit. S'il n'y en a pas — cas exact du transcript non encore écrit — il n'y a rien à
+  //      juger, et on laisse passer plutôt que d'accuser l'auteur d'un défaut qui n'est pas le
+  //      sien. Un message hors format, lui, reste attrapé : il est bien le dernier texte, et rien
+  //      ne le suit.
+  //
+  // Une voie a été écartée en chemin : déclarer NON JUGEABLE tout texte sans titre de section.
+  // Elle DÉSARMAIT le gate — un message hors format n'a pas de titres non plus, c'est même sa
+  // définition, et la recette l'a montré dans la minute. Un garde-fou qui s'annule sur le cas
+  // qu'il existe pour attraper est pire que pas de garde-fou.
+  const totalOutils = outils;
+  const finaux = tousLesTextes.filter((t) => t.outilsAvant === totalOutils);
+  const dernierTexte = finaux.length ? finaux[finaux.length - 1].texte : "";
   return { travail: ecritures >= 1 || commandes >= 4, ecritures, commandes, dernierTexte,
-           textes: tousLesTextes.length };
+           textes: tousLesTextes.length, finaux: finaux.length };
 }
 
 export function juger(texte) {
