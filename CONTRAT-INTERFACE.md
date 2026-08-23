@@ -170,6 +170,44 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   seulement le code ; un relevé vide se consigne (« aucune règle modifiée »).
   Contrôle exécutable : R-19 de `oracles/oracle-conformite-projet.mjs` (TF-0035).
 
+### 3 quater. Une note documente la FORME d'un contrat, jamais sa VALEUR courante (TF-0477)
+
+Ce qui **bouge** — un compte, un haché, un identifiant, une date de dernier passage — vit dans le
+dépôt et se lit à l'exécution. Une note qui recopie une telle valeur lui crée un **second domicile
+qui dérivera en silence**, et le lecteur fera confiance à la copie. Corollaire opérationnel, et
+c'est lui qu'on applique : *une valeur ne se cite que si quelque chose en aval dépend de CETTE
+valeur exacte, et ce dépendant est nommé dans la même phrase* — une citation sans dépendant nommé
+est une copie que rien ne surveille.
+
+La loi n° 4 disait où une donnée volatile **habite** (éditable, datée, sourcée) ; elle ne disait
+rien de la **prose qui la recopie**. Et la détection était **nominative** : un claim de
+`oraclesraicheur-claims.json` n'existe que si quelqu'un a déjà constaté la dérive et écrit sa
+sonde — donc on trouvait toujours l'instance et jamais la classe. Mesure du 22/08 : six claims,
+tous sur le même document, quand les deux dernières dérives avouées vivaient dans le README d'une
+forge (TF-0311, TF-0334).
+
+**Contrôlé** : `node oracles\oracle-fraicheur-doc.mjs` — les claims **prouvent** une valeur ;
+le balayage **F-CLASSE** signale, sur les documents de pilotage, toute assertion de dénombrement
+sans domicile nommé dans la phrase. Il est **avertissant et jamais bloquant**, par choix : le
+corpus en porte des dizaines de bonne foi, et un contrôle qui bloquerait sur elles apprendrait à
+être contourné. Il rend la liste de travail ; l'arbitrage reste une lecture.
+
+### 3 ter. Empreintes : UN format déclaré, et un registre qui le fait tenir (TF-0474)
+
+Tout artefact dont la **fraîcheur** ou l'**intégrité** est jugée par hachage suit la convention de
+`references\EMPREINTES.md`. Le format est `forge-ops/empreinte@1` — quatre champs (`format`,
+`release`, `ts`, `fichiers` haché par fichier), promu depuis forge-ops parce qu'il était le seul
+**déclaré ET versionné** du parc. Trois écarts qu'il absorbe, tous déjà payés : normalisation des
+fins de ligne avant hachage (TF-0072 rejoué en TF-0253), capture avant/après (ne jamais certifier
+un contenu qui a bougé pendant la mesure), et **tous** les chemins de scellement — TF-0288 a fermé
+une voie de promotion et laissé la seconde ouverte (TF-0298).
+
+**Ce qui fait tenir la convention n'est pas le format, c'est le registre** : `oracle-empreintes`
+compare la table des sites déclarés à ce que le parc contient, et **un site non déclaré est un
+constat**. Sept items du registre relevaient de cette classe et ont été traités un par un, dont
+deux redécouvertes strictes du même défaut : sans contrôle, le sixième mécanisme naîtrait comme les
+cinq premiers. Joué à chaque recette du pilot sur le parc réel (I4).
+
 ### 3 bis. Référentiels à identifiants : évolution sous table de correspondance (TF-0048)
 
 Tout référentiel dont les éléments portent des identifiants consommés par ailleurs (grille de
@@ -184,6 +222,9 @@ table de correspondance + contrôle de version de grille (seo, TF-0048). Une for
 évoluer un référentiel identifié sans sa table est en défaut de contrat.
 
 ## 4. Routage par modèle
+
+Chaque rôle a son modèle par défaut, et le tableau dit lequel : le lire évite deux erreurs
+symétriques — déléguer un arbitrage, et facturer un travail mécanique au prix du raisonnement.
 
 | Rôle | Modèle | Règle |
 |---|---|---|
@@ -257,6 +298,14 @@ Racine des chemins : `$FORGE_ROOT`, sinon le parent du dépôt pilot (`c:\dev` s
 d'origine). Amorçage d'un poste : `node bootstrap.mjs [--racine <dossier>] [--pull]` — clone les
 forges (`github.com/iguane39`, `gh` authentifié requis pour les dépôts privés) et vérifie
 les points d'entrée listés ci-dessous.
+
+**Comment lire cette table.** Une ligne par étape ou par forge transverse, dans l'ordre du run
+puis des transverses — jamais par priorité. **Point d'entrée** dit la commande réellement jouée,
+pas celle que la forge documente : c'est toute la valeur de la table. **Mode** distingue le
+`natif` (la forge est appelée telle quelle) du `dégradé` (le pilot fait le travail à sa place, et
+la colonne suivante dit pourquoi). **Dette** porte l'écart au contrat, et chaque entrée de dette
+est reprise dans `BOUCLE-AMELIORATION.md` comme retour candidat — une dette qui ne revient pas
+dans une boucle est une dette qu'on a acceptée sans le dire.
 
 | Étape | Point d'entrée utilisé | Mode | Dette (écart au contrat) |
 |---|---|---|---|

@@ -131,6 +131,15 @@ const ETAT_DU_PARC = [
     remede: "node oracles\\oracle-skills.mjs --appliquer (décision humaine, TF-0391)",
   },
   {
+    // TF-0474 (23/08) : la convention d'empreinte ne tient que si un site NON DECLARE se voit.
+    // Sept items du registre relevaient de cette classe, traites un par un, dont DEUX
+    // redecouvertes strictes du meme defaut. C'est un etat du PARC, pas un artefact : il se joue
+    // ici, a chaque recette.
+    nom: "oracle-empreintes.mjs",
+    motif: "site de scellement sha256 non declare au registre des empreintes",
+    remede: "declarer le site dans la table de references\EMPREINTES.md (depot, ce qui est scelle, format)",
+  },
+  {
     // R-44 (20/08) : un README par dossier d'input\ et output\, présent, à jour, rédigé.
     nom: "oracle-readme-dossiers.mjs",
     motif: "README d'input\\ et output\\ absents, périmés ou non rédigés",
