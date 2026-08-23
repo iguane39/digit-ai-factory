@@ -19,6 +19,10 @@
  *  · R-20 gagne le couple `TODO-PRODUIT.md` → `.html` (TF-0318, volet LECTURE seul), tenu en
  *    PARITÉ par sceau sha256 ; source absente = SANS_OBJET motivé, jamais un défaut de produit.
  *
+ * 23/08/2026 — R-20 gagne la NATURE DES LIGNES (TF-0528) : « Améliorations » n'accueille que de
+ * vrais restes à faire. Une contrainte CONDITIONNELLE et un écart DÉJÀ ASSUMÉ y ressortaient
+ * indéfiniment comme du travail en attente — deux lignes sur neuf contestées par le lecteur.
+ *
  * Usage : node oracle-conformite-projet.mjs <racine-du-projet>
  * Sortie : JSON sur stdout — { oracle, version, cible, verdict, findings[], non_juge[] }
  *          finding = { regle: "R-<n>", statut: PASS|FAIL|SANS_OBJET, ou, message }
@@ -927,6 +931,116 @@ else {
       ko("R-20", "docs\\projet\\TODO-PRODUIT.html", `projection PÉRIMÉE — le sceau de la source (${attendu}) est absent de la page : la source a changé sans que la vue soit régénérée. Rejouer node <pilot>\\todo\\generer-todo-produit.mjs docs\\projet\\TODO-PRODUIT.md`); okTdp = false;
     }
     if (okTdp) ok("R-20", "docs\\projet\\TODO-PRODUIT.md → .html", `couple source→projection à parité (sceau ${attendu}), frontmatter machine complet`);
+
+    // ---- R-20 (nature des lignes) · TROIS NATURES, TROIS EMPLACEMENTS (TF-0528, 23/08/2026) ---
+    //
+    // MESURE QUI A FAIT NAÎTRE LE CONTRÔLE : sur neuf lignes remises à un lecteur humain, DEUX ont
+    // été contestées mot pour mot — « Oubli, sujet déjà évoqué et traité. Revois pourquoi tu le
+    // ressors encore » et « Non sujet, pourquoi cela sort ? ». La cause n'était pas la rédaction
+    // des lignes : c'était leur EMPLACEMENT. Une seule table accueillait trois natures.
+    //   (a) de vrais restes à faire ;
+    //   (b) un ÉCART ASSUMÉ — une portée de droits décidée et consignée au journal des décisions
+    //       cinq jours plus tôt — qui portait encore le statut « à décider ». Un écart assumé est
+    //       une DÉCISION PRISE : il se redéclare au prochain audit, il ne se re-propose pas ;
+    //   (c) une CONTRAINTE CONDITIONNELLE — élargir une politique SI l'origine des médias change,
+    //       alors que la décision de ne pas la changer était close — dont la condition ne sera
+    //       peut-être jamais réunie, et qui n'appelle donc aucune action.
+    //
+    // Sans cette séparation, un relevé grossit d'un tiers à chaque passage et perd la confiance de
+    // son lecteur — qui cesse alors de le lire. C'est le coût réel : pas une ligne de trop, un
+    // document qu'on n'ouvre plus.
+    const sectionsTdp = (() => {
+      const out = new Map(); let titre = ""; let buf = [];
+      for (const l of source.split(/\r?\n/)) {
+        const m = /^##\s+(.+?)\s*$/.exec(l);
+        if (m) { if (titre) out.set(titre, buf.join("\n")); titre = m[1]; buf = []; }
+        else if (titre) buf.push(l);
+      }
+      if (titre) out.set(titre, buf.join("\n"));
+      return out;
+    })();
+    const trouverSection = (motif) => {
+      for (const [t, corps] of sectionsTdp) if (motif.test(t)) return corps;
+      return null;
+    };
+    // Les lignes de DONNÉES d'un tableau : ce qui suit le séparateur, jamais l'en-tête.
+    const lignesTdp = (bloc) => {
+      if (!bloc) return [];
+      const li = bloc.split("\n").map((x) => x.trim()).filter((x) => x.startsWith("|"));
+      const iSep = li.findIndex((x) => /^\|[\s:|-]+\|$/.test(x));
+      return (iSep < 0 ? [] : li.slice(iSep + 1))
+        .map((x) => x.replace(/^\|/, "").replace(/\|$/, "").split(/(?<!\\)\|/).map((c) => c.trim()));
+    };
+    // Une ligne dont l'Id est un GABARIT (`{A-01}`) est l'exemple que le gabarit prescrit : la
+    // juger condamnerait la forme que le gabarit impose, donc mettrait le gabarit en défaut plutôt
+    // que l'auteur. Leçon payée le 22/08 par un contrôle de Markdown qui accusait 7 blocs sur 9
+    // d'une restitution CONFORME.
+    const estGabarit = (l) => /^\{.*\}$/.test((l[0] || "").trim());
+
+    const contraintes = trouverSection(/contraintes\s+connues/i);
+    // ANTÉRIORITÉ, pas défaut : la section naît le 23/08. Un document non revu depuis ne l'a pas,
+    // et il n'a rien fait de mal — c'est la RÈGLE qui a bougé (même doctrine que TF-0366). Le
+    // signal de date est déjà DANS le fichier (`verifie_le` du frontmatter) : aucune boucle sur
+    // l'historique, aucune date de système de fichiers.
+    const verifieLe = (/^verifie_le\s*:\s*(\d{4}-\d{2}-\d{2})\s*$/m.exec(front || "") || [])[1] || null;
+    if (contraintes === null) {
+      if (verifieLe && verifieLe >= "2026-08-23")
+        ko("R-20", "docs\\projet\\TODO-PRODUIT.md", `section « Contraintes connues — ce ne sont PAS des restes à faire » absente d'un document revu le ${verifieLe}, donc APRÈS l'entrée en vigueur (TF-0528, 23/08) : une contrainte conditionnelle logée dans « Améliorations » ressort indéfiniment comme du travail en attente. La section se déclare même vide — « aucune contrainte connue à ce jour » — jamais par silence (loi n° 3)`);
+      else
+        antecedences.push(`R-20 (nature des lignes) non jugé sur docs\\projet\\TODO-PRODUIT.md : la section « Contraintes connues » naît le 23/08 (TF-0528) et le document porte verifie_le=${verifieLe || "non daté"} — antériorité déclarée, jamais un défaut de produit ; elle sera exigée dès la prochaine revue datée`);
+    } else {
+      const amel = lignesTdp(trouverSection(/am[ée]liorations/i));
+      const ecarts = lignesTdp(trouverSection(/[ée]carts\s+assum[ée]s/i)).filter((l) => !estGabarit(l));
+      let natureOk = true;
+
+      // (c) UNE CONDITION N'EST PAS UNE ACTION. « élargir la politique SI l'origine change » ne
+      // se fait pas : elle attend un événement extérieur. Sa place est aux contraintes connues.
+      // Les tournures qui ne conditionnent PAS l'action sont exclues nommément — « si possible »,
+      // « si besoin », « même si » modulent un travail déjà décidé, elles ne le suspendent pas.
+      const SANS_CONDITION = /\b(?:si\s+(?:possible|besoin|n[ée]cessaire|jamais)|m[êe]me\s+si|si\s+bien\s+que)\b/gi;
+      const CONDITION = /\b(?:si|lorsque|d[èe]s\s+que|au\s+cas\s+o[ùu]|tant\s+que|le\s+jour\s+o[ùu])\b/i;
+      for (const l of amel) {
+        if (estGabarit(l)) continue;
+        const texte = (l[1] || "").replace(SANS_CONDITION, " ");
+        if (CONDITION.test(texte)) {
+          ko("R-20", `docs\\projet\\TODO-PRODUIT.md · ${l[0] || "ligne sans Id"}`, `ligne CONDITIONNELLE dans « Améliorations » : « ${(l[1] || "").slice(0, 90)} ». Une action suspendue à un événement extérieur n'est pas un reste à faire — sa condition ne sera peut-être jamais réunie, et elle ressort à chaque relevé comme du travail en attente. Elle vit à « Contraintes connues », avec sa condition de déclenchement écrite`);
+          natureOk = false;
+        }
+      }
+
+      // (b) UN ÉCART ASSUMÉ EST UNE DÉCISION PRISE. Deux façons de le voir, et la première est la
+      // plus sûre : la ligne CITE elle-même sa décision tout en se déclarant « à décider ».
+      const CITE_DECISION = /(d[ée]cid[ée]e?\s+le|arbitrage\s+du|DECISIONS\.md|\bADR\s*\d|\bD-\d{2,})/i;
+      const A_DECIDER = /^\s*[àa]\s*d[ée]cider\s*$/i;
+      // La seconde : la ligne redit, en mots largement communs, un écart DÉJÀ inscrit plus bas.
+      const STOP = new Set(["parce", "quand", "comme", "depuis", "encore", "etait", "aussi", "toute",
+        "toutes", "autre", "autres", "celui", "celle", "leurs", "lorsque", "ainsi", "alors", "avant",
+        "apres", "chaque", "tandis", "notre", "votre", "cette", "jusqu", "faire", "avoir", "peut"]);
+      const jetons = (t) => new Set(String(t).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, " ").split(" ").filter((w) => w.length >= 5 && !STOP.has(w)));
+      for (const l of amel) {
+        if (estGabarit(l)) continue;
+        const statut = l.find((c) => A_DECIDER.test(c));
+        if (!statut) continue;
+        if (CITE_DECISION.test(l.join(" "))) {
+          ko("R-20", `docs\\projet\\TODO-PRODUIT.md · ${l[0] || "ligne sans Id"}`, `ligne « à décider » qui CITE POURTANT sa propre décision (« ${(CITE_DECISION.exec(l.join(" ")) || [""])[0]} ») : présentée comme un arbitrage ouvert alors qu'elle en porte la trace. Un écart assumé se redéclare aux « Écarts assumés » avec son motif et sa date ; il ne se re-propose pas`);
+          natureOk = false; continue;
+        }
+        const ja = jetons(l[1] || "");
+        for (const e of ecarts) {
+          const je = jetons(e[0] || "");
+          const communs = [...ja].filter((w) => je.has(w));
+          // Seuil à QUATRE mots significatifs communs : deux lignes distinctes d'un même produit
+          // partagent facilement deux ou trois mots de domaine. Le seuil est conservateur par
+          // choix — mieux vaut manquer une reformulation totale que crier sur deux vrais sujets.
+          if (communs.length >= 4) {
+            ko("R-20", `docs\\projet\\TODO-PRODUIT.md · ${l[0] || "ligne sans Id"}`, `ligne « à décider » qui redit un ÉCART DÉJÀ ASSUMÉ plus bas (« ${(e[0] || "").slice(0, 70)} », décidé le ${e[2] || "?"}) — ${communs.length} mots significatifs communs : ${communs.slice(0, 6).join(", ")}. La décision est prise : la ligne se retire des améliorations, ou son statut cesse d'être « à décider »`);
+            natureOk = false; break;
+          }
+        }
+      }
+      if (natureOk) ok("R-20", "docs\\projet\\TODO-PRODUIT.md (nature des lignes)", `trois natures séparées : ${amel.filter((l) => !estGabarit(l)).length} amélioration(s) réelle(s), ${ecarts.length} écart(s) assumé(s), section « Contraintes connues » présente — aucune ligne conditionnelle ni écart re-proposé (TF-0528)`);
+    }
   }
 
   // R-23 · ACCES-TEST : démo locale seulement, zéro secret (R-14 + loi 2)
@@ -959,6 +1073,8 @@ const nonJuge = [
   "R-27 : jugé seulement si un robots.txt existe (surface web non déclarée = SANS_OBJET) ; blocages CDN/WAF et cohérence llms.txt ↔ sitemap hors périmètre statique (nœud 58 forge-seo-geo au run)",
   "R-2 localisation (TF-0319) : seul ce qui est MARQUÉ est jugé — un producteur qui oublie de marquer son livrable y échappe (faux négatif ASSUMÉ, mesuré à la revue du 17/09 par le rapport entre livrables marqués et livrables déposés) ; la JUSTESSE du marquage relève de la relecture, pas d'un contrôle de forme ; `input\\`, `gabarits\\`, `fixtures\\`, `old\\` et `.oracles\\` sont hors jugement par motif déclaré ; la marque est attendue sur la COPIE remise, pas sur l'original de travail de `forge\\etapes\\` (règle 16) — l'oracle ne rapproche pas un original de sa copie",
   "R-2 localisation (TF-0319) : la structure INTERNE d'`output\\` (familles numérotées uniques, une seule version courante par famille, graphie `old\\`, LISEZMOI.md de correspondance — D-15 al. a à e) n'est PAS jugée ici : sa mécanisation vit chez `oracle-conventions.mjs` d'organization et reste suspendue à un mandat humain d'écriture dans ce dépôt frère",
+  "R-20 nature des lignes (TF-0528) : les lignes dont l'Id reste un gabarit (`{A-01}`) ne sont pas jugées — juger l'exemple que le gabarit prescrit mettrait le gabarit en défaut, jamais l'auteur ; un produit qui garde ses placeholders échappe donc au contrôle",
+  "R-20 nature des lignes (TF-0528) : le re-service d'un écart assumé est vu par RECOUVREMENT DE MOTS (quatre mots significatifs communs au moins), pas par compréhension — une ligne intégralement reformulée passe, et c'est un faux négatif ASSUMÉ : le seuil conservateur protège de l'inverse, crier sur deux sujets réellement distincts. La détection de condition repose sur un vocabulaire nommé (si, lorsque, dès que, au cas où, tant que, le jour où) moins les tournures qui modulent sans suspendre (si possible, si besoin, même si) — une condition dite autrement ne sera pas vue",
   "R-19 forme des clés (TF-0320) : seule la FORME des clés `versions_forges` est jugée, pas leur COMPLÉTUDE — un run_open qui ne relève que 5 forges sur 14 en noms complets reste PASS (Produit-01 en portait 5) ; un run_open sans `ts` n'est pas jugé sur la forme (pas de date, pas d'entrée en vigueur opposable) ; les run_open antérieurs au 2026-08-17 sont des antériorités déclarées, jamais réécrites",
 ];
 

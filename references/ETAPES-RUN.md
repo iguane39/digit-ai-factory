@@ -201,7 +201,7 @@ obligatoire dès qu'une URL de production ou de staging est déclarée au produi
 Constat qui l'impose, et il est net : le run `20260814-tests-fournisseur-a` s'est conclu « boucle close,
 pans mesurables au vert » **pendant que le login de production était en impasse totale** —
 `GET /` → 303 vers `/.auth/login/aad` → 404. Mort depuis le premier déploiement, vu par aucun
-test, découvert par l'humain **en cliquant, minutes après la clôture**. L'oracle MEP (M-1…M-5)
+test, découvert par l'humain **en cliquant, minutes après la clôture**. L'oracle MEP (M-1…M-7)
 porte ce regard *à la mise en production* ; rien ne le portait en cycle de tests
 post-déploiement. Un produit déjà en ligne était donc audité **sans que personne ne regarde ce
 que voit son visiteur**.
@@ -317,7 +317,7 @@ implémenté — le rendu se juge en pixels, pas sur la maquette seule ; la base
 ## 6. Étape MEP (portée par le pilot — `ETAPE-MEP.md`)
 
 Dockerfile/compose dans le produit, déploiement **staging** réel, `ROLLBACK.md` testé une
-fois, oracle MEP M-1…M-5 exécuté (build, healthcheck ×3, smoke tests des exigences critiques
+fois, oracle MEP M-1…M-7 exécuté (build, healthcheck ×3, smoke tests des exigences critiques
 contre l'instance servie, rollback prouvé, scan secrets de l'image). Puis générer
 `DOSSIER-MEP.md` et demander le **GO humain** — la production n'est jamais lancée sans lui ;
 sans GO, clore en `pret_production_en_attente_GO` (état de succès).

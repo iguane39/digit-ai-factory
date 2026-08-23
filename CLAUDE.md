@@ -56,13 +56,13 @@ jamais ici ; le run y vit (`forge\`, code à la racine). Séquence :
    `docs\run-playbook.md` de forge-development, TF-0007) ;
 5. **Tests** — audit forge-tests + boucle de fermeture bornée (≤ 5 cycles, G-2 absolue) ;
    **5 bis** en parallèle : revue graphique d'implémentation (forge-design, mode aval) ;
-6. **MEP** — staging outillé par **forge-ops** (O-1…O-4), oracle M-1…M-5,
+6. **MEP** — staging outillé par **forge-ops** (O-1…O-4), oracle M-1…M-7,
    `DOSSIER-MEP.md`, **GO humain** ;
 7. **Clore** — lot `<projet> - RETOURS - …` + sidecar remis à `<pilot>\input\00-retours\`,
    `run_close`, synthèse (`gabarits\RESTITUTION.md`).
 
 **Mode opératoire : `references\ETAPES-RUN.md`**. Contrat « prêt client » : oracles 1-3 verts ·
-forge-tests exit 0/3 seuils tenus · oracle MEP 5/5 · dossier MEP complet · traçabilité
+forge-tests exit 0/3 seuils tenus · oracle MEP 7/7 · dossier MEP complet · traçabilité
 exigences→tests 100 % · ledger vérifié.
 
 **Run de version** : jamais improvisé — `references\RUN-VERSION.md` (socle, delta, tests
