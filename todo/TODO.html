@@ -152,7 +152,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>a5cfd74665a8</code> · dernier événement 2026-08-23T09:58:10.964Z</p>
+      <p class="meta">sceau <code>3332161c7e5d</code> · dernier événement 2026-08-23T10:48:10.339Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -162,9 +162,9 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="7 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">7</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="2 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">2</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="0 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">0</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="1 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">1</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="2 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">2</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="468 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">468</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende">
@@ -205,12 +205,104 @@
       <span id="compteur" class="compteur" aria-live="polite">61 / 61 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">23 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">21 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-seo-geo"><strong>digit-ai-forge-seo-geo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">6 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">29 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">20 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-seo-geo"><strong>digit-ai-forge-seo-geo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-factory">
-      <h2>digit-ai-factory <span class="badge" title="23 item(s) actifs ciblant digit-ai-factory">23</span></h2>
+      <h2>digit-ai-factory <span class="badge" title="29 item(s) actifs ciblant digit-ai-factory">29</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-factory</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-en_cours" id="item-TF-0324" data-cite data-forge="digit-ai-factory" data-statut="en_cours" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0324</code>
+            <span class="statut s-en_cours">en_cours</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Artefacts périodiques du run de delivery absents : RAID, rapport d'avancement, compte rendu, REX, suivi des bénéfices</h3>
+          <div class="card-detail" data-cite><p class="lead">Seconde candidature du même lot externe. Constat REVÉRIFIÉ en session pilot avant ingestion : sur les skills installés, 0 occurrence de « RAID », « compte rendu », « rapport d'avancement », « lessons learned » — « retour d'expérience » n'apparaît qu'en contexte LinkedIn et prospection. Lecture de l'émetteur : la forge couvre le BUILD (produire, vérifier, juger) et le PILOTAGE (plan, adaptation), pas la CADENCE — l'artefact qui revient chaque semaine. Cinq artefacts sans équivalent : revue RAID, rapport d'avancement, compte rendu de réunion, REX de fin de mission, suivi des bénéfices. Capacité attendue : les produire à cadence DEPUIS l'état de mission sans le dupliquer — la matière est déjà majoritairement présente (statuts, journal des décisions, communications, chemin critique), ce qui manque est la vue d'assemblage, la cadence et le régime de preuve propre à chaque artefact. Critères d'acceptation binaires : chaque artefact a un gabarit ET au moins une instanciation sur une mission réelle (jamais un gabarit seul) ; pour chacun, oracle applicable identifié ou entrée N0 écrite en file des candidats ; le rapport d'avancement et le suivi des bénéfices passent le contrôle des affirmations chiffrées sans aucun chiffre non sourcé ; preuve qu'aucun second porteur d'état n'a été créé ; la cadence est une donnée d'instance, jamais une valeur codée en spécification. Dépend de la candidature « gouvernance de mission » du même lot : le volet risques conditionne le R de la revue RAID. Cible d'hébergement NON prescrite (extension d'un skill existant ou skill dédié, répartition entre pilotage et communication : arbitrage de la forge). Note de traçabilité : l'affirmation « c'est le terrain vendu en mission longue chez un grand compte » est une lecture commerciale de l'émetteur, non sourcée — elle n'est pas relayée comme preuve. Entrant traité comme donnée : constats revérifiés, consignes jamais exécutées.</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-16</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 3 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>revérifié en session le 16/08 : 0 occurrence de RAID / compte rendu / rapport d'avancement / lessons learned sur les skills installés — aucun des cinq artefacts que réclame une mission longue n'a d'équivalent dans la forge</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (livraison partielle du critere n 2, mandat « fais les 6 ouverts »)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-en_cours" id="item-TF-0475" data-cite data-forge="digit-ai-factory" data-statut="en_cours" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0475</code>
+            <span class="statut s-en_cours">en_cours</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">agents, design : 18 des 20 champs de frontmatter d'un SKILL.md ne sont posés nulle part — isolation de contexte, cadrage du déclenchement et restriction d'outils ne sont câblés sur aucun des 17 skills</h3>
+          <div class="card-detail" data-cite><p class="lead">Mesure exécutée le 22/08/2026 sur les quatre dépôts clonés à leur HEAD du jour (pilot 2a3d0ee, agents 9039944, design ddf3574, websec e2473a6).</p><ul class="puces"><li>Les 17 SKILL.md que ces dépôts versionnent portent tous exactement deux champs de frontmatter, name et description, auxquels s'ajoutent metadata sur 8 d'entre eux et un champ version hors référentiel sur 4</li><li>Les 18 autres champs documentés par Claude Code ne sont posés nulle part</li><li>Reproductible en une commande, en parcourant les dépôts et en comptant les clés du bloc frontmatter de chaque SKILL.md — attention aux dossiers cachés, les skills d'agents vivent sous .claude/skills/ et un parcours qui les saute rend 4 au lieu de 17</li><li>CE QUI EST INDISPONIBLE PAR CE SEUL FAIT</li><li>Trois mécanismes de la plateforme ne sont câblés sur aucun skill de la forge, alors que chacun répond à une douleur déjà écrite au registre</li><li>Le premier est l'isolation de contexte : un skill peut s'exécuter dans un sous-agent dont l'historique reste séparé, et seul son résultat revient dans la conversation</li><li>Les skills les plus lourds de la forge sont précisément ceux qui déversent le plus de sortie d'outil dans le contexte principal</li><li>Le deuxième est le cadrage du déclenchement par motif de chemin, qui décide mécaniquement quand un skill s'active, là où la forge n'agit aujourd'hui que sur la formulation de la description</li><li>Le troisième est le retrait d'un outil du pool pendant qu'un skill est actif, ce qui donnerait un contrat exécutable aux skills conçus pour ne pas rendre la parole</li><li>S'y ajoute la possibilité de faire porter ses hooks par le skill lui-même plutôt que par le settings.json d'un dépôt, ce qui supprimerait la dépendance inter-dépôts qui avait motivé l'arbitrage de TF-0290</li><li>CE QUE LA CANDIDATURE NE DEMANDE PAS</li><li>Elle ne désigne ni le skill à modifier, ni le dépôt d'accueil, ni la forme du contrôle</li><li>Elle ne demande surtout pas de poser ces champs partout : un frontmatter rempli sans effet est un coût de maintenance, pas un gain</li><li>Un champ ne se pose que là où son effet est nommé, par symétrie avec la loi du pool d'experts selon laquelle ce qui ne change rien matériellement n'a pas sa place</li><li>Un skill de pure référence ne se fait jamais exécuter en sous-agent, parce que le sous-agent reçoit alors la connaissance sans la tâche et ne rend rien — c'est le mode d'échec documenté du mécanisme</li><li>La surface sur laquelle un champ agit doit être établie avant toute généralisation, parce que ces champs sont ceux de Claude Code et que ce qu'en fait la surface Skills de claude.ai reste à vérifier, la forge livrant sur les deux</li><li>Enfin une pré-approbation d'outils ne se lit jamais comme une restriction, la liste des outils autorisés dispensant de la demande de permission sans en bloquer aucun autre</li><li>CRITÈRES D'ACCEPTATION, BINAIRES</li><li>Un contrôle exécuté rend, pour chaque SKILL.md versionné, si chaque champ déclaré a son effet énoncé quelque part, et signale les skills dont le profil appelle un champ qui reste absent</li><li>Ce contrôle échoue sur une fixture rouge où un skill de pure référence déclare une exécution en sous-agent, et passe sur sa fixture verte</li><li>La question de la surface est tranchée par une exécution réelle sur les deux surfaces, jamais par lecture de documentation, et son résultat est écrit avant qu'un seul champ soit généralisé</li><li>VOISINS EXAMINÉS, AUCUN DOUBLON</li><li>Balayage des 471 créations du registre actif et de l'archive</li><li>TF-0021 et TF-0023 touchent le frontmatter d'un SKILL.md mais par le parsing, fins de ligne et champ absent, jamais par les champs disponibles</li><li>TF-0155 est le cousin le plus proche en pesant le coût en jetons d'un frontmatter de plus et le risque de collision de déclenchement, mais il argumente sur l'opportunité de créer un skill, pas sur les leviers offerts à ceux qui existent</li><li>Les noms des champs eux-mêmes ne rendent aucune occurrence</li><li>Les 18 autres correspondances du mot frontmatter portent toutes sur l'en-tête des documents et des profils, pas sur celui d'un skill</li><li>Le versant divergence entre surfaces d'installation n'est délibérément PAS reversé ici : le lot d'empreinte 3d0672d26186, en attente de dépôt, porte déjà cette classe sous le nom périmètre des surfaces d'installation</li><li>CALIBRAGE ASSUMÉ</li><li>La preuve est notée 3 et non davantage parce que l'écart est mesuré exactement alors qu'aucun incident ne lui est encore rattaché</li><li>Le coût est structurel et non payé sur pièce, ce qui doit rester visible au moment de l'arbitrage humain plutôt qu'être gonflé</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 3 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>mesuré et non payé sur pièce : 17 SKILL.md sur 17 à deux champs, 18 champs disponibles à zéro occurrence, dont les trois seuls mécanismes de la plateforme capables d'isoler un contexte, de cadrer un déclenchement et de restreindre un outil</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Sébastien (option a du 22/08 — veille sur le dépôt externe shanraisshan/claude-code-best-practice)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0519" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0519</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">produit-07 : l ancien hote forge.produit-07 NE RESOUT PLUS DU TOUT — le trafic qui le connait encore tombe dans le vide, et c est le gate neuf M-6 qui l a mesure</h3>
+          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 23/08, mesure avec l outil neuf de M-6 (TF-0482) une heure apres l avoir ecrit.</p><ul class="puces"><li>`node scripts/verifier-bascule.mjs --apres --historique https://forge.produit-07` rend FAIL : « le nom forge.produit-07 ne resout pas (ENOTFOUND) ». La cible du renommage, elle, repond : `--avant --cible https://factory.produit-07` rend PASS. LE DEFAUT EST DONC L INVERSE DE CELUI DU 18/08. Le 18/08, la redirection etait armee vers un domaine qui ne resolvait pas encore, et le site est devenu injoignable pendant une vingtaine de secondes. Aujourd hui le nouveau domaine va bien, mais L ANCIEN A DISPARU : aucune resolution, donc aucune redirection possible. Tout ce qui connait encore l ancienne adresse — liens sortants, favoris, index de moteurs de recherche, signatures de courriel, documents deja remis a des clients — tombe dans le vide, avec une erreur de resolution et non une page d explication. CE QUE CA COUTE, et pourquoi ce n est pas rien : une erreur DNS n est pas une page 404. Un lecteur qui voit « ce site est introuvable » conclut que le produit n existe plus, pas qu il a change d adresse ; et un moteur de recherche qui ne resout plus un hote finit par retirer ses pages de l index sans transferer l anteriorite vers le nouveau domaine. C est precisement ce que la doctrine ecrite ce jour meme au ETAPE-MEP section 3 quater exige d eviter : « l ANCIEN hote est interroge APRES deploiement — 200, ou 301 vers un emplacement qui repond, chemin et requete preserves ». L etat actuel viole la regle que nous venons d ecrire. TROIS VOIES, aucune tranchee, et la premiere n est pas la moins chere par hasard :</li><li>reCREER l enregistrement DNS de l ancien hote et y servir une redirection 301 vers le nouveau, chemin preserve — c est la voie que la doctrine prescrit, et elle coute une entree de zone plus une regle de redirection</li><li>accepter la disparition et la DECLARER, en consignant au registre que l anteriorite de l ancien domaine est abandonnee volontairement — honnete, mais il faut alors savoir ce qu on perd, et personne ne l a mesure</li><li>mesurer d abord ce que l ancien hote recevait encore comme trafic avant de decider, ce qui suppose des journaux que nous n avons peut-etre plus. La voie</li><li>a ma preference et je ne la prends pas : la zone DNS n est pas dans le perimetre du pilot, et une entree de zone est un geste d infrastructure qui se decide</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-23</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>mesure le 23/08 : forge.produit-07 rend ENOTFOUND, donc aucune redirection n est possible. Une erreur de resolution n est pas une page 404 — un lecteur conclut que le produit n existe plus, et un moteur retire les pages de l index sans transferer l anteriorite. L etat viole la regle ecrite le jour meme a ETAPE-MEP section 3 quater.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du 23/08, mesure par l outil neuf de M-6 — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0514" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0514</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.7)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Produit-05 n'est PAS instancie sous la doctrine factory — ni forge\, ni clause de precedence, ni hooks : c'est ce qui explique les QUATRE lots refuses en trois jours, et non un gabarit perime</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat du 22/08, etabli en executant le mandat humain « recopier le gabarit chez le produit » (option c).</p><ul class="puces"><li>CE QUE JE PENSAIS ET QUI ETAIT FAUX : TF-0502 concluait que le produit ecrivait avec une COPIE PERIMEE du gabarit, prise a la creation de son run et jamais rafraichie. Verifie sur pieces : il n'y a AUCUNE copie. `find` sur tout le depot ne rend aucun fichier RETOURS-FORGES. La copie ne vieillissait pas, elle n'existait pas. TROIS FAITS MESURES, chacun verifiable en une commande</li><li>Le produit vit dans `c:\dev\Produit-05\projet` et n'a AUCUN dossier `forge\` : ses lots de retours sont ecrits dans `output\v2-architecture-cible\retours\`, une convention ad hoc, alors que la doctrine (ETAPES-RUN §1) prescrit `forge\retours\`</li><li>Son `CLAUDE.md` fait TREIZE lignes et ne mentionne la factory NULLE PART : ni le canal de retours, ni la clause de precedence R-43, ni les hooks R-44 (fraicheur a l'ouverture, restitution jugee). Il decrit un tracker d'issues local et deux flux de documentation produit — c'est un CLAUDE.md de projet, pas un CLAUDE.md instancie par le pilot</li><li>Consequence directe et entierement expliquee : quatre lots refuses par R-45/R-46 en trois jours (20260821a, 20260822a, 20260822b, 20260822c). Un produit qui n'a jamais recu le gabarit ne peut pas en porter les sections — ce n'est pas de la negligence, c'est une absence de canal. CE QUE J'AI FAIT SOUS MANDAT, ET RIEN DE PLUS : depose `gabarits\RETOURS-FORGES.md` (8 110 octets, sections aux lignes 59 et 85) dans `output\v2-architecture-cible\retours\`, la ou le produit ecrit REELLEMENT ses lots — le deposer dans un `forge\retours\` qu'il n'utilise pas n'aurait servi a personne. Aucun fichier ecrase (la cible n'existait pas), aucun commit chez le produit : le depot frere reste a son proprietaire. CE QUI RESTE OUVERT, et ce n'est pas a moi de le trancher : faut-il instancier Produit-05 sous doctrine (CLAUDE.md produit, forge\, hooks, precedence), ou reconnaitre qu'un produit peut contribuer des retours SANS etre sous doctrine et adapter R-45/R-46 en consequence ? Les quatre refus disent que la question n'a jamais ete posee</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>mesure le 22/08 : QUATRE lots refuses en trois jours pour un seul produit (20260821a, 20260822a, 20260822b, 20260822c), soit 100 % de ses remises depuis la publication de R-45. Trois ont fini par entrer par derogation, portant 15 candidatures dont une nommait un plantage bloquant du lanceur d'oracles. Le correctif livre le meme jour pour TF-0502 — rafraichir la copie du gabarit a chaque ouverture de run — n'aurait rien change ici : il n'y a pas de run ouvert sous doctrine, donc pas d'ouverture qui rafraichirait quoi que ce soit.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat etabli en executant le mandat humain « option c » du 22/08 — l'execution a dementi l'hypothese qui la motivait)</dd></div>
+            
+          </dl>
+        </article>
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
              titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
              socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
@@ -723,6 +815,52 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0474" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0474</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : cinq mécanismes d’empreinte sha256 coexistent sans format commun — la même classe de défaut est redécouverte forge par forge</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat instruit par lecture des dépôts (clones du 22/08/2026), jamais depuis une fiche.</p><ul class="puces"><li>L’écosystème hache du contenu pour juger la fraîcheur d’un artefact en AU MOINS CINQ endroits, chacun avec son format, sa granularité et sa durée de vie :</li><li>forge-ops, `forge-ops/empreinte@1` — {format, release, ts, fichiers:{chemin: sha256}} scellé par `ops.mjs deployer|canary`, lu par `oracle-ops --empreinte` (O-7) : le seul FORMAT DÉCLARÉ ET VERSIONNÉ</li><li>quality-oracles v2.6.1, `run-oracles.mjs` l.86-92 — sha256 tronqué à 16 hex, servant la clé de cache et JAMAIS persisté au journal ni à l’historique</li><li>forge-seo, empreinte de grille (TF-0072)</li><li>pilot, hachage de `oracle-boite-entree` (TF-0253)</li><li>sceau sha256 de TODO-PRODUIT (TF-0338). Ce que la dispersion coûte, prouvé par le registre : SEPT items archivés relèvent de la même classe et ont été traités isolément — TF-0072, TF-0247, TF-0253, TF-0288, TF-0294, TF-0298, TF-0338. TF-0072 et TF-0253 sont le MÊME défaut de fins de ligne, découvert deux fois dans deux forges différentes ; TF-0288 et TF-0298 sont le même trou de scellement, découvert deux fois dans la même forge. Capacité attendue, formulée en invariant et non en solution : un artefact dont la fraîcheur est jugée porte une empreinte au FORMAT DÉCLARÉ UNIQUE de l’écosystème, et tout nouveau mécanisme de scellement est refusé s’il en invente un autre. Le format le plus mûr existe déjà (`forge-ops/empreinte@1`) — l’enjeu est sa promotion en convention transverse assortie d’un contrôle qui la fasse tenir, pas une construction neuve. Trois écarts connus que le format retenu doit absorber, chacun déjà prouvé au registre : normalisation des fins de ligne avant hachage (TF-0072, TF-0253) ; capture avant/après, pour ne jamais certifier un contenu qui a bougé pendant la mesure (TF-0294) ; scellement à TOUS les points de promotion et non au seul chemin nominal (TF-0298). Aucune cible de code n’est prescrite : le choix du dépôt d’accueil et de la forme — référentiel du pilot, module partagé, ou promotion en place — est un arbitrage laissé à la forge</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>sept items archivés de la même classe, traités un par un, aucun n’ayant produit de convention : TF-0072, TF-0247, TF-0253, TF-0288, TF-0294, TF-0298, TF-0338. Deux redécouvertes strictes établies par lecture des titres au registre — le défaut de fins de ligne de TF-0072 (forge-seo) rejoué en TF-0253 (pilot), et le trou de scellement de TF-0288 rejoué en TF-0298 (forge-ops, canary). Anti-doublon exécuté le 22/08/2026 sur les 2338 événements des deux registres : aucun item existant ne porte le format partagé — une seule occurrence sur le motif « format/empreinte commun », TF-0298, qui traite un point de scellement manquant dans UNE forge, pas la convention.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (session claude.ai du 22/08/2026 — balayage de classe déclenché par une veille externe sur le dépôt garrytan/gstack v1.68.3.0)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0477" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0477</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">La loi 4 dit ou vit une donnee volatile, jamais qu'une note ne doit pas la RECOPIER — la derive se detecte claim par claim, sur un seul document, et la classe se re-paye</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat du 22/08, ne d'une veille externe (pattern « LLM Wiki » de Karpathy, gist du 04/04/2026 et son fil de retours de production).</p><ul class="puces"><li>Un contributeur y formule une regle de prevention absente de notre corpus : UNE NOTE DOCUMENTE LA FORME D'UN CONTRAT, JAMAIS SA VALEUR COURANTE. Ce qui bouge — un compte, un SHA, un id, une date de dernier passage — vit dans le depot et se lit a l'execution ; une note qui recopie une telle valeur lui a cree un second domicile qui derivera en silence, et le lecteur fera confiance a la copie. Corollaire operationnel : une valeur ne se cite que si quelque chose en aval depend de cette valeur exacte, et ce dependant est nomme dans la meme phrase — une citation sans dependant nomme est une copie que rien ne surveille. CE QUI EXISTE DEJA CHEZ NOUS, verifie sur pieces avant d'ecrire cette candidature : la loi transverse n.4 (« une donnee volatile est une donnee, pas du code ») porte sur le DOMICILE de la donnee produit (catalogues, tarifs, versions de modeles : editables, dates, sources) ; R-21 l'applique aux versions de TECHNOS.md contre les lockfiles ; oracle-fraicheur-doc et son fichier fraicheur-claims.json confrontent des affirmations comptables a des sondes executables. CE QUI MANQUE, et c'est l'objet de cette candidature :</li><li>la loi 4 ne dit rien de la PROSE qui recopie une valeur — elle range la donnee, elle n'interdit pas la copie</li><li>la detection est NOMINATIVE : un claim n'existe que si quelqu'un a deja constate la derive et ecrit sa sonde, donc on trouve toujours l'instance et jamais la classe</li><li>la couverture est d'UN SEUL document. INVARIANTS ATTENDUS : une valeur mobile ecrite hors de son domicile est un defaut, pas un detail de redaction ; une valeur citee nomme son dependant ou devient un pointeur ; un constat de derive declenche un balayage de sa classe, pas une correction unitaire ; ce qui n'est pas balayable se declare non_juge plutot que de passer en silence. CRITERES D'ACCEPTATION :</li><li>la regle est ecrite quelque part ou un redacteur la rencontre AVANT d'ecrire, pas apres</li><li>un controle executable rend un verdict localisant sur un document de pilotage, avec paire de fixtures rouge/verte et mutation regle par regle</li><li>le controle sait dire ce qu'il ne juge pas</li><li>rejouer le controle sur les documents qui ont deja produit un defaut de cette classe (README de forge-tests, manifeste forge-seo-geo) les rattrape, sinon la generalisation n'a pas eu lieu. NON DOUBLONS, verifies sur les 473 creations du registre : TF-0113 et TF-0115 (nes) ont CREE la detection par claims et sont archives corriges — ils fournissent le mecanisme, pas la regle de redaction ni le balayage ; TF-0311 puis TF-0334 sont deux instances de la meme maladie sur le meme README, le second disant en toutes lettres « hors des deux que l'item nommait » — c'est la preuve que la classe se re-paye a la main ; TF-0378 (forge-data) demande qu'un nombre de prose porte un marqueur de citation : objet voisin mais distinct, il traite le SOURCAGE d'un nombre, pas la COPIE d'une valeur mobile ; TF-0338, TF-0247, TF-0358, TF-0456 sont des instances, aucune ne porte la classe. Zero occurrence de « karpathy », « llm wiki » ou « obsidian » au registre : l'entrant est nouveau. LE CHOIX DE LA CIBLE N'EST PAS FAIT ICI — regle de redaction du socle, extension du fichier de claims, nouvel oracle, ou combinaison : arbitrage de la forge</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 3 × preuve 4 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>mesure executee le 22/08 sur le clone au commit 6aa0b20 : fraicheur-claims.json porte 6 claims, TOUS sur INVENTAIRE.md — zero claim sur un README de forge, alors que les deux derniers defauts avoues de cette classe (TF-0311, TF-0334) etaient dans le README de forge-tests ; et le seul document couvert porte environ 81 assertions de denombrement (mesure par proxy, ids TF, versions et dates retires — chiffre approximatif et declare comme tel) pour 6 sondes, soit moins d'une sur dix. Cout deja paye et trace au registre : TF-0113 et TF-0115 (6 derives en deux campagnes), TF-0311 puis TF-0334 sur le meme fichier, TF-0247 (3 citations perimees dont la correction change l'empreinte de grille), TF-0358 (sous-chemin perime), TF-0456 (dates de README). Le score porte un arbitrage a revoir : l'effort est note 3 parce que la regle est bon marche mais le balayage ne l'est pas ; si la forge tranche pour la seule regle de redaction, l'effort tombe a 1 et la valeur double.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Sebastien via session claude.ai du 22/08 (veille externe =&gt; candidat) — option b d'une sollicitation indicee, seule retenue</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-ecarte" id="item-TF-0473" data-cite data-forge="digit-ai-factory" data-statut="ecarte" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0473</code>
@@ -743,55 +881,9 @@
       </div>
     </section>
     <section id="digit-ai-forge-agents">
-      <h2>digit-ai-forge-agents <span class="badge" title="21 item(s) actifs ciblant digit-ai-forge-agents">21</span></h2>
+      <h2>digit-ai-forge-agents <span class="badge" title="20 item(s) actifs ciblant digit-ai-forge-agents">20</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-agents</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-en_cours" id="item-TF-0324" data-cite data-forge="digit-ai-forge-agents" data-statut="en_cours" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0324</code>
-            <span class="statut s-en_cours">en_cours</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">Artefacts périodiques du run de delivery absents : RAID, rapport d'avancement, compte rendu, REX, suivi des bénéfices</h3>
-          <div class="card-detail" data-cite><p class="lead">Seconde candidature du même lot externe. Constat REVÉRIFIÉ en session pilot avant ingestion : sur les skills installés, 0 occurrence de « RAID », « compte rendu », « rapport d'avancement », « lessons learned » — « retour d'expérience » n'apparaît qu'en contexte LinkedIn et prospection. Lecture de l'émetteur : la forge couvre le BUILD (produire, vérifier, juger) et le PILOTAGE (plan, adaptation), pas la CADENCE — l'artefact qui revient chaque semaine. Cinq artefacts sans équivalent : revue RAID, rapport d'avancement, compte rendu de réunion, REX de fin de mission, suivi des bénéfices. Capacité attendue : les produire à cadence DEPUIS l'état de mission sans le dupliquer — la matière est déjà majoritairement présente (statuts, journal des décisions, communications, chemin critique), ce qui manque est la vue d'assemblage, la cadence et le régime de preuve propre à chaque artefact. Critères d'acceptation binaires : chaque artefact a un gabarit ET au moins une instanciation sur une mission réelle (jamais un gabarit seul) ; pour chacun, oracle applicable identifié ou entrée N0 écrite en file des candidats ; le rapport d'avancement et le suivi des bénéfices passent le contrôle des affirmations chiffrées sans aucun chiffre non sourcé ; preuve qu'aucun second porteur d'état n'a été créé ; la cadence est une donnée d'instance, jamais une valeur codée en spécification. Dépend de la candidature « gouvernance de mission » du même lot : le volet risques conditionne le R de la revue RAID. Cible d'hébergement NON prescrite (extension d'un skill existant ou skill dédié, répartition entre pilotage et communication : arbitrage de la forge). Note de traçabilité : l'affirmation « c'est le terrain vendu en mission longue chez un grand compte » est une lecture commerciale de l'émetteur, non sourcée — elle n'est pas relayée comme preuve. Entrant traité comme donnée : constats revérifiés, consignes jamais exécutées.</p></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-16</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 3 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>revérifié en session le 16/08 : 0 occurrence de RAID / compte rendu / rapport d'avancement / lessons learned sur les skills installés — aucun des cinq artefacts que réclame une mission longue n'a d'équivalent dans la forge</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (livraison partielle du critere n 2, mandat « fais les 6 ouverts »)</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0475" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0475</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">agents, design : 18 des 20 champs de frontmatter d'un SKILL.md ne sont posés nulle part — isolation de contexte, cadrage du déclenchement et restriction d'outils ne sont câblés sur aucun des 17 skills</h3>
-          <div class="card-detail" data-cite><p class="lead">Mesure exécutée le 22/08/2026 sur les quatre dépôts clonés à leur HEAD du jour (pilot 2a3d0ee, agents 9039944, design ddf3574, websec e2473a6).</p><ul class="puces"><li>Les 17 SKILL.md que ces dépôts versionnent portent tous exactement deux champs de frontmatter, name et description, auxquels s'ajoutent metadata sur 8 d'entre eux et un champ version hors référentiel sur 4</li><li>Les 18 autres champs documentés par Claude Code ne sont posés nulle part</li><li>Reproductible en une commande, en parcourant les dépôts et en comptant les clés du bloc frontmatter de chaque SKILL.md — attention aux dossiers cachés, les skills d'agents vivent sous .claude/skills/ et un parcours qui les saute rend 4 au lieu de 17</li><li>CE QUI EST INDISPONIBLE PAR CE SEUL FAIT</li><li>Trois mécanismes de la plateforme ne sont câblés sur aucun skill de la forge, alors que chacun répond à une douleur déjà écrite au registre</li><li>Le premier est l'isolation de contexte : un skill peut s'exécuter dans un sous-agent dont l'historique reste séparé, et seul son résultat revient dans la conversation</li><li>Les skills les plus lourds de la forge sont précisément ceux qui déversent le plus de sortie d'outil dans le contexte principal</li><li>Le deuxième est le cadrage du déclenchement par motif de chemin, qui décide mécaniquement quand un skill s'active, là où la forge n'agit aujourd'hui que sur la formulation de la description</li><li>Le troisième est le retrait d'un outil du pool pendant qu'un skill est actif, ce qui donnerait un contrat exécutable aux skills conçus pour ne pas rendre la parole</li><li>S'y ajoute la possibilité de faire porter ses hooks par le skill lui-même plutôt que par le settings.json d'un dépôt, ce qui supprimerait la dépendance inter-dépôts qui avait motivé l'arbitrage de TF-0290</li><li>CE QUE LA CANDIDATURE NE DEMANDE PAS</li><li>Elle ne désigne ni le skill à modifier, ni le dépôt d'accueil, ni la forme du contrôle</li><li>Elle ne demande surtout pas de poser ces champs partout : un frontmatter rempli sans effet est un coût de maintenance, pas un gain</li><li>Un champ ne se pose que là où son effet est nommé, par symétrie avec la loi du pool d'experts selon laquelle ce qui ne change rien matériellement n'a pas sa place</li><li>Un skill de pure référence ne se fait jamais exécuter en sous-agent, parce que le sous-agent reçoit alors la connaissance sans la tâche et ne rend rien — c'est le mode d'échec documenté du mécanisme</li><li>La surface sur laquelle un champ agit doit être établie avant toute généralisation, parce que ces champs sont ceux de Claude Code et que ce qu'en fait la surface Skills de claude.ai reste à vérifier, la forge livrant sur les deux</li><li>Enfin une pré-approbation d'outils ne se lit jamais comme une restriction, la liste des outils autorisés dispensant de la demande de permission sans en bloquer aucun autre</li><li>CRITÈRES D'ACCEPTATION, BINAIRES</li><li>Un contrôle exécuté rend, pour chaque SKILL.md versionné, si chaque champ déclaré a son effet énoncé quelque part, et signale les skills dont le profil appelle un champ qui reste absent</li><li>Ce contrôle échoue sur une fixture rouge où un skill de pure référence déclare une exécution en sous-agent, et passe sur sa fixture verte</li><li>La question de la surface est tranchée par une exécution réelle sur les deux surfaces, jamais par lecture de documentation, et son résultat est écrit avant qu'un seul champ soit généralisé</li><li>VOISINS EXAMINÉS, AUCUN DOUBLON</li><li>Balayage des 471 créations du registre actif et de l'archive</li><li>TF-0021 et TF-0023 touchent le frontmatter d'un SKILL.md mais par le parsing, fins de ligne et champ absent, jamais par les champs disponibles</li><li>TF-0155 est le cousin le plus proche en pesant le coût en jetons d'un frontmatter de plus et le risque de collision de déclenchement, mais il argumente sur l'opportunité de créer un skill, pas sur les leviers offerts à ceux qui existent</li><li>Les noms des champs eux-mêmes ne rendent aucune occurrence</li><li>Les 18 autres correspondances du mot frontmatter portent toutes sur l'en-tête des documents et des profils, pas sur celui d'un skill</li><li>Le versant divergence entre surfaces d'installation n'est délibérément PAS reversé ici : le lot d'empreinte 3d0672d26186, en attente de dépôt, porte déjà cette classe sous le nom périmètre des surfaces d'installation</li><li>CALIBRAGE ASSUMÉ</li><li>La preuve est notée 3 et non davantage parce que l'écart est mesuré exactement alors qu'aucun incident ne lui est encore rattaché</li><li>Le coût est structurel et non payé sur pièce, ce qui doit rester visible au moment de l'arbitrage humain plutôt qu'être gonflé</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 3 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>mesuré et non payé sur pièce : 17 SKILL.md sur 17 à deux champs, 18 champs disponibles à zéro occurrence, dont les trois seuls mécanismes de la plateforme capables d'isoler un contexte, de cadrer un déclenchement et de restreindre un outil</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Sébastien (option a du 22/08 — veille sur le dépôt externe shanraisshan/claude-code-best-practice)</dd></div>
-            
-          </dl>
-        </article>
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
              titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
              socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
@@ -1189,6 +1281,29 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0489" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0489</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.7)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-design : aucun composant « lecteur de source » au catalogue alors que la regle d autoportance impose d embarquer les sources citees</h3>
+          <div class="card-detail" data-cite><p class="lead">FAIT : la regle A1 exige un fichier autoportant ; un rapport qui renvoie a des fichiers du depot perd ses sources des qu il part par courriel.</p><ul class="puces"><li>La consequence logique est d embarquer les documents — et rien n est prevu : un &lt;pre&gt; de 67 Ko de Markdown est illisible. Ce livrable a du ecrire un convertisseur Markdown (environ 130 lignes : titres, tableaux, listes, code, citations, separateurs, enrichissements de ligne), une bascule a deux vues, et un rendu DIFFERE au premier depliage — sans ce dernier point, les douze documents rendus d avance faisaient passer le DOM de 7 000 a plus de 25 000 noeuds, au-dela du seuil d echec de l oracle de performance. PROPOSITION : composant au catalogue — &lt;details&gt; avec bascule « mis en forme » / « texte brut », rendu paresseux, et la doctrine qui va avec : les liens d un document cite ne deviennent PAS cliquables, ils visent le depot et donc rien depuis la page</li><li>leur cible passe en infobulle. Un lien mort ment davantage qu une absence de lien</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-21</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>130 lignes de convertisseur ecrites a la main, plus la decouverte du seuil de DOM par essai ; besoin cree par une regle du socle lui-meme.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-corrige" id="item-TF-0500" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0500</code>
@@ -1313,55 +1428,9 @@
       </div>
     </section>
     <section id="digit-ai-forge-design">
-      <h2>digit-ai-forge-design <span class="badge" title="3 item(s) actifs ciblant digit-ai-forge-design">3</span></h2>
+      <h2>digit-ai-forge-design <span class="badge" title="2 item(s) actifs ciblant digit-ai-forge-design">2</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-design</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0483" data-cite data-forge="digit-ai-forge-design" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0483</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.7)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-design : rien n oblige a relever ce qui se fait de bien dans le domaine du produit avant de proposer une DA — les oracles jugent la discipline INTERNE, et une DA au vert complet a ete rejetee en bloc</h3>
-          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 22/08, recherche faite dans les documents et les oracles de forge-design : AUCUNE notion de barre externe, de reference du domaine ou d etat de l art.</p><ul class="puces"><li>Les oracles jugent la discipline INTERNE — oracle-slop, oracle-dtcg (tokens), oracle-motion, oracle-bascule, oracle-taste (accent, filets, systeme), oracle-mobile — et le font bien ; aucun ne peut dire « ce n est pas desirable pour la cible ». PREUVE DU COUT : la premiere direction artistique de factory.produit-07 a passe les oracles AU VERT et a ete REJETEE EN BLOC par le commanditaire (« ca ne presente rien et ca ne donne pas du tout envie »). La sortie de crise a consiste exactement en l entrant manquant — un releve de dix sites reconnus du meme domaine, trois directions neuves, puis un ARBITRAGE HUMAIN SUR CAPTURES. Un tour complet de conception+design perdu. ET C EST LA MOITIE DU SUJET : la forge tient DEJA la bonne doctrine ailleurs — « la justesse d une voix n est pas decidable par script… ce qui EST verifiable, c est la constance » (socle de marque, repris par TF-0383). Le present retour NE DEMANDE PAS a un oracle de juger le beau : il demande que l ENTRANT MANQUANT SOIT EXIGE et que l ARBITRAGE HUMAIN SOIT UNE ETAPE, pas un rattrapage. PROPOSITION : deux artefacts, aucun jugement automatique de gout</li><li>Une BARRE EXTERNE au dossier de cadrage design — N references du domaine du produit, relevees et datees, avec ce qui est retenu et ce qui est ecarte ; un oracle peut verifier qu elle EXISTE, est DATEE et CITE SES SOURCES, jamais qu elle est juste</li><li>Un GATE HUMAIN EXPLICITE SUR CAPTURES avant le developpement de la DA retenue : ce que le commanditaire arbitre, ce sont des images, pas une description. Les deux sont verifiables en presence et en completude, a l image de ce que CADRAGE-DESIGN.md fait deja pour ses six champs — ou le champ « ton attendu » est meme deja une HYPOTHESE A VALIDER A LA REVUE DESIGN : le crochet existe et n est pas arme</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-design</dt><dd>Un tour complet conception+design perdu sur factory.produit-07 : DA au vert sur tous les oracles, rejetee integralement par le commanditaire, refaite avec releve externe et arbitrage humain sur captures.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">factory-digit-ai-fr</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0489" data-cite data-forge="digit-ai-forge-design" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0489</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.7)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-design : aucun composant « lecteur de source » au catalogue alors que la regle d autoportance impose d embarquer les sources citees</h3>
-          <div class="card-detail" data-cite><p class="lead">FAIT : la regle A1 exige un fichier autoportant ; un rapport qui renvoie a des fichiers du depot perd ses sources des qu il part par courriel.</p><ul class="puces"><li>La consequence logique est d embarquer les documents — et rien n est prevu : un &lt;pre&gt; de 67 Ko de Markdown est illisible. Ce livrable a du ecrire un convertisseur Markdown (environ 130 lignes : titres, tableaux, listes, code, citations, separateurs, enrichissements de ligne), une bascule a deux vues, et un rendu DIFFERE au premier depliage — sans ce dernier point, les douze documents rendus d avance faisaient passer le DOM de 7 000 a plus de 25 000 noeuds, au-dela du seuil d echec de l oracle de performance. PROPOSITION : composant au catalogue — &lt;details&gt; avec bascule « mis en forme » / « texte brut », rendu paresseux, et la doctrine qui va avec : les liens d un document cite ne deviennent PAS cliquables, ils visent le depot et donc rien depuis la page</li><li>leur cible passe en infobulle. Un lien mort ment davantage qu une absence de lien</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-21</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-design</dt><dd>130 lignes de convertisseur ecrites a la main, plus la decouverte du seuil de DOM par essai ; besoin cree par une regle du socle lui-meme.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
-            
-          </dl>
-        </article>
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
              titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
              socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
@@ -1382,6 +1451,29 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 15 — gain 3 × preuve 5 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-design</dt><dd>Un point sur dix-sept perdu, decouvert par le client et non par la chaine de controle.</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0483" data-cite data-forge="digit-ai-forge-design" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0483</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.7)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-design : rien n oblige a relever ce qui se fait de bien dans le domaine du produit avant de proposer une DA — les oracles jugent la discipline INTERNE, et une DA au vert complet a ete rejetee en bloc</h3>
+          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 22/08, recherche faite dans les documents et les oracles de forge-design : AUCUNE notion de barre externe, de reference du domaine ou d etat de l art.</p><ul class="puces"><li>Les oracles jugent la discipline INTERNE — oracle-slop, oracle-dtcg (tokens), oracle-motion, oracle-bascule, oracle-taste (accent, filets, systeme), oracle-mobile — et le font bien ; aucun ne peut dire « ce n est pas desirable pour la cible ». PREUVE DU COUT : la premiere direction artistique de factory.produit-07 a passe les oracles AU VERT et a ete REJETEE EN BLOC par le commanditaire (« ca ne presente rien et ca ne donne pas du tout envie »). La sortie de crise a consiste exactement en l entrant manquant — un releve de dix sites reconnus du meme domaine, trois directions neuves, puis un ARBITRAGE HUMAIN SUR CAPTURES. Un tour complet de conception+design perdu. ET C EST LA MOITIE DU SUJET : la forge tient DEJA la bonne doctrine ailleurs — « la justesse d une voix n est pas decidable par script… ce qui EST verifiable, c est la constance » (socle de marque, repris par TF-0383). Le present retour NE DEMANDE PAS a un oracle de juger le beau : il demande que l ENTRANT MANQUANT SOIT EXIGE et que l ARBITRAGE HUMAIN SOIT UNE ETAPE, pas un rattrapage. PROPOSITION : deux artefacts, aucun jugement automatique de gout</li><li>Une BARRE EXTERNE au dossier de cadrage design — N references du domaine du produit, relevees et datees, avec ce qui est retenu et ce qui est ecarte ; un oracle peut verifier qu elle EXISTE, est DATEE et CITE SES SOURCES, jamais qu elle est juste</li><li>Un GATE HUMAIN EXPLICITE SUR CAPTURES avant le developpement de la DA retenue : ce que le commanditaire arbitre, ce sont des images, pas une description. Les deux sont verifiables en presence et en completude, a l image de ce que CADRAGE-DESIGN.md fait deja pour ses six champs — ou le champ « ton attendu » est meme deja une HYPOTHESE A VALIDER A LA REVUE DESIGN : le crochet existe et n est pas arme</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-design</dt><dd>Un tour complet conception+design perdu sur factory.produit-07 : DA au vert sur tous les oracles, rejetee integralement par le commanditaire, refaite avec releve externe et arbitrage humain sur captures.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">factory-digit-ai-fr</dd></div>
             
           </dl>
         </article>
@@ -1533,101 +1625,9 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
       </div>
     </section>
     <section id="pilot">
-      <h2>pilot <span class="badge" title="6 item(s) actifs ciblant pilot">6</span></h2>
+      <h2>pilot <span class="badge" title="2 item(s) actifs ciblant pilot">2</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0519" data-cite data-forge="pilot" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0519</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">produit-07 : l ancien hote forge.produit-07 NE RESOUT PLUS DU TOUT — le trafic qui le connait encore tombe dans le vide, et c est le gate neuf M-6 qui l a mesure</h3>
-          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 23/08, mesure avec l outil neuf de M-6 (TF-0482) une heure apres l avoir ecrit.</p><ul class="puces"><li>`node scripts/verifier-bascule.mjs --apres --historique https://forge.produit-07` rend FAIL : « le nom forge.produit-07 ne resout pas (ENOTFOUND) ». La cible du renommage, elle, repond : `--avant --cible https://factory.produit-07` rend PASS. LE DEFAUT EST DONC L INVERSE DE CELUI DU 18/08. Le 18/08, la redirection etait armee vers un domaine qui ne resolvait pas encore, et le site est devenu injoignable pendant une vingtaine de secondes. Aujourd hui le nouveau domaine va bien, mais L ANCIEN A DISPARU : aucune resolution, donc aucune redirection possible. Tout ce qui connait encore l ancienne adresse — liens sortants, favoris, index de moteurs de recherche, signatures de courriel, documents deja remis a des clients — tombe dans le vide, avec une erreur de resolution et non une page d explication. CE QUE CA COUTE, et pourquoi ce n est pas rien : une erreur DNS n est pas une page 404. Un lecteur qui voit « ce site est introuvable » conclut que le produit n existe plus, pas qu il a change d adresse ; et un moteur de recherche qui ne resout plus un hote finit par retirer ses pages de l index sans transferer l anteriorite vers le nouveau domaine. C est precisement ce que la doctrine ecrite ce jour meme au ETAPE-MEP section 3 quater exige d eviter : « l ANCIEN hote est interroge APRES deploiement — 200, ou 301 vers un emplacement qui repond, chemin et requete preserves ». L etat actuel viole la regle que nous venons d ecrire. TROIS VOIES, aucune tranchee, et la premiere n est pas la moins chere par hasard :</li><li>reCREER l enregistrement DNS de l ancien hote et y servir une redirection 301 vers le nouveau, chemin preserve — c est la voie que la doctrine prescrit, et elle coute une entree de zone plus une regle de redirection</li><li>accepter la disparition et la DECLARER, en consignant au registre que l anteriorite de l ancien domaine est abandonnee volontairement — honnete, mais il faut alors savoir ce qu on perd, et personne ne l a mesure</li><li>mesurer d abord ce que l ancien hote recevait encore comme trafic avant de decider, ce qui suppose des journaux que nous n avons peut-etre plus. La voie</li><li>a ma preference et je ne la prends pas : la zone DNS n est pas dans le perimetre du pilot, et une entree de zone est un geste d infrastructure qui se decide</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-23</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>mesure le 23/08 : forge.produit-07 rend ENOTFOUND, donc aucune redirection n est possible. Une erreur de resolution n est pas une page 404 — un lecteur conclut que le produit n existe plus, et un moteur retire les pages de l index sans transferer l anteriorite. L etat viole la regle ecrite le jour meme a ETAPE-MEP section 3 quater.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du 23/08, mesure par l outil neuf de M-6 — constat =&gt; candidat)</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0514" data-cite data-forge="pilot" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0514</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.7)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">Produit-05 n'est PAS instancie sous la doctrine factory — ni forge\, ni clause de precedence, ni hooks : c'est ce qui explique les QUATRE lots refuses en trois jours, et non un gabarit perime</h3>
-          <div class="card-detail" data-cite><p class="lead">Constat du 22/08, etabli en executant le mandat humain « recopier le gabarit chez le produit » (option c).</p><ul class="puces"><li>CE QUE JE PENSAIS ET QUI ETAIT FAUX : TF-0502 concluait que le produit ecrivait avec une COPIE PERIMEE du gabarit, prise a la creation de son run et jamais rafraichie. Verifie sur pieces : il n'y a AUCUNE copie. `find` sur tout le depot ne rend aucun fichier RETOURS-FORGES. La copie ne vieillissait pas, elle n'existait pas. TROIS FAITS MESURES, chacun verifiable en une commande</li><li>Le produit vit dans `c:\dev\Produit-05\projet` et n'a AUCUN dossier `forge\` : ses lots de retours sont ecrits dans `output\v2-architecture-cible\retours\`, une convention ad hoc, alors que la doctrine (ETAPES-RUN §1) prescrit `forge\retours\`</li><li>Son `CLAUDE.md` fait TREIZE lignes et ne mentionne la factory NULLE PART : ni le canal de retours, ni la clause de precedence R-43, ni les hooks R-44 (fraicheur a l'ouverture, restitution jugee). Il decrit un tracker d'issues local et deux flux de documentation produit — c'est un CLAUDE.md de projet, pas un CLAUDE.md instancie par le pilot</li><li>Consequence directe et entierement expliquee : quatre lots refuses par R-45/R-46 en trois jours (20260821a, 20260822a, 20260822b, 20260822c). Un produit qui n'a jamais recu le gabarit ne peut pas en porter les sections — ce n'est pas de la negligence, c'est une absence de canal. CE QUE J'AI FAIT SOUS MANDAT, ET RIEN DE PLUS : depose `gabarits\RETOURS-FORGES.md` (8 110 octets, sections aux lignes 59 et 85) dans `output\v2-architecture-cible\retours\`, la ou le produit ecrit REELLEMENT ses lots — le deposer dans un `forge\retours\` qu'il n'utilise pas n'aurait servi a personne. Aucun fichier ecrase (la cible n'existait pas), aucun commit chez le produit : le depot frere reste a son proprietaire. CE QUI RESTE OUVERT, et ce n'est pas a moi de le trancher : faut-il instancier Produit-05 sous doctrine (CLAUDE.md produit, forge\, hooks, precedence), ou reconnaitre qu'un produit peut contribuer des retours SANS etre sous doctrine et adapter R-45/R-46 en consequence ? Les quatre refus disent que la question n'a jamais ete posee</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>mesure le 22/08 : QUATRE lots refuses en trois jours pour un seul produit (20260821a, 20260822a, 20260822b, 20260822c), soit 100 % de ses remises depuis la publication de R-45. Trois ont fini par entrer par derogation, portant 15 candidatures dont une nommait un plantage bloquant du lanceur d'oracles. Le correctif livre le meme jour pour TF-0502 — rafraichir la copie du gabarit a chaque ouverture de run — n'aurait rien change ici : il n'y a pas de run ouvert sous doctrine, donc pas d'ouverture qui rafraichirait quoi que ce soit.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat etabli en executant le mandat humain « option c » du 22/08 — l'execution a dementi l'hypothese qui la motivait)</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0474" data-cite data-forge="pilot" data-statut="candidat" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0474</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : cinq mécanismes d’empreinte sha256 coexistent sans format commun — la même classe de défaut est redécouverte forge par forge</h3>
-          <div class="card-detail" data-cite><p class="lead">Constat instruit par lecture des dépôts (clones du 22/08/2026), jamais depuis une fiche.</p><ul class="puces"><li>L’écosystème hache du contenu pour juger la fraîcheur d’un artefact en AU MOINS CINQ endroits, chacun avec son format, sa granularité et sa durée de vie :</li><li>forge-ops, `forge-ops/empreinte@1` — {format, release, ts, fichiers:{chemin: sha256}} scellé par `ops.mjs deployer|canary`, lu par `oracle-ops --empreinte` (O-7) : le seul FORMAT DÉCLARÉ ET VERSIONNÉ</li><li>quality-oracles v2.6.1, `run-oracles.mjs` l.86-92 — sha256 tronqué à 16 hex, servant la clé de cache et JAMAIS persisté au journal ni à l’historique</li><li>forge-seo, empreinte de grille (TF-0072)</li><li>pilot, hachage de `oracle-boite-entree` (TF-0253)</li><li>sceau sha256 de TODO-PRODUIT (TF-0338). Ce que la dispersion coûte, prouvé par le registre : SEPT items archivés relèvent de la même classe et ont été traités isolément — TF-0072, TF-0247, TF-0253, TF-0288, TF-0294, TF-0298, TF-0338. TF-0072 et TF-0253 sont le MÊME défaut de fins de ligne, découvert deux fois dans deux forges différentes ; TF-0288 et TF-0298 sont le même trou de scellement, découvert deux fois dans la même forge. Capacité attendue, formulée en invariant et non en solution : un artefact dont la fraîcheur est jugée porte une empreinte au FORMAT DÉCLARÉ UNIQUE de l’écosystème, et tout nouveau mécanisme de scellement est refusé s’il en invente un autre. Le format le plus mûr existe déjà (`forge-ops/empreinte@1`) — l’enjeu est sa promotion en convention transverse assortie d’un contrôle qui la fasse tenir, pas une construction neuve. Trois écarts connus que le format retenu doit absorber, chacun déjà prouvé au registre : normalisation des fins de ligne avant hachage (TF-0072, TF-0253) ; capture avant/après, pour ne jamais certifier un contenu qui a bougé pendant la mesure (TF-0294) ; scellement à TOUS les points de promotion et non au seul chemin nominal (TF-0298). Aucune cible de code n’est prescrite : le choix du dépôt d’accueil et de la forme — référentiel du pilot, module partagé, ou promotion en place — est un arbitrage laissé à la forge</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>sept items archivés de la même classe, traités un par un, aucun n’ayant produit de convention : TF-0072, TF-0247, TF-0253, TF-0288, TF-0294, TF-0298, TF-0338. Deux redécouvertes strictes établies par lecture des titres au registre — le défaut de fins de ligne de TF-0072 (forge-seo) rejoué en TF-0253 (pilot), et le trou de scellement de TF-0288 rejoué en TF-0298 (forge-ops, canary). Anti-doublon exécuté le 22/08/2026 sur les 2338 événements des deux registres : aucun item existant ne porte le format partagé — une seule occurrence sur le motif « format/empreinte commun », TF-0298, qui traite un point de scellement manquant dans UNE forge, pas la convention.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (session claude.ai du 22/08/2026 — balayage de classe déclenché par une veille externe sur le dépôt garrytan/gstack v1.68.3.0)</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0477" data-cite data-forge="pilot" data-statut="candidat" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0477</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">La loi 4 dit ou vit une donnee volatile, jamais qu'une note ne doit pas la RECOPIER — la derive se detecte claim par claim, sur un seul document, et la classe se re-paye</h3>
-          <div class="card-detail" data-cite><p class="lead">Constat du 22/08, ne d'une veille externe (pattern « LLM Wiki » de Karpathy, gist du 04/04/2026 et son fil de retours de production).</p><ul class="puces"><li>Un contributeur y formule une regle de prevention absente de notre corpus : UNE NOTE DOCUMENTE LA FORME D'UN CONTRAT, JAMAIS SA VALEUR COURANTE. Ce qui bouge — un compte, un SHA, un id, une date de dernier passage — vit dans le depot et se lit a l'execution ; une note qui recopie une telle valeur lui a cree un second domicile qui derivera en silence, et le lecteur fera confiance a la copie. Corollaire operationnel : une valeur ne se cite que si quelque chose en aval depend de cette valeur exacte, et ce dependant est nomme dans la meme phrase — une citation sans dependant nomme est une copie que rien ne surveille. CE QUI EXISTE DEJA CHEZ NOUS, verifie sur pieces avant d'ecrire cette candidature : la loi transverse n.4 (« une donnee volatile est une donnee, pas du code ») porte sur le DOMICILE de la donnee produit (catalogues, tarifs, versions de modeles : editables, dates, sources) ; R-21 l'applique aux versions de TECHNOS.md contre les lockfiles ; oracle-fraicheur-doc et son fichier fraicheur-claims.json confrontent des affirmations comptables a des sondes executables. CE QUI MANQUE, et c'est l'objet de cette candidature :</li><li>la loi 4 ne dit rien de la PROSE qui recopie une valeur — elle range la donnee, elle n'interdit pas la copie</li><li>la detection est NOMINATIVE : un claim n'existe que si quelqu'un a deja constate la derive et ecrit sa sonde, donc on trouve toujours l'instance et jamais la classe</li><li>la couverture est d'UN SEUL document. INVARIANTS ATTENDUS : une valeur mobile ecrite hors de son domicile est un defaut, pas un detail de redaction ; une valeur citee nomme son dependant ou devient un pointeur ; un constat de derive declenche un balayage de sa classe, pas une correction unitaire ; ce qui n'est pas balayable se declare non_juge plutot que de passer en silence. CRITERES D'ACCEPTATION :</li><li>la regle est ecrite quelque part ou un redacteur la rencontre AVANT d'ecrire, pas apres</li><li>un controle executable rend un verdict localisant sur un document de pilotage, avec paire de fixtures rouge/verte et mutation regle par regle</li><li>le controle sait dire ce qu'il ne juge pas</li><li>rejouer le controle sur les documents qui ont deja produit un defaut de cette classe (README de forge-tests, manifeste forge-seo-geo) les rattrape, sinon la generalisation n'a pas eu lieu. NON DOUBLONS, verifies sur les 473 creations du registre : TF-0113 et TF-0115 (nes) ont CREE la detection par claims et sont archives corriges — ils fournissent le mecanisme, pas la regle de redaction ni le balayage ; TF-0311 puis TF-0334 sont deux instances de la meme maladie sur le meme README, le second disant en toutes lettres « hors des deux que l'item nommait » — c'est la preuve que la classe se re-paye a la main ; TF-0378 (forge-data) demande qu'un nombre de prose porte un marqueur de citation : objet voisin mais distinct, il traite le SOURCAGE d'un nombre, pas la COPIE d'une valeur mobile ; TF-0338, TF-0247, TF-0358, TF-0456 sont des instances, aucune ne porte la classe. Zero occurrence de « karpathy », « llm wiki » ou « obsidian » au registre : l'entrant est nouveau. LE CHOIX DE LA CIBLE N'EST PAS FAIT ICI — regle de redaction du socle, extension du fichier de claims, nouvel oracle, ou combinaison : arbitrage de la forge</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 3 × preuve 4 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>mesure executee le 22/08 sur le clone au commit 6aa0b20 : fraicheur-claims.json porte 6 claims, TOUS sur INVENTAIRE.md — zero claim sur un README de forge, alors que les deux derniers defauts avoues de cette classe (TF-0311, TF-0334) etaient dans le README de forge-tests ; et le seul document couvert porte environ 81 assertions de denombrement (mesure par proxy, ids TF, versions et dates retires — chiffre approximatif et declare comme tel) pour 6 sondes, soit moins d'une sur dix. Cout deja paye et trace au registre : TF-0113 et TF-0115 (6 derives en deux campagnes), TF-0311 puis TF-0334 sur le meme fichier, TF-0247 (3 citations perimees dont la correction change l'empreinte de grille), TF-0358 (sous-chemin perime), TF-0456 (dates de README). Le score porte un arbitrage a revoir : l'effort est note 3 parce que la regle est bon marche mais le balayage ne l'est pas ; si la forge tranche pour la seule regle de redaction, l'effort tombe a 1 et la valeur double.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Sebastien via session claude.ai du 22/08 (veille externe =&gt; candidat) — option b d'une sollicitation indicee, seule retenue</dd></div>
-            
-          </dl>
-        </article>
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
              titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
              socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte

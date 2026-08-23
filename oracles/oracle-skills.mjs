@@ -24,6 +24,11 @@
  *   K6  même contrat pour les HOOKS (`<forge>\.claude\hooks\` → `~\.claude\hooks\`) : divergence
  *       en échec, hook installé sans source versionnée déclaré et non jugé (comme K4), copie en
  *       avance protégée (comme K5).
+ *   K9  le RELEVÉ des champs de frontmatter des SKILL.md versionnés — déclaratif, JAMAIS en
+ *       échec (TF-0475) : il dit quels champs le parc pose et lesquels il ne pose nulle part,
+ *       dont les trois mécanismes d'isolation, de cadrage et de restriction d'outils. Écrire une
+ *       clé que la plateforme ignorerait serait une affordance non câblée : le nom exact des
+ *       champs appartient à sa documentation, donc le câblage reste une décision humaine.
  *   K7  le CÂBLAGE d'un hook versionné — déclaré, JAMAIS en échec : `<forge>\.claude\settings.json`
  *       dit ce que la forge attend, `~\.claude\settings.json` dit ce qui s'exécute vraiment ;
  *       l'écart est nommé avec la commande qui le poserait.
@@ -652,6 +657,60 @@ function jugerCablage(racine, fichierSettings, installesHooks, appliquer, findin
   jugerCheminsCables([...confrontees.values()], installesHooks, hooks, installe, appliquer, findings);
 }
 
+/* ---- K9 · le RELEVÉ des champs de frontmatter (TF-0475, 23/08/2026) --------------------------
+ *
+ * MESURE FONDATRICE, refaite ici à chaque recette au lieu d'être refaite à la main : les SKILL.md
+ * que le parc versionne portent tous exactement `name` et `description`, plus `metadata` sur
+ * certains et un `version` hors référentiel sur d'autres. Les autres champs documentés par la
+ * plateforme sont posés NULLE PART — dont les trois seuls mécanismes capables d'ISOLER un
+ * contexte, de CADRER un déclenchement et de RESTREINDRE un outil.
+ *
+ * POURQUOI CE RELEVÉ EST DÉCLARATIF ET NON UN ÉCHEC, et c'est un choix qui se défend : écrire des
+ * clés de frontmatter que la plateforme ignorerait serait EXACTEMENT une affordance non câblée —
+ * la première loi transverse, prise à l'envers. Le nom exact des champs et leur effet réel
+ * appartiennent à la documentation de la plateforme, qui n'est pas dans ce dépôt. L'oracle rend
+ * donc le FAIT, daté et reproductible ; le câblage reste une décision humaine informée, et il
+ * commence par vérifier les noms de champs contre la documentation courante.
+ *
+ * Ce que le relevé rend visible à chaque recette, et qui ne se voyait qu'une fois dans une
+ * candidature : combien de skills, combien de champs distincts, et lesquels manquent.
+ */
+function relevePreambule(par_nom, findings) {
+  const CHAMPS_MECANIQUES = ["allowed-tools", "disable-model-invocation", "context", "isolation"];
+  const parChamp = new Map();
+  let lus = 0;
+  for (const [nom, chemins] of [...par_nom].sort()) {
+    const src = chemins[0];
+    let texte = "";
+    try { texte = readFileSync(join(src, "SKILL.md"), "utf8"); } catch { continue; }
+    const m = /^---\r?\n([\s\S]*?)\r?\n---/.exec(texte);
+    if (!m) continue;
+    lus += 1;
+    for (const ligne of m[1].split(/\r?\n/)) {
+      const c = /^([A-Za-z][A-Za-z0-9_-]*)\s*:/.exec(ligne);
+      if (!c) continue;                       // ligne indentée d'un bloc : c'est une sous-clé
+      const liste = parChamp.get(c[1]) || [];
+      liste.push(nom);
+      parChamp.set(c[1], liste);
+    }
+  }
+  if (!lus) return;
+  const absents = CHAMPS_MECANIQUES.filter((c) => !parChamp.has(c));
+  findings.push({
+    regle: "K9", statut: "PASS", ou: `${lus} SKILL.md versionnés`,
+    message: `relevé des champs de frontmatter : ` +
+      [...parChamp].sort((a, b) => b[1].length - a[1].length)
+        .map(([c, l]) => `${c} (${l.length})`).join(", ") +
+      (absents.length
+        ? `. AUCUN skill ne porte ${absents.join(", ")} — les mécanismes d'isolation de contexte, ` +
+          "de cadrage du déclenchement et de restriction d'outils ne sont donc câblés nulle part. " +
+          "Ce relevé est un FAIT, pas un verdict : écrire une clé que la plateforme ignorerait " +
+          "serait une affordance non câblée, et le nom exact des champs appartient à sa " +
+          "documentation. Le câblage est une décision humaine informée (TF-0475)"
+        : ". les quatre champs mécaniques sont posés au moins une fois"),
+  });
+}
+
 function juger(racine, installes, appliquer = false, purger = false,
                installesHooks = join(dirname(installes), "hooks"),
                settingsInstalle = join(dirname(installes), "settings.json")) {
@@ -669,6 +728,9 @@ function juger(racine, installes, appliquer = false, purger = false,
   const purge = [];
   const racineQuarantaine = join(installes, ".quarantaine");
   const horodatage = horodatageQuarantaine();
+
+  // K9 · le relevé, avant tout jugement : il décrit le parc, il n'en juge rien.
+  relevePreambule(par_nom, findings);
 
   // K3 d'abord : sans source unique, K1 et K2 n'ont pas de sens pour ce nom.
   const ambigus = new Set();
@@ -875,6 +937,31 @@ function selfTest() {
   cas.push(["K4    — skill personnel déclaré, non jugé",
             !r.findings.some((f) => f.regle === "K4" && f.statut === "FAIL")
             && r.findings.some((f) => f.regle === "K4" && /perso/.test(f.message))]);
+
+  // K9 (TF-0475) : le RELEVÉ des champs de frontmatter. Deux sens, sur un parc fabriqué — le
+  // relevé doit DIRE ce qui manque quand rien ne le porte, et cesser de le dire dès qu'un skill
+  // le porte. Il reste déclaratif dans les deux cas : jamais un échec.
+  const baseK9 = mkdtempSync(join(tmpdir(), "skills-k9-"));
+  const racineK9 = join(baseK9, "forges");
+  const instK9 = join(baseK9, ".claude", "skills");
+  const srcK9 = join(racineK9, "digit-ai-forge-agents", ".claude", "skills");
+  poser(join(srcK9, "alpha", "SKILL.md"), "---\nname: alpha\ndescription: un skill\n---\n# alpha\n");
+  poser(join(instK9, "alpha", "SKILL.md"), "---\nname: alpha\ndescription: un skill\n---\n# alpha\n");
+  let rK9 = juger(racineK9, instK9);
+  const k9 = () => rK9.findings.filter((f) => f.regle === "K9");
+  cas.push(["K9    — relevé rendu, et jamais en échec",
+            k9().length === 1 && k9()[0].statut === "PASS"]);
+  cas.push(["K9    — les champs posés sont COMPTÉS, et les mécanismes absents NOMMÉS",
+            /name \(1\)/.test(k9()[0].message) && /allowed-tools/.test(k9()[0].message)]);
+  cas.push(["K9    — le relevé dit POURQUOI il ne juge pas : une clé ignorée serait une affordance non câblée",
+            /affordance non câblée/.test(k9()[0].message)]);
+  poser(join(srcK9, "beta", "SKILL.md"), "---\nname: beta\ndescription: un autre\nallowed-tools: Read, Grep\ncontext: isole\nisolation: worktree\ndisable-model-invocation: true\n---\n# beta\n");
+  poser(join(instK9, "beta", "SKILL.md"), "---\nname: beta\ndescription: un autre\nallowed-tools: Read, Grep\ncontext: isole\nisolation: worktree\ndisable-model-invocation: true\n---\n# beta\n");
+  rK9 = juger(racineK9, instK9);
+  cas.push(["K9    — dès qu'un skill porte les quatre champs, le relevé cesse de les réclamer",
+            k9().length === 1 && /les quatre champs mécaniques/.test(k9()[0].message)]);
+  // Le nettoyage suit la convention du fichier : les autres fixtures laissent leur base au
+  // temporaire, jugee sans importance. On fait pareil plutot que d'importer un outil de plus.
 
   // ---- TF-0289 : les sidecars d'oracles ne sont pas des divergences, et les VRAIES ne sont plus
   // tronquées. Base neuve : les cas précédents laissent volontairement un doublon K3 derrière eux,
