@@ -33,7 +33,7 @@ Plans stratégiques, synthèses de mandat et de campagne (format `gabarits\RESTI
 | `Digit-AI - Synthese Mandat - Traite todos et retours - 20260822b.md` | fichier | 16,8 Ko | Digit-AI — Synthèse de mandat — Traite tous les todos et retours — 20260822b |
 | `Digit-AI - Synthese Mandat - Traite todos et retours - 20260822c.md` | fichier | 9,2 Ko | Digit-AI — Synthèse de mandat — Traite todos et retours (suite) — 20260822c |
 | `Digit-AI - Synthese Mandat - Traite tous les retours - 20260817a.md` | fichier | 5,2 Ko | Synthèse de mandat — « tous les retours de 00-retours sont-ils traités ? traite-les, archi |
-| `Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md` | fichier | 9,2 Ko | Digit-AI — Synthèse de mandat — Traite tous les sujets suivants — 20260823a |
+| `Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md` | fichier | 9,8 Ko | Digit-AI — Synthèse de mandat — Traite tous les sujets suivants — 20260823a |
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 
 _21 fichier(s), 0 sous-dossier(s)_

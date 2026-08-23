@@ -4,8 +4,9 @@ destinataire: humain
 
 # Digit-AI — Synthèse de mandat — Traite tous les sujets suivants — 20260823a
 
-Six sujets de plus sont réglés depuis hier soir, ce qui fait trente-six corrections au total et
-quatorze restantes. Deux d'entre eux valent d'être signalés parce qu'ils changent ce que nos
+Six sujets de plus sont réglés depuis hier soir, ce qui fait trente-six corrections au total. Il en
+reste dix-neuf, cinq ayant été ajoutés entre-temps par la seconde session qui travaille la même
+liste. Deux d'entre eux valent d'être signalés parce qu'ils changent ce que nos
 contrôles voient : les documents en texte simple, qui sont le format que nous livrons le plus, ne
 recevaient jusqu'ici aucun contrôle de lisibilité — c'est réparé ; et une bascule d'adresse
 internet n'était vérifiée que d'un côté, ce qui explique la panne de la semaine dernière. Cette
@@ -17,19 +18,19 @@ continuer ou de m'arrêter.
 
 - **quoi** — suite du mandat de traitement du registre (pas un run produit).
 - **sur quoi** — le dépôt de pilotage, plus les forges d'agents et de design.
-- **quand** — fin le **23/08/2026 à 09:20 (UTC+02:00)**, durée de cette suite **≈ 2 h 30**.
-- **qui** — agent pilot (Opus 5) ; dépôt de pilotage à `c993120`.
+- **quand** — fin le **23/08/2026 à 09:35 (UTC+02:00)**, durée de cette suite **≈ 2 h 45**.
+- **qui** — agent pilot (Opus 5) ; dépôt de pilotage à `f6bd2f8`.
 
 ## 2. Verdict en une ligne
 
-**36 corrections faites** (+ 1 écartée sur votre décision), **14 restantes** · les 7 contrôles du
+**36 corrections faites** (+ 1 écartée sur votre décision), **19 restantes** · les 7 contrôles du
 dépôt de pilotage **tous verts** · recette du pilot **34/34**, socle HTML **101/101**, oracles
 qualité **166 verts / 0 rouge** (le seul rouge de la veille a disparu), forge de design **25 oracles
 et 79 règles, tout vert**.
 
 ## 3. Décisions attendues de vous
 
-- **Rien n'attend de décision.** Aucun des quatorze sujets restants n'est bloqué par un arbitrage.
+- **Rien n'attend de décision.** Aucun des dix-neuf sujets restants n'est bloqué par un arbitrage.
   Un mot suffit si vous voulez que je continue.
 
 ## 4. Traité — avec sa preuve
@@ -66,11 +67,18 @@ et 79 règles, tout vert**.
     contrôle qui refuse une ligne sans preuve, une preuve creuse, **et un compte annoncé qui ne
     correspond pas** — le défaut d'origine en une soustraction.
 
+- **Le contrôle qui relit mes comptes rendus a été réparé une seconde fois**, et cette fois sur la
+  bonne cause : il jugeait une phrase de transition au lieu du compte rendu, parce qu'il lisait le
+  fichier avant que celui-ci y soit écrit.
+  - preuve : mesuré sur un tour réel de **20 phrases de transition** ; l'épreuve reproduit le refus
+    à l'identique avec l'ancienne lecture et ne juge plus rien avec la nouvelle. Recette du contrôle
+    6/6 → **7/7**.
+
 ## 5. Non traité — avec son motif
 
-- 14 sujets restent ouverts — **motif : borne atteinte sur ce tour** ; quatre pour le design, quatre
-  pour le pilotage, deux pour les tests, deux pour les agents, un pour l'audit, un pour le
-  référencement.
+- 19 sujets restent ouverts — **motif : borne atteinte sur ce tour** ; neuf pour le pilotage, quatre
+  pour le design, deux pour les tests, deux pour les agents, un pour l'audit, un pour le
+  référencement. Cinq sont arrivés pendant ce tour, versés par la session parallèle.
 - Notre ancienne adresse internet ne mène plus nulle part — **motif : hors de mon périmètre** ; la
   zone d'adressage est un geste d'infrastructure. Le constat est enregistré avec sa mesure.
 - Le format PDF absent de la forge d'audit — **motif : hors mandat de ce tour** ; c'est un chantier.
@@ -111,7 +119,7 @@ le sujet qui touche une adresse publique.
 
 | # | acteur | id | action, exécutable telle quelle | motif / raison | si elle n'est pas faite |
 |---|---|---|---|---|---|
-| 1 | `manuelle_utilisateur` | `neuve` | Dire si je continue — répondre « continue » ou « stop » ; l'état à jour est dans `todo\TODO.md`, 14 sujets listés | `decision` — arbitrage de temps, pas une tâche | les 14 sujets restants attendent sans que personne sache qui les prend |
+| 1 | `manuelle_utilisateur` | `neuve` | Dire si je continue — répondre « continue » ou « stop » ; l'état à jour est dans `todo\TODO.md`, 19 sujets listés | `decision` — arbitrage de temps, pas une tâche | les 19 sujets restants attendent sans que personne sache qui les prend |
 | 2 | `auto_ia` | `TF-0491` | Reprendre la forge de design, 4 sujets — commencer par la largeur d'un bloc de texte comparée à ses voisins, signalée trois fois par le client | `dependance_bloc_3` | trois allers-retours client sur un même défaut restent possibles |
 | 3 | `auto_ia` | `TF-0470` | Reprendre la forge de tests, 2 sujets — commencer par la parité des routes par langue | `dependance_bloc_3` | un produit servi sans arborescence reste hors contrôle |
 | 4 | `manuelle_utilisateur` | `TF-0519` | Rétablir l'ancienne adresse avec une redirection, ou déclarer qu'on abandonne son ancienneté — vérifier ensuite par `node scripts\verifier-bascule.mjs --apres --historique <url>` | `acces` — la zone d'adressage n'est pas ouverte à l'agent | le trafic qui connaît l'ancienne adresse continue de tomber dans le vide |
@@ -120,7 +128,7 @@ le sujet qui touche une adresse publique.
 ## 9. Traces
 
 - Synthèse en fichier, jugée avant affichage : [output/04-plans/](output/04-plans/).
-- Dépôt de pilotage : commits `fcb9a8d` à `c993120`, poussés.
+- Dépôt de pilotage : commits `fcb9a8d` à `f6bd2f8`, poussés.
 - Forges : `digit-ai-forge-agents@efb5015`, `digit-ai-forge-design@6552659`.
 - Outils neufs : [scripts/verifier-secours.mjs](scripts/verifier-secours.mjs) ·
   [scripts/verifier-bascule.mjs](scripts/verifier-bascule.mjs) ·
