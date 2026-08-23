@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau 07c02b2a1c83)]
+sources_de_verite: [todo/TODO.jsonl (sceau 0899a70374ce)]
 verifie_le: 2026-08-23
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `07c02b2a1c83`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `0899a70374ce`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -19,8 +19,8 @@ les corrections donnerait l'illusion d'un progrès net.
 
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
-| Ouverts | 1 | candidats, décidés ou en cours — le reste à faire réel |
-| Clos sur gains constatés | 63 | corrigés avec leur mesure avant/après |
+| Ouverts | 0 | candidats, décidés ou en cours — le reste à faire réel |
+| Clos sur gains constatés | 64 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 3 | décidés non faits, motif écrit — jamais un silence |
 | Total suivi | 67 | tout ce que le registre a jamais porté |
 
@@ -29,15 +29,6 @@ les corrections donnerait l'illusion d'un progrès net.
 La table se lit par forge cible : c'est l'unité de décision, puisqu'une correction se
 livre dans un dépôt. L'ordre suit le NOMBRE d'items ouverts, jamais leur priorité — la
 priorité vit dans la colonne de score.
-
-### pilot — 1 item(s)
-
-Les items ouverts ciblant pilot, du score le plus fort au plus faible. Le score est
-celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
-
-| Id | Titre | Statut | Forge(s) | Score |
-|---|---|---|---|---|
-| TF-0535 | digit-ai-queue vit dans le parc hors de toute verification de fraicheur : il entre dans la liste des depots su | candidat | pilot | 10 |
 
 ## Ce que ce rapport ne dit pas
 
