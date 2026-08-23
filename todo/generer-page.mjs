@@ -2,6 +2,11 @@
 /**
  * generer-page.mjs — génère todo/TODO.html : la vue de CONSULTATION du reste-à-faire.
  *
+ * promesses-verifiees — ce fichier ADHÈRE au contrôle des promesses de commentaire
+ * (`oracle-promesses`) : une classe ou un attribut nommé dans un commentaire ici DOIT exister
+ * dans le code. Un générateur de page est l'endroit où une promesse de prose coûte le plus cher —
+ * elle s'y lit comme une garantie de ce que la page contient.
+ *
  * Vue générée à source unique (TODO.jsonl) — NE PAS ÉDITER LE HTML. Déterministe : deux
  * générations sur le même registre produisent le même fichier (horodatage = ts max des
  * événements ; aucun Date.now dans la sortie).

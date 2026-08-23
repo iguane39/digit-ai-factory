@@ -4,6 +4,11 @@
  * `TODO-PRODUIT.html` : le reste-à-faire ET les décisions attendues, lisibles hors session
  * (TF-0318, verdict O3 du 17/08 — volet LECTURE seul).
  *
+ * promesses-verifiees — ce fichier ADHÈRE au contrôle des promesses de commentaire
+ * (`oracle-promesses`) : une classe ou un attribut nommé dans un commentaire ici DOIT exister
+ * dans le code. Un générateur de page est l'endroit où une promesse de prose coûte le plus cher —
+ * elle s'y lit comme une garantie de ce que la page contient.
+ *
  * Patron : celui qui est DÉJÀ en production et DÉJÀ tenu par un oracle — source Markdown
  * versionnée → projection HTML générée par les scripts du pilot, comme
  * `ARCHITECTURE.md` → `ARCHITECTURE.html` (`oracle-conformite-projet.mjs`, R-20 :

@@ -37,22 +37,31 @@ date du fait.
 | N-8 | **Un jeu de livrables est complet, ou la passe le dit.** Ce qu'un catalogue déclare se produit dans la même passe, et l'écart s'annonce avec un code distinct. | Un jeu remis **incomplet** : c'est le commanditaire qui a réclamé le second format, et le générateur a ensuite été réécrit de zéro côté produit. | `build-fiche.mjs` rend les deux formats en une passe (forge-audit) · `oracles/verifier-pdf.mjs` **relit** le tirage · `13` tests |
 | N-9 | **Ce qui est mesuré est relu dans l'artefact, jamais déduit de la commande.** Un code de retour 0 ne prouve pas qu'un octet a été écrit. | Un PDF verrouillé par une visionneuse : le navigateur a échoué **sans le dire**, et le script a revalidé l'ancien tirage en croyant valider le nouveau. Vu en comparant les horodatages. | `verifier-pdf.mjs` P1-P4, dont la **fraîcheur** (postérieur au lancement ET à sa source) — le seul contrôle qui attrape ce cas |
 | N-10 | **Une mesure qui rend plusieurs familles est lue en entier par la CHAÎNE de ses consommateurs.** Un consommateur pris seul peut n'en lire qu'une : ce qui compte est qu'aucune famille ne soit lue par personne. | Une mesure tournait sur les routes servies depuis le 20/08 et rendait douze familles ; **un seul appelant lisait le contraste, le reste était jeté** — dont les débordements horizontaux, qui avaient vécu deux mois en production. | `scripts/verifier-familles-mesure.mjs` (F1, F2, F3) — `6/6` au self-test, `12` familles produites, `4` consommateurs déclarés, toutes lues |
+| N-11 | **Une affordance promise dans un commentaire est TENUE.** Un commentaire qui annonce un élément est une affordance de LECTURE : il dispense le relecteur de vérifier. Non tenue, elle est pire qu'un silence. | Un schéma livré annonçait « un `<title>` par forme » et n'en portait qu'un, celui du diagramme entier : **l'infobulle promise n'existait pas**, et quatre chevauchements V4 bloquants en découlaient — après quatre versions et trois relectures que le commentaire avait dispensées de vérifier. | Côté PAGE : `check_html.py` **L22**, annonces quantifiées jugées **porteur par porteur** — `114/114` cas, deux fixtures neuves. Côté CODE : `oracle-promesses` (PR1) sur les fichiers qui ont **signé** — `10/10` au self-test, `282` fichiers lus, `4` signataires ; il a trouvé sa première vraie promesse chez le socle lui-même |
 | N-12 | **La forme d'un artefact de cadence est contrôlée, pas recommandée.** Propriétaire nommé, date butoir d'hypothèse, relance datée ou avouée, acteur du vocabulaire fermé, bénéfice mesuré des deux côtés, enseignement adossé à un fait. | Quatre gabarits livrés le 23/08 imposaient leur forme **en prose** — c'est-à-dire par discipline, ce que la campagne du jour a nommé neuf fois. | `oracle-cadence` (C1-C6) — `16/16` au self-test, joué à chaque recette sur les quatre gabarits |
 
-*Le numéro `N-11` manque volontairement à cette table : c'est la seule règle encore sans mécanisme,
-et elle vit juste en dessous.*
+## Aucune règle ne reste sans mécanisme
 
-## La règle qui n'a pas encore de mécanisme
+Cette section portait les règles écrites sans contrôle — une dette assumée, pas une omission. **Elle
+est vide depuis le 23/08** : N-10 l'a quittée le matin, N-11 le soir. La table ci-dessus se lit donc
+sans réserve, ce qui n'était pas vrai hier.
 
-Elle est écrite ici pour ne pas se perdre, et **déclarée sans contrôle** — c'est une dette, pas une
-omission. *N-10 a quitté cette section le 23/08 : son contrôle existe et tourne à chaque recette.*
+*Ce que la fermeture de N-11 a coûté, et il faut le dire parce que c'est la leçon la plus chère de la
+journée.* Vérifier une promesse de prose demandait « de comprendre la prose » — c'était l'argument
+qui la laissait sans mécanisme. Faux : il suffisait de ne juger que le cas **mécanisable**, un
+commentaire qui NOMME un élément, une classe ou un attribut. Deux resserrages ont été nécessaires
+avant que le contrôle soit livrable, et chacun a été décidé sur une MESURE et non sur une intuition :
 
-- **N-11 · Une affordance promise dans un commentaire est vérifiée.** Le fait : un commentaire
-  annonçait « une infobulle par forme, aucun script » et aucune forme ne la portait ; un paramètre
-  était déclaré et jamais lu ; une classe était employée sans une seule règle de style. Les deux
-  derniers cas **ont** leur contrôle (O-8 et L21) ; le premier n'en a pas, parce que vérifier une
-  promesse de prose demande de comprendre la prose. *Candidat : restreindre au cas mécanisable —
-  un commentaire qui nomme un élément absent du même bloc.*
+- le balayage large du code rendait **54 constats**, la plupart faux — un vérificateur cite une
+  classe parce qu'il la CHERCHE, et une extension de fichier ressemble trait pour trait à une
+  classe (`.mjs`, puis `.csv`, puis `.gitkeep` : le même piège pris trois fois) ;
+- resserré, il en rendait encore **8 dont 1 vrai**. Une précision d'un sur huit n'est pas un
+  contrôle, c'est une nuisance qui s'apprend à être ignorée. La polarité a donc été **inversée** :
+  un fichier qui veut être tenu à ses promesses le **déclare** (`promesses-verifiees` en tête). La
+  précision devient totale sur les signataires, et ce que le contrôle ne juge pas est écrit.
+
+*Un contrôle bruyant ne se livre pas parce qu'il est vrai « en moyenne » — il se resserre jusqu'à ce
+que chacun de ses constats mérite d'être lu, et son périmètre s'écrit.*
 
 ## Ce que ce document ne garantit pas
 
