@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=ac0b393fc13e archive=54c0315cbe97 · dernier événement: 2026-08-23T15:45:52.330Z -->
+     sceaux: actifs=30b13787df86 archive=54c0315cbe97 · dernier événement: 2026-08-23T17:02:43.321Z -->
 
-**65 actifs** (candidat 0 · décidé 0 · en cours 0 · corrigé 62 · écarté 3) · **469 archivés**.
+**67 actifs** (candidat 1 · décidé 0 · en cours 0 · corrigé 63 · écarté 3) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -23,6 +23,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0512 | corrige | 15 | pilot : un retour arriere imprime dans un journal peut etre MASQUE par le moteur de pipeline — la precaution s'annule au moment precis ou elle sert | **oui** — une precaution deliberement conçue pour l'urgence, annulee par un masquage automatique, et decouverte par hasard en relisant le journal plutot qu'en ayant besoin de la commande |
 | TF-0520 | corrige | 15 | pilot : les deux squelettes DAT et DEX livres le 21/08 ECHOUAIENT a l'oracle du socle, sur leur propre feuille de style | **oui** — deux gabarits publies en statut ok le 21/08 dont les squelettes echouaient a l'oracle du socle — decouvert au premier usage reel, deux jours plus tard |
 | TF-0525 | corrige | 15 | Un SECOND clone du pilot vit sur le poste sous son ancien nom (digit-ai-forge-steering_old) : registre TODO divergent, 88 commits de retard, et une candidature qu'il a fallu redecouvrir quatre jours plus tard | **oui** — paye et mesurable : une candidature ingeree le 18/08 dans le registre du clone n'a jamais atteint le registre vivant, et son sujet a du etre REDECOUVERT le 22/08 par un autre canal (TF-0482) — quatre jours d'ecart pour un travail deja fait. Le clone porte 88 commits de retard et 3 modifications locales non commitees ; `bootstrap.mjs --pull` ne le voit pas et ne le verra jamais, puisqu'il n'est pas dans sa liste. |
+| TF-0534 | corrige | 15 | Les deux derniers depots pieges du parc sont archives, et le balayage qui devait les declarer avait TROIS trous de plus | **oui** — un clone de 99 Mo a 110 commits de retard contenant un .env, une pierre tombale prise pour un accident a chaque ouverture, un depot de l'ecosysteme jamais verifie et jamais nomme, et un compte de recette annonce « 11/11 » en dur alors que dix cas seulement etaient joues |
 | TF-0482 | corrige | 12.5 | forge-ops : aucune porte de MEP ne surveille une bascule de domaine — les gates M-1..M-5 n interrogent QUE la nouvelle URL, un deploiement qui casse l ANCIENNE passe tout au vert | **oui** — Site de production injoignable le 18/08 par une redirection armee vers un domaine non resolvant ; aucun gate MEP n a pu le voir, l ancienne URL n etant interrogee nulle part. |
 | TF-0504 | corrige | 12.5 | pilot : le faux negatif de R-2 n est pas un oubli de producteur, il est STRUCTUREL — aucun gabarit de la bibliotheque ne porte la marque destinataire qui declenche le jugement | **oui** — Fiche securite ecrite hors output\ le 22/08 en violation de R-2/R-39, six jours apres la correction de TF-0319 ; aucun oracle ne pouvait le voir faute de marque, defaut trouve par relecture humaine. Apres pose de la marque, oracle-conformite-projet rend R-2 PASS sur le meme depot. |
 | TF-0481 | corrige | 10 | pilot : le preflight anti-collision de TF-0394 est un check-then-act — il detecte une divergence DEJA PUBLIEE, pas deux sessions qui frappent simultanement ; il a re-cede le 22/08 sur le lot digit-ai-fr | **oui** — Deuxieme renumerotation manuelle du registre en un mois, la premiere ayant motive TF-0394 ; cinq candidatures renumerotees et trois commits de rattrapage le 22/08. |
@@ -114,6 +115,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0535 | candidat | 10 | digit-ai-queue vit dans le parc hors de toute verification de fraicheur : il entre dans la liste des depots suivis, ou il se declare hors perimetre | **oui** — un depot de l'ecosysteme jamais verifie par --pull, absent du ledger, et qui n'avait jamais ete nomme par aucun controle avant le 23/08 au soir |
 | TF-0471 | corrige | 10 | R-45 refuse des lots rédigés AVANT sa publication — deux lots Produit-05 bloqués à l'ingestion, dont un qui signalait un plantage réel du lanceur d'oracles | **oui** — payé le 22/08 : douze candidatures de deux lots restent hors du registre, et l'une d'elles nommait un défaut BLOQUANT du lanceur d'oracles qui n'a été corrigé que parce que la session l'a rencontré par un autre chemin — un refus de forme a mis un fait de production hors de portée |
 | TF-0502 | corrige | 6.7 | Deux derogations a R-45 en UN JOUR, dont une hors anteriorite : la propagation des regles du pilot vers les produits reste le manque, et le mecanisme de derogation est en train de devenir la voie normale | **oui** — mesure le 22/08 sur le registre : 15 candidatures (7 + 5 + 3) n'ont pu entrer que par derogation, sur 3 lots d'un meme produit en 2 jours. Deux evenements `ingestion` portent desormais un champ `derogation` — soit 2 derogations en un seul jour, pour une regle publiee la veille. Le taux est de 3 lots derogeables sur 3 lots recus de ce produit : 100 %, ce qui ne decrit plus une exception mais un regime. |
 

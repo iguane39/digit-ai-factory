@@ -9,7 +9,11 @@
  *      exit 1, remède nommé (--pull) ; AVEC --pull : mise à jour, exit 0 ;
  *   3. dossier hérité à l'ancien nom (digit-ai-forge-seo, origin = ce dépôt) → renommé sur
  *      place vers digit-ai-forge-seo-geo, aucun doublon, exit 0 ;
- *   3 ter. clone d'avant un RENOMMAGE (origin à l'ancien nom) → reconnu par la table d'alias ;
+ *   3 bis. les dépôts que la LISTE NE CONNAÎT PAS, cinq formes qui ne se détectent pas pareil :
+ *      (a) second clone à origin identique · (b) répertoire non versionné · (c) rien n'est effacé ·
+ *      (d) clone d'AVANT un renommage, origin à l'ancien nom, reconnu par la table d'alias ·
+ *      (e) pierre tombale (PERIME.md) déclarée comme telle et non comme un accident ·
+ *      (f) dépôt de l'écosystème hors liste, avec son propre origin, jamais vérifié ;
  *   4. preuve de point d'entrée absente → DÉFAUT, exit 1 ; restaurée → exit 0.
  * Le pilot courant et les skills du poste ne sont JAMAIS touchés (--sans-pilot --sans-skills).
  *
@@ -25,6 +29,7 @@ const ICI = dirname(fileURLToPath(import.meta.url));
 const BOOTSTRAP = join(ICI, "bootstrap.mjs");
 const base = mkdtempSync(join(tmpdir(), "bootstrap-"));
 const echecs = [];
+let joues = 0;
 const git = (dir, ...a) => execFileSync("git", ["-C", dir, "-c", "user.email=t@t", "-c", "user.name=t", ...a], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
 
 // Les treize noms et preuves sont LUS dans bootstrap.mjs : la recette ne tient pas sa
@@ -52,7 +57,12 @@ try {
   const racine = join(base, "racine"); mkdirSync(racine);
   const lancer = (...a) => spawnSync(process.execPath, [BOOTSTRAP, "--racine", racine, "--sans-pilot", "--sans-skills", ...a],
     { encoding: "utf8", env: { ...process.env, BOOTSTRAP_SOURCE: bare, BOOTSTRAP_RELANCE: "1" } });
+  // LE COMPTE SE COMPTE, IL NE S'ÉCRIT PAS (23/08/2026). La ligne finale annonçait « 11/11 » en
+  // DUR : deux cas ajoutés le même jour ne l'ont pas fait bouger, et le nombre a menti sans qu'un
+  // seul test échoue. Un compte affirmé au lieu d'être dérivé est exactement ce que le parc traque
+  // ailleurs — il vaut mieux ici aussi.
   const attendre = (nom, r, code, motif) => {
+    joues += 1;
     if (r.status !== code) echecs.push(`${nom} : exit ${r.status}, attendu ${code} — ${(r.stdout + r.stderr).split("\n").filter((l) => /DEFAUT|Poste/.test(l)).join(" | ").slice(0, 300)}`);
     else if (motif && !motif.test(r.stdout)) echecs.push(`${nom} : exit conforme mais motif absent (${motif})`);
   };
@@ -87,7 +97,8 @@ try {
   // instruit une seconde fois. Le marqueur `PERIME.md` qui y avait été posé était NON VERSIONNÉ : un
   // avertissement qui ne survit pas au clonage n'avertit personne.
   //
-  // Trois formes, jouées séparément parce qu'elles ne se détectent pas de la même façon.
+  // CINQ formes, jouées séparément parce qu'elles ne se détectent pas de la même façon — et trois
+  // d'entre elles (d, e, f) ont été ajoutées le 23/08 après avoir laissé passer un cas réel chacune.
   {
     // (a) un vrai second clone : même origin qu'un dépôt connu.
     const connu = join(racine, FORGES[0].nom);
@@ -124,6 +135,30 @@ try {
       }
     }
 
+    // (e) UNE PIERRE TOMBALE N'EST PAS UN ACCIDENT (23/08). La branche « répertoire NON versionné »
+    //     passait AVANT toute lecture de PERIME.md : un dossier tombé là par mégarde et un marqueur
+    //     posé exprès recevaient le même verdict. Confondre les deux apprend à ignorer les deux.
+    {
+      const tombe = join(racine, "digit-ai-forge-tombale");
+      mkdirSync(tombe);
+      writeFileSync(join(tombe, "PERIME.md"), "# PÉRIMÉ — ne rien exécuter d'ici\n");
+      attendre("marqueur PERIME.md lu même sans dépôt git", lancer(), 0, /mise de côté DÉCLARÉE/);
+      rmSync(tombe, { recursive: true, force: true });
+    }
+
+    // (f) LE TROISIÈME TROU (23/08) : un dépôt de l'écosystème, versionné, avec SON PROPRE origin —
+    //     ni forge de la liste, ni second clone, ni mise de côté. Il tombait entre toutes les
+    //     branches et n'était déclaré NULLE PART. Mesuré sur le parc réel : un dépôt vivait là
+    //     depuis un moment, hors de toute vérification de fraîcheur, et rien ne l'avait jamais dit.
+    {
+      const seul = join(racine, "digit-ai-forge-solitaire");
+      const bareSeul = join(bare, "digit-ai-forge-solitaire.git");
+      mkdirSync(bareSeul); git(bareSeul, "init", "--quiet", "--bare", "--initial-branch=main", ".");
+      execFileSync("git", ["clone", "--quiet", bareSeul, seul], { stdio: ["ignore", "pipe", "pipe"] });
+      attendre("dépôt de l'écosystème hors liste DÉCLARÉ", lancer(), 0, /digit-ai-forge-solitaire — dépôt de l'écosystème HORS LISTE/);
+      rmSync(seul, { recursive: true, force: true });
+    }
+
     // (c) le contrôle NE SUPPRIME RIEN : un répertoire signalé est toujours là au tour suivant.
     //     Effacer un dépôt sur une heuristique échangerait un piège contre une perte.
     if (!existsSync(doublon)) echecs.push("3 bis : le contrôle a SUPPRIMÉ le doublon — il doit le déclarer, pas l'effacer");
@@ -144,4 +179,4 @@ try {
 }
 
 if (echecs.length) { console.error("bootstrap : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log(`bootstrap : 11/11 — vierge clone ${FORGES.length}/${FORGES.length}, retard refusé puis résorbé par --pull, alias renommé sans doublon, second clone et répertoire non versionné DÉCLARÉS sans être effacés (TF-0525), clone d'AVANT un renommage reconnu par sa table d'alias (TF-0533), preuve absente refusée puis restaurée`);
+console.log(`bootstrap : ${joues}/${joues} — vierge clone ${FORGES.length}/${FORGES.length}, retard refusé puis résorbé par --pull, alias renommé sans doublon, second clone et répertoire non versionné DÉCLARÉS sans être effacés (TF-0525), clone d'AVANT un renommage reconnu par sa table d'alias (TF-0533), preuve absente refusée puis restaurée`);

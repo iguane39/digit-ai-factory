@@ -28,6 +28,12 @@
  * choix ne soit pas re-débattu à chaque lecture, et pour dire ce qui le renverserait : *un deuxième
  * vrai constat, et la règle passe bloquante* — c'est écrit ici, pas laissé au ressenti du jour.
  *
+ * ET LA BASCULE EST DÉJÀ AUTORISÉE (23/08/2026, fin de journée). Le pilote humain a validé l'action
+ * par avance : au SECOND vrai constat, la règle passe bloquante et l'item est journalisé, sans
+ * repasser par une question. Ce qui reste à juger est ce qu'aucun code ne juge — qu'un constat soit
+ * VRAI, c'est-à-dire une promesse réellement non tenue et non un commentaire qui parle d'ailleurs.
+ * L'autorisation est écrite ici pour que le tour qui la trouvera n'ait pas à la redemander.
+ *
  * Usage : node oracle-promesses.mjs [racine-des-forges] [--json] · --self-test
  * Exit : 0 = PASS (avertissements possibles) · 2 = SKIP motivé. Jamais 1 : la règle avertit.
  */
