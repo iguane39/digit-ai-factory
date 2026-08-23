@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=f49bc15ff85b archive=54c0315cbe97 · dernier événement: 2026-08-23T08:30:58.607Z -->
+     sceaux: actifs=70979fab02b2 archive=54c0315cbe97 · dernier événement: 2026-08-23T08:38:28.900Z -->
 
-**61 actifs** (candidat 17 · décidé 0 · en cours 1 · corrigé 42 · écarté 1) · **469 archivés**.
+**61 actifs** (candidat 16 · décidé 0 · en cours 1 · corrigé 43 · écarté 1) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -12,6 +12,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
+| TF-0526 | corrige | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
 | TF-0507 | corrige | 20 | pilot : un renvoi par NUMERO DE LIGNE designe autre chose au message suivant — la liste est renumerotee, S14 exige un id stable mais rien n'interdit de designer par la position (regle S17) | **oui** — le lecteur a du signaler lui-meme que deux renvois d'une meme phrase etaient incomprehensibles, et ils l'etaient reellement — les positions avaient change entre l'ecriture et la lecture |
 | TF-0508 | corrige | 20 | pilot : le classement par acteur rendu en SECTIONS SEPAREES detruit la liste unique — l'acteur est une colonne, l'ordre est le tri, et seul le calendrier justifie plusieurs tableaux | **oui** — deux rappels du lecteur sur la meme exigence, alors que les deux moities de sa demande etaient compatibles et que le referentiel ne le disait pas |
 | TF-0513 | corrige | 20 | oracle-synthese : une synthese CONFORME echoue S9 a cause de son propre titre — le frontmatter `destinataire: humain` que le gabarit PRESCRIT empeche le retrait du H1, et le code de lot du titre est alors lu comme un sha | **oui** — mesure le 22/08 : S9 FAIL « vocabulaire technique nu (sha) » sur une synthese sans defaut, le token fautif etant le code de lot 20260822a du titre ; le hook Stop etant bloquant depuis la v2.4.0, le refus tombe sur une restitution conforme. Apres renommage du titre en « 22 aout 2026, lot a », le meme fichier rend PASS S1-S16 — ce qui prouve que seul le titre etait en cause. |
@@ -104,7 +105,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0526 | candidat | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
 | TF-0528 | candidat | 20 | pilot : le reste-a-faire melange TROIS NATURES dans une seule table — un ecart assume et une contrainte conditionnelle ressortent indefiniment comme du travail en attente | **oui** — deux lignes sur neuf re-servies a un lecteur qui les avait deja tranchees, dont une decision consignee cinq jours plus tot au journal des decisions du produit |
 | TF-0519 | candidat | 10 | produit-07 : l ancien hote forge.produit-07 NE RESOUT PLUS DU TOUT — le trafic qui le connait encore tombe dans le vide, et c est le gate neuf M-6 qui l a mesure | **oui** — mesure le 23/08 : forge.produit-07 rend ENOTFOUND, donc aucune redirection n est possible. Une erreur de resolution n est pas une page 404 — un lecteur conclut que le produit n existe plus, et un moteur retire les pages de l index sans transferer l anteriorite. L etat viole la regle ecrite le jour meme a ETAPE-MEP section 3 quater. |
 | TF-0514 | candidat | 6.7 | Produit-05 n'est PAS instancie sous la doctrine factory — ni forge\, ni clause de precedence, ni hooks : c'est ce qui explique les QUATRE lots refuses en trois jours, et non un gabarit perime | **oui** — mesure le 22/08 : QUATRE lots refuses en trois jours pour un seul produit (20260821a, 20260822a, 20260822b, 20260822c), soit 100 % de ses remises depuis la publication de R-45. Trois ont fini par entrer par derogation, portant 15 candidatures dont une nommait un plantage bloquant du lanceur d'oracles. Le correctif livre le meme jour pour TF-0502 — rafraichir la copie du gabarit a chaque ouverture de run — n'aurait rien change ici : il n'y a pas de run ouvert sous doctrine, donc pas d'ouverture qui rafraichirait quoi que ce soit. |
