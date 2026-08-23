@@ -21,6 +21,6 @@ Revues d'écosystème (fiches d'audit des forges rejouées, synthèse trans-forg
 | `Digit-AI - Proposition Forge - Tuyauterie cognitive - 20260809a.md` | fichier | 9,5 Ko | Digit-AI — Proposition : optimisation de la tuyauterie cognitive — 2026-08-09 |
 | `Digit-AI - Revue D8 - Restitutions du 15-08 - 20260815a.md` | fichier | 3,8 Ko | Revue D8 « Lecture de données » — les trois restitutions migrées du 15/08 |
 | `Digit-AI - Revue Forge - Écosystème - 20260808a.md` | fichier | 11,4 Ko | Digit-AI — Revue stratégique de l'écosystème forge — 2026-08-08 |
-| `Digit-AI - Revue Forge - Écosystème - 20260819a.md` | fichier | 6,1 Ko | Digit-AI — Revue Forge — Écosystème — 20260819a |
+| `Digit-AI - Revue Forge - Écosystème - 20260819a.md` | fichier | 6,0 Ko | Digit-AI — Revue Forge — Écosystème — 20260819a |
 
 _8 fichier(s), 0 sous-dossier(s)_ · dossiers cachés (journaux machine, sans README) : `.oracles\`
