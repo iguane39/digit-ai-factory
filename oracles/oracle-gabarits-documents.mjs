@@ -29,6 +29,10 @@
  *      lecteur qui trouve un manque ne peut le remonter utilement que s'il peut dire de QUEL
  *      gabarit et de QUELLE version le document vient ; sinon le retour dit « il manquait une
  *      section » et personne ne sait à quoi l'appliquer (R-46, 21/08).
+ *  G10 toute famille en statut `ok` porte une INSTANCE DE PREUVE : un document minimal
+ *      produit depuis son squelette, versionné à côté de lui, sans emplacement resté à remplir
+ *      (TF-0522, 23/08/2026). On n'accepte pas un oracle sans fixture ; on n'accepte pas un
+ *      gabarit sans instance.
  *  G9  tout gabarit de LIVRABLE prescrit la marque de destinataire (`destinataire: humain`
  *      en frontmatter pour un .md, `<meta name="destinataire" content="humain">` pour un
  *      .html), ou déclare pourquoi il ne la porte pas (TF-0504, 22/08/2026). Sans marque en
@@ -259,6 +263,60 @@ function juger(racineGabarits) {
     }
   }
   if (g9) ok("G9", "tout gabarit `ok` prescrit sa marque de destinataire, ou déclare pourquoi il n'en porte pas");
+
+  // G10 (TF-0522, 23/08/2026) — UN GABARIT `ok` A DÉJÀ PRODUIT UN DOCUMENT, ET ON PEUT LE LIRE.
+  //
+  // LE FAIT. Deux familles sont entrées au catalogue le 21/08 en statut `ok`. Le 23/08, la PREMIÈRE
+  // tentative de produire un document réel avec elles a rencontré deux défauts : un BLOQUANT (le
+  // squelette échouait à l'oracle du socle, sur sa propre feuille de style) et un MAJEUR (le
+  // sommaire se rendait en liste numérotée nue). Aucun des deux ne demandait de perspicacité —
+  // seulement d'ESSAYER.
+  //
+  // Le README de la bibliothèque exige déjà la PROVENANCE : « extrait de quatre occurrences
+  // réelles », donc que la forme vienne du réel. Mais rien n'exigeait que le SQUELETTE ait produit
+  // du réel. C'est la différence entre « cette forme a été observée » et « cette forme fonctionne ».
+  //
+  // C'est le pendant EXACT des fixtures rouge/verte que l'écosystème exige de tout oracle : on
+  // n'accepte pas un oracle sans fixture, on ne devrait pas accepter un gabarit sans instance. Le
+  // coût est d'une page par famille, payé une fois.
+  //
+  // CE QUI EST JUGÉ, et c'est volontairement étroit : l'instance EXISTE à côté du gabarit, et son
+  // CORPS ne porte plus aucun emplacement `{…}`. Le second point est le seul qui distingue une
+  // instance d'une COPIE du squelette — et il se mesure. Le `<style>` est exclu du décompte : ses
+  // accolades sont du CSS, pas des emplacements, et un premier jet du générateur les avait
+  // remplacées, produisant une instance CASSÉE ET VERTE.
+  //
+  // CE QUI N'EST PAS JUGÉ ICI : que l'instance passe l'oracle de son FORMAT. Cet oracle ne lance
+  // pas `check_html` — cross-dépôt, autre langage. La preuve d'exécution se consigne au champ
+  // `preuve` de la famille, et c'est déclaré plutôt que promis.
+  const SANS_STYLE = /<style[^>]*>[\s\S]*?<\/style>|<script[^>]*>[\s\S]*?<\/script>/gi;
+  const EMPLACEMENT = /(?<!\{)\{[^{}]{1,120}\}(?!\})/g;
+  let g10 = true;
+  for (const f of familles.filter((x) => x.statut === "ok")) {
+    const ref = f.squelette || f.gabarit;
+    if (!ref) continue;                       // G4 le dit déjà
+    const dossier = join(racineDepot, ref).replace(/[\\/][^\\/]+$/, "");
+    const candidats = ["INSTANCE.html", "INSTANCE.md"].map((n) => join(dossier, n));
+    const trouve = candidats.find((c) => existsSync(c));
+    if (!trouve) {
+      ko("G10", ref, "famille `ok` SANS instance de preuve — aucun document n'a jamais été produit " +
+        "depuis ce squelette, donc rien ne dit qu'il PEUT en produire un. Les deux premiers défauts " +
+        "des familles du 21/08 ne demandaient pas de perspicacité, seulement d'essayer. Attendu : " +
+        "`INSTANCE.html` ou `INSTANCE.md` à côté du gabarit, corps entièrement rempli");
+      g10 = false;
+      continue;
+    }
+    const corps = readFileSync(trouve, "utf8").replace(SANS_STYLE, "");
+    const restants = corps.match(EMPLACEMENT) || [];
+    if (restants.length) {
+      ko("G10", trouve.slice(racineDepot.length + 1),
+        `instance de preuve avec ${restants.length} emplacement(s) NON REMPLI(S) — ex. « ${restants[0].slice(0, 50)} ». ` +
+        "Une instance à trous est une COPIE du squelette : elle ne prouve pas qu'un document conforme " +
+        "peut en sortir, elle prouve qu'on sait copier un fichier");
+      g10 = false;
+    }
+  }
+  if (g10) ok("G10", "toute famille `ok` porte son instance de preuve, corps entièrement rempli");
   if (g5) ok("G5", `${fichiersGabarits.length} gabarit(s) sans donnée client dans leur corps`);
   if (g7) ok("G7", "emplacements à la convention du socle `{…}`");
 
@@ -281,9 +339,13 @@ function selfTest() {
   // la fixture VERTE doit représenter une bibliothèque CONFORME, sinon elle cesse de prouver ce
   // que l'oracle exige. C'est la troisième fois que ce commentaire s'allonge, et c'est normal —
   // une fixture verte est le contrat, elle grossit avec lui.
-  const ecrire = (lignes, gabarit = "# G\n\n## Structure\n\ndestinataire: humain\n\ngabarit: gd-x · version du gabarit 1.0.0\n\nun {emplacement}\n") => {
+  // G10 (TF-0522) : la fixture VERTE porte aussi son INSTANCE DE PREUVE, corps rempli. Une
+  // bibliothèque sans instance n'est plus conforme — c'est tout l'objet de la règle.
+  const ecrire = (lignes, gabarit = "# G\n\n## Structure\n\ndestinataire: humain\n\ngabarit: gd-x · version du gabarit 1.0.0\n\nun {emplacement}\n", instance = "# G\n\n## Structure\n\ndestinataire: humain\n\ngabarit: gd-x · version du gabarit 1.0.0\n\nun emplacement rempli\n") => {
     mkdirSync(join(docs, "fx"), { recursive: true });
     writeFileSync(join(docs, "fx", "GABARIT.md"), gabarit, "utf8");
+    if (instance === null) { try { rmSync(join(docs, "fx", "INSTANCE.md")); } catch { /* absente, c'est le cas testé */ } }
+    else writeFileSync(join(docs, "fx", "INSTANCE.md"), instance, "utf8");
     writeFileSync(join(docs, "README.md"), "| **D1** | Largeur utile | fait |\n", "utf8");
     writeFileSync(join(docs, "catalogue.jsonl"), [meta, ...lignes].join("\n") + "\n", "utf8");
   };
@@ -335,6 +397,18 @@ function selfTest() {
   ecrire([famille()], "# G\n\n## Structure\n\ndestinataire: aucun — référentiel normatif, pas un livrable\n\ngabarit: gd-x · version du gabarit 1.0.0\n\nun {emplacement}\n");
   r = juger(gab);
   cas.push(["G9 ter — l'absence DÉCLARÉE est acceptée (borne, D-06)", r.verdict === "PASS", r.verdict]);
+
+  // G10 (TF-0522) — sens ROUGE : famille `ok` SANS instance. C'était l'état des deux familles du
+  // 21/08, dont la première utilisation réelle a trouvé deux défauts que personne n'avait cherchés.
+  ecrire([famille()], undefined, null);
+  r = juger(gab);
+  cas.push(["G10    — famille `ok` sans instance de preuve", r.findings.some((f) => f.regle === "G10" && f.statut === "FAIL"), r.verdict]);
+
+  // G10 bis — une instance À TROUS est une COPIE du squelette : elle prouve qu'on sait copier un
+  // fichier, pas qu'un document conforme peut en sortir.
+  ecrire([famille()], undefined, "# G\n\n## Structure\n\ndestinataire: humain\n\ngabarit: gd-x · version du gabarit 1.0.0\n\nun {emplacement} resté à remplir\n");
+  r = juger(gab);
+  cas.push(["G10 bis— instance à trous (copie du squelette)", r.findings.some((f) => f.regle === "G10" && f.statut === "FAIL"), r.verdict]);
 
   ecrire([famille()], "# G\n\n## Structure\n\nAudit mené chez Client-A pour Enseigne-A.\n");
   r = juger(gab);

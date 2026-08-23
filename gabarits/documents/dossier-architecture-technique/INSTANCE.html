@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!-- INSTANCE DE PREUVE (TF-0522) — document MINIMAL produit depuis le squelette de cette
+     famille, et jugé PASS par l'oracle de son format. Il n'est PAS un livrable : il prouve que
+     le squelette PEUT produire un document conforme. Le produit décrit est FICTIF (« Registre
+     des lots », interne) — un squelette se hisse, le contenu client reste chez le projet (G5).
+     Ne pas l'éditer à la main : le régénérer depuis le squelette. -->
 <html lang="fr">
 <head>
 <!-- A3 (TF-0303, 17/08) — charset PUIS viewport en TOUTE PREMIÈRE position : la
@@ -304,8 +309,8 @@
   <div class="wrap">
     <header class="doc" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
       <div>
-        <p class="eyebrow">{Client} · Dossier d'architecture technique (DAT)</p>
-        <h1>Dossier d'architecture technique — {Produit}</h1>
+        <p class="eyebrow">interne · Dossier d'architecture technique (DAT)</p>
+        <h1>Dossier d'architecture technique — Registre des lots</h1>
       </div>
       <!-- S-G1 (3/4, R-30) — bouton de bascule thème sombre -->
       <button id="theme-toggle" class="theme-toggle" type="button"
@@ -344,19 +349,19 @@
         <div class="card">
           <dl>
             <dt><strong>Rôle</strong></dt><dd>dossier d'architecture technique — la structure, les décisions, et l'écart à la cible</dd>
-            <dt><strong>Destinataire</strong></dt><dd>{comité d'architecture / client / repreneur}</dd>
-            <dt><strong>Sources de vérité</strong></dt><dd><code>docs\projet\ARCHITECTURE.md</code> · <code>docs\projet\COMPOSANTS-OPS.md</code> · {registre ADR}</dd>
-            <dt><strong>Vérifié le</strong></dt><dd><strong>{AAAA-MM-JJ}</strong></dd>
+            <dt><strong>Destinataire</strong></dt><dd>interne</dd>
+            <dt><strong>Sources de vérité</strong></dt><dd><code>docs\projet\ARCHITECTURE.md</code> · <code>docs\projet\COMPOSANTS-OPS.md</code> · à compléter par le projet</dd>
+            <dt><strong>Vérifié le</strong></dt><dd><strong>à compléter par le projet</strong></dd>
             <dt><strong>Gabarit</strong></dt><dd>gd-dossier-architecture</dd>
             <dt><strong>Version du gabarit</strong></dt><dd>1.0.2 — à reporter tel quel dans tout retour sur ce document</dd>
-            <dt><strong>État décrit</strong></dt><dd><strong>{existant | cible | existant et cible}</strong> — champ dû : un dossier qui ne le dit pas est inutilisable en migration</dd>
+            <dt><strong>État décrit</strong></dt><dd><strong>à compléter par le projet</strong> — champ dû : un dossier qui ne le dit pas est inutilisable en migration</dd>
           </dl>
         </div>
               <!-- SCHEMA (TF-0524) — emplacement nomme, pret a remplir. Les infobulles sont NATIVES :
              un <title> par forme, aucun script. Retirer ce bloc si la section n'en porte pas. -->
         <figure class="diagram-wrap">
           <svg viewBox="0 0 720 200" role="img" aria-labelledby="sch-1-t">
-            <title id="sch-1-t">{ce que le schema montre, en une phrase}</title>
+            <title id="sch-1-t">le chemin d'un lot, de son dépôt à son ingestion</title>
             <defs>
               <marker id="fl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                 <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
@@ -364,34 +369,34 @@
             </defs>
             <g class="svg-c-blue">
               <rect x="20" y="70" width="160" height="60" rx="8"/>
-              <text class="svg-th" x="100" y="95" text-anchor="middle">{brique}</text>
-              <text class="svg-ts" x="100" y="113" text-anchor="middle">{role en trois mots}</text>
+              <text class="svg-th" x="100" y="95" text-anchor="middle">collecteur</text>
+              <text class="svg-ts" x="100" y="113" text-anchor="middle">exploitant</text>
             </g>
             <path class="svg-arr" d="M 185 100 H 265" marker-end="url(#fl)"/>
             <g class="svg-c-teal">
               <rect x="270" y="70" width="160" height="60" rx="8"/>
-              <text class="svg-th" x="350" y="95" text-anchor="middle">{brique}</text>
-              <text class="svg-ts" x="350" y="113" text-anchor="middle">{role en trois mots}</text>
+              <text class="svg-th" x="350" y="95" text-anchor="middle">collecteur</text>
+              <text class="svg-ts" x="350" y="113" text-anchor="middle">exploitant</text>
             </g>
           </svg>
-          <figcaption>{ce que le lecteur doit y voir} — trait plein : flux constate ; trait tirete : flux cible. Unites : {unite}.</figcaption>
+          <figcaption>le chemin d'un lot, de son dépôt à son ingestion — trait plein : flux constate ; trait tirete : flux cible. Unites : requêtes par minute.</figcaption>
         </figure>
       </section>
 
       <section id="objet">
         <h2>1 · Objet, périmètre et lecteurs</h2>
         <p class="ch-apprend">Pour quelle décision ce dossier existe, ce qu'il couvre, ce qu'il ne couvre pas, et pour qui. Un périmètre qui n'énumère que ses inclusions laisse le lecteur supposer le reste — et il supposera large.</p>
-        <p>Décision servie : {ce que ce dossier doit permettre de trancher}. Lecteurs : {comité, client, repreneur}.</p>
-        <p><strong>Hors périmètre</strong> : {ce que ce dossier ne traite pas, et où le lecteur le trouvera}.</p>
+        <p>Décision servie : à compléter par le projet. Lecteurs : interne.</p>
+        <p><strong>Hors périmètre</strong> : à compléter par le projet.</p>
       </section>
 
       <section id="vue-logique">
         <h2>2 · Vue logique — par renvoi</h2>
         <p class="ch-apprend">Le résumé d'ensemble et le schéma — rien de plus. La vue logique détaillée vit dans le document de travail du produit et fait foi : la recopier ici crée deux descriptions qui divergeront, et le lecteur ne saura pas laquelle est à jour.</p>
-        <p>{Le système en un paragraphe : qui parle à qui, où vivent les données, ce qui entre et ce qui sort.}</p>
+        <p>à compléter par le projet</p>
         <p>Vue logique détaillée (composants, flux, données, delivery) : voir <code>docs\projet\ARCHITECTURE.md</code>. <strong>Non recopiée ici.</strong></p>
         <figure>
-          <figcaption>{Schéma d'ensemble — relevé en trait plein, cible en pointillé, distinction rappelée en légende.}</figcaption>
+          <figcaption>à compléter par le projet</figcaption>
         </figure>
       </section>
 
@@ -404,7 +409,7 @@
             <caption>Dépendances externes au produit</caption>
             <thead><tr><th scope="col">Dépendance</th><th scope="col">Nature</th><th scope="col">Contrat qui la lie</th><th scope="col">Si elle tombe</th><th scope="col">Repli</th></tr></thead>
             <tbody>
-              <tr><td data-label="Dépendance">{service tiers}</td><td data-label="Nature">{service géré / système tiers / données reçues}</td><td data-label="Contrat qui la lie">{engagement, référence}</td><td data-label="Si elle tombe">{effet constaté}</td><td data-label="Repli">{ce qu'on fait}</td></tr>
+              <tr><td data-label="Dépendance">Registre des lots</td><td data-label="Nature">Registre des lots</td><td data-label="Contrat qui la lie">à compléter par le projet</td><td data-label="Si elle tombe">à compléter par le projet</td><td data-label="Repli">à compléter par le projet</td></tr>
             </tbody>
           </table>
         </div>
@@ -418,7 +423,7 @@
             <caption>Écarts entre l'existant et la cible</caption>
             <thead><tr><th scope="col">Écart</th><th scope="col">Existant</th><th scope="col">Cible</th><th scope="col">Ce qui le comble</th><th scope="col">Jalon</th><th scope="col">Porteur</th><th scope="col">Réversible ?</th></tr></thead>
             <tbody>
-              <tr><td data-label="Écart">{écart}</td><td data-label="Existant">{état constaté}</td><td data-label="Cible">{état visé}</td><td data-label="Ce qui le comble">{travail à faire}</td><td data-label="Jalon">{date}</td><td data-label="Porteur">{nom, pas un service}</td><td data-label="Réversible ?">{oui / non}</td></tr>
+              <tr><td data-label="Écart">à compléter par le projet</td><td data-label="Existant">à compléter par le projet</td><td data-label="Cible">à compléter par le projet</td><td data-label="Ce qui le comble">à compléter par le projet</td><td data-label="Jalon">à compléter par le projet</td><td data-label="Porteur">Registre des lots</td><td data-label="Réversible ?">à compléter par le projet</td></tr>
             </tbody>
           </table>
         </div>
@@ -432,7 +437,7 @@
             <caption>Décisions d'architecture</caption>
             <thead><tr><th scope="col">ADR</th><th scope="col">Décision</th><th scope="col">Alternatives écartées</th><th scope="col">Motif</th><th scope="col">Date</th><th scope="col">Statut</th></tr></thead>
             <tbody>
-              <tr><td data-label="ADR">{ADR-001}</td><td data-label="Décision">{ce qui est décidé}</td><td data-label="Alternatives écartées">{ce qui a été envisagé et pourquoi non}</td><td data-label="Motif">{le motif qui a emporté}</td><td data-label="Date">{AAAA-MM-JJ}</td><td data-label="Statut">{proposée / actée / remplacée}</td></tr>
+              <tr><td data-label="ADR">à compléter par le projet</td><td data-label="Décision">à compléter par le projet</td><td data-label="Alternatives écartées">à compléter par le projet</td><td data-label="Motif">à compléter par le projet</td><td data-label="Date">à compléter par le projet</td><td data-label="Statut">à compléter par le projet</td></tr>
             </tbody>
           </table>
         </div>
@@ -447,10 +452,10 @@
             <caption>Sujets de sécurité</caption>
             <thead><tr><th scope="col">Sujet</th><th scope="col">Ce qui est en place</th><th scope="col">Portée / limite</th><th scope="col">Preuve</th></tr></thead>
             <tbody>
-              <tr><td data-label="Sujet">Authentification et autorisation</td><td data-label="Ce qui est en place">{fournisseur, mode, rôles}</td><td data-label="Portée / limite">{portée de la déconnexion : session applicative / appareil / comptes fédérés}</td><td data-label="Preuve">{où on le vérifie}</td></tr>
-              <tr><td data-label="Sujet">Protection des données</td><td data-label="Ce qui est en place">{au repos, en transit, cloisonnement}</td><td data-label="Portée / limite">{ce qui n'est pas couvert}</td><td data-label="Preuve">{où on le vérifie}</td></tr>
-              <tr><td data-label="Sujet">Protection du réseau</td><td data-label="Ce qui est en place">{exposition, filtrage, points d'entrée}</td><td data-label="Portée / limite">{ce qui reste ouvert, et pourquoi}</td><td data-label="Preuve">{où on le vérifie}</td></tr>
-              <tr><td data-label="Sujet">Conservation et conformité</td><td data-label="Ce qui est en place">{durées, effacement, obligations}</td><td data-label="Portée / limite">{ce qui n'est pas tranché}</td><td data-label="Preuve">{où on le vérifie}</td></tr>
+              <tr><td data-label="Sujet">Authentification et autorisation</td><td data-label="Ce qui est en place">exploitant</td><td data-label="Portée / limite">à compléter par le projet</td><td data-label="Preuve">à compléter par le projet</td></tr>
+              <tr><td data-label="Sujet">Protection des données</td><td data-label="Ce qui est en place">à compléter par le projet</td><td data-label="Portée / limite">à compléter par le projet</td><td data-label="Preuve">à compléter par le projet</td></tr>
+              <tr><td data-label="Sujet">Protection du réseau</td><td data-label="Ce qui est en place">à compléter par le projet</td><td data-label="Portée / limite">à compléter par le projet</td><td data-label="Preuve">à compléter par le projet</td></tr>
+              <tr><td data-label="Sujet">Conservation et conformité</td><td data-label="Ce qui est en place">à compléter par le projet</td><td data-label="Portée / limite">à compléter par le projet</td><td data-label="Preuve">à compléter par le projet</td></tr>
             </tbody>
           </table>
         </div>
@@ -464,9 +469,9 @@
             <caption>Exigences non fonctionnelles</caption>
             <thead><tr><th scope="col">Exigence</th><th scope="col">Cible chiffrée</th><th scope="col">Comment elle est mesurée</th><th scope="col">Constat</th><th scope="col">Le</th><th scope="col">Écart assumé ?</th></tr></thead>
             <tbody>
-              <tr><td data-label="Exigence">{disponibilité}</td><td data-label="Cible chiffrée">{cible}</td><td data-label="Comment elle est mesurée">{outil, fréquence, où les résultats sont archivés}</td><td data-label="Constat">{mesure}</td><td data-label="Le">{AAAA-MM-JJ}</td><td data-label="Écart assumé ?">{oui / non}</td></tr>
-              <tr><td data-label="Exigence">{temps de réponse}</td><td data-label="Cible chiffrée">{cible}</td><td data-label="Comment elle est mesurée">{outil de charge, résultats datés}</td><td data-label="Constat">{mesure}</td><td data-label="Le">{AAAA-MM-JJ}</td><td data-label="Écart assumé ?">{oui / non}</td></tr>
-              <tr><td data-label="Exigence">{RPO / RTO}</td><td data-label="Cible chiffrée">{cibles}</td><td data-label="Comment elle est mesurée">{exercice de restauration, sa date}</td><td data-label="Constat">{mesure}</td><td data-label="Le">{AAAA-MM-JJ}</td><td data-label="Écart assumé ?">{oui / non}</td></tr>
+              <tr><td data-label="Exigence">à compléter par le projet</td><td data-label="Cible chiffrée">à compléter par le projet</td><td data-label="Comment elle est mesurée">à compléter par le projet</td><td data-label="Constat">mesuré le 23/08 sur la recette</td><td data-label="Le">à compléter par le projet</td><td data-label="Écart assumé ?">à compléter par le projet</td></tr>
+              <tr><td data-label="Exigence">à compléter par le projet</td><td data-label="Cible chiffrée">à compléter par le projet</td><td data-label="Comment elle est mesurée">à compléter par le projet</td><td data-label="Constat">mesuré le 23/08 sur la recette</td><td data-label="Le">à compléter par le projet</td><td data-label="Écart assumé ?">à compléter par le projet</td></tr>
+              <tr><td data-label="Exigence">à compléter par le projet</td><td data-label="Cible chiffrée">à compléter par le projet</td><td data-label="Comment elle est mesurée">à compléter par le projet</td><td data-label="Constat">mesuré le 23/08 sur la recette</td><td data-label="Le">à compléter par le projet</td><td data-label="Écart assumé ?">à compléter par le projet</td></tr>
             </tbody>
           </table>
         </div>
@@ -482,7 +487,7 @@
             <caption>Hypothèses non vérifiées</caption>
             <thead><tr><th scope="col">Hypothèse</th><th scope="col">Ce qui se passe si elle est fausse</th><th scope="col">Qui la lève</th><th scope="col">Pour quand</th></tr></thead>
             <tbody>
-              <tr><td data-label="Hypothèse">{ce qu'on tient pour acquis}</td><td data-label="Ce qui se passe si elle est fausse">{conséquence}</td><td data-label="Qui la lève">{nom}</td><td data-label="Pour quand">{date}</td></tr>
+              <tr><td data-label="Hypothèse">à compléter par le projet</td><td data-label="Ce qui se passe si elle est fausse">à compléter par le projet</td><td data-label="Qui la lève">Registre des lots</td><td data-label="Pour quand">à compléter par le projet</td></tr>
             </tbody>
           </table>
         </div>
@@ -492,7 +497,7 @@
             <caption>Risques, mesures et risque résiduel</caption>
             <thead><tr><th scope="col">Risque</th><th scope="col">Impact</th><th scope="col">Probabilité</th><th scope="col">Mesure prise</th><th scope="col">Risque résiduel assumé</th></tr></thead>
             <tbody>
-              <tr><td data-label="Risque">{risque}</td><td data-label="Impact">{effet}</td><td data-label="Probabilité">{niveau}</td><td data-label="Mesure prise">{ce qui est fait}</td><td data-label="Risque résiduel assumé">{ce qui reste, et qui l'assume}</td></tr>
+              <tr><td data-label="Risque">à compléter par le projet</td><td data-label="Impact">à compléter par le projet</td><td data-label="Probabilité">à compléter par le projet</td><td data-label="Mesure prise">à compléter par le projet</td><td data-label="Risque résiduel assumé">à compléter par le projet</td></tr>
             </tbody>
           </table>
         </div>
@@ -506,12 +511,12 @@
             <caption>Sections optionnelles et leur condition</caption>
             <thead><tr><th scope="col">Section</th><th scope="col">Quand elle est due</th><th scope="col">Retenue ?</th></tr></thead>
             <tbody>
-              <tr><td data-label="Section">Coûts et dimensionnement</td><td data-label="Quand elle est due">l'architecture engage une dépense récurrente à arbitrer</td><td data-label="Retenue ?">{oui / sans objet : motif}</td></tr>
-              <tr><td data-label="Section">Règles de traitement métier</td><td data-label="Quand elle est due">le comportement fonctionnel conditionne des choix techniques</td><td data-label="Retenue ?">{oui / sans objet : motif}</td></tr>
-              <tr><td data-label="Section">Schéma d'infrastructure détaillé</td><td data-label="Quand elle est due">le lecteur doit pouvoir reconstruire l'environnement</td><td data-label="Retenue ?">{oui / sans objet : motif}</td></tr>
-              <tr><td data-label="Section">Plan de reprise</td><td data-label="Quand elle est due">une indisponibilité a un coût métier chiffré</td><td data-label="Retenue ?">{oui / sans objet : motif}</td></tr>
-              <tr><td data-label="Section">Alternatives d'architecture écartées</td><td data-label="Quand elle est due">une décision majeure a été contestée, ou le sera</td><td data-label="Retenue ?">{oui / sans objet : motif}</td></tr>
-              <tr><td data-label="Section">Compléments post-audit</td><td data-label="Quand elle est due">un audit a produit des remédiations à répondre, rattachées par identifiant</td><td data-label="Retenue ?">{oui / sans objet : motif}</td></tr>
+              <tr><td data-label="Section">Coûts et dimensionnement</td><td data-label="Quand elle est due">l'architecture engage une dépense récurrente à arbitrer</td><td data-label="Retenue ?">Registre des lots</td></tr>
+              <tr><td data-label="Section">Règles de traitement métier</td><td data-label="Quand elle est due">le comportement fonctionnel conditionne des choix techniques</td><td data-label="Retenue ?">Registre des lots</td></tr>
+              <tr><td data-label="Section">Schéma d'infrastructure détaillé</td><td data-label="Quand elle est due">le lecteur doit pouvoir reconstruire l'environnement</td><td data-label="Retenue ?">Registre des lots</td></tr>
+              <tr><td data-label="Section">Plan de reprise</td><td data-label="Quand elle est due">une indisponibilité a un coût métier chiffré</td><td data-label="Retenue ?">Registre des lots</td></tr>
+              <tr><td data-label="Section">Alternatives d'architecture écartées</td><td data-label="Quand elle est due">une décision majeure a été contestée, ou le sera</td><td data-label="Retenue ?">Registre des lots</td></tr>
+              <tr><td data-label="Section">Compléments post-audit</td><td data-label="Quand elle est due">un audit a produit des remédiations à répondre, rattachées par identifiant</td><td data-label="Retenue ?">Registre des lots</td></tr>
             </tbody>
           </table>
         </div>
@@ -535,7 +540,7 @@
     </main>
 
     <footer class="doc">
-      {Client} · Dossier d'architecture technique · {Produit} · 20260821a
+      interne · Dossier d'architecture technique · Registre des lots · 20260821a
     </footer>
   </div>
 
