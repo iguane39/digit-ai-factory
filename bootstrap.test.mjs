@@ -75,6 +75,37 @@ try {
     if (readdirSync(racine).filter((d) => /seo/.test(d)).length !== 1) echecs.push("alias : doublon seo / seo-geo");
   } else echecs.push("alias : digit-ai-forge-seo-geo absent de la liste lue");
 
+  // 3 bis (TF-0525). LES DÉPÔTS QUE LA LISTE NE CONNAÎT PAS. Mesuré le 23/08 : la racine portait un
+  // SECOND CLONE du pilot sous un ancien nom — même `origin`, deux répertoires, 110 commits de
+  // retard, et absent de la liste donc jamais mis à jour. Quelqu'un y avait ingéré une candidature
+  // en croyant écrire dans le registre vivant ; le sujet a été redécouvert quatre jours plus tard et
+  // instruit une seconde fois. Le marqueur `PERIME.md` qui y avait été posé était NON VERSIONNÉ : un
+  // avertissement qui ne survit pas au clonage n'avertit personne.
+  //
+  // Trois formes, jouées séparément parce qu'elles ne se détectent pas de la même façon.
+  {
+    // (a) un vrai second clone : même origin qu'un dépôt connu.
+    const connu = join(racine, FORGES[0].nom);
+    const doublon = join(racine, FORGES[0].nom + "_old");
+    execFileSync("git", ["clone", "--quiet", connu, doublon], { stdio: ["ignore", "pipe", "pipe"] });
+    // Son `origin` doit pointer le MÊME dépôt que le connu, sinon ce n'est pas le cas qu'on teste.
+    const url = execFileSync("git", ["-C", connu, "remote", "get-url", "origin"], { encoding: "utf8" }).trim();
+    git(doublon, "remote", "set-url", "origin", url);
+    attendre("second clone détecté (même origin)", lancer(), 0, /SECOND CLONE/);
+
+    // (b) un répertoire NON versionné qui porte un nom de l'écosystème : on s'y installe en croyant
+    //     être dans un dépôt, et rien n'y est suivi.
+    mkdirSync(join(racine, "digit-ai-forge-fantome"));
+    attendre("répertoire non versionné signalé", lancer(), 0, /NON versionné/);
+    rmSync(join(racine, "digit-ai-forge-fantome"), { recursive: true, force: true });
+
+    // (c) le contrôle NE SUPPRIME RIEN : un répertoire signalé est toujours là au tour suivant.
+    //     Effacer un dépôt sur une heuristique échangerait un piège contre une perte.
+    if (!existsSync(doublon)) echecs.push("3 bis : le contrôle a SUPPRIMÉ le doublon — il doit le déclarer, pas l'effacer");
+    rmSync(doublon, { recursive: true, force: true });
+    attendre("racine propre une fois le doublon retiré", lancer(), 0, /racine propre/);
+  }
+
   // 4. preuve absente puis restaurée
   const p = join(racine, FORGES[1].nom, FORGES[1].preuve);
   unlinkSync(p);
@@ -88,4 +119,4 @@ try {
 }
 
 if (echecs.length) { console.error("bootstrap : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log(`bootstrap : 7/7 — vierge clone ${FORGES.length}/${FORGES.length}, retard refusé puis résorbé par --pull, alias renommé sans doublon, preuve absente refusée puis restaurée`);
+console.log(`bootstrap : 11/11 — vierge clone ${FORGES.length}/${FORGES.length}, retard refusé puis résorbé par --pull, alias renommé sans doublon, second clone et répertoire non versionné DÉCLARÉS sans être effacés (TF-0525), preuve absente refusée puis restaurée`);

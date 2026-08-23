@@ -6,6 +6,19 @@ pour… »). Prérequis : la phase 0 d'AGENTS.md est passée (« Poste prêt »)
 visible pour l'utilisateur. La session travaille dans le **dossier courant** (le produit) ;
 le pilot et les forges sont des dépendances en lecture.
 
+**Un second clone du pilot est un piège, et le poste en porte** (TF-0525, 23/08/2026). Mesuré : la
+racine comptait un répertoire de plus que l'écosystème — un SECOND CLONE du pilot sous un ancien
+nom, même `origin`, 110 commits de retard, absent de la liste donc jamais mis à jour par `--pull`.
+Quelqu'un y avait ingéré une candidature en croyant écrire dans le registre vivant ; le sujet a été
+redécouvert **quatre jours plus tard** par un lot de retours, et instruit une seconde fois. Rien
+n'était perdu — c'est le travail refait qui a coûté.
+
+`bootstrap.mjs` le DÉCLARE désormais à chaque ouverture : tout répertoire de la racine dont
+l'`origin` est celui d'un dépôt déjà connu, tout répertoire portant `PERIME.md` ou un nom en
+`_old`/`_vide`, et tout répertoire **non versionné** au nom de l'écosystème. **Il ne supprime
+rien** : effacer un dépôt sur une heuristique échangerait un piège contre une perte, et supprimer
+reste un geste humain (R-29).
+
 ## Les 7 étapes
 
 1. **Identifier l'intention.** Ce que l'utilisateur veut obtenir, depuis son message et le
@@ -53,6 +66,8 @@ le pilot et les forges sont des dépendances en lecture.
    `bloque_question` si un humain doit trancher. Aucun ✓ sans oracle exécuté.
 
 ## Routage intention → situation
+
+Ce tableau **se lit par la colonne de gauche** : on y cherche la phrase qui ressemble à la demande reçue, et la ligne dit la situation à ouvrir. Il n'est pas trié par importance mais par intention, et une demande qui n'y figure pas relève du run de conseil.
 
 | L'utilisateur veut… | Situation | Références qui font foi |
 |---|---|---|
