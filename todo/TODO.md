@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=cb9832e2559e archive=54c0315cbe97 · dernier événement: 2026-08-23T13:47:54.086Z -->
+     sceaux: actifs=81b92b3102ab archive=54c0315cbe97 · dernier événement: 2026-08-23T15:05:50.061Z -->
 
-**63 actifs** (candidat 0 · décidé 0 · en cours 0 · corrigé 60 · écarté 3) · **469 archivés**.
+**64 actifs** (candidat 0 · décidé 0 · en cours 0 · corrigé 61 · écarté 3) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -58,6 +58,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0495 | corrige | 10 | forge-agents : aucune regle ne distingue « le contenu est present » de « le contenu est exploitable » | **oui** — Deux demandes explicites du client necessaires pour obtenir un contenu lisible, sur un livrable vert a tous les oracles. |
 | TF-0501 | corrige | 10 | forge-agents : run-oracles.mjs ecrit ses journaux DANS l arbre de livraison tout en imprimant qu il les ecrit hors livraison | **oui** — Le dossier se recree a chaque ecriture surveillee, y compris celle du lot de retours qui le signale ; le supprimer avant remise ne suffit donc pas. |
 | TF-0517 | corrige | 10 | forge-design : aucune regle de lisibilite n impose qu un identifiant porte son sens — L3 couvre les valeurs, L14 la plomberie, le troisieme cas est absent | **oui** — Retour direct du client en cours de session : quatre livrables et une restitution entiere illisibles sur ce point, jusqu a l interruption. |
+| TF-0532 | corrige | 10 | Une promesse ecrite en commentaire est TENUE — cote PAGE (L22) et cote CODE (oracle-promesses), et la table des familles de mesure a une SOURCE UNIQUE | **oui** — quatre chevauchements V4 bloquants et une infobulle inexistante sur un schema livre, promis par son propre commentaire et jamais contredits en quatre versions et trois relectures ; et une table de familles de mesure recopiee dans TROIS depots, deja divergente sur la severite sans que rien ne le dise |
 | TF-0493 | corrige | 8.3 | forge-design : le rendu ne couvre aucun etat d echec ou d interaction, et --etats-ouverts n y suffit pas | **oui** — Deux defauts d etat trouves par le client sur un seul livrable, tous deux reproductibles en deux clics. |
 | TF-0518 | corrige | 8.3 | forge-agents : un livrable Markdown ne recoit aucun controle de lisibilite — la famille L1-L17 est enfermee derriere une porte HTML | **oui** — Dix livrables Markdown remis a un client sans aucun controle de lisibilite ; le defaut qui en est ne a ete trouve par le client, pas par la chaine. |
 | TF-0490 | corrige | 8 | forge-design : confirmation de RD-12 — les exemples du socle emploient des glyphes absents des piles de repli declarees | **oui** — Meme defaut reproduit une seconde fois parce qu il vient de l exemple de reference. |

@@ -3,6 +3,11 @@
  * generer-archive.mjs — génère todo/TODO-ARCHIVE.html : la page de RECHERCHE des items CLOS
  * (TF-0350, mandat humain du 17/08).
  *
+ * promesses-verifiees — ce fichier ADHÈRE au contrôle des promesses de commentaire
+ * (`oracle-promesses`) : une classe ou un attribut nommé dans un commentaire ici DOIT exister
+ * dans le code. Un générateur de page est l'endroit où une promesse de prose coûte le plus cher —
+ * elle s'y lit comme une garantie de ce que la page contient.
+ *
  * Source unique : todo/TODO-ARCHIVE.jsonl — NE PAS ÉDITER LE HTML. L'archive porte l'HISTOIRE
  * COMPLÈTE de chaque item (creation → maj… → archive, ordre préservé par archiver.mjs) : la page
  * reconstitue donc, par item, son ÉTAT FINAL et ses JALONS datés — création, décision (avec son

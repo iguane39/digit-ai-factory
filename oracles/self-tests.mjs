@@ -175,6 +175,16 @@ const ETAT_DU_PARC = [
     remede: "declarer le site dans la table de references\EMPREINTES.md (depot, ce qui est scelle, format)",
   },
   {
+    // TF-0532 / N-11 (23/08) : une promesse écrite dans un commentaire de CODE est TENUE, sur les
+    // fichiers qui ont SIGNÉ. C'est un état du PARC et non un artefact : un fichier signataire peut
+    // devenir fautif par une suppression ailleurs, sans que personne ne relise son en-tête. La
+    // première vraie promesse trouvée était chez le socle lui-même — un attribut documenté dans son
+    // exemple d'usage et lu par personne.
+    nom: "oracle-promesses.mjs",
+    motif: "classe ou attribut promis dans un commentaire de code et posé nulle part, sur un fichier signataire",
+    remede: "poser l'élément promis, écrire la négation si le choix est de ne pas le faire, ou déclarer par « promesse-ok »",
+  },
+  {
     // R-44 (20/08) : un README par dossier d'input\ et output\, présent, à jour, rédigé.
     nom: "oracle-readme-dossiers.mjs",
     motif: "README d'input\\ et output\\ absents, périmés ou non rédigés",

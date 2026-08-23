@@ -28,6 +28,7 @@
  * Exit : 0 = PASS (avertissements possibles) · 1 = branche morte · 2 = SKIP motivé.
  */
 import { existsSync, readFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { join, dirname } from "node:path";
 import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -66,9 +67,15 @@ export function famillesProduites(source) {
 /** Un consommateur MENTIONNE une famille dès qu'il écrit son nom, et porte une branche par défaut
  *  s'il rapporte ce qu'il ne connaît pas. Les deux se lisent dans le texte, sans exécution. */
 export function lecture(source, familles) {
-  const nommees = familles.filter((f) => new RegExp(`\\b${f}\\b`).test(source));
+  // TROIS formes de couverture, de la plus forte a la plus faible :
+  //   · LIT LA TABLE publiee par le socle — couvre tout par construction, et ne se decale jamais ;
+  //   · BRANCHE PAR DEFAUT — rapporte l'inconnu sans le nommer ;
+  //   · NOMME les familles une a une — se decale au premier ajout, et c'est ce qui a ete paye.
+  const litTable = /--familles|familles-mesure@1/.test(source);
+  const nommees = litTable ? [...familles]
+    : familles.filter((f) => new RegExp(`\\b${f}\\b`).test(source));
   const parDefaut = /\|\|\s*\{\s*regle:|FAMILLES\[[^\]]+\]\s*\|\||famille inconnue|render_page:\$\{|non connue/i.test(source);
-  return { nommees, parDefaut };
+  return { nommees, parDefaut, litTable };
 }
 
 // Les consommateurs, écrits une fois : chemin relatif au parc, et ce qu'ils sont censés faire.
@@ -108,6 +115,13 @@ if (args.includes("--self-test")) {
   att("un consommateur qui nomme tout est vu comme complet", complet.nommees.length === 4);
   const defaut = lecture('const meta = FAMILLES[famille] || { regle: `render_page:${famille}` };', produites);
   att("une BRANCHE PAR DÉFAUT est reconnue : rien ne se perd en silence", defaut.parDefaut);
+  // La forme la plus forte, et celle qui a rendu ce contrôle FAUX avant d'être corrigée : un
+  // consommateur qui lit la table publiée couvre tout, et ses familles n'apparaissent plus dans
+  // son texte. Le premier jet a donc accusé « six familles lues par personne » le jour où elles
+  // étaient, pour la première fois, toutes couvertes.
+  const table = lecture('spawnSync(python, [SOCLE, "--familles"])', produites);
+  att("LIRE LA TABLE publiée couvre tout par construction",
+    table.litTable && table.nommees.length === produites.length);
 
   // F2 · la branche morte : un consommateur qui nomme une famille que la mesure ne produit plus.
   const mort = lecture("compter(issues.v9_disparue)", produites);
@@ -123,7 +137,24 @@ if (!existsSync(SOCLE)) {
   so("F0", SOCLE, "mesure du socle introuvable — sans source de production, il n'y a rien à confronter");
   sortir(2);
 }
-const produites = famillesProduites(readFileSync(SOCLE, "utf8"));
+// La table PUBLIÉE fait foi depuis le 23/08 (option « source unique ») : on la DEMANDE au socle
+// plutôt que de deviner son littéral. Le repli sur la lecture du source reste, pour un socle plus
+// ancien que ce contrôle — et il est DIT, jamais silencieux.
+let publiee = null;
+for (const bin of ["python", "python3", "py"]) {
+  const r = spawnSync(bin, ["-X", "utf8", SOCLE, "--familles"], { encoding: "utf8" });
+  if (r.error || r.status !== 0) continue;
+  try {
+    const lu = JSON.parse((r.stdout || "").trim());
+    if (lu.schema === "digit-ai/familles-mesure@1") { publiee = lu.familles; break; }
+  } catch { /* interpréteur trouvé, sortie illisible : on essaie le suivant */ }
+}
+const produites = publiee ? Object.keys(publiee) : famillesProduites(readFileSync(SOCLE, "utf8"));
+if (!publiee) {
+  av("F0", "socle", "le socle ne publie pas encore sa table (`--familles`) : les familles sont " +
+    "LUES DANS SON SOURCE, ce qui marche mais reste une devinette de forme. Le poids, lui, n'est " +
+    "pas connu — F4 ne peut donc pas juger un consommateur qui garde une table locale");
+}
 if (!produites.length) {
   so("F0", SOCLE, "aucun littéral de familles lu dans la mesure — la forme du fichier a changé, le contrôle se déclare aveugle plutôt que vert");
   sortir(2);
@@ -139,7 +170,7 @@ for (const [rel, quoi] of CONSOMMATEURS) {
   const chemin = join(PARC, rel);
   if (!existsSync(chemin)) { so("F1", rel, `${quoi} : fichier absent du poste — non confronté`); continue; }
   const source = readFileSync(chemin, "utf8");
-  const { nommees, parDefaut } = lecture(source, produites);
+  const { nommees, parDefaut, litTable } = lecture(source, produites);
   for (const f of nommees) lecteursParFamille.get(f).push(rel.split("/").pop());
   if (parDefaut) auMoinsUneBrancheDefaut = true;
 
@@ -150,8 +181,36 @@ for (const [rel, quoi] of CONSOMMATEURS) {
     ko("F2", rel, `${quoi} : ${mortes.length} famille(s) citée(s) et PLUS produites par la mesure ` +
       `(${mortes.join(", ")}) — branche morte : elle donne l'illusion d'une couverture qui n'existe plus`);
   }
-  ok("F3", rel, `${quoi} : ${nommees.length}/${produites.length} famille(s) nommée(s)` +
-    (parDefaut ? ", et une BRANCHE PAR DÉFAUT rapporte les autres" : ", sans branche par défaut"));
+  ok("F3", rel, litTable
+    ? `${quoi} : LIT LA TABLE publiée par le socle — couverture complète par construction, ` +
+      "aucune liste locale à décaler"
+    : `${quoi} : ${nommees.length}/${produites.length} famille(s) nommée(s)` +
+      (parDefaut ? ", et une BRANCHE PAR DÉFAUT rapporte les autres" : ", sans branche par défaut"));
+}
+
+// F4 · un consommateur qui garde une TABLE LOCALE doit s'accorder avec le socle. C'est la règle
+// qui manquait le 23/08 au matin : deux familles bloquantes arrivaient chez forge-design en simple
+// avertissement, et rien ne le disait. Depuis l'option « source unique » les consommateurs lisent
+// la table — mais celui qui en garderait une copie doit au moins être d'accord avec elle.
+if (publiee) {
+  for (const [rel, quoi] of CONSOMMATEURS) {
+    const chemin = join(PARC, rel);
+    if (!existsSync(chemin)) continue;
+    const source = readFileSync(chemin, "utf8");
+    if (/--familles|familles-mesure@1/.test(source)) continue;   // pas de copie : rien à confronter
+    const desaccords = [];
+    for (const [cle, v] of Object.entries(publiee)) {
+      const m = new RegExp(`${cle}[^\\n]{0,80}?(bloquant|avertissement|BLOQUANT)`).exec(source);
+      if (!m) continue;
+      const lu = /bloquant/i.test(m[1]) ? "bloquant" : "avertissement";
+      if (lu !== v.severite) desaccords.push(`${cle} : socle « ${v.severite} », local « ${lu} »`);
+    }
+    if (desaccords.length) {
+      ko("F4", rel, `${quoi} : ${desaccords.length} poids en DÉSACCORD avec le socle — ` +
+        desaccords.join(" ; ") + ". C'est le défaut du 23/08 : un constat visible qui ne pèse plus " +
+        "rien. Lire la table publiée (`render_page.py --familles`) au lieu d'en tenir une copie");
+    }
+  }
 }
 
 // F1 · le verdict d'ensemble : une famille que PERSONNE ne lit est une mesure jetée.

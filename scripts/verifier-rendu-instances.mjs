@@ -37,8 +37,18 @@ const iL = args.indexOf("--largeur");
 const largeur = iL > -1 ? args[iL + 1] : "1440";
 
 const SOCLE = join(homedir(), ".claude", "skills", "digit-ai-page-html", "scripts", "render_page.py");
-const BLOQUANTES = ["v1_overflow", "v2_contrast", "v4_overlap", "l2_width", "l2_gouttiere",
-  "l2_conteneur", "l2_filet", "etat_muet"];
+// LA LISTE N'EST PLUS ÉCRITE ICI (choix humain du 23/08, option « source unique ») : elle est LUE
+// dans le socle, qui la publie par `--familles`. Une copie locale se serait décalée le jour où une
+// famille naît — c'est exactement ce qui a laissé deux familles bloquantes se faire relire en
+// avertissement chez forge-design, sans que rien ne le dise.
+function familles(python) {
+  const r = spawnSync(python, ["-X", "utf8", SOCLE, "--familles"], { encoding: "utf8" });
+  try {
+    const lu = JSON.parse((r.stdout || "").trim());
+    if (lu.schema !== "digit-ai/familles-mesure@1") return null;
+    return lu.familles;
+  } catch { return null; }
+}
 
 const sortir = (verdict, code, findings, motif = null) => {
   console.log(JSON.stringify({ outil: "verifier-rendu-instances", verdict, motif, findings },
@@ -55,6 +65,15 @@ const python = ["python", "python3", "py"].find((bin) => {
   return !r.error && r.status === 0;
 });
 if (!python) sortir("SKIP", 2, [], "aucun interpréteur python — le contrôle n'a pas tourné");
+
+// Le socle est la source : s'il ne publie pas sa table, on ne DEVINE pas — on le dit.
+const table = familles(python);
+if (!table) {
+  sortir("SKIP", 2, [], "le socle ne publie pas sa table de familles (`--familles`) — sans elle, " +
+    "juger reviendrait à recopier une liste, c'est-à-dire à recréer la double vérité que ce " +
+    "contrôle vient de supprimer");
+}
+const BLOQUANTES = Object.entries(table).filter(([, v]) => v.severite === "bloquant").map(([c]) => c);
 
 const dossier = join(PILOT, "gabarits", "documents");
 if (!existsSync(dossier)) sortir("SKIP", 2, [], `${dossier} absent — aucune instance à rendre`);
@@ -84,7 +103,7 @@ for (const f of instances) {
   const causes = [];
   for (const famille of BLOQUANTES) {
     const n = (bp?.issues?.[famille] || []).length;
-    if (n) causes.push(`${famille} ×${n}`);
+    if (n) causes.push(`${table[famille].libelle} ×${n}`);
   }
   if (causes.length) {
     echecs += 1;
@@ -93,7 +112,7 @@ for (const f of instances) {
       "un livrable n'est conforme qu'après les deux" });
   } else {
     findings.push({ statut: "PASS", ou: nom, message: `rendu propre à ${largeur}px ` +
-      `(${BLOQUANTES.length} familles bloquantes vérifiées)` });
+      `(${BLOQUANTES.length} familles bloquantes vérifiées, lues dans la table du socle)` });
   }
 }
 rmSync(captures, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
