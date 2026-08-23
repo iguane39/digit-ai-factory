@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=24c514a92aa0 archive=54c0315cbe97 · dernier événement: 2026-08-23T09:30:14.218Z -->
+     sceaux: actifs=a5cfd74665a8 archive=54c0315cbe97 · dernier événement: 2026-08-23T09:58:10.964Z -->
 
-**61 actifs** (candidat 11 · décidé 0 · en cours 1 · corrigé 48 · écarté 1) · **469 archivés**.
+**61 actifs** (candidat 7 · décidé 0 · en cours 1 · corrigé 52 · écarté 1) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -65,8 +65,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0506 | candidat | 6.7 | forge-audit : la famille gd-fiche-securite declare deux formats (html, pdf) et la forge n en produit qu un — aucun outil HTML vers PDF n existe dans la forge | **oui** — Jeu de livrables remis incomplet : le commanditaire a du reclamer le PDF en second temps. Generateur PDF ecrit de zero cote produit, et premiere version piegee par un verrou de fichier Windows — ancien tirage revalide en croyant valider le nouveau. |
 | TF-0505 | corrige | 10 | forge-audit : build-fiche.mjs ecrit par defaut DANS LE DEPOT DE LA FORGE (deliverables/generated/<tenant>/) — exactement le cas que TF-0319 interdit | **oui** — Chemin par defaut lu dans tools/build-fiche.mjs le 22/08 : deliverables/generated/<tenant>/fiche-securite.html, dans le depot de la forge — le cas nomme par TF-0319. Le livrable de ce produit a fini hors output\, corrige a la main. |
+| TF-0506 | corrige | 6.7 | forge-audit : la famille gd-fiche-securite declare deux formats (html, pdf) et la forge n en produit qu un — aucun outil HTML vers PDF n existe dans la forge | **oui** — Jeu de livrables remis incomplet : le commanditaire a du reclamer le PDF en second temps. Generateur PDF ecrit de zero cote produit, et premiere version piegee par un verrou de fichier Windows — ancien tirage revalide en croyant valider le nouveau. |
 
 ## digit-ai-forge-conception
 
@@ -93,14 +93,14 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0476 | candidat | 10 | forge-seo-geo : le noeud 57 accepte un taux de citation sans plan de mesure — le controle « pas de verdict affirmatif sans la donnee nommee » (TF-0264) ne capte que la famille CrUX | **oui** — mesure sur les artefacts reels : noeud_exige_terrain() rend False sur la source du noeud 57 et True sur celle du noeud 31 (predicat litteral "crux") ; la reserve « ne jamais presenter le taux comme une metrique de suivi fiable » compte 1 occurrence dans le referentiel et 0 dans la fiche que l'auditeur remplit. Le cout se paie dans un livrable client remis : la forge a deja produit un rapport d'audit reel, et le service de runs recurrents (cat-seo-05) transformerait ce taux en tendance — sur une grandeur dont la litterature 2026 mesure que la marque explique 1,5 % de la variance |
+| TF-0476 | corrige | 10 | forge-seo-geo : le noeud 57 accepte un taux de citation sans plan de mesure — le controle « pas de verdict affirmatif sans la donnee nommee » (TF-0264) ne capte que la famille CrUX | **oui** — mesure sur les artefacts reels : noeud_exige_terrain() rend False sur la source du noeud 57 et True sur celle du noeud 31 (predicat litteral "crux") ; la reserve « ne jamais presenter le taux comme une metrique de suivi fiable » compte 1 occurrence dans le referentiel et 0 dans la fiche que l'auditeur remplit. Le cout se paie dans un livrable client remis : la forge a deja produit un rapport d'audit reel, et le service de runs recurrents (cat-seo-05) transformerait ce taux en tendance — sur une grandeur dont la litterature 2026 mesure que la marque explique 1,5 % de la variance |
 
 ## digit-ai-forge-tests
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0470 | candidat | 10 | forge-tests : les routes attendues par locale se DÉCLARENT — la parité de routes reste aveugle sur un produit dont le build ne laisse aucune arborescence | **oui** — mesuré sur produit-07, 201 pages FR / 201 EN en production : le pan sortirait en NA/SKIP sur la parité de routes pendant qu'un écart de route vit en production — et le produit est celui sur lequel le pan a été conçu, ce qui rend le trou d'autant plus coûteux : la forge ne voit plus le défaut qui l'a fait naître |
-| TF-0480 | candidat | 8.3 | forge-tests : le plancher visuel (V1 debordement, V2 contraste, V4 chevauchements) n est atteignable que sur un FICHIER html local — aucun produit SERVI n est jugeable, et les trois autres portes sont fermees | **oui** — En-tete compresse et menu anglais au tiers de la largeur en production de juin a aout 2026 sur produit-07, non vus par deux campagnes de verification declarees completes. |
+| TF-0470 | corrige | 10 | forge-tests : les routes attendues par locale se DÉCLARENT — la parité de routes reste aveugle sur un produit dont le build ne laisse aucune arborescence | **oui** — mesuré sur produit-07, 201 pages FR / 201 EN en production : le pan sortirait en NA/SKIP sur la parité de routes pendant qu'un écart de route vit en production — et le produit est celui sur lequel le pan a été conçu, ce qui rend le trou d'autant plus coûteux : la forge ne voit plus le défaut qui l'a fait naître |
+| TF-0480 | corrige | 8.3 | forge-tests : le plancher visuel (V1 debordement, V2 contraste, V4 chevauchements) n est atteignable que sur un FICHIER html local — aucun produit SERVI n est jugeable, et les trois autres portes sont fermees | **oui** — En-tete compresse et menu anglais au tiers de la largeur en production de juin a aout 2026 sur produit-07, non vus par deux campagnes de verification declarees completes. |
 
 ## pilot
 
