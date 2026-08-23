@@ -11,6 +11,8 @@ final se fabrique par un dossier de preuve, pas par l'absence de gate.
 
 ## 0 bis. Outillage forge-ops (articulation)
 
+Qui fait quoi, et surtout qui NE decide pas : ce tableau se lit par acteur, et la colonne de droite dit le geste concret que chacun porte.
+
 | Qui | Fait quoi |
 |---|---|
 | forge-ops | `ops.mjs deployer <build> <cible>` (healthcheck **avant** bascule, `COURANT` atomique), `restaurer` (rollback re-vérifié puis journalisé), `journal.jsonl` append-only |
@@ -39,16 +41,52 @@ Dans le projet produit (`forge\etapes\mep\` pour les preuves, racine pour les fi
    servie sur un port local dédié.
 3. `ROLLBACK.md` : procédure de retour arrière écrite **et testée une fois pendant l'étape**
    (arrêt de la version N, redémarrage de la version N-1 taguée, vérification healthcheck).
+   **C'est un ARTEFACT sur disque, jamais seulement une ligne de journal** — voir §2 bis.
 4. `DOSSIER-MEP.md` : le dossier de GO (cf. §4).
 
+## 2 bis. Un retour arrière ne vit pas dans un journal (TF-0512, 22/08/2026)
+
+*Constaté sur un geste coupant réel.* Un mode de test conçu pour **imprimer sa commande de retour
+arrière AVANT le geste risqué** — précaution voulue, pour que la restauration soit déjà consignée si
+l'étape casse au milieu — a bien imprimé la commande… **avec l'adresse de l'émetteur remplacée par
+`***`**. Le moteur de pipeline avait pris l'URL du tenant pour un secret et l'avait masquée.
+
+La commande imprimée était donc **inutilisable telle quelle**, et elle l'était **précisément dans le
+seul scénario où on irait la chercher : l'urgence**. Une précaution qui s'annule au moment où elle
+sert n'est pas une précaution, c'est une croyance.
+
+Ce n'est pas propre à un moteur : **tout secours imprimé dans un journal est exposé au même effet**,
+et le masquage est par nature imprévisible puisqu'il dépend de ce que le moteur a appris à masquer.
+Trois règles en sortent, et la troisième est celle qui manquait partout :
+
+1. **Le retour arrière est un ARTEFACT** — `ROLLBACK.md` sur disque, versionné, remis au dossier de
+   MEP. Le journal peut le répéter ; il ne le remplace pas.
+2. **Il se compose de valeurs NON MASQUABLES** quand c'est possible : un identifiant de version, un
+   tag d'image, un nom de service. Une URL, un jeton, un nom de tenant sont des candidats au
+   masquage — les mettre dans une variable nommée, dont la valeur se lit ailleurs, coûte une ligne.
+3. **Il se RELIT APRÈS COUP**, dans le canal où on irait le chercher. Ouvrir le fichier, ou relire
+   la sortie du journal, et vérifier qu'aucune valeur n'y est `***`, `[REDACTED]` ou vide. *Une
+   procédure de secours non testée à la lecture n'existe pas.* C'est le même geste que M-4 exige
+   pour l'EXÉCUTION, appliqué à la LISIBILITÉ.
+
+**Et c'est CÂBLÉ, pas recommandé** : `node scriptserifier-secours.mjs <fichier>` relit un
+`ROLLBACK.md`, ou une sortie de journal par `--stdin`, et REFUSE toute valeur masquée (`***`,
+`[REDACTED]`, `[MASKED]`…) ou toute option sans valeur **dans une ligne de commande**. Ce dernier
+point est la frontière qui rend la règle tenable : une doctrine qui PARLE de `***` en prose ne
+doit pas échouer — sans quoi la règle ferait crier la page qui l'explique, et se ferait désactiver
+le jour même. La liste des masques est une **donnée** : chaque moteur a le sien, aucun ne prévient,
+et elle grossit par les incidents, pas par la devinette.
+
 ## 3. Oracle MEP (exécuté, jamais déclaratif)
+
+Cinq controles, et pour chacun **la preuve exigee** — pas la case a cocher. Le tableau se lit de gauche a droite : ce qui est verifie, puis ce qui prouve qu'il l'a ete.
 
 | # | Contrôle | Preuve exigée |
 |---|---|---|
 | M-1 | Build du conteneur | `docker build` exit 0, image taguée `<produit>:<run-id>` |
 | M-2 | Healthcheck | HTTP 200 sur l'endpoint de santé de l'instance staging, 3 mesures espacées de 10 s |
 | M-3 | Smoke tests | ≥ 1 parcours rejoué par exigence MVP d'impact maximal (champ `cotation.impact` du référentiel `EXIGENCES.json` — toutes les ex æquo du niveau le plus élevé), exécutés **contre l'instance staging servie**, pas contre un TestClient |
-| M-4 | Rollback | procédure de `ROLLBACK.md` exécutée une fois avec succès (retour N-1 + healthcheck 200 + retour N) |
+| M-4 | Rollback | procédure de `ROLLBACK.md` exécutée une fois avec succès (retour N-1 + healthcheck 200 + retour N) **et RELUE après coup** : le fichier ne porte aucune valeur masquée (`***`, `[REDACTED]`) ni vide — §2 bis, TF-0512 |
 | M-5 | Propreté | aucun secret en clair dans l'image ni dans compose (scan des fichiers embarqués) |
 
 Verdict au ledger (`oracles_verdict`, étape `mep`). Un contrôle rouge → retour à l'étape
