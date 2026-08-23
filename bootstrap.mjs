@@ -2,7 +2,7 @@
 // bootstrap.mjs — amorce ou met à jour un poste pour l'écosystème forge Digit-AI.
 //
 // v2 (20/08/2026, revue « dernières versions ») — « Poste prêt » veut désormais dire, et
-// prouve par exécution : le pilot ET les treize forges sont présents, chacun À JOUR de son
+// prouve par exécution : le pilot ET les quatorze dépôts suivis sont présents, chacun À JOUR de son
 // origin (mesuré : retard/avance en commits, version affichée), et les skills installés sont
 // ceux que les forges versionnent. Avant : « mis à jour » signifiait « pull sans erreur »,
 // « déjà présent » valait « prêt » à 50 commits de retard, le pilot n'était pas mis à jour,
@@ -58,6 +58,15 @@ const FORGES = [
   { nom: "digit-ai-forge-observability", preuve: "oracles/self-test.mjs" },
   // forge-websec : sécurité du produit web livré (TF-0123).
   { nom: "digit-ai-forge-websec", preuve: "oracles/self-test.mjs" },
+  // digit-ai-queue : la FILE DE TICKETS versionnée en git que des humains et des agents lisent et
+  // écrivent — entrée dans cette liste le 23/08/2026 sur décision humaine (TF-0535). Elle vivait
+  // dans le parc depuis un moment, avec son propre dépôt distant, et AUCUN contrôle ne la nommait :
+  // ni forge suivie, ni second clone, ni mise de côté, elle tombait entre toutes les branches du
+  // balayage. Y entrer, c'est gagner la fraîcheur, la preuve de point d'entrée et la ligne au
+  // ledger ; c'est aussi accepter qu'un retard fasse échouer l'ouverture de poste jusqu'au --pull.
+  // La preuve est le CONTRAT du protocole, pas un fichier de commodité : `protocole/` se veut
+  // autoportant et clonable seul, donc son README est ce qui doit exister pour que la file serve.
+  { nom: "digit-ai-queue", preuve: "protocole/README.md" },
 ];
 
 const args = process.argv.slice(2);

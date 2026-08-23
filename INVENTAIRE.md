@@ -1,5 +1,5 @@
 ---
-verifie_le: 2026-08-20
+verifie_le: 2026-08-23
 ---
 
 # Inventaire des treize forges — 2026-08-04 · màj 2026-08-12 · vérifié le 2026-08-20 (RF-2 : passage conductor corrigé ; préséance : le code lu prime, puis CONTRAT-INTERFACE §5, puis ce document) (TF-0113 fraîcheur ; TF-0111/0112/0123 : +agents-security, +observability, +websec)
@@ -318,9 +318,23 @@ mécanisme de tickets (TF-0318, moitié écriture) sans jamais le confronter à 
   consigné et non bloquant, comme la règle le prévoit ; les cinq limites que l'oracle déclare
   lui-même (v0 statique) sont reprises telles quelles — elles suffisent à une admission
   documentaire, pas à un câblage.
-- **Hors bootstrap** : le dépôt n'entre pas dans la liste `FORGES` de `bootstrap.mjs` — rien
-  ne le clone, rien ne le met à jour. C'est voulu : on n'installe pas d'office un protocole
-  qu'on n'exécute pas.
+- **Dans la liste des dépôts suivis depuis le 23/08/2026** (décision humaine, TF-0535) — et
+  cette ligne disait exactement le contraire jusque-là : « le dépôt n'entre pas dans la liste
+  `FORGES` de `bootstrap.mjs`… c'est voulu : on n'installe pas d'office un protocole qu'on
+  n'exécute pas ». **Le raisonnement du 18/08 valait pour un poste qui ne l'a pas** ; il ne valait
+  pas pour celui-ci, où le dépôt vit depuis le 2026-07-16. Ce qu'il coûtait d'attendre a été
+  mesuré le 23/08 : présent mais jamais mis à jour, absent du ledger, et — le point qui a tranché —
+  **aucun contrôle ne le nommait**. Ni forge suivie, ni second clone, ni mise de côté : il tombait
+  entre toutes les branches du balayage de racine, qui existe précisément pour qu'aucun dépôt ne
+  soit silencieux. *Une admission documentaire sans ligne au bootstrap laisse le dépôt hors de
+  toute vérification, ce qui est le contraire d'une admission.*
+  Ce que l'entrée change, et rien de plus : le dépôt est CLONÉ sur un poste vierge, sa fraîcheur
+  est vérifiée à chaque ouverture (un retard fait échouer l'ouverture jusqu'au `--pull`), sa preuve
+  de point d'entrée est `protocole/README.md` — le contrat du protocole, choisi parce que
+  `protocole/` se veut autoportant et clonable seul — et sa version entre au ledger.
+  **Ce que l'entrée ne change PAS** : aucun hook n'est câblé, aucun `QUEUE_DIR` n'est déclaré,
+  aucun ticket n'est échangé, aucun dossier n'est écouté. Les deux invariants de TF-0318 restent
+  non négociables le jour où un transport reviendrait.
 
 ## Lecture transverse pour le pilot
 

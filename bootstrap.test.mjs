@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
  * bootstrap.test.mjs — recette de bootstrap.mjs sur dépôts git ÉPHÉMÈRES (aucun réseau :
- * BOOTSTRAP_SOURCE pointe un dossier de dépôts bare locaux portant les treize noms).
+ * BOOTSTRAP_SOURCE pointe un dossier de dépôts bare locaux portant les noms LUS dans la liste).
  *
  * Ce qu'elle prouve, dans les deux sens à chaque fois :
- *   1. poste vierge  → les 13 forges sont clonées, preuves présentes, « Poste prêt », exit 0 ;
+ *   1. poste vierge  → tous les dépôts de la liste sont clonés, preuves présentes, « Poste prêt », exit 0 ;
  *   2. une forge prend du retard sur son origin → SANS --pull : DÉFAUT « en retard de 1 »,
  *      exit 1, remède nommé (--pull) ; AVEC --pull : mise à jour, exit 0 ;
  *   3. dossier hérité à l'ancien nom (digit-ai-forge-seo, origin = ce dépôt) → renommé sur
@@ -32,7 +32,7 @@ const echecs = [];
 let joues = 0;
 const git = (dir, ...a) => execFileSync("git", ["-C", dir, "-c", "user.email=t@t", "-c", "user.name=t", ...a], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
 
-// Les treize noms et preuves sont LUS dans bootstrap.mjs : la recette ne tient pas sa
+// Les noms et preuves sont LUS dans bootstrap.mjs : la recette ne tient pas sa
 // propre liste — une forge ajoutée là-bas est couverte ici sans un geste.
 const src = (await import("node:fs")).readFileSync(BOOTSTRAP, "utf8");
 // Les ALIAS sont lus ici aussi (TF-0533) : le cas 3 bis (d) en a besoin, et une recette qui
@@ -42,7 +42,10 @@ const FORGES = [...src.matchAll(/\{\s*nom:\s*"([^"]+)",\s*preuve:\s*"([^"]+)"(?:
     alias: (m[3] || "").split(",").map((a) => a.trim().replace(/^"|"$/g, "")).filter(Boolean) }));
 
 try {
-  if (FORGES.length < 13) throw new Error(`liste de forges lue : ${FORGES.length} — attendu >= 13`);
+  // PLANCHER, pas un compte : ce test ne vérifie pas COMBIEN de dépôts la liste porte — elle
+  // grandit (quatorze le 23/08 avec l'entrée de digit-ai-queue) — mais qu'elle a bien été LUE.
+  // Un compte écrit ici mentirait au premier ajout, comme le « 11/11 » de la ligne finale l'a fait.
+  if (FORGES.length < 10) throw new Error(`liste de dépôts lue : ${FORGES.length} — la lecture a échoué`);
   const bare = join(base, "bare"); mkdirSync(bare);
   const atelier = join(base, "atelier"); mkdirSync(atelier);
   for (const f of FORGES) {
