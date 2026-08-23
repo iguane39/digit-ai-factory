@@ -182,7 +182,15 @@ if (!declares.size) {
 const depots = existsSync(racine)
   ? readdirSync(racine, { withFileTypes: true })
       .filter((e) => e.isDirectory() && /^digit-ai/.test(e.name)
-        && !/_old$|_vide$|\.bundle$|^digit-ai-forge-seo$|_client-a$/.test(e.name))
+        // L'EXCLUSION NOMMÉE « digit-ai-forge-seo » A DISPARU D'ICI LE 23/08, ET C'EST LA LEÇON
+        // (TF-0533) : ce dépôt était un CLONE PÉRIMÉ du dépôt renommé en forge-seo-geo, et il
+        // avait été contourné ICI, nommément, plutôt que traité à la racine. Un contournement
+        // local règle un symptôme et laisse le doublon fausser toutes les autres mesures du parc
+        // — celle des promesses annonçait « 16 dépôts » pour 15. Le dossier est désormais sorti
+        // du balayage par son nom (`_archive-…`, hors du motif `^digit-ai`) et bootstrap DÉCLARE
+        // tout clone d'avant un renommage. Une exclusion nommée est le signe qu'une cause n'a
+        // pas été traitée : elle vaut d'être relue à chaque fois qu'on en écrit une.
+        && !/_old$|_vide$|\.bundle$|_client-a$/.test(e.name))
       .map((e) => e.name)
   : [];
 if (!depots.length) {
