@@ -14,9 +14,9 @@
  * Usage : node ingerer-lot.mjs <sidecar.tf.jsonl> [--registre <TODO.jsonl>]
  * Exit : 0 = ingéré (ou déjà ingéré, 0 création) · 1 = sidecar rejeté · 2 = erreur.
  */
-import { readFileSync, appendFileSync, existsSync } from "node:fs";
+import { readFileSync, appendFileSync, existsSync, readdirSync } from "node:fs";
 import { createHash } from "node:crypto";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -286,4 +286,51 @@ if (!process.argv.includes("--sans-fetch") && nouvelles.length > 1) {
 execFileSync("node", [join(ICI, "oracle-todo.mjs"), registre, archive], { encoding: "utf8" });
 if (registre === resolve(join(ICI, "TODO.jsonl")))
   execFileSync("node", [join(ICI, "generer-vue.mjs")], { encoding: "utf8" });
+// ---- R-47 à l'arrivée d'un lot : refermer le cercle (23/08/2026) ---------------------------
+// Le diagnostic du 23/08, et c'est lui qui compte plus que la règle elle-même. Le défaut
+// d'héritage d'Produit-02 était DÉJÀ VU par `oracle-conformite-projet` — R-43 rendait
+// FAIL, mot pour mot : « précédence de la factory non câblée ». L'oracle existait, il voyait,
+// et personne ne l'a joué. Il n'est déclenché qu'à l'OUVERTURE d'un run et à sa CLÔTURE ; entre
+// les deux, le seul mécanisme qui pourrait le rejouer est le hook de la factory installé chez
+// le produit — or ce hook fait partie des artefacts manquants. Le contrôle dépendait donc d'un
+// artefact dont il était lui-même le seul juge : un cercle, et rien ne le rompait.
+//
+// Ce qui suit rompt le cercle en câblant le contrôle à un moment que le PILOT maîtrise, sans
+// rien attendre de ce qui est installé ailleurs : un produit qui remet un lot se nomme. On joue
+// alors la conformité de son héritage et on la DIT.
+//
+// AVERTISSEMENT, jamais blocage, et le motif tient en une phrase : refuser l'ingestion parce
+// que le produit n'a pas ses gabarits punirait deux fois le même défaut — une fois à la porte,
+// une fois sur le travail déjà fait. C'est exactement ce que les quinze candidatures refusées
+// en trois jours ont coûté.
+// Borne : R-47 ne parle que des LOTS DE RETOURS, dont le nom porte le produit. Une candidature
+// hors lot n'a pas de produit a juger, et crier dessus apprendrait a ignorer le message.
+const nomFichier = String(sidecarPath).split(/[\\\/]/).pop() || "";
+if (nouvelles.length > 1 && nomFichier.includes(" - RETOURS - ")) {
+  const projet = nomFichier.split(" - RETOURS - ")[0];
+  const racine = process.env.FORGE_ROOT || join(ICI, "..", "..");
+  let dossier = null;
+  try {
+    const candidats = readdirSync(racine, { withFileTypes: true })
+      .filter((d) => d.isDirectory() && d.name.toLowerCase().startsWith(projet.toLowerCase()))
+      .map((d) => join(racine, d.name));
+    dossier = candidats.find((c) => existsSync(join(c, "forge")))
+      || candidats.map((c) => join(c, "projet")).find((c) => existsSync(join(c, "forge")))
+      || null;
+  } catch { /* racine illisible : on ne devine pas */ }
+  if (!projet || !dossier) {
+    // Silence assumé et DIT : un produit qu'on ne localise pas sur ce poste n'est pas un produit
+    // en défaut. Le contraire ferait crier l'ingestion sur toutes les remises venues d'ailleurs.
+    console.error(`[R-47] conformité de l'héritage NON vérifiée pour « ${projet || "?"} » — dossier introuvable sous ${racine}. Ce n'est pas un constat sur le produit, c'est l'absence d'une cible à juger.`);
+  } else {
+    const r = spawnSync(process.execPath, [join(ICI, "..", "oracles", "oracle-conformite-projet.mjs"), dossier],
+      { encoding: "utf8", timeout: 120000 });
+    let f = null;
+    try { const j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); f = (j.findings || []).find((x) => x.regle === "R-47"); } catch { /* verdict illisible */ }
+    if (!f) console.error(`[R-47] verdict d'héritage illisible pour ${dossier} — non vérifié, jamais supposé bon`);
+    else if (f.statut === "FAIL") console.error(`[R-47 — AVERTISSEMENT] ${projet} : ${f.message}\n  Le lot est INGÉRÉ quand même : refuser ici punirait deux fois le même défaut.`);
+    else console.error(`[R-47] ${projet} : ${f.statut === "PASS" ? f.message : f.message}`);
+  }
+}
+
 console.log(`[OK] ${nouvelles.length - 1} candidature(s) ingérée(s) en CANDIDAT (lot ${lotSha.slice(0, 12)}) — la décision reste humaine`);

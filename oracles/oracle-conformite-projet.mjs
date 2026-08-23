@@ -482,6 +482,64 @@ else {
     : ok("R-43", "CLAUDE.md / .claude", "clause de précédence présente, hooks de la factory installés");
 }
 
+// R-47 — LES ARTEFACTS HÉRITÉS DU PILOT SONT PRÉSENTS ET À JOUR (23/08/2026).
+//
+// Ce que le constat a montré, deux produits en trois jours. Produit-02 possède un
+// `forge\retours\` complet, portant ses lots, et AUCUN gabarit RETOURS-FORGES.md : le dossier a
+// été créé, la copie n'y est jamais arrivée. Produit-05 n'a ni l'un ni l'autre. Résultat mesuré :
+// 15 candidatures refusées à l'ingestion par R-45/R-46 pour une forme que le produit ne pouvait
+// pas connaître, faute d'avoir le gabarit qui la porte.
+//
+// La cause n'est pas une négligence de produit, c'est une COPIE SANS PREUVE. Et le défaut est
+// plus large que ce gabarit : R-43 lui-même ne fait qu'un `existsSync` sur les hooks de la
+// factory — un hook PÉRIMÉ passe au vert et n'exécute pas les règles du jour. Aucun mécanisme
+// de l'écosystème ne comparait, jusqu'ici, une copie chez un produit à sa source dans le pilot.
+//
+// R-47 joue le référentiel `gabarits\HERITAGE.json` — donnée éditable, datée, motivée (loi n° 4)
+// plutôt qu'une liste en dur : le jour où le pilot copiera un artefact de plus, il s'ajoute là,
+// et il est jugé sans toucher au code.
+//
+// Trois prudences, chacune apprise d'un défaut réel :
+//  · un produit SANS `forge\` n'a jamais été instancié : SANS_OBJET, jamais un échec — accabler
+//    un dépôt qui n'est pas sous doctrine ne l'y amènerait pas (c'est le sujet distinct TF-0514) ;
+//  · les artefacts que le produit personnalise légitimement (settings.json, CLAUDE.md, robots)
+//    ne se comparent PAS au contenu : on exige leur présence, et le socle qu'ils doivent porter ;
+//  · la comparaison normalise les fins de ligne — un CRLF ne rend pas une copie périmée (TF-0072).
+{
+  const refPath = join(dirname(fileURLToPath(import.meta.url)), "..", "gabarits", "HERITAGE.json");
+  let heritage = null;
+  try { heritage = JSON.parse(readFileSync(refPath, "utf8")); } catch {}
+  if (!heritage || !Array.isArray(heritage.artefacts)) {
+    so("R-47", "référentiel gabarits\\HERITAGE.json illisible ou absent — R-47 ne devine aucun artefact hérité");
+  } else if (!existsSync(p("forge"))) {
+    so("R-47", "aucun dossier forge\\ — ce projet n'a pas été instancié par le pilot, il n'hérite donc de rien (TF-0514)");
+  } else {
+    const norm = (s) => s.split("\r\n").join("\n").trimEnd();
+    const manques = [], perimes = [], ok47 = [];
+    for (const a of heritage.artefacts) {
+      const src = join(dirname(fileURLToPath(import.meta.url)), "..", a.source);
+      const dst = p(a.cible);
+      if (a.conditionnel && !existsSync(dst)) continue;   // artefact dû seulement dans un cas déclaré
+      if (!existsSync(dst)) { manques.push(`${a.cible} (source ${a.source})`); continue; }
+      if (a.mode === "copie_conforme") {
+        if (!existsSync(src)) { so("R-47", `source ${a.source} absente du pilot — la copie du produit ne se compare à rien`); continue; }
+        norm(readFileSync(src, "utf8")) === norm(readFileSync(dst, "utf8"))
+          ? ok47.push(a.cible)
+          : perimes.push(`${a.cible} diverge de ${a.source}`);
+      } else if (a.mode === "presence_et_motif") {
+        new RegExp(a.motif_exige.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).test(readFileSync(dst, "utf8"))
+          ? ok47.push(a.cible)
+          : perimes.push(`${a.cible} ne porte pas « ${a.motif_exige} »`);
+      } else ok47.push(a.cible);
+    }
+    manques.length || perimes.length
+      ? ko("R-47", "artefacts hérités", `héritage du pilot non tenu — ${manques.length} absent(s)`
+          + (manques.length ? ` : ${manques.join(", ")}` : "")
+          + `, ${perimes.length} périmé(s) ou incomplet(s)` + (perimes.length ? ` : ${perimes.join(", ")}` : "")
+          + ". Recopier depuis le pilot (référentiel gabarits\\HERITAGE.json, ETAPES-RUN §1)")
+      : ok("R-47", "artefacts hérités", `${ok47.length} artefact(s) hérité(s) présent(s) et à jour`);
+  }
+}
 // R-11 bis — LES RÉFÉRENTIELS DISPONIBLES, déclarés (TF-0373, 18/08). Coût du silence, mesuré :
 // treize anomalies clients vivaient dans un board depuis le 29/07, six campagnes ont tourné
 // entre le 11 et le 18/08, AUCUNE n'a su qu'elles existaient — et le sujet n'est apparu que

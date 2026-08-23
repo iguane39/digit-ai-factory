@@ -807,3 +807,41 @@ actions. Aucune n'avait d'exécutant : le pilot n'avait pas un seul hook.
    de génération). Absent, périmé ou non rédigé = défaut nommé.
 Un gate qui ne peut pas jouer (pilot absent du poste, transcript illisible) le DIT et
 laisse passer — jamais en silence, jamais en bloquant le produit.
+
+## Y. Un artefact hérité du pilot est présent ET à jour (règle 47 — 23/08, mandat humain)
+
+**Le constat.** Deux produits en trois jours, quinze candidatures refusées à la porte pour une
+forme que le produit ne pouvait pas connaître. `Produit-02` possède un `forge\retours\`
+complet, portant ses lots, et **aucun** `RETOURS-FORGES.md` : le dossier a été créé, la copie
+n'y est jamais arrivée. `Produit-05` n'a ni l'un ni l'autre. Ce n'était pas une négligence de
+produit, c'était une **copie sans preuve** — rien ne vérifiait qu'elle était arrivée, et rien
+ne vérifie encore qu'elle est à jour.
+
+**Ce qui est plus grave que le gabarit.** Le défaut était DÉJÀ VU : `oracle-conformite-projet`
+rendait `R-43 FAIL` sur ce produit, mot pour mot « précédence de la factory non câblée ».
+L'oracle existait, il voyait, et **personne ne l'a joué**. Il n'est déclenché qu'à l'OUVERTURE
+d'un run et à sa CLÔTURE ; entre les deux, le seul mécanisme qui pourrait le rejouer est le hook
+de la factory installé chez le produit — **or ce hook fait partie des artefacts manquants**. Le
+contrôle dépendait d'un artefact dont il était lui-même le seul juge : un cercle.
+
+**La règle.** Tout artefact que le pilot copie chez un produit se déclare dans
+`gabarits\HERITAGE.json` — donnée éditable, datée, motivée (loi n° 4) plutôt qu'une liste en
+dur : le jour où le pilot copiera un artefact de plus, il s'ajoute là et il est jugé sans
+toucher au code. Trois modes, parce que tous les artefacts ne se contrôlent pas pareil :
+`copie_conforme` (identique à la source — réservé à ce que le produit ne personnalise jamais),
+`presence` (adapté légitimement, on n'exige que l'existence), `presence_et_motif` (le socle est
+exigé, la personnalisation reste libre autour).
+
+**Le cercle est rompu au moment que le pilot maîtrise** : un produit qui remet un lot se nomme.
+`ingerer-lot.mjs` joue alors R-47 sur lui et le **dit**. **Avertissement, jamais blocage** —
+refuser l'ingestion parce que le produit n'a pas ses gabarits punirait deux fois le même défaut,
+une fois à la porte et une fois sur le travail déjà fait.
+
+**Trois prudences, chacune apprise d'un défaut réel** : un produit sans `forge\` n'a jamais été
+instancié — `SANS_OBJET`, jamais un échec ; un produit introuvable sur le poste est déclaré
+**non vérifié**, jamais accusé ; la comparaison normalise les fins de ligne, un CRLF ne rend pas
+une copie périmée (TF-0072).
+
+**Oracles** : `oracle-conformite-projet` R-47 (recette `oracles\self-test.mjs`, fixture verte à
+vraies copies du pilot et fixture rouge) · câblage à l'ingestion (`todo\ingerer-r47.test.mjs`,
+4 cas dont deux BORNES : n'a pas bloqué, et n'accuse pas un produit absent du poste).

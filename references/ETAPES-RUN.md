@@ -88,7 +88,10 @@ seulement à la création. TF-0502 (22/08) : trois lots d'un même produit ont �
 R-45/R-46 en deux jours parce que le produit écrivait avec une copie du gabarit antérieure au
 21/08, date où les deux sections y sont entrées. La règle voyageait — elle est DANS le gabarit —
 mais la copie, elle, ne bougeait plus. Une copie prise une fois est une copie qui vieillit en
-silence. Copier enfin `gabarits\settings-produit.json` →
+silence. Ces artefacts sont DECLARES dans `gabarits\HERITAGE.json` et juges par **R-47** :
+presence ET fraicheur, chacun avec son mode (copie conforme, presence seule, presence + socle
+exige). R-47 se rejoue aussi a l'ARRIVEE D'UN LOT chez le pilot — un produit qui remet se nomme,
+et le controle ne depend alors plus de ce qui est installe chez lui. Copier enfin `gabarits\settings-produit.json` →
 `.claude\settings.json` et `gabarits\hooks-factory.mjs` → `forge\hooks\factory.mjs` (R-44 :
 les hooks de la factory — fraîcheur à l'ouverture, restitution jugée à chaque fin de tour de
 travail — sont actifs dès la première session du produit) ; la clause de **précédence**

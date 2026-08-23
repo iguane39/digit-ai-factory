@@ -1,0 +1,65 @@
+{
+  "schema": "pilot/heritage@1",
+  "version": "1.0.0",
+  "date": "2026-08-23",
+  "regle": "Tout artefact que le pilot COPIE chez un produit se déclare ici avec son mode de contrôle. Un artefact absent de ce référentiel n'est pas jugé par R-47 — l'oubli se voit à la revue, il ne se devine pas.",
+  "pourquoi": "Constat du 23/08, deux produits en trois jours. Produit-02 possède un `forge\\retours\\` complet, portant ses lots, et AUCUN gabarit RETOURS-FORGES.md : le dossier a été créé, la copie n'y est jamais arrivée. Produit-05 n'a ni l'un ni l'autre. Résultat mesuré : 15 candidatures refusées à l'ingestion par R-45/R-46 pour une forme que le produit ne pouvait pas connaître, faute d'avoir le gabarit qui la porte. La cause n'était pas une négligence de produit mais une COPIE SANS PREUVE : rien ne vérifiait qu'elle était arrivée, et rien ne vérifie encore qu'elle est à jour. Le contrôle R-43 lui-même ne fait qu'un `existsSync` sur les hooks — un hook périmé passe au vert.",
+  "modes": {
+    "copie_conforme": "le produit doit porter une copie IDENTIQUE à la source du pilot (comparaison sur le contenu normalisé en fins de ligne). Absent ou divergent = FAIL. Réservé aux artefacts que le produit ne personnalise JAMAIS : leur forme est jugée ailleurs, la faire diverger casse ce jugement.",
+    "presence": "le produit doit porter le fichier ; son contenu ne se compare pas, parce qu'il est légitimement adapté au projet.",
+    "presence_et_motif": "le produit doit porter le fichier ET son contenu doit contenir le motif déclaré — le socle est exigé, la personnalisation reste libre autour."
+  },
+  "non_juge": [
+    "la QUALITÉ de la personnalisation d'un artefact en mode `presence` : ce que le produit en fait lui appartient",
+    "les artefacts non déclarés ici : R-47 ne devine pas, elle joue ce référentiel",
+    "un produit qui n'est pas sous doctrine (aucun `forge\\`) : R-47 rend SANS_OBJET plutôt que d'accabler un dépôt qui n'a jamais été instancié — c'est le sujet distinct de TF-0514"
+  ],
+  "artefacts": [
+    {
+      "source": "gabarits/RETOURS-FORGES.md",
+      "cible": "forge/retours/RETOURS-FORGES.md",
+      "mode": "copie_conforme",
+      "motif": "le canal de retours du produit. Sa FORME est jugée à l'ingestion par R-45 et R-46 : un produit qui ne l'a pas ne peut pas produire un lot conforme, et son travail est refusé à la porte. C'est l'artefact qui a coûté 15 candidatures en trois jours.",
+      "depuis": "2026-08-23"
+    },
+    {
+      "source": "gabarits/hooks-factory.mjs",
+      "cible": "forge/hooks/factory.mjs",
+      "mode": "copie_conforme",
+      "motif": "les hooks de la factory (fraîcheur à l'ouverture, restitution jugée à chaque fin de tour). R-43 vérifie déjà leur PRÉSENCE ; ici on vérifie qu'ils sont À JOUR — un hook périmé s'exécute et ne joue pas les règles du jour.",
+      "depuis": "2026-08-23"
+    },
+    {
+      "source": "gabarits/settings-produit.json",
+      "cible": ".claude/settings.json",
+      "mode": "presence_et_motif",
+      "motif_exige": "forge/hooks/factory.mjs",
+      "motif": "le câblage des hooks. Le fichier est LÉGITIMEMENT personnalisé par chaque projet (permissions, serveurs MCP) : exiger une copie conforme mettrait en échec tout produit qui l'a adapté. Ce qui est exigé, c'est que le câblage de la factory y soit.",
+      "depuis": "2026-08-23"
+    },
+    {
+      "source": "gabarits/CLAUDE-PRODUIT.md",
+      "cible": "CLAUDE.md",
+      "mode": "presence_et_motif",
+      "motif_exige": "R-43",
+      "motif": "les instructions du produit. Personnalisées par construction — le gabarit porte des `<…>` que l'orchestrateur remplit. Seule la clause de précédence est exigée, et R-43 la juge déjà ; la déclaration ici rend le contrôle exhaustif plutôt que dispersé.",
+      "depuis": "2026-08-23"
+    },
+    {
+      "source": "gabarits/web/robots.txt",
+      "cible": "robots.txt",
+      "mode": "presence",
+      "conditionnel": "produit à surface web",
+      "motif": "agents IA autorisés par défaut ; bloquer se décide et se consigne DANS le fichier, donc son contenu diverge légitimement. R-27 juge déjà le couple robots/llms.",
+      "depuis": "2026-08-23"
+    },
+    {
+      "source": "gabarits/web/llms.txt",
+      "cible": "llms.txt",
+      "mode": "presence",
+      "conditionnel": "produit à surface web",
+      "motif": "la carte du site pour les moteurs génératifs, tenue par development/MEP : son contenu est propre au produit. R-27 juge déjà sa présence à côté de robots.txt.",
+      "depuis": "2026-08-23"
+    }
+  ]
+}

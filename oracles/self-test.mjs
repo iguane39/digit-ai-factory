@@ -27,7 +27,11 @@ const check = (nom, fn) => { try { fn(); console.log(`  [PASS] ${nom}`); pass++;
 const NL_TEST = String.fromCharCode(10);
 const verte = mkdtempSync(join(tmpdir(), "conf-verte-"));
 for (const d of ["input", "output", "docs", "forge", "forge/retours", "output/Old"]) mkdirSync(join(verte, d), { recursive: true });
-writeFileSync(join(verte, "forge", "retours", "RETOURS-FORGES.md"), "gabarit\n");
+// R-47 verte (23/08) : les artefacts herites sont de VRAIES copies du pilot, pas des fichiers
+// d'apparence. Un `factory.mjs` factice passait R-43, qui ne fait qu'un existsSync — et c'est
+// exactement le defaut que R-47 attrape : une copie presente mais perimee.
+const GAB47 = join(dirname(fileURLToPath(import.meta.url)), "..", "gabarits");
+writeFileSync(join(verte, "forge", "retours", "RETOURS-FORGES.md"), readFileSync(join(GAB47, "RETOURS-FORGES.md"), "utf8"));
 writeFileSync(join(verte, "CLAUDE.md"),
   "# Produit\n## Routage forge — obligatoire\nvalider : forge_tests\névoluer : run de version\ndéployer : MEP\n");
 writeFileSync(join(verte, "README.md"), "# Produit\nDémarrage : 2 commandes.\n");
@@ -51,7 +55,7 @@ mkdirSync(join(verte, ".claude"), { recursive: true });
 writeFileSync(join(verte, ".claude", "settings.json"),
   JSON.stringify({ hooks: { Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }] } }) + "\n");
 mkdirSync(join(verte, "forge", "hooks"), { recursive: true });
-writeFileSync(join(verte, "forge", "hooks", "factory.mjs"), "// lanceur des hooks de la factory (gabarits/hooks-factory.mjs)\n");
+writeFileSync(join(verte, "forge", "hooks", "factory.mjs"), readFileSync(join(GAB47, "hooks-factory.mjs"), "utf8"));
 // R-27 verte : surface web ouverte aux agents IA + llms.txt à côté (un blocage CONSIGNÉ
 // reste conforme — la décision datée au-dessus de la règle)
 writeFileSync(join(verte, "robots.txt"),
@@ -240,7 +244,7 @@ check("rouge : chaque règle attendue se déclenche, FAIL exit 1", () => {
   const { exit, rapport } = lance(rouge);
   if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
   const declenchees = new Set(rapport.findings.filter((f) => f.statut === "FAIL").map((f) => f.regle));
-  for (const attendue of ["R-1", "R-3", "R-4", "R-6", "R-7", "R-8", "R-10", "R-11", "R-12", "R-13", "R-18", "R-19", "R-25", "R-27", "R-32", "R-43"])
+  for (const attendue of ["R-1", "R-3", "R-4", "R-6", "R-7", "R-8", "R-10", "R-11", "R-12", "R-13", "R-18", "R-19", "R-25", "R-27", "R-32", "R-43", "R-47"])
     if (!declenchees.has(attendue)) throw new Error(`règle ${attendue} non déclenchée sur la fixture rouge`);
 });
 
