@@ -961,6 +961,17 @@ la commande la vérification n'est pas rejouable, sans la date elle ne périme j
 c'est une opinion mieux écrite. *Un commentaire n'est pas une source* — il vieillit sans prévenir, il
 survit à ce qu'il décrit, et il se lit avec l'autorité de ce qui est dans le code.
 
+**Le QUATRIÈME champ, ajouté le 25/08 (TF-0587)** : les **limites structurelles** connues du
+mécanisme. Le fait qui l'impose : la redirection DNS d'un hébergeur est le geste naturel quand on
+tient déjà la zone par son API, et **rien dans la réponse de cette API ne signale qu'elle n'écoute
+pas le port 443** — l'objet retourné ne porte que le sous-domaine, la cible et le type. La limite
+ne se découvre qu'en testant le port. Sept hostnames sur huit sont restés muets en HTTPS, et le
+seul remède complet imposait de recréer les enregistrements de messagerie — un risque sans commune
+mesure avec le confort initial. **Une limite découverte après coup coûte un changement
+d'architecture ; la même limite écrite avant coûte le choix d'un autre mécanisme.** Déclarer
+« aucune limite connue » est **gratuit et suffit** : même patron que R-45, l'omission ne vaut pas
+décision, mais l'aveu d'ignorance est honnête et se date.
+
 **L'échappatoire est nommée** : `hypothese-assumee`. Une hypothèse déclarée est honnête ; c'est une
 hypothèse déguisée en fait qui coûte. La règle ne demande pas de tout vérifier, elle demande de ne pas
 confondre les deux.
