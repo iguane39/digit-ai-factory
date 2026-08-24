@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau 1b7265ec5781)]
+sources_de_verite: [todo/TODO.jsonl (sceau e3478fb9eaf2)]
 verifie_le: 2026-08-24
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `1b7265ec5781`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `e3478fb9eaf2`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -20,9 +20,9 @@ les corrections donnerait l'illusion d'un progrès net.
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
 | Ouverts | 7 | candidats, décidés ou en cours — le reste à faire réel |
-| Clos sur gains constatés | 70 | corrigés avec leur mesure avant/après |
+| Clos sur gains constatés | 71 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 4 | décidés non faits, motif écrit — jamais un silence |
-| Total suivi | 81 | tout ce que le registre a jamais porté |
+| Total suivi | 82 | tout ce que le registre a jamais porté |
 
 ## Ce qui reste ouvert, par forge
 

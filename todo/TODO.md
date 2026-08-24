@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=c7ddce919f05 archive=acf69e8da61a · dernier événement: 2026-08-24T06:07:05.191Z -->
+     sceaux: actifs=a02328372f5a archive=54c0315cbe97 · dernier événement: 2026-08-24T06:53:05.907Z -->
 
-**81 actifs** (candidat 6 · décidé 1 · en cours 0 · corrigé 70 · écarté 4) · **469 archivés**.
+**82 actifs** (candidat 6 · décidé 1 · en cours 0 · corrigé 71 · écarté 4) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -38,6 +38,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0523 | corrige | 10 | pilot : rien ne detecte qu'un livrable a ete MODIFIE apres avoir ete juge, sans changer d'indice — la regle 5 existe et n'est cablee nulle part | **oui** — quatre etats successifs d'un livrable perdus, et le meme nom ayant designe quatre contenus — commis par un agent qui avait cite la meme regle une heure plus tot sur un autre objet |
 | TF-0533 | corrige | 10 | Un clone PERIME du depot renomme en forge-seo-geo vit encore dans le parc, et les oracles de parc le comptent comme un depot vivant | **oui** — un push refuse en fast-forward, trois commits de retard, et un doublon compte dans « 16 depots » par tout oracle de parc — dont le survol qui a propose de signer un fichier de ce clone |
 | TF-0535 | corrige | 10 | digit-ai-queue vit dans le parc hors de toute verification de fraicheur : il entre dans la liste des depots suivis, ou il se declare hors perimetre | **oui** — un depot de l'ecosysteme jamais verifie par --pull, absent du ledger, et qui n'avait jamais ete nomme par aucun controle avant le 23/08 au soir |
+| TF-0550 | corrige | 10 | Le garde-fou des produits accusait le pilot des ecritures faites PAR les produits — quatre fois en une heure | **oui** — quatre accusations fausses en une heure, une restitution bloquee, et un remede propose par le controle lui-meme qui aurait DETRUIT le travail d'une autre session (« git checkout -- . » chez le produit) |
 | TF-0522 | corrige | 8.3 | pilot : un gabarit entre au catalogue en statut ok SANS avoir jamais produit une seule page — extraire une forme et savoir la rejouer sont deux choses | **oui** — deux familles publiees en ok le 21/08, deux defauts au premier usage le 23/08, dont un bloquant — le catalogue promettait une forme utilisable qui ne l'etait pas |
 | TF-0511 | corrige | 8 | pilot : le langage commanditaire n'est exige qu'au bloc 0 (S9) — tout le reste peut etre ecrit en jargon, et l'a ete, au point qu'un meme point a du etre explique deux fois | **oui** — un meme sujet explique deux fois, la premiere version rejetee malgre sa structure — le jargon non glose a annule le benefice d'une explication par ailleurs complete |
 | TF-0479 | corrige | 7.5 | veille : le prompt de veille ne debouche sur AUCUN canal d'entree au registre — ce qu'une veille trouve n'a pas de chemin norme vers une candidature | **oui** — MESURE le 22/08 sur les deux registres : sur 473 items TF ecrits depuis l'origine, 2 seulement ont une veille pour source — 0,4 %, alors que la veille est un canal declare de l'ecosysteme et qu'elle a produit trois documents d'etude (ETUDE-EVERYTHING-CLAUDE-CODE, VEILLE-OUTILLAGE-CLAUDE-CODE, AMELIORATIONS-TIKTOK). Le canal existe, il produit, et sa production n'atteint pas le registre : c'est le dernier kilometre qui manque, pas la veille. |

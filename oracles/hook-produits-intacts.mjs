@@ -24,12 +24,29 @@
  * lequel un run est demandé. Ce produit-là est alors suivi et RAPPORTÉ, jamais bloqué — un run
  * demandé écrit chez son produit, c'est sa raison d'être.
  *
+ * CE QUE LE 24/08 A APPRIS, ET IL A FALLU TROIS DISCRIMINANTS. Le lendemain de son écriture, ce
+ * contrôle a accusé le pilot QUATRE FOIS en une heure — alors que c'était la session DU PRODUIT qui
+ * travaillait chez lui, exactement comme la décision humaine le prescrit. Comparer un état ne dit
+ * jamais QUI a écrit : c'est la limite structurelle du procédé. Ce qui se prouve, en revanche, c'est
+ * qu'un mouvement N'EST PAS une écriture de passage du pilot, et chaque signal a sa preuve propre —
+ * les mélanger a rouvert le trou deux fois :
+ *   · HEAD qui bouge → disculpé si l'histoire est PUBLIÉE sur le distant du produit ;
+ *   · arbre de travail qui bouge → disculpé si aucun fichier cité n'a été écrit depuis le relevé,
+ *     ou si le JOURNAL DE RÉFÉRENCES du dépôt montre qu'une session y travaillait dans la fenêtre.
+ * Les marges d'horloge penchent TOUJOURS vers le blocage : elles élargissent ce qui accuse et
+ * resserrent ce qui disculpe. Et le relevé se REMET À JOUR quand rien n'est reproché : sans cela,
+ * un mouvement légitime déjà déclaré est re-signalé à chaque tour, indéfiniment.
+ *
+ * LE TROU QUI RESTE, DÉCLARÉ : un pilot qui commiterait ET pousserait chez un produit serait
+ * disculpé par la première règle. Ce n'est pas le mode de défaillance réaliste — une écriture de
+ * passage est un script qui réécrit des fichiers, sans commit — et ce cas-là reste bloquant.
+ *
  * Usage :
  *   node oracles/hook-produits-intacts.mjs --empreinte   (SessionStart : relève l'état)
  *   node oracles/hook-produits-intacts.mjs               (Stop : compare, bloque si écart)
  *   node oracles/hook-produits-intacts.mjs --self-test   (les deux sens, sur des dépôts jouets)
  */
-import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, mkdtempSync, rmSync, statSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
@@ -66,6 +83,131 @@ function depotsProduits(racine) {
 }
 
 const git = (depot, ...a) => spawnSync("git", ["-C", depot, ...a], { encoding: "utf8" });
+
+/** LE PRODUIT S'EST-IL MODIFIÉ LUI-MÊME ? La question que ce contrôle ne posait pas.
+ *
+ * LE FAIT, ET IL EST TOMBÉ LE LENDEMAIN DE SON ÉCRITURE (24/08/2026, ~08:32). Une AUTRE session,
+ * celle du produit, a créé une branche chez lui, commité « Réponse à l'audit du dépôt du 18/08 »,
+ * fait fusionner sa demande de tirage et repris `main`. Ce contrôle a vu bouger le HEAD et a accusé
+ * le pilot d'avoir écrit chez un produit — alors que c'est EXACTEMENT ce que la décision humaine
+ * prescrit : « seuls les produits se modifient eux-mêmes ». Le contrôle confondait donc les deux
+ * choses que la règle sépare, et il accusait de violer la règle celui qui la respectait.
+ *
+ * LE DISCRIMINANT, mécanique et sans heuristique de message : une écriture non autorisée du pilot
+ * laisse des traces LOCALES — du travail non commité, ou des commits que le distant ne connaît pas.
+ * À l'inverse, une histoire PUBLIÉE (HEAD est un ancêtre de la branche de suivi distante) ne peut
+ * pas être un gribouillage local du pilot : elle est passée par le distant du produit.
+ *
+ * Ce qu'il reste hors de portée, et c'est déclaré : si le pilot commitait ET poussait chez un
+ * produit, cette fonction le tiendrait pour légitime. Le garde-fou du pilot est ailleurs (il ne
+ * pousse jamais chez un frère hors mandat journalisé) ; ici on refuse seulement d'accuser à tort,
+ * parce qu'une accusation fausse détruit la valeur d'un contrôle plus sûrement qu'un trou avoué.
+ */
+function histoirePubliee(depot) {
+  // ON NE MÊLE PAS LES SIGNAUX, et le premier jet le faisait : il refusait de répondre « publiée »
+  // dès que l'arbre de travail était sale. Or un produit a très bien un HEAD publié ET des fichiers
+  // de sortie non commités — c'est même son état ordinaire. Le mouvement de HEAD, parfaitement
+  // légitime, restait donc accusé à cause de fichiers qui ne le concernent pas. Ici on ne répond
+  // QU'À une question : cet historique est-il passé par le distant du produit ?
+  const suivi = (git(depot, "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{upstream}").stdout || "").trim();
+  if (!suivi) return { publiee: false, motif: "aucune branche de suivi distante" };
+  const ancetre = git(depot, "merge-base", "--is-ancestor", "HEAD", suivi);
+  if (ancetre.status !== 0) return { publiee: false, motif: `HEAD n'est pas publié sur ${suivi}` };
+  const auteur = (git(depot, "log", "-1", "--format=%an").stdout || "").trim();
+  const sujet = (git(depot, "log", "-1", "--format=%s").stdout || "").trim();
+  return { publiee: true, motif: `HEAD publié sur ${suivi} — dernier commit « ${sujet.slice(0, 70)} » par ${auteur}` };
+}
+
+/** RIEN N'A ÉTÉ ÉCRIT DEPUIS LE RELEVÉ ? La deuxième question qui manquait (24/08/2026).
+ *
+ * LE FAIT. Ce contrôle compare l'état d'un produit « entre l'ouverture et la fin du tour ». Mais
+ * une session de pilotage peut durer PLUS D'UN JOUR : le relevé de ce tour datait de la veille
+ * 13:49, et la session du produit avait travaillé chez lui dans l'intervalle. Le contrôle a donc
+ * accusé le tour courant d'écritures faites ailleurs, un jour plus tôt. Un contrôle dont la
+ * référence vieillit accuse le dernier arrivé.
+ *
+ * LE DISCRIMINANT : la DATE DE MODIFICATION des fichiers cités. Un fichier dont l'horodatage est
+ * ANTÉRIEUR au relevé ne peut pas avoir été écrit depuis. C'est mécanique, sans heuristique, et
+ * ça se vérifie fichier par fichier.
+ *
+ * Hors de portée, déclaré : un fichier réécrit avec un horodatage forcé dans le passé. Personne ne
+ * le fait par accident, et le pilot n'a aucune raison de le faire.
+ */
+function ecritDepuis(depot, iso) {
+  // MARGE D'HORLOGE, ET SA VALEUR VIENT D'UNE MESURE, PAS D'UNE PRÉCAUTION VAGUE. Deux horloges
+  // sont comparées ici : celle de `Date.now()`, qui datte le relevé, et celle du système de
+  // fichiers, qui datte les écritures. Sur ce poste, un fichier écrit APRÈS le relevé s'est mesuré
+  // à `mtime = …844,792` contre un seuil `…845` — 0,2 ms AVANT, donc « pas écrit depuis ». La
+  // recette l'a attrapé dans la minute. Deux secondes de marge couvrent l'écart entre les deux
+  // horloges de plusieurs ordres de grandeur, et le doute profite au BLOCAGE : un fichier douteux
+  // est compté comme récent, donc reproché. Se tromper vers l'accusation se corrige en une phrase ;
+  // se tromper vers l'absolution laisse passer une écriture chez un produit.
+  const MARGE_MS = 2000;
+  const seuil = Date.parse(iso || "") - MARGE_MS;
+  if (!Number.isFinite(seuil)) return { recent: true, motif: "relevé sans date lisible" };
+  // `core.quotepath=false` : sans lui, git ÉCHAPPE les octets non ASCII des chemins cités
+  // (des octets en clair au lieu de « Fiche Sécurité »), le fichier devient illisible et
+  // son horodatage inconnu. Le contrôle basculait alors vers « écrit depuis le relevé » — la
+  // direction prudente, mais pour une mauvaise raison : un accent dans un nom de fichier.
+  const lignes = (git(depot, "-c", "core.quotepath=false", "status", "--porcelain").stdout || "").split(/\r?\n/).filter(Boolean);
+  const recents = [];
+  for (const l of lignes) {
+    const chemin = l.slice(3).replace(/^"|"$/g, "").split(" -> ").pop();
+    try {
+      const st = statSync(join(depot, chemin));
+      if (st.mtimeMs > seuil) recents.push(chemin);
+    } catch { recents.push(`${chemin} (illisible)`); }
+  }
+  return recents.length
+    ? { recent: true, motif: `${recents.length} fichier(s) écrit(s) depuis le relevé : ${recents.slice(0, 3).join(", ")}` }
+    : { recent: false, motif: `aucun des ${lignes.length} fichier(s) non commité(s) n'a été écrit depuis le relevé` };
+}
+
+/** LA SESSION DU PRODUIT A-T-ELLE TRAVAILLÉ, ELLE, PENDANT LA FENÊTRE ? (24/08/2026)
+ *
+ * LE FAIT, ET IL S'EST PRODUIT TROIS FOIS EN VINGT MINUTES. La session du produit a commité,
+ * fusionné sa demande de tirage, repris `main`, publié une version, et déposé un livrable dans son
+ * dossier de sortie — pendant que ce tour-ci lisait des dépôts. Le contrôle a accusé le pilot à
+ * chaque mouvement. Or comparer un ÉTAT ne dit jamais QUI a écrit : c'est la limite structurelle
+ * de ce garde-fou, et elle ne se contourne pas par une heuristique de plus.
+ *
+ * CE QU'ON PEUT PROUVER, en revanche : que le dépôt a été VIVANT de son propre chef pendant la
+ * fenêtre. Le journal de références (`reflog`) porte les commits, bascules de branche et tirages
+ * avec leur date. S'il bouge après le relevé, une session travaille chez le produit — et les
+ * fichiers apparus lui appartiennent selon toute vraisemblance.
+ *
+ * LE TROU, DÉCLARÉ PLUTÔT QUE MASQUÉ : si le pilot commitait lui-même chez un produit, ce journal
+ * bougerait aussi et le mouvement serait RAPPORTÉ au lieu d'être bloqué. Ce n'est pas le mode de
+ * défaillance réaliste — une écriture de passage du pilot est un script qui réécrit des fichiers,
+ * sans commit — et ce cas-là reste bloquant, puisque le journal ne bouge pas.
+ */
+function depotVivant(depot, iso) {
+  // MÊME PIÈGE D'HORLOGE, MAIS LA MARGE VA DANS L'AUTRE SENS, et c'est la recette qui l'a imposé.
+  // Les dates du journal sont au format `iso-strict`, TRONQUÉES À LA SECONDE, quand le relevé porte
+  // des millisecondes. Une marge est donc nécessaire — mais ici « vivant » DISCULPE, alors que
+  // « écrit depuis » ACCUSE. La marge doit toujours pencher vers le blocage : elle ÉLARGIT ce qui
+  // accuse et RESSERRE ce qui disculpe. Posée du côté large, elle faisait passer un dépôt endormi
+  // pour actif — son commit initial, à quelques millisecondes du relevé, suffisait à l'absoudre.
+  const MARGE_MS = 2000;
+  const seuil = Date.parse(iso || "") + MARGE_MS;
+  if (!Number.isFinite(seuil)) return { vivant: false, motif: "relevé sans date lisible" };
+  // LA DATE DU GESTE, PAS CELLE DU COMMIT — et c'est la recette qui a tranché entre les deux. Le
+  // premier jet lisait `%cI`, la date du commit pointé : pour une bascule de branche, c'est la date
+  // d'un commit ancien, si bien qu'un dépôt actif à l'instant passait pour endormi. La date qui
+  // compte est celle de l'ENTRÉE du journal, que `%gd` porte sous la forme `HEAD@{…}`.
+  const brut = git(depot, "reflog", "--date=iso-strict", "--format=%gd|%gs").stdout || "";
+  const lignes = brut.split(/\r?\n/).filter(Boolean);
+  const recentes = [];
+  for (const l of lignes.slice(0, 40)) {
+    const [ref, geste] = l.split("|");
+    const dans = /\{([^}]+)\}/.exec(ref || "");
+    const t = Date.parse(dans ? dans[1] : "");
+    if (Number.isFinite(t) && t > seuil) recentes.push((geste || "").slice(0, 60));
+  }
+  return recentes.length
+    ? { vivant: true, motif: `le dépôt a vécu de son propre chef depuis le relevé : ${recentes.length} geste(s) à son journal, dont « ${recentes[0]} »` }
+    : { vivant: false, motif: "aucun geste au journal de références depuis le relevé" };
+}
 
 /** HEAD + empreinte de l'état de travail. Deux nombres suffisent : ils bougent à la moindre écriture. */
 function etat(depot) {
@@ -111,10 +253,50 @@ function comparer(racine = racineParc, empreinte = EMPREINTE) {
       apres.head !== etatAvant.head ? `HEAD ${etatAvant.head.slice(0, 7)} → ${apres.head.slice(0, 7)}` : null,
       apres.travail !== etatAvant.travail ? `état de travail ${etatAvant.lignes} → ${apres.lignes} fichier(s) modifié(s)` : null,
     ].filter(Boolean).join(", ");
-    if (mandat && (nom === mandat || depot.endsWith(mandat))) declares.push(`${nom} : ${quoi} — MANDAT DÉCLARÉ (FORGE_MANDAT_PRODUIT)`);
-    else ecarts.push(`${nom} (${depot}) : ${quoi}`);
+    if (mandat && (nom === mandat || depot.endsWith(mandat))) {
+      declares.push(`${nom} : ${quoi} — MANDAT DÉCLARÉ (FORGE_MANDAT_PRODUIT)`);
+      continue;
+    }
+    // LE PRODUIT A LE DROIT DE BOUGER TOUT SEUL, et c'est même la règle. Mais CHAQUE SIGNAL a sa
+    // propre disculpation, et les mélanger rouvre le trou qu'on ferme : un premier jet acceptait
+    // « rien d'écrit depuis le relevé » pour le HEAD aussi — or après un commit l'arbre de travail
+    // est PROPRE, donc « rien d'écrit » est vrai par construction, et n'importe quel commit du
+    // pilot passait pour légitime. Sa propre recette l'a dit dans la minute.
+    //   · HEAD qui bouge → disculpé SEULEMENT par une histoire publiée sur le distant du produit ;
+    //   · arbre de travail qui bouge → disculpé SEULEMENT si aucun fichier cité n'a été écrit
+    //     depuis le relevé (une session qui dure plus d'un jour voit bouger ce qu'elle n'a pas fait).
+    const inexplique = [];
+    let preuves = [];
+    if (apres.head !== etatAvant.head) {
+      const pub = histoirePubliee(depot);
+      if (pub.publiee) preuves.push(pub.motif);
+      else inexplique.push(`HEAD non publié — ${pub.motif}`);
+    }
+    if (apres.travail !== etatAvant.travail) {
+      const frais = ecritDepuis(depot, avant.releve_le);
+      if (!frais.recent) preuves.push(frais.motif);
+      else {
+        // Des fichiers ont bougé depuis le relevé. Reste à savoir si la session du PRODUIT
+        // travaillait, elle, pendant la même fenêtre — son journal de références le dit.
+        const vif = depotVivant(depot, avant.releve_le);
+        if (vif.vivant) preuves.push(`${frais.motif} — mais ${vif.motif}`);
+        else inexplique.push(`${frais.motif} · ${vif.motif}`);
+      }
+    }
+    if (!inexplique.length) {
+      declares.push(`${nom} : ${quoi} — LE PRODUIT S'EST MODIFIÉ LUI-MÊME (${preuves.join(" · ")}). Rien n'est reproché : « seuls les produits se modifient eux-mêmes »`);
+      continue;
+    }
+    ecarts.push(`${nom} (${depot}) : ${quoi} — ${inexplique.join(" · ")}`);
   }
-  return { verdict: ecarts.length ? "FAIL" : "PASS", ecarts, declares,
+  // LA RÉFÉRENCE SE REMET À JOUR QUAND ELLE A ÉTÉ HONORÉE, et cette ligne évite une classe entière
+  // de faux blocages : sans elle, un mouvement légitime déjà déclaré est re-signalé à CHAQUE tour
+  // suivant, indéfiniment — et un avertissement qui revient sans rien vouloir dire s'apprend à être
+  // ignoré. On ne remet à jour QUE si rien n'est reproché : sinon l'écart s'effacerait au second
+  // essai et le blocage n'aurait aucune dent.
+  const verdict = ecarts.length ? "FAIL" : "PASS";
+  if (verdict === "PASS") { try { relever(racine, empreinte); } catch { /* référence non réécrite : le tour suivant reverra le même écart, ce qui est le comportement sûr */ } }
+  return { verdict, ecarts, declares,
            motif: `${Object.keys(avant.produits || {}).length} produit(s) suivi(s) depuis ${avant.releve_le}` };
 }
 
@@ -158,6 +340,75 @@ if (args.includes("--self-test")) {
 
   // L'autre produit, intact, ne doit pas être accusé : un contrôle qui accuse tout n'accuse rien.
   ok("le produit intact n'est PAS accusé", !r.ecarts.some((e) => /autre-produit/.test(e)));
+
+  // LE PRODUIT QUI SE MODIFIE LUI-MÊME, et c'est le cas qui a fait entrer ce discriminant
+  // (24/08/2026). Une autre session, celle du produit, a commité chez lui, fait fusionner sa
+  // demande de tirage et repris `main` : ce contrôle a accusé le pilot d'avoir écrit là où la
+  // décision humaine dit « seuls les produits se modifient eux-mêmes ». Il accusait donc de
+  // violer la règle celui qui la respectait. Le discriminant est mécanique : une histoire
+  // PUBLIÉE sur le distant du produit n'est pas un gribouillage local du pilot.
+  {
+    const distant = join(base, "_distants", "publie.git");
+    mkdirSync(dirname(distant), { recursive: true });
+    git(dirname(distant), "init", "-q", "--bare", "--initial-branch=main", "publie.git");
+    const seul = faire("produit-publie");
+    git(seul, "branch", "-M", "main");
+    git(seul, "remote", "add", "origin", distant);
+    git(seul, "push", "-q", "-u", "origin", "main");
+    const emp2 = join(base, "empreinte-publiee.json");
+    relever(base, emp2);
+    // Le produit avance CHEZ LUI puis publie : exactement ce que fait sa propre session.
+    writeFileSync(join(seul, "a.txt"), "sa propre reponse\n");
+    git(seul, "add", "-A"); git(seul, "-c", "user.email=x@y", "-c", "user.name=x", "commit", "-qm", "le produit repond a son audit");
+    git(seul, "push", "-q", "origin", "main");
+    let rp = comparer(base, emp2);
+    ok("le produit qui se modifie LUI-MÊME et publie n'est pas accusé",
+      !rp.ecarts.some((e) => /produit-publie/.test(e)));
+    ok("son mouvement est tout de même DÉCLARÉ, pas passé sous silence (loi n° 3)",
+      (rp.declares || []).some((d) => /produit-publie/.test(d) && /LUI-MÊME/.test(d)));
+    // Sens ROUGE du même discriminant : le MÊME dépôt, avec du travail local NON publié, redevient
+    // un écart. Sans ce cas, la porte ouverte plus haut ne se refermerait jamais.
+    writeFileSync(join(seul, "b.txt"), "ecriture de passage\n");
+    rp = comparer(base, emp2);
+    ok("le même produit avec du travail local NON publié → FAIL, et le constat NOMME le fichier",
+      rp.verdict === "FAIL" && rp.ecarts.some((e) => /produit-publie/.test(e) && /écrit\(s\) depuis le relevé/.test(e) && /b\.txt/.test(e)));
+  }
+
+  // LE DÉPÔT VIVANT, dans les deux sens (24/08). Un fichier apparu APRÈS le relevé est suspect —
+  // sauf si la session du produit travaillait, elle, pendant la même fenêtre. Son journal de
+  // références le dit, et ça se vérifie des deux côtés.
+  {
+    const vif = faire("produit-vivant");
+    const emp3 = join(base, "empreinte-vivant.json");
+    relever(base, emp3);
+    // (1) un fichier apparaît, et RIEN au journal : c'est le cas qui doit bloquer.
+    writeFileSync(join(vif, "depose-par-le-pilot.txt"), "ecriture de passage\n");
+    let rv = comparer(base, emp3);
+    ok("un fichier apparu sans aucun geste au journal → FAIL",
+      rv.verdict === "FAIL" && rv.ecarts.some((e) => /produit-vivant/.test(e) && /aucun geste au journal/.test(e)));
+    // (2) le même fichier, mais le dépôt a VÉCU depuis le relevé : c'est sa session qui travaille.
+    // Le geste choisi ne déplace PAS le HEAD final — deux bascules de branche — parce que sinon on
+    // testerait deux choses à la fois : un commit sans distant rendrait le HEAD « non publié », et
+    // le cas échouerait pour une raison qui n'est pas celle qu'on mesure. Le premier jet du test
+    // faisait exactement cette erreur.
+    git(vif, "checkout", "-q", "-b", "sa-branche");
+    git(vif, "checkout", "-q", "-");
+    // LE RELEVÉ EST ANTIDATÉ DE CINQ SECONDES, et ce n'est pas une commodité : la marge d'horloge
+    // exige qu'un geste soit NETTEMENT postérieur au relevé pour disculper. Dans la vraie vie, la
+    // session d'un produit travaille des secondes ou des minutes après ; dans une recette, tout
+    // tombe dans la même milliseconde. Antidater le relevé reproduit la vraie chronologie au lieu
+    // d'affaiblir la règle pour faire passer le test.
+    {
+      const j = JSON.parse(readFileSync(emp3, "utf8"));
+      j.releve_le = new Date(Date.parse(j.releve_le) - 5000).toISOString();
+      writeFileSync(emp3, JSON.stringify(j, null, 1) + "\n", "utf8");
+    }
+    rv = comparer(base, emp3);
+    ok("le même fichier, mais le dépôt a VÉCU depuis le relevé → pas d'écart",
+      !rv.ecarts.some((e) => /produit-vivant/.test(e)));
+    ok("et son mouvement est DÉCLARÉ avec la preuve du journal",
+      (rv.declares || []).some((d) => /produit-vivant/.test(d) && /de son propre chef/.test(d)));
+  }
 
   // Le MANDAT déclaré : le produit est suivi et RAPPORTÉ, jamais bloqué.
   process.env.FORGE_MANDAT_PRODUIT = "mon-produit";
