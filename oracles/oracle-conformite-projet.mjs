@@ -769,6 +769,41 @@ else {
     if (!existsSync(join(dp, f))) { ko("R-20", `docs\\projet\\${f}`, "projection générée manquante — régénérer via les scripts du pilot (generer-architecture / generer-modele-donnees)"); ok20 = false; }
   }
   if (ok20) ok("R-20", "docs\\projet\\", `${FICHIERS_DP.length} fichiers + ${PROJECTIONS_DP.length} projections présents, frontmatter machine complet`);
+  // R-20 (suite) · COMPOSANTS-OPS porte aussi les ENVIRONNEMENTS DE DONNÉES (TF-0579, 24/08,
+  // retour Produit-10). LE FAIT MESURÉ : le fichier était défini comme l'inventaire des COMPOSANTS
+  // DÉPLOYÉS, « depuis ops etat / plans / DOSSIER-MEP ». Un produit d'analyse qui ne déploie
+  // RIEN mais interroge PLUSIEURS workspaces n'avait donc, en toute conformité, qu'à y écrire
+  // « aucun composant déployé » — ce qu'un produit a fait pendant onze jours, en une ligne, avec
+  // pour seule trace un identifiant d'hôte nu dans un tableau de dépendance externe. Le 24/08,
+  // l'humain donne un nom de workspace ; ce nom ne se rapproche d'AUCUN élément du dépôt ; la
+  // réponse rendue est fausse. Le fichier censé porter ce rapprochement existait, était
+  // CONFORME, et ne portait pas l'information.
+  //
+  // La classe est générique : tout produit d'analyse de données a des environnements et aucun
+  // composant déployé. Le manque était dans la DÉFINITION du fichier, pas dans son contrôle —
+  // cet oracle ne pouvait pas le voir, et il le déclare lui-même dans ses limites.
+  //
+  // ANTÉRIORITÉ, pas défaut, par le même mécanisme que la section « Contraintes connues »
+  // (TF-0528) : le signal de date est DANS le fichier. Un COMPOSANTS-OPS non revu depuis le
+  // 24/08 n'a rien fait de mal, c'est la règle qui a bougé. Exigée dès la prochaine revue datée.
+  //
+  // Ce qui est jugé : la PRÉSENCE de la section. Son contenu ne l'est pas, et « aucun
+  // environnement de données interrogé » est une réponse COMPLÈTE — la loi n° 3 demande que
+  // l'absence se DÉCLARE, elle n'exige pas qu'il y ait quelque chose à déclarer.
+  const cop = join(dp, "COMPOSANTS-OPS.md");
+  if (existsSync(cop)) {
+    const texteCop = readFileSync(cop, "utf8");
+    const frontCop = frontmatter(texteCop) || "";
+    const verifieCop = (/^verifie_le\s*:\s*(\d{4}-\d{2}-\d{2})\s*$/m.exec(frontCop) || [])[1] || null;
+    const aLaSection = /^#{2,}\s.*environnements?\s+de\s+donn[ée]es/im.test(texteCop);
+    if (aLaSection)
+      ok("R-20", "docs\\projet\\COMPOSANTS-OPS.md", "section « Environnements de données » présente — les instances INTERROGÉES sont déclarées, pas seulement les composants déployés");
+    else if (verifieCop && verifieCop >= "2026-08-24")
+      ko("R-20", "docs\\projet\\COMPOSANTS-OPS.md", `section « Environnements de données » absente d'un document revu le ${verifieCop}, donc APRÈS l'entrée en vigueur (TF-0579, 24/08) : un produit qui ne déploie rien mais LIT des workspaces n'a alors aucun endroit où déclarer ce qu'il interroge, et un nom d'instance donné par un humain ne se rapproche de rien dans le dépôt. Par environnement : nom d'affichage, hôte, identifiant, metastore, profil de connexion, entrepôt employé, et les catalogues avec leur MODE D'ACCÈS (lu / écrit / jamais ouvert) ; plus une section pour ceux connus par DOCUMENTS INTERPOSÉS. La section se déclare même vide — « aucun environnement de données interrogé » — jamais par silence (loi n° 3). Gabarit : gabarits\\docs-projet\\COMPOSANTS-OPS.md`);
+    else
+      antecedences.push(`R-20 (environnements de données) non jugé sur docs\\projet\\COMPOSANTS-OPS.md : la section naît le 24/08 (TF-0579) et le document porte verifie_le=${verifieCop || "non daté"} — antériorité déclarée, jamais un défaut de produit ; elle sera exigée dès la prochaine revue datée`);
+  }
+
 
   // R-21 · fraîcheur TECHNOS ↔ lockfiles (loi 4 : une donnée volatile est une donnée)
   const tp = join(dp, "TECHNOS.md");

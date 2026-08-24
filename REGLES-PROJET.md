@@ -101,8 +101,8 @@ importé (dépôt repris) : rattrapage explicite à l'ouverture de son premier r
 socle créé depuis l'état constaté, `.env.example` reconstruit (R-13) avant que R-22 ne juge.
 
 **Les règles nées des défauts réellement payés vivent dans `references\REGLES-DE-NON-REPETITION.md`**
-(23/08/2026) — neuf règles génériques, chacune avec le mécanisme qui l'exécute et son compte, plus
-deux déclarées sans mécanisme. Le document existe parce qu'une classe de défaut sans règle se
+(23/08/2026) — **vingt-sept** règles génériques, chacune avec le mécanisme qui l'exécute et son
+compte ; la section « sans mécanisme » est vide depuis le 23/08. Le document existe parce qu'une classe de défaut sans règle se
 re-paie autant de fois qu'il y a de sites, et qu'une règle sans mécanisme est une consigne.
 
 **Un reste-à-faire porte TROIS NATURES, et elles ne vivent pas au même endroit** (TF-0528,
@@ -116,6 +116,28 @@ déjà évoqué et traité », « non sujet, pourquoi cela sort ? » — non pou
 leur emplacement. Le contrôle vit dans `oracle-conformite-projet` (R-20, nature des lignes) et
 n'exige la troisième section qu'à partir du premier `verifie_le` postérieur au 23/08 : avant, c'est
 la règle qui a bougé, pas le produit.
+
+**`COMPOSANTS-OPS.md` porte DEUX inventaires, pas un** (TF-0579, 24/08/2026, retour Produit-10). Le
+fichier était défini comme celui des **composants déployés**, « depuis `ops etat` / plans /
+DOSSIER-MEP ». Un produit d'analyse qui ne déploie **rien** mais interroge **plusieurs** entrepôts
+n'avait donc, en toute conformité, qu'à y écrire « aucun composant déployé » — ce qu'un produit a
+fait pendant onze jours, en une ligne, avec pour seule trace un identifiant d'hôte nu dans un
+tableau de dépendance externe. *Mesure du 24/08* : l'humain donne un nom de workspace ; ce nom ne
+se rapproche d'**aucun** élément du dépôt ; la réponse rendue est fausse, et le fichier censé
+porter ce rapprochement existait, était **conforme**, et vide de l'information. Le manque était
+dans la **définition** du fichier, pas dans son contrôle — `oracle-conformite-projet` vérifie la
+présence des huit fichiers et leur frontmatter, jamais la pertinence de leur contenu, et il le
+déclare lui-même. La classe est **générique** : tout produit d'analyse de données a des
+environnements et aucun composant déployé. Le fichier porte donc aussi les **environnements de
+données interrogés** — par environnement : nom d'affichage (et *comment on le sait*), hôte,
+identifiant, metastore, profil de connexion, entrepôt employé, et les catalogues avec leur **mode
+d'accès** (lu / écrit / jamais ouvert) ; plus une section pour ceux connus par **documents
+interposés**, avec les documents qui en portent la connaissance et leur péremption ; plus un mode
+d'emploi « retrouver un environnement à partir d'un fragment de nom », qui dise que le nommage
+d'un environnement et celui de ses catalogues sont **indépendants**. La section se déclare même
+vide — « aucun environnement de données interrogé » — jamais par silence (loi n° 3). Le contrôle
+vit dans `oracle-conformite-projet` (R-20) et n'exige la section qu'à partir du premier
+`verifie_le` postérieur au 24/08, par le même mécanisme d'antériorité déclarée que ci-dessus.
 
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|

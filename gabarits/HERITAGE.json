@@ -1,6 +1,6 @@
 {
   "schema": "pilot/heritage@1",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "date": "2026-08-24",
   "regle": "Tout artefact que le pilot COPIE chez un produit se déclare ici avec son mode de contrôle. Un artefact absent de ce référentiel n'est pas jugé par R-47 — l'oubli se voit à la revue, il ne se devine pas.",
   "pourquoi": "Constat du 23/08, deux produits en trois jours. Produit-02 possède un `forge\\retours\\` complet, portant ses lots, et AUCUN gabarit RETOURS-FORGES.md : le dossier a été créé, la copie n'y est jamais arrivée. Produit-05 n'a ni l'un ni l'autre. Résultat mesuré : 15 candidatures refusées à l'ingestion par R-45/R-46 pour une forme que le produit ne pouvait pas connaître, faute d'avoir le gabarit qui la porte. La cause n'était pas une négligence de produit mais une COPIE SANS PREUVE : rien ne vérifiait qu'elle était arrivée, et rien ne vérifie encore qu'elle est à jour. Le contrôle R-43 lui-même ne fait qu'un `existsSync` sur les hooks — un hook périmé passe au vert.",
@@ -19,8 +19,15 @@
       "source": "gabarits/RETOURS-FORGES.md",
       "cible": "forge/retours/RETOURS-FORGES.md",
       "mode": "copie_conforme",
-      "motif": "le canal de retours du produit. Sa FORME est jugée à l'ingestion par R-45 et R-46 : un produit qui ne l'a pas ne peut pas produire un lot conforme, et son travail est refusé à la porte. C'est l'artefact qui a coûté 15 candidatures en trois jours.",
+      "motif": "le canal de retours du produit. Sa FORME est jugée à l'ingestion par R-45 et R-46 : un produit qui ne l'a pas ne peut pas produire un lot conforme, et son travail est refusé à la porte. C'est l'artefact qui a coûté 15 candidatures en trois jours. Son JUGE voyage avec lui depuis le 24/08 (`gabarits/oracle-lot-retours.mjs`) : un texte sans juge decore, un juge sans son texte force a deviner — les deux ou rien, meme raisonnement que pour RESTITUTION.md.",
       "depuis": "2026-08-23"
+    },
+    {
+      "source": "gabarits/oracle-lot-retours.mjs",
+      "cible": "forge/retours/oracle-lot.mjs",
+      "mode": "copie_conforme",
+      "motif": "LE JUGE de la forme d'un lot, a cote du gabarit qui la decrit. TF-0582 (24/08) : SIX lots admis par derogation en une journee, tous pour les memes sections R-45/R-46 absentes. La cause mesuree est TRIPLE — un produit sans heritage, un produit jamais instancie, et un produit qui a le gabarit A JOUR et ne l'applique pas (quatre lots sur six, le cas le plus frequent). Seul le troisieme n'avait AUCUN controle : les regles vivaient uniquement a la porte du pilot, donc le produit decouvrait le refus apres coup — et sous derogation, jamais. Copie CONFORME et non simple presence : deux implementations de la meme forme donneraient deux verites (defaut nomme par TF-0474 sur les empreintes). Le produit joue `node forge\retours\\oracle-lot.mjs \"<son lot>.md\"` avant de remettre ; le pilot importe le MEME module a l'ingestion.",
+      "depuis": "2026-08-24"
     },
     {
       "source": "gabarits/hooks-factory.mjs",

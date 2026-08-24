@@ -169,6 +169,29 @@ try {
     attendre("racine propre une fois le doublon retiré", lancer(), 0, /racine propre/);
   }
 
+  // 3 ter. LE VERSANT FICHIERS (TF-0583) — le balayage ne lisait que les RÉPERTOIRES, et c'est
+  //     pour cette raison qu'un fichier a vécu trois jours à la racine du parc sans qu'aucun
+  //     contrôle ne le nomme. Les deux sens, et le second compte autant : un fichier ordinaire à
+  //     la racine ne doit RIEN déclencher, sinon le contrôle crie sur des archives légitimes.
+  {
+    const puits = join(racine, "null");
+    writeFileSync(puits, "<html>Error 403 - Forbidden</html>\n");
+    const r = lancer();
+    attendre("3 ter : un puits de redirection RATÉ à la racine est déclaré", r, 0, /FICHIER de \d+ octets à la racine/);
+    if (!/redirection `> \/dev\/null` jouée par un shell Windows/.test(r.stdout + r.stderr))
+      echecs.push("3 ter : le constat ne dit pas la CAUSE — sans elle, on efface le fichier et la cause revient");
+    if (!/geste HUMAIN/.test(r.stdout + r.stderr))
+      echecs.push("3 ter : le constat ne rappelle pas que supprimer appartient à l'humain");
+    if (!existsSync(puits)) echecs.push("3 ter : le contrôle a SUPPRIMÉ le fichier — il doit le déclarer, pas l'effacer");
+    unlinkSync(puits);
+
+    // Le SECOND SENS : une archive ou un fichier ordinaire à la racine reste muet.
+    const ordinaire = join(racine, "notes-de-parc.md");
+    writeFileSync(ordinaire, "# notes\n");
+    attendre("3 ter : un fichier ORDINAIRE à la racine ne déclenche rien", lancer(), 0, /racine propre|racine sans dépôt/);
+    unlinkSync(ordinaire);
+  }
+
   // 4. preuve absente puis restaurée
   const p = join(racine, FORGES[1].nom, FORGES[1].preuve);
   unlinkSync(p);
@@ -182,4 +205,4 @@ try {
 }
 
 if (echecs.length) { console.error("bootstrap : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log(`bootstrap : ${joues}/${joues} — vierge clone ${FORGES.length}/${FORGES.length}, retard refusé puis résorbé par --pull, alias renommé sans doublon, second clone et répertoire non versionné DÉCLARÉS sans être effacés (TF-0525), clone d'AVANT un renommage reconnu par sa table d'alias (TF-0533), preuve absente refusée puis restaurée`);
+console.log(`bootstrap : ${joues}/${joues} — vierge clone ${FORGES.length}/${FORGES.length}, retard refusé puis résorbé par --pull, alias renommé sans doublon, second clone et répertoire non versionné DÉCLARÉS sans être effacés (TF-0525), puits de redirection raté déclaré avec sa CAUSE et un fichier ordinaire muet (TF-0583), clone d'AVANT un renommage reconnu par sa table d'alias (TF-0533), preuve absente refusée puis restaurée`);

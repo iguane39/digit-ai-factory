@@ -59,6 +59,10 @@ writeFileSync(join(verte, "forge", "hooks", "factory.mjs"), readFileSync(join(GA
 // TF-0571 (24/08) : LE TEXTE de la doctrine voyage avec le hook qui la juge. La fixture verte le
 // porte donc aussi — sinon elle prouverait un heritage que le referentiel ne declare plus.
 writeFileSync(join(verte, "forge", "RESTITUTION.md"), readFileSync(join(GAB47, "RESTITUTION.md"), "utf8"));
+// TF-0582 (24/08) : le JUGE de la forme d'un lot entre a l'heritage, a cote du gabarit qui la
+// decrit — pour que le produit se juge AVANT de remettre, et pas seulement a la porte du pilot.
+// La verte le porte donc, sinon elle prouverait un heritage que le referentiel ne declare plus.
+writeFileSync(join(verte, "forge", "retours", "oracle-lot.mjs"), readFileSync(join(GAB47, "oracle-lot-retours.mjs"), "utf8"));
 // R-27 verte : surface web ouverte aux agents IA + llms.txt à côté (un blocage CONSIGNÉ
 // reste conforme — la décision datée au-dessus de la règle)
 writeFileSync(join(verte, "robots.txt"),
@@ -70,8 +74,12 @@ mkdirSync(join(verte, "docs", "projet"), { recursive: true });
 writeFileSync(join(verte, "package-lock.json"), JSON.stringify({ packages: { "node_modules/express": { version: "5.1.0" } } }, null, 1).replace('"version": "5.1.0"', '"express"\n   : { "version": "5.1.0" }') + "\n"); // contient "express" et "5.1.0"
 writeFileSync(join(verte, "docs", "projet", "TECHNOS.md"),
   '---\nrole: technos\nsources_de_verite: [package-lock.json]\nverifie_le: 2026-08-11\nversions:\n  express: "5.1.0"\n---\n# Technos\n');
+// TF-0579 (24/08) : la verte porte la section « Environnements de données » ET une date
+// POSTÉRIEURE à l'entrée en vigueur — sans les deux, la branche PASS de la règle ne serait jouée
+// par personne (la borne d'antériorité rendrait un `non_juge`, jamais un PASS).
 writeFileSync(join(verte, "docs", "projet", "COMPOSANTS-OPS.md"),
-  '---\nrole: composants\nsources_de_verite: ["ops.mjs etat"]\nverifie_le: 2026-08-11\n---\n# Composants\n');
+  '---\nrole: composants et environnements de données\nsources_de_verite: ["ops.mjs etat"]\nverifie_le: 2026-08-24\n---\n# Composants\n\n' +
+  '## Environnements de données\n\naucun environnement de données interrogé — ce produit déploie, il ne lit aucun entrepôt.\n');
 writeFileSync(join(verte, "docs", "projet", "PARAMETRAGE.md"),
   '---\nrole: parametrage\nsources_de_verite: [.env.example]\nverifie_le: 2026-08-11\nvariables:\n  - PORT\n  - API_TIERCE_CLE\n---\n# Paramétrage\n\n' +
   '## URLs & ports par environnement\n\n' + // R-24 verte : hôtes <appli>-{env}, locale et placeholders hors périmètre
@@ -769,7 +777,38 @@ check("antériorité-nature : le même document revu AVANT l'entrée en vigueur 
   if (!declare) throw new Error("l'antériorité n'est pas DÉCLARÉE au non_juge — un contrôle qui se tait sans le dire est un contrôle absent");
 });
 
-for (const d of [verte, rouge, rougeDocs, rougeLock, rougeR24, ecartR24, rougeR2, verteR2, rougeR19, verteR19, rougeR42, verteR42, partielR42, verteTdp, rougeTdp, rougeTdpNu, rougeTdpNature, verteTdpNature, rougeTdpSection, antTdpSection]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+// TF-0579 — les ENVIRONNEMENTS DE DONNÉES de COMPOSANTS-OPS, dans les TROIS sens. Le fait
+// mesuré : un produit d'analyse qui ne déploie rien écrivait « aucun composant déployé » en toute
+// conformité, et le nom de workspace donné par l'humain ne se rapprochait de rien dans le dépôt.
+const COP_NU = ['---', 'role: composants', 'sources_de_verite: ["ops.mjs etat"]', 'verifie_le: 2026-08-24', '---', '', '# Composants Ops', '', '## Hiérarchie', '', 'aucun composant déployé', ''].join("\n");
+const rougeCop = mkdtempSync(join(tmpdir(), "conf-rouge-cop-"));
+ecrireDans(rougeCop, "docs/projet/COMPOSANTS-OPS.md", COP_NU);
+check("rouge-COMPOSANTS-OPS : section « Environnements de données » absente d'un document revu APRÈS le 24/08 → défaut", () => {
+  const { rapport } = lance(rougeCop);
+  const f = rapport.findings.find((x) => x.regle === "R-20" && x.statut === "FAIL" && /Environnements de données/.test(x.message));
+  if (!f) throw new Error("l'absence de la section des environnements de données n'est pas dénoncée");
+  if (!/2026-08-24/.test(f.message)) throw new Error("le constat ne dit pas SUR QUELLE DATE il s'appuie pour juger");
+  if (!/aucun environnement de données interrogé/.test(f.message)) throw new Error("le constat ne dit pas comment se déclare une section vide (loi n° 3)");
+  if (!/mode d'accès/i.test(f.message)) throw new Error("le constat ne dit pas ce que la section doit porter — un refus sans son remède se contourne");
+});
+
+const antCop = mkdtempSync(join(tmpdir(), "conf-ant-cop-"));
+ecrireDans(antCop, "docs/projet/COMPOSANTS-OPS.md", COP_NU.replace("verifie_le: 2026-08-24", "verifie_le: 2026-08-20"));
+check("antériorité-COMPOSANTS-OPS : le même document revu AVANT l'entrée en vigueur → non jugé, jamais accusé", () => {
+  const { rapport } = lance(antCop);
+  if (rapport.findings.some((x) => x.regle === "R-20" && x.statut === "FAIL" && /Environnements de données/.test(x.message)))
+    throw new Error("un document antérieur à la règle est mis en défaut — c'est la RÈGLE qui a bougé, pas le produit (TF-0366)");
+  const declare = (rapport.non_juge || []).find((x) => /environnements de données.*verifie_le=2026-08-20/.test(x));
+  if (!declare) throw new Error("l'antériorité n'est pas DÉCLARÉE au non_juge — un contrôle qui se tait sans le dire est un contrôle absent");
+});
+
+check("verte-COMPOSANTS-OPS : la section présente, même pour déclarer « aucun », rend PASS", () => {
+  const { rapport } = lance(verte);
+  const f = rapport.findings.find((x) => x.regle === "R-20" && x.statut === "PASS" && /Environnements de données/.test(x.message));
+  if (!f) throw new Error("la branche PASS de la règle n'est jouée par personne — une section déclarée « aucun » est une réponse COMPLÈTE");
+});
+
+for (const d of [verte, rouge, rougeDocs, rougeLock, rougeR24, ecartR24, rougeR2, verteR2, rougeR19, verteR19, rougeR42, verteR42, partielR42, verteTdp, rougeTdp, rougeTdpNu, rougeTdpNature, verteTdpNature, rougeTdpSection, antTdpSection, rougeCop, antCop]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 // TF-0541 (24/08) — un ledger ecrit AILLEURS etait indiscernable d'un run jamais ouvert. Le
 // produit ecrivait dans `runs\\<run>\\ledger.jsonl` et l'oracle rendait SANS_OBJET : un run REEL
 // passait pour inexistant. Les deux sens se jouent sur le meme projet, seule la place du fichier

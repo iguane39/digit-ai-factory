@@ -560,7 +560,7 @@ function juger(texte) {
   // LA FORME EXIGÉE : soit une SECONDE sonde de nature différente est nommée dans la même phrase,
   // soit l'énoncé se formule en « cette source me montre X » plutôt qu'en « il n'y a pas de X ».
   // Non bloquant : la règle apprend une tournure, elle ne refuse pas un travail juste.
-  const NEGATIF_EXTERNE = /(n.existe pas|n.est pas (?:mis|pos[ée]|cr[éeé]{1,2}|configur[ée]|d[ée]clar[ée])|il n.y a (?:pas|aucun)|aucun(?:e)? (?:enregistrement|entr[ée]e|r[ée]ponse|trace|jeton|domaine|route|champ)|(?:page|url|ressource|route|endpoint) (?:morte|inexistante|absente)|404|pas (?:de|d.) (?:TXT|CNAME|enregistrement))/i;
+  const NEGATIF_EXTERNE = /(n.existe pas|n.est pas (?:mis|pos[ée]|cr[éeé]{1,2}|configur[ée]|d[ée]clar[ée])|il n.y a (?:pas|aucun)|aucun(?:e)? (?:enregistrement|entr[ée]e|r[ée]ponse|trace|jeton|domaine|route|champ)|(?:page|url|ressource|route|endpoint) (?:morte|inexistante|absente)|\b404\b|pas (?:de|d.) (?:TXT|CNAME|enregistrement))/i;
   const SUJET_EXTERNE = /(API|DNS|TXT|CNAME|URL|https?:|GraphQL|OpenAPI|console|h[ée]bergeur|fournisseur|domaine|endpoint|OVH|Railway|Cloudflare|Google|Azure|GitHub)/i;
   const DEUX_SONDES = /(HEAD\s*(?:et|puis|\+)\s*GET|GET\s*(?:et|puis|\+)\s*HEAD|deux (?:sondes|m[ée]thodes|sources|appels)|introspection|seconde sonde|autre (?:m[ée]thode|point d.entr[ée]e|r[ée]solveur)|confirm[ée] par|recoup[ée])/i;
   const FORMULE_PRUDENTE = /(cette source (?:me )?montre|d.apr[èe]s cette source|la source interrog[ée]e (?:ne )?(?:montre|rend)|au vu de cette seule)/i;
@@ -573,6 +573,61 @@ function juger(texte) {
       "une liste ne dit pas qu'elle est complète, un 404 ne dit pas quelle méthode l'a produit. Nommer une SECONDE sonde de nature différente, " +
       `ou écrire « cette source me montre X » plutôt que « il n'y a pas de X ». Ex. : ${nues[0].replace(/\s+/g, " ").slice(0, 110)}`);
     else ok("S22", `${risquees.length} négatif(s) externe(s), chacun corroboré par une seconde sonde ou formulé comme une lecture de source`);
+  }
+
+  // ---- S24 (TF-0581, 24/08) — une recherche par NOM qui ne trouve rien n'établit que l'absence
+  // du NOM -----------------------------------------------------------------------------------------
+  //
+  // SŒUR DE S22, ET DÉLIBÉRÉMENT DISTINCTE. S22 traite le négatif prononcé sur une ressource
+  // EXTERNE depuis une seule sonde, et son acquittement est une SECONDE SONDE de nature différente.
+  // Ici l'objet n'est pas une ressource externe mais un CATALOGUE DE NOMS interrogé par motif, et
+  // l'acquittement n'est pas une seconde sonde : c'est une recherche par STRUCTURE. Les mêler
+  // aurait donné une règle dont le message ne sait plus quoi demander — et un message qui prescrit
+  // la moitié du geste conduit droit à une seconde violation (leçon de TF-0552).
+  //
+  // DEUX FAUX NÉGATIFS EN UNE JOURNÉE, tous deux rendus comme des faits d'absence.
+  // (1) « Aucune table de transcodification » — conclu après avoir cherché DIX motifs de NOM DE
+  // TABLE (`%transcod%`, `%corresp%`, `%mapping%`, `%codif%`…) sur trois schémas. La
+  // correspondance existait, dans un schéma nommé `dl50` dont les tables s'appellent `customer` et
+  // `owner` et dont les COLONNES s'appellent `COD_CLIENT_ALX` — hors d'atteinte des dix motifs, qui
+  // portaient tous sur des noms de tables. La conclusion a fondé une demande d'évolution de schéma
+  // qu'il a fallu suspendre.
+  // (2) Interrogé sur un WORKSPACE nommé `..._D2`, un catalogue au nom contenant `_d2` a été
+  // cherché, aucun n'a été trouvé, et « aucun environnement D2 » a été répondu — alors que le
+  // nommage d'un workspace et celui de ses catalogues sont INDÉPENDANTS, et que le test ne portait
+  // donc pas sur la question posée.
+  //
+  // CE QUI REND CES DEUX CAS INÉVITABLES SANS RÈGLE, et c'est exactement le mécanisme de S22 sur un
+  // autre objet : *une recherche par nom qui ne trouve rien établit que LE NOM cherché n'existe
+  // pas, jamais que LA CHOSE cherchée n'existe pas.* Énumérer ses dix motifs — ce que le premier
+  // cas faisait scrupuleusement — ne répare rien : dix motifs de la même NATURE partagent le même
+  // angle mort.
+  //
+  // LA FORME EXIGÉE : déclarer la recherche complémentaire par STRUCTURE — chercher des colonnes
+  // plutôt que des tables, un motif de VALEURS plutôt qu'un motif de nom, une contrainte de clé
+  // plutôt qu'un libellé — ou formuler « aucun objet dont le NOM porte X » plutôt que « aucun X ».
+  // Non bloquant, comme S22 : la règle apprend une tournure, elle ne refuse pas un travail juste.
+  const ABSENCE_TROUVEE = /(aucun(?:e)?\s|n.existe pas|introuvable|rien\s+(?:ne\s+)?(?:correspond|ressort|remonte)|pas\s+(?:de|d.)\s|z[ée]ro\s)/i;
+  const OBJET_DE_CATALOGUE = /(table|colonne|sch[ée]ma|catalogue|workspace|entrep[ôo]t|vue|base de donn[ée]es|m[ée]tastore|espace de travail|environnement)/i;
+  // La marque d'une recherche PAR NOM : un motif d'expression, un `LIKE`, un `grep`, ou le fait de
+  // dire qu'on a cherché un nom. C'est cette marque qui distingue « aucune table de X » (une
+  // conclusion tirée d'une recherche) de « aucune table n'est écrite » (un fait du produit).
+  const RECHERCHE_PAR_NOM = /(%[\w]+%|LIKE\s|ILIKE\s|grep|motif|pattern|nom\s+(?:contenant|comportant|qui\s+contient)|contenant\s+`|par\s+nom|dont\s+le\s+nom)/i;
+  // L'acquittement : la recherche par STRUCTURE est déclarée, ou l'énoncé se borne au NOM.
+  const PAR_STRUCTURE = /(par\s+structure|structurel|des\s+colonnes\s+plut[ôo]t|motif\s+de\s+valeurs|par\s+valeurs|contrainte\s+de\s+cl[ée]|information_schema\.columns|recherche\s+compl[ée]mentaire|crois[ée]\s+avec)/i;
+  const BORNE_AU_NOM = /(dont\s+le\s+NOM|aucun\s+objet\s+dont\s+le\s+nom|le\s+nom\s+cherch[ée]|au\s+vu\s+des\s+seuls\s+noms|sur\s+ce\s+seul\s+crit[èe]re\s+de\s+nom)/i;
+  {
+    const phrases = texte.split(/(?<=[.!?;])\s+|\n/).map((x) => x.trim()).filter(Boolean);
+    const risquees = phrases.filter((x) =>
+      ABSENCE_TROUVEE.test(x) && OBJET_DE_CATALOGUE.test(x) && RECHERCHE_PAR_NOM.test(x));
+    const nues = risquees.filter((x) => !PAR_STRUCTURE.test(x) && !BORNE_AU_NOM.test(x));
+    if (!risquees.length) ok("S24", "aucune absence conclue d'une recherche par nom — rien à borner");
+    else if (nues.length) ko("S24", `${nues.length} absence(s) sur ${risquees.length} conclue(s) d'une recherche PAR NOM : ` +
+      "une recherche par nom qui ne trouve rien établit que LE NOM cherché n'existe pas, jamais que LA CHOSE cherchée n'existe pas — " +
+      "et énumérer dix motifs de la même nature ne répare rien, ils partagent le même angle mort. Déclarer la recherche complémentaire " +
+      "par STRUCTURE (des colonnes plutôt que des tables, un motif de valeurs plutôt qu'un motif de nom), ou écrire « aucun objet dont le " +
+      `NOM porte X ». Ex. : ${nues[0].replace(/\s+/g, " ").slice(0, 110)}`);
+    else ok("S24", `${risquees.length} absence(s) conclue(s) d'une recherche par nom, chacune bornée au nom ou complétée par une recherche de STRUCTURE`);
   }
 
   // ---- S19 (TF-0510, 22/08) — une action dit ce qui se passe si elle n'est PAS faite -------
@@ -926,7 +981,9 @@ Aucun écart : la demande a été suivie à la lettre.
     // S23 : le designateur employe plusieurs fois et JAMAIS glose — la forme exacte du 24/08,
     // ou le lecteur a repondu « rien compris a V1, V3, V4, de quoi parle-t-on ? ».
     .replace("## 4. Traité", "## 4. Traité\n\n- Les controles V1 et V3 sont tenus ; V1 reste le plus couteux. — preuve : 4 cas.")
-    .replace("## 7. Risques", "## 7. Risques\n\n- L'API du fournisseur ne rend aucun enregistrement TXT : il n'y a pas de TXT côté DNS.\n");
+    // S24 : l'absence conclue d'une recherche PAR NOM — la forme exacte du 24/08, dix motifs de nom
+    // de table joués sur trois schémas, et la correspondance qui vivait dans les COLONNES.
+    .replace("## 7. Risques", "## 7. Risques\n\n- L'API du fournisseur ne rend aucun enregistrement TXT : il n'y a pas de TXT côté DNS.\n\n- Aucune table de transcodification : les motifs %transcod%, %corresp% et %mapping% ne remontent rien sur les trois schémas.\n");
   // TF-0567 — la branche « ouverture TITRÉE » a ses DEUX sens, sinon elle serait une porte ouverte :
   // titrée et conforme doit passer (c'est le défaut mesuré : 30 mots lus comme 0), titrée et
   // technique doit continuer d'échouer — un titre ne blanchit rien.
@@ -944,7 +1001,7 @@ Aucun écart : la demande a été suivie à la lettre.
   if (rr.status !== 1) casse.push("la fixture ROUGE ne FAIL pas");
   else {
     for (const regle of ["S2", "S3", "S5", "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16",
-                         "S17", "S18", "S19", "S20", "S21", "S22", "S23"]) {
+                         "S17", "S18", "S19", "S20", "S21", "S22", "S23", "S24"]) {
       if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
     }
   }
@@ -1026,7 +1083,7 @@ Aucun écart : la demande a été suivie à la lettre.
   }
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 11/11 PASS (verte PASS ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose)");
+    : "Self-test restitution : 11/11 PASS (verte PASS ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom)");
   process.exit(casse.length ? 1 : 0);
 }
 

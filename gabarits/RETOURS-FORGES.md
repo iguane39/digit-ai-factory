@@ -13,6 +13,28 @@
   (seule édition autorisée après coup : cette ligne de statut).
 - **Statut** : a_remettre
 
+> ## ⛔ AVANT DE REMETTRE — un geste, une seconde
+>
+> ```
+> node forge\retours\oracle-lot.mjs "<ce fichier>.md"
+> ```
+>
+> Il rend **0** si la forme du lot est tenue, **1** sinon — et il dit alors ce qui manque *et le
+> geste qui répare*. C'est **exactement le contrôle** que la porte du pilot joue à l'ingestion :
+> le même module, importé des deux côtés. Un lot qui passe ici passe là-bas.
+>
+> **Pourquoi ce paragraphe existe** (TF-0582, 24/08/2026). En une seule journée, **six** lots ont
+> dû être admis par dérogation, tous pour les mêmes deux sections absentes. La cause a été
+> cherchée jusqu'aux trois produits émetteurs et elle est **triple** : l'un n'avait jamais reçu ce
+> gabarit, l'autre n'avait jamais été instancié — et le troisième l'avait **à jour, recopié le
+> matin même**, et a écrit son lot huit heures plus tard sans les sections. Ce troisième cas est
+> le plus fréquent (quatre lots sur six) et le seul qu'aucune recopie ne répare : la règle était
+> écrite en **prose** ici, et jugée en **code** là-bas. *Une affordance non câblée n'existe pas.*
+>
+> Le fichier `forge\retours\oracle-lot.mjs` absent ? Alors l'héritage du produit n'est pas tenu —
+> `oracle-conformite-projet` (R-47) le dit — et il se recopie depuis `gabarits\oracle-lot-retours.mjs`
+> du pilot, avec ce gabarit.
+
 Convention de gravité : **bloquant** (a bloqué ou failli bloquer) · **majeur** (a coûté un
 aller-retour ou une découverte par lecture de code) · **mineur** (confort/précision).
 Si un retour se rapporte à un item du registre TODO-FORGE du pilot, citer son id

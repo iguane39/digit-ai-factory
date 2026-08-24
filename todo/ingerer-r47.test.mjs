@@ -55,6 +55,10 @@ const poste = (nomProjet, { herite, sousDossier = null }) => {
     // hook qui la juge. Un produit conforme le porte donc, sinon la fixture verte prouverait un
     // heritage que le referentiel ne declare plus.
     writeFileSync(join(projet, "forge", "RESTITUTION.md"), readFileSync(join(GAB, "RESTITUTION.md"), "utf8"));
+    // TF-0582 (24/08) : le JUGE de la forme d'un lot voyage avec le gabarit qui la decrit, pour
+    // que le produit puisse se juger AVANT de remettre. Un produit conforme le porte donc lui
+    // aussi — sinon la fixture verte prouverait un heritage que le referentiel ne declare plus.
+    writeFileSync(join(projet, "forge", "retours", "oracle-lot.mjs"), readFileSync(join(GAB, "oracle-lot-retours.mjs"), "utf8"));
     writeFileSync(join(projet, ".claude", "settings.json"), JSON.stringify({ hooks: { Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }] } }));
     writeFileSync(join(projet, "CLAUDE.md"), "# projet\n\n## Précédence (R-43)\nLes règles de la factory priment.\n");
   }
