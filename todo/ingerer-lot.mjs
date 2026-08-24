@@ -17,7 +17,7 @@
 import { readFileSync, appendFileSync, existsSync, readdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
-import { dirname, join, resolve } from "node:path";
+import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -310,11 +310,37 @@ if (nouvelles.length > 1 && nomFichier.includes(" - RETOURS - ")) {
   const projet = nomFichier.split(" - RETOURS - ")[0];
   const racine = process.env.FORGE_ROOT || join(ICI, "..", "..");
   let dossier = null;
+  // LE SIDECAR PEUT DIRE OU IL HABITE, ET C'EST LA SEULE SOURCE SURE (TF-0555, 24/08). La
+  // recherche ci-dessous DEVINE ; le produit, lui, SAIT. Un sidecar qui porte `racine_produit`
+  // court-circuite donc toute heuristique — c'est la voie recommandee par le lot qui a signale le
+  // defaut, et elle ne coute qu'un champ.
+  const declaree = nouvelles.map((n) => n && n.racine_produit).find(Boolean);
+  if (declaree) {
+    const abs = isAbsolute(String(declaree)) ? String(declaree) : join(racine, String(declaree));
+    if (existsSync(join(abs, "forge"))) dossier = abs;
+    else console.error(`[R-47] le sidecar declare racine_produit = « ${declaree} », introuvable ou sans forge\ — on ne la suit pas les yeux fermes`);
+  }
   try {
-    const candidats = readdirSync(racine, { withFileTypes: true })
-      .filter((d) => d.isDirectory() && d.name.toLowerCase().startsWith(projet.toLowerCase()))
-      .map((d) => join(racine, d.name));
-    dossier = candidats.find((c) => existsSync(join(c, "forge")))
+    // DEUX NIVEAUX, ET LE SECOND A ETE PAYE. La recherche ne regardait que les ENFANTS DIRECTS de
+    // la racine. Or 22 produits du parc vivent sous un dossier de rangement client (`_Client-A\`) :
+    // tous etaient hors de portee. Le lot qui a signale ce defaut portait un produit dans ce cas,
+    // et le meme oracle pointe A LA MAIN sur son dossier rendait R-43 FAIL et R-47 FAIL avec deux
+    // artefacts absents — le defaut que la regle devait rattraper etait donc VIVANT, et le
+    // mecanisme cense le voir regardait ailleurs.
+    const enfants = (d) => { try { return readdirSync(d, { withFileTypes: true }).filter((x) => x.isDirectory()); } catch { return []; } };
+    const correspond = (nom) => nom.toLowerCase().startsWith(projet.toLowerCase());
+    const candidats = [];
+    for (const d1 of enfants(racine)) {
+      const c1 = join(racine, d1.name);
+      if (correspond(d1.name)) candidats.push(c1);
+      // Un dossier de RANGEMENT n'est pas un produit : il n'a pas de `forge\`, et on descend d'un
+      // cran. Borne a deux niveaux — au-dela, on balaierait le disque pour deviner.
+      if (!existsSync(join(c1, "forge"))) {
+        for (const d2 of enfants(c1)) if (correspond(d2.name)) candidats.push(join(c1, d2.name));
+      }
+    }
+    dossier = dossier
+      || candidats.find((c) => existsSync(join(c, "forge")))
       || candidats.map((c) => join(c, "projet")).find((c) => existsSync(join(c, "forge")))
       || null;
   } catch { /* racine illisible : on ne devine pas */ }
@@ -322,6 +348,17 @@ if (nouvelles.length > 1 && nomFichier.includes(" - RETOURS - ")) {
     // Silence assumé et DIT : un produit qu'on ne localise pas sur ce poste n'est pas un produit
     // en défaut. Le contraire ferait crier l'ingestion sur toutes les remises venues d'ailleurs.
     console.error(`[R-47] conformité de l'héritage NON vérifiée pour « ${projet || "?"} » — dossier introuvable sous ${racine}. Ce n'est pas un constat sur le produit, c'est l'absence d'une cible à juger.`);
+    // UNE VÉRIFICATION NON FAITE QUI NE LAISSE PAS DE TRACE EST UNE VÉRIFICATION QU'ON CROIT FAITE
+    // (TF-0555, 24/08). Le message ci-dessus partait au seul flux d'erreur : il disparaissait avec
+    // la session. Le registre en garde donc une ligne, avec le nom cherché et la racine balayée —
+    // de quoi savoir, six mois plus tard, que ce lot est entré sans que l'héritage soit jugé.
+    // Même type d'événement que l'ingestion (le registre n'en accepte pas d'autre sans identifiant)
+    // et SANS `creations` : cette ligne ne couvre aucune candidature, elle consigne un silence.
+    appendFileSync(registre, JSON.stringify({
+      ev: "ingestion", ts: new Date().toISOString(), lot_sha: lotSha, fichier: String(sidecarPath),
+      heritage_non_verifie: { projet: projet || null, racine: String(racine),
+        motif: "produit introuvable sur ce poste — cible absente, aucun constat sur le produit" },
+    }) + "\n");
   } else {
     const r = spawnSync(process.execPath, [join(ICI, "..", "oracles", "oracle-conformite-projet.mjs"), dossier],
       { encoding: "utf8", timeout: 120000 });

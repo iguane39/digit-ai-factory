@@ -41,3 +41,177 @@ notamment les événements du registre `todo\TODO.jsonl`, jamais réécrits) :
 Même méthode appliquée le 13/08 aux `output\` des forges : agents (01-pv, 02-skills),
 design (01-pages-temoins), organization (01-etudes, 02-composants), seo (01-decisions,
 02-veille). forge-audit_client-a était déjà conforme (modèle d'origine : `01-…`/`07-…` + `old\`).
+
+<!-- index-livrables:debut — genere par scripts/generer-lisezmoi-output.mjs, NE PAS EDITER A LA MAIN -->
+
+## Index des livrables — le point d'entrée cliquable
+
+**Pourquoi cet index existe, et il vaut d'être lu une fois.** Le nom d'un livrable porte sa
+date et son indice — donc au moins trois espaces. Or le résolveur de liens de la session de
+travail **coupe le chemin au premier espace** : un livrable n'est jamais atteignable au clic,
+ni tel quel, ni encodé, ni entre chevrons. Mesuré le 24/08/2026 sur un produit : **22
+livrables, 0 atteignable**, pendant onze jours sans que la cause soit nommée.
+
+Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous sont donnés
+à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
+essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
+
+**État** : 115 livrable(s) courant(s), 8 archivé(s), 6 famille(s).
+
+### 01-revues-et-propositions
+
+| Livrable | Version | Poids | Chemin à copier |
+|---|---|---|---|
+| Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html | 20260815a | 35.1 Ko | `01-revues-et-propositions/Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html` |
+| Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html.jugement.json | — | 0.3 Ko | `01-revues-et-propositions/Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html.jugement.json` |
+| Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md | 20260815a | 7.1 Ko | `01-revues-et-propositions/Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md` |
+| Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md.jugement.json | — | 0.3 Ko | `01-revues-et-propositions/Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md.jugement.json` |
+| Digit-AI - Proposition Architecture - Circuit de l insatisfaction - 20260815a.md | 20260815a | 5.5 Ko | `01-revues-et-propositions/Digit-AI - Proposition Architecture - Circuit de l insatisfaction - 20260815a.md` |
+| Digit-AI - Proposition Architecture - Circuit de l insatisfaction - 20260815a.md.jugement.json | — | 0.4 Ko | `01-revues-et-propositions/Digit-AI - Proposition Architecture - Circuit de l insatisfaction - 20260815a.md.jugement.json` |
+| Digit-AI - Proposition Forge - Restitution lisible - 20260815a.md | 20260815a | 11.2 Ko | `01-revues-et-propositions/Digit-AI - Proposition Forge - Restitution lisible - 20260815a.md` |
+| Digit-AI - Proposition Forge - Restitution lisible - 20260815a.md.jugement.json | — | 0.3 Ko | `01-revues-et-propositions/Digit-AI - Proposition Forge - Restitution lisible - 20260815a.md.jugement.json` |
+| Digit-AI - Proposition Forge - Tuyauterie cognitive - 20260809a.md | 20260809a | 9.5 Ko | `01-revues-et-propositions/Digit-AI - Proposition Forge - Tuyauterie cognitive - 20260809a.md` |
+| Digit-AI - Proposition Forge - Tuyauterie cognitive - 20260809a.md.jugement.json | — | 0.3 Ko | `01-revues-et-propositions/Digit-AI - Proposition Forge - Tuyauterie cognitive - 20260809a.md.jugement.json` |
+| Digit-AI - Revue D8 - Restitutions du 15-08 - 20260815a.md | 20260815a | 3.8 Ko | `01-revues-et-propositions/Digit-AI - Revue D8 - Restitutions du 15-08 - 20260815a.md` |
+| Digit-AI - Revue D8 - Restitutions du 15-08 - 20260815a.md.jugement.json | — | 0.3 Ko | `01-revues-et-propositions/Digit-AI - Revue D8 - Restitutions du 15-08 - 20260815a.md.jugement.json` |
+| Digit-AI - Revue Forge - Écosystème - 20260808a.md | 20260808a | 11.4 Ko | `01-revues-et-propositions/Digit-AI - Revue Forge - Écosystème - 20260808a.md` |
+| Digit-AI - Revue Forge - Écosystème - 20260808a.md.jugement.json | — | 0.3 Ko | `01-revues-et-propositions/Digit-AI - Revue Forge - Écosystème - 20260808a.md.jugement.json` |
+| Digit-AI - Revue Forge - Écosystème - 20260808a.md.oracles-cache.json | — | 0 Ko | `01-revues-et-propositions/Digit-AI - Revue Forge - Écosystème - 20260808a.md.oracles-cache.json` |
+| Digit-AI - Revue Forge - Écosystème - 20260808a.md.oracles-historique.jsonl | — | 0.1 Ko | `01-revues-et-propositions/Digit-AI - Revue Forge - Écosystème - 20260808a.md.oracles-historique.jsonl` |
+| Digit-AI - Revue Forge - Écosystème - 20260808a.md.oracles.json | — | 1.9 Ko | `01-revues-et-propositions/Digit-AI - Revue Forge - Écosystème - 20260808a.md.oracles.json` |
+| Digit-AI - Revue Forge - Écosystème - 20260819a.md | 20260819a | 6.1 Ko | `01-revues-et-propositions/Digit-AI - Revue Forge - Écosystème - 20260819a.md` |
+| Digit-AI - Revue Forge - Écosystème - 20260819a.md.jugement.json | — | 0.3 Ko | `01-revues-et-propositions/Digit-AI - Revue Forge - Écosystème - 20260819a.md.jugement.json` |
+
+### 02-schema-ecosysteme
+
+| Livrable | Version | Poids | Chemin à copier |
+|---|---|---|---|
+| Forge Pilot - Schéma Écosystème - 20260820a.html | 20260820a | 57.9 Ko | `02-schema-ecosysteme/Forge Pilot - Schéma Écosystème - 20260820a.html` |
+| Forge Pilot - Schéma Écosystème - 20260820a.html.jugement.json | — | 0.3 Ko | `02-schema-ecosysteme/Forge Pilot - Schéma Écosystème - 20260820a.html.jugement.json` |
+| Forge Pilot - Schéma Écosystème - 20260811h.html *(archivé)* | 20260811h | 53.1 Ko | `02-schema-ecosysteme/old/Forge Pilot - Schéma Écosystème - 20260811h.html` |
+| Forge Pilot - Schéma Écosystème - 20260811h.html.jugement.json *(archivé)* | — | 0.3 Ko | `02-schema-ecosysteme/old/Forge Pilot - Schéma Écosystème - 20260811h.html.jugement.json` |
+| Forge Pilot - Schéma Écosystème - 20260812a.html *(archivé)* | 20260812a | 55.9 Ko | `02-schema-ecosysteme/old/Forge Pilot - Schéma Écosystème - 20260812a.html` |
+| Forge Pilot - Schéma Écosystème - 20260812a.html.jugement.json *(archivé)* | — | 0.3 Ko | `02-schema-ecosysteme/old/Forge Pilot - Schéma Écosystème - 20260812a.html.jugement.json` |
+| Forge Pilot - Schéma Écosystème - 20260812b.html *(archivé)* | 20260812b | 57.2 Ko | `02-schema-ecosysteme/old/Forge Pilot - Schéma Écosystème - 20260812b.html` |
+| Forge Pilot - Schéma Écosystème - 20260812b.html.jugement.json *(archivé)* | — | 0.3 Ko | `02-schema-ecosysteme/old/Forge Pilot - Schéma Écosystème - 20260812b.html.jugement.json` |
+| Forge Pilot - Schéma Écosystème - 20260813a.html *(archivé)* | 20260813a | 57.4 Ko | `02-schema-ecosysteme/old/Forge Pilot - Schéma Écosystème - 20260813a.html` |
+| Forge Pilot - Schéma Écosystème - 20260813a.html.jugement.json *(archivé)* | — | 0.3 Ko | `02-schema-ecosysteme/old/Forge Pilot - Schéma Écosystème - 20260813a.html.jugement.json` |
+
+### 03-etudes
+
+| Livrable | Version | Poids | Chemin à copier |
+|---|---|---|---|
+| 20260812-etude-forge-data-moteurs.md | — | 7.4 Ko | `03-etudes/20260812-etude-forge-data-moteurs.md` |
+| 20260812-etude-opportunite-forges.md | — | 15.2 Ko | `03-etudes/20260812-etude-opportunite-forges.md` |
+| 20260813-etude-opportunite-outillage-analyse.md | — | 20.1 Ko | `03-etudes/20260813-etude-opportunite-outillage-analyse.md` |
+| 20260813-etude-personas-agents.md | — | 11.4 Ko | `03-etudes/20260813-etude-personas-agents.md` |
+| 20260814-etude-opportunite-pans-tests-prompts.md | — | 18.6 Ko | `03-etudes/20260814-etude-opportunite-pans-tests-prompts.md` |
+| 20260814-etude-opportunite-pentest-owasp.md | — | 17.4 Ko | `03-etudes/20260814-etude-opportunite-pentest-owasp.md` |
+| 20260814-etude-opportunite-taste-skill.md | — | 14.5 Ko | `03-etudes/20260814-etude-opportunite-taste-skill.md` |
+| 20260815-etude-opportunite-ce-que-personne-ne-juge.md | — | 6.4 Ko | `03-etudes/20260815-etude-opportunite-ce-que-personne-ne-juge.md` |
+| 20260815-etude-opportunite-circuit-insatisfaction.md | — | 5.3 Ko | `03-etudes/20260815-etude-opportunite-circuit-insatisfaction.md` |
+| 20260815-etude-opportunite-cout-du-faux-positif.md | — | 7 Ko | `03-etudes/20260815-etude-opportunite-cout-du-faux-positif.md` |
+| 20260815-etude-opportunite-lecons-audit-reel.md | — | 5.7 Ko | `03-etudes/20260815-etude-opportunite-lecons-audit-reel.md` |
+| 20260815-etude-opportunite-qualite-graphique.md | — | 5.7 Ko | `03-etudes/20260815-etude-opportunite-qualite-graphique.md` |
+| 20260815-etude-opportunite-restitution-lisible.md | — | 6.4 Ko | `03-etudes/20260815-etude-opportunite-restitution-lisible.md` |
+| 20260817-etude-opportunite-cadence-de-mission.md | — | 24.3 Ko | `03-etudes/20260817-etude-opportunite-cadence-de-mission.md` |
+| 20260817-etude-opportunite-consignes-de-mise-a-jour.md | — | 20.3 Ko | `03-etudes/20260817-etude-opportunite-consignes-de-mise-a-jour.md` |
+| 20260817-etude-opportunite-conventions-parametrables.md | — | 20.8 Ko | `03-etudes/20260817-etude-opportunite-conventions-parametrables.md` |
+| 20260817-etude-opportunite-couverture-par-role.md | — | 5.5 Ko | `03-etudes/20260817-etude-opportunite-couverture-par-role.md` |
+| 20260817-etude-opportunite-ecart-servi-versionne.md | — | 6.4 Ko | `03-etudes/20260817-etude-opportunite-ecart-servi-versionne.md` |
+| 20260817-etude-opportunite-publication-livrables.md | — | 6.4 Ko | `03-etudes/20260817-etude-opportunite-publication-livrables.md` |
+| 20260817-etude-opportunite-rangement-output.md | — | 18.5 Ko | `03-etudes/20260817-etude-opportunite-rangement-output.md` |
+| 20260817-etude-opportunite-renommage-factory.md | — | 23 Ko | `03-etudes/20260817-etude-opportunite-renommage-factory.md` |
+| 20260817-etude-opportunite-sequencement-factory.md | — | 45.2 Ko | `03-etudes/20260817-etude-opportunite-sequencement-factory.md` |
+| 20260817-etude-opportunite-tests-bout-en-bout.md | — | 27.5 Ko | `03-etudes/20260817-etude-opportunite-tests-bout-en-bout.md` |
+| 20260817-etude-opportunite-todo-produit.md | — | 27.6 Ko | `03-etudes/20260817-etude-opportunite-todo-produit.md` |
+| 20260818-cartographie-oracles-cadence-de-mission.md | — | 5.7 Ko | `03-etudes/20260818-cartographie-oracles-cadence-de-mission.md` |
+| 20260818-etude-opportunite-admission-digit-ai-queue.md | — | 14.9 Ko | `03-etudes/20260818-etude-opportunite-admission-digit-ai-queue.md` |
+| 20260818-etude-opportunite-cablage-orchestrer-boucle.md | — | 12.4 Ko | `03-etudes/20260818-etude-opportunite-cablage-orchestrer-boucle.md` |
+| 20260818-etude-opportunite-memoire-partagee.md | — | 25.4 Ko | `03-etudes/20260818-etude-opportunite-memoire-partagee.md` |
+| 20260818-etude-opportunite-retour-usage-vers-delta.md | — | 9.1 Ko | `03-etudes/20260818-etude-opportunite-retour-usage-vers-delta.md` |
+| 20260819-etude-opportunite-forge-consulting.md | — | 13.4 Ko | `03-etudes/20260819-etude-opportunite-forge-consulting.md` |
+| 20260819-etude-opportunite-meta-oracle-enclenchement.md | — | 16.8 Ko | `03-etudes/20260819-etude-opportunite-meta-oracle-enclenchement.md` |
+| 20260819-etude-opportunite-module-de-traduction.md | — | 16.3 Ko | `03-etudes/20260819-etude-opportunite-module-de-traduction.md` |
+| 20260819-etude-opportunite-retro-documentation.md | — | 9.6 Ko | `03-etudes/20260819-etude-opportunite-retro-documentation.md` |
+| 20260819-etude-opportunite-retro-engineering.md | — | 10.4 Ko | `03-etudes/20260819-etude-opportunite-retro-engineering.md` |
+| 20260820-etude-opportunite-communication-interlocuteur.md | — | 10.4 Ko | `03-etudes/20260820-etude-opportunite-communication-interlocuteur.md` |
+| 20260820-etude-opportunite-rgaa.md | — | 12.9 Ko | `03-etudes/20260820-etude-opportunite-rgaa.md` |
+| 20260822-etude-opportunite-fraicheur-des-verdicts.md | — | 14 Ko | `03-etudes/20260822-etude-opportunite-fraicheur-des-verdicts.md` |
+| 20260822-etude-opportunite-troisieme-point-observation-i18n.md | — | 8.2 Ko | `03-etudes/20260822-etude-opportunite-troisieme-point-observation-i18n.md` |
+| 20260822-etude-opportunite-vue-portefeuille.md | — | 8.6 Ko | `03-etudes/20260822-etude-opportunite-vue-portefeuille.md` |
+
+### 04-plans
+
+| Livrable | Version | Poids | Chemin à copier |
+|---|---|---|---|
+| 20260813-plan-strategie-tests-e2e.md | — | 13.5 Ko | `04-plans/20260813-plan-strategie-tests-e2e.md` |
+| Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md | 20260818b | 4.2 Ko | `04-plans/Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md` |
+| Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md.jugement.json` |
+| Digit-AI - Note Revue - Denominateur des freres - 20260818a.md | 20260818a | 4.1 Ko | `04-plans/Digit-AI - Note Revue - Denominateur des freres - 20260818a.md` |
+| Digit-AI - Note Revue - Denominateur des freres - 20260818a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Note Revue - Denominateur des freres - 20260818a.md.jugement.json` |
+| Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md | 20260817a | 3.2 Ko | `04-plans/Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` |
+| Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md.jugement.json` |
+| Digit-AI - Synthese Boucle - 17 restants du registre - 20260818a.md | 20260818a | 13.3 Ko | `04-plans/Digit-AI - Synthese Boucle - 17 restants du registre - 20260818a.md` |
+| Digit-AI - Synthese Boucle - 17 restants du registre - 20260818a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Boucle - 17 restants du registre - 20260818a.md.jugement.json` |
+| Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md | 20260815a | 3.7 Ko | `04-plans/Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md` |
+| Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md.jugement.json` |
+| Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md | 20260815a | 3.8 Ko | `04-plans/Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md` |
+| Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Architecture du circuit insatisfaction - 20260815a.md | 20260815a | 3.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Architecture du circuit insatisfaction - 20260815a.md` |
+| Digit-AI - Synthese Mandat - Architecture du circuit insatisfaction - 20260815a.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Architecture du circuit insatisfaction - 20260815a.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md | 20260815a | 3.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md` |
+| Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md | 20260817a | 7.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md` |
+| Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md | 20260817a | 7.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md` |
+| Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md | 20260822a | 13.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md` |
+| Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Toute la todo avec le a - 20260815a.md | 20260815a | 5.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Toute la todo avec le a - 20260815a.md` |
+| Digit-AI - Synthese Mandat - Toute la todo avec le a - 20260815a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Toute la todo avec le a - 20260815a.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Traite les todo et retours - 20260815a.md | 20260815a | 4.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite les todo et retours - 20260815a.md` |
+| Digit-AI - Synthese Mandat - Traite les todo et retours - 20260815a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite les todo et retours - 20260815a.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md | 20260817a | 6.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md` |
+| Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Traite retours et todos - 20260817a.md | 20260817a | 6.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite retours et todos - 20260817a.md` |
+| Digit-AI - Synthese Mandat - Traite retours et todos - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite retours et todos - 20260817a.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Traite todos et retours - 20260822b.md | 20260822b | 16.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite todos et retours - 20260822b.md` |
+| Digit-AI - Synthese Mandat - Traite todos et retours - 20260822b.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite todos et retours - 20260822b.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Traite todos et retours - 20260822c.md | 20260822c | 9.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite todos et retours - 20260822c.md` |
+| Digit-AI - Synthese Mandat - Traite todos et retours - 20260822c.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite todos et retours - 20260822c.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Traite tous les retours - 20260817a.md | 20260817a | 5.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite tous les retours - 20260817a.md` |
+| Digit-AI - Synthese Mandat - Traite tous les retours - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite tous les retours - 20260817a.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md | 20260823a | 9.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md` |
+| Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md | 20260815a | 3.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` |
+| Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md.jugement.json` |
+
+### 05-catalogues-readmes-forges
+
+| Livrable | Version | Poids | Chemin à copier |
+|---|---|---|---|
+| agents-section-catalogue.md | — | 1.7 Ko | `05-catalogues-readmes-forges/agents-section-catalogue.md` |
+| agents-security-section-catalogue.md | — | 1 Ko | `05-catalogues-readmes-forges/agents-security-section-catalogue.md` |
+| audit-section-catalogue.md | — | 1.4 Ko | `05-catalogues-readmes-forges/audit-section-catalogue.md` |
+| conception-section-catalogue.md | — | 2 Ko | `05-catalogues-readmes-forges/conception-section-catalogue.md` |
+| data-section-catalogue.md | — | 1.9 Ko | `05-catalogues-readmes-forges/data-section-catalogue.md` |
+| design-section-catalogue.md | — | 2.2 Ko | `05-catalogues-readmes-forges/design-section-catalogue.md` |
+| development-section-catalogue.md | — | 1.9 Ko | `05-catalogues-readmes-forges/development-section-catalogue.md` |
+| observability-section-catalogue.md | — | 1.1 Ko | `05-catalogues-readmes-forges/observability-section-catalogue.md` |
+| ops-section-catalogue.md | — | 1.5 Ko | `05-catalogues-readmes-forges/ops-section-catalogue.md` |
+| organization-section-catalogue.md | — | 1.3 Ko | `05-catalogues-readmes-forges/organization-section-catalogue.md` |
+| seo-section-catalogue.md | — | 1.9 Ko | `05-catalogues-readmes-forges/seo-section-catalogue.md` |
+| tests-section-catalogue.md | — | 2.1 Ko | `05-catalogues-readmes-forges/tests-section-catalogue.md` |
+| websec-section-catalogue.md | — | 1.2 Ko | `05-catalogues-readmes-forges/websec-section-catalogue.md` |
+
+### 05-insatisfactions
+
+| Livrable | Version | Poids | Chemin à copier |
+|---|---|---|---|
+| INSTRUCTION.md | — | 6.9 Ko | `05-insatisfactions/INS-0001/INSTRUCTION.md` |
+
+*Un livrable présent et absent de ce tableau est un défaut : cet index est régénéré, et un
+index qui a dérivé de son dossier ne sert plus qu'à donner confiance à tort.*
+
+<!-- index-livrables:fin -->

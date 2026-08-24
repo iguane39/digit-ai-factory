@@ -63,7 +63,19 @@ export function mdVersHtml(corps) {
 }
 
 // Coquille chartée (tokens du socle, light, print, reduced-motion, favicon data:).
-export function coquille({ titre, description, front, svg, corpsHtml, source, lettre }) {
+export function coquille({ titre, description, front, svg, corpsHtml, source, lettre, version }) {
+  // A4 (TF-0556, 24/08) — LE TITRE PORTE LE DOCUMENT HORS DE SON DOSSIER. Ces vues sortaient avec un
+  // titre nu : ni marque, ni indice de version daté, donc A4 en échec sur les TROIS. Le titre est la
+  // seule métadonnée qui suit le fichier partout — onglet, favori, pied d'impression, pièce jointe —
+  // et sans date, deux révisions du même jour portent le même nom à l'écran.
+  //
+  // L'indice est DÉRIVÉ, jamais saisi : `verifie_le` de l'en-tête de la source quand elle en porte
+  // un, sinon la date du jour. Un paramètre à remplir à la main aurait été oublié au premier appel
+  // suivant — c'est la leçon de toutes les listes écrites à la main de ce dépôt.
+  const dateSource = String((front && (front.verifie_le || front.date)) || "").match(/(\d{4})-(\d{2})-(\d{2})/);
+  const indice = version
+    || (dateSource ? `${dateSource[1]}${dateSource[2]}${dateSource[3]}a` : new Date().toISOString().slice(0, 10).replaceAll("-", "") + "a");
+  const titreComplet = /\b\d{8}[a-z]?\b/.test(titre) ? titre : `Digit-AI — ${titre} — ${indice}`;
   // Fins de ligne normalisees AVANT le sceau (TF-0359, etendu par TF-0338) : la comparaison
   // de parite est DIFFEREE — scellee ici, verifiee plus tard, possiblement apres un checkout
   // qui a reecrit la source en CRLF. Mesure du 18/08 sur le seul produit du poste portant ces
@@ -78,7 +90,7 @@ export function coquille({ titre, description, front, svg, corpsHtml, source, le
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${esc(titre)}</title>
+  <title>${esc(titreComplet)}</title>
   <meta name="description" content="${esc(description)}">
   <meta name="theme-color" content="#2563EB">
   <meta name="color-scheme" content="light">
@@ -100,20 +112,28 @@ export function coquille({ titre, description, front, svg, corpsHtml, source, le
     h1{font-size:1.7rem;margin:0 0 .2em} h2{font-size:1.25rem;font-weight:700;margin:1.5em 0 .4em}
     h3{font-size:1.02rem;font-weight:700;margin:1.1em 0 .3em}
     code{font-family:var(--mono);font-size:.9em}
-    .meta{color:var(--muted);font-size:.85rem;margin:.2em 0 0;overflow-wrap:anywhere}
+    .meta{color:var(--muted);font-size:.85rem;margin:.2em 0 0}
     blockquote{margin:14px 0;padding:10px 16px;border-left:3px solid var(--blue);background:var(--surface);border-radius:0 var(--r-sm) var(--r-sm) 0;color:var(--muted)}
     blockquote p{margin:0}
     .scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin:10px 0}
     table{border-collapse:collapse;width:100%;font-size:.92rem}
     th{font-family:var(--head);font-weight:700;text-align:left;padding:9px 12px;border-bottom:2px solid var(--line)}
-    td{padding:7px 12px;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}
+    td{padding:7px 12px;border-bottom:1px solid var(--line);vertical-align:top}
     tr:last-child td{border-bottom:none}
     ul{margin:.4em 0;padding-left:1.3em}
     figure{margin:16px 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;overflow-x:auto}
     figcaption{color:var(--muted);font-size:.85rem;margin-top:8px}
     svg{max-width:100%;height:auto}
-    footer{margin-top:40px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:14px;overflow-wrap:anywhere}
-    @media (max-width:640px){.wrap{padding:16px 12px 48px} h1{font-size:1.3rem}}
+    footer{margin-top:40px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:14px}
+    /* L19 (TF-0556, 24/08) — LA COUPURE DE MOT QUITTE LA PROSE. La propriete overflow-wrap:anywhere
+       etait posee sur .meta, td et footer : ravageuse sur du texte courant, ou un mot se casse en
+       deux au milieu d'une ligne sans cesure ni trait d'union. Elle ne reste QUE sur les cellules,
+       et seulement sous le palier de repli, la ou le socle l'EXIGE (composants.md section 6) — un
+       identifiant long dans une cellule etroite doit pouvoir se couper, une phrase jamais.
+       ATTENTION : ce bloc vit dans un litteral gabarit JavaScript. Aucun accent grave ici, il
+       fermerait la chaine et casserait tout ce qui suit — defaut commis en ecrivant ce commentaire. */
+    @media (max-width:640px){.wrap{padding:16px 12px 48px} h1{font-size:1.3rem}
+      .scroll td{display:block;overflow-wrap:anywhere}}
     @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
     @page{margin:14mm}
     @media print{.scroll{overflow:visible;border:none} figure{break-inside:avoid} tr{break-inside:avoid} body{background:#fff}}

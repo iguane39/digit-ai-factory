@@ -220,6 +220,29 @@
     table { width: 100%; border-collapse: collapse; }
     th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
     th { font-weight: 700; }
+    /* TF-0558 (24/08/2026) — LE SEUIL ETAIT FIGE A 900 px, ET TOUT PROJET QUI INSTANCIE CETTE
+       FAMILLE LE REPRODUISAIT. Mesure sur un livrable reel : un tableau de huit colonnes debordait
+       jusque vers 1 400 px (bord droit a 1 308 px pour un viewport de 1 280) — SEIZE debordements
+       bloquants, invisibles cinq jours. Le seuil ne depend pas d'un pixel choisi mais du NOMBRE DE
+       COLONNES : ~165 px de largeur utile par colonne de prose, mesure et non regle du pouce.
+
+       Les paliers ci-dessous LISENT ce nombre dans le marquage — aucun emetteur n'a plus rien a
+       calibrer, et un tableau qui gagne une colonne se replie plus tot sans qu'une ligne de CSS
+       bouge. Le palier de base (900 px) reste pour les tableaux de quatre colonnes ou moins. */
+    @media (max-width: 1400px) {
+      .table-hote:has(th:nth-child(7)) { overflow-x: visible; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes thead { display: none; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes tr { display: block; border: 1px solid var(--line); border-radius: 8px; margin: 0 0 12px; padding: 8px 12px; break-inside: avoid; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes td { display: grid; grid-template-columns: minmax(9ch, 38%) 1fr; gap: 8px; border: 0; padding: 4px 0; box-sizing: border-box; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes td::before { content: attr(data-label); font-weight: 700; color: var(--muted); }
+    }
+    @media (max-width: 1020px) {
+      .table-hote:has(th:nth-child(5)) { overflow-x: visible; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes thead { display: none; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes tr { display: block; border: 1px solid var(--line); border-radius: 8px; margin: 0 0 12px; padding: 8px 12px; break-inside: avoid; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes td { display: grid; grid-template-columns: minmax(9ch, 38%) 1fr; gap: 8px; border: 0; padding: 4px 0; box-sizing: border-box; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes td::before { content: attr(data-label); font-weight: 700; color: var(--muted); }
+    }
     @media (max-width: 900px) {
       .table-hote { overflow-x: visible; }
       /* thead retiré du flux en mode carte. Le masquage « hors écran » (position absolue +
