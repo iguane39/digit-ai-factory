@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=73dfa4729721 archive=acf69e8da61a · dernier événement: 2026-08-24T17:38:14.915Z -->
+     sceaux: actifs=8070625e5a18 archive=acf69e8da61a · dernier événement: 2026-08-24T17:41:22.192Z -->
 
-**112 actifs** (candidat 4 · décidé 1 · en cours 0 · corrigé 103 · écarté 4) · **469 archivés**.
+**121 actifs** (candidat 13 · décidé 1 · en cours 0 · corrigé 103 · écarté 4) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,6 +11,15 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0583 | candidat | 20 | L'oracle de contraste n'est appele par rien et ne peut pas se lancer | **oui** — 0 fichier du depot cite check-contrast.mjs ; chemin Edge code en dur, inexistant sur la machine |
+| TF-0588 | candidat | 20 | Un secret attendu se prepare, il ne se decrit pas en prose | **oui** — 3 fournisseurs, 3 aller-retours, dont 2 jetons OVH crees pour rien |
+| TF-0589 | candidat | 15 | Le gabarit d'environnement n'est confronte a rien | **oui** — .env = 11 cles, .env.example = 7 ; 4 cles OVH jamais reportees au gabarit |
+| TF-0582 | candidat | 12.5 | Une mesure de contraste par styles calcules ne voit pas les pseudo-elements | **oui** — fond peint par ::before ; .txt en background:transparent ; une mesure DOM aurait lu le fond clair du conteneur et valide |
+| TF-0585 | candidat | 12.5 | Un comportement destine aux visiteurs valide sur un protocole qu'ils n'utilisent pas | **oui** — 7 hostnames sur 8 injoignables en HTTPS apres avoir ete declares fonctionnels ; port 443 ferme sur 213.186.33.5 |
+| TF-0581 | candidat | 8.3 | Le seul verificateur de contraste ne regarde que le menu du header | **oui** — texte a ratio 1,0 reste en production ; oracle de contraste present au depot et scope au seul .header-line |
+| TF-0586 | candidat | 8.3 | Aucun oracle ne verifie qu'un nom de domaine declare repond | **oui** — 8 hostnames declares, 0 controle ; base par defaut de check-redirects encore sur l'URL Railway apres bascule |
+| TF-0587 | candidat | 8 | Un mecanisme de redirection choisi sans connaitre sa limite structurelle | **oui** — port 443 ferme non documente ; remede impliquant de recreer les MX de 4 zones |
+| TF-0584 | candidat | 6 | Une sonde de contraste doit se confronter a la palette declaree du projet | **oui** — 2 erreurs de sonde successives produisant des verdicts faux, l'un negatif l'autre positif |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
 | TF-0526 | corrige | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
 | TF-0530 | corrige | 25 | pilot : le garde-fou « le pilot n'ecrit pas chez un produit » tenait par DISCIPLINE SEULE, et les classes de defaut du jour n'avaient pas de regle generique | **oui** — un garde-fou non execute est un garde-fou qu'on suit jusqu'au jour ou on ne le suit plus ; et neuf classes de defaut payees le meme jour sans qu'aucune regle generique ne les empeche de revenir ailleurs |
