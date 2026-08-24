@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=29636488cc6a archive=acf69e8da61a · dernier événement: 2026-08-24T19:23:24.685Z -->
+     sceaux: actifs=f23b652fbc34 archive=acf69e8da61a · dernier événement: 2026-08-24T19:42:05.551Z -->
 
-**137 actifs** (candidat 8 · décidé 1 · en cours 0 · corrigé 124 · écarté 4) · **469 archivés**.
+**137 actifs** (candidat 6 · décidé 1 · en cours 0 · corrigé 126 · écarté 4) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -123,8 +123,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0577 | candidat | 12.5 | forge-conception : le referentiel ne porte NULLE PART ce que le produit PROMET a son client — la une a vendu une livraison pendant neuf jours quand les six services vendaient un transfert de capacite | **oui** — Positionnement faux en production du 15/08 au 24/08 sur le site vitrine de la factory ; refonte complete de la page d accueil necessaire, tous oracles au vert pendant toute la periode. |
 | TF-0498 | corrige | 15 | forge-conception : la description du skill `qualifie-l-entrant` depasse la limite de 1024 caracteres — le self-test de quality-oracles echoue sur le parc installe | **oui** — mesure le 22/08 : le self-test de quality-oracles sort en echec (1 echec) des qu'il est joue depuis la copie installee, alors qu'il rend 156 PASS et 0 echec depuis la source. Le meme harnais donne deux verdicts selon l'endroit d'ou on le joue — et c'est le verdict rouge qui correspond a l'usage reel. |
+| TF-0577 | corrige | 12.5 | forge-conception : le referentiel ne porte NULLE PART ce que le produit PROMET a son client — la une a vendu une livraison pendant neuf jours quand les six services vendaient un transfert de capacite | **oui** — Positionnement faux en production du 15/08 au 24/08 sur le site vitrine de la factory ; refonte complete de la page d accueil necessaire, tous oracles au vert pendant toute la periode. |
 | TF-0570 | corrige | 9 | conception : une exigence dit ce qui est REFUSE, jamais ce que l utilisateur APPREND du refus | **oui** — quatre refus specifies au paragraphe 09 du cahier sans aucune clause de restitution ; 5 cles x 7 langues redigees apres coup le 24/08 et deux anomalies anterieures mal classees faute d un symptome discriminant |
 | TF-0576 | corrige | 4.5 | conception : un port qui ne declare que son cas nominal force les pannes d adaptateur en exceptions non gerees | **oui** — is_clean -> bool sans mode de panne : socket.gaierror remontee nue jusqu a l ASGI ; cinq ports du produit presentent le meme contrat incomplet ; troisieme instance du patron « contrainte enoncee sans sa contrepartie observable » apres RG-18 et RG-21 |
 | TF-0592 | corrige | 4.5 | conception : aucune doctrine n exige un INTERRUPTEUR D AUTHENTIFICATION sur un produit a identite deleguee — sans lui, les tests de bout en bout multi-identites sont impossibles | **oui** — client_id faux survivant neuf jours ; 5 workflows inter-profils jamais verts avant le 24/08 et echouant au premier passage reel (run 13894) ; trois fichiers portant trois valeurs du meme identifiant ; une demi-journee de diagnostic |
@@ -140,9 +140,9 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0578 | candidat | 6.7 | forge-design : rien n oppose la PROMESSE d une page a l OFFRE decrite ailleurs dans le meme run — les oracles jugent la page en vase clos | **oui** — Contradiction une/services non detectee par cinq oracles de design tous au vert, sur le site vitrine de la factory elle-meme. |
 | TF-0494 | corrige | 15 | forge-design : le workflow auditer ne prescrit aucune tracabilite pour une demande client multiple | **oui** — Un point sur dix-sept perdu, decouvert par le client et non par la chaine de controle. |
 | TF-0483 | corrige | 6.7 | forge-design : rien n oblige a relever ce qui se fait de bien dans le domaine du produit avant de proposer une DA — les oracles jugent la discipline INTERNE, et une DA au vert complet a ete rejetee en bloc | **oui** — Un tour complet conception+design perdu sur factory.produit-07 : DA au vert sur tous les oracles, rejetee integralement par le commanditaire, refaite avec releve externe et arbitrage humain sur captures. |
+| TF-0578 | corrige | 6.7 | forge-design : rien n oppose la PROMESSE d une page a l OFFRE decrite ailleurs dans le meme run — les oracles jugent la page en vase clos | **oui** — Contradiction une/services non detectee par cinq oracles de design tous au vert, sur le site vitrine de la factory elle-meme. |
 
 ## digit-ai-forge-development
 
