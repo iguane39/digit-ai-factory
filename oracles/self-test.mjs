@@ -767,5 +767,32 @@ check("antériorité-nature : le même document revu AVANT l'entrée en vigueur 
 });
 
 for (const d of [verte, rouge, rougeDocs, rougeLock, rougeR24, ecartR24, rougeR2, verteR2, rougeR19, verteR19, rougeR42, verteR42, partielR42, verteTdp, rougeTdp, rougeTdpNu, rougeTdpNature, verteTdpNature, rougeTdpSection, antTdpSection]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+// TF-0541 (24/08) — un ledger ecrit AILLEURS etait indiscernable d'un run jamais ouvert. Le
+// produit ecrivait dans `runs\\<run>\\ledger.jsonl` et l'oracle rendait SANS_OBJET : un run REEL
+// passait pour inexistant. Les deux sens se jouent sur le meme projet, seule la place du fichier
+// les separe. L'item proposait d'aligner le gabarit sur ce chemin ; c'est l'inverse — aligner la
+// doctrine sur une implementation divergente ferait de l'ecart la norme.
+check("R-19 : ledger ecrit HORS du chemin de doctrine → nomme, jamais confondu avec l'absence de run", () => {
+  const d = mkdtempSync(join(tmpdir(), "conf-ledger-"));
+  try {
+    mkdirSync(join(d, "runs", "20260815-audit"), { recursive: true });
+    writeFileSync(join(d, "runs", "20260815-audit", "ledger.jsonl"),
+      JSON.stringify({ seq: 1, type: "run_open", ts: "2026-08-15T10:00:00Z" }) + "\n", "utf8");
+    const f = (lance(d).rapport.findings || []).find((x) => x.regle === "R-19");
+    if (!f || f.statut !== "FAIL" || !/HORS du chemin/.test(f.message || ""))
+      throw new Error("un ledger hors doctrine passe pour « aucun run ouvert » — deux situations opposees, un seul silence");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
+check("R-19 borne : aucun ledger nulle part → SANS_OBJET, jamais un FAIL", () => {
+  // La regle neuve ne doit pas transformer « pas encore de run » en defaut.
+  const d = mkdtempSync(join(tmpdir(), "conf-sans-ledger-"));
+  try {
+    writeFileSync(join(d, "README.md"), "# projet\n", "utf8");
+    const f = (lance(d).rapport.findings || []).find((x) => x.regle === "R-19");
+    if (!f || f.statut !== "SANS_OBJET") throw new Error("un projet sans run est accuse — la regle met l'existant en echec");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 console.log(`\nSelf-test conformité projet : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

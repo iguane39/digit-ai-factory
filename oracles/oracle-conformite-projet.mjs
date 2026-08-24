@@ -622,7 +622,30 @@ const cleCanonique = (cle) => {
   return (brut === "pilot" || brut === "factory") ? "digit-ai-factory" : "digit-ai-forge-" + brut;
 };
 const ledgerF = p("forge", "ledger.jsonl");
-if (!existsSync(ledgerF)) so("R-19", "pas de forge\\ledger.jsonl (aucun run ouvert)");
+// TF-0541 (lot Produit-02 20260823a, 24/08) : un ledger ecrit AILLEURS etait indiscernable
+// d'un run jamais ouvert — les deux sortaient le meme SANS_OBJET muet. Le produit ecrivait dans
+// `runs\\<run>\\ledger.jsonl` et l'oracle concluait « aucun run ouvert » : un run REEL, avec ses
+// entrees, passait pour inexistant. L'item proposait d'aligner le gabarit sur ce chemin ; c'est
+// l'inverse qu'il faut faire — ETAPES-RUN, CONTRAT-INTERFACE et R-19/R-42 disent tous trois
+// `forge\\ledger.jsonl`, et aligner la doctrine sur une implementation divergente ferait de
+// l'ecart la norme. Ce qui manquait n'etait pas le bon chemin, c'etait de DIRE quand il n'est
+// pas tenu : un silence identique pour deux situations opposees n'aide personne.
+if (!existsSync(ledgerF)) {
+  const ailleurs = [];
+  const chercher = (dir, profondeur) => {
+    if (profondeur > 3) return;
+    let entrees = [];
+    try { entrees = readdirSync(dir, { withFileTypes: true }); } catch { return; }
+    for (const e of entrees) {
+      if (e.isDirectory()) { if (!IGNORES_PARCOURS.has(e.name)) chercher(join(dir, e.name), profondeur + 1); }
+      else if (e.name === "ledger.jsonl") ailleurs.push(rel(join(dir, e.name)));
+    }
+  };
+  chercher(cible, 0);
+  ailleurs.length
+    ? ko("R-19", ailleurs[0], `ledger trouve HORS du chemin de doctrine : ${ailleurs.join(", ")} — attendu forge\\ledger.jsonl (ETAPES-RUN, CONTRAT-INTERFACE §3). Un run reel y devient invisible pour R-19 et R-42, et se lit comme « aucun run ouvert »`)
+    : so("R-19", "pas de forge\\\\ledger.jsonl, et aucun ledger.jsonl ailleurs dans le projet — aucun run ouvert");
+}
 else {
   const opens = readFileSync(ledgerF, "utf8").split("\n").filter((l) => l.trim()).map((l) => {
     try { return JSON.parse(l); } catch { return null; }
