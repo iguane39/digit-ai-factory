@@ -175,6 +175,18 @@ const ETAT_DU_PARC = [
     remede: "declarer le site dans la table de references\EMPREINTES.md (depot, ce qui est scelle, format)",
   },
   {
+    // TF-0560 (24/08) : le POINT D'ENTRÉE cliquable des livrables. La règle de nommage impose un
+    // nom daté à espaces, et le résolveur de liens coupe au premier espace : mesuré, 22 livrables
+    // et 0 atteignable au clic sur un produit, pendant onze jours. Le seul fichier dont le nom n'a
+    // pas d'espace est donc la porte d'entrée du dossier — et un index qui a dérivé de son dossier
+    // ne sert plus qu'à donner confiance à tort. C'est un état du PARC : un livrable déposé sans
+    // régénérer l'index le fait mentir, et personne ne s'en aperçoit en le lisant.
+    nom: "../scripts/generer-lisezmoi-output.mjs",
+    motif: "index des livrables absent ou dérivé de son dossier",
+    remede: "node scripts\generer-lisezmoi-output.mjs (le régénère depuis le dossier)",
+    args: ["--verifier"],
+  },
+  {
     // TF-0532 / N-11 (23/08) : une promesse écrite dans un commentaire de CODE est TENUE, sur les
     // fichiers qui ont SIGNÉ. C'est un état du PARC et non un artefact : un fichier signataire peut
     // devenir fautif par une suppression ailleurs, sans que personne ne relise son en-tête. La

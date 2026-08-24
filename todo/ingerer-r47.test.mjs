@@ -37,9 +37,13 @@ const LOT_CONFORME = "# lot\n\n## Remarques restées au produit\n\n"
   + "## Retours sur les documents produits\n\nAucun document produit depuis un gabarit.\n";
 
 /** Pose un faux poste : une racine de forges contenant le produit nommé. */
-const poste = (nomProjet, { herite }) => {
+const poste = (nomProjet, { herite, sousDossier = null }) => {
   const racine = mkdtempSync(join(T, "poste-"));
-  const projet = join(racine, nomProjet);
+  // TF-0555 (24/08) : le parc REEL range 22 produits sous un dossier client (`_Client-A\`), et la
+  // recherche d'origine ne regardait que les enfants DIRECTS de la racine. Tous etaient donc hors
+  // de portee, et le defaut que R-47 devait rattraper est reste vivant sur l'un d'eux. Le bac
+  // d'essai sait maintenant reproduire ce rangement.
+  const projet = sousDossier ? join(racine, sousDossier, nomProjet) : join(racine, nomProjet);
   mkdirSync(join(projet, "forge"), { recursive: true });
   if (herite) {
     mkdirSync(join(projet, "forge", "retours"), { recursive: true });
@@ -93,6 +97,34 @@ check("BORNE — produit introuvable sur le poste : déclaré non vérifié, JAM
   if (r.code !== 0) throw new Error(`exit ${r.code} — une remise venue d'ailleurs doit entrer`);
   if (!/NON vérifiée/.test(r.sortie)) throw new Error("le silence n'est pas déclaré — un produit qu'on ne localise pas n'est pas un produit en défaut");
   if (/AVERTISSEMENT/.test(r.sortie)) throw new Error("un produit absent du poste est accusé — ce serait crier sur toutes les remises venues d'ailleurs");
+});
+
+check("rouge — produit RANGE SOUS UN DOSSIER CLIENT : trouve, et son heritage juge (TF-0555)", () => {
+  // Le defaut mesure le 24/08 : la recherche ne voyait que les enfants DIRECTS de la racine, et 22
+  // produits du parc vivent sous un dossier de rangement. Le lot passait avec « dossier introuvable »
+  // alors que le produit etait la, en defaut d'heritage — le mecanisme regardait ailleurs.
+  const r = ingerer("ProduitRange", poste("ProduitRange", { herite: false, sousDossier: "_Client" }));
+  if (/dossier introuvable/.test(r.sortie)) throw new Error("le produit range sous un dossier client reste INTROUVABLE — le cercle n'est pas referme");
+  if (!/R-47 — AVERTISSEMENT/.test(r.sortie)) throw new Error("trouve mais non juge : l'avertissement d'heritage manque");
+});
+
+check("verte — le meme, range et CONFORME : trouve et silencieux", () => {
+  const r = ingerer("ProduitRangeOk", poste("ProduitRangeOk", { herite: true, sousDossier: "_Client" }));
+  if (/dossier introuvable/.test(r.sortie)) throw new Error("produit range non trouve alors qu'il est conforme");
+  if (/AVERTISSEMENT/.test(r.sortie)) throw new Error("avertissement sur un produit conforme — un controle qui crie toujours se fait ignorer");
+});
+
+check("BORNE — produit introuvable : la NON-VERIFICATION est consignee au REGISTRE (TF-0555)", () => {
+  // Une verification non faite qui ne laisse pas de trace est une verification qu'on croit faite.
+  // Le message partait au seul flux d'erreur et disparaissait avec la session ; le registre en
+  // garde desormais une ligne, avec le nom cherche et la racine balayee.
+  const r = ingerer("ProduitAilleurs2", mkdtempSync(join(T, "poste-vide-")));
+  if (!/dossier introuvable/.test(r.sortie)) throw new Error("le cas teste n'est pas celui du produit introuvable");
+  const lignes = readFileSync(r.registre, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
+  const trace = lignes.find((e) => e.heritage_non_verifie);
+  if (!trace) throw new Error("aucune trace au registre — le silence ne survit pas a la session");
+  if (trace.heritage_non_verifie.projet !== "ProduitAilleurs2") throw new Error("la trace ne NOMME pas le produit cherche");
+  if (!trace.heritage_non_verifie.racine) throw new Error("la trace ne dit pas OU la recherche a eu lieu");
 });
 
 check("BORNE — candidature HORS lot de retours : R-47 ne dit rien du tout", () => {
