@@ -152,7 +152,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>1f84fc492a79</code> · dernier événement 2026-08-24T09:19:49.898Z</p>
+      <p class="meta">sceau <code>c0af7f12b9dc</code> · dernier événement 2026-08-24T09:34:38.661Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -162,7 +162,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="0 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">0</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="6 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">6</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="1 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">1</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="468 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">468</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -194,23 +194,70 @@
       </div>
       
       <div class="dropdown" data-dim="prio">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">2</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">3</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-prio" role="group" aria-label="Filtre Priorité" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
           <label><input type="checkbox" value="haute" checked> Haute</label>
           <label><input type="checkbox" value="moyenne" checked> Moyenne</label>
+          <label><input type="checkbox" value="basse" checked> Basse</label>
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">85 / 85 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">91 / 91 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">40 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">23 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-seo-geo"><strong>digit-ai-forge-seo-geo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">8 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">42 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">27 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-seo-geo"><strong>digit-ai-forge-seo-geo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">8 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-factory">
-      <h2>digit-ai-factory <span class="badge" title="40 item(s) actifs ciblant digit-ai-factory">40</span></h2>
+      <h2>digit-ai-factory <span class="badge" title="42 item(s) actifs ciblant digit-ai-factory">42</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-factory</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0555" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0555</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">factory, R-47 a l'ingestion d'un lot : un produit range sous un dossier client est introuvable, et le cercle que la regle devait refermer reste ouvert</h3>
+          <div class="card-detail" data-cite><p class="lead">todo/ingerer-lot.mjs l.308-320 cherche le produit parmi les ENFANTS DIRECTS de &lt;FORGE_ROOT&gt; dont le nom commence par le nom porte par le lot, plus un repli &lt;candidat&gt;/projet. Ce produit vit sous C:\dev\_Client-A\Produit-10 : la remise de ce lot a imprime « [R-47] conformite de l'heritage NON verifiee pour « Produit-10 » — dossier introuvable sous C:\dev ». Le message est honnete, et c'est la le probleme : il ne s'agit pas d'un produit hors doctrine, mais d'un produit invisible a la recherche. Verifie le 24/08 : le meme oracle-conformite-projet, pointe A LA MAIN sur le dossier, rendait R-43 FAIL (precedence de la factory non cablee) et R-47 FAIL (2 artefacts absents — forge/hooks/factory.mjs, .claude/settings.json — et CLAUDE.md sans la clause R-43). C'est exactement le defaut du 23/08 qui a motive la regle, VIVANT, et non vu par le mecanisme cense le rattraper ; il a ete corrige a la main dans la foulee (conformite passee de FAIL a PASS 29/0). Le dossier C:\dev\_Client-A\ porte 22 produits, tous hors de portee de cette recherche.</p><p class="detail-label">Proposition</p><ul class="puces"><li>descendre d'un niveau quand aucun enfant direct ne correspond (balayage des petits-enfants portant un forge\, borne a 2 niveaux)</li><li>mieux, faire porter au SIDECAR le chemin du produit (racine_produit) — le produit sait toujours ou il est, la factory ne peut que le deviner</li><li>et a defaut de cible trouvee, consigner la non-verification au REGISTRE plutot qu'au seul stderr, une verification non faite qui ne laisse pas de trace etant une verification qu'on croit faite</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un defaut d'heritage REEL (2 artefacts absents, clause R-43 manquante, aucun hook de la factory joue depuis le 23/08) non detecte par le controle ecrit pour cela ; 22 produits d'un meme dossier client sont dans le meme angle mort.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-10</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0556" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0556</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">factory : les vues docs\projet\ produites par ses propres scripts echouent au check_html du socle, et R-26 interdit au projet de les corriger</h3>
+          <div class="card-detail" data-cite><p class="lead">Mesure du 24/08 sur les fichiers COMMITES, avant toute modification, sous le jeu de regles courant (29 regles, empreinte b10762163897) : MODELE-DONNEES.html FAIL 23 / WARN 3 (A4 x1, L3 x6, L4 x13, L13 x1, L19 x2) ; TODO-PRODUIT.html FAIL 7 / WARN 2 (A4 x1, L3 x4, L19 x2) ; ARCHITECTURE.html FAIL 3 / WARN 3 (A4 x1, L19 x2). Les deux familles presentes sur LES TROIS viennent de la bibliotheque partagee scripts\lib-vue-html.mjs : le &lt;title&gt; (l.81) ne reprend aucun indice de version date -&gt; A4 ; overflow-wrap:anywhere pose sur .meta, td et footer (l.103, 109, 115) -&gt; L19. Les familles restantes dependent du contenu : 13 tables de 8 a 89 lignes sans data-filterable (L4), aucune barre de recherche statique (L13), jetons de colonne non legendes (L3). Tension de regles : R-26 interdit d'editer une vue generee, R-32 exige qu'un livrable HTML passe les oracles — un projet consciencieux ne peut ni corriger, ni livrer vert.</p><p class="detail-label">Proposition</p><ul class="puces"><li>traiter d'abord les deux familles transverses dans lib-vue-html.mjs (A4 : reprendre l'indice date du nommage dans le &lt;title&gt</li><li>L19 : reserver anywhere aux cellules d'identifiants, ou attendre l'arbitrage du retour L19/§6)</li><li>pour L4/L13, poser data-filterable et l'outillage de recherche du socle des qu'une table generee depasse 8 lignes, le generateur connaissant le nombre de lignes qu'il ecrit</li><li>pour L3, legender les jetons de colonne ou declarer une exemption motivee pour une vue de MODELE de donnees, ou tout jeton EST un nom de colonne. Elargit le constat reste au ledger le 19/08 (seq 55), qui ne portait que sur une vue et 21 echecs</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>33 echecs bloquants cumules sur les 3 vues generees, mesures sur la version commitee ; le projet ne peut pas les corriger sans violer R-26, ni les livrer sans violer R-32. Constat deja pose le 19/08 sur une seule vue, sans effet : le defaut est dans la bibliotheque partagee, pas dans un generateur.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-10</dd></div>
+            
+          </dl>
+        </article>
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
              titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
              socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
@@ -1134,9 +1181,101 @@
       </div>
     </section>
     <section id="digit-ai-forge-agents">
-      <h2>digit-ai-forge-agents <span class="badge" title="23 item(s) actifs ciblant digit-ai-forge-agents">23</span></h2>
+      <h2>digit-ai-forge-agents <span class="badge" title="27 item(s) actifs ciblant digit-ai-forge-agents">27</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-agents</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0557" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0557</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-agents, socle de rendu : composant-recherche.md prescrit mark.find-hit { color: inherit }, qui rend un badge a texte clair illisible en recherche active</h3>
+          <div class="card-detail" data-cite><p class="lead">references\composant-recherche.md l.39 prescrit mark.find-hit { background: var(--amber-fill,#fde9c8); color: inherit; border-radius: 2px } — verifie toujours en place le 24/08. Sur un badge a texte clair (le pattern .b-map du MEME socle, blanc sur bleu), le surlignage repeint le FOND en amber-fill sans toucher au texte : blanc sur presque blanc, ratio mesure 1,04:1. Mesure du 19/08 sur un livrable reel : 21 constats V2 BLOQUANTS aux quatre largeurs, uniquement en etat de recherche active (--etats-ouverts). Deux composants du meme socle se contredisent, et seule une page qui porte les DEUX et une recherche active le revele — c'est pourquoi il a survecu. Correctif applique cote produit et verifie aux quatre largeurs : color: var(--ink) ; les deux jetons basculent ensemble en theme sombre, le contraste tient des deux cotes.</p><p class="detail-label">Proposition</p><ul class="puces"><li>poser l'encre explicitement dans la prescription du socle</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>21 constats V2 bloquants sur un livrable par ailleurs vert, invisibles hors etat de recherche active ; le defaut vient d'une declaration de couleur prescrite par le socle, pas du CSS du projet.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-10</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0558" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0558</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-agents, composants.md §6 : la regle de calibrage du repli des tableaux est ecrite en prose et sans mecanisme — chaque projet la retraduit, et se trompe</h3>
+          <div class="card-detail" data-cite><p class="lead">§6 pose « ~130 px de largeur utile par colonne de prose — un tableau de N colonnes se replie sous N x 130 px environ, et 640 px n'est le bon seuil que jusqu'a 4-5 colonnes », puis l'exemple de code fige @media (max-width: 640px). Aucune mecanisation n'est fournie : le calibrage reste a la charge de chaque emetteur. Cout mesure ici : repli regle a 900 px alors qu'un tableau de 8 colonnes deborde jusque vers 1 400 px (bord droit mesure a 1 308 px pour un viewport de 1 280) — FAIL 16 debordements V1 sur le livrable 20260818e, INVISIBLES cinq jours (l'outil qui les mesure ne pouvait pas aller au bout de cette page, cf. TF-0365). Le meme 900 px est fige EN DUR dans gabarits\documents\rapport-de-donnees\SQUELETTE.html de la factory (l.209-231) : tout projet qui instancie la famille le reproduit.</p><p class="detail-label">Proposition</p><ul class="puces"><li>mecaniser plutot que decrire — .table-wrap:has(th:nth-child</li><li>declenche le repli anticipe sans qu'aucun emetteur ait a poser de classe (mesure : 20260818e repasse de FAIL 16 a PASS 0 bloquant). Un selecteur par palier de colonnes (5, 7, 9) couvre le calibrage §6 en trois lignes de CSS</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>16 debordements V1 bloquants restes invisibles cinq jours sur un livrable diffuse, pour une regle que le socle enonce correctement mais ne mecanise pas ; le meme seuil errone est fige dans le squelette de la bibliotheque de gabarits.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-10</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0554" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0554</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-agents, check_html L19 : la regle refuse ce que composants.md §6 rend OBLIGATOIRE, et elle juge un selecteur sans savoir sous quelle media query il vit</h3>
+          <div class="card-detail" data-cite><p class="lead">composants.md §6 (l.117-118) pose un « palier intermediaire OBLIGATOIRE entre le seuil de repli et la largeur ou le tableau tient a l'aise : overflow-wrap: anywhere sur les cellules ».</p><ul class="puces"><li>L19 (check_html.py l.1125-1170, TF-0492 du 22/08) traite td comme un selecteur de PROSE et rend FAIL bloquant. Les deux selecteurs releves ici — « tbody td » et « .table-wrap:has(th:nth-child</li><li>tbody td » — vivent A L'INTERIEUR du bloc @media du repli en cartes, donc ne s'appliquent QUE la ou §6 les exige. L'oracle ne peut pas le savoir : regles_css (check_html.py l.297-311) aplatit la feuille par la regex ([^{}]+)\{([^{}]*)\} et ne conserve AUCUN contexte d'at-rule — il n'ecarte que les selecteurs commencant par @. Mesure du 24/08 (jeu de regles 29 regles, empreinte b10762163897) : les 8 livrables HTML de output\, tous PASS 0/0 le 19/08, rendent 12 FAIL, TOUS L19, sans qu'un octet ait bouge ; les 3 vues docs\projet\ generees par les scripts de la factory en portent 2 chacune, du meme motif. Pistes, par ordre de cout :</li><li>faire porter a regles_css le contexte d'at-rule et exempter L19 sous une media query de repli en cartes</li><li>exempter le couple display:block + overflow-wrap:anywhere sur td — signature du repli en cartes, jamais de la prose</li><li>a defaut, trancher la contradiction DANS §6 et y ecrire l'exemption attendue (data-coupure-ok, ou une classe reconnue par le motif TECHNIQUE de L19). Ce qu'il ne faut pas laisser : les deux textes en l'etat, l'un obligeant ce que l'autre bloque</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>11 fichiers passes de PASS a FAIL sans modification : 8 livrables du projet (12 echecs, tous L19) et les 3 vues generees par la factory (2 chacune). Aucun projet appliquant §6 ne peut livrer vert tant que la contradiction tient.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-10</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0559" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0559</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1.5)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-agents, render_page V4 : la boite d'un element inline vaut la hauteur d'em, pas l'interligne — deux inline FRERES de lignes consecutives se chevauchent sans qu'un pixel ne se superpose</h3>
+          <div class="card-detail" data-cite><p class="lead">V4 mesure des boites englobantes. La boite d'un element inline vaut la hauteur d'em de la police, pas l'interligne : deux inline sur des lignes consecutives se recouvrent donc des que line-height est inferieur a cette hauteur, sans qu'aucun pixel peint ne se superpose. La parade deja presente (render_page.py l.360-366 : getClientRects() rend une boite PAR LIGNE) ne couvre QUE l'inline reparti sur plusieurs lignes — verifie le 24/08 : deux inline FRERES du meme parent restent juges sur leur boite d'em. Mesure du 19/08 (scripts/mesurer_chevauchement_marks.py, 1 246 marks d'un livrable reel) : a line-height 1,22 le recouvrement vaut 5 px et rend un constat BLOQUANT a 390 px ; a 1,3 il vaut encore 3 px ; a 1,45 il disparait.</p><p class="detail-label">Proposition</p><ul class="puces"><li>ignorer l'intersection entre deux inline freres du meme parent quand elle tient dans la difference entre hauteur d'em et interligne, ou la classer en avertissement — meme nature d'exclusion que colgroup/col (TF-0444) et que le groupe SVG titre (TF-0424)</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1.5 — gain 1 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un constat bloquant a 390 px leve sur une page geometriquement saine ; contourne cote produit en portant l'interligne des titres de 1,22 a 1,45 — une mise en page deformee pour satisfaire une mesure.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-10</dd></div>
+            
+          </dl>
+        </article>
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
              titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
              socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte

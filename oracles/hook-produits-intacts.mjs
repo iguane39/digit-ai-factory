@@ -18,7 +18,8 @@
  * CE QUI EST FAIT À LA PLACE : une COMPARAISON D'ÉTAT, insensible à l'outil employé. À
  * l'ouverture, on relève pour chaque dépôt produit son `HEAD` et l'empreinte de son état de
  * travail. À la fin du tour, on recompare. Une modification, un commit, un fichier neuf — quelle
- * que soit la voie — se voit. Et le tour est BLOQUÉ tant que la restitution ne l'a pas déclaré.
+ * que soit la voie — se voit, et il est RAPPORTÉ en fin de tour. Le blocage a été retiré le 24/08
+ * sur décision humaine (choix « 2a ») : voir « CE QUE LE 24/08 A APPRIS » ci-dessous.
  *
  * L'ÉCHAPPATOIRE EST NOMMÉE, JAMAIS DEVINÉE : `FORGE_MANDAT_PRODUIT=<nom>` déclare le produit sur
  * lequel un run est demandé. Ce produit-là est alors suivi et RAPPORTÉ, jamais bloqué — un run
@@ -43,7 +44,7 @@
  *
  * Usage :
  *   node oracles/hook-produits-intacts.mjs --empreinte   (SessionStart : relève l'état)
- *   node oracles/hook-produits-intacts.mjs               (Stop : compare, bloque si écart)
+ *   node oracles/hook-produits-intacts.mjs               (Stop : compare et RAPPORTE tout mouvement)
  *   node oracles/hook-produits-intacts.mjs --self-test   (les deux sens, sur des dépôts jouets)
  */
 import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, mkdtempSync, rmSync, statSync } from "node:fs";
@@ -471,6 +472,12 @@ if (r.verdict === "FAIL") {
     "le journalisant. " +
     "Ce contrôle compare l'état des dépôts produits entre l'ouverture et la fin du tour : il ne " +
     "dépend pas de l'outil employé, donc un script lancé en shell est vu comme une édition directe.";
+  // MODE VALIDÉ PAR L'HUMAIN (24/08, choix « 2a » après trois explications) : la question a été
+  // posée en trois options — signaler, bloquer, ou bloquer sur les seuls fichiers déjà suivis —
+  // avec le coût de chacune. Réponse : il SIGNALE. La réduction de garantie est donc assumée par
+  // qui l'avait demandée, et elle n'a pas à être re-débattue à chaque lecture. Ce qui la
+  // renverserait : une écriture réelle du pilot chez un produit, constatée et journalisée — ce
+  // jour-là l'arbitrage se repose avec ce fait en main, et pas avant.
   // RAPPORTÉ, jamais bloqué. Ce hook ne peut pas attribuer une écriture à son auteur — trois
   // discriminants l'ont réduit sans jamais y parvenir — et bloquer sur le travail d'une autre
   // session coûte plus qu'il ne protège : cinq refus en une heure, tous injustifiés, et un remède
