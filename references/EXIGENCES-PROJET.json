@@ -1,102 +1,529 @@
 {
-  "schema": "pilot/exigences-projet@1",
-  "version": "1.0.0",
-  "date": "2026-08-23",
-  "regle": "Chaque EXIGENCE d'une règle de REGLES-PROJET.md porte ici un identifiant stable `R-<n>.<i>` et dit qui la contrôle. Le taux de couverture se calcule sur les EXIGENCES, jamais sur les règles.",
-  "pourquoi": "TF-0548. La couverture affichait 24 règles sur 26, soit 92 %, pendant que quinze candidatures étaient refusées en trois jours à cause d'une exigence non contrôlée. La règle 18 exige le gabarit de retours depuis le 06/08 — « `forge\\retours\\` existe (GABARIT INCLUS) » — et son contrôle ne vérifiait que le dossier. Comptée couverte à 100 %, elle l'était à 20 %. Une métrique qui compte des règles là où le travail se fait par exigence peut rester au vert indéfiniment pendant que le trou grandit.",
-  "ce_qui_n_est_pas_fait_et_pourquoi": "Les numéros R-1..R-47 ne sont PAS renumérotés. Ils sont cités dans les findings de l'oracle, dans les messages de commit, dans le registre TODO-FORGE, dans les gabarits et dans les lots des produits : les renuméroter casserait toute la traçabilité pour un gain de forme. Une exigence devient donc une règle distincte et numérotée SOUS son numéro d'origine (`R-18.1`, `R-18.2`…), ce qui est l'esprit de la voie (a) sans son coût.",
-  "non_juge": [
-    "la JUSTESSE d'un contrôle : on vérifie qu'une exigence a un contrôle rattaché, jamais qu'il juge bien — c'est le rôle des recettes double sens de chaque oracle",
-    "l'exhaustivité de la décomposition elle-même : un énoncé peut porter une exigence que personne n'a vue. C'est déclaré comme une limite, pas résolu — la revue reste le seul filet",
-    "les règles W, X, Y (43, 44, 47) rédigées en sections et non au tableau : elles portent leurs exigences dans leur propre texte et sont couvertes par des findings dédiés"
-  ],
-  "statuts": {
-    "couverte": "une exigence rattachée à un finding identifié par le couple (règle, ou)",
-    "non_couverte": "aucun contrôle ne la joue — le motif dit pourquoi, et ce qu'il faudrait pour la couvrir",
-    "couverte_ailleurs": "contrôlée par un autre oracle ou un script dédié, hors oracle-conformite-projet — le porteur est nommé"
+ "schema": "pilot/exigences-projet@1",
+ "version": "1.0.0",
+ "date": "2026-08-24",
+ "regle": "Chaque EXIGENCE d'une règle de REGLES-PROJET.md porte ici un identifiant stable `R-<n>.<i>` et dit qui la contrôle. Le taux de couverture se calcule sur les EXIGENCES, jamais sur les règles.",
+ "pourquoi": "TF-0548. La couverture affichait 24 règles sur 26, soit 92 %, pendant que quinze candidatures étaient refusées en trois jours à cause d'une exigence non contrôlée. La règle 18 exige le gabarit de retours depuis le 06/08 — « `forge\\retours\\` existe (GABARIT INCLUS) » — et son contrôle ne vérifiait que le dossier. Comptée couverte à 100 %, elle l'était à 20 %. Une métrique qui compte des règles là où le travail se fait par exigence peut rester au vert indéfiniment pendant que le trou grandit.",
+ "ce_qui_n_est_pas_fait_et_pourquoi": "Les numéros R-1..R-47 ne sont PAS renumérotés. Ils sont cités dans les findings de l'oracle, dans les messages de commit, dans le registre TODO-FORGE, dans les gabarits et dans les lots des produits : les renuméroter casserait toute la traçabilité pour un gain de forme. Une exigence devient donc une règle distincte et numérotée SOUS son numéro d'origine (`R-18.1`, `R-18.2`…), ce qui est l'esprit de la voie (a) sans son coût.",
+ "non_juge": [
+  "la JUSTESSE d'un contrôle : on vérifie qu'une exigence a un contrôle rattaché, jamais qu'il juge bien — c'est le rôle des recettes double sens de chaque oracle",
+  "l'exhaustivité de la décomposition elle-même : un énoncé peut porter une exigence que personne n'a vue. C'est déclaré comme une limite, pas résolu — la revue reste le seul filet",
+  "les règles W, X, Y (43, 44, 47) rédigées en sections et non au tableau : elles portent leurs exigences dans leur propre texte et sont couvertes par des findings dédiés"
+ ],
+ "statuts": {
+  "couverte": "une exigence rattachée à un finding identifié par le couple (règle, ou)",
+  "non_couverte": "aucun contrôle ne la joue — le motif dit pourquoi, et ce qu'il faudrait pour la couvrir",
+  "couverte_ailleurs": "contrôlée par un autre oracle ou un script dédié, hors oracle-conformite-projet — le porteur est nommé"
+ },
+ "exigences": [
+  {
+   "id": "R-1.1",
+   "regle": 1,
+   "enonce": "`input\\` existe à la racine",
+   "statut": "couverte",
+   "controle": "R-1 / input"
   },
-  "exigences": [
-    { "id": "R-1.1", "regle": 1, "enonce": "`input\\` existe à la racine", "statut": "couverte", "controle": "R-1 / input" },
-    { "id": "R-1.2", "regle": 1, "enonce": "tout entrant fourni par l'humain vit dans `input\\`", "statut": "non_couverte", "motif": "juger qu'un fichier de la racine « vient de l'humain » demanderait de deviner sa provenance ; aucun marqueur ne la porte. Couvrable si les entrants recevaient un sidecar de provenance, ce qui n'existe pas." },
-
-    { "id": "R-2.1", "regle": 2, "enonce": "`output\\` existe", "statut": "couverte", "controle": "R-2 / output" },
-    { "id": "R-2.2", "regle": 2, "enonce": "tout livrable généré destiné à l'humain vit dans `output\\`", "statut": "couverte", "controle": "R-2 / output/, docs/" },
-    { "id": "R-2.3", "regle": 2, "enonce": "un document normatif (doctrine, gabarit, registre) n'est PAS une sortie : racine ou `docs\\`, jamais sous `output\\`", "statut": "non_couverte", "motif": "distinguer un document normatif d'un livrable demande de lire son intention ; le marquage `role:` du frontmatter le permettrait, il n'est pas exigé partout." },
-
-    { "id": "R-3.1", "regle": 3, "enonce": "`docs\\` existe pour la documentation pérenne", "statut": "couverte", "controle": "R-3 / docs" },
-
-    { "id": "R-4.1", "regle": 4, "enonce": "tout livrable documentaire est nommé `<Projet> - <Objet> - AAAAMMJJ<indice>.<ext>`", "statut": "couverte", "controle": "R-4 / output/, docs/" },
-    { "id": "R-4.2", "regle": 4, "enonce": "le nom du PROJET prime sur l'émetteur en tête de nom", "statut": "non_couverte", "motif": "l'oracle ne connaît pas le nom canonique du projet — il n'existe nulle part en donnée. Couvrable si le CLAUDE.md produit le déclarait." },
-    { "id": "R-4.3", "regle": 4, "enonce": "les fichiers historiques ne sont pas renommés", "statut": "non_couverte", "motif": "une interdiction de renommer se juge sur l'historique git, pas sur l'état ; aucun contrôle ne compare les noms d'un commit à l'autre." },
-
-    { "id": "R-5.1", "regle": 5, "enonce": "l'indice est une lettre (a, b, c…) par itération du même jour", "statut": "couverte", "controle": "R-4 / output/, docs/" },
-    { "id": "R-5.2", "regle": 5, "enonce": "une nouvelle version = un nouveau fichier daté, jamais d'écrasement", "statut": "couverte_ailleurs", "porteur": "scripts\\verifier-jugement.mjs (TF-0523, câblé le 23/08)", "motif": "le contrôle existe et compare l'empreinte d'un livrable à celle de son sceau, mais il n'émet AUCUN finding R-5 : la règle et son contrôle ne se rencontrent pas dans le verdict de conformité." },
-
-    { "id": "R-6.1", "regle": 6, "enonce": "aucune copie datée ni dossier `Old\\` pour du code", "statut": "couverte", "controle": "R-6 / *" },
-
-    { "id": "R-7.1", "regle": 7, "enonce": "un livrable documentaire remplacé migre dans `Old\\` du même dossier", "statut": "couverte", "controle": "R-7 / aucun dossier old\\ dans le projet" },
-
-    { "id": "R-8.1", "regle": 8, "enonce": "tout nouveau produit est `git init` à l'ouverture du run", "statut": "couverte", "controle": "R-8 / .git/" },
-    { "id": "R-8.2", "regle": 8, "enonce": "commit initial + commits par étape", "statut": "non_couverte", "motif": "« un commit par étape » suppose de savoir quelles étapes ont été jouées ; le ledger le dit, mais aucun contrôle ne confronte ledger et historique git." },
-    { "id": "R-8.3", "regle": 8, "enonce": "le push/remote reste sur GO humain", "statut": "non_couverte", "motif": "l'absence de push ne se distingue pas d'un push non encore fait ; un contrôle ici accuserait au hasard." },
-
-    { "id": "R-9.1", "regle": 9, "enonce": "commits en Conventional Commits français", "statut": "couverte", "controle": "R-9 / git log" },
-
-    { "id": "R-10.1", "regle": 10, "enonce": "`.gitignore` socle dès la création (.env, .venv/, __pycache__/, node_modules/, generated/, artefacts de build)", "statut": "couverte", "controle": "R-10 / .gitignore" },
-    { "id": "R-10.2", "regle": 10, "enonce": "sidecars d'oracles ignorés, avec exception `!forge\\**` (TF-0065)", "statut": "couverte", "controle": "R-10 / .gitignore" },
-
-    { "id": "R-11.1", "regle": 11, "enonce": "chaque produit naît avec un `CLAUDE.md` d'après le gabarit", "statut": "couverte", "controle": "R-11 / CLAUDE.md" },
-    { "id": "R-11.2", "regle": 11, "enonce": "section « Routage forge » remplie", "statut": "couverte", "controle": "R-11 / CLAUDE.md" },
-    { "id": "R-11.3", "regle": 11, "enonce": "les référentiels disponibles sont déclarés (R-11 bis, TF-0373)", "statut": "couverte", "controle": "R-11 bis / CLAUDE.md" },
-
-    { "id": "R-12.1", "regle": 12, "enonce": "`README.md` minimal : quoi, 2 commandes, lien CLAUDE.md", "statut": "couverte", "controle": "R-12 / README.md" },
-
-    { "id": "R-13.1", "regle": 13, "enonce": "`.env.example` versionné", "statut": "couverte", "controle": "R-13 / .env.example" },
-    { "id": "R-13.2", "regle": 13, "enonce": "exhaustif : variables applicatives ET infra", "statut": "non_couverte", "motif": "l'exhaustivité se juge contre ce que le code lit ; aucun contrôle ne balaie les accès aux variables d'environnement du produit pour les confronter au fichier." },
-    { "id": "R-13.3", "regle": 13, "enonce": "en-tête « ne jamais renseigner de secret ici »", "statut": "couverte", "controle": "R-13 / .env.example" },
-
-    { "id": "R-14.1", "regle": 14, "enonce": "`.env` réel toujours gitignoré", "statut": "couverte", "controle": "R-14 / .env" },
-    { "id": "R-14.2", "regle": 14, "enonce": "aucun secret committé, jamais", "statut": "couverte", "controle": "R-14 / .env" },
-
-    { "id": "R-15.1", "regle": 15, "enonce": "les variables non renseignables portent `# à fournir :` dans `.env.example`", "statut": "non_couverte", "motif": "AUCUN contrôle, ni ici ni ailleurs — le motif `# à fournir :` n'est vérifié que dans ACCES-TEST.md au titre de R-23. Couvrable immédiatement : le fichier et le motif sont tous deux déterministes." },
-    { "id": "R-15.2", "regle": 15, "enonce": "ces variables alimentent les `non_testables[]` de l'étape qualif (RT-6)", "statut": "non_couverte", "motif": "le chaînage vers l'étape qualif se juge dans forge-tests, pas ici ; aucun contrôle ne confronte les deux listes." },
-
-    { "id": "R-16.1", "regle": 16, "enonce": "les rapports finaux destinés à l'humain sont copiés dans `output\\` au nommage daté", "statut": "couverte", "controle": "R-16 / output/" },
-
-    { "id": "R-17.1", "regle": 17, "enonce": "les journaux d'oracles sont versionnés sous `forge\\`", "statut": "couverte", "controle": "R-17 / forge/" },
-    { "id": "R-17.2", "regle": 17, "enonce": "ils sont ignorés partout ailleurs", "statut": "couverte", "controle": "R-17 / forge/" },
-
-    { "id": "R-18.1", "regle": 18, "enonce": "`forge\\retours\\` existe", "statut": "couverte", "controle": "R-18 / forge/retours/" },
-    { "id": "R-18.2", "regle": 18, "enonce": "GABARIT INCLUS dans `forge\\retours\\`", "statut": "couverte", "controle": "R-47 / artefacts hérités", "note": "non couverte du 06/08 au 23/08 : c'est l'exigence qui a coûté quinze candidatures refusées sur deux produits, et c'est elle qui a fait naître ce référentiel." },
-    { "id": "R-18.3", "regle": 18, "enonce": "chaque lot est `<projet> - RETOURS - <AAAAMMJJ><indice>.md` + sidecar `.tf.jsonl` homonyme", "statut": "couverte_ailleurs", "porteur": "oracle-boite-entree (B1-B7), côté pilot", "motif": "le nom se juge à l'arrivée chez le pilot, pas chez le produit — c'est là que les lots cohabitent." },
-    { "id": "R-18.4", "regle": 18, "enonce": "le préfixe projet est obligatoire", "statut": "couverte_ailleurs", "porteur": "oracle-boite-entree", "motif": "même raison : le préfixe sert à distinguer les lots de plusieurs produits, ce qui n'a de sens que chez le pilot." },
-    { "id": "R-18.5", "regle": 18, "enonce": "ids en séquence continue par produit", "statut": "non_couverte", "motif": "aucun contrôle ne vérifie la continuité des indices d'un produit — ni chez lui, ni chez le pilot. Un trou dans la série passe inaperçu." },
-    { "id": "R-18.6", "regle": 18, "enonce": "un lot n'est JAMAIS modifié après remise", "statut": "non_couverte", "motif": "se juge sur l'historique, pas sur l'état. Le mécanisme d'empreinte de TF-0478 le rendrait mesurable si les lots étaient scellés à la remise." },
-    { "id": "R-18.7", "regle": 18, "enonce": "remise = copie dans `input\\00-retours\\` du pilot, puis `old\\` après ingestion", "statut": "couverte_ailleurs", "porteur": "oracle-boite-entree (B1)", "motif": "le rangement se constate chez le pilot." },
-
-    { "id": "R-19.1", "regle": 19, "enonce": "le ledger porte `versions_forges` aux clés canoniques", "statut": "couverte", "controle": "R-19 / forge/ledger.jsonl" },
-
-    { "id": "R-20.1", "regle": 20, "enonce": "`docs\\projet\\` porte les 8 fichiers du socle", "statut": "couverte", "controle": "R-20 / docs\\projet\\" },
-    { "id": "R-20.2", "regle": 20, "enonce": "`TODO-PRODUIT.md` existe et sa projection `.html` est en parité", "statut": "couverte", "controle": "R-20 / docs\\projet\\TODO-PRODUIT.md → .html" },
-    { "id": "R-20.3", "regle": 20, "enonce": "la section « Améliorations » n'accueille que de vrais restes à faire (TF-0528)", "statut": "couverte", "controle": "R-20 / docs\\projet\\TODO-PRODUIT.md (nature des lignes)" },
-
-    { "id": "R-21.1", "regle": 21, "enonce": "chaque `nom@version` de TECHNOS correspond aux lockfiles du produit", "statut": "couverte", "controle": "R-21 / docs\\projet\\TECHNOS.md" },
-
-    { "id": "R-22.1", "regle": 22, "enonce": "parité des noms de variables entre PARAMETRAGE et `.env.example`", "statut": "couverte", "controle": "R-22 / docs\\projet\\PARAMETRAGE.md" },
-
-    { "id": "R-23.1", "regle": 23, "enonce": "en-tête littéral « comptes de démonstration locale — jamais valides hors MODE_DEMO »", "statut": "couverte", "controle": "R-23 / docs\\projet\\ACCES-TEST.md" },
-    { "id": "R-23.2", "regle": 23, "enonce": "zéro motif de secret réel dans ACCES-TEST", "statut": "couverte", "controle": "R-23 / docs\\projet\\ACCES-TEST.md" },
-    { "id": "R-23.3", "regle": 23, "enonce": "comptes créés par seed derrière le drapeau MODE_DEMO (loi 2)", "statut": "non_couverte", "motif": "vérifier qu'un compte naît d'un seed sous drapeau demande de lire le code d'amorçage du produit ; l'oracle ne juge que le document." },
-
-    { "id": "R-24.1", "regle": 24, "enonce": "tout environnement hébergé expose `<nom-appli>-<env>.<domaine>`, env ∈ {dev, qualif, production}", "statut": "couverte", "controle": "R-24 / docs\\projet\\PARAMETRAGE.md" },
-
-    { "id": "R-25.1", "regle": 25, "enonce": "le `<Type>` de tout livrable daté figure au registre des types d'organization", "statut": "couverte", "controle": "R-25 / output/, docs/" },
-    { "id": "R-25.2", "regle": 25, "enonce": "un type nouveau s'ajoute au registre dans un commit motivé, jamais improvisé", "statut": "non_couverte", "motif": "se juge sur l'historique du dépôt frère organization, hors de portée d'un oracle qui juge un produit." },
-
-    { "id": "R-26.1", "regle": 26, "enonce": "chaque table de MODELE-DONNEES porte une `provenance:` qui existe et contient le nom de la table", "statut": "couverte", "controle": "R-26 / docs\\projet\\MODELE-DONNEES.md" },
-
-    { "id": "R-27.1", "regle": 27, "enonce": "tout produit à surface web copie `robots.txt` avec les agents IA autorisés par défaut", "statut": "couverte", "controle": "R-27 / robots.txt" },
-    { "id": "R-27.2", "regle": 27, "enonce": "`llms.txt` est présent à côté", "statut": "couverte", "controle": "R-27 / robots.txt" },
-    { "id": "R-27.3", "regle": 27, "enonce": "bloquer un agent est une décision consignée, datée et motivée DANS le fichier", "statut": "non_couverte", "motif": "un `Disallow` sans commentaire daté serait détectable ; le contrôle ne le fait pas encore. Couvrable sans difficulté." }
-  ]
+  {
+   "id": "R-1.2",
+   "regle": 1,
+   "enonce": "tout entrant fourni par l'humain vit dans `input\\`",
+   "statut": "non_couverte",
+   "motif": "juger qu'un fichier de la racine « vient de l'humain » demanderait de deviner sa provenance ; aucun marqueur ne la porte. Couvrable si les entrants recevaient un sidecar de provenance, ce qui n'existe pas."
+  },
+  {
+   "id": "R-2.1",
+   "regle": 2,
+   "enonce": "`output\\` existe",
+   "statut": "couverte",
+   "controle": "R-2 / output"
+  },
+  {
+   "id": "R-2.2",
+   "regle": 2,
+   "enonce": "tout livrable généré destiné à l'humain vit dans `output\\`",
+   "statut": "couverte",
+   "controle": "R-2 / output/, docs/"
+  },
+  {
+   "id": "R-2.3",
+   "regle": 2,
+   "enonce": "un document normatif (doctrine, gabarit, registre) n'est PAS une sortie : racine ou `docs\\`, jamais sous `output\\`",
+   "statut": "non_couverte",
+   "motif": "distinguer un document normatif d'un livrable demande de lire son intention ; le marquage `role:` du frontmatter le permettrait, il n'est pas exigé partout."
+  },
+  {
+   "id": "R-3.1",
+   "regle": 3,
+   "enonce": "`docs\\` existe pour la documentation pérenne",
+   "statut": "couverte",
+   "controle": "R-3 / docs"
+  },
+  {
+   "id": "R-4.1",
+   "regle": 4,
+   "enonce": "tout livrable documentaire est nommé `<Projet> - <Objet> - AAAAMMJJ<indice>.<ext>`",
+   "statut": "couverte",
+   "controle": "R-4 / output/, docs/"
+  },
+  {
+   "id": "R-4.2",
+   "regle": 4,
+   "enonce": "le nom du PROJET prime sur l'émetteur en tête de nom",
+   "statut": "non_couverte",
+   "motif": "l'oracle ne connaît pas le nom canonique du projet — il n'existe nulle part en donnée. Couvrable si le CLAUDE.md produit le déclarait."
+  },
+  {
+   "id": "R-4.3",
+   "regle": 4,
+   "enonce": "les fichiers historiques ne sont pas renommés",
+   "statut": "non_couverte",
+   "motif": "une interdiction de renommer se juge sur l'historique git, pas sur l'état ; aucun contrôle ne compare les noms d'un commit à l'autre."
+  },
+  {
+   "id": "R-5.1",
+   "regle": 5,
+   "enonce": "l'indice est une lettre (a, b, c…) par itération du même jour",
+   "statut": "couverte",
+   "controle": "R-4 / output/, docs/"
+  },
+  {
+   "id": "R-5.2",
+   "regle": 5,
+   "enonce": "une nouvelle version = un nouveau fichier daté, jamais d'écrasement",
+   "statut": "couverte_ailleurs",
+   "porteur": "scripts\\verifier-jugement.mjs (TF-0523, câblé le 23/08)",
+   "motif": "le contrôle existe et compare l'empreinte d'un livrable à celle de son sceau, mais il n'émet AUCUN finding R-5 : la règle et son contrôle ne se rencontrent pas dans le verdict de conformité."
+  },
+  {
+   "id": "R-6.1",
+   "regle": 6,
+   "enonce": "aucune copie datée ni dossier `Old\\` pour du code",
+   "statut": "couverte",
+   "controle": "R-6 / *"
+  },
+  {
+   "id": "R-7.1",
+   "regle": 7,
+   "enonce": "un livrable documentaire remplacé migre dans `Old\\` du même dossier",
+   "statut": "couverte",
+   "controle": "R-7 / aucun dossier old\\ dans le projet"
+  },
+  {
+   "id": "R-8.1",
+   "regle": 8,
+   "enonce": "tout nouveau produit est `git init` à l'ouverture du run",
+   "statut": "couverte",
+   "controle": "R-8 / .git/"
+  },
+  {
+   "id": "R-8.2",
+   "regle": 8,
+   "enonce": "commit initial + commits par étape",
+   "statut": "non_couverte",
+   "motif": "« un commit par étape » suppose de savoir quelles étapes ont été jouées ; le ledger le dit, mais aucun contrôle ne confronte ledger et historique git."
+  },
+  {
+   "id": "R-8.3",
+   "regle": 8,
+   "enonce": "le push/remote reste sur GO humain",
+   "statut": "non_couverte",
+   "motif": "l'absence de push ne se distingue pas d'un push non encore fait ; un contrôle ici accuserait au hasard."
+  },
+  {
+   "id": "R-9.1",
+   "regle": 9,
+   "enonce": "commits en Conventional Commits français",
+   "statut": "couverte",
+   "controle": "R-9 / git log"
+  },
+  {
+   "id": "R-10.1",
+   "regle": 10,
+   "enonce": "`.gitignore` socle dès la création (.env, .venv/, __pycache__/, node_modules/, generated/, artefacts de build)",
+   "statut": "couverte",
+   "controle": "R-10 / .gitignore"
+  },
+  {
+   "id": "R-10.2",
+   "regle": 10,
+   "enonce": "sidecars d'oracles ignorés, avec exception `!forge\\**` (TF-0065)",
+   "statut": "couverte",
+   "controle": "R-10 / .gitignore"
+  },
+  {
+   "id": "R-11.1",
+   "regle": 11,
+   "enonce": "chaque produit naît avec un `CLAUDE.md` d'après le gabarit",
+   "statut": "couverte",
+   "controle": "R-11 / CLAUDE.md"
+  },
+  {
+   "id": "R-11.2",
+   "regle": 11,
+   "enonce": "section « Routage forge » remplie",
+   "statut": "couverte",
+   "controle": "R-11 / CLAUDE.md"
+  },
+  {
+   "id": "R-11.3",
+   "regle": 11,
+   "enonce": "les référentiels disponibles sont déclarés (R-11 bis, TF-0373)",
+   "statut": "couverte",
+   "controle": "R-11 bis / CLAUDE.md"
+  },
+  {
+   "id": "R-12.1",
+   "regle": 12,
+   "enonce": "`README.md` minimal : quoi, 2 commandes, lien CLAUDE.md",
+   "statut": "couverte",
+   "controle": "R-12 / README.md"
+  },
+  {
+   "id": "R-13.1",
+   "regle": 13,
+   "enonce": "`.env.example` versionné",
+   "statut": "couverte",
+   "controle": "R-13 / .env.example"
+  },
+  {
+   "id": "R-13.2",
+   "regle": 13,
+   "enonce": "exhaustif : variables applicatives ET infra",
+   "statut": "non_couverte",
+   "motif": "l'exhaustivité se juge contre ce que le code lit ; aucun contrôle ne balaie les accès aux variables d'environnement du produit pour les confronter au fichier."
+  },
+  {
+   "id": "R-13.3",
+   "regle": 13,
+   "enonce": "en-tête « ne jamais renseigner de secret ici »",
+   "statut": "couverte",
+   "controle": "R-13 / .env.example"
+  },
+  {
+   "id": "R-14.1",
+   "regle": 14,
+   "enonce": "`.env` réel toujours gitignoré",
+   "statut": "couverte",
+   "controle": "R-14 / .env"
+  },
+  {
+   "id": "R-14.2",
+   "regle": 14,
+   "enonce": "aucun secret committé, jamais",
+   "statut": "couverte",
+   "controle": "R-14 / .env"
+  },
+  {
+   "id": "R-15.1",
+   "regle": 15,
+   "enonce": "les variables non renseignables portent `# à fournir :` dans `.env.example`",
+   "statut": "non_couverte",
+   "motif": "AUCUN contrôle, ni ici ni ailleurs — le motif `# à fournir :` n'est vérifié que dans ACCES-TEST.md au titre de R-23. Couvrable immédiatement : le fichier et le motif sont tous deux déterministes."
+  },
+  {
+   "id": "R-15.2",
+   "regle": 15,
+   "enonce": "ces variables alimentent les `non_testables[]` de l'étape qualif (RT-6)",
+   "statut": "non_couverte",
+   "motif": "le chaînage vers l'étape qualif se juge dans forge-tests, pas ici ; aucun contrôle ne confronte les deux listes."
+  },
+  {
+   "id": "R-16.1",
+   "regle": 16,
+   "enonce": "les rapports finaux destinés à l'humain sont copiés dans `output\\` au nommage daté",
+   "statut": "couverte",
+   "controle": "R-16 / output/"
+  },
+  {
+   "id": "R-17.1",
+   "regle": 17,
+   "enonce": "les journaux d'oracles sont versionnés sous `forge\\`",
+   "statut": "couverte",
+   "controle": "R-17 / forge/"
+  },
+  {
+   "id": "R-17.2",
+   "regle": 17,
+   "enonce": "ils sont ignorés partout ailleurs",
+   "statut": "couverte",
+   "controle": "R-17 / forge/"
+  },
+  {
+   "id": "R-18.1",
+   "regle": 18,
+   "enonce": "`forge\\retours\\` existe",
+   "statut": "couverte",
+   "controle": "R-18 / forge/retours/"
+  },
+  {
+   "id": "R-18.2",
+   "regle": 18,
+   "enonce": "GABARIT INCLUS dans `forge\\retours\\`",
+   "statut": "couverte",
+   "controle": "R-47 / artefacts hérités",
+   "note": "non couverte du 06/08 au 23/08 : c'est l'exigence qui a coûté quinze candidatures refusées sur deux produits, et c'est elle qui a fait naître ce référentiel."
+  },
+  {
+   "id": "R-18.3",
+   "regle": 18,
+   "enonce": "chaque lot est `<projet> - RETOURS - <AAAAMMJJ><indice>.md` + sidecar `.tf.jsonl` homonyme",
+   "statut": "couverte_ailleurs",
+   "porteur": "oracle-boite-entree (B1-B7), côté pilot",
+   "motif": "le nom se juge à l'arrivée chez le pilot, pas chez le produit — c'est là que les lots cohabitent."
+  },
+  {
+   "id": "R-18.4",
+   "regle": 18,
+   "enonce": "le préfixe projet est obligatoire",
+   "statut": "couverte_ailleurs",
+   "porteur": "oracle-boite-entree",
+   "motif": "même raison : le préfixe sert à distinguer les lots de plusieurs produits, ce qui n'a de sens que chez le pilot."
+  },
+  {
+   "id": "R-18.5",
+   "regle": 18,
+   "enonce": "ids en séquence continue par produit",
+   "statut": "non_couverte",
+   "motif": "aucun contrôle ne vérifie la continuité des indices d'un produit — ni chez lui, ni chez le pilot. Un trou dans la série passe inaperçu."
+  },
+  {
+   "id": "R-18.6",
+   "regle": 18,
+   "enonce": "un lot n'est JAMAIS modifié après remise",
+   "statut": "non_couverte",
+   "motif": "se juge sur l'historique, pas sur l'état. Le mécanisme d'empreinte de TF-0478 le rendrait mesurable si les lots étaient scellés à la remise."
+  },
+  {
+   "id": "R-18.7",
+   "regle": 18,
+   "enonce": "remise = copie dans `input\\00-retours\\` du pilot, puis `old\\` après ingestion",
+   "statut": "couverte_ailleurs",
+   "porteur": "oracle-boite-entree (B1)",
+   "motif": "le rangement se constate chez le pilot."
+  },
+  {
+   "id": "R-19.1",
+   "regle": 19,
+   "enonce": "le ledger porte `versions_forges` aux clés canoniques",
+   "statut": "couverte",
+   "controle": "R-19 / forge/ledger.jsonl"
+  },
+  {
+   "id": "R-20.1",
+   "regle": 20,
+   "enonce": "`docs\\projet\\` porte les 8 fichiers du socle",
+   "statut": "couverte",
+   "controle": "R-20 / docs\\projet\\"
+  },
+  {
+   "id": "R-20.2",
+   "regle": 20,
+   "enonce": "`TODO-PRODUIT.md` existe et sa projection `.html` est en parité",
+   "statut": "couverte",
+   "controle": "R-20 / docs\\projet\\TODO-PRODUIT.md → .html"
+  },
+  {
+   "id": "R-20.3",
+   "regle": 20,
+   "enonce": "la section « Améliorations » n'accueille que de vrais restes à faire (TF-0528)",
+   "statut": "couverte",
+   "controle": "R-20 / docs\\projet\\TODO-PRODUIT.md (nature des lignes)"
+  },
+  {
+   "id": "R-21.1",
+   "regle": 21,
+   "enonce": "chaque `nom@version` de TECHNOS correspond aux lockfiles du produit",
+   "statut": "couverte",
+   "controle": "R-21 / docs\\projet\\TECHNOS.md"
+  },
+  {
+   "id": "R-22.1",
+   "regle": 22,
+   "enonce": "parité des noms de variables entre PARAMETRAGE et `.env.example`",
+   "statut": "couverte",
+   "controle": "R-22 / docs\\projet\\PARAMETRAGE.md"
+  },
+  {
+   "id": "R-23.1",
+   "regle": 23,
+   "enonce": "en-tête littéral « comptes de démonstration locale — jamais valides hors MODE_DEMO »",
+   "statut": "couverte",
+   "controle": "R-23 / docs\\projet\\ACCES-TEST.md"
+  },
+  {
+   "id": "R-23.2",
+   "regle": 23,
+   "enonce": "zéro motif de secret réel dans ACCES-TEST",
+   "statut": "couverte",
+   "controle": "R-23 / docs\\projet\\ACCES-TEST.md"
+  },
+  {
+   "id": "R-23.3",
+   "regle": 23,
+   "enonce": "comptes créés par seed derrière le drapeau MODE_DEMO (loi 2)",
+   "statut": "non_couverte",
+   "motif": "vérifier qu'un compte naît d'un seed sous drapeau demande de lire le code d'amorçage du produit ; l'oracle ne juge que le document."
+  },
+  {
+   "id": "R-24.1",
+   "regle": 24,
+   "enonce": "tout environnement hébergé expose `<nom-appli>-<env>.<domaine>`, env ∈ {dev, qualif, production}",
+   "statut": "couverte",
+   "controle": "R-24 / docs\\projet\\PARAMETRAGE.md"
+  },
+  {
+   "id": "R-25.1",
+   "regle": 25,
+   "enonce": "le `<Type>` de tout livrable daté figure au registre des types d'organization",
+   "statut": "couverte",
+   "controle": "R-25 / output/, docs/"
+  },
+  {
+   "id": "R-25.2",
+   "regle": 25,
+   "enonce": "un type nouveau s'ajoute au registre dans un commit motivé, jamais improvisé",
+   "statut": "non_couverte",
+   "motif": "se juge sur l'historique du dépôt frère organization, hors de portée d'un oracle qui juge un produit."
+  },
+  {
+   "id": "R-26.1",
+   "regle": 26,
+   "enonce": "chaque table de MODELE-DONNEES porte une `provenance:` qui existe et contient le nom de la table",
+   "statut": "couverte",
+   "controle": "R-26 / docs\\projet\\MODELE-DONNEES.md"
+  },
+  {
+   "id": "R-27.1",
+   "regle": 27,
+   "enonce": "tout produit à surface web copie `robots.txt` avec les agents IA autorisés par défaut",
+   "statut": "couverte",
+   "controle": "R-27 / robots.txt"
+  },
+  {
+   "id": "R-27.2",
+   "regle": 27,
+   "enonce": "`llms.txt` est présent à côté",
+   "statut": "couverte",
+   "controle": "R-27 / robots.txt"
+  },
+  {
+   "id": "R-27.3",
+   "regle": 27,
+   "enonce": "bloquer un agent est une décision consignée, datée et motivée DANS le fichier",
+   "statut": "non_couverte",
+   "motif": "un `Disallow` sans commentaire daté serait détectable ; le contrôle ne le fait pas encore. Couvrable sans difficulté."
+  },
+  {
+   "id": "R-48.1",
+   "regle": 48,
+   "enonce": "toute action laissée à un humain porte sa NON-DÉDUCTIBILITÉ écrite : pourquoi deux personnes compétentes ne trancheraient pas identiquement sans information supplémentaire",
+   "statut": "couverte_ailleurs",
+   "porteur": "oracles\\oracle-sollicitations.mjs (SO1-SO3, TF-0540, ecrit le 24/08) ; cote forge, forge-tests tests/test_r48_sollicitation_justifiee.py",
+   "motif": "R-48 juge la FORME d'un rapport de forge, pas l'etat du depot du produit : le controle vit donc dans un oracle dedie, hors oracle-conformite-projet, et il se joue sur l'artefact qu'on lui passe. oracle-sollicitations SO1 — mesuré sur le parc le 24/08 : 21 constats sur un rapport de 2026-08-18 et 11 sur le plus récent, PASS sur un rapport généré après correction"
+  },
+  {
+   "id": "R-48.2",
+   "regle": 48,
+   "enonce": "un verdict DÉGRADÉ par une configuration absente nomme le défaut qui aurait pu s'appliquer, ou déclare pourquoi aucun défaut n'est raisonnable",
+   "statut": "couverte_ailleurs",
+   "porteur": "oracles\\oracle-sollicitations.mjs (SO1-SO3, TF-0540, ecrit le 24/08) ; cote forge, forge-tests tests/test_r48_sollicitation_justifiee.py",
+   "motif": "R-48 juge la FORME d'un rapport de forge, pas l'etat du depot du produit : le controle vit donc dans un oracle dedie, hors oracle-conformite-projet, et il se joue sur l'artefact qu'on lui passe. oracle-sollicitations SO2 — un constat sur chacun des deux rapports mesurés le 24/08"
+  },
+  {
+   "id": "R-48.3",
+   "regle": 48,
+   "enonce": "une passe qui a tranché d'office le DIT dans une section relisible a posteriori — une décision prise en silence est indiscernable d'un oubli",
+   "statut": "couverte_ailleurs",
+   "porteur": "oracles\\oracle-sollicitations.mjs (SO1-SO3, TF-0540, ecrit le 24/08) ; cote forge, forge-tests tests/test_r48_sollicitation_justifiee.py",
+   "motif": "R-48 juge la FORME d'un rapport de forge, pas l'etat du depot du produit : le controle vit donc dans un oracle dedie, hors oracle-conformite-projet, et il se joue sur l'artefact qu'on lui passe. oracle-sollicitations SO3 — recette double sens : la décision non déclarée est signalée, la même déclarée ne déclenche rien"
+  },
+  {
+   "id": "R-48.4",
+   "regle": 48,
+   "enonce": "demander un TRAVAIL n'est pas demander une DÉCISION : une action qui corrige un défaut trouvé ne porte aucune justification",
+   "statut": "couverte_ailleurs",
+   "porteur": "oracles\\oracle-sollicitations.mjs (SO1-SO3, TF-0540, ecrit le 24/08) ; cote forge, forge-tests tests/test_r48_sollicitation_justifiee.py",
+   "motif": "R-48 juge la FORME d'un rapport de forge, pas l'etat du depot du produit : le controle vit donc dans un oracle dedie, hors oracle-conformite-projet, et il se joue sur l'artefact qu'on lui passe. borne verrouillée des deux côtés — oracle-sollicitations (non_juge + cas de recette) et forge-tests test_r48_sollicitation_justifiee.py::test_corriger_un_defaut_trouve_nexige_aucune_justification"
+  },
+  {
+   "id": "R-49.1",
+   "regle": 49,
+   "enonce": "une constante de configuration qui designe une ressource externe porte la DATE de sa verification",
+   "statut": "couverte_ailleurs",
+   "porteur": "oracles\\oracle-constantes-externes.mjs (CE1-CE2, TF-0544, ecrit le 24/08)",
+   "motif": "R-49 juge le CODE d'un produit et non l'etat de son depot : le controle vit dans un oracle dedie, hors oracle-conformite-projet, et se joue sur le fichier ou le dossier qu'on lui passe. CE1 nomme le champ manquant, un par un."
+  },
+  {
+   "id": "R-49.2",
+   "regle": 49,
+   "enonce": "elle porte la SOURCE faisant autorite, et un commentaire n'en est pas une",
+   "statut": "couverte_ailleurs",
+   "porteur": "oracles\\oracle-constantes-externes.mjs (CE1-CE2, TF-0544, ecrit le 24/08)",
+   "motif": "R-49 juge le CODE d'un produit et non l'etat de son depot : le controle vit dans un oracle dedie, hors oracle-conformite-projet, et se joue sur le fichier ou le dossier qu'on lui passe. CE2 distingue le cas ou le commentaire AFFIRME un fait externe : c'est la forme exacte du defaut fondateur."
+  },
+  {
+   "id": "R-49.3",
+   "regle": 49,
+   "enonce": "elle porte la COMMANDE pour rejouer la verification — deux champs sur trois ne suffisent pas",
+   "statut": "couverte_ailleurs",
+   "porteur": "oracles\\oracle-constantes-externes.mjs (CE1-CE2, TF-0544, ecrit le 24/08)",
+   "motif": "R-49 juge le CODE d'un produit et non l'etat de son depot : le controle vit dans un oracle dedie, hors oracle-conformite-projet, et se joue sur le fichier ou le dossier qu'on lui passe. Un cas de recette verifie precisement que deux champs sur trois echouent."
+  },
+  {
+   "id": "R-49.4",
+   "regle": 49,
+   "enonce": "une hypothese DECLAREE (`hypothese-assumee`) est honnete et n'est pas jugee",
+   "statut": "couverte_ailleurs",
+   "porteur": "oracles\\oracle-constantes-externes.mjs (CE1-CE2, TF-0544, ecrit le 24/08)",
+   "motif": "R-49 juge le CODE d'un produit et non l'etat de son depot : le controle vit dans un oracle dedie, hors oracle-conformite-projet, et se joue sur le fichier ou le dossier qu'on lui passe. L'echappatoire est verifiee par un cas de recette : sans elle, la regle pousserait a inventer des sources."
+  },
+  {
+   "id": "R-50.1",
+   "regle": 50,
+   "enonce": "toute commande de controle du workflow de CI est atteignable par une cible locale declaree",
+   "statut": "couverte_ailleurs",
+   "porteur": "oracles\\oracle-recouvrement-controles.mjs (RC1-RC2, TF-0545, ecrit le 24/08)",
+   "motif": "Ces regles jugent le DEPOT d'un produit et non l'etat que oracle-conformite-projet mesure : le controle vit dans un oracle dedie, joue sur la cible qu'on lui passe. Mesure d'entree : 8 commandes sur 12 orphelines chez digit-ai-forge-audit."
+  },
+  {
+   "id": "R-50.2",
+   "regle": 50,
+   "enonce": "il existe une cible AGREGEE qui joue l'ensemble des controles en une commande",
+   "statut": "couverte_ailleurs",
+   "porteur": "oracles\\oracle-recouvrement-controles.mjs (RC1-RC2, TF-0545, ecrit le 24/08)",
+   "motif": "Ces regles jugent le DEPOT d'un produit et non l'etat que oracle-conformite-projet mesure : le controle vit dans un oracle dedie, joue sur la cible qu'on lui passe. RC2 reconnait `test` comme agregat, par convention npm mesuree sur le parc."
+  },
+  {
+   "id": "R-51.1",
+   "regle": 51,
+   "enonce": "chaque service externe declare sa source faisant autorite et sa sonde EXHAUSTIVE",
+   "statut": "couverte_ailleurs",
+   "porteur": "oracles\\oracle-integrations.mjs (I1-I4, TF-0547, ecrit le 24/08)",
+   "motif": "Ces regles jugent le DEPOT d'un produit et non l'etat que oracle-conformite-projet mesure : le controle vit dans un oracle dedie, joue sur la cible qu'on lui passe. I2 refuse une ligne dont la sonde ou l'ecart manque."
+  },
+  {
+   "id": "R-51.2",
+   "regle": 51,
+   "enonce": "chaque service declare l'ecart connu entre son API et son interface — « aucun connu » est une reponse",
+   "statut": "couverte_ailleurs",
+   "porteur": "oracles\\oracle-integrations.mjs (I1-I4, TF-0547, ecrit le 24/08)",
+   "motif": "Ces regles jugent le DEPOT d'un produit et non l'etat que oracle-conformite-projet mesure : le controle vit dans un oracle dedie, joue sur la cible qu'on lui passe."
+  },
+  {
+   "id": "R-51.3",
+   "regle": 51,
+   "enonce": "chaque service porte la DATE de sa derniere verification et son RISQUE DE FAUX SILENCE (oui/non)",
+   "statut": "couverte_ailleurs",
+   "porteur": "oracles\\oracle-integrations.mjs (I1-I4, TF-0547, ecrit le 24/08)",
+   "motif": "Ces regles jugent le DEPOT d'un produit et non l'etat que oracle-conformite-projet mesure : le controle vit dans un oracle dedie, joue sur la cible qu'on lui passe. I3 et I4 : sans date l'entree ne perime jamais, et sans oui/non le risque n'ordonne pas la lecture."
+  },
+  {
+   "id": "R-51.4",
+   "regle": 51,
+   "enonce": "un contrat PRESENT mais vide est refuse — presence ne vaut pas renseignement",
+   "statut": "couverte_ailleurs",
+   "porteur": "oracles\\oracle-integrations.mjs (I1-I4, TF-0547, ecrit le 24/08)",
+   "motif": "Ces regles jugent le DEPOT d'un produit et non l'etat que oracle-conformite-projet mesure : le controle vit dans un oracle dedie, joue sur la cible qu'on lui passe. I1, avec la borne ou le gabarit du pilot lui-meme est reconnu comme vide."
+  }
+ ]
 }

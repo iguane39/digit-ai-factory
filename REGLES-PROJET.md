@@ -873,3 +873,116 @@ affichait 100 %. Les 14 trous sont nommes un par un, avec ce qu'il faudrait pour
 **Oracle** : `oracles\oracle-couverture-exigences.mjs` (C1-C5, `--self-test` a 7 cas double sens).
 C3 merite d'etre lue : une exigence rattachee a un finding FANTOME est refusee, parce qu'elle
 ment dans le bon sens — c'est pire que de se declarer non couverte.
+
+## AA. R-48 — une sollicitation humaine se JUSTIFIE ou n'existe pas (TF-0540 — 24/08, retour humain du 23/08)
+
+**Le fait, et il est cité mot pour mot parce qu'il vaut mieux que sa paraphrase.** « Demande à la
+Factory de retravailler les éléments qu'elle peut traiter toute seule sans que j'aie de décisions à
+prendre à ce niveau-là — l'exemple de l'input est particulièrement parlant, forcément que les inputs
+ne pouvaient pas entrer dans le périmètre d'audit, c'est juste logique. » Les **quatre** constats du
+lot de forge-tests de ce jour-là n'étaient pas quatre défauts : c'était **quatre fois le même
+réflexe**. À chaque fois la réponse se déduisait du contexte — un dossier `input\` n'est pas du
+produit, un `.min.js.téléchargement` n'est pas du code, le tour qu'on vient d'exécuter est celui
+qu'on doit journaliser, les clés qu'on vient d'énumérer sont celles qu'on doit pré-remplir. À chaque
+fois l'outil a préféré **dégrader son verdict et rendre la main** plutôt que trancher.
+
+**Le coût est double, et le second est le pire** : le temps humain, et le **signal noyé**. Un rapport
+qui demande quatre arbitrages inutiles apprend à son lecteur à survoler la liste — donc à manquer le
+cinquième, celui qui comptait.
+
+**La règle.** Quand la réponse se déduit du contexte, la forge **décide, applique, et l'inscrit** au
+rapport dans une section relisible a posteriori. Toute action laissée à un humain porte sa
+**non-déductibilité écrite** : pourquoi deux personnes compétentes ne trancheraient pas identiquement
+sans information supplémentaire. Le critère est celui du retour lui-même : *si deux personnes
+compétentes trancheraient pareil sans information de plus, ce n'est pas une décision, c'est un défaut
+d'automatisation.*
+
+**Ce n'est PAS un affaiblissement du GO humain.** Il porte sur les **verdicts** et les **mises en
+production** (loi n° 5, R-29), jamais sur des évidences de configuration. Le contre-exemple à
+préserver vivait dans le même rapport : la section `non_juge` y expliquait pourquoi l'audit RGAA
+complet reste un livrable humain — là, rendre la main est juste, et la forge le motive.
+
+**La borne, et elle est assumée** : *demander un TRAVAIL n'est pas demander une DÉCISION.* Une action
+qui dit « corrigez ce lien cassé » n'a aucune justification à porter — la raison pour laquelle la
+forge ne le fait pas est permanente : elle audite, elle ne modifie pas le produit. Mesuré sur le parc,
+**quatorze** suites de findings étaient concernées : exiger une phrase sous chacune aurait produit du
+remplissage, et le remplissage use la crédibilité de la règle plus vite que son absence.
+
+**Oracle** : `oracles\oracle-sollicitations.mjs` (SO1-SO3, `--self-test` à 10 cas double sens, dont
+la borne du GO de mise en production). **Mesure d'entrée** : sur les rapports ANTÉRIEURS du parc il
+rend **21** et **11** constats — le réflexe était donc réel et répété ; sur un rapport généré après
+le correctif de forge-tests, **PASS**. Côté forge : `test_r48_sollicitation_justifiee.py`, 3 cas dont
+un de borne, verrouille les champs `non_deductible` pour qu'ils ne disparaissent pas en silence.
+
+## AB. R-49 — une constante qui désigne une ressource EXTERNE dit comment on l'a vérifiée (TF-0544 — 24/08)
+
+**Le fait, et il a fondé une décision humaine fausse.** Un fichier de configuration portait, au-dessus
+de sa constante de suivi : « Identifiants de suivi repris de l'ancien site (continuité Analytics à la
+migration) ». Ni date, ni source, ni moyen de rejouer la vérification — **et pourtant traité comme un
+fait**. Sur cette base, l'agent a annoncé à l'humain que les deux identifiants appartenaient à l'autre
+domaine ; l'humain a décidé que celui-ci devait avoir les siens ; la constante a été vidée ;
+régression, intégration continue rouge, correctif.
+
+**L'API faisant autorité disait l'inverse, et l'a établi en trente secondes** : le flux avait été créé
+le 15/08 à 12:12, `updateTime == createTime` — donc jamais modifié — et son URL par défaut était celle
+de ce domaine ; le conteneur portait même le nom du domaine. Le même dépôt contenait quatre autres
+constantes dans le même état.
+
+**La règle.** Toute constante de configuration qui désigne une ressource extérieure — URL, identifiant
+de service, compte, entrepôt — porte un en-tête à **trois champs** : la **date** de vérification, la
+**source faisant autorité**, et la **commande pour la rejouer**. Deux sur trois ne suffisent pas : sans
+la commande la vérification n'est pas rejouable, sans la date elle ne périme jamais, sans la source
+c'est une opinion mieux écrite. *Un commentaire n'est pas une source* — il vieillit sans prévenir, il
+survit à ce qu'il décrit, et il se lit avec l'autorité de ce qui est dans le code.
+
+**L'échappatoire est nommée** : `hypothese-assumee`. Une hypothèse déclarée est honnête ; c'est une
+hypothèse déguisée en fait qui coûte. La règle ne demande pas de tout vérifier, elle demande de ne pas
+confondre les deux.
+
+**Oracle** : `oracles\oracle-constantes-externes.mjs` (CE1-CE2, `--self-test` à 10 cas double sens,
+dont le défaut fondateur reproduit mot pour mot et sa version corrigée). **Mesure d'entrée** : PASS sur
+le pilot et sur forge-agents, SKIP sur forge-audit (aucun fichier de configuration au motif) — *le
+produit qui a payé le défaut n'est pas sur ce poste, la mesure sur son `build\data.mjs` reste donc à
+faire, et c'est écrit plutôt que sous-entendu.*
+
+## AC. R-50 — ce que la CI joue est ATTEIGNABLE en local (TF-0545 — 24/08)
+
+**Le fait, mesuré.** L'intégration continue d'un produit jouait deux contrôles ; en local, la session
+en jouait quatre autres. **Six contrôles, deux ensembles, recouvrement nul** — et le contrôle de la CI
+n'appelait aucun des locaux. Valider en local ne disait donc rien de la CI, et réciproquement. Une
+régression est passée jusqu'à la branche principale, la CI est sortie rouge avec douze contrôles en
+échec, et une bascule de domaine a été bloquée plusieurs heures.
+
+**Ce qui ne marche pas, et il faut le dire** : documenter la liste des contrôles. Une liste écrite à la
+main dérive au premier ajout, et personne ne le voit — ce parc l'a déjà payé trois fois (les zones de
+la recette, le registre des empreintes, les exclusions par suffixe). **La liste se dérive** : on lit le
+workflow, et on exige que chacune de ses commandes soit atteignable localement. Plus une **cible
+agrégée** : une seule commande qui joue l'ensemble, sans quoi le recouvrement dépend de la mémoire de
+qui pousse — et la mémoire n'est pas un mécanisme.
+
+**Oracle** : `oracles\oracle-recouvrement-controles.mjs` (RC1-RC2, `--self-test` à 9 cas double sens,
+dont le bloc `run: |` multiligne et le Makefile). **Mesure d'entrée** : sur `digit-ai-forge-audit`,
+**8 commandes de contrôle sur 12** qu'aucune cible locale ne rejoue — le trou existe donc aussi chez
+nous, et il est journalisé plutôt que corrigé en silence dans le même tour.
+
+## AD. R-51 — un produit déclare son CONTRAT D'INTÉGRATION (TF-0547 — 24/08)
+
+**Le fait.** Un produit dépendait de **onze** sources externes et, pour **aucune**, le dépôt ne disait
+où se trouve la source faisant autorité ni quelle sonde donne une réponse exhaustive. Chaque session
+redécouvrait, et se trompait : un champ d'API qui omet ce que la console exige, un `404` sur `HEAD`
+pour des pages qui répondent en `GET`, un moteur de réservation qui plafonne une valeur **en silence**
+et rabat une langue sans le dire — réponses identiques à l'octet près.
+
+**La règle.** Un `INTEGRATIONS.md` (gabarit : `gabarits\INTEGRATIONS.md`) dit, par service : la
+**source faisant autorité**, la **sonde exhaustive** — celle qui rend la réponse complète, pas la
+première qui répond —, l'**écart connu** entre l'API et l'interface, la **date** de vérification, et
+le **risque de faux silence**. Cette dernière colonne ordonne la lecture : un service qui échoue
+bruyamment est sans danger, un service qui répond faux avec assurance est le seul à relire.
+
+**Ce que l'oracle refuse, et c'est tout son intérêt** : un fichier présent et VIDE. C'est la leçon de
+R-47 (un artefact hérité présent mais périmé) et celle du gabarit de retours compté « couvert à 100 % »
+dont le contrôle ne vérifiait que le dossier.
+
+**Oracle** : `oracles\oracle-integrations.mjs` (I1-I4, `--self-test` à 9 cas, dont la borne où le
+GABARIT du pilot lui-même est reconnu comme vide et non comme un contrat). Un produit sans le fichier
+rend **SANS_OBJET** : le contrat s'instaure, il ne se réclame pas rétroactivement.
