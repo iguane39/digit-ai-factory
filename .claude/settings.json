@@ -21,7 +21,8 @@
       {
         "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash|PowerShell",
         "hooks": [
-          { "type": "command", "command": "node scripts/readme-dossiers.mjs --silencieux", "timeout": 30 }
+          { "type": "command", "command": "node scripts/readme-dossiers.mjs --silencieux", "timeout": 30 },
+          { "type": "command", "command": "node scripts/generer-lisezmoi-output.mjs --silencieux", "timeout": 30 }
         ]
       }
     ]
