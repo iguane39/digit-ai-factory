@@ -334,7 +334,54 @@ console.log("");
       suspects.push({ nom, motif: `dépôt de l'écosystème HORS LISTE avec son propre origin (${o || "origin illisible"}) — ni forge suivie, ni second clone, ni mise de côté : jamais vérifié par --pull. À inscrire dans la liste des forges, ou à déclarer hors périmètre` });
     }
   }
-  if (!suspects.length) ligne("ok", `racine propre — aucun dépôt hors liste sous ${racine}`);
+  // ---- LE VERSANT FICHIERS DU MÊME BALAYAGE (TF-0583, 24/08/2026) ---------------------------
+  // Ce balayage ne lisait que les RÉPERTOIRES — `filter((e) => e.isDirectory())` — et c'est
+  // exactement pour cette raison qu'un fichier a pu vivre trois jours à la racine du parc sans
+  // qu'aucun contrôle joué chaque matin ne le nomme.
+  //
+  // LE FAIT : `c:\dev\null`, 1892 octets, daté du 21/08, contenant une page HTML d'erreur 403
+  // d'un hébergeur. LA CAUSE tient en une phrase, et elle est structurelle sur ce poste : une
+  // redirection `> /dev/null` ou `2>/dev/null` n'est un puits QUE pour un shell POSIX. Jouée par
+  // PowerShell ou `cmd` avec la racine du parc pour répertoire courant, la même redirection CRÉE
+  // un fichier de ce nom et Y ÉCRIT ce qu'on croyait jeter. Les deux shells cohabitent ici par
+  // consigne, donc la confusion n'est pas un accident isolé : elle reviendra.
+  //
+  // CE QUE ÇA COÛTE, et ce n'est pas le fichier : le corps d'une réponse qu'on a EXPLICITEMENT
+  // demandé de jeter atterrit sur disque, à la racine du parc — hors de tout dépôt, donc hors de
+  // tout `.gitignore`, hors de toute recherche de secret jouée sur un dépôt, et hors du champ de
+  // tout oracle. Ici c'était une page d'erreur publique ; la même redirection sur un appel
+  // authentifié y conserverait un jeton.
+  //
+  // La CAUSE est écrite dans le message, et pas seulement le constat : sans elle, un lecteur qui
+  // trouve ce fichier le supprime et la cause revient au prochain mélange de shells.
+  const PUITS_RATES = new Map([
+    ["null", "redirection `> /dev/null` jouée par un shell Windows"],
+    ["nul", "redirection `> nul` sortie de son shell d'origine"],
+    ["1", "redirection `>1` ou `2>1` au lieu de `2>&1`"],
+    ["2", "redirection `>2` — le descripteur pris pour un nom de fichier"],
+    ["&1", "redirection `2>&1` mal citée par le shell"],
+    ["&2", "redirection `1>&2` mal citée par le shell"],
+  ]);
+  let fichiersSuspects = [];
+  try {
+    fichiersSuspects = readdirSync(racine, { withFileTypes: true })
+      .filter((e) => e.isFile() && PUITS_RATES.has(e.name.toLowerCase()))
+      .map((e) => e.name);
+  } catch { fichiersSuspects = []; }
+  for (const nom of fichiersSuspects) {
+    let taille = "?";
+    try { taille = String(statSync(join(racine, nom)).size); } catch { /* taille indisponible */ }
+    ligne("avert",
+      `${nom} — FICHIER de ${taille} octets à la racine du parc : ${PUITS_RATES.get(nom.toLowerCase())}. ` +
+      "Ce qu'une commande croyait JETER a été ÉCRIT sur disque, hors de tout dépôt — donc hors de " +
+      "tout .gitignore et de toute recherche de secret. Vérifier son contenu AVANT de l'effacer : " +
+      "une réponse authentifiée y conserverait un jeton. Supprimer un fichier est un geste HUMAIN " +
+      "(R-29) — ce contrôle le déclare, il ne l'efface pas");
+    averts.push(nom);
+  }
+
+  if (!suspects.length && !fichiersSuspects.length) ligne("ok", `racine propre — aucun dépôt hors liste ni puits de redirection raté sous ${racine}`);
+  else if (!suspects.length) ligne("ok", `racine sans dépôt hors liste sous ${racine}`);
   else for (const x of suspects) {
     ligne("avert", `${x.nom} — ${x.motif}. Ne rien y exécuter ; supprimer un répertoire est un geste HUMAIN (R-29) — ce contrôle le déclare, il ne l'efface pas`);
     averts.push(x.nom);

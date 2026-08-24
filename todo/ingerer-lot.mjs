@@ -19,6 +19,14 @@ import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+// TF-0582 (24/08) — LES RÈGLES DE FORME NE VIVENT PLUS ICI. Elles vivent dans
+// `gabarits\oracle-lot-retours.mjs`, que ce fichier IMPORTE et que l'héritage fait voyager
+// jusqu'au produit (`forge\retours\oracle-lot.mjs`, mode copie_conforme). Un seul jeu de
+// règles, deux endroits où le jouer : le produit AVANT de remettre, le pilot À LA PORTE.
+// Deux implémentations de la même forme auraient donné deux vérités — c'est le défaut que
+// TF-0474 a nommé sur les empreintes, où cinq mécanismes de scellement coexistaient sans
+// format commun et où la même classe de défaut a été redécouverte forge par forge.
+import { verifier as verifierFormeLot } from "../gabarits/oracle-lot-retours.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const sidecarPath = process.argv[2];
@@ -105,92 +113,38 @@ const lotSha = createHash("sha256").update(contenu.split("\r\n").join("\n")).dig
 const lotShaBrut = createHash("sha256").update(contenu).digest("hex");
 const lignes = contenu.split("\n").filter((l) => l.trim());
 
-// ---- R-45 (21/08) : un lot remis DIT ce qu'il n'a pas remonté ------------------------------
-// La règle vaut au moment où le lot ENTRE, pas seulement quand il attend dans la boîte : une
-// fois ingéré, il part en `old\` et `oracle-boite-entree` B6 ne le voit plus. Le constat et le
-// refus se cumulent — l'un détecte ce qui traîne, l'autre empêche d'entrer.
+// ---- R-45 et R-46 : la FORME du lot remis, jugée par le module partagé ---------------------
+// R-45 (21/08) exige que le lot DISE ce qu'il n'a pas remonté ; R-46 (22/08) ce que ses documents
+// ont coûté au gabarit. Les deux valent au moment où le lot ENTRE, pas seulement quand il attend
+// dans la boîte : une fois ingéré, il part en `old\` et `oracle-boite-entree` (B6, B7) ne le voit
+// plus. Le constat et le refus se cumulent — l'un détecte ce qui traîne, l'autre empêche d'entrer.
 //
-// Ce qui est exigé : la section « Remarques restées au produit » du gabarit, et sous elle un
-// verdict de généralisation, ou la phrase déclarant qu'aucune remarque n'est restée. Ce qui
-// n'est PAS jugé : la justesse du verdict — un raisonnement écrit peut être faux, un
-// raisonnement absent est perdu pour tout le monde.
-//
-// Portée : seuls les sidecars flanqués d'un `.md` homonyme sont concernés (une candidature
-// hors lot n'a pas de lot), et seuls ceux datés du 21/08 ou après (antériorité déclarée,
-// R-33 bis).
+// Le JUGEMENT est délégué au module partagé ; ce qui reste ici est ce qui n'appartient qu'à la
+// porte : le rejet ATOMIQUE et la dérogation tracée. Portée inchangée — seuls les sidecars
+// flanqués d'un `.md` homonyme sont concernés (une candidature hors lot n'a pas de lot).
 {
-  const SEUIL_R45 = "20260821";
-  const date = /(\d{8})[a-z]?\.tf\.jsonl$/i.exec(sidecarPath.split("\\").join("/").split("/").pop() || "");
   const lotMd = sidecarPath.replace(/\.normalise\.tf\.jsonl$/i, ".md").replace(/\.tf\.jsonl$/i, ".md");
-  if (date && date[1] >= SEUIL_R45 && existsSync(lotMd)) {
-    const texteLot = readFileSync(lotMd, "utf8");
-    const SECTION = /^##\s+Remarques\s+rest[ée]es?\s+au\s+produit\s*$/im;
-    if (!SECTION.test(texteLot)) {
-      if (!derogee("R-45", "le lot n'a pas de section « Remarques restées au produit »")) {
-        console.error(
-          `[REJET ATOMIQUE] ${sidecarPath} — registre intact.\n` +
-          `  - le lot ${lotMd} n'a pas de section « Remarques restées au produit » (R-45).\n` +
-          "    Ce qu'un produit corrige chez lui sans le remonter emporte la CLASSE du défaut\n" +
-          "    avec lui. Gabarit : gabarits\\RETOURS-FORGES.md.\n" +
-          "    CAUSE LA PLUS FREQUENTE (TF-0502, 22/08) : le produit ecrit avec une COPIE du\n" +
-          "    gabarit prise a la CREATION de son run et jamais rafraichie. Les deux sections y\n" +
-          "    sont entrees le 21/08 ; une copie plus ancienne ne les porte pas. Recopier\n" +
-          "    gabarits\\RETOURS-FORGES.md dans forge\\retours\\ du produit, puis reprendre le lot.");
-        process.exit(1);
-      }
-    }
-    const suite = (texteLot.split(SECTION)[1] || "").split(/^## /m)[0] || "";
-    if (!/g[ée]n[ée]ralisab/i.test(suite) && !/aucune\s+remarque\s+n['’]est\s+rest[ée]e?\s+au\s+produit/i.test(suite)) {
-      if (!derogee("R-45", "la section « Remarques restées au produit » ne porte ni verdict ni déclaration")) {
-        console.error(
-          `[REJET ATOMIQUE] ${sidecarPath} — registre intact.\n` +
-          `  - la section « Remarques restées au produit » de ${lotMd} ne porte ni verdict de\n` +
-          "    généralisation, ni la phrase déclarant qu'aucune remarque n'est restée au produit.\n" +
-          "    Une section vide se lit comme un oubli : l'omission ne vaut pas décision (R-45).");
-        process.exit(1);
-      }
-    }
-  }
-}
-
-// ---- R-46 (22/08) : un lot remis DIT ce que ses documents ont coûté au gabarit -------------
-// Pendant de R-45 côté LIVRABLES. R-45 demande ce que le projet a corrigé chez lui ; R-46
-// demande ce qui a manqué, gêné ou dû être ajouté à la main dans un document produit depuis un
-// gabarit de la bibliothèque. Un gabarit ne vieillit pas en s'usant : il vieillit parce que la
-// réalité des projets le dépasse et que personne ne le dit.
-//
-// Même architecture que R-45, et pour la même raison : le refus ferme la porte, `B7` constate ce
-// qui attend dans la boîte, et les deux se cumulent parce qu'un lot ingéré part en `old\`.
-{
-  const SEUIL_R46 = "20260822";
-  const dateR46 = /(\d{8})[a-z]?\.tf\.jsonl$/i.exec(sidecarPath.split("\\").join("/").split("/").pop() || "");
-  const lotMdR46 = sidecarPath.replace(/\.normalise\.tf\.jsonl$/i, ".md").replace(/\.tf\.jsonl$/i, ".md");
-  if (dateR46 && dateR46[1] >= SEUIL_R46 && existsSync(lotMdR46)) {
-    const texteLot = readFileSync(lotMdR46, "utf8");
-    const SECTION = /^##\s+Retours\s+sur\s+les\s+documents\s+produits\s*$/im;
-    if (!SECTION.test(texteLot)) {
-      if (!derogee("R-46", "le lot n'a pas de section « Retours sur les documents produits »")) {
-        console.error(
-          `[REJET ATOMIQUE] ${sidecarPath} — registre intact.\n` +
-          `  - le lot ${lotMdR46} n'a pas de section « Retours sur les documents produits » (R-46).\n` +
-          "    Ce qu'un document a coûté au gabarit — section manquante, champ non prévu, ajout à\n" +
-          "    la main — est le seul canal par lequel la bibliothèque s'améliore.\n" +
-          "    Gabarit : gabarits\\RETOURS-FORGES.md.");
-        process.exit(1);
-      }
-    }
-    const suite = (texteLot.split(SECTION)[1] || "").split(/^## /m)[0] || "";
-    if (!/gd-[a-z-]+|version[_ ]du[_ ]gabarit/i.test(suite)
-        && !/aucun\s+document\s+produit\s+depuis\s+un\s+gabarit/i.test(suite)) {
-      if (!derogee("R-46", "la section « Retours sur les documents produits » ne rattache aucun retour à un gabarit")) {
-        console.error(
-          `[REJET ATOMIQUE] ${sidecarPath} — registre intact.\n` +
-          `  - la section « Retours sur les documents produits » de ${lotMdR46} ne rattache aucun\n` +
-          "    retour à un gabarit (id `gd-…` ou version du gabarit), et ne déclare pas non plus\n" +
-          "    qu'aucun document n'en est issu. Un retour qui ne nomme pas sa source ne s'applique\n" +
-          "    à rien : « il manquait une section » ne se rattache à aucune famille (R-46).");
-        process.exit(1);
-      }
+  if (existsSync(lotMd)) {
+    const forme = verifierFormeLot(lotMd);
+    for (const c of forme.constats) {
+      if (c.statut !== "FAIL") continue;
+      if (derogee(c.regle, c.message)) continue;
+      console.error(
+        `[REJET ATOMIQUE] ${sidecarPath} — registre intact.\n` +
+        `  - ${lotMd} : ${c.message} (${c.regle}).\n` +
+        (c.remede ? `    REMÈDE : ${c.remede}\n` : "") +
+        "    CE REFUS ÉTAIT ÉVITABLE, et c'est tout le point (TF-0582) : le produit peut jouer ce\n" +
+        "    MÊME contrôle chez lui, AVANT de remettre son lot —\n" +
+        `      node forge\\retours\\oracle-lot.mjs \"<son lot>.md\"\n` +
+        "    TROIS CAUSES MESURÉES le 24/08 sur les trois produits émetteurs, et le remède diffère :\n" +
+        "    (1) le produit écrit avec une COPIE du gabarit prise à la création de son run et jamais\n" +
+        "        rafraîchie — les deux sections y sont entrées les 21 et 22/08. Recopier\n" +
+        "        gabarits\\RETOURS-FORGES.md ET gabarits\\oracle-lot-retours.mjs dans forge\\retours\\ ;\n" +
+        "    (2) le produit n'a JAMAIS reçu l'héritage — R-47 le nomme, et le geste est le même ;\n" +
+        "    (3) le produit A le gabarit, à jour, et ne l'applique pas. C'est le cas le PLUS FRÉQUENT\n" +
+        "        (quatre lots sur six ce jour-là) et le seul qu'aucune recopie ne répare : jouer le\n" +
+        "        contrôle ci-dessus avant la remise est alors le seul remède.");
+      process.exit(1);
     }
   }
 }
@@ -199,16 +153,16 @@ const lignes = contenu.split("\n").filter((l) => l.trim());
 // est ÉCRITE et non devinée : chaque motif dit ce qu'il reconnaît, et un nom hors table n'est pas
 // deviné — le lot est alors refusé, ce qui est le comportement sûr.
 const FORGES_CONNUES = [
-  { depot: "digit-ai-factory", motif: /(factory|pilot|noyau|restitution|registre todo|todo-forge)/ },
-  { depot: "digit-ai-forge-agents", motif: /(forge-agents|socle de rendu|page-html|check_html|render_page|skill)/ },
-  { depot: "digit-ai-forge-tests", motif: /(forge-tests|plancher de rendu|pan |adaptateur)/ },
-  { depot: "digit-ai-forge-conception", motif: /(forge-conception|conception|exigence)/ },
-  { depot: "digit-ai-forge-development", motif: /(forge-development|development)/ },
-  { depot: "digit-ai-forge-design", motif: /(forge-design|design|syst[èe]me de marque)/ },
-  { depot: "digit-ai-forge-ops", motif: /(forge-ops|mep|d[ée]ploiement)/ },
-  { depot: "digit-ai-forge-data", motif: /(forge-data|lineage|qualit[ée] de la donn[ée]e)/ },
-  { depot: "digit-ai-forge-audit", motif: /(forge-audit|auditcore)/ },
-  { depot: "digit-ai-forge-seo-geo", motif: /(forge-seo|seo|geo)/ },
+  { depot: "digit-ai-factory", motif: /\b(factory|pilot|noyau|restitution|registre todo|todo-forge)\b/ },
+  { depot: "digit-ai-forge-agents", motif: /\b(forge-agents|socle de rendu|page-html|check_html|render_page|skill)\b/ },
+  { depot: "digit-ai-forge-tests", motif: /\b(forge-tests|plancher de rendu|pan |adaptateur)\b/ },
+  { depot: "digit-ai-forge-conception", motif: /\b(forge-conception|conception|exigence)\b/ },
+  { depot: "digit-ai-forge-development", motif: /\b(forge-development|development)\b/ },
+  { depot: "digit-ai-forge-design", motif: /\b(forge-design|design|syst[èe]me de marque)\b/ },
+  { depot: "digit-ai-forge-ops", motif: /\b(forge-ops|mep|d[ée]ploiement)\b/ },
+  { depot: "digit-ai-forge-data", motif: /\b(forge-data|lineage|qualit[ée] de la donn[ée]e)\b/ },
+  { depot: "digit-ai-forge-audit", motif: /\b(forge-audit|auditcore)\b/ },
+  { depot: "digit-ai-forge-seo-geo", motif: /\b(forge-seo|seo|geo)\b/ },
 ];
 const deductions = [];
 
