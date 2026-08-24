@@ -44,6 +44,10 @@ import { fileURLToPath } from "node:url";
 const ICI = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
 const verifierSeulement = args.includes("--verifier");
+// CÂBLÉ EN HOOK, DONC SILENCIEUX PAR DÉFAUT SOUS CE DRAPEAU (24/08). L'index se régénère après
+// chaque écriture : sans `--silencieux`, il commenterait chaque outil joué et noierait la sortie.
+// Un générateur bavard câblé en hook s'apprend à être ignoré, exactement comme un contrôle bavard.
+const silencieux = args.includes("--silencieux");
 const cible = args.find((a) => !a.startsWith("--")) || join(ICI, "..", "output");
 
 const NOM = "LISEZMOI.md";
@@ -155,5 +159,11 @@ if (verifierSeulement) {
   process.exit(0);
 }
 
+if (existsSync(chemin) && readFileSync(chemin, "utf8") === attendu) {
+  // RIEN N'A CHANGÉ : on ne réécrit pas. Un hook qui touche le fichier à chaque outil joué rendrait
+  // le dépôt sale sans qu'un octet de contenu ait bougé — du bruit qui ressemble à du travail.
+  if (!silencieux) console.log(`${NOM} : index déjà à jour (${total} livrable(s))`);
+  process.exit(0);
+}
 writeFileSync(chemin, attendu, "utf8");
-console.log(`${NOM} : index régénéré → ${chemin} (${total} livrable(s), ${fam.length} famille(s))`);
+if (!silencieux) console.log(`${NOM} : index régénéré → ${chemin} (${total} livrable(s), ${fam.length} famille(s))`);

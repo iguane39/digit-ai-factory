@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=740096840a38 archive=54c0315cbe97 · dernier événement: 2026-08-24T10:22:13.155Z -->
+     sceaux: actifs=94e2ce49caac archive=54c0315cbe97 · dernier événement: 2026-08-24T12:11:03.284Z -->
 
-**93 actifs** (candidat 0 · décidé 1 · en cours 0 · corrigé 88 · écarté 4) · **469 archivés**.
+**94 actifs** (candidat 1 · décidé 1 · en cours 0 · corrigé 88 · écarté 4) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -140,6 +140,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0549 | decide | 10 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : `Produit-07` a un forge\retours\ mais rien de ce qui s'y fait n'est suivi | **oui** — mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration. |
+| TF-0562 | candidat | 10 | Un livrable REMIS du pilot echoue au marquage sous le jeu de regles courant — anteriorite a declarer, pas a corriger en silence | **oui** — un livrable remis a un destinataire externe qui ne passerait plus le controle d'aujourd'hui ; le cout reel depend de la voie choisie, et le fait qui tranche — ce livrable est-il encore lu ? — n'est pas au dossier |
 | TF-0541 | corrige | 15 | Gabarit de projet : `CLAUDE.md` et `ledger.py` divergent, et le run est épinglé en dur | **oui** — forge/ledger.jsonl absent du disque ; ledger.py ligne 68 run codé en dur ; run 20260815 clos en seq 24 |
 | TF-0471 | corrige | 10 | R-45 refuse des lots rédigés AVANT sa publication — deux lots Produit-05 bloqués à l'ingestion, dont un qui signalait un plantage réel du lanceur d'oracles | **oui** — payé le 22/08 : douze candidatures de deux lots restent hors du registre, et l'une d'elles nommait un défaut BLOQUANT du lanceur d'oracles qui n'a été corrigé que parce que la session l'a rencontré par un autre chemin — un refus de forme a mis un fait de production hors de portée |
 | TF-0548 | corrige | 8.3 | La couverture des regles se compte en REGLES, jamais en EXIGENCES : une regle qui en enonce cinq et n'en controle qu'une est comptee couverte — c'est ce qui a laisse passer le gabarit manquant | **oui** — paye et chiffre : QUINZE candidatures refusees a l'ingestion en trois jours, sur deux produits, pour une forme que ni l'un ni l'autre ne pouvait connaitre faute d'avoir le gabarit — que la regle 18 exigeait par ecrit depuis le 06/08 et que rien ne verifiait. Le taux de couverture affichait 24 regles sur 26, soit 92 %, pendant tout ce temps. Sur la seule regle 18, la couverture reelle est de 1 exigence controlee sur 5. |

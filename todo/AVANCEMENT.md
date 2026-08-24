@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau b7ea627a525d)]
+sources_de_verite: [todo/TODO.jsonl (sceau 57a7dae085dc)]
 verifie_le: 2026-08-24
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `b7ea627a525d`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `57a7dae085dc`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -19,10 +19,10 @@ les corrections donnerait l'illusion d'un progrès net.
 
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
-| Ouverts | 1 | candidats, décidés ou en cours — le reste à faire réel |
+| Ouverts | 2 | candidats, décidés ou en cours — le reste à faire réel |
 | Clos sur gains constatés | 88 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 4 | décidés non faits, motif écrit — jamais un silence |
-| Total suivi | 93 | tout ce que le registre a jamais porté |
+| Total suivi | 94 | tout ce que le registre a jamais porté |
 
 ## Ce qui reste ouvert, par forge
 
@@ -30,7 +30,7 @@ La table se lit par forge cible : c'est l'unité de décision, puisqu'une correc
 livre dans un dépôt. L'ordre suit le NOMBRE d'items ouverts, jamais leur priorité — la
 priorité vit dans la colonne de score.
 
-### pilot — 1 item(s)
+### pilot — 2 item(s)
 
 Les items ouverts ciblant pilot, du score le plus fort au plus faible. Le score est
 celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
@@ -38,6 +38,7 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | Id | Titre | Statut | Forge(s) | Score |
 |---|---|---|---|---|
 | TF-0549 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : | decide | pilot | 10 |
+| TF-0562 | Un livrable REMIS du pilot echoue au marquage sous le jeu de regles courant — anteriorite a declarer, pas a co | candidat | pilot | 10 |
 
 ## Ce que ce rapport ne dit pas
 
