@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=a24d29ce534e archive=acf69e8da61a · dernier événement: 2026-08-24T05:30:26.358Z -->
+     sceaux: actifs=c7ddce919f05 archive=acf69e8da61a · dernier événement: 2026-08-24T06:07:05.191Z -->
 
-**81 actifs** (candidat 12 · décidé 1 · en cours 0 · corrigé 65 · écarté 3) · **469 archivés**.
+**81 actifs** (candidat 6 · décidé 1 · en cours 0 · corrigé 70 · écarté 4) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,7 +11,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0541 | candidat | 15 | Gabarit de projet : `CLAUDE.md` et `ledger.py` divergent, et le run est épinglé en dur | **oui** — forge/ledger.jsonl absent du disque ; ledger.py ligne 68 run codé en dur ; run 20260815 clos en seq 24 |
 | TF-0544 | candidat | 12.5 | Un commentaire de code a fait autorite contre une API, et a fonde une decision humaine fausse | **oui** — decision utilisateur prise sur une premisse fausse ; refutation par API en 30 s ; 2 commits de rattrapage (be9f3f8 puis 7444077) |
 | TF-0545 | candidat | 12.5 | Rien ne joue l'ensemble des controles : CI et local sont deux ensembles disjoints | **oui** — 2 controles CI + 4 controles locaux, recouvrement 0 ; 12 echecs decouverts apres push sur main |
 | TF-0547 | candidat | 8 | Aucun contrat d'integration n'est declare : chaque session redecouvre et se trompe | **oui** — 11 sources inventoriees, 4 ecarts API/interface mesures dans la seule session du 23/08 |
@@ -115,20 +114,21 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0543 | candidat | 25 | Trois listes d'exclusion divergentes : `input` manque aux deux qui comptent, 3e occurrence de la famille | **oui** — 3 listes d'exclusion distinctes (interface.py _EXCLUS, securite.py _EXCLUS_DEPENDANCES, disposition.py _HORS_SOURCES) ; 2 lots anterieurs (20260814a x2) ont deja rallonge les deux premieres |
-| TF-0542 | candidat | 20 | Aucun levier projet ne borne le perimetre de fichiers : RT-1 n'est pas une config omise | **oui** — 37 cles FORGE_TESTS_* relevees dans forge_tests/ ; aucune ne borne le perimetre de fichiers des pans interface/securite/prompts |
-| TF-0536 | candidat | 12.5 | Périmètre d'audit : `input\` n'est pas du produit, et 12 constats sur 15 y portent | **oui** — 12 constats sur 15 hors produit ; pan interface FAIL à 0,9998 de couverture sur 18456 éléments ; 0 constat sur site\ |
-| TF-0538 | candidat | 12 | Journal de boucle : la forge nomme le fichier, le format et la règle, mais ne l'amorce pas | **oui** — boucle.statut=en_cours sur un audit de 16 pans effectivement exécutés ; le rapport nomme le fichier et la règle TF-0353 |
 | TF-0537 | candidat | 10 | Oracle secrets : clés API de tiers dans du JS minifié aspiré, comptées bloquantes | **oui** — 9 constats securite, 9 hors produit, 6 classés bloquants ; 3 déjà qualifiés placeholder par l'oracle lui-même |
-| TF-0539 | candidat | 9 | `.env.forge-tests` : la forge énumère les clés attendues mais ne dépose pas le gabarit | **oui** — rapport de 1,1 Mo énumérant les clés par pan ; aucun gabarit déposé côté projet |
+| TF-0543 | corrige | 25 | Trois listes d'exclusion divergentes : `input` manque aux deux qui comptent, 3e occurrence de la famille | **oui** — 3 listes d'exclusion distinctes (interface.py _EXCLUS, securite.py _EXCLUS_DEPENDANCES, disposition.py _HORS_SOURCES) ; 2 lots anterieurs (20260814a x2) ont deja rallonge les deux premieres |
+| TF-0542 | corrige | 20 | Aucun levier projet ne borne le perimetre de fichiers : RT-1 n'est pas une config omise | **oui** — 37 cles FORGE_TESTS_* relevees dans forge_tests/ ; aucune ne borne le perimetre de fichiers des pans interface/securite/prompts |
+| TF-0536 | corrige | 12.5 | Périmètre d'audit : `input\` n'est pas du produit, et 12 constats sur 15 y portent | **oui** — 12 constats sur 15 hors produit ; pan interface FAIL à 0,9998 de couverture sur 18456 éléments ; 0 constat sur site\ |
 | TF-0470 | corrige | 10 | forge-tests : les routes attendues par locale se DÉCLARENT — la parité de routes reste aveugle sur un produit dont le build ne laisse aucune arborescence | **oui** — mesuré sur produit-07, 201 pages FR / 201 EN en production : le pan sortirait en NA/SKIP sur la parité de routes pendant qu'un écart de route vit en production — et le produit est celui sur lequel le pan a été conçu, ce qui rend le trou d'autant plus coûteux : la forge ne voit plus le défaut qui l'a fait naître |
+| TF-0539 | corrige | 9 | `.env.forge-tests` : la forge énumère les clés attendues mais ne dépose pas le gabarit | **oui** — rapport de 1,1 Mo énumérant les clés par pan ; aucun gabarit déposé côté projet |
 | TF-0480 | corrige | 8.3 | forge-tests : le plancher visuel (V1 debordement, V2 contraste, V4 chevauchements) n est atteignable que sur un FICHIER html local — aucun produit SERVI n est jugeable, et les trois autres portes sont fermees | **oui** — En-tete compresse et menu anglais au tiers de la largeur en production de juin a aout 2026 sur produit-07, non vus par deux campagnes de verification declarees completes. |
+| TF-0538 | ecarte | 12 | Journal de boucle : la forge nomme le fichier, le format et la règle, mais ne l'amorce pas | **oui** — boucle.statut=en_cours sur un audit de 16 pans effectivement exécutés ; le rapport nomme le fichier et la règle TF-0353 |
 
 ## pilot
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0549 | decide | 10 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : `Produit-07` a un forge\retours\ mais rien de ce qui s'y fait n'est suivi | **oui** — mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration. |
+| TF-0541 | corrige | 15 | Gabarit de projet : `CLAUDE.md` et `ledger.py` divergent, et le run est épinglé en dur | **oui** — forge/ledger.jsonl absent du disque ; ledger.py ligne 68 run codé en dur ; run 20260815 clos en seq 24 |
 | TF-0471 | corrige | 10 | R-45 refuse des lots rédigés AVANT sa publication — deux lots Produit-05 bloqués à l'ingestion, dont un qui signalait un plantage réel du lanceur d'oracles | **oui** — payé le 22/08 : douze candidatures de deux lots restent hors du registre, et l'une d'elles nommait un défaut BLOQUANT du lanceur d'oracles qui n'a été corrigé que parce que la session l'a rencontré par un autre chemin — un refus de forme a mis un fait de production hors de portée |
 | TF-0548 | corrige | 8.3 | La couverture des regles se compte en REGLES, jamais en EXIGENCES : une regle qui en enonce cinq et n'en controle qu'une est comptee couverte — c'est ce qui a laisse passer le gabarit manquant | **oui** — paye et chiffre : QUINZE candidatures refusees a l'ingestion en trois jours, sur deux produits, pour une forme que ni l'un ni l'autre ne pouvait connaitre faute d'avoir le gabarit — que la regle 18 exigeait par ecrit depuis le 06/08 et que rien ne verifiait. Le taux de couverture affichait 24 regles sur 26, soit 92 %, pendant tout ce temps. Sur la seule regle 18, la couverture reelle est de 1 exigence controlee sur 5. |
 | TF-0502 | corrige | 6.7 | Deux derogations a R-45 en UN JOUR, dont une hors anteriorite : la propagation des regles du pilot vers les produits reste le manque, et le mecanisme de derogation est en train de devenir la voie normale | **oui** — mesure le 22/08 sur le registre : 15 candidatures (7 + 5 + 3) n'ont pu entrer que par derogation, sur 3 lots d'un meme produit en 2 jours. Deux evenements `ingestion` portent desormais un champ `derogation` — soit 2 derogations en un seul jour, pour une regle publiee la veille. Le taux est de 3 lots derogeables sur 3 lots recus de ce produit : 100 %, ce qui ne decrit plus une exception mais un regime. |
