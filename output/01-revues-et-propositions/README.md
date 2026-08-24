@@ -14,7 +14,7 @@ Revues d'écosystème (fiches d'audit des forges rejouées, synthèse trans-forg
 
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
-| `Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html` | fichier | 35,1 Ko | Étude SEO — produit-02.fr — maquette de refonte |
+| [`old\`](old/README.md) | dossier (1 fichier) | — | Les revues et propositions REMISES qui ne sont plus la référence courante. Un livrable n'entre ici que pour une raison, et jamais pour être corrigé : *une nouve… |
 | `Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md` | fichier | 7,1 Ko | Proposition — Refonte du rapport d'audit SEO d'Produit-02.com |
 | `Digit-AI - Proposition Architecture - Circuit de l insatisfaction - 20260815a.md` | fichier | 5,5 Ko | Proposition d'architecture — le circuit de l'insatisfaction |
 | `Digit-AI - Proposition Forge - Restitution lisible - 20260815a.md` | fichier | 11,2 Ko | Proposition — Doctrine « restitution lisible » pour forge-design |
@@ -23,4 +23,4 @@ Revues d'écosystème (fiches d'audit des forges rejouées, synthèse trans-forg
 | `Digit-AI - Revue Forge - Écosystème - 20260808a.md` | fichier | 11,4 Ko | Digit-AI — Revue stratégique de l'écosystème forge — 2026-08-08 |
 | `Digit-AI - Revue Forge - Écosystème - 20260819a.md` | fichier | 6,1 Ko | Digit-AI — Revue Forge — Écosystème — 20260819a |
 
-_8 fichier(s), 0 sous-dossier(s)_ · dossiers cachés (journaux machine, sans README) : `.oracles\`
+_7 fichier(s), 1 sous-dossier(s)_ · dossiers cachés (journaux machine, sans README) : `.oracles\`

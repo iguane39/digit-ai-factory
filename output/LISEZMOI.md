@@ -38,6 +38,23 @@ notamment les événements du registre `todo\TODO.jsonl`, jamais réécrits) :
 - `output\20260813-plan-*.md` → `output\04-plans\…`
 - `output\20260812-catalogues-readmes-forges\` → `output\05-catalogues-readmes-forges\`
 
+**Archivage du 24/08/2026 (TF-0562 — décision humaine, voie (c)).** Un livrable remis le 15/08 est
+passé en `old\` : il rendait **PASS au rendu** et **FAIL au marquage** sous le jeu de règles courant,
+sur **cinq familles nées après sa production** — titre sans indice daté, favicon absent, ponctuation
+orpheline (×2), composant déclaré sans style, onglets sans panneau (×2).
+
+*Il n'a pas été corrigé, et c'est la règle qui l'impose* : une nouvelle version est un nouveau fichier
+daté, jamais un écrasement (R-5). Son **sceau de jugement l'accompagne** dans `old\`, pour que la
+preuve reste attachée à l'artefact — vérifié après déplacement : « 1 livrable scellé vérifié, aucun
+modifié après jugement ».
+
+- `output\01-revues-et-propositions\Produit-02 - Maquette Vue d'ensemble - Rapport SEO -
+  20260815a.html` → `output\01-revues-et-propositions\old\…` (même nom, dossier `old\`)
+
+*Le document frère qui le cite — `Produit-02 - Proposition Refonte - Rapport SEO -
+20260815a.md` — n'a **pas** été modifié : il est lui-même scellé, et rouvrir un livrable remis pour
+corriger un chemin casserait son sceau. C'est précisément le rôle de cette table de correspondance.*
+
 Même méthode appliquée le 13/08 aux `output\` des forges : agents (01-pv, 02-skills),
 design (01-pages-temoins), organization (01-etudes, 02-composants), seo (01-decisions,
 02-veille). forge-audit_client-a était déjà conforme (modèle d'origine : `01-…`/`07-…` + `old\`).
@@ -56,14 +73,12 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 115 livrable(s) courant(s), 8 archivé(s), 6 famille(s).
+**État** : 113 livrable(s) courant(s), 10 archivé(s), 6 famille(s).
 
 ### 01-revues-et-propositions
 
 | Livrable | Version | Poids | Chemin à copier |
 |---|---|---|---|
-| Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html | 20260815a | 35.1 Ko | `01-revues-et-propositions/Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html` |
-| Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html.jugement.json | — | 0.3 Ko | `01-revues-et-propositions/Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html.jugement.json` |
 | Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md | 20260815a | 7.1 Ko | `01-revues-et-propositions/Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md` |
 | Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md.jugement.json | — | 0.3 Ko | `01-revues-et-propositions/Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md.jugement.json` |
 | Digit-AI - Proposition Architecture - Circuit de l insatisfaction - 20260815a.md | 20260815a | 5.5 Ko | `01-revues-et-propositions/Digit-AI - Proposition Architecture - Circuit de l insatisfaction - 20260815a.md` |
@@ -81,6 +96,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Revue Forge - Écosystème - 20260808a.md.oracles.json | — | 1.9 Ko | `01-revues-et-propositions/Digit-AI - Revue Forge - Écosystème - 20260808a.md.oracles.json` |
 | Digit-AI - Revue Forge - Écosystème - 20260819a.md | 20260819a | 6.1 Ko | `01-revues-et-propositions/Digit-AI - Revue Forge - Écosystème - 20260819a.md` |
 | Digit-AI - Revue Forge - Écosystème - 20260819a.md.jugement.json | — | 0.3 Ko | `01-revues-et-propositions/Digit-AI - Revue Forge - Écosystème - 20260819a.md.jugement.json` |
+| Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html *(archivé)* | 20260815a | 35.1 Ko | `01-revues-et-propositions/old/Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html` |
+| Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html.jugement.json *(archivé)* | — | 0.3 Ko | `01-revues-et-propositions/old/Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html.jugement.json` |
 
 ### 02-schema-ecosysteme
 
