@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=1f84fc492a79 archive=54c0315cbe97 · dernier événement: 2026-08-24T09:19:49.898Z -->
+     sceaux: actifs=c0af7f12b9dc archive=54c0315cbe97 · dernier événement: 2026-08-24T09:34:38.661Z -->
 
-**85 actifs** (candidat 0 · décidé 1 · en cours 0 · corrigé 80 · écarté 4) · **469 archivés**.
+**91 actifs** (candidat 6 · décidé 1 · en cours 0 · corrigé 80 · écarté 4) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,6 +11,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0555 | candidat | 9 | factory, R-47 a l'ingestion d'un lot : un produit range sous un dossier client est introuvable, et le cercle que la regle devait refermer reste ouvert | **oui** — un defaut d'heritage REEL (2 artefacts absents, clause R-43 manquante, aucun hook de la factory joue depuis le 23/08) non detecte par le controle ecrit pour cela ; 22 produits d'un meme dossier client sont dans le meme angle mort. |
+| TF-0556 | candidat | 4.5 | factory : les vues docs\projet\ produites par ses propres scripts echouent au check_html du socle, et R-26 interdit au projet de les corriger | **oui** — 33 echecs bloquants cumules sur les 3 vues generees, mesures sur la version commitee ; le projet ne peut pas les corriger sans violer R-26, ni les livrer sans violer R-32. Constat deja pose le 19/08 sur une seule vue, sans effet : le defaut est dans la bibliotheque partagee, pas dans un generateur. |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
 | TF-0526 | corrige | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
 | TF-0530 | corrige | 25 | pilot : le garde-fou « le pilot n'ecrit pas chez un produit » tenait par DISCIPLINE SEULE, et les classes de defaut du jour n'avaient pas de regle generique | **oui** — un garde-fou non execute est un garde-fou qu'on suit jusqu'au jour ou on ne le suit plus ; et neuf classes de defaut payees le meme jour sans qu'aucune regle generique ne les empeche de revenir ailleurs |
@@ -56,6 +58,10 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0557 | candidat | 9 | forge-agents, socle de rendu : composant-recherche.md prescrit mark.find-hit { color: inherit }, qui rend un badge a texte clair illisible en recherche active | **oui** — 21 constats V2 bloquants sur un livrable par ailleurs vert, invisibles hors etat de recherche active ; le defaut vient d'une declaration de couleur prescrite par le socle, pas du CSS du projet. |
+| TF-0558 | candidat | 6 | forge-agents, composants.md §6 : la regle de calibrage du repli des tableaux est ecrite en prose et sans mecanisme — chaque projet la retraduit, et se trompe | **oui** — 16 debordements V1 bloquants restes invisibles cinq jours sur un livrable diffuse, pour une regle que le socle enonce correctement mais ne mecanise pas ; le meme seuil errone est fige dans le squelette de la bibliotheque de gabarits. |
+| TF-0554 | candidat | 4.5 | forge-agents, check_html L19 : la regle refuse ce que composants.md §6 rend OBLIGATOIRE, et elle juge un selecteur sans savoir sous quelle media query il vit | **oui** — 11 fichiers passes de PASS a FAIL sans modification : 8 livrables du projet (12 echecs, tous L19) et les 3 vues generees par la factory (2 chacune). Aucun projet appliquant §6 ne peut livrer vert tant que la contradiction tient. |
+| TF-0559 | candidat | 1.5 | forge-agents, render_page V4 : la boite d'un element inline vaut la hauteur d'em, pas l'interligne — deux inline FRERES de lignes consecutives se chevauchent sans qu'un pixel ne se superpose | **oui** — un constat bloquant a 390 px leve sur une page geometriquement saine ; contourne cote produit en portant l'interligne des titres de 1,22 a 1,45 — une mise en page deformee pour satisfaire une mesure. |
 | TF-0484 | corrige | 25 | forge-agents : run-oracles.mjs plante sur JSON_OUT non defini, n affiche jamais son verdict et retourne 1 sur un PASS — le hook d ecriture bloque alors toute ecriture | **oui** — Bloque le hook d ecriture de tout l ecosysteme : deux ecritures refusees sur des fichiers au verdict PASS pendant cette seule passe. |
 | TF-0551 | corrige | 25 | page-html : render_page rend PASS sur une page qui perd 28 % de son contenu — un oracle visuel ne peut pas voir ce qu'overflow:hidden a rogne | **oui** — deux oracles verts sur un document ampute de deux sections entieres et de son pied de page — le defaut n'a ete vu que par un comptage de mots declenche par une demande sans rapport |
 | TF-0485 | corrige | 20 | forge-agents : oracle-claims analyse le JavaScript inline et lit la reference arriere $1 d une expression reguliere comme un montant en dollars | **oui** — FAIL bloquant sur un livrable conforme ; une demi-heure a remonter d un message pointant une accolade ouvrante jusqu a une expression reguliere. |
