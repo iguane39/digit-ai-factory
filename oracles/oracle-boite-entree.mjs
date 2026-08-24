@@ -39,7 +39,7 @@
  * Exit : 0 PASS · 1 FAIL · 2 non jugeable.
  */
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, readdirSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { appendFileSync, existsSync, readFileSync, readdirSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
@@ -275,6 +275,30 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
   //
   // Ce que B7 NE juge PAS : la valeur du retour. Qu'un manque signalé mérite de changer le
   // gabarit est une décision humaine au registre, jamais une mesure d'oracle.
+  // UNE DÉROGATION TRACÉE ÉTEINT LE ROUGE DE SON LOT, ET D'AUCUN AUTRE (24/08). L'ingestion sait
+  // déjà refuser un lot non conforme, et le contourner sur décision humaine avec un motif écrit
+  // qu'elle inscrit au registre. Mais ce contrôle-ci relisait le FICHIER, jamais la décision : le
+  // lot restait rouge à chaque ouverture de session, indéfiniment, alors que le sujet était tranché
+  // et la trace posée. Un rouge permanent sur un sujet clos est du bruit, et le bruit finit par
+  // masquer un vrai défaut — c'est la raison même pour laquelle la dérogation existe.
+  //
+  // Ce qui n'est PAS affaibli : la règle reste vraie pour tout autre lot, y compris le suivant du
+  // même produit. La dérogation est nominative — elle nomme un fichier, une règle et un motif.
+  // Déclaré AVANT la boucle qui s'en sert : posé après, il tombait dans la zone morte
+  // temporelle, l'erreur était avalée par le `catch` du même bloc, et l'ensemble restait VIDE.
+  // Le contrôle rendait donc FAIL en croyant avoir lu les dérogations — muet, pas faux : le
+  // pire état pour un contrôle. Trouvé en le jouant sur le lot réel.
+  const RE_LIGNES = new RegExp(String.fromCharCode(92) + "r?" + String.fromCharCode(92) + "n");
+  const derogesB7 = new Set();
+  for (const ligne of (() => { try { return readFileSync(registre, "utf8").split(RE_LIGNES); } catch { return []; } })()) {
+    if (!ligne.trim() || !ligne.includes('"ingestion"')) continue;
+    let e = null;
+    try { e = JSON.parse(ligne); } catch { continue; }
+    const regles = e?.derogation?.regles || [];
+    if (!regles.includes("R-46")) continue;
+    const base = String(e.fichier || "").split(/[\/]/).pop().replace(/\.tf\.jsonl$/, "");
+    if (base) derogesB7.add(base);
+  }
   const SEUIL_B7 = "20260822";
   const SECTION_B7 = /^##\s+Retours\s+sur\s+les\s+documents\s+produits\s*$/im;
   const VERDICT_B7 = /gd-[a-z-]+|version[_ ]du[_ ]gabarit/i;
@@ -286,6 +310,13 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
     if (!date || date[1] < SEUIL_B7) continue; // antériorité déclarée
     let texte = "";
     try { texte = readFileSync(join(repertoire, nom), "utf8"); } catch { continue; }
+    if (derogesB7.has(nom.replace(/\.md$/, ""))) {
+      findings.push({ regle: "B7", statut: "SANS_OBJET", ou: nom,
+        message: "lot INCOMPLET au sens de R-46, mais ingéré sous DÉROGATION tracée au registre " +
+          "(décision humaine, motif écrit) — la règle reste vraie pour tout autre lot, et le rouge " +
+          "de celui-ci s'éteint parce que le sujet est tranché, pas parce qu'il est oublié" });
+      continue;
+    }
     if (!SECTION_B7.test(texte)) {
       findings.push({ regle: "B7", statut: "FAIL", ou: nom,
         message: "lot sans section « Retours sur les documents produits » — ce qu'un document a coûté au gabarit (section manquante, champ non prévu, ajout à la main) est le seul canal par lequel la bibliothèque s'améliore (gabarit `gabarits\\RETOURS-FORGES.md`, R-46)" });
@@ -510,6 +541,26 @@ function selfTest() {
   cas.push(["B7 quinquies— lot ANTÉRIEUR au seuil : antériorité déclarée (R-33 bis)",
     !r.findings.some((f) => (f.regle === "B7" || f.regle === "B6") && f.ou === "PROD - RETOURS - 20260820z.md"),
     r.verdict]);
+  // PLACÉ APRÈS LES AUTRES CAS B7, ET CE DÉTAIL EST LA MOITIÉ DU TEST : la dérogation s'écrit
+  // dans le registre du bac d'essai, donc elle vaut pour tous les jugements SUIVANTS du même
+  // lot. Posé avant, ce cas éteignait « B7 bis » — un test qui casse le test d'à côté.
+
+  // B7 sexies (24/08) — LA DÉROGATION TRACÉE éteint le rouge de SON lot, et d'aucun autre. Sans ce
+  // cas, la branche neuve serait passée sans preuve ; et son premier jet était MUET — la constante
+  // du motif de lignes était déclarée APRÈS la boucle qui s'en sert, l'erreur était avalée par le
+  // `catch` du même bloc, et l'ensemble des dérogations restait vide. Le contrôle rendait donc FAIL
+  // en croyant avoir lu les dérogations : muet, pas faux, ce qui est le pire état d'un contrôle.
+  writeFileSync(lotDoc, "# lot\n\n## pilot\n\ntable\n" + AVEC_B6);
+  appendFileSync(reg, JSON.stringify({
+    ev: "ingestion", lot_sha: "x", fichier: "PROD - RETOURS - 20260822a.tf.jsonl",
+    derogation: { regles: ["R-46"], motif: "motif ecrit, decision humaine tracee", decision: "humaine" },
+  }) + "\n");
+  r = juger(boite, reg);
+  cas.push(["B7 sexies— le MÊME lot, ingéré sous dérogation tracée : SANS_OBJET, pas FAIL",
+    r.findings.some((f) => f.regle === "B7" && f.statut === "SANS_OBJET"), r.verdict]);
+  cas.push(["B7 septies— et il ne reste AUCUN B7 en FAIL sur ce lot",
+    !r.findings.some((f) => f.regle === "B7" && f.statut === "FAIL"), r.verdict]);
+
   rmSync(lotDoc); rmSync(sidecarDoc); rmSync(lotAvant); rmSync(sidecarAvant);
 
   // B4 (TF-0287) : un dépôt d'insatisfaction n'a pas de sidecar — B3 doit se taire, B4
