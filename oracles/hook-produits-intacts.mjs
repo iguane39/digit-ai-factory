@@ -188,9 +188,22 @@ function depotVivant(depot, iso) {
   // « écrit depuis » ACCUSE. La marge doit toujours pencher vers le blocage : elle ÉLARGIT ce qui
   // accuse et RESSERRE ce qui disculpe. Posée du côté large, elle faisait passer un dépôt endormi
   // pour actif — son commit initial, à quelques millisecondes du relevé, suffisait à l'absoudre.
+  // UNE FENÊTRE D'UNE HEURE, PARCE QU'UNE FENÊTRE DE DEUX MINUTES NE MESURE RIEN. Le relevé se
+  // remet à jour à chaque tour où rien n'est reproché — excellente chose, mais la fenêtre
+  // « depuis le relevé » devient alors minuscule, et l'activité d'une session est PAR RAFALES :
+  // elle commite, puis produit des livrables pendant dix minutes sans commiter. Mesuré ce matin :
+  // le dépôt avait commité à 08:32, 08:41 et 08:49, et à 08:53 il paraissait endormi pour n'avoir
+  // rien commité depuis quatre minutes. Un dépôt dont l'histoire a bougé DANS L'HEURE est un dépôt
+  // où une session travaille — ses fichiers non commités lui appartiennent.
+  //
+  // Le trou est déclaré : si le pilot écrivait dans un produit actif depuis moins d'une heure, ce
+  // mouvement serait rapporté au lieu d'être bloqué. C'est le prix d'un contrôle qui ne crie pas au
+  // loup à chaque tour — et un contrôle qui crie toujours ne protège plus de rien.
   const MARGE_MS = 2000;
-  const seuil = Date.parse(iso || "") + MARGE_MS;
-  if (!Number.isFinite(seuil)) return { vivant: false, motif: "relevé sans date lisible" };
+  const FENETRE_MS = 60 * 60 * 1000;
+  const releve = Date.parse(iso || "");
+  if (!Number.isFinite(releve)) return { vivant: false, motif: "relevé sans date lisible" };
+  const seuil = Math.min(releve + MARGE_MS, Date.now() - FENETRE_MS);
   // LA DATE DU GESTE, PAS CELLE DU COMMIT — et c'est la recette qui a tranché entre les deux. Le
   // premier jet lisait `%cI`, la date du commit pointé : pour une bascule de branche, c'est la date
   // d'un commit ancien, si bien qu'un dépôt actif à l'instant passait pour endormi. La date qui
@@ -205,8 +218,8 @@ function depotVivant(depot, iso) {
     if (Number.isFinite(t) && t > seuil) recentes.push((geste || "").slice(0, 60));
   }
   return recentes.length
-    ? { vivant: true, motif: `le dépôt a vécu de son propre chef depuis le relevé : ${recentes.length} geste(s) à son journal, dont « ${recentes[0]} »` }
-    : { vivant: false, motif: "aucun geste au journal de références depuis le relevé" };
+    ? { vivant: true, motif: `le dépôt a vécu de son propre chef : ${recentes.length} geste(s) à son journal dans l'heure, dont « ${recentes[0]} »` }
+    : { vivant: false, motif: "aucun geste à son journal de références dans l'heure — le dépôt est endormi" };
 }
 
 /** HEAD + empreinte de l'état de travail. Deux nombres suffisent : ils bougent à la moindre écriture. */
@@ -303,12 +316,19 @@ function comparer(racine = racineParc, empreinte = EMPREINTE) {
 // ---- recette : les deux sens, sur des dépôts jouets ------------------------------------------
 if (args.includes("--self-test")) {
   const base = mkdtempSync(join(tmpdir(), "produits-intacts-"));
+  // LES DÉPÔTS JOUETS NAISSENT ENDORMIS, et sans ça la recette ne mesure plus rien : le contrôle
+  // tient un dépôt pour VIVANT si son journal a bougé dans l'heure, or un dépôt créé à l'instant
+  // vient forcément de bouger — tous les cas de blocage devenaient verts. On antidate donc leur
+  // naissance de deux heures : c'est la seule façon de jouer un dépôt endormi sans attendre.
+  const ANCIEN = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+  const gitVieux = (depot, ...a) => spawnSync("git", ["-C", depot, ...a],
+    { encoding: "utf8", env: { ...process.env, GIT_COMMITTER_DATE: ANCIEN, GIT_AUTHOR_DATE: ANCIEN } });
   const faire = (nom, forge = false) => {
     const d = join(base, forge ? nom : join("_produits", nom));
     mkdirSync(d, { recursive: true });
-    git(d, "init", "-q");
+    gitVieux(d, "init", "-q");
     writeFileSync(join(d, "a.txt"), "un\n");
-    git(d, "add", "-A"); git(d, "-c", "user.email=x@y", "-c", "user.name=x", "commit", "-qm", "initial");
+    gitVieux(d, "add", "-A"); gitVieux(d, "-c", "user.email=x@y", "-c", "user.name=x", "commit", "-qm", "initial");
     return d;
   };
   const produit = faire("mon-produit");
@@ -352,15 +372,15 @@ if (args.includes("--self-test")) {
     mkdirSync(dirname(distant), { recursive: true });
     git(dirname(distant), "init", "-q", "--bare", "--initial-branch=main", "publie.git");
     const seul = faire("produit-publie");
-    git(seul, "branch", "-M", "main");
-    git(seul, "remote", "add", "origin", distant);
-    git(seul, "push", "-q", "-u", "origin", "main");
+    gitVieux(seul, "branch", "-M", "main");
+    gitVieux(seul, "remote", "add", "origin", distant);
+    gitVieux(seul, "push", "-q", "-u", "origin", "main");
     const emp2 = join(base, "empreinte-publiee.json");
     relever(base, emp2);
     // Le produit avance CHEZ LUI puis publie : exactement ce que fait sa propre session.
     writeFileSync(join(seul, "a.txt"), "sa propre reponse\n");
-    git(seul, "add", "-A"); git(seul, "-c", "user.email=x@y", "-c", "user.name=x", "commit", "-qm", "le produit repond a son audit");
-    git(seul, "push", "-q", "origin", "main");
+    gitVieux(seul, "add", "-A"); gitVieux(seul, "-c", "user.email=x@y", "-c", "user.name=x", "commit", "-qm", "le produit repond a son audit");
+    gitVieux(seul, "push", "-q", "origin", "main");
     let rp = comparer(base, emp2);
     ok("le produit qui se modifie LUI-MÊME et publie n'est pas accusé",
       !rp.ecarts.some((e) => /produit-publie/.test(e)));
@@ -385,7 +405,7 @@ if (args.includes("--self-test")) {
     writeFileSync(join(vif, "depose-par-le-pilot.txt"), "ecriture de passage\n");
     let rv = comparer(base, emp3);
     ok("un fichier apparu sans aucun geste au journal → FAIL",
-      rv.verdict === "FAIL" && rv.ecarts.some((e) => /produit-vivant/.test(e) && /aucun geste au journal/.test(e)));
+      rv.verdict === "FAIL" && rv.ecarts.some((e) => /produit-vivant/.test(e) && /le dépôt est endormi/.test(e)));
     // (2) le même fichier, mais le dépôt a VÉCU depuis le relevé : c'est sa session qui travaille.
     // Le geste choisi ne déplace PAS le HEAD final — deux bascules de branche — parce que sinon on
     // testerait deux choses à la fois : un commit sans distant rendrait le HEAD « non publié », et
