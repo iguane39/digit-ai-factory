@@ -47,7 +47,7 @@ const ko = (regle, ou, message) => F.push({ regle, statut: "FAIL", ou, message }
 const so = (regle, ou, message) => F.push({ regle, statut: "SANS_OBJET", ou, message });
 
 const NON_JUGE = [
-  "la VÉRITÉ de ce qu'affirme un en-tête : l'oracle exige une date, une source et une commande, pas qu'elles disent vrai. Vérifier le fond demanderait d'appeler les API tierces — ce que l'en-tête sert justement à rendre possible pour un humain",
+  "la VÉRITÉ de ce qu'affirme un en-tête : l'oracle exige une date, une source, une commande et des limites, pas qu'elles disent vrai. Vérifier le fond demanderait d'appeler les API tierces — ce que l'en-tête sert justement à rendre possible pour un humain",
   "les constantes INTERNES au projet (chemins, seuils, libellés) : elles ne désignent aucune autorité extérieure, donc rien à re-vérifier ailleurs",
   "les fichiers qui ne sont pas de la CONFIGURATION : un identifiant cité dans un test ou une note ne prétend pas être la valeur de production",
   "une valeur qui vient d'une variable d'environnement : la ressource est désignée ailleurs, et c'est là que la question se pose",
@@ -73,6 +73,21 @@ const NOM_EXTERNE = /(URL|URI|BASE|ENDPOINT|HOST|DOMAIN|DOMAINE|ACCOUNT|COMPTE|P
 const CHAMP_DATE = /(vérifié le|verifie le|vérifiée le|au\s+\d{2}[\/.]\d{2}[\/.]\d{4}|\b\d{4}-\d{2}-\d{2}\b|\b\d{2}\/\d{2}\/\d{4}\b)/i;
 const CHAMP_SOURCE = /(source\s*:|d'après|d apres|selon\s|autorité|autorite|API\s|console\s|tableau de bord|faisant foi)/i;
 const CHAMP_REJOUER = /(rejouer|pour (le |la )?revérifier|revérifier|reverifier|commande\s*:|`[^`]*(curl|gcloud|az |aws |gh |node |python)[^`]*`|\$ )/i;
+// TF-0587 (lot Produit-02 20260824) — le QUATRIEME champ : les LIMITES STRUCTURELLES.
+//
+// Le fait fondateur : la redirection DNS d'un hebergeur est le geste naturel quand on tient deja
+// la zone par son API, et RIEN dans la reponse de cette API ne signale qu'elle n'ecoute pas le
+// port 443 — l'objet retourne ne porte que le sous-domaine, la cible et le type. La limite ne se
+// decouvre qu'en testant le port. Consequence payee : sept hostnames sur huit muets en HTTPS, et
+// le seul remede complet imposait de recreer les enregistrements de messagerie — un risque sans
+// commune mesure avec le confort initial.
+//
+// « Une limite decouverte apres coup coute un changement d'architecture ; la meme limite ecrite
+// avant coute le choix d'un autre mecanisme. »
+//
+// DECLARER « aucune limite connue » EST GRATUIT et suffit — meme patron que R-45 : l'omission ne
+// vaut pas decision, mais l'aveu d'ignorance, lui, est honnete et se date.
+const CHAMP_LIMITES = /(limites?\s+(structurelles?|connues?)|limite\s*:|aucune\s+limite\s+connue|ne\s+(sert|ecoute|supporte|couvre)\s+(pas|que))/i;
 
 /** L'échappatoire déclarative. */
 const ASSUME = /hypothese-assumee|hypothèse-assumée|hypothese assumee/i;
@@ -106,14 +121,16 @@ export function juger(source, nom = "fichier") {
     if (!CHAMP_DATE.test(texte)) manque.push("la DATE de vérification (sans elle, elle ne périme jamais)");
     if (!CHAMP_SOURCE.test(texte)) manque.push("la SOURCE faisant autorité (sans elle, c'est une opinion mieux écrite)");
     if (!CHAMP_REJOUER.test(texte)) manque.push("la COMMANDE pour la rejouer (sans elle, la vérification n'est pas rejouable)");
+    if (!CHAMP_LIMITES.test(texte)) manque.push("les LIMITES STRUCTURELLES connues, ou l'aveu « aucune limite connue » (TF-0587 : une limite découverte après coup coûte un changement d'architecture ; écrite avant, elle coûte le choix d'un autre mécanisme)");
     if (!manque.length) continue;
 
     const affirme = AFFIRME.test(texte);
     if (!texte.trim()) {
       constats.push({ regle: "CE1", ligne: i + 1, cle, ou: `${nom}:${i + 1}`,
         message: `« ${cle} » désigne une ressource EXTERNE sans un mot sur la façon dont sa valeur a ` +
-          "été vérifiée. Trois champs sont attendus au-dessus : date, source faisant autorité, " +
-          "commande pour rejouer — ou l'aveu « hypothese-assumee »" });
+          "été vérifiée. Quatre champs sont attendus au-dessus : date, source faisant autorité, " +
+          "commande pour rejouer, limites structurelles connues (ou « aucune limite connue ») " +
+          "— ou l'aveu « hypothese-assumee »" });
       continue;
     }
     constats.push({ regle: affirme ? "CE2" : "CE1", ligne: i + 1, cle, ou: `${nom}:${i + 1}`,
@@ -163,10 +180,28 @@ if (lanceEnDirect && args.includes("--self-test")) {
   att("le constat nomme les trois champs manquants",
     /DATE/.test(c1[0]?.message) && /SOURCE/.test(c1[0]?.message) && /COMMANDE/.test(c1[0]?.message));
 
-  const CORRIGE = "// Vérifié le 2026-08-24 · source : API Google Analytics Admin (flux « Site web »,\n" +
-    "// createTime == updateTime, defaultUri du domaine) · rejouer :\n" +
-    "// `gcloud alpha analytics data-streams list --account=APB.com`\nexport const TRACKING = { gtm: \"GTM-MW8X3G8X\" };\n";
-  att("le même fichier, en-tête à trois champs, ne déclenche rien", juger(CORRIGE, "data.mjs").length === 0);
+  // TF-0587 (25/08) : l'en-tête vérifiable porte desormais QUATRE champs — les LIMITES
+  // STRUCTURELLES rejoignent la date, la source et la commande. Declarer « aucune limite
+  // connue » est gratuit et suffit : meme patron que R-45, l'omission ne vaut pas decision
+  // mais l'aveu d'ignorance est honnete et se date.
+  const CORRIGE = "// Verifie le 2026-08-24 · source : API Google Analytics Admin · rejouer :\n" +
+    "// `gcloud alpha analytics data-streams list --account=APB.com` · aucune limite connue\n" +
+    "export const TRACKING = { gtm: \"GTM-MW8X3G8X\" };\n";
+  att("le meme fichier, en-tete a QUATRE champs, ne declenche rien", juger(CORRIGE, "data.mjs").length === 0);
+
+  // Le cas fondateur de TF-0587, ecrit tel qu'il aurait du l'etre : la limite qui a coute un
+  // changement d'architecture tient en huit mots, et elle n'etait nulle part.
+  const AVEC_LIMITE = "// Verifie le 2026-08-24 · source : API OVH /domain/zone · rejouer :\n" +
+    "// `curl -s https://eu.api.ovh.com/1.0/domain/zone/x/redirection` ·\n" +
+    "// limites structurelles : redirection OVH = HTTP seul, port 443 FERME\n" +
+    "export const OVH_ZONE_API = \"https://eu.api.ovh.com/1.0/domain/zone\";\n";
+  att("une limite structurelle ecrite satisfait le quatrieme champ", juger(AVEC_LIMITE, "config.mjs").length === 0);
+
+  const SANS_LIMITE = "// Verifie le 2026-08-24 · source : API OVH /domain/zone · rejouer :\n" +
+    "// `curl -s https://eu.api.ovh.com/1.0/domain/zone/x/redirection`\n" +
+    "export const OVH_ZONE_API = \"https://eu.api.ovh.com/1.0/domain/zone\";\n";
+  att("trois champs sur quatre ne suffisent plus : la limite manquante est NOMMEE (TF-0587)",
+    juger(SANS_LIMITE, "config.mjs").some((c) => /LIMITES STRUCTURELLES/.test(c.message)));
 
   att("une constante nue qui désigne une URL est signalée (CE1)",
     juger("export const SITE_URL = \"https://www.exemple.com\";\n", "config.mjs").some((c) => c.regle === "CE1"));

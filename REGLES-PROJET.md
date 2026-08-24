@@ -983,6 +983,17 @@ la commande la vérification n'est pas rejouable, sans la date elle ne périme j
 c'est une opinion mieux écrite. *Un commentaire n'est pas une source* — il vieillit sans prévenir, il
 survit à ce qu'il décrit, et il se lit avec l'autorité de ce qui est dans le code.
 
+**Le QUATRIÈME champ, ajouté le 25/08 (TF-0587)** : les **limites structurelles** connues du
+mécanisme. Le fait qui l'impose : la redirection DNS d'un hébergeur est le geste naturel quand on
+tient déjà la zone par son API, et **rien dans la réponse de cette API ne signale qu'elle n'écoute
+pas le port 443** — l'objet retourné ne porte que le sous-domaine, la cible et le type. La limite
+ne se découvre qu'en testant le port. Sept hostnames sur huit sont restés muets en HTTPS, et le
+seul remède complet imposait de recréer les enregistrements de messagerie — un risque sans commune
+mesure avec le confort initial. **Une limite découverte après coup coûte un changement
+d'architecture ; la même limite écrite avant coûte le choix d'un autre mécanisme.** Déclarer
+« aucune limite connue » est **gratuit et suffit** : même patron que R-45, l'omission ne vaut pas
+décision, mais l'aveu d'ignorance est honnête et se date.
+
 **L'échappatoire est nommée** : `hypothese-assumee`. Une hypothèse déclarée est honnête ; c'est une
 hypothèse déguisée en fait qui coûte. La règle ne demande pas de tout vérifier, elle demande de ne pas
 confondre les deux.
@@ -1034,3 +1045,34 @@ dont le contrôle ne vérifiait que le dossier.
 **Oracle** : `oracles\oracle-integrations.mjs` (I1-I4, `--self-test` à 9 cas, dont la borne où le
 GABARIT du pilot lui-même est reconnu comme vide et non comme un contrat). Un produit sans le fichier
 rend **SANS_OBJET** : le contrat s'instaure, il ne se réclame pas rétroactivement.
+
+## AE. R-52 — une sonde mesure sur le canal REEL de son destinataire (TF-0585 — 25/08)
+
+**Le fait, et il a ete presente comme une preuve.** Le 23/08, un tableau de huit lignes a ete
+publie a un exploitant, avec des coches vertes, affirmant que quatre domaines convergeaient vers
+l'adresse canonique. Toutes ces mesures avaient ete faites en `http://`. Le 24/08, la meme
+verification en `https://` donne le resultat **oppose** : sept hostnames sur huit echouent au TLS,
+le port 443 etant ferme sur le serveur de redirection. Les navigateurs tentent HTTPS en priorite
+et un lien partage porte presque toujours `https://` : **la sonde portait sur un chemin que la
+quasi-totalite du trafic n'emprunte pas**.
+
+**Ce qui distingue ce defaut des quatre autres de sa famille** : la sonde n'etait pas incomplete,
+elle portait sur le **mauvais axe**. Une sonde incomplete se complete ; une sonde sur le mauvais
+axe rend un resultat qui a l'air d'une mesure et n'en est pas une.
+
+**La regle.** Un comportement destine a un public se verifie sur le **schema**, la **methode** et
+le **protocole** que ce public emploie reellement, jamais sur le plus commode a tester. Quand
+plusieurs axes existent — `http`/`https`, apex/`www`, `GET`/`HEAD`, avec ou sans barre finale —
+**la matrice se parcourt entiere, OU l'ecart se declare**. Declarer l'ecart est une reponse
+acceptable ; le taire ne l'est pas.
+
+**Ce que la regle NE demande PAS** : de tout parcourir. Elle demande que ce qui n'est pas parcouru
+soit **nomme**, pour qu'un lecteur sache ce que la coche verte couvre.
+
+**Oracle** : `oracles\oracle-domaines-declares.mjs` (D1-D4, `--self-test` a 10 cas). D1 porte la
+regle : chaque URL declaree est sondee **en HTTPS**, quelle que soit la facon dont elle est ecrite.
+Les axes non parcourus — methode, barre finale, apex/`www`, sous-domaines non declares — sont
+nommes dans son `non_juge`. **L'axe apex/`www` a ete implemente puis RETIRE** : en faire un defaut
+revenait a exiger que tout projet declare les deux variantes, ce qui accuse a tort ceux qui n'en
+exposent qu'une — et c'est legitime. L'ecart est donc declare, avec son motif, ce que la regle
+autorise explicitement.
