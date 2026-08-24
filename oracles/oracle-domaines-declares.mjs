@@ -139,6 +139,7 @@ export async function juger(racine, { sonde = sonder } = {}) {
       "la VALIDITÉ du certificat au-delà de l'établissement de la connexion : une chaîne acceptée par Node peut être refusée par un navigateur plus strict",
       "le contenu servi : cet oracle dit qu'un domaine répond, jamais qu'il sert la bonne chose",
       "les domaines NON déclarés dans PARAMETRAGE.md : ce qui n'est pas écrit n'est pas sondé, et c'est pourquoi R-24 exige qu'ils y soient",
+      "LES AXES DE LA MATRICE NON PARCOURUS (TF-0585), nommés plutôt que tus : la MÉTHODE (seul GET est joué, jamais HEAD — un serveur peut répondre différemment aux deux, mesuré le 23/08), la BARRE FINALE (`/chemin` contre `/chemin/`), l'AXE APEX/WWW, et les sous-domaines non déclarés. L'axe apex/www a été implémenté puis RETIRÉ : en faire un défaut revenait à exiger que tout projet déclare les deux variantes, ce qui accuse à tort ceux qui n'en exposent qu'une — et c'est légitime. La règle dit « la matrice se parcourt entière OU l'écart se déclare » : voici l'écart, avec son motif.",
     ],
   };
 }
