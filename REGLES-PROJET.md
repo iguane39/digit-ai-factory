@@ -845,3 +845,31 @@ une copie périmée (TF-0072).
 **Oracles** : `oracle-conformite-projet` R-47 (recette `oracles\self-test.mjs`, fixture verte à
 vraies copies du pilot et fixture rouge) · câblage à l'ingestion (`todo\ingerer-r47.test.mjs`,
 4 cas dont deux BORNES : n'a pas bloqué, et n'accuse pas un produit absent du poste).
+
+## Z. La couverture se compte en EXIGENCES, jamais en regles (TF-0548 — 23/08, mandat humain, voie (a))
+
+**Le constat.** La couverture affichait 24 regles sur 26, soit 92 %, pendant que quinze
+candidatures etaient refusees en trois jours a cause d'une exigence non controlee. La regle 18
+exige le gabarit de retours depuis le 06/08 — « `forge\retours\` existe (GABARIT INCLUS) » — et son
+controle ne verifiait que le dossier. Comptee couverte a 100 %, elle l'etait a 20 %. Une metrique
+qui compte des REGLES la ou le travail se fait par EXIGENCE peut rester au vert indefiniment
+pendant que le trou grandit : un enonce grossit, aucun chiffre ne bouge.
+
+**La regle.** Chaque exigence d'une regle porte un identifiant stable `R-<n>.<i>` dans
+`references\EXIGENCES-PROJET.json` et dit qui la controle : `couverte` (avec le finding cite),
+`couverte_ailleurs` (avec le porteur nomme), ou `non_couverte` (avec son motif ECRIT — sans lui,
+« non couverte » se lit comme un oubli et non comme une decision).
+
+**Ce qui n'est PAS fait, et pourquoi.** Les numeros R-1..R-47 ne sont pas renumerotes. Ils sont
+cites dans les findings, les commits, le registre TODO-FORGE, les gabarits et les lots des
+produits : les renumeroter casserait toute la tracabilite pour un gain de forme. Une exigence
+devient donc une regle distincte et numerotee SOUS son numero d'origine, ce qui est l'esprit de
+la voie (a) sans son cout.
+
+**Mesure du 23/08, la premiere honnete** : 56 exigences declarees, 38 couvertes, 4 couvertes
+ailleurs, **14 non couvertes** — soit **75 % par exigence**, quand la metrique par regle en
+affichait 100 %. Les 14 trous sont nommes un par un, avec ce qu'il faudrait pour les couvrir.
+
+**Oracle** : `oracles\oracle-couverture-exigences.mjs` (C1-C5, `--self-test` a 7 cas double sens).
+C3 merite d'etre lue : une exigence rattachee a un finding FANTOME est refusee, parce qu'elle
+ment dans le bon sens — c'est pire que de se declarer non couverte.

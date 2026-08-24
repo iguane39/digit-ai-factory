@@ -33,6 +33,7 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `candidature-oracle-claude-md-crlf.tf.jsonl` | fichier | 1,6 Ko | 1 ligne(s) JSONL |
 | `candidature-outillage-etude-opportunite.tf.jsonl` | fichier | 7,7 Ko | 3 ligne(s) JSONL |
 | `candidature-pilot-entrants-20260822.tf.jsonl` | fichier | 5,9 Ko | 2 ligne(s) JSONL |
+| `candidature-produit-a-moitie-instancie-20260824.tf.jsonl` | fichier | 2,8 Ko | 1 ligne(s) JSONL |
 | `candidature-propagation-regles-produits-20260822.tf.jsonl` | fichier | 3,3 Ko | 1 ligne(s) JSONL |
 | `candidature-qualite-graphique-par-defaut.tf.jsonl` | fichier | 3,9 Ko | 3 ligne(s) JSONL |
 | `candidature-question-deja-repondue.tf.jsonl` | fichier | 2,7 Ko | 1 ligne(s) JSONL |
@@ -71,4 +72,4 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `revue-20260819-pilot.normalise.tf.jsonl` | fichier | 2,1 Ko | 1 ligne(s) JSONL |
 | `revue-20260819-pilot.tf.jsonl` | fichier | 2,1 Ko | 1 ligne(s) JSONL |
 
-_56 fichier(s), 0 sous-dossier(s)_
+_57 fichier(s), 0 sous-dossier(s)_
