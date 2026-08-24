@@ -44,6 +44,7 @@ const NON_JUGE = [
   "les étapes de CI qui ne sont pas des CONTRÔLES : installer une dépendance, publier un artefact, se connecter à un fournisseur. Elles n'ont pas à être rejouables en local, et exiger qu'elles le soient produirait du bruit",
   "les workflows d'un autre hébergeur que GitHub : la lecture est bornée à `.github/workflows/`, et un dépôt qui a sa CI ailleurs rend SANS_OBJET plutôt qu'un faux vert",
   "le fait qu'une cible locale soit RÉELLEMENT jouée avant de pousser : aucun fichier ne le dit. RC2 exige qu'elle EXISTE, ce qui est la condition nécessaire",
+  "ce qu'un lanceur DÉRIVÉ joue vraiment : dès qu'une cible locale lit `.github/workflows`, l'oracle la croit sur parole et rend PASS. Vérifier qu'elle exécute bien chaque étape demanderait de l'exécuter — ce que fait le lanceur lui-même, et son propre code de retour le dit",
 ];
 
 /** La CHARPENTE d'un script shell n'est pas une commande. Mesuré sur forge-audit le 24/08 : un bloc
@@ -55,6 +56,8 @@ const CHARPENTE_SHELL = /^(for|done|do|if|fi|then|else|elif|while|case|esac)\b|^
 const PAS_UN_CONTROLE = /^(npm|yarn|pnpm)\s+(ci|install)\b|^(pip|python -m pip)\s+install\b|^apt-get|^sudo |^docker (login|push|build)|^gh (release|auth)|^git (config|clone|fetch)|^echo |^mkdir |^cp |^curl -fsSL|^actions\//i;
 
 /** Les fichiers qui déclarent des cibles locales. */
+const SCRIPT_LOCAL = /([\w./-]+\.(?:mjs|cjs|js|py|sh|ps1))/g;
+
 const PORTEURS = ["package.json", "Makefile", "makefile", "justfile", "Justfile", "tasks.py", "noxfile.py", "package-scripts.js"];
 
 export function ciblesLocales(racine) {
@@ -74,6 +77,19 @@ export function ciblesLocales(racine) {
       for (const m of brut.matchAll(/^([A-Za-z0-9_.-]+):(?!=)/gm)) cibles.add(m[1]);
       for (const m of brut.matchAll(/^\s*def\s+([a-z0-9_]+)\s*\(/gm)) cibles.add(m[1]);
     }
+  }
+  // UN CRAN D'INDIRECTION, ET IL EST INDISPENSABLE. Le corpus des porteurs ne contient que des
+  // APPELS — « node tools/verifier.mjs » — jamais ce que ces fichiers FONT. Un lanceur qui dérive
+  // les étapes du workflow était donc invisible, et l'oracle accusait la meilleure réponse possible
+  // de ne rien couvrir. On lit le contenu des scripts LOCAUX que les cibles invoquent, une seule
+  // fois et sans descendre plus loin : une indirection suffit au cas réel, et suivre une chaîne
+  // d'appels sans fin coûterait plus que ça ne rapporte.
+  const corpusDirect = textes.join(String.fromCharCode(10));
+  const scripts = new Set();
+  for (const m of corpusDirect.matchAll(SCRIPT_LOCAL)) scripts.add(m[1]);
+  for (const rel of [...scripts].slice(0, 30)) {
+    const p2 = join(racine, rel.replaceAll("\\", "/"));
+    if (existsSync(p2)) { try { textes.push(readFileSync(p2, "utf8")); } catch { /* illisible : on n'invente rien */ } }
   }
   return { cibles, corpus: textes.join("\n") };
 }
@@ -111,6 +127,16 @@ export function atteignable(cmd, cibles, corpus) {
   return Boolean(fichier && corpus.includes(fichier));
 }
 
+/** UNE CIBLE QUI LIT LE WORKFLOW couvre tout, par construction — et c'est mieux que la couverture
+ * que cet oracle sait mesurer. Le premier jet ne le voyait pas : il exigeait que chaque commande de
+ * la CI soit NOMMÉE quelque part en local, si bien qu'un lanceur qui DÉRIVE les étapes du workflow —
+ * la meilleure réponse possible, celle que le constat fondateur recommandait — était accusé de ne
+ * rien couvrir. Un contrôle qui condamne la solution qu'il préconise met le contrôle en défaut.
+ *
+ * La reconnaissance est mécanique : une cible locale dont le corpus lit `.github/workflows`. Le prix
+ * est déclaré — l'oracle croit ce lanceur sur parole, il ne vérifie pas qu'il joue vraiment tout. */
+const DERIVE_DU_WORKFLOW = /\.github[\/]workflows/;
+
 export function juger(racine) {
   const dossier = join(racine, ".github", "workflows");
   if (!existsSync(dossier)) return { skip: "aucun `.github/workflows/` — la CI de ce dépôt vit ailleurs ou n'existe pas" };
@@ -119,6 +145,10 @@ export function juger(racine) {
   const { cibles, corpus } = ciblesLocales(racine);
   if (!cibles.size && !corpus) return { skip: "aucun porteur de cible locale (package.json, Makefile, justfile…) — rien à comparer" };
 
+  if (DERIVE_DU_WORKFLOW.test(corpus)) {
+    return { derive: true, total: null, orphelines: [], cibles: cibles.size,
+      agregee: [...cibles].find((c) => /^(verifier|verify|check|ci|all|controles|qualite|test)$/i.test(c)) || null };
+  }
   const orphelines = [];
   let total = 0;
   for (const w of workflows) {
@@ -184,6 +214,26 @@ if (lanceEnDirect && args.includes("--self-test")) {
   att("un bloc `run: |` multiligne est lu ligne par ligne", r3.total === 2);
   att("un Makefile porte aussi bien les cibles qu'un package.json", r3.orphelines.length === 0 && r3.agregee === "verifier");
 
+  // LE LANCEUR QUI DÉRIVE, dans les deux sens (24/08). Une cible locale qui LIT le workflow couvre
+  // tout par construction — c'est la réponse que le constat fondateur recommandait, et le premier
+  // jet de cet oracle l'accusait de ne rien couvrir : il ne lisait que les APPELS des porteurs,
+  // jamais ce que les fichiers appelés FONT.
+  {
+    const d = faire("derive", WF_DEUX, { scripts: { test: "node tools/verifier.mjs" } });
+    mkdirSync(join(d, "tools"), { recursive: true });
+    // (1) le script existe mais ne lit PAS le workflow : le recouvrement reste à prouver.
+    writeFileSync(join(d, "tools", "verifier.mjs"), "console.log('je ne lis rien');\n", "utf8");
+    att("un lanceur qui ne lit pas le workflow ne couvre rien par construction",
+      juger(d).orphelines.length === 2);
+    // (2) le même lanceur, qui lit `.github/workflows` : tout est atteignable, et l'oracle le DIT.
+    writeFileSync(join(d, "tools", "verifier.mjs"),
+      "import { readdirSync } from 'node:fs';\nreaddirSync('.github/workflows');\n", "utf8");
+    const rd = juger(d);
+    att("un lanceur qui LIT le workflow est reconnu comme couvrant par construction",
+      rd.derive === true && rd.orphelines.length === 0);
+    att("et sa cible agrégée est nommée", rd.agregee === "test");
+  }
+
   rmSync(base, { recursive: true, force: true });
   console.log(`\nRecette recouvrement-controles : ${pass}/${pass + echecs.length} cas`);
   process.exit(echecs.length ? 1 : 0);
@@ -196,6 +246,15 @@ if (lanceEnDirect) {
     if (!existsSync(racine)) { so("RC0", racine, "racine introuvable — non vérifiée, jamais accusée"); continue; }
     const r = juger(racine);
     if (r.skip) { so("RC0", racine, r.skip); continue; }
+    if (r.derive) {
+      ok("RC1", racine, "une cible locale LIT le workflow et rejoue ses étapes : le recouvrement est " +
+        "total par construction, et une étape ajoutée à la CI est jouée en local sans un geste — " +
+        "c'est mieux que ce que cet oracle sait mesurer, et il le dit plutôt que d'accuser");
+      r.agregee
+        ? ok("RC2", racine, `la cible agrégée est « ${r.agregee} »`)
+        : ko("RC2", racine, "le lanceur dérive bien du workflow mais aucune cible ne le rend jouable en une commande");
+      continue;
+    }
     r.orphelines.length
       ? ko("RC1", racine, `${r.orphelines.length} commande(s) de CI sur ${r.total} qu'aucune cible locale ne rejoue : ` +
         `${r.orphelines.slice(0, 4).join(" · ")}. Valider en local ne dit alors rien de la CI — mesuré le 24/08 : ` +
