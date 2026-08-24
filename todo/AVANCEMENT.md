@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau 0fd138ae80b3)]
+sources_de_verite: [todo/TODO.jsonl (sceau ac6d119d7082)]
 verifie_le: 2026-08-24
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `0fd138ae80b3`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `ac6d119d7082`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -19,8 +19,8 @@ les corrections donnerait l'illusion d'un progrès net.
 
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
-| Ouverts | 4 | candidats, décidés ou en cours — le reste à faire réel |
-| Clos sur gains constatés | 77 | corrigés avec leur mesure avant/après |
+| Ouverts | 3 | candidats, décidés ou en cours — le reste à faire réel |
+| Clos sur gains constatés | 78 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 4 | décidés non faits, motif écrit — jamais un silence |
 | Total suivi | 85 | tout ce que le registre a jamais porté |
 
@@ -49,15 +49,6 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 |---|---|---|---|---|
 | TF-0551 | page-html : render_page rend PASS sur une page qui perd 28 % de son contenu — un oracle visuel ne peut pas voi | candidat | digit-ai-page-html, pilot | 25 |
 | TF-0552 | page-html : le message de remediation de L2 prescrit la moitie du geste et conduit tout droit a une seconde vi | candidat | digit-ai-page-html | 15 |
-
-### digit-ai-forge-audit — 1 item(s)
-
-Les items ouverts ciblant digit-ai-forge-audit, du score le plus fort au plus faible. Le score est
-celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
-
-| Id | Titre | Statut | Forge(s) | Score |
-|---|---|---|---|---|
-| TF-0553 | La CI de digit-ai-forge-audit joue 8 commandes de controle sur 12 qu'aucune cible locale ne rejoue | candidat | digit-ai-forge-audit | 10 |
 
 ## Ce que ce rapport ne dit pas
 

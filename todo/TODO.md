@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=08fb9e28c141 archive=54c0315cbe97 · dernier événement: 2026-08-24T07:45:04.850Z -->
+     sceaux: actifs=a9bd6df236cf archive=54c0315cbe97 · dernier événement: 2026-08-24T08:05:10.929Z -->
 
-**85 actifs** (candidat 3 · décidé 1 · en cours 0 · corrigé 77 · écarté 4) · **469 archivés**.
+**85 actifs** (candidat 2 · décidé 1 · en cours 0 · corrigé 78 · écarté 4) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -82,8 +82,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0553 | candidat | 10 | La CI de digit-ai-forge-audit joue 8 commandes de controle sur 12 qu'aucune cible locale ne rejoue | **oui** — 8 commandes de controle sur 12 non rejouables en local, mesurees par RC1 ; le meme defaut a coute chez un produit une regression jusqu'a la branche principale, une CI rouge a 12 controles et une bascule de domaine bloquee plusieurs heures |
 | TF-0505 | corrige | 10 | forge-audit : build-fiche.mjs ecrit par defaut DANS LE DEPOT DE LA FORGE (deliverables/generated/<tenant>/) — exactement le cas que TF-0319 interdit | **oui** — Chemin par defaut lu dans tools/build-fiche.mjs le 22/08 : deliverables/generated/<tenant>/fiche-securite.html, dans le depot de la forge — le cas nomme par TF-0319. Le livrable de ce produit a fini hors output\, corrige a la main. |
+| TF-0553 | corrige | 10 | La CI de digit-ai-forge-audit joue 8 commandes de controle sur 12 qu'aucune cible locale ne rejoue | **oui** — 8 commandes de controle sur 12 non rejouables en local, mesurees par RC1 ; le meme defaut a coute chez un produit une regression jusqu'a la branche principale, une CI rouge a 12 controles et une bascule de domaine bloquee plusieurs heures |
 | TF-0506 | corrige | 6.7 | forge-audit : la famille gd-fiche-securite declare deux formats (html, pdf) et la forge n en produit qu un — aucun outil HTML vers PDF n existe dans la forge | **oui** — Jeu de livrables remis incomplet : le commanditaire a du reclamer le PDF en second temps. Generateur PDF ecrit de zero cote produit, et premiere version piegee par un verrou de fichier Windows — ancien tirage revalide en croyant valider le nouveau. |
 
 ## digit-ai-forge-conception
