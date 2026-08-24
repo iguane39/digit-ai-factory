@@ -846,6 +846,32 @@ une copie périmée (TF-0072).
 vraies copies du pilot et fixture rouge) · câblage à l'ingestion (`todo\ingerer-r47.test.mjs`,
 4 cas dont deux BORNES : n'a pas bloqué, et n'accuse pas un produit absent du poste).
 
+## AE. R-52 — une doctrine opposable NOMME ses consommateurs et l'etat d'installation chez chacun (TF-0571 — 24/08)
+
+**Le constat.** Une session a travaille cinq heures dans un depot produit en rendant une dizaine de
+messages de fin de traitement : aucun sous la structure en huit blocs, aucun juge, aucun refus. Le
+hook qui rend la consigne opposable vivait chez le pilot et nulle part ailleurs. La mesure faite
+ensuite sur le parc est plus large que le retour : sur dix produits, cinq instancies, UN SEUL portant
+le hook, ZERO portant le texte de la doctrine.
+
+**La regle.** Toute doctrine rendue opposable par un mecanisme — hook, oracle, gate — declare (a) la
+liste de ses PIECES et ce que chacune vaut seule, (b) son mecanisme d'installation chez le
+consommateur, (c) l'etat d'installation constate, consommateur par consommateur et NOMME. Un
+`SANS_OBJET` silencieux sur un consommateur non equipe est un vert qui mente : il dit « rien a
+juger » la ou il faudrait lire « personne n'est protege ici ».
+
+**Trois bornes, chacune apprise d'un defaut reel.** Un consommateur introuvable sur le poste est
+declare **non verifie**, jamais accuse — l'absence d'une cible n'est pas un constat sur elle
+(TF-0555). Un depot jamais instancie est **hors doctrine**, et c'est un FAIT, pas une faute
+(TF-0514). Et le controle NOMME sans BLOQUER quand la cible n'est pas la sienne : le pilot n'ecrit
+pas chez un produit (mandat du 23/08), et un controle qui echoue sur ce qu'il ne peut pas faire
+reparer apprend a etre contourne — c'est l'erreur du hook « produits intacts », qui a bloque cinq
+restitutions et dont le remede suggere aurait detruit trois branches d'une autre session.
+
+**Oracle** : `oracles\oracle-portee-doctrine.mjs` (PD1 localisation et etat de doctrine, PD2 pieces
+installees et cablees ; `--self-test` a 5 cas double sens, dont les deux bornes). Mesure du 24/08 au
+registre. L'heritage porte les pieces : `gabarits\HERITAGE.json` v1.1.0, controle par R-47.
+
 ## Z. La couverture se compte en EXIGENCES, jamais en regles (TF-0548 — 23/08, mandat humain, voie (a))
 
 **Le constat.** La couverture affichait 24 regles sur 26, soit 92 %, pendant que quinze

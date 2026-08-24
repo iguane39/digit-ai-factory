@@ -1,472 +1,221 @@
 #!/usr/bin/env node
 /**
- * oracle-gabarits-documents.mjs — intégrité de la bibliothèque de gabarits de documents
- * (`gabarits\documents\`). Né du mandat du 21/08 : hisser au niveau de la factory les formes de
- * livrables que les projets réinventaient chacun de leur côté.
+ * oracle-gabarits-documents — UN SQUELETTE QUI N'A JAMAIS ÉTÉ INSTANCIÉ N'A JAMAIS ÉTÉ ÉPROUVÉ.
  *
- * Ce que cet oracle juge : la BIBLIOTHÈQUE, jamais les documents qu'on en tire. Un rapport
- * produit à partir d'un gabarit se juge par l'oracle de son domaine (`check_html.py` ET
- * `render_page.py` pour un HTML) — c'est écrit famille par famille au catalogue.
+ * LE FAIT (24/08/2026, TF-0565). Les squelettes `gd-dossier-architecture` et `gd-dossier-exploitation`,
+ * version 1.0.2 tous deux, posaient la classe `ch-apprend` sur 11 paragraphes de l'un et 8 de
+ * l'autre SANS qu'aucune règle CSS ne la vise. `check_html` rendait FAIL sur L21 — composant
+ * déclaré sans style — sur les deux fichiers, et depuis leur production. Le chapeau de chapitre se
+ * rendait comme un paragraphe ordinaire, et rien à l'écran ne le signalait : un oracle de RENDU ne
+ * voit rien tant que rien ne déborde. C'était la DEUXIÈME fois que ces mêmes squelettes livraient
+ * un défaut que seule la production d'un vrai document révélait.
  *
- * Règles :
- *  G1  `catalogue.jsonl` existe, 1re ligne méta `pilot/gabarits-documents@1`, JSONL valide
- *  G2  chaque famille porte les champs requis, non vides (dont `preuve` et `sources`) —
- *      un gabarit sans livrable réel derrière est une invention, pas une extraction
- *  G3  cohérence catalogue ↔ disque, DANS LES DEUX SENS : tout gabarit déclaré existe, et
- *      tout dossier de famille présent sur le disque est déclaré au catalogue. Le second sens
- *      est celui qui manque toujours : un gabarit posé sans être inscrit ne serait trouvé par
- *      personne (même classe que TF-0362, le skill absent du manifeste)
- *  G4  statut dans le référentiel fermé {ok, a_extraire, porte_ailleurs} et cohérent :
- *      `ok` exige un gabarit sur disque, des règles déclarées et un oracle nommé ;
- *      `a_extraire` exige des sources et INTERDIT un gabarit (sinon le statut ment) ;
- *      `porte_ailleurs` exige de dire OÙ la forme vit
- *  G5  aucun gabarit ne porte de donnée client : un squelette se hisse, un livrable reste chez
- *      le projet. Motifs cherchés : noms de clients du parc, adresses, identifiants Azure
- *  G6  toute règle de doctrine citée par une famille (D1…Dn) est définie dans `README.md` —
- *      une règle citée et non définie est une référence morte
- *  G8  tout gabarit en statut `ok` PRESCRIT le fil de traçabilité — son id de famille et une
- *      version — sans quoi un retour sur un document produit n'est rattachable à rien. Le
- *      lecteur qui trouve un manque ne peut le remonter utilement que s'il peut dire de QUEL
- *      gabarit et de QUELLE version le document vient ; sinon le retour dit « il manquait une
- *      section » et personne ne sait à quoi l'appliquer (R-46, 21/08).
- *  G10 toute famille en statut `ok` porte une INSTANCE DE PREUVE : un document minimal
- *      produit depuis son squelette, versionné à côté de lui, sans emplacement resté à remplir
- *      (TF-0522, 23/08/2026). On n'accepte pas un oracle sans fixture ; on n'accepte pas un
- *      gabarit sans instance.
- *  G9  tout gabarit de LIVRABLE prescrit la marque de destinataire (`destinataire: humain`
- *      en frontmatter pour un .md, `<meta name="destinataire" content="humain">` pour un
- *      .html), ou déclare pourquoi il ne la porte pas (TF-0504, 22/08/2026). Sans marque en
- *      AMONT, la règle R-2 d'`oracle-conformite-projet` est un faux négatif STRUCTUREL : elle
- *      ne juge que ce qui est marqué, et rien ne posait la marque.
- *  G7  les emplacements à remplir suivent la convention du socle `{…}` et jamais `{{…}}` :
- *      L11 de `check_html.py` refuse la seconde forme, un squelette qui la porte est rouge
- *      à l'oracle de son propre domaine (mesuré le 21/08 en écrivant le premier squelette)
+ * CE QUE CET ORACLE MÉCANISE, et c'est le second geste de l'item — le premier, embarquer le style
+ * de tout composant posé, est tenu par L21 du socle :
+ *   G1 · toute famille de `gabarits\documents\` porte sa doctrine (GABARIT.md) et au moins une
+ *        INSTANCE — la preuve qu'elle a été remplie une fois. Et LE FORMAT DU SQUELETTE DICTE CELUI
+ *        DE L'INSTANCE : un SQUELETTE.html réclame une INSTANCE.html, un squelette Markdown une
+ *        instance Markdown. L'oracle n'impose aucun format ; il vérifie qu'aucune forme posée ne
+ *        reste sans preuve ;
+ *   G2 · l'instance est REMPLIE : aucun marqueur de substitution DÉLIMITÉ (`{{…}}`, `[[…]]`,
+ *        `[À REMPLIR]`) hors commentaires,
+ *        et elle diffère de son squelette. Une instance qui recopie le squelette ne prouve rien ;
+ *   G3 · squelette ET instance passent le contrôle de MARQUAGE du socle (`check_html.py`). C'est
+ *        exactement le contrôle qui rendait FAIL depuis la production, et que personne ne jouait.
  *
- * Usage : node oracle-gabarits-documents.mjs [racine] [--self-test]
- * Exit : 0 PASS · 1 FAIL · 2 SKIP (bibliothèque absente — rien à juger).
+ * CE QU'IL NE FAIT PAS : rendre la page. Le rendu a son propre contrôle — `scripts\verifier-rendu-
+ * instances.mjs` — et le dupliquer créerait deux vérités sur les familles bloquantes. Il ne juge
+ * pas non plus la JUSTESSE du contenu d'une instance : un texte d'exemple faux est un défaut de
+ * relecture, pas de marquage, et aucun oracle ne le verra.
+ *
+ * SKIP MOTIVÉ, JAMAIS PASS SILENCIEUX : sans python ni socle, l'oracle dit qu'il n'a pas tourné.
+ *
+ *   node oracles\oracle-gabarits-documents.mjs             → jugement du parc
+ *   node oracles\oracle-gabarits-documents.mjs --self-test → double sens sur des familles fabriquées
  */
-import { existsSync, readFileSync, readdirSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { tmpdir } from "node:os";
+import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { tmpdir, homedir } from "node:os";
+import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
-const CHAMPS = ["id", "famille", "titre", "quand_l_employer", "formats", "statut", "sources", "preuve"];
-const STATUTS = new Set(["ok", "a_extraire", "porte_ailleurs"]);
-const META = "pilot/gabarits-documents@1";
+const PILOT = join(ICI, "..");
+const args = process.argv.slice(2);
 
-// Noms de clients et motifs de données qui n'ont RIEN à faire dans un squelette. La liste est
-// une DONNÉE (loi transverse n°4) : un client de plus s'ajoute ici, pas dans une condition.
-const MOTIFS_CLIENT = [
-  { motif: /\bClient-A\b/i, quoi: "nom de client (Client-A)" },
-  { motif: /\bEnseigne-A\b/i, quoi: "nom de client (Enseigne-A)" },
-  { motif: /\bProduit-05\b/i, quoi: "nom de client (Produit-05)" },
-  { motif: /\bClient-C\b/i, quoi: "nom de client (Client-C)" },
-  { motif: /[\w.+-]+@[\w-]+\.[a-z]{2,}/i, quoi: "adresse de courriel" },
-  { motif: /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/i, quoi: "identifiant GUID (tenant, app registration)" },
+const CANDIDATS_SOCLE = [
+  join(homedir(), ".claude", "skills", "digit-ai-page-html", "scripts", "check_html.py"),
+  join(PILOT, "..", "digit-ai-forge-agents", ".claude", "skills", "digit-ai-page-html", "scripts", "check_html.py"),
+];
+const SOCLE = CANDIDATS_SOCLE.find(existsSync) || null;
+const PYTHON = ["python", "python3", "py"].find((bin) => {
+  const r = spawnSync(bin, ["--version"], { encoding: "utf8" });
+  return !r.error && r.status === 0;
+});
+
+/**
+ * Les restes de substitution qui trahissent une instance jamais remplie — et ILS SONT DÉLIMITÉS.
+ *
+ * Première version de cette liste, le 24/08 : elle contenait `/\bà remplir\b/i` nu. L'oracle a
+ * rendu DEUX FAUX POSITIFS sur le parc en moins d'une minute, sur la phrase « emplacement nommé,
+ * prêt à remplir » — de la prose, dans un commentaire, qui DÉCRIT un emplacement voulu (TF-0524).
+ * Un marqueur de substitution se reconnaît à ses délimiteurs, jamais à ses mots : `{{x}}`, `[[x]]`,
+ * `[À REMPLIR]`, `<À REMPLIR>`. Chercher les mots, c'est accuser la documentation de son propre
+ * sujet — et c'est le défaut que je venais de corriger ailleurs le même jour.
+ */
+const RESTES = [
+  /\{\{[^}]{1,80}\}\}/,                       // {{cle.de.substitution}}
+  /\[\[[^\]]{1,80}\]\]/,                      // [[cle]]
+  /[[<«]\s*(?:À|A) REMPLIR[^\]>»]{0,40}[\]>»]/i, // [À REMPLIR], <à remplir : …>
+  /[[<]\s*TODO[^\]>]{0,60}[\]>]/i,            // [TODO …]
+  /\bLOREM IPSUM\b/i,
 ];
 
-/** Juge une bibliothèque. `racine` = dossier contenant `documents\`. */
-function juger(racineGabarits) {
+/** Le texte hors commentaires HTML : un marqueur laissé dans un commentaire ne se rend pas. */
+const sansCommentaires = (html) => html.replace(/<!--[\s\S]*?-->/g, " ");
+
+function marquage(fichier) {
+  if (!SOCLE || !PYTHON) return { skip: true };
+  const r = spawnSync(PYTHON, ["-X", "utf8", SOCLE, fichier], { encoding: "utf8", maxBuffer: 32 * 1024 * 1024 });
+  const sortie = (r.stdout || "") + (r.stderr || "");
+  const m = /^Verdict\s*:\s*(\w+)/m.exec(sortie);
+  return { verdict: m ? m[1] : "ILLISIBLE", detail: sortie.split("\n").filter((l) => /^\s+\[/.test(l)).slice(0, 3).join(" · ") };
+}
+
+export function juger(dossier) {
   const findings = [];
-  const ko = (regle, ou, message) => findings.push({ regle, statut: "FAIL", ou, message });
-  const ok = (regle, message) => findings.push({ regle, statut: "PASS", ou: "-", message });
-
-  const dossier = join(racineGabarits, "documents");
-  const catalogue = join(dossier, "catalogue.jsonl");
-  const readme = join(dossier, "README.md");
-  if (!existsSync(dossier)) return { verdict: "SKIP", findings, motif: "gabarits\\documents\\ absent" };
-  if (!existsSync(catalogue)) { ko("G1", "documents/catalogue.jsonl", "catalogue absent — la bibliothèque n'a pas de source unique"); return { verdict: "FAIL", findings }; }
-
-  const lignes = readFileSync(catalogue, "utf8").split(/\r?\n/).filter((l) => l.trim());
-  let meta;
-  try { meta = JSON.parse(lignes[0]); } catch { ko("G1", "catalogue.jsonl:1", "1re ligne non-JSON"); return { verdict: "FAIL", findings }; }
-  if (meta.schema !== META) ko("G1", "catalogue.jsonl:1", `schéma « ${meta.schema} » — attendu ${META}`);
-  const familles = [];
-  lignes.slice(1).forEach((l, i) => {
-    try { familles.push({ n: i + 2, ...JSON.parse(l) }); }
-    catch { ko("G1", `catalogue.jsonl:${i + 2}`, "ligne non-JSON"); }
-  });
-  if (!findings.some((f) => f.regle === "G1")) ok("G1", `catalogue valide (${meta.version}, ${familles.length} famille(s))`);
-
-  // G2 — champs requis
-  let g2 = true;
-  for (const f of familles) {
-    const manquants = CHAMPS.filter((c) => {
-      const v = f[c];
-      return Array.isArray(v) ? v.length === 0 : !String(v ?? "").trim();
-    });
-    if (manquants.length) { ko("G2", f.id || `ligne ${f.n}`, `champ(s) vide(s) ou absent(s) : ${manquants.join(", ")}`); g2 = false; }
-  }
-  if (g2) ok("G2", `${familles.length} famille(s) — tous les champs requis présents, sources et preuve comprises`);
-
-  // G4 — statut et cohérence du statut
-  let g4 = true;
-  for (const f of familles) {
-    if (!STATUTS.has(f.statut)) { ko("G4", f.id, `statut « ${f.statut} » hors référentiel {${[...STATUTS].join(", ")}}`); g4 = false; continue; }
-    if (f.statut === "ok") {
-      if (!f.gabarit) { ko("G4", f.id, "statut ok sans gabarit déclaré — un gabarit « ok » se prend et s'emploie"); g4 = false; }
-      if (!Array.isArray(f.regles) || !f.regles.length) { ko("G4", f.id, "statut ok sans règle de doctrine engagée"); g4 = false; }
-      if (!Array.isArray(f.oracles) || !f.oracles.length) { ko("G4", f.id, "statut ok sans oracle nommé — un livrable se juge sur verdict exécuté (D7)"); g4 = false; }
+  const familles = existsSync(dossier)
+    ? readdirSync(dossier, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name)
+    : [];
+  for (const fam of familles) {
+    const p = (n) => join(dossier, fam, n);
+    // LE FORMAT DU SQUELETTE DICTE CELUI DE L'INSTANCE, et l'oracle n'impose aucun format. La
+    // famille `diagnostic-exploitation` vit en Markdown — GABARIT.md + INSTANCE.md, aucun HTML :
+    // exiger d'elle un SQUELETTE.html serait imposer une forme au nom d'un contrôle, et le
+    // premier passage de cet oracle sur le parc a rendu exactement ce faux positif.
+    const fichiers = readdirSync(join(dossier, fam));
+    const formes = ["html", "md"].filter((ext) => fichiers.includes(`SQUELETTE.${ext}`));
+    const instances = ["html", "md"].filter((ext) => fichiers.includes(`INSTANCE.${ext}`));
+    const manquantes = [];
+    if (!fichiers.includes("GABARIT.md")) manquantes.push("GABARIT.md");
+    if (!instances.length) manquantes.push("INSTANCE.<html|md>");
+    for (const ext of formes) if (!instances.includes(ext)) manquantes.push(`INSTANCE.${ext} (le squelette est en .${ext})`);
+    if (manquantes.length) {
+      findings.push({ regle: "G1", statut: "FAIL", ou: fam, message:
+        `pièce(s) manquante(s) : ${manquantes.join(", ")}. Un squelette sans instance n'a jamais été ` +
+        "éprouvé — et son absence se lit comme un vert, ce qui est le pire des états" });
+      continue;
     }
-    if (f.statut === "a_extraire" && f.gabarit) { ko("G4", f.id, "statut a_extraire ALORS QUE le gabarit existe — le statut ment sur l'état du travail"); g4 = false; }
-    if (f.statut === "porte_ailleurs" && !(Array.isArray(f.sources) && f.sources.length)) { ko("G4", f.id, "statut porte_ailleurs sans dire OÙ la forme vit"); g4 = false; }
-  }
-  if (g4) ok("G4", "statuts dans le référentiel fermé et cohérents avec l'état du disque");
+    findings.push({ regle: "G1", statut: "PASS", ou: fam, message:
+      `doctrine + instance(s) .${instances.join(", .")}` + (formes.length ? ` face au squelette .${formes.join(", .")}` : " (famille sans squelette)") });
 
-  // G3 — cohérence catalogue ↔ disque, dans les DEUX sens
-  const racineDepot = join(racineGabarits, "..");
-  let g3 = true;
-  const famillesDeclarees = new Set();
-  for (const f of familles) {
-    if (f.famille) famillesDeclarees.add(String(f.famille));
-    for (const cle of ["gabarit", "squelette"]) {
-      const chemin = f[cle];
-      if (!chemin) continue;
-      if (!existsSync(join(racineDepot, chemin))) { ko("G3", f.id, `${cle} déclaré et ABSENT du disque : ${chemin}`); g3 = false; }
+    const ext = instances[0];
+    const inst = sansCommentaires(readFileSync(p(`INSTANCE.${ext}`), "utf8"));
+    const squel = formes.includes(ext) ? readFileSync(p(`SQUELETTE.${ext}`), "utf8") : null;
+    const reste = RESTES.map((re) => re.exec(inst)).find(Boolean);
+    if (reste) {
+      findings.push({ regle: "G2", statut: "FAIL", ou: fam, message:
+        `l'instance porte un reste de substitution (« ${reste[0].slice(0, 40)} ») — elle n'a pas été ` +
+        "remplie, donc elle ne prouve rien du squelette" });
+    } else if (squel !== null && inst.trim() === sansCommentaires(squel).trim()) {
+      findings.push({ regle: "G2", statut: "FAIL", ou: fam, message:
+        "l'instance est la copie exacte du squelette : instancier, c'est REMPLIR, sinon le contrôle " +
+        "se joue deux fois sur le même fichier et l'on croit avoir doublé la preuve" });
+    } else {
+      findings.push({ regle: "G2", statut: "PASS", ou: fam, message: "instance remplie, sans reste de substitution" });
     }
-  }
-  for (const e of readdirSync(dossier, { withFileTypes: true })) {
-    if (!e.isDirectory()) continue;
-    if (!famillesDeclarees.has(e.name)) {
-      ko("G3", `documents/${e.name}`, "dossier de famille présent sur le disque et ABSENT du catalogue — un gabarit posé sans être inscrit n'est trouvé par personne");
-      g3 = false;
-    }
-  }
-  if (g3) ok("G3", `catalogue ↔ disque cohérents dans les deux sens (${famillesDeclarees.size} famille(s) déclarée(s))`);
 
-  // G6 — règles de doctrine citées et définies
-  const texteReadme = existsSync(readme) ? readFileSync(readme, "utf8") : "";
-  const definies = new Set([...texteReadme.matchAll(/\*\*(D\d+)\*\*/g)].map((m) => m[1]));
-  let g6 = true;
-  if (!texteReadme) { ko("G6", "documents/README.md", "mode d'emploi absent — la doctrine n'est définie nulle part"); g6 = false; }
-  else {
-    for (const f of familles) {
-      for (const r of f.regles || []) {
-        if (!definies.has(r)) { ko("G6", f.id, `règle « ${r} » citée et NON définie dans README.md — référence morte`); g6 = false; }
+    for (const n of ["SQUELETTE.html", "INSTANCE.html"].filter((f) => fichiers.includes(f))) {
+      const r = marquage(p(n));
+      if (r.skip) {
+        findings.push({ regle: "G3", statut: "SKIP", ou: `${fam}/${n}`, message:
+          "socle de marquage ou python introuvable — le contrôle n'a PAS tourné" });
+      } else if (r.verdict !== "PASS") {
+        findings.push({ regle: "G3", statut: "FAIL", ou: `${fam}/${n}`, message:
+          `marquage ${r.verdict} — ${r.detail || "voir check_html.py"}` });
+      } else {
+        findings.push({ regle: "G3", statut: "PASS", ou: `${fam}/${n}`, message: "marquage PASS" });
       }
     }
   }
-  if (g6) ok("G6", `${definies.size} règle(s) de doctrine définies, toutes les citations résolues`);
-
-  // G5 et G7 — sur le contenu des gabarits présents
-  const fichiersGabarits = [];
-  const parcourir = (d) => {
-    for (const e of readdirSync(d, { withFileTypes: true })) {
-      const chemin = join(d, e.name);
-      if (e.isDirectory()) { parcourir(chemin); continue; }
-      if (/\.(md|html)$/.test(e.name) && e.name !== "README.md") fichiersGabarits.push(chemin);
-    }
-  };
-  parcourir(dossier);
-
-  let g5 = true, g7 = true;
-  for (const chemin of fichiersGabarits) {
-    const texte = readFileSync(chemin, "utf8");
-    const relatif = chemin.slice(dossier.length + 1).split("\\").join("/");
-    // G5 : la PROVENANCE cite légitimement des chemins de livrables clients ; seul le CORPS
-    // est jugé. Sans cette frontière, la règle refuserait la citation de sa propre source.
-    const corps = texte.split(/^## /m).slice(1).join("\n");
-    for (const { motif, quoi } of MOTIFS_CLIENT) {
-      const trouve = corps.match(motif);
-      if (trouve) { ko("G5", relatif, `${quoi} dans le corps du gabarit : « ${String(trouve[0]).slice(0, 40)} » — un squelette se hisse, le contenu client reste chez le projet`); g5 = false; }
-    }
-    if (/\{\{/.test(texte)) { ko("G7", relatif, "emplacement en `{{…}}` — convention du socle : `{…}` (L11 de check_html.py refuse la double accolade)"); g7 = false; }
-  }
-
-  // G8 — le fil de traçabilité, exigé des seuls gabarits `ok` : une famille `a_extraire` n'a
-  // pas de gabarit à juger, une famille `porte_ailleurs` suit la convention de la forge qui la
-  // porte, et lui imposer la nôtre serait re-créer le doublon que `porte_ailleurs` évite.
-  let g8 = true;
-  for (const f of familles.filter((x) => x.statut === "ok")) {
-    for (const cle of ["gabarit", "squelette"]) {
-      const chemin = f[cle];
-      if (!chemin) continue;
-      const abs = join(racineDepot, chemin);
-      if (!existsSync(abs)) continue; // G3 le dit déjà
-      const texte = readFileSync(abs, "utf8");
-      const porteId = texte.includes(f.id);
-      const porteVersion = /version[_ ]du[_ ]gabarit/i.test(texte);
-      if (porteId && porteVersion) continue;
-      const manque = [!porteId && `son id de famille (${f.id})`, !porteVersion && "une version du gabarit"].filter(Boolean);
-      ko("G8", `${chemin}`, `gabarit \`ok\` sans fil de traçabilité — il ne prescrit pas ${manque.join(" ni ")}. Un document produit sans ce couple rend tout retour inexploitable : « il manquait une section » ne se rattache à rien`);
-      g8 = false;
-    }
-  }
-  if (g8) ok("G8", "tout gabarit `ok` prescrit son id de famille et sa version — un retour reste rattachable");
-
-  // G9 (TF-0504, 22/08/2026) — LA MARQUE DE DESTINATAIRE SE POSE EN AMONT, OU ELLE NE SE POSE
-  // NULLE PART.
-  //
-  // `oracle-conformite-projet` déclare sa propre limite, mot pour mot : « seul ce qui est MARQUÉ
-  // est jugé — un producteur qui oublie de marquer son livrable y échappe (faux négatif ASSUMÉ,
-  // mesuré à la revue du 17/09 par le rapport entre livrables marqués et livrables déposés) ».
-  // La limite était donc connue et son ampleur prévue à la mesure.
-  //
-  // CE QUI NE L'ÉTAIT PAS : la marque n'était posée NULLE PART EN AMONT. Vérifié le 22/08 —
-  // `grep -ril destinataire` sur les gabarits et les outils de forge-audit : zéro occurrence ; le
-  // gabarit Client-A de la fiche sécurité (9 485 octets) : zéro occurrence ; cet oracle (G1-G8) :
-  // aucune règle n'exigeait la marque. Tout document produit depuis la bibliothèque naissait donc
-  // non marqué, donc INVISIBLE à R-2, donc rangeable n'importe où sans qu'aucun contrôle ne le
-  // dise. Preuve du coût : une fiche sécurité écrite à la racine du produit, hors `output\`, en
-  // violation de R-2 et R-39 — et aucun oracle ne pouvait le voir. Le défaut a été trouvé par
-  // relecture humaine, exactement ce que TF-0319 voulait supprimer.
-  //
-  // La revue du 17/09 aurait donc mesuré un ratio marqués/déposés proche de zéro SANS EN DONNER
-  // LA CAUSE, la cause n'étant pas chez les producteurs. On ferme la boucle à la SOURCE.
-  //
-  // L'ÉCHAPPATOIRE EST EXPLICITE ET NÉCESSAIRE : un gabarit NORMATIF n'est destiné à personne —
-  // c'est déjà la précision D-06, et `gabarits\INSATISFACTION.md` documente ce choix pour
-  // lui-même. Un gabarit peut donc déclarer `destinataire: aucun` avec son motif. Ce qui est
-  // refusé n'est pas l'absence de marque : c'est le SILENCE sur la marque.
-  // LA MARQUE JUGEE ICI EST EXACTEMENT CELLE QUE R-2 SAIT LIRE, et c'est le second faux negatif
-  // trouve en ecrivant la regle. `oracle-conformite-projet` cherche `destinataire: humain` (ou
-  // `content="humain"`) : une valeur de ROLE n'y suffit pas. Or deux gabarits portaient
-  // `destinataire: exploitant / astreinte` et `destinataire: comite d'architecture / client /
-  // repreneur` — donc un document ne d'eux restait INVISIBLE a R-2 malgre sa marque. Un premier
-  // jet de G9 les declarait conformes : il aurait ferme l'item en laissant le defaut entier.
-  //
-  // Le role du lecteur est une information utile, mais ce n'est pas la marque : il vit sous une
-  // cle distincte (`role_destinataire`). La marque, elle, repond a UNE question — ce document
-  // part-il chez un humain — et sa reponse est fermee.
-  const MARQUE_MD = /^\s*destinataire\s*:\s*humain\s*$/mi;
-  const MARQUE_HTML = /<meta\s+name=["']destinataire["']\s+content=["']humain["']/i;
-  // L'echappatoire NORMATIVE : un gabarit qui n'est destine a personne le declare (precision
-  // D-06, dont `gabarits\INSATISFACTION.md` fait deja usage pour lui-meme). Ce qui est refuse
-  // n'est pas l'absence de marque, c'est le SILENCE sur la marque.
-  const MARQUE_AUCUN = /^\s*destinataire\s*:\s*aucun\b/mi;
-  // ATTENTION AU FAUX NEGATIF, constate en ecrivant la regle : un premier jet acceptait TOUT
-  // fichier contenant le mot « destinataire », et `dossier-exploitation/SQUELETTE.html` passait
-  // alors grace a une legende de tableau — « Alertes et destinataires ». Une garde qui se
-  // satisfait d un mot dans une legende ne juge rien. On exige donc la FORME de la marque :
-  // `destinataire: <valeur>` en debut de ligne, ou l attribut `name="destinataire"` — ce second
-  // motif permet a un gabarit .md de PRESCRIRE la balise que sa copie .html devra porter.
-  const MARQUE_PRESCRITE = /name\s*=\s*["']destinataire["']\s+content\s*=\s*["']humain["']/i;
-  let g9 = true;
-  for (const f of familles.filter((x) => x.statut === "ok")) {
-    for (const cle of ["gabarit", "squelette"]) {
-      const chemin = f[cle];
-      if (!chemin) continue;
-      const abs = join(racineDepot, chemin);
-      if (!existsSync(abs)) continue; // G3 le dit déjà
-      const texte = readFileSync(abs, "utf8");
-      // Un gabarit PRESCRIT la marque : soit il la porte lui-même (et elle descend dans la copie),
-      // soit il l'écrit comme consigne à remplir. Les deux comptent — ce qui ne compte pas, c'est
-      // de n'en parler nulle part.
-      if (MARQUE_MD.test(texte) || MARQUE_HTML.test(texte) || MARQUE_AUCUN.test(texte)
-          || MARQUE_PRESCRITE.test(texte)) continue;
-      ko("G9", chemin, "gabarit de livrable SANS marque de destinataire ni déclaration de son absence — " +
-        "R-2 ne juge que ce qui est marqué, donc un document né de ce gabarit échappe au contrôle de localisation " +
-        "par construction, et pas par oubli du producteur. Poser `destinataire: humain` (frontmatter .md) ou " +
-        "`<meta name=\"destinataire\" content=\"humain\">` (.html) ; un gabarit normatif déclare `destinataire: aucun` avec son motif");
-      g9 = false;
-    }
-  }
-  if (g9) ok("G9", "tout gabarit `ok` prescrit sa marque de destinataire, ou déclare pourquoi il n'en porte pas");
-
-  // G10 (TF-0522, 23/08/2026) — UN GABARIT `ok` A DÉJÀ PRODUIT UN DOCUMENT, ET ON PEUT LE LIRE.
-  //
-  // LE FAIT. Deux familles sont entrées au catalogue le 21/08 en statut `ok`. Le 23/08, la PREMIÈRE
-  // tentative de produire un document réel avec elles a rencontré deux défauts : un BLOQUANT (le
-  // squelette échouait à l'oracle du socle, sur sa propre feuille de style) et un MAJEUR (le
-  // sommaire se rendait en liste numérotée nue). Aucun des deux ne demandait de perspicacité —
-  // seulement d'ESSAYER.
-  //
-  // Le README de la bibliothèque exige déjà la PROVENANCE : « extrait de quatre occurrences
-  // réelles », donc que la forme vienne du réel. Mais rien n'exigeait que le SQUELETTE ait produit
-  // du réel. C'est la différence entre « cette forme a été observée » et « cette forme fonctionne ».
-  //
-  // C'est le pendant EXACT des fixtures rouge/verte que l'écosystème exige de tout oracle : on
-  // n'accepte pas un oracle sans fixture, on ne devrait pas accepter un gabarit sans instance. Le
-  // coût est d'une page par famille, payé une fois.
-  //
-  // CE QUI EST JUGÉ, et c'est volontairement étroit : l'instance EXISTE à côté du gabarit, et son
-  // CORPS ne porte plus aucun emplacement `{…}`. Le second point est le seul qui distingue une
-  // instance d'une COPIE du squelette — et il se mesure. Le `<style>` est exclu du décompte : ses
-  // accolades sont du CSS, pas des emplacements, et un premier jet du générateur les avait
-  // remplacées, produisant une instance CASSÉE ET VERTE.
-  //
-  // CE QUI N'EST PAS JUGÉ ICI : que l'instance passe l'oracle de son FORMAT. Cet oracle ne lance
-  // pas `check_html` — cross-dépôt, autre langage. La preuve d'exécution se consigne au champ
-  // `preuve` de la famille, et c'est déclaré plutôt que promis.
-  const SANS_STYLE = /<style[^>]*>[\s\S]*?<\/style>|<script[^>]*>[\s\S]*?<\/script>/gi;
-  const EMPLACEMENT = /(?<!\{)\{[^{}]{1,120}\}(?!\})/g;
-  let g10 = true;
-  for (const f of familles.filter((x) => x.statut === "ok")) {
-    const ref = f.squelette || f.gabarit;
-    if (!ref) continue;                       // G4 le dit déjà
-    const dossier = join(racineDepot, ref).replace(/[\\/][^\\/]+$/, "");
-    const candidats = ["INSTANCE.html", "INSTANCE.md"].map((n) => join(dossier, n));
-    const trouve = candidats.find((c) => existsSync(c));
-    if (!trouve) {
-      ko("G10", ref, "famille `ok` SANS instance de preuve — aucun document n'a jamais été produit " +
-        "depuis ce squelette, donc rien ne dit qu'il PEUT en produire un. Les deux premiers défauts " +
-        "des familles du 21/08 ne demandaient pas de perspicacité, seulement d'essayer. Attendu : " +
-        "`INSTANCE.html` ou `INSTANCE.md` à côté du gabarit, corps entièrement rempli");
-      g10 = false;
-      continue;
-    }
-    const corps = readFileSync(trouve, "utf8").replace(SANS_STYLE, "");
-    const restants = corps.match(EMPLACEMENT) || [];
-    if (restants.length) {
-      ko("G10", trouve.slice(racineDepot.length + 1),
-        `instance de preuve avec ${restants.length} emplacement(s) NON REMPLI(S) — ex. « ${restants[0].slice(0, 50)} ». ` +
-        "Une instance à trous est une COPIE du squelette : elle ne prouve pas qu'un document conforme " +
-        "peut en sortir, elle prouve qu'on sait copier un fichier");
-      g10 = false;
-    }
-  }
-  if (g10) ok("G10", "toute famille `ok` porte son instance de preuve, corps entièrement rempli");
-  if (g5) ok("G5", `${fichiersGabarits.length} gabarit(s) sans donnée client dans leur corps`);
-  if (g7) ok("G7", "emplacements à la convention du socle `{…}`");
-
-  return { verdict: findings.some((f) => f.statut === "FAIL") ? "FAIL" : "PASS", findings };
+  if (!familles.length) findings.push({ regle: "G1", statut: "SKIP", ou: dossier, message: "aucune famille de gabarit sous ce dossier" });
+  return findings;
 }
 
-// ---- self-test : chaque règle prouvée dans les DEUX sens -------------------------------------
-function selfTest() {
-  const base = mkdtempSync(join(tmpdir(), "gabdocs-"));
-  const gab = join(base, "gabarits");
-  const docs = join(gab, "documents");
-  mkdirSync(docs, { recursive: true });
-  const meta = JSON.stringify({ schema: META, version: "1.0.0", genere: "2026-08-21", ecrivain: "pilot", regle: "recette" });
-  const famille = (sur = {}) => JSON.stringify({
-    id: "gd-x", famille: "fx", titre: "T", quand_l_employer: "Q", formats: ["md"],
-    statut: "ok", gabarit: "gabarits/documents/fx/GABARIT.md", squelette: null,
-    sources: ["source réelle"], regles: ["D1"], oracles: ["check_html.py"], preuve: "P", ...sur,
-  });
-  // Le gabarit par défaut porte le fil de traçabilité (G8) ET la marque de destinataire (G9) :
-  // la fixture VERTE doit représenter une bibliothèque CONFORME, sinon elle cesse de prouver ce
-  // que l'oracle exige. C'est la troisième fois que ce commentaire s'allonge, et c'est normal —
-  // une fixture verte est le contrat, elle grossit avec lui.
-  // G10 (TF-0522) : la fixture VERTE porte aussi son INSTANCE DE PREUVE, corps rempli. Une
-  // bibliothèque sans instance n'est plus conforme — c'est tout l'objet de la règle.
-  const ecrire = (lignes, gabarit = "# G\n\n## Structure\n\ndestinataire: humain\n\ngabarit: gd-x · version du gabarit 1.0.0\n\nun {emplacement}\n", instance = "# G\n\n## Structure\n\ndestinataire: humain\n\ngabarit: gd-x · version du gabarit 1.0.0\n\nun emplacement rempli\n") => {
-    mkdirSync(join(docs, "fx"), { recursive: true });
-    writeFileSync(join(docs, "fx", "GABARIT.md"), gabarit, "utf8");
-    if (instance === null) { try { rmSync(join(docs, "fx", "INSTANCE.md")); } catch { /* absente, c'est le cas testé */ } }
-    else writeFileSync(join(docs, "fx", "INSTANCE.md"), instance, "utf8");
-    writeFileSync(join(docs, "README.md"), "| **D1** | Largeur utile | fait |\n", "utf8");
-    writeFileSync(join(docs, "catalogue.jsonl"), [meta, ...lignes].join("\n") + "\n", "utf8");
+const verdictDe = (f) => (f.some((x) => x.statut === "FAIL") ? "FAIL" : f.every((x) => x.statut === "SKIP") ? "SKIP" : "PASS");
+
+if (args[0] === "--self-test") {
+  const dir = mkdtempSync(join(tmpdir(), "gab-doc-"));
+  const casse = [];
+  const PAGE = (titre, corps) => `<!doctype html><html lang="fr"><head><meta charset="utf-8">` +
+    `<meta name="viewport" content="width=device-width, initial-scale=1"><title>${titre} — 20260824a</title>` +
+    `<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E">` +
+    `<style>body{color:#1a1a1a;background:#fff;font-family:system-ui,sans-serif}main{max-width:70ch;margin:0 auto}</style>` +
+    `</head><body><main><h1>${titre}</h1>${corps}</main></body></html>`;
+  const poser = (nom, { gabarit = true, squelette = true, instance = "remplie" } = {}) => {
+    mkdirSync(join(dir, nom), { recursive: true });
+    if (gabarit) writeFileSync(join(dir, nom, "GABARIT.md"), "# doctrine\n", "utf8");
+    if (squelette) writeFileSync(join(dir, nom, "SQUELETTE.html"), PAGE("Squelette", "<p>Forme.</p>"), "utf8");
+    if (instance === "remplie") writeFileSync(join(dir, nom, "INSTANCE.html"), PAGE("Instance", "<p>Contenu réel, mesuré le 24 août 2026.</p>"), "utf8");
+    if (instance === "trous") writeFileSync(join(dir, nom, "INSTANCE.html"), PAGE("Instance", "<p>{{contenu.a.remplir}}</p>"), "utf8");
+    if (instance === "copie") writeFileSync(join(dir, nom, "INSTANCE.html"), PAGE("Squelette", "<p>Forme.</p>"), "utf8");
   };
 
-  const cas = [];
-  ecrire([famille()]);
-  let r = juger(gab);
-  cas.push(["verte  — bibliothèque conforme", r.verdict === "PASS", r.verdict]);
+  poser("verte");
+  let f = juger(dir);
+  const g = (r, ou) => f.filter((x) => x.regle === r && x.ou.startsWith(ou));
+  if (g("G1", "verte")[0]?.statut !== "PASS") casse.push("une famille complète échoue G1");
+  if (g("G2", "verte")[0]?.statut !== "PASS") casse.push("une instance remplie échoue G2 : " + JSON.stringify(g("G2", "verte")[0]));
 
-  ecrire([famille({ preuve: "" })]);
-  r = juger(gab);
-  cas.push(["G2     — famille sans preuve", r.findings.some((f) => f.regle === "G2" && f.statut === "FAIL"), r.verdict]);
+  poser("sans-instance", { instance: null });
+  f = juger(dir);
+  if (!g("G1", "sans-instance").some((x) => x.statut === "FAIL" && /INSTANCE\.html/.test(x.message))) {
+    casse.push("un squelette SANS instance ne rend aucun constat — le trou même que l'item décrit");
+  }
 
-  ecrire([famille({ statut: "a_extraire" })]);
-  r = juger(gab);
-  cas.push(["G4     — statut a_extraire alors que le gabarit existe", r.findings.some((f) => f.regle === "G4" && f.statut === "FAIL"), r.verdict]);
+  poser("a-trous", { instance: "trous" });
+  f = juger(dir);
+  if (!g("G2", "a-trous").some((x) => x.statut === "FAIL")) casse.push("une instance à trous passe G2");
 
-  ecrire([famille({ gabarit: "gabarits/documents/fx/ABSENT.md" })]);
-  r = juger(gab);
-  cas.push(["G3     — gabarit déclaré et absent du disque", r.findings.some((f) => f.regle === "G3" && f.statut === "FAIL"), r.verdict]);
+  poser("copie", { instance: "copie" });
+  f = juger(dir);
+  if (!g("G2", "copie").some((x) => x.statut === "FAIL")) casse.push("une instance copie du squelette passe G2");
 
-  ecrire([famille()]);
-  mkdirSync(join(docs, "non-declaree"), { recursive: true });
-  writeFileSync(join(docs, "non-declaree", "GABARIT.md"), "# orphelin\n\n## S\n\ntexte\n", "utf8");
-  r = juger(gab);
-  cas.push(["G3 bis — dossier présent et ABSENT du catalogue (sens qui manque toujours)",
-    r.findings.some((f) => f.regle === "G3" && f.statut === "FAIL" && String(f.ou).includes("non-declaree")), r.verdict]);
-  rmSync(join(docs, "non-declaree"), { recursive: true, force: true });
+  // G3, sens rouge : une classe posée sans règle CSS — le défaut exact du 24/08, en modèle réduit.
+  mkdirSync(join(dir, "classe-nue"), { recursive: true });
+  writeFileSync(join(dir, "classe-nue", "GABARIT.md"), "# doctrine\n", "utf8");
+  writeFileSync(join(dir, "classe-nue", "SQUELETTE.html"), PAGE("Squelette", '<p class="ch-apprend">Chapeau sans règle.</p>'), "utf8");
+  writeFileSync(join(dir, "classe-nue", "INSTANCE.html"), PAGE("Instance", '<p class="ch-apprend">Chapeau sans règle, rempli le 24 août 2026.</p>'), "utf8");
+  f = juger(dir);
+  const g3 = g("G3", "classe-nue");
+  if (g3.every((x) => x.statut === "SKIP")) {
+    console.log("Self-test gabarits-documents : 4/5 PASS, G3 non joué (socle de marquage ou python absent — " +
+      "il est déclaré, pas supposé)" + (casse.length ? " · CASSE : " + casse.join(" · ") : ""));
+    rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
+    process.exit(casse.length ? 1 : 0);
+  }
+  if (!g3.some((x) => x.statut === "FAIL")) casse.push("une classe posée sans règle CSS passe G3 — c'est le défaut mesuré le 24/08");
 
-  ecrire([famille({ regles: ["D1", "D99"] })]);
-  r = juger(gab);
-  cas.push(["G6     — règle citée et non définie au README", r.findings.some((f) => f.regle === "G6" && f.statut === "FAIL"), r.verdict]);
-
-  // G9 (TF-0504) — sens ROUGE : aucune mention de la marque. C'est le cas de TOUTE la
-  // bibliothèque avant le 22/08 : 7 gabarits `ok` sur 7, donc 100 %.
-  ecrire([famille()], "# G\n\n## Structure\n\ngabarit: gd-x · version du gabarit 1.0.0\n\nun {emplacement}\n");
-  r = juger(gab);
-  cas.push(["G9     — gabarit muet sur la marque de destinataire", r.findings.some((f) => f.regle === "G9" && f.statut === "FAIL"), r.verdict]);
-
-  // G9 bis — LE FAUX NÉGATIF À NE PAS REPRODUIRE, trouvé en écrivant la règle : une valeur de
-  // RÔLE n'est pas la marque. `destinataire: exploitant / astreinte` était présent sur deux
-  // gabarits réels, et R-2 ne sait lire que `humain` — un document né d'eux restait invisible.
-  ecrire([famille()], "# G\n\n## Structure\n\ndestinataire: exploitant / astreinte\n\ngabarit: gd-x · version du gabarit 1.0.0\n\nun {emplacement}\n");
-  r = juger(gab);
-  cas.push(["G9 bis — une valeur de RÔLE ne vaut pas la marque (R-2 ne lit que `humain`)", r.findings.some((f) => f.regle === "G9" && f.statut === "FAIL"), r.verdict]);
-
-  // G9 ter — LA BORNE : un gabarit NORMATIF n'est destiné à personne et le DÉCLARE (D-06).
-  // Ce qui est refusé n'est pas l'absence de marque, c'est le silence sur la marque.
-  ecrire([famille()], "# G\n\n## Structure\n\ndestinataire: aucun — référentiel normatif, pas un livrable\n\ngabarit: gd-x · version du gabarit 1.0.0\n\nun {emplacement}\n");
-  r = juger(gab);
-  cas.push(["G9 ter — l'absence DÉCLARÉE est acceptée (borne, D-06)", r.verdict === "PASS", r.verdict]);
-
-  // G10 (TF-0522) — sens ROUGE : famille `ok` SANS instance. C'était l'état des deux familles du
-  // 21/08, dont la première utilisation réelle a trouvé deux défauts que personne n'avait cherchés.
-  ecrire([famille()], undefined, null);
-  r = juger(gab);
-  cas.push(["G10    — famille `ok` sans instance de preuve", r.findings.some((f) => f.regle === "G10" && f.statut === "FAIL"), r.verdict]);
-
-  // G10 bis — une instance À TROUS est une COPIE du squelette : elle prouve qu'on sait copier un
-  // fichier, pas qu'un document conforme peut en sortir.
-  ecrire([famille()], undefined, "# G\n\n## Structure\n\ndestinataire: humain\n\ngabarit: gd-x · version du gabarit 1.0.0\n\nun {emplacement} resté à remplir\n");
-  r = juger(gab);
-  cas.push(["G10 bis— instance à trous (copie du squelette)", r.findings.some((f) => f.regle === "G10" && f.statut === "FAIL"), r.verdict]);
-
-  ecrire([famille()], "# G\n\n## Structure\n\nAudit mené chez Client-A pour Enseigne-A.\n");
-  r = juger(gab);
-  cas.push(["G5     — donnée client dans le corps d'un gabarit", r.findings.some((f) => f.regle === "G5" && f.statut === "FAIL"), r.verdict]);
-
-  ecrire([famille()], "# G\n\n> Provenance : livrable Client-A - Rapport - 20260821a\n\n## Structure\n\nun {emplacement}\n");
-  r = juger(gab);
-  cas.push(["G5 bis — la PROVENANCE peut citer son livrable source, elle n'est pas jugée",
-    !r.findings.some((f) => f.regle === "G5" && f.statut === "FAIL"), r.verdict]);
-
-  ecrire([famille()], "# G\n\n## Structure\n\nun {{ emplacement }}\n");
-  r = juger(gab);
-  cas.push(["G7     — emplacement en double accolade (refusé par L11 du socle)", r.findings.some((f) => f.regle === "G7" && f.statut === "FAIL"), r.verdict]);
-
-
-  // G8 (R-46) — le fil de traçabilité, dans les deux sens, plus la BORNE. Une famille qui n'est
-  // pas `ok` n'a pas de gabarit à juger, et lui imposer notre convention recréerait exactement
-  // le doublon que `porte_ailleurs` évite (TF-0453).
-  ecrire([famille()], "# G\n\n## Structure\n\ngabarit: gd-x · version du gabarit 1.0.0\n\nun {emplacement}\n");
-  r = juger(gab);
-  cas.push(["verte G8— le gabarit prescrit son id ET sa version",
-    !r.findings.some((f) => f.regle === "G8" && f.statut === "FAIL"), r.verdict]);
-
-  ecrire([famille()], "# G\n\n## Structure\n\ngd-x, mais aucune version\n\nun {emplacement}\n");
-  r = juger(gab);
-  cas.push(["G8     — id présent, VERSION absente : un retour ne sait pas à quelle version l'appliquer",
-    r.findings.some((f) => f.regle === "G8" && f.statut === "FAIL"), r.verdict]);
-
-  ecrire([famille()], "# G\n\n## Structure\n\nversion du gabarit 1.0.0, mais aucun id\n\nun {emplacement}\n");
-  r = juger(gab);
-  cas.push(["G8 bis — version présente, ID absent : le retour ne sait pas à quelle FAMILLE l'appliquer",
-    r.findings.some((f) => f.regle === "G8" && f.statut === "FAIL"), r.verdict]);
-
-  ecrire([famille({ statut: "porte_ailleurs", gabarit: null, regles: [], oracles: [] })], "# G\n\n## Structure\n\nrien\n");
-  r = juger(gab);
-  cas.push(["G8 ter — une famille porte_ailleurs n'est PAS jugée sur notre convention (borne)",
-    !r.findings.some((f) => f.regle === "G8" && f.statut === "FAIL"), r.verdict]);
-
-  rmSync(base, { recursive: true, force: true });
-  const echecs = cas.filter(([, ok]) => !ok);
-  for (const [nom, ok, verdict] of cas) console.log(`  [${ok ? "OK    " : "ECHEC "}] ${nom} (verdict ${verdict})`);
-  console.log(`Self-test gabarits de documents : ${cas.length - echecs.length}/${cas.length}`);
-  process.exit(echecs.length ? 1 : 0);
+  rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
+  console.log(casse.length
+    ? "SELF-TEST FAIL : " + casse.join(" · ")
+    : "Self-test gabarits-documents : 5/5 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ; " +
+      "instance à trous → FAIL ; instance copie du squelette → FAIL ; classe posée sans règle CSS → FAIL au marquage)");
+  process.exit(casse.length ? 1 : 0);
 }
 
-if (process.argv.includes("--self-test")) selfTest();
-
-const racine = process.argv.slice(2).find((a) => !a.startsWith("--")) || join(ICI, "..");
-const resultat = juger(join(racine, "gabarits"));
-process.stdout.write(JSON.stringify({
-  oracle: "oracle-gabarits-documents", version: "1.0.0", verdict: resultat.verdict,
-  findings: resultat.findings,
+const findings = juger(args[0] || join(PILOT, "gabarits", "documents"));
+const verdict = verdictDe(findings);
+console.log(JSON.stringify({
+  oracle: "oracle-gabarits-documents",
+  version: "1.0.0",
+  verdict,
+  findings,
   non_juge: [
-    "la QUALITÉ d'un gabarit — qu'il produise un bon document relève de la relecture humaine et des oracles du domaine, jamais de celui-ci",
-    "les documents PRODUITS à partir des gabarits : ils se jugent par l'oracle de leur domaine (check_html.py ET render_page.py pour un HTML), nommé famille par famille au catalogue",
-    "G5 ne cherche que des motifs DÉCLARÉS (noms de clients du parc, courriels, GUID) — une donnée client d'une autre forme passerait ; la relecture reste due avant publication",
-    "G8 juge que le gabarit PRESCRIT le couple, jamais qu'un document produit le PORTE — un projet qui retire la ligne à l'usage sort du périmètre de cet oracle ; c'est le retour lui-même qui le dira, en ne pouvant pas nommer sa source",
-    "l'exhaustivité du recensement des familles : le catalogue liste ce qui a été relevé le 21/08, pas ce qui existe (les familles manquantes se remontent en candidat)",
+    "le RENDU des pages : il a son propre contrôle (scripts\\verifier-rendu-instances.mjs) et le " +
+    "dupliquer créerait deux vérités sur les familles bloquantes",
+    "la justesse du CONTENU d'une instance : un texte d'exemple faux est un défaut de relecture",
+    "les familles de gabarit hors gabarits\\documents\\ (fiches, prompts, squelettes de forge)",
   ],
-}, null, 1) + "\n");
-process.exit(resultat.verdict === "FAIL" ? 1 : resultat.verdict === "SKIP" ? 2 : 0);
+}, null, 1));
+process.exit(verdict === "FAIL" ? 1 : 0);

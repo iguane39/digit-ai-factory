@@ -1,7 +1,7 @@
 {
   "schema": "pilot/heritage@1",
-  "version": "1.0.0",
-  "date": "2026-08-23",
+  "version": "1.1.0",
+  "date": "2026-08-24",
   "regle": "Tout artefact que le pilot COPIE chez un produit se déclare ici avec son mode de contrôle. Un artefact absent de ce référentiel n'est pas jugé par R-47 — l'oubli se voit à la revue, il ne se devine pas.",
   "pourquoi": "Constat du 23/08, deux produits en trois jours. Produit-02 possède un `forge\\retours\\` complet, portant ses lots, et AUCUN gabarit RETOURS-FORGES.md : le dossier a été créé, la copie n'y est jamais arrivée. Produit-05 n'a ni l'un ni l'autre. Résultat mesuré : 15 candidatures refusées à l'ingestion par R-45/R-46 pour une forme que le produit ne pouvait pas connaître, faute d'avoir le gabarit qui la porte. La cause n'était pas une négligence de produit mais une COPIE SANS PREUVE : rien ne vérifiait qu'elle était arrivée, et rien ne vérifie encore qu'elle est à jour. Le contrôle R-43 lui-même ne fait qu'un `existsSync` sur les hooks — un hook périmé passe au vert.",
   "modes": {
@@ -28,6 +28,13 @@
       "mode": "copie_conforme",
       "motif": "les hooks de la factory (fraîcheur à l'ouverture, restitution jugée à chaque fin de tour). R-43 vérifie déjà leur PRÉSENCE ; ici on vérifie qu'ils sont À JOUR — un hook périmé s'exécute et ne joue pas les règles du jour.",
       "depuis": "2026-08-23"
+    },
+    {
+      "source": "gabarits/RESTITUTION.md",
+      "cible": "forge/RESTITUTION.md",
+      "mode": "copie_conforme",
+      "motif": "LE TEXTE de la doctrine de restitution, a cote du hook qui la juge. TF-0571 (24/08) : le hook voyageait deja, le texte JAMAIS — mesure sur les dix produits du dossier client, cinq instancies, un seul portant le hook, ZERO portant le texte. Un juge sans son code force l'agent a deviner les huit blocs ; un texte sans juge decore. Les deux ou rien.",
+      "depuis": "2026-08-24"
     },
     {
       "source": "gabarits/settings-produit.json",

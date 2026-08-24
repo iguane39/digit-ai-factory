@@ -195,6 +195,23 @@ const lignes = contenu.split("\n").filter((l) => l.trim());
   }
 }
 
+// LES FORGES QUE LE PARC CONNAÎT, pour déduire une cible qu'un sidecar a oubliée (R-48). La table
+// est ÉCRITE et non devinée : chaque motif dit ce qu'il reconnaît, et un nom hors table n'est pas
+// deviné — le lot est alors refusé, ce qui est le comportement sûr.
+const FORGES_CONNUES = [
+  { depot: "digit-ai-factory", motif: /(factory|pilot|noyau|restitution|registre todo|todo-forge)/ },
+  { depot: "digit-ai-forge-agents", motif: /(forge-agents|socle de rendu|page-html|check_html|render_page|skill)/ },
+  { depot: "digit-ai-forge-tests", motif: /(forge-tests|plancher de rendu|pan |adaptateur)/ },
+  { depot: "digit-ai-forge-conception", motif: /(forge-conception|conception|exigence)/ },
+  { depot: "digit-ai-forge-development", motif: /(forge-development|development)/ },
+  { depot: "digit-ai-forge-design", motif: /(forge-design|design|syst[èe]me de marque)/ },
+  { depot: "digit-ai-forge-ops", motif: /(forge-ops|mep|d[ée]ploiement)/ },
+  { depot: "digit-ai-forge-data", motif: /(forge-data|lineage|qualit[ée] de la donn[ée]e)/ },
+  { depot: "digit-ai-forge-audit", motif: /(forge-audit|auditcore)/ },
+  { depot: "digit-ai-forge-seo-geo", motif: /(forge-seo|seo|geo)/ },
+];
+const deductions = [];
+
 // ---- validation intégrale AVANT toute écriture (rejet atomique) ----------------------------
 const motifs = [];
 const candidatures = lignes.map((l, i) => {
@@ -204,8 +221,40 @@ const candidatures = lignes.map((l, i) => {
   if (c.id) motifs.push(`ligne ${i + 1} : une candidature ne porte JAMAIS d'id (frappé à l'ingestion)`);
   for (const champ of ["titre", "contenu", "demandeur", "source", "date_demande"])
     if (!c[champ]) motifs.push(`ligne ${i + 1} : champ ${champ} manquant`);
-  if (!Array.isArray(c.forges_cibles_initiales) || !c.forges_cibles_initiales.length)
-    motifs.push(`ligne ${i + 1} : forges_cibles_initiales manquant ou vide`);
+  if (!Array.isArray(c.forges_cibles_initiales) || !c.forges_cibles_initiales.length) {
+    // R-48 APPLIQUÉE À NOTRE PROPRE OUTIL (24/08) : « si deux personnes compétentes trancheraient
+    // identiquement sans information supplémentaire, ce n'est pas une décision, c'est un défaut
+    // d'automatisation ». Un lot dont chaque entrée NOMME sa cible dans son titre était refusé en
+    // bloc, et le produit devait le remettre pour un champ que le texte disait déjà. Mesuré le
+    // 24/08 : trois entrées d'un lot, les trois nommant la factory, rejet atomique.
+    //
+    // On DÉDUIT donc, et on le DIT — la déduction s'inscrit dans la source de la candidature, pour
+    // qu'un lecteur sache que ce champ n'a pas été rempli par l'émetteur. Ce qui n'est PAS déductible
+    // reste refusé : on ne devine jamais une cible qu'aucun mot ne nomme.
+    // UN ALIAS DE CHAMP VAUT MIEUX QU'UN REJET, et c'est le cas réel qui l'a montré : le lot écrivait
+    // `forge_cible: "pilot"` — au singulier, sans le suffixe `_initiales`. Le champ EXISTAIT, sous un
+    // autre nom, et le lot était refusé en bloc pour une information qu'il portait. Deux lecteurs
+    // compétents traduisent identiquement « pilot » en « digit-ai-factory » : c'est donc un défaut
+    // d'automatisation, pas une décision (R-48). L'alias est lu d'abord, le texte en dernier recours.
+    const alias = [c.forge_cible, c.forges_cibles, c.cible].filter(Boolean).flat()
+      .map((x) => String(x).trim().toLowerCase())
+      .map((x) => (/^(pilot|factory|noyau)$/.test(x) ? "digit-ai-factory"
+        : /^forge-/.test(x) ? `digit-ai-${x}`
+        : /^digit-ai/.test(x) ? x : null))
+      .filter(Boolean);
+    const texte = `${c.titre || ""} ${c.contenu || ""}`.toLowerCase();
+    const deduites = alias.length ? alias
+      : FORGES_CONNUES.filter(({ motif }) => motif.test(texte)).map(({ depot }) => depot);
+    if (deduites.length) {
+      c.forges_cibles_initiales = [...new Set(deduites)];
+      c.source = `${c.source} · [déduit à l'ingestion] forges_cibles_initiales absent du sidecar, ` +
+        `dérivé du texte de l'entrée : ${c.forges_cibles_initiales.join(", ")} (R-48 — la réponse se ` +
+        `déduisait du contexte, la refuser aurait coûté un aller-retour pour un champ que le titre disait)`;
+      deductions.push(`ligne ${i + 1} → ${c.forges_cibles_initiales.join(", ")}`);
+    } else {
+      motifs.push(`ligne ${i + 1} : forges_cibles_initiales manquant, et AUCUN mot de l'entrée ne nomme une forge — on ne devine pas une cible que rien ne nomme`);
+    }
+  }
   return c;
 });
 if (motifs.length) {
@@ -370,4 +419,10 @@ if (nouvelles.length > 1 && nomFichier.includes(" - RETOURS - ")) {
   }
 }
 
+if (deductions.length) {
+  // Loi n° 3 : une décision prise d'office se DIT. Sans cette ligne, un champ rempli par
+  // déduction serait indiscernable d'un champ rempli par l'émetteur.
+  console.error(`[R-48 · décidé d'office] forges_cibles_initiales DÉDUIT pour ${deductions.length} ` +
+    `candidature(s), la déduction est écrite dans leur champ « source » : ${deductions.join(" · ")}`);
+}
 console.log(`[OK] ${nouvelles.length - 1} candidature(s) ingérée(s) en CANDIDAT (lot ${lotSha.slice(0, 12)}) — la décision reste humaine`);
