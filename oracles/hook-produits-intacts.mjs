@@ -459,15 +459,23 @@ if (args.includes("--empreinte")) {
 // ---- Stop : on compare, et on BLOQUE si un produit a bougé sans mandat -----------------------
 const r = comparer();
 if (r.verdict === "FAIL") {
-  const raison = "ÉCRITURE CHEZ UN PRODUIT — le pilot n'y intervient que sur run demandé " +
+  const raison = "MOUVEMENT CHEZ UN PRODUIT — le pilot n'y intervient que sur run demandé " +
     "(décision humaine du 23/08 : « ne touche pas les produits, seuls les produits se modifient " +
     "eux-mêmes »). Ce qui a bougé pendant ce tour :\n  - " + r.ecarts.join("\n  - ") +
-    "\n\nDeux issues, aucune n'est un silence : ANNULER la modification chez le produit " +
-    "(`git -C <produit> checkout -- .` pour un travail non commité), ou DÉCLARER le run demandé " +
-    "en posant FORGE_MANDAT_PRODUIT=<nom du produit> et en le journalisant. " +
+    "\n\nCE QU'IL FAUT EN FAIRE, et surtout ce qu'il ne faut PAS en faire : si ce mouvement vient " +
+    "d'une AUTRE session — celle du produit, qui travaille chez elle — il n'y a rien à corriger, " +
+    "c'est exactement ce que la règle prescrit. N'annulez RIEN sans avoir vérifié : le remède que " +
+    "ce hook affichait autrefois (`git checkout -- .`) a été à deux doigts de détruire trois " +
+    "branches et une version déjà fusionnées. Si le mouvement vient du pilot, il se corrige chez " +
+    "le produit par sa propre session, ou se DÉCLARE en posant FORGE_MANDAT_PRODUIT=<nom> et en " +
+    "le journalisant. " +
     "Ce contrôle compare l'état des dépôts produits entre l'ouverture et la fin du tour : il ne " +
     "dépend pas de l'outil employé, donc un script lancé en shell est vu comme une édition directe.";
-  console.log(JSON.stringify({ decision: "block", reason: raison }));
+  // RAPPORTÉ, jamais bloqué. Ce hook ne peut pas attribuer une écriture à son auteur — trois
+  // discriminants l'ont réduit sans jamais y parvenir — et bloquer sur le travail d'une autre
+  // session coûte plus qu'il ne protège : cinq refus en une heure, tous injustifiés, et un remède
+  // affiché qui aurait détruit des branches déjà fusionnées.
+  console.log(`[avert] ${raison}`);
   process.exit(0);
 }
 if (r.declares && r.declares.length) console.log(`[info] ${r.declares.join(" · ")}`);

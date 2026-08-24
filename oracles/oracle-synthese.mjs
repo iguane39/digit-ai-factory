@@ -476,6 +476,41 @@ function juger(texte) {
     "`decision`, `depense` et `irreversible` relèvent d'un arbitrage et ne sont pas concernés.",
     "chaque motif `acces`/`presence` porte la trace mesurée de sa tentative");
 
+  // ---- S22 (TF-0546, 24/08) — un NÉGATIF sur une ressource externe ne se prononce pas d'une
+  // seule sonde ----------------------------------------------------------------------------------
+  //
+  // DEUX OCCURRENCES DE FORME IDENTIQUE DANS UNE MÊME SESSION, et c'est la répétition qui fait la
+  // règle. (1) Une URL testée en HEAD a rendu 404 ; « la page est morte » a été annoncé. Un GET
+  // répondait 200 — l'hébergeur renvoie 404 sur HEAD pour ses pages applicatives. (2) Un champ
+  // d'API a rendu UN enregistrement DNS ; « non, le TXT n'a pas été mis » a été répondu à une
+  // question directe. La console en exigeait deux, le second vivant dans un autre champ du MÊME
+  // type — champs que l'introspection aurait énumérés, et l'introspection avait DÉJÀ servi plus tôt
+  // dans la session. Ce n'était donc pas une lacune de connaissance : c'était un DÉCLENCHEUR
+  // MANQUANT.
+  //
+  // CE QUI REND CES DEUX CAS INÉVITABLES SANS RÈGLE : aucune des deux réponses ne portait de
+  // marqueur d'exhaustivité. Une liste ne dit pas qu'elle est complète ; un 404 ne dit pas quelle
+  // méthode l'a produit. L'absence lue dans une source unique est donc une absence DANS CETTE
+  // SOURCE, jamais une absence dans le monde — et la restitution la transforme en fait.
+  //
+  // LA FORME EXIGÉE : soit une SECONDE sonde de nature différente est nommée dans la même phrase,
+  // soit l'énoncé se formule en « cette source me montre X » plutôt qu'en « il n'y a pas de X ».
+  // Non bloquant : la règle apprend une tournure, elle ne refuse pas un travail juste.
+  const NEGATIF_EXTERNE = /(n.existe pas|n.est pas (?:mis|pos[ée]|cr[éeé]{1,2}|configur[ée]|d[ée]clar[ée])|il n.y a (?:pas|aucun)|aucun(?:e)? (?:enregistrement|entr[ée]e|r[ée]ponse|trace|jeton|domaine|route|champ)|(?:page|url|ressource|route|endpoint) (?:morte|inexistante|absente)|404|pas (?:de|d.) (?:TXT|CNAME|enregistrement))/i;
+  const SUJET_EXTERNE = /(API|DNS|TXT|CNAME|URL|https?:|GraphQL|OpenAPI|console|h[ée]bergeur|fournisseur|domaine|endpoint|OVH|Railway|Cloudflare|Google|Azure|GitHub)/i;
+  const DEUX_SONDES = /(HEAD\s*(?:et|puis|\+)\s*GET|GET\s*(?:et|puis|\+)\s*HEAD|deux (?:sondes|m[ée]thodes|sources|appels)|introspection|seconde sonde|autre (?:m[ée]thode|point d.entr[ée]e|r[ée]solveur)|confirm[ée] par|recoup[ée])/i;
+  const FORMULE_PRUDENTE = /(cette source (?:me )?montre|d.apr[èe]s cette source|la source interrog[ée]e (?:ne )?(?:montre|rend)|au vu de cette seule)/i;
+  {
+    const phrases = texte.split(/(?<=[.!?;])\s+|\n/).map((x) => x.trim()).filter(Boolean);
+    const risquees = phrases.filter((x) => NEGATIF_EXTERNE.test(x) && SUJET_EXTERNE.test(x));
+    const nues = risquees.filter((x) => !DEUX_SONDES.test(x) && !FORMULE_PRUDENTE.test(x));
+    if (!risquees.length) ok("S22", "aucun négatif prononcé sur une ressource externe — rien à corroborer");
+    else if (nues.length) ko("S22", `${nues.length} négatif(s) sur ${risquees.length} prononcé(s) sur une ressource EXTERNE depuis une seule sonde : ` +
+      "une liste ne dit pas qu'elle est complète, un 404 ne dit pas quelle méthode l'a produit. Nommer une SECONDE sonde de nature différente, " +
+      `ou écrire « cette source me montre X » plutôt que « il n'y a pas de X ». Ex. : ${nues[0].replace(/\s+/g, " ").slice(0, 110)}`);
+    else ok("S22", `${risquees.length} négatif(s) externe(s), chacun corroboré par une seconde sonde ou formulé comme une lecture de source`);
+  }
+
   // ---- S19 (TF-0510, 22/08) — une action dit ce qui se passe si elle n'est PAS faite -------
   //
   // Demande humaine du 22/08, littérale et SYMÉTRIQUE : « fournir des actions claires, les
@@ -734,7 +769,11 @@ Aucun écart : la demande a été suivie à la lettre.
     .replace("Coût de la reprise proposée : complexité moyen · durée court.", "Coût de la reprise proposée : 2-3 j.")
     .replace("Recette S-01 TENU — 19/19 défauts détectés au banc rouge, pytest 365.", "Tout s'est bien passé.")
     .replace(/— recommandé[^;]*;/, "—")
-    .replace(/- Publier la version corrigée[\s\S]*?tant qu'on attend\./, "- Publier TF-0220 ?");
+    .replace(/- Publier la version corrigée[\s\S]*?tant qu'on attend\./, "- Publier TF-0220 ?")
+    // S22 : un NÉGATIF prononcé sur une ressource EXTERNE depuis une seule sonde — la forme exacte
+    // des deux cas du 24/08 (un 404 en HEAD lu comme une page morte, un champ d'API lu comme une
+    // absence). La phrase est ajoutée au bloc 7 pour ne pas perturber les règles du bloc 8.
+    .replace("## 7. Risques", "## 7. Risques\n\n- L'API du fournisseur ne rend aucun enregistrement TXT : il n'y a pas de TXT côté DNS.\n");
   writeFileSync(join(dir, "verte.md"), verte, "utf8");
   writeFileSync(join(dir, "rouge.md"), rouge, "utf8");
   const moi = fileURLToPath(import.meta.url);
@@ -745,13 +784,13 @@ Aucun écart : la demande a été suivie à la lettre.
   if (rr.status !== 1) casse.push("la fixture ROUGE ne FAIL pas");
   else {
     for (const regle of ["S2", "S3", "S5", "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16",
-                         "S17", "S18", "S19", "S20", "S21"]) {
+                         "S17", "S18", "S19", "S20", "S21", "S22"]) {
       if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
     }
   }
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 2/2 PASS (verte PASS ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative)");
+    : "Self-test restitution : 2/2 PASS (verte PASS ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde)");
   process.exit(casse.length ? 1 : 0);
 }
 
