@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=94e2ce49caac archive=54c0315cbe97 · dernier événement: 2026-08-24T12:11:03.284Z -->
+     sceaux: actifs=b0e0e37cd56f archive=54c0315cbe97 · dernier événement: 2026-08-24T12:38:11.338Z -->
 
-**94 actifs** (candidat 1 · décidé 1 · en cours 0 · corrigé 88 · écarté 4) · **469 archivés**.
+**97 actifs** (candidat 4 · décidé 1 · en cours 0 · corrigé 88 · écarté 4) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -92,6 +92,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0563 | candidat | 25 | fiche-securite : le canevas demande COMMENT on s'authentifie, jamais QUI est admis ni combien — un ecart d'audience a traverse trois controles sans etre vu | **oui** — un ecart d'audience reel — 3128 comptes invites admis — non decrit par une fiche de securite pourtant exacte sur tous les champs demandes, et passe au travers d'un audit, d'un dossier de comite et d'une revue de securite |
+| TF-0564 | candidat | 20 | fiche-securite : aucun champ d'engagement de service au canevas, chaque instance en ecrit un a la main, et rien n'y distingue un objectif d'un engagement opposable | **oui** — un engagement de disponibilite declare opposable dans un document de securite, alors que l'infrastructure mesuree ne peut pas le tenir — conteste par le lecteur metier |
 | TF-0505 | corrige | 10 | forge-audit : build-fiche.mjs ecrit par defaut DANS LE DEPOT DE LA FORGE (deliverables/generated/<tenant>/) — exactement le cas que TF-0319 interdit | **oui** — Chemin par defaut lu dans tools/build-fiche.mjs le 22/08 : deliverables/generated/<tenant>/fiche-securite.html, dans le depot de la forge — le cas nomme par TF-0319. Le livrable de ce produit a fini hors output\, corrige a la main. |
 | TF-0553 | corrige | 10 | La CI de digit-ai-forge-audit joue 8 commandes de controle sur 12 qu'aucune cible locale ne rejoue | **oui** — 8 commandes de controle sur 12 non rejouables en local, mesurees par RC1 ; le meme defaut a coute chez un produit une regression jusqu'a la branche principale, une CI rouge a 12 controles et une bascule de domaine bloquee plusieurs heures |
 | TF-0506 | corrige | 6.7 | forge-audit : la famille gd-fiche-securite declare deux formats (html, pdf) et la forge n en produit qu un — aucun outil HTML vers PDF n existe dans la forge | **oui** — Jeu de livrables remis incomplet : le commanditaire a du reclamer le PDF en second temps. Generateur PDF ecrit de zero cote produit, et premiere version piegee par un verrou de fichier Windows — ancien tirage revalide en croyant valider le nouveau. |
@@ -140,6 +142,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0549 | decide | 10 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : `Produit-07` a un forge\retours\ mais rien de ce qui s'y fait n'est suivi | **oui** — mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration. |
+| TF-0565 | candidat | 20 | squelettes de dossier : une classe posee sur 8 a 11 paragraphes sans aucune regle CSS — les deux documents echouaient leur propre oracle depuis leur production | **oui** — deux documents livres a un relecteur en echouant une regle bloquante de leur propre oracle, sur un defaut herite du squelette et invisible a l'ecran |
 | TF-0562 | candidat | 10 | Un livrable REMIS du pilot echoue au marquage sous le jeu de regles courant — anteriorite a declarer, pas a corriger en silence | **oui** — un livrable remis a un destinataire externe qui ne passerait plus le controle d'aujourd'hui ; le cout reel depend de la voie choisie, et le fait qui tranche — ce livrable est-il encore lu ? — n'est pas au dossier |
 | TF-0541 | corrige | 15 | Gabarit de projet : `CLAUDE.md` et `ledger.py` divergent, et le run est épinglé en dur | **oui** — forge/ledger.jsonl absent du disque ; ledger.py ligne 68 run codé en dur ; run 20260815 clos en seq 24 |
 | TF-0471 | corrige | 10 | R-45 refuse des lots rédigés AVANT sa publication — deux lots Produit-05 bloqués à l'ingestion, dont un qui signalait un plantage réel du lanceur d'oracles | **oui** — payé le 22/08 : douze candidatures de deux lots restent hors du registre, et l'une d'elles nommait un défaut BLOQUANT du lanceur d'oracles qui n'a été corrigé que parce que la session l'a rencontré par un autre chemin — un refus de forme a mis un fait de production hors de portée |
