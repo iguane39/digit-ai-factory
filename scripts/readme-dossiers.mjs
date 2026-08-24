@@ -41,6 +41,15 @@ const args = process.argv.slice(2);
 const lireArg = (nom, defaut) => { const i = args.indexOf(nom); return i >= 0 ? args[i + 1] : defaut; };
 const BASE = resolve(lireArg("--base", join(ICI, "..")));
 const RACINES = lireArg("--racines", "input,output").split(",").map((s) => s.trim()).filter(Boolean);
+// TF-0590 (25/08) : la comparaison normalise LES DEUX COTES, pas un seul. Le cote `courant`
+// l'etait deja ; l'ATTENDU ne l'etait pas, et ce n'est pas un oubli anodin : le bloc ROLE est
+// REPRIS du fichier existant pour etre preserve, donc il ramene les CRLF que git y a mis. Un
+// README a fins de ligne mixtes (mesure : 12 CRLF et 19 LF dans le meme fichier) restait alors
+// PERIME apres regeneration, indefiniment — trois passages, trois fois le meme defaut, un
+// `git diff` vide a chaque fois, et le harnais bloque a 54/55 sans qu'aucune action ne le
+// repare. Un rouge que rien ne repare s'apprend a ignorer, et c'est ainsi qu'un vrai defaut
+// passe. Meme remede que pour l'empreinte d'un lot (TF-0072).
+const lf = (t) => (t === null || t === undefined ? t : String(t).split(String.fromCharCode(13, 10)).join(String.fromCharCode(10)));
 const CHECK = args.includes("--check");
 const SILENCIEUX = args.includes("--silencieux");
 const MARQUE_DEBUT = "<!-- ROLE:DEBUT -->";
@@ -194,8 +203,9 @@ for (const racine of RACINES) {
   for (const dir of dossiers(abs)) {
     const rel = posix(relative(BASE, dir));
     const readme = join(dir, "README.md");
-    const { texte, role } = attendu(dir, rel);
-    const courant = existsSync(readme) ? readFileSync(readme, "utf8").split("\r\n").join("\n") : null;
+    const { texte: texteBrut, role } = attendu(dir, rel);
+    const texte = lf(texteBrut);
+    const courant = existsSync(readme) ? lf(readFileSync(readme, "utf8")) : null;
     if (role === PLACEHOLDER) defauts.push(`${affiche(rel)}README.md : rôle non rédigé`);
     if (courant === texte) continue;
     if (CHECK) {

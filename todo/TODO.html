@@ -152,7 +152,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>0ad7072be32b</code> · dernier événement 2026-08-24T18:47:59.437Z</p>
+      <p class="meta">sceau <code>522b03dd2b2f</code> · dernier événement 2026-08-24T18:51:04.995Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -162,7 +162,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="0 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">0</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="11 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">11</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="1 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">1</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="468 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">468</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -205,15 +205,176 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">123 / 123 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">137 / 137 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">59 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">27 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-data"><strong>digit-ai-forge-data</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-development"><strong>digit-ai-forge-development</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-seo-geo"><strong>digit-ai-forge-seo-geo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">13 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">66 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">28 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">6 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-data"><strong>digit-ai-forge-data</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-development"><strong>digit-ai-forge-development</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-seo-geo"><strong>digit-ai-forge-seo-geo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">14 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">7 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-factory">
-      <h2>digit-ai-factory <span class="badge" title="59 item(s) actifs ciblant digit-ai-factory">59</span></h2>
+      <h2>digit-ai-factory <span class="badge" title="66 item(s) actifs ciblant digit-ai-factory">66</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-factory</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0583" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0583</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 20)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">L'oracle de contraste n'est appele par rien et ne peut pas se lancer</h3>
+          <div class="card-detail" data-cite><p class="lead">Deux defauts cumules, mesures sur le depot.</p><ul class="puces"><li>build/check-contrast.mjs est cite par ZERO fichier : ni le workflow GitHub, ni package.json, ni aucune documentation</li><li>Sa ligne 23 code le navigateur en dur : executablePath: 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'. Ce chemin n'existe pas sur la machine de travail et l'oracle echoue au lancement, sans message exploitable. Son voisin immediat build/ci/oracle-consent.mjs fait pourtant bien les choses : liste de candidats avec CHROME_PATH en tete et message explicite si rien n'est trouve. La bonne pratique existait dans le meme depot, a un dossier de distance. Correctif propose : aucun oracle ne code un chemin de navigateur en dur — CHROME_PATH d'abord, liste de repli ensuite, echec bruyant sinon ; et tout oracle present au depot doit etre atteignable par la cible unique de verification proposee en RT-10 du lot 20260823c. Un oracle que rien n'appelle n'est pas un oracle, c'est un fichier</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>0 fichier du depot cite check-contrast.mjs ; chemin Edge code en dur, inexistant sur la machine</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-contraste-flip-20260824</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0588" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0588</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 20)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Un secret attendu se prepare, il ne se decrit pas en prose</h3>
+          <div class="card-detail" data-cite><p class="lead">Pour chacun des trois services integres pendant ce run, j'ai demande un secret en decrivant EN PROSE, dans un message de conversation, le nom des variables et les portees a cocher.</p><ul class="puces"><li>La prose est le pire vehicule : elle oblige l'humain a transcrire, elle ne survit pas a la conversation, et elle laisse le nom exact de la variable a l'interpretation. Mesure du cout, trois fournisseurs et trois aller-retours :</li><li>Railway — j'ai dicte RAILWAY_TOKEN alors que le CLI attend RAILWAY_API_TOKEN pour un jeton de COMPTE, avec a la cle un message « Invalid RAILWAY_TOKEN » trompeur et un diagnostic complet</li><li>OVH — DEUX jetons crees pour rien, le premier avec des chemins vides parce que le formulaire exige de cliquer « + » apres chaque portee, le second sans GET /domain/zone</li><li>Cloudflare — j'allais recommencer, evite par la remarque de l'exploitant. Le geste juste : ecrire d'abord la cle VIDE dans le fichier de configuration, avec en commentaire ou la creer, quelles portees exactes, et la commande pour verifier la portee reellement accordee — puis demander uniquement de coller la valeur. Correctif propose : regle de socle « avant de demander un secret, en preparer le receptacle ». La cle vide et son commentaire vont dans le fichier ignore par git ; le meme bloc, valeurs vides, va dans le gabarit committe. La demande a l'humain se reduit alors a « colle la valeur ici », sans nom de variable a retenir</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>3 fournisseurs, 3 aller-retours, dont 2 jetons OVH crees pour rien</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-receptacle-secret-20260824</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0589" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0589</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 15)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Le gabarit d'environnement n'est confronte a rien</h3>
+          <div class="card-detail" data-cite><p class="lead">.env.example est committe et documente le contrat de configuration du projet, mais rien ne verifie qu'il couvre les cles reellement lues par le code.</p><ul class="puces"><li>Preuve mesuree : .env porte ONZE cles, .env.example n'en documentait que SEPT. Les quatre cles OVH ajoutees le 23/08 etaient invisibles pour quiconque reprend le depot, et la meme chose se serait produite avec les deux cles Cloudflare. Un gabarit incomplet est pire qu'un gabarit absent : il donne l'illusion d'un contrat complet. Correctif propose : oracle de parite de configuration — toute cle lue par le code ou presente dans .env a son entree, valeur vide, dans le gabarit committe</li><li>et reciproquement, une cle du gabarit que rien ne lit est signalee. Fixture rouge : un .env portant une cle absente du gabarit. Cout faible, il s'agit de comparer deux listes</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 15 — gain 3 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>.env = 11 cles, .env.example = 7 ; 4 cles OVH jamais reportees au gabarit</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-receptacle-secret-20260824</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0585" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0585</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Un comportement destine aux visiteurs valide sur un protocole qu'ils n'utilisent pas</h3>
+          <div class="card-detail" data-cite><p class="lead">Le 23/08 j'ai publie a l'exploitant un tableau de huit lignes avec des coches vertes affirmant que les quatre domaines convergeaient vers l'adresse canonique.</p><ul class="puces"><li>Toutes ces mesures avaient ete faites en http://. Le 24/08, la meme verification en https:// donne un resultat oppose : SEPT hostnames sur HUIT echouent au TLS. Cause mesuree : le port 443 est FERME sur le serveur de redirection OVH (213.186.33.5), seul le 80 ecoute. Les navigateurs modernes tentent pourtant HTTPS en priorite et un lien partage porte presque toujours https:// : la sonde portait donc sur un chemin que la quasi-totalite du trafic n'emprunte pas. Le cout n'est pas seulement l'erreur, c'est qu'elle a ete PRESENTEE COMME UNE PREUVE. C'est la cinquieme occurrence du motif du lot 20260823c, avec un angle propre : la sonde n'etait pas incomplete, elle portait sur le MAUVAIS AXE. Correctif propose : un comportement destine aux visiteurs se verifie sur le schema, la methode et le protocole qu'ils emploient reellement, jamais sur le plus commode a tester</li><li>quand plusieurs axes existent (http/https, apex/www, GET/HEAD, avec ou sans barre finale) la matrice se parcourt entiere ou l'ecart se declare. A rapprocher du defaut OVH HEAD vs GET du 23/08 : meme famille, autre axe</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>7 hostnames sur 8 injoignables en HTTPS apres avoir ete declares fonctionnels ; port 443 ferme sur 213.186.33.5</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-apex-https-20260824</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0581" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0581</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8.3)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Le seul verificateur de contraste ne regarde que le menu du header</h3>
+          <div class="card-detail" data-cite><p class="lead">build/check-contrast.mjs s'annonce lui-meme : « Mesure le contraste reel du menu (texte blanc) sur chaque page FR, etat haut de page ».</p><ul class="puces"><li>Il selectionne .header-line et rien d'autre</li><li>Le corps de page — titres, paragraphes, boutons, legendes manuscrites — n'est jamais mesure</li><li>Il n'aurait donc JAMAIS vu le defaut signale, meme en tournant a chaque build : un texte a 1,0 de ratio de contraste, en production, sur la page d'accueil</li><li>Un oracle dont la portee est aussi etroite que son nom est large donne une fausse assurance : « le contraste est verifie » etait litteralement vrai et sans aucune valeur</li><li>Correctif propose : etendre la mesure au corps de page sur les elements porteurs de texte, a AU MOINS deux points de rupture — le defaut etait desktop uniquement, un controle mobile seul l'aurait manque, et reciproquement</li><li>Et nommer l'oracle d'apres ce qu'il couvre reellement, ou couvrir ce que son nom promet</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8.3 — gain 5 × preuve 5 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>texte a ratio 1,0 reste en production ; oracle de contraste present au depot et scope au seul .header-line</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-contraste-flip-20260824</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0587" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0587</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Un mecanisme de redirection choisi sans connaitre sa limite structurelle</h3>
+          <div class="card-detail" data-cite><p class="lead">La redirection DNS d'OVH est le geste naturel quand on tient deja la zone par l'API, et rien dans la reponse de son API ne signale qu'elle n'ecoute pas le 443 : l'objet retourne ne porte que subDomain, target, type, title, keywords, description.</p><ul class="puces"><li>La limite ne se decouvre qu'en testant le port. Consequence concrete : le seul remede complet consiste a deplacer les zones derriere un service qui aplatit le CNAME a l'apex et sert le TLS, ce qui IMPOSE DE RECREER LES ENREGISTREMENTS DE MESSAGERIE — un risque sans commune mesure avec le confort initial. A noter que le jeton OVH de la session, scope a /domain/zone/*/*, ne couvre meme pas le changement de serveurs de noms : mesure, 403 sur /domain/produit-02.com/nameServer. Correctif propose : le contrat d'integration de RT-12 doit porter, pour chaque service, non seulement la source faisant autorite mais aussi les LIMITES STRUCTURELLES connues — ici « redirection OVH = HTTP seul, port 443 ferme ». Une limite decouverte apres coup coute un changement d'architecture</li><li>la meme limite ecrite avant coute le choix d'un autre mecanisme</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 4 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>port 443 ferme non documente ; remede impliquant de recreer les MX de 4 zones</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-apex-https-20260824</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0584" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0584</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Une sonde de contraste doit se confronter a la palette declaree du projet</h3>
+          <div class="card-detail" data-cite><p class="lead">L'outil que j'ai ecrit pour VERIFIER le correctif etait lui-meme faux, deux fois.</p><ul class="puces"><li>page.screenshot({clip}) travaille en coordonnees PAGE alors que getBoundingClientRect rend des coordonnees VIEWPORT : apres defilement j'echantillonnais une zone sans rapport et je lisais des fonds rgb(204,204,204), rgb(141,141,141), rgb(100,100,100) — des gris qui n'existent dans AUCUNE variable du site</li><li>Echantillonner un seul pixel a cote du texte tombait de l'autre cote de la frontiere entre les deux moities, donnant un ratio de 1,0 sur un element pourtant corrige. Resolu en prenant la couleur DOMINANTE de la boite de l'element. Correctif propose, qui est un principe et non une astuce : les valeurs mesurees doivent etre confrontees a la palette connue du projet. Un fond echantillonne qui n'appartient a aucun token declare est un aveu que la SONDE est fausse, pas que le site l'est — un oracle de contraste devrait refuser de conclure dans ce cas plutot que de rendre un verdict</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 3 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>2 erreurs de sonde successives produisant des verdicts faux, l'un negatif l'autre positif</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-contraste-flip-20260824</dd></div>
+            
+          </dl>
+        </article>
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
              titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
              socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
@@ -1575,7 +1736,7 @@
       </div>
     </section>
     <section id="digit-ai-forge-agents">
-      <h2>digit-ai-forge-agents <span class="badge" title="27 item(s) actifs ciblant digit-ai-forge-agents">27</span></h2>
+      <h2>digit-ai-forge-agents <span class="badge" title="28 item(s) actifs ciblant digit-ai-forge-agents">28</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-agents</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
@@ -1759,6 +1920,29 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>Trois allers-retours client sur un seul defaut, sur quatre versions livrees.</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-05</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0582" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0582</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Une mesure de contraste par styles calcules ne voit pas les pseudo-elements</h3>
+          <div class="card-detail" data-cite><p class="lead">Le fond fautif est peint par un pseudo-element ::before (.color-exp::before peint 50% de la largeur), et la regle .color-exp .experience .txt { background: transparent } rend le fond propre de l'element transparent.</p><ul class="puces"><li>Un controle qui compare `color` a `background-color` — ce que font la plupart des outils, dont l'audit axe-core courant — lit donc le fond du conteneur, clair, et CONCLUT QUE TOUT VA BIEN sur un texte illisible</li><li>Seul un echantillonnage de pixels reels apres rendu detecte l'ecart</li><li>Correctif propose : poser au socle qu'un oracle de contraste se mesure AU PIXEL APRES RENDU, jamais aux styles calcules</li><li>Corollaire a ecrire dans son non_juge : tout ce qui peint sans etre un background-color — pseudo-elements, degrades, images de fond, mix-blend-mode, superpositions, filtres — est hors de portee d'une mesure DOM et doit etre declare comme tel</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>fond peint par ::before ; .txt en background:transparent ; une mesure DOM aurait lu le fond clair du conteneur et valide</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-contraste-flip-20260824</dd></div>
             
           </dl>
         </article>
@@ -2323,9 +2507,32 @@
       </div>
     </section>
     <section id="digit-ai-forge-conception">
-      <h2>digit-ai-forge-conception <span class="badge" title="5 item(s) actifs ciblant digit-ai-forge-conception">5</span></h2>
+      <h2>digit-ai-forge-conception <span class="badge" title="6 item(s) actifs ciblant digit-ai-forge-conception">6</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-conception</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0577" data-cite data-forge="digit-ai-forge-conception" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0577</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-conception : le referentiel ne porte NULLE PART ce que le produit PROMET a son client — la une a vendu une livraison pendant neuf jours quand les six services vendaient un transfert de capacite</h3>
+          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 24/08 sur factory.produit-07, a la demande du commanditaire (« la landing page n est pas assez claire sur ce qu est la Factory et ce qu elle peut apporter a son public »).</p><ul class="puces"><li>LA CONTRADICTION : la une promettait « Votre produit, livre avec ses preuves » — un visiteur en deduit une LIVRAISON</li><li>Les six services, produits par le MEME RUN, vendent tout autre chose : Conseil « nous evaluons VOTRE chaine », Formation « VOS EQUIPES apprennent a travailler sous oracles », Accompagnement « a la fin, VOS EQUIPES executent les oracles et tiennent le ledger SANS NOUS », Integration « nous branchons les forges sur VOTRE existant »</li><li>Aucun des six ne dit « nous construisons votre produit »</li><li>Le produit reel est l installation et le TRANSFERT d une chaine de fabrication verifiable chez le client</li><li>L attente formee en trois secondes etait dementie quatre sections plus bas, et le site est parti en production dans cet etat le 15/08</li><li>RIEN NE POUVAIT LE VOIR, et la cause est EN AMONT des oracles : `CADRAGE-DESIGN.md` porte six champs — secteur, cible, job principal, ton attendu, contraintes, hypotheses — et AUCUN ne dit ce que le produit PROMET</li><li>Le « job principal » y est celui de la PAGE (« donner a voir l offre forge de facon consultable et convertir en prise de rendez-vous »), jamais le gain du CLIENT</li><li>Les 61 exigences decrivent ce que le site DOIT FAIRE (EX-001 servie a la racine, EX-002 acces aux quatre pages, EX-007 six services sur la page services) et jamais ce qu il doit DIRE</li><li>La promesse n etant ecrite nulle part, elle n etait opposable a rien : elle s est decidee par defaut, en redigeant un titre, c est-a-dire au plus bas niveau de la chaine — alors que la liste fermee des six services, elle, etait une DECISION HUMAINE DATEE (15/08, consignee dans app/contenu.py)</li><li>PROPOSITION : un champ `promesse` au cadrage, en une phrase, dans les mots du client et non du produit — ce qu il gagne, et ce qu il n a plus a faire</li><li>Plus une exigence derivee, verifiable par simple lecture humaine : la promesse de la page d accueil est celle du cadrage</li><li>Le controle n a pas besoin d etre automatique pour etre opposable, il a besoin d EXISTER et d avoir un porteur</li><li>Corollaire : le champ `promesse` est de meme nature que la liste fermee des services, donc DECISION HUMAINE DATEE et non derivation</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>Positionnement faux en production du 15/08 au 24/08 sur le site vitrine de la factory ; refonte complete de la page d accueil necessaire, tous oracles au vert pendant toute la periode.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">factory-digit-ai-fr</dd></div>
+            
+          </dl>
+        </article>
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
              titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
              socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
@@ -2473,9 +2680,32 @@
       </div>
     </section>
     <section id="digit-ai-forge-design">
-      <h2>digit-ai-forge-design <span class="badge" title="2 item(s) actifs ciblant digit-ai-forge-design">2</span></h2>
+      <h2>digit-ai-forge-design <span class="badge" title="3 item(s) actifs ciblant digit-ai-forge-design">3</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-design</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0578" data-cite data-forge="digit-ai-forge-design" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0578</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.7)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-design : rien n oppose la PROMESSE d une page a l OFFRE decrite ailleurs dans le meme run — les oracles jugent la page en vase clos</h3>
+          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 24/08, meme incident que le retour vers forge-conception du meme lot.</p><ul class="puces"><li>Les oracles de design jugent la page ISOLEMENT : `oracle-slop` la genericite de l ecriture, `oracle-taste` la discipline d accent et de filets, `oracle-mobile` le contrat d usage tactile, `oracle-dtcg` les jetons, `oracle-motion` le mouvement. AUCUN ne lit un SECOND artefact du meme run pour verifier que les deux racontent la meme chose. La contradiction entre la une (« votre produit, LIVRE avec ses preuves ») et les six services (« VOS EQUIPES executent les oracles sans nous ») etait lisible en trente secondes par un humain, et detectable par script au moins grossierement — le SUJET GRAMMATICAL suffit a la reveler : qui agit, nous ou vous. A DISTINGUER de TF-0483 (barre externe avant une DA), depose le 22/08 : celui-la porte sur la DESIRABILITE — a-t-on regarde ce qui se fait de bien dans le domaine</li><li>celui-ci porte sur la COHERENCE INTERNE — la page dit-elle la meme chose que l offre. Les deux sont independants et se cumulent : la premiere DA etait indesirable ET la seconde une etait incoherente, ce sont deux defauts distincts du meme run. PROPOSITION : un controle de COHERENCE INTER-ARTEFACTS a la revue design — la promesse de la une, la liste des services et le champ `promesse` du cadrage (retour jumeau vers forge-conception) sont mis cote a cote, et l ecart est un constat. Automatisable en partie (presence du champ, reprise litterale), jamais en totalite, et c est acceptable : le pan i18n a montre qu un controle partiel qui DIT sa limite vaut mieux qu un vert muet</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-design</dt><dd>Contradiction une/services non detectee par cinq oracles de design tous au vert, sur le site vitrine de la factory elle-meme.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">factory-digit-ai-fr</dd></div>
+            
+          </dl>
+        </article>
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
              titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
              socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
@@ -2600,9 +2830,32 @@
       </div>
     </section>
     <section id="digit-ai-forge-ops">
-      <h2>digit-ai-forge-ops <span class="badge" title="2 item(s) actifs ciblant digit-ai-forge-ops">2</span></h2>
+      <h2>digit-ai-forge-ops <span class="badge" title="3 item(s) actifs ciblant digit-ai-forge-ops">3</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-ops</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0579" data-cite data-forge="digit-ai-forge-ops" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0579</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-ops : un gate de MEP est reste ROUGE six jours et le deploiement a eu lieu quand meme — un gate dont l echec n empeche rien n est pas un gate</h3>
+          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 24/08, verifie a l historique git.</p><ul class="puces"><li>Le smoke M-3 controle EX-026 par l egalite stricte `'href=&quot;/static/tokens.css&quot;' in accueil`. Le 18/08, le correctif de cache a VERSIONNE les feuilles de style par empreinte (commit 7519d4f, apres qu un intermediaire a servi le CSS de la veille avec la page du jour) : le HTML sert desormais `/static/tokens.css?v=...`. L egalite stricte sur le chemin nu echoue depuis. `git log -S` sur cette ligne du smoke ne rend AUCUN COMMIT : personne ne l a ajustee, et personne n a ete arrete. Le gate a donc ete soit non rejoue, soit rejoue et son echec ignore — dans les deux cas, un gate dont l echec n empeche rien n est pas un gate, c est un avis. Repare cote produit le 24/08 : le controle porte sur la CONSOMMATION des tokens, pas sur la forme de l URL, et il continue d echouer si le lien manque. PROPOSITION, independante du produit :</li><li>un VERDICT DE MEP HORODATE ET ARCHIVE — sans trace, « les gates sont passes » est une affirmation invérifiable, exactement ce que ce site reproche a un fournisseur</li><li>un gate qui echoue BLOQUE, ou DECLARE explicitement qu il est consultatif — c est le melange des deux regimes sans le dire qui a permis de passer outre sans qu aucune decision soit prise</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-ops</dt><dd>Six jours de MEP avec un gate rouge non vu, sur un produit dont l argument commercial est la porte executee.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">factory-digit-ai-fr</dd></div>
+            
+          </dl>
+        </article>
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
              titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
              socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
@@ -2693,9 +2946,32 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
       </div>
     </section>
     <section id="digit-ai-forge-tests">
-      <h2>digit-ai-forge-tests <span class="badge" title="13 item(s) actifs ciblant digit-ai-forge-tests">13</span></h2>
+      <h2>digit-ai-forge-tests <span class="badge" title="14 item(s) actifs ciblant digit-ai-forge-tests">14</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-tests</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0580" data-cite data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0580</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : rien ne detecte qu une copie VENDORISEE a diverge de sa source — le site annoncait v1.6.2 et 80 services quand le catalogue portait v1.8.0 et 83</h3>
+          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 24/08. Le `Dockerfile` pose `ENV FORGE_ROOT=/app/vendor` : en production, `vendor/digit-ai-factory/catalogues/catalogue.jsonl` EST la source qui alimente la base et donc les chiffres affiches. AUCUN mecanisme ne la rafraichit et AUCUN controle ne la compare a l amont. Mesure : le site annoncait v1.6.2 et 80 services quand le catalogue en portait v1.8.0 et 83 — DEUX VERSIONS DE RETARD, sur un site dont l argument entier est la PREUVE DATEE. Le retard etait masque par un second effet : l amont a renomme la forge `seo` en `seo-geo`, ce qui fait echouer la regeneration par un refus net (`forges hors regroupement connu : ['seo-geo']`). Le refus est BON — il ne devine pas — mais personne ne le voit tant que personne ne lance le script, et rien ne rappelle qu il faut le lancer. Une donnee perimee ne leve aucun drapeau : elle s affiche. PROPOSITION : un controle de FRAICHEUR DES COPIES VENDORISEES — pour toute copie declaree d une source connue, comparer l empreinte et rendre l ecart en constat date. Ce n est ni un test unitaire ni un test d integration : c est la meme famille que la parite de routes du pan i18n, deux arborescences qu on met en regard. COROLLAIRE DE DOCTRINE, valable au-dela de ce cas : un chiffre affiche sur une vitrine se COMPTE AU RENDU, il ne se recopie jamais — c est ce qui a ete fait cote produit, les comptes de la nouvelle une sont des SELECT et non des litteraux.</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>Chiffres periemes affiches en production pendant cinq jours (v1.6.2/80 contre v1.8.0/83) sur le bandeau de preuve d un site dont l argument est la preuve datee.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">factory-digit-ai-fr</dd></div>
+            
+          </dl>
+        </article>
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
              titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
              socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
@@ -2998,7 +3274,7 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
       </div>
     </section>
     <section id="pilot">
-      <h2>pilot <span class="badge" title="5 item(s) actifs ciblant pilot">5</span></h2>
+      <h2>pilot <span class="badge" title="7 item(s) actifs ciblant pilot">7</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
@@ -3021,6 +3297,29 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur pilot</dt><dd>mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration.</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du 24/08, mandat « rejouer R-47 » — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0590" data-cite data-forge="pilot" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0590</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 20)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Un README de dossier reste PERIME apres regeneration : fins de ligne MIXTES dans le meme fichier, et le harnais tombe a 54/55 sans qu'aucune action ne le repare</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat du 25/08, en jouant le harnais apres traitement des retours.</p><ul class="puces"><li>`oracle-readme-dossiers` rend FAIL sur `output\01-revues-et-propositions\old\README.md` : « perime (le dossier a change) ». LA BOUCLE NE CONVERGE PAS, et c'est ce qui distingue ce constat de TF-0451 et TF-0503 : regenerer ne change RIEN. `node scripts\readme-dossiers.mjs` annonce « README regeneres</li><li>», `git diff` sur le fichier rend un diff VIDE, et `--check` redit aussitot « perime ». Trois passages, meme resultat. CAUSE MESUREE : le fichier porte des fins de ligne MIXTES — 12 CRLF et 19 LF seuls dans le meme fichier (`file` le confirme : « with CRLF, LF line terminators »). Le generateur ecrit en LF, git le rend en CRLF a la sortie, et la comparaison du mode `--check` echoue sur une difference qui n'est pas de contenu. C'est exactement la classe de TF-0072 (« l'empreinte de grille depend des fins de ligne — un clone Linux declarerait ... »), rencontree ici sur un autre mecanisme. CE QUE CA COUTE, mesure : le harnais du pilot passe de 55/55 a 54/55 et y RESTE. Un harnais rouge en permanence pour une raison connue finit par se lire comme du bruit, et c'est ainsi qu'un vrai defaut passe inapercu — la meme phrase a deja ete ecrite pour TF-0498 il y a deux jours. CE QUE JE N'AI PAS FAIT, et pourquoi : `scripts\readme-dossiers.mjs` vient d'etre modifie par l'instance parallele (TF-0503, voie</li><li>: colonne de date RETIREE). Corriger a chaud un fichier qu'une autre instance vient de reecrire, sans voir son intention complete, exposerait a defaire son travail. Le constat est donc consigne avec sa mesure plutot que corrige dans la precipitation. TROIS VOIES :</li><li>normaliser les fins de ligne AVANT comparaison dans le mode `--check`, comme `ingerer-lot.mjs` le fait deja pour l'empreinte d'un lot (`contenu.split(chr 13 chr 10).join(chr 10)`) — le plus sur, et la maison connait deja ce remede</li><li>ecrire le fichier avec les fins de ligne de la plateforme, ce qui deplace le probleme sur les clones</li><li>poser un `.gitattributes` qui fige les README en LF, ce qui corrige la cause mais demande que tous les postes le respectent</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-25</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>mesure le 25/08 : le harnais du pilot passe de 55/55 a 54/55 et n'en bouge plus — trois regenerations, trois fois le meme FAIL, un diff vide a chaque fois. Aucune action disponible ne le repare, ce qui est la definition d'un rouge qu'on apprend a ignorer.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du 25/08, mandat « traite tous tes todos et retours » — constat =&gt; candidat)</dd></div>
             
           </dl>
         </article>
@@ -3090,6 +3389,29 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8.3 — gain 5 × preuve 5 ÷ effort 3)</span></dd></div>
             <div class="impact"><dt>Impact sur pilot</dt><dd>paye et chiffre : QUINZE candidatures refusees a l'ingestion en trois jours, sur deux produits, pour une forme que ni l'un ni l'autre ne pouvait connaitre faute d'avoir le gabarit — que la regle 18 exigeait par ecrit depuis le 06/08 et que rien ne verifiait. Le taux de couverture affichait 24 regles sur 26, soit 92 %, pendant tout ce temps. Sur la seule regle 18, la couverture reelle est de 1 exigence controlee sur 5.</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat remonte le 23/08 en instruisant deux produits — mandat « eleve la problematique pour anticiper et traiter d'autres types de plus haut niveau »)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0586" data-cite data-forge="pilot" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0586</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8.3)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Aucun oracle ne verifie qu'un nom de domaine declare repond</h3>
+          <div class="card-detail" data-cite><p class="lead">Le seul controle voisin, build/check-redirects.mjs, teste DES CHEMINS sur une base unique — 24 anciennes URLs — et jamais des HOSTNAMES.</p><ul class="puces"><li>Le projet en declare pourtant huit, repartis sur quatre domaines : aucun n'etait controle, ni en existence, ni en schema, ni en certificat, ni en chaine de redirection</li><li>Preuve supplementaire du meme angle mort : la valeur par defaut de cet oracle pointe ENCORE sur https://produit-02-site-production.up.railway.app, l'URL technique, alors que le site a bascule sur son domaine le 23/08 — personne ne s'en est apercu parce que rien ne confronte la liste des domaines a la realite servie</li><li>Correctif propose : un oracle « domaines declares » qui lit l'inventaire des hostnames du projet et verifie pour CHACUN la resolution DNS, la reponse en https, la validite et le nom du certificat, la chaine de redirections aboutissant a l'adresse canonique, et le code final</li><li>Fixture rouge : un hostname declare dont le port 443 est ferme — exactement le cas present</li><li>L'inventaire vient du INTEGRATIONS.md propose en RT-12 du lot 20260823c</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8.3 — gain 5 × preuve 5 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>8 hostnames declares, 0 controle ; base par defaut de check-redirects encore sur l'URL Railway apres bascule</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-apex-https-20260824</dd></div>
             
           </dl>
         </article>
