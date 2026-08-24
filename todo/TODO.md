@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=0ad7072be32b archive=54c0315cbe97 · dernier événement: 2026-08-24T18:47:59.437Z -->
+     sceaux: actifs=522b03dd2b2f archive=54c0315cbe97 · dernier événement: 2026-08-24T18:51:04.995Z -->
 
-**123 actifs** (candidat 0 · décidé 1 · en cours 0 · corrigé 118 · écarté 4) · **469 archivés**.
+**137 actifs** (candidat 11 · décidé 1 · en cours 0 · corrigé 121 · écarté 4) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,6 +11,13 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0583 | candidat | 20 | L'oracle de contraste n'est appele par rien et ne peut pas se lancer | **oui** — 0 fichier du depot cite check-contrast.mjs ; chemin Edge code en dur, inexistant sur la machine |
+| TF-0588 | candidat | 20 | Un secret attendu se prepare, il ne se decrit pas en prose | **oui** — 3 fournisseurs, 3 aller-retours, dont 2 jetons OVH crees pour rien |
+| TF-0589 | candidat | 15 | Le gabarit d'environnement n'est confronte a rien | **oui** — .env = 11 cles, .env.example = 7 ; 4 cles OVH jamais reportees au gabarit |
+| TF-0585 | candidat | 12.5 | Un comportement destine aux visiteurs valide sur un protocole qu'ils n'utilisent pas | **oui** — 7 hostnames sur 8 injoignables en HTTPS apres avoir ete declares fonctionnels ; port 443 ferme sur 213.186.33.5 |
+| TF-0581 | candidat | 8.3 | Le seul verificateur de contraste ne regarde que le menu du header | **oui** — texte a ratio 1,0 reste en production ; oracle de contraste present au depot et scope au seul .header-line |
+| TF-0587 | candidat | 8 | Un mecanisme de redirection choisi sans connaitre sa limite structurelle | **oui** — port 443 ferme non documente ; remede impliquant de recreer les MX de 4 zones |
+| TF-0584 | candidat | 6 | Une sonde de contraste doit se confronter a la palette declaree du projet | **oui** — 2 erreurs de sonde successives produisant des verdicts faux, l'un negatif l'autre positif |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
 | TF-0526 | corrige | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
 | TF-0530 | corrige | 25 | pilot : le garde-fou « le pilot n'ecrit pas chez un produit » tenait par DISCIPLINE SEULE, et les classes de defaut du jour n'avaient pas de regle generique | **oui** — un garde-fou non execute est un garde-fou qu'on suit jusqu'au jour ou on ne le suit plus ; et neuf classes de defaut payees le meme jour sans qu'aucune regle generique ne les empeche de revenir ailleurs |
@@ -83,6 +90,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0486 | corrige | 15 | forge-agents : oracle-claims analyse le CSS et lit les couleurs hexadecimales purement numeriques comme des nombres non sources | **oui** — FAIL sur des valeurs prescrites par la charte ; contournement contraire a la charte elle-meme. |
 | TF-0552 | corrige | 15 | page-html : le message de remediation de L2 prescrit la moitie du geste et conduit tout droit a une seconde violation de L2 | **oui** — un aller-retour d'oracle complet, plus la lecture d'un document tiers, pour un geste que le message aurait pu nommer en entier |
 | TF-0491 | corrige | 12.5 | forge-design : aucun controle ne compare la largeur d un bloc de texte a celle de ses blocs freres — trois allers-retours client sur le meme defaut | **oui** — Trois allers-retours client sur un seul defaut, sur quatre versions livrees. |
+| TF-0582 | corrige | 12.5 | Une mesure de contraste par styles calcules ne voit pas les pseudo-elements | **oui** — fond peint par ::before ; .txt en background:transparent ; une mesure DOM aurait lu le fond clair du conteneur et valide |
 | TF-0487 | corrige | 10 | forge-agents : confirmation de RA-4 sur un autre motif — les sources citees verbatim sont analysees comme du contenu propre au livrable | **oui** — Deuxieme occurrence du meme mecanisme en deux passes, sur un livrable dont l autoportance impose d embarquer ses sources. |
 | TF-0492 | corrige | 10 | forge-design : aucun controle ne detecte un mot coupe en deux au rendu (Utilisabl/e, Plateform/e, 231 occurrenc/es) | **oui** — Trois occurrences signalees par le client sur deux versions successives, dont une apres une correction incomplete. |
 | TF-0495 | corrige | 10 | forge-agents : aucune regle ne distingue « le contenu est present » de « le contenu est exploitable » | **oui** — Deux demandes explicites du client necessaires pour obtenir un contenu lisible, sur un livrable vert a tous les oracles. |
@@ -117,6 +125,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0577 | candidat | 12.5 | forge-conception : le referentiel ne porte NULLE PART ce que le produit PROMET a son client — la une a vendu une livraison pendant neuf jours quand les six services vendaient un transfert de capacite | **oui** — Positionnement faux en production du 15/08 au 24/08 sur le site vitrine de la factory ; refonte complete de la page d accueil necessaire, tous oracles au vert pendant toute la periode. |
 | TF-0498 | corrige | 15 | forge-conception : la description du skill `qualifie-l-entrant` depasse la limite de 1024 caracteres — le self-test de quality-oracles echoue sur le parc installe | **oui** — mesure le 22/08 : le self-test de quality-oracles sort en echec (1 echec) des qu'il est joue depuis la copie installee, alors qu'il rend 156 PASS et 0 echec depuis la source. Le meme harnais donne deux verdicts selon l'endroit d'ou on le joue — et c'est le verdict rouge qui correspond a l'usage reel. |
 | TF-0570 | corrige | 9 | conception : une exigence dit ce qui est REFUSE, jamais ce que l utilisateur APPREND du refus | **oui** — quatre refus specifies au paragraphe 09 du cahier sans aucune clause de restitution ; 5 cles x 7 langues redigees apres coup le 24/08 et deux anomalies anterieures mal classees faute d un symptome discriminant |
 | TF-0576 | corrige | 4.5 | conception : un port qui ne declare que son cas nominal force les pannes d adaptateur en exceptions non gerees | **oui** — is_clean -> bool sans mode de panne : socket.gaierror remontee nue jusqu a l ASGI ; cinq ports du produit presentent le meme contrat incomplet ; troisieme instance du patron « contrainte enoncee sans sa contrepartie observable » apres RG-18 et RG-21 |
@@ -133,6 +142,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0578 | candidat | 6.7 | forge-design : rien n oppose la PROMESSE d une page a l OFFRE decrite ailleurs dans le meme run — les oracles jugent la page en vase clos | **oui** — Contradiction une/services non detectee par cinq oracles de design tous au vert, sur le site vitrine de la factory elle-meme. |
 | TF-0494 | corrige | 15 | forge-design : le workflow auditer ne prescrit aucune tracabilite pour une demande client multiple | **oui** — Un point sur dix-sept perdu, decouvert par le client et non par la chaine de controle. |
 | TF-0483 | corrige | 6.7 | forge-design : rien n oblige a relever ce qui se fait de bien dans le domaine du produit avant de proposer une DA — les oracles jugent la discipline INTERNE, et une DA au vert complet a ete rejetee en bloc | **oui** — Un tour complet conception+design perdu sur factory.produit-07 : DA au vert sur tous les oracles, rejetee integralement par le commanditaire, refaite avec releve externe et arbitrage humain sur captures. |
 
@@ -148,6 +158,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0579 | candidat | 12.5 | forge-ops : un gate de MEP est reste ROUGE six jours et le deploiement a eu lieu quand meme — un gate dont l echec n empeche rien n est pas un gate | **oui** — Six jours de MEP avec un gate rouge non vu, sur un produit dont l argument commercial est la porte executee. |
 | TF-0527 | corrige | 20 | ops : un travail PLANIFIE qu'on ne peut pas declencher a la demande n'est jamais prouve — il se decouvre casse au moment ou l'on compte dessus | **oui** — un mecanisme declare « en place » dans un releve remis a l'humain, qui n'avait jamais execute une seule ligne sur un agent |
 | TF-0529 | corrige | 15 | ops : une instance d'approbation FIGE la contrainte de separation des roles a sa creation — relacher le reglage ne debloque pas l'instance en attente | **oui** — une porte de deploiement laissee bloquee 26 heures, et une demi-heure de recherche pour etablir que le relachement du reglage ne s'applique pas retroactivement |
 
@@ -161,6 +172,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0580 | candidat | 10 | forge-tests : rien ne detecte qu une copie VENDORISEE a diverge de sa source — le site annoncait v1.6.2 et 80 services quand le catalogue portait v1.8.0 et 83 | **oui** — Chiffres periemes affiches en production pendant cinq jours (v1.6.2/80 contre v1.8.0/83) sur le bandeau de preuve d un site dont l argument est la preuve datee. |
 | TF-0543 | corrige | 25 | Trois listes d'exclusion divergentes : `input` manque aux deux qui comptent, 3e occurrence de la famille | **oui** — 3 listes d'exclusion distinctes (interface.py _EXCLUS, securite.py _EXCLUS_DEPENDANCES, disposition.py _HORS_SOURCES) ; 2 lots anterieurs (20260814a x2) ont deja rallonge les deux premieres |
 | TF-0542 | corrige | 20 | Aucun levier projet ne borne le perimetre de fichiers : RT-1 n'est pas une config omise | **oui** — 37 cles FORGE_TESTS_* relevees dans forge_tests/ ; aucune ne borne le perimetre de fichiers des pans interface/securite/prompts |
 | TF-0602 | corrige | 15 | forge-tests : le registre de dette a un `--verifier` qui fonctionne et que rien ne joue a la livraison — 15 limites declarees par le code lui manquaient, sur trois modules livres les 22 et 23/08 | **oui** — QUINZE limites declarees par le code et absentes du registre commite, sur TROIS modules livres les 22 et 23/08 — soit la reapparition du defaut fondateur de TF-0384 deux jours apres sa correction, par une autre cause. L'ecart n'a ete trouve par aucun controle : il l'a ete par un appel ACCIDENTEL a un outil dont `--help` regenere le fichier au lieu d'afficher une aide. |
@@ -180,9 +192,11 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0549 | decide | 10 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : `Produit-07` a un forge\retours\ mais rien de ce qui s'y fait n'est suivi | **oui** — mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration. |
+| TF-0590 | corrige | 20 | Un README de dossier reste PERIME apres regeneration : fins de ligne MIXTES dans le meme fichier, et le harnais tombe a 54/55 sans qu'aucune action ne le repare | **oui** — mesure le 25/08 : le harnais du pilot passe de 55/55 a 54/55 et n'en bouge plus — trois regenerations, trois fois le meme FAIL, un diff vide a chaque fois. Aucune action disponible ne le repare, ce qui est la definition d'un rouge qu'on apprend a ignorer. |
 | TF-0541 | corrige | 15 | Gabarit de projet : `CLAUDE.md` et `ledger.py` divergent, et le run est épinglé en dur | **oui** — forge/ledger.jsonl absent du disque ; ledger.py ligne 68 run codé en dur ; run 20260815 clos en seq 24 |
 | TF-0471 | corrige | 10 | R-45 refuse des lots rédigés AVANT sa publication — deux lots Produit-05 bloqués à l'ingestion, dont un qui signalait un plantage réel du lanceur d'oracles | **oui** — payé le 22/08 : douze candidatures de deux lots restent hors du registre, et l'une d'elles nommait un défaut BLOQUANT du lanceur d'oracles qui n'a été corrigé que parce que la session l'a rencontré par un autre chemin — un refus de forme a mis un fait de production hors de portée |
 | TF-0548 | corrige | 8.3 | La couverture des regles se compte en REGLES, jamais en EXIGENCES : une regle qui en enonce cinq et n'en controle qu'une est comptee couverte — c'est ce qui a laisse passer le gabarit manquant | **oui** — paye et chiffre : QUINZE candidatures refusees a l'ingestion en trois jours, sur deux produits, pour une forme que ni l'un ni l'autre ne pouvait connaitre faute d'avoir le gabarit — que la regle 18 exigeait par ecrit depuis le 06/08 et que rien ne verifiait. Le taux de couverture affichait 24 regles sur 26, soit 92 %, pendant tout ce temps. Sur la seule regle 18, la couverture reelle est de 1 exigence controlee sur 5. |
+| TF-0586 | corrige | 8.3 | Aucun oracle ne verifie qu'un nom de domaine declare repond | **oui** — 8 hostnames declares, 0 controle ; base par defaut de check-redirects encore sur l'URL Railway apres bascule |
 | TF-0502 | corrige | 6.7 | Deux derogations a R-45 en UN JOUR, dont une hors anteriorite : la propagation des regles du pilot vers les produits reste le manque, et le mecanisme de derogation est en train de devenir la voie normale | **oui** — mesure le 22/08 sur le registre : 15 candidatures (7 + 5 + 3) n'ont pu entrer que par derogation, sur 3 lots d'un meme produit en 2 jours. Deux evenements `ingestion` portent desormais un champ `derogation` — soit 2 derogations en un seul jour, pour une regle publiee la veille. Le taux est de 3 lots derogeables sur 3 lots recus de ce produit : 100 %, ce qui ne decrit plus une exception mais un regime. |
 
 ---
