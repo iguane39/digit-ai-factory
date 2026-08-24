@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=e67835291d76 archive=54c0315cbe97 · dernier événement: 2026-08-24T14:34:47.752Z -->
+     sceaux: actifs=5bd2f1511349 archive=54c0315cbe97 · dernier événement: 2026-08-24T15:30:07.089Z -->
 
-**105 actifs** (candidat 0 · décidé 1 · en cours 0 · corrigé 100 · écarté 4) · **469 archivés**.
+**108 actifs** (candidat 0 · décidé 1 · en cours 0 · corrigé 103 · écarté 4) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -112,6 +112,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-0498 | corrige | 15 | forge-conception : la description du skill `qualifie-l-entrant` depasse la limite de 1024 caracteres — le self-test de quality-oracles echoue sur le parc installe | **oui** — mesure le 22/08 : le self-test de quality-oracles sort en echec (1 echec) des qu'il est joue depuis la copie installee, alors qu'il rend 156 PASS et 0 echec depuis la source. Le meme harnais donne deux verdicts selon l'endroit d'ou on le joue — et c'est le verdict rouge qui correspond a l'usage reel. |
 | TF-0570 | corrige | 9 | conception : une exigence dit ce qui est REFUSE, jamais ce que l utilisateur APPREND du refus | **oui** — quatre refus specifies au paragraphe 09 du cahier sans aucune clause de restitution ; 5 cles x 7 langues redigees apres coup le 24/08 et deux anomalies anterieures mal classees faute d un symptome discriminant |
+| TF-0576 | corrige | 4.5 | conception : un port qui ne declare que son cas nominal force les pannes d adaptateur en exceptions non gerees | **oui** — is_clean -> bool sans mode de panne : socket.gaierror remontee nue jusqu a l ASGI ; cinq ports du produit presentent le meme contrat incomplet ; troisieme instance du patron « contrainte enoncee sans sa contrepartie observable » apres RG-18 et RG-21 |
 
 ## digit-ai-forge-design
 
@@ -124,7 +125,9 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0575 | corrige | 9 | development : une reponse d erreur emise hors de la pile CORS est illisible par le navigateur, qui la rapporte en PERTE DE CONNEXION | **oui** — « Connexion perdue » affiche pour une erreur de configuration serveur ; deuxieme occurrence en une journee de la famille RG-20, cette fois cote serveur ; verifie sur pieces que le 401 porte les en-tetes CORS et que le 500 non gere ne les porte pas |
 | TF-0569 | corrige | 4.5 | development : la cause d une erreur est jetee a la frontiere client, et le message par defaut porte une instruction FAUSSE | **oui** — sept causes distinctes reduites a une phrase, instruction fausse dans six cas sur sept ; le meme message a deja masque deux defauts sans rapport classes vers deux forges differentes (rubriques 18 et 27-28 du lot de recette du 18/08, retours RG-17 et RG-18) ; toutes les portes passaient et la ligne fautive etait couverte |
+| TF-0574 | corrige | 4.5 | development/mep : le pipeline DEPLOIE et ne verifie JAMAIS le deploiement — un run vert a mis en service une panne totale | **oui** — panne totale du televersement sur Dev mise en service par un run vert incluant une recette e2e bloquante de 28 tests ; defaut signale par un utilisateur, diagnostique a posteriori dans les journaux ; l etape Deploy ne comporte que checkout, terraform apply et alembic upgrade head |
 
 ## digit-ai-forge-ops
 
