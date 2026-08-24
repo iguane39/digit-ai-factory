@@ -389,6 +389,85 @@ risques et traces relèvent de la restitution écrite, pas d'une sortie machine 
 **l'horodatage et le verdict, eux, sont exigibles partout**. Les règles S11 à S14 ne s'y
 appliquent pas non plus : elles jugent un fichier, et une CLI n'en écrit pas.
 
+## Deux formes que le bloc 3 admet, et une qu'il refuse (TF-0568, 0572, 0573 — 24/08/2026)
+
+**La mise en page ne fait pas la conformité (TF-0568).** Le bloc 3 accepte QUATRE mises en page de
+la même décision — puce unique, options en puces filles, options en tableau séparé, tableau sans
+puce — et rend le même verdict aux quatre. Avant le 24/08 une seule passait, la puce unique, soit un
+pavé de douze lignes au rendu ; les trois autres échouaient sur un chapeau vide ou tronqué. Mesuré :
+1 forme sur 5 acceptée avant, 4 sur 5 après, la cinquième restant refusée à bon droit (chapeau de
+quatre mots). *Une règle qui n'admet qu'une mise en page ne juge plus le fond, elle impose une
+typographie* — et elle punit exactement le lecteur qui demande une présentation lisible.
+
+**Le CHAPEAU COMMUN, quand un dossier porte plusieurs décisions d'une même histoire (TF-0573).**
+Onze décisions issues d'une même enquête ne peuvent pas répéter onze fois leur contexte : le dossier
+devient illisible par sa longueur. Les supposer connues produit l'inverse — « aucune mise en
+contexte ». Le bloc 3 admet donc une **prose de tête**, avant la première décision, qui porte
+l'histoire une fois : le problème, sa chaîne causale, ce qui est en jeu. Présente et substantielle
+(40 mots au moins), elle abaisse le rappel dû par décision de 25 à **12 mots** — le delta suffit,
+puisque le contexte est écrit juste au-dessus et non supposé. Douze mots restent dus : il faut
+nommer DE QUOI cette décision-là parle, sinon on retombe sur l'étiquette.
+
+Le bloc 0 ne remplace pas ce chapeau et ne le peut pas : il tient l'état, la conséquence et
+l'attendu en un paragraphe, pas l'exposé d'un problème et de sa chaîne causale.
+
+**Ce qu'il refuse : le désignateur non glosé (TF-0572, S23).** Un dossier remis le 24/08 nommait ses
+objets par des codes créés dans la même session — V1 à V4 pour quatre contrôles, A1, B2, E2 pour les
+décisions. Réponse du destinataire, mot pour mot : « Rien compris à V1, V3, V4, de quoi parle-t-on ? »
+
+Ni S15 ni S20 ne le voyaient. S15 interdit l'identifiant nu comme SUJET d'une décision, et vise ce
+que le lecteur ne peut pas connaître — un identifiant de registre écrit ailleurs et avant ; un code
+introduit dans le même message passe son test dès qu'une phrase de sujet l'accompagne. S20 glose
+depuis un référentiel fermé alimenté par les termes du métier : un code né du jour n'y est pas.
+
+**La règle porte sur l'USAGE, pas sur la naissance** : *un désignateur court employé plus d'une fois
+porte sa glose à son PREMIER emploi.* Quatre mots suffisent — « V1 (plausibilité de la commune) »,
+« V1 — plausibilité de la commune », ou une ligne de tableau « | V1 | plausibilité de la commune | ».
+Sans glose il n'existe pas pour le lecteur, et l'écrire c'est écrire pour soi. Seul `TF-####` est
+exclu : il est déjà tenu par S14 (obligatoire sur une action), S15 (interdit comme sujet) et S20
+(glosé). `R-52`, `V4`, `A1`, `EA6` ne le sont pas — le lecteur n'a pas nos référentiels sous les yeux.
+
+## Portée — où cette consigne s'applique, et comment elle y arrive (TF-0571, 24/08/2026)
+
+**Une doctrine n'existe que là où son mécanisme est installé.** La v1 de ce document le disait
+d'elle-même — « elle n'était citée par aucun run […] une convention qu'aucun run ne charge ne
+s'applique pas : elle décore » — et la v2 l'a corrigé POUR LES RUNS DU PILOT. Elle ne disait rien
+des sessions qui vivent chez le produit.
+
+**Le fait qui ouvre cette section.** Une session de travail a passé cinq heures et onze décisions
+dans un dépôt produit, en rendant une dizaine de messages de fin de traitement à l'humain : aucun
+ne portait la structure en huit blocs, aucun ne portait de bloc 0, aucun n'a été ni jugé ni refusé.
+Il n'y avait ni doctrine chargée ni oracle armé. Le défaut n'a été découvert que par la
+contestation humaine, cinq heures plus tard.
+
+**Mesure du 24/08 sur le parc, plus large que le retour** : sur les dix produits rangés sous le
+dossier client, CINQ portent un `forge\` — donc ont été instanciés — UN SEUL porte le hook de la
+factory, et ZÉRO portait le texte de cette consigne. La doctrine voyageait au mieux comme **un
+juge sans son code** : le hook refuse, et l'agent doit deviner les huit blocs.
+
+**Les trois pièces, et ce que chacune vaut seule.** Il faut les trois, et l'oracle les nomme
+séparément pour que le remède soit précis :
+
+| Pièce | Chez le produit | Sans elle |
+|---|---|---|
+| le juge | `forge\hooks\factory.mjs` | aucune fin de tour n'est jugée : la doctrine est un vœu |
+| le câblage | `.claude\settings.json` portant le hook | le juge est là et jamais appelé — le pire état, il donne confiance sans rien faire |
+| le texte | `forge\RESTITUTION.md` (copie de ce fichier) | le juge refuse sans que rien n'apprenne la forme : l'agent devine |
+
+**Comment elle arrive** : par l'héritage, jamais par bonne volonté. Les trois pièces sont déclarées
+dans `gabarits\HERITAGE.json` et contrôlées par **R-47** à chaque ingestion de lot. Le texte y est
+entré le 24/08 — il n'y était pas, c'est pourquoi il ne voyageait pas.
+
+**Qui écrit chez le produit** : le produit. « Ne touche pas les produits, seuls les produits se
+modifient eux-mêmes » (mandat humain du 23/08). Le pilot NOMME l'état d'installation
+(`oracles\oracle-portee-doctrine.mjs`, PD1-PD2) et **ne bloque pas dessus** : un contrôle qui
+échoue sur ce qu'il ne peut pas faire réparer apprend à être contourné. Le remède est toujours un
+run demandé au produit.
+
+**Un dépôt sans `forge\` est HORS doctrine, et c'est un fait, pas une faute** : il n'a jamais été
+instancié. Une session qui y travaille ne recevra ni consigne ni juge — et doit le savoir avant de
+rendre son premier message, pas après onze décisions.
+
 ## Contrôle
 
 **Trois bornes de domaine, écrites parce qu'elles ont été trouvées en jouant les règles neuves

@@ -197,6 +197,28 @@ const ETAT_DU_PARC = [
     remede: "poser l'élément promis, écrire la négation si le choix est de ne pas le faire, ou déclarer par « promesse-ok »",
   },
   {
+    // TF-0571 / R-52 (24/08) : une doctrine n'existe que là où son mécanisme est installé. Mesure :
+    // dix produits au registre, cinq instanciés, UN SEUL portant le hook, ZÉRO portant le texte.
+    // L'entrée est ici pour que l'état soit RELU à chaque recette — l'oracle NOMME et ne bloque
+    // pas (code de sortie 0 tant qu'aucun constat ne porte sur le pilot), parce que le remède
+    // appartient au produit et qu'un contrôle qui bloque sur ce qu'il ne peut pas faire réparer
+    // apprend à être contourné.
+    nom: "oracle-portee-doctrine.mjs",
+    motif: "produit instancié dont la doctrine de restitution n'est pas installée ou pas câblée",
+    remede: "un run demandé AU PRODUIT (le pilot n'écrit pas chez lui) ; l'héritage porte les pièces (gabarits\\HERITAGE.json, R-47)",
+  },
+  {
+    // TF-0565 (24/08) : UN SQUELETTE QUI N'A JAMAIS ÉTÉ INSTANCIÉ N'A JAMAIS ÉTÉ ÉPROUVÉ. Deux
+    // squelettes de dossier posaient une classe sur 8 et 11 paragraphes sans aucune règle CSS et
+    // rendaient FAIL à leur propre contrôle de marquage DEPUIS LEUR PRODUCTION : le chapeau se
+    // rendait comme un paragraphe ordinaire, et un oracle de rendu ne voit rien tant que rien ne
+    // déborde. C'est un état du PARC — le défaut naît d'une publication, jamais d'un artefact
+    // qu'on passe à un oracle.
+    nom: "oracle-gabarits-documents.mjs",
+    motif: "famille de gabarit sans instance, instance jamais remplie, ou pièce fautive au marquage",
+    remede: "remplir l'instance manquante, ou corriger la règle nommée par check_html (souvent L21, composant déclaré sans style)",
+  },
+  {
     // R-44 (20/08) : un README par dossier d'input\ et output\, présent, à jour, rédigé.
     nom: "oracle-readme-dossiers.mjs",
     motif: "README d'input\\ et output\\ absents, périmés ou non rédigés",

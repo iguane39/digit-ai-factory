@@ -79,15 +79,29 @@ import { fileURLToPath } from "node:url";
 // Un bloc = son titre reconnu par un motif. Le libellé exact est libre : c'est la PRÉSENCE du
 // bloc qui est opposable, pas sa formulation — imposer un mot à mot rendrait la consigne
 // inapplicable aux sorties courtes.
+// LE NUMÉRO SE SÉPARE COMME L'AUTEUR VEUT (TF-0566, 24/08). Le motif exigeait « N. » — un point,
+// rien d'autre. Un titre « ## 1 - En-tête d'identification » plaçait donc « 1 - » entre le dièse et
+// le mot-clé, et AUCUNE branche ne l'absorbait : les HUIT blocs étaient déclarés absents.
+//
+// MESURE PAR A/B DU 24/08, et c'est elle qui rend le défaut indiscutable : deux fichiers identiques
+// au séparateur près, l'un titré « ## N. », l'autre « ## N - ». Le premier rend S1 PASS, le second
+// S1 FAIL sur les huit blocs. Le coût n'est pas le refus, c'est le MESSAGE : « bloc(s) absent(s) »
+// envoie l'auteur chercher du contenu manquant alors qu'il manque un point — un auteur a réécrit
+// huit blocs pour changer une ponctuation. Aggravant : le tiret cadratin est la ponctuation que le
+// GABARIT emploie lui-même dans ses titres.
+//
+// `NUM` absorbe donc toutes les formes qu'un humain écrit : « 1. », « 1 - », « 1 — », « 1) », « 1 : »,
+// « 1 · », ou rien. Juger la ponctuation d'un titre n'a jamais été le sujet de S1.
+const NUM = String.raw`(?:\d{1,2}\s*(?:[.)\-–—:·]\s*)?)?`;
 const BLOCS = [
-  [/(^|\n)#{1,4}\s*(1\.\s*)?(en-t[êe]te|identification|contexte du traitement)/i, "1. En-tête d'identification"],
-  [/(^|\n)#{1,4}\s*(2\.\s*)?verdict/i, "2. Verdict en une ligne"],
-  [/(^|\n)#{1,4}\s*(3\.\s*)?d[ée]cisions?/i, "3. Décisions attendues"],
-  [/(^|\n)#{1,4}\s*(4\.\s*)?trait[ée]/i, "4. Traité"],
-  [/(^|\n)#{1,4}\s*(5\.\s*)?non\s+trait[ée]/i, "5. Non traité"],
-  [/(^|\n)#{1,4}\s*(6\.\s*)?[ée]carts?\s+[àa]\s+la\s+lettre/i, "6. Écarts à la lettre"],
-  [/(^|\n)#{1,4}\s*(7\.\s*)?risques?/i, "7. Risques"],
-  [/(^|\n)#{1,4}\s*(8\.\s*)?(prochaines?\s+actions?|suites?\s+[àa]\s+donner)/i, "8. Prochaines actions"],
+  [new RegExp(`(^|\n)#{1,4}\\s*${NUM}(en-t[êe]te|identification|contexte du traitement)`, "i"), "1. En-tête d'identification"],
+  [new RegExp(`(^|\n)#{1,4}\\s*${NUM}verdict`, "i"), "2. Verdict en une ligne"],
+  [new RegExp(`(^|\n)#{1,4}\\s*${NUM}d[ée]cisions?`, "i"), "3. Décisions attendues"],
+  [new RegExp(`(^|\n)#{1,4}\\s*${NUM}trait[ée]`, "i"), "4. Traité"],
+  [new RegExp(`(^|\n)#{1,4}\\s*${NUM}non\\s+trait[ée]`, "i"), "5. Non traité"],
+  [new RegExp(`(^|\n)#{1,4}\\s*${NUM}[ée]carts?\\s+[àa]\\s+la\\s+lettre`, "i"), "6. Écarts à la lettre"],
+  [new RegExp(`(^|\n)#{1,4}\\s*${NUM}risques?`, "i"), "7. Risques"],
+  [new RegExp(`(^|\n)#{1,4}\\s*${NUM}(prochaines?\\s+actions?|suites?\\s+[àa]\\s+donner)`, "i"), "8. Prochaines actions"],
 ];
 
 const MOTIFS_ABSENCE = /(aucun|rien|n[ée]ant|sans objet|non concern)/i;
@@ -156,6 +170,36 @@ function actionsGroupees(texte) {
   const entetes = entetesDeTableau(texte);
   const entete = entetes.length ? entetes[0] : "";
   return groupes.concat(lignesDeDonnees(texte).map((l) => entete + " " + l));
+}
+
+// UNE DÉCISION DU BLOC 3 SE LIT AUTREMENT QU'UNE ACTION DU BLOC 8 (TF-0568, 24/08). Le lecteur
+// des restitutions l'a signalé et a demandé la généralisation du correctif : S15 et S16
+// cherchaient le chapeau d'une décision DANS le groupe qui porte sa première option, et
+// `actionsGroupees` ne réunit qu'une puce avec ses lignes de continuation indentées. Trois mises
+// en page naturelles échouaient donc, alors qu'elles disent la MÊME décision :
+//   · options en puces FILLES non indentées → chaque option devient un groupe à chapeau vide ;
+//   · options en TABLEAU séparé par une ligne vide → la ligne vide coupe le groupe ;
+//   · tableau SANS puce → aucun groupe ne contient « (a) ».
+// La seule forme conforme était une puce unique portant chapeau + options + recommandation +
+// source + option par défaut : un pavé de douze lignes au rendu. *Une règle qui n'admet qu'une
+// mise en page ne juge plus le fond, elle impose une typographie* — et elle punit exactement le
+// lecteur qui demande une présentation lisible.
+//
+// La lecture juste segmente au DÉBUT DE DÉCISION, pas à la puce : une ligne d'OPTION, une ligne
+// de tableau, une ligne vide et une puce fille ne commencent jamais une décision, elles
+// continuent celle en cours. Un segment sans ouverture — bloc qui démarre droit sur son tableau
+// ou sa prose — s'ouvre implicitement, sinon la forme la plus dépouillée serait la seule muette.
+const RE_LIGNE_OPTION = /^\s*(?:[-*+]\s+|\|\s*)?\**\(?[a-e]\)/;
+function decisionsDuBloc(texte) {
+  const segs = [];
+  for (const ligne of texte.split("\n")) {
+    const ouvre = (/^[-*+]\s+\S/.test(ligne) || /^\s*#{2,6}\s/.test(ligne))
+      && !RE_LIGNE_OPTION.test(ligne) && !/^\s*\|/.test(ligne);
+    if (ouvre) { segs.push(ligne); continue; }
+    if (!segs.length) { if (ligne.trim()) segs.push(ligne); continue; }
+    if (ligne.trim()) segs[segs.length - 1] += " " + ligne.trim();
+  }
+  return segs;
 }
 
 // Les lignes de DONNÉES d'un tableau markdown : ni l'en-tête (1re ligne du tableau), ni le
@@ -329,8 +373,28 @@ function juger(texte) {
   //
   // Le remède ne réordonne pas : il boucle jusqu'à point fixe, donc il est INDIFFÉRENT à
   // l'ordre — frontmatter puis titre, titre puis frontmatter, ou l'un sans l'autre.
+  //
+  // TF-0567 (24/08) — UNE OUVERTURE PEUT PORTER UN TITRE, et c'est même le nom que le gabarit lui
+  // donne : « bloc 0 ». S9 ne lisait l'ouverture qu'AVANT le premier titre de niveau 2 à 4 ; une
+  // restitution qui la titrait « ### 0. Synthèse d'ouverture » — forme naturelle, prescrite en
+  // toutes lettres — rendait donc une ouverture VIDE, et S9 échouait sur « 0 mot(s) ».
+  // Le message était EXACT et TROMPEUR : vrai de ce que l'oracle avait lu, il faisait conclure à
+  // l'auteur que sa prose manquait alors qu'elle était là, complète, trente mots au-dessus.
+  // *Un message exact sur une lecture fausse coûte plus qu'un message absent* — l'auteur y croit.
+  // On accepte les deux formes, et on garde la plus longue : celui qui titre son ouverture ET
+  // écrit avant le titre ne doit être puni ni pour l'un ni pour l'autre.
+  const RE_TITRE_OUVERTURE =
+    /(^|\n)#{1,4}[ \t]*(?:0[ \t]*[.)\-–—:·]?[ \t]*)?(synth[èe]se d.ouverture|ouverture|bloc[ \t]*0)[^\n]*\n/i;
   const premierBloc = texte.search(/(^|\n)#{2,4}\s/);
   let ouverture = (premierBloc > 0 ? texte.slice(0, premierBloc) : "").trim();
+  const mTitre = RE_TITRE_OUVERTURE.exec(texte);
+  if (mTitre) {
+    const apres = texte.slice(mTitre.index + mTitre[0].length);
+    const fin = apres.search(/(^|\n)#{1,4}\s/);
+    const titree = (fin >= 0 ? apres.slice(0, fin) : apres).trim();
+    const compte = (t) => t.split(/\s+/).filter(Boolean).length;
+    if (compte(titree) > compte(ouverture)) ouverture = titree;
+  }
   for (let i = 0; i < 4; i++) {
     const avant = ouverture;
     ouverture = ouverture.replace(/^---[\s\S]*?\n---\s*/, "").replace(/^#[^\n]*\n?/, "").trim();
@@ -344,7 +408,7 @@ function juger(texte) {
     [/\b[a-f0-9]{7,40}\b/, "sha"],
   ].filter(([motif]) => motif.test(ouverture)).map(([, quoi]) => quoi);
   if (mots < 20) {
-    ko("S9", `synthèse d'ouverture absente ou trop courte (${mots} mot(s) avant le premier bloc) — ` +
+    ko("S9", `synthèse d'ouverture absente ou trop courte (${mots} mot(s) lu(s), en tête ou sous un titre d'ouverture) — ` +
       "l'état, ce que ça change et ce qui est attendu se disent en langage commanditaire AVANT le détail");
   } else if (techniques.length) {
     ko("S9", `la synthèse d'ouverture porte du vocabulaire technique nu (${techniques.join(", ")}) — ` +
@@ -639,23 +703,109 @@ function juger(texte) {
   // spans de code restent tolérés ici — le sujet d'une décision EST parfois un fichier, et
   // l'interdire ferait écrire des périphrases. L'identifiant, lui, n'est jamais le sujet : il est
   // le nom que la chose porte au registre, et le registre n'est pas dans la tête du lecteur.
-  const groupesDecisions = actionsGroupees(bDecisions)
+  const groupesDecisions = decisionsDuBloc(bDecisions)
     .filter((g) => !MOTIFS_ABSENCE.test(g.replace(/^\s*[-*]\s+/, "").slice(0, 40)))
     .filter((g) => /\(a\)/.test(g)); // sans option étiquetée, c'est S4 qui parle, pas S15
   if (!groupesDecisions.length) {
     ok("S15", "aucune décision à rappeler — bloc vide déclaré, ou choix fermé absent (S4)");
   } else {
-    const chapeau = (g) => g.split("(a)")[0].replace(/^\s*[-*]\s+/, "").replace(/\*\*/g, "").trim();
+    // Le chapeau, c'est la PROSE avant la première option : on retire la puce ou le titre qui
+    // ouvre le segment, et TOUTE cellule de tableau — sinon un en-tête de six mots posé au-dessus
+    // d'un chapeau de quatre mots ferait un total de dix et l'on croirait avoir mis en contexte.
+    const chapeau = (g) => g.split("(a)")[0]
+      .replace(/^\s*(?:[-*+]\s+|#{2,6}\s*)/, "").replace(/\|[^|]*/g, " ").replace(/\*\*/g, "").trim();
+    // TF-0573 (24/08) — UN DOSSIER DE PLUSIEURS DÉCISIONS A BESOIN D'UN ENDROIT POUR SON CONTEXTE
+    // COMMUN. Le fait : onze décisions issues d'une même enquête, toutes filles du même problème.
+    // S15 demandant 25 mots de rappel À CHACUNE, il ne restait que deux issues et les deux sont
+    // mauvaises — RÉPÉTER le contexte onze fois, et le dossier devient illisible par sa longueur ;
+    // ou le SUPPOSER connu et n'écrire que le delta, ce qui a été fait et a produit « aucune mise
+    // en contexte ». Le bloc 0 ne résout pas la question : il tient l'état, la conséquence et
+    // l'attendu en un paragraphe, pas l'exposé d'un problème et de sa chaîne causale.
+    //
+    // La demande humaine dit exactement le besoin : « l'humain doit pouvoir apprendre, comprendre,
+    // se rappeler le contexte, les problèmes, les choix, les solutions ». Le bloc 3 admet donc un
+    // CHAPEAU COMMUN : une prose de tête, avant la première décision, qui porte l'histoire une
+    // fois. Présent et substantiel (40 mots), il abaisse le rappel dû par décision à 12 mots — le
+    // delta suffit, puisque le contexte est écrit juste au-dessus et non supposé.
+    const preambule = decisionsDuBloc(bDecisions)
+      .slice(0, decisionsDuBloc(bDecisions).findIndex((g) => /\(a\)/.test(g)) < 0
+        ? undefined : decisionsDuBloc(bDecisions).findIndex((g) => /\(a\)/.test(g)))
+      .filter((g) => !/\(a\)/.test(g))
+      .join(" ")
+      .replace(/^\s*(?:[-*+]\s+|#{2,6}\s*)/, "").replace(/\|[^|]*/g, " ").trim();
+    const motsPreambule = preambule.split(/\s+/).filter(Boolean).length;
+    const chapeauCommun = motsPreambule >= 40 && !ID_STABLE.test(preambule);
+    const SEUIL = chapeauCommun ? 12 : 25;
     const fautifs = groupesDecisions.filter((g) => {
       const c = chapeau(g);
       const mots = c.split(/\s+/).filter(Boolean).length;
-      return mots < 25 || ID_STABLE.test(c);
+      return mots < SEUIL || ID_STABLE.test(c);
     });
     fautifs.length
       ? ko("S15", `${fautifs.length} décision(s) sur ${groupesDecisions.length} sans rappel de leur sujet — un identifiant ne désigne rien pour qui ne l'a pas écrit, ` +
-          `et un titre court est une étiquette : avant les options, 25 mots au moins qui disent DE QUOI on parle, sans identifiant nu. ` +
-          `Ex. : ${chapeau(fautifs[0]).replace(/\s+/g, " ").slice(0, 110)}`)
-      : ok("S15", `${groupesDecisions.length} décision(s), chacune rappelant son sujet avant ses options`);
+          `et un titre court est une étiquette : avant les options, ${SEUIL} mots au moins qui disent DE QUOI on parle, sans identifiant nu` +
+          (chapeauCommun ? ` (seuil abaissé de 25 à 12 : le chapeau commun du bloc porte déjà l'histoire, en ${motsPreambule} mots)` :
+            ` — ou un CHAPEAU COMMUN de 40 mots en tête du bloc, qui porte le contexte une fois pour toutes les décisions (TF-0573)`) +
+          `. Ex. : ${chapeau(fautifs[0]).replace(/\s+/g, " ").slice(0, 110)}`)
+      : ok("S15", `${groupesDecisions.length} décision(s), chacune rappelant son sujet avant ses options` +
+          (chapeauCommun ? ` (chapeau commun de ${motsPreambule} mots en tête du bloc : le rappel par décision se limite au delta)` : ""));
+  }
+
+  // ---- S23 (TF-0572, 24/08) — UN DÉSIGNATEUR INVENTÉ PAR L'AGENT ÉCHAPPE À S15 COMME À S20 ---
+  //
+  // LE FAIT. Le dossier remis le 24/08 nommait ses objets par des codes que l'agent venait de créer
+  // DANS LA MÊME SESSION — V1, V2, V3, V4 pour quatre contrôles de plausibilité géographique, A1,
+  // B2, E2 pour les décisions. Réponse du destinataire, mot pour mot : « Rien compris à V1, V3, V4,
+  // de quoi parle-t-on ? »
+  //
+  // POURQUOI LES DEUX RÈGLES EXISTANTES NE LE VOIENT PAS. S15 interdit l'identifiant nu comme SUJET
+  // d'une décision, et son exemple est TF-0469 : un identifiant DE REGISTRE, écrit ailleurs et
+  // avant. Elle vise ce que le lecteur ne peut pas connaître. Un code introduit par l'agent dans le
+  // même message passe son test de forme dès qu'une phrase de sujet l'accompagne — et c'était le
+  // cas. S20, elle, glose depuis un référentiel FERMÉ, alimenté par les termes du métier : un code
+  // né du jour n'y est pas et n'y sera jamais.
+  //
+  // CE QUI A MANQUÉ : le code a servi de RACCOURCI dans les renvois, les tableaux et les blocs
+  // suivants sans jamais redire ce qu'il désigne. La règle est donc sur l'USAGE, pas sur la
+  // naissance : *un désignateur court employé plus d'une fois porte sa glose à son PREMIER emploi*
+  // — entre parenthèses, après un tiret, après deux-points, ou en première cellule d'une ligne de
+  // tableau. Quatre mots suffisent. Sans glose, il n'existe pas pour le lecteur, et l'écrire c'est
+  // écrire pour soi.
+  const RE_DESIGNATEUR = /\b([A-Z]{1,4})-?(\d{1,3})\b/g;
+  const RE_DESIGNATEUR_UNIQUE = /^[A-Z]{1,4}-?\d{1,3}/;
+  // TF est exclu, et c'est la SEULE exclusion : l'identifiant de registre est déjà tenu par S14 (il
+  // est OBLIGATOIRE sur une action), par S15 (il est interdit comme sujet) et par S20 (il se glose).
+  // Toute autre forme courte — R-52, V4, A1, EA6 — est opaque au lecteur tant qu'elle n'est pas
+  // glosée, et l'exclure au motif qu'elle vit dans un de NOS référentiels serait raisonner depuis
+  // l'auteur : le lecteur n'a pas nos référentiels sous les yeux.
+  const EXCLUS_S23 = /^TF-?\d{3,4}$/;
+  const occurrences = new Map();
+  for (const m of texte.matchAll(RE_DESIGNATEUR)) {
+    const brut = m[0];
+    if (EXCLUS_S23.test(brut)) continue;
+    const cle = `${m[1]}${m[2]}`;
+    if (!occurrences.has(cle)) occurrences.set(cle, []);
+    occurrences.get(cle).push(m.index);
+  }
+  /** Glosé : le token est suivi d'un ouvreur de glose, puis d'au moins quatre mots. */
+  const estGlose = (i, brut) => {
+    const apres = texte.slice(i + brut.length, i + brut.length + 200).replace(/^\*\*/, "");
+    const m = /^\s*([(—–:|=§]|\bpour\b|\bdésigne\b|\bc'est\b)\s*([^)|\n.]{4,})/.exec(apres);
+    return Boolean(m) && m[2].split(/\s+/).filter(Boolean).length >= 4;
+  };
+  const nonGloses = [...occurrences.entries()]
+    .filter(([, positions]) => positions.length >= 2)
+    .filter(([, positions]) => !positions.some((i) => estGlose(i, texte.slice(i).match(RE_DESIGNATEUR_UNIQUE)?.[0] || "")))
+    .map(([cle, positions]) => `${cle} (${positions.length} emplois)`);
+  if (!occurrences.size) {
+    ok("S23", "aucun désignateur court employé — rien à gloser");
+  } else if (nonGloses.length) {
+    ko("S23", `${nonGloses.length} désignateur(s) employé(s) plusieurs fois sans jamais être glosé(s) : ` +
+      `${nonGloses.join(", ")} — « rien compris à V1, V3, V4, de quoi parle-t-on ? » est la réponse ` +
+      "que cette forme obtient. Quatre mots au premier emploi suffisent : « V1 (plausibilité de la " +
+      'commune) », ou une ligne de tableau « | V1 | plausibilité de la commune | »');
+  } else {
+    ok("S23", `${occurrences.size} désignateur(s) court(s), chacun glosé à son premier emploi`);
   }
 
   // ---- S16 (22/08) — une question dont la réponse est DANS les documents ne se pose pas nue ---
@@ -708,7 +858,7 @@ publication ci-dessous.
 Campagne · forge-tests · terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot.
 
 ## 2. Verdict
-Recette S-01 TENU — 19/19 défauts détectés au banc rouge, pytest 365.
+Recette S-01 (banc rouge de la forge de tests) TENU — 19/19 défauts détectés au banc rouge, pytest 365.
 
 Coût de la reprise proposée : complexité moyen · durée court.
 
@@ -767,15 +917,25 @@ Aucun écart : la demande a été suivie à la lettre.
     .replace("terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot.", "terminée aujourd'hui.")
     .replace("- Regroupement par cause racine : motif — sa cause est traitée, critère de réouverture écrit.", "- Regroupement par cause racine")
     .replace("Coût de la reprise proposée : complexité moyen · durée court.", "Coût de la reprise proposée : 2-3 j.")
-    .replace("Recette S-01 TENU — 19/19 défauts détectés au banc rouge, pytest 365.", "Tout s'est bien passé.")
+    .replace("Recette S-01 (banc rouge de la forge de tests) TENU — 19/19 défauts détectés au banc rouge, pytest 365.", "Tout s'est bien passé.")
     .replace(/— recommandé[^;]*;/, "—")
     .replace(/- Publier la version corrigée[\s\S]*?tant qu'on attend\./, "- Publier TF-0220 ?")
     // S22 : un NÉGATIF prononcé sur une ressource EXTERNE depuis une seule sonde — la forme exacte
     // des deux cas du 24/08 (un 404 en HEAD lu comme une page morte, un champ d'API lu comme une
     // absence). La phrase est ajoutée au bloc 7 pour ne pas perturber les règles du bloc 8.
+    // S23 : le designateur employe plusieurs fois et JAMAIS glose — la forme exacte du 24/08,
+    // ou le lecteur a repondu « rien compris a V1, V3, V4, de quoi parle-t-on ? ».
+    .replace("## 4. Traité", "## 4. Traité\n\n- Les controles V1 et V3 sont tenus ; V1 reste le plus couteux. — preuve : 4 cas.")
     .replace("## 7. Risques", "## 7. Risques\n\n- L'API du fournisseur ne rend aucun enregistrement TXT : il n'y a pas de TXT côté DNS.\n");
+  // TF-0567 — la branche « ouverture TITRÉE » a ses DEUX sens, sinon elle serait une porte ouverte :
+  // titrée et conforme doit passer (c'est le défaut mesuré : 30 mots lus comme 0), titrée et
+  // technique doit continuer d'échouer — un titre ne blanchit rien.
+  const titree = verte.replace("\nLe contrôle complet", "\n### 0. Synthèse d'ouverture\n\nLe contrôle complet");
+  const titreeSale = titree.replace("Rien n'attend de correction", "Rien n'attend de correction dans `oracle-synthese.mjs`");
   writeFileSync(join(dir, "verte.md"), verte, "utf8");
   writeFileSync(join(dir, "rouge.md"), rouge, "utf8");
+  writeFileSync(join(dir, "titree.md"), titree, "utf8");
+  writeFileSync(join(dir, "titree-sale.md"), titreeSale, "utf8");
   const moi = fileURLToPath(import.meta.url);
   const rv = spawnSync(process.execPath, [moi, join(dir, "verte.md")], { encoding: "utf8" });
   const rr = spawnSync(process.execPath, [moi, join(dir, "rouge.md")], { encoding: "utf8" });
@@ -784,13 +944,89 @@ Aucun écart : la demande a été suivie à la lettre.
   if (rr.status !== 1) casse.push("la fixture ROUGE ne FAIL pas");
   else {
     for (const regle of ["S2", "S3", "S5", "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16",
-                         "S17", "S18", "S19", "S20", "S21", "S22"]) {
+                         "S17", "S18", "S19", "S20", "S21", "S22", "S23"]) {
       if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
+    }
+  }
+  const rt = spawnSync(process.execPath, [moi, join(dir, "titree.md")], { encoding: "utf8" });
+  const rts = spawnSync(process.execPath, [moi, join(dir, "titree-sale.md")], { encoding: "utf8" });
+  if (!/"S9"[^}]*PASS/.test(rt.stdout)) {
+    casse.push("une ouverture TITRÉE et conforme n'est pas lue par S9 : " + (/"S9"[\s\S]{0,200}/.exec(rt.stdout) || [""])[0]);
+  }
+  if (!/"S9"[^}]*FAIL/.test(rts.stdout)) casse.push("une ouverture titrée mais TECHNIQUE passe S9 — le titre ne doit rien blanchir");
+  // TF-0568 — LES QUATRE MISES EN PAGE DE LA MEME DECISION. La mesure du 24/08 est celle-ci :
+  // le meme arbitrage, ecrit quatre fois, doit rendre le meme verdict. Avant correctif, une seule
+  // des quatre passait — la puce unique de douze lignes — et les trois autres rendaient S15 FAIL
+  // sur un chapeau vide ou tronque. Le cinquieme cas est le SENS ROUGE : meme tableau, chapeau
+  // reduit a quatre mots, S15 doit continuer d'echouer. Sans lui, l'elargissement serait une
+  // porte ouverte, et l'on aurait remplace une regle trop etroite par une regle qui ne juge rien.
+  const CHAPEAU = "Publier la version corrigee de la forge de tests ? Le banc rouge vient de tourner en entier : " +
+    "chaque defaut plante volontairement a ete detecte, donc la surveillance fonctionne et la version est prete.";
+  const OPT_A = "(a) taguer v1.12.0 maintenant — recommande : le journal de recette `recette-S01.md` ne porte aucun defaut ouvert ;";
+  const OPT_B = "(b) attendre le prochain lot — cout : les 26 commits restent locaux.";
+  const DEFAUT = "sans decision : rien n'est publie.";
+  const MISES_EN_PAGE = {
+    "puce unique": `- ${CHAPEAU}\n  - ${OPT_A}\n  - ${OPT_B}\n  - ${DEFAUT}\n`,
+    "puces filles a plat": `- ${CHAPEAU}\n- ${OPT_A}\n- ${OPT_B}\n- ${DEFAUT}\n`,
+    "tableau separe": `- ${CHAPEAU}\n\n| option | ce qu'elle coute |\n|---|---|\n| ${OPT_A} | — |\n| ${OPT_B} | — |\n| ${DEFAUT} | — |\n`,
+    "tableau sans puce": `${CHAPEAU}\n\n| option | ce qu'elle coute |\n|---|---|\n| ${OPT_A} | — |\n| ${OPT_B} | — |\n| ${DEFAUT} | — |\n`,
+  };
+  for (const [forme, corps] of Object.entries(MISES_EN_PAGE)) {
+    const f = join(dir, `d3-${forme.replace(/ /g, "-")}.md`);
+    writeFileSync(f, verte.replace(/## 3\. Décisions attendues[\s\S]*?(?=## 4\.)/, `## 3. Décisions attendues\n${corps}\n`), "utf8");
+    const r = spawnSync(process.execPath, [moi, f], { encoding: "utf8" });
+    for (const regle of ["S15", "S16"]) {
+      if (!new RegExp(`"${regle}"[^}]*PASS`).test(r.stdout)) {
+        casse.push(`mise en page « ${forme} » : ${regle} n'est pas PASS — ` +
+          (new RegExp(`"${regle}"[\\s\\S]{0,180}`).exec(r.stdout) || [""])[0].replace(/\s+/g, " "));
+      }
+    }
+  }
+  {
+    // Sens rouge de l'elargissement : la forme la plus permissive, avec un chapeau qui ne dit rien.
+    const f = join(dir, "d3-tableau-chapeau-nu.md");
+    const corps = `Publier la forge ?\n\n| option | cout |\n|---|---|\n| ${OPT_A} | — |\n| ${DEFAUT} | — |\n`;
+    writeFileSync(f, verte.replace(/## 3\. Décisions attendues[\s\S]*?(?=## 4\.)/, `## 3. Décisions attendues\n${corps}\n`), "utf8");
+    const r = spawnSync(process.execPath, [moi, f], { encoding: "utf8" });
+    if (!/"S15"[^}]*FAIL/.test(r.stdout)) casse.push("un chapeau de quatre mots au-dessus d'un tableau passe S15 — l'elargissement blanchirait tout");
+  }
+  // TF-0573 — LE CHAPEAU COMMUN, dans ses deux sens. Le fait : onze decisions issues d'une meme
+  // enquete. S15 demandant 25 mots de rappel a chacune, il ne restait qu'a repeter le contexte onze
+  // fois (illisible) ou a le supposer connu (ce qui a produit « aucune mise en contexte »). Le bloc
+  // 3 admet donc une prose de tete qui porte l'histoire UNE FOIS ; presente et substantielle, elle
+  // abaisse le rappel du par decision. Sens rouge : SANS elle, les memes rappels courts echouent —
+  // sinon on aurait supprime S15 en croyant l'assouplir.
+  {
+    const COMMUN = "Onze annonces immobilieres se sont retrouvees rattachees a la mauvaise commune, "
+      + "decouvertes en corrigeant une anomalie de recherche : la donnee de rattachement venait du "
+      + "libelle saisi et non du code officiel, et rien ne le verifiait a l'entree. Les decisions "
+      + "ci-dessous partagent toutes cette cause et se lisent dans cet ordre.";
+    const TROIS = ["premiere", "deuxieme", "troisieme"].map((r) =>
+      `- Corriger le rattachement de la ${r} annonce, celle que la recherche affiche sous une commune voisine depuis le 12 aout ?\n`
+      + `  - (a) recalculer depuis le code officiel — recommande : le referentiel `+ String.fromCharCode(96) + `communes.json` + String.fromCharCode(96) + ` porte le code ;\n`
+      + `  - (b) laisser en l'etat — cout : la recherche continue de mentir.\n`
+      + `  - sans decision : rien ne bouge.\n`).join("");
+    const avec = verte.replace(/## 3\. Décisions attendues[\s\S]*?(?=## 4\.)/,
+      `## 3. Décisions attendues\n\n${COMMUN}\n\n${TROIS}\n`);
+    const sans = verte.replace(/## 3\. Décisions attendues[\s\S]*?(?=## 4\.)/,
+      `## 3. Décisions attendues\n\n${TROIS}\n`);
+    const fA = join(dir, "d3-chapeau-commun.md");
+    const fS = join(dir, "d3-sans-chapeau.md");
+    writeFileSync(fA, avec, "utf8");
+    writeFileSync(fS, sans, "utf8");
+    const rA = spawnSync(process.execPath, [moi, fA], { encoding: "utf8" });
+    const rS = spawnSync(process.execPath, [moi, fS], { encoding: "utf8" });
+    if (!/"S15"[^}]*PASS/.test(rA.stdout)) {
+      casse.push("trois decisions sous un CHAPEAU COMMUN de 40 mots echouent S15 : " +
+        (/"S15"[\s\S]{0,200}/.exec(rA.stdout) || [""])[0].replace(/\s+/g, " "));
+    }
+    if (!/"S15"[^}]*FAIL/.test(rS.stdout)) {
+      casse.push("les memes rappels courts SANS chapeau commun passent S15 — l'assouplissement aurait supprime la regle");
     }
   }
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 2/2 PASS (verte PASS ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde)");
+    : "Self-test restitution : 11/11 PASS (verte PASS ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose)");
   process.exit(casse.length ? 1 : 0);
 }
 

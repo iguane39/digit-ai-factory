@@ -56,6 +56,9 @@ writeFileSync(join(verte, ".claude", "settings.json"),
   JSON.stringify({ hooks: { Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }] } }) + "\n");
 mkdirSync(join(verte, "forge", "hooks"), { recursive: true });
 writeFileSync(join(verte, "forge", "hooks", "factory.mjs"), readFileSync(join(GAB47, "hooks-factory.mjs"), "utf8"));
+// TF-0571 (24/08) : LE TEXTE de la doctrine voyage avec le hook qui la juge. La fixture verte le
+// porte donc aussi — sinon elle prouverait un heritage que le referentiel ne declare plus.
+writeFileSync(join(verte, "forge", "RESTITUTION.md"), readFileSync(join(GAB47, "RESTITUTION.md"), "utf8"));
 // R-27 verte : surface web ouverte aux agents IA + llms.txt à côté (un blocage CONSIGNÉ
 // reste conforme — la décision datée au-dessus de la règle)
 writeFileSync(join(verte, "robots.txt"),

@@ -53,6 +53,13 @@ const NON_JUGE = [
   "le contenu de `old\\`, canal d'échappement documenté pour un lot déjà traité ailleurs",
 ];
 
+// AU NIVEAU MODULE, ET CE N'EST PAS UN DÉTAIL DE STYLE : posée dans une fonction, cette constante
+// est tombée DEUX FOIS dans la zone morte temporelle d'un bloc qui la précédait — l'erreur avalée
+// par un `catch`, l'ensemble des dérogations vide, et le contrôle rendait FAIL en croyant avoir lu
+// le registre. Muet, pas faux : le pire état d'un contrôle. Une constante lue par plusieurs blocs
+// se déclare là où aucun ordre d'exécution ne peut la prendre de court.
+const RE_LIGNES = new RegExp(String.fromCharCode(92) + "r?" + String.fromCharCode(92) + "n");
+
 const SUFFIXE_SIDECAR = ".tf.jsonl";
 const SUFFIXE_NORMALISE = ".normalise.tf.jsonl";
 
@@ -211,6 +218,25 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
       message: "lot remis SANS sidecar — aucun canal ne peut l'ingérer, il est invisible par construction (`node todo\\normaliser-lot.mjs` ou sidecar à réclamer au produit)" });
   }
 
+  // GÉNÉRALISÉ À TOUTE RÈGLE (24/08, second passage). Le premier jet ne lisait les dérogations que
+  // pour R-46 : quatre lots ingérés le même jour sous une dérogation couvrant R-45 ET R-46 laissaient
+  // donc B6 rouge, alors que le sujet était tranché et tracé. Un contrôle qui ne reconnaît la
+  // décision que sur l'une des deux règles qu'elle nomme est un contrôle qui lit à moitié.
+  const derogesPar = new Map();      // règle -> ensemble de lots dérogés
+  for (const ligne of (() => { try { return readFileSync(registre, "utf8").split(RE_LIGNES); } catch { return []; } })()) {
+    if (!ligne.trim() || !ligne.includes('"ingestion"')) continue;
+    let e = null;
+    try { e = JSON.parse(ligne); } catch { continue; }
+    const regles = e?.derogation?.regles || [];
+    if (!regles.length) continue;
+    const base = String(e.fichier || "").split(/[\/]/).pop().replace(/\.tf\.jsonl$/, "");
+    if (!base) continue;
+    for (const r of regles) {
+      if (!derogesPar.has(r)) derogesPar.set(r, new Set());
+      derogesPar.get(r).add(base);
+    }
+  }
+
   // B6 (R-45, 21/08) — un lot remis DIT ce qu'il n'a pas remonté.
   //
   // Le fait qui la fait naître : un lot du 20/08 écrivait « Le lot ne remonte pas ces défauts,
@@ -241,6 +267,13 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
     if (!date || date[1] < SEUIL_B6) continue; // antériorité déclarée
     let texte = "";
     try { texte = readFileSync(join(repertoire, nom), "utf8"); } catch { continue; }
+    if ((derogesPar.get("R-45") || new Set()).has(nom.replace(/\.md$/, ""))) {
+      findings.push({ regle: "B6", statut: "SANS_OBJET", ou: nom,
+        message: "lot INCOMPLET au sens de R-45, mais ingéré sous DÉROGATION tracée au registre " +
+          "(décision humaine, motif écrit) — la règle reste vraie pour tout autre lot, et le rouge de " +
+          "celui-ci s'éteint parce que le sujet est tranché, pas parce qu'il est oublié" });
+      continue;
+    }
     if (!SECTION_B6.test(texte)) {
       findings.push({ regle: "B6", statut: "FAIL", ou: nom,
         message: "lot sans section « Remarques restées au produit » — ce qu'un produit corrige chez lui sans le remonter emporte la CLASSE du défaut avec lui (gabarit `gabarits\\RETOURS-FORGES.md`, R-45)" });
@@ -288,17 +321,6 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
   // temporelle, l'erreur était avalée par le `catch` du même bloc, et l'ensemble restait VIDE.
   // Le contrôle rendait donc FAIL en croyant avoir lu les dérogations — muet, pas faux : le
   // pire état pour un contrôle. Trouvé en le jouant sur le lot réel.
-  const RE_LIGNES = new RegExp(String.fromCharCode(92) + "r?" + String.fromCharCode(92) + "n");
-  const derogesB7 = new Set();
-  for (const ligne of (() => { try { return readFileSync(registre, "utf8").split(RE_LIGNES); } catch { return []; } })()) {
-    if (!ligne.trim() || !ligne.includes('"ingestion"')) continue;
-    let e = null;
-    try { e = JSON.parse(ligne); } catch { continue; }
-    const regles = e?.derogation?.regles || [];
-    if (!regles.includes("R-46")) continue;
-    const base = String(e.fichier || "").split(/[\/]/).pop().replace(/\.tf\.jsonl$/, "");
-    if (base) derogesB7.add(base);
-  }
   const SEUIL_B7 = "20260822";
   const SECTION_B7 = /^##\s+Retours\s+sur\s+les\s+documents\s+produits\s*$/im;
   const VERDICT_B7 = /gd-[a-z-]+|version[_ ]du[_ ]gabarit/i;
@@ -310,7 +332,7 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
     if (!date || date[1] < SEUIL_B7) continue; // antériorité déclarée
     let texte = "";
     try { texte = readFileSync(join(repertoire, nom), "utf8"); } catch { continue; }
-    if (derogesB7.has(nom.replace(/\.md$/, ""))) {
+    if ((derogesPar.get("R-46") || new Set()).has(nom.replace(/\.md$/, ""))) {
       findings.push({ regle: "B7", statut: "SANS_OBJET", ou: nom,
         message: "lot INCOMPLET au sens de R-46, mais ingéré sous DÉROGATION tracée au registre " +
           "(décision humaine, motif écrit) — la règle reste vraie pour tout autre lot, et le rouge " +
@@ -556,6 +578,19 @@ function selfTest() {
     derogation: { regles: ["R-46"], motif: "motif ecrit, decision humaine tracee", decision: "humaine" },
   }) + "\n");
   r = juger(boite, reg);
+  // B6 sous DÉROGATION (24/08, second passage) : la lecture ne reconnaissait que R-46, si bien que
+  // quatre lots ingérés sous une dérogation nommant R-45 ET R-46 laissaient B6 rouge. Un contrôle qui
+  // ne reconnaît la décision que sur l'une des deux règles qu'elle nomme lit à moitié.
+  writeFileSync(lotDoc, "# lot\n\n## Retours sur les documents produits\n\ngd-x v1\n");
+  appendFileSync(reg, JSON.stringify({
+    ev: "ingestion", lot_sha: "y", fichier: "PROD - RETOURS - 20260822a.tf.jsonl",
+    derogation: { regles: ["R-45"], motif: "motif ecrit, decision humaine tracee", decision: "humaine" },
+  }) + "\n");
+  r = juger(boite, reg);
+  cas.push(["B6 bis— lot sans « Remarques restées au produit » mais DÉROGÉ : SANS_OBJET, pas FAIL",
+    r.findings.some((f) => f.regle === "B6" && f.statut === "SANS_OBJET")
+    && !r.findings.some((f) => f.regle === "B6" && f.statut === "FAIL"), r.verdict]);
+
   cas.push(["B7 sexies— le MÊME lot, ingéré sous dérogation tracée : SANS_OBJET, pas FAIL",
     r.findings.some((f) => f.regle === "B7" && f.statut === "SANS_OBJET"), r.verdict]);
   cas.push(["B7 septies— et il ne reste AUCUN B7 en FAIL sur ce lot",

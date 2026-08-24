@@ -51,6 +51,10 @@ const poste = (nomProjet, { herite, sousDossier = null }) => {
     mkdirSync(join(projet, ".claude"), { recursive: true });
     writeFileSync(join(projet, "forge", "retours", "RETOURS-FORGES.md"), readFileSync(join(GAB, "RETOURS-FORGES.md"), "utf8"));
     writeFileSync(join(projet, "forge", "hooks", "factory.mjs"), readFileSync(join(GAB, "hooks-factory.mjs"), "utf8"));
+    // TF-0571 (24/08) : le TEXTE de la doctrine de restitution est entre a l heritage, a cote du
+    // hook qui la juge. Un produit conforme le porte donc, sinon la fixture verte prouverait un
+    // heritage que le referentiel ne declare plus.
+    writeFileSync(join(projet, "forge", "RESTITUTION.md"), readFileSync(join(GAB, "RESTITUTION.md"), "utf8"));
     writeFileSync(join(projet, ".claude", "settings.json"), JSON.stringify({ hooks: { Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }] } }));
     writeFileSync(join(projet, "CLAUDE.md"), "# projet\n\n## Précédence (R-43)\nLes règles de la factory priment.\n");
   }
