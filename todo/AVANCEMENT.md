@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau e3478fb9eaf2)]
+sources_de_verite: [todo/TODO.jsonl (sceau e7dbdfd1e147)]
 verifie_le: 2026-08-24
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `e3478fb9eaf2`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `e7dbdfd1e147`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
