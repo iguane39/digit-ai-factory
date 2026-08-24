@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=9a4dafdb7c4a archive=acf69e8da61a · dernier événement: 2026-08-24T19:10:18.213Z -->
+     sceaux: actifs=5a195b750063 archive=acf69e8da61a · dernier événement: 2026-08-24T19:13:55.050Z -->
 
-**122 actifs** (candidat 10 · décidé 1 · en cours 0 · corrigé 107 · écarté 4) · **469 archivés**.
+**122 actifs** (candidat 9 · décidé 1 · en cours 0 · corrigé 108 · écarté 4) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -14,7 +14,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0583 | candidat | 20 | L'oracle de contraste n'est appele par rien et ne peut pas se lancer | **oui** — 0 fichier du depot cite check-contrast.mjs ; chemin Edge code en dur, inexistant sur la machine |
 | TF-0588 | candidat | 20 | Un secret attendu se prepare, il ne se decrit pas en prose | **oui** — 3 fournisseurs, 3 aller-retours, dont 2 jetons OVH crees pour rien |
 | TF-0589 | candidat | 15 | Le gabarit d'environnement n'est confronte a rien | **oui** — .env = 11 cles, .env.example = 7 ; 4 cles OVH jamais reportees au gabarit |
-| TF-0585 | candidat | 12.5 | Un comportement destine aux visiteurs valide sur un protocole qu'ils n'utilisent pas | **oui** — 7 hostnames sur 8 injoignables en HTTPS apres avoir ete declares fonctionnels ; port 443 ferme sur 213.186.33.5 |
 | TF-0581 | candidat | 8.3 | Le seul verificateur de contraste ne regarde que le menu du header | **oui** — texte a ratio 1,0 reste en production ; oracle de contraste present au depot et scope au seul .header-line |
 | TF-0584 | candidat | 6 | Une sonde de contraste doit se confronter a la palette declaree du projet | **oui** — 2 erreurs de sonde successives produisant des verdicts faux, l'un negatif l'autre positif |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
@@ -173,6 +172,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0549 | decide | 10 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : `Produit-07` a un forge\retours\ mais rien de ce qui s'y fait n'est suivi | **oui** — mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration. |
 | TF-0590 | corrige | 20 | Un README de dossier reste PERIME apres regeneration : fins de ligne MIXTES dans le meme fichier, et le harnais tombe a 54/55 sans qu'aucune action ne le repare | **oui** — mesure le 25/08 : le harnais du pilot passe de 55/55 a 54/55 et n'en bouge plus — trois regenerations, trois fois le meme FAIL, un diff vide a chaque fois. Aucune action disponible ne le repare, ce qui est la definition d'un rouge qu'on apprend a ignorer. |
 | TF-0541 | corrige | 15 | Gabarit de projet : `CLAUDE.md` et `ledger.py` divergent, et le run est épinglé en dur | **oui** — forge/ledger.jsonl absent du disque ; ledger.py ligne 68 run codé en dur ; run 20260815 clos en seq 24 |
+| TF-0585 | corrige | 12.5 | Un comportement destine aux visiteurs valide sur un protocole qu'ils n'utilisent pas | **oui** — 7 hostnames sur 8 injoignables en HTTPS apres avoir ete declares fonctionnels ; port 443 ferme sur 213.186.33.5 |
 | TF-0471 | corrige | 10 | R-45 refuse des lots rédigés AVANT sa publication — deux lots Produit-05 bloqués à l'ingestion, dont un qui signalait un plantage réel du lanceur d'oracles | **oui** — payé le 22/08 : douze candidatures de deux lots restent hors du registre, et l'une d'elles nommait un défaut BLOQUANT du lanceur d'oracles qui n'a été corrigé que parce que la session l'a rencontré par un autre chemin — un refus de forme a mis un fait de production hors de portée |
 | TF-0548 | corrige | 8.3 | La couverture des regles se compte en REGLES, jamais en EXIGENCES : une regle qui en enonce cinq et n'en controle qu'une est comptee couverte — c'est ce qui a laisse passer le gabarit manquant | **oui** — paye et chiffre : QUINZE candidatures refusees a l'ingestion en trois jours, sur deux produits, pour une forme que ni l'un ni l'autre ne pouvait connaitre faute d'avoir le gabarit — que la regle 18 exigeait par ecrit depuis le 06/08 et que rien ne verifiait. Le taux de couverture affichait 24 regles sur 26, soit 92 %, pendant tout ce temps. Sur la seule regle 18, la couverture reelle est de 1 exigence controlee sur 5. |
 | TF-0586 | corrige | 8.3 | Aucun oracle ne verifie qu'un nom de domaine declare repond | **oui** — 8 hostnames declares, 0 controle ; base par defaut de check-redirects encore sur l'URL Railway apres bascule |
