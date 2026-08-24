@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=a9bd6df236cf archive=54c0315cbe97 · dernier événement: 2026-08-24T08:05:10.929Z -->
+     sceaux: actifs=1f84fc492a79 archive=54c0315cbe97 · dernier événement: 2026-08-24T09:19:49.898Z -->
 
-**85 actifs** (candidat 2 · décidé 1 · en cours 0 · corrigé 78 · écarté 4) · **469 archivés**.
+**85 actifs** (candidat 0 · décidé 1 · en cours 0 · corrigé 80 · écarté 4) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -57,10 +57,12 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0484 | corrige | 25 | forge-agents : run-oracles.mjs plante sur JSON_OUT non defini, n affiche jamais son verdict et retourne 1 sur un PASS — le hook d ecriture bloque alors toute ecriture | **oui** — Bloque le hook d ecriture de tout l ecosysteme : deux ecritures refusees sur des fichiers au verdict PASS pendant cette seule passe. |
+| TF-0551 | corrige | 25 | page-html : render_page rend PASS sur une page qui perd 28 % de son contenu — un oracle visuel ne peut pas voir ce qu'overflow:hidden a rogne | **oui** — deux oracles verts sur un document ampute de deux sections entieres et de son pied de page — le defaut n'a ete vu que par un comptage de mots declenche par une demande sans rapport |
 | TF-0485 | corrige | 20 | forge-agents : oracle-claims analyse le JavaScript inline et lit la reference arriere $1 d une expression reguliere comme un montant en dollars | **oui** — FAIL bloquant sur un livrable conforme ; une demi-heure a remonter d un message pointant une accolade ouvrante jusqu a une expression reguliere. |
 | TF-0488 | corrige | 20 | forge-design : la regle L1 « ponctuation orpheline » classe un element comme bloc a cause d un selecteur ou le display s applique a un descendant | **oui** — Six echecs bloquants simultanes sur du texte correct ; lecture du code source de l oracle necessaire pour comprendre la cause. |
 | TF-0499 | corrige | 20 | forge-design : le composant tableau repliable de composants.md met table en display:block sans sa legende, qui est alors reduite a une colonne d un mot | **oui** — Quinze tableaux d un livrable client illisibles en mobile pendant quatre versions ; trouve par la lecture, hors de portee des quatre oracles. |
 | TF-0486 | corrige | 15 | forge-agents : oracle-claims analyse le CSS et lit les couleurs hexadecimales purement numeriques comme des nombres non sources | **oui** — FAIL sur des valeurs prescrites par la charte ; contournement contraire a la charte elle-meme. |
+| TF-0552 | corrige | 15 | page-html : le message de remediation de L2 prescrit la moitie du geste et conduit tout droit a une seconde violation de L2 | **oui** — un aller-retour d'oracle complet, plus la lecture d'un document tiers, pour un geste que le message aurait pu nommer en entier |
 | TF-0491 | corrige | 12.5 | forge-design : aucun controle ne compare la largeur d un bloc de texte a celle de ses blocs freres — trois allers-retours client sur le meme defaut | **oui** — Trois allers-retours client sur un seul defaut, sur quatre versions livrees. |
 | TF-0487 | corrige | 10 | forge-agents : confirmation de RA-4 sur un autre motif — les sources citees verbatim sont analysees comme du contenu propre au livrable | **oui** — Deuxieme occurrence du meme mecanisme en deux passes, sur un livrable dont l autoportance impose d embarquer ses sources. |
 | TF-0492 | corrige | 10 | forge-design : aucun controle ne detecte un mot coupe en deux au rendu (Utilisabl/e, Plateform/e, 231 occurrenc/es) | **oui** — Trois occurrences signalees par le client sur deux versions successives, dont une apres une correction incomplete. |
@@ -124,13 +126,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0539 | corrige | 9 | `.env.forge-tests` : la forge énumère les clés attendues mais ne dépose pas le gabarit | **oui** — rapport de 1,1 Mo énumérant les clés par pan ; aucun gabarit déposé côté projet |
 | TF-0480 | corrige | 8.3 | forge-tests : le plancher visuel (V1 debordement, V2 contraste, V4 chevauchements) n est atteignable que sur un FICHIER html local — aucun produit SERVI n est jugeable, et les trois autres portes sont fermees | **oui** — En-tete compresse et menu anglais au tiers de la largeur en production de juin a aout 2026 sur produit-07, non vus par deux campagnes de verification declarees completes. |
 | TF-0538 | ecarte | 12 | Journal de boucle : la forge nomme le fichier, le format et la règle, mais ne l'amorce pas | **oui** — boucle.statut=en_cours sur un audit de 16 pans effectivement exécutés ; le rapport nomme le fichier et la règle TF-0353 |
-
-## digit-ai-page-html
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0551 | candidat | 25 | page-html : render_page rend PASS sur une page qui perd 28 % de son contenu — un oracle visuel ne peut pas voir ce qu'overflow:hidden a rogne | **oui** — deux oracles verts sur un document ampute de deux sections entieres et de son pied de page — le defaut n'a ete vu que par un comptage de mots declenche par une demande sans rapport |
-| TF-0552 | candidat | 15 | page-html : le message de remediation de L2 prescrit la moitie du geste et conduit tout droit a une seconde violation de L2 | **oui** — un aller-retour d'oracle complet, plus la lecture d'un document tiers, pour un geste que le message aurait pu nommer en entier |
 
 ## pilot
 
