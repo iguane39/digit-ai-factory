@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=92c300ca0ce0 archive=54c0315cbe97 · dernier événement: 2026-08-24T06:58:54.540Z -->
+     sceaux: actifs=b24fb6cf314c archive=54c0315cbe97 · dernier événement: 2026-08-24T07:12:32.680Z -->
 
-**82 actifs** (candidat 6 · décidé 1 · en cours 0 · corrigé 71 · écarté 4) · **469 archivés**.
+**84 actifs** (candidat 8 · décidé 1 · en cours 0 · corrigé 71 · écarté 4) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -123,6 +123,13 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0539 | corrige | 9 | `.env.forge-tests` : la forge énumère les clés attendues mais ne dépose pas le gabarit | **oui** — rapport de 1,1 Mo énumérant les clés par pan ; aucun gabarit déposé côté projet |
 | TF-0480 | corrige | 8.3 | forge-tests : le plancher visuel (V1 debordement, V2 contraste, V4 chevauchements) n est atteignable que sur un FICHIER html local — aucun produit SERVI n est jugeable, et les trois autres portes sont fermees | **oui** — En-tete compresse et menu anglais au tiers de la largeur en production de juin a aout 2026 sur produit-07, non vus par deux campagnes de verification declarees completes. |
 | TF-0538 | ecarte | 12 | Journal de boucle : la forge nomme le fichier, le format et la règle, mais ne l'amorce pas | **oui** — boucle.statut=en_cours sur un audit de 16 pans effectivement exécutés ; le rapport nomme le fichier et la règle TF-0353 |
+
+## digit-ai-page-html
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0551 | candidat | 25 | page-html : render_page rend PASS sur une page qui perd 28 % de son contenu — un oracle visuel ne peut pas voir ce qu'overflow:hidden a rogne | **oui** — deux oracles verts sur un document ampute de deux sections entieres et de son pied de page — le defaut n'a ete vu que par un comptage de mots declenche par une demande sans rapport |
+| TF-0552 | candidat | 15 | page-html : le message de remediation de L2 prescrit la moitie du geste et conduit tout droit a une seconde violation de L2 | **oui** — un aller-retour d'oracle complet, plus la lecture d'un document tiers, pour un geste que le message aurait pu nommer en entier |
 
 ## pilot
 
