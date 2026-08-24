@@ -152,7 +152,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>367503cde9e3</code> · dernier événement 2026-08-24T19:13:55.050Z</p>
+      <p class="meta">sceau <code>29636488cc6a</code> · dernier événement 2026-08-24T19:23:24.685Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -162,7 +162,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="9 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">9</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="8 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">8</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="1 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">1</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="468 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">468</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -2909,29 +2909,6 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0580" data-cite data-forge="digit-ai-forge-tests" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0580</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-tests : rien ne detecte qu une copie VENDORISEE a diverge de sa source — le site annoncait v1.6.2 et 80 services quand le catalogue portait v1.8.0 et 83</h3>
-          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 24/08. Le `Dockerfile` pose `ENV FORGE_ROOT=/app/vendor` : en production, `vendor/digit-ai-factory/catalogues/catalogue.jsonl` EST la source qui alimente la base et donc les chiffres affiches. AUCUN mecanisme ne la rafraichit et AUCUN controle ne la compare a l amont. Mesure : le site annoncait v1.6.2 et 80 services quand le catalogue en portait v1.8.0 et 83 — DEUX VERSIONS DE RETARD, sur un site dont l argument entier est la PREUVE DATEE. Le retard etait masque par un second effet : l amont a renomme la forge `seo` en `seo-geo`, ce qui fait echouer la regeneration par un refus net (`forges hors regroupement connu : ['seo-geo']`). Le refus est BON — il ne devine pas — mais personne ne le voit tant que personne ne lance le script, et rien ne rappelle qu il faut le lancer. Une donnee perimee ne leve aucun drapeau : elle s affiche. PROPOSITION : un controle de FRAICHEUR DES COPIES VENDORISEES — pour toute copie declaree d une source connue, comparer l empreinte et rendre l ecart en constat date. Ce n est ni un test unitaire ni un test d integration : c est la meme famille que la parite de routes du pan i18n, deux arborescences qu on met en regard. COROLLAIRE DE DOCTRINE, valable au-dela de ce cas : un chiffre affiche sur une vitrine se COMPTE AU RENDU, il ne se recopie jamais — c est ce qui a ete fait cote produit, les comptes de la nouvelle une sont des SELECT et non des litteraux.</p></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>Chiffres periemes affiches en production pendant cinq jours (v1.6.2/80 contre v1.8.0/83) sur le bandeau de preuve d un site dont l argument est la preuve datee.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">factory-digit-ai-fr</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-corrige" id="item-TF-0543" data-cite data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0543</code>
@@ -3084,6 +3061,29 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>DEUX executions de la recette, DEUX verdicts refuses, la seconde sur un arbre nettoye a la main juste avant — le refus est donc systematique et non accidentel. Sous ce refus, trois domaines ECHEC dont un banc VERT a 3 findings bloquants pour 0 attendu, 47 erreurs de linter sur 14 fichiers, et une vue HTML qui echoue au controle du socle. Une recette qui ne peut pas rendre de verdict est une recette qu'on cesse de jouer, et c'est ainsi que trois rouges s'installent.</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du 24/08 en jouant la recette de forge-tests apres livraison de TF-0578 — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0580" data-cite data-forge="digit-ai-forge-tests" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0580</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-tests : rien ne detecte qu une copie VENDORISEE a diverge de sa source — le site annoncait v1.6.2 et 80 services quand le catalogue portait v1.8.0 et 83</h3>
+          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 24/08. Le `Dockerfile` pose `ENV FORGE_ROOT=/app/vendor` : en production, `vendor/digit-ai-factory/catalogues/catalogue.jsonl` EST la source qui alimente la base et donc les chiffres affiches. AUCUN mecanisme ne la rafraichit et AUCUN controle ne la compare a l amont. Mesure : le site annoncait v1.6.2 et 80 services quand le catalogue en portait v1.8.0 et 83 — DEUX VERSIONS DE RETARD, sur un site dont l argument entier est la PREUVE DATEE. Le retard etait masque par un second effet : l amont a renomme la forge `seo` en `seo-geo`, ce qui fait echouer la regeneration par un refus net (`forges hors regroupement connu : ['seo-geo']`). Le refus est BON — il ne devine pas — mais personne ne le voit tant que personne ne lance le script, et rien ne rappelle qu il faut le lancer. Une donnee perimee ne leve aucun drapeau : elle s affiche. PROPOSITION : un controle de FRAICHEUR DES COPIES VENDORISEES — pour toute copie declaree d une source connue, comparer l empreinte et rendre l ecart en constat date. Ce n est ni un test unitaire ni un test d integration : c est la meme famille que la parite de routes du pan i18n, deux arborescences qu on met en regard. COROLLAIRE DE DOCTRINE, valable au-dela de ce cas : un chiffre affiche sur une vitrine se COMPTE AU RENDU, il ne se recopie jamais — c est ce qui a ete fait cote produit, les comptes de la nouvelle une sont des SELECT et non des litteraux.</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>Chiffres periemes affiches en production pendant cinq jours (v1.6.2/80 contre v1.8.0/83) sur le bandeau de preuve d un site dont l argument est la preuve datee.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">factory-digit-ai-fr</dd></div>
             
           </dl>
         </article>

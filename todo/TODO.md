@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=367503cde9e3 archive=54c0315cbe97 · dernier événement: 2026-08-24T19:13:55.050Z -->
+     sceaux: actifs=29636488cc6a archive=acf69e8da61a · dernier événement: 2026-08-24T19:23:24.685Z -->
 
-**137 actifs** (candidat 9 · décidé 1 · en cours 0 · corrigé 123 · écarté 4) · **469 archivés**.
+**137 actifs** (candidat 8 · décidé 1 · en cours 0 · corrigé 124 · écarté 4) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -170,7 +170,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0580 | candidat | 10 | forge-tests : rien ne detecte qu une copie VENDORISEE a diverge de sa source — le site annoncait v1.6.2 et 80 services quand le catalogue portait v1.8.0 et 83 | **oui** — Chiffres periemes affiches en production pendant cinq jours (v1.6.2/80 contre v1.8.0/83) sur le bandeau de preuve d un site dont l argument est la preuve datee. |
 | TF-0543 | corrige | 25 | Trois listes d'exclusion divergentes : `input` manque aux deux qui comptent, 3e occurrence de la famille | **oui** — 3 listes d'exclusion distinctes (interface.py _EXCLUS, securite.py _EXCLUS_DEPENDANCES, disposition.py _HORS_SOURCES) ; 2 lots anterieurs (20260814a x2) ont deja rallonge les deux premieres |
 | TF-0542 | corrige | 20 | Aucun levier projet ne borne le perimetre de fichiers : RT-1 n'est pas une config omise | **oui** — 37 cles FORGE_TESTS_* relevees dans forge_tests/ ; aucune ne borne le perimetre de fichiers des pans interface/securite/prompts |
 | TF-0602 | corrige | 15 | forge-tests : le registre de dette a un `--verifier` qui fonctionne et que rien ne joue a la livraison — 15 limites declarees par le code lui manquaient, sur trois modules livres les 22 et 23/08 | **oui** — QUINZE limites declarees par le code et absentes du registre commite, sur TROIS modules livres les 22 et 23/08 — soit la reapparition du defaut fondateur de TF-0384 deux jours apres sa correction, par une autre cause. L'ecart n'a ete trouve par aucun controle : il l'a ete par un appel ACCIDENTEL a un outil dont `--help` regenere le fichier au lieu d'afficher une aide. |
@@ -178,6 +177,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0470 | corrige | 10 | forge-tests : les routes attendues par locale se DÉCLARENT — la parité de routes reste aveugle sur un produit dont le build ne laisse aucune arborescence | **oui** — mesuré sur produit-07, 201 pages FR / 201 EN en production : le pan sortirait en NA/SKIP sur la parité de routes pendant qu'un écart de route vit en production — et le produit est celui sur lequel le pan a été conçu, ce qui rend le trou d'autant plus coûteux : la forge ne voit plus le défaut qui l'a fait naître |
 | TF-0537 | corrige | 10 | Oracle secrets : clés API de tiers dans du JS minifié aspiré, comptées bloquantes | **oui** — 9 constats securite, 9 hors produit, 6 classés bloquants ; 3 déjà qualifiés placeholder par l'oracle lui-même |
 | TF-0601 | corrige | 10 | forge-tests : la recette REFUSE son propre verdict parce qu'elle salit l'arbre qu'elle surveille — deux fichiers deposes par elle-meme, et trois domaines rouges qui vivent sous ce refus | **oui** — DEUX executions de la recette, DEUX verdicts refuses, la seconde sur un arbre nettoye a la main juste avant — le refus est donc systematique et non accidentel. Sous ce refus, trois domaines ECHEC dont un banc VERT a 3 findings bloquants pour 0 attendu, 47 erreurs de linter sur 14 fichiers, et une vue HTML qui echoue au controle du socle. Une recette qui ne peut pas rendre de verdict est une recette qu'on cesse de jouer, et c'est ainsi que trois rouges s'installent. |
+| TF-0580 | corrige | 10 | forge-tests : rien ne detecte qu une copie VENDORISEE a diverge de sa source — le site annoncait v1.6.2 et 80 services quand le catalogue portait v1.8.0 et 83 | **oui** — Chiffres periemes affiches en production pendant cinq jours (v1.6.2/80 contre v1.8.0/83) sur le bandeau de preuve d un site dont l argument est la preuve datee. |
 | TF-0539 | corrige | 9 | `.env.forge-tests` : la forge énumère les clés attendues mais ne dépose pas le gabarit | **oui** — rapport de 1,1 Mo énumérant les clés par pan ; aucun gabarit déposé côté projet |
 | TF-0593 | corrige | 9 | tests : un substitut d identite local doit JOUER la connexion, jamais la FABRIQUER — et rien ne le dit | **oui** — sessions fabriquees pendant neuf jours sans qu aucune porte ne le voie ; le correctif lui-meme a echoue une premiere fois sur le corollaire du stockage, en passant tsc, eslint, 137 tests unitaires et le harnais de connexion |
 | TF-0604 | corrige | 9 | tests : un seuil de couverture GLOBAL ne peut pas echouer sur un ecran non teste, et le DENOMINATEUR du calcul n est jamais exige d etre declare | **oui** — neuf points d ecart entre couverture affichee et couverture reelle, dans les deux sens ; deux ecrans livres a 1,88 % et 12,5 % sous un seuil global vert ; 90,6 % d instructions contre 37,5 % de fonctions sur le meme fichier, l indicateur rapporte etant celui qui prouve le moins |
