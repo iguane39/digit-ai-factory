@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * oracle-lot-retours.test.mjs — le juge de la forme d'un lot, dans les DEUX sens (TF-0582).
+ * oracle-lot-retours.test.mjs — le juge de la forme d'un lot, dans les DEUX sens (TF-0597).
  *
  * Ce module est la SOURCE des règles jouées à deux endroits : chez le produit avant la remise,
  * et à la porte du pilot à l'ingestion. Un défaut ici se paie donc deux fois, et une règle qui
@@ -24,7 +24,7 @@ const R45 = "## Remarques restées au produit\n\n| x | y |\n|---|---|\n| une rem
 const R46 = "## Retours sur les documents produits\n\n| doc | gd-fiche-securite 1.0.0 | section absente |\n";
 const constat = (r, regle) => r.constats.find((c) => c.regle === regle);
 
-console.log("oracle-lot-retours — la forme d'un lot, jugée avant la remise (TF-0582)\n");
+console.log("oracle-lot-retours — la forme d'un lot, jugée avant la remise (TF-0597)\n");
 
 // ---- Les deux sens de chaque règle -----------------------------------------------------------
 check("verte — les deux sections présentes et substantielles : PASS", () => {
@@ -117,5 +117,5 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
   if (r.verdict !== "PASS") throw new Error(`verdict ${r.verdict} — un titre en capitales sans accent reste le même titre`);
 });
 
-console.log(`\noracle-lot-retours (TF-0582) : ${pass} PASS, ${echec} FAIL`);
+console.log(`\noracle-lot-retours (TF-0597) : ${pass} PASS, ${echec} FAIL`);
 process.exit(echec ? 1 : 0);

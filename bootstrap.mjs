@@ -334,7 +334,7 @@ console.log("");
       suspects.push({ nom, motif: `dépôt de l'écosystème HORS LISTE avec son propre origin (${o || "origin illisible"}) — ni forge suivie, ni second clone, ni mise de côté : jamais vérifié par --pull. À inscrire dans la liste des forges, ou à déclarer hors périmètre` });
     }
   }
-  // ---- LE VERSANT FICHIERS DU MÊME BALAYAGE (TF-0583, 24/08/2026) ---------------------------
+  // ---- LE VERSANT FICHIERS DU MÊME BALAYAGE (TF-0598, 24/08/2026) ---------------------------
   // Ce balayage ne lisait que les RÉPERTOIRES — `filter((e) => e.isDirectory())` — et c'est
   // exactement pour cette raison qu'un fichier a pu vivre trois jours à la racine du parc sans
   // qu'aucun contrôle joué chaque matin ne le nomme.

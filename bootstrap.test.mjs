@@ -169,7 +169,7 @@ try {
     attendre("racine propre une fois le doublon retiré", lancer(), 0, /racine propre/);
   }
 
-  // 3 ter. LE VERSANT FICHIERS (TF-0583) — le balayage ne lisait que les RÉPERTOIRES, et c'est
+  // 3 ter. LE VERSANT FICHIERS (TF-0598) — le balayage ne lisait que les RÉPERTOIRES, et c'est
   //     pour cette raison qu'un fichier a vécu trois jours à la racine du parc sans qu'aucun
   //     contrôle ne le nomme. Les deux sens, et le second compte autant : un fichier ordinaire à
   //     la racine ne doit RIEN déclencher, sinon le contrôle crie sur des archives légitimes.
@@ -205,4 +205,4 @@ try {
 }
 
 if (echecs.length) { console.error("bootstrap : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log(`bootstrap : ${joues}/${joues} — vierge clone ${FORGES.length}/${FORGES.length}, retard refusé puis résorbé par --pull, alias renommé sans doublon, second clone et répertoire non versionné DÉCLARÉS sans être effacés (TF-0525), puits de redirection raté déclaré avec sa CAUSE et un fichier ordinaire muet (TF-0583), clone d'AVANT un renommage reconnu par sa table d'alias (TF-0533), preuve absente refusée puis restaurée`);
+console.log(`bootstrap : ${joues}/${joues} — vierge clone ${FORGES.length}/${FORGES.length}, retard refusé puis résorbé par --pull, alias renommé sans doublon, second clone et répertoire non versionné DÉCLARÉS sans être effacés (TF-0525), puits de redirection raté déclaré avec sa CAUSE et un fichier ordinaire muet (TF-0598), clone d'AVANT un renommage reconnu par sa table d'alias (TF-0533), preuve absente refusée puis restaurée`);

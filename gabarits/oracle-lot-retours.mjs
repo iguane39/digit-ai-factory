@@ -3,7 +3,7 @@
  * oracle-lot-retours.mjs — juge la FORME d'un lot de retours (R-45, R-46) AVANT sa remise.
  *
  * ============================================================================================
- * POURQUOI CE FICHIER EXISTE (TF-0582, 24/08/2026)
+ * POURQUOI CE FICHIER EXISTE (TF-0597, 24/08/2026)
  * ============================================================================================
  *
  * En une seule journée, SIX lots ont dû être admis par DÉROGATION, tous pour la même faute de

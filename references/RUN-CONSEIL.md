@@ -19,7 +19,7 @@ complet, ledger dès l'ouverture (`run_open`, `invocation` par service mobilisé
 routage et mesure (CONTRAT-INTERFACE §4/§4 bis). S'y ajoute : **lecture seule absolue
 sur le SI étudié** — un run de conseil ne modifie jamais le système qu'il instruit.
 
-**Deux règles de méthode, nées de deux faux négatifs payés le même jour** (TF-0581, 24/08/2026,
+**Deux règles de méthode, nées de deux faux négatifs payés le même jour** (TF-0596, 24/08/2026,
 retour Produit-10). Elles ne sont pas des précautions de rédaction : chacune a produit une réponse
 FAUSSE rendue avec l'apparence de la rigueur, et l'une des deux a fondé une demande d'évolution
 de schéma qu'il a fallu suspendre.
@@ -46,7 +46,7 @@ de schéma qu'il a fallu suspendre.
   nom, une contrainte de clé plutôt qu'un libellé —, ou se borne explicitement au nom. Contrôle :
   `oracle-synthese` **S24**, joué par le hook de restitution à chaque fin de tour.
 
-**Deux règles de plus, du même jour et de la même famille** (TF-0584 et TF-0585, objection humaine
+**Deux règles de plus, du même jour et de la même famille** (TF-0599 et TF-0600, objection humaine
 du 24/08). Les deux précédentes disent *où* on regarde ; celles-ci disent *comment on lit ce qu'on
 y trouve*.
 

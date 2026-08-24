@@ -575,7 +575,7 @@ function juger(texte) {
     else ok("S22", `${risquees.length} négatif(s) externe(s), chacun corroboré par une seconde sonde ou formulé comme une lecture de source`);
   }
 
-  // ---- S24 (TF-0581, 24/08) — une recherche par NOM qui ne trouve rien n'établit que l'absence
+  // ---- S24 (TF-0596, 24/08) — une recherche par NOM qui ne trouve rien n'établit que l'absence
   // du NOM -----------------------------------------------------------------------------------------
   //
   // SŒUR DE S22, ET DÉLIBÉRÉMENT DISTINCTE. S22 traite le négatif prononcé sur une ressource

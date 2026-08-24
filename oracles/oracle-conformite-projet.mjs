@@ -769,7 +769,7 @@ else {
     if (!existsSync(join(dp, f))) { ko("R-20", `docs\\projet\\${f}`, "projection générée manquante — régénérer via les scripts du pilot (generer-architecture / generer-modele-donnees)"); ok20 = false; }
   }
   if (ok20) ok("R-20", "docs\\projet\\", `${FICHIERS_DP.length} fichiers + ${PROJECTIONS_DP.length} projections présents, frontmatter machine complet`);
-  // R-20 (suite) · COMPOSANTS-OPS porte aussi les ENVIRONNEMENTS DE DONNÉES (TF-0579, 24/08,
+  // R-20 (suite) · COMPOSANTS-OPS porte aussi les ENVIRONNEMENTS DE DONNÉES (TF-0594, 24/08,
   // retour Produit-10). LE FAIT MESURÉ : le fichier était défini comme l'inventaire des COMPOSANTS
   // DÉPLOYÉS, « depuis ops etat / plans / DOSSIER-MEP ». Un produit d'analyse qui ne déploie
   // RIEN mais interroge PLUSIEURS workspaces n'avait donc, en toute conformité, qu'à y écrire
@@ -799,9 +799,9 @@ else {
     if (aLaSection)
       ok("R-20", "docs\\projet\\COMPOSANTS-OPS.md", "section « Environnements de données » présente — les instances INTERROGÉES sont déclarées, pas seulement les composants déployés");
     else if (verifieCop && verifieCop >= "2026-08-24")
-      ko("R-20", "docs\\projet\\COMPOSANTS-OPS.md", `section « Environnements de données » absente d'un document revu le ${verifieCop}, donc APRÈS l'entrée en vigueur (TF-0579, 24/08) : un produit qui ne déploie rien mais LIT des workspaces n'a alors aucun endroit où déclarer ce qu'il interroge, et un nom d'instance donné par un humain ne se rapproche de rien dans le dépôt. Par environnement : nom d'affichage, hôte, identifiant, metastore, profil de connexion, entrepôt employé, et les catalogues avec leur MODE D'ACCÈS (lu / écrit / jamais ouvert) ; plus une section pour ceux connus par DOCUMENTS INTERPOSÉS. La section se déclare même vide — « aucun environnement de données interrogé » — jamais par silence (loi n° 3). Gabarit : gabarits\\docs-projet\\COMPOSANTS-OPS.md`);
+      ko("R-20", "docs\\projet\\COMPOSANTS-OPS.md", `section « Environnements de données » absente d'un document revu le ${verifieCop}, donc APRÈS l'entrée en vigueur (TF-0594, 24/08) : un produit qui ne déploie rien mais LIT des workspaces n'a alors aucun endroit où déclarer ce qu'il interroge, et un nom d'instance donné par un humain ne se rapproche de rien dans le dépôt. Par environnement : nom d'affichage, hôte, identifiant, metastore, profil de connexion, entrepôt employé, et les catalogues avec leur MODE D'ACCÈS (lu / écrit / jamais ouvert) ; plus une section pour ceux connus par DOCUMENTS INTERPOSÉS. La section se déclare même vide — « aucun environnement de données interrogé » — jamais par silence (loi n° 3). Gabarit : gabarits\\docs-projet\\COMPOSANTS-OPS.md`);
     else
-      antecedences.push(`R-20 (environnements de données) non jugé sur docs\\projet\\COMPOSANTS-OPS.md : la section naît le 24/08 (TF-0579) et le document porte verifie_le=${verifieCop || "non daté"} — antériorité déclarée, jamais un défaut de produit ; elle sera exigée dès la prochaine revue datée`);
+      antecedences.push(`R-20 (environnements de données) non jugé sur docs\\projet\\COMPOSANTS-OPS.md : la section naît le 24/08 (TF-0594) et le document porte verifie_le=${verifieCop || "non daté"} — antériorité déclarée, jamais un défaut de produit ; elle sera exigée dès la prochaine revue datée`);
   }
 
 

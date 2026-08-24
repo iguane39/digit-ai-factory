@@ -108,7 +108,7 @@ JAMAIS éditées à la main — R-20 exige leur présence). Chaque étape actual
 fichiers : conception → FONCTIONNEL (vue d'`EXIGENCES.json`) · design/development → TECHNOS
 (ancré lockfiles, R-21), ARCHITECTURE et COMMANDES · development → MODELE-DONNEES **depuis
 le schéma réel** (provenance par table, R-26) · MEP → COMPOSANTS-OPS, PARAMETRAGE (URLs au
-motif R-24) et ACCES-TEST. **COMPOSANTS-OPS porte DEUX inventaires, pas un** (TF-0579, 24/08) :
+motif R-24) et ACCES-TEST. **COMPOSANTS-OPS porte DEUX inventaires, pas un** (TF-0594, 24/08) :
 les composants DÉPLOYÉS *et* les **environnements de données INTERROGÉS** — par environnement, son
 nom d'affichage, son hôte, son identifiant, son metastore, son profil de connexion, son entrepôt
 et ses catalogues avec leur **mode d'accès** (lu / écrit / jamais ouvert), plus ceux connus par

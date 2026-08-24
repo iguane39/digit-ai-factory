@@ -19,7 +19,7 @@ import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-// TF-0582 (24/08) — LES RÈGLES DE FORME NE VIVENT PLUS ICI. Elles vivent dans
+// TF-0597 (24/08) — LES RÈGLES DE FORME NE VIVENT PLUS ICI. Elles vivent dans
 // `gabarits\oracle-lot-retours.mjs`, que ce fichier IMPORTE et que l'héritage fait voyager
 // jusqu'au produit (`forge\retours\oracle-lot.mjs`, mode copie_conforme). Un seul jeu de
 // règles, deux endroits où le jouer : le produit AVANT de remettre, le pilot À LA PORTE.
@@ -133,7 +133,7 @@ const lignes = contenu.split("\n").filter((l) => l.trim());
         `[REJET ATOMIQUE] ${sidecarPath} — registre intact.\n` +
         `  - ${lotMd} : ${c.message} (${c.regle}).\n` +
         (c.remede ? `    REMÈDE : ${c.remede}\n` : "") +
-        "    CE REFUS ÉTAIT ÉVITABLE, et c'est tout le point (TF-0582) : le produit peut jouer ce\n" +
+        "    CE REFUS ÉTAIT ÉVITABLE, et c'est tout le point (TF-0597) : le produit peut jouer ce\n" +
         "    MÊME contrôle chez lui, AVANT de remettre son lot —\n" +
         `      node forge\\retours\\oracle-lot.mjs \"<son lot>.md\"\n` +
         "    TROIS CAUSES MESURÉES le 24/08 sur les trois produits émetteurs, et le remède diffère :\n" +
