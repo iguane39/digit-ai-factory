@@ -23,7 +23,7 @@
 > geste qui répare*. C'est **exactement le contrôle** que la porte du pilot joue à l'ingestion :
 > le même module, importé des deux côtés. Un lot qui passe ici passe là-bas.
 >
-> **Pourquoi ce paragraphe existe** (TF-0582, 24/08/2026). En une seule journée, **six** lots ont
+> **Pourquoi ce paragraphe existe** (TF-0597, 24/08/2026). En une seule journée, **six** lots ont
 > dû être admis par dérogation, tous pour les mêmes deux sections absentes. La cause a été
 > cherchée jusqu'aux trois produits émetteurs et elle est **triple** : l'un n'avait jamais reçu ce
 > gabarit, l'autre n'avait jamais été instancié — et le troisième l'avait **à jour, recopié le

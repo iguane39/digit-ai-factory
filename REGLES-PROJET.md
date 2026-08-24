@@ -117,7 +117,7 @@ leur emplacement. Le contrôle vit dans `oracle-conformite-projet` (R-20, nature
 n'exige la troisième section qu'à partir du premier `verifie_le` postérieur au 23/08 : avant, c'est
 la règle qui a bougé, pas le produit.
 
-**`COMPOSANTS-OPS.md` porte DEUX inventaires, pas un** (TF-0579, 24/08/2026, retour Produit-10). Le
+**`COMPOSANTS-OPS.md` porte DEUX inventaires, pas un** (TF-0594, 24/08/2026, retour Produit-10). Le
 fichier était défini comme celui des **composants déployés**, « depuis `ops etat` / plans /
 DOSSIER-MEP ». Un produit d'analyse qui ne déploie **rien** mais interroge **plusieurs** entrepôts
 n'avait donc, en toute conformité, qu'à y écrire « aucun composant déployé » — ce qu'un produit a

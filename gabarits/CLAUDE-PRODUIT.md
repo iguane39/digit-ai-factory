@@ -70,7 +70,7 @@ Boucle intérieure (libre, sans verdict) : `<commandes locales : pytest, ruff, s
   L'ÉTAPE concernée (conception → FONCTIONNEL · design/development → TECHNOS/ARCHITECTURE ·
   development → MODELE-DONNEES ancré au schéma réel (R-26) · MEP → COMPOSANTS-OPS, qui porte
   DEUX inventaires — les composants DÉPLOYÉS **et** les environnements de DONNÉES interrogés,
-  avec leur hôte, leur profil de connexion et le mode d'accès de chaque catalogue (TF-0579) ;
+  avec leur hôte, leur profil de connexion et le mode d'accès de chaque catalogue (TF-0594) ;
   un produit qui ne déploie rien y déclare quand même ce qu'il LIT · toute
   évolution de config → PARAMETRAGE/COMMANDES) ; comptes de démo locale derrière
   `MODE_DEMO`, jamais de secret.

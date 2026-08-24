@@ -39,7 +39,7 @@ environnements: [locale, staging, production]
 
 ## Environnements de données
 
-<!-- SECTION OBLIGATOIRE depuis le 24/08/2026 (TF-0579, retour Produit-10). Vérifiée par
+<!-- SECTION OBLIGATOIRE depuis le 24/08/2026 (TF-0594, retour Produit-10). Vérifiée par
      `oracle-conformite-projet` (R-20) dès le premier `verifie_le` postérieur au 24/08 : avant,
      c'est la règle qui a bougé, pas le produit.
 

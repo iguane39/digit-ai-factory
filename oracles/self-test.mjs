@@ -59,7 +59,7 @@ writeFileSync(join(verte, "forge", "hooks", "factory.mjs"), readFileSync(join(GA
 // TF-0571 (24/08) : LE TEXTE de la doctrine voyage avec le hook qui la juge. La fixture verte le
 // porte donc aussi — sinon elle prouverait un heritage que le referentiel ne declare plus.
 writeFileSync(join(verte, "forge", "RESTITUTION.md"), readFileSync(join(GAB47, "RESTITUTION.md"), "utf8"));
-// TF-0582 (24/08) : le JUGE de la forme d'un lot entre a l'heritage, a cote du gabarit qui la
+// TF-0597 (24/08) : le JUGE de la forme d'un lot entre a l'heritage, a cote du gabarit qui la
 // decrit — pour que le produit se juge AVANT de remettre, et pas seulement a la porte du pilot.
 // La verte le porte donc, sinon elle prouverait un heritage que le referentiel ne declare plus.
 writeFileSync(join(verte, "forge", "retours", "oracle-lot.mjs"), readFileSync(join(GAB47, "oracle-lot-retours.mjs"), "utf8"));
@@ -74,7 +74,7 @@ mkdirSync(join(verte, "docs", "projet"), { recursive: true });
 writeFileSync(join(verte, "package-lock.json"), JSON.stringify({ packages: { "node_modules/express": { version: "5.1.0" } } }, null, 1).replace('"version": "5.1.0"', '"express"\n   : { "version": "5.1.0" }') + "\n"); // contient "express" et "5.1.0"
 writeFileSync(join(verte, "docs", "projet", "TECHNOS.md"),
   '---\nrole: technos\nsources_de_verite: [package-lock.json]\nverifie_le: 2026-08-11\nversions:\n  express: "5.1.0"\n---\n# Technos\n');
-// TF-0579 (24/08) : la verte porte la section « Environnements de données » ET une date
+// TF-0594 (24/08) : la verte porte la section « Environnements de données » ET une date
 // POSTÉRIEURE à l'entrée en vigueur — sans les deux, la branche PASS de la règle ne serait jouée
 // par personne (la borne d'antériorité rendrait un `non_juge`, jamais un PASS).
 writeFileSync(join(verte, "docs", "projet", "COMPOSANTS-OPS.md"),
@@ -777,7 +777,7 @@ check("antériorité-nature : le même document revu AVANT l'entrée en vigueur 
   if (!declare) throw new Error("l'antériorité n'est pas DÉCLARÉE au non_juge — un contrôle qui se tait sans le dire est un contrôle absent");
 });
 
-// TF-0579 — les ENVIRONNEMENTS DE DONNÉES de COMPOSANTS-OPS, dans les TROIS sens. Le fait
+// TF-0594 — les ENVIRONNEMENTS DE DONNÉES de COMPOSANTS-OPS, dans les TROIS sens. Le fait
 // mesuré : un produit d'analyse qui ne déploie rien écrivait « aucun composant déployé » en toute
 // conformité, et le nom de workspace donné par l'humain ne se rapprochait de rien dans le dépôt.
 const COP_NU = ['---', 'role: composants', 'sources_de_verite: ["ops.mjs etat"]', 'verifie_le: 2026-08-24', '---', '', '# Composants Ops', '', '## Hiérarchie', '', 'aucun composant déployé', ''].join("\n");
