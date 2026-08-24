@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=8070625e5a18 archive=acf69e8da61a · dernier événement: 2026-08-24T17:41:22.192Z -->
+     sceaux: actifs=3472af0929d6 archive=acf69e8da61a · dernier événement: 2026-08-24T17:49:53.144Z -->
 
-**121 actifs** (candidat 13 · décidé 1 · en cours 0 · corrigé 103 · écarté 4) · **469 archivés**.
+**121 actifs** (candidat 12 · décidé 1 · en cours 0 · corrigé 104 · écarté 4) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -14,7 +14,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0583 | candidat | 20 | L'oracle de contraste n'est appele par rien et ne peut pas se lancer | **oui** — 0 fichier du depot cite check-contrast.mjs ; chemin Edge code en dur, inexistant sur la machine |
 | TF-0588 | candidat | 20 | Un secret attendu se prepare, il ne se decrit pas en prose | **oui** — 3 fournisseurs, 3 aller-retours, dont 2 jetons OVH crees pour rien |
 | TF-0589 | candidat | 15 | Le gabarit d'environnement n'est confronte a rien | **oui** — .env = 11 cles, .env.example = 7 ; 4 cles OVH jamais reportees au gabarit |
-| TF-0582 | candidat | 12.5 | Une mesure de contraste par styles calcules ne voit pas les pseudo-elements | **oui** — fond peint par ::before ; .txt en background:transparent ; une mesure DOM aurait lu le fond clair du conteneur et valide |
 | TF-0585 | candidat | 12.5 | Un comportement destine aux visiteurs valide sur un protocole qu'ils n'utilisent pas | **oui** — 7 hostnames sur 8 injoignables en HTTPS apres avoir ete declares fonctionnels ; port 443 ferme sur 213.186.33.5 |
 | TF-0581 | candidat | 8.3 | Le seul verificateur de contraste ne regarde que le menu du header | **oui** — texte a ratio 1,0 reste en production ; oracle de contraste present au depot et scope au seul .header-line |
 | TF-0586 | candidat | 8.3 | Aucun oracle ne verifie qu'un nom de domaine declare repond | **oui** — 8 hostnames declares, 0 controle ; base par defaut de check-redirects encore sur l'URL Railway apres bascule |
@@ -85,6 +84,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0486 | corrige | 15 | forge-agents : oracle-claims analyse le CSS et lit les couleurs hexadecimales purement numeriques comme des nombres non sources | **oui** — FAIL sur des valeurs prescrites par la charte ; contournement contraire a la charte elle-meme. |
 | TF-0552 | corrige | 15 | page-html : le message de remediation de L2 prescrit la moitie du geste et conduit tout droit a une seconde violation de L2 | **oui** — un aller-retour d'oracle complet, plus la lecture d'un document tiers, pour un geste que le message aurait pu nommer en entier |
 | TF-0491 | corrige | 12.5 | forge-design : aucun controle ne compare la largeur d un bloc de texte a celle de ses blocs freres — trois allers-retours client sur le meme defaut | **oui** — Trois allers-retours client sur un seul defaut, sur quatre versions livrees. |
+| TF-0582 | corrige | 12.5 | Une mesure de contraste par styles calcules ne voit pas les pseudo-elements | **oui** — fond peint par ::before ; .txt en background:transparent ; une mesure DOM aurait lu le fond clair du conteneur et valide |
 | TF-0487 | corrige | 10 | forge-agents : confirmation de RA-4 sur un autre motif — les sources citees verbatim sont analysees comme du contenu propre au livrable | **oui** — Deuxieme occurrence du meme mecanisme en deux passes, sur un livrable dont l autoportance impose d embarquer ses sources. |
 | TF-0492 | corrige | 10 | forge-design : aucun controle ne detecte un mot coupe en deux au rendu (Utilisabl/e, Plateform/e, 231 occurrenc/es) | **oui** — Trois occurrences signalees par le client sur deux versions successives, dont une apres une correction incomplete. |
 | TF-0495 | corrige | 10 | forge-agents : aucune regle ne distingue « le contenu est present » de « le contenu est exploitable » | **oui** — Deux demandes explicites du client necessaires pour obtenir un contenu lisible, sur un livrable vert a tous les oracles. |
