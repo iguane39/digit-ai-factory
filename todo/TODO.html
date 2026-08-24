@@ -152,7 +152,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>29636488cc6a</code> · dernier événement 2026-08-24T19:23:24.685Z</p>
+      <p class="meta">sceau <code>f23b652fbc34</code> · dernier événement 2026-08-24T19:42:05.551Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -162,7 +162,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="8 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">8</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="6 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">6</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="1 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">1</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="468 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">468</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -2470,29 +2470,6 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0577" data-cite data-forge="digit-ai-forge-conception" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0577</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-conception : le referentiel ne porte NULLE PART ce que le produit PROMET a son client — la une a vendu une livraison pendant neuf jours quand les six services vendaient un transfert de capacite</h3>
-          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 24/08 sur factory.produit-07, a la demande du commanditaire (« la landing page n est pas assez claire sur ce qu est la Factory et ce qu elle peut apporter a son public »).</p><ul class="puces"><li>LA CONTRADICTION : la une promettait « Votre produit, livre avec ses preuves » — un visiteur en deduit une LIVRAISON</li><li>Les six services, produits par le MEME RUN, vendent tout autre chose : Conseil « nous evaluons VOTRE chaine », Formation « VOS EQUIPES apprennent a travailler sous oracles », Accompagnement « a la fin, VOS EQUIPES executent les oracles et tiennent le ledger SANS NOUS », Integration « nous branchons les forges sur VOTRE existant »</li><li>Aucun des six ne dit « nous construisons votre produit »</li><li>Le produit reel est l installation et le TRANSFERT d une chaine de fabrication verifiable chez le client</li><li>L attente formee en trois secondes etait dementie quatre sections plus bas, et le site est parti en production dans cet etat le 15/08</li><li>RIEN NE POUVAIT LE VOIR, et la cause est EN AMONT des oracles : `CADRAGE-DESIGN.md` porte six champs — secteur, cible, job principal, ton attendu, contraintes, hypotheses — et AUCUN ne dit ce que le produit PROMET</li><li>Le « job principal » y est celui de la PAGE (« donner a voir l offre forge de facon consultable et convertir en prise de rendez-vous »), jamais le gain du CLIENT</li><li>Les 61 exigences decrivent ce que le site DOIT FAIRE (EX-001 servie a la racine, EX-002 acces aux quatre pages, EX-007 six services sur la page services) et jamais ce qu il doit DIRE</li><li>La promesse n etant ecrite nulle part, elle n etait opposable a rien : elle s est decidee par defaut, en redigeant un titre, c est-a-dire au plus bas niveau de la chaine — alors que la liste fermee des six services, elle, etait une DECISION HUMAINE DATEE (15/08, consignee dans app/contenu.py)</li><li>PROPOSITION : un champ `promesse` au cadrage, en une phrase, dans les mots du client et non du produit — ce qu il gagne, et ce qu il n a plus a faire</li><li>Plus une exigence derivee, verifiable par simple lecture humaine : la promesse de la page d accueil est celle du cadrage</li><li>Le controle n a pas besoin d etre automatique pour etre opposable, il a besoin d EXISTER et d avoir un porteur</li><li>Corollaire : le champ `promesse` est de meme nature que la liste fermee des services, donc DECISION HUMAINE DATEE et non derivation</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>Positionnement faux en production du 15/08 au 24/08 sur le site vitrine de la factory ; refonte complete de la page d accueil necessaire, tous oracles au vert pendant toute la periode.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">factory-digit-ai-fr</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-corrige" id="item-TF-0498" data-cite data-forge="digit-ai-forge-conception" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0498</code>
@@ -2507,6 +2484,29 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 15 — gain 3 × preuve 5 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>mesure le 22/08 : le self-test de quality-oracles sort en echec (1 echec) des qu'il est joue depuis la copie installee, alors qu'il rend 156 PASS et 0 echec depuis la source. Le meme harnais donne deux verdicts selon l'endroit d'ou on le joue — et c'est le verdict rouge qui correspond a l'usage reel.</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du 22/08, mandat de mise en oeuvre TF-0478 — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0577" data-cite data-forge="digit-ai-forge-conception" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0577</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-conception : le referentiel ne porte NULLE PART ce que le produit PROMET a son client — la une a vendu une livraison pendant neuf jours quand les six services vendaient un transfert de capacite</h3>
+          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 24/08 sur factory.produit-07, a la demande du commanditaire (« la landing page n est pas assez claire sur ce qu est la Factory et ce qu elle peut apporter a son public »).</p><ul class="puces"><li>LA CONTRADICTION : la une promettait « Votre produit, livre avec ses preuves » — un visiteur en deduit une LIVRAISON</li><li>Les six services, produits par le MEME RUN, vendent tout autre chose : Conseil « nous evaluons VOTRE chaine », Formation « VOS EQUIPES apprennent a travailler sous oracles », Accompagnement « a la fin, VOS EQUIPES executent les oracles et tiennent le ledger SANS NOUS », Integration « nous branchons les forges sur VOTRE existant »</li><li>Aucun des six ne dit « nous construisons votre produit »</li><li>Le produit reel est l installation et le TRANSFERT d une chaine de fabrication verifiable chez le client</li><li>L attente formee en trois secondes etait dementie quatre sections plus bas, et le site est parti en production dans cet etat le 15/08</li><li>RIEN NE POUVAIT LE VOIR, et la cause est EN AMONT des oracles : `CADRAGE-DESIGN.md` porte six champs — secteur, cible, job principal, ton attendu, contraintes, hypotheses — et AUCUN ne dit ce que le produit PROMET</li><li>Le « job principal » y est celui de la PAGE (« donner a voir l offre forge de facon consultable et convertir en prise de rendez-vous »), jamais le gain du CLIENT</li><li>Les 61 exigences decrivent ce que le site DOIT FAIRE (EX-001 servie a la racine, EX-002 acces aux quatre pages, EX-007 six services sur la page services) et jamais ce qu il doit DIRE</li><li>La promesse n etant ecrite nulle part, elle n etait opposable a rien : elle s est decidee par defaut, en redigeant un titre, c est-a-dire au plus bas niveau de la chaine — alors que la liste fermee des six services, elle, etait une DECISION HUMAINE DATEE (15/08, consignee dans app/contenu.py)</li><li>PROPOSITION : un champ `promesse` au cadrage, en une phrase, dans les mots du client et non du produit — ce qu il gagne, et ce qu il n a plus a faire</li><li>Plus une exigence derivee, verifiable par simple lecture humaine : la promesse de la page d accueil est celle du cadrage</li><li>Le controle n a pas besoin d etre automatique pour etre opposable, il a besoin d EXISTER et d avoir un porteur</li><li>Corollaire : le champ `promesse` est de meme nature que la liste fermee des services, donc DECISION HUMAINE DATEE et non derivation</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>Positionnement faux en production du 15/08 au 24/08 sur le site vitrine de la factory ; refonte complete de la page d accueil necessaire, tous oracles au vert pendant toute la periode.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">factory-digit-ai-fr</dd></div>
             
           </dl>
         </article>
@@ -2643,29 +2643,6 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0578" data-cite data-forge="digit-ai-forge-design" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0578</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.7)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-design : rien n oppose la PROMESSE d une page a l OFFRE decrite ailleurs dans le meme run — les oracles jugent la page en vase clos</h3>
-          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 24/08, meme incident que le retour vers forge-conception du meme lot.</p><ul class="puces"><li>Les oracles de design jugent la page ISOLEMENT : `oracle-slop` la genericite de l ecriture, `oracle-taste` la discipline d accent et de filets, `oracle-mobile` le contrat d usage tactile, `oracle-dtcg` les jetons, `oracle-motion` le mouvement. AUCUN ne lit un SECOND artefact du meme run pour verifier que les deux racontent la meme chose. La contradiction entre la une (« votre produit, LIVRE avec ses preuves ») et les six services (« VOS EQUIPES executent les oracles sans nous ») etait lisible en trente secondes par un humain, et detectable par script au moins grossierement — le SUJET GRAMMATICAL suffit a la reveler : qui agit, nous ou vous. A DISTINGUER de TF-0483 (barre externe avant une DA), depose le 22/08 : celui-la porte sur la DESIRABILITE — a-t-on regarde ce qui se fait de bien dans le domaine</li><li>celui-ci porte sur la COHERENCE INTERNE — la page dit-elle la meme chose que l offre. Les deux sont independants et se cumulent : la premiere DA etait indesirable ET la seconde une etait incoherente, ce sont deux defauts distincts du meme run. PROPOSITION : un controle de COHERENCE INTER-ARTEFACTS a la revue design — la promesse de la une, la liste des services et le champ `promesse` du cadrage (retour jumeau vers forge-conception) sont mis cote a cote, et l ecart est un constat. Automatisable en partie (presence du champ, reprise litterale), jamais en totalite, et c est acceptable : le pan i18n a montre qu un controle partiel qui DIT sa limite vaut mieux qu un vert muet</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-design</dt><dd>Contradiction une/services non detectee par cinq oracles de design tous au vert, sur le site vitrine de la factory elle-meme.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">factory-digit-ai-fr</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-corrige" id="item-TF-0494" data-cite data-forge="digit-ai-forge-design" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0494</code>
@@ -2702,6 +2679,29 @@
             <div><dt>Créé le</dt><dd>2026-08-22</dd></div>
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-design</dt><dd>Un tour complet conception+design perdu sur factory.produit-07 : DA au vert sur tous les oracles, rejetee integralement par le commanditaire, refaite avec releve externe et arbitrage humain sur captures.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">factory-digit-ai-fr</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0578" data-cite data-forge="digit-ai-forge-design" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0578</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.7)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-design : rien n oppose la PROMESSE d une page a l OFFRE decrite ailleurs dans le meme run — les oracles jugent la page en vase clos</h3>
+          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 24/08, meme incident que le retour vers forge-conception du meme lot.</p><ul class="puces"><li>Les oracles de design jugent la page ISOLEMENT : `oracle-slop` la genericite de l ecriture, `oracle-taste` la discipline d accent et de filets, `oracle-mobile` le contrat d usage tactile, `oracle-dtcg` les jetons, `oracle-motion` le mouvement. AUCUN ne lit un SECOND artefact du meme run pour verifier que les deux racontent la meme chose. La contradiction entre la une (« votre produit, LIVRE avec ses preuves ») et les six services (« VOS EQUIPES executent les oracles sans nous ») etait lisible en trente secondes par un humain, et detectable par script au moins grossierement — le SUJET GRAMMATICAL suffit a la reveler : qui agit, nous ou vous. A DISTINGUER de TF-0483 (barre externe avant une DA), depose le 22/08 : celui-la porte sur la DESIRABILITE — a-t-on regarde ce qui se fait de bien dans le domaine</li><li>celui-ci porte sur la COHERENCE INTERNE — la page dit-elle la meme chose que l offre. Les deux sont independants et se cumulent : la premiere DA etait indesirable ET la seconde une etait incoherente, ce sont deux defauts distincts du meme run. PROPOSITION : un controle de COHERENCE INTER-ARTEFACTS a la revue design — la promesse de la une, la liste des services et le champ `promesse` du cadrage (retour jumeau vers forge-conception) sont mis cote a cote, et l ecart est un constat. Automatisable en partie (presence du champ, reprise litterale), jamais en totalite, et c est acceptable : le pan i18n a montre qu un controle partiel qui DIT sa limite vaut mieux qu un vert muet</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-24</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-design</dt><dd>Contradiction une/services non detectee par cinq oracles de design tous au vert, sur le site vitrine de la factory elle-meme.</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">factory-digit-ai-fr</dd></div>
             
           </dl>
