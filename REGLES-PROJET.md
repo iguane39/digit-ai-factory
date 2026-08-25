@@ -101,7 +101,7 @@ importé (dépôt repris) : rattrapage explicite à l'ouverture de son premier r
 socle créé depuis l'état constaté, `.env.example` reconstruit (R-13) avant que R-22 ne juge.
 
 **Les règles nées des défauts réellement payés vivent dans `references\REGLES-DE-NON-REPETITION.md`**
-(25/08/2026) — **trente-deux** règles génériques, chacune avec le mécanisme qui l'exécute et son
+(25/08/2026) — **trente-trois** règles génériques, chacune avec le mécanisme qui l'exécute et son
 compte ; la section « sans mécanisme » est vide depuis le 23/08. Le document existe parce qu'une classe de défaut sans règle se
 re-paie autant de fois qu'il y a de sites, et qu'une règle sans mécanisme est une consigne.
 

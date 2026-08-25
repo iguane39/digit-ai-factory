@@ -1,0 +1,207 @@
+#!/usr/bin/env node
+/**
+ * oracle-controles-injoignables.mjs — un contrôle que RIEN n'appelle n'est pas un contrôle.
+ *
+ * ============================================================================================
+ * POURQUOI (TF-0583, lot produit-02 du 25/08/2026)
+ * ============================================================================================
+ *
+ * DEUX DÉFAUTS CUMULÉS, mesurés sur un dépôt produit, et le second explique pourquoi le premier
+ * n'avait jamais été remarqué :
+ *
+ *   1. `build/check-contrast.mjs` était cité par ZÉRO fichier du dépôt — ni le workflow, ni le
+ *      manifeste de paquets, ni aucune documentation. Il existait, il était juste ;
+ *   2. sa ligne 23 codait le chemin du navigateur EN DUR
+ *      (`C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe`), chemin absent de la
+ *      machine de travail. Il échouait au lancement, sans message exploitable.
+ *
+ * *Un oracle que rien n'appelle n'est pas un oracle, c'est un fichier.* Et la bonne pratique
+ * existait DANS LE MÊME DÉPÔT, à un dossier de distance : son voisin `build/ci/oracle-consent.mjs`
+ * énumérait des candidats avec une variable d'environnement en tête et un message explicite si
+ * rien n'était trouvé.
+ *
+ * LA FAMILLE EST DÉJÀ CONNUE DU PARC, et c'est ce qui rend la règle générique plutôt qu'anecdotique.
+ * Le 25/08 au matin, un garde de rédaction existait et n'avait pas été appelé — septième morsure
+ * d'une classe d'octets. Le même jour, un contrôle de conformité déclarait « non vérifié » sur des
+ * cibles qu'il ne savait pas localiser. *Le mécanisme existait ; personne ne l'avait branché.*
+ *
+ * ============================================================================================
+ * CE QUI EST JUGÉ
+ * ============================================================================================
+ *
+ *   CI1 · un fichier qui SE PRÉSENTE comme un contrôle — nom en `oracle-*`, `check-*`, `verifier-*`,
+ *         `valider-*`, ou `*-oracle` — est cité par au moins un AUTRE fichier du dépôt. Un fichier
+ *         que rien n'appelle et qui n'est pas un point d'entrée déclaré est signalé.
+ *   CI2 · aucun contrôle ne code en dur le chemin d'un outil externe (navigateur, interpréteur,
+ *         binaire). Le motif attendu est : variable d'environnement d'abord, liste de repli
+ *         ensuite, échec BRUYANT sinon.
+ *
+ * NON JUGÉ, et déclaré :
+ *   · si le contrôle est JUSTE : ce n'est pas le sujet. Un contrôle faux mais joué se corrige ;
+ *     un contrôle juste que rien ne joue ne se corrige jamais, faute d'être vu ;
+ *   · les appels par découverte dynamique — un lanceur qui balaie un dossier et joue ce qu'il
+ *     trouve. Ils sont indétectables par citation, et c'est pourquoi CI1 SIGNALE au lieu d'accuser
+ *     dès qu'un lanceur de ce genre existe dans le dépôt ;
+ *   · les chemins d'outil dans un fichier de TEST : une fixture peut nommer un chemin faux exprès.
+ *
+ * Usage : node oracle-controles-injoignables.mjs [dossier] [--json]
+ * Exit : 0 = PASS · 1 = FAIL.
+ */
+import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { join, dirname, relative, basename } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const ICI = dirname(fileURLToPath(import.meta.url));
+const args = process.argv.slice(2);
+const cible = args.find((a) => !a.startsWith("--")) || join(ICI, "..");
+
+const SAUTES = new Set([".git", "node_modules", ".venv", "__pycache__", "dist", "build_out",
+  ".next", "vendor", ".pytest_cache", ".ruff_cache", "old", "Old", "output"]);
+
+/** Ce qui SE PRÉSENTE comme un contrôle. Le nom est la promesse ; cet oracle la prend au mot. */
+export const SE_PRESENTE_COMME_UN_CONTROLE = (nom) =>
+  /^(oracle|check|verifier|valider|verify|lint)[-_]/i.test(nom) || /[-_](oracle|check)\.(mjs|cjs|js|py)$/i.test(nom);
+
+/** Un fichier de test : ni un contrôle à brancher, ni un lieu où un chemin faux est un défaut. */
+export const EST_UN_TEST = (chemin) => {
+  const n = String(chemin).replaceAll("\\", "/").toLowerCase();
+  return /(^|\/)(tests?|recette|recettes|spec|specs|__tests__|fixtures?)\//.test(n)
+    || /(^|\/)test_[^/]*$/.test(n) || /[.-](test|spec)\.[a-z]+$/.test(n);
+};
+
+/**
+ * UN CHEMIN D'OUTIL EXTERNE CODÉ EN DUR. Le motif cherche un chemin absolu désignant un exécutable
+ * — c'est ce qui rend un contrôle injouable ailleurs que sur la machine de son auteur.
+ */
+export const CHEMIN_OUTIL_EN_DUR = /["'`][A-Za-z]:[\\/][^"'`\n]{4,}\.(exe|cmd|bat)["'`]|["'`]\/(usr|opt|Applications)\/[^"'`\n]{4,}["'`]/;
+
+//: La bonne forme : une variable d'environnement consultée pour trouver l'outil.
+const PAR_VARIABLE = /process\.env\.[A-Z_]*(?:CHROME|CHROMIUM|EDGE|BROWSER|PLAYWRIGHT|PUPPETEER|NODE|PYTHON|BIN)[A-Z_]*|os\.environ(?:\.get\(|\[)\s*["'][A-Z_]*(?:CHROME|BROWSER|PYTHON|BIN)[A-Z_]*/;
+
+const EXT = /\.(mjs|cjs|js|ts|py)$/i;
+
+function fichiers(racine) {
+  const sortie = [];
+  const descendre = (d, niveau) => {
+    if (niveau > 6) return;
+    let entrees = [];
+    try { entrees = readdirSync(d, { withFileTypes: true }); } catch { return; }
+    for (const e of entrees) {
+      if (SAUTES.has(e.name)) continue;
+      const p = join(d, e.name);
+      if (e.isDirectory()) descendre(p, niveau + 1);
+      else sortie.push(p);
+    }
+  };
+  descendre(racine, 1);
+  return sortie;
+}
+
+/**
+ * Un dépôt possède-t-il un LANCEUR PAR DÉCOUVERTE — un fichier qui balaie un dossier et joue ce
+ * qu'il trouve ? S'il en a un, une absence de citation ne prouve plus rien, et CI1 le dit.
+ */
+export function aUnLanceurParDecouverte(textes) {
+  return [...textes.values()].some((t) => /readdirSync\([^)]*\)[\s\S]{0,200}?(oracle|check|test)/i.test(t)
+    || /glob\.glob\(|Path\([^)]*\)\.rglob\(/.test(t));
+}
+
+export function juger(racine) {
+  const tous = fichiers(racine);
+  const textes = new Map();
+  for (const p of tous) {
+    if (!EXT.test(p) && !/\.(ya?ml|json|md|toml|cfg|ini|sh|ps1)$/i.test(p)) continue;
+    try { textes.set(p, readFileSync(p, "utf8")); } catch { /* illisible : ignoré */ }
+  }
+  const controles = tous.filter((p) => EXT.test(p) && SE_PRESENTE_COMME_UN_CONTROLE(basename(p)) && !EST_UN_TEST(p));
+  const rel = (p) => relative(racine, p).replaceAll("\\", "/");
+  const F = [];
+  const ok = (regle, message) => F.push({ regle, statut: "PASS", message });
+  const ko = (regle, message) => F.push({ regle, statut: "FAIL", message });
+  const so = (regle, message) => F.push({ regle, statut: "SANS_OBJET", message });
+
+  if (!controles.length) {
+    so("CI0", `aucun fichier ne se présente comme un contrôle sous ${racine} — rien à joindre`);
+    return { verdict: "PASS", findings: F, controles: 0 };
+  }
+
+  // ---- CI1 : est-il cité par quelqu'un ? --------------------------------------------------
+  const decouverte = aUnLanceurParDecouverte(textes);
+  const orphelins = controles.filter((p) => {
+    const nom = basename(p);
+    const sansExt = nom.replace(EXT, "");
+    for (const [autre, t] of textes) {
+      if (autre === p) continue;
+      if (t.includes(nom) || new RegExp(`\\b${sansExt.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`).test(t)) return false;
+    }
+    return true;
+  });
+  if (!orphelins.length) ok("CI1", `les ${controles.length} contrôle(s) du dépôt sont cités par au moins un autre fichier`);
+  else if (decouverte) {
+    F.push({ regle: "CI1", statut: "AVERTISSEMENT",
+      message: `${orphelins.length} contrôle(s) sur ${controles.length} cité(s) par AUCUN autre fichier : `
+        + `${orphelins.map(rel).join(", ")}. Ce dépôt possède un lanceur par DÉCOUVERTE (il balaie un dossier `
+        + "et joue ce qu'il trouve), donc l'absence de citation ne prouve rien — c'est signalé et non accusé." });
+  } else {
+    ko("CI1", `${orphelins.length} contrôle(s) sur ${controles.length} cité(s) par AUCUN autre fichier du dépôt : `
+      + `${orphelins.map(rel).join(", ")}. Un contrôle que rien n'appelle n'est pas un contrôle, c'est un fichier — `
+      + "et sa présence donne l'assurance trompeuse que le sujet est couvert. Le brancher à une cible de "
+      + "vérification, ou l'ôter. Mesuré le 25/08 : un vérificateur de contraste cité par zéro fichier, "
+      + "pendant qu'un texte à ratio 1,0 vivait en production.");
+  }
+
+  // ---- CI2 : le chemin d'outil externe ---------------------------------------------------
+  const enDur = [];
+  for (const p of controles) {
+    const t = textes.get(p) || "";
+    const lignes = t.split(/\r?\n/);
+    for (const [i, ligne] of lignes.entries()) {
+      if (!CHEMIN_OUTIL_EN_DUR.test(ligne)) continue;
+      if (/outil-en-dur-ok/.test(ligne)) continue;
+      // UN CHEMIN CITÉ DANS UN COMMENTAIRE N'EST PAS UN CHEMIN CODÉ EN DUR — c'est souvent
+      // l'inverse : le commentaire DÉCRIT le défaut pour l'interdire. Mesure sur le pilot avant
+      // livraison (N-23) : les 2 constats rendus étaient tous deux de la prose, dont l'un dans
+      // l'en-tête de CET oracle, qui cite le chemin Edge du cas fondateur. Accuser la doctrine
+      // qui décrit un défaut est la forme la plus sûre de se faire désactiver.
+      if (/^\s*(\/\/|#|\*|<!--)/.test(ligne)) continue;
+      enDur.push(`${rel(p)}:${i + 1}`);
+    }
+  }
+  if (!enDur.length) ok("CI2", "aucun contrôle ne code en dur le chemin d'un outil externe");
+  else {
+    const avecVariable = controles.filter((p) => PAR_VARIABLE.test(textes.get(p) || "")).map(rel);
+    ko("CI2", `${enDur.length} chemin(s) d'outil externe codé(s) EN DUR dans un contrôle : ${enDur.join(", ")}. `
+      + "Un contrôle qui code le chemin de son navigateur ou de son interpréteur ne tourne que sur la machine de "
+      + "son auteur, et il échoue ailleurs SANS message exploitable — donc personne ne le rebranche. La forme "
+      + "attendue : variable d'environnement d'abord, liste de repli ensuite, échec BRUYANT sinon."
+      + (avecVariable.length ? ` La bonne pratique existe DÉJÀ dans ce dépôt : ${avecVariable.join(", ")}.` : "")
+      + " Un chemin volontairement littéral se marque `outil-en-dur-ok` en fin de ligne.");
+  }
+
+  return { verdict: F.some((f) => f.statut === "FAIL") ? "FAIL" : "PASS", findings: F, controles: controles.length };
+}
+
+export const NON_JUGE = [
+  "si le contrôle est JUSTE : ce n'est pas le sujet. Un contrôle faux mais joué se corrige ; un contrôle juste que rien ne joue ne se corrige jamais, faute d'être vu",
+  "les appels par DÉCOUVERTE DYNAMIQUE (un lanceur qui balaie un dossier) : indétectables par citation. Dès qu'un tel lanceur existe dans le dépôt, CI1 SIGNALE au lieu d'accuser, et le dit",
+  "un chemin cité dans un COMMENTAIRE : le commentaire décrit souvent le défaut pour l'interdire, et accuser la doctrine qui le décrit est la forme la plus sûre de se faire désactiver. Exclusion mesurée : les 2 constats du premier passage sur le pilot étaient tous deux de la prose",
+  "les chemins d'outil dans un fichier de TEST : une fixture peut nommer un chemin faux exprès, et l'accuser ferait crier l'oracle sur une recette juste",
+  "un contrôle appelé depuis un système d'intégration EXTERNE au dépôt (une tâche planifiée, un pipeline hébergé ailleurs) : la citation n'est pas dans le dépôt, donc invisible ici",
+];
+
+// ---- CLI --------------------------------------------------------------------------------------
+const lanceEnDirect = process.argv[1]
+  && fileURLToPath(import.meta.url).toLowerCase().replaceAll("\\", "/")
+     === process.argv[1].toLowerCase().replaceAll("\\", "/");
+if (lanceEnDirect) {
+  const r = juger(cible);
+  if (args.includes("--json")) {
+    console.log(JSON.stringify({ oracle: "oracle-controles-injoignables", version: "1.0.0",
+      cible: String(cible), ...r, non_juge: NON_JUGE }, null, 1));
+  } else {
+    console.log(`oracle-controles-injoignables — ${cible}`);
+    console.log(`verdict : ${r.verdict} (${r.controles} contrôle(s) examiné(s))`);
+    for (const f of r.findings) console.log(`  [${f.statut}] ${f.regle} — ${f.message}`);
+  }
+  process.exit(r.verdict === "FAIL" ? 1 : 0);
+}
