@@ -69,6 +69,16 @@ const FORGES = [
   { nom: "digit-ai-queue", preuve: "protocole/README.md" },
 ];
 
+// LE PILOT ET SES NOMS D'HIER (TF-0525, mesuré le 25/08/2026). Le pilot n'est pas une forge et ne
+// figure pas dans `FORGES` : son nom s'écrivait donc en littéral à chaque endroit qui en avait
+// besoin, et ses anciens noms nulle part. Une source unique ici, parce qu'un troisième renommage
+// est déjà arrivé deux fois.
+const PILOT = "digit-ai-factory";
+//: Les noms de dépôt sous lesquels le pilot a vécu, du plus récent au plus ancien. GitHub redirige
+//: les anciens noms, ce qui rend un vieux clone indiscernable d'un dépôt vivant à l'usage : il
+//: `fetch` sans broncher. Seule cette table permet de le rapprocher du pilot.
+const ALIAS_PILOT = ["digit-ai-forge-pilot", "digit-ai-forge-steering"];
+
 const args = process.argv.slice(2);
 const pull = args.includes("--pull");
 const sansSkills = args.includes("--sans-skills");
@@ -251,7 +261,7 @@ console.log("");
   ]);
   const connus = new Map();          // origin normalisé -> nom du dépôt attendu
   const attendus = new Set(FORGES.map((f) => f.nom));
-  attendus.add("digit-ai-factory");
+  attendus.add(PILOT);
   // LE SEPARATEUR FAIT PARTIE DE LA NORMALISATION, et son absence rendait la comparaison
   // fausse en silence : une origin ecrite « C:\\dev\\bare/depot.git » et une autre
   // « C:\\dev\\bare\\depot.git » designent le MEME depot et ne se ressemblaient pas. Deux clones du
@@ -279,8 +289,21 @@ console.log("");
     const o = originDe(d);
     if (!o) continue;
     connus.set(o, nom);
-    const f = FORGES.find((x) => x.nom === nom);
-    for (const ancien of (f && f.alias) || []) {
+    // LE PILOT ÉTAIT LE SEUL DÉPÔT SANS ALIAS, et c'est le seul qui a été renommé DEUX fois
+    // (steering → pilot → factory). Mesuré le 25/08 : la table d'alias, écrite le 23/08
+    // exactement pour ce cas (TF-0533), ne se remplit que depuis `FORGES` — or le pilot n'y
+    // figure pas, il entre par `attendus.add(…)` à quelques lignes d'ici. Donc `f` valait
+    // `undefined`, aucun alias n'était enregistré, et le clone du pilot dont l'origin porte
+    // encore « …/digit-ai-forge-pilot.git » ne se rapprochait PAS du pilot dont l'origin dit
+    // « …/digit-ai-factory.git ». Deux chaînes, aucun rapprochement.
+    // CE QUE ÇA COÛTAIT : le clone tombait dans la branche faible et sortait « mise de côté —
+    // ne rien y exécuter », sans son retard ni le motif qui compte (« y travailler écrit dans un
+    // registre mort »). Il n'y échappait même pas : c'est le HASARD de son suffixe `_old` qui le
+    // déclarait. Renommé sans ce suffixe, il serait passé pour un dépôt hors liste avec SON PROPRE
+    // origin — un diagnostic faux, qui invite à l'inscrire dans la liste des forges au lieu de le
+    // retirer. La règle protégeait tout le parc SAUF le seul dépôt dont elle était née.
+    const alias = nom === PILOT ? ALIAS_PILOT : (FORGES.find((x) => x.nom === nom) || {}).alias || [];
+    for (const ancien of alias) {
       connus.set(o.replace(/[^/]+$/, ancien.toLowerCase()), nom);
     }
   }
