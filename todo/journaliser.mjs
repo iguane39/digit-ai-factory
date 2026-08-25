@@ -49,6 +49,87 @@ function sortir(code, corps) {
   process.exit(code);
 }
 
+/**
+ * TF-0621 (25/08) — LE CONTRÔLE PASSE SUR LE CHEMIN D'ÉCRITURE, parce que c'est le seul endroit
+ * qu'on ne peut pas oublier de traverser.
+ *
+ * LE FAIT : la même classe d'octet a mordu SEPT fois en une journée. Un chemin Windows écrit dans
+ * une chaîne Python non brute voit son antislash avalé par l'échappement — `\f` devient un SAUT DE
+ * PAGE, `\a` une CLOCHE, `\r` un RETOUR CHARIOT, `\t` une TABULATION, `\n` un SAUT DE LIGNE. Trois
+ * de ces morsures ont été ÉCRITES dans ce registre, d'où les vues `TODO.md` et `TODO.html` sont
+ * générées : un octet de contrôle dans un chemin affiché ne se voit pas, se copie-colle en silence,
+ * et rend le chemin introuvable pour qui le réessaie.
+ *
+ * CE QUI A LAISSÉ PASSER, et c'est le cœur du sujet :
+ *   · le SyntaxWarning de Python est un signal INVERSÉ — il parle sur les échappements NON reconnus
+ *     (`\d` de `\dev`), donc les cas INOFFENSIFS, et se tait sur les reconnus, donc les destructeurs.
+ *     Un avertissement qui parle quand tout va bien apprend à être ignoré (R-33 bis) ;
+ *   · `oracle-pieges-regex` P3 existe exactement pour cette classe et ne l'a pas vue : sa portée
+ *     s'arrête aux fichiers de CODE. Le registre est une DONNÉE, et c'est la donnée qui alimente le
+ *     livrable lu par l'humain. Une exclusion nommée dans un contrôle signale une cause non traitée (N-13) ;
+ *   · un garde de rédaction a rendu VERT sur une ligne de tableau coupée en deux : il excluait le
+ *     saut de ligne, légitime dans un document mais DESTRUCTEUR dans une ligne de tableau ;
+ *   · et la septième n'a été attrapée par aucun mécanisme — le garde existait et n'a pas été appelé.
+ *
+ * D'OÙ LE PRÉDICAT, qui n'est pas « pas d'octet de contrôle » mais deux clauses :
+ *   1. aucun octet de contrôle, `\n` compris comme SEULE exception — la tabulation en fait donc
+ *      partie, et c'est voulu : dans ce registre elle n'a aucun emploi légitime et elle est
+ *      exactement la forme qu'a prise la septième morsure ;
+ *   2. aucun `\n` À L'INTÉRIEUR d'une ligne de tableau. Une ligne qui ouvre par `|` et ne ferme pas
+ *      par `|` est une ligne coupée : c'est la forme mesurée, et elle est invisible autrement.
+ *
+ * Le refus tombe AVANT toute écriture, et il nomme l'octet, son échappement d'origine et la parade
+ * (`chr(92)` plutôt qu'un antislash littéral) — un refus sans sa parade se contourne au hasard.
+ */
+const OCTETS = new Map([
+  [0x07, ["\\a", "CLOCHE"]], [0x08, ["\\b", "RETOUR ARRIÈRE"]], [0x09, ["\\t", "TABULATION"]],
+  [0x0b, ["\\v", "TABULATION VERTICALE"]], [0x0c, ["\\f", "SAUT DE PAGE"]], [0x0d, ["\\r", "RETOUR CHARIOT"]],
+]);
+
+export function octetsFautifs(evenement) {
+  const constats = [];
+  const visiter = (valeur, chemin) => {
+    if (typeof valeur === "string") {
+      for (let i = 0; i < valeur.length; i += 1) {
+        const c = valeur.charCodeAt(i);
+        if (c < 0x20 && c !== 0x0a) {
+          const [ech, nom] = OCTETS.get(c) || ["?", `octet 0x${c.toString(16)}`];
+          constats.push(`${chemin} porte un ${nom} (0x${c.toString(16).padStart(2, "0")}) au rang ${i} — ` +
+            `c'est un \`${ech}\` né d'un antislash avalé par l'échappement. Parade : composer l'antislash ` +
+            "par `chr(92)`, jamais en littéral dans une chaîne non brute");
+        }
+      }
+      // Clause 2 : un `\n` qui coupe une ligne de tableau. Une ligne qui OUVRE par `|` doit FERMER
+      // par `|` — sinon les cellules suivantes sont perdues, et le tableau rendu porte deux formes.
+      for (const [n, ligne] of valeur.split("\n").entries()) {
+        const nue = ligne.trim();
+        if (nue.startsWith("|") && !nue.endsWith("|")) {
+          constats.push(`${chemin} porte une ligne de tableau COUPÉE (segment ${n + 1} : « ${nue.slice(0, 60)} ») — ` +
+            "elle ouvre par `|` et ne ferme pas par `|`, donc un saut de ligne l'a tranchée et ses " +
+            "cellules suivantes sont perdues. Un saut de ligne est légitime dans un document et " +
+            "destructeur dans une ligne de tableau : c'est pourquoi la clause 1 ne suffit pas");
+        }
+      }
+      return;
+    }
+    if (Array.isArray(valeur)) { valeur.forEach((v, i) => visiter(v, `${chemin}[${i}]`)); return; }
+    if (valeur && typeof valeur === "object") {
+      for (const [k, v] of Object.entries(valeur)) visiter(v, chemin ? `${chemin}.${k}` : k);
+    }
+  };
+  visiter(evenement, "");
+  return constats;
+}
+
+// Le garde des octets est EXPORTÉ pour être joué sur le corpus réel avant livraison (N-23), et un
+// module dont l'import déclenche la ligne de commande n'est pas importable. La partie CLI ne
+// s'exécute donc que si ce fichier est le point d'entrée — même idiome que les oracles du dépôt.
+const lanceEnDirect = process.argv[1]
+  && fileURLToPath(import.meta.url).toLowerCase().replaceAll("\\", "/")
+     === process.argv[1].toLowerCase().replaceAll("\\", "/");
+if (!lanceEnDirect) { /* importé pour `octetsFautifs` : rien d'autre ne doit se produire */ }
+else {
+
 if (!fichier) sortir(1, { message: "usage : node journaliser.mjs --fichier <evenements.json> [--registre <f>] [--essai]" });
 if (!existsSync(fichier)) sortir(1, { message: `fichier d'événements introuvable : ${fichier}` });
 
@@ -65,6 +146,18 @@ if (porteurs.length) {
     message: `${porteurs.length} événement(s) portent déjà un \`ts\` (rang ${porteurs.join(", ")}) — refusé, ` +
       "aucune écriture. `ts` est l'heure de CONSIGNATION : elle est stampée ici. L'heure d'un " +
       "fait rapporté est une donnée — `date_decision`, `date_correction`, ou un champ nommé (TF-0413)",
+  });
+}
+
+// Refus AVANT toute écriture, comme celui du `ts` : un lot qui porte un octet fautif n'est pas
+// écrit à moitié. Le rang de l'événement est nommé, sinon le lecteur cherche dans tout le lot.
+const fautifs = entrants.flatMap((e, i) => octetsFautifs(e).map((c) => `rang ${i} — ${c}`));
+if (fautifs.length) {
+  sortir(1, {
+    message: `${fautifs.length} octet(s) de contrôle ou ligne(s) de tableau coupée(s) — refusé, aucune écriture. ` +
+      "Le registre alimente `TODO.md` et `TODO.html` : un octet invisible y devient un chemin " +
+      "introuvable, et une ligne de tableau coupée y perd ses cellules (TF-0621, classe payée sept " +
+      `fois le 25/08). Constats : ${fautifs.join(" · ")}`,
   });
 }
 
@@ -104,3 +197,5 @@ sortir(0, {
   message: `${lignes.length} événement(s) journalisé(s) dans ${REGISTRE}` +
     (avant !== "PASS" ? ` — ATTENTION : le registre était déjà ${avant} avant cette écriture` : ""),
 });
+
+}

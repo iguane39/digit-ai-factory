@@ -33,7 +33,10 @@
  *         dépôt, et du champ de tout oracle. C'est le cas fondateur, exactement.
  *   SP2 · un porteur de secrets qui vit dans un dépôt mais que ce dépôt N'IGNORE PAS est signalé
  *         et RENVOYÉ à R-14, qui est son juge. Ce contrôle ne la double pas : il la complète en
- *         amont, et le dire évite deux vérités sur le même objet.
+ *         amont, et le dire évite deux vérités sur le même objet. Et il rend l'état le plus
+ *         GRAVE des trois que la présence porte — non ignoré < SUIVI < PUBLIÉ (TF-0619) —
+ *         parce que le plus faible appelle un `git rm --cached` et le plus grave une ROTATION
+ *         D'IDENTIFIANT : un libellé commun aux deux fait rendre le mauvais geste.
  *
  * AUCUNE LECTURE DE CONTENU, JAMAIS — c'est le troisième point de la demande, et il est structurel :
  * un contrôle qui ouvrirait ces fichiers pour « vérifier » deviendrait lui-même un chemin de fuite
@@ -88,6 +91,8 @@ export const NON_JUGE = [
   "SP2 SIGNALE sans juger : qu'un porteur soit correctement ignoré par son dépôt est le travail de R-14 (`oracle-conformite-projet`), et deux vérités sur le même objet en valent zéro",
   "la PROFONDEUR est bornée à 3 niveaux sous la racine du parc : un porteur enfoui plus profond dans un dossier hors dépôt n'est pas vu — déclaré plutôt que promis",
   "les dossiers que git ignore DANS un dépôt (`node_modules`, `.venv`) ne sont pas parcourus : un porteur de secrets d'une dépendance tierce n'est pas notre sujet et le signaler noierait les vrais",
+  "la PUBLICATION est jugée sur les références distantes du DISQUE : aucun `fetch` n'est joué, donc un porteur publié APRÈS le dernier fetch est vu « non publié ». Un contrôle hors ligne ne peut pas tenir une promesse de fraîcheur, et un dépôt sans aucune référence distante rend `publication_non_verifiee` plutôt que « non publié » (N-16)",
+  "ce qu'un porteur PUBLIÉ contient réellement : l'état dit que le contenu est déposé, pas qu'il porte un secret valide. Juger cela exigerait de l'ouvrir, ce que ce contrôle ne fait jamais — la rotation est donc RECOMMANDÉE, et la décision reste humaine",
 ];
 
 const IGNORES = new Set([".git", "node_modules", ".venv", "__pycache__", "dist", "build", ".next", "vendor", ".pytest_cache", ".ruff_cache", ".mypy_cache"]);
@@ -123,6 +128,78 @@ function ignoreParSonDepot(depot, chemin) {
   return r.status === 0;
 }
 
+// TF-0619 (25/08) — LA PRÉSENCE PORTE TROIS ÉTATS, JAMAIS DEUX, et c'est N-26 sur l'autre face.
+// N-26 dit qu'un objet ABSENT porte trois états et que le cran manquant ne se devine pas : il faut
+// regarder AILLEURS pour le voir. La présence d'un porteur de secrets dans un dépôt en porte trois
+// aussi, et la première version de SP2 ne lisait que le plus faible :
+//
+//     non ignoré  <  SUIVI par git  <  PUBLIÉ sur un dépôt distant
+//
+// LE FAIT : le 25/08, SP2 a signalé trois porteurs « dans un dépôt qui ne les ignore pas ». Vrai
+// pour les trois. Mais l'un était SUIVI et son commit PRÉSENT sur `origin/main` chez Azure DevOps —
+// donc son contenu est déposé, et le retirer du disque n'y change rien ; un autre était SUIVI sur
+// deux commits, non publié. Un seul portait vraiment l'état le plus faible.
+//
+// UN CONTRÔLE QUI SOUS-ESTIME EST LE COUSIN DE CELUI QUI SUR-ESTIME, et il est plus dangereux :
+// son constat est VRAI, donc rien n'alerte. « Non ignoré » se lit « pourrait être commité un jour »
+// et appelle un `git rm --cached` ; « publié » se lit « le secret est parti » et appelle une
+// ROTATION D'IDENTIFIANT — deux gestes différents, pour un même libellé. Le coût a été payé : une
+// décision humaine a été rendue sur la lecture faible.
+//
+// LES DEUX BORNES, déclarées et non promises (N-16 : un négatif sur une ressource externe ne se
+// prononce pas depuis une seule sonde) :
+//   · un dépôt SANS aucune référence distante connue localement ne se juge pas « non publié » — il
+//     se juge `publication_non_verifiee`. L'absence de preuve n'est pas la preuve de l'absence ;
+//   · AUCUN `fetch` n'est joué. Les références distantes lues sont celles du disque, donc peut-être
+//     périmées : un fichier publié APRÈS le dernier fetch est vu « non publié ». Le dire, plutôt
+//     que de promettre une fraîcheur qu'un contrôle hors ligne ne peut pas tenir.
+const ETATS = ["non_ignore", "suivi", "publication_non_verifiee", "publie"];
+const GRAVITE = (e) => ETATS.indexOf(e);
+
+/** Le porteur est-il SUIVI par git ? Une question à l'index, aucune lecture du fichier. */
+function suiviParGit(depot, chemin) {
+  return spawnSync("git", ["-C", depot, "ls-files", "--error-unmatch", chemin],
+    { encoding: "utf8" }).status === 0;
+}
+
+/** Ce dépôt connaît-il au moins une référence distante ? Sinon la publication n'est pas jugeable. */
+function aDesReferencesDistantes(depot) {
+  const r = spawnSync("git", ["-C", depot, "for-each-ref", "--count=1", "refs/remotes"],
+    { encoding: "utf8" });
+  return r.status === 0 && String(r.stdout).trim().length > 0;
+}
+
+/**
+ * L'état le plus GRAVE des trois, MESURÉ. Le fichier lui-même n'est jamais ouvert : on interroge
+ * l'index, l'historique et les références distantes — jamais le contenu.
+ */
+function etatDansLeDepot(depot, chemin) {
+  if (!suiviParGit(depot, chemin)) return { etat: "non_ignore" };
+  if (!aDesReferencesDistantes(depot)) return { etat: "publication_non_verifiee" };
+  const log = spawnSync("git", ["-C", depot, "log", "--format=%H", "--all", "--", chemin],
+    { encoding: "utf8" });
+  const commits = String(log.stdout || "").split("\n").map((x) => x.trim()).filter(Boolean);
+  for (const sha of commits) {
+    const b = spawnSync("git", ["-C", depot, "branch", "-r", "--contains", sha, "--format=%(refname:short)"],
+      { encoding: "utf8" });
+    const branches = String(b.stdout || "").split("\n").map((x) => x.trim()).filter(Boolean);
+    // `git branch -r` liste aussi les pointeurs symboliques (`origin`, alias de `origin/HEAD`).
+    // Les nommer rendrait « PUBLIÉ sur `origin` », un renvoi que le lecteur ne peut pas rouvrir :
+    // il ne désigne aucune branche. On préfère une branche RÉELLE, et l'alias en dernier recours.
+    const reelles = branches.filter((x) => x.includes("/") && !/\/HEAD$/.test(x));
+    // La branche NOMMÉE est celle qui porte le plus loin : « publié sur `origin/main` » n'a pas la
+    // même portée que « publié sur une branche de travail », et prendre la première de la liste
+    // rendait l'une pour l'autre au hasard de l'ordre alphabétique. La principale d'abord, donc.
+    const principale = reelles.find((x) => /\/(main|master|develop)$/.test(x));
+    if (branches.length) {
+      return { etat: "publie", sha, branche: (principale || reelles[0] || branches[0]),
+        branches: reelles.length || branches.length };
+    }
+  }
+  // Suivi, des références distantes existent, et aucun de ses commits n'y figure : non publié.
+  return { etat: "suivi", commits: commits.length };
+}
+
 export function juger(racineParc) {
   const horsDepot = [];
   const dansDepotNonIgnore = [];
@@ -131,7 +208,9 @@ export function juger(racineParc) {
     lus += 1;
     const depot = depotDe(p);
     if (!depot) { horsDepot.push(p); continue; }
-    if (!ignoreParSonDepot(depot, p)) dansDepotNonIgnore.push({ p, depot });
+    if (!ignoreParSonDepot(depot, p)) {
+      dansDepotNonIgnore.push({ p, depot, ...etatDansLeDepot(depot, p) });
+    }
   }
   return { lus, horsDepot, dansDepotNonIgnore };
 }
@@ -172,6 +251,45 @@ if (args.includes("--self-test")) {
         .every(PORTEUR_DE_SECRETS));
     att("la famille NE reconnaît PAS ce qui n'en est pas",
       ![ "README.md", "package.json", "tokens.css", "environnement.md" ].some(PORTEUR_DE_SECRETS));
+    // TF-0619 — L'ÉCHELLE DES TROIS ÉTATS, chacun joué sur un dépôt fabriqué exprès. Un état
+    // dont la branche rouge n'est jamais jouée est une branche morte qui se croit vivante.
+    att("SP2 — un porteur non ignoré et NON SUIVI rend l'état le plus FAIBLE",
+      r.dansDepotNonIgnore.find((x) => basename(x.p) === "credentials.json").etat === "non_ignore");
+
+    // Un dépôt SANS aucune référence distante : la publication n'est pas jugeable (N-16).
+    const seul = join(base, "sans-remote");
+    mkdirSync(seul, { recursive: true });
+    execFileSync("git", ["-C", seul, "init", "-q"]);
+    execFileSync("git", ["-C", seul, "config", "user.email", "recette@local"]);
+    execFileSync("git", ["-C", seul, "config", "user.name", "recette"]);
+    writeFileSync(join(seul, ".env"), "CLE=valeur\n", "utf8");
+    execFileSync("git", ["-C", seul, "add", ".env"]);
+    execFileSync("git", ["-C", seul, "commit", "-q", "-m", "suivi"]);
+    const rSeul = juger(seul).dansDepotNonIgnore.find((x) => basename(x.p) === ".env");
+    att("SP2 — un porteur SUIVI dans un dépôt sans référence distante rend `publication_non_verifiee`, jamais « non publié »",
+      rSeul && rSeul.etat === "publication_non_verifiee");
+
+    // Le même dépôt, cloné : le clone connaît des références distantes, et son `.env` y est PUBLIÉ.
+    const clone = join(base, "clone");
+    execFileSync("git", ["clone", "-q", seul, clone]);
+    const rClone = juger(clone).dansDepotNonIgnore.find((x) => basename(x.p) === ".env");
+    att("SP2 — un porteur suivi dont un commit vit sur une référence distante rend `publie`",
+      rClone && rClone.etat === "publie" && typeof rClone.branche === "string");
+    att("SP2 — l'état `publie` nomme le commit qui le prouve, pour que le lecteur puisse le contredire",
+      rClone && /^[0-9a-f]{7,40}$/.test(String(rClone.sha)));
+
+    // Le sens ROUGE de l'échelle : un porteur suivi dont AUCUN commit n'est publié reste `suivi`.
+    writeFileSync(join(clone, "autre.key"), "x\n", "utf8");
+    execFileSync("git", ["-C", clone, "config", "user.email", "recette@local"]);
+    execFileSync("git", ["-C", clone, "config", "user.name", "recette"]);
+    execFileSync("git", ["-C", clone, "add", "autre.key"]);
+    execFileSync("git", ["-C", clone, "commit", "-q", "-m", "local seulement"]);
+    const rLocal = juger(clone).dansDepotNonIgnore.find((x) => basename(x.p) === "autre.key");
+    att("SP2 — un porteur suivi sur un commit LOCAL seulement rend `suivi`, pas `publie`",
+      rLocal && rLocal.etat === "suivi" && rLocal.commits === 1);
+    att("l'échelle est ORDONNÉE : publié est plus grave que suivi, lui-même plus grave que non ignoré",
+      GRAVITE("publie") > GRAVITE("suivi") && GRAVITE("suivi") > GRAVITE("non_ignore"));
+
     // Le second sens de SP1 : plus de porteur hors dépôt une fois le fichier retiré.
     rmSync(join(base, ".env"));
     att("SP1 — le constat DISPARAÎT quand le fichier est retiré (le contrôle n'est pas figé)",
@@ -210,10 +328,27 @@ if (lanceEnDirect) {
   }
 
   if (dansDepotNonIgnore.length) {
-    ko("SP2", String(racine), `${dansDepotNonIgnore.length} porteur(s) de secrets DANS un dépôt qui ne les IGNORE PAS : ` +
-      `${dansDepotNonIgnore.map((x) => rel(x.p)).join(", ")}. Celui-là est le sujet de R-14 et de son ` +
-      "oracle, qui en est le juge : ce constat le SIGNALE et le lui renvoie, il ne le double pas — " +
-      "deux vérités sur le même objet en valent zéro");
+    // L'ÉTAT LE PLUS GRAVE OUVRE LE MESSAGE, et chaque ligne porte le sien : « non ignoré » appelle
+    // un `git rm --cached`, « publié » appelle une ROTATION D'IDENTIFIANT. Un libellé commun aux
+    // deux ferait rendre le mauvais geste, ce qui est exactement le coût payé le 25/08.
+    const parGravite = [...dansDepotNonIgnore].sort((a, b) => GRAVITE(b.etat) - GRAVITE(a.etat));
+    const LIBELLE = {
+      publie: (x) => `PUBLIÉ sur \`${x.branche}\` (commit ${String(x.sha).slice(0, 7)}${x.branches > 1 ? `, et ${x.branches} branches distantes le contiennent` : ""}) — le contenu est DÉPOSÉ : ` +
+        "le retirer du disque n'y change rien, seule une ROTATION de l'identifiant réduit le risque",
+      publication_non_verifiee: () => "SUIVI par git, et sa publication n'est PAS VÉRIFIABLE ici — " +
+        "ce dépôt ne connaît aucune référence distante, et une absence de preuve n'est pas une preuve d'absence (N-16)",
+      suivi: (x) => `SUIVI par git sur ${x.commits} commit(s), non publié — un seul \`push\` suffirait, ` +
+        "donc le retirer du suivi passe AVANT toute publication",
+      non_ignore: () => "non ignoré, non suivi — l'état le plus faible des trois, sujet de R-14",
+    };
+    const pire = parGravite[0].etat;
+    ko("SP2", String(racine), `${dansDepotNonIgnore.length} porteur(s) de secrets DANS un dépôt qui ne les IGNORE PAS, ` +
+      `état le plus grave : ${pire.toUpperCase()}. ` +
+      parGravite.map((x) => `${rel(x.p)} → ${LIBELLE[x.etat](x)}`).join(" · ") +
+      ". La PRÉSENCE porte TROIS états et jamais deux (TF-0619, N-26 sur l'autre face) : non ignoré < " +
+      "suivi < publié, et le plus faible appelle un autre geste que le plus grave. L'état `non_ignore` " +
+      "reste le sujet de R-14 et de son oracle, qui en est le juge : ce constat le SIGNALE et le lui " +
+      "renvoie, il ne le double pas — deux vérités sur le même objet en valent zéro");
   } else {
     ok("SP2", String(racine), "aucun porteur de secrets non ignoré par son dépôt");
   }
@@ -229,7 +364,7 @@ if (lanceEnDirect) {
     AUTONOME.test(relative(racine, chemin).replaceAll("\\", "/").split("/")[0]);
   const bloquants = [...horsDepot, ...dansDepotNonIgnore.map((x) => x.p)].filter(dansNotrePerimetre);
   const verdict = F.some((f) => f.statut === "FAIL") ? "FAIL" : "PASS";
-  console.log(JSON.stringify({ oracle: "oracle-secrets-hors-perimetre", version: "1.0.0",
+  console.log(JSON.stringify({ oracle: "oracle-secrets-hors-perimetre", version: "1.1.0",
     racine: String(racine), verdict,
     bloquant: bloquants.length > 0,
     portee_du_blocage: "exit 1 SEULEMENT si un constat porte sur le pilot ou une forge — ailleurs le remède appartient au produit ou à l'humain",
