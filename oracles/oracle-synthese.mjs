@@ -575,6 +575,48 @@ function juger(texte) {
     else ok("S22", `${risquees.length} négatif(s) externe(s), chacun corroboré par une seconde sonde ou formulé comme une lecture de source`);
   }
 
+  // ---- S25 (TF-0606, 25/08) — une INCAPACITE affirmee nomme les CHEMINS essayes ---------------
+  //
+  // TROISIEME SOEUR DE S22, ET DISTINCTE DES DEUX AUTRES. S22 vise un negatif sur une RESSOURCE
+  // externe (« il n'y a pas de TXT »), S24 une recherche par NOM qui ne trouve rien. Ici l'objet
+  // n'est ni une ressource ni un catalogue : c'est une CAPACITE — « je ne peux pas deployer d'ici ».
+  //
+  // LE FAIT, de premiere main. Le CLI d'un hebergeur a rendu « Unauthorized. Please run login
+  // again » ; son verbe de connexion ouvre un navigateur, donc hors de portee. Conclusion ecrite a
+  // l'humain : « je ne peux pas deployer d'ici ». TROIS MINUTES plus tard, sur signalement de
+  // l'humain, l'API GraphQL du meme hebergeur repondait DU PREMIER COUP avec un jeton present sur
+  // le disque.
+  //
+  // POURQUOI S21 NE SUFFISAIT PAS, et c'est ce qui justifie une regle de plus : S21 exige la TRACE
+  // de la tentative, et la trace etait la — « Unauthorized » est un message d'erreur mesure. Une
+  // impossibilite peut donc etre EPROUVEE sur un chemin et FAUSSE sur la capacite. Le CLI n'est pas
+  // la capacite de deployer : il en est une PORTE.
+  //
+  // AGGRAVANT, et il ne se controle pas ici : la documentation qui nommait l'autre porte etait DEJA
+  // CHARGEE dans le contexte au moment de la conclusion. Ce n'etait pas une lacune de connaissance,
+  // c'etait un declencheur manquant — meme diagnostic que S22.
+  //
+  // LA FORME EXIGEE : soit DEUX chemins au moins sont nommes, soit l'enonce declare qu'un seul
+  // existe. Non bloquant : la regle apprend a chercher la seconde porte, elle ne refuse pas un
+  // travail juste.
+  // Le motif ne retient que les formulations SANS AMBIGUITE sur l'acces. « hors de portee » en
+  // a ete RETIRE apres mesure : la fixture conforme du hook porte « hors de portee de ce
+  // correctif », qui declare un PERIMETRE et non une incapacite d'agir. Une regle qui accuse un
+  // travail juste se fait desactiver — et celle-ci apprend une tournure, elle ne refuse rien.
+  const INCAPACITE = /(je ne (?:peux|pourrai) pas|impossible (?:depuis|d'ici)|pas (?:possible|faisable) (?:d'ici|depuis)|incapable de|bloqu[ée]{1,2} (?:pour|par) l'acc[èe]s)/i;
+  const PLUSIEURS_CHEMINS = /(deux (?:chemins|voies|acc[èe]s|portes)|CLI (?:et|puis|\+) API|API (?:et|puis|\+) CLI|autre (?:chemin|voie|porte|point d'entr[ée]e|acc[èe]s)|ni .{2,40} ni |seule (?:voie|porte|acc[èe]s)|unique (?:chemin|voie|acc[èe]s)|aucun autre chemin)/i;
+  {
+    const phrases = texte.split(/(?<=[.!?;])\s+|\n/).map((x) => x.trim()).filter(Boolean);
+    const risquees = phrases.filter((x) => INCAPACITE.test(x));
+    const nues = risquees.filter((x) => !PLUSIEURS_CHEMINS.test(x));
+    if (!risquees.length) ok("S25", "aucune incapacite affirmee — rien a corroborer");
+    else if (nues.length) ko("S25", `${nues.length} incapacite(s) sur ${risquees.length} affirmee(s) sans nommer les CHEMINS essayes : ` +
+      "un outil qui refuse n'est pas une capacite absente — un CLI non authentifie ne dit rien de l'API du meme service. " +
+      "Nommer au moins DEUX chemins, ou declarer qu'un seul existe (« seule voie », « aucun autre chemin »). " +
+      `Ex. : ${nues[0].replace(/\s+/g, " ").slice(0, 110)}`);
+    else ok("S25", `${risquees.length} incapacite(s) affirmee(s), chacune adossee aux chemins essayes`);
+  }
+
   // ---- S24 (TF-0596, 24/08) — une recherche par NOM qui ne trouve rien n'établit que l'absence
   // du NOM -----------------------------------------------------------------------------------------
   //
@@ -961,6 +1003,9 @@ Aucun écart : la demande a été suivie à la lettre.
       "## 8. Prochaines actions\n" +
       "- d'abord regrouper les constats (auto_ia) — parce que c'est le plus rentable, préalable : ligne 8 (droit IAM).\n" +
       "- ensuite publier la version (manuelle_dev) — parce que tout est prouvé, il faut un UAMI.\n" +
+      // TF-0606 : une incapacite affirmee sans nommer les chemins essayes. Le CLI a refuse,
+      // l'API du meme service repondait — mais rien ici ne dit qu'un second chemin a ete tente.
+      "- je ne peux pas deployer d'ici, le CLI rend Unauthorized.\n" +
       // S21 : un motif `acces` AFFIRMÉ, sans la moindre trace de tentative — c'est le cas fautif
       // mesuré le 23/08, où un blocage a été affirmé alors que la même classe de contrainte avait
       // déjà été levée deux fois le jour même. La ligne porte tout le reste (acteur, motif,
@@ -1001,7 +1046,7 @@ Aucun écart : la demande a été suivie à la lettre.
   if (rr.status !== 1) casse.push("la fixture ROUGE ne FAIL pas");
   else {
     for (const regle of ["S2", "S3", "S5", "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16",
-                         "S17", "S18", "S19", "S20", "S21", "S22", "S23", "S24"]) {
+                         "S17", "S18", "S19", "S20", "S21", "S22", "S23", "S24", "S25"]) {
       if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
     }
   }
