@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=ee931e706427 archive=40441f7fe541 · dernier événement: 2026-08-25T08:29:48.590Z -->
+     sceaux: actifs=deb41a6bdcf9 archive=40441f7fe541 · dernier événement: 2026-08-25T08:33:06.070Z -->
 
-**150 actifs** (candidat 12 · décidé 1 · en cours 0 · corrigé 132 · écarté 5) · **469 archivés**.
+**153 actifs** (candidat 15 · décidé 1 · en cours 0 · corrigé 132 · écarté 5) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -22,7 +22,9 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0613 | candidat | 10 | Une redirection Cloudflare exige un enregistrement proxifie, et le mecanisme moderne peut etre refuse | **oui** — regle moderne refusee malgre le droit apparemment adequat ; 7 hostnames a proxifier pour ouvrir le 443 |
 | TF-0581 | candidat | 8.3 | Le seul verificateur de contraste ne regarde que le menu du header | **oui** — texte a ratio 1,0 reste en production ; oracle de contraste present au depot et scope au seul .header-line |
 | TF-0584 | candidat | 6 | Une sonde de contraste doit se confronter a la palette declaree du projet | **oui** — 2 erreurs de sonde successives produisant des verdicts faux, l'un negatif l'autre positif |
+| TF-0619 | candidat | 3 | SP2 rend un fait VRAI a la MAUVAISE gravite : « non ignore » se lit « pourrait etre commite un jour » quand la verite etait « deja commite et deja publie » | **oui** — cout PAYE en run reel : la decision humaine D-02 du 25/08 a ete prise sur la lecture « non ignore », alors qu'un des trois fichiers etait deja publie sur un depot distant — le geste que cet etat appelle n'est pas le meme |
 | TF-0618 | candidat | 2 | Un lot qui denonce un fait DEJA CORRIGE ne cite pas l'item du registre qui le couvre | **oui** — cout PAYE en run reel : TF-0614 a consomme une lecture, un rangement au registre et une decision humaine pour un travail deja livre la veille (TF-0598, corrige le 24/08 a 18h48) |
+| TF-0621 | candidat | 2 | Un octet de controle accidentel dans le REGISTRE echappe a P3, dont la portee s'arrete aux fichiers de code — et c'est un avertissement d'interprete, pas un controle, qui a rattrape le coup | **oui** — cout PAYE trois fois : le 18/08 une regex morte sept jours dans forge-tests (TF-0591), ce matin deux fichiers du pilot, et a l'instant le registre lui-meme — la seule alerte etant un SyntaxWarning lu par hasard |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
 | TF-0526 | corrige | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
 | TF-0530 | corrige | 25 | pilot : le garde-fou « le pilot n'ecrit pas chez un produit » tenait par DISCIPLINE SEULE, et les classes de defaut du jour n'avaient pas de regle generique | **oui** — un garde-fou non execute est un garde-fou qu'on suit jusqu'au jour ou on ne le suit plus ; et neuf classes de defaut payees le meme jour sans qu'aucune regle generique ne les empeche de revenir ailleurs |
@@ -181,6 +183,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0620 | candidat | 3 | forge-tests PRESCRIT un nom de fichier porteur de secrets chez le projet audite et ne livre PAS la ligne qui l'ignore — 1 projet sur 3 l'ignore | **oui** — cout PAYE : deux projets sur trois ont leur configuration d'audit versionnee, dont un PUBLIE sur origin/main chez Azure DevOps — la protection etait supposee par un commentaire et par rien d'autre |
 | TF-0543 | corrige | 25 | Trois listes d'exclusion divergentes : `input` manque aux deux qui comptent, 3e occurrence de la famille | **oui** — 3 listes d'exclusion distinctes (interface.py _EXCLUS, securite.py _EXCLUS_DEPENDANCES, disposition.py _HORS_SOURCES) ; 2 lots anterieurs (20260814a x2) ont deja rallonge les deux premieres |
 | TF-0542 | corrige | 20 | Aucun levier projet ne borne le perimetre de fichiers : RT-1 n'est pas une config omise | **oui** — 37 cles FORGE_TESTS_* relevees dans forge_tests/ ; aucune ne borne le perimetre de fichiers des pans interface/securite/prompts |
 | TF-0602 | corrige | 15 | forge-tests : le registre de dette a un `--verifier` qui fonctionne et que rien ne joue a la livraison — 15 limites declarees par le code lui manquaient, sur trois modules livres les 22 et 23/08 | **oui** — QUINZE limites declarees par le code et absentes du registre commite, sur TROIS modules livres les 22 et 23/08 — soit la reapparition du defaut fondateur de TF-0384 deux jours apres sa correction, par une autre cause. L'ecart n'a ete trouve par aucun controle : il l'a ete par un appel ACCIDENTEL a un outil dont `--help` regenere le fichier au lieu d'afficher une aide. |
