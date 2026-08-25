@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=4d4ef8460f2e archive=40441f7fe541 · dernier événement: 2026-08-25T13:23:04.779Z -->
+     sceaux: actifs=5c12beb9f086 archive=40441f7fe541 · dernier événement: 2026-08-25T13:57:02.959Z -->
 
-**158 actifs** (candidat 12 · décidé 1 · en cours 0 · corrigé 138 · écarté 7) · **469 archivés**.
+**159 actifs** (candidat 13 · décidé 1 · en cours 0 · corrigé 138 · écarté 7) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -21,6 +21,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0613 | candidat | 10 | Une redirection Cloudflare exige un enregistrement proxifie, et le mecanisme moderne peut etre refuse | **oui** — regle moderne refusee malgre le droit apparemment adequat ; 7 hostnames a proxifier pour ouvrir le 443 |
 | TF-0581 | candidat | 8.3 | Le seul verificateur de contraste ne regarde que le menu du header | **oui** — texte a ratio 1,0 reste en production ; oracle de contraste present au depot et scope au seul .header-line |
 | TF-0584 | candidat | 6 | Une sonde de contraste doit se confronter a la palette declaree du projet | **oui** — 2 erreurs de sonde successives produisant des verdicts faux, l'un negatif l'autre positif |
+| TF-0627 | candidat | 3 | Le pilot n'a AUCUN canal pour confier un travail a un produit — le carnet du produit existe, il est tenu, et rien ne l'alimente depuis le pilot | **oui** — cout MESURE : 38 artefacts d'heritage absents chez 7 produits, dont le gabarit de restitution et son hook chez cinq — et AUCUN des sept ne le sait, faute de canal pour le lui dire. C'est la raison pour laquelle un etat mesure ne devient pas un travail fait |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
 | TF-0526 | corrige | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
 | TF-0530 | corrige | 25 | pilot : le garde-fou « le pilot n'ecrit pas chez un produit » tenait par DISCIPLINE SEULE, et les classes de defaut du jour n'avaient pas de regle generique | **oui** — un garde-fou non execute est un garde-fou qu'on suit jusqu'au jour ou on ne le suit plus ; et neuf classes de defaut payees le meme jour sans qu'aucune regle generique ne les empeche de revenir ailleurs |
