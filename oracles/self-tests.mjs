@@ -46,7 +46,13 @@ const ICI = dirname(fileURLToPath(import.meta.url));
 const DEDIES = {
   "oracle-conformite-projet.mjs": "self-test.mjs",
   "oracle-ecosysteme.mjs": "self-test-ecosysteme.mjs",
+  "oracle-parite-configuration.mjs": "oracle-parite-configuration.test.mjs",
 };
+
+// Un fichier de RECETTE n'est pas un oracle : le motif `oracle-*.mjs` attrapait
+// `oracle-parite-configuration.test.mjs` et exigeait de lui sa propre recette — une regression
+// infinie. Ecarte nommement plutot que par un motif plus fin, pour que l'exclusion se lise (N-13).
+const EST_UNE_RECETTE = (f) => f.endsWith(".test.mjs");
 
 // I1 bis (23/08, decision humaine « ne touche pas les produits ») : les HOOKS portant leur propre
 // recette entrent dans le meme invariant. Le motif `oracle-*` les laissait dehors — un hook
@@ -57,6 +63,7 @@ const oracles = readdirSync(ICI)
   .filter((f) => (f.startsWith("oracle-") || f.startsWith("hook-")) && f.endsWith(".mjs")
     && readFileSync(join(ICI, f), "utf8").includes('"--self-test"'))
   .concat(readdirSync(ICI).filter((f) => f.startsWith("oracle-") && f.endsWith(".mjs")))
+  .filter((f) => !EST_UNE_RECETTE(f))
   .filter((f, i, t) => t.indexOf(f) === i).sort();
 const resultats = [];
 
