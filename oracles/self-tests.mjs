@@ -208,6 +208,18 @@ const ETAT_DU_PARC = [
     remede: "un run demandé AU PRODUIT (le pilot n'écrit pas chez lui) ; l'héritage porte les pièces (gabarits\\HERITAGE.json, R-47)",
   },
   {
+    // TF-0616 (25/08, retour Produit-11). R-14 demande « ce `.env` est-il IGNORÉ ? » —
+    // question qui n'a de sens que DANS un dépôt. La question antérieure manquait : « est-il au
+    // BON ENDROIT ? ». Un `.env` créé au dossier PARENT d'un dépôt, portant une clé d'API RÉELLE,
+    // y a échappé entièrement : ni `.gitignore` pour le couvrir, ni `git status` pour le signaler,
+    // ni oracle pour le voir. C'est un état du PARC, donc relu à chaque recette. L'oracle NOMME et
+    // ne bloque que ce que le pilot peut réparer — la quasi-totalité des porteurs vit chez des
+    // produits, où le pilot n'écrit pas.
+    nom: "oracle-secrets-hors-perimetre.mjs",
+    motif: "porteur de secrets vivant hors de tout dépôt, ou non ignoré par le sien",
+    remede: "vérifier le contenu, déplacer dans le dépôt qui l'ignore, puis SUPPRIMER (geste humain, R-29) ; chez un produit, par un run demandé",
+  },
+  {
     // TF-0565 (24/08) : UN SQUELETTE QUI N'A JAMAIS ÉTÉ INSTANCIÉ N'A JAMAIS ÉTÉ ÉPROUVÉ. Deux
     // squelettes de dossier posaient une classe sur 8 et 11 paragraphes sans aucune règle CSS et
     // rendaient FAIL à leur propre contrôle de marquage DEPUIS LEUR PRODUCTION : le chapeau se

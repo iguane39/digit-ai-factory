@@ -617,6 +617,81 @@ function juger(texte) {
     else ok("S25", `${risquees.length} incapacite(s) affirmee(s), chacune adossee aux chemins essayes`);
   }
 
+  // ---- S26 (TF-0617, 25/08) — un contrôle qui confirme une écriture NOMME le chemin ABSOLU
+  // qu'il a vérifié -------------------------------------------------------------------------------
+  //
+  // LE FAIT, et c'est le plus instructif du lot qui l'a fait naître. Un agent devait ajouter deux
+  // lignes au `.env` d'un produit. Il l'a écrit sans chemin absolu, depuis un répertoire de travail
+  // qui n'était pas celui qu'il croyait — le fichier a été CRÉÉ dans le dossier parent du dépôt, et
+  // un humain y a collé une clé d'API réelle. Puis il a VÉRIFIÉ, sincèrement :
+  //
+  //     git check-ignore -v .env        →  .gitignore:3:.env   .env
+  //     git status --short | grep .env  →  (rien)
+  //
+  // LES DEUX RÉPONSES SONT VRAIES. Elles portent sur le `.env` du DÉPÔT, parce que la commande a
+  // tourné depuis le dépôt. Le fichier écrit, lui, était ailleurs. *Le contrôle était juste ; son
+  // objet était faux.* Il a rendu un vert sur un fichier que personne n'avait touché, et l'agent a
+  // rapporté à l'humain que sa clé était en sécurité.
+  //
+  // C'EST PIRE QU'UN CONTRÔLE ABSENT : un contrôle absent laisse le doute, un contrôle qui se trompe
+  // d'objet PRODUIT DE LA CONFIANCE. Et il est indétectable à la relecture — les deux commandes sont
+  // correctes, la sortie est correcte, seule la variable cachée (le répertoire de travail) diffère
+  // entre l'écriture et la vérification.
+  //
+  // LA RÈGLE EST S17 TRANSPOSÉE DU TEXTE AU SYSTÈME DE FICHIERS. S17 dit qu'un renvoi nomme son
+  // SUJET et jamais une position, parce qu'une position désigne autre chose au message suivant. Ici
+  // c'est la même chose : un chemin RELATIF désigne autre chose selon d'où on parle. « Le `.env` est
+  // bien gitignoré » n'est pas une preuve ; « `c:\…\Produit-11\.env` est couvert par
+  // `.gitignore:3` » en est une — et elle serait tombée en défaut TOUTE SEULE, parce que le lecteur
+  // aurait lu un chemin qui n'était pas le sien. Le bénéfice est double : la vérification devient
+  // opposable, et LE LECTEUR PEUT LA CONTREDIRE, ce qui est le seul contrôle qui ne se trompe jamais
+  // deux fois de la même façon.
+  //
+  // NON BLOQUANTE, comme S22 et S24 : la règle apprend une tournure, elle ne refuse pas un travail.
+  // LE RESSERRAGE, FAIT AVANT LIVRAISON ET POUR LA DEUXIÈME FOIS DE LA JOURNÉE. Le premier jet
+  // acceptait « est bien couvert » comme une confirmation d'écriture. Joué sur les 336 documents
+  // de `output\`, il a rendu 15 constats — TOUS FAUX : dans ce corpus, « couvert » veut dire
+  // « couvert par un oracle » (« (a) est couvert par les oracles existants »), jamais « couvert
+  // par un .gitignore ». Une règle à 0 % de précision sur le corpus réel n'est pas un contrôle.
+  //
+  // La forme retenue distingue donc DEUX familles de marqueurs :
+  //   · les AUTOSUFFISANTS — `check-ignore`, `gitignore`, `git status` ne parlent que de fichiers ;
+  //   · les FAIBLES — « a bien été créé », « est bien ignoré/protégé/en sécurité » — qui exigent
+  //     EN PLUS un désignateur de fichier dans la même phrase, sans quoi ils attrapent la prose.
+  // `git status` a QUITTÉ les marqueurs autosuffisants, et c'est le second resserrage. Le corpus
+  // l'emploie massivement pour prouver que RIEN n'a été écrit — « `git status` de forge-data
+  // inchangé, aucun fichier créé dans la forge ». C'est l'inverse exact du fait que cette règle
+  // traque, et l'accuser reviendrait à punir la preuve de non-écriture, qui est la bonne pratique.
+  // Cinq constats sur cinq étaient de cette forme.
+  const MARQUEUR_FORT = /\b(check-ignore|gitignor)\b/i;
+  //: Une déclaration d'ABSENCE n'est pas une confirmation d'écriture.
+  const DECLARE_UNE_ABSENCE = /\b(inchang[ée]|aucun(?:e)?\s+(?:fichier|[ée]criture|d[ée]p[ôo]t)|propre\b|rien n(?:'|’)a|hors ce rapport)/i;
+  const MARQUEUR_FAIBLE = /\ba (?:bien )?(?:[ée]t[ée] )?(?:cr[ée]{1,2}|[ée]crit|ajout[ée]|d[ée]pos[ée]|enregistr[ée])\b|\best (?:bien )?(?:ignor[ée]|prot[ée]g[ée]|en s[ée]curit[ée])\b/i;
+  //: Un désignateur de FICHIER, et pas n'importe quel objet : la famille des porteurs de secrets
+  //: et de configuration, plus le mot « fichier » lui-même. C'est ce qui empêche « la règle a été
+  //: créée » ou « le contrôle est bien protégé » de déclencher.
+  const DESIGNE_UN_FICHIER = /\.env\b|\.gitignore\b|\.(?:pem|key|npmrc)\b|\bcredentials?\b|\bsecrets?\b|\bfichier\b/i;
+  const CONFIRME_UNE_ECRITURE = {
+    // La déclaration d'ABSENCE est écartée d'abord : « aucun fichier `.env` n'a été créé » porte le
+    // marqueur et le désignateur, et dit pourtant l'inverse de ce que la règle traque.
+    test: (x) => !DECLARE_UNE_ABSENCE.test(x)
+      && (MARQUEUR_FORT.test(x) || (MARQUEUR_FAIBLE.test(x) && DESIGNE_UN_FICHIER.test(x))),
+  };
+  //: Un chemin ABSOLU, sous les deux formes du parc : Windows (`c:\…`) et POSIX (`/…`).
+  const CHEMIN_ABSOLU = /\b[A-Za-z]:[\\/][^\s`»]{3,}|(?:^|[\s`(])\/[A-Za-z_][\w./-]{3,}/;
+  {
+    const phrases = texte.split(/(?<=[.!?;])\s+|\n/).map((x) => x.trim()).filter(Boolean);
+    const risquees = phrases.filter((x) => CONFIRME_UNE_ECRITURE.test(x));
+    const nues = risquees.filter((x) => !CHEMIN_ABSOLU.test(x));
+    if (!risquees.length) ok("S26", "aucune écriture confirmée — rien à localiser");
+    else if (nues.length) ko("S26", `${nues.length} confirmation(s) d'écriture sur ${risquees.length} sans le chemin ABSOLU vérifié : ` +
+      "un chemin relatif désigne autre chose selon d'où on parle, et un contrôle qui se trompe d'objet PRODUIT de la confiance " +
+      "au lieu du doute. Mesuré le 25/08 : `git check-ignore .env` a rendu VRAI sur le `.env` du dépôt alors que le fichier écrit " +
+      "était dans le dossier parent, avec une clé d'API réelle — le contrôle était juste, son objet était faux. Citer le chemin " +
+      `absolu rend la vérification opposable, et surtout CONTREDISIBLE par le lecteur. Ex. : ${nues[0].replace(/\s+/g, " ").slice(0, 110)}`);
+    else ok("S26", `${risquees.length} confirmation(s) d'écriture, chacune citant le chemin absolu vérifié`);
+  }
+
   // ---- S24 (TF-0596, 24/08) — une recherche par NOM qui ne trouve rien n'établit que l'absence
   // du NOM -----------------------------------------------------------------------------------------
   //
@@ -1028,7 +1103,7 @@ Aucun écart : la demande a été suivie à la lettre.
     .replace("## 4. Traité", "## 4. Traité\n\n- Les controles V1 et V3 sont tenus ; V1 reste le plus couteux. — preuve : 4 cas.")
     // S24 : l'absence conclue d'une recherche PAR NOM — la forme exacte du 24/08, dix motifs de nom
     // de table joués sur trois schémas, et la correspondance qui vivait dans les COLONNES.
-    .replace("## 7. Risques", "## 7. Risques\n\n- L'API du fournisseur ne rend aucun enregistrement TXT : il n'y a pas de TXT côté DNS.\n\n- Aucune table de transcodification : les motifs %transcod%, %corresp% et %mapping% ne remontent rien sur les trois schémas.\n");
+    .replace("## 7. Risques", "## 7. Risques\n\n- L'API du fournisseur ne rend aucun enregistrement TXT : il n'y a pas de TXT côté DNS.\n\n- Aucune table de transcodification : les motifs %transcod%, %corresp% et %mapping% ne remontent rien sur les trois schémas.\n\n- Le fichier .env a bien ete cree et il est bien ignore par git.\n");
   // TF-0567 — la branche « ouverture TITRÉE » a ses DEUX sens, sinon elle serait une porte ouverte :
   // titrée et conforme doit passer (c'est le défaut mesuré : 30 mots lus comme 0), titrée et
   // technique doit continuer d'échouer — un titre ne blanchit rien.
@@ -1046,7 +1121,7 @@ Aucun écart : la demande a été suivie à la lettre.
   if (rr.status !== 1) casse.push("la fixture ROUGE ne FAIL pas");
   else {
     for (const regle of ["S2", "S3", "S5", "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16",
-                         "S17", "S18", "S19", "S20", "S21", "S22", "S23", "S24", "S25"]) {
+                         "S17", "S18", "S19", "S20", "S21", "S22", "S23", "S24", "S25", "S26"]) {
       if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
     }
   }

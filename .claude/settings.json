@@ -4,16 +4,36 @@
       {
         "matcher": "startup|resume",
         "hooks": [
-          { "type": "command", "command": "node oracles/hook-ouverture.mjs", "timeout": 240 },
-          { "type": "command", "command": "node oracles/hook-produits-intacts.mjs --empreinte", "timeout": 120 }
+          {
+            "type": "command",
+            "command": "node oracles/hook-ouverture.mjs",
+            "timeout": 240
+          },
+          {
+            "type": "command",
+            "command": "node oracles/hook-produits-intacts.mjs --empreinte",
+            "timeout": 120
+          }
         ]
       }
     ],
     "Stop": [
       {
         "hooks": [
-          { "type": "command", "command": "node oracles/hook-produits-intacts.mjs", "timeout": 120 },
-          { "type": "command", "command": "node oracles/hook-restitution.mjs", "timeout": 60 }
+          {
+            "type": "command",
+            "command": "node oracles/hook-produits-intacts.mjs",
+            "timeout": 120
+          },
+          {
+            "type": "command",
+            "command": "node oracles/oracle-secrets-hors-perimetre.mjs"
+          },
+          {
+            "type": "command",
+            "command": "node oracles/hook-restitution.mjs",
+            "timeout": 60
+          }
         ]
       }
     ],
@@ -21,8 +41,16 @@
       {
         "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash|PowerShell",
         "hooks": [
-          { "type": "command", "command": "node scripts/readme-dossiers.mjs --silencieux", "timeout": 30 },
-          { "type": "command", "command": "node scripts/generer-lisezmoi-output.mjs --silencieux", "timeout": 30 }
+          {
+            "type": "command",
+            "command": "node scripts/readme-dossiers.mjs --silencieux",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "node scripts/generer-lisezmoi-output.mjs --silencieux",
+            "timeout": 30
+          }
         ]
       }
     ]
