@@ -46,21 +46,30 @@ const poste = (nomProjet, { herite, sousDossier = null }) => {
   const projet = sousDossier ? join(racine, sousDossier, nomProjet) : join(racine, nomProjet);
   mkdirSync(join(projet, "forge"), { recursive: true });
   if (herite) {
-    mkdirSync(join(projet, "forge", "retours"), { recursive: true });
-    mkdirSync(join(projet, "forge", "hooks"), { recursive: true });
-    mkdirSync(join(projet, ".claude"), { recursive: true });
-    writeFileSync(join(projet, "forge", "retours", "RETOURS-FORGES.md"), readFileSync(join(GAB, "RETOURS-FORGES.md"), "utf8"));
-    writeFileSync(join(projet, "forge", "hooks", "factory.mjs"), readFileSync(join(GAB, "hooks-factory.mjs"), "utf8"));
-    // TF-0571 (24/08) : le TEXTE de la doctrine de restitution est entre a l heritage, a cote du
-    // hook qui la juge. Un produit conforme le porte donc, sinon la fixture verte prouverait un
-    // heritage que le referentiel ne declare plus.
-    writeFileSync(join(projet, "forge", "RESTITUTION.md"), readFileSync(join(GAB, "RESTITUTION.md"), "utf8"));
-    // TF-0597 (24/08) : le JUGE de la forme d'un lot voyage avec le gabarit qui la decrit, pour
-    // que le produit puisse se juger AVANT de remettre. Un produit conforme le porte donc lui
-    // aussi — sinon la fixture verte prouverait un heritage que le referentiel ne declare plus.
-    writeFileSync(join(projet, "forge", "retours", "oracle-lot.mjs"), readFileSync(join(GAB, "oracle-lot-retours.mjs"), "utf8"));
-    writeFileSync(join(projet, ".claude", "settings.json"), JSON.stringify({ hooks: { Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }] } }));
-    writeFileSync(join(projet, "CLAUDE.md"), "# projet\n\n## Précédence (R-43)\nLes règles de la factory priment.\n");
+    // TF-0627 (25/08) : CETTE FIXTURE EST DERIVEE DU CONTRAT, PLUS RECOPIEE A LA MAIN.
+    // Elle enumerait les artefacts un par un — la meme classe que les dix listes d'exclusion de
+    // TF-0543 et que le gabarit de configuration de TF-0539 : une liste recopiee se perime au
+    // premier ajout, EN SILENCE. Elle s'est perimee le 25/08, quand le contrat est passe de huit
+    // a dix artefacts pour ouvrir le canal des travaux : la fixture VERTE s'est mise a rendre un
+    // avertissement, et c'est la recette qui a paye, pas le produit. Derivee, elle suit le contrat.
+    const contrat = JSON.parse(readFileSync(join(GAB, "HERITAGE.json"), "utf8"));
+    for (const a of contrat.artefacts) {
+      const cible = join(projet, String(a.cible).replaceAll("/", "\\"));
+      mkdirSync(dirname(cible), { recursive: true });
+      const source = join(GAB, "..", String(a.source).replaceAll("/", "\\"));
+      // Deux artefacts ont un CONTENU juge, pas seulement une presence : les recopier depuis le
+      // gabarit ne suffirait pas, l'oracle y cherche des marqueurs precis. Ils restent explicites.
+      if (a.cible === ".claude/settings.json") {
+        writeFileSync(cible, JSON.stringify({ hooks: { Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }] } }));
+      } else if (a.cible === "CLAUDE.md") {
+        writeFileSync(cible, "# projet\n\n## Précédence (R-43)\nLes règles de la factory priment.\n");
+      } else if (existsSync(source)) {
+        writeFileSync(cible, readFileSync(source, "utf8"));
+      } else {
+        // Mode `presence` sans source lisible : le contrat n'exige que l'existence.
+        writeFileSync(cible, "");
+      }
+    }
   }
   return racine;
 };

@@ -1,79 +1,93 @@
 {
-  "schema": "pilot/heritage@1",
-  "version": "1.2.0",
-  "date": "2026-08-24",
-  "regle": "Tout artefact que le pilot COPIE chez un produit se déclare ici avec son mode de contrôle. Un artefact absent de ce référentiel n'est pas jugé par R-47 — l'oubli se voit à la revue, il ne se devine pas.",
-  "pourquoi": "Constat du 23/08, deux produits en trois jours. Produit-02 possède un `forge\\retours\\` complet, portant ses lots, et AUCUN gabarit RETOURS-FORGES.md : le dossier a été créé, la copie n'y est jamais arrivée. Produit-05 n'a ni l'un ni l'autre. Résultat mesuré : 15 candidatures refusées à l'ingestion par R-45/R-46 pour une forme que le produit ne pouvait pas connaître, faute d'avoir le gabarit qui la porte. La cause n'était pas une négligence de produit mais une COPIE SANS PREUVE : rien ne vérifiait qu'elle était arrivée, et rien ne vérifie encore qu'elle est à jour. Le contrôle R-43 lui-même ne fait qu'un `existsSync` sur les hooks — un hook périmé passe au vert.",
-  "modes": {
-    "copie_conforme": "le produit doit porter une copie IDENTIQUE à la source du pilot (comparaison sur le contenu normalisé en fins de ligne). Absent ou divergent = FAIL. Réservé aux artefacts que le produit ne personnalise JAMAIS : leur forme est jugée ailleurs, la faire diverger casse ce jugement.",
-    "presence": "le produit doit porter le fichier ; son contenu ne se compare pas, parce qu'il est légitimement adapté au projet.",
-    "presence_et_motif": "le produit doit porter le fichier ET son contenu doit contenir le motif déclaré — le socle est exigé, la personnalisation reste libre autour."
+ "schema": "pilot/heritage@1",
+ "version": "1.3.0",
+ "date": "2026-08-25",
+ "regle": "Tout artefact que le pilot COPIE chez un produit se déclare ici avec son mode de contrôle. Un artefact absent de ce référentiel n'est pas jugé par R-47 — l'oubli se voit à la revue, il ne se devine pas.",
+ "pourquoi": "Constat du 23/08, deux produits en trois jours. Produit-02 possède un `forge\\retours\\` complet, portant ses lots, et AUCUN gabarit RETOURS-FORGES.md : le dossier a été créé, la copie n'y est jamais arrivée. Produit-05 n'a ni l'un ni l'autre. Résultat mesuré : 15 candidatures refusées à l'ingestion par R-45/R-46 pour une forme que le produit ne pouvait pas connaître, faute d'avoir le gabarit qui la porte. La cause n'était pas une négligence de produit mais une COPIE SANS PREUVE : rien ne vérifiait qu'elle était arrivée, et rien ne vérifie encore qu'elle est à jour. Le contrôle R-43 lui-même ne fait qu'un `existsSync` sur les hooks — un hook périmé passe au vert.",
+ "modes": {
+  "copie_conforme": "le produit doit porter une copie IDENTIQUE à la source du pilot (comparaison sur le contenu normalisé en fins de ligne). Absent ou divergent = FAIL. Réservé aux artefacts que le produit ne personnalise JAMAIS : leur forme est jugée ailleurs, la faire diverger casse ce jugement.",
+  "presence": "le produit doit porter le fichier ; son contenu ne se compare pas, parce qu'il est légitimement adapté au projet.",
+  "presence_et_motif": "le produit doit porter le fichier ET son contenu doit contenir le motif déclaré — le socle est exigé, la personnalisation reste libre autour."
+ },
+ "non_juge": [
+  "la QUALITÉ de la personnalisation d'un artefact en mode `presence` : ce que le produit en fait lui appartient",
+  "les artefacts non déclarés ici : R-47 ne devine pas, elle joue ce référentiel",
+  "un produit qui n'est pas sous doctrine (aucun `forge\\`) : R-47 rend SANS_OBJET plutôt que d'accabler un dépôt qui n'a jamais été instancié — c'est le sujet distinct de TF-0514"
+ ],
+ "artefacts": [
+  {
+   "source": "gabarits/RETOURS-FORGES.md",
+   "cible": "forge/retours/RETOURS-FORGES.md",
+   "mode": "copie_conforme",
+   "motif": "le canal de retours du produit. Sa FORME est jugée à l'ingestion par R-45 et R-46 : un produit qui ne l'a pas ne peut pas produire un lot conforme, et son travail est refusé à la porte. C'est l'artefact qui a coûté 15 candidatures en trois jours. Son JUGE voyage avec lui depuis le 24/08 (`gabarits/oracle-lot-retours.mjs`) : un texte sans juge decore, un juge sans son texte force a deviner — les deux ou rien, meme raisonnement que pour RESTITUTION.md.",
+   "depuis": "2026-08-23"
   },
-  "non_juge": [
-    "la QUALITÉ de la personnalisation d'un artefact en mode `presence` : ce que le produit en fait lui appartient",
-    "les artefacts non déclarés ici : R-47 ne devine pas, elle joue ce référentiel",
-    "un produit qui n'est pas sous doctrine (aucun `forge\\`) : R-47 rend SANS_OBJET plutôt que d'accabler un dépôt qui n'a jamais été instancié — c'est le sujet distinct de TF-0514"
-  ],
-  "artefacts": [
-    {
-      "source": "gabarits/RETOURS-FORGES.md",
-      "cible": "forge/retours/RETOURS-FORGES.md",
-      "mode": "copie_conforme",
-      "motif": "le canal de retours du produit. Sa FORME est jugée à l'ingestion par R-45 et R-46 : un produit qui ne l'a pas ne peut pas produire un lot conforme, et son travail est refusé à la porte. C'est l'artefact qui a coûté 15 candidatures en trois jours. Son JUGE voyage avec lui depuis le 24/08 (`gabarits/oracle-lot-retours.mjs`) : un texte sans juge decore, un juge sans son texte force a deviner — les deux ou rien, meme raisonnement que pour RESTITUTION.md.",
-      "depuis": "2026-08-23"
-    },
-    {
-      "source": "gabarits/oracle-lot-retours.mjs",
-      "cible": "forge/retours/oracle-lot.mjs",
-      "mode": "copie_conforme",
-      "motif": "LE JUGE de la forme d'un lot, a cote du gabarit qui la decrit. TF-0597 (24/08) : SIX lots admis par derogation en une journee, tous pour les memes sections R-45/R-46 absentes. La cause mesuree est TRIPLE — un produit sans heritage, un produit jamais instancie, et un produit qui a le gabarit A JOUR et ne l'applique pas (quatre lots sur six, le cas le plus frequent). Seul le troisieme n'avait AUCUN controle : les regles vivaient uniquement a la porte du pilot, donc le produit decouvrait le refus apres coup — et sous derogation, jamais. Copie CONFORME et non simple presence : deux implementations de la meme forme donneraient deux verites (defaut nomme par TF-0474 sur les empreintes). Le produit joue `node forge\retours\\oracle-lot.mjs \"<son lot>.md\"` avant de remettre ; le pilot importe le MEME module a l'ingestion.",
-      "depuis": "2026-08-24"
-    },
-    {
-      "source": "gabarits/hooks-factory.mjs",
-      "cible": "forge/hooks/factory.mjs",
-      "mode": "copie_conforme",
-      "motif": "les hooks de la factory (fraîcheur à l'ouverture, restitution jugée à chaque fin de tour). R-43 vérifie déjà leur PRÉSENCE ; ici on vérifie qu'ils sont À JOUR — un hook périmé s'exécute et ne joue pas les règles du jour.",
-      "depuis": "2026-08-23"
-    },
-    {
-      "source": "gabarits/RESTITUTION.md",
-      "cible": "forge/RESTITUTION.md",
-      "mode": "copie_conforme",
-      "motif": "LE TEXTE de la doctrine de restitution, a cote du hook qui la juge. TF-0571 (24/08) : le hook voyageait deja, le texte JAMAIS — mesure sur les dix produits du dossier client, cinq instancies, un seul portant le hook, ZERO portant le texte. Un juge sans son code force l'agent a deviner les huit blocs ; un texte sans juge decore. Les deux ou rien.",
-      "depuis": "2026-08-24"
-    },
-    {
-      "source": "gabarits/settings-produit.json",
-      "cible": ".claude/settings.json",
-      "mode": "presence_et_motif",
-      "motif_exige": "forge/hooks/factory.mjs",
-      "motif": "le câblage des hooks. Le fichier est LÉGITIMEMENT personnalisé par chaque projet (permissions, serveurs MCP) : exiger une copie conforme mettrait en échec tout produit qui l'a adapté. Ce qui est exigé, c'est que le câblage de la factory y soit.",
-      "depuis": "2026-08-23"
-    },
-    {
-      "source": "gabarits/CLAUDE-PRODUIT.md",
-      "cible": "CLAUDE.md",
-      "mode": "presence_et_motif",
-      "motif_exige": "R-43",
-      "motif": "les instructions du produit. Personnalisées par construction — le gabarit porte des `<…>` que l'orchestrateur remplit. Seule la clause de précédence est exigée, et R-43 la juge déjà ; la déclaration ici rend le contrôle exhaustif plutôt que dispersé.",
-      "depuis": "2026-08-23"
-    },
-    {
-      "source": "gabarits/web/robots.txt",
-      "cible": "robots.txt",
-      "mode": "presence",
-      "conditionnel": "produit à surface web",
-      "motif": "agents IA autorisés par défaut ; bloquer se décide et se consigne DANS le fichier, donc son contenu diverge légitimement. R-27 juge déjà le couple robots/llms.",
-      "depuis": "2026-08-23"
-    },
-    {
-      "source": "gabarits/web/llms.txt",
-      "cible": "llms.txt",
-      "mode": "presence",
-      "conditionnel": "produit à surface web",
-      "motif": "la carte du site pour les moteurs génératifs, tenue par development/MEP : son contenu est propre au produit. R-27 juge déjà sa présence à côté de robots.txt.",
-      "depuis": "2026-08-23"
-    }
-  ]
+  {
+   "source": "gabarits/oracle-lot-retours.mjs",
+   "cible": "forge/retours/oracle-lot.mjs",
+   "mode": "copie_conforme",
+   "motif": "LE JUGE de la forme d'un lot, a cote du gabarit qui la decrit. TF-0597 (24/08) : SIX lots admis par derogation en une journee, tous pour les memes sections R-45/R-46 absentes. La cause mesuree est TRIPLE — un produit sans heritage, un produit jamais instancie, et un produit qui a le gabarit A JOUR et ne l'applique pas (quatre lots sur six, le cas le plus frequent). Seul le troisieme n'avait AUCUN controle : les regles vivaient uniquement a la porte du pilot, donc le produit decouvrait le refus apres coup — et sous derogation, jamais. Copie CONFORME et non simple presence : deux implementations de la meme forme donneraient deux verites (defaut nomme par TF-0474 sur les empreintes). Le produit joue `node forge\retours\\oracle-lot.mjs \"<son lot>.md\"` avant de remettre ; le pilot importe le MEME module a l'ingestion.",
+   "depuis": "2026-08-24"
+  },
+  {
+   "source": "gabarits/hooks-factory.mjs",
+   "cible": "forge/hooks/factory.mjs",
+   "mode": "copie_conforme",
+   "motif": "les hooks de la factory (fraîcheur à l'ouverture, restitution jugée à chaque fin de tour). R-43 vérifie déjà leur PRÉSENCE ; ici on vérifie qu'ils sont À JOUR — un hook périmé s'exécute et ne joue pas les règles du jour.",
+   "depuis": "2026-08-23"
+  },
+  {
+   "source": "gabarits/RESTITUTION.md",
+   "cible": "forge/RESTITUTION.md",
+   "mode": "copie_conforme",
+   "motif": "LE TEXTE de la doctrine de restitution, a cote du hook qui la juge. TF-0571 (24/08) : le hook voyageait deja, le texte JAMAIS — mesure sur les dix produits du dossier client, cinq instancies, un seul portant le hook, ZERO portant le texte. Un juge sans son code force l'agent a deviner les huit blocs ; un texte sans juge decore. Les deux ou rien.",
+   "depuis": "2026-08-24"
+  },
+  {
+   "source": "gabarits/settings-produit.json",
+   "cible": ".claude/settings.json",
+   "mode": "presence_et_motif",
+   "motif_exige": "forge/hooks/factory.mjs",
+   "motif": "le câblage des hooks. Le fichier est LÉGITIMEMENT personnalisé par chaque projet (permissions, serveurs MCP) : exiger une copie conforme mettrait en échec tout produit qui l'a adapté. Ce qui est exigé, c'est que le câblage de la factory y soit.",
+   "depuis": "2026-08-23"
+  },
+  {
+   "source": "gabarits/CLAUDE-PRODUIT.md",
+   "cible": "CLAUDE.md",
+   "mode": "presence_et_motif",
+   "motif_exige": "R-43",
+   "motif": "les instructions du produit. Personnalisées par construction — le gabarit porte des `<…>` que l'orchestrateur remplit. Seule la clause de précédence est exigée, et R-43 la juge déjà ; la déclaration ici rend le contrôle exhaustif plutôt que dispersé.",
+   "depuis": "2026-08-23"
+  },
+  {
+   "source": "gabarits/web/robots.txt",
+   "cible": "robots.txt",
+   "mode": "presence",
+   "conditionnel": "produit à surface web",
+   "motif": "agents IA autorisés par défaut ; bloquer se décide et se consigne DANS le fichier, donc son contenu diverge légitimement. R-27 juge déjà le couple robots/llms.",
+   "depuis": "2026-08-23"
+  },
+  {
+   "source": "gabarits/web/llms.txt",
+   "cible": "llms.txt",
+   "mode": "presence",
+   "conditionnel": "produit à surface web",
+   "motif": "la carte du site pour les moteurs génératifs, tenue par development/MEP : son contenu est propre au produit. R-27 juge déjà sa présence à côté de robots.txt.",
+   "depuis": "2026-08-23"
+  },
+  {
+   "source": "gabarits/TRAVAUX-PILOT.md",
+   "cible": "forge/travaux/TRAVAUX-PILOT.md",
+   "mode": "copie_conforme",
+   "motif": "le canal INVERSE, ouvert le 25/08 (TF-0627). Jusque-la le flux etait a SENS UNIQUE : le produit remontait ses retours par un dispositif complet (lot, sidecar, rejet atomique, derogation tracee) et le pilot n'avait AUCUNE voie pour lui confier un travail. Cout mesure : 38 artefacts d'heritage absents chez sept produits, dont le gabarit de restitution et son hook chez cinq, et AUCUN des sept ne le savait. Ce gabarit decrit la forme d'un lot de travaux depose par le pilot dans `input/00-travaux/` du produit — que le produit INGERE lui-meme, ce qui tient N-5 a la lettre : le pilot n'ecrit que dans une boite d'entree, jamais dans le carnet ni dans le code.",
+   "depuis": "2026-08-25"
+  },
+  {
+   "source": "gabarits/oracle-travaux-pilot.mjs",
+   "cible": "forge/travaux/oracle-travaux.mjs",
+   "mode": "copie_conforme",
+   "motif": "le JUGE du canal inverse, et il voyage avec son texte pour la meme raison que celui des retours : un texte sans juge decore, un juge sans son texte force a deviner. Il naît des DEUX COTES des le premier jour plutot que de re-payer la lecon du canal inverse, ou la forme etait prescrite en PROSE chez l'emetteur et jugee en CODE chez le destinataire — six lots en une journee admis par derogation. Le pilot le joue AVANT de deposer, le produit le joue avant de traiter : meme module, un seul jeu de regles.",
+   "depuis": "2026-08-25"
+  }
+ ]
 }
