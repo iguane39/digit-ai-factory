@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=fd89c86c67ed archive=40441f7fe541 · dernier événement: 2026-08-25T09:37:42.164Z -->
+     sceaux: actifs=e7ea1169a951 archive=40441f7fe541 · dernier événement: 2026-08-25T09:46:51.673Z -->
 
-**153 actifs** (candidat 12 · décidé 1 · en cours 0 · corrigé 135 · écarté 5) · **469 archivés**.
+**154 actifs** (candidat 12 · décidé 1 · en cours 0 · corrigé 135 · écarté 6) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -87,6 +87,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0519 | ecarte | 10 | produit-07 : l ancien hote forge.produit-07 NE RESOUT PLUS DU TOUT — le trafic qui le connait encore tombe dans le vide, et c est le gate neuf M-6 qui l a mesure | **oui** — mesure le 23/08 : forge.produit-07 rend ENOTFOUND, donc aucune redirection n est possible. Une erreur de resolution n est pas une page 404 — un lecteur conclut que le produit n existe plus, et un moteur retire les pages de l index sans transferer l anteriorite. L etat viole la regle ecrite le jour meme a ETAPE-MEP section 3 quater. |
 | TF-0514 | ecarte | 6.7 | Produit-05 n'est PAS instancie sous la doctrine factory — ni forge\, ni clause de precedence, ni hooks : c'est ce qui explique les QUATRE lots refuses en trois jours, et non un gabarit perime | **oui** — mesure le 22/08 : QUATRE lots refuses en trois jours pour un seul produit (20260821a, 20260822a, 20260822b, 20260822c), soit 100 % de ses remises depuis la publication de R-45. Trois ont fini par entrer par derogation, portant 15 candidatures dont une nommait un plantage bloquant du lanceur d'oracles. Le correctif livre le meme jour pour TF-0502 — rafraichir la copie du gabarit a chaque ouverture de run — n'aurait rien change ici : il n'y a pas de run ouvert sous doctrine, donc pas d'ouverture qui rafraichirait quoi que ce soit. |
 | TF-0473 | ecarte | 4 | pilot : vue portefeuille du reste-a-faire — etude remise, verdict O1, DIFFEREE par decision humaine du 22/08 (« je suis chaque projet independamment pour l'instant ») | **oui** — aucun cout constate a ce jour, et c'est le fait principal : a quatre produits l'humain declare suivre chaque projet independamment sans gene. Le cout est ANTICIPE a sept ou huit produits, et le critere de reouverture est ecrit pour ne pas avoir a le deviner |
+| TF-0622 | ecarte | 2 | RISQUE ACCEPTE ET DECLARE : deux fichiers de configuration porteurs d'identifiants sont deposes sur origin/main de depots d'entreprise, sans rotation | **oui** — cout PAYE et assume : deux fichiers porteurs d'identifiants restent deposes sur la branche principale de deux depots d'entreprise, sans rotation — etat mesure le 25/08 par trois sondes git dont aucune n'ouvre le fichier |
 
 ## digit-ai-forge-agents
 
