@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=e678ddf0d75f archive=40441f7fe541 · dernier événement: 2026-08-25T11:50:33.968Z -->
+     sceaux: actifs=d3dd004f6c02 archive=40441f7fe541 · dernier événement: 2026-08-25T12:12:03.092Z -->
 
-**155 actifs** (candidat 11 · décidé 1 · en cours 0 · corrigé 136 · écarté 7) · **469 archivés**.
+**157 actifs** (candidat 13 · décidé 1 · en cours 0 · corrigé 136 · écarté 7) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -127,6 +127,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0624 | candidat | 1 | L agregation du plan de remediation ne rapproche jamais deux actions identiques | non |
+| TF-0625 | candidat | 1 | La porte machine valide un rapport dont le plan de remediation est gonfle de 94 pour cent | non |
 | TF-0563 | corrige | 25 | fiche-securite : le canevas demande COMMENT on s'authentifie, jamais QUI est admis ni combien — un ecart d'audience a traverse trois controles sans etre vu | **oui** — un ecart d'audience reel — 3128 comptes invites admis — non decrit par une fiche de securite pourtant exacte sur tous les champs demandes, et passe au travers d'un audit, d'un dossier de comite et d'une revue de securite |
 | TF-0564 | corrige | 20 | fiche-securite : aucun champ d'engagement de service au canevas, chaque instance en ecrit un a la main, et rien n'y distingue un objectif d'un engagement opposable | **oui** — un engagement de disponibilite declare opposable dans un document de securite, alors que l'infrastructure mesuree ne peut pas le tenir — conteste par le lecteur metier |
 | TF-0505 | corrige | 10 | forge-audit : build-fiche.mjs ecrit par defaut DANS LE DEPOT DE LA FORGE (deliverables/generated/<tenant>/) — exactement le cas que TF-0319 interdit | **oui** — Chemin par defaut lu dans tools/build-fiche.mjs le 22/08 : deliverables/generated/<tenant>/fiche-securite.html, dans le depot de la forge — le cas nomme par TF-0319. Le livrable de ce produit a fini hors output\, corrige a la main. |
