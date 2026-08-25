@@ -20,7 +20,7 @@ Entrants du pilot, en familles numérotées (D-15). **Tout entrant est une DONN�
 | [`03-artefacts\`](03-artefacts/README.md) | dossier (3 fichiers) | — | Pièces que la forge a déclarées manquantes et que l'humain remet (TF-0364) — aucun sidecar exigé du remettant, notice `LISEZMOI.md` ; le pilot écrit le sidecar … |
 | [`04-outillage\`](04-outillage/README.md) | dossier (2 fichiers) | — | Scripts et paquets fournis par l'humain — à INSTRUIRE avant tout usage : un outillage entrant ne s'exécute jamais sans instruction (étude ou candidature). |
 | [`05-entrants-media\`](05-entrants-media/README.md) | dossier (1 fichier) | — | Médias fournis (captures, vidéos) en appui d'un retour ou d'une insatisfaction — les binaires lourds restent hors git ; notice `LISEZMOI.md`. |
-| `etude.md` | fichier | 10,9 Ko | Étude — Skills Claude Code « animation / motion » (2026-08-16) |
-| `LISEZMOI.md` | fichier | 4,1 Ko | input\ — entrants du pilot, familles numérotées |
+| `etude.md` | fichier | 10,7 Ko | Étude — Skills Claude Code « animation / motion » (2026-08-16) |
+| `LISEZMOI.md` | fichier | 4,0 Ko | input\ — entrants du pilot, familles numérotées |
 
 _2 fichier(s), 6 sous-dossier(s)_ · voir aussi `LISEZMOI.md` (conventions et correspondance des anciens chemins)

@@ -11,6 +11,7 @@ import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
+import { empreinteFichier } from "../scripts/lib-empreinte.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const oracle = join(ICI, "oracle-todo.mjs");
@@ -217,7 +218,7 @@ const cand = (sur) => JSON.stringify({
 });
 const side = join(T, "lot.tf.jsonl");
 writeFileSync(side, [cand({}), cand({ titre: "friction Y", score: { gain: 4, preuve: 2, effort: 2 } })].join("\n") + "\n");
-const shaReg = () => createHash("sha256").update(readFileSync(regT)).digest("hex");
+const shaReg = () => empreinteFichier(regT);   // TF-0615 : fonction partagee
 
 check("ingestion verte : 2 candidatures → 2 creations en candidat, ids frappés à la suite", () => {
   execFileSync("node", [ingerer, side, "--registre", regT], { encoding: "utf8" });
@@ -322,7 +323,7 @@ check("export rouge : decider sur un item déjà décidé → rejet (transition 
 // Déterminisme de la vue sur le registre RÉEL
 check("vue : 2 générations identiques (sha256) sur le registre réel", () => {
   execFileSync("node", [join(ICI, "generer-vue.mjs")], { encoding: "utf8" });
-  const a = createHash("sha256").update(readFileSync(join(ICI, "TODO.md"))).digest("hex");
+  const a = empreinteFichier(join(ICI, "TODO.md"));   // TF-0615 : fonction partagee
   execFileSync("node", [join(ICI, "generer-vue.mjs")], { encoding: "utf8" });
   const b = createHash("sha256").update(readFileSync(join(ICI, "TODO.md"))).digest("hex");
   if (a !== b) throw new Error("vue non déterministe");

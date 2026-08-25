@@ -1,7 +1,7 @@
 ---
 role: convention transverse d'empreinte — un seul format déclaré pour juger la fraîcheur d'un artefact, et le registre des sites de scellement du parc
 sources_de_verite: [oracles/oracle-empreintes.mjs (le contrôle), forge-ops/oracles/oracle-ops.mjs (le format d'origine), todo/TODO.jsonl (les sept items de la classe)]
-verifie_le: 2026-08-23
+verifie_le: 2026-08-25
 ---
 
 # Empreintes — un seul format, et un registre qui le fait tenir
@@ -72,20 +72,49 @@ d'artefact et n'est donc pas tenu au format. Ce qui est **exclu** de la table : 
 des emplacements lus par le contrôle, et les dépôts absents du poste — les deux sont écrits au
 `non_juge` plus bas.
 
+### Ce que le registre ne suffisait pas à tenir (TF-0615, 25/08/2026)
+
+Ce document et son contrôle sont nés de TF-0474, qui nommait la classe : *cinq mécanismes
+d'empreinte coexistent sans format commun*. Ils ont produit une **liste** et deux règles qui la
+tiennent — E1 (aucun site déclaré n'est mort) et E2 (aucun site n'est indéclaré). **Ils n'ont pas
+produit de fonction**, et c'est par là que la classe est revenue une cinquième fois.
+
+Mesure du 25/08 : **trois générateurs de vues du registre** étaient dûment déclarés à la table
+ci-dessous **et hachaient les octets bruts**. `TODO-ARCHIVE.jsonl` pèse 1 554 831 octets et 0 CRLF
+sur un poste, 1 557 156 et 2 325 CRLF sur l'autre — l'écart valant exactement le nombre de retours
+chariot que le checkout ajoute — et les deux sceaux différaient pour un registre identique. Onze
+fichiers générés rebasculaient à chaque aller-retour entre deux sessions.
+
+*Un registre qui déclare les sites empêche d'en **oublier** un ; il n'empêche pas d'en écrire un
+**mal**.* D'où deux ajouts, indissociables :
+
+- **`scripts/lib-empreinte.mjs`** — le calcul n'existe plus qu'à un endroit. Les huit sites du
+  pilot y délèguent, y compris les cinq qui normalisaient déjà **à la main** : cinq copies
+  correctes d'une même fonction sont cinq occasions que la sixième soit fausse ;
+- **la règle E4** — un site qui hache le contenu d'un **fichier** normalise ses fins de ligne, par
+  la fonction partagée ou visiblement. E1 et E2 tiennent la liste ; E4 tient le contenu.
+
+La portée d'E4 est **bornée au pilot**, et le motif est écrit : la fonction vit ici, une forge ne
+l'adopte qu'après publication, et chaque site demande son jugement — un scelleur de release hache
+peut-être des binaires à bon droit. Les sites des autres forges sont **nommés** par un constat non
+bloquant, jamais exclus par leur nom : une exclusion nommée signale une cause non traitée (N-13),
+un signal nommé ouvre un travail.
+
 | Dépôt | Site | Ce qui est scellé | Format |
 |---|---|---|---|
+| pilot | **`scripts/lib-empreinte.mjs`** | LE calcul lui-même — `empreinteFichier`, `empreinteTexte`, `empreinteBinaire`, `tailleNormalisee` | **la fonction partagée** : fins de ligne normalisées LF, rien d'autre |
 | forge-ops | `scripts/ops.mjs` · `oracles/oracle-ops.mjs` | fichiers d'une release déployée ou promue (O-7) | `forge-ops/empreinte@1` |
 | pilot | `oracles/oracle-conformite-projet.mjs` | parité source→projection de `TODO-PRODUIT`, `ARCHITECTURE`, `MODELE-DONNEES` (R-20/R-26) | sceau court (12 hex) dans la page générée |
 | pilot | `oracles/oracle-boite-entree.mjs` | lots entrants déjà ingérés (TF-0253) | sceau de contenu normalisé LF |
 | pilot | `scripts/verifier-jugement.mjs` | jugements humains scellés (`pilot/jugement@1`) | sha256 par livrable |
-| pilot | `todo/generer-page.mjs` · `todo/generer-archive.mjs` · `scripts/lib-vue-html.mjs` | parité registre→vue générée | sceau court (12 hex) |
-| pilot | `todo/generer-vue.mjs` · `todo/generer-todo-produit.mjs` | parité registre→vue Markdown, et source produit→projection | sceau court (12 hex) |
+| pilot | `todo/generer-page.mjs` · `todo/generer-archive.mjs` · `scripts/lib-vue-html.mjs` | parité registre→vue générée | sceau court (12 hex), **normalisé LF** via `lib-empreinte` |
+| pilot | `todo/generer-vue.mjs` · `todo/generer-todo-produit.mjs` | parité registre→vue Markdown, et source produit→projection | sceau court (12 hex), **normalisé LF** via `lib-empreinte` |
 | pilot | `todo/ingerer-lot.mjs` | lot de retours ingéré (empreinte d'idempotence) | sceau de contenu normalisé LF |
 | pilot | `scripts/generer-avancement.mjs` | source du rapport d'avancement dérivé du registre (TF-0324) | sceau court (12 hex), normalisé LF |
 | pilot | `todo/self-test.mjs` | recette du registre : vérifie les sceaux qu'elle produit | usage de test, déclaré |
 | pilot | `oracles/hook-produits-intacts.mjs` | état de travail de chaque dépôt PRODUIT, relevé à l'ouverture et recomparé à la fin du tour | sceau court (12 hex) de l'état git |
 | pilot | `bootstrap.mjs` | divergence entre un skill versionné et sa copie installée (K2) | sha256 par fichier |
-| pilot | `todo/appliquer-export.mjs` | export du registre rendu à un tiers | sha256 du lot |
+| pilot | `todo/appliquer-export.mjs` | export du registre rendu à un tiers | sha256 du lot, **normalisé LF** via `lib-empreinte` |
 | forge-seo-geo | `scripts/grille.py` · `scripts/gabarits.py` | empreinte de grille et registre d'évolutions (TF-0072) | sceau court dans le registre |
 | forge-conception | `oracles/oracle-tracabilite.mjs` · `oracles/oracle-vues-profil.mjs` | scellement d'`EXIGENCES.json` et parité de ses vues | sha256 du référentiel |
 | forge-design | `skills/systeme-de-marque/scripts/generer-design-md.mjs` | `DESIGN.md`, vue dérivée des tokens et de la voix | sceau dans la vue |

@@ -15,12 +15,12 @@ Revues d'écosystème (fiches d'audit des forges rejouées, synthèse trans-forg
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
 | [`old\`](old/README.md) | dossier (1 fichier) | — | Les revues et propositions REMISES qui ne sont plus la référence courante. Un livrable n'entre ici que pour une raison, et jamais pour être corrigé : *une nouve… |
-| `Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md` | fichier | 7,1 Ko | Proposition — Refonte du rapport d'audit SEO d'Produit-02.com |
-| `Digit-AI - Proposition Architecture - Circuit de l insatisfaction - 20260815a.md` | fichier | 5,5 Ko | Proposition d'architecture — le circuit de l'insatisfaction |
-| `Digit-AI - Proposition Forge - Restitution lisible - 20260815a.md` | fichier | 11,2 Ko | Proposition — Doctrine « restitution lisible » pour forge-design |
-| `Digit-AI - Proposition Forge - Tuyauterie cognitive - 20260809a.md` | fichier | 9,5 Ko | Digit-AI — Proposition : optimisation de la tuyauterie cognitive — 2026-08-09 |
-| `Digit-AI - Revue D8 - Restitutions du 15-08 - 20260815a.md` | fichier | 3,8 Ko | Revue D8 « Lecture de données » — les trois restitutions migrées du 15/08 |
-| `Digit-AI - Revue Forge - Écosystème - 20260808a.md` | fichier | 11,4 Ko | Digit-AI — Revue stratégique de l'écosystème forge — 2026-08-08 |
+| `Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md` | fichier | 7,0 Ko | Proposition — Refonte du rapport d'audit SEO d'Produit-02.com |
+| `Digit-AI - Proposition Architecture - Circuit de l insatisfaction - 20260815a.md` | fichier | 5,4 Ko | Proposition d'architecture — le circuit de l'insatisfaction |
+| `Digit-AI - Proposition Forge - Restitution lisible - 20260815a.md` | fichier | 11,0 Ko | Proposition — Doctrine « restitution lisible » pour forge-design |
+| `Digit-AI - Proposition Forge - Tuyauterie cognitive - 20260809a.md` | fichier | 9,4 Ko | Digit-AI — Proposition : optimisation de la tuyauterie cognitive — 2026-08-09 |
+| `Digit-AI - Revue D8 - Restitutions du 15-08 - 20260815a.md` | fichier | 3,7 Ko | Revue D8 « Lecture de données » — les trois restitutions migrées du 15/08 |
+| `Digit-AI - Revue Forge - Écosystème - 20260808a.md` | fichier | 11,2 Ko | Digit-AI — Revue stratégique de l'écosystème forge — 2026-08-08 |
 | `Digit-AI - Revue Forge - Écosystème - 20260819a.md` | fichier | 6,0 Ko | Digit-AI — Revue Forge — Écosystème — 20260819a |
 
-_7 fichier(s), 1 sous-dossier(s)_ · dossiers cachés (journaux machine, sans README) : `.oracles\`
+_7 fichier(s), 1 sous-dossier(s)_

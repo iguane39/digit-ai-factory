@@ -14,6 +14,6 @@ Instruction de l'insatisfaction INS-0001 (menus de produit-07) — `INSTRUCTION.
 
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
-| `INSTRUCTION.md` | fichier | 6,9 Ko | INS-0001 — « le menu français est compressé et le menu anglais ne reprend pas tout » |
+| `INSTRUCTION.md` | fichier | 6,8 Ko | INS-0001 — « le menu français est compressé et le menu anglais ne reprend pas tout » |
 
 _1 fichier(s), 0 sous-dossier(s)_

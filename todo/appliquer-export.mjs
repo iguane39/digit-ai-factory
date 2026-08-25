@@ -28,6 +28,7 @@ import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { empreinteTexte } from "../scripts/lib-empreinte.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const exportPath = process.argv[2];
@@ -36,7 +37,10 @@ const registre = resolve(iReg > 0 ? process.argv[iReg + 1] : join(ICI, "TODO.jso
 if (!exportPath || !existsSync(exportPath)) { console.error("usage : appliquer-export.mjs <TF-decisions.json> [--registre <TODO.jsonl>]"); process.exit(2); }
 
 const brut = readFileSync(exportPath, "utf8");
-const exportSha = createHash("sha256").update(brut).digest("hex");
+// TF-0615 : fonction partagee, fins de ligne normalisees. Un export rendu a un tiers puis
+// reimporte depuis un poste au checkout different aurait sinon un sceau different sans qu'un
+// octet ait bouge.
+const exportSha = empreinteTexte(brut);
 let doc;
 try { doc = JSON.parse(brut.replace(/^﻿/, "")); } catch { console.error("[REJET] export non-JSON"); process.exit(1); }
 

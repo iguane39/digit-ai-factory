@@ -43,6 +43,7 @@ import { appendFileSync, existsSync, readFileSync, readdirSync, mkdtempSync, mkd
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
+import { empreinteFichier, empreinteBinaire } from "../scripts/lib-empreinte.mjs";
 
 const VERSION = "1.0.0";
 const ORACLE = "oracle-boite-entree";
@@ -69,10 +70,9 @@ const SUFFIXE_NORMALISE = ".normalise.tf.jsonl";
 // signalent un travail non pris ou édité là où rien n'a bougé — 12 faux positifs constatés le
 // 14/08 pour zéro édition réelle. Normaliser ici rend la comparaison indifférente à la fin de
 // ligne, tout en laissant B2 détecter une VRAIE édition (le contenu normalisé diffère toujours).
-function empreinte(chemin) {
-  const brut = readFileSync(chemin, "utf8").replace(/\r\n/g, "\n");
-  return createHash("sha256").update(brut).digest("hex");
-}
+// TF-0615 : la normalisation passe par la fonction PARTAGEE. Le raisonnement ci-dessus est
+// intact — il est simplement joue par du code qui ne vit plus ici.
+const empreinte = (chemin) => empreinteFichier(chemin);
 
 // Compatibilité TF-0253 : les ingestions ANTÉRIEURES à la normalisation ont consigné le
 // sha des octets BRUTS (CRLF compris). Sans cette forme, la migration créait le faux
@@ -80,9 +80,9 @@ function empreinte(chemin) {
 // identique bit à bit à son commit, B2 levé quand même. Un fichier est donc couvert si
 // SON empreinte normalisée OU son empreinte brute est au registre — une vraie édition
 // ne matche ni l'une ni l'autre.
-function empreinteBrute(chemin) {
-  return createHash("sha256").update(readFileSync(chemin, "utf8")).digest("hex");
-}
+// TF-0615 : `empreinteBinaire` porte ce role dans la fonction partagee, et son nom DIT
+// qu'elle ne normalise rien — ce qui est exactement l'usage de compatibilite voulu ici.
+const empreinteBrute = (chemin) => empreinteBinaire(chemin);
 
 function couvert(parSha, chemin) {
   return parSha.has(empreinte(chemin)) || parSha.has(empreinteBrute(chemin));

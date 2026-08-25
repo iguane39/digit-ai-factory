@@ -39,6 +39,7 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join, dirname } from "node:path";
 import { lireSource, mdVersHtml, esc } from "../scripts/lib-vue-html.mjs";
+import { empreinteTexte } from "../scripts/lib-empreinte.mjs";
 
 const src = process.argv[2];
 if (!src || !existsSync(src)) {
@@ -58,7 +59,7 @@ const { front, corps } = lireSource(texte);
 // plus tard, possiblement apres un checkout qui a reecrit la source en CRLF. Sans cela,
 // une page fraiche se declare perimee, et une vue accusee a tort coute la confiance
 // qu'un sceau existe pour donner.
-const sceau = createHash("sha256").update(texte.split("\r\n").join("\n")).digest("hex").slice(0, 12);
+const sceau = empreinteTexte(texte, 12);   // TF-0615 : fonction partagee
 const titre = (corps.match(/^# (.+)$/m) || [null, "Reste à faire"])[1].trim();
 
 // Lignes RÉELLES d'une table de section : les en-têtes, les séparateurs et les lignes de

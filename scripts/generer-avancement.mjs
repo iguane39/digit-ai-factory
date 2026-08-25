@@ -24,6 +24,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
+import { empreinteTexte } from "./lib-empreinte.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
@@ -36,7 +37,7 @@ const brut = readFileSync(join(PILOT, "todo", "TODO.jsonl"), "utf8");
 const evenements = brut.trim().split(/\r?\n/).filter(Boolean).map((l) => JSON.parse(l));
 // Le sceau de la SOURCE, normalisé LF : la convention d'empreinte du parc
 // (`references\EMPREINTES.md`) — une vue qui ne scelle pas sa source ne se sait pas périmée.
-const sceau = createHash("sha256").update(brut.split("\r\n").join("\n")).digest("hex").slice(0, 12);
+const sceau = empreinteTexte(brut, 12);   // TF-0615 : fonction partagee
 
 const items = new Map();
 for (const e of evenements) {

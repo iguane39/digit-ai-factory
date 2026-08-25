@@ -3,6 +3,7 @@
 // (aucune date générée — verifie_le vient du frontmatter ; sceau = sha256 de la source).
 // La vue produite est autonome (A1 : zéro requête réseau) et chartée digit-ai-page-html.
 import { createHash } from "node:crypto";
+import { empreinteTexte } from "./lib-empreinte.mjs";
 
 export const esc = (s) => String(s ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;")
   .replaceAll(">", "&gt;").replaceAll('"', "&quot;");
@@ -81,7 +82,7 @@ export function coquille({ titre, description, front, svg, corpsHtml, source, le
   // qui a reecrit la source en CRLF. Mesure du 18/08 sur le seul produit du poste portant ces
   // deux projections : MODELE-DONNEES.md y vit en CRLF, donc brut != normalise — sans cette
   // normalisation, la parite ne pouvait pas etre durcie sans accuser une page fraiche.
-  const sceau = createHash("sha256").update(String(source).split("\r\n").join("\n")).digest("hex").slice(0, 12);
+  const sceau = empreinteTexte(source, 12);   // TF-0615 : fonction partagee
   // Favicon-lettre (13/08) : première lettre du produit (paramètre `lettre`), sinon celle
   // du titre — jamais un carré anonyme.
   const initiale = (lettre || (titre || "D").trim()[0] || "D").toUpperCase();

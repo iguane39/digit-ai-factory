@@ -9,6 +9,7 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { empreinteFichier } from "../scripts/lib-empreinte.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const SRC = join(ICI, "TODO.jsonl"), ARC = join(ICI, "TODO-ARCHIVE.jsonl"), OUT = join(ICI, "TODO.md");
@@ -30,7 +31,10 @@ for (const e of etats.values()) {
   if (!parForge.has(forge)) parForge.set(forge, []);
   parForge.get(forge).push(e);
 }
-const sceau = (f) => (existsSync(f) ? createHash("sha256").update(readFileSync(f)).digest("hex").slice(0, 12) : "absent");
+// TF-0615 : le sceau passe par la fonction PARTAGEE, qui normalise les fins de ligne. Avant,
+// il hachait les octets bruts — donc un sceau different sur un poste en CRLF et un poste en
+// LF, pour un registre identique. Un sceau qui depend du checkout ne prouve rien.
+const sceau = (f) => empreinteFichier(f, 12);
 const compte = (s) => [...etats.values()].filter((e) => e.statut === s).length;
 
 let md = `# TODO-FORGE — registre d'amélioration de l'écosystème
