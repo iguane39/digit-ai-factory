@@ -14,7 +14,7 @@
  * Usage : node ingerer-lot.mjs <sidecar.tf.jsonl> [--registre <TODO.jsonl>]
  * Exit : 0 = ingéré (ou déjà ingéré, 0 création) · 1 = sidecar rejeté · 2 = erreur.
  */
-import { readFileSync, appendFileSync, existsSync, readdirSync } from "node:fs";
+import { readFileSync, appendFileSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
 import { dirname, isAbsolute, join, resolve } from "node:path";
@@ -27,6 +27,7 @@ import { fileURLToPath } from "node:url";
 // TF-0474 a nommé sur les empreintes, où cinq mécanismes de scellement coexistaient sans
 // format commun et où la même classe de défaut a été redécouverte forge par forge.
 import { verifier as verifierFormeLot } from "../gabarits/oracle-lot-retours.mjs";
+import { localiserProduit, causeDuRefus } from "./localiser-produit.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const sidecarPath = process.argv[2];
@@ -136,14 +137,13 @@ const lignes = contenu.split("\n").filter((l) => l.trim());
         "    CE REFUS ÉTAIT ÉVITABLE, et c'est tout le point (TF-0597) : le produit peut jouer ce\n" +
         "    MÊME contrôle chez lui, AVANT de remettre son lot —\n" +
         `      node forge\\retours\\oracle-lot.mjs \"<son lot>.md\"\n` +
-        "    TROIS CAUSES MESURÉES le 24/08 sur les trois produits émetteurs, et le remède diffère :\n" +
-        "    (1) le produit écrit avec une COPIE du gabarit prise à la création de son run et jamais\n" +
-        "        rafraîchie — les deux sections y sont entrées les 21 et 22/08. Recopier\n" +
-        "        gabarits\\RETOURS-FORGES.md ET gabarits\\oracle-lot-retours.mjs dans forge\\retours\\ ;\n" +
-        "    (2) le produit n'a JAMAIS reçu l'héritage — R-47 le nomme, et le geste est le même ;\n" +
-        "    (3) le produit A le gabarit, à jour, et ne l'applique pas. C'est le cas le PLUS FRÉQUENT\n" +
-        "        (quatre lots sur six ce jour-là) et le seul qu'aucune recopie ne répare : jouer le\n" +
-        "        contrôle ci-dessus avant la remise est alors le seul remède.");
+        "    LA CAUSE EST MESUREE, PAS DEVINEE (TF-0623) — un controle qui enonce des hypotheses\n" +
+        "    sur sa propre cause prend la place de celle qu'il pouvait mesurer :\n" +
+        `    ${causeDuRefus(
+          (String(lotMd).split(/[\\\\/]/).pop() || "").split(" - RETOURS - ")[0],
+          process.env.FORGE_ROOT || join(ICI, "..", ".."),
+          (() => { try { return JSON.parse(readFileSync(join(ICI, "..", "gabarits", "HERITAGE.json"), "utf8")); } catch { return null; } })(),
+        ).texte}`);
       process.exit(1);
     }
   }
@@ -315,8 +315,13 @@ if (!process.argv.includes("--sans-fetch") && nouvelles.length > 1) {
         pris.map((id) => `    node todo\\renumeroter.mjs ${id} TF-XXXX --motif "collision avec une session parallèle le <date>"`).join("\n") +
         "\n  Choisir XXXX au-delà du max des DEUX registres (local et origin), puis régénérer les vues.");
     }
-  } catch {
-    console.error("[post-contrôle TF-0481] comparaison origin impossible (hors ligne ? remote absent ?) — collision inter-sessions NON vérifiée après écriture");
+  } catch (e) {
+    // TF-0623 : ce `catch` ne liait pas son exception. Il rendait « hors ligne ? remote absent ? » —
+    // deux hypotheses testees le 25/08 et FAUSSES toutes les deux, le fetch rendant 0 et le show
+    // rendant les 898 432 octets du registre distant. La cause reelle etait donc detruite au moment
+    // ou elle se produisait, et le controle rendait la seule information qui n'aidait pas.
+    console.error("[post-contrôle TF-0481] comparaison origin impossible — collision inter-sessions NON " +
+      `vérifiée après écriture. CAUSE RÉELLE : ${String(e && e.message || e).split("\n")[0].slice(0, 240)}`);
   }
 }
 
@@ -348,6 +353,7 @@ if (nouvelles.length > 1 && nomFichier.includes(" - RETOURS - ")) {
   const projet = nomFichier.split(" - RETOURS - ")[0];
   const racine = process.env.FORGE_ROOT || join(ICI, "..", "..");
   let dossier = null;
+  let parCritere = null;
   // LE SIDECAR PEUT DIRE OU IL HABITE, ET C'EST LA SEULE SOURCE SURE (TF-0555, 24/08). La
   // recherche ci-dessous DEVINE ; le produit, lui, SAIT. Un sidecar qui porte `racine_produit`
   // court-circuite donc toute heuristique — c'est la voie recommandee par le lot qui a signale le
@@ -358,30 +364,14 @@ if (nouvelles.length > 1 && nomFichier.includes(" - RETOURS - ")) {
     if (existsSync(join(abs, "forge"))) dossier = abs;
     else console.error(`[R-47] le sidecar declare racine_produit = « ${declaree} », introuvable ou sans forge\ — on ne la suit pas les yeux fermes`);
   }
-  try {
-    // DEUX NIVEAUX, ET LE SECOND A ETE PAYE. La recherche ne regardait que les ENFANTS DIRECTS de
-    // la racine. Or 22 produits du parc vivent sous un dossier de rangement client (`_Client-A\`) :
-    // tous etaient hors de portee. Le lot qui a signale ce defaut portait un produit dans ce cas,
-    // et le meme oracle pointe A LA MAIN sur son dossier rendait R-43 FAIL et R-47 FAIL avec deux
-    // artefacts absents — le defaut que la regle devait rattraper etait donc VIVANT, et le
-    // mecanisme cense le voir regardait ailleurs.
-    const enfants = (d) => { try { return readdirSync(d, { withFileTypes: true }).filter((x) => x.isDirectory()); } catch { return []; } };
-    const correspond = (nom) => nom.toLowerCase().startsWith(projet.toLowerCase());
-    const candidats = [];
-    for (const d1 of enfants(racine)) {
-      const c1 = join(racine, d1.name);
-      if (correspond(d1.name)) candidats.push(c1);
-      // Un dossier de RANGEMENT n'est pas un produit : il n'a pas de `forge\`, et on descend d'un
-      // cran. Borne a deux niveaux — au-dela, on balaierait le disque pour deviner.
-      if (!existsSync(join(c1, "forge"))) {
-        for (const d2 of enfants(c1)) if (correspond(d2.name)) candidats.push(join(c1, d2.name));
-      }
-    }
-    dossier = dossier
-      || candidats.find((c) => existsSync(join(c, "forge")))
-      || candidats.map((c) => join(c, "projet")).find((c) => existsSync(join(c, "forge")))
-      || null;
-  } catch { /* racine illisible : on ne devine pas */ }
+  // TF-0623 : la recherche vit dans `todo/localiser-produit.mjs`, qui la rend TESTABLE et la
+  // partage avec le message de rejet — c'est le meme besoin aux deux endroits, et deux copies
+  // divergeraient. Le module dit AUSSI par quel critere il a trouve, ce que le message reprend.
+  if (!dossier) {
+    const trouve = localiserProduit(projet, racine);
+    dossier = trouve.dossier;
+    if (dossier) parCritere = trouve.par;
+  }
   if (!projet || !dossier) {
     // Silence assumé et DIT : un produit qu'on ne localise pas sur ce poste n'est pas un produit
     // en défaut. Le contraire ferait crier l'ingestion sur toutes les remises venues d'ailleurs.
@@ -398,6 +388,10 @@ if (nouvelles.length > 1 && nomFichier.includes(" - RETOURS - ")) {
         motif: "produit introuvable sur ce poste — cible absente, aucun constat sur le produit" },
     }) + "\n");
   } else {
+    // Le CRITERE de localisation est dit : « trouve par ses lots » n'a pas la meme force que
+    // « trouve par son nom », et le lecteur doit pouvoir peser le constat qui suit (TF-0623).
+    console.error(`[R-47] produit « ${projet} » localise en ${dossier}` +
+      `${parCritere ? ` (par ses ${parCritere})` : " (racine declaree par le sidecar)"} — heritage juge sur cette cible.`);
     const r = spawnSync(process.execPath, [join(ICI, "..", "oracles", "oracle-conformite-projet.mjs"), dossier],
       { encoding: "utf8", timeout: 120000 });
     let f = null;
