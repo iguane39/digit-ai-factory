@@ -44,6 +44,7 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `candidature-readme-fins-de-ligne-mixtes-20260825.tf.jsonl` | fichier | 3,0 Ko | 1 ligne(s) JSONL |
 | `candidature-readme-retard-dun-commit-20260822.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
 | `candidature-recette-rouge-par-la-prose-d-un-candidat.tf.jsonl` | fichier | 2,8 Ko | 1 ligne(s) JSONL |
+| `candidature-redirection-null-windows-20260825.tf.jsonl` | fichier | 3,2 Ko | 1 ligne(s) JSONL |
 | `candidature-regles-executees.tf.jsonl` | fichier | 5,1 Ko | 3 ligne(s) JSONL |
 | `candidature-relais-avancement.tf.jsonl` | fichier | 3,3 Ko | 1 ligne(s) JSONL |
 | `candidature-renommage-seo-geo.tf.jsonl` | fichier | 2,3 Ko | 1 ligne(s) JSONL |
@@ -73,4 +74,4 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `revue-20260819-pilot.normalise.tf.jsonl` | fichier | 2,1 Ko | 1 ligne(s) JSONL |
 | `revue-20260819-pilot.tf.jsonl` | fichier | 2,1 Ko | 1 ligne(s) JSONL |
 
-_58 fichier(s), 0 sous-dossier(s)_
+_59 fichier(s), 0 sous-dossier(s)_

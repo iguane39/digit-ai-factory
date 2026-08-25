@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=09af6c7c9478 archive=acf69e8da61a · dernier événement: 2026-08-25T06:06:07.993Z -->
+     sceaux: actifs=3997c884ff80 archive=acf69e8da61a · dernier événement: 2026-08-25T06:13:50.613Z -->
 
-**145 actifs** (candidat 11 · décidé 1 · en cours 0 · corrigé 129 · écarté 4) · **469 archivés**.
+**146 actifs** (candidat 12 · décidé 1 · en cours 0 · corrigé 129 · écarté 4) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -197,6 +197,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0549 | decide | 10 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : `Produit-07` a un forge\retours\ mais rien de ce qui s'y fait n'est suivi | **oui** — mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration. |
+| TF-0614 | candidat | 10 | `> /dev/null` sous un shell Windows ECRIT un fichier `null` a la racine du parc — hors de tout depot, donc hors de tout .gitignore et de toute recherche de secret | **oui** — mesure le 25/08 : 10 927 octets ecrits hors de tout depot, sans que rien ne l'ait signale pendant plusieurs jours — c'est l'avertissement de bootstrap, ajoute recemment, qui l'a trouve. Le contenu s'est revele public apres verification, mais la verification etait NECESSAIRE : rien dans le mecanisme ne garantit que la prochaine occurrence le sera. |
 | TF-0606 | corrige | 25 | pilot : un refus d OUTIL a ete pris pour une absence de CAPACITE, et le blocage rapporte comme un fait sur le monde — « je ne peux pas deployer » alors que le jeton etait sur le disque, a un emplacement nomme dans un document deja charge en contexte | **oui** — Mise en production rendue a l humain a tort, avec une consigne d action inutile (railway login) ; deblocage en trois minutes une fois le signalement recu. Le travail etait fini, seul le rapport etait faux. |
 | TF-0590 | corrige | 20 | Un README de dossier reste PERIME apres regeneration : fins de ligne MIXTES dans le meme fichier, et le harnais tombe a 54/55 sans qu'aucune action ne le repare | **oui** — mesure le 25/08 : le harnais du pilot passe de 55/55 a 54/55 et n'en bouge plus — trois regenerations, trois fois le meme FAIL, un diff vide a chaque fois. Aucune action disponible ne le repare, ce qui est la definition d'un rouge qu'on apprend a ignorer. |
 | TF-0541 | corrige | 15 | Gabarit de projet : `CLAUDE.md` et `ledger.py` divergent, et le run est épinglé en dur | **oui** — forge/ledger.jsonl absent du disque ; ledger.py ligne 68 run codé en dur ; run 20260815 clos en seq 24 |
