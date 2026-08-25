@@ -152,7 +152,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>6a0f20f131bc</code> · dernier événement 2026-08-25T13:00:07.229Z</p>
+      <p class="meta">sceau <code>4d4ef8460f2e</code> · dernier événement 2026-08-25T13:23:04.779Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -162,7 +162,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="13 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">13</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="12 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">12</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="1 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">1</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="468 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">468</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -441,40 +441,6 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 3 × preuve 4 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>2 erreurs de sonde successives produisant des verdicts faux, l'un negatif l'autre positif</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-contraste-flip-20260824</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0626" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0626</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">Deux produits manquent six et sept artefacts d'heritage sur huit — le trou etait invisible parce que le controle ne savait pas localiser ses cibles</h3>
-          <div class="card-detail" data-cite><p class="lead">MESURE DU 25/08, tombee du correctif de TF-0623 et non cherchee.
-
-LE FAIT.</p><ul class="puces"><li>Le resolveur de produits corrige ce jour-la sait desormais localiser un produit par les lots qu'il remet. Joue sur le parc, il permet pour la premiere fois de mesurer l'heritage la ou il ne pouvait pas etre mesure. Resultat, contrat `gabarits/HERITAGE.json` v1.2.0 a huit artefacts :
-  · `Produit-01` (`_Client-A/Produit-01`) — SIX artefacts absents sur huit ;
-  · `Produit-03` (`_Client-A/Plateforme_video_IA_complet`) — SEPT sur huit ;
-  · `Produit-11` — SIX sur huit avant le depot de ce jour, QUATRE apres.
-
-CE QUI REND CE CONSTAT DIFFERENT D'UN SIMPLE RESTE A FAIRE : le trou n'est pas propre a un produit, il est GENERAL, et il etait STRUCTURELLEMENT invisible. R-47 existe, elle est cablee a l'ingestion, sa recette est verte a 8 cas — et elle rendait « non verifie » sur les produits qu'elle ne savait pas trouver. Un controle qui declare honnetement ne pas avoir mesure n'est pas en faute ; mais quand il le declare pour la MAJORITE de ses cibles, le parc croit avoir un juge et n'en a pas. C'est la meme forme que TF-0621 sous un autre angle : le mecanisme existait et n'etait pas appele.
-
-CE QUE CELA MET EN QUESTION, et qui depasse la recopie de fichiers : les artefacts manquants ne sont pas decoratifs. Parmi eux vivent le gabarit de restitution, le hook de fin de tour qui la juge, et le fichier de consignes du produit. Un produit qui ne les a pas rend ses travaux hors du format prescrit SANS QU'AUCUN CONTROLE NE LE REFUSE — exactement le defaut que N-21 decrit, mesure alors sur dix produits dont un seul portait le hook et zero le texte. Le present constat suggere que la situation n'a pas fondamentalement change depuis, et qu'elle etait masquee par un resolveur aveugle.
-
-PISTES</li><li>MESURER D'ABORD, DECIDER ENSUITE : un balayage qui rend, pour chaque produit localisable du parc, la liste de ses artefacts absents — un tableau, date, sans aucune ecriture chez les produits. C'est bon marche maintenant que la localisation fonctionne, et cela transforme une intuition en releve opposable. Le geste de recopie reste une decision humaine, produit par produit (N-5)</li><li>Recopier d'office chez tous les produits localises : REFUSE, ce serait ecrire dans des depots frere sans mandat, et le faire en masse est precisement le geste qu'aucun oracle ne pourrait annuler</li><li>Rien, et le parc continue de croire qu'il a un juge de conformite la ou il n'en a pas</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-25</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 4 × preuve 2 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>cout MESURE et non estime : 6 artefacts absents sur 8 chez Produit-01, 7 sur 8 chez Produit-03 — parmi eux le gabarit de restitution et le hook qui la juge, donc des travaux rendus hors format sans qu'aucun controle ne les refuse (meme classe que N-21)</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">digit-ai-factory (constat du pilot, retombee du correctif TF-0623)</dd></div>
             
           </dl>
         </article>
@@ -1784,6 +1750,40 @@ PISTES</li><li>LE REJET MESURE SA CAUSE ET LA NOMME : `ingerer-lot.mjs` joue le 
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 4 × preuve 2 ÷ effort 3)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>cout PAYE trois fois sur le meme produit : trois lots rejetes sur la meme cause (24/08a, 25/08a, 25/08b), les deux premiers entres par derogation humaine tracee — la derogation est devenue la voie normale, ce qui est R-33 bis sous un autre visage</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">digit-ai-factory (constat du pilot, en traitant un lot entrant)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0626" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0626</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Deux produits manquent six et sept artefacts d'heritage sur huit — le trou etait invisible parce que le controle ne savait pas localiser ses cibles</h3>
+          <div class="card-detail" data-cite><p class="lead">MESURE DU 25/08, tombee du correctif de TF-0623 et non cherchee.
+
+LE FAIT.</p><ul class="puces"><li>Le resolveur de produits corrige ce jour-la sait desormais localiser un produit par les lots qu'il remet. Joue sur le parc, il permet pour la premiere fois de mesurer l'heritage la ou il ne pouvait pas etre mesure. Resultat, contrat `gabarits/HERITAGE.json` v1.2.0 a huit artefacts :
+  · `Produit-01` (`_Client-A/Produit-01`) — SIX artefacts absents sur huit ;
+  · `Produit-03` (`_Client-A/Plateforme_video_IA_complet`) — SEPT sur huit ;
+  · `Produit-11` — SIX sur huit avant le depot de ce jour, QUATRE apres.
+
+CE QUI REND CE CONSTAT DIFFERENT D'UN SIMPLE RESTE A FAIRE : le trou n'est pas propre a un produit, il est GENERAL, et il etait STRUCTURELLEMENT invisible. R-47 existe, elle est cablee a l'ingestion, sa recette est verte a 8 cas — et elle rendait « non verifie » sur les produits qu'elle ne savait pas trouver. Un controle qui declare honnetement ne pas avoir mesure n'est pas en faute ; mais quand il le declare pour la MAJORITE de ses cibles, le parc croit avoir un juge et n'en a pas. C'est la meme forme que TF-0621 sous un autre angle : le mecanisme existait et n'etait pas appele.
+
+CE QUE CELA MET EN QUESTION, et qui depasse la recopie de fichiers : les artefacts manquants ne sont pas decoratifs. Parmi eux vivent le gabarit de restitution, le hook de fin de tour qui la juge, et le fichier de consignes du produit. Un produit qui ne les a pas rend ses travaux hors du format prescrit SANS QU'AUCUN CONTROLE NE LE REFUSE — exactement le defaut que N-21 decrit, mesure alors sur dix produits dont un seul portait le hook et zero le texte. Le present constat suggere que la situation n'a pas fondamentalement change depuis, et qu'elle etait masquee par un resolveur aveugle.
+
+PISTES</li><li>MESURER D'ABORD, DECIDER ENSUITE : un balayage qui rend, pour chaque produit localisable du parc, la liste de ses artefacts absents — un tableau, date, sans aucune ecriture chez les produits. C'est bon marche maintenant que la localisation fonctionne, et cela transforme une intuition en releve opposable. Le geste de recopie reste une decision humaine, produit par produit (N-5)</li><li>Recopier d'office chez tous les produits localises : REFUSE, ce serait ecrire dans des depots frere sans mandat, et le faire en masse est precisement le geste qu'aucun oracle ne pourrait annuler</li><li>Rien, et le parc continue de croire qu'il a un juge de conformite la ou il n'en a pas</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-25</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 4 × preuve 2 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>cout MESURE et non estime : 6 artefacts absents sur 8 chez Produit-01, 7 sur 8 chez Produit-03 — parmi eux le gabarit de restitution et le hook qui la juge, donc des travaux rendus hors format sans qu'aucun controle ne les refuse (meme classe que N-21)</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">digit-ai-factory (constat du pilot, retombee du correctif TF-0623)</dd></div>
             
           </dl>
         </article>
