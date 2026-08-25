@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=c7eeed27af54 archive=40441f7fe541 · dernier événement: 2026-08-25T08:09:00.373Z -->
+     sceaux: actifs=ee931e706427 archive=40441f7fe541 · dernier événement: 2026-08-25T08:29:48.590Z -->
 
-**150 actifs** (candidat 13 · décidé 1 · en cours 0 · corrigé 132 · écarté 4) · **469 archivés**.
+**150 actifs** (candidat 12 · décidé 1 · en cours 0 · corrigé 132 · écarté 5) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -201,7 +201,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0549 | decide | 10 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : `Produit-07` a un forge\retours\ mais rien de ce qui s'y fait n'est suivi | **oui** — mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration. |
-| TF-0614 | candidat | 10 | `> /dev/null` sous un shell Windows ECRIT un fichier `null` a la racine du parc — hors de tout depot, donc hors de tout .gitignore et de toute recherche de secret | **oui** — mesure le 25/08 : 10 927 octets ecrits hors de tout depot, sans que rien ne l'ait signale pendant plusieurs jours — c'est l'avertissement de bootstrap, ajoute recemment, qui l'a trouve. Le contenu s'est revele public apres verification, mais la verification etait NECESSAIRE : rien dans le mecanisme ne garantit que la prochaine occurrence le sera. |
 | TF-0606 | corrige | 25 | pilot : un refus d OUTIL a ete pris pour une absence de CAPACITE, et le blocage rapporte comme un fait sur le monde — « je ne peux pas deployer » alors que le jeton etait sur le disque, a un emplacement nomme dans un document deja charge en contexte | **oui** — Mise en production rendue a l humain a tort, avec une consigne d action inutile (railway login) ; deblocage en trois minutes une fois le signalement recu. Le travail etait fini, seul le rapport etait faux. |
 | TF-0590 | corrige | 20 | Un README de dossier reste PERIME apres regeneration : fins de ligne MIXTES dans le meme fichier, et le harnais tombe a 54/55 sans qu'aucune action ne le repare | **oui** — mesure le 25/08 : le harnais du pilot passe de 55/55 a 54/55 et n'en bouge plus — trois regenerations, trois fois le meme FAIL, un diff vide a chaque fois. Aucune action disponible ne le repare, ce qui est la definition d'un rouge qu'on apprend a ignorer. |
 | TF-0541 | corrige | 15 | Gabarit de projet : `CLAUDE.md` et `ledger.py` divergent, et le run est épinglé en dur | **oui** — forge/ledger.jsonl absent du disque ; ledger.py ligne 68 run codé en dur ; run 20260815 clos en seq 24 |
@@ -211,6 +210,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0586 | corrige | 8.3 | Aucun oracle ne verifie qu'un nom de domaine declare repond | **oui** — 8 hostnames declares, 0 controle ; base par defaut de check-redirects encore sur l'URL Railway apres bascule |
 | TF-0587 | corrige | 8 | Un mecanisme de redirection choisi sans connaitre sa limite structurelle | **oui** — port 443 ferme non documente ; remede impliquant de recreer les MX de 4 zones |
 | TF-0502 | corrige | 6.7 | Deux derogations a R-45 en UN JOUR, dont une hors anteriorite : la propagation des regles du pilot vers les produits reste le manque, et le mecanisme de derogation est en train de devenir la voie normale | **oui** — mesure le 22/08 sur le registre : 15 candidatures (7 + 5 + 3) n'ont pu entrer que par derogation, sur 3 lots d'un meme produit en 2 jours. Deux evenements `ingestion` portent desormais un champ `derogation` — soit 2 derogations en un seul jour, pour une regle publiee la veille. Le taux est de 3 lots derogeables sur 3 lots recus de ce produit : 100 %, ce qui ne decrit plus une exception mais un regime. |
+| TF-0614 | ecarte | 10 | `> /dev/null` sous un shell Windows ECRIT un fichier `null` a la racine du parc — hors de tout depot, donc hors de tout .gitignore et de toute recherche de secret | **oui** — mesure le 25/08 : 10 927 octets ecrits hors de tout depot, sans que rien ne l'ait signale pendant plusieurs jours — c'est l'avertissement de bootstrap, ajoute recemment, qui l'a trouve. Le contenu s'est revele public apres verification, mais la verification etait NECESSAIRE : rien dans le mecanisme ne garantit que la prochaine occurrence le sera. |
 
 ---
 Détail d'un item : `grep '"id":"TF-xxxx"' todo/TODO.jsonl` (tous ses événements). Archive : même commande sur TODO-ARCHIVE.jsonl.
