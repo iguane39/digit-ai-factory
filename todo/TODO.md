@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=3997c884ff80 archive=acf69e8da61a · dernier événement: 2026-08-25T06:13:50.613Z -->
+     sceaux: actifs=84b4c1a702dc archive=54c0315cbe97 · dernier événement: 2026-08-25T06:56:28.514Z -->
 
-**146 actifs** (candidat 12 · décidé 1 · en cours 0 · corrigé 129 · écarté 4) · **469 archivés**.
+**147 actifs** (candidat 13 · décidé 1 · en cours 0 · corrigé 129 · écarté 4) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -17,6 +17,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0608 | candidat | 20 | Six faits sur l'API OVH, tous mesures, aucun documente la ou on les cherche | **oui** — 2 jetons OVH sur 3 inoperants ; 1 URL declaree morte a tort ; droit nameServer decouvert au moment de s'en servir |
 | TF-0612 | candidat | 20 | Le modele de permissions Cloudflare ne dit pas ce qu'on croit | **oui** — 1 permission inventee envoyant l'exploitant dans un menu ou elle n'existe pas ; 1 aller-retour |
 | TF-0589 | candidat | 15 | Le gabarit d'environnement n'est confronte a rien | **oui** — .env = 11 cles, .env.example = 7 ; 4 cles OVH jamais reportees au gabarit |
+| TF-0615 | candidat | 15 | Onze fichiers GENERES et COMMITES basculent entre deux postes sans qu'un octet de contenu ait bouge — le sceau ne prouve plus rien, et il est calcule sur les octets BRUTS alors que l'ingestion normalise en LF depuis TF-0253 | **oui** — ONZE fichiers generes et versionnes qui rebasculent a chaque aller-retour entre deux postes, sans qu'un octet de contenu ait change. Deux sceaux differents pour un registre identique — `acf69e8da61a` et `54c0315cbe97` — l'ecart etant exactement les 2 325 retours chariot que le checkout ajoute. La meme lecon est deja ecrite DEUX FOIS dans l'outil voisin (TF-0253 puis TF-0359) et n'a jamais atteint le generateur de vues ; le site n'est pas non plus declare a l'oracle qui existe pour tenir les empreintes du parc. |
 | TF-0611 | candidat | 12.5 | Le scan DNS automatique de Cloudflare peut n'importer strictement rien, en silence | **oui** — 0 enregistrement importe sur 4 zones, 47 manquants dont tous les MX, SPF et DKIM |
 | TF-0610 | candidat | 12 | Les marqueurs de parking OVH ressemblent a des enregistrements legitimes | **oui** — 4 zones portaient 8 TXT de parking et 7 A vers l'infrastructure de redirection OVH |
 | TF-0613 | candidat | 10 | Une redirection Cloudflare exige un enregistrement proxifie, et le mecanisme moderne peut etre refuse | **oui** — regle moderne refusee malgre le droit apparemment adequat ; 7 hostnames a proxifier pour ouvrir le 443 |
