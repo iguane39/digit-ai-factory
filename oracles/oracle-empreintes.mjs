@@ -55,8 +55,10 @@ const NON_JUGE = [
   "les sites hors des emplacements connus (scripts/, oracles/, tools/, todo/, scripts de skills, profondeur bornée) restent invisibles — déclaré plutôt que promis",
   "les dépôts frères NON CLONÉS sur le poste ne sont pas jugés : l'absence d'un dépôt n'est pas l'absence d'un site",
   "la GRANULARITÉ d'un sceau (sha256 complet, tronqué à 12 ou 16 hex) n'est pas jugée hors du format `@1` : un sceau court dans une vue générée est une convention locale légitime, déclarée au registre",
-  "E4 lit un VOCABULAIRE, pas un flot : un site qui normalise dans une fonction auxiliaire définie ailleurs dans le même fichier, ou qui reçoit un texte déjà normalisé par son appelant, sera signalé à tort. Le remède est alors d'employer la fonction partagée — ce qui est le but — ou de laisser la marque de normalisation visible près du hachage",
-  "E4 ne juge que les sites qui lisent un FICHIER (`readFileSync`, `read_text`, `open(...).read()`) : hacher une chaîne construite en mémoire (état git, clé de cache, identifiant de trace) n'a pas de fin de ligne à normaliser, et ces usages sont déjà déclarés hors format au registre",
+  "E4 juge LA LIGNE du hachage, pas le flot : une normalisation faite à la ligne d'avant, ou dans une fonction auxiliaire, n'est pas vue. C'est le prix ASSUMÉ de la précision — le premier jet testait le fichier entier et rendait 3 faux positifs sur 6, dont le site du défaut FONDATEUR de la classe, qui l'avait corrigé avant tout le monde. Le remède est d'employer la fonction partagée, ou de laisser la marque de normalisation sur la ligne",
+  "E4 ne juge une ligne que si elle LIT un fichier en BRUT (`readFileSync`, `read_bytes`, `open(…,\"rb\")`). En Python, `read_text()` fait la traduction universelle des fins de ligne À LA LECTURE : la normalisation y est faite par le langage, et l\'exiger en plus serait accuser du code juste",
+  "E4 accepte un hachage brut DÉCLARÉ À L'USAGE par le marqueur `empreinte-brute-ok` sur sa ligne : marque de LIGNE et non exclusion par nom de fichier, elle ne couvre que la ligne où quelqu'un a réfléchi, jamais une faute future du même fichier. Ce qui n'est PAS jugé, c'est la JUSTESSE de la raison invoquée — elle se lit à la revue",
+  "E4 ne voit pas hacher une chaîne construite EN MÉMOIRE (état git, clé de cache, identifiant de trace) : il n\'y a pas de fin de ligne à normaliser, et ces usages sont déjà déclarés hors format au registre",
 ];
 
 const REGISTRE = join(PILOT, "references", "EMPREINTES.md");
@@ -279,17 +281,43 @@ if (inconnus.length) {
 // soit l'emploi de la fonction partagée, soit une normalisation visible. La lecture est
 // TEXTUELLE et sa limite est au `non_juge` — mieux vaut manquer un cas tordu que crier sur du
 // code sain, puisqu'un contrôle bruyant se fait contourner au lieu de se corriger (R-33 bis).
-const LIT_UN_FICHIER = /readFileSync\s*\(|\.read_text\s*\(|open\s*\([^)]*\)\s*\.read\s*\(/;
-const NORMALISE = /lib-empreinte|empreinteFichier|empreinteTexte|normaliserLignes|split\(\s*["']\\r\\n["']\s*\)|replace\(\s*\/\\r\\n\/g|replace\(\s*["']\\r\\n["']/;
-// Les usages qui n'ont AUCUNE fin de ligne à normaliser, nommés plutôt que devinés : ils hachent
-// des octets binaires par nature, ou une chaîne construite en mémoire.
+// CE QUI EST JUGE, ET LE RESSERRAGE QUI A ETE NECESSAIRE DES LE PREMIER USAGE REEL. Le premier
+// jet testait la presence des deux motifs DANS LE FICHIER — un hachage quelque part, une lecture
+// de fichier quelque part — sans verifier qu'ils se PARLENT. Joue sur le parc, il a rendu SIX
+// constats dont TROIS FAUX, soit une precision de 50 % :
+//
+//   · `forge-seo-geo/scripts/grille.py` normalise deja, et le DIT en citant TF-0072 — mais sous la
+//     forme Python `read_bytes().replace(b"\r\n", b"\n")`, que le motif ne connaissait pas ;
+//   · `forge-seo-geo/scripts/gabarits.py` hache une CHAINE lue par `read_text()`. En Python, le
+//     mode texte fait la traduction universelle des fins de ligne A LA LECTURE : `\r\n` y devient
+//     `\n` sans que personne l'ecrive. La normalisation est donc faite, par le langage ;
+//   · `forge-conception/oracles/self-test.mjs` hache une variable qui s'appelle `contenuLF` et qui
+//     est LF par construction — la lecture de fichier du meme fichier appartient a une fixture qui
+//     n'a rien a voir.
+//
+// Une regle a 50 % de precision n'est pas un controle, c'est une nuisance qui s'apprend a etre
+// ignoree — et celle-ci aurait ete ignoree en accusant `grille.py`, c'est-a-dire le site du defaut
+// FONDATEUR de la classe, qui l'avait corrige avant tout le monde. Le test porte donc desormais
+// sur LA LIGNE DU HACHAGE : ce qui est passe a `update(...)` ou a `sha256(...)`. La limite est
+// ecrite au `non_juge` — une normalisation faite a la ligne d'avant n'est pas vue, et c'est le
+// prix assume de la precision.
+const LIGNE_HACHE = /createHash\s*\(\s*["']sha256["']\s*\)\s*\.update\s*\(|hashlib\.sha256\s*\(/;
+// Une lecture de fichier BRUTE, sur la ligne meme du hachage. `read_text()` de Python n'y est PAS :
+// le mode texte normalise les fins de ligne a la lecture, c'est le langage qui fait le travail.
+const LECTURE_BRUTE = /readFileSync\s*\(|\.read_bytes\s*\(|open\s*\([^)]*["']rb["'][^)]*\)/;
+// La normalisation, sous toutes les formes rencontrees dans le parc — JavaScript et Python.
+const NORMALISE = /lib-empreinte|empreinteFichier|empreinteTexte|normaliserLignes|split\(\s*["']\\r\\n["']\s*\)|replace\(\s*\/\\r\\n\/g|replace\(\s*["']\\r\\n["']|replace\(\s*b["']\\r\\n["']/;
+
+// Les usages qui n'ont AUCUNE fin de ligne a normaliser, NOMMES plutot que devines : ils hachent
+// des octets binaires par nature, ou une chaine construite en memoire. Ce ne sont pas des
+// exclusions de complaisance — chacun est deja declare hors format au registre des empreintes.
 const HORS_SUJET_E4 = new Set([
   "hook-produits-intacts.mjs",   // hache la sortie de `git status --porcelain`, pas un fichier
   "verifier-jugement.mjs",       // sceau de jugement : sha par livrable, format `pilot/jugement@1`
-  "bootstrap.mjs",               // compare un skill versionné à sa copie installée, octet à octet
-  "run-oracles.mjs",             // clé de cache interne, déclarée hors format au registre
-  "otlp-project.mjs",            // identifiant de trace, déclaré hors format
-  "check_html.py",               // empreinte du JEU DE RÈGLES, pas d'un contenu
+  "bootstrap.mjs",               // compare un skill versionne a sa copie installee, octet a octet
+  "run-oracles.mjs",             // cle de cache interne, declaree hors format au registre
+  "otlp-project.mjs",            // identifiant de trace, declare hors format
+  "check_html.py",               // empreinte du JEU DE REGLES, pas d'un contenu
 ]);
 const malEcrits = [];
 for (const [nom, ou] of trouves.entries()) {
@@ -298,9 +326,15 @@ for (const [nom, ou] of trouves.entries()) {
     const abs = join(racine, chemin);
     let texte = "";
     try { texte = readFileSync(abs, "utf8"); } catch { continue; }
-    if (!LIT_UN_FICHIER.test(texte)) continue;
-    if (NORMALISE.test(texte)) continue;
-    malEcrits.push(chemin);
+    // Un hachage VOLONTAIREMENT brut se déclare À L'USAGE, sur sa ligne, avec sa raison — même
+    // idiome que le `piege-ok` d'`oracle-pieges-regex`. C'est l'inverse d'une exclusion par NOM de
+    // fichier : celle-ci aveuglerait le contrôle sur tout le fichier, y compris sur une faute
+    // future, là où une marque de ligne ne couvre que la ligne où quelqu'un a réfléchi.
+    const fautives = texte.split(/\r?\n/)
+      .map((l, i) => ({ n: i + 1, l }))
+      .filter(({ l }) => LIGNE_HACHE.test(l) && LECTURE_BRUTE.test(l)
+        && !NORMALISE.test(l) && !/empreinte-brute-ok/.test(l));
+    for (const { n } of fautives) malEcrits.push(`${chemin}:${n}`);
   }
 }
 // LA PORTÉE D'E4 EST BORNÉE AU PILOT, et le motif est écrit plutôt que subi. La fonction partagée
@@ -320,7 +354,7 @@ if (aInstruire.length) {
 }
 if (aCorriger.length) {
   ko("E4", `${racine}`, `${aCorriger.length} site(s) DU PILOT qui hachent le contenu d'un FICHIER sans normaliser ` +
-    `les fins de ligne : ${malEcrits.join(", ")}. Avec core.autocrlf, git repose un fichier en CRLF ` +
+    `les fins de ligne : ${aCorriger.join(", ")}. Avec core.autocrlf, git repose un fichier en CRLF ` +
     "sur un poste et en LF sur un autre SANS qu'un octet de contenu ait bougé : le sceau diffère " +
     "alors pour un contenu identique, et il cesse de prouver quoi que ce soit. Employer " +
     "`scripts\\lib-empreinte.mjs` (`empreinteFichier`, `empreinteTexte`) — la classe a été payée " +

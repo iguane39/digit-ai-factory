@@ -100,10 +100,17 @@ peut-être des binaires à bon droit. Les sites des autres forges sont **nommés
 bloquant, jamais exclus par leur nom : une exclusion nommée signale une cause non traitée (N-13),
 un signal nommé ouvre un travail.
 
+> **Limite du rapprochement, constatée le 25/08** : E1 et E2 apparient un site à sa ligne par son
+> NOM DE FICHIER seul. `forge-ops` porte désormais son propre `scripts/lib-empreinte.mjs`, distinct
+> de celui du pilot — deux fichiers homonymes dans deux dépôts, que le contrôle compte comme un.
+> Il ne peut donc pas dire qu'un des deux serait indéclaré. La table est écrite pour un lecteur
+> humain, et elle nomme les deux ; le contrôle, lui, ne les distingue pas, et c'est déclaré ici
+> plutôt que supposé résolu.
+
 | Dépôt | Site | Ce qui est scellé | Format |
 |---|---|---|---|
 | pilot | **`scripts/lib-empreinte.mjs`** | LE calcul lui-même — `empreinteFichier`, `empreinteTexte`, `empreinteBinaire`, `tailleNormalisee` | **la fonction partagée** : fins de ligne normalisées LF, rien d'autre |
-| forge-ops | `scripts/ops.mjs` · `oracles/oracle-ops.mjs` | fichiers d'une release déployée ou promue (O-7) | `forge-ops/empreinte@1` |
+| forge-ops | **`scripts/lib-empreinte.mjs`** · `scripts/ops.mjs` · `oracles/oracle-ops.mjs` | fichiers d'une release déployée ou promue (O-7) | `forge-ops/empreinte@1` — **texte normalisé LF, binaire brut**, vérification acceptant les deux formes (migration TF-0615) |
 | pilot | `oracles/oracle-conformite-projet.mjs` | parité source→projection de `TODO-PRODUIT`, `ARCHITECTURE`, `MODELE-DONNEES` (R-20/R-26) | sceau court (12 hex) dans la page générée |
 | pilot | `oracles/oracle-boite-entree.mjs` | lots entrants déjà ingérés (TF-0253) | sceau de contenu normalisé LF |
 | pilot | `scripts/verifier-jugement.mjs` | jugements humains scellés (`pilot/jugement@1`) | sha256 par livrable |
@@ -117,7 +124,7 @@ un signal nommé ouvre un travail.
 | pilot | `todo/appliquer-export.mjs` | export du registre rendu à un tiers | sha256 du lot, **normalisé LF** via `lib-empreinte` |
 | forge-seo-geo | `scripts/grille.py` · `scripts/gabarits.py` | empreinte de grille et registre d'évolutions (TF-0072) | sceau court dans le registre |
 | forge-conception | `oracles/oracle-tracabilite.mjs` · `oracles/oracle-vues-profil.mjs` | scellement d'`EXIGENCES.json` et parité de ses vues | sha256 du référentiel |
-| forge-design | `skills/systeme-de-marque/scripts/generer-design-md.mjs` | `DESIGN.md`, vue dérivée des tokens et de la voix | sceau dans la vue |
+| forge-design | `skills/systeme-de-marque/scripts/generer-design-md.mjs` | `DESIGN.md`, vue dérivée des tokens et de la voix | sceau dans la vue, **normalisé LF** (TF-0615) |
 | forge-agents | `skills/quality-oracles/scripts/run-oracles.mjs` | clé de cache d'un lancement d'oracles (16 hex, **non persisté**) | usage interne, déclaré |
 | forge-agents | `skills/digit-ai-page-html/scripts/check_html.py` | empreinte du JEU DE RÈGLES, citée au journal d'oracle (R-32) | empreinte de règles, pas de contenu |
 | forge-agents | `skills/forge-agents/scripts/otlp-project.mjs` | identifiant de trace d'un envoi de télémétrie | usage interne, déclaré |
