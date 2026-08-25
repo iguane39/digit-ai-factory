@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=79a5ee47fecd archive=40441f7fe541 · dernier événement: 2026-08-25T19:47:23.458Z -->
+     sceaux: actifs=d2995b28606a archive=40441f7fe541 · dernier événement: 2026-08-25T19:58:15.397Z -->
 
-**166 actifs** (candidat 1 · décidé 1 · en cours 0 · corrigé 157 · écarté 7) · **469 archivés**.
+**166 actifs** (candidat 0 · décidé 1 · en cours 0 · corrigé 158 · écarté 7) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,7 +11,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0633 | candidat | 6.7 | Un actif visuel valide sur son fichier, jamais sur son rendu en contexte | **oui** — defaut invisible sur le fichier, evident sur une capture du composant ; oracle de contraste aveugle aux images |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
 | TF-0526 | corrige | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
 | TF-0530 | corrige | 25 | pilot : le garde-fou « le pilot n'ecrit pas chez un produit » tenait par DISCIPLINE SEULE, et les classes de defaut du jour n'avaient pas de regle generique | **oui** — un garde-fou non execute est un garde-fou qu'on suit jusqu'au jour ou on ne le suit plus ; et neuf classes de defaut payees le meme jour sans qu'aucune regle generique ne les empeche de revenir ailleurs |
@@ -120,6 +119,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0478 | corrige | 6.7 | quality-oracles : un verdict ne dit pas SUR QUEL CONTENU il a ete rendu — un CONFORME cite en restitution vieillit en silence, ni re-verifiable ni invalidable | **oui** — MESURE le 22/08 sur le parc reel, et le resultat est total : sur les 2 journaux d'oracles confrontables a leur cible, 2 portent un verdict PASS rendu AVANT une modification de la cible (etude i18n : cible modifiee 5,9 min apres le verdict ; etude portefeuille : 1,5 min apres). Deux « PASS » sont donc citables aujourd'hui alors qu'ils ne portent plus sur le contenu present, et RIEN ne les distingue d'un verdict frais. Echantillon petit (2 journaux) — mais le taux de perime y est de 2/2, et le mecanisme est structurel, pas accidentel. |
 | TF-0489 | corrige | 6.7 | forge-design : aucun composant « lecteur de source » au catalogue alors que la regle d autoportance impose d embarquer les sources citees | **oui** — 130 lignes de convertisseur ecrites a la main, plus la decouverte du seuil de DOM par essai ; besoin cree par une regle du socle lui-meme. |
 | TF-0500 | corrige | 6.7 | forge-design : la regle L2-rendu ne peut structurellement pas voir un texte ecrase en filet sur mobile — trois causes independantes | **oui** — Une famille entiere de defauts de mise en page non surveillee sous 1100 px, la ou les bascules de layout la rendent la plus probable. |
+| TF-0633 | corrige | 6.7 | Un actif visuel valide sur son fichier, jamais sur son rendu en contexte | **oui** — defaut invisible sur le fichier, evident sur une capture du composant ; oracle de contraste aveugle aux images |
 | TF-0558 | corrige | 6 | forge-agents, composants.md §6 : la regle de calibrage du repli des tableaux est ecrite en prose et sans mecanisme — chaque projet la retraduit, et se trompe | **oui** — 16 debordements V1 bloquants restes invisibles cinq jours sur un livrable diffuse, pour une regle que le socle enonce correctement mais ne mecanise pas ; le meme seuil errone est fige dans le squelette de la bibliotheque de gabarits. |
 | TF-0554 | corrige | 4.5 | forge-agents, check_html L19 : la regle refuse ce que composants.md §6 rend OBLIGATOIRE, et elle juge un selecteur sans savoir sous quelle media query il vit | **oui** — 11 fichiers passes de PASS a FAIL sans modification : 8 livrables du projet (12 echecs, tous L19) et les 3 vues generees par la factory (2 chacune). Aucun projet appliquant §6 ne peut livrer vert tant que la contradiction tient. |
 | TF-0323 | corrige | 4 | Gouvernance de mission absente : ni registre de risques, ni parties prenantes, ni mesures de succès suivies | **oui** — revérifié en session le 16/08 : 0 occurrence de « risque » dans pilote-de-mission v1.0.0, 0 hit « parties prenantes » sur les skills installés — une mission client pilotée par la forge ne produit aucun des trois objets qu'un commanditaire attend en premier en comité de pilotage |
