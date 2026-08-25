@@ -118,6 +118,23 @@ try {
       "ce qui a été écarté se dit : « introuvable » sans motif n'apprend rien");
   });
 
+  // LE VERROU QUI NE PEUT PAS S'ÉVAPORER (TF-0630). Le cas précédent prouve que `PERIME.md`
+  // tranche — mais ce marqueur ne peut PAS être versionné (une copie du pilot partage son dépôt
+  // distant avec le pilot vivant), et il a réellement disparu entre le 23 et le 25/08. Ce cas
+  // exige donc que le PRÉFIXE du répertoire suffise, SANS marqueur : la copie porte ici une
+  // signature complète et aucun `PERIME.md`. Sans le verrou, elle est un second candidat valide
+  // et le résolveur refuse de choisir (exit 2) — le cas rougit alors sur `exit`.
+  cas("`_archive-` tranche SANS marqueur, et l'écart est NOMMÉ lui aussi", () => {
+    const racine = join(atelier, "cas4bis");
+    faireDepot(join(racine, "digit-ai-factory"));
+    faireDepot(join(racine, "_archive-digit-ai-forge-steering_old"));   // signature COMPLÈTE, pas de PERIME.md
+    const r = resoudre(racine);
+    assert.equal(r.exit, 0, "un dépôt archivé ne doit plus rendre la résolution ambiguë");
+    assert.match(r.racine, /digit-ai-factory$/);
+    assert.ok(r.ecartes.some((e) => /_archive-.*_archive-/.test(e)),
+      "écarter sans le dire redevient le choix silencieux que ce résolveur interdit");
+  });
+
   cas("aucun candidat : exit 1, distinct de l'ambiguïté", () => {
     const racine = join(atelier, "cas5");
     faireDepot(join(racine, "digit-ai-forge-tests"), { signature: false });
