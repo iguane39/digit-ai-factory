@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=6d37d5efb1dd archive=acf69e8da61a · dernier événement: 2026-08-25T06:02:00.975Z -->
+     sceaux: actifs=09af6c7c9478 archive=acf69e8da61a · dernier événement: 2026-08-25T06:06:07.993Z -->
 
-**145 actifs** (candidat 12 · décidé 1 · en cours 0 · corrigé 128 · écarté 4) · **469 archivés**.
+**145 actifs** (candidat 11 · décidé 1 · en cours 0 · corrigé 129 · écarté 4) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -162,10 +162,10 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0607 | candidat | 10 | forge-ops : le gabarit ops fait nommer la COMMANDE de deploiement et jamais son JUSTIFICATIF ni sa voie de repli — et laisse declarer source de verite un outil qui exige une authentification non documentee | **oui** — Documentation d exploitation inutilisable au moment ou elle servait : commande nommee, justificatif absent, repli absent, et un outil declare source de verite dont l echec d authentification se lit comme un constat d infrastructure. |
 | TF-0527 | corrige | 20 | ops : un travail PLANIFIE qu'on ne peut pas declencher a la demande n'est jamais prouve — il se decouvre casse au moment ou l'on compte dessus | **oui** — un mecanisme declare « en place » dans un releve remis a l'humain, qui n'avait jamais execute une seule ligne sur un agent |
 | TF-0529 | corrige | 15 | ops : une instance d'approbation FIGE la contrainte de separation des roles a sa creation — relacher le reglage ne debloque pas l'instance en attente | **oui** — une porte de deploiement laissee bloquee 26 heures, et une demi-heure de recherche pour etablir que le relachement du reglage ne s'applique pas retroactivement |
 | TF-0579 | corrige | 12.5 | forge-ops : un gate de MEP est reste ROUGE six jours et le deploiement a eu lieu quand meme — un gate dont l echec n empeche rien n est pas un gate | **oui** — Six jours de MEP avec un gate rouge non vu, sur un produit dont l argument commercial est la porte executee. |
+| TF-0607 | corrige | 10 | forge-ops : le gabarit ops fait nommer la COMMANDE de deploiement et jamais son JUSTIFICATIF ni sa voie de repli — et laisse declarer source de verite un outil qui exige une authentification non documentee | **oui** — Documentation d exploitation inutilisable au moment ou elle servait : commande nommee, justificatif absent, repli absent, et un outil declare source de verite dont l echec d authentification se lit comme un constat d infrastructure. |
 
 ## digit-ai-forge-seo-geo
 
