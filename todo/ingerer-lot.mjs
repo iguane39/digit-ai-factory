@@ -34,6 +34,17 @@ const sidecarPath = process.argv[2];
 const iReg = process.argv.indexOf("--registre");
 const registre = resolve(iReg > 0 ? process.argv[iReg + 1] : join(ICI, "TODO.jsonl"));
 const archive = join(dirname(registre), "TODO-ARCHIVE.jsonl");
+// LE DOSSIER DU REGISTRE, EN PORTÉE MODULE — et ce n'est pas un déplacement de confort (TF-0634,
+// mesuré le 25/08). Il était déclaré `const` DANS le bloc du préflight anti-collision, donc
+// invisible au POST-contrôle qui vit deux cents lignes plus bas et s'en sert aussi. Le
+// post-contrôle levait donc `todoDir is not defined` à chaque ingestion de plus d'une
+// candidature, son `catch` avalait l'erreur, et la seule chose qu'il rendait était qu'il n'avait
+// pas pu vérifier. Autrement dit : LE GARDE-FOU CONTRE LES COLLISIONS INTER-SESSIONS N'A JAMAIS
+// TOURNÉ — pendant que deux sessions parallèles écrivaient dans ce registre.
+// On ne l'a su que parce que le correctif de la veille (TF-0623) a fait dire à ce `catch` la
+// CAUSE RÉELLE au lieu de deux hypothèses fausses. Un contrôle qui échoue en silence et un
+// contrôle qui passe sont indiscernables ; c'est le message d'erreur honnête qui les sépare.
+const todoDir = dirname(registre);
 if (!sidecarPath || !existsSync(sidecarPath)) { console.error("usage : ingerer-lot.mjs <sidecar.tf.jsonl> [--registre <TODO.jsonl>] [--sans-fetch] [--derogation \"<motif>\"]"); process.exit(2); }
 
 // ---- dérogation TRACÉE aux règles de FORME du lot (décision humaine du 22/08, option b3) ---
@@ -85,7 +96,7 @@ const derogee = (regle, quoi) => {
 // séquentiels re-frapperaient des numéros déjà pris ailleurs — REFUS, pull d'abord.
 // Hors git ou hors ligne : constat déclaré, jamais silencieux. `--sans-fetch` assume.
 if (!process.argv.includes("--sans-fetch")) {
-  const todoDir = dirname(registre);
+  // `todoDir` vient de la portée module (TF-0634) : le redéclarer ici l'y enfermerait à nouveau.
   const git = (args) => execFileSync("git", ["-C", todoDir, ...args], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
   let dansGit = false;
   try { dansGit = git(["rev-parse", "--is-inside-work-tree"]) === "true"; } catch { /* registre nu : rien à confronter */ }

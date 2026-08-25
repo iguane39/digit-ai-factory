@@ -29,7 +29,7 @@
 // silencieux entre deux dépôts qui se ressemblent — c'est exactement le piège de `_old`).
 
 import { existsSync, readFileSync, readdirSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -49,7 +49,25 @@ const SIGNATURE = [
 // moyen donné aux copies mises de côté de ne plus jamais être prises pour l'original.
 const MARQUEUR_PERIME = "PERIME.md";
 
+// LA SECONDE SERRURE, ET POURQUOI IL EN FALLAIT UNE (TF-0630, 25/08/2026). Jusqu'ici, une copie
+// du pilot n'était écartée QUE par `PERIME.md`. Or ce marqueur n'est pas versionné — il ne peut
+// pas l'être : une copie du pilot partage son dépôt distant avec le pilot vivant, donc committer
+// puis pousser le marqueur apposerait « PÉRIMÉ » sur le dépôt vivant. Ce fichier est donc, par
+// construction, le genre de chose qui disparaît.
+// ET IL A DISPARU. TF-0525 consigne le 23/08 que le clone du pilot PORTE son `PERIME.md` ; le
+// 25/08, mesuré avant toute écriture, LE FICHIER ÉTAIT ABSENT. Deux jours, cause non établie.
+// Pendant cette fenêtre, ce clone portait les cinq fichiers de signature et redevenait un
+// candidat parfaitement valide.
+// LE PRÉFIXE `_archive-` EST LA SERRURE QUI NE PEUT PAS S'ÉVAPORER : il vit dans le NOM du
+// répertoire, visible sans l'ouvrir, et c'est déjà la convention du parc pour un dépôt mis de
+// côté (`references/CONVENTION-DEPOTS-MIS-DE-COTE.md`).
+// CE QUE ÇA NE CHANGE PAS, et c'est la raison d'être de ce fichier : l'écart reste BRUYANT. Le
+// motif est nommé dans `ecartes`, comme celui du marqueur. Ce résolveur n'a jamais eu le droit
+// de choisir en silence entre deux dépôts qui se ressemblent ; il ne l'a toujours pas.
+const PREFIXE_ARCHIVE = /^_archive-/i;
+
 function estPilot(racine) {
+  if (PREFIXE_ARCHIVE.test(basename(racine))) return { ok: false, motif: "nom en `_archive-` — dépôt mis de côté par la convention du parc" };
   if (existsSync(join(racine, MARQUEUR_PERIME))) return { ok: false, motif: "marqué PERIME.md" };
   const absents = SIGNATURE.filter((f) => !existsSync(join(racine, f)));
   if (absents.length) return { ok: false, motif: `signature incomplète (${absents.join(", ")})` };
@@ -88,7 +106,9 @@ export function resoudrePilot() {
     const chemin = join(racineForges, d.name);
     if (trouves.includes(chemin)) continue;
     const v = estPilot(chemin);
-    if (!v.ok && /PERIME|signature incomplète \(todo/.test(v.motif)) {
+    // `_archive-` est nommé ici AUSSI, et pas seulement dans `estPilot` : une exclusion qui
+    // écarte sans le dire redevient exactement le choix silencieux que ce fichier interdit.
+    if (!v.ok && /PERIME|_archive-|signature incomplète \(todo/.test(v.motif)) {
       ecartes.push(`${d.name} : ${v.motif}`);
     }
   }
@@ -98,7 +118,8 @@ export function resoudrePilot() {
   return {
     racine: null, methode: null, ecartes,
     erreur: `${trouves.length} candidats indiscernables : ${trouves.join(" · ")} — poser `
-      + "PILOT_ROOT, ou marquer les copies mises de côté d'un fichier PERIME.md",
+      + "PILOT_ROOT, renommer les copies mises de côté en `_archive-…` (durable, visible sans "
+      + "ouvrir le dossier), ou les marquer d'un fichier PERIME.md",
   };
 }
 

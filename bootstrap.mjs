@@ -27,7 +27,7 @@
 // Contrat de sortie : rapport sur stdout, exit 0 = poste prêt, 1 = au moins un défaut.
 
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, renameSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, renameSync, readdirSync, statSync, readlinkSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -403,7 +403,50 @@ console.log("");
     averts.push(nom);
   }
 
-  if (!suspects.length && !fichiersSuspects.length) ligne("ok", `racine propre — aucun dépôt hors liste ni puits de redirection raté sous ${racine}`);
+  // ---- LE TROISIÈME VERSANT : LES LIENS (TF-0631, 25/08/2026) --------------------------------
+  //
+  // LE FAIT. `digit-ai-forge-pilot_old` vit à la racine du parc depuis le 9 août — un LIEN
+  // SYMBOLIQUE vers `digit-ai-forge-steering`, un nom de dépôt d'il y a DEUX renommages, qui
+  // n'existe pas. Seize jours d'ouvertures de poste, et aucune ligne ne l'a jamais nommé.
+  //
+  // LA CAUSE, et elle est structurelle, pas une distraction : `readdirSync(..., withFileTypes)`
+  // NE SUIT PAS les liens. Pour un `Dirent` de lien symbolique, `isDirectory()` ET `isFile()`
+  // valent FAUX tous les deux — seul `isSymbolicLink()` est vrai. Les deux versants du balayage
+  // filtrent l'un sur `isDirectory()`, l'autre sur `isFile()` : un lien tombe donc ENTRE eux.
+  // Mesuré ici même : `isDirectory:false | isFile:false | isSymbolicLink:true`.
+  //
+  // CE QUE ÇA COÛTE, et ce n'est PAS le lien brisé — un lien brisé est inerte. Le risque est
+  // qu'il redevienne VIVANT sans que personne l'ait voulu : le jour où un répertoire
+  // `digit-ai-forge-steering` réapparaît à la racine (un clone sous un ancien nom, exactement ce
+  // que GitHub permet en redirigeant), ce lien pointe dessus, sous un nom qui dit « pilot ». On
+  // s'y installe en croyant être dans un dépôt mis de côté, et on écrit ailleurs. C'est le piège
+  // du second clone avec une indirection de plus.
+  //
+  // On DIT, on n'efface pas : un lien posé à la main l'a été pour une raison, même oubliée (R-29).
+  let liensSuspects = [];
+  try {
+    liensSuspects = readdirSync(racine, { withFileTypes: true })
+      .filter((e) => e.isSymbolicLink())
+      .map((e) => e.name);
+  } catch { liensSuspects = []; }
+  for (const nom of liensSuspects) {
+    const chemin = join(racine, nom);
+    let cible = "?";
+    try { cible = readlinkSync(chemin); } catch { /* cible illisible */ }
+    // `existsSync` SUIT le lien : faux ici veut dire « la cible n'existe pas », donc lien brisé.
+    const brise = !existsSync(chemin);
+    ligne("avert",
+      `${nom} — LIEN SYMBOLIQUE vers « ${cible} »${brise ? ", et sa cible N'EXISTE PAS" : ""} : ni ` +
+      "répertoire ni fichier pour le balayage, donc invisible aux deux autres versants de ce " +
+      "contrôle. " + (brise
+        ? "Brisé, il est inerte — mais il redeviendra VIVANT le jour où un répertoire de ce nom " +
+          "réapparaîtra, sous un nom qui n'est plus le sien. Un piège qui attend sa cible"
+        : "Vivant : on croit ouvrir ce nom-là et on écrit dans un autre dépôt") +
+      ". Supprimer un lien est un geste HUMAIN (R-29) — ce contrôle le déclare, il ne l'efface pas");
+    averts.push(nom);
+  }
+
+  if (!suspects.length && !fichiersSuspects.length && !liensSuspects.length) ligne("ok", `racine propre — aucun dépôt hors liste, puits de redirection raté ni lien symbolique sous ${racine}`);
   else if (!suspects.length) ligne("ok", `racine sans dépôt hors liste sous ${racine}`);
   else for (const x of suspects) {
     ligne("avert", `${x.nom} — ${x.motif}. Ne rien y exécuter ; supprimer un répertoire est un geste HUMAIN (R-29) — ce contrôle le déclare, il ne l'efface pas`);
