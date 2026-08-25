@@ -224,6 +224,41 @@ if (evenements.some((e) => e.ev === "ingestion" && (e.lot_sha === lotSha || e.lo
   process.exit(0);
 }
 
+// ---- rapprochement contre le registre : SIGNALE, ne bloque JAMAIS (TF-0618) ---------------
+// Un produit remonte ce qu'il OBSERVE, et il n'a aucun moyen de savoir ce que le registre du pilot
+// contient : `TODO-PRODUIT.md` porte les items qui LE concernent, pas ceux que le pilot a corriges
+// chez lui. Le 25/08, un signalement juste a donc produit un doublon strict d'un item corrige la
+// veille, et coute une decision humaine pour un travail deja livre. Le rapprochement rend cette
+// piste AVANT la decision au lieu de la laisser decouvrir apres.
+//
+// IL N'AFFIRME PAS UN DOUBLON, il dit « ressemble a » : mesure sur les 154 items du registre, 3 des
+// 5 paires signalees ne sont pas des doublons mais deux faces d'un meme episode. Affirmer serait
+// donc faux 3 fois sur 5, et un controle qui affirme faux se fait desactiver (R-33 bis).
+try {
+  const { rapprochements, itemsDuRegistre, frequences } = await import("./rapprocher.mjs");
+  const itemsClos = itemsDuRegistre(evenements);
+  const df = frequences(itemsClos);
+  const lignesRappro = [];
+  for (const [i, c] of candidatures.entries()) {
+    const r = rapprochements(`${c.titre || ""} ${c.contenu || ""}`, itemsClos, { df }).slice(0, 3);
+    for (const x of r) {
+      lignesRappro.push(`  item entrant n° ${i + 1} « ${String(c.titre).slice(0, 60)} »` +
+        `\n    ressemble a ${x.id} (${x.statut}${x.date ? ", " + x.date : ""}, recouvrement ${x.score}) : ${x.titre}` +
+        `\n    termes communs : ${x.communs.join(", ")}`);
+    }
+  }
+  if (lignesRappro.length) {
+    console.log(`[RAPPROCHEMENT] ${lignesRappro.length} piste(s) de lecture — AUCUN BLOCAGE, le juge reste humain.` +
+      "\n  Un item entrant peut decrire un defaut deja corrige a la source : le produit ne peut pas le savoir.\n" +
+      lignesRappro.join("\n") +
+      "\n  Ce n'est pas un verdict de doublon : sur le corpus reel, 3 paires sur 5 sont deux faces d'un" +
+      "\n  meme episode et non des doublons. A lire avant de decider.");
+  }
+} catch (e) {
+  // Un rapprochement indisponible ne doit JAMAIS empecher une ingestion : il aide, il ne garde pas.
+  console.error(`[RAPPROCHEMENT] indisponible (${e.message}) — ingestion poursuivie, la piste est perdue mais rien n'est bloque`);
+}
+
 // ---- frappage des ids à la suite (actifs + archive, jamais réutilisés) ---------------------
 const ids = [...evenements, ...lireEv(archive)].filter((e) => e.id).map((e) => parseInt(e.id.slice(3), 10));
 let prochain = (ids.length ? Math.max(...ids) : 0) + 1;

@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=e7ea1169a951 archive=40441f7fe541 · dernier événement: 2026-08-25T09:46:51.673Z -->
+     sceaux: actifs=26e81bff8c24 archive=40441f7fe541 · dernier événement: 2026-08-25T10:11:33.210Z -->
 
-**154 actifs** (candidat 12 · décidé 1 · en cours 0 · corrigé 135 · écarté 6) · **469 archivés**.
+**154 actifs** (candidat 11 · décidé 1 · en cours 0 · corrigé 136 · écarté 6) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -22,7 +22,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0613 | candidat | 10 | Une redirection Cloudflare exige un enregistrement proxifie, et le mecanisme moderne peut etre refuse | **oui** — regle moderne refusee malgre le droit apparemment adequat ; 7 hostnames a proxifier pour ouvrir le 443 |
 | TF-0581 | candidat | 8.3 | Le seul verificateur de contraste ne regarde que le menu du header | **oui** — texte a ratio 1,0 reste en production ; oracle de contraste present au depot et scope au seul .header-line |
 | TF-0584 | candidat | 6 | Une sonde de contraste doit se confronter a la palette declaree du projet | **oui** — 2 erreurs de sonde successives produisant des verdicts faux, l'un negatif l'autre positif |
-| TF-0618 | candidat | 2 | Un lot qui denonce un fait DEJA CORRIGE ne cite pas l'item du registre qui le couvre | **oui** — cout PAYE en run reel : TF-0614 a consomme une lecture, un rangement au registre et une decision humaine pour un travail deja livre la veille (TF-0598, corrige le 24/08 a 18h48) |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
 | TF-0526 | corrige | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
 | TF-0530 | corrige | 25 | pilot : le garde-fou « le pilot n'ecrit pas chez un produit » tenait par DISCIPLINE SEULE, et les classes de defaut du jour n'avaient pas de regle generique | **oui** — un garde-fou non execute est un garde-fou qu'on suit jusqu'au jour ou on ne le suit plus ; et neuf classes de defaut payees le meme jour sans qu'aucune regle generique ne les empeche de revenir ailleurs |
@@ -78,6 +77,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0324 | corrige | 3 | Artefacts périodiques du run de delivery absents : RAID, rapport d'avancement, compte rendu, REX, suivi des bénéfices | **oui** — revérifié en session le 16/08 : 0 occurrence de RAID / compte rendu / rapport d'avancement / lessons learned sur les skills installés — aucun des cinq artefacts que réclame une mission longue n'a d'équivalent dans la forge |
 | TF-0475 | corrige | 3 | agents, design : 18 des 20 champs de frontmatter d'un SKILL.md ne sont posés nulle part — isolation de contexte, cadrage du déclenchement et restriction d'outils ne sont câblés sur aucun des 17 skills | **oui** — mesuré et non payé sur pièce : 17 SKILL.md sur 17 à deux champs, 18 champs disponibles à zéro occurrence, dont les trois seuls mécanismes de la plateforme capables d'isoler un contexte, de cadrer un déclenchement et de restreindre un outil |
 | TF-0619 | corrige | 3 | SP2 rend un fait VRAI a la MAUVAISE gravite : « non ignore » se lit « pourrait etre commite un jour » quand la verite etait « deja commite et deja publie » | **oui** — cout PAYE en run reel : la decision humaine D-02 du 25/08 a ete prise sur la lecture « non ignore », alors qu'un des trois fichiers etait deja publie sur un depot distant — le geste que cet etat appelle n'est pas le meme |
+| TF-0618 | corrige | 2 | Un lot qui denonce un fait DEJA CORRIGE ne cite pas l'item du registre qui le couvre | **oui** — cout PAYE en run reel : TF-0614 a consomme une lecture, un rangement au registre et une decision humaine pour un travail deja livre la veille (TF-0598, corrige le 24/08 a 18h48) |
 | TF-0621 | corrige | 2 | Un octet de controle accidentel dans le REGISTRE echappe a P3, dont la portee s'arrete aux fichiers de code — et c'est un avertissement d'interprete, pas un controle, qui a rattrape le coup | **oui** — cout PAYE trois fois : le 18/08 une regex morte sept jours dans forge-tests (TF-0591), ce matin deux fichiers du pilot, et a l'instant le registre lui-meme — la seule alerte etant un SyntaxWarning lu par hasard |
 | TF-0571 | corrige | 1 | La doctrine de restitution n atteint pas une session qui travaille dans un depot produit | non |
 | TF-0572 | corrige | 1 | Un designateur INVENTE par l agent echappe a S15 comme a S20 | non |
