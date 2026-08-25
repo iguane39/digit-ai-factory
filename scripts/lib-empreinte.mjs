@@ -83,7 +83,8 @@ export function empreinteFichier(chemin, longueur) {
  */
 export function empreinteBinaire(chemin, longueur) {
   if (!existsSync(chemin)) return "absent";
-  const hex = createHash("sha256").update(readFileSync(chemin)).digest("hex");
+  // C'est LA fonction du brut : son nom le dit et son doc l'explique.
+  const hex = createHash("sha256").update(readFileSync(chemin)).digest("hex");   // empreinte-brute-ok
   return longueur ? hex.slice(0, longueur) : hex;
 }
 

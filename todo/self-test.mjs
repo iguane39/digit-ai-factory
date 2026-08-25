@@ -325,7 +325,10 @@ check("vue : 2 générations identiques (sha256) sur le registre réel", () => {
   execFileSync("node", [join(ICI, "generer-vue.mjs")], { encoding: "utf8" });
   const a = empreinteFichier(join(ICI, "TODO.md"));   // TF-0615 : fonction partagee
   execFileSync("node", [join(ICI, "generer-vue.mjs")], { encoding: "utf8" });
-  const b = createHash("sha256").update(readFileSync(join(ICI, "TODO.md"))).digest("hex");
+  // empreinte-brute-ok : on compare DEUX generations du MEME fichier sur le MEME poste — le
+  // determinisme se juge sur les octets, normaliser masquerait une difference de fins de ligne
+  // introduite par le generateur, qui serait justement un defaut.
+  const b = createHash("sha256").update(readFileSync(join(ICI, "TODO.md"))).digest("hex");   // empreinte-brute-ok
   if (a !== b) throw new Error("vue non déterministe");
 });
 
@@ -335,7 +338,8 @@ check("vue : 2 générations identiques (sha256) sur le registre réel", () => {
 // rien — c'est ce que la fixture témoin de RV-9 avait appris à ses dépens.
 const genArchive = join(ICI, "generer-archive.mjs");
 const genererArchive = (src, out) => execFileSync("node", [genArchive, src, out], { encoding: "utf8" });
-const shaFic = (f) => createHash("sha256").update(readFileSync(f)).digest("hex");
+// empreinte-brute-ok : compare deux archives generees sur le meme poste, meme raison que ci-dessus.
+const shaFic = (f) => createHash("sha256").update(readFileSync(f)).digest("hex");   // empreinte-brute-ok
 const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 // Simulation fidèle de la recherche côté client : une carte = un `textContent` normalisé, et
 // `indexOf` dessus. Tester la recherche sans navigateur exige de reproduire son entrée, pas de
