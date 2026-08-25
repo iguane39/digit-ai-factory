@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=f23b652fbc34 archive=acf69e8da61a · dernier événement: 2026-08-24T19:42:05.551Z -->
+     sceaux: actifs=a59954133f1d archive=acf69e8da61a · dernier événement: 2026-08-25T05:31:18.235Z -->
 
-**137 actifs** (candidat 6 · décidé 1 · en cours 0 · corrigé 126 · écarté 4) · **469 archivés**.
+**139 actifs** (candidat 7 · décidé 1 · en cours 0 · corrigé 127 · écarté 4) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -156,9 +156,10 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0579 | candidat | 12.5 | forge-ops : un gate de MEP est reste ROUGE six jours et le deploiement a eu lieu quand meme — un gate dont l echec n empeche rien n est pas un gate | **oui** — Six jours de MEP avec un gate rouge non vu, sur un produit dont l argument commercial est la porte executee. |
+| TF-0607 | candidat | 10 | forge-ops : le gabarit ops fait nommer la COMMANDE de deploiement et jamais son JUSTIFICATIF ni sa voie de repli — et laisse declarer source de verite un outil qui exige une authentification non documentee | **oui** — Documentation d exploitation inutilisable au moment ou elle servait : commande nommee, justificatif absent, repli absent, et un outil declare source de verite dont l echec d authentification se lit comme un constat d infrastructure. |
 | TF-0527 | corrige | 20 | ops : un travail PLANIFIE qu'on ne peut pas declencher a la demande n'est jamais prouve — il se decouvre casse au moment ou l'on compte dessus | **oui** — un mecanisme declare « en place » dans un releve remis a l'humain, qui n'avait jamais execute une seule ligne sur un agent |
 | TF-0529 | corrige | 15 | ops : une instance d'approbation FIGE la contrainte de separation des roles a sa creation — relacher le reglage ne debloque pas l'instance en attente | **oui** — une porte de deploiement laissee bloquee 26 heures, et une demi-heure de recherche pour etablir que le relachement du reglage ne s'applique pas retroactivement |
+| TF-0579 | corrige | 12.5 | forge-ops : un gate de MEP est reste ROUGE six jours et le deploiement a eu lieu quand meme — un gate dont l echec n empeche rien n est pas un gate | **oui** — Six jours de MEP avec un gate rouge non vu, sur un produit dont l argument commercial est la porte executee. |
 
 ## digit-ai-forge-seo-geo
 
@@ -190,6 +191,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0549 | decide | 10 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : `Produit-07` a un forge\retours\ mais rien de ce qui s'y fait n'est suivi | **oui** — mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration. |
+| TF-0606 | candidat | 25 | pilot : un refus d OUTIL a ete pris pour une absence de CAPACITE, et le blocage rapporte comme un fait sur le monde — « je ne peux pas deployer » alors que le jeton etait sur le disque, a un emplacement nomme dans un document deja charge en contexte | **oui** — Mise en production rendue a l humain a tort, avec une consigne d action inutile (railway login) ; deblocage en trois minutes une fois le signalement recu. Le travail etait fini, seul le rapport etait faux. |
 | TF-0590 | corrige | 20 | Un README de dossier reste PERIME apres regeneration : fins de ligne MIXTES dans le meme fichier, et le harnais tombe a 54/55 sans qu'aucune action ne le repare | **oui** — mesure le 25/08 : le harnais du pilot passe de 55/55 a 54/55 et n'en bouge plus — trois regenerations, trois fois le meme FAIL, un diff vide a chaque fois. Aucune action disponible ne le repare, ce qui est la definition d'un rouge qu'on apprend a ignorer. |
 | TF-0541 | corrige | 15 | Gabarit de projet : `CLAUDE.md` et `ledger.py` divergent, et le run est épinglé en dur | **oui** — forge/ledger.jsonl absent du disque ; ledger.py ligne 68 run codé en dur ; run 20260815 clos en seq 24 |
 | TF-0585 | corrige | 12.5 | Un comportement destine aux visiteurs valide sur un protocole qu'ils n'utilisent pas | **oui** — 7 hostnames sur 8 injoignables en HTTPS apres avoir ete declares fonctionnels ; port 443 ferme sur 213.186.33.5 |
