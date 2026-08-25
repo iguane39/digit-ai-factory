@@ -152,7 +152,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>26e81bff8c24</code> · dernier événement 2026-08-25T10:11:33.210Z</p>
+      <p class="meta">sceau <code>d143baa65c2c</code> · dernier événement 2026-08-25T11:40:33.035Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -162,7 +162,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="11 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">11</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="10 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">10</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="1 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">1</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="468 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">468</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -214,29 +214,6 @@
       <h2>digit-ai-factory <span class="badge" title="77 item(s) actifs ciblant digit-ai-factory">77</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-factory</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0609" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0609</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 25)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">La redirection DNS d'OVH n'ecoute pas le port 443</h3>
-          <div class="card-detail" data-cite><p class="lead">Mesure directe : port 443 FERME sur 213.186.33.5, port 80 ouvert.</p><ul class="puces"><li>Toute redirection posee par POST /domain/zone/&lt;zone&gt;/redirection est donc HTTP SEULEMENT. L'objet retourne par l'API ne porte aucun champ SSL — rien n'y signale la limite : subDomain, target, type, title, keywords, description. Consequence payee : sept hostnames sur huit declares fonctionnels apres une mesure faite en http://, et injoignables en https://, affirmation publiee a l'exploitant sous forme d'un tableau de coches vertes. Deux notes utiles : les types valides sont visible, invisible et visiblePermanent — ce dernier est le 301, le seul qui transfere l'autorite au sens SEO</li><li>et supprimer une redirection supprime AUSSI les enregistrements A et TXT qu'OVH lui associait, ce qui evite un nettoyage manuel mais surprend si on ne l'attend pas. Correctif propose : ecrire la limite au contrat d'integration comme une CONTRE-INDICATION et non comme une note — « redirection OVH = HTTP seul, inutilisable des qu'un visiteur peut arriver en HTTPS », c'est-a-dire toujours. Un mecanisme dont la limite est connue avant se remplace par un autre</li><li>decouverte apres, elle coute un changement d'architecture complet</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-08-25</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 25 — gain 5 × preuve 5 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>7 hostnames sur 8 injoignables en HTTPS ; remede impliquant de migrer 4 zones et recreer les MX</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-contrats-integration-20260825</dd></div>
-            
-          </dl>
-        </article>
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
              titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
              socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
@@ -1912,6 +1889,37 @@ PISTES</li><li>P3 etend sa portee aux fichiers de DONNEES du depot dont un livra
             <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd><span class="meta-sub">non chiffré</span></dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-11</dd></div>
             
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-ecarte" id="item-TF-0609" data-cite data-forge="digit-ai-factory" data-statut="ecarte" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0609</code>
+            <span class="statut s-ecarte">ecarte</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 25)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">La redirection DNS d'OVH n'ecoute pas le port 443</h3>
+          <div class="card-detail" data-cite><p class="lead">Mesure directe : port 443 FERME sur 213.186.33.5, port 80 ouvert.</p><ul class="puces"><li>Toute redirection posee par POST /domain/zone/&lt;zone&gt;/redirection est donc HTTP SEULEMENT. L'objet retourne par l'API ne porte aucun champ SSL — rien n'y signale la limite : subDomain, target, type, title, keywords, description. Consequence payee : sept hostnames sur huit declares fonctionnels apres une mesure faite en http://, et injoignables en https://, affirmation publiee a l'exploitant sous forme d'un tableau de coches vertes. Deux notes utiles : les types valides sont visible, invisible et visiblePermanent — ce dernier est le 301, le seul qui transfere l'autorite au sens SEO</li><li>et supprimer une redirection supprime AUSSI les enregistrements A et TXT qu'OVH lui associait, ce qui evite un nettoyage manuel mais surprend si on ne l'attend pas. Correctif propose : ecrire la limite au contrat d'integration comme une CONTRE-INDICATION et non comme une note — « redirection OVH = HTTP seul, inutilisable des qu'un visiteur peut arriver en HTTPS », c'est-a-dire toujours. Un mecanisme dont la limite est connue avant se remplace par un autre</li><li>decouverte apres, elle coute un changement d'architecture complet</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-25</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 25 — gain 5 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>7 hostnames sur 8 injoignables en HTTPS ; remede impliquant de migrer 4 zones et recreer les MX</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-contrats-integration-20260825</dd></div>
+            <div class="impact"><dt>Motif d'écart (TF-0157)</dt><dd>DOUBLON ENRICHI DE TF-0587, ET RIEN N'EST PERDU — c'est la condition de cet ecart et elle est tenue : le cout paye (sept hostnames sur huit declares fonctionnels apres une mesure en `http://`, publiee a l'exploitant) et les deux informations neuves (port 443 FERME mesure directement sur 213.186.33.5 ; les trois types valides `visible`, `invisible`, `visiblePermanent`) sont VERSES au dossier de TF-0587 par l'evenement qui precede celui-ci. Un ecart qui jetterait le cout paye ferait disparaitre du registre la seule preuve que cette classe se paie a un tiers, et non seulement en travail refait.
+
+LE FAIT COMMUN, mot pour mot dans les deux constats : la redirection DNS d'OVH n'ecoute pas le port 443, et l'objet rendu par son API ne porte aucun champ SSL — les deux items citent la MEME liste de six champs (subDomain, target, type, title, keywords, description). TF-0587 a ete cree et CORRIGE le 24/08 ; TF-0609 a ete ingere le 25/08 depuis le lot `produit-02-contrats-integration-20260825`. Le produit ne pouvait pas le savoir : son propre relevé ne porte que ce qui le concerne, jamais ce que le pilot a corrige chez lui — c'est exactement la cause decrite par TF-0618.
+
+LA LECTURE ALTERNATIVE A ETE SOUMISE ET N'A PAS ETE RETENUE, et le dire evite de la croire oubliee : cet item pouvait etre garde distinct sur une AUTRE classe — une verification jouee sur un protocole et conclue sur un autre, cousine de N-28. L'arbitrage humain a prefere verser cette lecon au dossier de TF-0587 plutot que d'ouvrir un item de plus, et elle y est ecrite dans les gains constates, nommement rattachee a N-28.
+
+CRITERE DE REOUVERTURE : si un troisieme produit paie la meme classe — une mesure jouee sur un protocole, un port ou un environnement autre que celui sur lequel elle conclut — alors la classe n'est pas la limite d'une API mais la METHODE de verification, et elle merite son propre item avec son propre mecanisme. Deux occurrences ne le prouvent pas encore ; une troisieme le prouverait, et c'est un fait mesurable, pas une intuition.
+
+CET ECART EST LE PREMIER RENDU PAR LE RAPPROCHEMENT MECANISE livre le meme jour (TF-0618) : il a signale la paire au recouvrement 0.234, le plus haut du registre, sans jamais bloquer — le juge est reste humain, et il a lu la piste avant de decider au lieu de la decouvrir apres.</dd></div>
           </dl>
         </article>
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
