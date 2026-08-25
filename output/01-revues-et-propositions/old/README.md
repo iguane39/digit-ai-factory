@@ -26,6 +26,6 @@ corrigée, sur décision humaine : elle n'est plus lue.
 
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
-| `Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html` | fichier | 35,1 Ko | Étude SEO — produit-02.fr — maquette de refonte |
+| `Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html` | fichier | 34,6 Ko | Étude SEO — produit-02.fr — maquette de refonte |
 
 _1 fichier(s), 0 sous-dossier(s)_

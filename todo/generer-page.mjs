@@ -32,6 +32,7 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { empreinteFichier } from "../scripts/lib-empreinte.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const SRC = join(ICI, "TODO.jsonl"), ARC = join(ICI, "TODO-ARCHIVE.jsonl"), OUT = join(ICI, "TODO.html");
@@ -96,7 +97,8 @@ for (const e of lire(SRC)) {
   if (e.ev === "creation") etats.set(e.id, { ...e });
   else if (e.ev === "maj" && etats.has(e.id)) Object.assign(etats.get(e.id), e);
 }
-const sceau = createHash("sha256").update(readFileSync(SRC)).digest("hex").slice(0, 12);
+// TF-0615 : fonction partagee, fins de ligne normalisees (voir generer-vue.mjs).
+const sceau = empreinteFichier(SRC, 12);
 const nbArchives = new Set(lire(ARC).filter((e) => e.id).map((e) => e.id)).size;
 
 const parForge = new Map();

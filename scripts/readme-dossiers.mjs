@@ -31,10 +31,11 @@
  * parc réel) · la main. Les dossiers cachés (`.oracles\`, `.git\`) ne reçoivent pas de README
  * et sont comptés dans le README de leur parent.
  */
-import { readdirSync, readFileSync, writeFileSync, statSync, existsSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, dirname, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { tailleNormalisee } from "./lib-empreinte.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -165,13 +166,23 @@ function attendu(dir, rel) {
       lignes.push(`| [\`${e.name}\\\`](${e.name}/README.md) | dossier (${n} fichier${n > 1 ? "s" : ""}) | — | ${resume.replace(/\|/g, "/")} |`);
     } else {
       nf++;
-      const st = statSync(chemin);
-      lignes.push(`| \`${e.name}\` | fichier | ${taille(st.size)} | ${nature(chemin).replace(/\|/g, "/")} |`);
+      // TF-0615 : la taille est celle du CONTENU NORMALISÉ, pas celle du checkout. Lue sur le
+      // disque, elle est gonflée d'un octet par ligne sur un poste en CRLF : « 4,1 Ko » ici et
+      // « 4,0 Ko » ailleurs pour le MÊME fichier, et neuf README qui rebasculent à chaque
+      // aller-retour entre deux sessions. Une projection commitée ne parle que de ce que le dépôt
+      // porte. Un binaire garde sa taille réelle — `tailleNormalisee` le détecte et le dit.
+      lignes.push(`| \`${e.name}\` | fichier | ${taille(tailleNormalisee(chemin))} | ${nature(chemin).replace(/\|/g, "/")} |`);
     }
   }
   if (!entrees.length) lignes.push("| _(dossier vide)_ | | | |");
   const notes = [`_${nf} fichier(s), ${nd} sous-dossier(s)_`];
-  if (caches.length) notes.push(`dossiers cachés (journaux machine, sans README) : ${caches.map((c) => `\`${c}\\\``).join(", ")}`);
+  // TF-0615 : les dossiers MACHINE ne sont PLUS mentionnés. Ils sont ignorés par git, donc ils ne
+  // voyagent pas : la version commitée affirmait la présence de `_oracles\` dans un dossier où il
+  // n'existe que sur le poste dont un hook l'a créé. Toute autre machine qui régénère retirait la
+  // mention, la première la remettait — onze fichiers qui rebasculent, et un diff qu'on apprend à
+  // ne plus lire. La règle générique : *une projection commitée ne parle que de ce que le dépôt
+  // porte*. Ce qui est local se lit sur le poste, il ne se publie pas. Le COMPTE de fichiers, lui,
+  // exclut déjà ces dossiers (EST_MACHINE au filtre) : rien n'est perdu que l'on comptait.
   if (existsSync(join(dir, "LISEZMOI.md"))) notes.push("voir aussi `LISEZMOI.md` (conventions et correspondance des anciens chemins)");
   lignes.push("", notes.join(" · "), "");
   return { texte: lignes.join("\n"), role };

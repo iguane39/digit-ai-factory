@@ -33,6 +33,7 @@ import { join, basename, relative, dirname } from "node:path";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
+import { empreinteTexte } from "../scripts/lib-empreinte.mjs";
 
 const cible = process.argv[2];
 if (!cible || !existsSync(cible)) {
@@ -997,7 +998,10 @@ else {
     const page = join(dp, nom);
     if (!existsSync(srcMd) || !existsSync(page)) continue; // la PRESENCE est deja jugee par R-20
     const texte = readFileSync(srcMd, "utf8").replace(/^\uFEFF/, "");
-    const attendu = createHash("sha256").update(texte.split("\r\n").join("\n")).digest("hex").slice(0, 12);
+    const attendu = empreinteTexte(texte, 12);            // TF-0615 : fonction partagee
+    // `attenduBrut` reste sur les octets BRUTS : c'est la forme de COMPATIBILITÉ (TF-0253), celle
+    // des sceaux consignés avant la normalisation. La normaliser la rendrait identique à `attendu`
+    // et ferait disparaître la tolérance qu'elle existe pour porter.
     const attenduBrut = createHash("sha256").update(texte).digest("hex").slice(0, 12);
     const rendu = readFileSync(page, "utf8");
     const scelle = (rendu.match(/Sceau source <code>([0-9a-f]{12})<\/code>/i) || [])[1];
@@ -1034,7 +1038,7 @@ else {
     // scelle depuis le 18/08 — et le sceau BRUT des pages scellees avant. Une page vraiment
     // perimee ne matche ni l'une ni l'autre ; sans le repli, la normalisation aurait accuse
     // toutes les pages existantes le jour de sa mise en service.
-    const attendu = createHash("sha256").update(source.split("\r\n").join("\n")).digest("hex").slice(0, 12);
+    const attendu = empreinteTexte(source, 12);           // TF-0615 : fonction partagee
     const attenduBrut = createHash("sha256").update(source).digest("hex").slice(0, 12);
     const proj = join(dp, "TODO-PRODUIT.html");
     let okTdp = true;

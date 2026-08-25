@@ -18,7 +18,14 @@
  *   E2 aucun site de scellement NON DÉCLARÉ dans les emplacements connus. C'est la règle qui fait
  *      tenir la convention : sans elle, le sixième mécanisme naîtrait comme les cinq premiers ;
  *   E3 `--verifier <fichier.json>` : une empreinte au format `@1` porte ses quatre champs, un
- *      horodatage lisible, et au moins un fichier haché en sha256 hexadécimal.
+ *      horodatage lisible, et au moins un fichier haché en sha256 hexadécimal ;
+ *   E4 un site qui hache LE CONTENU D'UN FICHIER NORMALISE ses fins de ligne — par la fonction
+ *      partagée `scripts/lib-empreinte.mjs`, ou en le faisant lui-même et visiblement. C'est la
+ *      règle qui manquait, et son absence a été payée une cinquième fois (TF-0615, 25/08) : E1 et
+ *      E2 tiennent la LISTE des sites, pas leur CONTENU. Trois générateurs de vues du registre
+ *      étaient dûment déclarés à la table ET hachaient les octets bruts — donc un sceau différent
+ *      sur un poste en CRLF et un poste en LF, pour un registre identique. Un registre qui
+ *      déclare empêche d'OUBLIER un site ; il n'empêche pas d'en écrire un mal.
  *
  * Usage : node oracle-empreintes.mjs [racine-des-forges] [--verifier <empreinte.json>] [--json]
  * Sortie : JSON {oracle,version,verdict,findings[],non_juge[]} · exit 0 = PASS · 1 = FAIL · 2 = SKIP.
@@ -48,10 +55,16 @@ const NON_JUGE = [
   "les sites hors des emplacements connus (scripts/, oracles/, tools/, todo/, scripts de skills, profondeur bornée) restent invisibles — déclaré plutôt que promis",
   "les dépôts frères NON CLONÉS sur le poste ne sont pas jugés : l'absence d'un dépôt n'est pas l'absence d'un site",
   "la GRANULARITÉ d'un sceau (sha256 complet, tronqué à 12 ou 16 hex) n'est pas jugée hors du format `@1` : un sceau court dans une vue générée est une convention locale légitime, déclarée au registre",
+  "E4 lit un VOCABULAIRE, pas un flot : un site qui normalise dans une fonction auxiliaire définie ailleurs dans le même fichier, ou qui reçoit un texte déjà normalisé par son appelant, sera signalé à tort. Le remède est alors d'employer la fonction partagée — ce qui est le but — ou de laisser la marque de normalisation visible près du hachage",
+  "E4 ne juge que les sites qui lisent un FICHIER (`readFileSync`, `read_text`, `open(...).read()`) : hacher une chaîne construite en mémoire (état git, clé de cache, identifiant de trace) n'a pas de fin de ligne à normaliser, et ces usages sont déjà déclarés hors format au registre",
 ];
 
 const REGISTRE = join(PILOT, "references", "EMPREINTES.md");
-const MOTIF_HACHAGE = /createHash\(\s*["']sha256["']\s*\)|hashlib\.sha256\(/;
+// TF-0615 : un site qui DÉLÈGUE à la fonction partagée est toujours un site de scellement, et
+// E1 le voyait comme mort. Constaté en centralisant : sept sites déclarés ont disparu du
+// balayage d'un coup, parce qu'ils avaient cessé d'écrire `createHash` — c'est-à-dire parce
+// qu'ils venaient d'être CORRIGÉS. Un contrôle qui accuse une correction est pire qu'absent.
+const MOTIF_HACHAGE = /createHash\(\s*["']sha256["']\s*\)|hashlib\.sha256\(|empreinte(?:Fichier|Texte|Binaire)\s*\(/;
 // Les emplacements lus. La liste a été CORRIGÉE par le premier passage sur le parc : elle oubliait
 // `skills/` — forge-design y range ses scripts et n'emploie pas `.claude/skills/` — et la RACINE
 // d'un dépôt, où vit `bootstrap.mjs`. Un balayage trop étroit ne rate pas seulement des sites : il
@@ -253,6 +266,70 @@ if (inconnus.length) {
 } else {
   ok("E2", `${racine}`, `${trouves.size} site(s) de scellement trouvé(s) dans ${depots.length} dépôt(s), ` +
     "tous déclarés au registre");
+}
+
+// E4 · UN SITE DÉCLARÉ PEUT ÊTRE MAL ÉCRIT, et E1/E2 ne le voient pas. Ils tiennent la LISTE des
+// sites ; ils ne regardent jamais COMMENT chacun hache. Payé le 25/08 : `todo\generer-vue.mjs`,
+// `todo\generer-page.mjs` et `todo\generer-archive.mjs` étaient tous trois à la table, tous trois
+// hachaient `readFileSync` sans normaliser, et produisaient donc un sceau différent selon que le
+// checkout du poste est en CRLF ou en LF — onze fichiers générés qui rebasculent à chaque
+// aller-retour entre deux sessions, et un sceau qui ne prouve plus rien.
+//
+// CE QUI EST JUGÉ : un fichier qui hache ET qui lit un fichier doit porter, près de son hachage,
+// soit l'emploi de la fonction partagée, soit une normalisation visible. La lecture est
+// TEXTUELLE et sa limite est au `non_juge` — mieux vaut manquer un cas tordu que crier sur du
+// code sain, puisqu'un contrôle bruyant se fait contourner au lieu de se corriger (R-33 bis).
+const LIT_UN_FICHIER = /readFileSync\s*\(|\.read_text\s*\(|open\s*\([^)]*\)\s*\.read\s*\(/;
+const NORMALISE = /lib-empreinte|empreinteFichier|empreinteTexte|normaliserLignes|split\(\s*["']\\r\\n["']\s*\)|replace\(\s*\/\\r\\n\/g|replace\(\s*["']\\r\\n["']/;
+// Les usages qui n'ont AUCUNE fin de ligne à normaliser, nommés plutôt que devinés : ils hachent
+// des octets binaires par nature, ou une chaîne construite en mémoire.
+const HORS_SUJET_E4 = new Set([
+  "hook-produits-intacts.mjs",   // hache la sortie de `git status --porcelain`, pas un fichier
+  "verifier-jugement.mjs",       // sceau de jugement : sha par livrable, format `pilot/jugement@1`
+  "bootstrap.mjs",               // compare un skill versionné à sa copie installée, octet à octet
+  "run-oracles.mjs",             // clé de cache interne, déclarée hors format au registre
+  "otlp-project.mjs",            // identifiant de trace, déclaré hors format
+  "check_html.py",               // empreinte du JEU DE RÈGLES, pas d'un contenu
+]);
+const malEcrits = [];
+for (const [nom, ou] of trouves.entries()) {
+  if (HORS_SUJET_E4.has(nom)) continue;
+  for (const chemin of ou) {
+    const abs = join(racine, chemin);
+    let texte = "";
+    try { texte = readFileSync(abs, "utf8"); } catch { continue; }
+    if (!LIT_UN_FICHIER.test(texte)) continue;
+    if (NORMALISE.test(texte)) continue;
+    malEcrits.push(chemin);
+  }
+}
+// LA PORTÉE D'E4 EST BORNÉE AU PILOT, et le motif est écrit plutôt que subi. La fonction partagée
+// vit chez le pilot : une forge ne peut l'adopter qu'une fois le pilot publié, et chacun de ses
+// sites demande son propre jugement — un scelleur de RELEASE hache peut-être des binaires à bon
+// droit, et normaliser les siens casserait sa vérification de déploiement. Les sites des autres
+// forges sont donc NOMMÉS sans bloquer, pas exclus : une exclusion nommée signale une cause non
+// traitée (règle N-13), un signal nommé ouvre un travail. Ils sont instruits au registre.
+const estDuPilot = (chemin) => chemin.startsWith("digit-ai-factory/");
+const aInstruire = malEcrits.filter((c) => !estDuPilot(c));
+const aCorriger = malEcrits.filter(estDuPilot);
+if (aInstruire.length) {
+  so("E4", `${racine}`, `${aInstruire.length} site(s) d'AUTRES FORGES hachent un fichier sans normaliser, ` +
+    `nommés et non bloqués : ${aInstruire.join(", ")}. La fonction partagée vit chez le pilot — une ` +
+    "forge ne l'adopte qu'après publication, et chaque site demande son jugement : un scelleur de " +
+    "release hache peut-être des binaires à bon droit. Instruits au registre plutôt qu'exclus par leur nom");
+}
+if (aCorriger.length) {
+  ko("E4", `${racine}`, `${aCorriger.length} site(s) DU PILOT qui hachent le contenu d'un FICHIER sans normaliser ` +
+    `les fins de ligne : ${malEcrits.join(", ")}. Avec core.autocrlf, git repose un fichier en CRLF ` +
+    "sur un poste et en LF sur un autre SANS qu'un octet de contenu ait bougé : le sceau diffère " +
+    "alors pour un contenu identique, et il cesse de prouver quoi que ce soit. Employer " +
+    "`scripts\\lib-empreinte.mjs` (`empreinteFichier`, `empreinteTexte`) — la classe a été payée " +
+    "CINQ fois (TF-0072, TF-0253, TF-0359, TF-0474, TF-0615), et la cinquième parce que les quatre " +
+    "premières avaient produit un registre et un contrôle, mais pas de fonction");
+} else {
+  ok("E4", `${racine}`, "tous les sites DU PILOT qui hachent un fichier normalisent leurs fins de ligne " +
+    `(${HORS_SUJET_E4.size} usages sans fin de ligne à normaliser, déclarés ; ` +
+    `${aInstruire.length} site(s) d'autres forges nommés au constat SANS_OBJET ci-dessus)`);
 }
 
 const echecs = F.filter((f) => f.statut === "FAIL").length;

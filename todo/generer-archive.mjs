@@ -39,6 +39,7 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { empreinteFichier } from "../scripts/lib-empreinte.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const SRC = process.argv[2] ? process.argv[2] : join(ICI, "TODO-ARCHIVE.jsonl");
@@ -148,7 +149,9 @@ const canon = (f) => String(f ?? "")
 const forgeBrute = (e) => ((e.forges_cibles_reelles && e.forges_cibles_reelles.length ? e.forges_cibles_reelles : e.forges_cibles_initiales) || [])[0] ?? "";
 
 const items = [...etats.values()].sort((a, b) => (a.id < b.id ? 1 : a.id > b.id ? -1 : 0)); // récents d'abord
-const sceau = createHash("sha256").update(existsSync(SRC) ? readFileSync(SRC) : Buffer.alloc(0)).digest("hex").slice(0, 12);
+// TF-0615 : fonction partagee, fins de ligne normalisees. `empreinteFichier` rend deja
+// "absent" quand la source manque — le ternaire sur un buffer vide n'a plus lieu d'etre.
+const sceau = empreinteFichier(SRC, 12);
 const nbCorriges = items.filter((e) => e.statut_final === "corrige").length;
 const nbEcartes = items.filter((e) => e.statut_final === "ecarte").length;
 const FORGES = [...new Set(items.map((e) => canon(forgeBrute(e))))].sort();

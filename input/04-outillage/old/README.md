@@ -14,7 +14,7 @@ Outillage entrant déjà instruit, remplacé ou écarté — archive.
 
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
-| `livrables-gen.py` | fichier | 29,9 Ko | PY |
+| `livrables-gen.py` | fichier | 29,4 Ko | PY |
 | `prompt-analyzer-l99 (5).skill` | fichier | 8,4 Ko | SKILL |
 
 _2 fichier(s), 0 sous-dossier(s)_

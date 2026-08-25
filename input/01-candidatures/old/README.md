@@ -26,7 +26,7 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `candidature-fins-de-ligne-vues-generees.tf.jsonl` | fichier | 2,8 Ko | 1 ligne(s) JSONL |
 | `candidature-frontiere-chiffre-recette-todo.tf.jsonl` | fichier | 2,1 Ko | 1 ligne(s) JSONL |
 | `candidature-frontmatter-skills-20260822.tf.jsonl` | fichier | 5,6 Ko | 1 ligne(s) JSONL |
-| `candidature-gabarit-a0.tf.jsonl` | fichier | 861 o | 1 ligne(s) JSONL |
+| `candidature-gabarit-a0.tf.jsonl` | fichier | 860 o | 1 ligne(s) JSONL |
 | `candidature-client-b-hors-doctrine-20260822.tf.jsonl` | fichier | 3,4 Ko | 1 ligne(s) JSONL |
 | `candidature-mise-en-oeuvre-0478-20260822.tf.jsonl` | fichier | 4,7 Ko | 2 ligne(s) JSONL |
 | `candidature-noeud-57-plan-mesure.tf.jsonl` | fichier | 7,1 Ko | 1 ligne(s) JSONL |
@@ -39,7 +39,7 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `candidature-question-deja-repondue.tf.jsonl` | fichier | 2,7 Ko | 1 ligne(s) JSONL |
 | `candidature-r21-lockfiles.tf.jsonl` | fichier | 2,8 Ko | 1 ligne(s) JSONL |
 | `candidature-r45-anteriorite.tf.jsonl` | fichier | 2,7 Ko | 1 ligne(s) JSONL |
-| `candidature-rattrapage-pilot.tf.jsonl` | fichier | 783 o | 1 ligne(s) JSONL |
+| `candidature-rattrapage-pilot.tf.jsonl` | fichier | 782 o | 1 ligne(s) JSONL |
 | `candidature-readme-date-de-soi.tf.jsonl` | fichier | 2,3 Ko | 1 ligne(s) JSONL |
 | `candidature-readme-fins-de-ligne-mixtes-20260825.tf.jsonl` | fichier | 3,0 Ko | 1 ligne(s) JSONL |
 | `candidature-readme-retard-dun-commit-20260822.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
@@ -58,7 +58,7 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `candidature-valeur-recopiee-20260822.tf.jsonl` | fichier | 5,1 Ko | 1 ligne(s) JSONL |
 | `candidature-vue-portefeuille-differee.tf.jsonl` | fichier | 2,7 Ko | 1 ligne(s) JSONL |
 | `Digit-AI - Brief Forge - Fraîcheur des verdicts qualité - 20260822a.md` | fichier | 10,3 Ko | Brief d'exécution — Fraîcheur des verdicts de `quality-oracles` |
-| `Digit-AI - Candidatures Forge - Extension Run-Delivery - 20260816b.md` | fichier | 9,6 Ko | Candidatures forge — extension « run de delivery » |
+| `Digit-AI - Candidatures Forge - Extension Run-Delivery - 20260816b.md` | fichier | 9,5 Ko | Candidatures forge — extension « run de delivery » |
 | `Digit-AI - Candidatures Forge - Extension Run-Delivery - 20260816b.tf.jsonl` | fichier | 5,8 Ko | 2 ligne(s) JSONL |
 | `Digit-AI - Candidatures Forge - Frontmatter des skills - 20260822a.zip` | fichier | 5,4 Ko | ZIP |
 | `Digit-AI - Forge Pilot - Candidature noeud 57 plan de mesure - 20260822f.zip` | fichier | 5,7 Ko | ZIP |
