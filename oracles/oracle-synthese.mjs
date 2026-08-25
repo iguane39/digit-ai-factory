@@ -692,6 +692,60 @@ function juger(texte) {
     else ok("S26", `${risquees.length} confirmation(s) d'écriture, chacune citant le chemin absolu vérifié`);
   }
 
+  // ---- S27 (TF-0632, 25/08) — l'IDENTITÉ de deux artefacts s'établit par EMPREINTE, jamais par
+  // une métadonnée -------------------------------------------------------------------------------
+  //
+  // QUATRIÈME SŒUR DE S22, et l'objet est encore différent des trois autres. S22 vise un négatif
+  // sur une RESSOURCE externe, S24 une recherche par NOM, S25 une CAPACITÉ. Ici c'est une
+  // IDENTITÉ : « ces deux fichiers sont le même ».
+  //
+  // LE FAIT, remonté par un produit et payé en PRODUCTION. Un site porte deux logos vectoriels
+  // pour deux contextes : `logo.svg` coloré pour les fonds clairs, `logo-white.svg` entièrement
+  // blanc pour le bandeau sombre. Les deux pesaient EXACTEMENT 19 922 octets et portaient la même
+  // date — un `ls -la` les affichait sur deux lignes rigoureusement parallèles. Conclusion écrite à
+  // l'exploitant comme un constat : c'est le même fichier dupliqué. Puis le contenu coloré a été
+  // écrit dans les DEUX. Résultat servi en production : le logo du bandeau rendu en `#2d4047` sur
+  // un fond `#2d4047` — un ratio de contraste de 1,0, un fantôme.
+  //
+  // POURQUOI LA COÏNCIDENCE N'A RIEN D'ÉTONNANT, et c'est ce qui rend l'indice si traître : ce sont
+  // deux exports du même dessin où seule la valeur hexadécimale des couleurs change, à longueur de
+  // chaîne égale. Les empreintes, elles, les séparaient en une seconde : `985f9811` contre
+  // `395285e8`.
+  //
+  // LA FORME DE LA RÈGLE. Taille, date, nom et nombre de lignes sont des INDICES DE DIVERGENCE :
+  // ils prouvent que deux artefacts diffèrent quand ils diffèrent, jamais qu'ils coïncident quand
+  // ils coïncident. Une identité affirmée s'adosse donc à une empreinte, un `diff`, ou une
+  // comparaison de contenu — trois choses dont le coût est nul.
+  //
+  // NON BLOQUANTE, comme ses trois sœurs : elle apprend un réflexe, elle ne refuse pas un travail.
+  //
+  // LE RESSERRAGE, FAIT AVANT LIVRAISON. Le premier jet déclenchait sur la seule présence d'un
+  // indice de métadonnée. Joué sur les documents réels du dépôt, il accusait des phrases qui
+  // CITENT une taille sans rien conclure (« un fichier `null` de 1892 octets à la racine ») —
+  // c'est-à-dire l'usage normal et juste de la métadonnée. La règle exige donc la CONJONCTION :
+  // une identité affirmée ET un indice de métadonnée dans la même phrase, sans empreinte. C'est
+  // l'inférence qui est fautive, pas le fait de mesurer une taille.
+  //: Affirmer que deux artefacts n'en sont qu'un. « copie conforme » en est EXCLU : le parc
+  //: l'emploie comme un MODE de propagation (`HERITAGE.json`), pas comme une conclusion.
+  const IDENTITE_AFFIRMEE = /\b(le m[êe]me fichier|m[êe]me contenu|fichiers? identiques?|sont identiques|un doublon|doublon de|dupliqu[ée]|duplicata|deux fois le m[êe]me)\b/i;
+  //: L'indice qui ne prouve rien : ce qu'on lit AUTOUR du fichier, jamais dedans.
+  const INDICE_METADONNEE = /\b(m[êe]mes? (?:taille|poids|date|horodatage|nom|nombre de lignes)|taille identique|\d[\d   ]*\s*octets|m[êe]me nombre de (?:lignes|octets))\b/i;
+  //: Ce qui, lui, établit l'identité — et dont le coût est nul.
+  const EMPREINTE = /\b(empreinte|sha-?\d*|hash|md5|checksum|somme de contr[ôo]le|diff\b|octet par octet|contenu compar[ée]|comparaison de contenu)\b/i;
+  {
+    const phrases = texte.split(/(?<=[.!?;])\s+|\n/).map((x) => x.trim()).filter(Boolean);
+    const risquees = phrases.filter((x) => IDENTITE_AFFIRMEE.test(x) && INDICE_METADONNEE.test(x));
+    const nues = risquees.filter((x) => !EMPREINTE.test(x));
+    if (!risquees.length) ok("S27", "aucune identité d'artefacts affirmée depuis une métadonnée — rien à établir");
+    else if (nues.length) ko("S27", `${nues.length} identité(s) sur ${risquees.length} affirmée(s) depuis une MÉTADONNÉE : ` +
+      "taille, date, nom et nombre de lignes prouvent que deux artefacts DIFFÈRENT quand ils diffèrent, jamais qu'ils " +
+      "COÏNCIDENT quand ils coïncident. Mesuré le 25/08 : deux logos de 19 922 octets à la même date, tenus pour un seul " +
+      "fichier, puis écrasés par le même contenu — un logo `#2d4047` sur fond `#2d4047` servi en production, contraste 1,0. " +
+      "Les empreintes les séparaient : 985f9811 contre 395285e8. Citer une empreinte, un `diff` ou une comparaison de " +
+      `contenu — le coût en est nul. Ex. : ${nues[0].replace(/\s+/g, " ").slice(0, 110)}`);
+    else ok("S27", `${risquees.length} identité(s) affirmée(s), chacune adossée à une empreinte ou une comparaison de contenu`);
+  }
+
   // ---- S24 (TF-0596, 24/08) — une recherche par NOM qui ne trouve rien n'établit que l'absence
   // du NOM -----------------------------------------------------------------------------------------
   //
@@ -1103,7 +1157,11 @@ Aucun écart : la demande a été suivie à la lettre.
     .replace("## 4. Traité", "## 4. Traité\n\n- Les controles V1 et V3 sont tenus ; V1 reste le plus couteux. — preuve : 4 cas.")
     // S24 : l'absence conclue d'une recherche PAR NOM — la forme exacte du 24/08, dix motifs de nom
     // de table joués sur trois schémas, et la correspondance qui vivait dans les COLONNES.
-    .replace("## 7. Risques", "## 7. Risques\n\n- L'API du fournisseur ne rend aucun enregistrement TXT : il n'y a pas de TXT côté DNS.\n\n- Aucune table de transcodification : les motifs %transcod%, %corresp% et %mapping% ne remontent rien sur les trois schémas.\n\n- Le fichier .env a bien ete cree et il est bien ignore par git.\n");
+    // S27 : une IDENTITÉ affirmée depuis une MÉTADONNÉE — la forme exacte du 25/08, deux logos de
+    // 19 922 octets à la même date tenus pour un seul fichier, puis écrasés par le même contenu.
+    // La phrase porte la conjonction complète (identité + indice) et AUCUNE empreinte : c'est
+    // l'inférence qui est jugée, pas le fait de citer une taille.
+    .replace("## 7. Risques", "## 7. Risques\n\n- L'API du fournisseur ne rend aucun enregistrement TXT : il n'y a pas de TXT côté DNS.\n\n- Aucune table de transcodification : les motifs %transcod%, %corresp% et %mapping% ne remontent rien sur les trois schémas.\n\n- Le fichier .env a bien ete cree et il est bien ignore par git.\n\n- Les deux logos font 19 922 octets et portent la meme date : c'est le meme fichier duplique.\n");
   // TF-0567 — la branche « ouverture TITRÉE » a ses DEUX sens, sinon elle serait une porte ouverte :
   // titrée et conforme doit passer (c'est le défaut mesuré : 30 mots lus comme 0), titrée et
   // technique doit continuer d'échouer — un titre ne blanchit rien.
@@ -1121,7 +1179,7 @@ Aucun écart : la demande a été suivie à la lettre.
   if (rr.status !== 1) casse.push("la fixture ROUGE ne FAIL pas");
   else {
     for (const regle of ["S2", "S3", "S5", "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16",
-                         "S17", "S18", "S19", "S20", "S21", "S22", "S23", "S24", "S25", "S26"]) {
+                         "S17", "S18", "S19", "S20", "S21", "S22", "S23", "S24", "S25", "S26", "S27"]) {
       if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
     }
   }

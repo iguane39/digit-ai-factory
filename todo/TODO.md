@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=0390e93f68d0 archive=40441f7fe541 · dernier événement: 2026-08-25T19:38:55.852Z -->
+     sceaux: actifs=79a5ee47fecd archive=40441f7fe541 · dernier événement: 2026-08-25T19:47:23.458Z -->
 
-**166 actifs** (candidat 2 · décidé 1 · en cours 0 · corrigé 156 · écarté 7) · **469 archivés**.
+**166 actifs** (candidat 1 · décidé 1 · en cours 0 · corrigé 157 · écarté 7) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,7 +11,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0632 | candidat | 25 | La taille en octets a servi de preuve d'identite entre deux fichiers | **oui** — regression atteignant la production ; logo a ratio de contraste 1,0 dans le bandeau de navigation |
 | TF-0633 | candidat | 6.7 | Un actif visuel valide sur son fichier, jamais sur son rendu en contexte | **oui** — defaut invisible sur le fichier, evident sur une capture du composant ; oracle de contraste aveugle aux images |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
 | TF-0526 | corrige | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
@@ -213,6 +212,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-0549 | decide | 10 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : `Produit-07` a un forge\retours\ mais rien de ce qui s'y fait n'est suivi | **oui** — mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration. |
 | TF-0606 | corrige | 25 | pilot : un refus d OUTIL a ete pris pour une absence de CAPACITE, et le blocage rapporte comme un fait sur le monde — « je ne peux pas deployer » alors que le jeton etait sur le disque, a un emplacement nomme dans un document deja charge en contexte | **oui** — Mise en production rendue a l humain a tort, avec une consigne d action inutile (railway login) ; deblocage en trois minutes une fois le signalement recu. Le travail etait fini, seul le rapport etait faux. |
+| TF-0632 | corrige | 25 | La taille en octets a servi de preuve d'identite entre deux fichiers | **oui** — regression atteignant la production ; logo a ratio de contraste 1,0 dans le bandeau de navigation |
 | TF-0634 | corrige | 25 | Le garde-fou anti-collision inter-sessions n'avait JAMAIS tourne : une variable enfermee dans le bloc du preflight, une erreur avalee par un catch, et trois cas de recette qui ne lisaient pas la seule sortie du controle | **oui** — la fenetre que ce controle existe pour raccourcir a ete payee TROIS FOIS, dont deux le 22/08 (cinq candidatures renumerotees le matin, un TF-0514 frappe pendant qu'une autre session publiait le sien le soir) — et le controle cense la voir n'a jamais tourne. Une seconde session tournait sur une autre machine au moment de la mesure. |
 | TF-0590 | corrige | 20 | Un README de dossier reste PERIME apres regeneration : fins de ligne MIXTES dans le meme fichier, et le harnais tombe a 54/55 sans qu'aucune action ne le repare | **oui** — mesure le 25/08 : le harnais du pilot passe de 55/55 a 54/55 et n'en bouge plus — trois regenerations, trois fois le meme FAIL, un diff vide a chaque fois. Aucune action disponible ne le repare, ce qui est la definition d'un rouge qu'on apprend a ignorer. |
 | TF-0628 | corrige | 16 | La table d'alias qui reconnait un second clone apres renommage ne couvre PAS le pilot — le seul depot renomme deux fois, et celui dont la regle est nee | **oui** — avant/apres sur le parc REEL, meme commande : « mise de cote (PERIME.md present) — ne rien y executer » devient « SECOND CLONE de digit-ai-factory (meme origin) — 169 commit(s) de retard ... Y travailler ecrit dans un registre mort ». Une apparition dans les deux cas, jamais deux. |
