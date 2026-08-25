@@ -122,6 +122,7 @@ un signal nommé ouvre un travail.
 | pilot | `oracles/hook-produits-intacts.mjs` | état de travail de chaque dépôt PRODUIT, relevé à l'ouverture et recomparé à la fin du tour | sceau court (12 hex) de l'état git |
 | pilot | `bootstrap.mjs` | divergence entre un skill versionné et sa copie installée (K2) | sha256 par fichier |
 | pilot | `todo/appliquer-export.mjs` | export du registre rendu à un tiers | sha256 du lot, **normalisé LF** via `lib-empreinte` |
+| pilot | `scripts/relever-heritage.mjs` | artefact d'héritage chez un produit : « présent » contre « présent ET À JOUR » (TF-0626) — la seule distinction qu'une existence ne donne pas, et un produit portant une copie périmée croit être conforme | sceau court (12 hex), **normalisé LF** via `lib-empreinte` ; comparaison SOURCE↔CIBLE, aucun contenu rendu |
 | forge-seo-geo | `scripts/grille.py` · `scripts/gabarits.py` | empreinte de grille et registre d'évolutions (TF-0072) | sceau court dans le registre |
 | forge-conception | `oracles/oracle-tracabilite.mjs` · `oracles/oracle-vues-profil.mjs` | scellement d'`EXIGENCES.json` et parité de ses vues | sha256 du référentiel |
 | forge-design | `skills/systeme-de-marque/scripts/generer-design-md.mjs` | `DESIGN.md`, vue dérivée des tokens et de la voix | sceau dans la vue, **normalisé LF** (TF-0615) |
