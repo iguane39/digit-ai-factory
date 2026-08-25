@@ -6,7 +6,7 @@
  * dossier temporaire (git réel inclus) — rien n'est écrit dans le dépôt.
  */
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -31,7 +31,24 @@ for (const d of ["input", "output", "docs", "forge", "forge/retours", "output/Ol
 // d'apparence. Un `factory.mjs` factice passait R-43, qui ne fait qu'un existsSync — et c'est
 // exactement le defaut que R-47 attrape : une copie presente mais perimee.
 const GAB47 = join(dirname(fileURLToPath(import.meta.url)), "..", "gabarits");
-writeFileSync(join(verte, "forge", "retours", "RETOURS-FORGES.md"), readFileSync(join(GAB47, "RETOURS-FORGES.md"), "utf8"));
+// TF-0627 (25/08) : LA FIXTURE EST DERIVEE DU CONTRAT, PLUS RECOPIEE A LA MAIN. Elle enumerait
+// les artefacts un par un, et chaque entree a l'heritage exigeait d'y penser — trois fois en
+// deux jours (TF-0571, TF-0597, puis TF-0627). La troisieme fois, personne n'y a pense : la
+// fixture VERTE s'est mise a rendre R-47 FAIL, et c'est la recette qui a paye. C'est la classe
+// des dix listes d'exclusion de TF-0543 — une liste recopiee se perime au premier ajout, EN
+// SILENCE. Derivee, elle suit le contrat sans que personne ait a y penser.
+//
+// Deux artefacts gardent leur ecriture EXPLICITE, et c'est declare : leur CONTENU est juge, pas
+// seulement leur presence, et la fixture doit y placer les marqueurs que l'oracle cherche.
+const CONTRAT47 = JSON.parse(readFileSync(join(GAB47, "HERITAGE.json"), "utf8"));
+const CONTENU_JUGE = new Set([".claude/settings.json", "CLAUDE.md", "robots.txt", "llms.txt"]);
+for (const a of CONTRAT47.artefacts) {
+  if (CONTENU_JUGE.has(a.cible)) continue;
+  const cible47 = join(verte, String(a.cible).replaceAll("/", "\\\\"));
+  mkdirSync(dirname(cible47), { recursive: true });
+  const source47 = join(GAB47, "..", String(a.source).replaceAll("/", "\\\\"));
+  writeFileSync(cible47, existsSync(source47) ? readFileSync(source47, "utf8") : "");
+}
 writeFileSync(join(verte, "CLAUDE.md"),
   "# Produit\n## Routage forge — obligatoire\nvalider : forge_tests\névoluer : run de version\ndéployer : MEP\n");
 writeFileSync(join(verte, "README.md"), "# Produit\nDémarrage : 2 commandes.\n");
@@ -55,14 +72,11 @@ mkdirSync(join(verte, ".claude"), { recursive: true });
 writeFileSync(join(verte, ".claude", "settings.json"),
   JSON.stringify({ hooks: { Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }] }] } }) + "\n");
 mkdirSync(join(verte, "forge", "hooks"), { recursive: true });
-writeFileSync(join(verte, "forge", "hooks", "factory.mjs"), readFileSync(join(GAB47, "hooks-factory.mjs"), "utf8"));
 // TF-0571 (24/08) : LE TEXTE de la doctrine voyage avec le hook qui la juge. La fixture verte le
 // porte donc aussi — sinon elle prouverait un heritage que le referentiel ne declare plus.
-writeFileSync(join(verte, "forge", "RESTITUTION.md"), readFileSync(join(GAB47, "RESTITUTION.md"), "utf8"));
 // TF-0597 (24/08) : le JUGE de la forme d'un lot entre a l'heritage, a cote du gabarit qui la
 // decrit — pour que le produit se juge AVANT de remettre, et pas seulement a la porte du pilot.
 // La verte le porte donc, sinon elle prouverait un heritage que le referentiel ne declare plus.
-writeFileSync(join(verte, "forge", "retours", "oracle-lot.mjs"), readFileSync(join(GAB47, "oracle-lot-retours.mjs"), "utf8"));
 // R-27 verte : surface web ouverte aux agents IA + llms.txt à côté (un blocage CONSIGNÉ
 // reste conforme — la décision datée au-dessus de la règle)
 writeFileSync(join(verte, "robots.txt"),
