@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=26e81bff8c24 archive=40441f7fe541 · dernier événement: 2026-08-25T10:11:33.210Z -->
+     sceaux: actifs=d143baa65c2c archive=40441f7fe541 · dernier événement: 2026-08-25T11:40:33.035Z -->
 
-**154 actifs** (candidat 11 · décidé 1 · en cours 0 · corrigé 136 · écarté 6) · **469 archivés**.
+**154 actifs** (candidat 10 · décidé 1 · en cours 0 · corrigé 136 · écarté 7) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,7 +11,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0609 | candidat | 25 | La redirection DNS d'OVH n'ecoute pas le port 443 | **oui** — 7 hostnames sur 8 injoignables en HTTPS ; remede impliquant de migrer 4 zones et recreer les MX |
 | TF-0583 | candidat | 20 | L'oracle de contraste n'est appele par rien et ne peut pas se lancer | **oui** — 0 fichier du depot cite check-contrast.mjs ; chemin Edge code en dur, inexistant sur la machine |
 | TF-0588 | candidat | 20 | Un secret attendu se prepare, il ne se decrit pas en prose | **oui** — 3 fournisseurs, 3 aller-retours, dont 2 jetons OVH crees pour rien |
 | TF-0608 | candidat | 20 | Six faits sur l'API OVH, tous mesures, aucun documente la ou on les cherche | **oui** — 2 jetons OVH sur 3 inoperants ; 1 URL declaree morte a tort ; droit nameServer decouvert au moment de s'en servir |
@@ -84,6 +83,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0573 | corrige | 1 | Un dossier de plusieurs decisions n a aucun endroit pour son contexte COMMUN | non |
 | TF-0616 | corrige | 1 | Un fichier de secrets cree HORS du depot echappe entierement a R-14 | non |
 | TF-0617 | corrige | 1 | Un controle qui reemploie un chemin RELATIF ne verifie pas l objet qu on vient d ecrire | non |
+| TF-0609 | ecarte | 25 | La redirection DNS d'OVH n'ecoute pas le port 443 | **oui** — 7 hostnames sur 8 injoignables en HTTPS ; remede impliquant de migrer 4 zones et recreer les MX |
 | TF-0519 | ecarte | 10 | produit-07 : l ancien hote forge.produit-07 NE RESOUT PLUS DU TOUT — le trafic qui le connait encore tombe dans le vide, et c est le gate neuf M-6 qui l a mesure | **oui** — mesure le 23/08 : forge.produit-07 rend ENOTFOUND, donc aucune redirection n est possible. Une erreur de resolution n est pas une page 404 — un lecteur conclut que le produit n existe plus, et un moteur retire les pages de l index sans transferer l anteriorite. L etat viole la regle ecrite le jour meme a ETAPE-MEP section 3 quater. |
 | TF-0514 | ecarte | 6.7 | Produit-05 n'est PAS instancie sous la doctrine factory — ni forge\, ni clause de precedence, ni hooks : c'est ce qui explique les QUATRE lots refuses en trois jours, et non un gabarit perime | **oui** — mesure le 22/08 : QUATRE lots refuses en trois jours pour un seul produit (20260821a, 20260822a, 20260822b, 20260822c), soit 100 % de ses remises depuis la publication de R-45. Trois ont fini par entrer par derogation, portant 15 candidatures dont une nommait un plantage bloquant du lanceur d'oracles. Le correctif livre le meme jour pour TF-0502 — rafraichir la copie du gabarit a chaque ouverture de run — n'aurait rien change ici : il n'y a pas de run ouvert sous doctrine, donc pas d'ouverture qui rafraichirait quoi que ce soit. |
 | TF-0473 | ecarte | 4 | pilot : vue portefeuille du reste-a-faire — etude remise, verdict O1, DIFFEREE par decision humaine du 22/08 (« je suis chaque projet independamment pour l'instant ») | **oui** — aucun cout constate a ce jour, et c'est le fait principal : a quatre produits l'humain declare suivre chaque projet independamment sans gene. Le cout est ANTICIPE a sept ou huit produits, et le critere de reouverture est ecrit pour ne pas avoir a le deviner |

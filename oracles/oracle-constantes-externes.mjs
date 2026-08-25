@@ -191,9 +191,24 @@ if (lanceEnDirect && args.includes("--self-test")) {
 
   // Le cas fondateur de TF-0587, ecrit tel qu'il aurait du l'etre : la limite qui a coute un
   // changement d'architecture tient en huit mots, et elle n'etait nulle part.
+  //
+  // ENRICHI LE 25/08, en versant TF-0609 a ce dossier (doublon enrichi, decision humaine). Le
+  // second produit qui a paye cette limite avait fait la MESURE DIRECTE que le dossier d'origine
+  // n'avait pas : port 443 FERME sur 213.186.33.5. C'est la seconde sonde que N-16 exige, et elle
+  // change la forme de la limite : « redirection OVH = HTTP seul » se croit, « port 443 FERME sur
+  // 213.186.33.5, mesure du 25/08 » se REJOUE. Une limite qui porte son adresse et sa date est
+  // opposable ; une limite qui porte un nom de service demande de faire confiance.
+  //
+  // Le cout paye par ce second produit est d'un autre ordre que le premier, et l'exemple le dit
+  // parce qu'un exemple sans son cout n'enseigne rien : sept hostnames sur huit declares
+  // fonctionnels apres une mesure jouee en `http://`, injoignables en `https://`, et cette
+  // affirmation publiee a l'exploitant. La cause profonde n'est pas la limite de l'API : c'est
+  // une verification jouee sur un protocole et conclue sur un autre — meme famille que N-28.
   const AVEC_LIMITE = "// Verifie le 2026-08-24 · source : API OVH /domain/zone · rejouer :\n" +
     "// `curl -s https://eu.api.ovh.com/1.0/domain/zone/x/redirection` ·\n" +
-    "// limites structurelles : redirection OVH = HTTP seul, port 443 FERME\n" +
+    "// limites structurelles : port 443 FERME sur 213.186.33.5 (mesure directe du 2026-08-25),\n" +
+    "//   donc toute redirection posee par cette API est HTTP SEULEMENT ; types valides :\n" +
+    "//   visible, invisible, visiblePermanent\n" +
     "export const OVH_ZONE_API = \"https://eu.api.ovh.com/1.0/domain/zone\";\n";
   att("une limite structurelle ecrite satisfait le quatrieme champ", juger(AVEC_LIMITE, "config.mjs").length === 0);
 
