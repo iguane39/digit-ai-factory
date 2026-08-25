@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=ec876223bc23 archive=acf69e8da61a · dernier événement: 2026-08-25T05:48:29.078Z -->
+     sceaux: actifs=6d37d5efb1dd archive=acf69e8da61a · dernier événement: 2026-08-25T06:02:00.975Z -->
 
-**139 actifs** (candidat 6 · décidé 1 · en cours 0 · corrigé 128 · écarté 4) · **469 archivés**.
+**145 actifs** (candidat 12 · décidé 1 · en cours 0 · corrigé 128 · écarté 4) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,9 +11,15 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0609 | candidat | 25 | La redirection DNS d'OVH n'ecoute pas le port 443 | **oui** — 7 hostnames sur 8 injoignables en HTTPS ; remede impliquant de migrer 4 zones et recreer les MX |
 | TF-0583 | candidat | 20 | L'oracle de contraste n'est appele par rien et ne peut pas se lancer | **oui** — 0 fichier du depot cite check-contrast.mjs ; chemin Edge code en dur, inexistant sur la machine |
 | TF-0588 | candidat | 20 | Un secret attendu se prepare, il ne se decrit pas en prose | **oui** — 3 fournisseurs, 3 aller-retours, dont 2 jetons OVH crees pour rien |
+| TF-0608 | candidat | 20 | Six faits sur l'API OVH, tous mesures, aucun documente la ou on les cherche | **oui** — 2 jetons OVH sur 3 inoperants ; 1 URL declaree morte a tort ; droit nameServer decouvert au moment de s'en servir |
+| TF-0612 | candidat | 20 | Le modele de permissions Cloudflare ne dit pas ce qu'on croit | **oui** — 1 permission inventee envoyant l'exploitant dans un menu ou elle n'existe pas ; 1 aller-retour |
 | TF-0589 | candidat | 15 | Le gabarit d'environnement n'est confronte a rien | **oui** — .env = 11 cles, .env.example = 7 ; 4 cles OVH jamais reportees au gabarit |
+| TF-0611 | candidat | 12.5 | Le scan DNS automatique de Cloudflare peut n'importer strictement rien, en silence | **oui** — 0 enregistrement importe sur 4 zones, 47 manquants dont tous les MX, SPF et DKIM |
+| TF-0610 | candidat | 12 | Les marqueurs de parking OVH ressemblent a des enregistrements legitimes | **oui** — 4 zones portaient 8 TXT de parking et 7 A vers l'infrastructure de redirection OVH |
+| TF-0613 | candidat | 10 | Une redirection Cloudflare exige un enregistrement proxifie, et le mecanisme moderne peut etre refuse | **oui** — regle moderne refusee malgre le droit apparemment adequat ; 7 hostnames a proxifier pour ouvrir le 443 |
 | TF-0581 | candidat | 8.3 | Le seul verificateur de contraste ne regarde que le menu du header | **oui** — texte a ratio 1,0 reste en production ; oracle de contraste present au depot et scope au seul .header-line |
 | TF-0584 | candidat | 6 | Une sonde de contraste doit se confronter a la palette declaree du projet | **oui** — 2 erreurs de sonde successives produisant des verdicts faux, l'un negatif l'autre positif |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
