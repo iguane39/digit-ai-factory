@@ -107,6 +107,58 @@ check("fichier d'événements absent → exit 1 et message, jamais une trace mue
   if (!/introuvable/.test(r.stdout || "")) throw new Error("le refus ne dit pas ce qui manque");
 });
 
+// -- 7. TF-0621 -- le garde des octets de controle, DANS LES DEUX SENS ------
+// La classe a mordu sept fois le 25/08. Trois morsures ont atteint ce registre, et la septieme
+// n'a ete attrapee par aucun mecanisme. Chaque octet est compose par `String.fromCharCode` :
+// ecrire un antislash litteral ici serait commettre le defaut que la recette juge.
+const r7 = join(T, "registre-7.jsonl");
+writeFileSync(r7, "", "utf8");
+const OCTET = { cloche: 0x07, retourArriere: 0x08, tabulation: 0x09, sautDePage: 0x0c, retourChariot: 0x0d };
+const AS = String.fromCharCode(92);
+const AS_ECH = AS;
+const MSG_OCTET = new RegExp("octet" + AS_ECH + "(s" + AS_ECH + ") de contr");
+const MSG_PARADE = new RegExp("chr" + AS_ECH + "(92" + AS_ECH + ")");
+const MSG_CHAMP = new RegExp("forges_cibles_initiales" + AS_ECH + "[0" + AS_ECH + "]");
+
+const SL = String.fromCharCode(10);
+
+for (const [nom, code] of Object.entries(OCTET)) {
+  check(`un ${nom} dans une valeur est REFUSE, et rien n'est ecrit`, () => {
+    const chemin = `c:${AS}dev${String.fromCharCode(code)}ossier${AS}f.md`;
+    const r = lancer([creation({ contenu: `le fichier ${chemin} existe` })], r7);
+    if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1`);
+    if (!MSG_OCTET.test(r.corps.message || "")) throw new Error(`message inattendu : ${r.corps.message}`);
+    if (!MSG_PARADE.test(r.corps.message || "")) throw new Error("le refus ne donne pas la PARADE — un refus sans parade se contourne au hasard");
+    if (readFileSync(r7, "utf8").length !== 0) throw new Error("le registre a ete ecrit malgre le refus");
+  });
+}
+
+check("le SAUT DE LIGNE reste admis : c'est la seule exception, et elle est legitime en prose", () => {
+  const r = lancer([creation({ contenu: `premier paragraphe${SL}${SL}second` })], r7);
+  if (r.code !== 0) throw new Error(`exit ${r.code} — un saut de ligne en prose ne doit pas etre refuse`);
+});
+
+check("un saut de ligne DANS une ligne de tableau est refuse (clause 2, la forme mesuree)", () => {
+  const coupe = `| A-11 | action | acteur | motif${SL}evue.py | consequence |`;
+  const r = lancer([creation({ contenu: coupe })], r7);
+  if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1 — la clause 1 seule ne voit pas ce cas`);
+  if (!/COUP/.test(r.corps.message || "")) throw new Error(`message inattendu : ${r.corps.message}`);
+});
+
+const r7b = join(T, "registre-7b.jsonl");
+writeFileSync(r7b, "", "utf8");
+check("une ligne de tableau ENTIERE n'est pas accusee — sinon aucun tableau ne passerait", () => {
+  const entier = `| id | action | acteur |${SL}|---|---|---|${SL}| A-01 | faire | humain |`;
+  const r = lancer([creation({ contenu: entier })], r7b);
+  if (r.code !== 0) throw new Error(`exit ${r.code} — un tableau bien forme doit passer`);
+});
+
+check("le garde visite les valeurs IMBRIQUEES, pas seulement le premier niveau", () => {
+  const r = lancer([creation({ forges_cibles_initiales: [`digit-ai${String.fromCharCode(9)}odo`] })], r7);
+  if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1 — un octet dans un tableau de valeurs echappe au garde`);
+  if (!MSG_CHAMP.test(r.corps.message || "")) throw new Error("le constat ne NOMME pas le champ fautif");
+});
+
 console.log(`\njournaliser (TF-0413) : ${pass} PASS, ${fail} FAIL`);
 if (!existsSync(OUTIL)) console.error("outil introuvable");
 process.exit(fail ? 1 : 0);
