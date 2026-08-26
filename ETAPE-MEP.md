@@ -91,7 +91,7 @@ Cinq controles, et pour chacun **la preuve exigee** — pas la case a cocher. Le
 | M-5 | Propreté | aucun secret en clair dans l'image ni dans compose (scan des fichiers embarqués) |
 | M-6 | Hôte historique | **si et seulement si** le produit déclare un hôte historique : la CIBLE d'une redirection résout et répond AVANT que la redirection soit armée, et l'ANCIEN hôte est interrogé APRÈS déploiement (200, ou 301 vers un emplacement qui répond, chemin et requête préservés) — §3 quater, TF-0482 |
 | M-7 | Travail planifié | **si et seulement si** le produit embarque une définition planifiée (cron) : elle porte un mode d'exercice à la demande CÂBLÉ, distinct de sa cadence, et elle a été EXERCÉE une fois — verdict O-8 de forge-ops, § 3 quinquies, TF-0527 |
-| M-8 | **Jalon de fraîcheur DÉRIVÉ** | **si et seulement si** le déploiement est gardé par une porte qui attend de voir « la nouvelle version en ligne » : la valeur qu'elle compare est **dérivée du contenu** — empreinte du livrable servi, identifiant de commit injecté à la génération — **jamais un numéro de version tenu à la main**. Preuve exigée : un **test négatif joué**, contenu local volontairement différent, la porte rend ÉCHEC en nommant les deux valeurs — §3 sexies, TF-0666 |
+| M-8 | **Jalon de fraîcheur DÉRIVÉ DE TOUT L'ENSEMBLE DÉPLOYÉ** | **si et seulement si** le déploiement est gardé par une porte qui attend de voir « la nouvelle version en ligne » : la valeur qu'elle compare est une **fonction de l'ENSEMBLE déployé** — empreinte du **manifeste de l'arbre de sortie** (chemins triés + hachages, condensés), ou **identifiant de commit injecté à la génération**. Jamais un numéro tenu à la main ; **jamais non plus l'empreinte d'un artefact échantillonné**. Le critère tient en une phrase : *si on ne sait pas dire « elle change dès que N'IMPORTE QUOI change », le jalon échantillonne.* Preuve exigée : un **test négatif joué sur un fichier QUELCONQUE de l'arbre**, pas sur celui que la porte regarde — §3 sexies, TF-0666 et TF-0672 |
 
 ### § 3 sexies — Une porte qui ne distingue pas l'avant de l'après valide un déploiement qui n'a pas eu lieu (M-8, TF-0666)
 
@@ -118,12 +118,34 @@ fraîcheur est **dérivée**, ou il n'y a pas de jalon. Une empreinte de contenu
 construction** dès que le contenu change ; c'est ce que « par construction » veut dire, et c'est
 ce qu'aucune discipline humaine ne remplace.
 
-**L'angle résiduel est dit, pas comblé.** Une poussée qui ne modifie ni le livrable ni ses actifs
-— un changement d'intégration continue, par exemple — laisse l'empreinte inchangée : la porte
-passe alors **légitimement** au premier essai, mais le conteneur redémarre quand même et les
-contrôles peuvent de nouveau courir contre une production en bascule. Fermer cet angle demande
-une **attente de disponibilité bornée** sur les contrôles eux-mêmes, ou l'injection d'un
-identifiant de commit dans la sortie générée. M-8 ne le couvre pas, et ne prétend pas le couvrir.
+**PREMIÈRE CORRECTION, ET ELLE EST TOMBÉE LE JOUR MÊME.** Le remède évident — remplacer le
+numéro figé par l'empreinte du HTML servi — a été appliqué, puis **il a récidivé le
+lendemain**. La porte lisait l'empreinte d'**UNE** page et concluait sur les **203**. Mesure
+sur une poussée réelle : **70 pages HTML modifiées, la page échantillonnée inchangée**, donc
+empreinte attendue identique à celle que servait encore l'ancien conteneur. La porte a écrit
+« déploiement en ligne au bout de 1 essai », les dix contrôles sont passés au vert et le
+rapport a conclu « production conforme » — pendant qu'au même instant deux pages servaient
+encore le contenu supprimé. Le déploiement réel a atterri **90 secondes plus tard**.
+
+**Une valeur qui ne varie JAMAIS avait été remplacée par une valeur qui ne varie QUE POUR UN
+ÉCHANTILLON — et le second défaut est plus dangereux que le premier, parce qu'une empreinte
+A L'AIR dérivée là où un numéro figé se lit.** D'où la formulation actuelle de M-8 : *fonction
+de l'ensemble déployé*, et un test négatif joué sur un fichier QUELCONQUE de l'arbre — pas
+sur celui que la porte regarde, qui ne prouve que lui-même.
+
+**LA LEÇON DE SECOND ORDRE VAUT AU-DELÀ DE CE JALON, et elle porte sur cette page même.**
+La première rédaction de ce paragraphe déclarait un angle résiduel : « une poussée qui ne
+modifie ni le livrable ni ses actifs laisse l'empreinte inchangée ». C'était vrai. Le cas qui
+a mordu était l'INVERSE — le contenu avait changé sur 70 pages et la porte n'a rien vu — et
+il était **plus probable** que celui qui avait été prévu. **Déclarer un angle résiduel ne
+couvre que l'angle nommé**, et la déclaration donne un faux sentiment d'exhaustivité :
+l'écrire fait croire qu'on a fait le tour. Un aveu borné reste un aveu, jamais une couverture.
+*Cette page a payé sa propre règle en moins de vingt-quatre heures.*
+
+**CE QUI RESTE OUVERT, sans prétendre que la liste soit close.** Le mécanisme d'attente
+lui-même n'est pas revu : même avec une valeur correcte, la porte reste une **comparaison
+ponctuelle** et ne dit pas que le conteneur a fini de basculer. Et **aucune mesure n'a été
+prise sur les autres produits du parc**, qui portent peut-être la même classe.
 
 Verdict au ledger (`oracles_verdict`, étape `mep`). Un contrôle rouge → retour à l'étape
 concernée (max 3 allers-retours, puis diagnostic — même règle que tests↔development).
