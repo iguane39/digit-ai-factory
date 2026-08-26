@@ -1076,3 +1076,48 @@ nommes dans son `non_juge`. **L'axe apex/`www` a ete implemente puis RETIRE** : 
 revenait a exiger que tout projet declare les deux variantes, ce qui accuse a tort ceux qui n'en
 exposent qu'une — et c'est legitime. L'ecart est donc declare, avec son motif, ce que la regle
 autorise explicitement.
+
+## AF. R-53 — un projet multilingue tient un GLOSSAIRE, et toute traduction en part (TF-0639 a TF-0643 — 26/08)
+
+**Le fait, mesure sur un produit du parc.** La connaissance terminologique ne vivait **nulle part** :
+elle naissait dans une conversation et mourait avec elle. Aucun fichier ne portait, par langue, le
+terme retenu, les termes proscrits et le motif. Consequence directe : la session suivante reecrivait
+le mot, et **aucun controle ne pouvait le refuser** — *un controle ne juge pas un choix qui n'est
+ecrit nulle part.*
+
+**Quatre defauts trouves en une heure de balayage systematique**, la ou un glossaire constitue *par
+accident* n'en portait qu'un seul : un `title` et un `H1` allemands disant « Pool » quand le
+catalogue dit « Hallenbad » **29 fois** ; l'anglais employant « deposit » pour la **caution** ET
+pour l'**acompte** ; un mot francais traite comme tel dans six langues alors qu'il est un
+**homographe au sens oppose** dans l'une d'elles ; et « 8 gites » annonce dans les sept langues
+quand la donnee en declare **5**.
+
+**Et le glossaire lui-meme a fait autorite a tort.** Le lendemain de sa livraison, **3 entrees sur 7**
+portaient un terme retenu faux, plus une proscription fausse. Elles portaient TOUTES les marques de
+la fiabilite : une date, un motif redige, deux sources citees. *Un glossaire non verifie est plus
+dangereux qu'une absence de glossaire, parce qu'il fait autorite et qu'on cesse de chercher.*
+
+**Ce que la regle exige**, et rien de plus :
+
+1. **Un lieu** — un projet servant plus d'une locale porte un glossaire au gabarit
+   `gabarits\GLOSSAIRE.md` : un terme par section, une ligne par locale.
+2. **Un moment** — *toute production de traduction part du glossaire.* Un terme metier ne se traduit
+   pas au fil de l'eau. Un controle qui n'attrape le mot qu'APRES COUP fait corriger 99 occurrences
+   la ou ouvrir le glossaire au depart n'en aurait coute aucune.
+3. **Un mode de remplissage** — par **balayage systematique du vocabulaire servi**, jamais au fil des
+   defauts rencontres. Un glossaire nourri par accident ne porte que ce qui a deja fait mal.
+4. **Une exigence de preuve qui depend de la CATEGORIE** — un terme de *visibilite* se prouve par au
+   moins **deux sources de nature differente** ; un terme *contractuel* par l'exactitude lexicale et
+   la coherence interlangue. Les confondre fait sur-chercher les evidences et sous-chercher les
+   termes a trafic.
+5. **Une portee** — un mot peut etre **juste ICI et ambigu LA**. `partout` est gratuit et suffit.
+
+**Le mecanisme** : `oracles\oracle-glossaire.mjs`, G1-G6, self-test double sens 8/8. Il tient la
+FORME opposable et **jamais la justesse** — *un oracle peut dire que le champ manque, jamais qu'il
+est juste*, meme patron que R-45, R-49 et O9. Sa **borne** : un fichier qui ne declare pas
+`role:` … glossaire/terminologie est SANS_OBJET, sinon la regle s'inventerait une cible.
+
+**Ce qu'aucun oracle ne peut juger, et c'est ecrit** : la justesse d'une entree (comprendre la
+langue), la completude du glossaire face au vocabulaire reellement servi, et l'application effective
+du terme retenu dans les traductions livrees — cette derniere se confronte au catalogue de langue du
+projet, pas a ce fichier.
