@@ -98,8 +98,11 @@ writeFileSync(join(verte, "docs", "projet", "TECHNOS.md"),
 // POSTÉRIEURE à l'entrée en vigueur — sans les deux, la branche PASS de la règle ne serait jouée
 // par personne (la borne d'antériorité rendrait un `non_juge`, jamais un PASS).
 writeFileSync(join(verte, "docs", "projet", "COMPOSANTS-OPS.md"),
-  '---\nrole: composants et environnements de données\nsources_de_verite: ["ops.mjs etat"]\nverifie_le: 2026-08-24\n---\n# Composants\n\n' +
-  '## Environnements de données\n\naucun environnement de données interrogé — ce produit déploie, il ne lit aucun entrepôt.\n');
+  '---\nrole: composants, environnements de données et infrastructure\nsources_de_verite: ["ops.mjs etat"]\nverifie_le: 2026-08-26\n---\n# Composants\n\n' +
+  '## Environnements de données\n\naucun environnement de données interrogé — ce produit déploie, il ne lit aucun entrepôt.\n\n' +
+  // TF-0651 : la verte porte AUSSI la section neuve et une date postérieure à son entrée en
+  // vigueur — sans les deux, la branche PASS de la règle ne serait jouée par personne.
+  '## Infrastructure déclarée\n\naucune infrastructure posée hors dépôt — ni domaine, ni zone, ni compte de mesure.\n');
 writeFileSync(join(verte, "docs", "projet", "PARAMETRAGE.md"),
   '---\nrole: parametrage\nsources_de_verite: [.env.example]\nverifie_le: 2026-08-11\nvariables:\n  - PORT\n  - API_TIERCE_CLE\n---\n# Paramétrage\n\n' +
   '## URLs & ports par environnement\n\n' + // R-24 verte : hôtes <appli>-{env}, locale et placeholders hors périmètre
@@ -837,6 +840,35 @@ check("rouge-COMPOSANTS-OPS : section « Environnements de données » absente d
   if (!/2026-08-24/.test(f.message)) throw new Error("le constat ne dit pas SUR QUELLE DATE il s'appuie pour juger");
   if (!/aucun environnement de données interrogé/.test(f.message)) throw new Error("le constat ne dit pas comment se déclare une section vide (loi n° 3)");
   if (!/mode d'accès/i.test(f.message)) throw new Error("le constat ne dit pas ce que la section doit porter — un refus sans son remède se contourne");
+});
+
+// TF-0651 (26/08) — L'INFRASTRUCTURE DÉCLARÉE, dans les trois sens. Le fait mesuré : quatre
+// domaines, des zones de frontal, des enregistrements DNS, des certificats et des comptes de mesure
+// posés PAR APPELS D'API depuis une session — sans artefact et sans revérification. Le parc portait
+// déjà la sonde (`oracle-domaines-declares`, D1-D4) : elle n'avait RIEN À LIRE. Le chaînon manquant
+// était la déclaration, pas la sonde.
+const rougeInfra = mkdtempSync(join(tmpdir(), "conf-rouge-infra-"));
+ecrireDans(rougeInfra, "docs/projet/COMPOSANTS-OPS.md",
+  COP_NU.replace("verifie_le: 2026-08-24", "verifie_le: 2026-08-26")
+    .replace("## Hiérarchie", "## Environnements de données\n\naucun\n\n## Hiérarchie"));
+check("rouge-infrastructure : section « Infrastructure déclarée » absente d'un document revu APRÈS le 26/08 → défaut", () => {
+  const { rapport } = lance(rougeInfra);
+  const f = rapport.findings.find((x) => x.regle === "R-20" && x.statut === "FAIL" && /Infrastructure déclarée/.test(x.message));
+  if (!f) throw new Error("l'absence de la déclaration d'infrastructure n'est pas dénoncée");
+  if (!/2026-08-26/.test(f.message)) throw new Error("le constat ne dit pas SUR QUELLE DATE il s'appuie pour juger");
+  if (!/aucune infrastructure posée hors dépôt/.test(f.message)) throw new Error("le constat ne dit pas comment se déclare une section vide (loi n° 3)");
+  if (!/revérifié/.test(f.message)) throw new Error("le constat n'exige pas la REVÉRIFICATION — c'est elle qui manquait, pas l'inventaire");
+});
+
+const antInfra = mkdtempSync(join(tmpdir(), "conf-ant-infra-"));
+ecrireDans(antInfra, "docs/projet/COMPOSANTS-OPS.md",
+  COP_NU.replace("## Hiérarchie", "## Environnements de données\n\naucun\n\n## Hiérarchie"));
+check("antériorité-infrastructure : un document revu AVANT le 26/08 → non jugé, jamais accusé", () => {
+  const { rapport } = lance(antInfra);
+  if (rapport.findings.some((x) => x.regle === "R-20" && x.statut === "FAIL" && /Infrastructure déclarée/.test(x.message)))
+    throw new Error("un document antérieur à la règle est mis en défaut — c'est la RÈGLE qui a bougé, pas le produit");
+  if (!(rapport.non_juge || []).some((x) => /infrastructure déclarée.*verifie_le=2026-08-24/.test(x)))
+    throw new Error("l'antériorité n'est pas DÉCLARÉE au non_juge — un contrôle qui se tait sans le dire est un contrôle absent");
 });
 
 const antCop = mkdtempSync(join(tmpdir(), "conf-ant-cop-"));
