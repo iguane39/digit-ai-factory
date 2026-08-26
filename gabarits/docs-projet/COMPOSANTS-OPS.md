@@ -14,6 +14,8 @@ environnements: [locale, staging, production]
 
 ## Hiérarchie (depuis la racine)
 
+*L'arborescence des composants déployés, du plus englobant au plus fin. Elle se lit de haut en bas : chaque niveau contient le suivant, et un composant absent d'ici est un composant que personne ne sait retrouver.*
+
 ```
 {produit}
 ├── {front}            — type: {statique|SPA} · id: {<ID_COMPOSANT>}
@@ -24,6 +26,8 @@ environnements: [locale, staging, production]
 
 ## Inventaire par environnement
 
+*Le même parc, vu par environnement plutôt que par hiérarchie. Cette vue sert à répondre à « qu'est-ce qui tourne en production ? » — une question que l'arborescence ci-dessus ne tranche pas.*
+
 | Composant | Type | Environnement | ID | URL | IP | Vérifié le |
 |---|---|---|---|---|---|---|
 | {api} | {service} | staging | {<ID>} | {<URL_STAGING>} | {<IP|n/a>} | {AAAA-MM-JJ} |
@@ -31,9 +35,44 @@ environnements: [locale, staging, production]
 
 ## Cible d'exploitation forge-ops
 
+*Où ce produit se déploie, et avec quel plan. Une seule ligne par cible : c'est elle que l'étape MEP lit pour savoir à quoi elle s'adresse.*
+
 | Cible | Plan (O-5) | Dernière release | Journal |
 |---|---|---|---|
 | {locale|railway|gcp|azure|aws} | {plan-<cible>.json — PASS} | {release} | {n événements} |
+
+---
+
+## Infrastructure déclarée
+
+*Ce qui a été posé HORS du dépôt, et que rien ne revérifie sans cette table.*
+
+**Le fait qui l'exige (TF-0651, 26/08/2026).** Sur un produit en production, quatre domaines, les
+zones et règles d'un frontal, les enregistrements DNS, les certificats et les comptes de mesure
+avaient été posés **par appels d'API depuis une session** — sans aucun artefact, et sans
+revérification. Si un enregistrement change demain, rien ne le voit.
+
+**Et le parc portait déjà la sonde.** `oracles\oracle-domaines-declares.mjs` (D1-D4) confronte au
+réel les URL déclarées ; il existe depuis le 24/08, il est juste, et il **n'avait rien à lire**.
+*Le chaînon manquant était la déclaration, pas la sonde.* Un contrôle sans donnée déclarée ne rend
+pas un défaut : il rend un silence.
+
+| Élément | Valeur | Posé comment | Revérifié le |
+|---|---|---|---|
+| domaine / hostname | {exemple.fr, www.exemple.fr} | {console fournisseur · appel d'API · IaC} | {AAAA-MM-JJ} |
+| zone / règles du frontal | {nom de zone, règles de redirection} | {…} | {AAAA-MM-JJ} |
+| enregistrements DNS | {A, CNAME, TXT — et où ils vivent} | {…} | {AAAA-MM-JJ} |
+| certificats | {émetteur, hostnames couverts, échéance} | {…} | {AAAA-MM-JJ} |
+| comptes de mesure | {propriété analytique, console de recherche} | {…} | {AAAA-MM-JJ} |
+
+**La colonne « Posé comment » n'est pas décorative** : une infrastructure posée à la console ne se
+reconstruit pas, une infrastructure posée par API se rejoue. La colonne « Revérifié le » distingue
+une déclaration éprouvée d'une déclaration plausible — c'est le même champ, et la même raison, que
+`verifie_le` des fiches du socle.
+
+**Cette section se déclare même VIDE.** « Aucune infrastructure posée hors dépôt » est une réponse
+**complète** : la loi n° 3 demande que l'absence se déclare, elle n'exige pas qu'il y ait quelque
+chose à déclarer. Le silence, lui, est indiscernable d'un oubli.
 
 ---
 
@@ -61,6 +100,10 @@ une garantie, dire CE QUI la tient (un garde dans l'outil de mesure, un droit de
 pas seulement l'intention.
 
 ### {W-1} — {rôle de cet environnement}, joint par le profil `{profil}`
+
+*Une fiche par environnement réellement JOINT. Elle sert à rapprocher un nom entendu — dans une
+phrase d'humain, dans un message d'erreur — de quelque chose qui existe dans le dépôt ; c'est le
+rapprochement dont l'absence a produit une réponse fausse le 24/08.*
 
 | Attribut | Valeur |
 |---|---|

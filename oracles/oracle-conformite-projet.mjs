@@ -837,6 +837,37 @@ else {
       ko("R-20", "docs\\projet\\COMPOSANTS-OPS.md", `section « Environnements de données » absente d'un document revu le ${verifieCop}, donc APRÈS l'entrée en vigueur (TF-0594, 24/08) : un produit qui ne déploie rien mais LIT des workspaces n'a alors aucun endroit où déclarer ce qu'il interroge, et un nom d'instance donné par un humain ne se rapproche de rien dans le dépôt. Par environnement : nom d'affichage, hôte, identifiant, metastore, profil de connexion, entrepôt employé, et les catalogues avec leur MODE D'ACCÈS (lu / écrit / jamais ouvert) ; plus une section pour ceux connus par DOCUMENTS INTERPOSÉS. La section se déclare même vide — « aucun environnement de données interrogé » — jamais par silence (loi n° 3). Gabarit : gabarits\\docs-projet\\COMPOSANTS-OPS.md`);
     else
       antecedences.push(`R-20 (environnements de données) non jugé sur docs\\projet\\COMPOSANTS-OPS.md : la section naît le 24/08 (TF-0594) et le document porte verifie_le=${verifieCop || "non daté"} — antériorité déclarée, jamais un défaut de produit ; elle sera exigée dès la prochaine revue datée`);
+
+    // R-20 (suite) · L'INFRASTRUCTURE POSÉE PAR APPELS D'API N'EXISTE NULLE PART (TF-0651, 26/08).
+    //
+    // LE FAIT, mesuré sur un produit en production : quatre domaines, les zones et règles d'un
+    // frontal, les enregistrements DNS, les certificats et les comptes de mesure avaient été posés
+    // par APPELS D'API depuis une session — sans aucun artefact et SANS REVÉRIFICATION. Si un
+    // enregistrement change demain, rien ne le voit.
+    //
+    // ET LE PARC PORTE DÉJÀ LA SONDE. `oracle-domaines-declares` (D1-D4) confronte au réel les URL
+    // déclarées à `docs\projet\PARAMETRAGE.md` — il existe depuis le 24/08, il est juste, et il
+    // n'avait RIEN À LIRE : *le chaînon manquant est la déclaration, pas la sonde.* Un contrôle
+    // sans donnée déclarée ne rend pas un défaut, il rend un silence.
+    //
+    // MÊME MÉCANIQUE QUE LA SECTION CI-DESSUS, et pour la même raison : l'endroit existe, ce qui
+    // manquait est l'obligation d'y écrire. La section se déclare même VIDE — « aucune
+    // infrastructure posée hors dépôt » est une réponse COMPLÈTE (loi n° 3).
+    //
+    // ANTÉRIORITÉ, jamais un défaut rétroactif : le signal de date est dans le fichier.
+    const aInfra = /^#{2,}\s.*infrastructure\s+d[ée]clar[ée]e/im.test(texteCop);
+    if (aInfra)
+      ok("R-20", "docs\\projet\\COMPOSANTS-OPS.md", "section « Infrastructure déclarée » présente — domaines, zones et comptes de mesure ont un endroit où être confrontés au réel");
+    else if (verifieCop && verifieCop >= "2026-08-26")
+      ko("R-20", "docs\\projet\\COMPOSANTS-OPS.md", `section « Infrastructure déclarée » absente d'un document revu le ${verifieCop}, donc APRÈS l'entrée en vigueur (TF-0651, 26/08) : `
+        + "une infrastructure posée par appels d'API depuis une session n'existe NULLE PART, et rien ne la revérifie. "
+        + "Par élément : domaines et hostnames, zones et règles du frontal, enregistrements DNS, certificats, "
+        + "comptes de mesure — avec, pour chacun, COMMENT il a été posé et QUAND il a été revérifié. "
+        + "`oracle-domaines-declares` (D1-D4) confronte ensuite ces déclarations au réel : il existe déjà et "
+        + "n'avait rien à lire. La section se déclare même VIDE — « aucune infrastructure posée hors dépôt » "
+        + "est une réponse complète, jamais un silence");
+    else
+      antecedences.push(`R-20 (infrastructure déclarée) non jugé sur docs\\projet\\COMPOSANTS-OPS.md : la section naît le 26/08 (TF-0651) et le document porte verifie_le=${verifieCop || "non daté"} — antériorité déclarée, jamais un défaut de produit ; elle sera exigée dès la prochaine revue datée`);
   }
 
 
