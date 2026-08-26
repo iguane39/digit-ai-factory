@@ -1099,8 +1099,13 @@ dangereux qu'une absence de glossaire, parce qu'il fait autorite et qu'on cesse 
 
 **Ce que la regle exige**, et rien de plus :
 
-1. **Un lieu** — un projet servant plus d'une locale porte un glossaire au gabarit
-   `gabarits\GLOSSAIRE.md` : un terme par section, une ligne par locale.
+1. **Un lieu** — un projet servant plus d'une locale porte `docs\projet\GLOSSAIRE.md`, instancie
+   depuis `gabarits\GLOSSAIRE.md` : un terme par section, une ligne par locale. **Ce n'est pas un
+   neuvieme fichier impose au socle** : R-20 admet un fichier de plus des lors qu'il **sert
+   l'automatisation** et **n'existe pas deja sous forme machine** — les deux conditions sont
+   tenues, puisque `oracle-glossaire.mjs` le juge et qu'aucune autre source ne porte cette
+   connaissance. Un projet **monolingue n'en porte pas**, et son absence n'est pas un defaut :
+   la regle se conditionne au nombre de locales servies, jamais a la presence du fichier.
 2. **Un moment** — *toute production de traduction part du glossaire.* Un terme metier ne se traduit
    pas au fil de l'eau. Un controle qui n'attrape le mot qu'APRES COUP fait corriger 99 occurrences
    la ou ouvrir le glossaire au depart n'en aurait coute aucune.
