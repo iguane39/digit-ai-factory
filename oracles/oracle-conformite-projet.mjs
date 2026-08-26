@@ -531,6 +531,17 @@ else {
         new RegExp(a.motif_exige.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).test(readFileSync(dst, "utf8"))
           ? ok47.push(a.cible)
           : perimes.push(`${a.cible} ne porte pas « ${a.motif_exige} »`);
+      } else if (a.mode === "presence_et_motifs") {
+        // TF-0649 — UN SOCLE, PAS UN PLAFOND. Le fichier du produit doit CONTENIR les motifs que
+        // le socle édicte ; il peut en porter d'autres, et c'est voulu — exiger l'identité
+        // reviendrait à interdire à un produit d'ignorer ses propres artefacts. La comparaison est
+        // faite sur les LIGNES nues : un motif noyé dans un commentaire ne protège rien.
+        const lignes = new Set(readFileSync(dst, "utf8").split(/\r?\n/)
+          .map((l) => l.trim()).filter((l) => l && !l.startsWith("#")));
+        const absents = (a.motifs_exiges || []).filter((m) => !lignes.has(m));
+        absents.length
+          ? perimes.push(`${a.cible} ne porte pas ${absents.length} motif(s) du socle : ${absents.join(", ")}`)
+          : ok47.push(a.cible);
       } else ok47.push(a.cible);
     }
     manques.length || perimes.length

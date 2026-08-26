@@ -55,7 +55,13 @@ writeFileSync(join(verte, "README.md"), "# Produit\nDémarrage : 2 commandes.\n"
 writeFileSync(join(verte, ".env.example"), "# ne jamais renseigner de secret ici\nPORT=8000\nAPI_TIERCE_CLE= # à fournir :\n");
 writeFileSync(join(verte, ".env"), "PORT=8000\n");
 // C1 amendé (TF-0150, 13/08) : old\ versionné — la fixture verte ne l'ignore PLUS.
-writeFileSync(join(verte, ".gitignore"), ".env\n.venv/\n__pycache__/\nnode_modules/\ngenerated/\n");
+// TF-0649 : les sidecars d'oracles et l'exception `!forge/**` entrent au socle exigé par R-47.
+// La fixture les porte donc — et le commentaire dit pourquoi elle a dû grandir : sans eux, la
+// règle 10 du socle n'avait aucun point d'application, et un `.pyc` est entré chez un produit.
+// L'exception SUIT les exclusions : placée avant, elle ne rattrape rien.
+writeFileSync(join(verte, ".gitignore"),
+  ".env\n.venv/\n__pycache__/\nnode_modules/\ngenerated/\n"
+  + "*.oracles.json\n*.oracles-cache.json\n*.oracles-historique.jsonl\n!forge/**\n");
 writeFileSync(join(verte, "output", "Digit-AI - Rapport Test - 20260806a.md"), "rapport\n");
 writeFileSync(join(verte, "forge", "audit.oracles.json"), "{}\n");
 writeFileSync(join(verte, "forge", "ledger.jsonl"), [

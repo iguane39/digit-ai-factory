@@ -135,6 +135,48 @@ try {
     att(etat.etat === "absent", `état « ${etat.etat} » au lieu de absent`);
   });
 
+  // ---- UN SOCLE SE VERIFIE, IL NE SE SUPPOSE PAS (TF-0649) -----------------------------------
+  //
+  // La règle 10 du socle énumérait ses exclusions de `.gitignore` en PROSE depuis le 06/08. Un
+  // produit ne l'enfreignait pas : il ne la rencontrait jamais. Et ce relevé rendait « présent »
+  // pour tout mode autre que `copie_conforme`, quand l'oracle de conformité, lui, vérifiait les
+  // motifs — deux consommateurs du même contrat, deux verdicts sur le même fichier.
+  const ARTEFACT_MOTIFS = {
+    cible: ".gitignore", source: "gabarits/gitignore-produit", mode: "presence_et_motifs",
+    motifs_exiges: ["__pycache__/", "node_modules/", "!forge/**"],
+  };
+
+  check("un fichier qui porte tous les motifs du socle est PRESENT", () => {
+    const produit = join(T, "_ClientIgnore");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    writeFileSync(join(produit, ".gitignore"),
+      "# le socle\n__pycache__/\nnode_modules/\n!forge/**\n\n# et ce que ce produit ajoute\n.cache/\n", "utf8");
+    const etat = etatArtefact(produit, ARTEFACT_MOTIFS, pilot);
+    att(etat.etat === "present", `état « ${etat.etat} » : un socle complet doit passer, et le produit garde le droit d'ajouter les siens`);
+  });
+
+  check("un motif du socle qui manque rend INCOMPLET, et les manquants sont NOMMÉS", () => {
+    const produit = join(T, "_ClientIgnorePartiel");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    writeFileSync(join(produit, ".gitignore"), "__pycache__/\n", "utf8");
+    const etat = etatArtefact(produit, ARTEFACT_MOTIFS, pilot);
+    att(etat.etat === "incomplet", `état « ${etat.etat} » au lieu de incomplet`);
+    att((etat.motifs_absents || []).join(",") === "node_modules/,!forge/**",
+      `les motifs absents ne sont pas nommés : ${JSON.stringify(etat.motifs_absents)}`);
+  });
+
+  check("BORNE — un motif en COMMENTAIRE ne protège rien, et ne compte pas", () => {
+    // Sans cette borne, un `.gitignore` qui MENTIONNE `node_modules/` dans une phrase passerait
+    // pour conforme — un vert obtenu sur du texte, jamais sur une exclusion.
+    const produit = join(T, "_ClientIgnoreCommente");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    writeFileSync(join(produit, ".gitignore"),
+      "__pycache__/\n# node_modules/ sera ajouté plus tard\n!forge/**\n", "utf8");
+    const etat = etatArtefact(produit, ARTEFACT_MOTIFS, pilot);
+    att(etat.etat === "incomplet", `état « ${etat.etat} » : un motif commenté a été compté comme actif`);
+    att((etat.motifs_absents || []).includes("node_modules/"), "le motif commenté n'est pas signalé absent");
+  });
+
   check("BORNE — les dossiers d'archives et de dépendances ne sont JAMAIS fouillés", () => {
     // Sans cette borne, un `robots.txt` traînant dans `node_modules` ou `old/` ferait passer le
     // produit pour « hors racine » — un vert obtenu sur une copie de quelque chose.

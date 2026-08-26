@@ -1153,6 +1153,10 @@ un ecart ASSUME d'un refus definitif, et qui rend le carnet relisable dans un an
 comme les autres. Mode `presence` et non `copie_conforme` : le carnet se REMPLIT chez le produit,
 exiger qu'il reste identique au gabarit reviendrait a interdire d'y ecrire.
 
+**SECONDE INSTANCE DE LA MEME CLASSE, LE JOUR MEME (TF-0649).** La regle 10 du socle enumere depuis le 06/08 les exclusions qu'un produit doit porter a son `.gitignore` « des la creation ». Elle vivait en PROSE, dans un tableau de ce document, et n'avait donc AUCUN point d'application : un produit ne l'enfreignait pas, il ne la rencontrait jamais. Mesure remontee : un `.pyc` suivi par git, un second qui s'appretait a entrer. Le socle est desormais livre comme un FICHIER — `gabarits\gitignore-produit` — et entre au contrat d'heritage en mode `presence_et_motifs` : le fichier du produit doit CONTENIR les motifs edictes, il peut en porter d'autres. Un socle, pas un plafond : exiger l'identite reviendrait a interdire a un produit d'ignorer ses propres artefacts.
+
+**ET UNE VERIFICATION QUI A CHANGE LE LIVRABLE.** L'item demandait aussi d'exclure `old\`, au motif que « `Old\` jamais versionne » serait une regle de socle. **C'est FAUX contre ce document** : l'arbitrage C1, amende par decision humaine du 13/08 (TF-0150), rend `old\` AUTORISE et VERSIONNE — « l'ancien arbitrage *jamais versionne* est caduc ». L'exclusion n'a donc PAS ete livree, et le gabarit ecrit pourquoi. *Un produit appliquait une regle ABROGEE treize jours plus tot* : c'est le meme defaut vu par l'autre bout — non pas une regle sans point d'application, mais une ABROGATION qui n'a atteint personne.
+
 **La classe du defaut, plus large que ce cas** : *une regle de socle exprimable comme un fichier
 doit etre livree comme un fichier*, jamais comme une phrase dans un document de regles. Une regle
 qui n'a nulle part ou s'appliquer ne se viole pas — elle ne s'applique simplement jamais, et

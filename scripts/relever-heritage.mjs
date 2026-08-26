@@ -136,6 +136,17 @@ export function etatArtefact(dossierProduit, artefact, racinePilot) {
     if (ailleurs) return { etat: "hors_racine", trouve_a: ailleurs };
     return { etat: "absent" };
   }
+  // TF-0649 — LE RELEVE ET R-47 DOIVENT DIRE LA MEME CHOSE. Ce module rendait « present » pour
+  // tout mode autre que `copie_conforme`, alors que l'oracle de conformite, lui, VERIFIE les
+  // motifs exiges. Deux consommateurs du meme contrat qui rendent deux verdicts differents sur le
+  // meme fichier, c'est la double verite que le parc a payee dix fois. Le mode est donc jugé ici
+  // aussi — un socle se verifie, il ne se suppose pas.
+  if (artefact.mode === "presence_et_motifs") {
+    const lignes = new Set(readFileSync(cible, "utf8").split(/\r?\n/)
+      .map((l) => l.trim()).filter((l) => l && !l.startsWith("#")));
+    const absents = (artefact.motifs_exiges || []).filter((m) => !lignes.has(m));
+    return absents.length ? { etat: "incomplet", motifs_absents: absents } : { etat: "present" };
+  }
   if (artefact.mode !== "copie_conforme") return { etat: "present" };
   const source = join(racinePilot, String(artefact.source).replaceAll("/", "\\"));
   if (!existsSync(source)) return { etat: "present", note: "source introuvable au pilot — non comparable" };
@@ -170,6 +181,10 @@ export function relever(base, contrat, racinePilot) {
       // le relevé vert sur une question ouverte ; le compter absent ferait recopier un fichier
       // qui existe déjà, au mauvais endroit. Il lui faut sa propre colonne.
       hors_racine: compte("hors_racine"),
+      // `incomplet` (TF-0649) : le fichier existe mais ne porte pas les motifs du socle. Il compte
+      // comme un manque, pas comme un conforme — un `.gitignore` present et vide protege autant
+      // qu'un `.gitignore` absent.
+      incomplets: compte("incomplet"),
       conformes: compte("conforme") + compte("present"),
       total: artefacts.length,
       artefacts,
@@ -184,16 +199,17 @@ const lanceEnDirect = process.argv[1]
 if (lanceEnDirect) {
   const contrat = JSON.parse(readFileSync(join(PILOT, "gabarits", "HERITAGE.json"), "utf8"));
   const lignes = relever(racine, contrat, PILOT);
-  const totalManques = lignes.reduce((n, l) => n + l.absents + l.divergents + l.hors_racine, 0);
+  const totalManques = lignes.reduce((n, l) => n + l.absents + l.divergents + l.hors_racine + l.incomplets, 0);
 
   if (args.includes("--json")) {
     console.log(JSON.stringify({ outil: "relever-heritage", racine: String(racine),
       contrat: contrat.version, produits: lignes.length, manques: totalManques, lignes }, null, 1));
   } else {
     for (const l of lignes) {
-      const drapeau = l.absents + l.divergents + l.hors_racine === 0 ? "CONFORME" : `${l.absents} absent(s)`
+      const drapeau = l.absents + l.divergents + l.hors_racine + l.incomplets === 0 ? "CONFORME" : `${l.absents} absent(s)`
         + (l.divergents ? `, ${l.divergents} DIVERGENT(s)` : "")
-        + (l.hors_racine ? `, ${l.hors_racine} HORS RACINE` : "");
+        + (l.hors_racine ? `, ${l.hors_racine} HORS RACINE` : "")
+        + (l.incomplets ? `, ${l.incomplets} INCOMPLET(s)` : "");
       console.log(`${l.produit.padEnd(50)} ${drapeau}`);
     }
     console.log(`\n${lignes.length} produit(s) relevé(s), ${totalManques} manque(s) au total — contrat v${contrat.version}`);

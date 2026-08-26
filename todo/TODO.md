@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=2e6c381ea3e0 archive=40441f7fe541 · dernier événement: 2026-08-26T08:08:54.789Z -->
+     sceaux: actifs=b9707f945a6a archive=40441f7fe541 · dernier événement: 2026-08-26T09:11:45.333Z -->
 
-**191 actifs** (candidat 9 · décidé 1 · en cours 0 · corrigé 174 · écarté 7) · **469 archivés**.
+**191 actifs** (candidat 7 · décidé 1 · en cours 0 · corrigé 176 · écarté 7) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,8 +11,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0649 | candidat | 20 | Une regle de socle sans porteur mecanique se viole en silence | **oui** — 29 archives Old/ et 1 .pyc suivis par git ; regle de socle en prose sans aucun point d'application |
-| TF-0659 | candidat | 20 | Le journal quality-oracles perd la raison de l'echec : FAIL avec detail vide sur un hook bloquant | **oui** — Hook bloquant rendu avec detail vide ; trois tours de session pour retrouver et rejouer l'oracle sous-jacent, qui affichait alors 9 constats nommes. Contrat divergent localise a run-oracles.mjs ligne 208. |
 | TF-0647 | candidat | 12.5 | Le socle documentaire declare sa propre verifiabilite et rien ne l'exerce | **oui** — 7 fiches sur 8 en gabarit apres 5 runs et une MEP ; 137 marqueurs ; 2 vues HTML generees depuis du vide |
 | TF-0648 | candidat | 10 | Un oracle dont l'echec d'environnement est indiscernable d'un defaut | **oui** — diagnostic subi sur un stderr vide ; controle rapporte « ni passe ni echoue », verdict inconsommable |
 | TF-0650 | candidat | 10 | Un controle de detection sans exemption declaree s'apprend a etre ignore | **oui** — 16 signalements sur 38 ne doivent pas etre corriges — 42 % de bruit structurel et permanent |
@@ -106,6 +104,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0485 | corrige | 20 | forge-agents : oracle-claims analyse le JavaScript inline et lit la reference arriere $1 d une expression reguliere comme un montant en dollars | **oui** — FAIL bloquant sur un livrable conforme ; une demi-heure a remonter d un message pointant une accolade ouvrante jusqu a une expression reguliere. |
 | TF-0488 | corrige | 20 | forge-design : la regle L1 « ponctuation orpheline » classe un element comme bloc a cause d un selecteur ou le display s applique a un descendant | **oui** — Six echecs bloquants simultanes sur du texte correct ; lecture du code source de l oracle necessaire pour comprendre la cause. |
 | TF-0499 | corrige | 20 | forge-design : le composant tableau repliable de composants.md met table en display:block sans sa legende, qui est alors reduite a une colonne d un mot | **oui** — Quinze tableaux d un livrable client illisibles en mobile pendant quatre versions ; trouve par la lecture, hors de portee des quatre oracles. |
+| TF-0659 | corrige | 20 | Le journal quality-oracles perd la raison de l'echec : FAIL avec detail vide sur un hook bloquant | **oui** — Hook bloquant rendu avec detail vide ; trois tours de session pour retrouver et rejouer l'oracle sous-jacent, qui affichait alors 9 constats nommes. Contrat divergent localise a run-oracles.mjs ligne 208. |
 | TF-0486 | corrige | 15 | forge-agents : oracle-claims analyse le CSS et lit les couleurs hexadecimales purement numeriques comme des nombres non sources | **oui** — FAIL sur des valeurs prescrites par la charte ; contournement contraire a la charte elle-meme. |
 | TF-0552 | corrige | 15 | page-html : le message de remediation de L2 prescrit la moitie du geste et conduit tout droit a une seconde violation de L2 | **oui** — un aller-retour d'oracle complet, plus la lecture d'un document tiers, pour un geste que le message aurait pu nommer en entier |
 | TF-0491 | corrige | 12.5 | forge-design : aucun controle ne compare la largeur d un bloc de texte a celle de ses blocs freres — trois allers-retours client sur le meme defaut | **oui** — Trois allers-retours client sur un seul defaut, sur quatre versions livrees. |
@@ -231,6 +230,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0590 | corrige | 20 | Un README de dossier reste PERIME apres regeneration : fins de ligne MIXTES dans le meme fichier, et le harnais tombe a 54/55 sans qu'aucune action ne le repare | **oui** — mesure le 25/08 : le harnais du pilot passe de 55/55 a 54/55 et n'en bouge plus — trois regenerations, trois fois le meme FAIL, un diff vide a chaque fois. Aucune action disponible ne le repare, ce qui est la definition d'un rouge qu'on apprend a ignorer. |
 | TF-0645 | corrige | 20 | Le lot de travaux confie au produit FABRIQUAIT le chemin source par chirurgie de chaine sur la cible, alors que le contrat le DECLARE — trois chemins sur neuf n'existaient pas | **oui** — trois chemins faux sur neuf dans un lot REELLEMENT depose chez un produit ; verifie par `[ -f ]` sur chacun. Le lot fautif a du etre retire et redepose. |
 | TF-0646 | corrige | 20 | Un motif de derogation passe en ARGUMENT traverse un shell : quatre motifs ont ete mutiles en silence, et rien ne l'a signale parce qu'ils restaient plausibles | **oui** — quatre motifs de derogation mutiles dans le registre, en ajout seul donc non reecrivables ; les deux noms perdus sont ceux des deux artefacts qui fondent la derogation. Le shell a imprime ses deux erreurs et l'ingestion a continue. |
+| TF-0649 | corrige | 20 | Une regle de socle sans porteur mecanique se viole en silence | **oui** — 29 archives Old/ et 1 .pyc suivis par git ; regle de socle en prose sans aucun point d'application |
 | TF-0655 | corrige | 20 | Le carnet des « Ecarts assumes » est prescrit et son emplacement n'existe pas | **oui** — emplacement deduit faute de definition ; chaque produit en inventera un autre, ecarts irrelevables |
 | TF-0628 | corrige | 16 | La table d'alias qui reconnait un second clone apres renommage ne couvre PAS le pilot — le seul depot renomme deux fois, et celui dont la regle est nee | **oui** — avant/apres sur le parc REEL, meme commande : « mise de cote (PERIME.md present) — ne rien y executer » devient « SECOND CLONE de digit-ai-factory (meme origin) — 169 commit(s) de retard ... Y travailler ecrit dans un registre mort ». Une apparition dans les deux cas, jamais deux. |
 | TF-0630 | corrige | 16 | La SEULE defense du resolveur de pilot contre une copie est un fichier non versionne — et ce fichier a demontrablement disparu une fois en deux jours | **oui** — le marqueur consigne present le 23/08 (TF-0525) etait absent le 25/08, mesure par `ls PERIME.md` avant toute ecriture. Les cinq fichiers de signature sont tous presents dans le clone archive : sans marqueur, il redevient un candidat valide pour `resoudre-pilot.mjs`. |

@@ -1,6 +1,6 @@
 {
   "schema": "pilot/heritage@1",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "date": "2026-08-25",
   "regle": "Tout artefact que le pilot COPIE chez un produit se déclare ici avec son mode de contrôle. Un artefact absent de ce référentiel n'est pas jugé par R-47 — l'oubli se voit à la revue, il ne se devine pas.",
   "pourquoi": "Constat du 23/08, deux produits en trois jours. Produit-02 possède un `forge\\retours\\` complet, portant ses lots, et AUCUN gabarit RETOURS-FORGES.md : le dossier a été créé, la copie n'y est jamais arrivée. Produit-05 n'a ni l'un ni l'autre. Résultat mesuré : 15 candidatures refusées à l'ingestion par R-45/R-46 pour une forme que le produit ne pouvait pas connaître, faute d'avoir le gabarit qui la porte. La cause n'était pas une négligence de produit mais une COPIE SANS PREUVE : rien ne vérifiait qu'elle était arrivée, et rien ne vérifie encore qu'elle est à jour. Le contrôle R-43 lui-même ne fait qu'un `existsSync` sur les hooks — un hook périmé passe au vert.",
@@ -95,6 +95,23 @@
       "mode": "copie_conforme",
       "motif": "le JUGE du canal inverse, et il voyage avec son texte pour la meme raison que celui des retours : un texte sans juge decore, un juge sans son texte force a deviner. Il naît des DEUX COTES des le premier jour plutot que de re-payer la lecon du canal inverse, ou la forme etait prescrite en PROSE chez l'emetteur et jugee en CODE chez le destinataire — six lots en une journee admis par derogation. Le pilot le joue AVANT de deposer, le produit le joue avant de traiter : meme module, un seul jeu de regles.",
       "depuis": "2026-08-25"
+    },
+    {
+      "source": "gabarits/gitignore-produit",
+      "cible": ".gitignore",
+      "mode": "presence_et_motifs",
+      "motifs_exiges": [
+        "__pycache__/",
+        ".venv/",
+        "node_modules/",
+        "generated/",
+        "*.oracles.json",
+        "*.oracles-cache.json",
+        "*.oracles-historique.jsonl",
+        "!forge/**"
+      ],
+      "motif": "LES EXCLUSIONS QUE LE SOCLE EDICTE, LIVREES COMME UN MOTIF DE FICHIER (TF-0649). La regle 10 du socle enumere ces exclusions depuis le 06/08 — en PROSE, dans un tableau de REGLES-PROJET.md, donc sans AUCUN point d'application. Un produit ne l'enfreignait pas : il ne la rencontrait jamais. Mesure remontee par un produit : un `.pyc` suivi par git, un second qui s'appretait a entrer. Mode `presence_et_motifs` et non `copie_conforme` : ce fichier est un SOCLE, pas un plafond — un produit y ajoute ce que sa pile impose, et exiger l'identite reviendrait a lui interdire d'ignorer ses propres artefacts. `.env` n'est PAS dans les motifs exiges parce que `.env.forge-tests` est deja couvert par le controle de forge-tests, et qu'un produit peut legitimement ecrire `.env*` ou `/.env` : exiger une graphie exacte ferait crier sur une protection equivalente. `old/` n'y est PAS NON PLUS, et c'est une decision : l'arbitrage C1, amende le 13/08 (TF-0150), le rend AUTORISE et VERSIONNE.",
+      "depuis": "2026-08-26"
     }
   ]
 }
