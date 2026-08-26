@@ -91,6 +91,39 @@ Cinq controles, et pour chacun **la preuve exigee** — pas la case a cocher. Le
 | M-5 | Propreté | aucun secret en clair dans l'image ni dans compose (scan des fichiers embarqués) |
 | M-6 | Hôte historique | **si et seulement si** le produit déclare un hôte historique : la CIBLE d'une redirection résout et répond AVANT que la redirection soit armée, et l'ANCIEN hôte est interrogé APRÈS déploiement (200, ou 301 vers un emplacement qui répond, chemin et requête préservés) — §3 quater, TF-0482 |
 | M-7 | Travail planifié | **si et seulement si** le produit embarque une définition planifiée (cron) : elle porte un mode d'exercice à la demande CÂBLÉ, distinct de sa cadence, et elle a été EXERCÉE une fois — verdict O-8 de forge-ops, § 3 quinquies, TF-0527 |
+| M-8 | **Jalon de fraîcheur DÉRIVÉ** | **si et seulement si** le déploiement est gardé par une porte qui attend de voir « la nouvelle version en ligne » : la valeur qu'elle compare est **dérivée du contenu** — empreinte du livrable servi, identifiant de commit injecté à la génération — **jamais un numéro de version tenu à la main**. Preuve exigée : un **test négatif joué**, contenu local volontairement différent, la porte rend ÉCHEC en nommant les deux valeurs — §3 sexies, TF-0666 |
+
+### § 3 sexies — Une porte qui ne distingue pas l'avant de l'après valide un déploiement qui n'a pas eu lieu (M-8, TF-0666)
+
+**Le fait, du 26/08/2026.** Une porte de production attendait que l'URL publique serve un actif
+portant un numéro de version lu dans le dépôt, avant de lancer ses contrôles navigateur. **Ce
+numéro est resté identique sur les SIX POUSSÉES CONSÉCUTIVES de la journée.** La porte
+reconnaissait donc la version que servait encore **l'ancien conteneur**, écrivait « déploiement
+en ligne au bout de 1 essai », et les contrôles partaient pendant le redémarrage.
+
+**Constat direct le même jour** : un contrôle en ÉCHEC à 09:52, **le même contrôle VERT au rejeu
+à 09:54**, code identique, sans un octet de différence. Vérification faite en production : le
+balisage attendu était bien servi. *Le rouge était faux.*
+
+**Le faux rouge est le symptôme bénin ; le faux vert est le vrai risque.** Une porte incapable de
+distinguer l'avant de l'après valide aussi bien un déploiement **qui n'a pas eu lieu** — et c'est
+exactement le défaut que cette porte avait été écrite pour empêcher, après qu'une poussée n'eut
+rien déclenché et que la production eut servi l'ancienne version cinq minutes sans que rien ne le
+signale. **La promesse était tenue à la lettre — la version est bien LUE dans le dépôt — et
+manquée dans l'esprit, puisqu'elle n'y VARIE pas.**
+
+**La classe est générique** : tout jalon de déploiement indexé sur un numéro tenu à la main porte
+ce défaut, *puisqu'un numéro manuel ne bouge que quand on y pense*. D'où M-8 : la valeur de
+fraîcheur est **dérivée**, ou il n'y a pas de jalon. Une empreinte de contenu change **par
+construction** dès que le contenu change ; c'est ce que « par construction » veut dire, et c'est
+ce qu'aucune discipline humaine ne remplace.
+
+**L'angle résiduel est dit, pas comblé.** Une poussée qui ne modifie ni le livrable ni ses actifs
+— un changement d'intégration continue, par exemple — laisse l'empreinte inchangée : la porte
+passe alors **légitimement** au premier essai, mais le conteneur redémarre quand même et les
+contrôles peuvent de nouveau courir contre une production en bascule. Fermer cet angle demande
+une **attente de disponibilité bornée** sur les contrôles eux-mêmes, ou l'injection d'un
+identifiant de commit dans la sortie générée. M-8 ne le couvre pas, et ne prétend pas le couvrir.
 
 Verdict au ledger (`oracles_verdict`, étape `mep`). Un contrôle rouge → retour à l'étape
 concernée (max 3 allers-retours, puis diagnostic — même règle que tests↔development).
