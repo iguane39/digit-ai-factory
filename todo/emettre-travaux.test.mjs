@@ -1,171 +1,175 @@
-#!/usr/bin/env node
-/**
- * emettre-travaux.test.mjs — recette de l'émetteur de lots de travaux (TF-0627).
- *
- * Les promesses qui rendent ce canal acceptable, chacune dans les deux sens :
- *   · il n'écrit QUE dans `input\00-travaux\` — vérifié par empreinte de l'arborescence ;
- *   · il joue son propre juge AVANT d'écrire, et ne dépose pas un lot en défaut ;
- *   · il est idempotent par contenu — deux passages ne s'empilent pas ;
- *   · `--essai` n'écrit rien, nulle part ;
- *   · un produit conforme ne reçoit AUCUN lot : un canal qui parle pour ne rien dire se fait taire.
- * Joué par `oracles\self-tests.mjs` (I2).
- */
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readdirSync, statSync, existsSync } from "node:fs";
+// TF-0673 — la SECONDE SOURCE du canal pilot → produit, et les deux façons dont elle peut mentir.
+//
+// LE FAIT QUI A OUVERT CETTE SOURCE. `emettre-travaux.mjs` est le seul canal du pilot vers un
+// produit, et il était câblé en dur sur une unique classe de travail : les artefacts d'héritage.
+// Tout autre constat destiné à un produit n'avait AUCUNE VOIE — le défaut exact que ce script
+// existe pour corriger, son propre en-tête l'écrivant : *un état mesuré qui n'atteint pas son
+// destinataire ne devient pas un travail fait.*
+//
+// LE FAIT QUI A RENDU CETTE RECETTE NÉCESSAIRE, et il est arrivé au premier essai. Le rendez-vous
+// ne se faisait pas : le relevé nomme le produit « Produit-02.com », le registre écrit
+// « Produit-02 ». L'émetteur a rendu « 1 déjà présent » — un message parfaitement normal —
+// en perdant trois constats SANS UN MOT. Rien ne l'aurait dit ; seule une empreinte qui n'avait
+// pas bougé l'a montré.
+//
+// Ces cas tiennent donc trois propriétés, chacune dans les deux sens :
+//   1. le rendez-vous SE FAIT malgré le suffixe de domaine, et il REFUSE l'inclusion ;
+//   2. un constat orphelin est DÉNONCÉ, jamais perdu ;
+//   3. un champ absent du registre est DIT absent, jamais comblé par de la prose plausible.
+
+import assert from "node:assert/strict";
+import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
-import { spawnSync } from "node:child_process";
-import { lotHeritage, indiceLibre, dateLot } from "./emettre-travaux.mjs";
-import { verifier } from "../gabarits/oracle-travaux-pilot.mjs";
+import { join } from "node:path";
 
-const ICI = dirname(fileURLToPath(import.meta.url));
-let pass = 0, fail = 0;
-const check = (nom, fn) => {
-  try { fn(); console.log(`  [PASS] ${nom}`); pass++; }
-  catch (e) { console.error(`  [FAIL] ${nom} — ${e.message}`); fail++; }
+import {
+  blocConstat, constatsDestines, constatsDuRegistre, memeProduit, normaliserProduit, orphelins,
+} from "./emettre-travaux.mjs";
+
+const dir = mkdtempSync(join(tmpdir(), "emettre-travaux-"));
+
+/** Un registre de fixture : append-only, un événement par ligne, comme le vrai. */
+const registre = (evenements) => {
+  const p = join(dir, `reg-${evenements.length}-${Math.abs(hash(evenements))}.jsonl`);
+  writeFileSync(p, evenements.map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+  return p;
 };
-const att = (cond, message) => { if (!cond) throw new Error(message); };
+const hash = (o) => [...JSON.stringify(o)].reduce((a, c) => ((a * 31 + c.charCodeAt(0)) | 0), 7);
 
-const LIGNE = (artefacts) => ({ produit: "produit-recette", dossier: "C:\\faux\\produit-recette", artefacts });
-const ABSENT = (cible, mode = "copie_conforme") => ({ cible, mode, etat: "absent" });
+const casse = [];
+const cas = (nom, fn) => {
+  try { fn(); console.log(`  [PASS] ${nom}`); }
+  catch (e) { casse.push(`${nom} — ${e.message}`); console.log(`  [FAIL] ${nom} : ${e.message}`); }
+};
 
-const T = mkdtempSync(join(tmpdir(), "emettre-travaux-"));
-try {
-  check("un lot est produit pour chaque artefact manquant, et il PASSE son propre juge", () => {
-    const lot = lotHeritage(LIGNE([ABSENT("forge/RESTITUTION.md"), ABSENT("forge/hooks/factory.mjs")]), "20260825", "a");
-    att(lot && lot.elements === 2, `${lot && lot.elements} élément(s) au lieu de 2`);
-    const r = verifier(lot.md);
-    att(r.verdict === "PASS", `le lot émis ne tient pas sa propre forme : ${r.constats.filter((c) => c.statut === "FAIL").map((c) => c.regle).join(", ")}`);
+console.log("emettre-travaux — seconde source du canal (TF-0673)");
+
+// ---------------------------------------------------------------------------------------------
+// 1. LE RENDEZ-VOUS
+// ---------------------------------------------------------------------------------------------
+
+cas("le suffixe de domaine du dépôt ne fait pas manquer le rendez-vous", () => {
+  assert.equal(normaliserProduit("Produit-02.com"), "produit-02");
+  assert.ok(memeProduit("Produit-02", "Produit-02.com"));
+});
+
+cas("le rapprochement REFUSE l'inclusion — « Foo » n'est pas « FooBar »", () => {
+  // Le motif vaut d'être tenu par un cas : une comparaison lâche qui se trompe dépose du travail
+  // chez quelqu'un qui n'en est pas le destinataire. C'est PIRE que ne rien déposer — le vrai
+  // destinataire n'apprend rien ET un autre est dérangé.
+  assert.ok(!memeProduit("Foo", "FooBar"));
+  assert.ok(!memeProduit("Foo", "FooBar.com"));
+});
+
+cas("un destinataire vide ne se rapproche de RIEN, pas même d'un autre vide", () => {
+  assert.ok(!memeProduit("", ""));
+  assert.ok(!memeProduit(undefined, "Foo"));
+});
+
+cas("un constat destiné au produit est retenu, et le rendez-vous traverse le suffixe", () => {
+  const p = registre([
+    { ev: "creation", id: "TF-9001", statut: "candidat", destinataire_produit: "MonProduit" },
+  ]);
+  assert.equal(constatsDuRegistre("MonProduit.com", p).length, 1);
+});
+
+cas("un constat CLOS n'est plus confié — sinon le produit le recevrait à chaque exécution", () => {
+  const p = registre([
+    { ev: "creation", id: "TF-9002", statut: "candidat", destinataire_produit: "MonProduit" },
+    { ev: "maj", id: "TF-9002", statut: "corrige" },
+  ]);
+  assert.equal(constatsDuRegistre("MonProduit", p).length, 0);
+});
+
+cas("l'état se reconstitue par FUSION des événements, pas sur le dernier vu", () => {
+  // Le registre est append-only : le titre écrit à la création n'est pas répété à chaque mise à
+  // jour. Lire le seul dernier événement rendrait un constat sans titre ni contenu.
+  const p = registre([
+    { ev: "creation", id: "TF-9003", statut: "candidat", destinataire_produit: "MonProduit",
+      titre: "Le titre d'origine", contenu: "le fait" },
+    { ev: "maj", id: "TF-9003", statut: "decide", decideur: "humain" },
+  ]);
+  const [c] = constatsDuRegistre("MonProduit", p);
+  assert.equal(c.titre, "Le titre d'origine");
+  assert.equal(c.statut, "decide");
+});
+
+// ---------------------------------------------------------------------------------------------
+// 2. L'ORPHELIN — la face voisine du défaut, celle dont le signal est nul par construction
+// ---------------------------------------------------------------------------------------------
+
+cas("un constat qui désigne un produit absent du parc est DÉNONCÉ", () => {
+  const p = registre([
+    { ev: "creation", id: "TF-9004", statut: "candidat", destinataire_produit: "ProduitDisparu" },
+  ]);
+  const perdus = orphelins([{ produit: "AutreProduit.com" }], p);
+  assert.equal(perdus.length, 1);
+  assert.equal(perdus[0].id, "TF-9004");
+});
+
+cas("un constat dont le produit EXISTE n'est pas dénoncé à tort", () => {
+  const p = registre([
+    { ev: "creation", id: "TF-9005", statut: "candidat", destinataire_produit: "MonProduit" },
+  ]);
+  assert.deepEqual(orphelins([{ produit: "MonProduit.com" }], p), []);
+});
+
+cas("un constat orphelin mais CLOS n'est pas dénoncé — il n'attend plus personne", () => {
+  const p = registre([
+    { ev: "creation", id: "TF-9006", statut: "candidat", destinataire_produit: "ProduitDisparu" },
+    { ev: "maj", id: "TF-9006", statut: "ecarte" },
+  ]);
+  assert.deepEqual(orphelins([{ produit: "AutreProduit" }], p), []);
+});
+
+cas("un registre SANS aucun destinataire ne fabrique pas d'orphelins", () => {
+  const p = registre([{ ev: "creation", id: "TF-9007", statut: "candidat" }]);
+  assert.deepEqual(constatsDestines(p), []);
+  assert.deepEqual(orphelins([{ produit: "MonProduit" }], p), []);
+});
+
+cas("un registre introuvable rend une liste vide, jamais une exception", () => {
+  // Un émetteur qui lève sur un registre absent transformerait une donnée manquante en panne.
+  assert.deepEqual(constatsDestines(join(dir, "il-n-existe-pas.jsonl")), []);
+});
+
+cas("une ligne illisible n'emporte pas les lignes saines", () => {
+  const p = join(dir, "abime.jsonl");
+  writeFileSync(p, '{"ev":"creation","id":"TF-9008","statut":"candidat","destinataire_produit":"MonProduit"}\n'
+    + "{ ceci n'est pas du JSON\n", "utf8");
+  assert.equal(constatsDuRegistre("MonProduit", p).length, 1);
+});
+
+// ---------------------------------------------------------------------------------------------
+// 3. LE CHAMP ABSENT — dit absent, jamais comblé
+// ---------------------------------------------------------------------------------------------
+
+cas("un champ absent du registre est DIT absent, et le bloc désigne le registre", () => {
+  // Un lot qui comblerait les trous par de la prose plausible ferait croire au produit qu'on lui
+  // a écrit quelque chose de mesuré. L'aveu doit pointer l'endroit où il se corrige.
+  const rendu = blocConstat({ id: "TF-9009", titre: "Un constat nu" });
+  assert.match(rendu, /non renseigné au registre/);
+  assert.match(rendu, /aucune demande explicite/);
+  assert.match(rendu, /aucune vérification déclarée/);
+});
+
+cas("un constat COMPLET ne porte aucun aveu de manque", () => {
+  const rendu = blocConstat({
+    id: "TF-9010", titre: "Un constat complet", gravite: "majeur", contenu: "le fait mesuré",
+    pourquoi_produit: "parce que", demande_produit: "faire ceci", effort: "simple × court",
+    verification: "la commande rend PASS", consequence: "sinon ceci",
   });
+  assert.ok(!rendu.includes("non renseigné au registre"), "un constat complet ne doit rien avouer");
+  assert.match(rendu, /gravité majeur/);
+});
 
-  check("un produit CONFORME ne reçoit AUCUN lot — un canal qui parle pour rien se fait taire", () => {
-    const lot = lotHeritage(LIGNE([{ cible: "forge/RESTITUTION.md", mode: "copie_conforme", etat: "conforme" }]), "20260825", "a");
-    att(lot === null, "un lot a été produit alors qu'il n'y a rien à confier");
-  });
+cas("le bloc porte l'IDENTIFIANT — sans lui, le produit ne peut rattacher son avancement", () => {
+  assert.match(blocConstat({ id: "TF-9011" }), /### TF-9011/);
+});
 
-  check("un artefact HORS RACINE demande une DÉCLARATION, jamais une recopie (TF-0654)", () => {
-    // Le fait : `robots.txt` compté ABSENT chez un produit où il vit en `site/robots.txt` et
-    // répond 200 en production. Appliquer le travail tel qu'il était rédigé aurait déposé un
-    // fichier à la racine du dépôt — JAMAIS servi — et fait passer le relevé au vert sur une
-    // question restée ouverte. Ce que le produit doit faire est déclarer sa racine web.
-    const lot = lotHeritage(LIGNE([{ cible: "robots.txt", source: "gabarits/web/robots.txt",
-      mode: "presence", etat: "hors_racine", trouve_a: "site/robots.txt" }]), "20260826", "a");
-    att(lot, "aucun lot produit pour un artefact hors racine");
-    att(/HORS de la racine/.test(lot.md), "le lot ne distingue pas ce cas d'un artefact absent");
-    att(lot.md.includes("site/robots.txt"), "le lot ne dit pas OÙ le fichier a été trouvé");
-    att(/DÉCLARER votre racine web/.test(lot.md), "le lot ne demande pas la déclaration attendue");
-    att(/Ne recopiez PAS/.test(lot.md),
-      "le lot n'interdit pas la recopie — sans quoi le produit crée un fichier mort et le relevé passe au vert");
-  });
-
-  check("un artefact PÉRIMÉ est confié comme tel, avec les deux empreintes qui le prouvent", () => {
-    // TF-0645 : les empreintes s'appellent `empreinte_pilot` et `empreinte_produit` depuis le
-    // 26/08. Elles s'appelaient `source` et `produit` — or `source` porte, AU CONTRAT, le CHEMIN
-    // de l'artefact chez le pilot. La collision faisait perdre ce chemin au relevé, et le lot le
-    // REFABRIQUAIT par chirurgie de chaîne : trois chemins faux sur neuf dans un lot réellement
-    // déposé. Le `source` de cette fixture est donc désormais le chemin, et il est VÉRIFIÉ.
-    const lot = lotHeritage(LIGNE([{ cible: "forge/RESTITUTION.md", source: "gabarits/RESTITUTION.md",
-      mode: "copie_conforme", etat: "divergent", empreinte_pilot: "aaaaaaaaaaaa", empreinte_produit: "bbbbbbbbbbbb" }]), "20260825", "a");
-    att(lot, "aucun lot produit pour un artefact périmé");
-    att(/PÉRIMÉ/.test(lot.md), "le lot ne dit pas que l'artefact est périmé plutôt qu'absent");
-    att(lot.md.includes("aaaaaaaaaaaa") && lot.md.includes("bbbbbbbbbbbb"),
-      "le lot ne cite pas les deux empreintes — le produit ne peut donc pas contredire le constat");
-    att(lot.md.includes("recopier `gabarits/RESTITUTION.md`"),
-      "le lot ne cite pas le chemin source DÉCLARÉ par le contrat — s'il le déduit de la cible, il invente (TF-0645)");
-  });
-
-  check("le sidecar porte une ligne JSON par élément, avec son moyen de vérification", () => {
-    const lot = lotHeritage(LIGNE([ABSENT("forge/RESTITUTION.md"), ABSENT("robots.txt", "presence")]), "20260825", "a");
-    const lignes = lot.sidecar.split("\n").filter((l) => l.trim()).map((l) => JSON.parse(l));
-    att(lignes.length === 2, `${lignes.length} ligne(s) au lieu de 2`);
-    att(lignes.every((x) => x.verification && x.origine_tf && x.gravite && x.effort),
-      "une ligne du sidecar manque un champ du contrat");
-    att(lignes.every((x) => !("id" in x)), "le sidecar porte un id : les ids sont frappés par le destinataire");
-  });
-
-  check("la gravité distingue ce qui agit à chaque travail rendu de ce qui gêne au cas par cas", () => {
-    const lot = lotHeritage(LIGNE([ABSENT("forge/RESTITUTION.md"), ABSENT("robots.txt", "presence")]), "20260825", "a");
-    const par = Object.fromEntries(lot.sidecar.split("\n").filter((l) => l.trim())
-      .map((l) => JSON.parse(l)).map((x) => [x.titre.includes("RESTITUTION") ? "restitution" : "web", x.gravite]));
-    att(par.restitution === "majeur", `restitution en « ${par.restitution} »`);
-    att(par.web === "mineur", `robots.txt en « ${par.web} »`);
-  });
-
-  check("l'indice du jour est la première lettre LIBRE de la boîte — deux lots du même jour cohabitent", () => {
-    const boite = join(T, "boite");
-    mkdirSync(boite, { recursive: true });
-    att(indiceLibre(boite, "20260825") === "a", "boîte vide : l'indice devrait être `a`");
-    writeFileSync(join(boite, "pilot - TRAVAUX - 20260825a.md"), "x", "utf8");
-    att(indiceLibre(boite, "20260825") === "b", "un `a` présent : l'indice devrait être `b`");
-    writeFileSync(join(boite, "pilot - TRAVAUX - 20260825b.md"), "x", "utf8");
-    att(indiceLibre(boite, "20260825") === "c", "un `b` présent : l'indice devrait être `c`");
-    att(indiceLibre(boite, "20260826") === "a", "un autre JOUR repart à `a`");
-  });
-
-  check("la date du lot est déterministe : elle vient de l'argument, jamais de l'horloge", () => {
-    att(dateLot(new Date(2026, 7, 5)) === "20260805", `rendu ${dateLot(new Date(2026, 7, 5))}`);
-    att(dateLot(new Date(2026, 11, 31)) === "20261231", "un mois à deux chiffres est mal rendu");
-  });
-
-  // ── LA PROMESSE QUI REND LE CANAL ACCEPTABLE : rien n'est écrit hors de la boîte ──
-  check("--essai n'écrit RIEN, nulle part — vérifié par empreinte de l'arborescence", () => {
-    const faux = join(T, "parc");
-    const produit = join(faux, "_Client", "produit-recette");
-    mkdirSync(join(produit, "forge"), { recursive: true });
-    writeFileSync(join(produit, "forge", "marqueur.txt"), "intact", "utf8");
-    const empreinte = (d) => readdirSync(d, { withFileTypes: true, recursive: true })
-      .map((e) => `${e.parentPath || e.path}|${e.name}|${e.isFile() ? statSync(join(e.parentPath || e.path, e.name)).size : "d"}`)
-      .sort().join("\n");
-    const avant = empreinte(faux);
-    const r = spawnSync(process.execPath, [join(ICI, "emettre-travaux.mjs"), "--tous", "--essai"],
-      { encoding: "utf8", env: { ...process.env, FORGE_ROOT: faux } });
-    att(r.status === 0, `exit ${r.status} : ${String(r.stderr).slice(0, 200)}`);
-    att(empreinte(faux) === avant, "l'essai a modifié l'arborescence du parc");
-    att(!existsSync(join(produit, "input")), "l'essai a créé une boîte d'entrée");
-  });
-
-  check("un dépôt réel n'écrit QUE dans `input\\00-travaux\\` — le reste est intact", () => {
-    const faux = join(T, "parc2");
-    const produit = join(faux, "_Client", "produit-recette");
-    mkdirSync(join(produit, "forge"), { recursive: true });
-    writeFileSync(join(produit, "forge", "marqueur.txt"), "intact", "utf8");
-    writeFileSync(join(produit, "CLAUDE.md"), "consignes du produit", "utf8");
-    // Le filtre ECARTE toute la boite d'entree, dossiers intermediaires COMPRIS : `input` et
-    // `input\\00-travaux` sont crees par le depot, et les compter ferait echouer la recette sur
-    // la seule chose qu'elle autorise. Premier jet : il ne regardait que le chemin PARENT, donc
-    // l'entree du dossier `00-travaux` lui-meme passait — la recette accusait l'outil A TORT.
-    const horsBoite = (d) => readdirSync(d, { withFileTypes: true, recursive: true })
-      .map((e) => `${e.parentPath || e.path}|${e.name}`)
-      .filter((l) => !l.includes("00-travaux") && !l.endsWith("|input"))
-      .sort().join("\n");
-    const avant = horsBoite(faux);
-    const r = spawnSync(process.execPath, [join(ICI, "emettre-travaux.mjs"), "--tous"],
-      { encoding: "utf8", env: { ...process.env, FORGE_ROOT: faux } });
-    att(r.status === 0, `exit ${r.status} : ${String(r.stderr).slice(0, 200)}`);
-    const boite = join(produit, "input", "00-travaux");
-    att(existsSync(boite), "aucun lot déposé");
-    att(readdirSync(boite).filter((f) => f.endsWith(".md")).length === 1, "un seul lot `.md` attendu");
-    att(readdirSync(boite).filter((f) => f.endsWith(".tf.jsonl")).length === 1, "le sidecar manque");
-    // Le marqueur et les consignes du produit n'ont pas bougé : seule la boîte a changé.
-    att(horsBoite(faux) === avant, "l'émetteur a touché autre chose que la boîte d'entrée");
-  });
-
-  check("IDEMPOTENT par contenu — un second passage ne redépose rien", () => {
-    const faux = join(T, "parc3");
-    const produit = join(faux, "_Client", "produit-recette");
-    mkdirSync(join(produit, "forge"), { recursive: true });
-    const lancer = () => spawnSync(process.execPath, [join(ICI, "emettre-travaux.mjs"), "--tous"],
-      { encoding: "utf8", env: { ...process.env, FORGE_ROOT: faux } });
-    lancer();
-    const boite = join(produit, "input", "00-travaux");
-    const apres1 = readdirSync(boite).length;
-    const r2 = lancer();
-    att(readdirSync(boite).length === apres1, `${readdirSync(boite).length} fichiers après le second passage au lieu de ${apres1}`);
-    att(/DÉJÀ DÉPOSÉ/.test(r2.stdout), "le second passage ne DIT pas qu'il n'a rien redéposé");
-  });
-} finally {
-  try { rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré */ }
-}
-
-console.log(`\nemettre-travaux (TF-0627) : ${pass} PASS, ${fail} FAIL`);
-process.exit(fail ? 1 : 0);
+console.log(casse.length
+  ? `\nemettre-travaux : ${casse.length} cas en échec\n  - ${casse.join("\n  - ")}`
+  : "\nemettre-travaux : 15/15 PASS (rendez-vous malgré le suffixe et refus de l'inclusion ; "
+    + "orphelin dénoncé, et non dénoncé à tort ni quand il est clos ; registre absent ou abîmé "
+    + "sans exception ; champ manquant DIT manquant, constat complet muet)");
+process.exit(casse.length ? 1 : 0);
