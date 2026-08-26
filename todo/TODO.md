@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=9c5ba81bcc95 archive=40441f7fe541 · dernier événement: 2026-08-26T11:35:05.420Z -->
+     sceaux: actifs=465153b3e999 archive=40441f7fe541 · dernier événement: 2026-08-26T12:09:01.864Z -->
 
-**201 actifs** (candidat 5 · décidé 1 · en cours 0 · corrigé 188 · écarté 7) · **469 archivés**.
+**203 actifs** (candidat 3 · décidé 1 · en cours 0 · corrigé 192 · écarté 7) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,8 +11,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0669 | candidat | 20 | La notion « un doublon est un defaut » n'est cablee que sur un axe : entre livrables, jamais dans un livrable | **oui** — 70 pages sur 203 portaient le defaut. Le controle qui l'aurait trouve tient en six lignes et n'existait sur aucun des six outils de la chaine, alors que sa direction inverse — l'unicite du title entre pages — etait cablee et rouge en CI depuis le debut. |
-| TF-0666 | candidat | 10 | Une porte de fraicheur de deploiement cloturait sur une valeur qui ne change pas d'un deploiement a l'autre | **oui** — Une verification de production rouge a 09:52 et verte a 09:54 sur un code identique, apres une poussee qui ne changeait qu'une chaine de description. Six poussees consecutives ont franchi la porte « au bout de 1 essai » sans qu'elle puisse distinguer l'ancien conteneur du nouveau. |
+| TF-0670 | candidat | 6.7 | L'étape A9 de la chaîne de traduction — relecture native déclarée, bloquante si absente — est énoncée et rien ne l'exécute | non |
+| TF-0671 | candidat | 5.3 | Le critère de réussite de la chaîne de traduction est écrit en prose et aucun script ne le mesure | non |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
 | TF-0526 | corrige | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
 | TF-0530 | corrige | 25 | pilot : le garde-fou « le pilot n'ecrit pas chez un produit » tenait par DISCIPLINE SEULE, et les classes de defaut du jour n'avaient pas de regle generique | **oui** — un garde-fou non execute est un garde-fou qu'on suit jusqu'au jour ou on ne le suit plus ; et neuf classes de defaut payees le meme jour sans qu'aucune regle generique ne les empeche de revenir ailleurs |
@@ -161,7 +161,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0668 | candidat | 15 | Un verdict visuel rendu sur des captures viewport ne peut pas voir un defaut qui est une relation entre deux points eloignes de la page | **oui** — Un surtitre repete, evident a l'oeil sur la page complete, a survecu a la revue visuelle parce que la seule capture desktop de la page couvrait 900 px sur 3684 et s'arretait 800 px au-dessus du defaut. |
 | TF-0494 | corrige | 15 | forge-design : le workflow auditer ne prescrit aucune tracabilite pour une demande client multiple | **oui** — Un point sur dix-sept perdu, decouvert par le client et non par la chaine de controle. |
 | TF-0483 | corrige | 6.7 | forge-design : rien n oblige a relever ce qui se fait de bien dans le domaine du produit avant de proposer une DA — les oracles jugent la discipline INTERNE, et une DA au vert complet a ete rejetee en bloc | **oui** — Un tour complet conception+design perdu sur factory.produit-07 : DA au vert sur tous les oracles, rejetee integralement par le commanditaire, refaite avec releve externe et arbitrage humain sur captures. |
 | TF-0578 | corrige | 6.7 | forge-design : rien n oppose la PROMESSE d une page a l OFFRE decrite ailleurs dans le meme run — les oracles jugent la page en vase clos | **oui** — Contradiction une/services non detectee par cinq oracles de design tous au vert, sur le site vitrine de la factory elle-meme. |
@@ -198,7 +197,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0667 | candidat | 8.3 | Les cinq pans qui regardent une page rendue sont declares SANS OBJET sur un projet qui n'est que des pages | **oui** — Un audit rendu le 25/08 annonce une couverture interface de 100 % (18329/18329) tout en ayant declare inexistants les cinq pans qui regardent une page. Un defaut visuel present sur 70 des 203 pages du produit a traverse cet audit sans etre vu, et a fini signale a l'oeil par l'exploitant. |
 | TF-0665 | candidat | 5.6 | Un nombre affiché dont aucune source du dépôt ne rend compte est un nombre orphelin, et personne ne le lui demande | non |
 | TF-0543 | corrige | 25 | Trois listes d'exclusion divergentes : `input` manque aux deux qui comptent, 3e occurrence de la famille | **oui** — 3 listes d'exclusion distinctes (interface.py _EXCLUS, securite.py _EXCLUS_DEPENDANCES, disposition.py _HORS_SOURCES) ; 2 lots anterieurs (20260814a x2) ont deja rallonge les deux premieres |
 | TF-0542 | corrige | 20 | Aucun levier projet ne borne le perimetre de fichiers : RT-1 n'est pas une config omise | **oui** — 37 cles FORGE_TESTS_* relevees dans forge_tests/ ; aucune ne borne le perimetre de fichiers des pans interface/securite/prompts |
@@ -222,12 +220,16 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0668 | corrige | 15 | Un verdict visuel rendu sur des captures viewport ne peut pas voir un defaut qui est une relation entre deux points eloignes de la page | **oui** — Un surtitre repete, evident a l'oeil sur la page complete, a survecu a la revue visuelle parce que la seule capture desktop de la page couvrait 900 px sur 3684 et s'arretait 800 px au-dessus du defaut. |
+| TF-0667 | corrige | 8.3 | Les cinq pans qui regardent une page rendue sont declares SANS OBJET sur un projet qui n'est que des pages | **oui** — Un audit rendu le 25/08 annonce une couverture interface de 100 % (18329/18329) tout en ayant declare inexistants les cinq pans qui regardent une page. Un defaut visuel present sur 70 des 203 pages du produit a traverse cet audit sans etre vu, et a fini signale a l'oeil par l'exploitant. |
 | TF-0663 | corrige | 6.7 | Verifier que sept langues disent la meme chose ne verifie pas qu'une seule soit coherente avec elle-meme | **oui** — Deux faits faux servis en production dans les sept langues, apres un audit ayant conclu « aucune incoherence factuelle interlangue » — conclusion exacte et insuffisante. Detectes uniquement a la relecture demandee apres coup. |
 
 ## p
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0669 | corrige | 20 | La notion « un doublon est un defaut » n'est cablee que sur un axe : entre livrables, jamais dans un livrable | **oui** — 70 pages sur 203 portaient le defaut. Le controle qui l'aurait trouve tient en six lignes et n'existait sur aucun des six outils de la chaine, alors que sa direction inverse — l'unicite du title entre pages — etait cablee et rouge en CI depuis le debut. |
+| TF-0666 | corrige | 10 | Une porte de fraicheur de deploiement cloturait sur une valeur qui ne change pas d'un deploiement a l'autre | **oui** — Une verification de production rouge a 09:52 et verte a 09:54 sur un code identique, apres une poussee qui ne changeait qu'une chaine de description. Six poussees consecutives ont franchi la porte « au bout de 1 essai » sans qu'elle puisse distinguer l'ancien conteneur du nouveau. |
 | TF-0660 | corrige | 8.3 | Aucun oracle ne peut juger une substitution de terme qui change le genre grammatical | **oui** — 11 fautes d'accord servies en production sur deux langues, CI verte et six controleurs au vert. Detectees uniquement parce que l'exploitant a demande une relecture apres coup. |
 | TF-0664 | corrige | 6.3 | Aucune chaine declaree pour « traduire un produit » ni pour « auditer ses traductions », et son absence se paie en tours | **oui** — 11 tours sur 17 ont existe parce qu'une etape, un format ou une regle manquait — dont 8 pour ecrire la methode a la main. Consequences mesurees : 11 fautes d'accord et 2 faits faux servis en production derriere une CI verte. Quatre retours du meme jour (RT-47, RT-48, RT-51, RT-54) sont chacun une etape de la sequence absente. |
 
