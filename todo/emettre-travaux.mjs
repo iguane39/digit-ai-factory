@@ -74,12 +74,36 @@ import { relever } from "../scripts/relever-heritage.mjs";
  * trompe dépose du travail chez quelqu'un qui n'en est pas le destinataire — c'est pire que
  * de ne rien déposer, parce que le vrai destinataire n'apprend rien ET qu'un autre est dérangé.
  */
-const normaliserProduit = (n) => String(n || "").toLowerCase().split(".")[0].trim();
-const memeProduit = (a, b) => normaliserProduit(a) === normaliserProduit(b)
+export const normaliserProduit = (n) => String(n || "").toLowerCase().split(".")[0].trim();
+export const memeProduit = (a, b) => normaliserProduit(a) === normaliserProduit(b)
   && normaliserProduit(a) !== "";
 
-function constatsDuRegistre(produit) {
-  const chemin = join(PILOT, "todo", "TODO.jsonl");
+/**
+ * LE RENDU D'UN CONSTAT, et sa seule règle : **les champs manquants ne sont pas inventés.**
+ *
+ * Un lot qui comblerait les trous du registre par de la prose plausible ferait croire au produit
+ * qu'on lui a écrit quelque chose de mesuré. « Non renseigné au registre » est laid à lire — et
+ * c'est exactement ce qu'il faut : il désigne le registre, pas le produit, et il se corrige là.
+ */
+const manque = (quoi) => `**non renseigné au registre** — ${quoi}`;
+
+export const blocConstat = (e) => `### ${e.id} — ${e.titre || "constat sans titre"} · gravité ${e.gravite || "mineur"}
+
+- **Le fait** : ${e.contenu ? String(e.contenu).slice(0, 1400) : manque("le constat n'a pas de contenu")}
+- **Pourquoi cela vous concerne** : ${e.pourquoi_produit || "ce constat a été relevé sur votre produit, et sa correction vous appartient — le pilot n'écrit pas dans votre code"}
+- **Ce qui est demandé** : ${e.demande_produit || manque("aucune demande explicite — à instruire avec le pilot avant d'agir")}
+- **Effort estimé** : ${e.effort || manque("non estimé")}
+- **Comment vous saurez que c'est fait** : ${e.verification || manque("aucune vérification déclarée — c'est un manque, pas une dispense")}
+- **Si ce n'est pas fait** : ${e.consequence || manque("conséquence non écrite")}`;
+
+/** Les constats destinés à un produit que le parc ne porte PAS. Voir l'avertissement de fin. */
+export function orphelins(lignes, chemin = join(PILOT, "todo", "TODO.jsonl")) {
+  const produits = lignes.map((l) => l.produit);
+  return constatsDestines(chemin)
+    .filter((e) => !produits.some((p) => memeProduit(e.destinataire_produit, p)));
+}
+
+export function constatsDuRegistre(produit, chemin = join(PILOT, "todo", "TODO.jsonl")) {
   if (!existsSync(chemin)) return [];
   const etat = new Map();
   for (const brute of readFileSync(chemin, "utf8").split(/\r?\n/)) {
@@ -97,8 +121,7 @@ function constatsDuRegistre(produit) {
 }
 
 /** Tous les constats destinés à UN produit, quel qu'il soit — pour dénoncer les orphelins. */
-function constatsDestines() {
-  const chemin = join(PILOT, "todo", "TODO.jsonl");
+export function constatsDestines(chemin = join(PILOT, "todo", "TODO.jsonl")) {
   if (!existsSync(chemin)) return [];
   const etat = new Map();
   for (const brute of readFileSync(chemin, "utf8").split(/\r?\n/)) {
@@ -204,10 +227,7 @@ export function lotHeritage(ligne, jour, indice) {
     : "l'écart reste, et le contrôle de conformité du pilot continue de le rendre à chaque lot que vous remettez"}`;
   };
 
-  // UN CONSTAT DU REGISTRE. Les champs manquants ne sont PAS inventés : ils sont dits manquants.
-  // Un lot qui comblerait les trous du registre par de la prose plausible ferait croire au
-  // produit qu'on lui a écrit quelque chose de mesuré.
-  const manque = (quoi) => `**non renseigné au registre** — ${quoi}`;
+  // (le rendu d'un constat vit au niveau module — voir `blocConstat`, jugé par la recette)
 
   // Le lot cite TOUS les items qu'il porte, pas seulement le premier. Citer un seul identifiant
   // quand le lot en confie quatre laisse le destinataire chercher d'où viennent les trois autres,
@@ -216,15 +236,6 @@ export function lotHeritage(ligne, jour, indice) {
     ...(perimes.length || absents.length || horsRacine.length ? ["TF-0626"] : []),
     ...constats.map((e) => e.id),
   ].map((i) => `\`${i}\``).join(", ") || "\`aucun\`";
-  const blocConstat = (e) => `### ${e.id} — ${e.titre || "constat sans titre"} · gravité ${e.gravite || "mineur"}
-
-- **Le fait** : ${e.contenu ? String(e.contenu).slice(0, 1400) : manque("le constat n'a pas de contenu")}
-- **Pourquoi cela vous concerne** : ${e.pourquoi_produit || "ce constat a été relevé sur votre produit, et sa correction vous appartient — le pilot n'écrit pas dans votre code"}
-- **Ce qui est demandé** : ${e.demande_produit || manque("aucune demande explicite — à instruire avec le pilot avant d'agir")}
-- **Effort estimé** : ${e.effort || manque("non estimé")}
-- **Comment vous saurez que c'est fait** : ${e.verification || manque("aucune vérification déclarée — c'est un manque, pas une dispense")}
-- **Si ce n'est pas fait** : ${e.consequence || manque("conséquence non écrite")}`;
-
   const items = [...perimes.map((a) => bloc(a, "majeur")), ...absents.map((a) => bloc(a, absents.length > 4 ? "majeur" : "mineur")),
                  ...horsRacine.map((a) => blocHorsRacine(a, jour)),
                  ...constats.map(blocConstat)];
@@ -333,6 +344,11 @@ if (lanceEnDirect) {
   let deposes = 0, ignores = 0, refuses = 0;
 
   for (const ligne of lignes) {
+    // Ce filtre-ci reste par INCLUSION, à dessein, et la différence avec `memeProduit` mérite
+    // d'être dite : `--produit` est un filtre d'AFFICHAGE tapé par un humain qui voit le résultat
+    // et peut recommencer ; le rapprochement d'un constat est une ROUTE automatique dont personne
+    // ne relit la cible. Le laxisme est acceptable là où une erreur se voit, jamais là où elle
+    // dépose du travail chez quelqu'un.
     if (cible && !ligne.produit.toLowerCase().includes(cible.toLowerCase())) continue;
     const boite = join(ligne.dossier, "input", "00-travaux");
     const indice = indiceLibre(boite, jour);
@@ -368,7 +384,29 @@ if (lanceEnDirect) {
   }
 
   console.log(`\n${deposes} lot(s) déposé(s), ${ignores} déjà présent(s), ${refuses} refusé(s) avant dépôt.`);
+
+  // L'AVERTISSEMENT DES ORPHELINS (TF-0673, second temps). Un constat qui désigne un produit que
+  // le parc ne porte pas — nom mal orthographié, produit retiré — n'atteint personne. Avant ce
+  // bloc, il disparaissait SANS UN MOT : l'émetteur ne le comptait nulle part.
+  //
+  // C'est la classe de défaut que cet émetteur venait de corriger, laissée ouverte sur sa face
+  // voisine — et le premier jet l'a lui-même payée : trois constats perdus derrière un message
+  // parfaitement normal, vus seulement parce qu'une empreinte n'avait pas bougé.
+  //
+  // IL SORT EN ÉCHEC, et ce n'est pas un excès de zèle : *un avertissement qui n'arrête rien est
+  // un avertissement qu'on apprend à lire sans le voir.* Le calcul se fait sur le parc ENTIER,
+  // indépendamment de `--produit` : un orphelin l'est vis-à-vis de tous les produits, pas du
+  // filtre d'affichage du moment.
+  const perdus = orphelins(lignes);
+  if (perdus.length) {
+    console.error(`\n[ORPHELINS] ${perdus.length} constat(s) désignent un produit que le parc ne porte pas —`);
+    console.error("ils n'atteindront JAMAIS personne, et rien d'autre ne le dirait :");
+    for (const e of perdus.slice(0, 10))
+      console.error(`  - ${e.id} → « ${e.destinataire_produit} » (aucun produit du parc ne correspond)`);
+    console.error("Corriger `destinataire_produit` au registre, ou clore l'item avec son motif.");
+  }
+
   console.log("AUCUN commit n'a été fait chez aucun produit : déposer dans une boîte d'entrée est réversible,");
   console.log("entrer dans un historique est un geste dont le produit est seul auteur.");
-  process.exit(refuses ? 1 : 0);
+  process.exit(refuses || perdus.length ? 1 : 0);
 }
