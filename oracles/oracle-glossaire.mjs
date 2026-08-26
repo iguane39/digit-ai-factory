@@ -31,6 +31,7 @@
  *   G4  chaque ligne porte `verifie_le` au format AAAA-MM-JJ ;
  *   G5  un terme de catégorie `visibilite` cite AU MOINS DEUX preuves de nature différente ;
  *   G6  aucun `retenu` d'une locale ne figure dans les `proscrits` de la MÊME locale.
+ *   G7  la preuve d'un terme de `visibilite` dit COMMENT la rejouer — la commande entre accents graves.
  *
  * G5 EST LA RÈGLE QUI VIENT D'UN COÛT PRÉCIS (TF-0637). Une complétion de recherche interrogée
  * langue par langue a désigné « gite » comme le terme le plus suggéré dans six langues étrangères —
@@ -168,6 +169,42 @@ export function juger(texte) {
       sondeUnique.map((l) => `${l.terme}/${l.locale}`).join(" · "));
     else ok("G5", `${visibilite.length} ligne(s) de visibilité, chacune adossée à au moins deux preuves`);
 
+    // G7 — UNE PREUVE QU'AUCUN SCRIPT NE REJOUE VIEILLIT EN SILENCE (TF-0657, 26/08/2026).
+    //
+    // LE FAIT, remonté par un produit. Les motifs de son glossaire portaient des preuves NOMMÉES
+    // et DATÉES — « complétions de recherche, hl=es gl=ES, 10 résultats », vérifié le 25/08,
+    // confiance haute. AUCUN SCRIPT DU DÉPÔT NE LES REPRODUISAIT : une recherche exhaustive sur
+    // le nom de la sonde rendait zéro fichier. Pour répondre à une question du commanditaire, la
+    // sonde a dû être RÉÉCRITE pendant la session.
+    //
+    // CE QUE LE REJEU A RÉVÉLÉ, et que le motif ne disait pas : le terme était confirmé, mais la
+    // requête témoin était POLLUÉE PAR UN HOMONYME — le même mécanisme qui avait produit une
+    // proscription FAUSSE quelques jours plus tôt. Une preuve qu'on ne rejoue pas ne se contredit
+    // jamais toute seule.
+    //
+    // MÊME DOCTRINE QUE R-49 du socle : une constante qui désigne une ressource EXTERNE dit
+    // comment on l'a vérifiée — date, source, COMMANDE, et limites structurelles. Ici l'objet est
+    // un terme de marché, et la commande manquait.
+    //
+    // CE QUI EST JUGÉ : la PRÉSENCE d'un fragment entre accents graves dans la preuve d'un terme
+    // de VISIBILITÉ — c'est-à-dire de quoi rejouer. Jamais que la commande soit juste, ni qu'elle
+    // rende encore le même résultat : un oracle peut dire que le moyen manque, jamais qu'il marche.
+    // Les termes CONTRACTUELS n'y sont pas soumis : leur preuve est l'exactitude lexicale et la
+    // cohérence interlangue, qui se lisent dans le produit et non dans une sonde externe.
+    {
+      const rejouables = toutesLignes.filter((l) => l.categorie === "visibilite");
+      const muettes = rejouables.filter((l) => !/`[^`]{3,}`/.test(l.preuve || ""));
+      if (!rejouables.length) findings.push({ regle: "G7", statut: "SANS_OBJET",
+        message: "aucun terme de visibilité — aucune sonde externe à rejouer" });
+      else if (muettes.length) ko("G7", `${muettes.length} ligne(s) de VISIBILITÉ sur ${rejouables.length} dont la preuve ne dit pas COMMENT la rejouer : ` +
+        "une preuve nommée et datée qu'aucun script ne reproduit vieillit en silence. Mesuré — un glossaire portait « vérifié le 25/08, " +
+        "confiance haute » sur une sonde qu'aucun fichier du dépôt ne rejouait ; réécrite à la main, elle a révélé que la requête témoin " +
+        "était polluée par un homonyme, le mécanisme même qui avait produit une proscription FAUSSE. Écrire la commande entre accents " +
+        "graves — même doctrine que R-49",
+        muettes.map((l) => `${l.terme}/${l.locale}`).join(" · "));
+      else ok("G7", `${rejouables.length} ligne(s) de visibilité, chacune avec de quoi rejouer sa sonde`);
+    }
+
     // G6 — la contradiction interne, la seule qu'un oracle puisse voir
     //
     // UN TERME PROSCRIT S'ÉCRIT ENTRE ACCENTS GRAVES, et cette convention n'est pas cosmétique :
@@ -224,8 +261,8 @@ verifie_le: 2026-08-26
 
 | locale | retenu | proscrits | portee | preuve | verifie_le |
 |---|---|---|---|---|---|
-| fr | gîte | aucun | partout | catalogue servi · usage du secteur | 2026-08-26 |
-| it | casa vacanze | \`gite\` — homographe au sens opposé | partout | complétions de recherche · absence d'article interlangue | 2026-08-26 |
+| fr | gîte | aucun | partout | catalogue servi · \`curl -s 'https://exemple/complete?hl=fr&q=gite'\` | 2026-08-26 |
+| it | casa vacanze | \`gite\` — homographe au sens opposé | partout | \`curl -s 'https://exemple/complete?hl=it&q=gite'\` · absence d'article interlangue | 2026-08-26 |
 
 ## caution
 
@@ -243,7 +280,7 @@ verifie_le: 2026-08-26
 
 | locale | retenu | proscrits | portee | preuve | verifie_le |
 |---|---|---|---|---|---|
-| de | Hallenbad | \`Pool\` — employé dans un title quand le catalogue dit Hallenbad | partout | comptage sur le catalogue servi · complétions de recherche | 2026-08-26 |
+| de | Hallenbad | \`Pool\` — employé dans un title quand le catalogue dit Hallenbad | partout | comptage sur le catalogue servi · \`curl -s 'https://exemple/complete?hl=de&q=hallenbad'\` | 2026-08-26 |
 `;
   // SIX DÉFAUTS INDÉPENDANTS, un par règle. Ils sont répartis sur TROIS termes différents, et ce
   // n'est pas un détail de mise en scène : au premier jet, le défaut de G1 (catégorie hors jeu)
@@ -252,11 +289,11 @@ verifie_le: 2026-08-26
   // laisse croire qu'une règle est tenue alors qu'elle n'a rien jugé.
   const rouge = verte
     .replace("- **categorie** : visibilite\n- **pivot** : gîte", "- **categorie** : marketing\n- **pivot** : gîte")  // G1
-    .replace("| fr | gîte | aucun | partout | catalogue servi · usage du secteur | 2026-08-26 |",
+    .replace("| fr | gîte | aucun | partout | catalogue servi · \`curl -s 'https://exemple/complete?hl=fr&q=gite'\` | 2026-08-26 |",
              "| fr | gîte | \`gîte\` — proscrit ET retenu | partout | catalogue servi | hier |")      // G4 et G6
     .replace("| en | security deposit | \`deposit\` seul — ambigu | ambigu si la page parle aussi de l'acompte | catalogue servi | 2026-08-26 |",
              "| en |  | — | — | catalogue servi | 2026-08-26 |")                                   // G2 et G3
-    .replace("| de | Hallenbad | \`Pool\` — employé dans un title quand le catalogue dit Hallenbad | partout | comptage sur le catalogue servi · complétions de recherche | 2026-08-26 |",
+    .replace("| de | Hallenbad | \`Pool\` — employé dans un title quand le catalogue dit Hallenbad | partout | comptage sur le catalogue servi · \`curl -s 'https://exemple/complete?hl=de&q=hallenbad'\` | 2026-08-26 |",
              "| de | Hallenbad | \`Pool\` — employé dans un title | partout | comptage sur le catalogue servi | 2026-08-26 |");  // G5
   const horsChamp = "---\nrole: une note quelconque\n---\n\n## un titre\n\ndu texte.\n";
   writeFileSync(join(dir, "verte.md"), verte, "utf8");
@@ -268,13 +305,13 @@ verifie_le: 2026-08-26
   const casse = [];
   if (rv.status !== 0) casse.push("la fixture VERTE ne passe pas : " + rv.stdout.slice(0, 400));
   if (rr.status !== 1) casse.push("la fixture ROUGE ne FAIL pas");
-  else for (const regle of ["G1", "G2", "G3", "G4", "G5", "G6"]) {
+  else for (const regle of ["G1", "G2", "G3", "G4", "G5", "G6", "G7"]) {
     if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
   }
   // LA BORNE A SON PROPRE CAS : sans elle, l'oracle accuserait tout document du dépôt.
   if (!/"SANS_OBJET"/.test(rh.stdout)) casse.push("un fichier hors champ n'est pas déclaré SANS_OBJET — la règle s'invente une cible");
   console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test glossaire : 8/8 PASS (verte PASS ; rouge FAIL sur G1 catégorie hors jeu, G2 retenu vide, G3 aveu absent, G4 date non ISO, G5 sonde unique, G6 retenu proscrit ; hors champ SANS_OBJET)");
+    : "Self-test glossaire : 8/8 PASS (verte PASS ; rouge FAIL sur G1 catégorie hors jeu, G2 retenu vide, G3 aveu absent, G4 date non ISO, G5 sonde unique, G6 retenu proscrit, G7 preuve non rejouable ; hors champ SANS_OBJET)");
   process.exit(casse.length ? 1 : 0);
 }
 
