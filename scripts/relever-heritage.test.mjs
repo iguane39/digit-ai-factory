@@ -111,6 +111,42 @@ try {
     att(/Aucune écriture/.test(md), "le rendu ne dit pas qu'il n'écrit rien chez les produits");
     att(/PÉRIMÉ/.test(md), "le rendu ne distingue pas visuellement un fichier périmé d'un absent");
   });
+  // ---- LE TROISIEME ETAT (TF-0654) ----------------------------------------------------------
+  //
+  // « robots.txt absent, gravité majeur » était FAUX sur un produit réel : le fichier vivait en
+  // `site/robots.txt` et répondait 200 en production — la racine WEB de ce produit n'est pas la
+  // racine de son dépôt. La sonde ne connaissait que deux lectures, « il manque » ou « l'absence
+  // est légitime », et aucune des deux n'était vraie.
+  check("un artefact trouvé AILLEURS est `hors_racine`, et le relevé DIT où", () => {
+    const produit = join(T, "_ClientWeb");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    mkdirSync(join(produit, "site"), { recursive: true });
+    writeFileSync(join(produit, "site", "robots.txt"), "User-agent: *\n", "utf8");
+    const artefact = { cible: "robots.txt", source: "gabarits/web/robots.txt", mode: "presence" };
+    const etat = etatArtefact(produit, artefact, pilot);
+    att(etat.etat === "hors_racine", `état « ${etat.etat} » au lieu de hors_racine`);
+    att(etat.trouve_a === "site/robots.txt", `le relevé ne dit pas OÙ : « ${etat.trouve_a} »`);
+  });
+
+  check("BORNE — introuvable partout reste ABSENT : le troisième état n'absout rien", () => {
+    const produit = join(T, "_ClientNu");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    const etat = etatArtefact(produit, { cible: "robots.txt", source: "gabarits/web/robots.txt", mode: "presence" }, pilot);
+    att(etat.etat === "absent", `état « ${etat.etat} » au lieu de absent`);
+  });
+
+  check("BORNE — les dossiers d'archives et de dépendances ne sont JAMAIS fouillés", () => {
+    // Sans cette borne, un `robots.txt` traînant dans `node_modules` ou `old/` ferait passer le
+    // produit pour « hors racine » — un vert obtenu sur une copie de quelque chose.
+    const produit = join(T, "_ClientBruit");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    mkdirSync(join(produit, "node_modules", "un-paquet"), { recursive: true });
+    writeFileSync(join(produit, "node_modules", "un-paquet", "robots.txt"), "x\n", "utf8");
+    mkdirSync(join(produit, "old"), { recursive: true });
+    writeFileSync(join(produit, "old", "robots.txt"), "x\n", "utf8");
+    const etat = etatArtefact(produit, { cible: "robots.txt", source: "gabarits/web/robots.txt", mode: "presence" }, pilot);
+    att(etat.etat === "absent", `état « ${etat.etat} » : un fichier d'archive ou de dépendance a été pris pour la surface servie`);
+  });
 } finally {
   try { rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré */ }
 }
