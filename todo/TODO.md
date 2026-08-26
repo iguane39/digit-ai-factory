@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=b9707f945a6a archive=40441f7fe541 · dernier événement: 2026-08-26T09:11:45.333Z -->
+     sceaux: actifs=141bd82fb183 archive=40441f7fe541 · dernier événement: 2026-08-26T09:21:45.889Z -->
 
-**191 actifs** (candidat 7 · décidé 1 · en cours 0 · corrigé 176 · écarté 7) · **469 archivés**.
+**191 actifs** (candidat 5 · décidé 1 · en cours 0 · corrigé 178 · écarté 7) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,7 +11,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0647 | candidat | 12.5 | Le socle documentaire declare sa propre verifiabilite et rien ne l'exerce | **oui** — 7 fiches sur 8 en gabarit apres 5 runs et une MEP ; 137 marqueurs ; 2 vues HTML generees depuis du vide |
 | TF-0648 | candidat | 10 | Un oracle dont l'echec d'environnement est indiscernable d'un defaut | **oui** — diagnostic subi sur un stderr vide ; controle rapporte « ni passe ni echoue », verdict inconsommable |
 | TF-0650 | candidat | 10 | Un controle de detection sans exemption declaree s'apprend a etre ignore | **oui** — 16 signalements sur 38 ne doivent pas etre corriges — 42 % de bruit structurel et permanent |
 | TF-0651 | candidat | 6.3 | La route MEP n'a pas de variante deploiement continu, et l'infrastructure n'a ni description ni reverification | **oui** — MEP pipelinee et verifiee mais hors route ; 4 domaines et toute l'infra sans declaration ni reverification |
@@ -189,7 +188,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0656 | candidat | 12.5 | Une regle conditionnelle de glossaire ne bloque jamais, et l'arbitrage prouve reste inapplique | **oui** — Trois langues sur sept livrees en production avec le terme retenu absent a 100 %, alors que le controle voyait la regle et l'a classee « a relire a l'oeil ». 243 occurrences du mauvais terme cumulees (82 + 79 + 82). |
 | TF-0658 | candidat | 12.5 | Aucun oracle ne verifie qu'une URL DECLAREE par le site repond 200 | **oui** — 203 canoniques sur 203 redirigent en production, plus 1 624 alternates hreflang et 203 <loc> de sitemap. Trois oracles du projet rendaient PASS au moment de la mesure. |
 | TF-0657 | candidat | 5.3 | Un glossaire cite une sonde qu'aucun script ne rejoue : la preuve vieillit en silence | **oui** — Sonde reecrite a la main en session pour verifier un terme. Une proscription fausse (casa rural, es) avait vecu jusqu'a sa correction fortuite le lendemain, et le motif corrige omet toujours la pollution par homonyme que le rejeu revele. |
 | TF-0653 | corrige | 20 | Les TROIS tables de synthese de la grille SEO se contredisaient avec la grille qu'elles resument, depuis quinze jours — et c'est ce qu'on lit pour planifier une renumerotation | **oui** — quinze jours de contradiction entre un document et lui-meme, sur les tables qui servent a planifier les evolutions de ce document. Trois tables fausses sur trois, mesurees contre le manifeste. |
@@ -205,6 +203,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0542 | corrige | 20 | Aucun levier projet ne borne le perimetre de fichiers : RT-1 n'est pas une config omise | **oui** — 37 cles FORGE_TESTS_* relevees dans forge_tests/ ; aucune ne borne le perimetre de fichiers des pans interface/securite/prompts |
 | TF-0602 | corrige | 15 | forge-tests : le registre de dette a un `--verifier` qui fonctionne et que rien ne joue a la livraison — 15 limites declarees par le code lui manquaient, sur trois modules livres les 22 et 23/08 | **oui** — QUINZE limites declarees par le code et absentes du registre commite, sur TROIS modules livres les 22 et 23/08 — soit la reapparition du defaut fondateur de TF-0384 deux jours apres sa correction, par une autre cause. L'ecart n'a ete trouve par aucun controle : il l'a ete par un appel ACCIDENTEL a un outil dont `--help` regenere le fichier au lieu d'afficher une aide. |
 | TF-0536 | corrige | 12.5 | Périmètre d'audit : `input\` n'est pas du produit, et 12 constats sur 15 y portent | **oui** — 12 constats sur 15 hors produit ; pan interface FAIL à 0,9998 de couverture sur 18456 éléments ; 0 constat sur site\ |
+| TF-0656 | corrige | 12.5 | Une regle conditionnelle de glossaire ne bloque jamais, et l'arbitrage prouve reste inapplique | **oui** — Trois langues sur sept livrees en production avec le terme retenu absent a 100 %, alors que le controle voyait la regle et l'a classee « a relire a l'oeil ». 243 occurrences du mauvais terme cumulees (82 + 79 + 82). |
 | TF-0470 | corrige | 10 | forge-tests : les routes attendues par locale se DÉCLARENT — la parité de routes reste aveugle sur un produit dont le build ne laisse aucune arborescence | **oui** — mesuré sur produit-07, 201 pages FR / 201 EN en production : le pan sortirait en NA/SKIP sur la parité de routes pendant qu'un écart de route vit en production — et le produit est celui sur lequel le pan a été conçu, ce qui rend le trou d'autant plus coûteux : la forge ne voit plus le défaut qui l'a fait naître |
 | TF-0537 | corrige | 10 | Oracle secrets : clés API de tiers dans du JS minifié aspiré, comptées bloquantes | **oui** — 9 constats securite, 9 hors produit, 6 classés bloquants ; 3 déjà qualifiés placeholder par l'oracle lui-même |
 | TF-0601 | corrige | 10 | forge-tests : la recette REFUSE son propre verdict parce qu'elle salit l'arbre qu'elle surveille — deux fichiers deposes par elle-meme, et trois domaines rouges qui vivent sous ce refus | **oui** — DEUX executions de la recette, DEUX verdicts refuses, la seconde sur un arbre nettoye a la main juste avant — le refus est donc systematique et non accidentel. Sous ce refus, trois domaines ECHEC dont un banc VERT a 3 findings bloquants pour 0 attendu, 47 erreurs de linter sur 14 fichiers, et une vue HTML qui echoue au controle du socle. Une recette qui ne peut pas rendre de verdict est une recette qu'on cesse de jouer, et c'est ainsi que trois rouges s'installent. |
@@ -238,6 +237,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0585 | corrige | 12.5 | Un comportement destine aux visiteurs valide sur un protocole qu'ils n'utilisent pas | **oui** — 7 hostnames sur 8 injoignables en HTTPS apres avoir ete declares fonctionnels ; port 443 ferme sur 213.186.33.5 |
 | TF-0637 | corrige | 12.5 | Une recherche a fonde une recommandation sur une source unique au biais indecelable | **oui** — recommandation inverse evitee de justesse ; homographe italien detecte en repondant a l'exploitant, pas en menant la recherche |
 | TF-0639 | corrige | 12.5 | La connaissance terminologique n'a nulle part ou vivre dans un projet multilingue | **oui** — 99 occurrences d'un faux ami dans un seul fichier de langue, invisibles aux 3 controles existants |
+| TF-0647 | corrige | 12.5 | Le socle documentaire declare sa propre verifiabilite et rien ne l'exerce | **oui** — 7 fiches sur 8 en gabarit apres 5 runs et une MEP ; 137 marqueurs ; 2 vues HTML generees depuis du vide |
 | TF-0631 | corrige | 12 | Un lien symbolique BRISE vit a la racine du parc depuis le 9 aout sous un nom de pilot, et AUCUN balayage ne le voit : `isDirectory()` et `isFile()` sont faux tous les deux pour un lien | **oui** — `ls -l /c/dev | grep '^l'` rend le lien ; `node bootstrap.mjs` ne le nomme dans aucune de ses lignes, alors qu'il declare le meme jour un fichier `null` de 10927 octets, deux repertoires non versionnes et le clone archive. Seize jours de presence, zero declaration. Le controle qui declare les pieges du parc est aveugle a une classe entiere d'entrees de repertoire. |
 | TF-0471 | corrige | 10 | R-45 refuse des lots rédigés AVANT sa publication — deux lots Produit-05 bloqués à l'ingestion, dont un qui signalait un plantage réel du lanceur d'oracles | **oui** — payé le 22/08 : douze candidatures de deux lots restent hors du registre, et l'une d'elles nommait un défaut BLOQUANT du lanceur d'oracles qui n'a été corrigé que parce que la session l'a rencontré par un autre chemin — un refus de forme a mis un fait de production hors de portée |
 | TF-0654 | corrige | 10 | La sonde d'heritage suppose que la racine web est la racine du depot | **oui** — 2 manques sur 2 restants sont des faux positifs ; appliquer le travail creerait 2 fichiers morts |
