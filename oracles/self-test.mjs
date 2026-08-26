@@ -221,6 +221,33 @@ check("R-11 bis : aucune section « Référentiels » → avertissement au non_j
   if (rapport.findings.some((f) => f.regle === "R-11 bis")) throw new Error("R-11 bis ne doit pas produire de finding tant que rien n'est déclaré");
 });
 
+// TF-0647 — UNE FICHE QUI PORTE ENCORE SES MARQUEURS EST UNE FICTION PLAUSIBLE.
+//
+// Mesuré après cinq runs et une mise en production : sept fiches sur huit étaient encore le
+// gabarit brut, `verifie_le: {AAAA-MM-JJ}` compris, pour 137 marqueurs. Le frontmatter était
+// COMPLET au sens du contrôle existant — role, sources, date, tous présents, tous vides de sens.
+check("R-20 ter : un marqueur de gabarit dans une fiche livrée est un ÉCHEC mécanique (TF-0647)", () => {
+  const chemin = join(verte, "docs", "projet", "TECHNOS.md");
+  const avant = readFileSync(chemin, "utf8");
+  try {
+    writeFileSync(chemin, avant + NL_TEST + "| Node | {VERSION} | {LIEN} |" + NL_TEST);
+    const { rapport } = lance(verte);
+    const f = rapport.findings.filter((x) => x.regle === "R-20" && /marqueur/.test(x.message || ""));
+    if (!f.length) throw new Error("une fiche non instanciée passe pour conforme — la fiction plausible n'est pas vue");
+    if (!/\{VERSION\}/.test(f[0].message)) throw new Error(`les marqueurs ne sont pas nommés : ${f[0].message}`);
+  } finally {
+    writeFileSync(chemin, avant);
+  }
+});
+
+check("R-20 ter BORNE : une fiche instanciée ne déclenche RIEN — la règle ne crie pas sur du texte", () => {
+  // Sans cette borne, une accolade légitime — un extrait de JSON, une expression de gabarit citée
+  // en exemple — ferait échouer une fiche juste, et la règle se ferait désactiver.
+  const { rapport } = lance(verte);
+  const f = rapport.findings.filter((x) => x.regle === "R-20" && /marqueur/.test(x.message || ""));
+  if (f.length) throw new Error(`faux positif sur une fiche instanciée : ${f[0].message}`);
+});
+
 check("R-11 bis : section présente mais incomplète → le manquant est NOMMÉ (TF-0373)", () => {
   const chemin = join(verte, "CLAUDE.md");
   const avant = readFileSync(chemin, "utf8");

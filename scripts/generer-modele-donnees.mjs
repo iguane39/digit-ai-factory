@@ -10,6 +10,30 @@ import { lireSource, mdVersHtml, coquille, svgBoites } from "./lib-vue-html.mjs"
 const src = process.argv[2];
 if (!src) { console.error("usage : generer-modele-donnees.mjs <MODELE-DONNEES.md>"); process.exit(2); }
 const texte = readFileSync(src, "utf8");
+
+// ---- TF-0647 : ON NE REND PAS UNE VUE DEPUIS UN GABARIT ----------------------------------------
+//
+// LE FAIT, mesure apres cinq runs et une mise en production. Les DEUX vues HTML produites par les
+// scripts du pilot avaient ete generees A PARTIR DE SOURCES ENCORE VIDES, et portaient 40 et 43
+// marqueurs `{...}` : du HTML soigne, rempli de trous, qu'aucun script n'avait refuse de rendre.
+//
+// Une vue FINIE fabriquee depuis une source VIDE est pire que pas de vue du tout : elle a la forme
+// d'un livrable, elle se lit comme un livrable, et elle ne dit rien. C'est la meme fiction plausible
+// que R-20 ter attrape cote fiche — attrapee ici a la source, avant qu'elle prenne l'apparence
+// d'un resultat.
+//
+// LE REFUS EST BRUYANT ET NOMME LES MARQUEURS : un script qui se contenterait de rendre en
+// silence laisserait le lecteur decouvrir les trous dans le HTML, c'est-a-dire trop tard.
+{
+  const marqueurs = [...new Set(texte.match(/\{[A-Z0-9ÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ_\- .|/]{2,60}\}/g) || [])];
+  if (marqueurs.length) {
+    console.error(`[REFUS TF-0647] ${src} porte encore ${marqueurs.length} marqueur(s) de gabarit — `
+      + `rendre une vue depuis une source non instanciee fabrique de la fausse completude : du HTML `
+      + `fini qui ne dit rien. Instancier la source d'abord. Ex. : ${marqueurs.slice(0, 4).join(", ")}`);
+    process.exit(1);
+  }
+}
+
 const { front, corps } = lireSource(texte);
 
 // tables : blocs « ## Table : nom » ; liens : table « Liens sortants » du bloc

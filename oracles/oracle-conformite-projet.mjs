@@ -776,6 +776,29 @@ else {
     if (!front || !/^role\s*:/m.test(front) || !/^sources_de_verite\s*:/m.test(front) || !/^verifie_le\s*:/m.test(front)) {
       ko("R-20", `docs\\projet\\${f}`, "frontmatter YAML incomplet — role, sources_de_verite et verifie_le requis (contrat machine)"); ok20 = false;
     }
+    // R-20 ter — UNE FICHE QUI PORTE ENCORE SES MARQUEURS N'EST PAS UNE FICHE (TF-0647, 26/08).
+    //
+    // LE FAIT, mesuré après CINQ runs et une mise en production complète : SEPT fiches sur huit
+    // étaient encore le gabarit brut, `verifie_le: {AAAA-MM-JJ}` compris, pour 137 marqueurs au
+    // total. Le frontmatter était pourtant COMPLET au sens du contrôle ci-dessus — role, sources,
+    // date, tous présents, tous vides de sens.
+    //
+    // *Le socle R-20 était une FICTION PLAUSIBLE, ce qui est pire qu'une absence : l'absence se
+    // voit.* Une session qui ouvre `ARCHITECTURE.md` pour comprendre le projet lit un gabarit, et
+    // rien ne l'avertit.
+    //
+    // AUCUNE INTERPRÉTATION N'EST REQUISE : un `{…}` dans une fiche livrée est un échec
+    // mécanique. Les deux champs et la conception étaient justes — seul l'exercice manquait.
+    const corps = readFileSync(fp, "utf8");
+    const marqueurs = corps.match(/\{[A-Z0-9ÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ_\- .|/]{2,60}\}/g) || [];
+    if (marqueurs.length) {
+      const uniques = [...new Set(marqueurs)];
+      ko("R-20", `docs\\projet\\${f}`, `${marqueurs.length} marqueur(s) de gabarit NON INSTANCIÉ(s) — `
+        + `une fiche qui porte encore ses trous est une fiction plausible, et une fiction plausible est pire `
+        + `qu'une absence : l'absence se voit. Ex. : ${uniques.slice(0, 4).join(", ")}`
+        + (uniques.length > 4 ? ` (+${uniques.length - 4} autres formes)` : ""));
+      ok20 = false;
+    }
   }
   for (const f of PROJECTIONS_DP) {
     if (!existsSync(join(dp, f))) { ko("R-20", `docs\\projet\\${f}`, "projection générée manquante — régénérer via les scripts du pilot (generer-architecture / generer-modele-donnees)"); ok20 = false; }
