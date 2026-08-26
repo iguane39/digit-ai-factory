@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=de0673f80127 archive=40441f7fe541 · dernier événement: 2026-08-26T11:10:25.485Z -->
+     sceaux: actifs=fcff66b5d2eb archive=40441f7fe541 · dernier événement: 2026-08-26T11:18:04.716Z -->
 
-**196 actifs** (candidat 3 · décidé 1 · en cours 0 · corrigé 185 · écarté 7) · **469 archivés**.
+**197 actifs** (candidat 3 · décidé 1 · en cours 0 · corrigé 186 · écarté 7) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -187,7 +187,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0663 | candidat | 6.7 | Verifier que sept langues disent la meme chose ne verifie pas qu'une seule soit coherente avec elle-meme | **oui** — Deux faits faux servis en production dans les sept langues, apres un audit ayant conclu « aucune incoherence factuelle interlangue » — conclusion exacte et insuffisante. Detectes uniquement a la relecture demandee apres coup. |
 | TF-0653 | corrige | 20 | Les TROIS tables de synthese de la grille SEO se contredisaient avec la grille qu'elles resument, depuis quinze jours — et c'est ce qu'on lit pour planifier une renumerotation | **oui** — quinze jours de contradiction entre un document et lui-meme, sur les tables qui servent a planifier les evolutions de ce document. Trois tables fausses sur trois, mesurees contre le manifeste. |
 | TF-0658 | corrige | 12.5 | Aucun oracle ne verifie qu'une URL DECLAREE par le site repond 200 | **oui** — 203 canoniques sur 203 redirigent en production, plus 1 624 alternates hreflang et 203 <loc> de sitemap. Trois oracles du projet rendaient PASS au moment de la mesure. |
 | TF-0476 | corrige | 10 | forge-seo-geo : le noeud 57 accepte un taux de citation sans plan de mesure — le controle « pas de verdict affirmatif sans la donnee nommee » (TF-0264) ne capte que la famille CrUX | **oui** — mesure sur les artefacts reels : noeud_exige_terrain() rend False sur la source du noeud 57 et True sur celle du noeud 31 (predicat litteral "crux") ; la reserve « ne jamais presenter le taux comme une metrique de suivi fiable » compte 1 occurrence dans le referentiel et 0 dans la fiche que l'auditeur remplit. Le cout se paie dans un livrable client remis : la forge a deja produit un rapport d'audit reel, et le service de runs recurrents (cat-seo-05) transformerait ce taux en tendance — sur une grandeur dont la litterature 2026 mesure que la marque explique 1,5 % de la variance |
@@ -198,6 +197,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0665 | candidat | 5.6 | Un nombre affiché dont aucune source du dépôt ne rend compte est un nombre orphelin, et personne ne le lui demande | non |
 | TF-0543 | corrige | 25 | Trois listes d'exclusion divergentes : `input` manque aux deux qui comptent, 3e occurrence de la famille | **oui** — 3 listes d'exclusion distinctes (interface.py _EXCLUS, securite.py _EXCLUS_DEPENDANCES, disposition.py _HORS_SOURCES) ; 2 lots anterieurs (20260814a x2) ont deja rallonge les deux premieres |
 | TF-0542 | corrige | 20 | Aucun levier projet ne borne le perimetre de fichiers : RT-1 n'est pas une config omise | **oui** — 37 cles FORGE_TESTS_* relevees dans forge_tests/ ; aucune ne borne le perimetre de fichiers des pans interface/securite/prompts |
 | TF-0602 | corrige | 15 | forge-tests : le registre de dette a un `--verifier` qui fonctionne et que rien ne joue a la livraison — 15 limites declarees par le code lui manquaient, sur trois modules livres les 22 et 23/08 | **oui** — QUINZE limites declarees par le code et absentes du registre commite, sur TROIS modules livres les 22 et 23/08 — soit la reapparition du defaut fondateur de TF-0384 deux jours apres sa correction, par une autre cause. L'ecart n'a ete trouve par aucun controle : il l'a ete par un appel ACCIDENTEL a un outil dont `--help` regenere le fichier au lieu d'afficher une aide. |
@@ -215,6 +215,12 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0480 | corrige | 8.3 | forge-tests : le plancher visuel (V1 debordement, V2 contraste, V4 chevauchements) n est atteignable que sur un FICHIER html local — aucun produit SERVI n est jugeable, et les trois autres portes sont fermees | **oui** — En-tete compresse et menu anglais au tiers de la largeur en production de juin a aout 2026 sur produit-07, non vus par deux campagnes de verification declarees completes. |
 | TF-0620 | corrige | 3 | forge-tests PRESCRIT un nom de fichier porteur de secrets chez le projet audite et ne livre PAS la ligne qui l'ignore — 1 projet sur 3 l'ignore | **oui** — cout PAYE : deux projets sur trois ont leur configuration d'audit versionnee, dont un PUBLIE sur origin/main chez Azure DevOps — la protection etait supposee par un commentaire et par rien d'autre |
 | TF-0538 | ecarte | 12 | Journal de boucle : la forge nomme le fichier, le format et la règle, mais ne l'amorce pas | **oui** — boucle.statut=en_cours sur un audit de 16 pans effectivement exécutés ; le rapport nomme le fichier et la règle TF-0353 |
+
+## f
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0663 | corrige | 6.7 | Verifier que sept langues disent la meme chose ne verifie pas qu'une seule soit coherente avec elle-meme | **oui** — Deux faits faux servis en production dans les sept langues, apres un audit ayant conclu « aucune incoherence factuelle interlangue » — conclusion exacte et insuffisante. Detectes uniquement a la relecture demandee apres coup. |
 
 ## pilot
 
