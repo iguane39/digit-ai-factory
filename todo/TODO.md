@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=fdb5cfb235f6 archive=40441f7fe541 · dernier événement: 2026-08-26T06:54:07.077Z -->
+     sceaux: actifs=72bcde327f06 archive=40441f7fe541 · dernier événement: 2026-08-26T06:56:54.975Z -->
 
-**185 actifs** (candidat 5 · décidé 2 · en cours 0 · corrigé 171 · écarté 7) · **469 archivés**.
+**187 actifs** (candidat 7 · décidé 2 · en cours 0 · corrigé 171 · écarté 7) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -12,9 +12,11 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0649 | candidat | 20 | Une regle de socle sans porteur mecanique se viole en silence | **oui** — 29 archives Old/ et 1 .pyc suivis par git ; regle de socle en prose sans aucun point d'application |
+| TF-0655 | candidat | 20 | Le carnet des « Ecarts assumes » est prescrit et son emplacement n'existe pas | **oui** — emplacement deduit faute de definition ; chaque produit en inventera un autre, ecarts irrelevables |
 | TF-0647 | candidat | 12.5 | Le socle documentaire declare sa propre verifiabilite et rien ne l'exerce | **oui** — 7 fiches sur 8 en gabarit apres 5 runs et une MEP ; 137 marqueurs ; 2 vues HTML generees depuis du vide |
 | TF-0648 | candidat | 10 | Un oracle dont l'echec d'environnement est indiscernable d'un defaut | **oui** — diagnostic subi sur un stderr vide ; controle rapporte « ni passe ni echoue », verdict inconsommable |
 | TF-0650 | candidat | 10 | Un controle de detection sans exemption declaree s'apprend a etre ignore | **oui** — 16 signalements sur 38 ne doivent pas etre corriges — 42 % de bruit structurel et permanent |
+| TF-0654 | candidat | 10 | La sonde d'heritage suppose que la racine web est la racine du depot | **oui** — 2 manques sur 2 restants sont des faux positifs ; appliquer le travail creerait 2 fichiers morts |
 | TF-0651 | candidat | 6.3 | La route MEP n'a pas de variante deploiement continu, et l'infrastructure n'a ni description ni reverification | **oui** — MEP pipelinee et verifiee mais hors route ; 4 domaines et toute l'infra sans declaration ni reverification |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
 | TF-0526 | corrige | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
