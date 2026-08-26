@@ -39,6 +39,9 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  confronter as confronterBaseline, ecrire as ecrireBaseline, lire as lireBaseline,
+} from "./lib-baseline-recettes.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 
@@ -84,10 +87,14 @@ for (const nom of oracles) {
     : [join(ICI, dedie), []];
   const r = spawnSync(process.execPath, [cmd, ...args], { encoding: "utf8" });
   const lignes = (r.stdout || "").split("\n").filter((l) => l.trim());
+  // `detail` est tronqué pour l'affichage ; `resume` garde la ligne ENTIÈRE. Lire un compte de
+  // cas dans une chaîne coupée à 72 caractères reviendrait à mesurer la mise en page.
+  const resume = lignes[lignes.length - 1] || r.stderr?.split("\n")[0] || "aucune sortie";
   resultats.push({
     nom,
     statut: r.status === 0 ? "OK" : "ECHEC",
-    detail: (lignes[lignes.length - 1] || r.stderr?.split("\n")[0] || "aucune sortie").slice(0, 72),
+    detail: resume.slice(0, 72),
+    resume,
     via: interne ? "--self-test" : dedie,
   });
 }
@@ -128,10 +135,12 @@ for (const zone of zonesTests) {
   for (const nom of fichiers) {
     const r = spawnSync(process.execPath, [join(RACINE, zone, nom)], { encoding: "utf8" });
     const lignes = (r.stdout || "").trim().split("\n").filter((l) => l.trim());
+    const resume = lignes[lignes.length - 1] || r.stderr?.split("\n")[0] || "aucune sortie";
     resultats.push({
       nom: `${zone}/${nom}`,
       statut: r.status === 0 ? "OK" : "ECHEC",
-      detail: (lignes[lignes.length - 1] || r.stderr?.split("\n")[0] || "aucune sortie").slice(0, 72),
+      detail: resume.slice(0, 72),
+      resume,
       via: "I2 (fichier de test du dépôt)",
     });
   }
@@ -273,11 +282,50 @@ for (const r of resultats) {
   const marque = r.statut === "OK" ? "OK    " : r.statut === "ECHEC" ? "ECHEC " : "MANQUE";
   console.log(`  [${marque}] ${r.nom.padEnd(32)} ${r.detail}`);
 }
+// ── I5 — LE CLIQUET DU NOMBRE DE CAS (TF-0681) ───────────────────────────────────────────────
+//
+// Le 26/08, un fichier de recette a été ÉCRASÉ et ONZE CAS ont disparu. Ce harnais a rendu tout
+// vert : il joue le fichier, lit sa ligne de résumé, compte un OK — et le compte est AUTO-DÉCLARÉ,
+// donc rien ne sait ce qu'il valait la veille. *Un dépôt qui se mesure par des recettes est
+// aveugle à la disparition de ses recettes.*
+//
+// Une HAUSSE inscrit la nouvelle valeur : c'est un cliquet, rien n'est perdu en montant, et
+// exiger un geste humain par cas ajouté produirait une friction dont on se débarrasse en
+// désactivant le contrôle. Une BAISSE échoue — retirer un cas devient un geste ÉCRIT.
+const jour = new Date().toISOString().slice(0, 10);
+const CHEMIN_BASELINE = join(ICI, "baseline-recettes.json");
+const bilan = confronterBaseline(resultats, lireBaseline(CHEMIN_BASELINE), jour);
+const APPLIQUER = process.argv.includes("--appliquer");
+
+if (bilan.nonLus.length) {
+  // Une recette dont le résumé ne porte aucun compte lisible sortirait du cliquet EN SILENCE.
+  // Elle est nommée : le silence d'une sonde n'est pas un verdict.
+  console.log(`  [NON JUGÉ] ${bilan.nonLus.length} recette(s) sans compte lisible dans leur `
+    + `résumé : ${bilan.nonLus.slice(0, 4).join(", ")}${bilan.nonLus.length > 4 ? "…" : ""}`);
+}
+for (const m of bilan.montees) {
+  console.log(`  [CLIQUET] ${m.nom} : ${m.avant === null ? "première mesure" : `${m.avant} →`} ${m.vu} cas`);
+}
+for (const b of bilan.baisses) {
+  console.error(`  [CAS PERDUS] ${b.nom} : ${b.avant} → ${b.vu} cas, ${b.perdus} DISPARU(S). `
+    + "Une recette qui perd des cas rend un harnais vert — retirer un cas est un geste ÉCRIT : "
+    + "rejouer avec `--appliquer` après avoir dit POURQUOI, ou restaurer les cas.");
+}
+if (bilan.montees.length && !bilan.baisses.length) ecrireBaseline(CHEMIN_BASELINE, bilan.baseline);
+if (bilan.baisses.length && APPLIQUER) {
+  const accepte = { ...bilan.baseline };
+  for (const b of bilan.baisses) accepte[b.nom] = { cas: b.vu, vu_le: jour, baisse_acceptee_le: jour };
+  ecrireBaseline(CHEMIN_BASELINE, accepte);
+  console.log(`  [CLIQUET] ${bilan.baisses.length} baisse(s) ACCEPTÉE(S) et datée(s) par --appliquer`);
+}
+
 const echecs = resultats.filter((r) => r.statut !== "OK");
+const perdus = APPLIQUER ? [] : bilan.baisses;
 console.log("=".repeat(78));
 console.log(
-  echecs.length
-    ? `  ${echecs.length}/${resultats.length} oracle(s) en défaut : ${echecs.map((r) => r.nom).join(", ")}`
-    : `  ${resultats.length}/${resultats.length} recettes jouées et vertes (oracles, fichiers de test du dépôt, état du parc — I1, I2 et I4)`,
+  echecs.length || perdus.length
+    ? `  ${echecs.length}/${resultats.length} oracle(s) en défaut${echecs.length ? ` : ${echecs.map((r) => r.nom).join(", ")}` : ""}`
+      + `${perdus.length ? ` · ${perdus.length} recette(s) ont PERDU des cas` : ""}`
+    : `  ${resultats.length}/${resultats.length} recettes jouées et vertes (oracles, fichiers de test du dépôt, état du parc — I1, I2 et I4) · cliquet des cas tenu (I5)`,
 );
-process.exit(echecs.length ? 1 : 0);
+process.exit(echecs.length || perdus.length ? 1 : 0);
