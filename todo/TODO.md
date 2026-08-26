@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=5fbad88c1159 archive=40441f7fe541 · dernier événement: 2026-08-26T06:28:42.210Z -->
+     sceaux: actifs=fdb5cfb235f6 archive=40441f7fe541 · dernier événement: 2026-08-26T06:54:07.077Z -->
 
-**178 actifs** (candidat 0 · décidé 3 · en cours 0 · corrigé 168 · écarté 7) · **469 archivés**.
+**185 actifs** (candidat 5 · décidé 2 · en cours 0 · corrigé 171 · écarté 7) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,6 +11,11 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0649 | candidat | 20 | Une regle de socle sans porteur mecanique se viole en silence | **oui** — 29 archives Old/ et 1 .pyc suivis par git ; regle de socle en prose sans aucun point d'application |
+| TF-0647 | candidat | 12.5 | Le socle documentaire declare sa propre verifiabilite et rien ne l'exerce | **oui** — 7 fiches sur 8 en gabarit apres 5 runs et une MEP ; 137 marqueurs ; 2 vues HTML generees depuis du vide |
+| TF-0648 | candidat | 10 | Un oracle dont l'echec d'environnement est indiscernable d'un defaut | **oui** — diagnostic subi sur un stderr vide ; controle rapporte « ni passe ni echoue », verdict inconsommable |
+| TF-0650 | candidat | 10 | Un controle de detection sans exemption declaree s'apprend a etre ignore | **oui** — 16 signalements sur 38 ne doivent pas etre corriges — 42 % de bruit structurel et permanent |
+| TF-0651 | candidat | 6.3 | La route MEP n'a pas de variante deploiement continu, et l'infrastructure n'a ni description ni reverification | **oui** — MEP pipelinee et verifiee mais hors route ; 4 domaines et toute l'infra sans declaration ni reverification |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
 | TF-0526 | corrige | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
 | TF-0530 | corrige | 25 | pilot : le garde-fou « le pilot n'ecrit pas chez un produit » tenait par DISCIPLINE SEULE, et les classes de defaut du jour n'avaient pas de regle generique | **oui** — un garde-fou non execute est un garde-fou qu'on suit jusqu'au jour ou on ne le suit plus ; et neuf classes de defaut payees le meme jour sans qu'aucune regle generique ne les empeche de revenir ailleurs |
@@ -184,9 +189,10 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0636 | decide | 10 | Le noeud 58 verifie la presence des directives IA, jamais leur exactitude | **oui** — 2 occurrences de « llms » dans le code de la forge, aucune lisant le contenu ; noeud verdict partiel T1 sur l'acces seul |
 | TF-0638 | decide | 6.3 | forge-seo-geo ne porte aucun noeud d'analyse lexicale par langue | **oui** — page allemande : 8 « Gite », 0 « Ferienhaus » ; page italienne sur un mot signifiant « excursions » |
+| TF-0653 | corrige | 20 | Les TROIS tables de synthese de la grille SEO se contredisaient avec la grille qu'elles resument, depuis quinze jours — et c'est ce qu'on lit pour planifier une renumerotation | **oui** — quinze jours de contradiction entre un document et lui-meme, sur les tables qui servent a planifier les evolutions de ce document. Trois tables fausses sur trois, mesurees contre le manifeste. |
 | TF-0476 | corrige | 10 | forge-seo-geo : le noeud 57 accepte un taux de citation sans plan de mesure — le controle « pas de verdict affirmatif sans la donnee nommee » (TF-0264) ne capte que la famille CrUX | **oui** — mesure sur les artefacts reels : noeud_exige_terrain() rend False sur la source du noeud 57 et True sur celle du noeud 31 (predicat litteral "crux") ; la reserve « ne jamais presenter le taux comme une metrique de suivi fiable » compte 1 occurrence dans le referentiel et 0 dans la fiche que l'auditeur remplit. Le cout se paie dans un livrable client remis : la forge a deja produit un rapport d'audit reel, et le service de runs recurrents (cat-seo-05) transformerait ce taux en tendance — sur une grandeur dont la litterature 2026 mesure que la marque explique 1,5 % de la variance |
+| TF-0636 | corrige | 10 | Le noeud 58 verifie la presence des directives IA, jamais leur exactitude | **oui** — 2 occurrences de « llms » dans le code de la forge, aucune lisant le contenu ; noeud verdict partiel T1 sur l'acces seul |
 
 ## digit-ai-forge-tests
 
@@ -234,6 +240,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0641 | corrige | 8.3 | Le glossaire terminologique se constitue par accident, pas par balayage | **oui** — 1 terme au glossaire contre 8 apres balayage ; 3 defauts en production invisibles a 9 controles projet |
 | TF-0642 | corrige | 8.3 | Un glossaire non verifie fait autorite : 3 entrees sur 7 etaient fausses | **oui** — 3 entrees fausses sur 7, toutes datees et sourcees ; 81 remplacements errones evites de justesse |
 | TF-0587 | corrige | 8 | Un mecanisme de redirection choisi sans connaitre sa limite structurelle | **oui** — port 443 ferme non documente ; remede impliquant de recreer les MX de 4 zones |
+| TF-0652 | corrige | 7.5 | Le canal pilot -> produit a ferme une cause en une matinee — et le motif de derogation que je venais d'ecrire etait deja perime a la minute ou je l'ecrivais | **oui** — un motif de derogation faux au present dans un registre en ajout seul, ecrit moins de deux minutes apres la mesure qui le fondait. Cote gain : 9 artefacts installes par le produit en une matinee sur simple depot d'un lot de travaux, la ou six derogations en deux jours n'avaient rien change. |
 | TF-0502 | corrige | 6.7 | Deux derogations a R-45 en UN JOUR, dont une hors anteriorite : la propagation des regles du pilot vers les produits reste le manque, et le mecanisme de derogation est en train de devenir la voie normale | **oui** — mesure le 22/08 sur le registre : 15 candidatures (7 + 5 + 3) n'ont pu entrer que par derogation, sur 3 lots d'un meme produit en 2 jours. Deux evenements `ingestion` portent desormais un champ `derogation` — soit 2 derogations en un seul jour, pour une regle publiee la veille. Le taux est de 3 lots derogeables sur 3 lots recus de ce produit : 100 %, ce qui ne decrit plus une exception mais un regime. |
 | TF-0643 | corrige | 6.7 | Une liste plate de termes ne peut exprimer ni l'exigence de preuve ni la portee | **oui** — ambiguite contractuelle en anglais sur 5 chaines ; 6 langues sur 7 distinguent les deux concepts |
 | TF-0640 | corrige | 5.3 | Rien n'impose de consulter la terminologie avant d'ecrire une traduction | **oui** — correction de 99 occurrences en aval contre une consultation de glossaire en amont ; angle mort partage par tout produit multilingue |
