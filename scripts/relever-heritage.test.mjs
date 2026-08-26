@@ -73,7 +73,7 @@ try {
     att(bon.etat === "conforme", `état « ${bon.etat} » au lieu de conforme`);
     const vieux = etatArtefact(perime, CONTRAT.artefacts[0], pilot);
     att(vieux.etat === "divergent", `état « ${vieux.etat} » au lieu de divergent`);
-    att(vieux.source && vieux.produit && vieux.source !== vieux.produit,
+    att(vieux.empreinte_pilot && vieux.empreinte_produit && vieux.empreinte_pilot !== vieux.empreinte_produit,
       "le divergent ne montre pas les deux empreintes qui le prouvent");
     const rien = etatArtefact(vide, CONTRAT.artefacts[0], pilot);
     att(rien.etat === "absent", `état « ${rien.etat} » au lieu de absent`);

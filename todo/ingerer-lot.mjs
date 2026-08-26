@@ -45,7 +45,7 @@ const archive = join(dirname(registre), "TODO-ARCHIVE.jsonl");
 // CAUSE RÉELLE au lieu de deux hypothèses fausses. Un contrôle qui échoue en silence et un
 // contrôle qui passe sont indiscernables ; c'est le message d'erreur honnête qui les sépare.
 const todoDir = dirname(registre);
-if (!sidecarPath || !existsSync(sidecarPath)) { console.error("usage : ingerer-lot.mjs <sidecar.tf.jsonl> [--registre <TODO.jsonl>] [--sans-fetch] [--derogation \"<motif>\"]"); process.exit(2); }
+if (!sidecarPath || !existsSync(sidecarPath)) { console.error("usage : ingerer-lot.mjs <sidecar.tf.jsonl> [--registre <TODO.jsonl>] [--sans-fetch] [--derogation \"<motif>\" | --derogation-fichier <motif.txt>]"); process.exit(2); }
 
 // ---- dérogation TRACÉE aux règles de FORME du lot (décision humaine du 22/08, option b3) ---
 // Deux lots Produit-05 rédigés AVANT la publication de R-45 restaient hors du registre : la règle
@@ -61,10 +61,39 @@ if (!sidecarPath || !existsSync(sidecarPath)) { console.error("usage : ingerer-l
 // Ce qu'elle exige : un motif ÉCRIT et substantiel, consigné dans l'événement `ingestion` du
 // registre. Une dérogation sans motif est un contournement silencieux ; le seuil de longueur
 // ne mesure aucune qualité, il rend seulement le geste coûteux à poser sans réfléchir.
+//
+// LE MOTIF SE LIT DEPUIS UN FICHIER, ET C'EST LA VOIE SÛRE (TF-0646, 26/08/2026). Un motif passé
+// en ARGUMENT traverse un shell, et un shell N'EST PAS UN TUYAU NEUTRE. Mesuré ce jour, sur ce
+// script même : un motif qui citait `forge/retours/RETOURS-FORGES.md` et `forge/retours/oracle-lot.mjs`
+// entre accents graves a vu bash exécuter les deux comme des substitutions de commande. Elles ont
+// échoué, leur sortie vide a REMPLACÉ les noms, et le registre a reçu « dont  (le gabarit …) et
+// (son juge) » — quatre lots, quatre motifs mutilés, et RIEN ne l'a signalé : le texte restait
+// au-dessus du seuil de longueur, donc plausible.
+//
+// C'EST LA MÊME LEÇON QUE LES MESSAGES DE COMMIT, apprise deux fois : on les écrit dans un fichier
+// et on passe `-F`, précisément pour que le shell ne les relise pas. Le registre mérite au moins
+// autant : ce qu'il consigne est la SEULE trace qui restera d'une dérogation.
+//
+// `--derogation` reste accepté — un motif court et sans caractère spécial n'a pas à changer de
+// forme. Mais dès qu'un motif cite un chemin, une commande ou une variable, `--derogation-fichier`
+// est la voie qui ne peut pas le trahir.
+const iDeroFichier = process.argv.indexOf("--derogation-fichier");
 const iDero = process.argv.indexOf("--derogation");
 const MOTIF_MIN = 30;
 let derogationMotif = null;
-if (iDero > 0) {
+if (iDeroFichier > 0) {
+  const chemin = process.argv[iDeroFichier + 1] || "";
+  if (!chemin || chemin.startsWith("--") || !existsSync(chemin)) {
+    console.error(`[REFUS] --derogation-fichier exige un fichier lisible : « ${chemin || "(rien)"} » introuvable.\n` +
+      "  Écrire le motif dans un fichier, puis passer son chemin — le shell ne le relit jamais.");
+    process.exit(2);
+  }
+  derogationMotif = readFileSync(chemin, "utf8").trim();
+  if (derogationMotif.length < MOTIF_MIN) {
+    console.error(`[REFUS] motif de dérogation trop court (${derogationMotif.length} caractères, minimum ${MOTIF_MIN}).`);
+    process.exit(2);
+  }
+} else if (iDero > 0) {
   derogationMotif = (process.argv[iDero + 1] || "").trim();
   if (!derogationMotif || derogationMotif.startsWith("--")) {
     console.error("[REFUS] --derogation exige un motif écrit : ce qui est dérogé, pourquoi, et sur quelle décision.\n" +

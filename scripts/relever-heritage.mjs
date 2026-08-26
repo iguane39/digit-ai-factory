@@ -88,13 +88,22 @@ export function etatArtefact(dossierProduit, artefact, racinePilot) {
   if (!existsSync(source)) return { etat: "present", note: "source introuvable au pilot — non comparable" };
   const a = empreinteFichier(source, 12);
   const b = empreinteFichier(cible, 12);
-  return a === b ? { etat: "conforme", empreinte: a } : { etat: "divergent", source: a, produit: b };
+  // LES EMPREINTES NE S'APPELLENT PLUS `source` ET `produit` (TF-0645, 26/08). Le contrat
+  // `HERITAGE.json` donne a `source` un sens PRECIS : le CHEMIN de l'artefact chez le pilot.
+  // Ce retour l'ecrasait par une EMPREINTE, et le releve perdait le chemin en route — si bien
+  // que `emettre-travaux.mjs` le REFABRIQUAIT par chirurgie de chaine sur la cible, avec deux
+  // cas particuliers rustines a la main. Un champ qui porte deux sens dans deux fichiers voisins
+  // ne se documente pas : il se renomme.
+  return a === b ? { etat: "conforme", empreinte: a } : { etat: "divergent", empreinte_pilot: a, empreinte_produit: b };
 }
 
 export function relever(base, contrat, racinePilot) {
   return produitsDuParc(base).map((dossier) => {
     const artefacts = contrat.artefacts.map((a) => ({
-      cible: a.cible, mode: a.mode, ...etatArtefact(dossier, a, racinePilot),
+      // `source` est PORTE jusqu'ici, tel que le contrat l'ecrit : c'est le chemin que le
+      // consommateur doit citer, et le deduire de la cible est faux des que les deux ne se
+      // repondent pas (TF-0645).
+      cible: a.cible, source: a.source, mode: a.mode, ...etatArtefact(dossier, a, racinePilot),
     }));
     const compte = (e) => artefacts.filter((x) => x.etat === e).length;
     return {

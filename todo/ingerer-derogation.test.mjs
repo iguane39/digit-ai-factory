@@ -125,6 +125,38 @@ check("borne — sans dérogation et lot conforme : le chemin normal reste incha
   if (ing?.derogation) throw new Error("une ingestion normale porte une dérogation");
 });
 
+// ---- LE MOTIF LU DEPUIS UN FICHIER (TF-0646, 26/08) -----------------------------------------
+//
+// POURQUOI CETTE VOIE EXISTE, et elle a été payée le jour même : un motif passé en ARGUMENT
+// traverse un shell, et un shell n'est pas un tuyau neutre. Un motif citant deux chemins entre
+// accents graves a vu bash les exécuter comme des substitutions de commande ; leur sortie vide a
+// REMPLACÉ les noms, et QUATRE lots ont reçu un motif mutilé sans que rien ne le signale — le
+// texte restait au-dessus du seuil de longueur, donc plausible.
+//
+// Le cas ci-dessous emploie exactement le motif qui a été trahi. Il ne prouve pas que le shell
+// abîme (le shell n'est pas dans la boucle ici) : il prouve que cette voie REND le motif tel
+// quel, accents graves compris — c'est-à-dire qu'elle retire le shell du chemin.
+check("le motif lu depuis un FICHIER arrive intact, accents graves compris", () => {
+  const motif = "Décision humaine du 26/08 : la cause est fermée dans le même geste — "
+    + "`forge/retours/RETOURS-FORGES.md` (le gabarit) et `forge/retours/oracle-lot.mjs` (son juge) "
+    + "sont confiés au produit par un lot de travaux.";
+  const fichierMotif = join(T, "motif-derogation.txt");
+  writeFileSync(fichierMotif, motif, "utf8");
+  const r = ingerer({ nomLot: "PROD - RETOURS - 20260826a", args: ["--derogation-fichier", fichierMotif], md: LOT_NU });
+  if (r.code !== 0) throw new Error(`exit ${r.code} : ${r.sortie.slice(0, 300)}`);
+  const ing = evenements(r).find((e) => e.ev === "ingestion");
+  if (!ing?.derogation) throw new Error("aucune dérogation consignée alors que le lot est nu");
+  if (ing.derogation.motif !== motif) throw new Error("le motif consigné DIFFÈRE du fichier lu");
+  if (!ing.derogation.motif.includes("`forge/retours/oracle-lot.mjs`"))
+    throw new Error("les chemins entre accents graves n'ont pas survécu — c'est le défaut même que cette voie retire");
+});
+
+check("borne — --derogation-fichier sur un fichier absent REFUSE, il ne déroge pas en silence", () => {
+  const r = ingerer({ nomLot: "PROD - RETOURS - 20260826b", args: ["--derogation-fichier", join(T, "nexiste-pas.txt")], md: LOT_NU });
+  if (r.code !== 2) throw new Error(`exit ${r.code} attendu 2 — un motif introuvable doit refuser`);
+  if (!/introuvable/.test(r.sortie)) throw new Error("le refus ne dit pas que le fichier de motif est introuvable");
+});
+
 rmSync(T, { recursive: true, force: true });
 console.log(`\nDérogation tracée (b3) : ${pass} PASS, ${fail} FAIL`);
 if (!existsSync(OUTIL)) console.error("outil introuvable");

@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=d2995b28606a archive=40441f7fe541 · dernier événement: 2026-08-25T19:58:15.397Z -->
+     sceaux: actifs=40afaadc3e5e archive=40441f7fe541 · dernier événement: 2026-08-26T05:46:14.784Z -->
 
-**166 actifs** (candidat 0 · décidé 1 · en cours 0 · corrigé 158 · écarté 7) · **469 archivés**.
+**178 actifs** (candidat 9 · décidé 1 · en cours 0 · corrigé 161 · écarté 7) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,6 +11,13 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0637 | candidat | 12.5 | Une recherche a fonde une recommandation sur une source unique au biais indecelable | **oui** — recommandation inverse evitee de justesse ; homographe italien detecte en repondant a l'exploitant, pas en menant la recherche |
+| TF-0639 | candidat | 12.5 | La connaissance terminologique n'a nulle part ou vivre dans un projet multilingue | **oui** — 99 occurrences d'un faux ami dans un seul fichier de langue, invisibles aux 3 controles existants |
+| TF-0644 | candidat | 10 | Aucun controle ne confronte les nombres du texte a la source de verite | **oui** — « 8 gites » contre 5 declares, dans 7 langues, parti en production sous 9 controles |
+| TF-0641 | candidat | 8.3 | Le glossaire terminologique se constitue par accident, pas par balayage | **oui** — 1 terme au glossaire contre 8 apres balayage ; 3 defauts en production invisibles a 9 controles projet |
+| TF-0642 | candidat | 8.3 | Un glossaire non verifie fait autorite : 3 entrees sur 7 etaient fausses | **oui** — 3 entrees fausses sur 7, toutes datees et sourcees ; 81 remplacements errones evites de justesse |
+| TF-0643 | candidat | 6.7 | Une liste plate de termes ne peut exprimer ni l'exigence de preuve ni la portee | **oui** — ambiguite contractuelle en anglais sur 5 chaines ; 6 langues sur 7 distinguent les deux concepts |
+| TF-0640 | candidat | 5.3 | Rien n'impose de consulter la terminologie avant d'ecrire une traduction | **oui** — correction de 99 occurrences en aval contre une consultation de glossaire en amont ; angle mort partage par tout produit multilingue |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
 | TF-0526 | corrige | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
 | TF-0530 | corrige | 25 | pilot : le garde-fou « le pilot n'ecrit pas chez un produit » tenait par DISCIPLINE SEULE, et les classes de defaut du jour n'avaient pas de regle generique | **oui** — un garde-fou non execute est un garde-fou qu'on suit jusqu'au jour ou on ne le suit plus ; et neuf classes de defaut payees le meme jour sans qu'aucune regle generique ne les empeche de revenir ailleurs |
@@ -184,6 +191,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0636 | candidat | 10 | Le noeud 58 verifie la presence des directives IA, jamais leur exactitude | **oui** — 2 occurrences de « llms » dans le code de la forge, aucune lisant le contenu ; noeud verdict partiel T1 sur l'acces seul |
+| TF-0638 | candidat | 6.3 | forge-seo-geo ne porte aucun noeud d'analyse lexicale par langue | **oui** — page allemande : 8 « Gite », 0 « Ferienhaus » ; page italienne sur un mot signifiant « excursions » |
 | TF-0476 | corrige | 10 | forge-seo-geo : le noeud 57 accepte un taux de citation sans plan de mesure — le controle « pas de verdict affirmatif sans la donnee nommee » (TF-0264) ne capte que la famille CrUX | **oui** — mesure sur les artefacts reels : noeud_exige_terrain() rend False sur la source du noeud 57 et True sur celle du noeud 31 (predicat litteral "crux") ; la reserve « ne jamais presenter le taux comme une metrique de suivi fiable » compte 1 occurrence dans le referentiel et 0 dans la fiche que l'auditeur remplit. Le cout se paie dans un livrable client remis : la forge a deja produit un rapport d'audit reel, et le service de runs recurrents (cat-seo-05) transformerait ce taux en tendance — sur une grandeur dont la litterature 2026 mesure que la marque explique 1,5 % de la variance |
 
 ## digit-ai-forge-tests
@@ -214,7 +223,10 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0606 | corrige | 25 | pilot : un refus d OUTIL a ete pris pour une absence de CAPACITE, et le blocage rapporte comme un fait sur le monde — « je ne peux pas deployer » alors que le jeton etait sur le disque, a un emplacement nomme dans un document deja charge en contexte | **oui** — Mise en production rendue a l humain a tort, avec une consigne d action inutile (railway login) ; deblocage en trois minutes une fois le signalement recu. Le travail etait fini, seul le rapport etait faux. |
 | TF-0632 | corrige | 25 | La taille en octets a servi de preuve d'identite entre deux fichiers | **oui** — regression atteignant la production ; logo a ratio de contraste 1,0 dans le bandeau de navigation |
 | TF-0634 | corrige | 25 | Le garde-fou anti-collision inter-sessions n'avait JAMAIS tourne : une variable enfermee dans le bloc du preflight, une erreur avalee par un catch, et trois cas de recette qui ne lisaient pas la seule sortie du controle | **oui** — la fenetre que ce controle existe pour raccourcir a ete payee TROIS FOIS, dont deux le 22/08 (cinq candidatures renumerotees le matin, un TF-0514 frappe pendant qu'une autre session publiait le sien le soir) — et le controle cense la voir n'a jamais tourne. Une seconde session tournait sur une autre machine au moment de la mesure. |
+| TF-0635 | corrige | 25 | Deux grandeurs comparees sans verifier qu'elles mesurent la meme chose | **oui** — affirmation fausse livree a l'exploitant + accusation infondee portee contre forge-seo-geo + 1 aller-retour |
 | TF-0590 | corrige | 20 | Un README de dossier reste PERIME apres regeneration : fins de ligne MIXTES dans le meme fichier, et le harnais tombe a 54/55 sans qu'aucune action ne le repare | **oui** — mesure le 25/08 : le harnais du pilot passe de 55/55 a 54/55 et n'en bouge plus — trois regenerations, trois fois le meme FAIL, un diff vide a chaque fois. Aucune action disponible ne le repare, ce qui est la definition d'un rouge qu'on apprend a ignorer. |
+| TF-0645 | corrige | 20 | Le lot de travaux confie au produit FABRIQUAIT le chemin source par chirurgie de chaine sur la cible, alors que le contrat le DECLARE — trois chemins sur neuf n'existaient pas | **oui** — trois chemins faux sur neuf dans un lot REELLEMENT depose chez un produit ; verifie par `[ -f ]` sur chacun. Le lot fautif a du etre retire et redepose. |
+| TF-0646 | corrige | 20 | Un motif de derogation passe en ARGUMENT traverse un shell : quatre motifs ont ete mutiles en silence, et rien ne l'a signale parce qu'ils restaient plausibles | **oui** — quatre motifs de derogation mutiles dans le registre, en ajout seul donc non reecrivables ; les deux noms perdus sont ceux des deux artefacts qui fondent la derogation. Le shell a imprime ses deux erreurs et l'ingestion a continue. |
 | TF-0628 | corrige | 16 | La table d'alias qui reconnait un second clone apres renommage ne couvre PAS le pilot — le seul depot renomme deux fois, et celui dont la regle est nee | **oui** — avant/apres sur le parc REEL, meme commande : « mise de cote (PERIME.md present) — ne rien y executer » devient « SECOND CLONE de digit-ai-factory (meme origin) — 169 commit(s) de retard ... Y travailler ecrit dans un registre mort ». Une apparition dans les deux cas, jamais deux. |
 | TF-0630 | corrige | 16 | La SEULE defense du resolveur de pilot contre une copie est un fichier non versionne — et ce fichier a demontrablement disparu une fois en deux jours | **oui** — le marqueur consigne present le 23/08 (TF-0525) etait absent le 25/08, mesure par `ls PERIME.md` avant toute ecriture. Les cinq fichiers de signature sont tous presents dans le clone archive : sans marqueur, il redevient un candidat valide pour `resoudre-pilot.mjs`. |
 | TF-0541 | corrige | 15 | Gabarit de projet : `CLAUDE.md` et `ledger.py` divergent, et le run est épinglé en dur | **oui** — forge/ledger.jsonl absent du disque ; ledger.py ligne 68 run codé en dur ; run 20260815 clos en seq 24 |
