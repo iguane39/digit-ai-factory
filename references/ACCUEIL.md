@@ -76,6 +76,7 @@ Ce tableau **se lit par la colonne de gauche** : on y cherche la phrase qui ress
 | faire évoluer / remédier | run de version | `RUN-VERSION.md` (socle d'abord, delta ensuite, tests en entier) |
 | mandat transverse (data, audit, seo…) | run de mandat — le livrable est un document | `RUN-MANDAT.md` (socle + ledger + oracles du domaine ; ni conception, ni design, ni MEP) |
 | obtenir un conseil (problématique de charge/perf/coûts, CDC ou architecture à instruire, lotissement, ROI, plan de migration) | run de conseil — le livrable est une trajectoire multi-lots | `RUN-CONSEIL.md` (l'existant orchestré C1→C5 ; `oracle-livrable-conseil.mjs` sur diagnostic et démarche ROI ; chaque lot GO sort comme entrant de build) |
+| traduire un produit dans N langues, ou auditer ses traductions | chaîne déclarée — séquence ordonnée, chaque étape avec son oracle et son **critère de blocage** | `CHAINE-TRADUCTION.md` (A1–A11 et B ; A9 *relecture native déclarée* est ABSENTE et **bloque la remise** — le filet mécanique va avant le locuteur natif, jamais à sa place) |
 | tester et corriger | cycle forge-tests | CLI `forge_tests` (--json --sortie ; --generer/--livrables HORS projet, G-1) ; boucle bornée 3 cycles, G-2 absolue |
 | revoir le design rendu | revue aval (étape 5 bis) | oracles design + `render_page.py` — le rendu se juge en pixels |
 | déployer | étape MEP | `ETAPE-MEP.md`, forge-ops O-1…O-5, GO humain sur dossier de preuve |

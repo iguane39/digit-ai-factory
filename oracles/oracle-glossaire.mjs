@@ -64,6 +64,15 @@ const DATE_ISO = /^\d{4}-\d{2}-\d{2}$/;
 /** Les colonnes attendues du tableau d'un terme, dans l'ordre où le gabarit les pose. */
 const COLONNES = ["locale", "retenu", "proscrits", "portee", "preuve", "verifie_le"];
 
+/**
+ * `genre` est une SEPTIEME colonne, OPTIONNELLE (TF-0660). Un glossaire ecrit avant le 26/08
+ * n'en porte pas, et il reste parfaitement valide : la regle a bouge, pas le depot. Ce qui est
+ * refuse, c'est une valeur ecrite au hasard — un genre faux est pire qu'un genre absent, parce
+ * qu'un controle s'appuiera dessus pour accuser.
+ */
+const COLONNE_GENRE = "genre";
+const GENRES = ["m", "f", "n", "invariable"];
+
 /** Découpe un texte en TERMES : une section `##` qui porte un champ `categorie`. */
 export function termesDe(texte) {
   const lignes = texte.split(/\r?\n/);
@@ -83,10 +92,15 @@ export function termesDe(texte) {
     // Une ligne de tableau : `| a | b | … |`. L'en-tête et le séparateur sont écartés.
     if (/^\s*\|/.test(brute)) {
       const cellules = brute.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
-      if (cellules.length !== COLONNES.length) return { erreurColonnes: { terme: courant.nom, vu: cellules.length, brute } };
+      // SIX colonnes, ou SEPT avec `genre`. Toute autre largeur rend le tableau illisible et
+      // AUCUNE ligne n'est jugee — on ne devine pas quelle colonne manque.
+      if (cellules.length !== COLONNES.length && cellules.length !== COLONNES.length + 1)
+        return { erreurColonnes: { terme: courant.nom, vu: cellules.length, brute } };
       if (cellules[0].toLowerCase() === "locale") continue;             // en-tête
       if (/^-{2,}$/.test(cellules[0].replace(/[:\s]/g, ""))) continue;  // séparateur
-      courant.lignes.push(Object.fromEntries(COLONNES.map((c, i) => [c, cellules[i]])));
+      const ligne = Object.fromEntries(COLONNES.map((c, i) => [c, cellules[i]]));
+      if (cellules.length === COLONNES.length + 1) ligne[COLONNE_GENRE] = cellules[COLONNES.length];
+      courant.lignes.push(ligne);
     }
   }
   if (courant) termes.push(courant);
@@ -226,6 +240,26 @@ export function juger(texte) {
       message: "aucune ligne ne porte de terme proscrit entre accents graves — la contradiction interne n'est pas jugeable ici. "
         + "Un mot proscrit s'écrit `ainsi` : c'est ce qui le distingue de la glose qui l'explique" });
     else ok("G6", `${jugeables.length} ligne(s) à proscription explicite, aucun terme retenu n'y figure`);
+
+    // G8 — un GENRE déclaré appartient au vocabulaire fermé (TF-0660)
+    //
+    // La colonne `genre` est OPTIONNELLE : une ligne sans elle n'est pas en défaut, et un
+    // glossaire antérieur au 26/08 n'en porte aucune. C'est la règle qui a bougé, pas le dépôt.
+    //
+    // CE QUI EST REFUSÉ, c'est une valeur écrite au hasard — `masculin`, `M.`, `le`. Un genre
+    // FAUX est pire qu'un genre ABSENT : absent, le contrôle d'accord se tait ; faux, il accuse
+    // des phrases justes en s'appuyant dessus. C'est la même doctrine que `categorie`, dont le
+    // jeu fermé existe parce qu'une valeur libre ne se contrôle pas.
+    const avecGenre = toutesLignes.filter((l) => (l.genre || "").trim());
+    const genresFaux = avecGenre.filter((l) => !GENRES.includes(l.genre.trim().toLowerCase()));
+    if (genresFaux.length) ko("G8", `${genresFaux.length} ligne(s) dont le \`genre\` n'est pas dans le jeu fermé ` +
+      `(${GENRES.join(", ")}) — un genre FAUX est pire qu'un genre ABSENT : absent, le contrôle d'accord se tait ; ` +
+      "faux, il accuse des phrases justes en s'appuyant dessus",
+      genresFaux.map((l) => `${l.terme}/${l.locale} → « ${l.genre} »`).join(" · "));
+    else if (!avecGenre.length) findings.push({ regle: "G8", statut: "SANS_OBJET",
+      message: "aucune ligne ne déclare de `genre` — la colonne est OPTIONNELLE (TF-0660) et son absence n'est pas un défaut. "
+        + "Conséquence à connaître : le contrôle d'accord de forge-tests n'a rien à lire ici, et se taira" });
+    else ok("G8", `${avecGenre.length} ligne(s) déclarent un genre, toutes dans le jeu fermé`);
   }
   return findings;
 }
@@ -264,6 +298,15 @@ verifie_le: 2026-08-26
 | fr | gîte | aucun | partout | catalogue servi · \`curl -s 'https://exemple/complete?hl=fr&q=gite'\` | 2026-08-26 |
 | it | casa vacanze | \`gite\` — homographe au sens opposé | partout | \`curl -s 'https://exemple/complete?hl=it&q=gite'\` · absence d'article interlangue | 2026-08-26 |
 
+## piscine
+
+- **categorie** : contractuel
+- **pivot** : piscine
+
+| locale | retenu | proscrits | portee | preuve | verifie_le | genre |
+|---|---|---|---|---|---|---|
+| es | piscina cubierta | aucun | partout | catalogue servi | 2026-08-26 | f |
+
 ## caution
 
 - **categorie** : contractuel
@@ -294,7 +337,9 @@ verifie_le: 2026-08-26
     .replace("| en | security deposit | \`deposit\` seul — ambigu | ambigu si la page parle aussi de l'acompte | catalogue servi | 2026-08-26 |",
              "| en |  | — | — | catalogue servi | 2026-08-26 |")                                   // G2 et G3
     .replace("| de | Hallenbad | \`Pool\` — employé dans un title quand le catalogue dit Hallenbad | partout | comptage sur le catalogue servi · \`curl -s 'https://exemple/complete?hl=de&q=hallenbad'\` | 2026-08-26 |",
-             "| de | Hallenbad | \`Pool\` — employé dans un title | partout | comptage sur le catalogue servi | 2026-08-26 |");  // G5
+             "| de | Hallenbad | \`Pool\` — employé dans un title | partout | comptage sur le catalogue servi | 2026-08-26 |")
+    .replace("| es | piscina cubierta | aucun | partout | catalogue servi | 2026-08-26 | f |",
+             "| es | piscina cubierta | aucun | partout | catalogue servi | 2026-08-26 | feminin |");  // G8
   const horsChamp = "---\nrole: une note quelconque\n---\n\n## un titre\n\ndu texte.\n";
   writeFileSync(join(dir, "verte.md"), verte, "utf8");
   writeFileSync(join(dir, "rouge.md"), rouge, "utf8");
@@ -305,13 +350,13 @@ verifie_le: 2026-08-26
   const casse = [];
   if (rv.status !== 0) casse.push("la fixture VERTE ne passe pas : " + rv.stdout.slice(0, 400));
   if (rr.status !== 1) casse.push("la fixture ROUGE ne FAIL pas");
-  else for (const regle of ["G1", "G2", "G3", "G4", "G5", "G6", "G7"]) {
+  else for (const regle of ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8"]) {
     if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
   }
   // LA BORNE A SON PROPRE CAS : sans elle, l'oracle accuserait tout document du dépôt.
   if (!/"SANS_OBJET"/.test(rh.stdout)) casse.push("un fichier hors champ n'est pas déclaré SANS_OBJET — la règle s'invente une cible");
   console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test glossaire : 8/8 PASS (verte PASS ; rouge FAIL sur G1 catégorie hors jeu, G2 retenu vide, G3 aveu absent, G4 date non ISO, G5 sonde unique, G6 retenu proscrit, G7 preuve non rejouable ; hors champ SANS_OBJET)");
+    : "Self-test glossaire : 9/9 PASS (verte PASS ; rouge FAIL sur G1 catégorie hors jeu, G2 retenu vide, G3 aveu absent, G4 date non ISO, G5 sonde unique, G6 retenu proscrit, G7 preuve non rejouable, G8 genre hors jeu ferme ; hors champ SANS_OBJET)");
   process.exit(casse.length ? 1 : 0);
 }
 
