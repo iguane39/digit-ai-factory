@@ -229,6 +229,56 @@ export function juger(racine) {
     + "un oracle a échoué sur un navigateur impossible à lancer, avec un stderr VIDE, et le contrôle a dû être "
     + "rapporté « ni passé ni échoué » — un verdict qu'aucune étape ne sait consommer (TF-0648)");
 
+  // ---- CI4 : une RECETTE l'exerce-t-elle ? (TF-0679, 26/08/2026) --------------------------
+  //
+  // CI1 demande « quelqu'un le cite-t-il ? ». CI4 demande AUTRE CHOSE, et l'écart entre les deux
+  // est exactement là où ce défaut vit : un contrôle peut être INVOQUÉ — par une chaîne
+  // d'intégration, par une commande de la documentation — et n'être joué par AUCUNE RECETTE.
+  // Il pourrit alors sans bruit.
+  //
+  // LE FAIT. Deux scripts d'audit portaient TROIS défauts dormants, tous antérieurs au chantier
+  // qui les a découverts : ils pilotaient un panneau retiré de la page depuis longtemps, donc ils
+  // levaient une exception AVANT d'avoir rendu leur verdict ; leur liste de pages nommait en
+  // français des pages à identifiants localisés, soit dix codes 404 à chaque exécution, un bruit
+  // qui noyait les vrais constats ; et un hôte tiers était compté comme panne réseau à chaque
+  // audit local, donc l'oracle criait toujours. Un contrôle qui crie toujours ne dit plus rien.
+  //
+  // MESURE D'ENTRÉE, et elle a décidé de la publication : sur ce dépôt, 0 contrôle sur 39 est
+  // sans recette — l'invariant I1 le tient déjà. Sur le produit d'où vient le constat :
+  // **26 contrôles, ZÉRO recette**, dont les deux scripts du fait fondateur. La règle ne mesure
+  // donc pas l'écart à son auteur : elle est muette là où la discipline existe, et elle mord là
+  // où le défaut a réellement coûté.
+  // CE QUI COMPTE COMME RECETTE se lit SUR LE DÉPÔT, jamais sur une convention choisie ici.
+  // Premier jet : `EST_UN_TEST`, qui ne reconnaît que `*.test.mjs` parce que CI1 s'en sert pour
+  // EXCLURE les tests de la liste des contrôles. Résultat mesuré : `oracle-ecosysteme.mjs`
+  // accusé de n'avoir aucune recette alors que `self-test-ecosysteme.mjs` le joue dans les deux
+  // sens et le nomme à sa ligne 17. *Une règle qui impose une forme que le dépôt n'emploie pas
+  // mesure l'écart à son auteur.* Le motif retenu est celui du harnais lui-même, qui est
+  // l'autorité sur ce que ce dépôt appelle une recette.
+  const EST_UNE_RECETTE = (p) => {
+    const n = basename(p);
+    return /\.test\.(mjs|cjs|js|ts|py)$/i.test(n) || /^(self-test|test_)/i.test(n)
+      || /[\\/]tests?[\\/]/i.test(p);
+  };
+  const recettes = tous.filter((p) => EXT.test(p) && EST_UNE_RECETTE(p));
+  const textesRecettes = recettes.map((p) => textes.get(p) || "").filter(Boolean);
+  const exerce = (p) => {
+    const nom = basename(p);
+    const sansExt = nom.replace(EXT, "");
+    if (textesRecettes.some((t) => t.includes(nom) || t.includes(sansExt))) return true;
+    // Un contrôle qui porte sa propre recette interne s'exerce lui-même : c'est la forme que ce
+    // dépôt emploie pour ses oracles, et l'ignorer accuserait la discipline qu'on veut répandre.
+    return (textes.get(p) || "").includes('"--self-test"');
+  };
+  const nus = controles.filter((p) => !exerce(p));
+  if (!nus.length) ok("CI4", `les ${controles.length} contrôle(s) sont exercés par une recette, ou portent la leur`);
+  else ko("CI4", `${nus.length} contrôle(s) sur ${controles.length} qu'AUCUNE recette n'exerce : `
+    + `${nus.slice(0, 8).map(rel).join(", ")}${nus.length > 8 ? `, +${nus.length - 8}` : ""}. `
+    + "Être cité (CI1) n'est pas être joué : un contrôle invoqué par une chaîne d'intégration mais "
+    + "qu'aucune recette n'exerce POURRIT SANS QUE RIEN NE LE SIGNALE — sélecteur disparu de la "
+    + "page, liste d'URL périmée, hôte tiers compté comme panne. Mesuré : deux scripts d'audit "
+    + "portant TROIS défauts dormants, dont un qui les faisait échouer AVANT tout verdict (TF-0679)");
+
   return { verdict: F.some((f) => f.statut === "FAIL") ? "FAIL" : "PASS", findings: F, controles: controles.length };
 }
 
@@ -238,6 +288,8 @@ export const NON_JUGE = [
   "un chemin cité dans un COMMENTAIRE : le commentaire décrit souvent le défaut pour l'interdire, et accuser la doctrine qui le décrit est la forme la plus sûre de se faire désactiver. Exclusion mesurée : les 2 constats du premier passage sur le pilot étaient tous deux de la prose",
   "les chemins d'outil dans un fichier de TEST : une fixture peut nommer un chemin faux exprès, et l'accuser ferait crier l'oracle sur une recette juste",
   "un contrôle appelé depuis un système d'intégration EXTERNE au dépôt (une tâche planifiée, un pipeline hébergé ailleurs) : la citation n'est pas dans le dépôt, donc invisible ici",
+  "CI4 compte comme EXERCÉ un contrôle que le harnais joue sur le parc réel. C'est défendable — cela aurait attrapé le défaut fondateur, un script qui levait une exception AVANT tout verdict — mais cela prouve seulement qu'il NE SE CASSE PAS, jamais qu'il sait ÉCHOUER quand il le doit. La preuve du double sens est l'objet de l'invariant I1, pas de cette règle",
+  "CI4 ne dit pas si la recette qui exerce un contrôle le fait BIEN : elle peut le nommer sans jouer son sens rouge. Le compte de cas d'une recette, lui, est tenu par le cliquet de `lib-baseline-recettes.mjs` (TF-0681) — un autre dispositif, sur un autre objet",
 ];
 
 // ---- CLI --------------------------------------------------------------------------------------

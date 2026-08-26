@@ -156,6 +156,55 @@ try {
     att(regle(r, "CI3").statut === "PASS", "un oracle sans dépendance externe est accusé alors qu'il l'a DIT");
   });
 
+  // ---- CI4 : être CITÉ n'est pas être JOUÉ (TF-0679) -------------------------------------
+  //
+  // Deux scripts d'audit portaient TROIS défauts dormants : ils pilotaient un panneau retiré de
+  // la page — donc ils levaient une exception AVANT tout verdict —, leur liste de pages nommait
+  // en français des pages à identifiants localisés — dix codes 404 par exécution —, et un hôte
+  // tiers comptait comme panne réseau à chaque audit local. Un contrôle qui crie toujours ne dit
+  // plus rien. Ils étaient CITÉS par la chaîne d'intégration, donc CI1 les trouvait joignables.
+
+  check("CI4 rouge — un contrôle cité par la chaîne d'intégration mais qu'AUCUNE recette n'exerce", () => {
+    const r = juger(depot({
+      "build/check-pages.mjs": "// exit 0/1/2\nprocess.exit(0);\n",
+      ".github/ci.yml": "run: node build/check-pages.mjs",
+    }));
+    att(regle(r, "CI1").statut === "PASS", "le contrôle devrait être CITÉ — sinon CI4 ne prouve rien de neuf");
+    att(regle(r, "CI4").statut === "FAIL", "un contrôle sans recette passe pour exercé");
+    att(/check-pages/.test(regle(r, "CI4").message || ""), "le contrôle nu n'est pas NOMMÉ");
+  });
+
+  check("CI4 vert — une recette qui NOMME le contrôle suffit à l'exercer", () => {
+    const r = juger(depot({
+      "build/check-pages.mjs": "// exit 0/1/2\nprocess.exit(0);\n",
+      "tests/check-pages.test.mjs": "import '../build/check-pages.mjs';\n",
+    }));
+    att(regle(r, "CI4").statut === "PASS", `un contrôle avec sa recette est accusé : ${regle(r, "CI4").message}`);
+  });
+
+  check("CI4 vert — la forme MAISON est reconnue : `self-test-<nom>.mjs` et la recette interne", () => {
+    // Premier jet mesuré sur ce dépôt : `oracle-ecosysteme.mjs` accusé de n'avoir aucune recette
+    // alors que `self-test-ecosysteme.mjs` le joue dans les deux sens et le nomme. Une règle qui
+    // impose une forme que le dépôt n'emploie pas mesure l'écart à son auteur.
+    const r = juger(depot({
+      "oracles/oracle-machin.mjs": "// exit 0/1/2\nprocess.exit(0);\n",
+      "oracles/self-test-machin.mjs": "const o = 'oracle-machin.mjs';\n",
+      "oracles/oracle-truc.mjs": '// exit 0/1/2\nif (process.argv.includes("--self-test")) process.exit(0);\n',
+      "p.json": "oracles/oracle-machin.mjs oracles/oracle-truc.mjs",
+    }));
+    att(regle(r, "CI4").statut === "PASS", `la forme maison est rejetée : ${regle(r, "CI4").message}`);
+  });
+
+  check("CI4 BORNE — une RECETTE n'est pas elle-même un contrôle à exercer", () => {
+    // Sans cette borne, chaque recette ajoutée réclamerait sa propre recette, et la règle
+    // exigerait une régression infinie au lieu d'une couverture.
+    const r = juger(depot({
+      "oracles/oracle-x.mjs": '// exit 0/1/2\nif (process.argv.includes("--self-test")) process.exit(0);\n',
+      "oracles/oracle-x.test.mjs": "import './oracle-x.mjs';\n",
+    }));
+    att(regle(r, "CI4").statut === "PASS", "une recette est comptée comme un contrôle à exercer");
+  });
+
   check("aucun contrôle dans le dépôt → SANS_OBJET, jamais un échec", () => {
     const r = juger(depot({ "src/index.mjs": "export const x = 1;\n" }));
     att(r.verdict === "PASS" && regle(r, "CI0").statut === "SANS_OBJET", "un dépôt sans contrôle est mis en défaut");

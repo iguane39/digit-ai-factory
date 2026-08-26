@@ -1,0 +1,238 @@
+{
+ "./bootstrap-parc.test.mjs": {
+  "cas": 7,
+  "vu_le": "2026-08-26"
+ },
+ "./bootstrap.test.mjs": {
+  "cas": 14,
+  "vu_le": "2026-08-26"
+ },
+ "gabarits/oracle-lot-retours.test.mjs": {
+  "cas": 13,
+  "vu_le": "2026-08-26"
+ },
+ "gabarits/oracle-travaux-pilot.test.mjs": {
+  "cas": 14,
+  "vu_le": "2026-08-26"
+ },
+ "hook-produits-intacts.mjs": {
+  "cas": 13,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-adoption-tests.mjs": {
+  "cas": 12,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-boite-entree.mjs": {
+  "cas": 31,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-cadence.mjs": {
+  "cas": 16,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-claude-md.mjs": {
+  "cas": 6,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-conformite-projet.mjs": {
+  "cas": 44,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-constantes-externes.mjs": {
+  "cas": 12,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-controles-injoignables.mjs": {
+  "cas": 15,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-couverture-exigences.mjs": {
+  "cas": 7,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-domaines-declares.mjs": {
+  "cas": 10,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-ecosysteme.mjs": {
+  "cas": 11,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-empreintes.mjs": {
+  "cas": 7,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-etude-opportunite.mjs": {
+  "cas": 2,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-gabarits-documents.mjs": {
+  "cas": 5,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-glossaire.mjs": {
+  "cas": 9,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-insatisfactions.mjs": {
+  "cas": 7,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-integrations.mjs": {
+  "cas": 9,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-livrable-conseil.mjs": {
+  "cas": 4,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-parite-configuration.mjs": {
+  "cas": 18,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-pieges-regex.mjs": {
+  "cas": 19,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-portee-doctrine.mjs": {
+  "cas": 5,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-promesses.mjs": {
+  "cas": 10,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-readme-dossiers.mjs": {
+  "cas": 5,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-recouvrement-controles.mjs": {
+  "cas": 12,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-secrets-hors-perimetre.mjs": {
+  "cas": 13,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-skills.mjs": {
+  "cas": 72,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-sollicitations.mjs": {
+  "cas": 10,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-synthese.mjs": {
+  "cas": 11,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-unicite.mjs": {
+  "cas": 14,
+  "vu_le": "2026-08-26"
+ },
+ "oracle-verdict-visuel.mjs": {
+  "cas": 7,
+  "vu_le": "2026-08-26"
+ },
+ "oracles/hook-restitution.test.mjs": {
+  "cas": 7,
+  "vu_le": "2026-08-26"
+ },
+ "oracles/lib-baseline-recettes.test.mjs": {
+  "cas": 13,
+  "vu_le": "2026-08-26"
+ },
+ "oracles/oracle-controles-injoignables.test.mjs": {
+  "cas": 19,
+  "vu_le": "2026-08-26"
+ },
+ "oracles/oracle-parite-configuration.test.mjs": {
+  "cas": 18,
+  "vu_le": "2026-08-26"
+ },
+ "oracles/resoudre-pilot.test.mjs": {
+  "cas": 9,
+  "vu_le": "2026-08-26"
+ },
+ "outillage-tests-e2e/appels-reels.test.mjs": {
+  "cas": 14,
+  "vu_le": "2026-08-26"
+ },
+ "outillage-tests-e2e/orchestrer-boucle.test.mjs": {
+  "cas": 7,
+  "vu_le": "2026-08-26"
+ },
+ "outillage-tests-e2e/preparer-environnement.test.mjs": {
+  "cas": 8,
+  "vu_le": "2026-08-26"
+ },
+ "scripts/balayer-motifs-numeriques.test.mjs": {
+  "cas": 9,
+  "vu_le": "2026-08-26"
+ },
+ "scripts/readme-dossiers.test.mjs": {
+  "cas": 7,
+  "vu_le": "2026-08-26"
+ },
+ "scripts/relever-heritage.test.mjs": {
+  "cas": 14,
+  "vu_le": "2026-08-26"
+ },
+ "scripts/verifier-bascule.test.mjs": {
+  "cas": 8,
+  "vu_le": "2026-08-26"
+ },
+ "scripts/verifier-jugement.test.mjs": {
+  "cas": 7,
+  "vu_le": "2026-08-26"
+ },
+ "scripts/verifier-secours.test.mjs": {
+  "cas": 7,
+  "vu_le": "2026-08-26"
+ },
+ "todo/emettre-travaux.test.mjs": {
+  "cas": 24,
+  "vu_le": "2026-08-26"
+ },
+ "todo/ingerer-derogation.test.mjs": {
+  "cas": 11,
+  "vu_le": "2026-08-26"
+ },
+ "todo/ingerer-r45.test.mjs": {
+  "cas": 8,
+  "vu_le": "2026-08-26"
+ },
+ "todo/ingerer-r46.test.mjs": {
+  "cas": 7,
+  "vu_le": "2026-08-26"
+ },
+ "todo/ingerer-r47.test.mjs": {
+  "cas": 8,
+  "vu_le": "2026-08-26"
+ },
+ "todo/journaliser.test.mjs": {
+  "cas": 15,
+  "vu_le": "2026-08-26"
+ },
+ "todo/localiser-produit.test.mjs": {
+  "cas": 11,
+  "vu_le": "2026-08-26"
+ },
+ "todo/preflight-collision.test.mjs": {
+  "cas": 5,
+  "vu_le": "2026-08-26"
+ },
+ "todo/rapprocher.test.mjs": {
+  "cas": 7,
+  "vu_le": "2026-08-26"
+ },
+ "todo/renumeroter.test.mjs": {
+  "cas": 8,
+  "vu_le": "2026-08-26"
+ },
+ "todo/self-test.mjs": {
+  "cas": 48,
+  "vu_le": "2026-08-26"
+ }
+}

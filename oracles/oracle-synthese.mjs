@@ -115,7 +115,32 @@ const MOTIFS_ABSENCE = /(aucun|rien|n[ée]ant|sans objet|non concern)/i;
 // un verdict mesuré, c'est-à-dire exactement la phrase que cette règle existe pour refuser.
 // Faux positif trouvé par le self-test le 14/08.
 const _JETONS = /\b(PASS|FAIL|SKIP|NA|TENU|OK|KO)\b/;
-const _CHIFFRES = /(\d+\s*\/\s*\d+|\d+\s*%|\d+\s+(test|finding|r[èe]gle|cas|item|constat|élément|commit|pan)s?\b)/i;
+// S3 — UN COMPTE EST UN COMPTE, QUEL QUE SOIT CE QU'IL COMPTE (TF-0678, 26/08/2026).
+//
+// LE DÉFAUT, ET IL A EU L'EFFET INVERSE DE SON INTENTION. Ce motif n'acceptait un nombre que
+// devant NEUF noms — test, finding, règle, cas, item, constat, élément, commit, pan. Mesure
+// reproduite en le rejouant sur les verdicts qu'il avait refusés : « 70 pages modifiées, 70
+// conformes en production, 0 en défaut » → FAIL ; « 446 fichiers, 7 essais » → FAIL ;
+// « 4 tests négatifs » → PASS. **Deux des trois refus d'une session** venaient de là, sur des
+// verdicts portant des comptes explicites et vérifiables.
+//
+// La règle existe pour refuser « tout s'est bien passé ». En imposant un lexique, elle poussait
+// à HABILLER un compte réel en vocabulaire admis — c'est-à-dire à dégrader le verdict pour
+// passer la porte.
+//
+// CE QUI EST RETENU : un nombre suivi d'un MOT d'au moins trois lettres. Trois bornes, chacune
+// mesurée sur cas construit : le nombre ne doit pas être collé à un identifiant (`TF-0668`,
+// `R-44`, `v2.1.0`, une date ISO) ; il ne doit pas suivre « version » ; et le mot qui suit ne
+// doit pas être un MOIS, sans quoi « livré le 26 août » passerait pour une mesure.
+//
+// MESURE D'ENTRÉE sur le corpus réel du dépôt — 224 fichiers, 1 947 puces : l'ancien motif en
+// reconnaissait 158, le nouveau 355. Les 197 qui basculent ont été échantillonnées une à une :
+// « 7 forges publiées », « 23 PASS », « 21 événements », « 6 dépôts poussés », « 2 fichiers, 4
+// insertions ». Aucune phrase vide dans le lot.
+const _MOIS = "janvier|f[ée]vrier|mars|avril|mai|juin|juillet|ao[ûu]t|septembre|octobre|novembre|d[ée]cembre";
+const _CHIFFRES = new RegExp(
+  String.raw`(\d+\s*/\s*\d+|\d+\s*%|(?<![\w.-])(?<!version\s)\d{1,6}\s+(?!(?:${_MOIS})\b)[a-zà-ÿ]{3,})`,
+  "i");
 const _LOCALISATEURS = /(`[^`]+`|\.(md|json|mjs|py|html|jsonl)\b|\b[a-f0-9]{7,40}\b)/;
 const preuve = (s) => _JETONS.test(s) || _CHIFFRES.test(s) || _LOCALISATEURS.test(s);
 
