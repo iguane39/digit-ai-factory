@@ -46,7 +46,7 @@
  * `--essai` rend le lot sur la sortie standard et n'écrit RIEN, nulle part.
  */
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
-import { join, dirname } from "node:path";
+import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { verifier } from "../gabarits/oracle-travaux-pilot.mjs";
 import { empreinteTexte } from "../scripts/lib-empreinte.mjs";
@@ -397,7 +397,23 @@ if (lanceEnDirect) {
   // un avertissement qu'on apprend à lire sans le voir.* Le calcul se fait sur le parc ENTIER,
   // indépendamment de `--produit` : un orphelin l'est vis-à-vis de tous les produits, pas du
   // filtre d'affichage du moment.
-  const perdus = orphelins(lignes);
+  // L'APPARIEMENT EST UNE CONDITION DE VALIDITÉ, pas une commodité. Ce contrôle confronte le
+  // registre DU PILOT au parc SCANNÉ. Quand `FORGE_ROOT` désigne un autre parc — une fixture de
+  // recette, un clone partiel —, les deux ne parlent pas des mêmes produits : tout constat réel
+  // y paraîtrait orphelin, et l'émetteur sortirait en échec sur un parc parfaitement sain.
+  //
+  // Le cas a été trouvé en RESTAURANT la recette de ce script : deux de ses cas, qui déposent
+  // dans un parc de fixture, sont passés au rouge dès que l'avertissement a été branché.
+  //
+  // Il est DÉCLARÉ non jugé, jamais tu : le silence d'une sonde n'est pas un verdict, et un
+  // contrôle silencieusement inactif est indiscernable d'un contrôle qui n'a rien trouvé.
+  const apparies = resolve(racine) === resolve(join(PILOT, ".."));
+  const perdus = apparies ? orphelins(lignes) : [];
+  if (!apparies) {
+    console.log("[ORPHELINS — NON JUGÉ] le parc scanné n'est pas celui du pilot "
+      + `(${resolve(racine)}) : le registre et le parc ne parlent pas des mêmes produits, `
+      + "et tout constat réel y paraîtrait orphelin");
+  }
   if (perdus.length) {
     console.error(`\n[ORPHELINS] ${perdus.length} constat(s) désignent un produit que le parc ne porte pas —`);
     console.error("ils n'atteindront JAMAIS personne, et rien d'autre ne le dirait :");

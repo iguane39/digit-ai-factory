@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=7c403733db88 archive=40441f7fe541 · dernier événement: 2026-08-26T13:01:05.345Z -->
+     sceaux: actifs=aea0b7f31c5e archive=40441f7fe541 · dernier événement: 2026-08-26T13:05:45.322Z -->
 
-**212 actifs** (candidat 10 · décidé 1 · en cours 0 · corrigé 194 · écarté 7) · **469 archivés**.
+**213 actifs** (candidat 11 · décidé 1 · en cours 0 · corrigé 194 · écarté 7) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -15,6 +15,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0677 | candidat | 10 | Le gate de restitution juge APRES l'affichage : chaque refus duplique le message, et le referentiel avait deja corrige ce defaut | **oui** — Trois refus successifs du gate dans une seule session, donc quatre affichages de huit blocs pour un seul message utile, et un retour humain explicite. Le defaut est une REGRESSION documentee : la v2.1.0 du referentiel prescrivait deja le jugement en fichier avant affichage, la v2.4.0 l'a remplace par un gate Stop, et la v2.5.0 a traite le symptome apres avoir recu le meme retour humain. |
 | TF-0678 | candidat | 10 | La regle S3 juge le VOCABULAIRE de la mesure et non sa presence : un verdict qui compte des pages est declare non mesurable | **oui** — Deux des trois refus de la session portent sur des verdicts chiffres et verifiables, refuses parce que le nom compte — pages, fichiers, essais, workflows — n'est pas dans une liste de neuf mots. L'auteur a fini par reformuler son verdict pour plaire au detecteur plutot que pour informer le lecteur, ce qui est exactement ce que la regle existe pour empecher. |
 | TF-0679 | candidat | 10 | Un script de verification qu'aucune recette n'invoque pourrit sans que rien ne le signale | **oui** — Trois defauts dormants dans deux scripts d'audit, dont un qui les faisait echouer des la premiere ligne et un autre qui produisait dix codes 404 par execution. Aucun n'etait appele par une recette ni par l'integration continue, et tous n'ont ete trouves qu'en ouvrant les fichiers pour une autre raison. |
+| TF-0681 | candidat | 8.3 | Une recette qui PERD des cas rend un harnais vert — le compte d'une recette est auto-déclaré, donc invisible à la baisse | non |
 | TF-0680 | candidat | 7.5 | Un lot de travaux dont le contenu est un SOUS-ENSEMBLE d'un lot déjà déposé est redéposé quand même | non |
 | TF-0670 | candidat | 6.7 | L'étape A9 de la chaîne de traduction — relecture native déclarée, bloquante si absente — est énoncée et rien ne l'exécute | non |
 | TF-0676 | candidat | 6.7 | Aucun script de capture du produit ne produit systématiquement une pleine page | non |
