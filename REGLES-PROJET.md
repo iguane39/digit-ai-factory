@@ -1126,3 +1126,34 @@ est juste*, meme patron que R-45, R-49 et O9. Sa **borne** : un fichier qui ne d
 langue), la completude du glossaire face au vocabulaire reellement servi, et l'application effective
 du terme retenu dans les traductions livrees — cette derniere se confronte au catalogue de langue du
 projet, pas a ce fichier.
+
+## AG. R-20 bis — un ECART ASSUME s'ECRIT, dans un carnet qui EXISTE (TF-0655 — 26/08)
+
+**Le fait, et il vient d'un produit.** `gabarits\TRAVAUX-PILOT.md` imposait depuis sa creation
+qu'un element ecarte « rejoigne les *Ecarts assumes* du carnet du produit avec son motif et sa date
+(**R-20 bis**) », en ajoutant — justement — qu'« un ecart tu est indiscernable d'un oubli ».
+**Aucun gabarit ne creait ce carnet**, et **R-20 bis n'etait defini nulle part** : la seule
+occurrence de cette chaine dans tout l'ecosysteme etait la phrase qui l'invoquait.
+
+**Ce que ca coutait, et ca se multipliait.** Pour declarer UN ecart, un produit a du **deduire**
+l'emplacement, puis ecrire dans le fichier lui-meme qu'il l'avait place par defaut et qu'il le
+deplacerait si un emplacement officiel etait publie. A l'echelle du parc, chaque produit en aurait
+invente un autre — et des ecarts eparpilles sous des noms differents ne se relevent pas.
+
+**La regle.** Un produit qui ecarte un element d'un travail confie l'inscrit a
+**`forge\travaux\ECARTS-ASSUMES.md`**, a cote du carnet des travaux
+qu'il recoit. Quatre champs, tous obligatoires, parce que l'omission ne vaut pas decision :
+`objet` (nomme assez precisement pour etre retrouve), `motif` (« pas prioritaire » n'en est pas un :
+un motif dit ce qui serait vrai pour que la decision change), `date` au format `AAAA-MM-JJ`, et
+**`reouverture`** — ce qui ferait revenir sur cette decision. C'est ce dernier champ qui distingue
+un ecart ASSUME d'un refus definitif, et qui rend le carnet relisable dans un an.
+
+**Le mecanisme** : le carnet entre au contrat d'heritage (`gabarits\HERITAGE.json`, v1.4.0) en mode
+`presence` — le gabarit cree un carnet vide portant sa consigne, et `relever-heritage.mjs` le compte
+comme les autres. Mode `presence` et non `copie_conforme` : le carnet se REMPLIT chez le produit,
+exiger qu'il reste identique au gabarit reviendrait a interdire d'y ecrire.
+
+**La classe du defaut, plus large que ce cas** : *une regle de socle exprimable comme un fichier
+doit etre livree comme un fichier*, jamais comme une phrase dans un document de regles. Une regle
+qui n'a nulle part ou s'appliquer ne se viole pas — elle ne s'applique simplement jamais, et
+personne ne le voit.

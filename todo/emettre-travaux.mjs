@@ -78,7 +78,11 @@ export function indiceLibre(boite, jour) {
 export function lotHeritage(ligne, jour, indice) {
   const absents = ligne.artefacts.filter((a) => a.etat === "absent");
   const perimes = ligne.artefacts.filter((a) => a.etat === "divergent");
-  if (!absents.length && !perimes.length) return null;
+  // TF-0654 : un artefact TROUVE AILLEURS ne se recopie pas — il se DECLARE. Le confondre avec
+  // un absent ferait deposer un fichier mort a la racine du depot, et le relevé passerait au
+  // vert sur une question restee ouverte.
+  const horsRacine = ligne.artefacts.filter((a) => a.etat === "hors_racine");
+  if (!absents.length && !perimes.length && !horsRacine.length) return null;
 
   // L'EMPREINTE D'IDEMPOTENCE PORTE CE QUI EST CONFIE, PAS L'ENVELOPPE QUI LE PORTE.
   // Premier jet : le sceau etait calcule sur le lot ENTIER, titre compris — or le titre porte
@@ -86,7 +90,7 @@ export function lotHeritage(ligne, jour, indice) {
   // deposaient donc deux lots identiques dans le fond et differents dans l'octet, et la boite du
   // produit se remplissait — exactement la nuisance que ce canal doit eviter (R-33 bis). Trouve
   // par la recette d'idempotence, qui rendait 4 fichiers au lieu de 2.
-  const sceauConfie = empreinteTexte([...perimes, ...absents]
+  const sceauConfie = empreinteTexte([...perimes, ...absents, ...horsRacine]
     .map((a) => `${a.cible}|${a.etat}|${a.empreinte_pilot || ""}|${a.empreinte_produit || ""}`).sort().join("\n"), 12);
 
   const glose = {
@@ -99,6 +103,21 @@ export function lotHeritage(ligne, jour, indice) {
     "robots.txt": "l'ouverture aux robots d'indexation — légitimement absent si ce projet n'a aucune surface web, mais alors le DÉCLARER",
     "llms.txt": "l'ouverture aux agents IA — même remarque : légitimement absent sans surface web, à déclarer",
   };
+
+  // TF-0654 — LE TROISIEME CAS DEMANDE AUTRE CHOSE QUE LES DEUX AUTRES. Un artefact absent se
+  // recopie ; un artefact perime se met a jour ; un artefact TROUVE AILLEURS existe deja et
+  // fonctionne peut-etre tres bien. Ce qui manque n'est pas le fichier, c'est la DECLARATION de
+  // l'endroit d'ou il est servi. Lui demander de recopier creerait un doublon mort a la racine du
+  // depot, et le relevé passerait au vert sur une question ouverte — le pire des deux mondes.
+  const blocHorsRacine = (a, jour) => `### TF-0654 — artefact TROUVÉ HORS de la racine du dépôt : \`${a.cible}\` · gravité mineur
+
+- **Le fait**, mesuré le ${jour.slice(6, 8)}/${jour.slice(4, 6)}/${jour.slice(0, 4)} : \`${a.cible}\` n'est pas à la racine de votre dépôt, mais il EXISTE — trouvé à \`${a.trouve_a}\`. Le relevé ne le compte donc **ni absent, ni conforme**.
+- **Pourquoi cela vous concerne** : le pilot ne peut pas savoir si \`${a.trouve_a.split("/")[0]}\` est votre racine WEB — le répertoire réellement servi — ou un dossier quelconque. Sans cette déclaration, ce contrôle restera indécis à chaque relevé, et un contrôle indécis qui revient s'apprend à être ignoré.
+- **Ce qui est demandé** : DÉCLARER votre racine web dans \`docs/projet/PARAMETRAGE.md\`, sous une ligne \`racine_web:\` de son frontmatter. **Ne recopiez PAS le fichier à la racine du dépôt** : vous y créeriez un doublon qui n'est jamais servi, et le relevé passerait au vert sur un fichier mort.
+- **Effort estimé** : simple × court
+- **Comment vous saurez que c'est fait** : \`node c:\\\\dev\\\\digit-ai-factory\\\\scripts\\\\relever-heritage.mjs\` cesse de compter cet artefact « hors racine » pour votre projet.
+- **Si ce n'est pas fait** : le relevé continue de signaler un écart qui n'en est peut-être pas un, et personne ne peut trancher depuis le pilot.
+`;
 
   const bloc = (a, gravite) => {
     const g = glose[a.cible] || "artefact du contrat d'héritage";
@@ -116,7 +135,8 @@ export function lotHeritage(ligne, jour, indice) {
     : "l'écart reste, et le contrôle de conformité du pilot continue de le rendre à chaque lot que vous remettez"}`;
   };
 
-  const items = [...perimes.map((a) => bloc(a, "majeur")), ...absents.map((a) => bloc(a, absents.length > 4 ? "majeur" : "mineur"))];
+  const items = [...perimes.map((a) => bloc(a, "majeur")), ...absents.map((a) => bloc(a, absents.length > 4 ? "majeur" : "mineur")),
+                 ...horsRacine.map((a) => blocHorsRacine(a, jour))];
 
   const md = `# Travaux confiés par le pilot — ${ligne.produit} — ${jour}${indice}
 

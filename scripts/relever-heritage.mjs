@@ -59,6 +59,38 @@ const enfants = (d) => {
   catch { return []; }
 };
 
+//: Les dossiers qu'on ne fouille jamais en cherchant un artefact ailleurs : ils portent des copies
+//: de tout, et y trouver un `robots.txt` ne dirait rien de ce que le produit SERT.
+const JAMAIS_FOUILLES = new Set([
+  ".git", "node_modules", ".venv", "__pycache__", "dist", "build", ".next", "old", "Old",
+  "coverage", ".oracles", "input", "output", "forge",
+]);
+
+/**
+ * Le même artefact, trouvé AILLEURS qu'à l'endroit prescrit — ou `null`.
+ *
+ * Cherché sur DEUX niveaux seulement, et jamais dans les dossiers ci-dessus : au-delà, on ne
+ * trouve plus l'artefact du produit mais une copie de quelque chose. La fonction rend le CHEMIN
+ * relatif tel qu'on le lit, parce que c'est lui l'information — pas le fait qu'un fichier de ce
+ * nom existe quelque part (TF-0654).
+ */
+export function trouverAilleurs(dossierProduit, cible, profondeur = 2) {
+  const nom = String(cible).replaceAll("\\", "/").split("/").pop();
+  if (!nom) return null;
+  const descendre = (d, niveau) => {
+    if (niveau > profondeur) return null;
+    for (const e of enfants(d)) {
+      if (JAMAIS_FOUILLES.has(e.name) || e.name.startsWith(".")) continue;
+      const candidat = join(d, e.name, nom);
+      if (existsSync(candidat)) return relative(dossierProduit, candidat).replaceAll("\\", "/");
+      const plusLoin = descendre(join(d, e.name), niveau + 1);
+      if (plusLoin) return plusLoin;
+    }
+    return null;
+  };
+  return descendre(dossierProduit, 1);
+}
+
 /**
  * Tous les produits du parc, reconnus à leur `forge\` — le marqueur qu'un run de forge a eu lieu.
  * On ne descend pas SOUS un produit : ses sous-dossiers ne sont pas des produits.
@@ -82,7 +114,28 @@ export function produitsDuParc(base, profondeurMax = PROFONDEUR_MAX) {
 /** L'état d'UN artefact chez UN produit : absent, présent-divergent, ou conforme. */
 export function etatArtefact(dossierProduit, artefact, racinePilot) {
   const cible = join(dossierProduit, String(artefact.cible).replaceAll("/", "\\"));
-  if (!existsSync(cible)) return { etat: "absent" };
+  if (!existsSync(cible)) {
+    // LE TROISIEME CAS, CELUI QUI N'AVAIT PAS DE NOM (TF-0654, 26/08/2026).
+    //
+    // LE FAIT, remonte par un produit et VERIFIE ici : `robots.txt` et `llms.txt` etaient comptes
+    // ABSENT, gravite majeur. Ils ne l'etaient pas — ils vivent en `site/robots.txt` et
+    // `site/llms.txt`, et repondent 200 en production. La racine WEB de ce produit est `site/`,
+    // le repertoire reellement servi ; ce n'est pas la racine du depot.
+    //
+    // La sonde ne connaissait que DEUX lectures : « le produit a une surface web et le fichier
+    // manque » ou « il n'a pas de surface web et l'absence est legitime ». Aucune des deux n'etait
+    // vraie. CE QUE CA COUTAIT SI ON AVAIT APPLIQUE LE TRAVAIL CONFIE : deux fichiers deposes a la
+    // racine du depot, JAMAIS SERVIS, et un relevé passe au vert — le pire des deux mondes, une
+    // exigence qu'on croit satisfaite par des fichiers morts.
+    //
+    // CE QUE CET ETAT FAIT, ET CE QU'IL NE FAIT PAS : il NOMME l'endroit ou le fichier a ete
+    // trouve, et il ne DEVINE PAS la racine web. Deviner reviendrait a affirmer ce que la donnee
+    // ne porte pas — un `site/` peut etre servi comme il peut etre un dossier d'archives. Ce que
+    // le produit doit faire est donc DECLARER sa racine web, pas recopier un fichier qu'il a deja.
+    const ailleurs = trouverAilleurs(dossierProduit, artefact.cible);
+    if (ailleurs) return { etat: "hors_racine", trouve_a: ailleurs };
+    return { etat: "absent" };
+  }
   if (artefact.mode !== "copie_conforme") return { etat: "present" };
   const source = join(racinePilot, String(artefact.source).replaceAll("/", "\\"));
   if (!existsSync(source)) return { etat: "present", note: "source introuvable au pilot — non comparable" };
@@ -111,11 +164,17 @@ export function relever(base, contrat, racinePilot) {
       dossier,
       absents: compte("absent"),
       divergents: compte("divergent"),
+      // `hors_racine` compte A PART, et surtout PAS parmi les conformes (TF-0654) : un fichier
+      // trouvé ailleurs n'est pas un fichier tenu — il est peut-être servi, peut-être pas, et
+      // c'est précisément ce que le produit doit DÉCLARER. Le noyer dans les conformes rendrait
+      // le relevé vert sur une question ouverte ; le compter absent ferait recopier un fichier
+      // qui existe déjà, au mauvais endroit. Il lui faut sa propre colonne.
+      hors_racine: compte("hors_racine"),
       conformes: compte("conforme") + compte("present"),
       total: artefacts.length,
       artefacts,
     };
-  }).sort((x, y) => (y.absents + y.divergents) - (x.absents + x.divergents));
+  }).sort((x, y) => (y.absents + y.divergents + y.hors_racine) - (x.absents + x.divergents + x.hors_racine));
 }
 
 // ---- exécution ------------------------------------------------------------------------------
@@ -125,15 +184,16 @@ const lanceEnDirect = process.argv[1]
 if (lanceEnDirect) {
   const contrat = JSON.parse(readFileSync(join(PILOT, "gabarits", "HERITAGE.json"), "utf8"));
   const lignes = relever(racine, contrat, PILOT);
-  const totalManques = lignes.reduce((n, l) => n + l.absents + l.divergents, 0);
+  const totalManques = lignes.reduce((n, l) => n + l.absents + l.divergents + l.hors_racine, 0);
 
   if (args.includes("--json")) {
     console.log(JSON.stringify({ outil: "relever-heritage", racine: String(racine),
       contrat: contrat.version, produits: lignes.length, manques: totalManques, lignes }, null, 1));
   } else {
     for (const l of lignes) {
-      const drapeau = l.absents + l.divergents === 0 ? "CONFORME" : `${l.absents} absent(s)`
-        + (l.divergents ? `, ${l.divergents} DIVERGENT(s)` : "");
+      const drapeau = l.absents + l.divergents + l.hors_racine === 0 ? "CONFORME" : `${l.absents} absent(s)`
+        + (l.divergents ? `, ${l.divergents} DIVERGENT(s)` : "")
+        + (l.hors_racine ? `, ${l.hors_racine} HORS RACINE` : "");
       console.log(`${l.produit.padEnd(50)} ${drapeau}`);
     }
     console.log(`\n${lignes.length} produit(s) relevé(s), ${totalManques} manque(s) au total — contrat v${contrat.version}`);
@@ -150,13 +210,15 @@ if (lanceEnDirect) {
 
 export function rendreMarkdown(lignes, contrat, base, totalManques) {
   const t = [];
-  t.push("| Produit | Absents | Divergents | Conformes | Ce qui manque |");
-  t.push("|---|---|---|---|---|");
+  t.push("| Produit | Absents | Divergents | Hors racine | Conformes | Ce qui manque |");
+  t.push("|---|---|---|---|---|---|");
   for (const l of lignes) {
     const manque = l.artefacts.filter((a) => a.etat === "absent").map((a) => a.cible);
     const diverge = l.artefacts.filter((a) => a.etat === "divergent").map((a) => `${a.cible} (PÉRIMÉ)`);
-    t.push(`| \`${l.produit}\` | ${l.absents} | ${l.divergents} | ${l.conformes}/${l.total} | `
-      + `${[...diverge, ...manque].join(" · ") || "—"} |`);
+    const ailleurs = l.artefacts.filter((a) => a.etat === "hors_racine")
+      .map((a) => `${a.cible} → trouvé à \`${a.trouve_a}\` : racine web à DÉCLARER`);
+    t.push(`| \`${l.produit}\` | ${l.absents} | ${l.divergents} | ${l.hors_racine} | ${l.conformes}/${l.total} | `
+      + `${[...diverge, ...manque, ...ailleurs].join(" · ") || "—"} |`);
   }
   return t.join("\n") + `\n\n${lignes.length} produits relevés · ${totalManques} manques · contrat v${contrat.version}`
     + `\n\nNON RELEVÉ : tout produit rangé au-delà de ${PROFONDEUR_MAX} niveaux sous \`${base}\`, et tout`

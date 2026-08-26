@@ -43,6 +43,21 @@ try {
     att(lot === null, "un lot a été produit alors qu'il n'y a rien à confier");
   });
 
+  check("un artefact HORS RACINE demande une DÉCLARATION, jamais une recopie (TF-0654)", () => {
+    // Le fait : `robots.txt` compté ABSENT chez un produit où il vit en `site/robots.txt` et
+    // répond 200 en production. Appliquer le travail tel qu'il était rédigé aurait déposé un
+    // fichier à la racine du dépôt — JAMAIS servi — et fait passer le relevé au vert sur une
+    // question restée ouverte. Ce que le produit doit faire est déclarer sa racine web.
+    const lot = lotHeritage(LIGNE([{ cible: "robots.txt", source: "gabarits/web/robots.txt",
+      mode: "presence", etat: "hors_racine", trouve_a: "site/robots.txt" }]), "20260826", "a");
+    att(lot, "aucun lot produit pour un artefact hors racine");
+    att(/HORS de la racine/.test(lot.md), "le lot ne distingue pas ce cas d'un artefact absent");
+    att(lot.md.includes("site/robots.txt"), "le lot ne dit pas OÙ le fichier a été trouvé");
+    att(/DÉCLARER votre racine web/.test(lot.md), "le lot ne demande pas la déclaration attendue");
+    att(/Ne recopiez PAS/.test(lot.md),
+      "le lot n'interdit pas la recopie — sans quoi le produit crée un fichier mort et le relevé passe au vert");
+  });
+
   check("un artefact PÉRIMÉ est confié comme tel, avec les deux empreintes qui le prouvent", () => {
     // TF-0645 : les empreintes s'appellent `empreinte_pilot` et `empreinte_produit` depuis le
     // 26/08. Elles s'appelaient `source` et `produit` — or `source` porte, AU CONTRAT, le CHEMIN
