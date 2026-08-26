@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=465153b3e999 archive=40441f7fe541 · dernier événement: 2026-08-26T12:09:01.864Z -->
+     sceaux: actifs=7ef1b3cdd117 archive=40441f7fe541 · dernier événement: 2026-08-26T12:19:24.546Z -->
 
-**203 actifs** (candidat 3 · décidé 1 · en cours 0 · corrigé 192 · écarté 7) · **469 archivés**.
+**204 actifs** (candidat 3 · décidé 1 · en cours 0 · corrigé 193 · écarté 7) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -229,6 +229,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0669 | corrige | 20 | La notion « un doublon est un defaut » n'est cablee que sur un axe : entre livrables, jamais dans un livrable | **oui** — 70 pages sur 203 portaient le defaut. Le controle qui l'aurait trouve tient en six lignes et n'existait sur aucun des six outils de la chaine, alors que sa direction inverse — l'unicite du title entre pages — etait cablee et rouge en CI depuis le debut. |
+| TF-0672 | corrige | 12.5 | La porte de fraicheur de deploiement empreinte UNE page et conclut sur les 203 — recidive du defaut corrige la veille | **oui** — Une verification de production a rendu « PRODUCTION CONFORME » a 11:47 UTC sur un conteneur qui servait encore la version d'avant la poussee, verifie par requete directe a la meme minute. Le defaut se produit sur la porte CORRIGEE LA VEILLE pour ce meme motif : deux lots consecutifs, une seule classe, et le second faux vert etait plus difficile a voir que le premier. |
 | TF-0666 | corrige | 10 | Une porte de fraicheur de deploiement cloturait sur une valeur qui ne change pas d'un deploiement a l'autre | **oui** — Une verification de production rouge a 09:52 et verte a 09:54 sur un code identique, apres une poussee qui ne changeait qu'une chaine de description. Six poussees consecutives ont franchi la porte « au bout de 1 essai » sans qu'elle puisse distinguer l'ancien conteneur du nouveau. |
 | TF-0660 | corrige | 8.3 | Aucun oracle ne peut juger une substitution de terme qui change le genre grammatical | **oui** — 11 fautes d'accord servies en production sur deux langues, CI verte et six controleurs au vert. Detectees uniquement parce que l'exploitant a demande une relecture apres coup. |
 | TF-0664 | corrige | 6.3 | Aucune chaine declaree pour « traduire un produit » ni pour « auditer ses traductions », et son absence se paie en tours | **oui** — 11 tours sur 17 ont existe parce qu'une etape, un format ou une regle manquait — dont 8 pour ecrire la methode a la main. Consequences mesurees : 11 fautes d'accord et 2 faits faux servis en production derriere une CI verte. Quatre retours du meme jour (RT-47, RT-48, RT-51, RT-54) sont chacun une etape de la sequence absente. |
