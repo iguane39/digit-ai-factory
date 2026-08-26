@@ -53,7 +53,11 @@ justesse — *un oracle peut dire que le champ manque, jamais qu'il est juste.*
 - **`portee`** — *un mot peut être juste ICI et ambigu LÀ.* « deposit » est l'usage anglais correct
   pour la caution, et ambigu dès que la page parle aussi de l'acompte. **`partout` est gratuit et
   suffit.**
-- **`preuve`** — les sources, séparées par ` · `. Pour un terme de **visibilité**, il en faut **au
+- **`preuve`** — les sources, séparées par ` · `. Pour un terme de **visibilité**, au moins une
+  doit être **rejouable** : la commande s'écrit entre accents graves. *Une preuve nommée et datée
+  qu'aucun script ne reproduit vieillit en silence* — mesuré, une sonde réécrite à la main a révélé
+  que sa requête témoin était polluée par un homonyme, le mécanisme même qui avait produit une
+  proscription fausse. Même doctrine que R-49 du socle. Pour un terme de visibilité, il en faut **au
   moins deux, de nature différente** : une sonde unique porte un biais que la donnée ne montre pas.
   Mesuré : une complétion de recherche interrogée langue par langue a désigné « gite » comme le
   terme le plus suggéré dans six langues — le paramètre de langue fixait l'**interface**, pas le
@@ -70,9 +74,9 @@ justesse — *un oracle peut dire que le champ manque, jamais qu'il est juste.*
 
 | locale | retenu | proscrits | portee | preuve | verifie_le |
 |---|---|---|---|---|---|
-| fr | gîte | aucun | partout | catalogue de langue servi · usage établi du secteur | 2026-08-26 |
-| en | gîte | aucun | partout | article dédié en anglais dans une encyclopédie interlangue · complétions de recherche | 2026-08-26 |
-| it | casa vacanze | `gite` — HOMOGRAPHE au sens opposé : pluriel de *gita*, une excursion | partout | complétions de recherche italiennes (« gite organizzate », « gite in giornata », « gite in barca ») · absence d'article interlangue équivalent | 2026-08-26 |
+| fr | gîte | aucun | partout | catalogue de langue servi · complétions, `curl -s 'https://suggestqueries.google.com/complete/search?client=firefox&hl=fr&gl=FR&q=gite'` | 2026-08-26 |
+| en | gîte | aucun | partout | article dédié en anglais dans une encyclopédie interlangue · `curl -s 'https://suggestqueries.google.com/complete/search?client=firefox&hl=en&gl=GB&q=gite'` | 2026-08-26 |
+| it | casa vacanze | `gite` — HOMOGRAPHE au sens opposé : pluriel de *gita*, une excursion | partout | `curl -s 'https://suggestqueries.google.com/complete/search?client=firefox&hl=it&gl=IT&q=gite'` (rend « gite organizzate », « gite in giornata », « gite in barca ») · absence d'article interlangue équivalent | 2026-08-26 |
 
 ## caution
 
