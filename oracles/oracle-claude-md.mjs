@@ -13,6 +13,10 @@
  * qu'on n'a pas vu refuser est un gardien supposé. Trouvé le 15/08 par `self-tests.mjs` dès son
  * premier passage — c'est exactement ce qu'un agrégateur existe pour trouver.
  */
+// Exit : 0 = conforme · 1 = defaut MESURE. Cet oracle n'a AUCUN chemin « je ne peux pas
+// mesurer » : il ne depend d'aucun outil externe et lit des fichiers du depot. Le declarer
+// vaut mieux que de le taire — un contrat muet laisse croire qu'un 1 peut etre une panne
+// d'environnement (TF-0648).
 import { readFileSync, existsSync, readdirSync, statSync, mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
