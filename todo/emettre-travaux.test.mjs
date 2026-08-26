@@ -44,12 +44,19 @@ try {
   });
 
   check("un artefact PÉRIMÉ est confié comme tel, avec les deux empreintes qui le prouvent", () => {
-    const lot = lotHeritage(LIGNE([{ cible: "forge/RESTITUTION.md", mode: "copie_conforme",
-      etat: "divergent", source: "aaaaaaaaaaaa", produit: "bbbbbbbbbbbb" }]), "20260825", "a");
+    // TF-0645 : les empreintes s'appellent `empreinte_pilot` et `empreinte_produit` depuis le
+    // 26/08. Elles s'appelaient `source` et `produit` — or `source` porte, AU CONTRAT, le CHEMIN
+    // de l'artefact chez le pilot. La collision faisait perdre ce chemin au relevé, et le lot le
+    // REFABRIQUAIT par chirurgie de chaîne : trois chemins faux sur neuf dans un lot réellement
+    // déposé. Le `source` de cette fixture est donc désormais le chemin, et il est VÉRIFIÉ.
+    const lot = lotHeritage(LIGNE([{ cible: "forge/RESTITUTION.md", source: "gabarits/RESTITUTION.md",
+      mode: "copie_conforme", etat: "divergent", empreinte_pilot: "aaaaaaaaaaaa", empreinte_produit: "bbbbbbbbbbbb" }]), "20260825", "a");
     att(lot, "aucun lot produit pour un artefact périmé");
     att(/PÉRIMÉ/.test(lot.md), "le lot ne dit pas que l'artefact est périmé plutôt qu'absent");
     att(lot.md.includes("aaaaaaaaaaaa") && lot.md.includes("bbbbbbbbbbbb"),
       "le lot ne cite pas les deux empreintes — le produit ne peut donc pas contredire le constat");
+    att(lot.md.includes("recopier `gabarits/RESTITUTION.md`"),
+      "le lot ne cite pas le chemin source DÉCLARÉ par le contrat — s'il le déduit de la cible, il invente (TF-0645)");
   });
 
   check("le sidecar porte une ligne JSON par élément, avec son moyen de vérification", () => {

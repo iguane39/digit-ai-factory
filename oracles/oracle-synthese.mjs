@@ -746,6 +746,49 @@ function juger(texte) {
     else ok("S27", `${risquees.length} identité(s) affirmée(s), chacune adossée à une empreinte ou une comparaison de contenu`);
   }
 
+  // ---- S28 (TF-0635, 26/08) — METTRE UN OUTIL EN CAUSE EST UN CONSTAT, et se vérifie comme tel
+  // ------------------------------------------------------------------------------------------------
+  //
+  // CINQUIÈME SŒUR DE S22, et l'objet change encore. S22 vise un négatif sur une RESSOURCE, S24 une
+  // recherche par NOM, S25 une CAPACITÉ, S27 une IDENTITÉ. Ici : une IMPUTATION — « forge-seo-geo
+  // aurait dû le voir ».
+  //
+  // LE FAIT, remonté par un produit. Une dérive de capacités a été annoncée à l'exploitant, tableau
+  // comparatif à l'appui, et l'agent en a tiré qu'un outil de la forge aurait dû la détecter.
+  // Vérification faite APRÈS : le fichier incriminé était RIGOUREUSEMENT CONFORME. Ce qui avait été
+  // pris pour un minimum commercial était le seuil d'un filtre de recherche — deux notions
+  // différentes, légitimement différentes. Il suffisait de suivre l'unique usage de la valeur pour
+  // le voir. Résultat : une affirmation fausse livrée à l'exploitant, PUIS retournée contre un outil
+  // de la forge sous forme d'une mise en cause infondée.
+  //
+  // POURQUOI C'EST PIRE QU'UNE ERREUR ORDINAIRE : une mise en cause d'un outil déclenche un travail
+  // chez quelqu'un d'autre, et elle entame la confiance dans un contrôle qui, lui, faisait son
+  // travail. Un outil accusé à tort finit désactivé « par prudence ».
+  //
+  // LA FORME EXIGÉE : la phrase qui met un outil en cause porte, dans la même phrase, la trace de
+  // ce qui a été vérifié — rejoué, mesuré, exécuté, la sortie citée. Non bloquante, comme ses
+  // quatre sœurs : elle apprend un réflexe, elle ne refuse pas un travail.
+  //
+  // MESURE D'ENTRÉE (N-23), dépôt entier, 387 fichiers et 61 589 phrases : **2** phrases portent
+  // une mise en cause de cette forme, et les deux vivent dans des lots ENTRANTS, pas dans une
+  // restitution. La règle a donc très peu de cibles — c'est une règle de prévention, et ses
+  // fixtures sont ce qui prouve qu'elle fonctionne, puisque le corpus ne le prouvera pas.
+  const MISE_EN_CAUSE = /\b(forge-[a-z-]+|l'oracle|le contr[ôo]le|le pan|l'outil|la sonde)\b[^.;!?]{0,90}\b(aurait d[ûu] (?:le |la |les |l')?(?:voir|d[ée]tecter|refuser|attraper)|n'(?:a|ont) pas (?:vu|d[ée]tect[ée]|refus[ée]|attrap[ée])|a laiss[ée] passer|est en d[ée]faut|est fauti[fv])\b/i;
+  const VERIFICATION = /\b(v[ée]rifi[ée]|rejou[ée]|mesur[ée]|reproduit|jou[ée] sur|ex[ée]cut[ée]|preuve|sortie|exit \d|constat[ée] par)\b/i;
+  {
+    const phrases = texte.split(/(?<=[.!?;])\s+|\n/).map((x) => x.trim()).filter(Boolean);
+    const risquees = phrases.filter((x) => MISE_EN_CAUSE.test(x));
+    const nues = risquees.filter((x) => !VERIFICATION.test(x));
+    if (!risquees.length) ok("S28", "aucun outil de l'écosystème mis en cause — rien à corroborer");
+    else if (nues.length) ko("S28", `${nues.length} mise(s) en cause sur ${risquees.length} formulée(s) sans la trace de la vérification : ` +
+      "une imputation à un outil est un CONSTAT, et se vérifie avant d'être écrite au même titre qu'un défaut. " +
+      "Mesuré le 26/08 : un outil accusé de n'avoir pas vu une dérive, alors que le fichier incriminé était " +
+      "RIGOUREUSEMENT conforme — deux valeurs comparées sans établir qu'elles mesuraient la même grandeur. " +
+      "Un outil accusé à tort finit désactivé « par prudence ». Citer ce qui a été rejoué, mesuré ou exécuté. " +
+      `Ex. : ${nues[0].replace(/\s+/g, " ").slice(0, 110)}`);
+    else ok("S28", `${risquees.length} mise(s) en cause, chacune adossée à une vérification`);
+  }
+
   // ---- S24 (TF-0596, 24/08) — une recherche par NOM qui ne trouve rien n'établit que l'absence
   // du NOM -----------------------------------------------------------------------------------------
   //
@@ -1161,7 +1204,7 @@ Aucun écart : la demande a été suivie à la lettre.
     // 19 922 octets à la même date tenus pour un seul fichier, puis écrasés par le même contenu.
     // La phrase porte la conjonction complète (identité + indice) et AUCUNE empreinte : c'est
     // l'inférence qui est jugée, pas le fait de citer une taille.
-    .replace("## 7. Risques", "## 7. Risques\n\n- L'API du fournisseur ne rend aucun enregistrement TXT : il n'y a pas de TXT côté DNS.\n\n- Aucune table de transcodification : les motifs %transcod%, %corresp% et %mapping% ne remontent rien sur les trois schémas.\n\n- Le fichier .env a bien ete cree et il est bien ignore par git.\n\n- Les deux logos font 19 922 octets et portent la meme date : c'est le meme fichier duplique.\n");
+    .replace("## 7. Risques", "## 7. Risques\n\n- L'API du fournisseur ne rend aucun enregistrement TXT : il n'y a pas de TXT côté DNS.\n\n- Aucune table de transcodification : les motifs %transcod%, %corresp% et %mapping% ne remontent rien sur les trois schémas.\n\n- Le fichier .env a bien ete cree et il est bien ignore par git.\n\n- Les deux logos font 19 922 octets et portent la meme date : c'est le meme fichier duplique.\n\n- forge-seo-geo aurait du voir cette derive de capacites, et ne l'a pas signalee.\n");
   // TF-0567 — la branche « ouverture TITRÉE » a ses DEUX sens, sinon elle serait une porte ouverte :
   // titrée et conforme doit passer (c'est le défaut mesuré : 30 mots lus comme 0), titrée et
   // technique doit continuer d'échouer — un titre ne blanchit rien.
@@ -1179,7 +1222,7 @@ Aucun écart : la demande a été suivie à la lettre.
   if (rr.status !== 1) casse.push("la fixture ROUGE ne FAIL pas");
   else {
     for (const regle of ["S2", "S3", "S5", "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16",
-                         "S17", "S18", "S19", "S20", "S21", "S22", "S23", "S24", "S25", "S26", "S27"]) {
+                         "S17", "S18", "S19", "S20", "S21", "S22", "S23", "S24", "S25", "S26", "S27", "S28"]) {
       if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
     }
   }

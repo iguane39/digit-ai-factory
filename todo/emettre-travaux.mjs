@@ -87,7 +87,7 @@ export function lotHeritage(ligne, jour, indice) {
   // produit se remplissait — exactement la nuisance que ce canal doit eviter (R-33 bis). Trouve
   // par la recette d'idempotence, qui rendait 4 fichiers au lieu de 2.
   const sceauConfie = empreinteTexte([...perimes, ...absents]
-    .map((a) => `${a.cible}|${a.etat}|${a.source || ""}|${a.produit || ""}`).sort().join("\n"), 12);
+    .map((a) => `${a.cible}|${a.etat}|${a.empreinte_pilot || ""}|${a.empreinte_produit || ""}`).sort().join("\n"), 12);
 
   const glose = {
     "forge/retours/RETOURS-FORGES.md": "le gabarit qui décrit la forme d'un lot de retours — sans lui, vos retours sont refusés à la porte du pilot pour une forme que rien ne vous a dite",
@@ -106,9 +106,9 @@ export function lotHeritage(ligne, jour, indice) {
 
 - **Le fait**, mesuré le ${jour.slice(6, 8)}/${jour.slice(4, 6)}/${jour.slice(0, 4)} : \`${a.cible}\` ${a.etat === "absent"
   ? "n'existe pas dans votre dépôt"
-  : `existe mais DIVERGE de la source du pilot (empreintes \`${a.source}\` contre \`${a.produit}\`)`}. Contrat : \`gabarits\\HERITAGE.json\`, mode \`${a.mode}\`.
+  : `existe mais DIVERGE de la source du pilot (empreintes \`${a.empreinte_pilot}\` contre \`${a.empreinte_produit}\`)`}. Contrat : \`gabarits\\HERITAGE.json\`, mode \`${a.mode}\`.
 - **Pourquoi cela vous concerne** : ${g}.
-- **Ce qui est demandé** : recopier \`${a.cible.replace(/^forge\//, "gabarits/").replace("gabarits/retours/RETOURS-FORGES.md", "gabarits/RETOURS-FORGES.md").replace("gabarits/retours/oracle-lot.mjs", "gabarits/oracle-lot-retours.mjs")}\` depuis \`c:\\dev\\digit-ai-factory\\\` vers \`${a.cible}\` de votre dépôt. Le chemin source exact est au contrat.
+- **Ce qui est demandé** : recopier \`${a.source}\` depuis \`c:\\dev\\digit-ai-factory\\\` vers \`${a.cible}\` de votre dépôt — chemin source DÉCLARÉ par le contrat, jamais déduit de la cible (TF-0645).
 - **Effort estimé** : simple × court
 - **Comment vous saurez que c'est fait** : \`node c:\\dev\\digit-ai-factory\\scripts\\relever-heritage.mjs\` ne liste plus cet artefact pour votre projet.
 - **Si ce n'est pas fait** : ${a.cible.includes("RESTITUTION") || a.cible.includes("hooks")

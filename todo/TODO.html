@@ -14,7 +14,7 @@
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digit-AI — TODO-FORGE · Reste à faire — V20260825</title>
+  <title>Digit-AI — TODO-FORGE · Reste à faire — V20260826</title>
   <meta name="description" content="Reste-à-faire du registre TODO-FORGE : candidats à décider, décidés, en cours — détaillés en puces, avec date de création, priorité de traitement et impact sur la forge concernée.">
   <meta name="theme-color" content="#2563EB">
   <!-- Favicon-lettre (13/08) : « F » = Forge (projet). -->
@@ -152,7 +152,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>d2995b28606a</code> · dernier événement 2026-08-25T19:58:15.397Z</p>
+      <p class="meta">sceau <code>40afaadc3e5e</code> · dernier événement 2026-08-26T05:46:14.784Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -162,7 +162,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="0 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">0</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="9 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">9</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="1 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">1</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="468 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">468</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -205,15 +205,176 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">166 / 166 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">178 / 178 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">79 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">29 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">7 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">6 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-data"><strong>digit-ai-forge-data</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-development"><strong>digit-ai-forge-development</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-seo-geo"><strong>digit-ai-forge-seo-geo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">15 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">17 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">86 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">29 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">7 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">6 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-data"><strong>digit-ai-forge-data</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-development"><strong>digit-ai-forge-development</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-seo-geo"><strong>digit-ai-forge-seo-geo</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">15 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">20 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-factory">
-      <h2>digit-ai-factory <span class="badge" title="79 item(s) actifs ciblant digit-ai-factory">79</span></h2>
+      <h2>digit-ai-factory <span class="badge" title="86 item(s) actifs ciblant digit-ai-factory">86</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-factory</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0637" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0637</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Une recherche a fonde une recommandation sur une source unique au biais indecelable</h3>
+          <div class="card-detail" data-cite><p class="lead">Pour savoir si les visiteurs anglophones, germanophones et neerlandophones cherchent le mot « gite » dans leur langue, j'ai interroge Google Suggest langue par langue.</p><ul class="puces"><li>Resultat obtenu : « gite » est le terme LE PLUS SUGGERE dans les six langues etrangeres, jusqu'a dix completions en italien — le score le plus eleve du test. Lu seul, ce resultat dit « gardez gite partout ». Deux biais l'invalident, et AUCUN n'est visible dans la donnee</li><li>Le parametre hl= fixe la langue d'INTERFACE, pas le pays du chercheur : « gite » domine parce que la requete francaise domine cet espace de recherche mondialement</li><li>En italien, « gite » est un HOMOGRAPHE AU SENS OPPOSE — pluriel de gita, une sortie, une excursion. Les completions le disent : « gite organizzate mont saint michel », « gite in giornata da parigi », « gite in barca da bonifacio ». Le score le plus eleve du test mesurait donc L'INVERSE DU PRODUIT. Par ailleurs la seconde source disponible, l'export Search Console du projet, etait STRUCTURELLEMENT MUETTE : elle vient de l'ancien site uniquement en francais, qui ne pouvait pas se positionner sur Ferienhaus — zero occurrence n'y prouve rien. La donnee n'etait ni fausse ni partielle : elle REPONDAIT A UNE AUTRE QUESTION, variante deja remontee en RT-30 le meme jour. Correctif propose : regle de socle pour toute recherche fondant une recommandation — DEUX A TROIS SOURCES DE NATURE DIFFERENTE, et la nature de chacune declaree. Une source qui ne peut pas repondre se NOMME comme telle au lieu d'etre omise. Livrable type : un tableau source x ce qu'elle mesure x ce qu'elle ne peut pas mesurer, produit AVANT toute conclusion</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-25</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>recommandation inverse evitee de justesse ; homographe italien detecte en repondant a l'exploitant, pas en menant la recherche</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-recherche-lexicale-20260825</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0639" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0639</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">La connaissance terminologique n'a nulle part ou vivre dans un projet multilingue</h3>
+          <div class="card-detail" data-cite><p class="lead">« Gite est un faux ami en italien » a ete etabli par DEUX sources aujourd'hui — Google Suggest (completions « gite organizzate mont saint michel », « gite in giornata da parigi », « gite in barca da bonifacio ») et les liens interlangues de Wikipedia (« Gite rural » a un article dedie en anglais et en neerlandais, AUCUN equivalent en allemand, espagnol, italien ni portugais).</p><ul class="puces"><li>Cette connaissance n'existe aujourd'hui que dans une conversation</li><li>Aucun fichier du projet ne porte, par langue, le terme retenu, les termes proscrits et le motif</li><li>Consequence directe : la prochaine session reecrira le mot, et AUCUN CONTROLE NE LE VERRA</li><li>Mesure : it.mjs contient 99 occurrences de « gite » dans des phrases PARFAITEMENT TRADUITES — « Regalatevi una parentesi di relax nei nostri gite, alle porte della baia » est de l'italien irreprochable employant un mot qui designe des sorties a la journee</li><li>Les trois controles disponibles echouent tous : le pan i18n de forge-tests passe au vert et le declare (« la JUSTESSE d'une traduction n'est PAS jugee »), check-traductions.mjs ne detecte que les chaines identiques au francais et signale 0 sur 99, et un relecteur natif y verrait un emprunt au francais plutot qu'une erreur</li><li>Correctif propose : un GLOSSAIRE TERMINOLOGIQUE PAR LANGUE, artefact de projet et non de forge — pour chaque terme metier, le mot retenu, les mots proscrits, et le MOTIF de la proscription, car c'est le motif qui empeche de le retablir par ignorance</li><li>Une donnee, pas du code</li><li>Le controle devient alors trivial : chercher les termes proscrits dans chaque fichier de langue, echouer bruyamment</li><li>Fixture rouge : un fichier de langue employant un terme declare proscrit</li><li>A rapprocher de RT-9 : une valeur porte sa source et sa date, un choix de vocabulaire porte son motif</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-25</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>99 occurrences d'un faux ami dans un seul fichier de langue, invisibles aux 3 controles existants</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-glossaire-terminologique-20260825</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0644" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0644</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Aucun controle ne confronte les nombres du texte a la source de verite</h3>
+          <div class="card-detail" data-cite><p class="lead">Mesure : la meta description de la page reservation annoncait « 8 gites » dans les SEPT langues, francais compris, quand build/data.mjs declare 5 gites.</p><ul class="puces"><li>C'est un residu du retrait des gites bretons — le run a mis a jour l'integralite du site sauf cette chaine, dans toutes les langues a la fois, et le defaut est parti EN PRODUCTION</li><li>Neuf controles projet ne l'ont pas vu, dont un pan i18n complet (qui verifie la completude des clefs, pas leur contenu) et un audit forge-seo-geo de 88 noeuds</li><li>Aucun ne compare un nombre ecrit dans une chaine a la donnee dont il derive</li><li>Correctif propose : le motif EXISTE DEJA et n'est pas applique au bon endroit — check-llms.mjs confronte llms.txt aux sources (surfaces, prix, capacite du groupe = somme des capMax) et aurait attrape l'equivalent</li><li>Etendre ce motif aux catalogues de langue : tout nombre suivi d'un nom denombrable que data.mjs sait trancher</li><li>Portee honnete a declarer avec l'oracle : il ne juge que les nombres DERIVABLES d'une source de verite, pas les faits redactionnels</li><li>Fixture rouge : un catalogue annoncant un compte d'entites different de celui de la source</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-25</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>« 8 gites » contre 5 declares, dans 7 langues, parti en production sous 9 controles</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-glossaire-passe-complete-20260825</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0641" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0641</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8.3)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Le glossaire terminologique se constitue par accident, pas par balayage</h3>
+          <div class="card-detail" data-cite><p class="lead">RT-34 a donne au glossaire un LIEU, RT-35 un MOMENT ; rien ne dit COMMENT IL SE REMPLIT.</p><ul class="puces"><li>En pratique un terme y entre quand un defaut l'a revele : le glossaire livre la veille sur ce projet portait UN SEUL terme, celui qui m'avait saute aux yeux. Mesure : une passe systematique sur le vocabulaire du produit, menee en une heure, a fait entrer HUIT termes et revele TROIS defauts en production qu'un glossaire a un terme ne pouvait pas voir — un title et un H1 allemands disant « Pool » quand le catalogue dit « Hallenbad » 29 fois, l'anglais employant « deposit » pour la caution ET pour l'acompte, et « 8 gites » annonce dans les 7 langues quand data.mjs en declare 5. Correctif propose : le glossaire se dresse EN AMONT, en balayant le vocabulaire de la langue source avant la premiere traduction. Critere de selection a inscrire au socle — un terme merite une entree quand le choix N'EST PAS EVIDENT, et il y a quatre facons de ne pas l'etre :</li><li>contresens ou faux ami,</li><li>plusieurs rendus valables, la coherence devenant le sujet,</li><li>poids SEO,</li><li>precision contractuelle. Corollaire a ecrire aussi, sans quoi la regle produit du bruit : un terme a rendu unique et evident (jardin, terrasse, sauna) NE MERITE RIEN — un glossaire exhaustif est du bruit qu'il faut maintenir. Fixture : un produit multilingue dont le glossaire ne couvre pas un terme metier a rendu non evident</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-25</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8.3 — gain 5 × preuve 5 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>1 terme au glossaire contre 8 apres balayage ; 3 defauts en production invisibles a 9 controles projet</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-glossaire-passe-complete-20260825</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0642" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0642</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8.3)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Un glossaire non verifie fait autorite : 3 entrees sur 7 etaient fausses</h3>
+          <div class="card-detail" data-cite><p class="lead">UN GLOSSAIRE NON VERIFIE EST PLUS DANGEREUX QU'UNE ABSENCE DE GLOSSAIRE, parce qu'il fait autorite et qu'on cesse de rechercher.</p><ul class="puces"><li>Mesure sur ce projet, le lendemain de sa livraison : 3 entrees sur 7 portaient un terme RETENU FAUX (it « alloggio », es « alojamiento », pt « alojamento »), plus UNE PROSCRIPTION FAUSSE (« casa rural » interdit a tort en espagnol au motif qu'il designerait l'Espagne rurale — la sonde renvoie « casa rural francia pirineos » et « casa rural bayona francia »). Ces entrees portaient TOUTES les marques de la fiabilite : une date, un motif redige, deux sources citees. Le mecanisme est identique dans les trois langues : alloggio, alojamiento et alojamento completent tous en LOGEMENT SOCIAL et RECHERCHES DE DICTIONNAIRE — « alloggi per sinistrati », « alloggi erp », « alojamiento en frances », « alojamento social », « alojamento significado ». J'allais remplacer un mot signifiant « excursions » par un mot signifiant « logement d'urgence », 81 fois. CAUSE RACINE : le terme RETENU avait ete choisi a partir de la sonde qui avait servi a etablir le terme PROSCRIT. Etablir « X est faux » et etablir « Y est juste » sont deux recherches distinctes</li><li>seule la premiere avait ete faite, et la seconde presentee comme faite. Correctif propose : une entree porte les sources du terme RETENU, pas seulement celles du terme ecarte — deux recherches, deux jeux de sources. Ajouter un champ `confiance` avec OBLIGATION de le renseigner a BASSE quand les sources n'ont pas tranche, plutot que d'enoncer un verdict fabrique. A rapprocher de RT-32 (deux a trois sources par recommandation) : la regle existait deja et n'a pas suffi, parce qu'elle ne disait pas SUR QUELLE AFFIRMATION porter les sources</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-25</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8.3 — gain 5 × preuve 5 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>3 entrees fausses sur 7, toutes datees et sourcees ; 81 remplacements errones evites de justesse</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-glossaire-passe-complete-20260825</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0643" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0643</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.7)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Une liste plate de termes ne peut exprimer ni l'exigence de preuve ni la portee</h3>
+          <div class="card-detail" data-cite><p class="lead">Deux structures manquent au glossaire, chacune demontree par un defaut reel trouve sur ce projet.</p><ul class="puces"><li>CATEGORIE : les termes n'ont pas tous la meme exigence de preuve. Un terme de VISIBILITE se prouve par une source externe — ce que les gens tapent reellement — et une erreur y coute du trafic non qualifie. Un terme CONTRACTUEL se prouve par l'exactitude lexicale et la coherence interlangue, et une erreur y coute un litige sur ce qui est du. Les confondre fait sur-chercher les evidences et sous-chercher les termes a trafic</li><li>PORTEE : un mot peut etre JUSTE ICI et AMBIGU LA. « deposit » est l'usage anglais correct pour l'acompte (« 30% deposit ») et ambigu pour la caution : le visiteur anglophone lisait « 30% deposit » a la reservation puis « Deposit of €400 payable on arrival », sans que rien ne dise que le second est RENDU. Les six autres langues ont deux mots distincts — de Kaution/Anzahlung, es fianza/anticipo, it cauzione/acconto, nl borg/aanbetaling, pt caucao/sinal. Une proscription globale de « deposit » aurait casse l'acompte. Correctif propose : deux champs au schema — une CATEGORIE (visibilite/contractuel) qui commande le type de preuve exige, et une PORTEE { cle } qui restreint une regle aux chaines rangees sous une clef donnee. La portee ouvre au passage une seconde forme de regle, absente jusqu'ici : le TERME REQUIS. Proscrire ne suffisait pas — c'est l'ABSENCE de « security deposit » sous la clef `caution` qu'il fallait pouvoir exiger. Implemente et verifie sur ce projet : build/i18n/glossaire.json et build/check-glossaire.mjs, 8 termes x 7 langues, 0 ecart</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-25</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>ambiguite contractuelle en anglais sur 5 chaines ; 6 langues sur 7 distinguent les deux concepts</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-glossaire-passe-complete-20260825</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0640" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0640</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 5.3)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Rien n'impose de consulter la terminologie avant d'ecrire une traduction</h3>
+          <div class="card-detail" data-cite><p class="lead">Meme avec un glossaire, le controle n'attrape le mot qu'APRES COUP : la traduction est ecrite, relue, commitee, puis rejetee.</p><ul class="puces"><li>Le cout est reel — sur ce projet, corriger 99 occurrences apres ecriture est un travail sans rapport avec celui d'avoir ouvert le glossaire au depart. Et l'angle mort ne tient pas a ce projet : TOUT PRODUIT MULTILINGUE DE LA FORGE le partage, puisque aucune etape ne prescrit d'ou vient le vocabulaire d'une locale. Correctif propose : regle de socle — toute production de traduction part du glossaire du projet, un terme metier ne se traduit pas au fil de l'eau</li><li>si le glossaire n'existe pas encore, l'etablir est la PREMIERE ETAPE de la traduction, pas une regularisation ulterieure. Corollaire utile tire de ce cas : un terme n'est PAS traduisible par defaut — un emprunt peut etre lexicalise dans une langue cible (« gite » en anglais et en neerlandais, article Wikipedia dedie) et absent ou trompeur dans une autre (allemand, espagnol, portugais : absent</li><li>italien : homographe signifiant excursions). Le glossaire tranche PAR LANGUE, jamais globalement. Limite a declarer avec la regle : la JUSTESSE d'une traduction reste hors de portee d'un script — ce qui devient controlable est l'emploi d'un terme declare proscrit, rien de plus</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-25</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 5.3 — gain 4 × preuve 4 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>correction de 99 occurrences en aval contre une consultation de glossaire en amont ; angle mort partage par tout produit multilingue</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-glossaire-terminologique-20260825</dd></div>
+            
+          </dl>
+        </article>
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
              titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
              socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
@@ -3394,9 +3555,55 @@ LES QUATRE CRITERES DE REOUVERTURE vivent au contenu de l'item et n'ont pas a et
       </div>
     </section>
     <section id="digit-ai-forge-seo-geo">
-      <h2>digit-ai-forge-seo-geo <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-seo-geo">1</span></h2>
+      <h2>digit-ai-forge-seo-geo <span class="badge" title="3 item(s) actifs ciblant digit-ai-forge-seo-geo">3</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-seo-geo</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0636" data-cite data-forge="digit-ai-forge-seo-geo" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0636</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Le noeud 58 verifie la presence des directives IA, jamais leur exactitude</h3>
+          <div class="card-detail" data-cite><p class="lead">Sa question d'audit est explicite : « Les agents des moteurs generatifs peuvent-ils acceder au site, et les directives IA sont-elles posees ? ».</p><ul class="puces"><li>Sa source requise est un crawl de robots.txt et llms.txt</li><li>Son constat sur ce projet porte entierement sur l'acces : « le serveur repond HTTP 200 et 17 421 octets a l'identique a un navigateur, a GPTBot, a ClaudeBot et a PerplexityBot »</li><li>Exact, et sans rapport avec le contenu</li><li>Mesure par ailleurs : la chaine « llms » n'apparait que DEUX FOIS dans tout le code Python de la forge, jamais pour en lire le contenu</li><li>Un llms.txt annoncant des tarifs perimes, des capacites fausses ou des URLs mortes passerait donc le noeud sans une remarque — et ce fichier existe precisement pour etre lu par des modeles de langue, qui le reprendront sans le verifier : une erreur y porte plus loin qu'ailleurs</li><li>Meme forme que RT-13 du lot 20260824a sur l'oracle de contraste</li><li>Correctif propose : un noeud distinct « coherence des directives IA » confrontant ce que llms.txt affirme aux donnees du site — tarifs, capacites, surfaces, URLs, langues declarees — peu couteux parce que le fichier est structure</li><li>A defaut, que le noeud 58 DECLARE SA PORTEE dans son non_juge : « presence et accessibilite, jamais exactitude du contenu », pour que « les directives IA sont posees » ne se lise pas comme « les directives IA sont justes »</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-25</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-seo-geo</dt><dd>2 occurrences de « llms » dans le code de la forge, aucune lisant le contenu ; noeud verdict partiel T1 sur l'acces seul</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-llms-noeud58-20260825</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0638" data-cite data-forge="digit-ai-forge-seo-geo" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0638</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.3)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-seo-geo ne porte aucun noeud d'analyse lexicale par langue</h3>
+          <div class="card-detail" data-cite><p class="lead">Sa grille de 88 noeuds traite le multilingue sous l'angle TECHNIQUE : hreflang, canoniques, sitemap, parite des routes, acces des agents IA — tous conformes sur ce projet, 204 pages avec hreflang, x-default sur les 203, reciprocite verifiee.</p><ul class="puces"><li>Aucun noeud ne demande si le VOCABULAIRE EMPLOYE est celui que le marche cible utilise reellement. Defaut mesure sur ce projet : la page allemande dit HUIT FOIS « Gite » et JAMAIS « Ferienhaus »</li><li>la page italienne emploie un mot qui designe des excursions. Techniquement irreprochable, commercialement muet — le site est correctement traduit et cherche des visiteurs avec un mot qu'ils ne tapent pas. A noter que le probleme n'est pas le titre seul : il y a quatre niveaux (title/meta, H1, corps de texte et navigation, puis hreflang/sitemap/canoniques) et seul le quatrieme est correct. Changer le titre sans le corps creerait une incoherence entre ce que le titre promet et ce que la page contient. Correctif propose : un noeud « adequation lexicale par marche », instrumente comme les autres — pour chaque locale servie, confronter le vocabulaire du title, du H1 et du corps aux termes reellement employes dans cette langue pour cette categorie de produit. La sonde peut rester legere (completions + requetes Search Console du marche quand elles existent) mais elle doit DECLARER SES LIMITES — pas de volume, pas de geolocalisation fiable — et signaler les HOMOGRAPHES TROMPEURS, cas le plus couteux et le moins visible</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-25</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.3 — gain 5 × preuve 5 ÷ effort 4)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-seo-geo</dt><dd>page allemande : 8 « Gite », 0 « Ferienhaus » ; page italienne sur un mot signifiant « excursions »</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-recherche-lexicale-20260825</dd></div>
+            
+          </dl>
+        </article>
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
              titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
              socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
@@ -3797,7 +4004,7 @@ HORS PORTEE DU PILOT SANS MANDAT : la correction vit chez forge-tests, et les tr
       </div>
     </section>
     <section id="pilot">
-      <h2>pilot <span class="badge" title="17 item(s) actifs ciblant pilot">17</span></h2>
+      <h2>pilot <span class="badge" title="20 item(s) actifs ciblant pilot">20</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
@@ -3898,6 +4105,29 @@ HORS PORTEE DU PILOT SANS MANDAT : la correction vit chez forge-tests, et les tr
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0635" data-cite data-forge="pilot" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0635</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 25)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Deux grandeurs comparees sans verifier qu'elles mesurent la meme chose</h3>
+          <div class="card-detail" data-cite><p class="lead">J'ai annonce a l'exploitant que llms.txt annoncait des capacites fausses sur les cinq gites, tableau comparatif a l'appui, et j'en ai tire que forge-seo-geo aurait du le voir.</p><ul class="puces"><li>Verification faite ensuite : llms.txt est RIGOUREUSEMENT CONFORME a ce que le site affiche (capCourt des fichiers de langue)</li><li>Ce que j'avais pris pour un minimum commercial etait capMin, le SEUIL DU FILTRE DE RECHERCHE — combien de personnes peuvent chercher et voir ce gite</li><li>Deux notions differentes, legitimement differentes</li><li>Il suffisait de suivre l'unique usage de capMin, le filtre de la page reservation, pour le voir</li><li>Surfaces et prix concordaient aussi sur les cinq, et les maximums correspondent a ce que Beds24 accepte</li><li>Consequence : une affirmation fausse livree a l'exploitant, puis RETOURNEE CONTRE UN OUTIL DE LA FORGE sous forme d'une mise en cause</li><li>C'est la huitieme occurrence en trois jours de la famille remontee au lot 20260823c, avec une variante inedite : la source n'etait ni partielle ni perimee, elle etait HORS SUJET</li><li>Comparer deux valeurs justes ne prouve rien tant que leur definition n'est pas etablie</li><li>Correctif propose : etendre RT-11 d'un cran — avant de conclure d'un ecart entre deux valeurs, etablir que les deux mesurent la meme grandeur</li><li>Test praticable en une question : QUI CONSOMME CETTE VALEUR, ET POUR QUOI FAIRE ? Corollaire opposable : une mise en cause d'un outil de la forge se verifie avant d'etre formulee, au meme titre qu'un constat de defaut</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-25</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 25 — gain 5 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>affirmation fausse livree a l'exploitant + accusation infondee portee contre forge-seo-geo + 1 aller-retour</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produit-02-llms-noeud58-20260825</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-corrige" id="item-TF-0590" data-cite data-forge="pilot" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0590</code>
@@ -3912,6 +4142,52 @@ HORS PORTEE DU PILOT SANS MANDAT : la correction vit chez forge-tests, et les tr
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur pilot</dt><dd>mesure le 25/08 : le harnais du pilot passe de 55/55 a 54/55 et n'en bouge plus — trois regenerations, trois fois le meme FAIL, un diff vide a chaque fois. Aucune action disponible ne le repare, ce qui est la definition d'un rouge qu'on apprend a ignorer.</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du 25/08, mandat « traite tous tes todos et retours » — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0645" data-cite data-forge="pilot" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0645</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 20)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Le lot de travaux confie au produit FABRIQUAIT le chemin source par chirurgie de chaine sur la cible, alors que le contrat le DECLARE — trois chemins sur neuf n'existaient pas</h3>
+          <div class="card-detail" data-cite><p class="lead">Trouve le 26/08 en relisant un lot que je VENAIS DE DEPOSER chez un produit (mandat « 1a »).</p><ul class="puces"><li>LE FAIT : sur les neuf artefacts d'heritage confies, le lot prescrivait `recopier gabarits/hooks/factory.mjs`, `recopier .claude/settings.json` et `recopier robots.txt`</li><li>Les trois chemins N'EXISTENT PAS au pilot</li><li>Les vrais, DECLARES au contrat `gabarits/HERITAGE.json`, sont `gabarits/hooks-factory.mjs`, `gabarits/settings-produit.json` et `gabarits/web/robots.txt`</li><li>LA CAUSE : `emettre-travaux.mjs` derivait le chemin source de la CIBLE — `a.cible.replace(/^forge\//, &quot;gabarits/&quot;)` — avec DEUX cas particuliers rustines a la main pour les seuls artefacts ou la devinette tombait juste</li><li>Deux rustines dans une derivation sont le signal que la derivation est fausse</li><li>LA CAUSE DE LA CAUSE, et c'est elle qui compte : une COLLISION DE NOM</li><li>Le contrat donne a `source` un sens precis — le CHEMIN de l'artefact chez le pilot</li><li>Or `relever-heritage.mjs` ne portait pas ce champ dans son releve, et y ecrivait a la place une EMPREINTE sous le meme nom (`{ etat: &quot;divergent&quot;, source: a, produit: b }`)</li><li>Le consommateur avait donc perdu le chemin en route et n'avait plus qu'a le refabriquer</li><li>Un champ qui porte deux sens dans deux fichiers voisins ne se documente pas : il se renomme</li><li>ATTENUATION HONNETE : le lot ajoutait « le chemin source exact est au contrat », donc un lecteur attentif s'en sortait</li><li>Mais une clause de sauvegarde ne repare pas une phrase fausse — elle demande au lecteur de faire le travail que l'outil devait faire</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-26</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>trois chemins faux sur neuf dans un lot REELLEMENT depose chez un produit ; verifie par `[ -f ]` sur chacun. Le lot fautif a du etre retire et redepose.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0646" data-cite data-forge="pilot" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0646</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 20)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Un motif de derogation passe en ARGUMENT traverse un shell : quatre motifs ont ete mutiles en silence, et rien ne l'a signale parce qu'ils restaient plausibles</h3>
+          <div class="card-detail" data-cite><p class="lead">Commis et constate le 26/08, sur ce script meme.</p><ul class="puces"><li>LE FAIT : un motif de derogation citait `forge/retours/RETOURS-FORGES.md` et `forge/retours/oracle-lot.mjs` entre accents graves</li><li>Passe en argument depuis bash, les deux ont ete executes comme des SUBSTITUTIONS DE COMMANDE</li><li>Elles ont echoue (« No such file or directory »), leur sortie VIDE a remplace les noms, et le registre a recu, pour QUATRE lots : « dont  (le gabarit qui decrit les sections R-45/R-46) et  (son juge) »</li><li>CE QUI REND CE DEFAUT INSIDIEUX : rien ne l'a signale</li><li>Le motif mutile restait bien au-dessus du seuil de longueur, sa phrase restait grammaticalement presque correcte, et le seul controle existant mesure la LONGUEUR</li><li>Un motif ampute de ses deux noms les plus importants est indiscernable d'un motif complet pour tout ce qui le juge</li><li>LA VERITE, POUR LE REGISTRE, puisque celui-ci est en ajout seul et que les quatre evenements d'ingestion ne se reecrivent pas : les deux artefacts que le motif nommait et qui ont ete effaces sont `forge/retours/RETOURS-FORGES.md` — le gabarit qui decrit les sections R-45 et R-46 — et `forge/retours/oracle-lot.mjs` — son juge</li><li>Les quatre lots concernes sont Produit-02 - RETOURS - 20260825c (sceau 9c8e2307d603), 20260825d (2bb08decad70), 20260825e (b59bb1f949a4) et 20260825f (c1dabe486951)</li><li>C'EST LA MEME LECON QUE LES MESSAGES DE COMMIT, apprise deux fois dans la meme session : on les ecrit dans un fichier et on passe `-F`, precisement pour que le shell ne les relise pas</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-26</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>quatre motifs de derogation mutiles dans le registre, en ajout seul donc non reecrivables ; les deux noms perdus sont ceux des deux artefacts qui fondent la derogation. Le shell a imprime ses deux erreurs et l'ingestion a continue.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
             
           </dl>
         </article>
