@@ -52,6 +52,66 @@ import { verifier } from "../gabarits/oracle-travaux-pilot.mjs";
 import { empreinteTexte } from "../scripts/lib-empreinte.mjs";
 import { relever } from "../scripts/relever-heritage.mjs";
 
+/**
+ * LA SECONDE SOURCE DU CANAL (TF-0673). Jusqu'ici cet émetteur ne savait confier qu'UNE classe :
+ * les artefacts d'héritage manquants. Tout autre constat destiné à un produit — un correctif que
+ * lui seul peut appliquer, un arbitrage qui lui appartient — n'avait AUCUNE VOIE, et retombait
+ * donc dans le défaut exact que ce script existe pour corriger : *un état mesuré qui n'atteint
+ * pas son destinataire ne devient pas un travail fait.*
+ *
+ * Un item du registre est confié quand il porte `destinataire_produit` et qu'il n'est pas clos.
+ * Le champ est EXPLICITE, jamais déduit d'une cible de forge : « ce constat concerne le produit
+ * X » est une décision humaine, pas une inférence — et une inférence déposerait chez un produit
+ * du travail que personne n'a voulu lui confier.
+ */
+/**
+ * « Produit-02 » et « Produit-02.com » désignent le même produit : le dépôt porte
+ * un suffixe de domaine que le registre n'écrit pas. On normalise les DEUX côtés — minuscules,
+ * tout ce qui suit le premier point retiré — puis on compare EXACTEMENT.
+ *
+ * JAMAIS PAR INCLUSION, et le motif vaut d'être écrit : « Foo » serait alors rapproché de
+ * « FooBar », et un constat partirait chez le mauvais produit. Une comparaison lâche qui se
+ * trompe dépose du travail chez quelqu'un qui n'en est pas le destinataire — c'est pire que
+ * de ne rien déposer, parce que le vrai destinataire n'apprend rien ET qu'un autre est dérangé.
+ */
+const normaliserProduit = (n) => String(n || "").toLowerCase().split(".")[0].trim();
+const memeProduit = (a, b) => normaliserProduit(a) === normaliserProduit(b)
+  && normaliserProduit(a) !== "";
+
+function constatsDuRegistre(produit) {
+  const chemin = join(PILOT, "todo", "TODO.jsonl");
+  if (!existsSync(chemin)) return [];
+  const etat = new Map();
+  for (const brute of readFileSync(chemin, "utf8").split(/\r?\n/)) {
+    if (!brute.trim()) continue;
+    let e;
+    try { e = JSON.parse(brute); } catch { continue; }
+    if (!e.id) continue;
+    etat.set(e.id, { ...(etat.get(e.id) || {}), ...e });
+  }
+  const clos = new Set(["corrige", "ecarte"]);
+  return [...etat.values()]
+    .filter((e) => e.destinataire_produit && memeProduit(e.destinataire_produit, produit)
+      && !clos.has(e.statut))
+    .sort((a, b) => String(a.id).localeCompare(String(b.id)));
+}
+
+/** Tous les constats destinés à UN produit, quel qu'il soit — pour dénoncer les orphelins. */
+function constatsDestines() {
+  const chemin = join(PILOT, "todo", "TODO.jsonl");
+  if (!existsSync(chemin)) return [];
+  const etat = new Map();
+  for (const brute of readFileSync(chemin, "utf8").split(/\r?\n/)) {
+    if (!brute.trim()) continue;
+    let e;
+    try { e = JSON.parse(brute); } catch { continue; }
+    if (!e.id) continue;
+    etat.set(e.id, { ...(etat.get(e.id) || {}), ...e });
+  }
+  const clos = new Set(["corrige", "ecarte"]);
+  return [...etat.values()].filter((e) => e.destinataire_produit && !clos.has(e.statut));
+}
+
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
 const args = process.argv.slice(2);
@@ -90,8 +150,17 @@ export function lotHeritage(ligne, jour, indice) {
   // deposaient donc deux lots identiques dans le fond et differents dans l'octet, et la boite du
   // produit se remplissait — exactement la nuisance que ce canal doit eviter (R-33 bis). Trouve
   // par la recette d'idempotence, qui rendait 4 fichiers au lieu de 2.
-  const sceauConfie = empreinteTexte([...perimes, ...absents, ...horsRacine]
-    .map((a) => `${a.cible}|${a.etat}|${a.empreinte_pilot || ""}|${a.empreinte_produit || ""}`).sort().join("\n"), 12);
+  const constats = constatsDuRegistre(ligne.produit);
+  const sceauConfie = empreinteTexte([
+    ...[...perimes, ...absents, ...horsRacine]
+      .map((a) => `${a.cible}|${a.etat}|${a.empreinte_pilot || ""}|${a.empreinte_produit || ""}`),
+    // LES CONSTATS ENTRENT DANS LE SCEAU, et leur CONTENU avec eux. Sceller le seul identifiant
+    // ferait qu'un constat reformulé garderait l'empreinte de l'ancien : le lot corrigé serait
+    // tenu pour déjà déposé et ne partirait jamais. C'est la classe de défaut de N-39 —
+    // une valeur qui ne varie que pour une partie de ce qu'elle prétend couvrir.
+    ...constats.map((e) => `${e.id}|constat|${empreinteTexte(String(e.contenu || "") + "|"
+      + String(e.demande_produit || ""), 12)}`),
+  ].sort().join("\n"), 12);
 
   const glose = {
     "forge/retours/RETOURS-FORGES.md": "le gabarit qui décrit la forme d'un lot de retours — sans lui, vos retours sont refusés à la porte du pilot pour une forme que rien ne vous a dite",
@@ -135,13 +204,35 @@ export function lotHeritage(ligne, jour, indice) {
     : "l'écart reste, et le contrôle de conformité du pilot continue de le rendre à chaque lot que vous remettez"}`;
   };
 
+  // UN CONSTAT DU REGISTRE. Les champs manquants ne sont PAS inventés : ils sont dits manquants.
+  // Un lot qui comblerait les trous du registre par de la prose plausible ferait croire au
+  // produit qu'on lui a écrit quelque chose de mesuré.
+  const manque = (quoi) => `**non renseigné au registre** — ${quoi}`;
+
+  // Le lot cite TOUS les items qu'il porte, pas seulement le premier. Citer un seul identifiant
+  // quand le lot en confie quatre laisse le destinataire chercher d'où viennent les trois autres,
+  // et rend la remontée de son avancement impossible à rattacher.
+  const refsRegistre = [
+    ...(perimes.length || absents.length || horsRacine.length ? ["TF-0626"] : []),
+    ...constats.map((e) => e.id),
+  ].map((i) => `\`${i}\``).join(", ") || "\`aucun\`";
+  const blocConstat = (e) => `### ${e.id} — ${e.titre || "constat sans titre"} · gravité ${e.gravite || "mineur"}
+
+- **Le fait** : ${e.contenu ? String(e.contenu).slice(0, 1400) : manque("le constat n'a pas de contenu")}
+- **Pourquoi cela vous concerne** : ${e.pourquoi_produit || "ce constat a été relevé sur votre produit, et sa correction vous appartient — le pilot n'écrit pas dans votre code"}
+- **Ce qui est demandé** : ${e.demande_produit || manque("aucune demande explicite — à instruire avec le pilot avant d'agir")}
+- **Effort estimé** : ${e.effort || manque("non estimé")}
+- **Comment vous saurez que c'est fait** : ${e.verification || manque("aucune vérification déclarée — c'est un manque, pas une dispense")}
+- **Si ce n'est pas fait** : ${e.consequence || manque("conséquence non écrite")}`;
+
   const items = [...perimes.map((a) => bloc(a, "majeur")), ...absents.map((a) => bloc(a, absents.length > 4 ? "majeur" : "mineur")),
-                 ...horsRacine.map((a) => blocHorsRacine(a, jour))];
+                 ...horsRacine.map((a) => blocHorsRacine(a, jour)),
+                 ...constats.map(blocConstat)];
 
   const md = `# Travaux confiés par le pilot — ${ligne.produit} — ${jour}${indice}
 
 - **Émetteur** : \`digit-ai-factory\` (le pilot)
-- **Références registre** : \`todo\\TODO.jsonl\` — item \`TF-0626\`
+- **Références registre** : \`todo\\TODO.jsonl\` — item(s) ${refsRegistre}
 - **Dépôt** : ce fichier a été déposé par le pilot dans \`input\\00-travaux\\\`. L'original reste au
   pilot. Statut : \`a_traiter\` → \`traite le <date>\` — seule édition autorisée après coup.
 - **Statut** : a_traiter
@@ -201,7 +292,17 @@ ${items.join("\n\n")}
    que le projet n'expose pas de surface web.
 `;
 
-  const sidecar = [...perimes, ...absents].map((a) => JSON.stringify({
+  const sidecarConstats = constats.map((e) => JSON.stringify({
+    schema: 1,
+    titre: e.titre || `Constat ${e.id}`,
+    contenu: String(e.contenu || "").slice(0, 1400),
+    origine_tf: e.id,
+    gravite: e.gravite || "mineur",
+    effort: e.effort || "non estime",
+    verification: e.verification || "aucune verification declaree",
+  }));
+
+  const sidecar = [...[...perimes, ...absents].map((a) => JSON.stringify({
     schema: 1,
     titre: `${a.etat === "absent" ? "Artefact d'heritage absent" : "Artefact d'heritage perime"} : ${a.cible}`,
     contenu: `Mesure du pilot du ${jour} : ${a.cible} ${a.etat === "absent" ? "n'existe pas" : "diverge de la source"} dans ce depot. ${glose[a.cible] || ""}`,
@@ -209,7 +310,7 @@ ${items.join("\n\n")}
     gravite: a.cible.includes("RESTITUTION") || a.cible.includes("hooks") ? "majeur" : "mineur",
     effort: "simple × court",
     verification: "node c:\\dev\\digit-ai-factory\\scripts\\relever-heritage.mjs ne liste plus cet artefact",
-  })).join("\n") + "\n";
+  })), ...sidecarConstats].join("\n") + "\n";
 
   return { md, sidecar, elements: items.length, sceauConfie };
 }

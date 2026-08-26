@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=7ef1b3cdd117 archive=40441f7fe541 · dernier événement: 2026-08-26T12:19:24.546Z -->
+     sceaux: actifs=758b8db1bc4d archive=40441f7fe541 · dernier événement: 2026-08-26T12:39:56.042Z -->
 
-**204 actifs** (candidat 3 · décidé 1 · en cours 0 · corrigé 193 · écarté 7) · **469 archivés**.
+**208 actifs** (candidat 6 · décidé 1 · en cours 0 · corrigé 194 · écarté 7) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,8 +11,11 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0674 | candidat | 12.5 | La porte de fraîcheur de déploiement empreinte encore un échantillon — le correctif d'ensemble n'est pas appliqué | non |
 | TF-0670 | candidat | 6.7 | L'étape A9 de la chaîne de traduction — relecture native déclarée, bloquante si absente — est énoncée et rien ne l'exécute | non |
+| TF-0676 | candidat | 6.7 | Aucun script de capture du produit ne produit systématiquement une pleine page | non |
 | TF-0671 | candidat | 5.3 | Le critère de réussite de la chaîne de traduction est écrit en prose et aucun script ne le mesure | non |
+| TF-0675 | candidat | 5 | Soixante-trois pages portent le même surtitre deux fois — arbitrage éditorial ouvert | non |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
 | TF-0526 | corrige | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
 | TF-0530 | corrige | 25 | pilot : le garde-fou « le pilot n'ecrit pas chez un produit » tenait par DISCIPLINE SEULE, et les classes de defaut du jour n'avaient pas de regle generique | **oui** — un garde-fou non execute est un garde-fou qu'on suit jusqu'au jour ou on ne le suit plus ; et neuf classes de defaut payees le meme jour sans qu'aucune regle generique ne les empeche de revenir ailleurs |
@@ -231,6 +234,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0669 | corrige | 20 | La notion « un doublon est un defaut » n'est cablee que sur un axe : entre livrables, jamais dans un livrable | **oui** — 70 pages sur 203 portaient le defaut. Le controle qui l'aurait trouve tient en six lignes et n'existait sur aucun des six outils de la chaine, alors que sa direction inverse — l'unicite du title entre pages — etait cablee et rouge en CI depuis le debut. |
 | TF-0672 | corrige | 12.5 | La porte de fraicheur de deploiement empreinte UNE page et conclut sur les 203 — recidive du defaut corrige la veille | **oui** — Une verification de production a rendu « PRODUCTION CONFORME » a 11:47 UTC sur un conteneur qui servait encore la version d'avant la poussee, verifie par requete directe a la meme minute. Le defaut se produit sur la porte CORRIGEE LA VEILLE pour ce meme motif : deux lots consecutifs, une seule classe, et le second faux vert etait plus difficile a voir que le premier. |
 | TF-0666 | corrige | 10 | Une porte de fraicheur de deploiement cloturait sur une valeur qui ne change pas d'un deploiement a l'autre | **oui** — Une verification de production rouge a 09:52 et verte a 09:54 sur un code identique, apres une poussee qui ne changeait qu'une chaine de description. Six poussees consecutives ont franchi la porte « au bout de 1 essai » sans qu'elle puisse distinguer l'ancien conteneur du nouveau. |
+| TF-0673 | corrige | 10 | Le canal pilot → produit ne savait confier QU'UNE classe de travail : les artefacts d'héritage manquants | non |
 | TF-0660 | corrige | 8.3 | Aucun oracle ne peut juger une substitution de terme qui change le genre grammatical | **oui** — 11 fautes d'accord servies en production sur deux langues, CI verte et six controleurs au vert. Detectees uniquement parce que l'exploitant a demande une relecture apres coup. |
 | TF-0664 | corrige | 6.3 | Aucune chaine declaree pour « traduire un produit » ni pour « auditer ses traductions », et son absence se paie en tours | **oui** — 11 tours sur 17 ont existe parce qu'une etape, un format ou une regle manquait — dont 8 pour ecrire la methode a la main. Consequences mesurees : 11 fautes d'accord et 2 faits faux servis en production derriere une CI verte. Quatre retours du meme jour (RT-47, RT-48, RT-51, RT-54) sont chacun une etape de la sequence absente. |
 
