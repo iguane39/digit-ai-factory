@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=bc0a6a35f7f2 archive=40441f7fe541 · dernier événement: 2026-08-26T09:59:09.095Z -->
+     sceaux: actifs=de0673f80127 archive=40441f7fe541 · dernier événement: 2026-08-26T11:10:25.485Z -->
 
-**196 actifs** (candidat 5 · décidé 1 · en cours 0 · corrigé 183 · écarté 7) · **469 archivés**.
+**196 actifs** (candidat 3 · décidé 1 · en cours 0 · corrigé 185 · écarté 7) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,8 +11,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0661 | candidat | 12.5 | Un run qui identifie un risque non couvert le DECLARE et passe la main, au lieu de boucler | **oui** — Un risque ecrit noir sur blanc dans la restitution, puis livre ET deploye sans traitement. Il a fallu une demande explicite de l'exploitant pour que la boucle se ferme, et elle a produit 11 corrections. |
-| TF-0662 | candidat | 10 | La route de deploiement prescrite par le gabarit contredit le mecanisme reel, et son dossier n'existe pas | **oui** — Session ayant annonce un deploiement « restant a faire » sur une production deja a jour, et corrigee par l'exploitant. Le dossier de reference cite par le gabarit est absent du depot. |
 | TF-0660 | candidat | 8.3 | Aucun oracle ne peut juger une substitution de terme qui change le genre grammatical | **oui** — 11 fautes d'accord servies en production sur deux langues, CI verte et six controleurs au vert. Detectees uniquement parce que l'exploitant a demande une relecture apres coup. |
 | TF-0664 | candidat | 6.3 | Aucune chaine declaree pour « traduire un produit » ni pour « auditer ses traductions », et son absence se paie en tours | **oui** — 11 tours sur 17 ont existe parce qu'une etape, un format ou une regle manquait — dont 8 pour ecrire la methode a la main. Consequences mesurees : 11 fautes d'accord et 2 faits faux servis en production derriere une CI verte. Quatre retours du meme jour (RT-47, RT-48, RT-51, RT-54) sont chacun une etape de la sequence absente. |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
@@ -239,11 +237,13 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0637 | corrige | 12.5 | Une recherche a fonde une recommandation sur une source unique au biais indecelable | **oui** — recommandation inverse evitee de justesse ; homographe italien detecte en repondant a l'exploitant, pas en menant la recherche |
 | TF-0639 | corrige | 12.5 | La connaissance terminologique n'a nulle part ou vivre dans un projet multilingue | **oui** — 99 occurrences d'un faux ami dans un seul fichier de langue, invisibles aux 3 controles existants |
 | TF-0647 | corrige | 12.5 | Le socle documentaire declare sa propre verifiabilite et rien ne l'exerce | **oui** — 7 fiches sur 8 en gabarit apres 5 runs et une MEP ; 137 marqueurs ; 2 vues HTML generees depuis du vide |
+| TF-0661 | corrige | 12.5 | Un run qui identifie un risque non couvert le DECLARE et passe la main, au lieu de boucler | **oui** — Un risque ecrit noir sur blanc dans la restitution, puis livre ET deploye sans traitement. Il a fallu une demande explicite de l'exploitant pour que la boucle se ferme, et elle a produit 11 corrections. |
 | TF-0631 | corrige | 12 | Un lien symbolique BRISE vit a la racine du parc depuis le 9 aout sous un nom de pilot, et AUCUN balayage ne le voit : `isDirectory()` et `isFile()` sont faux tous les deux pour un lien | **oui** — `ls -l /c/dev | grep '^l'` rend le lien ; `node bootstrap.mjs` ne le nomme dans aucune de ses lignes, alors qu'il declare le meme jour un fichier `null` de 10927 octets, deux repertoires non versionnes et le clone archive. Seize jours de presence, zero declaration. Le controle qui declare les pieges du parc est aveugle a une classe entiere d'entrees de repertoire. |
 | TF-0471 | corrige | 10 | R-45 refuse des lots rédigés AVANT sa publication — deux lots Produit-05 bloqués à l'ingestion, dont un qui signalait un plantage réel du lanceur d'oracles | **oui** — payé le 22/08 : douze candidatures de deux lots restent hors du registre, et l'une d'elles nommait un défaut BLOQUANT du lanceur d'oracles qui n'a été corrigé que parce que la session l'a rencontré par un autre chemin — un refus de forme a mis un fait de production hors de portée |
 | TF-0648 | corrige | 10 | Un oracle dont l'echec d'environnement est indiscernable d'un defaut | **oui** — diagnostic subi sur un stderr vide ; controle rapporte « ni passe ni echoue », verdict inconsommable |
 | TF-0650 | corrige | 10 | Un controle de detection sans exemption declaree s'apprend a etre ignore | **oui** — 16 signalements sur 38 ne doivent pas etre corriges — 42 % de bruit structurel et permanent |
 | TF-0654 | corrige | 10 | La sonde d'heritage suppose que la racine web est la racine du depot | **oui** — 2 manques sur 2 restants sont des faux positifs ; appliquer le travail creerait 2 fichiers morts |
+| TF-0662 | corrige | 10 | La route de deploiement prescrite par le gabarit contredit le mecanisme reel, et son dossier n'existe pas | **oui** — Session ayant annonce un deploiement « restant a faire » sur une production deja a jour, et corrigee par l'exploitant. Le dossier de reference cite par le gabarit est absent du depot. |
 | TF-0548 | corrige | 8.3 | La couverture des regles se compte en REGLES, jamais en EXIGENCES : une regle qui en enonce cinq et n'en controle qu'une est comptee couverte — c'est ce qui a laisse passer le gabarit manquant | **oui** — paye et chiffre : QUINZE candidatures refusees a l'ingestion en trois jours, sur deux produits, pour une forme que ni l'un ni l'autre ne pouvait connaitre faute d'avoir le gabarit — que la regle 18 exigeait par ecrit depuis le 06/08 et que rien ne verifiait. Le taux de couverture affichait 24 regles sur 26, soit 92 %, pendant tout ce temps. Sur la seule regle 18, la couverture reelle est de 1 exigence controlee sur 5. |
 | TF-0586 | corrige | 8.3 | Aucun oracle ne verifie qu'un nom de domaine declare repond | **oui** — 8 hostnames declares, 0 controle ; base par defaut de check-redirects encore sur l'URL Railway apres bascule |
 | TF-0641 | corrige | 8.3 | Le glossaire terminologique se constitue par accident, pas par balayage | **oui** — 1 terme au glossaire contre 8 apres balayage ; 3 defauts en production invisibles a 9 controles projet |

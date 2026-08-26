@@ -792,6 +792,49 @@ function juger(texte) {
     else ok("S28", `${risquees.length} mise(s) en cause, chacune adossée à une vérification`);
   }
 
+  // ---- S29 (TF-0661, 26/08) — DÉCLARER UN RISQUE N'EST PAS LE TRAITER -------------------------
+  //
+  // LE FAIT, et il est d'une netteté rare parce que le run avait tout bien fait sauf la dernière
+  // chose. Sa restitution portait, en clair : « La relecture native n'a pas eu lieu. Environ 180
+  // chaînes de corps de texte sont concernées, sur des pages publiques. C'est le seul endroit du
+  // lot où le risque n'est pas couvert par un oracle. » Le risque était **vu, nommé, chiffré et
+  // écrit**. Le run a ensuite poussé, déployé, et attendu.
+  //
+  // ONZE FAUTES D'ACCORD sont parties en production, et ont été trouvées **une demande de
+  // l'exploitant plus tard** — la demande étant, mot pour mot, de faire ce que le run avait dit ne
+  // pas avoir fait.
+  //
+  // LE DÉFAUT N'EST PAS D'AVOIR MANQUÉ LE RISQUE : c'est d'avoir traité **la déclaration du risque
+  // comme son traitement**. Même faute de forme que R-45 corrige pour les remarques écartées — une
+  // remarque sans verdict est invisible — appliquée ici à un risque sans destinataire.
+  //
+  // CE QUI EST JUGÉ, et rien de plus : la CONTRADICTION INTERNE. On ne peut pas écrire au bloc 7
+  // « rien ne couvre ce risque » et au bloc 8 « aucune action ». L'une des deux phrases est fausse.
+  // C'est le seul cas où un oracle peut trancher sans comprendre le risque — et c'est exactement le
+  // cas fondateur.
+  //
+  // CE QUI N'EST PAS JUGÉ : qu'une action PORTE sur le risque déclaré. Rapprocher un risque de
+  // l'action qui le traite demanderait de comprendre les deux ; exiger une correspondance par mots
+  // ferait accuser des restitutions justes. Un bloc 8 non vide suffit donc — la règle attrape la
+  // contradiction, pas la négligence fine.
+  const RISQUE_DECOUVERT = /\b(n'est pas couvert|ne sont pas couverts?|rien ne (?:le |la |les )?couvre|aucun (?:oracle|contr[ôo]le|garde-fou) ne (?:le |la |les )?(?:couvre|voit)|n'a pas eu lieu|reste non couvert)\b/i;
+  {
+    const b7 = bloc(texte, /##\s*7\.\s*Risques/i) || "";
+    const b8 = bloc(texte, /##\s*8\.\s*Prochaines actions/i) || "";
+    const declares = b7.split(/\n(?=\s*[-*])/).map((x) => x.trim()).filter((x) => RISQUE_DECOUVERT.test(x));
+    // Un bloc 8 « vide » au sens de cette règle : aucune ligne d'action numérotée ni pointée.
+    const aUneAction = /^\s*(?:\d+\.|[-*])\s+\S/m.test(b8);
+    if (!b7) findings.push({ regle: "S29", statut: "SANS_OBJET", message: "aucun bloc de risques — rien à confronter" });
+    else if (!declares.length) ok("S29", "aucun risque déclaré non couvert — rien à passer la main");
+    else if (aUneAction) ok("S29", `${declares.length} risque(s) déclaré(s) non couvert(s), et le bloc 8 passe la main`);
+    else ko("S29", `${declares.length} risque(s) déclaré(s) NON COUVERT(s) et AUCUNE action au bloc 8 : `
+      + "on ne peut pas écrire « rien ne couvre ce risque » et « rien n'est à faire » — l'une des deux phrases "
+      + "est fausse. Mesuré le 26/08 : un run a écrit « la relecture native n'a pas eu lieu, c'est le seul "
+      + "endroit où le risque n'est pas couvert », puis a poussé et attendu ; onze fautes sont parties en "
+      + "production et ont été trouvées une demande de l'exploitant plus tard. DÉCLARER UN RISQUE N'EST PAS "
+      + `LE TRAITER. Ex. : ${declares[0].replace(/\s+/g, " ").slice(0, 110)}`);
+  }
+
   // ---- S24 (TF-0596, 24/08) — une recherche par NOM qui ne trouve rien n'établit que l'absence
   // du NOM -----------------------------------------------------------------------------------------
   //
@@ -1215,6 +1258,24 @@ Aucun écart : la demande a été suivie à la lettre.
   const titreeSale = titree.replace("Rien n'attend de correction", "Rien n'attend de correction dans `oracle-synthese.mjs`");
   writeFileSync(join(dir, "verte.md"), verte, "utf8");
   writeFileSync(join(dir, "rouge.md"), rouge, "utf8");
+  // TF-0661 — S29 a besoin de SA fixture : la rouge porte des actions au bloc 8, donc la
+  // contradiction que S29 traque n'y existe pas. Ici, un risque déclaré NON COUVERT et un bloc 8
+  // qui ne passe la main à personne — le cas fondateur, mot pour mot dans sa forme.
+  const risqueOrphelin = verte
+    .replace("## 7. Risques\n- Le pack anglais ne se régénère plus.",
+      "## 7. Risques\n- La relecture native n'a pas eu lieu : environ 180 chaînes de corps de texte sont concernées, "
+      + "sur des pages publiques. C'est le seul endroit du lot où le risque n'est pas couvert par un oracle.")
+    .replace(/## 8\. Prochaines actions[\s\S]*$/, "## 8. Prochaines actions\n\nRien à faire.\n");
+  // Et sa contre-épreuve : le MÊME risque, mais la main est passée. Sans elle, une règle qui
+  // crierait sur tout risque déclaré passerait le cas rouge.
+  const risqueRepris = risqueOrphelin.replace(
+    "## 8. Prochaines actions\n\nRien à faire.\n",
+    "## 8. Prochaines actions\n\n- d'abord faire relire les 180 chaînes par un natif (manuelle_utilisateur) — "
+    + "parce que c'est le seul risque du lot qu'aucun oracle ne couvre.\n  - pourquoi pas l'IA : decision — "
+    + "l'accord grammatical d'une langue étrangère se tranche à l'oreille ;\n  - où : `web/src/i18n/locales/`.\n"
+    + "  - si rien n'est fait : les 180 chaînes partent en production sans relecture.\n");
+  writeFileSync(join(dir, "risque-orphelin.md"), risqueOrphelin, "utf8");
+  writeFileSync(join(dir, "risque-repris.md"), risqueRepris, "utf8");
   writeFileSync(join(dir, "titree.md"), titree, "utf8");
   writeFileSync(join(dir, "titree-sale.md"), titreeSale, "utf8");
   const moi = fileURLToPath(import.meta.url);
@@ -1229,6 +1290,13 @@ Aucun écart : la demande a été suivie à la lettre.
       if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
     }
   }
+  // TF-0661 — S29 dans SES DEUX SENS.
+  const ro = spawnSync(process.execPath, [moi, join(dir, "risque-orphelin.md")], { encoding: "utf8" });
+  const rrep = spawnSync(process.execPath, [moi, join(dir, "risque-repris.md")], { encoding: "utf8" });
+  if (!/"S29"[^}]*FAIL/.test(ro.stdout))
+    casse.push("S29 : un risque declare NON COUVERT avec un bloc 8 vide passe pour conforme — declarer un risque n'est pas le traiter");
+  if (!/"S29"[^}]*PASS/.test(rrep.stdout))
+    casse.push("S29 : le MEME risque, la main passee au bloc 8, est accuse — la regle crie sur un travail juste");
   const rt = spawnSync(process.execPath, [moi, join(dir, "titree.md")], { encoding: "utf8" });
   const rts = spawnSync(process.execPath, [moi, join(dir, "titree-sale.md")], { encoding: "utf8" });
   if (!/"S9"[^}]*PASS/.test(rt.stdout)) {
@@ -1307,7 +1375,7 @@ Aucun écart : la demande a été suivie à la lettre.
   }
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 11/11 PASS (verte PASS ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom)");
+    : "Self-test restitution : 11/11 PASS (verte PASS ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe)");
   process.exit(casse.length ? 1 : 0);
 }
 

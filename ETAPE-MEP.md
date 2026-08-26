@@ -233,10 +233,78 @@ La mise en **production** exige un GO humain explicite, donné sur `DOSSIER-MEP.
 
 Le GO est consigné au ledger (`reponse_humain`, portée : « GO production <produit> <version> »).
 Sans GO : le run se clôt en statut `pret_production_en_attente_GO` — c'est un état de succès,
-pas un échec. **Ce gate est incompressible.** Si une autonomie totale sans GO devait un jour
+pas un échec. **Ce gate est incompressible.** Il change de FORME dans la variante « déploiement
+continu » (§4 bis) — la poussée sur un commit nommé y tient lieu de GO — mais il n'y disparaît
+pas : sans acte humain, rien ne part. Si une autonomie totale sans GO devait un jour
 être voulue, elle devrait être demandée explicitement et consignée comme décision assumée dans
 `HYPOTHESES.md` — elle est déconseillée : elle contredit les constitutions de forge-development
 (HITL non négociables) et la fabrique de confiance client.
+
+## 4 bis. La variante DÉPLOIEMENT CONTINU (TF-0651, décision humaine du 26/08/2026)
+
+*Ce que cette variante échange, et ce qu'elle ne relâche pas. Elle ne retire aucune preuve : elle
+change l'endroit où la preuve vit, et la forme que prend la porte humaine.*
+
+**Le fait qui l'ouvre.** Un produit du parc fait du déploiement continu, et le fait bien : la
+poussée sur la branche principale déclenche des contrôles, l'hébergeur n'installe qu'au vert, puis
+une vérification de production **se place sur le commit déclencheur** — pas sur la tête de branche —
+attend que l'URL publique serve **cette** version, et rejoue les contrôles décisifs dans un vrai
+navigateur. Ce dernier garde-fou existe parce qu'un incident du **15/08/2026** l'a exigé : une
+poussée réussie n'avait rien déployé, et la production a servi l'ancienne version **cinq minutes**
+sans qu'aucun signal ne le dise.
+
+**La route standard fabriquait donc une non-conformité permanente pour un produit qui fait mieux
+qu'elle.** Un dispositif dont la porte est un dossier rédigé et relu ne prouve pas que la version
+poussée est servie ; celui-ci le prouve à chaque déploiement. *Une règle qui déclare non conforme
+ce qui la dépasse s'apprend à être contournée.*
+
+### Ce que le GO devient, et pourquoi ce n'est pas une autonomie sans porte
+
+**Le GO humain reste incompressible — il change de forme, pas de nature.** Dans cette variante,
+c'est **la poussée sur un commit nommé** : un acte humain, délibéré, daté, attribué et
+irréversible sans un second acte. Ce n'est pas « aucune porte » ; c'est une porte dont l'artefact
+est un identifiant de commit plutôt qu'une signature au bas d'un dossier.
+
+Ce que §4 déconseille — « une autonomie totale sans GO » — reste déconseillé, et cette variante n'y
+touche pas : sans poussée humaine, rien ne part.
+
+### Les quatre conditions, toutes exigées ensemble
+
+Cette variante ne s'applique QUE si les quatre tiennent. Il en manque une, la route standard
+s'applique : **on ne panache pas.**
+
+1. **Les contrôles précèdent le déploiement, et le déploiement y est CONDITIONNÉ.** L'hébergeur
+   n'installe qu'au vert. Un déploiement qui part en parallèle des contrôles n'est pas couvert.
+2. **Une vérification de production se place sur le COMMIT DÉCLENCHEUR**, attend que l'URL
+   publique serve cette version, puis rejoue les contrôles décisifs contre l'instance servie.
+   C'est la condition qui remplace la relecture humaine du dossier — et la seule qui aurait vu
+   l'incident du 15/08.
+3. **Les preuves M-1 à M-7 restent dues, à l'identique.** Elles vivent dans le run plutôt que dans
+   un dossier rédigé, et le run doit les rendre **récupérables** : un journal effacé au bout de
+   trente jours n'est pas une preuve opposable. Le rollback (M-4) reste écrit ET exercé — §2 bis
+   ne bouge pas d'une ligne.
+4. **La variante est DÉCLARÉE au brief produit**, au même titre que la cible de déploiement, et
+   consignée au ledger à l'ouverture du run. Jamais improvisée en cours de route : un produit qui
+   choisirait sa route selon ce qu'il a réussi à faire ne serait pas audité, il serait raconté.
+
+### Ce qui reste écrit, et ce qui disparaît
+
+**Disparaît** : `DOSSIER-MEP.md` comme artefact de la porte — le run le remplace.
+
+**Reste dû, et ne se dilue pas dans un journal de CI** : les **limites déclarées** du run (modes
+dégradés, `non_juge`, hypothèses), l'**écart RGAA** d'un produit public français tant que le trou
+de §3 tient, et la **liste des saisies attendues de l'utilisateur** extraite du rapport de tests.
+Ces trois-là ne sont pas des verdicts de contrôle : ce sont des choses qu'un humain doit LIRE, et
+un humain ne lit pas un journal de CI. Elles vivent donc dans un artefact court, versionné avec le
+produit.
+
+### Ce qui n'est pas encore mécanisé, et c'est dit
+
+L'oracle MEP ne sait pas encore **lire un run de CI** : il vérifie des preuves posées sur disque.
+Tant que ce câblage n'existe pas, cette variante se prouve par les **traces du run citées au
+ledger**, exactement comme les verdicts d'oracles y sont cités par leur `seq`. C'est une preuve
+opposable — un identifiant de run est vérifiable par un tiers — mais elle n'est pas **rejouée**
+par le pilot, et le déclarer vaut mieux que de laisser croire l'inverse.
 
 ## 5. Après la MEP
 

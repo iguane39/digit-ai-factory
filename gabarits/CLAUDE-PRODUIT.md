@@ -28,7 +28,7 @@ elle s'arrête et le dit.
 |---|---|---|
 | « Relance les tests », valider, clore | audit forge_tests : `uv run python -m forge_tests "<racine-de-ce-projet>" --json --sortie forge\etapes\tests\rapport-<AAAAMMJJ>.json` depuis `<FORGE_ROOT>\digit-ai-forge-tests` — exit 3 = PARTIEL acceptable documenté ; reprise ciblée : `--reprendre <rapport>` | conclure « tests OK » sur un pytest direct |
 | Corriger une anomalie, faire évoluer | consigner le retour au ledger (`type: retour`) puis **run de version** : rouvrir une session ici, coller `PROMPT-PRODUIT.md` (brief delta) ou « reprends le run » | éditer le code et livrer hors run |
-| Déployer | étape MEP du pilot : staging → qualif populée → **GO humain** (`forge\DOSSIER-MEP.md`) | `docker push` / mise en prod à la main |
+| Déployer | étape MEP du pilot, **selon la route déclarée au brief** (TF-0662) — *manuelle à porte* : staging → qualif populée → **GO humain** sur `forge\DOSSIER-MEP.md` ; *déploiement continu* (`ETAPE-MEP.md` §4 bis) : contrôles en CI, déploiement conditionné au vert, vérification de production placée sur le **commit déclencheur** — le GO humain y est **la poussée** | mise en prod à la main **hors** de la route déclarée ; et surtout : prescrire une route que le produit ne suit pas |
 | Juger le rendu visuel | mode « critique d'implémentation » de forge-design (produit vs promesse du run) | verdict à l'œil |
 | Signaler un défaut / retour sur les forges | consigner AU MOMENT MÊME au ledger (`type: retour`, `destinataire: <forge>`) — pas de mémoire de fin de run | retour oral perdu, ou modification d'un lot déjà remis |
 
