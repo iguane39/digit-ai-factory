@@ -1,0 +1,57 @@
+# .gitignore SOCLE d'un produit de la forge — instancié depuis `gabarits\gitignore-produit`.
+#
+# POURQUOI CE FICHIER EXISTE (TF-0649, 26/08/2026). La règle 10 du socle énumère depuis le 06/08
+# les exclusions qu'un produit doit porter « dès la création ». Elle vivait en PROSE, dans un
+# tableau de `REGLES-PROJET.md`, et n'avait donc AUCUN point d'application : un produit ne
+# l'enfreignait pas, il ne la rencontrait jamais. Mesure remontée par un produit : un `.pyc` suivi
+# par git, et un second qui s'apprêtait à entrer.
+#
+# *Une règle de socle exprimable comme un MOTIF DE FICHIER se livre comme un motif de fichier,
+# jamais comme une phrase dans un document de règles.* Même mécanisme que le gabarit
+# d'environnement et que le carnet des écarts assumés — objets différents, défaut identique.
+#
+# CE FICHIER EST UN SOCLE, PAS UN PLAFOND : un produit y ajoute ce que sa pile impose. Le contrôle
+# d'héritage vérifie que les motifs ci-dessous y sont PRÉSENTS, jamais que rien d'autre ne s'y
+# trouve — exiger l'identité reviendrait à interdire au produit d'ignorer ses propres artefacts.
+
+# ---- Secrets et environnement -----------------------------------------------------------------
+# Un `.env` versionné est le défaut le plus coûteux du parc : il ne se retire pas de l'histoire,
+# et seule une rotation d'identifiant réduit le risque une fois publié.
+.env
+.env.*
+!.env.*.exemple
+
+# ---- Artefacts compilés et dépendances ---------------------------------------------------------
+# Aucun projet n'a de raison de versionner ce qu'une commande régénère.
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+generated/
+dist/
+build/
+
+# ---- Sidecars d'oracles (règle 10 du socle, arbitrage C4) --------------------------------------
+# Les journaux d'oracles sont des PREUVES quand ils vivent sous `forge\` : ils y restent versionnés.
+# Partout ailleurs ce sont des artefacts d'atelier, et trois campagnes ont été polluées par eux.
+# L'exception doit suivre les exclusions, sinon elle ne rattrape rien.
+*.oracles.json
+*.oracles-cache.json
+*.oracles-historique.jsonl
+.oracles/
+!forge/**
+
+# ---- Journaux d'état de poste ------------------------------------------------------------------
+# Un état de poste versionné ferait croire qu'il vaut pour un autre poste, et le garde-fou
+# comparerait alors deux réalités différentes.
+*.log
+.claude/hooks-journal.jsonl
+.ops-journal.jsonl
+
+# ---- CE QUI N'EST PAS ICI, ET C'EST UNE DÉCISION ------------------------------------------------
+# `old\` N'EST PAS EXCLU. L'arbitrage C1, amendé par décision humaine du 13/08/2026 (TF-0150), le
+# rend AUTORISÉ et VERSIONNÉ : « le rangement fait partie de l'histoire que git garde ;
+# re-gitignorer retirerait des livrables déjà commités — l'ancien arbitrage *jamais versionné* est
+# caduc, le CODE reste hors old\ par la règle 6 ». Un produit qui exclut `old\` applique une règle
+# ABROGÉE. La graphie est `old\` en minuscules (D-15) ; `Old\` est un écart de nommage, pas un
+# écart de versionnement.
