@@ -37,6 +37,9 @@
  * Usage : node oracle-promesses.mjs [racine-des-forges] [--json] · --self-test
  * Exit : 0 = PASS (avertissements possibles) · 2 = SKIP motivé. Jamais 1 : la règle avertit.
  */
+// Exit : 0 = conforme · 1 = defaut MESURE. Aucun chemin « je ne peux pas mesurer » : cet oracle lit des fichiers du depot.
+// Le declarer vaut mieux que de le taire — un contrat muet laisse lire un 1 comme une panne
+// d'environnement (TF-0648).
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";

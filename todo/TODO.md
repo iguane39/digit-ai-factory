@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=d8ebdd5bba7a archive=40441f7fe541 · dernier événement: 2026-08-26T09:29:28.779Z -->
+     sceaux: actifs=4cb42a0fdd8e archive=40441f7fe541 · dernier événement: 2026-08-26T09:47:43.105Z -->
 
-**194 actifs** (candidat 7 · décidé 1 · en cours 0 · corrigé 179 · écarté 7) · **469 archivés**.
+**194 actifs** (candidat 5 · décidé 1 · en cours 0 · corrigé 181 · écarté 7) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -12,7 +12,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0661 | candidat | 12.5 | Un run qui identifie un risque non couvert le DECLARE et passe la main, au lieu de boucler | **oui** — Un risque ecrit noir sur blanc dans la restitution, puis livre ET deploye sans traitement. Il a fallu une demande explicite de l'exploitant pour que la boucle se ferme, et elle a produit 11 corrections. |
-| TF-0648 | candidat | 10 | Un oracle dont l'echec d'environnement est indiscernable d'un defaut | **oui** — diagnostic subi sur un stderr vide ; controle rapporte « ni passe ni echoue », verdict inconsommable |
 | TF-0650 | candidat | 10 | Un controle de detection sans exemption declaree s'apprend a etre ignore | **oui** — 16 signalements sur 38 ne doivent pas etre corriges — 42 % de bruit structurel et permanent |
 | TF-0662 | candidat | 10 | La route de deploiement prescrite par le gabarit contredit le mecanisme reel, et son dossier n'existe pas | **oui** — Session ayant annonce un deploiement « restant a faire » sur une production deja a jour, et corrigee par l'exploitant. Le dossier de reference cite par le gabarit est absent du depot. |
 | TF-0660 | candidat | 8.3 | Aucun oracle ne peut juger une substitution de terme qui change le genre grammatical | **oui** — 11 fautes d'accord servies en production sur deux langues, CI verte et six controleurs au vert. Detectees uniquement parce que l'exploitant a demande une relecture apres coup. |
@@ -191,8 +190,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0658 | candidat | 12.5 | Aucun oracle ne verifie qu'une URL DECLAREE par le site repond 200 | **oui** — 203 canoniques sur 203 redirigent en production, plus 1 624 alternates hreflang et 203 <loc> de sitemap. Trois oracles du projet rendaient PASS au moment de la mesure. |
 | TF-0653 | corrige | 20 | Les TROIS tables de synthese de la grille SEO se contredisaient avec la grille qu'elles resument, depuis quinze jours — et c'est ce qu'on lit pour planifier une renumerotation | **oui** — quinze jours de contradiction entre un document et lui-meme, sur les tables qui servent a planifier les evolutions de ce document. Trois tables fausses sur trois, mesurees contre le manifeste. |
+| TF-0658 | corrige | 12.5 | Aucun oracle ne verifie qu'une URL DECLAREE par le site repond 200 | **oui** — 203 canoniques sur 203 redirigent en production, plus 1 624 alternates hreflang et 203 <loc> de sitemap. Trois oracles du projet rendaient PASS au moment de la mesure. |
 | TF-0476 | corrige | 10 | forge-seo-geo : le noeud 57 accepte un taux de citation sans plan de mesure — le controle « pas de verdict affirmatif sans la donnee nommee » (TF-0264) ne capte que la famille CrUX | **oui** — mesure sur les artefacts reels : noeud_exige_terrain() rend False sur la source du noeud 57 et True sur celle du noeud 31 (predicat litteral "crux") ; la reserve « ne jamais presenter le taux comme une metrique de suivi fiable » compte 1 occurrence dans le referentiel et 0 dans la fiche que l'auditeur remplit. Le cout se paie dans un livrable client remis : la forge a deja produit un rapport d'audit reel, et le service de runs recurrents (cat-seo-05) transformerait ce taux en tendance — sur une grandeur dont la litterature 2026 mesure que la marque explique 1,5 % de la variance |
 | TF-0636 | corrige | 10 | Le noeud 58 verifie la presence des directives IA, jamais leur exactitude | **oui** — 2 occurrences de « llms » dans le code de la forge, aucune lisant le contenu ; noeud verdict partiel T1 sur l'acces seul |
 | TF-0638 | corrige | 6.3 | forge-seo-geo ne porte aucun noeud d'analyse lexicale par langue | **oui** — page allemande : 8 « Gite », 0 « Ferienhaus » ; page italienne sur un mot signifiant « excursions » |
@@ -242,6 +241,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0647 | corrige | 12.5 | Le socle documentaire declare sa propre verifiabilite et rien ne l'exerce | **oui** — 7 fiches sur 8 en gabarit apres 5 runs et une MEP ; 137 marqueurs ; 2 vues HTML generees depuis du vide |
 | TF-0631 | corrige | 12 | Un lien symbolique BRISE vit a la racine du parc depuis le 9 aout sous un nom de pilot, et AUCUN balayage ne le voit : `isDirectory()` et `isFile()` sont faux tous les deux pour un lien | **oui** — `ls -l /c/dev | grep '^l'` rend le lien ; `node bootstrap.mjs` ne le nomme dans aucune de ses lignes, alors qu'il declare le meme jour un fichier `null` de 10927 octets, deux repertoires non versionnes et le clone archive. Seize jours de presence, zero declaration. Le controle qui declare les pieges du parc est aveugle a une classe entiere d'entrees de repertoire. |
 | TF-0471 | corrige | 10 | R-45 refuse des lots rédigés AVANT sa publication — deux lots Produit-05 bloqués à l'ingestion, dont un qui signalait un plantage réel du lanceur d'oracles | **oui** — payé le 22/08 : douze candidatures de deux lots restent hors du registre, et l'une d'elles nommait un défaut BLOQUANT du lanceur d'oracles qui n'a été corrigé que parce que la session l'a rencontré par un autre chemin — un refus de forme a mis un fait de production hors de portée |
+| TF-0648 | corrige | 10 | Un oracle dont l'echec d'environnement est indiscernable d'un defaut | **oui** — diagnostic subi sur un stderr vide ; controle rapporte « ni passe ni echoue », verdict inconsommable |
 | TF-0654 | corrige | 10 | La sonde d'heritage suppose que la racine web est la racine du depot | **oui** — 2 manques sur 2 restants sont des faux positifs ; appliquer le travail creerait 2 fichiers morts |
 | TF-0548 | corrige | 8.3 | La couverture des regles se compte en REGLES, jamais en EXIGENCES : une regle qui en enonce cinq et n'en controle qu'une est comptee couverte — c'est ce qui a laisse passer le gabarit manquant | **oui** — paye et chiffre : QUINZE candidatures refusees a l'ingestion en trois jours, sur deux produits, pour une forme que ni l'un ni l'autre ne pouvait connaitre faute d'avoir le gabarit — que la regle 18 exigeait par ecrit depuis le 06/08 et que rien ne verifiait. Le taux de couverture affichait 24 regles sur 26, soit 92 %, pendant tout ce temps. Sur la seule regle 18, la couverture reelle est de 1 exigence controlee sur 5. |
 | TF-0586 | corrige | 8.3 | Aucun oracle ne verifie qu'un nom de domaine declare repond | **oui** — 8 hostnames declares, 0 controle ; base par defaut de check-redirects encore sur l'URL Railway apres bascule |

@@ -33,6 +33,10 @@
  *   node oracles\oracle-gabarits-documents.mjs             → jugement du parc
  *   node oracles\oracle-gabarits-documents.mjs --self-test → double sens sur des familles fabriquées
  */
+// Exit : 0 = conforme · 1 = defaut MESURE. Cet oracle n'a AUCUN chemin « je ne peux pas
+// mesurer » : il ne depend d'aucun outil externe et lit des fichiers du depot. Le declarer
+// vaut mieux que de le taire — un contrat muet laisse croire qu'un 1 peut etre une panne
+// d'environnement (TF-0648).
 import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { tmpdir, homedir } from "node:os";

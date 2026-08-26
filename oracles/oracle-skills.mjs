@@ -102,6 +102,10 @@
  * K2 restait FAIL. `--purger` déplace ces orphelins sous `<installes>\.quarantaine\<horodatage>\
  * <skill>\` — un déplacement, jamais une suppression sèche — et le liste au verdict (`purge`).
  */
+// Exit : 0 = conforme · 1 = defaut MESURE. Cet oracle n'a AUCUN chemin « je ne peux pas
+// mesurer » : il ne depend d'aucun outil externe et lit des fichiers du depot. Le declarer
+// vaut mieux que de le taire — un contrat muet laisse croire qu'un 1 peut etre une panne
+// d'environnement (TF-0648).
 import {
   existsSync, readFileSync, readdirSync, statSync, mkdirSync, copyFileSync, writeFileSync,
   mkdtempSync, renameSync,

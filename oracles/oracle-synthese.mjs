@@ -70,6 +70,9 @@
  *         node oracle-synthese.mjs --self-test     → fixtures double sens
  * Exit : 0 PASS · 1 FAIL · 2 non jugeable.
  */
+// Exit : 0 = conforme · 1 = defaut MESURE · 2 = JE NE PEUX PAS MESURER — la condition et
+// son remede sont alors NOMMES. Un oracle qui ne distingue pas les deux fait passer une panne
+// d'environnement pour un defaut du produit (TF-0648).
 import { existsSync, readFileSync, writeFileSync, mkdtempSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";

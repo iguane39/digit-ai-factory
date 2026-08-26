@@ -9,6 +9,10 @@
  *         node oracle-readme-dossiers.mjs --self-test          → arbre éphémère, double sens
  * Remède nommé : node scripts\readme-dossiers.mjs (puis rédiger le rôle dans le bloc ROLE).
  */
+// Exit : 0 = conforme · 1 = defaut MESURE. Cet oracle n'a AUCUN chemin « je ne peux pas
+// mesurer » : il ne depend d'aucun outil externe et lit des fichiers du depot. Le declarer
+// vaut mieux que de le taire — un contrat muet laisse croire qu'un 1 peut etre une panne
+// d'environnement (TF-0648).
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";

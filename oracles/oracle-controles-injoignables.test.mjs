@@ -120,6 +120,42 @@ try {
     att(regle(r, "CI2").statut === "PASS", "le marqueur d'exception n'est pas respecté");
   });
 
+  // ---- CI3 : « je ne peux pas mesurer » n'est pas « la mesure est mauvaise » (TF-0648) --------
+  //
+  // Un oracle a échoué en local sur « Failed to launch the browser process », stderr VIDE, parce
+  // que 81 navigateurs étaient déjà ouverts. Le même oracle passait au vert en intégration
+  // continue. Il a fallu un diagnostic entier pour établir que ce n'était PAS une régression, puis
+  // rapporter le contrôle « ni passé ni échoué » — un verdict qu'aucune étape ne sait consommer.
+  check("CI3 : un oracle qui ne déclare pas ses codes de sortie est signalé", () => {
+    const r = juger(depot({
+      "oracles/oracle-muet.mjs": "// un oracle sans contrat de sortie\nprocess.exit(1);\n",
+      "p.json": "oracles/oracle-muet.mjs",
+    }));
+    att(regle(r, "CI3").statut === "FAIL", "un oracle au contrat muet passe pour conforme");
+    att(/oracle-muet/.test(regle(r, "CI3").message || ""), "l'oracle fautif n'est pas NOMMÉ");
+  });
+
+  check("CI3 : la forme employée par la maison est reconnue — « exit 0/1/2 »", () => {
+    // Le motif est calé sur ce que le dépôt ÉCRIT. Un premier jet exigeait la déclaration en TÊTE
+    // de ligne et rejetait treize oracles conformes, parce que la maison l'écrit après
+    // « Sortie : » ou « Contrat : ». Une règle qui impose une forme que le dépôt n'emploie pas ne
+    // mesure pas la conformité : elle mesure l'écart à son auteur.
+    const r = juger(depot({
+      "oracles/oracle-poli.mjs": "// Contrat : JSON {oracle,verdict} · exit 0/1/2.\nprocess.exit(0);\n",
+      "p.json": "oracles/oracle-poli.mjs",
+    }));
+    att(regle(r, "CI3").statut === "PASS", `la forme maison est rejetée : ${regle(r, "CI3").message}`);
+  });
+
+  check("CI3 BORNE : déclarer qu'il n'y a AUCUN chemin « je ne peux pas mesurer » suffit", () => {
+    // C'est même la forme la plus utile : elle interdit de lire un 1 comme une panne d'environnement.
+    const r = juger(depot({
+      "oracles/oracle-sobre.mjs": "// Exit : 0 = conforme · 1 = defaut mesure. Aucun chemin « je ne peux pas mesurer ».\n",
+      "p.json": "oracles/oracle-sobre.mjs",
+    }));
+    att(regle(r, "CI3").statut === "PASS", "un oracle sans dépendance externe est accusé alors qu'il l'a DIT");
+  });
+
   check("aucun contrôle dans le dépôt → SANS_OBJET, jamais un échec", () => {
     const r = juger(depot({ "src/index.mjs": "export const x = 1;\n" }));
     att(r.verdict === "PASS" && regle(r, "CI0").statut === "SANS_OBJET", "un dépôt sans contrôle est mis en défaut");

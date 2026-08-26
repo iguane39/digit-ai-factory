@@ -77,6 +77,9 @@
  * Usage : node oracle-adoption-tests.mjs <racine-projet>   → verdict JSON, exit 0/1/2
  *         node oracle-adoption-tests.mjs --self-test       → fixtures double sens
  */
+// Exit : 0 = conforme · 1 = defaut MESURE · 2 = JE NE PEUX PAS MESURER — la condition et
+// son remede sont alors NOMMES. Un oracle qui ne distingue pas les deux fait passer une panne
+// d'environnement pour un defaut du produit (TF-0648).
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { basename, join, relative } from "node:path";
 import { tmpdir } from "node:os";

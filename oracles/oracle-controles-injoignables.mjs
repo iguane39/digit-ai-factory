@@ -35,6 +35,9 @@
  *   CI2 · aucun contrôle ne code en dur le chemin d'un outil externe (navigateur, interpréteur,
  *         binaire). Le motif attendu est : variable d'environnement d'abord, liste de repli
  *         ensuite, échec BRUYANT sinon.
+ *   CI3 · chaque oracle DÉCLARE ses codes de sortie, « je ne peux pas mesurer » compris. Un oracle
+ *         qui ne le nomme pas laisse choisir entre PASS et FAIL — et le FAIL fait passer une panne
+ *         d'environnement pour un défaut du produit (TF-0648).
  *
  * NON JUGÉ, et déclaré :
  *   · si le contrôle est JUSTE : ce n'est pas le sujet. Un contrôle faux mais joué se corrige ;
@@ -177,6 +180,54 @@ export function juger(racine) {
       + (avecVariable.length ? ` La bonne pratique existe DÉJÀ dans ce dépôt : ${avecVariable.join(", ")}.` : "")
       + " Un chemin volontairement littéral se marque `outil-en-dur-ok` en fin de ligne.");
   }
+
+  // ---- CI3 — « JE NE PEUX PAS MESURER » N'EST PAS « LA MESURE EST MAUVAISE » (TF-0648) --------
+  //
+  // LE FAIT, remonté par un produit. Un oracle a échoué en local sur « Failed to launch the browser
+  // process: Code: 0 », avec un **stderr VIDE**. Cause réelle : 81 processus de navigateur ouverts
+  // empêchaient d'en lancer un de plus. Le même oracle passait au vert en intégration continue, où
+  // aucun navigateur ne tourne.
+  //
+  // CE QUE ÇA A COÛTÉ : un diagnostic entier pour établir qu'il ne s'agissait PAS d'une régression
+  // introduite par les modifications en cours, puis l'obligation de rapporter le contrôle comme
+  // « ni passé ni échoué » — un verdict qu'aucun tableau de bord ne sait lire et qu'aucune étape ne
+  // sait consommer.
+  //
+  // LE MÉCANISME EXISTE DÉJÀ DANS CE PARC : le lanceur d'oracles mappe l'exit 2 sur SKIP. Ce qui
+  // manquait, c'est que les oracles s'en SERVENT et le DISENT. Un contrat d'oracle qui ne nomme pas
+  // son code « je ne peux pas mesurer » laisse son auteur choisir entre 0 et 1 — et le 1 fait passer
+  // une panne d'environnement pour un défaut du produit.
+  //
+  // CE QUI EST JUGÉ : la PRÉSENCE de la déclaration dans l'en-tête, jamais que l'oracle l'emploie
+  // correctement — un oracle peut dire que le contrat manque, jamais qu'il est tenu. Mesure d'entrée
+  // (N-23) sur le pilot : 23 oracles sur 31 déclaraient déjà leurs codes ; six vrais oracles ne le
+  // faisaient pas, et ce sont eux que cette règle a fait écrire.
+  // Ce qui compte est une DÉCLARATION explicite, pas la présence des chiffres quelque part dans le
+  // fichier : une ligne qui commence par « Exit : » ou « Code de sortie : » et nomme au moins 0 et
+  // 1. Un oracle SANS chemin « je ne peux pas mesurer » satisfait la règle en le DISANT — c'est
+  // même la forme la plus utile, puisqu'elle interdit de lire un 1 comme une panne d'environnement.
+  // LE MOTIF EST CALÉ SUR CE QUE LE DÉPÔT ÉCRIT, pas sur ce qu'il devrait écrire. Relevé avant de
+  // livrer : les formes en usage sont « exit 0/1/2 », « exit 0 = PASS · 1 = FAIL · 2 = SKIP » et
+  // « exit 0 PASS · 1 FAIL · 2 non jugeable ». Un premier jet exigeait la déclaration en TÊTE de
+  // ligne et rejetait les trois, parce que la maison l'écrit après « Sortie : » ou « Contrat : ».
+  // Une règle qui impose une forme que le dépôt n'emploie pas ne mesure pas la conformité : elle
+  // mesure l'écart à son auteur.
+  const DECLARE_SES_CODES = /\bexit\b[^\n]{0,50}?\b0\b[^\n]{0,50}?\b1\b|codes? de sortie[^\n]{0,50}?\b0\b/i;
+  const SANS_CONTRAT = controles
+    .filter((p) => /oracles[\\/]oracle-[^\\/]*\.mjs$/.test(p) && !/\.test\.mjs$/.test(p))
+        // LE FICHIER ENTIER, ET NON SES 4 000 PREMIERS CARACTERES. Premier jet : la fenetre coupait
+    // avant la declaration de deux oracles dont l'en-tete depasse cette taille — mesure faite,
+    // 5 329 et 7 996 caracteres. Ils etaient donc accuses de ne pas declarer ce qu'ils declaraient.
+    // Le motif est assez precis pour lire tout le fichier sans risque : il exige « exit » puis 0
+    // puis 1 sur la MEME ligne, ce qu'un `process.exit(2)` ne produit jamais.
+    .filter((p) => !DECLARE_SES_CODES.test(textes.get(p) || ""))
+    .map(rel);
+  if (!SANS_CONTRAT.length) ok("CI3", "chaque oracle déclare ses codes de sortie, « je ne peux pas mesurer » compris");
+  else ko("CI3", `${SANS_CONTRAT.length} oracle(s) ne déclarent pas leurs codes de sortie dans leur en-tête : `
+    + `${SANS_CONTRAT.join(", ")}. Un oracle qui ne nomme pas son code « je ne peux pas mesurer » laisse choisir `
+    + "entre PASS et FAIL — et le FAIL fait passer une panne d'environnement pour un défaut du produit. Mesuré : "
+    + "un oracle a échoué sur un navigateur impossible à lancer, avec un stderr VIDE, et le contrôle a dû être "
+    + "rapporté « ni passé ni échoué » — un verdict qu'aucune étape ne sait consommer (TF-0648)");
 
   return { verdict: F.some((f) => f.statut === "FAIL") ? "FAIL" : "PASS", findings: F, controles: controles.length };
 }
