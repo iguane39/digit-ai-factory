@@ -93,6 +93,26 @@ justesse — *un oracle peut dire que le champ manque, jamais qu'il est juste.*
 |---|---|---|---|---|---|
 | de | Hallenbad | `Pool` — employé dans un `title` et un `H1` quand le catalogue dit Hallenbad 29 fois | partout | comptage sur le catalogue de langue servi (29 occurrences) | 2026-08-26 |
 
+## CE FORMAT EST UN CONTRAT, et il est lu par DEUX analyseurs
+
+Depuis le 26/08/2026, ce fichier n'est plus seulement un modele : sa STRUCTURE est lue par deux
+programmes, dans deux langages.
+
+- `oracles\oracle-glossaire.mjs` (pilot, JavaScript) — juge la forme d'un glossaire de projet ;
+- `forge_tests\glossaire.py` (forge-tests, Python) — y lit le terme retenu par locale pour
+  confronter les nombres servis a la donnee du produit (TF-0644, decision humaine voie (b)).
+
+**Deux analyseurs d'un meme format, c'est la classe de defaut qui a coute dix listes d'exclusion
+divergentes.** Le risque a ete assume en connaissance de cause, et la contrepartie est **cablee** :
+`tests	est_tf_0644_glossaire.py` chez forge-tests fait lire CE FICHIER par l'analyseur Python et
+verifie qu'il y retrouve ce que l'autre y compte — **3 termes, 6 lignes**.
+
+*Consequence pratique, et elle vaut avertissement :* **modifier la structure de ce gabarit fait
+rougir une recette de forge-tests.** C'est voulu. Mesure faite le 26/08 : un quatrieme terme
+ajoute ici rend « 4 terme(s) lus au lieu de 3 — le format a derive d'un cote », et sa suppression
+rend la recette verte. Ajouter un TERME au glossaire d'un PROJET ne change rien ; c'est ce
+gabarit-ci, fichier de reference, qui est compte.
+
 ## Ce que ce gabarit n'apporte PAS, et qui se traite ailleurs
 
 - **Le remplissage.** Un glossaire se remplit par **balayage systématique du vocabulaire servi**,
