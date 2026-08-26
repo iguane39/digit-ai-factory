@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=ede4162b9c46 archive=40441f7fe541 · dernier événement: 2026-08-26T05:58:06.159Z -->
+     sceaux: actifs=af4a6e89991a archive=40441f7fe541 · dernier événement: 2026-08-26T06:04:14.988Z -->
 
-**178 actifs** (candidat 3 · décidé 1 · en cours 0 · corrigé 167 · écarté 7) · **469 archivés**.
+**178 actifs** (candidat 0 · décidé 4 · en cours 0 · corrigé 167 · écarté 7) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,7 +11,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0644 | candidat | 10 | Aucun controle ne confronte les nombres du texte a la source de verite | **oui** — « 8 gites » contre 5 declares, dans 7 langues, parti en production sous 9 controles |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
 | TF-0526 | corrige | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
 | TF-0530 | corrige | 25 | pilot : le garde-fou « le pilot n'ecrit pas chez un produit » tenait par DISCIPLINE SEULE, et les classes de defaut du jour n'avaient pas de regle generique | **oui** — un garde-fou non execute est un garde-fou qu'on suit jusqu'au jour ou on ne le suit plus ; et neuf classes de defaut payees le meme jour sans qu'aucune regle generique ne les empeche de revenir ailleurs |
@@ -185,14 +184,15 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0636 | candidat | 10 | Le noeud 58 verifie la presence des directives IA, jamais leur exactitude | **oui** — 2 occurrences de « llms » dans le code de la forge, aucune lisant le contenu ; noeud verdict partiel T1 sur l'acces seul |
-| TF-0638 | candidat | 6.3 | forge-seo-geo ne porte aucun noeud d'analyse lexicale par langue | **oui** — page allemande : 8 « Gite », 0 « Ferienhaus » ; page italienne sur un mot signifiant « excursions » |
+| TF-0636 | decide | 10 | Le noeud 58 verifie la presence des directives IA, jamais leur exactitude | **oui** — 2 occurrences de « llms » dans le code de la forge, aucune lisant le contenu ; noeud verdict partiel T1 sur l'acces seul |
+| TF-0638 | decide | 6.3 | forge-seo-geo ne porte aucun noeud d'analyse lexicale par langue | **oui** — page allemande : 8 « Gite », 0 « Ferienhaus » ; page italienne sur un mot signifiant « excursions » |
 | TF-0476 | corrige | 10 | forge-seo-geo : le noeud 57 accepte un taux de citation sans plan de mesure — le controle « pas de verdict affirmatif sans la donnee nommee » (TF-0264) ne capte que la famille CrUX | **oui** — mesure sur les artefacts reels : noeud_exige_terrain() rend False sur la source du noeud 57 et True sur celle du noeud 31 (predicat litteral "crux") ; la reserve « ne jamais presenter le taux comme une metrique de suivi fiable » compte 1 occurrence dans le referentiel et 0 dans la fiche que l'auditeur remplit. Le cout se paie dans un livrable client remis : la forge a deja produit un rapport d'audit reel, et le service de runs recurrents (cat-seo-05) transformerait ce taux en tendance — sur une grandeur dont la litterature 2026 mesure que la marque explique 1,5 % de la variance |
 
 ## digit-ai-forge-tests
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0644 | decide | 10 | Aucun controle ne confronte les nombres du texte a la source de verite | **oui** — « 8 gites » contre 5 declares, dans 7 langues, parti en production sous 9 controles |
 | TF-0543 | corrige | 25 | Trois listes d'exclusion divergentes : `input` manque aux deux qui comptent, 3e occurrence de la famille | **oui** — 3 listes d'exclusion distinctes (interface.py _EXCLUS, securite.py _EXCLUS_DEPENDANCES, disposition.py _HORS_SOURCES) ; 2 lots anterieurs (20260814a x2) ont deja rallonge les deux premieres |
 | TF-0542 | corrige | 20 | Aucun levier projet ne borne le perimetre de fichiers : RT-1 n'est pas une config omise | **oui** — 37 cles FORGE_TESTS_* relevees dans forge_tests/ ; aucune ne borne le perimetre de fichiers des pans interface/securite/prompts |
 | TF-0602 | corrige | 15 | forge-tests : le registre de dette a un `--verifier` qui fonctionne et que rien ne joue a la livraison — 15 limites declarees par le code lui manquaient, sur trois modules livres les 22 et 23/08 | **oui** — QUINZE limites declarees par le code et absentes du registre commite, sur TROIS modules livres les 22 et 23/08 — soit la reapparition du defaut fondateur de TF-0384 deux jours apres sa correction, par une autre cause. L'ecart n'a ete trouve par aucun controle : il l'a ete par un appel ACCIDENTEL a un outil dont `--help` regenere le fichier au lieu d'afficher une aide. |
