@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=91914501742b archive=40441f7fe541 · dernier événement: 2026-08-26T08:06:05.452Z -->
+     sceaux: actifs=2e6c381ea3e0 archive=40441f7fe541 · dernier événement: 2026-08-26T08:08:54.789Z -->
 
-**187 actifs** (candidat 5 · décidé 1 · en cours 0 · corrigé 174 · écarté 7) · **469 archivés**.
+**191 actifs** (candidat 9 · décidé 1 · en cours 0 · corrigé 174 · écarté 7) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -12,6 +12,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0649 | candidat | 20 | Une regle de socle sans porteur mecanique se viole en silence | **oui** — 29 archives Old/ et 1 .pyc suivis par git ; regle de socle en prose sans aucun point d'application |
+| TF-0659 | candidat | 20 | Le journal quality-oracles perd la raison de l'echec : FAIL avec detail vide sur un hook bloquant | **oui** — Hook bloquant rendu avec detail vide ; trois tours de session pour retrouver et rejouer l'oracle sous-jacent, qui affichait alors 9 constats nommes. Contrat divergent localise a run-oracles.mjs ligne 208. |
 | TF-0647 | candidat | 12.5 | Le socle documentaire declare sa propre verifiabilite et rien ne l'exerce | **oui** — 7 fiches sur 8 en gabarit apres 5 runs et une MEP ; 137 marqueurs ; 2 vues HTML generees depuis du vide |
 | TF-0648 | candidat | 10 | Un oracle dont l'echec d'environnement est indiscernable d'un defaut | **oui** — diagnostic subi sur un stderr vide ; controle rapporte « ni passe ni echoue », verdict inconsommable |
 | TF-0650 | candidat | 10 | Un controle de detection sans exemption declaree s'apprend a etre ignore | **oui** — 16 signalements sur 38 ne doivent pas etre corriges — 42 % de bruit structurel et permanent |
@@ -189,6 +190,9 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0656 | candidat | 12.5 | Une regle conditionnelle de glossaire ne bloque jamais, et l'arbitrage prouve reste inapplique | **oui** — Trois langues sur sept livrees en production avec le terme retenu absent a 100 %, alors que le controle voyait la regle et l'a classee « a relire a l'oeil ». 243 occurrences du mauvais terme cumulees (82 + 79 + 82). |
+| TF-0658 | candidat | 12.5 | Aucun oracle ne verifie qu'une URL DECLAREE par le site repond 200 | **oui** — 203 canoniques sur 203 redirigent en production, plus 1 624 alternates hreflang et 203 <loc> de sitemap. Trois oracles du projet rendaient PASS au moment de la mesure. |
+| TF-0657 | candidat | 5.3 | Un glossaire cite une sonde qu'aucun script ne rejoue : la preuve vieillit en silence | **oui** — Sonde reecrite a la main en session pour verifier un terme. Une proscription fausse (casa rural, es) avait vecu jusqu'a sa correction fortuite le lendemain, et le motif corrige omet toujours la pollution par homonyme que le rejeu revele. |
 | TF-0653 | corrige | 20 | Les TROIS tables de synthese de la grille SEO se contredisaient avec la grille qu'elles resument, depuis quinze jours — et c'est ce qu'on lit pour planifier une renumerotation | **oui** — quinze jours de contradiction entre un document et lui-meme, sur les tables qui servent a planifier les evolutions de ce document. Trois tables fausses sur trois, mesurees contre le manifeste. |
 | TF-0476 | corrige | 10 | forge-seo-geo : le noeud 57 accepte un taux de citation sans plan de mesure — le controle « pas de verdict affirmatif sans la donnee nommee » (TF-0264) ne capte que la famille CrUX | **oui** — mesure sur les artefacts reels : noeud_exige_terrain() rend False sur la source du noeud 57 et True sur celle du noeud 31 (predicat litteral "crux") ; la reserve « ne jamais presenter le taux comme une metrique de suivi fiable » compte 1 occurrence dans le referentiel et 0 dans la fiche que l'auditeur remplit. Le cout se paie dans un livrable client remis : la forge a deja produit un rapport d'audit reel, et le service de runs recurrents (cat-seo-05) transformerait ce taux en tendance — sur une grandeur dont la litterature 2026 mesure que la marque explique 1,5 % de la variance |
 | TF-0636 | corrige | 10 | Le noeud 58 verifie la presence des directives IA, jamais leur exactitude | **oui** — 2 occurrences de « llms » dans le code de la forge, aucune lisant le contenu ; noeud verdict partiel T1 sur l'acces seul |
