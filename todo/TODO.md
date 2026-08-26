@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=5acc1d0c2909 archive=40441f7fe541 · dernier événement: 2026-08-26T09:28:58.465Z -->
+     sceaux: actifs=d8ebdd5bba7a archive=40441f7fe541 · dernier événement: 2026-08-26T09:29:28.779Z -->
 
-**191 actifs** (candidat 4 · décidé 1 · en cours 0 · corrigé 179 · écarté 7) · **469 archivés**.
+**194 actifs** (candidat 7 · décidé 1 · en cours 0 · corrigé 179 · écarté 7) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,8 +11,11 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0661 | candidat | 12.5 | Un run qui identifie un risque non couvert le DECLARE et passe la main, au lieu de boucler | **oui** — Un risque ecrit noir sur blanc dans la restitution, puis livre ET deploye sans traitement. Il a fallu une demande explicite de l'exploitant pour que la boucle se ferme, et elle a produit 11 corrections. |
 | TF-0648 | candidat | 10 | Un oracle dont l'echec d'environnement est indiscernable d'un defaut | **oui** — diagnostic subi sur un stderr vide ; controle rapporte « ni passe ni echoue », verdict inconsommable |
 | TF-0650 | candidat | 10 | Un controle de detection sans exemption declaree s'apprend a etre ignore | **oui** — 16 signalements sur 38 ne doivent pas etre corriges — 42 % de bruit structurel et permanent |
+| TF-0662 | candidat | 10 | La route de deploiement prescrite par le gabarit contredit le mecanisme reel, et son dossier n'existe pas | **oui** — Session ayant annonce un deploiement « restant a faire » sur une production deja a jour, et corrigee par l'exploitant. Le dossier de reference cite par le gabarit est absent du depot. |
+| TF-0660 | candidat | 8.3 | Aucun oracle ne peut juger une substitution de terme qui change le genre grammatical | **oui** — 11 fautes d'accord servies en production sur deux langues, CI verte et six controleurs au vert. Detectees uniquement parce que l'exploitant a demande une relecture apres coup. |
 | TF-0651 | candidat | 6.3 | La route MEP n'a pas de variante deploiement continu, et l'infrastructure n'a ni description ni reverification | **oui** — MEP pipelinee et verifiee mais hors route ; 4 domaines et toute l'infra sans declaration ni reverification |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
 | TF-0526 | corrige | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
