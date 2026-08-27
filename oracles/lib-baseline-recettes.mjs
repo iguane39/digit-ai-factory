@@ -58,7 +58,19 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
  * Rend `null` quand rien n'est lisible. `null` n'est pas `0` : zéro cas serait un fait, illisible
  * est un aveu.
  */
-export function compteDe(resume) {
+export function compteDe(resume, sortie = null) {
+  // LE COMPTE PEUT NE PAS ÊTRE DANS LA DERNIÈRE LIGNE. Deux oracles de ce dépôt rendent leur
+  // recette en JSON : leur dernière ligne est une accolade fermante, et leur compte vit dans le
+  // tableau `resultats`. Exiger une ligne de résumé les aurait laissés hors du cliquet pour une
+  // question de MISE EN FORME — la même erreur que d'exiger le mot « PASS ».
+  if (typeof sortie === "string" && sortie.trim().startsWith("{")) {
+    try {
+      const o = JSON.parse(sortie);
+      for (const champ of ["resultats", "cas"]) {
+        if (Array.isArray(o[champ]) && o[champ].length) return o[champ].length;
+      }
+    } catch { /* pas du JSON : on retombe sur la lecture textuelle */ }
+  }
   if (typeof resume !== "string") return null;
   // LE RATIO NU passe en premier, et il n'exige PAS le mot « PASS ». Mesure du premier passage :
   // exiger « PASS » laissait 39 recettes sur 73 hors du cliquet, dont deux familles parfaitement
@@ -99,9 +111,20 @@ export function confronter(resultats, baseline, jour) {
 
   for (const r of resultats) {
     if (r.statut !== "OK") continue;
-    const vu = compteDe(r.resume);
+    const vu = compteDe(r.resume, r.sortie);
     if (vu === null) {
-      nonLus.push(r.nom);
+      // UNE EXEMPTION SE DÉCLARE, ET ELLE SE VERSIONNE. Certaines entrées ne portent AUCUN
+      // compte de cas et n'en porteront jamais : un oracle d'état joué sur le parc réel rend
+      // « PASS sur le parc », pas un nombre de cas. Les compter à zéro ferait échouer le cliquet
+      // sur une absence normale ; les taire les rendrait indiscernables d'un oubli.
+      //
+      // La déclaration vit DANS le fichier de baseline — `{ "non_lu": true, "motif": "…" }` —
+      // parce qu'un motif qui ne vit que dans un message de console n'est ni relu ni opposable.
+      // Une entrée déclarée qui redevient lisible bascule automatiquement au cliquet : la
+      // déclaration est une exemption datée, jamais une porte ouverte.
+      const declare = baseline[r.nom] && baseline[r.nom].non_lu;
+      if (declare) suivante[r.nom] = baseline[r.nom];
+      else nonLus.push(r.nom);
       continue;
     }
     const connu = baseline[r.nom];

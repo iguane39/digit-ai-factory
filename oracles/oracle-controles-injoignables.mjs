@@ -255,6 +255,7 @@ export function juger(racine) {
   // sens et le nomme à sa ligne 17. *Une règle qui impose une forme que le dépôt n'emploie pas
   // mesure l'écart à son auteur.* Le motif retenu est celui du harnais lui-même, qui est
   // l'autorité sur ce que ce dépôt appelle une recette.
+  const MARQUEUR_RECETTE_INTERNE = '"--self' + '-test"';
   const EST_UNE_RECETTE = (p) => {
     const n = basename(p);
     return /\.test\.(mjs|cjs|js|ts|py)$/i.test(n) || /^(self-test|test_)/i.test(n)
@@ -268,7 +269,15 @@ export function juger(racine) {
     if (textesRecettes.some((t) => t.includes(nom) || t.includes(sansExt))) return true;
     // Un contrôle qui porte sa propre recette interne s'exerce lui-même : c'est la forme que ce
     // dépôt emploie pour ses oracles, et l'ignorer accuserait la discipline qu'on veut répandre.
-    return (textes.get(p) || "").includes('"--self-test"');
+    //
+    // LE MARQUEUR EST ASSEMBLÉ, JAMAIS ÉCRIT D'UN BLOC, et le motif vaut d'être lu. Le harnais
+    // reconnaît un oracle « à recette interne » en cherchant cette chaîne EXACTE dans sa source.
+    // L'écrire ici en clair a fait croire que CET oracle portait une recette interne : le harnais
+    // a cessé de jouer ses fixtures et l'a lancé sur le dépôt — il mesurait alors le parc au lieu
+    // de prouver qu'il sait échouer. Constaté par le cliquet, dont l'entrée est passée de 19 cas
+    // à illisible. *Une sonde qui, par sa seule présence, change la façon dont on l'interroge
+    // mesure autre chose que ce qu'elle croit.*
+    return (textes.get(p) || "").includes(MARQUEUR_RECETTE_INTERNE);
   };
   const nus = controles.filter((p) => !exerce(p));
   if (!nus.length) ok("CI4", `les ${controles.length} contrôle(s) sont exercés par une recette, ou portent la leur`);

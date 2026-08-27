@@ -49,8 +49,10 @@ const DOUBLONS_GELES = new Map([
 ]);
 
 let echecs = 0;
+let joues = 0;
 const dit = (ok, message) => {
   console.log(`  [${ok ? "PASS" : "FAIL"}] ${message}`);
+  joues += 1;
   if (!ok) echecs += 1;
 };
 
@@ -124,7 +126,10 @@ for (const dossier of ["input", "output"]) {
   }
 }
 
+// Le COMPTE DE CAS figure dans la ligne de résumé, et pas seulement le verdict : sans lui, cette
+// recette reste hors du cliquet de `lib-baseline-recettes.mjs` (TF-0681) et peut perdre des cas
+// sans que rien ne le signale. La forme employée est celle de la maison — `N/N`.
 console.log(echecs
-  ? `\nI3 — familles numérotées : ${echecs} écart(s)`
-  : "\nI3 — familles numérotées : disque et tables d accord (input, output)");
+  ? `\nI3 — familles numérotées : ${echecs} écart(s) sur ${joues} cas`
+  : `\nI3 — familles numérotées : ${joues}/${joues} cas — disque et tables d accord (input, output)`);
 process.exit(echecs ? 1 : 0);
