@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=273696343091 archive=40441f7fe541 · dernier événement: 2026-08-26T16:19:45.752Z -->
+     sceaux: actifs=5ba3dd4377e4 archive=40441f7fe541 · dernier événement: 2026-08-27T06:02:16.989Z -->
 
-**215 actifs** (candidat 7 · décidé 2 · en cours 0 · corrigé 198 · écarté 8) · **469 archivés**.
+**216 actifs** (candidat 7 · décidé 3 · en cours 0 · corrigé 198 · écarté 8) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,13 +11,14 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0683 | decide | 10 | La regle L1 accuse un selecteur CSS de mettre en bloc des elements qui ne lui sont pas soumis : le matcher ignore la contrainte d'ancetre | **oui** — Six constats faux sur un livrable, dont les deux seules issues vertes consistent a degrader le document juge — retirer des liens d'une prose ou les renommer pour tromper le controle. La mesure est double : les bornes du nav dans le document (ouvert 33433, ferme 35102, liens incrimines a 35661) et une fixture de vingt-cinq lignes qui reproduit le defaut hors de tout contexte. |
 | TF-0674 | candidat | 12.5 | La porte de fraîcheur de déploiement empreinte encore un échantillon — le correctif d'ensemble n'est pas appliqué | non |
 | TF-0682 | candidat | 10 | Quinze contrôles du produit ne sont exercés par AUCUNE recette — être cité n'est pas être joué | non |
-| TF-0683 | candidat | 10 | La regle L1 accuse un selecteur CSS de mettre en bloc des elements qui ne lui sont pas soumis : le matcher ignore la contrainte d'ancetre | **oui** — Six constats faux sur un livrable, dont les deux seules issues vertes consistent a degrader le document juge — retirer des liens d'une prose ou les renommer pour tromper le controle. La mesure est double : les bornes du nav dans le document (ouvert 33433, ferme 35102, liens incrimines a 35661) et une fixture de vingt-cinq lignes qui reproduit le defaut hors de tout contexte. |
 | TF-0680 | candidat | 7.5 | Un lot de travaux dont le contenu est un SOUS-ENSEMBLE d'un lot déjà déposé est redéposé quand même | non |
 | TF-0670 | candidat | 6.7 | L'étape A9 de la chaîne de traduction — relecture native déclarée, bloquante si absente — est énoncée et rien ne l'exécute | non |
 | TF-0676 | candidat | 6.7 | Aucun script de capture du produit ne produit systématiquement une pleine page | non |
 | TF-0671 | candidat | 5.3 | Le critère de réussite de la chaîne de traduction est écrit en prose et aucun script ne le mesure | non |
+| TF-0684 | candidat | 5 | Six recettes échappent à toute mesure rétrospective : leur idiome de déclaration de cas n'est reconnu par rien | non |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
 | TF-0526 | corrige | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
 | TF-0530 | corrige | 25 | pilot : le garde-fou « le pilot n'ecrit pas chez un produit » tenait par DISCIPLINE SEULE, et les classes de defaut du jour n'avaient pas de regle generique | **oui** — un garde-fou non execute est un garde-fou qu'on suit jusqu'au jour ou on ne le suit plus ; et neuf classes de defaut payees le meme jour sans qu'aucune regle generique ne les empeche de revenir ailleurs |

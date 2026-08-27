@@ -1,4 +1,19 @@
 {
+ "../scripts/generer-lisezmoi-output.mjs (parc réel)": {
+  "non_lu": true,
+  "motif": "entrée d'ÉTAT (I4) : jouée sur le PARC RÉEL, elle rend un verdict — « PASS sur le parc » — et non un compte de cas. Il n'y a rien à compter, et compter à zéro ferait échouer le cliquet sur une absence normale. Sa recette à double sens, quand elle existe, est comptée sous son autre entrée : l'exemption ne laisse donc aucun trou. CELLE-CI RÉPOND « sans verdict lisible sur le parc » : ce n'est pas un compte manquant, c'est un VERDICT manquant, et cela relève de l'invariant I4, pas du cliquet.",
+  "vu_le": "2026-08-27"
+ },
+ "../scripts/verifier-familles-mesure.mjs (parc réel)": {
+  "non_lu": true,
+  "motif": "entrée d'ÉTAT (I4) : jouée sur le PARC RÉEL, elle rend un verdict — « PASS sur le parc » — et non un compte de cas. Il n'y a rien à compter, et compter à zéro ferait échouer le cliquet sur une absence normale. Sa recette à double sens, quand elle existe, est comptée sous son autre entrée : l'exemption ne laisse donc aucun trou.",
+  "vu_le": "2026-08-27"
+ },
+ "../scripts/verifier-rendu-instances.mjs (parc réel)": {
+  "non_lu": true,
+  "motif": "entrée d'ÉTAT (I4) : jouée sur le PARC RÉEL, elle rend un verdict — « PASS sur le parc » — et non un compte de cas. Il n'y a rien à compter, et compter à zéro ferait échouer le cliquet sur une absence normale. Sa recette à double sens, quand elle existe, est comptée sous son autre entrée : l'exemption ne laisse donc aucun trou.",
+  "vu_le": "2026-08-27"
+ },
  "./bootstrap-parc.test.mjs": {
   "cas": 7,
   "vu_le": "2026-08-26"
@@ -31,6 +46,15 @@
   "cas": 16,
   "vu_le": "2026-08-26"
  },
+ "oracle-cadence.mjs (parc réel)": {
+  "non_lu": true,
+  "motif": "entrée d'ÉTAT (I4) : jouée sur le PARC RÉEL, elle rend un verdict — « PASS sur le parc » — et non un compte de cas. Il n'y a rien à compter, et compter à zéro ferait échouer le cliquet sur une absence normale. Sa recette à double sens, quand elle existe, est comptée sous son autre entrée : l'exemption ne laisse donc aucun trou.",
+  "vu_le": "2026-08-27"
+ },
+ "oracle-catalogues.mjs": {
+  "cas": 5,
+  "vu_le": "2026-08-27"
+ },
  "oracle-claude-md.mjs": {
   "cas": 6,
   "vu_le": "2026-08-26"
@@ -44,8 +68,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-controles-injoignables.mjs": {
-  "cas": 15,
-  "vu_le": "2026-08-26"
+  "cas": 19,
+  "vu_le": "2026-08-27"
  },
  "oracle-couverture-exigences.mjs": {
   "cas": 7,
@@ -63,13 +87,27 @@
   "cas": 7,
   "vu_le": "2026-08-26"
  },
+ "oracle-empreintes.mjs (parc réel)": {
+  "non_lu": true,
+  "motif": "entrée d'ÉTAT (I4) : jouée sur le PARC RÉEL, elle rend un verdict — « PASS sur le parc » — et non un compte de cas. Il n'y a rien à compter, et compter à zéro ferait échouer le cliquet sur une absence normale. Sa recette à double sens, quand elle existe, est comptée sous son autre entrée : l'exemption ne laisse donc aucun trou.",
+  "vu_le": "2026-08-27"
+ },
  "oracle-etude-opportunite.mjs": {
   "cas": 2,
   "vu_le": "2026-08-26"
  },
+ "oracle-fraicheur-doc.mjs": {
+  "cas": 4,
+  "vu_le": "2026-08-27"
+ },
  "oracle-gabarits-documents.mjs": {
   "cas": 5,
   "vu_le": "2026-08-26"
+ },
+ "oracle-gabarits-documents.mjs (parc réel)": {
+  "non_lu": true,
+  "motif": "entrée d'ÉTAT (I4) : jouée sur le PARC RÉEL, elle rend un verdict — « PASS sur le parc » — et non un compte de cas. Il n'y a rien à compter, et compter à zéro ferait échouer le cliquet sur une absence normale. Sa recette à double sens, quand elle existe, est comptée sous son autre entrée : l'exemption ne laisse donc aucun trou.",
+  "vu_le": "2026-08-27"
  },
  "oracle-glossaire.mjs": {
   "cas": 9,
@@ -99,13 +137,28 @@
   "cas": 5,
   "vu_le": "2026-08-26"
  },
+ "oracle-portee-doctrine.mjs (parc réel)": {
+  "non_lu": true,
+  "motif": "entrée d'ÉTAT (I4) : jouée sur le PARC RÉEL, elle rend un verdict — « PASS sur le parc » — et non un compte de cas. Il n'y a rien à compter, et compter à zéro ferait échouer le cliquet sur une absence normale. Sa recette à double sens, quand elle existe, est comptée sous son autre entrée : l'exemption ne laisse donc aucun trou.",
+  "vu_le": "2026-08-27"
+ },
  "oracle-promesses.mjs": {
   "cas": 10,
   "vu_le": "2026-08-26"
  },
+ "oracle-promesses.mjs (parc réel)": {
+  "non_lu": true,
+  "motif": "entrée d'ÉTAT (I4) : jouée sur le PARC RÉEL, elle rend un verdict — « PASS sur le parc » — et non un compte de cas. Il n'y a rien à compter, et compter à zéro ferait échouer le cliquet sur une absence normale. Sa recette à double sens, quand elle existe, est comptée sous son autre entrée : l'exemption ne laisse donc aucun trou.",
+  "vu_le": "2026-08-27"
+ },
  "oracle-readme-dossiers.mjs": {
   "cas": 5,
   "vu_le": "2026-08-26"
+ },
+ "oracle-readme-dossiers.mjs (parc réel)": {
+  "non_lu": true,
+  "motif": "entrée d'ÉTAT (I4) : jouée sur le PARC RÉEL, elle rend un verdict — « PASS sur le parc » — et non un compte de cas. Il n'y a rien à compter, et compter à zéro ferait échouer le cliquet sur une absence normale. Sa recette à double sens, quand elle existe, est comptée sous son autre entrée : l'exemption ne laisse donc aucun trou.",
+  "vu_le": "2026-08-27"
  },
  "oracle-recouvrement-controles.mjs": {
   "cas": 12,
@@ -115,9 +168,19 @@
   "cas": 13,
   "vu_le": "2026-08-26"
  },
+ "oracle-secrets-hors-perimetre.mjs (parc réel)": {
+  "non_lu": true,
+  "motif": "entrée d'ÉTAT (I4) : jouée sur le PARC RÉEL, elle rend un verdict — « PASS sur le parc » — et non un compte de cas. Il n'y a rien à compter, et compter à zéro ferait échouer le cliquet sur une absence normale. Sa recette à double sens, quand elle existe, est comptée sous son autre entrée : l'exemption ne laisse donc aucun trou.",
+  "vu_le": "2026-08-27"
+ },
  "oracle-skills.mjs": {
   "cas": 72,
   "vu_le": "2026-08-26"
+ },
+ "oracle-skills.mjs (parc réel)": {
+  "non_lu": true,
+  "motif": "entrée d'ÉTAT (I4) : jouée sur le PARC RÉEL, elle rend un verdict — « PASS sur le parc » — et non un compte de cas. Il n'y a rien à compter, et compter à zéro ferait échouer le cliquet sur une absence normale. Sa recette à double sens, quand elle existe, est comptée sous son autre entrée : l'exemption ne laisse donc aucun trou.",
+  "vu_le": "2026-08-27"
  },
  "oracle-sollicitations.mjs": {
   "cas": 10,
@@ -134,6 +197,10 @@
  "oracle-verdict-visuel.mjs": {
   "cas": 7,
   "vu_le": "2026-08-26"
+ },
+ "oracles/familles-numerotees.test.mjs": {
+  "cas": 6,
+  "vu_le": "2026-08-27"
  },
  "oracles/hook-restitution.test.mjs": {
   "cas": 7,

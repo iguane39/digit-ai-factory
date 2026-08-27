@@ -95,6 +95,7 @@ for (const nom of oracles) {
     statut: r.status === 0 ? "OK" : "ECHEC",
     detail: resume.slice(0, 72),
     resume,
+    sortie: r.stdout,
     via: interne ? "--self-test" : dedie,
   });
 }
@@ -141,6 +142,7 @@ for (const zone of zonesTests) {
       statut: r.status === 0 ? "OK" : "ECHEC",
       detail: resume.slice(0, 72),
       resume,
+      sortie: r.stdout,
       via: "I2 (fichier de test du dépôt)",
     });
   }
@@ -300,8 +302,12 @@ const APPLIQUER = process.argv.includes("--appliquer");
 if (bilan.nonLus.length) {
   // Une recette dont le résumé ne porte aucun compte lisible sortirait du cliquet EN SILENCE.
   // Elle est nommée : le silence d'une sonde n'est pas un verdict.
-  console.log(`  [NON JUGÉ] ${bilan.nonLus.length} recette(s) sans compte lisible dans leur `
-    + `résumé : ${bilan.nonLus.slice(0, 4).join(", ")}${bilan.nonLus.length > 4 ? "…" : ""}`);
+  // UN AVEU TRONQUÉ EST UN AVEU PARTIEL. Le premier jet coupait la liste à QUATRE noms suivis
+  // de points de suspension : impossible de savoir lesquelles des quinze recettes étaient hors
+  // du cliquet, donc impossible d'agir dessus. Elles sont toutes nommées, une par ligne.
+  console.log(`  [NON JUGÉ] ${bilan.nonLus.length} recette(s) sans compte lisible et SANS exemption`
+    + " déclarée — les nommer est la seule façon d'en sortir :");
+  for (const n of bilan.nonLus) console.log(`             · ${n}`);
 }
 for (const m of bilan.montees) {
   console.log(`  [CLIQUET] ${m.nom} : ${m.avant === null ? "première mesure" : `${m.avant} →`} ${m.vu} cas`);
