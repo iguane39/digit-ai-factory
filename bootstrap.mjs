@@ -52,7 +52,8 @@ const FORGES = [
   { nom: "digit-ai-forge-seo-geo", preuve: "scripts/validate.py", alias: ["digit-ai-forge-seo"] },
   { nom: "digit-ai-forge-organization", preuve: "output/02-composants/composant-filtres-tableau/oracle-filtres-tableau.mjs" },
   // forge-audit : le PRODUIT AuditCore (public, marque blanche — ex `digit-ai-forge-auditcore`,
-  // renommé le 11/08). L'espace d'engagement client (`digit-ai-forge-audit_client-a`, privé) est hors bootstrap.
+  // renommé le 11/08). L'espace d'engagement client (`digit-ai-forge-audit_<engagement>`, privé)
+  // est hors bootstrap — voir la convention de suffixe plus bas.
   { nom: "digit-ai-forge-audit", preuve: "core/invariants.json", alias: ["digit-ai-forge-auditcore"] },
   // forge-ops : exploitation — outille l'étape MEP du pilot (TF-0040).
   { nom: "digit-ai-forge-ops", preuve: "oracles/self-test.mjs" },
@@ -261,9 +262,13 @@ console.log("");
   // chaque ouverture, et un avertissement qui revient sans jamais rien vouloir dire s'apprend à
   // être ignoré. C'est la mesure du 23/08 qui l'impose : la règle neuve rendait TROIS dépôts, dont
   // deux volontaires et déjà documentés ailleurs. Une précision d'un sur trois n'est pas un contrôle.
-  const HORS_PERIMETRE = new Map([
-    ["digit-ai-forge-audit_client-a", "espace d'engagement CLIENT, privé et hors bootstrap — porte des livrables remis, pas de l'outillage"],
-  ]);
+  // PLUS AUCUN NOM DE CLIENT ICI (27/08). La table nommait un dépôt d'engagement, et ce nom
+  // fuitait dans un dépôt public. Elle est remplacée par la CONVENTION qu'elle encodait : un
+  // dépôt `digit-ai…` portant un SUFFIXE `_<engagement>` est un espace d'engagement CLIENT,
+  // privé et hors bootstrap — il porte des livrables remis, pas de l'outillage. Aucune forge du
+  // parc ne porte d'underscore, le motif est donc exact, et tout engagement futur est couvert
+  // sans qu'on ait à l'inscrire à la main.
+  const horsPerimetre = (nom) => /^digit-ai[a-z0-9-]*_/i.test(nom);
   const connus = new Map();          // origin normalisé -> nom du dépôt attendu
   const attendus = new Set(FORGES.map((f) => f.nom));
   attendus.add(PILOT);
@@ -358,7 +363,7 @@ console.log("");
     // de toute vérification de fraîcheur, et rien ne l'avait jamais dit. Le contrôle ne tranche pas
     // — il POSE la question, parce que la réponse (entrer dans la liste, ou être hors périmètre
     // assumé) est une décision humaine.
-    if (/^digit-ai/i.test(nom) && !HORS_PERIMETRE.has(nom.toLowerCase())) {
+    if (/^digit-ai/i.test(nom) && !horsPerimetre(nom)) {
       suspects.push({ nom, motif: `dépôt de l'écosystème HORS LISTE avec son propre origin (${o || "origin illisible"}) — ni forge suivie, ni second clone, ni mise de côté : jamais vérifié par --pull. À inscrire dans la liste des forges, ou à déclarer hors périmètre` });
     }
   }
