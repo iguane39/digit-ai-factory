@@ -70,7 +70,7 @@ for (const f of forges) {
 // TF-0390) — même forge, née le 08/08 donc avant R-31 ; une clé périmée la faisait passer
 // pour une forge NOUVELLE et exigeait d'elle un verdict que son antériorité lui épargne.
 const ANTERIORITE_R28 = new Set([
-  "agents", "agents-security", "audit", "audit_client-a", "conception", "data", "design",
+  "agents", "agents-security", "audit", "conception", "data", "design",
   "development", "observability", "ops", "organization", "seo-geo", "tests", "websec",
 ]);
 for (const f of forges.filter((f) => !ANTERIORITE_R28.has(f))) {

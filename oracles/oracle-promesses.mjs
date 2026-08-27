@@ -224,7 +224,10 @@ if (lanceEnDirect) {
     so("PR0", String(racine), "racine introuvable — rien à balayer");
   } else {
     const depots = readdirSync(racine, { withFileTypes: true })
-      .filter((e) => e.isDirectory() && /^digit-ai/.test(e.name) && !/_old$|_vide$|\.bundle$|_client-a$/.test(e.name))
+      // `_` couvre les suffixes d'archive (`_old`, `_vide`) ET les espaces d'engagement
+      // client (`…_<engagement>`, privés) : aucune forge du parc ne porte d'underscore. Le
+      // motif nommé qui vivait ici portait le nom d'un client (retiré le 27/08).
+      .filter((e) => e.isDirectory() && /^digit-ai/.test(e.name) && !/\.bundle$|_/.test(e.name))
       .map((e) => e.name);
     let lus = 0;
     const trouves = [];

@@ -25,7 +25,7 @@ Plans stratégiques, synthèses de mandat et de campagne (format `gabarits\RESTI
 | `Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md` | fichier | 3,4 Ko | Synthèse de mandat — option (a) : l'avancement des campagnes est câblé (TF-0252) |
 | `Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md` | fichier | 7,2 Ko | Synthèse de mandat — le prompt réécrit L99 exécuté (5 postes, 6 agents, 3 lots avalés) |
 | `Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md` | fichier | 7,0 Ko | Synthèse de mandat — « récupère la todo et les retours, traite les tous » (18 items, 7 cam |
-| `Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md` | fichier | 13,2 Ko | Digit-AI — Synthèse de mandat — Synchronisation GitHub — 20260822a |
+| `Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md` | fichier | 13,3 Ko | Digit-AI — Synthèse de mandat — Synchronisation GitHub — 20260822a |
 | `Digit-AI - Synthese Mandat - Toute la todo avec le a - 20260815a.md` | fichier | 5,5 Ko | Synthèse de mandat — « fais toute la todo avec le a » (21 items, 4 campagnes, 1 circuit) |
 | `Digit-AI - Synthese Mandat - Traite les todo et retours - 20260815a.md` | fichier | 4,4 Ko | Synthèse de mandat — « traite les todo et retours » (14 items, 3 campagnes) |
 | `Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md` | fichier | 6,1 Ko | Synthèse de mandat — « traite les TODOs à faire » (8 items, 4 campagnes + doctrine) |
