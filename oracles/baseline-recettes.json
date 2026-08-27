@@ -164,6 +164,10 @@
   "cas": 12,
   "vu_le": "2026-08-26"
  },
+ "oracle-remise-traduction.mjs": {
+  "cas": 11,
+  "vu_le": "2026-08-27"
+ },
  "oracle-secrets-hors-perimetre.mjs": {
   "cas": 13,
   "vu_le": "2026-08-26"

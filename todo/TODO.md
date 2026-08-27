@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=5ba3dd4377e4 archive=40441f7fe541 · dernier événement: 2026-08-27T06:02:16.989Z -->
+     sceaux: actifs=bdcb9ebee5b1 archive=40441f7fe541 · dernier événement: 2026-08-27T06:07:58.096Z -->
 
-**216 actifs** (candidat 7 · décidé 3 · en cours 0 · corrigé 198 · écarté 8) · **469 archivés**.
+**216 actifs** (candidat 5 · décidé 3 · en cours 0 · corrigé 200 · écarté 8) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -15,9 +15,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0674 | candidat | 12.5 | La porte de fraîcheur de déploiement empreinte encore un échantillon — le correctif d'ensemble n'est pas appliqué | non |
 | TF-0682 | candidat | 10 | Quinze contrôles du produit ne sont exercés par AUCUNE recette — être cité n'est pas être joué | non |
 | TF-0680 | candidat | 7.5 | Un lot de travaux dont le contenu est un SOUS-ENSEMBLE d'un lot déjà déposé est redéposé quand même | non |
-| TF-0670 | candidat | 6.7 | L'étape A9 de la chaîne de traduction — relecture native déclarée, bloquante si absente — est énoncée et rien ne l'exécute | non |
 | TF-0676 | candidat | 6.7 | Aucun script de capture du produit ne produit systématiquement une pleine page | non |
-| TF-0671 | candidat | 5.3 | Le critère de réussite de la chaîne de traduction est écrit en prose et aucun script ne le mesure | non |
 | TF-0684 | candidat | 5 | Six recettes échappent à toute mesure rétrospective : leur idiome de déclaration de cas n'est reconnu par rien | non |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
 | TF-0526 | corrige | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
@@ -243,7 +241,9 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0679 | corrige | 10 | Un script de verification qu'aucune recette n'invoque pourrit sans que rien ne le signale | **oui** — Trois defauts dormants dans deux scripts d'audit, dont un qui les faisait echouer des la premiere ligne et un autre qui produisait dix codes 404 par execution. Aucun n'etait appele par une recette ni par l'integration continue, et tous n'ont ete trouves qu'en ouvrant les fichiers pour une autre raison. |
 | TF-0660 | corrige | 8.3 | Aucun oracle ne peut juger une substitution de terme qui change le genre grammatical | **oui** — 11 fautes d'accord servies en production sur deux langues, CI verte et six controleurs au vert. Detectees uniquement parce que l'exploitant a demande une relecture apres coup. |
 | TF-0681 | corrige | 8.3 | Une recette qui PERD des cas rend un harnais vert — le compte d'une recette est auto-déclaré, donc invisible à la baisse | non |
+| TF-0670 | corrige | 6.7 | L'étape A9 de la chaîne de traduction — relecture native déclarée, bloquante si absente — est énoncée et rien ne l'exécute | non |
 | TF-0664 | corrige | 6.3 | Aucune chaine declaree pour « traduire un produit » ni pour « auditer ses traductions », et son absence se paie en tours | **oui** — 11 tours sur 17 ont existe parce qu'une etape, un format ou une regle manquait — dont 8 pour ecrire la methode a la main. Consequences mesurees : 11 fautes d'accord et 2 faits faux servis en production derriere une CI verte. Quatre retours du meme jour (RT-47, RT-48, RT-51, RT-54) sont chacun une etape de la sequence absente. |
+| TF-0671 | corrige | 5.3 | Le critère de réussite de la chaîne de traduction est écrit en prose et aucun script ne le mesure | non |
 | TF-0677 | ecarte | 10 | Le gate de restitution juge APRES l'affichage : chaque refus duplique le message, et le referentiel avait deja corrige ce defaut | **oui** — Trois refus successifs du gate dans une seule session, donc quatre affichages de huit blocs pour un seul message utile, et un retour humain explicite. Le defaut est une REGRESSION documentee : la v2.1.0 du referentiel prescrivait deja le jugement en fichier avant affichage, la v2.4.0 l'a remplace par un gate Stop, et la v2.5.0 a traite le symptome apres avoir recu le meme retour humain. |
 
 ## pilot

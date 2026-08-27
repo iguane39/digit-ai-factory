@@ -2,7 +2,7 @@
 role: les deux chaînes déclarées de la traduction — « traduire un produit », « auditer ses traductions »
 destinataire: orchestrateur (pilot) et forges mobilisées
 sources_de_verite: ["retour Produit-02 20260826f (TF-0664)", "todo/TODO.jsonl — TF-0660, TF-0663, TF-0661", "gabarits/GLOSSAIRE.md", "forge_tests/adaptateurs/i18n.py"]
-verifie_le: 2026-08-26
+verifie_le: 2026-08-27
 ---
 
 # Traduire, auditer : deux chaînes déclarées
@@ -63,12 +63,12 @@ souhaiterait qu'elle ait.*
 | A6 | **contrôle du genre et de l'accord après substitution** | catalogues + `genre` déclaré | écarts d'accord nommés par clé | contrôle **(j)** du pan i18n de forge-tests — **livré le 26/08** (TF-0660) | un déterminant du genre opposé collé au terme retenu |
 | A7 | **cohérence INTERNE de chaque langue**, confrontée aux sources de données | catalogues + données du produit | contradictions intra-locale nommées par clé | contrôle **(i)** du pan i18n — **livré le 26/08** (TF-0663) ; nombres confrontés à la donnée : contrôle (g), TF-0644 | un sujet portant deux valeurs pour la même unité |
 | A8 | cohérence interlangue | catalogues | divergences par clé | **existe (partiel)** — et *il a rendu ZÉRO écart sur un corpus portant deux faits faux* : voir A7 | divergence non expliquée par un format de localisation |
-| A9 | **RELECTURE NATIVE DÉCLARÉE** | catalogues | déclaration datée : faite, par qui — ou **explicitement refusée** | **ABSENT** | *l'absence de déclaration BLOQUE la remise* (principe 2) |
+| A9 | **RELECTURE NATIVE DÉCLARÉE** | catalogues | déclaration datée : faite, par qui — ou **explicitement refusée avec son motif** | `oracles\oracle-remise-traduction.mjs` **T1** — **livré le 27/08** (TF-0670) | *l'absence de déclaration BLOQUE la remise* (principe 2) — et elle l'arrête désormais pour de bon |
 | A10 | dimensionnement SERP | catalogues | longueurs par balise | `check-seo` (produit) — **existe** | titre ou description hors gabarit |
 | A11 | remise avec risques **fermés ou refusés** | tout ce qui précède | restitution + lot de retours | S29 de `oracles\oracle-synthese.mjs` — **livré le 26/08** (TF-0661) | un risque déclaré non couvert sans action correspondante |
 
 **Trois des quatre étapes manquantes nommées par le retour ont été outillées le 26/08** — A2
-(`genre`), A6, A7 — et A11 avec elles. **A9 reste ABSENTE**, et c'est la seule que rien ne
+(`genre`), A6, A7 — et A11 avec elles. **A9 est outillée depuis le 27/08** (T1) — et c'est la seule étape que rien ne
 remplace : *personne ne remplace un locuteur natif.* Le filet mécanique va AVANT lui, jamais à
 sa place.
 
@@ -98,9 +98,40 @@ Au prochain produit, « audite les traductions » formulé **en une phrase** doi
 3. la liste explicite des **arbitrages posés à l'humain, NON VIDE** ;
 4. une **déclaration de relecture native**, faite ou explicitement refusée.
 
+**Les points 1, 3 et 4 sont désormais JUGÉS** par `oracle-remise-traduction.mjs` (T2, T3, T1) et le point 2 par les contrôles (i) et (j) du pan i18n de forge-tests, dont T4 exige la citation. Voir « La FICHE DE REMISE » ci-dessous.
+
 **La mesure a deux moitiés, et la seconde compte autant que la première** : le nombre de tours de
 classe DÉFAUT tombe à **0**, ET le nombre de tours de classe DÉCISION reste **≥ 1**. Une chaîne
 qui ferait tomber les deux aurait supprimé l'arbitrage, pas le défaut.
+
+## La FICHE DE REMISE, et ce que sa forme empêche
+
+**Les quatre critères de réussite ci-dessus étaient rédigés en prose et rejoués par aucune
+commande** — la classe de défaut de R-49 et de G7 : *une preuve nommée et datée qu'aucun script
+ne reproduit vieillit en silence.* Depuis le 27/08, un run de traduction rend une **fiche de
+remise** que `oracles\oracle-remise-traduction.mjs` juge (T1–T4, exit 0/1/2).
+
+La fiche déclare `role:` … *remise* … *traduction* dans son frontmatter — un document qui ne s'en
+réclame pas n'est pas jugé, sans quoi l'oracle accuserait n'importe quel markdown du dépôt. Elle
+porte **quatre sections**, et chacune empêche une chose précise :
+
+| Section | Ce qu'elle doit porter | Ce que son absence laisserait passer |
+|---|---|---|
+| `## Relecture native` | « Faite par *<nom>*, *AAAA-MM-JJ* » **ou** « Refusée — *<motif>* » | onze fautes d'accord parties en production, la relecture ayant eu lieu APRÈS la mise en ligne |
+| `## Ancres verbatim` | une ligne par ancre : ``- `le texte exact` → chemin/du/fichier`` | un plan **inapplicable** : celui qui l'applique cherche un texte qui n'existe pas et ne peut pas trancher entre un plan faux et un fichier modifié |
+| `## Arbitrages posés à l'humain` | une puce par arbitrage, **liste non vide** | une chaîne qui a décidé à la place de quelqu'un — l'inverse de la loi n° 5 |
+| `## Contrôles mécaniques` | le verdict de l'accord **et** de la cohérence interne | les deux classes qui ont réellement franchi la chaîne : onze fautes d'accord, deux faits faux identiques dans les sept langues |
+
+**Le REFUS est une réponse valide, le silence ne l'est pas.** T1 accepte « Refusée — aucun
+locuteur natif disponible avant la date de remise, et l'exploitant a tranché » exactement comme
+elle accepte une relecture faite. Ce qu'elle refuse est une section présente et vide : *un titre
+sans contenu est indiscernable d'un oubli*, et un titre suffirait alors à passer la porte.
+
+**Ce que l'oracle ne fait pas, et il vaut mieux le lire avant de s'y fier.** Il ne juge pas la
+QUALITÉ d'une relecture — personne ne remplace un locuteur natif. Il ne rejoue pas les contrôles
+qu'il exige de citer : T4 vérifie qu'un verdict est **rapporté**, pas qu'il est **vrai**. Et il ne
+mesure pas la seconde moitié du critère de réussite — « les tours de DÉCISION restent ≥ 1 » se
+compte sur une session, pas sur un document.
 
 ## Ce que cette fiche NE couvre PAS
 
