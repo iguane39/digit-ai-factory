@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=2ab7d9987f9c archive=40441f7fe541 · dernier événement: 2026-08-26T16:11:24.950Z -->
+     sceaux: actifs=273696343091 archive=40441f7fe541 · dernier événement: 2026-08-26T16:19:45.752Z -->
 
-**214 actifs** (candidat 6 · décidé 2 · en cours 0 · corrigé 198 · écarté 8) · **469 archivés**.
+**215 actifs** (candidat 7 · décidé 2 · en cours 0 · corrigé 198 · écarté 8) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -13,6 +13,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-0674 | candidat | 12.5 | La porte de fraîcheur de déploiement empreinte encore un échantillon — le correctif d'ensemble n'est pas appliqué | non |
 | TF-0682 | candidat | 10 | Quinze contrôles du produit ne sont exercés par AUCUNE recette — être cité n'est pas être joué | non |
+| TF-0683 | candidat | 10 | La regle L1 accuse un selecteur CSS de mettre en bloc des elements qui ne lui sont pas soumis : le matcher ignore la contrainte d'ancetre | **oui** — Six constats faux sur un livrable, dont les deux seules issues vertes consistent a degrader le document juge — retirer des liens d'une prose ou les renommer pour tromper le controle. La mesure est double : les bornes du nav dans le document (ouvert 33433, ferme 35102, liens incrimines a 35661) et une fixture de vingt-cinq lignes qui reproduit le defaut hors de tout contexte. |
 | TF-0680 | candidat | 7.5 | Un lot de travaux dont le contenu est un SOUS-ENSEMBLE d'un lot déjà déposé est redéposé quand même | non |
 | TF-0670 | candidat | 6.7 | L'étape A9 de la chaîne de traduction — relecture native déclarée, bloquante si absente — est énoncée et rien ne l'exécute | non |
 | TF-0676 | candidat | 6.7 | Aucun script de capture du produit ne produit systématiquement une pleine page | non |
