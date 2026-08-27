@@ -34,7 +34,7 @@
 | `20260817-etude-opportunite-ecart-servi-versionne.md` | fichier | 6,3 Ko | Étude d'opportunité — écart servi ↔ versionné (TF-0288) — 20260817a |
 | `20260817-etude-opportunite-publication-livrables.md` | fichier | 6,3 Ko | Étude d'opportunité — publication externe et autoportance des livrables (TF-0302/0303) — 2 |
 | `20260817-etude-opportunite-rangement-output.md` | fichier | 18,3 Ko | Étude d'opportunité — rangement des livrables destinés à l'humain dans `output\` (TF-0319) |
-| `20260817-etude-opportunite-renommage-factory.md` | fichier | 22,7 Ko | Étude d'opportunité — renommage du pilot en « factory » — 20260817h |
+| `20260817-etude-opportunite-renommage-factory.md` | fichier | 22,8 Ko | Étude d'opportunité — renommage du pilot en « factory » — 20260817h |
 | `20260817-etude-opportunite-sequencement-factory.md` | fichier | 44,7 Ko | Étude d'opportunité — séquencement du renommage `digit-ai-forge-pilot` → `digit-ai-factory |
 | `20260817-etude-opportunite-tests-bout-en-bout.md` | fichier | 27,3 Ko | Étude d'opportunité — fermeture de la voie « proposition de tests » (TF-0349) — 20260817j |
 | `20260817-etude-opportunite-todo-produit.md` | fichier | 27,4 Ko | Étude d'opportunité — la todo de chaque produit en page HTML — 20260817i |

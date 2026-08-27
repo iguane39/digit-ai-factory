@@ -16,6 +16,7 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 |---|---|---|---|
 | `candidature-bootstrap-dernieres-versions.tf.jsonl` | fichier | 2,9 Ko | 1 ligne(s) JSONL |
 | `candidature-cablage-orchestrer-boucle.tf.jsonl` | fichier | 2,6 Ko | 1 ligne(s) JSONL |
+| `candidature-client-b-hors-doctrine-20260822.tf.jsonl` | fichier | 3,4 Ko | 1 ligne(s) JSONL |
 | `candidature-clone-doublon-pilot-20260823.tf.jsonl` | fichier | 3,5 Ko | 1 ligne(s) JSONL |
 | `candidature-consigne-restitution.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
 | `candidature-convention-rangement-output.tf.jsonl` | fichier | 2,6 Ko | 1 ligne(s) JSONL |
@@ -27,7 +28,6 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `candidature-frontiere-chiffre-recette-todo.tf.jsonl` | fichier | 2,1 Ko | 1 ligne(s) JSONL |
 | `candidature-frontmatter-skills-20260822.tf.jsonl` | fichier | 5,6 Ko | 1 ligne(s) JSONL |
 | `candidature-gabarit-a0.tf.jsonl` | fichier | 860 o | 1 ligne(s) JSONL |
-| `candidature-client-b-hors-doctrine-20260822.tf.jsonl` | fichier | 3,4 Ko | 1 ligne(s) JSONL |
 | `candidature-mise-en-oeuvre-0478-20260822.tf.jsonl` | fichier | 4,7 Ko | 2 ligne(s) JSONL |
 | `candidature-noeud-57-plan-mesure.tf.jsonl` | fichier | 7,1 Ko | 1 ligne(s) JSONL |
 | `candidature-oracle-claude-md-crlf.tf.jsonl` | fichier | 1,6 Ko | 1 ligne(s) JSONL |
