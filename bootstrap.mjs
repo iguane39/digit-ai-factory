@@ -39,7 +39,13 @@ const SOURCE = (process.env.BOOTSTRAP_SOURCE || "https://github.com/iguane39").r
 const FORGES = [
   { nom: "digit-ai-forge-conception", preuve: "oracles/self-test.mjs" },
   { nom: "digit-ai-forge-design", preuve: "oracles/run-oracles-design.mjs" },
-  { nom: "digit-ai-forge-development", preuve: "digit-ai-forge-development/pyproject.toml" },
+  // forge-development : ex `digit-ai-saas-forge`, renommée sur GitHub — l'alias manquait, et c'est
+  // le SEUL renommage de forge qui n'était pas dans cette table. GitHub redirige l'ancienne URL,
+  // donc le clone resté dessus `fetch` sans broncher : rien ne le distinguait d'un produit
+  // autonome, et il était même exclu nommément du balayage §4 bis sous ce motif faux (retiré le
+  // 27/08). Mesure : `git ls-remote` sur les DEUX URL rend le même `refs/heads/main` (015a754) ;
+  // le clone dormait à la racine du parc depuis le 09/07, jamais déclaré par aucun contrôle.
+  { nom: "digit-ai-forge-development", preuve: "digit-ai-forge-development/pyproject.toml", alias: ["digit-ai-saas-forge"] },
   { nom: "digit-ai-forge-tests", preuve: "forge_tests/__main__.py" },
   { nom: "digit-ai-forge-agents", preuve: ".claude/skills/forge-agents/SKILL.md" },
   // forge-seo-geo : ex forge-seo, renommée le 20/08 (TF-0390) — le volet GEO entre au nom.
@@ -257,7 +263,6 @@ console.log("");
   // deux volontaires et déjà documentés ailleurs. Une précision d'un sur trois n'est pas un contrôle.
   const HORS_PERIMETRE = new Map([
     ["digit-ai-forge-audit_client-a", "espace d'engagement CLIENT, privé et hors bootstrap — porte des livrables remis, pas de l'outillage"],
-    ["digit-ai - saas forge", "produit SaaS distinct, gouverné par son propre dépôt public — l'écosystème forge ne le pilote pas"],
   ]);
   const connus = new Map();          // origin normalisé -> nom du dépôt attendu
   const attendus = new Set(FORGES.map((f) => f.nom));

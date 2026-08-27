@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=bdcb9ebee5b1 archive=40441f7fe541 · dernier événement: 2026-08-27T06:07:58.096Z -->
+     sceaux: actifs=f43f1a93c7f3 archive=40441f7fe541 · dernier événement: 2026-08-27T07:41:48.182Z -->
 
-**216 actifs** (candidat 5 · décidé 3 · en cours 0 · corrigé 200 · écarté 8) · **469 archivés**.
+**217 actifs** (candidat 6 · décidé 3 · en cours 0 · corrigé 200 · écarté 8) · **469 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -17,6 +17,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0680 | candidat | 7.5 | Un lot de travaux dont le contenu est un SOUS-ENSEMBLE d'un lot déjà déposé est redéposé quand même | non |
 | TF-0676 | candidat | 6.7 | Aucun script de capture du produit ne produit systématiquement une pleine page | non |
 | TF-0684 | candidat | 5 | Six recettes échappent à toute mesure rétrospective : leur idiome de déclaration de cas n'est reconnu par rien | non |
+| TF-0685 | candidat | 4 | hook-produits-intacts : tout ce qui DISCULPE un mouvement est avalé dès qu'un seul écart existe — `declares` est rendu après un `process.exit(0)` | non |
 | TF-0496 | corrige | 25 | pilot : une question dont la reponse est DANS les documents fournis se pose quand meme — S4 et S15 ne verifient jamais que l'agent a cherche (regle S16) | **oui** — trois decisions sur six posees a l'humain alors que leur reponse etait dans des pieces deja fournies — dont une a la premiere ligne du document, et le lecteur a du le signaler lui-meme |
 | TF-0526 | corrige | 25 | pilot : S12 exige un MOTIF d'attribution a l'humain, jamais la TRACE d'une tentative — une attribution peut donc etre sincere et FAUSSE (regle S12 bis) | **oui** — sept lignes sur neuf contestees par le destinataire dans un seul releve, dont plusieurs attribuees a l'humain alors que l'agent avait deja leve la meme contrainte deux fois le jour meme |
 | TF-0530 | corrige | 25 | pilot : le garde-fou « le pilot n'ecrit pas chez un produit » tenait par DISCIPLINE SEULE, et les classes de defaut du jour n'avaient pas de regle generique | **oui** — un garde-fou non execute est un garde-fou qu'on suit jusqu'au jour ou on ne le suit plus ; et neuf classes de defaut payees le meme jour sans qu'aucune regle generique ne les empeche de revenir ailleurs |
