@@ -61,6 +61,10 @@
  *       GROUPE, la TRACE MESURÉE de la tentative — un code de réponse, un message d'erreur, une
  *       sortie de commande (TF-0526, 23/08/2026). S12 lit un jeton de vocabulaire ; elle ne peut
  *       pas voir la différence entre une impossibilité ÉPROUVÉE et une impossibilité SUPPOSÉE.
+ *   S30 toute décision du bloc 3 porte un NUMÉRO, et les numéros sont DISTINCTS (28/08) — une
+ *       décision se désigne pour se trancher. S4 compte des options et ne voit jamais que la
+ *       QUESTION est insélectionnable ; le destinataire avait invente la numerotation avant de
+ *       dire « je ne peux pas les sélectionner ».
  *   S20 un terme du référentiel `gabarits\JARGON-A-GLOSER.json` employé aux blocs 3 ou 8
  *       porte sa glose adjacente (TF-0511, 22/08) — S9 ne juge que l'OUVERTURE, or c'est aux
  *       blocs qu'on EXÉCUTE que le jargon coûte le plus : un jargon au bloc 0 fait perdre le
@@ -1179,6 +1183,53 @@ function juger(texte) {
     ok("S16", "aucune décision à instruire");
   }
 
+  // ---- S30 (28/08/2026) — UNE DÉCISION SE SÉLECTIONNE, DONC ELLE PORTE UN NUMÉRO ------------
+  //
+  // LE RETOUR EST LA MESURE, mot pour mot : « Il n'y a pas de numéro sur les décisions, je ne
+  // peux pas les sélectionner. » Et le plus instructif est ce qui l'a précédé : le destinataire
+  // avait déjà répondu « 1b, 2a, 3a » à une restitution portant TROIS décisions non numérotées.
+  // Il avait donc INVENTÉ la numérotation pour pouvoir répondre — l'ordre d'apparition faisant
+  // office de numéro tacite. Ça a marché deux fois, et la troisième il a dit stop.
+  //
+  // POURQUOI S4 NE LE VOIT PAS, et c'est la même cécité que S15 corrigeait au niveau du sujet :
+  // S4 compte des OPTIONS étiquetées `(a)`, `(b)`, `(c)` — elle vérifie que le choix est fermé,
+  // jamais que la QUESTION est adressable. Un bloc à trois décisions parfaitement optionnées est
+  // donc conforme à S4 et pourtant insélectionnable : « je prends (b) » ne dit pas laquelle.
+  //
+  // CE QUE COÛTE L'ABSENCE : soit le lecteur numérote lui-même et le risque d'un décalage est
+  // sur lui, soit il rédige sa réponse en prose — c'est-à-dire exactement ce que le choix fermé
+  // du bloc 3 existe pour lui épargner. Une décision qu'on ne peut pas désigner en deux
+  // caractères n'est pas un choix fermé, c'est un questionnaire.
+  //
+  // LES NUMÉROS DOIVENT AUSSI ÊTRE DISTINCTS : deux décisions numérotées 1 ne se sélectionnent
+  // pas davantage qu'aucune. C'est le second sens de la règle, et il se mesure aussi.
+  //
+  // La FORME est libre, comme pour les titres de bloc (S1) : « **Décision 1 —** », « 1. »,
+  // « **1)** », « D1 — » sont tous acceptés. Juger la typographie n'a jamais été le sujet.
+  const numeroDeDecision = (g) => {
+    const tete = g.replace(/^\s*(?:[-*+]\s+|#{2,6}\s*)/, "").replace(/^\*\*/, "").trim();
+    const m = /^(?:d[ée]cision\s*)?(?:n[°ºo]\s*)?D?\s*(\d{1,2})\s*(?:[.)\-–—:·]|\*\*|\s)/i.exec(tete);
+    return m ? m[1] : null;
+  };
+  if (groupesDecisions.length) {
+    const numeros = groupesDecisions.map(numeroDeDecision);
+    const sansNumero = numeros.filter((n) => n === null).length;
+    const poses = numeros.filter(Boolean);
+    const doublons = poses.filter((n, i) => poses.indexOf(n) !== i);
+    if (sansNumero) {
+      ko("S30", `${sansNumero} décision(s) sur ${groupesDecisions.length} SANS NUMÉRO — une décision se désigne pour se trancher. ` +
+        "Le destinataire a répondu « 1b, 2a, 3a » à un bloc non numéroté avant de dire « je ne peux pas les sélectionner » : " +
+        "il inventait la numérotation. Formes admises : « **Décision 1 —** », « 1. », « **1)** », « D1 — ».");
+    } else if (doublons.length) {
+      ko("S30", `numéro(s) de décision en DOUBLE : ${[...new Set(doublons)].join(", ")} — deux décisions portant le même numéro ` +
+        "ne se sélectionnent pas mieux qu'aucune.");
+    } else {
+      ok("S30", `${groupesDecisions.length} décision(s), chacune numérotée et distincte (${poses.join(", ")})`);
+    }
+  } else {
+    ok("S30", "aucune décision à numéroter");
+  }
+
   return findings;
 }
 
@@ -1203,7 +1254,7 @@ Recette S-01 (banc rouge de la forge de tests) TENU — 19/19 défauts détecté
 Coût de la reprise proposée : complexité moyen · durée court.
 
 ## 3. Décisions attendues
-- Publier la version corrigée de la forge de tests ? Le banc rouge vient de tourner en entier :
+- **Décision 1 —** Publier la version corrigée de la forge de tests ? Le banc rouge vient de tourner en entier :
   chaque défaut planté volontairement a été détecté, donc la surveillance fonctionne et la
   version est prête à sortir. Publier la rend visible aux autres projets ; ne pas publier la
   laisse sur ce poste, et personne d'autre n'en profite tant qu'on attend.
@@ -1262,7 +1313,7 @@ Aucun écart : la demande a été suivie à la lettre.
     .replace("Coût de la reprise proposée : complexité moyen · durée court.", "Coût de la reprise proposée : 2-3 j.")
     .replace("Recette S-01 (banc rouge de la forge de tests) TENU — 19/19 défauts détectés au banc rouge, pytest 365.", "Tout s'est bien passé.")
     .replace(/— recommandé[^;]*;/, "—")
-    .replace(/- Publier la version corrigée[\s\S]*?tant qu'on attend\./, "- Publier TF-0220 ?")
+    .replace(/- \*\*Décision 1 —\*\* Publier la version corrigée[\s\S]*?tant qu'on attend\./, "- Publier TF-0220 ?")
     // S22 : un NÉGATIF prononcé sur une ressource EXTERNE depuis une seule sonde — la forme exacte
     // des deux cas du 24/08 (un 404 en HEAD lu comme une page morte, un champ d'API lu comme une
     // absence). La phrase est ajoutée au bloc 7 pour ne pas perturber les règles du bloc 8.
@@ -1281,6 +1332,21 @@ Aucun écart : la demande a été suivie à la lettre.
   // technique doit continuer d'échouer — un titre ne blanchit rien.
   const titree = verte.replace("\nLe contrôle complet", "\n### 0. Synthèse d'ouverture\n\nLe contrôle complet");
   const titreeSale = titree.replace("Rien n'attend de correction", "Rien n'attend de correction dans `oracle-synthese.mjs`");
+  // TF-0699 — S30 DANS SES DEUX SENS. Le premier (aucun numero) est porte par la rouge. Le
+  // second se mesure a part : deux decisions numerotees 1 ne se selectionnent pas mieux
+  // qu'aucune, et un controle qui ne verrait que l'absence laisserait passer le doublon.
+  const numeroDouble = verte.replace(
+    "  - sans décision : rien n'est publié.",
+    [
+      "  - sans décision : rien n'est publié.",
+      "- **Décision 1 —** Faut-il aussi publier le journal de recette de la forge de tests ? Il",
+      "  porte le detail des 19 defauts plantes et de leur detection, ce que le verdict resume",
+      "  en une seule ligne.",
+      "  - (a) le publier avec la version — recommandé : `recette-S01.md` ne porte aucun défaut ouvert ;",
+      "  - (b) le garder local — coût : le detail reste invisible aux autres projets.",
+      "  - sans décision : le journal reste local.",
+    ].join(String.fromCharCode(10)));
+  writeFileSync(join(dir, "numero-double.md"), numeroDouble, "utf8");
   writeFileSync(join(dir, "verte.md"), verte, "utf8");
   writeFileSync(join(dir, "rouge.md"), rouge, "utf8");
   // TF-0661 — S29 a besoin de SA fixture : la rouge porte des actions au bloc 8, donc la
@@ -1311,7 +1377,7 @@ Aucun écart : la demande a été suivie à la lettre.
   if (rr.status !== 1) casse.push("la fixture ROUGE ne FAIL pas");
   else {
     for (const regle of ["S2", "S3", "S5", "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16",
-                         "S17", "S18", "S19", "S20", "S21", "S22", "S23", "S24", "S25", "S26", "S27", "S28"]) {
+                         "S17", "S18", "S19", "S20", "S21", "S22", "S23", "S24", "S25", "S26", "S27", "S28", "S30"]) {
       if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
     }
   }
@@ -1322,6 +1388,9 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("S29 : un risque declare NON COUVERT avec un bloc 8 vide passe pour conforme — declarer un risque n'est pas le traiter");
   if (!/"S29"[^}]*PASS/.test(rrep.stdout))
     casse.push("S29 : le MEME risque, la main passee au bloc 8, est accuse — la regle crie sur un travail juste");
+  const rnd = spawnSync(process.execPath, [moi, join(dir, "numero-double.md")], { encoding: "utf8" });
+  if (!/"S30"[^}]*FAIL/.test(rnd.stdout))
+    casse.push("S30 : deux décisions portant le MÊME numéro passent pour sélectionnables — le doublon ne se voit pas");
   const rt = spawnSync(process.execPath, [moi, join(dir, "titree.md")], { encoding: "utf8" });
   const rts = spawnSync(process.execPath, [moi, join(dir, "titree-sale.md")], { encoding: "utf8" });
   if (!/"S9"[^}]*PASS/.test(rt.stdout)) {
@@ -1400,7 +1469,7 @@ Aucun écart : la demande a été suivie à la lettre.
   }
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 11/11 PASS (verte PASS ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe)");
+    : "Self-test restitution : 11/11 PASS (verte PASS ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe)");
   process.exit(casse.length ? 1 : 0);
 }
 

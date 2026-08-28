@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=1944643be5e6 archive=8030a6cb0bcd · dernier événement: 2026-08-28T07:31:21.970Z -->
+     sceaux: actifs=ac0c2cb7a7b1 archive=8030a6cb0bcd · dernier événement: 2026-08-28T07:46:03.060Z -->
 
-**21 actifs** (candidat 18 · décidé 2 · en cours 0 · corrigé 1 · écarté 0) · **678 archivés**.
+**22 actifs** (candidat 18 · décidé 2 · en cours 0 · corrigé 2 · écarté 0) · **678 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -17,6 +17,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0676 | candidat | 6.7 | Aucun script de capture du produit ne produit systématiquement une pleine page | non |
 | TF-0684 | candidat | 5 | Six recettes échappent à toute mesure rétrospective : leur idiome de déclaration de cas n'est reconnu par rien | non |
 | TF-0685 | candidat | 4 | hook-produits-intacts : tout ce qui DISCULPE un mouvement est avalé dès qu'un seul écart existe — `declares` est rendu après un `process.exit(0)` | non |
+| TF-0699 | corrige | 40 | pilot : une decision du bloc 3 n'a jamais porte de NUMERO, et le destinataire l'inventait pour pouvoir repondre | **oui** — Deux restitutions repondues par une numerotation INVENTEE par le lecteur (« 1b, 2a, 3a », puis « a »), et une troisieme ou il a declare ne pas pouvoir selectionner. La regle neuve, jouee sur la restitution incriminee, rend « 3 decision(s) sur 3 SANS NUMERO ». |
 | TF-0698 | corrige | 20 | pilot : l'archiveur DEFINISSAIT depuis six jours la fonction qui fait suivre les rectifications a leurs cibles, et ne l'APPELAIT jamais | **oui** — Six constats R9 et un registre entier en FAIL, sur un archivage par ailleurs correct. Le cout n'est pas l'archivage rate : c'est qu'un correctif ECRIT et COMMENTE six jours plus tot n'a servi a rien faute d'un appel, et que son commentaire decrivait exactement l'incident qu'il n'a pas empeche. |
 
 ## digit-ai-forge-tests
