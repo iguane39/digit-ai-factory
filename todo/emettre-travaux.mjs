@@ -366,9 +366,48 @@ if (lanceEnDirect) {
 
     // IDEMPOTENCE PAR CONTENU : le même lot ne s'empile pas dans la boîte du produit.
     const sceau = lot.sceauConfie;
-    const dejaLa = existsSync(boite) && readdirSync(boite).filter((f) => f.endsWith(".md"))
-      .some((f) => readFileSync(join(boite, f), "utf8").includes(sceau));
+    const lotsPresents = existsSync(boite)
+      ? readdirSync(boite).filter((f) => f.endsWith(".md"))
+        .map((f) => ({ nom: f, txt: readFileSync(join(boite, f), "utf8") }))
+      : [];
+    const dejaLa = lotsPresents.some((l) => l.txt.includes(sceau));
     if (dejaLa) { ignores += 1; console.log(`[DÉJÀ DÉPOSÉ] ${ligne.produit} — empreinte ${sceau}, rien de redéposé`); continue; }
+
+    // ---- INCLUSION, ET PAS SEULEMENT ÉGALITÉ (TF-0680, mesure du 26/08/2026) ---------------
+    //
+    // LE FAIT, pris dans l'heure : le produit avait installé UN des artefacts que le lot `c`
+    // demandait. L'empreinte du contenu confié a donc changé, et l'émetteur s'apprêtait à
+    // déposer un lot `d` de 5 éléments là où `c` en portait 6 — les 5 STRICTEMENT INCLUS dans
+    // les 6. Le produit aurait reçu deux lots quasi identiques en moins d'une heure, le second
+    // n'apportant RIEN de neuf.
+    //
+    // LE COMPORTEMENT ÉTAIT CORRECT AU SENS DE LA RÈGLE ÉCRITE — le contenu a bien changé — ET
+    // NUISIBLE AU SENS DE CE QU'ELLE PROTÈGE : « sans cela, deux exécutions du même relevé
+    // enseveliraient le produit sous des lots identiques, et le canal deviendrait la nuisance
+    // qu'il est censé éviter » (R-33 bis). La règle mesurait l'ÉGALITÉ des contenus quand la
+    // propriété visée est l'ABSENCE DE NOUVEAUTÉ.
+    //
+    // LA BORNE COMPTE AUTANT QUE LA RÈGLE, et elle est dans le constat d'origine : un lot déjà
+    // TRAITÉ par le produit ne doit PAS bloquer un redépôt, sans quoi un constat rouvert
+    // n'atteindrait plus personne. On ne regarde donc que les lots encore `a_traiter`.
+    //
+    // L'inclusion se lit sur les ÉLÉMENTS, jamais sur le texte : deux formulations d'un même
+    // constat sont le même travail pour le produit.
+    const elementsDe = (txt) => new Set([...txt.matchAll(/^### (.+?)\s*$/gm)].map((m) => m[1].trim()));
+    const estATraiter = (txt) => /^-\s+\*\*Statut\*\*\s*:\s*a_traiter\s*$/m.test(txt);
+    const mien = elementsDe(lot.md);
+    const englobant = lotsPresents.find((l) => {
+      if (!estATraiter(l.txt)) return false;             // un lot TRAITÉ ne bloque rien
+      const sien = elementsDe(l.txt);
+      return mien.size > 0 && [...mien].every((e) => sien.has(e));
+    });
+    if (englobant) {
+      ignores += 1;
+      console.log(`[INCLUS DANS UN LOT NON TRAITÉ] ${ligne.produit} — les ${mien.size} élément(s) de ce lot ` +
+        `sont déjà tous dans « ${englobant.nom} », encore \`a_traiter\`. Rien de neuf à confier : ` +
+        "redéposer empilerait un doublon que le produit devrait trier lui-même.");
+      continue;
+    }
 
     const nom = `pilot - TRAVAUX - ${jour}${indice}`;
     if (ESSAI) {

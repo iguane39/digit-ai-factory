@@ -10,7 +10,7 @@
  *   · un produit conforme ne reçoit AUCUN lot : un canal qui parle pour ne rien dire se fait taire.
  * Joué par `oracles\self-tests.mjs` (I2).
  */
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readdirSync, statSync, existsSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, readdirSync, statSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -166,6 +166,55 @@ try {
     const r2 = lancer();
     att(readdirSync(boite).length === apres1, `${readdirSync(boite).length} fichiers après le second passage au lieu de ${apres1}`);
     att(/DÉJÀ DÉPOSÉ/.test(r2.stdout), "le second passage ne DIT pas qu'il n'a rien redéposé");
+  });
+
+  // ── TF-0680 — L'INCLUSION, ET SA BORNE. Deux sens, parce que la borne compte autant que la
+  // règle : un lot dont les éléments sont TOUS déjà dans un lot NON TRAITÉ n'apporte rien et ne
+  // se dépose pas ; le même, face à un lot DÉJÀ TRAITÉ, doit repartir — sans quoi un constat
+  // rouvert n'atteindrait plus personne.
+  // On reproduit la scène du 26/08 : le produit INSTALLE l'un des artefacts que le lot
+  // demandait. Le relevé suivant porte donc un élément de MOINS — un sous-ensemble strict —
+  // et c'est ce cas précis que l'égalité d'empreinte laissait passer.
+  const monterInclusion = (nomParc, statut) => {
+    const faux = join(T, nomParc);
+    const produit = join(faux, "_Client", "produit-recette");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    const lancer = () => spawnSync(process.execPath, [join(ICI, "emettre-travaux.mjs"), "--tous"],
+      { encoding: "utf8", env: { ...process.env, FORGE_ROOT: faux } });
+    lancer();
+    const boite = join(produit, "input", "00-travaux");
+    const lot = readdirSync(boite).find((f) => f.endsWith(".md"));
+    if (statut !== "a_traiter") {
+      const chemin = join(boite, lot);
+      writeFileSync(chemin, readFileSync(chemin, "utf8")
+        .replace(/-\s+\*\*Statut\*\*\s*:\s*a_traiter/, `- **Statut** : ${statut}`), "utf8");
+    }
+    // LE GESTE QUI REND LE LOT SUIVANT PLUS PETIT : le produit satisfait UNE demande, et il
+    // l'installe VRAIMENT — un fichier bouchon rendrait l'artefact « PÉRIMÉ » au lieu de le
+    // faire disparaître, l'élément changerait de libellé, et il n'y aurait plus d'inclusion.
+    // Ce faux pas a été payé en écrivant ce cas : il passait au vert sans rien exercer.
+    mkdirSync(join(produit, "forge", "retours"), { recursive: true });
+    writeFileSync(join(produit, "forge", "retours", "RETOURS-FORGES.md"),
+      readFileSync(join(ICI, "..", "gabarits", "RETOURS-FORGES.md"), "utf8"), "utf8");
+    return { boite, lancer };
+  };
+
+  check("TF-0680 — un lot INCLUS dans un lot NON TRAITÉ ne se redépose pas", () => {
+    const { boite, lancer } = monterInclusion("parc-incl-1", "a_traiter");
+    const avant = readdirSync(boite).length;
+    const r = lancer();
+    att(readdirSync(boite).length === avant,
+      `${readdirSync(boite).length} fichiers au lieu de ${avant} : un sous-ensemble a été redéposé`);
+    att(/INCLUS DANS UN LOT NON TRAITÉ/.test(r.stdout),
+      "le refus ne passe PAS par la règle d'inclusion — le cas n'exerce donc pas ce qu'il prétend " +
+      "prouver : " + r.stdout.split(String.fromCharCode(10)).filter((x) => x.trim()).slice(-2).join(" | "));
+  });
+
+  check("TF-0680 borne — un lot DÉJÀ TRAITÉ ne bloque pas un redépôt", () => {
+    const { boite, lancer } = monterInclusion("parc-incl-2", "traite le 2026-08-27");
+    const r = lancer();
+    att(!/INCLUS DANS UN LOT NON TRAITÉ/.test(r.stdout),
+      "un lot déjà traité bloque le redépôt — un constat rouvert n'atteindrait plus personne");
   });
 
   // ═══════════════════════════════════════════════════════════════════════════════════════════
