@@ -4,10 +4,13 @@
 avec `destinataire: humain` en frontmatter YAML. La localisation R-2/E9 ne juge que ce qui
 est MARQUÉ — sans porteur, la règle est un faux négatif volontaire : elle est livrée,
 prouvée à zéro faux positif, et ne voit rien. Le marquage a été vérifié toléré par
-`oracle-synthese` (S1-S8 à l'époque, S1-S21 depuis la v2.10.0) sur une synthèse réelle PASS avant d'être prescrit ici.
+`oracle-synthese` (S1-S8 à l'époque, S1-S30 depuis la v2.11.0) sur une synthèse réelle PASS avant d'être prescrit ici.
 Cette consigne, elle, ne se marque PAS : c'est un référentiel normatif, pas un livrable.
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 2.10.0, 23/08/2026** (règle **S21**,
+Référentiel versionné (loi n° 4, daté-éditable) — **version 2.11.0, 28/08/2026** (règle **S30** :
+toute décision du bloc 3 porte un NUMÉRO, et les numéros sont distincts — retour humain du 28/08,
+« Il n'y a pas de numéro sur les décisions, je ne peux pas les sélectionner »). Précédente :
+**2.10.0, 23/08/2026** (règle **S21**,
 second volet de S12 : un motif `acces` ou `presence` porte la TRACE MESURÉE de la tentative — un
 code de réponse, un message d'erreur, une sortie de commande. Le destinataire a contesté sept lignes
 sur neuf d'un relevé, dont plusieurs par « pourquoi ce n'est pas déjà fait par l'IA ») — précédente :
@@ -89,7 +92,9 @@ S-01 TENU, 19/19 au banc rouge »*, jamais *« tout s'est bien passé »*.
 **En tête, jamais en fin.** Chaque décision est présentée en **choix fermé** — l'humain
 tranche, il ne rédige pas :
 
-- **le RAPPEL DU SUJET — au moins 25 mots, sans identifiant nu** (règle **S15**, v2.7.0) ;
+- **un NUMÉRO, distinct des autres** (règle **S30**, v2.11.0) — c'est par lui que l'humain
+  répond, et sans lui il numérote de tête ou rédige en prose ;
+  - **le RAPPEL DU SUJET — au moins 25 mots, sans identifiant nu** (règle **S15**, v2.7.0) ;
   - **la RECOMMANDATION, et la SOURCE consultée d'où elle sort** — ou la déclaration qu'aucune
     source disponible ne répond (règle **S16**, v2.8.0) ;
   - les options `(a)` / `(b)` / `(c)`, chacune avec **son coût et ce qu'elle exclut** ;
@@ -120,6 +125,30 @@ transforme une lecture en arbitrage.**
 Les deux sont exigées, et la source est un localisateur ordinaire — le document, le fichier, la
 ligne d'où sort la réponse proposée. Quand rien dans les pièces disponibles ne répond, **le dire
 explicitement** vaut source : c'est une information, pas un aveu.
+
+#### Une décision se SÉLECTIONNE, donc elle porte un NUMÉRO (S30, 28/08/2026)
+
+*Le retour est la mesure, mot pour mot* : **« Il n'y a pas de numéro sur les décisions, je ne peux
+pas les sélectionner. »** Et le plus instructif est ce qui l'a précédé : le destinataire avait
+déjà répondu **« 1b, 2a, 3a »** à une restitution portant trois décisions non numérotées, puis
+**« a »** à une autre. Il avait donc INVENTÉ la numérotation pour pouvoir répondre, l'ordre
+d'apparition faisant office de numéro tacite. Ça a marché deux fois ; la troisième, il a dit stop.
+
+**Pourquoi S4 ne le voyait pas**, et c'est la même cécité que S15 corrige au niveau du sujet : S4
+compte des OPTIONS étiquetées `(a)`, `(b)`, `(c)` — elle vérifie que le choix est fermé, jamais
+que la QUESTION est adressable. Un bloc à trois décisions parfaitement optionnées passe donc S4
+et reste insélectionnable : « je prends (b) » ne dit pas laquelle.
+
+**Ce que coûtait l'absence** : soit le lecteur numérote lui-même, et le risque d'un décalage est
+sur lui ; soit il rédige sa réponse en prose, c'est-à-dire exactement ce que le choix fermé du
+bloc 3 existe pour lui épargner. *Une décision qu'on ne peut pas désigner en deux caractères
+n'est pas un choix fermé, c'est un questionnaire.*
+
+**Les numéros doivent aussi être DISTINCTS** — deux décisions numérotées 1 ne se sélectionnent
+pas mieux qu'aucune. C'est le second sens de la règle, et il a sa propre fixture.
+
+La **forme est libre**, comme pour les titres de bloc : « **Décision 1 —** », « 1. », « **1)** »,
+« D1 — » sont tous acceptés. Juger la typographie n'a jamais été le sujet.
 
 #### Pourquoi « une phrase » ne suffisait pas (S15, 22/08/2026)
 
