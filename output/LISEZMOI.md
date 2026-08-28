@@ -80,8 +80,6 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Livrable | Version | Poids | Chemin à copier |
 |---|---|---|---|
 | 20260825-releve-heritage-produits.md | — | 5.8 Ko | `01-revues-et-propositions/20260825-releve-heritage-produits.md` |
-| Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md | 20260815a | 7 Ko | `01-revues-et-propositions/Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md` |
-| Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md.jugement.json | — | 0.3 Ko | `01-revues-et-propositions/Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md.jugement.json` |
 | Digit-AI - Proposition Architecture - Circuit de l insatisfaction - 20260815a.md | 20260815a | 5.5 Ko | `01-revues-et-propositions/Digit-AI - Proposition Architecture - Circuit de l insatisfaction - 20260815a.md` |
 | Digit-AI - Proposition Architecture - Circuit de l insatisfaction - 20260815a.md.jugement.json | — | 0.4 Ko | `01-revues-et-propositions/Digit-AI - Proposition Architecture - Circuit de l insatisfaction - 20260815a.md.jugement.json` |
 | Digit-AI - Proposition Forge - Restitution lisible - 20260815a.md | 20260815a | 11 Ko | `01-revues-et-propositions/Digit-AI - Proposition Forge - Restitution lisible - 20260815a.md` |
@@ -99,6 +97,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Revue Forge - Écosystème - 20260819a.md.jugement.json | — | 0.3 Ko | `01-revues-et-propositions/Digit-AI - Revue Forge - Écosystème - 20260819a.md.jugement.json` |
 | Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html *(archivé)* | 20260815a | 35.1 Ko | `01-revues-et-propositions/old/Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html` |
 | Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html.jugement.json *(archivé)* | — | 0.3 Ko | `01-revues-et-propositions/old/Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html.jugement.json` |
+| Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md | 20260815a | 7.1 Ko | `01-revues-et-propositions/Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md` |
+| Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md.jugement.json | — | 0.3 Ko | `01-revues-et-propositions/Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md.jugement.json` |
 
 ### 02-schema-ecosysteme
 
@@ -133,13 +133,13 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260815-etude-opportunite-qualite-graphique.md | — | 5.7 Ko | `03-etudes/20260815-etude-opportunite-qualite-graphique.md` |
 | 20260815-etude-opportunite-restitution-lisible.md | — | 6.3 Ko | `03-etudes/20260815-etude-opportunite-restitution-lisible.md` |
 | 20260817-etude-opportunite-cadence-de-mission.md | — | 24.3 Ko | `03-etudes/20260817-etude-opportunite-cadence-de-mission.md` |
-| 20260817-etude-opportunite-consignes-de-mise-a-jour.md | — | 20.1 Ko | `03-etudes/20260817-etude-opportunite-consignes-de-mise-a-jour.md` |
+| 20260817-etude-opportunite-consignes-de-mise-a-jour.md | — | 20.3 Ko | `03-etudes/20260817-etude-opportunite-consignes-de-mise-a-jour.md` |
 | 20260817-etude-opportunite-conventions-parametrables.md | — | 20.6 Ko | `03-etudes/20260817-etude-opportunite-conventions-parametrables.md` |
 | 20260817-etude-opportunite-couverture-par-role.md | — | 5.4 Ko | `03-etudes/20260817-etude-opportunite-couverture-par-role.md` |
 | 20260817-etude-opportunite-ecart-servi-versionne.md | — | 6.4 Ko | `03-etudes/20260817-etude-opportunite-ecart-servi-versionne.md` |
 | 20260817-etude-opportunite-publication-livrables.md | — | 6.3 Ko | `03-etudes/20260817-etude-opportunite-publication-livrables.md` |
 | 20260817-etude-opportunite-rangement-output.md | — | 18.3 Ko | `03-etudes/20260817-etude-opportunite-rangement-output.md` |
-| 20260817-etude-opportunite-renommage-factory.md | — | 22.8 Ko | `03-etudes/20260817-etude-opportunite-renommage-factory.md` |
+| 20260817-etude-opportunite-renommage-factory.md | — | 23 Ko | `03-etudes/20260817-etude-opportunite-renommage-factory.md` |
 | 20260817-etude-opportunite-sequencement-factory.md | — | 44.8 Ko | `03-etudes/20260817-etude-opportunite-sequencement-factory.md` |
 | 20260817-etude-opportunite-tests-bout-en-bout.md | — | 27.3 Ko | `03-etudes/20260817-etude-opportunite-tests-bout-en-bout.md` |
 | 20260817-etude-opportunite-todo-produit.md | — | 27.4 Ko | `03-etudes/20260817-etude-opportunite-todo-produit.md` |
@@ -150,7 +150,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260818-etude-opportunite-retour-usage-vers-delta.md | — | 9.1 Ko | `03-etudes/20260818-etude-opportunite-retour-usage-vers-delta.md` |
 | 20260819-etude-opportunite-forge-consulting.md | — | 13.4 Ko | `03-etudes/20260819-etude-opportunite-forge-consulting.md` |
 | 20260819-etude-opportunite-meta-oracle-enclenchement.md | — | 16.8 Ko | `03-etudes/20260819-etude-opportunite-meta-oracle-enclenchement.md` |
-| 20260819-etude-opportunite-module-de-traduction.md | — | 16.3 Ko | `03-etudes/20260819-etude-opportunite-module-de-traduction.md` |
+| 20260819-etude-opportunite-module-de-traduction.md | — | 16.6 Ko | `03-etudes/20260819-etude-opportunite-module-de-traduction.md` |
 | 20260819-etude-opportunite-retro-documentation.md | — | 9.6 Ko | `03-etudes/20260819-etude-opportunite-retro-documentation.md` |
 | 20260819-etude-opportunite-retro-engineering.md | — | 10.4 Ko | `03-etudes/20260819-etude-opportunite-retro-engineering.md` |
 | 20260820-etude-opportunite-communication-interlocuteur.md | — | 10.4 Ko | `03-etudes/20260820-etude-opportunite-communication-interlocuteur.md` |
@@ -182,7 +182,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md | 20260817a | 7.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md` |
 | Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md.jugement.json` |
-| Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md | 20260817a | 7.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md` |
+| Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md | 20260817a | 7.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md` |
 | Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md | 20260822a | 13.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md` |
 | Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md.jugement.json` |
@@ -190,7 +190,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Toute la todo avec le a - 20260815a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Toute la todo avec le a - 20260815a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Traite les todo et retours - 20260815a.md | 20260815a | 4.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite les todo et retours - 20260815a.md` |
 | Digit-AI - Synthese Mandat - Traite les todo et retours - 20260815a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite les todo et retours - 20260815a.md.jugement.json` |
-| Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md | 20260817a | 6.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md` |
+| Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md | 20260817a | 6.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md` |
 | Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Traite retours et todos - 20260817a.md | 20260817a | 6.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite retours et todos - 20260817a.md` |
 | Digit-AI - Synthese Mandat - Traite retours et todos - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite retours et todos - 20260817a.md.jugement.json` |

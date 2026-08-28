@@ -59,7 +59,11 @@ const CHEMIN_PRODUITS = () => process.env.FORGE_PRODUITS_PSEUDO || join(RACINE, 
 // Un sigle court se cherche en MOT ENTIER : mesuré le 27/08, le sigle d'un opérateur télécom
 // inscrit comme un nom ordinaire attrapait `candidatsFreres` et `resFront`, deux identifiants de
 // code bien réels. La frontière exclut lettres, chiffres et souligné — un tiret ou un point EST
-// une frontière, ce qui couvre `COMPTA-XYZ` sans toucher `resFront generique.
+// une frontière, ce qui couvre une forme composée du genre `COMPTA-XYZ` sans toucher un
+// identifiant de code qui contiendrait les mêmes lettres au milieu d'un mot.
+// LES EXEMPLES DE CE FICHIER SONT INVENTÉS, et c'est une règle : le 27/08, un oracle écrit
+// pour traquer les noms de clients a été refusé par lui-même parce que son propre commentaire
+// en citait un en exemple.
 const bordé = (mot) => new RegExp(`(?<![A-Za-z0-9_])${mot.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![A-Za-z0-9_])`, "g");
 
 function lireClients() {
