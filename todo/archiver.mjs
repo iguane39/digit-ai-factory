@@ -110,6 +110,21 @@ const restent = [], partent = [];
       (ids.length && ids.every((id) => archivables.has(id)) ? partent : restent).push(l);
       continue;
     }
+    // 28/08 — `scinderRectification` etait DEFINIE depuis le 22/08 et JAMAIS APPELEE : la loi
+    // transverse n° 1 du noyau dit qu'une affordance est cablee ou n'existe pas, et celle-ci
+    // n'existait pas. Un evenement `rectification_horodatage` ne porte pas de champ `id` — il
+    // tombait donc dans `restent` par le seul jeu de `e.id && …`, sans que rien ne le decide.
+    // MESURE DU JOUR : le premier archivage a deplacer un item PORTEUR de rectifications a laisse
+    // cinq d'entre elles orphelines dans l'actif, et `oracle-todo` est passe de PASS a FAIL sur
+    // R9 « rectification sans cible ANTERIEURE ». Le commentaire de la fonction annoncait
+    // exactement ce defaut, six jours avant qu'il ne se produise.
+    if (e.ev === "rectification_horodatage") {
+      const scindee = scinderRectification(e, archivables);
+      if (!scindee) { restent.push(l); continue; }
+      partent.push(JSON.stringify({ ...e, entrees: scindee.partent }));
+      if (scindee.restent.length) restent.push(JSON.stringify({ ...e, entrees: scindee.restent }));
+      continue;
+    }
     if (e.ev === "creation") recentes.push(e.id);
     (e.id && archivables.has(e.id) ? partent : restent).push(l);
   }
