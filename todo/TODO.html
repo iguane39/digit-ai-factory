@@ -152,7 +152,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>ac0c2cb7a7b1</code> · dernier événement 2026-08-28T07:46:03.060Z</p>
+      <p class="meta">sceau <code>f7057cd488af</code> · dernier événement 2026-08-28T07:54:29.488Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -162,7 +162,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="18 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">18</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="22 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">22</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="2 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">2</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="677 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">677</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -178,10 +178,11 @@
       <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
       
       <div class="dropdown" data-dim="forge">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">6</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">7</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
           <label><input type="checkbox" value="digit-ai-factory" checked> digit-ai-factory</label>
+          <label><input type="checkbox" value="digit-ai-forge-audit" checked> digit-ai-forge-audit</label>
           <label><input type="checkbox" value="digit-ai-forge-tests" checked> digit-ai-forge-tests</label>
           <label><input type="checkbox" value="digit-ai-page-html" checked> digit-ai-page-html</label>
           <label><input type="checkbox" value="factory" checked> factory</label>
@@ -200,10 +201,10 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">22 / 22 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">26 / 26 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">8 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-page-html"><strong>digit-ai-page-html</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#factory"><strong>factory</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a><a href="#forge-audit"><strong>forge-audit</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">8 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-page-html"><strong>digit-ai-page-html</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#factory"><strong>factory</strong> <span class="toc-d">7 item(s) reste-à-faire</span></a><a href="#forge-audit"><strong>forge-audit</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-factory">
       <h2>digit-ai-factory <span class="badge" title="8 item(s) actifs ciblant digit-ai-factory">8</span></h2>
@@ -395,6 +396,58 @@
         </article>
       </div>
     </section>
+    <section id="digit-ai-forge-audit">
+      <h2>digit-ai-forge-audit <span class="badge" title="2 item(s) actifs ciblant digit-ai-forge-audit">2</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-audit</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0700" data-cite data-forge="digit-ai-forge-audit" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0700</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 9)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">audit : le livrable DIFFUSE de la fiche securite est un PDF, que le kit ne prescrit pas, n outille pas et ne controle pas — le projet a diffuse une IMAGE, d un indice anterieur au HTML depose a cote</h3>
+          <div class="card-detail" data-cite><p class="lead">Le paragraphe 10 de compliance-pack/compliance.skill.md prescrit la fiche securite de mise a disposition en quatre lignes et ne parle QUE de HTML : nom de sortie en .html, reference interne, zero placeholder, lien DEV.</p><ul class="puces"><li>Le README du pack decrit de meme le gabarit comme produisant un .html. Or le livrable REELLEMENT DIFFUSE a l equipe securite est un PDF — c est sous cette forme qu il part, et c est ce que le proprietaire du produit a demande le 27/08. Ni ce format, ni le moyen de le produire, ni aucun controle sur lui ne figurent dans le kit, alors que le pack fournit trois outils pour le rapport d audit (verifier-rapport-audit.mjs, verifier-remediation.mjs, maj-versions.mjs). MESURE SUR LE DOSSIER DE LIVRAISON D PRODUIT-01 AVANT CORRECTION : le PDF diffuse (Fiche Securite Dev 20260724c.pdf, 653169 octets) est 1 page, ZERO caractere de texte extractible, 9 images incorporees — c est une capture rasterisee, pas une impression. Consequences verifiables : non recherchable, MUET POUR UN LECTEUR D ECRAN alors que le destinataire est l equipe securite, non controlable par machine, et cinq fois plus lourd que le meme document imprime en texte (653 Ko contre 124 Ko mesures le 27/08). SECOND DEFAUT DANS LE MEME DOSSIER : le PDF porte l indice c et le HTML depose a cote porte l indice d — une revision POSTERIEURE. Le HTML d indice c n existe plus que dans Old/. Ce qui a ete diffuse n est donc pas la revision de reference conservee a cote de lui, et rien ne l a signale. Le second defaut decoule du premier : un PDF qu aucun outil ne produit est un PDF qu on regenere a la main, quand on y pense, depuis la version qu on a sous les yeux. CE QUI REND LA CORRECTION FACILE : le gabarit fait deja le plus dur, il porte @media print et @page{size:A4 portrait;margin:8mm} et il est concu pour etre imprime ; il ne manque que l instruction et l outil qui s en servent. ACTION :</li><li>le paragraphe 10 prescrit les DEUX sorties, .html de reference et .pdf de diffusion, avec la regle explicite que le PDF est IMPRIME depuis le HTML et jamais capture</li><li>le pack fournit un compliance-pack/fiche-en-pdf.mjs d une vingtaine de lignes — Playwright/Chromium, emulateMedia print, printBackground, et surtout preferCSSPageSize, point non evident sans lequel Chromium impose ses propres format et marges et IGNORE le @page du gabarit, de sorte que la fiche imprimee cesse de ressembler a la fiche relue</li><li>regle d indice : le PDF porte le MEME indice que le HTML dont il est imprime, une fiche rendue sans son PDF de meme indice n etant pas complete</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-27</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 9 — gain 3 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-audit</dt><dd>PDF diffuse le 24/07 : 1 page, 0 caractere extractible, 9 images, 653169 octets, indice c — contre un HTML voisin d indice d. Aucune porte ne l a vu.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-01</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0701" data-cite data-forge="digit-ai-forge-audit" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0701</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">audit : la fiche securite n a AUCUN verificateur alors que ses deux regles sont mecaniques, et que le rapport d audit, lui, a une porte bloquante</h3>
+          <div class="card-detail" data-cite><p class="lead">Le rapport d audit dispose d une porte bloquante — paragraphe 9 de compliance.skill.md : « le rapport n est CONFORME (diffusable) que si exit code = 0 », via verifier-rapport-audit.mjs.</p><ul class="puces"><li>La fiche securite n a aucun controle, alors que le paragraphe 10 pose deux regles parfaitement verifiables par machine : zero placeholder <code>{{...}}</code> restant, et lien du projet deploye en DEV present</li><li>CAUSE : le pack a outille le document le plus volumineux et laisse l autre a la relecture humaine</li><li>C est defendable pour une fiche de deux pages, SAUF QUE la relecture humaine porte sur le HTML alors que ce qui est diffuse est le PDF (voir le retour precedent du meme lot) : aucun oeil ne relit l artefact reellement transmis</li><li>ACTION : un compliance-pack/verifier-fiche-securite.mjs sur le modele de son aine — zero placeholder, les 8 sections presentes, reference interne au format &lt;TRIGRAMME&gt;-SEC-DEV-&lt;AAAAMMJJ&gt;&lt;indice&gt; et coherente entre en-tete et pied, lien DEV present</li><li>Et, si la regle d indice du retour precedent est retenue, deux controles de plus qui auraient chacun attrape un des deux defauts constates : indice du PDF egal a celui du HTML, et PDF porteur de texte extractible — un seuil grossier suffit, un PDF de fiche sous quelques centaines de caracteres etant une image</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-27</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-audit</dt><dd>Deux regles ecrites au paragraphe 10 et tenues par personne ; le seul artefact relu est celui qui n est pas diffuse.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-01</dd></div>
+            
+          </dl>
+        </article>
+      </div>
+    </section>
     <section id="digit-ai-forge-tests">
       <h2>digit-ai-forge-tests <span class="badge" title="1 item(s) actifs ciblant digit-ai-forge-tests">1</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-tests</strong> — trié par statut puis priorité décroissante.</p>
@@ -454,7 +507,7 @@
       </div>
     </section>
     <section id="factory">
-      <h2>factory <span class="badge" title="5 item(s) actifs ciblant factory">5</span></h2>
+      <h2>factory <span class="badge" title="7 item(s) actifs ciblant factory">7</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>factory</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
@@ -568,6 +621,52 @@
             <div><dt>Créé le</dt><dd>2026-08-27</dd></div>
             <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
             <div class="impact"><dt>Impact sur factory</dt><dd>impossible de dater la conformite d une fiche remise ; la section R-46 du gabarit de retours ne peut etre remplie par aucun produit de la famille, ce qui rend muet le seul canal d amelioration des gabarits</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-11</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0702" data-cite data-forge="factory" data-statut="candidat" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0702</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">factory : les generateurs des produits sont des REECRITURES de ceux de la factory, donc hors d atteinte de toute correction</h3>
+          <div class="card-detail" data-cite><p class="lead">C EST LA VRAIE CAUSE DU DEFAUT DE PROPAGATION REMONTE EN RT-39, et elle l aggrave au lieu de l excuser.</p><ul class="puces"><li>FAIT MESURE, sur pieces : la factory tient tools/build-fiche.mjs, 208 lignes, en Node, qui produit bien les DEUX formats et porte meme le commentaire « Le catalogue de la bibliotheque declare deux formats pour cette famille — html ET pdf ». Le produit Produit-11 tient outils-audit/batir-fiche.py, 346 lignes, en Python. Le correctif de TF-0506 (commit 56c651c, 23/08) a ete porte dans le fichier Node ; AUCUN mecanisme concevable ne le fait arriver dans le fichier Python. ET LA REECRITURE N EST PAS UN CAPRICE : batir-fiche.py rend depuis kit/compliance-pack/Client-A - Modele Fiche Securite Mise a disposition - Dev - 20260710a.html, un gabarit HTML IMPOSE PAR LE CLIENT, que build-fiche.mjs ne sait pas consommer — il rend depuis deliverables/templates/fiche-securite.template.md. Le produit avait donc a choisir entre respecter le gabarit de son client et employer l outil de la factory. POURQUOI CELA AGGRAVE RT-39 : le produit n etait pas negligent et son livrable n etait pas detache d un generateur — il POSSEDAIT un generateur versionne et entretenu, et la correction ne l a pas atteint quand meme. Le manifeste d adoption propose en RT-39 aurait rendu le retard VISIBLE ; il n aurait pas rendu la correction TRANSMISSIBLE. PROPOSITION : PROPAGER LES ORACLES, PAS LES GENERATEURS — un oracle est agnostique du langage, un generateur ne l est pas. La preuve que le motif fonctionne est deja au dossier : batir-fiche.py appelle oracles/verifier-pdf.mjs de la factory, en Node, depuis Python, via subprocess, et s arrete sur son code de retour. Donc :</li><li>chaque famille du catalogue declare, a cote de `formats`, la liste des ORACLES qu un jeu remis doit passer</li><li>un oracle verifier-jeu-livrables lit le catalogue et ECHOUE si un format declare manque — il aurait refuse les remises du 25/08 et du 27/08 SANS RIEN SAVOIR du generateur employe</li><li>build-fiche.mjs accepte un gabarit HTML fourni par le produit (--gabarit), ce qui rend la reecriture INUTILE dans le cas Client-A au lieu de la rendre seulement mesurable. Le point</li><li>est le moins couteux et ne depend d aucune decision de gouvernance ; le point</li><li>supprime la cause au lieu de la mesurer</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-28</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur factory</dt><dd>une correction de la factory datee du 23/08 n a pu atteindre ni la remise du 25/08 ni celle du 27/08 du produit explicitement nomme beneficiaire, parce que le generateur du produit est ecrit dans un autre langage et lit un gabarit impose par le client que l outil de la factory ne sait pas consommer ; la cause proposee en RT-39, un livrable detache de son generateur, etait fausse</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-11</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0703" data-cite data-forge="factory" data-statut="candidat" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0703</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">factory : le protocole de retours n a aucun canal de rectification d un lot remis</h3>
+          <div class="card-detail" data-cite><p class="lead">FAIT MESURE. gabarits/RETOURS-FORGES.md pose, a raison, qu un fichier remis ne se modifie JAMAIS. Mais AUCUN champ du sidecar .tf.jsonl ne permet de designer un retour anterieur pour le corriger ou l annuler : le schema porte titre, contenu, demandeur, source, date_demande, forges_cibles_initiales, gravite, portee, score, preuve_du_cout — et rien qui pointe en arriere. CAS REEL QUI L A REVELE, sur le produit qui ecrit ces lignes : le lot Produit-11 - RETOURS - 20260827b affirme, en section « Remarques restees au produit », que « la fiche de Produit-11 n est pas produite par build-fiche.mjs : c est un HTML maintenu a la main, derive une fois du gabarit puis suivi separement ». C EST FAUX. La fiche est produite par outils-audit/batir-fiche.py, 346 lignes, versionne, cree le 25/08 dans le commit 1525c69 — celui-la meme qui a livre la premiere fiche — et suivi depuis (e7dc5a8 le 26/08, 8226f02 le 27/08, de82e2a le 28/08). Un `git log --diff-filter=A` suffisait a le demontrer. Le lot a donc decrit la cause immediate d un defaut par une situation inexistante, sur son propre produit. CONSEQUENCE SI LE CANAL MANQUE : une fois ingeree, cette affirmation devient un item de TODO.jsonl indiscernable d un item exact, et le seul moyen de la contredire est un item CONCURRENT que rien ne relie au premier. Un registre incapable de se corriger n accumule pas de la connaissance : il accumule aussi ses erreurs, avec le meme poids. CE QUI LIMITE LES DEGATS ICI, et c est une chance de calendrier et non une propriete du protocole : au 28/08, todo/TODO.jsonl ne contient aucune occurrence de RT-39 — le lot 20260827b n est pas encore ingere, la rectification arrive avant toute decision. PROPOSITION : deux champs OPTIONNELS au sidecar, `rectifie` (id du retour vise) et `nature_de_la_rectification` (fait_errone | cause_erronee | annule). L ingestion, en les voyant, MARQUE l item vise au lieu d en creer un second sans lien. Corollaire d oracle, peu couteux : refuser un sidecar dont `rectifie` designe un id inconnu, ce qui empeche une rectification de porter a cote. La regle d immuabilite n est PAS a assouplir — elle est ce qui a force la declaration de l erreur ; il lui manque seulement le geste complementaire.</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-08-28</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur factory</dt><dd>un lot deja remis porte une affirmation fausse sur son propre produit, relevee par le destinataire humain le 28/08 ; le protocole n offrait aucun geste pour la dedire, et seule l absence d ingestion a ce jour empeche la factory d agir sur une cause erronee</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-11</dd></div>
             
           </dl>

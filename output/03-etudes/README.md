@@ -26,7 +26,7 @@
 | `20260815-etude-opportunite-cout-du-faux-positif.md` | fichier | 6,9 Ko | Étude d'opportunité — le coût du faux positif d'oracle (TF-0275..TF-0282) — 20260815e |
 | `20260815-etude-opportunite-lecons-audit-reel.md` | fichier | 5,6 Ko | Étude d'opportunité — leçons du run d'audit réel (TF-0260..TF-0266) — 20260815c |
 | `20260815-etude-opportunite-qualite-graphique.md` | fichier | 5,6 Ko | Étude d'opportunité — qualité graphique par défaut (TF-0236, TF-0237, TF-0238) — 20260815b |
-| `20260815-etude-opportunite-restitution-lisible.md` | fichier | 6,4 Ko | Étude d'opportunité — doctrine « restitution lisible » (TF-0235) — 20260815a |
+| `20260815-etude-opportunite-restitution-lisible.md` | fichier | 6,3 Ko | Étude d'opportunité — doctrine « restitution lisible » (TF-0235) — 20260815a |
 | `20260817-etude-opportunite-cadence-de-mission.md` | fichier | 24,0 Ko | Étude d'opportunité — gouvernance et cadence d'une mission (TF-0323 · TF-0324) — 20260817g |
 | `20260817-etude-opportunite-consignes-de-mise-a-jour.md` | fichier | 20,1 Ko | Étude d'opportunité — la mise à jour des forges transporte le code, pas la consigne (TF-03 |
 | `20260817-etude-opportunite-conventions-parametrables.md` | fichier | 20,6 Ko | Étude d'opportunité — conventions de la forge gravées ou paramétrables (TF-0322) — 2026081 |
@@ -35,7 +35,7 @@
 | `20260817-etude-opportunite-publication-livrables.md` | fichier | 6,3 Ko | Étude d'opportunité — publication externe et autoportance des livrables (TF-0302/0303) — 2 |
 | `20260817-etude-opportunite-rangement-output.md` | fichier | 18,3 Ko | Étude d'opportunité — rangement des livrables destinés à l'humain dans `output\` (TF-0319) |
 | `20260817-etude-opportunite-renommage-factory.md` | fichier | 22,8 Ko | Étude d'opportunité — renommage du pilot en « factory » — 20260817h |
-| `20260817-etude-opportunite-sequencement-factory.md` | fichier | 44,7 Ko | Étude d'opportunité — séquencement du renommage `digit-ai-forge-pilot` → `digit-ai-factory |
+| `20260817-etude-opportunite-sequencement-factory.md` | fichier | 44,8 Ko | Étude d'opportunité — séquencement du renommage `digit-ai-forge-pilot` → `digit-ai-factory |
 | `20260817-etude-opportunite-tests-bout-en-bout.md` | fichier | 27,3 Ko | Étude d'opportunité — fermeture de la voie « proposition de tests » (TF-0349) — 20260817j |
 | `20260817-etude-opportunite-todo-produit.md` | fichier | 27,4 Ko | Étude d'opportunité — la todo de chaque produit en page HTML — 20260817i |
 | `20260818-cartographie-oracles-cadence-de-mission.md` | fichier | 5,7 Ko | Digit-AI — Cartographie des oracles : les cinq artefacts de cadence — 20260818a |
@@ -52,6 +52,6 @@
 | `20260820-etude-opportunite-rgaa.md` | fichier | 12,9 Ko | Étude d'opportunité — RGAA AA dans le parc : forge-design, forge-tests, et ce qui n'est pa |
 | `20260822-etude-opportunite-fraicheur-des-verdicts.md` | fichier | 13,8 Ko | Étude d'opportunité — fraîcheur des verdicts d'oracles — 20260822b |
 | `20260822-etude-opportunite-troisieme-point-observation-i18n.md` | fichier | 8,1 Ko | Étude d'opportunité — un troisième point d'observation pour le pan i18n — 20260822a |
-| `20260822-etude-opportunite-vue-portefeuille.md` | fichier | 8,5 Ko | Étude d'opportunité — vue portefeuille du reste-à-faire — 20260822a |
+| `20260822-etude-opportunite-vue-portefeuille.md` | fichier | 8,4 Ko | Étude d'opportunité — vue portefeuille du reste-à-faire — 20260822a |
 
 _39 fichier(s), 0 sous-dossier(s)_

@@ -28,6 +28,7 @@ import { fileURLToPath } from "node:url";
 // format commun et où la même classe de défaut a été redécouverte forge par forge.
 import { verifier as verifierFormeLot } from "../gabarits/oracle-lot-retours.mjs";
 import { localiserProduit, causeDuRefus } from "./localiser-produit.mjs";
+import { anonymiserCandidature, pseudoProduit } from "./anonymiser-entrant.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const sidecarPath = process.argv[2];
@@ -208,7 +209,7 @@ const deductions = [];
 
 // ---- validation intégrale AVANT toute écriture (rejet atomique) ----------------------------
 const motifs = [];
-const candidatures = lignes.map((l, i) => {
+let candidatures = lignes.map((l, i) => {
   let c;
   try { c = JSON.parse(l); } catch { motifs.push(`ligne ${i + 1} : JSON invalide`); return null; }
   if (c.schema !== 1) motifs.push(`ligne ${i + 1} : schema attendu 1, reçu ${c.schema}`);
@@ -302,7 +303,43 @@ try {
 // ---- frappage des ids à la suite (actifs + archive, jamais réutilisés) ---------------------
 const ids = [...evenements, ...lireEv(archive)].filter((e) => e.id).map((e) => parseInt(e.id.slice(3), 10));
 let prochain = (ids.length ? Math.max(...ids) : 0) + 1;
+// ---- ANONYMISATION À LA SOURCE (décision humaine du 28/08/2026) ---------------------------
+// « anonymiser la source dans les traitements, permettant de ne pas garder de trace des clients
+// et produits ». Le registre est PUBLIÉ : tout ce qui y entre est publié avec lui.
+//
+// TROIS ACTES EN DEUX JOURS ont montré qu'un geste manuel ne tient pas. Le 27/08, dix dépôts
+// réécrits pour un nom de client. Le 28/08 au matin, cinq lots pseudonymisés À LA MAIN avant
+// ingestion. À 09:47 le même jour, un nouveau lot est arrivé, porteur du même nom. Le flux des
+// retours est CONTINU et chaque lot porte le nom du produit qui l'envoie : tant que la
+// substitution vit dans les doigts de celui qui ingère, elle sera oubliée le jour où il pense à
+// autre chose — et ce jour-là le nom repart dans un dépôt public.
+//
+// La substitution est donc faite ICI, avant l'écriture, sur les champs texte de chaque
+// candidature. Elle s'arrête net si un référentiel manque : anonymiser à moitié serait pire que
+// ne pas anonymiser, parce que le registre passerait pour propre.
 const ts = new Date().toISOString();
+// LE PRODUIT S'INSCRIT AVANT D'ÊTRE SUBSTITUÉ, et cet ordre n'est pas un détail : la table des
+// produits s'étend À LA DÉCOUVERTE. Sans cette ligne, le premier lot d'un produit passerait avec
+// son nom en clair — et « le premier lot passe » est exactement la faille qu'on vient de payer
+// trois fois. Le nom se lit dans le NOM DU LOT, seule source qui le porte à coup sûr.
+const nomDuLot = String(sidecarPath).split(/[\/]/).pop() || "";
+if (nomDuLot.includes(" - RETOURS - ")) {
+  const nomProduit = nomDuLot.split(" - RETOURS - ")[0];
+  const pseudo = pseudoProduit(nomProduit);
+  if (pseudo) console.log(`[ANONYMISÉ] produit « ${nomProduit} » → ${pseudo} (table hors dépôt)`);
+}
+let remplacesTotal = [];
+candidatures = candidatures.map((c) => {
+  const { candidature, remplaces } = anonymiserCandidature(c);
+  remplacesTotal.push(...remplaces);
+  return candidature;
+});
+remplacesTotal = [...new Set(remplacesTotal)];
+if (remplacesTotal.length) {
+  console.log(`[ANONYMISÉ] ${remplacesTotal.length} nom(s) substitué(s) avant écriture au registre : ` +
+    remplacesTotal.join(", "));
+  console.log("  Les tables de correspondance vivent HORS des dépôts.");
+}
 const nouvelles = candidatures.map((c) => {
   const score = c.score && [c.score.gain, c.score.preuve, c.score.effort].every((v) => typeof v === "number")
     ? { ...c.score, valeur: Math.round((c.score.gain * c.score.preuve / c.score.effort) * 10) / 10 }
