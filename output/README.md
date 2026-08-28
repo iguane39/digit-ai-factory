@@ -20,6 +20,6 @@ Livrables du pilot, en familles numérotées (D-15/D-16) : **une seule version �
 | [`04-plans\`](04-plans/README.md) | dossier (21 fichiers) | — | Plans stratégiques, synthèses de mandat et de campagne (format `gabarits\RESTITUTION.md`), notes de migration — livrables R-4 datés. |
 | [`05-catalogues-readmes-forges\`](05-catalogues-readmes-forges/README.md) | dossier (14 fichiers) | — | Sections « catalogue de services » proposées aux README des treize forges, générées depuis `catalogues\catalogue.jsonl` ; `LISEZMOI.md` explique la remise à cha… |
 | [`05-insatisfactions\`](05-insatisfactions/README.md) | dossier (1 fichier) | — | Dossiers d'instruction des insatisfactions (TF-0287) : un dossier `INS-XXXX\` par insatisfaction, chemins portés par `insatisfactions\REGISTRE.jsonl` (registre … |
-| `LISEZMOI.md` | fichier | 25,9 Ko | output\ — rangement (13/08/2026, amendé le 18/08/2026 — TF-0339) |
+| `LISEZMOI.md` | fichier | 25,8 Ko | output\ — rangement (13/08/2026, amendé le 18/08/2026 — TF-0339) |
 
 _1 fichier(s), 6 sous-dossier(s)_ · voir aussi `LISEZMOI.md` (conventions et correspondance des anciens chemins)
