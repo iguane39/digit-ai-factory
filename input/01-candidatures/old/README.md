@@ -36,7 +36,7 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `candidature-produit-a-moitie-instancie-20260824.tf.jsonl` | fichier | 2,8 Ko | 1 ligne(s) JSONL |
 | `candidature-propagation-regles-produits-20260822.tf.jsonl` | fichier | 3,3 Ko | 1 ligne(s) JSONL |
 | `candidature-qualite-graphique-par-defaut.tf.jsonl` | fichier | 3,9 Ko | 3 ligne(s) JSONL |
-| `candidature-question-deja-repondue.tf.jsonl` | fichier | 2,7 Ko | 1 ligne(s) JSONL |
+| `candidature-question-deja-repondue.tf.jsonl` | fichier | 2,6 Ko | 1 ligne(s) JSONL |
 | `candidature-r21-lockfiles.tf.jsonl` | fichier | 2,8 Ko | 1 ligne(s) JSONL |
 | `candidature-r45-anteriorite.tf.jsonl` | fichier | 2,7 Ko | 1 ligne(s) JSONL |
 | `candidature-rattrapage-pilot.tf.jsonl` | fichier | 782 o | 1 ligne(s) JSONL |
@@ -56,7 +56,7 @@ Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — ar
 | `candidature-socle-docs-projet.tf.jsonl` | fichier | 4,5 Ko | 2 ligne(s) JSONL |
 | `candidature-trous-detection-site-principal.tf.jsonl` | fichier | 4,7 Ko | 4 ligne(s) JSONL |
 | `candidature-valeur-recopiee-20260822.tf.jsonl` | fichier | 5,1 Ko | 1 ligne(s) JSONL |
-| `candidature-vue-portefeuille-differee.tf.jsonl` | fichier | 2,7 Ko | 1 ligne(s) JSONL |
+| `candidature-vue-portefeuille-differee.tf.jsonl` | fichier | 2,6 Ko | 1 ligne(s) JSONL |
 | `Digit-AI - Brief Forge - Fraîcheur des verdicts qualité - 20260822a.md` | fichier | 10,3 Ko | Brief d'exécution — Fraîcheur des verdicts de `quality-oracles` |
 | `Digit-AI - Candidatures Forge - Extension Run-Delivery - 20260816b.md` | fichier | 9,5 Ko | Candidatures forge — extension « run de delivery » |
 | `Digit-AI - Candidatures Forge - Extension Run-Delivery - 20260816b.tf.jsonl` | fichier | 5,8 Ko | 2 ligne(s) JSONL |

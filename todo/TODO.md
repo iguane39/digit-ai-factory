@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=ac0c2cb7a7b1 archive=8030a6cb0bcd · dernier événement: 2026-08-28T07:46:03.060Z -->
+     sceaux: actifs=f7057cd488af archive=72692a35ee91 · dernier événement: 2026-08-28T07:54:29.488Z -->
 
-**22 actifs** (candidat 18 · décidé 2 · en cours 0 · corrigé 2 · écarté 0) · **678 archivés**.
+**26 actifs** (candidat 22 · décidé 2 · en cours 0 · corrigé 2 · écarté 0) · **678 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -19,6 +19,13 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0685 | candidat | 4 | hook-produits-intacts : tout ce qui DISCULPE un mouvement est avalé dès qu'un seul écart existe — `declares` est rendu après un `process.exit(0)` | non |
 | TF-0699 | corrige | 40 | pilot : une decision du bloc 3 n'a jamais porte de NUMERO, et le destinataire l'inventait pour pouvoir repondre | **oui** — Deux restitutions repondues par une numerotation INVENTEE par le lecteur (« 1b, 2a, 3a », puis « a »), et une troisieme ou il a declare ne pas pouvoir selectionner. La regle neuve, jouee sur la restitution incriminee, rend « 3 decision(s) sur 3 SANS NUMERO ». |
 | TF-0698 | corrige | 20 | pilot : l'archiveur DEFINISSAIT depuis six jours la fonction qui fait suivre les rectifications a leurs cibles, et ne l'APPELAIT jamais | **oui** — Six constats R9 et un registre entier en FAIL, sur un archivage par ailleurs correct. Le cout n'est pas l'archivage rate : c'est qu'un correctif ECRIT et COMMENTE six jours plus tot n'a servi a rien faute d'un appel, et que son commentaire decrivait exactement l'incident qu'il n'a pas empeche. |
+
+## digit-ai-forge-audit
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0700 | candidat | 9 | audit : le livrable DIFFUSE de la fiche securite est un PDF, que le kit ne prescrit pas, n outille pas et ne controle pas — le projet a diffuse une IMAGE, d un indice anterieur au HTML depose a cote | **oui** — PDF diffuse le 24/07 : 1 page, 0 caractere extractible, 9 images, 653169 octets, indice c — contre un HTML voisin d indice d. Aucune porte ne l a vu. |
+| TF-0701 | candidat | 6 | audit : la fiche securite n a AUCUN verificateur alors que ses deux regles sont mecaniques, et que le rapport d audit, lui, a une porte bloquante | **oui** — Deux regles ecrites au paragraphe 10 et tenues par personne ; le seul artefact relu est celui qui n est pas diffuse. |
 
 ## digit-ai-forge-tests
 
@@ -41,6 +48,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0688 | candidat | 1 | factory : la destination des documents produits n est declaree nulle part | **oui** — une reprise demandee explicitement par le destinataire |
 | TF-0689 | candidat | 1 | factory : une correction marquee `corrige` n est jamais suivie jusqu au produit | **oui** — un jeu de livrables remis incomplet DEUX FOIS sur le meme produit apres correction, et trois produits ayant remonte la meme classe en trois jours. Le destinataire a du reclamer le PDF en disant qu il l avait deja demande — il avait raison, la demande etait tracee en TF-0506 et corrigee quatre jours plus tot |
 | TF-0690 | candidat | 1 | factory : un livrable produit ne porte ni l identifiant ni la version de son gabarit | **oui** — impossible de dater la conformite d une fiche remise ; la section R-46 du gabarit de retours ne peut etre remplie par aucun produit de la famille, ce qui rend muet le seul canal d amelioration des gabarits |
+| TF-0702 | candidat | 1 | factory : les generateurs des produits sont des REECRITURES de ceux de la factory, donc hors d atteinte de toute correction | **oui** — une correction de la factory datee du 23/08 n a pu atteindre ni la remise du 25/08 ni celle du 27/08 du produit explicitement nomme beneficiaire, parce que le generateur du produit est ecrit dans un autre langage et lit un gabarit impose par le client que l outil de la factory ne sait pas consommer ; la cause proposee en RT-39, un livrable detache de son generateur, etait fausse |
+| TF-0703 | candidat | 1 | factory : le protocole de retours n a aucun canal de rectification d un lot remis | **oui** — un lot deja remis porte une affirmation fausse sur son propre produit, relevee par le destinataire humain le 28/08 ; le protocole n offrait aucun geste pour la dedire, et seule l absence d ingestion a ce jour empeche la factory d agir sur une cause erronee |
 
 ## forge-audit
 
