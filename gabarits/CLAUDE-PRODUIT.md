@@ -51,7 +51,10 @@ Boucle intérieure (libre, sans verdict) : `<commandes locales : pytest, ruff, s
 
 ## Conventions locales
 
-- Socle projet : règles `REGLES-PROJET.md` du pilot (nommage daté des livrables dans
+- Socle projet : règles `REGLES-PROJET.md` du pilot (**`input\` en LECTURE SEULE pour tout
+  producteur** — un livrable généré ne s'y écrit jamais, pas même à côté de sa référence : il
+  va sous `output\`, dans le sous-dossier existant qui correspond, TF-0688 ;
+  nommage daté des livrables dans
   `output\`/`docs\`, `old\` VERSIONNÉ pour les livrables documentaires — le code, lui,
   n'a que git, jamais de copie datée (C1/TF-0150, 13/08) —, `.env` jamais committé, commits Conventional
   Commits français — locaux par défaut, push sur GO humain ; socle documentaire R-20..R-23,
