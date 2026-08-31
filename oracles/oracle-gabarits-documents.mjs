@@ -21,7 +21,10 @@
  *        `[À REMPLIR]`) hors commentaires,
  *        et elle diffère de son squelette. Une instance qui recopie le squelette ne prouve rien ;
  *   G3 · squelette ET instance passent le contrôle de MARQUAGE du socle (`check_html.py`). C'est
- *        exactement le contrôle qui rendait FAIL depuis la production, et que personne ne jouait.
+ *        exactement le contrôle qui rendait FAIL depuis la production, et que personne ne jouait ;
+ *   G4 · le document REND son gabarit et sa version (`Gabarit : gd-… · version du gabarit x.y.z`),
+ *        visiblement — jamais seulement en commentaire. Une instance périmée est invisible sur
+ *        l'artefact, et la section R-46 des lots devient impossible à remplir sans lui (TF-0690).
  *
  * CE QU'IL NE FAIT PAS : rendre la page. Le rendu a son propre contrôle — `scripts\verifier-rendu-
  * instances.mjs` — et le dupliquer créerait deux vérités sur les familles bloquantes. Il ne juge
@@ -141,6 +144,33 @@ export function juger(dossier) {
         findings.push({ regle: "G3", statut: "PASS", ou: `${fam}/${n}`, message: "marquage PASS" });
       }
     }
+
+    // G4 (TF-0690, 28/08) — LE DOCUMENT LIVRÉ PORTE SON GABARIT ET SA VERSION, VISIBLEMENT.
+    // Le fait mesuré : une fiche remise portait sa date et sa référence, rien d'autre — une
+    // instance périmée est INVISIBLE SUR L'ARTEFACT, un lecteur qui la tient ne peut pas savoir
+    // si elle respecte le catalogue en vigueur. Et la section R-46 du gabarit de retours demande
+    // de reporter le couple : un produit dont le document ne le porte pas ne peut répondre que
+    // « aucun », ce qui rend muet le seul canal d'amélioration des gabarits. C'est le contrôle
+    // le moins cher de la chaîne — le seul qui fonctionne sur un document reçu par courriel,
+    // hors de tout dépôt. Le squelette DOIT le porter (sinon aucune instance ne l'héritera) ;
+    // l'instance le prouve rendu. Un commentaire HTML ne compte pas : il ne se rend pas.
+    const ID_GABARIT = /gabarit\s*:\s*(gd-[a-z0-9-]+)/i;
+    const VERSION_GABARIT = /version[_ ]du[_ ]gabarit\s*:?\s*\d+\.\d+\.\d+/i;
+    for (const n of [...formes.map((e) => `SQUELETTE.${e}`), ...instances.map((e) => `INSTANCE.${e}`)]) {
+      const texte = sansCommentaires(readFileSync(p(n), "utf8"));
+      const id = ID_GABARIT.exec(texte);
+      const manque = [!id && "l'identifiant `gabarit: gd-…`",
+        !VERSION_GABARIT.test(texte) && "la `version du gabarit x.y.z`"].filter(Boolean);
+      if (manque.length) {
+        findings.push({ regle: "G4", statut: "FAIL", ou: `${fam}/${n}`, message:
+          `le document ne rend pas ${manque.join(" ni ")} — une instance périmée est invisible ` +
+          "sur l'artefact, et la section R-46 des lots de retours devient impossible à remplir. " +
+          "Le couple se RETRANSCRIT dans le rendu (pied de page), jamais seulement en commentaire (TF-0690)" });
+      } else {
+        findings.push({ regle: "G4", statut: "PASS", ou: `${fam}/${n}`,
+          message: `porte ${id[1]} et sa version, visibles dans le rendu` });
+      }
+    }
   }
   if (!familles.length) findings.push({ regle: "G1", statut: "SKIP", ou: dossier, message: "aucune famille de gabarit sous ce dossier" });
   return findings;
@@ -156,13 +186,16 @@ if (args[0] === "--self-test") {
     `<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E">` +
     `<style>body{color:#1a1a1a;background:#fff;font-family:system-ui,sans-serif}main{max-width:70ch;margin:0 auto}</style>` +
     `</head><body><main><h1>${titre}</h1>${corps}</main></body></html>`;
-  const poser = (nom, { gabarit = true, squelette = true, instance = "remplie" } = {}) => {
+  // Le couple gabarit + version est dû dans le RENDU (G4, TF-0690) : les fixtures le portent,
+  // sauf celle qui prouve le sens rouge de la règle.
+  const COUPLE = "<p>Gabarit : gd-recette · version du gabarit 1.0.0</p>";
+  const poser = (nom, { gabarit = true, squelette = true, instance = "remplie", couple = COUPLE } = {}) => {
     mkdirSync(join(dir, nom), { recursive: true });
     if (gabarit) writeFileSync(join(dir, nom, "GABARIT.md"), "# doctrine\n", "utf8");
-    if (squelette) writeFileSync(join(dir, nom, "SQUELETTE.html"), PAGE("Squelette", "<p>Forme.</p>"), "utf8");
-    if (instance === "remplie") writeFileSync(join(dir, nom, "INSTANCE.html"), PAGE("Instance", "<p>Contenu réel, mesuré le 24 août 2026.</p>"), "utf8");
-    if (instance === "trous") writeFileSync(join(dir, nom, "INSTANCE.html"), PAGE("Instance", "<p>{{contenu.a.remplir}}</p>"), "utf8");
-    if (instance === "copie") writeFileSync(join(dir, nom, "INSTANCE.html"), PAGE("Squelette", "<p>Forme.</p>"), "utf8");
+    if (squelette) writeFileSync(join(dir, nom, "SQUELETTE.html"), PAGE("Squelette", "<p>Forme.</p>" + couple), "utf8");
+    if (instance === "remplie") writeFileSync(join(dir, nom, "INSTANCE.html"), PAGE("Instance", "<p>Contenu réel, mesuré le 24 août 2026.</p>" + couple), "utf8");
+    if (instance === "trous") writeFileSync(join(dir, nom, "INSTANCE.html"), PAGE("Instance", "<p>{{contenu.a.remplir}}</p>" + couple), "utf8");
+    if (instance === "copie") writeFileSync(join(dir, nom, "INSTANCE.html"), PAGE("Squelette", "<p>Forme.</p>" + couple), "utf8");
   };
 
   poser("verte");
@@ -170,6 +203,14 @@ if (args[0] === "--self-test") {
   const g = (r, ou) => f.filter((x) => x.regle === r && x.ou.startsWith(ou));
   if (g("G1", "verte")[0]?.statut !== "PASS") casse.push("une famille complète échoue G1");
   if (g("G2", "verte")[0]?.statut !== "PASS") casse.push("une instance remplie échoue G2 : " + JSON.stringify(g("G2", "verte")[0]));
+  if (!g("G4", "verte").every((x) => x.statut === "PASS")) casse.push("un couple gabarit+version rendu échoue G4 — la règle accuse ce qu'elle prescrit");
+
+  // G4, sens rouge : le document ne rend NI l'identifiant NI la version — l'artefact du 27/08.
+  poser("sans-couple", { couple: "" });
+  f = juger(dir);
+  if (!g("G4", "sans-couple").some((x) => x.statut === "FAIL")) {
+    casse.push("un document sans gabarit ni version visible passe G4 — l'instance périmée reste invisible sur l'artefact");
+  }
 
   poser("sans-instance", { instance: null });
   f = juger(dir);
@@ -203,8 +244,9 @@ if (args[0] === "--self-test") {
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test gabarits-documents : 5/5 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ; " +
-      "instance à trous → FAIL ; instance copie du squelette → FAIL ; classe posée sans règle CSS → FAIL au marquage)");
+    : "Self-test gabarits-documents : 7/7 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ; " +
+      "instance à trous → FAIL ; instance copie du squelette → FAIL ; classe posée sans règle CSS → FAIL au marquage ; " +
+      "couple gabarit+version rendu → PASS G4 ; document sans le couple → FAIL G4)");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -219,7 +261,18 @@ console.log(JSON.stringify({
     "le RENDU des pages : il a son propre contrôle (scripts\\verifier-rendu-instances.mjs) et le " +
     "dupliquer créerait deux vérités sur les familles bloquantes",
     "la justesse du CONTENU d'une instance : un texte d'exemple faux est un défaut de relecture",
-    "les familles de gabarit hors gabarits\\documents\\ (fiches, prompts, squelettes de forge)",
+    // TF-0696 (28/08) : un non_juge qui renvoie vers un contrôle nommé est une frontière ; un
+    // non_juge qui ne renvoie nulle part est un trou avec une étiquette dessus. Le gabarit de la
+    // fiche sécurité portait un défaut de mise en page depuis sa création en juillet, et n'a été
+    // jugé par RIEN jusqu'à la relecture humaine du 27/08 — précisément parce que cette ligne
+    // s'arrêtait à l'exclusion.
+    "les FICHES (familles portées par digit-ai-forge-audit, ex. gd-fiche-securite) : leur RENDU " +
+    "se juge par `scripts\\verifier-rendu-instances.mjs <dossier de la famille>` (périmètre " +
+    "arbitraire depuis TF-0695) et leur marquage par le socle digit-ai-page-html (check_html.py) ; " +
+    "leur CONTENU attend le vérificateur de la famille (TF-0701, décidé, chez forge-audit)",
+    "les PROMPTS et SQUELETTES DE FORGE : jugés par AUCUN contrôle nommé à ce jour — trou " +
+    "DÉCLARÉ et non couvert (TF-0696), à combler famille par famille quand l'une d'elles " +
+    "coûtera assez pour mériter son juge",
   ],
 }, null, 1));
 process.exit(verdict === "FAIL" ? 1 : 0);
