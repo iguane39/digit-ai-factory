@@ -38,12 +38,13 @@ const BON = `La mise à jour demandée est en place et vérifiée : le poste rep
 - Recette du pilot 22/22 verte, bootstrap 7/7.
 
 ## 3. Décisions attendues
-- Publier maintenant la version corrigée du démarrage, ou attendre demain matin ? Le contrôle
+- **D-1 —** Publier maintenant la version corrigée du démarrage, ou attendre demain matin ? Le contrôle
   vient de passer en entier, donc la version est prête ; la seule question est de savoir si on
   la met à disposition des autres postes tout de suite, ou si on garde une nuit pour un dernier
   regard humain avant qu'elle ne circule.
   - (a) pousser maintenant — coût nul, exclut un dernier regard humain ; recommandé : le journal \`recette.md\` ne porte aucun défaut ouvert.
-  - (b) pousser demain matin — coût : un poste périmé une nuit. Défaut si rien n'est décidé : (a).
+  - (b) pousser demain matin — coût : un poste périmé une nuit ; exclut la mise à disposition immédiate.
+  - si rien n'est décidé : (a) s'applique.
 
 ## 4. Traité
 - bootstrap v2 livré — preuve : bootstrap.test.mjs 7/7, recette 22/22.

@@ -42,6 +42,7 @@ export function analyserTranscript(texte) {
   for (let i = entrees.length - 1; i >= 0; i--) if (estHumain(entrees[i])) { debut = i; break; }
   const tour = entrees.slice(debut + 1);
   let ecritures = 0, commandes = 0;
+  const fichiersMd = [];
   // Chaque texte du tour, AVEC le nombre d'outils déjà vus à ce moment-là. C'est ce compteur qui
   // permet de reconnaître un texte FINAL : rien ne l'a suivi.
   const tousLesTextes = [];
@@ -52,7 +53,16 @@ export function analyserTranscript(texte) {
     const textes = blocs.filter((b) => b.type === "text").map((b) => b.text).join("\n").trim();
     if (textes) tousLesTextes.push({ texte: textes, outilsAvant: outils });
     for (const b of blocs) {
-      if (b.type === "tool_use") { outils++; if (ECRITURES.has(b.name)) ecritures++; else if (COMMANDES.has(b.name)) commandes++; }
+      if (b.type === "tool_use") {
+        outils++;
+        if (ECRITURES.has(b.name)) {
+          ecritures++;
+          // Les fichiers .md écrits pendant le tour : c'est parmi eux que vit la synthèse déposée,
+          // celle que la doctrine prescrit d'écrire AVANT d'afficher (voir `syntheseDuTour`).
+          const p = b.input?.file_path;
+          if (typeof p === "string" && /\.md$/i.test(p)) fichiersMd.push(p);
+        } else if (COMMANDES.has(b.name)) commandes++;
+      }
     }
   }
   // TF-0516 (22/08/2026) — LE HOOK JUGEAIT UN AUTRE TEXTE QUE CELUI QUI PORTE LA RESTITUTION.
@@ -95,7 +105,7 @@ export function analyserTranscript(texte) {
   const finaux = tousLesTextes.filter((t) => t.outilsAvant === totalOutils);
   const dernierTexte = finaux.length ? finaux[finaux.length - 1].texte : "";
   return { travail: ecritures >= 1 || commandes >= 4, ecritures, commandes, dernierTexte,
-           textes: tousLesTextes.length, finaux: finaux.length };
+           textes: tousLesTextes.length, finaux: finaux.length, fichiersMd };
 }
 
 export function juger(texte) {
@@ -106,6 +116,60 @@ export function juger(texte) {
   let rapport = {};
   try { rapport = JSON.parse(r.stdout); } catch { /* jugé par le code */ }
   return { code: r.status, fails: (rapport.findings || []).filter((x) => x.statut === "FAIL") };
+}
+
+// ---- L'AFFICHÉ DIT CE QUE LE JUGÉ DISAIT (30/08/2026) ---------------------------------------
+//
+// DEUX OBJETS VIVAIENT SANS LIEN, et personne ne le savait avant le 30/08. La doctrine prescrit
+// que « la synthèse s'écrit EN FICHIER […] et ne s'affiche qu'après son verdict — un message de
+// chat ne passe devant aucun contrôle, un fichier si ». Ce hook, lui, juge le MESSAGE AFFICHÉ.
+// Il y a donc deux artefacts, et rien ne vérifiait qu'ils disaient la même chose.
+//
+// LE FAIT QUI L'A RÉVÉLÉ, et c'est une dérive de l'agent, pas du dispositif : un fichier déposé
+// portait ses trois lignes « si rien n'est décidé » et rendait PASS ; le message affiché, retapé
+// plus court, les avait perdues — et rien n'a signalé l'écart. Le destinataire a lu un rendu
+// amputé de ce que le document jugé contenait, et a demandé pourquoi le format n'était pas tenu.
+//
+// CE QUI EST COMPARÉ, et pourquoi si peu : les DEUX PROPRIÉTÉS SÉLECTIONNABLES du bloc 3 — la
+// liste des numéros de décision, et le nombre d'options par défaut nommées. Comparer les textes
+// mot à mot serait absurde : un message abrège légitimement une prose. Ce qui ne s'abrège pas,
+// c'est ce sur quoi le lecteur TRANCHE — une décision qui disparaît de l'écran ne peut pas être
+// prise, et une ligne de repli qui disparaît fait croire que ne rien faire est sans effet.
+//
+// SANS_OBJET quand aucun fichier de synthèse n'a été écrit dans le tour : la règle ne réclame pas
+// un fichier, elle vérifie la cohérence quand il y en a un. Le marqueur retenu est celui que la
+// doctrine prescrit depuis TF-0331 — le frontmatter `destinataire: humain` —, jamais le nom du
+// fichier : un nom se devine, un marqueur se déclare.
+const bloc3De = (t) => {
+  const m = /(^|\n)#{1,4}\s*\**\s*3[.)]?\s*\**\s*D[ée]cisions?/i.exec(t);
+  if (!m) return "";
+  const debut = m.index + m[0].length;
+  const suivant = t.slice(debut).search(/\n#{1,4}\s/);
+  return t.slice(debut, suivant === -1 ? undefined : debut + suivant);
+};
+const numerosDe = (t) => [...new Set((bloc3De(t).match(/(?:^|\n)\s*[-*]?\s*\*{0,2}(?:D\s*-?\s*|D[ée]cision\s+)(\d{1,2})\b/gi) || [])
+  .map((s) => (/(\d{1,2})\b/.exec(s) || [])[1]))].sort((a, b) => Number(a) - Number(b));
+const replisDe = (t) => (bloc3De(t).match(/si rien n(?:'|’)est d[ée]cid|sans d[ée]cision|option par d[ée]faut/gi) || []).length;
+
+export function syntheseDuTour(chemins) {
+  for (let i = chemins.length - 1; i >= 0; i--) {
+    try {
+      if (!existsSync(chemins[i])) continue;
+      if (/destinataire\s*:\s*humain/i.test(readFileSync(chemins[i], "utf8").slice(0, 400))) return chemins[i];
+    } catch { /* illisible : ce n'est pas un constat sur l'auteur, on passe */ }
+  }
+  return null;
+}
+
+export function comparerAffiche(message, fichier) {
+  const ecarts = [];
+  const nm = numerosDe(message), nf = numerosDe(fichier);
+  if (nf.join(",") !== nm.join(","))
+    ecarts.push(`décisions du fichier jugé : ${nf.join(", ") || "aucune"} — décisions affichées : ${nm.join(", ") || "aucune"}`);
+  const rm = replisDe(message), rf = replisDe(fichier);
+  if (rf !== rm)
+    ecarts.push(`options par défaut nommées : ${rf} dans le fichier jugé, ${rm} à l'écran`);
+  return ecarts;
 }
 
 // SÉVÉRITÉS (22/08, retour humain : « le prompt de résultat s'affiche 2 fois »). Un hook `Stop`
@@ -138,9 +202,17 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const entree = lireStdin();
   const chemin = entree.transcript_path;
   if (!chemin || !existsSync(chemin)) process.exit(0); // rien à juger sans transcript
-  const { travail, ecritures, commandes, dernierTexte, textes } = analyserTranscript(readFileSync(chemin, "utf8"));
+  const { travail, ecritures, commandes, dernierTexte, textes, fichiersMd } = analyserTranscript(readFileSync(chemin, "utf8"));
   if (!travail || !dernierTexte) process.exit(0);
   const { code, fails } = juger(dernierTexte);
+  // L'AFFICHÉ DIT CE QUE LE JUGÉ DISAIT : quand une synthèse a été déposée dans le tour, ce qui se
+  // TRANCHE doit se retrouver à l'écran. Bloquant, parce qu'une décision absente de l'écran ne peut
+  // pas être prise — et la garde anti-boucle empêche qu'un faux positif coûte plus d'une relecture.
+  const fichierSynthese = syntheseDuTour(fichiersMd);
+  let ecartsAffichage = [];
+  try {
+    if (fichierSynthese) ecartsAffichage = comparerAffiche(dernierTexte, readFileSync(fichierSynthese, "utf8"));
+  } catch { /* fichier illisible : une lecture ratée ne se transforme pas en accusation */ }
   const bloquants = fails.filter((f) => BLOQUANTES.has(f.regle));
   const avertissements = fails.filter((f) => !BLOQUANTES.has(f.regle));
   const journal = join(ICI, "..", ".claude", "hooks-journal.jsonl");
@@ -148,14 +220,15 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     mkdirSync(dirname(journal), { recursive: true });
     appendFileSync(journal, JSON.stringify({
       ts: new Date().toISOString(), hook: "restitution", session: entree.session_id, ecritures, commandes,
-      verdict: code === 0 ? "PASS" : (bloquants.length ? "FAIL" : "AVERTISSEMENT"),
+      verdict: (code === 0 && !ecartsAffichage.length) ? "PASS" : ((bloquants.length || ecartsAffichage.length) ? "FAIL" : "AVERTISSEMENT"),
       regles: fails.map((f) => f.regle), bloquantes: bloquants.map((f) => f.regle),
+      synthese_deposee: fichierSynthese || null, ecarts_affichage: ecartsAffichage,
       deja_refuse: !!entree.stop_hook_active,
     }) + "\n");
   } catch { /* journal facultatif */ }
-  if (code === 0) process.exit(0);
+  if (code === 0 && !ecartsAffichage.length) process.exit(0);
   // Avertissements seuls : dits sous la réponse, jamais réécrits — pas de doublon à l'écran.
-  if (!bloquants.length) {
+  if (!bloquants.length && !ecartsAffichage.length) {
     console.log(JSON.stringify({
       systemMessage: `[restitution — R-44] avertissement${avertissements.length > 1 ? "s" : ""} non bloquant${avertissements.length > 1 ? "s" : ""} : ` +
         avertissements.map((f) => `${f.regle} — ${f.message}`).join(" · ") +
@@ -164,7 +237,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     process.exit(0);
   }
   if (entree.stop_hook_active) process.exit(0); // déjà refusé une fois : on ne boucle pas, le verdict est journalisé
-  const motifs = bloquants.map((f) => `${f.regle} — ${f.message}`).join("\n");
+  const motifs = [
+    ...bloquants.map((f) => `${f.regle} — ${f.message}`),
+    ...ecartsAffichage.map((e) => `AFFICHAGE — ton message affiché ne dit pas ce que la synthèse déposée disait : ${e}. `
+      + `Le document jugé est ${fichierSynthese} : reprends-en le bloc 3 en entier plutôt qu'une version abrégée.`),
+  ].join("\n");
   const enPlus = avertissements.length ? `\n(à corriger au passage, non bloquant : ${avertissements.map((f) => f.regle).join(", ")})` : "";
   console.log(JSON.stringify({ decision: "block", reason: `[hook restitution — R-44] oracle-synthese FAIL BLOQUANT sur ta réponse finale :\n${motifs}${enPlus}\n\n${RAPPEL}` }));
   process.exit(0);
