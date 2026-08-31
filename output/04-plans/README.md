@@ -30,6 +30,7 @@ Plans stratégiques, synthèses de mandat et de campagne (format `gabarits\RESTI
 | `Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md` | fichier | 17,7 Ko | Synthèse de mandat — forme par défaut du bloc 3, et redescente de la doctrine aux produits |
 | `Digit-AI - Synthese Mandat - Heritage a l ouverture et localisateurs - 20260830g.md` | fichier | 16,0 Ko | Synthèse de mandat — le contrôle d'héritage joué à chaque ouverture, et la fin d'un faux r |
 | `Digit-AI - Synthese Mandat - Identifiants exposes verification - 20260830i.md` | fichier | 16,4 Ko | Synthèse de mandat — ce qu'ouvrent réellement les onze porteurs de secrets du poste (30/08 |
+| `Digit-AI - Synthese Mandat - Ingestion rouverte et banc au vert - 20260831c.md` | fichier | 13,8 Ko | Synthèse de mandat — l'ingestion rouverte, deux journées enregistrées, et le banc entièrem |
 | `Digit-AI - Synthese Mandat - Juste milieu du canal de remontee - 20260830k.md` | fichier | 15,1 Ko | Synthèse de mandat — le juste milieu entre les deux voies de remontée, et pourquoi ce n'es |
 | `Digit-AI - Synthese Mandat - Lexique d invocation inerte - 20260830l.md` | fichier | 14,4 Ko | Synthèse de mandat — pourquoi « Améliore le prompt » ne déclenche rien, et depuis quand (3 |
 | `Digit-AI - Synthese Mandat - Lexique d invocation reactive - 20260830m.md` | fichier | 14,0 Ko | Synthèse de mandat — le lexique d'invocation redevient actif, à la prochaine session (30/0 |
@@ -52,4 +53,4 @@ Plans stratégiques, synthèses de mandat et de campagne (format `gabarits\RESTI
 | `Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md` | fichier | 9,8 Ko | Digit-AI — Synthèse de mandat — Traite tous les sujets suivants — 20260823a |
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 
-_37 fichier(s), 0 sous-dossier(s)_
+_38 fichier(s), 0 sous-dossier(s)_
