@@ -101,8 +101,8 @@
   "vu_le": "2026-08-27"
  },
  "oracle-gabarits-documents.mjs": {
-  "cas": 5,
-  "vu_le": "2026-08-26"
+  "cas": 7,
+  "vu_le": "2026-08-31"
  },
  "oracle-gabarits-documents.mjs (parc réel)": {
   "non_lu": true,
@@ -238,6 +238,10 @@
   "cas": 8,
   "vu_le": "2026-08-26"
  },
+ "scripts/allouer-indice.test.mjs": {
+  "cas": 9,
+  "vu_le": "2026-08-31"
+ },
  "scripts/balayer-motifs-numeriques.test.mjs": {
   "cas": 9,
   "vu_le": "2026-08-26"
@@ -254,8 +258,16 @@
   "cas": 8,
   "vu_le": "2026-08-26"
  },
+ "scripts/verifier-jeu-livrables.test.mjs": {
+  "cas": 7,
+  "vu_le": "2026-08-31"
+ },
  "scripts/verifier-jugement.test.mjs": {
   "cas": 10,
+  "vu_le": "2026-08-31"
+ },
+ "scripts/verifier-ooxml.test.mjs": {
+  "cas": 3,
   "vu_le": "2026-08-31"
  },
  "scripts/verifier-secours.test.mjs": {
@@ -263,7 +275,7 @@
   "vu_le": "2026-08-26"
  },
  "todo/emettre-travaux.test.mjs": {
-  "cas": 26,
+  "cas": 30,
   "vu_le": "2026-08-31"
  },
  "todo/ingerer-derogation.test.mjs": {
@@ -281,6 +293,10 @@
  "todo/ingerer-r47.test.mjs": {
   "cas": 8,
   "vu_le": "2026-08-26"
+ },
+ "todo/ingerer-rectification.test.mjs": {
+  "cas": 7,
+  "vu_le": "2026-08-31"
  },
  "todo/journaliser.test.mjs": {
   "cas": 15,

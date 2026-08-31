@@ -14,8 +14,8 @@
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digit-AI — TODO-FORGE · Archive des items clos — V20260828</title>
-  <meta name="description" content="Page de recherche des items clos du registre TODO-FORGE : 677 items archivés, corrigés ou écartés, avec leur histoire complète — création, décision et décideur, clôture et gains constatés.">
+  <title>Digit-AI — TODO-FORGE · Archive des items clos — V20260831</title>
+  <meta name="description" content="Page de recherche des items clos du registre TODO-FORGE : 692 items archivés, corrigés ou écartés, avec leur histoire complète — création, décision et décideur, clôture et gains constatés.">
   <meta name="theme-color" content="#2563EB">
   <!-- Pas de <meta name="color-scheme" content="light dark"> : FIGÉ, le navigateur peint ses
        propres surfaces (ascenseurs, contrôles) en sombre sur un corps clair — défaut relevé par
@@ -158,16 +158,16 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — archive des items clos</h1>
-      <p class="meta">sceau <code>72692a35ee91</code> · dernier événement 2026-08-28T07:29:18Z</p>
+      <p class="meta">sceau <code>e9c36f97ba63</code> · dernier événement 2026-08-31T20:40:40Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       </button>
     </header>
-    <p>Ce que le registre actif a cessé de porter vit ici : <strong>677 items clos</strong>, chacun avec son histoire complète — ce qui a été demandé, qui l'a décidé, ce qui a été corrigé et quels gains ont été constatés. C'est la mémoire des décisions déjà prises : on y cherche avant de re-candidater, et on y vérifie ce qu'une correction a réellement rapporté. La recherche et les filtres agissent sur cette page seule, sans rien envoyer nulle part.</p>
+    <p>Ce que le registre actif a cessé de porter vit ici : <strong>692 items clos</strong>, chacun avec son histoire complète — ce qui a été demandé, qui l'a décidé, ce qui a été corrigé et quels gains ont été constatés. C'est la mémoire des décisions déjà prises : on y cherche avant de re-candidater, et on y vérifie ce qu'une correction a réellement rapporté. La recherche et les filtres agissent sur cette page seule, sans rien envoyer nulle part.</p>
     <div class="kpis">
-      <div class="kpi" title="677 items archivés depuis todo\TODO.jsonl — l'histoire complète de chacun est sur cette page"><span class="kpi-label">Items clos, archivés</span><span class="kpi-value">677</span><span class="kpi-hint">source unique — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
-      <button type="button" class="kpi" data-statut="corrige" aria-pressed="false" title="661 item(s) clos sur gains constatés — clic : n'afficher qu'eux"><span class="kpi-label">Corrigés</span><span class="kpi-value">661</span><span class="kpi-hint">clos sur gains constatés · clic&nbsp;: filtrer</span></button>
+      <div class="kpi" title="692 items archivés depuis todo\TODO.jsonl — l'histoire complète de chacun est sur cette page"><span class="kpi-label">Items clos, archivés</span><span class="kpi-value">692</span><span class="kpi-hint">source unique — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
+      <button type="button" class="kpi" data-statut="corrige" aria-pressed="false" title="676 item(s) clos sur gains constatés — clic : n'afficher qu'eux"><span class="kpi-label">Corrigés</span><span class="kpi-value">676</span><span class="kpi-hint">clos sur gains constatés · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="ecarte" aria-pressed="false" title="16 item(s) écartés, chacun avec son motif d'écart — clic : n'afficher qu'eux"><span class="kpi-label">Écartés</span><span class="kpi-value">16</span><span class="kpi-hint">refus motivé, mémoire gardée · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="nombre de forges distinctes visées par les items archivés, noms normalisés"><span class="kpi-label">Forges concernées</span><span class="kpi-value">19</span><span class="kpi-hint">noms normalisés — le brut reste en infobulle</span></div>
     </div>
@@ -214,10 +214,10 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser la recherche</button>
-      <span id="compteur" class="compteur" aria-live="polite">677 / 677 item(s) clos affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">692 / 692 item(s) clos affichés</span>
     </div>
-    <p id="vide" class="etat-vide" hidden><strong>Aucun item clos ne correspond.</strong> <span id="vide-quoi"></span> L'archive porte 677 items : élargissez les filtres, essayez un identifiant (<code>TF-0062</code>) ou un mot du titre — ou <button type="button" id="vide-reinit" class="lien-btn">réinitialisez la recherche</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#forge-agents"><strong>agents</strong> <span class="toc-d">106 item(s) clos</span></a><a href="#forge-agents-security"><strong>agents-security</strong> <span class="toc-d">2 item(s) clos</span></a><a href="#forge-audit"><strong>audit</strong> <span class="toc-d">14 item(s) clos</span></a><a href="#forge-conception"><strong>conception</strong> <span class="toc-d">20 item(s) clos</span></a><a href="#forge-contenu"><strong>contenu</strong> <span class="toc-d">1 item(s) clos</span></a><a href="#forge-data"><strong>data</strong> <span class="toc-d">12 item(s) clos</span></a><a href="#forge-design"><strong>design</strong> <span class="toc-d">29 item(s) clos</span></a><a href="#forge-development"><strong>development</strong> <span class="toc-d">11 item(s) clos</span></a><a href="#forge-digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">102 item(s) clos</span></a><a href="#forge-f"><strong>f</strong> <span class="toc-d">3 item(s) clos</span></a><a href="#forge-la-barre"><strong>la-barre</strong> <span class="toc-d">1 item(s) clos</span></a><a href="#forge-ops"><strong>ops</strong> <span class="toc-d">13 item(s) clos</span></a><a href="#forge-organization"><strong>organization</strong> <span class="toc-d">11 item(s) clos</span></a><a href="#forge-p"><strong>p</strong> <span class="toc-d">12 item(s) clos</span></a><a href="#forge-pilot"><strong>pilot</strong> <span class="toc-d">165 item(s) clos</span></a><a href="#forge-seo"><strong>seo</strong> <span class="toc-d">31 item(s) clos</span></a><a href="#forge-seo-geo"><strong>seo-geo</strong> <span class="toc-d">5 item(s) clos</span></a><a href="#forge-tests"><strong>tests</strong> <span class="toc-d">136 item(s) clos</span></a><a href="#forge-websec"><strong>websec</strong> <span class="toc-d">3 item(s) clos</span></a></nav>
+    <p id="vide" class="etat-vide" hidden><strong>Aucun item clos ne correspond.</strong> <span id="vide-quoi"></span> L'archive porte 692 items : élargissez les filtres, essayez un identifiant (<code>TF-0062</code>) ou un mot du titre — ou <button type="button" id="vide-reinit" class="lien-btn">réinitialisez la recherche</button>.</p>
+    <nav class="toc" aria-label="Sommaire"><a href="#forge-agents"><strong>agents</strong> <span class="toc-d">106 item(s) clos</span></a><a href="#forge-agents-security"><strong>agents-security</strong> <span class="toc-d">2 item(s) clos</span></a><a href="#forge-audit"><strong>audit</strong> <span class="toc-d">14 item(s) clos</span></a><a href="#forge-conception"><strong>conception</strong> <span class="toc-d">20 item(s) clos</span></a><a href="#forge-contenu"><strong>contenu</strong> <span class="toc-d">1 item(s) clos</span></a><a href="#forge-data"><strong>data</strong> <span class="toc-d">12 item(s) clos</span></a><a href="#forge-design"><strong>design</strong> <span class="toc-d">29 item(s) clos</span></a><a href="#forge-development"><strong>development</strong> <span class="toc-d">11 item(s) clos</span></a><a href="#forge-digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">117 item(s) clos</span></a><a href="#forge-f"><strong>f</strong> <span class="toc-d">3 item(s) clos</span></a><a href="#forge-la-barre"><strong>la-barre</strong> <span class="toc-d">1 item(s) clos</span></a><a href="#forge-ops"><strong>ops</strong> <span class="toc-d">13 item(s) clos</span></a><a href="#forge-organization"><strong>organization</strong> <span class="toc-d">11 item(s) clos</span></a><a href="#forge-p"><strong>p</strong> <span class="toc-d">12 item(s) clos</span></a><a href="#forge-pilot"><strong>pilot</strong> <span class="toc-d">165 item(s) clos</span></a><a href="#forge-seo"><strong>seo</strong> <span class="toc-d">31 item(s) clos</span></a><a href="#forge-seo-geo"><strong>seo-geo</strong> <span class="toc-d">5 item(s) clos</span></a><a href="#forge-tests"><strong>tests</strong> <span class="toc-d">136 item(s) clos</span></a><a href="#forge-websec"><strong>websec</strong> <span class="toc-d">3 item(s) clos</span></a></nav>
     <main>
       <section id="forge-agents">
         <h2>agents <span class="badge" title="106 item(s) clos ciblant agents — 106 corrigé(s), 0 écarté(s)">106</span></h2>
@@ -6731,9 +6731,478 @@ CE QUI N'EST PAS ATTRAPE EST DECLARE : une redite entre domaines DIFFERENTS au r
         </div>
       </section>
       <section id="forge-digit-ai-factory">
-        <h2>digit-ai-factory <span class="badge" title="102 item(s) clos ciblant digit-ai-factory — 97 corrigé(s), 5 écarté(s)">102</span></h2>
-        <p class="ch-apprend meta">Items clos ciblant <strong>digit-ai-factory</strong> — 97 corrigé(s), 5 écarté(s), du plus récent au plus ancien. Chaque carte porte le détail tel qu'il a été candidaté, puis son histoire dépliable : création, décision et décideur, ouverture des travaux, clôture, archivage.</p>
+        <h2>digit-ai-factory <span class="badge" title="117 item(s) clos ciblant digit-ai-factory — 112 corrigé(s), 5 écarté(s)">117</span></h2>
+        <p class="ch-apprend meta">Items clos ciblant <strong>digit-ai-factory</strong> — 112 corrigé(s), 5 écarté(s), du plus récent au plus ancien. Chaque carte porte le détail tel qu'il a été candidaté, puis son histoire dépliable : création, décision et décideur, ouverture des travaux, clôture, archivage.</p>
         <div class="cartes">
+        <article class="card s-corrige" id="item-TF-0729" data-forge="digit-ai-factory" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0729</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : digit-ai-factory">digit-ai-factory</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-08-31</span>
+          </header>
+          <h3 class="card-titre">pilot : l'emetteur de travaux comparait le PSEUDONYME du registre aux noms REELS du parc — les trois constats au plus haut score du mandat du 28/08 sortaient en [ORPHELINS] avec leur produit sur le poste</h3>
+          <div class="card-detail" data-cite><p class="lead">TROUVE EN EXECUTANT le mandat « traite les todos et retours » du 31/08.</p><ul class="puces"><li>LE FAIT : node todo\emettre-travaux.mjs --tous --essai sort en echec avec [ORPHELINS] TF-0674, TF-0676, TF-0682 → « Produit-02 » (aucun produit du parc ne correspond) — alors que le produit est sur le poste, localisable par ses lots, et venait de remettre un lot le matin meme. LA CAUSE : depuis que l'anonymisation est dans la chaine d'ingestion (28/08), destinataire_produit porte un pseudonyme</li><li>le parc, lui, porte les noms reels. memeProduit() compare EXACTEMENT — c'est sa vertu — mais aucun des deux cotes ne traduisait. Le rendez-vous ne pouvait plus JAMAIS se faire pour un item pseudonymise : la classe entiere des constats a destinataire_produit passes par l'ingestion etait perdue, et l'avertissement des orphelins accusait le registre a tort (« corriger destinataire_produit au registre » — le registre etait juste). C'est la rechute exacte du defaut fondateur de la seconde source (TF-0673) : un rendez-vous manque qui perd des constats — cette fois NOMMES par l'avertissement, ce qui a permis de le voir au premier essai. CE QUI REND LE CAS PIQUANT : les deux mecanismes se sont croises a QUATRE jours d'intervalle — l'anonymisation (28/08 matin) a casse l'appariement de l'emetteur (TF-0673, 26/08) sans qu'aucune recette ne le voie, parce que les fixtures des deux outils ne se parlent pas</li></ul></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 4 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-08-31</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">pilot (execution du mandat « traite les todos et retours » du 31/08)</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">node todo\emettre-travaux.mjs --tous --essai du 31/08 : exit 1, trois [ORPHELINS] nommes ; table &lt;racine&gt;\_produits-pseudonymes.json porteuse de l'association ; produit localise par ses lots le meme jour</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">pilot</dd></div><div><dt>Score d'entrée</dt><dd>12.5 — gain 5 × preuve 5 ÷ effort 2</dd></div><div class="pleine"><dt>Coût déjà payé</dt><dd><p class="jalon-prose">les trois constats au plus haut score du mandat du 28/08 (TF-0674 a 12.5, TF-0682 a 10, TF-0676 a 6.7) n'atteignaient PERSONNE depuis trois jours, et rien d'autre que l'execution du canal ne l'aurait dit ; la classe couvre tout item futur a destinataire_produit passe par l'ingestion anonymisee, soit TOUS</p></dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-08-31</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">correction immediate : l'emission du mandat en cours etait BLOQUEE par ce defaut — les trois items a emettre ne pouvaient pas partir (precedent TF-0698)</p></dd></div></dl>
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-08-31</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">Recette de l'emetteur portee de 26 a 30 cas, 30/30 — les quatre cas neufs : resolution avec suffixe de domaine, lecture seule prouvee (la table n'est pas etendue par un rapprochement), constat adresse au pseudonyme ATTEINT le produit reel, pseudonyme inconnu de la table reste orphelin. EPROUVE PAR MUTATION : la comparaison directe remise en place fait tomber la recette a 29/30 sur exactement le cas vise ; restauree, 30/30. Preuve d'usage dans l'heure : le lot pilot - TRAVAUX - 20260831a (6 elements, sceau 36b21c3f29d1) est parti chez le produit avec TF-0674, TF-0676 et TF-0682 a bord — exit 0, zero orphelin.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><p class="jalon-prose">Une resolution de pseudonyme EN LECTURE SEULE (pseudonymeDe) lit la table hors depot (&lt;racine&gt;\_produits-pseudonymes.json, surchargeable par FORGE_PRODUITS_PSEUDO) et le rendez-vous (designeProduit) essaie le nom reel PUIS le pseudonyme — exact dans les deux cas, jamais par inclusion. Elle n'emploie PAS pseudoProduit() de l'anonymiseur, qui ETEND la table a l'inconnu : rapprocher n'est pas baptiser, et l'employer aurait inscrit chaque dossier scanne du parc — clones, archives, fixtures — comme produit pseudonymise. Table absente ou illisible → <code>null</code>, retombee sur la comparaison directe. Applique au rapprochement des constats ET a la denonciation des orphelins.</p></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">digit-ai-factory (todo/emettre-travaux.mjs)</p></dd></div><div><dt>Forge réellement touchée</dt><dd title="dépôt de forge réellement modifié par la correction — nom brut du registre">digit-ai-factory</dd></div><div><dt>Produits bénéficiaires</dt><dd title="produits ou missions ayant bénéficié de la correction, nommés au registre">tout produit dont un constat du registre porte un destinataire_produit pseudonymise — soit tout constat passe par l'ingestion depuis le 28/08</dd></div></dl>
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-08-31</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
+        <article class="card s-corrige" id="item-TF-0703" data-forge="digit-ai-factory" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0703</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : digit-ai-factory">digit-ai-factory</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-08-31</span>
+          </header>
+          <h3 class="card-titre">factory : le protocole de retours n a aucun canal de rectification d un lot remis</h3>
+          <div class="card-detail" data-cite><p class="lead">FAIT MESURE. gabarits/RETOURS-FORGES.md pose, a raison, qu un fichier remis ne se modifie JAMAIS. Mais AUCUN champ du sidecar .tf.jsonl ne permet de designer un retour anterieur pour le corriger ou l annuler : le schema porte titre, contenu, demandeur, source, date_demande, forges_cibles_initiales, gravite, portee, score, preuve_du_cout — et rien qui pointe en arriere. CAS REEL QUI L A REVELE, sur le produit qui ecrit ces lignes : le lot Produit-11 - RETOURS - 20260827b affirme, en section « Remarques restees au produit », que « la fiche de Produit-11 n est pas produite par build-fiche.mjs : c est un HTML maintenu a la main, derive une fois du gabarit puis suivi separement ». C EST FAUX. La fiche est produite par outils-audit/batir-fiche.py, 346 lignes, versionne, cree le 25/08 dans le commit 1525c69 — celui-la meme qui a livre la premiere fiche — et suivi depuis (e7dc5a8 le 26/08, 8226f02 le 27/08, de82e2a le 28/08). Un `git log --diff-filter=A` suffisait a le demontrer. Le lot a donc decrit la cause immediate d un defaut par une situation inexistante, sur son propre produit. CONSEQUENCE SI LE CANAL MANQUE : une fois ingeree, cette affirmation devient un item de TODO.jsonl indiscernable d un item exact, et le seul moyen de la contredire est un item CONCURRENT que rien ne relie au premier. Un registre incapable de se corriger n accumule pas de la connaissance : il accumule aussi ses erreurs, avec le meme poids. CE QUI LIMITE LES DEGATS ICI, et c est une chance de calendrier et non une propriete du protocole : au 28/08, todo/TODO.jsonl ne contient aucune occurrence de RT-39 — le lot 20260827b n est pas encore ingere, la rectification arrive avant toute decision. PROPOSITION : deux champs OPTIONNELS au sidecar, `rectifie` (id du retour vise) et `nature_de_la_rectification` (fait_errone | cause_erronee | annule). L ingestion, en les voyant, MARQUE l item vise au lieu d en creer un second sans lien. Corollaire d oracle, peu couteux : refuser un sidecar dont `rectifie` designe un id inconnu, ce qui empeche une rectification de porter a cote. La regle d immuabilite n est PAS a assouplir — elle est ce qui a force la declaration de l erreur ; il lui manque seulement le geste complementaire.</p></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 4 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">Produit-11</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">lot Produit-11 - RETOURS - 20260828a, forge/ledger.jsonl seq 167</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">factory</dd></div><div><dt>Score d'entrée</dt><dd>1 — gain 3 × preuve 1 ÷ effort 3</dd></div><div class="pleine"><dt>Coût déjà payé</dt><dd><p class="jalon-prose">un lot deja remis porte une affirmation fausse sur son propre produit, relevee par le destinataire humain le 28/08 ; le protocole n offrait aucun geste pour la dedire, et seule l absence d ingestion a ce jour empeche la factory d agir sur une cause erronee</p></dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">Sebastien — mandat « 3 : Tout traiter directement » du 28/08/2026, qui tranche EN BLOC les 22 candidatures alors en attente d'arbitrage</p></dd></div></dl>
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-08-31</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">Recette NEUVE ingerer-rectification.test.mjs : 7/7 — deux vertes (marquage sans id neuf, comptage separe), trois rouges (id inconnu, id archive, nature hors jeu, format non TF), une borne (aucune cible de forge exigee d'une rectification). EPROUVE PAR MUTATION : le marquage neutralise fait tomber la recette a 4/7 sur exactement les cas vises ; restaure, 7/7. Self-test TODO-FORGE intact a 48/48. Le registre sait desormais se corriger sans accumuler ses erreurs avec le meme poids que ses faits.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><p class="jalon-prose">Deux champs OPTIONNELS au sidecar, exactement ceux que l'item proposait : `rectifie` (id TF vise, format TF-xxxx impose) et `nature_de_la_rectification` (jeu FERME : fait_errone | cause_erronee | annule — une nature libre redeviendrait de la prose que rien ne sait interroger). Une ligne qui les porte MARQUE l'item vise — evenement maj portant un bloc `rectification` avec titre, contenu, demandeur, source — au lieu de creer un second item sans lien ; aucun id neuf n'est frappe, et l'evenement d'ingestion compte creations et rectifications SEPAREMENT. Le corollaire d'oracle est cable : un `rectifie` INCONNU (actifs + archive) est un rejet atomique ; un id ARCHIVE aussi, avec son remede nomme — marquer l'archive est une decision humaine, pas un geste d'ingestion (R8). Le post-controle anti-collision exclut desormais les ids de rectification (un id existant est present sur origin par construction — le compter ferait crier collision sur chaque rectification). Le gabarit RETOURS-FORGES.md documente le canal cote produits. La regle d'immuabilite d'un lot remis n'est PAS assouplie : le geste complementaire arrive par un NOUVEAU lot.</p></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">digit-ai-factory (todo/ingerer-lot.mjs + gabarits/RETOURS-FORGES.md)</p></dd></div><div><dt>Forge réellement touchée</dt><dd title="dépôt de forge réellement modifié par la correction — nom brut du registre">digit-ai-factory</dd></div><div><dt>Produits bénéficiaires</dt><dd title="produits ou missions ayant bénéficié de la correction, nommés au registre">tout produit ou forge ayant remis un lot dont un retour s'avere faux — le cas fondateur (RT-39, cause immediate decrite par une situation inexistante) devient rectifiable au lieu d'exiger un item concurrent sans lien</dd></div></dl>
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-08-31</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
+        <article class="card s-corrige" id="item-TF-0702" data-forge="digit-ai-factory" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0702</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : digit-ai-factory">digit-ai-factory</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-08-31</span>
+          </header>
+          <h3 class="card-titre">factory : les generateurs des produits sont des REECRITURES de ceux de la factory, donc hors d atteinte de toute correction</h3>
+          <div class="card-detail" data-cite><p class="lead">C EST LA VRAIE CAUSE DU DEFAUT DE PROPAGATION REMONTE EN RT-39, et elle l aggrave au lieu de l excuser.</p><ul class="puces"><li>FAIT MESURE, sur pieces : la factory tient tools/build-fiche.mjs, 208 lignes, en Node, qui produit bien les DEUX formats et porte meme le commentaire « Le catalogue de la bibliotheque declare deux formats pour cette famille — html ET pdf ». Le produit Produit-11 tient outils-audit/batir-fiche.py, 346 lignes, en Python. Le correctif de TF-0506 (commit 56c651c, 23/08) a ete porte dans le fichier Node</li><li>AUCUN mecanisme concevable ne le fait arriver dans le fichier Python. ET LA REECRITURE N EST PAS UN CAPRICE : batir-fiche.py rend depuis kit/compliance-pack/Client-A - Modele Fiche Securite Mise a disposition - Dev - 20260710a.html, un gabarit HTML IMPOSE PAR LE CLIENT, que build-fiche.mjs ne sait pas consommer — il rend depuis deliverables/templates/fiche-securite.template.md. Le produit avait donc a choisir entre respecter le gabarit de son client et employer l outil de la factory. POURQUOI CELA AGGRAVE RT-39 : le produit n etait pas negligent et son livrable n etait pas detache d un generateur — il POSSEDAIT un generateur versionne et entretenu, et la correction ne l a pas atteint quand meme. Le manifeste d adoption propose en RT-39 aurait rendu le retard VISIBLE</li><li>il n aurait pas rendu la correction TRANSMISSIBLE. PROPOSITION : PROPAGER LES ORACLES, PAS LES GENERATEURS — un oracle est agnostique du langage, un generateur ne l est pas. La preuve que le motif fonctionne est deja au dossier : batir-fiche.py appelle oracles/verifier-pdf.mjs de la factory, en Node, depuis Python, via subprocess, et s arrete sur son code de retour. Donc :</li><li>chaque famille du catalogue declare, a cote de `formats`, la liste des ORACLES qu un jeu remis doit passer</li><li>un oracle verifier-jeu-livrables lit le catalogue et ECHOUE si un format declare manque — il aurait refuse les remises du 25/08 et du 27/08 SANS RIEN SAVOIR du generateur employe</li><li>build-fiche.mjs accepte un gabarit HTML fourni par le produit (--gabarit), ce qui rend la reecriture INUTILE dans le cas Client-A au lieu de la rendre seulement mesurable. Le point</li><li>est le moins couteux et ne depend d aucune decision de gouvernance ; le point</li><li>supprime la cause au lieu de la mesurer</li></ul></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 4 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">Produit-11</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">lot Produit-11 - RETOURS - 20260828a, forge/ledger.jsonl seq 167</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">factory</dd></div><div><dt>Score d'entrée</dt><dd>1 — gain 3 × preuve 1 ÷ effort 3</dd></div><div class="pleine"><dt>Coût déjà payé</dt><dd><p class="jalon-prose">une correction de la factory datee du 23/08 n a pu atteindre ni la remise du 25/08 ni celle du 27/08 du produit explicitement nomme beneficiaire, parce que le generateur du produit est ecrit dans un autre langage et lit un gabarit impose par le client que l outil de la factory ne sait pas consommer ; la cause proposee en RT-39, un livrable detache de son generateur, etait fausse</p></dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">Sebastien — mandat « 3 : Tout traiter directement » du 28/08/2026, qui tranche EN BLOC les 22 candidatures alors en attente d'arbitrage</p></dd></div></dl>
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-08-31</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">Recette NEUVE verifier-jeu-livrables.test.mjs : 7/7 — la scene du 25/08 rejouee en rouge (pdf manquant nomme), jeu complet vert, famille a un format sans exigence superflue, sans-marqueur en SKIP jamais en vert silencieux, famille fantome denoncee, old\ epargne, catalogue absent en SKIP motive. Et la borne RESTANTE de TF-0692 (« l'absence d'un format d'un jeu declare n'est toujours pas signalee ») est exactement ce que ce controle comble — declare la-bas, couvert ici.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><p class="jalon-prose">Le point (2) de l'item — le moins couteux, sans dependance de gouvernance — est livre : verifier-jeu-livrables.mjs lit le catalogue des familles (qui declarait DEJA formats et oracles, point (1) constate acquis), identifie la famille d'un livrable par le marqueur que G4 (TF-0690, corrige le meme jour) fait rendre, et ECHOUE quand un format declare manque a cote du fichier — en nommant le fichier attendu. Il aurait refuse les remises des 25 et 27/08 SANS RIEN SAVOIR du generateur employe : propager les ORACLES marche la ou propager les generateurs ne peut pas. Frontieres declarees : document sans marqueur non juge (SKIP dit), famille inconnue du catalogue DENONCEE, old\ hors perimetre, contenu des fichiers hors sujet (le sceau et les oracles de famille s'en chargent).</p></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">digit-ai-factory (scripts/verifier-jeu-livrables.mjs)</p></dd></div><div><dt>Forge réellement touchée</dt><dd title="dépôt de forge réellement modifié par la correction — nom brut du registre">digit-ai-factory</dd></div><div><dt>Produits bénéficiaires</dt><dd title="produits ou missions ayant bénéficié de la correction, nommés au registre">tout produit remettant un jeu de livrables d'une famille du catalogue, quel que soit le langage de son generateur — Python compris, via subprocess</dd></div></dl>
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-08-31</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
+        <article class="card s-corrige" id="item-TF-0699" data-forge="digit-ai-factory" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0699</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : digit-ai-factory">digit-ai-factory</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-08-28</span>
+          </header>
+          <h3 class="card-titre">pilot : une decision du bloc 3 n'a jamais porte de NUMERO, et le destinataire l'inventait pour pouvoir repondre</h3>
+          <div class="card-detail" data-cite><p class="lead">Retour humain du 28/08/2026, mot pour mot : « Il n'y a pas de numero sur les decisions, je ne peux pas les selectionner.</p><ul class="puces"><li>» CE QUI L'A PRECEDE EST LE PLUS INSTRUCTIF : le meme destinataire avait deja repondu « 1b, 2a, 3a » a une restitution portant TROIS decisions non numerotees, puis « a » a une autre. Il avait donc INVENTE la numerotation pour pouvoir repondre, l'ordre d'apparition faisant office de numero tacite. Ca a marche deux fois ; la troisieme, il a dit stop. POURQUOI S4 NE LE VOYAIT PAS, et c'est la meme cecite que S15 corrige au niveau du sujet : S4 compte des OPTIONS etiquetees</li><li></li><li></li><li>— elle verifie que le choix est ferme, jamais que la QUESTION est adressable. Un bloc a trois decisions parfaitement optionnees passe donc S4 et reste inselectionnable : « je prends</li><li>» ne dit pas laquelle. CE QUE COUTAIT L'ABSENCE : soit le lecteur numerote lui-meme et le risque d'un decalage est sur lui, soit il redige sa reponse en prose — c'est-a-dire exactement ce que le choix ferme du bloc 3 existe pour lui epargner. Une decision qu'on ne peut pas designer en deux caracteres n'est pas un choix ferme, c'est un questionnaire</li></ul></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 4 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">pilot (retour humain direct du 28/08/2026)</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">Retour humain du 28/08/2026 sur la restitution du mandat « traite tous les todos et retours ». Corrige A LA SOURCE sur demande explicite : le referentiel gabarits/RESTITUTION.md ET son oracle, une regle sans controle execute n'etant pas une regle.</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">pilot</dd></div><div><dt>Score d'entrée</dt><dd>40 — gain 4 × preuve 5 ÷ effort 1</dd></div><div class="pleine"><dt>Coût déjà payé</dt><dd><p class="jalon-prose">Deux restitutions repondues par une numerotation INVENTEE par le lecteur (« 1b, 2a, 3a », puis « a »), et une troisieme ou il a declare ne pas pouvoir selectionner. La regle neuve, jouee sur la restitution incriminee, rend « 3 decision(s) sur 3 SANS NUMERO ».</p></dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">Sebastien — demande explicite « Corrige ce probleme a la source et reaffiche »</p></dd></div></dl>
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">La regle attrape le defaut reel : jouee sur la restitution qui a provoque le retour, elle rend « 3 decision(s) sur 3 SANS NUMERO ». Self-test de l'oracle : exit 0, avec S30 dans SES DEUX SENS — la fixture rouge (aucun numero) et une fixture dediee ou deux decisions portent le meme numero. La fixture verte a ete numerotee, et la fixture rouge realignee sur elle : sans ce realignement la rouge heritait de la decision numerotee de la verte et S15 comme S30 passaient a tort, ce que le self-test a signale immediatement.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><p class="jalon-prose">Regle S30 posee des DEUX cotes. Referentiel : version 2.11.0, une section qui expose le fait mesure et sa cause, et le NUMERO ajoute en tete de ce que chaque decision doit porter — avant le rappel du sujet. Oracle : S30 verifie que chaque groupe de decision du bloc 3 porte un numero ET que les numeros sont DISTINCTS, deux decisions numerotees 1 ne se selectionnant pas mieux qu'aucune. La forme est libre — « **Decision 1 —** », « 1. », « **1)** », « D1 — » — juger la typographie n'a jamais ete le sujet.</p></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">digit-ai-factory — gabarits/RESTITUTION.md v2.11.0 et oracles/oracle-synthese.mjs (regle S30)</p></dd></div><div><dt>Forge réellement touchée</dt><dd title="dépôt de forge réellement modifié par la correction — nom brut du registre">digit-ai-factory</dd></div></dl>
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-08-31</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
+        <article class="card s-corrige" id="item-TF-0698" data-forge="digit-ai-factory" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0698</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : digit-ai-factory">digit-ai-factory</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-08-28</span>
+          </header>
+          <h3 class="card-titre">pilot : l'archiveur DEFINISSAIT depuis six jours la fonction qui fait suivre les rectifications a leurs cibles, et ne l'APPELAIT jamais</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat en passant du mandat « traite tous les todos et retours » du 28/08.</p><ul class="puces"><li>LE FAIT : le premier archivage a deplacer un item PORTEUR de rectifications d'horodatage (TF-0324) a laisse CINQ evenements `rectification_horodatage` orphelins dans le registre actif, leurs cibles etant parties a l'archive. `oracle-todo` est passe de PASS a FAIL sur R9, « rectification sans cible ANTERIEURE ». LA CAUSE, et elle est exemplaire : `archiver.mjs` porte depuis le 22/08 une fonction `scinderRectification` dont le commentaire annonce MOT POUR MOT ce defaut — « laissee dans l'actif alors que ses items partent, elle viole R9 et fait tomber le registre entier en FAIL ». Cette fonction etait DEFINIE et JAMAIS APPELEE : `grep` ne la trouve qu'a sa ligne de declaration. La boucle de partition ne traite pas ce type d'evenement, qui ne porte pas de champ `id` et tombait donc dans « reste actif » par le seul jeu de la condition `e.id &amp;&amp; archivables.has(e.id)`, sans que rien ne le decide. C'est la loi transverse n° 1 du noyau prise en flagrant delit : toute affordance est cablee ou n'existe pas. POURQUOI PERSONNE NE L'A VU PENDANT SIX JOURS : aucun archivage depuis le 22/08 n'avait deplace un item porteur de rectifications</li><li>le defaut dormait derriere une condition qui ne se rencontre pas tous les jours</li></ul></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 4 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">pilot (constat en passant du mandat « traite tous les todos et retours » du 28/08)</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">Mandat humain « traite tous les todos et retours » du 28/08/2026 ; defaut rencontre en archivant les 209 items clos. LIMITE DECLAREE : seul le cas `rectification_horodatage` a ete cable et prouve. Si d'autres types d'evenements sans champ `id` existent ou apparaissent, ils tombent dans le meme piege par la meme condition, et personne ne l'a verifie.</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">pilot</dd></div><div><dt>Score d'entrée</dt><dd>20 — gain 4 × preuve 5 ÷ effort 2</dd></div><div class="pleine"><dt>Coût déjà payé</dt><dd><p class="jalon-prose">Six constats R9 et un registre entier en FAIL, sur un archivage par ailleurs correct. Le cout n'est pas l'archivage rate : c'est qu'un correctif ECRIT et COMMENTE six jours plus tot n'a servi a rien faute d'un appel, et que son commentaire decrivait exactement l'incident qu'il n'a pas empeche.</p></dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">correction immediate : l'archivage du mandat en cours etait BLOQUE par ce defaut, le registre restant en FAIL tant qu'il n'etait pas corrige</p></dd></div></dl>
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">Sequence rejouee de bout en bout apres restauration du registre a son etat d'avant : `oracle-todo` rend PASS apres archivage, la ou il rendait FAIL sur six constats R9. L'archive recoit 944 evenements contre 939 avant correction — les cinq rectifications manquantes sont exactement l'ecart. Registre actif ramene de 229 a 20 items.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><p class="jalon-prose">La boucle de partition traite desormais explicitement `rectification_horodatage` : elle appelle `scinderRectification`, envoie a l'archive une jumelle portant les entrees dont l'item part, et conserve dans l'actif les entrees dont l'item reste. L'ordre des lignes est preserve, donc la jumelle atterrit apres les evenements qu'elle rectifie. Aucun ecart declare n'est perdu : chacun reste imprime du cote ou vit son item.</p></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">digit-ai-factory (todo/archiver.mjs)</p></dd></div><div><dt>Forge réellement touchée</dt><dd title="dépôt de forge réellement modifié par la correction — nom brut du registre">digit-ai-factory</dd></div></dl>
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-08-31</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
+        <article class="card s-corrige" id="item-TF-0696" data-forge="digit-ai-factory" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0696</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : digit-ai-factory">digit-ai-factory</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-08-31</span>
+          </header>
+          <h3 class="card-titre">pilot : les FICHES sont explicitement hors du perimetre de l oracle de gabarits, et aucun autre controle ne les reprend</h3>
+          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 27/08. oracles\oracle-gabarits-documents.mjs declare son non_juge, mot pour mot : 'les familles de gabarit hors gabarits\documents\ (fiches, prompts, squelettes de forge)'. Le gabarit de la fiche securite de mise a disposition est precisement une fiche, portee par digit-ai-forge-audit. L exclusion est honnete et assumee ; le probleme est qu AUCUN autre controle ne la rattrape, si bien qu un gabarit de fiche n est juge par RIEN - ni sur sa forme, ni sur son rendu. Or une fiche securite est lue par un RSSI : c est un des documents les plus exposes de l ecosysteme. PROPOSITION : soit etendre le perimetre aux familles de fiches, soit - plus honnete si l exclusion doit rester - DECLARER NOMMEMENT QUI LES JUGE. Un non_juge qui renvoie vers un controle nomme est une frontiere ; un non_juge qui ne renvoie nulle part est un trou avec une etiquette dessus. Meme remarque pour 'prompts' et 'squelettes de forge'.</p></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 4 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-08-27</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">Produit-04</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">Produit-04 - RETOURS - 20260827b.md (relecture humaine du PDF de la fiche securite le 27/08/2026, hors run ; aucun ledger dans ce produit, absence declaree au carnet des ecarts assumes)</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">pilot</dd></div><div><dt>Score d'entrée</dt><dd>1 — gain 3 × preuve 1 ÷ effort 3</dd></div><div class="pleine"><dt>Coût déjà payé</dt><dd><p class="jalon-prose">Le non_juge cite est lisible aux lignes 218-223 de oracles\oracle-gabarits-documents.mjs, releve le 27/08/2026. Cout constate : le gabarit Client-A de la fiche securite (20260710a) portait td.k{width:32%} depuis sa creation en juillet et n a jamais ete juge par quoi que ce soit, ni sur sa forme ni sur son rendu, jusqu a la relecture humaine du 27/08.</p></dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">Sebastien — mandat « 3 : Tout traiter directement » du 28/08/2026, qui tranche EN BLOC les 22 candidatures alors en attente d'arbitrage</p></dd></div></dl>
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-08-31</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">Self-test de l'oracle 7/7 (porte de 5/5 par la regle G4 posee sous TF-0690 le meme jour) ; verdict live du parc PASS. La difference mesurable : le lecteur du non_juge sait desormais OU va chaque exclusion — deux renvois nommes, un trou avoue avec son item.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><p class="jalon-prose">La variante honnete retenue : l'exclusion reste, et le non_juge RENVOIE NOMMEMENT — les FICHES (forge-audit) voient leur RENDU jugeable par scripts/verifier-rendu-instances.mjs &lt;dossier&gt; (possible depuis TF-0695, corrige le meme jour) et leur marquage par check_html.py du socle, leur CONTENU attendant le verificateur de la famille (TF-0701, decide, forge-audit) ; les PROMPTS et SQUELETTES DE FORGE restent un trou DECLARE et non couvert, a combler famille par famille quand l'une coutera assez pour meriter son juge. Un non_juge qui renvoie vers un controle nomme est une frontiere ; un non_juge qui ne renvoie nulle part est un trou avec une etiquette dessus.</p></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">digit-ai-factory (oracles/oracle-gabarits-documents.mjs, non_juge)</p></dd></div><div><dt>Forge réellement touchée</dt><dd title="dépôt de forge réellement modifié par la correction — nom brut du registre">digit-ai-factory</dd></div></dl>
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-08-31</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
+        <article class="card s-corrige" id="item-TF-0695" data-forge="digit-ai-factory" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0695</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : digit-ai-factory">digit-ai-factory</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-08-31</span>
+          </header>
+          <h3 class="card-titre">pilot : le controle de rendu ne s execute jamais sur un livrable de produit, il ne balaie que les instances de reference du pilot</h3>
+          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 27/08. scripts\verifier-rendu-instances.mjs, ecrit le 23/08 sur le constat qu 'un controle statique ne rend pas la page', porte son perimetre EN DUR : const dossier = join(PILOT, 'gabarits', 'documents'), puis INSTANCE.html de chaque famille. Aucun chemin d un output\ de produit n y entre, et aucun controle equivalent n existe cote produit. CONSEQUENCE : tout ce que le socle de rendu sait mesurer - contraste, debordement, chevauchement, largeurs L2 - n est JAMAIS mesure sur ce qui est reellement REMIS a un lecteur. Les instances de reference sont vertes ; les livrables ne sont pas juges. La capacite existe depuis le 23/08 et elle ne regarde que le catalogue, jamais la production. PROPOSITION : un point d entree rendant le controle executable sur un dossier arbitraire (node scripts\verifier-rendu-instances.mjs &lt;dossier&gt;) et, mieux, un controle destine aux produits qui prenne leur output\. Le produit peut alors le jouer DANS la passe qui produit le livrable, seul moment ou le resultat sert a quelque chose.</p></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 4 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-08-27</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">Produit-04</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">Produit-04 - RETOURS - 20260827b.md (relecture humaine du PDF de la fiche securite le 27/08/2026, hors run ; aucun ledger dans ce produit, absence declaree au carnet des ecarts assumes)</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">pilot</dd></div><div><dt>Score d'entrée</dt><dd>1 — gain 3 × preuve 1 ÷ effort 3</dd></div><div class="pleine"><dt>Coût déjà payé</dt><dd><p class="jalon-prose">Lecture du code le 27/08/2026 : ligne 78 de scripts\verifier-rendu-instances.mjs, const dossier = join(PILOT, 'gabarits', 'documents'). Cout constate sur ce produit : la fiche securite, document lu par un RSSI, a ete produite et remise trois fois sans qu aucun controle de rendu ne s execute dessus - alors que le socle capable de la juger est installe sur le meme poste. Le defaut de mise en page a ete trouve par l oeil du commanditaire.</p></dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">Sebastien — mandat « 3 : Tout traiter directement » du 28/08/2026, qui tranche EN BLOC les 22 candidatures alors en attente d'arbitrage</p></dd></div></dl>
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-08-31</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">Verifie en execution sur les trois modes : sans argument → 3 instances rendues, PASS, exit 0 (perimetre historique intact) ; dossier sans html → SKIP motive exit 2 ; fichier seul → rendu et juge, exit 0. LIMITE DECLAREE : pas de recette dediee — le controle depend du socle python installe et une fixture le simulant simulerait le juge lui-meme ; la verification est d'execution, pas de banc.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><p class="jalon-prose">Le perimetre n'est plus en dur : un argument positionnel — dossier arbitraire ou fichier .html — devient la cible, parcourue recursivement (`old\` exclu, canal d'echappement documente ; node_modules et dossiers caches sautes). Sans argument, le controle garde son perimetre historique (les INSTANCE.html du catalogue), donc rien de l'existant ne change. Un produit peut desormais jouer LE MEME juge sur son output\, dans la passe qui produit le livrable — seul moment ou le resultat sert. Un defaut d'analyse d'argument attrape en route : sans --largeur, l'exclusion d'indice iL+1 valait 0 et avalait le premier positionnel — corrige et verifie sur les trois modes.</p></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">digit-ai-factory (scripts/verifier-rendu-instances.mjs)</p></dd></div><div><dt>Forge réellement touchée</dt><dd title="dépôt de forge réellement modifié par la correction — nom brut du registre">digit-ai-factory</dd></div><div><dt>Produits bénéficiaires</dt><dd title="produits ou missions ayant bénéficié de la correction, nommés au registre">tout produit dont l'output\ porte des livrables HTML — la capacite existait depuis le 23/08 et ne regardait que le catalogue, jamais la production</dd></div></dl>
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-08-31</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
+        <article class="card s-corrige" id="item-TF-0692" data-forge="digit-ai-factory" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0692</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : digit-ai-factory">digit-ai-factory</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-08-31</span>
+          </header>
+          <h3 class="card-titre">pilot : le sceau ne couvre pas les PDF, alors que des familles declarent deux formats - la paire se desynchronise sans que rien ne le dise</h3>
+          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 27/08. scripts\verifier-jugement.mjs ne juge que .html/.htm/.md (const JUGES = new Set avec .html, .htm et .md, ligne 37). La famille gd-fiche-securite declare deux formats, html et pdf : la moitie du jeu de livrables est hors du champ du controle, Y COMPRIS QUAND ELLE EST SCELLEE. PROPOSITION, deux variantes, la seconde recommandee. (1) Etendre JUGES aux formats binaires livres, PDF en tete, en scellant sur l empreinte du fichier plutot que sur son texte - le mecanisme du sceau EST deja une empreinte, rien n exige que le contenu soit lisible. (2) Moins ambitieux et suffisant pour le cas reel : un controle de COHERENCE DE JEU - pour un meme nom de base, tous les formats declares par la famille doivent exister et etre posterieurs ou egaux au plus ancien scelle. Un jeu depareille se voit alors sans qu il soit besoin de lire le PDF.</p></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 5 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-08-27</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">Produit-04</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">Produit-04 - RETOURS - 20260827a.md (evolution controles de saisie P2.2 du 27/08/2026, hors run ; aucun ledger dans ce produit, absence declaree au carnet des ecarts assumes)</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">pilot</dd></div><div><dt>Score d'entrée</dt><dd>1 — gain 3 × preuve 1 ÷ effort 3</dd></div><div class="pleine"><dt>Coût déjà payé</dt><dd><p class="jalon-prose">Fait observe le 27/08/2026 sur le depot Produit-04 : apres regeneration, le HTML portait le contenu de 16:24 et le PDF celui de 16:05, le PDF n ayant pas pu etre reecrit (verrou de visionneuse Windows). Verifie par empreinte : le PDF sur disque etait identique a celui du commit precedent (cf2e64cdbee70f0c) tandis que le HTML etait modifie dans l arbre. Les deux fichiers ont coexiste sous le meme nom de base, disant deux choses differentes, pendant huit minutes, et ils etaient a un git add de partir ensemble. Le seul rempart a ete un controle LOCAL au produit (fraicheur du PDF), pas le sceau du pilot, qui ne regardait pas ce fichier.</p></dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">Sebastien — mandat « 3 : Tout traiter directement » du 28/08/2026, qui tranche EN BLOC les 22 candidatures alors en attente d'arbitrage</p></dd></div></dl>
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-08-31</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">Une recette NEUVE est nee avec la correction — ce controle n'en avait aucune, ni sens vert ni sens rouge, ce qui avait permis d'etendre son champ sans qu'aucun mecanisme ne dise si l'extension marchait. 5/5 cas : sceau pose, PDF intact non accuse, PDF modifie a indice inchange denonce en J-1 bloquant, indice neuf non puni, hors convention non juge. EPROUVE PAR MUTATION : en retirant le PDF du champ, la recette tombe a 3/5 ; restauree, 5/5.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><p class="jalon-prose">Le PDF entre dans le champ du sceau — extension ajoutee au jeu juge ET a la convention de nommage date. L'item recommandait la SECONDE variante, un controle de coherence de jeu sans lire le PDF ; la mesure a renverse ce choix : le sceau hache un BUFFER, sans encodage, donc rien n'exigeait que le contenu soit lisible et la premiere variante coutait deux lignes. L'effet de bord a ete mesure AVANT d'etre suppose : zero fichier PDF dans ce depot, donc aucun livrable existant ne bascule sous controle par surprise. La borne restante est DECLAREE au non_juge : deux formats sont desormais scelles separement, ce qui attrape la modification silencieuse de l'un ou de l'autre, mais l'ABSENCE de l'un des deux reste un autre sujet.</p></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">digit-ai-factory (scripts/verifier-jugement.mjs)</p></dd></div><div><dt>Forge réellement touchée</dt><dd title="dépôt de forge réellement modifié par la correction — nom brut du registre">digit-ai-factory</dd></div><div><dt>Produits bénéficiaires</dt><dd title="produits ou missions ayant bénéficié de la correction, nommés au registre">toute famille de livrables declarant deux formats : la version imprimable diffusee cesse de pouvoir deriver en silence</dd></div></dl>
+            </li>
+            <li class="jalon j-maj">
+              <p class="jalon-tete"><strong>maj</strong> <span class="jalon-date">2026-08-31</span></p>
+              
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-08-31</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
+        <article class="card s-corrige" id="item-TF-0691" data-forge="digit-ai-factory" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0691</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : digit-ai-factory">digit-ai-factory</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-08-31</span>
+          </header>
+          <h3 class="card-titre">pilot : le cablage de la regle 5 DETECTE apres coup, il n ALLOUE jamais avant d ecrire - un livrable produit par script n est donc protege par rien</h3>
+          <div class="card-detail" data-cite><p class="lead">CONSTAT DU 27/08. scripts\verifier-jugement.mjs compare un livrable a un sceau pose au premier passage d oracles et refuse une modification a indice inchange (TF-0523, 23/08). Deux bornes, toutes deux assumees et ecrites : il ne juge que les livrables SCELLES (un livrable non scelle n est pas en defaut : c est un etat, et il est declare, REGLES-PROJET.md) et que les extensions .html/.htm/.md (const JUGES = new Set, ligne 37). OR UN GENERATEUR ECRIT SON NOM DE SORTIE AVANT TOUT PASSAGE D ORACLE : il n y a pas de sceau a ce moment-la, par construction. Le generateur de fiche securite de ce produit portait donc son indice dans une constante (const BASE = ... - Dev - 20260827a) et reecrivait le meme nom a chaque execution. C est la reproduction exacte du defaut fondateur de TF-0523 - le meme fichier ecrase quatre fois - quatre jours plus tard, par un autre acteur, PAR LA VOIE QUE LE REMEDE NE COUVRE PAS. PROPOSITION : livrer l allocation comme une FONCTION et pas seulement la violation comme un VERDICT. Un module du pilot, scripts\allouer-indice.mjs, exposant allouerIndice avec dossier, prefixe, jour et contenu, qui rend : a si rien n existe ce jour ; l indice EXISTANT si le contenu est identique (une re-generation a contenu inchange n est pas une nouvelle version, sinon l outil pond un fichier par lancement) ; l indice SUIVANT sinon. La comparaison se fait sur une forme canonique ou l indice est neutralise, parce que la reference imprimee dans le document contient l indice et ferait croire a une difference a chaque fois. Corollaire : tout gabarit de generateur de la bibliotheque l importe au lieu de porter une constante. verifier-jugement.mjs reste utile pour l edition a la main, mais il ne peut pas attraper ce qu un script ecrit avant d exister.</p></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 4 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-08-27</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">Produit-04</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">Produit-04 - RETOURS - 20260827a.md (evolution controles de saisie P2.2 du 27/08/2026, hors run ; aucun ledger dans ce produit, absence declaree au carnet des ecarts assumes)</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">pilot</dd></div><div><dt>Score d'entrée</dt><dd>1 — gain 3 × preuve 1 ÷ effort 3</dd></div><div class="pleine"><dt>Coût déjà payé</dt><dd><p class="jalon-prose">Mesure sur le depot Produit-04 le 27/08/2026 : le nom Client-A - CAL - Fiche Securite Mise a disposition - Dev - 20260827a.html a designe TROIS contenus differents - empreintes SHA-256 dac2a310e9acb164 (commit 25c59fd), e0ace645febd37ce (commit 7e3e9ff), 54ceefbdb0bbd68b (arbre de travail) - dont DEUX ont ete POUSSES sur origin/main. Quatre ecritures horodatees 15:45, 15:46, 16:05 et 16:24, soit quatre ecrasements en 80 minutes. Aucun controle n a rien vu, et il n y avait rien a voir : le fichier n etait pas scelle. Defaut trouve par relecture humaine du commanditaire, qui a demande pourquoi la regle d indice n etait pas respectee.</p></dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">Sebastien — mandat « 3 : Tout traiter directement » du 28/08/2026, qui tranche EN BLOC les 22 candidatures alors en attente d'arbitrage</p></dd></div></dl>
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-08-31</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">Recette NEUVE allouer-indice.test.mjs : 9/9 — les trois promesses du contrat dans les deux sens, la neutralisation prouvee sur la scene reelle (reference auto-citee), les bornes (autre jour, autre extension, prefixe a caracteres speciaux, jour mal forme refuse, dossier absent tolere). EPROUVE PAR MUTATION : la comparaison brute remise a la place de la canonique fait tomber la recette a 8/9 sur exactement le cas de la reference auto-citee.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><p class="jalon-prose">L'allocation livree comme une FONCTION : scripts/allouer-indice.mjs exporte allouerIndice({dossier, prefixe, jour, contenu, extension}) — `a` si rien n'existe ce jour, l'indice EXISTANT si le contenu est identique (une re-generation a contenu inchange n'est pas une nouvelle version), l'indice SUIVANT sinon. La comparaison se fait sur une forme canonique ou `&lt;jour&gt;&lt;lettre&gt;` est neutralise, parce que la reference imprimee DANS le document contient l'indice et ferait differer deux contenus identiques a chaque lancement. Le module n'ecrit rien, ne juge rien, et declare sa fenetre de course (deux generateurs simultanes). references/PRODUCTION-OOXML.md le prescrit a tout generateur a la place d'une constante.</p></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">digit-ai-factory (scripts/allouer-indice.mjs)</p></dd></div><div><dt>Forge réellement touchée</dt><dd title="dépôt de forge réellement modifié par la correction — nom brut du registre">digit-ai-factory</dd></div><div><dt>Produits bénéficiaires</dt><dd title="produits ou missions ayant bénéficié de la correction, nommés au registre">tout generateur de livrable date du parc — la voie que verifier-jugement.mjs ne peut pas couvrir par construction (pas de sceau avant le premier passage d'oracles) est desormais outillée en amont</dd></div></dl>
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-08-31</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
+        <article class="card s-corrige" id="item-TF-0690" data-forge="digit-ai-factory" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0690</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : digit-ai-factory">digit-ai-factory</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-08-31</span>
+          </header>
+          <h3 class="card-titre">factory : un livrable produit ne porte ni l identifiant ni la version de son gabarit</h3>
+          <div class="card-detail" data-cite><p class="lead">FAIT MESURE : la fiche securite de Produit-11 porte en en-tete sa date et sa reference documentaire, et rien d autre — ni gd-fiche-securite, ni version.</p><ul class="puces"><li>Une instance perimee est donc INVISIBLE SUR L ARTEFACT : un exploitant, un auditeur ou un RSSI qui tient la fiche ne peut pas savoir si elle respecte le catalogue en vigueur</li><li>DEJA REMONTE PAR UN AUTRE PRODUIT, le 24/08, mot pour mot : « le document ne porte aucune version de gabarit dans son en-tete, et c est deja un manque en soi »</li><li>Encore vrai trois jours plus tard, sur un autre produit</li><li>CONSEQUENCE PRATIQUE MESURABLE : la section R-46 du gabarit de retours demande de reporter le couple gabarit + version_du_gabarit</li><li>Un produit honnete ne peut repondre que « aucun » — ce qui prive la factory du seul signal dont elle a besoin pour savoir quelle version circule</li><li>PROPOSITION : le bloc d en-tete de chaque gabarit porte gabarit: &lt;id&gt; et version_du_gabarit: &lt;semver&gt;, RENDUS DANS LE DOCUMENT LIVRE — visibles, pas seulement en commentaire</li><li>Corollaire qui ferme la boucle avec le retour precedent : un oracle peut alors juger un artefact SANS registre, en comparant la version qu il porte a celle du catalogue</li><li>C est le controle le moins cher de la chaine, et le seul qui fonctionne sur un document recu par courriel, hors de tout depot</li></ul></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 4 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-08-27</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">Produit-11</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">lot Produit-11 - RETOURS - 20260827b, forge/ledger.jsonl seq 166</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">factory</dd></div><div><dt>Score d'entrée</dt><dd>1 — gain 3 × preuve 1 ÷ effort 3</dd></div><div class="pleine"><dt>Coût déjà payé</dt><dd><p class="jalon-prose">impossible de dater la conformite d une fiche remise ; la section R-46 du gabarit de retours ne peut etre remplie par aucun produit de la famille, ce qui rend muet le seul canal d amelioration des gabarits</p></dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">Sebastien — mandat « 3 : Tout traiter directement » du 28/08/2026, qui tranche EN BLOC les 22 candidatures alors en attente d'arbitrage</p></dd></div></dl>
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-08-31</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">Self-test 7/7 avec G4 dans les DEUX sens (couple rendu → PASS ; document sans couple → FAIL) ; verdict live du parc PASS apres mise a niveau, la regle ayant d'abord rendu FAIL sur exactement les 4 fichiers mesures a la main — l'oracle et la mesure disent la meme chose. Le corollaire de l'item est acquis : un artefact peut etre juge SANS registre, en comparant la version qu'il porte a celle du catalogue — c'est ce que verifier-jeu-livrables (TF-0702) exploite des aujourd'hui pour la famille.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><p class="jalon-prose">Regle G4 posee : squelette ET instance de chaque famille RENDENT `Gabarit : gd-… · version du gabarit x.y.z`, visiblement — un commentaire HTML ne compte pas, il ne se rend pas. Mesure AVANT correction : 4 fichiers sur 7 ne le rendaient pas (les deux familles dossier-*), 1 famille sur 3 le faisait deja (rapport-de-donnees) et la famille Markdown passait. Les 4 fichiers portent desormais le couple en pied de page, avec la mention « a reporter tel quel dans tout retour sur ce document » qui alimente R-46, et la version des deux familles modifiees monte a 1.1.0 (rendue ET declaree au GABARIT.md — un gabarit est un livrable, il suit la regle 5).</p></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">digit-ai-factory (oracles/oracle-gabarits-documents.mjs G4 + gabarits/documents/*)</p></dd></div><div><dt>Forge réellement touchée</dt><dd title="dépôt de forge réellement modifié par la correction — nom brut du registre">digit-ai-factory</dd></div><div><dt>Produits bénéficiaires</dt><dd title="produits ou missions ayant bénéficié de la correction, nommés au registre">tout lecteur d'un document produit — exploitant, auditeur, RSSI — qui peut enfin dater la conformite de ce qu'il tient, y compris recu par courriel hors de tout depot</dd></div></dl>
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-08-31</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
+        <article class="card s-corrige" id="item-TF-0688" data-forge="digit-ai-factory" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0688</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : digit-ai-factory">digit-ai-factory</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-08-31</span>
+          </header>
+          <h3 class="card-titre">factory : la destination des documents produits n est declaree nulle part</h3>
+          <div class="card-detail" data-cite><p class="lead">FAIT MESURE : le livrable a ete ecrit dans input/, a cote du document de reference fourni par le client, alors que output/ porte deja une arborescence dediee (« 02 - Presentation Design Authority »).</p><ul class="puces"><li>Aucune consigne de destination n a ete trouvee dans le depot : grep -rilE &quot;dans output|livrables produits&quot; sur docs/ et forge/ ne rend rien. La convention existait — dans la tete du client et dans la structure des dossiers — mais nulle part ou un producteur la lirait. PROPOSITION : une ligne dans la procedure de production. input/ est en LECTURE SEULE, c est ce que le client fournit</li><li>output/ recoit ce que le projet produit</li><li>et le sous-dossier se choisit dans l arborescence existante plutot que d en creer un. C est controlable : un producteur qui ecrit sous input/ peut etre refuse</li></ul></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 4 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-08-27</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">Produit-11</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">lot Produit-11 - RETOURS - 20260827a, forge/ledger.jsonl seq 165</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">factory</dd></div><div><dt>Score d'entrée</dt><dd>1 — gain 3 × preuve 1 ÷ effort 3</dd></div><div class="pleine"><dt>Coût déjà payé</dt><dd><p class="jalon-prose">une reprise demandee explicitement par le destinataire</p></dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">Sebastien — mandat « 3 : Tout traiter directement » du 28/08/2026, qui tranche EN BLOC les 22 candidatures alors en attente d'arbitrage</p></dd></div></dl>
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-08-31</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">La convention qui vivait « dans la tete du client et dans la structure des dossiers » est desormais lisible la ou un producteur travaille — et propagee aux produits par l'heritage existant (CLAUDE-PRODUIT est un artefact herite, son ecart se releve a chaque lot). Verification : README d'input\ regenere par le hook avec le role neuf et l'ouverture de chapitre, juge de lisibilite passe.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><p class="jalon-prose">La regle est ecrite AUX TROIS ENDROITS ou un producteur la lirait : precision TF-0688 a la regle 1 de REGLES-PROJET.md (`input\` en LECTURE SEULE pour tout producteur, le livrable va sous `output\` dans le sous-dossier EXISTANT qui correspond, jamais dans un dossier cree pour l'occasion) ; le bloc role du README genere d'input\ ; et le gabarit CLAUDE-PRODUIT.md que l'heritage fait voyager jusqu'aux produits. Au passage, la cause d'un refus du juge de lisibilite a ete corrigee A LA SOURCE : le generateur de README ouvrait son chapitre « Contenu » directement par la table (M7) — il emet desormais sa phrase d'ouverture pour tous les README du depot.</p></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">digit-ai-factory (REGLES-PROJET.md regle 1 + input/README.md role + gabarits/CLAUDE-PRODUIT.md)</p></dd></div><div><dt>Forge réellement touchée</dt><dd title="dépôt de forge réellement modifié par la correction — nom brut du registre">digit-ai-factory</dd></div></dl>
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-08-31</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
+        <article class="card s-corrige" id="item-TF-0687" data-forge="digit-ai-factory" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0687</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : digit-ai-factory">digit-ai-factory</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-08-31</span>
+          </header>
+          <h3 class="card-titre">factory : quand un document de reference est fourni, la charte est deduite au lieu d etre relevee</h3>
+          <div class="card-detail" data-cite><p class="lead">FAIT MESURE : premier livrable produit hors charte.</p><ul class="puces"><li>L identite visuelle avait ete deduite d un histogramme des couleurs du XML des diapositives. Or la couverture de la reference est un DEGRADE VERT porte par une IMAGE (ppt/media/image1.png, #006A2B -&gt; #3EA867) : aucun comptage de couleurs de XML ne peut la voir. Le livrable est sorti BLEU sur fond blanc, c est-a-dire avec la mauvaise couleur de marque en couverture. MEME CAUSE, SECOND ECART : la geometrie avait ete relevee sur une liste de formes TRONQUEE (14 premieres), d ou des cartes de 4 a 6 cm la ou la reference en porte de 9,83 x 11,23 cm au pas de 10,44, remplissant la page de y=5,79 a y=17,02. Les pages etaient creuses, et le premier reflexe a ete de RATTRAPER le creux par des rustines verticales au lieu de corriger la cause. CE QUE LA REFERENCE OFFRAIT ET QUI N A PAS ETE VU : 11 medias, dont 9 icones 256x256 monochromes directement reemployables, et une grille mesurable au centieme de centimetre. PROPOSITION : une procedure de RELEVE DE CHARTE, a jouer avant d ecrire une ligne, en trois gestes</li><li>inventaire de ppt/media avec dimensions et couleurs dominantes — c est la que vit l identite</li><li>extraction COMPLETE, jamais tronquee, de la geometrie et de la typographie d une diapositive de contenu, run par run</li><li>REEMPLOI des ressources de la reference plutot que reinvention. Corollaire a ecrire noir sur blanc : une page creuse est un symptome de grille mal relevee, pas un espace a combler</li></ul></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 4 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-08-27</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">Produit-11</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">lot Produit-11 - RETOURS - 20260827a, forge/ledger.jsonl seq 165</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">factory</dd></div><div><dt>Score d'entrée</dt><dd>1 — gain 3 × preuve 1 ÷ effort 3</dd></div><div class="pleine"><dt>Coût déjà payé</dt><dd><p class="jalon-prose">un livrable entierement refait apres le verdict du destinataire : « ne respecte pas DU TOUT la charte Client-A du document fourni en entree ». Le support ne portait pas non plus de schema d architecture, dans une Design Review d architecture</p></dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">Sebastien — mandat « 3 : Tout traiter directement » du 28/08/2026, qui tranche EN BLOC les 22 candidatures alors en attente d'arbitrage</p></dd></div></dl>
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-08-31</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">references/PRODUCTION-OOXML.md porte la procedure avec ses mesures d'origine, adossee au controle executable de TF-0686 (meme document) et aux regles de destination (TF-0688) et d'indice (TF-0691) — la chaine de production OOXML a desormais UNE reference, la ou chaque defaut avait ete paye isolement. LIMITE DECLAREE : une procedure est de la prose — aucun oracle ne mesure qu'elle est jouee ; le controle d'ordre (TF-0686) et le verdict du destinataire restent les seuls juges.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><p class="jalon-prose">La procedure de RELEVE DE CHARTE est ecrite en trois gestes, a jouer avant d'ecrire une ligne : (1) inventaire de ppt/media avec dimensions et couleurs dominantes — c'est la que vit l'identite, et c'est la que le degrade vert porte par une image echappait a tout comptage de couleurs du XML ; (2) extraction COMPLETE, jamais tronquee, de la geometrie et de la typographie d'une diapositive de contenu — la liste tronquee aux 14 premieres formes a donne des cartes de 4-6 cm pour des cartes de 9,83 × 11,23 cm ; (3) REEMPLOI des ressources de la reference plutot que reinvention. Le corollaire est ecrit noir sur blanc : une page creuse est un symptome de grille mal relevee, pas un espace a combler.</p></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">digit-ai-factory (references/PRODUCTION-OOXML.md)</p></dd></div><div><dt>Forge réellement touchée</dt><dd title="dépôt de forge réellement modifié par la correction — nom brut du registre">digit-ai-factory</dd></div></dl>
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-08-31</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
+        <article class="card s-corrige" id="item-TF-0686" data-forge="digit-ai-factory" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0686</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : digit-ai-factory">digit-ai-factory</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-08-31</span>
+          </header>
+          <h3 class="card-titre">factory : un paquet OOXML genere peut etre invalide sans que rien ne le signale a la generation</h3>
+          <div class="card-detail" data-cite><p class="lead">FAIT MESURE : le livrable .pptx remis a fait afficher a PowerPoint « un probleme dans le contenu … PowerPoint peut essayer de reparer », avec des defauts d affichage constates par le destinataire.</p><ul class="puces"><li>Cause relevee dans le paquet dezippe, ppt/slides/slide3.xml : sur deux connecteurs, l ordre des enfants de a:ln etait « prstDash -&gt; solidFill -&gt; srgbClr -&gt; tailEnd » alors que le schema CT_LineProperties impose « remplissage -&gt; prstDash -&gt; cap/join -&gt; headEnd -&gt; tailEnd »</li><li>Le code inserait prstDash en tete (ln.insert(0, ...))</li><li>CE QUI REND LE DEFAUT COUTEUX : python-pptx a ecrit cet arbre SANS RIEN SIGNALER, unzip -t declare l archive saine (« No errors detected »), et seul PowerPoint chez le client le decouvre — en proposant une reparation qui perd du formatage en silence</li><li>Le defaut se paie donc deux fois : a l ouverture, puis a l impression</li><li>PROPOSITION : un controle d ordre des enfants, BLOQUANT AVANT ECRITURE, dans tout producteur de .pptx/.docx/.xlsx</li><li>Ecrit ici en 14 lignes : il compare l ordre trouve a la sequence du schema pour a:ln et a:rPr, refuse d ecrire, et nomme la diapositive et la forme fautive</li><li>Apres correctif : 120 blocs a:ln et 186 blocs a:rPr controles, 0 en faute</li><li>Reutilisable tel quel</li></ul></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 4 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-08-27</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">Produit-11</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">lot Produit-11 - RETOURS - 20260827a, forge/ledger.jsonl seq 165</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">factory</dd></div><div><dt>Score d'entrée</dt><dd>1 — gain 3 × preuve 1 ÷ effort 3</dd></div><div class="pleine"><dt>Coût déjà payé</dt><dd><p class="jalon-prose">un livrable remis au client, refuse a l ouverture par PowerPoint, plus un aller-retour complet de correction ; la reparation proposee degrade le formatage sans le dire</p></dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">Sebastien — mandat « 3 : Tout traiter directement » du 28/08/2026, qui tranche EN BLOC les 22 candidatures alors en attente d'arbitrage</p></dd></div></dl>
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-08-31</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">Recette NEUVE verifier-ooxml.test.mjs : 3/3 — la rouge rejoue l'ordre exact du 27/08 (prstDash avant solidFill, celui que ln.insert(0,…) produisait) sur un vrai paquet zip bati par le python du poste, la verte porte le meme bloc dans l'ordre du schema, la borne prouve qu'un non-zip rend ILLISIBLE et jamais un verdict. Sans python, la recette se declare NON JOUEE au lieu de faire mentir le banc.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><p class="jalon-prose">Controle d'ordre des enfants OOXML, stdlib python seule : ouvre le paquet (.pptx/.docx/.xlsx), parcourt chaque partie XML, verifie que les enfants de a:ln, a:rPr et a:defRPr suivent la sequence de leur schema (remplissage → prstDash → cap/join → headEnd → tailEnd pour CT_LineProperties). FAIL nomme le fichier, la partie et l'element, avec l'ordre trouve et l'ordre attendu ; un fichier illisible sort en 2, jamais en verdict. Les bornes sont declarees : seule la classe PAYEE est couverte (l'etendre = une sequence de plus), un enfant inconnu n'est jamais accuse. Prescrit en gate bloquante apres generation et avant remise par references/PRODUCTION-OOXML.md — le motif subprocess fonctionne depuis Python comme depuis Node, le produit du cas reel le pratique deja avec verifier-pdf.mjs.</p></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">digit-ai-factory (scripts/verifier-ooxml.py)</p></dd></div><div><dt>Forge réellement touchée</dt><dd title="dépôt de forge réellement modifié par la correction — nom brut du registre">digit-ai-factory</dd></div><div><dt>Produits bénéficiaires</dt><dd title="produits ou missions ayant bénéficié de la correction, nommés au registre">tout producteur de .pptx/.docx/.xlsx du parc — le defaut que python-pptx ecrit sans rien dire et qu'unzip -t declare sain cesse d'etre decouvert par PowerPoint chez le client</dd></div></dl>
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-08-31</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
+        <article class="card s-corrige" id="item-TF-0685" data-forge="digit-ai-factory" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0685</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : digit-ai-factory">digit-ai-factory</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-08-31</span>
+          </header>
+          <h3 class="card-titre">hook-produits-intacts : tout ce qui DISCULPE un mouvement est avalé dès qu'un seul écart existe — `declares` est rendu après un `process.exit(0)`</h3>
+          <div class="card-detail" data-cite><p class="lead">TROUVÉ EN VÉRIFIANT UN GESTE MANDATÉ (mandat « 1a &amp; 2a » du 27/08 : archiver le clone périmé `Digit-AI - Saas Forge`).</p><ul class="puces"><li>Le renommage d'un dépôt PRODUIT SUIVI n'a été déclaré NULLE PART par le hook censé déclarer tout mouvement chez un produit. LA CAUSE EST STRUCTURELLE, pas un oubli de cas : `oracles/hook-produits-intacts.mjs` remplit DEUX listes — `ecarts` (mouvement inexpliqué) et `declares` (mouvement EXPLIQUÉ : « dépôt absent à la fin du tour », « MANDAT DÉCLARÉ », « LE PRODUIT S'EST MODIFIÉ LUI-MÊME »). La branche `if (r.verdict === &quot;FAIL&quot;)` imprime les `ecarts` puis appelle `process.exit</li><li>` ; la ligne qui imprime `declares` est la ligne SUIVANTE, donc INATTEIGNABLE dès qu'un seul écart existe. CONSÉQUENCE, et c'est l'inverse de l'intention : plus il y a de mouvement, moins le lecteur reçoit d'information disculpante — alors que le long texte du hook lui prescrit précisément d'aller vérifier si le mouvement vient d'une autre session. La disculpation n'apparaît que quand il n'y a rien à disculper. MESURE À TROIS POINTS, sur le cas réel du 27/08 :</li><li>le chemin relevé à l'ouverture n'existe plus — existsSync rend false</li><li>il est toujours dans le relevé d'ouverture — clé présente dans `.oracles/produits-au-demarrage.json`</li><li>le hook n'en dit rien — zéro ligne préfixée info et zéro occurrence de « saas » sur sa sortie complète. Trois autres produits bougeaient le même tour, ce qui a mis le verdict à FAIL et déclenché la sortie anticipée. CE QUI EST DEMANDÉ : rendre `declares` AVANT la sortie de la branche FAIL, et non après — plus une recette qui joue les deux listes NON VIDES en même temps, puisque c'est exactement la combinaison qu'aucune fixture ne couvrait. NON JUGÉ ICI : si « MANDAT DÉCLARÉ » a déjà été avalé par le passé sur un tour à écarts, le registre ne le dirait pas — un mandat correctement posé et jamais affiché est indiscernable d'un mandat jamais posé</li></ul></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 4 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-08-27</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">pilot (constat en passant, mandat « 1a &amp; 2a » du 27/08)</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">vérification du renommage de `Digit-AI - Saas Forge` en `_archive-digit-ai-saas-forge`</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">digit-ai-factory</dd></div><div><dt>Score d'entrée</dt><dd>4 — gain 3 × preuve 5 ÷ effort 1</dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">Sebastien — mandat « 3 : Tout traiter directement » du 28/08/2026, qui tranche EN BLOC les 22 candidatures alors en attente d'arbitrage</p></dd></div></dl>
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-08-31</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">Recette produits-intacts portee de 13 a 14 cas, 14/14. Le cas a ete EPROUVE PAR MUTATION : en remettant l'impression apres la branche d'echec, la recette tombe a 13/14 ; restauree, elle rend 14/14. Le defaut ne peut donc plus revenir sans casser le banc.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><p class="jalon-prose">L'impression des mouvements DECLARES passe AVANT la branche d'echec, et non apres son process.exit : ce qui disculpe se lit desormais dans les deux verdicts, et d'abord. Le rendu a ete extrait en fonction rendre() pour que la recette puisse jouer le chemin REEL du hook — le mode de recette existant n'exercait que comparer() et imprimait son JSON, si bien que ce defaut lui etait structurellement invisible. Un cas neuf a ete ajoute, AUTONOME parce que comparer() remet le releve a jour quand le verdict est PASS : il prend son propre releve, l'antidate, provoque un mouvement EXPLIQUE et un mouvement INEXPLIQUE en une fois, puis verifie sur la sortie complete que [info] et [avert] sont tous deux presents ET dans cet ordre.</p></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">digit-ai-factory (oracles/hook-produits-intacts.mjs)</p></dd></div><div><dt>Forge réellement touchée</dt><dd title="dépôt de forge réellement modifié par la correction — nom brut du registre">digit-ai-factory</dd></div><div><dt>Produits bénéficiaires</dt><dd title="produits ou missions ayant bénéficié de la correction, nommés au registre">tout produit suivi : un mouvement explique cesse d etre avale des qu un autre produit bouge sans explication</dd></div></dl>
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-08-31</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
+        <article class="card s-corrige" id="item-TF-0680" data-forge="digit-ai-factory" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0680</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : digit-ai-factory">digit-ai-factory</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-08-28</span>
+          </header>
+          <h3 class="card-titre">Un lot de travaux dont le contenu est un SOUS-ENSEMBLE d'un lot déjà déposé est redéposé quand même</h3>
+          <div class="card-detail" data-cite><p class="lead">Relevé en vérifiant le dépôt du lot 20260826c.</p><ul class="puces"><li>L'idempotence de `emettre-travaux.mjs` repose sur une empreinte du contenu confié : deux lots au même contenu ne se redéposent pas. MESURE PRISE DANS L'HEURE : le produit a installé l'un des artefacts que le lot c demandait</li><li>l'empreinte a donc changé, et l'émetteur s'apprêtait à déposer un lot d de 5 éléments là où c en portait 6 — les 5 étant STRICTEMENT INCLUS dans les 6. Le produit aurait reçu deux lots quasi identiques en moins d'une heure, le second n'apportant RIEN de neuf. LE COMPORTEMENT EST CORRECT AU SENS DE LA RÈGLE ÉCRITE — le contenu a bien changé — ET NUISIBLE AU SENS DE CE QU'ELLE PROTÈGE : « sans cela, deux exécutions du même relevé enseveliraient le produit sous des lots identiques, et le canal deviendrait la nuisance qu'il est censé éviter » (R-33 bis, en-tête du script). La règle mesure l'ÉGALITÉ des contenus quand la propriété visée est l'ABSENCE DE NOUVEAUTÉ. CE QUI EST DEMANDÉ : qu'un lot ne soit pas déposé quand l'ensemble de ses éléments est INCLUS dans celui d'un lot déjà présent et non traité — l'inclusion se lisant sur les identifiants d'éléments, pas sur le texte. À NE PAS SOUS-ESTIMER : un lot déjà TRAITÉ par le produit ne doit pas bloquer un redépôt, sans quoi un constat rouvert n'atteindrait plus personne. La borne compte autant que la règle. NON MESURÉ : combien de lots du parc sont dans ce cas — aucun relevé n'a été fait au-delà de ce produit</li></ul></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 4 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-08-26</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">pilot (constat d'exécution du mandat « 3a » du 26/08)</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">vérification du dépôt du lot 20260826c — TF-0673</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">digit-ai-factory</dd></div><div><dt>Score d'entrée</dt><dd>7.5 — gain 3 × preuve 5 ÷ effort 2</dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">Sebastien — mandat « 3 : Tout traiter directement » du 28/08/2026, qui tranche EN BLOC les 22 candidatures alors en attente d'arbitrage</p></dd></div></dl>
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">Recette de l'emetteur : 26 PASS, 0 FAIL, contre 24 avant — les deux cas neufs sont la regle et sa borne. LE PREMIER JET DU CAS NE PROUVAIT RIEN et le durcissement l'a montre : il acceptait aussi bien l'ancien message d'egalite d'empreinte que le neuf, et passait au vert sans exercer la regle. Rendu strict, il a echoue — puis une seconde cause est apparue : le produit installait un fichier BOUCHON, ce qui rendait l'artefact PERIME au lieu de le faire disparaitre, l'element changeait de libelle et l'inclusion n'existait plus. Le cas installe desormais le VRAI gabarit, reproduisant la scene du 26/08.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><p class="jalon-prose">L'emetteur ne depose plus un lot dont TOUS les elements sont deja dans un lot present et encore `a_traiter`. L'inclusion se lit sur les ELEMENTS (les titres de section du lot, qui portent l'identifiant et la cible), jamais sur le texte : deux formulations d'un meme constat sont le meme travail pour le produit. LA BORNE EST CABLEE AUSSI : un lot DEJA TRAITE ne bloque rien, sans quoi un constat rouvert n'atteindrait plus personne.</p></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">digit-ai-factory (todo/emettre-travaux.mjs)</p></dd></div><div><dt>Forge réellement touchée</dt><dd title="dépôt de forge réellement modifié par la correction — nom brut du registre">digit-ai-factory</dd></div></dl>
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-08-31</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
         <article class="card s-corrige" id="item-TF-0675" data-forge="digit-ai-factory" data-statut="corrige">
           <header class="card-head">
             <code class="tf-id">TF-0675</code>
@@ -23057,7 +23526,7 @@ HORS PORTEE DU PILOT SANS MANDAT : la correction vit chez forge-tests, et les tr
         </div>
       </section>
     </main>
-    <footer>Page générée par <code>todo/generer-archive.mjs</code> — ne pas éditer. Source unique : <code>todo/TODO-ARCHIVE.jsonl</code> (sceau <code>72692a35ee91</code> — si la source a bougé sans régénération, le sceau ne correspond plus). Détail brut d'un item : <code>grep '"id":"TF-xxxx"' todo/TODO-ARCHIVE.jsonl</code>. Le reste-à-faire vit dans <code>todo/TODO.html</code>.</footer>
+    <footer>Page générée par <code>todo/generer-archive.mjs</code> — ne pas éditer. Source unique : <code>todo/TODO-ARCHIVE.jsonl</code> (sceau <code>e9c36f97ba63</code> — si la source a bougé sans régénération, le sceau ne correspond plus). Détail brut d'un item : <code>grep '"id":"TF-xxxx"' todo/TODO-ARCHIVE.jsonl</code>. Le reste-à-faire vit dans <code>todo/TODO.html</code>.</footer>
   </div>
   <!-- S-G1 (4/4, R-30) — câblage : persistance + aria-pressed, aucune bascule muette -->
   <script>
