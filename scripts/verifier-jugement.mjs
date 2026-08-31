@@ -34,11 +34,24 @@ import { createHash } from "node:crypto";
 const args = process.argv.slice(2);
 const SCELLER = args.includes("--sceller");
 const cibles = args.filter((a) => !a.startsWith("--"));
-const JUGES = new Set([".html", ".htm", ".md"]);
+// TF-0692 (31/08/2026) — LE PDF ENTRE DANS LE CHAMP DU SCEAU.
+//
+// LE FAIT : des familles de livrables declarent DEUX formats, html et pdf. Le controle n'en jugeait
+// qu'un : la moitie du jeu etait hors de portee, Y COMPRIS QUAND ELLE ETAIT SCELLEE. Une paire
+// pouvait donc se desynchroniser — le document corrige, sa version imprimable restee en arriere —
+// sans que rien ne le dise, et c'est la version imprimable qui est DIFFUSEE.
+//
+// L'ITEM PROPOSAIT DEUX VARIANTES ET RECOMMANDAIT LA SECONDE, moins ambitieuse : un controle de
+// coherence de jeu, sans lire le PDF. La MESURE a renverse ce choix. Le sceau hache un BUFFER —
+// `sha(readFileSync(f))`, sans encodage — donc rien n'exigeait que le contenu soit lisible : la
+// premiere variante coutait deux lignes, pas un dispositif. Et l'effet de bord a ete mesure avant
+// d'etre suppose : ZERO fichier PDF dans ce depot, donc aucun livrable existant ne bascule sous
+// controle par surprise.
+const JUGES = new Set([".html", ".htm", ".md", ".pdf"]);
 // Le nom d'un livrable porte sa date et son indice (règle 4) : c'est cela qui doit changer quand le
 // contenu change. Un fichier hors convention n'est pas jugé — les README, notices et registres
 // générés ne sont pas des livrables datés.
-const NOMME_LIVRABLE = /\s-\s\d{8}[a-z]\.(html?|md)$/i;
+const NOMME_LIVRABLE = /\s-\s\d{8}[a-z]\.(html?|md|pdf)$/i;
 const SCEAU = ".jugement.json";
 
 const findings = [];
@@ -52,6 +65,10 @@ const NON_JUGE = [
   "la QUALITÉ du contenu : cet outil compare deux empreintes, il ne relit rien",
   "un fichier RENOMMÉ correctement (nouvel indice) : c'est exactement ce que la règle demande, et " +
   "son sceau naît avec lui",
+  "la COHÉRENCE D'UN JEU de formats : un livrable html scellé dont le pdf frère manque n'est pas " +
+  "signalé ici. Depuis le 31/08 les deux formats sont scellés SÉPARÉMENT, ce qui attrape la " +
+  "modification silencieuse de l'un ou de l'autre ; l'ABSENCE de l'un des deux reste un autre " +
+  "sujet, et il est déclaré plutôt que faussement promis",
 ];
 
 const sha = (b) => createHash("sha256").update(b).digest("hex");

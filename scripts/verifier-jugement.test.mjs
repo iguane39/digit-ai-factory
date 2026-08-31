@@ -93,6 +93,57 @@ check("un sceau ILLISIBLE est signalé, pas ignoré", () => {
   if (!/sceau illisible/.test(JSON.stringify(r.j))) throw new Error("un sceau cassé passe inaperçu — c'est un sceau absent qui se croit présent");
 });
 
+// ---- TF-0692 (31/08/2026) — LE PDF ENTRE DANS LE CHAMP DU SCEAU ------------------------------
+//
+// LE FAIT : des familles de livrables déclarent DEUX formats, html et pdf, et le contrôle n'en
+// jugeait qu'un. La moitié du jeu était hors de portée Y COMPRIS QUAND ELLE ÉTAIT SCELLÉE — donc
+// une paire pouvait se désynchroniser en silence, et c'est la version imprimable qui est DIFFUSÉE.
+//
+// L'item recommandait un contrôle de cohérence de jeu, sans lire le PDF. La mesure a renversé ce
+// choix : le sceau hache un BUFFER, sans encodage, donc rien n'exigeait que le contenu soit
+// lisible et l'extension coûtait deux lignes. Le contenu employé ici n'est d'ailleurs PAS un vrai
+// PDF, et c'est délibéré : en fabriquer un ferait croire que le format compte.
+//
+// DOSSIER PROPRE : ces cas vivent dans leur propre répertoire, sinon les fichiers ajoutés
+// fausseraient les compteurs `non_scelles` des cas ci-dessus — un banc qui se marche dessus finit
+// par être corrigé en affaiblissant ses assertions.
+{
+  const P = mkdtempSync(join(tmpdir(), "jugement-pdf-"));
+  const PDF = join(P, "Client - Fiche securite - 20260831a.pdf");
+  const jouerP = (...a) => {
+    const r = spawnSync(process.execPath, [OUTIL, P, ...a], { encoding: "utf8" });
+    let j = null;
+    try { j = JSON.parse(r.stdout || "null"); } catch { /* sortie illisible */ }
+    return { code: r.status, j };
+  };
+
+  check("un PDF scellé puis laissé intact ne déclenche rien", () => {
+    writeFileSync(PDF, Buffer.from("contenu initial du livrable imprimable"));
+    const s = jouerP("--sceller");
+    if (!existsSync(PDF + ".jugement.json")) throw new Error("le sceau n'est pas posé sur un PDF — l'extension ne sert à rien");
+    if (s.j.mesure.scelles !== 1) throw new Error(`${s.j.mesure.scelles} scellé(s), 1 attendu`);
+    const r = jouerP();
+    if (r.code !== 0) throw new Error(`exit ${r.code} sur un PDF inchangé`);
+  });
+
+  check("LE CAS QUI RENDAIT PASS AVANT : PDF modifié à indice INCHANGÉ → REFUS", () => {
+    writeFileSync(PDF, Buffer.from("contenu MODIFIE sans changer l'indice du nom"));
+    const r = jouerP();
+    if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1 — un PDF hors champ passait pour conforme`);
+    const t = JSON.stringify(r.j);
+    if (!/indice INCHANG/.test(t)) throw new Error("le motif ne nomme pas l'indice inchangé");
+    if (!/\.pdf/i.test(t)) throw new Error("le constat ne nomme pas le fichier PDF en cause");
+  });
+
+  check("un PDF hors convention de nommage daté reste NON JUGÉ", () => {
+    writeFileSync(join(P, "notice.pdf"), Buffer.from("hors convention, jamais un livrable a indice"));
+    const r = jouerP();
+    if (/notice\.pdf/.test(JSON.stringify(r.j))) throw new Error("une notice ordinaire est jugée — le bruit tuerait le contrôle");
+  });
+
+  rmSync(P, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+}
+
 rmSync(T, { recursive: true, force: true });
-console.log(`\nverifier-jugement (TF-0523) : ${pass} PASS, ${fail} FAIL`);
+console.log(`\nverifier-jugement (TF-0523, TF-0692) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
