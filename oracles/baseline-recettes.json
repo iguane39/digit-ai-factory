@@ -255,8 +255,8 @@
   "vu_le": "2026-08-26"
  },
  "scripts/verifier-jugement.test.mjs": {
-  "cas": 7,
-  "vu_le": "2026-08-26"
+  "cas": 10,
+  "vu_le": "2026-08-31"
  },
  "scripts/verifier-secours.test.mjs": {
   "cas": 7,

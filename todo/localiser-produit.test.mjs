@@ -48,7 +48,17 @@ try {
 
   check("la ponctuation du nom n'empêche rien : `mon-produit` reconnaît `MonProduit`", () => {
     att(normal("mon-produit") === normal("MonProduit"), "la normalisation ne rapproche pas les deux formes");
-    att(normal("Produit-11") === "Produit-11", "la normalisation est fausse");
+    // TF-0705 (31/08) — CETTE ASSERTION ÉTAIT AUTOCONTRADICTOIRE, et elle rendait ce banc rouge.
+    // Elle attendait que la normalisation d'un PSEUDONYME rende un nom de produit RÉEL, ce qu'une
+    // fonction qui se contente d'abaisser la casse et de retirer la ponctuation ne peut pas faire.
+    // La cause est une trace de la pseudonymisation de masse du 28/08 : la substitution a réécrit
+    // le membre GAUCHE de l'égalité — le nom réel devenu `Produit-11` — sans toucher le membre
+    // droit, qui portait sa forme normalisée. L'attente est restée figée sur l'ancien monde.
+    // C'est la classe de défaut qu'une substitution automatique produit toujours : elle voit du
+    // texte, pas une égalité. L'intention d'origine — casse et ponctuation ne séparent pas deux
+    // écritures du même nom — est rétablie ici sans dépendre d'aucun nom réel.
+    att(normal("Produit-11") === normal("PRODUIT 11"), "la casse et la ponctuation devraient se rejoindre");
+    att(normal("Produit-11") === "produit11", "la normalisation ne retire pas ce qu'elle prétend retirer");
   });
 
   check("il trouve par le NOM quand il n'y a pas de lot, et le DIT", () => {

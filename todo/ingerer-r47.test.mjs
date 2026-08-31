@@ -32,6 +32,17 @@ const check = (nom, fn) => {
 };
 
 const T = mkdtempSync(join(tmpdir(), "r47-"));
+
+/** Un parc d'essai VIDE mais utilisable : il porte les deux tables jetables que la chaine
+ *  d'ingestion exige depuis le 28/08 (voir la note dans `poste`). Sans elles, les deux bornes
+ *  « produit introuvable » echouent pour une raison qui n'est pas celle qu'elles mesurent. */
+const parcVide = () => {
+  const r = mkdtempSync(join(T, "poste-vide-"));
+  writeFileSync(join(r, "_noms-interdits.json"),
+    JSON.stringify({ noms: [], identifiants: [], sigles: [], pseudonymes: {} }), "utf8");
+  writeFileSync(join(r, "_produits-pseudonymes.json"), JSON.stringify({ produits: {} }), "utf8");
+  return r;
+};
 const LOT_CONFORME = "# lot\n\n## Remarques restées au produit\n\n"
   + "Aucune remarque n'est restée au produit — vérifié le 2026-08-23.\n\n"
   + "## Retours sur les documents produits\n\nAucun document produit depuis un gabarit.\n";
@@ -39,6 +50,21 @@ const LOT_CONFORME = "# lot\n\n## Remarques restées au produit\n\n"
 /** Pose un faux poste : une racine de forges contenant le produit nommé. */
 const poste = (nomProjet, { herite, sousDossier = null }) => {
   const racine = mkdtempSync(join(T, "poste-"));
+  // TF-0704 (31/08) — UN POSTE D'ESSAI A BESOIN DE SES PROPRES TABLES D'ANONYMISATION.
+  //
+  // Le 28/08, l'anonymisation est entrée DANS la chaîne d'ingestion : elle refuse d'écrire au
+  // registre si ses deux tables manquent, et c'est son comportement voulu — anonymiser à moitié
+  // ferait passer le registre pour propre. Cette recette isole son parc en posant `FORGE_ROOT` sur
+  // un répertoire jetable, si bien que l'anonymiseur y cherche des tables qui n'y sont pas : elle
+  // est rouge depuis ce jour-là, et pour une raison qui n'a rien à voir avec ce qu'elle mesure.
+  //
+  // Les tables posées ici sont JETABLES et vides de tout nom réel : ce banc juge le câblage de
+  // R-47 à l'ingestion, pas la substitution des noms. Leur présence suffit à ce que la chaîne
+  // consente à écrire, et c'est tout ce qu'on lui demande.
+  writeFileSync(join(racine, "_noms-interdits.json"),
+    JSON.stringify({ noms: [], identifiants: [], sigles: [], pseudonymes: {} }), "utf8");
+  writeFileSync(join(racine, "_produits-pseudonymes.json"),
+    JSON.stringify({ produits: {} }), "utf8");
   // TF-0555 (24/08) : le parc REEL range 22 produits sous un dossier client (`_Client-A\`), et la
   // recherche d'origine ne regardait que les enfants DIRECTS de la racine. Tous etaient donc hors
   // de portee, et le defaut que R-47 devait rattraper est reste vivant sur l'un d'eux. Le bac
@@ -110,7 +136,7 @@ check("verte — produit dont l'héritage est complet et à jour : aucun avertis
 });
 
 check("BORNE — produit introuvable sur le poste : déclaré non vérifié, JAMAIS accusé", () => {
-  const r = ingerer("ProduitAilleurs", mkdtempSync(join(T, "poste-vide-")));
+  const r = ingerer("ProduitAilleurs", parcVide());
   if (r.code !== 0) throw new Error(`exit ${r.code} — une remise venue d'ailleurs doit entrer`);
   if (!/NON vérifiée/.test(r.sortie)) throw new Error("le silence n'est pas déclaré — un produit qu'on ne localise pas n'est pas un produit en défaut");
   if (/AVERTISSEMENT/.test(r.sortie)) throw new Error("un produit absent du poste est accusé — ce serait crier sur toutes les remises venues d'ailleurs");
@@ -135,7 +161,7 @@ check("BORNE — produit introuvable : la NON-VERIFICATION est consignee au REGI
   // Une verification non faite qui ne laisse pas de trace est une verification qu'on croit faite.
   // Le message partait au seul flux d'erreur et disparaissait avec la session ; le registre en
   // garde desormais une ligne, avec le nom cherche et la racine balayee.
-  const r = ingerer("ProduitAilleurs2", mkdtempSync(join(T, "poste-vide-")));
+  const r = ingerer("ProduitAilleurs2", parcVide());
   if (!/dossier introuvable/.test(r.sortie)) throw new Error("le cas teste n'est pas celui du produit introuvable");
   const lignes = readFileSync(r.registre, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
   const trace = lignes.find((e) => e.heritage_non_verifie);
