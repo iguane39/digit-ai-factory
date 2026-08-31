@@ -208,6 +208,16 @@ const FORGES_CONNUES = [
 const deductions = [];
 
 // ---- validation intégrale AVANT toute écriture (rejet atomique) ----------------------------
+// TF-0703 — LE CANAL DE RECTIFICATION. Un lot remis ne se modifie JAMAIS, et c'est cette
+// immuabilité qui a forcé la déclaration de l'erreur du 28/08 : un lot affirmait qu'une fiche
+// était « maintenue à la main », le générateur versionné existait, et AUCUN champ du sidecar ne
+// permettait de le dédire. Un registre incapable de se corriger n'accumule pas de la
+// connaissance : il accumule aussi ses erreurs, avec le même poids. Deux champs OPTIONNELS :
+// `rectifie` (l'id TF visé) et `nature_de_la_rectification` (fait_errone | cause_erronee |
+// annule). Une ligne qui les porte MARQUE l'item visé (événement `maj` avec bloc
+// `rectification`) au lieu d'en créer un second sans lien. La règle d'immuabilité du lot
+// N'EST PAS assouplie — le geste complémentaire arrive par un NOUVEAU lot.
+const NATURES_RECTIFICATION = new Set(["fait_errone", "cause_erronee", "annule"]);
 const motifs = [];
 let candidatures = lignes.map((l, i) => {
   let c;
@@ -216,6 +226,15 @@ let candidatures = lignes.map((l, i) => {
   if (c.id) motifs.push(`ligne ${i + 1} : une candidature ne porte JAMAIS d'id (frappé à l'ingestion)`);
   for (const champ of ["titre", "contenu", "demandeur", "source", "date_demande"])
     if (!c[champ]) motifs.push(`ligne ${i + 1} : champ ${champ} manquant`);
+  if (c.rectifie !== undefined) {
+    // Une rectification vise un item : elle n'a pas de cible de forge à elle, et sa nature est
+    // FERMÉE — une nature libre redeviendrait de la prose que rien ne sait interroger.
+    if (!/^TF-\d{4}$/.test(String(c.rectifie)))
+      motifs.push(`ligne ${i + 1} : rectifie doit désigner un id « TF-xxxx », reçu « ${c.rectifie} »`);
+    if (!NATURES_RECTIFICATION.has(c.nature_de_la_rectification))
+      motifs.push(`ligne ${i + 1} : nature_de_la_rectification doit être fait_errone, cause_erronee ou annule — reçu « ${c.nature_de_la_rectification ?? "(rien)"} »`);
+    return c;
+  }
   if (!Array.isArray(c.forges_cibles_initiales) || !c.forges_cibles_initiales.length) {
     // R-48 APPLIQUÉE À NOTRE PROPRE OUTIL (24/08) : « si deux personnes compétentes trancheraient
     // identiquement sans information supplémentaire, ce n'est pas une décision, c'est un défaut
@@ -263,6 +282,31 @@ const evenements = lireEv(registre);
 if (evenements.some((e) => e.ev === "ingestion" && (e.lot_sha === lotSha || e.lot_sha === lotShaBrut))) {
   console.log(`[DÉJÀ INGÉRÉ] empreinte ${lotSha.slice(0, 12)} — 0 création (idempotence)`);
   process.exit(0);
+}
+
+// ---- TF-0703 : une rectification qui porterait À CÔTÉ est refusée AVANT toute écriture ------
+// Un id inconnu marquerait le vide ; un id ARCHIVÉ vit dans un fichier dont chaque ligne doit
+// appartenir à un item d'état final `archive` (R8) — y ajouter une marque se décide, elle ne
+// s'automatise pas. Les deux cas sont des rejets atomiques, chacun avec son remède.
+const rectifications = candidatures.filter((c) => c.rectifie !== undefined);
+if (rectifications.length) {
+  const actifsIds = new Set(evenements.filter((e) => e.id).map((e) => e.id));
+  const archivesIds = new Set(lireEv(archive).filter((e) => e.id).map((e) => e.id));
+  const motifsRect = [];
+  for (const c of rectifications) {
+    if (actifsIds.has(c.rectifie)) continue;
+    motifsRect.push(archivesIds.has(c.rectifie)
+      ? `rectification de ${c.rectifie} : l'item est ARCHIVÉ — marquer l'archive est une décision ` +
+        "humaine, pas un geste d'ingestion. Remettre la rectification au pilot avec l'id en clair : " +
+        "c'est lui qui arbitrera entre rouvrir l'item et consigner la rectification à l'archive"
+      : `rectification de ${c.rectifie} : id INCONNU du registre (actifs et archive) — une ` +
+        "rectification qui vise un id absent porterait à côté, et le premier lecteur croirait " +
+        "l'erreur d'origine corrigée quelque part");
+  }
+  if (motifsRect.length) {
+    console.error(`[REJET ATOMIQUE] ${sidecarPath} — registre intact. Motifs :\n  - ${motifsRect.join("\n  - ")}`);
+    process.exit(1);
+  }
 }
 
 // ---- rapprochement contre le registre : SIGNALE, ne bloque JAMAIS (TF-0618) ---------------
@@ -341,6 +385,19 @@ if (remplacesTotal.length) {
   console.log("  Les tables de correspondance vivent HORS des dépôts.");
 }
 const nouvelles = candidatures.map((c) => {
+  // TF-0703 : une rectification MARQUE l'item visé — événement `maj`, aucun id neuf frappé.
+  // L'item d'origine et sa correction restent reliés par le même identifiant, au lieu de deux
+  // créations concurrentes que rien ne rattache.
+  if (c.rectifie !== undefined) {
+    return JSON.stringify({
+      ev: "maj", ts, id: c.rectifie,
+      rectification: {
+        nature: c.nature_de_la_rectification,
+        titre: c.titre, contenu: c.contenu, demandeur: c.demandeur,
+        source: c.source, date_demande: c.date_demande,
+      },
+    });
+  }
   const score = c.score && [c.score.gain, c.score.preuve, c.score.effort].every((v) => typeof v === "number")
     ? { ...c.score, valeur: Math.round((c.score.gain * c.score.preuve / c.score.effort) * 10) / 10 }
     : { gain: 3, preuve: 1, effort: 3, valeur: 1, par_defaut: true };
@@ -361,7 +418,11 @@ if (derogationMotif && !reglesDerogees.length) {
   console.error("[AVERTISSEMENT] --derogation posé mais aucune règle de forme ne refusait ce lot —\n" +
     "  dérogation inutile, non consignée. Une trace décorative brouille les vraies.");
 }
-const evIngestion = { ev: "ingestion", ts, lot_sha: lotSha, fichier: String(sidecarPath), creations: nouvelles.length };
+// TF-0703 : `creations` ne compte que les créations — compter les rectifications ferait croire
+// à des ids frappés qui n'existent pas, et fausserait tout rapprochement registre↔lot futur.
+const nbRectifications = candidatures.filter((c) => c.rectifie !== undefined).length;
+const evIngestion = { ev: "ingestion", ts, lot_sha: lotSha, fichier: String(sidecarPath), creations: nouvelles.length - nbRectifications };
+if (nbRectifications) evIngestion.rectifications = nbRectifications;
 if (reglesDerogees.length) {
   evIngestion.derogation = { regles: [...new Set(reglesDerogees)], motif: derogationMotif, decision: "humaine" };
 }
@@ -380,7 +441,12 @@ appendFileSync(registre, nouvelles.join("\n") + "\n");
 // ferait perdre le travail d'ingestion. Il AVERTIT, nomme les ids en cause, et donne la commande
 // qui répare. C'est la différence entre un défaut qu'on subit et un défaut qu'on voit.
 if (!process.argv.includes("--sans-fetch") && nouvelles.length > 1) {
-  const frappes = nouvelles.slice(0, -1).map((l) => { try { return JSON.parse(l).id; } catch { return null; } }).filter(Boolean);
+  // TF-0703 : seuls les ids FRAPPÉS ICI se confrontent à origin — l'id d'une rectification
+  // désigne un item existant, donc présent sur le distant par construction : le compter ferait
+  // crier collision sur chaque rectification d'un item déjà publié.
+  const frappes = nouvelles.slice(0, -1)
+    .map((l) => { try { return JSON.parse(l); } catch { return null; } })
+    .filter((o) => o && o.ev === "creation").map((o) => o.id);
   try {
     execFileSync("git", ["-C", todoDir, "fetch", "--quiet", "origin"], { stdio: "ignore", timeout: 20000 });
     const distant = execFileSync("git", ["-C", todoDir, "show", "origin/main:todo/TODO.jsonl"], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
@@ -485,4 +551,6 @@ if (deductions.length) {
   console.error(`[R-48 · décidé d'office] forges_cibles_initiales DÉDUIT pour ${deductions.length} ` +
     `candidature(s), la déduction est écrite dans leur champ « source » : ${deductions.join(" · ")}`);
 }
-console.log(`[OK] ${nouvelles.length - 1} candidature(s) ingérée(s) en CANDIDAT (lot ${lotSha.slice(0, 12)}) — la décision reste humaine`);
+console.log(`[OK] ${nouvelles.length - 1 - nbRectifications} candidature(s) ingérée(s) en CANDIDAT` +
+  (nbRectifications ? ` et ${nbRectifications} rectification(s) MARQUÉE(S) sur leur item (TF-0703)` : "") +
+  ` (lot ${lotSha.slice(0, 12)}) — la décision reste humaine`);
