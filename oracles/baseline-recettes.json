@@ -31,8 +31,8 @@
   "vu_le": "2026-08-26"
  },
  "hook-produits-intacts.mjs": {
-  "cas": 13,
-  "vu_le": "2026-08-26"
+  "cas": 14,
+  "vu_le": "2026-08-31"
  },
  "oracle-adoption-tests.mjs": {
   "cas": 12,
@@ -263,8 +263,8 @@
   "vu_le": "2026-08-26"
  },
  "todo/emettre-travaux.test.mjs": {
-  "cas": 24,
-  "vu_le": "2026-08-26"
+  "cas": 26,
+  "vu_le": "2026-08-31"
  },
  "todo/ingerer-derogation.test.mjs": {
   "cas": 11,

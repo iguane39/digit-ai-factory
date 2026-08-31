@@ -400,6 +400,9 @@ if (args.includes("--self-test")) {
   // références le dit, et ça se vérifie des deux côtés.
   {
     const vif = faire("produit-vivant");
+    // Créé AVANT le relevé, pour le dernier cas de ce bloc : un dépôt qui n'était pas au relevé
+    // relève d'une autre règle, et il faut qu'il y soit pour que son mouvement compte comme écart.
+    const muet = faire("produit-muet");
     const emp3 = join(base, "empreinte-vivant.json");
     relever(base, emp3);
     // (1) un fichier apparaît, et RIEN au journal : c'est le cas qui doit bloquer.
@@ -429,6 +432,40 @@ if (args.includes("--self-test")) {
       !rv.ecarts.some((e) => /produit-vivant/.test(e)));
     ok("et son mouvement est DÉCLARÉ avec la preuve du journal",
       (rv.declares || []).some((d) => /produit-vivant/.test(d) && /de son propre chef/.test(d)));
+
+    // TF-0685 (31/08) — LES DEUX LISTES ENSEMBLE, SUR LE CHEMIN RÉEL DU RENDU.
+    //
+    // Le cas fondateur du 27/08 : un mouvement EXPLIQUÉ chez un produit, et des mouvements
+    // INEXPLIQUÉS chez d'autres dans le même tour. Le verdict passait FAIL, la branche sortait, et
+    // la déclaration disculpante était avalée — le lecteur recevait la liste de ce qu'il devait
+    // aller vérifier, amputée de ce qui était déjà réglé.
+    //
+    // Ce cas ne se joue PAS sur `comparer()` seul : le défaut vivait dans le RENDU, pas dans la
+    // comparaison, et les deux cas ci-dessus le manquaient tous les deux pour cette raison. Il se
+    // joue donc sur `--rendre-pour-test`, qui traverse exactement le code du hook.
+    //
+    // Sens rouge implicite : si la ligne d'information repassait après la sortie, `[info]` serait
+    // absent de la sortie complète et ce cas tomberait — c'est précisément ce qu'il garde.
+    // LE CAS EST AUTONOME, ET IL DOIT L'ÊTRE : `comparer` REMET LE RELEVÉ À JOUR quand le verdict
+    // est PASS (voir la ligne qui le fait, et la raison qui l'accompagne). Les comparaisons
+    // précédentes de ce bloc ont donc rafraîchi `emp3`, et s'appuyer dessus mesurerait un état qui
+    // n'existe plus. Ce cas prend son propre relevé, l'antidate, puis provoque les deux natures de
+    // mouvement en une seule fois — un expliqué et un inexpliqué — et ne compare qu'UNE fois.
+    const emp4 = join(base, "empreinte-deux-listes.json");
+    relever(base, emp4);
+    {
+      const j = JSON.parse(readFileSync(emp4, "utf8"));
+      j.releve_le = new Date(Date.parse(j.releve_le) - 60000).toISOString();
+      writeFileSync(emp4, JSON.stringify(j, null, 1) + "\n", "utf8");
+    }
+    writeFileSync(join(vif, "encore-un-fichier.txt"), "la session du produit travaille\n");
+    writeFileSync(join(muet, "ecrit-sans-explication.txt"), "mouvement inexplique\n");
+    const rendu = spawnSync(process.execPath,
+      [fileURLToPath(import.meta.url), "--rendre-pour-test", base, emp4], { encoding: "utf8" });
+    ok("un tour qui ÉCHOUE et DISCULPE à la fois rend les DEUX : l'expliqué d'abord, l'inexpliqué ensuite",
+      /\[info\]/.test(rendu.stdout) && /\[avert\]/.test(rendu.stdout)
+      && rendu.stdout.indexOf("[info]") < rendu.stdout.indexOf("[avert]")
+      && /produit-vivant/.test(rendu.stdout) && /produit-muet/.test(rendu.stdout));
   }
 
   // Le MANDAT déclaré : le produit est suivi et RAPPORTÉ, jamais bloqué.
@@ -457,9 +494,34 @@ if (args.includes("--empreinte")) {
   process.exit(0);
 }
 
-// ---- Stop : on compare, et on BLOQUE si un produit a bougé sans mandat -----------------------
-const r = comparer();
-if (r.verdict === "FAIL") {
+// ---- Stop : on compare, et on RAPPORTE si un produit a bougé sans mandat ---------------------
+// LE RENDU EST UNE FONCTION, et non le corps du script, pour une seule raison : la recette doit
+// pouvoir le JOUER. Avant le 31/08, le mode de recette n'exerçait que `comparer()` et imprimait son
+// JSON — il ne traversait jamais le code qui décide quoi afficher, si bien que le défaut d'ordre
+// corrigé ici lui était structurellement invisible. Un banc qui ne joue pas le chemin réel ne
+// protège pas le chemin réel.
+function rendre(r) {
+// CE QUI DISCULPE SE DIT TOUJOURS, ET D'ABORD (TF-0685, 31/08/2026).
+//
+// LE DÉFAUT, et il produisait l'inverse exact de l'intention de ce hook : la ligne qui imprime
+// `declares` vivait APRÈS le `process.exit(0)` de la branche FAIL. Elle était donc INATTEIGNABLE
+// dès qu'un seul écart existait — c'est-à-dire précisément quand le lecteur a besoin de savoir
+// lesquels des mouvements sont déjà expliqués. Plus il y avait de mouvement, moins il recevait
+// d'information disculpante ; la disculpation n'apparaissait que lorsqu'il n'y avait rien à
+// disculper.
+//
+// CE QUE ÇA A COÛTÉ, mesuré sur le cas réel du 27/08 : le renommage d'un dépôt produit suivi,
+// pourtant explicable, n'a été déclaré NULLE PART — trois autres produits bougeaient le même
+// tour, le verdict est passé FAIL, et la sortie anticipée a avalé la déclaration. Le hook
+// prescrit dans son propre texte d'aller vérifier si un mouvement vient d'une autre session : il
+// retenait justement l'information qui répond à cette question.
+//
+// LE REMÈDE EST L'ORDRE, pas une branche de plus : ce qui est expliqué se lit AVANT ce qui ne
+// l'est pas, dans les deux verdicts. Le lecteur écarte d'abord ce qui est réglé, puis lit ce qui
+// reste. La recette joue désormais les deux listes ENSEMBLE, sur un cas qui échoue et disculpe à
+// la fois — sans quoi la correction se déferait au premier remaniement.
+  if (r.declares && r.declares.length) console.log(`[info] ${r.declares.join(" · ")}`);
+  if (r.verdict === "FAIL") {
   const raison = "MOUVEMENT CHEZ UN PRODUIT — le pilot n'y intervient que sur run demandé " +
     "(décision humaine du 23/08 : « ne touche pas les produits, seuls les produits se modifient " +
     "eux-mêmes »). Ce qui a bougé pendant ce tour :\n  - " + r.ecarts.join("\n  - ") +
@@ -483,7 +545,14 @@ if (r.verdict === "FAIL") {
   // session coûte plus qu'il ne protège : cinq refus en une heure, tous injustifiés, et un remède
   // affiché qui aurait détruit des branches déjà fusionnées.
   console.log(`[avert] ${raison}`);
+  }
+}
+
+// Mode interne de la recette : jouer le RENDU réel sur une base et un relevé de test.
+if (args[0] === "--rendre-pour-test") {
+  rendre(comparer(args[1], args[2]));
   process.exit(0);
 }
-if (r.declares && r.declares.length) console.log(`[info] ${r.declares.join(" · ")}`);
+
+rendre(comparer());
 process.exit(0);
