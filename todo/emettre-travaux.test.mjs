@@ -18,7 +18,7 @@ import { spawnSync } from "node:child_process";
 import {
   lotHeritage, indiceLibre, dateLot,
   blocConstat, constatsDestines, constatsDuRegistre, memeProduit, normaliserProduit,
-  orphelins,
+  orphelins, pseudonymeDe,
 } from "./emettre-travaux.mjs";
 import { verifier } from "../gabarits/oracle-travaux-pilot.mjs";
 
@@ -253,6 +253,50 @@ try {
     att(!memeProduit("", ""), "deux vides se sont rapprochés");
     att(!memeProduit(undefined, "Foo"), "un destinataire absent s'est rapproché d'un produit");
   });
+
+  // ── LE REGISTRE PARLE EN PSEUDONYMES, LE PARC EN NOMS RÉELS (mesure du 31/08/2026) ──
+  //
+  // Depuis que l'anonymisation est dans la chaîne d'ingestion, `destinataire_produit` porte un
+  // pseudonyme quand le parc porte le nom réel. Sans résolution, les TROIS constats au plus haut
+  // score du mandat du 28/08 sortaient en [ORPHELINS] alors que leur produit était sur le poste
+  // et venait de remettre un lot le matin même. La résolution passe par la table hors dépôt, en
+  // LECTURE SEULE — rapprocher n'est pas baptiser.
+  const tablePseudo = join(T, "pseudo.json");
+  writeFileSync(tablePseudo, JSON.stringify({ produits: { MonProduit: "Produit-77" } }), "utf8");
+  const avecTable = (fn) => {
+    const avant = process.env.FORGE_PRODUITS_PSEUDO;
+    process.env.FORGE_PRODUITS_PSEUDO = tablePseudo;
+    try { fn(); } finally {
+      if (avant === undefined) delete process.env.FORGE_PRODUITS_PSEUDO;
+      else process.env.FORGE_PRODUITS_PSEUDO = avant;
+    }
+  };
+
+  check("pseudonymeDe résout un nom réel, suffixe de domaine compris — et rend null sans table", () => {
+    att(pseudonymeDe("MonProduit.com", tablePseudo) === "Produit-77", "le nom réel suffixé ne résout pas");
+    att(pseudonymeDe("Inconnu", tablePseudo) === null, "un produit hors table a reçu un pseudonyme");
+    att(pseudonymeDe("MonProduit", join(T, "table-absente.json")) === null, "une table absente n'a pas rendu null");
+  });
+
+  check("la résolution est en LECTURE SEULE — un inconnu n'est pas baptisé (pseudoProduit étend, pas elle)", () => {
+    const avant = readFileSync(tablePseudo, "utf8");
+    pseudonymeDe("JamaisVuNullePart", tablePseudo);
+    att(readFileSync(tablePseudo, "utf8") === avant, "un simple rapprochement a ÉTENDU la table");
+  });
+
+  check("un constat adressé au PSEUDONYME atteint le produit réel du parc", () => avecTable(() => {
+    const f = registre([{ ev: "creation", id: "TF-9011", statut: "decide", destinataire_produit: "Produit-77" }], "g");
+    att(constatsDuRegistre("MonProduit.com", f).length === 1,
+      "le rendez-vous ne traverse pas le pseudonyme — le constat au registre n'atteint personne");
+    att(orphelins([{ produit: "MonProduit.com" }], f).length === 0,
+      "le constat est dénoncé orphelin alors que son produit est dans le parc");
+  }));
+
+  check("un pseudonyme que la table ne porte PAS reste orphelin — la résolution n'invente rien", () => avecTable(() => {
+    const f = registre([{ ev: "creation", id: "TF-9012", statut: "decide", destinataire_produit: "Produit-99" }], "h");
+    att(orphelins([{ produit: "MonProduit.com" }], f).length === 1,
+      "un pseudonyme inconnu de la table a été rapproché d'un produit quand même");
+  }));
 
   check("un constat destiné au produit est retenu, et le rendez-vous traverse le suffixe", () => {
     const f = registre([{ ev: "creation", id: "TF-9001", statut: "candidat", destinataire_produit: "MonProduit" }], "a");

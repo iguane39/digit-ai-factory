@@ -79,6 +79,37 @@ export const memeProduit = (a, b) => normaliserProduit(a) === normaliserProduit(
   && normaliserProduit(a) !== "";
 
 /**
+ * LE REGISTRE PARLE EN PSEUDONYMES, LE PARC EN NOMS RÉELS (mesure du 31/08/2026).
+ *
+ * Depuis que l'anonymisation est dans la chaîne d'ingestion (28/08), `destinataire_produit`
+ * porte un pseudonyme (« Produit-02 ») quand le parc, lui, porte le nom réel du dépôt. Le
+ * rendez-vous exact ne se faisait plus : les TROIS constats au plus haut score du mandat du
+ * 28/08 sortaient en [ORPHELINS] alors que leur produit était sur le poste, localisable, et
+ * venait de remettre un lot le matin même. C'est la rechute exacte du défaut fondateur de la
+ * seconde source (TF-0673) : un rendez-vous manqué qui perd des constats derrière un message
+ * normal — cette fois l'avertissement les nommait, mais il accusait le registre à tort.
+ *
+ * LA RÉSOLUTION EST EN LECTURE SEULE, et ce n'est pas un détail : `pseudoProduit()` de
+ * l'anonymiseur ÉTEND la table à l'inconnu. L'employer ici inscrirait chaque dossier scanné du
+ * parc — clones, archives, fixtures de recette — comme un produit pseudonymisé. Rapprocher
+ * n'est pas baptiser. Table absente ou illisible → `null`, et le rapprochement retombe sur la
+ * comparaison directe : un parc sans table n'a jamais rien anonymisé, il n'y a rien à résoudre.
+ */
+export function pseudonymeDe(nomReel, chemin = process.env.FORGE_PRODUITS_PSEUDO
+    || join(process.env.FORGE_ROOT || join(PILOT, ".."), "_produits-pseudonymes.json")) {
+  if (!existsSync(chemin)) return null;
+  let d;
+  try { d = JSON.parse(readFileSync(chemin, "utf8")); } catch { return null; }
+  for (const [reel, pseudo] of Object.entries(d.produits || {}))
+    if (memeProduit(reel, nomReel)) return pseudo;
+  return null;
+}
+
+/** Le rendez-vous complet : nom réel d'abord, pseudonyme ensuite — EXACT dans les deux cas. */
+export const designeProduit = (destinataire, produit) =>
+  memeProduit(destinataire, produit) || memeProduit(destinataire, pseudonymeDe(produit));
+
+/**
  * LE RENDU D'UN CONSTAT, et sa seule règle : **les champs manquants ne sont pas inventés.**
  *
  * Un lot qui comblerait les trous du registre par de la prose plausible ferait croire au produit
@@ -100,7 +131,7 @@ export const blocConstat = (e) => `### ${e.id} — ${e.titre || "constat sans ti
 export function orphelins(lignes, chemin = join(PILOT, "todo", "TODO.jsonl")) {
   const produits = lignes.map((l) => l.produit);
   return constatsDestines(chemin)
-    .filter((e) => !produits.some((p) => memeProduit(e.destinataire_produit, p)));
+    .filter((e) => !produits.some((p) => designeProduit(e.destinataire_produit, p)));
 }
 
 export function constatsDuRegistre(produit, chemin = join(PILOT, "todo", "TODO.jsonl")) {
@@ -115,7 +146,7 @@ export function constatsDuRegistre(produit, chemin = join(PILOT, "todo", "TODO.j
   }
   const clos = new Set(["corrige", "ecarte"]);
   return [...etat.values()]
-    .filter((e) => e.destinataire_produit && memeProduit(e.destinataire_produit, produit)
+    .filter((e) => e.destinataire_produit && designeProduit(e.destinataire_produit, produit)
       && !clos.has(e.statut))
     .sort((a, b) => String(a.id).localeCompare(String(b.id)));
 }
