@@ -51,6 +51,16 @@ si estimable, "preuve_du_cout":…}`. **JAMAIS d'id** : les ids TF sont frappés
 par le pilot. Le sidecar est ce qui rend la remontée automatique — le `.md` reste la
 lecture humaine.
 
+**Rectifier un retour déjà remis (TF-0703, 31/08)** : un lot remis ne se modifie JAMAIS — et
+c'est cette immuabilité qui force à déclarer une erreur plutôt qu'à l'effacer. Le geste
+complémentaire passe par un NOUVEAU lot : une ligne de sidecar portant deux champs optionnels,
+`"rectifie":"TF-xxxx"` (l'id du registre pilot visé — il figure dans `TODO-PRODUIT.md` et dans
+les lots de travaux reçus) et `"nature_de_la_rectification"` parmi `fait_errone`,
+`cause_erronee`, `annule`. Le `contenu` dit ce qui était faux et ce qui est vrai, preuve à
+l'appui. À l'ingestion, cette ligne **marque l'item visé** (aucun id neuf) au lieu de créer un
+doublon sans lien ; un `rectifie` inconnu du registre est refusé en bloc — une rectification qui
+porte à côté ferait croire l'erreur corrigée.
+
 **Sidecar hors format (TF-0196, 14/08)** : `ingerer-lot.mjs` rejette le lot ENTIER, motif par
 motif, et le registre reste intact — c'est voulu, un rejet atomique vaut mieux qu'une
 candidature mal formée. Côté pilot, `todo\normaliser-lot.mjs <sidecar>` convertit la forme
