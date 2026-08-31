@@ -53,5 +53,7 @@
 | `20260822-etude-opportunite-fraicheur-des-verdicts.md` | fichier | 13,8 Ko | Étude d'opportunité — fraîcheur des verdicts d'oracles — 20260822b |
 | `20260822-etude-opportunite-troisieme-point-observation-i18n.md` | fichier | 8,1 Ko | Étude d'opportunité — un troisième point d'observation pour le pan i18n — 20260822a |
 | `20260822-etude-opportunite-vue-portefeuille.md` | fichier | 8,4 Ko | Étude d'opportunité — vue portefeuille du reste-à-faire — 20260822a |
+| `20260830-L99-etat-de-l-art-marche.md` | fichier | 27,0 Ko | Analyse L99 — « construire un skill et/ou une forge pour l'état de l'art du marché » |
+| `20260831-opportunite-etat-de-l-art-marche.md` | fichier | 9,0 Ko | Étude d'opportunité — un dispositif d'état de l'art de marché est-il à construire ? |
 
-_39 fichier(s), 0 sous-dossier(s)_
+_41 fichier(s), 0 sous-dossier(s)_
