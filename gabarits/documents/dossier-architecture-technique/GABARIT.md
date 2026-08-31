@@ -49,7 +49,7 @@ role_destinataire: comité d'architecture / client / repreneur
 sources_de_verite: ["docs\projet\ARCHITECTURE.md", "docs\projet\COMPOSANTS-OPS.md", "{registre ADR}"]
 verifie_le: {AAAA-MM-JJ}
 gabarit: gd-dossier-architecture
-version_du_gabarit: 1.0.0
+version_du_gabarit: 1.1.0
 etat_decrit: {existant | cible | existant et cible}
 ---
 
