@@ -64,7 +64,13 @@
  *   S30 toute décision du bloc 3 porte un NUMÉRO, et les numéros sont DISTINCTS (28/08) — une
  *       décision se désigne pour se trancher. S4 compte des options et ne voit jamais que la
  *       QUESTION est insélectionnable ; le destinataire avait invente la numerotation avant de
- *       dire « je ne peux pas les sélectionner ».
+ *       dire « je ne peux pas les sélectionner ». Formes admises, tiret compris : « D-5 — ».
+ *   S31 chaque OPTION du bloc 3 porte son COÛT et CE QU'ELLE EXCLUT (30/08) — exigence écrite
+ *       depuis le 13/08 et restée sans juge ; en TABLEAU, les colonnes suffisent (borne de S19 :
+ *       une ligne se juge avec son en-tête). Sans elle, une liste d'options est un menu.
+ *   S32 chaque DÉCISION nomme son OPTION PAR DÉFAUT (30/08) — ne pas trancher EST une décision,
+ *       et la taire fait croire que ne rien faire est sans effet. Même origine que S31 : deux
+ *       rendus du même bloc passaient le contrôle en ne se ressemblant pas.
  *   S20 un terme du référentiel `gabarits\JARGON-A-GLOSER.json` employé aux blocs 3 ou 8
  *       porte sa glose adjacente (TF-0511, 22/08) — S9 ne juge que l'OUVERTURE, or c'est aux
  *       blocs qu'on EXÉCUTE que le jargon coûte le plus : un jargon au bloc 0 fait perdre le
@@ -145,7 +151,26 @@ const _MOIS = "janvier|f[ée]vrier|mars|avril|mai|juin|juillet|ao[ûu]t|septembr
 const _CHIFFRES = new RegExp(
   String.raw`(\d+\s*/\s*\d+|\d+\s*%|(?<![\w.-])(?<!version\s)\d{1,6}\s+(?!(?:${_MOIS})\b)[a-zà-ÿ]{3,})`,
   "i");
-const _LOCALISATEURS = /(`[^`]+`|\.(md|json|mjs|py|html|jsonl)\b|\b[a-f0-9]{7,40}\b)/;
+// LA LISTE DES EXTENSIONS RECONNUES, ÉLARGIE LE 30/08 — et son étroitesse était un FAUX REFUS.
+//
+// LE FAIT, mesuré sur le rendu de référence d'un produit : une décision citait
+// `.github/workflows/deploiement.yml` comme la source de sa recommandation — un fichier de chaîne
+// d'intégration, une source parfaitement vérifiable — et S16 la refusait, parce que `yml` n'était
+// pas dans la liste. Six extensions y figuraient, choisies au fil des besoins du pilot lui-même :
+// `md`, `json`, `mjs`, `py`, `html`, `jsonl`. Un produit qui n'écrit ni en Python ni en Markdown
+// ne pouvait donc citer aucune de ses propres sources.
+//
+// CE QUE COÛTAIT LE REFUS : le rédacteur n'a que deux issues, entourer la source d'accents graves
+// pour tromper la reconnaissance, ou renoncer à la citer. La première apprend à contourner la
+// règle, la seconde appauvrit la restitution — c'est exactement le dilemme que L1 posait sur un
+// autre contrôle le 26/08, et il se tranche pareil : un contrôle dont la seule issue verte dégrade
+// ce qu'il juge travaille contre son propre objet.
+//
+// EFFET DE BORD ASSUMÉ ET DÉCLARÉ : `_LOCALISATEURS` sert aussi de PREUVE à S3 et S8. Élargir la
+// liste élargit donc ce qui compte comme preuve — citer un fichier de configuration vaut désormais
+// localisateur au bloc 4. C'est cohérent (un chemin vérifiable EST un localisateur) mais ce n'est
+// pas neutre, et le banc le vérifie : la fixture rouge doit continuer d'échouer sur S3 et S8.
+const _LOCALISATEURS = /(`[^`]+`|\.(md|json|mjs|py|html|jsonl|ya?ml|jsx?|tsx?|css|scss|txt|csv|toml|ini|cfg|conf|sh|ps1|sql|xml|env|lock)\b|\b[a-f0-9]{7,40}\b)/;
 const preuve = (s) => _JETONS.test(s) || _CHIFFRES.test(s) || _LOCALISATEURS.test(s);
 
 // Une puce Markdown se POURSUIT sur les lignes suivantes quand elle dépasse la largeur. Juger
@@ -222,10 +247,35 @@ function actionsGroupees(texte) {
 // continuent celle en cours. Un segment sans ouverture — bloc qui démarre droit sur son tableau
 // ou sa prose — s'ouvre implicitement, sinon la forme la plus dépouillée serait la seule muette.
 const RE_LIGNE_OPTION = /^\s*(?:[-*+]\s+|\|\s*)?\**\(?[a-e]\)/;
+// LE BLOC DE CITATION OUVRE UNE DÉCISION (30/08/2026), et son absence était la cause racine de
+// tout le fil de ce jour.
+//
+// LE FAIT, mesuré sur le rendu de référence lui-même — le message qu'un produit a réellement
+// affiché et que le destinataire a mis en regard trois fois en demandant « pourquoi ce format
+// n'est pas appliqué ». Ses décisions s'écrivent en BLOC DE CITATION : trois lignes préfixées
+// d'un chevron portent le titre, le rappel et la recommandation, puis le tableau des options vit
+// au niveau du document, puis une dernière ligne citée porte le repli. Jugé par cet oracle, ce
+// rendu rendait « 1 décision SANS NUMÉRO » là où il en porte DEUX, numérotées D-5 et D-6 : aucune
+// ligne à chevron n'ouvrait de segment, les deux décisions fusionnaient en un seul bloc, et le
+// numéro n'était plus en tête.
+//
+// CE QUE ÇA A COÛTÉ, et c'est le vrai sujet : le format que le destinataire demandait était
+// REFUSÉ par le contrôle censé le faire respecter. Un agent qui satisfait l'oracle dérive donc
+// mécaniquement vers la puce, et chaque « correction » du format l'éloignait de ce qui était
+// demandé. Deux tours de ce fil ont été passés à corriger vers ce que l'oracle acceptait.
+//
+// N'OUVRE QUE LA TÊTE D'UNE DÉCISION : la ligne citée qui porte le repli (« > **Si rien n'est
+// décidé** … ») doit rester RATTACHÉE à la décision, sinon elle deviendrait une décision sans
+// options et S15 comme S32 crieraient sur une forme juste.
+const RE_TETE_CITATION = /^>\s*\**\s*(?:d[ée]cision\s*)?(?:n[°ºo]\s*)?(?:D\s*-?\s*)?\d{1,2}\s*(?:[.)\-–—:·]|\*\*|\s)/i;
+// Le préfixe d'une tête de décision, quelle que soit sa mise en page : chevron de citation,
+// puce, ou titre de section. Retiré avant de lire le numéro et avant de compter le chapeau.
+const TETE_DECISION = /^\s*(?:>\s*)?(?:[-*+]\s+|#{2,6}\s*)?/;
+
 function decisionsDuBloc(texte) {
   const segs = [];
   for (const ligne of texte.split("\n")) {
-    const ouvre = (/^[-*+]\s+\S/.test(ligne) || /^\s*#{2,6}\s/.test(ligne))
+    const ouvre = (/^[-*+]\s+\S/.test(ligne) || /^\s*#{2,6}\s/.test(ligne) || RE_TETE_CITATION.test(ligne))
       && !RE_LIGNE_OPTION.test(ligne) && !/^\s*\|/.test(ligne);
     if (ouvre) { segs.push(ligne); continue; }
     if (!segs.length) { if (ligne.trim()) segs.push(ligne); continue; }
@@ -1056,8 +1106,23 @@ function juger(texte) {
     // Le chapeau, c'est la PROSE avant la première option : on retire la puce ou le titre qui
     // ouvre le segment, et TOUTE cellule de tableau — sinon un en-tête de six mots posé au-dessus
     // d'un chapeau de quatre mots ferait un total de dix et l'on croirait avoir mis en contexte.
-    const chapeau = (g) => g.split("(a)")[0]
-      .replace(/^\s*(?:[-*+]\s+|#{2,6}\s*)/, "").replace(/\|[^|]*/g, " ").replace(/\*\*/g, "").trim();
+    // 30/08 — LE SÉLECTEUR D'UNE DÉCISION N'EST PAS UN IDENTIFIANT DE REGISTRE, et S15 les
+    // confondait. S30 prescrit depuis la v2.13.0 la forme « D-10 — » ; or `ID_STABLE` reconnaît
+    // « une à quatre majuscules, un tiret, deux à quatre chiffres » — donc `D-10` en est un pour
+    // elle, et S15 accusait la décision de porter un identifiant nu DANS SON PROPRE TITRE. Deux
+    // règles du même référentiel se contredisaient : l'une imposait l'écriture que l'autre
+    // refusait, et l'anatomie prescrite était inapplicable le jour de son écriture.
+    //
+    // LE DÉFAUT AVAIT ÉCHAPPÉ AU BANC, et c'est instructif : sa fixture employait « D-5 », un
+    // seul chiffre, quand `ID_STABLE` en exige deux. Elle passait par chance, pas par
+    // conformité — elle porte désormais « D-12 », et elle attrape la collision.
+    //
+    // La carve-out est la même que celle de `TF-####` pour S23 : un sélecteur introduit dans le
+    // MÊME message, et prescrit par une autre règle du même gabarit, n'est pas ce que S15 traque.
+    // Elle vise l'identifiant écrit AILLEURS et AVANT, que le lecteur ne peut pas connaître.
+    const sansSelecteur = (t) => t.replace(/\bD-\d{1,2}\b/g, " ");
+    const chapeau = (g) => sansSelecteur(g.split("(a)")[0]
+      .replace(TETE_DECISION, "").replace(/>\s*/g, " ").replace(/\|[^|]*/g, " ").replace(/\*\*/g, "")).trim();
     // TF-0573 (24/08) — UN DOSSIER DE PLUSIEURS DÉCISIONS A BESOIN D'UN ENDROIT POUR SON CONTEXTE
     // COMMUN. Le fait : onze décisions issues d'une même enquête, toutes filles du même problème.
     // S15 demandant 25 mots de rappel À CHACUNE, il ne restait que deux issues et les deux sont
@@ -1076,9 +1141,9 @@ function juger(texte) {
         ? undefined : decisionsDuBloc(bDecisions).findIndex((g) => /\(a\)/.test(g)))
       .filter((g) => !/\(a\)/.test(g))
       .join(" ")
-      .replace(/^\s*(?:[-*+]\s+|#{2,6}\s*)/, "").replace(/\|[^|]*/g, " ").trim();
+      .replace(TETE_DECISION, "").replace(/\|[^|]*/g, " ").trim();
     const motsPreambule = preambule.split(/\s+/).filter(Boolean).length;
-    const chapeauCommun = motsPreambule >= 40 && !ID_STABLE.test(preambule);
+    const chapeauCommun = motsPreambule >= 40 && !ID_STABLE.test(sansSelecteur(preambule));
     const SEUIL = chapeauCommun ? 12 : 25;
     const fautifs = groupesDecisions.filter((g) => {
       const c = chapeau(g);
@@ -1122,7 +1187,13 @@ function juger(texte) {
   // Toute autre forme courte — R-52, V4, A1, EA6 — est opaque au lecteur tant qu'elle n'est pas
   // glosée, et l'exclure au motif qu'elle vit dans un de NOS référentiels serait raisonner depuis
   // l'auteur : le lecteur n'a pas nos référentiels sous les yeux.
-  const EXCLUS_S23 = /^TF-?\d{3,4}$/;
+  // 30/08 — LE SÉLECTEUR D'UNE DÉCISION REJOINT L'EXCLUSION, pour la raison même qui y met `TF` :
+  // il est déjà tenu par d'autres règles du même gabarit. S30 le prescrit et le vérifie, S15
+  // l'ignore comme sujet depuis ce matin, et la doctrine impose qu'il ouvre chaque décision.
+  // Mesuré sur le rendu de référence : « D4 (2 emplois), D3 (2 emplois) » y étaient dénoncés alors
+  // qu'ils renvoyaient à des décisions posées DANS LE MÊME FIL — c'est-à-dire l'usage exact que
+  // S17 exige, un renvoi qui nomme son sujet au lieu d'une position. Deux règles se contredisaient.
+  const EXCLUS_S23 = /^(?:TF-?\d{3,4}|D-?\d{1,2})$/;
   const occurrences = new Map();
   for (const m of texte.matchAll(RE_DESIGNATEUR)) {
     const brut = m[0];
@@ -1205,10 +1276,18 @@ function juger(texte) {
   // pas davantage qu'aucune. C'est le second sens de la règle, et il se mesure aussi.
   //
   // La FORME est libre, comme pour les titres de bloc (S1) : « **Décision 1 —** », « 1. »,
-  // « **1)** », « D1 — » sont tous acceptés. Juger la typographie n'a jamais été le sujet.
+  // « **1)** », « D1 — », « D-1 — » sont tous acceptés. Juger la typographie n'a jamais été le sujet.
+  //
+  // LE TIRET A ÉTÉ AJOUTÉ LE 30/08, ET LE DÉFAUT VALAIT LA MESURE. La forme réellement employée
+  // dans les rendus du parc est « **D-5 —** » — c'est celle que le destinataire a mise en regard
+  // en demandant qu'elle devienne la référence. Or l'expression n'admettait `D` que COLLÉ à son
+  // chiffre : `D5` passait, `D-5` était REFUSÉ, et `D-12` aussi. La règle écrite pour rendre une
+  // décision sélectionnable refusait donc l'écriture qui la rend sélectionnable — et elle l'aurait
+  // fait au moment précis où la doctrine allait la prescrire. Vérifié dans les deux sens au
+  // self-test : `D-5` passe, une décision sans numéro échoue toujours.
   const numeroDeDecision = (g) => {
-    const tete = g.replace(/^\s*(?:[-*+]\s+|#{2,6}\s*)/, "").replace(/^\*\*/, "").trim();
-    const m = /^(?:d[ée]cision\s*)?(?:n[°ºo]\s*)?D?\s*(\d{1,2})\s*(?:[.)\-–—:·]|\*\*|\s)/i.exec(tete);
+    const tete = g.replace(TETE_DECISION, "").replace(/^\*\*/, "").trim();
+    const m = /^(?:d[ée]cision\s*)?(?:n[°ºo]\s*)?(?:D\s*-?\s*)?(\d{1,2})\s*(?:[.)\-–—:·]|\*\*|\s)/i.exec(tete);
     return m ? m[1] : null;
   };
   if (groupesDecisions.length) {
@@ -1228,6 +1307,92 @@ function juger(texte) {
     }
   } else {
     ok("S30", "aucune décision à numéroter");
+  }
+
+  // ---- S31 et S32 (30/08/2026) — LES DEUX EXIGENCES DU BLOC 3 QUI N'AVAIENT AUCUN JUGE -------
+  //
+  // LE FAIT, mesuré le 30/08 en instruisant un écart de forme signalé par le destinataire. Le
+  // bloc 3 énonce CINQ exigences depuis le 13/08 : rappeler le sujet, recommander en citant sa
+  // source, proposer des options portant chacune SON COÛT ET CE QU'ELLE FERME, motiver la
+  // recommandation, et NOMMER CE QUI SE PASSE SI RIEN N'EST DÉCIDÉ. Quatre règles étaient nées au
+  // fil des retours — S4 le choix fermé, S15 le rappel du sujet, S16 la source, S30 le numéro.
+  // Les deux dernières exigences, elles, n'ont jamais reçu de juge : comptage du 30/08 sur ce
+  // fichier, ZÉRO occurrence de « coût », « exclut » et « si rien n'est décidé » hors commentaires.
+  //
+  // CE QUE L'ABSENCE A COÛTÉ, et c'est la mesure : deux rendus du même bloc, à deux jours d'écart,
+  // passaient tous deux le contrôle en ne se ressemblant pas — l'un portait le coût, ce que chaque
+  // option ferme et la ligne de repli, l'autre en avait perdu une partie en chemin. Le destinataire
+  // a lu cette différence de forme comme une différence de VERSION, et a demandé pourquoi « le
+  // format n'était pas appliqué ». Une exigence écrite que rien ne mesure tient tant que le
+  // rédacteur y pense — c'est-à-dire pas longtemps, et c'est exactement ce que la v1 de ce
+  // référentiel disait déjà d'elle-même.
+  //
+  // BORNE DE DOMAINE, REPRISE DE S19 : UNE LIGNE DE TABLEAU SE JUGE AVEC SON EN-TÊTE. En forme de
+  // puce, le coût vit dans la puce ; en forme de TABLEAU — la forme par défaut depuis la v2.12.0 —
+  // il vit dans la COLONNE. Exiger la locution dans chaque cellule pousserait au bruit et mettrait
+  // deux règles du même référentiel en contradiction, comme S18 et S19 l'ont été le 22/08 : l'une
+  // prescrivait le tableau que l'autre rendait impossible à satisfaire proprement.
+  //
+  // LA LIGNE DE REPLI N'EST PAS UNE OPTION : « sans décision : rien n'est publié » n'est pas un
+  // choix qu'on retient, c'est ce qui arrive quand on n'en retient aucun. Elle est donc exclue du
+  // décompte de S31 et devient l'objet de S32.
+  //
+  // AVERTISSANTES, comme toute règle neuve depuis la v2.5.0 : une option sans son coût rend
+  // l'arbitrage moins sûr, elle ne le rend pas impossible.
+  const lignesDeDecisions = (t) => {
+    const segs = [];
+    for (const ligne of t.split("\n")) {
+      const ouvre = (/^[-*+]\s+\S/.test(ligne) || /^\s*#{2,6}\s/.test(ligne) || RE_TETE_CITATION.test(ligne))
+        && !RE_LIGNE_OPTION.test(ligne) && !/^\s*\|/.test(ligne);
+      if (ouvre) { segs.push([ligne]); continue; }
+      if (!segs.length) { if (ligne.trim()) segs.push([ligne]); continue; }
+      if (ligne.trim()) segs[segs.length - 1].push(ligne);
+    }
+    return segs;
+  };
+  // Les vocabulaires sont LARGES à dessein : ces deux règles apprennent une tournure, elles
+  // n'imposent pas un mot. « coûte », « effort », « charge » disent le même prix ; « exclut »,
+  // « renonce », « se prive », « empêche » disent la même fermeture.
+  const COUT_OPTION = /(co[ûu]te?|effort|charge|budget|prix|gratuit)/i;
+  const EXCLUSION_OPTION = /(exclu|renonc|se prive|interdi|emp[êe]che|ferme la porte|ce qu(?:'|’)elle ferme)/i;
+  const OPTION_PAR_DEFAUT = /(si rien n(?:'|’)est d[ée]cid|sans d[ée]cision|[àa] d[ée]faut\s*[:,]|option par d[ée]faut|par d[ée]faut\s*[:,]|faute de d[ée]cision)/i;
+  {
+    const groupesLignes = lignesDeDecisions(bDecisions)
+      .filter((g) => !MOTIFS_ABSENCE.test(g[0].replace(/^\s*[-*]\s+/, "").slice(0, 40)))
+      .filter((g) => g.some((l) => /\(a\)/.test(l)));
+    const fautives = [];
+    let options = 0;
+    for (const g of groupesLignes) {
+      const entete = g.find((l) => /^\s*\|/.test(l)) || "";
+      const enteteCout = COUT_OPTION.test(entete);
+      const enteteExclut = EXCLUSION_OPTION.test(entete);
+      for (const l of g) {
+        if (!RE_LIGNE_OPTION.test(l)) continue;
+        if (OPTION_PAR_DEFAUT.test(l)) continue;
+        options++;
+        const enTableau = /^\s*\|/.test(l);
+        const aCout = COUT_OPTION.test(l) || (enTableau && enteteCout);
+        const aExclut = EXCLUSION_OPTION.test(l) || (enTableau && enteteExclut);
+        if (!aCout || !aExclut) fautives.push(l);
+      }
+    }
+    if (!options) ok("S31", "aucune option à qualifier — bloc vide déclaré, ou choix fermé absent (S4)");
+    else if (fautives.length) {
+      ko("S31", `${fautives.length} option(s) sur ${options} sans son COÛT ou sans CE QU'ELLE EXCLUT — ` +
+        "une liste d'options qui ne dit ni ce qu'elles coûtent ni ce qu'elles ferment n'est pas un choix fermé, " +
+        "c'est un menu. L'exigence est écrite au bloc 3 depuis le 13/08 et n'avait aucun juge. En TABLEAU, " +
+        "les colonnes suffisent — une ligne se juge avec son en-tête, comme pour S19. " +
+        `Ex. : ${fautives[0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
+    } else ok("S31", `${options} option(s), chacune portant son coût et ce qu'elle exclut`);
+
+    const sansRepli = groupesLignes.filter((g) => !g.some((l) => OPTION_PAR_DEFAUT.test(l)));
+    if (!groupesLignes.length) ok("S32", "aucune décision — rien dont nommer l'option par défaut");
+    else if (sansRepli.length) {
+      ko("S32", `${sansRepli.length} décision(s) sur ${groupesLignes.length} sans OPTION PAR DÉFAUT nommée — ` +
+        "l'option par défaut existe toujours : ne pas trancher EST une décision, et la taire fait croire " +
+        "que ne rien faire est sans effet. Formes admises : « si rien n'est décidé », « sans décision », " +
+        `« à défaut : », « par défaut : ». Ex. : ${sansRepli[0][0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
+    } else ok("S32", `${groupesLignes.length} décision(s), chacune nommant ce qui se passe si rien n'est décidé`);
   }
 
   return findings;
@@ -1258,8 +1423,8 @@ Coût de la reprise proposée : complexité moyen · durée court.
   chaque défaut planté volontairement a été détecté, donc la surveillance fonctionne et la
   version est prête à sortir. Publier la rend visible aux autres projets ; ne pas publier la
   laisse sur ce poste, et personne d'autre n'en profite tant qu'on attend.
-  - (a) taguer v1.12.0 maintenant — recommandé : le journal de recette \`recette-S01.md\` ne porte aucun défaut ouvert ;
-  - (b) attendre le prochain lot — coût : les 26 commits restent locaux.
+  - (a) taguer v1.12.0 maintenant — recommandé : le journal de recette \`recette-S01.md\` ne porte aucun défaut ouvert ; coût : effort simple × court ; exclut de grouper cette sortie avec le prochain lot ;
+  - (b) attendre le prochain lot — coût : les 26 commits restent locaux ; exclut la publication cette semaine.
   - sans décision : rien n'est publié.
 
 ## 4. Traité
@@ -1347,6 +1512,51 @@ Aucun écart : la demande a été suivie à la lettre.
       "  - sans décision : le journal reste local.",
     ].join(String.fromCharCode(10)));
   writeFileSync(join(dir, "numero-double.md"), numeroDouble, "utf8");
+  // 30/08 — S30 ADMET LE TIRET. La forme réellement employée dans les rendus du parc est
+  // « **D-5 —** », et c'est celle que la doctrine prescrit depuis la v2.13.0. Elle était REFUSÉE :
+  // l'expression n'admettait `D` que collé à son chiffre. Sans cette fixture, la correction serait
+  // invérifiable et pourrait être défaite sans que rien ne le dise.
+  // « D-12 » et non « D-5 » : à un seul chiffre, la fixture passait par CHANCE — `ID_STABLE`
+  // exige deux chiffres, donc « D-5 » n'était pas lu comme un identifiant et la collision entre
+  // S30 et S15 restait invisible. Deux chiffres, et le banc attrape ce que S15 refusait.
+  const numeroTiret = verte.replace("- **Décision 1 —** Publier", "- **D-12 —** Publier");
+  writeFileSync(join(dir, "numero-tiret.md"), numeroTiret, "utf8");
+  // 30/08 — S31 ET S32 DANS LEURS DEUX SENS. La verte porte désormais, sur chaque option, son coût
+  // et ce qu'elle exclut, ainsi que sa ligne de repli : elle est le sens VERT des deux règles. Les
+  // deux fixtures ci-dessous en retirent chacune une moitié — sans quoi une règle qui ne crierait
+  // jamais passerait pour tenue.
+  const optionsNues = verte.replace(
+    /  - \(a\) taguer[\s\S]*?exclut la publication cette semaine\.\n/,
+    "  - (a) taguer v1.12.0 maintenant ;\n  - (b) attendre le prochain lot.\n");
+  const sansRepli = verte.replace("  - sans décision : rien n'est publié.\n", "");
+  writeFileSync(join(dir, "options-nues.md"), optionsNues, "utf8");
+  writeFileSync(join(dir, "sans-repli.md"), sansRepli, "utf8");
+  // 30/08 — LA FORME DE RÉFÉRENCE : LA DÉCISION EN BLOC DE CITATION, celle que les produits
+  // affichent réellement et que la doctrine prescrit depuis la v2.14.0. Cet oracle en était
+  // AVEUGLE : aucune ligne à chevron n'ouvrait de segment, deux décisions fusionnaient en une
+  // seule, et le rendu de référence était jugé « 1 décision SANS NUMÉRO » quand il en porte deux.
+  // Le format demandé était donc REFUSÉ par le contrôle censé le faire respecter — et un agent
+  // qui satisfait l'oracle dérivait mécaniquement vers la puce. Sans cette fixture, la correction
+  // se déferait au premier remaniement, et le fil du 30/08 se rejouerait à l'identique.
+  const CITATION = [
+    "> **D-7 — Publie-t-on la version corrigée de la forge de tests, ou attend-on le prochain lot ?**",
+    "> Le banc rouge vient de tourner en entier : chaque défaut planté volontairement a été détecté,",
+    "> donc la surveillance fonctionne et la version est prête à sortir sans autre vérification.",
+    // La source est citée SANS accents graves et porte une extension qui n'entrait pas dans la
+    // liste avant le 30/08 : la fixture tient donc les DEUX corrections du jour — la forme citée
+    // et l'élargissement des localisateurs. Si l'une des deux se défait, S16 tombe ici.
+    "> **Recommandation : (a).** Source consultée : la chaîne d'intégration .github/workflows/recette.yml, dont le dernier passage ne porte aucun défaut ouvert.",
+    "",
+    "| Option | Ce qu'elle coûte | Ce qu'elle exclut |",
+    "|---|---|---|",
+    "| **(a)** Taguer v1.12.0 maintenant | Effort simple × court | Exclut de grouper cette sortie avec le prochain lot |",
+    "| **(b)** Attendre le prochain lot | Les 26 commits restent locaux | Exclut la publication cette semaine |",
+    "",
+    "> **Si rien n'est décidé** : (b) s'applique, rien n'est publié.",
+  ].join(String.fromCharCode(10));
+  const enCitation = verte.replace(/## 3\. Décisions attendues[\s\S]*?(?=## 4\.)/,
+    `## 3. Décisions attendues\n\n${CITATION}\n\n`);
+  writeFileSync(join(dir, "d3-citation.md"), enCitation, "utf8");
   writeFileSync(join(dir, "verte.md"), verte, "utf8");
   writeFileSync(join(dir, "rouge.md"), rouge, "utf8");
   // TF-0661 — S29 a besoin de SA fixture : la rouge porte des actions au bloc 8, donc la
@@ -1391,6 +1601,34 @@ Aucun écart : la demande a été suivie à la lettre.
   const rnd = spawnSync(process.execPath, [moi, join(dir, "numero-double.md")], { encoding: "utf8" });
   if (!/"S30"[^}]*FAIL/.test(rnd.stdout))
     casse.push("S30 : deux décisions portant le MÊME numéro passent pour sélectionnables — le doublon ne se voit pas");
+  // 30/08 — S30 admet « D-5 » ; S31 et S32 dans leurs deux sens.
+  const rnt = spawnSync(process.execPath, [moi, join(dir, "numero-tiret.md")], { encoding: "utf8" });
+  if (!/"S15"[^}]*PASS/.test(rnt.stdout))
+    casse.push("S15 accuse le SÉLECTEUR de la décision : la forme « D-12 — » que S30 prescrit est lue comme un "
+      + "identifiant de registre nu — deux règles du même gabarit se contredisent : " +
+      (/"S15"[\s\S]{0,180}/.exec(rnt.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S30"[^}]*PASS/.test(rnt.stdout))
+    casse.push("S30 : la forme « D-12 — », celle que la doctrine prescrit, est refusée : " +
+      (/"S30"[\s\S]{0,180}/.exec(rnt.stdout) || [""])[0].replace(/\s+/g, " "));
+  // La forme de référence doit être LUE, pas seulement tolérée : deux décisions distinctes ne se
+  // comptent pas comme une, et un numéro derrière un chevron reste un numéro.
+  const rct = spawnSync(process.execPath, [moi, join(dir, "d3-citation.md")], { encoding: "utf8" });
+  for (const regle of ["S4", "S15", "S16", "S30", "S31", "S32"]) {
+    if (!new RegExp(`"${regle}"[^}]*PASS`).test(rct.stdout)) {
+      casse.push(`la DÉCISION EN BLOC DE CITATION — la forme de référence — échoue sur ${regle} : ` +
+        (new RegExp(`"${regle}"[\\s\\S]{0,180}`).exec(rct.stdout) || [""])[0].replace(/\s+/g, " "));
+    }
+  }
+  const ron = spawnSync(process.execPath, [moi, join(dir, "options-nues.md")], { encoding: "utf8" });
+  if (!/"S31"[^}]*FAIL/.test(ron.stdout))
+    casse.push("S31 : des options sans coût ni exclusion passent pour un choix fermé — la règle ne crie jamais");
+  if (!/"S31"[^}]*PASS/.test(rv.stdout))
+    casse.push("S31 : la verte, dont chaque option porte son coût et ce qu'elle exclut, est accusée — la règle crie sur un travail juste");
+  const rsr = spawnSync(process.execPath, [moi, join(dir, "sans-repli.md")], { encoding: "utf8" });
+  if (!/"S32"[^}]*FAIL/.test(rsr.stdout))
+    casse.push("S32 : une décision sans option par défaut nommée passe — ne pas trancher est pourtant une décision");
+  if (!/"S32"[^}]*PASS/.test(rv.stdout))
+    casse.push("S32 : la verte, qui nomme son option par défaut, est accusée — la règle crie sur un travail juste");
   const rt = spawnSync(process.execPath, [moi, join(dir, "titree.md")], { encoding: "utf8" });
   const rts = spawnSync(process.execPath, [moi, join(dir, "titree-sale.md")], { encoding: "utf8" });
   if (!/"S9"[^}]*PASS/.test(rt.stdout)) {
@@ -1469,7 +1707,7 @@ Aucun écart : la demande a été suivie à la lettre.
   }
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 11/11 PASS (verte PASS ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe)");
+    : "Self-test restitution : 11/11 PASS (verte PASS ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe)");
   process.exit(casse.length ? 1 : 0);
 }
 

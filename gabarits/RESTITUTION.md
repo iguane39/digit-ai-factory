@@ -7,7 +7,23 @@ prouvée à zéro faux positif, et ne voit rien. Le marquage a été vérifié t
 `oracle-synthese` (S1-S8 à l'époque, S1-S30 depuis la v2.11.0) sur une synthèse réelle PASS avant d'être prescrit ici.
 Cette consigne, elle, ne se marque PAS : c'est un référentiel normatif, pas un livrable.
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 2.11.0, 28/08/2026** (règle **S30** :
+Référentiel versionné (loi n° 4, daté-éditable) — **version 2.14.0, 30/08/2026** : la décision
+s'écrit en **BLOC DE CITATION**, squelette **relevé à la source** dans le journal d'une session
+produit et non plus approché de mémoire — et `oracle-synthese`, qui en était AVEUGLE, sait
+désormais le lire : le rendu de référence passait pour « 1 décision sans numéro » quand il en
+porte deux. Le format demandé était refusé par le contrôle censé le faire respecter, ce qui
+poussait tout agent cherchant le vert vers la puce. Troisième et dernier retour du 30/08 : « le
+format de sortie n'est toujours pas bon, pourquoi ? ». Précédente : **2.13.0, 30/08/2026** :
+l'**anatomie complète d'une décision** — identifiant `D-N` continu dans la session, titre en
+QUESTION, recommandation et source AVANT le tableau, tableau à trois colonnes, ligne de repli
+pour finir — et **deux règles neuves l'arment** : **S31** (chaque option porte son coût et ce
+qu'elle exclut) et **S32** (chaque décision nomme son option par défaut), deux exigences écrites
+depuis le 13/08 et restées sans juge. **S30** admet la forme au tiret « D-5 — », qu'elle
+REFUSAIT. Précédente : **2.12.0, 30/08/2026** : la **forme par
+défaut du bloc 3 est le tableau d'options** (`Option` / `Ce qu'elle coûte` / `Ce qu'elle exclut`),
+les trois autres mises en page restant admises — retour humain du 30/08, « le nouveau prompt de
+résultat a ce format là, pourquoi n'est-il pas appliqué sur ce projet ? », deux restitutions
+conformes dont l'écart de forme s'est lu comme un écart de version. Précédente : **2.11.0, 28/08/2026** (règle **S30** :
 toute décision du bloc 3 porte un NUMÉRO, et les numéros sont distincts — retour humain du 28/08,
 « Il n'y a pas de numéro sur les décisions, je ne peux pas les sélectionner »). Précédente :
 **2.10.0, 23/08/2026** (règle **S21**,
@@ -427,6 +443,105 @@ pavé de douze lignes au rendu ; les trois autres échouaient sur un chapeau vid
 1 forme sur 5 acceptée avant, 4 sur 5 après, la cinquième restant refusée à bon droit (chapeau de
 quatre mots). *Une règle qui n'admet qu'une mise en page ne juge plus le fond, elle impose une
 typographie* — et elle punit exactement le lecteur qui demande une présentation lisible.
+
+#### L'ANATOMIE d'une décision, dans cet ordre exact (30/08/2026, v2.13.0)
+
+*Le retour qui fait naître cette clause est le second du même jour, et il dit que la première
+version ne suffisait pas* : **« le prompt ne respecte toujours pas le format pour le chapitre 3
+des décisions »**. La clause précédente prescrivait le tableau et laissait libre tout ce qui
+l'entoure — si bien que deux rendus pouvaient tous deux la respecter en ne se ressemblant pas.
+Prescrire la moitié d'une forme ne stabilise rien.
+
+Une décision s'écrit donc ainsi, et l'ordre fait partie de la forme. **Ce squelette n'est pas
+déduit : il est relevé à la source**, dans le journal de session d'un produit, sur le rendu que le
+destinataire a mis en regard trois fois. Les deux premières tentatives de l'écrire l'avaient
+approché de mémoire, et c'est ce qui a fait durer le sujet.
+
+```
+> **D-5 — <la question, posée comme une question, avec son point d'interrogation>**
+> <le rappel du sujet : ce dont on parle, en prose, sans identifiant nu>
+> **Recommandation : (a).** Source consultée : <le document d'où sort la réponse proposée>.
+> <pourquoi cette option et pas les autres>
+
+| Option | Ce qu'elle coûte | Ce qu'elle exclut |
+|---|---|---|
+| **(a)** … | … | … |
+| **(b)** … | … | … |
+| **(c)** … | … | … |
+
+> **Si rien n'est décidé** : (c) …
+```
+
+**La décision est un BLOC DE CITATION, pas une puce**, et c'est le point qui manquait aux deux
+versions précédentes de cette section. Le chevron ouvre le titre, le rappel et la recommandation ;
+le tableau vit ensuite AU NIVEAU DU DOCUMENT, pleine largeur, hors de la citation ; une dernière
+ligne citée porte le repli. Au rendu, chaque décision devient une carte encadrée avec son tableau
+détaché — ce qui la sépare visuellement de la suivante sans qu'aucun titre ne soit nécessaire.
+Une puce ne produit pas cet effet : elle aligne les décisions dans une même liste, où l'œil ne
+sait plus où l'une finit.
+
+**Ce que cette forme a coûté avant d'être écrite, et il faut le savoir** : `oracle-synthese` en
+était AVEUGLE. Aucune ligne à chevron n'ouvrait une décision, si bien que le rendu de référence —
+deux décisions numérotées D-5 et D-6 — était jugé « **1 décision SANS NUMÉRO** ». Le format
+demandé était donc refusé par le contrôle censé le faire respecter, et tout agent cherchant le
+vert dérivait mécaniquement vers la puce. Corrigé le 30/08, avec une fixture qui joue la forme
+citée et vérifie que six règles la lisent.
+
+Cinq points, et chacun a sa raison :
+
+1. **L'identifiant est `D-N`**, et **N ne repart pas à 1 dans une même session**. Une décision
+   posée au troisième tour et reprise au cinquième garde son numéro : c'est ce qui permet de
+   répondre « D-7 (a) » sans ambiguïté trois messages plus tard. La règle **S30** admet la forme
+   au tiret depuis le 30/08 — elle la refusait, et c'est un défaut qui a été payé pour être vu.
+2. **Le titre est une QUESTION.** Un groupe nominal nomme un sujet ; une question appelle une
+   réponse. Le lecteur sait ce qu'on attend de lui avant d'avoir lu les options.
+3. **La recommandation et sa source viennent AVANT le tableau.** Le lecteur qui fait confiance
+   s'arrête là ; celui qui veut vérifier lit le tableau. L'inverse l'oblige à traverser trois
+   options pour découvrir laquelle on lui propose.
+4. **Le tableau porte les options, jamais l'instruction.** Trois colonnes, dans cet ordre :
+   `Option` · `Ce qu'elle coûte` · `Ce qu'elle exclut`. Le coût s'écrit en complexité × durée ou
+   en effet concret, **jamais en jours** (S10). Contrôle : **S31**.
+5. **La ligne de repli ferme la décision.** Ne pas trancher est une option, et elle s'applique
+   toujours : la taire fait croire que ne rien faire est sans effet. Contrôle : **S32**.
+
+Les points 4 et 5 sont désormais **mesurés**. Les points 1 à 3 restent des défauts de rédaction :
+juger la place d'une phrase reviendrait à imposer une typographie, ce que la clause suivante
+interdit depuis le 24/08.
+
+#### La forme PAR DÉFAUT du bloc 3 est le tableau d'options (30/08/2026)
+
+*Le retour qui fait naître cette clause est, une fois de plus, la mesure elle-même.* Le 30/08, le
+destinataire compare deux restitutions rendues à deux jours d'écart sur deux dépôts de
+l'écosystème : l'une pose ses options en **tableau** — une ligne par option, trois colonnes
+`Option` / `Ce qu'elle coûte` / `Ce qu'elle exclut` —, l'autre les pose en **puces filles**. Sa
+question, mot pour mot : *« le nouveau prompt de résultat a ce format là, pourquoi n'est-il pas
+appliqué sur ce projet ? »* Les deux étaient conformes, et c'est précisément le problème : **le
+lecteur a lu une différence de forme comme une différence de version.**
+
+Les quatre mises en page restent ADMISES — TF-0568 tient, et sa raison n'a pas changé. Ce qui
+s'ajoute est un **défaut** au sens propre : à contenu égal, on rend le tableau.
+
+| Option | Ce qu'elle coûte | Ce qu'elle exclut |
+|---|---|---|
+| **(a)** l'option, en gras, une ligne | son coût, en complexité × durée ou en effet | ce que la retenir ferme |
+
+Le reste de la décision vit hors du tableau, avant lui : le rappel du sujet, la recommandation et
+sa source, puis, après, la recommandation motivée et l'option par défaut. Le tableau porte les
+options, jamais l'instruction.
+
+**Pourquoi un défaut plutôt qu'une règle.** Une règle binaire refuserait les trois autres formes,
+et c'est exactement ce que TF-0568 a corrigé le 24/08 : un bloc 3 qui n'admet qu'une typographie
+ne juge plus le fond. `oracle-synthese` continue donc de rendre le même verdict aux quatre, et ce
+défaut ne s'exécute pas — il se lit. **C'est une limite assumée** : rien ne mesure qu'il est
+suivi, et l'oracle déclare déjà en `non_juge` qu'il ne voit pas la stabilité d'un tour au suivant,
+faute de conserver l'état du tour précédent.
+
+**Pourquoi il vaut quand même d'être écrit.** S18 dit le coût, et il est du même ordre : *à chaque
+changement, le lecteur RÉAPPREND la mise en page avant de pouvoir lire, et il perd la comparaison
+avec le message précédent.* S18 ne tenait cette cohérence qu'à l'INTÉRIEUR d'un document, et
+entre deux sessions il n'y avait rien du tout — chacune choisissait, et le parc rendait quatre
+formes du même bloc. Un défaut écrit ne garantit pas l'uniformité ; il la rend au moins
+**dérivable d'une source** au lieu du goût de la session.
 
 **Le CHAPEAU COMMUN, quand un dossier porte plusieurs décisions d'une même histoire (TF-0573).**
 Onze décisions issues d'une même enquête ne peuvent pas répéter onze fois leur contexte : le dossier
