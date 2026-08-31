@@ -12,6 +12,8 @@ Pièces que la forge a déclarées manquantes et que l'humain remet (TF-0364) �
 
 ## Contenu
 
+Ce que le dossier contient à l'instant de la dernière régénération — chaque élément avec son type, sa taille et sa nature, les sous-dossiers pointant vers leur propre README.
+
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
 | `LISEZMOI.md` | fichier | 2,7 Ko | `input\03-artefacts\` — remise d'un artefact que la forge réclame |

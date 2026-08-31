@@ -12,6 +12,8 @@
 
 ## Contenu
 
+Ce que le dossier contient à l'instant de la dernière régénération — chaque élément avec son type, sa taille et sa nature, les sous-dossiers pointant vers leur propre README.
+
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
 | `20260812-etude-forge-data-moteurs.md` | fichier | 7,3 Ko | Étude d'opportunité — spécialisations forge-data par moteur (Databricks, Oracle, Postgres, |

@@ -24,6 +24,8 @@ corrigée, sur décision humaine : elle n'est plus lue.
 
 ## Contenu
 
+Ce que le dossier contient à l'instant de la dernière régénération — chaque élément avec son type, sa taille et sa nature, les sous-dossiers pointant vers leur propre README.
+
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
 | `Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html` | fichier | 34,6 Ko | Étude SEO — produit-02.fr — maquette de refonte |

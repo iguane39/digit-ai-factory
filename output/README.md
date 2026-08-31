@@ -12,6 +12,8 @@ Livrables du pilot, en familles numérotées (D-15/D-16) : **une seule version �
 
 ## Contenu
 
+Ce que le dossier contient à l'instant de la dernière régénération — chaque élément avec son type, sa taille et sa nature, les sous-dossiers pointant vers leur propre README.
+
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
 | [`01-revues-et-propositions\`](01-revues-et-propositions/README.md) | dossier (9 fichiers) | — | Revues d'écosystème (fiches d'audit des forges rejouées, synthèse trans-forges) et propositions de forge — rapports, maquettes HTML, notes ; un document par rev… |

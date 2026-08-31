@@ -12,8 +12,12 @@ Candidatures hors lot de retours : `candidature-*.tf.jsonl`, `revue-*.tf.jsonl`,
 
 ## Contenu
 
+Ce que le dossier contient à l'instant de la dernière régénération — chaque élément avec son type, sa taille et sa nature, les sous-dossiers pointant vers leur propre README.
+
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
 | [`old\`](old/README.md) | dossier (59 fichiers) | — | Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — archive figée, jamais ré-ingérée. |
+| `Produit-02 - CANDIDATURE - Etude DataForSEO - 20260831a.md` | fichier | 7,3 Ko | Produit-02 — Candidature : étude poussée de la stratégie DataForSEO — 20260831a |
+| `Produit-02 - CANDIDATURE - Etude DataForSEO - 20260831a.tf.jsonl` | fichier | 3,2 Ko | 1 ligne(s) JSONL |
 
-_0 fichier(s), 1 sous-dossier(s)_
+_2 fichier(s), 1 sous-dossier(s)_
