@@ -151,6 +151,10 @@
   "motif": "entrée d'ÉTAT (I4) : jouée sur le PARC RÉEL, elle rend un verdict — « PASS sur le parc » — et non un compte de cas. Il n'y a rien à compter, et compter à zéro ferait échouer le cliquet sur une absence normale. Sa recette à double sens, quand elle existe, est comptée sous son autre entrée : l'exemption ne laisse donc aucun trou.",
   "vu_le": "2026-08-27"
  },
+ "oracle-propagation.mjs": {
+  "cas": 8,
+  "vu_le": "2026-09-01"
+ },
  "oracle-readme-dossiers.mjs": {
   "cas": 5,
   "vu_le": "2026-08-26"
@@ -305,6 +309,10 @@
  "todo/localiser-produit.test.mjs": {
   "cas": 11,
   "vu_le": "2026-08-26"
+ },
+ "todo/normaliser-lot.test.mjs": {
+  "cas": 6,
+  "vu_le": "2026-09-01"
  },
  "todo/preflight-collision.test.mjs": {
   "cas": 5,

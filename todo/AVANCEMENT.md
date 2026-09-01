@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau b7a25e192b74)]
-verifie_le: 2026-08-31
+sources_de_verite: [todo/TODO.jsonl (sceau e95521468e89)]
+verifie_le: 2026-09-01
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `b7a25e192b74`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `e95521468e89`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -19,10 +19,10 @@ les corrections donnerait l'illusion d'un progrès net.
 
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
-| Ouverts | 40 | candidats, décidés ou en cours — le reste à faire réel |
+| Ouverts | 44 | candidats, décidés ou en cours — le reste à faire réel |
 | Clos sur gains constatés | 0 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 0 | décidés non faits, motif écrit — jamais un silence |
-| Total suivi | 40 | tout ce que le registre a jamais porté |
+| Total suivi | 44 | tout ce que le registre a jamais porté |
 
 ## Ce qui reste ouvert, par forge
 
@@ -30,7 +30,7 @@ La table se lit par forge cible : c'est l'unité de décision, puisqu'une correc
 livre dans un dépôt. L'ordre suit le NOMBRE d'items ouverts, jamais leur priorité — la
 priorité vit dans la colonne de score.
 
-### digit-ai-factory — 18 item(s)
+### digit-ai-factory — 20 item(s)
 
 Les items ouverts ciblant digit-ai-factory, du score le plus fort au plus faible. Le score est
 celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
@@ -50,13 +50,15 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0721 | Le perimetre de la mesure n'est pas le perimetre de la conclusion — quatre incidents, une seule erreur | candidat | digit-ai-factory | 12.5 |
 | TF-0682 | Quinze contrôles du produit ne sont exercés par AUCUNE recette — être cité n'est pas être joué | decide | digit-ai-factory | 10 |
 | TF-0712 | pilot : R-32 n'a pas de forme de journal pour un livrable qui porte des donnees personnelles | candidat | digit-ai-factory, digit-ai-forge-design | 10 |
+| TF-0735 | pilot : le principe de connexion a Railway par jeton n'est un artefact d'aucun referentiel de la route MEP — c | candidat | digit-ai-factory, digit-ai-forge-ops | 10 |
 | TF-0722 | Des valeurs de contexte ecrites comme des regles — instantane fige, valeur observable gravee, contrainte sans  | candidat | digit-ai-factory | 8 |
 | TF-0710 | pilot : un artefact copie_conforme de R-47 revendique un nom generique qu'un produit occupait legitimement | candidat | digit-ai-factory | 7.5 |
 | TF-0676 | Aucun script de capture du produit ne produit systématiquement une pleine page | decide | digit-ai-factory | 6.7 |
 | TF-0704 | pilot : l'etape MEP pilote Railway par le CLI, qui ne sait ni renommer un service ni corriger un domaine | candidat | digit-ai-factory, digit-ai-forge-ops | 6.7 |
 | TF-0684 | Six recettes échappent à toute mesure rétrospective : leur idiome de déclaration de cas n'est reconnu par rien | decide | digit-ai-factory | 5 |
+| TF-0734 | La porte parle trop : les surfaces pre-authentification se jugent du point de vue de l'inconnu | candidat | digit-ai-factory | 1 |
 
-### pilot — 6 item(s)
+### pilot — 7 item(s)
 
 Les items ouverts ciblant pilot, du score le plus fort au plus faible. Le score est
 celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
@@ -64,11 +66,40 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | Id | Titre | Statut | Forge(s) | Score |
 |---|---|---|---|---|
 | TF-0731 | pilot : `racine_produit` declare par un sidecar n'est JAMAIS lu — la voie recommandee par TF-0555 est morte de | candidat | pilot | 15 |
+| TF-0738 | pilot : le cliquet des recettes lit le PREMIER ratio de la ligne de resume — une date a barre oblique dans le  | candidat | pilot | 15 |
 | TF-0549 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : | decide | pilot | 10 |
 | TF-0732 | poste : le gate d'ecriture C7 juge le FICHIER ENTIER, pas le delta — et sa regle « DM Sans bannie » contredit  | candidat | pilot | 10 |
 | TF-0730 | pilot : un produit a heritage CONFORME ne recoit jamais ses constats — l'emetteur rend null avant de les calcu | candidat | pilot | 7.5 |
 | TF-0693 | forge-audit : la famille gd-fiche-securite ne fournit aucune allocation d indice avec son gabarit, alors que t | decide | forge-audit, pilot | 1 |
 | TF-0694 | digit-ai-page-html : la regle l2_gouttiere decrit EXACTEMENT ce defaut, au seuil exact, et rend PASS dessus -  | decide | digit-ai-page-html, pilot | 1 |
+
+### digit-ai-forge-design — 6 item(s)
+
+Les items ouverts ciblant digit-ai-forge-design, du score le plus fort au plus faible. Le score est
+celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
+
+| Id | Titre | Statut | Forge(s) | Score |
+|---|---|---|---|---|
+| TF-0720 | digit-ai-page-html : M18 refuse une glose correcte quand une emphase ou un retour a la ligne s intercale entre | candidat | digit-ai-forge-design | 15 |
+| TF-0707 | design : un choix exclusif se pose AVANT les champs qu'il commande, jamais au milieu d'un formulaire qui les a | candidat | digit-ai-forge-design | 10 |
+| TF-0712 | pilot : R-32 n'a pas de forme de journal pour un livrable qui porte des donnees personnelles | candidat | digit-ai-factory, digit-ai-forge-design | 10 |
+| TF-0719 | digit-ai-page-html : le badge acte n est pas resolvant — il affirme un statut que rien ne verifie, et il a por | candidat | digit-ai-forge-design | 10 |
+| TF-0736 | forge-design : aucun referentiel ne dit qu'un champ de saisie doit etre TYPE a son format, PROPOSE selon son c | candidat | digit-ai-forge-design | 6.7 |
+| TF-0708 | tests : distinguer deux motifs legitimes d'ecran de creation plutot que d'imposer le formulaire replie partout | candidat | digit-ai-forge-tests, digit-ai-forge-design | 6 |
+
+### digit-ai-forge-agents — 6 item(s)
+
+Les items ouverts ciblant digit-ai-forge-agents, du score le plus fort au plus faible. Le score est
+celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
+
+| Id | Titre | Statut | Forge(s) | Score |
+|---|---|---|---|---|
+| TF-0723 | Une formule d'invocation lue comme une tournure : un skill disponible non invoque trois fois, sans laisser de  | candidat | digit-ai-factory, digit-ai-forge-agents | 20 |
+| TF-0718 | quality-oracles : un effectif annonce en toutes lettres n est compare a rien — « sept ecarts » en tete d un ta | candidat | digit-ai-forge-agents | 15 |
+| TF-0715 | quality-oracles : aucun domaine ne verifie l AUTORITE d une decision affirmee — un livrable peut ecrire « Deci | candidat | digit-ai-forge-agents | 12.5 |
+| TF-0717 | experts-forge : un angle declare vide le 20/08 a produit le 31/08 exactement le defaut qu il aurait attrape —  | candidat | digit-ai-forge-agents | 8.3 |
+| TF-0716 | quality-oracles : aucun domaine ne teste si une consequence declaree est LIVRABLE — « l utilisateur decouvre e | candidat | digit-ai-forge-agents | 6.7 |
+| TF-0733 | Un voile [hidden] au display explicite intercepte chaque clic — invisible a seize oracles de forme | candidat | digit-ai-forge-agents | 1 |
 
 ### digit-ai-forge-tests — 5 item(s)
 
@@ -83,33 +114,7 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0708 | tests : distinguer deux motifs legitimes d'ecran de creation plutot que d'imposer le formulaire replie partout | candidat | digit-ai-forge-tests, digit-ai-forge-design | 6 |
 | TF-0665 | Un nombre affiché dont aucune source du dépôt ne rend compte est un nombre orphelin, et personne ne le lui dem | decide | digit-ai-forge-tests | 5.6 |
 
-### digit-ai-forge-design — 5 item(s)
-
-Les items ouverts ciblant digit-ai-forge-design, du score le plus fort au plus faible. Le score est
-celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
-
-| Id | Titre | Statut | Forge(s) | Score |
-|---|---|---|---|---|
-| TF-0720 | digit-ai-page-html : M18 refuse une glose correcte quand une emphase ou un retour a la ligne s intercale entre | candidat | digit-ai-forge-design | 15 |
-| TF-0707 | design : un choix exclusif se pose AVANT les champs qu'il commande, jamais au milieu d'un formulaire qui les a | candidat | digit-ai-forge-design | 10 |
-| TF-0712 | pilot : R-32 n'a pas de forme de journal pour un livrable qui porte des donnees personnelles | candidat | digit-ai-factory, digit-ai-forge-design | 10 |
-| TF-0719 | digit-ai-page-html : le badge acte n est pas resolvant — il affirme un statut que rien ne verifie, et il a por | candidat | digit-ai-forge-design | 10 |
-| TF-0708 | tests : distinguer deux motifs legitimes d'ecran de creation plutot que d'imposer le formulaire replie partout | candidat | digit-ai-forge-tests, digit-ai-forge-design | 6 |
-
-### digit-ai-forge-agents — 5 item(s)
-
-Les items ouverts ciblant digit-ai-forge-agents, du score le plus fort au plus faible. Le score est
-celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
-
-| Id | Titre | Statut | Forge(s) | Score |
-|---|---|---|---|---|
-| TF-0723 | Une formule d'invocation lue comme une tournure : un skill disponible non invoque trois fois, sans laisser de  | candidat | digit-ai-factory, digit-ai-forge-agents | 20 |
-| TF-0718 | quality-oracles : un effectif annonce en toutes lettres n est compare a rien — « sept ecarts » en tete d un ta | candidat | digit-ai-forge-agents | 15 |
-| TF-0715 | quality-oracles : aucun domaine ne verifie l AUTORITE d une decision affirmee — un livrable peut ecrire « Deci | candidat | digit-ai-forge-agents | 12.5 |
-| TF-0717 | experts-forge : un angle declare vide le 20/08 a produit le 31/08 exactement le defaut qu il aurait attrape —  | candidat | digit-ai-forge-agents | 8.3 |
-| TF-0716 | quality-oracles : aucun domaine ne teste si une consequence declaree est LIVRABLE — « l utilisateur decouvre e | candidat | digit-ai-forge-agents | 6.7 |
-
-### digit-ai-forge-ops — 3 item(s)
+### digit-ai-forge-ops — 4 item(s)
 
 Les items ouverts ciblant digit-ai-forge-ops, du score le plus fort au plus faible. Le score est
 celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
@@ -118,6 +123,7 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 |---|---|---|---|---|
 | TF-0706 | pilot : deux pieges de l'API Railway a documenter au mode d'emploi de l'etape MEP | candidat | digit-ai-factory, digit-ai-forge-ops | 15 |
 | TF-0705 | pilot : une URL de production anonyme est produite par la MEP — RT-14 traitait le symptome cote forge-tests | candidat | digit-ai-factory, digit-ai-forge-ops, digit-ai-forge-tests | 12.5 |
+| TF-0735 | pilot : le principe de connexion a Railway par jeton n'est un artefact d'aucun referentiel de la route MEP — c | candidat | digit-ai-factory, digit-ai-forge-ops | 10 |
 | TF-0704 | pilot : l'etape MEP pilote Railway par le CLI, qui ne sait ni renommer un service ni corriger un domaine | candidat | digit-ai-factory, digit-ai-forge-ops | 6.7 |
 
 ### forge-audit — 2 item(s)
@@ -149,15 +155,6 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 |---|---|---|---|---|
 | TF-0700 | audit : le livrable DIFFUSE de la fiche securite est un PDF, que le kit ne prescrit pas, n outille pas et ne c | decide | digit-ai-forge-audit | 9 |
 | TF-0701 | audit : la fiche securite n a AUCUN verificateur alors que ses deux regles sont mecaniques, et que le rapport  | decide | digit-ai-forge-audit | 6 |
-
-### factory — 1 item(s)
-
-Les items ouverts ciblant factory, du score le plus fort au plus faible. Le score est
-celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
-
-| Id | Titre | Statut | Forge(s) | Score |
-|---|---|---|---|---|
-| TF-0689 | factory : une correction marquee `corrige` n est jamais suivie jusqu au produit | decide | factory | 1 |
 
 ## Ce que ce rapport ne dit pas
 

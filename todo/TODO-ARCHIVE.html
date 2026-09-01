@@ -14,8 +14,8 @@
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digit-AI — TODO-FORGE · Archive des items clos — V20260831</title>
-  <meta name="description" content="Page de recherche des items clos du registre TODO-FORGE : 692 items archivés, corrigés ou écartés, avec leur histoire complète — création, décision et décideur, clôture et gains constatés.">
+  <title>Digit-AI — TODO-FORGE · Archive des items clos — V20260901</title>
+  <meta name="description" content="Page de recherche des items clos du registre TODO-FORGE : 694 items archivés, corrigés ou écartés, avec leur histoire complète — création, décision et décideur, clôture et gains constatés.">
   <meta name="theme-color" content="#2563EB">
   <!-- Pas de <meta name="color-scheme" content="light dark"> : FIGÉ, le navigateur peint ses
        propres surfaces (ascenseurs, contrôles) en sombre sur un corps clair — défaut relevé par
@@ -158,16 +158,16 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — archive des items clos</h1>
-      <p class="meta">sceau <code>e9c36f97ba63</code> · dernier événement 2026-08-31T20:40:40Z</p>
+      <p class="meta">sceau <code>f57344596b8d</code> · dernier événement 2026-09-01T04:13:45Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       </button>
     </header>
-    <p>Ce que le registre actif a cessé de porter vit ici : <strong>692 items clos</strong>, chacun avec son histoire complète — ce qui a été demandé, qui l'a décidé, ce qui a été corrigé et quels gains ont été constatés. C'est la mémoire des décisions déjà prises : on y cherche avant de re-candidater, et on y vérifie ce qu'une correction a réellement rapporté. La recherche et les filtres agissent sur cette page seule, sans rien envoyer nulle part.</p>
+    <p>Ce que le registre actif a cessé de porter vit ici : <strong>694 items clos</strong>, chacun avec son histoire complète — ce qui a été demandé, qui l'a décidé, ce qui a été corrigé et quels gains ont été constatés. C'est la mémoire des décisions déjà prises : on y cherche avant de re-candidater, et on y vérifie ce qu'une correction a réellement rapporté. La recherche et les filtres agissent sur cette page seule, sans rien envoyer nulle part.</p>
     <div class="kpis">
-      <div class="kpi" title="692 items archivés depuis todo\TODO.jsonl — l'histoire complète de chacun est sur cette page"><span class="kpi-label">Items clos, archivés</span><span class="kpi-value">692</span><span class="kpi-hint">source unique — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
-      <button type="button" class="kpi" data-statut="corrige" aria-pressed="false" title="676 item(s) clos sur gains constatés — clic : n'afficher qu'eux"><span class="kpi-label">Corrigés</span><span class="kpi-value">676</span><span class="kpi-hint">clos sur gains constatés · clic&nbsp;: filtrer</span></button>
+      <div class="kpi" title="694 items archivés depuis todo\TODO.jsonl — l'histoire complète de chacun est sur cette page"><span class="kpi-label">Items clos, archivés</span><span class="kpi-value">694</span><span class="kpi-hint">source unique — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
+      <button type="button" class="kpi" data-statut="corrige" aria-pressed="false" title="678 item(s) clos sur gains constatés — clic : n'afficher qu'eux"><span class="kpi-label">Corrigés</span><span class="kpi-value">678</span><span class="kpi-hint">clos sur gains constatés · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="ecarte" aria-pressed="false" title="16 item(s) écartés, chacun avec son motif d'écart — clic : n'afficher qu'eux"><span class="kpi-label">Écartés</span><span class="kpi-value">16</span><span class="kpi-hint">refus motivé, mémoire gardée · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="nombre de forges distinctes visées par les items archivés, noms normalisés"><span class="kpi-label">Forges concernées</span><span class="kpi-value">19</span><span class="kpi-hint">noms normalisés — le brut reste en infobulle</span></div>
     </div>
@@ -214,10 +214,10 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser la recherche</button>
-      <span id="compteur" class="compteur" aria-live="polite">692 / 692 item(s) clos affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">694 / 694 item(s) clos affichés</span>
     </div>
-    <p id="vide" class="etat-vide" hidden><strong>Aucun item clos ne correspond.</strong> <span id="vide-quoi"></span> L'archive porte 692 items : élargissez les filtres, essayez un identifiant (<code>TF-0062</code>) ou un mot du titre — ou <button type="button" id="vide-reinit" class="lien-btn">réinitialisez la recherche</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#forge-agents"><strong>agents</strong> <span class="toc-d">106 item(s) clos</span></a><a href="#forge-agents-security"><strong>agents-security</strong> <span class="toc-d">2 item(s) clos</span></a><a href="#forge-audit"><strong>audit</strong> <span class="toc-d">14 item(s) clos</span></a><a href="#forge-conception"><strong>conception</strong> <span class="toc-d">20 item(s) clos</span></a><a href="#forge-contenu"><strong>contenu</strong> <span class="toc-d">1 item(s) clos</span></a><a href="#forge-data"><strong>data</strong> <span class="toc-d">12 item(s) clos</span></a><a href="#forge-design"><strong>design</strong> <span class="toc-d">29 item(s) clos</span></a><a href="#forge-development"><strong>development</strong> <span class="toc-d">11 item(s) clos</span></a><a href="#forge-digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">117 item(s) clos</span></a><a href="#forge-f"><strong>f</strong> <span class="toc-d">3 item(s) clos</span></a><a href="#forge-la-barre"><strong>la-barre</strong> <span class="toc-d">1 item(s) clos</span></a><a href="#forge-ops"><strong>ops</strong> <span class="toc-d">13 item(s) clos</span></a><a href="#forge-organization"><strong>organization</strong> <span class="toc-d">11 item(s) clos</span></a><a href="#forge-p"><strong>p</strong> <span class="toc-d">12 item(s) clos</span></a><a href="#forge-pilot"><strong>pilot</strong> <span class="toc-d">165 item(s) clos</span></a><a href="#forge-seo"><strong>seo</strong> <span class="toc-d">31 item(s) clos</span></a><a href="#forge-seo-geo"><strong>seo-geo</strong> <span class="toc-d">5 item(s) clos</span></a><a href="#forge-tests"><strong>tests</strong> <span class="toc-d">136 item(s) clos</span></a><a href="#forge-websec"><strong>websec</strong> <span class="toc-d">3 item(s) clos</span></a></nav>
+    <p id="vide" class="etat-vide" hidden><strong>Aucun item clos ne correspond.</strong> <span id="vide-quoi"></span> L'archive porte 694 items : élargissez les filtres, essayez un identifiant (<code>TF-0062</code>) ou un mot du titre — ou <button type="button" id="vide-reinit" class="lien-btn">réinitialisez la recherche</button>.</p>
+    <nav class="toc" aria-label="Sommaire"><a href="#forge-agents"><strong>agents</strong> <span class="toc-d">106 item(s) clos</span></a><a href="#forge-agents-security"><strong>agents-security</strong> <span class="toc-d">2 item(s) clos</span></a><a href="#forge-audit"><strong>audit</strong> <span class="toc-d">14 item(s) clos</span></a><a href="#forge-conception"><strong>conception</strong> <span class="toc-d">20 item(s) clos</span></a><a href="#forge-contenu"><strong>contenu</strong> <span class="toc-d">1 item(s) clos</span></a><a href="#forge-data"><strong>data</strong> <span class="toc-d">12 item(s) clos</span></a><a href="#forge-design"><strong>design</strong> <span class="toc-d">29 item(s) clos</span></a><a href="#forge-development"><strong>development</strong> <span class="toc-d">11 item(s) clos</span></a><a href="#forge-digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">119 item(s) clos</span></a><a href="#forge-f"><strong>f</strong> <span class="toc-d">3 item(s) clos</span></a><a href="#forge-la-barre"><strong>la-barre</strong> <span class="toc-d">1 item(s) clos</span></a><a href="#forge-ops"><strong>ops</strong> <span class="toc-d">13 item(s) clos</span></a><a href="#forge-organization"><strong>organization</strong> <span class="toc-d">11 item(s) clos</span></a><a href="#forge-p"><strong>p</strong> <span class="toc-d">12 item(s) clos</span></a><a href="#forge-pilot"><strong>pilot</strong> <span class="toc-d">165 item(s) clos</span></a><a href="#forge-seo"><strong>seo</strong> <span class="toc-d">31 item(s) clos</span></a><a href="#forge-seo-geo"><strong>seo-geo</strong> <span class="toc-d">5 item(s) clos</span></a><a href="#forge-tests"><strong>tests</strong> <span class="toc-d">136 item(s) clos</span></a><a href="#forge-websec"><strong>websec</strong> <span class="toc-d">3 item(s) clos</span></a></nav>
     <main>
       <section id="forge-agents">
         <h2>agents <span class="badge" title="106 item(s) clos ciblant agents — 106 corrigé(s), 0 écarté(s)">106</span></h2>
@@ -6731,9 +6731,40 @@ CE QUI N'EST PAS ATTRAPE EST DECLARE : une redite entre domaines DIFFERENTS au r
         </div>
       </section>
       <section id="forge-digit-ai-factory">
-        <h2>digit-ai-factory <span class="badge" title="117 item(s) clos ciblant digit-ai-factory — 112 corrigé(s), 5 écarté(s)">117</span></h2>
-        <p class="ch-apprend meta">Items clos ciblant <strong>digit-ai-factory</strong> — 112 corrigé(s), 5 écarté(s), du plus récent au plus ancien. Chaque carte porte le détail tel qu'il a été candidaté, puis son histoire dépliable : création, décision et décideur, ouverture des travaux, clôture, archivage.</p>
+        <h2>digit-ai-factory <span class="badge" title="119 item(s) clos ciblant digit-ai-factory — 114 corrigé(s), 5 écarté(s)">119</span></h2>
+        <p class="ch-apprend meta">Items clos ciblant <strong>digit-ai-factory</strong> — 114 corrigé(s), 5 écarté(s), du plus récent au plus ancien. Chaque carte porte le détail tel qu'il a été candidaté, puis son histoire dépliable : création, décision et décideur, ouverture des travaux, clôture, archivage.</p>
         <div class="cartes">
+        <article class="card s-corrige" id="item-TF-0737" data-forge="digit-ai-factory" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0737</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : digit-ai-factory">digit-ai-factory</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-09-01</span>
+          </header>
+          <h3 class="card-titre">pilot : `schema: 1` valait PASSE-DROIT au normalisateur — un sidecar hybride traversait avec un [OK] puis se faisait rejeter a la porte, et la conversion de TF-0196 se refaisait a la main</h3>
+          <div class="card-detail" data-cite><p class="lead">TROUVE EN EXECUTANT le mandat « traite les todos et retours » du 01/09.</p><ul class="puces"><li>LE FAIT : le lot 20260831b d'un produit portait des lignes schema:1 avec titre, contenu, demandeur, date_demande — mais `origine`/`destinataire`/`date` A LA PLACE de `source` et de la cible. normaliser-lot.mjs commencait par « if (c.schema === 1) { sorties.push</li><li>return; } » commente « deja au format R10 : on ne retouche pas ce qui est conforme » — CONFORME ETAIT SUPPOSE, JAMAIS VERIFIE. Le normalisateur rendait [OK] 2 candidatures normalisees, l'ingesteur strict rejetait le derive en bloc (champ source manquant, cible absente), et la seule issue restait la conversion manuelle — le defaut fondateur de TF-0196, a l'identique, derriere un vert. LA CORRECTION : une ligne schema:1 incomplete est COMPLETEE sur ce qui se DERIVE et rien d'autre — `source` absent recoit le nom du lot (une source vraie, celle que la branche produit derive deja) annote « [derive par normaliser-lot] », et une cible absente se resout depuis `destinataire` par table EXACTE (forges + socles portes : digit-ai-page-html → digit-ai-forge-agents, pilot/factory → digit-ai-factory) — un destinataire inconnu est REFUSE avec son motif, jamais devine (R-48)</li></ul></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 4 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-09-01</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">pilot (execution du mandat « traite les todos et retours » du 01/09)</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">rejet atomique de ingerer-lot.mjs sur le derive .normalise.tf.jsonl du lot Produit-02 - RETOURS - 20260831b, memes motifs que sur l'original ; lecture de normaliser-lot.mjs, branche schema === 1</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">pilot</dd></div><div><dt>Score d'entrée</dt><dd>10 — gain 4 × preuve 5 ÷ effort 2</dd></div><div class="pleine"><dt>Coût déjà payé</dt><dd><p class="jalon-prose">deux retours majeurs d'un produit (un voile invisible aux seize oracles, six divulgations pre-authentification) bloques a la porte du registre par un outil dont le role est precisement de les faire entrer ; sans correction, chaque lot de cette forme repaye la conversion manuelle que TF-0196 devait supprimer</p></dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-09-01</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">correction immediate : l'ingestion du mandat en cours etait BLOQUEE par ce defaut — les deux retours du lot ne pouvaient pas entrer (precedent TF-0698, TF-0729)</p></dd></div></dl>
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-09-01</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">Recette NEUVE normaliser-lot.test.mjs : 6/6 — l'hybride complete (source derivee dite derivee, socle route vers sa forge porteuse), pilot/factory resolus, le conforme inchange, le destinataire inconnu refuse sans ecriture, la forme produit historique toujours convertie, la garde sans-preuve intacte. EPROUVE PAR MUTATION : le passe-droit remis en tete fait tomber la recette a 3/6 ; restaure, 6/6. Preuve d'usage dans l'heure : le lot reel renormalise puis ingere — 2 candidatures en CANDIDAT (TF-0733, TF-0734), boite d'entree PASS.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><p class="jalon-prose">La branche schema:1 COMPLETE au lieu de passer : source derivee du nom du lot (annotee comme derivee), cible resolue depuis `destinataire` par table exacte forges + socles, refus motive pour un destinataire inconnu. Une ligne schema:1 COMPLETE passe toujours inchangee — on ne retouche pas ce qui est conforme, on cesse de le supposer.</p></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">digit-ai-factory (todo/normaliser-lot.mjs)</p></dd></div><div><dt>Forge réellement touchée</dt><dd title="dépôt de forge réellement modifié par la correction — nom brut du registre">digit-ai-factory</dd></div><div><dt>Produits bénéficiaires</dt><dd title="produits ou missions ayant bénéficié de la correction, nommés au registre">tout produit dont l'emetteur de lots ecrit une forme voisine du contrat — la classe qui a coute la conversion manuelle du 14/08 et le blocage du 01/09</dd></div></dl>
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-09-01</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
         <article class="card s-corrige" id="item-TF-0729" data-forge="digit-ai-factory" data-statut="corrige">
           <header class="card-head">
             <code class="tf-id">TF-0729</code>
@@ -7043,6 +7074,41 @@ CE QUI N'EST PAS ATTRAPE EST DECLARE : une redite entre domaines DIFFERENTS au r
             </li>
             <li class="jalon j-archive">
               <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-08-31</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
+        <article class="card s-corrige" id="item-TF-0689" data-forge="digit-ai-factory" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0689</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : digit-ai-factory">digit-ai-factory</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-09-01</span>
+          </header>
+          <h3 class="card-titre">factory : une correction marquee `corrige` n est jamais suivie jusqu au produit</h3>
+          <div class="card-detail" data-cite><p class="lead">FAIT MESURE. TF-0506 (« la famille gd-fiche-securite declare deux formats html et pdf et la forge n en produit qu un ») a ete cree le 22/08 par Produit-04, decide le 23/08 par le pilote humain, et CORRIGE le 23/08 — version_forge_corrigee : « forge-audit — oracles/verifier-pdf.mjs + build-fiche a deux formats (commit 56c651c) ; pilot — catalogue des gabarits ». Son champ produits_beneficiaires porte : ['tout produit recevant une fiche securite', 'tout run d audit produisant un jeu de livrables a deux formats']. OR Produit-11, produit explicitement nomme beneficiaire, a livre une fiche securite le 25/08 puis une autre le 27/08 : LES DEUX SANS PDF. Deux occasions manquees, a deux et quatre jours de la correction. LE CAS N EST PAS ISOLE. Produit-03 a remonte la meme classe deux fois de plus, les 24/08a et 24/08b, sur la meme famille. Trois produits, trois demandes, du 22 au 24/08, sur un sujet corrige le 23/08. Et le decompte donne l echelle : 73 items de todo/TODO.jsonl sont au statut corrige avec des produits_beneficiaires de la forme « tout produit », sans qu aucun registre, ni cote factory ni cote produit, ne dise lesquels un produit donne a absorbes. Le champ est en PROSE, donc non interrogeable : on ne peut meme pas produire la liste des obligations d un produit. PREUVE QUE LA PROPAGATION EST SELECTIVE ET NON ABSENTE : la feuille de style de la fiche de Produit-11 porte le commentaire « Hauteur dimensionnee par le CONTENU (plus de min-height:297mm) », qui est exactement la lecon de troncature du lot 24/08a. Cette lecon-la est arrivee. Le PDF du meme lot, non. Une correction voyage donc quand une session tombe sur le bon fichier, et pas autrement. TF-0502 avait deja nomme le sujet le 22/08 — « la propagation des regles du pilot vers les produits reste le manque » — et son correctif n a traite qu un cas particulier, la recopie du gabarit de retours. PROPOSITION : rendre la propagation mesurable des DEUX cotes. (1) Cote factory, produits_beneficiaires devient une liste de criteres interrogeables (famille_de_gabarit, type_de_livrable) et non de la prose — sans quoi aucun controle n est ecrivable. (2) Cote produit, un manifeste forge/socle-adopte.jsonl : un item TF par ligne, avec date d adoption et PREUVE (fichier, commande, empreinte). (3) Un oracle qui confronte les deux et ECHOUE quand le produit est en retard, sur le modele de oracle-conformite-projet (R-47), deja employe pour la recopie du gabarit. Une obligation non cablee n existe pas : c est la lecon TF-0597, appliquee a la propagation elle-meme.</p></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 5 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-08-27</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">Produit-11</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">lot Produit-11 - RETOURS - 20260827b, forge/ledger.jsonl seq 166</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">factory</dd></div><div><dt>Score d'entrée</dt><dd>1 — gain 3 × preuve 1 ÷ effort 3</dd></div><div class="pleine"><dt>Coût déjà payé</dt><dd><p class="jalon-prose">un jeu de livrables remis incomplet DEUX FOIS sur le meme produit apres correction, et trois produits ayant remonte la meme classe en trois jours. Le destinataire a du reclamer le PDF en disant qu il l avait deja demande — il avait raison, la demande etait tracee en TF-0506 et corrigee quatre jours plus tot</p></dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-08-28</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">Sebastien — mandat « 3 : Tout traiter directement » du 28/08/2026, qui tranche EN BLOC les 22 candidatures alors en attente d'arbitrage</p></dd></div></dl>
+            </li>
+            <li class="jalon j-maj">
+              <p class="jalon-tete"><strong>maj</strong> <span class="jalon-date">2026-08-31</span></p>
+              
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-09-01</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">Self-test 8/8, les deux sens : concerne sans manifeste → FAIL (la scene des 25 et 27/08), adoption prouvee → PASS, antidatee → FAIL (adopte avant le correctif n'est pas ce correctif), id inconnu → FAIL, match par type de livrable → FAIL, produit non concerne → SANS_OBJET, ligne de manifeste invalide → FAIL, registre sans criteres → SANS_OBJET declare. EPROUVE PAR MUTATION : le message de P1 altere fait tomber le self-test sur exactement le cas vise. Joue sur le parc reel : SANS_OBJET honnete (aucun item ne porte encore de criteres), et la confrontation a tourne sur un rejeu de lot reel a l'ingestion. Ce que TF-0506 a coute — deux remises sans pdf a quatre jours de la correction, trois produits remontant la meme classe — devient detectable a la premiere cloture porteuse de criteres.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><ul class="puces"><li>Les trois pieces de l'item, livrees ensemble. (1) COTE REGISTRE : la convention `criteres_beneficiaires` — {familles_de_gabarit, types_de_livrable}, structure fermee et interrogeable a la place de la prose</li><li>confrontable au marqueur G4 des documents (TF-0690) et au 2e segment des noms dates (regle 25). (2) COTE PRODUIT : le manifeste forge/socle-adopte.jsonl — une ligne {tf, date_adoption, preuve} par adoption, la preuve etant un FAIT (fichier, commande, empreinte, commit). (3) LA CONFRONTATION : oracles/oracle-propagation.mjs (P1 : tout item clos a criteres dont un critere matche la PRODUCTION du produit figure au manifeste, adoption posterieure a la correction, preuve non vide</li><li>P2 : lignes du manifeste valides et visant un id connu — une adoption qui porte a cote ferait croire une obligation tenue). Un produit n'est juge QUE sur ce qu'il produit : pas de production concernee = SANS_OBJET, jamais FAIL — une obligation universelle non filtree ferait desactiver l'oracle. CABLE au point que le pilot maitrise : ingerer-lot.mjs le joue a CHAQUE lot remis, apres R-47, en avertissement jamais en blocage. Convention documentee a references/TODO-FORGE.md. Au passage, le piege d'analyse d'arguments paye hier sur TF-0695 (index d'un drapeau absent = -1, donc « +1 » exclut le premier positionnel) a ete attrape ICI AUSSI avant publication, et le commentaire du correctif nomme la classe</li></ul></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">digit-ai-factory (oracles/oracle-propagation.mjs + todo/ingerer-lot.mjs + references/TODO-FORGE.md)</p></dd></div><div><dt>Forge réellement touchée</dt><dd title="dépôt de forge réellement modifié par la correction — nom brut du registre">digit-ai-factory</dd></div><div><dt>Produits bénéficiaires</dt><dd title="produits ou missions ayant bénéficié de la correction, nommés au registre">tout produit dont la production matche un critere d'une cloture future — l'obligation devient nominale, datee et prouvable, au lieu de voyager quand une session tombe sur le bon fichier</dd></div></dl>
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-09-01</span></p>
               
             </li>
             </ol>
@@ -23526,7 +23592,7 @@ HORS PORTEE DU PILOT SANS MANDAT : la correction vit chez forge-tests, et les tr
         </div>
       </section>
     </main>
-    <footer>Page générée par <code>todo/generer-archive.mjs</code> — ne pas éditer. Source unique : <code>todo/TODO-ARCHIVE.jsonl</code> (sceau <code>e9c36f97ba63</code> — si la source a bougé sans régénération, le sceau ne correspond plus). Détail brut d'un item : <code>grep '"id":"TF-xxxx"' todo/TODO-ARCHIVE.jsonl</code>. Le reste-à-faire vit dans <code>todo/TODO.html</code>.</footer>
+    <footer>Page générée par <code>todo/generer-archive.mjs</code> — ne pas éditer. Source unique : <code>todo/TODO-ARCHIVE.jsonl</code> (sceau <code>f57344596b8d</code> — si la source a bougé sans régénération, le sceau ne correspond plus). Détail brut d'un item : <code>grep '"id":"TF-xxxx"' todo/TODO-ARCHIVE.jsonl</code>. Le reste-à-faire vit dans <code>todo/TODO.html</code>.</footer>
   </div>
   <!-- S-G1 (4/4, R-30) — câblage : persistance + aria-pressed, aucune bascule muette -->
   <script>
