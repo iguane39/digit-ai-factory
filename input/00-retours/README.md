@@ -35,6 +35,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-02 - RETOURS - 20260831b.normalise.tf.jsonl` | fichier | 3,9 Ko | 2 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20260831b.tf.jsonl` | fichier | 3,5 Ko | 2 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20260901a.md` | fichier | 6,0 Ko | Retours forges — l'écart déclaré qui remplaçait la solution disponible — 20260901a |
+| `Produit-02 - RETOURS - 20260901a.normalise.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20260901a.tf.jsonl` | fichier | 2,3 Ko | 1 ligne(s) JSONL |
 | `Produit-05 - RETOURS - 20260831a.md` | fichier | 24,0 Ko | Retours forges — Produit-05 — 20260831a |
 | `Produit-05 - RETOURS - 20260831a.tf.jsonl` | fichier | 14,7 Ko | 6 ligne(s) JSONL |
@@ -85,4 +86,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-02 - RETOURS - 20260826k.md` | fichier | 8,7 Ko | Retours forges — Produit-02.com — 20260826k |
 | `Produit-02 - RETOURS - 20260826k.tf.jsonl` | fichier | 4,1 Ko | 1 ligne(s) JSONL |
 
-_67 fichier(s), 1 sous-dossier(s)_
+_68 fichier(s), 1 sous-dossier(s)_

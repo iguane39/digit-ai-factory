@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=ad2b1ab68399 archive=bca717389565 · dernier événement: 2026-09-01T05:07:28.504Z -->
+     sceaux: actifs=5b4934007ae3 archive=bca717389565 · dernier événement: 2026-09-01T05:55:11.232Z -->
 
-**22 actifs** (candidat 0 · décidé 22 · en cours 0 · corrigé 0 · écarté 0) · **717 archivés**.
+**24 actifs** (candidat 2 · décidé 22 · en cours 0 · corrigé 0 · écarté 0) · **717 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -14,6 +14,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0674 | decide | 12.5 | La porte de fraîcheur de déploiement empreinte encore un échantillon — le correctif d'ensemble n'est pas appliqué | non |
 | TF-0682 | decide | 10 | Quinze contrôles du produit ne sont exercés par AUCUNE recette — être cité n'est pas être joué | non |
 | TF-0676 | decide | 6.7 | Aucun script de capture du produit ne produit systématiquement une pleine page | non |
+| TF-0740 | candidat | 1 | Gestion des heures : l'ecart declare qui remplacait la solution disponible, et le patron heure-locale-sur-planificateur-UTC | non |
 
 ## digit-ai-forge-agents
 
@@ -39,6 +40,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0707 | decide | 10 | design : un choix exclusif se pose AVANT les champs qu'il commande, jamais au milieu d'un formulaire qui les affiche deja tous | **oui** — inspection utilisateur en production : l'ecran a ete mal compris par son destinataire, qui a deduit une alternative inexistante entre deux moitiees du meme flux. |
 | TF-0719 | decide | 10 | digit-ai-page-html : le badge acte n est pas resolvant — il affirme un statut que rien ne verifie, et il a porte une decision qui n a jamais ete prise | **oui** — Badge acte pose a tort sur cinq emplacements d un livrable client, vert a check_html et render_page ; corrige seulement apres intervention du client. |
 | TF-0736 | decide | 6.7 | forge-design : aucun referentiel ne dit qu'un champ de saisie doit etre TYPE a son format, PROPOSE selon son contexte et BORNE par son sens — chaque ecran improvise | **oui** — retour utilisateur avec capture sur un ecran livre et audite (campagne v0.4.0 : interface 233/235, le defaut n'etait pas mesurable — les affordances etaient cablees, c'est la valeur et la borne qui manquaient) ; correctif produit : 1 service, 1 contexte, 2 champs, 4 tests, une soiree. |
+| TF-0739 | candidat | 10 | forge-design : la cible de geste d'un composant composite n'est un critere d'aucun referentiel — sur un champ date natif, seule une icone de vingt pixels ouvre le calendrier | **oui** — second retour utilisateur en deux jours sur le meme composant d'un ecran livre et audite (apres la valeur et les bornes, la cible de geste) ; correctif produit : 8 lignes de script global, 1 test, une demi-heure — le cout est dans la redecouverte par chaque produit, pas dans le correctif. |
 
 ## digit-ai-forge-tests
 
