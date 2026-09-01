@@ -1,84 +1,67 @@
-# Retours forges — Produit-12 — 20260831a
+# Retours forges — Client-A-POC-to-Prod — 20260831a
 
-- **Contexte** : clôture de la campagne forge-tests v0.4.0 (run `Produit-12-20260830b`,
-  rapport `forge\etapes\tests\rapport-20260831.json`) — et **demande d'étude commanditée par
-  l'utilisateur le 2026-08-31** : stratégie de tests et réduction des temps d'exécution sans
-  perte de qualité, métriques du projet fournies à l'appui.
-- **Références ledger** : `forge\ledger.jsonl` seq 93 (verdict de campagne), seq 96-97 (les retours)
+- **Contexte** : production d'un livrable HTML de consolidation de process (`Client-A - Process
+  Ingénierie POC-to-Prod - Consolidation et cible`), **trois indices en un jour** — `a` non
+  conforme au socle, `b` conforme au socle subordonné mais refusée par le lecteur, `c` conforme
+  après alignement sur le livrable de référence de la maison
+- **Références** : ce projet ne tient pas de ledger de run ; traçabilité par les fichiers
+  `output/old/03-Syntheses/…20260831a` et `…20260831b`, et par le livrable servi `…20260831c`
 - **Remise au pilot** : copier ce fichier (et son sidecar) dans `<pilot>\input\00-retours\` —
-  l'original reste ici.
-- **Statut** : remis le 2026-08-31 dans la boîte d'entrée du pilot (`<pilot>\input\00-retours\`) — ce lot ne se modifie plus
+  l'original reste ici (historique du produit).
+- **Statut** : **remis le 2026-08-31** — les deux fichiers déposés dans la boîte d'entrée du pilot `digit-ai-factory/input/00-retours/`, hors git ; l'original reste ici (historique du produit).
 
-Convention de gravité : **bloquant** · **majeur** · **mineur**. Ids en séquence continue du
-produit : la série RT s'arrêtait à RT-19 (lot 04).
+Convention de gravité : **bloquant** (a bloqué ou failli bloquer) · **majeur** (a coûté un
+aller-retour ou une découverte par lecture de code) · **mineur** (confort/précision).
+
+**Ce que ce lot documente.** Quatre jours après le lot `20260827a`, **le même projet a refait la
+même erreur, par le même chemin**. Il a écrit un livrable HTML contre
+`references/BEST-PRACTICES-HTML.md`, a chargé trois `<link>` Google Fonts parce que son item A1
+les autorise en toutes lettres, et n'a découvert la contradiction qu'en **relisant son propre lot
+de retours du 27/08**, où elle est déjà décrite sous **RT-1**. Le lot ne remonte pas une nouvelle
+classe de défaut : il apporte la **preuve que RT-1 est toujours ouvert et se rejoue**, plus trois
+défauts de forme qui n'avaient pas encore été rencontrés. Il consigne aussi, sans les remonter,
+les deux erreurs qui sont miennes et non celles du socle.
 
 ---
 
-## forge-tests (`digit-ai-forge-tests`)
+## digit-ai-factory (`digit-ai-factory`)
 
-La campagne v0.4.0 a coûté **67 minutes**, dont **~54 minutes de mutation** — 80 % du temps
-pour un seul pan — pendant que la suite complète du produit (984 tests) tourne en **~52 s**.
-Le premier retour est une **demande d'étude**, chiffrée ; le second, un défaut du détecteur
-statique constaté sur pièces.
-
-| id | Gravité | Portée | Retour (fait observé, avec preuve : fichier, message, mesure) | Proposition esquissée |
+| id | Gravité | Portée | Retour (fait observé, avec preuve) | Proposition esquissée |
 |---|---|---|---|---|
-| RT-20 | majeur | générique | **Demande d'étude approfondie : stratégie de tests et temps d'exécution des campagnes — le coût croît linéairement avec modules × mutants, et l'échantillonnage est déjà une concession au temps, pas une mesure choisie.** Mesuré sur la campagne v0.4.0 (2026-08-31) : durée totale 67 min, dont ~54 min de mutation — **115 mutants × ~37 s**, séquentiels. Or la suite complète du produit (984 tests) tourne en **~52 s** : ~37 s par mutant signifie que **chaque mutant rejoue une part quasi entière de la suite**, alors qu'une poignée de tests couvre la ligne mutée. L'échantillonnage actuel (3 mutants/module, plafond 400, `FORGE_TESTS_MUTANTS_PAR_MODULE`) borne la mesure par le budget temps : à couverture pleine du plafond, la mutation seule passerait à ~4 h (400 × 37 s). Et chaque campagne **rejoue tout**, même quand le delta du run ne touche que 10 modules sur 40 (lots A/B de ce run). Cadence mesurée au journal `forge\avancement.jsonl` : 0,57–0,60 module/min. Les axes demandés à l'étude : **sélection d'impact** (jouer les tests touchés par le diff, carte couverture module→tests, rejeu complet périodique en garde), **mutation ciblée par ligne** (ne rejouer par mutant que les tests couvrant la ligne mutée ; cache de verdicts des mutants inchangés entre campagnes, invalidé par empreinte du module et de sa suite), **parallélisation locale** (pytest-xdist pour la suite ; mutants en N processus — chaque test du produit monte déjà sa base SQLite isolée), **distribution multi-postes/serveurs** (file de mutants — le parc porte déjà `digit-ai-queue` —, agrégation au rapport), le tout sous un **garde-fou de non-perte** : sur un corpus de référence, la campagne optimisée rend le MÊME verdict que la campagne pleine (mêmes survivants, mêmes findings) — toute divergence est un défaut de l'optimisation, jamais un arrondi acceptable. Données fournies ci-dessous (« Données de mesure ») | Mener l'étude au niveau de la forge (elle vaut pour tout projet audité) ; livrer un plan par paliers, chaque palier avec son critère de non-perte exécutable ; le palier 1 le plus rentable est vraisemblablement la sélection par ligne mutée — il divise le coût du pan dominant sans toucher au périmètre mesuré |
-| RT-21 | mineur | générique | **Le détecteur statique de codes déclarés ne voit pas une émission sous garde `try/except` : 4 faux écarts sur la campagne v0.4.0.** Les 4 divergences statiques publiées portent toutes sur les codes 400 neufs des lots A/B, et **tous les 4 sont exercés dynamiquement par le pan api de la même campagne** (api 483/483) — le constat statique contredit la mesure dynamique du même rapport, ledger seq 93 | Croiser le constat statique avec la couverture dynamique avant publication : un couple opération×code que le pan api a exercé n'est pas une divergence — le publier en « confirmé dynamiquement » plutôt qu'en écart |
+| RT-1bis | **bloquant** | générique | **Reconstat de RT-1, quatre jours après, sur un autre livrable du même projet — et le coût est identique.** L'item **A1** de `references/BEST-PRACTICES-HTML.md` autorise « zéro dépendance **hors web fonts** », et son item **D4** prescrit Roboto + DM Sans + JetBrains Mono en citant une source qui les charge. J'ai donc écrit `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?…">` et trois `<link rel="preconnect">`, et déclaré le livrable conforme — indice `20260831b`, publié. La règle **A1** de l'oracle normatif refuse toute requête réseau au chargement. **Le seul document qui m'a détrompé est mon propre lot de retours du 27/08**, relu par hasard ; le livrable conforme de la maison (`Client-A - Différentiel Sécurité PSO IA - 20260827b`) fait, lui, **0 requête réseau** et déclare les trois familles en tokens avec repli système. La proposition de RT-1 n'a pas été appliquée : l'en-tête du fichier revendique toujours « **Source de vérité unique** ». | Appliquer RT-1 tel quel, et **corriger A1 et D4 dans le même geste** : « aucune requête réseau au chargement, y compris pour les polices ; les familles chartées se déclarent en tokens avec repli système, comme `…PSO IA - 20260827b`. » Tant que le texte autorise les web fonts, chaque nouveau lecteur du fichier refera ce livrable. Deux occurrences en quatre jours, même projet, même chemin. |
+| RT-4 | majeur | générique | **B1 et B6 se contredisent en pratique, et le socle n'arbitre pas.** B1 « header sticky » est verdict *adapter*, B6 « tableau de données triable, **`thead` sticky** » est verdict *adopter*. Sur une page longue à tableaux, les deux se superposent : l'en-tête de tableau se colle au bord haut de la fenêtre, **derrière** l'en-tête de document, et devient illisible ; ou bien on lui donne un décalage vertical, et il flotte alors au-dessus des premières lignes de son propre tableau. Aucun des deux textes ne dit lequel cède, ni ne fournit le décalage. Coût : deux cycles de rendu pour découvrir la collision, puis un arbitrage pris **par le produit** — l'en-tête et le sommaire forment un bloc fixe, le `thead` cède — ce qu'un produit ne devrait pas avoir à trancher seul. | Trancher au socle, et écrire le geste : soit B6 l'emporte et B1 devient « en-tête statique sur les pages à tableaux », soit B1 l'emporte et B6 reçoit son décalage sous la forme d'un token (`--hh`) que le gabarit pose. Un exemple dans le boilerplate suffirait ; c'est une question de deux lignes de CSS, et elle coûte un cycle de rendu à chaque page longue. |
+| RT-5 | mineur | générique | **La ligne D5 ne documente pas la teinte de refus, que la maison emploie pourtant.** D5 « palette sémantique de statut » nomme `--green`, `--amber`, `--teal`. Un rapport de conformité a besoin d'un quatrième registre — « non déclaré », bas d'échelle d'une carte de chaleur. Faute de le trouver, je l'ai d'abord **inventé** et déclaré comme extension locale dans mon livrable. En ouvrant le livrable conforme de la maison, j'ai constaté que `--red` / `--red-fill` / `--red-line` **y figurent déjà** (`#B91C1C` / `#FEF2F2` / `#F6CFCF`) : la palette les porte, la documentation non. | Ajouter `--red` et ses deux dérivés à la ligne D5, avec leurs valeurs. Une palette dont un registre entier n'est documenté nulle part se fait réinventer, et deux réinventions donnent deux rouges différents dans deux livrables de la même maison. |
+| RT-6 | mineur | générique | **Aucune famille de gabarit ne couvre une consolidation de process, et le catalogue ne le dit pas comme un manque.** Les 31 familles de `gabarits/documents/catalogue.jsonl` ont été parcourues : `gd-note-synthese-audit` porte un verdict d'audit à un commanditaire, `gd-modele-maturite` évalue une maturité, `gd-tableau-bord-post-remediation` compare deux audits du même objet. Aucune ne consolide **les process déclarés par plusieurs produits** en une cible commune avec écarts et décisions. J'ai donc inventé la structure, et déclaré `gabarit : candidat « consolidation-process »` dans l'en-tête du livrable, faute de pouvoir renseigner **G8**. | Ouvrir la famille en statut `a_extraire` avec ce livrable comme première source. Elle a des voisines proches : le lot PROCESS amont (déclaration par produit) et la consolidation aval forment une paire, et la paire se reproduira à chaque campagne. |
 
-### Données de mesure fournies à l'étude (RT-20)
+**Portée** (R-45) : les quatre retours ci-dessus sont de portée *générique*. Aucun ne dépend du
+contenu du livrable, ni de ce projet, ni de son client.
 
-Campagnes mesurées sur ce produit :
+## Confirmations — ce qui a bien fonctionné
 
-| Campagne | Date | Suite produit | Mutation | Durée campagne | Rapport |
-|---|---|---|---|---|---|
-| v0.1.0 | 2026-08-05 | 581 tests, ~17 s | 37 mutants, 7 modules, 37/37 tués | non tracée finement | `rapport-forge-tests.json` |
-| v0.2.x / v0.3.0 | 2026-08-05 → 08-08 | 581→~900 tests | périmètre élargi par chantiers A-1..A-3 | non tracée finement | `rapport-forge-tests-v0.2.0.json`, `-v0.2.2.json`, `-v0.3.0.json`, `-v0.3.0-20260808.json` |
-| v0.4.0 | 2026-08-31 | 984 tests, **~52 s** (mesuré ce jour, poste du run) | **115 mutants, 39/40 modules, 92 tués (80 %), ~37 s/mutant, ~54 min au total** | **67 min** | `rapport-20260831.json` (247 Ko : couverture élément par élément, score par module, 23 survivants nommés) |
-
-Autres pans de la v0.4.0 (part résiduelle des 13 min hors mutation) : api 483/483 · interface
-233/235 · data 194/197 · migrations 27/27 (aller-retour-aller × 9) · qualif 79/79 sur instance
-servie · prompts 0/15 · 94 findings (26 critique / 68 standard). Emplacements bruts :
-`forge\etapes\tests\rapport-*.json`, `forge\avancement.jsonl` (cadence horodatée de la
-mutation, entrée par module), `forge\ledger.jsonl` seq 17-21 et 92-93, suite
-`backend\tests\` (test le plus lent : 0,38 s — aucun test n'est individuellement coûteux,
-c'est le **nombre de rejeux** qui fait le coût).
+| Objet | Constat |
+|---|---|
+| **E4 · largeur utile** | Le token `clamp(75vw, 1680px, 92vw)` et la doctrine D1 sont **justes et suffisamment argumentés** : le texte de E4 raconte l'arbitrage du 21/08, le coût mesuré (647 px de texte pour 1 130 px de conteneur) et ce qu'il remplace. C'est ce récit — pas la règle seule — qui m'a permis de comprendre que ma bride à 1 280 px était le défaut exact qu'il décrit. |
+| **Doctrine D3 · repli en cartes** | La phrase « un conteneur `overflow-x: auto` ne fait pas passer un tableau » avec ses 26 défauts mesurés à 390 px a évité une discussion : il n'y avait rien à arbitrer, seulement à faire. Le repli en cartes a supprimé tout débordement sur 14 tableaux. |
+| **Pattern S-G1** | Collé tel quel, il fonctionne du premier coup, y compris la note sur la fixture sombre — « figer `data-theme="dark"` dans le HTML rendu ». Sans cette note j'aurais produit huit captures « sombres » qui rendaient clair, puisque l'init rebascule. Elle m'a fait refaire la preuve. |
+| **Livrable conforme de la maison** | `Client-A - Différentiel Sécurité PSO IA - 20260827b` a tranché **quatre** questions que les textes laissaient ouvertes : zéro requête réseau, `.lire` centré par marges auto, `--red` déjà dans la palette, `--w` en `max-width`. **Un artefact conforme vaut trois pages de doctrine** — c'est la leçon la plus utile de la journée, et elle plaide pour que le socle nomme explicitement un livrable de référence à ouvrir. |
 
 ## Remarques restées au produit
 
-Trois constats de la campagne restent au produit, chacun avec son verdict de généralisation
-écrit — aucun ne met la forge en cause.
-
 | Remarque (chez le produit) | Corrigée comment | Généralisable ? | Verdict |
 |---|---|---|---|
-| Pan data 194/197 : trois contraintes uniques (`uq_generation_curseurs`, `uq_archive_mails`, `uq_archive_curseurs`) jamais violées par un test — seuil 100 % non tenu | non corrigée dans ce lot : trois tests de violation à écrire au prochain run de version | non | dette de tests du produit sur ses migrations 0008/0009 ; la mesure de la forge a nommé exactement les trois éléments, c'est le comportement attendu |
-| Pan prompts 0/15 : les modèles du catalogue ne sont exercés par aucun cas | non corrigée : les cas d'épreuve des 15 modèles restent à écrire | non | le pan est nouveau côté forge et fonctionne ; c'est le produit qui ne l'alimente pas encore — à traiter au prochain run |
-| 23 mutants survivants dont 10 dans le code des lots A/B | non corrigée : assertions à renforcer au prochain run, survivants nommés au rapport | non | le seuil global (70 %) est tenu à 80 % ; les survivants sont l'outil de travail normal du prochain run, pas un défaut de la forge |
+| J'ai posé `.lire{max-width:1080px}` **sans marges auto**, donc collé à gauche : à 1920 px, le texte occupait 61 % du conteneur et laissait la moitié droite vide — le défaut exact que la doctrine D1 décrit, reproduit en croyant l'appliquer. | Bride retirée : la prose occupe la largeur offerte, première branche de D1. | **non** | Le socle écrit « ~1 080 px **centrés** » — le mot y est. C'est une lecture fautive de ma part, pas un défaut du texte. Consigné pour l'honnêteté du registre. |
+| J'ai chargé trois `<link>` Google Fonts en croyant appliquer A1. | Retirés ; familles déclarées en tokens avec repli système. | **oui** | La faute d'attention est mienne, mais la **classe** ne l'est pas : le texte autorise explicitement ce que l'oracle refuse. Remonté en **RT-1bis** — c'est la deuxième occurrence en quatre jours. |
+| J'ai d'abord mesuré la conformité avec un contrôle écrit par moi, faute des deux oracles du socle. | Les 17 contrôles maison sont conservés **et déclarés comme substituts** dans le livrable, avec la mention explicite que ce n'est pas équivalent à `check_html.py` + `render_page.py`. | **oui** | Exactement **RT-2** du lot du 27/08, toujours ouvert : les deux oracles vivent dans le skill, non vendorisé dans le sous-module `factory/` pinné de ce dépôt. Aucun livrable HTML d'ici ne peut être jugé comme la doctrine D7 l'exige. Pas de nouveau numéro : RT-2 suffit, et ce lot en est la seconde preuve de coût. |
+| Trois indices publiés en une journée (`a`, `b`, `c`) pour un même livrable. | Les deux versions supplantées sont versées dans `output/old/03-Syntheses/`, conformément à la règle de nommage. | non | Coût de mon apprentissage du socle, pas un défaut de forge. Il est néanmoins la mesure de ce que RT-1bis et RT-4 coûtent à un nouvel arrivant. |
 
 ## Retours sur les documents produits
 
-Aucun document produit depuis un gabarit de la bibliothèque `gabarits\documents\` sur ce lot —
-vérifié par la session de clôture de campagne, le 2026-08-31.
+**Aucun document produit depuis un gabarit** — et c'est le retour lui-même : la famille qui
+conviendrait, une consolidation de process multi-produits, est absente du catalogue (RT-6).
+Le livrable porte donc en en-tête `gabarit : candidat « consolidation-process »`, faute de
+pouvoir renseigner G8 (identifiant de famille + `version_du_gabarit`). Le tableau ci-dessous
+documente ce que cette absence a coûté.
 
-## Confirmations positives
-
-Trois mécanismes issus des lots précédents ont tenu en conditions réelles sur cette campagne.
-
-- **Les chantiers A-1/A-2/A-3 de la campagne d'amélioration du 06/08 ont tenu en conditions
-  réelles** : mutation sur 39/40 modules (contre 7 avant la campagne), les 4 exclusions
-  nominatives et motivées au rapport, seuils explicites, justifiés, et le seuil par module
-  métier joué (aucune compensation possible).
-- **Le pan qualif (A-4, demande utilisateur d'origine RT-6)** : 79/79 routes parcourues sans
-  erreur sur l'instance servie et peuplée.
-- **Le mécanisme anti « mutant échappé » (RT-17, lot 04) a tenu** : suite du produit vérifiée
-  INTACTE après restauration des mutants — 984 tests verts en fin de campagne.
-
-## Ordre recommandé
-
-L'ordre suit le rapport gain/effort : le poste de coût dominant d'abord.
-
-1. **RT-20** — l'étude : la mutation est 80 % du coût de campagne et croît linéairement avec le
-   périmètre ; chaque campagne future de chaque produit du parc la paie. La donnée fournie
-   (37 s/mutant contre 52 s de suite complète) désigne déjà le levier dominant.
-2. **RT-21** — le croisement statique/dynamique : supprime 4 faux constats par campagne, au prix
-   d'une jointure entre deux sections d'un même rapport.
+| Document produit | Gabarit employé + version | Ce qui a manqué | Ce qui a GÊNÉ LE LECTEUR | Ajouté à la main | Portée |
+|---|---|---|---|---|---|
+| `Client-A - Process Ingénierie POC-to-Prod - Consolidation et cible - 20260831c.html` | **aucun** — famille absente du catalogue, déclarée en candidat « consolidation-process » dans l'en-tête | La famille elle-même (RT-6), et un **livrable de référence nommé** à ouvrir avant d'écrire : c'est en ouvrant `…PSO IA - 20260827b` que quatre questions ouvertes se sont fermées d'un coup. | Deux refus successifs du lecteur humain, **tous deux sur la forme** : indice `a` « le format ne respecte pas la Factory » ; indice `b` « défauts sur la largeur, et l'en-tête n'est pas fixe avec les onglets affichés en permanence ». La structure, elle, n'a été contestée à aucun des trois indices. | Toute la structure : synthèse décisionnelle à KPI cliquables, table de réconciliation étapes ↔ phases, fiches d'étape à champs imposés, carte de chaleur produit × étape, plans de rattrapage par produit, décisions numérotées à options et recommandation, annexe de traçabilité ligne à ligne, et une **annexe A6 de conformité de forme** qui dit où chaque règle du socle est tenue. | **générique** |
