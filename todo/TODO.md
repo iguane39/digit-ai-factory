@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=b7a25e192b74 archive=e9c36f97ba63 · dernier événement: 2026-08-31T20:43:43.233Z -->
+     sceaux: actifs=e95521468e89 archive=f57344596b8d · dernier événement: 2026-09-01T04:17:00.276Z -->
 
-**40 actifs** (candidat 28 · décidé 12 · en cours 0 · corrigé 0 · écarté 0) · **693 archivés**.
+**44 actifs** (candidat 33 · décidé 11 · en cours 0 · corrigé 0 · écarté 0) · **695 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -26,9 +26,11 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0711 | candidat | 12.5 | pilot : un artefact copie_conforme qui bouge chez le pilot met tout le parc en FAIL, et aucun produit ne l'apprend | **oui** — deux derives du meme gabarit en une heure sur un poste, et deux produits du parc en FAIL R-47 sur ce fichier le meme jour. |
 | TF-0721 | candidat | 12.5 | Le perimetre de la mesure n'est pas le perimetre de la conclusion — quatre incidents, une seule erreur | **oui** — Une regression en production sur un budget publicitaire d'environ 100 EUR par mois, rendue definitive jusqu'a reparation ; et une recommandation de suppression qui aurait detruit 59 commits que ne detient aucun distant, arretee par le seul choix humain de verifier d'abord. Les deux mesures sont rejouables : inventaire du conteneur et des liens publicitaires d'un cote, comparaison des sujets de commit entre branche de sauvegarde et origin de l'autre. |
 | TF-0712 | candidat | 10 | pilot : R-32 n'a pas de forme de journal pour un livrable qui porte des donnees personnelles | **oui** — sept journaux ecrits sous forge/oracles/, dont cinq ont du etre caviardes par un mecanisme invente par le produit faute de contrat. |
+| TF-0735 | candidat | 10 | pilot : le principe de connexion a Railway par jeton n'est un artefact d'aucun referentiel de la route MEP — chaque session le reperd, deux episodes mesures sur le meme produit | **oui** — deux episodes de redecouverte sur le meme produit a 15 jours d'ecart ; le second a coute un aller-retour humain (restitution declarant un blocage + contre-ordre « le token est disponible ») et une entree de ledger fausse (seq 98), alors que le deploiement a reussi 30 minutes plus tard avec le jeton du poste. |
 | TF-0722 | candidat | 8 | Des valeurs de contexte ecrites comme des regles — instantane fige, valeur observable gravee, contrainte sans point de bascule | **oui** — Trois hypotheses fausses dans un seul prompt destine a piloter une construction, dont une qui aurait fait transformer un site statique en application sans decision humaine. Les trois ont ete relevees par l'humain lors d'une relecture, aucune par l'agent. |
 | TF-0710 | candidat | 7.5 | pilot : un artefact copie_conforme de R-47 revendique un nom generique qu'un produit occupait legitimement | **oui** — renommage de forge/retours/RETOURS-FORGES.md en INDEX-DES-LOTS.md plus trois sidecars d'oracles, et correction de deux documents qui le citaient. |
 | TF-0704 | candidat | 6.7 | pilot : l'etape MEP pilote Railway par le CLI, qui ne sait ni renommer un service ni corriger un domaine | **oui** — domaine de production anonyme laisse en l'etat du 2026-08-05 au 2026-08-16, corrige seulement par un appel d'API hors du chemin outille. |
+| TF-0734 | candidat | 1 | La porte parle trop : les surfaces pre-authentification se jugent du point de vue de l'inconnu | non |
 
 ## digit-ai-forge-agents
 
@@ -38,6 +40,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0715 | candidat | 12.5 | quality-oracles : aucun domaine ne verifie l AUTORITE d une decision affirmee — un livrable peut ecrire « Decideur : le prestataire, pour le client » et sortir vert | **oui** — Defaut alle jusqu au client sur un livrable vert a quatre portes ; correction d une phrase par le client, puis regeneration complete du rapport et reprise de cinq emplacements. |
 | TF-0717 | candidat | 8.3 | experts-forge : un angle declare vide le 20/08 a produit le 31/08 exactement le defaut qu il aurait attrape — fiche « migration de plateforme brownfield » jamais ecrite | **oui** — Angle vide declare le 20/08 et non comble ; defaut correspondant trouve par le client le 31/08, apres qu une contre-expertise complete et quatre portes automatiques l aient laisse passer. |
 | TF-0716 | candidat | 6.7 | quality-oracles : aucun domaine ne teste si une consequence declaree est LIVRABLE — « l utilisateur decouvre en production » passe les quatre portes | **oui** — Formulation presente dans six versions livrees et validee par quatre portes ; reaction directe du client, quatre lignes du rapport reecrites et un ecart neuf declare. |
+| TF-0733 | candidat | 1 | Un voile [hidden] au display explicite intercepte chaque clic — invisible a seize oracles de forme | non |
 
 ## digit-ai-forge-audit
 
@@ -53,6 +56,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0720 | candidat | 15 | digit-ai-page-html : M18 refuse une glose correcte quand une emphase ou un retour a la ligne s intercale entre le jeton et sa parenthese — deuxieme fois que le balisage casse une adjacence | **oui** — Quatre refus successifs a l ecriture de ce lot, dont deux sur du contenu conforme ; meme cause qu un faux positif deja signale le 22/08 sur un autre oracle. |
 | TF-0707 | candidat | 10 | design : un choix exclusif se pose AVANT les champs qu'il commande, jamais au milieu d'un formulaire qui les affiche deja tous | **oui** — inspection utilisateur en production : l'ecran a ete mal compris par son destinataire, qui a deduit une alternative inexistante entre deux moitiees du meme flux. |
 | TF-0719 | candidat | 10 | digit-ai-page-html : le badge acte n est pas resolvant — il affirme un statut que rien ne verifie, et il a porte une decision qui n a jamais ete prise | **oui** — Badge acte pose a tort sur cinq emplacements d un livrable client, vert a check_html et render_page ; corrige seulement apres intervention du client. |
+| TF-0736 | candidat | 6.7 | forge-design : aucun referentiel ne dit qu'un champ de saisie doit etre TYPE a son format, PROPOSE selon son contexte et BORNE par son sens — chaque ecran improvise | **oui** — retour utilisateur avec capture sur un ecran livre et audite (campagne v0.4.0 : interface 233/235, le defaut n'etait pas mesurable — les affordances etaient cablees, c'est la valeur et la borne qui manquaient) ; correctif produit : 1 service, 1 contexte, 2 champs, 4 tests, une soiree. |
 
 ## digit-ai-forge-tests
 
@@ -70,12 +74,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0694 | decide | 1 | digit-ai-page-html : la regle l2_gouttiere decrit EXACTEMENT ce defaut, au seuil exact, et rend PASS dessus - elle ne regarde que les grilles CSS, jamais les table | **oui** — Execute le 27/08/2026 : python render_page.py sur la fiche fautive 'Client-A - CAL - Fiche Securite Mise a disposition - Dev - 20260827b.html' (colonne d intitules a 32 %), --widths 1440 --output json. Resultat : verdict PASS, et l2_gouttiere : 0 constat - de meme que v1_overflow, v2_contrast, v4_overlap, l2_width, l2_conteneur, l2_filet, l2_freres, tous a 0. Le socle rend donc PASS sur le document meme que la regle est faite pour condamner. Cout constate : le defaut a traverse DEUX fiches livrees et TROIS regenerations avant qu un humain ne l ouvre et ne le dise. Mesure du gaspillage : 12,6 % a 19,4 % de la largeur de page perdus sur 7 tables sur 8. |
 | TF-0724 | candidat | 20 | Le socle de page HTML livre une declaration que son propre controle refuse, et une classe qui viole la regle de largeur qu'il enonce | **oui** — Deux echecs d'oracle sur un livrable, imputables au seul CSS du socle et non a son auteur, dont la correction a exige de modifier le squelette a l'assemblage — une surcharge ne suffisant pas, l'oracle lisant la declaration et non la cascade. Et un defaut de largeur releve par le destinataire humain que l'oracle ne voit pas. |
 
-## factory
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0689 | decide | 1 | factory : une correction marquee `corrige` n est jamais suivie jusqu au produit | **oui** — un jeu de livrables remis incomplet DEUX FOIS sur le meme produit apres correction, et trois produits ayant remonte la meme classe en trois jours. Le destinataire a du reclamer le PDF en disant qu il l avait deja demande — il avait raison, la demande etait tracee en TF-0506 et corrigee quatre jours plus tot |
-
 ## forge-audit
 
 | id | statut | score | titre | payé en réel |
@@ -89,6 +87,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-0549 | decide | 10 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : `Produit-07` a un forge\retours\ mais rien de ce qui s'y fait n'est suivi | **oui** — mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration. |
 | TF-0731 | candidat | 15 | pilot : `racine_produit` declare par un sidecar n'est JAMAIS lu — la voie recommandee par TF-0555 est morte depuis sa pose | **oui** — aucun cout paye visible — et c'est le probleme : une voie morte derriere une heuristique qui marche est indiscernable d'une voie vivante, jusqu'au produit qu'on ne localise pas alors qu'il avait declare sa racine (le cas exact pour lequel TF-0555 l'a fait poser) |
+| TF-0738 | candidat | 15 | pilot : le cliquet des recettes lit le PREMIER ratio de la ligne de resume — une date a barre oblique dans le libelle s'enregistre comme le compte de cas, et le cliquet s'affaiblit en silence | **oui** — une baseline fausse des son premier enregistrement, mesuree le jour meme ; la classe est celle de TF-0684 (un compte declare que la mesure ne sait pas lire) mais en pire : ici la mesure lit un FAUX compte plausible au lieu de rendre null — indiscernable d'une petite recette |
 | TF-0732 | candidat | 10 | poste : le gate d'ecriture C7 juge le FICHIER ENTIER, pas le delta — et sa regle « DM Sans bannie » contredit la charte maison : tout gabarit HTML de la bibliotheque est inedittable sans friction | **oui** — quatre editions de trois lignes bloquees en un tour pour des defauts anterieurs ; sans arbitrage, CHAQUE evolution future d'un gabarit HTML de la bibliotheque paiera le meme peage, et la regle de police fera accuser tout livrable conforme a la charte maison |
 | TF-0730 | candidat | 7.5 | pilot : un produit a heritage CONFORME ne recoit jamais ses constats — l'emetteur rend null avant de les calculer | **oui** — aucun cout paye a ce jour — le defaut est structurel et date de la seconde source (TF-0673, 26/08) ; il se paiera le jour ou un produit a heritage conforme portera un constat decide, et rien ne le dira |
 

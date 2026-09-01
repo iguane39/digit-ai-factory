@@ -73,7 +73,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 155 livrable(s) courant(s), 10 archivé(s), 6 famille(s).
+**État** : 156 livrable(s) courant(s), 10 archivé(s), 6 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -223,6 +223,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md | 20260830b | 19.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md` |
 | Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md | 20260830j | 16.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md` |
+| Digit-AI - Synthese Mandat - Retours pris et propagation mesurable - 20260901a.md | 20260901a | 12.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours pris et propagation mesurable - 20260901a.md` |
 | Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md | 20260822a | 13.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md` |
 | Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Toute la todo avec le a - 20260815a.md | 20260815a | 5.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Toute la todo avec le a - 20260815a.md` |
