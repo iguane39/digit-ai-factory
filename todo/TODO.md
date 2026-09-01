@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=c1c64f02dae0 archive=bca717389565 · dernier événement: 2026-09-01T09:13:10.336Z -->
+     sceaux: actifs=807b595a9ac5 archive=bca717389565 · dernier événement: 2026-09-01T12:20:46.293Z -->
 
-**32 actifs** (candidat 9 · décidé 22 · en cours 0 · corrigé 1 · écarté 0) · **717 archivés**.
+**32 actifs** (candidat 7 · décidé 23 · en cours 0 · corrigé 1 · écarté 1) · **717 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -72,8 +72,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0748 | decide | 5 | Palier 1 de la strategie de tests livre derriere un drapeau : la CONDITION DE NON-PERTE reste a jouer une fois sur un projet reel avant qu'il devienne le defaut | **oui** — campagne mesuree a 67 min dont 54 de mutation, 28,2 s par mutant ; surcout fixe mesure a 0,386 s |
 | TF-0747 | candidat | 15 | La suite de forge-tests est ROUGE sur son propre banc : la regle L23 du skill digit-ai-page-html a evolue, la fixture HTML de test_tf_0117 ne porte pas la garde | **oui** — 1 test en echec sur 1174, bloquant en mode -x : toute mesure de suite entiere sur ce banc est invalide tant qu'il dure |
-| TF-0748 | candidat | 5 | Palier 1 de la strategie de tests livre derriere un drapeau : la CONDITION DE NON-PERTE reste a jouer une fois sur un projet reel avant qu'il devienne le defaut | **oui** — campagne mesuree a 67 min dont 54 de mutation, 28,2 s par mutant ; surcout fixe mesure a 0,386 s |
 
 ## pilot
 
@@ -82,7 +82,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0549 | decide | 10 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : `Produit-07` a un forge\retours\ mais rien de ce qui s'y fait n'est suivi | **oui** — mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration. |
 | TF-0732 | decide | 10 | poste : le gate d'ecriture C7 juge le FICHIER ENTIER, pas le delta — et sa regle « DM Sans bannie » contredit la charte maison : tout gabarit HTML de la bibliotheque est inedittable sans friction | **oui** — quatre editions de trois lignes bloquees en un tour pour des defauts anterieurs ; sans arbitrage, CHAQUE evolution future d'un gabarit HTML de la bibliotheque paiera le meme peage, et la regle de police fera accuser tout livrable conforme a la charte maison |
 | TF-0745 | candidat | 12.5 | Le juge et le gabarit de restitution avancaient ensemble, le RAPPEL du hook restait au 20/08 : dix versions de doctrine dictees a l'envers | **oui** — trois retours humains du 30/08 sur le meme sujet, tous portant sur une forme deja prescrite au gabarit et deja jugee par l'oracle ; commit 6d45638 du 20/08 contre commit 176bc5e du 31/08 sur le meme fichier |
-| TF-0746 | candidat | 6.7 | Le texte de la doctrine voyage une fois et ne se met jamais a jour : trois produits portent RESTITUTION.md en 2.10.0 quand le pilot est en 2.15.0 | **oui** — trois copies de forge/RESTITUTION.md relevees en version 2.10.0 le 01/09 contre 2.15.0 a la source ; R-47 ne se joue qu'a l'ingestion d'un lot |
+| TF-0746 | ecarte | 6.7 | Le texte de la doctrine voyage une fois et ne se met jamais a jour : trois produits portent RESTITUTION.md en 2.10.0 quand le pilot est en 2.15.0 | **oui** — trois copies de forge/RESTITUTION.md relevees en version 2.10.0 le 01/09 contre 2.15.0 a la source ; R-47 ne se joue qu'a l'ingestion d'un lot |
 
 ---
 Détail d'un item : `grep '"id":"TF-xxxx"' todo/TODO.jsonl` (tous ses événements). Archive : même commande sur TODO-ARCHIVE.jsonl.

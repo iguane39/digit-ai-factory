@@ -655,8 +655,27 @@ séparément pour que le remède soit précis :
 | le texte | `forge\RESTITUTION.md` (copie de ce fichier) | le juge refuse sans que rien n'apprenne la forme : l'agent devine |
 
 **Comment elle arrive** : par l'héritage, jamais par bonne volonté. Les trois pièces sont déclarées
-dans `gabarits\HERITAGE.json` et contrôlées par **R-47** à chaque ingestion de lot. Le texte y est
-entré le 24/08 — il n'y était pas, c'est pourquoi il ne voyageait pas.
+dans `gabarits\HERITAGE.json`. Le texte y est entré le 24/08 — il n'y était pas, c'est pourquoi il
+ne voyageait pas.
+
+**Et depuis le 30/08, elle arrive TOUTE SEULE, à l'ouverture de session du produit.** Cette page a
+dit jusqu'au 01/09 que les pièces étaient « contrôlées par R-47 à chaque ingestion de lot », et
+c'était vrai jusqu'au 30/08 seulement : la redescente dépendait alors du trafic SORTANT de chaque
+produit — un produit qui consomme la doctrine sans jamais renvoyer de lot n'était jamais contrôlé,
+ce que le destinataire a décrit d'un mot, « assez aléatoire ». Décision humaine du 30/08, voie (a) :
+`oracles\hook-ouverture.mjs` RECOPIE lui-même, au démarrage de la session du produit, tout artefact
+déclaré en **copie identique** — donc ce fichier —, dit lesquels il a écrits, puis se juge. Ce n'est
+pas le pilot qui écrit chez le produit : ce hook s'exécute DANS le produit, lancé par la
+configuration du produit ; le pilot ne fournit que la source.
+
+**Ce que cette correction a coûté avant d'être écrite, et il vaut d'être su (01/09)** : la phrase
+périmée a été LUE et reprise pour argent comptant dans une restitution, qui a posé au destinataire
+une décision entière — « comment le texte à jour arrive-t-il chez les produits ? » — sur un mécanisme
+livré depuis deux jours. Trois produits relevés en version 2.10.0 le même jour ne prouvaient pas
+l'absence de mécanisme : ils prouvaient qu'aucune session n'y avait été ouverte depuis. *Une page de
+doctrine qui décrit un mécanisme remplacé fait poser des questions déjà répondues* — c'est le même
+défaut que le RAPPEL périmé du hook, à un jour d'intervalle, et la même parade : le texte, son juge
+et ce que l'agent lit se mettent à jour ensemble.
 
 **Qui écrit chez le produit** : le produit. « Ne touche pas les produits, seuls les produits se
 modifient eux-mêmes » (mandat humain du 23/08). Le pilot NOMME l'état d'installation
