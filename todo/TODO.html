@@ -155,7 +155,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>c1c64f02dae0</code> · dernier événement 2026-09-01T09:13:10.336Z</p>
+      <p class="meta">sceau <code>807b595a9ac5</code> · dernier événement 2026-09-01T12:20:46.293Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -165,8 +165,8 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="9 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">9</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="22 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">22</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="7 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">7</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="23 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">23</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="716 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">716</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
@@ -860,6 +860,29 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-decide" id="item-TF-0748" data-cite data-forge="forge-tests" data-statut="decide" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0748</code>
+            <span class="statut s-decide">decide</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">Palier 1 de la strategie de tests livre derriere un drapeau : la CONDITION DE NON-PERTE reste a jouer une fois sur un projet reel avant qu'il devienne le defaut</h3>
+          <div class="card-detail" data-cite><p class="lead">DECISION D-34 du 01/09, et elle ne retient AUCUNE des trois options proposees : « Tous les tests sont pleinement executes tout le temps, sauf les tests sur les mutants qui sont executes a la demande, lors d'un passage en Prod sur proposition de l'IA, et uniquement s'ils n'ont ete executes depuis plusieurs modifications de code.</p><ul class="puces"><li>» L'etude cherchait a rendre la mutation moins CHERE</li><li>la decision la rend plus RARE, et le raisonnement est le plus solide des deux : le cout d'une campagne ne devient un probleme que parce qu'on la joue a chaque fois. CE QUE LA DECISION FERME AUSSI : « pleinement executes tout le temps » interdit toute SELECTION sur la suite ordinaire — le palier 3 de l'etude (selection d'impact) est refuse et ne se representera pas sous un autre nom. LIVRE le 01/09 dans digit-ai-forge-tests : le pan mutation ne se joue plus par defaut (FORGE_TESTS_MUTATION=1 le demande), il DIT ce qu'il n'a pas mesure et publie quand meme modules[], la campagne jouee se note chez le produit dans forge/mutation-derniere-campagne.json, les modifications du code source depuis se comptent par git sur le paquet de sources, le seuil de peremption vaut 10 commits et se change par FORGE_TESTS_MUTATION_PEREMPTION, une anciennete inconnue vaut perimee, et la PROPOSITION est redigee dans le rapport parce que « sur proposition de l'IA » n'a d'executant que si le texte la porte. Doctrine cote pilot : ETAPE-MEP.md section 1 bis. Banc : 10 tests rouges et verts dans tests/test_d34_mutation_a_la_demande.py, banc rouge joue (4 echecs sur 10 quand l'implementation est cassee a la main). RESTE OUVERT : le sort du ciblage par ligne mutee, ecrit et eprouve mais eteint — la decision ne dit rien du rejeu d'un mutant, et trancher a la place de l'humain serait ici une prise de position, pas une deduction</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-01</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 5 — gain 5 × preuve 4 ÷ effort 4)</span></dd></div>
+            <div class="impact"><dt>Impact sur forge-tests</dt><dd>campagne mesuree a 67 min dont 54 de mutation, 28,2 s par mutant ; surcout fixe mesure a 0,386 s</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-candidat" id="item-TF-0747" data-cite data-forge="forge-tests" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0747</code>
@@ -874,29 +897,6 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 15 — gain 3 × preuve 5 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur forge-tests</dt><dd>1 test en echec sur 1174, bloquant en mode -x : toute mesure de suite entiere sur ce banc est invalide tant qu'il dure</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">ia</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0748" data-cite data-forge="forge-tests" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0748</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 5)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">Palier 1 de la strategie de tests livre derriere un drapeau : la CONDITION DE NON-PERTE reste a jouer une fois sur un projet reel avant qu'il devienne le defaut</h3>
-          <div class="card-detail" data-cite><p class="lead">Suite directe de l'etude output/03-etudes/20260901-etude-opportunite-strategie-tests.md (option retenue O3, palier 1).</p><ul class="puces"><li>CE QUI EST FAIT le 01/09 dans digit-ai-forge-tests : la mesure NOMMEE par l'etude est jouee — le surcout fixe par mutant vaut 0,386 s (mediane de trois, mesures 0,361 puis 0,386 puis 0,414, suite de 1174 tests, memes drapeaux que _suite_verte), tres loin du critere d'abandon de 10 s</li><li>et le ciblage par ligne mutee est implemente dans forge_tests/adaptateurs/mutation.py (passe de couverture par test avec dynamic_context, selection des identifiants de test couvrant la ligne, repli sur la suite entiere quand la carte manque). Six tests en rouge et en vert dans tests/test_palier1_ciblage_mutation.py, banc rouge joue : 4 echecs sur 6 quand l'implementation est cassee a la main. CE QUI RESTE : la condition de non-perte de l'etude — meme liste de survivants que la campagne pleine — n'a pas pu etre jouee, coverage etant absent du venv de la forge et le banc vert n'ayant pas d'environnement. Le ciblage vit donc derriere FORGE_TESTS_MUTATION_CIBLAGE=1, absent par defaut (loi transverse n° 2), et le rapport publie mutation.ciblage.non_perte_jouee a false. Il ne devient le defaut qu'apres une campagne reelle ou les deux verdicts ont ete compares. Paliers 2 a 5 (cache de verdicts, selection d'impact, parallelisation, distribution) non engages</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-01</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 5 — gain 5 × preuve 4 ÷ effort 4)</span></dd></div>
-            <div class="impact"><dt>Impact sur forge-tests</dt><dd>campagne mesuree a 67 min dont 54 de mutation, 28,2 s par mutant ; surcout fixe mesure a 0,386 s</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain</dd></div>
             
           </dl>
         </article>
@@ -981,21 +981,21 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0746" data-cite data-forge="pilot" data-statut="candidat" data-prio="haute">
+        <article class="card s-ecarte" id="item-TF-0746" data-cite data-forge="pilot" data-statut="ecarte" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0746</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-ecarte">ecarte</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.7)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
           <h3 class="card-titre">Le texte de la doctrine voyage une fois et ne se met jamais a jour : trois produits portent RESTITUTION.md en 2.10.0 quand le pilot est en 2.15.0</h3>
-          <div class="card-detail" data-cite><p class="lead">Constat du 01/09, mesure sur le poste. gabarits/HERITAGE.json declare gabarits/RESTITUTION.md en mode copie_conforme vers forge/RESTITUTION.md depuis le 24/08 (TF-0571). Les trois produits instancies du poste portent tous la version 2.10.0 : cinq versions de retard, dont les quatre qui ont refondu le bloc 3 (S30, tableau d'options, anatomie, bloc de citation) et celle du 01/09 (selecteurs D-N et A-N). LA CAUSE STRUCTURELLE : R-47 ne joue qu'a l'INGESTION D'UN LOT. Un produit qui ne remet rien ne decouvre jamais que son texte est perime — et un produit qui travaille sans remettre est exactement celui qui en aurait le plus besoin. oracle-portee-doctrine ne comble pas le trou : il declare lui-meme en non_juge que la fraicheur des pieces n'est pas son travail. CE QUE CA COUTE : le produit rend un message de fin de tour au format 2.10.0, l'humain le lit a cote d'un message du pilot au format 2.15.0, et lit une difference de forme comme une difference de version — c'est mot pour mot le retour du 30/08. REMEDE : un run demande au produit (le pilot n'ecrit jamais chez un produit, mandat du 23/08) ; ou une declaration de perimetre a l'ouverture de session du produit, jouee par le hook qui s'y trouve deja.</p></div>
+          <div class="card-detail" data-cite><p class="lead">RECTIFICATION PAR AJOUT — la premisse de cet item etait FAUSSE, et sa cause vaut d'etre nommee.</p><ul class="puces"><li>L'item affirmait que rien ne dirait a un produit que son texte de doctrine est perime tant qu'il ne remettrait pas de lot. C'etait vrai jusqu'au 30/08 seulement : depuis la decision humaine du 30/08 (voie a), oracles/hook-ouverture.mjs RECOPIE lui-meme, au demarrage de la session du produit, tout artefact declare en copie identique dans HERITAGE.json — donc RESTITUTION.md — puis se juge. Verifie le 01/09 sur les trois produits instancies du poste : les trois portent forge/hooks/factory.mjs ET le cablage SessionStart vers le hook ouverture. Leur version 2.10.0 ne prouvait donc pas l'absence de mecanisme, mais qu'aucune session n'y avait ete ouverte depuis. D'OU VENAIT L'ERREUR : la section « Portee » de gabarits/RESTITUTION.md decrivait encore le mecanisme d'avant le 30/08 (« controlees par R-47 a chaque ingestion de lot »), et cette phrase perimee a ete lue et reprise pour argent comptant — au point de poser a l'humain une decision entiere (D-35) sur un mecanisme livre depuis deux jours. Meme classe de defaut que TF-0745, a un jour d'intervalle : un referentiel qui a un double en prose ailleurs a deux verites des la version suivante. CORRIGE le 01/09 : la section Portee decrit la recopie automatique et raconte ce que la phrase perimee a coute. Item ecarte parce que son remede existait deja</li><li>le defaut reel qu'il a revele est corrige, et la lecon est ecrite a la source</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-09-01</dd></div>
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
             <div class="impact"><dt>Impact sur pilot</dt><dd>trois copies de forge/RESTITUTION.md relevees en version 2.10.0 le 01/09 contre 2.15.0 a la source ; R-47 ne se joue qu'a l'ingestion d'un lot</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">ia</dd></div>
-            
+            <div class="impact"><dt>Motif d'écart (TF-0157)</dt><dd>remede deja livre le 30/08 : la recopie automatique des artefacts en copie identique a l ouverture de session du produit (hook-ouverture) couvre exactement ce que cet item demandait. Le defaut REEL revele en le verifiant — la section Portee du gabarit decrivait encore le mecanisme d avant — est corrige le 01/09. Rouvrir si un produit instancie se revele non cable, ou si un artefact en mode presence prend du retard sans que rien ne le dise.</dd></div>
           </dl>
         </article>
       </div>

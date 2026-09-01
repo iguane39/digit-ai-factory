@@ -33,6 +33,50 @@ déploiement** vient du brief produit (champ « cible de déploiement ») — si
 conteneur Docker local/staging. Une cible cloud (Railway, VPS, autre) est un **paramètre du
 brief**, jamais improvisée en cours de run.
 
+## 1 bis. La campagne de MUTATION se propose ICI, et nulle part ailleurs (D-34, 01/09/2026)
+
+**La décision humaine, mot pour mot** : « Tous les tests sont pleinement exécutés tout le temps,
+sauf les tests sur les mutants qui sont exécutés à la demande, lors d'un passage en Prod sur
+proposition de l'IA, et uniquement s'ils n'ont été exécutés depuis plusieurs modifications de
+code. »
+
+**Ce qu'elle tranche, et ce n'est aucune des options qui lui étaient proposées.** L'étude du 01/09
+cherchait à rendre la mutation moins CHÈRE ; la décision la rend plus RARE. Le raisonnement est le
+plus solide des deux et il faut le dire : le coût d'une campagne de mutation ne devient un problème
+que parce qu'on la joue à chaque fois. Jouée une fois avant une mise en production, après plusieurs
+modifications, une campagne longue n'est plus un coût — c'est le prix d'une porte, et une porte se
+franchit rarement.
+
+**Ce qu'elle interdit, et c'est le versant qu'on oublierait** : « pleinement exécutés tout le
+temps » ferme la porte à toute SÉLECTION sur la suite ordinaire. Ne rejouer que les tests touchés
+par un changement — le troisième palier de l'étude — est refusé, et ne se représentera pas sous un
+autre nom. La suite entière reste la mesure de chaque changement.
+
+**Les trois conditions, et qui les porte** :
+
+| Condition | Qui l'exécute | Ce qui se passe si elle manque |
+|---|---|---|
+| à la demande | l'adaptateur de mutation de forge-tests, éteint par défaut (`FORGE_TESTS_MUTATION=1`) | chaque audit repaie la campagne entière, et le coût redevient la raison de la couper |
+| sur proposition de l'IA, au passage en production | **cette étape** : l'entrée de la MEP lit l'état publié par le pan et pose la proposition au GO humain | la porte n'a aucun moment où s'ouvrir, et la mutation ne se joue jamais |
+| seulement si périmée | la campagne précédente est notée chez le produit (`forge\mutation-derniere-campagne.json`), et les modifications du code source depuis se comptent | la proposition tombe à chaque passage, devient du bruit, et se fait ignorer |
+
+**Le geste, à l'entrée de l'étape** : lire `mutation.a_la_demande` au rapport de forge-tests. S'il
+porte `perimee: true`, la campagne se PROPOSE au bloc de décisions de la restitution, avec son
+motif chiffré — nombre de modifications depuis la dernière campagne, et seuil retenu. La décision
+de la jouer reste humaine (R-29) : elle coûte du temps machine, et une dépense de temps se décide.
+
+**Le seuil est un chiffre, pas un mot.** « Plusieurs modifications » vaut **10 commits touchant le
+paquet de sources** par défaut, et se change par `FORGE_TESTS_MUTATION_PEREMPTION`. Il est publié
+au rapport : un seuil qu'on ne lit pas est un seuil qu'on ne discute pas.
+
+**Une ancienneté inconnue vaut périmée.** Sans dépôt git, sans campagne antérieure notée, ou si le
+compte échoue, la campagne est proposée. Le choix inverse ferait passer un projet neuf entre les
+mailles pour toujours, et personne ne le verrait — c'est la forme la plus coûteuse du silence.
+
+**Ce que le seuil bloquant devient quand le pan n'est pas joué** : sans porteur, et le rapport le
+DIT. Un pan non demandé et un pan dont le score est nul sont deux choses différentes ; les
+confondre au tableau de bord ferait lire une absence de mesure comme un échec de mesure.
+
 ## 2. Ce que l'étape produit (staging, autonome)
 
 Dans le projet produit (`forge\etapes\mep\` pour les preuves, racine pour les fichiers de build) :
