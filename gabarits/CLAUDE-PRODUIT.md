@@ -79,6 +79,20 @@ Boucle intérieure (libre, sans verdict) : `<commandes locales : pytest, ruff, s
   `MODE_DEMO`, jamais de secret.
 - `<conventions spécifiques au produit>`
 
+## Lexique d'invocation (RV-6, étendu aux produits par TF-0723)
+
+**Une formule du message qui figure LITTÉRALEMENT dans les déclencheurs d'un skill disponible
+est une INVOCATION, jamais une tournure.** La coïncidence littérale prime sur l'interprétation
+contextuelle ; en cas de doute réel, poser la question en une ligne AVANT d'exécuter la suite —
+l'aller-retour coûte une minute, une construction lancée sans l'analyse due se compte en tours.
+*Le fait qui a créé cette règle* : trois messages ouverts par « Améliore le prompt : » ont été
+lus comme un préambule et exécutés sans le skill d'analyse présent dans l'environnement — le
+travail rendu à la place était réel et accepté, donc RIEN ne signalait le manque (un skill non
+invoqué ne laisse ni erreur ni journal, seule l'absence de son livrable propre le trahit) ; le
+prompt ainsi ignoré valait 39/100 avec quatre défauts bloquants, et la construction fautive
+avait commencé quand l'humain a interrompu. À l'ouverture de tout run : lister les skills
+disponibles et leurs déclencheurs.
+
 ## Référentiels
 
 Ce sur quoi la mesure peut — ou ne peut PAS — s'appuyer. **Une réponse par ligne, et « absent »
