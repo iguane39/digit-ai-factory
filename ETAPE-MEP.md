@@ -73,6 +73,8 @@ au rapport : un seuil qu'on ne lit pas est un seuil qu'on ne discute pas.
 compte échoue, la campagne est proposée. Le choix inverse ferait passer un projet neuf entre les
 mailles pour toujours, et personne ne le verrait — c'est la forme la plus coûteuse du silence.
 
+**Et la règle a son EXÉCUTANT, sinon elle décore (01/09, le jour même).** `node oracles\oracle-trace-mutation-mep.mjs <produit>` juge le dossier de MEP en trois règles : **TM1** le dossier NOMME l'état de la campagne — jouée, ou proposée puis refusée, le silence étant le défaut fondateur ; **TM2** une campagne déclarée jouée porte sa preuve chiffrée ou localisante, jamais un ✓ nu ; **TM3** elle est ADOSSÉE au marqueur que la campagne écrit elle-même chez le produit — c'est la seule des trois qu'une phrase bien tournée ne peut pas satisfaire. Un produit sans dossier de MEP rend SANS_OBJET et jamais FAIL : l'étape n'a pas été atteinte, et juger une absence d'événement reviendrait à accabler un projet pour ne pas être allé assez loin.
+
 **Ce que le seuil bloquant devient quand le pan n'est pas joué** : sans porteur, et le rapport le
 DIT. Un pan non demandé et un pan dont le score est nul sont deux choses différentes ; les
 confondre au tableau de bord ferait lire une absence de mesure comme un échec de mesure.

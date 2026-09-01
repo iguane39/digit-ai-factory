@@ -161,7 +161,7 @@ d'attente décroissant.
 
 ## 9. Traces
 
-- Cette synthèse : output/04-plans/Digit-AI - Synthese Mandat - Selecteurs de familles et palier 1 des tests - 20260901b.md
+- Cette synthèse : output/04-plans/Digit-AI - Synthese Mandat - Selecteurs de familles et palier 1 des tests - 20260901e.md
 - Commits : 5a1495a au pilot · 4672f7a à la forge de tests — locaux, non publiés
 - Référentiel de forme : gabarits/RESTITUTION.md version 2.15.0
 - Juges de forme : oracles/oracle-synthese.mjs · oracles/hook-restitution.mjs · oracles/hook-ouverture.mjs
