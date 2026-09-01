@@ -57,5 +57,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `20260822-etude-opportunite-vue-portefeuille.md` | fichier | 8,4 Ko | Étude d'opportunité — vue portefeuille du reste-à-faire — 20260822a |
 | `20260830-L99-etat-de-l-art-marche.md` | fichier | 27,0 Ko | Analyse L99 — « construire un skill et/ou une forge pour l'état de l'art du marché » |
 | `20260831-opportunite-etat-de-l-art-marche.md` | fichier | 9,0 Ko | Étude d'opportunité — un dispositif d'état de l'art de marché est-il à construire ? |
+| `20260901-etude-opportunite-dataforseo.md` | fichier | 20,6 Ko | Étude d'opportunité — DataForSEO dans le dispositif de mesure de Produit-02 — 20260901a |
+| `20260901-etude-opportunite-strategie-tests.md` | fichier | 23,9 Ko | Étude d'opportunité — stratégie de tests et temps d'exécution des campagnes — 20260901a |
 
-_41 fichier(s), 0 sous-dossier(s)_
+_43 fichier(s), 0 sous-dossier(s)_
