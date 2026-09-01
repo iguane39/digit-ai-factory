@@ -1,19 +1,19 @@
 {
-  "cible": "c:\\dev\\digit-ai-factory\\REGLES-PROJET.md",
-  "date_iso": "2026-09-01T05:26:13.412Z",
+  "cible": "c:\\dev\\digit-ai-factory\\gabarits\\docs-projet\\ACCES-TEST.md",
+  "date_iso": "2026-09-01T05:18:29.208Z",
   "registre_version": "2.13.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
   "resume": {
-    "pass": 4,
+    "pass": 3,
     "fail": 0,
-    "skip": 3,
+    "skip": 4,
     "cache": 0
   },
   "bilan_fichiers": {
     "jugé": [
-      "REGLES-PROJET.md"
+      "gabarits\\docs-projet\\ACCES-TEST.md"
     ],
     "exempté": [],
     "délégué": [],
@@ -24,43 +24,43 @@
   "resultats": [
     {
       "domaine": "Lisibilité d'un document (Markdown)",
-      "file": "REGLES-PROJET.md",
+      "file": "gabarits\\docs-projet\\ACCES-TEST.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Format / livraison / versioning",
-      "file": "REGLES-PROJET.md",
+      "file": "gabarits\\docs-projet\\ACCES-TEST.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Sécurité / secrets",
-      "file": "REGLES-PROJET.md",
+      "file": "gabarits\\docs-projet\\ACCES-TEST.md",
       "verdict": "PASS",
       "detail": "aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
-      "file": "REGLES-PROJET.md",
+      "file": "gabarits\\docs-projet\\ACCES-TEST.md",
       "verdict": "SKIP",
       "detail": ""
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
-      "file": "REGLES-PROJET.md",
-      "verdict": "PASS",
-      "detail": "11 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (11 avertissement(s)) ; nombre « 3 984 » non sourcé"
+      "file": "gabarits\\docs-projet\\ACCES-TEST.md",
+      "verdict": "SKIP",
+      "detail": ""
     },
     {
       "domaine": "Nommage / convention de livraison",
-      "file": "REGLES-PROJET.md",
+      "file": "gabarits\\docs-projet\\ACCES-TEST.md",
       "verdict": "SKIP",
       "detail": ""
     },
     {
       "domaine": "Cohérence inter-documents",
-      "file": "REGLES-PROJET.md",
+      "file": "gabarits\\docs-projet\\ACCES-TEST.md",
       "verdict": "SKIP",
       "detail": ""
     }
@@ -68,10 +68,10 @@
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
-    "release": "REGLES-PROJET.md",
-    "ts": "2026-09-01T05:26:13.412Z",
+    "release": "gabarits\\docs-projet\\ACCES-TEST.md",
+    "ts": "2026-09-01T05:18:29.208Z",
     "fichiers": {
-      "REGLES-PROJET.md": "8f491baf6b0ba02d17425770a76c3f466de50872c96e4bc936549e93da294519"
+      "gabarits\\docs-projet\\ACCES-TEST.md": "438f32ee1ad50022a1b54baa8eb31c1fe460ea39487329c76bf69d47eb2a1214"
     }
   },
   "empreinte_motif": null,

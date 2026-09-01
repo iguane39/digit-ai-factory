@@ -215,8 +215,8 @@
   "vu_le": "2026-08-26"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
-  "cas": 13,
-  "vu_le": "2026-08-26"
+  "cas": 14,
+  "vu_le": "2026-09-01"
  },
  "oracles/oracle-controles-injoignables.test.mjs": {
   "cas": 19,
@@ -254,9 +254,13 @@
   "cas": 7,
   "vu_le": "2026-08-26"
  },
+ "scripts/recopier-heritage.test.mjs": {
+  "cas": 6,
+  "vu_le": "2026-09-01"
+ },
  "scripts/relever-heritage.test.mjs": {
-  "cas": 14,
-  "vu_le": "2026-08-26"
+  "cas": 19,
+  "vu_le": "2026-09-01"
  },
  "scripts/verifier-bascule.test.mjs": {
   "cas": 8,
@@ -279,8 +283,8 @@
   "vu_le": "2026-08-26"
  },
  "todo/emettre-travaux.test.mjs": {
-  "cas": 30,
-  "vu_le": "2026-08-31"
+  "cas": 31,
+  "vu_le": "2026-09-01"
  },
  "todo/ingerer-derogation.test.mjs": {
   "cas": 11,
@@ -295,8 +299,8 @@
   "vu_le": "2026-08-26"
  },
  "todo/ingerer-r47.test.mjs": {
-  "cas": 8,
-  "vu_le": "2026-08-26"
+  "cas": 10,
+  "vu_le": "2026-09-01"
  },
  "todo/ingerer-rectification.test.mjs": {
   "cas": 7,
