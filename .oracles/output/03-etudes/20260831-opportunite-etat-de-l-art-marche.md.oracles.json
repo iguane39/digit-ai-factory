@@ -1,0 +1,79 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\output\\03-etudes\\20260831-opportunite-etat-de-l-art-marche.md",
+  "date_iso": "2026-08-31T18:27:49.140Z",
+  "registre_version": "2.13.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\03-etudes\\20260831-opportunite-etat-de-l-art-marche.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\03-etudes\\20260831-opportunite-etat-de-l-art-marche.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\03-etudes\\20260831-opportunite-etat-de-l-art-marche.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\03-etudes\\20260831-opportunite-etat-de-l-art-marche.md",
+      "verdict": "PASS",
+      "detail": "aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\03-etudes\\20260831-opportunite-etat-de-l-art-marche.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\03-etudes\\20260831-opportunite-etat-de-l-art-marche.md",
+      "verdict": "PASS",
+      "detail": "6 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (6 avertissement(s)) ; nombre « 1 000 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\03-etudes\\20260831-opportunite-etat-de-l-art-marche.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\03-etudes\\20260831-opportunite-etat-de-l-art-marche.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\03-etudes\\20260831-opportunite-etat-de-l-art-marche.md",
+    "ts": "2026-08-31T18:27:49.139Z",
+    "fichiers": {
+      "output\\03-etudes\\20260831-opportunite-etat-de-l-art-marche.md": "121fa4a7694da8f26aefe4116332f0d990645386565f86c7e1dff0101e52f780"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

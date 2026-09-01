@@ -20,6 +20,12 @@
 .env
 .env.*
 !.env.*.exemple
+# TF-0714 (30/08, mesuré sur un produit) : le fichier que R-13 nomme s'écrit `.env.example`,
+# et la seule négation ci-dessus — en français — ne le couvrait pas. R-13 rendait PASS sur un
+# fichier que `git check-ignore` déclarait IGNORÉ : la conformité affichée et l'état réel du
+# dépôt divergeaient sans aucun signal. Les deux graphies sont ré-incluses.
+!.env.example
+!.env.exemple
 
 # ---- Artefacts compilés et dépendances ---------------------------------------------------------
 # Aucun projet n'a de raison de versionner ce qu'une commande régénère.
@@ -40,6 +46,19 @@ build/
 *.oracles-historique.jsonl
 .oracles/
 !forge/**
+
+# ---- Ce que la négation ne doit PAS rouvrir (TF-0713, 30/08) -----------------------------------
+# En gitignore, le DERNIER motif qui matche l'emporte : `!forge/**` seul ré-inclut les secrets
+# rangés sous forge\. Mesuré sur un produit : `forge/etapes/mep/.env.recette` et un mot de passe
+# de production étaient à UN COMMIT d'entrer dans l'histoire — un humain avait vu le piège et
+# refusé la ligne, la conformité l'imposait. La re-exclusion se place APRÈS la négation, sinon
+# elle ne protège rien.
+forge/**/.env*
+forge/**/*mdp*
+forge/**/*motdepasse*
+!forge/**/.env.example
+!forge/**/.env.exemple
+!forge/**/.env.*.exemple
 
 # ---- Journaux d'état de poste ------------------------------------------------------------------
 # Un état de poste versionné ferait croire qu'il vaut pour un autre poste, et le garde-fou

@@ -1,0 +1,73 @@
+{
+  "cible": "output/03-etudes/20260822-etude-opportunite-fraicheur-des-verdicts.md",
+  "date_iso": "2026-08-22T11:32:48.271Z",
+  "registre_version": "2.13.0",
+  "profil": "digit-ai",
+  "niveau": "diffuse",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 3,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\03-etudes\\20260822-etude-opportunite-fraicheur-des-verdicts.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\03-etudes\\20260822-etude-opportunite-fraicheur-des-verdicts.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\03-etudes\\20260822-etude-opportunite-fraicheur-des-verdicts.md",
+      "verdict": "PASS",
+      "detail": "aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\03-etudes\\20260822-etude-opportunite-fraicheur-des-verdicts.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\03-etudes\\20260822-etude-opportunite-fraicheur-des-verdicts.md",
+      "verdict": "PASS",
+      "detail": "2 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (2 avertissement(s)) ; nombre « 23841 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\03-etudes\\20260822-etude-opportunite-fraicheur-des-verdicts.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\03-etudes\\20260822-etude-opportunite-fraicheur-des-verdicts.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\03-etudes\\20260822-etude-opportunite-fraicheur-des-verdicts.md",
+    "ts": "2026-08-22T11:32:48.271Z",
+    "fichiers": {
+      "output\\03-etudes\\20260822-etude-opportunite-fraicheur-des-verdicts.md": "c9aedac460d165813fbb43202886988f3f38fb56860a9f8ade242b299db5365c"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

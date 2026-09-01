@@ -1,0 +1,79 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md",
+  "date_iso": "2026-08-31T18:30:07.378Z",
+  "registre_version": "2.13.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md",
+      "verdict": "PASS",
+      "detail": "aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md",
+      "verdict": "PASS",
+      "detail": "10 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (10 avertissement(s)) ; nombre « 1 398 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md",
+      "verdict": "PASS",
+      "detail": "nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md",
+    "ts": "2026-08-31T18:30:07.378Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md": "e0e210117106b37f5b4ab1246cb8aaec9f4de33052a21b95d636307c5f3b1c72"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}
