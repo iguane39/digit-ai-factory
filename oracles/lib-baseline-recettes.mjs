@@ -72,14 +72,21 @@ export function compteDe(resume, sortie = null) {
     } catch { /* pas du JSON : on retombe sur la lecture textuelle */ }
   }
   if (typeof resume !== "string") return null;
-  // LE RATIO NU passe en premier, et il n'exige PAS le mot « PASS ». Mesure du premier passage :
-  // exiger « PASS » laissait 39 recettes sur 73 hors du cliquet, dont deux familles parfaitement
-  // comptables — « 14/14 tests verts », « Recette cadence : 16/16 cas ». Une règle qui impose une
-  // forme que le dépôt n'emploie pas mesure l'écart à son auteur, pas la couverture.
-  const ratio = /(\d{1,4})\s*\/\s*(\d{1,4})/.exec(resume);
-  if (ratio) return Number(ratio[1]);
-  const pass = /(\d{1,4})\s*PASS/i.exec(resume);
+  // TF-0738 (01/09) — L'ORDRE DE LECTURE A ÉTÉ PAYÉ : le ratio nu passait en PREMIER et le
+  // motif n'est pas ancré, si bien qu'une DATE à barre oblique dans le libellé (« … du 01/09) :
+  // 6 PASS, 0 FAIL ») s'enregistrait comme un compte de 1 cas — une baseline fausse dès son
+  // premier passage, qui laisse ensuite cinq cas disparaître sans un mot. Deux corrections,
+  // toutes deux mesurées sur le corpus réel :
+  //   · « N PASS » se lit D'ABORD — quand le mot est là, il désigne le compte sans ambiguïté
+  //     (« 6 PASS, 0 FAIL », « 14/14 PASS ») ;
+  //   · à défaut, le DERNIER ratio de la ligne — le compte CLÔT un résumé (« Recette
+  //     cadence : 16/16 cas »), une date le commence.
+  // Le ratio reste admis sans « PASS » : l'exiger laissait 39 recettes sur 73 hors du cliquet
+  // au premier passage, et cette mesure-là n'a pas changé.
+  const pass = /(\d{1,4})\s*PASS\b/i.exec(resume);
   if (pass) return Number(pass[1]);
+  const ratios = [...resume.matchAll(/(\d{1,4})\s*\/\s*(\d{1,4})/g)];
+  if (ratios.length) return Number(ratios[ratios.length - 1][1]);
   return null;
 }
 

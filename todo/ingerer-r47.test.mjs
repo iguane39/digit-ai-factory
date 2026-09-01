@@ -101,13 +101,14 @@ const poste = (nomProjet, { herite, sousDossier = null }) => {
 };
 
 let serie = 0;
-const ingerer = (nomProjet, racine) => {
+const ingerer = (nomProjet, racine, { racineProduit = null } = {}) => {
   const d = mkdtempSync(join(T, "lot-"));
   const base = `${nomProjet} - RETOURS - 2026082${++serie}a`;
   writeFileSync(join(d, `${base}.md`), LOT_CONFORME, "utf8");
   writeFileSync(join(d, `${base}.tf.jsonl`), JSON.stringify({
     schema: 1, titre: "pilot : un retour de recette R-47", contenu: "c", demandeur: nomProjet,
     source: "recette", date_demande: "2026-08-23", forges_cibles_initiales: ["digit-ai-factory"],
+    ...(racineProduit ? { racine_produit: racineProduit } : {}),
   }) + "\n", "utf8");
   const registre = join(d, "reg.jsonl");
   writeFileSync(registre, "", "utf8");
@@ -168,6 +169,30 @@ check("BORNE — produit introuvable : la NON-VERIFICATION est consignee au REGI
   if (!trace) throw new Error("aucune trace au registre — le silence ne survit pas a la session");
   if (trace.heritage_non_verifie.projet !== "ProduitAilleurs2") throw new Error("la trace ne NOMME pas le produit cherche");
   if (!trace.heritage_non_verifie.racine) throw new Error("la trace ne dit pas OU la recherche a eu lieu");
+});
+
+check("TF-0731 — `racine_produit` déclaré par le sidecar est SUIVI : la seule source sûre est enfin lue", () => {
+  // Le défaut mesuré le 01/09 : la garde lisait `nouvelles` — des CHAÎNES JSON — et
+  // `.racine_produit` y rend toujours undefined. La voie recommandée par TF-0555 était morte
+  // depuis sa pose, masquée par l'heuristique qui trouvait par ailleurs. Ce cas la rend
+  // inévitable : le dossier du produit ne porte NI le nom du lot NI de lots — l'heuristique ne
+  // peut pas le trouver, seule la déclaration le peut.
+  const racine = poste("DossierSansRapport", { herite: true });
+  const r = ingerer("ProduitDeclare", racine, { racineProduit: "DossierSansRapport" });
+  if (!/racine declaree par le sidecar/.test(r.sortie)) {
+    throw new Error("la racine déclarée n'a pas été suivie — la voie TF-0555 est toujours morte : "
+      + r.sortie.split(String.fromCharCode(10)).filter((x) => /R-47/.test(x)).join(" | ").slice(0, 200));
+  }
+  if (/NON vérifiée/.test(r.sortie)) throw new Error("l'héritage n'a pas été jugé malgré la racine déclarée");
+});
+
+check("TF-0731 borne — une racine déclarée SANS forge\\ ne se suit pas les yeux fermés", () => {
+  const racine = parcVide();
+  mkdirSync(join(racine, "DossierVide"), { recursive: true });
+  const r = ingerer("ProduitMenteur", racine, { racineProduit: "DossierVide" });
+  if (!/on ne la suit pas les yeux fermes/.test(r.sortie)) {
+    throw new Error("une racine déclarée sans forge\\ a été suivie ou tue — la déclaration prime, elle ne dispense pas de vérifier");
+  }
 });
 
 check("BORNE — candidature HORS lot de retours : R-47 ne dit rien du tout", () => {
