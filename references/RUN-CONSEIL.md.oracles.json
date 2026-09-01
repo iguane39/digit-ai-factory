@@ -1,0 +1,63 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\references\\RUN-CONSEIL.md",
+  "date_iso": "2026-08-19T17:18:17.056Z",
+  "registre_version": "2.11.1",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 3,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "references\\RUN-CONSEIL.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "references\\RUN-CONSEIL.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "references\\RUN-CONSEIL.md",
+      "verdict": "PASS",
+      "detail": "aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "references\\RUN-CONSEIL.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "references\\RUN-CONSEIL.md",
+      "verdict": "PASS",
+      "detail": "1 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; nombre « 20260819 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "references\\RUN-CONSEIL.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "references\\RUN-CONSEIL.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": []
+}

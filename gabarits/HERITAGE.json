@@ -1,7 +1,7 @@
 {
   "schema": "pilot/heritage@1",
-  "version": "1.5.0",
-  "date": "2026-08-25",
+  "version": "1.6.0",
+  "date": "2026-09-01",
   "regle": "Tout artefact que le pilot COPIE chez un produit se déclare ici avec son mode de contrôle. Un artefact absent de ce référentiel n'est pas jugé par R-47 — l'oubli se voit à la revue, il ne se devine pas.",
   "pourquoi": "Constat du 23/08, deux produits en trois jours. Produit-02 possède un `forge\\retours\\` complet, portant ses lots, et AUCUN gabarit RETOURS-FORGES.md : le dossier a été créé, la copie n'y est jamais arrivée. Produit-05 n'a ni l'un ni l'autre. Résultat mesuré : 15 candidatures refusées à l'ingestion par R-45/R-46 pour une forme que le produit ne pouvait pas connaître, faute d'avoir le gabarit qui la porte. La cause n'était pas une négligence de produit mais une COPIE SANS PREUVE : rien ne vérifiait qu'elle était arrivée, et rien ne vérifie encore qu'elle est à jour. Le contrôle R-43 lui-même ne fait qu'un `existsSync` sur les hooks — un hook périmé passe au vert.",
   "modes": {
@@ -108,9 +108,12 @@
         "*.oracles.json",
         "*.oracles-cache.json",
         "*.oracles-historique.jsonl",
-        "!forge/**"
+        "!forge/**",
+        "forge/**/.env*",
+        "forge/**/*mdp*",
+        "!.env.example"
       ],
-      "motif": "LES EXCLUSIONS QUE LE SOCLE EDICTE, LIVREES COMME UN MOTIF DE FICHIER (TF-0649). La regle 10 du socle enumere ces exclusions depuis le 06/08 — en PROSE, dans un tableau de REGLES-PROJET.md, donc sans AUCUN point d'application. Un produit ne l'enfreignait pas : il ne la rencontrait jamais. Mesure remontee par un produit : un `.pyc` suivi par git, un second qui s'appretait a entrer. Mode `presence_et_motifs` et non `copie_conforme` : ce fichier est un SOCLE, pas un plafond — un produit y ajoute ce que sa pile impose, et exiger l'identite reviendrait a lui interdire d'ignorer ses propres artefacts. `.env` n'est PAS dans les motifs exiges parce que `.env.forge-tests` est deja couvert par le controle de forge-tests, et qu'un produit peut legitimement ecrire `.env*` ou `/.env` : exiger une graphie exacte ferait crier sur une protection equivalente. `old/` n'y est PAS NON PLUS, et c'est une decision : l'arbitrage C1, amende le 13/08 (TF-0150), le rend AUTORISE et VERSIONNE.",
+      "motif": "LES EXCLUSIONS QUE LE SOCLE EDICTE, LIVREES COMME UN MOTIF DE FICHIER (TF-0649). La regle 10 du socle enumere ces exclusions depuis le 06/08 — en PROSE, dans un tableau de REGLES-PROJET.md, donc sans AUCUN point d'application. Un produit ne l'enfreignait pas : il ne la rencontrait jamais. Mesure remontee par un produit : un `.pyc` suivi par git, un second qui s'appretait a entrer. Mode `presence_et_motifs` et non `copie_conforme` : ce fichier est un SOCLE, pas un plafond — un produit y ajoute ce que sa pile impose, et exiger l'identite reviendrait a lui interdire d'ignorer ses propres artefacts. `.env` n'est PAS dans les motifs exiges parce que `.env.forge-tests` est deja couvert par le controle de forge-tests, et qu'un produit peut legitimement ecrire `.env*` ou `/.env` : exiger une graphie exacte ferait crier sur une protection equivalente. `old/` n'y est PAS NON PLUS, et c'est une decision : l'arbitrage C1, amende le 13/08 (TF-0150), le rend AUTORISE et VERSIONNE. TF-0713/TF-0714 (mesures du 30/08 chez un produit, decides le 01/09) : `forge/**/.env*` et `forge/**/*mdp*` RE-EXCLUENT ce que `!forge/**` rouvrait — en gitignore le dernier motif qui matche l'emporte, et deux fichiers de secrets reels etaient a un commit d'entrer dans l'histoire ; `!.env.example` re-inclut le fichier que R-13 exige VERSIONNE, que la seule negation en francais (`!.env.*.exemple`) ne couvrait pas.",
       "depuis": "2026-08-26"
     }
   ]

@@ -1,0 +1,79 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\gabarits\\ECARTS-ASSUMES.md",
+  "date_iso": "2026-08-26T08:01:46.658Z",
+  "registre_version": "2.13.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 3,
+    "fail": 0,
+    "skip": 4,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "gabarits\\ECARTS-ASSUMES.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "gabarits\\ECARTS-ASSUMES.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "gabarits\\ECARTS-ASSUMES.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "gabarits\\ECARTS-ASSUMES.md",
+      "verdict": "PASS",
+      "detail": "aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "gabarits\\ECARTS-ASSUMES.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "gabarits\\ECARTS-ASSUMES.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "gabarits\\ECARTS-ASSUMES.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "gabarits\\ECARTS-ASSUMES.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "gabarits\\ECARTS-ASSUMES.md",
+    "ts": "2026-08-26T08:01:46.657Z",
+    "fichiers": {
+      "gabarits\\ECARTS-ASSUMES.md": "69ea58ed09d47439c3151a6096dd299d9177d0fed3bff11d7c5aa15fcb49125e"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

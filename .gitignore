@@ -1,28 +1,4 @@
-# runs/ : les artefacts probants (ledger, étapes, journaux d'oracles) sont versionnés —
-# c'est la preuve fondatrice citée par le README (TF-0036) ; le produit construit, lui,
-# vit dans son propre dépôt et ne se duplique pas ici.
-runs/**/produit/
-*.log
 .env
-*.oracles.json
-*.oracles-cache.json
-*.oracles-historique.jsonl
-!runs/**/*.oracles.json
-
-# journal des verdicts des hooks (R-44) : etat de poste, jamais versionne
-.claude/hooks-journal.jsonl
-
-# Releve d'ouverture du garde-fou des produits (TF-0530) : c'est un ETAT DE POSTE, propre a une
-# session et a un parc local — le versionner ferait croire qu'il vaut pour un autre poste, et le
-# garde-fou comparerait alors deux realites differentes.
-.oracles/produits-au-demarrage.json
-
-# ---- 00-retours : la boite d'entree ne se publie plus (decision humaine du 28/08/2026) -------
-# « Retirer 00-retours de github, le mettre en gitignore et anonymiser la source dans les
-# traitements, permettant de ne pas garder de trace des clients et produits. »
-#
-# CE QUE CE DOSSIER PORTAIT : 207 fichiers suivis, 2,2 Mo, dont chaque nom de lot porte le nom
-# du PRODUIT qui l'a remis, et chaque contenu le detail de ce qu'un client a constate chez lui.
-# Le registre, lui, garde la trace utile — anonymisee a l'ingestion par todo/anonymiser-entrant.mjs.
-# La boite reste sur le disque ; elle cesse d'etre publiee.
-input/00-retours/
+.env.*
+!.env.*.exemple
+!forge/**

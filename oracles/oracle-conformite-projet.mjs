@@ -550,6 +550,25 @@ else {
           + `, ${perimes.length} périmé(s) ou incomplet(s)` + (perimes.length ? ` : ${perimes.join(", ")}` : "")
           + ". Recopier depuis le pilot (référentiel gabarits\\HERITAGE.json, ETAPES-RUN §1)")
       : ok("R-47", "artefacts hérités", `${ok47.length} artefact(s) hérité(s) présent(s) et à jour`);
+
+    // TF-0713 — AUCUN FICHIER D'APPARENCE SECRÈTE SOUS forge\ N'EST SUIVI PAR GIT. Le socle
+    // exige `!forge/**`, qui ré-inclut tout : chez un produit, un `.env.recette` et un mot de
+    // passe de production étaient à un commit d'entrer dans l'histoire — un humain avait vu le
+    // piège, la conformité l'imposait quand même. Le gabarit porte désormais les re-exclusions ;
+    // ce contrôle juge l'EFFET, pas le motif : ce que `git ls-files` rend est ce qui partira.
+    const lsf = git("ls-files", "--", "forge");
+    if (lsf.status === 0) {
+      const SECRET = /(^|\/)\.env(?!\.example$|\.exemple$|\..*\.exemple$)|mdp|motdepasse|secret|password/i;
+      const suivis = (lsf.stdout || "").split(/\r?\n/).filter((f) => f && SECRET.test(f));
+      suivis.length
+        ? ko("R-47", "forge\\ (secrets)", `${suivis.length} fichier(s) d'apparence secrète SUIVI(S) par git sous forge\\ : `
+            + suivis.slice(0, 5).join(", ")
+            + " — `!forge/**` les ré-inclut, et un secret entré dans l'histoire ne s'en retire pas : "
+            + "re-exclure APRÈS la négation (bloc « ce que la négation ne doit pas rouvrir » du gabarit) puis `git rm --cached` (TF-0713)")
+        : ok("R-47", "forge\\ (secrets)", "aucun fichier d'apparence secrète suivi sous forge\\ — la négation du socle ne rouvre rien");
+    }
+    // Hors dépôt git (status ≠ 0) : rien à juger ici — l'absence de dépôt est jugée ailleurs,
+    // et un silence sur un sous-contrôle inapplicable vaut mieux qu'un verdict inventé.
   }
 }
 // R-11 bis — LES RÉFÉRENTIELS DISPONIBLES, déclarés (TF-0373, 18/08). Coût du silence, mesuré :
@@ -583,10 +602,23 @@ else {
 
 existsSync(p("README.md")) ? ok("R-12", "README.md", "présent") : ko("R-12", "README.md", "absent");
 
-// R-13 — .env.example exhaustif (présence + ≥ 1 variable)
+// R-13 — .env.example exhaustif (présence + ≥ 1 variable + SUIVI par git, TF-0714)
+// Le fait mesuré le 30/08 : `.env.example` créé et renseigné, R-13 PASS — et `git check-ignore`
+// répondait IGNORÉ, le gabarit de .gitignore ne ré-incluant que la graphie française. Le fichier
+// n'apparaissait même pas en `??` : rien ne signalait qu'il ne serait pas commité. Un
+// `.env.example` ignoré est indiscernable d'un `.env.example` absent pour quiconque clone.
 const envEx = [".env.example", ".env.exemple"].map((n) => p(n)).find((f) => existsSync(f));
 if (!envEx) ko("R-13", ".env.example", "absent — toutes les variables attendues (applicatives + infra) doivent y être déclarées");
 else if (!/^[A-Z][A-Z0-9_]*=/m.test(readFileSync(envEx, "utf8"))) ko("R-13", basename(envEx), "présent mais aucune variable déclarée");
+else if ((() => {
+  // `check-ignore` sort 0 quand le fichier EST ignoré ; 1 quand il ne l'est pas ; 128 hors
+  // dépôt git — et hors dépôt, ce sous-contrôle n'a rien à juger (le dépôt lui-même est jugé
+  // ailleurs). On ne conclut que sur un verdict net.
+  const r = git("check-ignore", "--quiet", basename(envEx));
+  return r.status === 0;
+})()) ko("R-13", basename(envEx), "présent et renseigné mais IGNORÉ par git (`git check-ignore` le confirme) — " +
+  "la conformité affichée et l'état réel du dépôt divergent : quiconque clone ne l'aura pas. " +
+  "Ré-inclure la graphie exacte au .gitignore (`!.env.example`, gabarit du socle depuis le 01/09) (TF-0714)");
 else ok("R-13", basename(envEx), "présent avec variables déclarées");
 
 // R-14 — .env jamais versionné

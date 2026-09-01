@@ -1,0 +1,63 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\references\\ETAPES-RUN.md",
+  "date_iso": "2026-08-20T19:55:34.918Z",
+  "registre_version": "2.13.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 3,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "references\\ETAPES-RUN.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "references\\ETAPES-RUN.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "references\\ETAPES-RUN.md",
+      "verdict": "PASS",
+      "detail": "aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "references\\ETAPES-RUN.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "references\\ETAPES-RUN.md",
+      "verdict": "PASS",
+      "detail": "3 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (3 avertissement(s)) ; pourcentage « 100 % » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "references\\ETAPES-RUN.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "references\\ETAPES-RUN.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": []
+}

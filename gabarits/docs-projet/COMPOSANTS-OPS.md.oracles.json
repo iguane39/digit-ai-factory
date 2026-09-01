@@ -1,0 +1,79 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\gabarits\\docs-projet\\COMPOSANTS-OPS.md",
+  "date_iso": "2026-08-26T09:56:30.079Z",
+  "registre_version": "2.13.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 3,
+    "fail": 0,
+    "skip": 4,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "gabarits\\docs-projet\\COMPOSANTS-OPS.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "gabarits\\docs-projet\\COMPOSANTS-OPS.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "gabarits\\docs-projet\\COMPOSANTS-OPS.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "gabarits\\docs-projet\\COMPOSANTS-OPS.md",
+      "verdict": "PASS",
+      "detail": "aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "gabarits\\docs-projet\\COMPOSANTS-OPS.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "gabarits\\docs-projet\\COMPOSANTS-OPS.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "gabarits\\docs-projet\\COMPOSANTS-OPS.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "gabarits\\docs-projet\\COMPOSANTS-OPS.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "gabarits\\docs-projet\\COMPOSANTS-OPS.md",
+    "ts": "2026-08-26T09:56:30.078Z",
+    "fichiers": {
+      "gabarits\\docs-projet\\COMPOSANTS-OPS.md": "482c2750a13ceefc1d810b28f36a00850e27d4222e18bff188df6bddd0cf7685"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

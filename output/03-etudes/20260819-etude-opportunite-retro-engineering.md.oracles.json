@@ -1,0 +1,63 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\output\\03-etudes\\20260819-etude-opportunite-retro-engineering.md",
+  "date_iso": "2026-08-19T16:56:56.300Z",
+  "registre_version": "2.11.1",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 3,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\03-etudes\\20260819-etude-opportunite-retro-engineering.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\03-etudes\\20260819-etude-opportunite-retro-engineering.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\03-etudes\\20260819-etude-opportunite-retro-engineering.md",
+      "verdict": "PASS",
+      "detail": "aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\03-etudes\\20260819-etude-opportunite-retro-engineering.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\03-etudes\\20260819-etude-opportunite-retro-engineering.md",
+      "verdict": "PASS",
+      "detail": "3 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (3 avertissement(s)) ; pourcentage « 40 % » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\03-etudes\\20260819-etude-opportunite-retro-engineering.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\03-etudes\\20260819-etude-opportunite-retro-engineering.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": []
+}

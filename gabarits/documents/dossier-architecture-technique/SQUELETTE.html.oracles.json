@@ -1,0 +1,133 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\gabarits\\documents\\dossier-architecture-technique\\SQUELETTE.html",
+  "date_iso": "2026-08-31T20:30:27.306Z",
+  "registre_version": "2.13.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "FAIL",
+  "resume": {
+    "pass": 8,
+    "fail": 3,
+    "skip": 5,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "gabarits\\documents\\dossier-architecture-technique\\SQUELETTE.html"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Rendu HTML / visuel",
+      "file": "gabarits\\documents\\dossier-architecture-technique\\SQUELETTE.html",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Conformité charte HTML (charte, sémantique, print)",
+      "file": "gabarits\\documents\\dossier-architecture-technique\\SQUELETTE.html",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Accessibilité (WCAG structurel)",
+      "file": "gabarits\\documents\\dossier-architecture-technique\\SQUELETTE.html",
+      "verdict": "PASS",
+      "detail": "controles WCAG structurels OK"
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "gabarits\\documents\\dossier-architecture-technique\\SQUELETTE.html",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "gabarits\\documents\\dossier-architecture-technique\\SQUELETTE.html",
+      "verdict": "PASS",
+      "detail": "aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "gabarits\\documents\\dossier-architecture-technique\\SQUELETTE.html",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "gabarits\\documents\\dossier-architecture-technique\\SQUELETTE.html",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "gabarits\\documents\\dossier-architecture-technique\\SQUELETTE.html",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "gabarits\\documents\\dossier-architecture-technique\\SQUELETTE.html",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Régression visuelle (golden diff)",
+      "file": "gabarits\\documents\\dossier-architecture-technique\\SQUELETTE.html",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Design généré : marqueurs de slop",
+      "file": "gabarits\\documents\\dossier-architecture-technique\\SQUELETTE.html",
+      "verdict": "FAIL",
+      "detail": "police réflexe « \"DM Sans\" » — famille bannie par impeccable, monoculture inter-projets"
+    },
+    {
+      "domaine": "Système de marque : traçabilité des tokens",
+      "file": "gabarits\\documents\\dossier-architecture-technique\\SQUELETTE.html",
+      "verdict": "FAIL",
+      "detail": "couleur en dur « #F8FAFC » sur background : passer par var(--token) ; couleur en dur « #E2E8F0 » sur border : passer par var(--token)"
+    },
+    {
+      "domaine": "Cible mobile : contrat d'usage tactile",
+      "file": "gabarits\\documents\\dossier-architecture-technique\\SQUELETTE.html",
+      "verdict": "FAIL",
+      "detail": "9 table(s) sans reflow en cartes sous 768 px : défilement horizontal forcé ; aucune règle @media (orientation: landscape) : le rendu paysage n'est pas traité explicitement"
+    },
+    {
+      "domaine": "Visuels générés : traçabilité et budget",
+      "file": "gabarits\\documents\\dossier-architecture-technique\\SQUELETTE.html",
+      "verdict": "PASS",
+      "detail": "I1–I6 sans écart"
+    },
+    {
+      "domaine": "Mouvement : craft de l'animation",
+      "file": "gabarits\\documents\\dossier-architecture-technique\\SQUELETTE.html",
+      "verdict": "PASS",
+      "detail": "R1–R7 sans écart"
+    },
+    {
+      "domaine": "Filtres de colonne sur tableaux de donnees",
+      "file": "gabarits\\documents\\dossier-architecture-technique\\SQUELETTE.html",
+      "verdict": "PASS",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "gabarits\\documents\\dossier-architecture-technique\\SQUELETTE.html",
+    "ts": "2026-08-31T20:30:27.305Z",
+    "fichiers": {
+      "gabarits\\documents\\dossier-architecture-technique\\SQUELETTE.html": "728979e1ded0d2b2f242e3d64e5b53ef56211d3635862ffb3552a75df3705449"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "FAIL"
+}
