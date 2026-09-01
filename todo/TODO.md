@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=b3fe92819562 archive=ccd0c3192f84 · dernier événement: 2026-09-01T13:09:39.526Z -->
+     sceaux: actifs=11c886e22f59 archive=ccd0c3192f84 · dernier événement: 2026-09-01T13:25:13.281Z -->
 
-**30 actifs** (candidat 6 · décidé 23 · en cours 1 · corrigé 0 · écarté 0) · **721 archivés**.
+**31 actifs** (candidat 7 · décidé 23 · en cours 1 · corrigé 0 · écarté 0) · **721 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -80,6 +80,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-0732 | en_cours | 10 | poste : le gate d'ecriture C7 juge le FICHIER ENTIER, pas le delta — et sa regle « DM Sans bannie » contredit la charte maison : tout gabarit HTML de la bibliotheque est inedittable sans friction | **oui** — quatre editions de trois lignes bloquees en un tour pour des defauts anterieurs ; sans arbitrage, CHAQUE evolution future d'un gabarit HTML de la bibliotheque paiera le meme peage, et la regle de police fera accuser tout livrable conforme a la charte maison |
 | TF-0549 | decide | 10 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : `Produit-07` a un forge\retours\ mais rien de ce qui s'y fait n'est suivi | **oui** — mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration. |
+| TF-0751 | candidat | 8.3 | Le pilot n'est PAS publiable : 200 constats de nom de client sur 56 fichiers suivis, et la porte de publication le refuse depuis avant ce jour | **oui** — 200 constats C1 sur 56 fichiers suivis ; les commits du jour restent locaux sur le pilot alors que forge-tests et forge-agents ont ete publies sans reserve |
 | TF-0750 | candidat | 7.5 | Deux livrables du meme jour ont porte le meme indice sans que rien ne le voie : R-4 juge la FORME du nom, jamais l'unicite de l'indice | **oui** — deux fichiers de output/04-plans/ portant l'indice 20260901b le 01/09 ; R-4 rend PASS sur les deux, aucun controle ne compare deux noms entre eux |
 
 ---
