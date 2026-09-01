@@ -17,7 +17,9 @@
   "artefacts": [
     {
       "source": "gabarits/RETOURS-FORGES.md",
-      "cible": "forge/retours/RETOURS-FORGES.md",
+      "cible": "forge/retours/GABARIT-LOT-RETOURS.md",
+      "alias_accepte": "forge/retours/RETOURS-FORGES.md",
+      "note_alias": "TF-0710 (01/09) : l'ancien nom de voyage revendiquait un nom generique qu'un produit occupait legitimement (son index des remises) — la mise en conformite lui a coute un renommage en cascade pour un fichier que R-43 imposait de ceder. Le gabarit voyage desormais sous un nom qui dit ce qu'il est, symetrique de son juge (oracle-lot.mjs) ; l'ancienne cible reste ACCEPTEE le temps de la transition — un produit qui la porte conforme n'est pas en defaut, et la migration se fait au rythme des produits.",
       "mode": "copie_conforme",
       "motif": "le canal de retours du produit. Sa FORME est jugée à l'ingestion par R-45 et R-46 : un produit qui ne l'a pas ne peut pas produire un lot conforme, et son travail est refusé à la porte. C'est l'artefact qui a coûté 15 candidatures en trois jours. Son JUGE voyage avec lui depuis le 24/08 (`gabarits/oracle-lot-retours.mjs`) : un texte sans juge decore, un juge sans son texte force a deviner — les deux ou rien, meme raisonnement que pour RESTITUTION.md.",
       "depuis": "2026-08-23"

@@ -10,8 +10,12 @@
  */
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readdirSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { produitsDuParc, etatArtefact, relever, rendreMarkdown } from "./relever-heritage.mjs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { spawnSync } from "node:child_process";
+import { produitsDuParc, etatArtefact, relever, rendreMarkdown, attribuerDivergence } from "./relever-heritage.mjs";
+
+const ICI = dirname(fileURLToPath(import.meta.url));
 
 let pass = 0, fail = 0;
 const check = (nom, fn) => {
@@ -188,6 +192,54 @@ try {
     writeFileSync(join(produit, "old", "robots.txt"), "x\n", "utf8");
     const etat = etatArtefact(produit, { cible: "robots.txt", source: "gabarits/web/robots.txt", mode: "presence" }, pilot);
     att(etat.etat === "absent", `état « ${etat.etat} » : un fichier d'archive ou de dépendance a été pris pour la surface servie`);
+  });
+
+  check("TF-0710 — une copie conforme sous l'ALIAS de transition n'est pas un défaut", () => {
+    const produit = join(T, "_Client", "produit-alias");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    writeFileSync(join(produit, "forge", "ANCIEN.md"), "contenu de reference\n", "utf8");
+    const etat = etatArtefact(produit, { mode: "copie_conforme", source: "gabarits/MODELE.md",
+      cible: "forge/NOUVEAU.md", alias_accepte: "forge/ANCIEN.md" }, pilot);
+    att(etat.etat === "conforme", `état « ${etat.etat} » — le parc entier serait force de migrer le jour de la publication`);
+  });
+
+  check("TF-0710 borne — un alias DIVERGENT reste un divergent : l'alias accepte le nom, pas la dérive", () => {
+    const produit = join(T, "_Client", "produit-alias-perime");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    writeFileSync(join(produit, "forge", "ANCIEN.md"), "vieux contenu\n", "utf8");
+    const etat = etatArtefact(produit, { mode: "copie_conforme", source: "gabarits/MODELE.md",
+      cible: "forge/NOUVEAU.md", alias_accepte: "forge/ANCIEN.md" }, pilot);
+    att(etat.etat === "divergent", `état « ${etat.etat} » — un alias périmé est passé pour conforme`);
+  });
+
+  // ── TF-0711 — L'ATTRIBUTION D'UNE DIVERGENCE SE MESURE DANS L'HISTORIQUE GIT DU PILOT ──
+  // Les trois sens, joués contre le VRAI dépôt du pilot : une copie qui correspond à une version
+  // publiée accuse le pilot (qui a avancé) ; une copie modifiée accuse le produit ; un pilot
+  // sans historique rend « inconnu » dit, jamais deviné.
+  const PILOT_REEL = join(ICI, "..");
+
+  check("TF-0711 — une copie égale à une version PUBLIÉE : « le pilot a avancé », datée, sans faute produit", () => {
+    const log = spawnSync("git", ["-C", PILOT_REEL, "log", "-n", "5", "--format=%H", "--", "gabarits/RETOURS-FORGES.md"], { encoding: "utf8" });
+    const revs = (log.stdout || "").split("\n").filter(Boolean);
+    att(revs.length >= 2, "historique trop court pour jouer le cas");
+    const ancienne = spawnSync("git", ["-C", PILOT_REEL, "show", `${revs[1]}:gabarits/RETOURS-FORGES.md`],
+      { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 }).stdout;
+    const cause = attribuerDivergence("gabarits/RETOURS-FORGES.md", ancienne, PILOT_REEL);
+    att(cause.qui === "pilot", `attribution « ${cause.qui} » — une version publiée n'est pas reconnue`);
+    att(/publiée le \d{4}-\d{2}-\d{2}/.test(cause.detail), "la date de la version n'est pas dite");
+  });
+
+  check("TF-0711 — une copie MODIFIÉE côté produit est attribuée au produit, avec la garde « ne pas écraser »", () => {
+    const courante = spawnSync("git", ["-C", PILOT_REEL, "show", "HEAD:gabarits/RETOURS-FORGES.md"],
+      { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 }).stdout;
+    const cause = attribuerDivergence("gabarits/RETOURS-FORGES.md", courante + "\nmodif locale du produit\n", PILOT_REEL);
+    att(cause.qui === "produit", `attribution « ${cause.qui} » — une modification locale est passée pour une version du pilot`);
+    att(/ne pas écraser/.test(cause.detail), "la garde contre l'écrasement aveugle manque");
+  });
+
+  check("TF-0711 borne — un pilot SANS git rend « inconnu », dit plutôt que deviné", () => {
+    const cause = attribuerDivergence("gabarits/MODELE.md", "x", pilot);
+    att(cause.qui === "inconnu", `attribution « ${cause.qui} » sur un dépôt sans historique`);
   });
 } finally {
   try { rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré */ }
