@@ -195,8 +195,12 @@
   "vu_le": "2026-08-26"
  },
  "oracle-synthese.mjs": {
-  "cas": 11,
-  "vu_le": "2026-08-26"
+  "cas": 13,
+  "vu_le": "2026-09-01"
+ },
+ "oracle-trace-mutation-mep.mjs": {
+  "cas": 8,
+  "vu_le": "2026-09-01"
  },
  "oracle-unicite.mjs": {
   "cas": 14,
@@ -315,7 +319,7 @@
   "vu_le": "2026-08-26"
  },
  "todo/normaliser-lot.test.mjs": {
-  "cas": 6,
+  "cas": 9,
   "vu_le": "2026-09-01"
  },
  "todo/preflight-collision.test.mjs": {

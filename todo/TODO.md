@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=f2a4ef5ad6bb archive=bca717389565 · dernier événement: 2026-09-01T12:33:52.602Z -->
+     sceaux: actifs=b3fe92819562 archive=ccd0c3192f84 · dernier événement: 2026-09-01T13:09:39.526Z -->
 
-**33 actifs** (candidat 7 · décidé 24 · en cours 0 · corrigé 1 · écarté 1) · **717 archivés**.
+**30 actifs** (candidat 6 · décidé 23 · en cours 1 · corrigé 0 · écarté 0) · **721 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -17,7 +17,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0742 | candidat | 25 | digit-ai-factory : l'anonymisation ne connaît qu'UNE graphie du nom d'un produit — la forme espacée traverse et entre au registre | **oui** — 2 occurrences du nom réel d'un produit entrées au registre suivi malgré un message [ANONYMISE] affiché ; récidive de la classe TF-0712 en un jour |
 | TF-0740 | candidat | 1 | Gestion des heures : l'ecart declare qui remplacait la solution disponible, et le patron heure-locale-sur-planificateur-UTC | non |
 | TF-0741 | candidat | 1 | Etude poussee de la strategie DataForSEO pour Produit-02 : interet, services, objectifs, donnees, suivis, resultats, couts | non |
-| TF-0743 | corrige | 20 | digit-ai-factory : le normalisateur ne dérivait « demandeur » et « date_demande » que sur la branche historique — la branche hybride rejetait des champs que le sidecar contenait | **oui** — deux refus successifs de l ingesteur sur des champs présents dans le sidecar ; conversion à refaire à la main derrière un vert du normalisateur |
 
 ## digit-ai-forge-agents
 
@@ -74,16 +73,14 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-0749 | decide | 10 | Le ciblage par ligne mutee reste eteint jusqu'a sa verification, et la verification cesse d'etre une intention : elle est jouable | **oui** — surcout fixe mesure a 0,386 s par mutant contre 28,2 s de rejeu actuel ; la condition de non-perte de l'etude n'avait aucun executant avant ce lot |
 | TF-0748 | decide | 5 | Palier 1 de la strategie de tests livre derriere un drapeau : la CONDITION DE NON-PERTE reste a jouer une fois sur un projet reel avant qu'il devienne le defaut | **oui** — campagne mesuree a 67 min dont 54 de mutation, 28,2 s par mutant ; surcout fixe mesure a 0,386 s |
-| TF-0747 | candidat | 15 | La suite de forge-tests est ROUGE sur son propre banc : la regle L23 du skill digit-ai-page-html a evolue, la fixture HTML de test_tf_0117 ne porte pas la garde | **oui** — 1 test en echec sur 1174, bloquant en mode -x : toute mesure de suite entiere sur ce banc est invalide tant qu'il dure |
 
 ## pilot
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0732 | en_cours | 10 | poste : le gate d'ecriture C7 juge le FICHIER ENTIER, pas le delta — et sa regle « DM Sans bannie » contredit la charte maison : tout gabarit HTML de la bibliotheque est inedittable sans friction | **oui** — quatre editions de trois lignes bloquees en un tour pour des defauts anterieurs ; sans arbitrage, CHAQUE evolution future d'un gabarit HTML de la bibliotheque paiera le meme peage, et la regle de police fera accuser tout livrable conforme a la charte maison |
 | TF-0549 | decide | 10 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : `Produit-07` a un forge\retours\ mais rien de ce qui s'y fait n'est suivi | **oui** — mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration. |
-| TF-0732 | decide | 10 | poste : le gate d'ecriture C7 juge le FICHIER ENTIER, pas le delta — et sa regle « DM Sans bannie » contredit la charte maison : tout gabarit HTML de la bibliotheque est inedittable sans friction | **oui** — quatre editions de trois lignes bloquees en un tour pour des defauts anterieurs ; sans arbitrage, CHAQUE evolution future d'un gabarit HTML de la bibliotheque paiera le meme peage, et la regle de police fera accuser tout livrable conforme a la charte maison |
-| TF-0745 | candidat | 12.5 | Le juge et le gabarit de restitution avancaient ensemble, le RAPPEL du hook restait au 20/08 : dix versions de doctrine dictees a l'envers | **oui** — trois retours humains du 30/08 sur le meme sujet, tous portant sur une forme deja prescrite au gabarit et deja jugee par l'oracle ; commit 6d45638 du 20/08 contre commit 176bc5e du 31/08 sur le meme fichier |
-| TF-0746 | ecarte | 6.7 | Le texte de la doctrine voyage une fois et ne se met jamais a jour : trois produits portent RESTITUTION.md en 2.10.0 quand le pilot est en 2.15.0 | **oui** — trois copies de forge/RESTITUTION.md relevees en version 2.10.0 le 01/09 contre 2.15.0 a la source ; R-47 ne se joue qu'a l'ingestion d'un lot |
+| TF-0750 | candidat | 7.5 | Deux livrables du meme jour ont porte le meme indice sans que rien ne le voie : R-4 juge la FORME du nom, jamais l'unicite de l'indice | **oui** — deux fichiers de output/04-plans/ portant l'indice 20260901b le 01/09 ; R-4 rend PASS sur les deux, aucun controle ne compare deux noms entre eux |
 
 ---
 Détail d'un item : `grep '"id":"TF-xxxx"' todo/TODO.jsonl` (tous ses événements). Archive : même commande sur TODO-ARCHIVE.jsonl.
