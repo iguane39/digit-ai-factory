@@ -60,8 +60,42 @@ const sorties = [];
 lignes.forEach((ligne, i) => {
   let c;
   try { c = JSON.parse(ligne); } catch { refus.push(`ligne ${i + 1} : JSON invalide`); return; }
-  // Déjà au format R10 : on ne retouche pas ce qui est conforme.
-  if (c.schema === 1) { sorties.push(c); return; }
+  // FORME HYBRIDE (mesure du 01/09/2026) : `schema: 1` valait PASSE-DROIT — « déjà conforme »
+  // était supposé, jamais vérifié. Un lot réel portait schema:1, titre, contenu, demandeur et
+  // date_demande… mais `origine`/`destinataire`/`date` à la place de `source` et de la cible.
+  // Le normalisateur le laissait passer tel quel, l'ingesteur strict le rejetait, et la
+  // conversion qui devait être outillée (TF-0196) se refaisait à la main — le défaut fondateur,
+  // à l'identique, derrière un [OK] du normalisateur. On COMPLÈTE donc ce qui se DÉRIVE, et
+  // rien d'autre :
+  //   · `source` absent → le nom du lot est une source vraie, c'est déjà celle que la branche
+  //     produit dérive ; l'origine déclarée s'y ajoute quand elle existe ;
+  //   · cible absente mais `destinataire` présent → table EXACTE (forges + socles portés),
+  //     jamais une inclusion — un destinataire inconnu est REFUSÉ avec son motif, pas deviné.
+  if (c.schema === 1) {
+    const s = { ...c };
+    if (!s.source) {
+      s.source = `lot ${basename(source)}${s.origine ? ` (produit ${s.origine})` : ""}` +
+        " · [dérivé par normaliser-lot : champ source absent du sidecar]";
+    }
+    if ((!Array.isArray(s.forges_cibles_initiales) || !s.forges_cibles_initiales.length)
+        && !s.forge_cible && !s.forges_cibles && !s.cible && s.destinataire) {
+      const d = String(s.destinataire).trim().toLowerCase();
+      // Les SOCLES sont portés par une forge : le destinataire nomme le composant, la cible
+      // est le dépôt qui le tient. Table écrite, jamais déduite (R-48).
+      const SOCLES = { "digit-ai-page-html": "digit-ai-forge-agents", "page-html": "digit-ai-forge-agents" };
+      const cible = SOCLES[d]
+        || (/^(pilot|factory|noyau|digit-ai-factory)$/.test(d) ? "digit-ai-factory" : null)
+        || (FORGES.includes(d) ? (d.startsWith("digit-ai") ? d : `digit-ai-${d}`) : null);
+      if (!cible) {
+        refus.push(`ligne ${i + 1} : destinataire « ${s.destinataire} » inconnu de la table — ` +
+          "une cible ne se devine pas ; forges et socles connus seulement");
+        return;
+      }
+      s.forges_cibles_initiales = [cible];
+    }
+    sorties.push(s);
+    return;
+  }
   const titre = String(c.titre || "").trim();
   if (!titre) { refus.push(`ligne ${i + 1} : aucun titre — rien à convertir`); return; }
   const cibles = FORGES.filter((f) => titre.toLowerCase().includes(f));
