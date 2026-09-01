@@ -77,6 +77,18 @@ mailles pour toujours, et personne ne le verrait — c'est la forme la plus coû
 DIT. Un pan non demandé et un pan dont le score est nul sont deux choses différentes ; les
 confondre au tableau de bord ferait lire une absence de mesure comme un échec de mesure.
 
+**Et quand la campagne est jouée, elle l'est DEUX FOIS la première fois (D-36 (a), 01/09/2026).**
+Le ciblage par ligne mutée — ne rejouer, pour un mutant, que les tests couvrant la ligne
+altérée — est écrit et éteint. La décision humaine le laisse éteint jusqu'à sa vérification, et
+cette vérification se joue **à la prochaine campagne réelle**, pas « un jour » :
+`python recette/non_perte_ciblage.py <projet>` côté forge-tests joue les deux campagnes et
+compare les listes de survivants. Verdict `PASS` : le ciblage peut devenir le défaut, et cela
+se redécide. Verdict `FAIL` : il reste éteint, et l'écart mesuré est consigné.
+
+*Pourquoi la vérification vit ici et pas dans une intention* : une campagne réelle est le seul
+endroit où les deux passes portent sur du code qui compte. La jouer sur un banc d'essai
+prouverait que le mécanisme tourne, pas qu'il ne perd rien.
+
 ## 2. Ce que l'étape produit (staging, autonome)
 
 Dans le projet produit (`forge\etapes\mep\` pour les preuves, racine pour les fichiers de build) :

@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=807b595a9ac5 archive=bca717389565 · dernier événement: 2026-09-01T12:20:46.293Z -->
+     sceaux: actifs=f2a4ef5ad6bb archive=bca717389565 · dernier événement: 2026-09-01T12:33:52.602Z -->
 
-**32 actifs** (candidat 7 · décidé 23 · en cours 0 · corrigé 1 · écarté 1) · **717 archivés**.
+**33 actifs** (candidat 7 · décidé 24 · en cours 0 · corrigé 1 · écarté 1) · **717 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -72,6 +72,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0749 | decide | 10 | Le ciblage par ligne mutee reste eteint jusqu'a sa verification, et la verification cesse d'etre une intention : elle est jouable | **oui** — surcout fixe mesure a 0,386 s par mutant contre 28,2 s de rejeu actuel ; la condition de non-perte de l'etude n'avait aucun executant avant ce lot |
 | TF-0748 | decide | 5 | Palier 1 de la strategie de tests livre derriere un drapeau : la CONDITION DE NON-PERTE reste a jouer une fois sur un projet reel avant qu'il devienne le defaut | **oui** — campagne mesuree a 67 min dont 54 de mutation, 28,2 s par mutant ; surcout fixe mesure a 0,386 s |
 | TF-0747 | candidat | 15 | La suite de forge-tests est ROUGE sur son propre banc : la regle L23 du skill digit-ai-page-html a evolue, la fixture HTML de test_tf_0117 ne porte pas la garde | **oui** — 1 test en echec sur 1174, bloquant en mode -x : toute mesure de suite entiere sur ce banc est invalide tant qu'il dure |
 
