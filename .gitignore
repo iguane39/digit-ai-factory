@@ -2,3 +2,12 @@
 .env.*
 !.env.*.exemple
 !forge/**
+
+# État MACHINE, jamais du savoir partagé (01/09/2026, décision D-37).
+# Ces deux fichiers sont réécrits par des hooks à chaque session avec les CHEMINS RÉELS du parc.
+# Les anonymiser casserait leur fonction — ce sont des clés, pas de la prose : le premier compare
+# des empreintes par chemin de produit, le second journalise où une synthèse a été déposée. Les
+# suivre remettait donc des noms de clients dans un dépôt publiable à CHAQUE ouverture de session,
+# c'est-à-dire que tout nettoyage y était provisoire par construction.
+.oracles/produits-au-demarrage.json
+.claude/hooks-journal.jsonl

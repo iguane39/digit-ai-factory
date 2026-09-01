@@ -64,7 +64,13 @@ const CHEMIN_PRODUITS = () => process.env.FORGE_PRODUITS_PSEUDO || join(RACINE, 
 // LES EXEMPLES DE CE FICHIER SONT INVENTÉS, et c'est une règle : le 27/08, un oracle écrit
 // pour traquer les noms de clients a été refusé par lui-même parce que son propre commentaire
 // en citait un en exemple.
-const bordé = (mot) => new RegExp(`(?<![A-Za-z0-9_])${mot.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![A-Za-z0-9_])`, "g");
+// LA CASSE, et elle a coûté une passe entière (01/09/2026). Ce motif était sensible à la casse
+// (`"g"` seul) là où la PORTE de publication, elle, compare sans y être sensible. Résultat
+// mesuré sur le parc : un anonymiseur passé sur 187 fichiers laissait `20260814-tests-Fournisseur-A` —
+// le sigle en minuscules — et la porte le refusait juste après. Deux contrôles du même sujet
+// qui ne s'accordent pas sur la casse donnent le pire des deux mondes : le nettoyage se croit
+// fini, et le refus tombe à la publication, quand il coûte le plus cher à comprendre.
+const bordé = (mot) => new RegExp(`(?<![A-Za-z0-9_])${mot.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![A-Za-z0-9_])`, "gi");
 
 function lireClients() {
   const p = CHEMIN_CLIENTS();
@@ -155,7 +161,19 @@ export function anonymiserCandidature(c) {
 }
 
 // ---- self-test : les DEUX sens, sur des tables jetables ------------------------------------
-if (process.argv[2] === "--self-test") {
+//
+// LA GARDE D'IMPORT (01/09/2026), et elle a été payée pour être vue. Ce bloc se déclenchait sur
+// `process.argv[2] === "--self-test"` SEUL, sans vérifier que ce fichier est le point d'entrée.
+// Conséquence : tout module qui l'IMPORTE et qu'on lance avec `--self-test` voyait le banc de
+// l'anonymiseur s'exécuter à sa place, puis `process.exit` emporter la session avant que son
+// propre banc n'ait joué une seule ligne — un banc qui rend 4/4 verts pour un module qui n'a
+// rien été testé. C'est le pire état d'un contrôle : il rassure au lieu de juger.
+//
+// Le défaut était DÉJÀ NOMMÉ dans ce dossier — `todo\journaliser.mjs` porte la même garde et
+// écrit pourquoi : « un module dont l'import déclenche la ligne de commande n'est pas
+// importable ». La leçon existait, l'idiome existait, et ce fichier ne l'avait pas repris.
+if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("\\", "/")
+    === process.argv[1].toLowerCase().replaceAll("\\", "/") && process.argv[2] === "--self-test") {
   const { mkdtempSync } = await import("node:fs");
   const { tmpdir } = await import("node:os");
   const dir = mkdtempSync(join(tmpdir(), "anon-entrant-"));

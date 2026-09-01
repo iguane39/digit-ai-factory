@@ -29,22 +29,12 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-12 - RETOURS - 20260831c.tf.jsonl` | fichier | 2,3 Ko | 1 ligne(s) JSONL |
 | `Produit-12 - RETOURS - 20260901a.md` | fichier | 5,3 Ko | Retours forges — Produit-12 — 20260901a |
 | `Produit-12 - RETOURS - 20260901a.tf.jsonl` | fichier | 2,1 Ko | 1 ligne(s) JSONL |
-| `Produit-02 - RETOURS - 20260831a.md` | fichier | 15,1 Ko | Retours forges — trois familles d'erreurs d'un agent, mesurées sur une session — 20260831a |
-| `Produit-02 - RETOURS - 20260831a.tf.jsonl` | fichier | 11,7 Ko | 4 ligne(s) JSONL |
-| `Produit-02 - RETOURS - 20260831b.md` | fichier | 7,5 Ko | Retours forges — deux défauts que seize oracles verts n'ont pas vus — 20260831b |
-| `Produit-02 - RETOURS - 20260831b.normalise.tf.jsonl` | fichier | 3,9 Ko | 2 ligne(s) JSONL |
-| `Produit-02 - RETOURS - 20260831b.tf.jsonl` | fichier | 3,5 Ko | 2 ligne(s) JSONL |
-| `Produit-02 - RETOURS - 20260901a.md` | fichier | 6,0 Ko | Retours forges — l'écart déclaré qui remplaçait la solution disponible — 20260901a |
-| `Produit-02 - RETOURS - 20260901a.normalise.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
-| `Produit-02 - RETOURS - 20260901a.tf.jsonl` | fichier | 2,3 Ko | 1 ligne(s) JSONL |
-| `Produit-05 - RETOURS - 20260831a.md` | fichier | 24,0 Ko | Retours forges — Produit-05 — 20260831a |
-| `Produit-05 - RETOURS - 20260831a.tf.jsonl` | fichier | 14,7 Ko | 6 ligne(s) JSONL |
-| `Client-A-POC-to-Prod - RETOURS - 20260831a.md` | fichier | 11,7 Ko | Retours forges — Client-A-POC-to-Prod — 20260831a |
-| `Client-A-POC-to-Prod - RETOURS - 20260831a.tf.jsonl` | fichier | 6,9 Ko | 4 ligne(s) JSONL |
-| `Client-A-POC-to-Prod - RETOURS - 20260831b.md` | fichier | 13,9 Ko | Retours forges — Client-A-POC-to-Prod — 20260831b |
-| `Client-A-POC-to-Prod - RETOURS - 20260831b.tf.jsonl` | fichier | 9,3 Ko | 4 ligne(s) JSONL |
-| `Client-A-POC-to-Prod - RETOURS - 20260831c.md` | fichier | 7,7 Ko | Retours forges — Client-A-POC-to-Prod — 20260831c |
-| `Client-A-POC-to-Prod - RETOURS - 20260831c.tf.jsonl` | fichier | 4,2 Ko | 2 ligne(s) JSONL |
+| `Produit-12 - RETOURS - 20260831a.md` | fichier | 11,7 Ko | Retours forges — Produit-12 — 20260831a |
+| `Produit-12 - RETOURS - 20260831a.tf.jsonl` | fichier | 6,9 Ko | 4 ligne(s) JSONL |
+| `Produit-12 - RETOURS - 20260831b.md` | fichier | 13,9 Ko | Retours forges — Produit-12 — 20260831b |
+| `Produit-12 - RETOURS - 20260831b.tf.jsonl` | fichier | 9,3 Ko | 4 ligne(s) JSONL |
+| `Produit-12 - RETOURS - 20260831c.md` | fichier | 7,7 Ko | Retours forges — Produit-12 — 20260831c |
+| `Produit-12 - RETOURS - 20260831c.tf.jsonl` | fichier | 4,2 Ko | 2 ligne(s) JSONL |
 | `Produit-01 - RETOURS - 20260827a.md` | fichier | 8,3 Ko | Retours forges — Produit-01 — 20260827a |
 | `Produit-01 - RETOURS - 20260827a.tf.jsonl` | fichier | 4,9 Ko | 2 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20260823a.md` | fichier | 13,1 Ko | Retours forges — retrait du domaine breton & audit forge-tests — 20260823a |
@@ -52,8 +42,8 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-02 - RETOURS - 20260823b.md` | fichier | 5,9 Ko | Retours forges — complément au lot 20260823a : localisation du correctif — 20260823b |
 | `Produit-02 - RETOURS - 20260823b.tf.jsonl` | fichier | 3,8 Ko | 2 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20260823c.md` | fichier | 14,7 Ko | Retours forges — quatre fois la même erreur en une session — 20260823c |
-| `Produit-02 - RETOURS - 20260823c.tf.jsonl` | fichier | 7,6 Ko | 4 ligne(s) JSONL |
-| `Produit-02 - RETOURS - 20260824a.md` | fichier | 9,8 Ko | Retours forges — un texte illisible en production, et l'oracle qui ne pouvait pas le voir  |
+| `Produit-02 - RETOURS - 20260823c.tf.jsonl` | fichier | 7,5 Ko | 4 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20260824a.md` | fichier | 9,7 Ko | Retours forges — un texte illisible en production, et l'oracle qui ne pouvait pas le voir  |
 | `Produit-02 - RETOURS - 20260824a.tf.jsonl` | fichier | 6,1 Ko | 4 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20260824b.md` | fichier | 9,0 Ko | Retours forges — sept hostnames sur huit injoignables en HTTPS, et personne ne le mesurait |
 | `Produit-02 - RETOURS - 20260824b.tf.jsonl` | fichier | 5,1 Ko | 3 ligne(s) JSONL |
@@ -93,14 +83,24 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-02 - RETOURS - 20260826j.tf.jsonl` | fichier | 8,3 Ko | 3 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20260826k.md` | fichier | 8,7 Ko | Retours forges — Produit-02.com — 20260826k |
 | `Produit-02 - RETOURS - 20260826k.tf.jsonl` | fichier | 4,1 Ko | 1 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20260831a.md` | fichier | 15,1 Ko | Retours forges — trois familles d'erreurs d'un agent, mesurées sur une session — 20260831a |
+| `Produit-02 - RETOURS - 20260831a.tf.jsonl` | fichier | 11,6 Ko | 4 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20260831b.md` | fichier | 7,4 Ko | Retours forges — deux défauts que seize oracles verts n'ont pas vus — 20260831b |
+| `Produit-02 - RETOURS - 20260831b.normalise.tf.jsonl` | fichier | 3,9 Ko | 2 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20260831b.tf.jsonl` | fichier | 3,5 Ko | 2 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20260901a.md` | fichier | 6,0 Ko | Retours forges — l'écart déclaré qui remplaçait la solution disponible — 20260901a |
+| `Produit-02 - RETOURS - 20260901a.normalise.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20260901a.tf.jsonl` | fichier | 2,3 Ko | 1 ligne(s) JSONL |
 | `Produit-04 - RETOURS - 20260827a.md` | fichier | 12,3 Ko | Retours forges — Produit-04 — 20260827a |
-| `Produit-04 - RETOURS - 20260827a.tf.jsonl` | fichier | 7,3 Ko | 3 ligne(s) JSONL |
+| `Produit-04 - RETOURS - 20260827a.tf.jsonl` | fichier | 7,2 Ko | 3 ligne(s) JSONL |
 | `Produit-04 - RETOURS - 20260827b.md` | fichier | 12,2 Ko | Retours forges — Produit-04 — 20260827b |
-| `Produit-04 - RETOURS - 20260827b.tf.jsonl` | fichier | 8,5 Ko | 4 ligne(s) JSONL |
-| `Produit-11 - RETOURS - 20260827a.md` | fichier | 10,4 Ko | Retours forgés — Produit-11 — 20260827a |
+| `Produit-04 - RETOURS - 20260827b.tf.jsonl` | fichier | 8,4 Ko | 4 ligne(s) JSONL |
+| `Produit-05 - RETOURS - 20260831a.md` | fichier | 24,0 Ko | Retours forges — Produit-05 — 20260831a |
+| `Produit-05 - RETOURS - 20260831a.tf.jsonl` | fichier | 14,8 Ko | 6 ligne(s) JSONL |
+| `Produit-11 - RETOURS - 20260827a.md` | fichier | 10,3 Ko | Retours forgés — Produit-11 — 20260827a |
 | `Produit-11 - RETOURS - 20260827a.tf.jsonl` | fichier | 5,2 Ko | 3 ligne(s) JSONL |
-| `Produit-11 - RETOURS - 20260827b.md` | fichier | 12,3 Ko | Retours forgés — Produit-11 — 20260827b |
-| `Produit-11 - RETOURS - 20260827b.tf.jsonl` | fichier | 5,2 Ko | 2 ligne(s) JSONL |
+| `Produit-11 - RETOURS - 20260827b.md` | fichier | 12,2 Ko | Retours forgés — Produit-11 — 20260827b |
+| `Produit-11 - RETOURS - 20260827b.tf.jsonl` | fichier | 5,1 Ko | 2 ligne(s) JSONL |
 | `Produit-11 - RETOURS - 20260828a.md` | fichier | 12,4 Ko | Retours forgés — Produit-11 — 20260828a |
 | `Produit-11 - RETOURS - 20260828a.tf.jsonl` | fichier | 6,0 Ko | 2 ligne(s) JSONL |
 
