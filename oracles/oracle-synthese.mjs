@@ -64,7 +64,12 @@
  *   S30 toute décision du bloc 3 porte un NUMÉRO, et les numéros sont DISTINCTS (28/08) — une
  *       décision se désigne pour se trancher. S4 compte des options et ne voit jamais que la
  *       QUESTION est insélectionnable ; le destinataire avait invente la numerotation avant de
- *       dire « je ne peux pas les sélectionner ». Formes admises, tiret compris : « D-5 — ».
+ *       dire « je ne peux pas les sélectionner ». Formes admises, tiret compris : « D-5 — »,
+ *       « D5 », « Décision 5 — ». DURCIE LE 01/09 : le numéro NU (« 5. », « 5) ») n'est plus
+ *       admis, il ne dit pas à quelle des deux listes numérotées du message il appartient.
+ *   S33 toute action du bloc 8 porte un SÉLECTEUR « A-N » distinct (01/09) — symétrique de S30
+ *       et né du même retour : « le 3 était pour les prochaines actions ». Deux familles
+ *       numérotées pareil ne se désignent pas ; le sélecteur nomme la sienne.
  *   S31 chaque OPTION du bloc 3 porte son COÛT et CE QU'ELLE EXCLUT (30/08) — exigence écrite
  *       depuis le 13/08 et restée sans juge ; en TABLEAU, les colonnes suffisent (borne de S19 :
  *       une ligne se juge avec son en-tête). Sans elle, une liste d'options est un menu.
@@ -577,10 +582,105 @@ function juger(texte) {
     "pour savoir ce qu'on lui demande — c'est le coût que cette règle existe pour supprimer.",
     "chaque action humaine est exécutable telle quelle");
 
-  juger8("S14", ACTEURS, (g) => ID_STABLE.test(g) || DECLAREE_NEUVE.test(g),
+  // 01/09 — LE SÉLECTEUR D'UNE ACTION N'EST PAS UN IDENTIFIANT DE REGISTRE, et S14 les
+  // confondrait comme S15 confondait « D-10 » avec un identifiant nu le 30/08 : `ID_STABLE`
+  // reconnaît « une à quatre majuscules, un tiret, deux à quatre chiffres », donc `A-10` en est
+  // un pour elle. Une action numérotée A-10 et SANS identifiant de registre passerait alors S14
+  // par son seul sélecteur — la règle serait satisfaite par l'étiquette que S33 vient d'imposer,
+  // et deux restitutions cesseraient de se comparer sans que rien ne crie. Le sélecteur est donc
+  // retiré AVANT la mesure, exactement comme le nom d'acteur l'est pour S13.
+  juger8("S14", ACTEURS, (g) => ID_STABLE.test(g.replace(/\bA\s*-?\s*\d{1,2}\b/g, " ")) || DECLAREE_NEUVE.test(g),
     "une action sans identifiant stable ni mention `neuve` : deux restitutions successives ne se comparent pas, " +
     "et la même ligne se re-sert d'une liste à l'autre.",
     "chaque action porte un identifiant stable ou se déclare neuve");
+
+  // ---- S33 (01/09/2026) — UNE ACTION SE DÉSIGNE AUSSI, ET PAS DANS LA MÊME SUITE QUE LES
+  // DÉCISIONS -----------------------------------------------------------------------------
+  //
+  // LE RETOUR EST LA MESURE, mot pour mot : « Il y a un problème de numérotation entre les
+  // décisions et les prochaines actions. Tu confonds une fois l'un et une fois l'autre. Ici le 3
+  // était pour les prochaines actions. » Le lecteur avait répondu « 3 » en désignant une action
+  // du bloc 8 ; la réponse a été lue comme la décision 3 du bloc 3. Le message n'était pas
+  // ambigu pour lui : il l'était pour qui devait le relire.
+  //
+  // POURQUOI S30 NE POUVAIT PAS LE VOIR, et c'est le même angle mort qu'elle corrigeait au bloc 3
+  // huit jours plus tôt. S30 rend une décision SÉLECTIONNABLE — elle exige un numéro et sa
+  // distinction — mais elle ne regarde qu'un seul bloc. Or une restitution porte DEUX listes
+  // numérotées, et rien ne les distinguait : deux suites d'entiers, dans le même message, avec la
+  // même écriture. Un numéro n'est un sélecteur que s'il désigne UNE chose ; deux familles qui
+  // partagent leur numérotation en désignent deux, et le lecteur ne peut pas lever l'ambiguïté
+  // puisqu'il répond en deux caractères — c'est précisément ce que le choix fermé lui promet.
+  //
+  // CE QUE COÛTE L'AMBIGUÏTÉ, et c'est plus cher que l'absence de numéro : un bloc non numéroté
+  // se voit et fait rédiger en prose (S30) ; deux blocs numérotés PAREIL ne se voient pas, et la
+  // mauvaise ligne est traitée en silence, avec l'air d'avoir obéi. Le défaut ne se découvre
+  // qu'au tour suivant, quand le lecteur constate qu'on a répondu à côté.
+  //
+  // LA RÈGLE : le sélecteur NOMME SA FAMILLE. Une décision s'écrit « D-N » (ou « Décision N »),
+  // une action « A-N » (ou « Action N ») ; un numéro NU — « 3. », « 3) » — n'appartient à aucune
+  // des deux et cesse d'être admis, des deux côtés. C'est le durcissement que S30 reçoit le même
+  // jour : elle acceptait « 1. » et « 1) », et cette tolérance est exactement la porte par
+  // laquelle les deux suites se sont confondues.
+  //
+  // DOMAINE identique à S14 — les groupes du bloc 8 qui portent un nom d'acteur. Une ligne de
+  // prose du bloc 8 (la clause qui justifie l'ordre, par exemple) n'est pas une action et ne se
+  // numérote pas. En TABLEAU, le sélecteur est cherché EN TÊTE DE CELLULE, dans n'importe
+  // laquelle : imposer la première colonne serait imposer une typographie, ce que TF-0568
+  // interdit depuis le 24/08.
+  //
+  // AVERTISSANTE, comme toute règle neuve depuis la v2.5.0.
+  const RE_SELECTEUR_ACTION = /^(?:\*\*|`|\s)*(?:action\s*(?:n[°ºo]\s*)?|A\s*-?\s*)(\d{1,2})\b/i;
+  const selecteurDAction = (ligne) => {
+    const candidats = /^\s*\|/.test(ligne)
+      ? ligne.split("|").map((c) => c.trim()).filter(Boolean)
+      : [ligne.replace(/^\s*[-*]\s+/, "")];
+    for (const c of candidats) {
+      const m = RE_SELECTEUR_ACTION.exec(c);
+      if (m) return m[1];
+    }
+    return null;
+  };
+  // Le même découpage qu'`actionsGroupees`, mais qui CONSERVE la ligne d'origine à côté du groupe :
+  // le groupe sert à décider si c'est une action (il porte l'acteur, et pour un tableau il porte
+  // son en-tête) ; la LIGNE seule sert à lire le sélecteur, sinon l'en-tête d'un tableau nommant
+  // sa colonne « A-N » vaudrait sélecteur pour toutes ses lignes.
+  const actionsAvecLeurLigne = (t) => {
+    const sortie = [];
+    let dernier = null;
+    for (const ligne of t.split("\n")) {
+      if (/^\s*\|/.test(ligne)) continue;
+      if (/^[-*]\s+\S/.test(ligne)) { dernier = { ligne, groupe: ligne }; sortie.push(dernier); }
+      else if (dernier && /^\s+\S/.test(ligne)) dernier.groupe += " " + ligne.trim();
+    }
+    const entetes = entetesDeTableau(t);
+    const entete = entetes.length ? entetes[0] : "";
+    for (const l of lignesDeDonnees(t)) sortie.push({ ligne: l, groupe: entete + " " + l });
+    return sortie;
+  };
+  {
+    const actions33 = actionsAvecLeurLigne(bActions)
+      .filter((a) => !MOTIFS_ABSENCE.test(a.groupe.replace(/^\s*[-*]\s+/, "").slice(0, 40)))
+      .filter((a) => ACTEURS.test(a.groupe));
+    if (!actions33.length) {
+      ok("S33", "aucune action à désigner — bloc vide déclaré, ou aucun acteur nommé (S6)");
+    } else {
+      const selecteurs = actions33.map((a) => selecteurDAction(a.ligne));
+      const sans = actions33.filter((a, i) => selecteurs[i] === null);
+      const poses = selecteurs.filter(Boolean);
+      const doublons = poses.filter((n, i) => poses.indexOf(n) !== i);
+      if (sans.length) {
+        ko("S33", `${sans.length} action(s) sur ${actions33.length} SANS SÉLECTEUR « A-N » — le lecteur a répondu « 3 » ` +
+          "en désignant une action, et le « 3 » a été lu comme la décision 3. Deux listes numérotées dans le même message " +
+          "ne se distinguent que si leur sélecteur NOMME sa famille : « A-1 » pour une action, « D-1 » pour une décision. " +
+          `Formes admises : « **A-1** — », « A1 », « Action 1 ». Ex. : ${sans[0].ligne.replace(/\s+/g, " ").trim().slice(0, 110)}`);
+      } else if (doublons.length) {
+        ko("S33", `sélecteur(s) d'action en DOUBLE : ${[...new Set(doublons)].map((n) => `A-${n}`).join(", ")} — ` +
+          "deux actions portant le même sélecteur ne se désignent pas mieux qu'aucune.");
+      } else {
+        ok("S33", `${actions33.length} action(s), chacune désignée et distincte (${poses.map((n) => `A-${n}`).join(", ")})`);
+      }
+    }
+  }
 
   // ---- S21 (TF-0526, 23/08) — « acces » et « presence » se PROUVENT, ils ne s'affirment pas ---
   //
@@ -1193,7 +1293,11 @@ function juger(texte) {
   // Mesuré sur le rendu de référence : « D4 (2 emplois), D3 (2 emplois) » y étaient dénoncés alors
   // qu'ils renvoyaient à des décisions posées DANS LE MÊME FIL — c'est-à-dire l'usage exact que
   // S17 exige, un renvoi qui nomme son sujet au lieu d'une position. Deux règles se contredisaient.
-  const EXCLUS_S23 = /^(?:TF-?\d{3,4}|D-?\d{1,2})$/;
+  // 01/09 — LE SÉLECTEUR D'UNE ACTION rejoint l'exclusion pour la même raison que celui d'une
+  // décision : S33 le prescrit et le vérifie, et la doctrine impose qu'il ouvre chaque action du
+  // bloc 8. Sans cette exclusion, S23 dénoncerait « A-1 (3 emplois) » sur une restitution dont le
+  // seul tort serait d'obéir — le renvoi par sélecteur est justement ce que S17 exige.
+  const EXCLUS_S23 = /^(?:TF-?\d{3,4}|[DA]-?\d{1,2})$/;
   const occurrences = new Map();
   for (const m of texte.matchAll(RE_DESIGNATEUR)) {
     const brut = m[0];
@@ -1275,8 +1379,14 @@ function juger(texte) {
   // LES NUMÉROS DOIVENT AUSSI ÊTRE DISTINCTS : deux décisions numérotées 1 ne se sélectionnent
   // pas davantage qu'aucune. C'est le second sens de la règle, et il se mesure aussi.
   //
-  // La FORME est libre, comme pour les titres de bloc (S1) : « **Décision 1 —** », « 1. »,
-  // « **1)** », « D1 — », « D-1 — » sont tous acceptés. Juger la typographie n'a jamais été le sujet.
+  // LA FORME RESTE LIBRE, MAIS ELLE NOMME SA FAMILLE — durcissement du 01/09, et il vient d'un
+  // défaut mesuré. Étaient acceptés jusque-là « **Décision 1 —** », « 1. », « **1)** », « D1 — »,
+  // « D-1 — » : les deux formes NUES (« 1. », « 1) ») ont été retirées. Le retour qui les retire :
+  // « Il y a un problème de numérotation entre les décisions et les prochaines actions. Tu confonds
+  // une fois l'un et une fois l'autre. » Une restitution porte DEUX listes numérotées, et un entier
+  // nu n'appartient à aucune des deux — le lecteur répond « 3 » en désignant une action, et le « 3 »
+  // se lit comme la décision 3. Juger la typographie n'a jamais été le sujet ; désambiguïser deux
+  // familles l'est. Restent admises : « **Décision 1 —** », « D1 », « D-1 — ». Symétrique : S33.
   //
   // LE TIRET A ÉTÉ AJOUTÉ LE 30/08, ET LE DÉFAUT VALAIT LA MESURE. La forme réellement employée
   // dans les rendus du parc est « **D-5 —** » — c'est celle que le destinataire a mise en regard
@@ -1287,7 +1397,7 @@ function juger(texte) {
   // self-test : `D-5` passe, une décision sans numéro échoue toujours.
   const numeroDeDecision = (g) => {
     const tete = g.replace(TETE_DECISION, "").replace(/^\*\*/, "").trim();
-    const m = /^(?:d[ée]cision\s*)?(?:n[°ºo]\s*)?(?:D\s*-?\s*)?(\d{1,2})\s*(?:[.)\-–—:·]|\*\*|\s)/i.exec(tete);
+    const m = /^(?:d[ée]cision\s*(?:n[°ºo]\s*)?|D\s*-?\s*)(\d{1,2})\b/i.exec(tete);
     return m ? m[1] : null;
   };
   if (groupesDecisions.length) {
@@ -1298,7 +1408,7 @@ function juger(texte) {
     if (sansNumero) {
       ko("S30", `${sansNumero} décision(s) sur ${groupesDecisions.length} SANS NUMÉRO — une décision se désigne pour se trancher. ` +
         "Le destinataire a répondu « 1b, 2a, 3a » à un bloc non numéroté avant de dire « je ne peux pas les sélectionner » : " +
-        "il inventait la numérotation. Formes admises : « **Décision 1 —** », « 1. », « **1)** », « D1 — ».");
+        "il inventait la numérotation. Formes admises : « **Décision 1 —** », « D1 — », « D-1 — » — le numéro NU (« 1. », « 1) ») ne dit pas à laquelle des deux listes du message il appartient (S33).");
     } else if (doublons.length) {
       ko("S30", `numéro(s) de décision en DOUBLE : ${[...new Set(doublons)].join(", ")} — deux décisions portant le même numéro ` +
         "ne se sélectionnent pas mieux qu'aucune.");
@@ -1442,15 +1552,15 @@ Aucun écart : la demande a été suivie à la lettre.
   - parade : traduire D17 en amont.
 
 ## 8. Prochaines actions
-- d'abord TF-0220 (manuelle_dev) — parce qu'il débloque toute correction ultérieure du corpus.
+- **A-1** — d'abord TF-0220 (manuelle_dev) — parce qu'il débloque toute correction ultérieure du corpus.
   - pourquoi pas l'IA : decision — arbitrage normatif sur le seuil retenu ;
   - où : \`forge_tests\\corpus.py\`, puis relancer la recette S-01.
   - si rien n'est fait : les corrections suivantes du corpus restent bloquées derrière celle-là.
-- ensuite TF-0221 (manuelle_utilisateur) — décision normative, impact sur 19 citations.
+- **A-2** — ensuite TF-0221 (manuelle_utilisateur) — décision normative, impact sur 19 citations.
   - pourquoi pas l'IA : acces — publication TENTÉE le 14/08, \`HTTP 403 Authorization_RequestDenied\` ; le compte de l'agent ne porte aucun rôle sur le portail ;
   - où : écran « Publier la version », bouton \`Publier\`.
   - si rien n'est fait : les 19 citations continuent de pointer une version non publiée.
-- enfin TF-0222 (auto_ia) — regrouper les constats par cause racine.
+- **A-3** — enfin TF-0222 (auto_ia) — regrouper les constats par cause racine.
   - motif de non-exécution : dependance_bloc_3 — attend la décision de publication ci-dessus.
   - si rien n'est fait : les constats restent listés un par un, sans leur cause commune.
 `;
@@ -1557,6 +1667,18 @@ Aucun écart : la demande a été suivie à la lettre.
   const enCitation = verte.replace(/## 3\. Décisions attendues[\s\S]*?(?=## 4\.)/,
     `## 3. Décisions attendues\n\n${CITATION}\n\n`);
   writeFileSync(join(dir, "d3-citation.md"), enCitation, "utf8");
+  // 01/09 — S33 DANS SON SECOND SENS, et S30 DANS SON DURCISSEMENT. Les deux fixtures qui
+  // suivent tiennent le retour du 01/09 : « il y a un problème de numérotation entre les
+  // décisions et les prochaines actions ; ici le 3 était pour les prochaines actions ».
+  //   · selecteur-double : deux actions portant A-1 — l'absence est portée par la rouge, le
+  //     DOUBLON ne se voit que si on le mesure à part, exactement comme pour S30 ;
+  //   · numero-nu : la décision revient au numéro NU (« 1. »), la forme que S30 acceptait
+  //     jusqu'ici et par laquelle les deux familles se sont confondues. Sans cette fixture, le
+  //     durcissement se déferait au premier remaniement et le retour se rejouerait à l'identique.
+  const selecteurDouble = verte.replace("- **A-2** — ensuite", "- **A-1** — ensuite");
+  writeFileSync(join(dir, "selecteur-double.md"), selecteurDouble, "utf8");
+  const numeroNu = verte.replace("- **Décision 1 —** Publier", "- **1.** Publier");
+  writeFileSync(join(dir, "numero-nu.md"), numeroNu, "utf8");
   writeFileSync(join(dir, "verte.md"), verte, "utf8");
   writeFileSync(join(dir, "rouge.md"), rouge, "utf8");
   // TF-0661 — S29 a besoin de SA fixture : la rouge porte des actions au bloc 8, donc la
@@ -1587,7 +1709,7 @@ Aucun écart : la demande a été suivie à la lettre.
   if (rr.status !== 1) casse.push("la fixture ROUGE ne FAIL pas");
   else {
     for (const regle of ["S2", "S3", "S5", "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16",
-                         "S17", "S18", "S19", "S20", "S21", "S22", "S23", "S24", "S25", "S26", "S27", "S28", "S30"]) {
+                         "S17", "S18", "S19", "S20", "S21", "S22", "S23", "S24", "S25", "S26", "S27", "S28", "S30", "S33"]) {
       if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
     }
   }
@@ -1598,6 +1720,17 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("S29 : un risque declare NON COUVERT avec un bloc 8 vide passe pour conforme — declarer un risque n'est pas le traiter");
   if (!/"S29"[^}]*PASS/.test(rrep.stdout))
     casse.push("S29 : le MEME risque, la main passee au bloc 8, est accuse — la regle crie sur un travail juste");
+  // 01/09 — S33 dans ses DEUX sens, et le durcissement de S30 dans le sien.
+  const rsd = spawnSync(process.execPath, [moi, join(dir, "selecteur-double.md")], { encoding: "utf8" });
+  if (!/"S33"[^}]*FAIL/.test(rsd.stdout))
+    casse.push("S33 : deux actions portant le MÊME sélecteur passent pour désignables — le doublon ne se voit pas");
+  if (!/"S33"[^}]*PASS/.test(rv.stdout))
+    casse.push("S33 : la verte, dont chaque action porte son sélecteur A-N, est accusée — la règle crie sur un travail juste : " +
+      (/"S33"[sS]{0,180}/.exec(rv.stdout) || [""])[0].replace(/s+/g, " "));
+  const rnn = spawnSync(process.execPath, [moi, join(dir, "numero-nu.md")], { encoding: "utf8" });
+  if (!/"S30"[^}]*FAIL/.test(rnn.stdout))
+    casse.push("S30 : un numéro NU (« 1. ») passe encore pour un sélecteur de décision — c'est par cette tolérance " +
+      "que le « 3 » d'une action s'est lu comme la décision 3");
   const rnd = spawnSync(process.execPath, [moi, join(dir, "numero-double.md")], { encoding: "utf8" });
   if (!/"S30"[^}]*FAIL/.test(rnd.stdout))
     casse.push("S30 : deux décisions portant le MÊME numéro passent pour sélectionnables — le doublon ne se voit pas");
@@ -1707,7 +1840,7 @@ Aucun écart : la demande a été suivie à la lettre.
   }
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 11/11 PASS (verte PASS ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe)");
+    : "Self-test restitution : 13/13 PASS (verte PASS ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3)");
   process.exit(casse.length ? 1 : 0);
 }
 

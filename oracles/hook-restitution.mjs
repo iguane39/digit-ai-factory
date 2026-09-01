@@ -196,7 +196,31 @@ export function comparerAffiche(message, fichier) {
 //     corpus sera propre, exactement comme la v2.0.0 est restée informative avant de bloquer.
 const BLOQUANTES = new Set(["S1", "S3", "S4", "S6"]);
 
-const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md : bloc 0 « synthèse d'ouverture » en langage commanditaire (≥ 20 mots, sans identifiant, chemin ni sha — l'état, ce que ça change, ce qui est attendu du lecteur), puis les 8 blocs numérotés, aucun omis (un bloc vide se dit en une ligne) : 1 en-tête (quoi · sur quoi · date ET heure avec fuseau + durée · qui avec version) · 2 verdict en une ligne FACTUEL (un chiffre, un compteur) · 3 décisions attendues de l'humain, EN TÊTE, en choix fermé (a)/(b)/(c) avec coût, exclusion, recommandation et option par défaut — ou « rien n'attend de décision » · 4 traité, chaque puce avec sa preuve (oracle, verdict, chiffre) · 5 non traité, chaque puce avec son motif · 6 écarts à la lettre (« vous avez demandé → j'ai fait → pourquoi », ou « aucun écart ») · 7 risques (énoncé + signal + parade) · 8 prochaines actions classées par acteur (auto_ia / manuelle_dev / manuelle_utilisateur) ET par ordre justifié. Puces ≤ 2 niveaux. Effort en complexité × durée, jamais en jours.";
+// LE TEXTE QUI APPREND LA FORME — et il avait DIX VERSIONS DE RETARD (01/09/2026).
+//
+// LE FAIT, et il est mesurable au registre : cette chaîne a été écrite le 20/08 (v2.4.0) et n'a
+// plus bougé, pendant que `gabarits\RESTITUTION.md` passait de 2.5.0 à 2.14.0 — dix versions,
+// toutes nées d'un retour humain. Elle ignorait donc TOUT de ce qui a été prescrit depuis : le
+// bloc 8 en TABLEAU UNIQUE (S18, 22/08), le sélecteur `D-N` des décisions (S30, 28/08), le
+// tableau d'options par défaut (v2.12.0, 30/08), l'anatomie complète d'une décision et ses deux
+// juges S31/S32 (v2.13.0), la décision en BLOC DE CITATION (v2.14.0).
+//
+// POURQUOI C'EST LE PIRE ENDROIT OÙ LAISSER UN TEXTE PÉRIMÉ. Cette chaîne n'est pas de la
+// documentation : c'est ce que l'agent LIT au moment précis où on lui refuse sa réponse et où il
+// la réécrit. Le hook refusait donc au nom de la v2.14 en dictant la v2.4 — l'agent obéissait au
+// texte qu'il avait sous les yeux, et le retour humain qui en sort trois fois de suite est
+// toujours le même : « le nouveau prompt de résultat a ce format là, pourquoi n'est-il pas
+// appliqué sur ce projet ? », puis « le prompt ne respecte toujours pas le format », puis « le
+// format de sortie n'est toujours pas bon, pourquoi ? ». La cause n'était ni l'oracle ni le
+// gabarit — les deux étaient à jour — mais la SEULE pièce que personne ne relisait.
+//
+// LA LEÇON, opposable au-delà de ce fichier : un référentiel versionné qui a un DOUBLE en prose
+// ailleurs a deux vérités dès la version suivante. Les trois porteurs de la forme — le gabarit
+// (le texte), `oracle-synthese` (le juge) et ce rappel (ce que l'agent lit quand il corrige) —
+// se mettent à jour ENSEMBLE ou la doctrine ne s'applique pas. Le même défaut vaut pour la ligne
+// des gates de `hook-ouverture.mjs`, corrigée le même jour et pour la même raison.
+
+const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.15.0) : bloc 0 « synthèse d'ouverture » en langage commanditaire (≥ 20 mots, sans identifiant, chemin ni sha — l'état, ce que ça change, ce qui est attendu du lecteur), puis les 8 blocs numérotés, aucun omis (un bloc vide se dit en une ligne). · 1 en-tête (quoi · sur quoi · date ET heure avec fuseau + durée · qui avec version) · 2 verdict en une ligne FACTUEL (un chiffre, un compteur) · 3 décisions attendues de l'humain, EN TÊTE, chacune en BLOC DE CITATION et dans cet ordre exact : « > **D-N — <la question, posée comme une question, avec son point d'interrogation>** » (N continu dans la session, jamais remis à 1), puis le rappel du sujet en prose (≥ 25 mots, sans identifiant nu — 12 mots si un chapeau commun d'au moins 40 mots ouvre le bloc), puis « > **Recommandation : (a).** Source consultée : <le document d'où sort la réponse proposée> » et pourquoi ; PUIS, hors de la citation et pleine largeur, le tableau des options « | Option | Ce qu'elle coûte | Ce qu'elle exclut | », une ligne par (a)/(b)/(c) ; PUIS « > **Si rien n'est décidé** : (c) … ». Si rien n'attend l'humain, le dire en une ligne · 4 traité, chaque puce avec sa preuve (oracle, verdict, chiffre) · 5 non traité, chaque puce avec son motif · 6 écarts à la lettre (« vous avez demandé → j'ai fait → pourquoi », ou « aucun écart ») · 7 risques (énoncé + signal + parade) · 8 prochaines actions en UN TABLEAU UNIQUE, l'acteur en COLONNE et jamais en section, trié auto_ia d'abord — chaque action porte son sélecteur **A-N** distinct (jamais un numéro nu : un « 3 » nu ne dit pas s'il désigne la décision 3 ou l'action 3), son identifiant stable TF-#### ou la mention `neuve`, son acteur (auto_ia | manuelle_dev | manuelle_utilisateur), le motif de non-exécution si auto_ia (gate_gouvernance | dependance_bloc_3 | garde_fou | borne_atteinte | dependance_externe | hors_mandat), la raison d'impossibilité IA si elle est laissée à l'humain (acces | decision | depense | presence | irreversible, non accentués — et pour acces comme pour presence, la TRACE MESURÉE de la tentative : code de réponse, message d'erreur, sortie de commande), un chemin ou une commande qui la rend exécutable telle quelle, et ce qu'il en coûte de NE PAS la faire · 9 traces (chemins relatifs et vérifiables). Puces ≤ 2 niveaux. Un renvoi nomme son sujet ou son sélecteur, jamais une position (« ligne 5 » est un défaut). Effort en complexité × durée, jamais en jours.";
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const entree = lireStdin();

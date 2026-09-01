@@ -4,10 +4,23 @@
 avec `destinataire: humain` en frontmatter YAML. La localisation R-2/E9 ne juge que ce qui
 est MARQUÉ — sans porteur, la règle est un faux négatif volontaire : elle est livrée,
 prouvée à zéro faux positif, et ne voit rien. Le marquage a été vérifié toléré par
-`oracle-synthese` (S1-S8 à l'époque, S1-S30 depuis la v2.11.0) sur une synthèse réelle PASS avant d'être prescrit ici.
+`oracle-synthese` (S1-S8 à l'époque, S1-S33 depuis la v2.15.0) sur une synthèse réelle PASS avant d'être prescrit ici.
 Cette consigne, elle, ne se marque PAS : c'est un référentiel normatif, pas un livrable.
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 2.14.0, 30/08/2026** : la décision
+Référentiel versionné (loi n° 4, daté-éditable) — **version 2.15.0, 01/09/2026** : **un sélecteur
+NOMME SA FAMILLE**. Une restitution porte DEUX listes numérotées — les décisions du bloc 3, les
+actions du bloc 8 — et rien ne les distinguait : deux suites d'entiers, dans le même message, avec
+la même écriture. Retour humain du 01/09, mot pour mot : « Il y a un problème de numérotation entre
+les décisions et les prochaines actions. Tu confonds une fois l'un et une fois l'autre. Ici le 3
+était pour les prochaines actions. » Une décision s'écrit désormais **`D-N`**, une action **`A-N`**,
+et le numéro NU (« 3. », « 3) ») cesse d'être admis des deux côtés. Règle neuve **S33** (symétrique
+de S30 au bloc 8), **S30 durcie**. Le même jour, et c'est la cause qui a laissé les dix versions
+précédentes sans effet : **le RAPPEL du hook `Stop` — ce que l'agent lit au moment où on lui refuse
+sa réponse et où il la réécrit — datait du 20/08 et dictait la v2.4.0**. Le hook refusait au nom de
+la v2.14 en prescrivant la v2.4 ; l'agent obéissait au texte qu'il avait sous les yeux. Corrigé
+dans `oracles\hook-restitution.mjs` et dans la ligne des gates de `oracles\hook-ouverture.mjs`.
+*Les trois porteurs de la forme — ce gabarit, son juge et ce que l'agent lit pour corriger — se
+mettent à jour ENSEMBLE, ou la doctrine ne s'applique pas.* Précédente : **2.14.0, 30/08/2026** : la décision
 s'écrit en **BLOC DE CITATION**, squelette **relevé à la source** dans le journal d'une session
 produit et non plus approché de mémoire — et `oracle-synthese`, qui en était AVEUGLE, sait
 désormais le lire : le rendu de référence passait pour « 1 décision sans numéro » quand il en
@@ -108,8 +121,10 @@ S-01 TENU, 19/19 au banc rouge »*, jamais *« tout s'est bien passé »*.
 **En tête, jamais en fin.** Chaque décision est présentée en **choix fermé** — l'humain
 tranche, il ne rédige pas :
 
-- **un NUMÉRO, distinct des autres** (règle **S30**, v2.11.0) — c'est par lui que l'humain
-  répond, et sans lui il numérote de tête ou rédige en prose ;
+- **un SÉLECTEUR `D-N`, distinct des autres** (règle **S30**, v2.11.0, durcie en v2.15.0) —
+  c'est par lui que l'humain répond, et sans lui il numérote de tête ou rédige en prose. Le `D`
+  n'est pas décoratif : le bloc 8 numérote lui aussi, et un entier nu n'appartient à aucune des
+  deux listes (voir S33 au bloc 8) ;
   - **le RAPPEL DU SUJET — au moins 25 mots, sans identifiant nu** (règle **S15**, v2.7.0) ;
   - **la RECOMMANDATION, et la SOURCE consultée d'où elle sort** — ou la déclaration qu'aucune
     source disponible ne répond (règle **S16**, v2.8.0) ;
@@ -163,8 +178,13 @@ n'est pas un choix fermé, c'est un questionnaire.*
 **Les numéros doivent aussi être DISTINCTS** — deux décisions numérotées 1 ne se sélectionnent
 pas mieux qu'aucune. C'est le second sens de la règle, et il a sa propre fixture.
 
-La **forme est libre**, comme pour les titres de bloc : « **Décision 1 —** », « 1. », « **1)** »,
-« D1 — » sont tous acceptés. Juger la typographie n'a jamais été le sujet.
+La **forme reste libre, mais elle nomme sa famille** (durcissement du 01/09/2026, v2.15.0) :
+« **Décision 1 —** », « **D1 —** », « **D-1 —** » sont acceptés ; « 1. » et « **1)** » ne le sont
+plus. *Juger la typographie n'a jamais été le sujet ; désambiguïser deux listes numérotées l'est.*
+Ce qui a fait tomber la tolérance est écrit au bloc 8, section S33 : le lecteur a répondu « 3 » en
+désignant une ACTION, et le « 3 » a été lu comme la décision 3. Un bloc non numéroté se voit et
+coûte une prose ; deux blocs numérotés pareil ne se voient pas, et la mauvaise ligne est traitée
+en silence, avec l'air d'avoir obéi.
 
 #### Pourquoi « une phrase » ne suffisait pas (S15, 22/08/2026)
 
@@ -221,7 +241,7 @@ porte trois choses, sinon ce n'est pas un risque mais une inquiétude :
   - le **signal** qui le rendrait visible (ce qu'on verrait le jour où il se réalise) ;
   - la **parade** ou l'acceptation déclarée.
 
-### 8. Prochaines actions — UN TABLEAU, ordonné, l'acteur en colonne
+### 8. Prochaines actions — UN TABLEAU, ordonné, l'acteur en colonne, chaque action en `A-N`
 
 **La forme est un TABLEAU UNIQUE, et ce n'est plus un goût (S18, TF-0508, 22/08).** Le
 destinataire des restitutions l'a réclamé trois fois dans une seule session : « pourquoi tout
@@ -328,6 +348,42 @@ redemandés.
 n'offre pas toujours un choix, et l'imposer partout produirait du remplissage. Formes admises pour
 la conséquence : « si rien n'est fait », « si on ne le fait pas », « à défaut », « sinon : »,
 « impact si … ».
+
+#### Une action se DÉSIGNE aussi — et pas dans la même suite que les décisions (S33, 01/09/2026)
+
+*Le retour est la mesure, mot pour mot* : **« Il y a un problème de numérotation entre les décisions
+et les prochaines actions. Tu confonds une fois l'un et une fois l'autre. Ici le 3 était pour les
+prochaines actions. »** Le lecteur avait répondu « 3 » en désignant une action du bloc 8 ; la réponse
+a été lue comme la décision 3 du bloc 3.
+
+**Pourquoi S30 ne pouvait pas le voir**, et c'est le même angle mort qu'elle corrigeait au bloc 3
+huit jours plus tôt. S30 rend une décision SÉLECTIONNABLE — elle exige un numéro et sa distinction —
+mais **elle ne regarde qu'un seul bloc**. Or une restitution porte DEUX listes numérotées, et rien
+ne les distinguait. *Un numéro n'est un sélecteur que s'il désigne UNE chose* ; deux familles qui
+partagent leur numérotation en désignent deux, et le lecteur ne peut pas lever l'ambiguïté puisqu'il
+répond en deux caractères — c'est exactement ce que le choix fermé lui promet.
+
+**Ce que coûte l'ambiguïté, et c'est plus cher que l'absence de numéro** : un bloc non numéroté se
+VOIT, et fait rédiger en prose (S30) ; deux blocs numérotés PAREIL ne se voient pas, et la mauvaise
+ligne est traitée en silence, avec l'air d'avoir obéi. Le défaut ne se découvre qu'au tour suivant,
+quand le lecteur constate qu'on a répondu à côté.
+
+**La règle : le sélecteur nomme sa famille.** Une action porte **`A-N`** — formes admises
+« **A-1** — », « A1 », « Action 1 » —, une décision **`D-N`**, et le numéro nu cesse d'être admis
+des deux côtés. En TABLEAU, le sélecteur est cherché **en tête de cellule, dans n'importe
+laquelle** : imposer la première colonne serait imposer une typographie, ce que TF-0568 interdit
+depuis le 24/08.
+
+**`A-N` n'est pas l'identifiant de l'action, et les deux restent dus.** S14 exige l'identifiant
+STABLE — celui du registre produit — pour qu'une ligne se compare d'un tour au suivant ; S33 exige
+le SÉLECTEUR pour qu'elle se désigne dans CE message. Le sélecteur est donc retiré avant la mesure
+de S14, sans quoi une action numérotée `A-10` et sans identifiant de registre satisferait S14 par
+la seule étiquette que S33 vient d'imposer — une règle satisfaite par une autre règle ne mesure
+plus rien. Même carve-out pour S23 : renvoyer à « A-1 » n'est pas un désignateur non glosé, c'est
+l'usage que S17 réclame.
+
+**Portée : le bloc 8 seul, et les seules lignes qui portent un acteur.** La clause qui justifie
+l'ordre n'est pas une action et ne se numérote pas.
 
 #### Un renvoi nomme son SUJET, jamais une position (S17, 22/08/2026)
 
@@ -635,7 +691,7 @@ jamais celui de l'auteur :
 - **S8 ignore la tournure conditionnelle de S19.** « si rien n'est fait » contient le mot
   « fait », que S8 lisait comme une affirmation de complétion sans preuve.
 
-**Exécuté** : `node oracles\oracle-synthese.mjs <synthese.md>` — règles S1-S21 binaires,
+**Exécuté** : `node oracles\oracle-synthese.mjs <synthese.md>` — règles S1-S33 binaires,
 fixtures double sens au self-test (la fixture rouge échoue sur 16 règles distinctes).
 **Proportionnalité (v2.5.0, inchangée)** : bloquantes S1, S3, S4, S6 ; tout le reste — S17 à S20
 comprises — entre en AVERTISSANTE, dit en une ligne sous la réponse et jamais réécrit. Une action

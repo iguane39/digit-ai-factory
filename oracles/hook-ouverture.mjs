@@ -143,7 +143,7 @@ if (!args.includes("--sans-readme")) {
 
 lignes.push("",
   "## Gates actifs dans cette session (R-44)",
-  "- Tout message de fin de tour de TRAVAIL suit gabarits\\RESTITUTION.md (bloc 0 + 8 blocs ; décisions en options (a)/(b)/(c) ; actions par acteur auto_ia/manuelle_dev/manuelle_utilisateur ET ordonnées ; effort en complexité × durée). Le hook Stop le juge par oracle-synthese et REFUSE l'arrêt en cas d'échec.",
+  "- Tout message de fin de tour de TRAVAIL suit gabarits\RESTITUTION.md — bloc 0 + 8 blocs, aucun omis. Bloc 3 : une décision par BLOC DE CITATION, ouverte par son sélecteur `D-N` et une QUESTION, rappel du sujet puis recommandation SOURCÉE, options en tableau `Option | Ce qu'elle coûte | Ce qu'elle exclut` hors citation, ligne de repli « si rien n'est décidé » pour finir. Bloc 8 : UN TABLEAU unique, l'acteur en COLONNE (auto_ia/manuelle_dev/manuelle_utilisateur), trié auto_ia d'abord, chaque action ouverte par son sélecteur `A-N` — les deux familles ne partagent JAMAIS la même numérotation. Effort en complexité × durée, jamais en jours. Le hook Stop le juge par oracle-synthese et REFUSE l'arrêt en cas d'échec.",
   "- Les README d'input\\ et output\\ se régénèrent après chaque écriture (hook PostToolUse) ; un rôle non rédigé est un défaut.",
   "- Quand la factory est impliquée, ses règles priment sur celles du projet (R-43).");
 console.log(lignes.join("\n"));
