@@ -47,6 +47,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md` | fichier | 16,6 Ko | Synthèse de mandat — pourquoi les produits ne remontent rien tout seuls, et ce qu'il faudr |
 | `Digit-AI - Synthese Mandat - Retours pris et propagation mesurable - 20260901a.md` | fichier | 12,6 Ko | Synthèse de mandat — trois lots pris, la propagation devient mesurable, et le banc monte à |
 | `Digit-AI - Synthese Mandat - Selecteurs de familles et palier 1 des tests - 20260901e.md` | fichier | 13,8 Ko | Synthèse de mandat — les sélecteurs de familles, et le premier palier de la stratégie de t |
+| `Digit-AI - Synthese Mandat - Six actions et une porte de publication - 20260901f.md` | fichier | 12,8 Ko | Synthèse de mandat — les six actions, et la porte qui a refusé la publication |
 | `Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md` | fichier | 13,2 Ko | Digit-AI — Synthèse de mandat — Synchronisation GitHub — 20260822a |
 | `Digit-AI - Synthese Mandat - Toute la todo avec le a - 20260815a.md` | fichier | 5,5 Ko | Synthèse de mandat — « fais toute la todo avec le a » (21 items, 4 campagnes, 1 circuit) |
 | `Digit-AI - Synthese Mandat - Traite les todo et retours - 20260815a.md` | fichier | 4,4 Ko | Synthèse de mandat — « traite les todo et retours » (14 items, 3 campagnes) |
@@ -61,4 +62,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Verification de non perte jouable - 20260901d.md` | fichier | 9,0 Ko | Synthèse de mandat — le tri reste éteint, et sa vérification cesse d'être une intention |
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 
-_44 fichier(s), 0 sous-dossier(s)_
+_45 fichier(s), 0 sous-dossier(s)_
