@@ -36,6 +36,7 @@ import { join, dirname, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { tailleNormalisee } from "./lib-empreinte.mjs";
+import { anonymiser } from "../todo/anonymiser-entrant.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -215,11 +216,36 @@ const ecrits = [];
 for (const racine of RACINES) {
   const abs = join(BASE, racine);
   if (!existsSync(abs)) { defauts.push(`${racine}\\ : racine absente`); continue; }
+  // UN INDEX DÉRIVÉ DE DONNÉES SALES EST SALE (01/09/2026, décision D-37). Cette table liste ce
+  // que le dossier CONTIENT, y compris les lots bruts qu'un produit vient de déposer et que git
+  // ne suit pas — et le README, lui, est suivi. Un nom de client entrait donc dans un fichier
+  // publiable sans que personne n'ait rien écrit à la main : c'est la forme la plus discrète du
+  // défaut, celle qu'aucune relecture n'attrape parce qu'il n'y a pas d'auteur à interroger.
+  //
+  // La substitution se fait ICI, au dernier moment, et pas plus haut : ce que le générateur
+  // MANIPULE reste le nom réel — il lit le disque, il compte, il mesure — et seul ce qui est
+  // ÉCRIT est pseudonymisé. Anonymiser plus tôt ferait chercher des fichiers qui n'existent pas.
+  //
+  // Référentiel manquant : on N'ÉCRIT PAS, et on le dit. Un index périmé se voit à la revue ;
+  // un index publié avec un nom de client ne se rattrape pas. Même règle que l'anonymiseur
+  // d'entrants — « un anonymiseur qui ne peut pas anonymiser doit arrêter le convoi ».
+  const pseudonymise = (brut) => {
+    try { return { texte: anonymiser(brut).texte, ok: true }; }
+    catch (e) { return { texte: null, ok: false, motif: e.message }; }
+  };
+
   for (const dir of dossiers(abs)) {
     const rel = posix(relative(BASE, dir));
     const readme = join(dir, "README.md");
     const { texte: texteBrut, role } = attendu(dir, rel);
-    const texte = lf(texteBrut);
+    const propre = pseudonymise(texteBrut);
+    if (!propre.ok) {
+      defauts.push(`${affiche(rel)}README.md : NON régénéré — ${propre.motif}. Un index qui ne peut 
+        pas être pseudonymisé n'est pas écrit : périmé se voit, publié avec un nom de client ne se 
+        rattrape pas.`.replace(/\s+/g, " "));
+      continue;
+    }
+    const texte = lf(propre.texte);
     const courant = existsSync(readme) ? lf(readFileSync(readme, "utf8")) : null;
     if (role === PLACEHOLDER) defauts.push(`${affiche(rel)}README.md : rôle non rédigé`);
     if (courant === texte) continue;
