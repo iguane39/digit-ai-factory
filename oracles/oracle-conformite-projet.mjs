@@ -34,6 +34,7 @@ import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { empreinteTexte } from "../scripts/lib-empreinte.mjs";
+import { attribuerDivergence } from "../scripts/relever-heritage.mjs";
 
 const cible = process.argv[2];
 if (!cible || !existsSync(cible)) {
@@ -519,14 +520,25 @@ else {
     const manques = [], perimes = [], ok47 = [];
     for (const a of heritage.artefacts) {
       const src = join(dirname(fileURLToPath(import.meta.url)), "..", a.source);
-      const dst = p(a.cible);
+      let dst = p(a.cible);
+      // TF-0710 : un alias de transition déclaré au contrat est une cible ACCEPTÉE — juger la
+      // canonique absente pendant que l'alias est conforme forcerait le parc entier à migrer le
+      // jour de la publication (le renommage en cascade que l'item corrige).
+      if (!existsSync(dst) && a.alias_accepte && existsSync(p(a.alias_accepte))) dst = p(a.alias_accepte);
       if (a.conditionnel && !existsSync(dst)) continue;   // artefact dû seulement dans un cas déclaré
       if (!existsSync(dst)) { manques.push(`${a.cible} (source ${a.source})`); continue; }
       if (a.mode === "copie_conforme") {
         if (!existsSync(src)) { so("R-47", `source ${a.source} absente du pilot — la copie du produit ne se compare à rien`); continue; }
-        norm(readFileSync(src, "utf8")) === norm(readFileSync(dst, "utf8"))
-          ? ok47.push(a.cible)
-          : perimes.push(`${a.cible} diverge de ${a.source}`);
+        if (norm(readFileSync(src, "utf8")) === norm(readFileSync(dst, "utf8"))) {
+          ok47.push(a.cible);
+        } else {
+          // TF-0711 : « diverge » était symétrique — « le produit n'a pas recopié » et « le
+          // pilot vient de publier » sortaient dans le même mot, mesuré deux fois en une heure
+          // le 30/08. L'attribution se MESURE dans l'historique git du pilot.
+          const cause = attribuerDivergence(a.source, readFileSync(dst, "utf8"),
+            join(dirname(fileURLToPath(import.meta.url)), ".."));
+          perimes.push(`${a.cible} diverge de ${a.source} — ${cause.detail}`);
+        }
       } else if (a.mode === "presence_et_motif") {
         new RegExp(a.motif_exige.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).test(readFileSync(dst, "utf8"))
           ? ok47.push(a.cible)
@@ -548,7 +560,8 @@ else {
       ? ko("R-47", "artefacts hérités", `héritage du pilot non tenu — ${manques.length} absent(s)`
           + (manques.length ? ` : ${manques.join(", ")}` : "")
           + `, ${perimes.length} périmé(s) ou incomplet(s)` + (perimes.length ? ` : ${perimes.join(", ")}` : "")
-          + ". Recopier depuis le pilot (référentiel gabarits\\HERITAGE.json, ETAPES-RUN §1)")
+          + ". Remise à niveau EN UN GESTE, exécuté par le produit depuis son dépôt : "
+          + "`node <PILOT_ROOT>\\scripts\\recopier-heritage.mjs .` (TF-0711 ; référentiel gabarits\\HERITAGE.json)")
       : ok("R-47", "artefacts hérités", `${ok47.length} artefact(s) hérité(s) présent(s) et à jour`);
 
     // TF-0713 — AUCUN FICHIER D'APPARENCE SECRÈTE SOUS forge\ N'EST SUIVI PAR GIT. Le socle
@@ -691,16 +704,35 @@ if (!existsSync(ledgerF)) {
     : so("R-19", "pas de forge\\\\ledger.jsonl, et aucun ledger.jsonl ailleurs dans le projet — aucun run ouvert");
 }
 else {
-  const opens = readFileSync(ledgerF, "utf8").split("\n").filter((l) => l.trim()).map((l) => {
+  const entreesLedger = readFileSync(ledgerF, "utf8").split("\n").filter((l) => l.trim()).map((l) => {
     try { return JSON.parse(l); } catch { return null; }
-  }).filter((e) => e && (e.type === "run_open" || e.ev === "run_open"));
+  }).filter(Boolean);
+  const opens = entreesLedger.filter((e) => e.type === "run_open" || e.ev === "run_open");
+  // TF-0709 (décidé 01/09) — MÊME CONTRÔLE, MÊME CHAMP, MÊME BOUCLE, MÊME PARDON. Les clés en
+  // noms courts d'un run_open antérieur au 17/08 sont une antériorité déclarée ; un run_open qui
+  // ne PORTE PAS le champ était un FAIL sans échappatoire — R-42 interdit de réécrire l'entrée,
+  // et les versions des forges à la date du run ne sont plus mesurables. Le produit était en
+  // FAIL définitif sur une règle dont la sœur immédiate sait pardonner. La voie ouverte est
+  // celle que R-42 possède déjà : la RECTIFICATION PAR AJOUT — un événement
+  // `{type: "rectification_versions_forges", seq_vise: <seq du run_open>, cause: "…"}` déclare
+  // l'écart au lieu de le réécrire, et R-19 le lit comme une antériorité déclarée, imprimée.
+  const rectifsVF = entreesLedger.filter((e) => (e.type || e.ev) === "rectification_versions_forges");
   if (!opens.length) ko("R-19", "forge/ledger.jsonl", "ledger présent mais aucun run_open — le ledger s'ouvre par run_open");
   else {
     let r19 = true, anteriorites = 0, jugesSurForme = 0;
+    const rectifies = [];
     opens.forEach((o, i) => {
       const v = o.versions_forges;
       if (!v || typeof v !== "object" || !Object.keys(v).length) {
-        ko("R-19", `forge/ledger.jsonl (run_open #${i + 1})`, "run_open sans versions_forges — consigner la version de chaque forge (contrat §3, fraîcheur)"); r19 = false;
+        const rect = rectifsVF.find((x) => x.seq_vise === o.seq && String(x.cause || "").trim().length >= 20);
+        if (rect) {
+          rectifies.push(`run_open #${i + 1} (seq ${o.seq}) — cause déclarée : ${String(rect.cause).slice(0, 90)}`);
+        } else {
+          ko("R-19", `forge/ledger.jsonl (run_open #${i + 1})`, "run_open sans versions_forges — consigner la version de chaque forge " +
+            "(contrat §3, fraîcheur). Si les versions de l'époque ne sont plus mesurables (R-42 interdit de réécrire l'entrée), " +
+            `déclarer l'écart PAR AJOUT : {type: \"rectification_versions_forges\", seq_vise: ${o.seq ?? "<seq>"}, cause: \"…\"} — ` +
+            "l'histoire s'annote, elle ne se réécrit pas (TF-0709)"); r19 = false;
+        }
       } else if (String(o.ts || "") >= DOCTRINE_CLES_COMPLETES) {
         // TF-0320 (17/08) : la forme CANONIQUE des clés est le nom de dépôt COMPLET
         // (CONTRAT-INTERFACE.md §3). Mesuré sur pièces le 17/08 : Produit-01 portait 5 clés en
@@ -721,9 +753,10 @@ else {
         ko("R-19", `forge/ledger.jsonl (run_open #${i + 1})`, "run de version sans run_precedent — les runs se chaînent"); r19 = false;
       }
     });
-    if (r19) ok("R-19", "forge/ledger.jsonl", `${opens.length} run_open avec versions_forges${opens.length > 1 ? " et chaînage run_precedent" : ""}` +
+    if (r19) ok("R-19", "forge/ledger.jsonl", `${opens.length} run_open ${rectifies.length ? "conformes ou couverts" : "avec versions_forges"}${opens.length > 1 ? " et chaînage run_precedent" : ""}` +
       (jugesSurForme ? `, dont ${jugesSurForme} au nom de dépôt complet (TF-0320)` : "") +
-      (anteriorites ? ` — ${anteriorites} run_open antérieur(s) au ${DOCTRINE_CLES_COMPLETES} en antériorité déclarée sur la forme des clés (jamais réécrits)` : ""));
+      (anteriorites ? ` — ${anteriorites} run_open antérieur(s) au ${DOCTRINE_CLES_COMPLETES} en antériorité déclarée sur la forme des clés (jamais réécrits)` : "") +
+      (rectifies.length ? ` — [RECTIFIÉ] ${rectifies.length} run_open sans versions_forges couvert(s) par rectification déclarée : ${rectifies.join(" · ")}` : ""));
   }
 }
 

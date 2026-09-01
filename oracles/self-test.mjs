@@ -59,9 +59,15 @@ writeFileSync(join(verte, ".env"), "PORT=8000\n");
 // La fixture les porte donc — et le commentaire dit pourquoi elle a dû grandir : sans eux, la
 // règle 10 du socle n'avait aucun point d'application, et un `.pyc` est entré chez un produit.
 // L'exception SUIT les exclusions : placée avant, elle ne rattrape rien.
-writeFileSync(join(verte, ".gitignore"),
-  ".env\n.venv/\n__pycache__/\nnode_modules/\ngenerated/\n"
-  + "*.oracles.json\n*.oracles-cache.json\n*.oracles-historique.jsonl\n!forge/**\n");
+// TF-0713/0714 (01/09) — LA LISTE N'EST PLUS RECOPIÉE, ELLE EST DÉRIVÉE DU CONTRAT. La version
+// à la main s'est périmée le jour où le socle a gagné trois motifs (re-exclusions sous forge\,
+// graphie anglaise de l'exemple) : la fixture VERTE est passée au rouge — c'est la classe que
+// TF-0627 nomme, payée ICI même. `.env` reste ajouté en tête : il n'est pas un motif EXIGÉ
+// (voir la note du contrat), mais la fixture le porte comme tout produit réel.
+const motifsSocle = JSON.parse(readFileSync(
+  join(dirname(fileURLToPath(import.meta.url)), "..", "gabarits", "HERITAGE.json"), "utf8"))
+  .artefacts.find((a) => a.cible === ".gitignore").motifs_exiges;
+writeFileSync(join(verte, ".gitignore"), ".env\n" + motifsSocle.join("\n") + "\n");
 writeFileSync(join(verte, "output", "Digit-AI - Rapport Test - 20260806a.md"), "rapport\n");
 writeFileSync(join(verte, "forge", "audit.oracles.json"), "{}\n");
 writeFileSync(join(verte, "forge", "ledger.jsonl"), [

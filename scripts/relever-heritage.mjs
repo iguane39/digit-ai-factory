@@ -41,6 +41,7 @@
  */
 import { existsSync, readdirSync, writeFileSync } from "node:fs";
 import { readFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { join, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { empreinteFichier } from "./lib-empreinte.mjs";
@@ -113,7 +114,15 @@ export function produitsDuParc(base, profondeurMax = PROFONDEUR_MAX) {
 
 /** L'état d'UN artefact chez UN produit : absent, présent-divergent, ou conforme. */
 export function etatArtefact(dossierProduit, artefact, racinePilot) {
-  const cible = join(dossierProduit, String(artefact.cible).replaceAll("/", "\\"));
+  let cible = join(dossierProduit, String(artefact.cible).replaceAll("/", "\\"));
+  // TF-0710 (01/09) — UN ALIAS DE TRANSITION EST UNE CIBLE ACCEPTÉE, PAS UN DÉFAUT. Quand la
+  // cible canonique manque mais que l'alias déclaré au contrat existe, c'est LUI la copie du
+  // produit : le juger absent forcerait tout le parc à migrer le jour de la publication, et
+  // c'est exactement le renommage en cascade que l'item corrige.
+  if (!existsSync(cible) && artefact.alias_accepte) {
+    const alias = join(dossierProduit, String(artefact.alias_accepte).replaceAll("/", "\\"));
+    if (existsSync(alias)) cible = alias;
+  }
   if (!existsSync(cible)) {
     // LE TROISIEME CAS, CELUI QUI N'AVAIT PAS DE NOM (TF-0654, 26/08/2026).
     //
@@ -158,7 +167,45 @@ export function etatArtefact(dossierProduit, artefact, racinePilot) {
   // que `emettre-travaux.mjs` le REFABRIQUAIT par chirurgie de chaine sur la cible, avec deux
   // cas particuliers rustines a la main. Un champ qui porte deux sens dans deux fichiers voisins
   // ne se documente pas : il se renomme.
-  return a === b ? { etat: "conforme", empreinte: a } : { etat: "divergent", empreinte_pilot: a, empreinte_produit: b };
+  if (a === b) return { etat: "conforme", empreinte: a };
+  return { etat: "divergent", empreinte_pilot: a, empreinte_produit: b,
+    cause: attribuerDivergence(artefact.source, readFileSync(cible, "utf8"), racinePilot) };
+}
+
+/**
+ * TF-0711 (01/09) — DIRE QUI A BOUGÉ, au lieu d'un « diverge » symétrique.
+ *
+ * Le fait mesuré à la minute, le 30/08 : une copie posée à 08:56 était déclarée périmée à
+ * 09:12 parce que le PILOT avait publié une version neuve à 09:01 — et le message accusait la
+ * copie comme si le produit avait failli. Le même scénario s'est rejoué dans l'heure. Deux
+ * situations opposées — « le produit n'a pas recopié » et « le pilot vient de publier » —
+ * sortaient dans le même mot, et le produit ne pouvait pas savoir laquelle le concernait.
+ *
+ * LA MESURE REMPLACE LA DÉCLARATION : plutôt que de faire porter une version à chaque gabarit,
+ * on confronte la copie du produit à l'HISTORIQUE GIT de la source chez le pilot. Si la copie
+ * correspond à une version publiée — la divergence vient du pilot, qui a avancé depuis ; sinon
+ * — la copie a été modifiée côté produit, ou tirée d'un état jamais publié. Borne déclarée :
+ * la recherche s'arrête aux 30 dernières révisions de la source, et un pilot sans git (ou une
+ * source jamais commitée) rend une attribution inconnue, dite comme telle.
+ */
+export function attribuerDivergence(sourceRel, contenuProduit, racinePilot) {
+  const posix = String(sourceRel).replaceAll("\\", "/");
+  const log = spawnSync("git", ["-C", racinePilot, "log", "-n", "30", "--format=%H %cs", "--", posix],
+    { encoding: "utf8", timeout: 30000 });
+  if (log.status !== 0) return { qui: "inconnu", detail: "historique git du pilot illisible — attribution impossible, dite plutôt que devinée" };
+  const norm = (t) => String(t).split("\r\n").join("\n").trimEnd();
+  const attendu = norm(contenuProduit);
+  for (const ligne of (log.stdout || "").split("\n").filter((l) => l.trim())) {
+    const [h, date] = ligne.trim().split(/\s+/);
+    const montre = spawnSync("git", ["-C", racinePilot, "show", `${h}:${posix}`],
+      { encoding: "utf8", timeout: 30000, maxBuffer: 16 * 1024 * 1024 });
+    if (montre.status === 0 && norm(montre.stdout) === attendu) {
+      return { qui: "pilot", detail: `votre copie correspond à la version publiée le ${date} — ` +
+        "le PILOT a avancé depuis : recopier suffit (aucune faute côté produit)" };
+    }
+  }
+  return { qui: "produit", detail: "votre copie ne correspond à AUCUNE des 30 dernières versions publiées — " +
+    "elle a été modifiée côté produit, ou tirée d'un état jamais publié : ne pas écraser sans lire la différence" };
 }
 
 export function relever(base, contrat, racinePilot) {
