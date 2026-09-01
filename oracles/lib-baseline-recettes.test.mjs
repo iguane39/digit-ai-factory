@@ -49,6 +49,17 @@ check("le ratio nu est lu SANS exiger le mot « PASS »", () => {
   att(compteDe("Recette cadence : 16/16 cas") === 16, "« Recette X : N/N cas » non lu");
 });
 
+check("TF-0738 — une DATE à barre oblique dans le libellé n'est pas prise pour le compte de cas", () => {
+  // Le fait mesuré le 01/09 : « normaliser-lot (TF-0196 + forme hybride du 01/09) : 6 PASS,
+  // 0 FAIL » enregistré au cliquet comme « 1 cas » — le ratio nu passait en premier, non ancré,
+  // et « 01/09 » matchait avant « 6 PASS ». Une baseline fausse dès son premier passage laisse
+  // ensuite cinq cas disparaître sans un mot.
+  att(compteDe("normaliser-lot (TF-0196 + forme hybride du 01/09) : 6 PASS, 0 FAIL") === 6,
+    "la date du libellé a été lue comme le compte — la baseline naît fausse");
+  att(compteDe("recette du 01/09 : 16/16 cas") === 16,
+    "avec deux ratios, ce n'est pas le DERNIER qui est lu — le compte clôt un résumé, une date le commence");
+});
+
 check("un verdict d'ÉTAT du parc n'est pas pris pour un compte de cas", () => {
   // Les oracles d'état rendent « I4 — PASS sur le parc » : aucun chiffre, donc rien à compter.
   // Les compter à zéro ferait échouer le cliquet à chaque exécution sur une absence normale.

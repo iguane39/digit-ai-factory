@@ -241,6 +241,9 @@ const html = `<!DOCTYPE html>
     .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0 0}
     .toolbar input[type="search"]{flex:1 1 320px;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:9px 12px}
     .toolbar input[type="search"]:focus-visible{outline:3px solid var(--blue);outline-offset:1px}
+    /* garde TF-0733 : l'attribut hidden reste souverain face a tout display explicite —
+       sans elle, un panneau masque devient un voile transparent qui intercepte les clics (L23) */
+    [hidden]{display:none !important}
     .dropdown{position:relative}
     .dd-btn{font:inherit;font-weight:600;color:var(--blue);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:8px 12px;cursor:pointer}
     .dd-btn:focus-visible,.dd-panel button:focus-visible,#reinit:focus-visible,.lien-btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}

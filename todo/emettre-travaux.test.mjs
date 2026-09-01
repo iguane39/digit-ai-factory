@@ -47,6 +47,25 @@ try {
     att(lot === null, "un lot a été produit alors qu'il n'y a rien à confier");
   });
 
+  check("TF-0730 — un produit CONFORME dont des constats DÉCIDÉS l'attendent reçoit son lot quand même", () => {
+    // Le défaut mesuré le 31/08 : le retour anticipé « héritage conforme » venait AVANT le calcul
+    // des constats — un produit qui aurait réparé son héritage sans traiter ses constats aurait vu
+    // les relances cesser en silence. Le lot à constats seuls doit aussi PASSER le juge, ses
+    // sections de prose disant vrai (pas de discours d'héritage sur un lot qui n'en porte pas).
+    const f = join(T, "registre-0730.jsonl");
+    writeFileSync(f, JSON.stringify({ ev: "creation", id: "TF-9020", statut: "decide",
+      destinataire_produit: "produit-recette", titre: "Un constat qui attend",
+      contenu: "le fait", demande_produit: "faire ceci", gravite: "majeur" }) + "\n", "utf8");
+    const lot = lotHeritage(LIGNE([{ cible: "forge/RESTITUTION.md", mode: "copie_conforme", etat: "conforme" }]),
+      "20260831", "a", f);
+    att(lot !== null, "RIEN À CONFIER rendu alors qu'un constat décidé attendait — la relance a cessé en silence");
+    att(/### TF-9020/.test(lot.md), "le constat n'est pas dans le lot");
+    att(!/forge\/RESTITUTION\.md.*d'abord/.test(lot.md), "l'ordre recommandé parle d'héritage sur un lot qui n'en porte pas");
+    const r = verifier(lot.md);
+    att(r.verdict === "PASS", "le lot à constats seuls ne tient pas sa propre forme : "
+      + r.constats.filter((c) => c.statut === "FAIL").map((c) => c.regle + " " + c.message).join(" · ").slice(0, 200));
+  });
+
   check("un artefact HORS RACINE demande une DÉCLARATION, jamais une recopie (TF-0654)", () => {
     // Le fait : `robots.txt` compté ABSENT chez un produit où il vit en `site/robots.txt` et
     // répond 200 en production. Appliquer le travail tel qu'il était rédigé aurait déposé un

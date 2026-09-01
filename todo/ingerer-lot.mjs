@@ -501,7 +501,11 @@ if (nouvelles.length > 1 && nomFichier.includes(" - RETOURS - ")) {
   // recherche ci-dessous DEVINE ; le produit, lui, SAIT. Un sidecar qui porte `racine_produit`
   // court-circuite donc toute heuristique — c'est la voie recommandee par le lot qui a signale le
   // defaut, et elle ne coute qu'un champ.
-  const declaree = nouvelles.map((n) => n && n.racine_produit).find(Boolean);
+  // TF-0731 (corrigé le 01/09) : cette ligne lisait `nouvelles` — un tableau de CHAÎNES JSON —
+  // et `.racine_produit` sur une chaîne rend toujours undefined. La « seule source sûre »
+  // (TF-0555) était donc celle que le code ne lisait pas, et toute localisation retombait sur
+  // l'heuristique, qui masquait la voie morte tant qu'elle trouvait. On lit les OBJETS.
+  const declaree = candidatures.map((c) => c && c.racine_produit).find(Boolean);
   if (declaree) {
     const abs = isAbsolute(String(declaree)) ? String(declaree) : join(racine, String(declaree));
     if (existsSync(join(abs, "forge"))) dossier = abs;

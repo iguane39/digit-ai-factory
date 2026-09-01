@@ -189,14 +189,23 @@ export function indiceLibre(boite, jour) {
  * — genre de travail que le pilot confie : le relevé du 25/08 l'a mesuré, et le produit ne peut
  * pas le connaître autrement.
  */
-export function lotHeritage(ligne, jour, indice) {
+export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
   const absents = ligne.artefacts.filter((a) => a.etat === "absent");
   const perimes = ligne.artefacts.filter((a) => a.etat === "divergent");
   // TF-0654 : un artefact TROUVE AILLEURS ne se recopie pas — il se DECLARE. Le confondre avec
   // un absent ferait deposer un fichier mort a la racine du depot, et le relevé passerait au
   // vert sur une question restee ouverte.
   const horsRacine = ligne.artefacts.filter((a) => a.etat === "hors_racine");
-  if (!absents.length && !perimes.length && !horsRacine.length) return null;
+  // TF-0730 (01/09) — LES CONSTATS SE CALCULENT AVANT LE RETOUR ANTICIPÉ. L'ordre inverse
+  // faisait rendre [RIEN À CONFIER] à un produit dont l'héritage est conforme mais que des
+  // constats DÉCIDÉS attendaient au registre : le message « héritage conforme » était vrai, et
+  // répondait à une question plus étroite que celle posée — la même classe que TF-0680 et
+  // TF-0729, un constat perdu derrière un message normal. Le seul produit porteur de constats
+  // avait AUSSI des défauts d'héritage, ce qui a masqué la voie jusqu'à sa lecture.
+  const constats = cheminRegistre === undefined
+    ? constatsDuRegistre(ligne.produit) : constatsDuRegistre(ligne.produit, cheminRegistre);
+  const aHeritage = absents.length || perimes.length || horsRacine.length;
+  if (!aHeritage && !constats.length) return null;
 
   // L'EMPREINTE D'IDEMPOTENCE PORTE CE QUI EST CONFIE, PAS L'ENVELOPPE QUI LE PORTE.
   // Premier jet : le sceau etait calcule sur le lot ENTIER, titre compris — or le titre porte
@@ -204,7 +213,6 @@ export function lotHeritage(ligne, jour, indice) {
   // deposaient donc deux lots identiques dans le fond et differents dans l'octet, et la boite du
   // produit se remplissait — exactement la nuisance que ce canal doit eviter (R-33 bis). Trouve
   // par la recette d'idempotence, qui rendait 4 fichiers au lieu de 2.
-  const constats = constatsDuRegistre(ligne.produit);
   const sceauConfie = empreinteTexte([
     ...[...perimes, ...absents, ...horsRacine]
       .map((a) => `${a.cible}|${a.etat}|${a.empreinte_pilot || ""}|${a.empreinte_produit || ""}`),
@@ -217,6 +225,7 @@ export function lotHeritage(ligne, jour, indice) {
   ].sort().join("\n"), 12);
 
   const glose = {
+    "forge/retours/GABARIT-LOT-RETOURS.md": "le gabarit qui décrit la forme d'un lot de retours — sans lui, vos retours sont refusés à la porte du pilot pour une forme que rien ne vous a dite (il voyageait sous RETOURS-FORGES.md avant le 01/09, l'ancien nom reste accepté — TF-0710)",
     "forge/retours/RETOURS-FORGES.md": "le gabarit qui décrit la forme d'un lot de retours — sans lui, vos retours sont refusés à la porte du pilot pour une forme que rien ne vous a dite",
     "forge/retours/oracle-lot.mjs": "l'outil qui vérifie un lot de retours AVANT de le remettre — sans lui, vous découvrez le refus après coup, ou jamais si une dérogation le masque",
     "forge/hooks/factory.mjs": "les automatismes de fin de tour de travail — sans eux, aucun contrôle ne s'exécute à la clôture",
@@ -271,6 +280,35 @@ export function lotHeritage(ligne, jour, indice) {
                  ...horsRacine.map((a) => blocHorsRacine(a, jour)),
                  ...constats.map(blocConstat)];
 
+  // TF-0730 : les sections de prose parlaient d'HÉRITAGE même quand le lot n'en portait pas —
+  // un lot à constats seuls doit garder les QUATRE sections (le juge les exige, et il a raison :
+  // une section absente est indiscernable d'une section oubliée) avec un contenu qui dit vrai.
+  const dejaFait = aHeritage
+    ? `- Le contrôle qui devait mesurer cet écart ne savait pas localiser votre dépôt : il cherchait par
+  préfixe de nom, sans normalisation, sur deux niveaux de profondeur. Corrigé le 25/08 — un produit
+  est désormais reconnu à ses lots de retours, et non à sa profondeur de rangement. Preuve : recette
+  \`localiser-produit\` 11/11, et 4 produits localisés sur 6 dont 2 qui étaient impossibles avant.
+- Le message de refus d'un lot énumérait trois causes possibles au lieu de nommer celle qu'il
+  mesure ; il en nomme désormais une, avec le chemin absolu. Preuve : les 3 branches jouées en recette.
+- Le relevé qui a produit ce lot a été écrit, joué et publié le 25/08, sans aucune écriture chez
+  aucun produit — sa recette le vérifie par empreinte de l'arborescence avant et après.`
+    : `- Votre héritage du socle est CONFORME au relevé de ce jour — ce lot ne porte donc que des
+  constats du registre. Chacun a été instruit et DÉCIDÉ côté pilot avant d'être confié : le bloc
+  cite son identifiant \`TF-xxxx\`, la décision est humaine et tracée au registre.
+- Ce qui relevait du pilot dans ces constats a été fait chez lui — ce qui reste est précisément
+  la part que lui seul ne peut pas faire : elle se corrige dans VOTRE dépôt.`;
+  const ordre = aHeritage
+    ? `1. \`forge/RESTITUTION.md\` et \`forge/hooks/factory.mjs\` **d'abord**, parce que leur absence est
+   la seule du lot qui produise un effet à chaque travail que vous rendez : sans eux, un compte
+   rendu hors format n'est refusé par rien.
+2. \`forge/retours/oracle-lot.mjs\` et son gabarit **ensuite**, parce qu'ils vous évitent un refus
+   à la porte du pilot — un aller-retour par lot remis.
+3. Les fichiers d'ouverture web **en dernier**, ou déclarés hors sujet : leur impact est nul tant
+   que le projet n'expose pas de surface web.`
+    : `1. Les constats dans l'ordre où ils apparaissent — ils sont rendus du plus fort enjeu au plus
+   faible selon le registre, et chacun porte son effort estimé et sa vérification. Un constat
+   écarté rejoint vos « Écarts assumés » avec son motif : il ne disparaît pas.`;
+
   const md = `# Travaux confiés par le pilot — ${ligne.produit} — ${jour}${indice}
 
 - **Émetteur** : \`digit-ai-factory\` (le pilot)
@@ -304,14 +342,7 @@ ${items.join("\n\n")}
 
 ## Ce que le pilot a déjà fait de son côté
 
-- Le contrôle qui devait mesurer cet écart ne savait pas localiser votre dépôt : il cherchait par
-  préfixe de nom, sans normalisation, sur deux niveaux de profondeur. Corrigé le 25/08 — un produit
-  est désormais reconnu à ses lots de retours, et non à sa profondeur de rangement. Preuve : recette
-  \`localiser-produit\` 11/11, et 4 produits localisés sur 6 dont 2 qui étaient impossibles avant.
-- Le message de refus d'un lot énumérait trois causes possibles au lieu de nommer celle qu'il
-  mesure ; il en nomme désormais une, avec le chemin absolu. Preuve : les 3 branches jouées en recette.
-- Le relevé qui a produit ce lot a été écrit, joué et publié le 25/08, sans aucune écriture chez
-  aucun produit — sa recette le vérifie par empreinte de l'arborescence avant et après.
+${dejaFait}
 
 ## Ce que le pilot NE demande PAS
 
@@ -325,13 +356,7 @@ ${items.join("\n\n")}
 
 ## Ordre recommandé
 
-1. \`forge/RESTITUTION.md\` et \`forge/hooks/factory.mjs\` **d'abord**, parce que leur absence est
-   la seule du lot qui produise un effet à chaque travail que vous rendez : sans eux, un compte
-   rendu hors format n'est refusé par rien.
-2. \`forge/retours/oracle-lot.mjs\` et son gabarit **ensuite**, parce qu'ils vous évitent un refus
-   à la porte du pilot — un aller-retour par lot remis.
-3. Les fichiers d'ouverture web **en dernier**, ou déclarés hors sujet : leur impact est nul tant
-   que le projet n'expose pas de surface web.
+${ordre}
 `;
 
   const sidecarConstats = constats.map((e) => JSON.stringify({
