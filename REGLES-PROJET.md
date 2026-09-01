@@ -328,6 +328,19 @@ journal d'oracle correspondant est un défaut. Mécanisme : O — contrôle R-32
 `oracle-conformite-projet.mjs` (présence du journal ; le contenu du verdict reste
 porté par le journal lui-même).
 
+**Alinéa CAVIARDAGE (TF-0712, décidé 01/09).** Un livrable bâti sur des **données
+personnelles réelles** (courrier, noms, coordonnées) pose un conflit que la règle ne voyait
+pas : le journal est VERSIONNÉ (C4) et les messages de `check_html.py` citent des fragments de
+page entre guillemets (L1, L19) — jouer le gate à la lettre versionnait des extraits de
+correspondance réelle. Un produit a dû inventer son caviardage, faute de contrat. Le contrat
+est désormais celui-ci : le journal PEUT porter un champ `caviardage` —
+`{ "applique": true, "regle": "fragments cités remplacés par «[…]», règle et sélecteur
+conservés", "motif": "données personnelles réelles (préciser la nature, jamais les données)" }`
+— et un journal caviardé qui le DÉCLARE est conforme ; un journal caviardé qui ne le déclare
+pas est indiscernable d'un journal tronqué, et c'est lui le défaut. Côté outil, l'option
+`--sans-extraits` de `check_html.py` (les mêmes constats sans citer la page) appartient au
+socle de la forge des skills — demandée, tracée au registre.
+
 ## M. Sécurité offensive — sur mandat, jamais dans la voie automatique (règle 33 — 14/08, TF-0189)
 
 Constat de l'étude du 14/08 (`output\03-etudes\20260814-etude-opportunite-pentest-owasp.md`) :

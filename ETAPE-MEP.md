@@ -361,6 +361,41 @@ ledger**, exactement comme les verdicts d'oracles y sont cités par leur `seq`. 
 opposable — un identifiant de run est vérifiable par un tiers — mais elle n'est pas **rejouée**
 par le pilot, et le déclarer vaut mieux que de laisser croire l'inverse.
 
+## 4 ter. Piloter Railway — le mode d'emploi qui se reperdait à chaque session (TF-0704, 0705, 0706, 0735)
+
+Railway est la cible cloud la plus fréquente du parc, et son mode d'emploi a été payé QUATRE
+fois avant d'être écrit ici : un domaine anonyme laissé onze jours en production, une campagne
+de tests qui a audité la mauvaise application, deux impasses de diagnostic en une session, et
+un déploiement déclaré « bloqué, geste humain requis » pendant qu'un jeton valide vivait sur le
+poste. Quatre faits, une cause : le principe vivait dans la mémoire des sessions.
+
+- **L'authentification est le JETON, jamais `railway login`** (TF-0735). Le CLI honore
+  `RAILWAY_API_TOKEN` en variable d'environnement SANS aucun login — `railway whoami` répond du
+  premier coup ; `railway login` ouvre un parcours OAuth navigateur hors de portée d'une session
+  agent, et ne se prescrit jamais. L'emplacement du jeton sur le poste se lit dans la fiche
+  `docs\projet\ACCES-TEST.md` du produit (ligne « déploiement », obligatoire depuis le 01/09).
+  **Une impossibilité d'accès ne se déclare qu'après avoir tenté ce repli** : le contrôle
+  d'entrée de l'étape échoue TÔT avec « jeton absent, attendu à `<emplacement>` » plutôt que de
+  laisser la session conclure au geste humain — l'épisode du 31/08 a coûté un aller-retour
+  humain complet et une entrée de ledger fausse pour un déploiement qui a réussi trente minutes
+  plus tard avec le jeton du poste.
+- **Le CLI ne sert qu'à téléverser** (TF-0704). `railway service` ne sait ni renommer un
+  service ni corriger un domaine ; tout le reste passe par l'API GraphQL —
+  `https://backboard.railway.com/graphql/v2`, en-tête `Authorization: Bearer <jeton>` :
+  renommage de domaine, lecture d'état, vérification de disponibilité.
+- **Le domaine se NOMME au premier déploiement** (TF-0705). Le domaine généré par défaut
+  (`app-production-<hash>`) ne nomme ni le produit ni son environnement — une campagne a
+  crawlé la mauvaise application à cause de lui. La MEP nomme le domaine à partir du nom de
+  projet et de l'environnement (`<produit>-production.up.railway.app`, R-24), et l'inscrit au
+  dossier de MEP et au ledger. La garde côté forge-tests reste une défense en profondeur, elle
+  cesse d'être la seule.
+- **Deux pièges de l'API, mesurés** (TF-0706) : toute requête SANS en-tête `User-Agent` reçoit
+  un 403 du WAF avant d'atteindre l'API — symptôme trompeur qui se lit comme un défaut de
+  jeton ; et un refus de schéma revient en HTTP 400 avec le seul message « Problem processing
+  request », sans nommer le champ fautif — introspecter le schéma
+  (`__type(name: …) { inputFields }`) AVANT d'écrire une mutation plutôt que la déduire de la
+  documentation (`ServiceDomainUpdateInput` exige quatre champs non nuls).
+
 ## 5. Après la MEP
 
 Les retours de production (incidents, monitoring, remontées client) entrent au ledger avec
