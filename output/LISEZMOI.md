@@ -73,7 +73,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 160 livrable(s) courant(s), 10 archivé(s), 6 famille(s).
+**État** : 161 livrable(s) courant(s), 10 archivé(s), 6 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -217,6 +217,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Juste milieu du canal de remontee - 20260830k.md | 20260830k | 15.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Juste milieu du canal de remontee - 20260830k.md` |
 | Digit-AI - Synthese Mandat - Lexique d invocation inerte - 20260830l.md | 20260830l | 14.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Lexique d invocation inerte - 20260830l.md` |
 | Digit-AI - Synthese Mandat - Lexique d invocation reactive - 20260830m.md | 20260830m | 14.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Lexique d invocation reactive - 20260830m.md` |
+| Digit-AI - Synthese Mandat - Mutation a la demande et Portee rectifiee - 20260901c.md | 20260901c | 12.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Mutation a la demande et Portee rectifiee - 20260901c.md` |
 | Digit-AI - Synthese Mandat - Pourquoi le bloc 3 derive - 20260830d.md | 20260830d | 16.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Pourquoi le bloc 3 derive - 20260830d.md` |
 | Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md | 20260817a | 7.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md` |
 | Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md.jugement.json` |
