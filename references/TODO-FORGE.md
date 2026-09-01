@@ -106,6 +106,20 @@ invisible par construction (B3). Un sidecar brut au format produit est couvert p
 `.normalise.tf.jsonl` ingéré, et `old\` reste hors périmètre : le canal d'échappement
 documenté plus haut n'est pas un défaut.
 
+**La propagation d'une correction se MESURE, elle ne se souhaite pas (TF-0689, 01/09).** Le
+champ `produits_beneficiaires` est de la prose — 73 items clos en portaient au 27/08, aucun
+n'était opposable à personne, et un produit nommé bénéficiaire a livré DEUX FOIS sans le
+correctif à quatre jours de sa clôture. Trois pièces ferment la boucle : (1) une clôture PEUT
+porter `criteres_beneficiaires` — `{familles_de_gabarit: ["gd-…"], types_de_livrable: ["…"]}`,
+structure fermée confrontable au marqueur G4 des documents et au 2ᵉ segment des noms datés ;
+(2) le produit tient `forge\socle-adopte.jsonl` — une ligne `{tf, date_adoption, preuve}` par
+adoption, la preuve étant un FAIT (fichier, commande, empreinte, commit) ; (3)
+`oracles\oracle-propagation.mjs <dossier produit>` confronte les deux (P1-P2, self-test 8/8) et
+est joué À CHAQUE LOT REMIS par `ingerer-lot.mjs`, en avertissement jamais en blocage — un
+produit n'est jugé QUE sur ce qu'il PRODUIT (pas de production concernée = SANS_OBJET). Bornes
+déclarées : les 600+ items archivés avant la convention restent de la prose ; la véracité des
+preuves d'adoption relève du produit.
+
 **Étude d'opportunité (TF-0155)** : avant de passer en `decide` un candidat qui **crée un
 objet durable** (R-31), **touche ≥ 3 forges ou le noyau**, ou **porte un gain ≥ 3 avec une
 preuve ≤ 2**, l'instruire via `gabarits\ETUDE-OPPORTUNITE.md` (livrable :

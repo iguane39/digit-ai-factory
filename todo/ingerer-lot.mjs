@@ -542,6 +542,23 @@ if (nouvelles.length > 1 && nomFichier.includes(" - RETOURS - ")) {
     if (!f) console.error(`[R-47] verdict d'héritage illisible pour ${dossier} — non vérifié, jamais supposé bon`);
     else if (f.statut === "FAIL") console.error(`[R-47 — AVERTISSEMENT] ${projet} : ${f.message}\n  Le lot est INGÉRÉ quand même : refuser ici punirait deux fois le même défaut.`);
     else console.error(`[R-47] ${projet} : ${f.statut === "PASS" ? f.message : f.message}`);
+
+    // TF-0689 — LA PROPAGATION SE CONFRONTE AU MÊME MOMENT QUE L'HÉRITAGE : un produit qui
+    // remet un lot se nomme, c'est l'instant que le pilot maîtrise. AVERTISSEMENT, jamais
+    // blocage — même raison que R-47 : refuser punirait deux fois, une fois à la porte, une
+    // fois sur le travail déjà fait.
+    const rp = spawnSync(process.execPath, [join(ICI, "..", "oracles", "oracle-propagation.mjs"), dossier, "--json"],
+      { encoding: "utf8", timeout: 120000 });
+    let vp = null;
+    try { vp = JSON.parse((rp.stdout || "").slice((rp.stdout || "").indexOf("{"))); } catch { /* dit juste après */ }
+    if (!vp) console.error(`[propagation TF-0689] verdict illisible pour ${dossier} — non confronté, jamais supposé à jour`);
+    else if (vp.verdict === "FAIL") {
+      const durs = (vp.findings || []).filter((x) => x.statut === "FAIL");
+      console.error(`[propagation TF-0689 — AVERTISSEMENT] ${projet} : ${durs.length} obligation(s) en retard —\n`
+        + durs.slice(0, 4).map((x) => `  - ${x.ou} : ${String(x.message).slice(0, 200)}`).join("\n"));
+    } else {
+      console.error(`[propagation TF-0689] ${projet} : ${vp.verdict} — ${(vp.findings || [])[0]?.message?.slice(0, 140) || ""}`);
+    }
   }
 }
 
