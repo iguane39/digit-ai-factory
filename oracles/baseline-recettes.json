@@ -39,8 +39,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-boite-entree.mjs": {
-  "cas": 31,
-  "vu_le": "2026-08-26"
+  "cas": 32,
+  "vu_le": "2026-09-02"
  },
  "oracle-cadence.mjs": {
   "cas": 16,
@@ -60,8 +60,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 44,
-  "vu_le": "2026-08-26"
+  "cas": 45,
+  "vu_le": "2026-09-02"
  },
  "oracle-constantes-externes.mjs": {
   "cas": 12,
@@ -290,6 +290,10 @@
   "cas": 31,
   "vu_le": "2026-09-01"
  },
+ "todo/ingerer-anonymise-fichier.test.mjs": {
+  "cas": 4,
+  "vu_le": "2026-09-02"
+ },
  "todo/ingerer-derogation.test.mjs": {
   "cas": 11,
   "vu_le": "2026-08-26"
@@ -329,6 +333,10 @@
  "todo/rapprocher.test.mjs": {
   "cas": 7,
   "vu_le": "2026-08-26"
+ },
+ "todo/reempreinter-lot.test.mjs": {
+  "cas": 12,
+  "vu_le": "2026-09-02"
  },
  "todo/renumeroter.test.mjs": {
   "cas": 8,

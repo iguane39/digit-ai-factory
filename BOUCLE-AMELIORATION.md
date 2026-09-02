@@ -1908,3 +1908,92 @@ refusé trois ingestions et **a eu raison à chaque fois**.
 publication de la règle, sans chemin de propagation vers les produits — TF-0471, décision
 humaine due : affaiblir un gate décidé la veille sans mandat serait le geste que la discipline
 interdit).
+
+## 02/09/2026 — « Traite tous les retours et todos » : la boîte rendue prouvable après la passe d'anonymisation, et une campagne mandatée sur quatre forges sœurs
+
+Mandat humain, lu comme le mandat global des 28/08 et 01/09 (décision en bloc des candidatures en
+attente — sauf TF-0752, réécriture d'historique irréversible, laissée à une décision nominative).
+Inventaire d'ouverture : 31 actifs (7 candidats), boîte d'entrée **FAIL** — 5 B1, 23 B2 — et
+trois lots hors suivi.
+
+**Ce que la boîte disait, et ce qu'elle voulait dire.** Les 23 « sidecars édités après
+ingestion » n'avaient pas été édités : la passe d'anonymisation du 01/09 (D-37) avait réécrit
+leur contenu, et l'empreinte consignée était celle d'avant (mesuré : empreinte au registre =
+empreinte du fichier au commit 478eb82). B2 avait raison sur le fait et tort sur la lecture ;
+les deux réponses faciles — assouplir B2, ré-ingérer — auraient l'une désarmé le contrôle,
+l'autre recréé chaque candidature en doublon (idempotence par empreinte). D'où
+`todo/reempreinter-lot.mjs` : il PROUVE avant de consigner (historique git renommages compris,
+copie d'avant, ou rapprochement titre à titre — preuve plus faible, dite), et refuse tout le
+reste comme édition. 22 sidecars par l'historique, 1 par rapprochement, 26 de plus par la passe
+rejouée ; recette 12/12. `anonymiser-suivis` ré-empreinte lui-même ce qu'il réécrit.
+
+**Les trois lots hors suivi** portaient le nom du client dans leur nom ; le tour précédent les
+avait écartés « par construction ». Ils ont été réindexés à la réception (a→d, b→e, c→f : un
+autre lot du même produit, remis par une autre session, portait déjà ces indices au registre —
+classe TF-0750 transposée aux lots), anonymisés SUR DISQUE par la porte explicite
+`anonymiser-suivis --fichiers`, ingérés (TF-0753 à TF-0762) et suivis. L'original reste chez le
+produit. TF-0761 (l'événement d'ingestion portait le nom du client) clos dans l'heure : le champ
+`fichier` et l'événement d'héritage passent par la même substitution que la candidature.
+
+**Quatre défauts payés en chemin, tous dans l'anonymisation, tous fermés avec recette** : le nom
+du lot découpé sur `/` seulement inscrivait le CHEMIN ENTIER comme produit sur un poste Windows
+(24 entrées parasites dans la table hors dépôt, retirées) ; un nom déjà pseudonyme (« Produit-12 »
+lu dans un lot anonymisé sur disque) était réinscrit comme produit neuf et dix candidatures ont
+été substituées « Produit-13 » avant d'être rectifiées ; six recettes jouaient l'ingesteur SANS
+isoler les tables et inscrivaient leurs noms de fixture (« PROD ») dans la table réelle —
+isolées, et un nom de moins de 5 caractères ne s'inscrit plus ; la règle des variantes de
+graphie (TF-0742, clos) a réécrit son propre banc — un nom de domaine réel dans un cas de test
+devenu pseudonyme, et le cas testait autre chose : les exemples des fichiers de code sont
+INVENTÉS, la règle existait, elle est appliquée. Et en archivant les clôtures, deux règles de la
+boîte se sont rallumées sur un lot dérogé le 27/08 : la dérogation avait suivi ses items dans
+l'archive, que le contrôle ne lisait pas — corrigé, recette 32/32.
+
+**Pilot, clos** : TF-0750 (R-4 juge l'unicité de l'indice par jour et par dossier, recette
+45/45), TF-0740 (R-54 § AH : un écart ne se déclare qu'après deux questions ; référentiel
+`references/PATRONS-EPROUVES.md` ouvert avec P-1), TF-0741 (étude DataForSEO, E1-E8 PASS, GO
+conditionnel sur le seul palier des volumes, 0,24 USD/mois, aucune dépense), TF-0727 (étude et
+D-34 livrées le 01/09 ; le reste vit dans TF-0749), TF-0693 côté catalogue.
+
+**Forges sœurs, sous mandat de campagne, commits locaux jamais poussés** — routage : six agents
+Opus 5 (construction complexe : oracles, fixtures, Python), escalade de modèle : aucune.
+- forge-agents, skill `digit-ai-page-html` @ b745f08 : TF-0720 (emphase neutralisée avant
+  l'analyse des jetons, fenêtre de glose sur le paragraphe reflué), TF-0719 (badge « acté »
+  résolvant, L24, dégradation à sens unique), TF-0694 (gouttière d'étiquettes jugée aussi sur les
+  tableaux — la fixture du 27/08 passe de PASS à FAIL, 33 % contre 20 %). Banc 127 → 141.
+- forge-agents, skills `quality-oracles` 2.10.0 et `experts-forge` 1.5.0 @ ca3d320, 2a93e7a,
+  32161b8, 737076f : TF-0715 (domaine « autorité d'une décision affirmée », A1-A4, bruit 0 FAIL
+  sur 467 documents), TF-0716 (domaine « livrabilité d'une conséquence déclarée », L1-L2, 0 FAIL
+  sur 468), TF-0718 (effectif en lettres ou en chiffres rapproché du cardinal réel — première
+  version 19 faux positifs, livrée 0), TF-0717 (fiche expert « migration de plateforme
+  brownfield » ADMISE par le juge, verdict matériel 5 axes, et porte de méthode
+  `oracle-angles-vides` G1-G5). Self-test 170 → 186. Reste dit : `versions-livrees.json` non mis
+  à jour (oracle-etat-forge F1 déjà FAIL avant la campagne).
+- forge-design @ 5fb269f, 67a1e6b, acb17be : TF-0707 (oracle panneau de tâche PA1-PA6),
+  TF-0736 et TF-0739 (grille TYPÉ / PROPOSÉ / BORNÉ / ATTEIGNABLE, oracle SA1-SA6, snippet de
+  référence du geste d'ouverture), TF-0708 volet design (deux motifs légitimes d'écran de
+  création, critère binaire). Banc 27 oracles / 83 règles → 31 / 101 ; copies installées remises
+  à niveau par `oracle-skills --appliquer`.
+- forge-audit @ 3b24854, e4271b1 : TF-0700 (PDF IMPRIMÉ depuis le HTML, preferCSSPageSize
+  mesuré : 612×792 sans, 595×842 avec), TF-0701 (porte bloquante FS1-FS7 de la fiche),
+  TF-0697 (colonne d'intitulés 34 % → 22 % mesurée au moteur), TF-0693 (allocateur d'indice
+  vendorisé, REF_FICHE dérivée du nom). Banc 10/10 → 11/11 étapes, tests 81 → 93.
+- forge-tests @ 949d83b, 8a44495, bdf3723, 623a618 : TF-0744 (« s par mutant » DÉRIVÉ, jamais
+  saisi, décomposition tués/survivants : 23 survivants à 52 s = 37 % du temps), TF-0728
+  (constat statique croisé avec la couverture dynamique : 4 → 0 faux écarts par campagne),
+  TF-0708 volet tests (bruit mesuré 7 → 0 sur 220 gabarits réels), TF-0665 (nombres orphelins :
+  mécanisme prouvé sur le cas fondateur, bruit 405 → 67 → 6 sur 4 886 chaînes, précision 0 %
+  donc AVERTISSANT derrière un drapeau absent par défaut, seuil 80 % écrit). pytest 1195 → 1227.
+
+**Constats en passant, entrés en candidat** : TF-0763 (forge-tests : la recette corpus S-01
+n'est plus prononçable depuis D-34, banc rouge 21/23, banc vert 3 findings — identique avant et
+après la campagne) ; TF-0764 (la passe d'anonymisation ne couvre que le pilot : 5, 41, 70 et 7
+fichiers des quatre forges publiques portent encore un nom de produit en clair).
+
+**Non traité, déclaré** : TF-0752 (D-38, geste irréversible), TF-0732 (A-5, arbitrage entre deux
+doctrines du poste), TF-0549 (choix humain 3c), TF-0674/0676/0682 (correctifs côté produit,
+D-31), TF-0748/0749 (campagne réelle), les neuf candidatures du jour et les deux constats (D-39,
+D-40).
+
+Registre : 31 actifs → 19 (12 candidats, 6 décidés, 1 en cours) ; 24 items archivés ce tour
+(722 → 746). Boîte PASS, registre PASS, empreintes PASS, porte de publication : 0 constat hors
+historique. Banc pilot : voir la synthèse du tour.
