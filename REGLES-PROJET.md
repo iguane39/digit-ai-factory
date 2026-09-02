@@ -1174,3 +1174,48 @@ exiger qu'il reste identique au gabarit reviendrait a interdire d'y ecrire.
 doit etre livree comme un fichier*, jamais comme une phrase dans un document de regles. Une regle
 qui n'a nulle part ou s'appliquer ne se viole pas — elle ne s'applique simplement jamais, et
 personne ne le voit.
+
+## AH. R-54 — un ECART ne se DECLARE qu'apres deux questions, et un patron paye entre au referentiel (TF-0740 — 02/09)
+
+**Le fait, et il vient d'un produit (lot `Produit-02 - RETOURS - 20260901a`, ledger produit
+seq 64-65).** L'exploitant demande un releve « tous les lundis matins a 6 h ». L'agent regle un
+cron UTC unique et **declare l'ecart** ete/hiver (6 h l'hiver, 5 h l'ete) avec une justification
+chiffree presentee comme dissuasive — « exigerait deux crons et un test d'heure locale ». Or le
+produit portait DEJA la mecanique de la solution, construite la veille. Une question d'une ligne de
+l'exploitant a suffi ; la solution complete a coute une demi-heure, douze cas de test compris.
+
+**Ce que le fait dit de la declaration d'ecart.** La declaration d'ecart est une pratique saine
+(R-20 bis, § AG) — et elle a servi ici de **sortie de moindre effort** : le cout de la solution a
+ete chiffre sans etre compare au cout de l'ecart sur sa duree de vie, et sans verifier si le
+systeme contenait deja le mecanisme. *Un ecart ferme en moins de temps qu'il n'en faut pour le
+documenter est une solution refusee.*
+
+**La regle.** Toute declaration d'ecart — carnet `ECARTS-ASSUMES.md`, section « Ecarts assumes »
+d'un `TODO-PRODUIT.md`, ligne d'un lot de retours — repond, **dans le motif**, a deux questions
+avant d'etre ecrite :
+
+1. **le systeme contient-il deja le mecanisme qui fermerait l'ecart ?** — la reponse cite ce qui
+   a ete cherche (un fichier, une commande, un module), pas une impression ;
+2. **le cout de fermeture depasse-t-il le cout de l'ecart sur sa duree de vie ?** — les deux
+   couts sont ecrits, en complexite × duree (jamais en jours), l'un en face de l'autre.
+
+Un motif qui ne repond pas aux deux n'est pas un ecart assume : c'est un ecart **suppose**, et il
+reste ouvert. Le champ `reouverture` de R-20 bis en decoule naturellement : « le jour ou le
+mecanisme existe » est la reouverture la plus frequente, et la premiere question dit s'il existe
+deja.
+
+**Ce que la regle n'exige PAS.** Elle ne juge pas la justesse de la comparaison de couts — un
+raisonnement ecrit peut etre faux et se corrige, un raisonnement absent est perdu. Elle ne
+mecanise rien aujourd'hui : un oracle de forme sur les deux questions (presence des deux reponses
+dans le motif) est possible et se decidera sur le premier carnet reel qui les portera ; l'ecrire
+avant que le corpus existe simulerait la mesure.
+
+**Second volet — le patron eprouve entre au referentiel.** Le meme lot livrait, avec sa preuve
+d'execution (12 cas dont les 4 instants de bascule a la minute pres, 26/26 en local et en CI), un
+mecanisme reutilisable : *une consigne en heure locale ne se traduit jamais en une heure UTC
+unique* — deux battements UTC encadrant l'heure visee, filtre d'heure locale a l'execution, regle
+europeenne des changements d'heure codee en dur en un point nomme, battement retarde tolere,
+idempotence de la serie, declenchement manuel hors filtre. Il vit desormais dans
+**`references\PATRONS-EPROUVES.md`** (P-1), referentiel date et source ou un patron n'entre
+qu'avec sa preuve d'execution ET ses exclusions ecrites — la moitie qui evite la reapplication
+aveugle. Un patron sans preuve reste une candidature au registre TODO-FORGE.
