@@ -55,7 +55,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `candidature-retro-modele.tf.jsonl` | fichier | 2,3 Ko | 1 ligne(s) JSONL |
 | `candidature-routes-declarees-i18n.tf.jsonl` | fichier | 2,4 Ko | 1 ligne(s) JSONL |
 | `candidature-run-conseil.tf.jsonl` | fichier | 2,7 Ko | 1 ligne(s) JSONL |
-| `candidature-socle-docs-projet.tf.jsonl` | fichier | 4,5 Ko | 2 ligne(s) JSONL |
+| `candidature-socle-docs-projet.tf.jsonl` | fichier | 4,6 Ko | 2 ligne(s) JSONL |
 | `candidature-trous-detection-site-principal.tf.jsonl` | fichier | 4,7 Ko | 4 ligne(s) JSONL |
 | `candidature-valeur-recopiee-20260822.tf.jsonl` | fichier | 5,1 Ko | 1 ligne(s) JSONL |
 | `candidature-vue-portefeuille-differee.tf.jsonl` | fichier | 2,6 Ko | 1 ligne(s) JSONL |

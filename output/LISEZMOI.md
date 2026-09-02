@@ -73,7 +73,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 166 livrable(s) courant(s), 10 archivé(s), 6 famille(s).
+**État** : 167 livrable(s) courant(s), 10 archivé(s), 6 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -240,6 +240,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Traite les todo et retours - 20260815a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite les todo et retours - 20260815a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md | 20260817a | 6.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md` |
 | Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Traite les todos et les retours - 20260902b.md | 20260902b | 24.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite les todos et les retours - 20260902b.md` |
 | Digit-AI - Synthese Mandat - Traite les todos et retours - 20260830a.md | 20260830a | 17.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite les todos et retours - 20260830a.md` |
 | Digit-AI - Synthese Mandat - Traite retours et todos - 20260817a.md | 20260817a | 6.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite retours et todos - 20260817a.md` |
 | Digit-AI - Synthese Mandat - Traite retours et todos - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite retours et todos - 20260817a.md.jugement.json` |

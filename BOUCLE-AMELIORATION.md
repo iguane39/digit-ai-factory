@@ -1997,3 +1997,66 @@ D-40).
 Registre : 31 actifs → 19 (12 candidats, 6 décidés, 1 en cours) ; 24 items archivés ce tour
 (722 → 746). Boîte PASS, registre PASS, empreintes PASS, porte de publication : 0 constat hors
 historique. Banc pilot : voir la synthèse du tour.
+
+## 02/09/2026 (second tour) — « Traite les todos et les retours » : trente candidatures décidées, les retours REDESCENDENT, et une campagne sur trois forges
+
+Mandat humain, même lecture que le matin (décision en bloc, TF-0752 exclu). Inventaire
+d'ouverture : 19 actifs (12 candidats), boîte **FAIL** — trois lots du produit 02 arrivés dans
+la journée (19 candidatures), hors suivi, sous le nom réel du produit.
+
+**Retours.** Les trois lots anonymisés sur disque par la porte `--fichiers`, ingérés (TF-0765 à
+TF-0783), suivis ; boîte PASS. Le nom d'APPLICATION du produit 12 et une abréviation du produit 11
+(relevée par forge-tests) rejoignent la table de pseudonymes comme alias : passe rejouée au pilot
+(12 lots renommés, 29 + 25 fichiers, 11 sidecars ré-empreintés avec preuve). La passe est jouée
+sur les QUATRE forges publiques (D-40, TF-0764), chacune relue par son banc — et chaque relecture
+a trouvé ce que la passe ne pouvait pas voir : des noms réels hors table dans des exemples, un nom
+de client dans le commentaire de l'oracle de publication lui-même, des élisions cassées
+(« d'Produit-01 »), un pseudonyme mal attribué. Tous remplacés par des noms INVENTÉS.
+
+**Pilot — ce qui REDESCEND.** R12 au registre (TF-0757) : toute clôture en corrige postérieure au
+02/09 14:00 Z porte `descente` (règle | oracle | digest | non_mecanisable), sinon refus et
+écriture annulée — les 31 clôtures du tour la portent. Socle HTML : A1 cesse d'autoriser les web
+fonts que l'oracle refuse (TF-0753), B1/B6 tranchés au token `--hh` (TF-0754), D5 documente le
+rouge (TF-0755), section I « pages de DONNÉES » (pleine largeur, sommaire, alignement, dictionnaire
+de colonnes, temps — TF-0771/72/73/77/78/83). Doctrine documentaire D8 (conception intention →
+stratégie → tactique → opérationnel, TF-0759) et D9 (une mesure dit son dénominateur, TF-0760) ;
+famille gd-consolidation-process (TF-0756). Restitution v2.16.0 (TF-0766, 0775, 0779, 0767) :
+S34 aucune écriture demandée à l'humain, S35 une preuve est une sortie exécutée, S36 une page HTML
+livrée porte son verdict de critique d'implémentation, S37 une correction nomme son contrôle
+rouge → vert ; le hook juge le fichier nommé Synthese/Restitution ; les trois porteurs (gabarit,
+hook Stop, rappel d'ouverture) mis à jour ensemble ; oracle-verdict-visuel W5 (un écart résiduel
+sur un débordement se mesure). Hook produit `page-html` (TF-0765) : à chaque écriture d'un .html,
+les règles de socle se jouent chez le producteur ; CLAUDE-PRODUIT porte « Règles de socle
+applicables » ; HERITAGE 1.7.0. Relevé d'héritage du parc à chaque ouverture du pilot (TF-0762 :
+9 produits, 71 manques, 5 sans lanceur nommés avec le geste). Doctrine : maquette validée avant
+le code (RUN-VERSION, TF-0780), contrat de sortie dérivé par un agent distinct (ETAPES-RUN § 4
+bis, TF-0776), la règle qui aurait évité le retour (RETOURS-FORGES, TF-0779).
+
+**Forges sœurs, sous mandat, commits locaux** — cinq agents (trois Opus, deux Sonnet), aucune
+escalade.
+- forge-agents, page-html @ e83a8ca, 3763998, c0cf621, effe6b7 : table-filters lit `data-v`,
+  ré-initialise et expose son état, ordonne ses facettes, donne une facette à chaque colonne
+  (TF-0768/69/81/82) ; L25 sommaire + famille sommaire_perdu (TF-0772), controles_desalignes
+  (TF-0773), rognage_donnees + L26 (TF-0771), prose_etroite (TF-0778), L28 temps (TF-0783), L27
+  dictionnaire de colonnes (TF-0777), L29 et token `--hh` (TF-0754), tokens `--red` (TF-0755).
+  Banc 141 → 173, 36 règles statiques, 18 familles de rendu, bruit mesuré à 0 hors cas réels.
+- forge-agents, quality-oracles et l99 @ 7237083, a4c8584, 81a0463, f19faa0, c8f4046, 437e055,
+  ecc9260 : oracle conception C1-C4 (TF-0758, bruit 35 → 0 sur 103 documents), N3 pourcentage
+  sans formule (TF-0760), N4/N5 unités (TF-0777), oracle lecture par un tiers T1-T4 (TF-0774,
+  invocation explicite), F6 maquette validée et F7 auteur ≠ exécutant (TF-0780, 0776), forme de
+  la sortie L99 (TF-0770) et injection des règles de socle (TF-0765), précédence de charte au gate
+  d'écriture (TF-0732, D-41 (b), banc 15 → 21), versions livrées soldées (F1 vert). Banc 186 → 210.
+- forge-tests @ dcb8ffe, b6faef4, 3973a7d, 62fd1b7 : S-01 redevient prononçable (TF-0763 —
+  corpus ECHEC → OK, K2 60 % de faux positifs → 0), pytest 1227 → 1233.
+- forge-design @ aa18bce, f99e293 et forge-audit : relecture post-anonymisation, bancs inchangés.
+
+**Constats en passant, entrés en candidat** : TF-0784 (digit-ai-schemas embarque une copie figée
+du composant de filtres), TF-0785 (lint de forge-tests rouge par dérive de version de ruff non
+épinglée), TF-0786 (un verdict de recette dépend d'oracles installés non épinglés — les règles ont
+changé pendant la session), TF-0787 (les trois familles HTML de la bibliothèque du pilot n'ont pas de sommaire latéral collant — la règle neuve les met en défaut au rendu, deux contrôles du banc restent rouges, déclarés).
+
+**Non traité, déclaré** : TF-0752 (D-38), TF-0549 (3c), TF-0674/0676/0682 (lots de travaux chez le
+produit, décision), TF-0748/0749 (campagne réelle), les trois constats du jour.
+
+Registre : 19 → 10 actifs (4 candidats, 6 décidés), 31 clôtures ce tour, toutes avec descente, 777 archivés. Boîte PASS,
+registre PASS.
