@@ -73,7 +73,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 164 livrable(s) courant(s), 10 archivé(s), 6 famille(s).
+**État** : 166 livrable(s) courant(s), 10 archivé(s), 6 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -100,7 +100,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Revue Forge - Écosystème - 20260819a.md.oracles.json | — | 2.1 Ko | `01-revues-et-propositions/Digit-AI - Revue Forge - Écosystème - 20260819a.md.oracles.json` |
 | Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html *(archivé)* | 20260815a | 35.1 Ko | `01-revues-et-propositions/old/Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html` |
 | Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html.jugement.json *(archivé)* | — | 0.3 Ko | `01-revues-et-propositions/old/Produit-02 - Maquette Vue d'ensemble - Rapport SEO - 20260815a.html.jugement.json` |
-| Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md | 20260815a | 7.1 Ko | `01-revues-et-propositions/Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md` |
+| Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md | 20260815a | 7 Ko | `01-revues-et-propositions/Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md` |
 | Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md.jugement.json | — | 0.3 Ko | `01-revues-et-propositions/Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md.jugement.json` |
 
 ### 02-schema-ecosysteme
@@ -109,7 +109,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 |---|---|---|---|
 | Forge Pilot - Schéma Écosystème - 20260820a.html | 20260820a | 57.9 Ko | `02-schema-ecosysteme/Forge Pilot - Schéma Écosystème - 20260820a.html` |
 | Forge Pilot - Schéma Écosystème - 20260820a.html.jugement.json | — | 0.3 Ko | `02-schema-ecosysteme/Forge Pilot - Schéma Écosystème - 20260820a.html.jugement.json` |
-| Forge Pilot - Schéma Écosystème - 20260811h.html *(archivé)* | 20260811h | 53.1 Ko | `02-schema-ecosysteme/old/Forge Pilot - Schéma Écosystème - 20260811h.html` |
+| Forge Pilot - Schéma Écosystème - 20260811h.html *(archivé)* | 20260811h | 53 Ko | `02-schema-ecosysteme/old/Forge Pilot - Schéma Écosystème - 20260811h.html` |
 | Forge Pilot - Schéma Écosystème - 20260811h.html.jugement.json *(archivé)* | — | 0.3 Ko | `02-schema-ecosysteme/old/Forge Pilot - Schéma Écosystème - 20260811h.html.jugement.json` |
 | Forge Pilot - Schéma Écosystème - 20260812a.html *(archivé)* | 20260812a | 55.9 Ko | `02-schema-ecosysteme/old/Forge Pilot - Schéma Écosystème - 20260812a.html` |
 | Forge Pilot - Schéma Écosystème - 20260812a.html.jugement.json *(archivé)* | — | 0.3 Ko | `02-schema-ecosysteme/old/Forge Pilot - Schéma Écosystème - 20260812a.html.jugement.json` |
@@ -183,6 +183,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260831-opportunite-etat-de-l-art-marche.md | — | 9.1 Ko | `03-etudes/20260831-opportunite-etat-de-l-art-marche.md` |
 | 20260901-etude-opportunite-dataforseo.md | — | 20.6 Ko | `03-etudes/20260901-etude-opportunite-dataforseo.md` |
 | 20260901-etude-opportunite-strategie-tests.md | — | 23.9 Ko | `03-etudes/20260901-etude-opportunite-strategie-tests.md` |
+| 20260902-etude-opportunite-dataforseo-produit-02.md | — | 43.7 Ko | `03-etudes/20260902-etude-opportunite-dataforseo-produit-02.md` |
 
 ### 04-plans
 
@@ -201,7 +202,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md.jugement.json` |
 | Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md | 20260815a | 3.8 Ko | `04-plans/Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md` |
 | Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md.jugement.json` |
-| Digit-AI - Synthese Mandat - Analyse L99 etat de l art marche - 20260830n.md | 20260830n | 15.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Analyse L99 etat de l art marche - 20260830n.md` |
+| Digit-AI - Synthese Mandat - Analyse L99 etat de l art marche - 20260830n.md | 20260830n | 15.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Analyse L99 etat de l art marche - 20260830n.md` |
 | Digit-AI - Synthese Mandat - Anatomie du bloc 3 armee - 20260830e.md | 20260830e | 17.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Anatomie du bloc 3 armee - 20260830e.md` |
 | Digit-AI - Synthese Mandat - Anonymisation cablee sur git - 20260901g.md | 20260901g | 11.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Anonymisation cablee sur git - 20260901g.md` |
 | Digit-AI - Synthese Mandat - Architecture du circuit insatisfaction - 20260815a.md | 20260815a | 3.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Architecture du circuit insatisfaction - 20260815a.md` |
@@ -249,6 +250,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Traite todos et retours - 20260831b.md | 20260831b | 17.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite todos et retours - 20260831b.md` |
 | Digit-AI - Synthese Mandat - Traite tous les retours - 20260817a.md | 20260817a | 5.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite tous les retours - 20260817a.md` |
 | Digit-AI - Synthese Mandat - Traite tous les retours - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite tous les retours - 20260817a.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Traite tous les retours et todos - 20260902a.md | 20260902a | 27.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite tous les retours et todos - 20260902a.md` |
 | Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md | 20260823a | 9.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md` |
 | Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Verification de non perte jouable - 20260901d.md | 20260901d | 9 Ko | `04-plans/Digit-AI - Synthese Mandat - Verification de non perte jouable - 20260901d.md` |

@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=6fcc468531d6 archive=07f024a6ca9b · dernier événement: 2026-09-01T13:53:41.794Z -->
+     sceaux: actifs=a6351cd03ba7 archive=64d57a9c796c · dernier événement: 2026-09-02T12:14:22.658Z -->
 
-**31 actifs** (candidat 7 · décidé 23 · en cours 1 · corrigé 0 · écarté 0) · **722 archivés**.
+**19 actifs** (candidat 12 · décidé 6 · en cours 1 · corrigé 0 · écarté 0) · **746 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -14,58 +14,22 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0674 | decide | 12.5 | La porte de fraîcheur de déploiement empreinte encore un échantillon — le correctif d'ensemble n'est pas appliqué | non |
 | TF-0682 | decide | 10 | Quinze contrôles du produit ne sont exercés par AUCUNE recette — être cité n'est pas être joué | non |
 | TF-0676 | decide | 6.7 | Aucun script de capture du produit ne produit systématiquement une pleine page | non |
-| TF-0742 | candidat | 25 | digit-ai-factory : l'anonymisation ne connaît qu'UNE graphie du nom d'un produit — la forme espacée traverse et entre au registre | **oui** — 2 occurrences du nom réel d'un produit entrées au registre suivi malgré un message [ANONYMISE] affiché ; récidive de la classe TF-0712 en un jour |
-| TF-0740 | candidat | 1 | Gestion des heures : l'ecart declare qui remplacait la solution disponible, et le patron heure-locale-sur-planificateur-UTC | non |
-| TF-0741 | candidat | 1 | Etude poussee de la strategie DataForSEO pour Produit-02 : interet, services, objectifs, donnees, suivis, resultats, couts | non |
-
-## digit-ai-forge-agents
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0718 | decide | 15 | quality-oracles : un effectif annonce en toutes lettres n est compare a rien — « sept ecarts » en tete d un tableau qui en porte huit, dans trois versions livrees | **oui** — Decalage present dans trois versions livrees et vert a quatre portes ; trouve a la main, hors de tout controle. |
-| TF-0715 | decide | 12.5 | quality-oracles : aucun domaine ne verifie l AUTORITE d une decision affirmee — un livrable peut ecrire « Decideur : le prestataire, pour le client » et sortir vert | **oui** — Defaut alle jusqu au client sur un livrable vert a quatre portes ; correction d une phrase par le client, puis regeneration complete du rapport et reprise de cinq emplacements. |
-| TF-0717 | decide | 8.3 | experts-forge : un angle declare vide le 20/08 a produit le 31/08 exactement le defaut qu il aurait attrape — fiche « migration de plateforme brownfield » jamais ecrite | **oui** — Angle vide declare le 20/08 et non comble ; defaut correspondant trouve par le client le 31/08, apres qu une contre-expertise complete et quatre portes automatiques l aient laisse passer. |
-| TF-0716 | decide | 6.7 | quality-oracles : aucun domaine ne teste si une consequence declaree est LIVRABLE — « l utilisateur decouvre en production » passe les quatre portes | **oui** — Formulation presente dans six versions livrees et validee par quatre portes ; reaction directe du client, quatre lignes du rapport reecrites et un ecart neuf declare. |
-
-## digit-ai-forge-audit
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0700 | decide | 9 | audit : le livrable DIFFUSE de la fiche securite est un PDF, que le kit ne prescrit pas, n outille pas et ne controle pas — le projet a diffuse une IMAGE, d un indice anterieur au HTML depose a cote | **oui** — PDF diffuse le 24/07 : 1 page, 0 caractere extractible, 9 images, 653169 octets, indice c — contre un HTML voisin d indice d. Aucune porte ne l a vu. |
-| TF-0701 | decide | 6 | audit : la fiche securite n a AUCUN verificateur alors que ses deux regles sont mecaniques, et que le rapport d audit, lui, a une porte bloquante | **oui** — Deux regles ecrites au paragraphe 10 et tenues par personne ; le seul artefact relu est celui qui n est pas diffuse. |
-
-## digit-ai-forge-design
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0720 | decide | 15 | digit-ai-page-html : M18 refuse une glose correcte quand une emphase ou un retour a la ligne s intercale entre le jeton et sa parenthese — deuxieme fois que le balisage casse une adjacence | **oui** — Quatre refus successifs a l ecriture de ce lot, dont deux sur du contenu conforme ; meme cause qu un faux positif deja signale le 22/08 sur un autre oracle. |
-| TF-0707 | decide | 10 | design : un choix exclusif se pose AVANT les champs qu'il commande, jamais au milieu d'un formulaire qui les affiche deja tous | **oui** — inspection utilisateur en production : l'ecran a ete mal compris par son destinataire, qui a deduit une alternative inexistante entre deux moitiees du meme flux. |
-| TF-0719 | decide | 10 | digit-ai-page-html : le badge acte n est pas resolvant — il affirme un statut que rien ne verifie, et il a porte une decision qui n a jamais ete prise | **oui** — Badge acte pose a tort sur cinq emplacements d un livrable client, vert a check_html et render_page ; corrige seulement apres intervention du client. |
-| TF-0736 | decide | 6.7 | forge-design : aucun referentiel ne dit qu'un champ de saisie doit etre TYPE a son format, PROPOSE selon son contexte et BORNE par son sens — chaque ecran improvise | **oui** — retour utilisateur avec capture sur un ecran livre et audite (campagne v0.4.0 : interface 233/235, le defaut n'etait pas mesurable — les affordances etaient cablees, c'est la valeur et la borne qui manquaient) ; correctif produit : 1 service, 1 contexte, 2 champs, 4 tests, une soiree. |
-| TF-0739 | candidat | 10 | forge-design : la cible de geste d'un composant composite n'est un critere d'aucun referentiel — sur un champ date natif, seule une icone de vingt pixels ouvre le calendrier | **oui** — second retour utilisateur en deux jours sur le meme composant d'un ecran livre et audite (apres la valeur et les bornes, la cible de geste) ; correctif produit : 8 lignes de script global, 1 test, une demi-heure — le cout est dans la redecouverte par chaque produit, pas dans le correctif. |
+| TF-0753 | candidat | 25 | digit-ai-factory : RT-1 toujours ouvert -- l'item A1 autorise les web fonts que l'oracle normatif refuse, et il a reproduit le meme livrable non conforme quatre jours apres | **oui** — un indice complet publie non conforme (20260831b) ; contradiction A1 socle subordonne contre A1 oracle normatif, deja remontee le 27/08 et non traitee |
+| TF-0755 | candidat | 15 | digit-ai-factory : la ligne D5 ne documente pas la teinte de refus, que le livrable conforme de la maison emploie pourtant | **oui** — une teinte reinventee puis alignee a la main sur un autre livrable ; risque de divergence chromatique entre livrables de la meme maison |
+| TF-0758 | candidat | 12.5 | digit-ai-factory : aucun oracle ne juge la CONCEPTION d'un livrable -- 17 controles de forme verts, deux refus du lecteur | **oui** — un livrable integralement conforme et refuse deux fois ; quatre griefs qu'aucun controle ne cherche |
+| TF-0764 | candidat | 12.5 | digit-ai-factory : la passe d'anonymisation (D-37) ne couvre que le pilot — les quatre forges soeurs, depots publics, portent encore des noms de produits en clair (essai du 02/09 : 5, 41, 70 et 7 fichiers) | **oui** — 123 fichiers suivis de quatre depots publics portent un nom de produit en clair, et un nom de produit client en clair dans une reference de conception ; la porte de publication ne les voit pas (elle ne connait que les clients) |
+| TF-0754 | candidat | 12 | digit-ai-factory : B1 « header sticky » et B6 « thead sticky » se superposent, et aucun des deux textes ne dit lequel cede | **oui** — deux cycles de rendu, et un arbitrage de socle pris par un produit |
+| TF-0760 | candidat | 10 | digit-ai-factory : une mesure exacte case par case peut etre fausse dans son ensemble, et aucun controle ne le voit | **oui** — un produit affiche a 0 % sur une exigence qu'il tient ; credibilite du rapport entamee sur tous ses autres chiffres |
+| TF-0762 | candidat | 10 | digit-ai-factory : l'avertissement R-47 sur l'heritage arrive a l'ingestion, donc apres la remise, chez celui qui ne peut plus rien en faire | **oui** — deux lots remis sans avoir pu jouer l'oracle de forme prevu pour eux ; RT-2 non refermable tant que l'information ne descend pas |
+| TF-0757 | candidat | 8.3 | digit-ai-factory : la boucle de retour ne redescend pas -- trois recidives en quatre jours sur un seul projet | **oui** — trois recidives mesurees en quatre jours sur un seul projet ; deux indices de livrable publies puis supplantes |
+| TF-0759 | candidat | 6.7 | digit-ai-factory : il manque une methode de construction d'un livrable -- le socle prescrit le rendu, les gabarits la structure, personne la conception | **oui** — un chapitre entier illisible pour son lecteur, ecrit parce que le plan le prevoyait |
+| TF-0756 | candidat | 6 | digit-ai-factory : aucune famille de gabarit ne couvre une consolidation de process multi-produits, et G8 ne peut donc pas etre renseigne | **oui** — structure entierement inventee ; G8 non renseignable, donc un futur « il manquait une section » ne se rattachera a rien |
 
 ## digit-ai-forge-tests
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0728 | decide | 10 | forge-tests : le detecteur statique de codes declares ne voit pas une emission sous garde try/except — 4 faux ecarts par campagne | **oui** — 4 faux ecarts a analyser a la main par campagne, contredits par une section du meme rapport (rapport-20260831.json, divergences statiques vs pan api). |
-| TF-0727 | decide | 6.3 | forge-tests : demande d'etude approfondie — strategie de tests et temps d'execution des campagnes (selection d'impact, mutation ciblee, parallelisation, distribution), sans perte de qualite | **oui** — 67 min de campagne dont ~54 min de mutation mesurees au rapport-20260831.json et au journal forge/avancement.jsonl, pour une suite produit qui tourne en ~52 s ; 37 s/mutant contre 52 s de suite complete = le rejeu est quasi integral par mutant. |
-| TF-0708 | decide | 6 | tests : distinguer deux motifs legitimes d'ecran de creation plutot que d'imposer le formulaire replie partout | **oui** — un test d'exigence d'interface a du etre assoupli pour laisser passer une refonte qui corrigeait un defaut d'ergonomie reel. |
-| TF-0665 | decide | 5.6 | Un nombre affiché dont aucune source du dépôt ne rend compte est un nombre orphelin, et personne ne le lui demande | non |
-| TF-0744 | candidat | 20 | digit-ai-forge-tests : la valeur « ~37 s par mutant » publiee au rapport ne se reconcilie ni avec la duree de mutation ni avec celle de la campagne | **oui** — une valeur publiee arithmetiquement impossible (115 x 37 s = 71 min > 67 min de campagne) ; tout gain calcule dessus est surevalue d'environ 31 % |
-
-## digit-ai-page-html
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0694 | decide | 1 | digit-ai-page-html : la regle l2_gouttiere decrit EXACTEMENT ce defaut, au seuil exact, et rend PASS dessus - elle ne regarde que les grilles CSS, jamais les table | **oui** — Execute le 27/08/2026 : python render_page.py sur la fiche fautive 'Client-A - CAL - Fiche Securite Mise a disposition - Dev - 20260827b.html' (colonne d intitules a 32 %), --widths 1440 --output json. Resultat : verdict PASS, et l2_gouttiere : 0 constat - de meme que v1_overflow, v2_contrast, v4_overlap, l2_width, l2_conteneur, l2_filet, l2_freres, tous a 0. Le socle rend donc PASS sur le document meme que la regle est faite pour condamner. Cout constate : le defaut a traverse DEUX fiches livrees et TROIS regenerations avant qu un humain ne l ouvre et ne le dise. Mesure du gaspillage : 12,6 % a 19,4 % de la largeur de page perdus sur 7 tables sur 8. |
-
-## forge-audit
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0693 | decide | 1 | forge-audit : la famille gd-fiche-securite ne fournit aucune allocation d indice avec son gabarit, alors que toute fiche est regeneree plusieurs fois par jour | **oui** — Le commanditaire a demande a la relecture, le 27/08/2026 : pourquoi la regle de nouvelle version de fichier avec nouvel indice n est pas respectee dans la generation de nouveaux fichiers comme la fiche securite ? La question porte sur le NOM du livrable et non sur son contenu : c est le premier signal recu que quatre versions s etaient ecrasees. Cout direct : quatre ecrasements, dont deux pousses, et un aller-retour humain. |
-| TF-0697 | decide | 1 | forge-audit : le gabarit gd-fiche-securite reserve 32 % de la page a une colonne d intitules courts - correctif mesure disponible | **oui** — Mesure avant correction : 32 % reserves, 12,6 % a 19,4 % GASPILLES sur 7 tables sur 8. Apres : 0,6 % a 7,4 %, soit 68 % -> 80 % de largeur rendue au texte, sans debordement (scrollWidth == clientWidth verifie a 739 px). Le commanditaire a demande la correction apres avoir ouvert le PDF, le 27/08/2026 : reduire la premiere colonne 'afin de laisser plus d espace pour la largeur de la deuxieme colonne qui contient plus de texte'. Le defaut avait traverse deux fiches livrees et trois regenerations. |
+| TF-0763 | candidat | 6 | forge-tests : la recette corpus (verdict S-01) n'est plus prononcable depuis D-34 — banc rouge 21/23, banc vert 3 findings bloquants, identique avant et apres la campagne du 02/09 | **oui** — un verdict de forge (S-01) non prononcable depuis le 01/09 sans qu'aucune restitution ne l'ait dit ; mesure : banc rouge 21/23, banc vert 3 findings bloquants, identique avant et apres la campagne |
 
 ## forge-tests
 
@@ -80,7 +44,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-0732 | en_cours | 10 | poste : le gate d'ecriture C7 juge le FICHIER ENTIER, pas le delta — et sa regle « DM Sans bannie » contredit la charte maison : tout gabarit HTML de la bibliotheque est inedittable sans friction | **oui** — quatre editions de trois lignes bloquees en un tour pour des defauts anterieurs ; sans arbitrage, CHAQUE evolution future d'un gabarit HTML de la bibliotheque paiera le meme peage, et la regle de police fera accuser tout livrable conforme a la charte maison |
 | TF-0549 | decide | 10 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : `Produit-07` a un forge\retours\ mais rien de ce qui s'y fait n'est suivi | **oui** — mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration. |
-| TF-0750 | candidat | 7.5 | Deux livrables du meme jour ont porte le meme indice sans que rien ne le voie : R-4 juge la FORME du nom, jamais l'unicite de l'indice | **oui** — deux fichiers de output/04-plans/ portant l'indice 20260901b le 01/09 ; R-4 rend PASS sur les deux, aucun controle ne compare deux noms entre eux |
 | TF-0752 | candidat | 5 | L'HISTOIRE du depot porte encore 200 noms de clients, et aucun outil du parc ne peut les en retirer | **oui** — 200 constats de regle C4 avec 0 constat sur l'arbre de travail ; toute publication du pilot reste refusee |
 
 ---

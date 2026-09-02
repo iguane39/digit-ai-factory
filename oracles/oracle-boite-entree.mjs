@@ -222,14 +222,21 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
   // pour R-46 : quatre lots ingérés le même jour sous une dérogation couvrant R-45 ET R-46 laissaient
   // donc B6 rouge, alors que le sujet était tranché et tracé. Un contrôle qui ne reconnaît la
   // décision que sur l'une des deux règles qu'elle nomme est un contrôle qui lit à moitié.
+  // LU DANS LE REGISTRE ET DANS L'ARCHIVE (02/09/2026, payé le jour même) : quand les items d'un
+  // lot dérogé sont archivés, `archiver.mjs` emporte l'événement d'ingestion qui porte la dérogation
+  // avec eux — et ce contrôle, qui ne lisait que le registre actif, rallumait B6/B7 sur un lot
+  // tranché six jours plus tôt. Même lecture que B1/B2 (`ingestions()`), qui lisent déjà les deux.
+  // Et les DEUX séparateurs de chemin : un `fichier` consigné avec des antislashs donnait pour
+  // base le chemin entier, donc une dérogation qui ne couvrait jamais son lot.
   const derogesPar = new Map();      // règle -> ensemble de lots dérogés
-  for (const ligne of (() => { try { return readFileSync(registre, "utf8").split(RE_LIGNES); } catch { return []; } })()) {
+  const sourcesDerog = [registre, join(dirname(registre), "TODO-ARCHIVE.jsonl")];
+  for (const ligne of sourcesDerog.flatMap((f) => { try { return readFileSync(f, "utf8").split(RE_LIGNES); } catch { return []; } })) {
     if (!ligne.trim() || !ligne.includes('"ingestion"')) continue;
     let e = null;
     try { e = JSON.parse(ligne); } catch { continue; }
     const regles = e?.derogation?.regles || [];
     if (!regles.length) continue;
-    const base = String(e.fichier || "").split(/[\/]/).pop().replace(/\.tf\.jsonl$/, "");
+    const base = String(e.fichier || "").split(/[\\/]/).pop().replace(/\.tf\.jsonl$/, "");
     if (!base) continue;
     for (const r of regles) {
       if (!derogesPar.has(r)) derogesPar.set(r, new Set());
@@ -596,6 +603,20 @@ function selfTest() {
   cas.push(["B7 septies— et il ne reste AUCUN B7 en FAIL sur ce lot",
     !r.findings.some((f) => f.regle === "B7" && f.statut === "FAIL"), r.verdict]);
 
+  // B6/B7 octies (02/09) — la dérogation vit dans l'ARCHIVE : ses items sont clos, l'événement
+  // d'ingestion les a suivis, et le lot reste tranché. Le jour où ce cas a été écrit, deux règles
+  // se sont rallumées sur un lot dérogé le 27/08 parce que ses deux items venaient d'être archivés.
+  const lotArch = join(boite, "PROD - RETOURS - 20260823a.md"), sidecarArch = join(boite, "PROD - RETOURS - 20260823a.tf.jsonl");
+  writeFileSync(sidecarArch, '{"titre":"archive"}\n');
+  writeFileSync(lotArch, "# lot\n\n## pilot\n\ntable\n");
+  appendFileSync(join(dirname(reg), "TODO-ARCHIVE.jsonl"), JSON.stringify({
+    ev: "ingestion", lot_sha: empreinte(sidecarArch), fichier: "input\\00-retours\\PROD - RETOURS - 20260823a.tf.jsonl",
+    derogation: { regles: ["R-45", "R-46"], motif: "motif ecrit, decision humaine tracee", decision: "humaine" },
+  }) + "\n");
+  r = juger(boite, reg);
+  cas.push(["B6/B7 octies— dérogation lue dans l'ARCHIVE (et chemin à antislashs) : aucun FAIL sur ce lot",
+    !r.findings.some((f) => (f.regle === "B6" || f.regle === "B7") && f.statut === "FAIL" && f.ou === "PROD - RETOURS - 20260823a.md"), r.verdict]);
+  rmSync(lotArch); rmSync(sidecarArch);
   rmSync(lotDoc); rmSync(sidecarDoc); rmSync(lotAvant); rmSync(sidecarAvant);
 
   // B4 (TF-0287) : un dépôt d'insatisfaction n'a pas de sidecar — B3 doit se taire, B4

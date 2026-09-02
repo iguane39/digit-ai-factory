@@ -59,8 +59,9 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Traite todos et retours - 20260822c.md` | fichier | 9,2 Ko | Digit-AI — Synthèse de mandat — Traite todos et retours (suite) — 20260822c |
 | `Digit-AI - Synthese Mandat - Traite todos et retours - 20260831b.md` | fichier | 17,4 Ko | Synthèse de mandat — « traite tous les todos et retours » : un défaut corrigé, et deux por |
 | `Digit-AI - Synthese Mandat - Traite tous les retours - 20260817a.md` | fichier | 5,1 Ko | Synthèse de mandat — « tous les retours de 00-retours sont-ils traités ? traite-les, archi |
+| `Digit-AI - Synthese Mandat - Traite tous les retours et todos - 20260902a.md` | fichier | 27,7 Ko | Synthèse de mandat — tous les retours pris, la boîte prouvée vide, et vingt-quatre chantie |
 | `Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md` | fichier | 9,8 Ko | Digit-AI — Synthèse de mandat — Traite tous les sujets suivants — 20260823a |
 | `Digit-AI - Synthese Mandat - Verification de non perte jouable - 20260901d.md` | fichier | 9,0 Ko | Synthèse de mandat — le tri reste éteint, et sa vérification cesse d'être une intention |
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 
-_46 fichier(s), 0 sous-dossier(s)_
+_47 fichier(s), 0 sous-dossier(s)_
