@@ -12,6 +12,8 @@
  *      · en_cours→corrige|ecarte · corrige→archive · ecarte→archive
  *  R6  candidat→decide exige decideur + date_decision (la décision est humaine, tracée)
  *  R7  clôture en corrige exige gains_constates + corrections_realisees + date_correction ;
+ *  R12 clôture en corrige postérieure au 02/09/2026 14:00 Z exige `descente` (regle | oracle | digest |
+ *      non_mecanisable) — une correction qui ne redescend pas chez les producteurs se rouvre (TF-0757) ;
  *      clôture en ecarte exige motif_ecart + decideur + date_decision (TF-0157, 13/08 —
  *      la mémoire des refus est structurée, une idée déjà tranchée ne se re-paye pas)
  *  R8  l'archive ne contient que des items dont l'état final est archive
@@ -76,6 +78,7 @@ function lire(fichier) {
 
 const SEUIL_R10 = "2026-08-09T00:00:00Z";
 const SEUIL_R7_ECART = "2026-08-13T00:00:00Z"; // naissance de TF-0157
+const SEUIL_R12_DESCENTE = "2026-09-02T14:00:00Z"; // TF-0757 : les clôtures antérieures restent de la prose, déclaré
 // R11 : entrée en vigueur POSTÉRIEURE au dernier horodatage inventé du registre
 // (2026-08-20T18:21:00Z) — les événements en deçà sont l'antériorité que TF-0413 a mesurée,
 // jamais réécrite (patron R-42 : on ne corrige pas l'histoire, on cesse d'en produire).
@@ -188,6 +191,20 @@ function replier(evenements, ou) {
         // ré-instruction se re-paye à chaque réouverture. Symétrique de R6 pour decide.
         // Datée comme R10 : les 5 écarts antérieurs (TF-0003/13/41 du 11/08, TF-0129/130
         // du 12/08) précèdent la règle — constat consigné, jamais réécrits.
+        // R12 (TF-0757, 02/09/2026) — UNE CORRECTION CLOSE SANS DESCENTE SE ROUVRE. Trois récidives
+        // en quatre jours sur un seul projet : les retours MONTENT au registre et ne REDESCENDENT pas
+        // sous une forme qu'un producteur rencontre au moment où il produit — un registre de
+        // candidatures n'est pas une redescente. Toute clôture en corrige postérieure au seuil porte
+        // donc `descente` : la règle générique écrite au socle ou au gabarit (`regle`), l'oracle
+        // qui la contrôle (`oracle`), la ligne du digest hérité par les produits (`digest`), ou
+        // l'énoncé explicite qu'elle n'est pas mécanisable et pourquoi (`non_mecanisable`). Une
+        // correction qui vit dans le registre du pilot et nulle part chez le producteur n'est pas
+        // câblée (loi transverse n° 1).
+        if (e.statut === "corrige" && tsEffectif >= SEUIL_R12_DESCENTE) {
+          const d = { ...etat, ...e }.descente;
+          const porte = d && typeof d === "object" && ["regle", "oracle", "digest", "non_mecanisable"].some((k) => typeof d[k] === "string" && d[k].trim().length >= 10);
+          if (!porte) ko("R12", e.id, "clôture en corrige sans `descente` — nommer la règle, l'oracle ou le digest par lequel la correction REDESCEND chez les producteurs, ou déclarer non_mecanisable avec son motif (TF-0757)");
+        }
         if (e.statut === "ecarte" && e.ts >= SEUIL_R7_ECART) {
           const fusion = { ...etat, ...e };
           for (const champ of ["motif_ecart", "decideur", "date_decision"])

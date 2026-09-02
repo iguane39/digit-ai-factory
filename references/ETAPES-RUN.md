@@ -373,3 +373,19 @@ pans mesurés · oracle MEP 5/5 en staging · `DOSSIER-MEP.md` complet · traça
 MVP → tests 100 % · ledger vérifié par `ledger.mjs verify`.
 
 *L'intégrité du ledger ne s'attend plus jusqu'ici* (R-42, TF-0411, 20/08) : `oracle-conformite-projet` la juge à CHAQUE exécution, donc dès le pas 1 — seq continu, horodatages non décroissants, ouverture par `run_open`. Un défaut historique se **rectifie par ajout** (entrée `type: rectification_horodatage` nommant les `seq`, le `ts` consigné, le `ts` réel estimé et la cause) : l'écart reste imprimé en `[RECTIFIÉ]`, jamais effacé. Ce critère de fin de run est donc devenu une garde d'ouverture — un ledger rompu se voit avant d'avoir coûté un run entier.
+
+## 4 bis. L'auteur d'un brief ne juge pas son propre contrat de sortie (TF-0776 — 02/09/2026)
+
+**Le fait.** Vingt-deux critères d'un contrat de sortie rédigés ET vérifiés par la même session ;
+tous vrais, livrable illisible pour son destinataire. Un critère écrit par celui qui va l'exécuter
+décrit ce qu'il sait faire, pas ce que le lecteur attend.
+
+**La règle.** Le contrat de sortie d'un brief est DÉRIVÉ par un agent distinct de l'exécutant
+(sous-agent dédié, ou session distincte), consigné au ledger avec son auteur
+(« contrat_de_sortie » : auteur, fichier, date) ; l'exécution consigne son exécutant. Auteur et
+exécutant identiques = défaut nommé par l'oracle d'état de forge (quality-oracles, TF-0776). Le
+juge de lecture — l'oracle « lecture par un tiers » (TF-0774) — ne reçoit JAMAIS le contrat : il
+lit ce que le destinataire lira, sans brief ni code, et dit ce que la page lui permet de décider.
+
+**Bornes.** Tant que le ledger d'un produit ne porte pas les deux entrées, la règle ne juge pas :
+elle déclare un « non vérifié », jamais un PASS.

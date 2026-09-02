@@ -53,6 +53,17 @@ fonctionnerait — la mise à jour d'une référence git EST un compare-and-swap
 POUSSER pendant l'ingestion, et R-38 réserve le push au GO humain : un outil qui publie sans GO
 pour se protéger d'une collision échangerait un défaut contre une violation.
 
+**Une correction close REDESCEND chez les producteurs, ou elle se rouvre (R12, TF-0757, 02/09).**
+Trois récidives en quatre jours sur un seul projet ont montré que les retours MONTENT au registre
+et ne redescendent pas sous une forme qu'un producteur rencontre au moment où il produit — un
+registre de candidatures n'est pas une redescente. Toute clôture en `corrige` postérieure au
+02/09/2026 15:00 Z porte un champ **`descente`** : `regle` (la règle générique écrite au socle ou au
+gabarit, avec sa référence), `oracle` (le contrôle qui la joue), `digest` (la ligne du référentiel
+hérité par les produits), ou `non_mecanisable` (l'énoncé explicite et son motif). R12 refuse la
+clôture qui n'en porte aucun — et `journaliser.mjs` annule alors l'écriture. *Une correction qui vit
+dans le registre du pilot et nulle part chez le producteur n'est pas câblée* (loi n° 1). Les 600+
+clôtures antérieures restent de la prose : c'est déclaré, pas rattrapé.
+
 **Gouvernance** : tout entre en `candidat` ; seul un mandat humain (« décide TF-xxxx », un lot de
 décisions appliqué par `todo\appliquer-export.mjs` — format `TF-decisions-*.json`, produit
 par l'humain et non plus par la page (TF-0328) — ou un mandat global explicite) passe en `decide` — le décideur

@@ -7,7 +7,26 @@ prouvée à zéro faux positif, et ne voit rien. Le marquage a été vérifié t
 `oracle-synthese` (S1-S8 à l'époque, S1-S33 depuis la v2.15.0) sur une synthèse réelle PASS avant d'être prescrit ici.
 Cette consigne, elle, ne se marque PAS : c'est un référentiel normatif, pas un livrable.
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 2.15.0, 01/09/2026** : **un sélecteur
+Référentiel versionné (loi n° 4, daté-éditable) — **version 2.16.0, 02/09/2026** : **quatre règles
+tirées d'un lot de retours d'un produit, toutes mesurées le même jour sur des restitutions
+réelles** (TF-0766, TF-0775, TF-0779, TF-0767), toutes AVERTISSANTES à leur entrée comme la
+v2.5.0 le prescrit. **S34** — une action `manuelle_utilisateur` ne demande pas à l'humain de
+CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier : c'est un geste d'agent (loi
+n° 5), ce qui reste à l'humain est la VALEUR (une session a demandé de coller un jeton sur une
+ligne « déjà présente » qui n'existait pas). **S35** — une preuve du bloc 4 est une sortie
+exécutée, jamais « préparé », « prêt à coller » ni « voir A-N » (des lignes « préparées »
+inexistantes ont été restituées deux heures plus tard). **S36** — une page HTML citée comme
+livrée porte un verdict de critique d'implémentation (forge-design) dans la restitution, au bloc 9
+ou au bloc 4 : le routage « juger le rendu visuel » est écrit au CLAUDE.md de tout produit, et
+trois livraisons sont parties sans l'invoquer, revues « à l'œil » par la session auteur.
+**S37** — une correction restituée porte son contrôle rouge → vert ou nomme sa classe (une
+hauteur de ligne corrigée en cachant la période, une largeur corrigée pour les tableaux mais pas
+pour la prose : trois symptômes, aucune classe). Et le hook de fin de tour choisit le fichier jugé
+par son NOM parmi les fichiers marqués `destinataire: humain` (Synthese, Restitution) — une analyse
+destinée à l'humain avait été jugée à la place de la restitution du même tour ; le marqueur reste
+le repli, et il est désormais RÉSERVÉ aux restitutions : une analyse, une étude ou un rapport
+destinés à l'humain se marquent par leur propre frontmatter (`role:`), pas par celui-ci. Précédente :
+**2.15.0, 01/09/2026** : **un sélecteur
 NOMME SA FAMILLE**. Une restitution porte DEUX listes numérotées — les décisions du bloc 3, les
 actions du bloc 8 — et rien ne les distinguait : deux suites d'entiers, dans le même message, avec
 la même écriture. Retour humain du 01/09, mot pour mot : « Il y a un problème de numérotation entre
@@ -462,7 +481,9 @@ allonger la ligne d'entrée.
 ### 9. Traces
 
 Les chemins cliquables de ce qui a été produit : livrables, commits, entrées de ledger,
-journaux d'oracles. **Relatifs et vérifiables**, jamais décrits de mémoire.
+journaux d'oracles. **Relatifs et vérifiables**, jamais décrits de mémoire. **Tout livrable HTML
+cité porte, ici ou au bloc 4, le verdict daté de la critique d'implémentation de forge-design**
+(S36, TF-0775) — une page revue « à l'œil » par sa session auteur n'a pas été jugée.
 
 ## Règles de forme transverses
 

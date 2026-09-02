@@ -1,7 +1,8 @@
 {
   "schema": "pilot/heritage@1",
-  "version": "1.6.0",
-  "date": "2026-09-01",
+  "version": "1.7.0",
+  "date": "2026-09-02",
+  "evolution_1_7_0": "TF-0765 (02/09/2026) : le lanceur de hooks (copie identique) connaît un troisième hook, `page-html` — PostToolUse sur Write|Edit, joue les règles de socle d'une page HTML (filtres de tableau L4 / G1-G6) chez le produit au moment où il écrit ; `settings-produit.json` (présence et motif) le câble ; `CLAUDE-PRODUIT.md` porte une section « Règles de socle applicables » remplie à l'ouverture. Les produits dont la copie du lanceur est périmée la reçoivent à leur prochaine ouverture (hook-ouverture, recopie des copies identiques).",
   "regle": "Tout artefact que le pilot COPIE chez un produit se déclare ici avec son mode de contrôle. Un artefact absent de ce référentiel n'est pas jugé par R-47 — l'oubli se voit à la revue, il ne se devine pas.",
   "pourquoi": "Constat du 23/08, deux produits en trois jours. Produit-02 possède un `forge\\retours\\` complet, portant ses lots, et AUCUN gabarit RETOURS-FORGES.md : le dossier a été créé, la copie n'y est jamais arrivée. Produit-05 n'a ni l'un ni l'autre. Résultat mesuré : 15 candidatures refusées à l'ingestion par R-45/R-46 pour une forme que le produit ne pouvait pas connaître, faute d'avoir le gabarit qui la porte. La cause n'était pas une négligence de produit mais une COPIE SANS PREUVE : rien ne vérifiait qu'elle était arrivée, et rien ne vérifie encore qu'elle est à jour. Le contrôle R-43 lui-même ne fait qu'un `existsSync` sur les hooks — un hook périmé passe au vert.",
   "modes": {

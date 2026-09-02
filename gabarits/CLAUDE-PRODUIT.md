@@ -43,6 +43,23 @@ humaine demeure (tout entre en candidat au registre TODO-FORGE).
 
 Boucle intérieure (libre, sans verdict) : `<commandes locales : pytest, ruff, serveur de dev…>`
 
+## Règles de socle applicables — remplies à l'ouverture, selon le type de livrable (TF-0765)
+
+*Pourquoi cette section existe* : un brief a exigé « tri et filtres » sans nommer la règle ni le
+composant du socle, et la console est partie avec un tri maison jugé conforme par ses propres
+oracles — l'humain a dû redemander « comme demandé par la factory ». Une règle que le producteur ne
+rencontre pas au moment où il produit n'existe pas pour lui. À l'ouverture du run, la session
+remplit ce tableau pour chaque type de livrable du produit, et le brief de chaque livrable le cite.
+
+| Type de livrable | Règles de socle qui s'appliquent | Composant / oracle |
+|---|---|---|
+| Page HTML de données (tableau, console, tableau de bord) | `references/BEST-PRACTICES-HTML.md` du pilot § I (pleine largeur, sommaire, alignement, dictionnaire de colonnes, temps structuré) ; L4 filtres de tableau, G1-G6 | composant `table-filters` du skill `digit-ai-page-html` ; `oracle-filtres-tableau.mjs` (joué à chaque écriture d'un `.html` par le hook `page-html`) ; `check_html.py`, `render_page.py` |
+| Page HTML de prose (rapport, fiche, note) | socle `digit-ai-page-html` (charte, tokens, print) ; doctrine documentaire D1-D9 (`gabarits/documents/README.md` du pilot) | `check_html.py`, `render_page.py`, famille de gabarit du catalogue |
+| <autre type de ce produit> | <règles> | <composant / oracle> |
+
+Un type absent de ce tableau n'a pas de règle de socle déclarée : le déclarer « aucune » est une
+décision, l'omettre est un oubli (loi n° 3).
+
 ## Commandes
 
 - Lancer : `<commande>`

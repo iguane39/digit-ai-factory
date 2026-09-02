@@ -141,9 +141,42 @@ if (!args.includes("--sans-readme")) {
   }
 }
 
+// TF-0762 (02/09/2026) — L'HÉRITAGE DES PRODUITS SE LIT À L'OUVERTURE DU PILOT, PAS À L'INGESTION
+// DE LEURS LOTS. Le fait : un produit a appris à l'ingestion de son lot que sept artefacts hérités
+// lui manquaient — dont l'oracle de forme des lots, qu'il aurait voulu jouer AVANT de remettre.
+// « Un avertissement juste, arrivé trop tard, est un avertissement perdu. » Le relevé existe
+// (scripts/relever-heritage.mjs, lecture seule, TF-0626) ; il se joue ici, à chaque ouverture du
+// pilot, et nomme les produits en défaut avec le geste qui les remet à niveau — geste du PRODUIT
+// (son hook d'ouverture recopie les copies identiques) ou geste humain (poser le lanceur quand il
+// n'existe pas). Chez le produit, le même contrôle se joue déjà à SON ouverture (30/08) quand le
+// lanceur est présent ; ce relevé couvre le cas où il ne l'est pas.
+if (iPilot < 0) {
+  const relever = join(PILOT, "scripts", "relever-heritage.mjs");
+  if (existsSync(relever)) {
+    const r = spawnSync(process.execPath, [relever, "--json"], { encoding: "utf8", timeout: 90000 });
+    let j = null;
+    try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* relevé illisible : dit ci-dessous */ }
+    lignes.push("", "## Héritage des produits (R-47, relevé en lecture seule)");
+    if (!j) lignes.push("- relevé ILLISIBLE — le contrôle n'a pas rendu de résultat exploitable ; ce n'est pas un constat sur les produits.");
+    else {
+      const enDefaut = (j.lignes || []).filter((l) => (l.absents || 0) + (l.divergents || 0) + (l.incomplets || 0) > 0);
+      lignes.push(`- ${j.produits} produit(s) relevé(s), ${j.manques} manque(s) — contrat ${j.contrat}`);
+      for (const l of enDefaut.slice(0, 12)) {
+        const lanceur = (l.artefacts || []).find((a) => /hooks\/factory\.mjs$/.test(a.cible || ""));
+        const sansLanceur = lanceur && lanceur.etat === "absent";
+        lignes.push(`  - ${l.produit} : ${l.absents} absent(s), ${l.divergents} divergent(s), ${l.incomplets} incomplet(s) sur ${l.total}` +
+          (sansLanceur ? " — SANS lanceur de hooks : rien ne se remettra à niveau tout seul ; poser gabarits/hooks-factory.mjs et settings-produit.json chez lui (geste humain, R-29)"
+            : " — remis à niveau à sa prochaine ouverture (copies identiques) ; le reste est un geste du produit"));
+      }
+      if (enDefaut.length > 12) lignes.push(`  - … et ${enDefaut.length - 12} autre(s) — détail : node scripts/relever-heritage.mjs --md <fichier>`);
+      if (!enDefaut.length) lignes.push("- tous les produits relevés portent leur héritage à jour");
+    }
+  }
+}
+
 lignes.push("",
   "## Gates actifs dans cette session (R-44)",
-  "- Tout message de fin de tour de TRAVAIL suit gabarits\RESTITUTION.md — bloc 0 + 8 blocs, aucun omis. Bloc 3 : une décision par BLOC DE CITATION, ouverte par son sélecteur `D-N` et une QUESTION, rappel du sujet puis recommandation SOURCÉE, options en tableau `Option | Ce qu'elle coûte | Ce qu'elle exclut` hors citation, ligne de repli « si rien n'est décidé » pour finir. Bloc 8 : UN TABLEAU unique, l'acteur en COLONNE (auto_ia/manuelle_dev/manuelle_utilisateur), trié auto_ia d'abord, chaque action ouverte par son sélecteur `A-N` — les deux familles ne partagent JAMAIS la même numérotation. Effort en complexité × durée, jamais en jours. Le hook Stop le juge par oracle-synthese et REFUSE l'arrêt en cas d'échec.",
+  "- Tout message de fin de tour de TRAVAIL suit gabarits\RESTITUTION.md — bloc 0 + 8 blocs, aucun omis. Bloc 3 : une décision par BLOC DE CITATION, ouverte par son sélecteur `D-N` et une QUESTION, rappel du sujet puis recommandation SOURCÉE, options en tableau `Option | Ce qu'elle coûte | Ce qu'elle exclut` hors citation, ligne de repli « si rien n'est décidé » pour finir. Bloc 8 : UN TABLEAU unique, l'acteur en COLONNE (auto_ia/manuelle_dev/manuelle_utilisateur), trié auto_ia d'abord, chaque action ouverte par son sélecteur `A-N` — les deux familles ne partagent JAMAIS la même numérotation. Effort en complexité × durée, jamais en jours. v2.16.0 (02/09) : aucune action manuelle_utilisateur ne demande à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation ; une correction restituée nomme son contrôle rouge → vert ou sa classe ; le fichier de synthèse se nomme Synthese ou Restitution — le marqueur `destinataire: humain` est réservé aux restitutions. Le hook Stop le juge par oracle-synthese et REFUSE l'arrêt en cas d'échec.",
   "- Les README d'input\\ et output\\ se régénèrent après chaque écriture (hook PostToolUse) ; un rôle non rédigé est un défaut.",
   "- Quand la factory est impliquée, ses règles priment sur celles du projet (R-43).");
 console.log(lignes.join("\n"));

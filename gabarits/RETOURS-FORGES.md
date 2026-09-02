@@ -156,3 +156,15 @@ entrées du backlog comme « vérifiées ». Citer les correctifs concernés.>
 
 1. <le retour au meilleur rapport gain/effort, et pourquoi>
 2. …
+
+## La règle qui aurait évité le retour (TF-0779 — 02/09/2026)
+
+Chaque retour de ce lot qui suit un RETOUR HUMAIN (une correction demandée par le destinataire,
+pas un défaut trouvé par un oracle) nomme, dans sa colonne « Proposition esquissée », **la règle
+qui aurait évité ce retour** — une règle existante du socle, d'un gabarit ou d'un oracle, citée
+par sa référence — ou déclare qu'aucune règle ne le couvre, ce qui déclenche la règle § 4 de
+quality-oracles (domaine sans oracle → en définir un). *Pourquoi* : une correction après retour
+humain traite le symptôme (la hauteur d'une ligne, la largeur d'un tableau) ; nommer la règle
+force à traiter la CLASSE, et un lot qui ne peut nommer aucune règle dit exactement où le socle
+a un trou. Contrôle côté restitution : une puce « corrigé » sans contrôle rouge → vert couvrant
+la classe est signalée (oracle-synthese, TF-0779).

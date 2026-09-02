@@ -68,6 +68,11 @@
  *       « D5 », « Décision 5 — ». DURCIE LE 01/09 : le numéro NU (« 5. », « 5) ») n'est plus
  *       admis, il ne dit pas à quelle des deux listes numérotées du message il appartient.
  *   S33 toute action du bloc 8 porte un SÉLECTEUR « A-N » distinct (01/09) — symétrique de S30
+ *   S34 une action manuelle_utilisateur ne demande pas à l'humain de CRÉER/AJOUTER/ÉCRIRE une ligne, une
+ *       variable ou un fichier — geste d'agent, loi n° 5 (02/09, TF-0766) ;
+ *   S35 une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » (02/09, TF-0766) ;
+ *   S36 une page HTML citée comme livrée porte un verdict de critique d'implémentation (02/09, TF-0775) ;
+ *   S37 une correction restituée porte son contrôle rouge → vert ou nomme sa classe (02/09, TF-0779) ;
  *       et né du même retour : « le 3 était pour les prochaines actions ». Deux familles
  *       numérotées pareil ne se désignent pas ; le sélecteur nomme la sienne.
  *   S31 chaque OPTION du bloc 3 porte son COÛT et CE QU'ELLE EXCLUT (30/08) — exigence écrite
@@ -680,6 +685,60 @@ function juger(texte) {
         ok("S33", `${actions33.length} action(s), chacune désignée et distincte (${poses.map((n) => `A-${n}`).join(", ")})`);
       }
     }
+  }
+
+  // ---- S34 à S37 (02/09/2026, lots du produit 02 — TF-0766, TF-0775, TF-0779) ------------------
+  //
+  // S34 — UNE ACTION LAISSÉE À L'HUMAIN NE LUI DEMANDE PAS D'ÉCRIRE À LA PLACE DE L'IA. Le fait :
+  // une session a demandé de « coller un jeton sur la ligne GITHUB_JETON= déjà présente », ligne qui
+  // n'existait pas ; deux heures plus tard une restitution annonçait des lignes « préparées »
+  // inexistantes. Créer une ligne, ajouter une variable, écrire dans un fichier est un geste d'agent
+  // (loi transverse n° 5 : la voie automatisée est le défaut) ; ce qui reste à l'humain est la
+  // VALEUR secrète, jamais l'écriture. Les mots du geste d'écriture dans une action
+  // manuelle_utilisateur sont donc un défaut — sauf si la ligne porte un motif `acces` prouvé (S21).
+  {
+    const bActions = bloc(texte, BLOCS[7][0]) || "";
+    const humaines = puces(bActions).concat(bActions.split("\n").filter((l) => /^\s*\|/.test(l)))
+      .filter((l) => /\bmanuelle_utilisateur\b/.test(l));
+    const ECRITURE = /\b(cr[ée]er|ajouter|[ée]crire dans|coller|ins[ée]rer|renseigner)\b[^.;|]{0,60}\b(ligne|variable|fichier|cl[ée]|entr[ée]e|section)\b/i;
+    const fautives = humaines.filter((l) => ECRITURE.test(l) && !/\bacces\b/.test(l));
+    fautives.length
+      ? ko("S34", `${fautives.length} action(s) manuelle_utilisateur demandent à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier — c'est un geste d'agent (loi n° 5) ; ce qui lui reste est la valeur, jamais l'écriture : « ${fautives[0].trim().slice(0, 90)} »`)
+      : ok("S34", "aucune action humaine ne demande un geste d'écriture que l'IA peut faire");
+  }
+  // S35 — UNE PREUVE DU BLOC 4 EST UNE SORTIE EXÉCUTÉE, JAMAIS UN RENVOI À UNE ACTION. « Préparé »,
+  // « prêt à coller », « voir A-2 » ne prouvent rien : ils annoncent. Le fait du 02/09 : des lignes
+  // « préparées » qui n'existaient pas, annoncées au bloc 4 d'une restitution.
+  {
+    const bTraite = bloc(texte, BLOCS[3][0]) || "";
+    const renvois = puces(bTraite).filter((l) => /(pr[ée]par[ée]e?s?\b|pr[êe]te?s? [àa] (coller|poser|copier)|\bvoir A-\d+)/i.test(l) && !_JETONS.test(l));
+    renvois.length
+      ? ko("S35", `${renvois.length} puce(s) du bloc 4 ne PROUVENT pas, elles ANNONCENT (« préparé », « voir A-N ») — une preuve est une sortie exécutée, un verdict, un compteur : « ${renvois[0].trim().slice(0, 90)} »`)
+      : ok("S35", "aucune puce du bloc 4 ne remplace sa preuve par un renvoi à une action");
+  }
+  // S36 — UN LIVRABLE HTML RESTITUÉ PORTE LE VERDICT DE LA CRITIQUE D'IMPLÉMENTATION. Le routage
+  // « juger le rendu visuel → critique-le-design » est écrit au CLAUDE.md de tout produit ; trois
+  // livraisons du 02/09 sont parties sans l'invoquer, revues « à l'œil » par la session auteur. Une
+  // restitution qui cite une page .html livrée (hors fixture, gabarit, boilerplate) et ne porte
+  // aucun verdict de critique d'implémentation est en défaut.
+  {
+    const zones = [bloc(texte, BLOCS[3][0]) || "", bloc(texte, /(^|\n)#{1,4}\s*9[.)]?\s*traces?/i) || ""].join("\n");
+    const pagesLivrees = (zones.match(/[\w\-. \/\\]+\.html?\b/gi) || []).filter((p) => !/fixture|gabarit|boilerplate|template|temoin|\.oracles/i.test(p));
+    const verdict = /(critique-le-design|critique d'impl[ée]mentation|revue graphique|revue visuelle|verdict design)/i.test(texte);
+    pagesLivrees.length && !verdict
+      ? ko("S36", `${pagesLivrees.length} page(s) HTML citée(s) comme livrées sans AUCUN verdict de critique d'implémentation (forge-design) dans la restitution — le routage « juger le rendu visuel » n'a pas été joué : ${pagesLivrees.slice(0, 2).join(", ")}`)
+      : ok("S36", pagesLivrees.length ? "les pages HTML livrées portent un verdict de critique d'implémentation" : "aucune page HTML livrée citée");
+  }
+  // S37 — UNE CORRECTION SE RESTITUE AVEC SON CONTRÔLE ROUGE → VERT, SUR LA CLASSE. Le fait du
+  // 02/09 : hauteur de ligne corrigée en cachant la période, largeur corrigée pour les tableaux
+  // mais pas pour la prose, débordement reclassé acceptable — trois symptômes, aucune classe.
+  {
+    const bTraite = bloc(texte, BLOCS[3][0]) || "";
+    const corrections = puces(bTraite).filter((l) => /\bcorrig[ée]/i.test(l));
+    const sansClasse = corrections.filter((l) => !/(rouge|vert|fixture|recette|classe|self-test|banc|double sens|\d+\s*\/\s*\d+)/i.test(l));
+    sansClasse.length
+      ? ko("S37", `${sansClasse.length} correction(s) restituée(s) sans contrôle rouge → vert ni classe nommée — une correction après retour humain traite le symptôme, jamais la classe : « ${sansClasse[0].trim().slice(0, 90)} »`)
+      : ok("S37", corrections.length ? "chaque correction restituée porte son contrôle rouge → vert ou nomme sa classe" : "aucune correction restituée");
   }
 
   // ---- S21 (TF-0526, 23/08) — « acces » et « presence » se PROUVENT, ils ne s'affirment pas ---
@@ -1580,7 +1639,7 @@ Aucun écart : la demande a été suivie à la lettre.
       // déjà été levée deux fois le jour même. La ligne porte tout le reste (acteur, motif,
       // localisateur, conséquence) : seule la TRACE manque, et c'est cela seul que S21 juge.
       "- enfin ouvrir le portail (manuelle_utilisateur) — pourquoi pas l'IA : acces, le portail n'est pas ouvert a l'agent ; ou : `portail.html` ; si rien n'est fait : rien ne sort.\n" +
-      "\n| id | acteur | action |\n|---|---|---|\n| A1 | manuelle_utilisateur | ouvrir le portail |\n" +
+      "\n| id | acteur | action |\n|---|---|---|\n| A1 | manuelle_utilisateur | ouvrir le portail |\n| A2 | manuelle_utilisateur | créer la ligne GITHUB_JETON= dans le fichier .env et y coller le jeton |\n" +
       "\n| acteur | quoi |\n|---|---|\n| auto_ia | regrouper les constats |\n")
     .replace(/\n\nLe contrôle complet[\s\S]*?ci-dessous\./, "")  // S9 : plus d ouverture
     .replace("terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot.", "terminée aujourd'hui.")
@@ -1594,7 +1653,7 @@ Aucun écart : la demande a été suivie à la lettre.
     // absence). La phrase est ajoutée au bloc 7 pour ne pas perturber les règles du bloc 8.
     // S23 : le designateur employe plusieurs fois et JAMAIS glose — la forme exacte du 24/08,
     // ou le lecteur a repondu « rien compris a V1, V3, V4, de quoi parle-t-on ? ».
-    .replace("## 4. Traité", "## 4. Traité\n\n- Les controles V1 et V3 sont tenus ; V1 reste le plus couteux. — preuve : 4 cas.")
+    .replace("## 4. Traité", "## 4. Traité\n\n- Les controles V1 et V3 sont tenus ; V1 reste le plus couteux. — preuve : 4 cas.\n- Jeton préparé sur la ligne prévue — voir A-2.\n- Page console.html livrée — preuve : check_html PASS, 21 règles.\n- Hauteur de ligne corrigée en cachant la période.")
     // S24 : l'absence conclue d'une recherche PAR NOM — la forme exacte du 24/08, dix motifs de nom
     // de table joués sur trois schémas, et la correspondance qui vivait dans les COLONNES.
     // S27 : une IDENTITÉ affirmée depuis une MÉTADONNÉE — la forme exacte du 25/08, deux logos de
@@ -1709,7 +1768,7 @@ Aucun écart : la demande a été suivie à la lettre.
   if (rr.status !== 1) casse.push("la fixture ROUGE ne FAIL pas");
   else {
     for (const regle of ["S2", "S3", "S5", "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16",
-                         "S17", "S18", "S19", "S20", "S21", "S22", "S23", "S24", "S25", "S26", "S27", "S28", "S30", "S33"]) {
+                         "S17", "S18", "S19", "S20", "S21", "S22", "S23", "S24", "S25", "S26", "S27", "S28", "S30", "S33", "S34", "S35", "S36", "S37"]) {
       if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
     }
   }
