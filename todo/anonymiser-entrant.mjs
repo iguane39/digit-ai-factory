@@ -96,6 +96,21 @@ function lireClients() {
   return { table, sigles };
 }
 
+/**
+ * Les VARIANTES de graphie d'un nom de produit, en une expression (TF-0742) : mots de la clé
+ * séparés par rien, une espace, un tiret ou un souligné, en toute casse, bornés par des
+ * non-alphanumériques. `null` quand la clé n'a qu'un mot (rien à dériver, et un mot seul en
+ * toute casse mordrait sur de la prose) ou porte un point (graphie de domaine, prise telle quelle).
+ */
+export function variantes(nom) {
+  if (typeof nom !== "string" || nom.includes(".")) return null;
+  const mots = nom.replace(/([a-z0-9])([A-Z])/g, "$1 $2").replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
+    .split(/[\s\-_]+/).filter(Boolean);
+  if (mots.length < 2 || mots.join("").length < 8) return null;
+  const corps = mots.map((m) => m.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("[\\s\\-_]*");
+  return new RegExp(`(?<![A-Za-z0-9])${corps}(?![A-Za-z0-9])`, "gi");
+}
+
 function lireProduits() {
   const p = CHEMIN_PRODUITS();
   if (!existsSync(p)) return null;
@@ -108,6 +123,16 @@ export function pseudoProduit(nom) {
   const d = lireProduits();
   if (!d) return null;
   d.produits = d.produits || {};
+  // UN NOM QUI EST DÉJÀ UN PSEUDONYME NE S'INSCRIT PAS (02/09/2026, payé en ingérant un lot
+  // anonymisé sur disque avant son ingestion) : « Produit-12 » lu dans le nom du lot était
+  // inconnu comme CLÉ, donc inscrit comme produit neuf → « Produit-13 », et l'anonymiseur a
+  // ensuite substitué Produit-12 par Produit-13 dans dix candidatures. Une table qui pseudonymise
+  // ses propres pseudonymes tourne en rond, et chaque tour décale tout le parc d'un cran.
+  if (Object.values(d.produits).includes(nom) || /^Produit-\d{2,}$/.test(nom)) return nom;
+  // UN NOM TROP COURT NE S'INSCRIT PAS NON PLUS (02/09, second cas payé le même jour) : « PROD »,
+  // nom de fixture d'une recette non isolée, inscrit comme produit — et une clé de quatre lettres
+  // substituée par inclusion réécrit « PRODUCTION » en « Produit-13UCTION ». Le refus est dit.
+  if (nom.length < 5) { console.error(`[ANONYMISÉ] « ${nom} » n'est pas inscrit : un nom de produit fait au moins 5 caractères (une clé courte mordrait sur les mots qui la contiennent)`); return null; }
   if (!d.produits[nom]) {
     const n = Object.keys(d.produits).length + 1;
     d.produits[nom] = `Produit-${String(n).padStart(2, "0")}`;
@@ -135,6 +160,15 @@ export function anonymiser(texte) {
   // client (`Produit-04`). Substituer le client en premier casserait la clé du produit.
   for (const [nom, pseudo] of Object.entries(produits.produits || {})) {
     if (out.includes(nom)) { out = out.split(nom).join(pseudo); remplaces.push(nom); }
+    // TF-0742 (02/09/2026) : UNE table qui n'énumère qu'une graphie ne protège que cette graphie.
+    // Mesuré le 01/09 : la clé concaténée était substituée, la forme ESPACÉE du même nom — écrite
+    // en toutes lettres dans le titre et le contenu — traversait, et deux occurrences sont entrées
+    // au registre suivi pendant que l'outil affichait « [ANONYMISÉ] ». Les variantes se DÉRIVENT
+    // donc de la clé : ses mots (frontières de casse, tirets, soulignés) peuvent être séparés par
+    // rien, une espace, un tiret ou un souligné, en toute casse. Une clé qui porte un point est une
+    // graphie de domaine et se prend telle quelle : la dériver attraperait des liens légitimes.
+    const re = variantes(nom);
+    if (re && re.test(out)) { out = out.replace(re, pseudo); remplaces.push(nom); }
   }
   for (const [de, vers] of clients.table) {
     if (out.includes(de)) { out = out.split(de).join(vers); remplaces.push(de); }
@@ -204,6 +238,24 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
   if (!p1 || p1 !== p2) casse.push(`le pseudonyme d'un produit n'est pas stable : ${p1} puis ${p2}`);
   if (p1 === "Produit-01") casse.push("un produit neuf réutilise le pseudonyme d'un autre");
 
+  // 2 bis) TF-0742 — les VARIANTES de graphie d'un produit sont substituées : forme espacée en
+  //        toute casse, tirets, soulignés ; et le second sens : un mot seul de la clé ne bouge pas
+  const r2b = anonymiser("Le site Calculatrice zorglub scc, dit calculatrice-Zorglub-SCC ou calculatrice_zorglub_scc, est en ligne.");
+  if (/calculatrice[\s\-_]*zorglub[\s\-_]*scc/i.test(r2b.texte)) casse.push("une graphie espacée, tiretée ou soulignée du produit traverse : " + r2b.texte);
+  if ((r2b.texte.match(/Produit-01/g) || []).length !== 3) casse.push("les trois graphies ne sont pas toutes remplacées par le pseudonyme : " + r2b.texte);
+  const r2c = anonymiser("Une calculatrice ordinaire et le mot SCC seul ne sont pas des produits.");
+  if (r2c.texte.includes("Produit-01")) casse.push("un mot isolé de la clé est pris pour le produit : " + r2c.texte);
+  // (nom de domaine INVENTÉ : une clé réelle écrite ici serait réécrite par la passe d'anonymisation
+  //  — c'est arrivé le 02/09, et le banc s'est mis à tester autre chose que ce qu'il croyait)
+  if (variantes("Zorglub-ai.fr") !== null) casse.push("une clé de domaine (avec un point) se voit dériver des variantes — elle doit être prise telle quelle");
+
+  // 3 bis) un nom qui EST déjà un pseudonyme n'est jamais réinscrit ni décalé (02/09)
+  const p3 = pseudoProduit("Produit-01");
+  if (p3 !== "Produit-01") casse.push(`un pseudonyme réinscrit comme produit neuf : Produit-01 → ${p3}`);
+  if (Object.keys(JSON.parse(readFileSync(process.env.FORGE_PRODUITS_PSEUDO, "utf8")).produits).includes("Produit-01"))
+    casse.push("la table porte un pseudonyme comme CLÉ — elle pseudonymise ses propres pseudonymes");
+  if (anonymiser("lot de Produit-01").texte !== "lot de Produit-01") casse.push("un texte déjà anonymisé est réécrit");
+
   // 4) référentiel ABSENT → refus, jamais un passage silencieux
   process.env.FORGE_NOMS_INTERDITS = join(dir, "absent.json");
   let refuse = false;
@@ -211,6 +263,6 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
   if (!refuse) casse.push("référentiel absent et le texte passe quand même — le convoi n'est pas arrêté");
 
   for (const m of casse) console.log("  [FAIL] " + m);
-  console.log(`\nSelf-test anonymiseur d'entrants : ${4 - casse.length}/4 cas, ${casse.length} FAIL`);
+  console.log(`\nSelf-test anonymiseur d'entrants : ${6 - casse.length}/6 cas, ${casse.length} FAIL`);
   process.exit(casse.length ? 1 : 0);
 }

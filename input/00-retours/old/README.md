@@ -66,7 +66,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-01 - RETOURS - 20260824d.tf.jsonl` | fichier | 8,9 Ko | 3 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20260815a.md` | fichier | 6,8 Ko | Retours de run — audit SEO Produit-02.fr, 15/08/2026 |
 | `Produit-02 - RETOURS - 20260815a.tf.jsonl` | fichier | 6,9 Ko | 7 ligne(s) JSONL |
-| `Produit-02 - RETOURS - 20260823a.md` | fichier | 11,5 Ko | Retours forges — retrait du domaine breton & audit forge-tests — 20260823a |
+| `Produit-02 - RETOURS - 20260823a.md` | fichier | 11,4 Ko | Retours forges — retrait du domaine breton & audit forge-tests — 20260823a |
 | `Produit-02 - RETOURS - 20260823a.tf.jsonl` | fichier | 10,0 Ko | 6 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20260823b.md` | fichier | 4,5 Ko | Retours forges — complément au lot 20260823a : localisation du correctif — 20260823b |
 | `Produit-02 - RETOURS - 20260823b.tf.jsonl` | fichier | 3,8 Ko | 2 ligne(s) JSONL |
@@ -74,12 +74,12 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-02 - RETOURS - 20260823c.tf.jsonl` | fichier | 7,5 Ko | 4 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20260824a.md` | fichier | 8,3 Ko | Retours forges — un texte illisible en production, et l'oracle qui ne pouvait pas le voir  |
 | `Produit-02 - RETOURS - 20260824a.tf.jsonl` | fichier | 6,1 Ko | 4 ligne(s) JSONL |
-| `Produit-02 - RETOURS - 20260824b.md` | fichier | 7,6 Ko | Retours forges — sept hostnames sur huit injoignables en HTTPS, et personne ne le mesurait |
+| `Produit-02 - RETOURS - 20260824b.md` | fichier | 7,5 Ko | Retours forges — sept hostnames sur huit injoignables en HTTPS, et personne ne le mesurait |
 | `Produit-02 - RETOURS - 20260824b.tf.jsonl` | fichier | 5,1 Ko | 3 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20260824c.md` | fichier | 5,5 Ko | Retours forges — préparer le réceptacle d'un secret plutôt que le décrire en prose — 20260 |
 | `Produit-02 - RETOURS - 20260824c.tf.jsonl` | fichier | 3,2 Ko | 2 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20260825a.md` | fichier | 10,7 Ko | Retours forges — contrats d'intégration OVH et Cloudflare, établis par la pratique — 20260 |
-| `Produit-02 - RETOURS - 20260825a.tf.jsonl` | fichier | 11,1 Ko | 6 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20260825a.tf.jsonl` | fichier | 11,0 Ko | 6 ligne(s) JSONL |
 | `Produit-03 - RETOURS - 20260821a.md` | fichier | 7,6 Ko | Retours forges — Bibliothèque vidéo IA Enseigne-A — 20260821a |
 | `Produit-03 - RETOURS - 20260821a.tf.jsonl` | fichier | 8,1 Ko | 4 ligne(s) JSONL |
 | `Produit-03 - RETOURS - 20260821b.md` | fichier | 3,2 Ko | Retours forges — Bibliothèque vidéo IA Enseigne-A — 20260821b |

@@ -106,6 +106,26 @@ invisible par construction (B3). Un sidecar brut au format produit est couvert p
 `.normalise.tf.jsonl` ingéré, et `old\` reste hors périmètre : le canal d'échappement
 documenté plus haut n'est pas un défaut.
 
+**Un lot reçu sous un nom interdit se NETTOIE SUR DISQUE avant d'entrer, et une empreinte qui
+change par anonymisation se RE-CONSIGNE avec sa preuve (02/09).** Le lendemain de la passe
+d'anonymisation du 01/09 (D-37), la boîte rendait 23 constats B2 et 5 constats B1 pour ZÉRO
+édition : l'empreinte consignée était celle du fichier d'avant la passe. Trois pièces ferment ce
+trou. (1) `node todo\anonymiser-suivis.mjs --fichiers <chemin>…` nettoie une liste EXPLICITE,
+suivie ou non par git — c'est la voie d'un lot reçu avec un nom de client : contenu et nom
+réécrits sur disque avant `ingerer-lot`, l'original restant chez le produit ; le pilot n'ajoute
+jamais un lot brut au suivi. (2) `node todo\reempreinter-lot.mjs <sidecar>` consigne la nouvelle
+empreinte d'un sidecar déjà ingéré SEULEMENT s'il PROUVE que le contenu courant est la forme
+anonymisée du contenu ingéré : version retrouvée dans l'historique git (renommages compris), copie
+d'avant fournie par `--avant`, ou `--par-rapprochement` (titres du sidecar = créations consignées,
+en nombre égal) — tout le reste est REFUSÉ comme édition. L'événement est une `ingestion` sans
+`creations` portant un bloc `reempreinte` (empreinte d'avant, motif, preuve). `anonymiser-suivis`
+l'appelle lui-même sur chaque sidecar qu'il réécrit : celui qui change un contenu est le seul à
+tenir la preuve. (3) Deux lots d'un même produit remis le même jour sous le même indice par deux
+sessions se **réindexent** à la réception (indice suivant libre, note en tête du `.md`, source du
+sidecar suivie) : deux lots sous un même nom ne s'ordonnent pas — classe TF-0750, transposée aux
+lots. Recettes : `todo\reempreinter-lot.test.mjs` (12 cas), `todo\ingerer-anonymise-fichier.test.mjs`
+(l'événement d'ingestion passe par la même substitution que la candidature — RT-11 du Produit-12).
+
 **La propagation d'une correction se MESURE, elle ne se souhaite pas (TF-0689, 01/09).** Le
 champ `produits_beneficiaires` est de la prose — 73 items clos en portaient au 27/08, aucun
 n'était opposable à personne, et un produit nommé bénéficiaire a livré DEUX FOIS sans le

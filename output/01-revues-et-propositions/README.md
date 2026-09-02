@@ -24,6 +24,6 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Revue D8 - Restitutions du 15-08 - 20260815a.md` | fichier | 3,7 Ko | Revue D8 « Lecture de données » — les trois restitutions migrées du 15/08 |
 | `Digit-AI - Revue Forge - Écosystème - 20260808a.md` | fichier | 11,2 Ko | Digit-AI — Revue stratégique de l'écosystème forge — 2026-08-08 |
 | `Digit-AI - Revue Forge - Écosystème - 20260819a.md` | fichier | 6,0 Ko | Digit-AI — Revue Forge — Écosystème — 20260819a |
-| `Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md` | fichier | 7,0 Ko | Proposition — Refonte du rapport d'audit SEO d'Produit-02.com |
+| `Produit-02 - Proposition Refonte - Rapport SEO - 20260815a.md` | fichier | 6,9 Ko | Proposition — Refonte du rapport d'audit SEO d'Produit-02.com |
 
 _8 fichier(s), 1 sous-dossier(s)_
