@@ -53,6 +53,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Toute la todo avec le a - 20260815a.md` | fichier | 5,5 Ko | Synthèse de mandat — « fais toute la todo avec le a » (21 items, 4 campagnes, 1 circuit) |
 | `Digit-AI - Synthese Mandat - Traite les todo et retours - 20260815a.md` | fichier | 4,4 Ko | Synthèse de mandat — « traite les todo et retours » (14 items, 3 campagnes) |
 | `Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md` | fichier | 6,1 Ko | Synthèse de mandat — « traite les TODOs à faire » (8 items, 4 campagnes + doctrine) |
+| `Digit-AI - Synthese Mandat - Traite les todos et les retours - 20260902b.md` | fichier | 24,5 Ko | Synthèse de mandat — trente candidatures décidées, trente et une clôtures qui REDESCENDENT |
 | `Digit-AI - Synthese Mandat - Traite les todos et retours - 20260830a.md` | fichier | 17,8 Ko | Synthèse de mandat — « Traite les todos et retours » (30/08/2026) |
 | `Digit-AI - Synthese Mandat - Traite retours et todos - 20260817a.md` | fichier | 6,3 Ko | Synthèse de mandat — « traite tous les retours et tous les todos » (8 items, 3 campagnes) |
 | `Digit-AI - Synthese Mandat - Traite todos et retours - 20260822b.md` | fichier | 16,8 Ko | Digit-AI — Synthèse de mandat — Traite tous les todos et retours — 20260822b |
@@ -64,4 +65,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Verification de non perte jouable - 20260901d.md` | fichier | 9,0 Ko | Synthèse de mandat — le tri reste éteint, et sa vérification cesse d'être une intention |
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 
-_47 fichier(s), 0 sous-dossier(s)_
+_48 fichier(s), 0 sous-dossier(s)_

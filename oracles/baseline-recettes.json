@@ -30,6 +30,10 @@
   "cas": 14,
   "vu_le": "2026-08-26"
  },
+ "hook-page-html.mjs": {
+  "cas": 7,
+  "vu_le": "2026-09-02"
+ },
  "hook-produits-intacts.mjs": {
   "cas": 14,
   "vu_le": "2026-08-31"
@@ -207,12 +211,16 @@
   "vu_le": "2026-08-26"
  },
  "oracle-verdict-visuel.mjs": {
-  "cas": 7,
-  "vu_le": "2026-08-26"
+  "cas": 9,
+  "vu_le": "2026-09-02"
  },
  "oracles/familles-numerotees.test.mjs": {
   "cas": 6,
   "vu_le": "2026-08-27"
+ },
+ "oracles/hook-restitution-selection.test.mjs": {
+  "cas": 4,
+  "vu_le": "2026-09-02"
  },
  "oracles/hook-restitution.test.mjs": {
   "cas": 7,
@@ -343,7 +351,7 @@
   "vu_le": "2026-08-26"
  },
  "todo/self-test.mjs": {
-  "cas": 48,
-  "vu_le": "2026-08-26"
+  "cas": 50,
+  "vu_le": "2026-09-02"
  }
 }

@@ -150,17 +150,17 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-11 - RETOURS - 20260814c.md` | fichier | 5,7 Ko | Retours forges — Produit-11 — 20260814c |
 | `Produit-11 - RETOURS - 20260814c.normalise.tf.jsonl` | fichier | 3,7 Ko | 3 ligne(s) JSONL |
 | `Produit-11 - RETOURS - 20260814c.tf.jsonl` | fichier | 2,4 Ko | 3 ligne(s) JSONL |
-| `Produit-11 - RETOURS - 20260817a.md` | fichier | 7,8 Ko | Retours forges — Produit-11 — 20260817a |
+| `Produit-11 - RETOURS - 20260817a.md` | fichier | 7,9 Ko | Retours forges — Produit-11 — 20260817a |
 | `Produit-11 - RETOURS - 20260817a.tf.jsonl` | fichier | 5,4 Ko | 3 ligne(s) JSONL |
 | `Produit-11 - RETOURS - 20260817b.md` | fichier | 6,1 Ko | Retours forges — Produit-11 — 20260817b |
 | `Produit-11 - RETOURS - 20260817b.tf.jsonl` | fichier | 4,3 Ko | 2 ligne(s) JSONL |
 | `Produit-11 - RETOURS - 20260818a.md` | fichier | 14,5 Ko | Retours forges — Produit-11 — 20260818a |
 | `Produit-11 - RETOURS - 20260818a.tf.jsonl` | fichier | 12,1 Ko | 5 ligne(s) JSONL |
-| `Produit-11 - RETOURS - 20260824a.md` | fichier | 9,2 Ko | Retours forges — Produit-11 — 20260824a |
+| `Produit-11 - RETOURS - 20260824a.md` | fichier | 9,3 Ko | Retours forges — Produit-11 — 20260824a |
 | `Produit-11 - RETOURS - 20260824a.tf.jsonl` | fichier | 6,0 Ko | 3 ligne(s) JSONL |
 | `Produit-11 - RETOURS - 20260825a.md` | fichier | 7,7 Ko | Retours forges — Produit-11 — 20260825a |
 | `Produit-11 - RETOURS - 20260825a.tf.jsonl` | fichier | 4,4 Ko | 2 ligne(s) JSONL |
-| `Produit-11 - RETOURS - 20260825b.md` | fichier | 7,1 Ko | Retours forges — Produit-11 — 20260825b |
+| `Produit-11 - RETOURS - 20260825b.md` | fichier | 7,2 Ko | Retours forges — Produit-11 — 20260825b |
 | `Produit-11 - RETOURS - 20260825b.tf.jsonl` | fichier | 4,2 Ko | 2 ligne(s) JSONL |
 | `RETOURS-FORGES-02.md` | fichier | 15,8 Ko | Retours du run `Produit-12-20260805a` — à remettre au steering |
 | `RETOURS-FORGES-03.md` | fichier | 5,1 Ko | Retours forges — lot 03 (2026-08-06) |
