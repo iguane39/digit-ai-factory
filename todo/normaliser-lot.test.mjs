@@ -17,6 +17,17 @@ import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
+
+// ISOLATION DES TABLES D'ANONYMISATION (02/09/2026) : une recette qui joue l'ingesteur sans les
+// isoler INSCRIT ses noms de fixture dans la table REELLE des pseudonymes du parc (« PROD » et
+// 24 chemins Temp… y sont entrés ainsi). Tables jetables, donc, comme pour tout ce qui écrit.
+{
+  const _d = mkdtempSync(join(tmpdir(), "tables-anon-"));
+  writeFileSync(join(_d, "_noms-interdits.json"), JSON.stringify({ noms: ["Zorglub"], identifiants: [], sigles: [], pseudonymes: { Zorglub: "Client-A" } }), "utf8");
+  writeFileSync(join(_d, "_produits-pseudonymes.json"), JSON.stringify({ produits: {} }), "utf8");
+  process.env.FORGE_NOMS_INTERDITS = join(_d, "_noms-interdits.json");
+  process.env.FORGE_PRODUITS_PSEUDO = join(_d, "_produits-pseudonymes.json");
+}
 const OUTIL = join(ICI, "normaliser-lot.mjs");
 let pass = 0, fail = 0;
 const check = (nom, fn) => {
@@ -63,6 +74,30 @@ try {
     const [l] = r.lignes;
     att(l.source === complet.source, "une source présente a été réécrite");
     att(l.forges_cibles_initiales[0] === "digit-ai-forge-tests", "une cible présente a été réécrite");
+  });
+
+  check("hybride — schema:1 portant « origine »/« date » mais NI demandeur NI date_demande : COMPLÉTÉ", () => {
+    const r = jouer([{ schema: 1, titre: "une demande d'étude", contenu: "le brief",
+      origine: "MonProduit", date: "2026-08-31", forges_cibles_initiales: ["digit-ai-factory"] }]);
+    att(r.code === 0, `exit ${r.code} : ${r.sortie.slice(0, 300)}`);
+    const [l] = r.lignes;
+    att(l.demandeur === "MonProduit", `demandeur « ${l.demandeur} » — l'origine déclarée ne descend pas`);
+    att(l.date_demande === "2026-08-31", `date_demande « ${l.date_demande} » — la date déclarée ne descend pas`);
+  });
+
+  check("hybride — « ts » horodaté vaut date_demande, tronqué au jour", () => {
+    const r = jouer([{ schema: 1, titre: "une demande", contenu: "le brief", demandeur: "P",
+      ts: "2026-08-31T11:41:11.397Z", forges_cibles_initiales: ["digit-ai-factory"] }]);
+    att(r.code === 0, `exit ${r.code} : ${r.sortie.slice(0, 300)}`);
+    att(r.lignes[0].date_demande === "2026-08-31", `date_demande « ${r.lignes[0].date_demande} »`);
+  });
+
+  check("rouge — schema:1 sans demandeur NI origine : REFUS motivé, aucun « produit non nommé » inventé", () => {
+    const r = jouer([{ schema: 1, titre: "une demande", contenu: "le brief", date: "2026-08-31",
+      forges_cibles_initiales: ["digit-ai-factory"] }]);
+    att(r.code === 1, `exit ${r.code} attendu 1 — un demandeur a été inventé`);
+    att(/demandeur/.test(r.sortie), "le refus ne nomme pas le champ manquant");
+    att(r.lignes === null, "un dérivé a été écrit malgré le refus");
   });
 
   check("rouge — destinataire INCONNU de la table : REFUS motivé, rien n'est écrit", () => {

@@ -77,6 +77,31 @@ lignes.forEach((ligne, i) => {
       s.source = `lot ${basename(source)}${s.origine ? ` (produit ${s.origine})` : ""}` +
         " · [dérivé par normaliser-lot : champ source absent du sidecar]";
     }
+    // `demandeur` / `date_demande` — MÊME DÉFAUT, AUTRE PORTE (mesuré le 01/09/2026). La
+    // branche produit historique dérivait déjà l'un d'`origine` et l'autre de `ts` ; la branche
+    // hybride, elle, ne dérivait que `source`. Une demande d'étude réelle portait `origine` et
+    // `date` — le normalisateur rendait [OK], l'ingesteur strict rejetait sur deux champs que le
+    // sidecar CONTENAIT sous un autre nom. On dérive donc les deux, et on REFUSE quand la matière
+    // manque : inventer « produit non nommé » ou la date du jour ferait entrer au registre une
+    // valeur que personne n'a déclarée, dans les deux champs qui servent à retrouver l'émetteur.
+    if (!s.demandeur) {
+      const declaree = String(s.origine || s.produit || "").trim();
+      if (!declaree) {
+        refus.push(`ligne ${i + 1} : champ demandeur absent, et aucune origine déclarée dont le dériver — ` +
+          "un demandeur ne se devine pas ; ajouter `demandeur` ou `origine` au sidecar");
+        return;
+      }
+      s.demandeur = declaree;
+    }
+    if (!s.date_demande) {
+      const jour = String(s.date || s.ts || "").slice(0, 10);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(jour)) {
+        refus.push(`ligne ${i + 1} : champ date_demande absent, et ni date ni ts exploitable — ` +
+          "la date d'une demande ne se remplace pas par celle du jour, elle se déclare");
+        return;
+      }
+      s.date_demande = jour;
+    }
     if ((!Array.isArray(s.forges_cibles_initiales) || !s.forges_cibles_initiales.length)
         && !s.forge_cible && !s.forges_cibles && !s.cible && s.destinataire) {
       const d = String(s.destinataire).trim().toLowerCase();
