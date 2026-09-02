@@ -214,6 +214,14 @@ existsSync(p("forge", "QUESTIONS.md"))
 
 // R-4 — nommage daté des livrables (output/ et docs/ ; input/ non jugé : entrants humains)
 let r4 = true;
+// TF-0750 (02/09/2026) : R-4 jugeait la FORME du nom, jamais l'UNICITÉ de l'indice. Deux synthèses
+// du même jour, dans le même dossier, ont porté « 20260901b » sans qu'un mot soit dit — et
+// l'indice existe précisément pour ORDONNER plusieurs traitements d'un même jour (même classe que
+// S30 au bloc 3 des restitutions : deux décisions numérotées 1 ne se sélectionnent pas mieux
+// qu'aucune). On relève donc, par dossier, les couples jour+indice, et deux fichiers de RADICAL
+// distinct qui le partagent sont un défaut. Même radical, extensions différentes (le .html et le
+// .pdf d'une même fiche) : c'est UN livrable en deux formats, l'indice est le même à bon droit.
+const indicesParDossier = new Map();
 for (const d of ["output", "docs"]) {
   for (const f of fichiers(p(d))) {
     const nom = basename(f);
@@ -233,10 +241,27 @@ for (const d of ["output", "docs"]) {
       if (!/^\d{8}-/.test(nom)) { ko("R-4", rel(f), "étude sans préfixe daté « AAAAMMJJ-… » (gabarits\\ETUDE-OPPORTUNITE.md)"); r4 = false; }
       continue;
     }
-    if (!MOTIF_DATE.test(nom)) { ko("R-4", rel(f), "livrable sans nommage « <Marque> - <Objet> - AAAAMMJJ<indice> »"); r4 = false; }
+    if (!MOTIF_DATE.test(nom)) { ko("R-4", rel(f), "livrable sans nommage « <Marque> - <Objet> - AAAAMMJJ<indice> »"); r4 = false; continue; }
+    const m = nom.match(/ - (\d{8}[a-z]?)\.[\w.]+$/);
+    const dossier = dirname(rel(f));
+    const radical = nom.slice(0, nom.lastIndexOf(m[1]) + m[1].length); // le nom sans son extension
+    if (!indicesParDossier.has(dossier)) indicesParDossier.set(dossier, new Map());
+    const cle = m[1];
+    const parCle = indicesParDossier.get(dossier);
+    if (!parCle.has(cle)) parCle.set(cle, new Set());
+    parCle.get(cle).add(radical);
   }
 }
-if (r4) ok("R-4", "output/, docs/", "livrables au nommage daté (ou aucun livrable)");
+for (const [dossier, parCle] of indicesParDossier) {
+  for (const [cle, radicaux] of parCle) {
+    if (radicaux.size < 2) continue;
+    r4 = false;
+    ko("R-4", `${dossier}/`, `indice « ${cle} » porté par ${radicaux.size} livrables de radical distinct — ` +
+      `${[...radicaux].map((r) => `« ${r} »`).join(", ")} : l'indice existe pour ORDONNER les traitements d'un même jour, ` +
+      "deux livrables qui le partagent ne s'ordonnent pas (TF-0750) ; réindexer le plus récent (`scripts\\allouer-indice.mjs`)");
+  }
+}
+if (r4) ok("R-4", "output/, docs/", "livrables au nommage daté, indices uniques par jour et par dossier (ou aucun livrable)");
 
 // R-25 — le <Type> de tout livrable daté figure au registre des types (D-04 organization,
 // encodé le 11/08 TF-0084). Le type est le premier mot du 2e segment ; comparaison

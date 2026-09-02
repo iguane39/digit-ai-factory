@@ -69,6 +69,8 @@ const motifsSocle = JSON.parse(readFileSync(
   .artefacts.find((a) => a.cible === ".gitignore").motifs_exiges;
 writeFileSync(join(verte, ".gitignore"), ".env\n" + motifsSocle.join("\n") + "\n");
 writeFileSync(join(verte, "output", "Digit-AI - Rapport Test - 20260806a.md"), "rapport\n");
+// TF-0750 : le même radical en deux FORMATS partage son indice à bon droit — un livrable, deux sorties.
+writeFileSync(join(verte, "output", "Digit-AI - Rapport Test - 20260806a.pdf"), "%PDF-1.4 rapport\n");
 writeFileSync(join(verte, "forge", "audit.oracles.json"), "{}\n");
 writeFileSync(join(verte, "forge", "ledger.jsonl"), [
   JSON.stringify({ type: "run_open", ts: "2026-08-09T08:00:00Z", versions_forges: { conception: "951d46e", design: "2ae8517", development: "b65ff31", tests: "d0abbd6", agents: "9d3b3a5" } }),
@@ -290,6 +292,7 @@ const rouge = mkdtempSync(join(tmpdir(), "conf-rouge-"));
 mkdirSync(join(rouge, "output", "Old"), { recursive: true });      // R-1 (input absent), R-3 (docs absent)
 writeFileSync(join(rouge, "output", "rapport-final.md"), "x\n");    // R-4 : livrable non daté
 writeFileSync(join(rouge, "output", "Produit - Grimoire Néant - 20260811a.md"), "x\n"); // R-25 : type improvisé (daté correct → R-4 muette dessus)
+writeFileSync(join(rouge, "output", "Produit - Rapport Second - 20260811a.md"), "x\n"); // R-4 (TF-0750) : indice 20260811a DÉJÀ pris dans ce dossier par un autre radical
 writeFileSync(join(rouge, "output", "Produit - Raport Fantome - 20260812a.md"), "x\n"); // R-25 (TF-0265) : typo proche d'un type admis (« Rapport »)
 writeFileSync(join(rouge, "output", "Produit - Rapport Fantome - 20260813a.html"), "<html></html>\n"); // R-32 : HTML livré sans journal d'oracles sous forge\oracles\
 writeFileSync(join(rouge, "robots.txt"), "User-agent: GPTBot\nDisallow: /\n\nUser-agent: *\nAllow: /\n"); // R-27 : agent IA bloqué SANS décision consignée + llms.txt absent
@@ -313,6 +316,13 @@ check("rouge : chaque règle attendue se déclenche, FAIL exit 1", () => {
   const declenchees = new Set(rapport.findings.filter((f) => f.statut === "FAIL").map((f) => f.regle));
   for (const attendue of ["R-1", "R-3", "R-4", "R-6", "R-7", "R-8", "R-10", "R-11", "R-12", "R-13", "R-18", "R-19", "R-25", "R-27", "R-32", "R-43", "R-47"])
     if (!declenchees.has(attendue)) throw new Error(`règle ${attendue} non déclenchée sur la fixture rouge`);
+});
+
+check("rouge : R-4 dénonce un INDICE EN DOUBLE dans un même dossier, et nomme les deux radicaux (TF-0750)", () => {
+  const { rapport } = lance(rouge);
+  const f = rapport.findings.find((x) => x.regle === "R-4" && x.statut === "FAIL" && /indice « 20260811a »/.test(x.message));
+  if (!f) throw new Error("aucun finding R-4 sur l'indice 20260811a partagé");
+  if (!/Grimoire Néant/.test(f.message) || !/Rapport Second/.test(f.message)) throw new Error(`les deux radicaux ne sont pas nommés : ${f.message}`);
 });
 
 check("rouge : les findings sont localisants (jamais « quelque part »)", () => {
