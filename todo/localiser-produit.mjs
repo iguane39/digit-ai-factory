@@ -54,7 +54,7 @@ export const PROFONDEUR_MAX = 3;
 export const SAUTES = new Set([".git", "node_modules", ".venv", "__pycache__", "dist", "build",
   ".next", "vendor", "output", "input", ".pytest_cache", ".ruff_cache"]);
 
-/** Comparaison de noms insensible à la casse ET à la ponctuation : `Produit-11` ≡ `Produit-11`. */
+/** Comparaison de noms insensible à la casse ET à la ponctuation : `Produit-11` ≡ `produit_11` ≡ `PRODUIT11`. */
 export const normal = (x) => String(x).toLowerCase().replace(/[^a-z0-9]/g, "");
 
 const enfants = (d) => {

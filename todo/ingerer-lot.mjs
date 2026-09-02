@@ -28,7 +28,7 @@ import { fileURLToPath } from "node:url";
 // format commun et où la même classe de défaut a été redécouverte forge par forge.
 import { verifier as verifierFormeLot } from "../gabarits/oracle-lot-retours.mjs";
 import { localiserProduit, causeDuRefus } from "./localiser-produit.mjs";
-import { anonymiserCandidature, pseudoProduit } from "./anonymiser-entrant.mjs";
+import { anonymiserCandidature, pseudoProduit, anonymiser } from "./anonymiser-entrant.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const sidecarPath = process.argv[2];
@@ -366,11 +366,19 @@ const ts = new Date().toISOString();
 // produits s'étend À LA DÉCOUVERTE. Sans cette ligne, le premier lot d'un produit passerait avec
 // son nom en clair — et « le premier lot passe » est exactement la faille qu'on vient de payer
 // trois fois. Le nom se lit dans le NOM DU LOT, seule source qui le porte à coup sûr.
-const nomDuLot = String(sidecarPath).split(/[\/]/).pop() || "";
+// LES DEUX SÉPARATEURS, et c'est une mesure (02/09/2026) : ce découpage ne connaissait que `/`.
+// Sur un chemin Windows, « le nom du lot » était donc le chemin ENTIER, et la table des
+// pseudonymes s'est étendue à la découverte avec 24 entrées de la forme
+// `C:\…\Temp\<recette>\PROD` → Produit-13 à Produit-36 — des répertoires jetables de recettes,
+// inscrits comme produits. La table est hors dépôt, rien ne l'a relue ; la recette
+// `ingerer-anonymise-fichier.test.mjs` l'a attrapé en trouvant un pseudonyme dans le chemin et
+// aucun dans le nom du projet.
+const nomDuLot = String(sidecarPath).split(/[\\/]/).pop() || "";
 if (nomDuLot.includes(" - RETOURS - ")) {
   const nomProduit = nomDuLot.split(" - RETOURS - ")[0];
   const pseudo = pseudoProduit(nomProduit);
-  if (pseudo) console.log(`[ANONYMISÉ] produit « ${nomProduit} » → ${pseudo} (table hors dépôt)`);
+  // La sortie ne répète pas le nom réel : elle finit dans des journaux que rien ne relit.
+  if (pseudo) console.log(`[ANONYMISÉ] produit du lot → ${pseudo} (table hors dépôt)`);
 }
 let remplacesTotal = [];
 candidatures = candidatures.map((c) => {
@@ -421,7 +429,13 @@ if (derogationMotif && !reglesDerogees.length) {
 // TF-0703 : `creations` ne compte que les créations — compter les rectifications ferait croire
 // à des ids frappés qui n'existent pas, et fausserait tout rapprochement registre↔lot futur.
 const nbRectifications = candidatures.filter((c) => c.rectifie !== undefined).length;
-const evIngestion = { ev: "ingestion", ts, lot_sha: lotSha, fichier: String(sidecarPath), creations: nouvelles.length - nbRectifications };
+// LE CHEMIN DU LOT PASSE PAR LA MÊME SUBSTITUTION QUE LA CANDIDATURE (RT du 31/08, lot c du
+// Produit-12 : « l'anonymisation couvre la candidature mais pas l'événement d'ingestion »). Le nom
+// du fichier reçu porte le nom du produit, et le registre est suivi par git : deux occurrences
+// d'un nom de client sont ainsi entrées dans un commit pendant que la sortie affichait
+// « [ANONYMISÉ] ». Un contrôle qui annonce propre et laisse fuir retire au relecteur la raison de
+// regarder. L'idempotence n'a besoin que du lot_sha ; le nom consigné est le nom pseudonymisé.
+const evIngestion = { ev: "ingestion", ts, lot_sha: lotSha, fichier: anonymiser(String(sidecarPath)).texte, creations: nouvelles.length - nbRectifications };
 if (nbRectifications) evIngestion.rectifications = nbRectifications;
 if (reglesDerogees.length) {
   evIngestion.derogation = { regles: [...new Set(reglesDerogees)], motif: derogationMotif, decision: "humaine" };
@@ -530,8 +544,10 @@ if (nouvelles.length > 1 && nomFichier.includes(" - RETOURS - ")) {
     // Même type d'événement que l'ingestion (le registre n'en accepte pas d'autre sans identifiant)
     // et SANS `creations` : cette ligne ne couvre aucune candidature, elle consigne un silence.
     appendFileSync(registre, JSON.stringify({
-      ev: "ingestion", ts: new Date().toISOString(), lot_sha: lotSha, fichier: String(sidecarPath),
-      heritage_non_verifie: { projet: projet || null, racine: String(racine),
+      // Même substitution que l'événement d'ingestion : le chemin ET le nom du projet (lu dans le
+      // nom du lot, donc le nom du produit) entrent dans un fichier suivi par git.
+      ev: "ingestion", ts: new Date().toISOString(), lot_sha: lotSha, fichier: anonymiser(String(sidecarPath)).texte,
+      heritage_non_verifie: { projet: projet ? anonymiser(projet).texte : null, racine: anonymiser(String(racine)).texte,
         motif: "produit introuvable sur ce poste — cible absente, aucun constat sur le produit" },
     }) + "\n");
   } else {

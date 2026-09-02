@@ -167,7 +167,11 @@ check("BORNE — produit introuvable : la NON-VERIFICATION est consignee au REGI
   const lignes = readFileSync(r.registre, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
   const trace = lignes.find((e) => e.heritage_non_verifie);
   if (!trace) throw new Error("aucune trace au registre — le silence ne survit pas a la session");
-  if (trace.heritage_non_verifie.projet !== "ProduitAilleurs2") throw new Error("la trace ne NOMME pas le produit cherche");
+  // Depuis le 02/09 (TF-0761), le nom du projet consigné est PSEUDONYMISÉ comme la candidature —
+  // le registre est suivi par git. La trace nomme donc le produit par son pseudonyme, jamais en clair.
+  const projet = String(trace.heritage_non_verifie.projet || "");
+  if (!/^Produit-\d{2,}$/.test(projet)) throw new Error(`la trace ne NOMME pas le produit cherche par son pseudonyme : « ${projet} »`);
+  if (/ProduitAilleurs2/.test(JSON.stringify(trace))) throw new Error("la trace porte le nom du produit EN CLAIR dans un fichier suivi");
   if (!trace.heritage_non_verifie.racine) throw new Error("la trace ne dit pas OU la recherche a eu lieu");
 });
 

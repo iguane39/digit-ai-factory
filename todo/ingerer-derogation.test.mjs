@@ -20,6 +20,17 @@ import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
+
+// ISOLATION DES TABLES D'ANONYMISATION (02/09/2026) : une recette qui joue l'ingesteur sans les
+// isoler INSCRIT ses noms de fixture dans la table REELLE des pseudonymes du parc (« PROD » et
+// 24 chemins Temp… y sont entrés ainsi). Tables jetables, donc, comme pour tout ce qui écrit.
+{
+  const _d = mkdtempSync(join(tmpdir(), "tables-anon-"));
+  writeFileSync(join(_d, "_noms-interdits.json"), JSON.stringify({ noms: ["Zorglub"], identifiants: [], sigles: [], pseudonymes: { Zorglub: "Client-A" } }), "utf8");
+  writeFileSync(join(_d, "_produits-pseudonymes.json"), JSON.stringify({ produits: {} }), "utf8");
+  process.env.FORGE_NOMS_INTERDITS = join(_d, "_noms-interdits.json");
+  process.env.FORGE_PRODUITS_PSEUDO = join(_d, "_produits-pseudonymes.json");
+}
 const OUTIL = join(ICI, "ingerer-lot.mjs");
 let pass = 0, fail = 0;
 const check = (nom, fn) => {

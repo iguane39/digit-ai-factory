@@ -57,7 +57,14 @@
  *      propre dans un fichier au nom sale ne vaut rien : la porte lit les deux ;
  *   3. RIEN d'autre. Il ne touche pas ce que git ne suit pas — le lot brut déposé par un produit
  *      reste intact sur le disque tant que personne ne l'ajoute, et c'est voulu : l'artefact reçu
- *      est une donnée, il se conserve tel qu'il est arrivé.
+ *      est une donnée, il se conserve tel qu'il est arrivé. UNE porte, et elle se NOMME (02/09) :
+ *      `--fichiers <chemin>…` nettoie une liste explicite, suivie ou non — c'est ainsi qu'un lot
+ *      reçu avec un nom de client se nettoie AVANT son ingestion et son ajout au suivi, le produit
+ *      gardant l'original. L'outil ne devine toujours rien.
+ *   4. RÉ-EMPREINTE (02/09) : un sidecar `*.tf.jsonl` qu'il réécrit change d'empreinte, et la
+ *      boîte d'entrée le lirait comme ÉDITÉ après ingestion (23 constats B2 le lendemain de la
+ *      passe du 01/09, pour zéro édition). Il passe donc le contenu d'avant à
+ *      `reempreinter-lot.mjs`, qui PROUVE puis consigne, ou refuse — jamais une empreinte sur parole.
  *
  * BORNES :
  *   · les fichiers BINAIRES sont sautés et COMPTÉS — un octet nul dans les 8 premiers ko suffit à
@@ -69,13 +76,14 @@
  *     module ne prétend pas le contraire — c'est un geste distinct, humain, et il se décide.
  *
  *   node todo\anonymiser-suivis.mjs --essai   → ce qui serait changé, rien n'est écrit
- *   node todo\anonymiser-suivis.mjs           → écrit, et rend son compte
+ *   node todo\anonymiser-suivis.mjs           → écrit, et rend son compte (ré-empreintes comprises)
+ *   node todo\anonymiser-suivis.mjs --fichiers <chemin>…   → une liste explicite, suivie ou non
  *   node todo\anonymiser-suivis.mjs --self-test
  *
  * Exit : 0 = rien à faire ou fait · 1 = référentiel manquant, ou écriture impossible.
  */
-import { readFileSync, writeFileSync, existsSync, mkdtempSync, rmSync } from "node:fs";
-import { join, dirname, basename } from "node:path";
+import { readFileSync, writeFileSync, existsSync, mkdtempSync, rmSync, renameSync } from "node:fs";
+import { join, dirname, basename, relative, isAbsolute } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -110,7 +118,9 @@ export function planifier(depot, fichiers, lire = (f) => readFileSync(join(depot
     if (estBinaire(octets)) { binaires.push(f); continue; }
     const avant = octets.toString("utf8");
     const { texte, remplaces } = anonymiser(avant);
-    if (texte !== avant) contenus.push({ fichier: f, remplaces, texte });
+    // Le plan garde le contenu d'AVANT : c'est la preuve dont la ré-empreinte d'un sidecar a
+    // besoin (reempreinter-lot.mjs), et l'écrivain qui change un contenu est le seul à l'avoir.
+    if (texte !== avant) contenus.push({ fichier: f, remplaces, texte, avant });
     const nom = anonymiser(f);
     if (nom.texte !== f) renommages.push({ de: f, vers: nom.texte, remplaces: nom.remplaces });
   }
@@ -127,10 +137,41 @@ function jouer(depot, plan) {
   // l'ancien chemin recréerait un doublon non suivi portant le nom sale.
   for (const r of plan.renommages) {
     const mv = spawnSync("git", ["-C", depot, "mv", "--", r.de, r.vers], { encoding: "utf8" });
-    if (mv.status === 0) faits.renommes++;
-    else faits.echecs.push(`${r.de} -> ${r.vers} : ${(mv.stderr || "").trim()}`);
+    if (mv.status === 0) { faits.renommes++; continue; }
+    // Un fichier que git ne suit pas (mode `--fichiers`) se renomme sur le disque.
+    if (/not under version control|pas sous contr/i.test(mv.stderr || "")) {
+      try { renameSync(join(depot, r.de), join(depot, r.vers)); faits.renommes++; continue; } catch (e) { faits.echecs.push(`${r.de} -> ${r.vers} : ${e.code || e.message}`); continue; }
+    }
+    faits.echecs.push(`${r.de} -> ${r.vers} : ${(mv.stderr || "").trim()}`);
   }
   return faits;
+}
+
+/**
+ * RÉ-EMPREINTE des sidecars réécrits (02/09/2026). Un sidecar `*.tf.jsonl` dont le contenu change
+ * change d'empreinte, et la boîte d'entrée le lit alors comme ÉDITÉ après ingestion (B2) — 23
+ * constats le lendemain de la passe du 01/09, pour zéro édition. Celui qui réécrit est le seul à
+ * tenir la preuve (le contenu d'avant) : il la passe à `reempreinter-lot.mjs`, qui vérifie et
+ * consigne, ou refuse. Un sidecar jamais ingéré est simplement rapporté tel quel.
+ */
+export function reempreinter(depot, plan, registre = join(depot, "todo", "TODO.jsonl")) {
+  const resultats = [];
+  if (!existsSync(registre)) return resultats;
+  const versFinal = new Map(plan.renommages.map((r) => [r.de, r.vers]));
+  for (const c of plan.contenus) {
+    if (!c.fichier.endsWith(".tf.jsonl") || typeof c.avant !== "string") continue;
+    const chemin = join(depot, versFinal.get(c.fichier) || c.fichier);
+    const tmp = mkdtempSync(join(tmpdir(), "reemp-avant-"));
+    const copie = join(tmp, basename(c.fichier));
+    writeFileSync(copie, c.avant, "utf8");
+    const r = spawnSync(process.execPath, [join(ICI, "reempreinter-lot.mjs"), chemin, "--avant", copie, "--registre", registre, "--depot", depot],
+      { encoding: "utf8" });
+    rmSync(tmp, { recursive: true, force: true });
+    let verdict = "ILLISIBLE", message = (r.stdout || r.stderr || "").trim().slice(0, 300);
+    try { const j = JSON.parse(r.stdout.slice(r.stdout.indexOf("{"))); verdict = j.verdict; message = j.message; } catch { /* sortie brute conservée */ }
+    resultats.push({ fichier: versFinal.get(c.fichier) || c.fichier, verdict, message });
+  }
+  return resultats;
 }
 
 // ---- banc a double sens ---------------------------------------------------------------------
@@ -170,6 +211,11 @@ function selfTest() {
   if (!plan.binaires.includes("logo.png")) casse.push("un fichier binaire n'est pas saute — le reecrire le corromprait");
   if (plan.contenus.some((c) => c.fichier === "logo.png")) casse.push("un fichier binaire entre dans le plan d'ecriture");
 
+  // 3 bis) un sidecar réécrit porte son contenu d'AVANT dans le plan — c'est la preuve que la
+  //        ré-empreinte exige (02/09) ; sans elle, la boîte d'entrée lirait la passe comme une édition
+  const side = plan.contenus.find((c) => c.fichier === "note.md");
+  if (!side || side.avant !== faux["note.md"].toString("utf8")) casse.push("le plan ne garde pas le contenu d'avant d'un fichier réécrit — la ré-empreinte n'a plus de preuve");
+
   // 4) un REFERENTIEL MANQUANT arrete tout, sans ecrire une ligne
   process.env.FORGE_NOMS_INTERDITS = join(dir, "_absent.json");
   let leve = false;
@@ -179,7 +225,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test anonymiser-suivis : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test anonymiser-suivis : 6/6 PASS (contenu porteur nettoyé ; fichier propre NON réécrit ; "
+    : "Self-test anonymiser-suivis : 7/7 PASS (contenu porteur nettoyé ; fichier propre NON réécrit ; contenu d'avant conservé ; "
       + "nom de fichier porteur renommé ; destination du renommage propre ; binaire sauté et hors du "
       + "plan d'écriture ; référentiel manquant = arrêt sans écriture)");
   return casse.length ? 1 : 0;
@@ -191,7 +237,14 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const ESSAI = args.includes("--essai");
   const i = args.indexOf("--depot");
   const depot = i >= 0 ? args[i + 1] : join(ICI, "..");
-  const fichiers = suivis(depot);
+  // `--fichiers <chemin>…` : une liste EXPLICITE, suivie ou non par git. C'est la seule porte
+  // vers un fichier non suivi — un lot brut reçu avec un nom de client, qu'on nettoie AVANT de
+  // l'ingérer et de l'ajouter au suivi (02/09/2026). L'outil ne devine toujours rien : on le nomme.
+  const iF = args.indexOf("--fichiers");
+  const explicites = iF >= 0 ? args.slice(iF + 1).filter((a) => !a.startsWith("--")) : null;
+  const fichiers = explicites
+    ? explicites.map((f) => (isAbsolute(f) ? relative(depot, f) : f).replaceAll("\\", "/"))
+    : suivis(depot);
   if (!fichiers) { console.error(`anonymiser-suivis : ${depot} n'est pas un dépôt git lisible.`); process.exit(1); }
 
   let plan;
@@ -226,6 +279,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     process.exit(0);
   }
   const faits = jouer(depot, plan);
-  console.log(JSON.stringify({ ...rapport, ...faits }, null, 1));
-  process.exit(faits.echecs.length ? 1 : 0);
+  const reempreintes = reempreinter(depot, plan);
+  console.log(JSON.stringify({ ...rapport, ...faits, reempreintes }, null, 1));
+  process.exit(faits.echecs.length || reempreintes.some((r) => r.verdict === "ECHEC_JOURNAL") ? 1 : 0);
 }
