@@ -124,6 +124,26 @@ export function juger(revue, dossierCaptures = null) {
     + "défaut : 1440 × 900 sur une page de 1440 × 3684",
     suspectes.map((c) => `${c.fichier} : ${c.largeur}×${c.hauteur}`).join(" · "));
   else if (pleines.length) ok("W4", "aucune capture pleine page ne porte une hauteur de fenêtre usuelle");
+
+  // W5 (TF-0771, 02/09/2026) — UN ÉCART RÉSIDUEL SUR UN DÉBORDEMENT NE S'ASSUME PAS SANS MESURE.
+  // Le fait : render_page avait relevé un rognage de tableaux (1 301 px pour 1 136 disponibles à
+  // 1 440 px), et la revue l'a classé « acceptable (conteneur défilant) » sans un chiffre. Le
+  // destinataire : « les pages doivent profiter de toute la largeur de l'écran ». Une ligne
+  // d'écart résiduel qui parle de débordement ou de rognage porte donc sa mesure en pixels, ET le
+  // mot qui la classe (bloquant, corrigé) — « acceptable » nu est le verdict d'un œil, pas d'une
+  // règle. Le socle (BEST-PRACTICES-HTML I1) classe un tableau rogné à ≥ 1 280 px BLOQUANT.
+  const lignesTexte = texte.split(/\r?\n/);
+  const residuelles = lignesTexte.filter((l) =>
+    /(r[ée]siduel|acceptable|assum[ée]|tol[ée]r[ée])/i.test(l) && /(d[ée]bord|rogn|overflow|d[ée]passe|tronqu)/i.test(l));
+  const sansMesure = residuelles.filter((l) => !(/\d{3,4}\s*px/.test(l) && /(bloquant|corrig[ée])/i.test(l)));
+  if (sansMesure.length) ko("W5",
+    "un écart résiduel sur un DÉBORDEMENT ou un ROGNAGE est assumé sans mesure ni classement — "
+    + "« acceptable » nu est le verdict d'un œil : la ligne porte la largeur en px (contenu et "
+    + "conteneur) et le mot qui la classe (bloquant à ≥ 1 280 px pour un tableau, ou corrigé)",
+    sansMesure.map((l) => l.trim().slice(0, 120)).slice(0, 3).join(" · "));
+  else ok("W5", residuelles.length
+    ? `${residuelles.length} écart(s) résiduel(s) sur débordement, chacun mesuré et classé`
+    : "aucun écart résiduel assumé sur un débordement");
   return findings;
 }
 
@@ -176,6 +196,14 @@ if (args.includes("--self-test")) {
     "# Revue\n\n- `fenetre.png` — 1440 × 900 — pleine page\n");
   // ROUGE 4 : aucune capture nommée.
   const rougeW1 = ecrire("rouge-w1.md", "# Revue\n\nTout est conforme, j'ai regardé les captures.\n");
+  // ROUGE 5 (TF-0771) : un débordement classé « acceptable » sans un chiffre — le cas du 02/09.
+  const rougeW5 = ecrire("rouge-w5.md",
+    "# Revue\n\n- `pleine.png` — 1440 × 3684 — pleine page\n\n## Écarts résiduels\n\n"
+    + "- Le tableau des volumes déborde de son conteneur défilant : acceptable, le conteneur défile.\n");
+  // VERTE 5 : le même écart, MESURÉ et CLASSÉ — la règle ne crie pas sur une revue honnête.
+  const verteW5 = ecrire("verte-w5.md",
+    "# Revue\n\n- `pleine.png` — 1440 × 3684 — pleine page\n\n## Écarts résiduels\n\n"
+    + "- Le tableau des volumes déborde : 1301 px de contenu pour 1136 px de conteneur à 1440 px — bloquant, corrigé en pleine largeur.\n");
 
   const moi = fileURLToPath(import.meta.url);
   const jouer = (f) => spawnSync(process.execPath, [moi, f, "--captures", dir], { encoding: "utf8" });
@@ -196,11 +224,15 @@ if (args.includes("--self-test")) {
   // Sans cela, une fixture prouverait qu'une règle rougit sans prouver qu'elle rougit sur SA cause.
   exige(/"W3"[^}]*PASS/.test(r2.stdout), "la rouge de W2 devrait passer W3 — les règles ne sont pas indépendantes");
   exige(/"W1"[^}]*PASS/.test(r3.stdout), "la rouge de W3 devrait passer W1 — les règles ne sont pas indépendantes");
+  const r5 = jouer(rougeW5);
+  exige(r5.status === 1 && /"W5"[^}]*FAIL/.test(r5.stdout), "un débordement classé « acceptable » sans mesure doit échouer (W5)");
+  const v5 = jouer(verteW5);
+  exige(v5.status === 0 && /"W5"[^}]*PASS/.test(v5.stdout), "le même écart, mesuré en px et classé bloquant/corrigé, doit passer (W5) — " + v5.stdout.slice(0, 200));
 
   console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test verdict-visuel : 7/7 PASS (verte PASS ; rouges sur W1 aucune capture nommée, W2 dimension "
+    : "Self-test verdict-visuel : 9/9 PASS (verte PASS ; rouges sur W1 aucune capture nommée, W2 dimension "
       + "démentie par le fichier, W3 aucune pleine page — le cas fondateur —, W4 « pleine page » à hauteur "
-      + "de fenêtre ; et deux contrôles d'INDÉPENDANCE des règles)");
+      + "de fenêtre, W5 débordement « acceptable » sans mesure ; verte W5 mesurée et classée ; et deux contrôles d'INDÉPENDANCE des règles)");
   process.exit(casse.length ? 1 : 0);
 }
 

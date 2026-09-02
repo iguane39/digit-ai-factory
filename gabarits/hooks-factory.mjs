@@ -22,8 +22,11 @@ import { fileURLToPath } from "node:url";
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PRODUIT = resolve(ICI, "..", "..");
 const [nom, ...options] = process.argv.slice(2);
-const NOMS = new Set(["ouverture", "restitution"]);
-if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ouverture | restitution)`); process.exit(0); }
+// `page-html` (TF-0765, 02/09/2026) : hook PostToolUse joué à chaque écriture d'un fichier .html du
+// produit — les règles de socle d'une page (filtres de tableau L4 / G1-G6) se rencontrent au moment
+// où l'on produit, pas au pilot trois livraisons plus tard. Avertit, ne bloque jamais.
+const NOMS = new Set(["ouverture", "restitution", "page-html"]);
+if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ouverture | restitution | page-html)`); process.exit(0); }
 
 const candidats = [
   process.env.FORGE_ROOT && join(process.env.FORGE_ROOT, "digit-ai-factory"),

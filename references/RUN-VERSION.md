@@ -35,3 +35,21 @@ la parité, puis dérouler l'oracle. Consigné au ledger comme `rattrapage_impor
 - **tests** : **audit complet** (jamais en delta — la régression ne se voit qu'en entier) ;
 - **MEP** : staging + qualif populée + GO, comme un premier run (M-4 avec un vrai N-1 cette
   fois).
+
+## Une vue nouvelle ne se code pas sans maquette VALIDÉE (TF-0780 — 02/09/2026)
+
+**Le fait.** Sept vues d'une console de données ont été définies par un tableau
+question / dimensions / mesures / action écrit par la session, puis codées, puis livrées — rien n'a
+été montré au destinataire avant production, et le compagnon visuel n'a pas été offert « au motif
+de l'autonomie ». Trois livraisons, trois refus, dont « on n'y comprend absolument rien ».
+
+**La règle.** Un run de version qui touche une INTERFACE (vue, écran, page de données, console)
+passe par l'étape design en delta (§ 3 des étapes de run) et porte au ledger une entrée
+« maquette_validee » — fichier de la maquette, qui l'a validée, date — AVANT la première ligne de
+code de la vue. Sans cette entrée, l'oracle d'état de forge refuse le run (règle portée par
+quality-oracles, TF-0780). Une maquette n'est pas un luxe offert au destinataire : c'est le seul
+moment où le refus coûte une image et non trois livraisons.
+
+**Ce que la règle n'exige pas.** Une vue reprise à l'identique (correctif sans changement de
+structure) n'a pas de maquette à faire valider ; la ledger le dit par une entrée « vue_inchangee »
+avec le motif.

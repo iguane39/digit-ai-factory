@@ -53,7 +53,7 @@ puis dédoublonnage des patterns et confrontation de chacun à la charte
 
 | ID | Nom | Source | Repère | Verdict | Règle d'application |
 |---|---|---|---|---|---|
-| A1 | Fichier unique autonome (CSS+JS inline, zéro dépendance hors web fonts) | F1, F2 | inline `<style>`+`<script>` | **adopter** | Tout livrable HistoryHtml reste auto-portant ; web fonts avec repli système. |
+| A1 | Fichier unique autonome (CSS+JS inline, **aucune requête réseau au chargement, polices comprises**) | F1, F2 | inline `<style>`+`<script>` | **adopter** | Tout livrable reste auto-portant : **zéro web font distante** (règle A1 de l'oracle normatif `check_html.py`) — les familles chartées se déclarent en tokens AVEC repli système, jamais par `<link>` vers un service de polices. Corrigé le 02/09 (TF-0753) : ce référentiel autorisait ce que l'oracle refuse, et deux livrables l'ont payé en quatre jours. |
 | A2 | Favicon SVG inline en `data:` URI | F1, F2 | `<link rel="icon" type="image/svg+xml" href="data:…">` | **adopter** | Porte le logo, zéro requête, net en PDF. Voir snippet S-A2. |
 | A3 | `charset` **puis** `viewport` en tête de `<head>`, `<html lang="fr">` | F1, F2 | F1 `charset="utf-8"`, F2 `charset="UTF-8"` | **adopter** | Charset dans les 1024 premiers octets ; normaliser en `UTF-8`. |
 | A4 | `<title>` porteur de marque + scope + version + date | F2 | `Client-A — … — V20260715a — 15 juillet 2026` | **adopter** | Reprendre le motif `Digit-AI — {Objet} · {Client}` + indice version. |
@@ -63,12 +63,12 @@ puis dédoublonnage des patterns et confrontation de chacun à la charte
 
 | ID | Nom | Source | Repère | Verdict | Règle d'application |
 |---|---|---|---|---|---|
-| B1 | Header sticky (marque + sous-titre + méta-ligne) | F1, F2 | `.hwrap/.brand/.sub/.meta-line`, `position:sticky` | **adapter** | Repasser couleurs/typo en tokens ; garder `position:sticky;top:0`. |
+| B1 | Header sticky (marque + sous-titre + méta-ligne) | F1, F2 | `.hwrap/.brand/.sub/.meta-line`, `position:sticky` | **adapter** | Repasser couleurs/typo en tokens ; garder `position:sticky;top:0` **et poser sa hauteur en token `--hh`** (`:root{--hh:56px}`), que B6 consomme. **Arbitrage B1/B6 (TF-0754, 02/09)** : B1 l'emporte, B6 reçoit son décalage — jamais un thead qui se colle derrière l'en-tête. |
 | B2 | Grille de KPI (label · valeur · hint) | F1, F2 | `.kpis/.kpi-card/.kpi-label/.kpi-value/.kpi-hint` | **adopter** | Bloc de chiffres-clés en tête de livrable. Voir snippet S-B2. |
 | B3 | Cartes de synthèse (titre · corps · puces) | F2 | `.summary-card/.sc-title/.sc-body/.sc-bullets` | **adopter** | Résumé exécutif structuré, une carte par thème. |
 | B4 | Badges de statut / type / criticité (pastille **+ libellé**) | F1, F2 | `.badge`, `.pill`, `statutBadge()`/`typeBadge()` | **adopter** | Couleur **jamais seule** (C : libellé obligatoire). Mappe sur `--green/--amber/--teal`. |
 | B5 | Barre de progression CSS (`track`/`fill`) | F1 | `.bar/.track/.fill` | **adopter** | Score ou avancement ; largeur en `%` via `--val`. Voir snippet S-B5. |
-| B6 | Tableau de données triable, `thead` sticky | F1, F2 | `<table>`, `data-sort`, `data-tmsort` | **adopter** | Données en vrai `<table>` (`<th scope>`, `<caption>`), tri au clic sur `<th>`. |
+| B6 | Tableau de données triable, `thead` sticky | F1, F2 | `<table>`, `data-sort`, `data-tmsort` | **adopter** | Données en vrai `<table>` (`<th scope>`, `<caption>`), tri au clic sur `<th>` ; **`thead th{position:sticky;top:var(--hh,0)}`** — le décalage est le token posé par B1, sans quoi le thead flotte derrière l'en-tête (deux cycles de rendu payés par un produit, TF-0754). Le tri lit `data-v` avant le texte formaté (TF-0768). |
 | B7 | Légende (swatch + label) | F2 | `.leg-item/.leg-swatch/.leg-label` | **adopter** | Accompagne tout code couleur ; swatch **+** libellé texte. |
 | B8 | Drawer / panneau latéral détaillé | F1 | `.dw-overlay/.drawer/.dw-close`, `openDrawer()` | **adapter** | Ajouter piège de focus, `role="dialog"` `aria-modal`, `Esc` pour fermer, équivalent statique si PDF. |
 | B9 | Dropdown multi-sélection (Tout / Aucun) | F1, F2 | `.dropdown/.dd-panel`, `data-fall/-fnone` | **adapter** | Ajouter `aria-expanded`/`aria-controls`, navigation clavier. |
@@ -96,8 +96,8 @@ puis dédoublonnage des patterns et confrontation de chacun à la charte
 | D1 | `:root` centralisé | F1 (partiel) | `:root{--bg,--txt,--accent…}` | **adapter** | Bon principe, **mais noms non canoniques** : renommer vers `--ink/--muted/--blue/--line` (C8). |
 | D2 | Couleurs **hex en dur** (`#404040`, `#0F766E`…) | F2 | `body{color:#404040}`, vars scoping composant | **rejeter** | Viole « tout en `:root`, aucun hex en dur ». Contre-exemple. |
 | D3 | Pile de police `"Segoe UI",Roboto` **sans DM Sans** | F1 | `font-family:'Segoe UI',Roboto,…` | **rejeter** | Viole C1/C2 (corps doit être DM Sans, titres Roboto). |
-| D4 | Fonts chartées Roboto + DM Sans + JetBrains Mono | F2 | `'Roboto'`, `'DM Sans'`, `'JetBrains Mono'` | **adopter** | Conforme C1/C2/C5 ; conserver la pile de repli système. |
-| D5 | Palette sémantique de statut (base · `-bg` · `-txt`) | F2 | `--tm-ok/-okbg/-oktx`, `ko/part/na/todo` | **adopter** | Mappe sur `--green/--amber/--teal` du skill (base + `-fill` + `-line`). |
+| D4 | Fonts chartées Roboto + DM Sans + JetBrains Mono | F2 | `'Roboto'`, `'DM Sans'`, `'JetBrains Mono'` | **adopter** | Conforme C1/C2/C5 ; **déclarées en tokens `--font-titre/--font-corps/--font-mono` avec pile de repli système, sans aucun chargement distant** (A1). La source F2 les chargeait depuis un CDN : ce trait-là n'est PAS adopté (TF-0753). |
+| D5 | Palette sémantique de statut (base · `-bg` · `-txt`) | F2 | `--tm-ok/-okbg/-oktx`, `ko/part/na/todo` | **adopter** | Mappe sur `--green/--amber/--teal` du skill (base + `-fill` + `-line`) **et sur `--red/--red-fill/--red-line` = `#B91C1C / #FEF2F2 / #F6CFCF` pour le refus et le « non déclaré »** — la palette les portait, la documentation non, et un produit a réinventé un rouge (TF-0755, 02/09). |
 | D6 | Ombres douces, rayons, transitions | F1, F2 | `box-shadow`, `--r`, `transition` | **adopter** | Rayons via token `--r`/`--r-sm` ; transitions courtes. |
 
 ## E — Responsive
@@ -196,6 +196,25 @@ ouverts, recherche remplie (`--etats-ouverts`) — et l'acceptation d'une campag
 joint **une capture par retour**, jamais un verdict textuel seul.
 
 ---
+
+## I — Pages de DONNÉES : règles normatives du 02/09/2026 (TF-0771, 0772, 0773, 0777, 0778, 0783)
+
+*Le fait, mesuré sur une console de données livrée trois fois le 02/09 par un produit* : colonne de
+lecture de 1 180 px pour des tableaux de 1 301 px (rognage classé « acceptable » sans mesure), aucun
+sommaire sur une page de 4 000 px à six blocs, quatre champs d'une même rangée sur deux hauteurs,
+en-têtes sans définition ni unité, calendrier en prose. Dix-sept contrôles verts, et « on n'y
+comprend absolument rien ». Ces règles sont NORMATIVES pour toute page dont le corps est un tableau,
+un tableau de bord ou une console ; la mesure est portée par le skill `digit-ai-page-html`
+(render_page.py, check_html.py), la doctrine documentaire par D8-D9 de `gabarits/documents/README.md`.
+
+| Réf | Règle | Mesure (skill) | Source du fait |
+|---|---|---|---|
+| I1 | **Une page de données est PLEINE LARGEUR adaptative** (`<body data-page="donnees">`) ; la colonne de lecture (max-width en `ch`) ne s'applique qu'à la PROSE, et un bloc de prose dans une page de données prend la largeur du conteneur ou deux lignes. Un tableau rogné dans un conteneur défilant à ≥ 1 280 px est un défaut BLOQUANT, jamais un « écart résiduel acceptable » sans mesure. | render_page : rognage en conteneur défilant ≥ 1 280 px = bloquant ; bloc de texte < 70 % du conteneur = défaut ; `oracle-verdict-visuel` W5 refuse un écart résiduel non mesuré | TF-0771, TF-0778 |
+| I2 | **Au-delà de trois chapitres ou de deux écrans, un SOMMAIRE reste visible** — latéral au bureau, bande en mobile — listant les `h2`/`h3`. | check_html : `nav[aria-label]` listant les titres ; render_page : visible après défilement | TF-0772 |
+| I3 | **Les contrôles d'une même rangée sont ALIGNÉS** (2 px de tolérance) ; une étiquette de statut se pose SOUS le champ, jamais dans le libellé. | render_page : alignement des contrôles d'une rangée | TF-0773 |
+| I4 | **Chaque colonne porte son DICTIONNAIRE** — définition, unité, source, ordre — dans un fichier de données d'où sont générés en-têtes, infobulles et glossaire ; un `th` sans `data-definition` sur une page de données est un défaut ; une unité incohérente (une valeur « par an » consommée par un compte de séjours) se signale. | check_html G7 ; oracle-calculs (unités) | TF-0777 |
+| I5 | **Le temps s'affiche comme du temps** : une dimension temporelle est une date ou une borne de mois ORDONNÉE (`data-v` ISO), une vue de fenêtres est une frise mensuelle ; un calendrier en prose sans mois structurés est un défaut. | render_page : colonne temporelle sans valeur d'ordre = défaut | TF-0783 |
+| I6 | **Chaque en-tête est filtrable ET triable par défaut** ; l'exemption se motive par colonne ; l'heuristique de cardinalité décide de la FORME d'une facette, jamais de son existence ; les facettes temporelles s'ordonnent chronologiquement ; le tri lit `data-v`. | table-filters.js (RA-5, G7, G8) | TF-0768, 0781, 0782 |
 
 ## Delta vers le skill `digit-ai-page-html` — TOUS SOLDÉS (resync du 14/08)
 

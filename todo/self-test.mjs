@@ -36,6 +36,17 @@ writeFileSync(verte, [item({}),
   maj({ ts: "2026-08-08T12:00:00Z", statut: "en_cours" }),
   maj({ ts: "2026-08-08T13:00:00Z", statut: "corrige", gains_constates: "g", corrections_realisees: "sha", date_correction: "2026-08-08" }),
 ].join("\n") + "\n");
+const verteDescente = join(T, "verte-descente.jsonl");
+writeFileSync(verteDescente, [item({}),
+  maj({ statut: "decide", decideur: "humain", date_decision: "2026-08-08" }),
+  maj({ ts: "2026-09-02T14:10:00Z", statut: "corrige", gains_constates: "g", corrections_realisees: "sha", date_correction: "2026-09-02",
+    descente: { regle: "REGLES-PROJET.md § AH — l'écart se justifie deux fois", oracle: "oracle-todo R12" } }),
+].join("\n") + "\n");
+check("verte : corrige apres le 02/09 AVEC descente (regle + oracle) → PASS (TF-0757)", () => {
+  const r = lance(verteDescente);
+  if (r !== 0) throw new Error(`exit ${r.code} : ${r.sortie.slice(0, 200)}`);
+});
+
 check("verte : cycle candidat→decide→en_cours→corrige légal → PASS", () => {
   const r = lance(verte);
   if (r !== 0) throw new Error(`exit ${r.code} : ${r.sortie.slice(0, 200)}`);
@@ -50,6 +61,8 @@ const rouges = [
   // TF-0157 (13/08) : la mémoire des refus est structurée — un écart sans motif FAIL.
   ["R7 : ecarte sans motif_ecart", [item({}), maj({ ts: "2026-08-13T12:00:00Z", statut: "ecarte", decideur: "h", date_decision: "2026-08-13" })]],
   ["R4 : creation hors statut candidat", [item({ statut: "decide" })]],
+  // TF-0757 (02/09) : une correction close sans DESCENTE se rouvre — le registre n'est pas une redescente.
+  ["R12 : corrige apres le 02/09 sans descente", [item({}), maj({ statut: "decide", decideur: "h", date_decision: "2026-08-08" }), maj({ ts: "2026-09-02T14:10:00Z", statut: "corrige", gains_constates: "g", corrections_realisees: "x", date_correction: "2026-09-02" })]],
   ["R1 : ingestion sans lot_sha", [item({}), JSON.stringify({ ev: "ingestion", ts: "2026-08-10T10:00:01Z", creations: 0 })]],
   ["R10 : creation externe (run-*) sans ingestion — écriture directe", [item({ ts: "2026-08-10T10:00:00Z", demandeur: "run-produit-x-20260810" })]],
 ];
