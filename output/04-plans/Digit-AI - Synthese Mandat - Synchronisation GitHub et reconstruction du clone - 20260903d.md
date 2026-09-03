@@ -62,7 +62,7 @@ Les quatre décisions découlent d'un même fait : l'histoire du pilot a été r
 
 > **D-4 — Ingère-t-on maintenant les cinq lots de retours restés sur disque, dont quatre portent encore le nom réel du produit dans leur nom de fichier ?**
 > Cinq lots de retours (dix fichiers, dix constats au total) sont arrivés dans la boîte d'entrée du pilot les 01 et 02 septembre et n'ont été ingérés par aucune des deux sessions : trois du produit 12, deux du produit 02. Ils sont restés hors du suivi git, à dessein : quatre d'entre eux portent le nom réel du produit dans leur nom de fichier, et l'anonymiseur d'entrée doit les passer avant tout enregistrement. Les ingérer relève de l'ouverture d'un run ou d'un mandat de traitement des retours, pas d'une synchronisation.
-> **Recommandation : (a).** Source consultée : relevé de `input -retours\` (cinq lots, aucun de leurs constats retrouvé dans `todo\TODO.jsonl` ni dans `todo\TODO-ARCHIVE.jsonl` côté GitHub) et `references\TODO-FORGE.md`, qui fait passer l'oracle de boîte d'entrée à l'ouverture de tout run.
+> **Recommandation : (a).** Source consultée : relevé de `input\00-retours\` (cinq lots, aucun de leurs constats retrouvé dans `todo\TODO.jsonl` ni dans `todo\TODO-ARCHIVE.jsonl` côté GitHub) et `references\TODO-FORGE.md`, qui fait passer l'oracle de boîte d'entrée à l'ouverture de tout run.
 > L'ingestion est un geste d'agent, borné et outillé (anonymisation à l'entrée, contrôle de collision d'identifiants) ; le laisser attendre fait courir dix constats réels sans décision.
 
 | Option | Ce qu'elle coûte | Ce qu'elle exclut |
