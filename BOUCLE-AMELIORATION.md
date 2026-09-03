@@ -2060,3 +2060,54 @@ produit, décision), TF-0748/0749 (campagne réelle), les trois constats du jour
 
 Registre : 19 → 10 actifs (4 candidats, 6 décidés), 31 clôtures ce tour, toutes avec descente, 777 archivés. Boîte PASS,
 registre PASS.
+
+## 03/09/2026 — « 42a, 43a, 38a » : l'historique du pilot réécrit et publiable, les travaux déposés chez le produit 02, un constat du soir clos et trois en cours
+
+Réponse humaine aux trois décisions de la synthèse du second tour du 02/09 : D-42 (a) les quatre
+constats du soir décidés en bloc, D-43 (a) les lots de travaux déposés chez le produit 02,
+D-38 (a) le passé du dépôt principal réécrit maintenant, sauvegarde exigée avant le geste.
+
+**D-38 (a) — TF-0752 clos.** Sauvegarde entière hors dépôt (`git bundle --all`, 94,6 Mo,
+`git bundle verify` OK, HEAD d'avant consigné à côté). Règles DÉRIVÉES des deux tables hors git,
+jamais écrites à la main : `scripts/generer-remplacements-historique.mjs` (44 règles de contenu et
+de messages, 35 paires de noms de fichiers). `git filter-repo` 2.47.0 en DEUX passes sur 459
+commits : la première laissait 96 constats, tous le sigle d'un client en minuscules dans un
+identifiant de run (« tests-<sigle> ») que la règle sensible à la casse ne voyait pas — la porte,
+elle, juge un sigle insensible à la casse ; le générateur est corrigé (pas le fichier de règles),
+seconde passe, `origin` remis. Porte de publication `oracle-nom-client-publie .` : 200 → 96 → 0,
+PASS, historique compris. Le pilot est PUBLIABLE pour la première fois ; la publication forcée
+reste un GO humain (R-38), et toute autre copie locale (`_archive-digit-ai-forge-pilot_old`) est
+devenue incompatible. Mode opératoire consigné dans `references/TODO-FORGE.md` (« Réécrire
+l'historique d'un dépôt est un geste humain décidé, outillé par un mode opératoire fixe »).
+Leçon : la première clôture pointait sa règle sur `references/EMPREINTES.md`, qui n'en parlait
+pas — un second événement a corrigé la descente, le registre ne se réécrit pas.
+
+**D-42 (a) — TF-0787 clos (pilot).** Les six fichiers de `gabarits/documents/` (trois familles ×
+SQUELETTE/INSTANCE) reçoivent une grille deux colonnes `.doc-grille` (250 px + colonne fluide) dont
+le sommaire `nav.toc` est COLLANT sur bureau (sticky, top 16 px, sa propre barre de défilement) et
+redevient un bloc statique sous 900 px. rapport-de-donnees, qui n'avait pas de sommaire, reçoit six
+entrées et un chapeau `.ch-apprend` par chapitre (L7), avec le style qui manquait (L21 — la première
+insertion a échoué sur un simple motif de fin de ligne, corrigée par recherche de chaîne).
+check_html.py 6/6 PASS ; `oracle-gabarits-documents` FAIL → PASS ; `verifier-rendu-instances`
+(parc réel, famille `sommaire_perdu`) FAIL → PASS : les deux rouges du banc d'hier sont verts.
+**TF-0784, TF-0785, TF-0786 en cours** chez deux agents (forge-agents : composant de filtres chargé
+depuis le skill de pages, parité des assets ; forge-tests : ruff épinglé, lint soldé, empreinte des
+règles au rapport) — rapports non rendus à l'heure de ce point d'étape, rien commis ; le banc du
+pilot voit déjà leurs fichiers (oracle-skills K2 ×3, oracle-empreintes E2 ×2 : 84/86, déclaré).
+
+**D-43 (a) — lot de travaux déposé chez le produit 02.** `pilot - TRAVAUX - 20260903a` (.md +
+sidecar, 8 éléments dont TF-0674/0676/0682) dans `input/00-travaux/` du produit, sous
+`FORGE_MANDAT_PRODUIT` ; fichiers non suivis chez lui, aucun commit fait à sa place ; trois
+événements `travaux_deposes` au registre. Le produit exécute à son prochain travail et le dit dans
+son prochain lot de retours.
+
+**En passant.** La demande « Améliore ce prompt : conçois et construis un système d'amélioration
+continue… », interrompue par l'humain, avait déjà été traitée par L99 avant l'interruption
+(`output/03-etudes/20260903-L99-amelioration-continue.md`, synthèse 20260903a PASS) : l'analyse
+conclut que le système existe pour l'essentiel et que le défaut réel est la DESCENTE chez les
+produits ; l'écart de verbe (« conçois » → « mesure puis complète ») est soumis en D-44, rien n'est
+construit sans validation.
+
+Registre : 11 → 9 actifs (0 candidat, 9 décidés), 2 clôtures ce point d'étape, toutes avec
+descente, 778 archivés. Registre PASS, porte de publication PASS, banc 84/86 (deux rouges = chantier
+de l'agent en cours).
