@@ -155,7 +155,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>3f0a694f590f</code> · dernier événement 2026-09-03T07:46:19.592Z</p>
+      <p class="meta">sceau <code>348efc45a017</code> · dernier événement 2026-09-03T09:00:39.846Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -165,10 +165,10 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="0 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">0</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="9 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">9</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="1 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">1</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="7 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">7</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="0 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">0</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
-      <div class="kpi" title="778 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">778</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
+      <div class="kpi" title="780 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">780</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende">
       <span class="leg-item"><span class="leg-swatch" style="background:var(--blue)"></span>candidat</span>
@@ -181,12 +181,11 @@
       <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
       
       <div class="dropdown" data-dim="forge">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">5</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">4</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
           <label><input type="checkbox" value="digit-ai-factory" checked> digit-ai-factory</label>
           <label><input type="checkbox" value="digit-ai-forge-agents" checked> digit-ai-forge-agents</label>
-          <label><input type="checkbox" value="digit-ai-forge-tests" checked> digit-ai-forge-tests</label>
           <label><input type="checkbox" value="forge-tests" checked> forge-tests</label>
           <label><input type="checkbox" value="pilot" checked> pilot</label>
         </div>
@@ -200,10 +199,10 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">9 / 9 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">8 / 8 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#forge-tests"><strong>forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-tests"><strong>forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-factory">
       <h2>digit-ai-factory <span class="badge" title="3 item(s) actifs ciblant digit-ai-factory">3</span></h2>
@@ -309,58 +308,6 @@
         </article>
       </div>
     </section>
-    <section id="digit-ai-forge-tests">
-      <h2>digit-ai-forge-tests <span class="badge" title="2 item(s) actifs ciblant digit-ai-forge-tests">2</span></h2>
-      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-tests</strong> — trié par statut puis priorité décroissante.</p>
-      <div class="cartes">
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0786" data-cite data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0786</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-tests : un verdict de la recette (dashboard) depend des oracles du skill de pages INSTALLES sur le poste, non epingles — les regles ont change PENDANT la session (L25, render_page) sans qu'un octet du depot ne bouge</h3>
-          <div class="card-detail" data-cite><p class="lead">Constat en passant du chantier forge-tests du 02/09 (TF-0763).</p><ul class="puces"><li>La section `dashboard` de la recette joue `check_html.py` et `render_page.py` depuis `~/.claude/skills/digit-ai-page-html/` — la copie INSTALLEE, mise a jour par un autre chantier pendant la session (empreinte des regles 4b9b6179fb57 → c16177d42a88, 31 → 36 regles, 14 → 18 familles de rendu). Entre deux executions, L25 (sommaire obligatoire au-dela de trois chapitres) et un echec de render_page sont apparus sur le tableau de bord de la forge. L25 a ete refermee dans la session (le manifeste d'ecarts porte desormais ancre, chapeau et entree de sommaire, sha 3973a7d) ; restent L17 (9 lignes de detail sans id dans les tables T6-T8) et render_page code 1, non instruits. CE QUE CELA DIT : un verdict de forge qui depend d'un oracle non epingle n'est pas reproductible — meme classe que TF-0785 (ruff), et que la regle de fraicheur R-19 pour les forges. PROPOSITION :</li><li>la recette CONSIGNE l'empreinte des regles des oracles joues (`check_html.py --version-regles`) dans son rapport, et refuse de comparer deux rapports a empreintes differentes sans le dire</li><li>instruire L17 et l'echec de render_page sur le tableau de bord</li><li>au pilot : quand un skill monte de version dans la journee, les forges qui le consomment le sachent (oracle-etat-forge, versions-livrees)</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-02</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>une section de recette passee de vert a rouge entre deux executions sans changement du depot ; 2 constats (L17, render_page) restent non instruits sur le tableau de bord de la forge</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du chantier forge-tests du 02/09, second tour)</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0785" data-cite data-forge="digit-ai-forge-tests" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0785</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 7.5)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-tests : la section lint de la recette est rouge depuis une derive de version de ruff non epinglee (ruff&gt;=0.5, 0.16.1 installe) — 100 constats anterieurs a la campagne, S-01 non tenu</h3>
-          <div class="card-detail" data-cite><p class="lead">Constat en passant du chantier forge-tests du 02/09 (TF-0763).</p><ul class="puces"><li>`uv run python recette/verifier_corpus.py` (entiere) rend S-01 NON TENU : la section `lint` porte 100 constats ruff (69 E501, 12 E741, 7 I001…) dans le perimetre meme de la recette — 101 mesures au commit 623a618, donc anterieurs a la campagne. Le pas « arme apres avoir solde les 21 » est rouge depuis une DERIVE DE VERSION de ruff : la dependance est declaree `ruff&gt;=0.5`, la version installee est 0.16.1, et les regles ont bouge entre les deux. CE QUE CELA DIT : un verdict de forge qui depend d'un outil non epingle n'est pas reproductible — le meme depot rend vert sur un poste et rouge sur l'autre, sans qu'un octet ait change. PROPOSITION :</li><li>epingler ruff (version exacte dans pyproject et uv.lock)</li><li>solder les 100 constats ou les declarer au registre de dette avec leur regle</li><li>la recette dit la version de ruff qu'elle a jouee dans son rapport, comme la version des oracles de rendu (TF-0786)</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-02</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 7.5 — gain 3 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-tests</dt><dd>S-01 non prononcable sur la recette entiere depuis une date inconnue, pour 100 constats qu'aucun commit n'a introduits — le verdict depend de la version d'un outil que personne n'a epinglee</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du chantier forge-tests du 02/09, second tour)</dd></div>
-            
-          </dl>
-        </article>
-      </div>
-    </section>
     <section id="forge-tests">
       <h2>forge-tests <span class="badge" title="2 item(s) actifs ciblant forge-tests">2</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>forge-tests</strong> — trié par statut puis priorité décroissante.</p>
@@ -414,7 +361,7 @@
       </div>
     </section>
     <section id="pilot">
-      <h2>pilot <span class="badge" title="1 item(s) actifs ciblant pilot">1</span></h2>
+      <h2>pilot <span class="badge" title="2 item(s) actifs ciblant pilot">2</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
@@ -437,6 +384,29 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur pilot</dt><dd>mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration.</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du 24/08, mandat « rejouer R-47 » — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0788" data-cite data-forge="pilot" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0788</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : une montee de version d un skill dans la journee n est SUE d aucune forge qui le consomme — la recette de forge-tests a change de verdict entre deux executions parce que check_html et render_page avaient change de regles sur le poste, sans qu aucun signal ne lui parvienne</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat en passant de la campagne du 03/09 (agent forge-tests, volet 3 de TF-0786, laisse au pilot). TF-0786 a ferme le volet local : la recette de forge-tests consigne desormais l empreinte des oracles du socle qu elle joue (check_html.py --version-regles, render_page.py --familles) et refuse de comparer deux rapports d empreintes differentes. Reste le volet TRANSVERSE : quand forge-agents monte quality-oracles ou digit-ai-page-html de version dans la journee (36 regles hier, 31 familles neuves en un jour), les forges consommatrices (tests, design, audit) et les produits ne l apprennent que par un verdict qui change. Aujourd hui, oracle-etat-forge F1 juge que versions-livrees.json est a jour COTE PRODUCTEUR ; rien ne dit, cote consommateur, que l empreinte des regles installees a bouge depuis la derniere recette.</p><p class="detail-label">Proposition</p><ul class="puces"><li>le relevé d ouverture du pilot (hook-ouverture) et la recette de chaque forge comparent l empreinte des oracles installes (~/.claude/skills) a la derniere consignee dans leur journal, et le disent en une ligne (« regles du socle changees depuis la derniere recette : check_html c16177d42a88 → … »)</li><li>Une regle de fraicheur qui ne vaut que pour celui qui publie n est pas une regle de fraicheur</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-03</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 3 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>le 02/09, la section dashboard de la recette de forge-tests est passee de vert a rouge entre deux executions sans qu un octet ait bouge dans son depot (mesure de TF-0786) ; sans signal cote consommateur, le meme diagnostic se refait a la main a chaque montee de version</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant de l agent forge-tests, TF-0786 volet 3, 03/09/2026)</dd></div>
             
           </dl>
         </article>

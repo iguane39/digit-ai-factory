@@ -15,7 +15,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Digit-AI — TODO-FORGE · Archive des items clos — V20260903</title>
-  <meta name="description" content="Page de recherche des items clos du registre TODO-FORGE : 778 items archivés, corrigés ou écartés, avec leur histoire complète — création, décision et décideur, clôture et gains constatés.">
+  <meta name="description" content="Page de recherche des items clos du registre TODO-FORGE : 780 items archivés, corrigés ou écartés, avec leur histoire complète — création, décision et décideur, clôture et gains constatés.">
   <meta name="theme-color" content="#2563EB">
   <!-- Pas de <meta name="color-scheme" content="light dark"> : FIGÉ, le navigateur peint ses
        propres surfaces (ascenseurs, contrôles) en sombre sur un corps clair — défaut relevé par
@@ -158,16 +158,16 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — archive des items clos</h1>
-      <p class="meta">sceau <code>9a69679e4882</code> · dernier événement 2026-09-03T08:07:09Z</p>
+      <p class="meta">sceau <code>79fea665313e</code> · dernier événement 2026-09-03T09:01:56Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       </button>
     </header>
-    <p>Ce que le registre actif a cessé de porter vit ici : <strong>778 items clos</strong>, chacun avec son histoire complète — ce qui a été demandé, qui l'a décidé, ce qui a été corrigé et quels gains ont été constatés. C'est la mémoire des décisions déjà prises : on y cherche avant de re-candidater, et on y vérifie ce qu'une correction a réellement rapporté. La recherche et les filtres agissent sur cette page seule, sans rien envoyer nulle part.</p>
+    <p>Ce que le registre actif a cessé de porter vit ici : <strong>780 items clos</strong>, chacun avec son histoire complète — ce qui a été demandé, qui l'a décidé, ce qui a été corrigé et quels gains ont été constatés. C'est la mémoire des décisions déjà prises : on y cherche avant de re-candidater, et on y vérifie ce qu'une correction a réellement rapporté. La recherche et les filtres agissent sur cette page seule, sans rien envoyer nulle part.</p>
     <div class="kpis">
-      <div class="kpi" title="778 items archivés depuis todo\TODO.jsonl — l'histoire complète de chacun est sur cette page"><span class="kpi-label">Items clos, archivés</span><span class="kpi-value">778</span><span class="kpi-hint">source unique — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
-      <button type="button" class="kpi" data-statut="corrige" aria-pressed="false" title="761 item(s) clos sur gains constatés — clic : n'afficher qu'eux"><span class="kpi-label">Corrigés</span><span class="kpi-value">761</span><span class="kpi-hint">clos sur gains constatés · clic&nbsp;: filtrer</span></button>
+      <div class="kpi" title="780 items archivés depuis todo\TODO.jsonl — l'histoire complète de chacun est sur cette page"><span class="kpi-label">Items clos, archivés</span><span class="kpi-value">780</span><span class="kpi-hint">source unique — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
+      <button type="button" class="kpi" data-statut="corrige" aria-pressed="false" title="763 item(s) clos sur gains constatés — clic : n'afficher qu'eux"><span class="kpi-label">Corrigés</span><span class="kpi-value">763</span><span class="kpi-hint">clos sur gains constatés · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="ecarte" aria-pressed="false" title="17 item(s) écartés, chacun avec son motif d'écart — clic : n'afficher qu'eux"><span class="kpi-label">Écartés</span><span class="kpi-value">17</span><span class="kpi-hint">refus motivé, mémoire gardée · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="nombre de forges distinctes visées par les items archivés, noms normalisés"><span class="kpi-label">Forges concernées</span><span class="kpi-value">22</span><span class="kpi-hint">noms normalisés — le brut reste en infobulle</span></div>
     </div>
@@ -217,10 +217,10 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser la recherche</button>
-      <span id="compteur" class="compteur" aria-live="polite">778 / 778 item(s) clos affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">780 / 780 item(s) clos affichés</span>
     </div>
-    <p id="vide" class="etat-vide" hidden><strong>Aucun item clos ne correspond.</strong> <span id="vide-quoi"></span> L'archive porte 778 items : élargissez les filtres, essayez un identifiant (<code>TF-0062</code>) ou un mot du titre — ou <button type="button" id="vide-reinit" class="lien-btn">réinitialisez la recherche</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#forge-agents"><strong>agents</strong> <span class="toc-d">112 item(s) clos</span></a><a href="#forge-agents-security"><strong>agents-security</strong> <span class="toc-d">2 item(s) clos</span></a><a href="#forge-audit"><strong>audit</strong> <span class="toc-d">18 item(s) clos</span></a><a href="#forge-conception"><strong>conception</strong> <span class="toc-d">20 item(s) clos</span></a><a href="#forge-contenu"><strong>contenu</strong> <span class="toc-d">1 item(s) clos</span></a><a href="#forge-data"><strong>data</strong> <span class="toc-d">12 item(s) clos</span></a><a href="#forge-design"><strong>design</strong> <span class="toc-d">34 item(s) clos</span></a><a href="#forge-development"><strong>development</strong> <span class="toc-d">11 item(s) clos</span></a><a href="#forge-digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">154 item(s) clos</span></a><a href="#forge-digit-ai-page-html"><strong>digit-ai-page-html</strong> <span class="toc-d">7 item(s) clos</span></a><a href="#forge-f"><strong>f</strong> <span class="toc-d">3 item(s) clos</span></a><a href="#forge-factory"><strong>factory</strong> <span class="toc-d">12 item(s) clos</span></a><a href="#forge-la-barre"><strong>la-barre</strong> <span class="toc-d">1 item(s) clos</span></a><a href="#forge-ops"><strong>ops</strong> <span class="toc-d">13 item(s) clos</span></a><a href="#forge-organization"><strong>organization</strong> <span class="toc-d">11 item(s) clos</span></a><a href="#forge-p"><strong>p</strong> <span class="toc-d">12 item(s) clos</span></a><a href="#forge-pilot"><strong>pilot</strong> <span class="toc-d">172 item(s) clos</span></a><a href="#forge-prompt-analyzer-l99"><strong>prompt-analyzer-l99</strong> <span class="toc-d">1 item(s) clos</span></a><a href="#forge-seo"><strong>seo</strong> <span class="toc-d">31 item(s) clos</span></a><a href="#forge-seo-geo"><strong>seo-geo</strong> <span class="toc-d">5 item(s) clos</span></a><a href="#forge-tests"><strong>tests</strong> <span class="toc-d">143 item(s) clos</span></a><a href="#forge-websec"><strong>websec</strong> <span class="toc-d">3 item(s) clos</span></a></nav>
+    <p id="vide" class="etat-vide" hidden><strong>Aucun item clos ne correspond.</strong> <span id="vide-quoi"></span> L'archive porte 780 items : élargissez les filtres, essayez un identifiant (<code>TF-0062</code>) ou un mot du titre — ou <button type="button" id="vide-reinit" class="lien-btn">réinitialisez la recherche</button>.</p>
+    <nav class="toc" aria-label="Sommaire"><a href="#forge-agents"><strong>agents</strong> <span class="toc-d">112 item(s) clos</span></a><a href="#forge-agents-security"><strong>agents-security</strong> <span class="toc-d">2 item(s) clos</span></a><a href="#forge-audit"><strong>audit</strong> <span class="toc-d">18 item(s) clos</span></a><a href="#forge-conception"><strong>conception</strong> <span class="toc-d">20 item(s) clos</span></a><a href="#forge-contenu"><strong>contenu</strong> <span class="toc-d">1 item(s) clos</span></a><a href="#forge-data"><strong>data</strong> <span class="toc-d">12 item(s) clos</span></a><a href="#forge-design"><strong>design</strong> <span class="toc-d">34 item(s) clos</span></a><a href="#forge-development"><strong>development</strong> <span class="toc-d">11 item(s) clos</span></a><a href="#forge-digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">154 item(s) clos</span></a><a href="#forge-digit-ai-page-html"><strong>digit-ai-page-html</strong> <span class="toc-d">7 item(s) clos</span></a><a href="#forge-f"><strong>f</strong> <span class="toc-d">3 item(s) clos</span></a><a href="#forge-factory"><strong>factory</strong> <span class="toc-d">12 item(s) clos</span></a><a href="#forge-la-barre"><strong>la-barre</strong> <span class="toc-d">1 item(s) clos</span></a><a href="#forge-ops"><strong>ops</strong> <span class="toc-d">13 item(s) clos</span></a><a href="#forge-organization"><strong>organization</strong> <span class="toc-d">11 item(s) clos</span></a><a href="#forge-p"><strong>p</strong> <span class="toc-d">12 item(s) clos</span></a><a href="#forge-pilot"><strong>pilot</strong> <span class="toc-d">172 item(s) clos</span></a><a href="#forge-prompt-analyzer-l99"><strong>prompt-analyzer-l99</strong> <span class="toc-d">1 item(s) clos</span></a><a href="#forge-seo"><strong>seo</strong> <span class="toc-d">31 item(s) clos</span></a><a href="#forge-seo-geo"><strong>seo-geo</strong> <span class="toc-d">5 item(s) clos</span></a><a href="#forge-tests"><strong>tests</strong> <span class="toc-d">145 item(s) clos</span></a><a href="#forge-websec"><strong>websec</strong> <span class="toc-d">3 item(s) clos</span></a></nav>
     <main>
       <section id="forge-agents">
         <h2>agents <span class="badge" title="112 item(s) clos ciblant agents — 112 corrigé(s), 0 écarté(s)">112</span></h2>
@@ -21330,9 +21330,71 @@ ANTI-DOUBLON. Execute sur le registre du pilot au HEAD 6aa0b20 : 2 342 evenement
         </div>
       </section>
       <section id="forge-tests">
-        <h2>tests <span class="badge" title="143 item(s) clos ciblant tests — 140 corrigé(s), 3 écarté(s)">143</span></h2>
-        <p class="ch-apprend meta">Items clos ciblant <strong>tests</strong> — 140 corrigé(s), 3 écarté(s), du plus récent au plus ancien. Chaque carte porte le détail tel qu'il a été candidaté, puis son histoire dépliable : création, décision et décideur, ouverture des travaux, clôture, archivage.</p>
+        <h2>tests <span class="badge" title="145 item(s) clos ciblant tests — 142 corrigé(s), 3 écarté(s)">145</span></h2>
+        <p class="ch-apprend meta">Items clos ciblant <strong>tests</strong> — 142 corrigé(s), 3 écarté(s), du plus récent au plus ancien. Chaque carte porte le détail tel qu'il a été candidaté, puis son histoire dépliable : création, décision et décideur, ouverture des travaux, clôture, archivage.</p>
         <div class="cartes">
+        <article class="card s-corrige" id="item-TF-0786" data-forge="tests" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0786</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : digit-ai-forge-tests">tests</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-09-03</span>
+          </header>
+          <h3 class="card-titre">forge-tests : un verdict de la recette (dashboard) depend des oracles du skill de pages INSTALLES sur le poste, non epingles — les regles ont change PENDANT la session (L25, render_page) sans qu'un octet du depot ne bouge</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat en passant du chantier forge-tests du 02/09 (TF-0763).</p><ul class="puces"><li>La section `dashboard` de la recette joue `check_html.py` et `render_page.py` depuis `~/.claude/skills/digit-ai-page-html/` — la copie INSTALLEE, mise a jour par un autre chantier pendant la session (empreinte des regles 4b9b6179fb57 → c16177d42a88, 31 → 36 regles, 14 → 18 familles de rendu). Entre deux executions, L25 (sommaire obligatoire au-dela de trois chapitres) et un echec de render_page sont apparus sur le tableau de bord de la forge. L25 a ete refermee dans la session (le manifeste d'ecarts porte desormais ancre, chapeau et entree de sommaire, sha 3973a7d) ; restent L17 (9 lignes de detail sans id dans les tables T6-T8) et render_page code 1, non instruits. CE QUE CELA DIT : un verdict de forge qui depend d'un oracle non epingle n'est pas reproductible — meme classe que TF-0785 (ruff), et que la regle de fraicheur R-19 pour les forges. PROPOSITION :</li><li>la recette CONSIGNE l'empreinte des regles des oracles joues (`check_html.py --version-regles`) dans son rapport, et refuse de comparer deux rapports a empreintes differentes sans le dire</li><li>instruire L17 et l'echec de render_page sur le tableau de bord</li><li>au pilot : quand un skill monte de version dans la journee, les forges qui le consomment le sachent (oracle-etat-forge, versions-livrees)</li></ul></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 4 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-09-02</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">pilot (constat en passant du chantier forge-tests du 02/09, second tour)</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">rapport de l'agent forge-tests du 02/09/2026 ; `check_html.py --version-regles` 4b9b6179fb57 → c16177d42a88 (chantier digit-ai-page-html du meme jour)</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">digit-ai-forge-tests, digit-ai-forge-agents</dd></div><div><dt>Score d'entrée</dt><dd>10 — gain 4 × preuve 5 ÷ effort 2</dd></div><div class="pleine"><dt>Coût déjà payé</dt><dd><p class="jalon-prose">une section de recette passee de vert a rouge entre deux executions sans changement du depot ; 2 constats (L17, render_page) restent non instruits sur le tableau de bord de la forge</p></dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-09-03</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">Sebastien — reponse « 42a, 43a, 38a » du 03/09/2026 a la synthese du second tour du 02/09 (D-42 (a) : les quatre constats du soir decides en bloc)</p></dd></div></dl>
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-09-03</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">MESURÉ : check_html.py sur le dashboard du banc rouge : exit 1, FAIL, 196 constats L17 → exit 0, PASS, 0 constat (empreinte de regles c16177d42a88, 36 regles) ; render_page.py --widths 1280,768,390 : FAIL 1 bloquant (2 controles sur 2 hauteurs, 22 px) → PASS ; recette ENTIERE : S-01 NON TENU (lint, dashboard rouges) → S-01 TENU, 13/13 sections OK, exit 0 ; consignation effective : « oracles du socle joues — empreinte d ensemble aae91ec14f0a / check_html c16177d42a88 / render_page 8409e3adf838 » ; 9 fixtures double sens executees ; bruit du controle neuf sur les 33 documents HTML versionnes : 0 accusation ; banc 1240 → 1257 tests, 0 echec.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><p class="jalon-prose">forge-tests @ 89d6bc8 — recette/verifier_corpus.py : empreinte_oracles_socle() (lit l empreinte publiee par check_html.py --version-regles, derive celle de la table de render_page.py --familles), lignes_empreinte_oracles(), comparabilite(), journal recette/.empreintes-oracles.json (ignore par git) ; la section dashboard CONSIGNE l identite des oracles joues et declare NON COMPARABLES deux rapports d empreintes differentes. forge_tests/livrables/dashboard.py : id derive stable sur chaque tr[data-detail] et aria-controls sur son .btn-detail (L17) ; .chemin en flex-column + .c-actions a margin-top:auto (alignement 768 px) ; controle § 2 bis : _ecarts_lignes_de_detail() et regles conditionnelles L26bis. tests/test_tf_0786_oracles_du_socle.py (17 cas). Volet 3 (qu une montee de version d un skill dans la journee soit sue des forges consommatrices) NON traite ici : il releve du pilot (oracle-etat-forge, versions-livrees), nomme dans le message de commit.</p></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">forge-tests @ 89d6bc8</p></dd></div><div><dt>Produits bénéficiaires</dt><dd title="produits ou missions ayant bénéficié de la correction, nommés au registre">Produit-01, Produit-02, Produit-09, Produit-10, Produit-11, Produit-12</dd></div></dl>
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-09-03</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
+        <article class="card s-corrige" id="item-TF-0785" data-forge="tests" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0785</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : digit-ai-forge-tests">tests</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-09-03</span>
+          </header>
+          <h3 class="card-titre">forge-tests : la section lint de la recette est rouge depuis une derive de version de ruff non epinglee (ruff&gt;=0.5, 0.16.1 installe) — 100 constats anterieurs a la campagne, S-01 non tenu</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat en passant du chantier forge-tests du 02/09 (TF-0763).</p><ul class="puces"><li>`uv run python recette/verifier_corpus.py` (entiere) rend S-01 NON TENU : la section `lint` porte 100 constats ruff (69 E501, 12 E741, 7 I001…) dans le perimetre meme de la recette — 101 mesures au commit 623a618, donc anterieurs a la campagne. Le pas « arme apres avoir solde les 21 » est rouge depuis une DERIVE DE VERSION de ruff : la dependance est declaree `ruff&gt;=0.5`, la version installee est 0.16.1, et les regles ont bouge entre les deux. CE QUE CELA DIT : un verdict de forge qui depend d'un outil non epingle n'est pas reproductible — le meme depot rend vert sur un poste et rouge sur l'autre, sans qu'un octet ait change. PROPOSITION :</li><li>epingler ruff (version exacte dans pyproject et uv.lock)</li><li>solder les 100 constats ou les declarer au registre de dette avec leur regle</li><li>la recette dit la version de ruff qu'elle a jouee dans son rapport, comme la version des oracles de rendu (TF-0786)</li></ul></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 4 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-09-02</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">pilot (constat en passant du chantier forge-tests du 02/09, second tour)</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">rapport de l'agent forge-tests du 02/09/2026 ; `uv run ruff check forge_tests tests recette` → 100 constats @ 62fd1b7, 101 @ 623a618</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">digit-ai-forge-tests</dd></div><div><dt>Score d'entrée</dt><dd>7.5 — gain 3 × preuve 5 ÷ effort 2</dd></div><div class="pleine"><dt>Coût déjà payé</dt><dd><p class="jalon-prose">S-01 non prononcable sur la recette entiere depuis une date inconnue, pour 100 constats qu'aucun commit n'a introduits — le verdict depend de la version d'un outil que personne n'a epinglee</p></dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-09-03</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">Sebastien — reponse « 42a, 43a, 38a » du 03/09/2026 a la synthese du second tour du 02/09 (D-42 (a) : les quatre constats du soir decides en bloc)</p></dd></div></dl>
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-09-03</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">MESURÉ : derive sur le MEME arbre — ruff 0.5.7 = 115 constats, ruff 0.16.1 = 100 (17 UP038 retires en amont, 2 UP031 apparus, zero octet change). Apres : uv run ruff check → All checks passed (100 → 0) ; verifier_corpus --section lint ECHEC → OK avec version consignee 0.16.1 / ruff==0.16.1 ; fixture double sens : 5 declarations non epinglees refusees, ruff==0.16.1 acceptee ; banc 1233 → 1240 tests, 0 echec.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><p class="jalon-prose">forge-tests @ 0000ff7 — pyproject.toml : ruff&gt;=0.5 → ruff==0.16.1 (+ uv.lock relocke). Les 100 constats SOLDES, pas mis en dette : 69 E501, 12 E741, 7 I001, 4 UP031, 3 F401, 2 UP009, 1 UP017, 1 F541, 1 B905 (zip strict=False assume) sur 12 modules et 15 fichiers de tests. recette/verifier_corpus.py : epinglage_ruff() + _version_ruff() ; la section lint CONSIGNE la version jouee et la declaration lue, et ECHOUE si la declaration n epingle pas (&gt;=, ~=, fourchette, absence) ou si la version jouee differe. tests/test_tf_0785_epinglage_ruff.py (7 cas). README : ligne S-01 lint fermee + doctrine.</p></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">forge-tests @ 0000ff7</p></dd></div><div><dt>Produits bénéficiaires</dt><dd title="produits ou missions ayant bénéficié de la correction, nommés au registre">Produit-01, Produit-02, Produit-09, Produit-10, Produit-11, Produit-12</dd></div></dl>
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-09-03</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
         <article class="card s-corrige" id="item-TF-0763" data-forge="tests" data-statut="corrige">
           <header class="card-head">
             <code class="tf-id">TF-0763</code>
@@ -26233,7 +26295,7 @@ HORS PORTEE DU PILOT SANS MANDAT : la correction vit chez forge-tests, et les tr
         </div>
       </section>
     </main>
-    <footer>Page générée par <code>todo/generer-archive.mjs</code> — ne pas éditer. Source unique : <code>todo/TODO-ARCHIVE.jsonl</code> (sceau <code>9a69679e4882</code> — si la source a bougé sans régénération, le sceau ne correspond plus). Détail brut d'un item : <code>grep '"id":"TF-xxxx"' todo/TODO-ARCHIVE.jsonl</code>. Le reste-à-faire vit dans <code>todo/TODO.html</code>.</footer>
+    <footer>Page générée par <code>todo/generer-archive.mjs</code> — ne pas éditer. Source unique : <code>todo/TODO-ARCHIVE.jsonl</code> (sceau <code>79fea665313e</code> — si la source a bougé sans régénération, le sceau ne correspond plus). Détail brut d'un item : <code>grep '"id":"TF-xxxx"' todo/TODO-ARCHIVE.jsonl</code>. Le reste-à-faire vit dans <code>todo/TODO.html</code>.</footer>
   </div>
   <!-- S-G1 (4/4, R-30) — câblage : persistance + aria-pressed, aucune bascule muette -->
   <script>

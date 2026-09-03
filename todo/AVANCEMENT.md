@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau 3f0a694f590f)]
+sources_de_verite: [todo/TODO.jsonl (sceau 348efc45a017)]
 verifie_le: 2026-09-03
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `3f0a694f590f`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `348efc45a017`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -19,10 +19,10 @@ les corrections donnerait l'illusion d'un progrès net.
 
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
-| Ouverts | 9 | candidats, décidés ou en cours — le reste à faire réel |
+| Ouverts | 8 | candidats, décidés ou en cours — le reste à faire réel |
 | Clos sur gains constatés | 0 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 0 | décidés non faits, motif écrit — jamais un silence |
-| Total suivi | 9 | tout ce que le registre a jamais porté |
+| Total suivi | 8 | tout ce que le registre a jamais porté |
 
 ## Ce qui reste ouvert, par forge
 
@@ -40,6 +40,16 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0674 | La porte de fraîcheur de déploiement empreinte encore un échantillon — le correctif d'ensemble n'est pas appli | decide | digit-ai-factory | 12.5 |
 | TF-0682 | Quinze contrôles du produit ne sont exercés par AUCUNE recette — être cité n'est pas être joué | decide | digit-ai-factory | 10 |
 | TF-0676 | Aucun script de capture du produit ne produit systématiquement une pleine page | decide | digit-ai-factory | 6.7 |
+
+### pilot — 2 item(s)
+
+Les items ouverts ciblant pilot, du score le plus fort au plus faible. Le score est
+celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
+
+| Id | Titre | Statut | Forge(s) | Score |
+|---|---|---|---|---|
+| TF-0549 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : | decide | pilot | 10 |
+| TF-0788 | pilot : une montee de version d un skill dans la journee n est SUE d aucune forge qui le consomme — la recette | candidat | pilot, digit-ai-forge-agents | 8 |
 
 ### forge-tests — 2 item(s)
 
@@ -59,26 +69,7 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | Id | Titre | Statut | Forge(s) | Score |
 |---|---|---|---|---|
 | TF-0784 | digit-ai-schemas : l'asset de reference embarque une COPIE FIGEE de table-filters.js (donc d'avant les correct | decide | digit-ai-forge-agents | 15 |
-| TF-0786 | forge-tests : un verdict de la recette (dashboard) depend des oracles du skill de pages INSTALLES sur le poste | decide | digit-ai-forge-tests, digit-ai-forge-agents | 10 |
-
-### digit-ai-forge-tests — 2 item(s)
-
-Les items ouverts ciblant digit-ai-forge-tests, du score le plus fort au plus faible. Le score est
-celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
-
-| Id | Titre | Statut | Forge(s) | Score |
-|---|---|---|---|---|
-| TF-0786 | forge-tests : un verdict de la recette (dashboard) depend des oracles du skill de pages INSTALLES sur le poste | decide | digit-ai-forge-tests, digit-ai-forge-agents | 10 |
-| TF-0785 | forge-tests : la section lint de la recette est rouge depuis une derive de version de ruff non epinglee (ruff> | decide | digit-ai-forge-tests | 7.5 |
-
-### pilot — 1 item(s)
-
-Les items ouverts ciblant pilot, du score le plus fort au plus faible. Le score est
-celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
-
-| Id | Titre | Statut | Forge(s) | Score |
-|---|---|---|---|---|
-| TF-0549 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : | decide | pilot | 10 |
+| TF-0788 | pilot : une montee de version d un skill dans la journee n est SUE d aucune forge qui le consomme — la recette | candidat | pilot, digit-ai-forge-agents | 8 |
 
 ## Ce que ce rapport ne dit pas
 
