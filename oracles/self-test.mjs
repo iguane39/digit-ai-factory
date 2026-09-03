@@ -6,7 +6,7 @@
  * dossier temporaire (git réel inclus) — rien n'est écrit dans le dépôt.
  */
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync, cpSync, renameSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -901,6 +901,35 @@ check("verte-COMPOSANTS-OPS : la section présente, même pour déclarer « aucu
   const { rapport } = lance(verte);
   const f = rapport.findings.find((x) => x.regle === "R-20" && x.statut === "PASS" && /Environnements de données/.test(x.message));
   if (!f) throw new Error("la branche PASS de la règle n'est jouée par personne — une section déclarée « aucun » est une réponse COMPLÈTE");
+});
+
+// ---- TF-0793 (03/09) — R-47 LIT LA RACINE WEB DÉCLARÉE, comme le relevé d'héritage -------------
+// Le produit 02 avait déclaré `racine_web: site` sur la demande de TF-0654, et AUCUN script ne
+// lisait la ligne. Ici : la même fixture verte, ses robots.txt et llms.txt déplacés sous site\ ;
+// AVEC la déclaration, R-47 les compte présents (deux artefacts de plus au vert) ; SANS elle,
+// ils sont simplement hors du compte (conditionnels) — rien n'est deviné, et le compte le dit.
+check("TF-0793 : R-47 compte un artefact conditionnel trouvé SOUS la racine web déclarée, et pas sans déclaration", () => {
+  const compte47 = (dossier) => {
+    const f = (lance(dossier).rapport.findings || []).find((x) => x.regle === "R-47" && x.ou === "artefacts hérités");
+    if (!f) throw new Error("aucun finding R-47 « artefacts hérités »");
+    const m = /(\d+) artefact\(s\) hérité\(s\)/.exec(f.message);
+    if (!m) throw new Error(`R-47 ne dit pas combien d'artefacts il a comptés : ${f.message}`);
+    return Number(m[1]);
+  };
+  const monter = (declare) => {
+    const d = mkdtempSync(join(tmpdir(), "conf-racine-web-"));
+    cpSync(verte, d, { recursive: true });
+    mkdirSync(join(d, "site"), { recursive: true });
+    for (const f of ["robots.txt", "llms.txt"]) { renameSync(join(d, f), join(d, "site", f)); }
+    const param = readFileSync(join(d, "docs", "projet", "PARAMETRAGE.md"), "utf8");
+    if (declare) writeFileSync(join(d, "docs", "projet", "PARAMETRAGE.md"), param.replace("verifie_le:", "racine_web: site\nverifie_le:"), "utf8");
+    return d;
+  };
+  const avec = monter(true), sans = monter(false);
+  try {
+    const nAvec = compte47(avec), nSans = compte47(sans);
+    if (nAvec !== nSans + 2) throw new Error(`avec déclaration ${nAvec} artefact(s) au vert, sans ${nSans} — attendu +2 (robots.txt et llms.txt sous site\\)`);
+  } finally { rmSync(avec, { recursive: true, force: true }); rmSync(sans, { recursive: true, force: true }); }
 });
 
 for (const d of [verte, rouge, rougeDocs, rougeLock, rougeR24, ecartR24, rougeR2, verteR2, rougeR19, verteR19, rougeR42, verteR42, partielR42, verteTdp, rougeTdp, rougeTdpNu, rougeTdpNature, verteTdpNature, rougeTdpSection, antTdpSection, rougeCop, antCop]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
