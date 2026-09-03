@@ -25,6 +25,11 @@
  *      du 08/08 (TF-0042..48) précèdent la règle et le circuit de remise, constat consigné.
  *  R11 aucun `ts` POSTÉRIEUR à l'heure d'exécution — un horodatage qui n'est pas encore
  *      arrivé n'a pas été mesuré, il a été composé (TF-0413, 20/08).
+ *  R13 (03/09/2026, mandat d'amélioration continue) toute `classe` portée par une création
+ *      est une clé de todo/CLASSES.json (FAIL sinon : une clé hors référentiel ne se compte pas) ;
+ *      toute création marquée `recidive_de` est SIGNALÉE — statut AVERT, jamais FAIL : la
+ *      récidive est une mesure de la descente, refuser le registre qui la porte la cacherait.
+ *      Entre avertissante (doctrine v2.5.0 de RESTITUTION.md) : se durcira sur corpus propre.
  *  R9 bis — RECTIFICATION DÉCLARÉE d'un horodatage (TF-0413, patron R-42/TF-0410). Un
  *      événement `ev: "rectification_horodatage"` porte `entrees: [{id, ts_consigne,
  *      ts_reel_estime, cause}]` : R9 se juge alors sur `ts_reel_estime`, et l'écart s'IMPRIME
@@ -62,6 +67,8 @@ const findings = [];
 const notes = [];
 const ko = (regle, ou, message) => findings.push({ regle, statut: "FAIL", ou, message });
 const ok = (regle, message) => findings.push({ regle, statut: "PASS", ou: "-", message });
+const avert = (regle, ou, message) => findings.push({ regle, statut: "AVERT", ou, message });
+let recidivesVues = 0, classesVues = 0;
 
 const TRANSITIONS = {
   candidat: ["decide", "ecarte"], decide: ["en_cours", "corrige", "ecarte"],
@@ -79,6 +86,11 @@ function lire(fichier) {
 const SEUIL_R10 = "2026-08-09T00:00:00Z";
 const SEUIL_R7_ECART = "2026-08-13T00:00:00Z"; // naissance de TF-0157
 const SEUIL_R12_DESCENTE = "2026-09-02T14:00:00Z"; // TF-0757 : les clôtures antérieures restent de la prose, déclaré
+// R13 : le référentiel de classes — surchargeable par --classes pour la recette.
+const iClasses = process.argv.indexOf("--classes");
+const CLASSES_PATH = iClasses > 0 ? process.argv[iClasses + 1] : join(ICI, "CLASSES.json");
+let CLASSES = null;
+try { CLASSES = new Set((JSON.parse(readFileSync(CLASSES_PATH, "utf8")).classes || []).map((c) => c.cle)); } catch { CLASSES = null; }
 // R11 : entrée en vigueur POSTÉRIEURE au dernier horodatage inventé du registre
 // (2026-08-20T18:21:00Z) — les événements en deçà sont l'antériorité que TF-0413 a mesurée,
 // jamais réécrite (patron R-42 : on ne corrige pas l'histoire, on cesse d'en produire).
@@ -169,6 +181,16 @@ function replier(evenements, ou) {
       if (e.statut !== "candidat") ko("R4", e.id, `creation en statut ${e.statut} — tout entre en candidat`);
       creationsRecentes.push(e.id);
       if (RE_EXTERNE.test(e.demandeur || "") && e.ts >= SEUIL_R10) externesNonCouvertes.push(e.id);
+      // R13 — classe hors référentiel : FAIL ; récidive marquée : AVERT (mesure, pas défaut du registre)
+      if (e.classe) {
+        classesVues++;
+        if (CLASSES === null) ko("R13", e.id, `classe « ${e.classe} » portée mais référentiel ${CLASSES_PATH} illisible — une clé ne se juge pas sans référentiel`);
+        else if (!CLASSES.has(String(e.classe))) ko("R13", e.id, `classe « ${e.classe} » absente de todo/CLASSES.json — une clé hors référentiel ne se compte pas ; la créer dans le référentiel (datée, sourcée) ou corriger la création par rectification`);
+      }
+      if (Array.isArray(e.recidive_de) && e.recidive_de.length) {
+        recidivesVues++;
+        avert("R13", e.id, `RÉCIDIVE de ${e.recidive_de.join(", ")} (classe « ${e.classe} ») — la descente n'a pas tenu chez « ${e.demandeur} » ; à lire au tableau de bord todo/RECIDIVES.md, jamais à effacer`);
+      }
       etats.set(e.id, { ...e, ts: tsEffectif });
     } else if (e.ev === "maj") {
       const etat = etats.get(e.id);
@@ -243,8 +265,9 @@ if (process.argv.includes("--rectifications")) {
 }
 const echecs = findings.filter((f) => f.statut === "FAIL").length;
 console.log(JSON.stringify({
-  oracle: "oracle-todo", version: "1.2.0", verdict: echecs ? "FAIL" : "PASS", findings,
+  oracle: "oracle-todo", version: "1.3.0", verdict: echecs ? "FAIL" : "PASS", findings,
   non_juge: [
+    `R13 : ${classesVues} création(s) classée(s), ${recidivesVues} récidive(s) marquée(s) — la récidive est AVERTISSANTE, elle mesure la descente et ne met jamais le registre en échec ; la JUSTESSE d'une classe déclarée par un producteur n'est pas jugée`,
     "la pertinence des scores (gain/effort) est un jugement humain, pas une règle",
     "la véracité des gains_constates n'est pas vérifiée dans le monde — seule leur présence l'est",
     "R11 ne juge que l'AVANCE sur l'heure d'exécution : un ts en RETARD (antidaté) reste hors de portée, comme un ts faux mais plausible — seul l'impossible est refusé",

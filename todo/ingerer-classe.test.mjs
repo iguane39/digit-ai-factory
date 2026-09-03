@@ -42,9 +42,10 @@ writeFileSync(CLASSES, JSON.stringify({
 // Registre de départ : TF-0001 clos en corrige le 27/08 (la classe est fondée par lui).
 const REGISTRE_BASE = [
   JSON.stringify({ ev: "creation", ts: "2026-08-20T10:00:00.000Z", id: "TF-0001", titre: "t", contenu: "c", demandeur: "pilot", source: "s", date_demande: "2026-08-20", statut: "candidat", forges_cibles_initiales: ["digit-ai-factory"], score: { gain: 3, preuve: 1, effort: 1, valeur: 3 } }),
+  JSON.stringify({ ev: "maj", ts: "2026-08-21T10:00:00.000Z", id: "TF-0001", statut: "decide", decideur: "humain", date_decision: "2026-08-21" }),
   JSON.stringify({ ev: "maj", ts: "2026-08-27T10:00:00.000Z", id: "TF-0001", statut: "corrige", date_correction: "2026-08-27", gains_constates: "g", corrections_realisees: "x" }),
 ].join("\n") + "\n";
-const MD = "# lot\n\n## pilot\n\ntable\n\n## Remarques restées au produit\n\nAucune.\n\n## Retours sur les documents produits\n\nAucun document produit depuis un gabarit de la bibliothèque sur ce lot.\n";
+const MD = "# lot\n\n## pilot\n\ntable\n\n## Remarques restées au produit\n\n| Remarque | Corrigée comment | Généralisable ? | Verdict |\n|---|---|---|---|\n| tri cassé | index ajouté | non | propre au schéma de ce produit |\n\n## Retours sur les documents produits\n\nAucun document produit depuis un gabarit de la bibliothèque sur ce lot.\n";
 const cand = (sur) => JSON.stringify({
   schema: 1, titre: "pilot : un retour de recette", contenu: "c", demandeur: "produit-recette",
   source: "lot de recette", date_demande: "2026-09-03", forges_cibles_initiales: ["digit-ai-factory"], ...sur,

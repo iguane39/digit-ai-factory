@@ -47,9 +47,19 @@ pilot, préfixé du nom de la forge émettrice).
 par élément visant une forge :
 `{"schema":1, "titre":…, "contenu":…, "demandeur":"<produit ou forge>", "source":"<lot +
 seq ledger>", "date_demande":…, "forges_cibles_initiales":[…], "score":{gain,preuve,effort}
-si estimable, "preuve_du_cout":…}`. **JAMAIS d'id** : les ids TF sont frappés à l'ingestion
-par le pilot. Le sidecar est ce qui rend la remontée automatique — le `.md` reste la
-lecture humaine.
+si estimable, "preuve_du_cout":…, "classe":"<clé de forge\retours\CLASSES.json>"}`. **JAMAIS
+d'id** : les ids TF sont frappés à l'ingestion par le pilot. Le sidecar est ce qui rend la
+remontée automatique — le `.md` reste la lecture humaine.
+
+**La classe est obligatoire depuis le 03/09/2026** (mandat d'amélioration continue) : chaque ligne
+du sidecar désigne UNE classe de `forge\retours\CLASSES.json` — copie identique du référentiel
+du pilot, reçue avec ce gabarit. Une classe est le défaut généralisé que ce retour illustre — la
+règle qui aurait évité le retour — jamais une famille. Lot sans classe, ou à classe inconnue :
+**refusé à l'ingestion**, avec les clés proches. Aucune clé ne convient ? Le dire dans le `.md`
+(section « La règle qui aurait évité le retour ») et laisser le pilot créer la classe dans son
+référentiel : une classe ne se crée jamais dans un sidecar. Un retour dont la classe est déjà
+close chez le pilot entre quand même, **marqué récidive** — c'est précisément l'information
+que la factory cherche : une correction qui n'a pas redescendu jusqu'à vous.
 
 **Rectifier un retour déjà remis (TF-0703, 31/08)** : un lot remis ne se modifie JAMAIS — et
 c'est cette immuabilité qui force à déclarer une erreur plutôt qu'à l'effacer. Le geste

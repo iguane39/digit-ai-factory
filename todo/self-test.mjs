@@ -5,7 +5,7 @@
  * ÉCHOUENT chacune pour la règle attendue. La vue est générée 2× → identique (déterminisme).
  * Fixtures en dossier temporaire — rien n'est écrit dans le dépôt.
  */
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { mkdtempSync, writeFileSync, rmSync, readFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
@@ -557,6 +557,28 @@ check("fixture témoin verte : elle démontre bien R-30, et non son contraire", 
     throw new Error("color-scheme figé dans un <meta> — défaut RV-9 dans la preuve de référence");
   if (/prefers-color-scheme honoré/.test(html))
     throw new Error("la description annonce encore « prefers-color-scheme honoré » — la fixture ment sur ce qu'elle prouve");
+});
+
+// ── R13 (03/09/2026) : une classe se juge au référentiel, une récidive se SIGNALE sans échec ──
+const classesRecette = join(T, "CLASSES.json");
+writeFileSync(classesRecette, JSON.stringify({ classes: [{ cle: "page-html-polices-distantes", famille: "page-html-socle", fondee_par: [] }] }), "utf8");
+const lanceClasses = (actifs) => {
+  const r = spawnSync("node", [oracle, actifs, join(T, "vide.jsonl"), "--classes", classesRecette], { encoding: "utf8" });
+  return { code: r.status, sortie: String(r.stdout || "") };
+};
+const r13verte = join(T, "R13-verte.jsonl");
+writeFileSync(r13verte, item({ classe: "page-html-polices-distantes", recidive_de: ["TF-0001"] }) + "\n", "utf8");
+check("verte R13 : classe connue + récidive marquée → PASS exit 0, et la récidive est SIGNALÉE (AVERT) sans échec", () => {
+  const r = lanceClasses(r13verte);
+  if (r.code !== 0) throw new Error(`exit ${r.code} : ${r.sortie.slice(0, 300)}`);
+  if (!/"regle": "R13",\s*"statut": "AVERT"/.test(r.sortie)) throw new Error("la récidive n'est pas signalée en AVERT");
+});
+const r13rouge = join(T, "R13-rouge.jsonl");
+writeFileSync(r13rouge, item({ classe: "page-html-polices" }) + "\n", "utf8");
+check("rouge R13 : classe hors référentiel → FAIL exit 1, règle nommée", () => {
+  const r = lanceClasses(r13rouge);
+  if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1`);
+  if (!/"regle": "R13",\s*"statut": "FAIL"/.test(r.sortie)) throw new Error("R13 absente des échecs");
 });
 
 rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
