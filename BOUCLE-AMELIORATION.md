@@ -2153,3 +2153,5 @@ Registre : 11 → 7 actifs (1 candidat, 6 décidés), 5 clôtures ce jour avec d
 Registre PASS, porte de publication PASS (historique compris), banc du pilot rejoué en clôture.
 
 **Rapport final de l agent forge-agents (11:45)** : second constat en passant entré en candidat, **TF-0789** — l exemple de référence de digit-ai-schemas déborde à 390 px (16 constats v1_overflow, antérieurs, mesurés identiques avant et après TF-0784) et n a pas de verdict de lecture tierce (T1/T2 du 02/09). Registre : 8 actifs (2 candidats, 6 décidés).
+
+**Incident de clôture (11:35)** : une seconde session (mandat d'amélioration continue du 03/09) écrit dans ce dépôt en parallèle ; `git add -A` a emporté quatre de ses fichiers en cours dans fb9a560 et faa288b (`todo/CLASSES.json`, `oracles/hook-lexique.mjs` + test, `todo/generer-recidives.mjs`, `todo/ingerer-classe.test.mjs`), non relus ici. Classe du 22/08 (deux sessions qui se croisent) : parade appliquée dès cet enregistrement — `git add` par chemins nommés ; l'autre session ré-enregistre son travail par-dessus. Le banc 86/86 de clôture a été joué avant leur apparition.
