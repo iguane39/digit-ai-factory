@@ -261,6 +261,31 @@
     .etat-vide { display: none; padding: 16px; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); }
     .table-hote[data-vide="oui"] table { display: none; }
     .table-hote[data-vide="oui"] .etat-vide { display: block; }
+    /* Sommaire (L6) — le `nav.toc` était déclaré sans jamais être stylé : il se rendait en
+       liste numérotée nue, ce qu'aucun livrable Digit-AI ne fait. Forme alignée sur les
+       livrables réels du parc : deux colonnes, titre souligné en bloc, annonce en gris dessous.
+       Marquage attendu par entrée : <a href="#id"><span class="toc-t">…</span><span class="toc-d">…</span></a> */
+    .toc { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 24px; margin: 24px 0 32px; }
+    .toc h2 { margin-top: 0; }
+    .toc ol, .toc ul { columns: 2; column-gap: 32px; padding-left: 20px; }
+    .toc li { break-inside: avoid; max-width: none; margin-bottom: .6em; }
+    .toc a { text-decoration: none; }
+    .ch-apprend { color: var(--muted); margin: .2em 0 1.1em; }
+
+    /* TF-0787 (03/09/2026) — au-delà de trois chapitres, le sommaire est LATÉRAL et COLLANT sur
+       bureau (L25 du socle, famille de rendu sommaire_perdu) : un sommaire posé en tête d'un
+       document de quatre écrans disparaît au premier tiers de la lecture et ne navigue plus rien.
+       Grille deux colonnes, sommaire collé au bord haut, une colonne d'entrées ; sous 900 px, le
+       sommaire redevient un bloc statique en tête. */
+    .doc-grille { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 32px; align-items: start; }
+    .doc-grille > nav.toc { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; margin: 0; padding: 16px 18px; }
+    .doc-grille > nav.toc ol, .doc-grille > nav.toc ul { columns: 1; }
+    .doc-grille > nav.toc h2 { font-size: 1.05rem; margin: 0 0 .5em; }
+    .doc-grille > .doc-corps { min-width: 0; }
+    @media (max-width: 900px) { .doc-grille { grid-template-columns: 1fr; } .doc-grille > nav.toc { position: static; max-height: none; } }
+    .toc .toc-t { display: block; text-decoration: underline; }
+    .toc .toc-d { display: block; color: var(--muted); font-size: .84rem; }
+    @media (max-width: 760px) { .toc ol, .toc ul { columns: 1; } }
   </style>
 </head>
 <body>
@@ -286,10 +311,24 @@
     </header>
 
     <main>
+      <div class="doc-grille">
+      <nav class="toc" aria-label="Sommaire">
+        <h2>Sommaire</h2>
+        <ol>
+          <li><a href="#resultat"><span class="toc-t">Le résultat en une page</span><span class="toc-d">ce que le lecteur retient, avant tout détail</span></a></li>
+          <li><a href="#contenu"><span class="toc-t">Ce que contiennent les données</span><span class="toc-d">les sources, leur périmètre et leur fraîcheur</span></a></li>
+          <li><a href="#detail"><span class="toc-t">Le détail, élément par élément</span><span class="toc-d">chaque élément avec sa mesure et son verdict</span></a></li>
+          <li><a href="#synthese"><span class="toc-t">Synthèse</span><span class="toc-d">ce qui ressort de l'ensemble des éléments</span></a></li>
+          <li><a href="#decisions"><span class="toc-t">Décisions restantes</span><span class="toc-d">ce qui reste à trancher, et par qui</span></a></li>
+          <li><a href="#tracabilite"><span class="toc-t">Traçabilité</span><span class="toc-d">d'où vient chaque chiffre, et comment le rejouer</span></a></li>
+        </ol>
+      </nav>
+      <div class="doc-corps">
       <!-- 1 · LE RÉSULTAT EN UNE PAGE — le verdict avant toute mécanique.
            Un lecteur qui s'arrête ici repart avec le résultat. -->
       <section class="chap lire" id="resultat">
         <h2>Le résultat en une page</h2>
+        <p class="ch-apprend">Ce chapitre donne le verdict d'ensemble avant tout détail : ce que les données disent, en une page, et la décision qu'elles permettent de prendre ou d'ajourner.</p>
         <p>{Trois à cinq phrases en langage de commanditaire : ce qu'on a trouvé, et ce que
            ça change pour celui qui lit. Aucune méthode ici.}</p>
         <div class="table-hote">
@@ -312,6 +351,7 @@
       <!-- 2 · CE QUE CONTIENNENT LES DONNÉES — de quoi juger si le reste tient. -->
       <section class="chap lire" id="contenu">
         <h2>Ce que contiennent les données</h2>
+        <p class="ch-apprend">Ce chapitre décrit les sources lues : leur périmètre, leur date de fraîcheur, ce qu'elles couvrent et ce qu'elles ne couvrent pas — pour que chaque chiffre du rapport ait une origine nommée.</p>
         <p>{Volumes, période couverte, complétude, anomalies structurelles.}</p>
       </section>
 
@@ -320,6 +360,7 @@
            + data-label sur CHAQUE td). D4 : l'état vide est écrit. -->
       <section id="detail">
         <h2>Le détail, élément par élément</h2>
+        <p class="ch-apprend">Ce chapitre passe les éléments un par un, chacun avec sa mesure, son seuil et son verdict, dans l'ordre où le lecteur les rencontre dans le tableau.</p>
         <div class="table-hote">
           <table class="repli-cartes">
             <caption>Détail par élément</caption>
@@ -340,12 +381,14 @@
       <!-- 4 · SYNTHÈSE — ce que le détail dessine, pas une répétition du résultat. -->
       <section class="chap lire" id="synthese">
         <h2>Synthèse</h2>
+        <p class="ch-apprend">Ce chapitre rassemble ce qui ressort de l'ensemble : les tendances, les écarts qui comptent, et ce qui distingue un signal d'un bruit de mesure.</p>
         <p>{…}</p>
       </section>
 
       <!-- 5 · DÉCISIONS RESTANTES — une décision sans porteur nommé n'en est pas une. -->
       <section id="decisions">
         <h2>Décisions restantes</h2>
+        <p class="ch-apprend">Ce chapitre liste ce qui reste à trancher, par qui, avant quelle date — une décision sans décideur nommé n'y figure pas.</p>
         <div class="table-hote">
           <table class="repli-cartes">
             <caption>Décisions restant à trancher</caption>
@@ -367,6 +410,7 @@
       <!-- 6 · TRAÇABILITÉ — un rapport dont les chiffres ne se rejouent pas est une opinion. -->
       <section id="tracabilite">
         <h2>Traçabilité</h2>
+        <p class="ch-apprend">Ce chapitre dit d'où vient chaque chiffre et comment le rejouer : les fichiers lus, la commande jouée, et l'empreinte du jeu de données.</p>
         <div class="table-hote">
           <table class="repli-cartes">
             <caption>Origine de chaque chiffre</caption>
@@ -383,6 +427,8 @@
           <p class="etat-vide">Aucune source déclarée — un rapport de données sans traçabilité ne se remet pas.</p>
         </div>
       </section>
+      </div>
+      </div>
     </main>
 
     <footer class="doc">

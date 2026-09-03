@@ -60,5 +60,6 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `20260901-etude-opportunite-dataforseo.md` | fichier | 20,6 Ko | Étude d'opportunité — DataForSEO dans le dispositif de mesure de Produit-02 — 20260901a |
 | `20260901-etude-opportunite-strategie-tests.md` | fichier | 23,9 Ko | Étude d'opportunité — stratégie de tests et temps d'exécution des campagnes — 20260901a |
 | `20260902-etude-opportunite-dataforseo-produit-02.md` | fichier | 43,7 Ko | Étude d'opportunité — entrée de DataForSEO dans le dispositif de mesure de Produit-02 — 20 |
+| `20260903-L99-amelioration-continue.md` | fichier | 42,3 Ko | Analyse L99 — « Conçois et construis un système d'amélioration continue de la factory » |
 
-_44 fichier(s), 0 sous-dossier(s)_
+_45 fichier(s), 0 sous-dossier(s)_
