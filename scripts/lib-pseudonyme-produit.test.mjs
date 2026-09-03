@@ -15,7 +15,7 @@ const clients = join(T, "clients.json");
 const produits = join(T, "produits.json");
 // Forme du référentiel réel (lireClients) : noms + sigles, pseudonymes déclarés par nom — inventés.
 writeFileSync(clients, JSON.stringify({ noms: ["Fictilabs"], sigles: ["FLB"], pseudonymes: { Fictilabs: "Client-Z", FLB: "Fournisseur-Z" } }), "utf8");
-writeFileSync(produits, JSON.stringify({ produits: { "Produit-01": "Produit-01", "CalculatriceClient-ZSCC": "Produit-04", "portail-fictif": "Produit-07" } }), "utf8");
+writeFileSync(produits, JSON.stringify({ produits: { "portail-valideur": "Produit-01","CalculatriceClient-ZSCC": "Produit-04", "portail-fictif": "Produit-07" } }), "utf8");
 process.env.FORGE_NOMS_INTERDITS = clients;
 process.env.FORGE_PRODUITS_PSEUDO = produits;
 
@@ -28,7 +28,7 @@ const cles = () => Object.keys(JSON.parse(readFileSync(produits, "utf8")).produi
 
 try {
   check("un produit connu de la table rend son pseudonyme", () => {
-    att(pseudonymeProduit("_Fictilabs/Produit-01") === "Produit-01", "attendu Produit-01");
+    att(pseudonymeProduit("_Fictilabs/portail-valideur") === "Produit-01", "attendu Produit-01");
   });
   check("un nom dont la clé de table est déjà partiellement anonymisée rend le pseudonyme existant", () => {
     att(pseudonymeProduit("_Fictilabs/CalculatriceFictilabsSCC") === "Produit-04", "attendu Produit-04 (clé CalculatriceClient-ZSCC)");
@@ -54,7 +54,7 @@ try {
   check("un référentiel absent fait LEVER — l'appelant ne journalise pas", () => {
     process.env.FORGE_NOMS_INTERDITS = join(T, "absent.json");
     let leve = false;
-    try { pseudonymeProduit("_Fictilabs/Produit-01"); } catch { leve = true; }
+    try { pseudonymeProduit("_Fictilabs/portail-valideur"); } catch { leve = true; }
     process.env.FORGE_NOMS_INTERDITS = clients;
     att(leve, "aucune exception levée sans référentiel des clients");
   });
