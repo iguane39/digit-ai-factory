@@ -137,6 +137,25 @@ sidecar suivie) : deux lots sous un même nom ne s'ordonnent pas — classe TF-0
 lots. Recettes : `todo\reempreinter-lot.test.mjs` (12 cas), `todo\ingerer-anonymise-fichier.test.mjs`
 (l'événement d'ingestion passe par la même substitution que la candidature — RT-11 du Produit-12).
 
+**Réécrire l'historique d'un dépôt est un geste humain décidé, outillé par un mode opératoire
+fixe (TF-0752, D-38 (a), 03/09).** Nettoyer l'arbre ne nettoie pas le passé : le 01/09, la porte
+de publication rendait 200 constats dans l'historique seul du pilot. La séquence jouée, et à
+rejouer telle quelle sur tout dépôt qui publie : (1) **sauvegarde entière** — `git bundle create
+<hors-dépôt>/<dépôt>-avant-filter-repo.bundle --all`, vérifiée par `git bundle verify`, HEAD
+d'avant consigné à côté ; (2) **règles dérivées des tables, jamais écrites à la main** —
+`node scripts\generer-remplacements-historique.mjs <dossier>` produit `remplacements.txt`
+(contenus + messages) et `filename-callback.py` (noms de fichiers) depuis `_noms-interdits.json`
+et `_produits-pseudonymes.json`, lues au moment du geste ; (3) **réécriture** —
+`git filter-repo --replace-text <dossier>\remplacements.txt --replace-message <même fichier>
+--filename-callback "$(cat <dossier>\filename-callback.py)" --force` (répondre N si l'outil
+propose de continuer une passe d'un autre jour) ; (4) **remettre `origin`**, que l'outil retire ;
+(5) **juger** — `oracle-nom-client-publie .` doit rendre PASS, historique compris ; un constat
+restant se traite en corrigeant le GÉNÉRATEUR (pas le fichier de règles) et en rejouant (3)-(5).
+Ce que la première passe a appris : un sigle se remplace insensible à la casse, comme la porte le
+juge — 96 constats tenaient à un identifiant de run en minuscules. Après le geste, deux choses
+restent humaines : la publication forcée (`git push --force`, R-38) et toute autre copie locale du
+dépôt, devenue incompatible avec la nouvelle histoire (à recloner, pas à fusionner).
+
 **La propagation d'une correction se MESURE, elle ne se souhaite pas (TF-0689, 01/09).** Le
 champ `produits_beneficiaires` est de la prose — 73 items clos en portaient au 27/08, aucun
 n'était opposable à personne, et un produit nommé bénéficiaire a livré DEUX FOIS sans le
