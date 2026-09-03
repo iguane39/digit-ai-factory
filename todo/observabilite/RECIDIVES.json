@@ -1,0 +1,15 @@
+{
+ "outil": "generer-recidives",
+ "etat_au": "2026-09-03T12:33:09.964Z",
+ "items": 790,
+ "items_classes": 0,
+ "recidives": 0,
+ "classes": 30,
+ "familles": 18,
+ "classes_sans_fondateur": 1,
+ "retours_classe_suspecte": 0,
+ "releves": 2,
+ "produits_releves": 9,
+ "produits_non_equipes": 5,
+ "manques_heritage": 76
+}

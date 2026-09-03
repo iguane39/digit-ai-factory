@@ -50,7 +50,10 @@ famille `page-html-socle` compte 13 récidives déclarées sur 5 producteurs, `v
 plus (les 28 classes seed en portent déjà une chacune) : elle demande que la vue soit
 SURVEILLÉE ENTRE LES RUNS par forge-observability — sonde `rapport_json` sur le tableau de bord,
 dérive = une récidive de plus ou une classe de plus par rapport au relevé précédent — parce qu'une
-mesure que personne ne relit entre deux tours est une mesure qui ne change rien (N-1).
+mesure que personne ne relit entre deux tours est une mesure qui ne change rien (N-1). **Décidée le
+03/09 (D-2, option a) et câblée le jour même** : plan `todo\observabilite\plan-recidives.json`,
+lanceur `todo\observer-recidives.mjs` (recette 4 cas rouge/vert), cadence hebdomadaire tenue par
+le hook d'ouverture du pilot, premier passage exercé — voir `fiches\forge-observability.md`.
 
 ## Canal des retours produits (règle 18, 06/08/2026)
 

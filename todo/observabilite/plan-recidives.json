@@ -1,0 +1,28 @@
+{
+  "format": "forge-observability/plan@1",
+  "nom": "recidives-pilot",
+  "_role": "TF-0790 (décision D-2 (a) du 03/09/2026) : surveiller ENTRE les runs le tableau de bord des récidives et de la descente. Une récidive de plus, une classe de plus ou un produit non équipé de plus depuis le relevé précédent est une DÉRIVE — le FAIL de derive.mjs est le signal, rien n'est appliqué automatiquement (R-29). Invoqué par todo/observer-recidives.mjs (chemins relatifs à la racine du pilot) ; cadence hebdomadaire tenue par le hook d'ouverture du pilot, premier passage exercé à la main le 03/09 (N-1).",
+  "sondes": [
+    {
+      "nom": "recidives-regeneration",
+      "type": "commande",
+      "cadence": "hebdomadaire",
+      "commande": ["node", "todo/generer-recidives.mjs", "--json", "todo/observabilite/RECIDIVES.json"],
+      "champ_valeur": "recidives",
+      "seuils": { "max_delta": 0 }
+    },
+    {
+      "nom": "recidives-compteurs",
+      "type": "rapport_json",
+      "cadence": "hebdomadaire",
+      "fichier": "todo/observabilite/RECIDIVES.json",
+      "champs": ["recidives", "classes", "classes_sans_fondateur", "retours_classe_suspecte", "produits_non_equipes", "manques_heritage"],
+      "seuils": {
+        "recidives": { "max_delta": 0 },
+        "classes": { "max_delta": 0 },
+        "produits_non_equipes": { "max_delta": 0 },
+        "retours_classe_suspecte": { "max_delta": 0 }
+      }
+    }
+  ]
+}

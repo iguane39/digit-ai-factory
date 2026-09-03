@@ -35,6 +35,10 @@ const CLS = arg("--classes", join(ICI, "CLASSES.json"));
 const REL = arg("--releves", join(ICI, "HERITAGE-RELEVES.jsonl"));
 const HER = arg("--heritage", join(ICI, "..", "gabarits", "HERITAGE.json"));
 const OUT = arg("--sortie", join(ICI, "RECIDIVES.md"));
+// `--json <fichier>` (TF-0790, 03/09/2026) : les compteurs du tableau de bord dans un JSON que la sonde
+// `rapport_json` de forge-observability sait lire — et sur stdout, pour la sonde `commande`. La vue
+// Markdown reste générée dans le même passage : un seul calcul, deux formes.
+const JSON_OUT = arg("--json", null);
 const lire = (f) => (existsSync(f) ? readFileSync(f, "utf8").split("\n").filter((l) => l.trim()).map((l) => JSON.parse(l)) : []);
 // Le sceau passe par la fonction PARTAGÉE (N-7, references/EMPREINTES.md) — un sixième mécanisme de hachage
 // maison est exactement ce que l'oracle des empreintes existe pour refuser.
@@ -174,4 +178,20 @@ L.push(`## Ce que cette vue ne juge pas`, ``,
   `- la descente d'une règle qui ne vit dans aucun artefact hérité : elle est déclarée non mesurable, jamais supposée faite ;`,
   `- les items antérieurs au 03/09/2026 sans classe : ils ne comptent ni comme items ni comme récidives — la mesure du pas 0 (output/03-etudes) les a lus une fois, à la main.`, ``);
 writeFileSync(OUT, L.join("\n"), "utf8");
-console.log(`${OUT} : ${classes.size} classe(s), ${recidives.length} récidive(s), ${releves.length} relevé(s) — état au ${tsMax || "(vide)"}`);
+if (JSON_OUT) {
+  // Les compteurs que la sonde surveille. `produits_non_equipes` = produits du dernier relevé sans
+  // lanceur de hooks (ils ne reçoivent aucune descente) ; `manques_heritage` = total des manques.
+  const produitsNonEquipes = dernier ? (dernier.produits || []).filter((p) => (p.artefacts || []).some((a) => /hooks\/factory\.mjs$/.test(a.cible || "") && a.etat === "absent")).length : null;
+  const manques = dernier ? (dernier.produits || []).reduce((n, p) => n + (p.absents || 0) + (p.divergents || 0) + (p.incomplets || 0), 0) : null;
+  const compteurs = {
+    outil: "generer-recidives", etat_au: tsMax || null,
+    items: items.length, items_classes: avecClasse.length, recidives: recidives.length,
+    classes: classes.size, familles: familles.size, classes_sans_fondateur: sansFondateur.length, retours_classe_suspecte: suspectes.length,
+    releves: releves.length, produits_releves: dernier ? (dernier.produits || []).length : null,
+    produits_non_equipes: produitsNonEquipes, manques_heritage: manques,
+  };
+  writeFileSync(JSON_OUT, JSON.stringify(compteurs, null, 1) + "\n", "utf8");
+  console.log(JSON.stringify(compteurs));
+} else {
+  console.log(`${OUT} : ${classes.size} classe(s), ${recidives.length} récidive(s), ${releves.length} relevé(s) — état au ${tsMax || "(vide)"}`);
+}
