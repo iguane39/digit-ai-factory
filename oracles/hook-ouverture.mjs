@@ -174,14 +174,22 @@ if (iPilot < 0) {
         const parCible = new Map((her.artefacts || []).map((a) => [a.cible, a.familles_protegees || []]));
         famillesDe = (l) => [...new Set((l.artefacts || []).filter((a) => a.etat === "absent" || a.etat === "divergent" || a.etat === "incomplet").flatMap((a) => parCible.get(a.cible) || []))].sort();
       } catch { /* héritage illisible : les familles ne sont pas nommées, le manque l'est déjà */ }
+      // D-1 (a) du 03/09/2026 — LE JOURNAL EST SUIVI PAR GIT, DONC IL NE PORTE QUE DES PSEUDONYMES.
+      // Cinq ouvertures ont écrit ici le chemin RÉEL de chaque produit ; la porte de publication
+      // (oracle-nom-client-publie) a rendu 21 constats C1 sur ce fichier et sur todo/RECIDIVES.md
+      // qui en est généré — le matin même de la réécriture d'historique qui retirait ces noms.
+      // Le pseudonyme sort de scripts/lib-pseudonyme-produit.mjs (référentiels hors dépôt) ; si un
+      // référentiel manque, on ne journalise PAS et on le dit : un nom réel de plus n'est jamais
+      // le moindre mal. L'affichage à l'écran, lui, garde les chemins réels — il n'est pas suivi.
       try {
+        const { pseudonymeProduit } = await import("../scripts/lib-pseudonyme-produit.mjs");
         appendFileSync(join(PILOT, "todo", "HERITAGE-RELEVES.jsonl"), JSON.stringify({
           ts: new Date().toISOString(), contrat: j.contrat, produits: (j.lignes || []).map((l) => ({
-            produit: l.produit, absents: l.absents, divergents: l.divergents, incomplets: l.incomplets, total: l.total,
+            produit: pseudonymeProduit(l.produit), absents: l.absents, divergents: l.divergents, incomplets: l.incomplets, total: l.total,
             artefacts: (l.artefacts || []).map((a) => ({ cible: a.cible, etat: a.etat })),
           })),
         }) + "\n", "utf8");
-      } catch (e) { lignes.push(`- relevé NON journalisé (${e.message}) — le délai de descente ne se mesurera pas sur cette ouverture`); }
+      } catch (e) { lignes.push(`- relevé NON journalisé (${e.message}) — le délai de descente ne se mesurera pas sur cette ouverture ; aucun nom réel n'a été écrit`); }
       for (const l of enDefaut.slice(0, 12)) {
         const lanceur = (l.artefacts || []).find((a) => /hooks\/factory\.mjs$/.test(a.cible || ""));
         const sansLanceur = lanceur && lanceur.etat === "absent";
@@ -192,6 +200,25 @@ if (iPilot < 0) {
       if (enDefaut.length > 12) lignes.push(`  - … et ${enDefaut.length - 12} autre(s) — détail : node scripts/relever-heritage.mjs --md <fichier>`);
       if (!enDefaut.length) lignes.push("- tous les produits relevés portent leur héritage à jour");
     }
+  }
+}
+
+// TF-0788 (décision D-3 (a), 03/09/2026) — UNE MONTÉE DE VERSION D'UN SKILL SE LIT CHEZ QUI LE
+// CONSOMME. Le 02/09, une recette de forge-tests a changé de verdict entre deux exécutions sans
+// qu'un octet bouge dans son dépôt : le socle installé sous ~/.claude/skills avait été monté de
+// version pendant la session, et rien ne le disait côté consommateur. À chaque ouverture — pilot
+// comme produit, puisque tous consomment les skills installés — l'empreinte de chaque skill est
+// comparée à la dernière consignée sur ce poste, et l'écart est dit en une ligne. Jamais bloquant :
+// une montée de version est un fait à lire avant de juger un verdict, pas une faute (R-29).
+{
+  const relever = join(PILOT, "scripts", "relever-empreintes-skills.mjs");
+  lignes.push("", "## Skills installés (TF-0788 : l'empreinte des règles du socle, comparée à l'ouverture précédente)");
+  if (!existsSync(relever)) lignes.push("- relevé des empreintes ABSENT du pilot — les montées de version ne sont pas vues");
+  else {
+    const r = spawnSync(process.execPath, [relever], { encoding: "utf8", cwd: PILOT, timeout: 90000 });
+    const sortie = (r.stdout || "").trim();
+    if (r.status !== 0 || !sortie) lignes.push(`- relevé NON rendu (exit ${r.status}) — ${(r.stderr || "").trim().slice(0, 200)}`);
+    else lignes.push(...sortie.split(/\r?\n/));
   }
 }
 

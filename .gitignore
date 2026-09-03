@@ -11,3 +11,6 @@
 # c'est-à-dire que tout nettoyage y était provisoire par construction.
 .oracles/produits-au-demarrage.json
 .claude/hooks-journal.jsonl
+# TF-0788 (03/09/2026) : empreintes des skills installés sur CE poste, réécrites à chaque ouverture —
+# état machine, propre au poste ; la comparaison vaut entre deux ouvertures du même poste.
+.oracles/empreintes-skills.json
