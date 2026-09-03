@@ -9,7 +9,7 @@ ne décide jamais), **forge-data** (lineage, qualité, restitution), **forge-obs
 agentique), **forge-websec** (sécurité du produit livré). Gouvernance : **organization
 propose, le pilot décide** (`REGLES-PROJET.md`).
 
-Noyau ≤ 6 Ko (`oracle-claude-md.mjs`) ; le détail vit dans `references\`.
+Noyau ≤ 6 Ko (`oracle-claude-md.mjs`) ; détail : `references\INDEX.md`.
 
 **Chemins** : racine = `$FORGE_ROOT`, sinon le parent de ce dépôt (`c:\dev\…` se lit
 `<racine>\…`) ; renommages : `references\CORRESPONDANCE-RENOMMAGE-FACTORY.md`.

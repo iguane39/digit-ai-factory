@@ -64,8 +64,8 @@
   "vu_le": "2026-08-27"
  },
  "oracle-claude-md.mjs": {
-  "cas": 6,
-  "vu_le": "2026-08-26"
+  "cas": 9,
+  "vu_le": "2026-09-03"
  },
  "oracle-conformite-projet.mjs": {
   "cas": 45,

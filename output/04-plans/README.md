@@ -23,7 +23,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md` | fichier | 5,7 Ko | Synthèse — Décision d'engagement actée, exécution transférée au produit — 20260901i |
 | `Digit-AI - Synthese - Etapes transferees au produit par lot de travaux - 20260901j.md` | fichier | 5,2 Ko | Synthèse — Les étapes de la décision transférées au produit — 20260901j |
 | `Digit-AI - Synthese - Etude donnees de recherche et cascade intention - 20260901h.md` | fichier | 10,4 Ko | Synthèse — Étude des données de recherche et cascade de l'intention — 20260901h |
-| `Digit-AI - Synthese - Expertise SEO capitalisee au pilot - 20260901k.md` | fichier | 7,4 Ko | Synthèse — L'expertise « données de recherche » capitalisée dans la factory — 20260901k |
+| `Digit-AI - Synthese - Expertise SEO capitalisee au pilot - 20260901k.md` | fichier | 7,3 Ko | Synthèse — L'expertise « données de recherche » capitalisée dans la factory — 20260901k |
 | `Digit-AI - Synthese Boucle - 17 restants du registre - 20260818a.md` | fichier | 13,1 Ko | Digit-AI — Synthèse de boucle : les 17 restants du registre — 20260818a |
 | `Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md` | fichier | 3,6 Ko | Synthèse de campagne — 4e mandat global « ok, fais tout » |
 | `Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md` | fichier | 3,7 Ko | Synthèse de diagnostic — pourquoi aucun avancement toutes les 3 minutes (TF-0252) |
