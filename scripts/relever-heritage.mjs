@@ -112,9 +112,43 @@ export function produitsDuParc(base, profondeurMax = PROFONDEUR_MAX) {
   return trouves;
 }
 
+/**
+ * La racine WEB que le produit a DÉCLARÉE — ligne `racine_web:` du frontmatter de
+ * `docs/projet/PARAMETRAGE.md` — ou null s'il n'a rien déclaré.
+ *
+ * TF-0793 (03/09/2026, lot du produit 02) : TF-0654 demandait cette déclaration et promettait
+ * que le relevé cesserait de compter l'artefact « hors racine ». Le produit a déclaré
+ * (`racine_web: site`, 01/09) et le relevé rendait toujours « 2 HORS RACINE » : AUCUN script ne
+ * lisait la ligne — seul le gabarit d'émission des travaux la citait. Un contrôle qui prescrit
+ * un geste et ne le lit jamais apprend au produit à l'ignorer. Lecture volontairement étroite :
+ * une seule ligne, dans le frontmatter seulement, un chemin relatif au dépôt ; rien n'est deviné.
+ */
+export function racineWebDeclaree(dossierProduit) {
+  const param = join(dossierProduit, "docs", "projet", "PARAMETRAGE.md");
+  if (!existsSync(param)) return null;
+  const texte = readFileSync(param, "utf8").replace(/^﻿/, "");
+  const fm = /^---\r?\n([\s\S]*?)\r?\n---/.exec(texte);
+  if (!fm) return null;
+  const m = /^racine_web\s*:\s*["']?([^"'\r\n#]+?)["']?\s*$/m.exec(fm[1]);
+  if (!m) return null;
+  const rel = m[1].trim().replace(/^[.][\\/]/, "").replace(/[\\/]+$/, "");
+  return rel && rel !== "." ? rel : null;
+}
+
 /** L'état d'UN artefact chez UN produit : absent, présent-divergent, ou conforme. */
 export function etatArtefact(dossierProduit, artefact, racinePilot) {
   let cible = join(dossierProduit, String(artefact.cible).replaceAll("/", "\\"));
+  // TF-0793 — LA DÉCLARATION SE LIT. Quand la cible manque à la racine du dépôt et que le produit
+  // a déclaré sa racine web, l'artefact se cherche SOUS cette racine, et c'est là qu'il se juge
+  // (présence, motifs ou conformité, comme à la racine). Le chemin déclaré est nommé au relevé.
+  let sousRacineWeb = null;
+  if (!existsSync(cible)) {
+    const racineWeb = racineWebDeclaree(dossierProduit);
+    if (racineWeb) {
+      const sous = join(dossierProduit, racineWeb.replaceAll("/", "\\"), String(artefact.cible).replaceAll("/", "\\"));
+      if (existsSync(sous)) { cible = sous; sousRacineWeb = racineWeb; }
+    }
+  }
   // TF-0710 (01/09) — UN ALIAS DE TRANSITION EST UNE CIBLE ACCEPTÉE, PAS UN DÉFAUT. Quand la
   // cible canonique manque mais que l'alias déclaré au contrat existe, c'est LUI la copie du
   // produit : le juger absent forcerait tout le parc à migrer le jour de la publication, et
@@ -156,7 +190,7 @@ export function etatArtefact(dossierProduit, artefact, racinePilot) {
     const absents = (artefact.motifs_exiges || []).filter((m) => !lignes.has(m));
     return absents.length ? { etat: "incomplet", motifs_absents: absents } : { etat: "present" };
   }
-  if (artefact.mode !== "copie_conforme") return { etat: "present" };
+  if (artefact.mode !== "copie_conforme") return sousRacineWeb ? { etat: "present", sous_racine_web: sousRacineWeb } : { etat: "present" };
   const source = join(racinePilot, String(artefact.source).replaceAll("/", "\\"));
   if (!existsSync(source)) return { etat: "present", note: "source introuvable au pilot — non comparable" };
   const a = empreinteFichier(source, 12);

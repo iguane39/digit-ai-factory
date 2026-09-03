@@ -68,8 +68,8 @@
   "vu_le": "2026-09-03"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 45,
-  "vu_le": "2026-09-02"
+  "cas": 46,
+  "vu_le": "2026-09-03"
  },
  "oracle-constantes-externes.mjs": {
   "cas": 12,
@@ -287,8 +287,8 @@
   "vu_le": "2026-09-03"
  },
  "scripts/relever-heritage.test.mjs": {
-  "cas": 19,
-  "vu_le": "2026-09-01"
+  "cas": 23,
+  "vu_le": "2026-09-03"
  },
  "scripts/verifier-bascule.test.mjs": {
   "cas": 8,

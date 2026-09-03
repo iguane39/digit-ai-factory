@@ -34,7 +34,7 @@ import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { empreinteTexte } from "../scripts/lib-empreinte.mjs";
-import { attribuerDivergence } from "../scripts/relever-heritage.mjs";
+import { attribuerDivergence, racineWebDeclaree } from "../scripts/relever-heritage.mjs";
 
 const cible = process.argv[2];
 if (!cible || !existsSync(cible)) {
@@ -550,6 +550,15 @@ else {
       // canonique absente pendant que l'alias est conforme forcerait le parc entier à migrer le
       // jour de la publication (le renommage en cascade que l'item corrige).
       if (!existsSync(dst) && a.alias_accepte && existsSync(p(a.alias_accepte))) dst = p(a.alias_accepte);
+      // TF-0793 (03/09) : la racine web DÉCLARÉE par le produit (`racine_web:` du frontmatter de
+      // docs/projet/PARAMETRAGE.md, demandée par TF-0654) se LIT — un artefact trouvé sous cette
+      // racine se juge là, exactement comme le relevé d'héritage le fait (même lecteur, TF-0649 :
+      // les deux consommateurs du contrat rendent le même verdict). Rien n'est deviné : sans
+      // déclaration, l'artefact manque.
+      if (!existsSync(dst)) {
+        const racineWeb = racineWebDeclaree(p("."));
+        if (racineWeb && existsSync(p(join(racineWeb, a.cible)))) dst = p(join(racineWeb, a.cible));
+      }
       if (a.conditionnel && !existsSync(dst)) continue;   // artefact dû seulement dans un cas déclaré
       if (!existsSync(dst)) { manques.push(`${a.cible} (source ${a.source})`); continue; }
       if (a.mode === "copie_conforme") {

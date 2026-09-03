@@ -13,7 +13,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import { produitsDuParc, etatArtefact, relever, rendreMarkdown, attribuerDivergence } from "./relever-heritage.mjs";
+import { produitsDuParc, etatArtefact, relever, rendreMarkdown, attribuerDivergence, racineWebDeclaree } from "./relever-heritage.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 
@@ -210,6 +210,55 @@ try {
     const etat = etatArtefact(produit, { mode: "copie_conforme", source: "gabarits/MODELE.md",
       cible: "forge/NOUVEAU.md", alias_accepte: "forge/ANCIEN.md" }, pilot);
     att(etat.etat === "divergent", `état « ${etat.etat} » — un alias périmé est passé pour conforme`);
+  });
+
+  // ── TF-0793 — LA RACINE WEB DÉCLARÉE SE LIT (ce que TF-0654 promettait sans le tenir) ──
+  const ROBOTS = { cible: "robots.txt", source: "gabarits/web/robots.txt", mode: "presence" };
+  const declarer = (produit, valeur) => {
+    mkdirSync(join(produit, "docs", "projet"), { recursive: true });
+    writeFileSync(join(produit, "docs", "projet", "PARAMETRAGE.md"),
+      `---\nrole: miroir de la configuration\n${valeur === null ? "" : `racine_web: ${valeur}\n`}verifie_le: 2026-09-01\n---\n\n# Paramétrage\n`, "utf8");
+  };
+
+  check("TF-0793 — un artefact trouvé SOUS la racine web déclarée est PRÉSENT, et la racine est nommée", () => {
+    const produit = join(T, "_ClientRacineWeb", "declare");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    mkdirSync(join(produit, "site"), { recursive: true });
+    writeFileSync(join(produit, "site", "robots.txt"), "User-agent: *\n", "utf8");
+    declarer(produit, "site");
+    const etat = etatArtefact(produit, ROBOTS, pilot);
+    att(etat.etat === "present", `état « ${etat.etat} » : la déclaration a été faite et n'est pas lue — le défaut même de TF-0793`);
+    att(etat.sous_racine_web === "site", `la racine web sous laquelle l'artefact a été trouvé n'est pas nommée : ${JSON.stringify(etat)}`);
+  });
+
+  check("TF-0793 borne — SANS déclaration, le même fichier reste HORS RACINE : rien n'est deviné", () => {
+    const produit = join(T, "_ClientRacineWeb", "non-declare");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    mkdirSync(join(produit, "site"), { recursive: true });
+    writeFileSync(join(produit, "site", "robots.txt"), "User-agent: *\n", "utf8");
+    declarer(produit, null);
+    const etat = etatArtefact(produit, ROBOTS, pilot);
+    att(etat.etat === "hors_racine", `état « ${etat.etat} » : la racine web a été devinée au lieu d'être lue`);
+  });
+
+  check("TF-0793 borne — une racine déclarée où le fichier MANQUE ne rend pas présent", () => {
+    const produit = join(T, "_ClientRacineWeb", "declare-vide");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    mkdirSync(join(produit, "site"), { recursive: true });
+    declarer(produit, "site");
+    const etat = etatArtefact(produit, ROBOTS, pilot);
+    att(etat.etat === "absent", `état « ${etat.etat} » : la déclaration ne vaut pas présence`);
+  });
+
+  check("TF-0793 — la déclaration se lit dans le frontmatter seulement, et sous ses formes usuelles", () => {
+    const produit = join(T, "_ClientRacineWeb", "formes");
+    mkdirSync(join(produit, "docs", "projet"), { recursive: true });
+    writeFileSync(join(produit, "docs", "projet", "PARAMETRAGE.md"), "---\r\nracine_web: \"./public/\"\r\n---\r\n\r\nracine_web: pas-ici\r\n", "utf8");
+    att(racineWebDeclaree(produit) === "public", `lu « ${racineWebDeclaree(produit)} » au lieu de « public »`);
+    const sans = join(T, "_ClientRacineWeb", "sans-frontmatter");
+    mkdirSync(join(sans, "docs", "projet"), { recursive: true });
+    writeFileSync(join(sans, "docs", "projet", "PARAMETRAGE.md"), "# Paramétrage\n\nracine_web: site\n", "utf8");
+    att(racineWebDeclaree(sans) === null, "une ligne hors frontmatter a été prise pour une déclaration");
   });
 
   // ── TF-0711 — L'ATTRIBUTION D'UNE DIVERGENCE SE MESURE DANS L'HISTORIQUE GIT DU PILOT ──
