@@ -2126,3 +2126,28 @@ pas fermer chez elle entre en candidat : **TF-0788** — une montée de version 
 journée n'est sue d'aucune forge qui le consomme ; F1 juge la fraîcheur côté producteur seulement.
 Registre : 11 → 8 actifs (1 candidat, 7 décidés), 4 clôtures ce jour avec descente, 780 archivés.
 TF-0784 toujours en cours chez l'agent forge-agents (dix fichiers dans trois skills, non commis).
+
+**Clôture du tour (11:30) — forge-agents rendue : TF-0784 clos, les quatre constats du soir sont
+fermés.** Le défaut payé : `digit-ai-schemas/assets/exemple-reference.html` embarquait une copie
+MANUELLE de `table-filters.js`, collée un jour où elle était juste et corrigée SEPT fois depuis
+sans qu'un octet de la copie bouge — classe TF-0761/RT-39 (un générateur hors d'atteinte des
+corrections) transposée ENTRE DEUX SKILLS. La copie n'est pas le défaut (A1 exige l'autoportance),
+c'est qu'elle soit manuelle : (1) un POSEUR `embarquer-composants.mjs` (--constat / --ecrire) ne
+touche que les blocs marqués, scelle l'empreinte sha256 de la source, n'admet que l'échappement
+`</script` (RA-1) ; (2) un ORACLE de parité `oracle-parite-assets.mjs` (P1 déclaration, P2
+empreinte du jour, P3 parité octet pour octet, P4 exemption datée et motivée), registre v2.16.0 ;
+(3) le self-test de quality-oracles le rejoue SUR LE DÉPÔT RÉEL — c'est ce qui arrête le troisième
+skill ; (4) six copies remises à la parité ; (5) l'exemple de référence reçoit son sommaire L25
+collant à toutes les largeurs (un sommaire statique sur mobile est compté `sommaire_perdu` à
+chaque largeur rendue — payé ici même). Mesure : bruit 6 détections / 6 vraies / 0 faux positif
+sur 178 pages ; check_html FAIL (L25) → PASS ; sommaire_perdu 2 → 0 ; quality-oracles 210 → 215 ;
+page-html 173/173 ; oracle-etat-forge PASS (page-html 1.18.0, quality-oracles 2.12.0) ; commit
+921a5a0. Au pilot : les deux scripts DÉCLARÉS comme sites de scellement dans
+`references/EMPREINTES.md` (oracle-empreintes E2 FAIL → PASS), copies installées identiques
+(oracle-skills K2 FAIL → PASS). Leçon du tour : deux contrôles du banc du pilot ont rougi PENDANT
+le chantier d'un agent (scripts neufs pas encore déclarés) — le banc a vu la fourche avant l'humain,
+c'est exactement son rôle ; la déclaration au registre des empreintes fait partie du brief d'un
+chantier qui crée un script scellant, pas de sa relecture.
+
+Registre : 11 → 7 actifs (1 candidat, 6 décidés), 5 clôtures ce jour avec descente, 781 archivés.
+Registre PASS, porte de publication PASS (historique compris), banc du pilot rejoué en clôture.
