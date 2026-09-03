@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=348efc45a017 archive=79fea665313e · dernier événement: 2026-09-03T09:00:39.846Z -->
+     sceaux: actifs=834ef18c8cf5 archive=d3c801ad4540 · dernier événement: 2026-09-03T09:00:39.846Z -->
 
-**8 actifs** (candidat 1 · décidé 7 · en cours 0 · corrigé 0 · écarté 0) · **781 archivés**.
+**7 actifs** (candidat 1 · décidé 6 · en cours 0 · corrigé 0 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -14,12 +14,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0674 | decide | 12.5 | La porte de fraîcheur de déploiement empreinte encore un échantillon — le correctif d'ensemble n'est pas appliqué | non |
 | TF-0682 | decide | 10 | Quinze contrôles du produit ne sont exercés par AUCUNE recette — être cité n'est pas être joué | non |
 | TF-0676 | decide | 6.7 | Aucun script de capture du produit ne produit systématiquement une pleine page | non |
-
-## digit-ai-forge-agents
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0784 | decide | 15 | digit-ai-schemas : l'asset de reference embarque une COPIE FIGEE de table-filters.js (donc d'avant les correctifs du 02/09) et porte neuf chapitres sans sommaire (L25) | **oui** — une copie figee d'un composant corrige trois fois le meme jour, dans le meme depot, hors de portee des trois correctifs ; 1 constat L25 reel sur un asset de reference |
 
 ## forge-tests
 
