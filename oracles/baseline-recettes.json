@@ -30,6 +30,10 @@
   "cas": 14,
   "vu_le": "2026-08-26"
  },
+ "hook-lexique.mjs": {
+  "cas": 7,
+  "vu_le": "2026-09-03"
+ },
  "hook-page-html.mjs": {
   "cas": 7,
   "vu_le": "2026-09-02"
@@ -218,6 +222,10 @@
   "cas": 6,
   "vu_le": "2026-08-27"
  },
+ "oracles/hook-lexique.test.mjs": {
+  "cas": 4,
+  "vu_le": "2026-09-03"
+ },
  "oracles/hook-restitution-selection.test.mjs": {
   "cas": 4,
   "vu_le": "2026-09-02"
@@ -298,9 +306,17 @@
   "cas": 31,
   "vu_le": "2026-09-01"
  },
+ "todo/generer-recidives.test.mjs": {
+  "cas": 5,
+  "vu_le": "2026-09-03"
+ },
  "todo/ingerer-anonymise-fichier.test.mjs": {
   "cas": 4,
   "vu_le": "2026-09-02"
+ },
+ "todo/ingerer-classe.test.mjs": {
+  "cas": 8,
+  "vu_le": "2026-09-03"
  },
  "todo/ingerer-derogation.test.mjs": {
   "cas": 11,
@@ -351,7 +367,7 @@
   "vu_le": "2026-08-26"
  },
  "todo/self-test.mjs": {
-  "cas": 50,
-  "vu_le": "2026-09-02"
+  "cas": 52,
+  "vu_le": "2026-09-03"
  }
 }
