@@ -63,7 +63,7 @@ Ordre : A-11 attend D-4 ; A-10 et A-8 sont les deux actions déjà ouvertes de l
 | Sélecteur | Action | Acteur | Motif / raison | Si rien n'est fait | Identifiant |
 |---|---|---|---|---|---|
 | **A-11** | Mandater un run de la forge de référencement pour ingérer `references\SEO-RECHERCHE.md` dans son corpus (baseline, gabarits ou skill), adapté à sa grille | auto_ia | dependance_bloc_3 (D-4) | l'expertise reste au pilot seul ; les missions de la forge repartent de leur baseline actuelle | TF-0792 |
-| **A-10** | Ouvrir une session dans `C:\dev\AuxPortesDeLaBaie.com` et lancer : `Traite ta boîte d'entrée input\00-travaux\ — en priorité le lot pilot - TRAVAUX - 20260901a.md` | manuelle_utilisateur | decision — mandater un run chez un produit autonome est un arbitrage humain | l'escalier décidé reste sans chantier ; les tarifs relevés périment le 01/10 | TF-0741 |
+| **A-10** | Ouvrir une session dans `C:\dev\Produit-02.com` et lancer : `Traite ta boîte d'entrée input\00-travaux\ — en priorité le lot pilot - TRAVAUX - 20260901a.md` | manuelle_utilisateur | decision — mandater un run chez un produit autonome est un arbitrage humain | l'escalier décidé reste sans chantier ; les tarifs relevés périment le 01/10 | TF-0741 |
 | **A-8** | Autoriser ou refuser le commit git local des travaux du jour — répondre `A-8 : commit` ou `A-8 : non` dans le chat | manuelle_utilisateur | decision — geste à autorisation explicite | les travaux du jour (études, noyau, référentiels, registre) restent non versionnés | neuve |
 
 ## 9. Traces

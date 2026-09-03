@@ -203,7 +203,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md | 20260901i | 5.7 Ko | `04-plans/Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md` |
 | Digit-AI - Synthese - Etapes transferees au produit par lot de travaux - 20260901j.md | 20260901j | 5.2 Ko | `04-plans/Digit-AI - Synthese - Etapes transferees au produit par lot de travaux - 20260901j.md` |
 | Digit-AI - Synthese - Etude donnees de recherche et cascade intention - 20260901h.md | 20260901h | 10.4 Ko | `04-plans/Digit-AI - Synthese - Etude donnees de recherche et cascade intention - 20260901h.md` |
-| Digit-AI - Synthese - Expertise SEO capitalisee au pilot - 20260901k.md | 20260901k | 7.4 Ko | `04-plans/Digit-AI - Synthese - Expertise SEO capitalisee au pilot - 20260901k.md` |
+| Digit-AI - Synthese - Expertise SEO capitalisee au pilot - 20260901k.md | 20260901k | 7.3 Ko | `04-plans/Digit-AI - Synthese - Expertise SEO capitalisee au pilot - 20260901k.md` |
 | Digit-AI - Synthese Boucle - 17 restants du registre - 20260818a.md | 20260818a | 13.3 Ko | `04-plans/Digit-AI - Synthese Boucle - 17 restants du registre - 20260818a.md` |
 | Digit-AI - Synthese Boucle - 17 restants du registre - 20260818a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Boucle - 17 restants du registre - 20260818a.md.jugement.json` |
 | Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md | 20260815a | 3.7 Ko | `04-plans/Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md` |

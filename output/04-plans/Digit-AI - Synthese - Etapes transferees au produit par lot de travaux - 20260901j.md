@@ -48,12 +48,12 @@ Ordre : A-10 d'abord — tout le chantier vit dans la session qu'elle ouvre ; A-
 
 | Sélecteur | Action | Acteur | Motif / raison | Si rien n'est fait | Identifiant |
 |---|---|---|---|---|---|
-| **A-10** | Ouvrir une session dans `C:\dev\AuxPortesDeLaBaie.com` et lancer : `Traite ta boîte d'entrée input\00-travaux\ — en priorité le lot pilot - TRAVAUX - 20260901a.md (étapes de la première campagne de données de recherche, décision D-3 (a) du 01/09).` Les gestes humains y sont marqués [humain] : comptes et dépôt se joueront à ce moment-là | manuelle_utilisateur | decision — mandater un run chez un produit autonome est un arbitrage humain | l'escalier décidé reste sans chantier ; les tarifs relevés périment le 01/10 | TF-0741 |
+| **A-10** | Ouvrir une session dans `C:\dev\Produit-02.com` et lancer : `Traite ta boîte d'entrée input\00-travaux\ — en priorité le lot pilot - TRAVAUX - 20260901a.md (étapes de la première campagne de données de recherche, décision D-3 (a) du 01/09).` Les gestes humains y sont marqués [humain] : comptes et dépôt se joueront à ce moment-là | manuelle_utilisateur | decision — mandater un run chez un produit autonome est un arbitrage humain | l'escalier décidé reste sans chantier ; les tarifs relevés périment le 01/10 | TF-0741 |
 | **A-8** | Autoriser ou refuser le commit git local des travaux du jour côté factory — répondre `A-8 : commit` ou `A-8 : non` dans le chat | manuelle_utilisateur | decision — geste à autorisation explicite | les travaux restent non versionnés, vulnérables à une écriture concurrente | neuve |
 
 ## 9. Traces
 
-- `c:\dev\AuxPortesDeLaBaie.com\input\00-travaux\pilot - TRAVAUX - 20260901a.md` — le lot déposé (sceau 3532d443faf2) ;
+- `c:\dev\Produit-02.com\input\00-travaux\pilot - TRAVAUX - 20260901a.md` — le lot déposé (sceau 3532d443faf2) ;
 - `todo\TODO.jsonl` — événement TF-0741 du 2026-09-01T20:41:15Z (étapes + destinataire produit) ; vues `todo\TODO.md` et `todo\TODO.html` ;
 - `output\03-etudes\20260901-etude-opportunite-donnees-de-recherche.md` — l'étude, donnée d'entrée citée par le lot ;
 - synthèse jugée : `output\04-plans\Digit-AI - Synthese - Etapes transferees au produit par lot de travaux - 20260901j.md`.

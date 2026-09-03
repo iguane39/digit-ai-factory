@@ -17,14 +17,6 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
 | [`old\`](old/README.md) | dossier (149 fichiers) | — | Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réé… |
-| `Produit-12 - RETOURS - 20260901b.md` | fichier | 8,5 Ko | Retours forges — Produit-12 — 20260901b |
-| `Produit-12 - RETOURS - 20260901b.tf.jsonl` | fichier | 3,0 Ko | 3 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20260901c.md` | fichier | 6,4 Ko | Retours forges — Produit-12 — 20260901c |
-| `Produit-12 - RETOURS - 20260901c.tf.jsonl` | fichier | 1,8 Ko | 2 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20260902a.md` | fichier | 4,3 Ko | Retours forges — Produit-12 — 20260902a |
-| `Produit-12 - RETOURS - 20260902a.tf.jsonl` | fichier | 1011 o | 1 ligne(s) JSONL |
-| `Produit-02 - RETOURS - 20260901b.md` | fichier | 4,9 Ko | Retours forges — la page que personne ne conçoit : la 404 — 20260901b |
-| `Produit-02 - RETOURS - 20260901b.tf.jsonl` | fichier | 2,0 Ko | 1 ligne(s) JSONL |
 | `Produit-01 - RETOURS - 20260827a.md` | fichier | 8,3 Ko | Retours forges — Produit-01 — 20260827a |
 | `Produit-01 - RETOURS - 20260827a.tf.jsonl` | fichier | 4,9 Ko | 2 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20260823a.md` | fichier | 13,0 Ko | Retours forges — retrait du domaine breton & audit forge-tests — 20260823a |
@@ -81,6 +73,9 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-02 - RETOURS - 20260901a.md` | fichier | 6,0 Ko | Retours forges — l'écart déclaré qui remplaçait la solution disponible — 20260901a |
 | `Produit-02 - RETOURS - 20260901a.normalise.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20260901a.tf.jsonl` | fichier | 2,3 Ko | 1 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20260901b.md` | fichier | 4,9 Ko | Retours forges — la page que personne ne conçoit : la 404 — 20260901b |
+| `Produit-02 - RETOURS - 20260901b.normalise.tf.jsonl` | fichier | 2,1 Ko | 1 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20260901b.tf.jsonl` | fichier | 1,9 Ko | 1 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20260902a.md` | fichier | 7,4 Ko | Retours forges — trois contrôles du pilot sans consommateur de leur propre remède — 202609 |
 | `Produit-02 - RETOURS - 20260902a.tf.jsonl` | fichier | 4,5 Ko | 3 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20260902b.md` | fichier | 10,2 Ko | Retours forges — Produit-02 — 20260902b |
@@ -119,5 +114,11 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-12 - RETOURS - 20260831f.tf.jsonl` | fichier | 4,1 Ko | 2 ligne(s) JSONL |
 | `Produit-12 - RETOURS - 20260901a.md` | fichier | 5,2 Ko | Retours forges — Produit-12 — 20260901a |
 | `Produit-12 - RETOURS - 20260901a.tf.jsonl` | fichier | 2,1 Ko | 1 ligne(s) JSONL |
+| `Produit-12 - RETOURS - 20260901b.md` | fichier | 8,5 Ko | Retours forges — Produit-12 — 20260901b |
+| `Produit-12 - RETOURS - 20260901b.tf.jsonl` | fichier | 2,9 Ko | 3 ligne(s) JSONL |
+| `Produit-12 - RETOURS - 20260901c.md` | fichier | 6,3 Ko | Retours forges — Produit-12 — 20260901c |
+| `Produit-12 - RETOURS - 20260901c.tf.jsonl` | fichier | 1,8 Ko | 2 ligne(s) JSONL |
+| `Produit-12 - RETOURS - 20260902a.md` | fichier | 4,3 Ko | Retours forges — Produit-12 — 20260902a |
+| `Produit-12 - RETOURS - 20260902a.tf.jsonl` | fichier | 1003 o | 1 ligne(s) JSONL |
 
-_102 fichier(s), 1 sous-dossier(s)_
+_103 fichier(s), 1 sous-dossier(s)_
