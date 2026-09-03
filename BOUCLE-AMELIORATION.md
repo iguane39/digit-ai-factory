@@ -2111,3 +2111,18 @@ construit sans validation.
 Registre : 11 → 9 actifs (0 candidat, 9 décidés), 2 clôtures ce point d'étape, toutes avec
 descente, 778 archivés. Registre PASS, porte de publication PASS, banc 84/86 (deux rouges = chantier
 de l'agent en cours).
+
+**Second point d'étape (11:05) — forge-tests rendue : TF-0785 et TF-0786 clos.** TF-0785 : `ruff>=0.5`
+→ `ruff==0.16.1`, cent constats SOLDÉS (pas mis en dette) ; dérive mesurée sur le même arbre :
+0.5.7 = 115 constats, 0.16.1 = 100, zéro octet changé ; la section lint de la recette consigne la
+version jouée et la déclaration lue, et échoue si la déclaration n'épingle pas (7 cas) ; ruff
+100 → 0, banc 1233 → 1240 (commit 0000ff7). TF-0786 : la recette lit l'empreinte publiée par
+`check_html.py --version-regles` et celle des familles de `render_page.py`, les CONSIGNE au rapport
+et déclare NON COMPARABLES deux rapports d'empreintes différentes (journal `.empreintes-oracles.json`
+ignoré par git) ; le dashboard reçoit un id stable par ligne de détail (196 constats L17 → 0) et
+l'alignement 768 px (22 px → PASS) ; recette entière S-01 NON TENU → TENU, 13/13, exit 0 ; bruit
+0/33 documents ; banc 1240 → 1257 (commit 89d6bc8). Le volet TRANSVERSE que la forge ne pouvait
+pas fermer chez elle entre en candidat : **TF-0788** — une montée de version d'un skill dans la
+journée n'est sue d'aucune forge qui le consomme ; F1 juge la fraîcheur côté producteur seulement.
+Registre : 11 → 8 actifs (1 candidat, 7 décidés), 4 clôtures ce jour avec descente, 780 archivés.
+TF-0784 toujours en cours chez l'agent forge-agents (dix fichiers dans trois skills, non commis).

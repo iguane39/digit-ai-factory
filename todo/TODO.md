@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=3f0a694f590f archive=9a69679e4882 · dernier événement: 2026-09-03T07:46:19.592Z -->
+     sceaux: actifs=348efc45a017 archive=79fea665313e · dernier événement: 2026-09-03T09:00:39.846Z -->
 
-**9 actifs** (candidat 0 · décidé 9 · en cours 0 · corrigé 0 · écarté 0) · **779 archivés**.
+**8 actifs** (candidat 1 · décidé 7 · en cours 0 · corrigé 0 · écarté 0) · **781 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -21,13 +21,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-0784 | decide | 15 | digit-ai-schemas : l'asset de reference embarque une COPIE FIGEE de table-filters.js (donc d'avant les correctifs du 02/09) et porte neuf chapitres sans sommaire (L25) | **oui** — une copie figee d'un composant corrige trois fois le meme jour, dans le meme depot, hors de portee des trois correctifs ; 1 constat L25 reel sur un asset de reference |
 
-## digit-ai-forge-tests
-
-| id | statut | score | titre | payé en réel |
-|---|---|---|---|---|
-| TF-0786 | decide | 10 | forge-tests : un verdict de la recette (dashboard) depend des oracles du skill de pages INSTALLES sur le poste, non epingles — les regles ont change PENDANT la session (L25, render_page) sans qu'un octet du depot ne bouge | **oui** — une section de recette passee de vert a rouge entre deux executions sans changement du depot ; 2 constats (L17, render_page) restent non instruits sur le tableau de bord de la forge |
-| TF-0785 | decide | 7.5 | forge-tests : la section lint de la recette est rouge depuis une derive de version de ruff non epinglee (ruff>=0.5, 0.16.1 installe) — 100 constats anterieurs a la campagne, S-01 non tenu | **oui** — S-01 non prononcable sur la recette entiere depuis une date inconnue, pour 100 constats qu'aucun commit n'a introduits — le verdict depend de la version d'un outil que personne n'a epinglee |
-
 ## forge-tests
 
 | id | statut | score | titre | payé en réel |
@@ -40,6 +33,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0549 | decide | 10 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : `Produit-07` a un forge\retours\ mais rien de ce qui s'y fait n'est suivi | **oui** — mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration. |
+| TF-0788 | candidat | 8 | pilot : une montee de version d un skill dans la journee n est SUE d aucune forge qui le consomme — la recette de forge-tests a change de verdict entre deux executions parce que check_html et render_page avaient change de regles sur le poste, sans qu aucun signal ne lui parvienne | **oui** — le 02/09, la section dashboard de la recette de forge-tests est passee de vert a rouge entre deux executions sans qu un octet ait bouge dans son depot (mesure de TF-0786) ; sans signal cote consommateur, le meme diagnostic se refait a la main a chaque montee de version |
 
 ---
 Détail d'un item : `grep '"id":"TF-xxxx"' todo/TODO.jsonl` (tous ses événements). Archive : même commande sur TODO-ARCHIVE.jsonl.
