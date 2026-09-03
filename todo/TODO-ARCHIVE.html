@@ -14,8 +14,8 @@
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digit-AI — TODO-FORGE · Archive des items clos — V20260902</title>
-  <meta name="description" content="Page de recherche des items clos du registre TODO-FORGE : 776 items archivés, corrigés ou écartés, avec leur histoire complète — création, décision et décideur, clôture et gains constatés.">
+  <title>Digit-AI — TODO-FORGE · Archive des items clos — V20260903</title>
+  <meta name="description" content="Page de recherche des items clos du registre TODO-FORGE : 778 items archivés, corrigés ou écartés, avec leur histoire complète — création, décision et décideur, clôture et gains constatés.">
   <meta name="theme-color" content="#2563EB">
   <!-- Pas de <meta name="color-scheme" content="light dark"> : FIGÉ, le navigateur peint ses
        propres surfaces (ascenseurs, contrôles) en sombre sur un corps clair — défaut relevé par
@@ -158,16 +158,16 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — archive des items clos</h1>
-      <p class="meta">sceau <code>30285155be8e</code> · dernier événement 2026-09-02T16:44:26Z</p>
+      <p class="meta">sceau <code>9a69679e4882</code> · dernier événement 2026-09-03T08:07:09Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       </button>
     </header>
-    <p>Ce que le registre actif a cessé de porter vit ici : <strong>776 items clos</strong>, chacun avec son histoire complète — ce qui a été demandé, qui l'a décidé, ce qui a été corrigé et quels gains ont été constatés. C'est la mémoire des décisions déjà prises : on y cherche avant de re-candidater, et on y vérifie ce qu'une correction a réellement rapporté. La recherche et les filtres agissent sur cette page seule, sans rien envoyer nulle part.</p>
+    <p>Ce que le registre actif a cessé de porter vit ici : <strong>778 items clos</strong>, chacun avec son histoire complète — ce qui a été demandé, qui l'a décidé, ce qui a été corrigé et quels gains ont été constatés. C'est la mémoire des décisions déjà prises : on y cherche avant de re-candidater, et on y vérifie ce qu'une correction a réellement rapporté. La recherche et les filtres agissent sur cette page seule, sans rien envoyer nulle part.</p>
     <div class="kpis">
-      <div class="kpi" title="776 items archivés depuis todo\TODO.jsonl — l'histoire complète de chacun est sur cette page"><span class="kpi-label">Items clos, archivés</span><span class="kpi-value">776</span><span class="kpi-hint">source unique — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
-      <button type="button" class="kpi" data-statut="corrige" aria-pressed="false" title="759 item(s) clos sur gains constatés — clic : n'afficher qu'eux"><span class="kpi-label">Corrigés</span><span class="kpi-value">759</span><span class="kpi-hint">clos sur gains constatés · clic&nbsp;: filtrer</span></button>
+      <div class="kpi" title="778 items archivés depuis todo\TODO.jsonl — l'histoire complète de chacun est sur cette page"><span class="kpi-label">Items clos, archivés</span><span class="kpi-value">778</span><span class="kpi-hint">source unique — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
+      <button type="button" class="kpi" data-statut="corrige" aria-pressed="false" title="761 item(s) clos sur gains constatés — clic : n'afficher qu'eux"><span class="kpi-label">Corrigés</span><span class="kpi-value">761</span><span class="kpi-hint">clos sur gains constatés · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="ecarte" aria-pressed="false" title="17 item(s) écartés, chacun avec son motif d'écart — clic : n'afficher qu'eux"><span class="kpi-label">Écartés</span><span class="kpi-value">17</span><span class="kpi-hint">refus motivé, mémoire gardée · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="nombre de forges distinctes visées par les items archivés, noms normalisés"><span class="kpi-label">Forges concernées</span><span class="kpi-value">22</span><span class="kpi-hint">noms normalisés — le brut reste en infobulle</span></div>
     </div>
@@ -217,10 +217,10 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser la recherche</button>
-      <span id="compteur" class="compteur" aria-live="polite">776 / 776 item(s) clos affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">778 / 778 item(s) clos affichés</span>
     </div>
-    <p id="vide" class="etat-vide" hidden><strong>Aucun item clos ne correspond.</strong> <span id="vide-quoi"></span> L'archive porte 776 items : élargissez les filtres, essayez un identifiant (<code>TF-0062</code>) ou un mot du titre — ou <button type="button" id="vide-reinit" class="lien-btn">réinitialisez la recherche</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#forge-agents"><strong>agents</strong> <span class="toc-d">112 item(s) clos</span></a><a href="#forge-agents-security"><strong>agents-security</strong> <span class="toc-d">2 item(s) clos</span></a><a href="#forge-audit"><strong>audit</strong> <span class="toc-d">18 item(s) clos</span></a><a href="#forge-conception"><strong>conception</strong> <span class="toc-d">20 item(s) clos</span></a><a href="#forge-contenu"><strong>contenu</strong> <span class="toc-d">1 item(s) clos</span></a><a href="#forge-data"><strong>data</strong> <span class="toc-d">12 item(s) clos</span></a><a href="#forge-design"><strong>design</strong> <span class="toc-d">34 item(s) clos</span></a><a href="#forge-development"><strong>development</strong> <span class="toc-d">11 item(s) clos</span></a><a href="#forge-digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">154 item(s) clos</span></a><a href="#forge-digit-ai-page-html"><strong>digit-ai-page-html</strong> <span class="toc-d">7 item(s) clos</span></a><a href="#forge-f"><strong>f</strong> <span class="toc-d">3 item(s) clos</span></a><a href="#forge-factory"><strong>factory</strong> <span class="toc-d">12 item(s) clos</span></a><a href="#forge-la-barre"><strong>la-barre</strong> <span class="toc-d">1 item(s) clos</span></a><a href="#forge-ops"><strong>ops</strong> <span class="toc-d">13 item(s) clos</span></a><a href="#forge-organization"><strong>organization</strong> <span class="toc-d">11 item(s) clos</span></a><a href="#forge-p"><strong>p</strong> <span class="toc-d">12 item(s) clos</span></a><a href="#forge-pilot"><strong>pilot</strong> <span class="toc-d">170 item(s) clos</span></a><a href="#forge-prompt-analyzer-l99"><strong>prompt-analyzer-l99</strong> <span class="toc-d">1 item(s) clos</span></a><a href="#forge-seo"><strong>seo</strong> <span class="toc-d">31 item(s) clos</span></a><a href="#forge-seo-geo"><strong>seo-geo</strong> <span class="toc-d">5 item(s) clos</span></a><a href="#forge-tests"><strong>tests</strong> <span class="toc-d">143 item(s) clos</span></a><a href="#forge-websec"><strong>websec</strong> <span class="toc-d">3 item(s) clos</span></a></nav>
+    <p id="vide" class="etat-vide" hidden><strong>Aucun item clos ne correspond.</strong> <span id="vide-quoi"></span> L'archive porte 778 items : élargissez les filtres, essayez un identifiant (<code>TF-0062</code>) ou un mot du titre — ou <button type="button" id="vide-reinit" class="lien-btn">réinitialisez la recherche</button>.</p>
+    <nav class="toc" aria-label="Sommaire"><a href="#forge-agents"><strong>agents</strong> <span class="toc-d">112 item(s) clos</span></a><a href="#forge-agents-security"><strong>agents-security</strong> <span class="toc-d">2 item(s) clos</span></a><a href="#forge-audit"><strong>audit</strong> <span class="toc-d">18 item(s) clos</span></a><a href="#forge-conception"><strong>conception</strong> <span class="toc-d">20 item(s) clos</span></a><a href="#forge-contenu"><strong>contenu</strong> <span class="toc-d">1 item(s) clos</span></a><a href="#forge-data"><strong>data</strong> <span class="toc-d">12 item(s) clos</span></a><a href="#forge-design"><strong>design</strong> <span class="toc-d">34 item(s) clos</span></a><a href="#forge-development"><strong>development</strong> <span class="toc-d">11 item(s) clos</span></a><a href="#forge-digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">154 item(s) clos</span></a><a href="#forge-digit-ai-page-html"><strong>digit-ai-page-html</strong> <span class="toc-d">7 item(s) clos</span></a><a href="#forge-f"><strong>f</strong> <span class="toc-d">3 item(s) clos</span></a><a href="#forge-factory"><strong>factory</strong> <span class="toc-d">12 item(s) clos</span></a><a href="#forge-la-barre"><strong>la-barre</strong> <span class="toc-d">1 item(s) clos</span></a><a href="#forge-ops"><strong>ops</strong> <span class="toc-d">13 item(s) clos</span></a><a href="#forge-organization"><strong>organization</strong> <span class="toc-d">11 item(s) clos</span></a><a href="#forge-p"><strong>p</strong> <span class="toc-d">12 item(s) clos</span></a><a href="#forge-pilot"><strong>pilot</strong> <span class="toc-d">172 item(s) clos</span></a><a href="#forge-prompt-analyzer-l99"><strong>prompt-analyzer-l99</strong> <span class="toc-d">1 item(s) clos</span></a><a href="#forge-seo"><strong>seo</strong> <span class="toc-d">31 item(s) clos</span></a><a href="#forge-seo-geo"><strong>seo-geo</strong> <span class="toc-d">5 item(s) clos</span></a><a href="#forge-tests"><strong>tests</strong> <span class="toc-d">143 item(s) clos</span></a><a href="#forge-websec"><strong>websec</strong> <span class="toc-d">3 item(s) clos</span></a></nav>
     <main>
       <section id="forge-agents">
         <h2>agents <span class="badge" title="112 item(s) clos ciblant agents — 112 corrigé(s), 0 écarté(s)">112</span></h2>
@@ -14235,9 +14235,75 @@ LA PROPRIETE QUI REND TOUT CECI POSSIBLE est ecrite, parce qu'elle n'est documen
         </div>
       </section>
       <section id="forge-pilot">
-        <h2>pilot <span class="badge" title="170 item(s) clos ciblant pilot — 165 corrigé(s), 5 écarté(s)">170</span></h2>
-        <p class="ch-apprend meta">Items clos ciblant <strong>pilot</strong> — 165 corrigé(s), 5 écarté(s), du plus récent au plus ancien. Chaque carte porte le détail tel qu'il a été candidaté, puis son histoire dépliable : création, décision et décideur, ouverture des travaux, clôture, archivage.</p>
+        <h2>pilot <span class="badge" title="172 item(s) clos ciblant pilot — 167 corrigé(s), 5 écarté(s)">172</span></h2>
+        <p class="ch-apprend meta">Items clos ciblant <strong>pilot</strong> — 167 corrigé(s), 5 écarté(s), du plus récent au plus ancien. Chaque carte porte le détail tel qu'il a été candidaté, puis son histoire dépliable : création, décision et décideur, ouverture des travaux, clôture, archivage.</p>
         <div class="cartes">
+        <article class="card s-corrige" id="item-TF-0787" data-forge="pilot" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0787</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : pilot">pilot</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-09-03</span>
+          </header>
+          <h3 class="card-titre">pilot : les trois familles HTML de la bibliotheque de gabarits (dossier d architecture, dossier d exploitation, rapport de donnees) ne portent pas de sommaire lateral collant — la regle neuve « sommaire visible en permanence » les met en defaut au rendu</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat du 02/09 au soir, paye en jouant le banc du pilot apres le chantier page-html du meme jour (TF-0772).</p><ul class="puces"><li>La famille de rendu `sommaire_perdu` (render_page.py, bloquante : au-dela de trois chapitres ou deux ecrans, le sommaire reste atteignable aux 60 % de la page) rend FAIL sur INSTANCE.html des familles dossier-architecture-technique et dossier-exploitation, et L25 signalait le sommaire absent de rapport-de-donnees : le sommaire des gabarits est un BLOC en tete de page, qui disparait au premier tiers de la lecture — exactement le defaut du livrable qui a fait naitre la regle. Deux moitiés ont ete faites ce soir : L25 n exige plus qu un sommaire se cite lui-meme ni ne liste les chapitres de SERVICE du gabarit (h2 data-toc=&quot;hors&quot; : en-tete a renseigner, sections optionnelles, contrat de personnalisation), et les six fichiers portent ce marquage. RESTE, et c est un chantier de mise en page, pas un marquage : le sommaire des trois familles devient LATERAL et COLLANT sur bureau (grille deux colonnes, nav.toc.colle avec top: var(--hh) — le motif du boilerplate du socle), bande repliable sous 900 px</li><li>rapport-de-donnees recoit son sommaire. Tant que ce n est pas fait, `scripts/verifier-rendu-instances.mjs` (parc reel) reste rouge au banc du pilot : declare, pas tu. Un controle rouge en permanence ne protege plus rien — c est pour cela que ce constat est un item et non une note</li></ul></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 4 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-09-02</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">pilot (constat en passant de la campagne « Traite les todos et les retours » du 02/09, second tour, banc final)</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">oracles/self-tests.mjs du 02/09 au soir : 2/86 en defaut (verifier-rendu-instances parc reel, oracle-gabarits-documents parc reel) ; render_page.py sur gabarits/documents/*/INSTANCE.html : « Sommaire perdu au defilement »</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">pilot, digit-ai-forge-design</dd></div><div><dt>Score d'entrée</dt><dd>10 — gain 4 × preuve 5 ÷ effort 2</dd></div><div class="pleine"><dt>Coût déjà payé</dt><dd><p class="jalon-prose">deux controles du banc du pilot rouges sur le parc reel depuis l entree de la regle ; trois familles de gabarits que tout produit instancie rendent des documents que le socle refuse desormais</p></dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-09-03</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">Sebastien — reponse « 42a, 43a, 38a » du 03/09/2026 a la synthese du second tour du 02/09 (D-42 (a) : les quatre constats du soir decides en bloc)</p></dd></div></dl>
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-09-03</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">MESURÉ : check_html.py sur les six fichiers 4 PASS + 2 FAIL (L7 puis L21 sur la famille rapport) → 6/6 PASS ; oracles/oracle-gabarits-documents.mjs FAIL → PASS ; scripts/verifier-rendu-instances.mjs (parc reel, famille de rendu sommaire_perdu) FAIL → PASS ; les deux controles rouges du banc du pilot (84/86 le 02/09 au soir) repassent au vert.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><p class="jalon-prose">pilot @ 280c220 — les six fichiers de gabarits/documents/{dossier-architecture-technique,dossier-exploitation,rapport-de-donnees}/{SQUELETTE,INSTANCE}.html portent une grille deux colonnes (.doc-grille : 250px + colonne fluide, gap 32px) dont le sommaire nav.toc est COLLANT sur bureau (position: sticky ; top: 16px ; max-height: calc(100vh - 32px) ; overflow: auto) et redevient un bloc statique en tete sous 900 px ; le corps est enveloppe dans .doc-corps (min-width: 0). rapport-de-donnees, qui n avait pas de sommaire, recoit un nav.toc de six entrees (resultat, contenu, detail, synthese, decisions, tracabilite, chacune avec toc-t/toc-d) et un chapeau .ch-apprend d au moins 40 caracteres en tete de chacun de ses six chapitres (exige par L7 du socle), avec le style .ch-apprend qui manquait (L21). Moitie faite la veille et deja commise : L25 n exige plus qu un sommaire se cite lui-meme ni ne liste les chapitres de service marques data-toc=hors (forge-agents @ c6cbb8e).</p></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">pilot @ 280c220 (gabarits/documents) + forge-agents @ c6cbb8e (L25)</p></dd></div><div><dt>Produits bénéficiaires</dt><dd title="produits ou missions ayant bénéficié de la correction, nommés au registre">Produit-02, Produit-05, Produit-12</dd></div></dl>
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-09-03</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
+        <article class="card s-corrige" id="item-TF-0752" data-forge="pilot" data-statut="corrige">
+          <header class="card-head">
+            <code class="tf-id">TF-0752</code>
+            <span class="statut s-corrige">corrigé</span>
+            <span class="chip forge" title="forge visée — valeur brute du registre : pilot">pilot</span>
+            <span class="chip jour" title="date de clôture portée par l'événement de clôture">clos le 2026-09-03</span>
+          </header>
+          <h3 class="card-titre">L'HISTOIRE du depot porte encore 200 noms de clients, et aucun outil du parc ne peut les en retirer</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat du 01/09, ce qui reste apres le nettoyage complet de l'arbre de travail.</p><ul class="puces"><li>La porte de publication rend 200 constats de regle C4 : noms interdits dans le CONTENU de commits anterieurs, et dans le NOM de fichiers ayant existe. L'arbre de travail est propre — zero constat — et la porte refuse quand meme, parce qu'un depot publie porte son histoire avec lui. TROIS CHOSES A SAVOIR AVANT DE DECIDER :</li><li>le remede est une REECRITURE D'HISTORIQUE (filter-repo ou equivalent), geste destructif qui change tous les identifiants de commit et casse toute copie existante du depot</li><li>le depot a des commits DEJA PUBLIES, donc les noms sont deja sortis — la reecriture reduit l'exposition future, elle n'annule pas le passe, et il faut le dire plutot que de laisser croire l'inverse</li><li>tant qu'elle n'est pas faite, AUCUNE publication du pilot n'est possible sans contournement explicite, et le contournement est un geste humain (R-38). A NOTER AUSSI : les MESSAGES de commit sont scannes comme le reste. Deux messages ecrits ce jour meme enumeraient les noms retires — ils ont ete reecrits avant publication, les commits etant restes locaux. Un message de commit est du contenu publie : il s'anonymise comme le reste, et rien ne le verifie avant la porte</li></ul></div>
+          <details class="histoire">
+            <summary>Histoire de l'item — 5 jalon(s), de la création à l'archivage</summary>
+            <ol class="jalons">
+            <li class="jalon j-creation">
+              <p class="jalon-tete"><strong>Création</strong> <span class="jalon-date">2026-09-01</span></p>
+              <dl class="jalon-meta"><div><dt>Demandé par</dt><dd title="run, session, produit ou humain à l'origine de la candidature, tel qu'inscrit au registre">ia</dd></div><div><dt>Origine</dt><dd title="circuit d'entrée de la candidature : lot de retours, audit, mandat humain ou run nommé">mesure du 01/09/2026, apres nettoyage complet de l'arbre de travail</dd></div><div><dt>Forge visée à la création</dt><dd title="dépôt de forge visé au moment de la candidature — nom brut du registre, avant normalisation">pilot</dd></div><div><dt>Score d'entrée</dt><dd>5 — gain 4 × preuve 5 ÷ effort 4</dd></div><div class="pleine"><dt>Coût déjà payé</dt><dd><p class="jalon-prose">200 constats de regle C4 avec 0 constat sur l'arbre de travail ; toute publication du pilot reste refusee</p></dd></div></dl>
+            </li>
+            <li class="jalon j-decide">
+              <p class="jalon-tete"><strong>Décision</strong> <span class="jalon-date">2026-09-03</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Décideur</dt><dd><p class="jalon-prose">Sebastien — reponse « 38a » du 03/09/2026 : reecrire le passe du depot principal maintenant (D-38 (a)), copie de sauvegarde exigee avant le geste</p></dd></div></dl>
+            </li>
+            <li class="jalon j-corrige">
+              <p class="jalon-tete"><strong>Clôture — corrigé</strong> <span class="jalon-date">2026-09-03</span></p>
+              <dl class="jalon-meta"><div class="pleine"><dt>Gains constatés</dt><dd><p class="jalon-prose">MESURÉ : oracle-nom-client-publie sur le depot (arbre + noms + messages + historique) : 200 constats C4 le 01/09 → 96 apres la premiere passe → 0 apres la seconde, verdict PASS. Le depot principal est PUBLIABLE ; ce qui reste est humain : la publication forcee (git push --force, R-38) et la seconde copie locale « _archive-digit-ai-forge-pilot_old », devenue incompatible avec la nouvelle histoire.</p></dd></div><div class="pleine"><dt>Corrections réalisées</dt><dd><p class="jalon-prose">D-38 (a) jouee le 03/09 : sauvegarde entiere du depot (git bundle --all, 94,6 Mo, verifiee par git bundle verify, dans c:/dev/_sauvegarde-avant-filter-repo-20260903/ avec le HEAD d avant) puis git filter-repo 2.47.0 en deux passes (--replace-text + --replace-message sur 44 regles derivees des deux tables hors git, --filename-callback sur 35 paires de noms de fichiers) : la premiere passe a laisse 96 constats, tous le sigle du client de comptabilite en minuscules dans un identifiant de run (« tests-&lt;sigle&gt; ») que la regle sensible a la casse ne voyait pas ; la seconde passe rend la regle des sigles insensible a la casse (comme la porte). 459 commits reecrits, origin retire par l outil puis remis, stash reecrit. Le generateur des regles (gen-remplacements.mjs) lit les tables au moment du geste : un alias ajoute a la table entre dans la reecriture sans retouche.</p></dd></div><div class="pleine"><dt>Version de forge corrigée</dt><dd><p class="jalon-prose">pilot @ aa36c74 (historique reecrit, HEAD d avant consigne dans la sauvegarde)</p></dd></div><div><dt>Produits bénéficiaires</dt><dd title="produits ou missions ayant bénéficié de la correction, nommés au registre">pilot</dd></div></dl>
+            </li>
+            <li class="jalon j-maj">
+              <p class="jalon-tete"><strong>maj</strong> <span class="jalon-date">2026-09-03</span></p>
+              
+            </li>
+            <li class="jalon j-archive">
+              <p class="jalon-tete"><strong>Archivage</strong> <span class="jalon-date">2026-09-03</span></p>
+              
+            </li>
+            </ol>
+          </details>
+        </article>
         <article class="card s-corrige" id="item-TF-0751" data-forge="pilot" data-statut="corrige">
           <header class="card-head">
             <code class="tf-id">TF-0751</code>
@@ -26167,7 +26233,7 @@ HORS PORTEE DU PILOT SANS MANDAT : la correction vit chez forge-tests, et les tr
         </div>
       </section>
     </main>
-    <footer>Page générée par <code>todo/generer-archive.mjs</code> — ne pas éditer. Source unique : <code>todo/TODO-ARCHIVE.jsonl</code> (sceau <code>30285155be8e</code> — si la source a bougé sans régénération, le sceau ne correspond plus). Détail brut d'un item : <code>grep '"id":"TF-xxxx"' todo/TODO-ARCHIVE.jsonl</code>. Le reste-à-faire vit dans <code>todo/TODO.html</code>.</footer>
+    <footer>Page générée par <code>todo/generer-archive.mjs</code> — ne pas éditer. Source unique : <code>todo/TODO-ARCHIVE.jsonl</code> (sceau <code>9a69679e4882</code> — si la source a bougé sans régénération, le sceau ne correspond plus). Détail brut d'un item : <code>grep '"id":"TF-xxxx"' todo/TODO-ARCHIVE.jsonl</code>. Le reste-à-faire vit dans <code>todo/TODO.html</code>.</footer>
   </div>
   <!-- S-G1 (4/4, R-30) — câblage : persistance + aria-pressed, aucune bascule muette -->
   <script>
