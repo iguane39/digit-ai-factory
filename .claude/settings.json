@@ -53,6 +53,17 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node oracles/hook-lexique.mjs",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }

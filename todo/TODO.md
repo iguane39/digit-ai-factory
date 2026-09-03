@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=def8caa7a26b archive=d3c801ad4540 · dernier événement: 2026-09-03T09:32:05.310Z -->
+     sceaux: actifs=a0a824bcd45f archive=d3c801ad4540 · dernier événement: 2026-09-03T09:42:14.273Z -->
 
-**8 actifs** (candidat 2 · décidé 6 · en cours 0 · corrigé 0 · écarté 0) · **782 archivés**.
+**9 actifs** (candidat 3 · décidé 6 · en cours 0 · corrigé 0 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -20,6 +20,12 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0789 | candidat | 8 | digit-ai-schemas : l exemple de reference du skill deborde a 390 px (16 constats v1_overflow, tableaux et blocs de code larges) et n a pas de verdict de lecture par un tiers (T1/T2 du 02/09 non traites) — un exemple de reference qui ne tient pas ses propres regles enseigne le defaut | **oui** — render_page.py --widths 390 sur l exemple de reference : 16 constats v1_overflow, mesures le 03/09 avant et apres TF-0784 ; oracle-lecture-tiers du 02/09 : T1 + T2 en defaut sur la meme page |
+
+## digit-ai-forge-observability
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0790 | candidat | 6 | forge-observability : surveiller le tableau de bord des récidives ENTRE les runs — une récidive ou une classe de plus par rapport au relevé précédent est une dérive | **oui** — 50 récidives déclarées en prose sur 788 items (6 %), 1 → 11 → 15 → 19 par semaine du 03/08 au 30/08 ; trois récidives en quatre jours sur un seul projet (TF-0757) ; aucun compteur ne les voyait avant le 03/09 |
 
 ## forge-tests
 

@@ -1,7 +1,7 @@
 {
   "schema": "pilot/heritage@1",
-  "version": "1.7.0",
-  "date": "2026-09-02",
+  "version": "1.8.0",
+  "date": "2026-09-03",
   "evolution_1_7_0": "TF-0765 (02/09/2026) : le lanceur de hooks (copie identique) connaît un troisième hook, `page-html` — PostToolUse sur Write|Edit, joue les règles de socle d'une page HTML (filtres de tableau L4 / G1-G6) chez le produit au moment où il écrit ; `settings-produit.json` (présence et motif) le câble ; `CLAUDE-PRODUIT.md` porte une section « Règles de socle applicables » remplie à l'ouverture. Les produits dont la copie du lanceur est périmée la reçoivent à leur prochaine ouverture (hook-ouverture, recopie des copies identiques).",
   "regle": "Tout artefact que le pilot COPIE chez un produit se déclare ici avec son mode de contrôle. Un artefact absent de ce référentiel n'est pas jugé par R-47 — l'oubli se voit à la revue, il ne se devine pas.",
   "pourquoi": "Constat du 23/08, deux produits en trois jours. Produit-02 possède un `forge\\retours\\` complet, portant ses lots, et AUCUN gabarit RETOURS-FORGES.md : le dossier a été créé, la copie n'y est jamais arrivée. Produit-05 n'a ni l'un ni l'autre. Résultat mesuré : 15 candidatures refusées à l'ingestion par R-45/R-46 pour une forme que le produit ne pouvait pas connaître, faute d'avoir le gabarit qui la porte. La cause n'était pas une négligence de produit mais une COPIE SANS PREUVE : rien ne vérifiait qu'elle était arrivée, et rien ne vérifie encore qu'elle est à jour. Le contrôle R-43 lui-même ne fait qu'un `existsSync` sur les hooks — un hook périmé passe au vert.",
@@ -23,28 +23,43 @@
       "note_alias": "TF-0710 (01/09) : l'ancien nom de voyage revendiquait un nom generique qu'un produit occupait legitimement (son index des remises) — la mise en conformite lui a coute un renommage en cascade pour un fichier que R-43 imposait de ceder. Le gabarit voyage desormais sous un nom qui dit ce qu'il est, symetrique de son juge (oracle-lot.mjs) ; l'ancienne cible reste ACCEPTEE le temps de la transition — un produit qui la porte conforme n'est pas en defaut, et la migration se fait au rythme des produits.",
       "mode": "copie_conforme",
       "motif": "le canal de retours du produit. Sa FORME est jugée à l'ingestion par R-45 et R-46 : un produit qui ne l'a pas ne peut pas produire un lot conforme, et son travail est refusé à la porte. C'est l'artefact qui a coûté 15 candidatures en trois jours. Son JUGE voyage avec lui depuis le 24/08 (`gabarits/oracle-lot-retours.mjs`) : un texte sans juge decore, un juge sans son texte force a deviner — les deux ou rien, meme raisonnement que pour RESTITUTION.md.",
-      "depuis": "2026-08-23"
+      "depuis": "2026-08-23",
+      "familles_protegees": [
+        "lot-forme"
+      ]
     },
     {
       "source": "gabarits/oracle-lot-retours.mjs",
       "cible": "forge/retours/oracle-lot.mjs",
       "mode": "copie_conforme",
       "motif": "LE JUGE de la forme d'un lot, a cote du gabarit qui la decrit. TF-0597 (24/08) : SIX lots admis par derogation en une journee, tous pour les memes sections R-45/R-46 absentes. La cause mesuree est TRIPLE — un produit sans heritage, un produit jamais instancie, et un produit qui a le gabarit A JOUR et ne l'applique pas (quatre lots sur six, le cas le plus frequent). Seul le troisieme n'avait AUCUN controle : les regles vivaient uniquement a la porte du pilot, donc le produit decouvrait le refus apres coup — et sous derogation, jamais. Copie CONFORME et non simple presence : deux implementations de la meme forme donneraient deux verites (defaut nomme par TF-0474 sur les empreintes). Le produit joue `node forge\retours\\oracle-lot.mjs \"<son lot>.md\"` avant de remettre ; le pilot importe le MEME module a l'ingestion.",
-      "depuis": "2026-08-24"
+      "depuis": "2026-08-24",
+      "familles_protegees": [
+        "lot-forme"
+      ]
     },
     {
       "source": "gabarits/hooks-factory.mjs",
       "cible": "forge/hooks/factory.mjs",
       "mode": "copie_conforme",
       "motif": "les hooks de la factory (fraîcheur à l'ouverture, restitution jugée à chaque fin de tour). R-43 vérifie déjà leur PRÉSENCE ; ici on vérifie qu'ils sont À JOUR — un hook périmé s'exécute et ne joue pas les règles du jour.",
-      "depuis": "2026-08-23"
+      "depuis": "2026-08-23",
+      "familles_protegees": [
+        "skill-ou-oracle-non-invoque",
+        "restitution-forme",
+        "page-html-socle",
+        "heritage-produit"
+      ]
     },
     {
       "source": "gabarits/RESTITUTION.md",
       "cible": "forge/RESTITUTION.md",
       "mode": "copie_conforme",
       "motif": "LE TEXTE de la doctrine de restitution, a cote du hook qui la juge. TF-0571 (24/08) : le hook voyageait deja, le texte JAMAIS — mesure sur les dix produits du dossier client, cinq instancies, un seul portant le hook, ZERO portant le texte. Un juge sans son code force l'agent a deviner les huit blocs ; un texte sans juge decore. Les deux ou rien.",
-      "depuis": "2026-08-24"
+      "depuis": "2026-08-24",
+      "familles_protegees": [
+        "restitution-forme"
+      ]
     },
     {
       "source": "gabarits/settings-produit.json",
@@ -52,7 +67,13 @@
       "mode": "presence_et_motif",
       "motif_exige": "forge/hooks/factory.mjs",
       "motif": "le câblage des hooks. Le fichier est LÉGITIMEMENT personnalisé par chaque projet (permissions, serveurs MCP) : exiger une copie conforme mettrait en échec tout produit qui l'a adapté. Ce qui est exigé, c'est que le câblage de la factory y soit.",
-      "depuis": "2026-08-23"
+      "depuis": "2026-08-23",
+      "familles_protegees": [
+        "skill-ou-oracle-non-invoque",
+        "restitution-forme",
+        "page-html-socle",
+        "heritage-produit"
+      ]
     },
     {
       "source": "gabarits/CLAUDE-PRODUIT.md",
@@ -60,7 +81,10 @@
       "mode": "presence_et_motif",
       "motif_exige": "R-43",
       "motif": "les instructions du produit. Personnalisées par construction — le gabarit porte des `<…>` que l'orchestrateur remplit. Seule la clause de précédence est exigée, et R-43 la juge déjà ; la déclaration ici rend le contrôle exhaustif plutôt que dispersé.",
-      "depuis": "2026-08-23"
+      "depuis": "2026-08-23",
+      "familles_protegees": [
+        "skill-ou-oracle-non-invoque"
+      ]
     },
     {
       "source": "gabarits/web/robots.txt",
@@ -68,7 +92,8 @@
       "mode": "presence",
       "conditionnel": "produit à surface web",
       "motif": "agents IA autorisés par défaut ; bloquer se décide et se consigne DANS le fichier, donc son contenu diverge légitimement. R-27 juge déjà le couple robots/llms.",
-      "depuis": "2026-08-23"
+      "depuis": "2026-08-23",
+      "familles_protegees": []
     },
     {
       "source": "gabarits/web/llms.txt",
@@ -76,28 +101,38 @@
       "mode": "presence",
       "conditionnel": "produit à surface web",
       "motif": "la carte du site pour les moteurs génératifs, tenue par development/MEP : son contenu est propre au produit. R-27 juge déjà sa présence à côté de robots.txt.",
-      "depuis": "2026-08-23"
+      "depuis": "2026-08-23",
+      "familles_protegees": []
     },
     {
       "source": "gabarits/TRAVAUX-PILOT.md",
       "cible": "forge/travaux/TRAVAUX-PILOT.md",
       "mode": "copie_conforme",
       "motif": "le canal INVERSE, ouvert le 25/08 (TF-0627). Jusque-la le flux etait a SENS UNIQUE : le produit remontait ses retours par un dispositif complet (lot, sidecar, rejet atomique, derogation tracee) et le pilot n'avait AUCUNE voie pour lui confier un travail. Cout mesure : 38 artefacts d'heritage absents chez sept produits, dont le gabarit de restitution et son hook chez cinq, et AUCUN des sept ne le savait. Ce gabarit decrit la forme d'un lot de travaux depose par le pilot dans `input/00-travaux/` du produit — que le produit INGERE lui-meme, ce qui tient N-5 a la lettre : le pilot n'ecrit que dans une boite d'entree, jamais dans le carnet ni dans le code.",
-      "depuis": "2026-08-25"
+      "depuis": "2026-08-25",
+      "familles_protegees": [
+        "heritage-produit"
+      ]
     },
     {
       "source": "gabarits/ECARTS-ASSUMES.md",
       "cible": "forge/travaux/ECARTS-ASSUMES.md",
       "mode": "presence",
       "motif": "LE CARNET DES ECARTS ASSUMES (R-20 bis). `TRAVAUX-PILOT.md` imposait depuis sa creation qu'un element ecarte « rejoigne les Ecarts assumes du carnet du produit avec son motif et sa date », en ajoutant qu'« un ecart tu est indiscernable d'un oubli » — et AUCUN gabarit ne creait ce carnet, R-20 bis n'etant defini nulle part. Mesure du 26/08 (TF-0655) : pour declarer UN ecart, un produit a du DEDUIRE l'emplacement et ecrire dans le fichier qu'il l'avait place par defaut. A l'echelle du parc, chaque produit en aurait invente un autre, et des ecarts eparpilles sous des noms differents ne se relevent pas. Mode `presence` et non `copie_conforme` : le carnet se REMPLIT chez le produit, exiger qu'il reste identique au gabarit reviendrait a interdire d'y ecrire.",
-      "depuis": "2026-08-26"
+      "depuis": "2026-08-26",
+      "familles_protegees": [
+        "heritage-produit"
+      ]
     },
     {
       "source": "gabarits/oracle-travaux-pilot.mjs",
       "cible": "forge/travaux/oracle-travaux.mjs",
       "mode": "copie_conforme",
       "motif": "le JUGE du canal inverse, et il voyage avec son texte pour la meme raison que celui des retours : un texte sans juge decore, un juge sans son texte force a deviner. Il naît des DEUX COTES des le premier jour plutot que de re-payer la lecon du canal inverse, ou la forme etait prescrite en PROSE chez l'emetteur et jugee en CODE chez le destinataire — six lots en une journee admis par derogation. Le pilot le joue AVANT de deposer, le produit le joue avant de traiter : meme module, un seul jeu de regles.",
-      "depuis": "2026-08-25"
+      "depuis": "2026-08-25",
+      "familles_protegees": [
+        "heritage-produit"
+      ]
     },
     {
       "source": "gabarits/gitignore-produit",
@@ -117,7 +152,22 @@
         "!.env.example"
       ],
       "motif": "LES EXCLUSIONS QUE LE SOCLE EDICTE, LIVREES COMME UN MOTIF DE FICHIER (TF-0649). La regle 10 du socle enumere ces exclusions depuis le 06/08 — en PROSE, dans un tableau de REGLES-PROJET.md, donc sans AUCUN point d'application. Un produit ne l'enfreignait pas : il ne la rencontrait jamais. Mesure remontee par un produit : un `.pyc` suivi par git, un second qui s'appretait a entrer. Mode `presence_et_motifs` et non `copie_conforme` : ce fichier est un SOCLE, pas un plafond — un produit y ajoute ce que sa pile impose, et exiger l'identite reviendrait a lui interdire d'ignorer ses propres artefacts. `.env` n'est PAS dans les motifs exiges parce que `.env.forge-tests` est deja couvert par le controle de forge-tests, et qu'un produit peut legitimement ecrire `.env*` ou `/.env` : exiger une graphie exacte ferait crier sur une protection equivalente. `old/` n'y est PAS NON PLUS, et c'est une decision : l'arbitrage C1, amende le 13/08 (TF-0150), le rend AUTORISE et VERSIONNE. TF-0713/TF-0714 (mesures du 30/08 chez un produit, decides le 01/09) : `forge/**/.env*` et `forge/**/*mdp*` RE-EXCLUENT ce que `!forge/**` rouvrait — en gitignore le dernier motif qui matche l'emporte, et deux fichiers de secrets reels etaient a un commit d'entrer dans l'histoire ; `!.env.example` re-inclut le fichier que R-13 exige VERSIONNE, que la seule negation en francais (`!.env.*.exemple`) ne couvrait pas.",
-      "depuis": "2026-08-26"
+      "depuis": "2026-08-26",
+      "familles_protegees": [
+        "secret-hors-perimetre"
+      ]
+    },
+    {
+      "source": "todo/CLASSES.json",
+      "cible": "forge/retours/CLASSES.json",
+      "mode": "copie_conforme",
+      "motif": "LE RÉFÉRENTIEL DES CLASSES de défaut, à côté du gabarit de lot et de son juge. Depuis le 03/09/2026 tout retour d'un lot désigne UNE classe, et un lot sans classe ou à classe inconnue est refusé à l'ingestion : un produit qui n'a pas ce fichier ne peut pas produire un lot conforme, exactement comme pour le gabarit. Copie identique — une classe se crée chez le pilot, jamais dans un sidecar.",
+      "depuis": "2026-09-03",
+      "familles_protegees": [
+        "heritage-produit",
+        "lot-forme"
+      ]
     }
-  ]
+  ],
+  "evolution_1_8_0": "Mandat d'amélioration continue (03/09/2026) : (1) le lanceur de hooks (copie identique) connaît un quatrième hook, `lexique` — UserPromptSubmit, le lexique d'invocation RV-6 devient un détrompeur ; `settings-produit.json` le câble ; (2) `todo/CLASSES.json` est hérité en copie identique (forge/retours/CLASSES.json) — le producteur qui écrit un lot y lit les classes qu'il doit déclarer ; (3) chaque artefact déclare les FAMILLES de défaut dont il protège (`familles_protegees`), pour que le relevé d'ouverture nomme, chez un produit non équipé, ce dont il n'est pas protégé — et non seulement ce qui lui manque."
 }

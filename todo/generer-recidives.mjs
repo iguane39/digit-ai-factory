@@ -23,9 +23,9 @@
  *          [--releves <…>] [--heritage <…>] [--sortie <RECIDIVES.md>]
  */
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import { createHash } from "node:crypto";
 import { dirname, join, basename } from "node:path";
 import { fileURLToPath } from "node:url";
+import { empreinteFichier } from "../scripts/lib-empreinte.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i > 0 ? process.argv[i + 1] : d; };
@@ -36,7 +36,9 @@ const REL = arg("--releves", join(ICI, "HERITAGE-RELEVES.jsonl"));
 const HER = arg("--heritage", join(ICI, "..", "gabarits", "HERITAGE.json"));
 const OUT = arg("--sortie", join(ICI, "RECIDIVES.md"));
 const lire = (f) => (existsSync(f) ? readFileSync(f, "utf8").split("\n").filter((l) => l.trim()).map((l) => JSON.parse(l)) : []);
-const sha = (f) => (existsSync(f) ? createHash("sha256").update(readFileSync(f, "utf8").split("\r\n").join("\n")).digest("hex").slice(0, 12) : "absent");
+// Le sceau passe par la fonction PARTAGÉE (N-7, references/EMPREINTES.md) — un sixième mécanisme de hachage
+// maison est exactement ce que l'oracle des empreintes existe pour refuser.
+const sha = (f) => (existsSync(f) ? empreinteFichier(f, 12) : "absent");
 
 const ref = existsSync(CLS) ? JSON.parse(readFileSync(CLS, "utf8")) : { familles: [], classes: [] };
 const heritage = existsSync(HER) ? JSON.parse(readFileSync(HER, "utf8")) : { artefacts: [] };

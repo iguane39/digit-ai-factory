@@ -35,6 +35,12 @@ const sidecarPath = process.argv[2];
 const iReg = process.argv.indexOf("--registre");
 const registre = resolve(iReg > 0 ? process.argv[iReg + 1] : join(ICI, "TODO.jsonl"));
 const archive = join(dirname(registre), "TODO-ARCHIVE.jsonl");
+// LA CLASSE D'UN RETOUR (mandat du 03/09/2026, pas 1 — mesure au pas 0 : 50 items du registre
+// déclaraient une récidive en toutes lettres et AUCUN champ ne permettait de les compter ; un
+// classement automatique par famille de mots-clés rendait 94 % de faux positifs). Le producteur
+// DÉCLARE la classe ; le référentiel est une donnée datée (loi n° 4), surchargeable pour la recette.
+const iCl = process.argv.indexOf("--classes");
+const CLASSES_PATH = resolve(iCl > 0 ? process.argv[iCl + 1] : join(ICI, "CLASSES.json"));
 // LE DOSSIER DU REGISTRE, EN PORTÉE MODULE — et ce n'est pas un déplacement de confort (TF-0634,
 // mesuré le 25/08). Il était déclaré `const` DANS le bloc du préflight anti-collision, donc
 // invisible au POST-contrôle qui vit deux cents lignes plus bas et s'en sert aussi. Le
@@ -219,6 +225,46 @@ const deductions = [];
 // N'EST PAS assouplie — le geste complémentaire arrive par un NOUVEAU lot.
 const NATURES_RECTIFICATION = new Set(["fait_errone", "cause_erronee", "annule"]);
 const motifs = [];
+
+// ---- classe déclarée, récidive comptée (03/09/2026) --------------------------------------
+// Un lot daté du 03/09/2026 ou après porte une `classe` par retour, prise dans todo/CLASSES.json.
+// Clé absente ou inconnue = rejet atomique, avec les clés proches : on ne devine pas une classe,
+// on ne la crée pas dans un sidecar. Une candidature HORS lot (sans « - RETOURS - » ni date dans
+// le nom) peut en porter une ; elle n'y est pas tenue — elle n'a pas de lot.
+// La récidive, elle, ne refuse JAMAIS : elle se compte. Un retour dont la classe est déjà close
+// en `corrige` entre marqué `recidive_de` — c'est le signal que la descente n'a pas tenu, et
+// cacher ce signal en refusant le lot serait exactement le défaut que le mandat corrige.
+const NOM_SIDECAR = String(sidecarPath).split(/[\\/]/).pop() || "";
+const M_DATE = NOM_SIDECAR.match(/(\d{4})(\d{2})(\d{2})[a-z]?(?:\.normalise)?\.tf\.jsonl$/i);
+const DATE_LOT = M_DATE ? `${M_DATE[1]}-${M_DATE[2]}-${M_DATE[3]}` : null;
+const EST_UN_LOT = NOM_SIDECAR.includes(" - RETOURS - ");
+const SEUIL_CLASSE = "2026-09-03";
+let REF_CLASSES = null;
+try { REF_CLASSES = JSON.parse(readFileSync(CLASSES_PATH, "utf8")); } catch { REF_CLASSES = null; }
+const CLASSES = new Map((REF_CLASSES?.classes || []).map((k) => [k.cle, k]));
+const FAMILLES = [...new Set([...CLASSES.values()].map((k) => k.famille))];
+const proches = (cle) => {
+  const jetons = new Set(String(cle).toLowerCase().split(/[^a-z0-9]+/).filter((j) => j.length > 2));
+  return [...CLASSES.keys()]
+    .map((k) => ({ k, n: k.split(/[^a-z0-9]+/).filter((j) => jetons.has(j)).length + (k.includes(String(cle).toLowerCase()) ? 2 : 0) }))
+    .filter((x) => x.n > 0).sort((a, b) => b.n - a.n || a.k.localeCompare(b.k)).slice(0, 5).map((x) => x.k);
+};
+const verifierClasse = (c, i) => {
+  if (c.rectifie !== undefined) return;
+  const exigee = EST_UN_LOT && DATE_LOT && DATE_LOT >= SEUIL_CLASSE;
+  if (c.classe === undefined || c.classe === null || c.classe === "") {
+    if (exigee) {
+      if (!REF_CLASSES) motifs.push(`ligne ${i + 1} : classe manquante, et le référentiel ${CLASSES_PATH} est illisible — un lot daté du ${SEUIL_CLASSE} ou après ne s'ingère pas sans référentiel de classes`);
+      else motifs.push(`ligne ${i + 1} : classe manquante — tout retour d'un lot daté du ${SEUIL_CLASSE} ou après désigne UNE classe de todo/CLASSES.json (${CLASSES.size} clés ; familles : ${FAMILLES.join(", ")}). Une classe nouvelle se crée dans le référentiel, datée et sourcée, jamais dans le sidecar`);
+    }
+    return;
+  }
+  if (!REF_CLASSES) { motifs.push(`ligne ${i + 1} : classe « ${c.classe} » déclarée mais référentiel ${CLASSES_PATH} illisible — on ne juge pas une clé sans référentiel`); return; }
+  if (!CLASSES.has(String(c.classe))) {
+    const p = proches(c.classe);
+    motifs.push(`ligne ${i + 1} : classe « ${c.classe} » inconnue du référentiel — clés proches : ${p.length ? p.join(", ") : "(aucune)"} ; si aucune ne convient, créer la clé dans todo/CLASSES.json (datée, sourcée, rattachée à sa famille) puis remettre le lot`);
+  }
+};
 let candidatures = lignes.map((l, i) => {
   let c;
   try { c = JSON.parse(l); } catch { motifs.push(`ligne ${i + 1} : JSON invalide`); return null; }
@@ -269,6 +315,7 @@ let candidatures = lignes.map((l, i) => {
       motifs.push(`ligne ${i + 1} : forges_cibles_initiales manquant, et AUCUN mot de l'entrée ne nomme une forge — on ne devine pas une cible que rien ne nomme`);
     }
   }
+  verifierClasse(c, i);
   return c;
 });
 if (motifs.length) {
@@ -392,6 +439,47 @@ if (remplacesTotal.length) {
     remplacesTotal.join(", "));
   console.log("  Les tables de correspondance vivent HORS des dépôts.");
 }
+// ---- récidive : la classe est-elle déjà close en corrige ? --------------------------------
+// Deux sources, réunies : les items que la classe déclare l'avoir FONDÉE (todo/CLASSES.json,
+// `fondee_par`) et tout item du registre portant déjà cette `classe`. La date de correction se
+// LIT au registre — actifs ET archive —, jamais dans le référentiel (N-6 : une valeur mobile ne se
+// recopie pas). Une classe SUSPECTE est une clé créée SANS clôture fondatrice, moins de 30 jours
+// après un retour d'une classe voisine : la façon la moins chère de faire baisser un compteur de
+// récidives est d'inventer une clé neuve, et c'est ce que ce signal rend visible.
+const etatsTous = new Map();
+for (const e of [...lireEv(archive), ...evenements]) {
+  if (!e.id) continue;
+  if (e.ev === "creation") etatsTous.set(e.id, { ...e, _corrige: null });
+  else if (e.ev === "maj" && etatsTous.has(e.id)) {
+    const s = etatsTous.get(e.id); Object.assign(s, e);
+    if (e.statut === "corrige") s._corrige = e.date_correction || String(e.ts || "").slice(0, 10);
+  }
+}
+const recidiveDe = (cle, dateRetour) => {
+  const ids = new Set();
+  for (const id of (CLASSES.get(cle)?.fondee_par || [])) {
+    const s = etatsTous.get(id);
+    if (s && s._corrige && (!dateRetour || s._corrige < dateRetour)) ids.add(id);
+  }
+  for (const s of etatsTous.values()) if (s.classe === cle && s._corrige && (!dateRetour || s._corrige < dateRetour)) ids.add(s.id);
+  return [...ids].sort();
+};
+const classeSuspecte = (cle) => {
+  const ref = CLASSES.get(cle);
+  if (!ref || (ref.fondee_par || []).length || !ref.creee_le || !(ref.voisines || []).length) return null;
+  const voisinesRecentes = [];
+  for (const v of ref.voisines) {
+    const dates = [...etatsTous.values()].filter((s) => s.classe === v).map((s) => s.date_demande || String(s.ts || "").slice(0, 10))
+      .concat((CLASSES.get(v)?.fondee_par || []).map((id) => etatsTous.get(id)?.date_demande).filter(Boolean));
+    const derniere = dates.sort().pop();
+    if (!derniere) continue;
+    const jours = (Date.parse(ref.creee_le) - Date.parse(derniere)) / 86400000;
+    if (jours >= 0 && jours < 30) voisinesRecentes.push(`${v} (retour du ${derniere})`);
+  }
+  return voisinesRecentes.length ? voisinesRecentes : null;
+};
+let nbRecidives = 0;
+const produitDuLot = EST_UN_LOT ? (pseudoProduit(NOM_SIDECAR.split(" - RETOURS - ")[0]) || NOM_SIDECAR.split(" - RETOURS - ")[0]) : "(candidature hors lot)";
 const nouvelles = candidatures.map((c) => {
   // TF-0703 : une rectification MARQUE l'item visé — événement `maj`, aucun id neuf frappé.
   // L'item d'origine et sa correction restent reliés par le même identifiant, au lieu de deux
@@ -409,11 +497,21 @@ const nouvelles = candidatures.map((c) => {
   const score = c.score && [c.score.gain, c.score.preuve, c.score.effort].every((v) => typeof v === "number")
     ? { ...c.score, valeur: Math.round((c.score.gain * c.score.preuve / c.score.effort) * 10) / 10 }
     : { gain: 3, preuve: 1, effort: 3, valeur: 1, par_defaut: true };
+  const classe = c.classe ? String(c.classe) : null;
+  const rec = classe ? recidiveDe(classe, c.date_demande) : [];
+  const susp = classe ? classeSuspecte(classe) : null;
+  if (rec.length) {
+    nbRecidives++;
+    console.error(`[RÉCIDIVE] classe « ${classe} » déjà close en corrige par ${rec.join(", ")} — le retour ENTRE, marqué recidive_de. ` +
+      `La descente n'a pas tenu chez ${produitDuLot} ; contrôle censé la jouer : ${CLASSES.get(classe)?.oracle || "(aucun déclaré)"} ; règle : ${CLASSES.get(classe)?.regle || "?"}`);
+  }
+  if (susp) console.error(`[CLASSE SUSPECTE] « ${classe} » créée le ${CLASSES.get(classe)?.creee_le} sans clôture fondatrice, moins de 30 jours après un retour d'une classe voisine : ${susp.join(" ; ")} — la contre-métrique du tableau de bord la compte`);
   return JSON.stringify({
     ev: "creation", ts, id: `TF-${String(prochain++).padStart(4, "0")}`,
     titre: c.titre, contenu: c.contenu, demandeur: c.demandeur, source: c.source,
     date_demande: c.date_demande, statut: "candidat",
     forges_cibles_initiales: c.forges_cibles_initiales, forges_cibles_reelles: null,
+    classe, recidive_de: rec.length ? rec : null, ...(susp ? { classe_suspecte: susp } : {}),
     score, preuve_du_cout: c.preuve_du_cout ?? null,
     decideur: null, date_decision: null, date_correction: null, corrections_realisees: null,
     gains_constates: null, version_forge_corrigee: null, produits_beneficiaires: null,
@@ -437,6 +535,7 @@ const nbRectifications = candidatures.filter((c) => c.rectifie !== undefined).le
 // regarder. L'idempotence n'a besoin que du lot_sha ; le nom consigné est le nom pseudonymisé.
 const evIngestion = { ev: "ingestion", ts, lot_sha: lotSha, fichier: anonymiser(String(sidecarPath)).texte, creations: nouvelles.length - nbRectifications };
 if (nbRectifications) evIngestion.rectifications = nbRectifications;
+if (nbRecidives) evIngestion.recidives = nbRecidives;
 if (reglesDerogees.length) {
   evIngestion.derogation = { regles: [...new Set(reglesDerogees)], motif: derogationMotif, decision: "humaine" };
 }
@@ -483,7 +582,7 @@ if (!process.argv.includes("--sans-fetch") && nouvelles.length > 1) {
 }
 
 // ---- contrôles post-écriture ---------------------------------------------------------------
-execFileSync("node", [join(ICI, "oracle-todo.mjs"), registre, archive], { encoding: "utf8" });
+execFileSync("node", [join(ICI, "oracle-todo.mjs"), registre, archive, "--classes", CLASSES_PATH], { encoding: "utf8" });
 if (registre === resolve(join(ICI, "TODO.jsonl")))
   execFileSync("node", [join(ICI, "generer-vue.mjs")], { encoding: "utf8" });
 // ---- R-47 à l'arrivée d'un lot : refermer le cercle (23/08/2026) ---------------------------

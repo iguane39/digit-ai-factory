@@ -13,7 +13,7 @@
  * Options : --sans-bootstrap · --sans-readme (sessions produit : les README du pilot ne sont
  * pas leur affaire) · --pilot <dossier> (lanceur produit : chemin du pilot résolu).
  */
-import { existsSync, readFileSync, copyFileSync, mkdirSync } from "node:fs";
+import { existsSync, readFileSync, copyFileSync, mkdirSync, appendFileSync } from "node:fs";
 import { join, dirname, sep } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -161,11 +161,32 @@ if (iPilot < 0) {
     else {
       const enDefaut = (j.lignes || []).filter((l) => (l.absents || 0) + (l.divergents || 0) + (l.incomplets || 0) > 0);
       lignes.push(`- ${j.produits} produit(s) relevé(s), ${j.manques} manque(s) — contrat ${j.contrat}`);
+      // Mandat d'amélioration continue (03/09/2026) : (a) le relevé se JOURNALISE — c'est la seule
+      // source du délai « clôture au pilot → descente constatée chez le produit » du tableau de
+      // bord todo/RECIDIVES.md ; sans journal, la descente n'est jamais mesurée, seulement
+      // supposée ; (b) chez un produit SANS lanceur, on nomme les FAMILLES de défaut dont il n'est
+      // pas protégé (familles_protegees des artefacts absents, gabarits/HERITAGE.json) — « il lui
+      // manque trois fichiers » ne dit rien à l'humain qui décide de poser le lanceur ; « il n'est
+      // protégé ni des restitutions hors gabarit ni des lots hors forme » dit ce que coûte l'attente.
+      let famillesDe = () => [];
+      try {
+        const her = JSON.parse(readFileSync(join(PILOT, "gabarits", "HERITAGE.json"), "utf8"));
+        const parCible = new Map((her.artefacts || []).map((a) => [a.cible, a.familles_protegees || []]));
+        famillesDe = (l) => [...new Set((l.artefacts || []).filter((a) => a.etat === "absent" || a.etat === "divergent" || a.etat === "incomplet").flatMap((a) => parCible.get(a.cible) || []))].sort();
+      } catch { /* héritage illisible : les familles ne sont pas nommées, le manque l'est déjà */ }
+      try {
+        appendFileSync(join(PILOT, "todo", "HERITAGE-RELEVES.jsonl"), JSON.stringify({
+          ts: new Date().toISOString(), contrat: j.contrat, produits: (j.lignes || []).map((l) => ({
+            produit: l.produit, absents: l.absents, divergents: l.divergents, incomplets: l.incomplets, total: l.total,
+            artefacts: (l.artefacts || []).map((a) => ({ cible: a.cible, etat: a.etat })),
+          })),
+        }) + "\n", "utf8");
+      } catch (e) { lignes.push(`- relevé NON journalisé (${e.message}) — le délai de descente ne se mesurera pas sur cette ouverture`); }
       for (const l of enDefaut.slice(0, 12)) {
         const lanceur = (l.artefacts || []).find((a) => /hooks\/factory\.mjs$/.test(a.cible || ""));
         const sansLanceur = lanceur && lanceur.etat === "absent";
         lignes.push(`  - ${l.produit} : ${l.absents} absent(s), ${l.divergents} divergent(s), ${l.incomplets} incomplet(s) sur ${l.total}` +
-          (sansLanceur ? " — SANS lanceur de hooks : rien ne se remettra à niveau tout seul ; poser gabarits/hooks-factory.mjs et settings-produit.json chez lui (geste humain, R-29)"
+          (sansLanceur ? ` — SANS lanceur de hooks : rien ne se remettra à niveau tout seul ; poser gabarits/hooks-factory.mjs et settings-produit.json chez lui (geste humain, R-29)${famillesDe(l).length ? ` ; NON PROTÉGÉ des familles : ${famillesDe(l).join(", ")}` : ""}`
             : " — remis à niveau à sa prochaine ouverture (copies identiques) ; le reste est un geste du produit"));
       }
       if (enDefaut.length > 12) lignes.push(`  - … et ${enDefaut.length - 12} autre(s) — détail : node scripts/relever-heritage.mjs --md <fichier>`);

@@ -12,6 +12,46 @@ Version 1.0.0 — 2026-08-04
 Le steering améliore les cinq forges par **itérations bornées**. Jamais d'amélioration spontanée,
 jamais d'application sans validation humaine.
 
+## Revue des classes — l'anticipation à partir de faits (03/09/2026, mandat d'amélioration continue)
+
+La boucle corrective ferme des retours un par un. Ce qu'elle ne voit pas, c'est la CLASSE qui
+revient chez plusieurs producteurs sous des symptômes différents — et c'est là que vit
+l'anticipation : proposer une règle, un oracle, un gabarit ou un changement du contrat d'échange
+AVANT le retour suivant, à partir de ce qui a déjà été compté, jamais à partir d'une intuition.
+Mesure fondatrice (pas 0 du mandat, 03/09) : 50 récidives déclarées en prose sur 788 items, en
+hausse chaque semaine d'août, invisibles à tout compteur.
+
+**Cadence** : au plus UNE revue par quinzaine, jouée à l'ouverture d'un tour du pilot, à partir de
+`todo\RECIDIVES.md` régénéré (`node todo\generer-recidives.mjs`) — jamais d'un souvenir.
+
+**Seuil** : toute classe comptée sur **au moins 2 produits** ou **au moins 3 occurrences**
+(fondateurs compris) produit UNE candidature au registre — jamais une application. La candidature
+porte : la mesure (classes, produits, dates, lues à la vue), la forge cible, et la FORME proposée
+parmi quatre — règle au socle ou au gabarit, oracle, gabarit de document, changement du contrat
+d'échange. Elle entre en `candidat` par un sidecar `revue-classes-<AAAAMMJJ><indice>.tf.jsonl`
+dans `input\01-candidatures\` (source : « revue des classes du <date> »), et suit la
+gouvernance ordinaire : décision humaine, clôture sur gains constatés, descente R12.
+
+**Contre-lecture obligatoire** : la revue lit la contre-métrique de la vue (classes créées par
+semaine, classes sans fondateur, retours entrés sous une classe suspecte) et le nombre d'items
+non classés. Une quinzaine qui crée plus de classes qu'elle ne clôt de récidives fait l'objet
+d'une candidature de RELECTURE du référentiel, pas d'une règle de plus.
+
+**Format des échanges** : quand une candidature de revue propose de changer le contrat de lot
+(gabarit `RETOURS-FORGES.md`, sidecar, sections R-45/R-46, classe), le changement est VERSIONNÉ
+(version du gabarit, seuil daté dans `ingerer-lot.mjs` comme R-45, R-46 et la classe), et les lots
+en attente s'ingèrent encore : l'ingestion accepte les deux formes pendant la transition, et une
+règle neuve entre avertissante avant de se durcir (doctrine v2.5.0). Casser le format ferait
+re-remonter ce qui l'était déjà — l'inverse du but.
+
+**Première revue (03/09/2026)**, jouée sur la mesure du pas 0 faute de classes au registre : la
+famille `page-html-socle` compte 13 récidives déclarées sur 5 producteurs, `versionnement-livrable`
+10 sur 4 — les deux dépassent le seuil. La candidature qui en sort ne demande pas une règle de
+plus (les 28 classes seed en portent déjà une chacune) : elle demande que la vue soit
+SURVEILLÉE ENTRE LES RUNS par forge-observability — sonde `rapport_json` sur le tableau de bord,
+dérive = une récidive de plus ou une classe de plus par rapport au relevé précédent — parce qu'une
+mesure que personne ne relit entre deux tours est une mesure qui ne change rien (N-1).
+
 ## Canal des retours produits (règle 18, 06/08/2026)
 
 Chaque produit prépare ses retours dans `forge\retours\` — un lot = un fichier

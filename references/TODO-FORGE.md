@@ -64,6 +64,35 @@ clôture qui n'en porte aucun — et `journaliser.mjs` annule alors l'écriture.
 dans le registre du pilot et nulle part chez le producteur n'est pas câblée* (loi n° 1). Les 600+
 clôtures antérieures restent de la prose : c'est déclaré, pas rattrapé.
 
+**Un retour porte sa CLASSE, et une récidive se COMPTE — jamais refusée (R13, mandat du 03/09/2026).**
+Mesuré au pas 0 du mandat, sur les 788 items du registre : **50** déclaraient une récidive en toutes
+lettres (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine
+d'août (1, 11, 15, 19) — et AUCUN champ ne permettait de les compter. Un classement automatique par
+famille de mots-clés a été essayé d'abord : 94 % de « récidives » sur les grandes familles, 321
+items dans plusieurs familles, 196 dans aucune — inexploitable, parce qu'une famille (« page
+HTML ») n'est pas un défaut (« polices distantes chargées »). D'où trois choses câblées le même
+jour. (1) **Le référentiel `todo\CLASSES.json`** — donnée datée (loi n° 4), deux niveaux : la
+FAMILLE sert à lire, la CLASSE sert à compter ; une classe est un défaut généralisé avec la règle
+où il vit, l'oracle qui la joue et les clôtures qui l'ont fondée (`fondee_par`, ids seulement —
+la date se lit au registre, N-6). Il est **hérité en copie identique** (`forge\retours\CLASSES.json`,
+R-47) : le producteur qui écrit un lot y lit ce qu'il doit déclarer. (2) **À l'ingestion**, tout
+retour d'un lot daté du 03/09 ou après porte `classe` ; absente ou inconnue, `ingerer-lot.mjs`
+REFUSE en nommant les clés proches — une classe nouvelle se crée dans le référentiel, jamais dans
+un sidecar. Un retour dont la classe est déjà close en `corrige` ENTRE, marqué `recidive_de`,
+avec l'oracle censé l'avoir attrapé : la récidive est la mesure de la descente, la refuser la
+cacherait. Une classe créée SANS clôture fondatrice moins de 30 jours après un retour d'une classe
+voisine est signalée `classe_suspecte` — la façon la moins chère de faire baisser un compteur est
+d'inventer des clés. (3) **R13** de l'oracle : une classe hors référentiel est un FAIL ; une
+récidive marquée est AVERTISSANTE (doctrine v2.5.0 de la restitution : elle se durcira sur corpus
+propre). **La vue `todo\RECIDIVES.md`** (`generer-recidives.mjs`, générée, jamais éditée)
+porte le taux de récidive par classe et par produit, le délai clôture → descente constatée (lu
+dans `todo\HERITAGE-RELEVES.jsonl`, que le hook d'ouverture du pilot écrit à chaque relevé
+R-47), le taux d'héritage par artefact, et la contre-métrique : classes créées par semaine et
+classes sans fondateur. Ce qui n'est pas mesurable y est dit, jamais mis à zéro. Recettes :
+`todo\ingerer-classe.test.mjs` (8 cas), `todo\self-test.mjs` (R13, 2 cas),
+`todo\generer-recidives.test.mjs` (5 cas). La cadence de relecture du référentiel — la revue
+des classes — est écrite dans `BOUCLE-AMELIORATION.md`.
+
 **Gouvernance** : tout entre en `candidat` ; seul un mandat humain (« décide TF-xxxx », un lot de
 décisions appliqué par `todo\appliquer-export.mjs` — format `TF-decisions-*.json`, produit
 par l'humain et non plus par la page (TF-0328) — ou un mandat global explicite) passe en `decide` — le décideur
