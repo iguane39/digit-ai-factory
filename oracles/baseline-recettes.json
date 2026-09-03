@@ -270,6 +270,10 @@
   "cas": 9,
   "vu_le": "2026-08-26"
  },
+ "scripts/lib-pseudonyme-produit.test.mjs": {
+  "cas": 7,
+  "vu_le": "2026-09-03"
+ },
  "scripts/readme-dossiers.test.mjs": {
   "cas": 7,
   "vu_le": "2026-08-26"
@@ -277,6 +281,10 @@
  "scripts/recopier-heritage.test.mjs": {
   "cas": 6,
   "vu_le": "2026-09-01"
+ },
+ "scripts/relever-empreintes-skills.test.mjs": {
+  "cas": 8,
+  "vu_le": "2026-09-03"
  },
  "scripts/relever-heritage.test.mjs": {
   "cas": 19,
