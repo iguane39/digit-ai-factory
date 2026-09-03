@@ -7,16 +7,16 @@ ne décide jamais), **forge-data** (lineage, qualité, restitution), **forge-obs
 (veille entre runs). Sur mandat humain : **forge-seo-geo** (post-MEP, SEO+GEO), **forge-audit**
 (gouvernance), **forge-organization** (conventions), **forge-agents-security** (sécurité
 agentique), **forge-websec** (sécurité du produit livré). Gouvernance : **organization
-organise, pilot pilote** — elle propose, le pilot décide (`REGLES-PROJET.md`).
+propose, le pilot décide** (`REGLES-PROJET.md`).
 
 Noyau ≤ 6 Ko (`oracle-claude-md.mjs`) ; le détail vit dans `references\`.
 
 **Chemins** : racine = `$FORGE_ROOT`, sinon le parent de ce dépôt (`c:\dev\…` se lit
 `<racine>\…`) ; renommages : `references\CORRESPONDANCE-RENOMMAGE-FACTORY.md`.
-**Fraîcheur** : `node bootstrap.mjs --pull` à toute ouverture (pilot, forges, skills — joué
-par le hook SessionStart, R-44) ; versions au ledger (R-19).
-**Précédence (R-43)** : la factory impliquée, ses règles priment sur celles du projet —
-renforcer oui, assouplir jamais ; conflit → factory, consigné au ledger.
+**Fraîcheur** : `node bootstrap.mjs --pull` à toute ouverture (hook SessionStart, R-44) ;
+versions au ledger (R-19).
+**Précédence (R-43)** : la factory impliquée, ses règles priment (renforcer oui,
+assouplir jamais) ; conflit → factory, consigné au ledger.
 **Restitution (R-44)** : toute fin de tour de travail suit `gabarits\RESTITUTION.md` (bloc 0 +
 8 blocs, options (a)/(b)/(c), actions par acteur) — hook Stop bloquant (`oracle-synthese`).
 `input\`/`output\` : un README.md par dossier, régénéré par hook.
@@ -33,6 +33,8 @@ renforcer oui, assouplir jamais ; conflit → factory, consigné au ledger.
    l'humain se justifie ; dépenses et gates restent humains (R-29).
 6. *Un rendu générique est un défaut, pas un goût* — la DA se dérive de l'expérience
    client visée (`systeme-de-marque`) ; généricité et baseline en oracle.
+7. *Le résultat sert l'intention, pas la lettre* — cascade + test rétro :
+   `references\INTENTION.md`.
 
 **TODO-FORGE** (`todo\`) : source unique `TODO.jsonl` (écrivains : `journaliser.mjs`,
 `ingerer-lot.mjs`), vues générées, oracle R1-R11 ; tout entre en `candidat`, décision
@@ -41,7 +43,8 @@ humaine, clôture sur gains constatés. Mode opératoire : `references\TODO-FORG
 
 **Références** (avant tout run) : `INVENTAIRE.md`, `CONTRAT-INTERFACE.md` (routage §4,
 mesure §4 bis, référentiels §3 bis), `ETAPE-MEP.md`, `BOUCLE-AMELIORATION.md`,
-`HYPOTHESES.md`, `fiches\<forge>.md`, `references\BEST-PRACTICES-HTML.md`.
+`HYPOTHESES.md`, `fiches\<forge>.md`, `references\BEST-PRACTICES-HTML.md` ;
+SEO : `references\SEO-RECHERCHE.md`.
 
 ## Lancement d'un run
 
@@ -65,8 +68,8 @@ jamais ici ; le run y vit (`forge\`, code à la racine). Séquence :
 forge-tests exit 0/3 seuils tenus · oracle MEP 7/7 · dossier MEP complet · traçabilité
 exigences→tests 100 % · ledger vérifié.
 
-**Run de version** : jamais improvisé — `references\RUN-VERSION.md` (socle, delta, tests
-entiers). **Mandat transverse** : `references\RUN-MANDAT.md`. **Run de conseil** :
+**Run de version** : jamais improvisé — `references\RUN-VERSION.md`.
+**Mandat transverse** : `references\RUN-MANDAT.md`. **Run de conseil** :
 `references\RUN-CONSEIL.md`.
 
 ## Parallélisme et agents
@@ -74,7 +77,7 @@ entiers). **Mandat transverse** : `references\RUN-MANDAT.md`. **Run de conseil**
 Étapes séquentielles ; parallélisme seulement entre tâches indépendantes d'une même
 étape. Routage et mesure : `CONTRAT-INTERFACE.md` §4 et §4 bis — défaut Sonnet, mécanique
 Haiku, construction complexe Opus, pilotage Fable ; escalades consignées, « aucune »
-compris. Campagnes : `gabarits\AGENT-CAMPAGNE.md` (TF-0050), gabarit + delta.
+compris. Campagnes : `gabarits\AGENT-CAMPAGNE.md` (TF-0050).
 
 ## Garde-fous (détail : `references\ACCUEIL.md`)
 

@@ -57,10 +57,12 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `20260822-etude-opportunite-vue-portefeuille.md` | fichier | 8,4 Ko | Étude d'opportunité — vue portefeuille du reste-à-faire — 20260822a |
 | `20260830-L99-etat-de-l-art-marche.md` | fichier | 26,9 Ko | Analyse L99 — « construire un skill et/ou une forge pour l'état de l'art du marché » |
 | `20260831-opportunite-etat-de-l-art-marche.md` | fichier | 9,0 Ko | Étude d'opportunité — un dispositif d'état de l'art de marché est-il à construire ? |
+| `20260901-etude-dataforseo-cadrage-v2.md` | fichier | 8,6 Ko | Cadrage v2 — Étude DataForSEO : repartir de l'intention — 20260901b |
 | `20260901-etude-opportunite-dataforseo.md` | fichier | 20,6 Ko | Étude d'opportunité — DataForSEO dans le dispositif de mesure de Produit-02 — 20260901a |
+| `20260901-etude-opportunite-donnees-de-recherche.md` | fichier | 20,6 Ko | Étude d'opportunité — Données de recherche pour le SEO multilingue de Produit-02 — 2026090 |
 | `20260901-etude-opportunite-strategie-tests.md` | fichier | 23,9 Ko | Étude d'opportunité — stratégie de tests et temps d'exécution des campagnes — 20260901a |
 | `20260902-etude-opportunite-dataforseo-produit-02.md` | fichier | 43,7 Ko | Étude d'opportunité — entrée de DataForSEO dans le dispositif de mesure de Produit-02 — 20 |
 | `20260903-L99-amelioration-continue.md` | fichier | 42,3 Ko | Analyse L99 — « Conçois et construis un système d'amélioration continue de la factory » |
 | `20260903-recidives-mesure.md` | fichier | 7,3 Ko | Récidives au registre — mesure du pas 0 (03/09/2026) |
 
-_46 fichier(s), 0 sous-dossier(s)_
+_48 fichier(s), 0 sous-dossier(s)_

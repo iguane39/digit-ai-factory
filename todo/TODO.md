@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=62f1fa31a0eb archive=d3c801ad4540 · dernier événement: 2026-09-03T14:25:22.185Z -->
+     sceaux: actifs=6c3ad3ee6084 archive=d3c801ad4540 · dernier événement: 2026-09-03T14:25:22.185Z -->
 
-**9 actifs** (candidat 0 · décidé 6 · en cours 0 · corrigé 3 · écarté 0) · **782 archivés**.
+**11 actifs** (candidat 1 · décidé 6 · en cours 1 · corrigé 3 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -38,8 +38,15 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0791 | en_cours | 6.7 | Cascade Intention > Strategie > Tactique > Operationnel + test retro : la definition des demandes ne capture pas l'intention initiale de l'utilisateur | **oui** — etude output/03-etudes/20260901-etude-opportunite-dataforseo.md : conforme a sa definition, PASS a ses controles, et refusee par son destinataire — sept questions du retour du 01/09 sans reponse dans le texte ; cout paye : une etude entiere a redefinir et rejouer |
 | TF-0549 | decide | 10 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : `Produit-07` a un forge\retours\ mais rien de ce qui s'y fait n'est suivi | **oui** — mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration. |
 | TF-0788 | corrige | 8 | pilot : une montee de version d un skill dans la journee n est SUE d aucune forge qui le consomme — la recette de forge-tests a change de verdict entre deux executions parce que check_html et render_page avaient change de regles sur le poste, sans qu aucun signal ne lui parvienne | **oui** — le 02/09, la section dashboard de la recette de forge-tests est passee de vert a rouge entre deux executions sans qu un octet ait bouge dans son depot (mesure de TF-0786) ; sans signal cote consommateur, le meme diagnostic se refait a la main a chaque montee de version |
+
+## seo-geo
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0792 | candidat | 6 | Ingerer l'expertise « donnees de recherche multilingues » (references/SEO-RECHERCHE.md du pilot) dans le corpus propre de forge-seo-geo | **oui** — l'expertise capitalisee vit chez le pilot ; un run forge-seo-geo qui ne la charge pas re-derivera la doctrine de cadence et le pattern d'escalier depuis zero, comme l'etude 20260901a l'a fait avant d'etre refusee |
 
 ---
 Détail d'un item : `grep '"id":"TF-xxxx"' todo/TODO.jsonl` (tous ses événements). Archive : même commande sur TODO-ARCHIVE.jsonl.

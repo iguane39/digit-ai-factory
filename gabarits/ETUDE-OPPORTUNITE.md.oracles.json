@@ -1,19 +1,19 @@
 {
-  "cible": "c:\\dev\\digit-ai-factory\\CLAUDE.md",
-  "date_iso": "2026-09-01T20:48:08.196Z",
+  "cible": "c:\\dev\\digit-ai-factory\\gabarits\\ETUDE-OPPORTUNITE.md",
+  "date_iso": "2026-09-01T19:11:45.300Z",
   "registre_version": "2.13.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
   "resume": {
-    "pass": 4,
+    "pass": 3,
     "fail": 0,
-    "skip": 3,
+    "skip": 4,
     "cache": 0
   },
   "bilan_fichiers": {
     "jugé": [
-      "CLAUDE.md"
+      "gabarits\\ETUDE-OPPORTUNITE.md"
     ],
     "exempté": [],
     "délégué": [],
@@ -24,43 +24,43 @@
   "resultats": [
     {
       "domaine": "Lisibilité d'un document (Markdown)",
-      "file": "CLAUDE.md",
+      "file": "gabarits\\ETUDE-OPPORTUNITE.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Format / livraison / versioning",
-      "file": "CLAUDE.md",
+      "file": "gabarits\\ETUDE-OPPORTUNITE.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Sécurité / secrets",
-      "file": "CLAUDE.md",
+      "file": "gabarits\\ETUDE-OPPORTUNITE.md",
       "verdict": "PASS",
       "detail": "aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
-      "file": "CLAUDE.md",
+      "file": "gabarits\\ETUDE-OPPORTUNITE.md",
       "verdict": "SKIP",
       "detail": ""
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
-      "file": "CLAUDE.md",
-      "verdict": "PASS",
-      "detail": "1 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; pourcentage « 100 % » non sourcé"
+      "file": "gabarits\\ETUDE-OPPORTUNITE.md",
+      "verdict": "SKIP",
+      "detail": ""
     },
     {
       "domaine": "Nommage / convention de livraison",
-      "file": "CLAUDE.md",
+      "file": "gabarits\\ETUDE-OPPORTUNITE.md",
       "verdict": "SKIP",
       "detail": ""
     },
     {
       "domaine": "Cohérence inter-documents",
-      "file": "CLAUDE.md",
+      "file": "gabarits\\ETUDE-OPPORTUNITE.md",
       "verdict": "SKIP",
       "detail": ""
     }
@@ -68,10 +68,10 @@
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
-    "release": "CLAUDE.md",
-    "ts": "2026-09-01T20:48:08.195Z",
+    "release": "gabarits\\ETUDE-OPPORTUNITE.md",
+    "ts": "2026-09-01T19:11:45.299Z",
     "fichiers": {
-      "CLAUDE.md": "5d71bc8da8ee2252cf00f7776c3ff49636c739f48e9b5502d3e8c51c01b9c295"
+      "gabarits\\ETUDE-OPPORTUNITE.md": "abb249e51cbe07eacf33d6ddce59e93ad9683b98e31cb266baed15cfd210747f"
     }
   },
   "empreinte_motif": null,

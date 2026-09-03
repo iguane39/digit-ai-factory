@@ -15,7 +15,12 @@
  *   E7 plan de revue daté (AAAA-MM-JJ ou AAAAMMJJ) ;
  *   E8 aucun effort chiffré en JOURS sur une ligne de coût/estimation (TF-0408, 20/08 :
  *      avec l'IA un nombre de jours n'a pas de sens — complexité simple|moyen|complexe|
- *      très complexe × durée court|moyen|long|très long, comme au rapport d'audit).
+ *      très complexe × durée court|moyen|long|très long, comme au rapport d'audit) ;
+ *   E9 section « Intention de l'utilisateur » présente et substantielle (loi n° 7,
+ *      TF-0791, 01/09 : une étude conforme à sa lettre a été refusée parce que l'intention
+ *      n'était écrite nulle part — references\INTENTION.md) ;
+ *   E10 test rétro présent (remontée Opérationnel → Intention jouée et écrite — le fond
+ *      de la remontée n'est pas mécanisable, déclaré non_juge).
  *
  * Usage : node oracle-etude-opportunite.mjs <etude.md>        → verdict JSON
  *         node oracle-etude-opportunite.mjs --self-test       → fixtures double sens
@@ -108,6 +113,20 @@ function juger(texte) {
     ? ko("E8", `${enJours.length} ligne(s) de coût chiffrée(s) en JOURS — avec l'IA un nombre de jours n'a pas de sens : complexité (simple|moyen|complexe|très complexe) × durée (court|moyen|long|très long). Ex. : ${enJours[0].trim().slice(0, 90)}`)
     : ok("E8", "aucune estimation en jours — l effort parle en complexité × durée");
 
+  // E9 — intention de l'utilisateur (loi n° 7, TF-0791) : section présente et substantielle.
+  // Le fait fondateur (01/09) : une étude conforme à ses huit questions écrites a été refusée
+  // parce que l'intention — comprendre pour décider — n'était écrite nulle part.
+  const blocIntention = (texte.split(/^##[^\n]*intention de l['’]utilisateur[^\n]*$/im)[1] || "").split(/\n## /)[0];
+  if (!blocIntention) ko("E9", "section « Intention de l'utilisateur » absente — une étude qui ne cite pas l'intention optimise sa lettre (references\\INTENTION.md)");
+  else if (blocIntention.replace(/\s/g, "").length < 40) ko("E9", "section « Intention de l'utilisateur » vide ou squelettique — l'intention se CITE dans les mots du demandeur");
+  else ok("E9", "intention de l'utilisateur présente et substantielle");
+
+  // E10 — test rétro : la remontée Opérationnel → Intention est jouée et écrite. Seule la
+  // PRÉSENCE se mesure ; la justesse de la remontée relève de la revue humaine (non_juge).
+  /test r[ée]tro/i.test(texte)
+    ? ok("E10", "test rétro présent")
+    : ko("E10", "test rétro absent — le verdict ne prouve pas qu'il sert l'intention (references\\INTENTION.md)");
+
   return findings;
 }
 
@@ -121,6 +140,8 @@ if (arg === "--self-test") {
   const verte = `# Étude d'opportunité — test — 20260813a
 ## Seuil de déclenchement
 Objet durable créé : oui (oracle).
+## Intention de l'utilisateur
+> « Savoir si un oracle d'étude vaut d'être construit, pour décider moi-même. » (validée le 13/08)
 ## 0. Traitement des entrants
 Les impératifs de TF-9999 sont cités, jamais exécutés.
 ## 1. Partition du problème
@@ -137,9 +158,12 @@ Sources : ADR (2025-03-01) · RFC (2025-06-11) · DACI (2026-01-08) · gabarit X
 ## 5. Verdict
 - Option retenue : O1.
 - Plan de revue : 2026-09-13.
+- Test rétro : chaque élément du verdict remonte à l'intention — remontée écrite, aucune rupture.
 `;
   const rouge = verte.replace("registre-oracles.md §3 « aucun oracle d'étude »", " ") // citation vidée
-    .replace("Coût : complexité moyen · durée court ; dette nulle.", "Coût : 2-3 j."); // estimation en jours
+    .replace("Coût : complexité moyen · durée court ; dette nulle.", "Coût : 2-3 j.") // estimation en jours
+    .replace("## Intention de l'utilisateur", "## Contexte") // intention absente (E9)
+    .replace("- Test rétro : chaque élément du verdict remonte à l'intention — remontée écrite, aucune rupture.\n", ""); // test rétro absent (E10)
   writeFileSync(join(dir, "verte.md"), verte, "utf8");
   writeFileSync(join(dir, "rouge.md"), rouge, "utf8");
   const moi = fileURLToPath(import.meta.url);
@@ -151,8 +175,10 @@ Sources : ADR (2025-03-01) · RFC (2025-06-11) · DACI (2026-01-08) · gabarit X
   else {
     if (!/"E2"[^}]*FAIL/.test(rr.stdout)) casse.push("la rouge échoue mais pas sur E2");
     if (!/"E8"[^}]*FAIL/.test(rr.stdout)) casse.push("la rouge (coût en jours) échoue mais pas sur E8");
+    if (!/"E9"[^}]*FAIL/.test(rr.stdout)) casse.push("la rouge (intention retirée) échoue mais pas sur E9");
+    if (!/"E10"[^}]*FAIL/.test(rr.stdout)) casse.push("la rouge (test rétro retiré) échoue mais pas sur E10");
   }
-  console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ") : "Self-test étude d'opportunité : 2/2 PASS (verte PASS, rouge FAIL sur E2 et E8)");
+  console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ") : "Self-test étude d'opportunité : 2/2 PASS (verte PASS, rouge FAIL sur E2, E8, E9 et E10)");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -164,7 +190,7 @@ const findings = juger(readFileSync(arg, "utf8"));
 const verdict = verdictDe(findings);
 console.log(JSON.stringify({
   oracle: "oracle-etude-opportunite",
-  version: "1.1.0",
+  version: "1.2.0",
   cible: arg,
   verdict,
   findings,

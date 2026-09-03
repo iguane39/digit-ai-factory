@@ -1,6 +1,6 @@
 {
-  "cible": "c:\\dev\\digit-ai-factory\\CLAUDE.md",
-  "date_iso": "2026-09-01T20:48:08.196Z",
+  "cible": "c:\\dev\\digit-ai-factory\\output\\03-etudes\\20260901-etude-dataforseo-cadrage-v2.md",
+  "date_iso": "2026-09-01T19:14:14.380Z",
   "registre_version": "2.13.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -13,7 +13,7 @@
   },
   "bilan_fichiers": {
     "jugé": [
-      "CLAUDE.md"
+      "output\\03-etudes\\20260901-etude-dataforseo-cadrage-v2.md"
     ],
     "exempté": [],
     "délégué": [],
@@ -24,43 +24,43 @@
   "resultats": [
     {
       "domaine": "Lisibilité d'un document (Markdown)",
-      "file": "CLAUDE.md",
+      "file": "output\\03-etudes\\20260901-etude-dataforseo-cadrage-v2.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Format / livraison / versioning",
-      "file": "CLAUDE.md",
+      "file": "output\\03-etudes\\20260901-etude-dataforseo-cadrage-v2.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Sécurité / secrets",
-      "file": "CLAUDE.md",
+      "file": "output\\03-etudes\\20260901-etude-dataforseo-cadrage-v2.md",
       "verdict": "PASS",
       "detail": "aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
-      "file": "CLAUDE.md",
+      "file": "output\\03-etudes\\20260901-etude-dataforseo-cadrage-v2.md",
       "verdict": "SKIP",
       "detail": ""
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
-      "file": "CLAUDE.md",
+      "file": "output\\03-etudes\\20260901-etude-dataforseo-cadrage-v2.md",
       "verdict": "PASS",
-      "detail": "1 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; pourcentage « 100 % » non sourcé"
+      "detail": "4 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; nombre « 1 000 » non sourcé"
     },
     {
       "domaine": "Nommage / convention de livraison",
-      "file": "CLAUDE.md",
+      "file": "output\\03-etudes\\20260901-etude-dataforseo-cadrage-v2.md",
       "verdict": "SKIP",
       "detail": ""
     },
     {
       "domaine": "Cohérence inter-documents",
-      "file": "CLAUDE.md",
+      "file": "output\\03-etudes\\20260901-etude-dataforseo-cadrage-v2.md",
       "verdict": "SKIP",
       "detail": ""
     }
@@ -68,10 +68,10 @@
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
-    "release": "CLAUDE.md",
-    "ts": "2026-09-01T20:48:08.195Z",
+    "release": "output\\03-etudes\\20260901-etude-dataforseo-cadrage-v2.md",
+    "ts": "2026-09-01T19:14:14.380Z",
     "fichiers": {
-      "CLAUDE.md": "5d71bc8da8ee2252cf00f7776c3ff49636c739f48e9b5502d3e8c51c01b9c295"
+      "output\\03-etudes\\20260901-etude-dataforseo-cadrage-v2.md": "5c1eca8158f1e7bcbd06f4f36b8af598cfac9a4ed633489cc77d4f2874b437b6"
     }
   },
   "empreinte_motif": null,

@@ -1,0 +1,79 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md",
+  "date_iso": "2026-09-01T20:30:36.978Z",
+  "registre_version": "2.13.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md",
+      "verdict": "PASS",
+      "detail": "aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md",
+      "verdict": "PASS",
+      "detail": "nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md",
+    "ts": "2026-09-01T20:30:36.978Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md": "9c1ae3eb5144207c46a3cd582c4ad83869b821f23af6960f12e2ba45dfc2826a"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}
