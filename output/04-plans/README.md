@@ -20,6 +20,10 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md` | fichier | 4,3 Ko | Digit-AI — Note de migration : les chemins du pilot renommé — 20260818b |
 | `Digit-AI - Note Revue - Denominateur des freres - 20260818a.md` | fichier | 4,1 Ko | Digit-AI — Note de revue : le dénominateur des « frères » — 20260818a |
 | `Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` | fichier | 3,2 Ko | Plan de renommage `digit-ai-forge-pilot` → `digit-ai-factory` — fenêtre A exécutée, gate n |
+| `Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md` | fichier | 5,7 Ko | Synthèse — Décision d'engagement actée, exécution transférée au produit — 20260901i |
+| `Digit-AI - Synthese - Etapes transferees au produit par lot de travaux - 20260901j.md` | fichier | 5,2 Ko | Synthèse — Les étapes de la décision transférées au produit — 20260901j |
+| `Digit-AI - Synthese - Etude donnees de recherche et cascade intention - 20260901h.md` | fichier | 10,4 Ko | Synthèse — Étude des données de recherche et cascade de l'intention — 20260901h |
+| `Digit-AI - Synthese - Expertise SEO capitalisee au pilot - 20260901k.md` | fichier | 7,4 Ko | Synthèse — L'expertise « données de recherche » capitalisée dans la factory — 20260901k |
 | `Digit-AI - Synthese Boucle - 17 restants du registre - 20260818a.md` | fichier | 13,1 Ko | Digit-AI — Synthèse de boucle : les 17 restants du registre — 20260818a |
 | `Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md` | fichier | 3,6 Ko | Synthèse de campagne — 4e mandat global « ok, fais tout » |
 | `Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md` | fichier | 3,7 Ko | Synthèse de diagnostic — pourquoi aucun avancement toutes les 3 minutes (TF-0252) |
@@ -69,4 +73,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Verification de non perte jouable - 20260901d.md` | fichier | 9,0 Ko | Synthèse de mandat — le tri reste éteint, et sa vérification cesse d'être une intention |
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 
-_52 fichier(s), 0 sous-dossier(s)_
+_56 fichier(s), 0 sous-dossier(s)_
