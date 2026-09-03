@@ -37,9 +37,12 @@ import { anonymiser } from "../todo/anonymiser-entrant.mjs";
 export function pseudonymeProduit(cheminRelatif) {
   const nom = basename(String(cheminRelatif).replaceAll("\\", "/"));
   // DEUX PASSES, et la recette l'a exigé : `anonymiser` substitue les PRODUITS avant les CLIENTS.
-  // Un nom de dossier qui porte le client (« CalculatriceClientSCC ») ne rejoint la clé de la
-  // table (« Produit-04 ») qu'après la substitution du client — donc au second
-  // passage seulement. Sur un texte déjà propre, la seconde passe ne change rien.
+  // Un nom de dossier qui porte le client (« OutilFictilabsSCC », nom inventé) ne rejoint la clé
+  // de la table (« OutilClient-ZSCC », clé déjà pseudonymisée côté client) qu'après la
+  // substitution du client — donc au second passage seulement. Sur un texte déjà propre, la
+  // seconde passe ne change rien. (Exemples inventés : le 03/09, la réécriture d'historique a
+  // remplacé dans ce commentaire même un nom réel de produit cité en exemple — la loi n° 4 vaut
+  // aussi pour les commentaires.)
   const propre = anonymiser(anonymiser(nom).texte).texte;
   // Un pseudonyme présent dans le texte (« Produit-02.com », « Produit-11 ») EST la réponse : le
   // réinscrire créerait un pseudonyme de pseudonyme (défaut payé le 02/09, note de la table).
