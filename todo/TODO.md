@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=834ef18c8cf5 archive=d3c801ad4540 · dernier événement: 2026-09-03T09:00:39.846Z -->
+     sceaux: actifs=def8caa7a26b archive=d3c801ad4540 · dernier événement: 2026-09-03T09:32:05.310Z -->
 
-**7 actifs** (candidat 1 · décidé 6 · en cours 0 · corrigé 0 · écarté 0) · **782 archivés**.
+**8 actifs** (candidat 2 · décidé 6 · en cours 0 · corrigé 0 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -14,6 +14,12 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0674 | decide | 12.5 | La porte de fraîcheur de déploiement empreinte encore un échantillon — le correctif d'ensemble n'est pas appliqué | non |
 | TF-0682 | decide | 10 | Quinze contrôles du produit ne sont exercés par AUCUNE recette — être cité n'est pas être joué | non |
 | TF-0676 | decide | 6.7 | Aucun script de capture du produit ne produit systématiquement une pleine page | non |
+
+## digit-ai-forge-agents
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0789 | candidat | 8 | digit-ai-schemas : l exemple de reference du skill deborde a 390 px (16 constats v1_overflow, tableaux et blocs de code larges) et n a pas de verdict de lecture par un tiers (T1/T2 du 02/09 non traites) — un exemple de reference qui ne tient pas ses propres regles enseigne le defaut | **oui** — render_page.py --widths 390 sur l exemple de reference : 16 constats v1_overflow, mesures le 03/09 avant et apres TF-0784 ; oracle-lecture-tiers du 02/09 : T1 + T2 en defaut sur la meme page |
 
 ## forge-tests
 

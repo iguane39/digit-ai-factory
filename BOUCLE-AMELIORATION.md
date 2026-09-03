@@ -2151,3 +2151,5 @@ chantier qui crée un script scellant, pas de sa relecture.
 
 Registre : 11 → 7 actifs (1 candidat, 6 décidés), 5 clôtures ce jour avec descente, 781 archivés.
 Registre PASS, porte de publication PASS (historique compris), banc du pilot rejoué en clôture.
+
+**Rapport final de l agent forge-agents (11:45)** : second constat en passant entré en candidat, **TF-0789** — l exemple de référence de digit-ai-schemas déborde à 390 px (16 constats v1_overflow, antérieurs, mesurés identiques avant et après TF-0784) et n a pas de verdict de lecture tierce (T1/T2 du 02/09). Registre : 8 actifs (2 candidats, 6 décidés).
