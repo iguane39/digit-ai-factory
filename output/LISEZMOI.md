@@ -73,7 +73,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 167 livrable(s) courant(s), 10 archivé(s), 6 famille(s).
+**État** : 169 livrable(s) courant(s), 10 archivé(s), 6 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -184,6 +184,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260901-etude-opportunite-dataforseo.md | — | 20.6 Ko | `03-etudes/20260901-etude-opportunite-dataforseo.md` |
 | 20260901-etude-opportunite-strategie-tests.md | — | 23.9 Ko | `03-etudes/20260901-etude-opportunite-strategie-tests.md` |
 | 20260902-etude-opportunite-dataforseo-produit-02.md | — | 43.7 Ko | `03-etudes/20260902-etude-opportunite-dataforseo-produit-02.md` |
+| 20260903-L99-amelioration-continue.md | — | 42.3 Ko | `03-etudes/20260903-L99-amelioration-continue.md` |
 
 ### 04-plans
 
@@ -202,6 +203,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md.jugement.json` |
 | Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md | 20260815a | 3.8 Ko | `04-plans/Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md` |
 | Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Analyse L99 amelioration continue - 20260903a.md | 20260903a | 15.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Analyse L99 amelioration continue - 20260903a.md` |
 | Digit-AI - Synthese Mandat - Analyse L99 etat de l art marche - 20260830n.md | 20260830n | 15.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Analyse L99 etat de l art marche - 20260830n.md` |
 | Digit-AI - Synthese Mandat - Anatomie du bloc 3 armee - 20260830e.md | 20260830e | 17.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Anatomie du bloc 3 armee - 20260830e.md` |
 | Digit-AI - Synthese Mandat - Anonymisation cablee sur git - 20260901g.md | 20260901g | 11.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Anonymisation cablee sur git - 20260901g.md` |
@@ -240,7 +242,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Traite les todo et retours - 20260815a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite les todo et retours - 20260815a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md | 20260817a | 6.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md` |
 | Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md.jugement.json` |
-| Digit-AI - Synthese Mandat - Traite les todos et les retours - 20260902b.md | 20260902b | 24.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite les todos et les retours - 20260902b.md` |
+| Digit-AI - Synthese Mandat - Traite les todos et les retours - 20260902b.md | 20260902b | 24.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite les todos et les retours - 20260902b.md` |
 | Digit-AI - Synthese Mandat - Traite les todos et retours - 20260830a.md | 20260830a | 17.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite les todos et retours - 20260830a.md` |
 | Digit-AI - Synthese Mandat - Traite retours et todos - 20260817a.md | 20260817a | 6.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite retours et todos - 20260817a.md` |
 | Digit-AI - Synthese Mandat - Traite retours et todos - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite retours et todos - 20260817a.md.jugement.json` |
