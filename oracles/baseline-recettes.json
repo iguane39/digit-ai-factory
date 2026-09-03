@@ -350,6 +350,10 @@
   "cas": 9,
   "vu_le": "2026-09-01"
  },
+ "todo/observer-recidives.test.mjs": {
+  "cas": 4,
+  "vu_le": "2026-09-03"
+ },
  "todo/preflight-collision.test.mjs": {
   "cas": 5,
   "vu_le": "2026-08-26"

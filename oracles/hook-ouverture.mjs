@@ -195,6 +195,31 @@ if (iPilot < 0) {
   }
 }
 
+// TF-0790 (décision D-2 (a), 03/09/2026) — LA CADENCE D'UN PLAN DE SURVEILLANCE EST TENUE PAR QUI
+// L'INVOQUE. forge-observability le dit elle-même : « la cadence est documentaire en v0 ». Sans
+// invocateur, le plan des récidives serait une intention de plus (N-1). L'ouverture du pilot joue
+// donc `todo/observer-recidives.mjs` quand le dernier snapshot a plus de sept jours, ou n'existe
+// pas — et rend le verdict de dérive en une ligne, sans jamais bloquer : le FAIL est le signal.
+if (iPilot < 0) {
+  const plan = join(PILOT, "todo", "observabilite", "plan-recidives.json");
+  const ledger = join(PILOT, "todo", "observabilite", "snapshots-recidives.jsonl");
+  if (existsSync(plan)) {
+    let dernier = null;
+    try { const l = readFileSync(ledger, "utf8").trim().split("\n").filter(Boolean); dernier = l.length ? JSON.parse(l[l.length - 1]).ts : null; } catch { dernier = null; }
+    const age = dernier ? (Date.now() - Date.parse(dernier)) / 86400000 : Infinity;
+    lignes.push("", "## Surveillance des récidives (TF-0790, forge-observability, cadence hebdomadaire)");
+    if (age < 7) lignes.push(`- dernier relevé du ${dernier} (${age.toFixed(1)} j) — prochain passage dans ${(7 - age).toFixed(1)} j ; à la demande : node todo/observer-recidives.mjs`);
+    else {
+      const r = spawnSync(process.execPath, [join(PILOT, "todo", "observer-recidives.mjs")], { encoding: "utf8", cwd: PILOT, timeout: 180000 });
+      let j = null; try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* illisible */ }
+      if (!j) lignes.push(`- passage NON rendu (exit ${r.status}) — ${(r.stderr || r.stdout || "").trim().slice(0, 200)}`);
+      else if (j.verdict === "PASS") lignes.push(`- passage joué : aucune dérive depuis le relevé précédent (snapshot ${j.snapshot_seq ?? "?"})`);
+      else if (j.verdict === "donnees_insuffisantes") lignes.push(`- premier relevé écrit (snapshot ${j.snapshot_seq ?? "?"}) — la dérive se lira au prochain passage`);
+      else lignes.push(`- DÉRIVE (${j.verdict}) : ${(j.derive?.findings || [j.message]).slice(0, 4).join(" ; ")} — lire todo/RECIDIVES.md, décider en revue des classes (rien n'est appliqué automatiquement)`);
+    }
+  }
+}
+
 lignes.push("",
   "## Gates actifs dans cette session (R-44)",
   "- Tout message de fin de tour de TRAVAIL suit gabarits\RESTITUTION.md — bloc 0 + 8 blocs, aucun omis. Bloc 3 : une décision par BLOC DE CITATION, ouverte par son sélecteur `D-N` et une QUESTION, rappel du sujet puis recommandation SOURCÉE, options en tableau `Option | Ce qu'elle coûte | Ce qu'elle exclut` hors citation, ligne de repli « si rien n'est décidé » pour finir. Bloc 8 : UN TABLEAU unique, l'acteur en COLONNE (auto_ia/manuelle_dev/manuelle_utilisateur), trié auto_ia d'abord, chaque action ouverte par son sélecteur `A-N` — les deux familles ne partagent JAMAIS la même numérotation. Effort en complexité × durée, jamais en jours. v2.16.0 (02/09) : aucune action manuelle_utilisateur ne demande à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation ; une correction restituée nomme son contrôle rouge → vert ou sa classe ; le fichier de synthèse se nomme Synthese ou Restitution — le marqueur `destinataire: humain` est réservé aux restitutions. Le hook Stop le juge par oracle-synthese et REFUSE l'arrêt en cas d'échec.",

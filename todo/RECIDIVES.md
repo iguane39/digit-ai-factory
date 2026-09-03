@@ -1,10 +1,10 @@
 # Récidives et descente — tableau de bord
 
-<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre a0a824bcd45f · archive d3c801ad4540 · classes bbb2812d6329 · relevés 5ffae72713b4 · héritage 23d6b9c4bee8. État au 2026-09-03T09:42:14.273Z (ts max des sources, jamais l'horloge). -->
+<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 6cf88d203459 · archive d3c801ad4540 · classes bbb2812d6329 · relevés 19bf44f4780e · héritage 23d6b9c4bee8. État au 2026-09-03T12:33:09.964Z (ts max des sources, jamais l'horloge). -->
 
 Ce tableau de bord répond à trois questions que le registre seul ne savait pas poser : est-ce la deuxième fois, chez qui, et depuis combien de temps la correction existe sans être appliquée. Il se lit avec sa contre-métrique : un compteur de récidives qui baisse pendant que le nombre de classes monte est un compteur contourné, pas un progrès.
 
-**Périmètre mesuré** : 790 item(s) au registre (actifs et archive), 0 portant une classe, 0 marqué(s) récidive ; référentiel de 30 classe(s) en 18 famille(s) (v1.0.0) ; 1 relevé(s) d'héritage.
+**Périmètre mesuré** : 790 item(s) au registre (actifs et archive), 0 portant une classe, 0 marqué(s) récidive ; référentiel de 30 classe(s) en 18 famille(s) (v1.0.0) ; 2 relevé(s) d'héritage.
 
 ## 1. Récidives par classe
 
@@ -82,7 +82,7 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 
 ## 3. Taux d'héritage par règle (dernier relevé)
 
-Comment lire : une ligne par artefact hérité déclaré dans `gabarits/HERITAGE.json`, état au relevé du 2026-09-03T09:39:19.651Z sur 9 produit(s) ; *conformes* compte les produits chez qui l'artefact est présent et à jour ; *familles* dit de quelles familles de défaut cet artefact protège.
+Comment lire : une ligne par artefact hérité déclaré dans `gabarits/HERITAGE.json`, état au relevé du 2026-09-03T12:32:32.717Z sur 9 produit(s) ; *conformes* compte les produits chez qui l'artefact est présent et à jour ; *familles* dit de quelles familles de défaut cet artefact protège.
 
 | Artefact | Mode | Conformes | Familles protégées |
 |---|---|---|---|

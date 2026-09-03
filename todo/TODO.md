@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=a0a824bcd45f archive=d3c801ad4540 · dernier événement: 2026-09-03T09:42:14.273Z -->
+     sceaux: actifs=6cf88d203459 archive=d3c801ad4540 · dernier événement: 2026-09-03T12:33:09.964Z -->
 
-**9 actifs** (candidat 3 · décidé 6 · en cours 0 · corrigé 0 · écarté 0) · **782 archivés**.
+**9 actifs** (candidat 2 · décidé 6 · en cours 0 · corrigé 1 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -25,7 +25,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0790 | candidat | 6 | forge-observability : surveiller le tableau de bord des récidives ENTRE les runs — une récidive ou une classe de plus par rapport au relevé précédent est une dérive | **oui** — 50 récidives déclarées en prose sur 788 items (6 %), 1 → 11 → 15 → 19 par semaine du 03/08 au 30/08 ; trois récidives en quatre jours sur un seul projet (TF-0757) ; aucun compteur ne les voyait avant le 03/09 |
+| TF-0790 | corrige | 6 | forge-observability : surveiller le tableau de bord des récidives ENTRE les runs — une récidive ou une classe de plus par rapport au relevé précédent est une dérive | **oui** — 50 récidives déclarées en prose sur 788 items (6 %), 1 → 11 → 15 → 19 par semaine du 03/08 au 30/08 ; trois récidives en quatre jours sur un seul projet (TF-0757) ; aucun compteur ne les voyait avant le 03/09 |
 
 ## forge-tests
 
