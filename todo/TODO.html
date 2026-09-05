@@ -155,7 +155,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>954068be02b0</code> · dernier événement 2026-09-05T12:36:43.008Z</p>
+      <p class="meta">sceau <code>52ef0af1d0bd</code> · dernier événement 2026-09-05T13:21:43.164Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -165,8 +165,8 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="8 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">8</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="6 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">6</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="1 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">1</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="9 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">9</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="1 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">1</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="781 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">781</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
@@ -291,79 +291,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0808" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0808</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-factory : M-9 fonde sa preuve sur « le controle executable du produit » et ne nomme pas le controle generique du socle, qui existe desormais</h3>
-          <div class="card-detail" data-cite><p class="lead">ETAPE-MEP.md ligne M-9 exige comme preuve « la sortie du controle executable du PRODUIT jouant ces trois cas », et l'exigence 5 du patron P-2 demande « un controle executable qui joue les cas » sans dire lequel. La formulation prescrit donc a chaque produit d'ecrire le sien — le cout exact que TF-0803 vient de solder. La recette generique demandee existe depuis le commit 23c7622 de Produit-61 (recette/quatre_cent_quatre.py) : parametree par la liste des prefixes de langue et l'URL de preproduction, elle joue les trois cas de M-9, rend une piece JSON pour le dossier de MEP et un code de sortie (0 tenu / 1 defaut / 2 non mesurable), et son double sens est prouve par 29 cas de banc dont sept serveurs HTTP locaux (un conforme, six portant chacun un refus). Rien dans M-9 ni dans P-2 ne la nomme : un produit qui lit M-9 aujourd'hui repart ecrire son propre controle.</p><p class="detail-label">Proposition</p><ul class="puces"><li>M-9 et l'exigence 5 de P-2 nomment la recette du socle comme source de preuve recevable, et ne renvoient au controle maison que par ecart declare</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>la realisation de reference du patron a coute 14 pages et 5 controles d'oracle sur un seul produit (P-2, references/PATRONS-EPROUVES.md) ; tant que M-9 ne nomme pas le controle du socle, chaque produit a surface web repaie cette ecriture a sa MEP</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-61</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0809" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0809</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-factory : M-9 (a) ne juge que les adresses inconnues SOUS un prefixe, la racine sans prefixe que l'exigence 4 de P-2 demande sort du jugement</h3>
-          <div class="card-detail" data-cite><p class="lead">Le patron P-2, exigence 4, demande deux choses : « la langue choisie au prefixe du chemin (/fr/inconnu -&gt; 404 en francais ; SANS PREFIXE -&gt; langue par defaut) ». Le controle M-9 (a) n'en juge qu'une : « une adresse inconnue sous chaque prefixe de langue ». L'adresse la plus visitee d'un site — sa racine — n'a donc aucun lieu de jugement, alors que c'est elle qu'un serveur de fichiers mal enveloppe sert le plus volontiers en 404 nu. Mesure : en ecrivant la recette generique, le cas a du etre cable sous une OPTION (--langue-par-defaut) parce que M-9 ne le demande pas ; il est joue et tenu au banc (cas de sortie « prefixe »: chaine vide), mais un produit qui joue strictement M-9 ne l'active pas.</p><p class="detail-label">Proposition</p><ul class="puces"><li>M-9</li><li>ajoute la racine sans prefixe, avec la langue par defaut declaree par le produit</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>ecart constate entre les cinq exigences de P-2 et les trois cas de M-9 : une exigence sur cinq n'est jugee qu'a moitie, et l'ecart n'etait visible qu'en traduisant le patron en mesures — aucune relecture du texte ne l'avait signale entre le 03/09 et le 05/09</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-61</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0810" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0810</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-factory : la frontiere Unicode prescrite par TF-0799 elargit les gardes sur les chiffres et le tiret bas — la generalisation exacte de \b est [\p{L}\p{N}_]</h3>
-          <div class="card-detail" data-cite><p class="lead">Le lot de travaux du 05/09 prescrit de remplacer `\b` par `(?&lt;![\p{L}])` / `(?![\p{L}])`.</p><ul class="puces"><li>Cette forme corrige bien l'accent, mais elle elargit la garde : les chiffres et le `_` cessent d'etre des caracteres de mot, alors que `\b` les compte. Mesure faite sur la garde des pronoms d'E8 (oracle-exigences), cinq cas : la forme prescrite tient 3 cas sur 5 — elle attrape « le champ elle2 du formulaire » et « la colonne elle_id » comme des pronoms, ce que `\b` refusait justement</li><li>la forme `(?&lt;![\p{L}\p{N}_])` / `(?![\p{L}\p{N}_])` tient 5 sur 5. Meme mesure sur une unite chiffree : « un delai de 10 j2 » est lu « 10 jours » par la forme prescrite, et ne l'est ni par `\b` ni par la forme retenue. La forge a donc applique la seconde, publiee en constantes partagees AVANT/APRES dans `oracles/_contrat.mjs` pour ses onze oracles. Le pilot doit appliquer la meme correction a `oracle-synthese` S21 : c'est le moment ou l'ecart coute</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>Banc de mesure joue le 05/09/2026 sur les trois formes de frontiere : ASCII 3/5, forme prescrite 3/5 (deux faux positifs neufs : elle2, elle_id), forme retenue 5/5. Sans ce constat, la descente de TF-0799 vers oracle-synthese S21 et vers les autres forges introduit deux faux positifs mesures la ou elle corrige un faux positif.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0812" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="basse">
+        <article class="card s-decide" id="item-TF-0812" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0812</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -400,6 +331,75 @@
             
           </dl>
         </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0808" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0808</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-factory : M-9 fonde sa preuve sur « le controle executable du produit » et ne nomme pas le controle generique du socle, qui existe desormais</h3>
+          <div class="card-detail" data-cite><p class="lead">ETAPE-MEP.md ligne M-9 exige comme preuve « la sortie du controle executable du PRODUIT jouant ces trois cas », et l'exigence 5 du patron P-2 demande « un controle executable qui joue les cas » sans dire lequel. La formulation prescrit donc a chaque produit d'ecrire le sien — le cout exact que TF-0803 vient de solder. La recette generique demandee existe depuis le commit 23c7622 de Produit-61 (recette/quatre_cent_quatre.py) : parametree par la liste des prefixes de langue et l'URL de preproduction, elle joue les trois cas de M-9, rend une piece JSON pour le dossier de MEP et un code de sortie (0 tenu / 1 defaut / 2 non mesurable), et son double sens est prouve par 29 cas de banc dont sept serveurs HTTP locaux (un conforme, six portant chacun un refus). Rien dans M-9 ni dans P-2 ne la nomme : un produit qui lit M-9 aujourd'hui repart ecrire son propre controle.</p><p class="detail-label">Proposition</p><ul class="puces"><li>M-9 et l'exigence 5 de P-2 nomment la recette du socle comme source de preuve recevable, et ne renvoient au controle maison que par ecart declare</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>la realisation de reference du patron a coute 14 pages et 5 controles d'oracle sur un seul produit (P-2, references/PATRONS-EPROUVES.md) ; tant que M-9 ne nomme pas le controle du socle, chaque produit a surface web repaie cette ecriture a sa MEP</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-61</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0809" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0809</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-factory : M-9 (a) ne juge que les adresses inconnues SOUS un prefixe, la racine sans prefixe que l'exigence 4 de P-2 demande sort du jugement</h3>
+          <div class="card-detail" data-cite><p class="lead">Le patron P-2, exigence 4, demande deux choses : « la langue choisie au prefixe du chemin (/fr/inconnu -&gt; 404 en francais ; SANS PREFIXE -&gt; langue par defaut) ». Le controle M-9 (a) n'en juge qu'une : « une adresse inconnue sous chaque prefixe de langue ». L'adresse la plus visitee d'un site — sa racine — n'a donc aucun lieu de jugement, alors que c'est elle qu'un serveur de fichiers mal enveloppe sert le plus volontiers en 404 nu. Mesure : en ecrivant la recette generique, le cas a du etre cable sous une OPTION (--langue-par-defaut) parce que M-9 ne le demande pas ; il est joue et tenu au banc (cas de sortie « prefixe »: chaine vide), mais un produit qui joue strictement M-9 ne l'active pas.</p><p class="detail-label">Proposition</p><ul class="puces"><li>M-9</li><li>ajoute la racine sans prefixe, avec la langue par defaut declaree par le produit</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>ecart constate entre les cinq exigences de P-2 et les trois cas de M-9 : une exigence sur cinq n'est jugee qu'a moitie, et l'ecart n'etait visible qu'en traduisant le patron en mesures — aucune relecture du texte ne l'avait signale entre le 03/09 et le 05/09</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-61</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0810" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0810</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-factory : la frontiere Unicode prescrite par TF-0799 elargit les gardes sur les chiffres et le tiret bas — la generalisation exacte de \b est [\p{L}\p{N}_]</h3>
+          <div class="card-detail" data-cite><p class="lead">Le lot de travaux du 05/09 prescrit de remplacer `\b` par `(?&lt;![\p{L}])` / `(?![\p{L}])`.</p><ul class="puces"><li>Cette forme corrige bien l'accent, mais elle elargit la garde : les chiffres et le `_` cessent d'etre des caracteres de mot, alors que `\b` les compte. Mesure faite sur la garde des pronoms d'E8 (oracle-exigences), cinq cas : la forme prescrite tient 3 cas sur 5 — elle attrape « le champ elle2 du formulaire » et « la colonne elle_id » comme des pronoms, ce que `\b` refusait justement</li><li>la forme `(?&lt;![\p{L}\p{N}_])` / `(?![\p{L}\p{N}_])` tient 5 sur 5. Meme mesure sur une unite chiffree : « un delai de 10 j2 » est lu « 10 jours » par la forme prescrite, et ne l'est ni par `\b` ni par la forme retenue. La forge a donc applique la seconde, publiee en constantes partagees AVANT/APRES dans `oracles/_contrat.mjs` pour ses onze oracles. Le pilot doit appliquer la meme correction a `oracle-synthese` S21 : c'est le moment ou l'ecart coute</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>Banc de mesure joue le 05/09/2026 sur les trois formes de frontiere : ASCII 3/5, forme prescrite 3/5 (deux faux positifs neufs : elle2, elle_id), forme retenue 5/5. Sans ce constat, la descente de TF-0799 vers oracle-synthese S21 et vers les autres forges introduit deux faux positifs mesures la ou elle corrige un faux positif.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
+            
+          </dl>
+        </article>
       </div>
     </section>
     <section id="digit-ai-forge-agents">
@@ -412,10 +412,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0806" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="basse">
+        <article class="card s-decide" id="item-TF-0806" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0806</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -464,10 +464,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0811" data-cite data-forge="digit-ai-forge-conception" data-statut="candidat" data-prio="basse">
+        <article class="card s-decide" id="item-TF-0811" data-cite data-forge="digit-ai-forge-conception" data-statut="decide" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0811</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -805,29 +805,6 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0807" data-cite data-forge="pilot" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0807</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : l'ingestion d'un lot remis par une FORGE pseudonymise la forge comme un produit client (digit-ai-forge-development → Produit-60, entree ajoutee a la table hors depot) — une forge est publique, son nom ne se cache pas</h3>
-          <div class="card-detail" data-cite><p class="lead">Mesure le 05/09/2026 a l'ingestion de « digit-ai-forge-development - RETOURS - 20260905a » : [ANONYMISE] produit du lot → Produit-60, 1 nom substitue (digit-ai-forge-development), R-47 « dossier introuvable » (une forge n'est pas un produit).</p><ul class="puces"><li>L'anonymiseur d'entree derive le produit du prefixe du lot et etend la table des produits a la decouverte</li><li>le gabarit RETOURS-FORGES.md autorise pourtant une forge a remettre un lot au pilot, prefixe de son nom. Effet : le registre porte « Produit-60 » comme demandeur d'un constat qui vient d'une forge publique, la table hors depot gagne une entree parasite, et R-47 est joue sur une cible qui n'en est pas une. Demande : l'ingestion reconnait un prefixe digit-ai-forge-* / digit-ai-factory comme EMETTEUR FORGE (jamais pseudonymise, jamais inscrit a la table, R-47 sans objet declare), fixture double sens (lot d'une forge → demandeur conserve</li><li>lot d'un produit → pseudonymise)</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 3 × preuve 4 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur pilot</dt><dd>un demandeur illisible au registre (Produit-60) pour un constat de forge, une entree parasite dans la table des pseudonymes, un R-47 joue a vide — a chaque lot de forge tant que ce n'est pas corrige</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot-ingestion-20260905</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-corrige" id="item-TF-0805" data-cite data-forge="pilot" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0805</code>
@@ -865,6 +842,29 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 3 × preuve 4 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur pilot</dt><dd>le 02/09, la section dashboard de la recette de forge-tests est passee de vert a rouge entre deux executions sans qu un octet ait bouge dans son depot (mesure de TF-0786) ; sans signal cote consommateur, le meme diagnostic se refait a la main a chaque montee de version</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant de l agent forge-tests, TF-0786 volet 3, 03/09/2026)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0807" data-cite data-forge="pilot" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0807</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : l'ingestion d'un lot remis par une FORGE pseudonymise la forge comme un produit client (digit-ai-forge-development → Produit-60, entree ajoutee a la table hors depot) — une forge est publique, son nom ne se cache pas</h3>
+          <div class="card-detail" data-cite><p class="lead">Mesure le 05/09/2026 a l'ingestion de « digit-ai-forge-development - RETOURS - 20260905a » : [ANONYMISE] produit du lot → Produit-60, 1 nom substitue (digit-ai-forge-development), R-47 « dossier introuvable » (une forge n'est pas un produit).</p><ul class="puces"><li>L'anonymiseur d'entree derive le produit du prefixe du lot et etend la table des produits a la decouverte</li><li>le gabarit RETOURS-FORGES.md autorise pourtant une forge a remettre un lot au pilot, prefixe de son nom. Effet : le registre porte « Produit-60 » comme demandeur d'un constat qui vient d'une forge publique, la table hors depot gagne une entree parasite, et R-47 est joue sur une cible qui n'en est pas une. Demande : l'ingestion reconnait un prefixe digit-ai-forge-* / digit-ai-factory comme EMETTEUR FORGE (jamais pseudonymise, jamais inscrit a la table, R-47 sans objet declare), fixture double sens (lot d'une forge → demandeur conserve</li><li>lot d'un produit → pseudonymise)</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 3 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>un demandeur illisible au registre (Produit-60) pour un constat de forge, une entree parasite dans la table des pseudonymes, un R-47 joue a vide — a chaque lot de forge tant que ce n'est pas corrige</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot-ingestion-20260905</dd></div>
             
           </dl>
         </article>

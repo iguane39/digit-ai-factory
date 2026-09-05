@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau 954068be02b0)]
+sources_de_verite: [todo/TODO.jsonl (sceau 52ef0af1d0bd)]
 verifie_le: 2026-09-05
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `954068be02b0`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `52ef0af1d0bd`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -19,8 +19,8 @@ les corrections donnerait l'illusion d'un progrès net.
 
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
-| Ouverts | 15 | candidats, décidés ou en cours — le reste à faire réel |
-| Clos sur gains constatés | 16 | corrigés avec leur mesure avant/après |
+| Ouverts | 11 | candidats, décidés ou en cours — le reste à faire réel |
+| Clos sur gains constatés | 20 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 0 | décidés non faits, motif écrit — jamais un silence |
 | Total suivi | 31 | tout ce que le registre a jamais porté |
 
@@ -30,7 +30,7 @@ La table se lit par forge cible : c'est l'unité de décision, puisqu'une correc
 livre dans un dépôt. L'ordre suit le NOMBRE d'items ouverts, jamais leur priorité — la
 priorité vit dans la colonne de score.
 
-### digit-ai-factory — 7 item(s)
+### digit-ai-factory — 4 item(s)
 
 Les items ouverts ciblant digit-ai-factory, du score le plus fort au plus faible. Le score est
 celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
@@ -40,12 +40,9 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0674 | La porte de fraîcheur de déploiement empreinte encore un échantillon — le correctif d'ensemble n'est pas appli | decide | digit-ai-factory | 12.5 |
 | TF-0682 | Quinze contrôles du produit ne sont exercés par AUCUNE recette — être cité n'est pas être joué | decide | digit-ai-factory | 10 |
 | TF-0676 | Aucun script de capture du produit ne produit systématiquement une pleine page | decide | digit-ai-factory | 6.7 |
-| TF-0808 | digit-ai-factory : M-9 fonde sa preuve sur « le controle executable du produit » et ne nomme pas le controle g | candidat | digit-ai-factory | 1 |
-| TF-0809 | digit-ai-factory : M-9 (a) ne juge que les adresses inconnues SOUS un prefixe, la racine sans prefixe que l'ex | candidat | digit-ai-factory | 1 |
-| TF-0810 | digit-ai-factory : la frontiere Unicode prescrite par TF-0799 elargit les gardes sur les chiffres et le tiret  | candidat | digit-ai-factory | 1 |
-| TF-0812 | digit-ai-factory : le gate d'ecriture C7 a impute a l'edition en cours deux constats presents a l'identique da | candidat | digit-ai-factory | 1 |
+| TF-0812 | digit-ai-factory : le gate d'ecriture C7 a impute a l'edition en cours deux constats presents a l'identique da | decide | digit-ai-factory | 1 |
 
-### pilot — 3 item(s)
+### pilot — 2 item(s)
 
 Les items ouverts ciblant pilot, du score le plus fort au plus faible. Le score est
 celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
@@ -54,7 +51,6 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 |---|---|---|---|---|
 | TF-0549 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : | decide | pilot | 10 |
 | TF-0791 | Cascade Intention > Strategie > Tactique > Operationnel + test retro : la definition des demandes ne capture p | en_cours | pilot | 6.7 |
-| TF-0807 | pilot : l'ingestion d'un lot remis par une FORGE pseudonymise la forge comme un produit client (digit-ai-forge | candidat | pilot | 6 |
 
 ### forge-tests — 2 item(s)
 
@@ -82,7 +78,7 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 
 | Id | Titre | Statut | Forge(s) | Score |
 |---|---|---|---|---|
-| TF-0806 | digit-ai-forge-agents : le delta neufs/preexistants du hook d'ecriture est inoperant des que le constat porte  | candidat | digit-ai-forge-agents | 1 |
+| TF-0806 | digit-ai-forge-agents : le delta neufs/preexistants du hook d'ecriture est inoperant des que le constat porte  | decide | digit-ai-forge-agents | 1 |
 
 ### digit-ai-forge-conception — 1 item(s)
 
@@ -91,7 +87,7 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 
 | Id | Titre | Statut | Forge(s) | Score |
 |---|---|---|---|---|
-| TF-0811 | Produit-62 : l'ecart explicite d'un candidat de la surface implicite n'a nulle part ou s'ecrire dans EXIGENCES | candidat | digit-ai-forge-conception | 1 |
+| TF-0811 | Produit-62 : l'ecart explicite d'un candidat de la surface implicite n'a nulle part ou s'ecrire dans EXIGENCES | decide | digit-ai-forge-conception | 1 |
 
 ## Ce que ce rapport ne dit pas
 

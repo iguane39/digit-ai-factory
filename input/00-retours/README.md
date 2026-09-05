@@ -17,14 +17,14 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
 | [`old\`](old/README.md) | dossier (149 fichiers) | — | Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réé… |
-| `Produit-62 - RETOURS - 20260905a.md` | fichier | 16,8 Ko | Retours forges — Produit-62 — 20260905a |
-| `Produit-62 - RETOURS - 20260905a.tf.jsonl` | fichier | 5,1 Ko | 3 ligne(s) JSONL |
+| `digit-ai-forge-conception - RETOURS - 20260905a.md` | fichier | 16,8 Ko | Retours forges — digit-ai-forge-conception — 20260905a |
+| `digit-ai-forge-conception - RETOURS - 20260905a.tf.jsonl` | fichier | 5,1 Ko | 3 ligne(s) JSONL |
 | `digit-ai-forge-design - RETOURS - 20260905a.md` | fichier | 15,2 Ko | Retours forges — digit-ai-forge-design — 20260905a |
 | `digit-ai-forge-design - RETOURS - 20260905a.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
-| `Produit-60 - RETOURS - 20260905a.md` | fichier | 12,8 Ko | Retours forges — Produit-60 — 20260905a |
-| `Produit-60 - RETOURS - 20260905a.tf.jsonl` | fichier | 2,4 Ko | 1 ligne(s) JSONL |
-| `Produit-61 - RETOURS - 20260905a.md` | fichier | 12,7 Ko | Retours forges — Produit-61 — 20260905a |
-| `Produit-61 - RETOURS - 20260905a.tf.jsonl` | fichier | 3,2 Ko | 2 ligne(s) JSONL |
+| `digit-ai-forge-development - RETOURS - 20260905a.md` | fichier | 12,8 Ko | Retours forges — digit-ai-forge-development — 20260905a |
+| `digit-ai-forge-development - RETOURS - 20260905a.tf.jsonl` | fichier | 2,4 Ko | 1 ligne(s) JSONL |
+| `digit-ai-forge-tests - RETOURS - 20260905a.md` | fichier | 12,7 Ko | Retours forges — digit-ai-forge-tests — 20260905a |
+| `digit-ai-forge-tests - RETOURS - 20260905a.tf.jsonl` | fichier | 3,2 Ko | 2 ligne(s) JSONL |
 | `Produit-01 - RETOURS - 20260827a.md` | fichier | 8,3 Ko | Retours forges — Produit-01 — 20260827a |
 | `Produit-01 - RETOURS - 20260827a.tf.jsonl` | fichier | 4,9 Ko | 2 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20260823a.md` | fichier | 13,0 Ko | Retours forges — retrait du domaine breton & audit forge-tests — 20260823a |

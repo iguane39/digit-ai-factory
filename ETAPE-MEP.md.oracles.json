@@ -1,6 +1,6 @@
 {
   "cible": "c:\\dev\\digit-ai-factory\\ETAPE-MEP.md",
-  "date_iso": "2026-09-05T07:47:07.175Z",
+  "date_iso": "2026-09-05T13:18:05.215Z",
   "registre_version": "2.16.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "ETAPE-MEP.md",
-    "ts": "2026-09-05T07:47:07.174Z",
+    "ts": "2026-09-05T13:18:05.214Z",
     "fichiers": {
-      "ETAPE-MEP.md": "f1b55f92e38173ab7f0960f9a512d225af8e6f7472753f9bb977107bfbca43f9"
+      "ETAPE-MEP.md": "339872f164f22ff199ed7c063d547bade20abd95594fd1e003e47017d56c94de"
     }
   },
   "empreinte_motif": null,

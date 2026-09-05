@@ -66,8 +66,11 @@ qu'aucune demande de fonctionnalité ne fera émerger.
    (une page absente du sitemap sans déclaration passe pour un oubli).
 4. **La langue choisie au préfixe du chemin** (`/fr/inconnu` → 404 en français ; sans préfixe →
    langue par défaut).
-5. **Un contrôle exécutable qui joue les cas** : adresse inconnue → 404 avec menu ; préfixe respecté ;
-   ressource non-HTML inconnue (image, script) → 404 nu, jamais une page HTML.
+5. **Un contrôle exécutable qui joue les cas** : adresse inconnue → 404 avec menu ; préfixe respecté,
+   racine sans préfixe → langue par défaut ; ressource non-HTML inconnue (image, script) → 404 nu,
+   jamais une page HTML. **Le contrôle existe, générique, chez forge-tests** (TF-0803, 05/09/2026) :
+   `recette\quatre_cent_quatre.py`, paramétré par l'URL de préproduction, les préfixes de langue, la
+   langue par défaut et le sitemap — un produit l'invoque, il ne le réécrit pas (TF-0808).
 
 **Réalisation de référence** (Produit-02, 01/09) : 14 pages générées (7 langues × 404 + page de
 retour de réservation, même mécanique hors index) ; **enveloppe** `writeHead/write/end` autour du
