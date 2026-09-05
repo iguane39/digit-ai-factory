@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau cf45e0ddbddf)]
+sources_de_verite: [todo/TODO.jsonl (sceau fb9a67adefe7)]
 verifie_le: 2026-09-05
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `cf45e0ddbddf`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `fb9a67adefe7`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -19,16 +19,27 @@ les corrections donnerait l'illusion d'un progrès net.
 
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
-| Ouverts | 15 | candidats, décidés ou en cours — le reste à faire réel |
-| Clos sur gains constatés | 9 | corrigés avec leur mesure avant/après |
+| Ouverts | 16 | candidats, décidés ou en cours — le reste à faire réel |
+| Clos sur gains constatés | 10 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 0 | décidés non faits, motif écrit — jamais un silence |
-| Total suivi | 24 | tout ce que le registre a jamais porté |
+| Total suivi | 26 | tout ce que le registre a jamais porté |
 
 ## Ce qui reste ouvert, par forge
 
 La table se lit par forge cible : c'est l'unité de décision, puisqu'une correction se
 livre dans un dépôt. L'ordre suit le NOMBRE d'items ouverts, jamais leur priorité — la
 priorité vit dans la colonne de score.
+
+### pilot — 3 item(s)
+
+Les items ouverts ciblant pilot, du score le plus fort au plus faible. Le score est
+celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
+
+| Id | Titre | Statut | Forge(s) | Score |
+|---|---|---|---|---|
+| TF-0549 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : | decide | pilot | 10 |
+| TF-0791 | Cascade Intention > Strategie > Tactique > Operationnel + test retro : la definition des demandes ne capture p | en_cours | pilot | 6.7 |
+| TF-0807 | pilot : l'ingestion d'un lot remis par une FORGE pseudonymise la forge comme un produit client (digit-ai-forge | candidat | pilot | 6 |
 
 ### digit-ai-factory — 3 item(s)
 
@@ -52,16 +63,6 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0797 | forge-design : semantique des declencheurs - une action se declenche par un bouton qui a l air d un bouton, un | decide | forge-design | 1 |
 | TF-0800 | forge-design : B-T2/B-T3 declarent morte une bascule cablee par ecouteur delegue et cle en constante - documen | decide | forge-design | 1 |
 
-### pilot — 2 item(s)
-
-Les items ouverts ciblant pilot, du score le plus fort au plus faible. Le score est
-celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
-
-| Id | Titre | Statut | Forge(s) | Score |
-|---|---|---|---|---|
-| TF-0549 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : | decide | pilot | 10 |
-| TF-0791 | Cascade Intention > Strategie > Tactique > Operationnel + test retro : la definition des demandes ne capture p | en_cours | pilot | 6.7 |
-
 ### forge-tests — 2 item(s)
 
 Les items ouverts ciblant forge-tests, du score le plus fort au plus faible. Le score est
@@ -80,15 +81,6 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | Id | Titre | Statut | Forge(s) | Score |
 |---|---|---|---|---|
 | TF-0792 | Ingerer l'expertise « donnees de recherche multilingues » (references/SEO-RECHERCHE.md du pilot) dans le corpu | candidat | seo-geo | 6 |
-
-### forge-development — 1 item(s)
-
-Les items ouverts ciblant forge-development, du score le plus fort au plus faible. Le score est
-celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
-
-| Id | Titre | Statut | Forge(s) | Score |
-|---|---|---|---|---|
-| TF-0798 | forge-development : toute adresse de fichier statique porte la version de l application (ou une empreinte), de | decide | forge-development | 20 |
 
 ### forge-conception — 1 item(s)
 
@@ -116,6 +108,15 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | Id | Titre | Statut | Forge(s) | Score |
 |---|---|---|---|---|
 | TF-0804 | forge-conception : la 404 par langue entre dans la surface implicite proposee d'office par enumere-la-surface  | decide | digit-ai-forge-conception | 6 |
+
+### digit-ai-forge-agents — 1 item(s)
+
+Les items ouverts ciblant digit-ai-forge-agents, du score le plus fort au plus faible. Le score est
+celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
+
+| Id | Titre | Statut | Forge(s) | Score |
+|---|---|---|---|---|
+| TF-0806 | digit-ai-forge-agents : le delta neufs/preexistants du hook d'ecriture est inoperant des que le constat porte  | candidat | digit-ai-forge-agents | 1 |
 
 ## Ce que ce rapport ne dit pas
 
