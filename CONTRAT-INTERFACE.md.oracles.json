@@ -1,0 +1,79 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\CONTRAT-INTERFACE.md",
+  "date_iso": "2026-09-05T07:36:39.187Z",
+  "registre_version": "2.16.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "CONTRAT-INTERFACE.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "CONTRAT-INTERFACE.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "CONTRAT-INTERFACE.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "CONTRAT-INTERFACE.md",
+      "verdict": "PASS",
+      "detail": "aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "CONTRAT-INTERFACE.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "CONTRAT-INTERFACE.md",
+      "verdict": "PASS",
+      "detail": "1 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; pourcentage « 100 % » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "CONTRAT-INTERFACE.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "CONTRAT-INTERFACE.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "CONTRAT-INTERFACE.md",
+    "ts": "2026-09-05T07:36:39.186Z",
+    "fichiers": {
+      "CONTRAT-INTERFACE.md": "418027ce721c46cf34d8955cf219d25836f0ab372eb0b2eddea8bf64ad0aa80d"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}
