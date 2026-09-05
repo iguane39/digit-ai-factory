@@ -13,6 +13,7 @@ Le nom des fichiers ne change jamais (`<Projet> - <Objet> - AAAAMMJJ<indice>`, r
 | `04-plans\` | Plans stratégiques | stratégie tests e2e (13/08) |
 | `05-catalogues-readmes-forges\` | Sections catalogue proposées aux README des forges | 13 sections + LISEZMOI (générées depuis `catalogues\catalogue.jsonl`) |
 | `05-insatisfactions\` | Dossiers d'instruction des insatisfactions (TF-0287) | un dossier par insatisfaction (`INS-XXXX\`), chemins portés par `insatisfactions\REGISTRE.jsonl` |
+| `06-travaux-confies\` | Originaux des lots de travaux confiés par le pilot à une forge ou à un produit (gabarit `gabarits\TRAVAUX-PILOT.md`, jugés T1-T6 avant dépôt) | `pilot - TRAVAUX - AAAAMMJJ<i>.md` + sidecar `.tf.jsonl` ; la copie déposée chez le destinataire (`input\00-travaux\`) est la seule qui change de statut (05/09) |
 
 **Deux familles portent le numéro 05, et ce n'est pas une erreur à corriger — c'est une
 erreur à DÉCLARER (TF-0339, 18/08).** `05-insatisfactions\` a été créée sans prendre le
@@ -73,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 199 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 204 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -211,7 +212,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md | 20260815a | 3.8 Ko | `04-plans/Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md` |
 | Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md | 20260905i | 15.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md` |
-| Digit-AI - Synthese Mandat - Actions 36 a 40 achevees - 20260905k.md | 20260905k | 23 Ko | `04-plans/Digit-AI - Synthese Mandat - Actions 36 a 40 achevees - 20260905k.md` |
+| Digit-AI - Synthese Mandat - Actions 36 a 40 achevees - 20260905k.md | 20260905k | 23.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Actions 36 a 40 achevees - 20260905k.md` |
 | Digit-AI - Synthese Mandat - Amelioration continue pas 0 a 4 - 20260903b.md | 20260903b | 19.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Amelioration continue pas 0 a 4 - 20260903b.md` |
 | Digit-AI - Synthese Mandat - Analyse L99 amelioration continue - 20260903a.md | 20260903a | 15.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Analyse L99 amelioration continue - 20260903a.md` |
 | Digit-AI - Synthese Mandat - Analyse L99 etat de l art marche - 20260830n.md | 20260830n | 15.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Analyse L99 etat de l art marche - 20260830n.md` |
@@ -225,6 +226,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md | 20260901b | 13.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md` |
 | Digit-AI - Synthese Mandat - Decision 5a et TF-0793 clos - 20260903f.md | 20260903f | 13.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Decision 5a et TF-0793 clos - 20260903f.md` |
 | Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md | 20260905j | 19.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md` |
+| Digit-AI - Synthese Mandat - Decisions 16a 17a 18a - 20260905l.md | 20260905l | 17.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 16a 17a 18a - 20260905l.md` |
 | Digit-AI - Synthese Mandat - Decisions 1a 2a 3b 4a synchronisation - 20260903e.md | 20260903e | 16.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 1a 2a 3b 4a synchronisation - 20260903e.md` |
 | Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md | 20260903b | 26 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md` |
 | Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md | 20260905h | 13.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md` |
@@ -318,6 +320,10 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | pilot - TRAVAUX - 20260905d.tf.jsonl | — | 0.9 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905d.tf.jsonl` |
 | pilot - TRAVAUX - 20260905e.md | 20260905e | 6.4 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905e.md` |
 | pilot - TRAVAUX - 20260905e.tf.jsonl | — | 0.9 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905e.tf.jsonl` |
+| pilot - TRAVAUX - 20260905f.md | 20260905f | 6.3 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905f.md` |
+| pilot - TRAVAUX - 20260905f.tf.jsonl | — | 0.7 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905f.tf.jsonl` |
+| pilot - TRAVAUX - 20260905g.md | 20260905g | 9 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905g.md` |
+| pilot - TRAVAUX - 20260905g.tf.jsonl | — | 1.5 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905g.tf.jsonl` |
 
 *Un livrable présent et absent de ce tableau est un défaut : cet index est régénéré, et un
 index qui a dérivé de son dossier ne sert plus qu'à donner confiance à tort.*

@@ -131,5 +131,45 @@ check("T5 vert — un SEUL travail n'exige aucun ordre : l'exiger serait du brui
     "un lot à un seul élément a été refusé pour un ordre qu'il n'a pas à porter");
 });
 
+// ── T6 : tout module producteur nommé a été lu (TF-0819) ───────────────────
+const ELEMENT_PRODUCTEUR = `### TF-0814 — un champ d'écart · gravité majeur
+
+- **Le fait**, mesuré le 05/09/2026 : la section 7 est de la prose.
+- **Pourquoi cela vous concerne** : l'oubli est indiscernable de la décision.
+- **Ce qui est demandé** : un champ racine transcrit de la section 7 par \`redige-les-exigences\`, porté dans la vue par \`derive-les-vues\`.
+- **Effort estimé** : simple × court
+- **Comment vous saurez que c'est fait** : le self-test compte les états.
+- **Si ce n'est pas fait** : trois lois restent injugeables.`;
+
+check("T6 rouge — un producteur nommé (« transcrit par `x` ») sans lecture déclarée est REFUSÉ, les deux modules nommés", () => {
+  const r = verifier(LOT({ elements: [ELEMENT_PRODUCTEUR] }));
+  att(echoue(r, "T6"), "T6 n'a pas vu le producteur non lu");
+  const c = r.constats.find((x) => x.regle === "T6");
+  att(/redige-les-exigences/.test(c.message) && /derive-les-vues/.test(c.message), "les deux modules nommés ne sont pas cités");
+  att(/^2 module/.test(c.message), "le compte des modules non lus n'est pas 2 : " + c.message.slice(0, 40));
+});
+
+check("T6 rouge — la lecture déclarée d'UN module ne couvre pas l'autre", () => {
+  const r = verifier(LOT({ elements: [ELEMENT_PRODUCTEUR],
+    dejaFait: "- **Module producteur lu** : `redige-les-exigences` produit EXIGENCES.json (source : `skills/redige-les-exigences/SKILL.md`)" }));
+  att(echoue(r, "T6"), "T6 a accepté un module non lu parce qu'un autre l'était");
+  att(/derive-les-vues/.test(r.constats.find((x) => x.regle === "T6").message) && !/redige-les-exigences/.test(r.constats.find((x) => x.regle === "T6").message),
+    "le constat ne nomme pas exactement le module qui manque");
+});
+
+check("T6 vert — chaque module nommé a sa ligne « Module producteur lu » avec sa source", () => {
+  const r = verifier(LOT({ elements: [ELEMENT_PRODUCTEUR],
+    dejaFait: "- **Module producteur lu** : `redige-les-exigences` produit EXIGENCES.json (source : `skills/redige-les-exigences/SKILL.md`)\n"
+      + "- **Module producteur lu** : `derive-les-vues` produit CADRAGE-DESIGN.md (source : `skills/derive-les-vues/references/vues.md`)" }));
+  att(!echoue(r, "T6"), "un lot dont les deux producteurs sont lus a été refusé");
+  att(/2 module/.test(r.constats.find((x) => x.regle === "T6").message), "le constat vert ne compte pas les deux modules lus");
+});
+
+check("T6 vert — un lot qui ne nomme aucun producteur n'a rien à lire", () => {
+  const r = verifier(LOT());
+  att(!echoue(r, "T6"), "un lot sans producteur nommé a été refusé");
+  att(/rien à lire/.test(r.constats.find((x) => x.regle === "T6").message), "le constat ne dit pas qu'il n'y avait rien à lire");
+});
+
 console.log(`\noracle-travaux-pilot (TF-0627) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

@@ -76,6 +76,7 @@ la clôture de ses propres items (`gains_constates`).
 - **Ce qui est demandé** : <le geste, exécutable tel quel — chemin absolu, commande, ou libellé>
 - **Effort estimé** : <simple|moyen|complexe|très complexe> × <court|moyen|long|très long>
 - **Comment vous saurez que c'est fait** : <la commande à rejouer, ou le fait à constater>
+- **Module producteur lu** (T6, seulement si « ce qui est demandé » nomme un module qui produit un artefact — « transcrit par `x` », « porté par `x` ») : `<module>` produit <artefact> (source : <chemin ou SKILL.md lu>)
 - **Si ce n'est pas fait** : <la conséquence de l'inaction — jamais une menace, un fait>
 
 ## Ce que le pilot a déjà fait de son côté
