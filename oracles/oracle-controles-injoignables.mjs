@@ -38,6 +38,12 @@
  *   CI3 · chaque oracle DÉCLARE ses codes de sortie, « je ne peux pas mesurer » compris. Un oracle
  *         qui ne le nomme pas laisse choisir entre PASS et FAIL — et le FAIL fait passer une panne
  *         d'environnement pour un défaut du produit (TF-0648).
+ *   CI5 · chaque contrôle POSSÈDE un chemin d'échec explicite — une sortie non nulle écrite dans sa
+ *         source (`process.exit(<non 0>)`, `process.exitCode =`, `sys.exit(<non 0>)`,
+ *         `raise SystemExit(<non 0>)`, `exit 1`). Être DÉCLARÉ (CI3) n'est pas être RENDU : un
+ *         contrôle sans chemin d'échec ne sait que réussir ou planter en trace brute, et il rassure
+ *         au lieu de juger (TF-0795, 05/09/2026 — deux contrôles d'un produit déclaraient leurs
+ *         codes et n'avaient AUCUN `sys.exit` conditionnel ; CI3 les tenait pour conformes).
  *
  * NON JUGÉ, et déclaré :
  *   · si le contrôle est JUSTE : ce n'est pas le sujet. Un contrôle faux mais joué se corrige ;
@@ -288,10 +294,45 @@ export function juger(racine) {
     + "page, liste d'URL périmée, hôte tiers compté comme panne. Mesuré : deux scripts d'audit "
     + "portant TROIS défauts dormants, dont un qui les faisait échouer AVANT tout verdict (TF-0679)");
 
+  // ---- CI5 — ÊTRE DÉCLARÉ N'EST PAS ÊTRE RENDU (TF-0795, 05/09/2026) -----------------------------
+  //
+  // LE FAIT, mesuré par un produit en écrivant les recettes double sens de ses contrôles : deux
+  // scripts déclaraient leurs codes de sortie dans leur en-tête et n'avaient AUCUN `sys.exit`
+  // conditionnel — aucun chemin d'échec n'existait, ils ne pouvaient que réussir ou planter en
+  // trace brute sur données absentes. CI3 rendait PASS : elle lit la DÉCLARATION, pas l'existence
+  // d'un chemin. Le sens rouge de ces contrôles n'existait pas, et c'est la recette qui l'a révélé —
+  // le mécanisme même que TF-0679 décrit (un contrôle qui ne sait pas échouer rassure au lieu de
+  // juger ; trois défauts dormants ont coûté un chantier entier avant d'être vus).
+  //
+  // CE QUI EST JUGÉ : la PRÉSENCE, dans la source du contrôle, d'une sortie non nulle écrite —
+  // `process.exit(<expr non 0>)`, `process.exitCode = …`, `sys.exit(<expr non 0>)`,
+  // `raise SystemExit(<expr non 0>)`, `exit <n≠0>` en shell. Une expression (`echecs ? 1 : 0`,
+  // `1 if ko else 0`) compte : elle porte le 1. NON JUGÉ, et déclaré : que ce chemin soit
+  // CONDITIONNEL et atteignable — un `sys.exit(1)` inconditionnel passe cette règle et fait un
+  // contrôle qui échoue toujours ; c'est CI4 et la recette double sens qui l'attrapent.
+  const A_UN_CHEMIN_D_ECHEC = [
+    /process\.exit\(\s*(?!0\s*\))[^)]*\)/,               // process.exit(1) · process.exit(echecs ? 1 : 0) · process.exit(code)
+    /process\.exitCode\s*=/,
+    /\bsys\.exit\(\s*(?!0\s*\))[^)]*\)/,                 // sys.exit(1) · sys.exit(1 if ko else 0) · sys.exit(code)
+    /\braise\s+SystemExit\(\s*(?!0\s*\))[^)]*\)/,
+    /^\s*exit\s+[1-9][0-9]*\b/m,                          // shell
+    /\bDie\(|\bthrow\s+new\s+Error\(.*exit/i,             // formes rares, comptées large plutôt qu'accusées
+  ];
+  const sansEchec = controles
+    .filter((p) => /\.(mjs|cjs|js|py|sh|ps1)$/i.test(p))
+    .filter((p) => !A_UN_CHEMIN_D_ECHEC.some((re) => re.test((textes.get(p) || "").replace(/^\s*(#|\/\/|\*).*$/gm, ""))))
+    .map(rel);
+  if (!sansEchec.length) ok("CI5", "chaque contrôle possède un chemin d'échec explicite (sortie non nulle écrite dans sa source)");
+  else ko("CI5", `${sansEchec.length} contrôle(s) sur ${controles.length} SANS chemin d'échec : ${sansEchec.slice(0, 8).join(", ")}${sansEchec.length > 8 ? `, +${sansEchec.length - 8}` : ""}. `
+    + "Aucune sortie non nulle n'est écrite dans leur source : ils ne savent que réussir ou planter en trace brute, et un contrôle qui ne sait pas "
+    + "échouer rassure au lieu de juger. Être déclaré (CI3) n'est pas être rendu — écrire le chemin d'échec (sys.exit(1) / process.exit(1) sous condition) "
+    + "et le jouer dans une recette double sens (TF-0795)");
+
   return { verdict: F.some((f) => f.statut === "FAIL") ? "FAIL" : "PASS", findings: F, controles: controles.length };
 }
 
 export const NON_JUGE = [
+  "CI5 juge la PRÉSENCE d'une sortie non nulle écrite dans la source, jamais qu'elle soit CONDITIONNELLE ni atteignable : un exit(1) inconditionnel passe et fait un contrôle qui échoue toujours — c'est CI4 et la recette double sens du contrôle qui l'attrapent (TF-0795)",
   "si le contrôle est JUSTE : ce n'est pas le sujet. Un contrôle faux mais joué se corrige ; un contrôle juste que rien ne joue ne se corrige jamais, faute d'être vu",
   "les appels par DÉCOUVERTE DYNAMIQUE (un lanceur qui balaie un dossier) : indétectables par citation. Dès qu'un tel lanceur existe dans le dépôt, CI1 SIGNALE au lieu d'accuser, et le dit",
   "un chemin cité dans un COMMENTAIRE : le commentaire décrit souvent le défaut pour l'interdire, et accuser la doctrine qui le décrit est la forme la plus sûre de se faire désactiver. Exclusion mesurée : les 2 constats du premier passage sur le pilot étaient tous deux de la prose",

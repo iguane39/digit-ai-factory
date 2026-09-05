@@ -705,7 +705,11 @@ else {
 const DOCTRINE_CLES_COMPLETES = "2026-08-17";
 // Le pilot est la seule exception nommée au motif depuis son renommage en digit-ai-factory
 // (17/08 soir, gate humain — table : references\CORRESPONDANCE-RENOMMAGE-FACTORY.md).
-const RE_CLE_DEPOT = /^(digit-ai-forge-[a-z0-9_-]+|digit-ai-factory)$/;
+// TF-0801 (05/09/2026, lot du produit 02) : `digit-ai-queue` — la file de tickets versionnée, déclarée
+// au parc par bootstrap.mjs sous ce nom — est une EXCEPTION NOMMÉE : ce n'est pas une forge, son nom
+// réel est le seul qu'un run_open puisse consigner, et R-19 le refusait comme « nom court ». Le
+// produit a réécrit sa clé en forme canonique inexistante, geste que R-42 réprouve, faute de voie.
+const RE_CLE_DEPOT = /^(digit-ai-forge-[a-z0-9_-]+|digit-ai-factory|digit-ai-queue)$/;
 /** Nom de dépôt complet attendu pour une clé courte (« conception » → « digit-ai-forge-conception »,
  *  « pilot »/« factory » → « digit-ai-factory ») ; les préfixes partiels ne sont pas redoublés. */
 const cleCanonique = (cle) => {
@@ -757,8 +761,12 @@ else {
     const rectifies = [];
     opens.forEach((o, i) => {
       const v = o.versions_forges;
+      // La rectification par ajout couvre le champ ABSENT (TF-0709) ET, depuis TF-0801, une clé
+      // MALFORMÉE : la boucle des clés n'avait aucune échappatoire — FAIL définitif qui poussait à la
+      // réécriture que R-42 interdit (mesuré : clôture du run v0.6.0 du produit 02, rectification
+      // seq 141 déposée et SANS EFFET, clé réécrite faute de voie). Même événement, même champ.
+      const rect = rectifsVF.find((x) => x.seq_vise === o.seq && String(x.cause || "").trim().length >= 20);
       if (!v || typeof v !== "object" || !Object.keys(v).length) {
-        const rect = rectifsVF.find((x) => x.seq_vise === o.seq && String(x.cause || "").trim().length >= 20);
         if (rect) {
           rectifies.push(`run_open #${i + 1} (seq ${o.seq}) — cause déclarée : ${String(rect.cause).slice(0, 90)}`);
         } else {
@@ -774,13 +782,16 @@ else {
         // rendaient PASS, et aucun diff de versions n'était calculable d'un run à l'autre.
         // R-19 jugeait la présence d'un point de comparaison, jamais sa comparabilité.
         jugesSurForme++;
-        for (const cle of Object.keys(v)) {
-          if (RE_CLE_DEPOT.test(cle)) continue;
+        const malformees = Object.keys(v).filter((cle) => !RE_CLE_DEPOT.test(cle));
+        if (malformees.length && rect) {
+          rectifies.push(`run_open #${i + 1} (seq ${o.seq}) — clé(s) « ${malformees.join("», «")} » malformée(s), cause déclarée : ${String(rect.cause).slice(0, 90)}`);
+        } else for (const cle of malformees) {
           ko("R-19", `forge/ledger.jsonl (run_open #${i + 1})`,
             `versions_forges : clé « ${cle} » en nom court — la forme canonique est le nom de ` +
             `dépôt COMPLET, attendu « ${cleCanonique(cle)} » (CONTRAT-INTERFACE.md §3, TF-0320) ; ` +
             "deux conventions de clés ont cohabité en PASS jusqu'au 17/08, ce qui rendait le " +
-            "diff de versions incalculable entre deux runs"); r19 = false;
+            "diff de versions incalculable entre deux runs. L'entrée ne se réécrit pas (R-42) : " +
+            `déclarer l'écart PAR AJOUT : {type: "rectification_versions_forges", seq_vise: ${o.seq ?? "<seq>"}, cause: "…"} (TF-0801)`); r19 = false;
         }
       } else anteriorites++;
       if (i > 0 && !o.run_precedent) {
@@ -790,7 +801,7 @@ else {
     if (r19) ok("R-19", "forge/ledger.jsonl", `${opens.length} run_open ${rectifies.length ? "conformes ou couverts" : "avec versions_forges"}${opens.length > 1 ? " et chaînage run_precedent" : ""}` +
       (jugesSurForme ? `, dont ${jugesSurForme} au nom de dépôt complet (TF-0320)` : "") +
       (anteriorites ? ` — ${anteriorites} run_open antérieur(s) au ${DOCTRINE_CLES_COMPLETES} en antériorité déclarée sur la forme des clés (jamais réécrits)` : "") +
-      (rectifies.length ? ` — [RECTIFIÉ] ${rectifies.length} run_open sans versions_forges couvert(s) par rectification déclarée : ${rectifies.join(" · ")}` : ""));
+      (rectifies.length ? ` — [RECTIFIÉ] ${rectifies.length} run_open couvert(s) par rectification déclarée (champ absent ou clé malformée) : ${rectifies.join(" · ")}` : ""));
   }
 }
 

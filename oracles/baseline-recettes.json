@@ -68,7 +68,7 @@
   "vu_le": "2026-09-03"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 49,
+  "cas": 52,
   "vu_le": "2026-09-05"
  },
  "oracle-constantes-externes.mjs": {
@@ -76,8 +76,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-controles-injoignables.mjs": {
-  "cas": 19,
-  "vu_le": "2026-08-27"
+  "cas": 22,
+  "vu_le": "2026-09-05"
  },
  "oracle-couverture-exigences.mjs": {
   "cas": 7,
@@ -239,8 +239,8 @@
   "vu_le": "2026-09-01"
  },
  "oracles/oracle-controles-injoignables.test.mjs": {
-  "cas": 19,
-  "vu_le": "2026-08-26"
+  "cas": 22,
+  "vu_le": "2026-09-05"
  },
  "oracles/oracle-parite-configuration.test.mjs": {
   "cas": 18,

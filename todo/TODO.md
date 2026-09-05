@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=d8d6c39794d4 archive=d3c801ad4540 · dernier événement: 2026-09-03T19:29:35.720Z -->
+     sceaux: actifs=9d4679498ed8 archive=d3c801ad4540 · dernier événement: 2026-09-05T07:41:20.891Z -->
 
-**21 actifs** (candidat 1 · décidé 15 · en cours 1 · corrigé 4 · écarté 0) · **782 archivés**.
+**21 actifs** (candidat 1 · décidé 14 · en cours 1 · corrigé 5 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -61,11 +61,11 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-0791 | en_cours | 6.7 | Cascade Intention > Strategie > Tactique > Operationnel + test retro : la definition des demandes ne capture pas l'intention initiale de l'utilisateur | **oui** — etude output/03-etudes/20260901-etude-opportunite-dataforseo.md : conforme a sa definition, PASS a ses controles, et refusee par son destinataire — sept questions du retour du 01/09 sans reponse dans le texte ; cout paye : une etude entiere a redefinir et rejouer |
 | TF-0549 | decide | 10 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : `Produit-07` a un forge\retours\ mais rien de ce qui s'y fait n'est suivi | **oui** — mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration. |
-| TF-0794 | decide | 1 | pilot : le remede que R-42 prescrit ne solde pas le defaut qu'il vise, et l'ecriture concurrente du ledger collisionne par construction | **oui** — un FAIL R-42 incurable a chaque conformite tant que la collision n'est pas consommable ; le lot 20260901b a compile son controle de completude SANS voir la seq 75 ecrite 3 minutes plus tot par l'autre session |
 | TF-0795 | decide | 1 | pilot : CI3 rend PASS sur des controles qui declarent leurs codes de sortie sans posseder AUCUN chemin d'echec — etre declare n'est pas etre rendu | **oui** — un controle qui ne sait pas echouer rassure au lieu de juger — les trois defauts dormants de TF-0679 ont coute un chantier entier avant d'etre vus |
 | TF-0801 | decide | 1 | pilot : R-19 sans voie de rectification pour une cle malformee de versions_forges, et le depot digit-ai-queue innommable sous son vrai nom | **oui** — cloture du run v0.6.0 : run_open seq 134 avec cle digit-ai-queue (nom reel du depot au bootstrap) -> FAIL R-19 ; rectification seq 141 deposee et SANS EFFET ; issue prise : cle reecrite en forme canonique, geste que la doctrine reprouve, choisi faute de voie |
 | TF-0788 | corrige | 8 | pilot : une montee de version d un skill dans la journee n est SUE d aucune forge qui le consomme — la recette de forge-tests a change de verdict entre deux executions parce que check_html et render_page avaient change de regles sur le poste, sans qu aucun signal ne lui parvienne | **oui** — le 02/09, la section dashboard de la recette de forge-tests est passee de vert a rouge entre deux executions sans qu un octet ait bouge dans son depot (mesure de TF-0786) ; sans signal cote consommateur, le meme diagnostic se refait a la main a chaque montee de version |
 | TF-0793 | corrige | 1 | pilot : la declaration racine_web demandee par TF-0654 n'est lue par AUCUN script — le critere de cloture du lot est hors de portee du produit | **oui** — deux constats HORS RACINE re-rendus a chaque releve du parc pour ce produit, et pour tout produit dont la racine web n'est pas la racine du depot |
+| TF-0794 | corrige | 1 | pilot : le remede que R-42 prescrit ne solde pas le defaut qu'il vise, et l'ecriture concurrente du ledger collisionne par construction | **oui** — un FAIL R-42 incurable a chaque conformite tant que la collision n'est pas consommable ; le lot 20260901b a compile son controle de completude SANS voir la seq 75 ecrite 3 minutes plus tot par l'autre session |
 
 ## seo-geo
 

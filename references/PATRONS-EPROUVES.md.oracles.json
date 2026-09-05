@@ -1,19 +1,19 @@
 {
-  "cible": "c:\\dev\\digit-ai-factory\\CONTRAT-INTERFACE.md",
-  "date_iso": "2026-09-05T07:47:20.536Z",
+  "cible": "c:\\dev\\digit-ai-factory\\references\\PATRONS-EPROUVES.md",
+  "date_iso": "2026-09-05T07:47:01.922Z",
   "registre_version": "2.16.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
   "resume": {
-    "pass": 4,
+    "pass": 3,
     "fail": 0,
-    "skip": 3,
+    "skip": 4,
     "cache": 0
   },
   "bilan_fichiers": {
     "jugé": [
-      "CONTRAT-INTERFACE.md"
+      "references\\PATRONS-EPROUVES.md"
     ],
     "exempté": [],
     "délégué": [],
@@ -24,43 +24,43 @@
   "resultats": [
     {
       "domaine": "Lisibilité d'un document (Markdown)",
-      "file": "CONTRAT-INTERFACE.md",
+      "file": "references\\PATRONS-EPROUVES.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Format / livraison / versioning",
-      "file": "CONTRAT-INTERFACE.md",
+      "file": "references\\PATRONS-EPROUVES.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Sécurité / secrets",
-      "file": "CONTRAT-INTERFACE.md",
+      "file": "references\\PATRONS-EPROUVES.md",
       "verdict": "PASS",
       "detail": "aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
-      "file": "CONTRAT-INTERFACE.md",
+      "file": "references\\PATRONS-EPROUVES.md",
       "verdict": "SKIP",
       "detail": ""
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
-      "file": "CONTRAT-INTERFACE.md",
-      "verdict": "PASS",
-      "detail": "1 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; pourcentage « 100 % » non sourcé"
+      "file": "references\\PATRONS-EPROUVES.md",
+      "verdict": "SKIP",
+      "detail": ""
     },
     {
       "domaine": "Nommage / convention de livraison",
-      "file": "CONTRAT-INTERFACE.md",
+      "file": "references\\PATRONS-EPROUVES.md",
       "verdict": "SKIP",
       "detail": ""
     },
     {
       "domaine": "Cohérence inter-documents",
-      "file": "CONTRAT-INTERFACE.md",
+      "file": "references\\PATRONS-EPROUVES.md",
       "verdict": "SKIP",
       "detail": ""
     }
@@ -68,10 +68,10 @@
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
-    "release": "CONTRAT-INTERFACE.md",
-    "ts": "2026-09-05T07:47:20.535Z",
+    "release": "references\\PATRONS-EPROUVES.md",
+    "ts": "2026-09-05T07:47:01.921Z",
     "fichiers": {
-      "CONTRAT-INTERFACE.md": "ae099bf9ac3169eb82b3e27ee032d8585fbdbd9bb4281a006c84162b9f0151c3"
+      "references\\PATRONS-EPROUVES.md": "8789998e15d652fadeedcf9388ea1bbd6ab14c2ccb3034215a99d3546e50f3eb"
     }
   },
   "empreinte_motif": null,
