@@ -1,0 +1,79 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\output\\06-travaux-confies\\pilot - TRAVAUX - 20260905c.md",
+  "date_iso": "2026-09-05T14:47:34.059Z",
+  "registre_version": "2.16.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\06-travaux-confies\\pilot - TRAVAUX - 20260905c.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\06-travaux-confies\\pilot - TRAVAUX - 20260905c.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\06-travaux-confies\\pilot - TRAVAUX - 20260905c.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\06-travaux-confies\\pilot - TRAVAUX - 20260905c.md",
+      "verdict": "PASS",
+      "detail": "aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\06-travaux-confies\\pilot - TRAVAUX - 20260905c.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\06-travaux-confies\\pilot - TRAVAUX - 20260905c.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\06-travaux-confies\\pilot - TRAVAUX - 20260905c.md",
+      "verdict": "PASS",
+      "detail": "nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\06-travaux-confies\\pilot - TRAVAUX - 20260905c.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\06-travaux-confies\\pilot - TRAVAUX - 20260905c.md",
+    "ts": "2026-09-05T14:47:34.058Z",
+    "fichiers": {
+      "output\\06-travaux-confies\\pilot - TRAVAUX - 20260905c.md": "75ee6c92681fd333db9906115ac6bcf8fa0146402008b3242b645ec2ffa923b1"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

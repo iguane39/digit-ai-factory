@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.0.0",
- "date": "2026-09-03",
+ "version": "1.1.0",
+ "date": "2026-09-05",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -494,6 +494,20 @@
    "regle": "frontieres Unicode (assertions « pas une lettre Unicode » avant/apres, drapeau u) dans toute garde lexicale ; fixture double sens par garde",
    "oracle": "self-test de l'oracle porteur (oracle-exigences E3/E8 chez forge-conception ; oracle-synthese S21 chez le pilot)",
    "voisines": []
+  },
+  {
+   "cle": "sceau-de-vue-provenance-sans-contenu",
+   "famille": "regle-morte",
+   "libelle": "Le sceau d'une vue derivee prouve sa provenance (empreinte de la source), jamais son contenu : une vue amputee d'une section entiere garde un sceau valide et rend PASS — une decision opposable peut disparaitre sans qu'aucun oracle ne le voie",
+   "creee_le": "2026-09-05",
+   "fondee_par": [
+    "TF-0818"
+   ],
+   "regle": "une vue derivee porte l'empreinte de son propre corps en plus de celle de sa source, ou une liste close de sections attendues par type de vue est jugee par l'oracle de tracabilite (contrat de vues.md chez forge-conception, porte en prose a ce jour)",
+   "oracle": "forge-conception oracle-tracabilite T3 (a etendre) — aucun oracle generique ; candidature TF-0818",
+   "voisines": [
+    "recette-verdict-non-prononcable"
+   ]
   }
  ]
 }

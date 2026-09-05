@@ -73,7 +73,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 191 livrable(s) courant(s), 10 archivé(s), 6 famille(s).
+**État** : 196 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -210,7 +210,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md.jugement.json` |
 | Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md | 20260815a | 3.8 Ko | `04-plans/Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md` |
 | Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md.jugement.json` |
-| Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md | 20260905i | 15.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md` |
+| Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md | 20260905i | 15.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md` |
 | Digit-AI - Synthese Mandat - Amelioration continue pas 0 a 4 - 20260903b.md | 20260903b | 19.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Amelioration continue pas 0 a 4 - 20260903b.md` |
 | Digit-AI - Synthese Mandat - Analyse L99 amelioration continue - 20260903a.md | 20260903a | 15.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Analyse L99 amelioration continue - 20260903a.md` |
 | Digit-AI - Synthese Mandat - Analyse L99 etat de l art marche - 20260830n.md | 20260830n | 15.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Analyse L99 etat de l art marche - 20260830n.md` |
@@ -223,6 +223,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Bloc 3 forme de reference - 20260830f.md | 20260830f | 15.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Bloc 3 forme de reference - 20260830f.md` |
 | Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md | 20260901b | 13.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md` |
 | Digit-AI - Synthese Mandat - Decision 5a et TF-0793 clos - 20260903f.md | 20260903f | 13.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Decision 5a et TF-0793 clos - 20260903f.md` |
+| Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md | 20260905j | 19.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md` |
 | Digit-AI - Synthese Mandat - Decisions 1a 2a 3b 4a synchronisation - 20260903e.md | 20260903e | 16.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 1a 2a 3b 4a synchronisation - 20260903e.md` |
 | Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md | 20260903b | 26 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md` |
 | Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md | 20260905h | 13.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md` |
@@ -305,6 +306,15 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Livrable | Version | Poids | Chemin à copier |
 |---|---|---|---|
 | INSTRUCTION.md | — | 6.9 Ko | `05-insatisfactions/INS-0001/INSTRUCTION.md` |
+
+### 06-travaux-confies
+
+| Livrable | Version | Poids | Chemin à copier |
+|---|---|---|---|
+| pilot - TRAVAUX - 20260905c.md | 20260905c | 9.9 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905c.md` |
+| pilot - TRAVAUX - 20260905c.tf.jsonl | — | 1.7 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905c.tf.jsonl` |
+| pilot - TRAVAUX - 20260905d.md | 20260905d | 6.9 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905d.md` |
+| pilot - TRAVAUX - 20260905d.tf.jsonl | — | 0.9 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905d.tf.jsonl` |
 
 *Un livrable présent et absent de ce tableau est un défaut : cet index est régénéré, et un
 index qui a dérivé de son dossier ne sert plus qu'à donner confiance à tort.*

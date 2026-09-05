@@ -155,7 +155,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>0c01d9916545</code> · dernier événement 2026-09-05T14:14:13.610Z</p>
+      <p class="meta">sceau <code>8a70ba2008bb</code> · dernier événement 2026-09-05T14:45:18.090Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -165,8 +165,8 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="6 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">6</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="6 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">6</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="3 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">3</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="9 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">9</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="1 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">1</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="781 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">781</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
@@ -200,18 +200,19 @@
       </div>
       
       <div class="dropdown" data-dim="prio">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">2</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-prio">Priorité (<span class="dd-n">3</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-prio" role="group" aria-label="Filtre Priorité" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
           <label><input type="checkbox" value="haute" checked> Haute</label>
+          <label><input type="checkbox" value="moyenne" checked> Moyenne</label>
           <label><input type="checkbox" value="basse" checked> Basse</label>
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">36 / 36 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">37 / 37 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">8 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-development"><strong>digit-ai-forge-development</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-observability"><strong>digit-ai-forge-observability</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-conception"><strong>forge-conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-design"><strong>forge-design</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#forge-development"><strong>forge-development</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-tests"><strong>forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">9 item(s) reste-à-faire</span></a><a href="#seo-geo"><strong>seo-geo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">8 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">5 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">4 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-development"><strong>digit-ai-forge-development</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-observability"><strong>digit-ai-forge-observability</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-conception"><strong>forge-conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-design"><strong>forge-design</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#forge-development"><strong>forge-development</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-tests"><strong>forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">9 item(s) reste-à-faire</span></a><a href="#seo-geo"><strong>seo-geo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-factory">
       <h2>digit-ai-factory <span class="badge" title="8 item(s) actifs ciblant digit-ai-factory">8</span></h2>
@@ -413,33 +414,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0817" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0817</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 5)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-forge-agents : l'historique du depot porte 200 constats de la porte de publication (1 message, 199 contenus de fichiers anciens — fiches et fixtures d'experts, manifest des oracles) — reecrire l'histoire selon le mode operatoire du pilot (TF-0752), puis push force</h3>
-          <div class="card-detail" data-cite><p class="lead">Mesure le 05/09/2026 a 16:15 avant la publication du commit 966402a (TF-0806/TF-0812) : oracle-nom-client-publie sur le depot rend FAIL, C3 1 et C4 199 (plafond d'affichage), tous dans des enregistrements anterieurs au jour (commit be0d6d4d et voisins : fiches d'experts, fixtures, manifest) ; l'arbre courant et le commit du jour sont propres.</p><ul class="puces"><li>Meme classe que TF-0813 (forge-development)</li><li>Demande : appliquer le mode operatoire de reecriture consigne dans references/TODO-FORGE.md (sauvegarde en paquet hors depot, filter-repo avec regles derivees des tables hors depot par scripts/generer-remplacements-historique.mjs, porte C1-C4 PASS, push force, clones a rebatir) — et mesurer les treize forges d'un coup : design, conception et tests ont rendu PASS le 05/09, development et agents FAIL, les huit autres non mesurees</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 5 — gain 4 × preuve 4 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>200 constats bloquants de la porte sur un depot public qui porte les skills installes chez tous les produits ; chaque publication de cette forge contredit la regle « porte verte avant push » tant que l'histoire n'est pas reecrite</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot-publication-20260905</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0815" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="basse">
+        <article class="card s-decide" id="item-TF-0815" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0815</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -459,10 +437,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0816" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="basse">
+        <article class="card s-decide" id="item-TF-0816" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0816</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -505,6 +483,29 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0817" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0817</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-forge-agents : l'historique du depot porte 200 constats de la porte de publication (1 message, 199 contenus de fichiers anciens — fiches et fixtures d'experts, manifest des oracles) — reecrire l'histoire selon le mode operatoire du pilot (TF-0752), puis push force</h3>
+          <div class="card-detail" data-cite><p class="lead">Mesure le 05/09/2026 a 16:15 avant la publication du commit 966402a (TF-0806/TF-0812) : oracle-nom-client-publie sur le depot rend FAIL, C3 1 et C4 199 (plafond d'affichage), tous dans des enregistrements anterieurs au jour (commit be0d6d4d et voisins : fiches d'experts, fixtures, manifest) ; l'arbre courant et le commit du jour sont propres.</p><ul class="puces"><li>Meme classe que TF-0813 (forge-development)</li><li>Demande : appliquer le mode operatoire de reecriture consigne dans references/TODO-FORGE.md (sauvegarde en paquet hors depot, filter-repo avec regles derivees des tables hors depot par scripts/generer-remplacements-historique.mjs, porte C1-C4 PASS, push force, clones a rebatir) — et mesurer les treize forges d'un coup : design, conception et tests ont rendu PASS le 05/09, development et agents FAIL, les huit autres non mesurees</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 5 — gain 4 × preuve 4 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>200 constats bloquants de la porte sur un depot public qui porte les skills installes chez tous les produits ; chaque publication de cette forge contredit la regle « porte verte avant push » tant que l'histoire n'est pas reecrite</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot-publication-20260905</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-corrige" id="item-TF-0806" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0806</code>
@@ -525,7 +526,7 @@
       </div>
     </section>
     <section id="digit-ai-forge-conception">
-      <h2>digit-ai-forge-conception <span class="badge" title="3 item(s) actifs ciblant digit-ai-forge-conception">3</span></h2>
+      <h2>digit-ai-forge-conception <span class="badge" title="4 item(s) actifs ciblant digit-ai-forge-conception">4</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-forge-conception</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
@@ -534,10 +535,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0814" data-cite data-forge="digit-ai-forge-conception" data-statut="candidat" data-prio="basse">
+        <article class="card s-decide" id="item-TF-0814" data-cite data-forge="digit-ai-forge-conception" data-statut="decide" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0814</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -547,6 +548,29 @@
             <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
             <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>Mesure du 05/09/2026 sur le depot de la forge : sur les onze oracles, zero ne prend EXIGENCES.md en entree, et les huit qui jugent EXIGENCES.json n'ont aucun champ a lire pour ces trois candidates. Cout de reference : TF-0811 a comble le meme trou pour la surface implicite en une passe, avec 7 cas de fixtures et un champ de quatre sous-champs — le meme profil de travail rendrait jugeables trois lois transverses de plus.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">digit-ai-forge-conception</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0818" data-cite data-forge="digit-ai-forge-conception" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0818</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-forge-conception : le sceau d'une vue dérivée prouve sa provenance, jamais son contenu — oracle-tracabilite T3 rend PASS sur une vue amputée d'un tiers</h3>
+          <div class="card-detail" data-cite><p class="lead">Retour RC-5 du lot de la forge de conception du 05/09 (20260905b), remis SANS sidecar parce qu'aucune classe ne le couvrait ; classe créée par le pilot sur D-12 (a).</p><ul class="puces"><li>oracle-tracabilite T3 compare l'empreinte SHA-256 que la vue PORTE à celle de sa source</li><li>il ne regarde pas ce que la vue contient. Mesure du 05/09 sur la fixture verte de TF-0811 : la section « Surface implicite écartée » retirée de CADRAGE-DESIGN.md (996 caractères sur 3 074, un tiers du document, dont les deux écarts déclarés), l'en-tête laissé intact — T3 rend PASS, verdict global PASS, exit 0. Une vue peut donc perdre une section entière, et avec elle une décision opposable, sans qu'aucun oracle ne le voie</li><li>le défaut grandit avec chaque champ neuf porté par une vue (TF-0811 en ajoute un). Pistes de la forge : sceller ce que la vue DOIT contenir (liste close de sections par type de vue, que le contrat de vues.md porte déjà en prose), ou faire porter à la vue l'empreinte de son propre corps en plus de celle de sa source</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>mesure du 05/09 : un tiers d'une vue dérivée retiré, deux écarts déclarés perdus, oracle-tracabilite PASS et exit 0 — la perte d'une décision opposable est invisible à tout oracle de la forge</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">digit-ai-forge-conception</dd></div>
             
           </dl>
