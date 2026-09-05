@@ -481,6 +481,19 @@
    "regle": "references/PATRONS-EPROUVES.md P-2 ; loi transverse n 3 (CLAUDE.md) ; ETAPE-MEP.md M-9",
    "oracle": "ETAPE-MEP.md M-9 (preuve : controle executable du produit) — aucun oracle generique, candidature chez forge-tests",
    "voisines": []
+  },
+  {
+   "cle": "garde-lexicale-frontiere-ascii",
+   "famille": "regle-morte",
+   "libelle": "Une garde lexicale sur du texte francais emploie la frontiere de mot ASCII du moteur de Node : un accent vaut frontiere — faux positifs (pronom lu dans un mot accentue) et faux negatifs (motif accentue jamais atteint)",
+   "creee_le": "2026-09-05",
+   "fondee_par": [
+    "TF-0799",
+    "TF-0805"
+   ],
+   "regle": "frontieres Unicode (assertions « pas une lettre Unicode » avant/apres, drapeau u) dans toute garde lexicale ; fixture double sens par garde",
+   "oracle": "self-test de l'oracle porteur (oracle-exigences E3/E8 chez forge-conception ; oracle-synthese S21 chez le pilot)",
+   "voisines": []
   }
  ]
 }
