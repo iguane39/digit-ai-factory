@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau 52ef0af1d0bd)]
+sources_de_verite: [todo/TODO.jsonl (sceau f09ee1c3e797)]
 verifie_le: 2026-09-05
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `52ef0af1d0bd`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `f09ee1c3e797`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -19,10 +19,10 @@ les corrections donnerait l'illusion d'un progrès net.
 
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
-| Ouverts | 11 | candidats, décidés ou en cours — le reste à faire réel |
+| Ouverts | 12 | candidats, décidés ou en cours — le reste à faire réel |
 | Clos sur gains constatés | 20 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 0 | décidés non faits, motif écrit — jamais un silence |
-| Total suivi | 31 | tout ce que le registre a jamais porté |
+| Total suivi | 32 | tout ce que le registre a jamais porté |
 
 ## Ce qui reste ouvert, par forge
 
@@ -88,6 +88,15 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | Id | Titre | Statut | Forge(s) | Score |
 |---|---|---|---|---|
 | TF-0811 | Produit-62 : l'ecart explicite d'un candidat de la surface implicite n'a nulle part ou s'ecrire dans EXIGENCES | decide | digit-ai-forge-conception | 1 |
+
+### digit-ai-forge-development — 1 item(s)
+
+Les items ouverts ciblant digit-ai-forge-development, du score le plus fort au plus faible. Le score est
+celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
+
+| Id | Titre | Statut | Forge(s) | Score |
+|---|---|---|---|---|
+| TF-0813 | digit-ai-forge-development : l'historique du depot porte 89 constats de la porte de publication (38 messages d | candidat | digit-ai-forge-development | 5 |
 
 ## Ce que ce rapport ne dit pas
 
