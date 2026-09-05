@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=fb9a67adefe7 archive=d3c801ad4540 · dernier événement: 2026-09-05T12:06:41.263Z -->
+     sceaux: actifs=7e1ed1a32571 archive=d3c801ad4540 · dernier événement: 2026-09-05T12:17:38.871Z -->
 
-**26 actifs** (candidat 4 · décidé 11 · en cours 1 · corrigé 10 · écarté 0) · **782 archivés**.
+**28 actifs** (candidat 5 · décidé 11 · en cours 1 · corrigé 11 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -14,6 +14,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0674 | decide | 12.5 | La porte de fraîcheur de déploiement empreinte encore un échantillon — le correctif d'ensemble n'est pas appliqué | non |
 | TF-0682 | decide | 10 | Quinze contrôles du produit ne sont exercés par AUCUNE recette — être cité n'est pas être joué | non |
 | TF-0676 | decide | 6.7 | Aucun script de capture du produit ne produit systématiquement une pleine page | non |
+| TF-0808 | candidat | 1 | digit-ai-factory : M-9 fonde sa preuve sur « le controle executable du produit » et ne nomme pas le controle generique du socle, qui existe desormais | **oui** — la realisation de reference du patron a coute 14 pages et 5 controles d'oracle sur un seul produit (P-2, references/PATRONS-EPROUVES.md) ; tant que M-9 ne nomme pas le controle du socle, chaque produit a surface web repaie cette ecriture a sa MEP |
+| TF-0809 | candidat | 1 | digit-ai-factory : M-9 (a) ne juge que les adresses inconnues SOUS un prefixe, la racine sans prefixe que l'exigence 4 de P-2 demande sort du jugement | **oui** — ecart constate entre les cinq exigences de P-2 et les trois cas de M-9 : une exigence sur cinq n'est jugee qu'a moitie, et l'ecart n'etait visible qu'en traduisant le patron en mesures — aucune relecture du texte ne l'avait signale entre le 03/09 et le 05/09 |
 | TF-0802 | corrige | 1 | La 404 personnalisee, menu et toutes langues : un standard d'office pour tout site cree par la factory | non |
 
 ## digit-ai-forge-agents
@@ -39,7 +41,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0803 | candidat | 6 | forge-tests : un controle executable generique de la 404 (adresse inconnue par langue, prefixe respecte, non-HTML nu, statut 404 conserve, noindex), consommable comme preuve du controle M-9 de la MEP | **oui** — un site multilingue a servi le 404 nu du serveur en production du 25/08 au 01/09 sans qu'aucun controle le voie (TF-0802) ; la realisation de reference a coute 14 pages et 5 controles sur un seul produit |
+| TF-0803 | corrige | 6 | forge-tests : un controle executable generique de la 404 (adresse inconnue par langue, prefixe respecte, non-HTML nu, statut 404 conserve, noindex), consommable comme preuve du controle M-9 de la MEP | **oui** — un site multilingue a servi le 404 nu du serveur en production du 25/08 au 01/09 sans qu'aucun controle le voie (TF-0802) ; la realisation de reference a coute 14 pages et 5 controles sur un seul produit |
 
 ## forge-conception
 

@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau fb9a67adefe7)]
+sources_de_verite: [todo/TODO.jsonl (sceau 7e1ed1a32571)]
 verifie_le: 2026-09-05
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `fb9a67adefe7`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `7e1ed1a32571`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -19,16 +19,29 @@ les corrections donnerait l'illusion d'un progrès net.
 
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
-| Ouverts | 16 | candidats, décidés ou en cours — le reste à faire réel |
-| Clos sur gains constatés | 10 | corrigés avec leur mesure avant/après |
+| Ouverts | 17 | candidats, décidés ou en cours — le reste à faire réel |
+| Clos sur gains constatés | 11 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 0 | décidés non faits, motif écrit — jamais un silence |
-| Total suivi | 26 | tout ce que le registre a jamais porté |
+| Total suivi | 28 | tout ce que le registre a jamais porté |
 
 ## Ce qui reste ouvert, par forge
 
 La table se lit par forge cible : c'est l'unité de décision, puisqu'une correction se
 livre dans un dépôt. L'ordre suit le NOMBRE d'items ouverts, jamais leur priorité — la
 priorité vit dans la colonne de score.
+
+### digit-ai-factory — 5 item(s)
+
+Les items ouverts ciblant digit-ai-factory, du score le plus fort au plus faible. Le score est
+celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
+
+| Id | Titre | Statut | Forge(s) | Score |
+|---|---|---|---|---|
+| TF-0674 | La porte de fraîcheur de déploiement empreinte encore un échantillon — le correctif d'ensemble n'est pas appli | decide | digit-ai-factory | 12.5 |
+| TF-0682 | Quinze contrôles du produit ne sont exercés par AUCUNE recette — être cité n'est pas être joué | decide | digit-ai-factory | 10 |
+| TF-0676 | Aucun script de capture du produit ne produit systématiquement une pleine page | decide | digit-ai-factory | 6.7 |
+| TF-0808 | digit-ai-factory : M-9 fonde sa preuve sur « le controle executable du produit » et ne nomme pas le controle g | candidat | digit-ai-factory | 1 |
+| TF-0809 | digit-ai-factory : M-9 (a) ne juge que les adresses inconnues SOUS un prefixe, la racine sans prefixe que l'ex | candidat | digit-ai-factory | 1 |
 
 ### pilot — 3 item(s)
 
@@ -40,17 +53,6 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0549 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : | decide | pilot | 10 |
 | TF-0791 | Cascade Intention > Strategie > Tactique > Operationnel + test retro : la definition des demandes ne capture p | en_cours | pilot | 6.7 |
 | TF-0807 | pilot : l'ingestion d'un lot remis par une FORGE pseudonymise la forge comme un produit client (digit-ai-forge | candidat | pilot | 6 |
-
-### digit-ai-factory — 3 item(s)
-
-Les items ouverts ciblant digit-ai-factory, du score le plus fort au plus faible. Le score est
-celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
-
-| Id | Titre | Statut | Forge(s) | Score |
-|---|---|---|---|---|
-| TF-0674 | La porte de fraîcheur de déploiement empreinte encore un échantillon — le correctif d'ensemble n'est pas appli | decide | digit-ai-factory | 12.5 |
-| TF-0682 | Quinze contrôles du produit ne sont exercés par AUCUNE recette — être cité n'est pas être joué | decide | digit-ai-factory | 10 |
-| TF-0676 | Aucun script de capture du produit ne produit systématiquement une pleine page | decide | digit-ai-factory | 6.7 |
 
 ### forge-design — 3 item(s)
 
@@ -90,15 +92,6 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | Id | Titre | Statut | Forge(s) | Score |
 |---|---|---|---|---|
 | TF-0799 | forge-conception : remplacer les frontieres \b ASCII des gardes lexicales par des frontieres Unicode - E8 lit  | decide | forge-conception | 1 |
-
-### digit-ai-forge-tests — 1 item(s)
-
-Les items ouverts ciblant digit-ai-forge-tests, du score le plus fort au plus faible. Le score est
-celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
-
-| Id | Titre | Statut | Forge(s) | Score |
-|---|---|---|---|---|
-| TF-0803 | forge-tests : un controle executable generique de la 404 (adresse inconnue par langue, prefixe respecte, non-H | candidat | digit-ai-forge-tests | 6 |
 
 ### digit-ai-forge-conception — 1 item(s)
 
