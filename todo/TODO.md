@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=47698bc19312 archive=d3c801ad4540 · dernier événement: 2026-09-05T08:13:26.769Z -->
+     sceaux: actifs=cf45e0ddbddf archive=d3c801ad4540 · dernier événement: 2026-09-05T11:59:39.959Z -->
 
-**24 actifs** (candidat 3 · décidé 12 · en cours 1 · corrigé 8 · écarté 0) · **782 archivés**.
+**24 actifs** (candidat 2 · décidé 12 · en cours 1 · corrigé 9 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -73,7 +73,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-0791 | en_cours | 6.7 | Cascade Intention > Strategie > Tactique > Operationnel + test retro : la definition des demandes ne capture pas l'intention initiale de l'utilisateur | **oui** — etude output/03-etudes/20260901-etude-opportunite-dataforseo.md : conforme a sa definition, PASS a ses controles, et refusee par son destinataire — sept questions du retour du 01/09 sans reponse dans le texte ; cout paye : une etude entiere a redefinir et rejouer |
 | TF-0549 | decide | 10 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : `Produit-07` a un forge\retours\ mais rien de ce qui s'y fait n'est suivi | **oui** — mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration. |
-| TF-0805 | candidat | 9 | pilot : les gardes lexicales d'oracle-synthese (S21 et voisines) emploient des frontieres de mot ASCII (la sequence barre-oblique-inverse b) — un motif accentue comme « mesuree » n'est jamais atteint ; passer aux frontieres Unicode avec fixture double sens | **oui** — un motif accentue jamais atteint = une regle qui ne juge jamais ce qu'elle croit juger (S21 sur « mesuree ») ; 3 des 13 FAIL du delta v0.5.0 du produit 02 relevaient de cette classe cote conception |
+| TF-0805 | corrige | 9 | pilot : les gardes lexicales d'oracle-synthese (S21 et voisines) emploient des frontieres de mot ASCII (la sequence barre-oblique-inverse b) — un motif accentue comme « mesuree » n'est jamais atteint ; passer aux frontieres Unicode avec fixture double sens | **oui** — un motif accentue jamais atteint = une regle qui ne juge jamais ce qu'elle croit juger (S21 sur « mesuree ») ; 3 des 13 FAIL du delta v0.5.0 du produit 02 relevaient de cette classe cote conception |
 | TF-0788 | corrige | 8 | pilot : une montee de version d un skill dans la journee n est SUE d aucune forge qui le consomme — la recette de forge-tests a change de verdict entre deux executions parce que check_html et render_page avaient change de regles sur le poste, sans qu aucun signal ne lui parvienne | **oui** — le 02/09, la section dashboard de la recette de forge-tests est passee de vert a rouge entre deux executions sans qu un octet ait bouge dans son depot (mesure de TF-0786) ; sans signal cote consommateur, le meme diagnostic se refait a la main a chaque montee de version |
 | TF-0793 | corrige | 1 | pilot : la declaration racine_web demandee par TF-0654 n'est lue par AUCUN script — le critere de cloture du lot est hors de portee du produit | **oui** — deux constats HORS RACINE re-rendus a chaque releve du parc pour ce produit, et pour tout produit dont la racine web n'est pas la racine du depot |
 | TF-0794 | corrige | 1 | pilot : le remede que R-42 prescrit ne solde pas le defaut qu'il vise, et l'ecriture concurrente du ledger collisionne par construction | **oui** — un FAIL R-42 incurable a chaque conformite tant que la collision n'est pas consommable ; le lot 20260901b a compile son controle de completude SANS voir la seq 75 ecrite 3 minutes plus tot par l'autre session |

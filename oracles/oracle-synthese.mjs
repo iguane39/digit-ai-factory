@@ -180,6 +180,15 @@ const _CHIFFRES = new RegExp(
 // liste élargit donc ce qui compte comme preuve — citer un fichier de configuration vaut désormais
 // localisateur au bloc 4. C'est cohérent (un chemin vérifiable EST un localisateur) mais ce n'est
 // pas neutre, et le banc le vérifie : la fixture rouge doit continuer d'échouer sur S3 et S8.
+// TF-0805 (05/09/2026, lot du produit 02 — même classe que TF-0799 chez forge-conception) : dans le
+// moteur de Node, `\b` est ASCII — un accent vaut frontière de mot. « mesuré » ne matchait donc
+// jamais `\bmesur[ée]e?s?\b` (le « é » final n'est pas un caractère de mot, la frontière n'existe
+// pas), et « réelle » déclenchait une garde du pronom « elle ». Ce qui suit réécrit `\b` en
+// frontière Unicode ÉQUIVALENTE (lettre/chiffre/souligné d'un côté, rien de tel de l'autre) et
+// pose le drapeau `u`. Seuls les motifs où une classe accentuée touche `\b` passent par ici —
+// une règle réécrite sans mesure serait une règle changée sans raison.
+const _FRONTIERE_UNICODE = "(?:(?<![\\p{L}\\p{N}_])(?=[\\p{L}\\p{N}_])|(?<=[\\p{L}\\p{N}_])(?![\\p{L}\\p{N}_]))";
+const uni = (re) => new RegExp(re.source.split("\\b").join(_FRONTIERE_UNICODE), re.flags.includes("u") ? re.flags : re.flags + "u");
 const _LOCALISATEURS = /(`[^`]+`|\.(md|json|mjs|py|html|jsonl|ya?ml|jsx?|tsx?|css|scss|txt|csv|toml|ini|cfg|conf|sh|ps1|sql|xml|env|lock)\b|\b[a-f0-9]{7,40}\b)/;
 const preuve = (s) => _JETONS.test(s) || _CHIFFRES.test(s) || _LOCALISATEURS.test(s);
 
@@ -440,7 +449,7 @@ function juger(texte) {
   // donc le verdict, le traité et les actions — là où la complétion se CLAIME.
   const zonesAffirmantes = [bloc(texte, BLOCS[1][0]) || "", bloc(texte, BLOCS[3][0]) || "", bloc(texte, BLOCS[7][0]) || ""].join(String.fromCharCode(10));
   const nus = puces(zonesAffirmantes).filter((l) => {
-    if (!/(✓|\bfait\b|\btermin[ée]|\bsold[ée]|\bclos\b)/i.test(sansConditionnel(l))) return false;
+    if (!uni(/(✓|\bfait\b|\btermin[ée]|\bsold[ée]|\bclos\b)/i).test(sansConditionnel(l))) return false;
     return !preuve(l);
   });
   nus.length
@@ -700,7 +709,7 @@ function juger(texte) {
     const bActions = bloc(texte, BLOCS[7][0]) || "";
     const humaines = puces(bActions).concat(bActions.split("\n").filter((l) => /^\s*\|/.test(l)))
       .filter((l) => /\bmanuelle_utilisateur\b/.test(l));
-    const ECRITURE = /\b(cr[ée]er|ajouter|[ée]crire dans|coller|ins[ée]rer|renseigner)\b[^.;|]{0,60}\b(ligne|variable|fichier|cl[ée]|entr[ée]e|section)\b/i;
+    const ECRITURE = uni(/\b(cr[ée]er|ajouter|[ée]crire dans|coller|ins[ée]rer|renseigner)\b[^.;|]{0,60}\b(ligne|variable|fichier|cl[ée]|entr[ée]e|section)\b/i);
     const fautives = humaines.filter((l) => ECRITURE.test(l) && !/\bacces\b/.test(l));
     fautives.length
       ? ko("S34", `${fautives.length} action(s) manuelle_utilisateur demandent à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier — c'est un geste d'agent (loi n° 5) ; ce qui lui reste est la valeur, jamais l'écriture : « ${fautives[0].trim().slice(0, 90)} »`)
@@ -711,7 +720,7 @@ function juger(texte) {
   // « préparées » qui n'existaient pas, annoncées au bloc 4 d'une restitution.
   {
     const bTraite = bloc(texte, BLOCS[3][0]) || "";
-    const renvois = puces(bTraite).filter((l) => /(pr[ée]par[ée]e?s?\b|pr[êe]te?s? [àa] (coller|poser|copier)|\bvoir A-\d+)/i.test(l) && !_JETONS.test(l));
+    const renvois = puces(bTraite).filter((l) => uni(/(pr[ée]par[ée]e?s?\b|pr[êe]te?s? [àa] (coller|poser|copier)|\bvoir A-\d+)/i).test(l) && !_JETONS.test(l));
     renvois.length
       ? ko("S35", `${renvois.length} puce(s) du bloc 4 ne PROUVENT pas, elles ANNONCENT (« préparé », « voir A-N ») — une preuve est une sortie exécutée, un verdict, un compteur : « ${renvois[0].trim().slice(0, 90)} »`)
       : ok("S35", "aucune puce du bloc 4 ne remplace sa preuve par un renvoi à une action");
@@ -734,7 +743,7 @@ function juger(texte) {
   // mais pas pour la prose, débordement reclassé acceptable — trois symptômes, aucune classe.
   {
     const bTraite = bloc(texte, BLOCS[3][0]) || "";
-    const corrections = puces(bTraite).filter((l) => /\bcorrig[ée]/i.test(l));
+    const corrections = puces(bTraite).filter((l) => uni(/\bcorrig[ée]/i).test(l));
     const sansClasse = corrections.filter((l) => !/(rouge|vert|fixture|recette|classe|self-test|banc|double sens|\d+\s*\/\s*\d+)/i.test(l));
     sansClasse.length
       ? ko("S37", `${sansClasse.length} correction(s) restituée(s) sans contrôle rouge → vert ni classe nommée — une correction après retour humain traite le symptôme, jamais la classe : « ${sansClasse[0].trim().slice(0, 90)} »`)
@@ -772,7 +781,7 @@ function juger(texte) {
   // le mot « ecran ». La règle rendait PASS sur une action sans aucune trace : elle était MORTE
   // EN CROYANT VIVRE, et c'est le pire état pour un contrôle — il rassure au lieu de juger.
   const TRACE_CODE = /(HTTP\s*\d{3}|\b\d{3}\s+(?:Forbidden|Unauthorized|Denied|Conflict)\b|\bE[A-Z]{4,}\b|Authorization_\w+)/;
-  const TRACE_MOT = /(exit\s*\d|permission denied|access denied|\btent[ée]e?s?\b|\bessay[ée]e?s?\b|\brefus[ée]e?s?\b|\bmesur[ée]e?s?\b)/i;
+  const TRACE_MOT = uni(/(exit\s*\d|permission denied|access denied|\btent[ée]e?s?\b|\bessay[ée]e?s?\b|\brefus[ée]e?s?\b|\bmesur[ée]e?s?\b)/i);
   const TRACE_TENTATIVE = { test: (g) => TRACE_CODE.test(g) || TRACE_MOT.test(g) };
   juger8("S21", MOTIFS_MESURABLES, (g) => TRACE_TENTATIVE.test(g) && preuve(g),
     "un motif `acces` ou `presence` SANS trace mesurée de la tentative : l'impossibilité est affirmée, " +
@@ -906,8 +915,8 @@ function juger(texte) {
   // Cinq constats sur cinq étaient de cette forme.
   const MARQUEUR_FORT = /\b(check-ignore|gitignor)\b/i;
   //: Une déclaration d'ABSENCE n'est pas une confirmation d'écriture.
-  const DECLARE_UNE_ABSENCE = /\b(inchang[ée]|aucun(?:e)?\s+(?:fichier|[ée]criture|d[ée]p[ôo]t)|propre\b|rien n(?:'|’)a|hors ce rapport)/i;
-  const MARQUEUR_FAIBLE = /\ba (?:bien )?(?:[ée]t[ée] )?(?:cr[ée]{1,2}|[ée]crit|ajout[ée]|d[ée]pos[ée]|enregistr[ée])\b|\best (?:bien )?(?:ignor[ée]|prot[ée]g[ée]|en s[ée]curit[ée])\b/i;
+  const DECLARE_UNE_ABSENCE = uni(/\b(inchang[ée]|aucun(?:e)?\s+(?:fichier|[ée]criture|d[ée]p[ôo]t)|propre\b|rien n(?:'|’)a|hors ce rapport)/i);
+  const MARQUEUR_FAIBLE = uni(/\ba (?:bien )?(?:[ée]t[ée] )?(?:cr[ée]{1,2}|[ée]crit|ajout[ée]|d[ée]pos[ée]|enregistr[ée])\b|\best (?:bien )?(?:ignor[ée]|prot[ée]g[ée]|en s[ée]curit[ée])\b/i);
   //: Un désignateur de FICHIER, et pas n'importe quel objet : la famille des porteurs de secrets
   //: et de configuration, plus le mot « fichier » lui-même. C'est ce qui empêche « la règle a été
   //: créée » ou « le contrôle est bien protégé » de déclencher.
@@ -968,11 +977,11 @@ function juger(texte) {
   // l'inférence qui est fautive, pas le fait de mesurer une taille.
   //: Affirmer que deux artefacts n'en sont qu'un. « copie conforme » en est EXCLU : le parc
   //: l'emploie comme un MODE de propagation (`HERITAGE.json`), pas comme une conclusion.
-  const IDENTITE_AFFIRMEE = /\b(le m[êe]me fichier|m[êe]me contenu|fichiers? identiques?|sont identiques|un doublon|doublon de|dupliqu[ée]|duplicata|deux fois le m[êe]me)\b/i;
+  const IDENTITE_AFFIRMEE = uni(/\b(le m[êe]me fichier|m[êe]me contenu|fichiers? identiques?|sont identiques|un doublon|doublon de|dupliqu[ée]|duplicata|deux fois le m[êe]me)\b/i);
   //: L'indice qui ne prouve rien : ce qu'on lit AUTOUR du fichier, jamais dedans.
-  const INDICE_METADONNEE = /\b(m[êe]mes? (?:taille|poids|date|horodatage|nom|nombre de lignes)|taille identique|\d[\d   ]*\s*octets|m[êe]me nombre de (?:lignes|octets))\b/i;
+  const INDICE_METADONNEE = uni(/\b(m[êe]mes? (?:taille|poids|date|horodatage|nom|nombre de lignes)|taille identique|\d[\d   ]*\s*octets|m[êe]me nombre de (?:lignes|octets))\b/i);
   //: Ce qui, lui, établit l'identité — et dont le coût est nul.
-  const EMPREINTE = /\b(empreinte|sha-?\d*|hash|md5|checksum|somme de contr[ôo]le|diff\b|octet par octet|contenu compar[ée]|comparaison de contenu)\b/i;
+  const EMPREINTE = uni(/\b(empreinte|sha-?\d*|hash|md5|checksum|somme de contr[ôo]le|diff\b|octet par octet|contenu compar[ée]|comparaison de contenu)\b/i);
   {
     const phrases = texte.split(/(?<=[.!?;])\s+|\n/).map((x) => x.trim()).filter(Boolean);
     const risquees = phrases.filter((x) => IDENTITE_AFFIRMEE.test(x) && INDICE_METADONNEE.test(x));
@@ -1014,8 +1023,8 @@ function juger(texte) {
   // une mise en cause de cette forme, et les deux vivent dans des lots ENTRANTS, pas dans une
   // restitution. La règle a donc très peu de cibles — c'est une règle de prévention, et ses
   // fixtures sont ce qui prouve qu'elle fonctionne, puisque le corpus ne le prouvera pas.
-  const MISE_EN_CAUSE = /\b(forge-[a-z-]+|l'oracle|le contr[ôo]le|le pan|l'outil|la sonde)\b[^.;!?]{0,90}\b(aurait d[ûu] (?:le |la |les |l')?(?:voir|d[ée]tecter|refuser|attraper)|n'(?:a|ont) pas (?:vu|d[ée]tect[ée]|refus[ée]|attrap[ée])|a laiss[ée] passer|est en d[ée]faut|est fauti[fv])\b/i;
-  const VERIFICATION = /\b(v[ée]rifi[ée]|rejou[ée]|mesur[ée]|reproduit|jou[ée] sur|ex[ée]cut[ée]|preuve|sortie|exit \d|constat[ée] par)\b/i;
+  const MISE_EN_CAUSE = uni(/\b(forge-[a-z-]+|l'oracle|le contr[ôo]le|le pan|l'outil|la sonde)\b[^.;!?]{0,90}\b(aurait d[ûu] (?:le |la |les |l')?(?:voir|d[ée]tecter|refuser|attraper)|n'(?:a|ont) pas (?:vu|d[ée]tect[ée]|refus[ée]|attrap[ée])|a laiss[ée] passer|est en d[ée]faut|est fauti[fv])\b/i);
+  const VERIFICATION = uni(/\b(v[ée]rifi[ée]|rejou[ée]|mesur[ée]|reproduit|jou[ée] sur|ex[ée]cut[ée]|preuve|sortie|exit \d|constat[ée] par)\b/i);
   {
     const phrases = texte.split(/(?<=[.!?;])\s+|\n/).map((x) => x.trim()).filter(Boolean);
     const risquees = phrases.filter((x) => MISE_EN_CAUSE.test(x));
@@ -1760,6 +1769,13 @@ Aucun écart : la demande a été suivie à la lettre.
   writeFileSync(join(dir, "risque-repris.md"), risqueRepris, "utf8");
   writeFileSync(join(dir, "titree.md"), titree, "utf8");
   writeFileSync(join(dir, "titree-sale.md"), titreeSale, "utf8");
+  // TF-0805 (05/09) — S21 lit une trace écrite avec un mot accentué EN FIN DE MOT (« tenté »,
+  // « refusé »). Avant la frontière Unicode, `\btent[ée]e?s?\b` ne matchait jamais « tenté » : le
+  // « é » final n'est pas un caractère de mot ASCII, donc aucune frontière après lui — une action
+  // prouvée rougissait, et la règle ne jugeait jamais ce qu'elle croyait juger.
+  const accentFinal = verte.replace("publication TENTÉE le 14/08, `HTTP 403 Authorization_RequestDenied` ;",
+    "accès tenté le 14/08, sortie de `git push` : refusé par le portail ;");
+  writeFileSync(join(dir, "accent-final.md"), accentFinal, "utf8");
   const moi = fileURLToPath(import.meta.url);
   const rv = spawnSync(process.execPath, [moi, join(dir, "verte.md")], { encoding: "utf8" });
   const rr = spawnSync(process.execPath, [moi, join(dir, "rouge.md")], { encoding: "utf8" });
@@ -1772,6 +1788,13 @@ Aucun écart : la demande a été suivie à la lettre.
       if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
     }
   }
+  // TF-0805 — la trace accentuée en fin de mot est LUE ; la fixture rouge (« acces » sans aucune
+  // trace) garde son sens rouge sur S21, jouée plus haut.
+  if (!accentFinal.includes("accès tenté le 14/08")) casse.push("fixture accent-final : la substitution n'a pas eu lieu, le cas n'est pas joué");
+  const raf = spawnSync(process.execPath, [moi, join(dir, "accent-final.md")], { encoding: "utf8" });
+  if (!/"S21"[^}]*PASS/.test(raf.stdout))
+    casse.push("S21 (TF-0805) : une trace écrite avec un mot accentué en fin de mot (« tenté », « refusé ») n'est pas lue — " +
+      "la frontière ASCII fait rougir une action prouvée : " + (/"S21"[\s\S]{0,180}/.exec(raf.stdout) || [""])[0].replace(/\s+/g, " "));
   // TF-0661 — S29 dans SES DEUX SENS.
   const ro = spawnSync(process.execPath, [moi, join(dir, "risque-orphelin.md")], { encoding: "utf8" });
   const rrep = spawnSync(process.execPath, [moi, join(dir, "risque-repris.md")], { encoding: "utf8" });
@@ -1899,7 +1922,7 @@ Aucun écart : la demande a été suivie à la lettre.
   }
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 13/13 PASS (verte PASS ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3)");
+    : "Self-test restitution : 14/14 PASS (verte PASS ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3)");
   process.exit(casse.length ? 1 : 0);
 }
 
