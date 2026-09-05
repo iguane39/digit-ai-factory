@@ -39,6 +39,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Decision 5a et TF-0793 clos - 20260903f.md` | fichier | 13,8 Ko | Synthèse de mandat — décision 5a appliquée et premier chantier du pilot clos (03/09/2026) |
 | `Digit-AI - Synthese Mandat - Decisions 1a 2a 3b 4a synchronisation - 20260903e.md` | fichier | 16,1 Ko | Synthèse de mandat — exécution des décisions 1a, 2a, 3b et 4a de la synchronisation (03/09 |
 | `Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md` | fichier | 25,9 Ko | Synthèse de mandat — vos trois décisions du matin exécutées : l'historique du pilot réécri |
+| `Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md` | fichier | 13,4 Ko | Synthèse de mandat — décisions 8a et 9a exécutées : trois forges publiées, quatre candidat |
 | `Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md` | fichier | 15,2 Ko | Synthèse de mandat — l'étude d'opportunité conclut de ne rien construire, et signale une f |
 | `Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md` | fichier | 19,1 Ko | Synthèse de mandat — second « fais tous les A » achevé : les sept items de forges sont clo |
 | `Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md` | fichier | 17,7 Ko | Synthèse de mandat — forme par défaut du bloc 3, et redescente de la doctrine aux produits |
@@ -83,4 +84,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Verification de non perte jouable - 20260901d.md` | fichier | 9,0 Ko | Synthèse de mandat — le tri reste éteint, et sa vérification cesse d'être une intention |
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 
-_66 fichier(s), 0 sous-dossier(s)_
+_67 fichier(s), 0 sous-dossier(s)_
