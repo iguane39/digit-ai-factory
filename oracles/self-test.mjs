@@ -643,6 +643,50 @@ check("partiel-R42 : rectifier UN écart sur deux ne blanchit pas l'autre", () =
   if (!/\[RECTIFIÉ\].*seq 3(?![0-9])/.test(f.message)) throw new Error("l'écart rectifié n'est plus imprimé alors qu'il reste un fait");
 });
 
+// ---- TF-0794 (03/09) — R-42 CONSOMME UNE RECTIFICATION DE SEQ, ET DIT SA FORME. Le cas réel du
+// produit 02 : deux sessions ont calculé leur seq depuis la même queue (deux seq 3, deux seq 4 ici),
+// ts exacts et ordonnés. Trois états : rectifiée dans `entrees[]` → PASS avec les deux [RECTIFIÉ] ;
+// rectifiée en PROSE seulement (ce que le produit avait fait) → FAIL, et le message nomme le champ ;
+// sans rectification → FAIL sur les deux seq. --------------------------------------------------
+const LEDGER_COLLISION = [
+  { seq: 1, ts: "2026-09-01T20:00:00Z", type: "run_open", versions_forges: { "digit-ai-factory": "abc1234" } },
+  { seq: 2, ts: "2026-09-01T20:47:31Z", type: "retour" },
+  { seq: 3, ts: "2026-09-01T20:50:45Z", type: "retour" },          // session A
+  { seq: 4, ts: "2026-09-01T20:51:53Z", type: "etape_close" },     // session A
+  { seq: 3, ts: "2026-09-01T20:52:00Z", type: "etape_close" },     // session B — collision
+  { seq: 4, ts: "2026-09-01T20:56:15Z", type: "etape_close" },     // session B — collision
+].map((e) => JSON.stringify(e)).join(NL_TEST) + NL_TEST;
+const collisionR42 = mkdtempSync(join(tmpdir(), "conf-collision-r42-"));
+ecrireDans(collisionR42, "forge/ledger.jsonl", LEDGER_COLLISION +
+  JSON.stringify({ seq: 5, ts: "2026-09-01T20:57:22Z", type: "rectification_horodatage", resume: "collision de seq par sessions concurrentes",
+    entrees: [{ seq: 3, cause: "deux sessions, même queue (2) — seq attribué sans verrou" }, { seq: 4, cause: "même collision, même fenêtre" }] }) + NL_TEST);
+check("TF-0794 : une collision de seq NOMMÉE dans entrees[] est [RECTIFIÉ] → PASS, la suite reprend au plus haut seq", () => {
+  const { rapport } = lance(collisionR42);
+  const r42 = rapport.findings.filter((x) => x.regle === "R-42");
+  if (r42.some((x) => x.statut === "FAIL")) throw new Error(`FAIL inattendu : ${JSON.stringify(r42.filter((x) => x.statut === "FAIL").map((x) => x.message))}`);
+  const f = r42.find((x) => x.statut === "PASS");
+  if (!f || (f.message.match(/\[RECTIFIÉ\] seq [34] là où/g) || []).length !== 2) throw new Error(`les deux seq en collision ne sont pas imprimés [RECTIFIÉ] : ${f && f.message}`);
+  if (/sans écart correspondant/.test(f.message)) throw new Error(`une rectification consommée est encore comptée « sans écart » : ${f.message}`);
+});
+const proseR42 = mkdtempSync(join(tmpdir(), "conf-prose-r42-"));
+ecrireDans(proseR42, "forge/ledger.jsonl", LEDGER_COLLISION +
+  JSON.stringify({ seq: 5, ts: "2026-09-01T20:57:22Z", type: "rectification_horodatage", resume: "collision : les seq 3 et 4 sont chacun portes par deux entrees" }) + NL_TEST);
+check("TF-0794 borne : une rectification en PROSE seulement ne rectifie rien, et le FAIL nomme le champ entrees[]", () => {
+  const { exit, rapport } = lance(proseR42);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1 — la prose n'est pas lue, et ne doit pas l'être`);
+  const f = rapport.findings.find((x) => x.regle === "R-42" && x.statut === "FAIL");
+  if (!f || !/seq 3 là où 5 était attendu/.test(f.message)) throw new Error(`la collision n'est plus dénoncée : ${f && f.message}`);
+  if (!/entrees: \[\{seq/.test(f.message)) throw new Error("le message ne dit pas la FORME exacte de la rectification — le produit a payé une entrée en prose pour rien");
+});
+const nueR42 = mkdtempSync(join(tmpdir(), "conf-nue-r42-"));
+ecrireDans(nueR42, "forge/ledger.jsonl", LEDGER_COLLISION);
+check("TF-0794 borne : sans rectification, les DEUX seq en collision sont des écarts", () => {
+  const { exit, rapport } = lance(nueR42);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const f = rapport.findings.find((x) => x.regle === "R-42" && x.statut === "FAIL");
+  if (!f || !/seq 3 là où 5/.test(f.message) || !/seq 4 là où 5/.test(f.message)) throw new Error(`un des deux seq en collision n'est pas dénoncé : ${f && f.message}`);
+});
+
 // ---- fixtures R-20 TODO-PRODUIT (TF-0318, verdict O3 du 17/08 — volet LECTURE seul) : le
 // couple « source MD versionnée → projection HTML générée », au patron déjà tenu par R-20 pour
 // ARCHITECTURE et MODELE-DONNEES. Trois états à prouver, dont l'ABSENCE : les produits nés avant
@@ -932,7 +976,7 @@ check("TF-0793 : R-47 compte un artefact conditionnel trouvé SOUS la racine web
   } finally { rmSync(avec, { recursive: true, force: true }); rmSync(sans, { recursive: true, force: true }); }
 });
 
-for (const d of [verte, rouge, rougeDocs, rougeLock, rougeR24, ecartR24, rougeR2, verteR2, rougeR19, verteR19, rougeR42, verteR42, partielR42, verteTdp, rougeTdp, rougeTdpNu, rougeTdpNature, verteTdpNature, rougeTdpSection, antTdpSection, rougeCop, antCop]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+for (const d of [verte, rouge, rougeDocs, rougeLock, rougeR24, ecartR24, rougeR2, verteR2, rougeR19, verteR19, rougeR42, verteR42, partielR42, collisionR42, proseR42, nueR42, verteTdp, rougeTdp, rougeTdpNu, rougeTdpNature, verteTdpNature, rougeTdpSection, antTdpSection, rougeCop, antCop]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 // TF-0541 (24/08) — un ledger ecrit AILLEURS etait indiscernable d'un run jamais ouvert. Le
 // produit ecrivait dans `runs\\<run>\\ledger.jsonl` et l'oracle rendait SANS_OBJET : un run REEL
 // passait pour inexistant. Les deux sens se jouent sur le meme projet, seule la place du fichier

@@ -103,6 +103,17 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
 - **Écrivain unique : l'orchestrateur.** Les agents d'étape ne touchent jamais le ledger (défaut
   de verrou concurrent connu dans `ledger.mjs`, consigné au backlog). Ils rendent leurs résultats,
   l'orchestrateur consigne.
+- **Deux sessions le même jour sont le cas NORMAL d'un produit actif, pas l'exception (TF-0794 —
+  03/09/2026).** Mesuré le 01/09 chez le produit 02 : deux sessions légitimes ont calculé leur `seq`
+  depuis la même queue → deux seq 76 et deux seq 77, `ts` exacts et ordonnés, aucune ligne réécrite.
+  Trois clauses en découlent : (1) **le `ts` est la clé d'ordre**, le `seq` dit la continuité d'append
+  et se relit dans la queue du fichier IMMÉDIATEMENT avant un append écrit en UN SEUL appel — jamais
+  calculé en début de session ; (2) **une collision constatée se rectifie par ajout**, jamais par
+  réécriture : une entrée `type: rectification_horodatage` portant `entrees: [{seq, ts_consigne,
+  ts_reel_estime, cause}]`, un seq par élément, ANTÉRIEUR à l'entrée qui le rectifie — un seq nommé
+  en prose n'est pas lu ; (3) **R-42 consomme cette rectification** : le seq en double devient
+  `[RECTIFIÉ]`, la suite attendue reprend au plus haut seq vu, l'écart reste imprimé. L'attribution
+  du seq sous verrou dans `ledger.mjs` reste au backlog de forge-agents.
 - Types utilisés par le pilot : `run_open`, `etape_open`, `invocation`, `oracles_verdict`,
   `escalade_modele`, `question_humain`, `reponse_humain` (dont le GO production de l'étape MEP),
   `etape_close`, `retour` (alimente la boucle d'amélioration ; champ `source` :

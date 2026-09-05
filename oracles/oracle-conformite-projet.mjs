@@ -806,6 +806,18 @@ else {
 // `entrees: [{seq, ts_consigne, ts_reel_estime, cause}]` couvre des seq NOMMÉS et ANTÉRIEURS
 // à elle. L'écart reste IMPRIMÉ (statut PASS, message « [RECTIFIÉ] ») — l'histoire ne se
 // réécrit pas, elle se rectifie par ajout. Un écart non déclaré reste FAIL.
+//
+// TF-0794 (03/09/2026, lot du produit 02) — LA RECTIFICATION COUVRE AUSSI LES SEQ, et le message
+// dit sa FORME. Le fait : deux sessions produit légitimes ont écrit au ledger dans la même
+// fenêtre, chacune calculant son seq depuis la même queue → deux seq 76 et deux seq 77, ts exacts
+// et ordonnés. Le produit a ajouté l'entrée que ce message prescrivait, et le verdict n'a pas
+// bougé : (1) la rectification n'était consommée que pour les horodatages, jamais pour un seq en
+// double ; (2) le message disait « nommant les seq, le ts et la cause » sans dire le champ
+// `entrees[]` — le produit a nommé les seq en PROSE, et rien ne lit la prose. Un remède prescrit
+// qui ne solde pas le défaut apprend au produit à ignorer le contrôle. Désormais : un seq en
+// double ou en recul nommé dans `entrees[]` d'une rectification ultérieure est [RECTIFIÉ], la
+// suite attendue reprend au plus haut seq vu, et le message FAIL écrit la forme exacte.
+// Deux sessions le même jour sont le cas NORMAL d'un produit actif (contrat §3, TF-0794).
 if (!existsSync(ledgerF)) so("R-42", "pas de forge\\ledger.jsonl — aucune intégrité à juger");
 else {
   const lignes = readFileSync(ledgerF, "utf8").split("\n").filter((l) => l.trim());
@@ -836,8 +848,14 @@ else {
       const seq = Number(e.seq);
       if (Number.isFinite(seq)) {
         avecSeq++;
-        if (seq !== seqAttendu) ecarts.push(`seq ${seq} là où ${seqAttendu} était attendu — append-only rompu`);
-        seqAttendu = seq + 1;
+        if (seq !== seqAttendu) {
+          const quoi = `seq ${seq} là où ${seqAttendu} était attendu`;
+          // TF-0794 : un seq en double ou en recul NOMMÉ par une rectification ultérieure est
+          // déclaré, pas fautif ; un saut en avant ou un seq non nommé reste un écart.
+          if (seq < seqAttendu && rectifies.has(seq)) notes.push(`[RECTIFIÉ] ${quoi} : seq en collision — ${rectifies.get(seq)}`);
+          else ecarts.push(`${quoi} — append-only rompu`);
+        }
+        seqAttendu = Math.max(seqAttendu, seq + 1);
       }
       const ts = String(e.ts || "");
       if (ts && tsMax && ts < tsMax) {
@@ -849,12 +867,14 @@ else {
     }
   }
   if (lues.length && !avecSeq) notes.push("aucune entree ne porte SEQ — la continuite d append n est PAS jugeable sur ce ledger (le contrat 3 l exige ; anteriorite, jamais reecrite) : seuls les horodatages et l ouverture le sont");
-  const rectifiesNonVus = [...rectifies.keys()].filter((seq) => !notes.some((n) => n.includes(`seq ${seq} :`)));
+  // Garde de chiffre (TF-0438) : « seq 7 » nu matcherait « seq 76 » ; et depuis TF-0794 une note
+  // rectifiée peut dire « seq 76 là où 78 était attendu », pas seulement « seq 76 : ».
+  const rectifiesNonVus = [...rectifies.keys()].filter((seq) => !notes.some((n) => n.startsWith("[RECTIFIÉ]") && new RegExp(`seq ${seq}(?![0-9])`).test(n)));
   if (rectifiesNonVus.length) notes.push(`rectification(s) sans écart correspondant : seq ${rectifiesNonVus.join(", ")} — une rectification qui ne rectifie rien se retire`);
   if (ecarts.length) {
     ko("R-42", "forge/ledger.jsonl", `intégrité rompue — ${ecarts.length} écart(s) : ${ecarts.slice(0, 6).join(" · ")}${ecarts.length > 6 ? " …" : ""}` +
       (notes.length ? ` (par ailleurs : ${notes.join(" · ")})` : "") +
-      ". L'histoire ne se réécrit pas : ajouter une entrée `type: rectification_horodatage` nommant les seq, le ts consigné, le ts réel estimé et la cause");
+      ". L'histoire ne se réécrit pas : ajouter une entrée `type: rectification_horodatage` portant le champ `entrees: [{seq, ts_consigne, ts_reel_estime, cause}]` — un seq par élément, ANTÉRIEUR à l'entrée qui le rectifie ; un seq nommé en prose dans `resume` n'est pas lu (TF-0794). Un seq en double ou en recul ainsi nommé devient [RECTIFIÉ], un saut en avant reste un écart");
   } else {
     ok("R-42", "forge/ledger.jsonl", `intégrité tenue sur ${lues.length} entrée(s) — seq continu, horodatages non décroissants, ouverture par run_open` +
       (notes.length ? ` ; ${notes.join(" · ")}` : ""));
