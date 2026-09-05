@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=9449644a1be4 archive=d3c801ad4540 · dernier événement: 2026-09-05T12:27:14.519Z -->
+     sceaux: actifs=954068be02b0 archive=d3c801ad4540 · dernier événement: 2026-09-05T12:36:43.008Z -->
 
-**31 actifs** (candidat 8 · décidé 9 · en cours 1 · corrigé 13 · écarté 0) · **782 archivés**.
+**31 actifs** (candidat 8 · décidé 6 · en cours 1 · corrigé 16 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -56,9 +56,9 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0796 | decide | 1 | forge-design : un composant genere par script et affiche en sur-couche porte TOUT son habillage depuis les jetons - jamais le rendu par defaut du navigateur, et color-scheme est declare par theme | **oui** — capture utilisateur du 2026-09-01 (mots de l utilisateur : des trucs moches sortis de nulle part) ; composant pourtant PASS campagne v0.4.0 api 483/483 et suite 989/989 |
-| TF-0797 | decide | 1 | forge-design : semantique des declencheurs - une action se declenche par un bouton qui a l air d un bouton, un lien navigue, la variante fantome n est jamais l unique acces a une fonctionnalite | **oui** — mots de l utilisateur du 2026-09-01 : mets-le sous forme de bouton, pas de lien - le lien a une signification particuliere, tout comme le bouton a la sienne ; la veille, premier retour je ne vois pas de changement sur la meme fonctionnalite livree |
-| TF-0800 | decide | 1 | forge-design : B-T2/B-T3 declarent morte une bascule cablee par ecouteur delegue et cle en constante - documenter la convention exigee ou elargir l heuristique | **oui** — session du 2026-09-01 : app.js reecrit (ecouteur attache, cle en litteral, data-theme-toggle) pour obtenir le PASS - l adaptation a une vertu (verifiabilite) mais la regle jugeait une convention, pas le comportement |
+| TF-0796 | corrige | 1 | forge-design : un composant genere par script et affiche en sur-couche porte TOUT son habillage depuis les jetons - jamais le rendu par defaut du navigateur, et color-scheme est declare par theme | **oui** — capture utilisateur du 2026-09-01 (mots de l utilisateur : des trucs moches sortis de nulle part) ; composant pourtant PASS campagne v0.4.0 api 483/483 et suite 989/989 |
+| TF-0797 | corrige | 1 | forge-design : semantique des declencheurs - une action se declenche par un bouton qui a l air d un bouton, un lien navigue, la variante fantome n est jamais l unique acces a une fonctionnalite | **oui** — mots de l utilisateur du 2026-09-01 : mets-le sous forme de bouton, pas de lien - le lien a une signification particuliere, tout comme le bouton a la sienne ; la veille, premier retour je ne vois pas de changement sur la meme fonctionnalite livree |
+| TF-0800 | corrige | 1 | forge-design : B-T2/B-T3 declarent morte une bascule cablee par ecouteur delegue et cle en constante - documenter la convention exigee ou elargir l heuristique | **oui** — session du 2026-09-01 : app.js reecrit (ecouteur attache, cle en litteral, data-theme-toggle) pour obtenir le PASS - l adaptation a une vertu (verifiabilite) mais la regle jugeait une convention, pas le comportement |
 
 ## forge-development
 

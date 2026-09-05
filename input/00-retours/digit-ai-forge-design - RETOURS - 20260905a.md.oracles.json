@@ -1,0 +1,79 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\input\\00-retours\\digit-ai-forge-design - RETOURS - 20260905a.md",
+  "date_iso": "2026-09-05T12:35:48.315Z",
+  "registre_version": "2.16.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "input\\00-retours\\digit-ai-forge-design - RETOURS - 20260905a.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "input\\00-retours\\digit-ai-forge-design - RETOURS - 20260905a.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "input\\00-retours\\digit-ai-forge-design - RETOURS - 20260905a.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "input\\00-retours\\digit-ai-forge-design - RETOURS - 20260905a.md",
+      "verdict": "PASS",
+      "detail": "aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "input\\00-retours\\digit-ai-forge-design - RETOURS - 20260905a.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "input\\00-retours\\digit-ai-forge-design - RETOURS - 20260905a.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "input\\00-retours\\digit-ai-forge-design - RETOURS - 20260905a.md",
+      "verdict": "PASS",
+      "detail": "nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "input\\00-retours\\digit-ai-forge-design - RETOURS - 20260905a.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "input\\00-retours\\digit-ai-forge-design - RETOURS - 20260905a.md",
+    "ts": "2026-09-05T12:35:48.314Z",
+    "fichiers": {
+      "input\\00-retours\\digit-ai-forge-design - RETOURS - 20260905a.md": "30396e10edf4a42e0f790c4ef13ec85274b75ea65c02c06193d293294073e592"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}
