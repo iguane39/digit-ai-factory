@@ -48,7 +48,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Lexique d invocation inerte - 20260830l.md` | fichier | 14,4 Ko | Synthèse de mandat — pourquoi « Améliore le prompt » ne déclenche rien, et depuis quand (3 |
 | `Digit-AI - Synthese Mandat - Lexique d invocation reactive - 20260830m.md` | fichier | 14,0 Ko | Synthèse de mandat — le lexique d'invocation redevient actif, à la prochaine session (30/0 |
 | `Digit-AI - Synthese Mandat - Mutation a la demande et Portee rectifiee - 20260901c.md` | fichier | 12,2 Ko | Synthèse de mandat — la mutation devient une porte, et une page de doctrine cessait d'avoi |
-| `Digit-AI - Synthese Mandat - Point d etape fais tous les A - 20260905f.md` | fichier | 9,8 Ko | Synthèse de mandat — point d'étape du second « fais tous les A » : le pilot a fini sa part |
+| `Digit-AI - Synthese Mandat - Point d etape fais tous les A - 20260905f.md` | fichier | 12,3 Ko | Synthèse de mandat — point d'étape du second « fais tous les A » : le pilot a fini sa part |
 | `Digit-AI - Synthese Mandat - Pourquoi le bloc 3 derive - 20260830d.md` | fichier | 16,1 Ko | Synthèse de mandat — pourquoi le bloc des décisions dérive d'un rendu à l'autre (30/08/202 |
 | `Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md` | fichier | 7,2 Ko | Synthèse de mandat — le prompt réécrit L99 exécuté (5 postes, 6 agents, 3 lots avalés) |
 | `Digit-AI - Synthese Mandat - Publication et campagne des items decides - 20260831d.md` | fichier | 22,9 Ko | Synthèse de mandat — publié, neuf chantiers décidés menés à fond, et les travaux partis ch |

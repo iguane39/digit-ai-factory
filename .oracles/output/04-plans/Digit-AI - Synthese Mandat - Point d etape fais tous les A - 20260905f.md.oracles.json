@@ -1,6 +1,6 @@
 {
   "cible": "c:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese Mandat - Point d etape fais tous les A - 20260905f.md",
-  "date_iso": "2026-09-05T12:02:22.974Z",
+  "date_iso": "2026-09-05T12:07:49.833Z",
   "registre_version": "2.16.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "output\\04-plans\\Digit-AI - Synthese Mandat - Point d etape fais tous les A - 20260905f.md",
-    "ts": "2026-09-05T12:02:22.974Z",
+    "ts": "2026-09-05T12:07:49.832Z",
     "fichiers": {
-      "output\\04-plans\\Digit-AI - Synthese Mandat - Point d etape fais tous les A - 20260905f.md": "01f1b2b606859523c04f25ed8595e85962114401ffde2b6cd8b18779ccb9544c"
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Point d etape fais tous les A - 20260905f.md": "b88345873d5e0df7524e89d7ffc751bc5d2c6a5e9a9b3121b93b6b8bc30dd477"
     }
   },
   "empreinte_motif": null,
