@@ -585,6 +585,41 @@ check("verte-R19 : 14 clés au nom de dépôt complet → PASS, et le verdict le
     throw new Error("la forme tenue n'est pas dite au verdict — une exigence muette est indistinguable d'une absence de règle");
 });
 
+// ---- TF-0801 (05/09) — R-19 : une clé MALFORMÉE se rectifie par ajout comme un champ absent, et
+// `digit-ai-queue` est une exception NOMMÉE. Le cas réel : un run_open portait la clé « digit-ai-queue »
+// (nom réel du dépôt de file d'attente au bootstrap) → FAIL R-19 ; la rectification déposée (seq 141)
+// n'avait aucun effet ; la clé a été réécrite, geste que R-42 réprouve, faute de voie. ---------------
+const queueR19 = mkdtempSync(join(tmpdir(), "conf-queue-r19-"));
+ecrireDans(queueR19, "forge/ledger.jsonl",
+  JSON.stringify({ seq: 1, type: "run_open", ts: "2026-09-01T08:00:00Z", versions_forges: { "digit-ai-factory": "sha0001", "digit-ai-queue": "7cc71d1" } }) + "\n");
+check("TF-0801 : la clé « digit-ai-queue » est acceptée telle quelle — exception nommée, pas un nom court", () => {
+  const { rapport } = lance(queueR19);
+  const fails = rapport.findings.filter((f) => f.regle === "R-19" && f.statut === "FAIL");
+  if (fails.length) throw new Error(`R-19 refuse le nom réel du dépôt de file d'attente : ${JSON.stringify(fails.map((f) => f.message))}`);
+});
+const malformeeR19 = mkdtempSync(join(tmpdir(), "conf-malformee-r19-"));
+ecrireDans(malformeeR19, "forge/ledger.jsonl", [
+  JSON.stringify({ seq: 1, type: "run_open", ts: "2026-09-01T08:00:00Z", versions_forges: { "digit-ai-factory": "sha0001", "queue": "7cc71d1" } }),
+  JSON.stringify({ seq: 2, type: "rectification_versions_forges", ts: "2026-09-02T08:00:00Z", seq_vise: 1, cause: "clé « queue » écrite en nom court à l'ouverture, avant la lecture du contrat §3" }),
+].join("\n") + "\n");
+check("TF-0801 : une clé malformée COUVERTE par une rectification (seq_vise) → PASS, et le verdict l'imprime [RECTIFIÉ]", () => {
+  const { rapport } = lance(malformeeR19);
+  const r19 = rapport.findings.filter((f) => f.regle === "R-19");
+  if (r19.some((f) => f.statut === "FAIL")) throw new Error(`FAIL inattendu : ${JSON.stringify(r19.filter((f) => f.statut === "FAIL").map((f) => f.message))}`);
+  const f = r19.find((x) => x.statut === "PASS");
+  if (!f || !/\[RECTIFIÉ\].*« queue » malformée/.test(f.message)) throw new Error(`la rectification n'est pas imprimée : ${f && f.message}`);
+});
+const malformeeNueR19 = mkdtempSync(join(tmpdir(), "conf-malformee-nue-r19-"));
+ecrireDans(malformeeNueR19, "forge/ledger.jsonl",
+  JSON.stringify({ seq: 1, type: "run_open", ts: "2026-09-01T08:00:00Z", versions_forges: { "digit-ai-factory": "sha0001", "queue": "7cc71d1" } }) + "\n");
+check("TF-0801 borne : sans rectification, la clé malformée reste un FAIL — et le message dit la VOIE par ajout", () => {
+  const { exit, rapport } = lance(malformeeNueR19);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const f = rapport.findings.find((x) => x.regle === "R-19" && x.statut === "FAIL" && /clé « queue »/.test(x.message));
+  if (!f) throw new Error("la clé malformée n'est plus dénoncée");
+  if (!/rectification_versions_forges/.test(f.message)) throw new Error("le message ne dit pas la voie par ajout — le produit réécrira l'entrée faute de mieux");
+});
+
 // ---- fixtures R-42 INTÉGRITÉ du ledger (TF-0411, 20/08) : le contrôle existait dans
 // `ledger.mjs verify` et n'était joué nulle part. Trois états à prouver — dont le fail-fast :
 // un vérificateur qui s'arrête au premier écart a laissé un second défaut invisible trois
@@ -976,7 +1011,7 @@ check("TF-0793 : R-47 compte un artefact conditionnel trouvé SOUS la racine web
   } finally { rmSync(avec, { recursive: true, force: true }); rmSync(sans, { recursive: true, force: true }); }
 });
 
-for (const d of [verte, rouge, rougeDocs, rougeLock, rougeR24, ecartR24, rougeR2, verteR2, rougeR19, verteR19, rougeR42, verteR42, partielR42, collisionR42, proseR42, nueR42, verteTdp, rougeTdp, rougeTdpNu, rougeTdpNature, verteTdpNature, rougeTdpSection, antTdpSection, rougeCop, antCop]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+for (const d of [verte, rouge, rougeDocs, rougeLock, rougeR24, ecartR24, rougeR2, verteR2, rougeR19, verteR19, rougeR42, verteR42, partielR42, collisionR42, proseR42, nueR42, queueR19, malformeeR19, malformeeNueR19, verteTdp, rougeTdp, rougeTdpNu, rougeTdpNature, verteTdpNature, rougeTdpSection, antTdpSection, rougeCop, antCop]) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 // TF-0541 (24/08) — un ledger ecrit AILLEURS etait indiscernable d'un run jamais ouvert. Le
 // produit ecrivait dans `runs\\<run>\\ledger.jsonl` et l'oracle rendait SANS_OBJET : un run REEL
 // passait pour inexistant. Les deux sens se jouent sur le meme projet, seule la place du fichier

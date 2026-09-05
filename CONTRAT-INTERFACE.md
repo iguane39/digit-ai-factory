@@ -173,7 +173,12 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
   `digit-ai-forge-*` depuis son renommage, table : `references\CORRESPONDANCE-RENOMMAGE-FACTORY.md`)
   et `digit-ai-forge-<forge>` pour les 13 forges — mesuré sur pièces : Produit-01
   portait 5 clés en noms courts et Produit-10 14 clés complètes, les deux PASS, aucun diff
-  machine calculable entre deux runs. Une clé courte est un écart R-19.
+  machine calculable entre deux runs. Une clé courte est un écart R-19. **Seconde exception nommée
+  (TF-0801, 05/09/2026)** : `digit-ai-queue`, la file de tickets déclarée au parc par `bootstrap.mjs`
+  sous ce nom — ce n'est pas une forge, son nom réel est le seul consignable. **Une clé malformée se
+  rectifie PAR AJOUT** comme un champ absent (TF-0709) : `{type: "rectification_versions_forges",
+  seq_vise: <seq du run_open>, cause: "…"}` ; R-19 l'imprime `[RECTIFIÉ]`, l'entrée ne se réécrit
+  jamais (R-42).
   **Diff de doctrine à l'ouverture (TF-0320)** : sur un run de version, jouer
   `git -C <pilot> diff --stat <sha versions_forges du run_precedent> -- REGLES-PROJET.md
   gabarits references` et porter le relevé au ledger (`type: oracles_verdict`,

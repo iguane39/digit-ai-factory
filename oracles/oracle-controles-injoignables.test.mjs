@@ -156,6 +156,39 @@ try {
     att(regle(r, "CI3").statut === "PASS", "un oracle sans dépendance externe est accusé alors qu'il l'a DIT");
   });
 
+  // ---- CI5 : être DÉCLARÉ n'est pas être RENDU (TF-0795, 05/09) ----------------------------
+  //
+  // Le cas réel : deux contrôles Python d'un produit déclaraient « exit 0/1 » en en-tête et
+  // n'avaient aucun sys.exit — CI3 PASS, aucun sens rouge. La règle lit la SOURCE, pas l'en-tête.
+  check("CI5 rouge — un contrôle qui DÉCLARE ses codes mais n'a AUCUNE sortie non nulle est REFUSÉ, et nommé", () => {
+    const r = juger(depot({
+      "build/stats/check-ecarts.py": "# Exit : 0 = OK · 1 = ecart. \nimport json\nd = json.load(open('x.json'))\nprint('ecarts', len(d))\n",
+      "p.json": "build/stats/check-ecarts.py",
+    }));
+    att(regle(r, "CI3").statut !== "FAIL", "CI3 devrait tenir : les codes SONT déclarés — c'est CI5 qui juge l'existence");
+    att(regle(r, "CI5").statut === "FAIL", "un contrôle sans chemin d'échec passe pour conforme : il rassure au lieu de juger");
+    att(/check-ecarts\.py/.test(regle(r, "CI5").message || ""), "le contrôle sans chemin d'échec n'est pas NOMMÉ");
+  });
+
+  check("CI5 vert — une sortie non nulle sous condition, en Python comme en Node, suffit", () => {
+    const r = juger(depot({
+      "build/stats/check-ht-ttc.py": "import sys\nko = 1\nsys.exit(1 if ko else 0)\n",
+      "oracles/oracle-net.mjs": "// exit 0/1\nconst echecs = 2;\nprocess.exit(echecs ? 1 : 0);\n",
+      "p.json": "build/stats/check-ht-ttc.py oracles/oracle-net.mjs",
+    }));
+    att(regle(r, "CI5").statut === "PASS", `un chemin d'échec écrit est accusé : ${regle(r, "CI5").message}`);
+  });
+
+  check("CI5 BORNE — un exit non nul cité seulement en COMMENTAIRE ne compte pas ; exitCode compte", () => {
+    const r = juger(depot({
+      "oracles/oracle-commente.mjs": "// on devrait faire process.exit(1) un jour\nconsole.log('ok');\n",
+      "oracles/oracle-code.mjs": "// exit 0/1\nprocess.exitCode = defauts.length ? 1 : 0;\n",
+      "p.json": "oracles/oracle-commente.mjs oracles/oracle-code.mjs",
+    }));
+    att(regle(r, "CI5").statut === "FAIL" && /oracle-commente/.test(regle(r, "CI5").message || ""), "un exit en commentaire a été compté comme un chemin d'échec");
+    att(!/oracle-code/.test(regle(r, "CI5").message || ""), "process.exitCode = … n'est pas reconnu comme chemin d'échec");
+  });
+
   // ---- CI4 : être CITÉ n'est pas être JOUÉ (TF-0679) -------------------------------------
   //
   // Deux scripts d'audit portaient TROIS défauts dormants : ils pilotaient un panneau retiré de
