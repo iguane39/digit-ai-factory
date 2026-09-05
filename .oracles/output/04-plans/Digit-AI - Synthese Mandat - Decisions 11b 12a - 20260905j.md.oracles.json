@@ -1,0 +1,79 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md",
+  "date_iso": "2026-09-05T14:52:47.316Z",
+  "registre_version": "2.16.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md",
+      "verdict": "PASS",
+      "detail": "aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md",
+      "verdict": "PASS",
+      "detail": "0 total(aux) de colonne vérifié(s) par re-somme + 0 effectif(s) annoncé(s) rapproché(s) de leur cardinal réel + 1/1 mesure(s) publiée(s) portant leur dénominateur et leurs unités, 0 écart"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md",
+      "verdict": "PASS",
+      "detail": "nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md",
+    "ts": "2026-09-05T14:52:47.315Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md": "fa315bbe56dd9858163b586fc4a0a9667fa4b0fed74b0ec99a565e5723951583"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}
