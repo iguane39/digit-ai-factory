@@ -4,7 +4,7 @@ destinataire: humain
 
 # Synthèse de mandat — point d'étape du second « fais tous les A » : le pilot a fini sa part, les quatre forges travaillent (05/09/2026)
 
-Votre second mandat portait sur les actions restantes de la synthèse précédente. Côté pilot, c'est fait : la candidature sur les gardes lexicales est décidée, instruite et publiée, avec la preuve avant et après. Côté forges, quatre agents ont été lancés en parallèle, un par forge, chacun avec le lot déposé ce matin comme cahier des charges, l'obligation de jouer les oracles de sa forge et de remettre son compte rendu dans la boîte d'entrée du pilot ; ils travaillent encore au moment où ce point d'étape est rendu. Côté produit 02, rien n'a été écrit : sa session est vivante (son journal a bougé il y a dix minutes, cent six fichiers y sont en cours), et écrire dans un journal où quelqu'un écrit est exactement ce qui a produit la collision de ce matin. Ce qui change pour vous : le pilot n'a plus de reste propre. Ce qui est attendu de vous : rien maintenant ; le tour suivant, déclenché par l'arrivée des comptes rendus, clôturera les items des forges et vous dira ce qu'elles ont fait.
+Votre second mandat portait sur les actions restantes de la synthèse précédente. Côté pilot, c'est fait : la candidature sur les gardes lexicales est décidée, instruite et publiée, avec la preuve avant et après. Côté forges, quatre agents ont été lancés en parallèle, un par forge, chacun avec le lot déposé ce matin comme cahier des charges, l'obligation de jouer les oracles de sa forge et de remettre son compte rendu dans la boîte d'entrée du pilot ; le premier, celui de la forge de développement, a rendu son compte rendu : son travail est jugé conforme, ingéré et l'item est clos ; les trois autres travaillent encore au moment où ce point d'étape est rendu. Un défaut du pilot a été vu en passant : l'ingestion a caché le nom de la forge derrière un pseudonyme de produit, ce qu'une forge, publique, n'appelle pas — consigné en candidat. Côté produit 02, rien n'a été écrit : sa session est vivante (son journal a bougé il y a dix minutes, cent six fichiers y sont en cours), et écrire dans un journal où quelqu'un écrit est exactement ce qui a produit la collision de ce matin. Ce qui change pour vous : le pilot n'a plus de reste propre. Ce qui est attendu de vous : rien maintenant ; le tour suivant, déclenché par l'arrivée des comptes rendus, clôturera les items des forges et vous dira ce qu'elles ont fait.
 
 ## 1. En-tête d'identification
 
@@ -15,7 +15,7 @@ Votre second mandat portait sur les actions restantes de la synthèse précéden
 
 ## 2. Verdict en une ligne
 
-TF-0805 **corrigé** et publié (self-test de l'oracle de restitution 13 → 14, preuve avant/après sur fixture réelle) ; 4 agents en cours chez forge-design, forge-development, forge-conception, forge-tests ; produit 02 **non touché** (session vivante mesurée) ; banc 92/93 (défaut restant : les compétences installées divergent de sources que les forges sont en train de modifier).
+TF-0805 **corrigé** et publié (self-test de l'oracle de restitution 13 → 14, preuve avant/après sur fixture réelle) ; TF-0798 **corrigé** chez forge-development (tests 385 → 400, gate double sens, lot de retours PASS et ingéré, 1 récidive TF-0806 et 1 candidat TF-0807) ; 3 agents en cours chez forge-design, forge-conception, forge-tests ; produit 02 **non touché** (session vivante mesurée) ; banc 92/93 (défaut restant : les compétences installées divergent de sources que les forges sont en train de modifier).
 
 ## 3. Décisions attendues
 
@@ -27,13 +27,18 @@ Rien n'attend de décision à ce point d'étape ; D-7 reste ouverte avec son opt
   - preuve : `oracles\oracle-synthese.mjs --self-test` : 14/14 PASS ; script de preuve lu en UTF-8 : « avant : false | après : true » sur la ligne de fixture, « mesuré » idem ; non-régression : la synthèse 20260905e rend PASS avant et après ; événements `decide` puis `corrige` journalisés (PASS) ; commit `6e92bd8` poussé.
 - **Quatre agents lancés en parallèle**, un par forge, avec le lot déposé ce matin comme cahier des charges et des règles fermées : écrire seulement dans leur forge et dans la boîte d'entrée du pilot, jouer tous les oracles de la forge, recette double sens par règle nouvelle, commit local sans publication, compte rendu au gabarit des lots de retours jugé par l'oracle du pilot.
   - preuve : quatre agents actifs (identifiants internes au harnais) ; une garde attend les quatre fichiers `<forge> - RETOURS - 20260905a.md` dans `input\00-retours\` du pilot (0 arrivé à 14:05).
+- **A-21 — TF-0798 clos chez forge-development** — classe : un statique servi nu que le gabarit de projet propage à chaque instanciation ; contrôle rouge → vert : tests de la forge 385 → 400, double sens joué sur un projet instancié (statiques nus → exit 1 avec quatre constats nommés ; versionnés avec `Cache-Control` → exit 0). L'agent a ajouté la huitième discipline de production au manuel de run, un gate « static-cache » à trois classes de constat avec 15 cas, et un quatrième contrôle après déploiement ; il a choisi `?v=<version>` par défaut, empreinte acceptée à égalité, et dit pourquoi. Non fait, déclaré : pas de question dans le gabarit externe non forké, gate non câblé en intégration continue (vert décoratif), `curl` sur instance neuve (aucune servie).
+  - preuve : commit local `00097b6` de la forge (non publié) ; lot `digit-ai-forge-development - RETOURS - 20260905a.md` jugé PASS par `gabarits\oracle-lot-retours.mjs`, ingéré (1 candidature TF-0806, récidive de la classe close par TF-0732 chez forge-agents) ; événement `corrige` TF-0798 journalisé (PASS).
+- **Un défaut du pilot vu en passant et consigné** : l'ingestion d'un lot remis par une forge la pseudonymise comme un produit client et l'inscrit à la table hors dépôt ; une forge est publique.
+  - preuve : sortie de l'ingestion « produit du lot → Produit-60, 1 nom substitué » ; candidature TF-0807 (candidat, score complet) ; la table hors dépôt porte l'entrée parasite, laissée en place jusqu'à décision pour ne pas rendre le registre illisible.
 - **La session vivante du produit 02 mesurée avant de ne pas y écrire**.
   - preuve : journal du produit modifié à 13:50:59 (seq 119 non commise), 106 fichiers en cours à 14:00 ; dernier commit du produit à 10:05.
 
 ## 5. Non traité — avec son motif
 
 - **A-25 et A-19 (journal et contrôles du produit 02)** : *garde-fou* — une session y écrit ; le pilot n'écrit pas dans un journal où quelqu'un écrit (collision de ce matin, TF-0794) ; à rejouer quand le produit est au repos, ou par sa propre session.
-- **A-20 à A-23** : *en cours* — les agents n'ont pas encore remis leur compte rendu ; leurs commits locaux et leurs lots seront lus, jugés et clos au tour suivant.
+- **A-20, A-22, A-23** : *en cours* — trois agents n'ont pas encore remis leur compte rendu ; leurs commits locaux et leurs lots seront lus, jugés et clos au tour suivant.
+- **TF-0806 (récidive chez forge-agents) et TF-0807 (ingestion d'un lot de forge)** : *tout entre en candidat* — décision humaine.
 - **A-6 (l'autre poste)** : *impossible à prouver ici* — inchangé.
 - **A-17 (nom du dépôt de file)** : *dépendance à une décision humaine* — D-7 non tranchée.
 - **Les compétences installées** (oracle des skills rouge au banc) : *en cours* — les forges modifient leurs sources ; le remède d'application se rejoue quand elles ont fini.
@@ -62,7 +67,7 @@ Ordre de traitement : d'abord la lecture des quatre comptes rendus, parce qu'ils
 
 | # | Identifiant | Action | Acteur | Motif / raison | Si elle n'est pas faite |
 |---|---|---|---|---|---|
-| A-26 | TF-0796, TF-0797, TF-0800, TF-0798, TF-0799, TF-0804, TF-0803 | Lire les quatre comptes rendus dès leur arrivée, juger chaque lot (`gabarits\oracle-lot-retours.mjs`), ingérer les constats nouveaux, clore au registre les items faits avec leurs gains, renvoyer un agent sur ce qui ne l'est pas. | `auto_ia` | `dependance_externe` — les agents n'ont pas fini (garde armée sur la boîte d'entrée). | Sept items décidés restent ouverts alors que le travail est fait chez les forges. |
+| A-26 | TF-0796, TF-0797, TF-0800, TF-0799, TF-0804, TF-0803 | Lire les trois comptes rendus restants dès leur arrivée, juger chaque lot (`gabarits\oracle-lot-retours.mjs`), ingérer les constats nouveaux, clore au registre les items faits avec leurs gains, renvoyer un agent sur ce qui ne l'est pas. | `auto_ia` | `dependance_externe` — les agents n'ont pas fini (garde armée sur la boîte d'entrée). | Sept items décidés restent ouverts alors que le travail est fait chez les forges. |
 | A-27 | `neuve` | Rejouer `node oracles\oracle-skills.mjs --racine "C:\dev"` puis `--appliquer` si les seules divergences sont des sources modifiées par les forges ce jour, et relire K2. | `auto_ia` | `dependance_externe` — les sources bougent tant que les agents travaillent. | Les compétences installées jugent avec des règles d'avant les chantiers du jour. |
 | A-25 | TF-0794 | Quand le journal du produit 02 est inchangé depuis plus d'une heure : relire sa queue, ajouter l'entrée de rectification de la seq 118 en un seul append, rejouer R-42 jusqu'à PASS. | `auto_ia` | `garde_fou` — une session vit chez le produit (journal modifié à 13:50:59, 106 fichiers en cours à 14:00) ; écrire pendant qu'elle écrit reproduit la collision du matin. | Le produit garde un R-42 rouge. |
 | A-19 | TF-0795 | Depuis le produit 02 : relire et commettre les deux contrôles statistiques et leurs recettes déposés par le pilot. | `manuelle_utilisateur` | `irreversible` — entrer dans l'historique d'un produit est un geste dont il est seul auteur ; trace mesurée : quatre fichiers modifiés parmi les 106 en cours. | Un nettoyage efface les chemins d'échec prouvés. |
@@ -71,7 +76,8 @@ Ordre de traitement : d'abord la lecture des quatre comptes rendus, parce qu'ils
 
 ## 9. Traces
 
-- Pilot : commit `6e92bd8` (TF-0805, `oracles\oracle-synthese.mjs`, `oracles\baseline-recettes.json`), poussé ; ce point d'étape part dans le commit suivant.
+- Pilot : commits `6e92bd8` (TF-0805, `oracles\oracle-synthese.mjs`, `oracles\baseline-recettes.json`) et `5a57f21` (TF-0798 clos, lot de forge-development ingéré, TF-0806, TF-0807), poussés ; ce point d'étape part dans le commit suivant.
+- Forge-development : commit local `00097b6` (`docs\run-playbook.md`, `conductor\gates\static_cache_gate.py`, `tests\test_static_cache_gate.py`, `contracts.py`), non publié ; lot de travaux marqué traité.
 - Preuve : `scratchpad\preuve-tf0805.mjs` (fixture `accent-final.md` du self-test, lue en UTF-8).
 - Registre : `todo\TODO.jsonl` — TF-0805 décidé puis corrigé ; vues `todo\TODO.md`, `todo\AVANCEMENT.md` (15 ouverts, 9 fermés).
 - Forges : lots déposés ce matin (`input\00-travaux\pilot - TRAVAUX - 20260905a.md` chez trois forges, `input\00-retours\digit-ai-factory - RETOURS - 20260905a.md` chez forge-tests) ; comptes rendus attendus dans `input\00-retours\` du pilot.
