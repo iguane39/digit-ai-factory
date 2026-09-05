@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=fdaee3e143c3 archive=d3c801ad4540 · dernier événement: 2026-09-05T14:12:58.165Z -->
+     sceaux: actifs=0c01d9916545 archive=d3c801ad4540 · dernier événement: 2026-09-05T14:14:13.610Z -->
 
-**35 actifs** (candidat 5 · décidé 6 · en cours 1 · corrigé 23 · écarté 0) · **782 archivés**.
+**36 actifs** (candidat 6 · décidé 6 · en cours 1 · corrigé 23 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -24,6 +24,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0817 | candidat | 5 | digit-ai-forge-agents : l'historique du depot porte 200 constats de la porte de publication (1 message, 199 contenus de fichiers anciens — fiches et fixtures d'experts, manifest des oracles) — reecrire l'histoire selon le mode operatoire du pilot (TF-0752), puis push force | **oui** — 200 constats bloquants de la porte sur un depot public qui porte les skills installes chez tous les produits ; chaque publication de cette forge contredit la regle « porte verte avant push » tant que l'histoire n'est pas reecrite |
 | TF-0815 | candidat | 1 | digit-ai-forge-agents : le partage au delta identifie un constat par une ligne tronquee a deux raisons, donc au troisieme constat du meme oracle le gate d ecriture s ouvre sur du travail neuf | **oui** — Mesure du 05/09/2026 : deux notes Markdown identiques a un chapitre pres — l'une avec deux chapitres ouverts sur un tableau nu, l'autre avec trois — passees a run-oracles.mjs --profil digit-ai --niveau note. Les deux lignes rendues sont identiques mot pour mot, seul le nom de fichier differe : « [Lisibilite d'un document (Markdown)] <fichier> — M7 chapitre sans ouverture : « Chapitre A » (ligne 5) ... ; M7 chapitre sans ouverture : « Chapitre B » (ligne 11) ... ». Le troisieme chapitre fautif n'apparait dans aucune des deux. Apres normalisation du chemin (correction de TF-0806, commit 966402a), ces deux lignes produisent la meme cle : un fichier dont HEAD porte deja deux constats du meme oracle et dont l'edition en ajoute un troisieme obtient « 0 neuf » et l'ecriture est acceptee. |
 | TF-0816 | candidat | 1 | digit-ai-forge-agents : le delta du gate d ecriture se rend silencieusement non calculable quand la cible est un chemin relatif, et le repli n est pas declare | **oui** — Mesure du 05/09/2026, meme fichier et meme edition que la reproduction de TF-0806 (run/rapport-jouet.md du depot de la forge, dont HEAD porte un constat M7, edition d'une phrase sans rapport en fin de fichier). Avec un file_path ABSOLU : delta=true, 1 neuf, 1 preexistant. Avec le meme file_path RELATIF (« run/rapport-jouet.md ») : delta=false, 2 neufs, 0 preexistant, et le verdict bloquant ne mentionne nulle part que le delta n'a pas ete calcule. Trace obtenue en instrumentant temporairement le hook (ligne de trace retiree avant commit). |
 | TF-0789 | corrige | 8 | digit-ai-schemas : l exemple de reference du skill deborde a 390 px (16 constats v1_overflow, tableaux et blocs de code larges) et n a pas de verdict de lecture par un tiers (T1/T2 du 02/09 non traites) — un exemple de reference qui ne tient pas ses propres regles enseigne le defaut | **oui** — render_page.py --widths 390 sur l exemple de reference : 16 constats v1_overflow, mesures le 03/09 avant et apres TF-0784 ; oracle-lecture-tiers du 02/09 : T1 + T2 en defaut sur la meme page |
