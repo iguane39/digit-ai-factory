@@ -27,8 +27,8 @@
   "vu_le": "2026-08-26"
  },
  "gabarits/oracle-travaux-pilot.test.mjs": {
-  "cas": 14,
-  "vu_le": "2026-08-26"
+  "cas": 18,
+  "vu_le": "2026-09-05"
  },
  "hook-lexique.mjs": {
   "cas": 7,

@@ -49,6 +49,14 @@
  *      un produit ne sait pas si le silence sur un sujet vaut accord ou oubli (loi n° 3).
  * T5 · l'ordre recommandé est **justifié**. Une liste non ordonnée se lit dans l'ordre où elle a
  *      été écrite, pas dans celui qui sert — même règle que S6 sur les restitutions.
+ * T6 · tout MODULE PRODUCTEUR nommé a été LU (TF-0819, 05/09/2026). Quand « ce qui est demandé »
+ *      dit qu'un artefact est « transcrit / produit / écrit / dérivé / généré / porté par
+ *      `<module>` », le lot porte une ligne « **Module producteur lu** : `<module>` … » qui cite
+ *      la source lue (un chemin, un SKILL.md, un en-tête). Le fait payé : le lot 20260905b
+ *      attribuait à `derive-les-vues` l'écriture d'un champ que ce verbe ne produit jamais ; la
+ *      forge a dû répartir le travail elle-même, et l'écart n'avait aucune classe où entrer.
+ *      *Nommer un producteur sans l'avoir lu, c'est confier une tâche à quelqu'un qui n'existe
+ *      pas.* T6 exige la lecture DÉCLARÉE, pas sa justesse (même borne que T1).
  *
  * NON JUGÉ, et c'est délibéré :
  *   · la JUSTESSE de ce qui est demandé — un contrôle de forme ne juge pas un fond, et un
@@ -64,7 +72,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { basename } from "node:path";
 
-export const VERSION = "1.0.0";
+export const VERSION = "1.1.0";
 
 const SECTION_TRAVAUX = /^##\s+Travaux\s+confi[ée]s\s*$/im;
 const SECTION_DEJA_FAIT = /^##\s+Ce\s+que\s+le\s+pilot\s+a\s+d[ée]j[àa]\s+fait\s+de\s+son\s+c[ôo]t[ée]\s*$/im;
@@ -80,6 +88,10 @@ const ORDRE_JUSTIFIE = /(parce\s+qu|car\b|d['’]abord|priorit|impact|risque|d[�
 //: Les déclarations d'absence : une section vide se DIT, elle ne se devine pas (loi n° 3).
 const AUCUN_DEJA_FAIT = /rien\s+n['’]a\s+[ée]t[ée]\s+corrig[ée]\s+au\s+pilot|aucun\s+travail\s+pr[ée]alable/i;
 const AUCUNE_BORNE = /aucune\s+borne|rien\s+n['’]est\s+[ée]cart[ée]\s+de\s+ce\s+lot/i;
+//: T6 — un module PRODUCTEUR nommé dans « ce qui est demandé » : « transcrit … par `x` », « produit par `x` »…
+const PRODUCTEUR_NOMME = /(?:transcri|produi|[ée]cri|d[ée]riv|g[ée]n[ée]r|port|r[ée]g[ée]n[ée]r)[a-zéèê]*\s+(?:[^`\n]{0,60}?\s)?par\s+`([^`\n]+)`/gi;
+//: T6 — la lecture déclarée du producteur : « **Module producteur lu** : `x` … » (une ligne par module).
+const LECTURE_PRODUCTEUR = /module\s+producteur\s+lu[^\n]*?`([^`\n]+)`/gi;
 
 /** Le corps d'un élément : du sous-titre au sous-titre suivant, ou à la section suivante. */
 function corpsDesElements(texte) {
@@ -180,6 +192,28 @@ export function verifier(cheminOuTexte, nomFichier) {
     }
   } else {
     ok("T5", "un seul travail confié (ou aucun) — aucun ordre à justifier");
+  }
+
+  // ---- T6 : tout module producteur nommé a été lu (TF-0819) --------------------------------
+  const lus = new Set();
+  LECTURE_PRODUCTEUR.lastIndex = 0;
+  for (let l; (l = LECTURE_PRODUCTEUR.exec(texte)) !== null;) lus.add(l[1].trim().toLowerCase());
+  const nonLus = [];
+  for (const e of elements) {
+    PRODUCTEUR_NOMME.lastIndex = 0;
+    for (let p; (p = PRODUCTEUR_NOMME.exec(e.corps)) !== null;) {
+      const module = p[1].trim();
+      if (!lus.has(module.toLowerCase())) nonLus.push(`${e.id} → \`${module}\``);
+    }
+  }
+  const nonLusUniques = [...new Set(nonLus)];
+  if (nonLusUniques.length) {
+    ko("T6", `${nonLusUniques.length} module(s) producteur(s) nommé(s) sans lecture déclarée (${nonLusUniques.join(", ")}) — `
+      + "nommer un producteur sans l'avoir lu, c'est confier une tâche à quelqu'un qui n'existe peut-être pas (lot 20260905b : un verbe chargé d'un champ qu'il ne produit jamais)",
+      "ajouter, par module, une ligne « - **Module producteur lu** : `<module>` produit <artefact> (source : <chemin ou SKILL.md lu>) »");
+  } else {
+    ok("T6", elements.length && lus.size ? `${lus.size} module(s) producteur(s) nommé(s), chacun lu et sa source citée`
+      : "aucun module producteur nommé — rien à lire");
   }
 
   return { fichier: nom, version: VERSION, constats,

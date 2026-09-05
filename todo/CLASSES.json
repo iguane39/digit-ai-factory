@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.1.0",
+ "version": "1.2.0",
  "date": "2026-09-05",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -521,6 +521,49 @@
    "oracle": "gabarits/oracle-travaux-pilot.mjs — regle a ajouter (T6 : tout module producteur nomme existe et produit l artefact cite) ; candidature TF-0819",
    "voisines": [
     "correction-symptome-sans-classe"
+   ]
+  },
+  {
+   "cle": "champ-transcrit-de-prose-sans-correspondance",
+   "famille": "regle-morte",
+   "libelle": "Un champ machine déclaré « transcrit d'une décision écrite en prose » dont aucun contrôle ne vérifie qu'il en vient : l'oracle prouve que l'écart est écrit, jamais qu'il a été décidé — un écart écrit directement dans le JSON passe et personne ne l'a pris",
+   "creee_le": "2026-09-05",
+   "fondee_par": [
+    "TF-0822"
+   ],
+   "regle": "tout document en prose dont un champ machine est transcrit est un artefact JUGÉ (existence, forme) et une règle de correspondance vérifie que chaque entrée du champ existe dans la prose (forge-conception : EXIGENCES.md section 7, SURFACE.md section 3)",
+   "oracle": "forge-conception — oracle à créer (existence et forme d'EXIGENCES.md, correspondance prose ↔ champ) ; candidature TF-0822",
+   "voisines": [
+    "sceau-de-vue-provenance-sans-contenu"
+   ]
+  },
+  {
+   "cle": "fixture-jugee-par-son-seul-oracle",
+   "famille": "skill-ou-oracle-non-invoque",
+   "libelle": "Une fixture de recette dont le verdict n'est jugé que par l'oracle qu'elle sert : une règle neuve sur un oracle partagé fait basculer les verdicts des autres fixtures en silence, et seul un balayage manuel le voit",
+   "creee_le": "2026-09-05",
+   "fondee_par": [
+    "TF-0823"
+   ],
+   "regle": "le self-test publie la matrice des verdicts fixture × oracle et la compare à une matrice attendue versionnée ; un verdict qui change sans mise à jour de la matrice est un échec de recette",
+   "oracle": "forge-conception oracles/self-test.mjs (matrice à ajouter) ; candidature TF-0823 — patron transposable à toute forge à fixtures partagées",
+   "voisines": [
+    "recette-verdict-non-prononcable"
+   ]
+  },
+  {
+   "cle": "contrat-de-sortie-sans-domicile",
+   "famille": "contrat-interface-forge",
+   "libelle": "Le format de ce qu'un outil partagé REND (lanceur d'oracles, hook, script hérité) n'est écrit nulle part ni versionné : il change sans qu'un lecteur ait quoi surveiller, et le changement ne se déclare que par un lot de retours",
+   "creee_le": "2026-09-05",
+   "fondee_par": [
+    "TF-0824"
+   ],
+   "regle": "tout outil hérité par d'autres dépôts porte un contrat de SORTIE écrit et versionné à côté de son contrat d'entrée (forge-agents : references/regles-oracles.md pour run-oracles.mjs) ; un changement du contrat incrémente la version et se lit dans le registre",
+   "oracle": "forge-agents — recette de quality-oracles (contrat de sortie à documenter et à éprouver) ; candidature TF-0824",
+   "voisines": [
+    "recette-verdict-non-prononcable",
+    "auteur-juge-son-contrat"
    ]
   }
  ]
