@@ -40,6 +40,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Decisions 1a 2a 3b 4a synchronisation - 20260903e.md` | fichier | 16,1 Ko | Synthèse de mandat — exécution des décisions 1a, 2a, 3b et 4a de la synchronisation (03/09 |
 | `Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md` | fichier | 25,9 Ko | Synthèse de mandat — vos trois décisions du matin exécutées : l'historique du pilot réécri |
 | `Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md` | fichier | 15,2 Ko | Synthèse de mandat — l'étude d'opportunité conclut de ne rien construire, et signale une f |
+| `Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md` | fichier | 19,1 Ko | Synthèse de mandat — second « fais tous les A » achevé : les sept items de forges sont clo |
 | `Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md` | fichier | 17,7 Ko | Synthèse de mandat — forme par défaut du bloc 3, et redescente de la doctrine aux produits |
 | `Digit-AI - Synthese Mandat - Heritage a l ouverture et localisateurs - 20260830g.md` | fichier | 16,0 Ko | Synthèse de mandat — le contrôle d'héritage joué à chaque ouverture, et la fin d'un faux r |
 | `Digit-AI - Synthese Mandat - Identifiants exposes verification - 20260830i.md` | fichier | 16,4 Ko | Synthèse de mandat — ce qu'ouvrent réellement les onze porteurs de secrets du poste (30/08 |
@@ -82,4 +83,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Verification de non perte jouable - 20260901d.md` | fichier | 9,0 Ko | Synthèse de mandat — le tri reste éteint, et sa vérification cesse d'être une intention |
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 
-_65 fichier(s), 0 sous-dossier(s)_
+_66 fichier(s), 0 sous-dossier(s)_
