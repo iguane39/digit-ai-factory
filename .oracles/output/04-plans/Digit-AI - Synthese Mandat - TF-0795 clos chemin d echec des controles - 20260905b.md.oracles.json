@@ -1,0 +1,79 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md",
+  "date_iso": "2026-09-05T07:54:39.933Z",
+  "registre_version": "2.16.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md",
+      "verdict": "PASS",
+      "detail": "aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md",
+      "verdict": "PASS",
+      "detail": "nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md",
+    "ts": "2026-09-05T07:54:39.933Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md": "cbc653408bdac2b319f3c8a49fbbf6313ff84db5f36c0c21262a6ae1d436b983"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

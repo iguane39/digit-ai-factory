@@ -62,6 +62,9 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md` | fichier | 13,2 Ko | Digit-AI — Synthèse de mandat — Synchronisation GitHub — 20260822a |
 | `Digit-AI - Synthese Mandat - Synchronisation GitHub et reconstruction du clone - 20260903d.md` | fichier | 25,2 Ko | Synthèse de mandat — synchronisation de la factory et des forges avec GitHub (03/09/2026) |
 | `Digit-AI - Synthese Mandat - TF-0794 clos rectification de seq - 20260905a.md` | fichier | 12,3 Ko | Synthèse de mandat — deuxième chantier pilot clos : la rectification d'une collision de se |
+| `Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md` | fichier | 9,0 Ko | Synthèse de mandat — troisième chantier pilot clos : un contrôle qui déclare ses codes doi |
+| `Digit-AI - Synthese Mandat - TF-0801 clos cle de versions et file d attente - 20260905c.md` | fichier | 10,0 Ko | Synthèse de mandat — quatrième chantier pilot clos : une clé de versions malformée a une v |
+| `Digit-AI - Synthese Mandat - TF-0802 clos la 404 d office et fin du tri - 20260905d.md` | fichier | 12,3 Ko | Synthèse de mandat — cinquième chantier pilot clos : la 404 devient un standard d'office,  |
 | `Digit-AI - Synthese Mandat - Toute la todo avec le a - 20260815a.md` | fichier | 5,5 Ko | Synthèse de mandat — « fais toute la todo avec le a » (21 items, 4 campagnes, 1 circuit) |
 | `Digit-AI - Synthese Mandat - Traite les todo et retours - 20260815a.md` | fichier | 4,4 Ko | Synthèse de mandat — « traite les todo et retours » (14 items, 3 campagnes) |
 | `Digit-AI - Synthese Mandat - Traite les todos a faire - 20260817a.md` | fichier | 6,1 Ko | Synthèse de mandat — « traite les TODOs à faire » (8 items, 4 campagnes + doctrine) |
@@ -77,4 +80,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Verification de non perte jouable - 20260901d.md` | fichier | 9,0 Ko | Synthèse de mandat — le tri reste éteint, et sa vérification cesse d'être une intention |
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 
-_60 fichier(s), 0 sous-dossier(s)_
+_63 fichier(s), 0 sous-dossier(s)_
