@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau 88c92b6e362a)]
+sources_de_verite: [todo/TODO.jsonl (sceau de8c306234c6)]
 verifie_le: 2026-09-05
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `88c92b6e362a`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `de8c306234c6`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -19,10 +19,10 @@ les corrections donnerait l'illusion d'un progrès net.
 
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
-| Ouverts | 13 | candidats, décidés ou en cours — le reste à faire réel |
+| Ouverts | 15 | candidats, décidés ou en cours — le reste à faire réel |
 | Clos sur gains constatés | 8 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 0 | décidés non faits, motif écrit — jamais un silence |
-| Total suivi | 21 | tout ce que le registre a jamais porté |
+| Total suivi | 23 | tout ce que le registre a jamais porté |
 
 ## Ce qui reste ouvert, par forge
 
@@ -98,6 +98,24 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | Id | Titre | Statut | Forge(s) | Score |
 |---|---|---|---|---|
 | TF-0799 | forge-conception : remplacer les frontieres \b ASCII des gardes lexicales par des frontieres Unicode - E8 lit  | decide | forge-conception | 1 |
+
+### digit-ai-forge-tests — 1 item(s)
+
+Les items ouverts ciblant digit-ai-forge-tests, du score le plus fort au plus faible. Le score est
+celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
+
+| Id | Titre | Statut | Forge(s) | Score |
+|---|---|---|---|---|
+| TF-0803 | forge-tests : un controle executable generique de la 404 (adresse inconnue par langue, prefixe respecte, non-H | candidat | digit-ai-forge-tests | 6 |
+
+### digit-ai-forge-conception — 1 item(s)
+
+Les items ouverts ciblant digit-ai-forge-conception, du score le plus fort au plus faible. Le score est
+celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
+
+| Id | Titre | Statut | Forge(s) | Score |
+|---|---|---|---|---|
+| TF-0804 | forge-conception : la 404 par langue entre dans la surface implicite proposee d'office par enumere-la-surface  | decide | digit-ai-forge-conception | 6 |
 
 ## Ce que ce rapport ne dit pas
 

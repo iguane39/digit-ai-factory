@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=88c92b6e362a archive=d3c801ad4540 · dernier événement: 2026-09-05T07:51:40.882Z -->
+     sceaux: actifs=de8c306234c6 archive=d3c801ad4540 · dernier événement: 2026-09-05T08:09:20.892Z -->
 
-**21 actifs** (candidat 1 · décidé 11 · en cours 1 · corrigé 8 · écarté 0) · **782 archivés**.
+**23 actifs** (candidat 2 · décidé 12 · en cours 1 · corrigé 8 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -22,11 +22,23 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-0789 | corrige | 8 | digit-ai-schemas : l exemple de reference du skill deborde a 390 px (16 constats v1_overflow, tableaux et blocs de code larges) et n a pas de verdict de lecture par un tiers (T1/T2 du 02/09 non traites) — un exemple de reference qui ne tient pas ses propres regles enseigne le defaut | **oui** — render_page.py --widths 390 sur l exemple de reference : 16 constats v1_overflow, mesures le 03/09 avant et apres TF-0784 ; oracle-lecture-tiers du 02/09 : T1 + T2 en defaut sur la meme page |
 
+## digit-ai-forge-conception
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0804 | decide | 6 | forge-conception : la 404 par langue entre dans la surface implicite proposee d'office par enumere-la-surface (loi transverse n 3), avec ses cinq exigences comme criteres d'acceptation candidats | **oui** — meme fait que TF-0802 : 404 nue en production une semaine, vue par l'exploitant et par aucune revue |
+
 ## digit-ai-forge-observability
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0790 | corrige | 6 | forge-observability : surveiller le tableau de bord des récidives ENTRE les runs — une récidive ou une classe de plus par rapport au relevé précédent est une dérive | **oui** — 50 récidives déclarées en prose sur 788 items (6 %), 1 → 11 → 15 → 19 par semaine du 03/08 au 30/08 ; trois récidives en quatre jours sur un seul projet (TF-0757) ; aucun compteur ne les voyait avant le 03/09 |
+
+## digit-ai-forge-tests
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0803 | candidat | 6 | forge-tests : un controle executable generique de la 404 (adresse inconnue par langue, prefixe respecte, non-HTML nu, statut 404 conserve, noindex), consommable comme preuve du controle M-9 de la MEP | **oui** — un site multilingue a servi le 404 nu du serveur en production du 25/08 au 01/09 sans qu'aucun controle le voie (TF-0802) ; la realisation de reference a coute 14 pages et 5 controles sur un seul produit |
 
 ## forge-conception
 
