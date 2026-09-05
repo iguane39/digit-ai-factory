@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=cf45e0ddbddf archive=d3c801ad4540 · dernier événement: 2026-09-05T11:59:39.959Z -->
+     sceaux: actifs=fb9a67adefe7 archive=d3c801ad4540 · dernier événement: 2026-09-05T12:06:41.263Z -->
 
-**24 actifs** (candidat 2 · décidé 12 · en cours 1 · corrigé 9 · écarté 0) · **782 archivés**.
+**26 actifs** (candidat 4 · décidé 11 · en cours 1 · corrigé 10 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -20,6 +20,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0806 | candidat | 1 | digit-ai-forge-agents : le delta neufs/preexistants du hook d'ecriture est inoperant des que le constat porte le chemin du fichier | **oui** — Mesure du 05/09/2026 sur Produit-60 : une edition de 5 lignes dans docs/run-playbook.md, dans un chapitre situe 250 lignes plus bas, a ete BLOQUEE en passe 1/3 sur deux constats M7 visant les chapitres « Matrice de contexte (Phase -1) » (ligne 30) et « Options de cadrage du CLI » (ligne 193). Les deux constats sont presents A L'IDENTIQUE dans HEAD : verifie en rejouant run-oracles.mjs sur `git show HEAD:docs/run-playbook.md` ecrit dans un dossier temporaire — sortie mot pour mot identique, seul le chemin differe. Le hook a lui-meme declare « + 1 constat(s) PREEXISTANT(S) » : la seule ligne sans chemin, le bilan « NON CONFORME — 1 oracle(s) en echec ». Cout paye : deux chapitres sans rapport avec l'edition ont du etre reecrits pour livrer TF-0798. |
 | TF-0789 | corrige | 8 | digit-ai-schemas : l exemple de reference du skill deborde a 390 px (16 constats v1_overflow, tableaux et blocs de code larges) et n a pas de verdict de lecture par un tiers (T1/T2 du 02/09 non traites) — un exemple de reference qui ne tient pas ses propres regles enseigne le defaut | **oui** — render_page.py --widths 390 sur l exemple de reference : 16 constats v1_overflow, mesures le 03/09 avant et apres TF-0784 ; oracle-lecture-tiers du 02/09 : T1 + T2 en defaut sur la meme page |
 
 ## digit-ai-forge-conception
@@ -58,7 +59,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0798 | decide | 20 | forge-development : toute adresse de fichier statique porte la version de l application (ou une empreinte), des le gabarit de projet, et la route MEP le verifie | **oui** — mesure du 2026-09-01 : curl -sI sur app.css de production = 200, feuille a jour, aucun Cache-Control, pendant que le poste utilisateur rendait une feuille d avant le composant |
+| TF-0798 | corrige | 20 | forge-development : toute adresse de fichier statique porte la version de l application (ou une empreinte), des le gabarit de projet, et la route MEP le verifie | **oui** — mesure du 2026-09-01 : curl -sI sur app.css de production = 200, feuille a jour, aucun Cache-Control, pendant que le poste utilisateur rendait une feuille d avant le composant |
 
 ## forge-tests
 
@@ -73,6 +74,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-0791 | en_cours | 6.7 | Cascade Intention > Strategie > Tactique > Operationnel + test retro : la definition des demandes ne capture pas l'intention initiale de l'utilisateur | **oui** — etude output/03-etudes/20260901-etude-opportunite-dataforseo.md : conforme a sa definition, PASS a ses controles, et refusee par son destinataire — sept questions du retour du 01/09 sans reponse dans le texte ; cout paye : une etude entiere a redefinir et rejouer |
 | TF-0549 | decide | 10 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : `Produit-07` a un forge\retours\ mais rien de ce qui s'y fait n'est suivi | **oui** — mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration. |
+| TF-0807 | candidat | 6 | pilot : l'ingestion d'un lot remis par une FORGE pseudonymise la forge comme un produit client (digit-ai-forge-development → Produit-60, entree ajoutee a la table hors depot) — une forge est publique, son nom ne se cache pas | **oui** — un demandeur illisible au registre (Produit-60) pour un constat de forge, une entree parasite dans la table des pseudonymes, un R-47 joue a vide — a chaque lot de forge tant que ce n'est pas corrige |
 | TF-0805 | corrige | 9 | pilot : les gardes lexicales d'oracle-synthese (S21 et voisines) emploient des frontieres de mot ASCII (la sequence barre-oblique-inverse b) — un motif accentue comme « mesuree » n'est jamais atteint ; passer aux frontieres Unicode avec fixture double sens | **oui** — un motif accentue jamais atteint = une regle qui ne juge jamais ce qu'elle croit juger (S21 sur « mesuree ») ; 3 des 13 FAIL du delta v0.5.0 du produit 02 relevaient de cette classe cote conception |
 | TF-0788 | corrige | 8 | pilot : une montee de version d un skill dans la journee n est SUE d aucune forge qui le consomme — la recette de forge-tests a change de verdict entre deux executions parce que check_html et render_page avaient change de regles sur le poste, sans qu aucun signal ne lui parvienne | **oui** — le 02/09, la section dashboard de la recette de forge-tests est passee de vert a rouge entre deux executions sans qu un octet ait bouge dans son depot (mesure de TF-0786) ; sans signal cote consommateur, le meme diagnostic se refait a la main a chaque montee de version |
 | TF-0793 | corrige | 1 | pilot : la declaration racine_web demandee par TF-0654 n'est lue par AUCUN script — le critere de cloture du lot est hors de portee du produit | **oui** — deux constats HORS RACINE re-rendus a chaque releve du parc pour ce produit, et pour tout produit dont la racine web n'est pas la racine du depot |
