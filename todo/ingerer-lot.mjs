@@ -28,7 +28,7 @@ import { fileURLToPath } from "node:url";
 // format commun et où la même classe de défaut a été redécouverte forge par forge.
 import { verifier as verifierFormeLot } from "../gabarits/oracle-lot-retours.mjs";
 import { localiserProduit, causeDuRefus } from "./localiser-produit.mjs";
-import { anonymiserCandidature, pseudoProduit, anonymiser } from "./anonymiser-entrant.mjs";
+import { anonymiserCandidature, pseudoProduit, anonymiser, EST_EMETTEUR_FORGE } from "./anonymiser-entrant.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const sidecarPath = process.argv[2];
@@ -425,7 +425,9 @@ if (nomDuLot.includes(" - RETOURS - ")) {
   const nomProduit = nomDuLot.split(" - RETOURS - ")[0];
   const pseudo = pseudoProduit(nomProduit);
   // La sortie ne répète pas le nom réel : elle finit dans des journaux que rien ne relit.
-  if (pseudo) console.log(`[ANONYMISÉ] produit du lot → ${pseudo} (table hors dépôt)`);
+  // TF-0807 : un émetteur forge est public, son nom se dit et ne s'inscrit pas.
+  if (EST_EMETTEUR_FORGE.test(nomProduit)) console.log(`[ÉMETTEUR FORGE] lot remis par « ${nomProduit} » — nom public, conservé tel quel, jamais inscrit à la table des pseudonymes (TF-0807)`);
+  else if (pseudo) console.log(`[ANONYMISÉ] produit du lot → ${pseudo} (table hors dépôt)`);
 }
 let remplacesTotal = [];
 candidatures = candidatures.map((c) => {
@@ -605,7 +607,12 @@ if (registre === resolve(join(ICI, "TODO.jsonl")))
 // Borne : R-47 ne parle que des LOTS DE RETOURS, dont le nom porte le produit. Une candidature
 // hors lot n'a pas de produit a juger, et crier dessus apprendrait a ignorer le message.
 const nomFichier = String(sidecarPath).split(/[\\\/]/).pop() || "";
-if (nouvelles.length > 1 && nomFichier.includes(" - RETOURS - ")) {
+// TF-0807 (05/09) : R-47 juge l'héritage d'un PRODUIT. Un lot remis par une forge n'a pas de
+// produit à localiser — le chercher rendait « dossier introuvable » sur un émetteur qui n'est pas
+// une cible, et consignait un silence qui n'en était pas un. Sans objet, déclaré, jamais cherché.
+if (nouvelles.length > 1 && nomFichier.includes(" - RETOURS - ") && EST_EMETTEUR_FORGE.test(nomFichier.split(" - RETOURS - ")[0])) {
+  console.error(`[R-47] lot remis par la forge « ${nomFichier.split(" - RETOURS - ")[0]} » — l'héritage du pilot se juge chez un produit, pas chez une forge : SANS OBJET (TF-0807)`);
+} else if (nouvelles.length > 1 && nomFichier.includes(" - RETOURS - ")) {
   const projet = nomFichier.split(" - RETOURS - ")[0];
   const racine = process.env.FORGE_ROOT || join(ICI, "..", "..");
   let dossier = null;

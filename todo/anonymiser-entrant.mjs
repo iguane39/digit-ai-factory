@@ -117,6 +117,9 @@ function lireProduits() {
   return JSON.parse(readFileSync(p, "utf8"));
 }
 
+/** Un émetteur FORGE (ou le pilot, ou la file de tickets) : nom public, jamais pseudonymisé (TF-0807). */
+export const EST_EMETTEUR_FORGE = /^digit-ai-(forge-[a-z0-9-]+|factory|queue)$/i;
+
 /** Pseudonyme STABLE d'un produit ; l'inscrit s'il est inconnu. */
 export function pseudoProduit(nom) {
   const p = CHEMIN_PRODUITS();
@@ -129,6 +132,12 @@ export function pseudoProduit(nom) {
   // ensuite substitué Produit-12 par Produit-13 dans dix candidatures. Une table qui pseudonymise
   // ses propres pseudonymes tourne en rond, et chaque tour décale tout le parc d'un cran.
   if (Object.values(d.produits).includes(nom) || /^Produit-\d{2,}$/.test(nom)) return nom;
+  // UNE FORGE N'EST PAS UN PRODUIT (TF-0807, 05/09/2026) : le gabarit des lots autorise une forge à
+  // remettre un lot au pilot, préfixé de son nom — et ce nom est PUBLIC (dépôt publié, cité par le
+  // noyau). Le 05/09, trois lots de forges ont inscrit « Produit-60 », « Produit-61 », « Produit-62 »
+  // à la table et rendu le registre illisible (« demandeur : Produit-60 » pour un constat de la forge
+  // de développement). Un émetteur forge garde son nom et n'entre jamais à la table.
+  if (EST_EMETTEUR_FORGE.test(nom)) return nom;
   // UN NOM TROP COURT NE S'INSCRIT PAS NON PLUS (02/09, second cas payé le même jour) : « PROD »,
   // nom de fixture d'une recette non isolée, inscrit comme produit — et une clé de quatre lettres
   // substituée par inclusion réécrit « PRODUCTION » en « Produit-13UCTION ». Le refus est dit.
