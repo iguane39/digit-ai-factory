@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=7e1ed1a32571 archive=d3c801ad4540 · dernier événement: 2026-09-05T12:17:38.871Z -->
+     sceaux: actifs=9449644a1be4 archive=d3c801ad4540 · dernier événement: 2026-09-05T12:27:14.519Z -->
 
-**28 actifs** (candidat 5 · décidé 11 · en cours 1 · corrigé 11 · écarté 0) · **782 archivés**.
+**31 actifs** (candidat 8 · décidé 9 · en cours 1 · corrigé 13 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -16,6 +16,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0676 | decide | 6.7 | Aucun script de capture du produit ne produit systématiquement une pleine page | non |
 | TF-0808 | candidat | 1 | digit-ai-factory : M-9 fonde sa preuve sur « le controle executable du produit » et ne nomme pas le controle generique du socle, qui existe desormais | **oui** — la realisation de reference du patron a coute 14 pages et 5 controles d'oracle sur un seul produit (P-2, references/PATRONS-EPROUVES.md) ; tant que M-9 ne nomme pas le controle du socle, chaque produit a surface web repaie cette ecriture a sa MEP |
 | TF-0809 | candidat | 1 | digit-ai-factory : M-9 (a) ne juge que les adresses inconnues SOUS un prefixe, la racine sans prefixe que l'exigence 4 de P-2 demande sort du jugement | **oui** — ecart constate entre les cinq exigences de P-2 et les trois cas de M-9 : une exigence sur cinq n'est jugee qu'a moitie, et l'ecart n'etait visible qu'en traduisant le patron en mesures — aucune relecture du texte ne l'avait signale entre le 03/09 et le 05/09 |
+| TF-0810 | candidat | 1 | digit-ai-factory : la frontiere Unicode prescrite par TF-0799 elargit les gardes sur les chiffres et le tiret bas — la generalisation exacte de \b est [\p{L}\p{N}_] | **oui** — Banc de mesure joue le 05/09/2026 sur les trois formes de frontiere : ASCII 3/5, forme prescrite 3/5 (deux faux positifs neufs : elle2, elle_id), forme retenue 5/5. Sans ce constat, la descente de TF-0799 vers oracle-synthese S21 et vers les autres forges introduit deux faux positifs mesures la ou elle corrige un faux positif. |
+| TF-0812 | candidat | 1 | digit-ai-factory : le gate d'ecriture C7 a impute a l'edition en cours deux constats presents a l'identique dans la version precedente du fichier | **oui** — Preuve reproductible : `check_markdown.py` joue sur `git show 90d3767:skills/enumere-la-surface/references/typologie-surface.md` (version anterieure a toute edition de ce run) rend les deux memes constats M7 (lignes 6 et 92) que le gate a ensuite imputes a l'edition suivante. Cout mesure : deux passes consommees sur trois, et cinq corrections de forme hors perimetre du lot. |
 | TF-0802 | corrige | 1 | La 404 personnalisee, menu et toutes langues : un standard d'office pour tout site cree par la factory | non |
 
 ## digit-ai-forge-agents
@@ -29,7 +31,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0804 | decide | 6 | forge-conception : la 404 par langue entre dans la surface implicite proposee d'office par enumere-la-surface (loi transverse n 3), avec ses cinq exigences comme criteres d'acceptation candidats | **oui** — meme fait que TF-0802 : 404 nue en production une semaine, vue par l'exploitant et par aucune revue |
+| TF-0811 | candidat | 1 | Produit-62 : l'ecart explicite d'un candidat de la surface implicite n'a nulle part ou s'ecrire dans EXIGENCES.json — la loi n° 3 ne peut qu'avertir | **oui** — Mesure du 05/09/2026 : sur les trois fixtures de la branche TF-0804 du self-test, le cas « surface web sans 404 » ne peut rendre qu'un SANS_OBJET — un FAIL refuserait aussi les deux ecarts que P-2 declare legitimes, sans qu'aucun champ ne permette de les declarer. Onze candidats d'office concernes, un seul (la 404) outille aujourd'hui. |
+| TF-0804 | corrige | 6 | forge-conception : la 404 par langue entre dans la surface implicite proposee d'office par enumere-la-surface (loi transverse n 3), avec ses cinq exigences comme criteres d'acceptation candidats | **oui** — meme fait que TF-0802 : 404 nue en production une semaine, vue par l'exploitant et par aucune revue |
 
 ## digit-ai-forge-observability
 
@@ -47,7 +50,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0799 | decide | 1 | forge-conception : remplacer les frontieres \b ASCII des gardes lexicales par des frontieres Unicode - E8 lit elle dans reelle, et cote pilot mesure ne matche jamais | **oui** — delta v0.5.0 : critere « exemples issus de l arborescence reelle » refuse pour pronom elle ; enonce reecrit pour esquiver la garde (seq 125, 13 FAIL E3/E8 dont 3 de cette classe) |
+| TF-0799 | corrige | 1 | forge-conception : remplacer les frontieres \b ASCII des gardes lexicales par des frontieres Unicode - E8 lit elle dans reelle, et cote pilot mesure ne matche jamais | **oui** — delta v0.5.0 : critere « exemples issus de l arborescence reelle » refuse pour pronom elle ; enonce reecrit pour esquiver la garde (seq 125, 13 FAIL E3/E8 dont 3 de cette classe) |
 
 ## forge-design
 
