@@ -17,8 +17,11 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
 | [`old\`](old/README.md) | dossier (149 fichiers) | — | Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réé… |
+| `digit-ai-forge-agents - RETOURS - 20260905a.md` | fichier | 13,6 Ko | Retours forges — digit-ai-forge-agents — 20260905a |
 | `digit-ai-forge-conception - RETOURS - 20260905a.md` | fichier | 16,8 Ko | Retours forges — digit-ai-forge-conception — 20260905a |
 | `digit-ai-forge-conception - RETOURS - 20260905a.tf.jsonl` | fichier | 5,1 Ko | 3 ligne(s) JSONL |
+| `digit-ai-forge-conception - RETOURS - 20260905b.md` | fichier | 18,2 Ko | Retours forges — digit-ai-forge-conception — 20260905b |
+| `digit-ai-forge-conception - RETOURS - 20260905b.tf.jsonl` | fichier | 2,0 Ko | 1 ligne(s) JSONL |
 | `digit-ai-forge-design - RETOURS - 20260905a.md` | fichier | 15,2 Ko | Retours forges — digit-ai-forge-design — 20260905a |
 | `digit-ai-forge-design - RETOURS - 20260905a.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
 | `digit-ai-forge-development - RETOURS - 20260905a.md` | fichier | 12,8 Ko | Retours forges — digit-ai-forge-development — 20260905a |
@@ -129,4 +132,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-12 - RETOURS - 20260902a.md` | fichier | 4,3 Ko | Retours forges — Produit-12 — 20260902a |
 | `Produit-12 - RETOURS - 20260902a.tf.jsonl` | fichier | 1003 o | 1 ligne(s) JSONL |
 
-_111 fichier(s), 1 sous-dossier(s)_
+_114 fichier(s), 1 sous-dossier(s)_

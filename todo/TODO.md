@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=f09ee1c3e797 archive=d3c801ad4540 · dernier événement: 2026-09-05T13:43:38.711Z -->
+     sceaux: actifs=427a96f3d3a7 archive=d3c801ad4540 · dernier événement: 2026-09-05T14:11:46.179Z -->
 
-**32 actifs** (candidat 2 · décidé 9 · en cours 1 · corrigé 20 · écarté 0) · **782 archivés**.
+**33 actifs** (candidat 3 · décidé 8 · en cours 1 · corrigé 21 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -31,8 +31,9 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0811 | decide | 1 | Produit-62 : l'ecart explicite d'un candidat de la surface implicite n'a nulle part ou s'ecrire dans EXIGENCES.json — la loi n° 3 ne peut qu'avertir | **oui** — Mesure du 05/09/2026 : sur les trois fixtures de la branche TF-0804 du self-test, le cas « surface web sans 404 » ne peut rendre qu'un SANS_OBJET — un FAIL refuserait aussi les deux ecarts que P-2 declare legitimes, sans qu'aucun champ ne permette de les declarer. Onze candidats d'office concernes, un seul (la 404) outille aujourd'hui. |
+| TF-0814 | candidat | 1 | digit-ai-forge-conception : les trois exigences socle candidates ont le meme trou que la surface implicite avant TF-0811 — leur ecart vit en prose, aucun oracle ne le lit | **oui** — Mesure du 05/09/2026 sur le depot de la forge : sur les onze oracles, zero ne prend EXIGENCES.md en entree, et les huit qui jugent EXIGENCES.json n'ont aucun champ a lire pour ces trois candidates. Cout de reference : TF-0811 a comble le meme trou pour la surface implicite en une passe, avec 7 cas de fixtures et un champ de quatre sous-champs — le meme profil de travail rendrait jugeables trois lois transverses de plus. |
 | TF-0804 | corrige | 6 | forge-conception : la 404 par langue entre dans la surface implicite proposee d'office par enumere-la-surface (loi transverse n 3), avec ses cinq exigences comme criteres d'acceptation candidats | **oui** — meme fait que TF-0802 : 404 nue en production une semaine, vue par l'exploitant et par aucune revue |
+| TF-0811 | corrige | 1 | Produit-62 : l'ecart explicite d'un candidat de la surface implicite n'a nulle part ou s'ecrire dans EXIGENCES.json — la loi n° 3 ne peut qu'avertir | **oui** — Mesure du 05/09/2026 : sur les trois fixtures de la branche TF-0804 du self-test, le cas « surface web sans 404 » ne peut rendre qu'un SANS_OBJET — un FAIL refuserait aussi les deux ecarts que P-2 declare legitimes, sans qu'aucun champ ne permette de les declarer. Onze candidats d'office concernes, un seul (la 404) outille aujourd'hui. |
 
 ## digit-ai-forge-development
 

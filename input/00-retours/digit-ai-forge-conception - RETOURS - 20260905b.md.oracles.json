@@ -1,0 +1,79 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905b.md",
+  "date_iso": "2026-09-05T14:04:38.329Z",
+  "registre_version": "2.16.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "FAIL",
+  "resume": {
+    "pass": 3,
+    "fail": 1,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905b.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905b.md",
+      "verdict": "FAIL",
+      "detail": "M7 chapitre sans ouverture : « La preuve, dans l'ordre où le lot la demandait » (ligne 52) commence directement par des données — une phrase doit dire ce que le lecteur va y apprendre, sinon il doit deviner la question à laquelle le chapitre répond. ; M7 chapitre sans ouverture : « Le compte, avant → après » (ligne 62) commence directement par des données — une phrase doit dire ce que le lecteur va y apprendre, sinon il doit deviner la question à laquelle le chapitre répond."
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905b.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905b.md",
+      "verdict": "PASS",
+      "detail": "aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905b.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905b.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905b.md",
+      "verdict": "PASS",
+      "detail": "nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905b.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905b.md",
+    "ts": "2026-09-05T14:04:38.328Z",
+    "fichiers": {
+      "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905b.md": "a4c3021f5cd00419c07f0ef1999cc09f06224d6828657a3817b57ed10badca2a"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "FAIL"
+}
