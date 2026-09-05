@@ -1,0 +1,79 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md",
+  "date_iso": "2026-09-05T12:41:17.538Z",
+  "registre_version": "2.16.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md",
+      "verdict": "PASS",
+      "detail": "aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md",
+      "verdict": "PASS",
+      "detail": "0 total(aux) de colonne vérifié(s) par re-somme + 0 effectif(s) annoncé(s) rapproché(s) de leur cardinal réel + 1/1 mesure(s) publiée(s) portant leur dénominateur et leurs unités, 0 écart"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md",
+      "verdict": "PASS",
+      "detail": "nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md",
+    "ts": "2026-09-05T12:41:17.537Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md": "ce30ec5bdbf0adac25bcac4a9e60b6958141ebd4ecc7d1e10615c42abbac95b5"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}
