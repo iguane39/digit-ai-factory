@@ -183,7 +183,7 @@ restant se traite en corrigeant le GÉNÉRATEUR (pas le fichier de règles) et e
 Ce que la première passe a appris : un sigle se remplace insensible à la casse, comme la porte le
 juge — 96 constats tenaient à un identifiant de run en minuscules. Après le geste, deux choses
 restent humaines : la publication forcée (`git push --force`, R-38) et toute autre copie locale du
-dépôt, devenue incompatible avec la nouvelle histoire (à recloner, pas à fusionner).
+dépôt, devenue incompatible avec la nouvelle histoire (à recloner, pas à fusionner). **Ce que la troisième passe a appris (05/09, forge-development, TF-0813)** : la mesure qui DÉCIDE une réécriture se fait sur un clone à BRANCHE UNIQUE de ce qui est publié — 89 constats vivaient dans une branche locale jamais poussée, l'histoire publiée était verte ; et une branche protégée sur GitHub refuse tout push forcé — vérifier la protection AVANT de réécrire, sinon la passe ne se publie pas.
 
 **La propagation d'une correction se MESURE, elle ne se souhaite pas (TF-0689, 01/09).** Le
 champ `produits_beneficiaires` est de la prose — 73 items clos en portaient au 27/08, aucun

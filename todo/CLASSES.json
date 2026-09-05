@@ -508,6 +508,20 @@
    "voisines": [
     "recette-verdict-non-prononcable"
    ]
+  },
+  {
+   "cle": "lot-de-travaux-mauvais-module-producteur",
+   "famille": "lot-forme",
+   "libelle": "Un lot de travaux confie a un module (verbe, skill, script) la production d un artefact que ce module ne produit jamais : le destinataire doit repartir le travail lui-meme, et l ecart n est pas remonte au sidecar faute de classe",
+   "creee_le": "2026-09-05",
+   "fondee_par": [
+    "TF-0819"
+   ],
+   "regle": "avant d ecrire « ce qui est demande », le pilot lit le module producteur nomme (son SKILL.md ou son en-tete) et cite ce qu il produit ; un lot qui nomme un producteur cite la ligne qui le prouve (gabarits/TRAVAUX-PILOT.md)",
+   "oracle": "gabarits/oracle-travaux-pilot.mjs — regle a ajouter (T6 : tout module producteur nomme existe et produit l artefact cite) ; candidature TF-0819",
+   "voisines": [
+    "correction-symptome-sans-classe"
+   ]
   }
  ]
 }

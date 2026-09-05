@@ -20,5 +20,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `pilot - TRAVAUX - 20260905c.tf.jsonl` | fichier | 1,7 Ko | 2 ligne(s) JSONL |
 | `pilot - TRAVAUX - 20260905d.md` | fichier | 6,9 Ko | Travaux confiés par le pilot — digit-ai-forge-conception — 20260905d |
 | `pilot - TRAVAUX - 20260905d.tf.jsonl` | fichier | 941 o | 1 ligne(s) JSONL |
+| `pilot - TRAVAUX - 20260905e.md` | fichier | 6,4 Ko | Travaux confiés par le pilot — digit-ai-forge-conception — 20260905e |
+| `pilot - TRAVAUX - 20260905e.tf.jsonl` | fichier | 871 o | 1 ligne(s) JSONL |
 
-_4 fichier(s), 0 sous-dossier(s)_
+_6 fichier(s), 0 sous-dossier(s)_
