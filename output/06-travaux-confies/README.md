@@ -26,5 +26,13 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `pilot - TRAVAUX - 20260905f.tf.jsonl` | fichier | 705 o | 1 ligne(s) JSONL |
 | `pilot - TRAVAUX - 20260905g.md` | fichier | 9,0 Ko | Travaux confiés par le pilot — digit-ai-forge-agents — 20260905g |
 | `pilot - TRAVAUX - 20260905g.tf.jsonl` | fichier | 1,5 Ko | 2 ligne(s) JSONL |
+| `pilot - TRAVAUX - 20260905h.md` | fichier | 9,3 Ko | Travaux confiés par le pilot — digit-ai-forge-conception — 20260905h |
+| `pilot - TRAVAUX - 20260905h.tf.jsonl` | fichier | 1,3 Ko | 2 ligne(s) JSONL |
+| `pilot - TRAVAUX - 20260905i.md` | fichier | 6,2 Ko | Travaux confiés par le pilot — digit-ai-forge-agents — 20260905i |
+| `pilot - TRAVAUX - 20260905i.tf.jsonl` | fichier | 726 o | 1 ligne(s) JSONL |
+| `pilot - TRAVAUX - 20260905j.md` | fichier | 5,7 Ko | Travaux confiés par le pilot — Produit-02 — 20260905j |
+| `pilot - TRAVAUX - 20260905j.tf.jsonl` | fichier | 630 o | 1 ligne(s) JSONL |
+| `pilot - TRAVAUX - 20260905k.md` | fichier | 5,7 Ko | Travaux confiés par le pilot — Produit-12 — 20260905k |
+| `pilot - TRAVAUX - 20260905k.tf.jsonl` | fichier | 630 o | 1 ligne(s) JSONL |
 
-_10 fichier(s), 0 sous-dossier(s)_
+_18 fichier(s), 0 sous-dossier(s)_

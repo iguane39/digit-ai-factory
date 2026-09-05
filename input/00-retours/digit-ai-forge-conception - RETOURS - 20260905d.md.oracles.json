@@ -1,0 +1,79 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905d.md",
+  "date_iso": "2026-09-05T16:34:04.401Z",
+  "registre_version": "2.16.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905d.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905d.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905d.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905d.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905d.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905d.md",
+      "verdict": "PASS",
+      "detail": "7 constat(s) · 6 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (6 avertissement(s)) ; nombre « 4 327 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905d.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905d.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905d.md",
+    "ts": "2026-09-05T16:34:04.400Z",
+    "fichiers": {
+      "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260905d.md": "a629f465c4d12c081721fbbca44c27ccc565c2ecd0e0f68dc4d001bd752e4dfa"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

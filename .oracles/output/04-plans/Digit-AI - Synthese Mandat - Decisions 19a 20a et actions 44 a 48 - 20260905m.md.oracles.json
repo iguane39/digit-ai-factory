@@ -1,0 +1,79 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 19a 20a et actions 44 a 48 - 20260905m.md",
+  "date_iso": "2026-09-05T16:54:48.969Z",
+  "registre_version": "2.17.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 19a 20a et actions 44 a 48 - 20260905m.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 19a 20a et actions 44 a 48 - 20260905m.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 19a 20a et actions 44 a 48 - 20260905m.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 19a 20a et actions 44 a 48 - 20260905m.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 19a 20a et actions 44 a 48 - 20260905m.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 19a 20a et actions 44 a 48 - 20260905m.md",
+      "verdict": "PASS",
+      "detail": "2 constat(s) · 1 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; nombre « 3 074 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 19a 20a et actions 44 a 48 - 20260905m.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 19a 20a et actions 44 a 48 - 20260905m.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 19a 20a et actions 44 a 48 - 20260905m.md",
+    "ts": "2026-09-05T16:54:48.969Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Decisions 19a 20a et actions 44 a 48 - 20260905m.md": "dd89ed151e15e77abb62ee62b6f838db985dbb00b69d16545151971b149d99e4"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

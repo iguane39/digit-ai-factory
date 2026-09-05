@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 204 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 213 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -227,6 +227,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Decision 5a et TF-0793 clos - 20260903f.md | 20260903f | 13.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Decision 5a et TF-0793 clos - 20260903f.md` |
 | Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md | 20260905j | 19.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md` |
 | Digit-AI - Synthese Mandat - Decisions 16a 17a 18a - 20260905l.md | 20260905l | 17.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 16a 17a 18a - 20260905l.md` |
+| Digit-AI - Synthese Mandat - Decisions 19a 20a et actions 44 a 48 - 20260905m.md | 20260905m | 24.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 19a 20a et actions 44 a 48 - 20260905m.md` |
 | Digit-AI - Synthese Mandat - Decisions 1a 2a 3b 4a synchronisation - 20260903e.md | 20260903e | 16.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 1a 2a 3b 4a synchronisation - 20260903e.md` |
 | Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md | 20260903b | 26 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md` |
 | Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md | 20260905h | 13.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md` |
@@ -324,6 +325,14 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | pilot - TRAVAUX - 20260905f.tf.jsonl | — | 0.7 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905f.tf.jsonl` |
 | pilot - TRAVAUX - 20260905g.md | 20260905g | 9 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905g.md` |
 | pilot - TRAVAUX - 20260905g.tf.jsonl | — | 1.5 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905g.tf.jsonl` |
+| pilot - TRAVAUX - 20260905h.md | 20260905h | 9.3 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905h.md` |
+| pilot - TRAVAUX - 20260905h.tf.jsonl | — | 1.3 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905h.tf.jsonl` |
+| pilot - TRAVAUX - 20260905i.md | 20260905i | 6.2 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905i.md` |
+| pilot - TRAVAUX - 20260905i.tf.jsonl | — | 0.7 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905i.tf.jsonl` |
+| pilot - TRAVAUX - 20260905j.md | 20260905j | 5.7 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905j.md` |
+| pilot - TRAVAUX - 20260905j.tf.jsonl | — | 0.6 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905j.tf.jsonl` |
+| pilot - TRAVAUX - 20260905k.md | 20260905k | 5.7 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905k.md` |
+| pilot - TRAVAUX - 20260905k.tf.jsonl | — | 0.6 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260905k.tf.jsonl` |
 
 *Un livrable présent et absent de ce tableau est un défaut : cet index est régénéré, et un
 index qui a dérivé de son dossier ne sert plus qu'à donner confiance à tort.*
