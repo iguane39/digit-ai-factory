@@ -330,6 +330,10 @@
   "cas": 11,
   "vu_le": "2026-08-26"
  },
+ "todo/ingerer-emetteur-forge.test.mjs": {
+  "cas": 2,
+  "vu_le": "2026-09-05"
+ },
  "todo/ingerer-r45.test.mjs": {
   "cas": 8,
   "vu_le": "2026-08-26"

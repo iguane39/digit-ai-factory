@@ -95,4 +95,4 @@ Ordre de traitement : d'abord la décision sur forge-development, parce qu'un co
 - Forges publiées : forge-design `98122d0`, forge-conception `0830694`, forge-tests `23c7622` ; retenue : forge-development `00097b6`.
 - Lots déposés : `digit-ai-forge-agents\input\00-travaux\pilot - TRAVAUX - 20260905a.md` (+ `input\LISEZMOI.md`) · `digit-ai-forge-conception\input\00-travaux\pilot - TRAVAUX - 20260905b.md`.
 - Registre : `todo\TODO.jsonl` — sept décisions, TF-0807 à TF-0810 corrigés, six rectifications de demandeur ; vues `todo\TODO.md`, `todo\AVANCEMENT.md` (11 ouverts, 20 fermés). Table hors dépôt `c:\dev\_produits-pseudonymes.json` : 62 → 59 entrées.
-- Oracles rejoués : `oracle-nom-client-publie` ×4 sur les forges (3 PASS, 1 FAIL) · `gabarits\oracle-travaux-pilot.mjs` ×2 (PASS) · `todo\ingerer-emetteur-forge.test.mjs` (2/2) · `todo\oracle-todo.mjs` (PASS).
+- Oracles rejoués : `oracle-nom-client-publie` ×4 sur les forges (3 PASS, 1 FAIL) · `gabarits\oracle-travaux-pilot.mjs` ×2 (PASS) · `todo\ingerer-emetteur-forge.test.mjs` (2/2) · `todo\oracle-todo.mjs` (PASS) · `oracles\self-tests.mjs` (94/94, la recette neuve comptée au cliquet).
