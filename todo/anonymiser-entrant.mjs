@@ -226,13 +226,13 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
     pseudonymes: { Zorglub: "Client-A", "wks-99999999999999": "wks-00000000000000", ZRG: "Sigle-A" },
   }), "utf8");
   writeFileSync(join(dir, "_produits-pseudonymes.json"), JSON.stringify({
-    produits: { "CalculatriceZorglubSCC": "Produit-01" },
+    produits: { "CalculatriceZorglubZAP": "Produit-01" },
   }), "utf8");
   process.env.FORGE_NOMS_INTERDITS = join(dir, "_noms-interdits.json");
   process.env.FORGE_PRODUITS_PSEUDO = join(dir, "_produits-pseudonymes.json");
 
   // 1) un texte porteur est nettoyé — client, identifiant, sigle et produit
-  const r1 = anonymiser("Lot de CalculatriceZorglubSCC pour Zorglub, espace wks-99999999999999, facture ZRG.");
+  const r1 = anonymiser("Lot de CalculatriceZorglubZAP pour Zorglub, espace wks-99999999999999, facture ZRG.");
   if (/Zorglub|wks-99999999999999|\bZRG\b/.test(r1.texte)) casse.push("un texte porteur n'est pas nettoyé : " + r1.texte);
   if (!r1.texte.includes("Produit-01")) casse.push("le nom de produit n'est pas remplacé par son pseudonyme");
 
@@ -249,10 +249,10 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
 
   // 2 bis) TF-0742 — les VARIANTES de graphie d'un produit sont substituées : forme espacée en
   //        toute casse, tirets, soulignés ; et le second sens : un mot seul de la clé ne bouge pas
-  const r2b = anonymiser("Le site Calculatrice zorglub Produit-09, dit calculatrice-Zorglub-Produit-09 ou calculatrice_zorglub_Produit-09, est en ligne.");
-  if (/calculatrice[\s\-_]*zorglub[\s\-_]*Produit-09/i.test(r2b.texte)) casse.push("une graphie espacée, tiretée ou soulignée du produit traverse : " + r2b.texte);
+  const r2b = anonymiser("Le site Calculatrice zorglub zap, dit calculatrice-Zorglub-ZAP ou calculatrice_zorglub_zap, est en ligne.");
+  if (/calculatrice[\s\-_]*zorglub[\s\-_]*zap/i.test(r2b.texte)) casse.push("une graphie espacée, tiretée ou soulignée du produit traverse : " + r2b.texte);
   if ((r2b.texte.match(/Produit-01/g) || []).length !== 3) casse.push("les trois graphies ne sont pas toutes remplacées par le pseudonyme : " + r2b.texte);
-  const r2c = anonymiser("Une calculatrice ordinaire et le mot Produit-09 seul ne sont pas des produits.");
+  const r2c = anonymiser("Une calculatrice ordinaire et le mot ZAP seul ne sont pas des produits.");
   if (r2c.texte.includes("Produit-01")) casse.push("un mot isolé de la clé est pris pour le produit : " + r2c.texte);
   // (nom de domaine INVENTÉ : une clé réelle écrite ici serait réécrite par la passe d'anonymisation
   //  — c'est arrivé le 02/09, et le banc s'est mis à tester autre chose que ce qu'il croyait)

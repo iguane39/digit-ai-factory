@@ -183,7 +183,7 @@ function selfTest() {
     pseudonymes: { Zorglub: "Client-A", ZRG: "Sigle-A" },
   }), "utf8");
   writeFileSync(join(dir, "_produits-pseudonymes.json"), JSON.stringify({
-    produits: { "CalculatriceZorglubSCC": "Produit-01" },
+    produits: { "CalculatriceZorglubZAP": "Produit-01" },
   }), "utf8");
   process.env.FORGE_NOMS_INTERDITS = join(dir, "_noms-interdits.json");
   process.env.FORGE_PRODUITS_PSEUDO = join(dir, "_produits-pseudonymes.json");
@@ -191,7 +191,7 @@ function selfTest() {
   const faux = {
     "note.md": Buffer.from("Lot remis par Zorglub, facture ZRG.\n", "utf8"),
     "propre.md": Buffer.from("Rien a voir ici.\n", "utf8"),
-    "CalculatriceZorglubSCC - RETOURS - 20260901a.md": Buffer.from("Corps propre.\n", "utf8"),
+    "CalculatriceZorglubZAP - RETOURS - 20260901a.md": Buffer.from("Corps propre.\n", "utf8"),
     "logo.png": Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x00, 0x01, 0x02, 0x03]),
   };
   const plan = planifier(dir, Object.keys(faux), (f) => faux[f]);
@@ -203,7 +203,7 @@ function selfTest() {
 
   // 2) le NOM porteur est renomme. Un contenu propre dans un fichier au nom sale ne vaut rien :
   //    la porte de publication lit les deux, et c'est le cas d'un lot deja nettoye a l'ingestion.
-  const ren = plan.renommages.find((r) => r.de.startsWith("CalculatriceZorglubSCC"));
+  const ren = plan.renommages.find((r) => r.de.startsWith("CalculatriceZorglubZAP"));
   if (!ren) casse.push("un fichier dont le NOM porte un nom interdit n'est pas renomme");
   else if (/Zorglub/.test(ren.vers)) casse.push("le nom de destination porte encore le nom interdit : " + ren.vers);
 

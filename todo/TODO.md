@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=306d20256fd0 archive=d3c801ad4540 · dernier événement: 2026-09-05T16:50:39.578Z -->
+     sceaux: actifs=7770f81b4244 archive=6ce2fe14c2bb · dernier événement: 2026-09-06T07:02:42.609Z -->
 
-**48 actifs** (candidat 6 · décidé 9 · en cours 1 · corrigé 32 · écarté 0) · **782 archivés**.
+**69 actifs** (candidat 27 · décidé 9 · en cours 1 · corrigé 32 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -15,6 +15,11 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0682 | decide | 10 | Quinze contrôles du produit ne sont exercés par AUCUNE recette — être cité n'est pas être joué | non |
 | TF-0676 | decide | 6.7 | Aucun script de capture du produit ne produit systématiquement une pleine page | non |
 | TF-0826 | candidat | 1 | digit-ai-factory : le depot PUBLIC du pilot porte lui-meme, dans 9 fichiers suivis, le nom de produit que TF-0820 fait retirer de la forge | **oui** — Mesure du 05/09/2026. Visibilite : `gh repo view iguane39/digit-ai-factory --json visibility,isPrivate` rend {"isPrivate":false,"visibility":"PUBLIC"} (idem pour digit-ai-forge-development). Occurrences du nom du produit sur les fichiers SUIVIS du depot du pilot : 43 occurrences, 9 fichiers — input/00-retours/old/Produit-09 - RETOURS - 20260820a.md 9, le sidecar homonyme 4, output/03-etudes/20260820-etude-opportunite-rgaa.md 3, todo/TODO-ARCHIVE.jsonl 7, todo/TODO-ARCHIVE.html 7, todo/anonymiser-entrant.mjs 4, todo/anonymiser-suivis.mjs 3, scripts/lib-pseudonyme-produit.mjs 2, scripts/lib-pseudonyme-produit.test.mjs 2. A comparer aux 3 occurrences sur 2 fichiers que TF-0820 fait retirer de la forge : le geste demande retire trois mentions d'un depot public pendant que quarante-trois vivent dans un autre, celui qui edicte la regle. Deux des neuf fichiers portent DEJA le pseudonyme dans leur NOM et le nom reel dans leur CONTENU, ce qui montre que la passe a ete jouee sur les noms de fichiers sans l'etre sur les contenus. |
+| TF-0836 | candidat | 1 | pilot : le hook qo-gate-write juge un template de maquette comme un livrable | **oui** — un blocage par écriture du template, six écritures |
+| TF-0838 | candidat | 1 | pilot : le skill claude-api ne documente pas fallbacks avec messages.parse | **oui** — un écart déclaré au lieu d'une mise en œuvre |
+| TF-0848 | candidat | 1 | digit-ai-factory : R-47 juge l'arbre de travail — un heritage recopie mais NON COMMIS rend PASS pendant que le depot porte encore la version perimee | **oui** — Mesure du 06/09/2026 chez Produit-02, APRES la remise a niveau de TF-0819. oracle-conformite-projet rend R-47 PASS — « 13 artefact(s) herite(s) present(s) et a jour » — alors que TROIS artefacts en copie_conforme divergent encore du pilot dans HEAD : forge/RESTITUTION.md (dernier commit 3209608 du 01/09 ; HEAD porte la version 2.15.0, l'arbre de travail la 2.16.0), forge/hooks/factory.mjs (dernier commit 13146aa du 26/08) et forge/retours/GABARIT-LOT-RETOURS.md (3209608, 01/09). git diff sur ces trois fichiers : 3 files changed, 57 insertions(+), 8 deletions(-) ; la comparaison de chaque version de HEAD avec la source du pilot rend DIVERGENT pour les trois. Ces copies ont ete deposees par une session anterieure et jamais commises ; recopier-heritage.mjs les a lues « CONFORME » et n'a rien dit de leur etat git. C'est aussi le risque que le mandat humain a du prevenir en PROSE : la session mandatee a ete avertie qu'elle trouverait des modifications non commises qui n'etaient pas les siennes — une precaution qu'aucun outil ne porte aujourd'hui. |
+| TF-0849 | candidat | 1 | digit-ai-factory : le message d'attribution de divergence date la copie du produit par la date du COMMIT du pilot, en contradiction avec la version que le fichier declare | **oui** — Mesure du 06/09/2026 chez Produit-02, AVANT la remise a niveau. Le message R-47 ecrit : « forge/retours/CLASSES.json diverge de todo/CLASSES.json — votre copie correspond a la version publiee le 2026-09-05 ». Le fichier alors present chez le produit portait version 1.0.0, date 2026-09-03, 32 classes ; la source du pilot portait version 1.2.0, date 2026-09-05, 37 classes. Le lot de travaux TF-0819, lu dans la meme minute, ecrivait de son cote « forge/retours/CLASSES.json correspond a la version du 03/09 ». Deux dates pour le meme fichier, a deux jours d'ecart, dans les deux documents que le produit lit cote a cote — et l'ecart n'est visible qu'en ouvrant le JSON, geste qu'aucune consigne ne demande. |
+| TF-0850 | candidat | 1 | digit-ai-factory : le « geste unique » de remise à niveau de l'héritage ne rend pas R-47 vert, et le message de R-47 promet qu'il le fait | **oui** — Mesure du 06/09/2026, identique chez TROIS Produit-62 traites l un apres l autre. R-47 avant chez chacun : FAIL, 8 absent(s) et 3 perime(s). Sortie du geste unique chez chacun : « 7 copie(s), 0 deja conforme(s), 6 laisse(s) au produit (modes personnalises) ». Parmi les 6 laisses, QUATRE maintiennent R-47 en FAIL : .claude\settings.json ABSENT, forge\travaux\ECARTS-ASSUMES.md ABSENT, CLAUDE.md ne portant pas « R-43 », .gitignore ne portant pas 4 motifs du socle chez le produit n 1, 3 chez le n 2 et 6 chez le n 3. Les deux autres laisses (robots.txt, llms.txt, mode presence) etaient presents et sans effet sur le verdict. Cout direct : 12 gestes manuels (4 x 3 produits), dont deux copies de gabarit pur, une insertion de paragraphe dans un fichier existant et une edition de .gitignore ou l ORDRE des lignes decide du resultat (chez le produit n 3, inserer les trois graphies exactes APRES `!forge/**` aurait re-ignore onze fichiers non suivis que le depot portait deja). Apres instanciation manuelle des quatre : R-47 PASS, 13 artefacts herites presents et a jour, chez les trois. R-43 bascule au vert par la meme occasion chez les trois, sans qu aucune correction ne l ait vise. |
 | TF-0819 | corrige | 2 | pilot : un lot de travaux a confié à derive-les-vues l'écriture d'un champ d'EXIGENCES.json que ce verbe ne produit jamais — le pilot nomme un module producteur sans lire ce qu'il produit | **oui** — un aller-retour de répartition chez la forge destinataire, et un écart non compté faute de classe (lot 20260905b, 05/09) |
 | TF-0802 | corrige | 1 | La 404 personnalisee, menu et toutes langues : un standard d'office pour tout site cree par la factory | non |
 | TF-0808 | corrige | 1 | digit-ai-factory : M-9 fonde sa preuve sur « le controle executable du produit » et ne nomme pas le controle generique du socle, qui existe desormais | **oui** — la realisation de reference du patron a coute 14 pages et 5 controles d'oracle sur un seul produit (P-2, references/PATRONS-EPROUVES.md) ; tant que M-9 ne nomme pas le controle du socle, chaque produit a surface web repaie cette ecriture a sa MEP |
@@ -43,10 +48,23 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0822 | decide | 3 | digit-ai-forge-conception : la transcription d'un champ depuis la prose n'est vérifiée par rien, et EXIGENCES.md n'est l'entrée d'aucun oracle — l'écart est prouvé écrit, jamais décidé | **oui** — mesure du 05/09 : 0 oracle sur 11 lit les deux documents de prose dont deux champs machine sont transcrits ; un écart non décidé passe |
 | TF-0823 | decide | 2 | digit-ai-forge-conception : une fixture est déclarée verte pour l'oracle qu'elle sert, jamais pour les autres — une règle neuve sur un oracle partagé fait basculer les autres en silence | **oui** — un verdict basculé sans qu'aucun cas le déclare, trouvé à la main le 05/09 ; le coût croît avec le nombre de fixtures partagées |
 | TF-0827 | candidat | 1 | digit-ai-forge-conception : la seconde famille de vues garde le sceau de provenance seul, et la variante « liste close de sections cablee » ne ferme pas le trou — mesure a l'appui | **oui** — Banc joue le 05/09/2026 sur la fixture verte des vues par profil, deux amputations comparees. (1) Section « Regles de gestion » videe, titre garde : 750 caracteres -> 588, soit 162 retires (22 %) ; oracle-vues-profil rend PASS sur ses quatre regles, exit 0 — la decision disparue est indetectable. (2) Meme section retiree avec son titre : 750 -> 566 ; VP4 rend FAIL (« 1 section(s) imposee(s) du profil absente(s) »), VP2 rend toujours PASS. La regle qui devrait voir le contenu ne voit que le titre, et la regle du sceau ne voit que la source. Cout de reference : TF-0818 a comble le meme trou sur la premiere famille en une passe, 6 cas de branche et 2 fixtures dediees, sans toucher au sceau de la source ni migrer aucune vue existante. |
+| TF-0831 | candidat | 1 | forge-conception : run-oracles-conception sans --seulement juge EXIGENCES.json comme un RETRO-MODELE | **oui** — un FAIL à lire dans le code du runner avant de trouver --seulement |
+| TF-0832 | candidat | 1 | forge-conception : T5 attend corps-sha256 que ni derive-les-vues ni vues.md ne documentent | **oui** — T5 SANS_OBJET sur les vues du run |
 | TF-0804 | corrige | 6 | forge-conception : la 404 par langue entre dans la surface implicite proposee d'office par enumere-la-surface (loi transverse n 3), avec ses cinq exigences comme criteres d'acceptation candidats | **oui** — meme fait que TF-0802 : 404 nue en production une semaine, vue par l'exploitant et par aucune revue |
 | TF-0818 | corrige | 3 | digit-ai-forge-conception : le sceau d'une vue dérivée prouve sa provenance, jamais son contenu — oracle-tracabilite T3 rend PASS sur une vue amputée d'un tiers | **oui** — mesure du 05/09 : un tiers d'une vue dérivée retiré, deux écarts déclarés perdus, oracle-tracabilite PASS et exit 0 — la perte d'une décision opposable est invisible à tout oracle de la forge |
 | TF-0811 | corrige | 1 | Produit-62 : l'ecart explicite d'un candidat de la surface implicite n'a nulle part ou s'ecrire dans EXIGENCES.json — la loi n° 3 ne peut qu'avertir | **oui** — Mesure du 05/09/2026 : sur les trois fixtures de la branche TF-0804 du self-test, le cas « surface web sans 404 » ne peut rendre qu'un SANS_OBJET — un FAIL refuserait aussi les deux ecarts que P-2 declare legitimes, sans qu'aucun champ ne permette de les declarer. Onze candidats d'office concernes, un seul (la 404) outille aujourd'hui. |
 | TF-0814 | corrige | 1 | digit-ai-forge-conception : les trois exigences socle candidates ont le meme trou que la surface implicite avant TF-0811 — leur ecart vit en prose, aucun oracle ne le lit | **oui** — Mesure du 05/09/2026 sur le depot de la forge : sur les onze oracles, zero ne prend EXIGENCES.md en entree, et les huit qui jugent EXIGENCES.json n'ont aucun champ a lire pour ces trois candidates. Cout de reference : TF-0811 a comble le meme trou pour la surface implicite en une passe, avec 7 cas de fixtures et un champ de quatre sous-champs — le meme profil de travail rendrait jugeables trois lois transverses de plus. |
+
+## digit-ai-forge-design
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0846 | candidat | 10 | forge-design : la barre basse sticky de la doctrine mobile chevauche le contenu (V4) hors coquille défilante | **oui** — 18 pages FAIL V4 au premier passage 5 bis |
+| TF-0830 | candidat | 7.5 | digit-ai-forge-design : la critique d implementation juge le CSS herite du socle digit-ai-page-html (table-filters.css embarque avec empreinte) comme celui de l auteur - FAIL sur des pages conformes au socle | **oui** — trois journaux R-32 du produit (forge/oracles/*20260905a.json) portant check_html PASS, render_page PASS et run-oracles-design FAIL cote a cote, avec le partage socle / hors socle ([] hors socle sur les trois pages) |
+| TF-0833 | candidat | 1 | forge-design : oracle-declencheurs DE3 apparie les sélecteurs par jeton et non par sélecteur complet | **oui** — deux passes de maquette |
+| TF-0834 | candidat | 1 | forge-design : oracle-surcouche SC1 prend un box-shadow commençant par 0 pour un contour nul | **oui** — une passe de maquette |
+| TF-0835 | candidat | 1 | forge-design : check_maquette C2 ne reconnaît pas une route référençant une fonction nommée | **oui** — une passe de maquette |
+| TF-0847 | candidat | 1 | forge-design : render_page contenu_rogne signale les champs de saisie dont la valeur dépasse la largeur | **oui** — un aller-retour de rendu |
 
 ## digit-ai-forge-development
 
@@ -62,10 +80,28 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-0790 | corrige | 6 | forge-observability : surveiller le tableau de bord des récidives ENTRE les runs — une récidive ou une classe de plus par rapport au relevé précédent est une dérive | **oui** — 50 récidives déclarées en prose sur 788 items (6 %), 1 → 11 → 15 → 19 par semaine du 03/08 au 30/08 ; trois récidives en quatre jours sur un seul projet (TF-0757) ; aucun compteur ne les voyait avant le 03/09 |
 
+## digit-ai-forge-ops
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0844 | candidat | 1 | forge-ops : oracle-ops exige COURANT et journal.jsonl sur une cible Railway qui ne les porte pas | **oui** — un FAIL d'oracle à déclarer en écart au dossier de MEP |
+| TF-0845 | candidat | 1 | forge-ops : railway up -p ne remplace pas railway link (« prefix not found ») | **oui** — un téléversement perdu |
+
+## digit-ai-forge-organization
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-0837 | candidat | 1 | forge-organization : oracle-filtres-tableau G3/G6 exigent init et règle print dans le document | **oui** — G3/G6 FAIL sur la page rendue, nonce CSP ajouté |
+
 ## digit-ai-forge-tests
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0839 | candidat | 12.5 | forge-tests : la greffe FORGE_TESTS_APP importe app avant conftest et fige moteur et réglages | **oui** — trois audits sans mesure des pans api, data, migrations ; base de démo effacée |
+| TF-0840 | candidat | 8.3 | forge-tests : les cas --generer du pan data passent sur une erreur de syntaxe SQL | **oui** — output/Produit-61-cas/test_genere_data.py relu, 56 cas réécrits à la main |
+| TF-0841 | candidat | 1 | forge-tests : les livrables sont refusés parce qu'une clé de cas reprend un chemin de route lu dans .env.forge-tests | **oui** — aucun livrable dérivé sur le run |
+| TF-0842 | candidat | 1 | forge-tests : INSTANCE_MONTER sans secrets de session et INSTANCE_DEMONTER qui ne libère pas le port | **oui** — une demi-heure de diagnostic, trois relances |
+| TF-0843 | candidat | 1 | forge-tests : le pan interface et oracle-panneau-tache PA6 s'excluent sur une page-formulaire dédiée | **oui** — une action manuelle_dev qui ne peut être soldée |
 | TF-0803 | corrige | 6 | forge-tests : un controle executable generique de la 404 (adresse inconnue par langue, prefixe respecte, non-HTML nu, statut 404 conserve, noindex), consommable comme preuve du controle M-9 de la MEP | **oui** — un site multilingue a servi le 404 nu du serveur en production du 25/08 au 01/09 sans qu'aucun controle le voie (TF-0802) ; la realisation de reference a coute 14 pages et 5 controles sur un seul produit |
 
 ## forge-conception

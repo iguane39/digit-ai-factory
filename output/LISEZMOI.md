@@ -176,7 +176,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260819-etude-opportunite-retro-engineering.md.oracles-historique.jsonl | — | 0.1 Ko | `03-etudes/20260819-etude-opportunite-retro-engineering.md.oracles-historique.jsonl` |
 | 20260819-etude-opportunite-retro-engineering.md.oracles.json | — | 1.9 Ko | `03-etudes/20260819-etude-opportunite-retro-engineering.md.oracles.json` |
 | 20260820-etude-opportunite-communication-interlocuteur.md | — | 10.6 Ko | `03-etudes/20260820-etude-opportunite-communication-interlocuteur.md` |
-| 20260820-etude-opportunite-rgaa.md | — | 13 Ko | `03-etudes/20260820-etude-opportunite-rgaa.md` |
+| 20260820-etude-opportunite-rgaa.md | — | 13.1 Ko | `03-etudes/20260820-etude-opportunite-rgaa.md` |
 | 20260822-etude-opportunite-fraicheur-des-verdicts.md | — | 13.8 Ko | `03-etudes/20260822-etude-opportunite-fraicheur-des-verdicts.md` |
 | 20260822-etude-opportunite-troisieme-point-observation-i18n.md | — | 8.2 Ko | `03-etudes/20260822-etude-opportunite-troisieme-point-observation-i18n.md` |
 | 20260822-etude-opportunite-vue-portefeuille.md | — | 8.6 Ko | `03-etudes/20260822-etude-opportunite-vue-portefeuille.md` |

@@ -15,7 +15,7 @@ const clients = join(T, "clients.json");
 const produits = join(T, "produits.json");
 // Forme du référentiel réel (lireClients) : noms + sigles, pseudonymes déclarés par nom — inventés.
 writeFileSync(clients, JSON.stringify({ noms: ["Fictilabs"], sigles: ["FLB"], pseudonymes: { Fictilabs: "Client-Z", FLB: "Fournisseur-Z" } }), "utf8");
-writeFileSync(produits, JSON.stringify({ produits: { "portail-valideur": "Produit-01","CalculatriceClient-ZSCC": "Produit-04", "portail-fictif": "Produit-07" } }), "utf8");
+writeFileSync(produits, JSON.stringify({ produits: { "portail-valideur": "Produit-01","CalculatriceClient-ZZAP": "Produit-04", "portail-fictif": "Produit-07" } }), "utf8");
 process.env.FORGE_NOMS_INTERDITS = clients;
 process.env.FORGE_PRODUITS_PSEUDO = produits;
 
@@ -31,7 +31,7 @@ try {
     att(pseudonymeProduit("_Fictilabs/portail-valideur") === "Produit-01", "attendu Produit-01");
   });
   check("un nom dont la clé de table est déjà partiellement anonymisée rend le pseudonyme existant", () => {
-    att(pseudonymeProduit("_Fictilabs/CalculatriceFictilabsSCC") === "Produit-04", "attendu Produit-04 (clé CalculatriceClient-ZSCC)");
+    att(pseudonymeProduit("_Fictilabs/CalculatriceFictilabsZAP") === "Produit-04", "attendu Produit-04 (clé CalculatriceClient-ZZAP)");
   });
   check("un domaine dont le pseudonyme est déjà dans le texte rend ce pseudonyme seul", () => {
     att(pseudonymeProduit("portail-fictif.com") === "Produit-07", "attendu Produit-07");

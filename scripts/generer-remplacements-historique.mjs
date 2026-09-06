@@ -41,7 +41,12 @@ for (const i of clients.identifiants || []) { const c = clients.pseudonymes?.[i]
 for (const g of clients.sigles || []) { const c = clients.pseudonymes?.[g]; if (c) lignes.push(`regex:(?i)(?<![A-Za-z0-9_])${esc(g)}(?![A-Za-z0-9_])==>${c}`); }
 for (const [k, v] of Object.entries(produits)) {
   if (/^[A-Za-z]:[\\/]/.test(k)) continue;
-  lignes.push(`${k}==>${v}`); noms.push([k, v]);
+  // Un nom d'UN SEUL MOT (alias court, sigle de produit — 06/09/2026, TF-0826) se remplace MOT ENTIER et
+  // insensible à la casse, comme la porte C5 le juge : un littéral toucherait l'intérieur d'un autre mot
+  // (« Produit-09M », « escc ») et manquerait la graphie en minuscules d'un identifiant de run.
+  if (/^[A-Za-z0-9]+$/.test(k)) lignes.push(`regex:(?i)(?<![A-Za-z0-9])${esc(k)}(?![A-Za-z0-9])==>${v}`);
+  else lignes.push(`${k}==>${v}`);
+  noms.push([k, v]);
   if (!k.includes(".")) {
     const mots = k.replace(/([a-z0-9])([A-Z])/g, "$1 $2").replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2").split(/[\s\-_]+/).filter(Boolean);
     if (mots.length >= 2 && mots.join("").length >= 8) lignes.push(`regex:(?i)(?<![A-Za-z0-9])${mots.map(esc).join("[\\s\\-_]*")}(?![A-Za-z0-9])==>${v}`);

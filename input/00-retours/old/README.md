@@ -112,7 +112,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-05 - RETOURS - 20260822b.tf.jsonl` | fichier | 6,6 Ko | 3 ligne(s) JSONL |
 | `Produit-05 - RETOURS - 20260822c.md` | fichier | 7,6 Ko | Retours forges — Produit-05 — 20260822c |
 | `Produit-05 - RETOURS - 20260822c.tf.jsonl` | fichier | 4,8 Ko | 2 ligne(s) JSONL |
-| `Produit-09 - RETOURS - 20260820a.md` | fichier | 16,8 Ko | Retours forges — Produit-09 — 20260820a |
+| `Produit-09 - RETOURS - 20260820a.md` | fichier | 16,9 Ko | Retours forges — Produit-09 — 20260820a |
 | `Produit-09 - RETOURS - 20260820a.tf.jsonl` | fichier | 13,1 Ko | 8 ligne(s) JSONL |
 | `Produit-10 - RETOURS - 20260813a.md` | fichier | 6,8 Ko | Retours forges — Produit-10 — 20260813a |
 | `Produit-10 - RETOURS - 20260813a.tf.jsonl` | fichier | 6,5 Ko | 7 ligne(s) JSONL |
