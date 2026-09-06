@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau 7770f81b4244)]
+sources_de_verite: [todo/TODO.jsonl (sceau 6abadc23b718)]
 verifie_le: 2026-09-06
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `7770f81b4244`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `6abadc23b718`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -19,10 +19,10 @@ les corrections donnerait l'illusion d'un progrès net.
 
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
-| Ouverts | 37 | candidats, décidés ou en cours — le reste à faire réel |
-| Clos sur gains constatés | 32 | corrigés avec leur mesure avant/après |
+| Ouverts | 39 | candidats, décidés ou en cours — le reste à faire réel |
+| Clos sur gains constatés | 35 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 0 | décidés non faits, motif écrit — jamais un silence |
-| Total suivi | 69 | tout ce que le registre a jamais porté |
+| Total suivi | 74 | tout ce que le registre a jamais porté |
 
 ## Ce qui reste ouvert, par forge
 
@@ -30,7 +30,7 @@ La table se lit par forge cible : c'est l'unité de décision, puisqu'une correc
 livre dans un dépôt. L'ordre suit le NOMBRE d'items ouverts, jamais leur priorité — la
 priorité vit dans la colonne de score.
 
-### digit-ai-factory — 10 item(s)
+### digit-ai-factory — 13 item(s)
 
 Les items ouverts ciblant digit-ai-factory, du score le plus fort au plus faible. Le score est
 celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
@@ -47,6 +47,9 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0848 | digit-ai-factory : R-47 juge l'arbre de travail — un heritage recopie mais NON COMMIS rend PASS pendant que le | candidat | digit-ai-factory | 1 |
 | TF-0849 | digit-ai-factory : le message d'attribution de divergence date la copie du produit par la date du COMMIT du pi | candidat | digit-ai-factory | 1 |
 | TF-0850 | digit-ai-factory : le « geste unique » de remise à niveau de l'héritage ne rend pas R-47 vert, et le message d | candidat | digit-ai-factory | 1 |
+| TF-0851 | digit-ai-factory : la descente d'heritage atteint le disque du poste et jamais l'histoire git du produit, et R | candidat | digit-ai-factory | 1 |
+| TF-0852 | digit-ai-factory : le lot de travaux demande a la main le geste que le hook d'ouverture fait seul depuis le 30 | candidat | digit-ai-factory | 1 |
+| TF-0853 | digit-ai-factory : oracle-conformite-projet rend 242 constats sur 247 dans un dossier que le .gitignore du pro | candidat | digit-ai-factory | 1 |
 
 ### digit-ai-forge-design — 7 item(s)
 
@@ -63,19 +66,6 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0843 | forge-tests : le pan interface et oracle-panneau-tache PA6 s'excluent sur une page-formulaire dédiée | candidat | digit-ai-forge-tests, digit-ai-forge-design | 1 |
 | TF-0847 | forge-design : render_page contenu_rogne signale les champs de saisie dont la valeur dépasse la largeur | candidat | digit-ai-forge-design | 1 |
 
-### digit-ai-forge-conception — 5 item(s)
-
-Les items ouverts ciblant digit-ai-forge-conception, du score le plus fort au plus faible. Le score est
-celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
-
-| Id | Titre | Statut | Forge(s) | Score |
-|---|---|---|---|---|
-| TF-0822 | digit-ai-forge-conception : la transcription d'un champ depuis la prose n'est vérifiée par rien, et EXIGENCES. | decide | digit-ai-forge-conception | 3 |
-| TF-0823 | digit-ai-forge-conception : une fixture est déclarée verte pour l'oracle qu'elle sert, jamais pour les autres  | decide | digit-ai-forge-conception | 2 |
-| TF-0827 | digit-ai-forge-conception : la seconde famille de vues garde le sceau de provenance seul, et la variante « lis | candidat | digit-ai-forge-conception | 1 |
-| TF-0831 | forge-conception : run-oracles-conception sans --seulement juge EXIGENCES.json comme un RETRO-MODELE | candidat | digit-ai-forge-conception | 1 |
-| TF-0832 | forge-conception : T5 attend corps-sha256 que ni derive-les-vues ni vues.md ne documentent | candidat | digit-ai-forge-conception | 1 |
-
 ### digit-ai-forge-tests — 5 item(s)
 
 Les items ouverts ciblant digit-ai-forge-tests, du score le plus fort au plus faible. Le score est
@@ -88,6 +78,18 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0841 | forge-tests : les livrables sont refusés parce qu'une clé de cas reprend un chemin de route lu dans .env.forge | candidat | digit-ai-forge-tests | 1 |
 | TF-0842 | forge-tests : INSTANCE_MONTER sans secrets de session et INSTANCE_DEMONTER qui ne libère pas le port | candidat | digit-ai-forge-tests | 1 |
 | TF-0843 | forge-tests : le pan interface et oracle-panneau-tache PA6 s'excluent sur une page-formulaire dédiée | candidat | digit-ai-forge-tests, digit-ai-forge-design | 1 |
+
+### digit-ai-forge-conception — 4 item(s)
+
+Les items ouverts ciblant digit-ai-forge-conception, du score le plus fort au plus faible. Le score est
+celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
+
+| Id | Titre | Statut | Forge(s) | Score |
+|---|---|---|---|---|
+| TF-0827 | digit-ai-forge-conception : la seconde famille de vues garde le sceau de provenance seul, et la variante « lis | candidat | digit-ai-forge-conception | 1 |
+| TF-0831 | forge-conception : run-oracles-conception sans --seulement juge EXIGENCES.json comme un RETRO-MODELE | candidat | digit-ai-forge-conception | 1 |
+| TF-0832 | forge-conception : T5 attend corps-sha256 que ni derive-les-vues ni vues.md ne documentent | candidat | digit-ai-forge-conception | 1 |
+| TF-0854 | digit-ai-forge-conception : les tables closes des oracles sont elles aussi des transcriptions de prose que rie | candidat | digit-ai-forge-conception | 1 |
 
 ### pilot — 3 item(s)
 
@@ -107,9 +109,9 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 
 | Id | Titre | Statut | Forge(s) | Score |
 |---|---|---|---|---|
-| TF-0824 | digit-ai-forge-agents : le contrat de sortie de run-oracles.mjs n'a aucun domicile écrit — le champ detail a c | decide | digit-ai-forge-agents | 2 |
 | TF-0825 | digit-ai-forge-agents : etendre la porte de publication aux noms de produits demande deux garde-fous, parce qu | candidat | digit-ai-forge-agents | 1 |
 | TF-0828 | digit-ai-forge-agents : la regle C5 de la porte de publication juge trois angles sur les quatre que C1-C4 couv | candidat | digit-ai-forge-agents | 1 |
+| TF-0855 | digit-ai-forge-agents : la porte de publication rend FAIL sur main — cinq mentions reelles d un nom de produit | candidat | digit-ai-forge-agents | 1 |
 
 ### forge-tests — 2 item(s)
 

@@ -1,0 +1,85 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260906a.md",
+  "date_iso": "2026-09-06T07:18:19.065Z",
+  "registre_version": "2.17.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 6,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260906a.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260906a.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260906a.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260906a.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260906a.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · 0 total(aux) de colonne vérifié(s) par re-somme + 1 effectif(s) annoncé(s) rapproché(s) de leur cardinal réel + 0/0 mesure(s) publiée(s) portant leur dénominateur et leurs unités, 0 écart"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260906a.md",
+      "verdict": "PASS",
+      "detail": "3 constat(s) · 2 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (2 avertissement(s)) ; nombre « 1 381 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260906a.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260906a.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Autorité d'une décision affirmée",
+      "file": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260906a.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260906a.md",
+    "ts": "2026-09-06T07:18:19.064Z",
+    "fichiers": {
+      "input\\00-retours\\digit-ai-forge-conception - RETOURS - 20260906a.md": "965494c858569b7c0e3b3c59cad2f37937bd3d916635c63ee240ee489aac8846"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

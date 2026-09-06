@@ -1,0 +1,79 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\input\\00-retours\\Produit-12 - RETOURS - 20260906b.md",
+  "date_iso": "2026-09-06T07:08:39.503Z",
+  "registre_version": "2.17.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "input\\00-retours\\Produit-12 - RETOURS - 20260906b.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "input\\00-retours\\Produit-12 - RETOURS - 20260906b.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "input\\00-retours\\Produit-12 - RETOURS - 20260906b.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "input\\00-retours\\Produit-12 - RETOURS - 20260906b.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "input\\00-retours\\Produit-12 - RETOURS - 20260906b.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "input\\00-retours\\Produit-12 - RETOURS - 20260906b.md",
+      "verdict": "PASS",
+      "detail": "3 constat(s) · 2 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (2 avertissement(s)) ; pourcentage « 98 % » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "input\\00-retours\\Produit-12 - RETOURS - 20260906b.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "input\\00-retours\\Produit-12 - RETOURS - 20260906b.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "input\\00-retours\\Produit-12 - RETOURS - 20260906b.md",
+    "ts": "2026-09-06T07:08:39.503Z",
+    "fichiers": {
+      "input\\00-retours\\Produit-12 - RETOURS - 20260906b.md": "6d92e4762a3d3da72cf55682e8d48dec5236b006b3a4f153a58aeaa1453ac003"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}
