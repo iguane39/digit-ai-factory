@@ -64,5 +64,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `20260902-etude-opportunite-dataforseo-produit-02.md` | fichier | 43,7 Ko | Étude d'opportunité — entrée de DataForSEO dans le dispositif de mesure de Produit-02 — 20 |
 | `20260903-L99-amelioration-continue.md` | fichier | 42,3 Ko | Analyse L99 — « Conçois et construis un système d'amélioration continue de la factory » |
 | `20260903-recidives-mesure.md` | fichier | 7,3 Ko | Récidives au registre — mesure du pas 0 (03/09/2026) |
+| `20260907-etude-opportunite-mission-data-silver-gold-powerbi.md` | fichier | 43,4 Ko | Étude d'opportunité — préparation des forges à une mission data Silver/Gold sur Databricks |
+| `20260907-L99-mission-data-silver-gold-powerbi.md` | fichier | 47,5 Ko | Analyse L99 — « Identifie les compétences manquantes des forges pour une mission data Silv |
 
-_48 fichier(s), 0 sous-dossier(s)_
+_50 fichier(s), 0 sous-dossier(s)_
