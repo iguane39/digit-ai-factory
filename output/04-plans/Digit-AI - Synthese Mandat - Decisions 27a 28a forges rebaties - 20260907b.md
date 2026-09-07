@@ -62,6 +62,8 @@ Les deux décisions viennent de la porte de publication de la forge des outils, 
 - **Sauvegardes hors dépôt** : onze paquets git dans `c:\dev\_sauvegarde-reconstruction-20260907` (dix anciennes histoires, un paquet de la branche `main` de la forge des outils avec les schémas) et un LISEZMOI.
   - preuve : `git bundle verify` du paquet des schémas → « The bundle uses this hash algorithm: sha1 » (valide) ; tailles listées, 0,2 à 16,5 Mo.
 - **Fraîcheur du poste** : `node bootstrap.mjs --pull` → « Poste prêt — présent, à jour, skills alignés (1 avertissement non bloquant) » ; quatorze dépôts à jour, forge des outils « en avance de 3 commit(s) ».
+- **Lot du produit 03 nettoyé sur disque** : la porte de publication du pilot, dans sa version réalignée ce matin (elle voit désormais les noms de produits), a refusé le push de cette synthèse sur deux lignes de l'index de la boîte d'entrée qui citaient le nom du lot déposé le 03/09 ; la règle du mode opératoire prescrit `anonymiser-suivis --fichiers` pour un lot reçu sous un nom interdit, avant toute ingestion : le nom du client est réécrit en pseudonyme dans le nom des deux fichiers et dans leur contenu, le lot reste non suivi, l'index régénéré rend le produit sous son pseudonyme.
+  - preuve : `oracle-nom-client-publie` via le hook → « PUBLICATION REFUSÉE », C5 × 2 sur `input/00-retours/README.md` ; après nettoyage, `grep -c -i` du nom réel du client dans les deux fichiers → 0 et 0, index lignes 20-21 → `Produit-03 - RETOURS - 20260903a` ; push `fa122c5..76fb053` accepté par la porte ; `git rev-list --left-right --count` → `0 0`.
 
 ## 5. Non traité — avec son motif
 
@@ -70,7 +72,7 @@ Les deux décisions viennent de la porte de publication de la forge des outils, 
 - **La porte de publication sur les neuf autres forges** : *écarté* — aucune n'a rien à publier (0 devant), et la porte y serait rouge par les seules branches de sauvegarde tant que D-30 n'est pas prise ; critère de réouverture : un commit local dans l'une d'elles.
 - **La mise à jour du registre du pilot avec les nouveaux identifiants des commits des schémas** (la clôture de TF-0856 cite `24308f6`, devenu `d506679`) : *hors mandat*, le registre n'était pas dans la décision ; l'ancien identifiant reste lisible dans le paquet de sauvegarde et dans cette synthèse (A-71).
 - **Les actions A-64, A-65 et A-67 de la synthèse du matin** (lot du produit 03, sidecar du produit 01, candidature d'allocateur) : *hors mandat*, non décidées.
-- **Le lot du produit 03 du 03/09** : reste sur disque, non suivi, pour l'oracle de la boîte d'entrée.
+- **L'ingestion du lot du produit 03 du 03/09** : *hors mandat* ; le lot, nettoyé, reste sur disque sous son pseudonyme, non suivi, pour l'oracle de la boîte d'entrée (A-64).
 
 ## 6. Écarts à la lettre
 
@@ -113,5 +115,5 @@ Ordre de traitement : d'abord ce qui met le chantier des schémas à l'abri de l
 
 - Forges : dix branches `sauvegarde/ancienne-histoire-20260907` ; `main` = `origin/main` dans neuf forges ; forge des outils `main` = `43ef9a3` (trois commits locaux) ; aucun fichier de forge modifié hors ces commits.
 - Copie installée des skills : 10 fichiers recopiés depuis la forge des outils.
-- Pilot : trois branches supprimées ; cette synthèse, README d'output, `output/LISEZMOI.md`.
+- Pilot : trois branches supprimées ; cette synthèse, README d'output, `output/LISEZMOI.md` ; index `input/00-retours/README.md` régénéré ; le lot du produit 03 renommé et réécrit sur disque (non suivi).
 - Hors dépôt : `c:\dev\_sauvegarde-reconstruction-20260907` (onze paquets git, un LISEZMOI).

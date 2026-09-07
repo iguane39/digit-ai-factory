@@ -46,7 +46,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Decisions 1a 2a 3a 4a - 20260903g.md` | fichier | 16,4 Ko | Synthèse — décisions 1a, 2a, 3a, 4a du 03/09/2026 |
 | `Digit-AI - Synthese Mandat - Decisions 1a 2a 3b 4a synchronisation - 20260903e.md` | fichier | 16,1 Ko | Synthèse de mandat — exécution des décisions 1a, 2a, 3b et 4a de la synchronisation (03/09 |
 | `Digit-AI - Synthese Mandat - Decisions 21a 22a 23a et actions 49 a 52 - 20260906n.md` | fichier | 24,8 Ko | Synthèse de mandat — décisions 21, 22 et 23, actions 49 à 52 exécutées : neuf histoires ré |
-| `Digit-AI - Synthese Mandat - Decisions 27a 28a forges rebaties - 20260907b.md` | fichier | 17,0 Ko | Synthèse de mandat — décisions 27 et 28 exécutées : les dix forges rebâties sur leur histo |
+| `Digit-AI - Synthese Mandat - Decisions 27a 28a forges rebaties - 20260907b.md` | fichier | 18,1 Ko | Synthèse de mandat — décisions 27 et 28 exécutées : les dix forges rebâties sur leur histo |
 | `Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md` | fichier | 25,9 Ko | Synthèse de mandat — vos trois décisions du matin exécutées : l'historique du pilot réécri |
 | `Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md` | fichier | 13,5 Ko | Synthèse de mandat — décisions 8a et 9a exécutées : trois forges publiées, quatre candidat |
 | `Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md` | fichier | 15,2 Ko | Synthèse de mandat — l'étude d'opportunité conclut de ne rien construire, et signale une f |

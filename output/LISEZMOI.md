@@ -232,7 +232,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Decisions 1a 2a 3a 4a - 20260903g.md | 20260903g | 16.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 1a 2a 3a 4a - 20260903g.md` |
 | Digit-AI - Synthese Mandat - Decisions 1a 2a 3b 4a synchronisation - 20260903e.md | 20260903e | 16.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 1a 2a 3b 4a synchronisation - 20260903e.md` |
 | Digit-AI - Synthese Mandat - Decisions 21a 22a 23a et actions 49 a 52 - 20260906n.md | 20260906n | 24.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 21a 22a 23a et actions 49 a 52 - 20260906n.md` |
-| Digit-AI - Synthese Mandat - Decisions 27a 28a forges rebaties - 20260907b.md | 20260907b | 17 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 27a 28a forges rebaties - 20260907b.md` |
+| Digit-AI - Synthese Mandat - Decisions 27a 28a forges rebaties - 20260907b.md | 20260907b | 18.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 27a 28a forges rebaties - 20260907b.md` |
 | Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md | 20260903b | 25.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md` |
 | Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md | 20260905h | 13.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md` |
 | Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md | 20260831a | 15.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md` |
