@@ -88,6 +88,13 @@ const PILOT = "digit-ai-factory";
 //: les anciens noms, ce qui rend un vieux clone indiscernable d'un dépôt vivant à l'usage : il
 //: `fetch` sans broncher. Seule cette table permet de le rapprocher du pilot.
 const ALIAS_PILOT = ["digit-ai-forge-pilot", "digit-ai-forge-steering"];
+// LE CANAL CONFIDENTIEL (D-28 (a), 07/09/2026). Un dépôt PRIVÉ, cloné sous un nom de dossier qui ne
+// commence pas par « digit-ai » pour qu'aucun balayage ne le prenne pour une forge : il porte les deux
+// tables de pseudonymisation (clients, produits) et les entrants confidentiels des produits et des
+// forges. Tiré à chaque ouverture comme les forges, il est un DÉFAUT s'il est absent ou en retard —
+// deux postes qui étendent chacun leur table finissent par donner un même numéro à deux produits.
+// Son oracle (`oracle-confidentiel.mjs`, dans le dépôt) vérifie qu'il est resté privé et sans secret.
+const CANAL = { nom: "digit-ai-confidentiel", dossier: "_confidentiel", preuve: "tables/produits-pseudonymes.json" };
 
 const args = process.argv.slice(2);
 // --rebatir <dépôt> (D-12 a, 07/09/2026, TF-0877) : quand un dépôt rend « DIVERGÉ » parce que son
@@ -253,6 +260,31 @@ for (const f of FORGES) {
   }
 }
 
+// 4 ter. LE CANAL CONFIDENTIEL : présent, à jour, privé, sans secret ------------------------
+{
+  const dest = process.env.FORGE_CONFIDENTIEL || join(racine, CANAL.dossier);
+  if (existsSync(join(dest, ".git"))) {
+    traiterPresent(`${CANAL.nom} (canal confidentiel)`, dest);
+    if (!existsSync(join(dest, CANAL.preuve))) defaut(`${CANAL.nom} — la table des produits manque (${CANAL.preuve})`, "jouer scripts/fusionner-tables-confidentielles.mjs depuis le pilot");
+    const o = spawnSync(process.execPath, [join(dest, "oracle-confidentiel.mjs"), dest], { encoding: "utf8" });
+    if (o.status === 0) ligne("ok", `${CANAL.nom} — oracle-confidentiel PASS (privé, tables valides, aucun secret)`);
+    else {
+      let detail = "";
+      try { detail = (JSON.parse(o.stdout).constats || []).filter((c) => c.statut === "FAIL").map((c) => `${c.regle} : ${c.message}`).join(" · ").slice(0, 200); } catch { detail = (o.stderr || o.stdout || "").trim().slice(0, 200); }
+      defaut(`${CANAL.nom} — oracle-confidentiel FAIL : ${detail}`, `node "${join(dest, "oracle-confidentiel.mjs")}" "${dest}" et corriger`);
+    }
+  } else {
+    // Absent : cloné comme une forge (le poste vierge doit le recevoir). Une SOURCE surchargée
+    // (recette du bootstrap, miroir local) peut ne pas porter ce dépôt privé : alors on le DIT en
+    // avertissement, jamais en défaut — un miroir sans canal n'est pas un poste sans tables, c'est
+    // un poste dont les tables restent à l'ancien emplacement, ce que lib-confidentiel déclare.
+    const r = git(racine, "clone", "--quiet", `${SOURCE}/${CANAL.nom}.git`, dest);
+    if (r.status === 0) ligne("ok", `${CANAL.nom} — canal confidentiel cloné en ${dest} ; si ce poste portait encore des tables libres, jouer scripts/fusionner-tables-confidentielles.mjs`);
+    else if (process.env.BOOTSTRAP_SOURCE) { ligne("avert", `${CANAL.nom} — canal confidentiel absent à la source surchargée ${SOURCE} : tables lues à l'ancien emplacement s'il existe`); averts.push(`${CANAL.nom} absent à la source surchargée`); }
+    else defaut(`${CANAL.nom} — canal confidentiel ABSENT et clone en échec : ${(r.stderr || "").trim().split("\n")[0].slice(0, 120)}`, `vérifier l'accès au dépôt PRIVÉ ${SOURCE}/${CANAL.nom}.git (gh auth status), puis scripts/fusionner-tables-confidentielles.mjs si des tables libres existent`);
+  }
+}
+
 // 4 bis. LES DÉPÔTS QUE LA LISTE NE CONNAÎT PAS (TF-0525) ------------------------------------
 //
 // LE FAIT, mesuré le 23/08. Le balayage des dépôts de la racine a rendu QUINZE entrées là où
@@ -290,6 +322,7 @@ console.log("");
   const connus = new Map();          // origin normalisé -> nom du dépôt attendu
   const attendus = new Set(FORGES.map((f) => f.nom));
   attendus.add(PILOT);
+  attendus.add(CANAL.dossier); // le canal confidentiel est un dépôt connu, sous son nom de dossier
   // LE SEPARATEUR FAIT PARTIE DE LA NORMALISATION, et son absence rendait la comparaison
   // fausse en silence : une origin ecrite « C:\\dev\\bare/depot.git » et une autre
   // « C:\\dev\\bare\\depot.git » designent le MEME depot et ne se ressemblaient pas. Deux clones du

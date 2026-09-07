@@ -270,6 +270,10 @@
   "cas": 9,
   "vu_le": "2026-08-26"
  },
+ "scripts/fusionner-tables-confidentielles.test.mjs": {
+  "cas": 3,
+  "vu_le": "2026-09-07"
+ },
  "scripts/lib-pseudonyme-produit.test.mjs": {
   "cas": 7,
   "vu_le": "2026-09-03"

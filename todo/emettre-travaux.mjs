@@ -48,6 +48,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { cheminsTables } from "../scripts/lib-confidentiel.mjs";
 import { verifier } from "../gabarits/oracle-travaux-pilot.mjs";
 import { empreinteTexte } from "../scripts/lib-empreinte.mjs";
 import { relever } from "../scripts/relever-heritage.mjs";
@@ -95,8 +96,7 @@ export const memeProduit = (a, b) => normaliserProduit(a) === normaliserProduit(
  * n'est pas baptiser. Table absente ou illisible → `null`, et le rapprochement retombe sur la
  * comparaison directe : un parc sans table n'a jamais rien anonymisé, il n'y a rien à résoudre.
  */
-export function pseudonymeDe(nomReel, chemin = process.env.FORGE_PRODUITS_PSEUDO
-    || join(process.env.FORGE_ROOT || join(PILOT, ".."), "_produits-pseudonymes.json")) {
+export function pseudonymeDe(nomReel, chemin = cheminsTables().produits) { // canal confidentiel (D-28 a), env, ou ancien fichier libre
   if (!existsSync(chemin)) return null;
   let d;
   try { d = JSON.parse(readFileSync(chemin, "utf8")); } catch { return null; }

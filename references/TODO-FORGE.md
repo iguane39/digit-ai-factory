@@ -173,8 +173,10 @@ rejouer telle quelle sur tout dépôt qui publie : (1) **sauvegarde entière** �
 <hors-dépôt>/<dépôt>-avant-filter-repo.bundle --all`, vérifiée par `git bundle verify`, HEAD
 d'avant consigné à côté ; (2) **règles dérivées des tables, jamais écrites à la main** —
 `node scripts\generer-remplacements-historique.mjs <dossier>` produit `remplacements.txt`
-(contenus + messages) et `filename-callback.py` (noms de fichiers) depuis `_noms-interdits.json`
-et `_produits-pseudonymes.json`, lues au moment du geste ; (3) **réécriture** —
+(contenus + messages) et `filename-callback.py` (noms de fichiers) depuis les deux tables du CANAL
+CONFIDENTIEL (`<racine>\_confidentiel\tables\`, dépôt privé `digit-ai-confidentiel`, D-28 (a) du 07/09 — avant cette
+date, deux fichiers libres `_noms-interdits.json` et `_produits-pseudonymes.json` à la racine du parc, que
+`scripts\fusionner-tables-confidentielles.mjs` fait entrer au canal une fois par poste), lues au moment du geste ; (3) **réécriture** —
 `git filter-repo --replace-text <dossier>\remplacements.txt --replace-message <même fichier>
 --filename-callback "$(cat <dossier>\filename-callback.py)" --force` (répondre N si l'outil
 propose de continuer une passe d'un autre jour) ; (4) **remettre `origin`**, que l'outil retire ;
@@ -184,6 +186,18 @@ Ce que la première passe a appris : un sigle se remplace insensible à la casse
 juge — 96 constats tenaient à un identifiant de run en minuscules. Après le geste, deux choses
 restent humaines : la publication forcée (`git push --force`, R-38) et toute autre copie locale du
 dépôt, devenue incompatible avec la nouvelle histoire (à recloner, pas à fusionner). **Ce que la troisième passe a appris (05/09, forge-development, TF-0813)** : la mesure qui DÉCIDE une réécriture se fait sur un clone à BRANCHE UNIQUE de ce qui est publié — 89 constats vivaient dans une branche locale jamais poussée, l'histoire publiée était verte ; et une branche protégée sur GitHub refuse tout push forcé — vérifier la protection AVANT de réécrire, sinon la passe ne se publie pas. **Ce que la quatrième passe a appris (07/09, forge-design, forge-tests, forge-development, D-10)** : hors de `c:\dev`, la porte ne trouve pas les deux tables et rend SKIP, jamais PASS — les désigner par `FORGE_NOMS_INTERDITS` et `FORGE_PRODUITS_PSEUDO` avant de juger un clone frais ; et la porte lit `git log --all`, qui compte les **arborescences de travail liées** (`git worktree list`) : une arborescence d'une session antérieure, détachée sur l'ancienne histoire, a gardé 79 commits atteignables sur un clone local pourtant réaligné (262 commits vus pour 183) — retirer son enregistrement (`git worktree prune` après suppression de `.git\worktrees\<nom>`) fait partie du diagnostic d'un clone rebâti ; enfin `git filter-repo` se lance par `python -m git_filter_repo` sur un poste où `git filter-repo` répond « Function not implemented ». **Et la copie locale de l'AUTRE poste se rebâtit par l'outil, plus à la main (D-12 a, 07/09, TF-0877)** : `node bootstrap.mjs --rebatir <dépôt> [--essai]` (`scripts\rebatir-clone.mjs`, recette `scripts\rebatir-clone.test.mjs`) refuse un arbre sale, sauvegarde le clone entier en paquet vérifié sous `<racine>\_sauvegardes\`, exporte le delta propre au poste en patches, retire l'enregistrement des arborescences liées, réaligne sur `origin/main`, rejoue les patches (`git am --3way`, arrêt en exit 1 au premier conflit, patch conservé), joue la porte de publication avec les deux tables de la racine — et ne pousse jamais. Ce que git ne synchronise pas entre deux postes se copie à la main : les deux tables (`_noms-interdits.json`, `_produits-pseudonymes.json`) et, après `--pull`, la copie installée des skills (`oracle-skills --appliquer`, joué par `--pull`).
+
+**Le canal confidentiel (D-28 (a), 07/09/2026).** Ce qui ne doit jamais entrer dans un dépôt publié et
+doit pourtant voyager entre les postes et remonter des produits et des forges vit dans UN dépôt privé,
+`digit-ai-confidentiel`, cloné en `<racine>\_confidentiel\` : les deux tables de pseudonymisation
+(`tables\`) et les entrants confidentiels (`entrants\`, un fichier par remise avec son en-tête, traités puis
+déplacés en `traites\`). Le bootstrap le tire à chaque ouverture, le clone s'il manque, le compte en
+DÉFAUT s'il est en retard, et joue son oracle (`oracle-confidentiel.mjs` : privé chez l'hébergeur,
+tables valides, aucun secret, entrants en forme, un pseudonyme par produit). Le fait qui l'a imposé :
+deux postes ont étendu chacun leur table libre pendant deux jours sans aucun lien — mêmes numéros par
+chance, pas par construction. Règle : toute extension d'une table se commet et se pousse dans la foulée ;
+`scripts\lib-confidentiel.mjs` est le seul endroit qui sait où lire les tables (variable d'environnement,
+canal, sinon ancien fichier libre EN LE DISANT).
 
 **La propagation d'une correction se MESURE, elle ne se souhaite pas (TF-0689, 01/09).** Le
 champ `produits_beneficiaires` est de la prose — 73 items clos en portaient au 27/08, aucun

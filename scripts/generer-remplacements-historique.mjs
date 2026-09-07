@@ -21,11 +21,12 @@
 // réécriture sans retouche du script. Les tables ne sont jamais copiées dans le dépôt.
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
+import { cheminsTables } from "./lib-confidentiel.mjs";
 
 const sortie = process.argv[2];
 if (!sortie) { console.error("usage : node scripts/generer-remplacements-historique.mjs <dossier-de-sortie>"); process.exit(2); }
-const NOMS = process.env.FORGE_NOMS_INTERDITS || "c:/dev/_noms-interdits.json";
-const PRODUITS = process.env.FORGE_PRODUITS_PSEUDO || "c:/dev/_produits-pseudonymes.json";
+const NOMS = cheminsTables().clients; // canal confidentiel (D-28 a), env, ou ancien fichier libre
+const PRODUITS = cheminsTables().produits;
 const clients = JSON.parse(readFileSync(NOMS, "utf8"));
 const produits = JSON.parse(readFileSync(PRODUITS, "utf8")).produits || {};
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

@@ -49,12 +49,13 @@
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { cheminsTables } from "../scripts/lib-confidentiel.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const RACINE = process.env.FORGE_ROOT || join(ICI, "..", "..");
 
-const CHEMIN_CLIENTS = () => process.env.FORGE_NOMS_INTERDITS || join(RACINE, "_noms-interdits.json");
-const CHEMIN_PRODUITS = () => process.env.FORGE_PRODUITS_PSEUDO || join(RACINE, "_produits-pseudonymes.json");
+const CHEMIN_CLIENTS = () => cheminsTables(RACINE).clients; // canal confidentiel (D-28 a), env, ou ancien fichier libre
+const CHEMIN_PRODUITS = () => cheminsTables(RACINE).produits;
 
 // Un sigle court se cherche en MOT ENTIER : mesuré le 27/08, le sigle d'un opérateur télécom
 // inscrit comme un nom ordinaire attrapait `candidatsFreres` et `resFront`, deux identifiants de

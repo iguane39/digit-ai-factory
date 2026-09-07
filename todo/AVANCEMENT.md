@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau 3ba6a03baee3)]
+sources_de_verite: [todo/TODO.jsonl (sceau 3fca6f674bd4)]
 verifie_le: 2026-09-07
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `3ba6a03baee3`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `3fca6f674bd4`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -20,9 +20,9 @@ les corrections donnerait l'illusion d'un progrès net.
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
 | Ouverts | 49 | candidats, décidés ou en cours — le reste à faire réel |
-| Clos sur gains constatés | 46 | corrigés avec leur mesure avant/après |
+| Clos sur gains constatés | 49 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 0 | décidés non faits, motif écrit — jamais un silence |
-| Total suivi | 95 | tout ce que le registre a jamais porté |
+| Total suivi | 98 | tout ce que le registre a jamais porté |
 
 ## Ce qui reste ouvert, par forge
 
@@ -45,7 +45,7 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0871 | pilot : la convention de démonstration (R-23, aide MODE_DEMO) a mis des identifiants sur une page servie sur I | candidat | digit-ai-factory | 12.5 |
 | TF-0682 | Quinze contrôles du produit ne sont exercés par AUCUNE recette — être cité n'est pas être joué | decide | digit-ai-factory | 10 |
 | TF-0676 | Aucun script de capture du produit ne produit systématiquement une pleine page | decide | digit-ai-factory | 6.7 |
-| TF-0829 | digit-ai-forge-development : trois messages de commit de l'histoire portent le nom d'un produit — la porte C5  | en_cours | digit-ai-forge-development, digit-ai-factory | 3 |
+| TF-0879 | pilot : la recette scripts/rebatir-clone.test.mjs (écrite sur l'autre poste le 07/09) échoue sur ce poste avan | candidat | digit-ai-factory | 2 |
 | TF-0826 | digit-ai-factory : le depot PUBLIC du pilot porte lui-meme, dans 9 fichiers suivis, le nom de produit que TF-0 | candidat | digit-ai-factory | 1 |
 | TF-0836 | pilot : le hook qo-gate-write juge un template de maquette comme un livrable | candidat | digit-ai-factory | 1 |
 | TF-0838 | pilot : le skill claude-api ne documente pas fallbacks avec messages.parse | candidat | digit-ai-factory | 1 |
@@ -153,15 +153,6 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | Id | Titre | Statut | Forge(s) | Score |
 |---|---|---|---|---|
 | TF-0792 | Ingerer l'expertise « donnees de recherche multilingues » (references/SEO-RECHERCHE.md du pilot) dans le corpu | candidat | seo-geo | 6 |
-
-### digit-ai-forge-development — 1 item(s)
-
-Les items ouverts ciblant digit-ai-forge-development, du score le plus fort au plus faible. Le score est
-celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
-
-| Id | Titre | Statut | Forge(s) | Score |
-|---|---|---|---|---|
-| TF-0829 | digit-ai-forge-development : trois messages de commit de l'histoire portent le nom d'un produit — la porte C5  | en_cours | digit-ai-forge-development, digit-ai-factory | 3 |
 
 ### digit-ai-forge-organization — 1 item(s)
 

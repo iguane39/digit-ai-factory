@@ -41,6 +41,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import { homedir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { cheminsTables } from "./lib-confidentiel.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -171,7 +172,7 @@ const oracle = pistesOracle.find((p) => existsSync(p));
 if (!oracle) R.porte = { verdict: "SKIP", motif: "oracle-nom-client-publie introuvable — la porte se joue à la main avant tout push" };
 else {
   const env = { ...process.env };
-  const noms = join(racineParc, "_noms-interdits.json"), prod = join(racineParc, "_produits-pseudonymes.json");
+  const { clients: noms, produits: prod } = cheminsTables(racineParc); // canal confidentiel (D-28 a), env, ou ancien fichier libre
   if (existsSync(noms) && !env.FORGE_NOMS_INTERDITS) env.FORGE_NOMS_INTERDITS = noms;
   if (existsSync(prod) && !env.FORGE_PRODUITS_PSEUDO) env.FORGE_PRODUITS_PSEUDO = prod;
   const o = spawnSync(process.execPath, [oracle, depot], { encoding: "utf8", env, maxBuffer: 1 << 26 });
