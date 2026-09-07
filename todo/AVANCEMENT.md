@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau 3fca6f674bd4)]
+sources_de_verite: [todo/TODO.jsonl (sceau 302e7ba60653)]
 verifie_le: 2026-09-07
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `3fca6f674bd4`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `302e7ba60653`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -19,10 +19,10 @@ les corrections donnerait l'illusion d'un progrès net.
 
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
-| Ouverts | 49 | candidats, décidés ou en cours — le reste à faire réel |
+| Ouverts | 56 | candidats, décidés ou en cours — le reste à faire réel |
 | Clos sur gains constatés | 49 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 0 | décidés non faits, motif écrit — jamais un silence |
-| Total suivi | 98 | tout ce que le registre a jamais porté |
+| Total suivi | 105 | tout ce que le registre a jamais porté |
 
 ## Ce qui reste ouvert, par forge
 
@@ -30,7 +30,7 @@ La table se lit par forge cible : c'est l'unité de décision, puisqu'une correc
 livre dans un dépôt. L'ordre suit le NOMBRE d'items ouverts, jamais leur priorité — la
 priorité vit dans la colonne de score.
 
-### digit-ai-factory — 19 item(s)
+### digit-ai-factory — 24 item(s)
 
 Les items ouverts ciblant digit-ai-factory, du score le plus fort au plus faible. Le score est
 celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
@@ -45,7 +45,12 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0871 | pilot : la convention de démonstration (R-23, aide MODE_DEMO) a mis des identifiants sur une page servie sur I | candidat | digit-ai-factory | 12.5 |
 | TF-0682 | Quinze contrôles du produit ne sont exercés par AUCUNE recette — être cité n'est pas être joué | decide | digit-ai-factory | 10 |
 | TF-0676 | Aucun script de capture du produit ne produit systématiquement une pleine page | decide | digit-ai-factory | 6.7 |
+| TF-0884 | digit-ai-factory : rien n'empêche d'écraser un lot de retours déjà remis et ingéré — arrivé le 06/09, réparé p | candidat | digit-ai-factory | 5 |
+| TF-0881 | digit-ai-factory : l'alias de transition périmé (ancien gabarit de lot, 62 lignes du 14/08) survit à côté de l | candidat | digit-ai-factory | 3 |
+| TF-0886 | digit-ai-forge-development : la règle de branche annoncée par le pilot (« avance rapide seulement ») diffère d | candidat | digit-ai-forge-development, digit-ai-factory | 3 |
 | TF-0879 | pilot : la recette scripts/rebatir-clone.test.mjs (écrite sur l'autre poste le 07/09) échoue sur ce poste avan | candidat | digit-ai-factory | 2 |
+| TF-0882 | digit-ai-factory : R-47 compte « absent » un motif d'exclusion qu'une graphie plus large du .gitignore couvre  | candidat | digit-ai-factory | 2 |
+| TF-0883 | digit-ai-factory : le canal des lots suppose la boîte d'entrée du produit ignorée par git sans le dire — chez  | candidat | digit-ai-factory | 2 |
 | TF-0826 | digit-ai-factory : le depot PUBLIC du pilot porte lui-meme, dans 9 fichiers suivis, le nom de produit que TF-0 | candidat | digit-ai-factory | 1 |
 | TF-0836 | pilot : le hook qo-gate-write juge un template de maquette comme un livrable | candidat | digit-ai-factory | 1 |
 | TF-0838 | pilot : le skill claude-api ne documente pas fallbacks avec messages.parse | candidat | digit-ai-factory | 1 |
@@ -89,7 +94,7 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0842 | forge-tests : INSTANCE_MONTER sans secrets de session et INSTANCE_DEMONTER qui ne libère pas le port | candidat | digit-ai-forge-tests | 1 |
 | TF-0843 | forge-tests : le pan interface et oracle-panneau-tache PA6 s'excluent sur une page-formulaire dédiée | candidat | digit-ai-forge-tests, digit-ai-forge-design | 1 |
 
-### digit-ai-forge-conception — 5 item(s)
+### digit-ai-forge-conception — 6 item(s)
 
 Les items ouverts ciblant digit-ai-forge-conception, du score le plus fort au plus faible. Le score est
 celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
@@ -97,22 +102,24 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | Id | Titre | Statut | Forge(s) | Score |
 |---|---|---|---|---|
 | TF-0874 | forge-conception : la surface implicite ne propose ni lien public partageable ni comptes d'essai | candidat | digit-ai-forge-conception | 20 |
+| TF-0885 | digit-ai-forge-conception : le point d'entrée déclaré au manifeste rend FAIL sur toute cible, même verte — ora | candidat | digit-ai-forge-conception | 5 |
 | TF-0827 | digit-ai-forge-conception : la seconde famille de vues garde le sceau de provenance seul, et la variante « lis | candidat | digit-ai-forge-conception | 1 |
 | TF-0831 | forge-conception : run-oracles-conception sans --seulement juge EXIGENCES.json comme un RETRO-MODELE | candidat | digit-ai-forge-conception | 1 |
 | TF-0832 | forge-conception : T5 attend corps-sha256 que ni derive-les-vues ni vues.md ne documentent | candidat | digit-ai-forge-conception | 1 |
 | TF-0854 | digit-ai-forge-conception : les tables closes des oracles sont elles aussi des transcriptions de prose que rie | candidat | digit-ai-forge-conception | 1 |
 
-### digit-ai-forge-agents — 4 item(s)
+### digit-ai-forge-agents — 5 item(s)
 
 Les items ouverts ciblant digit-ai-forge-agents, du score le plus fort au plus faible. Le score est
 celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 
 | Id | Titre | Statut | Forge(s) | Score |
 |---|---|---|---|---|
+| TF-0880 | digit-ai-forge-agents : la règle C5 de la porte cherche une clé courte sans frontière — trois faux positifs su | decide | digit-ai-forge-agents | 3 |
 | TF-0857 | digit-ai-schemas : ce que la critique forge-design laisse apres TF-0791 — trois CONFLITS entre oracles de forg | candidat | digit-ai-forge-design, digit-ai-forge-agents | 2.7 |
 | TF-0825 | digit-ai-forge-agents : etendre la porte de publication aux noms de produits demande deux garde-fous, parce qu | candidat | digit-ai-forge-agents | 1 |
 | TF-0828 | digit-ai-forge-agents : la regle C5 de la porte de publication juge trois angles sur les quatre que C1-C4 couv | candidat | digit-ai-forge-agents | 1 |
-| TF-0855 | digit-ai-forge-agents : la porte de publication rend FAIL sur main — cinq mentions reelles d un nom de produit | candidat | digit-ai-forge-agents | 1 |
+| TF-0855 | digit-ai-forge-agents : la porte de publication rend FAIL sur main — cinq mentions reelles d un nom de produit | decide | digit-ai-forge-agents | 1 |
 
 ### pilot — 3 item(s)
 
@@ -162,6 +169,15 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | Id | Titre | Statut | Forge(s) | Score |
 |---|---|---|---|---|
 | TF-0837 | forge-organization : oracle-filtres-tableau G3/G6 exigent init et règle print dans le document | candidat | digit-ai-forge-organization | 1 |
+
+### digit-ai-forge-development — 1 item(s)
+
+Les items ouverts ciblant digit-ai-forge-development, du score le plus fort au plus faible. Le score est
+celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
+
+| Id | Titre | Statut | Forge(s) | Score |
+|---|---|---|---|---|
+| TF-0886 | digit-ai-forge-development : la règle de branche annoncée par le pilot (« avance rapide seulement ») diffère d | candidat | digit-ai-forge-development, digit-ai-factory | 3 |
 
 ## Ce que ce rapport ne dit pas
 

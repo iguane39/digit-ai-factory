@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.2.0",
- "date": "2026-09-05",
+ "version": "1.3.0",
+ "date": "2026-09-07",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -564,6 +564,122 @@
    "voisines": [
     "recette-verdict-non-prononcable",
     "auteur-juge-son-contrat"
+   ]
+  },
+  {
+   "cle": "porte-cle-courte-sans-frontiere",
+   "famille": "hook-ou-gate",
+   "libelle": "La porte de publication cherche une clé courte de la table (forme littérale d'un seul mot) sans frontière de mot : elle accuse à l'intérieur d'autres mots et de blobs encodés — faux positifs qui décrédibilisent les vrais constats",
+   "creee_le": "2026-09-07",
+   "fondee_par": [
+    "TF-0880"
+   ],
+   "regle": "toute graphie cherchée par la porte est bornée par des non-alphanumériques (la même frontière que les variantes), un blob base64 ne compte jamais ; fixture double sens (blob → PASS, mot entier → FAIL)",
+   "oracle": "forge-agents quality-oracles/scripts/oracle-nom-client-publie.mjs C5 et sa recette ; candidature TF-0880",
+   "voisines": [
+    "garde-lexicale-frontiere-ascii",
+    "anonymisation-portee-partielle"
+   ]
+  },
+  {
+   "cle": "alias-de-transition-perime-survivant",
+   "famille": "heritage-produit",
+   "libelle": "Un alias de transition (ancien nom d'un artefact hérité) survit à côté de la copie canonique à jour, et le relevé d'héritage cesse de le regarder dès que la cible canonique existe : le produit porte deux versions du même contrat, dont une périmée que ses lots citent encore",
+   "creee_le": "2026-09-07",
+   "fondee_par": [
+    "TF-0881"
+   ],
+   "regle": "quand la cible canonique est présente, un alias encore présent est compté PÉRIMÉ par R-47 et nommé avec le geste de retrait (le produit supprime, le pilot ne supprime jamais)",
+   "oracle": "scripts/relever-heritage.mjs (R-47) et sa recette ; candidature TF-0881",
+   "voisines": [
+    "heritage-avertissement-tardif"
+   ]
+  },
+  {
+   "cle": "motif-exclusion-couvert-compte-absent",
+   "famille": "heritage-produit",
+   "libelle": "Le relevé d'héritage compare des lignes nues exactes d'un fichier d'exclusion et compte « absent » un motif qu'une graphie plus large présente couvre déjà : la mise en conformité écrit des lignes redondantes",
+   "creee_le": "2026-09-07",
+   "fondee_par": [
+    "TF-0882"
+   ],
+   "regle": "un motif exigé est tenu s'il est présent OU couvert par un motif plus large du même fichier (même raisonnement que HERITAGE.json pose pour .env) ; fixture double sens",
+   "oracle": "scripts/relever-heritage.mjs (contrôle presence_et_motifs) et sa recette ; candidature TF-0882",
+   "voisines": [
+    "garde-lexicale-frontiere-ascii"
+   ]
+  },
+  {
+   "cle": "boite-entree-produit-statut-git-non-dit",
+   "famille": "contrat-interface-forge",
+   "libelle": "Le canal des lots de travaux suppose la boîte d'entrée du produit ignorée par git sans le dire : chez un produit qui versionne input\\, le lot reçu reste un fichier non suivi indéfiniment et aucune règle ne dit s'il entre dans son histoire",
+   "creee_le": "2026-09-07",
+   "fondee_par": [
+    "TF-0883"
+   ],
+   "regle": "gabarits/TRAVAUX-PILOT.md dit le sort du lot reçu dans les deux cas (boîte ignorée : rien ; boîte versionnée : le produit commet le lot marqué traité, jamais le pilot) et le lot le rappelle",
+   "oracle": "gabarits/oracle-travaux-pilot.mjs (règle T7 à ajouter : la ligne du sort du lot reçu est présente) ; candidature TF-0883",
+   "voisines": [
+    "lot-de-travaux-mauvais-module-producteur"
+   ]
+  },
+  {
+   "cle": "lot-remis-ecrasable",
+   "famille": "lot-forme",
+   "libelle": "Rien n'empêche d'écraser un lot de retours déjà remis et ingéré : l'immuabilité est écrite en prose des deux côtés du canal, l'oracle de forme juge le fichier écrit et non le fait qu'il en remplace un autre, et la boîte d'entrée ne le voit qu'à l'ouverture suivante",
+   "creee_le": "2026-09-07",
+   "fondee_par": [
+    "TF-0884"
+   ],
+   "regle": "un lot dont l'empreinte est au registre (événement d'ingestion) ne se réécrit pas : oracle-lot-retours refuse une écriture dont le chemin est déjà ingéré avec une autre empreinte, et le gabarit prescrit l'indice suivant",
+   "oracle": "gabarits/oracle-lot-retours.mjs (règle R-48 à ajouter, lecture des événements d'ingestion) ; candidature TF-0884",
+   "voisines": [
+    "lot-forme",
+    "versionnement-livrable"
+   ]
+  },
+  {
+   "cle": "releve-heritage-juge-arbre-pas-histoire",
+   "famille": "heritage-produit",
+   "libelle": "Le relevé d'héritage compare le disque du poste à la source du pilot et jamais l'état versionné du produit : un héritage recopié mais non commis rend PASS, et un clone ou un restore ramène l'héritage périmé après un relevé vert",
+   "creee_le": "2026-09-07",
+   "fondee_par": [
+    "TF-0848"
+   ],
+   "regle": "le relevé distingue « conforme et commis » de « conforme non commis » (git status --porcelain sur chaque artefact) et compte le second à part ; recopier-heritage.mjs imprime l'état git de ce qu'il laisse",
+   "oracle": "scripts/relever-heritage.mjs (état conforme_non_commis) et sa recette ; item TF-0848 (rattaché par défaut à heritage-avertissement-tardif, rectifié le 07/09)",
+   "voisines": [
+    "heritage-avertissement-tardif",
+    "boucle-retour-sans-descente"
+   ]
+  },
+  {
+   "cle": "point-entree-declare-rouge-sur-toute-cible",
+   "famille": "regle-morte",
+   "libelle": "Le point d'entrée déclaré au manifeste d'une forge (son lanceur agrégé) rend FAIL sur toute cible, même verte, parce qu'un oracle hors de son domaine sort en échec au lieu de se déclarer non jugeant : le verdict agrégé n'est plus prononçable",
+   "creee_le": "2026-09-07",
+   "fondee_par": [
+    "TF-0885"
+   ],
+   "regle": "un oracle appelé sur un artefact hors de son domaine sort en NON_JUGE (exit 2, motif déclaré), jamais en FAIL ; la recette du lanceur agrégé joue une cible verte et exige exit 0",
+   "oracle": "forge-conception oracles/run-oracles-conception.mjs et self-test (cas cible verte) ; candidature TF-0885 (le produit 61 l'a vu aussi : TF-0831)",
+   "voisines": [
+    "recette-verdict-non-prononcable",
+    "fixture-jugee-par-son-seul-oracle"
+   ]
+  },
+  {
+   "cle": "regle-de-branche-annoncee-differente-configuree",
+   "famille": "contrat-interface-forge",
+   "libelle": "La règle de protection d'une branche telle que le pilot l'annonce dans ses lots et synthèses diffère de la règle configurée chez l'hébergeur, et le compte qui pousse la contourne d'office : une protection qui ne protège pas, décrite comme si elle protégeait",
+   "creee_le": "2026-09-07",
+   "fondee_par": [
+    "TF-0886"
+   ],
+   "regle": "avant de décrire ou de lever une protection, la LIRE chez l'hébergeur (gh api …/branches/main/protection) et citer ses champs ; un contournement d'office (« Bypassed rule violations ») se déclare comme un constat",
+   "oracle": "aucun oracle générique — relevé à jouer dans le mode opératoire de réécriture (references/TODO-FORGE.md) ; candidature TF-0886",
+   "voisines": [
+    "anonymisation-portee-partielle"
    ]
   }
  ]
