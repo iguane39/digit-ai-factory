@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 216 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 217 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -261,6 +261,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md | 20260822a | 13.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md` |
 | Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Synchronisation GitHub et reconstruction du clone - 20260903d.md | 20260903d | 25.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub et reconstruction du clone - 20260903d.md` |
+| Digit-AI - Synthese Mandat - Synchronisation GitHub reconstruction du clone - 20260907a.md | 20260907a | 19.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub reconstruction du clone - 20260907a.md` |
 | Digit-AI - Synthese Mandat - TF-0794 clos rectification de seq - 20260905a.md | 20260905a | 12.4 Ko | `04-plans/Digit-AI - Synthese Mandat - TF-0794 clos rectification de seq - 20260905a.md` |
 | Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md | 20260905b | 9.1 Ko | `04-plans/Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md` |
 | Digit-AI - Synthese Mandat - TF-0801 clos cle de versions et file d attente - 20260905c.md | 20260905c | 10.1 Ko | `04-plans/Digit-AI - Synthese Mandat - TF-0801 clos cle de versions et file d attente - 20260905c.md` |

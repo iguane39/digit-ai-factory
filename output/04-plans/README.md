@@ -72,6 +72,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Surveillance des recidives TF-0790 - 20260903c.md` | fichier | 11,3 Ko | Synthèse de mandat — surveillance des récidives entre les runs (03/09/2026, après votre dé |
 | `Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md` | fichier | 13,2 Ko | Digit-AI — Synthèse de mandat — Synchronisation GitHub — 20260822a |
 | `Digit-AI - Synthese Mandat - Synchronisation GitHub et reconstruction du clone - 20260903d.md` | fichier | 25,2 Ko | Synthèse de mandat — synchronisation de la factory et des forges avec GitHub (03/09/2026) |
+| `Digit-AI - Synthese Mandat - Synchronisation GitHub reconstruction du clone - 20260907a.md` | fichier | 19,4 Ko | Synthèse de mandat — synchronisation avec GitHub : le clone du pilot rebâti sur l'histoire |
 | `Digit-AI - Synthese Mandat - TF-0794 clos rectification de seq - 20260905a.md` | fichier | 12,3 Ko | Synthèse de mandat — deuxième chantier pilot clos : la rectification d'une collision de se |
 | `Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md` | fichier | 9,0 Ko | Synthèse de mandat — troisième chantier pilot clos : un contrôle qui déclare ses codes doi |
 | `Digit-AI - Synthese Mandat - TF-0801 clos cle de versions et file d attente - 20260905c.md` | fichier | 10,0 Ko | Synthèse de mandat — quatrième chantier pilot clos : une clé de versions malformée a une v |
@@ -92,4 +93,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Verification de non perte jouable - 20260901d.md` | fichier | 9,0 Ko | Synthèse de mandat — le tri reste éteint, et sa vérification cesse d'être une intention |
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 
-_75 fichier(s), 0 sous-dossier(s)_
+_76 fichier(s), 0 sous-dossier(s)_
