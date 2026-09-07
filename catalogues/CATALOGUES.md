@@ -1,7 +1,7 @@
 # Catalogues de services des forges — vue générée
 
 > **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.8.0, 2026-08-19) — ne jamais éditer ce fichier.
-> 83 services · 69 prouvés · 14 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
+> 89 services · 75 prouvés · 14 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
 
 ## forge-conception (pipeline) — 9 services
 
@@ -17,7 +17,7 @@
 | cat-con-08 | **Rétro-modèle d'un projet existant** | reconstruire un modèle vérifiable (fonctionnel, technique, paramétrage, data, services) d'un projet existant, chaque affirmation ancrée et un échantillon confronté au code | `skills\qualifie-l-entrant (mode rétro-modèle, references\retro-modele.md) · node oracles\oracle-retro-modele.mjs` | GO du 19/08 (étude 20260819a) : oracle RM1-RM5 au self-test double sens, rejoué le 19/08 (10 oracles, 42 règles, VERT) — pas encore de run réel | prouve | experimental |
 | cat-con-09 | **Vues par profil (PO, CSM, utilisateur)** | décliner le rétro-modèle en documentations par audience, fidélité (ancres [RM-xxx]) et péremption (empreinte SHA-256) jugées | `skills\derive-les-vues (references\vues-par-profil.md) · node oracles\oracle-vues-profil.mjs <vue> --modele <modele>` | GO du 19/08 (étude 20260819b) : oracle VP1-VP4 au self-test double sens, rejoué le 19/08 — pas encore de run réel | prouve | experimental |
 
-## forge-design (pipeline) — 9 services
+## forge-design (pipeline) — 10 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -30,6 +30,7 @@
 | cat-des-07 | **Tokens DTCG (source → dérivé)** | faire des tokens une source W3C interopérable, jamais éditée en CSS | `node scripts\generer-tokens-css.mjs · node oracles\oracle-dtcg.mjs <tokens.json> <css>` | TF-0102 (12/08) : 66 déclarations iso à l'ancien fichier main, PASS production, self-test 48 règles rejoué pilot | prouve | experimental |
 | cat-des-08 | **Baseline de régression visuelle** | détecter toute régression visuelle contre une référence approuvée versionnée | `node oracles\oracle-baseline.mjs [approuver\|juger]` | TF-0102 (12/08) : 0,0000 % conforme / 17,3 % divergent mesurés ; approbation post-FAIL refusée | prouve | experimental |
 | cat-des-09 | **Contrôler la généricité d'une interface (règles importées)** | vérifier mécaniquement ce qui, dans un rendu, trahit une interface faite par défaut | `node oracles\oracle-taste.mjs <page.html>` | TF-0199 (14/08) : règles extraites d'une source externe MIT (consultée le 14/08), self-test 13 oracles / 56 règles. TA1/TA2 rétrogradées APRÈS mesure : la borne de saturation condamnait toute palette OKLCH du corpus, et la source se contredit (son propre accent recommandé viole sa règle) | prouve | experimental |
+| cat-des-10 | **Thème Power BI dérivé de la marque** | livrer des rapports Power BI au thème de la marque, jamais au thème par défaut | `node scripts\generer-theme-powerbi.mjs <tokens.json> --sortie <theme.json> · node oracles\oracle-theme-powerbi.mjs <tokens.json> <theme.json>` | TF-0863 (07/09) : self-test double sens (verte = régénération du corpus, rouge = thème par défaut Power BI → TP2, TP3) | prouve | experimental |
 
 ## forge-development (pipeline) — 7 services
 
@@ -73,7 +74,7 @@ oyau.py (section essais) + forge_tests\junit.py` | TF-0146 (13/08) : 12 tests, s
 | cat-agt-10 | **Fiches expert du domaine** | mobiliser ou rédiger une fiche d'expertise versionnée (experts-forge / write-an-expert) | `skills experts-forge et write-an-expert` | déclaré au catalogue le 14/08 (RV-7) — fiches\ du pilot en sont les consommatrices | declare | experimental |
 | cat-agt-11 | **Fixer la barre d'un livrable** | trouver, prouver (test d'existence exécuté) et décomposer la référence externe qui fixe le niveau d'un livrable — pré-vol d'un prompt ou en ligne d'une boucle | `skill la-barre — invocation : « barre… » en tête de message ; registre : references\registre-barres.md` | usages réels : pré-vol TF-0083 (11/08, 3 barres data), campagne catalogues (12/08), TF-0153 (13/08, barre Allure), run Produit-10 (13/08 : protocole tenu intégralement, arrêt au pas 5, garde anti-gameable exercé) | prouve | production |
 
-## forge-ops (transverse) — 5 services
+## forge-ops (transverse) — 6 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -82,8 +83,9 @@ oyau.py (section essais) + forge_tests\junit.py` | TF-0146 (13/08) : 12 tests, s
 | cat-ops-03 | **Plans cloud plan-first** | préparer un déploiement cloud sans exposer de credential | `node scripts\ops.mjs plan <cible> + oracle O-5` | plans livrés et O-5 PASS (TF-0081, 11/08) — exécution réelle par cible restant à consigner (D-P1) | prouve | experimental |
 | cat-ops-04 | **Canary local simulé** | basculer progressivement avec critère de promotion explicite | `node scripts\ops.mjs canary <build> <cible> [--seuils f.json]` | TF-0107 (12/08) : promotion ET dégradation au palier 25 % prouvées au self-test (45 PASS rejoué pilot) | prouve | experimental |
 | cat-ops-05 | **Drift O-6 et verdict rollback SLO** | détecter la dérive déclaré↔constaté et savoir quand recommander un retour arrière | `node oracles\oracle-ops.mjs --drift <f> <cible> · --verdict-rollback <mesures> --seuils <f>` | TF-0107 (12/08) : 3 classes de dérive invisibles à O1-O4, chacune PASS-avant/FAIL-après au self-test | prouve | experimental |
+| cat-ops-06 | **Plans plan-first d'un produit data** | préparer la promotion d'un bundle Databricks et d'un projet Power BI entre espaces de travail, publication sur GO humain | `node scripts\ops.mjs plan databricks-bundle\|powerbi-workspace <build> --sortie plan.json + oracle O-5` | TF-0865 (07/09) : self-test forge-ops, O-5 PASS sur les deux plans générés | prouve | experimental |
 
-## forge-data (transverse) — 8 services
+## forge-data (transverse) — 11 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -95,6 +97,9 @@ oyau.py (section essais) + forge_tests\junit.py` | TF-0146 (13/08) : 12 tests, s
 | cat-dat-06 | **Importer un schéma exporté** | dériver un brouillon d'assertions et de contrat depuis le schéma exporté de ma base | `node scripts\importer.mjs <schema.sql>` | TF-0139 (12/08) : round-trip prouvé — le brouillon PASSE oracle-profiler/oracle-contractualiser ; self-test 30→36 PASS, rejoué pilot ; jamais de connexion (fichier seul) ; TF-0858 (07/09) : dialecte Databricks — round-trip prouvé sur fixtures schema-databricks-{verte,rouge}.sql (self-test double sens) | prouve | experimental |
 | cat-dat-07 | **Traduire un lineage Unity Catalog** | convertir le lineage colonne natif de Databricks en lineage exigible par la forge | `node scripts	raduire-unity-catalog.mjs <export.json>` | TF-0141 (12/08) : round-trip prouvé (oracle-tracer PASS), self-test 36→41 ; VALIDÉ SUR FIXTURE SYNTHÉTIQUE (aucun workspace payant) ; export incohérent → refus | prouve | experimental |
 | cat-dat-08 | **Mesurer une base connectée** | exécuter des requêtes SQL en lecture seule sur un warehouse Databricks et archiver chaque couple requête/résultat, pour que tout chiffre restitué remonte à sa source | `python scripts\mesurer_base.py <id> "<sql>" \| --lot <lot.json> \| --self-test` | RD-3 (Produit-10, 13/08) : porté du script éprouvé du run réel (7,2 M de lignes mesurées, Databricks Statement Execution) ; garde lecture-seule à self-test double sens 8/8 ; AUCUNE valeur de poste en dur (env seul) | prouve | experimental |
+| cat-dat-09 | **Modéliser (couche Gold dimensionnelle)** | déclarer et faire juger le modèle dimensionnel de ma couche Gold avant de le construire | `node oracles\oracle-modeliser.mjs <modele.json>` | TF-0860 (07/09) : self-test double sens sur fixtures modele-dimensionnel-{verte,rouge}.json ; barre Kimball validée D-6 a | prouve | experimental |
+| cat-dat-10 | **Transformer (forme d'un projet Silver/Gold)** | vérifier que mon projet de transformation déclare ses dépendances, décrit et teste chaque modèle, rejoue ses tests et génère sa documentation | `node oracles\oracle-transformer.mjs <dossier-target>` | TF-0861 (07/09) : self-test double sens sur fixtures transformation-{verte,rouge}/ ; barre dbt-core validée D-6 a ; construction chez forge-development (profil data-transformation), composition déclarée chez forge-tests | prouve | experimental |
+| cat-dat-11 | **Réconcilier (Gold ↔ modèle sémantique)** | prouver que chaque mesure exposée par mon modèle sémantique vaut ce que ma couche Gold dit, sous tolérance déclarée | `node oracles\oracle-reconcilier.mjs <reconciliation.json>` | TF-0864 (07/09) : self-test double sens sur fixtures reconciliation-{verte,rouge}.json et rapport-reconciliation-{verte,rouge}.md | prouve | experimental |
 
 ## forge-observability (transverse) — 3 services
 
@@ -104,7 +109,7 @@ oyau.py (section essais) + forge_tests\junit.py` | TF-0146 (13/08) : 12 tests, s
 | cat-obs-02 | **Détecter la dérive** | être alerté quand quelque chose a changé depuis le dernier passage | `node scripts\derive.mjs <snapshots.jsonl>` | TF-0112 (12/08) : régressions data et tests prouvées sur fixtures (faux oracle à état PASS→FAIL) | prouve | experimental |
 | cat-obs-03 | **Veille citation IA** | suivre la présence d'un domaine dans les réponses génératives | `veille-ia\METHODE.md (méthode manuelle documentée)` | méthode documentée seule — automatisation écartée en v0 avec raisons datées (API payantes, non-reproductibilité) | declare | experimental |
 
-## forge-audit (sur mandat) — 4 services
+## forge-audit (sur mandat) — 5 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -112,6 +117,7 @@ oyau.py (section essais) + forge_tests\junit.py` | TF-0146 (13/08) : 12 tests, s
 | cat-aud-02 | **Oracles d'audit** | vérifier mécaniquement parcours et couverture fonctionnelle | `node oracles\smoke-parcours.mjs · node oracles\verifier-couverture-fonctionnelle.mjs` | exécutés en CI (produit + tenant) | prouve | production |
 | cat-aud-03 | **Engagement d'audit par tenant** | mener un engagement client isolé consommant le référentiel | `dépôt d'engagement privé par client, consommant le produit en submodule pinné — sur mandat humain` | un engagement client réel complet, 2 CI vertes (produit + engagement, iso-parité) | prouve | production |
 | cat-aud-04 | **Policy-as-code (démonstrateur OPA)** | transformer des contrôles déclaratifs en gate exécuté sur l'IaC | `profiles\policy-as-code\ (conftest via Docker)` | TF-0110 (12/08) : iac-verte 5/5 PASS, iac-rouge 5/5 FAIL nommant le CTL — démonstrateur, migration non faite | prouve | experimental |
+| cat-aud-05 | **Modèle sémantique Power BI jugé sur fichiers (TMDL)** | juger mon modèle sémantique Power BI à chaque commit, sans point de terminaison XMLA | `node oracleserifier-modele-semantique.mjs --modele <dossier definition/>` | TF-0862 (07/09) : tests/oracles/modele-semantique.test.mjs (verte OK, rouge BLOQUANT MS2-MS6) ; barre TabularEditor/BestPracticeRules validée D-6 a ; bindings powerbi 1.1.0 | prouve | experimental |
 
 ## forge-seo-geo (sur mandat) — 7 services
 

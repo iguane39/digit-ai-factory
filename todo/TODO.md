@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=6132d46a617a archive=6ce2fe14c2bb · dernier événement: 2026-09-07T13:38:10.322Z -->
+     sceaux: actifs=a73934adfb97 archive=6ce2fe14c2bb · dernier événement: 2026-09-07T14:25:18.572Z -->
 
-**84 actifs** (candidat 33 · décidé 12 · en cours 1 · corrigé 38 · écarté 0) · **782 archivés**.
+**85 actifs** (candidat 34 · décidé 6 · en cours 1 · corrigé 44 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -51,7 +51,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0862 | decide | 5.3 | forge-audit : oracle executable dans profiles/powerbi sur les fichiers TMDL/PBIP d'un modele semantique — mesure definie une fois (CTL-D05-02 et 10), relations actives et non ambigues, table de dates marquee et contigue (CTL-D05-13), mode de connexion declare par profil de besoin (CTL-D05-14), roles de securite au niveau ligne presents, statut de certification (CTL-D05-15) — sans point de terminaison XMLA (manque M4, lot L5) | non |
+| TF-0862 | corrige | 5.3 | forge-audit : oracle executable dans profiles/powerbi sur les fichiers TMDL/PBIP d'un modele semantique — mesure definie une fois (CTL-D05-02 et 10), relations actives et non ambigues, table de dates marquee et contigue (CTL-D05-13), mode de connexion declare par profil de besoin (CTL-D05-14), roles de securite au niveau ligne presents, statut de certification (CTL-D05-15) — sans point de terminaison XMLA (manque M4, lot L5) | non |
 
 ## digit-ai-forge-conception
 
@@ -72,16 +72,15 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0860 | decide | 5.3 | forge-data : oracle « modeliser » sur un format declaratif forge-data/modele-dimensionnel@1 — grain de chaque fait, dimensions conformes, cles de substitution, dimension temps contigue, type de changement lent par dimension, matrice en bus — Kimball retenu par STANDARDS-DATA « sans oracle » depuis le 11/08 (manque M3, lot L3) | non |
-| TF-0864 | decide | 5.3 | forge-data : oracle « reconcilier » — comparer deux lots de mesures identifiees (agregats Gold archives par mesurer_base.py, valeurs des mesures du modele semantique exportees en JSON) sous tolerance declaree, chaque ecart nomme ; extension de restituer pour qu'un [c:id] pointe un lot de reconciliation (manque M6, lot L7 — defaut n° 18 de l'analyse L99) | non |
-| TF-0861 | decide | 4 | transformation Silver/Gold sous gates : oracle « transformer » chez forge-data (forme d'un projet de transformation : source ou ref declare, au moins un test et une description par modele, documentation generee) + profil data du manifeste .forge/profile.toml chez forge-development (role transformations, commandes test et docs) + composition du pan data de forge-tests avec les tests du projet (manque M2, lot L4 — porteur de la construction tranche par frontieres) | non |
 | TF-0858 | corrige | 6 | forge-data : etendre le verbe importer au dialecte Databricks (DDL SHOW CREATE TABLE, export information_schema en JSON) et porter le profil-moteur databricks.md en 1.1.0 — cles PRIMARY/FOREIGN informationnelles averties, commentaires et cles orphelines denonces comme sur Postgres (manque M1, lot L1) | non |
+| TF-0860 | corrige | 5.3 | forge-data : oracle « modeliser » sur un format declaratif forge-data/modele-dimensionnel@1 — grain de chaque fait, dimensions conformes, cles de substitution, dimension temps contigue, type de changement lent par dimension, matrice en bus — Kimball retenu par STANDARDS-DATA « sans oracle » depuis le 11/08 (manque M3, lot L3) | non |
+| TF-0864 | corrige | 5.3 | forge-data : oracle « reconcilier » — comparer deux lots de mesures identifiees (agregats Gold archives par mesurer_base.py, valeurs des mesures du modele semantique exportees en JSON) sous tolerance declaree, chaque ecart nomme ; extension de restituer pour qu'un [c:id] pointe un lot de reconciliation (manque M6, lot L7 — defaut n° 18 de l'analyse L99) | non |
+| TF-0861 | corrige | 4 | transformation Silver/Gold sous gates : oracle « transformer » chez forge-data (forme d'un projet de transformation : source ou ref declare, au moins un test et une description par modele, documentation generee) + profil data du manifeste .forge/profile.toml chez forge-development (role transformations, commandes test et docs) + composition du pan data de forge-tests avec les tests du projet (manque M2, lot L4 — porteur de la construction tranche par frontieres) | non |
 
 ## digit-ai-forge-design
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0863 | decide | 6 | forge-design : deriver un theme Power BI (fichier JSON de theme : palette, polices, styles de visuels) depuis tokens.css DTCG — cible « powerbi » de generer-tokens-css.mjs ou script frere, regle dans oracle-dtcg.mjs, fixture rouge = theme par defaut (manque M5, lot L6, loi transverse n° 6) | non |
 | TF-0846 | candidat | 10 | forge-design : la barre basse sticky de la doctrine mobile chevauche le contenu (V4) hors coquille défilante | **oui** — 18 pages FAIL V4 au premier passage 5 bis |
 | TF-0830 | candidat | 7.5 | digit-ai-forge-design : la critique d implementation juge le CSS herite du socle digit-ai-page-html (table-filters.css embarque avec empreinte) comme celui de l auteur - FAIL sur des pages conformes au socle | **oui** — trois journaux R-32 du produit (forge/oracles/*20260905a.json) portant check_html PASS, render_page PASS et run-oracles-design FAIL cote a cote, avec le partage socle / hors socle ([] hors socle sur les trois pages) |
 | TF-0857 | candidat | 2.7 | digit-ai-schemas : ce que la critique forge-design laisse apres TF-0791 — trois CONFLITS entre oracles de forge-design et doctrine du socle (S3 « DM Sans » police reflexe vs police de corps de la charte ; M4 thead masque par le repli en cartes vs motif prescrit par le socle ; S4/T1 couleurs pures dans la copie embarquee de table-filters.css, composant du socle) et des defauts preexistants des gabarits (render_page V4 x9 sur multi-bandes, V4 x11 + V1 x2 + C x5 sur modele-donnees ; check_html FAIL sur les trois fragments et le gabarit multi-bandes malgre les exemptions annoncees par SKILL.md ; T3 espacements hors echelle 4 pt x72 ; T5/T7 contrastes non mesures) | **oui** — apres correction complete des couleurs, bandeaux et mouvement (TF-0791), la critique forge-design rend encore FAIL sur les trois oracles, pour des motifs que le skill ne peut pas corriger seul : le verdict Refondre n est plus un defaut du skill, c est un desaccord entre juges |
@@ -89,6 +88,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0834 | candidat | 1 | forge-design : oracle-surcouche SC1 prend un box-shadow commençant par 0 pour un contour nul | **oui** — une passe de maquette |
 | TF-0835 | candidat | 1 | forge-design : check_maquette C2 ne reconnaît pas une route référençant une fonction nommée | **oui** — une passe de maquette |
 | TF-0847 | candidat | 1 | forge-design : render_page contenu_rogne signale les champs de saisie dont la valeur dépasse la largeur | **oui** — un aller-retour de rendu |
+| TF-0863 | corrige | 6 | forge-design : deriver un theme Power BI (fichier JSON de theme : palette, polices, styles de visuels) depuis tokens.css DTCG — cible « powerbi » de generer-tokens-css.mjs ou script frere, regle dans oracle-dtcg.mjs, fixture rouge = theme par defaut (manque M5, lot L6, loi transverse n° 6) | non |
 
 ## digit-ai-forge-development
 
@@ -108,9 +108,9 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0865 | decide | 4 | forge-ops : deux cibles de plan-first pour un produit data — « databricks-bundle » (validation hors ligne d'un bundle declaratif Databricks, quatre phases, retour arriere reel, zero credential) et « powerbi-workspace » (projet PBIP versionne, promotion dev -> test -> prod, publication conditionnee au GO humain R-38) — regle O-5 etendue (manque M7, lot L8 — defaut n° 20 de l'analyse L99) | non |
 | TF-0844 | candidat | 1 | forge-ops : oracle-ops exige COURANT et journal.jsonl sur une cible Railway qui ne les porte pas | **oui** — un FAIL d'oracle à déclarer en écart au dossier de MEP |
 | TF-0845 | candidat | 1 | forge-ops : railway up -p ne remplace pas railway link (« prefix not found ») | **oui** — un téléversement perdu |
+| TF-0865 | corrige | 4 | forge-ops : deux cibles de plan-first pour un produit data — « databricks-bundle » (validation hors ligne d'un bundle declaratif Databricks, quatre phases, retour arriere reel, zero credential) et « powerbi-workspace » (projet PBIP versionne, promotion dev -> test -> prod, publication conditionnee au GO humain R-38) — regle O-5 etendue (manque M7, lot L8 — defaut n° 20 de l'analyse L99) | non |
 
 ## digit-ai-forge-organization
 
@@ -122,6 +122,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0866 | candidat | 15 | digit-ai-forge-tests : tests/test_tf_0401_manifeste_racines.py ne se collecte plus — un nom de produit pseudonymisé A L'INTERIEUR d'un identifiant Python (def test_le_cas_Produit-09_FR_…) a introduit un tiret, SyntaxError « invalid decimal literal » ; la suite s'arrête avant de jouer (pytest -x) depuis le 20/08 | non |
 | TF-0839 | candidat | 12.5 | forge-tests : la greffe FORGE_TESTS_APP importe app avant conftest et fige moteur et réglages | **oui** — trois audits sans mesure des pans api, data, migrations ; base de démo effacée |
 | TF-0840 | candidat | 8.3 | forge-tests : les cas --generer du pan data passent sur une erreur de syntaxe SQL | **oui** — output/Produit-61-cas/test_genere_data.py relu, 56 cas réécrits à la main |
 | TF-0841 | candidat | 1 | forge-tests : les livrables sont refusés parce qu'une clé de cas reprend un chemin de route lu dans .env.forge-tests | **oui** — aucun livrable dérivé sur le run |

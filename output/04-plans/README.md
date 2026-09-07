@@ -60,6 +60,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Lexique d invocation inerte - 20260830l.md` | fichier | 14,4 Ko | Synthèse de mandat — pourquoi « Améliore le prompt » ne déclenche rien, et depuis quand (3 |
 | `Digit-AI - Synthese Mandat - Lexique d invocation reactive - 20260830m.md` | fichier | 14,0 Ko | Synthèse de mandat — le lexique d'invocation redevient actif, à la prochaine session (30/0 |
 | `Digit-AI - Synthese Mandat - Lots L1 L2 mission data ouverts decision D5a - 20260907d.md` | fichier | 14,9 Ko | Synthèse de mandat — décision D-5 (a) exécutée : le lot L1 livré chez la forge des données |
+| `Digit-AI - Synthese Mandat - Lots L3 a L8 mission data livres decisions D8a A24 A26 - 20260907f.md` | fichier | 16,0 Ko | Synthèse de mandat — décision D-8 (a) et GO A-24 à A-26 exécutés : la forge des données pu |
 | `Digit-AI - Synthese Mandat - Mission data Silver Gold Power BI decisions D3a D4b - 20260907c.md` | fichier | 9,5 Ko | Synthèse de mandat — décisions D-3 (a) et D-4 (b) exécutées : les huit candidatures de la  |
 | `Digit-AI - Synthese Mandat - Mutation a la demande et Portee rectifiee - 20260901c.md` | fichier | 12,2 Ko | Synthèse de mandat — la mutation devient une porte, et une page de doctrine cessait d'avoi |
 | `Digit-AI - Synthese Mandat - Point d etape fais tous les A - 20260905f.md` | fichier | 12,3 Ko | Synthèse de mandat — point d'étape du second « fais tous les A » : le pilot a fini sa part |
@@ -97,4 +98,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Verification de non perte jouable - 20260901d.md` | fichier | 9,0 Ko | Synthèse de mandat — le tri reste éteint, et sa vérification cesse d'être une intention |
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 
-_80 fichier(s), 0 sous-dossier(s)_
+_81 fichier(s), 0 sous-dossier(s)_
