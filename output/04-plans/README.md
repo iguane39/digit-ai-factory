@@ -36,6 +36,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Anonymisation cablee sur git - 20260901g.md` | fichier | 11,2 Ko | Synthèse de mandat — l'anonymisation était câblée sur une porte, elle l'est maintenant sur |
 | `Digit-AI - Synthese Mandat - Architecture du circuit insatisfaction - 20260815a.md` | fichier | 3,8 Ko | Synthèse de mandat — architecture du circuit de l'insatisfaction (TF-0287) |
 | `Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md` | fichier | 3,4 Ko | Synthèse de mandat — option (a) : l'avancement des campagnes est câblé (TF-0252) |
+| `Digit-AI - Synthese Mandat - Barres validees et publication decisions D6a D7a - 20260907e.md` | fichier | 10,4 Ko | Synthèse de mandat — décisions D-6 (a) et D-7 (a) exécutées : quatre barres validées et cl |
 | `Digit-AI - Synthese Mandat - Bloc 3 forme de reference - 20260830f.md` | fichier | 15,3 Ko | Synthèse de mandat — la forme du bloc des décisions, relevée à la source et rendue lisible |
 | `Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md` | fichier | 13,1 Ko | Synthèse de mandat — la liste tranchée en bloc, vingt-deux chantiers clos, tout publié (01 |
 | `Digit-AI - Synthese Mandat - Decision 5a et TF-0793 clos - 20260903f.md` | fichier | 13,8 Ko | Synthèse de mandat — décision 5a appliquée et premier chantier du pilot clos (03/09/2026) |
@@ -96,4 +97,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Verification de non perte jouable - 20260901d.md` | fichier | 9,0 Ko | Synthèse de mandat — le tri reste éteint, et sa vérification cesse d'être une intention |
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 
-_79 fichier(s), 0 sous-dossier(s)_
+_80 fichier(s), 0 sous-dossier(s)_
