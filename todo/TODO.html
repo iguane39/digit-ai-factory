@@ -155,7 +155,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>f8d5308218b8</code> · dernier événement 2026-09-07T12:51:29.267Z</p>
+      <p class="meta">sceau <code>211a7f272cfa</code> · dernier événement 2026-09-07T13:15:00.396Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -166,8 +166,8 @@
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
       <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="33 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">33</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="14 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">14</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="1 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">1</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="12 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">12</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="2 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">2</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="781 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">781</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende">
@@ -649,10 +649,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0859" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="haute">
+        <article class="card s-en_cours" id="item-TF-0859" data-cite data-forge="digit-ai-forge-agents" data-statut="en_cours" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0859</code>
-            <span class="statut s-decide">decide</span>
+            <span class="statut s-en_cours">en_cours</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8)">Priorité Haute</span>
             
           </header>
@@ -1196,29 +1196,6 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0858" data-cite data-forge="digit-ai-forge-data" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0858</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
-            
-          </header>
-          <h3 class="card-titre">forge-data : etendre le verbe importer au dialecte Databricks (DDL SHOW CREATE TABLE, export information_schema en JSON) et porter le profil-moteur databricks.md en 1.1.0 — cles PRIMARY/FOREIGN informationnelles averties, commentaires et cles orphelines denonces comme sur Postgres (manque M1, lot L1)</h3>
-          <div class="card-detail" data-cite><p class="lead">Etude d'opportunite 20260907a, verdict O3, manque M1.</p><ul class="puces"><li>Le profil-moteur databricks.md documente le dialecte depuis le 12/08 « pour un futur parseur analogue a importer, hors v0 »</li><li>LISEZMOI point 5 reserve l'extension au « jour ou un artefact reel de ce moteur doit etre importe » — ce jour est le temps T1 de la mission data Silver/Gold sur Databricks (decision humaine D-2 a du 07/09). Preuve de pret : oracles/self-test.mjs double sens PASS avec un round-trip schema-databricks-{verte,rouge}, cat-dat-06 mis a jour. Si non fait : T1 se fait a la main, assertions et contrat Bronze ecrits sans derivation, cles orphelines non denoncees. Effort : moyen x court</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-07</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 3 × preuve 4 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-data</dt><dd><span class="meta-sub">non chiffré</span></dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (message du 07/09/2026, decisions D-1 a et D-2 a) via etude d'opportunite du pilot</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-decide" id="item-TF-0860" data-cite data-forge="digit-ai-forge-data" data-statut="decide" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0860</code>
@@ -1277,6 +1254,29 @@
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-09-07</dd></div>
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4 — gain 4 × preuve 3 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-data</dt><dd><span class="meta-sub">non chiffré</span></dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (message du 07/09/2026, decisions D-1 a et D-2 a) via etude d'opportunite du pilot</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0858" data-cite data-forge="digit-ai-forge-data" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0858</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            
+          </header>
+          <h3 class="card-titre">forge-data : etendre le verbe importer au dialecte Databricks (DDL SHOW CREATE TABLE, export information_schema en JSON) et porter le profil-moteur databricks.md en 1.1.0 — cles PRIMARY/FOREIGN informationnelles averties, commentaires et cles orphelines denonces comme sur Postgres (manque M1, lot L1)</h3>
+          <div class="card-detail" data-cite><p class="lead">Etude d'opportunite 20260907a, verdict O3, manque M1.</p><ul class="puces"><li>Le profil-moteur databricks.md documente le dialecte depuis le 12/08 « pour un futur parseur analogue a importer, hors v0 »</li><li>LISEZMOI point 5 reserve l'extension au « jour ou un artefact reel de ce moteur doit etre importe » — ce jour est le temps T1 de la mission data Silver/Gold sur Databricks (decision humaine D-2 a du 07/09). Preuve de pret : oracles/self-test.mjs double sens PASS avec un round-trip schema-databricks-{verte,rouge}, cat-dat-06 mis a jour. Si non fait : T1 se fait a la main, assertions et contrat Bronze ecrits sans derivation, cles orphelines non denoncees. Effort : moyen x court</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-07</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 3 × preuve 4 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-data</dt><dd><span class="meta-sub">non chiffré</span></dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (message du 07/09/2026, decisions D-1 a et D-2 a) via etude d'opportunite du pilot</dd></div>
             
