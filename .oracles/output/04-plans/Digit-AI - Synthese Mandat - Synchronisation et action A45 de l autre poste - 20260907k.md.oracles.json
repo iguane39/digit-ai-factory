@@ -1,0 +1,79 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md",
+  "date_iso": "2026-09-07T19:32:44.694Z",
+  "registre_version": "2.17.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md",
+    "ts": "2026-09-07T19:32:44.693Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md": "141befc9387fecb43d94d7af8d20419900baa653b0c59459dbe1008808376839"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}
