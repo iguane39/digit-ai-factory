@@ -16,6 +16,9 @@
 //                 --appliquer) — lancer --pull EST la décision humaine de propagation (R-29)
 //   --sans-skills ne juge ni ne propage les skills (recette sur dépôts factices)
 //   --sans-pilot  ne touche pas au dépôt pilot courant (recette)
+//   --rebatir <dépôt> [--essai]  rebâtit un clone DIVERGÉ sur son histoire publiée réécrite, sans
+//                 perdre le travail propre au poste (scripts/rebatir-clone.mjs, D-12 a du 07/09) ;
+//                 jamais de push — la publication reste un GO humain
 // Env :  BOOTSTRAP_SOURCE        base des dépôts (défaut https://github.com/iguane39)
 //        FORGE_SKILLS_INSTALLES  dossier des skills installés (défaut ~/.claude/skills)
 //
@@ -87,6 +90,21 @@ const PILOT = "digit-ai-factory";
 const ALIAS_PILOT = ["digit-ai-forge-pilot", "digit-ai-forge-steering"];
 
 const args = process.argv.slice(2);
+// --rebatir <dépôt> (D-12 a, 07/09/2026, TF-0877) : quand un dépôt rend « DIVERGÉ » parce que son
+// histoire publiée a été réécrite, --pull ne peut rien (avance rapide refusée) et le mode opératoire
+// dit « à recloner, pas à fusionner ». Ce mode délègue à scripts/rebatir-clone.mjs : sauvegarde en
+// paquet vérifié, delta propre au poste exporté en patches, réalignement sur origin/main, rejeu,
+// arborescences liées retirées, porte de publication jouée — jamais de push. Sortie JSON du script.
+const iRebatir = args.indexOf("--rebatir");
+if (iRebatir >= 0) {
+  const nomDepot = args[iRebatir + 1];
+  if (!nomDepot || nomDepot.startsWith("--")) { console.error("usage : node bootstrap.mjs --rebatir <nom-du-dépôt> [--essai]"); process.exit(2); }
+  const iR = args.indexOf("--racine");
+  const racineR = resolve(iR >= 0 ? args[iR + 1] : process.env.FORGE_ROOT || dirname(ICI));
+  const cible = existsSync(join(racineR, nomDepot)) ? join(racineR, nomDepot) : resolve(nomDepot);
+  const r = spawnSync(process.execPath, [join(ICI, "scripts", "rebatir-clone.mjs"), cible, ...(args.includes("--essai") ? ["--essai"] : [])], { stdio: "inherit", env: { ...process.env, FORGE_ROOT: racineR } });
+  process.exit(r.status ?? 1);
+}
 const pull = args.includes("--pull");
 const sansSkills = args.includes("--sans-skills");
 const sansPilot = args.includes("--sans-pilot");
