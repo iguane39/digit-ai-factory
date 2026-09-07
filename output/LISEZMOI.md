@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 226 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 228 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -251,6 +251,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Lots L3 a L8 mission data livres decisions D8a A24 A26 - 20260907f.md | 20260907f | 16 Ko | `04-plans/Digit-AI - Synthese Mandat - Lots L3 a L8 mission data livres decisions D8a A24 A26 - 20260907f.md` |
 | Digit-AI - Synthese Mandat - Mission data Silver Gold Power BI decisions D3a D4b - 20260907c.md | 20260907c | 9.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Mission data Silver Gold Power BI decisions D3a D4b - 20260907c.md` |
 | Digit-AI - Synthese Mandat - Mutation a la demande et Portee rectifiee - 20260901c.md | 20260901c | 12.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Mutation a la demande et Portee rectifiee - 20260901c.md` |
+| Digit-AI - Synthese Mandat - Outil de reconstruction de clone decision D12a - 20260907j.md | 20260907j | 11.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Outil de reconstruction de clone decision D12a - 20260907j.md` |
 | Digit-AI - Synthese Mandat - Point d etape fais tous les A - 20260905f.md | 20260905f | 12.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Point d etape fais tous les A - 20260905f.md` |
 | Digit-AI - Synthese Mandat - Pourquoi le bloc 3 derive - 20260830d.md | 20260830d | 16.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Pourquoi le bloc 3 derive - 20260830d.md` |
 | Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md | 20260817a | 7.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Prompt reecrit execute - 20260817a.md` |
@@ -269,6 +270,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Surveillance des recidives TF-0790 - 20260903c.md | 20260903c | 11.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Surveillance des recidives TF-0790 - 20260903c.md` |
 | Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md | 20260822a | 13.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md` |
 | Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Synchronisation GitHub et procedure de l autre poste - 20260907i.md | 20260907i | 15.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub et procedure de l autre poste - 20260907i.md` |
 | Digit-AI - Synthese Mandat - Synchronisation GitHub et reconstruction du clone - 20260903d.md | 20260903d | 25.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub et reconstruction du clone - 20260903d.md` |
 | Digit-AI - Synthese Mandat - Synchronisation GitHub reconstruction du clone - 20260907a.md | 20260907a | 19.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub reconstruction du clone - 20260907a.md` |
 | Digit-AI - Synthese Mandat - TF-0794 clos rectification de seq - 20260905a.md | 20260905a | 12.4 Ko | `04-plans/Digit-AI - Synthese Mandat - TF-0794 clos rectification de seq - 20260905a.md` |
