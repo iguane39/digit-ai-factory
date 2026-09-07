@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau 6abadc23b718)]
-verifie_le: 2026-09-06
+sources_de_verite: [todo/TODO.jsonl (sceau d62b89cddf54)]
+verifie_le: 2026-09-07
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `6abadc23b718`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `d62b89cddf54`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -19,10 +19,10 @@ les corrections donnerait l'illusion d'un progrès net.
 
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
-| Ouverts | 39 | candidats, décidés ou en cours — le reste à faire réel |
-| Clos sur gains constatés | 35 | corrigés avec leur mesure avant/après |
+| Ouverts | 40 | candidats, décidés ou en cours — le reste à faire réel |
+| Clos sur gains constatés | 36 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 0 | décidés non faits, motif écrit — jamais un silence |
-| Total suivi | 74 | tout ce que le registre a jamais porté |
+| Total suivi | 76 | tout ce que le registre a jamais porté |
 
 ## Ce qui reste ouvert, par forge
 
@@ -51,7 +51,7 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0852 | digit-ai-factory : le lot de travaux demande a la main le geste que le hook d'ouverture fait seul depuis le 30 | candidat | digit-ai-factory | 1 |
 | TF-0853 | digit-ai-factory : oracle-conformite-projet rend 242 constats sur 247 dans un dossier que le .gitignore du pro | candidat | digit-ai-factory | 1 |
 
-### digit-ai-forge-design — 7 item(s)
+### digit-ai-forge-design — 8 item(s)
 
 Les items ouverts ciblant digit-ai-forge-design, du score le plus fort au plus faible. Le score est
 celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
@@ -60,6 +60,7 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 |---|---|---|---|---|
 | TF-0846 | forge-design : la barre basse sticky de la doctrine mobile chevauche le contenu (V4) hors coquille défilante | candidat | digit-ai-forge-design | 10 |
 | TF-0830 | digit-ai-forge-design : la critique d implementation juge le CSS herite du socle digit-ai-page-html (table-fil | candidat | digit-ai-forge-design, pilot | 7.5 |
+| TF-0857 | digit-ai-schemas : ce que la critique forge-design laisse apres TF-0791 — trois CONFLITS entre oracles de forg | candidat | digit-ai-forge-design, digit-ai-forge-agents | 2.7 |
 | TF-0833 | forge-design : oracle-declencheurs DE3 apparie les sélecteurs par jeton et non par sélecteur complet | candidat | digit-ai-forge-design | 1 |
 | TF-0834 | forge-design : oracle-surcouche SC1 prend un box-shadow commençant par 0 pour un contour nul | candidat | digit-ai-forge-design | 1 |
 | TF-0835 | forge-design : check_maquette C2 ne reconnaît pas une route référençant une fonction nommée | candidat | digit-ai-forge-design | 1 |
@@ -78,6 +79,18 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0841 | forge-tests : les livrables sont refusés parce qu'une clé de cas reprend un chemin de route lu dans .env.forge | candidat | digit-ai-forge-tests | 1 |
 | TF-0842 | forge-tests : INSTANCE_MONTER sans secrets de session et INSTANCE_DEMONTER qui ne libère pas le port | candidat | digit-ai-forge-tests | 1 |
 | TF-0843 | forge-tests : le pan interface et oracle-panneau-tache PA6 s'excluent sur une page-formulaire dédiée | candidat | digit-ai-forge-tests, digit-ai-forge-design | 1 |
+
+### digit-ai-forge-agents — 4 item(s)
+
+Les items ouverts ciblant digit-ai-forge-agents, du score le plus fort au plus faible. Le score est
+celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
+
+| Id | Titre | Statut | Forge(s) | Score |
+|---|---|---|---|---|
+| TF-0857 | digit-ai-schemas : ce que la critique forge-design laisse apres TF-0791 — trois CONFLITS entre oracles de forg | candidat | digit-ai-forge-design, digit-ai-forge-agents | 2.7 |
+| TF-0825 | digit-ai-forge-agents : etendre la porte de publication aux noms de produits demande deux garde-fous, parce qu | candidat | digit-ai-forge-agents | 1 |
+| TF-0828 | digit-ai-forge-agents : la regle C5 de la porte de publication juge trois angles sur les quatre que C1-C4 couv | candidat | digit-ai-forge-agents | 1 |
+| TF-0855 | digit-ai-forge-agents : la porte de publication rend FAIL sur main — cinq mentions reelles d un nom de produit | candidat | digit-ai-forge-agents | 1 |
 
 ### digit-ai-forge-conception — 4 item(s)
 
@@ -101,17 +114,6 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0549 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : | decide | pilot | 10 |
 | TF-0830 | digit-ai-forge-design : la critique d implementation juge le CSS herite du socle digit-ai-page-html (table-fil | candidat | digit-ai-forge-design, pilot | 7.5 |
 | TF-0791 | Cascade Intention > Strategie > Tactique > Operationnel + test retro : la definition des demandes ne capture p | en_cours | pilot | 6.7 |
-
-### digit-ai-forge-agents — 3 item(s)
-
-Les items ouverts ciblant digit-ai-forge-agents, du score le plus fort au plus faible. Le score est
-celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
-
-| Id | Titre | Statut | Forge(s) | Score |
-|---|---|---|---|---|
-| TF-0825 | digit-ai-forge-agents : etendre la porte de publication aux noms de produits demande deux garde-fous, parce qu | candidat | digit-ai-forge-agents | 1 |
-| TF-0828 | digit-ai-forge-agents : la regle C5 de la porte de publication juge trois angles sur les quatre que C1-C4 couv | candidat | digit-ai-forge-agents | 1 |
-| TF-0855 | digit-ai-forge-agents : la porte de publication rend FAIL sur main — cinq mentions reelles d un nom de produit | candidat | digit-ai-forge-agents | 1 |
 
 ### forge-tests — 2 item(s)
 

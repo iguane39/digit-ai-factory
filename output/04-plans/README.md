@@ -39,9 +39,11 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Bloc 3 forme de reference - 20260830f.md` | fichier | 15,3 Ko | Synthèse de mandat — la forme du bloc des décisions, relevée à la source et rendue lisible |
 | `Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md` | fichier | 13,1 Ko | Synthèse de mandat — la liste tranchée en bloc, vingt-deux chantiers clos, tout publié (01 |
 | `Digit-AI - Synthese Mandat - Decision 5a et TF-0793 clos - 20260903f.md` | fichier | 13,8 Ko | Synthèse de mandat — décision 5a appliquée et premier chantier du pilot clos (03/09/2026) |
+| `Digit-AI - Synthese Mandat - Decision 5a jetons digit-ai-schemas - 20260904a.md` | fichier | 19,7 Ko | Synthèse — décision 5a du 04/09/2026 : le skill de schémas émet des jetons |
 | `Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md` | fichier | 19,9 Ko | Synthèse de mandat — décisions 11 (b) et 12 (a) exécutées : l'histoire de la forge des out |
 | `Digit-AI - Synthese Mandat - Decisions 16a 17a 18a - 20260905l.md` | fichier | 17,6 Ko | Synthèse de mandat — décisions 16, 17 et 18 exécutées : le parc des treize forges est vert |
 | `Digit-AI - Synthese Mandat - Decisions 19a 20a et actions 44 a 48 - 20260905m.md` | fichier | 24,3 Ko | Synthèse de mandat — décisions 19 et 20, actions 44 à 48 exécutées : trois forges publiées |
+| `Digit-AI - Synthese Mandat - Decisions 1a 2a 3a 4a - 20260903g.md` | fichier | 16,4 Ko | Synthèse — décisions 1a, 2a, 3a, 4a du 03/09/2026 |
 | `Digit-AI - Synthese Mandat - Decisions 1a 2a 3b 4a synchronisation - 20260903e.md` | fichier | 16,1 Ko | Synthèse de mandat — exécution des décisions 1a, 2a, 3b et 4a de la synchronisation (03/09 |
 | `Digit-AI - Synthese Mandat - Decisions 21a 22a 23a et actions 49 a 52 - 20260906n.md` | fichier | 24,8 Ko | Synthèse de mandat — décisions 21, 22 et 23, actions 49 à 52 exécutées : neuf histoires ré |
 | `Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md` | fichier | 25,9 Ko | Synthèse de mandat — vos trois décisions du matin exécutées : l'historique du pilot réécri |
@@ -90,4 +92,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Verification de non perte jouable - 20260901d.md` | fichier | 9,0 Ko | Synthèse de mandat — le tri reste éteint, et sa vérification cesse d'être une intention |
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 
-_73 fichier(s), 0 sous-dossier(s)_
+_75 fichier(s), 0 sous-dossier(s)_

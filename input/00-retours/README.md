@@ -17,6 +17,8 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
 | [`old\`](old/README.md) | dossier (149 fichiers) | — | Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réé… |
+| `Produit-65 - RETOURS - 20260903a.md` | fichier | 15,9 Ko | Retours forges — Bibliothèque vidéo IA Enseigne-A — 20260903a |
+| `Produit-65 - RETOURS - 20260903a.tf.jsonl` | fichier | 4,5 Ko | 2 ligne(s) JSONL |
 | `digit-ai-forge-agents - RETOURS - 20260905a.md` | fichier | 13,6 Ko | Retours forges — digit-ai-forge-agents — 20260905a |
 | `digit-ai-forge-agents - RETOURS - 20260905a.tf.jsonl` | fichier | 4,8 Ko | 2 ligne(s) JSONL |
 | `digit-ai-forge-agents - RETOURS - 20260905b.md` | fichier | 17,3 Ko | Retours forges — digit-ai-forge-agents — 20260905b |
@@ -157,4 +159,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `produits-anciens - RETOURS - 20260906a.md` | fichier | 19,6 Ko | Retours forges — produits-anciens — 20260906a |
 | `produits-anciens - RETOURS - 20260906a.tf.jsonl` | fichier | 3,0 Ko | 1 ligne(s) JSONL |
 
-_139 fichier(s), 1 sous-dossier(s)_
+_141 fichier(s), 1 sous-dossier(s)_
