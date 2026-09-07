@@ -102,6 +102,23 @@ test("rejeu en conflit → exit 1, patch conservé, clone laissé sur origin/mai
   rmSync(base, { recursive: true, force: true });
 });
 
+test("fetch fait AVANT l'outil + commit réécrit dont le contenu change → seul le commit propre au poste est rejoué (filtre par sujet)", () => {
+  // Le cas réel du 07/09 21:32 (forge-development) : l'ancien distant n'est plus connu, et un
+  // commit publié réécrit avec un autre contenu porte un autre identifiant de patch.
+  const { base, auteur, poste } = parc();
+  writeFileSync(join(poste, "local.txt"), "travail du poste\n"); g(poste, "add", "."); g(poste, "commit", "-q", "-m", "travail propre au poste");
+  writeFileSync(join(auteur, "b.txt"), "deux, contenu pseudonymisé\n"); g(auteur, "add", "."); g(auteur, "commit", "-q", "--amend", "--no-edit"); g(auteur, "push", "-q", "--force", "origin", "main");
+  g(poste, "fetch", "-q", "origin"); // la connaissance de l'ancien distant est perdue
+  const r = lancer(poste, "--sauvegardes", join(base, "sauv"));
+  assert.equal(r.code, 0, r.brut);
+  assert.ok(g(poste, "rev-parse", "origin/main").startsWith(r.j.avant.ancien_origin), "l'ancien distant connu est déjà le nouveau (fetch fait avant)");
+  assert.equal(r.j.rejeu.length, 1, `un seul rejeu attendu — mesuré : ${JSON.stringify(r.j.rejeu)}`);
+  assert.equal(r.j.rejeu[0].statut, "rejoue");
+  assert.ok(existsSync(join(poste, "local.txt")));
+  assert.match(g(poste, "show", "HEAD~1:b.txt"), /pseudonymisé/, "le contenu réécrit du distant est conservé, pas écrasé par l'ancien");
+  rmSync(base, { recursive: true, force: true });
+});
+
 let pass = 0, fail = 0;
 for (const [nom, fn] of CAS) {
   try { fn(); console.log(`  [PASS] ${nom}`); pass++; }

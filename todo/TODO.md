@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=a26efd9b72aa archive=6ce2fe14c2bb · dernier événement: 2026-09-07T19:12:01.124Z -->
+     sceaux: actifs=3187b97e531b archive=6ce2fe14c2bb · dernier événement: 2026-09-07T19:34:07.079Z -->
 
-**96 actifs** (candidat 41 · décidé 6 · en cours 2 · corrigé 47 · écarté 0) · **782 archivés**.
+**96 actifs** (candidat 41 · décidé 6 · en cours 1 · corrigé 48 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -103,9 +103,9 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0829 | en_cours | 3 | digit-ai-forge-development : trois messages de commit de l'histoire portent le nom d'un produit — la porte C5 y reste FAIL, et la branche main protégée refuse tout push forcé | **oui** — trois messages de commit publics portent un nom de produit ; la porte C5 est rouge par construction sur cette forge tant que l'histoire tient |
 | TF-0813 | corrige | 5 | digit-ai-forge-development : l'historique du depot porte 89 constats de la porte de publication (38 messages de commit, 51 chemins anciens) — reecrire l'histoire selon le mode operatoire du pilot (TF-0752), puis push force | **oui** — 89 constats bloquants de la porte sur un depot public ; une regle « porte verte avant push » que chaque publication de cette forge contredit tant que l'histoire n'est pas reecrite |
 | TF-0820 | corrige | 3 | digit-ai-forge-development : un nom de produit réel vit dans deux fichiers courants (catalogue du conductor, une recette), et la porte de publication ne juge pas les noms de produits | **oui** — deux fichiers publics portent un nom de produit que le pilot pseudonymise partout ailleurs ; la porte le laisse passer par construction |
+| TF-0829 | corrige | 3 | digit-ai-forge-development : trois messages de commit de l'histoire portent le nom d'un produit — la porte C5 y reste FAIL, et la branche main protégée refuse tout push forcé | **oui** — trois messages de commit publics portent un nom de produit ; la porte C5 est rouge par construction sur cette forge tant que l'histoire tient |
 
 ## digit-ai-forge-observability
 

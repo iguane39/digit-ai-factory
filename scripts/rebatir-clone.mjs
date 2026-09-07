@@ -87,7 +87,16 @@ R.avant = { head: head(), avance: compte(`${DISTANT}..HEAD`), retard: compte(`HE
 // rejoué ; un commit réécrit avec un autre diff est un vrai delta, jugé au rejeu).
 const plageDelta = ancienOrigin && ok(git("merge-base", "--is-ancestor", ancienOrigin, "HEAD")) ? `${ancienOrigin}..HEAD` : `${DISTANT}..HEAD`;
 const absentsDuDistant = new Set((git("cherry", DISTANT, "HEAD").stdout || "").split("\n").filter((l) => l.startsWith("+ ")).map((l) => l.slice(2).trim()));
-const commitsDelta = (git("rev-list", "--reverse", plageDelta).stdout || "").split("\n").map((s) => s.trim()).filter((s) => s && absentsDuDistant.has(s));
+// PREMIER USAGE RÉEL (forge-development, 07/09 21:32) : un `git fetch` fait à la main AVANT l'outil
+// avait déjà déplacé origin/main — l'ancien distant n'était plus connu, la plage est retombée sur
+// `origin/main..HEAD`, et un commit réécrit dont le CONTENU avait changé (pseudonymisation d'un
+// fichier) portait un autre identifiant de patch : pris pour propre au poste, rejoué, conflit.
+// Second filtre, par le SUJET : un commit dont le sujet existe déjà dans l'histoire du distant est
+// un commit publié sous une autre empreinte, jamais un delta — la réécriture conserve les sujets.
+const sujetsDistants = new Set((git("log", "--format=%s", DISTANT).stdout || "").split("\n").map((s) => s.trim()).filter(Boolean));
+const sujetDe = (c) => (git("log", "-1", "--format=%s", c).stdout || "").trim();
+const commitsDelta = (git("rev-list", "--reverse", plageDelta).stdout || "").split("\n").map((s) => s.trim())
+  .filter((s) => s && absentsDuDistant.has(s) && !sujetsDistants.has(sujetDe(s)));
 R.avant.delta_propre = commitsDelta.length;
 if (R.avant.retard === 0) { if (ESSAI) finirEssai(); sortir(0, R.avant.avance === 0 ? "à jour de origin/main — rien à rebâtir" : `en avance simple de ${R.avant.avance} commit(s), origin/main est un ancêtre — rien à rebâtir, un push ordinaire suffit (sur GO humain)`); }
 

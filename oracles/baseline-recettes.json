@@ -279,7 +279,7 @@
   "vu_le": "2026-08-26"
  },
  "scripts/rebatir-clone.test.mjs": {
-  "cas": 4,
+  "cas": 5,
   "vu_le": "2026-09-07"
  },
  "scripts/recopier-heritage.test.mjs": {
