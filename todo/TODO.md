@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=b09adfa4f04b archive=6ce2fe14c2bb · dernier événement: 2026-09-07T14:43:21.439Z -->
+     sceaux: actifs=47b72fdb6db6 archive=6ce2fe14c2bb · dernier événement: 2026-09-07T15:11:07.461Z -->
 
-**87 actifs** (candidat 36 · décidé 6 · en cours 1 · corrigé 44 · écarté 0) · **782 archivés**.
+**87 actifs** (candidat 33 · décidé 6 · en cours 2 · corrigé 46 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -83,19 +83,19 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-0846 | candidat | 10 | forge-design : la barre basse sticky de la doctrine mobile chevauche le contenu (V4) hors coquille défilante | **oui** — 18 pages FAIL V4 au premier passage 5 bis |
 | TF-0830 | candidat | 7.5 | digit-ai-forge-design : la critique d implementation juge le CSS herite du socle digit-ai-page-html (table-filters.css embarque avec empreinte) comme celui de l auteur - FAIL sur des pages conformes au socle | **oui** — trois journaux R-32 du produit (forge/oracles/*20260905a.json) portant check_html PASS, render_page PASS et run-oracles-design FAIL cote a cote, avec le partage socle / hors socle ([] hors socle sur les trois pages) |
-| TF-0867 | candidat | 5 | digit-ai-forge-design : deux messages de commit de l'histoire PUBLIEE portent un nom de produit (« Produit-05 », commits 6cd6c92 et c42683e) — la porte C5 refuse tout push de la forge, y compris le lot L6 (theme Power BI, commit local d49db27) | non |
 | TF-0857 | candidat | 2.7 | digit-ai-schemas : ce que la critique forge-design laisse apres TF-0791 — trois CONFLITS entre oracles de forge-design et doctrine du socle (S3 « DM Sans » police reflexe vs police de corps de la charte ; M4 thead masque par le repli en cartes vs motif prescrit par le socle ; S4/T1 couleurs pures dans la copie embarquee de table-filters.css, composant du socle) et des defauts preexistants des gabarits (render_page V4 x9 sur multi-bandes, V4 x11 + V1 x2 + C x5 sur modele-donnees ; check_html FAIL sur les trois fragments et le gabarit multi-bandes malgre les exemptions annoncees par SKILL.md ; T3 espacements hors echelle 4 pt x72 ; T5/T7 contrastes non mesures) | **oui** — apres correction complete des couleurs, bandeaux et mouvement (TF-0791), la critique forge-design rend encore FAIL sur les trois oracles, pour des motifs que le skill ne peut pas corriger seul : le verdict Refondre n est plus un defaut du skill, c est un desaccord entre juges |
 | TF-0833 | candidat | 1 | forge-design : oracle-declencheurs DE3 apparie les sélecteurs par jeton et non par sélecteur complet | **oui** — deux passes de maquette |
 | TF-0834 | candidat | 1 | forge-design : oracle-surcouche SC1 prend un box-shadow commençant par 0 pour un contour nul | **oui** — une passe de maquette |
 | TF-0835 | candidat | 1 | forge-design : check_maquette C2 ne reconnaît pas une route référençant une fonction nommée | **oui** — une passe de maquette |
 | TF-0847 | candidat | 1 | forge-design : render_page contenu_rogne signale les champs de saisie dont la valeur dépasse la largeur | **oui** — un aller-retour de rendu |
 | TF-0863 | corrige | 6 | forge-design : deriver un theme Power BI (fichier JSON de theme : palette, polices, styles de visuels) depuis tokens.css DTCG — cible « powerbi » de generer-tokens-css.mjs ou script frere, regle dans oracle-dtcg.mjs, fixture rouge = theme par defaut (manque M5, lot L6, loi transverse n° 6) | non |
+| TF-0867 | corrige | 5 | digit-ai-forge-design : deux messages de commit de l'histoire PUBLIEE portent un nom de produit (« Produit-05 », commits 6cd6c92 et c42683e) — la porte C5 refuse tout push de la forge, y compris le lot L6 (theme Power BI, commit local d49db27) | non |
 
 ## digit-ai-forge-development
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0829 | candidat | 3 | digit-ai-forge-development : trois messages de commit de l'histoire portent le nom d'un produit — la porte C5 y reste FAIL, et la branche main protégée refuse tout push forcé | **oui** — trois messages de commit publics portent un nom de produit ; la porte C5 est rouge par construction sur cette forge tant que l'histoire tient |
+| TF-0829 | en_cours | 3 | digit-ai-forge-development : trois messages de commit de l'histoire portent le nom d'un produit — la porte C5 y reste FAIL, et la branche main protégée refuse tout push forcé | **oui** — trois messages de commit publics portent un nom de produit ; la porte C5 est rouge par construction sur cette forge tant que l'histoire tient |
 | TF-0813 | corrige | 5 | digit-ai-forge-development : l'historique du depot porte 89 constats de la porte de publication (38 messages de commit, 51 chemins anciens) — reecrire l'histoire selon le mode operatoire du pilot (TF-0752), puis push force | **oui** — 89 constats bloquants de la porte sur un depot public ; une regle « porte verte avant push » que chaque publication de cette forge contredit tant que l'histoire n'est pas reecrite |
 | TF-0820 | corrige | 3 | digit-ai-forge-development : un nom de produit réel vit dans deux fichiers courants (catalogue du conductor, une recette), et la porte de publication ne juge pas les noms de produits | **oui** — deux fichiers publics portent un nom de produit que le pilot pseudonymise partout ailleurs ; la porte le laisse passer par construction |
 
@@ -126,11 +126,11 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0866 | candidat | 15 | digit-ai-forge-tests : tests/test_tf_0401_manifeste_racines.py ne se collecte plus — un nom de produit pseudonymisé A L'INTERIEUR d'un identifiant Python (def test_le_cas_Produit-09_FR_…) a introduit un tiret, SyntaxError « invalid decimal literal » ; la suite s'arrête avant de jouer (pytest -x) depuis le 20/08 | non |
 | TF-0839 | candidat | 12.5 | forge-tests : la greffe FORGE_TESTS_APP importe app avant conftest et fige moteur et réglages | **oui** — trois audits sans mesure des pans api, data, migrations ; base de démo effacée |
 | TF-0840 | candidat | 8.3 | forge-tests : les cas --generer du pan data passent sur une erreur de syntaxe SQL | **oui** — output/Produit-61-cas/test_genere_data.py relu, 56 cas réécrits à la main |
-| TF-0868 | candidat | 5 | digit-ai-forge-tests : sept messages de commit de l'histoire PUBLIEE et treize commits de l'ancienne histoire encore joignables par les etiquettes de version (tags v1.x) portent un nom de produit — la porte C5 refuse tout push de la forge, y compris le lot L4 (commit local acbeb35) | non |
 | TF-0841 | candidat | 1 | forge-tests : les livrables sont refusés parce qu'une clé de cas reprend un chemin de route lu dans .env.forge-tests | **oui** — aucun livrable dérivé sur le run |
 | TF-0842 | candidat | 1 | forge-tests : INSTANCE_MONTER sans secrets de session et INSTANCE_DEMONTER qui ne libère pas le port | **oui** — une demi-heure de diagnostic, trois relances |
 | TF-0843 | candidat | 1 | forge-tests : le pan interface et oracle-panneau-tache PA6 s'excluent sur une page-formulaire dédiée | **oui** — une action manuelle_dev qui ne peut être soldée |
 | TF-0803 | corrige | 6 | forge-tests : un controle executable generique de la 404 (adresse inconnue par langue, prefixe respecte, non-HTML nu, statut 404 conserve, noindex), consommable comme preuve du controle M-9 de la MEP | **oui** — un site multilingue a servi le 404 nu du serveur en production du 25/08 au 01/09 sans qu'aucun controle le voie (TF-0802) ; la realisation de reference a coute 14 pages et 5 controles sur un seul produit |
+| TF-0868 | corrige | 5 | digit-ai-forge-tests : sept messages de commit de l'histoire PUBLIEE et treize commits de l'ancienne histoire encore joignables par les etiquettes de version (tags v1.x) portent un nom de produit — la porte C5 refuse tout push de la forge, y compris le lot L4 (commit local acbeb35) | non |
 
 ## forge-conception
 
