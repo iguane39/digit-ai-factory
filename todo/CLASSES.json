@@ -748,6 +748,19 @@
     "banc-etend-referentiel-production",
     "gate-cout-invite-au-contournement"
    ]
+  },
+  {
+   "cle": "controle-sans-fixture-double-sens",
+   "famille": "skill-ou-oracle-non-invoque",
+   "libelle": "Un controle en service n a aucun banc de fixtures dans les deux sens, et rien ne le dit -- pire, son en-tete affirme parfois en avoir. Aucune de ses regles n est alors eprouvee : une regle qui cesse de mordre ne signale rien, et une regle qui se met a mordre sur un artefact conforme bloque tout le monde sans qu on sache pourquoi",
+   "creee_le": "2026-09-08",
+   "fondee_par": [],
+   "regle": "tout controle en service porte un banc de fixtures double sens, sur artefact jetable ; une affirmation d en-tete sur l existence d un banc est verifiee par le banc lui-meme, jamais crue sur parole ; et aucune regle neuve ne s ajoute a un controle qui n en a pas avant que le harnais existe",
+   "oracle": "a creer pour oracle-conformite-projet ; candidature du 08/09",
+   "voisines": [
+    "fixture-jugee-par-son-seul-oracle",
+    "regle-neuve-sans-mesure-de-bruit"
+   ]
   }
  ]
 }

@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=3116c21deea6 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T14:37:21.937Z -->
+     sceaux: actifs=52463db69f42 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T14:40:45.553Z -->
 
-**184 actifs** (candidat 9 · décidé 19 · en cours 6 · corrigé 150 · écarté 0) · **782 archivés**.
+**185 actifs** (candidat 10 · décidé 19 · en cours 6 · corrigé 150 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -22,6 +22,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0956 | candidat | 10 | pilot : le registre ne sait ni détecter ni écarter un DOUBLON de candidature — six items identiques mot pour mot y sont entrés le 08/09, et rien ne les a signalés | **oui** — six candidatures en double entrées en une commande, non détectées ; le compte des items ouverts est faux de six tant qu'elles ne sont pas écartées, et aucun statut ne permet de les écarter |
 | TF-0965 | candidat | 10 | pilot : propager les skills a casse un test d'une forge voisine — une regle neuve du socle est mesuree sur le parc du pilot seulement, jamais sur les depots qui la CONSOMMENT | **oui** — une suite de tests d'une forge passee au rouge par un geste joue dans un autre depot, et un agent qui a declare l'echec preexistant de bonne foi parce que rien ne lui disait que la copie installee avait change sous lui |
 | TF-0966 | candidat | 8.3 | pilot : la pseudonymisation ne couvre pas les IDENTIFIANTS TECHNIQUES cites dans le corps d un item — cinq objets d un systeme client vivent en clair dans le registre publie, invisibles a la porte | **oui** — cinq identifiants techniques d un systeme client en clair dans un depot publie, invisibles a la porte parce qu absents des tables ; decouverts par un agent qui les avait recopies dans ses fixtures avant de les remplacer de lui-meme |
+| TF-0967 | candidat | 8.3 | pilot : oracle-conformite-projet n a AUCUN banc de fixtures, et son propre en-tete affirme le contraire — c est l oracle dont un FAIL suspend l ouverture de tout run | **oui** — l oracle qui suspend l ouverture de tout run n a aucune fixture, et son en-tete affirme qu il en a — deux volets d un item decide sont bloques par ce manque, et la campagne a prefere s arreter plutot que d empiler une regle non eprouvee |
 | TF-0869 | corrige | 25 | pilot : aucun .env local créé d'office, le commanditaire a saisi sa clé Anthropic dans .env.example versionné | **oui** — git diff --stat .env.example : 1 ligne, clé de 108 caractères préfixée sk-ant- dans un fichier versionné ; un commit de plus et le secret partait |
 | TF-0870 | corrige | 20 | pilot : une clé Anthropic d'organisation sans espace de travail échoue en 400, variable ANTHROPIC_WORKSPACE_ID absente du gabarit et du skill | **oui** — un redéploiement qualif et un appel direct à l'API pour lire la cause ; smoke-qualif-20260906.json E-011 FAIL 502 |
 | TF-0872 | corrige | 20 | pilot : ETAPE-MEP § 3 bis ne prescrit ni comptes d'essai vides ni source des identifiants d'une qualif publique | **oui** — retour humain lot 20260906b, un run de version |
