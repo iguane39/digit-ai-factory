@@ -12,6 +12,24 @@ environnements: [locale, staging, production]
 > Instanciations datées. Sur dépôt public : valeurs d'infra réelles en placeholders,
 > l'instanciation vit dans le dossier MEP du run.
 
+## Dépôt de code du produit — OBLIGATOIRE (TF-0873)
+
+*Quel dépôt distant EST ce produit, et comment on le sait. Cette ligne est la première du
+document parce qu'elle est le point d'ancrage de tout le reste : un composant se déploie DEPUIS
+un dépôt, et un lot se dépose DANS le dossier de ce dépôt.*
+
+| Dépôt distant | Branche par défaut | Comment on le sait | Vérifié le |
+|---|---|---|---|
+| {<organisation>/<dépôt>} | {main} | `git remote -v` depuis la racine du produit, le {AAAA-MM-JJ} | {AAAA-MM-JJ} |
+
+**Le fait payé le 06/09** : une session parallèle a créé les quatre lots d'insatisfaction d'un
+run dans un dépôt distant VIDE, au nom sans rapport avec le dossier du produit, avec son propre
+`.env.example` et sa propre fiche d'accès. Il a fallu réconcilier deux socles à la main —
+`git fetch` puis import de quatre fichiers. Rien ne liait le dossier de travail au dépôt
+distant, donc rien ne pouvait contredire une session qui en supposait un autre. *Le lien se lit
+en une commande ; ce qui manquait, c'est qu'il soit ÉCRIT.* Le dépôt distant qu'un run touche se
+lit ici, jamais dans la mémoire de la session en cours.
+
 ## Hiérarchie (depuis la racine)
 
 *L'arborescence des composants déployés, du plus englobant au plus fin. Elle se lit de haut en bas : chaque niveau contient le suivant, et un composant absent d'ici est un composant que personne ne sait retrouver.*

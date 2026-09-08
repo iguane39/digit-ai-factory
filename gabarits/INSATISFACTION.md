@@ -27,6 +27,13 @@ COMMENT ÇA MARCHE (tu n'as rien à faire de plus)
        <pilot>\input\00-retours\     sinon
      Nomme-le : INSATISFACTION - <produit|a-identifier> - AAAAMMJJ<lettre>.md
 
+     LE PRODUIT DU RUN, ET RIEN D'AUTRE (TF-0873, 08/09). Le nom qui entre ici est celui du
+     produit sur lequel le run travaille — celui du dossier où vit ce run, dont le dépôt distant
+     est ÉCRIT dans `docs\projet\COMPOSANTS-OPS.md` (« Dépôt de code du produit »). Le 06/09,
+     une session parallèle a déposé quatre lots dans un dépôt distant VIDE au nom différent, avec
+     son propre socle : deux socles à réconcilier, et un import manuel de quatre fichiers. Un lot
+     déposé ailleurs que chez son produit n'est pas un lot, c'est une copie perdue.
+
   2. Tu n'écris JAMAIS le protocole. Pas de « étudie pourquoi », pas de « propose des
      retours », pas de « corrige puis libère une version » : c'est le travail du circuit,
      et il le fait pareil à chaque fois (gabarits\AGENT-INSATISFACTION.md, six blocs).

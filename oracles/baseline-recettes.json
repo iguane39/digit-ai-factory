@@ -23,11 +23,11 @@
   "vu_le": "2026-08-26"
  },
  "gabarits/oracle-lot-retours.test.mjs": {
-  "cas": 13,
-  "vu_le": "2026-08-26"
+  "cas": 17,
+  "vu_le": "2026-09-08"
  },
  "gabarits/oracle-travaux-pilot.test.mjs": {
-  "cas": 20,
+  "cas": 23,
   "vu_le": "2026-09-08"
  },
  "hook-lexique.mjs": {
@@ -72,7 +72,7 @@
   "vu_le": "2026-09-03"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 63,
+  "cas": 65,
   "vu_le": "2026-09-08"
  },
  "oracle-constantes-externes.mjs": {
@@ -299,15 +299,15 @@
   "vu_le": "2026-09-07"
  },
  "scripts/recopier-heritage.test.mjs": {
-  "cas": 6,
-  "vu_le": "2026-09-01"
+  "cas": 12,
+  "vu_le": "2026-09-08"
  },
  "scripts/relever-empreintes-skills.test.mjs": {
   "cas": 8,
   "vu_le": "2026-09-03"
  },
  "scripts/relever-heritage.test.mjs": {
-  "cas": 25,
+  "cas": 30,
   "vu_le": "2026-09-08"
  },
  "scripts/verifier-bascule.test.mjs": {

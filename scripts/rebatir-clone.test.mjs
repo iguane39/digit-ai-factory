@@ -71,18 +71,33 @@ test("histoire distante réécrite + commit propre au poste + arborescence liée
   assert.equal(essai.j.patches.length, 1, `un patch propre au poste annoncé — mesuré : ${JSON.stringify(essai.j.avant)} ${JSON.stringify(essai.j.patches)}`);
   assert.ok(existsSync(join(poste, "local.txt")) && essai.j.sauvegarde.verifie === null, "l'essai n'écrit rien");
   const r = lancer(poste, "--sauvegardes", join(base, "sauv"));
-  assert.equal(r.code, 0, r.brut);
-  assert.equal(r.j.sauvegarde.verifie, true, "paquet vérifié");
-  assert.ok(existsSync(r.j.sauvegarde.paquet));
-  assert.equal(r.j.rejeu.length, 1); assert.equal(r.j.rejeu[0].statut, "rejoue");
-  assert.equal(r.j.worktrees_retires.length, 1);
-  assert.equal(r.j.apres.avance, 1); assert.equal(r.j.apres.retard, 0, "réaligné sur la nouvelle histoire");
+  // TF-0879 (08/09) — CE CAS A ÉCHOUÉ SUR UN POSTE ET PASSÉ SUR L'AUTRE, et son message ne disait
+  // ni QUELLE assertion ni QUELLES valeurs : « Expected values to be strictly equal », rien de
+  // plus. Une recette qui ne dit pas par quoi elle a jugé oblige à rejouer le scénario à la main
+  // pour apprendre ce qu'elle savait déjà. Chaque assertion porte donc son intitulé ET ses deux
+  // valeurs. La dépendance au poste, elle, est bornée en amont : `lancer()` force
+  // `FORGE_SKILLS_INSTALLES` sur un dossier inexistant du parc temporaire, si bien que la porte
+  // rend SKIP sur TOUT poste, qu'un oracle y soit installé ou non.
+  assert.equal(r.code, 0, `exit ${r.code} attendu 0 — sortie brute : ${r.brut}`);
+  assert.equal(r.j.sauvegarde.verifie, true, `paquet vérifié : mesuré ${JSON.stringify(r.j.sauvegarde)}`);
+  assert.ok(existsSync(r.j.sauvegarde.paquet), `le paquet annoncé n'existe pas sur le disque : ${r.j.sauvegarde.paquet}`);
+  assert.equal(r.j.rejeu.length, 1, `un seul patch propre au poste doit être rejoué — mesuré ${r.j.rejeu.length} : ${JSON.stringify(r.j.rejeu)}`);
+  assert.equal(r.j.rejeu[0].statut, "rejoue", `statut du rejeu « ${r.j.rejeu[0].statut} », « rejoue » attendu : ${JSON.stringify(r.j.rejeu[0])}`);
+  assert.equal(r.j.worktrees_retires.length, 1, `une arborescence liée doit être retirée — mesuré ${r.j.worktrees_retires.length} : ${JSON.stringify(r.j.worktrees_retires)}`);
+  assert.equal(r.j.apres.avance, 1, `avance après rebâti : mesurée ${r.j.apres.avance}, 1 attendue (le seul commit propre au poste) — ${JSON.stringify(r.j.apres)}`);
+  assert.equal(r.j.apres.retard, 0, `réaligné sur la nouvelle histoire : retard mesuré ${r.j.apres.retard}, 0 attendu — ${JSON.stringify(r.j.apres)}`);
   assert.ok(existsSync(join(poste, "local.txt")), "le travail propre au poste est rejoué");
   assert.match(g(poste, "log", "-1", "--format=%s", "HEAD~1"), /second commit/);
   assert.match(g(poste, "log", "--format=%s", "--all"), /Client-A/); assert.doesNotMatch(g(poste, "log", "--format=%s", "--all"), /NomClient/, "l'ancienne histoire n'est plus atteignable");
-  assert.equal(g(poste, "worktree", "list").split("\n").length, 1, "arborescence liée retirée");
-  assert.ok(existsSync(lie), "les fichiers de l'arborescence liée sont laissés en place");
-  assert.equal(r.j.porte.verdict, "SKIP", "sans oracle sur le poste de recette, la porte se déclare SKIP — jamais PASS par défaut");
+  assert.equal(g(poste, "worktree", "list").split("\n").length, 1,
+    `arborescence liée retirée — « git worktree list » rend encore :\n${g(poste, "worktree", "list")}`);
+  assert.ok(existsSync(lie), `les fichiers de l'arborescence liée sont laissés en place : ${lie}`);
+  // CE QUE CE CAS EXIGE DU POSTE, et il l'IMPOSE au lieu de l'espérer (TF-0879) : aucun
+  // `oracle-nom-client-publie` atteignable. `lancer()` pointe `FORGE_SKILLS_INSTALLES` sur un
+  // dossier inexistant, et la seconde piste vit sous le parc TEMPORAIRE — donc SKIP partout.
+  assert.equal(r.j.porte.verdict, "SKIP",
+    `la porte doit se déclarer SKIP quand aucun oracle n'est atteignable — mesuré « ${r.j.porte.verdict} » : ${JSON.stringify(r.j.porte)}. `
+    + "Un poste qui rendrait autre chose a un oracle atteignable malgré FORGE_SKILLS_INSTALLES : c'est CELA qu'il faut corriger, pas l'assertion");
   assert.match(r.j.message, /GO humain/, "la publication reste un GO humain, jamais un push du script");
   assert.ok(readdirSync(join(base, "sauv")).some((f) => f.endsWith(".HEAD.txt")), "HEAD d'avant consigné");
   rmSync(base, { recursive: true, force: true });
