@@ -101,7 +101,7 @@ avec un cas de plus, et ne donnent donc pas de candidature nouvelle.
 **Resté au produit, et signalé au commanditaire — un défaut de PRODUCTION non corrigé.** À 390 px
 et **en état défilé**, l'en-tête compacté déborde horizontalement : `scrollWidth` 402 contre 390,
 sur les entrées « À propos » et « Contact ». Mesuré identique en local et sur
-`https://factory.digit-ai.fr` — le défaut est donc antérieur, introduit avec l'en-tête figé, et
+`https://factory.Produit-07` — le défaut est donc antérieur, introduit avec l'en-tête figé, et
 il est en ligne. Il n'apparaît **ni au chargement ni sans défilement**, ce qui le met hors de
 portée de tout contrôle statique et de tout crawl. Non corrigé faute de mandat : la refonte
 portait sur le message, pas sur la navigation.

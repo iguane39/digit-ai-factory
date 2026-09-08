@@ -192,6 +192,25 @@ export function anonymiser(texte) {
     // graphie de domaine et se prend telle quelle : la dériver attraperait des liens légitimes.
     const re = variantes(nom);
     if (re && re.test(out)) { out = out.replace(re, pseudo); remplaces.push(nom); }
+    // TF-0826 (08/09/2026) — LA CASSE, POUR LES PRODUITS AUSSI, ET ELLE A DORMI SEPT JOURS.
+    //
+    // La ligne du dessus compare avec `includes`, donc À LA CASSE PRÈS. La table portait un nom
+    // de produit en capitale initiale ; treize fichiers suivis du dépôt PUBLIC du pilot en
+    // portaient la graphie minuscule — un nom de domaine, forme naturelle dans de la prose. Le
+    // module passait dessus à chaque exécution en rendant « 0 à réécrire », et la porte de
+    // publication ne rattrapait rien : elle ne connaît que la table des CLIENTS.
+    //
+    // Le commentaire de `bordé`, écrit le 01/09, dit DÉJÀ la leçon — « deux contrôles du même
+    // sujet qui ne s'accordent pas sur la casse donnent le pire des deux mondes » — mais elle
+    // n'avait été appliquée qu'aux sigles des clients. Une leçon rangée dans un commentaire
+    // n'est pas un correctif : elle vaut pour chaque site qui compare des noms.
+    //
+    // Bornée, parce qu'insensible à la casse SANS frontière, une clé courte mordrait sur de la
+    // prose ordinaire. Additive, parce qu'elle vient APRÈS la voie littérale : une occurrence
+    // que celle-ci attrapait au milieu d'un mot reste attrapée, rien ne se perd. Mesuré sur les
+    // 1367 fichiers suivis du pilot : 13 fichiers gagnés, 0 perdu, 0 clé nouvellement mordante.
+    const bord = bordé(nom);
+    if (bord.test(out)) { out = out.replace(bordé(nom), pseudo); remplaces.push(nom); }
   }
   for (const [de, vers] of [...clients.table].sort(parLongueur)) {
     if (out.includes(de)) { out = out.split(de).join(vers); remplaces.push(de); }
@@ -240,7 +259,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
     pseudonymes: { Zorglub: "Client-A", "wks-99999999999999": "wks-00000000000000", ZRG: "Sigle-A" },
   }), "utf8");
   writeFileSync(join(dir, "_produits-pseudonymes.json"), JSON.stringify({
-    produits: { "CalculatriceZorglubZAP": "Produit-01" },
+    produits: { "CalculatriceZorglubZAP": "Produit-01", "Gribouille-ai.fr": "Produit-02" },
   }), "utf8");
   process.env.FORGE_NOMS_INTERDITS = join(dir, "_noms-interdits.json");
   process.env.FORGE_PRODUITS_PSEUDO = join(dir, "_produits-pseudonymes.json");
@@ -272,6 +291,17 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
   //  — c'est arrivé le 02/09, et le banc s'est mis à tester autre chose que ce qu'il croyait)
   if (variantes("Zorglub-ai.fr") !== null) casse.push("une clé de domaine (avec un point) se voit dériver des variantes — elle doit être prise telle quelle");
 
+  // 3 quater) LA CASSE D'UNE CLÉ DE PRODUIT, DANS LES DEUX SENS (TF-0826, 08/09) — sens vert :
+  //           la clé porte une capitale initiale, le texte porte la graphie minuscule du même
+  //           nom, et elle est remplacée ; sens rouge : la même graphie COLLÉE dans un mot plus
+  //           long n'est pas touchée, sans quoi une clé courte insensible à la casse mordrait
+  //           sur de la prose ordinaire.
+  const r2d = anonymiser("redéployer gribouille-ai.fr ce soir, puis xgribouille-ai.frx à la marge");
+  if (r2d.texte.includes("gribouille-ai.fr ce soir"))
+    casse.push("la graphie minuscule d'une clé de produit capitalisée traverse : " + r2d.texte);
+  if (!r2d.texte.includes("xgribouille-ai.frx"))
+    casse.push("la clé insensible à la casse mord à l'intérieur d'un mot plus long : " + r2d.texte);
+
   // 3 bis) un nom qui EST déjà un pseudonyme n'est jamais réinscrit ni décalé (02/09)
   const p3 = pseudoProduit("Produit-01");
   if (p3 !== "Produit-01") casse.push(`un pseudonyme réinscrit comme produit neuf : Produit-01 → ${p3}`);
@@ -286,6 +316,6 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
   if (!refuse) casse.push("référentiel absent et le texte passe quand même — le convoi n'est pas arrêté");
 
   for (const m of casse) console.log("  [FAIL] " + m);
-  console.log(`\nSelf-test anonymiseur d'entrants : ${6 - casse.length}/6 cas, ${casse.length} FAIL`);
+  console.log(`\nSelf-test anonymiseur d'entrants : ${7 - casse.length}/7 cas, ${casse.length} FAIL`);
   process.exit(casse.length ? 1 : 0);
 }

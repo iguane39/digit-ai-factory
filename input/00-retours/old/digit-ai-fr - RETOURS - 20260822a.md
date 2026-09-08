@@ -16,9 +16,9 @@ aller-retour ou une découverte par lecture de code) · **mineur** (confort/pré
 ## Le constat qui tient les autres
 
 Le pan `i18n` a **deux points d'observation** — le build servi (TF-0284) et le catalogue de
-chaînes (TF-0383). Sur digit-ai.fr, **aucun des deux ne s'applique** :
+chaînes (TF-0383). Sur Produit-07, **aucun des deux ne s'applique** :
 
-| Point d'observation | Sur digit-ai.fr | Décision qui l'écarte |
+| Point d'observation | Sur Produit-07 | Décision qui l'écarte |
 |---|---|---|
 | **build servi** — parité de routes, parité de menus, langue du contenu | `next.config.ts` porte `output: "standalone"` : aucune arborescence de pages sur le disque | **hors champ**, décision explicite de TF-0405 |
 | **catalogue de chaînes** — complétude, paramètres, constance des libellés | aucun catalogue : les locales sont des **composants dupliqués** (`Footer.tsx` / `FooterEn.tsx`, `Header.tsx` / `HeaderEn.tsx`) | rien à lire — `catalogue_i18n.py` ne trouve pas de source |
@@ -29,7 +29,7 @@ l'étude fondatrice du 15/08 (« une route sur 201, un menu à 4 entrées contre
 a été faite ici.
 
 Le mécanisme est nommable et se reproduira ailleurs : **les deux points d'observation ont été
-calibrés chacun sur un produit différent** — le build sur digit-ai.fr, le catalogue sur Approval
+calibrés chacun sur un produit différent** — le build sur Produit-07, le catalogue sur Approval
 (TF-0383 : « le pan est structurellement aveugle à cette forme — qui est la forme dominante du
 parc ») — **et chacun a déclaré hors champ ce que l'autre était censé couvrir**. TF-0405 avait
 raison de trancher que le SSR sort de l'analyse statique ; ce que la décision n'a pas vérifié,

@@ -191,7 +191,11 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-62 - RETOURS - 20260908d.tf.jsonl` | fichier | 1,5 Ko | 1 ligne(s) JSONL |
 | `Produit-62 - RETOURS - 20260908e.md` | fichier | 8,7 Ko | Retours forges — Produit-62 — 20260908e |
 | `Produit-62 - RETOURS - 20260908e.tf.jsonl` | fichier | 4,0 Ko | 3 ligne(s) JSONL |
+| `Produit-62 - RETOURS - 20260908f.md` | fichier | 9,8 Ko | Retours forges — Produit-62 — 20260908f |
+| `Produit-62 - RETOURS - 20260908f.tf.jsonl` | fichier | 5,1 Ko | 3 ligne(s) JSONL |
+| `Produit-62 - RETOURS - 20260908g.md` | fichier | 8,5 Ko | Retours forges — Produit-62 — 20260908g |
+| `Produit-62 - RETOURS - 20260908g.tf.jsonl` | fichier | 4,3 Ko | 3 ligne(s) JSONL |
 | `produits-anciens - RETOURS - 20260906a.md` | fichier | 19,6 Ko | Retours forges — produits-anciens — 20260906a |
 | `produits-anciens - RETOURS - 20260906a.tf.jsonl` | fichier | 3,0 Ko | 1 ligne(s) JSONL |
 
-_176 fichier(s), 1 sous-dossier(s)_ · 4 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_180 fichier(s), 1 sous-dossier(s)_ · 2 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

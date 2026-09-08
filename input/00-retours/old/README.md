@@ -42,7 +42,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `factory-digit-ai-fr - RETOURS - 20260824a.tf.jsonl` | fichier | 8,9 Ko | 4 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20260825a.md` | fichier | 8,9 Ko | Retours forges — factory-digit-ai-fr — 20260825a |
 | `factory-digit-ai-fr - RETOURS - 20260825a.tf.jsonl` | fichier | 6,0 Ko | 2 ligne(s) JSONL |
-| `forge-digit-ai-fr - RETOURS - 20260815a.md` | fichier | 2,4 Ko | Retours forges — forge-digit-ai-fr — 20260815a |
+| `forge-digit-ai-fr - RETOURS - 20260815a.md` | fichier | 2,3 Ko | Retours forges — forge-digit-ai-fr — 20260815a |
 | `forge-digit-ai-fr - RETOURS - 20260815a.tf.jsonl` | fichier | 3,7 Ko | 5 ligne(s) JSONL |
 | `pilot-campagne-fiches-html - RETOURS - 20260809a.md` | fichier | 6,4 Ko | Retours forges — campagne « fiches HTML lisibles » — 20260809a |
 | `pilot-campagne-fiches-html - RETOURS - 20260809a.tf.jsonl` | fichier | 6,3 Ko | 6 ligne(s) JSONL |

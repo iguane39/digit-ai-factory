@@ -1,6 +1,6 @@
 # Retours forges — forge-digit-ai-fr — 20260815a
 
-- **Contexte** : clôture du run forge-digit-ai-fr-20260815a (site vitrine forge.digit-ai.fr,
+- **Contexte** : clôture du run forge-digit-ai-fr-20260815a (site vitrine forge.Produit-07,
   brief → staging vérifié, MEP en attente de GO)
 - **Références ledger** : `forge\ledger.jsonl` seq 8, 15, 17, 18, 20 (entrées `type: retour`)
 - **Remise au pilot** : copie de ce fichier et de son sidecar dans `<pilot>\input\00-retours\`
