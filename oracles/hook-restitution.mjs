@@ -17,6 +17,12 @@
  * Ce qui est un tour de TRAVAIL (et donc une restitution) : au moins une écriture (Write, Edit,
  * MultiEdit, NotebookEdit) ou au moins quatre commandes (Bash, PowerShell) depuis le dernier
  * message humain. Un tour de lecture ou de conversation n'est pas jugé.
+ *
+ * TF-0904 (08/09/2026) — ET DEPUIS, UN VERDICT SANS ÉCRITURE L'EST AUSSI. Le critère ci-dessus
+ * mesure l'EFFORT ; `RESTITUTION.md` régit « tout message de fin de traitement », c'est-à-dire la
+ * NATURE de ce qui est rendu. Un message final est donc jugé aussi quand il porte un VERDICT ou
+ * dépasse 150 mots, écriture ou pas (fonction `jugeable`) ; les exemptions — accusé de réception,
+ * réponse courte, question rendue à l'humain — sont écrites au §Portée du gabarit.
  */
 import { readFileSync, writeFileSync, mkdtempSync, appendFileSync, existsSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
@@ -147,6 +153,20 @@ const bloc3De = (t) => {
   const suivant = t.slice(debut).search(/\n#{1,4}\s/);
   return t.slice(debut, suivant === -1 ? undefined : debut + suivant);
 };
+// TF-0891 (07/09/2026) — LE BLOC 8 AUSSI SE PERD À L'ÉCRAN, ET IL SE PERD AUTREMENT.
+// Le fait : un fichier jugé PASS S1-S37 a été PARAPHRASÉ à l'affichage. Le bloc 3 y a perdu son
+// tableau d'options ; le bloc 8 y a perdu ses acteurs du vocabulaire gelé — « vous » et « IA »
+// à la place de `manuelle_utilisateur` et `auto_ia` —, donc ce qui dit QUI agit. Retour humain :
+// « le prompt de sortie ne respecte pas le format attendu pour 3 & 8, pourquoi ? ». La
+// comparaison de 30/08 ne regardait que deux propriétés du bloc 3 : elle ne pouvait rien voir.
+const bloc8De = (t) => {
+  const m = /(^|\n)#{1,4}\s*\**\s*8[.)]?\s*\**\s*(?:Prochaines?\s+)?actions?/i.exec(t);
+  if (!m) return "";
+  const debut = m.index + m[0].length;
+  const suivant = t.slice(debut).search(/\n#{1,4}\s/);
+  return t.slice(debut, suivant === -1 ? undefined : debut + suivant);
+};
+const ACTEURS_GELES = /\b(auto_ia|manuelle_dev|manuelle_utilisateur)\b/g;
 const numerosDe = (t) => [...new Set((bloc3De(t).match(/(?:^|\n)\s*[-*]?\s*\*{0,2}(?:D\s*-?\s*|D[ée]cision\s+)(\d{1,2})\b/gi) || [])
   .map((s) => (/(\d{1,2})\b/.exec(s) || [])[1]))].sort((a, b) => Number(a) - Number(b));
 const replisDe = (t) => (bloc3De(t).match(/si rien n(?:'|’)est d[ée]cid|sans d[ée]cision|option par d[ée]faut/gi) || []).length;
@@ -169,6 +189,21 @@ export function syntheseDuTour(chemins) {
   return nomme || marques[0] || null;
 }
 
+// TF-0891 — ce qui s'ajoute aux deux propriétés de 30/08, et pourquoi CELLES-LÀ. Le critère reste
+// le même : on ne compare JAMAIS des textes mot à mot, seulement ce sur quoi le lecteur AGIT et
+// qui ne s'abrège donc pas. Trois propriétés de plus le remplissent :
+//   · le TABLEAU D'OPTIONS du bloc 3 — c'est lui qui porte le coût et l'exclusion de chaque voie
+//     (S31) ; une décision rendue en prose se tranche à l'aveugle ;
+//   · les SÉLECTEURS d'action `A-N` — ce sont eux qu'on cite pour répondre (S33) ; sans eux le
+//     lecteur répond « 3 » et personne ne sait de quelle liste il parle ;
+//   · les ACTEURS du vocabulaire gelé au bloc 8 — `auto_ia`, `manuelle_dev`,
+//     `manuelle_utilisateur`. Le 07/09, ils sont devenus « IA » et « vous » à l'écran : la seule
+//     information qui dit à qui la ligne appartient a disparu dans une reformulation.
+const tableauOptions = (t) => /\|[^\n|]*\bOptions?\b[^\n|]*\|/i.test(bloc3De(t));
+const selecteursActions = (t) => [...new Set((bloc8De(t).match(/\bA\s*-\s*(\d{1,2})\b/g) || [])
+  .map((s) => (/(\d{1,2})/.exec(s) || [])[1]))].sort((a, b) => Number(a) - Number(b));
+const acteursDe = (t) => (bloc8De(t).match(ACTEURS_GELES) || []).length;
+
 export function comparerAffiche(message, fichier) {
   const ecarts = [];
   const nm = numerosDe(message), nf = numerosDe(fichier);
@@ -177,7 +212,61 @@ export function comparerAffiche(message, fichier) {
   const rm = replisDe(message), rf = replisDe(fichier);
   if (rf !== rm)
     ecarts.push(`options par défaut nommées : ${rf} dans le fichier jugé, ${rm} à l'écran`);
+  if (tableauOptions(fichier) && !tableauOptions(message))
+    ecarts.push("le bloc 3 du fichier jugé porte le TABLEAU DES OPTIONS (« Option | Ce qu'elle coûte | Ce qu'elle exclut ») ; "
+      + "l'écran l'a remplacé par de la prose — le coût et l'exclusion de chaque voie ne sont plus lisibles (S31)");
+  const am = selecteursActions(message), af = selecteursActions(fichier);
+  if (af.join(",") !== am.join(","))
+    ecarts.push(`actions du fichier jugé : ${af.map((n) => `A-${n}`).join(", ") || "aucune"} — `
+      + `actions affichées : ${am.map((n) => `A-${n}`).join(", ") || "aucune"} (S33 : une action se cite par son sélecteur)`);
+  const cm = acteursDe(message), cf = acteursDe(fichier);
+  if (cf > 0 && cm === 0)
+    ecarts.push(`le bloc 8 du fichier jugé nomme ${cf} acteur(s) du vocabulaire gelé (auto_ia | manuelle_dev | manuelle_utilisateur) ; `
+      + "l'écran n'en porte aucun — « vous » et « IA » ne disent pas à qui la ligne appartient (S6)");
   return ecarts;
+}
+
+// ---- TF-0904 (08/09/2026) — UN VERDICT RENDU SANS ÉCRIRE UN FICHIER EST UNE RESTITUTION -------
+//
+// LE FAIT, mesuré le 07/09 : question humaine « la proposition a-t-elle été testée ? peut-on
+// garantir… », réponse de 450 mots en prose — verdict remis sans bloc 0, sans preuve, sans
+// fichier. UNE commande, ZÉRO écriture : hors du critère de « tour de TRAVAIL », donc jamais
+// jugée. Retour humain : « pourquoi le prompt ne suit pas la norme ? ».
+//
+// LA CONTRADICTION QU'IL RÉVÈLE : `RESTITUTION.md` régit **« tout message de fin de
+// traitement »** ; ce hook n'en jugeait qu'un sous-ensemble défini par le nombre d'outils
+// appelés. Le nombre d'outils mesure l'EFFORT, jamais la NATURE de ce qui est rendu — et c'est
+// la nature qui décide si un lecteur va agir sur le message.
+//
+// CE QUI EST AJOUTÉ, et rien de plus : un message final est jugé s'il porte un VERDICT (mots du
+// vocabulaire fermé ci-dessous) ou s'il dépasse le seuil de mots. Les EXEMPTIONS sont écrites au
+// §Portée du gabarit et tenues ici : un accusé de réception, une réponse courte, une question
+// rendue à l'humain. Le seuil est haut (150 mots) par choix : un gate `Stop` juge APRÈS
+// affichage, donc chaque faux refus fait relire un message entier (v2.5.0) — mieux vaut manquer
+// une prose de 140 mots que refuser une phrase de politesse.
+const SEUIL_MOTS = 150;
+// LE VOCABULAIRE DE VERDICT, ET LE PIÈGE QU'IL A TENDU DÈS SA PREMIÈRE EXÉCUTION. Écrit d'abord
+// en un seul motif insensible à la casse, il contenait le jeton PASS — qui a matché « passé »
+// dans « tout s'est bien passé » : le « é » final n'est pas un caractère de mot ASCII, donc la
+// frontière tombe juste après « pass ». Un accusé de réception ordinaire devenait un verdict, et
+// la recette l'a montré dans la minute. C'est EXACTEMENT la classe de TF-0805, prise par l'autre
+// bout : là une frontière ASCII empêchait de lire un mot accentué, ici elle en fabriquait un.
+// Les jetons en capitales sont donc jugés SENSIBLES à la casse et bornés sur les lettres
+// accentuées ; les mots français gardent l'insensibilité, qui leur est légitime.
+const VERDICT_MOTS = /\bverdicts?\b|\bnon conformes?\b|\bconformes?\b|\bgaranti(?:r|e|es|s)?\b|\brecette (?:verte|rouge|ex[ée]cut[ée]e)\b|\bexhaustive?s?\b/i;
+const VERDICT_JETONS = /(?<![A-Za-zÀ-ÿ])(?:PASS|FAIL)(?![A-Za-zÀ-ÿ])/;
+const VERDICT = { test: (s) => VERDICT_MOTS.test(s) || VERDICT_JETONS.test(s) };
+
+export function jugeable({ travail, ecritures = 0, commandes = 0, dernierTexte }) {
+  if (!dernierTexte) return { juge: false, motif: "aucun texte final dans le transcript" };
+  const mots = dernierTexte.trim().split(/\s+/).filter(Boolean).length;
+  if (travail) return { juge: true, motif: `tour de travail (${ecritures} écriture(s), ${commandes} commande(s))` };
+  // Une QUESTION rendue à l'humain n'est pas une restitution : c'est `bloque_question`, et la
+  // doctrine la veut courte. L'exempter explicitement vaut mieux que de la laisser au seuil.
+  if (/\?\s*$/.test(dernierTexte.trim()) && mots <= 60) return { juge: false, motif: `question rendue à l'humain (${mots} mots)` };
+  if (VERDICT.test(dernierTexte)) return { juge: true, motif: `message portant un VERDICT (${mots} mots, sans écriture)` };
+  if (mots >= SEUIL_MOTS) return { juge: true, motif: `message de ${mots} mots rendu à l'humain (sans écriture)` };
+  return { juge: false, motif: `${mots} mots, aucun verdict — accusé de réception ou réponse courte (exemption §Portée)` };
 }
 
 // SÉVÉRITÉS (22/08, retour humain : « le prompt de résultat s'affiche 2 fois »). Un hook `Stop`
@@ -228,14 +317,15 @@ const BLOQUANTES = new Set(["S1", "S3", "S4", "S6"]);
 // se mettent à jour ENSEMBLE ou la doctrine ne s'applique pas. Le même défaut vaut pour la ligne
 // des gates de `hook-ouverture.mjs`, corrigée le même jour et pour la même raison.
 
-const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.16.0) : bloc 0 « synthèse d'ouverture » en langage commanditaire (≥ 20 mots, sans identifiant, chemin ni sha — l'état, ce que ça change, ce qui est attendu du lecteur), puis les 8 blocs numérotés, aucun omis (un bloc vide se dit en une ligne). · 1 en-tête (quoi · sur quoi · date ET heure avec fuseau + durée · qui avec version) · 2 verdict en une ligne FACTUEL (un chiffre, un compteur) · 3 décisions attendues de l'humain, EN TÊTE, chacune en BLOC DE CITATION et dans cet ordre exact : « > **D-N — <la question, posée comme une question, avec son point d'interrogation>** » (N continu dans la session, jamais remis à 1), puis le rappel du sujet en prose (≥ 25 mots, sans identifiant nu — 12 mots si un chapeau commun d'au moins 40 mots ouvre le bloc), puis « > **Recommandation : (a).** Source consultée : <le document d'où sort la réponse proposée> » et pourquoi ; PUIS, hors de la citation et pleine largeur, le tableau des options « | Option | Ce qu'elle coûte | Ce qu'elle exclut | », une ligne par (a)/(b)/(c) ; PUIS « > **Si rien n'est décidé** : (c) … ». Si rien n'attend l'humain, le dire en une ligne · 4 traité, chaque puce avec sa preuve (oracle, verdict, chiffre) · 5 non traité, chaque puce avec son motif · 6 écarts à la lettre (« vous avez demandé → j'ai fait → pourquoi », ou « aucun écart ») · 7 risques (énoncé + signal + parade) · 8 prochaines actions en UN TABLEAU UNIQUE, l'acteur en COLONNE et jamais en section, trié auto_ia d'abord — chaque action porte son sélecteur **A-N** distinct (jamais un numéro nu : un « 3 » nu ne dit pas s'il désigne la décision 3 ou l'action 3), son identifiant stable TF-#### ou la mention `neuve`, son acteur (auto_ia | manuelle_dev | manuelle_utilisateur), le motif de non-exécution si auto_ia (gate_gouvernance | dependance_bloc_3 | garde_fou | borne_atteinte | dependance_externe | hors_mandat), la raison d'impossibilité IA si elle est laissée à l'humain (acces | decision | depense | presence | irreversible, non accentués — et pour acces comme pour presence, la TRACE MESURÉE de la tentative : code de réponse, message d'erreur, sortie de commande), un chemin ou une commande qui la rend exécutable telle quelle, et ce qu'il en coûte de NE PAS la faire · 9 traces (chemins relatifs et vérifiables). Puces ≤ 2 niveaux. Un renvoi nomme son sujet ou son sélecteur, jamais une position (« ligne 5 » est un défaut). Effort en complexité × durée, jamais en jours. · v2.16.0 (02/09) : une action manuelle_utilisateur ne demande jamais à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent, seule la VALEUR lui reste) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation (forge-design) ; une correction restituée nomme son contrôle rouge → vert ou sa classe.";
+const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.17.0) : bloc 0 « synthèse d'ouverture » en langage commanditaire (≥ 20 mots, sans identifiant, chemin ni sha — l'état, ce que ça change, ce qui est attendu du lecteur), puis les 8 blocs numérotés, aucun omis (un bloc vide se dit en une ligne). · 1 en-tête (quoi · sur quoi · date ET heure avec fuseau + durée · qui avec version) · 2 verdict en une ligne FACTUEL (un chiffre, un compteur) · 3 décisions attendues de l'humain, EN TÊTE, chacune en BLOC DE CITATION et dans cet ordre exact : « > **D-N — <la question, posée comme une question, avec son point d'interrogation>** » (N continu dans la session, jamais remis à 1), puis le rappel du sujet en prose (≥ 25 mots, sans identifiant nu — 12 mots si un chapeau commun d'au moins 40 mots ouvre le bloc), puis « > **Recommandation : (a).** Source consultée : <le document d'où sort la réponse proposée> » et pourquoi ; PUIS, hors de la citation et pleine largeur, le tableau des options « | Option | Ce qu'elle coûte | Ce qu'elle exclut | », une ligne par (a)/(b)/(c) ; PUIS « > **Si rien n'est décidé** : (c) … ». Si rien n'attend l'humain, le dire en une ligne · 4 traité, chaque puce avec sa preuve (oracle, verdict, chiffre) · 5 non traité, chaque puce avec son motif · 6 écarts à la lettre (« vous avez demandé → j'ai fait → pourquoi », ou « aucun écart ») · 7 risques (énoncé + signal + parade) · 8 prochaines actions en UN TABLEAU UNIQUE, l'acteur en COLONNE et jamais en section, trié auto_ia d'abord — chaque action porte son sélecteur **A-N** distinct (jamais un numéro nu : un « 3 » nu ne dit pas s'il désigne la décision 3 ou l'action 3), son identifiant stable TF-#### ou la mention `neuve`, son acteur (auto_ia | manuelle_dev | manuelle_utilisateur), le motif de non-exécution si auto_ia (gate_gouvernance | dependance_bloc_3 | garde_fou | borne_atteinte | dependance_externe | hors_mandat), la raison d'impossibilité IA si elle est laissée à l'humain (acces | decision | depense | presence | irreversible, non accentués — et pour acces comme pour presence, la TRACE MESURÉE de la tentative : code de réponse, message d'erreur, sortie de commande), un chemin ou une commande qui la rend exécutable telle quelle, et ce qu'il en coûte de NE PAS la faire · 9 traces (chemins relatifs et vérifiables). Puces ≤ 2 niveaux. Un renvoi nomme son sujet ou son sélecteur, jamais une position (« ligne 5 » est un défaut). Effort en complexité × durée, jamais en jours. · v2.16.0 (02/09) : une action manuelle_utilisateur ne demande jamais à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent, seule la VALEUR lui reste) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation (forge-design) ; une correction restituée nomme son contrôle rouge → vert ou sa classe. · v2.17.0 (08/09) : CE MESSAGE EST LE FICHIER JUGÉ, jamais son résumé — quand une synthèse a été déposée dans le tour, le message affiché reprend ses blocs 3 et 8 EN ENTIER (tableau des options, sélecteurs A-N, acteurs du vocabulaire gelé auto_ia | manuelle_dev | manuelle_utilisateur) ; la LONGUEUR n'est pas un motif de condensation, et un fichier PASS paraphrasé à l'écran ne protège aucun lecteur.";
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const entree = lireStdin();
   const chemin = entree.transcript_path;
   if (!chemin || !existsSync(chemin)) process.exit(0); // rien à juger sans transcript
   const { travail, ecritures, commandes, dernierTexte, textes, fichiersMd } = analyserTranscript(readFileSync(chemin, "utf8"));
-  if (!travail || !dernierTexte) process.exit(0);
+  const portee = jugeable({ travail, ecritures, commandes, dernierTexte });
+  if (!portee.juge) process.exit(0);
   const { code, fails } = juger(dernierTexte);
   // L'AFFICHÉ DIT CE QUE LE JUGÉ DISAIT : quand une synthèse a été déposée dans le tour, ce qui se
   // TRANCHE doit se retrouver à l'écran. Bloquant, parce qu'une décision absente de l'écran ne peut
@@ -252,6 +342,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     mkdirSync(dirname(journal), { recursive: true });
     appendFileSync(journal, JSON.stringify({
       ts: new Date().toISOString(), hook: "restitution", session: entree.session_id, ecritures, commandes,
+      portee: portee.motif,
       verdict: (code === 0 && !ecartsAffichage.length) ? "PASS" : ((bloquants.length || ecartsAffichage.length) ? "FAIL" : "AVERTISSEMENT"),
       regles: fails.map((f) => f.regle), bloquantes: bloquants.map((f) => f.regle),
       synthese_deposee: fichierSynthese || null, ecarts_affichage: ecartsAffichage,

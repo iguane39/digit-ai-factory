@@ -68,8 +68,8 @@
   "vu_le": "2026-09-03"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 52,
-  "vu_le": "2026-09-05"
+  "cas": 58,
+  "vu_le": "2026-09-08"
  },
  "oracle-constantes-externes.mjs": {
   "cas": 12,
@@ -231,8 +231,8 @@
   "vu_le": "2026-09-02"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 7,
-  "vu_le": "2026-08-26"
+  "cas": 13,
+  "vu_le": "2026-09-08"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
   "cas": 14,

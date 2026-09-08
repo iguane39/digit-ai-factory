@@ -7,7 +7,25 @@ prouvée à zéro faux positif, et ne voit rien. Le marquage a été vérifié t
 `oracle-synthese` (S1-S8 à l'époque, S1-S33 depuis la v2.15.0) sur une synthèse réelle PASS avant d'être prescrit ici.
 Cette consigne, elle, ne se marque PAS : c'est un référentiel normatif, pas un livrable.
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 2.16.0, 02/09/2026** : **quatre règles
+Référentiel versionné (loi n° 4, daté-éditable) — **version 2.17.0, 08/09/2026** : **le message
+AFFICHÉ est le fichier jugé, et un verdict rendu sans écrire un fichier est une restitution**
+(TF-0891, TF-0904 — lot d'un produit du 07/09). Deux faits du même jour, une seule cause : le
+gate ne voyait pas ce que le lecteur lisait. **(1)** Un fichier `output\` jugé PASS S1-S37 a été
+PARAPHRASÉ à l'écran — bloc 3 rendu en prose sans le tableau `Option | Ce qu'elle coûte | Ce
+qu'elle exclut` et sans option par défaut, bloc 8 avec « vous » et « IA » à la place des acteurs
+du vocabulaire gelé. Retour humain, mot pour mot : « Le prompt de sortie ne respecte pas le format
+attendu pour 3 & 8, pourquoi ? » *Un fichier PASS n'a protégé aucun lecteur* : les consignes
+générales de concision de l'assistant avaient primé sur R-44, malgré R-43. La comparaison
+affiché ↔ jugé du 30/08 ne regardait que deux propriétés du bloc 3 — elle ne pouvait rien voir.
+Elle en regarde désormais **cinq** : numéros de décision, options par défaut, **tableau des
+options**, **sélecteurs `A-N`** et **acteurs du vocabulaire gelé**, et l'écart est BLOQUANT.
+*La longueur n'est pas un motif de condensation : reproduire le bloc coûte moins qu'un
+aller-retour.* **(2)** Un tour du 07/09 a rendu un verdict de 450 mots en prose — « la
+proposition a-t-elle été testée ? peut-on garantir… » — avec UNE commande et ZÉRO écriture : hors
+du critère « tour de TRAVAIL » du hook, donc jamais jugé, alors que cette page régit *tout message
+de fin de traitement*. Le nombre d'outils mesure l'EFFORT, jamais la NATURE de ce qui est rendu.
+Le hook juge maintenant aussi **un message final portant un verdict, ou dépassant 150 mots**, et
+les seules exemptions sont écrites au §Portée. Précédente : **2.16.0, 02/09/2026** : **quatre règles
 tirées d'un lot de retours d'un produit, toutes mesurées le même jour sur des restitutions
 réelles** (TF-0766, TF-0775, TF-0779, TF-0767), toutes AVERTISSANTES à leur entrée comme la
 v2.5.0 le prescrit. **S34** — une action `manuelle_utilisateur` ne demande pas à l'humain de
@@ -708,6 +726,34 @@ run demandé au produit.
 instancié. Une session qui y travaille ne recevra ni consigne ni juge — et doit le savoir avant de
 rendre son premier message, pas après onze décisions.
 
+### Quels messages sont jugés, et les TROIS seules exemptions (TF-0904, 08/09/2026)
+
+Cette page régit « tout message de fin de traitement ». Le hook, lui, ne jugeait qu'un
+sous-ensemble défini par le nombre d'outils appelés — **au moins une écriture, ou au moins quatre
+commandes**. *Le nombre d'outils mesure l'EFFORT, jamais la NATURE de ce qui est rendu*, et c'est
+la nature qui décide si un lecteur va agir sur le message. Le 07/09, un verdict de 450 mots rendu
+après UNE commande et ZÉRO écriture est donc sorti sans bloc 0, sans preuve, sans fichier — et
+sans qu'aucun mécanisme le refuse. Retour humain : « pourquoi le prompt ne suit pas la norme ? ».
+
+**Est jugé** : tout tour de travail (le critère d'origine, inchangé) · **tout message final
+portant un VERDICT** (vocabulaire fermé : verdict, conforme / non conforme, garanti, exhaustif,
+`PASS`, `FAIL`, recette verte / rouge / exécutée) · **tout message final de 150 mots ou plus**.
+
+**Les trois exemptions, et rien d'autre** — écrites ici pour qu'on ne les élargisse pas en
+silence, et tenues par `oracles\hook-restitution.mjs` (fonction `jugeable`, recette double sens) :
+
+| Exemption | Ce que c'est | Borne |
+|---|---|---|
+| accusé de réception | « c'est noté », « je m'en occupe » | moins de 150 mots ET aucun mot de verdict |
+| réponse courte | une information rendue sans jugement | idem |
+| question rendue à l'humain | `bloque_question` — la session s'arrête pour demander | le texte finit par « ? » ET fait 60 mots au plus |
+
+**Pourquoi le seuil est HAUT (150 mots) et non bas.** Un hook `Stop` juge APRÈS l'affichage : tout
+refus laisse la version rejetée à l'écran et fait relire le message (v2.5.0). Mieux vaut manquer
+une prose de 140 mots que refuser une phrase de politesse — un gate qui accuse à tort s'apprend à
+contourner (R-33 bis). Le seuil se baissera quand le corpus sera propre, comme les règles
+avertissantes se durcissent.
+
 ## Contrôle
 
 **Trois bornes de domaine, écrites parce qu'elles ont été trouvées en jouant les règles neuves
@@ -745,3 +791,14 @@ mémoire : clôture de run (pas 7, `ETAPES-RUN.md`) · fin de campagne (`AGENT-C
 synthèse s'écrit EN FICHIER (`output\` du pilot ou `forge\` du produit), passe
 `oracle-synthese` et ne s'affiche qu'après son verdict — un message de chat ne passe
 devant aucun contrôle, un fichier si.
+
+**Et l'AFFICHÉ est ce fichier, pas son résumé (TF-0891, 07/09/2026).** Quand une synthèse a été
+déposée dans le tour, le message rendu à l'écran reprend ses blocs 3 et 8 **en entier** : le
+tableau des options, la ligne de repli, les sélecteurs `D-N` et `A-N`, les acteurs du vocabulaire
+gelé (`auto_ia`, `manuelle_dev`, `manuelle_utilisateur`). Ce sont les cinq propriétés que
+`hook-restitution.mjs` compare, et un écart y est **BLOQUANT** — non par formalisme, mais parce
+qu'une décision absente de l'écran ne peut pas être prise et qu'un acteur remplacé par « vous »
+ne dit plus à qui la ligne appartient. *La longueur n'est jamais un motif de condensation* : le
+07/09, un fichier PASS S1-S37 a été paraphrasé et le destinataire a demandé pourquoi le format
+n'était pas tenu — le fichier jugé n'avait protégé personne. Ce qui s'abrège légitimement, c'est
+la prose ; jamais ce sur quoi le lecteur TRANCHE.

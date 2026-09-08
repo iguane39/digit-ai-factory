@@ -21,6 +21,7 @@ import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { comparerAffiche } from "./hook-restitution.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const HOOK = join(ICI, "hook-restitution.mjs");
@@ -157,6 +158,27 @@ try {
   const r4 = lancer("lecture", MAUVAIS, ["Read", "Grep"]);
   if (r4.decision !== null) echecs.push("4 : tour de lecture → attendu non jugé");
 
+  // 7 (TF-0904, 08/09) — UN VERDICT RENDU SANS ÉCRITURE EST UNE RESTITUTION. Le cas du 07/09 :
+  // une question « la proposition a-t-elle été testée ? peut-on garantir… », une réponse en prose
+  // portant un verdict, UNE commande, ZÉRO écriture. Hors critère « tour de travail » → jamais
+  // jugée, alors que RESTITUTION.md régit « tout message de fin de traitement ».
+  const VERDICT_LIBRE = "La proposition est conforme et je peux garantir qu'elle couvre le périmètre : "
+    + "le mapping a été relu, les colonnes se correspondent, et rien ne manque à ma connaissance.";
+  const r7 = lancer("verdict-sans-ecriture", VERDICT_LIBRE, ["Read"]);
+  if (r7.decision?.decision !== "block")
+    echecs.push(`7 : verdict rendu sans écriture → attendu block, obtenu ${JSON.stringify(r7.decision)}`);
+
+  // 8 — SA CONTRE-ÉPREUVE, et sans elle la règle 7 désarmerait la conversation ordinaire : un
+  // accusé de réception court, sans verdict, reste NON jugé (exemption écrite au §Portée).
+  const r8 = lancer("accuse-reception", "C'est noté, je m'en occupe.", ["Read"]);
+  if (r8.decision !== null)
+    echecs.push(`8 : accusé de réception court → attendu non jugé, obtenu ${JSON.stringify(r8.decision).slice(0, 160)}`);
+
+  // 9 — et une QUESTION rendue à l'humain (bloque_question) n'est pas une restitution non plus.
+  const r9 = lancer("question", "Sur quel environnement dois-je mesurer, la recette ou la production ?", ["Read"]);
+  if (r9.decision !== null)
+    echecs.push(`9 : question rendue à l'humain → attendu non jugé, obtenu ${JSON.stringify(r9.decision).slice(0, 160)}`);
+
   // 5 — défaut de DÉTAIL seul : la structure tient, une puce du bloc 4 perd sa preuve.
   // S8 cherche un mot d'achèvement (« fait », « terminé », « clos », ✓) dans une puce SANS
   // preuve : on retire la preuve de la seule puce du bloc 4 et on garde le mot.
@@ -170,8 +192,34 @@ try {
     echecs.push("5 : défaut de détail → ni blocage ni avertissement : le verdict serait muet");
   else if (!/S8/.test(r5.decision.systemMessage))
     echecs.push("5 : l'avertissement ne nomme pas la règle en cause");
+
+  // 10 à 12 (TF-0891, 08/09) — L'AFFICHÉ REPREND LES BLOCS 3 ET 8 DU FICHIER JUGÉ.
+  // Le fait du 07/09 : un fichier PASS S1-S37 paraphrasé à l'écran — bloc 3 sans tableau
+  // d'options, bloc 8 avec « vous » et « IA » à la place du vocabulaire gelé. La comparaison du
+  // 30/08 ne regardait que les numéros de décision et les lignes de repli : elle n'a rien vu.
+  // Les trois sens se jouent sur le MÊME fichier de référence, seule la paraphrase change.
+  const FICHIER = BON.replace(
+    "  - (a) pousser maintenant — coût nul, exclut un dernier regard humain ; recommandé : le journal `recette.md` ne porte aucun défaut ouvert.",
+    "\n| Option | Ce qu'elle coûte | Ce qu'elle exclut |\n|---|---|---|\n| (a) pousser maintenant | nul | un dernier regard humain |\n| (b) pousser demain | un poste périmé une nuit | la mise à disposition immédiate |\n");
+  if (comparerAffiche(FICHIER, FICHIER).length)
+    echecs.push(`10 : le fichier comparé à LUI-MÊME rend un écart — la règle accuserait un affichage fidèle : ${comparerAffiche(FICHIER, FICHIER).join(" | ")}`);
+
+  const SANS_TABLEAU = FICHIER.replace(/\n\| Option \|[\s\S]*?\n\n/, "\n(a) pousser maintenant, ou (b) pousser demain matin.\n\n");
+  const e11 = comparerAffiche(SANS_TABLEAU, FICHIER);
+  if (!e11.some((x) => /TABLEAU DES OPTIONS/.test(x)))
+    echecs.push(`11 : le tableau d'options perdu à l'écran n'est pas vu — écarts rendus : ${e11.join(" | ") || "aucun"}`);
+
+  const PARAPHRASE = FICHIER
+    .replace(/\*\*A-1\*\* — auto_ia/, "l'IA")
+    .replace(/\*\*A-2\*\* — manuelle_utilisateur/, "vous")
+    .replace("- manuelle_dev : aucune.", "- rien côté développeur.");
+  const e12 = comparerAffiche(PARAPHRASE, FICHIER);
+  if (!e12.some((x) => /actions du fichier jugé/.test(x)))
+    echecs.push(`12 : les sélecteurs A-N disparus de l'écran ne sont pas vus — écarts : ${e12.join(" | ") || "aucun"}`);
+  if (!e12.some((x) => /vocabulaire gelé/.test(x)))
+    echecs.push(`12 bis : les acteurs remplacés par « vous » et « IA » ne sont pas vus — écarts : ${e12.join(" | ") || "aucun"}`);
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 200)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error("hook-restitution : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log("hook-restitution : 7/7 — hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516)");
+console.log("hook-restitution : 13/13 — hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891)");
