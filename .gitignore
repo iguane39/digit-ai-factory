@@ -24,3 +24,6 @@
 # pseudonymise -- nom ET contenu -- puis le depose dans `input\00-retours\`, qui reste suivi.
 # La fenetre ne se reduit pas : elle disparait.
 input/00-retours/_arrivee/
+
+# TF-0980 — journal des substitutions faites au commit : etat MACHINE, propre a ce poste.
+.claude/anonymisation-au-commit.jsonl

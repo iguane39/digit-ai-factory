@@ -133,6 +133,8 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-11 - RETOURS - 20260908a.tf.jsonl` | fichier | 7,4 Ko | 3 ligne(s) JSONL |
 | `Produit-11 - RETOURS - 20260908b.md` | fichier | 13,1 Ko | Retours forgés — Produit-11 — 20260908b |
 | `Produit-11 - RETOURS - 20260908b.tf.jsonl` | fichier | 5,0 Ko | 2 ligne(s) JSONL |
+| `Produit-11 - RETOURS - 20260908c.md` | fichier | 11,8 Ko | Retours forgés — Produit-11 — 20260908c |
+| `Produit-11 - RETOURS - 20260908c.tf.jsonl` | fichier | 5,4 Ko | 2 ligne(s) JSONL |
 | `Produit-12 - RETOURS - 20260816a.md` | fichier | 4,7 Ko | Retours forges — lot 05 (2026-08-16) |
 | `Produit-12 - RETOURS - 20260816a.tf.jsonl` | fichier | 6,0 Ko | 5 ligne(s) JSONL |
 | `Produit-12 - RETOURS - 20260830a.md` | fichier | 13,5 Ko | Retours forges — Produit-12 — 20260830a |
@@ -206,9 +208,13 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-62 - RETOURS - 20260908j.tf.jsonl` | fichier | 4,4 Ko | 2 ligne(s) JSONL |
 | `Produit-62 - RETOURS - 20260908k.md` | fichier | 11,6 Ko | Retours forges — Produit-62 — 20260908k |
 | `Produit-62 - RETOURS - 20260908k.tf.jsonl` | fichier | 7,0 Ko | 3 ligne(s) JSONL |
+| `Produit-62 - RETOURS - 20260908l.md` | fichier | 6,6 Ko | Retours forges — Produit-62 — 20260908l |
+| `Produit-62 - RETOURS - 20260908l.tf.jsonl` | fichier | 3,1 Ko | 1 ligne(s) JSONL |
+| `Produit-62 - RETOURS - 20260909a.md` | fichier | 9,4 Ko | Retours forges — Produit-62 — 20260909a |
+| `Produit-62 - RETOURS - 20260909a.tf.jsonl` | fichier | 4,3 Ko | 2 ligne(s) JSONL |
 | `Produit-65 - RETOURS - 20260903a.md` | fichier | 15,9 Ko | Retours forges — Bibliothèque vidéo IA Enseigne-A — 20260903a |
 | `Produit-65 - RETOURS - 20260903a.tf.jsonl` | fichier | 4,4 Ko | 2 ligne(s) JSONL |
 | `produits-anciens - RETOURS - 20260906a.md` | fichier | 19,6 Ko | Retours forges — produits-anciens — 20260906a |
 | `produits-anciens - RETOURS - 20260906a.tf.jsonl` | fichier | 3,0 Ko | 1 ligne(s) JSONL |
 
-_192 fichier(s), 2 sous-dossier(s)_ · 6 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_198 fichier(s), 2 sous-dossier(s)_
