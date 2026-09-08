@@ -218,8 +218,30 @@ try {
     echecs.push(`12 : les sélecteurs A-N disparus de l'écran ne sont pas vus — écarts : ${e12.join(" | ") || "aucun"}`);
   if (!e12.some((x) => /vocabulaire gelé/.test(x)))
     echecs.push(`12 bis : les acteurs remplacés par « vous » et « IA » ne sont pas vus — écarts : ${e12.join(" | ") || "aucun"}`);
+
+  // 13 et 14 (TF-0918, 08/09) — LE VERDICT AFFICHÉ MESURE CE QUE LA TRACE MESURE.
+  // Le fait du 08/09 : au cours d'un mandat long, l'écran a été enrichi à chaque rapport d'agent
+  // (« 3 rapports sur 7 » puis « 6 items clos ») sans que le fichier déposé soit redéposé — il
+  // portait encore « 2 sur 7 ». Décisions, options, sélecteurs et acteurs identiques des deux
+  // côtés : les cinq propriétés de TF-0891 rendaient PASS. Le sens est inversé (l'écran plus
+  // riche que la trace) et l'effet est pire : c'est la pièce opposable qui ment, après coup.
+  const AVEC_VERDICT = FICHIER.replace(/\n## 2\.[^\n]*\n/, "\n## 2. Verdict en une ligne\n\n2 rapports sur 7 reçus, 3 items clos, recette 22/22 verte.\n");
+  if (comparerAffiche(AVEC_VERDICT, AVEC_VERDICT).length)
+    echecs.push(`13 : verdict identique des deux côtés → écart rendu à tort : ${comparerAffiche(AVEC_VERDICT, AVEC_VERDICT).join(" | ")}`);
+  const ECRAN_ENRICHI = AVEC_VERDICT.replace("2 rapports sur 7 reçus, 3 items clos", "6 rapports sur 7 reçus, 31 items clos");
+  const e13 = comparerAffiche(ECRAN_ENRICHI, AVEC_VERDICT);
+  if (!e13.some((x) => /VERDICT \(bloc 2\) affiché/.test(x)))
+    echecs.push(`14 : l'écran avance des chiffres absents de la trace, non vu — écarts : ${e13.join(" | ") || "aucun"}`);
+  if (!e13.some((x) => /31/.test(x)))
+    echecs.push(`14 bis : l'écart ne nomme pas le chiffre en cause — écarts : ${e13.join(" | ") || "aucun"}`);
+  // La borne : un identifiant, une empreinte, une version ou une date qui change de forme n'est
+  // PAS un fait mesuré — sans quoi la règle crierait sur toute reformulation légitime.
+  const REFORMULE = AVEC_VERDICT.replace(/\n## 2\.[^\n]*\n\n[^\n]*\n/, "\n## 2. Verdict en une ligne\n\n2 rapports sur 7 reçus, 3 items clos (TF-0844, TF-0845, TF-0886), recette 22/22 verte, publié en 6a33b3e le 2026-09-08 à 09:32, gabarit v2.18.0.\n");
+  const e14 = comparerAffiche(REFORMULE, AVEC_VERDICT);
+  if (e14.some((x) => /VERDICT \(bloc 2\) affiché/.test(x)))
+    echecs.push(`14 ter : identifiants, empreinte, date et version comptés comme des faits mesurés — écarts : ${e14.join(" | ")}`);
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 200)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error("hook-restitution : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log("hook-restitution : 13/13 — hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891)");
+console.log("hook-restitution : 16/16 — hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918)");

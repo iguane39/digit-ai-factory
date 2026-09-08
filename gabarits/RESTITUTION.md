@@ -7,7 +7,25 @@ prouvée à zéro faux positif, et ne voit rien. Le marquage a été vérifié t
 `oracle-synthese` (S1-S8 à l'époque, S1-S33 depuis la v2.15.0) sur une synthèse réelle PASS avant d'être prescrit ici.
 Cette consigne, elle, ne se marque PAS : c'est un référentiel normatif, pas un livrable.
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 2.17.0, 08/09/2026** : **le message
+Référentiel versionné (loi n° 4, daté-éditable) — **version 2.18.0, 08/09/2026** : **le VERDICT
+affiché mesure ce que le fichier jugé mesure, et une restitution n'est pas un fil d'avancement**
+(TF-0918 — mandat de campagne du 08/09). Le fait : au cours d'un mandat long, sept campagnes
+rendaient leurs rapports l'une après l'autre, et à chacun le hook `Stop` exigeait une restitution.
+Quatre ont été affichées à la suite, chacune enrichie des chiffres du moment — « 3 rapports sur 7 »
+puis « 6 items clos », « design 4 commits » — **sans que le fichier déposé soit redéposé** : il
+portait toujours « 2 sur 7 » et « design 2 ». Décisions, options par défaut, tableau d'options,
+sélecteurs `A-N` et acteurs étaient identiques des deux côtés : les cinq propriétés de la v2.17.0
+rendaient PASS à chaque tour. Retour humain, mot pour mot : « Le prompt de sortie ne respecte pas
+le format attendu par la Factory. » *Le sens est inversé par rapport à la v2.17.0 — l'écran était
+plus RICHE que la trace — et l'effet est pire : un écran appauvri prive le lecteur au moment où il
+lit, une trace périmée ment à tous ceux qui la reliront, et c'est elle qui est opposable.* Sixième
+propriété comparée : **les faits mesurés du bloc 2**, ses nombres, identifiants, empreintes,
+versions et dates retirés — S3 exige déjà qu'un verdict porte un fait mesurable, et ces faits-là ne
+s'abrègent pas, ils se recopient. **La règle de conduite qui en découle** : un tour qui n'apporte
+qu'un delta ne réaffiche pas une synthèse retouchée à la main — il MET À JOUR le fichier, le fait
+juger, et affiche celui-là. Et un tour qui n'apporte rien de neuf (une notification de tâche de
+fond, un rapport reçu et rien d'autre) relève des exemptions du §Portée : un accusé de réception
+bref, jamais une restitution complète de plus. Précédente : **2.17.0, 08/09/2026** : **le message
 AFFICHÉ est le fichier jugé, et un verdict rendu sans écrire un fichier est une restitution**
 (TF-0891, TF-0904 — lot d'un produit du 07/09). Deux faits du même jour, une seule cause : le
 gate ne voyait pas ce que le lecteur lisait. **(1)** Un fichier `output\` jugé PASS S1-S37 a été

@@ -131,6 +131,7 @@ un signal nommé ouvre un travail.
 | forge-seo-geo | `scripts/grille.py` · `scripts/gabarits.py` | empreinte de grille et registre d'évolutions (TF-0072) | sceau court dans le registre |
 | forge-conception | `oracles/oracle-tracabilite.mjs` · `oracles/oracle-vues-profil.mjs` | scellement d'`EXIGENCES.json` et parité de ses vues | sha256 du référentiel |
 | forge-design | `skills/systeme-de-marque/scripts/generer-design-md.mjs` | `DESIGN.md`, vue dérivée des tokens et de la voix | sceau dans la vue, **normalisé LF** (TF-0615) |
+| forge-design | `oracles/lib/socle.mjs` (TF-0830, 08/09) | sceau d'un bloc `COMPOSANT-EMBARQUE` d'une page jugée, VÉRIFIÉ contre la source du socle installée avant toute exemption : la critique graphique n'impute pas à l'auteur un CSS qu'il n'a pas le droit de modifier, et un sceau seulement DÉCLARÉ n'exempte de rien — sans quoi deux commentaires suffiraient à échapper au jugement | sha256 de la source comparé à `data-empreinte`, **et** corps canonique comparé après ré-échappement `</script` à l'identique (jamais inversé : la transformation n'est pas inversible) |
 | forge-agents | `skills/quality-oracles/scripts/run-oracles.mjs` | clé de cache d'un lancement d'oracles (16 hex, **non persisté**) | usage interne, déclaré |
 | forge-agents | `skills/digit-ai-page-html/scripts/check_html.py` | empreinte du JEU DE RÈGLES, citée au journal d'oracle (R-32) | empreinte de règles, pas de contenu |
 | forge-agents | `skills/forge-agents/scripts/otlp-project.mjs` | identifiant de trace d'un envoi de télémétrie | usage interne, déclaré |

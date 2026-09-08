@@ -204,6 +204,46 @@ const selecteursActions = (t) => [...new Set((bloc8De(t).match(/\bA\s*-\s*(\d{1,
   .map((s) => (/(\d{1,2})/.exec(s) || [])[1]))].sort((a, b) => Number(a) - Number(b));
 const acteursDe = (t) => (bloc8De(t).match(ACTEURS_GELES) || []).length;
 
+// TF-0918 (08/09/2026) — SIXIÈME PROPRIÉTÉ : LES FAITS MESURÉS DU BLOC 2, ET LE SENS INVERSE.
+//
+// LES CINQ PROPRIÉTÉS DE TF-0891 REGARDENT LES BLOCS 3 ET 8, ET RIEN D'AUTRE. Elles ont été
+// taillées pour un écran PLUS PAUVRE que la trace : une paraphrase qui perd le tableau d'options
+// ou les acteurs. Le 08/09 le défaut est arrivé PAR L'AUTRE BOUT, et aucune des cinq ne pouvait
+// le voir : au cours d'un mandat long, quatre restitutions successives ont été AFFICHÉES en
+// réponse à des rapports d'agents de campagne, chacune enrichie des chiffres du moment — « 3
+// rapports sur 7 » puis « 6 items clos », « design 4 commits » — alors que le fichier déposé,
+// lui, n'était PAS redéposé et portait toujours « 2 sur 7 » et « design 2 ». Les décisions, les
+// options, les sélecteurs et les acteurs étaient identiques des deux côtés : PASS à chaque tour.
+// Retour humain, mot pour mot : « Le prompt de sortie ne respecte pas le format attendu par la
+// Factory. »
+//
+// POURQUOI C'EST PIRE QUE LE CAS DE TF-0891, et non un simple symétrique. Un écran appauvri prive
+// le lecteur du moment où il lit ; une trace périmée ment APRÈS, à tous ceux qui la reliront —
+// et c'est elle qui est opposable. Le fichier est la pièce, l'écran est la lecture : si les deux
+// divergent, ce n'est pas l'écran qui est faux, c'est la pièce.
+//
+// CE QUI EST COMPARÉ, dans la doctrine constante du fichier (jamais le texte mot à mot) : les
+// FAITS MESURÉS du bloc 2 — ses nombres. S3 exige déjà qu'un verdict porte un fait mesurable ;
+// ces faits-là ne s'abrègent pas, ils se recopient. Les identifiants (TF-####, D-N, A-N, R-##),
+// les empreintes de commit, les versions, les dates et les heures sont retirés AVANT extraction :
+// ils changent de forme sans changer de fait, et les compter ferait crier la règle sur une
+// reformulation légitime. Reste ce que le lecteur retient : des compteurs.
+const bloc2De = (t) => {
+  const m = /(^|\n)#{1,4}\s*\**\s*2[.)]?\s*\**\s*Verdict/i.exec(t);
+  if (!m) return "";
+  const debut = m.index + m[0].length;
+  const suivant = t.slice(debut).search(/\n#{1,4}\s/);
+  return t.slice(debut, suivant === -1 ? undefined : debut + suivant);
+};
+const faitsDe = (t) => {
+  const nu = bloc2De(t)
+    .replace(/\b[A-Za-z]{1,4}\s*-\s*\d{1,4}\b/g, " ")          // TF-0844, D-16, A-54, R-38, C5
+    .replace(/\b(?=[0-9a-f]{7,40}\b)(?=[a-f0-9]*[a-f])[0-9a-f]{7,40}\b/gi, " ") // empreintes de commit
+    .replace(/\bv?\d+\.\d+(\.\d+)?\b/g, " ")                    // versions
+    .replace(/\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}\/\d{1,2}(\/\d{2,4})?\b|\b\d{1,2}\s*[:h]\s*\d{2}\b/g, " "); // dates, heures
+  return [...new Set(nu.match(/\d+/g) || [])].sort((a, b) => Number(a) - Number(b));
+};
+
 export function comparerAffiche(message, fichier) {
   const ecarts = [];
   const nm = numerosDe(message), nf = numerosDe(fichier);
@@ -223,6 +263,15 @@ export function comparerAffiche(message, fichier) {
   if (cf > 0 && cm === 0)
     ecarts.push(`le bloc 8 du fichier jugé nomme ${cf} acteur(s) du vocabulaire gelé (auto_ia | manuelle_dev | manuelle_utilisateur) ; `
       + "l'écran n'en porte aucun — « vous » et « IA » ne disent pas à qui la ligne appartient (S6)");
+  const fm = faitsDe(message), ff = faitsDe(fichier);
+  const ecranSeul = fm.filter((n) => !ff.includes(n)), fichierSeul = ff.filter((n) => !fm.includes(n));
+  if (ecranSeul.length || fichierSeul.length)
+    ecarts.push("le VERDICT (bloc 2) affiché ne mesure pas ce que le fichier jugé mesure — "
+      + (ecranSeul.length ? `l'écran avance ${ecranSeul.join(", ")} que la trace ne porte pas` : "")
+      + (ecranSeul.length && fichierSeul.length ? " ; " : "")
+      + (fichierSeul.length ? `la trace porte ${fichierSeul.join(", ")} que l'écran tait` : "")
+      + ". Le fichier est la pièce opposable : si l'écran a été mis à jour et pas lui, c'est LUI qu'il faut redéposer, "
+      + "pas l'écran qu'il faut appauvrir (S3)");
   return ecarts;
 }
 
@@ -317,7 +366,7 @@ const BLOQUANTES = new Set(["S1", "S3", "S4", "S6"]);
 // se mettent à jour ENSEMBLE ou la doctrine ne s'applique pas. Le même défaut vaut pour la ligne
 // des gates de `hook-ouverture.mjs`, corrigée le même jour et pour la même raison.
 
-const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.17.0) : bloc 0 « synthèse d'ouverture » en langage commanditaire (≥ 20 mots, sans identifiant, chemin ni sha — l'état, ce que ça change, ce qui est attendu du lecteur), puis les 8 blocs numérotés, aucun omis (un bloc vide se dit en une ligne). · 1 en-tête (quoi · sur quoi · date ET heure avec fuseau + durée · qui avec version) · 2 verdict en une ligne FACTUEL (un chiffre, un compteur) · 3 décisions attendues de l'humain, EN TÊTE, chacune en BLOC DE CITATION et dans cet ordre exact : « > **D-N — <la question, posée comme une question, avec son point d'interrogation>** » (N continu dans la session, jamais remis à 1), puis le rappel du sujet en prose (≥ 25 mots, sans identifiant nu — 12 mots si un chapeau commun d'au moins 40 mots ouvre le bloc), puis « > **Recommandation : (a).** Source consultée : <le document d'où sort la réponse proposée> » et pourquoi ; PUIS, hors de la citation et pleine largeur, le tableau des options « | Option | Ce qu'elle coûte | Ce qu'elle exclut | », une ligne par (a)/(b)/(c) ; PUIS « > **Si rien n'est décidé** : (c) … ». Si rien n'attend l'humain, le dire en une ligne · 4 traité, chaque puce avec sa preuve (oracle, verdict, chiffre) · 5 non traité, chaque puce avec son motif · 6 écarts à la lettre (« vous avez demandé → j'ai fait → pourquoi », ou « aucun écart ») · 7 risques (énoncé + signal + parade) · 8 prochaines actions en UN TABLEAU UNIQUE, l'acteur en COLONNE et jamais en section, trié auto_ia d'abord — chaque action porte son sélecteur **A-N** distinct (jamais un numéro nu : un « 3 » nu ne dit pas s'il désigne la décision 3 ou l'action 3), son identifiant stable TF-#### ou la mention `neuve`, son acteur (auto_ia | manuelle_dev | manuelle_utilisateur), le motif de non-exécution si auto_ia (gate_gouvernance | dependance_bloc_3 | garde_fou | borne_atteinte | dependance_externe | hors_mandat), la raison d'impossibilité IA si elle est laissée à l'humain (acces | decision | depense | presence | irreversible, non accentués — et pour acces comme pour presence, la TRACE MESURÉE de la tentative : code de réponse, message d'erreur, sortie de commande), un chemin ou une commande qui la rend exécutable telle quelle, et ce qu'il en coûte de NE PAS la faire · 9 traces (chemins relatifs et vérifiables). Puces ≤ 2 niveaux. Un renvoi nomme son sujet ou son sélecteur, jamais une position (« ligne 5 » est un défaut). Effort en complexité × durée, jamais en jours. · v2.16.0 (02/09) : une action manuelle_utilisateur ne demande jamais à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent, seule la VALEUR lui reste) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation (forge-design) ; une correction restituée nomme son contrôle rouge → vert ou sa classe. · v2.17.0 (08/09) : CE MESSAGE EST LE FICHIER JUGÉ, jamais son résumé — quand une synthèse a été déposée dans le tour, le message affiché reprend ses blocs 3 et 8 EN ENTIER (tableau des options, sélecteurs A-N, acteurs du vocabulaire gelé auto_ia | manuelle_dev | manuelle_utilisateur) ; la LONGUEUR n'est pas un motif de condensation, et un fichier PASS paraphrasé à l'écran ne protège aucun lecteur.";
+const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.18.0) : bloc 0 « synthèse d'ouverture » en langage commanditaire (≥ 20 mots, sans identifiant, chemin ni sha — l'état, ce que ça change, ce qui est attendu du lecteur), puis les 8 blocs numérotés, aucun omis (un bloc vide se dit en une ligne). · 1 en-tête (quoi · sur quoi · date ET heure avec fuseau + durée · qui avec version) · 2 verdict en une ligne FACTUEL (un chiffre, un compteur) · 3 décisions attendues de l'humain, EN TÊTE, chacune en BLOC DE CITATION et dans cet ordre exact : « > **D-N — <la question, posée comme une question, avec son point d'interrogation>** » (N continu dans la session, jamais remis à 1), puis le rappel du sujet en prose (≥ 25 mots, sans identifiant nu — 12 mots si un chapeau commun d'au moins 40 mots ouvre le bloc), puis « > **Recommandation : (a).** Source consultée : <le document d'où sort la réponse proposée> » et pourquoi ; PUIS, hors de la citation et pleine largeur, le tableau des options « | Option | Ce qu'elle coûte | Ce qu'elle exclut | », une ligne par (a)/(b)/(c) ; PUIS « > **Si rien n'est décidé** : (c) … ». Si rien n'attend l'humain, le dire en une ligne · 4 traité, chaque puce avec sa preuve (oracle, verdict, chiffre) · 5 non traité, chaque puce avec son motif · 6 écarts à la lettre (« vous avez demandé → j'ai fait → pourquoi », ou « aucun écart ») · 7 risques (énoncé + signal + parade) · 8 prochaines actions en UN TABLEAU UNIQUE, l'acteur en COLONNE et jamais en section, trié auto_ia d'abord — chaque action porte son sélecteur **A-N** distinct (jamais un numéro nu : un « 3 » nu ne dit pas s'il désigne la décision 3 ou l'action 3), son identifiant stable TF-#### ou la mention `neuve`, son acteur (auto_ia | manuelle_dev | manuelle_utilisateur), le motif de non-exécution si auto_ia (gate_gouvernance | dependance_bloc_3 | garde_fou | borne_atteinte | dependance_externe | hors_mandat), la raison d'impossibilité IA si elle est laissée à l'humain (acces | decision | depense | presence | irreversible, non accentués — et pour acces comme pour presence, la TRACE MESURÉE de la tentative : code de réponse, message d'erreur, sortie de commande), un chemin ou une commande qui la rend exécutable telle quelle, et ce qu'il en coûte de NE PAS la faire · 9 traces (chemins relatifs et vérifiables). Puces ≤ 2 niveaux. Un renvoi nomme son sujet ou son sélecteur, jamais une position (« ligne 5 » est un défaut). Effort en complexité × durée, jamais en jours. · v2.16.0 (02/09) : une action manuelle_utilisateur ne demande jamais à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent, seule la VALEUR lui reste) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation (forge-design) ; une correction restituée nomme son contrôle rouge → vert ou sa classe. · v2.17.0 (08/09) : CE MESSAGE EST LE FICHIER JUGÉ, jamais son résumé — quand une synthèse a été déposée dans le tour, le message affiché reprend ses blocs 3 et 8 EN ENTIER (tableau des options, sélecteurs A-N, acteurs du vocabulaire gelé auto_ia | manuelle_dev | manuelle_utilisateur) ; la LONGUEUR n'est pas un motif de condensation, et un fichier PASS paraphrasé à l'écran ne protège aucun lecteur. · v2.18.0 (08/09) : LE VERDICT AFFICHÉ MESURE CE QUE LE FICHIER JUGÉ MESURE — une restitution n'est pas un fil d'avancement : si l'écran a été enrichi au fil du tour (un rapport reçu, un compteur qui monte), c'est le FICHIER qu'il faut redéposer, jamais l'écran qu'il faut appauvrir ; la trace est la pièce opposable, et une pièce périmée ment à tous ceux qui la reliront.";
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const entree = lireStdin();
