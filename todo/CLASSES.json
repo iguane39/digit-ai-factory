@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
  "version": "1.3.1",
- "date": "2026-09-07",
+ "date": "2026-09-08",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -695,6 +695,19 @@
    "voisines": [
     "porte-cle-courte-sans-frontiere",
     "heritage-avertissement-tardif"
+   ]
+  },
+  {
+   "cle": "registre-doublon-non-detecte",
+   "famille": "lot-forme",
+   "libelle": "Deux candidatures de contenu identique entrent au registre sans qu'aucune regle ne bronche, et aucun statut ne permet ensuite de les ecarter : l'ingestion compare les identifiants et les classes, jamais le contenu, et le vocabulaire du registre n'a que candidat, decide, en_cours et corrige",
+   "creee_le": "2026-09-08",
+   "fondee_par": [],
+   "regle": "l'ingestion calcule une empreinte du couple titre+contenu et refuse ou marque doublon_de une candidature deja presente ; le registre porte un statut d'ecartement avec motif obligatoire, qui ne compte pour aucun gain",
+   "oracle": "todo/oracle-todo.mjs (regle a creer) et todo/self-test.mjs, fixture double sens ; candidature du 08/09",
+   "voisines": [
+    "lot-remis-ecrasable",
+    "anonymisation-portee-partielle"
    ]
   }
  ]
