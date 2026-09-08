@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=5f2a0b8ac144 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T14:26:16.449Z -->
+     sceaux: actifs=3116c21deea6 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T14:37:21.937Z -->
 
-**184 actifs** (candidat 9 · décidé 21 · en cours 5 · corrigé 149 · écarté 0) · **782 archivés**.
+**184 actifs** (candidat 9 · décidé 19 · en cours 6 · corrigé 150 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -72,13 +72,13 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0958 | en_cours | 12.5 | digit-ai-forge-agents (quality-oracles) : la porte de publication prend 81 à 99 s sur le dépôt du pilot avec un jeu d'essai MINIMAL, et le facteur est le nombre de termes cherchés — un gate à ce prix se contourne | **oui** — 81 s et 99 s mesurés avec 4 termes seulement ; 2 à 4 min avec les tables réelles, trois fois ; une première extension de la règle a doublé ce temps (177 s et 183 s) avant d'être reprise, ce qui montre que le motif se reproduit dès qu'on ajoute un angle |
 | TF-0938 | en_cours | 6.7 | digit-ai-forge-agents (digit-ai-schemas / digit-ai-page-html) : aucun gabarit de schéma de base de données DIFFÉRENTIEL (tables et colonnes existantes, ajoutées, modifiées, colorées et marquées) ; le SVG du skill de schémas se heurte à render_page V4 | **oui** — un retour humain ; composant de schéma écrit chez le produit, sans relations dessinées |
 | TF-0954 | decide | 25 | digit-ai-page-html : une INFOBULLE QUI RECOPIE LA CELLULE qu'elle explique passe tous les oracles — L3 et L18 exigent une explication, aucune règle ne juge le rapport entre l'explication et ce qu'elle explique | **oui** — un retour humain sur une page déjà jugée PASS ; famille entière de fausses explications générées |
 | TF-0944 | decide | 15 | digit-ai-forge-agents (digit-ai-page-html) : un système d'identifiants employé dans une page (S1..S12, G1..G9) n'a nulle part à être expliqué — L18 exige la glose dans la CELLULE, jamais une légende du système avant le tableau | **oui** — un point du retour humain ; deux tableaux de légende ajoutés |
 | TF-0951 | decide | 15 | digit-ai-forge-agents (digit-ai-page-html) : un système d'identifiants employé dans une page (S1..S12, G1..G9) n'a nulle part à être expliqué — L18 exige la glose dans la CELLULE, jamais une légende du système avant le tableau | **oui** — un point du retour humain ; deux tableaux de légende ajoutés |
 | TF-0939 | decide | 12.5 | digit-ai-forge-agents : le canevas « modèle de données » (digit-ai-schemas) existe et personne ne le trouve — aucune règle, aucun oracle, aucun mode opératoire ne route une page de données vers lui quand elle doit montrer un schéma de base ; un composant maison a été écrit puis jeté | **oui** — un tour humain ; un composant de schéma écrit chez le produit puis jeté |
 | TF-0946 | decide | 12.5 | digit-ai-forge-agents : le canevas « modèle de données » (digit-ai-schemas) existe et personne ne le trouve — aucune règle, aucun oracle, aucun mode opératoire ne route une page de données vers lui quand elle doit montrer un schéma de base ; un composant maison a été écrit puis jeté | **oui** — un tour humain ; un composant de schéma écrit chez le produit puis jeté |
-| TF-0958 | decide | 12.5 | digit-ai-forge-agents (quality-oracles) : la porte de publication prend 81 à 99 s sur le dépôt du pilot avec un jeu d'essai MINIMAL, et le facteur est le nombre de termes cherchés — un gate à ce prix se contourne | **oui** — 81 s et 99 s mesurés avec 4 termes seulement ; 2 à 4 min avec les tables réelles, trois fois ; une première extension de la règle a doublé ce temps (177 s et 183 s) avant d'être reprise, ce qui montre que le motif se reproduit dès qu'on ajoute un angle |
 | TF-0953 | decide | 10 | digit-ai-page-html : le composant de filtres s'arroge l'attribut hidden des lignes et le recalcule depuis ses seuls attributs — tout autre mécanisme de visibilité est écrasé sans avertissement | **oui** — un observateur de rattrapage écrit chez le produit pour coexister avec le socle |
 | TF-0941 | decide | 8.3 | digit-ai-forge-agents (digit-ai-schemas) : le canevas ERD ne connaît pas le schéma DIFFÉRENTIEL (créé / ajouté / corrigé / repris), ne monte qu'un schéma par page (ids figés) et déclenche quinze constats du socle HTML quand on l'insère dans une page de données | **oui** — quinze constats du socle levés un par un chez le produit ; tout produit qui insère le canevas refera ce travail |
 | TF-0948 | decide | 8.3 | digit-ai-forge-agents (digit-ai-schemas) : le canevas ERD ne connaît pas le schéma DIFFÉRENTIEL (créé / ajouté / corrigé / repris), ne monte qu'un schéma par page (ids figés) et déclenche quinze constats du socle HTML quand on l'insère dans une page de données | **oui** — quinze constats du socle levés un par un chez le produit ; tout produit qui insère le canevas refera ce travail |
@@ -206,7 +206,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0837 | decide | 1 | forge-organization : oracle-filtres-tableau G3/G6 exigent init et règle print dans le document | **oui** — G3/G6 FAIL sur la page rendue, nonce CSP ajouté |
+| TF-0837 | corrige | 1 | forge-organization : oracle-filtres-tableau G3/G6 exigent init et règle print dans le document | **oui** — G3/G6 FAIL sur la page rendue, nonce CSP ajouté |
 
 ## digit-ai-forge-tests
 
