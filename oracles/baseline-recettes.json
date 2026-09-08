@@ -307,7 +307,7 @@
   "vu_le": "2026-09-03"
  },
  "scripts/relever-heritage.test.mjs": {
-  "cas": 30,
+  "cas": 31,
   "vu_le": "2026-09-08"
  },
  "scripts/verifier-bascule.test.mjs": {

@@ -220,7 +220,11 @@ function etatDansHistoire(dossierProduit, cible) {
 export function etatArtefact(dossierProduit, artefact, racinePilot) {
   const sortie = {};
   const etat = etatSurDisque(dossierProduit, artefact, racinePilot, sortie);
-  return { ...etat, ...etatDansHistoire(dossierProduit, sortie.cible) };
+  const alias = sortie.alias_perime
+    ? { alias_perime: sortie.alias_perime, geste_alias: sortie.geste_alias,
+        note_alias: "l'alias de TRANSITION survit à côté de la cible canonique — un gabarit périmé qu'aucun contrôle ne regarde reste lu et cité (TF-0881)" }
+    : {};
+  return { ...etat, ...etatDansHistoire(dossierProduit, sortie.cible), ...alias };
 }
 
 function etatSurDisque(dossierProduit, artefact, racinePilot, sortie = {}) {
@@ -243,6 +247,26 @@ function etatSurDisque(dossierProduit, artefact, racinePilot, sortie = {}) {
   if (!existsSync(cible) && artefact.alias_accepte) {
     const alias = join(dossierProduit, String(artefact.alias_accepte).replaceAll("/", "\\"));
     if (existsSync(alias)) cible = alias;
+  }
+  // TF-0881 (08/09) — L'ALIAS DE TRANSITION SURVIT À CÔTÉ DE LA CIBLE CANONIQUE, ET R-47 CESSE DE
+  // LE REGARDER. L'alias n'est LU que si la cible canonique manque (TF-0710, à bon droit : un
+  // produit qui n'a que l'ancien nom n'est pas en défaut). Mais quand les DEUX existent, l'ancien
+  // fichier — 62 lignes du 14/08, sans obligation de classe ni section « la règle qui aurait évité
+  // le retour » — reste sur le disque et R-47 rend PASS. Mesure du 06/09 chez TROIS produits
+  // anciens : seul faux vert du lot, et trois lots d'un de ces produits citaient encore l'ancien
+  // nom. Un gabarit périmé qu'aucun contrôle ne regarde est un gabarit qu'on continue de lire.
+  // Le constat est DÉCLARÉ et compté à part : le retrait est un geste du produit (`git rm`), le
+  // pilot n'écrit pas chez lui — mais il cesse de se taire.
+  // La comparaison porte sur le chemin CANONIQUE du contrat, jamais sur `cible` — qui vient
+  // justement d'être réassignée à l'alias quand la cible canonique manque (TF-0710). Les
+  // confondre ferait relever « alias périmé » sur le cas exact que TF-0710 déclare LÉGITIME.
+  const canonique = join(dossierProduit, String(artefact.cible).replaceAll("/", "\\"));
+  if (artefact.alias_accepte && existsSync(canonique)) {
+    const alias = join(dossierProduit, String(artefact.alias_accepte).replaceAll("/", "\\"));
+    if (existsSync(alias)) {
+      sortie.alias_perime = String(artefact.alias_accepte);
+      sortie.geste_alias = `git rm "${artefact.alias_accepte}"`;
+    }
   }
   // Le chemin RÉELLEMENT jugé, une fois toutes les résolutions faites (racine web, alias) : c'est
   // lui, et pas la cible du contrat, dont l'état dans l'histoire git se relève (TF-0851).
@@ -410,6 +434,8 @@ export function relever(base, contrat, racinePilot) {
       // relevé du parc mesurait l'état d'un POSTE en croyant mesurer l'état d'un produit.
       hors_histoire: artefacts.filter((x) => x.histoire === "non_suivi").length,
       non_commis: artefacts.filter((x) => x.histoire === "non_commis").length,
+      // TF-0881 : l'alias de transition PÉRIMÉ (la cible canonique existe, l'ancien fichier aussi).
+      alias_perimes: artefacts.filter((x) => x.alias_perime).length,
       conformes: compte("conforme") + compte("present"),
       total: artefacts.length,
       artefacts,
@@ -437,7 +463,8 @@ if (lanceEnDirect) {
         + (l.incomplets ? `, ${l.incomplets} INCOMPLET(s)` : "");
       // TF-0851 : l'état dans l'HISTOIRE se dit à côté du verdict de contenu, jamais à sa place.
       const histoire = (l.hors_histoire ? ` · ${l.hors_histoire} HORS HISTOIRE (présents, non suivis par git)` : "")
-        + (l.non_commis ? ` · ${l.non_commis} NON COMMIS (conformes sur le disque, divergents de HEAD)` : "");
+        + (l.non_commis ? ` · ${l.non_commis} NON COMMIS (conformes sur le disque, divergents de HEAD)` : "")
+        + (l.alias_perimes ? ` · ${l.alias_perimes} ALIAS PÉRIMÉ(S) à côté de la cible canonique (le produit supprime : git rm)` : "");
       console.log(`${l.produit.padEnd(50)} ${drapeau}${histoire}`);
     }
     console.log(`\n${lignes.length} produit(s) relevé(s), ${totalManques} manque(s) au total — contrat v${contrat.version}`);

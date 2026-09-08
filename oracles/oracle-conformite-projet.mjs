@@ -721,6 +721,25 @@ else {
         }
       }
     }
+    // TF-0881 (08/09) — L'ALIAS DE TRANSITION QUI SURVIT À CÔTÉ DE LA CIBLE CANONIQUE. L'alias
+    // n'est LU que si la cible canonique manque (TF-0710, à bon droit). Mais quand les DEUX
+    // existent, l'ancien fichier — 62 lignes du 14/08, sans obligation de classe ni section « la
+    // règle qui aurait évité le retour » — reste sur le disque et R-47 rend PASS : mesuré chez
+    // TROIS produits anciens le 06/09, seul faux vert du lot, et trois lots d'un de ces produits
+    // citaient encore l'ancien nom. Un gabarit périmé qu'aucun contrôle ne regarde reste lu.
+    // DÉCLARÉ, jamais en échec : le retrait est un `git rm` du produit, le pilot n'écrit pas chez
+    // lui — mais il cesse de se taire.
+    const aliasPerimes = [];
+    for (const a of (heritage.artefacts || [])) {
+      if (!a.alias_accepte) continue;
+      if (existsSync(p(a.cible)) && existsSync(p(a.alias_accepte))) {
+        aliasPerimes.push(`${a.alias_accepte} — périmé, la cible canonique ${a.cible} existe ; \`git rm "${a.alias_accepte}"\``);
+      }
+    }
+    if (aliasPerimes.length) {
+      so("R-47", `${aliasPerimes.length} alias de transition PÉRIMÉ(S) : l'ancien fichier survit à côté de la cible canonique et continue d'être lu et cité. `
+        + `Constat DÉCLARÉ, jamais un défaut — le retrait est un geste du produit (TF-0881) : ${aliasPerimes.join(" · ")}`);
+    }
     if (horsHistoire.length) {
       so("R-47", `${horsHistoire.length} artefact(s) hérité(s) tenu(s) sur le DISQUE mais pas dans l'HISTOIRE du dépôt — `
         + "une recopie n'est TENUE qu'une fois commise : un clone neuf, une CI ou un `git restore` ne les auraient pas. "

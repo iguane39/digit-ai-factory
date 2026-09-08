@@ -275,6 +275,23 @@ try {
     const etat = etatArtefact(produit, { mode: "copie_conforme", source: "gabarits/MODELE.md",
       cible: "forge/NOUVEAU.md", alias_accepte: "forge/ANCIEN.md" }, pilot);
     att(etat.etat === "conforme", `état « ${etat.etat} » — le parc entier serait force de migrer le jour de la publication`);
+    att(!etat.alias_perime, "un alias SEUL n'est pas périmé : il EST la copie du produit (TF-0710)");
+  });
+
+  // ── TF-0881 : l'alias qui SURVIT à côté de la cible canonique ─────────────────────────────
+  // Mesure du 06/09 chez TROIS produits anciens : l'ancien gabarit (62 lignes du 14/08, sans
+  // obligation de classe) restait à côté du nouveau (180 lignes), R-47 rendait PASS — seul faux
+  // vert du lot — et trois lots d'un de ces produits citaient encore l'ancien nom.
+  check("TF-0881 — l'alias PÉRIMÉ (la cible canonique existe ET l'ancien fichier aussi) est relevé, le geste de retrait nommé", () => {
+    const produit = join(T, "_Client", "produit-deux-noms");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    writeFileSync(join(produit, "forge", "NOUVEAU.md"), "contenu de reference\n", "utf8");
+    writeFileSync(join(produit, "forge", "ANCIEN.md"), "le gabarit du 14/08, 62 lignes\n", "utf8");
+    const etat = etatArtefact(produit, { mode: "copie_conforme", source: "gabarits/MODELE.md",
+      cible: "forge/NOUVEAU.md", alias_accepte: "forge/ANCIEN.md" }, pilot);
+    att(etat.etat === "conforme", `état « ${etat.etat} » : la cible canonique EST conforme, c'est le propos — le faux vert vient de l'autre fichier`);
+    att(etat.alias_perime === "forge/ANCIEN.md", `alias périmé non relevé (« ${etat.alias_perime} ») — un gabarit périmé qu'aucun contrôle ne regarde reste lu et cité`);
+    att(/git rm/.test(etat.geste_alias || ""), "le geste de retrait n'est pas nommé, et le produit est le seul à pouvoir le faire");
   });
 
   check("TF-0710 borne — un alias DIVERGENT reste un divergent : l'alias accepte le nom, pas la dérive", () => {
