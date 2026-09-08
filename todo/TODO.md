@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=e7c99cc529f4 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T16:34:53.012Z -->
+     sceaux: actifs=4aca1d95321e archive=6ce2fe14c2bb · dernier événement: 2026-09-08T16:47:48.253Z -->
 
-**201 actifs** (candidat 26 · décidé 14 · en cours 9 · corrigé 152 · écarté 0) · **782 archivés**.
+**202 actifs** (candidat 27 · décidé 14 · en cours 9 · corrigé 152 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -90,6 +90,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0947 | decide | 6.7 | digit-ai-forge-agents / digit-ai-forge-audit : deux implémentations du schéma de base de données coexistent (renderERD SVG de rapport-engine.mjs et le canevas hybride de digit-ai-schemas) — le rapport d'audit rend l'ANCIENNE, la capture donnée comme modèle est la NOUVELLE | **oui** — le modèle demandé par l'humain n'est pas ce que produit la forge d'audit aujourd'hui |
 | TF-0952 | decide | 6.7 | digit-ai-page-html : le socle n'a pas de composant de TABLEAU ARBORESCENT — une hiérarchie rendue en tableau reste une liste indentée, sans pliage, et le lecteur reçoit 296 lignes d'un coup | **oui** — un retour humain nommant un composant externe ; composant réécrit chez le produit |
 | TF-0969 | candidat | 20 | digit-ai-page-html : la regle L30 de check_html.py cherche les termes de son referentiel en SOUS-CHAINE — gate est trouve dans aggregate_type et le chapitre est accuse d'employer un terme absent | **oui** — quatre gloses d'un terme absent ecrites dans un seul produit pour satisfaire le controle ; un passage FAIL sans defaut reel |
+| TF-0984 | candidat | 20 | digit-ai-forge-agents : la regle A5 du socle est un FAUX POSITIF STRUCTUREL — toute page autoportante qui embarque ses polices, c est-a-dire toute page conforme a la regle A1 du MEME socle, echoue A5 par construction | **oui** — le gabarit de modele de donnees du socle echoue A5 en permanence pour 320 Ko de polices que la regle A1 du meme socle lui impose d embarquer ; tout produit qui suit la doctrine d autoportance herite du meme echec, et le lit comme sa propre faute |
 | TF-0968 | candidat | 12.5 | digit-ai-page-html : la sonde V15 de render_page.py rend FAIL par ARITHMETIQUE sur tout tableau dont la hauteur tombe dans une bande, sans qu'aucun collant ne masque quoi que ce soit | **oui** — gate R-32 non prononcable vert sur une page par ailleurs conforme ; trois constats declares au journal, et les memes trois constats sur une page deja livree |
 | TF-0970 | candidat | 12.5 | digit-ai-page-html : kpi-filter.js applique l'attribut de la carte ACTIVE a TOUS les tableaux du perimetre — cliquer une carte d'un tableau vide les autres tableaux a cartes, sans un mot au lecteur | **oui** — un tableau de 160 lignes vide sans explication dans une page remise a un destinataire ; decouvert par la mesure, aucun oracle ne le voit |
 | TF-0973 | candidat | 10 | digit-ai-page-html : NUANCE sur RA-24 — la sonde V15 attrape de VRAIS defauts, la corriger ne doit pas la desarmer ; ses deux causes doivent se distinguer dans son message | **oui** — un tableau vide annonce a 276 lignes, vu par la seule sonde que le lot precedent signalait comme bruyante ; trois autres controles verts sur la meme page |
