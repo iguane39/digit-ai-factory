@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=5fc398dbb368 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T18:10:49.205Z -->
+     sceaux: actifs=4411e6c19341 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T18:27:48.521Z -->
 
-**209 actifs** (candidat 8 · décidé 27 · en cours 11 · corrigé 163 · écarté 0) · **782 archivés**.
+**210 actifs** (candidat 9 · décidé 27 · en cours 11 · corrigé 163 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -27,6 +27,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0990 | candidat | 10 | pilot : le referentiel de restitution declare une exemption que son juge n'implemente pas — un tour sans nouveaute doit rendre un accuse bref, et l'accuse bref est refuse | **oui** — un accuse de reception de trois phrases refuse par quatre regles bloquantes, puis quatre-vingt-dix lignes de restitution pour un tour ou rien n'a change |
 | TF-0966 | candidat | 8.3 | pilot : la pseudonymisation ne couvre pas les IDENTIFIANTS TECHNIQUES cites dans le corps d un item — cinq objets d un systeme client vivent en clair dans le registre publie, invisibles a la porte | **oui** — cinq identifiants techniques d un systeme client en clair dans un depot publie, invisibles a la porte parce qu absents des tables ; decouverts par un agent qui les avait recopies dans ses fixtures avant de les remplacer de lui-meme |
 | TF-0967 | candidat | 8.3 | pilot : oracle-conformite-projet n a AUCUN banc de fixtures, et son propre en-tete affirme le contraire — c est l oracle dont un FAIL suspend l ouverture de tout run | **oui** — l oracle qui suspend l ouverture de tout run n a aucune fixture, et son en-tete affirme qu il en a — deux volets d un item decide sont bloques par ce manque, et la campagne a prefere s arreter plutot que d empiler une regle non eprouvee |
+| TF-0992 | candidat | 8 | pilot : la règle S37 du juge des restitutions accuse le NOM D'UN CHAMP de la preuve — `corriges: []`, une sortie verte, est comptée comme une correction sans classe | **oui** — une preuve exacte paraphrasée pour obtenir un vert, sur le bloc dont la valeur tient à son exactitude |
 | TF-0983 | candidat | 6.7 | pilot : les vues generees du registre sont versionnees — 1173 revisions de contenu derive, qui transforment UNE occurrence au registre en 25 dans l histoire | **oui** — 75 des 194 occurrences historiques du 08/09 viennent de la seule amplification par les vues generees ; 1173 revisions de contenu derive dans l histoire du depot |
 | TF-0869 | corrige | 25 | pilot : aucun .env local créé d'office, le commanditaire a saisi sa clé Anthropic dans .env.example versionné | **oui** — git diff --stat .env.example : 1 ligne, clé de 108 caractères préfixée sk-ant- dans un fichier versionné ; un commit de plus et le secret partait |
 | TF-0870 | corrige | 20 | pilot : une clé Anthropic d'organisation sans espace de travail échoue en 400, variable ANTHROPIC_WORKSPACE_ID absente du gabarit et du skill | **oui** — un redéploiement qualif et un appel direct à l'API pour lire la cause ; smoke-qualif-20260906.json E-011 FAIL 502 |

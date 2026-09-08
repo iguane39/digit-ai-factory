@@ -790,6 +790,22 @@
     "sceau-de-vue-provenance-sans-contenu",
     "gate-cout-invite-au-contournement"
    ]
+  },
+  {
+   "cle": "regle-balaie-prose-et-identifiants",
+   "famille": "regle-morte",
+   "libelle": "Une regle balaie dans une MEME expression la prose ecrite par l auteur et les identifiants machine qu il cite en preuve — noms de champs, codes, sorties encadrees d accents graves. Elle se declenche alors sur un fragment dont le sens est l inverse de ce qu elle cherche, et le seul remede laisse a l auteur est de PARAPHRASER sa propre preuve pour obtenir un vert : le controle degrade exactement ce qu il est cense proteger. Le defaut a deux visages opposes et il faut les nommer ensemble — la regle devient MUETTE quand le motif technique avale un mot de prose, BAVARDE quand un motif de prose avale un identifiant ; le premier rassure a tort, le second pousse a abimer les preuves",
+   "creee_le": "2026-09-08",
+   "fondee_par": [
+    "TF-0992"
+   ],
+   "regle": "une regle qui juge de la PROSE exclut de son balayage les fragments cites entre accents graves et les blocs de code ; une regle qui juge des IDENTIFIANTS ne partage jamais son expression avec des mots francais, et n emprunte pas le drapeau insensible a la casse a ses voisines",
+   "oracle": "a creer : une fixture double sens ou les deux puces ne different QUE par la nature du fragment — une citation de sortie machine (PASS attendu) contre la meme forme ecrite en prose (FAIL attendu)",
+   "voisines": [
+    "controle-sans-fixture-double-sens",
+    "compte-total-hors-canal-des-constats",
+    "fixture-jugee-par-son-seul-oracle"
+   ]
   }
  ]
 }
