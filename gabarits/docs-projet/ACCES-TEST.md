@@ -27,14 +27,40 @@ parcours qu'il sert à éprouver.
 
 ## Comptes de démo (locale uniquement — seed `MODE_DEMO`)
 
-Les comptes que le seed de démo crée en local — identifiants volontairement triviaux et
-notoires, qui n'existent dans aucun environnement réel.
+Les comptes que le seed de démo crée en local. **Cette fiche nomme des VARIABLES, jamais des
+valeurs** (R-23, TF-0871) : chaque colonne porte le nom de la variable de `.env` que le seed lit
+et que l'humain renseigne dans son `.env` local (R-13). Une valeur écrite ici est une valeur
+versionnée — et, le 06/09, la même valeur s'est retrouvée affichée sur la page de connexion
+d'une qualif servie sur Internet, dans un dépôt public : « Démo : admin@demo.local /
+demo-admin », retour humain en une minute d'essai. Un identifiant de démonstration n'est pas
+un secret fort ; c'est exactement ce qui fait que rien ne s'oppose à sa publication.
 
-| Profil | Identifiant | Mot de passe (trivial, notoire) |
+| Profil | Identifiant | Mot de passe |
 |---|---|---|
-| admin | {admin@demo.local} | {demo-admin} |
-| écriture | {editeur@demo.local} | {demo-editeur} |
-| lecture | {lecteur@demo.local} | {demo-lecteur} |
+| admin | `DEMO_ADMIN_IDENTIFIANT` | `DEMO_ADMIN_MOTDEPASSE` |
+| écriture | `DEMO_EDITEUR_IDENTIFIANT` | `DEMO_EDITEUR_MOTDEPASSE` |
+| lecture | `DEMO_LECTEUR_IDENTIFIANT` | `DEMO_LECTEUR_MOTDEPASSE` |
+
+### Comptes de la qualif peuplée (§ 3 bis de `ETAPE-MEP.md`, TF-0872)
+
+La qualif ne porte JAMAIS un seul compte peuplé : **un compte peuplé + N comptes vides** (N ≥ 2
+par défaut) — sans quoi rien ne montre la première minute d'un client (états vides, onboarding).
+Chaque compte est piloté par ses variables, déclarées en NOMS dans `.env.example` :
+
+| Compte | Peuplé ? | Identifiant | Mot de passe |
+|---|---|---|---|
+| 1 | `DEMO_COMPTE_1_PEUPLE` (= 1) | `DEMO_COMPTE_1_IDENTIFIANT` | `DEMO_COMPTE_1_MOTDEPASSE` |
+| 2 | `DEMO_COMPTE_2_PEUPLE` (= 0) | `DEMO_COMPTE_2_IDENTIFIANT` | `DEMO_COMPTE_2_MOTDEPASSE` |
+| 3 | `DEMO_COMPTE_3_PEUPLE` (= 0) | `DEMO_COMPTE_3_IDENTIFIANT` | `DEMO_COMPTE_3_MOTDEPASSE` |
+
+Leurs valeurs sont remises à l'humain **par le canal de la mission** — jamais par une page, jamais
+par un fichier versionné. Un nombre de comptes vides ramené à 0 se DÉCLARE avec son motif (loi
+transverse n° 3), jamais par silence.
+
+**Aucune page servie n'affiche d'identifiant, jamais — pas même sous `MODE_DEMO`.** Le drapeau
+borne ce qui EXISTE (les comptes de seed), pas ce qui s'AFFICHE : une qualif est servie sur
+Internet comme la production l'est. Ce qu'une page peut dire au plus : « des comptes de
+démonstration existent ; leurs identifiants sont remis par le canal de la mission ».
 
 ## Accès d'environnements réels (références, jamais de valeurs)
 

@@ -737,7 +737,32 @@ else if ((() => {
 })()) ko("R-13", basename(envEx), "présent et renseigné mais IGNORÉ par git (`git check-ignore` le confirme) — " +
   "la conformité affichée et l'état réel du dépôt divergent : quiconque clone ne l'aura pas. " +
   "Ré-inclure la graphie exacte au .gitignore (`!.env.example`, gabarit du socle depuis le 01/09) (TF-0714)");
-else ok("R-13", basename(envEx), "présent avec variables déclarées");
+else {
+  // R-13 (TF-0869) — un `.env.example` VERSIONNÉ ne porte aucune VALEUR sensible. Le fait mesuré
+  // le 06/09 : aucun `.env` local n'existait chez le produit, le commanditaire a donc saisi sa
+  // clé d'API (108 caractères, préfixe `sk-ant-`) DANS le `.env.example` suivi par git, sur la
+  // ligne même que « # à fournir : » désignait comme à renseigner ailleurs. Un commit de plus et
+  // le secret partait au dépôt public. Deux constats distincts : la valeur posée sur une variable
+  // explicitement déléguée à l'humain (R-15), et le motif de secret fort où qu'il soit.
+  const MOTIF_SECRET_EX = /AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9_-]{20,}|BEGIN [A-Z ]*PRIVATE KEY|xox[bpors]-[A-Za-z0-9-]{10,}/;
+  let sainEx = true;
+  readFileSync(envEx, "utf8").split(/\r?\n/).forEach((ligne, i) => {
+    const m = /^([A-Z][A-Z0-9_]*)=(.*)$/.exec(ligne);
+    if (!m) return;
+    const [, nom, reste] = m;
+    const valeur = reste.split("#")[0].trim();
+    if (/#\s*à\s+fournir/i.test(reste) && valeur) {
+      sainEx = false;
+      ko("R-13", `${basename(envEx)}:${i + 1}`, `\`${nom}\` porte une VALEUR alors que « # à fournir : » la délègue à l'humain (R-15) — ` +
+        "un .env.example est une liste de NOMS, jamais de valeurs ; la valeur vit dans le `.env` local, gitignoré (R-14) (TF-0869)");
+    } else if (MOTIF_SECRET_EX.test(reste)) {
+      sainEx = false;
+      ko("R-13", `${basename(envEx)}:${i + 1}`, `\`${nom}\` porte un motif de SECRET RÉEL dans un fichier VERSIONNÉ — aucun secret, jamais (R-14) ; ` +
+        "retirer la valeur du dépôt, la porter au `.env` local, et considérer la clé comme compromise (TF-0869)");
+    }
+  });
+  if (sainEx) ok("R-13", basename(envEx), "présent avec variables déclarées, aucune valeur ni motif de secret");
+}
 
 // R-14 — .env jamais versionné
 if (!aGit) so("R-14", "pas de git");
@@ -1440,7 +1465,35 @@ else {
     if (/AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{20,}|gho_[A-Za-z0-9]{20,}|sk-[a-zA-Z0-9]{20,}|BEGIN [A-Z ]*PRIVATE KEY|xox[bpors]-/.test(t)) {
       ko("R-23", "docs\\projet\\ACCES-TEST.md", "motif de secret réel détecté — aucun secret, jamais (R-14) ; les accès réels sont des références « # à fournir : »"); ok23 = false;
     }
-    if (ok23) ok("R-23", "docs\\projet\\ACCES-TEST.md", "en-tête démo-locale présent, aucun motif de secret");
+    // R-23 (TF-0871) — UNE FICHE D'ACCÈS NOMME DES VARIABLES, JAMAIS DES VALEURS.
+    // Le fait mesuré le 06/09 : le gabarit prescrivait des « identifiants volontairement triviaux
+    // et notoires » DANS une fiche versionnée, et la page de connexion du produit affichait
+    // « Démo : admin@demo.local / demo-admin » sous MODE_DEMO — sur une qualif servie sur Internet,
+    // dans un dépôt public. Le retour humain est tombé en une minute d'essai. Les motifs de secret
+    // FORT ne voyaient rien : un identifiant de démonstration n'en est pas un, et c'est précisément
+    // ce qui le rend publiable sans que rien ne s'y oppose. Ce qui est jugé : les cellules
+    // « identifiant » et « mot de passe » du tableau des comptes de démo portent un NOM DE VARIABLE
+    // (`DEMO_ADMIN_EMAIL`), jamais la valeur elle-même.
+    const estNomDeVariable = (cell) => {
+      const nu = cell.replace(/[`{}<>*]/g, "").trim();
+      return nu === "" || nu === "—" || /^[A-Z][A-Z0-9_]*$/.test(nu);
+    };
+    const lignes23 = t.split(/\r?\n/);
+    let dansComptes = false;
+    lignes23.forEach((l, i) => {
+      if (/^#{2,}\s/.test(l)) dansComptes = /comptes\s+de\s+d[ée]mo/i.test(l);
+      if (!dansComptes || !l.trim().startsWith("|")) return;
+      const cells = l.split("|").slice(1, -1).map((c) => c.trim());
+      if (cells.length < 3 || /^-+$/.test(cells[0].replace(/[\s:]/g, "")) || /profil/i.test(cells[0])) return;
+      for (const [rang, intitule] of [[1, "identifiant"], [2, "mot de passe"]]) {
+        if (cells[rang] === undefined || estNomDeVariable(cells[rang])) continue;
+        ko("R-23", `docs\\projet\\ACCES-TEST.md:${i + 1}`, `le ${intitule} du profil « ${cells[0]} » est une VALEUR (« ${cells[rang].slice(0, 40)} ») — ` +
+          "une fiche d'accès nomme des variables (`DEMO_ADMIN_EMAIL`), jamais des valeurs : le fichier est versionné, et la même valeur " +
+          "finit affichée sur la page de connexion servie sur Internet (TF-0871)");
+        ok23 = false;
+      }
+    });
+    if (ok23) ok("R-23", "docs\\projet\\ACCES-TEST.md", "en-tête démo-locale présent, aucun motif de secret, comptes de démo nommés par variables");
   }
 }
 

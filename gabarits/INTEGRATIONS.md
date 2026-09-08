@@ -35,7 +35,12 @@ colonne nomme la commande qui énumère — l'introspection d'un schéma, un `--
 appel qui rend les champs de vérification — et non celle qui a répondu la première.
 
 **Pourquoi l'écart connu** : c'est la colonne qui empêche la prochaine session de refaire l'erreur.
-Elle se remplit avec ce qu'on a payé, jamais avec ce qu'on imagine.
+Elle se remplit avec ce qu'on a payé, jamais avec ce qu'on imagine. *Exemple réel, 06/09 (TF-0870)* : l'API
+Claude répond `400` — « This API key is not scoped to a workspace, so this request must include the
+anthropic-workspace-id header » — quand la clé est une clé d'ORGANISATION ; le produit rendait `502`
+sans recopier ce message, et la cause n'a été lue qu'en appelant l'API directement. L'écart n'était
+pas dans l'API : il était dans la traduction qu'en faisait le produit. **Un service dont on avale le
+message d'erreur devient un service à faux silence**, quelle que soit sa franchise à lui.
 
 **Pourquoi la date** : sans elle, l'entrée ne périme jamais et se lit comme un fait présent.
 

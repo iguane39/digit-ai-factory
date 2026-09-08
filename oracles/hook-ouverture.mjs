@@ -13,7 +13,7 @@
  * Options : --sans-bootstrap · --sans-readme (sessions produit : les README du pilot ne sont
  * pas leur affaire) · --pilot <dossier> (lanceur produit : chemin du pilot résolu).
  */
-import { existsSync, readFileSync, copyFileSync, mkdirSync, appendFileSync } from "node:fs";
+import { existsSync, readFileSync, copyFileSync, mkdirSync, appendFileSync, writeFileSync } from "node:fs";
 import { join, dirname, sep } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -97,6 +97,26 @@ if (iPilot >= 0) {
     }
   } catch (e) {
     refus.push(`recopie interrompue : ${e.message} — l'état du produit n'est pas garanti, le verdict ci-dessous fait foi`);
+  }
+  // TF-0869 — le `.env` local NAÎT à l'ouverture, vide, à côté de son exemple. Le fait mesuré le
+  // 06/09 : aucun `.env` n'existait chez le produit et rien ne prescrivait d'en créer un ; le
+  // commanditaire a donc saisi sa clé d'API dans le `.env.example`, VERSIONNÉ — un commit de plus
+  // et le secret partait. Le fichier créé ici est gitignoré (R-14) : la place où poser une valeur
+  // existe AVANT qu'on ait besoin d'en poser une. JAMAIS d'écrasement : un `.env` présent porte
+  // des valeurs que personne d'autre ne connaît.
+  try {
+    const ex = [".env.example", ".env.exemple"].map((n) => join(PRODUIT, n)).find((f) => existsSync(f));
+    const local = join(PRODUIT, ".env");
+    if (ex && !existsSync(local)) {
+      const squelette = readFileSync(ex, "utf8").split(/\r?\n/)
+        // une variable déléguée à l'humain (« # à fournir : ») naît VIDE, quoi qu'en dise l'exemple
+        .map((l) => (/^[A-Z][A-Z0-9_]*=/.test(l) && /#\s*à\s+fournir/i.test(l) ? l.replace(/^([A-Z][A-Z0-9_]*)=[^#]*/, "$1=") : l))
+        .join("\n");
+      writeFileSync(local, squelette);
+      recopies.push(".env — créé depuis .env.example (valeurs « # à fournir : » vides) ; gitignoré, c'est LA place d'un secret — jamais l'exemple (TF-0869)");
+    }
+  } catch (e) {
+    refus.push(`.env local non créé : ${e.message} — poser les valeurs dans un \`.env\` créé à la main, jamais dans \`.env.example\` (TF-0869)`);
   }
   if (existsSync(o)) {
     const r = spawnSync(process.execPath, [o, PRODUIT], { encoding: "utf8", timeout: 60000 });

@@ -119,7 +119,10 @@ writeFileSync(join(verte, "docs", "projet", "PARAMETRAGE.md"),
   '| qualif | https://demoapp-qualif.up.railway.app | https://demoapp-api-qualif.up.railway.app | <HOTE_BDD_QUALIF> | staging de la MEP |\n' +
   '| production | https://demoapp-production.up.railway.app | {<URL_API_PROD>} | <HOTE_BDD_PROD> | GO humain |\n');
 writeFileSync(join(verte, "docs", "projet", "ACCES-TEST.md"),
-  '---\nrole: acces de test\nsources_de_verite: ["seed MODE_DEMO"]\nverifie_le: 2026-08-11\n---\n# Accès\n> comptes de démonstration locale — jamais valides hors MODE_DEMO\n\n| admin | admin@demo.local | demo-admin |\n');
+  // TF-0871 : la moitié VERTE de la preuve — le tableau des comptes de démo nomme des VARIABLES,
+  // et c'est le seul état qui rend R-23 PASS depuis le 08/09.
+  '---\nrole: acces de test\nsources_de_verite: ["seed MODE_DEMO"]\nverifie_le: 2026-08-11\n---\n# Accès\n> comptes de démonstration locale — jamais valides hors MODE_DEMO\n\n' +
+  '## Comptes de démo (locale uniquement)\n\n| Profil | Identifiant | Mot de passe |\n|---|---|---|\n| admin | `DEMO_ADMIN_IDENTIFIANT` | `DEMO_ADMIN_MOTDEPASSE` |\n');
 writeFileSync(join(verte, "docs", "projet", "COMMANDES.md"),
   '---\nrole: commandes\nsources_de_verite: [package.json]\nverifie_le: 2026-08-11\n---\n# Commandes\n```bash\nnpm ci\n```\n');
 writeFileSync(join(verte, "docs", "projet", "FONCTIONNEL.md"), // TF-0087 : la vue métier fait partie du socle
@@ -365,7 +368,10 @@ writeFileSync(join(rougeDocs, "docs", "projet", "PARAMETRAGE.md"),
   '| staging | https://demoapp-staging.up.railway.app | mauvais vocabulaire |\n' +
   '| production | https://demoapp.up.railway.app | aucun préfixe |\n');
 writeFileSync(join(rougeDocs, "docs", "projet", "ACCES-TEST.md"),
-  '---\nrole: acces\nsources_de_verite: [seed]\nverifie_le: 2026-08-11\n---\n# Accès\naws_key = "AKIAIOSFODNN7EXAMPLE"\n'); // R-23 : en-tête absent + motif AKIA
+  '---\nrole: acces\nsources_de_verite: [seed]\nverifie_le: 2026-08-11\n---\n# Accès\naws_key = "AKIAIOSFODNN7EXAMPLE"\n\n' +
+  // TF-0871 : la valeur LITTÉRALE d'un compte de démo — publiée telle quelle sur la page de
+  // connexion d'une qualif servie sur Internet le 06/09. Aucun motif de secret FORT ne la voit.
+  '## Comptes de démo (locale uniquement)\n\n| Profil | Identifiant | Mot de passe |\n|---|---|---|\n| admin | {admin@demo.local} | {demo-admin} |\n'); // R-23 : en-tête absent + motif AKIA + valeurs littérales
 writeFileSync(join(rougeDocs, "docs", "projet", "COMMANDES.md"), "# sans frontmatter\n"); // R-20 : frontmatter incomplet
 writeFileSync(join(rougeDocs, "docs", "projet", "MODELE-DONNEES.md"), // R-26 : table fantôme — provenance inexistante
   "---\nrole: modèle\nsources_de_verite: [migrations/absente.sql]\nverifie_le: 2026-08-11\n---\n# Modèle\n\n## Table : fantome\n\n- role: n'existe nulle part\n- provenance: migrations/absente.sql\n\n| Colonne | Type | Nullable | Clé |\n|---|---|---|---|\n| id | uuid | non | PK |\n");
@@ -380,6 +386,20 @@ check("rouge-docs : R-20..R-24 + R-26 se déclenchent, localisantes", () => {
   const r24 = rapport.findings.filter((f) => f.regle === "R-24" && f.statut === "FAIL");
   if (r24.length !== 2) throw new Error(`R-24 : 2 constats attendus (sans préfixe + staging), ${r24.length} obtenu(s)`);
   for (const f of rapport.findings) if (!f.ou || !f.message) throw new Error(`finding ${f.regle} sans localisation`);
+});
+
+check("rouge-docs : un identifiant et un mot de passe de démo écrits en VALEUR → 2 constats R-23 nommant le profil (TF-0871)", () => {
+  const { rapport } = lance(rougeDocs);
+  const valeurs = rapport.findings.filter((f) => f.regle === "R-23" && f.statut === "FAIL" && /est une VALEUR/.test(f.message));
+  if (valeurs.length !== 2) throw new Error(`R-23 valeurs : 2 constats attendus (identifiant + mot de passe), ${valeurs.length} obtenu(s)`);
+  if (!valeurs.every((f) => /admin/.test(f.message) && /ACCES-TEST\.md:\d+$/.test(f.ou)))
+    throw new Error("un constat ne nomme pas le profil ou ne porte pas sa ligne");
+});
+
+check("verte : des comptes de démo nommés par VARIABLES ne déclenchent aucun R-23 (TF-0871)", () => {
+  const { rapport } = lance(verte);
+  const r23 = rapport.findings.filter((f) => f.regle === "R-23" && f.statut === "FAIL");
+  if (r23.length) throw new Error(`R-23 : 0 constat attendu sur la fixture verte, ${r23.length} obtenu(s) — ${r23.map((f) => f.message).join(" | ")}`);
 });
 
 // ---- fixture ROUGE-R24 (TF-0267) : le cas réel du 15/08 — l'URL de la ligne QUALIF portait
@@ -452,6 +472,36 @@ check("écart-R24 : un écart sans motif ni date n'excuse rien", () => {
   const { exit, rapport } = lance(ecartR24);
   if (exit !== 1) throw new Error(`exit ${exit} attendu 1 — un écart incomplet n'est pas un écart`);
   if (!rapport.findings.some((f) => f.regle === "R-24" && f.statut === "FAIL")) throw new Error("l'écart incomplet a été accepté");
+});
+
+// ---- fixture ROUGE-ENV (TF-0869) : le `.env.example` est PRÉSENT, RENSEIGNÉ et SUIVI — donc
+// vert pour les trois sous-contrôles historiques de R-13 — et il porte pourtant deux valeurs
+// qui n'auraient jamais dû entrer dans un fichier versionné : une variable déléguée à l'humain
+// par « # à fournir : » qui porte quand même sa valeur, et un motif de secret fort. C'est le
+// cas réel du 06/09 : faute de `.env` local, la clé d'API a été saisie dans l'exemple. La
+// moitié VERTE de la preuve vit dans la fixture verte, dont le `.env.example` porte
+// `API_TIERCE_CLE= # à fournir :` — marqueur présent, valeur vide, R-13 PASS. ----
+const rougeEnv = mkdtempSync(join(tmpdir(), "conf-rouge-env-"));
+writeFileSync(join(rougeEnv, ".env.example"),
+  "# ne jamais renseigner de secret ici\nPORT=8000\n" +
+  "API_TIERCE_CLE=valeur-saisie-a-la-main # à fournir :\n" +
+  "JETON_HEBERGEUR=ghp_0123456789abcdefghijklmnopqrstuvwx\n");
+
+check("rouge-env : une valeur sur une variable « # à fournir : » et un motif de secret → 2 constats R-13 localisants (TF-0869)", () => {
+  const { exit, rapport } = lance(rougeEnv);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const r13 = rapport.findings.filter((f) => f.regle === "R-13" && f.statut === "FAIL");
+  if (r13.length !== 2) throw new Error(`R-13 : 2 constats FAIL attendus, ${r13.length} obtenu(s)`);
+  if (!r13.some((f) => /API_TIERCE_CLE/.test(f.message) && /:3$/.test(f.ou)))
+    throw new Error("le constat « valeur sur une variable à fournir » ne nomme pas la variable et sa ligne");
+  if (!r13.some((f) => /JETON_HEBERGEUR/.test(f.message) && /:4$/.test(f.ou)))
+    throw new Error("le constat « motif de secret » ne nomme pas la variable et sa ligne");
+});
+
+check("verte : un `.env.example` à valeurs VIDES sous « # à fournir : » ne déclenche aucun R-13 (TF-0869)", () => {
+  const { rapport } = lance(verte);
+  const r13 = rapport.findings.filter((f) => f.regle === "R-13" && f.statut === "FAIL");
+  if (r13.length) throw new Error(`R-13 : 0 constat attendu sur la fixture verte, ${r13.length} obtenu(s) — ${r13.map((f) => f.message).join(" | ")}`);
 });
 
 // ---- fixture ROUGE-LOCK (TF-0128) : reproduit le cas réel Produit-11 — des versions SONT

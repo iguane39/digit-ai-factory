@@ -15,6 +15,23 @@ verifie_le: {AAAA-MM-JJ}
 {npm ci}
 ```
 
+## Configurer l'environnement local
+
+Le `.env` local est créé par le hook d'ouverture depuis `.env.example` (valeurs `# à fournir :`
+vides) et n'est jamais écrasé s'il existe. **Une valeur ne s'écrit QUE là** : `.env.example` est
+versionné, il ne porte que des NOMS de variables (R-13, TF-0869). S'il faut le refaire à la main :
+
+```bash
+cp .env.example .env        # puis renseigner les lignes « # à fournir : » dans .env, jamais dans l'exemple
+```
+
+Le chargement du `.env` n'est pas implicite — la commande le nomme :
+
+```bash
+{uv run --env-file .env python -m {module}}   # Python (uv)
+{node --env-file=.env {serveur.js}}           # Node
+```
+
 ## Lancer en développement
 
 ```bash

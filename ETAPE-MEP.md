@@ -302,6 +302,20 @@ déployée et auditée comme l'application réelle :
    {élément, champs_requis}, présentée à l'humain EN FIN d'audit avec la liste précise à saisir.
 4. Dès que l'humain fournit les éléments : `--reprendre <rapport>` rejoue **uniquement** les
    éléments non exercés, jusqu'à couverture complète — sans rejouer ce qui a déjà passé.
+5. **Un compte peuplé NE SUFFIT PAS : la qualif porte aussi des comptes VIDES** (TF-0872). Le
+   peuplement montre le produit plein ; il ne montre jamais ce qu'un client voit à sa première
+   minute — états vides, onboarding, premier objet créé (loi transverse n° 3 : la surface
+   implicite se propose d'office). Le 06/09, la qualif livrée ne portait qu'un unique compte de
+   démonstration peuplé, et le commanditaire a dû demander lui-même **trois comptes : un peuplé,
+   deux vides**. Le drapeau de peuplement crée donc **un compte peuplé + N comptes vides**,
+   N ≥ 2 par défaut, et il se déclare même à 0 (« un seul compte, motif : … »), jamais par
+   silence.
+6. **Les identifiants de ces comptes ont une SOURCE nommée, et ce n'est jamais une page ni un
+   fichier versionné** (TF-0872, TF-0871) : ils sont pilotés par les variables
+   `DEMO_COMPTE_<N>_IDENTIFIANT` / `DEMO_COMPTE_<N>_MOTDEPASSE` / `DEMO_COMPTE_<N>_PEUPLE` du
+   `.env` local (déclarées en NOMS dans `.env.example`, R-13), et remis à l'humain **par le canal
+   de la mission**. Aucune page servie ne les affiche — une qualif est servie sur Internet comme
+   la production l'est. `docs\projet\ACCES-TEST.md` nomme ces variables, jamais leurs valeurs.
 
 Le résultat qualif (couverture, non-testables soldés) entre au dossier de MEP.
 

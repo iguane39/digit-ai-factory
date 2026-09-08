@@ -24,6 +24,27 @@ variables:
 | {PORT} | {port d'écoute du back} | {8080} | défaut |
 | {DATABASE_URL} | {connexion BDD} | {postgres://demo:demo@localhost:5432/demo} | `# à fournir :` hors local |
 
+### Accès au modèle Claude — la clé ne suffit pas toujours (TF-0870)
+
+Un produit qui appelle l'API Claude déclare **deux** variables, pas une :
+
+| Variable | Rôle | Format / exemple factice | Qui la fournit |
+|---|---|---|---|
+| `ANTHROPIC_API_KEY` | clé d'appel de l'API Claude | `<clé sk-ant-… — jamais ici>` | `# à fournir :` |
+| `ANTHROPIC_WORKSPACE_ID` | espace de travail de rattachement — **OPTIONNEL**, requis seulement si la clé est une clé d'ORGANISATION | `<identifiant d'espace de travail>` | `# à fournir :` (vide = clé déjà rattachée) |
+
+**Le fait payé le 06/09** : la clé remise par le commanditaire était une clé d'organisation non
+rattachée à un espace de travail. L'API a répondu **400** avec ce message exact —
+
+> `This API key is not scoped to a workspace, so this request must include the anthropic-workspace-id header`
+
+— et le produit a rendu **502** sans nommer la cause : un redéploiement de qualif et un appel
+direct à l'API ont été nécessaires pour la lire. Ce que le produit doit faire : poser l'en-tête
+`anthropic-workspace-id` (`default_headers` du client) quand `ANTHROPIC_WORKSPACE_ID` est
+renseigné, et **recopier le message de l'amont** dans son propre diagnostic au lieu de le
+remplacer par un code générique. Une variable absente du gabarit ne se devine pas ; un message
+d'erreur avalé se paie en redéploiements.
+
 ## URLs & ports par environnement
 
 > **R-24 (décision du 11/08)** : tout hôte applicatif hébergé est préfixé
