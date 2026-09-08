@@ -191,7 +191,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260903-recidives-mesure.md | — | 7.3 Ko | `03-etudes/20260903-recidives-mesure.md` |
 | 20260907-etude-opportunite-mission-data-silver-gold-powerbi.md | — | 43.4 Ko | `03-etudes/20260907-etude-opportunite-mission-data-silver-gold-powerbi.md` |
 | 20260907-L99-mission-data-silver-gold-powerbi.md | — | 47.5 Ko | `03-etudes/20260907-L99-mission-data-silver-gold-powerbi.md` |
-| 20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md | — | 9 Ko | `03-etudes/20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md` |
+| 20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md | — | 10.9 Ko | `03-etudes/20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md` |
 
 ### 04-plans
 
@@ -276,7 +276,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Retours pris et propagation mesurable - 20260901a.md | 20260901a | 12.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours pris et propagation mesurable - 20260901a.md` |
 | Digit-AI - Synthese Mandat - Selecteurs de familles et palier 1 des tests - 20260901e.md | 20260901e | 13.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Selecteurs de familles et palier 1 des tests - 20260901e.md` |
 | Digit-AI - Synthese Mandat - Sept campagnes closes et format de sortie corrige - 20260908e.md | 20260908e | 22.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Sept campagnes closes et format de sortie corrige - 20260908e.md` |
-| Digit-AI - Synthese Mandat - Sept decisions executees parc publie puis bloque par sa propre porte - 20260908h.md | 20260908h | 24.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Sept decisions executees parc publie puis bloque par sa propre porte - 20260908h.md` |
+| Digit-AI - Synthese Mandat - Sept decisions executees parc publie puis bloque par sa propre porte - 20260908h.md | 20260908h | 26.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Sept decisions executees parc publie puis bloque par sa propre porte - 20260908h.md` |
 | Digit-AI - Synthese Mandat - Six actions et une porte de publication - 20260901f.md | 20260901f | 12.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Six actions et une porte de publication - 20260901f.md` |
 | Digit-AI - Synthese Mandat - Surveillance des recidives TF-0790 - 20260903c.md | 20260903c | 11.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Surveillance des recidives TF-0790 - 20260903c.md` |
 | Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md | 20260907k | 14.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md` |

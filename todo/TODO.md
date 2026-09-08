@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=aba3cd45d258 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T17:44:04.566Z -->
+     sceaux: actifs=5fc398dbb368 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T18:10:49.205Z -->
 
-**208 actifs** (candidat 7 · décidé 27 · en cours 11 · corrigé 163 · écarté 0) · **782 archivés**.
+**209 actifs** (candidat 8 · décidé 27 · en cours 11 · corrigé 163 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -89,6 +89,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0973 | decide | 10 | digit-ai-page-html : NUANCE sur RA-24 — la sonde V15 attrape de VRAIS defauts, la corriger ne doit pas la desarmer ; ses deux causes doivent se distinguer dans son message | **oui** — un tableau vide annonce a 276 lignes, vu par la seule sonde que le lot precedent signalait comme bruyante ; trois autres controles verts sur la meme page |
 | TF-0947 | decide | 6.7 | digit-ai-forge-agents / digit-ai-forge-audit : deux implémentations du schéma de base de données coexistent (renderERD SVG de rapport-engine.mjs et le canevas hybride de digit-ai-schemas) — le rapport d'audit rend l'ANCIENNE, la capture donnée comme modèle est la NOUVELLE | **oui** — le modèle demandé par l'humain n'est pas ce que produit la forge d'audit aujourd'hui |
 | TF-0984 | candidat | 20 | digit-ai-forge-agents : la regle A5 du socle est un FAUX POSITIF STRUCTUREL — toute page autoportante qui embarque ses polices, c est-a-dire toute page conforme a la regle A1 du MEME socle, echoue A5 par construction | **oui** — le gabarit de modele de donnees du socle echoue A5 en permanence pour 320 Ko de polices que la regle A1 du meme socle lui impose d embarquer ; tout produit qui suit la doctrine d autoportance herite du meme echec, et le lit comme sa propre faute |
+| TF-0991 | candidat | 10 | parc : un contrôle borné à 200 constats déclare son vrai total dans une ligne de prose — le pilot a publié 200 pour un passif de 939 | **oui** — un chiffre faux d'un facteur 3,8 publié dans une étude et dans une synthèse remise à l'humain, trois sous-comptes dérivés à retirer, et une invariance publiée comme preuve qui ne prouve rien |
 | TF-0899 | corrige | 25 | digit-ai-forge-agents (digit-ai-page-html) : table-filters.js pose « position: relative » en ligne sur chaque th filtrable et écrase le « sticky » de L29 — le « top: var(--hh) » devient un décalage permanent de 104 px, l'en-tête de tableau se pose sur ses deux premières lignes | **oui** — un tour humain, page régénérée sous un indice neuf, cinq oracles rejoués, mesure au navigateur écrite par le produit |
 | TF-0954 | corrige | 25 | digit-ai-page-html : une INFOBULLE QUI RECOPIE LA CELLULE qu'elle explique passe tous les oracles — L3 et L18 exigent une explication, aucune règle ne juge le rapport entre l'explication et ce qu'elle explique | **oui** — un retour humain sur une page déjà jugée PASS ; famille entière de fausses explications générées |
 | TF-0900 | corrige | 20 | digit-ai-forge-agents (digit-ai-page-html) : « .table-hote { overflow-x: auto } » du boilerplate fait du conteneur la zone de défilement du thead collé — l'en-tête se fige sous le haut du tableau (+67 px au repos), jamais sous l'en-tête de page | **oui** — même tour humain que RA-2 ; quatre tableaux sur huit concernés par cette seule cause |

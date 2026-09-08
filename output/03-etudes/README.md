@@ -66,6 +66,6 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `20260903-recidives-mesure.md` | fichier | 7,3 Ko | Récidives au registre — mesure du pas 0 (03/09/2026) |
 | `20260907-etude-opportunite-mission-data-silver-gold-powerbi.md` | fichier | 43,4 Ko | Étude d'opportunité — préparation des forges à une mission data Silver/Gold sur Databricks |
 | `20260907-L99-mission-data-silver-gold-powerbi.md` | fichier | 47,5 Ko | Analyse L99 — « Identifie les compétences manquantes des forges pour une mission data Silv |
-| `20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md` | fichier | 9,0 Ko | Pourquoi faut-il réécrire l'histoire à chaque fois, et comment cesser |
+| `20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md` | fichier | 10,9 Ko | Pourquoi faut-il réécrire l'histoire à chaque fois, et comment cesser |
 
 _51 fichier(s), 0 sous-dossier(s)_

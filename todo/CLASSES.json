@@ -774,6 +774,22 @@
     "regle-neuve-sans-mesure-de-bruit",
     "controle-sans-fixture-double-sens"
    ]
+  },
+  {
+   "cle": "compte-total-hors-canal-des-constats",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un contrôle borne la liste de constats qu'il rend et déclare son vrai total AILLEURS — une ligne de prose d'un canal secondaire (« non jugé », en-tête, journal). Le lecteur, humain comme agent, compte les entrées du tableau et publie ce nombre comme si c'était le passif. Le défaut est invisible tant que le passif reste sous la borne, et il ne se manifeste jamais comme une erreur : les deux chiffres sont vrais, seul leur rapprochement est faux. Pire, il rend indémontrables les invariances mesurées sur la liste bornée — « autant de constats avant qu'après » ne prouve rien quand les deux mesures butent sur le même plafond",
+   "creee_le": "2026-09-08",
+   "fondee_par": [
+    "TF-0991"
+   ],
+   "regle": "un contrôle qui borne sa sortie porte son total DANS la structure qui porte ses constats (un champ frère de la liste : total, rendus, bornee), jamais dans un canal de prose ; et toute mesure d'invariance ou d'écart menée sur une liste bornée se joue sur le total, sinon elle se déclare non concluante",
+   "oracle": "à créer : une fixture qui dépasse la borne et dont le total est lu depuis le champ frère — la fixture doit ÉCHOUER si le lecteur ne peut obtenir le total qu'en analysant de la prose",
+   "voisines": [
+    "contrat-de-sortie-sans-domicile",
+    "sceau-de-vue-provenance-sans-contenu",
+    "gate-cout-invite-au-contournement"
+   ]
   }
  ]
 }

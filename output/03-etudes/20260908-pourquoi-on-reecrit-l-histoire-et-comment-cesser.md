@@ -11,6 +11,16 @@ Que la réécriture d'histoire n'est pas la rançon d'une erreur humaine répét
 
 Le fait chiffré, les quatre causes mesurées une par une, le remède propre à chacune, puis l'architecture cible et ce qu'elle change pour le cas du jour. Les quatre causes sont indépendantes : chacune suffit à provoquer une réécriture, et corriger l'une n'éteint pas les autres.
 
+> **Errata du 08/09 au soir — les chiffres de cette étude ont été refaits.** La première version
+> annonçait « deux cents occurrences », « 96 révisions » et « 11 emplacements ». Ces trois nombres
+> décrivaient la **tranche affichée** par la porte, pas son passif : la porte tronque sa liste de
+> constats à deux cents entrées et déclare son vrai total dans une ligne de prose d'un canal
+> secondaire, que l'auteur de l'étude n'avait pas lue. Le passif réel était de **761 constats à
+> 16 h 41 et 939 à 20 h 08 le même jour**. Tous les chiffres ci-dessous ont été rejoués sur une
+> copie de la porte dont le plafond d'affichage est levé ; le défaut de lecture est journalisé
+> en TF-0991, avec sa classe. Une conséquence à ne pas manquer : la croissance de 761 à 939 en
+> trois heures et demie, sans qu'aucun nom soit écrit, est la cause 4 prise sur le fait.
+
 ---
 
 ## 1. Le fait
@@ -43,15 +53,17 @@ C'est la cause du jour, et la plus contre-intuitive.
 
 Mesure : les deux tables portent **une seule date globale**, `date_derniere_extension`. Aucune entrée ne porte sa propre date d'entrée.
 
-Ce qui s'est passé aujourd'hui : les deux cents occurrences relevées dans l'histoire **n'ont pas bougé d'un octet**. Ce qui a changé, c'est la table (64 → 65 clés) et l'angle de la porte. Du contenu écrit, commité et publié en toute conformité est devenu fautif sans que personne n'y touche.
+Ce qui s'est passé aujourd'hui : les **939 constats** relevés dans l'histoire **n'ont pas bougé d'un octet**. Ce qui a changé, c'est la table (64 → 65 clés) et l'angle de la porte. Du contenu écrit, commité et publié en toute conformité est devenu fautif sans que personne n'y touche.
 
 Tant qu'une table s'étend à la découverte — et elle le doit, c'est sa raison d'être — **chaque extension crée mécaniquement un passif dans l'histoire**. La réécriture n'est alors pas la réparation d'une faute : c'est le prix payé pour avoir appris quelque chose.
 
 ### Cause 4 — Les vues générées amplifient chaque occurrence
 
-Mesure : les trois vues dérivées du registre sont versionnées, et totalisent **1 173 révisions** — 395 pour la source, 399 et 379 pour deux vues qui la recopient.
+Mesure : les vues dérivées du registre sont versionnées, et totalisent **867 révisions** — 403 pour la source `TODO.jsonl`, 407 et 387 pour `TODO.md` et `TODO.html` qui la recopient, plus deux archives (53 et 20).
 
-Effet mesuré aujourd'hui : une occurrence présente dans le registre apparaît dans **25 révisions** de chacune des deux vues, soit 75 occurrences dans l'histoire pour un seul nom écrit une seule fois. Sur les 194 occurrences historiques, 75 viennent de cette amplification.
+Effet sur le passif du jour, mesuré constat par constat : la famille du registre pèse **434 des 939 constats, soit 46 % du passif** — et dans cette famille, **399 constats viennent des vues contre 35 de la source, un rapport de 11,4 pour 1**. Ramené aux versions de fichier qui portent réellement un nom : 63 pour les vues contre 27 pour la source.
+
+**Une seconde amplification, plus forte, a été trouvée en vérifiant la première — et elle ne vient pas des vues mais de la porte elle-même.** Un constat de la porte est un couple (révision, chemin) : un fichier qui ne change pas pendant mille commits est compté mille fois pour une seule version fautive. Preuve : `output/03-etudes/20260820-etude-opportunite-rgaa.md` n'a que **deux versions** portant le terme dans toute l'histoire, et rend **201 constats**. Sur l'ensemble, **939 constats pour 132 versions de fichier portant réellement un nom — un facteur 7,1**. Les deux amplifications se composent : les vues multiplient les versions, la porte multiplie les versions par les commits qui les traversent.
 
 **Un contenu dérivé versionné multiplie par le nombre de régénérations le coût de toute erreur dans sa source.**
 
@@ -109,12 +121,12 @@ Ce que cette architecture change : la réécriture d'histoire redevient ce qu'el
 
 ## 5. Ce que cela change pour le cas du jour
 
-Avec la table datée, les 194 occurrences historiques sont **antérieures à l'inscription des termes qui les révèlent**. Elles deviennent des antériorités déclarées, nommées dans le rapport de la porte, et la porte repasse au vert sans qu'une ligne d'histoire soit réécrite.
+Avec la table datée, les 939 constats historiques — 132 versions de fichier réelles, sur 14 chemins et 284 révisions — sont **antérieurs à l'inscription des termes qui les révèlent**. Elles deviennent des antériorités déclarées, nommées dans le rapport de la porte, et la porte repasse au vert sans qu'une ligne d'histoire soit réécrite.
 
 L'option qui ressemblait à un assouplissement arbitraire — « déclarer ces occurrences hors périmètre » — devient une règle motivée, datée et opposable, identique à celle que le registre et le juge des lots appliquent déjà.
 
 ## 6. Ce que cette étude ne dit pas
 
-- **Elle ne dit pas si les trois noms en cause sont réellement confidentiels.** Un terme de trois lettres en majuscules, versé sans forme bornée, peut être un acronyme homographe. La question reste ouverte et une lecture la tranche.
+- **Elle ne dit pas si les trois noms en cause sont réellement confidentiels.** Un terme de trois lettres en majuscules, versé sans forme bornée, peut être un acronyme homographe. La question reste ouverte et une lecture la tranche — et elle pèse lourd : **ce seul terme fait 636 des 939 constats**. S'il tombe, le passif passe à **303 constats, 82 révisions et 7 chemins** ; s'il tient, il est à lui seul les deux tiers de l'affaire.
 - **Elle ne chiffre pas le coût de mise en œuvre.** Les remèdes 1 à 3 sont bornés à trois fichiers et une structure de données ; le remède 4 touche à ce qui est publié, donc à un arbitrage.
 - **Elle ne juge pas les épisodes passés.** Les trois réécritures de ce mois-ci ont été rendues nécessaires par l'état du système à ce moment-là ; elles n'auraient pas été évitées par une attention plus soutenue.
