@@ -798,6 +798,18 @@ jamais celui de l'auteur :
 **Exécuté** : `node oracles\oracle-synthese.mjs <synthese.md>` — règles S1-S41 binaires,
 fixtures double sens au self-test, 18 cas (la fixture rouge échoue sur 29 règles distinctes ; S29,
 S30, S31, S32, S33, S38, S39, S40 et S41 portent en plus leur propre paire, rouge ET verte).
+
+**Calibration mesurée d'une règle neuve (08/09/2026)** — une règle entre au gabarit avec son TAUX
+d'accusation relevé sur le corpus réel, jamais supposé. Les quatre règles du 08/09 ont été jouées
+sur les **95 synthèses** de `output\04-plans\`, toutes antérieures à leur écriture : S38 en accuse 3,
+S39 cinq, S40 aucune, S41 quatre. *Le premier jet de S38 en accusait 22*, et c'est la mesure qui l'a
+dit : le nom du dépôt frère `forge-tests` contient le mot « tests », donc « verser chez forge-tests
+la candidature d'un contrôle » — un dépôt chez un frère, où `hors_mandat` est le motif JUSTE — était
+lu comme un test esquivé. Même classe que le `\bPASS\b` qui matchait « passé » : **une frontière de
+mot ne sépare pas un nom composé de son composant**. La règle retire donc les noms de forge avant de
+mesurer et exige un VERBE D'EXÉCUTION — la règle 40 dit qu'un test proposé s'EXÉCUTE, elle ne dit
+rien d'un test qu'on mentionne. *Une règle qui accuse une synthèse sur quatre s'apprend à contourner
+(R-33 bis) : le taux fait partie de la livraison, au même titre que la fixture rouge.*
 **Proportionnalité (v2.5.0, inchangée)** : bloquantes S1, S3, S4, S6 ; tout le reste — S17 à S20
 comprises — entre en AVERTISSANTE, dit en une ligne sous la réponse et jamais réécrit. Une action
 sans conséquence rend la liste moins utile, jamais illisible ; les règles se durciront quand le

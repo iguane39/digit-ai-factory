@@ -780,9 +780,18 @@ function juger(texte) {
   // vocabulaire de S11 peut servir à se dispenser de mesurer.
   {
     const bActions = bloc(texte, BLOCS[7][0]) || "";
-    const TEST = uni(/\b(tests?|recettes?|bancs?|couverture|self-test|jeu d'essai|oracles?)\b/i);
+    // LE NOM D'UNE FORGE N'EST PAS UN TEST, et le premier jet de cette regle l'a oublie : le
+    // depot frere « forge-tests » contient le mot, donc « verser chez forge-tests la candidature
+    // d'un controle » — action de DEPOT, ou `hors_mandat` est le motif JUSTE puisque le mandat
+    // appartient a l'autre forge — etait lue comme un test esquive. Mesure sur les 95 syntheses
+    // reelles de `output\04-plans\` : 22 accusations, dont celle-la. Meme classe que le `\bPASS\b`
+    // qui matchait « passe » : la frontiere de mot ne separe pas un nom compose de son composant.
+    // On retire donc les noms de forge AVANT de mesurer, et l'on exige un VERBE D'EXECUTION : la
+    // regle 40 dit « un test propose s'EXECUTE », elle ne dit rien d'un test qu'on mentionne.
+    const sansNomDeForge = (g) => g.replace(/\bforge-[a-z-]+/gi, " ");
+    const TEST = uni(/\b(jouer|rejouer|ex[ée]cuter|lancer|relancer|mesurer|d[ée]rouler)\b[^.;|]{0,60}\b(tests?|recettes?|bancs?|couverture|self-test|jeu d'essai)\b/i);
     const EXEMPTION = /\b(hors_mandat|borne_atteinte)\b/;
-    const testsIA = actionsGroupees(bActions).filter((g) => /\bauto_ia\b/.test(g) && TEST.test(g));
+    const testsIA = actionsGroupees(bActions).filter((g) => /\bauto_ia\b/.test(g) && TEST.test(sansNomDeForge(g)));
     const esquives = testsIA.filter((g) => EXEMPTION.test(g));
     esquives.length
       ? ko("S38", `${esquives.length} action(s) de TEST sur ${testsIA.length} sont laissées non exécutées sous un motif d'EXEMPTION (\`hors_mandat\`, \`borne_atteinte\`) — un test jouable s'exécute (règle 40) ; ces deux motifs déclarent un périmètre, ils ne mesurent rien : « ${esquives[0].replace(/\s+/g, " ").trim().slice(0, 110)} »`)
