@@ -34,7 +34,7 @@ import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { empreinteTexte } from "../scripts/lib-empreinte.mjs";
-import { attribuerDivergence, racineWebDeclaree } from "../scripts/relever-heritage.mjs";
+import { attribuerDivergence, racineWebDeclaree, estCouvertParPlusLarge } from "../scripts/relever-heritage.mjs";
 
 // TF-0898 (08/09/2026) — R-4 DOIT ÊTRE JOUABLE SEULE, SUR UN `output\` ET RIEN D'AUTRE.
 // Le fait : onze livrables d'un mandat sont sortis en « AAAAMMJJ-objet.ext » parce que la FORME
@@ -652,7 +652,7 @@ else {
     so("R-47", "aucun dossier forge\\ — ce projet n'a pas été instancié par le pilot, il n'hérite donc de rien (TF-0514)");
   } else {
     const norm = (s) => s.split("\r\n").join("\n").trimEnd();
-    const manques = [], perimes = [], ok47 = [];
+    const manques = [], perimes = [], ok47 = [], horsHistoire = [];
     for (const a of heritage.artefacts) {
       const src = join(dirname(fileURLToPath(import.meta.url)), "..", a.source);
       let dst = p(a.cible);
@@ -694,18 +694,48 @@ else {
         // faite sur les LIGNES nues : un motif noyé dans un commentaire ne protège rien.
         const lignes = new Set(readFileSync(dst, "utf8").split(/\r?\n/)
           .map((l) => l.trim()).filter((l) => l && !l.startsWith("#")));
-        const absents = (a.motifs_exiges || []).filter((m) => !lignes.has(m));
+        // TF-0882 : un motif est tenu s'il est PRÉSENT **ou COUVERT par plus large**. La règle
+        // vient du relevé d'héritage et s'importe plutôt que de se réécrire : deux consommateurs
+        // du même contrat qui jugent différemment le même fichier, c'est la double vérité que ce
+        // fichier dénonce dix lignes plus haut — et elle avait déjà été payée sur ce mode exact.
+        const absents = (a.motifs_exiges || []).filter((m) => !lignes.has(m) && !estCouvertParPlusLarge(m, lignes));
         absents.length
           ? perimes.push(`${a.cible} ne porte pas ${absents.length} motif(s) du socle : ${absents.join(", ")}`)
           : ok47.push(a.cible);
       } else ok47.push(a.cible);
+      // TF-0851 / TF-0848 (08/09) — LE DISQUE N'EST PAS L'HISTOIRE. Un artefact hérité recopié
+      // chez un produit y arrive sur le DISQUE ; rien ne le fait entrer dans l'histoire git, et
+      // R-47 ne lisait que ce disque. Mesuré le 06/09 chez deux produits : un `CLASSES.json`
+      // présent, conforme et NON SUIVI (arrivé par une recopie, rangé en « Untracked »), et trois
+      // copies conformes NON COMMISES que R-47 comptait « présentes et à jour ». Conséquence : un
+      // clone neuf du même dépôt repartirait en FAIL, un `git restore` ramènerait l'héritage de la
+      // veille, et la session suivante arbitre à l'aveugle entre commettre et jeter.
+      // Le verdict n'est PAS retourné — la décision de le faire basculer appartient au pilot
+      // (TF-0848 le dit) — mais le silence cesse : l'état est relevé, compté et le geste nommé.
+      if (aGit && existsSync(dst)) {
+        const relDst = relative(cible, dst).replaceAll("\\", "/");
+        if (git("ls-files", "--error-unmatch", "--", relDst).status !== 0) {
+          horsHistoire.push(`${relDst} — présent et conforme, HORS HISTOIRE (non suivi par git) ; \`git add "${relDst}"\``);
+        } else if (git("diff", "--quiet", "HEAD", "--", relDst).status === 1) {
+          horsHistoire.push(`${relDst} — conforme sur le DISQUE, divergent de HEAD (recopié, jamais commis) ; \`git add "${relDst}" && git commit\``);
+        }
+      }
+    }
+    if (horsHistoire.length) {
+      so("R-47", `${horsHistoire.length} artefact(s) hérité(s) tenu(s) sur le DISQUE mais pas dans l'HISTOIRE du dépôt — `
+        + "une recopie n'est TENUE qu'une fois commise : un clone neuf, une CI ou un `git restore` ne les auraient pas. "
+        + `Constat DÉCLARÉ, jamais un défaut de produit (TF-0851) : ${horsHistoire.join(" · ")}`);
     }
     manques.length || perimes.length
       ? ko("R-47", "artefacts hérités", `héritage du pilot non tenu — ${manques.length} absent(s)`
           + (manques.length ? ` : ${manques.join(", ")}` : "")
           + `, ${perimes.length} périmé(s) ou incomplet(s)` + (perimes.length ? ` : ${perimes.join(", ")}` : "")
           + ". Remise à niveau EN UN GESTE, exécuté par le produit depuis son dépôt : "
-          + "`node <PILOT_ROOT>\\scripts\\recopier-heritage.mjs .` (TF-0711 ; référentiel gabarits\\HERITAGE.json)")
+          + "`node <PILOT_ROOT>\\scripts\\recopier-heritage.mjs .` (TF-0711 ; référentiel gabarits\\HERITAGE.json). "
+          + "Depuis TF-0850 le geste instancie AUSSI les artefacts personnalisables ABSENTS et complète les motifs "
+          + "manquants du socle — un fichier PRÉSENT n'est jamais écrasé, et une cible modifiée-non-commise fait "
+          + "basculer le geste en essai (`--forcer` pour passer outre). Il finit par la ligne `git add` de ce qu'il "
+          + "a écrit : une recopie n'est TENUE qu'une fois commise (TF-0851)")
       : ok("R-47", "artefacts hérités", `${ok47.length} artefact(s) hérité(s) présent(s) et à jour`);
 
     // TF-0713 — AUCUN FICHIER D'APPARENCE SECRÈTE SOUS forge\ N'EST SUIVI PAR GIT. Le socle

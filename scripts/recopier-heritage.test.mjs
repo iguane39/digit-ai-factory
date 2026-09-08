@@ -87,6 +87,76 @@ try {
     const r = lancer(PILOT);
     att(r.code === 2, `exit ${r.code} attendu 2 — le pilot s'est recopié sur lui-même`);
   });
+
+  // ── TF-0850 : un artefact PERSONNALISABLE **ABSENT** n'a rien à protéger ───────────────────
+  // Mesure du 06/09, identique chez TROIS produits : le geste unique laissait QUATRE artefacts
+  // absents et R-47 restait rouge — « remise à niveau EN UN GESTE » promettait la moitié du geste.
+  check("TF-0850 — un artefact personnalisable ABSENT est INSTANCIÉ depuis son gabarit, et R-47 cesse de le compter absent", () => {
+    const produit = join(T, "produit-absents");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    const r = lancer(produit);
+    att(r.code === 0, `exit ${r.code}`);
+    att(existsSync(join(produit, "CLAUDE.md")), "CLAUDE.md, mode personnalisé et ABSENT, n'a pas été instancié");
+    att(existsSync(join(produit, ".gitignore")), ".gitignore, mode personnalisé et ABSENT, n'a pas été instancié");
+    att(/INSTANCIÉ/.test(r.sortie), "l'instanciation n'est pas dite");
+  });
+
+  check("TF-0850 borne — un artefact personnalisable PRÉSENT n'est JAMAIS écrasé : c'est la garde qui donne sa valeur au script", () => {
+    const produit = join(T, "produit-absents");
+    writeFileSync(join(produit, "CLAUDE.md"), "# mes consignes a moi\n", "utf8");
+    const r = lancer(produit);
+    att(r.code === 0, `exit ${r.code}`);
+    att(readFileSync(join(produit, "CLAUDE.md"), "utf8") === "# mes consignes a moi\n",
+      "un fichier personnalisé PRÉSENT a été écrasé — la personnalisation est perdue sans recours");
+  });
+
+  check("TF-0850 — un `.gitignore` PRÉSENT auquel il manque des motifs est COMPLÉTÉ en fin de fichier, et l'ORDRE est signalé", () => {
+    const produit = join(T, "produit-motifs");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    writeFileSync(join(produit, ".gitignore"), "__pycache__/\n!forge/**\n", "utf8");
+    const r = lancer(produit);
+    const apres = readFileSync(join(produit, ".gitignore"), "utf8");
+    att(/^__pycache__\/$/m.test(apres), "le contenu d'origine a été perdu — les motifs doivent s'AJOUTER, pas écraser");
+    att(/node_modules\//.test(apres), "les motifs manquants du socle n'ont pas été ajoutés");
+    att(/COMPLÉTÉ/.test(r.sortie), "la complétion n'est pas dite");
+    att(/l'ORDRE décide du résultat/.test(r.sortie),
+      "l'avertissement sur l'ordre manque — chez un produit, insérer une exclusion APRÈS `!forge/**` a re-ignoré onze fichiers");
+  });
+
+  // ── TF-0852 (b) : la garde git, qui vivait dans la PROSE d'un mandat humain ────────────────
+  check("TF-0852 — une cible MODIFIÉE et non commise fait basculer le geste en essai, et demande --forcer", () => {
+    const produit = join(T, "produit-git");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    const g = (...a) => spawnSync("git", ["-C", produit, "-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", ...a], { encoding: "utf8" });
+    g("init", "-q", "-b", "main");
+    lancer(produit);                                   // premier passage : tout est écrit
+    g("add", "-A"); g("commit", "-q", "-m", "socle");
+    writeFileSync(join(produit, "forge", "travaux", "TRAVAUX-PILOT.md"), "# travail local non commis\n", "utf8");
+    const r = lancer(produit);
+    att(r.code === 0, `exit ${r.code}`);
+    att(/\[GARDE\]/.test(r.sortie), "aucune garde n'a joué : le travail local a été écrasé en silence");
+    att(/--forcer/.test(r.sortie), "la garde ne dit pas comment passer outre");
+    att(readFileSync(join(produit, "forge", "travaux", "TRAVAUX-PILOT.md"), "utf8") === "# travail local non commis\n",
+      "le fichier modifié a été écrasé malgré la garde");
+  });
+
+  check("TF-0852 borne — `--forcer` écrase, et c'est le SEUL moyen : le cas nominal n'est pas ralenti", () => {
+    const produit = join(T, "produit-git");
+    const r = lancer(produit, "--forcer");
+    att(r.code === 0, `exit ${r.code}`);
+    att(readFileSync(join(produit, "forge", "travaux", "TRAVAUX-PILOT.md"), "utf8") !== "# travail local non commis\n",
+      "--forcer n'écrase pas — la porte de sortie n'existe pas");
+  });
+
+  // ── TF-0851 (2) : le geste rend compte de ce qu'il laisse au dépôt ─────────────────────────
+  check("TF-0851 — le geste imprime la ligne `git add` des fichiers qu'il vient d'écrire", () => {
+    const produit = join(T, "produit-add");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    const r = lancer(produit);
+    att(/git add /.test(r.sortie), "le geste n'a pas proposé le commit de ce qu'il a écrit");
+    att(/n'est TENUE qu'une fois commise/i.test(r.sortie),
+      "le geste ne dit pas qu'une recopie hors de l'histoire ne tient rien — un clone neuf repartirait sans elle");
+  });
 } finally {
   try { rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré */ }
 }

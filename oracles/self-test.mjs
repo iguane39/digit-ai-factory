@@ -474,6 +474,31 @@ check("écart-R24 : un écart sans motif ni date n'excuse rien", () => {
   if (!rapport.findings.some((f) => f.regle === "R-24" && f.statut === "FAIL")) throw new Error("l'écart incomplet a été accepté");
 });
 
+// ---- TF-0882 côté R-47 : LES DEUX CONSOMMATEURS DU CONTRAT DOIVENT JUGER PAREIL. La règle
+// « un motif est tenu s'il est présent OU couvert par plus large » vit dans `relever-heritage`
+// et est IMPORTÉE ici — la réécrire donnerait deux verdicts sur le même `.gitignore`, la double
+// vérité que ce dépôt a déjà payée sur ce mode exact (TF-0649). La fixture verte reçoit donc les
+// motifs de sidecars sous une graphie PLUS LARGE, et R-47 doit rester muette. ------------------
+{
+  const gitignoreVert = readFileSync(join(verte, ".gitignore"), "utf8");
+  const large = gitignoreVert.split(/\r?\n/)
+    .filter((l) => !/^\*\.oracles(-cache|-historique)?\.(json|jsonl)$/.test(l.trim()))
+    .concat(["*.oracles*.json", "*.oracles*.jsonl"]).join("\n") + "\n";
+  writeFileSync(join(verte, ".gitignore"), large);
+  check("TF-0882 (R-47) — trois graphies de sidecar couvertes par deux motifs plus larges : R-47 reste muette", () => {
+    const { rapport } = lance(verte);
+    const r47 = rapport.findings.filter((f) => f.regle === "R-47" && f.statut === "FAIL");
+    if (r47.length) throw new Error(`R-47 accuse une protection ÉQUIVALENTE : ${r47.map((f) => f.message).join(" | ")}`);
+  });
+  check("TF-0882 borne (R-47) — retirer la couverture ramène le constat : la règle n'a pas désarmé R-47", () => {
+    writeFileSync(join(verte, ".gitignore"), large.split("\n").filter((l) => !/^\*\.oracles\*/.test(l)).join("\n") + "\n");
+    const { rapport } = lance(verte);
+    const r47 = rapport.findings.filter((f) => f.regle === "R-47" && f.statut === "FAIL");
+    if (!r47.length) throw new Error("aucun motif n'est plus exigé — la couverture a avalé la règle");
+    writeFileSync(join(verte, ".gitignore"), gitignoreVert);   // la fixture verte reprend son état
+  });
+}
+
 // ---- fixture IGNORÉ (TF-0853) : LE MOTIF LE PLUS FORT — le dépôt a écrit que ce chemin
 // n'entrera jamais dans son histoire. Mesuré le 06/09 chez un produit : 242 constats sur 247
 // portaient les fichiers d'un SEUL dossier d'output\ exclu par le .gitignore, dont 41 dossiers au

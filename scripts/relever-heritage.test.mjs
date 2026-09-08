@@ -54,6 +54,51 @@ try {
   const vide = join(T, "produit-vide");
   mkdirSync(join(vide, "forge"), { recursive: true });
 
+  // ── TF-0851 / TF-0848 : LE DISQUE N'EST PAS L'HISTOIRE ────────────────────────────────────
+  // Un produit à dépôt RÉEL, dont l'artefact hérité est conforme sur le disque et traverse les
+  // trois états successifs : non suivi → suivi mais non commis → commis. Les trois se relèvent,
+  // et le contenu reste CONFORME dans les trois — c'est tout le propos : R-47 rendait le même
+  // verdict pour trois situations que `git status` distingue.
+  const versionne = join(T, "_Client", "produit-versionne");
+  mkdirSync(join(versionne, "forge"), { recursive: true });
+  writeFileSync(join(versionne, "forge", "MODELE.md"), "contenu de reference\n", "utf8");
+  writeFileSync(join(versionne, "robots.txt"), "User-agent: *\n", "utf8");
+  const gitP = (...a) => spawnSync("git", ["-C", versionne, "-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", ...a], { encoding: "utf8" });
+  gitP("init", "-q", "-b", "main");
+  const ARTEFACT_MODELE = { mode: "copie_conforme", source: "gabarits/MODELE.md", cible: "forge/MODELE.md" };
+
+  check("TF-0851 — une recopie CONFORME mais NON SUIVIE par git est relevée « hors histoire », et le geste est nommé", () => {
+    const e = etatArtefact(versionne, ARTEFACT_MODELE, pilot);
+    att(e.etat === "conforme", `état « ${e.etat} » : le CONTENU est bien conforme, c'est le propos`);
+    att(e.histoire === "non_suivi", `histoire « ${e.histoire} » — ce poste l'a, le dépôt ne l'a pas, et rien ne le disait`);
+    att(/git add/.test(e.geste_git || ""), "le geste qui répare n'est pas nommé");
+  });
+
+  check("TF-0848 — la même copie, SUIVIE mais NON COMMISE, est relevée à part : une recopie n'est tenue qu'une fois commise", () => {
+    gitP("add", "forge/MODELE.md");
+    gitP("commit", "-q", "-m", "socle");
+    writeFileSync(join(versionne, "forge", "MODELE.md"), "vieille version\n", "utf8");
+    gitP("add", "forge/MODELE.md");
+    gitP("commit", "-q", "-m", "une version perimee entre dans l histoire");
+    writeFileSync(join(versionne, "forge", "MODELE.md"), "contenu de reference\n", "utf8");
+    const e = etatArtefact(versionne, ARTEFACT_MODELE, pilot);
+    att(e.etat === "conforme", `état « ${e.etat} » : le disque est conforme`);
+    att(e.histoire === "non_commis", `histoire « ${e.histoire} » — HEAD porte encore la version périmée, un git restore la ramènerait`);
+  });
+
+  check("TF-0851 borne — une fois COMMISE, la copie n'est plus signalée : le relevé ne crie pas sur un état tenu", () => {
+    gitP("add", "forge/MODELE.md");
+    gitP("commit", "-q", "-m", "la recopie entre dans l histoire");
+    const e = etatArtefact(versionne, ARTEFACT_MODELE, pilot);
+    att(e.histoire === "commis", `histoire « ${e.histoire} » — un artefact commis doit être muet`);
+  });
+
+  check("TF-0851 borne — un produit SANS dépôt git n'est pas jugé sur son histoire, jamais accusé", () => {
+    const e = etatArtefact(conforme, ARTEFACT_MODELE, pilot);
+    att(e.etat === "conforme", `état « ${e.etat} »`);
+    att(e.histoire === undefined, `histoire « ${e.histoire} » relevée sur un répertoire sans dépôt — il n'y a pas d'histoire où entrer`);
+  });
+
   check("les produits sont trouvés par leur `forge`, à un et deux niveaux", () => {
     const p = produitsDuParc(T);
     att(p.includes(conforme), "un produit à deux niveaux n'est pas trouvé");
@@ -304,7 +349,29 @@ try {
       { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 }).stdout;
     const cause = attribuerDivergence("gabarits/RETOURS-FORGES.md", ancienne, PILOT_REEL);
     att(cause.qui === "pilot", `attribution « ${cause.qui} » — une version publiée n'est pas reconnue`);
-    att(/publiée le \d{4}-\d{2}-\d{2}/.test(cause.detail), "la date de la version n'est pas dite");
+    // TF-0849 : la phrase NOMME ce qu'elle mesure. Elle disait « version publiée le X » là où
+    // elle mesure « état porté par le COMMIT du X » — et elle rendait systématiquement la date la
+    // plus RÉCENTE des deux, exactement le sens qui pousse à croire sa copie fraîche. L'assertion
+    // suit la correction : ce qui est exigé reste une date, mais dite pour ce qu'elle est.
+    att(/PAR LE COMMIT du \d{4}-\d{2}-\d{2}/.test(cause.detail), "la date du commit n'est pas dite");
+    att(/pas la version que le fichier déclare/.test(cause.detail),
+      "le message ne distingue pas la date du COMMIT de la version DÉCLARÉE — c'est cette confusion qui a fait lire deux dates pour un même fichier le 06/09");
+  });
+
+  check("TF-0849 — quand l'artefact DÉCLARE une version, le message cite les DEUX côtés", () => {
+    // Le cas fondateur, rejoué sur la forme qui l'a produit : un JSON à champs `version` et
+    // `date`. Le produit lisait « version publiée le 05/09 » pour un fichier qui déclarait
+    // 1.0.0 du 03/09, pendant que le lot de travaux écrivait « version du 03/09 ».
+    const log = spawnSync("git", ["-C", PILOT_REEL, "log", "-n", "5", "--format=%H", "--", "todo/CLASSES.json"], { encoding: "utf8" });
+    const revs = (log.stdout || "").split("\n").filter(Boolean);
+    att(revs.length >= 2, "historique trop court pour jouer le cas");
+    const ancienne = spawnSync("git", ["-C", PILOT_REEL, "show", `${revs[1]}:todo/CLASSES.json`],
+      { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 }).stdout;
+    const cause = attribuerDivergence("todo/CLASSES.json", ancienne, PILOT_REEL);
+    att(cause.qui === "pilot", `attribution « ${cause.qui} »`);
+    att(/versions DÉCLARÉES/.test(cause.detail), `le message ne cite aucune version déclarée : ${cause.detail}`);
+    att(/votre copie : \d+\.\d+\.\d+/.test(cause.detail), `la version de la COPIE n'est pas citée : ${cause.detail}`);
+    att(/pilot : \d+\.\d+\.\d+/.test(cause.detail), `la version du PILOT n'est pas citée : ${cause.detail}`);
   });
 
   check("TF-0711 — une copie MODIFIÉE côté produit est attribuée au produit, avec la garde « ne pas écraser »", () => {

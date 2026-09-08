@@ -177,8 +177,53 @@ export function estCouvertParPlusLarge(motif, lignes) {
   return false;
 }
 
+/**
+ * TF-0851 / TF-0848 (08/09) — LE DISQUE N'EST PAS L'HISTOIRE, et R-47 ne lisait que le disque.
+ *
+ * Deux faits mesurés le 06/09 chez deux produits différents, même classe. (1) `forge/retours/
+ * CLASSES.json` était PRÉSENT, conforme à une version du pilot, et NON SUIVI par git : il n'a pu
+ * arriver que par une recopie d'héritage, et `git status` le rangeait en « Untracked ». (2) Trois
+ * artefacts en copie conforme étaient CONFORMES au pilot et NON COMMIS : `recopier-heritage
+ * --essai` les rendait [CONFORME], `git status` les rendait « modified », et R-47 comptait
+ * « 11 artefacts présents et à jour » — verdict identique qu'ils soient versionnés ou non.
+ *
+ * CE QUE ÇA COÛTE : un `git restore` ramène l'héritage de la veille, un `git clone` (CI, autre
+ * poste) livre les artefacts périmés, et la session suivante ne peut pas distinguer ces recopies
+ * de travaux du produit — elle arbitre à l'aveugle entre les commettre et les jeter. Le relevé du
+ * parc, lui, mesure ce même disque : il mesure l'état d'un POSTE, pas l'état d'un produit.
+ *
+ * CE QUI EST FAIT ICI, et pas plus : l'état de l'artefact DANS L'HISTOIRE est relevé et COMPTÉ À
+ * PART — `non_suivi` (présent, conforme, hors histoire), `non_commis` (suivi, mais l'arbre de
+ * travail diverge de HEAD), `commis`. Le verdict de R-47 n'est pas retourné par ce relevé : la
+ * décision de le faire basculer appartient au pilot (TF-0848 le dit en toutes lettres), et le
+ * comptage à part en est le préalable. Ce qui change dès aujourd'hui, c'est que le silence cesse.
+ */
+function etatDansHistoire(dossierProduit, cible) {
+  if (!cible || !existsSync(cible) || !existsSync(join(dossierProduit, ".git"))) return {};
+  const rel = relative(dossierProduit, cible).replaceAll("\\", "/");
+  const suivi = spawnSync("git", ["-C", dossierProduit, "ls-files", "--error-unmatch", "--", rel],
+    { encoding: "utf8", timeout: 20000 });
+  if (suivi.status !== 0) {
+    return { histoire: "non_suivi", geste_git: `git add "${rel}"`,
+      note_histoire: "présent, conforme, HORS HISTOIRE — ce poste l'a, le dépôt ne l'a pas : un clone neuf repartirait sans lui" };
+  }
+  const propre = spawnSync("git", ["-C", dossierProduit, "diff", "--quiet", "HEAD", "--", rel],
+    { encoding: "utf8", timeout: 20000 });
+  if (propre.status === 1) {
+    return { histoire: "non_commis", geste_git: `git add "${rel}" && git commit`,
+      note_histoire: "conforme sur le DISQUE, divergent de HEAD — une recopie n'est TENUE qu'une fois commise ; un `git restore` ramènerait la version d'avant" };
+  }
+  return { histoire: "commis" };
+}
+
 /** L'état d'UN artefact chez UN produit : absent, présent-divergent, ou conforme. */
 export function etatArtefact(dossierProduit, artefact, racinePilot) {
+  const sortie = {};
+  const etat = etatSurDisque(dossierProduit, artefact, racinePilot, sortie);
+  return { ...etat, ...etatDansHistoire(dossierProduit, sortie.cible) };
+}
+
+function etatSurDisque(dossierProduit, artefact, racinePilot, sortie = {}) {
   let cible = join(dossierProduit, String(artefact.cible).replaceAll("/", "\\"));
   // TF-0793 — LA DÉCLARATION SE LIT. Quand la cible manque à la racine du dépôt et que le produit
   // a déclaré sa racine web, l'artefact se cherche SOUS cette racine, et c'est là qu'il se juge
@@ -199,6 +244,9 @@ export function etatArtefact(dossierProduit, artefact, racinePilot) {
     const alias = join(dossierProduit, String(artefact.alias_accepte).replaceAll("/", "\\"));
     if (existsSync(alias)) cible = alias;
   }
+  // Le chemin RÉELLEMENT jugé, une fois toutes les résolutions faites (racine web, alias) : c'est
+  // lui, et pas la cible du contrat, dont l'état dans l'histoire git se relève (TF-0851).
+  sortie.cible = cible;
   if (!existsSync(cible)) {
     // LE TROISIEME CAS, CELUI QUI N'AVAIT PAS DE NOM (TF-0654, 26/08/2026).
     //
@@ -271,6 +319,26 @@ export function etatArtefact(dossierProduit, artefact, racinePilot) {
  * la recherche s'arrête aux 30 dernières révisions de la source, et un pilot sans git (ou une
  * source jamais commitée) rend une attribution inconnue, dite comme telle.
  */
+/**
+ * TF-0849 (08/09) — LA VERSION QU'UN ARTEFACT DÉCLARE, quand il en déclare une. Un JSON porte
+ * `version` et `date` ; un document versionné porte un en-tête « version X.Y.Z » ou un
+ * frontmatter. `null` quand rien n'est déclaré — auquel cas la date du commit reste la seule
+ * mesure disponible, et le message le dit comme telle.
+ */
+function versionDeclaree(contenu) {
+  const t = String(contenu);
+  try {
+    const j = JSON.parse(t);
+    if (j && (j.version || j.date)) return [j.version, j.date].filter(Boolean).join(" du ");
+  } catch { /* pas un JSON : on lit l'en-tête */ }
+  const enTete = t.slice(0, 2000);
+  const m = /(?:^|\n)[^\n]*?\bversion\s*:?\s*(?:\*\*)?\s*(\d+\.\d+\.\d+)/i.exec(enTete)
+    || /(?:^|\n)[^\n]*?\bv(\d+\.\d+\.\d+)\b/.exec(enTete);
+  if (!m) return null;
+  const d = /(\d{4}-\d{2}-\d{2})/.exec(enTete);
+  return m[1] + (d ? ` du ${d[1]}` : "");
+}
+
 export function attribuerDivergence(sourceRel, contenuProduit, racinePilot) {
   const posix = String(sourceRel).replaceAll("\\", "/");
   const log = spawnSync("git", ["-C", racinePilot, "log", "-n", "30", "--format=%H %cs", "--", posix],
@@ -283,7 +351,29 @@ export function attribuerDivergence(sourceRel, contenuProduit, racinePilot) {
     const montre = spawnSync("git", ["-C", racinePilot, "show", `${h}:${posix}`],
       { encoding: "utf8", timeout: 30000, maxBuffer: 16 * 1024 * 1024 });
     if (montre.status === 0 && norm(montre.stdout) === attendu) {
-      return { qui: "pilot", detail: `votre copie correspond à la version publiée le ${date} — ` +
+      // TF-0849 (08/09/2026) — LE MESSAGE DISAIT « VERSION PUBLIÉE LE X » LÀ OÙ IL MESURE
+      // « ÉTAT PORTÉ PAR LE COMMIT DU X ». Le mécanisme n'était pas faux, la PHRASE l'était : la
+      // date rendue est celle du COMMIT qui portait ce contenu, pas la version que l'artefact
+      // DÉCLARE — et elle est systématiquement la plus RÉCENTE des deux, exactement le sens qui
+      // pousse à croire sa copie fraîche. Mesure du 06/09 chez un produit : l'oracle écrivait
+      // « votre copie correspond à la version publiée le 2026-09-05 » pour un fichier qui portait
+      // `version 1.0.0, date 2026-09-03, 32 classes`, quand la source du pilot portait
+      // `1.2.0, 2026-09-05, 37 classes` ; le lot de travaux lu dans la même minute écrivait, lui,
+      // « correspond à la version du 03/09 ». Deux dates pour le même fichier, à deux jours
+      // d'écart, dans les deux documents que le produit lit côte à côte — et l'écart n'était
+      // visible qu'en ouvrant le JSON, geste qu'aucune consigne ne demande.
+      // Deux corrections indépendantes : NOMMER ce qui est mesuré, et CITER les deux versions
+      // déclarées quand l'artefact en porte une. Le message machine dit désormais ce que la prose
+      // humaine du lot disait déjà — au lieu de la contredire.
+      const vProduit = versionDeclaree(contenuProduit);
+      const source = spawnSync("git", ["-C", racinePilot, "show", `HEAD:${posix}`],
+        { encoding: "utf8", timeout: 30000, maxBuffer: 16 * 1024 * 1024 });
+      const vPilot = source.status === 0 ? versionDeclaree(source.stdout) : null;
+      const versions = vProduit || vPilot
+        ? ` · versions DÉCLARÉES — votre copie : ${vProduit || "aucune"} · pilot : ${vPilot || "aucune"}`
+        : "";
+      return { qui: "pilot", detail: `votre copie correspond à l'état publié PAR LE COMMIT du ${date} ` +
+        `(date du commit, pas la version que le fichier déclare)${versions} — ` +
         "le PILOT a avancé depuis : recopier suffit (aucune faute côté produit)" };
     }
   }
@@ -315,6 +405,11 @@ export function relever(base, contrat, racinePilot) {
       // comme un manque, pas comme un conforme — un `.gitignore` present et vide protege autant
       // qu'un `.gitignore` absent.
       incomplets: compte("incomplet"),
+      // TF-0851 / TF-0848 : l'état dans l'HISTOIRE se compte À PART, comme `hors_racine`. Ni un
+      // manque (le produit a fait le geste), ni un artefact tenu (le dépôt ne le porte pas). Le
+      // relevé du parc mesurait l'état d'un POSTE en croyant mesurer l'état d'un produit.
+      hors_histoire: artefacts.filter((x) => x.histoire === "non_suivi").length,
+      non_commis: artefacts.filter((x) => x.histoire === "non_commis").length,
       conformes: compte("conforme") + compte("present"),
       total: artefacts.length,
       artefacts,
@@ -340,7 +435,10 @@ if (lanceEnDirect) {
         + (l.divergents ? `, ${l.divergents} DIVERGENT(s)` : "")
         + (l.hors_racine ? `, ${l.hors_racine} HORS RACINE` : "")
         + (l.incomplets ? `, ${l.incomplets} INCOMPLET(s)` : "");
-      console.log(`${l.produit.padEnd(50)} ${drapeau}`);
+      // TF-0851 : l'état dans l'HISTOIRE se dit à côté du verdict de contenu, jamais à sa place.
+      const histoire = (l.hors_histoire ? ` · ${l.hors_histoire} HORS HISTOIRE (présents, non suivis par git)` : "")
+        + (l.non_commis ? ` · ${l.non_commis} NON COMMIS (conformes sur le disque, divergents de HEAD)` : "");
+      console.log(`${l.produit.padEnd(50)} ${drapeau}${histoire}`);
     }
     console.log(`\n${lignes.length} produit(s) relevé(s), ${totalManques} manque(s) au total — contrat v${contrat.version}`);
     console.log(`NON RELEVÉ : tout produit rangé au-delà de ${PROFONDEUR_MAX} niveaux sous ${racine}, ` +
