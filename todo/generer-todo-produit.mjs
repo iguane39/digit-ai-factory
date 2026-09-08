@@ -102,7 +102,7 @@ const enCours = iStatut < 0 ? 0 : ameliorations.filter((c) => /en cours/i.test(c
 const vide = !decisions.length && !ameliorations.length && !ecarts.length;
 
 const kpi = (label, valeur, aide, accent) =>
-  `      <div class="kpi${accent ? " kpi-" + accent : ""}"><span class="kpi-label">${esc(label)}</span><span class="kpi-value">${valeur}</span><span class="kpi-hint">${esc(aide)}</span></div>`;
+  `      <div class="kpi${accent ? " kpi-" + accent : ""}"><span class="kpi-label">${esc(label)}</span><span class="kpi-value" aria-label="${esc(label)} : ${valeur} — ${esc(aide)}">${valeur}</span><span class="kpi-hint">${esc(aide)}</span></div>`;
 
 const html = `<!DOCTYPE html>
 <html lang="fr">
@@ -120,7 +120,7 @@ const html = `<!DOCTYPE html>
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${esc(titre)}</title>
+  <title>${esc(titre)} — ${esc(front.verifie_le || "")}</title>
   <meta name="description" content="Reste-à-faire et décisions attendues du produit — vue générée depuis docs\\projet\\TODO-PRODUIT.md (la source fait foi). Lecture seule.">
   <meta name="theme-color" content="#2563EB">
   <!-- Pas de <meta name="color-scheme" content="light dark"> : FIGÉ à « light dark », le
@@ -146,12 +146,12 @@ const html = `<!DOCTYPE html>
     *{box-sizing:border-box} html{-webkit-text-size-adjust:100%}
     body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:16px}
     .wrap{max-width:clamp(75vw,1680px,92vw);margin:0 auto;padding:32px 24px 64px}
-    .colonne{max-width:75ch;margin:0 auto}
+    .colonne{max-width:none;margin:0}
     h1,h2,h3{font-family:var(--head);font-weight:800;line-height:1.2}
     h1{font-size:1.7rem;margin:0} h2{font-size:1.25rem;font-weight:700;margin:1.5em 0 .4em}
     h3{font-size:1.02rem;font-weight:700;margin:1.1em 0 .3em}
     code{font-family:var(--mono);font-size:.9em}
-    .meta{color:var(--muted);font-size:.85rem;margin:.2em 0 0;overflow-wrap:anywhere}
+    .meta{color:var(--muted);font-size:.85rem;margin:.2em 0 0}
     .entete{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
     .entete>div{flex:1 1 260px}
     .theme-toggle{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);
@@ -168,10 +168,10 @@ const html = `<!DOCTYPE html>
     .kpi-hint{color:var(--muted);font-size:.8rem}
     blockquote{margin:14px 0;padding:10px 16px;border-left:3px solid var(--blue);background:var(--surface);border-radius:0 var(--r-sm) var(--r-sm) 0;color:var(--muted)}
     blockquote p{margin:0}
-    .scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin:10px 0}
+    .defile{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin:10px 0}
     table{border-collapse:collapse;width:100%;font-size:.92rem}
     th{font-family:var(--head);font-weight:700;text-align:left;padding:9px 12px;border-bottom:2px solid var(--line)}
-    td{padding:7px 12px;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}
+    td{padding:7px 12px;border-bottom:1px solid var(--line);vertical-align:top}
     tr:last-child td{border-bottom:none}
     ul{margin:.4em 0;padding-left:1.3em}
     .etat-vide{background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);padding:16px;color:var(--muted)}
@@ -185,7 +185,7 @@ const html = `<!DOCTYPE html>
         --bg:#FFFFFF;--surface:#FFFFFF;--ink:#0F172A;--muted:#64748B;
         --faint:#94A3B8;--line:#E6EAF2;--blue:#2563EB;--teal:#0E9488;--teal-fill:#EFFDFB;
         --amber:#B45309;--amber-fill:#FFFBEB}
-      .theme-toggle{display:none} .scroll{overflow:visible;border:none} tr{break-inside:avoid}
+      .theme-toggle{display:none} .defile{overflow:visible;border:none} tr{break-inside:avoid}
     }
   </style>
 </head>
@@ -193,7 +193,7 @@ const html = `<!DOCTYPE html>
   <div class="wrap"><div class="colonne">
     <header class="entete">
       <div>
-        <h1>${esc(titre)}</h1>
+        <h1>${esc(titre)} — ${esc(front.verifie_le || "")}</h1>
         <p class="meta">rôle : ${esc(front.role || "—")} · sources de vérité : <code>${esc(front.sources_de_verite || "—")}</code> · vérifié le ${esc(front.verifie_le || "—")} · sceau source <code>${sceau}</code></p>
       </div>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
