@@ -1080,5 +1080,46 @@ check("TF-0898 borne : une règle demandée sans constat est DITE, jamais un PAS
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
+// ---- TF-0902 (08/09) — R-7 bis : deux versions du même livrable hors old\ ---------------------
+// ROUGE : le cas exact du 07/09 — deux indices du même journal dans le même dossier, que R-4
+// laissait passer (deux noms valides, chacun unique). VERTE : la version remplacée a migré dans
+// `old\`, il ne reste qu'une version courante. BORNE : deux FORMATS du même livrable (.html et
+// .pdf, même radical, même indice) ne sont pas deux versions — sans cette borne, la règle
+// crierait sur la pratique que le socle prescrit.
+const projetVersions = (fichiersOutput, dansOld = []) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-r7bis-"));
+  mkdirSync(join(d, "output"), { recursive: true });
+  for (const n of fichiersOutput) writeFileSync(join(d, "output", n), "# livrable\n", "utf8");
+  if (dansOld.length) {
+    mkdirSync(join(d, "output", "old"), { recursive: true });
+    for (const n of dansOld) writeFileSync(join(d, "output", "old", n), "# livrable\n", "utf8");
+  }
+  return d;
+};
+const r7bis = (d) => (lanceArgs(d, "--regles", "R-7 bis").rapport.findings || []).find((x) => x.regle === "R-7 bis");
+check("TF-0902 rouge : deux indices du même livrable dans le même dossier hors old\\ → FAIL R-7 bis", () => {
+  const d = projetVersions(["Client-A - Journal du mandat - 20260907j.md", "Client-A - Journal du mandat - 20260907m.md"]);
+  try {
+    const f = r7bis(d);
+    if (!f || f.statut !== "FAIL") throw new Error(`deux versions cohabitent sans constat : ${JSON.stringify(f)}`);
+    if (!/20260907j, 20260907m/.test(f.message)) throw new Error(`le constat ne nomme pas les deux indices : ${f.message}`);
+    if (!/git mv/.test(f.message)) throw new Error("le constat ne nomme pas le geste — l'auteur reposerait la question à l'humain");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-0902 verte : la version remplacée a migré dans old\\ → plus de constat", () => {
+  const d = projetVersions(["Client-A - Journal du mandat - 20260907m.md"], ["Client-A - Journal du mandat - 20260907j.md"]);
+  try {
+    const f = r7bis(d);
+    if (!f || f.statut === "FAIL") throw new Error(`le rangement prescrit est accusé : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-0902 borne : deux FORMATS d'un même livrable (.html et .pdf) ne sont pas deux versions", () => {
+  const d = projetVersions(["Client-A - Fiche - 20260907a.html", "Client-A - Fiche - 20260907a.pdf"]);
+  try {
+    const f = r7bis(d);
+    if (!f || f.statut === "FAIL") throw new Error(`un livrable en deux formats est pris pour deux versions : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 console.log(`\nSelf-test conformité projet : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

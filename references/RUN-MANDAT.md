@@ -95,6 +95,12 @@ MEP — et le run Produit-10 a dû improviser ce que cette page encode désormai
    `node <pilot>\scripts\allouer-indice.mjs`, jamais à la main. Le contrôle se joue seul,
    sans socle installé et avant la remise :
    `node <pilot>\oracles\oracle-conformite-projet.mjs <projet> --regles R-4`.
+   **Un livrable remplacé migre dans `old\` du même dossier, versionné** (TF-0902 ;
+   REGLES-PROJET règle 7, C1 tranché le 13/08 par TF-0150) : `git mv`, une commande,
+   pas une question. *Mesuré le 07/09* : une synthèse a posé à l'humain la décision
+   « garder ou supprimer la version remplacée ? » — la doctrine y répondait depuis
+   trois semaines, et un tour humain y est passé. Contrôle :
+   `--regles "R-7 bis"` (deux versions du même radical dans un même dossier hors `old\`).
    Puis : lot `<projet> - RETOURS - AAAAMMJJ<i>.md` +
    sidecar remis à `<pilot>\input\00-retours\`, `run_close`, synthèse **au format
    `gabarits\RESTITUTION.md`** (8 blocs, horodatée, jugée par `oracle-synthese.mjs`).

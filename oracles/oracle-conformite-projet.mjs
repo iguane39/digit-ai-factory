@@ -415,6 +415,53 @@ else if (/^[Oo]ld\/$/m.test(gitignore) || /(^|\n)\*{0,2}\/?[Oo]ld\/(\n|$)/.test(
   ko("R-7", ".gitignore", "old\\ est ignoré par git — C1 amendé (TF-0150, 13/08) : old\\ est un rangement de lisibilité VERSIONNÉ ; retirer la ligne du .gitignore");
 else ok("R-7", ".gitignore", "old\\ présent et versionné (C1 amendé TF-0150)");
 
+// ---- R-7 bis (TF-0902, 08/09/2026) — DEUX VERSIONS DU MÊME LIVRABLE NE COHABITENT PAS --------
+//
+// CE QUE R-7 VOYAIT, ET CE QU'ELLE NE VOYAIT PAS. Le bloc ci-dessus ne juge qu'une chose : si un
+// `old\` EXISTE, il n'est pas gitignoré. Il ne dit rien du cas que la règle 7 existe pour traiter
+// — un livrable remplacé qui n'a JAMAIS migré. Et R-4 ne le voit pas non plus : deux indices
+// distincts sont deux noms valides, chacun unique. Mesuré le 07/09 : les deux versions d'un même
+// journal ont vécu côte à côte dans `output\`, l'oracle a rendu PASS, et la question « garder ou
+// supprimer la version remplacée ? » est remontée à l'humain comme une décision — alors que la
+// doctrine la tranche depuis le 13/08 (REGLES-PROJET règle 7 + C1/TF-0150 : `git mv` vers `old\`
+// du même dossier, versionné). Un tour humain consommé par une réponse déjà écrite.
+//
+// CE QUI EST JUGÉ : même dossier (hors `old\`), même RADICAL (le nom sans son « - AAAAMMJJ<i> »),
+// même extension, deux dates ou indices différents. L'extension entre dans la clé parce qu'un
+// livrable vit légitimement en deux formats — le `.html` et le `.pdf` d'une même fiche ne sont
+// pas deux versions. `old\` est hors périmètre : c'est justement la destination.
+//
+// CE QUI N'EST PAS JUGÉ, et c'est déclaré au `non_juge` : LAQUELLE des deux est la courante. Le
+// constat nomme les fichiers et le geste ; il ne choisit pas à la place de l'auteur.
+{
+  const versions = new Map();
+  for (const d of ["output", "docs"]) {
+    for (const f of fichiers(p(d))) {
+      const nom = basename(f);
+      const ext = nom.split(".").pop().toLowerCase();
+      if (EXCLUS_NOMMAGE.has(nom) || !EXT_LIVRABLE.has(ext)) continue;
+      if (/(^|\/)[Oo]ld\//.test("/" + rel(f))) continue;
+      if (/[\/]\.oracles[\/]/.test("/" + rel(f))) continue;
+      const m = nom.match(/^(.*) - (\d{8}[a-z]?)\.([\w.]+)$/);
+      if (!m) continue;
+      // Clé COMPOSÉE, jamais concaténée : un radical porte des espaces et des tirets, et un
+      // séparateur de fortune rendrait le dossier faux au message — un message faux se corrige de travers.
+      const cle = JSON.stringify([dirname(rel(f)), m[1], m[3].toLowerCase()]);
+      if (!versions.has(cle)) versions.set(cle, []);
+      versions.get(cle).push({ nom, indice: m[2] });
+    }
+  }
+  const doublons = [...versions.entries()].filter(([, v]) => new Set(v.map((x) => x.indice)).size > 1);
+  if (!doublons.length) so("R-7 bis", "aucun livrable en deux versions hors old\\ (output\\, docs\\)");
+  else for (const [cle, v] of doublons) {
+    const [dossier, radical] = JSON.parse(cle);
+    const tries = v.map((x) => x.indice).sort();
+    ko("R-7 bis", `${dossier}/`, `« ${radical} » vit en ${tries.length} versions dans le MÊME dossier hors old\\ ` +
+      `(${tries.join(", ")}) — règle 7 + C1 tranché le 13/08 (TF-0150) : la version remplacée migre par ` +
+      `\`git mv\` dans \`${dossier}/old/\`, versionnée. Ce n'est pas une question à poser à l'humain, la doctrine y répond`);
+  }
+}
+
 // R-32 — gate AVAL des livrables HTML (13/08, retour Produit-10 RV-4) : tout .html d'output\
 // (hors old\) a son journal d'oracles sous forge\oracles\<basename>.json — la preuve que
 // check_html.py ET render_page.py ont été exécutés avant remise. Le §2 bis du contrat
@@ -1400,6 +1447,7 @@ else {
 const nonJuge = [
   ...antecedences,
   "R-5 (pas d'écrasement de version) : invisible statiquement — jugé par revue de diff",
+  "R-7 bis (TF-0902) : LAQUELLE de deux versions cohabitantes est la courante n'est pas jugée — le constat nomme les fichiers et le geste (`git mv` vers `old\\` du même dossier), il ne choisit pas à la place de l'auteur ; deux formats d'un même livrable (`.html` et `.pdf` du même radical) ne sont pas deux versions, l'extension entre dans la clé",
   "R-15 (marqueurs « à fournir » exhaustifs) : l'oracle ne sait pas quelles variables sont tierces",
   "input\\ non jugé en nommage : les entrants humains arrivent tels quels",
   "seule la PRÉSENCE de CLAUDE.md/README est jugée, pas la pertinence de leur contenu",
