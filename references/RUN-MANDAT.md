@@ -78,16 +78,26 @@ MEP — et le run Produit-10 a dû improviser ce que cette page encode désormai
 4. **Juger** — tous les oracles cadrés au pas 2 exécutés, verdicts au ledger ; un FAIL
    se corrige ou se déclare (boucle bornée ≤ 3, G-2 : jamais d'assouplissement).
 5. **Clore** — livrable nommé R-4 dans `output\` (journal d'oracles sous
-   `forge\oracles\` — R-32 pour le HTML), lot `<projet> - RETOURS - AAAAMMJJ<i>.md` +
+   `forge\oracles\` — R-32 pour le HTML).
+   **Toute proposition remise à un humain se remet AUSSI en page HTML autoportante**
+   (TF-0895) — socle `digit-ai-page-html`, R-32 — sauf écart déclaré au ledger avec son
+   motif. Le Markdown est la source, la page est le livrable : *mesuré le 07/09*, un
+   mandat a rendu un rapport, un CSV, deux JSON, trois propositions et deux synthèses
+   toutes jugées PASS, et zéro page ; le destinataire a répondu « aucun fichier HTML n'a
+   été généré […] il doit faire partie intégrante de la proposition », et la page a dû
+   être produite après coup avec trois passes d'oracles.
+   Puis : lot `<projet> - RETOURS - AAAAMMJJ<i>.md` +
    sidecar remis à `<pilot>\input\00-retours\`, `run_close`, synthèse **au format
    `gabarits\RESTITUTION.md`** (8 blocs, horodatée, jugée par `oracle-synthese.mjs`).
 
 ## Ce qui ne s'applique PAS (et ne se singe pas)
 
 - Pas d'`EXIGENCES.json` scellé ni de 4 verbes — le mandat cadre, le ledger trace.
-- Pas d'étape design ni de tokens — sauf si le livrable est une page HTML : alors le
-  socle `digit-ai-page-html` s'applique en entier (charte, G1 clair strict, favicon-lettre,
-  E4, standard H).
+- Pas d'étape design ni de tokens. **Mais la page HTML, elle, n'est pas une option**
+  (TF-0895, pas 5) : toute proposition remise à un humain en porte une, et le socle
+  `digit-ai-page-html` s'y applique alors en entier (charte, G1 clair strict,
+  favicon-lettre, E4, standard H). Ce qui reste facultatif est le TRAVAIL de design,
+  pas le LIVRABLE.
 - Pas de MEP ni de GO production — la remise du livrable EST la fin du run ; le seul
   gate humain est celui que le mandat déclare.
 - Pas de boucle de fermeture forge-tests — les oracles du domaine tiennent ce rôle.

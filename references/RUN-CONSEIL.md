@@ -105,7 +105,12 @@ y trouve*.
    construction et de migration (applications ET bases — plans forge-ops `plan <cible>`
    + oracle O-5 pour les cibles cloud), plan daté par `pilote-de-mission`, chiffrage
    commercial délégué à `digit-ai-propale` s'il y a propale. Jugé par le même oracle.
-5. **Remettre aux forges (C5)** — le contrat d'interface : chaque lot GO sort comme
+5. **Remettre aux forges (C5)** — **toute proposition remise à un humain se remet AUSSI
+   en page HTML autoportante** (TF-0895, socle `digit-ai-page-html`, R-32), sauf écart
+   déclaré au ledger avec son motif : le Markdown est la source, la page est le livrable.
+   Un mandat voisin a rendu le 07/09 huit artefacts jugés PASS et zéro page ; le
+   destinataire l'attendait « partie intégrante de la proposition ». Puis
+   le contrat d'interface : chaque lot GO sort comme
    **entrant de build** — `PROMPT-PRODUIT.md` rempli (nouveau produit) ou brief delta
    d'un run de version (produit existant) — déposé dans le dossier du produit, tracé au
    ledger (`invocation` vers la voie choisie). Le conseil ne construit rien lui-même :
