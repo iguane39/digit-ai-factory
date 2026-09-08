@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=52463db69f42 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T14:40:45.553Z -->
+     sceaux: actifs=0698d5d66676 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T14:44:09.789Z -->
 
-**185 actifs** (candidat 10 · décidé 19 · en cours 6 · corrigé 150 · écarté 0) · **782 archivés**.
+**190 actifs** (candidat 15 · décidé 19 · en cours 6 · corrigé 150 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -86,6 +86,9 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0940 | decide | 6.7 | digit-ai-forge-agents / digit-ai-forge-audit : deux implémentations du schéma de base de données coexistent (renderERD SVG de rapport-engine.mjs et le canevas hybride de digit-ai-schemas) — le rapport d'audit rend l'ANCIENNE, la capture donnée comme modèle est la NOUVELLE | **oui** — le modèle demandé par l'humain n'est pas ce que produit la forge d'audit aujourd'hui |
 | TF-0947 | decide | 6.7 | digit-ai-forge-agents / digit-ai-forge-audit : deux implémentations du schéma de base de données coexistent (renderERD SVG de rapport-engine.mjs et le canevas hybride de digit-ai-schemas) — le rapport d'audit rend l'ANCIENNE, la capture donnée comme modèle est la NOUVELLE | **oui** — le modèle demandé par l'humain n'est pas ce que produit la forge d'audit aujourd'hui |
 | TF-0952 | decide | 6.7 | digit-ai-page-html : le socle n'a pas de composant de TABLEAU ARBORESCENT — une hiérarchie rendue en tableau reste une liste indentée, sans pliage, et le lecteur reçoit 296 lignes d'un coup | **oui** — un retour humain nommant un composant externe ; composant réécrit chez le produit |
+| TF-0969 | candidat | 20 | digit-ai-page-html : la regle L30 de check_html.py cherche les termes de son referentiel en SOUS-CHAINE — gate est trouve dans aggregate_type et le chapitre est accuse d'employer un terme absent | **oui** — quatre gloses d'un terme absent ecrites dans un seul produit pour satisfaire le controle ; un passage FAIL sans defaut reel |
+| TF-0968 | candidat | 12.5 | digit-ai-page-html : la sonde V15 de render_page.py rend FAIL par ARITHMETIQUE sur tout tableau dont la hauteur tombe dans une bande, sans qu'aucun collant ne masque quoi que ce soit | **oui** — gate R-32 non prononcable vert sur une page par ailleurs conforme ; trois constats declares au journal, et les memes trois constats sur une page deja livree |
+| TF-0970 | candidat | 12.5 | digit-ai-page-html : kpi-filter.js applique l'attribut de la carte ACTIVE a TOUS les tableaux du perimetre — cliquer une carte d'un tableau vide les autres tableaux a cartes, sans un mot au lecteur | **oui** — un tableau de 160 lignes vide sans explication dans une page remise a un destinataire ; decouvert par la mesure, aucun oracle ne le voit |
 | TF-0899 | corrige | 25 | digit-ai-forge-agents (digit-ai-page-html) : table-filters.js pose « position: relative » en ligne sur chaque th filtrable et écrase le « sticky » de L29 — le « top: var(--hh) » devient un décalage permanent de 104 px, l'en-tête de tableau se pose sur ses deux premières lignes | **oui** — un tour humain, page régénérée sous un indice neuf, cinq oracles rejoués, mesure au navigateur écrite par le produit |
 | TF-0900 | corrige | 20 | digit-ai-forge-agents (digit-ai-page-html) : « .table-hote { overflow-x: auto } » du boilerplate fait du conteneur la zone de défilement du thead collé — l'en-tête se fige sous le haut du tableau (+67 px au repos), jamais sous l'en-tête de page | **oui** — même tour humain que RA-2 ; quatre tableaux sur huit concernés par cette seule cause |
 | TF-0896 | corrige | 15 | digit-ai-forge-agents (digit-ai-page-html) : le boilerplate cite la balise « <style> » en toutes lettres dans un commentaire HTML avant la vraie balise — un générateur qui extrait le style par première occurrence embarque le commentaire, Chromium ne lit qu'une règle CSS et les oracles mesurent des symptômes sans lien avec la cause | **oui** — trois passes complètes de check_html + render_page sur une page de 188 Ko avant de trouver une cause d'une ligne |
@@ -146,6 +149,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0972 | candidat | 10 | forge-data : la resolution des references d'un langage de calcul n'a aucun contrat — casse et references non qualifiees font perdre des colonnes en SILENCE | **oui** — trois colonnes perdues et trois colonnes faussement declarees inutilisees, sans aucune erreur affichee ; decouvert par un audit manuel des references non resolues |
+| TF-0971 | candidat | 6.3 | forge-data : aucun oracle ni outil ne mesure l'USAGE REEL d'un modele de restitution — la couverture se mesure contre le MODELE, jamais contre ce qui est a l'ECRAN | **oui** — quatre outils ecrits chez le producteur ; une dette annoncee a 38 colonnes dont 18 sont inutiles au rapport |
 | TF-0893 | corrige | 10 | digit-ai-forge-data : traduire-unity-catalog ne lit que l'export des system tables — sur un workspace réel system.access est refusé (SQLSTATE 42501) alors que l'API REST lineage-tracking répond | **oui** — lineage de 30 tables transcrit à la main depuis des réponses d'API |
 | TF-0936 | corrige | 10 | digit-ai-forge-data : le vocabulaire dit « grain » (modele-dimensionnel@1, oracle-modeliser, gabarits, commentaires DDL) ; le destinataire lit « granularité » | **oui** — un retour humain ; 33 substitutions et une table d'accords |
 | TF-0942 | corrige | 10 | digit-ai-forge-data : la projection d'évolutions par couche (proposée en RD-5) rend une liste PLATE — la hiérarchie schéma › table › colonne est perdue, le statut n'existe qu'à la ligne la plus fine, un schéma n'apparaît nulle part comme objet | **oui** — un retour humain le lendemain de la livraison de la projection |
