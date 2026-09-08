@@ -15,7 +15,7 @@ Votre retour portait juste, et il désigne un trou réel du dispositif. Pendant 
 
 ## 2. Verdict en une ligne
 
-7 campagnes sur 7 rendues et sondées ; 36 items clos en corrigé et 3 laissés en cours avec leur reste nommé ; registre PASS, 90 corrigés contre 57 ce matin ; 12 candidatures nées des rapports ; vérifications rejouées par le pilot et non recopiées : forge-ops 100 PASS, forge-data 166 PASS, forge-design 117 règles verrouillées, forge-tests suite complète verte, socle des pages 208 cas, pilot 97 recettes sur 97 ; portes de publication vertes sur les 4 dépôts sondés ; défaut de format corrigé, recette du juge 13 → 16 cas, gabarit et ses trois porteurs montés en 2.18.0, oracle des empreintes remis à PASS ; 0 publication, 30 commits locaux répartis sur 7 dépôts.
+7 campagnes sur 7 rendues et sondées ; 36 items clos en corrigé et 3 laissés en cours avec leur reste nommé ; registre PASS, 91 items clos contre 57 ce matin ; 12 candidatures nées des rapports et 5 de plus par un lot arrivé en fin de mandat ; vérifications rejouées par le pilot et non recopiées : forge-ops 100 PASS, forge-data 166 PASS, forge-design 117 règles verrouillées, forge-tests suite complète verte, socle des pages 208 cas, pilot 97 recettes sur 97 ; portes de publication vertes sur les 4 dépôts sondés ; défaut de format corrigé, recette du juge 13 → 16 cas, gabarit et ses trois porteurs montés en 2.18.0, oracle des empreintes remis à PASS ; 0 publication, 30 commits locaux répartis sur 7 dépôts.
 
 ## 3. Décisions attendues de l'humain
 
@@ -81,6 +81,8 @@ Quatre décisions, toutes des gestes que la doctrine réserve à l'humain : publ
   - preuve : `journaliser.mjs` → « 16 événement(s) journalisé(s) » puis « 20 événement(s) » ; `oracle-todo.mjs` → PASS ; comptes du registre : 90 items clos, 36 candidats, 5 décidés, 4 en cours.
 - Douze candidatures nées des rapports, dont la cause première de la suite de tests muette pendant dix-huit jours : l'anonymiseur remplace un nom à l'intérieur d'un identifiant de code, et c'est au pilot que ça se corrige — classe : une pseudonymisation qui écrit à l'intérieur d'un jeton de code au lieu de s'arrêter à sa frontière.
   - preuve : `journaliser.mjs` → « 3 événement(s) » puis « 9 événement(s) » ; `oracle-todo.mjs` → PASS.
+- Un lot de retours arrivé pendant la campagne a été ingéré et pseudonymisé avant restitution, l'avance du distant fusionnée en local sans rebase pour ne pas fausser les empreintes citées au registre. Contrôle rouge → vert : l'anonymiseur a de nouveau nommé le lot par l'alias court d'un autre produit → renommé et réécrit au pseudonyme du nom complet, 0 occurrence de l'alias, 0 nom réel sur 65 testés dans le lot, dans l'index et dans le registre ; classe : l'alias le plus court apparié avant le nom complet, journalisée ce matin et reproduite en direct.
+  - preuve : `ingerer-lot.mjs` → « [OK] 5 candidature(s) ingérée(s) en CANDIDAT (lot e252a9ae3f6f) » ; `git merge origin/main` → 8 conflits résolus, registre fusionné sans perte (513 lignes, 56 locales et 3 du distant) ; `oracle-todo.mjs` → PASS après fusion et après ingestion.
 - Catalogue de services complété pour la forge des données. Contrôle rouge → vert : le point d'entrée d'un service affichait un mot amputé de sa première lettre dans le fichier de lecture généré, une tabulation ayant été écrite à la place de la séquence d'échappement → compte des tabulations 1 → 0, format de ligne validé ; classe : séquence d'échappement prise pour un antislash.
   - preuve : « {"cat_dat_07_maj":1,"ajoutees":["cat-dat-12","cat-dat-13"],"lignes":92} » ; « jsonl valide » ; `generer-vues.mjs` → deux fichiers régénérés.
 - Site de scellement né de la campagne design déclaré au registre des empreintes. Contrôle rouge → vert : l'oracle des empreintes rendait FAIL sur le parc depuis 08:31 → PASS après déclaration ; classe : un mécanisme de scellement naît sans rejoindre la table.
@@ -93,6 +95,7 @@ Quatre décisions, toutes des gestes que la doctrine réserve à l'humain : publ
 - Fusion des tables de pseudonymisation : attend votre lecture des six lignes déposées dans le canal privé.
 - Les trois items laissés en cours : un diagnostic dont la correction vit chez le socle des pages, et deux paliers de stratégie de tests dont la condition de clôture exige une campagne sur un produit réel, que la recette a refusé de déclarer tenue sur un banc.
 - Les six volets d'oracle proposés par les items du pilot et non livrés par sa campagne : journalisés en candidature plutôt que bâclés, parce que cinq vivent dans le même juge et que la doctrine interdit de le faire monter deux fois dans la même session.
+- Les cinq candidatures du lot arrivé en fin de mandat : entrées au registre en candidat, non décidées, parce qu'une candidature ne se décide pas seule.
 - Le lot du 03/09 non suivi, le fichier parasite à la racine du parc, les deux réserves du 01/09 : inchangés.
 
 ## 6. Écarts à la lettre
