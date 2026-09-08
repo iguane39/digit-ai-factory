@@ -103,6 +103,32 @@ function ignores() {
 const IGNORES = ignores();
 const estIgnore = (rel) => IGNORES.has(rel) || [...IGNORES].some((i) => i.endsWith("/") && rel.startsWith(i));
 
+// UN INDEX SUIVI NE PORTE PAS LE NOM D'UN FICHIER QUE LE DÉPÔT NE PORTE PAS (TF-0914, 08/09/2026).
+//
+// Le fait mesuré le 08/09 : un lot déposé dans `input\00-retours\` par un produit dont le nom réel
+// n'est PAS connu du canal confidentiel est resté NON SUIVI le temps d'un arbitrage. La
+// pseudonymisation de fin de chaîne (D-37, plus bas) n'y pouvait rien : elle ne substitue que ce
+// que la table connaît, et ce nom-là lui était inconnu. Ce hook a donc écrit le nom RÉEL du produit
+// dans le README d'index — qui, lui, EST suivi et publié. La porte de publication a refusé le push
+// (C5) et le README a été régénéré après retrait ; la porte a fait son office, mais l'index
+// n'aurait jamais dû porter ce nom.
+//
+// La règle qui supprime la classe entière, et pas seulement ce cas : ce qui n'est pas dans
+// l'histoire du dépôt n'entre pas dans une projection que le dépôt publie. C'est la même loi que
+// la mention des dossiers machine retirée par TF-0615 — « une projection commitée ne parle que de
+// ce que le dépôt porte » — appliquée cette fois aux fichiers non suivis, et pas seulement aux
+// fichiers ignorés. Le CHIFFRE, lui, se dit (loi n° 3 : jamais par omission) : le pied de table
+// annonce combien de fichiers non suivis ont été tenus hors de l'index.
+function suivis() {
+  const r = spawnSync("git", ["-C", BASE, "-c", "core.quotepath=false", "ls-files", "--", ...RACINES], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  return new Set(r.status === 0 ? r.stdout.split(/\r?\n/).filter(Boolean) : []);
+}
+const SUIVIS = suivis();
+// Hors dépôt git (`ls-files` muet), on ne cache rien : un relevé vide ferait disparaître TOUT le
+// contenu de l'index, ce qui est un dégât bien pire que le défaut qu'on prévient.
+const HORS_DEPOT = SUIVIS.size === 0;
+const estSuivi = (rel) => HORS_DEPOT || SUIVIS.has(rel);
+
 function taille(o) {
   if (o < 1024) return `${o} o`;
   if (o < 1024 * 1024) return `${(o / 1024).toFixed(1).replace(".", ",")} Ko`;
@@ -127,7 +153,10 @@ function compter(dir) {
   let fichiers = 0;
   for (const e of readdirSync(dir, { withFileTypes: true })) {
     if (EST_MACHINE(e.name)) continue;
-    if (e.isDirectory()) fichiers += compter(join(dir, e.name)); else if (e.name !== "README.md" && !EST_SIDECAR(e.name)) fichiers++;
+    // TF-0914 : le compte ne porte que ce que le dépôt porte — sinon la table dirait « 95 » là où
+    // un clone en voit 94, et le README rebasculerait à chaque régénération sur un autre poste.
+    if (e.isDirectory()) fichiers += compter(join(dir, e.name));
+    else if (e.name !== "README.md" && !EST_SIDECAR(e.name) && estSuivi(posix(relative(BASE, join(dir, e.name))))) fichiers++;
   }
   return fichiers;
 }
@@ -142,8 +171,12 @@ function roleExistant(readme) {
 }
 
 function attendu(dir, rel) {
-  const entrees = readdirSync(dir, { withFileTypes: true })
-    .filter((e) => !EST_MACHINE(e.name) && !EST_SIDECAR(e.name) && e.name !== "README.md" && !estIgnore(rel + "/" + e.name))
+  const visibles = readdirSync(dir, { withFileTypes: true })
+    .filter((e) => !EST_MACHINE(e.name) && !EST_SIDECAR(e.name) && e.name !== "README.md" && !estIgnore(rel + "/" + e.name));
+  // TF-0914 : un fichier NON SUIVI par git ne donne pas son nom à un index suivi et publié.
+  const nonSuivis = visibles.filter((e) => !e.isDirectory() && !estSuivi(rel + "/" + e.name)).length;
+  const entrees = visibles
+    .filter((e) => e.isDirectory() || estSuivi(rel + "/" + e.name))
     .sort((x, y) => (x.isDirectory() === y.isDirectory() ? x.name.localeCompare(y.name, "fr") : x.isDirectory() ? -1 : 1));
   const caches = readdirSync(dir, { withFileTypes: true }).filter((e) => EST_MACHINE(e.name) && e.isDirectory()).map((e) => e.name);
   const role = roleExistant(join(dir, "README.md")) || ROLES[rel] || PLACEHOLDER;
@@ -181,6 +214,9 @@ function attendu(dir, rel) {
   }
   if (!entrees.length) lignes.push("| _(dossier vide)_ | | | |");
   const notes = [`_${nf} fichier(s), ${nd} sous-dossier(s)_`];
+  // Le chiffre se DIT (loi n° 3) : un index qui tait ce qu'il a écarté se lit comme un index
+  // complet, et c'est exactement l'illusion contre laquelle TF-0914 a été payé.
+  if (nonSuivis) notes.push(`${nonSuivis} fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)`);
   // TF-0615 : les dossiers MACHINE ne sont PLUS mentionnés. Ils sont ignorés par git, donc ils ne
   // voyagent pas : la version commitée affirmait la présence de `_oracles\` dans un dossier où il
   // n'existe que sur le poste dont un hook l'a créé. Toute autre machine qui régénère retirait la

@@ -181,6 +181,35 @@ try {
     att((etat.motifs_absents || []).includes("node_modules/"), "le motif commenté n'est pas signalé absent");
   });
 
+  // ── TF-0882 : un motif COUVERT PAR PLUS LARGE est TENU ────────────────────────────────────
+  // Mesuré le 06/09 chez un produit ancien : `*.oracles*.json` et `*.oracles*.jsonl` couvraient
+  // strictement les trois motifs de sidecars exigés, comptés « 3 absents sur 6 » ; trois lignes
+  // redondantes ont été écrites à côté des deux qui faisaient le travail.
+  const ARTEFACT_SIDECARS = {
+    cible: ".gitignore", source: "gabarits/gitignore-produit", mode: "presence_et_motifs",
+    motifs_exiges: ["*.oracles.json", "*.oracles-cache.json", "*.oracles-historique.jsonl", "!forge/**"],
+  };
+
+  check("TF-0882 — trois graphies exactes COUVERTES par deux motifs plus larges → PRESENT, aucune ligne redondante à écrire", () => {
+    const produit = join(T, "_ClientIgnoreLarge");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    writeFileSync(join(produit, ".gitignore"), "*.oracles*.json\n*.oracles*.jsonl\n!forge/**\n", "utf8");
+    const etat = etatArtefact(produit, ARTEFACT_SIDECARS, pilot);
+    att(etat.etat === "present", `état « ${etat.etat} » : ${JSON.stringify(etat.motifs_absents)} — une protection équivalente est comptée absente`);
+  });
+
+  check("TF-0882 borne — un motif que RIEN ne couvre reste absent, et une NÉGATION exige sa graphie exacte", () => {
+    const produit = join(T, "_ClientIgnoreLargePartiel");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    // `*.oracles*.json` couvre les deux graphies `.json`, rien ne couvre le `.jsonl`, et la
+    // négation ne se couvre jamais : dans un `.gitignore`, c'est l'ORDRE qui décide (TF-0850).
+    writeFileSync(join(produit, ".gitignore"), "*.oracles*.json\n", "utf8");
+    const etat = etatArtefact(produit, ARTEFACT_SIDECARS, pilot);
+    att(etat.etat === "incomplet", `état « ${etat.etat} » au lieu de incomplet`);
+    att((etat.motifs_absents || []).join(",") === "*.oracles-historique.jsonl,!forge/**",
+      `les absents attendus sont le .jsonl et la négation : ${JSON.stringify(etat.motifs_absents)}`);
+  });
+
   check("BORNE — les dossiers d'archives et de dépendances ne sont JAMAIS fouillés", () => {
     // Sans cette borne, un `robots.txt` traînant dans `node_modules` ou `old/` ferait passer le
     // produit pour « hors racine » — un vert obtenu sur une copie de quelque chose.

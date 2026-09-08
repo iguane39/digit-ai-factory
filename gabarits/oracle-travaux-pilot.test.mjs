@@ -171,5 +171,30 @@ check("T6 vert — un lot qui ne nomme aucun producteur n'a rien à lire", () =>
   att(/rien à lire/.test(r.constats.find((x) => x.regle === "T6").message), "le constat ne dit pas qu'il n'y avait rien à lire");
 });
 
+// ── T6 (TF-0888) : le NOM « porte » n'est pas le VERBE « porter », et une OPTION n'est pas un
+// module. Mesuré le 08/09 en déposant un lot chez la forge des outils : la phrase ci-dessous a
+// été refusée pour un module producteur imaginaire, et le lot a dû être reformulé. ────────────
+const ELEMENT_PORTE = `### TF-0887 — une porte muette · gravité majeur
+
+- **Le fait**, mesuré le 08/09/2026 : la porte de publication ne dit rien quand elle laisse passer.
+- **Pourquoi cela vous concerne** : une porte muette par défaut se contourne par \`--no-verify\`.
+- **Ce qui est demandé** : que la porte DISE ce qu'elle a laissé passer.
+- **Effort estimé** : simple × court
+- **Comment vous saurez que c'est fait** : la sortie porte le compte des fichiers examinés.
+- **Si ce n'est pas fait** : le contournement reste indiscernable du cas nominal.`;
+
+check("T6 vert (TF-0888) — le NOM « porte » suivi d'une OPTION ne fait pas un module producteur", () => {
+  const r = verifier(LOT({ elements: [ELEMENT_PORTE] }));
+  att(!echoue(r, "T6"), "un lot qui nomme la porte de publication et une option a été refusé pour un module imaginaire");
+  const c = r.constats.find((x) => x.regle === "T6");
+  att(!/--no-verify/.test(c.message), "l'option est encore comptée comme un module producteur : " + c.message.slice(0, 80));
+});
+
+check("T6 rouge (TF-0888) — la FORME VERBALE « portée … par `<module>` » reste refusée sans lecture déclarée", () => {
+  const r = verifier(LOT({ elements: [ELEMENT_PRODUCTEUR] }));
+  att(echoue(r, "T6"), "le durcissement du motif a désarmé la règle : « portée dans la vue par `derive-les-vues` » n'est plus vue");
+  att(/derive-les-vues/.test(r.constats.find((x) => x.regle === "T6").message), "le module porté dans la vue n'est plus nommé");
+});
+
 console.log(`\noracle-travaux-pilot (TF-0627) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

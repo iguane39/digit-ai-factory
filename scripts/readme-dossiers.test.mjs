@@ -128,6 +128,37 @@ check("`--strict` a disparu sans casser l'appel : le drapeau est ignoré, le ver
   if (sans.status !== 0) throw new Error(`exit ${sans.status} attendu 0`);
 });
 
+// ---- TF-0914 : UN INDEX SUIVI NE PORTE PAS LE NOM D'UN FICHIER QUE LE DÉPÔT NE PORTE PAS -----
+//
+// Le 08/09, un lot déposé par un produit dont le nom réel n'est PAS connu du canal confidentiel
+// est resté non suivi le temps d'un arbitrage ; le hook a écrit ce nom dans l'index, qui est
+// suivi et publié. La pseudonymisation ne pouvait rien : elle ne substitue que ce qu'elle
+// connaît. La règle qui supprime la classe : hors de l'histoire du dépôt, hors de l'index.
+//
+// LES DEUX SENS, sur le même dossier et dans le même état de départ :
+//   · non suivi  → ABSENT de la table, et son NOMBRE dit au pied (jamais par omission) ;
+//   · suivi      → PRÉSENT, dès le commit qui le versionne et sans autre geste.
+const NOM_NON_SUIVI = "Client-X_Reporting - RETOURS - 20260908z.md";
+writeFileSync(join(T, "input", NOM_NON_SUIVI), "# Retours d un produit dont le nom n est pas au canal\n", "utf8");
+lancer();
+
+check("TF-0914 : un fichier NON SUIVI n'entre pas dans l'index, et le pied DIT combien ont été écartés", () => {
+  const t = readFileSync(README, "utf8");
+  if (t.includes(NOM_NON_SUIVI)) throw new Error("le nom d'un fichier non suivi est écrit dans un index suivi et publié");
+  if (!/1 fichier\(s\) présent\(s\) sur le poste et NON suivi\(s\) par git/.test(t))
+    throw new Error("l'index tait ce qu'il a écarté — un index muet se lit comme un index complet (loi n° 3)");
+});
+
+check("TF-0914 : le MÊME fichier, une fois COMMIS, entre dans l'index sans autre geste", () => {
+  git("add", "-A");
+  const c = git("commit", "-q", "-m", "recette : versionner le lot");
+  if (c.status !== 0) throw new Error(`commit de recette en échec : ${(c.stderr || "").slice(0, 150)}`);
+  lancer();
+  const t = readFileSync(README, "utf8");
+  if (!t.includes(NOM_NON_SUIVI)) throw new Error("un fichier SUIVI reste absent de l'index — la règle a mordu trop large");
+  if (/NON suivi\(s\) par git/.test(t)) throw new Error("le pied annonce encore un écart alors qu'il n'y en a plus");
+});
+
 rmSync(T, { recursive: true, force: true });
 console.log(`\nreadme-dossiers, table sans dates (TF-0503) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

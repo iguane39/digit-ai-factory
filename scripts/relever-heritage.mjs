@@ -135,6 +135,48 @@ export function racineWebDeclaree(dossierProduit) {
   return rel && rel !== "." ? rel : null;
 }
 
+/**
+ * TF-0882 — UN MOTIF D'EXCLUSION COUVERT PAR PLUS LARGE EST TENU.
+ *
+ * Un motif exigé (`*.oracles.json`) est TENU si une autre ligne du fichier, prise comme glob,
+ * attrape tout ce qu'il attrape (`*.oracles*.json`). La couverture se prouve par TÉMOINS : on
+ * fabrique depuis le motif exigé quelques chemins qu'il désigne — l'étoile valant rien, un mot,
+ * puis un mot composé — et la ligne candidate doit les attraper TOUS. Un témoin qui échappe suffit
+ * à refuser : mieux vaut demander une ligne de trop que déclarer protégé ce qui ne l'est pas.
+ *
+ * DEUX BORNES, chacune contre un dégât précis :
+ *   · une NÉGATION (`!forge/**`) ne se couvre jamais : dans un `.gitignore`, c'est l'ORDRE des
+ *     lignes qui décide du résultat, pas leur présence (leçon TF-0850 : insérer trois graphies
+ *     APRÈS `!forge/**` aurait ré-ignoré onze fichiers que le dépôt portait déjà) ;
+ *   · une ligne de NÉGATION ne couvre rien non plus — elle ré-inclut, elle n'exclut pas.
+ *
+ * Un motif à barre oblique finale (`.venv/`) est aussi cherché sans elle : dans un `.gitignore`,
+ * `.venv` couvre le dossier comme le fichier.
+ */
+const globVersRegex = (glob) => {
+  let re = "";
+  for (let i = 0; i < glob.length; i++) {
+    const c = glob[i];
+    if (c === "*") { if (glob[i + 1] === "*") { re += ".*"; i++; } else re += "[^/]*"; }
+    else if (c === "?") re += "[^/]";
+    else re += c.replace(/[.+^${}()|[\]\\]/g, "\\$&");
+  }
+  return new RegExp(`^${re}$`);
+};
+const temoinsDe = (motif) => [...new Set(["", "a", "a-b"].map((jeton) => motif.replace(/\*+/g, jeton)))];
+export function estCouvertParPlusLarge(motif, lignes) {
+  if (motif.startsWith("!")) return false;
+  const familles = [temoinsDe(motif)];
+  if (motif.endsWith("/")) familles.push(temoinsDe(motif.slice(0, -1)));
+  for (const ligne of lignes) {
+    if (ligne.startsWith("!") || ligne === motif) continue;
+    let re;
+    try { re = globVersRegex(ligne); } catch { continue; }
+    if (familles.some((temoins) => temoins.every((t) => re.test(t)))) return true;
+  }
+  return false;
+}
+
 /** L'état d'UN artefact chez UN produit : absent, présent-divergent, ou conforme. */
 export function etatArtefact(dossierProduit, artefact, racinePilot) {
   let cible = join(dossierProduit, String(artefact.cible).replaceAll("/", "\\"));
@@ -187,7 +229,14 @@ export function etatArtefact(dossierProduit, artefact, racinePilot) {
   if (artefact.mode === "presence_et_motifs") {
     const lignes = new Set(readFileSync(cible, "utf8").split(/\r?\n/)
       .map((l) => l.trim()).filter((l) => l && !l.startsWith("#")));
-    const absents = (artefact.motifs_exiges || []).filter((m) => !lignes.has(m));
+    // TF-0882 (08/09/2026) — UN MOTIF EST TENU S'IL EST PRÉSENT **OU COUVERT PAR PLUS LARGE**.
+    // Le contrôle comparait des lignes NUES, à l'exacte graphie. Mesuré le 06/09 chez un produit
+    // ancien : `*.oracles*.json` et `*.oracles*.jsonl` couvraient STRICTEMENT les trois motifs de
+    // sidecars exigés, comptés « 3 absents sur 6 » ; la mise en conformité a donc écrit trois
+    // lignes redondantes à côté des deux qui faisaient déjà le travail. `HERITAGE.json` pose
+    // pourtant le raisonnement INVERSE pour `.env` — « exiger une graphie exacte ferait crier sur
+    // une protection équivalente » : le relevé contredisait la règle qu'il applique ailleurs.
+    const absents = (artefact.motifs_exiges || []).filter((m) => !lignes.has(m) && !estCouvertParPlusLarge(m, lignes));
     return absents.length ? { etat: "incomplet", motifs_absents: absents } : { etat: "present" };
   }
   if (artefact.mode !== "copie_conforme") return sousRacineWeb ? { etat: "present", sous_racine_web: sousRacineWeb } : { etat: "present" };

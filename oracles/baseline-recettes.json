@@ -27,8 +27,8 @@
   "vu_le": "2026-08-26"
  },
  "gabarits/oracle-travaux-pilot.test.mjs": {
-  "cas": 18,
-  "vu_le": "2026-09-05"
+  "cas": 20,
+  "vu_le": "2026-09-08"
  },
  "hook-lexique.mjs": {
   "cas": 7,
@@ -68,7 +68,7 @@
   "vu_le": "2026-09-03"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 58,
+  "cas": 62,
   "vu_le": "2026-09-08"
  },
  "oracle-constantes-externes.mjs": {
@@ -226,6 +226,10 @@
   "cas": 4,
   "vu_le": "2026-09-03"
  },
+ "oracles/hook-ouverture.test.mjs": {
+  "cas": 5,
+  "vu_le": "2026-09-08"
+ },
  "oracles/hook-restitution-selection.test.mjs": {
   "cas": 4,
   "vu_le": "2026-09-02"
@@ -283,8 +287,8 @@
   "vu_le": "2026-09-08"
  },
  "scripts/readme-dossiers.test.mjs": {
-  "cas": 7,
-  "vu_le": "2026-08-26"
+  "cas": 9,
+  "vu_le": "2026-09-08"
  },
  "scripts/rebatir-clone.test.mjs": {
   "cas": 5,
@@ -299,8 +303,8 @@
   "vu_le": "2026-09-03"
  },
  "scripts/relever-heritage.test.mjs": {
-  "cas": 23,
-  "vu_le": "2026-09-03"
+  "cas": 25,
+  "vu_le": "2026-09-08"
  },
  "scripts/verifier-bascule.test.mjs": {
   "cas": 8,

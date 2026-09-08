@@ -89,7 +89,20 @@ const ORDRE_JUSTIFIE = /(parce\s+qu|car\b|d['’]abord|priorit|impact|risque|d[�
 const AUCUN_DEJA_FAIT = /rien\s+n['’]a\s+[ée]t[ée]\s+corrig[ée]\s+au\s+pilot|aucun\s+travail\s+pr[ée]alable/i;
 const AUCUNE_BORNE = /aucune\s+borne|rien\s+n['’]est\s+[ée]cart[ée]\s+de\s+ce\s+lot/i;
 //: T6 — un module PRODUCTEUR nommé dans « ce qui est demandé » : « transcrit … par `x` », « produit par `x` »…
-const PRODUCTEUR_NOMME = /(?:transcri|produi|[ée]cri|d[ée]riv|g[ée]n[ée]r|port|r[ée]g[ée]n[ée]r)[a-zéèê]*\s+(?:[^`\n]{0,60}?\s)?par\s+`([^`\n]+)`/gi;
+//
+// TF-0888 (08/09/2026) — LE NOM « PORTE » N'EST PAS LE VERBE « PORTER ». Le motif acceptait tout
+// mot commençant par « port » (`port` + `[a-zéèê]*`) : le NOM commun « porte » — la porte de
+// publication, celle que la doctrine du pilot nomme dix fois — déclenchait donc la règle. Mesuré
+// le 08/09 en déposant un lot chez la forge des outils : la phrase « une porte muette par défaut
+// se contourne par `--no-verify` » a été refusée pour un module producteur imaginaire, et le lot
+// a dû être reformulé au lieu d'être corrigé. Deux bornes, chacune contre une moitié du défaut :
+//   · les FORMES VERBALES seulement — « porté », « portée », « portés », « portées » (participe
+//     passé, au sens de « porté dans une vue par … »), jamais « porte » ni « portes » ;
+//   · le complément doit être un NOM DE MODULE : une option de ligne de commande commence par un
+//     tiret (`--no-verify`), et une option n'a jamais produit d'artefact.
+const PRODUCTEUR_NOMME = /(?:(?:transcri|produi|[ée]cri|d[ée]riv|g[ée]n[ée]r|r[ée]g[ée]n[ée]r)[a-zéèê]*|porté(?:e?s)?)\s+(?:[^`\n]{0,60}?\s)?par\s+`([^`\n]+)`/gi;
+//: T6 (TF-0888) — un complément qui commence par un tiret est une OPTION, jamais un module.
+const EST_OPTION = (jeton) => /^-/.test(jeton.trim());
 //: T6 — la lecture déclarée du producteur : « **Module producteur lu** : `x` … » (une ligne par module).
 const LECTURE_PRODUCTEUR = /module\s+producteur\s+lu[^\n]*?`([^`\n]+)`/gi;
 
@@ -203,6 +216,7 @@ export function verifier(cheminOuTexte, nomFichier) {
     PRODUCTEUR_NOMME.lastIndex = 0;
     for (let p; (p = PRODUCTEUR_NOMME.exec(e.corps)) !== null;) {
       const module = p[1].trim();
+      if (EST_OPTION(module)) continue;   // TF-0888 : `--no-verify` n'est pas un producteur
       if (!lus.has(module.toLowerCase())) nonLus.push(`${e.id} → \`${module}\``);
     }
   }
