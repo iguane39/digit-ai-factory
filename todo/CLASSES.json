@@ -806,6 +806,21 @@
     "compte-total-hors-canal-des-constats",
     "fixture-jugee-par-son-seul-oracle"
    ]
+  },
+  {
+   "cle": "marque-de-propriete-devinee-par-sous-chaine",
+   "famille": "hook-ou-gate",
+   "libelle": "Un outil qui POSE un artefact partage (hameçon, fichier de configuration, entree de manifeste) reconnait << le sien >> en cherchant une SOUS-CHAINE — typiquement le nom de son propre script — dans ce qui occupe deja la place. Le garde-fou anti-ecrasement ne tient alors qu'a l'improbabilite que le fichier d'autrui contienne ce fragment : le jour ou il le contient, l'outil croit reconnaitre son ouvrage et ECRASE EN SILENCE le travail d'un tiers, en affichant << repose >>. Le defaut ne se voit dans aucune recette qui pose et repose SES propres artefacts ; il ne se voit que dans un cas ou l'occupant etranger ressemble au sien",
+   "creee_le": "2026-09-08",
+   "fondee_par": [
+    "TF-0994"
+   ],
+   "regle": "un outil qui pose un artefact partage y ecrit une SIGNATURE explicite — une ligne dediee, de forme qui ne peut pas apparaitre par accident, portant son nom ET sa version — et ne reconnait sa propriete que par cette ligne, jamais par un nom de fichier ni par un fragment de commande",
+   "oracle": "a creer : une fixture ou l'occupant ETRANGER contient le nom du script de l'outil — il doit etre classe CONFLIT et laisse intact ; sa jumelle porte la signature et doit etre reposee",
+   "voisines": [
+    "controle-sans-fixture-double-sens",
+    "regle-balaie-prose-et-identifiants"
+   ]
   }
  ]
 }
