@@ -48,7 +48,7 @@ Deux temps, séparés pour ne pas maquiller le second en premier :
    invariant **I2** : tout `*.test.mjs` du dépôt est joué. Un test vert que rien ne lance
    n'était pas un garde-fou ;
 2. **fait le 18/08 aussi, après instruction** — l'intégration réelle, sous la forme que
-   l'étude `output-etudes60818-etude-opportunite-cablage-orchestrer-boucle.md` a retenue
+   l'étude `output\03-etudes\20260818-etude-opportunite-cablage-orchestrer-boucle.md` a retenue
    (verdict **O3**, candidature TF-0360). Voir la section suivante.
 
 ## Le câblage réel, et la frontière qu'il tient (TF-0360, 18/08)

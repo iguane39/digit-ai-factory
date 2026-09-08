@@ -123,7 +123,7 @@ le backlog, chaque forge vérifiée par sa recette native puis rejouée par l'or
 
 ## 08/08/2026 (soir) — Revue stratégique de l'écosystème (audit delta, 8 périmètres)
 
-Rapport : `output-revues-et-propositions\Digit-AI - Revue Forge - Écosystème - 20260808a.md` — santé re-exécutée 8/8
+Rapport : `output\01-revues-et-propositions\Digit-AI - Revue Forge - Écosystème - 20260808a.md` — santé re-exécutée 8/8
 (sauf self-test quality-oracles : 3 échecs repo / 6 installation), modèle de scorage durable
 (GAIN×PREUVE÷EFFORT), test d'admission des nouvelles forges. **Top 10 scoré au rapport** —
 têtes : trancher le statut du conductor (10,0), RT-13 (8,0), régression CRLF SKILL.md (6,0),

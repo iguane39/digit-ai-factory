@@ -250,6 +250,16 @@ const ETAT_DU_PARC = [
     remede: "remplir l'instance manquante, ou corriger la règle nommée par check_html (souvent L21, composant déclaré sans style)",
   },
   {
+    // TF-0922 (08/09) : un caractère de contrôle né d'un antislash de chemin Windows interprété
+    // (`scripts\v…` → 0x0B) est INVISIBLE à la lecture et rend le fichier binaire pour une
+    // recherche textuelle. Six fichiers suivis en portaient un, dont quatre pièces de doctrine de
+    // premier rang, présents depuis des commits antérieurs et vus par personne. C'est un état du
+    // PARC : le défaut naît d'une ÉCRITURE, jamais d'un artefact qu'on passerait à un oracle.
+    nom: "oracle-caracteres-controle.mjs",
+    motif: "caractère de contrôle dans un fichier texte versionné (antislash de chemin interprété)",
+    remede: "rétablir l'antislash littéral à la ligne nommée, et écrire les contenus accentués par un outil d'édition plutôt que par une redirection de shell",
+  },
+  {
     // R-44 (20/08) : un README par dossier d'input\ et output\, présent, à jour, rédigé.
     nom: "oracle-readme-dossiers.mjs",
     motif: "README d'input\\ et output\\ absents, périmés ou non rédigés",

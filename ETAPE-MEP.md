@@ -128,7 +128,7 @@ Trois règles en sortent, et la troisième est celle qui manquait partout :
    procédure de secours non testée à la lecture n'existe pas.* C'est le même geste que M-4 exige
    pour l'EXÉCUTION, appliqué à la LISIBILITÉ.
 
-**Et c'est CÂBLÉ, pas recommandé** : `node scriptserifier-secours.mjs <fichier>` relit un
+**Et c'est CÂBLÉ, pas recommandé** : `node scripts\verifier-secours.mjs <fichier>` relit un
 `ROLLBACK.md`, ou une sortie de journal par `--stdin`, et REFUSE toute valeur masquée (`***`,
 `[REDACTED]`, `[MASKED]`…) ou toute option sans valeur **dans une ligne de commande**. Ce dernier
 point est la frontière qui rend la règle tenable : une doctrine qui PARLE de `***` en prose ne

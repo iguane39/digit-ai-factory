@@ -220,7 +220,7 @@ est une copie que rien ne surveille.
 
 La loi n° 4 disait où une donnée volatile **habite** (éditable, datée, sourcée) ; elle ne disait
 rien de la **prose qui la recopie**. Et la détection était **nominative** : un claim de
-`oraclesraicheur-claims.json` n'existe que si quelqu'un a déjà constaté la dérive et écrit sa
+`oracles\fraicheur-claims.json` n'existe que si quelqu'un a déjà constaté la dérive et écrit sa
 sonde — donc on trouvait toujours l'instance et jamais la classe. Mesure du 22/08 : six claims,
 tous sur le même document, quand les deux dernières dérives avouées vivaient dans le README d'une
 forge (TF-0311, TF-0334).

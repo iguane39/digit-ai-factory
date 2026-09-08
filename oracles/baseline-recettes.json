@@ -59,6 +59,10 @@
   "motif": "entrée d'ÉTAT (I4) : jouée sur le PARC RÉEL, elle rend un verdict — « PASS sur le parc » — et non un compte de cas. Il n'y a rien à compter, et compter à zéro ferait échouer le cliquet sur une absence normale. Sa recette à double sens, quand elle existe, est comptée sous son autre entrée : l'exemption ne laisse donc aucun trou.",
   "vu_le": "2026-08-27"
  },
+ "oracle-caracteres-controle.mjs": {
+  "cas": 6,
+  "vu_le": "2026-09-08"
+ },
  "oracle-catalogues.mjs": {
   "cas": 5,
   "vu_le": "2026-08-27"
