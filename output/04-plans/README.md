@@ -85,7 +85,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Retours pris et propagation mesurable - 20260901a.md` | fichier | 12,6 Ko | Synthèse de mandat — trois lots pris, la propagation devient mesurable, et le banc monte à |
 | `Digit-AI - Synthese Mandat - Selecteurs de familles et palier 1 des tests - 20260901e.md` | fichier | 13,8 Ko | Synthèse de mandat — les sélecteurs de familles, et le premier palier de la stratégie de t |
 | `Digit-AI - Synthese Mandat - Sept campagnes closes et format de sortie corrige - 20260908e.md` | fichier | 22,8 Ko | Synthèse de mandat — les sept campagnes sont closes et vérifiées une par une, et le défaut |
-| `Digit-AI - Synthese Mandat - Sept decisions executees parc publie puis bloque par sa propre porte - 20260908h.md` | fichier | 38,2 Ko | Synthèse de mandat — vos sept décisions sont exécutées, le parc est publié, la porte le bl |
+| `Digit-AI - Synthese Mandat - Sept decisions executees parc publie puis bloque par sa propre porte - 20260908h.md` | fichier | 45,7 Ko | Synthèse de mandat — vos sept décisions sont exécutées, le parc est publié, la porte le bl |
 | `Digit-AI - Synthese Mandat - Six actions et une porte de publication - 20260901f.md` | fichier | 12,8 Ko | Synthèse de mandat — les six actions, et la porte qui a refusé la publication |
 | `Digit-AI - Synthese Mandat - Surveillance des recidives TF-0790 - 20260903c.md` | fichier | 11,3 Ko | Synthèse de mandat — surveillance des récidives entre les runs (03/09/2026, après votre dé |
 | `Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md` | fichier | 14,1 Ko | Synthèse de mandat — synchronisation faite et action A-45 de l'autre poste jouée ici : rie |
