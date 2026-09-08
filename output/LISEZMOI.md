@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 243 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 244 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -191,6 +191,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260903-recidives-mesure.md | — | 7.3 Ko | `03-etudes/20260903-recidives-mesure.md` |
 | 20260907-etude-opportunite-mission-data-silver-gold-powerbi.md | — | 43.4 Ko | `03-etudes/20260907-etude-opportunite-mission-data-silver-gold-powerbi.md` |
 | 20260907-L99-mission-data-silver-gold-powerbi.md | — | 47.5 Ko | `03-etudes/20260907-L99-mission-data-silver-gold-powerbi.md` |
+| 20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md | — | 9 Ko | `03-etudes/20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md` |
 
 ### 04-plans
 
