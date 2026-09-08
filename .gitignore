@@ -14,3 +14,13 @@
 # TF-0788 (03/09/2026) : empreintes des skills installés sur CE poste, réécrites à chaque ouverture —
 # état machine, propre au poste ; la comparaison vaut entre deux ouvertures du même poste.
 .oracles/empreintes-skills.json
+
+# TF-0981 (08/09/2026) — L'ARRIVEE DES LOTS N'EST PAS INDEXABLE, ET C'EST LE POINT.
+# Mesure du 08/09 : six lots sont arrives portant un nom REEL dans leur nom de fichier, dans un
+# repertoire SUIVI (394 fichiers). Chacun y a sejourne avant que la pseudonymisation ne soit
+# jouee a la main ; un `git add -A` dans cette fenetre a deja fait entrer un nom dans un commit,
+# qu il a fallu amender avant publication.
+# Un produit depose desormais son lot ici, tel qu il est. `todo\accueillir-lot.mjs` le
+# pseudonymise -- nom ET contenu -- puis le depose dans `input\00-retours\`, qui reste suivi.
+# La fenetre ne se reduit pas : elle disparait.
+input/00-retours/_arrivee/
