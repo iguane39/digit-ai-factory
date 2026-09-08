@@ -74,7 +74,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Publication de forge-development actions A39 A37 - 20260907l.md` | fichier | 10,7 Ko | Synthèse de mandat — actions A-39 puis A-37 exécutées : la protection levée puis remise à  |
 | `Digit-AI - Synthese Mandat - Publication des forges decision D9a - 20260907g.md` | fichier | 11,2 Ko | Synthèse de mandat — décision D-9 (a) exécutée : quatre dépôts publiés, trois forges reten |
 | `Digit-AI - Synthese Mandat - Publication et campagne des items decides - 20260831d.md` | fichier | 22,9 Ko | Synthèse de mandat — publié, neuf chantiers décidés menés à fond, et les travaux partis ch |
-| `Digit-AI - Synthese Mandat - Quatre decisions executees parc publie et tables arbitrees - 20260908f.md` | fichier | 13,2 Ko | Synthèse de mandat — vos quatre décisions et vos quatre actions exécutées : le parc entier |
+| `Digit-AI - Synthese Mandat - Quatre decisions executees parc publie et tables arbitrees - 20260908f.md` | fichier | 14,1 Ko | Synthèse de mandat — vos quatre décisions et vos quatre actions exécutées : le parc entier |
 | `Digit-AI - Synthese Mandat - Recopie de l heritage et parite - 20260830h.md` | fichier | 14,6 Ko | Synthèse de mandat — la Factory se recopie chez les produits, et un contrôle de configurat |
 | `Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md` | fichier | 7,1 Ko | Synthèse de mandat — « récupère la todo et les retours, traite les tous » (18 items, 7 cam |
 | `Digit-AI - Synthese Mandat - Reecriture des histoires design tests development decision D10a - 20260907h.md` | fichier | 13,3 Ko | Synthèse de mandat — décision D-10 (a) exécutée : deux histoires réécrites et publiées ave |

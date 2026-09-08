@@ -15,7 +15,7 @@ Tout ce que vous avez accordé est fait. L'histoire de la forge de développemen
 
 ## 2. Verdict en une ligne
 
-Histoire de la forge de développement réécrite (150 commits, 15 étiquettes) et republiée en force, porte PASS avant et après, protection remise identique sur 6 réglages comparés, clone rebâti et son commit de campagne rejoué puis publié, 411 tests verts ; 7 dépôts publiés sur 7, dont 2 par fusion ; 3 branches d'ancienne histoire supprimées, portes vertes ; skills propagés, contrôle PASS ; 6 conflits de tables tranchés (3 même produit, 3 pseudonymes neufs) puis 1 arbitrage rectifié après rejeu de la porte, tables fusionnées (64 produits, 10 clients), oracle du canal PASS, canal publié en 2 commits ; 24 candidatures décidées, registre PASS ; 1 fichier parasite supprimé ; 91 items clos au registre sur la journée.
+Histoire de la forge de développement réécrite (150 commits, 15 étiquettes) et republiée en force, porte PASS avant et après, protection remise identique sur 6 réglages comparés, clone rebâti et son commit de campagne rejoué puis publié, 411 tests verts ; 7 dépôts publiés sur 7, dont 2 par fusion ; 3 branches d'ancienne histoire supprimées, portes vertes ; skills propagés, contrôle PASS ; 6 conflits de tables tranchés (3 même produit, 3 pseudonymes neufs) puis 1 arbitrage rectifié après rejeu de la porte, tables fusionnées (64 produits, 10 clients), oracle du canal PASS, canal publié en 2 commits ; 24 candidatures décidées, registre PASS ; 1 fichier parasite supprimé ; 91 items clos au registre sur la journée ; 1 lot arrivé en fin de course ingéré, pseudonymisé et son commit corrigé avant publication ; portes rejouées vertes sur les 15 dépôts.
 
 ## 3. Décisions attendues de l'humain
 
@@ -42,6 +42,10 @@ Aucune décision n'attend : vos quatre réponses couvrent tout ce qui était ouv
   - preuve : `journaliser.mjs` → « 24 événement(s) journalisé(s) » ; `oracle-todo.mjs` → PASS ; registre : 91 clos, 28 décidés, 30 candidats, 4 en cours.
 - Fichier parasite supprimé de la racine du parc, son contenu relu une dernière fois avant le geste.
   - preuve : contenu affiché (objet JSON de statut de mode, 44 octets), puis « supprime : OUI ».
+- Un dernier lot de retours, arrivé pendant la restitution, ingéré et pseudonymisé. Contrôle rouge → vert : mon commit avait embarqué son nom réel dans un nom de fichier → lot renommé au pseudonyme, contenu réécrit, commit local corrigé avant toute publication, 0 occurrence du nom réel dans le commit ; classe : un entrant nouveau pris par une écriture globale avant d’avoir été pseudonymisé.
+  - preuve : `ingerer-lot.mjs` → « [OK] 3 candidature(s) ingérée(s) » ; `git show --stat --name-only HEAD` → 0 ligne portant le nom réel ; `oracle-todo.mjs` → PASS.
+- Portes de publication rejouées sur les quinze dépôts après arbitrage : les trois qui étaient rouges sont verts.
+  - preuve : « digit-ai-factory: PASS 0 », « digit-ai-forge-agents: PASS 0 », « digit-ai-forge-organization: PASS 0 ».
 
 ## 5. Non traité — avec son motif
 

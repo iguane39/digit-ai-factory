@@ -263,7 +263,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Publication de forge-development actions A39 A37 - 20260907l.md | 20260907l | 10.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication de forge-development actions A39 A37 - 20260907l.md` |
 | Digit-AI - Synthese Mandat - Publication des forges decision D9a - 20260907g.md | 20260907g | 11.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication des forges decision D9a - 20260907g.md` |
 | Digit-AI - Synthese Mandat - Publication et campagne des items decides - 20260831d.md | 20260831d | 23.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication et campagne des items decides - 20260831d.md` |
-| Digit-AI - Synthese Mandat - Quatre decisions executees parc publie et tables arbitrees - 20260908f.md | 20260908f | 13.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Quatre decisions executees parc publie et tables arbitrees - 20260908f.md` |
+| Digit-AI - Synthese Mandat - Quatre decisions executees parc publie et tables arbitrees - 20260908f.md | 20260908f | 14.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Quatre decisions executees parc publie et tables arbitrees - 20260908f.md` |
 | Digit-AI - Synthese Mandat - Recopie de l heritage et parite - 20260830h.md | 20260830h | 14.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Recopie de l heritage et parite - 20260830h.md` |
 | Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md | 20260817a | 7.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md` |
 | Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md.jugement.json` |
