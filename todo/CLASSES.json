@@ -722,6 +722,19 @@
     "anonymisation-portee-partielle",
     "registre-doublon-non-detecte"
    ]
+  },
+  {
+   "cle": "gate-cout-invite-au-contournement",
+   "famille": "hook-ou-gate",
+   "libelle": "Un controle BLOQUANT dont le temps d execution depasse ce qu un humain accepte d attendre a chaque geste : il ne protege plus rien le jour ou quelqu un apprend l option qui le saute. La cause mesuree ici est une boucle qui relit la meme donnee une fois par terme cherche, la ou les termes partageant leurs drapeaux tiennent en une seule passe",
+   "creee_le": "2026-09-08",
+   "fondee_par": [],
+   "regle": "un controle pose en gate declare son temps d execution mesure sur le plus gros depot du parc, et toute extension le remesure avant/apres ; les termes d une recherche qui partagent leurs drapeaux se groupent en une passe, l identification fine se faisant a posteriori sur les seules correspondances",
+   "oracle": "mesure avant/apres sur digit-ai-factory (900 revisions, 1369 fichiers suivis), deux passes de chaque pour absorber le cache disque",
+   "voisines": [
+    "porte-sans-chemin-des-tables",
+    "porte-cle-courte-sans-frontiere"
+   ]
   }
  ]
 }
