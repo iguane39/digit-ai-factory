@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=c1c9a5099617 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T14:55:20.741Z -->
+     sceaux: actifs=a30119dbfd7e archive=6ce2fe14c2bb · dernier événement: 2026-09-08T15:02:33.598Z -->
 
-**190 actifs** (candidat 15 · décidé 14 · en cours 10 · corrigé 151 · écarté 0) · **782 archivés**.
+**190 actifs** (candidat 15 · décidé 14 · en cours 9 · corrigé 152 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -73,7 +73,6 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0958 | en_cours | 12.5 | digit-ai-forge-agents (quality-oracles) : la porte de publication prend 81 à 99 s sur le dépôt du pilot avec un jeu d'essai MINIMAL, et le facteur est le nombre de termes cherchés — un gate à ce prix se contourne | **oui** — 81 s et 99 s mesurés avec 4 termes seulement ; 2 à 4 min avec les tables réelles, trois fois ; une première extension de la règle a doublé ce temps (177 s et 183 s) avant d'être reprise, ce qui montre que le motif se reproduit dès qu'on ajoute un angle |
 | TF-0938 | en_cours | 6.7 | digit-ai-forge-agents (digit-ai-schemas / digit-ai-page-html) : aucun gabarit de schéma de base de données DIFFÉRENTIEL (tables et colonnes existantes, ajoutées, modifiées, colorées et marquées) ; le SVG du skill de schémas se heurte à render_page V4 | **oui** — un retour humain ; composant de schéma écrit chez le produit, sans relations dessinées |
 | TF-0954 | decide | 25 | digit-ai-page-html : une INFOBULLE QUI RECOPIE LA CELLULE qu'elle explique passe tous les oracles — L3 et L18 exigent une explication, aucune règle ne juge le rapport entre l'explication et ce qu'elle explique | **oui** — un retour humain sur une page déjà jugée PASS ; famille entière de fausses explications générées |
 | TF-0944 | decide | 15 | digit-ai-forge-agents (digit-ai-page-html) : un système d'identifiants employé dans une page (S1..S12, G1..G9) n'a nulle part à être expliqué — L18 exige la glose dans la CELLULE, jamais une légende du système avant le tableau | **oui** — un point du retour humain ; deux tableaux de légende ajoutés |
@@ -96,6 +95,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0930 | corrige | 15 | digit-ai-forge-agents (digit-ai-page-html) : la largeur d'une page de DONNÉES est bridée par --w: clamp(75vw, 1680px, 92vw) du boilerplate alors que I1 / L26 disent « pleine largeur » — sept colonnes de mapping dans 1 260 px à 1 370 px | **oui** — un retour humain, une ligne de CSS |
 | TF-0909 | corrige | 12.5 | digit-ai-forge-agents (digit-ai-page-html) : aucune règle n'exige qu'une page de mapping ou de couverture affiche son DÉNOMINATEUR (N éléments source) et la liste exhaustive des éléments couverts — une page à 47 lignes de mapping, jugée PASS par trois oracles, cachait 38 colonnes et 22 mesures sans correspondance | **oui** — un retour humain ; trois synthèses PASS et une page PASS présentaient comme complet un mapping à 89 % de couverture |
 | TF-0929 | corrige | 12.5 | digit-ai-forge-agents (digit-ai-page-html) : le token --hh est une constante — un en-tête sur deux lignes ou une bande de sommaire collante masquent l'en-tête de tableau collant, L29 rend PASS (troisième instance de la classe) | **oui** — troisième retour humain sur l'en-tête collant en deux jours (TF-0899, TF-0900, celui-ci) |
+| TF-0958 | corrige | 12.5 | digit-ai-forge-agents (quality-oracles) : la porte de publication prend 81 à 99 s sur le dépôt du pilot avec un jeu d'essai MINIMAL, et le facteur est le nombre de termes cherchés — un gate à ce prix se contourne | **oui** — 81 s et 99 s mesurés avec 4 termes seulement ; 2 à 4 min avec les tables réelles, trois fois ; une première extension de la règle a doublé ce temps (177 s et 183 s) avant d'être reprise, ce qui montre que le motif se reproduit dès qu'on ajoute un angle |
 | TF-0919 | corrige | 12 | digit-ai-forge-agents : la copie embarquée du composant de filtres dans le skill des schémas est périmée depuis la correction du 08/09 — la parité rend exit 1 et le poseur, qui sait la réparer, n'a pas été lancé | **oui** — parité verte avant la campagne, rouge après : une copie embarquée diverge de sa source dans un dépôt publié |
 | TF-0910 | corrige | 10 | digit-ai-forge-agents (digit-ai-page-html) : les cinq teintes d'état pastel du socle (*-fill) sont indiscernables entre elles pour le lecteur ; render_page V2 ne mesure que le contraste texte/fond de chaque badge, jamais la distance entre états ni un indice non colorimétrique (WCAG 1.4.1) | **oui** — un retour humain ; palette refaite chez le produit hors socle |
 | TF-0928 | corrige | 10 | digit-ai-forge-agents (digit-ai-page-html) : check_html L3 accepte une infobulle TAUTOLOGIQUE — un title qui recopie le contenu de la cellule vaut « légende » ; 900 cellules ainsi légendées ont passé le contrôle | **oui** — un retour humain ; 900 infobulles conformes et inutiles |

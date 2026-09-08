@@ -155,7 +155,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>c1c9a5099617</code> · dernier événement 2026-09-08T14:55:20.741Z</p>
+      <p class="meta">sceau <code>a30119dbfd7e</code> · dernier événement 2026-09-08T15:02:33.598Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -167,7 +167,7 @@
     <div class="kpis">
       <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="15 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">15</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="14 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">14</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="10 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">10</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="9 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">9</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="781 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">781</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende">
@@ -1548,29 +1548,6 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-en_cours" id="item-TF-0958" data-cite data-forge="digit-ai-forge-agents" data-statut="en_cours" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0958</code>
-            <span class="statut s-en_cours">en_cours</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-forge-agents (quality-oracles) : la porte de publication prend 81 à 99 s sur le dépôt du pilot avec un jeu d'essai MINIMAL, et le facteur est le nombre de termes cherchés — un gate à ce prix se contourne</h3>
-          <div class="card-detail" data-cite><p class="lead">Mesuré le 08/09 après-midi par deux sources indépendantes, sur le même dépôt et avec des protocoles différents.</p><ul class="puces"><li>CÔTÉ PILOT : trois exécutions de la porte sur digit-ai-factory avec les tables réelles du canal, chacune dépassant le délai de 120 s du lanceur et devant partir en tâche de fond — ordre de grandeur 2 à 4 minutes. CÔTÉ CAMPAGNE, protocole propre (deux passes pour absorber le cache disque, mêmes tables pour toutes les passes, exécutions séquentielles pour éviter la contention) : 81 s et 99 s sur ce même dépôt de 900 révisions et 1369 fichiers suivis, avec un jeu d'essai de seulement 4 termes clients et 2 noms de produits. L'écart entre les deux mesures s'explique par la taille des tables : le temps croît avec le nombre de termes, ce qui confirme la cause. LA CAUSE, telle que la campagne l'a lue dans le code : la règle qui balaie l'historique lance une invocation de recherche PAR TERME et PAR LOT de révisions — 4 termes × 6 lots de 150 révisions = 24 invocations sur 900 révisions, là où 6 suffiraient. Les termes qui partagent leurs drapeaux de recherche (sensibilité à la casse, frontière de mot) tiennent dans UNE passe avec autant d'aiguilles</li><li>le prix du groupage est que la passe ne dit plus laquelle a mordu, mais l'identification fine ne coûte qu'une relecture des seules correspondances — c'est-à-dire presque jamais, le cas nominal d'une porte étant de ne rien trouver. La technique est déjà écrite par la campagne pour la règle des produits</li><li>elle vaut telle quelle pour celle des clients. POURQUOI CE N'EST PAS UN CONFORT : un contrôle bloquant qui coûte deux à quatre minutes à chaque publication ne protège plus rien le jour où quelqu'un apprend l'option qui le saute — et cette option est documentée dans le hameçon lui-même. La lenteur d'un gate est un défaut de sécurité, pas d'ergonomie. Demande : grouper les termes partageant leurs drapeaux en une passe par groupe, avec raffinement a posteriori sur les seules correspondances, et déclarer au non_jugé le temps mesuré sur le plus gros dépôt du parc. La campagne qui l'a diagnostiqué ne l'a délibérément PAS corrigé : la règle des clients n'est pas dans ses items, et y toucher aurait été le refactor opportuniste que le contrat de campagne interdit</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>81 s et 99 s mesurés avec 4 termes seulement ; 2 à 4 min avec les tables réelles, trois fois ; une première extension de la règle a doublé ce temps (177 s et 183 s) avant d'être reprise, ce qui montre que le motif se reproduit dès qu'on ajoute un angle</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-en_cours" id="item-TF-0938" data-cite data-forge="digit-ai-forge-agents" data-statut="en_cours" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0938</code>
@@ -2068,6 +2045,29 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>troisième retour humain sur l'en-tête collant en deux jours (TF-0899, TF-0900, celui-ci)</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-10_Reporting</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0958" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0958</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-forge-agents (quality-oracles) : la porte de publication prend 81 à 99 s sur le dépôt du pilot avec un jeu d'essai MINIMAL, et le facteur est le nombre de termes cherchés — un gate à ce prix se contourne</h3>
+          <div class="card-detail" data-cite><p class="lead">Mesuré le 08/09 après-midi par deux sources indépendantes, sur le même dépôt et avec des protocoles différents.</p><ul class="puces"><li>CÔTÉ PILOT : trois exécutions de la porte sur digit-ai-factory avec les tables réelles du canal, chacune dépassant le délai de 120 s du lanceur et devant partir en tâche de fond — ordre de grandeur 2 à 4 minutes. CÔTÉ CAMPAGNE, protocole propre (deux passes pour absorber le cache disque, mêmes tables pour toutes les passes, exécutions séquentielles pour éviter la contention) : 81 s et 99 s sur ce même dépôt de 900 révisions et 1369 fichiers suivis, avec un jeu d'essai de seulement 4 termes clients et 2 noms de produits. L'écart entre les deux mesures s'explique par la taille des tables : le temps croît avec le nombre de termes, ce qui confirme la cause. LA CAUSE, telle que la campagne l'a lue dans le code : la règle qui balaie l'historique lance une invocation de recherche PAR TERME et PAR LOT de révisions — 4 termes × 6 lots de 150 révisions = 24 invocations sur 900 révisions, là où 6 suffiraient. Les termes qui partagent leurs drapeaux de recherche (sensibilité à la casse, frontière de mot) tiennent dans UNE passe avec autant d'aiguilles</li><li>le prix du groupage est que la passe ne dit plus laquelle a mordu, mais l'identification fine ne coûte qu'une relecture des seules correspondances — c'est-à-dire presque jamais, le cas nominal d'une porte étant de ne rien trouver. La technique est déjà écrite par la campagne pour la règle des produits</li><li>elle vaut telle quelle pour celle des clients. POURQUOI CE N'EST PAS UN CONFORT : un contrôle bloquant qui coûte deux à quatre minutes à chaque publication ne protège plus rien le jour où quelqu'un apprend l'option qui le saute — et cette option est documentée dans le hameçon lui-même. La lenteur d'un gate est un défaut de sécurité, pas d'ergonomie. Demande : grouper les termes partageant leurs drapeaux en une passe par groupe, avec raffinement a posteriori sur les seules correspondances, et déclarer au non_jugé le temps mesuré sur le plus gros dépôt du parc. La campagne qui l'a diagnostiqué ne l'a délibérément PAS corrigé : la règle des clients n'est pas dans ses items, et y toucher aurait été le refactor opportuniste que le contrat de campagne interdit</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>81 s et 99 s mesurés avec 4 termes seulement ; 2 à 4 min avec les tables réelles, trois fois ; une première extension de la règle a doublé ce temps (177 s et 183 s) avant d'être reprise, ce qui montre que le motif se reproduit dès qu'on ajoute un angle</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
             
           </dl>
         </article>
