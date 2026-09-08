@@ -15,6 +15,27 @@ import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { produitsDuParc, etatArtefact, relever, rendreMarkdown, attribuerDivergence, racineWebDeclaree } from "./relever-heritage.mjs";
 
+// TF-0957 — LES TABLES DE CE BANC SONT JETABLES, ET C'EST LUI QUI LES POSE.
+//
+// Le 08/09, les 46 bancs du dépôt ont été joués d'affilée avec FORGE_NOMS_INTERDITS et
+// FORGE_PRODUITS_PSEUDO pointant sur les tables RÉELLES du canal confidentiel. Ce banc n'en
+// posait pas : il héritait de l'environnement, ses produits jouets sont entrés dans la table de
+// PRODUCTION — neuf clés, « Produit-65 » à « Produit-73 » — et la porte de publication a ensuite
+// refusé le dépôt sur 81 constats, tous nés de noms inventés par des fixtures.
+//
+// Un banc qui hérite du référentiel de production ne s'éprouve pas : il l'abîme. Et les
+// sous-processus qu'il lance héritent de `process.env`, donc les poser ICI suffit à isoler
+// toute la chaîne, y compris `ingerer-lot.mjs` lancé plus bas.
+{
+  const _iso = mkdtempSync(join(tmpdir(), "relever-heritage-tables-"));
+  writeFileSync(join(_iso, "_noms-interdits.json"),
+    JSON.stringify({ noms: [], identifiants: [], sigles: [], pseudonymes: {} }), "utf8");
+  writeFileSync(join(_iso, "_produits-pseudonymes.json"), JSON.stringify({ produits: {} }), "utf8");
+  process.env.FORGE_NOMS_INTERDITS = join(_iso, "_noms-interdits.json");
+  process.env.FORGE_PRODUITS_PSEUDO = join(_iso, "_produits-pseudonymes.json");
+}
+
+
 const ICI = dirname(fileURLToPath(import.meta.url));
 
 let pass = 0, fail = 0;

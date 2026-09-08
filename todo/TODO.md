@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=473cf8a84006 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T11:01:02.719Z -->
+     sceaux: actifs=dff5ba6acc29 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T11:11:10.784Z -->
 
-**174 actifs** (candidat 1 · décidé 43 · en cours 4 · corrigé 126 · écarté 0) · **782 archivés**.
+**175 actifs** (candidat 2 · décidé 43 · en cours 4 · corrigé 126 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -18,6 +18,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0923 | decide | 3 | pilot : six volets d'oracle proposés par les items du 08/09 restent non livrés, cinq d'entre eux vivant dans le même juge de restitution que la campagne n'a pas voulu faire monter deux fois | **oui** — six doctrines opposables sans juge exécuté : la règle décore tant que rien ne la joue |
 | TF-0836 | decide | 1 | pilot : le hook qo-gate-write juge un template de maquette comme un livrable | **oui** — un blocage par écriture du template, six écritures |
 | TF-0838 | decide | 1 | pilot : le skill claude-api ne documente pas fallbacks avec messages.parse | **oui** — un écart déclaré au lieu d'une mise en œuvre |
+| TF-0957 | candidat | 12.5 | pilot : cinq bancs de test n'isolaient pas leurs tables et ont écrit neuf produits de fixture dans le référentiel RÉEL des pseudonymes — la porte de publication a refusé le dépôt sur 81 constats nés de noms inventés | **oui** — 81 constats bloquants de la porte de publication sur le dépôt du pilot, neuf clés parasites dans le référentiel de production, et une table restaurée à la main ; le défaut est passé inaperçu jusqu'à ce que la porte soit rejouée |
 | TF-0956 | candidat | 10 | pilot : le registre ne sait ni détecter ni écarter un DOUBLON de candidature — six items identiques mot pour mot y sont entrés le 08/09, et rien ne les a signalés | **oui** — six candidatures en double entrées en une commande, non détectées ; le compte des items ouverts est faux de six tant qu'elles ne sont pas écartées, et aucun statut ne permet de les écarter |
 | TF-0869 | corrige | 25 | pilot : aucun .env local créé d'office, le commanditaire a saisi sa clé Anthropic dans .env.example versionné | **oui** — git diff --stat .env.example : 1 ligne, clé de 108 caractères préfixée sk-ant- dans un fichier versionné ; un commit de plus et le secret partait |
 | TF-0870 | corrige | 20 | pilot : une clé Anthropic d'organisation sans espace de travail échoue en 400, variable ANTHROPIC_WORKSPACE_ID absente du gabarit et du skill | **oui** — un redéploiement qualif et un appel direct à l'API pour lire la cause ; smoke-qualif-20260906.json E-011 FAIL 502 |

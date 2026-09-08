@@ -49,6 +49,7 @@
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { tmpdir } from "node:os";
 import { cheminsTables } from "../scripts/lib-confidentiel.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -126,9 +127,48 @@ function lireProduits() {
 /** Un émetteur FORGE (ou le pilot, ou la file de tickets) : nom public, jamais pseudonymisé (TF-0807). */
 export const EST_EMETTEUR_FORGE = /^digit-ai-(forge-[a-z0-9-]+|factory|queue)$/i;
 
+/** Le processus courant est-il un banc de test ? Mesuré sur son point d'entrée, jamais deviné. */
+const estUnBanc = () => /\.test\.mjs$/i.test(process.argv[1] || "") || process.argv.includes("--self-test");
+
+/** Le chemin vise-t-il une table JETABLE, sous le répertoire temporaire du système ? */
+function sousRepertoireTemporaire(chemin) {
+  const norme = (x) => String(x).replaceAll("\\", "/").toLowerCase();
+  return norme(chemin).startsWith(norme(tmpdir()));
+}
+
+/**
+ * La garde, isolée pour être éprouvable SANS rien écrire nulle part : un banc de test qui vise une
+ * table hors du répertoire temporaire du système ne doit pas pouvoir l'étendre.
+ */
+export const extensionInterdite = (chemin) => estUnBanc() && !sousRepertoireTemporaire(chemin);
+
 /** Pseudonyme STABLE d'un produit ; l'inscrit s'il est inconnu. */
 export function pseudoProduit(nom) {
   const p = CHEMIN_PRODUITS();
+  // UN BANC DE TEST N'ÉTEND JAMAIS LE RÉFÉRENTIEL RÉEL (08/09/2026), et c'est la TROISIÈME fois
+  // que la même classe se paie ici : la garde du dessus — « un nom de moins de 5 caractères ne
+  // s'inscrit pas » — est née le 02/09 d'une fixture non isolée qui avait inscrit son produit
+  // jouet. Elle traitait la LONGUEUR du nom, pas la CAUSE.
+  //
+  // Le fait, mesuré le 08/09 : les 46 bancs du dépôt ont été joués d'affilée avec les variables
+  // d'environnement pointant sur les tables RÉELLES du canal confidentiel. Cinq bancs ne posent
+  // pas leurs propres tables jetables ; leurs neuf produits jouets sont entrés dans la table de
+  // production, et la porte de publication a refusé le dépôt sur 81 constats — tous nés de noms
+  // inventés par des fixtures. Corriger les cinq bancs aurait été exact et insuffisant : le
+  // sixième banc écrit demain repartirait avec le même défaut (loi n° 1, toute affordance est
+  // câblée ou n'existe pas).
+  //
+  // La garde vit donc au point de PASSAGE, et elle ne devine rien : le point d'entrée du
+  // processus est-il un banc (`*.test.mjs`, ou `--self-test`), et la table visée est-elle hors du
+  // répertoire temporaire du système ? Les deux ensemble, et seulement les deux, valent refus —
+  // un banc correct pose ses tables sous `tmpdir()` et passe, l'ingestion réelle n'est pas un
+  // banc et passe aussi. Le refus est BRUYANT : un banc qui ne s'isole pas doit le savoir.
+  if (extensionInterdite(p)) {
+    throw new Error(
+      `un banc de test ne peut pas étendre le référentiel réel des produits (${p}) : poser des tables `
+      + "jetables sous le répertoire temporaire et les désigner par FORGE_NOMS_INTERDITS et "
+      + "FORGE_PRODUITS_PSEUDO, comme le font les autres bancs du dossier");
+  }
   const d = lireProduits();
   if (!d) return null;
   d.produits = d.produits || {};
@@ -420,6 +460,23 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
     casse.push("la table porte un pseudonyme comme CLÉ — elle pseudonymise ses propres pseudonymes");
   if (anonymiser("lot de Produit-01").texte !== "lot de Produit-01") casse.push("un texte déjà anonymisé est réécrit");
 
+  // 3 sexies) UN BANC N'ÉTEND PAS LE RÉFÉRENTIEL RÉEL (08/09) — la garde est éprouvée SANS rien
+  //           écrire : elle est une fonction pure du chemin visé. Sens rouge : un chemin hors du
+  //           répertoire temporaire, depuis un banc, est interdit. Sens vert : la table jetable de
+  //           ce banc-ci, sous ce même répertoire, est autorisée — sans quoi la garde bloquerait
+  //           les bancs corrects, et le cas 3 ci-dessus ne passerait pas. Le défaut d'origine :
+  //           46 bancs joués avec les variables pointant sur les tables réelles ont fait entrer
+  //           neuf produits jouets dans la table de production, et la porte de publication a
+  //           refusé le dépôt sur 81 constats, tous nés de noms inventés par des fixtures.
+  if (!extensionInterdite("C:/un/chemin/hors/du/repertoire/temporaire.json"))
+    casse.push("un banc peut étendre un référentiel hors du répertoire temporaire — c'est ainsi que neuf produits jouets sont entrés dans la table de production le 08/09");
+  if (extensionInterdite(join(dir, "_produits-pseudonymes.json")))
+    casse.push("la garde bloque la table JETABLE d'un banc correct — elle empêcherait tous les bancs de s'exécuter");
+  let refusDit = "";
+  try { pseudoProduit("un-produit-de-fixture"); } catch (e) { refusDit = e.message; }
+  if (refusDit && !/FORGE_PRODUITS_PSEUDO/.test(refusDit))
+    casse.push("le refus ne nomme pas la variable à poser : " + refusDit);
+
   // 4) référentiel ABSENT → refus, jamais un passage silencieux
   process.env.FORGE_NOMS_INTERDITS = join(dir, "absent.json");
   let refuse = false;
@@ -427,6 +484,6 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
   if (!refuse) casse.push("référentiel absent et le texte passe quand même — le convoi n'est pas arrêté");
 
   for (const m of casse) console.log("  [FAIL] " + m);
-  console.log(`\nSelf-test anonymiseur d'entrants : ${8 - casse.length}/8 cas, ${casse.length} FAIL`);
+  console.log(`\nSelf-test anonymiseur d'entrants : ${9 - casse.length}/9 cas, ${casse.length} FAIL`);
   process.exit(casse.length ? 1 : 0);
 }

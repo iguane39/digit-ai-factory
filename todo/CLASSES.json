@@ -709,6 +709,19 @@
     "lot-remis-ecrasable",
     "anonymisation-portee-partielle"
    ]
+  },
+  {
+   "cle": "banc-etend-referentiel-production",
+   "famille": "anonymisation",
+   "libelle": "Un banc de test qui ne pose pas ses propres tables jetables herite des variables d environnement de la session et ecrit ses noms de fixtures dans le referentiel REEL des pseudonymes ; la porte de publication refuse ensuite le depot sur des noms qui n existent pas",
+   "creee_le": "2026-09-08",
+   "fondee_par": [],
+   "regle": "tout banc qui appelle la chaine d anonymisation, directement ou par un sous-processus, pose ses tables jetables sous le repertoire temporaire et les designe par FORGE_NOMS_INTERDITS et FORGE_PRODUITS_PSEUDO avant tout appel ; la fonction d extension refuse en outre d ecrire hors du repertoire temporaire quand le point d entree du processus est un banc",
+   "oracle": "todo/anonymiser-entrant.mjs --self-test (cas 3 sexies, garde pure a deux sens) ; les bancs eux-memes, rejoues avec les variables reelles au shell",
+   "voisines": [
+    "anonymisation-portee-partielle",
+    "registre-doublon-non-detecte"
+   ]
   }
  ]
 }
