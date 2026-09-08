@@ -77,6 +77,10 @@
  *       (`hors_mandat`, `borne_atteinte`) — un test jouable s'exécute, règle 40 (08/09, TF-0923) ;
  *   S39 une remontée annoncée au bloc 4 porte son identifiant — « remonté » sans identifiant se lit
  *       « traité » et vaut « déposé, non traité », donc un reste du bloc 5 (08/09, TF-0923) ;
+ *   S40 un chemin de livrable cité sous `output\` n'emprunte pas le préfixe daté « AAAAMMJJ-… »,
+ *       forme RÉSERVÉE à `output\03-etudes\` — partout ailleurs R-4 s'applique (08/09, TF-0923) ;
+ *   S41 une décision portant un mot que la DOCTRINE du projet régit cite cette doctrine en source :
+ *       une source qui n'est pas celle qui tranche est une opinion sourcée (08/09, TF-0923) ;
  *       et né du même retour : « le 3 était pour les prochaines actions ». Deux familles
  *       numérotées pareil ne se désignent pas ; le sélecteur nomme la sienne.
  *   S31 chaque OPTION du bloc 3 porte son COÛT et CE QU'ELLE EXCLUT (30/08) — exigence écrite
@@ -1475,6 +1479,58 @@ function juger(texte) {
     ok("S16", "aucune décision à instruire");
   }
 
+  // ---- S40 et S41 (08/09/2026, TF-0923 — second paquet des six volets restés non joués) --------
+  //
+  // S41 — QUAND LA DOCTRINE RÉGIT LE SUJET, C'EST ELLE LA SOURCE. S16 exige qu'une décision porte
+  // sa recommandation et LA source consultée ; elle ne regarde pas LAQUELLE. Le fait du 07/09
+  // (TF-0902) : une décision a été posée à l'humain — garder ou supprimer la version remplacée
+  // d'un livrable — avec sa recommandation et sa source, donc S16 PASS. Or `REGLES-PROJET.md`
+  // règle 7 y répond depuis toujours : un livrable remplacé part sous `old\` du même dossier,
+  // versionné. La question n'avait pas à être posée ; elle l'a été parce que la source citée
+  // était un fichier du chantier et non la doctrine qui régit le mot.
+  //
+  // C'est le défaut de S16 poussé d'un cran : *une recommandation sans source est une opinion*,
+  // mais une source qui n'est pas celle qui TRANCHE est une opinion sourcée. La règle ne juge pas
+  // la réponse — indécidable à la machine — elle juge que la doctrine a été OUVERTE là où elle
+  // régit le mot. Le vocabulaire est donc étroit ET fermé : cinq familles de mots dont la
+  // doctrine du projet est l'autorité écrite, et rien d'autre. Élargir cette liste rendrait la
+  // règle bavarde sur des décisions qu'aucun texte ne tranche — exactement ce que S16 évite déjà.
+  if (groupesDecisions.length) {
+    const REGI = uni(/\b(remplac[ée]e?s?|remplacement|ancienne version|version pr[ée]c[ée]dente|old\\|supprimer le livrable|renommer le livrable|indice du livrable)\b/i);
+    const DOCTRINE = /(REGLES-PROJET|CLAUDE\.md|CLAUDE-PRODUIT|ETAPES-RUN|RUN-MANDAT|RUN-CONSEIL|RESTITUTION\.md|ACCUEIL\.md|CONTRAT-INTERFACE|\br[èe]gle\s+\d+\b|\bR-\d{1,2}\b)/i;
+    const regies = groupesDecisions.filter((g) => REGI.test(g));
+    const horsDoctrine = regies.filter((g) => !DOCTRINE.test(g));
+    horsDoctrine.length
+      ? ko("S41", `${horsDoctrine.length} décision(s) sur ${regies.length} portent un mot que la doctrine du projet RÉGIT, sans citer cette doctrine comme source — une source qui n'est pas celle qui tranche est une opinion sourcée : le 07/09, « garder ou supprimer la version remplacée » a été posé à l'humain alors que la règle 7 y répond (livrable remplacé → \`old\\\` du même dossier, versionné) : « ${horsDoctrine[0].replace(/\s+/g, " ").trim().slice(0, 110)} »`)
+      : ok("S41", regies.length ? `${regies.length} décision(s) régie(s) par la doctrine, chacune la citant en source` : "aucune décision ne porte un mot régi par la doctrine du projet");
+  } else {
+    ok("S41", "aucune décision à instruire");
+  }
+  // S40 — LA FORME DATÉE EN TÊTE EST RÉSERVÉE AUX ÉTUDES. Deux nommages cohabitent chez le pilot,
+  // et un seul est général : R-4 impose « <Marque> - <Objet> - AAAAMMJJ<indice>.<ext> » à tout
+  // livrable d'`output\` ; `output\03-etudes\` en est l'EXCEPTION écrite, avec son préfixe daté
+  // « AAAAMMJJ-… » qui fait lire le dossier dans l'ordre chronologique (gabarits\ETUDE-OPPORTUNITE.md).
+  // Le fait du 07/09 (TF-0898) : onze livrables d'un mandat sont sortis en « 20260907-objet.ext »
+  // — la forme des études, recopiée hors des études, sur trois tours et quatre synthèses PASS.
+  // L'exception s'était propagée par imitation parce que rien ne disait qu'elle en était une.
+  //
+  // La règle lit les chemins CITÉS, pas le disque : une restitution qui annonce un livrable le
+  // nomme, et c'est à cet instant que la forme se voit. Elle ne juge que ce qui vit sous
+  // `output\` — ailleurs, R-4 ne s'applique pas et la règle n'aurait rien à dire.
+  {
+    const zones = [bloc(texte, BLOCS[3][0]) || "", bloc(texte, BLOCS[4][0]) || "",
+      bloc(texte, /(^|\n)#{1,4}\s*9[.)]?\s*traces?/i) || ""].join("\n");
+    const cites = zones.match(/[\w\-. ]*output[\/\\][\w\-. \/\\]+\.\w{2,5}/gi) || [];
+    const fautifs = cites.filter((c) => {
+      const chemin = c.replace(/\\/g, "/");
+      if (/output\/03-etudes\//i.test(chemin)) return false;      // l'exception, chez elle
+      return /^\d{8}[a-z]?-/.test(chemin.slice(chemin.lastIndexOf("/") + 1));
+    });
+    fautifs.length
+      ? ko("S40", `${fautifs.length} chemin(s) de livrable cité(s) portent le préfixe daté « AAAAMMJJ-… » hors de \`output\\03-etudes\\\` — cette forme est RÉSERVÉE aux études (gabarits\\ETUDE-OPPORTUNITE.md) ; partout ailleurs sous \`output\\\`, R-4 impose « <Marque> - <Objet> - AAAAMMJJ<indice>.<ext> » : ${fautifs.slice(0, 2).join(", ")}`)
+      : ok("S40", cites.length ? `${cites.length} chemin(s) de livrable cité(s) sous \`output\\\`, aucun n'emprunte la forme réservée aux études` : "aucun chemin de livrable d'`output\\` cité");
+  }
+
   // ---- S30 (28/08/2026) — UNE DÉCISION SE SÉLECTIONNE, DONC ELLE PORTE UN NUMÉRO ------------
   //
   // LE RETOUR EST LA MESURE, mot pour mot : « Il n'y a pas de numéro sur les décisions, je ne
@@ -1849,6 +1905,39 @@ Aucun écart : la demande a été suivie à la lettre.
     REMONTEE.replace("forge-design", "forge-design (TF-0930)") + "\n\n## 5. Non traité");
   writeFileSync(join(dir, "remontee-nue.md"), remonteeNue, "utf8");
   writeFileSync(join(dir, "remontee-tracee.md"), remonteeTracee, "utf8");
+  // 08/09 — S40 ET S41 DANS LEURS DEUX SENS (TF-0923, second paquet). Même discipline que S38 et
+  // S39 : chaque paire ne varie que sur ce que la règle prétend juger — le DOSSIER du chemin pour
+  // S40, la SOURCE citée pour S41. Le reste de la ligne est identique au caractère près.
+  //
+  // S40 : le MÊME livrable, au même nom daté, cité sous `output\04-plans\` puis sous
+  // `output\03-etudes\`. Le premier emprunte la forme réservée aux études, le second EST une
+  // étude. Sans le sens vert, la règle refuserait le nommage que la doctrine prescrit aux études.
+  const CHEMIN = (dossier) => "- Livrable déposé — preuve : `output\\" + dossier
+    + "\\20260908-mapping-lineage.md`, oracle-conformite-projet PASS.";
+  const cheminHorsEtudes = verte.replace("## 5. Non traité", CHEMIN("04-plans") + "\n\n## 5. Non traité");
+  const cheminEtude = verte.replace("## 5. Non traité", CHEMIN("03-etudes") + "\n\n## 5. Non traité");
+  writeFileSync(join(dir, "chemin-hors-etudes.md"), cheminHorsEtudes, "utf8");
+  writeFileSync(join(dir, "chemin-etude.md"), cheminEtude, "utf8");
+  //
+  // S41 : la MÊME décision — garder ou supprimer la version remplacée, le cas exact du 07/09 —
+  // avec pour seule différence la SOURCE citée. La première nomme un fichier du chantier, et
+  // c'est le défaut : S16 la trouve sourcée, alors que la question était déjà tranchée. La
+  // seconde nomme la doctrine qui la tranche. Sans le sens vert, S41 accuserait toute décision
+  // qui parle d'un livrable remplacé, y compris celle qui a ouvert le bon texte.
+  const DECISION_REGIE = (source) => [
+    "- **D-9 —** Faut-il garder la version remplacée du dossier de mapping, ou la supprimer ? Le",
+    "  livrable a été redéposé ce matin sous un indice neuf, et l'ancienne version cohabite avec la",
+    "  nouvelle dans le même dossier depuis, sans que rien ne dise laquelle fait foi.",
+    "  - (a) la déplacer sous `old\\` du même dossier — recommandé : " + source + " ; coût : effort simple × court ; exclut de la supprimer tout de suite ;",
+    "  - (b) la supprimer — coût : la version remplacée n'est plus relisible ; exclut toute comparaison ultérieure.",
+    "  - sans décision : les deux versions cohabitent.",
+  ].join(String.fromCharCode(10));
+  const poseDecision = (source) => verte.replace("  - sans décision : rien n'est publié.",
+    "  - sans décision : rien n'est publié.\n" + DECISION_REGIE(source));
+  const sourceChantier = poseDecision("le journal de recette `recette-S01.md` ne porte aucun défaut ouvert");
+  const sourceDoctrine = poseDecision("`REGLES-PROJET.md` règle 7 tranche — un livrable remplacé part sous `old\\` du même dossier, versionné");
+  writeFileSync(join(dir, "source-chantier.md"), sourceChantier, "utf8");
+  writeFileSync(join(dir, "source-doctrine.md"), sourceDoctrine, "utf8");
   const moi = fileURLToPath(import.meta.url);
   const rv = spawnSync(process.execPath, [moi, join(dir, "verte.md")], { encoding: "utf8" });
   const rr = spawnSync(process.execPath, [moi, join(dir, "rouge.md")], { encoding: "utf8" });
@@ -2012,9 +2101,28 @@ Aucun écart : la demande a été suivie à la lettre.
       (/"S39"[\s\S]{0,180}/.exec(rrt.stdout) || [""])[0].replace(/\s+/g, " "));
   if (!/"S38"[^}]*PASS/.test(rv.stdout) || !/"S39"[^}]*PASS/.test(rv.stdout))
     casse.push("S38 ou S39 accuse la fixture VERTE, qui ne porte ni test esquivé ni remontée : la règle crie sur un travail juste");
+  // 08/09 — S40 ET S41, LEURS DEUX SENS CHACUNE (TF-0923, second paquet).
+  const rche = spawnSync(process.execPath, [moi, join(dir, "chemin-hors-etudes.md")], { encoding: "utf8" });
+  const rce = spawnSync(process.execPath, [moi, join(dir, "chemin-etude.md")], { encoding: "utf8" });
+  if (!/"S40"[^}]*FAIL/.test(rche.stdout))
+    casse.push("S40 : un livrable cité sous `output\\04-plans\\` au préfixe daté « AAAAMMJJ-… » passe — c'est la forme " +
+      "RÉSERVÉE aux études, et c'est par cette imitation que onze livrables d'un mandat sont sortis hors R-4 le 07/09");
+  if (!/"S40"[^}]*PASS/.test(rce.stdout))
+    casse.push("S40 : le MÊME nom, cité sous `output\\03-etudes\\` — chez lui —, est accusé : la règle refuse le nommage " +
+      "que la doctrine prescrit aux études : " + (/"S40"[\s\S]{0,180}/.exec(rce.stdout) || [""])[0].replace(/\s+/g, " "));
+  const rsc = spawnSync(process.execPath, [moi, join(dir, "source-chantier.md")], { encoding: "utf8" });
+  const rsdoc = spawnSync(process.execPath, [moi, join(dir, "source-doctrine.md")], { encoding: "utf8" });
+  if (!/"S41"[^}]*FAIL/.test(rsc.stdout))
+    casse.push("S41 : une décision sur une version REMPLACÉE, sourcée par un fichier du chantier, passe — S16 la trouve " +
+      "sourcée alors que la règle 7 la tranchait déjà : une source qui n'est pas celle qui tranche est une opinion sourcée");
+  if (!/"S41"[^}]*PASS/.test(rsdoc.stdout))
+    casse.push("S41 : la MÊME décision, sourcée par `REGLES-PROJET.md` règle 7, est accusée — la règle crie sur celle qui a " +
+      "ouvert le bon texte : " + (/"S41"[\s\S]{0,180}/.exec(rsdoc.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S40"[^}]*PASS/.test(rv.stdout) || !/"S41"[^}]*PASS/.test(rv.stdout))
+    casse.push("S40 ou S41 accuse la fixture VERTE, qui ne cite ni chemin en forme d'étude ni décision régie : la règle crie sur un travail juste");
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 16/16 PASS (verte PASS ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger)");
+    : "Self-test restitution : 18/18 PASS (verte PASS ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS))");
   process.exit(casse.length ? 1 : 0);
 }
 
