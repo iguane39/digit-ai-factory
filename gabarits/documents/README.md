@@ -4,7 +4,7 @@ Les gabarits de **livrables** que la factory propose à un projet, quel que soit
 un projet qui doit rendre un rapport de données, un diagnostic, un rapport d'audit ou une
 fiche de sécurité prend le gabarit de sa famille plutôt que d'inventer une forme.
 
-La bibliothèque est autant un **index** qu'un atelier. Sur ses trente familles, seize sont des
+La bibliothèque est autant un **index** qu'un atelier. Sur ses trente-deux familles, seize sont des
 formes qu'une forge produit déjà : pour celles-là elle ne réécrit rien — elle dit où elles vivent,
 par quel outil les obtenir, et quel oracle les juge. **Écrire un gabarit est le cas minoritaire**,
 et c'est voulu : le doublon coûte plus cher que le renvoi.
