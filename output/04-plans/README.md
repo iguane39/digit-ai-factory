@@ -39,10 +39,12 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Barres validees et publication decisions D6a D7a - 20260907e.md` | fichier | 10,4 Ko | Synthèse de mandat — décisions D-6 (a) et D-7 (a) exécutées : quatre barres validées et cl |
 | `Digit-AI - Synthese Mandat - Bloc 3 forme de reference - 20260830f.md` | fichier | 15,3 Ko | Synthèse de mandat — la forme du bloc des décisions, relevée à la source et rendue lisible |
 | `Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md` | fichier | 13,1 Ko | Synthèse de mandat — la liste tranchée en bloc, vingt-deux chantiers clos, tout publié (01 |
+| `Digit-AI - Synthese Mandat - Campagnes en cours trois corrections closes porte rouge sur quatre depots - 20260908d.md` | fichier | 20,1 Ko | Synthèse de mandat — campagnes en cours : trois corrections vérifiées et closes, trois cam |
 | `Digit-AI - Synthese Mandat - Canal confidentiel et actions 58 60 61 62 63 - 20260907m.md` | fichier | 25,4 Ko | Synthèse de mandat — le canal confidentiel existe et les tables y vivent, la forge des out |
 | `Digit-AI - Synthese Mandat - Decision 5a et TF-0793 clos - 20260903f.md` | fichier | 13,8 Ko | Synthèse de mandat — décision 5a appliquée et premier chantier du pilot clos (03/09/2026) |
 | `Digit-AI - Synthese Mandat - Decision 5a jetons digit-ai-schemas - 20260904a.md` | fichier | 19,7 Ko | Synthèse — décision 5a du 04/09/2026 : le skill de schémas émet des jetons |
 | `Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md` | fichier | 19,9 Ko | Synthèse de mandat — décisions 11 (b) et 12 (a) exécutées : l'histoire de la forge des out |
+| `Digit-AI - Synthese Mandat - Decisions 13 14 15 executees campagnes en cours - 20260908c.md` | fichier | 11,6 Ko | Synthèse de mandat — vos trois réponses du matin exécutées : la forge des outils publiée,  |
 | `Digit-AI - Synthese Mandat - Decisions 16a 17a 18a - 20260905l.md` | fichier | 17,6 Ko | Synthèse de mandat — décisions 16, 17 et 18 exécutées : le parc des treize forges est vert |
 | `Digit-AI - Synthese Mandat - Decisions 19a 20a et actions 44 a 48 - 20260905m.md` | fichier | 24,3 Ko | Synthèse de mandat — décisions 19 et 20, actions 44 à 48 exécutées : trois forges publiées |
 | `Digit-AI - Synthese Mandat - Decisions 1a 2a 3a 4a - 20260903g.md` | fichier | 16,4 Ko | Synthèse — décisions 1a, 2a, 3a, 4a du 03/09/2026 |
@@ -79,6 +81,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Retours ingeres et todos a partager entre postes - 20260908b.md` | fichier | 17,6 Ko | Synthèse de mandat — « fais tous les retours et todos » : les neuf lots en attente sont in |
 | `Digit-AI - Synthese Mandat - Retours pris et propagation mesurable - 20260901a.md` | fichier | 12,6 Ko | Synthèse de mandat — trois lots pris, la propagation devient mesurable, et le banc monte à |
 | `Digit-AI - Synthese Mandat - Selecteurs de familles et palier 1 des tests - 20260901e.md` | fichier | 13,8 Ko | Synthèse de mandat — les sélecteurs de familles, et le premier palier de la stratégie de t |
+| `Digit-AI - Synthese Mandat - Sept campagnes closes et format de sortie corrige - 20260908e.md` | fichier | 21,4 Ko | Synthèse de mandat — les sept campagnes sont closes et vérifiées une par une, et le défaut |
 | `Digit-AI - Synthese Mandat - Six actions et une porte de publication - 20260901f.md` | fichier | 12,8 Ko | Synthèse de mandat — les six actions, et la porte qui a refusé la publication |
 | `Digit-AI - Synthese Mandat - Surveillance des recidives TF-0790 - 20260903c.md` | fichier | 11,3 Ko | Synthèse de mandat — surveillance des récidives entre les runs (03/09/2026, après votre dé |
 | `Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md` | fichier | 14,1 Ko | Synthèse de mandat — synchronisation faite et action A-45 de l'autre poste jouée ici : rie |
@@ -106,4 +109,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Verification de non perte jouable - 20260901d.md` | fichier | 9,0 Ko | Synthèse de mandat — le tri reste éteint, et sa vérification cesse d'être une intention |
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 
-_89 fichier(s), 0 sous-dossier(s)_
+_92 fichier(s), 0 sous-dossier(s)_
