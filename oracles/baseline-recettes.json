@@ -47,8 +47,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-boite-entree.mjs": {
-  "cas": 32,
-  "vu_le": "2026-09-02"
+  "cas": 35,
+  "vu_le": "2026-09-08"
  },
  "oracle-cadence.mjs": {
   "cas": 16,

@@ -27,6 +27,11 @@
  *       chez lui sans le remonter emporte la CLASSE du défaut avec lui. B6 CONSTATE ce qui
  *       attend dans la boîte ; `ingerer-lot.mjs` REFUSE à l'entrée — les deux se cumulent,
  *       un lot ingéré part en old et B6 ne le voit plus.
+ *   B8  (TF-0908, 08/09) un lot non ingéré depuis plus de 24 h n'attend plus son tour : il est
+ *       OUBLIÉ. B1 et B3 disent QUOI n'est pas entré ; B8 dit DEPUIS QUAND, et c'est cette
+ *       ancienneté que le hook d'ouverture du pilot rend bloquante. Six lots déposés le 07/09,
+ *       zéro ingéré, un producteur qui écrit « remonté » — la remise est un dépôt de fichier,
+ *       l'ingestion un geste de session que rien ne déclenchait.
  *
  * Ce qu'il ne juge PAS : la valeur des candidatures, la justesse d'un retour, l'opportunité
  * de les traiter. Il dit qu'un travail est arrivé et n'a pas été pris, jamais s'il le mérite.
@@ -39,7 +44,7 @@
  * Exit : 0 PASS · 1 FAIL · 2 non jugeable.
  */
 import { createHash } from "node:crypto";
-import { appendFileSync, existsSync, readFileSync, readdirSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { appendFileSync, existsSync, readFileSync, readdirSync, mkdtempSync, mkdirSync, writeFileSync, rmSync, statSync, utimesSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
@@ -52,6 +57,7 @@ const NON_JUGE = [
   "la VALEUR des candidatures d'un lot — cet oracle dit qu'un travail est arrivé sans être pris, jamais s'il le mérite",
   "les lots remis par un canal autre que le répertoire (message, dépôt frère) — il ne voit que ce qui est déposé",
   "le contenu de `old\\`, canal d'échappement documenté pour un lot déjà traité ailleurs",
+  "B8 mesure l'ancienneté sur la date du FICHIER (mtime), jamais sur la date portée par son nom : un lot recopié ou renommé repart à zéro. C'est assumé — la question posée est « depuis quand attend-il À CET ENDROIT », pas « depuis quand a-t-il été écrit »",
 ];
 
 // AU NIVEAU MODULE, ET CE N'EST PAS UN DÉTAIL DE STYLE : posée dans une fonction, cette constante
@@ -87,6 +93,30 @@ const empreinteBrute = (chemin) => empreinteBinaire(chemin);
 function couvert(parSha, chemin) {
   return parSha.has(empreinte(chemin)) || parSha.has(empreinteBrute(chemin));
 }
+
+// ---- B8 (TF-0908, 08/09/2026) — DEPUIS QUAND, ET PAS SEULEMENT QUOI ---------------------------
+//
+// B1 et B3 répondent à « ce lot est-il entré ? ». Elles ont toujours répondu juste — et pourtant,
+// le 07/09, SIX lots d'un même produit ont été déposés et ZÉRO ingéré : `grep -c` sur le registre
+// et sur l'archive rendait 0 / 0. Le producteur, lui, écrivait « remonté » dans ses synthèses,
+// et l'humain a fini par mesurer la même chose autrement : « remonté plusieurs fois, toujours
+// pas traité ». *La remise est un dépôt de fichier ; l'ingestion est un geste de session que
+// rien ne déclenchait.*
+//
+// B8 répond à une AUTRE question, et c'est ce qui la distingue de B1 : **depuis combien de
+// temps**. Un lot déposé il y a dix minutes attend son tour, c'est normal ; un lot déposé il y a
+// plus de 24 heures a été OUBLIÉ, et la différence entre les deux ne se lit nulle part dans un
+// constat B1. C'est cette ancienneté que le hook d'ouverture rend BLOQUANTE — un constat qu'on
+// relit chaque matin sans jamais le traiter est un constat qui ne protège plus (R-33 bis).
+//
+// L'horloge est celle du FICHIER (mtime), pas celle du nom : un lot renommé ou recopié repart
+// à zéro, et c'est voulu — on mesure depuis quand il attend À CET ENDROIT, pas depuis quand il
+// a été écrit chez le produit.
+const SEUIL_OUBLI_H = 24;
+const ageHeures = (chemin) => {
+  try { return (Date.now() - statSync(chemin).mtimeMs) / 3600000; }
+  catch { return null; } // fichier illisible : on ne devine pas une ancienneté
+};
 
 /** Les ingestions déjà consignées, par empreinte ET par nom de fichier. */
 function ingestions(registre) {
@@ -195,12 +225,14 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
       if (sidecars.includes(derive) && couvert(parSha, join(repertoire, derive))) continue;
     }
 
+    const age = ageHeures(join(repertoire, nom));
     findings.push(
       parNom.has(nom)
-        ? { regle: "B2", statut: "FAIL", ou: nom,
+        ? { regle: "B2", statut: "FAIL", ou: nom, depuis_h: age === null ? null : Number(age.toFixed(1)),
             message: "sidecar ÉDITÉ après son ingestion — le registre porte ce nom, mais plus ce contenu ; ce qui a été ajouté depuis n'est entré nulle part" }
-        : { regle: "B1", statut: "FAIL", ou: nom,
-            message: "sidecar JAMAIS ingéré — le travail est arrivé et n'a pas été pris (`node todo\\ingerer-lot.mjs <fichier>`)" },
+        : { regle: "B1", statut: "FAIL", ou: nom, depuis_h: age === null ? null : Number(age.toFixed(1)),
+            message: "sidecar JAMAIS ingéré — le travail est arrivé et n'a pas été pris (`node todo\\ingerer-lot.mjs <fichier>`)"
+              + (age === null ? "" : ` ; déposé depuis ${age < 1 ? "moins d'une heure" : `${age.toFixed(0)} h`}`) },
     );
   }
 
@@ -214,8 +246,10 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
     if (NOTICES_DE_DOSSIER.has(nom)) continue;
     const base = nom.slice(0, -3);
     if (sidecars.some((s) => s.startsWith(base))) continue;
-    findings.push({ regle: "B3", statut: "FAIL", ou: nom,
-      message: "lot remis SANS sidecar — aucun canal ne peut l'ingérer, il est invisible par construction (`node todo\\normaliser-lot.mjs` ou sidecar à réclamer au produit)" });
+    const ageMd = ageHeures(join(repertoire, nom));
+    findings.push({ regle: "B3", statut: "FAIL", ou: nom, depuis_h: ageMd === null ? null : Number(ageMd.toFixed(1)),
+      message: "lot remis SANS sidecar — aucun canal ne peut l'ingérer, il est invisible par construction (`node todo\\normaliser-lot.mjs` ou sidecar à réclamer au produit)"
+        + (ageMd === null ? "" : ` ; déposé depuis ${ageMd < 1 ? "moins d'une heure" : `${ageMd.toFixed(0)} h`}`) });
   }
 
   // GÉNÉRALISÉ À TOUTE RÈGLE (24/08, second passage). Le premier jet ne lisait les dérogations que
@@ -382,6 +416,24 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
       message: `remise d'artefact NON RATTACHÉE (${motif}) — un objet réclamé par le registre `
         + `est arrivé sans que rien ne dise à quel item il répond : la prochaine session verra `
         + `un fichier orphelin. Écrire ${nom}${SUFFIXE_REMISE} avec repond_a / provenance / date` });
+  }
+
+  // B8 (TF-0908) — L'ANCIENNETÉ, la question que B1 et B3 ne posent pas. Elle se calcule sur les
+  // constats DÉJÀ rendus : rien n'est relu, rien n'est jugé deux fois — B8 ne dit pas qu'un lot
+  // n'est pas entré (B1/B3 le disent), elle dit qu'il attend depuis trop longtemps.
+  const oublies = findings.filter((f) => (f.regle === "B1" || f.regle === "B3")
+    && f.statut === "FAIL" && typeof f.depuis_h === "number" && f.depuis_h > SEUIL_OUBLI_H);
+  if (!oublies.length) {
+    findings.push({ regle: "B8", statut: "PASS", ou: "-",
+      message: `aucun lot non ingéré depuis plus de ${SEUIL_OUBLI_H} h — ce qui attend dans la boîte y est arrivé récemment` });
+  } else {
+    const plusVieux = Math.max(...oublies.map((f) => f.depuis_h));
+    findings.push({ regle: "B8", statut: "FAIL", ou: "-", depuis_h: Number(plusVieux.toFixed(1)),
+      message: `${oublies.length} lot(s) attendent depuis plus de ${SEUIL_OUBLI_H} h (le plus ancien : ${plusVieux.toFixed(0)} h) — `
+        + `${oublies.slice(0, 6).map((f) => f.ou).join(", ")}${oublies.length > 6 ? ", …" : ""}. `
+        + "Un travail remonté qui n'entre pas au registre est un travail que le producteur croit remonté et que personne ne traite "
+        + "(mesuré le 07/09 : six lots déposés, zéro item). À jouer AVANT tout autre travail : `node todo\\ingerer-lot.mjs <fichier>` "
+        + "pour chacun (un lot sans sidecar passe d'abord par `node todo\\normaliser-lot.mjs`)" });
   }
 
   const vues = new Set(findings.map((f) => f.regle));
@@ -673,6 +725,24 @@ function selfTest() {
   r = juger(boite, reg, regIns);
   cas.push(["B5    — vert : remise rattachée, et la NOTICE du canal n'est pas une remise",
     !r.findings.some((f) => f.regle === "B5" && f.statut === "FAIL"), r.verdict]);
+
+  // B8 (TF-0908) — L'ANCIENNETÉ, dans ses DEUX sens, sur le MÊME lot. Seule la date du fichier
+  // change entre les deux mesures : c'est ce qui prouve que la règle lit bien l'horloge et pas
+  // autre chose. Le cas du 07/09 est reproduit tel quel — un lot déposé, jamais ingéré.
+  const oublie = join(boite, "OUBLIE - RETOURS - 20260101a.tf.jsonl");
+  writeFileSync(oublie, '{"titre":"depose et jamais pris"}\n');
+  const surB8 = (f) => f.regle === "B8";
+  r = juger(boite, reg, regIns);
+  cas.push(["B8    — vert : un lot déposé à l'instant attend son tour, ce n'est pas un oubli",
+    r.findings.some((f) => surB8(f) && f.statut === "PASS"), r.verdict]);
+  const vieux = (Date.now() - 30 * 3600000) / 1000; // 30 h, au-delà du seuil de 24 h
+  utimesSync(oublie, vieux, vieux);
+  r = juger(boite, reg, regIns);
+  const f8 = r.findings.find(surB8);
+  cas.push(["B8    — rouge : le même lot, déposé il y a 30 h, est un OUBLI et non une file d'attente",
+    !!f8 && f8.statut === "FAIL" && /30 h/.test(f8.message), r.verdict]);
+  cas.push(["B8 bis— le constat NOMME le lot et la commande qui le fait entrer",
+    !!f8 && f8.statut === "FAIL" && /OUBLIE - RETOURS/.test(f8.message) && /ingerer-lot\.mjs/.test(f8.message), r.verdict]);
 
   let ok = 0;
   for (const [nom, tenu, verdict] of cas) {

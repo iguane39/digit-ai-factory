@@ -222,6 +222,48 @@ if (iPilot < 0) {
   }
 }
 
+// TF-0908 (08/09/2026) — UN LOT DÉPOSÉ ET JAMAIS INGÉRÉ SE DIT À L'OUVERTURE, PAS AU HASARD.
+//
+// LE FAIT : le 07/09, six lots de retours d'un même produit ont été déposés dans `input\00-retours`
+// et AUCUN ingéré — `grep -c` sur le registre actif et sur l'archive rendait 0 / 0. Cinq de ces
+// lots portaient la même cause racine. Le producteur écrivait « remonté » dans ses synthèses ; le
+// destinataire a mesuré la même chose autrement : « remonté plusieurs fois, toujours pas traité ».
+//
+// LA CAUSE, et elle est structurelle : la remise est un DÉPÔT DE FICHIER, l'ingestion est un
+// GESTE DE SESSION. `oracle-boite-entree` sait le dire depuis le 14/08 — le noyau prescrit même
+// de le jouer « à l'ouverture de tout run » — mais aucun mécanisme ne le lançait : il fallait y
+// penser. C'est la classe de défaut que ce hook existe pour éteindre, prise une fois de plus.
+//
+// POURQUOI BLOQUANT ICI, alors que les autres sections de ce hook ne le sont pas : les autres
+// DÉCLARENT un état qu'elles ne peuvent pas réparer (héritage d'un produit, câblage d'un poste,
+// R-29). Celui-ci nomme un travail que LA SESSION QUI LIT peut prendre à l'instant, en une
+// commande. Un constat qu'on relit chaque matin sans le traiter cesse d'être lu (R-33 bis) : le
+// seuil de 24 h sépare donc la file d'attente normale de l'oubli, et seul l'oubli passe en tête.
+if (iPilot < 0) {
+  const ob = join(PILOT, "oracles", "oracle-boite-entree.mjs");
+  lignes.push("", "## Boîte d'entrée des retours (TF-0908)");
+  if (!existsSync(ob)) lignes.push("- oracle-boite-entree ABSENT du pilot — un lot déposé et non ingéré ne serait vu par personne.");
+  else {
+    const r = spawnSync(process.execPath, [ob], { encoding: "utf8", cwd: PILOT, timeout: 90000 });
+    let j = null;
+    try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* dit ci-dessous */ }
+    const f8 = j && (j.findings || []).find((x) => x.regle === "B8");
+    if (!j) lignes.push(`- verdict ILLISIBLE (exit ${r.status}) — ce n'est pas un constat sur la boîte : ${(r.stderr || "").trim().slice(0, 160)}`);
+    else if (j.verdict === "SKIP") lignes.push(`- sans objet — ${j.motif || "répertoire absent"}`);
+    else if (!f8) lignes.push("- l'oracle n'a pas rendu B8 — l'ancienneté des lots n'est pas mesurée sur cette ouverture.");
+    else if (f8.statut === "PASS") {
+      const restants = (j.findings || []).filter((x) => x.statut === "FAIL").length;
+      lignes.push(restants
+        ? `- ${restants} constat(s) ouvert(s), aucun de plus de 24 h — ${f8.message}`
+        : `- boîte à jour — ${f8.message}`);
+    } else {
+      lignes.push(`- **BLOQUANT — ${f8.message}**`,
+        "- À TRAITER AVANT TOUT AUTRE TRAVAIL de cette session : un lot remonté qui n'entre pas au registre",
+        "  n'existe pour personne, et le producteur le croit pris. Détail : node oracles/oracle-boite-entree.mjs");
+    }
+  }
+}
+
 // TF-0790 (décision D-2 (a), 03/09/2026) — LA CADENCE D'UN PLAN DE SURVEILLANCE EST TENUE PAR QUI
 // L'INVOQUE. forge-observability le dit elle-même : « la cadence est documentaire en v0 ». Sans
 // invocateur, le plan des récidives serait une intention de plus (N-1). L'ouverture du pilot joue
