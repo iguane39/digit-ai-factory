@@ -112,4 +112,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Verification de non perte jouable - 20260901d.md` | fichier | 9,0 Ko | Synthèse de mandat — le tri reste éteint, et sa vérification cesse d'être une intention |
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 
-_95 fichier(s), 0 sous-dossier(s)_
+_95 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

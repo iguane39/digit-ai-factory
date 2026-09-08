@@ -1,0 +1,115 @@
+# Synthèse de mandat — vos sept décisions sont exécutées, le parc est publié, et la porte de publication le bloque désormais elle-même (08/09/2026)
+
+Vos sept décisions ont été suivies dans la minute : les huit dépôts sont publiés, soixante-douze commits, aucun refus. Les six actions suivantes sont closes ou engagées, et quatre campagnes ont travaillé sur les trente-six items encore ouverts — trois ont rendu, la quatrième finit. Vingt-cinq items ont été sondés cet après-midi, douze clos, treize laissés en cours avec leur mesure plutôt que fermés à tort. Mais un fait s'est imposé entre-temps : la propagation des skills que vous avez validée a donné à la porte de publication un angle qu'elle n'avait pas — la lecture du contenu de l'historique — et elle refuse maintenant le parc sur deux cents occurrences dormant dans le passé. Ce qui est attendu de vous : trancher le sort de cette histoire, car plus rien ne peut être publié avant.
+
+## 1. En-tête d'identification
+
+- **quoi** — exécution des sept décisions humaines du 08/09 (D-29 (a) publication, puis A-74, A-73, A-72, A-71, A-66, A-68), puis lancement de quatre campagnes, sondage de leurs rapports, et traitement du changement d'état de la porte.
+- **sur quoi** — les huit dépôts du parc, la copie installée des skills, le canal confidentiel, le registre du pilot.
+- **quand** — 2026-09-08 15:50 UTC+02:00 (Europe/Paris), durée ≈ 3 h 30 à l'heure de ce dépôt ; une campagne encore en cours.
+- **qui** — pilot digit-ai-factory 73e3bab ; porte de publication du skill des oracles, `oracles\oracle-skills.mjs`, `oracles\oracle-synthese.mjs`, `oracles\oracle-boite-entree.mjs`, `todo\bancs-isoles.mjs` (neuf), `todo\anonymiser-suivis.mjs` ; quatre agents de campagne sous `gabarits\AGENT-CAMPAGNE.md`.
+
+## 2. Verdict en une ligne
+
+**8 dépôts publiés sur 8 à 15 h 50, 72 commits, 0 refus de la porte ; 6 skills divergents → 0 ; garde des bancs 14/14 ; 3 lots pseudonymisés et ingérés, boîte d'entrée PASS ; 4 campagnes lancées sur 36 items, 3 closes et sondées, 25 items traités (12 clos, 13 en cours avec leur mesure) ; porte allégée de 34 à 35 % (330,9 s et 295,5 s → 217,9 s et 191,4 s), 70 invocations → 21, à 200 constats identiques, recette 233 → 239 rejouée ici ; un canevas livré la veille corrigé d'un contraste à 3,08:1 là où 4,5:1 est dû, trouvé aux quatre largeurs ; MAIS depuis 16 h 05 la porte rend FAIL sur 200 constats — 96 révisions, 11 emplacements — là où elle rendait PASS trois fois le matin, 3 occurrences vivantes nettoyées et 194 restant dans l'histoire ; registre 152 clos, 14 décidés, 9 en cours, 15 candidats, 51 classes ; 22 commits locaux non publiables.**
+
+## 3. Décisions attendues de l'humain
+
+Une décision attend, et elle bloque toute publication.
+
+> **D-30 — La porte refuse le parc à cause de cent quatre-vingt-quatorze occurrences dormant dans l'histoire : réécrit-on cette histoire, ou desserre-t-on la porte ?**
+>
+> J'ai nettoyé les trois occurrences vivantes — une ligne dans chacune de trois synthèses, mes propres fichiers. Cela ne suffit pas : la porte balaye l'histoire, donc elle refusera tout push tant que le passé n'est pas traité. Trois noms de produits sont en cause, sur cinq fichiers — des lots de retours archivés, et le registre avec ses deux vues, recopiés à chaque régénération. Un doute demeure sur l'un des trois, une clé de trois lettres en majuscules versée sans forme bornée, qui peut être un vrai nom comme un acronyme homographe : s'il tombe, l'affaire passe de 200 à 125 occurrences et de 96 à environ 48 révisions.
+>
+> **Recommandation : (a).** Source consultée : `CLAUDE.md` du pilot, garde-fou R-29 — supprimer ou réécrire une histoire est un geste humain, jamais automatique — et `references/TODO-FORGE.md`, qui impose qu'une décision se prenne sur une mesure et non sur une estimation. La mesure ci-dessus dit qu'une lecture d'une ligne peut diviser l'ampleur par deux avant d'engager une opération lourde.
+
+| Option | Ce qu'elle coûte | Ce qu'elle exclut |
+|---|---|---|
+| (a) Qualifier d'abord le terme de trois lettres, puis décider sur l'ampleur réelle | Une lecture, que je n'ai pas su faire seul | Rien : c'est le préalable des deux autres |
+| (b) Réécrire l'histoire des dépôts concernés | Une opération lourde, déjà menée deux fois ce mois-ci, et l'autre poste doit rebâtir ses clones | Rien, mais 96 révisions réécrites dont peut-être la moitié pour un faux positif |
+| (c) Déclarer ces occurrences historiques hors périmètre de la porte, avec leur motif écrit | Une règle qui s'assouplit, et le risque qu'elle masque un vrai cas demain | La garantie que la porte protège toute l'histoire — ce serait un choix assumé, pas un oubli |
+
+> **Si rien n'est décidé** : (c) par défaut inverse — rien ne bouge, les vingt-deux commits restent sur ce poste, et l'autre poste continue sur l'histoire de 15 h 50.
+
+## 4. Traité — avec sa preuve
+
+- **D-29 (a) — les huit dépôts sont publiés**, chacun après passage de la porte, à un moment où elle rendait PASS.
+  - preuve : pilot 42 commits, outils 15, conception 5, données 4, design 3, tests 1, conventions 1, référencement 1 — huit lignes « PUBLIE », zéro « REFUSE ».
+- **A-74 — les six skills divergents sont propagés.** Contrôle rouge → vert : FAIL sur 6 divergences → PASS, 0, sur 21 skills, là où l'item en mesurait 28 ; classe : la copie installée est ce qui s'exécute, et elle était en retard sur le versionné.
+  - preuve : `oracle-skills.mjs` avant et après, revérifié indépendamment par la campagne du pilot. **Réserve honnête** : le contrôle est repassé FAIL à 16 h 49 sur deux fichiers d'un dépôt frère, la campagne qui y travaille les ayant modifiés depuis — un versionné qui avance, pas une régression.
+- **A-72 — le trou du sous-processus est fermé, et la limite de la prévention est déclarée au lieu d'être promise.** Contrôle rouge → vert : en retirant l'isolation d'un des cinq bancs fautifs, la table de production est réécrite MALGRÉ les deux gardes — le marqueur n'est posé qu'à l'import, et ces bancs lancent l'ingestion en sous-processus → un contrôle neuf lit le texte des bancs et refuse ceux qui ne posent pas leurs tables ; classe : une prévention qui ne couvre pas le cas pour lequel elle a été écrite.
+  - preuve : `node todo/bancs-isoles.mjs` → « 14/14 touchant la chaîne, 0 FAIL » ; son banc → 4 PASS ; anonymiseur 9/9 → 10/10 ; le contrôle a produit **un faux positif au premier jeu** — il accusait un banc citant un nom de module dans une chaîne de test — corrigé et pris comme troisième cas du banc.
+- **A-73 et A-66 — les deux candidatures sont décidées et journalisées**, la seconde créée à cette occasion : `journaliser.mjs` rend « 3 événement(s) journalisé(s) » et l'oracle du registre rend PASS après écriture.
+  - preuve : `node todo/journaliser.mjs --fichier <decisions.json>` → « 3 événement(s) journalisé(s) » ; `node todo/oracle-todo.mjs` → verdict PASS ; `node todo/self-test.mjs` → « 52 PASS, 0 FAIL ».
+- **A-71 — quatre campagnes lancées** sur les 36 items ouverts, dossiers écrits depuis le registre et triés par score.
+  - preuve : pilot 10, outils 13, données 9, tests 2, design 1, conventions 1 ; les quatre ont relevé leur cliquet de départ avant toute écriture.
+- **A-68 — le lot du 3 septembre porte un pseudonyme**, sur votre consigne d'en attribuer un sans connaître le nom réel. Contrôle rouge → vert : 1 constat bloquant de la boîte d'entrée → 0.
+  - preuve : clé inscrite au canal (64 → 65 clés), lot et sidecar renommés, réécrits et ingérés — 2 candidatures ; deux lots de plus arrivés sous un nom réel pendant le tour ont reçu le même traitement.
+- **Le changement d'état de la porte, mesuré et compris.** Contrôle rouge → vert inversé : PASS trois fois le matin → FAIL, 200 constats ; classe : un contrôle dont la copie installée est en retard sur le versionné rend un verdict qui ne vaut que pour sa version.
+  - preuve : « FAIL, 200 findings, 200 bloquants », 96 révisions, 11 emplacements distincts ; l'angle du contenu de l'historique est versionné depuis le 5 septembre et n'était pas dans la copie installée avant 16 h 05 — la campagne propriétaire l'a vérifié par empreinte, et sa correction de mon interprétation est reprise ici.
+- **Les trois occurrences vivantes sont nettoyées.** Contrôle rouge → vert : 3 occurrences dans l'arbre courant → 0 ; les 194 autres sont dans l'histoire et ne se corrigent pas par une édition.
+- **La porte est allégée d'un tiers, sondée et close.** Contrôle rouge → vert : la fixture rejouée en runner autonome contre la version d'avant rend 3 échecs — le coût n'est pas déclaré, le temps mesuré non plus, la gratuité du régime nominal n'est pas montrée — et aucun après ; classe : un contrôle bloquant dont le temps d'exécution le rend contournable, par une boucle qui relit la même donnée une fois par terme cherché.
+  - preuve : 330,9 s et 295,5 s avant, 217,9 s et 191,4 s après, l'écart entre conditions valant trois fois le plus grand écart intra-condition et les plages ne se recouvrant pas ; 70 invocations → 21 ; **invariance : 200 constats avant, 200 après, zéro perdu, zéro ajouté** ; recette rejouée ICI « PASS, 239 contrôles » contre 233 au départ ; et l'oracle joué ICI rend sa ligne de coût à l'exécution, ce qui était la condition de clôture de l'item.
+- **Un canevas livré la veille corrigé d'un défaut d'accessibilité, et la vraie cause nommée.** Contrôle rouge → vert : 1 bloquant à chacune des quatre largeurs → 0 ; la même page avec l'ancienne légende en rend 4, un par largeur ; classe : un fragment qu'aucune recette ne rend, donc dont personne ne mesure ce qu'il produit une fois posé.
+  - preuve : une teinte à 3,08:1 là où un texte doit tenir 4,5:1, les deux autres passant ; correction en pastille jugée à 3:1 au titre du composant graphique — la bonne règle pour le bon objet, rien d'assoupli ; la recette pose désormais le canevas dans une page hôte **générée** depuis lui, jamais recopiée, pour ne pas ouvrir la dérive que le contrôle de parité existe pour attraper ; cliquet du socle 236 → 238.
+- **La demande littérale du même item reste non close, et c'est le bon verdict.** Contrôle : deux campagnes indépendantes ont cherché le défaut supposé à quatre largeurs chacune — 1920, 1280, 768 et 390 pixels — et relevé zéro constat de la règle visée sur la cible, à chaque largeur ; classe : une demande de correction qui suppose un défaut que personne n'a mesuré.
+  - preuve : le rendu joué aux quatre largeurs sur le canevas instancié dans une page hôte de 40 cartes et 274 puces → 0 constat ; aucune exclusion posée, et l'item repart chez le produit demandeur, qui n'a pas joint la page.
+- **Les neuf items de la forge des données, sondés et clos** — cliquet rejoué ici à 229 cas verts contre 210 au départ. Contrôle rouge → vert : la fixture rouge confrontée aux DEUX versions de l'oracle relève trois règles avec celui d'avant — le type d'évolution hors du jeu fermé, le compte incohérent, la provenance absente — contre six avec celui d'après, les trois mêmes plus les trois neuves : provenance sans explication, arbre incohérent avec ses enfants, objets cités non résolus ; classe : un document hiérarchique rendu à plat, dont rien ne vérifie que le parent dit la même chose que ses enfants.
+  - preuve : cliquet rejoué **sur un clone** pour ne pas toucher l'arbre de la campagne → « 229 PASS, 0 FAIL » (210 au départ) ; deux doublons clos avec leur original **sans gain propre, écrit noir sur blanc** ; quatre items déjà faits vérifiés par lecture du code et non sur la foi d'un titre de commit.
+- **Les quatre items de la campagne des trois dépôts, sondés (1 clos, 3 en cours).** Contrôle rouge → vert sur celui qui est clos : les deux formes de référence d'une application servie passaient de « bloquant à tort » à « jugé sur pièces », 6 fixtures sur 6.
+  - preuve : cliquet « 11/12 » inchangé, le douzième échec étant le préexistant connu ; l'agent signale de lui-même que sa fixture rouge neuve échouait DÉJÀ avant, et que ce qu'elle prouve est le motif, non le verdict — nuance gardée telle quelle au registre. Le faux vert de la recette de non-perte est vérifié ici : **5 échecs sur 12** contre le code d'avant, tous dans le sens « PASS rendu là où l'abstention est exigée ».
+- **Les dix items de la campagne du pilot, sondés (1 clos, 5 en cours, 4 rendus côté produit).** Classe la plus instructive : une frontière de mot ne sépare pas un nom composé de son composant.
+  - preuve : juge de restitution 14/14 → 18/18, chaque règle neuve dans SES DEUX SENS, chaque paire de fixtures ne différant que d'UN MOT ; sur 95 synthèses réelles, 12 accusations remontent que rien ne voyait ; et l'agent a trouvé un défaut de **sa propre règle** en la jouant avant de la déclarer livrée — 22 accusations sur 95 ramenées à 3, toutes vérifiées vraies, et le taux d'accusation entre au gabarit.
+- **A-80 — le harnais absent de l'oracle d'ouverture est journalisé, l'item de rognage réattribué.** Classe créée : un contrôle en service sans banc double sens, dont l'en-tête affirme parfois en avoir.
+  - preuve : l'en-tête annonce « trois volets neufs, tous à fixture double sens » ; le banc du dépôt ne mentionne cet oracle nulle part ; la campagne a refusé d'y poser deux règles tant que le harnais n'existe pas.
+
+## 5. Non traité — avec son motif
+
+- Les cent quatre-vingt-quatorze occurrences historiques : c'est la décision D-30, et elle bloque toute publication.
+- La qualification du terme de trois lettres : je n'ai pas su la faire — zéro occurrence dans l'arbre courant et dans les quarante dernières révisions lues ; elle demande de remonter plus loin, ou votre connaissance du parc.
+- Les sept items restants de la campagne des outils : en cours — motif : la campagne travaille encore, et rien ne se clôt au registre avant que j'aie rejoué chaque preuve.
+- Quatre items rendus côté produit, chacun le disant dans son propre texte, plus celui du canevas renvoyé à son demandeur faute de page jointe.
+- Le harnais de l'oracle d'ouverture : journalisé, pas construit — motif : c'est un chantier distinct de l'item qu'il bloque, et l'y fondre aurait mêlé la construction d'un banc à l'ajout de deux règles.
+- La règle d'intention portée à toute restitution : décidée, exécution reportée — motif : le juge de restitution vient de recevoir quatre règles d'une autre nature, et empiler la cinquième mélangerait deux chantiers dans un même commit.
+- Les quinze candidatures ouvertes, dont quatre nées aujourd'hui — motif : une candidature se décide avant d'être corrigée, et aucune décision n'a été prise sur celles-ci.
+
+## 6. Écarts à la lettre
+
+- Vous avez décidé « 72 » avec la direction du marqueur d'environnement → je l'ai posée, **mesurée insuffisante**, et fermé le cas par un contrôle → pourquoi : le marqueur n'est posé qu'à l'import de la chaîne, et les cinq bancs fautifs ne l'importent pas.
+- Vous avez décidé « 71 » → quatre campagnes et non six → pourquoi : trois dépôts d'un item chacun sont confiés à une seule campagne, et un dépôt n'est confié qu'à une campagne à la fois.
+- J'ai donné à une campagne des commandes de vérification qui n'existent pas dans son dépôt → elle l'a signalé, j'ai reconnu l'erreur et gardé ses commandes réelles.
+- J'ai rapproché à tort les deux cents occurrences et cinq identifiants techniques trouvés ailleurs → la campagne a corrigé : deux tables et deux angles distincts, et son chiffre ne dit rien des identifiants.
+- J'ai affirmé trois fois que la porte rendait PASS sur le pilot → c'était exact pour la version installée d'alors, et faux depuis la propagation ; la mesure est refaite et le fait est écrit.
+- J'ai tranché seul une option qu'un item laissait à arbitrer, la règle d'intention portant désormais à toute restitution et non à la seule étude d'opportunité → pourquoi : le retour humain d'origine dit « tous types de demande », et la loi transverse du noyau ne connaît aucune restriction. Dites-moi si vous la voulez autrement.
+
+## 7. Risques
+
+- **Un parc qui ne peut plus être publié** : signal = le hameçon refuse le push ; parade = la décision D-30, sans laquelle les vingt-deux commits resteront locaux.
+- **Une décision lourde prise sur un faux positif** : signal = un terme de trois lettres versé sans forme bornée, profil exact de deux défauts déjà documentés ; parade = l'option (a), qui coûte une lecture.
+- **Un verdict d'oracle qui ne vaut que pour sa version installée** : signal = un PASS et un FAIL sur le même dépôt le même jour ; parade = le fait est écrit, et une candidature demande que la propagation rejoue les vérifications des consommateurs avant/après.
+- **Un fragment livré que rien ne rend** : signal = un gabarit qui échoue une fois posé sans qu'aucune recette ne l'ait vu ; parade = la recette rend désormais le canevas dans une page générée, et la classe est nommée au registre.
+- **Une règle neuve qui accuse à tort** : signal = un taux d'accusation non mesuré sur le corpus réel ; parade = le taux entre désormais au gabarit, mesuré et non supposé.
+- **Deux écrivains dans le dépôt du pilot** : signal = un fichier modifié que je n'ai pas touché ; parade = j'ai réservé nommément le registre, ses vues et la synthèse, et la campagne s'y est tenue.
+
+## 8. Prochaines actions — un tableau, l'acteur en colonne
+
+| Sélecteur | Action | Identifiant | Acteur | Motif ou raison | Exécutable par | Si non faite |
+|---|---|---|---|---|---|---|
+| A-81 | Qualifier le terme de trois lettres, puis traiter l'histoire selon votre arbitrage | TF-0966, TF-0965 | auto_ia | dependance_bloc_3 (décision D-30) | selon l'option retenue : inscription au canal, réécriture d'histoire, ou déclaration de portée | plus rien ne se publie |
+| A-75 | Recevoir le rapport final de la campagne des outils, sonder chaque commit, clore ou renvoyer au registre avec gains constatés | TF-0944, TF-0939, TF-0953, TF-0941, TF-0940, TF-0952 | auto_ia | dependance_externe (campagne en cours) | rapport puis `node todo/journaliser.mjs --fichier <clotures.json>`, `node todo/generer-vue.mjs` | sept items restent décidés sans correction constatée |
+| A-76 | Publier les vingt-deux commits des campagnes, porte jouée avant chacun | les mêmes | auto_ia | dependance_bloc_3 (la porte refuse tant que D-30 n'est pas tranchée) | `git push origin main` dans chaque dépôt touché | les corrections restent locales à ce poste |
+| A-82 | Repropager les skills après la campagne des outils, qui a modifié la porte et son banc depuis la propagation de 16 h 05 | TF-0920 | auto_ia | dependance_externe (attend la fin de cette campagne) | `node oracles/oracle-skills.mjs --appliquer` puis rejeu du contrôle de propagation | la copie qui s'exécute reste en retard sur le versionné, et l'allègement de la porte n'agit pas |
+| A-83 | Renvoyer au produit demandeur l'item du canevas, avec la mesure des deux campagnes, pour qu'il fournisse la page ou que l'item se ferme | TF-0938 | auto_ia | gate_gouvernance — barrière de gouvernance : le lot part chez un produit, geste de remise qui demande un feu vert | `node todo/emettre-travaux.mjs` vers le produit demandeur | l'item reste ouvert sur une demande que rien ne vérifie |
+| A-77 | Décider les quinze candidatures ouvertes | TF-0959, TF-0965, TF-0966, TF-0967 et les 11 des lots | auto_ia | gate_gouvernance — barrière de gouvernance : l'action est prête, mais une décision humaine doit la précéder | `node todo/journaliser.mjs --fichier <decisions.json>` | quinze items restent candidats |
+| A-67 | Sur l'autre poste, à sa prochaine ouverture : rebâtir le clone de la forge de développement, dont l'histoire a été réécrite ce matin | TF-0829 | manuelle_dev | presence : commandes à jouer sur l'autre poste, hors de portée de ce poste — `git -C ../digit-ai-forge-development rev-list --count HEAD..@{u}` ne mesure que cette machine et rend 0 ici | `node bootstrap.mjs --pull` puis `node bootstrap.mjs --rebatir ..\digit-ai-forge-development` | l'autre poste travaillera sur une histoire incompatible |
+
+Ordre : A-81 en premier, parce qu'elle débloque tout le reste ; A-75 dès le rapport reçu ; A-76 dès que la porte repasse ; A-82 juste après, parce que c'est la copie installée qui s'exécute ; A-83 et A-77 ensuite ; A-67 dès que l'autre poste ouvre une session.
+
+## 9. Traces
+
+- pilot — publié jusqu'à cfeb73f, puis seize commits locaux jusqu'à 73e3bab ; `todo\TODO.jsonl` (152 clos, 14 décidés, 9 en cours, 15 candidats), `todo\CLASSES.json` (51 classes), `todo\bancs-isoles.mjs` et son banc, `gabarits\RESTITUTION.md` v2.20.0, `oracles\oracle-synthese.mjs` S1-S41, trois synthèses nettoyées.
+- Porte de publication sur le pilot — PASS trois fois avant 16 h 05, **FAIL 200 constats** après ; allégée de 34 à 35 % par le commit 0f07cf8 de la forge des outils, à constats identiques, recette 239 contrôles rejouée ici.
+- `..\digit-ai-forge-data` — close, 2 commits, cliquet 229 PASS rejoué ici sur clone ; `..\digit-ai-forge-organization` — 5795a26, 6 fixtures sur 6, cliquet 11/12 inchangé ; `..\digit-ai-forge-tests` — 9ce711f, sens rouge vérifié ici ; `..\digit-ai-forge-design` — inchangé, aucune écriture ; `..\digit-ai-forge-conception` et `..\digit-ai-forge-seo-geo` — à jour, rien à publier ; `..\digit-ai-forge-agents` — campagne en cours, 18 commits, cliquet du socle 238.
+- `output\04-plans\Digit-AI - Synthese Mandat - Sept decisions executees parc publie puis bloque par sa propre porte - 20260908h.md` — cette synthèse.
+- Canal confidentiel — 782fb09, table des produits 65 clés.
+- `input\00-retours\` — 101 sidecars, tous ingérés ; `oracle-boite-entree` PASS.
