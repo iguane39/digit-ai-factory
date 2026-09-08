@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=9e20484b981f archive=6ce2fe14c2bb · dernier événement: 2026-09-08T17:34:13.627Z -->
+     sceaux: actifs=aba3cd45d258 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T17:44:04.566Z -->
 
-**207 actifs** (candidat 6 · décidé 27 · en cours 11 · corrigé 163 · écarté 0) · **782 archivés**.
+**208 actifs** (candidat 7 · décidé 27 · en cours 11 · corrigé 163 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -24,6 +24,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0987 | decide | 1 | pilot : le vocabulaire ferme des motifs d'oracle-synthese est cherche dans TOUT le groupe de puce, spans de code inclus - un nom de donnee se fait lire comme un motif et la regle rougit sur une action irreprochable | **oui** — S21 a compte 2 actions concernees au lieu de 1 et rendu FAIL sur une action dont le motif declare est decision ; deux passes d'oracle et une lecture de l'implementation pour le diagnostic ; remede applique chez le producteur : renommer une colonne de livrable en etats_porteurs |
 | TF-0959 | candidat | 20 | canal confidentiel : une clé DÉJÀ pseudonymisée peut entrer dans une table de noms réels, et rien ne l'en empêche — l'arbitrage du 08/09 l'a fait une fois, la porte l'a rattrapé | **oui** — trois dépôts condamnés par la porte de publication et une rectification manuelle de la table, le 08/09 au matin, sur un défaut dont la garde était déjà écrite ailleurs depuis six jours |
 | TF-0965 | candidat | 10 | pilot : propager les skills a casse un test d'une forge voisine — une regle neuve du socle est mesuree sur le parc du pilot seulement, jamais sur les depots qui la CONSOMMENT | **oui** — une suite de tests d'une forge passee au rouge par un geste joue dans un autre depot, et un agent qui a declare l'echec preexistant de bonne foi parce que rien ne lui disait que la copie installee avait change sous lui |
+| TF-0990 | candidat | 10 | pilot : le referentiel de restitution declare une exemption que son juge n'implemente pas — un tour sans nouveaute doit rendre un accuse bref, et l'accuse bref est refuse | **oui** — un accuse de reception de trois phrases refuse par quatre regles bloquantes, puis quatre-vingt-dix lignes de restitution pour un tour ou rien n'a change |
 | TF-0966 | candidat | 8.3 | pilot : la pseudonymisation ne couvre pas les IDENTIFIANTS TECHNIQUES cites dans le corps d un item — cinq objets d un systeme client vivent en clair dans le registre publie, invisibles a la porte | **oui** — cinq identifiants techniques d un systeme client en clair dans un depot publie, invisibles a la porte parce qu absents des tables ; decouverts par un agent qui les avait recopies dans ses fixtures avant de les remplacer de lui-meme |
 | TF-0967 | candidat | 8.3 | pilot : oracle-conformite-projet n a AUCUN banc de fixtures, et son propre en-tete affirme le contraire — c est l oracle dont un FAIL suspend l ouverture de tout run | **oui** — l oracle qui suspend l ouverture de tout run n a aucune fixture, et son en-tete affirme qu il en a — deux volets d un item decide sont bloques par ce manque, et la campagne a prefere s arreter plutot que d empiler une regle non eprouvee |
 | TF-0983 | candidat | 6.7 | pilot : les vues generees du registre sont versionnees — 1173 revisions de contenu derive, qui transforment UNE occurrence au registre en 25 dans l histoire | **oui** — 75 des 194 occurrences historiques du 08/09 viennent de la seule amplification par les vues generees ; 1173 revisions de contenu derive dans l histoire du depot |
