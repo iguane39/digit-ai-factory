@@ -155,7 +155,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>30c50204db5f</code> · dernier événement 2026-09-08T17:14:25.664Z</p>
+      <p class="meta">sceau <code>87ef5949ca58</code> · dernier événement 2026-09-08T17:23:46.319Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -166,8 +166,8 @@
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
       <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="29 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">29</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="14 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">14</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="10 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">10</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="4 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">4</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="11 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">11</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="781 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">781</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende">
@@ -1732,194 +1732,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0954" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0954</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 25)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-page-html : une INFOBULLE QUI RECOPIE LA CELLULE qu'elle explique passe tous les oracles — L3 et L18 exigent une explication, aucune règle ne juge le rapport entre l'explication et ce qu'elle explique</h3>
-          <div class="card-detail" data-cite><p class="lead">Version 20260908m : cellule « Lease_Start_Date de l'avenant actif (renouvellement inclus) — legacy Current lease start date », infobulle « Provenance / Lease_Start_Date de l'avenant actif (renouvellement inclus) — legacy Current lease start date » : mot pour mot la cellule, verdict PASS sur 36 règles. Retour humain : « ne répète pas dans le tooltip ce qu'il y a dans la cellule, ça n'a pas d'intérêt ». Correction produit 20260908o : résolution des noms de colonnes nus par index du catalogue, chemin complet catalogue.schéma.table.colonne, commentaire d'origine, rôle de la couche ; mesure : sur 396 infobulles de provenance, 1 seule contient encore le texte de sa cellule, et c'est un enrichissement.</p><p class="detail-label">Proposition</p><ul class="puces"><li>L3 bis dans check_html.py — une explication (title, data-definition, data-tip) dont le texte normalisé contient celui de son porteur sans rien y ajouter n'est pas une explication</li><li>seuil : au moins un fait nouveau (un chemin, un nombre, une définition)</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 25 — gain 5 × preuve 5 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un retour humain sur une page déjà jugée PASS ; famille entière de fausses explications générées</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0944" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0944</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 15)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-forge-agents (digit-ai-page-html) : un système d'identifiants employé dans une page (S1..S12, G1..G9) n'a nulle part à être expliqué — L18 exige la glose dans la CELLULE, jamais une légende du système avant le tableau</h3>
-          <div class="card-detail" data-cite><p class="lead">check_html L18 était satisfait (infobulle par cellule) et le lecteur demandait pourtant « à quoi servent les repères S1, S2, G5 ? ce n'est pas expliqué » : une infobulle de cellule ne dit ni ce qu'EST un repère, ni combien il y en a, ni où ils vivent aussi (fichier de définition, chapitre des objets, listing). Correction produit 20260908m : un tableau « À quoi servent les repères » avant chaque listing (S1 à S12, G1 à G9 : repère, objet, action, pourquoi).</p><p class="detail-label">Proposition</p><ul class="puces"><li>L18 bis — quand un même préfixe d'identifiant apparaît sur plus de trois lignes d'une page, la page porte une légende du système d'identifiants avant le premier tableau qui l'emploie</li><li>l'infobulle de cellule ne suffit pas</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 15 — gain 3 × preuve 5 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un point du retour humain ; deux tableaux de légende ajoutés</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-10_Reporting</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0951" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0951</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 15)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-forge-agents (digit-ai-page-html) : un système d'identifiants employé dans une page (S1..S12, G1..G9) n'a nulle part à être expliqué — L18 exige la glose dans la CELLULE, jamais une légende du système avant le tableau</h3>
-          <div class="card-detail" data-cite><p class="lead">check_html L18 était satisfait (infobulle par cellule) et le lecteur demandait pourtant « à quoi servent les repères S1, S2, G5 ? ce n'est pas expliqué » : une infobulle de cellule ne dit ni ce qu'EST un repère, ni combien il y en a, ni où ils vivent aussi (fichier de définition, chapitre des objets, listing). Correction produit 20260908m : un tableau « À quoi servent les repères » avant chaque listing (S1 à S12, G1 à G9 : repère, objet, action, pourquoi).</p><p class="detail-label">Proposition</p><ul class="puces"><li>L18 bis — quand un même préfixe d'identifiant apparaît sur plus de trois lignes d'une page, la page porte une légende du système d'identifiants avant le premier tableau qui l'emploie</li><li>l'infobulle de cellule ne suffit pas</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 15 — gain 3 × preuve 5 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un point du retour humain ; deux tableaux de légende ajoutés</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0939" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0939</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-forge-agents : le canevas « modèle de données » (digit-ai-schemas) existe et personne ne le trouve — aucune règle, aucun oracle, aucun mode opératoire ne route une page de données vers lui quand elle doit montrer un schéma de base ; un composant maison a été écrit puis jeté</h3>
-          <div class="card-detail" data-cite><p class="lead">references/canevas-modele-donnees.md décrit exactement l'objet demandé (signes : « schéma de base de données », « ERD », « MCD/MLD ») et assets/template-modele-donnees.html le livre prêt à instancier. Le tour précédent (lot 20260908e, RA-16) a conclu « aucun gabarit de schéma différentiel » et écrit une grille maison de 40 cartes / 429 puces : la recherche s'était arrêtée à digit-ai-page-html, seul socle cité par le CLAUDE.md produit, qui ne renvoie nulle part à digit-ai-schemas. Coût : un composant écrit puis jeté, un tour humain. Correction produit 20260908k : moteur du skill LU à la génération (CSS + renderDbSchema/renderDbDictionary/DB_CLASS), jamais recopié ; Silver 24 cartes / 7 arêtes, Gold 16 cartes / 35 arêtes, 40 cartes de dictionnaire.</p><p class="detail-label">Proposition</p><ul class="puces"><li>CLAUDE-PRODUIT § règles de socle applicables renvoie « schéma de base de données / ERD → digit-ai-schemas »</li><li>check_html L31 candidate (page de données nommant tables et colonnes dans une figure sans les classes db-schema/db-card = constat)</li><li>lexique d'invocation RV-6 gagne « schéma de base de données »</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un tour humain ; un composant de schéma écrit chez le produit puis jeté</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-10_Reporting</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0946" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0946</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-forge-agents : le canevas « modèle de données » (digit-ai-schemas) existe et personne ne le trouve — aucune règle, aucun oracle, aucun mode opératoire ne route une page de données vers lui quand elle doit montrer un schéma de base ; un composant maison a été écrit puis jeté</h3>
-          <div class="card-detail" data-cite><p class="lead">references/canevas-modele-donnees.md décrit exactement l'objet demandé (signes : « schéma de base de données », « ERD », « MCD/MLD ») et assets/template-modele-donnees.html le livre prêt à instancier. Le tour précédent (lot 20260908e, RA-16) a conclu « aucun gabarit de schéma différentiel » et écrit une grille maison de 40 cartes / 429 puces : la recherche s'était arrêtée à digit-ai-page-html, seul socle cité par le CLAUDE.md produit, qui ne renvoie nulle part à digit-ai-schemas. Coût : un composant écrit puis jeté, un tour humain. Correction produit 20260908k : moteur du skill LU à la génération (CSS + renderDbSchema/renderDbDictionary/DB_CLASS), jamais recopié ; Silver 24 cartes / 7 arêtes, Gold 16 cartes / 35 arêtes, 40 cartes de dictionnaire.</p><p class="detail-label">Proposition</p><ul class="puces"><li>CLAUDE-PRODUIT § règles de socle applicables renvoie « schéma de base de données / ERD → digit-ai-schemas »</li><li>check_html L31 candidate (page de données nommant tables et colonnes dans une figure sans les classes db-schema/db-card = constat)</li><li>lexique d'invocation RV-6 gagne « schéma de base de données »</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un tour humain ; un composant de schéma écrit chez le produit puis jeté</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0953" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0953</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-page-html : le composant de filtres s'arroge l'attribut hidden des lignes et le recalcule depuis ses seuls attributs — tout autre mécanisme de visibilité est écrasé sans avertissement</h3>
-          <div class="card-detail" data-cite><p class="lead">table-filters.js pose tr.hidden = tr.hasAttribute('data-tf-hidden') || tr.hasAttribute('data-rech-cache') ; kpi-filter.js du même socle refait le même calcul avec sa propre liste. Un troisième mécanisme (pliage d'arbre) n'a aucun moyen de s'inscrire : le produit a dû poser un MutationObserver sur hidden pour réappliquer le pliage après chaque passage des filtres, et déplier tout l'arbre à chaque changement de filtre pour ne jamais cacher un résultat.</p><p class="detail-label">Proposition</p><ul class="puces"><li>une arbitration partagée du socle — DigitAIRowVisibility.register('arbre') / apply(tr) — où chaque mécanisme déclare son attribut de masquage</li><li>hidden devient la disjonction de tous les attributs enregistrés, calculée à un seul endroit</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un observateur de rattrapage écrit chez le produit pour coexister avec le socle</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0941" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0941</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8.3)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-forge-agents (digit-ai-schemas) : le canevas ERD ne connaît pas le schéma DIFFÉRENTIEL (créé / ajouté / corrigé / repris), ne monte qu'un schéma par page (ids figés) et déclenche quinze constats du socle HTML quand on l'insère dans une page de données</h3>
-          <div class="card-detail" data-cite><p class="lead">Le modèle déclaratif ne porte que la classification (gray/blue/coral/teal/dashed) : rien pour l'évolution. Détourné ici : blue = créée, teal = complétée/étendue, coral = à corriger, gray = existante ; signe devant chaque colonne (+ créée, ! à corriger, = reprise) ; nature dans la note du dictionnaire. Ids de montage figés (dbSchemaMount/dbLegendMount/dbDicoMount) → enveloppe pour deux schémas. Inséré dans une page jugée : V4 5 bloquants (arêtes et étiquettes se croisent par construction), rognage 4 bloquants (mise à l'échelle par transformation lue comme contenu masqué ; noms de tables abrégés), V1 à 390 px 3 bloquants (cellules du dictionnaire en nowrap), L19 3 bloquants (.dd-col/.dd-type/.dd-name portent anywhere sans nom technique). Tous levés côté produit par data-overlap-ok (arêtes seules), data-rognage-assume (conteneurs mis à l'échelle, cartes abrégées), repli sous 900 px et classe .dd-mono.</p><p class="detail-label">Proposition</p><ul class="puces"><li>axe evolution dans le modèle déclaratif</li><li>identifiant de montage en paramètre</li><li>le canevas pose lui-même ses déclarations et replie son dictionnaire</li><li>fixture « canevas dans une page de données » jugée par check_html et render_page</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8.3 — gain 5 × preuve 5 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>quinze constats du socle levés un par un chez le produit ; tout produit qui insère le canevas refera ce travail</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-10_Reporting</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0948" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0948</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8.3)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-forge-agents (digit-ai-schemas) : le canevas ERD ne connaît pas le schéma DIFFÉRENTIEL (créé / ajouté / corrigé / repris), ne monte qu'un schéma par page (ids figés) et déclenche quinze constats du socle HTML quand on l'insère dans une page de données</h3>
-          <div class="card-detail" data-cite><p class="lead">Le modèle déclaratif ne porte que la classification (gray/blue/coral/teal/dashed) : rien pour l'évolution. Détourné ici : blue = créée, teal = complétée/étendue, coral = à corriger, gray = existante ; signe devant chaque colonne (+ créée, ! à corriger, = reprise) ; nature dans la note du dictionnaire. Ids de montage figés (dbSchemaMount/dbLegendMount/dbDicoMount) → enveloppe pour deux schémas. Inséré dans une page jugée : V4 5 bloquants (arêtes et étiquettes se croisent par construction), rognage 4 bloquants (mise à l'échelle par transformation lue comme contenu masqué ; noms de tables abrégés), V1 à 390 px 3 bloquants (cellules du dictionnaire en nowrap), L19 3 bloquants (.dd-col/.dd-type/.dd-name portent anywhere sans nom technique). Tous levés côté produit par data-overlap-ok (arêtes seules), data-rognage-assume (conteneurs mis à l'échelle, cartes abrégées), repli sous 900 px et classe .dd-mono.</p><p class="detail-label">Proposition</p><ul class="puces"><li>axe evolution dans le modèle déclaratif</li><li>identifiant de montage en paramètre</li><li>le canevas pose lui-même ses déclarations et replie son dictionnaire</li><li>fixture « canevas dans une page de données » jugée par check_html et render_page</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8.3 — gain 5 × preuve 5 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>quinze constats du socle levés un par un chez le produit ; tout produit qui insère le canevas refera ce travail</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0940" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="haute">
+        <article class="card s-en_cours" id="item-TF-0940" data-cite data-forge="digit-ai-forge-agents" data-statut="en_cours" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0940</code>
-            <span class="statut s-decide">decide</span>
+            <span class="statut s-en_cours">en_cours</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.7)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -1952,29 +1768,6 @@
             <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>le modèle demandé par l'humain n'est pas ce que produit la forge d'audit aujourd'hui</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0952" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0952</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.7)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-page-html : le socle n'a pas de composant de TABLEAU ARBORESCENT — une hiérarchie rendue en tableau reste une liste indentée, sans pliage, et le lecteur reçoit 296 lignes d'un coup</h3>
-          <div class="card-detail" data-cite><p class="lead">Version 20260908m : les listings portaient déjà data-niveau (schéma, table, colonne) et une indentation par espaces insécables ; mesure Playwright : 134 lignes Silver et 296 lignes Gold visibles à l'ouverture, aucun pliage, aucun compte d'enfants sur la ligne parente. Le destinataire a dû citer un composant externe (shadcn-tree-table) pour se faire comprendre. Correction produit 20260908o : chevron par schéma et par table (aria-expanded, libellé accessible, compteur d'enfants), guides d'indentation, boutons Tout déplier / Tout replier, état vivant du nombre de lignes visibles ; 16 lignes visibles sur 134 en Silver, 18 sur 296 en Gold ; recette Playwright forge/oracles/2026-09-08o-recette-arbre.json.</p><p class="detail-label">Proposition</p><ul class="puces"><li>le socle porte table-arbre.js / table-arbre.css au même rang que table-filters (lecture de data-niveau, data-cle, data-parent), accordé avec le composant de filtres</li><li>règle d'oracle : un tableau dont plus de N lignes portent un niveau hiérarchique offre le pliage</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un retour humain nommant un composant externe ; composant réécrit chez le produit</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
             
           </dl>
@@ -2123,6 +1916,29 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0954" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0954</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 25)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-page-html : une INFOBULLE QUI RECOPIE LA CELLULE qu'elle explique passe tous les oracles — L3 et L18 exigent une explication, aucune règle ne juge le rapport entre l'explication et ce qu'elle explique</h3>
+          <div class="card-detail" data-cite><p class="lead">Version 20260908m : cellule « Lease_Start_Date de l'avenant actif (renouvellement inclus) — legacy Current lease start date », infobulle « Provenance / Lease_Start_Date de l'avenant actif (renouvellement inclus) — legacy Current lease start date » : mot pour mot la cellule, verdict PASS sur 36 règles. Retour humain : « ne répète pas dans le tooltip ce qu'il y a dans la cellule, ça n'a pas d'intérêt ». Correction produit 20260908o : résolution des noms de colonnes nus par index du catalogue, chemin complet catalogue.schéma.table.colonne, commentaire d'origine, rôle de la couche ; mesure : sur 396 infobulles de provenance, 1 seule contient encore le texte de sa cellule, et c'est un enrichissement.</p><p class="detail-label">Proposition</p><ul class="puces"><li>L3 bis dans check_html.py — une explication (title, data-definition, data-tip) dont le texte normalisé contient celui de son porteur sans rien y ajouter n'est pas une explication</li><li>seuil : au moins un fait nouveau (un chemin, un nombre, une définition)</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 25 — gain 5 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un retour humain sur une page déjà jugée PASS ; famille entière de fausses explications générées</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-corrige" id="item-TF-0900" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0900</code>
@@ -2215,6 +2031,52 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0944" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0944</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 15)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-forge-agents (digit-ai-page-html) : un système d'identifiants employé dans une page (S1..S12, G1..G9) n'a nulle part à être expliqué — L18 exige la glose dans la CELLULE, jamais une légende du système avant le tableau</h3>
+          <div class="card-detail" data-cite><p class="lead">check_html L18 était satisfait (infobulle par cellule) et le lecteur demandait pourtant « à quoi servent les repères S1, S2, G5 ? ce n'est pas expliqué » : une infobulle de cellule ne dit ni ce qu'EST un repère, ni combien il y en a, ni où ils vivent aussi (fichier de définition, chapitre des objets, listing). Correction produit 20260908m : un tableau « À quoi servent les repères » avant chaque listing (S1 à S12, G1 à G9 : repère, objet, action, pourquoi).</p><p class="detail-label">Proposition</p><ul class="puces"><li>L18 bis — quand un même préfixe d'identifiant apparaît sur plus de trois lignes d'une page, la page porte une légende du système d'identifiants avant le premier tableau qui l'emploie</li><li>l'infobulle de cellule ne suffit pas</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 15 — gain 3 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un point du retour humain ; deux tableaux de légende ajoutés</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-10_Reporting</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0951" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0951</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 15)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-forge-agents (digit-ai-page-html) : un système d'identifiants employé dans une page (S1..S12, G1..G9) n'a nulle part à être expliqué — L18 exige la glose dans la CELLULE, jamais une légende du système avant le tableau</h3>
+          <div class="card-detail" data-cite><p class="lead">check_html L18 était satisfait (infobulle par cellule) et le lecteur demandait pourtant « à quoi servent les repères S1, S2, G5 ? ce n'est pas expliqué » : une infobulle de cellule ne dit ni ce qu'EST un repère, ni combien il y en a, ni où ils vivent aussi (fichier de définition, chapitre des objets, listing). Correction produit 20260908m : un tableau « À quoi servent les repères » avant chaque listing (S1 à S12, G1 à G9 : repère, objet, action, pourquoi).</p><p class="detail-label">Proposition</p><ul class="puces"><li>L18 bis — quand un même préfixe d'identifiant apparaît sur plus de trois lignes d'une page, la page porte une légende du système d'identifiants avant le premier tableau qui l'emploie</li><li>l'infobulle de cellule ne suffit pas</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 15 — gain 3 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un point du retour humain ; deux tableaux de légende ajoutés</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-corrige" id="item-TF-0909" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0909</code>
@@ -2252,6 +2114,52 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>troisième retour humain sur l'en-tête collant en deux jours (TF-0899, TF-0900, celui-ci)</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-10_Reporting</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0939" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0939</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-forge-agents : le canevas « modèle de données » (digit-ai-schemas) existe et personne ne le trouve — aucune règle, aucun oracle, aucun mode opératoire ne route une page de données vers lui quand elle doit montrer un schéma de base ; un composant maison a été écrit puis jeté</h3>
+          <div class="card-detail" data-cite><p class="lead">references/canevas-modele-donnees.md décrit exactement l'objet demandé (signes : « schéma de base de données », « ERD », « MCD/MLD ») et assets/template-modele-donnees.html le livre prêt à instancier. Le tour précédent (lot 20260908e, RA-16) a conclu « aucun gabarit de schéma différentiel » et écrit une grille maison de 40 cartes / 429 puces : la recherche s'était arrêtée à digit-ai-page-html, seul socle cité par le CLAUDE.md produit, qui ne renvoie nulle part à digit-ai-schemas. Coût : un composant écrit puis jeté, un tour humain. Correction produit 20260908k : moteur du skill LU à la génération (CSS + renderDbSchema/renderDbDictionary/DB_CLASS), jamais recopié ; Silver 24 cartes / 7 arêtes, Gold 16 cartes / 35 arêtes, 40 cartes de dictionnaire.</p><p class="detail-label">Proposition</p><ul class="puces"><li>CLAUDE-PRODUIT § règles de socle applicables renvoie « schéma de base de données / ERD → digit-ai-schemas »</li><li>check_html L31 candidate (page de données nommant tables et colonnes dans une figure sans les classes db-schema/db-card = constat)</li><li>lexique d'invocation RV-6 gagne « schéma de base de données »</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un tour humain ; un composant de schéma écrit chez le produit puis jeté</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-10_Reporting</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0946" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0946</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-forge-agents : le canevas « modèle de données » (digit-ai-schemas) existe et personne ne le trouve — aucune règle, aucun oracle, aucun mode opératoire ne route une page de données vers lui quand elle doit montrer un schéma de base ; un composant maison a été écrit puis jeté</h3>
+          <div class="card-detail" data-cite><p class="lead">references/canevas-modele-donnees.md décrit exactement l'objet demandé (signes : « schéma de base de données », « ERD », « MCD/MLD ») et assets/template-modele-donnees.html le livre prêt à instancier. Le tour précédent (lot 20260908e, RA-16) a conclu « aucun gabarit de schéma différentiel » et écrit une grille maison de 40 cartes / 429 puces : la recherche s'était arrêtée à digit-ai-page-html, seul socle cité par le CLAUDE.md produit, qui ne renvoie nulle part à digit-ai-schemas. Coût : un composant écrit puis jeté, un tour humain. Correction produit 20260908k : moteur du skill LU à la génération (CSS + renderDbSchema/renderDbDictionary/DB_CLASS), jamais recopié ; Silver 24 cartes / 7 arêtes, Gold 16 cartes / 35 arêtes, 40 cartes de dictionnaire.</p><p class="detail-label">Proposition</p><ul class="puces"><li>CLAUDE-PRODUIT § règles de socle applicables renvoie « schéma de base de données / ERD → digit-ai-schemas »</li><li>check_html L31 candidate (page de données nommant tables et colonnes dans une figure sans les classes db-schema/db-card = constat)</li><li>lexique d'invocation RV-6 gagne « schéma de base de données »</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un tour humain ; un composant de schéma écrit chez le produit puis jeté</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
             
           </dl>
         </article>
@@ -2445,6 +2353,29 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0953" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0953</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-page-html : le composant de filtres s'arroge l'attribut hidden des lignes et le recalcule depuis ses seuls attributs — tout autre mécanisme de visibilité est écrasé sans avertissement</h3>
+          <div class="card-detail" data-cite><p class="lead">table-filters.js pose tr.hidden = tr.hasAttribute('data-tf-hidden') || tr.hasAttribute('data-rech-cache') ; kpi-filter.js du même socle refait le même calcul avec sa propre liste. Un troisième mécanisme (pliage d'arbre) n'a aucun moyen de s'inscrire : le produit a dû poser un MutationObserver sur hidden pour réappliquer le pliage après chaque passage des filtres, et déplier tout l'arbre à chaque changement de filtre pour ne jamais cacher un résultat.</p><p class="detail-label">Proposition</p><ul class="puces"><li>une arbitration partagée du socle — DigitAIRowVisibility.register('arbre') / apply(tr) — où chaque mécanisme déclare son attribut de masquage</li><li>hidden devient la disjonction de tous les attributs enregistrés, calculée à un seul endroit</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un observateur de rattrapage écrit chez le produit pour coexister avec le socle</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-corrige" id="item-TF-0901" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0901</code>
@@ -2491,6 +2422,52 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0941" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0941</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8.3)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-forge-agents (digit-ai-schemas) : le canevas ERD ne connaît pas le schéma DIFFÉRENTIEL (créé / ajouté / corrigé / repris), ne monte qu'un schéma par page (ids figés) et déclenche quinze constats du socle HTML quand on l'insère dans une page de données</h3>
+          <div class="card-detail" data-cite><p class="lead">Le modèle déclaratif ne porte que la classification (gray/blue/coral/teal/dashed) : rien pour l'évolution. Détourné ici : blue = créée, teal = complétée/étendue, coral = à corriger, gray = existante ; signe devant chaque colonne (+ créée, ! à corriger, = reprise) ; nature dans la note du dictionnaire. Ids de montage figés (dbSchemaMount/dbLegendMount/dbDicoMount) → enveloppe pour deux schémas. Inséré dans une page jugée : V4 5 bloquants (arêtes et étiquettes se croisent par construction), rognage 4 bloquants (mise à l'échelle par transformation lue comme contenu masqué ; noms de tables abrégés), V1 à 390 px 3 bloquants (cellules du dictionnaire en nowrap), L19 3 bloquants (.dd-col/.dd-type/.dd-name portent anywhere sans nom technique). Tous levés côté produit par data-overlap-ok (arêtes seules), data-rognage-assume (conteneurs mis à l'échelle, cartes abrégées), repli sous 900 px et classe .dd-mono.</p><p class="detail-label">Proposition</p><ul class="puces"><li>axe evolution dans le modèle déclaratif</li><li>identifiant de montage en paramètre</li><li>le canevas pose lui-même ses déclarations et replie son dictionnaire</li><li>fixture « canevas dans une page de données » jugée par check_html et render_page</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8.3 — gain 5 × preuve 5 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>quinze constats du socle levés un par un chez le produit ; tout produit qui insère le canevas refera ce travail</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-10_Reporting</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0948" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0948</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8.3)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-forge-agents (digit-ai-schemas) : le canevas ERD ne connaît pas le schéma DIFFÉRENTIEL (créé / ajouté / corrigé / repris), ne monte qu'un schéma par page (ids figés) et déclenche quinze constats du socle HTML quand on l'insère dans une page de données</h3>
+          <div class="card-detail" data-cite><p class="lead">Le modèle déclaratif ne porte que la classification (gray/blue/coral/teal/dashed) : rien pour l'évolution. Détourné ici : blue = créée, teal = complétée/étendue, coral = à corriger, gray = existante ; signe devant chaque colonne (+ créée, ! à corriger, = reprise) ; nature dans la note du dictionnaire. Ids de montage figés (dbSchemaMount/dbLegendMount/dbDicoMount) → enveloppe pour deux schémas. Inséré dans une page jugée : V4 5 bloquants (arêtes et étiquettes se croisent par construction), rognage 4 bloquants (mise à l'échelle par transformation lue comme contenu masqué ; noms de tables abrégés), V1 à 390 px 3 bloquants (cellules du dictionnaire en nowrap), L19 3 bloquants (.dd-col/.dd-type/.dd-name portent anywhere sans nom technique). Tous levés côté produit par data-overlap-ok (arêtes seules), data-rognage-assume (conteneurs mis à l'échelle, cartes abrégées), repli sous 900 px et classe .dd-mono.</p><p class="detail-label">Proposition</p><ul class="puces"><li>axe evolution dans le modèle déclaratif</li><li>identifiant de montage en paramètre</li><li>le canevas pose lui-même ses déclarations et replie son dictionnaire</li><li>fixture « canevas dans une page de données » jugée par check_html et render_page</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8.3 — gain 5 × preuve 5 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>quinze constats du socle levés un par un chez le produit ; tout produit qui insère le canevas refera ce travail</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-corrige" id="item-TF-0789" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0789</code>
@@ -2528,6 +2505,29 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd><span class="meta-sub">non chiffré</span></dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (message du 07/09/2026, decisions D-1 a et D-2 a) via etude d'opportunite du pilot</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0952" data-cite data-forge="digit-ai-forge-agents" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0952</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.7)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-page-html : le socle n'a pas de composant de TABLEAU ARBORESCENT — une hiérarchie rendue en tableau reste une liste indentée, sans pliage, et le lecteur reçoit 296 lignes d'un coup</h3>
+          <div class="card-detail" data-cite><p class="lead">Version 20260908m : les listings portaient déjà data-niveau (schéma, table, colonne) et une indentation par espaces insécables ; mesure Playwright : 134 lignes Silver et 296 lignes Gold visibles à l'ouverture, aucun pliage, aucun compte d'enfants sur la ligne parente. Le destinataire a dû citer un composant externe (shadcn-tree-table) pour se faire comprendre. Correction produit 20260908o : chevron par schéma et par table (aria-expanded, libellé accessible, compteur d'enfants), guides d'indentation, boutons Tout déplier / Tout replier, état vivant du nombre de lignes visibles ; 16 lignes visibles sur 134 en Silver, 18 sur 296 en Gold ; recette Playwright forge/oracles/2026-09-08o-recette-arbre.json.</p><p class="detail-label">Proposition</p><ul class="puces"><li>le socle porte table-arbre.js / table-arbre.css au même rang que table-filters (lecture de data-niveau, data-cle, data-parent), accordé avec le composant de filtres</li><li>règle d'oracle : un tableau dont plus de N lignes portent un niveau hiérarchique offre le pliage</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un retour humain nommant un composant externe ; composant réécrit chez le produit</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
             
           </dl>
         </article>
