@@ -474,6 +474,29 @@ check("écart-R24 : un écart sans motif ni date n'excuse rien", () => {
   if (!rapport.findings.some((f) => f.regle === "R-24" && f.statut === "FAIL")) throw new Error("l'écart incomplet a été accepté");
 });
 
+// ---- fixture IGNORÉ (TF-0853) : LE MOTIF LE PLUS FORT — le dépôt a écrit que ce chemin
+// n'entrera jamais dans son histoire. Mesuré le 06/09 chez un produit : 242 constats sur 247
+// portaient les fichiers d'un SEUL dossier d'output\ exclu par le .gitignore, dont 41 dossiers au
+// nom RÉEL d'un tiers du client, recopié tel quel dans le message de chaque constat — et le
+// verdict est imprimé à chaque démarrage de session. Les constats RÉELS pesaient 2 %.
+// LES DEUX SENS SUR LA MÊME FIXTURE : le fichier exclu est muet, son voisin NON exclu est jugé —
+// sans quoi la règle pourrait avoir désarmé R-4 tout entière sans qu'on le voie. ---------------
+const rougeIgnore = mkdtempSync(join(tmpdir(), "conf-ignore-"));
+mkdirSync(join(rougeIgnore, "output", "atelier"), { recursive: true });
+writeFileSync(join(rougeIgnore, ".gitignore"), "# noms réels de tiers — produits localement, jamais versionnés\noutput/atelier/\n");
+writeFileSync(join(rougeIgnore, "output", "atelier", "rapport sans date.md"), "x\n");        // exclu : muet
+writeFileSync(join(rougeIgnore, "output", "livrable-sans-date.md"), "x\n");                  // suivi : jugé
+sh("git", ["init", "-q", "-b", "main"], rougeIgnore);
+
+check("TF-0853 — un chemin que `git check-ignore` déclare EXCLU n'est jamais jugé, son voisin suivi l'est", () => {
+  const { rapport } = lance(rougeIgnore);
+  const r4 = rapport.findings.filter((f) => f.regle === "R-4" && f.statut === "FAIL");
+  if (r4.some((f) => /atelier/.test(f.ou)))
+    throw new Error(`un chemin exclu du dépôt est jugé, et son nom entre dans le verdict : ${r4.filter((f) => /atelier/.test(f.ou)).map((f) => f.ou).join(", ")}`);
+  if (!r4.some((f) => /livrable-sans-date\.md/.test(f.ou)))
+    throw new Error("le voisin NON exclu n'est plus jugé — l'exclusion a désarmé R-4 au-delà de sa portée");
+});
+
 // ---- fixture ROUGE-ENV (TF-0869) : le `.env.example` est PRÉSENT, RENSEIGNÉ et SUIVI — donc
 // vert pour les trois sous-contrôles historiques de R-13 — et il porte pourtant deux valeurs
 // qui n'auraient jamais dû entrer dans un fichier versionné : une variable déléguée à l'humain

@@ -118,6 +118,39 @@ function* fichiers(dossier, prof = 0) {
 }
 const rel = (f) => relative(cible, f).replaceAll("\\", "/");
 
+// ---- TF-0853 · CE QUE LE DÉPÔT A DÉCLARÉ NE JAMAIS VOULOIR VERSIONNER N'EST PAS UN LIVRABLE ----
+//
+// Le fait mesuré le 06/09 chez un produit : `oracle-conformite-projet` rendait 247 constats, dont
+// 242 sur les fichiers d'UN SEUL dossier d'`output\` que le `.gitignore` du produit exclut par une
+// ligne assortie de son motif écrit (« noms réels de propriétaires et de locataires — produits
+// localement, jamais versionnés »). Vérification : les 242 chemins passés à `git check-ignore`
+// rendaient 242 ignorés sur 242. Les constats RÉELS du dépôt pesaient donc 2 % du verdict.
+//
+// DEUX DÉGÂTS, ET LE SECOND EST LE PIRE. (1) Le bruit : « un gate qui bruite se contourne avant
+// d'être corrigé », et ce verdict est imprimé à chaque démarrage de session. (2) L'ANONYMISATION :
+// 41 dossiers de ces chemins portaient un nom RÉEL de tiers du client, recopié tel quel dans le
+// message de chaque constat. Le pilot applique déjà ce raisonnement à ses propres journaux (D-1 (a)
+// du 03/09 : un fichier suivi ne porte que des pseudonymes) ; la SORTIE d'un oracle joué chez un
+// produit n'était couverte par aucune passe équivalente.
+//
+// Le mécanisme d'exemption existait déjà — `input\`, `gabarits\`, `fixtures\`, `old\` et
+// `.oracles\` sont hors jugement par motif déclaré. Ce qui manquait, c'est que le motif LE PLUS
+// FORT — le dépôt a écrit que ce chemin n'entrera jamais dans son histoire — n'en fasse pas partie.
+// Un fichier qui ne sera jamais versionné n'est pas un livrable d'`output\` au sens de R-4 : c'est
+// un artefact d'atelier. Un seul appel à git, jamais un par chemin.
+let _exclusDuDepot = null;
+function estExcluDuDepot(relPosix) {
+  if (!aGit) return false;
+  if (_exclusDuDepot === null) {
+    const tous = [...fichiers(cible)].map((f) => rel(f));
+    const r = tous.length
+      ? spawnSync("git", ["-C", cible, "check-ignore", "--stdin"], { encoding: "utf8", input: tous.join("\n"), maxBuffer: 128 * 1024 * 1024 })
+      : { stdout: "" };
+    _exclusDuDepot = new Set((r.stdout || "").split(/\r?\n/).filter(Boolean).map((s) => s.trim().replaceAll("\\", "/")));
+  }
+  return _exclusDuDepot.has(relPosix);
+}
+
 // TF-0128 : recherche dédiée des lockfiles — 2 niveaux de descente au plus (racine, puis
 // deux sous-niveaux), exclusions node_modules/.venv/dist/build (distincte de `fichiers()`,
 // utilisée ailleurs à profondeur 6 pour les livrables).
@@ -167,7 +200,10 @@ const MARQUE_HTML = /<meta\s+name=["']destinataire["']\s+content=["']humain["']\
  *  fixture rouge doit pouvoir violer la règle qu'elle prouve) · `old\` = archive gelée, jamais
  *  renommée (NON_JUGE d'`oracle-conventions`) · `.oracles\` = pièces de preuve d'oracle. */
 const horsJugementMarque = (r) =>
-  /^(input|gabarits)\//i.test(r) || /(^|\/)(old|fixtures?|\.oracles)\//i.test(r);
+  /^(input|gabarits)\//i.test(r) || /(^|\/)(old|fixtures?|\.oracles)\//i.test(r)
+  // TF-0853 : le motif d'exclusion LE PLUS FORT rejoint les cinq autres — le dépôt a écrit que
+  // ce chemin n'entrera jamais dans son histoire, il n'a donc rien d'un livrable à localiser.
+  || estExcluDuDepot(r);
 /** Zones de dépôt CONFORMES : `output\` (règle 2) et `docs\` (précision D-06 — un document
  *  normatif n'est pas une sortie et vit à la racine ou dans `docs\`). */
 const zoneDeDepot = (r) => /^(output|docs)\//i.test(r);
@@ -251,6 +287,7 @@ for (const d of ["output", "docs"]) {
     const nom = basename(f);
     const ext = nom.split(".").pop().toLowerCase();
     if (EXCLUS_NOMMAGE.has(nom) || !EXT_LIVRABLE.has(ext) || /\/Old\//i.test("/" + rel(f))) continue;
+    if (estExcluDuDepot(rel(f))) continue;   // TF-0853 : jamais versionné = pas un livrable
     // `.oracles\` : captures produites PAR `render_page.py` à côté de la page auditée — ce
     // sont des pièces de preuve d'oracle, pas des livrables remis. Les nommer R-4 reviendrait
     // à dater un journal (TF-0197).
@@ -341,6 +378,7 @@ else {
         const nom = basename(f);
         const ext = nom.split(".").pop().toLowerCase();
         if (EXCLUS_NOMMAGE.has(nom) || !EXT_LIVRABLE.has(ext) || /\/Old\//i.test("/" + rel(f))) continue;
+        if (estExcluDuDepot(rel(f))) continue;   // TF-0853 : jamais versionné = pas un livrable
         if (/^docs[\/]projet[\/]/.test(rel(f)) || !MOTIF_DATE.test(nom)) continue;
         const segs = nom.split(" - ");
         if (segs.length < 3) continue; // pas de segment type — déjà R-4
@@ -442,6 +480,7 @@ else ok("R-7", ".gitignore", "old\\ présent et versionné (C1 amendé TF-0150)"
       if (EXCLUS_NOMMAGE.has(nom) || !EXT_LIVRABLE.has(ext)) continue;
       if (/(^|\/)[Oo]ld\//.test("/" + rel(f))) continue;
       if (/[\/]\.oracles[\/]/.test("/" + rel(f))) continue;
+      if (estExcluDuDepot(rel(f))) continue;   // TF-0853 : jamais versionné = pas un livrable
       const m = nom.match(/^(.*) - (\d{8}[a-z]?)\.([\w.]+)$/);
       if (!m) continue;
       // Clé COMPOSÉE, jamais concaténée : un radical porte des espaces et des tirets, et un
@@ -1501,6 +1540,7 @@ const nonJuge = [
   ...antecedences,
   "R-5 (pas d'écrasement de version) : invisible statiquement — jugé par revue de diff",
   "R-7 bis (TF-0902) : LAQUELLE de deux versions cohabitantes est la courante n'est pas jugée — le constat nomme les fichiers et le geste (`git mv` vers `old\\` du même dossier), il ne choisit pas à la place de l'auteur ; deux formats d'un même livrable (`.html` et `.pdf` du même radical) ne sont pas deux versions, l'extension entre dans la clé",
+  "R-2, R-4, R-7 bis et R-25 (TF-0853) : un chemin que  declare EXCLU du depot n est pas juge — le depot a ecrit que ce fichier n entrera jamais dans son histoire, donc ce n est pas un livrable mais un artefact d atelier. Mesure du 06/09 : 242 constats sur 247 portaient les fichiers d un seul dossier exclu, dont 41 dossiers au nom REEL d un tiers du client recopie dans le message. Hors depot git, aucune exclusion n est deduite",
   "R-15 (marqueurs « à fournir » exhaustifs) : l'oracle ne sait pas quelles variables sont tierces",
   "input\\ non jugé en nommage : les entrants humains arrivent tels quels",
   "seule la PRÉSENCE de CLAUDE.md/README est jugée, pas la pertinence de leur contenu",
