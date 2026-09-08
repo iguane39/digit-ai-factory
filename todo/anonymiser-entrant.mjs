@@ -128,7 +128,30 @@ function lireProduits() {
 export const EST_EMETTEUR_FORGE = /^digit-ai-(forge-[a-z0-9-]+|factory|queue)$/i;
 
 /** Le processus courant est-il un banc de test ? Mesuré sur son point d'entrée, jamais deviné. */
-const estUnBanc = () => /\.test\.mjs$/i.test(process.argv[1] || "") || process.argv.includes("--self-test");
+const EST_UN_BANC_ICI = () => /\.test\.mjs$/i.test(process.argv[1] || "") || process.argv.includes("--self-test");
+
+/**
+ * Le marqueur d'isolement, et POURQUOI c'est une variable d'environnement (TF-0957, 08/09/2026).
+ *
+ * La première garde ne regardait que le point d'entrée du processus COURANT. Elle attrapait donc
+ * un banc qui appelle `pseudoProduit` lui-même, et RATAIT le cas qui a causé l'incident : les cinq
+ * bancs fautifs lancent `ingerer-lot.mjs` en SOUS-PROCESSUS, où `process.argv[1]` n'est plus un
+ * fichier de banc. La garde rendait vert sur les cinq cas qu'elle devait attraper.
+ *
+ * On pouvait remonter l'arbre des processus pour demander « mon parent est-il un banc ? ». C'est
+ * fragile — l'arbre se lit mal, diffère selon les plateformes, et un lanceur intermédiaire le
+ * casse. Un marqueur d'environnement, lui, SE PROPAGE : Node transmet `process.env` à tout
+ * enfant, sans qu'aucun appelant ait à le savoir. Le banc le pose une fois, toute sa descendance
+ * l'hérite, et l'ingestion réelle — qui ne le pose jamais — n'est pas gênée.
+ *
+ * Il se pose donc TOUT SEUL dès qu'un banc démarre : c'est la loi n° 1, une affordance est câblée
+ * ou n'existe pas. Un banc qui devrait penser à poser sa propre garde ne la poserait pas, et c'est
+ * exactement ce que les cinq bancs fautifs prouvaient déjà pour leurs tables.
+ */
+export const MARQUEUR_BANC = "FORGE_CONTEXTE_BANC";
+if (EST_UN_BANC_ICI() && !process.env[MARQUEUR_BANC]) process.env[MARQUEUR_BANC] = "1";
+
+const estUnBanc = () => EST_UN_BANC_ICI() || process.env[MARQUEUR_BANC] === "1";
 
 /** Le chemin vise-t-il une table JETABLE, sous le répertoire temporaire du système ? */
 function sousRepertoireTemporaire(chemin) {
@@ -477,6 +500,32 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
   if (refusDit && !/FORGE_PRODUITS_PSEUDO/.test(refusDit))
     casse.push("le refus ne nomme pas la variable à poser : " + refusDit);
 
+  // 3 septies) LE SOUS-PROCESSUS, qui est le cas qui a causé l'incident (TF-0957, 08/09) — les
+  //            cinq bancs fautifs ne touchaient pas la chaîne eux-mêmes : ils lançaient l'ingestion
+  //            en sous-processus, où le point d'entrée n'est plus un fichier de banc, et la
+  //            première garde y rendait vert. Le marqueur d'environnement est posé par le banc et
+  //            hérité par tout enfant. Sens rouge : un enfant lancé d'ici refuse d'étendre une
+  //            table hors du répertoire temporaire. Sens vert : le MÊME enfant, marqueur retiré —
+  //            c'est-à-dire une ingestion réelle —, l'étend sans entrave.
+  {
+    const { spawnSync } = await import("node:child_process");
+    const moi = import.meta.url;   // URL file://, seule forme importable depuis `node -e` sur Windows
+    // Le CHEMIN sert de sonde et rien n'est ecrit ; il doit etre HORS du repertoire temporaire,
+    // sans quoi la garde ne s'arme pas et le cas rouge se croit vert (piege paye deux fois le 08/09).
+    const hors = "C:/un/chemin/hors/du/repertoire/temporaire.json";
+    const code = "import{extensionInterdite}from" + JSON.stringify(moi)
+      + ";process.stdout.write(String(extensionInterdite(process.argv[1])))";
+    const enfant = (env) => spawnSync(process.execPath, ["--input-type=module", "-e", code, hors],
+      { encoding: "utf8", env }).stdout;
+
+    if (enfant({ ...process.env }) !== "true")
+      casse.push("un SOUS-PROCESSUS lancé par un banc peut étendre le référentiel réel — c'est le cas exact qui a fait entrer neuf produits jouets dans la table de production le 08/09");
+    const sansMarqueur = { ...process.env };
+    delete sansMarqueur[MARQUEUR_BANC];
+    if (enfant(sansMarqueur) !== "false")
+      casse.push("une ingestion RÉELLE, hors banc, se voit refuser l'extension de la table — la garde mordrait sur le seul usage légitime");
+  }
+
   // 4) référentiel ABSENT → refus, jamais un passage silencieux
   process.env.FORGE_NOMS_INTERDITS = join(dir, "absent.json");
   let refuse = false;
@@ -484,6 +533,6 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
   if (!refuse) casse.push("référentiel absent et le texte passe quand même — le convoi n'est pas arrêté");
 
   for (const m of casse) console.log("  [FAIL] " + m);
-  console.log(`\nSelf-test anonymiseur d'entrants : ${9 - casse.length}/9 cas, ${casse.length} FAIL`);
+  console.log(`\nSelf-test anonymiseur d'entrants : ${10 - casse.length}/10 cas, ${casse.length} FAIL`);
   process.exit(casse.length ? 1 : 0);
 }
