@@ -155,7 +155,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>52bd32afc9fb</code> · dernier événement 2026-09-08T17:31:46.485Z</p>
+      <p class="meta">sceau <code>9e20484b981f</code> · dernier événement 2026-09-08T17:34:13.627Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -165,8 +165,8 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="29 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">29</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="4 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">4</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="6 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">6</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="27 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">27</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="11 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">11</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="781 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">781</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
@@ -369,6 +369,75 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-decide" id="item-TF-0988" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0988</code>
+            <span class="statut s-decide">decide</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : un mot d'EXCLUSIVITE dans une demande humaine (« uniquement », « seulement ») n'est couvert par aucune regle — le producteur ajoute du contenu hors perimetre et le bloc 6 ne le voit pas</h3>
+          <div class="card-detail" data-cite><p class="lead">Fait mesure, sur demande explicite de remontee du destinataire : demande « Cree un nouveau fichier [...] uniquement avec ces 66 colonnes en cible » ; livraison d'une page dont le tableau des champs portait bien 66 lignes, mais qui CONSERVAIT un tableau de 276 lignes listant les colonnes ecartees, plus une carte de chiffres et une legende a leur sujet. Mesure : les 276 colonnes hors perimetre etaient TOUTES visibles dans la page (276 sur 276 trouvees), soit 342 colonnes affichees au total — exactement ce que la demande excluait. Retour humain : « je recois un HTML avec les 342 colonnes, comme avant, pourquoi ? Qu'est-ce qui n'a pas ete compris ? ». Le bloc 6 « Ecarts a la lettre » de la synthese du tour declarait TROIS ecarts (une colonne de tableau en plus, quatre livrables non reduits, le radical du fichier) mais PAS celui-la, parce que le producteur avait interprete « en cible » comme « cible du lineage » et tenu les colonnes ecartees pour de la documentation legitime ; oracle-synthese a rendu PASS sur 41 regles. Cout : un aller-retour complet et un destinataire qui doit redemander ce qu'il avait ecrit clairement.</p><p class="detail-label">Proposition</p><ul class="puces"><li>regle de restitution S42 — quand la demande humaine citee au bloc 6 contient un mot d'exclusivite, la restitution declare ce que le livrable contient EN PLUS du perimetre nomme, ou declare qu'il ne contient rien d'autre ; le vocabulaire est ferme (uniquement, seulement, exclusivement, rien que, et rien d'autre, only), donc la regle est mecanisable</li><li>regle de conduite au gabarit, section Portee : un mot d'exclusivite restreint le CONTENU du livrable, pas seulement sa cible ; l'ajout « pour information » d'un complement hors perimetre est un ecart, meme utile, et il se declare AVANT la livraison ou se pose en question d'une ligne. La doctrine couvre deja l'affaiblissement noye dans un long message (TF-0176) : ce cas en est le symetrique, l'ENRICHISSEMENT non demande, et rien ne le couvre</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-09</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un livrable entier a refaire, un aller-retour humain, et une synthese PASS sur 41 regles qui n'a rien vu</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-decide" id="item-TF-0989" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0989</code>
+            <span class="statut s-decide">decide</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : aucune recette de livrable n'a d'obligation de juger l'EXCLUSIVITE — elle compte ce qui doit etre la, jamais ce qui ne doit pas y etre</h3>
+          <div class="card-detail" data-cite><p class="lead">Preuve : la recette du produit (recette-cible.py, 20 controles) a rendu PASS sur la version fautive. Elle verifiait la volumetrie de chaque tableau — 66 colonnes, 34 lignes de mapping, 54 mesures, 83 champs affiches — et la couverture de chaque en-tete affiche par une cible Gold. Aucun de ses controles ne demandait « et rien d'autre ». La version corrigee en ajoute quatre, dont un qui enumere les 276 colonnes hors perimetre et cherche leur nom dans chaque ligne de tableau du livrable : c'est ce controle-la qui manquait, et il tient en douze lignes. Symetrie utile pour la doctrine : un test prouve d'ordinaire une PRESENCE, or un perimetre est par definition une ASSERTION D'ABSENCE — ce que la regle 40 ne dit pas.</p><p class="detail-label">Proposition</p><ul class="puces"><li>doubler la regle 40 d'une regle de completude de recette — toute recette d'un livrable defini par un PERIMETRE porte au moins un controle d'exclusivite, la population complementaire etant enumeree et cherchee dans le livrable, le controle echouant si elle s'y trouve</li><li>Applicable bien au-dela d'une page HTML : un export reduit, un jeu de donnees anonymise, un lot filtre</li><li>Fixture double sens : un livrable au perimetre exact (PASS), le meme plus une ligne hors perimetre (FAIL)</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-09</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un verdict PASS sur 20 controles rendu sur une page qui affichait 342 colonnes au lieu de 66</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-decide" id="item-TF-0956" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0956</code>
+            <span class="statut s-decide">decide</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : le registre ne sait ni détecter ni écarter un DOUBLON de candidature — six items identiques mot pour mot y sont entrés le 08/09, et rien ne les a signalés</h3>
+          <div class="card-detail" data-cite><p class="lead">Mesuré le 08/09 à midi. Deux lots avaient été ingérés le matin sous un nom de produit erroné, puis renommés par la passe de pseudonymisation qui a corrigé ce nom. La boîte d'entrée identifie un lot par son NOM de fichier : renommés, les deux lots sont redevenus « jamais ingérés », et le pilot les a ingérés une seconde fois au lieu de les rattacher — le geste de rattachement existe pourtant, et il avait servi douze fois deux heures plus tôt. Résultat : six candidatures dont le titre ET le contenu sont identiques à six autres, entrées sans qu'aucune règle ne bronche. DEUX MANQUES, à traiter ensemble. (1) DÉTECTION : `ingerer-lot.mjs` refuse un identifiant déjà pris (R2) et signale une RÉCIDIVE de classe, mais ne compare jamais le CONTENU d'une candidature à celles déjà au registre ; une empreinte du couple titre+contenu suffirait à refuser l'entrée ou à la marquer `doublon_de`. (2) ÉCARTEMENT : le registre n'a que quatre statuts — candidat, decide, en_cours, corrige — et aucun ne dit « cet item ne sera pas traité, et il ne compte pour aucun gain ». Les six doublons ont donc dû être DÉCIDÉS avec leur motif écrit en prose, faute de vocabulaire, ce qui les fera compter comme des items ordinaires dans toutes les mesures. Demande : une empreinte de contenu à l'ingestion, et un statut d'écartement avec son motif obligatoire, tous deux jugés par une règle de l'oracle du registre et une fixture double sens. À traiter avec la classe voisine : un lot renommé perd son lien au registre (déjà mesuré trois fois le 08/09).</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>six candidatures en double entrées en une commande, non détectées ; le compte des items ouverts est faux de six tant qu'elles ne sont pas écartées, et aucun statut ne permet de les écarter</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-decide" id="item-TF-0676" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0676</code>
@@ -392,6 +461,29 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-decide" id="item-TF-0987" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0987</code>
+            <span class="statut s-decide">decide</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : le vocabulaire ferme des motifs d'oracle-synthese est cherche dans TOUT le groupe de puce, spans de code inclus - un nom de donnee se fait lire comme un motif et la regle rougit sur une action irreprochable</h3>
+          <div class="card-detail" data-cite><p class="lead">Fait mesure, deux fois de suite sur la meme restitution. L'action A-16 du bloc 8 porte le motif decision et dit comment faire : ouvrir le livrable et trier sur la colonne presence. Le livrable est un fichier tableur dont une colonne s'appelle reellement presence - elle dit dans quels etats locatifs un intitule existe. S21 (un motif acces ou presence porte la trace mesuree de sa tentative) a compte 2 actions concernees au lieu de 1 et rendu FAIL sur 1 sur 2 : elle a lu le NOM DE LA COLONNE comme un motif, sur une ligne dont le motif declare est decision, que S21 declare pourtant explicitement hors de sa portee (decision, depense et irreversible relevent d'un arbitrage et ne sont pas concernes). Le diagnostic a coute la lecture de l'implementation - MOTIFS_MESURABLES = /\b(acces|presence)\b/ appliquee au groupe de puce entier, oracles/oracle-synthese.mjs autour de la ligne 836 - et le contournement a ete de RENOMMER la colonne du livrable en etats_porteurs, c'est-a-dire de laisser un oracle de forme dicter le schema d'un livrable de donnees. La regle est par ailleurs exemplaire : portee etroite ecrite, deux traces separees pour ne pas confondre un code technique et un mot francais, commentaire racontant le faux PASS qu'un premier jet produisait. Le defaut n'est pas dans son intention, il est dans l'ASSIETTE de sa recherche.</p><p class="detail-label">Proposition</p><ul class="puces"><li>retirer les spans de code et les blocs de code du texte avant toute recherche de vocabulaire ferme - un identifiant entre accents graves est une CITATION, jamais une declaration d'intention, et cela vaut pour S11, S12 et S21 qui partagent le meme mecanisme</li><li>mieux, chercher le motif dans la seule cellule Motif / raison quand le bloc 8 est rendu en tableau, ce que le gabarit prescrit comme forme par defaut depuis la v2.9.0 - la colonne existe, elle est nommee, et la lire supprime la question. Fixture double : une action decision citant une colonne nommee presence dans sa cellule Comment (PASS attendu, FAIL aujourd'hui), et la meme action portant reellement le motif presence sans trace (FAIL attendu). Meme cause que RA-25 du 08/09 sur la regle L30 de check_html sous un autre angle : la frontiere de mot etait bien la, c'est le PERIMETRE de lecture qui manquait. Un vocabulaire ferme cherche dans un texte non delimite finit par trouver des mots que personne n'a ecrits pour lui</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-09</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>S21 a compte 2 actions concernees au lieu de 1 et rendu FAIL sur une action dont le motif declare est decision ; deux passes d'oracle et une lecture de l'implementation pour le diagnostic ; remede applique chez le producteur : renommer une colonne de livrable en etats_porteurs</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-candidat" id="item-TF-0959" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0959</code>
@@ -405,75 +497,6 @@
             <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>trois dépôts condamnés par la porte de publication et une rectification manuelle de la table, le 08/09 au matin, sur un défaut dont la garde était déjà écrite ailleurs depuis six jours</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0988" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0988</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : un mot d'EXCLUSIVITE dans une demande humaine (« uniquement », « seulement ») n'est couvert par aucune regle — le producteur ajoute du contenu hors perimetre et le bloc 6 ne le voit pas</h3>
-          <div class="card-detail" data-cite><p class="lead">Fait mesure, sur demande explicite de remontee du destinataire : demande « Cree un nouveau fichier [...] uniquement avec ces 66 colonnes en cible » ; livraison d'une page dont le tableau des champs portait bien 66 lignes, mais qui CONSERVAIT un tableau de 276 lignes listant les colonnes ecartees, plus une carte de chiffres et une legende a leur sujet. Mesure : les 276 colonnes hors perimetre etaient TOUTES visibles dans la page (276 sur 276 trouvees), soit 342 colonnes affichees au total — exactement ce que la demande excluait. Retour humain : « je recois un HTML avec les 342 colonnes, comme avant, pourquoi ? Qu'est-ce qui n'a pas ete compris ? ». Le bloc 6 « Ecarts a la lettre » de la synthese du tour declarait TROIS ecarts (une colonne de tableau en plus, quatre livrables non reduits, le radical du fichier) mais PAS celui-la, parce que le producteur avait interprete « en cible » comme « cible du lineage » et tenu les colonnes ecartees pour de la documentation legitime ; oracle-synthese a rendu PASS sur 41 regles. Cout : un aller-retour complet et un destinataire qui doit redemander ce qu'il avait ecrit clairement.</p><p class="detail-label">Proposition</p><ul class="puces"><li>regle de restitution S42 — quand la demande humaine citee au bloc 6 contient un mot d'exclusivite, la restitution declare ce que le livrable contient EN PLUS du perimetre nomme, ou declare qu'il ne contient rien d'autre ; le vocabulaire est ferme (uniquement, seulement, exclusivement, rien que, et rien d'autre, only), donc la regle est mecanisable</li><li>regle de conduite au gabarit, section Portee : un mot d'exclusivite restreint le CONTENU du livrable, pas seulement sa cible ; l'ajout « pour information » d'un complement hors perimetre est un ecart, meme utile, et il se declare AVANT la livraison ou se pose en question d'une ligne. La doctrine couvre deja l'affaiblissement noye dans un long message (TF-0176) : ce cas en est le symetrique, l'ENRICHISSEMENT non demande, et rien ne le couvre</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-09</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un livrable entier a refaire, un aller-retour humain, et une synthese PASS sur 41 regles qui n'a rien vu</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0989" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0989</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : aucune recette de livrable n'a d'obligation de juger l'EXCLUSIVITE — elle compte ce qui doit etre la, jamais ce qui ne doit pas y etre</h3>
-          <div class="card-detail" data-cite><p class="lead">Preuve : la recette du produit (recette-cible.py, 20 controles) a rendu PASS sur la version fautive. Elle verifiait la volumetrie de chaque tableau — 66 colonnes, 34 lignes de mapping, 54 mesures, 83 champs affiches — et la couverture de chaque en-tete affiche par une cible Gold. Aucun de ses controles ne demandait « et rien d'autre ». La version corrigee en ajoute quatre, dont un qui enumere les 276 colonnes hors perimetre et cherche leur nom dans chaque ligne de tableau du livrable : c'est ce controle-la qui manquait, et il tient en douze lignes. Symetrie utile pour la doctrine : un test prouve d'ordinaire une PRESENCE, or un perimetre est par definition une ASSERTION D'ABSENCE — ce que la regle 40 ne dit pas.</p><p class="detail-label">Proposition</p><ul class="puces"><li>doubler la regle 40 d'une regle de completude de recette — toute recette d'un livrable defini par un PERIMETRE porte au moins un controle d'exclusivite, la population complementaire etant enumeree et cherchee dans le livrable, le controle echouant si elle s'y trouve</li><li>Applicable bien au-dela d'une page HTML : un export reduit, un jeu de donnees anonymise, un lot filtre</li><li>Fixture double sens : un livrable au perimetre exact (PASS), le meme plus une ligne hors perimetre (FAIL)</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-09</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un verdict PASS sur 20 controles rendu sur une page qui affichait 342 colonnes au lieu de 66</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0956" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0956</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : le registre ne sait ni détecter ni écarter un DOUBLON de candidature — six items identiques mot pour mot y sont entrés le 08/09, et rien ne les a signalés</h3>
-          <div class="card-detail" data-cite><p class="lead">Mesuré le 08/09 à midi. Deux lots avaient été ingérés le matin sous un nom de produit erroné, puis renommés par la passe de pseudonymisation qui a corrigé ce nom. La boîte d'entrée identifie un lot par son NOM de fichier : renommés, les deux lots sont redevenus « jamais ingérés », et le pilot les a ingérés une seconde fois au lieu de les rattacher — le geste de rattachement existe pourtant, et il avait servi douze fois deux heures plus tôt. Résultat : six candidatures dont le titre ET le contenu sont identiques à six autres, entrées sans qu'aucune règle ne bronche. DEUX MANQUES, à traiter ensemble. (1) DÉTECTION : `ingerer-lot.mjs` refuse un identifiant déjà pris (R2) et signale une RÉCIDIVE de classe, mais ne compare jamais le CONTENU d'une candidature à celles déjà au registre ; une empreinte du couple titre+contenu suffirait à refuser l'entrée ou à la marquer `doublon_de`. (2) ÉCARTEMENT : le registre n'a que quatre statuts — candidat, decide, en_cours, corrige — et aucun ne dit « cet item ne sera pas traité, et il ne compte pour aucun gain ». Les six doublons ont donc dû être DÉCIDÉS avec leur motif écrit en prose, faute de vocabulaire, ce qui les fera compter comme des items ordinaires dans toutes les mesures. Demande : une empreinte de contenu à l'ingestion, et un statut d'écartement avec son motif obligatoire, tous deux jugés par une règle de l'oracle du registre et une fixture double sens. À traiter avec la classe voisine : un lot renommé perd son lien au registre (déjà mesuré trois fois le 08/09).</p></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>six candidatures en double entrées en une commande, non détectées ; le compte des items ouverts est faux de six tant qu'elles ne sont pas écartées, et aucun statut ne permet de les écarter</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
             
           </dl>
@@ -567,29 +590,6 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>75 des 194 occurrences historiques du 08/09 viennent de la seule amplification par les vues generees ; 1173 revisions de contenu derive dans l histoire du depot</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0987" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0987</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : le vocabulaire ferme des motifs d'oracle-synthese est cherche dans TOUT le groupe de puce, spans de code inclus - un nom de donnee se fait lire comme un motif et la regle rougit sur une action irreprochable</h3>
-          <div class="card-detail" data-cite><p class="lead">Fait mesure, deux fois de suite sur la meme restitution. L'action A-16 du bloc 8 porte le motif decision et dit comment faire : ouvrir le livrable et trier sur la colonne presence. Le livrable est un fichier tableur dont une colonne s'appelle reellement presence - elle dit dans quels etats locatifs un intitule existe. S21 (un motif acces ou presence porte la trace mesuree de sa tentative) a compte 2 actions concernees au lieu de 1 et rendu FAIL sur 1 sur 2 : elle a lu le NOM DE LA COLONNE comme un motif, sur une ligne dont le motif declare est decision, que S21 declare pourtant explicitement hors de sa portee (decision, depense et irreversible relevent d'un arbitrage et ne sont pas concernes). Le diagnostic a coute la lecture de l'implementation - MOTIFS_MESURABLES = /\b(acces|presence)\b/ appliquee au groupe de puce entier, oracles/oracle-synthese.mjs autour de la ligne 836 - et le contournement a ete de RENOMMER la colonne du livrable en etats_porteurs, c'est-a-dire de laisser un oracle de forme dicter le schema d'un livrable de donnees. La regle est par ailleurs exemplaire : portee etroite ecrite, deux traces separees pour ne pas confondre un code technique et un mot francais, commentaire racontant le faux PASS qu'un premier jet produisait. Le defaut n'est pas dans son intention, il est dans l'ASSIETTE de sa recherche.</p><p class="detail-label">Proposition</p><ul class="puces"><li>retirer les spans de code et les blocs de code du texte avant toute recherche de vocabulaire ferme - un identifiant entre accents graves est une CITATION, jamais une declaration d'intention, et cela vaut pour S11, S12 et S21 qui partagent le meme mecanisme</li><li>mieux, chercher le motif dans la seule cellule Motif / raison quand le bloc 8 est rendu en tableau, ce que le gabarit prescrit comme forme par defaut depuis la v2.9.0 - la colonne existe, elle est nommee, et la lire supprime la question. Fixture double : une action decision citant une colonne nommee presence dans sa cellule Comment (PASS attendu, FAIL aujourd'hui), et la meme action portant reellement le motif presence sans trace (FAIL attendu). Meme cause que RA-25 du 08/09 sur la regle L30 de check_html sous un autre angle : la frontiere de mot etait bien la, c'est le PERIMETRE de lecture qui manquait. Un vocabulaire ferme cherche dans un texte non delimite finit par trouver des mots que personne n'a ecrits pour lui</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-09</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>S21 a compte 2 actions concernees au lieu de 1 et rendu FAIL sur une action dont le motif declare est decision ; deux passes d'oracle et une lecture de l'implementation pour le diagnostic ; remede applique chez le producteur : renommer une colonne de livrable en etats_porteurs</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
             
           </dl>
         </article>
@@ -1755,6 +1755,98 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-decide" id="item-TF-0969" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0969</code>
+            <span class="statut s-decide">decide</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 20)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-page-html : la regle L30 de check_html.py cherche les termes de son referentiel en SOUS-CHAINE — gate est trouve dans aggregate_type et le chapitre est accuse d'employer un terme absent</h3>
+          <div class="card-detail" data-cite><p class="lead">Preuve : premier passage sur la version 20260908r, « x L30 terme technique non glose dans #usage-reel : gate ». Recherche dans le texte du chapitre : 0 occurrence sur frontiere de mot, 17 en sous-chaine, toutes dans billing.fact_debt_rollup (aggregate_type LEASE) — une valeur relevee dans Unity Catalog et affichee en clair dans une cellule. Le code lit : if terme.lower() not in texte_chapitre.lower(): continue. Le defaut est deja PAYE ailleurs dans le meme produit : les chapitres mapping et champs portent une glose de gate qu'aucun de leurs textes n'emploie — trois chapitres glosant un mot absent pour satisfaire le controle, et la parade de ce tour a ete d'en gloser un quatrieme, ce qui ajoute du bruit au lecteur pour un faux positif.</p><p class="detail-label">Proposition</p><ul class="puces"><li>L30 borne chaque terme par des frontieres de mot Unicode, comme porte-cle-courte-sans-frontiere l'a impose a la porte de publication (TF-0880) et garde-lexicale-frontiere-ascii aux gardes lexicales (TF-0799, TF-0805) : assertions pas-une-lettre-Unicode avant et apres, drapeau u, et un identifiant technique (aggregate_type, snake_case) ne compte jamais. Fixture double sens : aggregate_type seul -&gt; PASS</li><li>« la gate du mandat » -&gt; FAIL. RECIDIVE dans un troisieme oracle d'une classe deja corrigee deux fois : la correction n'a pas redescendu jusqu'a check_html.py</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>quatre gloses d'un terme absent ecrites dans un seul produit pour satisfaire le controle ; un passage FAIL sans defaut reel</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-decide" id="item-TF-0968" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0968</code>
+            <span class="statut s-decide">decide</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-page-html : la sonde V15 de render_page.py rend FAIL par ARITHMETIQUE sur tout tableau dont la hauteur tombe dans une bande, sans qu'aucun collant ne masque quoi que ce soit</h3>
+          <div class="card-detail" data-cite><p class="lead">La sonde defile de recul = min(400, hauteur - 250), ce qui laisse TOUJOURS exactement 250 px de tableau en vue ; l'en-tete collant est alors bride par son bloc conteneur a bas_du_tableau - hauteur_du_th, soit 250 - 41 = 209 px, et ne peut plus atteindre son top declare de 219 px. Les 11 px masques annonces sont exactement cet ecart, donc constants. Mesure Playwright, deux etats, sur output/Client-A - Proposition Lineage Tenancy Schedule Asset - 20260908r.html a 1280 px : etat de la sonde -&gt; th_top 208, top declare 219, table_bottom 250, coupable nav.toc.colle, masque 11 ; etat de LECTURE (recul 60 px) -&gt; th_top 219 = top declare, bas_collant 0, aucun coupable, rien de masque. Condition d'apparition purement dimensionnelle : hauteur entre ~291 et ~660 px ; les trois tableaux accuses mesurent 585, 370 et 478 px, les 55 autres tableaux de la page passent. Les trois memes constats, aux memes 11 px, sont presents sur output/old/Client-A - Proposition Lineage Tenancy Schedule Asset - 20260908o.html, livree AVANT ce tour : la sonde est arrivee avec la version du socle du jour et rougit une page deja remise. Le produit a poserHauteurs() cable et mesure, --hh-tab vaut bien 219 px.</p><p class="detail-label">Proposition</p><ul class="puces"><li>la sonde s'arrete avant de mesurer quand l'en-tete ne peut pas atteindre son top declare (if (rt.bottom - rth.height &lt; attendu - 1) return;) — le th est alors bride par la fin de son propre tableau, comportement normal d'un position sticky</li><li>et le recul se choisit pour placer le tableau en position de LECTURE (par exemple min(hauteur - 250, hauteur / 3)), pas en position de sortie d'ecran. Fixture double sens : tableau court dont le pied passe sous la bande de sommaire -&gt; PASS</li><li>tableau haut dont le th se pose au-dessus du bas d'un collant -&gt; FAIL. Classe candidate : sonde-mesure-etat-hors-lecture (famille regle-morte)</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>gate R-32 non prononcable vert sur une page par ailleurs conforme ; trois constats declares au journal, et les memes trois constats sur une page deja livree</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-decide" id="item-TF-0970" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0970</code>
+            <span class="statut s-decide">decide</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-page-html : kpi-filter.js applique l'attribut de la carte ACTIVE a TOUS les tableaux du perimetre — cliquer une carte d'un tableau vide les autres tableaux a cartes, sans un mot au lecteur</h3>
+          <div class="card-detail" data-cite><p class="lead">Le code construit vues = un tableau par carte, puis teste pour chacun d'eux tr.getAttribute('data-' + actif.getAttribute('data-kpi-attr')) === actif.getAttribute('data-kpi-valeur') — l'attribut et la valeur de la carte active, quel que soit le tableau. Le mode d'emploi ne dit pas que init(document) couple tous les tableaux entre eux. Defaut mesure sur une page DEJA LIVREE (output/old/Client-A - Proposition Lineage Tenancy Schedule Asset - 20260908o.html, Playwright 1440x900) : au repos mapping 47, champs 342, mesures DAX 160 ; apres un clic sur la carte A corriger du tableau de mapping -&gt; mapping 3, champs 3, mesures DAX 0. Le lecteur qui filtre le mapping voit le tableau des 160 mesures DAX se vider sans savoir pourquoi. Le defaut restait invisible tant que tous les tableaux partageaient data-statut ; il devient total des qu'une carte filtre sur un autre attribut — c'est ce qui l'a revele (0 ligne visible sur 21 attendues, recette forge/etapes/data/recette-usage-reel.py). Correction produit : une init par groupe de cartes (div.kpis), l'API du composant prevoyant ce perimetre ; verification apres correction — clic A corriger du mapping -&gt; mapping 3, champs 342, mesures 160, usage 66, aucune fuite.</p><p class="detail-label">Proposition</p><ul class="puces"><li>appliquer() n'applique a un tableau que les cartes QUI LE DESIGNENT (actif devient un etat par table), ce qui rend init(document) sur</li><li>mode d'emploi et regle d'oracle : un clic sur une carte ne change le nombre de lignes visibles QUE du tableau designe</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un tableau de 160 lignes vide sans explication dans une page remise a un destinataire ; decouvert par la mesure, aucun oracle ne le voit</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-decide" id="item-TF-0973" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0973</code>
+            <span class="statut s-decide">decide</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-page-html : NUANCE sur RA-24 — la sonde V15 attrape de VRAIS defauts, la corriger ne doit pas la desarmer ; ses deux causes doivent se distinguer dans son message</h3>
+          <div class="card-detail" data-cite><p class="lead">Dans le tour qui a suivi le depot de RA-24, la meme sonde a signale un quatrieme constat sur la page 20260908u, de signature nettement differente des trois autres : en-tete a 58 px pour un top declare de 219, coupable header.doc.colle et non nav.toc.colle, 49 px masques au lieu de 10 ou 11, sur un tableau de 125 px de haut au lieu de 25 203. Cause reelle mesuree : le tableau des colonnes ecartees du chapitre du perimetre etait VIDE — le filtre du mode cible avait reduit la population source, et son titre annoncait pourtant 276 lignes. Aucun autre controle ne l'a vu : check_html PASS 39 regles, oracle-filtres-tableau PASS, la recette du chapitre ne comptait pas encore ce tableau. La famille V15 a donc rendu un service qu'aucune autre sonde ne rend, le jour meme ou un lot la signalait comme bruyante.</p><p class="detail-label">Proposition</p><ul class="puces"><li>corriger V15 SANS la desarmer —</li><li>la garde de RA-24, ne pas mesurer quand rt.bottom - rth.height &lt; attendu, l'en-tete etant alors bride par la fin de son propre tableau</li><li>le recul choisi en position de LECTURE</li><li>DISTINGUER les deux signatures dans le message, « bride par la fin du tableau » (informatif) et « recouvert par un collant alors qu'il pouvait atteindre son top » (bloquant). Une regle qui separe ses deux causes dans son texte ne s'apprend pas a ignorer — c'est ce que le faux positif de RA-24 etait en train de produire. Fixture triple : tableau court (PASS), tableau vide par un filtre en amont (FAIL, cas de ce tour), tableau haut recouvert (FAIL)</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-09</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un tableau vide annonce a 276 lignes, vu par la seule sonde que le lot precedent signalait comme bruyante ; trois autres controles verts sur la meme page</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-decide" id="item-TF-0947" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0947</code>
@@ -1768,29 +1860,6 @@
             <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>le modèle demandé par l'humain n'est pas ce que produit la forge d'audit aujourd'hui</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0969" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0969</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 20)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-page-html : la regle L30 de check_html.py cherche les termes de son referentiel en SOUS-CHAINE — gate est trouve dans aggregate_type et le chapitre est accuse d'employer un terme absent</h3>
-          <div class="card-detail" data-cite><p class="lead">Preuve : premier passage sur la version 20260908r, « x L30 terme technique non glose dans #usage-reel : gate ». Recherche dans le texte du chapitre : 0 occurrence sur frontiere de mot, 17 en sous-chaine, toutes dans billing.fact_debt_rollup (aggregate_type LEASE) — une valeur relevee dans Unity Catalog et affichee en clair dans une cellule. Le code lit : if terme.lower() not in texte_chapitre.lower(): continue. Le defaut est deja PAYE ailleurs dans le meme produit : les chapitres mapping et champs portent une glose de gate qu'aucun de leurs textes n'emploie — trois chapitres glosant un mot absent pour satisfaire le controle, et la parade de ce tour a ete d'en gloser un quatrieme, ce qui ajoute du bruit au lecteur pour un faux positif.</p><p class="detail-label">Proposition</p><ul class="puces"><li>L30 borne chaque terme par des frontieres de mot Unicode, comme porte-cle-courte-sans-frontiere l'a impose a la porte de publication (TF-0880) et garde-lexicale-frontiere-ascii aux gardes lexicales (TF-0799, TF-0805) : assertions pas-une-lettre-Unicode avant et apres, drapeau u, et un identifiant technique (aggregate_type, snake_case) ne compte jamais. Fixture double sens : aggregate_type seul -&gt; PASS</li><li>« la gate du mandat » -&gt; FAIL. RECIDIVE dans un troisieme oracle d'une classe deja corrigee deux fois : la correction n'a pas redescendu jusqu'a check_html.py</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>quatre gloses d'un terme absent ecrites dans un seul produit pour satisfaire le controle ; un passage FAIL sans defaut reel</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
             
           </dl>
@@ -1815,75 +1884,6 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>le gabarit de modele de donnees du socle echoue A5 en permanence pour 320 Ko de polices que la regle A1 du meme socle lui impose d embarquer ; tout produit qui suit la doctrine d autoportance herite du meme echec, et le lit comme sa propre faute</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0968" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0968</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-page-html : la sonde V15 de render_page.py rend FAIL par ARITHMETIQUE sur tout tableau dont la hauteur tombe dans une bande, sans qu'aucun collant ne masque quoi que ce soit</h3>
-          <div class="card-detail" data-cite><p class="lead">La sonde defile de recul = min(400, hauteur - 250), ce qui laisse TOUJOURS exactement 250 px de tableau en vue ; l'en-tete collant est alors bride par son bloc conteneur a bas_du_tableau - hauteur_du_th, soit 250 - 41 = 209 px, et ne peut plus atteindre son top declare de 219 px. Les 11 px masques annonces sont exactement cet ecart, donc constants. Mesure Playwright, deux etats, sur output/Client-A - Proposition Lineage Tenancy Schedule Asset - 20260908r.html a 1280 px : etat de la sonde -&gt; th_top 208, top declare 219, table_bottom 250, coupable nav.toc.colle, masque 11 ; etat de LECTURE (recul 60 px) -&gt; th_top 219 = top declare, bas_collant 0, aucun coupable, rien de masque. Condition d'apparition purement dimensionnelle : hauteur entre ~291 et ~660 px ; les trois tableaux accuses mesurent 585, 370 et 478 px, les 55 autres tableaux de la page passent. Les trois memes constats, aux memes 11 px, sont presents sur output/old/Client-A - Proposition Lineage Tenancy Schedule Asset - 20260908o.html, livree AVANT ce tour : la sonde est arrivee avec la version du socle du jour et rougit une page deja remise. Le produit a poserHauteurs() cable et mesure, --hh-tab vaut bien 219 px.</p><p class="detail-label">Proposition</p><ul class="puces"><li>la sonde s'arrete avant de mesurer quand l'en-tete ne peut pas atteindre son top declare (if (rt.bottom - rth.height &lt; attendu - 1) return;) — le th est alors bride par la fin de son propre tableau, comportement normal d'un position sticky</li><li>et le recul se choisit pour placer le tableau en position de LECTURE (par exemple min(hauteur - 250, hauteur / 3)), pas en position de sortie d'ecran. Fixture double sens : tableau court dont le pied passe sous la bande de sommaire -&gt; PASS</li><li>tableau haut dont le th se pose au-dessus du bas d'un collant -&gt; FAIL. Classe candidate : sonde-mesure-etat-hors-lecture (famille regle-morte)</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>gate R-32 non prononcable vert sur une page par ailleurs conforme ; trois constats declares au journal, et les memes trois constats sur une page deja livree</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0970" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0970</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-page-html : kpi-filter.js applique l'attribut de la carte ACTIVE a TOUS les tableaux du perimetre — cliquer une carte d'un tableau vide les autres tableaux a cartes, sans un mot au lecteur</h3>
-          <div class="card-detail" data-cite><p class="lead">Le code construit vues = un tableau par carte, puis teste pour chacun d'eux tr.getAttribute('data-' + actif.getAttribute('data-kpi-attr')) === actif.getAttribute('data-kpi-valeur') — l'attribut et la valeur de la carte active, quel que soit le tableau. Le mode d'emploi ne dit pas que init(document) couple tous les tableaux entre eux. Defaut mesure sur une page DEJA LIVREE (output/old/Client-A - Proposition Lineage Tenancy Schedule Asset - 20260908o.html, Playwright 1440x900) : au repos mapping 47, champs 342, mesures DAX 160 ; apres un clic sur la carte A corriger du tableau de mapping -&gt; mapping 3, champs 3, mesures DAX 0. Le lecteur qui filtre le mapping voit le tableau des 160 mesures DAX se vider sans savoir pourquoi. Le defaut restait invisible tant que tous les tableaux partageaient data-statut ; il devient total des qu'une carte filtre sur un autre attribut — c'est ce qui l'a revele (0 ligne visible sur 21 attendues, recette forge/etapes/data/recette-usage-reel.py). Correction produit : une init par groupe de cartes (div.kpis), l'API du composant prevoyant ce perimetre ; verification apres correction — clic A corriger du mapping -&gt; mapping 3, champs 342, mesures 160, usage 66, aucune fuite.</p><p class="detail-label">Proposition</p><ul class="puces"><li>appliquer() n'applique a un tableau que les cartes QUI LE DESIGNENT (actif devient un etat par table), ce qui rend init(document) sur</li><li>mode d'emploi et regle d'oracle : un clic sur une carte ne change le nombre de lignes visibles QUE du tableau designe</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un tableau de 160 lignes vide sans explication dans une page remise a un destinataire ; decouvert par la mesure, aucun oracle ne le voit</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0973" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0973</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-page-html : NUANCE sur RA-24 — la sonde V15 attrape de VRAIS defauts, la corriger ne doit pas la desarmer ; ses deux causes doivent se distinguer dans son message</h3>
-          <div class="card-detail" data-cite><p class="lead">Dans le tour qui a suivi le depot de RA-24, la meme sonde a signale un quatrieme constat sur la page 20260908u, de signature nettement differente des trois autres : en-tete a 58 px pour un top declare de 219, coupable header.doc.colle et non nav.toc.colle, 49 px masques au lieu de 10 ou 11, sur un tableau de 125 px de haut au lieu de 25 203. Cause reelle mesuree : le tableau des colonnes ecartees du chapitre du perimetre etait VIDE — le filtre du mode cible avait reduit la population source, et son titre annoncait pourtant 276 lignes. Aucun autre controle ne l'a vu : check_html PASS 39 regles, oracle-filtres-tableau PASS, la recette du chapitre ne comptait pas encore ce tableau. La famille V15 a donc rendu un service qu'aucune autre sonde ne rend, le jour meme ou un lot la signalait comme bruyante.</p><p class="detail-label">Proposition</p><ul class="puces"><li>corriger V15 SANS la desarmer —</li><li>la garde de RA-24, ne pas mesurer quand rt.bottom - rth.height &lt; attendu, l'en-tete etant alors bride par la fin de son propre tableau</li><li>le recul choisi en position de LECTURE</li><li>DISTINGUER les deux signatures dans le message, « bride par la fin du tableau » (informatif) et « recouvert par un collant alors qu'il pouvait atteindre son top » (bloquant). Une regle qui separe ses deux causes dans son texte ne s'apprend pas a ignorer — c'est ce que le faux positif de RA-24 etait en train de produire. Fixture triple : tableau court (PASS), tableau vide par un filtre en amont (FAIL, cas de ce tour), tableau haut recouvert (FAIL)</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-09</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un tableau vide annonce a 276 lignes, vu par la seule sonde que le lot precedent signalait comme bruyante ; trois autres controles verts sur la meme page</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
             
           </dl>
         </article>
@@ -3176,10 +3176,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0972" data-cite data-forge="digit-ai-forge-data" data-statut="candidat" data-prio="haute">
+        <article class="card s-decide" id="item-TF-0972" data-cite data-forge="digit-ai-forge-data" data-statut="decide" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0972</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -3199,10 +3199,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0974" data-cite data-forge="digit-ai-forge-data" data-statut="candidat" data-prio="haute">
+        <article class="card s-decide" id="item-TF-0974" data-cite data-forge="digit-ai-forge-data" data-statut="decide" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0974</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8.3)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -3222,10 +3222,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0971" data-cite data-forge="digit-ai-forge-data" data-statut="candidat" data-prio="haute">
+        <article class="card s-decide" id="item-TF-0971" data-cite data-forge="digit-ai-forge-data" data-statut="decide" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0971</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6.3)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -3245,10 +3245,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0975" data-cite data-forge="digit-ai-forge-data" data-statut="candidat" data-prio="basse">
+        <article class="card s-decide" id="item-TF-0975" data-cite data-forge="digit-ai-forge-data" data-statut="decide" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0975</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -3268,10 +3268,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0976" data-cite data-forge="digit-ai-forge-data" data-statut="candidat" data-prio="basse">
+        <article class="card s-decide" id="item-TF-0976" data-cite data-forge="digit-ai-forge-data" data-statut="decide" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0976</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -4149,10 +4149,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0977" data-cite data-forge="digit-ai-forge-organization" data-statut="candidat" data-prio="basse">
+        <article class="card s-decide" id="item-TF-0977" data-cite data-forge="digit-ai-forge-organization" data-statut="decide" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0977</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -4414,10 +4414,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0961" data-cite data-forge="digit-ai-page-html" data-statut="candidat" data-prio="haute">
+        <article class="card s-decide" id="item-TF-0961" data-cite data-forge="digit-ai-page-html" data-statut="decide" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0961</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 7.5)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -4466,10 +4466,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0962" data-cite data-forge="factory" data-statut="candidat" data-prio="basse">
+        <article class="card s-decide" id="item-TF-0962" data-cite data-forge="factory" data-statut="decide" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0962</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -4489,10 +4489,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0963" data-cite data-forge="factory" data-statut="candidat" data-prio="basse">
+        <article class="card s-decide" id="item-TF-0963" data-cite data-forge="factory" data-statut="decide" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0963</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -4512,10 +4512,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0964" data-cite data-forge="factory" data-statut="candidat" data-prio="basse">
+        <article class="card s-decide" id="item-TF-0964" data-cite data-forge="factory" data-statut="decide" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0964</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -4535,10 +4535,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0978" data-cite data-forge="factory" data-statut="candidat" data-prio="basse">
+        <article class="card s-decide" id="item-TF-0978" data-cite data-forge="factory" data-statut="decide" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0978</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -4558,10 +4558,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0979" data-cite data-forge="factory" data-statut="candidat" data-prio="basse">
+        <article class="card s-decide" id="item-TF-0979" data-cite data-forge="factory" data-statut="decide" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0979</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -4581,10 +4581,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0985" data-cite data-forge="factory" data-statut="candidat" data-prio="basse">
+        <article class="card s-decide" id="item-TF-0985" data-cite data-forge="factory" data-statut="decide" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0985</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -4604,10 +4604,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0986" data-cite data-forge="factory" data-statut="candidat" data-prio="basse">
+        <article class="card s-decide" id="item-TF-0986" data-cite data-forge="factory" data-statut="decide" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0986</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -4864,10 +4864,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0960" data-cite data-forge="pilot" data-statut="candidat" data-prio="haute">
+        <article class="card s-decide" id="item-TF-0960" data-cite data-forge="pilot" data-statut="decide" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0960</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-decide">decide</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
