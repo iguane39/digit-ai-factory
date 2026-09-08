@@ -27,13 +27,18 @@ const ELEMENT = (id = "TF-0626") => `### ${id} — artefact absent · gravité m
 - **Comment vous saurez que c'est fait** : le relevé ne liste plus cet artefact.
 - **Si ce n'est pas fait** : l'écart reste.`;
 
+// TF-0883 — la ligne que T8 exige : le sort du lot reçu, dans les deux cas, avec la commande
+// qui les départage. Les fixtures vertes la portent ; la rouge de T8 la retire.
+const SORT_DU_LOT_CONFORME = "- **Sort du lot reçu** : ce lot entre dans l'histoire du produit — `git add` du fichier et de "
+  + "son sidecar — SAUF si `git check-ignore \"<ce fichier>\"` le déclare ignoré, auquel cas il reste hors de l'histoire.";
+
 const LOT = ({ elements = [ELEMENT()], dejaFait = "- le résolveur a été corrigé, recette 11/11",
   borne = "- rien sur le code applicatif", ordre = "1. le premier — parce que son absence agit à chaque travail rendu",
-  sections = {} } = {}) => {
+  sections = {}, sortDuLot = SORT_DU_LOT_CONFORME, jour = "20260825a" } = {}) => {
   const s = { travaux: true, dejaFait: true, borne: true, ordre: true, ...sections };
   return [
-    "# Travaux confiés par le pilot — produit-recette — 20260825a",
-    "", "- **Statut** : a_traiter", "",
+    `# Travaux confiés par le pilot — produit-recette — ${jour}`,
+    "", "- **Statut** : a_traiter", sortDuLot, "",
     s.travaux ? "## Travaux confiés" : "## Autre titre",
     "", elements.join("\n\n"), "",
     s.dejaFait ? "## Ce que le pilot a déjà fait de son côté" : "## Rien de ce genre",
@@ -229,6 +234,33 @@ check("T7 vert borne — un lot qui n'affirme AUCUNE configuration externe n'a r
   att(!echoue(r, "T7"), "un lot sans configuration externe a été refusé");
   att(/rien à lire chez l'hébergeur/.test(r.constats.find((x) => x.regle === "T7").message),
     "le constat ne dit pas qu'il n'y avait rien à lire");
+});
+
+check("T8 rouge (TF-0883) — un lot qui ne dit PAS le sort du lot reçu est REFUSÉ", () => {
+  const r = verifier(LOT({ sortDuLot: "", jour: "20260909a" }));
+  att(echoue(r, "T8"), "un lot muet sur le sort du lot reçu a été accepté — c'est l'état qui a laissé deux fichiers non suivis");
+  att(/check-ignore/.test(r.constats.find((x) => x.regle === "T8").remede),
+    "la correction ne nomme pas la commande qui départage les deux cas");
+});
+
+check("T8 rouge borne — le sort ANNONCÉ sans la commande qui départage est refusé aussi", () => {
+  const r = verifier(LOT({ sortDuLot: "- **Sort du lot reçu** : déposez-le où il faut chez vous.", jour: "20260909a" }));
+  att(echoue(r, "T8"), "une annonce sans commande a été acceptée — « où il faut » n'est pas une règle");
+});
+
+check("T8 vert — la ligne conforme passe, et la règle n'impose AUCUN des deux sorts", () => {
+  const r = verifier(LOT({ jour: "20260909a" }));
+  att(!echoue(r, "T8"), "un lot portant la ligne conforme a été refusé");
+  const m = r.constats.find((x) => x.regle === "T8").message;
+  att(/dans les deux cas/.test(m), "le constat ne dit pas que les deux cas sont couverts : " + m);
+});
+
+check("T8 borne — un lot ANTÉRIEUR au 08/09 est SANS_OBJET, pas refusé : un lot déposé ne se modifie jamais", () => {
+  const r = verifier(LOT({ sortDuLot: "", jour: "20260825a" }));
+  att(!echoue(r, "T8"), "un lot antérieur à la règle a été REFUSÉ — il ne peut plus être corrigé, le rouge serait permanent");
+  const c = r.constats.find((x) => x.regle === "T8");
+  att(c.statut === "SANS_OBJET", "l'abstention n'est pas déclarée comme telle : " + c.statut);
+  att(/antérieur/.test(c.message), "le motif de l'abstention ne dit pas l'antériorité : " + c.message);
 });
 
 console.log(`\noracle-travaux-pilot (TF-0627) : ${pass} PASS, ${fail} FAIL`);

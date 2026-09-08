@@ -316,6 +316,13 @@ export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
 - **Dépôt** : ce fichier a été déposé par le pilot dans \`input\\00-travaux\\\`. L'original reste au
   pilot. Statut : \`a_traiter\` → \`traite le <date>\` — seule édition autorisée après coup.
 - **Statut** : a_traiter
+- **Sort du lot reçu** (TF-0883) : ce lot entre dans l'histoire du produit — \`git add\` du fichier
+  et de son sidecar — SAUF si \`git check-ignore "<ce fichier>"\` le déclare ignoré, auquel cas il
+  reste hors de l'histoire et vit sur le seul poste qui l'a reçu. Le canal supposait la boîte
+  d'entrée ignorée par git sans le dire ; mesuré le 06/09 chez un produit qui versionne
+  sa boîte d'entrée à dessein, la question a été tranchée dans le mandat HUMAIN qui accompagnait le lot,
+  et deux fichiers reçus sont restés non suivis indéfiniment. Une garde qui vit dans un mandat ne
+  protège que la session qui l'a reçue.
 - **Empreinte du contenu confié** : \`${sceauConfie}\` — deux lots portant la même
   empreinte confient la même chose ; le pilot ne redépose jamais une empreinte déjà présente.
 

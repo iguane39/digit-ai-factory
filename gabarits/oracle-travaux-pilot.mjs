@@ -129,6 +129,16 @@ const EST_OPTION = (jeton) => /^-/.test(jeton.trim());
 //: T7 — une CONFIGURATION EXTERNE nommée : ce qui vit chez l'hébergeur, lisible en direct, et que
 //: personne ne peut deviner depuis le dépôt. Le vocabulaire est BORNÉ et écrit, jamais deviné.
 const CONFIGURATION_EXTERNE = /(r[èe]gle\s+de\s+branche|protection\s+de\s+branche|branch\s+protection|avance\s+rapide|fast[- ]forward|revue\s+(exig[ée]e|requise|obligatoire)|push\s+forc[ée]|force[- ]push|enforce_admins|contr[ôo]les?\s+requis|required\s+status\s+check|droits\s+d['’]acc[èe]s\s+du\s+d[ée]p[ôo]t|permissions\s+du\s+d[ée]p[ôo]t|secret[s]?\s+d['’]organisation|variable[s]?\s+d['’]environnement\s+de\s+l['’]h[ée]bergeur)/i;
+//: T8 — l'annonce du sort du lot reçu dans l'en-tête, et la commande qui départage les deux cas.
+const SORT_DU_LOT = /sort\s+du\s+lot\s+re[çc]u/i;
+//: T8 — la date à partir de laquelle la ligne est exigée. Le correctif de l'émetteur date du
+//: 08/09, mais un lot du 08/09 émis AVANT ce correctif ne se distingue pas d'un lot émis après :
+//: la date d'un lot n'a pas d'heure. La borne prend donc le jour SUIVANT — un jour de tolérance
+//: contre un rouge permanent sur un artefact qu'aucun geste licite ne peut plus corriger. Rien
+//: n'est perdu : l'émetteur produit la ligne d'office dès le 08/09, et un lot du 08/09 qui la
+//: porte passe T8 par le fond, pas par l'abstention.
+const ENTREE_EN_VIGUEUR_T8 = "20260909";
+const COMMANDE_QUI_DEPARTAGE = /git\s+check-ignore/i;
 //: T7 — la lecture déclarée d'une configuration externe : une commande EN BACKTICKS et une DATE.
 const LECTURE_EXTERNE = /configuration\s+externe\s+lue[^\n]*?`([^`\n]+)`[^\n]*?(\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}|\d{2}\/\d{2})/gi;
 //: T6 — la lecture déclarée du producteur : « **Module producteur lu** : `x` … » (une ligne par module).
@@ -287,6 +297,45 @@ export function verifier(cheminOuTexte, nomFichier) {
     ok("T7", `${sansLecture.length} élément(s) affirment une configuration externe, et ${luesExternes.size} lecture(s) sont citées avec leur date`);
   } else {
     ok("T7", "aucun fait portant sur une configuration externe — rien à lire chez l'hébergeur");
+  }
+
+  // T8 (TF-0883) — LE SORT DU LOT REÇU SE DIT, DANS LES DEUX CAS.
+  //
+  // Le canal des lots supposait la boîte d'entrée du produit ignorée par git, et ne le disait
+  // nulle part. Mesuré le 06/09 chez un produit qui versionne `input\` À DESSEIN, et n'en exclut
+  // que deux entrants nommés : `git check-ignore` sur le lot déposé rendait 1, donc le lot n'était
+  // pas ignoré — ni lui ni le gabarit ne disaient s'il devait entrer dans l'histoire. La question
+  // a été tranchée dans le MANDAT HUMAIN qui accompagnait le lot, et deux fichiers reçus sont
+  // restés non suivis indéfiniment. Une garde qui vit dans un mandat ne protège que la session qui
+  // l'a reçue : elle se retranchera au lot suivant, et se retranchait déjà au précédent.
+  //
+  // La règle n'impose AUCUN des deux sorts — c'est au produit d'en décider par son `.gitignore`.
+  // Elle impose que le lot le DISE, et qu'il nomme la commande qui départage. C'est la loi n° 3
+  // mot pour mot : la surface implicite se traite d'office, jamais par omission.
+  // BORNÉE DANS LE TEMPS, parce qu'un lot déposé NE SE MODIFIE JAMAIS — le gabarit le dit en
+  // toutes lettres, et le lot suivant est un nouveau fichier daté. Sans borne, les onze lots
+  // émis avant le 08/09 deviendraient rouges à jamais, sans qu'aucun geste licite puisse les
+  // corriger : un juge qui condamne ce qu'on n'a pas le droit de réparer n'apprend rien à
+  // personne, et son rouge permanent finit par se lire comme du bruit. Même doctrine que R11 du
+  // registre. La date se lit dans le TITRE du lot (« — <produit> — <AAAAMMJJ><indice> ») ou, à
+  // défaut, dans son nom de fichier ; illisible des deux côtés, le lot EST jugé — l'abstention ne
+  // doit pas s'obtenir en effaçant sa date.
+  const dateLue = (/—\s*(\d{8})[a-z]?\s*$/m.exec(texte) || /(\d{8})[a-z]?\.md$/i.exec(nom) || [])[1];
+  if (dateLue && dateLue < ENTREE_EN_VIGUEUR_T8) {
+    constats.push({ regle: "T8", statut: "SANS_OBJET",
+      message: `lot du ${dateLue}, antérieur à l'entrée en vigueur de T8 (${ENTREE_EN_VIGUEUR_T8}) — un lot déposé ne se `
+        + "modifie jamais, et le juger sur une règle postérieure le condamnerait sans recours" });
+  } else if (!SORT_DU_LOT.test(texte)) {
+    ko("T8", "l'en-tête ne dit pas le SORT DU LOT REÇU — le canal suppose la boîte d'entrée du produit ignorée par git "
+      + "sans le dire, et chez un produit qui versionne `input\` le lot reste non suivi indéfiniment (mesuré le 06/09)",
+      "ajouter à l'en-tête « - **Sort du lot reçu** : ce lot entre dans l'histoire du produit — `git add` du fichier et de "
+      + "son sidecar — SAUF si `git check-ignore \"<ce fichier>\"` le déclare ignoré, auquel cas il reste hors de l'histoire »");
+  } else if (!COMMANDE_QUI_DEPARTAGE.test(texte)) {
+    ko("T8", "le sort du lot reçu est annoncé mais AUCUNE commande ne le départage — « déposez-le où il faut » n'est pas "
+      + "une règle : sans `git check-ignore`, le lecteur retranche la question à chaque lot",
+      "citer `git check-ignore \"<ce fichier>\"` dans la ligne du sort du lot");
+  } else {
+    ok("T8", "le sort du lot reçu est dit, dans les deux cas, et la commande qui les départage est citée");
   }
 
   return { fichier: nom, version: VERSION, constats,

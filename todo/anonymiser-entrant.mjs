@@ -109,7 +109,12 @@ export function variantes(nom) {
     .split(/[\s\-_]+/).filter(Boolean);
   if (mots.length < 2 || mots.join("").length < 8) return null;
   const corps = mots.map((m) => m.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("[\\s\\-_]*");
-  return new RegExp(`(?<![A-Za-z0-9])${corps}(?![A-Za-z0-9])`, "gi");
+  // Le SOULIGNÉ est une frontière d'identifiant, pas une frontière de mot (TF-0927, 08/09) :
+  // écrites `[A-Za-z0-9]`, ces bornes laissaient `calc_<nom>_total` matcher, et la substitution
+  // coupait l'identifiant que la garde du dessous venait de refuser de couper. Deux gardes du
+  // même sujet qui ne s'accordent pas sur l'alphabet donnent le pire des deux mondes — la même
+  // leçon que la casse, au même endroit. `bordé` excluait déjà `_` ; celle-ci ne le faisait pas.
+  return new RegExp(`(?<![A-Za-z0-9_])${corps}(?![A-Za-z0-9_])`, "gi");
 }
 
 function lireProduits() {
@@ -152,12 +157,88 @@ export function pseudoProduit(nom) {
   return d.produits[nom];
 }
 
+// Les caractères dont est fait un identifiant de code, dans à peu près tous les langages.
+const IDENT = /[A-Za-z0-9_]/;
+
 /**
- * Anonymise un texte. Rend `{ texte, remplaces }`, ou lève si un référentiel manque —
- * un anonymiseur qui ne peut pas anonymiser arrête le convoi, il ne laisse pas passer.
+ * Substitution LITTÉRALE d'un nom, occurrence par occurrence, qui REFUSE de couper un
+ * identifiant de code — et le dit (TF-0927).
+ *
+ * ============================================================================================
+ * LE FAIT, ET IL A COÛTÉ DIX-HUIT JOURS DE TESTS MUETS
+ * ============================================================================================
+ *
+ * Le 20/08, une passe de pseudonymisation a remplacé un nom de produit AU MILIEU d'un
+ * identifiant de fonction Python. Le pseudonyme porte un tiret (`Produit-07`, `Client-A`) ;
+ * le tiret n'est pas un caractère d'identifiant. Le module est devenu non compilable, la
+ * collecte de la suite de tests s'est arrêtée sur l'erreur d'import, zéro test a été joué —
+ * et rien ne l'a signalé pendant DIX-HUIT JOURS. La forge des tests a livré le garde-fou du
+ * SYMPTÔME (un module non collectable est un échec nommé, pas un silence) ; la CAUSE est ici.
+ *
+ * ============================================================================================
+ * POURQUOI REFUSER PLUTÔT QUE SUBSTITUER AUTREMENT
+ * ============================================================================================
+ *
+ * On pouvait dériver un pseudonyme sans tiret pour les contextes de code. Ç'aurait été deux
+ * pseudonymes pour un produit, donc deux vérités dans le registre, et la règle K5 du canal
+ * confidentiel dit l'inverse : un pseudonyme par produit. Surtout, un identifiant de code qui
+ * porte un nom de client est un défaut de nommage du CODE : il se renomme, avec ses appelants,
+ * par un développeur qui sait ce qu'il casse. Une substitution de texte ne sait pas cela.
+ *
+ * Le refus n'est donc pas une abstention : c'est le seul verdict exact. Il laisse le nom en
+ * place, l'inscrit dans `refuses`, et la porte de publication continuera de refuser le dépôt —
+ * ce qui rend le défaut visible AVANT la publication au lieu de le rafistoler en silence.
+ *
+ * La borne, dans l'autre sens : un remplacement collé dont le pseudonyme n'introduit AUCUN
+ * caractère étranger à un identifiant reste fait. Refuser là serait perdre des nettoyages
+ * légitimes sans rien protéger.
+ *
+ * ============================================================================================
+ * ET LE CONTEXTE, PARCE QUE HORS DU CODE LA MÊME GARDE DÉTRUIT AUTRE CHOSE
+ * ============================================================================================
+ *
+ * La garde ne s'arme que sur un texte DÉCLARÉ code par son appelant (`anonymiser(t, { code:
+ * true })`). Mesuré en la posant d'abord partout : `scripts/lib-pseudonyme-produit.mjs` résout
+ * le pseudonyme d'un produit en anonymisant son nom DEUX FOIS, et la table porte donc des clés
+ * déjà à moitié pseudonymisées, nées d'une substitution COLLÉE. Armée sur ces noms, la garde
+ * rendait un produit connu introuvable — un banc vert depuis le 03/09 est passé au rouge.
+ *
+ * Un nom de produit n'est pas un identifiant de code : le couper n'y casse aucune compilation.
+ * C'est bien le CONTEXTE qui discrimine, comme le demandait l'item, et il se déclare — il ne se
+ * devine pas depuis le texte.
  */
-export function anonymiser(texte) {
-  if (typeof texte !== "string" || !texte) return { texte, remplaces: [] };
+function substituerHorsIdentifiant(texte, nom, pseudo, refuses, code) {
+  if (!texte.includes(nom)) return { texte, fait: false };
+  const pseudoCasseUnIdent = code && [...String(pseudo)].some((c) => !IDENT.test(c));
+  let out = "", i = 0, fait = false;
+  for (;;) {
+    const j = texte.indexOf(nom, i);
+    if (j < 0) { out += texte.slice(i); break; }
+    const avant = j > 0 ? texte[j - 1] : "";
+    const apres = j + nom.length < texte.length ? texte[j + nom.length] : "";
+    const collé = (avant && IDENT.test(avant)) || (apres && IDENT.test(apres));
+    if (collé && pseudoCasseUnIdent) {
+      refuses.push({
+        nom_masqué: `${nom.length} caractère(s)`, pseudo,
+        motif: "l'occurrence est collée à un caractère d'identifiant et le pseudonyme en introduirait un "
+          + "étranger — substituer casserait le code ; l'identifiant se renomme à la main",
+        autour: texte.slice(Math.max(0, j - 24), j).replace(/\s+/g, " ")
+          + "⟦…⟧" + texte.slice(j + nom.length, j + nom.length + 24).replace(/\s+/g, " "),
+      });
+      out += texte.slice(i, j + nom.length);
+    } else { out += texte.slice(i, j) + pseudo; fait = true; }
+    i = j + nom.length;
+  }
+  return { texte: out, fait };
+}
+
+/**
+ * Anonymise un texte. Rend `{ texte, remplaces, refuses }`, ou lève si un référentiel manque —
+ * un anonymiseur qui ne peut pas anonymiser arrête le convoi, il ne laisse pas passer.
+ * `refuses` n'est jamais vide pour rien : chaque entrée est une occurrence LAISSÉE EN PLACE.
+ */
+export function anonymiser(texte, { code = false } = {}) {
+  if (typeof texte !== "string" || !texte) return { texte, remplaces: [], refuses: [] };
   const clients = lireClients();
   const produits = lireProduits();
   if (!clients) throw new Error(`référentiel des clients introuvable (${CHEMIN_CLIENTS()}) — ` +
@@ -165,6 +246,7 @@ export function anonymiser(texte) {
   if (!produits) throw new Error(`référentiel des produits introuvable (${CHEMIN_PRODUITS()}) — ` +
     "l'ingestion s'arrête : anonymiser à moitié serait pire que ne pas anonymiser");
   const remplaces = [];
+  const refuses = [];
   let out = texte;
   // Les PRODUITS d'abord : leurs noms sont souvent plus longs et contiennent parfois un nom de
   // client (`Produit-04`). Substituer le client en premier casserait la clé du produit.
@@ -182,7 +264,8 @@ export function anonymiser(texte) {
   // recouvrement existe (un sigle contenu dans un nom).
   const parLongueur = (a, b) => String(b[0]).length - String(a[0]).length;
   for (const [nom, pseudo] of Object.entries(produits.produits || {}).sort(parLongueur)) {
-    if (out.includes(nom)) { out = out.split(nom).join(pseudo); remplaces.push(nom); }
+    const litt = substituerHorsIdentifiant(out, nom, pseudo, refuses, code);
+    if (litt.fait) { out = litt.texte; remplaces.push(nom); } else out = litt.texte;
     // TF-0742 (02/09/2026) : UNE table qui n'énumère qu'une graphie ne protège que cette graphie.
     // Mesuré le 01/09 : la clé concaténée était substituée, la forme ESPACÉE du même nom — écrite
     // en toutes lettres dans le titre et le contenu — traversait, et deux occurrences sont entrées
@@ -213,13 +296,16 @@ export function anonymiser(texte) {
     if (bord.test(out)) { out = out.replace(bordé(nom), pseudo); remplaces.push(nom); }
   }
   for (const [de, vers] of [...clients.table].sort(parLongueur)) {
-    if (out.includes(de)) { out = out.split(de).join(vers); remplaces.push(de); }
+    // Même garde pour les clients : c'est un nom de CLIENT qui a cassé le module Python le 20/08.
+    const litt = substituerHorsIdentifiant(out, de, vers, refuses, code);
+    out = litt.texte;
+    if (litt.fait) remplaces.push(de);
   }
   for (const [de, vers] of clients.sigles) {
     const re = bordé(de);
     if (re.test(out)) { out = out.replace(bordé(de), vers); remplaces.push(de); }
   }
-  return { texte: out, remplaces: [...new Set(remplaces)] };
+  return { texte: out, remplaces: [...new Set(remplaces)], refuses };
 }
 
 /** Anonymise les champs texte d'une candidature, en place sur une copie. */
@@ -302,6 +388,31 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
   if (!r2d.texte.includes("xgribouille-ai.frx"))
     casse.push("la clé insensible à la casse mord à l'intérieur d'un mot plus long : " + r2d.texte);
 
+  // 3 quinquies) UN REMPLACEMENT NE COUPE PAS UN IDENTIFIANT DE CODE, ET IL LE DIT (TF-0927,
+  //              08/09) — le défaut d'origine : un nom substitué au milieu d'un identifiant de
+  //              fonction Python y a introduit le tiret du pseudonyme, le module est devenu non
+  //              compilable, et la suite de tests n'a plus rien collecté pendant dix-huit jours.
+  //              Sens vert : l'occurrence en PROSE est remplacée. Sens rouge : l'occurrence
+  //              COLLÉE dans un identifiant reste en place ET remonte dans `refuses`.
+  const r2e = anonymiser("def calc_CalculatriceZorglubZAP_total(): pass  # module de CalculatriceZorglubZAP", { code: true });
+  if (!r2e.texte.includes("calc_CalculatriceZorglubZAP_total"))
+    casse.push("l'identifiant de code a été coupé par la substitution : " + r2e.texte);
+  if (!r2e.texte.includes("de Produit-01"))
+    casse.push("l'occurrence en prose n'est pas remplacée : " + r2e.texte);
+  if (r2e.refuses.length !== 2)
+    casse.push(`les refus ne sont pas remontés (produit ET client attendus) : ${JSON.stringify(r2e.refuses)}`);
+  if (!r2e.refuses.every((x) => /identifiant/.test(x.motif) && !/Zorglub|Calculatrice/.test(JSON.stringify(x.nom_masqué))))
+    casse.push("un refus ne nomme pas son motif, ou recopie le nom qu'il protège : " + JSON.stringify(r2e.refuses));
+
+  //           Et le SECOND SENS DU CONTEXTE : hors code, la garde ne s'arme pas — un nom de
+  //           produit à moitié pseudonymisé naît d'une substitution collée, et l'interdire
+  //           rendrait introuvable un produit connu de la table (banc de lib-pseudonyme-produit).
+  const r2f = anonymiser("def calc_CalculatriceZorglubZAP_total()");
+  if (r2f.texte.includes("CalculatriceZorglubZAP"))
+    casse.push("hors contexte de code, la garde s'arme quand même : " + r2f.texte);
+  if (r2f.refuses.length)
+    casse.push("hors contexte de code, un refus est remonté : " + JSON.stringify(r2f.refuses));
+
   // 3 bis) un nom qui EST déjà un pseudonyme n'est jamais réinscrit ni décalé (02/09)
   const p3 = pseudoProduit("Produit-01");
   if (p3 !== "Produit-01") casse.push(`un pseudonyme réinscrit comme produit neuf : Produit-01 → ${p3}`);
@@ -316,6 +427,6 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
   if (!refuse) casse.push("référentiel absent et le texte passe quand même — le convoi n'est pas arrêté");
 
   for (const m of casse) console.log("  [FAIL] " + m);
-  console.log(`\nSelf-test anonymiseur d'entrants : ${7 - casse.length}/7 cas, ${casse.length} FAIL`);
+  console.log(`\nSelf-test anonymiseur d'entrants : ${8 - casse.length}/8 cas, ${casse.length} FAIL`);
   process.exit(casse.length ? 1 : 0);
 }

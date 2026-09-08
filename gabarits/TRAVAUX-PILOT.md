@@ -10,9 +10,9 @@
   reste au pilot (`output\` daté). Statut : `a_traiter` → `traite le <date>` — seule édition
   autorisée après coup : cette ligne de statut.
 - **Statut** : a_traiter
-- **Sort du lot reçu** (TF-0883 — prescrit ici, **juge en attente** : son entrée en vigueur
-  demande une ligne dans l'émetteur des lots, `todo\emettre-travaux.mjs`, hors du périmètre de la
-  campagne qui a écrit cette prescription) : ce lot entre dans l'histoire du produit — `git add` du
+- **Sort du lot reçu** (TF-0883 — **jugé par la règle T8** de `oracle-travaux-pilot.mjs`, et
+  produit d'office par l'émetteur `todo\emettre-travaux.mjs` depuis le 08/09) : ce lot entre dans
+  l'histoire du produit — `git add` du
   fichier et de son sidecar — SAUF si `git check-ignore "<ce fichier>"` le déclare ignoré, auquel
   cas il reste hors de l'histoire et vit sur le seul poste qui l'a reçu. *La ligne est
   OBLIGATOIRE, dans l'un ou l'autre cas.* Le canal supposait la boîte d'entrée ignorée par git

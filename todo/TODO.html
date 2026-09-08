@@ -155,7 +155,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>7e7bb3a380e5</code> · dernier événement 2026-09-08T10:34:47.067Z</p>
+      <p class="meta">sceau <code>d08480367bd1</code> · dernier événement 2026-09-08T10:51:33.527Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -166,8 +166,8 @@
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
       <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="16 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">16</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="29 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">29</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="5 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">5</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="27 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">27</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="4 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">4</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="781 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">781</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
     <p class="legende">
@@ -224,29 +224,6 @@
       <h2>digit-ai-factory <span class="badge" title="51 item(s) actifs ciblant digit-ai-factory">51</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-factory</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-en_cours" id="item-TF-0927" data-cite data-forge="digit-ai-factory" data-statut="en_cours" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0927</code>
-            <span class="statut s-en_cours">en_cours</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 16)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : l'anonymiseur remplace un nom À L'INTÉRIEUR d'un identifiant de code — c'est ce qui a rendu la suite de la forge des tests non collectable pendant dix-huit jours</h3>
-          <div class="card-detail" data-cite><p class="lead">Cause première de l'item clos le 08/09 chez forge-tests, remontée par sa campagne.</p><ul class="puces"><li>Le 20/08, la pseudonymisation a réécrit un nom au milieu d'un identifiant de fonction Python et y a introduit un tiret, rendant le module non compilable</li><li>la collecte s'arrêtait, zéro test joué, et rien ne l'a signalé pendant dix-huit jours. Le garde-fou livré côté forge attrape désormais le SYMPTÔME (un module non compilable est un échec nommé)</li><li>la CAUSE vit au pilot. Demande : l'anonymiseur refuse tout remplacement à l'intérieur d'un identifiant de code — frontière de mot ET contexte (extension de fichier, position dans une déclaration) — et le dit au lieu de le faire</li><li>fixture double sens : le même nom dans une prose est remplacé, dans un identifiant il est refusé avec son motif. À traiter avec la classe voisine de l'alias court pris avant le nom complet</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 16 — gain 4 × preuve 4 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>dix-huit jours de suite non jouée chez forge-tests, cause mesurée au commit d'anonymisation du 20/08</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
-            
-          </dl>
-        </article>
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
              titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
              socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
@@ -368,52 +345,6 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0883" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0883</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-factory : le canal des lots suppose la boîte d'entrée du produit ignorée par git sans le dire — chez un produit qui versionne input\, le lot reçu reste non suivi indéfiniment</h3>
-          <div class="card-detail" data-cite><p class="lead">Constat RS-28 du lot du produit 12 du 06/09 (Produit-12 20260906b), en prose faute de classe ; classe créée sur D-26 (a).</p><ul class="puces"><li>Mesure : git check-ignore sur le lot déposé rend exit 1 (non ignoré)</li><li>le produit versionne input/ à dessein et n'en exclut que deux entrants nommés. Ni le lot ni TRAVAUX-PILOT.md ne disent si le lot reçu entre dans l'histoire du produit</li><li>la question a été tranchée dans le mandat humain qui accompagnait le lot, et se retranchera dans le suivant. Demande : une ligne du gabarit qui dit le sort du lot reçu dans les deux cas, rappelée par chaque lot</li><li>règle T7 de l'oracle des lots</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-07</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>une question tranchée à la main dans un mandat, à retrancher au suivant ; deux fichiers non suivis indéfiniment chez le produit</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-12</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0826" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0826</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-factory : le depot PUBLIC du pilot porte lui-meme, dans 9 fichiers suivis, le nom de produit que TF-0820 fait retirer de la forge</h3>
-          <div class="card-detail" data-cite><p class="lead">Le pilot a confie a digit-ai-forge-development le retrait de trois mentions d'un nom de produit reel dans deux fichiers courants (TF-0820), au motif que la forge est publique.</p><ul class="puces"><li>Le controle joue en fin de traitement — pour verifier que le compte rendu ne recopiait le nom nulle part — montre que le depot du pilot est public LUI AUSSI et qu'il porte le meme nom dans 9 fichiers SUIVIS par git. La porte oracle-nom-client-publie rend PASS sur ces fichiers, pour la raison exacte de TF-0820 : elle ne connait que la table des CLIENTS. Deux cas a separer avant de corriger</li><li>Archives et livrables — input/00-retours/old/, output/03-etudes/, todo/TODO-ARCHIVE.jsonl et .html : passe de pseudonymisation ordinaire, y compris le renommage de fichiers dont le NOM porte deja le pseudonyme Produit-09 alors que le CONTENU porte le nom reel</li><li>Modules de pseudonymisation eux-memes — todo/anonymiser-entrant.mjs, todo/anonymiser-suivis.mjs, scripts/lib-pseudonyme-produit.mjs et son banc : le lot TF-0820 ecrit que la table des pseudonymes de produits vit « hors depot », or le nom vit ici dans le code et dans le banc. Decision a prendre : soit le nom sort du code vers cette donnee hors depot, soit ces occurrences sont des fixtures de banc et doivent employer un nom FICTIF. Un banc qui se prouve avec la donnee qu'il existe pour cacher est un banc qui publie. Aucune ecriture n'a ete faite dans le depot du pilot depuis ce run : le mandat porte sur la forge, et ecrire dans un depot frere hors mandat est interdit</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>Mesure du 05/09/2026. Visibilite : `gh repo view iguane39/digit-ai-factory --json visibility,isPrivate` rend {&quot;isPrivate&quot;:false,&quot;visibility&quot;:&quot;PUBLIC&quot;} (idem pour digit-ai-forge-development). Occurrences du nom du produit sur les fichiers SUIVIS du depot du pilot : 43 occurrences, 9 fichiers — input/00-retours/old/Produit-09 - RETOURS - 20260820a.md 9, le sidecar homonyme 4, output/03-etudes/20260820-etude-opportunite-rgaa.md 3, todo/TODO-ARCHIVE.jsonl 7, todo/TODO-ARCHIVE.html 7, todo/anonymiser-entrant.mjs 4, todo/anonymiser-suivis.mjs 3, scripts/lib-pseudonyme-produit.mjs 2, scripts/lib-pseudonyme-produit.test.mjs 2. A comparer aux 3 occurrences sur 2 fichiers que TF-0820 fait retirer de la forge : le geste demande retire trois mentions d'un depot public pendant que quarante-trois vivent dans un autre, celui qui edicte la regle. Deux des neuf fichiers portent DEJA le pseudonyme dans leur NOM et le nom reel dans leur CONTENU, ce qui montre que la passe a ete jouee sur les noms de fichiers sans l'etre sur les contenus.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">digit-ai-forge-development</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-decide" id="item-TF-0836" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0836</code>
@@ -520,6 +451,29 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>retour humain lot 20260906b, un run de version</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-61</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0927" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0927</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 16)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : l'anonymiseur remplace un nom À L'INTÉRIEUR d'un identifiant de code — c'est ce qui a rendu la suite de la forge des tests non collectable pendant dix-huit jours</h3>
+          <div class="card-detail" data-cite><p class="lead">Cause première de l'item clos le 08/09 chez forge-tests, remontée par sa campagne.</p><ul class="puces"><li>Le 20/08, la pseudonymisation a réécrit un nom au milieu d'un identifiant de fonction Python et y a introduit un tiret, rendant le module non compilable</li><li>la collecte s'arrêtait, zéro test joué, et rien ne l'a signalé pendant dix-huit jours. Le garde-fou livré côté forge attrape désormais le SYMPTÔME (un module non compilable est un échec nommé)</li><li>la CAUSE vit au pilot. Demande : l'anonymiseur refuse tout remplacement à l'intérieur d'un identifiant de code — frontière de mot ET contexte (extension de fichier, position dans une déclaration) — et le dit au lieu de le faire</li><li>fixture double sens : le même nom dans une prose est remplacé, dans un identifiant il est refusé avec son motif. À traiter avec la classe voisine de l'alias court pris avant le nom complet</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 16 — gain 4 × preuve 4 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>dix-huit jours de suite non jouée chez forge-tests, cause mesurée au commit d'anonymisation du 20/08</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
             
           </dl>
         </article>
@@ -1104,6 +1058,29 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0883" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0883</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-factory : le canal des lots suppose la boîte d'entrée du produit ignorée par git sans le dire — chez un produit qui versionne input\, le lot reçu reste non suivi indéfiniment</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat RS-28 du lot du produit 12 du 06/09 (Produit-12 20260906b), en prose faute de classe ; classe créée sur D-26 (a).</p><ul class="puces"><li>Mesure : git check-ignore sur le lot déposé rend exit 1 (non ignoré)</li><li>le produit versionne input/ à dessein et n'en exclut que deux entrants nommés. Ni le lot ni TRAVAUX-PILOT.md ne disent si le lot reçu entre dans l'histoire du produit</li><li>la question a été tranchée dans le mandat humain qui accompagnait le lot, et se retranchera dans le suivant. Demande : une ligne du gabarit qui dit le sort du lot reçu dans les deux cas, rappelée par chaque lot</li><li>règle T7 de l'oracle des lots</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-07</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>une question tranchée à la main dans un mandat, à retrancher au suivant ; deux fichiers non suivis indéfiniment chez le produit</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-12</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-corrige" id="item-TF-0888" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0888</code>
@@ -1233,6 +1210,29 @@
             <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>Preuve reproductible : `check_markdown.py` joue sur `git show 90d3767:skills/enumere-la-surface/references/typologie-surface.md` (version anterieure a toute edition de ce run) rend les deux memes constats M7 (lignes 6 et 92) que le gate a ensuite imputes a l'edition suivante. Cout mesure : deux passes consommees sur trois, et cinq corrections de forme hors perimetre du lot.</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0826" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0826</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-factory : le depot PUBLIC du pilot porte lui-meme, dans 9 fichiers suivis, le nom de produit que TF-0820 fait retirer de la forge</h3>
+          <div class="card-detail" data-cite><p class="lead">Le pilot a confie a digit-ai-forge-development le retrait de trois mentions d'un nom de produit reel dans deux fichiers courants (TF-0820), au motif que la forge est publique.</p><ul class="puces"><li>Le controle joue en fin de traitement — pour verifier que le compte rendu ne recopiait le nom nulle part — montre que le depot du pilot est public LUI AUSSI et qu'il porte le meme nom dans 9 fichiers SUIVIS par git. La porte oracle-nom-client-publie rend PASS sur ces fichiers, pour la raison exacte de TF-0820 : elle ne connait que la table des CLIENTS. Deux cas a separer avant de corriger</li><li>Archives et livrables — input/00-retours/old/, output/03-etudes/, todo/TODO-ARCHIVE.jsonl et .html : passe de pseudonymisation ordinaire, y compris le renommage de fichiers dont le NOM porte deja le pseudonyme Produit-09 alors que le CONTENU porte le nom reel</li><li>Modules de pseudonymisation eux-memes — todo/anonymiser-entrant.mjs, todo/anonymiser-suivis.mjs, scripts/lib-pseudonyme-produit.mjs et son banc : le lot TF-0820 ecrit que la table des pseudonymes de produits vit « hors depot », or le nom vit ici dans le code et dans le banc. Decision a prendre : soit le nom sort du code vers cette donnee hors depot, soit ces occurrences sont des fixtures de banc et doivent employer un nom FICTIF. Un banc qui se prouve avec la donnee qu'il existe pour cacher est un banc qui publie. Aucune ecriture n'a ete faite dans le depot du pilot depuis ce run : le mandat porte sur la forge, et ecrire dans un depot frere hors mandat est interdit</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>Mesure du 05/09/2026. Visibilite : `gh repo view iguane39/digit-ai-factory --json visibility,isPrivate` rend {&quot;isPrivate&quot;:false,&quot;visibility&quot;:&quot;PUBLIC&quot;} (idem pour digit-ai-forge-development). Occurrences du nom du produit sur les fichiers SUIVIS du depot du pilot : 43 occurrences, 9 fichiers — input/00-retours/old/Produit-09 - RETOURS - 20260820a.md 9, le sidecar homonyme 4, output/03-etudes/20260820-etude-opportunite-rgaa.md 3, todo/TODO-ARCHIVE.jsonl 7, todo/TODO-ARCHIVE.html 7, todo/anonymiser-entrant.mjs 4, todo/anonymiser-suivis.mjs 3, scripts/lib-pseudonyme-produit.mjs 2, scripts/lib-pseudonyme-produit.test.mjs 2. A comparer aux 3 occurrences sur 2 fichiers que TF-0820 fait retirer de la forge : le geste demande retire trois mentions d'un depot public pendant que quarante-trois vivent dans un autre, celui qui edicte la regle. Deux des neuf fichiers portent DEJA le pseudonyme dans leur NOM et le nom reel dans leur CONTENU, ce qui montre que la passe a ete jouee sur les noms de fichiers sans l'etre sur les contenus.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">digit-ai-forge-development</dd></div>
             
           </dl>
         </article>

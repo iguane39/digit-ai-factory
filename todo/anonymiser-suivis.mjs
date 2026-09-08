@@ -110,21 +110,31 @@ function suivis(depot) {
  * Fonction SÉPARÉE de l'écriture, et c'est ce qui la rend éprouvable : le banc lui donne des
  * fichiers et lit son plan, sans qu'aucun `git mv` ne parte.
  */
+// TF-0927 — LES EXTENSIONS OÙ UN IDENTIFIANT COUPÉ CASSE QUELQUE CHOSE, et la liste se DÉCLARE.
+// Elle est POSITIVE, donc un fichier de code portant une extension absente d'ici n'est pas gardé :
+// limite assumée et écrite plutôt que devinée depuis le contenu. Les formats structurés y sont —
+// une clé JSON ou YAML coupée casse un lecteur aussi sûrement qu'un identifiant Python.
+const EST_CODE = /\.(m?[jt]sx?|cjs|py|rb|php|java|go|rs|cs|c|h|cc|cpp|sh|bash|ps1|sql|css|scss|html?|ya?ml|json|toml|ini|cfg)$/i;
+
 export function planifier(depot, fichiers, lire = (f) => readFileSync(join(depot, f))) {
-  const contenus = [], renommages = [], binaires = [], illisibles = [];
+  const contenus = [], renommages = [], binaires = [], illisibles = [], refuses = [];
   for (const f of fichiers) {
     let octets;
     try { octets = lire(f); } catch (e) { illisibles.push({ fichier: f, motif: e.code || e.message }); continue; }
     if (estBinaire(octets)) { binaires.push(f); continue; }
     const avant = octets.toString("utf8");
-    const { texte, remplaces } = anonymiser(avant);
+    const { texte, remplaces, refuses: refusesDuFichier } = anonymiser(avant, { code: EST_CODE.test(f) });
+    // TF-0927 : un nom LAISSÉ EN PLACE parce qu'il vit dans un identifiant de code n'est pas un
+    // détail d'implémentation — c'est un fichier qui restera porteur, et que la porte de
+    // publication refusera. Il se remonte au rapport, nommé, plutôt que d'être avalé ici.
+    for (const x of refusesDuFichier || []) refuses.push({ fichier: f, ...x });
     // Le plan garde le contenu d'AVANT : c'est la preuve dont la ré-empreinte d'un sidecar a
     // besoin (reempreinter-lot.mjs), et l'écrivain qui change un contenu est le seul à l'avoir.
     if (texte !== avant) contenus.push({ fichier: f, remplaces, texte, avant });
     const nom = anonymiser(f);
     if (nom.texte !== f) renommages.push({ de: f, vers: nom.texte, remplaces: nom.remplaces });
   }
-  return { contenus, renommages, binaires, illisibles };
+  return { contenus, renommages, binaires, illisibles, refuses };
 }
 
 function jouer(depot, plan) {
@@ -233,6 +243,21 @@ function selfTest() {
   const contR = planR.contenus.find((c) => c.fichier.startsWith("ZorglubZAPetal"));
   if (!contR || !/Produit-42/.test(contR.texte) || /Produit-07etal/.test(contR.texte)) casse.push("le CONTENU est coupé par la clé courte : " + (contR ? contR.texte.trim() : "absent"));
 
+  // 3 quater) TF-0927 (08/09) — UN NOM DANS UN IDENTIFIANT DE CODE EST REFUSÉ, PAS SUBSTITUÉ.
+  //           Le 20/08, une substitution au milieu d'un identifiant Python y a glissé le tiret du
+  //           pseudonyme ; le module est devenu non compilable et la suite de tests n'a plus rien
+  //           collecté pendant dix-huit jours. Sens vert : l'occurrence en prose du même fichier
+  //           est nettoyée. Sens rouge : l'identifiant sort intact ET le refus est remonté, nommé.
+  const code = { "outil.py": Buffer.from(["def calc_ZorglubZAP_total():", "    pass  # sert a ZorglubZAP", ""].join(String.fromCharCode(10)), "utf8") };
+  const planC = planifier(dir, Object.keys(code), (f) => code[f]);
+  const cont = planC.contenus.find((c) => c.fichier === "outil.py");
+  if (!cont || !cont.texte.includes("calc_ZorglubZAP_total"))
+    casse.push("l'identifiant de code est coupé par la substitution : " + (cont ? cont.texte.trim() : "fichier absent du plan"));
+  if (!cont || !/sert a Produit-07/.test(cont.texte))
+    casse.push("l'occurrence en PROSE du même fichier n'est pas nettoyée : " + (cont ? cont.texte.trim() : "absent"));
+  if (!planC.refuses.length || !planC.refuses.every((x) => x.fichier === "outil.py" && /identifiant/.test(x.motif)))
+    casse.push("le refus n'est pas remonté au rapport avec son fichier et son motif : " + JSON.stringify(planC.refuses));
+
   // 4) un REFERENTIEL MANQUANT arrete tout, sans ecrire une ligne
   process.env.FORGE_NOMS_INTERDITS = join(dir, "_absent.json");
   let leve = false;
@@ -242,9 +267,10 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test anonymiser-suivis : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test anonymiser-suivis : 9/9 PASS (contenu porteur nettoyé ; fichier propre NON réécrit ; contenu d'avant conservé ; "
+    : "Self-test anonymiser-suivis : 10/10 PASS (contenu porteur nettoyé ; fichier propre NON réécrit ; contenu d'avant conservé ; "
       + "nom de fichier porteur renommé ; destination du renommage propre ; binaire sauté et hors du "
-      + "plan d'écriture ; référentiel manquant = arrêt sans écriture ; clé la plus longue appariée avant la clé courte qui la contient, nom ET contenu, TF-0913)");
+      + "plan d'écriture ; référentiel manquant = arrêt sans écriture ; clé la plus longue appariée avant la clé courte qui la contient, nom ET contenu, TF-0913 ; "
+      + "nom dans un identifiant de code REFUSÉ et remonté, prose du même fichier nettoyée, TF-0927)");
   return casse.length ? 1 : 0;
 }
 
@@ -276,6 +302,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     a_renommer: plan.renommages.length,
     binaires_sautes: plan.binaires.length,
     illisibles: plan.illisibles,
+    refuses: plan.refuses,
     noms_rencontres: [...new Set([...plan.contenus, ...plan.renommages].flatMap((x) => x.remplaces))].sort(),
     fichiers: [
       ...plan.contenus.map((c) => ({ quoi: "contenu", fichier: c.fichier, remplaces: c.remplaces })),
