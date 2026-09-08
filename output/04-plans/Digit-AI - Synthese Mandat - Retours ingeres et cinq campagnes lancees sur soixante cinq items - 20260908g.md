@@ -8,10 +8,10 @@ Votre demande de tout traiter est engagée sur les deux fronts. Côté retours, 
 
 ## 1. En-tête d'identification
 
-- **quoi** — mandat humain « Traite tous les todos et retours » : ingestion et réconciliation de la boîte d'entrée, décision de tous les items ouverts, lancement des campagnes de correction.
-- **sur quoi** — la boîte d'entrée et le registre du pilot ; huit dépôts cibles (pilot, forge des outils, conception, données, design, tests, conventions, référencement).
-- **quand** — 2026-09-08 11:10 UTC+02:00 (Europe/Paris), durée ≈ 15 min depuis votre message ; campagnes en cours, première émission reçue.
-- **qui** — pilot digit-ai-factory ce948df ; `oracles\oracle-boite-entree.mjs`, `todo\reempreinter-lot.mjs`, `todo\journaliser.mjs`, `todo\oracle-todo.mjs` ; cinq agents de campagne sous `gabarits\AGENT-CAMPAGNE.md`.
+- **quoi** — mandat humain « Traite tous les todos et retours » : ingestion et réconciliation de la boîte d'entrée, décision de tous les items ouverts, lancement des campagnes de correction, puis reprise par le pilot des items fermés aux campagnes.
+- **sur quoi** — la boîte d'entrée et le registre du pilot ; huit dépôts cibles (pilot, forge des outils, conception, données, design, tests, conventions, référencement) ; le canal confidentiel pour la table des pseudonymes.
+- **quand** — 2026-09-08 11:10 UTC+02:00 (Europe/Paris), durée ≈ 3 h 40 depuis votre message ; une campagne encore en cours, quatre rapports finaux reçus.
+- **qui** — pilot digit-ai-factory 5b602ac ; `oracles\oracle-boite-entree.mjs`, `oracles\oracle-skills.mjs`, `todo\reempreinter-lot.mjs`, `todo\journaliser.mjs`, `todo\oracle-todo.mjs`, `todo\anonymiser-entrant.mjs`, `gabarits\oracle-travaux-pilot.mjs`, porte de publication du skill des oracles ; cinq agents de campagne sous `gabarits\AGENT-CAMPAGNE.md`.
 
 ## 2. Verdict en une ligne
 
@@ -19,7 +19,21 @@ Boîte d'entrée : 13 constats bloquants → 0, verdict PASS (12 lots rattachés
 
 ## 3. Décisions attendues de l'humain
 
-Aucune décision n'attend pendant que les campagnes travaillent. La seule qui viendra est la publication de leurs corrections, à leur retour, comme ce matin. Si rien n'est décidé : les corrections resteront en commits locaux sur ce poste et l'autre poste ne les verra pas.
+Une seule décision attend, et elle n'est pas urgente tant que la dernière campagne tourne. Les corrections de la journée vivent en commits locaux sur ce poste : trente-huit sur le pilot, trente réparties sur sept forges. Elles ne parviendront à l'autre poste, et ne seront sauvegardées ailleurs qu'ici, qu'une fois publiées. La porte de publication a été jouée sur le pilot après correction et rend PASS.
+
+> **D-29 — Publier maintenant les sept dépôts déjà verts, ou attendre que la dernière campagne ait rendu son rapport pour tout publier d'un geste ?**
+>
+> Sept dépôts sur huit ont des arbres propres et des campagnes closes, sondées ici commit par commit. Le huitième, la forge des outils, travaille encore : elle a posé quinze commits, son arbre est propre, et son dernier item touche la porte de publication elle-même. Publier maintenant met les corrections à l'abri et les porte à l'autre poste ; attendre garde un seul point de contrôle pour tout le lot.
+>
+> **Recommandation : (a).** Source consultée : la règle de publication du noyau du pilot, qui exige un feu vert humain par dépôt et non par lot, et la mesure des huit dépôts faite pendant ce tour (arbres propres, aucun retard sur l'origine).
+
+| Option | Ce qu'elle coûte | Ce qu'elle exclut |
+|---|---|---|
+| (a) Publier les sept dépôts verts maintenant, la forge des outils à son retour | Deux gestes de publication au lieu d'un, deux passages de la porte — mesurée entre 81 s et 4 min par dépôt, soit une dizaine de minutes en tout | Rien : la forge des outils reste publiable dès qu'elle a fini |
+| (b) Tout publier d'un seul geste au retour de la dernière campagne | Les corrections restent sur ce seul poste jusque-là, sans sauvegarde distante | La possibilité pour l'autre poste de travailler cet après-midi sur les corrections déjà faites |
+| (c) Ne rien publier aujourd'hui | Rien à faire | Toute reprise sur l'autre poste ; le travail de la journée reste sur une seule machine |
+
+> **Si rien n'est décidé** : (c) — les soixante-huit commits restent locaux sur ce poste, l'autre poste continue sur une histoire antérieure, et une panne de cette machine perdrait la journée.
 
 ## 4. Traité — avec sa preuve
 
@@ -104,28 +118,35 @@ Aucune décision n'attend pendant que les campagnes travaillent. La seule qui vi
 
 ## 7. Risques
 
-- **Une campagne de trente-trois items qui bâcle pour finir sa liste** : signal = un item clos sans sortie native avant et après ; parade = l'agent a pour consigne de s'arrêter sur un commit vert et de dire ce qui reste, et je sonde chaque commit avant clôture.
-- **Deux campagnes qui écrivent dans le même dépôt** : signal = un commit inattendu dans un dépôt cible ; parade = un dépôt n'est confié qu'à une seule campagne, et les items à double cible sont attribués au propriétaire du code.
-- **Un lot renommé qui casse à nouveau son lien au registre** : signal = la boîte d'entrée redevient rouge après une pseudonymisation ; parade = le rattachement est désormais un geste connu, et la cause est déjà au registre comme item à corriger.
-- **Une session qui joue les bancs avec les variables du canal** : signal = la porte de publication refuse sur des noms inventés par des fixtures ; parade = les cinq bancs posent désormais leurs tables, la garde du point de passage refuse une extension hors du répertoire temporaire, et le trou restant — le sous-processus — est au registre avec sa demande.
+- **Une correction close sur le rapport de son auteur plutôt que sur une preuve rejouée** : signal = un item clos sans sortie native avant et après ; parade = chaque commit est sondé ici, et le sondage a déjà corrigé une attribution fausse dans un rapport par ailleurs exact.
+- **Une porte trop lente pour être supportée** : signal = un `--no-verify` apparaît dans une commande de publication ; parade = la mesure est faite, croisée et journalisée avec sa cause et sa correction, et la campagne a repris son implémentation plutôt que d'ajouter au problème.
+- **Une session qui joue les bancs avec les variables du canal** : signal = la porte refuse sur des noms inventés par des fixtures ; parade = les cinq bancs posent désormais leurs tables, la garde du point de passage refuse une extension hors du répertoire temporaire, et le trou restant est au registre avec sa demande.
+- **Un écart entre ce que l'écran affirme et ce que la trace porte** : signal = le gate de restitution compare les deux et refuse ; parade = les blocs du fichier sont réécrits, pas seulement complétés — l'incident s'est produit trois fois aujourd'hui, la troisième sur les blocs d'en-tête et de décision que mes correctifs successifs ne touchaient jamais.
+- **Deux campagnes qui écrivent dans le même dépôt** : signal = un commit inattendu dans un dépôt cible ; parade = un dépôt n'est confié qu'à une seule campagne.
+- **Soixante-huit commits sur une seule machine** : signal = aucun, jusqu'à la panne ; parade = la décision D-29.
 - **L'autre poste qui travaille en même temps** : signal = un push refusé pour non-avance rapide ; parade = fusionner, jamais rebaser.
 
 ## 8. Prochaines actions — un tableau, l'acteur en colonne
 
 | Sélecteur | Action | Identifiant | Acteur | Motif ou raison | Exécutable par | Si non faite |
 |---|---|---|---|---|---|---|
-| A-69 | Recevoir les cinq rapports, sonder chaque commit (diff lu, vérification native rejouée ici), clore ou renvoyer au registre avec gains constatés, régénérer les vues | TF-0674, TF-0676, TF-0682, TF-0549, TF-0791, TF-0792, TF-0825 à TF-0938 (les 65 items ouverts) | auto_ia | dependance_externe (campagnes en cours) | rapports puis `node todo/journaliser.mjs --fichier <clotures.json>`, `node todo/generer-vue.mjs`, `node todo/generer-page.mjs` | soixante-cinq items restent décidés sans correction constatée |
-| A-70 | Publier les huit dépôts après vérification, porte jouée avant chacun | TF-0674, TF-0676, TF-0682, TF-0549, TF-0791, TF-0792, TF-0825 à TF-0938 | auto_ia | gate_gouvernance (publication sur feu vert humain, règle 38) | `git push origin main` dans chaque dépôt, porte jouée avant | les corrections restent locales à ce poste |
+| A-69 | Recevoir le dernier rapport, sonder chaque commit (diff lu, vérification native rejouée ici), clore ou renvoyer au registre avec gains constatés, régénérer les vues | TF-0828, TF-0912 | auto_ia | dependance_externe (campagne des outils en cours, quinze commits posés, rapport final non rendu) | rapport puis `node todo/journaliser.mjs --fichier <clotures.json>`, `node todo/generer-vue.mjs`, `node todo/generer-page.mjs` | deux items restent décidés sans correction constatée |
+| A-70 | Publier les dépôts après vérification, porte jouée avant chacun | TF-0674, TF-0676, TF-0682, TF-0549, TF-0791, TF-0792, TF-0825 à TF-0958 | auto_ia | dependance_bloc_3 (décision D-29) | `git push origin main` dans chaque dépôt, porte jouée avant | les soixante-huit commits restent sur ce seul poste |
+| A-73 | Décider TF-0958 puis grouper les termes de la porte qui partagent leurs drapeaux en une passe, avec raffinement a posteriori sur les seules correspondances, et déclarer le temps mesuré au non-jugé | TF-0958 | auto_ia | gate_gouvernance (candidature à décider avant correction) | `node todo/journaliser.mjs --fichier <decision.json>` puis campagne sur `..\digit-ai-forge-agents` | la porte reste entre 81 s et 4 min, au-delà du seuil où un contournement devient tentant |
+| A-72 | Fermer le troisième niveau de l'incident des bancs : un marqueur d'isolement propagé aux sous-processus, ou une autorisation explicite d'extension que seule la chaîne d'ingestion réelle porte | TF-0957 | auto_ia | gate_gouvernance (candidature à décider avant correction) | `node todo/journaliser.mjs --fichier <decision.json>` puis campagne sur le pilot | un banc écrit demain repartira avec le même défaut, et polluera de nouveau le référentiel |
+| A-74 | Propager les six skills divergents vers leur copie installée, une fois la publication faite | neuve | auto_ia | dependance_bloc_3 (la propagation suit la publication, et écrit hors des dépôts cibles) | `node oracles/oracle-skills.mjs --appliquer` après la publication, puis rejeu de la gate | la copie qui s'exécute reste en retard sur le versionné, et les corrections du jour n'agissent pas |
+| A-71 | Traiter les seize candidatures décidées à midi, dont les six doublons qui se clôtureront avec leur original | TF-0939 à TF-0944, TF-0946 à TF-0956 | auto_ia | dependance_externe (les dépôts cibles sont ceux des campagnes en cours) | campagne suivante sur les dépôts cibles, dossier écrit depuis le registre | seize items décidés restent sans correction |
 | A-66 | Porter dans l'oracle du canal la règle apprise ce matin : une clé déjà pseudonymisée n'entre jamais dans une table de noms réels, avec sa fixture rouge | neuve | auto_ia | gate_gouvernance (candidature à journaliser puis décider) | `node todo/journaliser.mjs --fichier <evenement.json>` puis campagne sur le canal | le même arbitrage refera le même défaut |
-| A-67 | Sur l'autre poste, à sa prochaine ouverture : rebâtir le clone de la forge de développement, dont l'histoire a été réécrite ce matin | TF-0829 | manuelle_dev | presence : commandes à jouer sur l'autre poste, hors de portée de ce poste — la mesure locale ne dit rien de l'autre machine | `node bootstrap.mjs --pull` puis `node bootstrap.mjs --rebatir ..\digit-ai-forge-development` | l'autre poste travaillera sur une histoire incompatible |
-| A-68 | Rattacher le lot de retours du 3 septembre à un produit, pour qu'il porte un pseudonyme comme les autres | neuve | manuelle_utilisateur | decision : le rattachement suppose de savoir quel produit a émis ce lot, information que ce poste n'a pas | répondre ici avec le nom du produit émetteur ; le lot concerné est `input\00-retours\Produit-65 - RETOURS - 20260903a.md` et je l'inscris au canal et le renomme | un lot reste nommé sans pseudonyme dans un dépôt publié |
+| A-67 | Sur l'autre poste, à sa prochaine ouverture : rebâtir le clone de la forge de développement, dont l'histoire a été réécrite ce matin | TF-0829 | manuelle_dev | presence : commandes à jouer sur l'autre poste, hors de portée de ce poste — `git -C ../digit-ai-forge-development rev-list --count HEAD..@{u}` ne mesure que cette machine et rend 0 ici | `node bootstrap.mjs --pull` puis `node bootstrap.mjs --rebatir ..\digit-ai-forge-development` | l'autre poste travaillera sur une histoire incompatible |
+| A-68 | Rattacher le lot de retours du 3 septembre à un produit, pour qu'il porte un pseudonyme comme les autres | neuve | manuelle_utilisateur | decision : le rattachement suppose de savoir quel produit a émis ce lot — la table des pseudonymes ne contient aucune clé correspondant au nom porté par ce lot, vérifié sur ses 64 clés | répondre ici avec le nom du produit émetteur ; le lot concerné est `input\00-retours\Produit-65 - RETOURS - 20260903a.md`, et je l'inscris au canal puis le renomme | un lot reste nommé sans pseudonyme dans un dépôt publié |
 
-Ordre : A-69 au fil des rapports, parce qu'une clôture non vérifiée est un item qui ment ; A-70 ensuite, parce qu'elle publie et demande votre feu vert ; A-66 avec la campagne suivante ; A-67 dès que l'autre poste ouvre une session ; A-68 quand vous voulez.
+Ordre : A-69 dès le rapport reçu, parce qu'une clôture non vérifiée est un item qui ment ; A-70 ensuite, parce qu'elle dépend de la décision D-29 ; A-73 juste après, parce que chaque publication paie ce coût ; A-74 dans la foulée, parce que la copie installée est ce qui s'exécute ; A-72 avant la campagne suivante, parce que c'est elle qui rejouera des bancs ; A-71 avec cette campagne, une fois les dépôts cibles libérés ; A-66 dans la même ; A-67 dès que l'autre poste ouvre une session ; A-68 quand vous voulez.
 
 ## 9. Traces
 
-- pilot 24a6270 puis c623873, efd46fc, 032c3c1, ffce5b6 et 0caca89 — les clôtures du 08/09 après-midi — `todo\anonymiser-entrant.mjs`, `todo\anonymiser-suivis.mjs`, `todo\emettre-travaux.mjs`, `gabarits\oracle-travaux-pilot.mjs` et son banc, `gabarits\TRAVAUX-PILOT.md` ; 13 fichiers d'archive nettoyés ; 3 lots du jour ingérés.
-- pilot 24a6270 — `todo\TODO.jsonl` (12 rattachements, 1 ré-empreinte, 33 décisions) et ses vues, publié jusqu'au commit précédent.
-- Dossiers de campagne : scratchpad `campagne2\` — un fichier par dépôt cible, items triés par score.
-- Dépôts cibles : `.`, `..\digit-ai-forge-agents`, `..\digit-ai-forge-conception`, `..\digit-ai-forge-data`, `..\digit-ai-forge-design`, `..\digit-ai-forge-tests`, `..\digit-ai-forge-organization`, `..\digit-ai-forge-seo-geo`.
-- `input\00-retours\` — 89 sidecars, tous ingérés ou rattachés ; `oracle-boite-entree` PASS.
+- pilot 24a6270 puis c623873, efd46fc, 032c3c1, ffce5b6, 0caca89, bcba17d, f30d58d, 7842008, c1132cc et 5b602ac — `todo\TODO.jsonl` (126 clos, 43 décidés, 4 en cours, 3 candidats) et ses vues ; `todo\anonymiser-entrant.mjs`, `todo\anonymiser-suivis.mjs`, `todo\emettre-travaux.mjs`, `todo\CLASSES.json` (49 classes) ; `gabarits\oracle-travaux-pilot.mjs` et son banc, `gabarits\TRAVAUX-PILOT.md` ; les cinq bancs isolés ; 13 fichiers d'archive nettoyés ; 3 lots du jour ingérés. La campagne du pilot y a posé 8 commits. Porte PASS 0 bloquant.
+- `..\digit-ai-forge-agents` — 15 commits (aff3cde → a539fa9), campagne en cours, arbre propre ; `..\digit-ai-forge-data` — 4 commits, self-test 210 PASS ; `..\digit-ai-forge-design` — 3 commits, self-test 39 oracles / 120 règles ; `..\digit-ai-forge-conception` — 5 commits (549410e, 0478ce2, ea11fad y touchent 6 fichiers de skills), self-test vert ; `..\digit-ai-forge-organization` — 905ae78 ; `..\digit-ai-forge-seo-geo` — 7cb87fe ; `..\digit-ai-forge-tests` — e30f536. Tous locaux, arbres propres.
+- `output\04-plans\Digit-AI - Synthese Mandat - Retours ingeres et cinq campagnes lancees sur soixante cinq items - 20260908g.md` — cette synthèse.
+- Canal confidentiel — `tables\produits-pseudonymes.json` restaurée à sa version consignée, 64 clés, arbre propre après le rejeu complet des 46 bancs.
+- `input\00-retours\` — 95 sidecars, tous ingérés ou rattachés ; `oracle-boite-entree` PASS.
+

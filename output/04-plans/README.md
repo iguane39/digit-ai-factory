@@ -80,7 +80,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Reecriture des histoires design tests development decision D10a - 20260907h.md` | fichier | 13,3 Ko | Synthèse de mandat — décision D-10 (a) exécutée : deux histoires réécrites et publiées ave |
 | `Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md` | fichier | 19,2 Ko | Synthèse de mandat — remise à niveau du dépôt et renommage des lots (30/08/2026) |
 | `Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md` | fichier | 16,6 Ko | Synthèse de mandat — pourquoi les produits ne remontent rien tout seuls, et ce qu'il faudr |
-| `Digit-AI - Synthese Mandat - Retours ingeres et cinq campagnes lancees sur soixante cinq items - 20260908g.md` | fichier | 33,3 Ko | Synthèse de mandat — tous les retours sont pris et la boîte d'entrée est verte pour la pre |
+| `Digit-AI - Synthese Mandat - Retours ingeres et cinq campagnes lancees sur soixante cinq items - 20260908g.md` | fichier | 38,5 Ko | Synthèse de mandat — tous les retours sont pris et la boîte d'entrée est verte pour la pre |
 | `Digit-AI - Synthese Mandat - Retours ingeres et todos a partager entre postes - 20260908b.md` | fichier | 17,6 Ko | Synthèse de mandat — « fais tous les retours et todos » : les neuf lots en attente sont in |
 | `Digit-AI - Synthese Mandat - Retours pris et propagation mesurable - 20260901a.md` | fichier | 12,6 Ko | Synthèse de mandat — trois lots pris, la propagation devient mesurable, et le banc monte à |
 | `Digit-AI - Synthese Mandat - Selecteurs de familles et palier 1 des tests - 20260901e.md` | fichier | 13,8 Ko | Synthèse de mandat — les sélecteurs de familles, et le premier palier de la stratégie de t |

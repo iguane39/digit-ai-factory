@@ -74,8 +74,13 @@ const enSegments = (brut) => {
 const puce = (s) => `<li>${escLit(s.trim().replace(/^[)\s.;,]+/, "").replace(/\s*[;.]\s*$/, ""))}</li>`;
 // Un bloc de prose : liste si c'est une énumération déguisée, paragraphe sinon.
 const prose = (brut, classe) => {
+  // TF-0945 bis (08/09) : la prose d'un jalon est CITEE, comme le detail de la carte -- le
+  // marquage `data-cite` etait pose sur la carte et sur les champs longs, pas sur ce paragraphe,
+  // et le controle du socle y relevait 12 constats de lisibilite avant meme la regle neuve d'une
+  // campagne voisine. Une vue qui cite la prose d'un emetteur la marque PARTOUT, pas par endroits.
+  const cite = classe === "jalon-prose" ? " data-cite" : "";
   const seg = enSegments(brut);
-  return seg ? `<ul class="puces">${seg.map(puce).join("")}</ul>` : `<p class="${classe}">${escLit(brut)}</p>`;
+  return seg ? `<ul class="puces"${cite}>${seg.map(puce).join("")}</ul>` : `<p class="${classe}"${cite}>${escLit(brut)}</p>`;
 };
 
 // Détail en puces : sépare le constat de la proposition, puis découpe en vraies puces —
