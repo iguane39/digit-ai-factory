@@ -155,7 +155,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>d2a893afd5b3</code> · dernier événement 2026-09-08T10:20:21.157Z</p>
+      <p class="meta">sceau <code>68c6747a7363</code> · dernier événement 2026-09-08T10:24:41.298Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -166,7 +166,7 @@
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
       <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="6 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">6</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="48 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">48</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="29 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">29</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="5 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">5</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="781 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">781</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
@@ -253,75 +253,6 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0869" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0869</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 25)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : aucun .env local créé d'office, le commanditaire a saisi sa clé Anthropic dans .env.example versionné</h3>
-          <div class="card-detail" data-cite><p class="lead">Le 06/09, l'humain a posé sa clé Anthropic dans .env.example parce qu'aucun .env local n'existait et qu'il pensait la factory tenue d'en créer un avec les valeurs attendues. R-13/R-14/R-15 exigent .env.example exhaustif, .env gitignoré et # à fournir, mais rien ne prescrit la création du .env local ni la documentation de son chargement (uv run --env-file).</p><p class="detail-label">Proposition</p><ul class="puces"><li>créer .env à l'ouverture (copie de .env.example, valeurs # à fournir vides), documenter --env-file dans COMMANDES.md et CLAUDE.md, étendre l'oracle R-14 pour refuser un .env.example dont une variable # à fournir porte une valeur non vide</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-06</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 25 — gain 5 × preuve 5 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>git diff --stat .env.example : 1 ligne, clé de 108 caractères préfixée sk-ant- dans un fichier versionné ; un commit de plus et le secret partait</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-61</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0870" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0870</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 20)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : une clé Anthropic d'organisation sans espace de travail échoue en 400, variable ANTHROPIC_WORKSPACE_ID absente du gabarit et du skill</h3>
-          <div class="card-detail" data-cite><p class="lead">La clé fournie par le commanditaire est une clé d'organisation non rattachée à un espace de travail : l'API répond 400 « This API key is not scoped to a workspace, so this request must include the anthropic-workspace-id header ». Le produit rendait 502 sans nommer la cause ; ni le skill claude-api ni le gabarit .env.example de la factory ne prévoient de variable d'espace de travail.</p><p class="detail-label">Proposition</p><ul class="puces"><li>ANTHROPIC_WORKSPACE_ID optionnel au gabarit et au skill (default_headers anthropic-workspace-id), message d'erreur cité dans le diagnostic</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-06</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un redéploiement qualif et un appel direct à l'API pour lire la cause ; smoke-qualif-20260906.json E-011 FAIL 502</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-61</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0872" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0872</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 20)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : ETAPE-MEP § 3 bis ne prescrit ni comptes d'essai vides ni source des identifiants d'une qualif publique</h3>
-          <div class="card-detail" data-cite><p class="lead">La qualif populée par drapeau a livré un seul restaurant de démonstration ; le commanditaire a demandé trois comptes (un populé, deux vides) avec identifiants dans .env.</p><p class="detail-label">Proposition</p><ul class="puces"><li>§ 3 bis prescrit un compte populé + N comptes vides pilotés par DEMO_ACCOUNT_N_* dans le gabarit .env.example du pilot</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-06</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>retour humain lot 20260906b, un run de version</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-61</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-decide" id="item-TF-0920" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0920</code>
@@ -368,52 +299,6 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0871" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0871</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : la convention de démonstration (R-23, aide MODE_DEMO) a mis des identifiants sur une page servie sur Internet et dans un dépôt poussé</h3>
-          <div class="card-detail" data-cite><p class="lead">ACCES-TEST.md prescrit des « identifiants volontairement triviaux et notoires » dans une fiche versionnée, et la page de connexion affichait « Démo : admin@demo.local / demo-admin » sous MODE_DEMO ; la qualif est servie sur Internet et le dépôt est sur GitHub. Retour humain lot 20260906a.</p><p class="detail-label">Proposition</p><ul class="puces"><li>une fiche d'accès nomme des variables, jamais des valeurs</li><li>aucun identifiant dans une page servie</li><li>oracle R-14 étendu aux gabarits</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-06</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>git show 6e23fce:docs/projet/ACCES-TEST.md porte les valeurs ; retour humain en une minute d'essai</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-61</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0914" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0914</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : le hook qui régénère input/00-retours/README.md y écrit le NOM des fichiers non suivis — un lot dont le nom réel n'est pas résolu par le canal ressort en clair dans un fichier suivi et publié</h3>
-          <div class="card-detail" data-cite><p class="lead">Mesure du 08/09 : le lot du 03/09 d'un produit dont le nom ne figure pas au canal confidentiel est resté non suivi (git) en attendant l'arbitrage des tables ; le hook de fin de tour qui régénère le README d'index de `input/00-retours/` a listé ce fichier par son nom réel dans le README, qui EST suivi et publié.</p><ul class="puces"><li>Le push a été refusé par la porte de publication (C5), puis le README a été régénéré après retrait du fichier</li><li>la porte a fait son office, mais l'index n'aurait jamais dû porter le nom. Demande : le générateur d'index de la boîte d'entrée n'inscrit que les fichiers suivis par git (ou passe chaque nom par la table des pseudonymes du canal avant écriture, et refuse d'écrire un nom présent dans noms-interdits)</li><li>fixture double sens : un fichier non suivi au nom interdit → absent de l'index (ou pseudonymisé), un fichier suivi au nom pseudonymisé → présent</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12 — gain 3 × preuve 4 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un push refusé le 08/09 et un index régénéré deux fois ; sans la porte, un nom réel de produit publié dans un dépôt public</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-decide" id="item-TF-0682" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0682</code>
@@ -428,29 +313,6 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 5 × preuve 5 ÷ effort 4)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd><span class="meta-sub">non chiffré</span></dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (mandat « 3a » du 26/08)</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0922" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0922</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : un fichier de doctrine versionné porte un caractère de contrôle né d'un antislash de chemin Windows interprété, et aucun contrôle du parc ne balaie les caractères de contrôle</h3>
-          <div class="card-detail" data-cite><p class="lead">Constat de la campagne D-14 (a) du 08/09 chez le pilot (hors périmètre, non corrigé).</p><ul class="puces"><li>Le caractère est invisible à la lecture et rend le fichier binaire pour une recherche textuelle</li><li>il est présent avant la campagne, vérifié sur un commit antérieur. La même classe a mordu l'agent en cours de campagne : des séquences d'échappement écrites par redirection de shell sont devenues de vrais caractères de contrôle dans un fichier de code, détectées par la recette. Demande : un balayage des caractères de contrôle dans les fichiers versionnés, joué par l'agrégateur de recettes</li><li>fixture rouge portant le caractère, fixture verte sans</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un fichier de doctrine illisible à la recherche textuelle, et la même classe payée deux fois le 08/09</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
             
           </dl>
         </article>
@@ -483,75 +345,6 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0915" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0915</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : la règle T1 de l'oracle des lots de travaux exige qu'un moyen de vérification soit ÉCRIT, jamais qu'il soit exact — un lot a affirmé « avance rapide seulement » sur une branche que l'hébergeur protège autrement, et T1-T6 ont rendu PASS</h3>
-          <div class="card-detail" data-cite><p class="lead">Suite pilot de TF-0886 (campagne D-14 a du 08/09, forge-development 8029348).</p><ul class="puces"><li>Le lot pilot - TRAVAUX - 20260905f affirmait une règle de branche (« avance rapide seule ») sans l'avoir lue chez l'hébergeur</li><li>la configuration réelle (une revue exigée, contrôles code et design, enforce_admins false, push forcé interdit) a été mesurée le 06/09 par `gh api …/branches/main/protection`. gabarits/oracle-travaux-pilot.mjs T1 déclare en non_juge « la VÉRACITÉ d'un moyen de vérification : T1 exige qu'il soit écrit, pas qu'il soit exact »</li><li>gabarits/TRAVAUX-PILOT.md demande « un fait, mesuré et daté » sans imposer, pour un fait portant sur une configuration externe lisible en direct (protection de branche, CI, droits), la commande de lecture citée et sa date. Demande : règle T7 (ou renforcement de T1) — tout fait portant sur une configuration externe vérifiable cite la commande sourcée et sa date, sinon FAIL</li><li>fixture double sens</li><li>et une classe nouvelle dans todo/CLASSES.json : « règle de branche annoncée différente de la configurée » (la campagne a constaté que `regle-de-branche-annoncee-differente-configuree` existe déjà comme clé : vérifier qu'elle couvre bien le cas et la rattacher à T7)</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 3 × preuve 4 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un mandat du pilot a annoncé une règle de branche fausse, lue par la forge comme vraie ; un aller-retour humain et un lot de retours pour la corriger (05-06/09)</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0884" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0884</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 5)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-factory : rien n'empêche d'écraser un lot de retours déjà remis et ingéré — arrivé le 06/09, réparé par l'agent qui l'avait fait</h3>
-          <div class="card-detail" data-cite><p class="lead">Constat RS-29 du lot du produit 12 du 06/09, en prose faute de classe ; classe créée sur D-26 (a).</p><ul class="puces"><li>Le fait : un compte rendu d'agent a pris l'indice « a » que le mandat nommait, déjà porté par un lot du même produit remis et ingéré le matin même (commit e3031e1 du pilot)</li><li>une écriture ordinaire l'a remplacé, et aucun contrôle ne s'y est opposé — ni le gabarit (« un lot remis ne se modifie JAMAIS »), ni oracle-lot-retours (PASS sur l'écrasement), ni la boîte d'entrée (qui le voit à l'ouverture suivante). Réparé : lot d'origine restauré depuis HEAD, indice « b » pris. Demande : oracle-lot-retours refuse une écriture dont le chemin est déjà ingéré avec une autre empreinte (lecture des événements d'ingestion)</li><li>le gabarit prescrit l'indice suivant</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-07</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 5 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un lot ingéré écrasé sans qu'aucun contrôle le dise, le 06/09 ; l'histoire du registre aurait divergé du fichier</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-12</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0881" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-0881</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-factory : l'alias de transition périmé (ancien gabarit de lot, 62 lignes du 14/08) survit à côté de la copie à jour chez trois produits, et R-47 cesse de le regarder</h3>
-          <div class="card-detail" data-cite><p class="lead">Constat RH-2 du lot des produits anciens du 06/09 (produits-anciens 20260906a), en prose faute de classe ; classe créée sur D-26 (a).</p><ul class="puces"><li>R-47 lit l'alias seulement si la cible canonique est absente. Mesure du 06/09 chez les trois produits anciens : forge/retours/RETOURS-FORGES.md (version du 14/08, 62 lignes, sans obligation de classe ni section « la règle qui aurait évité le retour ») reste à côté de forge/retours/GABARIT-LOT-RETOURS.md (180 lignes) et R-47 rend PASS — seul faux vert du lot</li><li>trois lots du produit n° 3 citent encore l'ancien nom. Demande : compter l'alias PÉRIMÉ dès que la cible canonique existe, nommer le geste de retrait (le produit supprime)</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-07</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 4 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un faux vert de R-47 chez trois produits ; un gabarit périmé encore cité par trois lots</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produits anciens n° 1, 2 et 3 (run d'héritage A-55)</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-decide" id="item-TF-0923" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0923</code>
@@ -575,52 +368,6 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0879" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0879</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : la recette scripts/rebatir-clone.test.mjs (écrite sur l'autre poste le 07/09) échoue sur ce poste avant comme après tout changement — son quatrième cas dépend du poste, et son message tronque la valeur attendue</h3>
-          <div class="card-detail" data-cite><p class="lead">Mesuré le 07/09 au soir en rejouant le banc du pilot après D-28 : scripts/rebatir-clone.test.mjs rend 3 PASS, 1 FAIL sur le cas « histoire distante réécrite + commit propre au poste + arborescence liée → … porte déclarée », et rend exactement la même chose sur la version committée du script (rebatir-clone.mjs ramené à HEAD le temps de la mesure) : l'échec ne vient pas des changements du soir.</p><ul class="puces"><li>L'autre poste rapporte « agrégateur 95/95 » sur la même recette : le cas dépend donc du poste (oracle installé trouvé ou non, chemin, fins de ligne ?)</li><li>Le message d'échec s'arrête à « Expected values to be strictly equal » sans dire quelle assertion ni quelles valeurs : la recette ne dit pas par quoi elle a jugé</li><li>Demande : rendre le cas indépendant du poste (ou déclarer ce qu'il exige) et faire porter au message l'assertion et les deux valeurs</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-07</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>le banc du pilot est rouge sur ce poste (1/96) pour un cas que l'autre poste voit vert ; la cause n'est pas lisible dans le message</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot-banc-20260907</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0882" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0882</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-factory : R-47 compte « absent » un motif d'exclusion qu'une graphie plus large du .gitignore couvre déjà — la mise en conformité écrit des lignes redondantes</h3>
-          <div class="card-detail" data-cite><p class="lead">Constat RH-3 du lot des produits anciens du 06/09, en prose faute de classe ; classe créée sur D-26 (a).</p><ul class="puces"><li>Le contrôle presence_et_motifs compare des lignes nues exactes. Mesure du 06/09, produit n° 3 : *.oracles*.json et *.oracles*.jsonl couvraient strictement les trois motifs exigés, comptés « 3 absents sur 6 »</li><li>trois lignes redondantes écrites à côté de deux lignes qui faisaient le travail. HERITAGE.json pose le raisonnement inverse pour .env (« exiger une graphie exacte ferait crier sur une protection équivalente »). Demande : un motif est tenu s'il est présent ou couvert par un motif plus large</li><li>fixture double sens</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-07</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>trois lignes redondantes écrites chez un produit pour satisfaire un relevé qui contredit sa propre règle</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produits anciens n° 1, 2 et 3 (run d'héritage A-55)</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-decide" id="item-TF-0883" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0883</code>
@@ -635,29 +382,6 @@
             <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>une question tranchée à la main dans un mandat, à retrancher au suivant ; deux fichiers non suivis indéfiniment chez le produit</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-12</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0888" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0888</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : la regle T6 de l oracle des lots prend le nom « porte » pour le verbe « porter » — un lot qui dit « une porte muette se contourne par &lt;option&gt; » est refuse pour un module producteur imaginaire</h3>
-          <div class="card-detail" data-cite><p class="lead">Mesure du 08/09 en deposant le lot pilot - TRAVAUX - 20260908a chez la forge des outils : T6 rend FAIL « module producteur nomme sans lecture declaree (TF-0887 → --no-verify) » sur la phrase « une porte muette par defaut se contourne par `--no-verify` ».</p><ul class="puces"><li>Le motif PRODUCTEUR_NOMME de gabarits/oracle-travaux-pilot.mjs accepte tout mot commencant par « port » (porte, porter, portage) suivi de « par `x` » a moins de 60 caracteres</li><li>le nom « porte » (la porte de publication) declenche la regle. Contournement du jour : phrase reformulee. Demande : borner le motif aux formes verbales (participe passe ou verbe conjugue : transcrit(e/s), produit(e/s), ecrit(e/s), derive(e/s), genere(e/s), porte(e/s) au sens de porter dans une vue) et exiger que le complement soit un nom de module (backtick sans tiret initial : une option de commande commence par --), fixture double sens (phrase avec le nom « porte » → PASS</li><li>« porte dans la vue par `derive-les-vues` » → FAIL sans lecture)</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un lot conforme refuse une fois le 08/09 ; toute phrase qui nomme la porte et une option est refusee</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot-lot-20260908a</dd></div>
             
           </dl>
         </article>
@@ -736,20 +460,20 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0848" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="basse">
+        <article class="card s-corrige" id="item-TF-0869" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
           <header class="card-head">
-            <code class="tf-id">TF-0848</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <code class="tf-id">TF-0869</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 25)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">digit-ai-factory : R-47 juge l'arbre de travail — un heritage recopie mais NON COMMIS rend PASS pendant que le depot porte encore la version perimee</h3>
-          <div class="card-detail" data-cite><p class="lead">relever-heritage.mjs compare le CONTENU du fichier sur disque a la source du pilot, jamais l'etat versionne.</p><ul class="puces"><li>Un produit qui recopie son heritage sans commettre dans la foulee obtient donc un R-47 PASS sur un etat que son depot ne porte pas : un git restore ramene l'heritage de la veille, un git clone (CI, autre poste) livre les artefacts perimes, et la session suivante ne peut pas distinguer ces recopies de travaux du produit — elle arbitre a l'aveugle entre les commettre et les jeter. Le dispositif SAIT que le commit est un geste separe (le lot TF-0819 le demande en partie 3) : ce qui manque est le controle et le signal, pas la regle. Deux gestes proposes, aucun n'ecrit chez le produit</li><li>recopier-heritage.mjs termine par l'etat git des cibles qu'il vient d'ecrire (git status --porcelain -- &lt;cibles&gt;) et dit en une ligne qu'une recopie n'est TENUE qu'une fois commise, en nommant les fichiers restants : le geste unique doit rendre compte de ce qu'il laisse au depot</li><li>relever-heritage.mjs distingue un troisieme etat, conforme_non_commis (conforme sur disque, divergent de HEAD), compte a part comme l'est deja hors_racine — ni perime (le produit a fait le geste), ni tenu (le depot ne le porte pas). R-47 peut rester PASS en le DISANT ou basculer en avertissement : la decision est au pilot, le comptage a part est le prealable</li></ul></div>
+          <h3 class="card-titre">pilot : aucun .env local créé d'office, le commanditaire a saisi sa clé Anthropic dans .env.example versionné</h3>
+          <div class="card-detail" data-cite><p class="lead">Le 06/09, l'humain a posé sa clé Anthropic dans .env.example parce qu'aucun .env local n'existait et qu'il pensait la factory tenue d'en créer un avec les valeurs attendues. R-13/R-14/R-15 exigent .env.example exhaustif, .env gitignoré et # à fournir, mais rien ne prescrit la création du .env local ni la documentation de son chargement (uv run --env-file).</p><p class="detail-label">Proposition</p><ul class="puces"><li>créer .env à l'ouverture (copie de .env.example, valeurs # à fournir vides), documenter --env-file dans COMMANDES.md et CLAUDE.md, étendre l'oracle R-14 pour refuser un .env.example dont une variable # à fournir porte une valeur non vide</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-09-06</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>Mesure du 06/09/2026 chez Produit-02, APRES la remise a niveau de TF-0819. oracle-conformite-projet rend R-47 PASS — « 13 artefact(s) herite(s) present(s) et a jour » — alors que TROIS artefacts en copie_conforme divergent encore du pilot dans HEAD : forge/RESTITUTION.md (dernier commit 3209608 du 01/09 ; HEAD porte la version 2.15.0, l'arbre de travail la 2.16.0), forge/hooks/factory.mjs (dernier commit 13146aa du 26/08) et forge/retours/GABARIT-LOT-RETOURS.md (3209608, 01/09). git diff sur ces trois fichiers : 3 files changed, 57 insertions(+), 8 deletions(-) ; la comparaison de chaque version de HEAD avec la source du pilot rend DIVERGENT pour les trois. Ces copies ont ete deposees par une session anterieure et jamais commises ; recopier-heritage.mjs les a lues « CONFORME » et n'a rien dit de leur etat git. C'est aussi le risque que le mandat humain a du prevenir en PROSE : la session mandatee a ete avertie qu'elle trouverait des modifications non commises qui n'etaient pas les siennes — une precaution qu'aucun outil ne porte aujourd'hui.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-02</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 25 — gain 5 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>git diff --stat .env.example : 1 ligne, clé de 108 caractères préfixée sk-ant- dans un fichier versionné ; un commit de plus et le secret partait</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-61</dd></div>
             
           </dl>
         </article>
@@ -759,20 +483,20 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0849" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="basse">
+        <article class="card s-corrige" id="item-TF-0870" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
           <header class="card-head">
-            <code class="tf-id">TF-0849</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <code class="tf-id">TF-0870</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 20)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">digit-ai-factory : le message d'attribution de divergence date la copie du produit par la date du COMMIT du pilot, en contradiction avec la version que le fichier declare</h3>
-          <div class="card-detail" data-cite><p class="lead">attribuerDivergence() dans scripts/relever-heritage.mjs parcourt `git log -n 30 --format=%H %cs` de la source chez le pilot et rend « votre copie correspond a la version publiee le &lt;%cs&gt; ».</p><ul class="puces"><li>La date rendue est donc celle du COMMIT qui portait ce contenu, pas la version que l'artefact declare lui-meme — et quand les deux different, le produit lit deux dates pour un meme fichier dans les deux documents qu'il a sous les yeux (le message de l'oracle et le lot de travaux). Le mecanisme n'est pas faux, la PHRASE l'est : elle dit « version publiee le X » la ou elle mesure « etat porte par le commit du X », et elle rend systematiquement la date la PLUS RECENTE des deux — exactement le sens qui pousse a croire sa copie fraiche. Deux corrections independantes :</li><li>nommer ce qui est mesure — « votre copie correspond a l'etat publie PAR LE COMMIT du &lt;date&gt; »</li><li>quand l'artefact porte une version declaree (champs version/date d'un JSON, en-tete versionne d'un .md), la citer des DEUX cotes — « votre copie : 1.0.0 du 03/09 · pilot : 1.2.0 du 05/09 ». Le lot de travaux cite deja la bonne : c'est le message machine qui devrait la porter, pas seulement la prose humaine qui le double</li></ul></div>
+          <h3 class="card-titre">pilot : une clé Anthropic d'organisation sans espace de travail échoue en 400, variable ANTHROPIC_WORKSPACE_ID absente du gabarit et du skill</h3>
+          <div class="card-detail" data-cite><p class="lead">La clé fournie par le commanditaire est une clé d'organisation non rattachée à un espace de travail : l'API répond 400 « This API key is not scoped to a workspace, so this request must include the anthropic-workspace-id header ». Le produit rendait 502 sans nommer la cause ; ni le skill claude-api ni le gabarit .env.example de la factory ne prévoient de variable d'espace de travail.</p><p class="detail-label">Proposition</p><ul class="puces"><li>ANTHROPIC_WORKSPACE_ID optionnel au gabarit et au skill (default_headers anthropic-workspace-id), message d'erreur cité dans le diagnostic</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-09-06</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>Mesure du 06/09/2026 chez Produit-02, AVANT la remise a niveau. Le message R-47 ecrit : « forge/retours/CLASSES.json diverge de todo/CLASSES.json — votre copie correspond a la version publiee le 2026-09-05 ». Le fichier alors present chez le produit portait version 1.0.0, date 2026-09-03, 32 classes ; la source du pilot portait version 1.2.0, date 2026-09-05, 37 classes. Le lot de travaux TF-0819, lu dans la meme minute, ecrivait de son cote « forge/retours/CLASSES.json correspond a la version du 03/09 ». Deux dates pour le meme fichier, a deux jours d'ecart, dans les deux documents que le produit lit cote a cote — et l'ecart n'est visible qu'en ouvrant le JSON, geste qu'aucune consigne ne demande.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-02</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un redéploiement qualif et un appel direct à l'API pour lire la cause ; smoke-qualif-20260906.json E-011 FAIL 502</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-61</dd></div>
             
           </dl>
         </article>
@@ -782,20 +506,20 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0850" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="basse">
+        <article class="card s-corrige" id="item-TF-0872" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
           <header class="card-head">
-            <code class="tf-id">TF-0850</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <code class="tf-id">TF-0872</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 20)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">digit-ai-factory : le « geste unique » de remise à niveau de l'héritage ne rend pas R-47 vert, et le message de R-47 promet qu'il le fait</h3>
-          <div class="card-detail" data-cite><p class="lead">scripts\recopier-heritage.mjs ne copie que les artefacts declares en mode copie_conforme. Ceux en mode presence, presence_et_motif et presence_et_motifs sont listes et LAISSES, y compris quand ils sont ABSENTS chez le produit — c est-a-dire quand il n y a aucune personnalisation a preserver. Le message de R-47 se termine pourtant par « Remise a niveau EN UN GESTE, execute par le produit depuis son depot : node &lt;PILOT_ROOT&gt;\scripts\recopier-heritage.mjs . ». Le geste joue, R-47 rend encore FAIL : il manque .claude\settings.json (absent), forge\travaux\ECARTS-ASSUMES.md (absent), la clause de precedence R-43 au CLAUDE.md et les motifs de socle du .gitignore.</p><p class="detail-label">Proposition</p><ul class="puces"><li>distinguer dans le script ABSENT de PRESENT</li><li>Un artefact personnalisable ABSENT n a rien a proteger — l instancier depuis le gabarit est strictement correct, et c est exactement ce que le produit refait a la main</li><li>Pour presence_et_motifs, ajouter les motifs manquants en fin de fichier plutot qu ecraser, en signalant que l ordre des negations decide du resultat</li><li>Ne rien ecraser des qu un fichier est PRESENT reste la regle : c est la garde qui donne sa valeur au script</li><li>A defaut de corriger le script, corriger le message de R-47 — un message qui prescrit la moitie du geste conduit a la seconde violation (lecon TF-0552, citee par l oracle de lot lui-meme)</li></ul></div>
+          <h3 class="card-titre">pilot : ETAPE-MEP § 3 bis ne prescrit ni comptes d'essai vides ni source des identifiants d'une qualif publique</h3>
+          <div class="card-detail" data-cite><p class="lead">La qualif populée par drapeau a livré un seul restaurant de démonstration ; le commanditaire a demandé trois comptes (un populé, deux vides) avec identifiants dans .env.</p><p class="detail-label">Proposition</p><ul class="puces"><li>§ 3 bis prescrit un compte populé + N comptes vides pilotés par DEMO_ACCOUNT_N_* dans le gabarit .env.example du pilot</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-09-06</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>Mesure du 06/09/2026, identique chez TROIS Produit-62 traites l un apres l autre. R-47 avant chez chacun : FAIL, 8 absent(s) et 3 perime(s). Sortie du geste unique chez chacun : « 7 copie(s), 0 deja conforme(s), 6 laisse(s) au produit (modes personnalises) ». Parmi les 6 laisses, QUATRE maintiennent R-47 en FAIL : .claude\settings.json ABSENT, forge\travaux\ECARTS-ASSUMES.md ABSENT, CLAUDE.md ne portant pas « R-43 », .gitignore ne portant pas 4 motifs du socle chez le produit n 1, 3 chez le n 2 et 6 chez le n 3. Les deux autres laisses (robots.txt, llms.txt, mode presence) etaient presents et sans effet sur le verdict. Cout direct : 12 gestes manuels (4 x 3 produits), dont deux copies de gabarit pur, une insertion de paragraphe dans un fichier existant et une edition de .gitignore ou l ORDRE des lignes decide du resultat (chez le produit n 3, inserer les trois graphies exactes APRES `!forge/**` aurait re-ignore onze fichiers non suivis que le depot portait deja). Apres instanciation manuelle des quatre : R-47 PASS, 13 artefacts herites presents et a jour, chez les trois. R-43 bascule au vert par la meme occasion chez les trois, sans qu aucune correction ne l ait vise.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>retour humain lot 20260906b, un run de version</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-61</dd></div>
             
           </dl>
         </article>
@@ -805,88 +529,19 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0851" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="basse">
+        <article class="card s-corrige" id="item-TF-0871" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
           <header class="card-head">
-            <code class="tf-id">TF-0851</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <code class="tf-id">TF-0871</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">digit-ai-factory : la descente d'heritage atteint le disque du poste et jamais l'histoire git du produit, et R-47 juge le meme disque</h3>
-          <div class="card-detail" data-cite><p class="lead">Un artefact herite recopie chez un produit y arrive sur le DISQUE ; rien ne le fait entrer dans l'histoire git du depot, et R-47 ne lit que ce disque.</p><ul class="puces"><li>Consequence : un produit peut rendre PASS a l'heritage pendant des mois alors qu'aucune ligne de son depot ne le porte, et un clone neuf du meme depot repartirait en FAIL. Le releve du parc (todo/HERITAGE-RELEVES.jsonl), qui alimente le delai de descente de todo/RECIDIVES.md, mesure ce meme disque : il mesure l'etat d'un POSTE, pas l'etat d'un produit. Deux gestes reparent, tous deux petits</li><li>R-47 releve l'artefact herite CONFORME MAIS NON SUIVI par git — un `git ls-files --error-unmatch &lt;cible&gt;` par artefact suffit, et le constat se formule comme les autres : « present, conforme, hors histoire — ce poste l'a, le depot ne l'a pas »</li><li>La voie de recopie, script comme hook, imprime en fin de geste la ligne `git add` exacte des fichiers qu'elle vient d'ecrire : elle sait deja les nommer, elle les liste. Le commit reste la decision du produit ; ce qui manque, c'est qu'il soit PROPOSE</li></ul></div>
+          <h3 class="card-titre">pilot : la convention de démonstration (R-23, aide MODE_DEMO) a mis des identifiants sur une page servie sur Internet et dans un dépôt poussé</h3>
+          <div class="card-detail" data-cite><p class="lead">ACCES-TEST.md prescrit des « identifiants volontairement triviaux et notoires » dans une fiche versionnée, et la page de connexion affichait « Démo : admin@demo.local / demo-admin » sous MODE_DEMO ; la qualif est servie sur Internet et le dépôt est sur GitHub. Retour humain lot 20260906a.</p><p class="detail-label">Proposition</p><ul class="puces"><li>une fiche d'accès nomme des variables, jamais des valeurs</li><li>aucun identifiant dans une page servie</li><li>oracle R-14 étendu aux gabarits</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-09-06</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>Mesure du 06/09/2026 chez Produit-12, avant tout geste. forge/retours/CLASSES.json etait PRESENT en version 1.0.0 (30 classes, datee du 03/09) et NON SUIVI par git — `git status` le rangeait en « Untracked files ». Il n'a pu arriver que par une recopie d'heritage : present, conforme a une version du pilot, et absent de toute histoire. Au meme instant, trois autres artefacts en mode copie_conforme etaient CONFORMES au pilot et NON COMMIS : forge/RESTITUTION.md, forge/hooks/factory.mjs, forge/retours/GABARIT-LOT-RETOURS.md — `recopier-heritage.mjs --essai` les rend [CONFORME], `git status` les rend « modified ». R-47 n'a rien dit d'aucun des quatre : avant le geste elle comptait « 0 absent, 3 perimes » sur le seul contenu ; apres, « 11 artefact(s) herite(s) present(s) et a jour » — verdict identique qu'ils soient versionnes ou non. Quatre artefacts sur onze vivaient donc hors de l'histoire du depot sans qu'aucun controle ne le dise.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-12</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0852" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0852</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-factory : le lot de travaux demande a la main le geste que le hook d'ouverture fait seul depuis le 30/08, et recopier-heritage.mjs ecrase sans aucune garde git</h3>
-          <div class="card-detail" data-cite><p class="lead">Deux faits qui se tiennent. (a) La voie AUTOMATIQUE couvre deja le geste demande : oracles/hook-ouverture.mjs recopie, a chaque ouverture d'un produit portant le lanceur, TOUS les artefacts en mode copie_conforme de HERITAGE.json (l. 86-95, copyFileSync) — soit exactement les trois artefacts de TF-0819. Le pilot le sait et l'imprime : son propre releve du parc ecrit, pour un produit portant le lanceur, « — remis a niveau a sa prochaine ouverture (copies identiques) ; le reste est un geste du produit » (l. 198). Le lot ne cite jamais cette voie et argumente comme si la voie manuelle etait la seule. La difference reelle entre les deux voies n'est pas la recopie : c'est le COMMIT, que le lot demande (partie 3) et que la voie automatique ne fait pas. La valeur propre du lot est donc dans sa partie 3, et tout son argumentaire porte sur sa partie 1. Remede : quand la voie automatique couvre le geste, le lot le DIT en une ligne — « votre hook d'ouverture recopie ces trois fichiers a votre prochaine ouverture ; ce que ce lot ajoute, c'est le commit » — a poser dans gabarits/TRAVAUX-PILOT.md, pas dans un lot. (b) L'outil manuel n'a AUCUNE garde git : recopier-heritage.mjs ecrit (writeFileSync, l. 85) sans consulter ni les modifications non commises ni les fichiers non suivis. La garde existait — dans la PROSE du mandat humain qui accompagnait ce lot (« si le script veut ecraser un fichier modifie localement, arrete-toi ») — donc chez l'operateur, pas dans l'outil ; une garde qui vit dans un mandat ne protege que la session qui l'a recu. Le mode --essai fait deja le travail et rien ne l'appelle avant le geste, ni le message de R-47 ni le lot. Remede : une cible modifiee non commise, ou non suivie et divergente, fait basculer le geste en --essai (il liste, n'ecrit pas) et demande --forcer ; le cas nominal n'est pas ralenti.</p></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-06</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>Mesure et lecture du 06/09/2026. (a) gabarits/HERITAGE.json declare les trois artefacts de TF-0819 en mode copie_conforme : forge/travaux/TRAVAUX-PILOT.md (depuis 2026-08-25), forge/travaux/oracle-travaux.mjs (2026-08-25), forge/retours/CLASSES.json (2026-09-03). oracles/hook-ouverture.mjs recopie tous les copie_conforme a l'ouverture d'un produit (l. 86-95) et le produit porte le cablage : .claude/settings.json, SessionStart matcher « startup|resume » → `node forge/hooks/factory.mjs ouverture`, forge/hooks/factory.mjs conforme au pilot et passant --pilot au hook. Le lot manuel et la voie automatique recopient donc le MEME ensemble ; seul le commit les separe. Cout constate : un depot de lot chez chaque produit du parc, un mandat humain et un run de produit pour une recopie que l'ouverture suivante faisait seule. (b) Au moment du geste, trois artefacts heritages etaient modifies-non-commis dans l'arbre de travail (forge/RESTITUTION.md, forge/hooks/factory.mjs, forge/retours/GABARIT-LOT-RETOURS.md) ; ils se sont trouves [CONFORME] a l'essai, donc rien n'a ete perdu — mais le script ne l'avait pas verifie, et ces trois-la n'etaient dans aucune histoire git ou les recuperer.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-12</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0853" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0853</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-factory : oracle-conformite-projet rend 242 constats sur 247 dans un dossier que le .gitignore du produit exclut, et recopie dans son verdict les noms reels de 41 tiers</h3>
-          <div class="card-detail" data-cite><p class="lead">La commande de verification que la doctrine impose avant toute cloture de run juge des fichiers que le depot a declare, noir sur blanc, ne jamais vouloir versionner.</p><ul class="puces"><li>Deux consequences</li><li>Anonymisation : les chemins juges portent des noms REELS de tiers du client (proprietaires, locataires) et ces noms sont recopies tels quels dans le message de chaque constat — verdict que le hook d'ouverture imprime a chaque demarrage de session. Le pilot applique deja exactement ce raisonnement a ses propres journaux (D-1</li><li>du 03/09 : HERITAGE-RELEVES.jsonl est suivi par git, DONC il ne porte que des pseudonymes) ; la sortie d'un oracle joue CHEZ un produit n'est couverte par aucune passe equivalente</li><li>Bruit : les constats reels du depot pesent 2 % du verdict, et « un gate qui bruite se contourne avant d'etre corrige » (mot du pilot, lot 20260905b). Remede propose : R-2 et R-4 ne jugent pas un chemin que `git check-ignore` declare exclu du depot. Le mecanisme d'exclusion existe deja et est declare — input/, gabarits/, fixtures/, old/ et .oracles/ sont hors jugement « par motif declare » ; ce qui manque, c'est que le motif le plus fort (le depot a ecrit que ce chemin n'entrera jamais dans son histoire) n'en fasse pas partie. Un fichier qui ne sera jamais versionne n'est pas un livrable d'output/ au sens de R-4 : c'est un artefact d'atelier. Si l'exclusion doit rester un choix explicite plutot qu'une deduction, un champ declare cote produit fait le meme travail — mais le silence doit alors jouer en faveur de la non-publication du nom</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-06</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>Mesure du 06/09/2026 chez Produit-12. `node oracles/oracle-conformite-projet.mjs .` rend verdict FAIL avec 247 findings FAIL : R-4 243, R-25 3, R-2 1. 242 d'entre eux portent des fichiers d'un unique dossier d'output/ que le .gitignore du produit exclut par une ligne assortie de son motif ecrit (« noms reels de proprietaires et de locataires — produits localement, jamais versionnes »). Verification : les 242 chemins passes a `git check-ignore --stdin` rendent 242 ignores sur 242, et 242 fichiers distincts. Les 242 constats sont tous R-4 (« livrable sans nommage &lt;Marque&gt; - &lt;Objet&gt; - AAAAMMJJ&lt;indice&gt; ») sur des PDF ranges selon la norme documentaire du metier du client ; 41 dossiers de premier niveau de ces chemins portent un nom reel de tiers, recopie tel quel dans le message du constat. Restent 5 constats reels (4 R-4, 1 R-2), soit 2 % du verdict. Aucun de ces noms n'entre dans un fichier suivi par git du produit — verifie : `git grep` sur trois noms echantillons rend 0 fichier suivi — la fuite est dans la SORTIE de l'oracle, pas dans le depot.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-12</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0873" data-cite data-forge="digit-ai-factory" data-statut="decide" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0873</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : une session parallèle a déposé les lots d'insatisfaction dans un dépôt vide au nom différent du produit</h3>
-          <div class="card-detail" data-cite><p class="lead">Les quatre lots INSATISFACTION ont été créés dans le dépôt GitHub command-manager (vide, branche claude/…) avec un .env.example et un ACCES-TEST.md propres, sans lien avec le dossier produit Produit-61 du run ; convergence à la main (git fetch puis import).</p><p class="detail-label">Proposition</p><ul class="puces"><li>lier le dépôt GitHub au produit à l'ouverture (COMPOSANTS-OPS.md) et faire porter au gabarit INSATISFACTION le nom du produit du run</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-06</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>deux socles à réconcilier, un import manuel de quatre fichiers</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>git show 6e23fce:docs/projet/ACCES-TEST.md porte les valeurs ; retour humain en une minute d'essai</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-61</dd></div>
             
           </dl>
@@ -1002,6 +657,29 @@
             <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12 — gain 3 × preuve 4 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>quinze fichiers publiables réécrits sous un pseudonyme faux le 08/09, détectés par lecture humaine de l'index de la boîte et non par un oracle ; correction manuelle ≈ 10 min ; sans détection, un lot attribué au mauvais produit au registre des lots publiés</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0914" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0914</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : le hook qui régénère input/00-retours/README.md y écrit le NOM des fichiers non suivis — un lot dont le nom réel n'est pas résolu par le canal ressort en clair dans un fichier suivi et publié</h3>
+          <div class="card-detail" data-cite><p class="lead">Mesure du 08/09 : le lot du 03/09 d'un produit dont le nom ne figure pas au canal confidentiel est resté non suivi (git) en attendant l'arbitrage des tables ; le hook de fin de tour qui régénère le README d'index de `input/00-retours/` a listé ce fichier par son nom réel dans le README, qui EST suivi et publié.</p><ul class="puces"><li>Le push a été refusé par la porte de publication (C5), puis le README a été régénéré après retrait du fichier</li><li>la porte a fait son office, mais l'index n'aurait jamais dû porter le nom. Demande : le générateur d'index de la boîte d'entrée n'inscrit que les fichiers suivis par git (ou passe chaque nom par la table des pseudonymes du canal avant écriture, et refuse d'écrire un nom présent dans noms-interdits)</li><li>fixture double sens : un fichier non suivi au nom interdit → absent de l'index (ou pseudonymisé), un fichier suivi au nom pseudonymisé → présent</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12 — gain 3 × preuve 4 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un push refusé le 08/09 et un index régénéré deux fois ; sans la porte, un nom réel de produit publié dans un dépôt public</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
             
           </dl>
@@ -1242,6 +920,75 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0922" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0922</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 8)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : un fichier de doctrine versionné porte un caractère de contrôle né d'un antislash de chemin Windows interprété, et aucun contrôle du parc ne balaie les caractères de contrôle</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat de la campagne D-14 (a) du 08/09 chez le pilot (hors périmètre, non corrigé).</p><ul class="puces"><li>Le caractère est invisible à la lecture et rend le fichier binaire pour une recherche textuelle</li><li>il est présent avant la campagne, vérifié sur un commit antérieur. La même classe a mordu l'agent en cours de campagne : des séquences d'échappement écrites par redirection de shell sont devenues de vrais caractères de contrôle dans un fichier de code, détectées par la recette. Demande : un balayage des caractères de contrôle dans les fichiers versionnés, joué par l'agrégateur de recettes</li><li>fixture rouge portant le caractère, fixture verte sans</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 8 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un fichier de doctrine illisible à la recherche textuelle, et la même classe payée deux fois le 08/09</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0915" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0915</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : la règle T1 de l'oracle des lots de travaux exige qu'un moyen de vérification soit ÉCRIT, jamais qu'il soit exact — un lot a affirmé « avance rapide seulement » sur une branche que l'hébergeur protège autrement, et T1-T6 ont rendu PASS</h3>
+          <div class="card-detail" data-cite><p class="lead">Suite pilot de TF-0886 (campagne D-14 a du 08/09, forge-development 8029348).</p><ul class="puces"><li>Le lot pilot - TRAVAUX - 20260905f affirmait une règle de branche (« avance rapide seule ») sans l'avoir lue chez l'hébergeur</li><li>la configuration réelle (une revue exigée, contrôles code et design, enforce_admins false, push forcé interdit) a été mesurée le 06/09 par `gh api …/branches/main/protection`. gabarits/oracle-travaux-pilot.mjs T1 déclare en non_juge « la VÉRACITÉ d'un moyen de vérification : T1 exige qu'il soit écrit, pas qu'il soit exact »</li><li>gabarits/TRAVAUX-PILOT.md demande « un fait, mesuré et daté » sans imposer, pour un fait portant sur une configuration externe lisible en direct (protection de branche, CI, droits), la commande de lecture citée et sa date. Demande : règle T7 (ou renforcement de T1) — tout fait portant sur une configuration externe vérifiable cite la commande sourcée et sa date, sinon FAIL</li><li>fixture double sens</li><li>et une classe nouvelle dans todo/CLASSES.json : « règle de branche annoncée différente de la configurée » (la campagne a constaté que `regle-de-branche-annoncee-differente-configuree` existe déjà comme clé : vérifier qu'elle couvre bien le cas et la rattacher à T7)</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 3 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un mandat du pilot a annoncé une règle de branche fausse, lue par la forge comme vraie ; un aller-retour humain et un lot de retours pour la corriger (05-06/09)</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0884" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0884</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-factory : rien n'empêche d'écraser un lot de retours déjà remis et ingéré — arrivé le 06/09, réparé par l'agent qui l'avait fait</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat RS-29 du lot du produit 12 du 06/09, en prose faute de classe ; classe créée sur D-26 (a).</p><ul class="puces"><li>Le fait : un compte rendu d'agent a pris l'indice « a » que le mandat nommait, déjà porté par un lot du même produit remis et ingéré le matin même (commit e3031e1 du pilot)</li><li>une écriture ordinaire l'a remplacé, et aucun contrôle ne s'y est opposé — ni le gabarit (« un lot remis ne se modifie JAMAIS »), ni oracle-lot-retours (PASS sur l'écrasement), ni la boîte d'entrée (qui le voit à l'ouverture suivante). Réparé : lot d'origine restauré depuis HEAD, indice « b » pris. Demande : oracle-lot-retours refuse une écriture dont le chemin est déjà ingéré avec une autre empreinte (lecture des événements d'ingestion)</li><li>le gabarit prescrit l'indice suivant</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-07</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 5 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un lot ingéré écrasé sans qu'aucun contrôle le dise, le 06/09 ; l'histoire du registre aurait divergé du fichier</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-12</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-corrige" id="item-TF-0878" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-0878</code>
@@ -1265,6 +1012,29 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0881" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-0881</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-factory : l'alias de transition périmé (ancien gabarit de lot, 62 lignes du 14/08) survit à côté de la copie à jour chez trois produits, et R-47 cesse de le regarder</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat RH-2 du lot des produits anciens du 06/09 (produits-anciens 20260906a), en prose faute de classe ; classe créée sur D-26 (a).</p><ul class="puces"><li>R-47 lit l'alias seulement si la cible canonique est absente. Mesure du 06/09 chez les trois produits anciens : forge/retours/RETOURS-FORGES.md (version du 14/08, 62 lignes, sans obligation de classe ni section « la règle qui aurait évité le retour ») reste à côté de forge/retours/GABARIT-LOT-RETOURS.md (180 lignes) et R-47 rend PASS — seul faux vert du lot</li><li>trois lots du produit n° 3 citent encore l'ancien nom. Demande : compter l'alias PÉRIMÉ dès que la cible canonique existe, nommer le geste de retrait (le produit supprime)</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-07</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un faux vert de R-47 chez trois produits ; un gabarit périmé encore cité par trois lots</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produits anciens n° 1, 2 et 3 (run d'héritage A-55)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-corrige" id="item-TF-0819" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="basse">
           <header class="card-head">
             <code class="tf-id">TF-0819</code>
@@ -1279,6 +1049,75 @@
             <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 2 × preuve 3 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un aller-retour de répartition chez la forge destinataire, et un écart non compté faute de classe (lot 20260905b, 05/09)</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">digit-ai-forge-conception</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0879" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0879</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : la recette scripts/rebatir-clone.test.mjs (écrite sur l'autre poste le 07/09) échoue sur ce poste avant comme après tout changement — son quatrième cas dépend du poste, et son message tronque la valeur attendue</h3>
+          <div class="card-detail" data-cite><p class="lead">Mesuré le 07/09 au soir en rejouant le banc du pilot après D-28 : scripts/rebatir-clone.test.mjs rend 3 PASS, 1 FAIL sur le cas « histoire distante réécrite + commit propre au poste + arborescence liée → … porte déclarée », et rend exactement la même chose sur la version committée du script (rebatir-clone.mjs ramené à HEAD le temps de la mesure) : l'échec ne vient pas des changements du soir.</p><ul class="puces"><li>L'autre poste rapporte « agrégateur 95/95 » sur la même recette : le cas dépend donc du poste (oracle installé trouvé ou non, chemin, fins de ligne ?)</li><li>Le message d'échec s'arrête à « Expected values to be strictly equal » sans dire quelle assertion ni quelles valeurs : la recette ne dit pas par quoi elle a jugé</li><li>Demande : rendre le cas indépendant du poste (ou déclarer ce qu'il exige) et faire porter au message l'assertion et les deux valeurs</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-07</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 2 × preuve 4 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>le banc du pilot est rouge sur ce poste (1/96) pour un cas que l'autre poste voit vert ; la cause n'est pas lisible dans le message</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot-banc-20260907</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0882" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0882</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-factory : R-47 compte « absent » un motif d'exclusion qu'une graphie plus large du .gitignore couvre déjà — la mise en conformité écrit des lignes redondantes</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat RH-3 du lot des produits anciens du 06/09, en prose faute de classe ; classe créée sur D-26 (a).</p><ul class="puces"><li>Le contrôle presence_et_motifs compare des lignes nues exactes. Mesure du 06/09, produit n° 3 : *.oracles*.json et *.oracles*.jsonl couvraient strictement les trois motifs exigés, comptés « 3 absents sur 6 »</li><li>trois lignes redondantes écrites à côté de deux lignes qui faisaient le travail. HERITAGE.json pose le raisonnement inverse pour .env (« exiger une graphie exacte ferait crier sur une protection équivalente »). Demande : un motif est tenu s'il est présent ou couvert par un motif plus large</li><li>fixture double sens</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-07</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>trois lignes redondantes écrites chez un produit pour satisfaire un relevé qui contredit sa propre règle</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">produits anciens n° 1, 2 et 3 (run d'héritage A-55)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0888" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0888</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 2)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : la regle T6 de l oracle des lots prend le nom « porte » pour le verbe « porter » — un lot qui dit « une porte muette se contourne par &lt;option&gt; » est refuse pour un module producteur imaginaire</h3>
+          <div class="card-detail" data-cite><p class="lead">Mesure du 08/09 en deposant le lot pilot - TRAVAUX - 20260908a chez la forge des outils : T6 rend FAIL « module producteur nomme sans lecture declaree (TF-0887 → --no-verify) » sur la phrase « une porte muette par defaut se contourne par `--no-verify` ».</p><ul class="puces"><li>Le motif PRODUCTEUR_NOMME de gabarits/oracle-travaux-pilot.mjs accepte tout mot commencant par « port » (porte, porter, portage) suivi de « par `x` » a moins de 60 caracteres</li><li>le nom « porte » (la porte de publication) declenche la regle. Contournement du jour : phrase reformulee. Demande : borner le motif aux formes verbales (participe passe ou verbe conjugue : transcrit(e/s), produit(e/s), ecrit(e/s), derive(e/s), genere(e/s), porte(e/s) au sens de porter dans une vue) et exiger que le complement soit un nom de module (backtick sans tiret initial : une option de commande commence par --), fixture double sens (phrase avec le nom « porte » → PASS</li><li>« porte dans la vue par `derive-les-vues` » → FAIL sans lecture)</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 2 — gain 2 × preuve 4 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un lot conforme refuse une fois le 08/09 ; toute phrase qui nomme la porte et une option est refusee</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot-lot-20260908a</dd></div>
             
           </dl>
         </article>
@@ -1394,6 +1233,167 @@
             <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>Preuve reproductible : `check_markdown.py` joue sur `git show 90d3767:skills/enumere-la-surface/references/typologie-surface.md` (version anterieure a toute edition de ce run) rend les deux memes constats M7 (lignes 6 et 92) que le gate a ensuite imputes a l'edition suivante. Cout mesure : deux passes consommees sur trois, et cinq corrections de forme hors perimetre du lot.</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0848" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0848</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-factory : R-47 juge l'arbre de travail — un heritage recopie mais NON COMMIS rend PASS pendant que le depot porte encore la version perimee</h3>
+          <div class="card-detail" data-cite><p class="lead">relever-heritage.mjs compare le CONTENU du fichier sur disque a la source du pilot, jamais l'etat versionne.</p><ul class="puces"><li>Un produit qui recopie son heritage sans commettre dans la foulee obtient donc un R-47 PASS sur un etat que son depot ne porte pas : un git restore ramene l'heritage de la veille, un git clone (CI, autre poste) livre les artefacts perimes, et la session suivante ne peut pas distinguer ces recopies de travaux du produit — elle arbitre a l'aveugle entre les commettre et les jeter. Le dispositif SAIT que le commit est un geste separe (le lot TF-0819 le demande en partie 3) : ce qui manque est le controle et le signal, pas la regle. Deux gestes proposes, aucun n'ecrit chez le produit</li><li>recopier-heritage.mjs termine par l'etat git des cibles qu'il vient d'ecrire (git status --porcelain -- &lt;cibles&gt;) et dit en une ligne qu'une recopie n'est TENUE qu'une fois commise, en nommant les fichiers restants : le geste unique doit rendre compte de ce qu'il laisse au depot</li><li>relever-heritage.mjs distingue un troisieme etat, conforme_non_commis (conforme sur disque, divergent de HEAD), compte a part comme l'est deja hors_racine — ni perime (le produit a fait le geste), ni tenu (le depot ne le porte pas). R-47 peut rester PASS en le DISANT ou basculer en avertissement : la decision est au pilot, le comptage a part est le prealable</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-06</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>Mesure du 06/09/2026 chez Produit-02, APRES la remise a niveau de TF-0819. oracle-conformite-projet rend R-47 PASS — « 13 artefact(s) herite(s) present(s) et a jour » — alors que TROIS artefacts en copie_conforme divergent encore du pilot dans HEAD : forge/RESTITUTION.md (dernier commit 3209608 du 01/09 ; HEAD porte la version 2.15.0, l'arbre de travail la 2.16.0), forge/hooks/factory.mjs (dernier commit 13146aa du 26/08) et forge/retours/GABARIT-LOT-RETOURS.md (3209608, 01/09). git diff sur ces trois fichiers : 3 files changed, 57 insertions(+), 8 deletions(-) ; la comparaison de chaque version de HEAD avec la source du pilot rend DIVERGENT pour les trois. Ces copies ont ete deposees par une session anterieure et jamais commises ; recopier-heritage.mjs les a lues « CONFORME » et n'a rien dit de leur etat git. C'est aussi le risque que le mandat humain a du prevenir en PROSE : la session mandatee a ete avertie qu'elle trouverait des modifications non commises qui n'etaient pas les siennes — une precaution qu'aucun outil ne porte aujourd'hui.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-02</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0849" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0849</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-factory : le message d'attribution de divergence date la copie du produit par la date du COMMIT du pilot, en contradiction avec la version que le fichier declare</h3>
+          <div class="card-detail" data-cite><p class="lead">attribuerDivergence() dans scripts/relever-heritage.mjs parcourt `git log -n 30 --format=%H %cs` de la source chez le pilot et rend « votre copie correspond a la version publiee le &lt;%cs&gt; ».</p><ul class="puces"><li>La date rendue est donc celle du COMMIT qui portait ce contenu, pas la version que l'artefact declare lui-meme — et quand les deux different, le produit lit deux dates pour un meme fichier dans les deux documents qu'il a sous les yeux (le message de l'oracle et le lot de travaux). Le mecanisme n'est pas faux, la PHRASE l'est : elle dit « version publiee le X » la ou elle mesure « etat porte par le commit du X », et elle rend systematiquement la date la PLUS RECENTE des deux — exactement le sens qui pousse a croire sa copie fraiche. Deux corrections independantes :</li><li>nommer ce qui est mesure — « votre copie correspond a l'etat publie PAR LE COMMIT du &lt;date&gt; »</li><li>quand l'artefact porte une version declaree (champs version/date d'un JSON, en-tete versionne d'un .md), la citer des DEUX cotes — « votre copie : 1.0.0 du 03/09 · pilot : 1.2.0 du 05/09 ». Le lot de travaux cite deja la bonne : c'est le message machine qui devrait la porter, pas seulement la prose humaine qui le double</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-06</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>Mesure du 06/09/2026 chez Produit-02, AVANT la remise a niveau. Le message R-47 ecrit : « forge/retours/CLASSES.json diverge de todo/CLASSES.json — votre copie correspond a la version publiee le 2026-09-05 ». Le fichier alors present chez le produit portait version 1.0.0, date 2026-09-03, 32 classes ; la source du pilot portait version 1.2.0, date 2026-09-05, 37 classes. Le lot de travaux TF-0819, lu dans la meme minute, ecrivait de son cote « forge/retours/CLASSES.json correspond a la version du 03/09 ». Deux dates pour le meme fichier, a deux jours d'ecart, dans les deux documents que le produit lit cote a cote — et l'ecart n'est visible qu'en ouvrant le JSON, geste qu'aucune consigne ne demande.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-02</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0850" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0850</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-factory : le « geste unique » de remise à niveau de l'héritage ne rend pas R-47 vert, et le message de R-47 promet qu'il le fait</h3>
+          <div class="card-detail" data-cite><p class="lead">scripts\recopier-heritage.mjs ne copie que les artefacts declares en mode copie_conforme. Ceux en mode presence, presence_et_motif et presence_et_motifs sont listes et LAISSES, y compris quand ils sont ABSENTS chez le produit — c est-a-dire quand il n y a aucune personnalisation a preserver. Le message de R-47 se termine pourtant par « Remise a niveau EN UN GESTE, execute par le produit depuis son depot : node &lt;PILOT_ROOT&gt;\scripts\recopier-heritage.mjs . ». Le geste joue, R-47 rend encore FAIL : il manque .claude\settings.json (absent), forge\travaux\ECARTS-ASSUMES.md (absent), la clause de precedence R-43 au CLAUDE.md et les motifs de socle du .gitignore.</p><p class="detail-label">Proposition</p><ul class="puces"><li>distinguer dans le script ABSENT de PRESENT</li><li>Un artefact personnalisable ABSENT n a rien a proteger — l instancier depuis le gabarit est strictement correct, et c est exactement ce que le produit refait a la main</li><li>Pour presence_et_motifs, ajouter les motifs manquants en fin de fichier plutot qu ecraser, en signalant que l ordre des negations decide du resultat</li><li>Ne rien ecraser des qu un fichier est PRESENT reste la regle : c est la garde qui donne sa valeur au script</li><li>A defaut de corriger le script, corriger le message de R-47 — un message qui prescrit la moitie du geste conduit a la seconde violation (lecon TF-0552, citee par l oracle de lot lui-meme)</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-06</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>Mesure du 06/09/2026, identique chez TROIS Produit-62 traites l un apres l autre. R-47 avant chez chacun : FAIL, 8 absent(s) et 3 perime(s). Sortie du geste unique chez chacun : « 7 copie(s), 0 deja conforme(s), 6 laisse(s) au produit (modes personnalises) ». Parmi les 6 laisses, QUATRE maintiennent R-47 en FAIL : .claude\settings.json ABSENT, forge\travaux\ECARTS-ASSUMES.md ABSENT, CLAUDE.md ne portant pas « R-43 », .gitignore ne portant pas 4 motifs du socle chez le produit n 1, 3 chez le n 2 et 6 chez le n 3. Les deux autres laisses (robots.txt, llms.txt, mode presence) etaient presents et sans effet sur le verdict. Cout direct : 12 gestes manuels (4 x 3 produits), dont deux copies de gabarit pur, une insertion de paragraphe dans un fichier existant et une edition de .gitignore ou l ORDRE des lignes decide du resultat (chez le produit n 3, inserer les trois graphies exactes APRES `!forge/**` aurait re-ignore onze fichiers non suivis que le depot portait deja). Apres instanciation manuelle des quatre : R-47 PASS, 13 artefacts herites presents et a jour, chez les trois. R-43 bascule au vert par la meme occasion chez les trois, sans qu aucune correction ne l ait vise.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0851" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0851</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-factory : la descente d'heritage atteint le disque du poste et jamais l'histoire git du produit, et R-47 juge le meme disque</h3>
+          <div class="card-detail" data-cite><p class="lead">Un artefact herite recopie chez un produit y arrive sur le DISQUE ; rien ne le fait entrer dans l'histoire git du depot, et R-47 ne lit que ce disque.</p><ul class="puces"><li>Consequence : un produit peut rendre PASS a l'heritage pendant des mois alors qu'aucune ligne de son depot ne le porte, et un clone neuf du meme depot repartirait en FAIL. Le releve du parc (todo/HERITAGE-RELEVES.jsonl), qui alimente le delai de descente de todo/RECIDIVES.md, mesure ce meme disque : il mesure l'etat d'un POSTE, pas l'etat d'un produit. Deux gestes reparent, tous deux petits</li><li>R-47 releve l'artefact herite CONFORME MAIS NON SUIVI par git — un `git ls-files --error-unmatch &lt;cible&gt;` par artefact suffit, et le constat se formule comme les autres : « present, conforme, hors histoire — ce poste l'a, le depot ne l'a pas »</li><li>La voie de recopie, script comme hook, imprime en fin de geste la ligne `git add` exacte des fichiers qu'elle vient d'ecrire : elle sait deja les nommer, elle les liste. Le commit reste la decision du produit ; ce qui manque, c'est qu'il soit PROPOSE</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-06</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>Mesure du 06/09/2026 chez Produit-12, avant tout geste. forge/retours/CLASSES.json etait PRESENT en version 1.0.0 (30 classes, datee du 03/09) et NON SUIVI par git — `git status` le rangeait en « Untracked files ». Il n'a pu arriver que par une recopie d'heritage : present, conforme a une version du pilot, et absent de toute histoire. Au meme instant, trois autres artefacts en mode copie_conforme etaient CONFORMES au pilot et NON COMMIS : forge/RESTITUTION.md, forge/hooks/factory.mjs, forge/retours/GABARIT-LOT-RETOURS.md — `recopier-heritage.mjs --essai` les rend [CONFORME], `git status` les rend « modified ». R-47 n'a rien dit d'aucun des quatre : avant le geste elle comptait « 0 absent, 3 perimes » sur le seul contenu ; apres, « 11 artefact(s) herite(s) present(s) et a jour » — verdict identique qu'ils soient versionnes ou non. Quatre artefacts sur onze vivaient donc hors de l'histoire du depot sans qu'aucun controle ne le dise.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-12</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0852" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0852</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-factory : le lot de travaux demande a la main le geste que le hook d'ouverture fait seul depuis le 30/08, et recopier-heritage.mjs ecrase sans aucune garde git</h3>
+          <div class="card-detail" data-cite><p class="lead">Deux faits qui se tiennent. (a) La voie AUTOMATIQUE couvre deja le geste demande : oracles/hook-ouverture.mjs recopie, a chaque ouverture d'un produit portant le lanceur, TOUS les artefacts en mode copie_conforme de HERITAGE.json (l. 86-95, copyFileSync) — soit exactement les trois artefacts de TF-0819. Le pilot le sait et l'imprime : son propre releve du parc ecrit, pour un produit portant le lanceur, « — remis a niveau a sa prochaine ouverture (copies identiques) ; le reste est un geste du produit » (l. 198). Le lot ne cite jamais cette voie et argumente comme si la voie manuelle etait la seule. La difference reelle entre les deux voies n'est pas la recopie : c'est le COMMIT, que le lot demande (partie 3) et que la voie automatique ne fait pas. La valeur propre du lot est donc dans sa partie 3, et tout son argumentaire porte sur sa partie 1. Remede : quand la voie automatique couvre le geste, le lot le DIT en une ligne — « votre hook d'ouverture recopie ces trois fichiers a votre prochaine ouverture ; ce que ce lot ajoute, c'est le commit » — a poser dans gabarits/TRAVAUX-PILOT.md, pas dans un lot. (b) L'outil manuel n'a AUCUNE garde git : recopier-heritage.mjs ecrit (writeFileSync, l. 85) sans consulter ni les modifications non commises ni les fichiers non suivis. La garde existait — dans la PROSE du mandat humain qui accompagnait ce lot (« si le script veut ecraser un fichier modifie localement, arrete-toi ») — donc chez l'operateur, pas dans l'outil ; une garde qui vit dans un mandat ne protege que la session qui l'a recu. Le mode --essai fait deja le travail et rien ne l'appelle avant le geste, ni le message de R-47 ni le lot. Remede : une cible modifiee non commise, ou non suivie et divergente, fait basculer le geste en --essai (il liste, n'ecrit pas) et demande --forcer ; le cas nominal n'est pas ralenti.</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-06</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>Mesure et lecture du 06/09/2026. (a) gabarits/HERITAGE.json declare les trois artefacts de TF-0819 en mode copie_conforme : forge/travaux/TRAVAUX-PILOT.md (depuis 2026-08-25), forge/travaux/oracle-travaux.mjs (2026-08-25), forge/retours/CLASSES.json (2026-09-03). oracles/hook-ouverture.mjs recopie tous les copie_conforme a l'ouverture d'un produit (l. 86-95) et le produit porte le cablage : .claude/settings.json, SessionStart matcher « startup|resume » → `node forge/hooks/factory.mjs ouverture`, forge/hooks/factory.mjs conforme au pilot et passant --pilot au hook. Le lot manuel et la voie automatique recopient donc le MEME ensemble ; seul le commit les separe. Cout constate : un depot de lot chez chaque produit du parc, un mandat humain et un run de produit pour une recopie que l'ouverture suivante faisait seule. (b) Au moment du geste, trois artefacts heritages etaient modifies-non-commis dans l'arbre de travail (forge/RESTITUTION.md, forge/hooks/factory.mjs, forge/retours/GABARIT-LOT-RETOURS.md) ; ils se sont trouves [CONFORME] a l'essai, donc rien n'a ete perdu — mais le script ne l'avait pas verifie, et ces trois-la n'etaient dans aucune histoire git ou les recuperer.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-12</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0853" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0853</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-factory : oracle-conformite-projet rend 242 constats sur 247 dans un dossier que le .gitignore du produit exclut, et recopie dans son verdict les noms reels de 41 tiers</h3>
+          <div class="card-detail" data-cite><p class="lead">La commande de verification que la doctrine impose avant toute cloture de run juge des fichiers que le depot a declare, noir sur blanc, ne jamais vouloir versionner.</p><ul class="puces"><li>Deux consequences</li><li>Anonymisation : les chemins juges portent des noms REELS de tiers du client (proprietaires, locataires) et ces noms sont recopies tels quels dans le message de chaque constat — verdict que le hook d'ouverture imprime a chaque demarrage de session. Le pilot applique deja exactement ce raisonnement a ses propres journaux (D-1</li><li>du 03/09 : HERITAGE-RELEVES.jsonl est suivi par git, DONC il ne porte que des pseudonymes) ; la sortie d'un oracle joue CHEZ un produit n'est couverte par aucune passe equivalente</li><li>Bruit : les constats reels du depot pesent 2 % du verdict, et « un gate qui bruite se contourne avant d'etre corrige » (mot du pilot, lot 20260905b). Remede propose : R-2 et R-4 ne jugent pas un chemin que `git check-ignore` declare exclu du depot. Le mecanisme d'exclusion existe deja et est declare — input/, gabarits/, fixtures/, old/ et .oracles/ sont hors jugement « par motif declare » ; ce qui manque, c'est que le motif le plus fort (le depot a ecrit que ce chemin n'entrera jamais dans son histoire) n'en fasse pas partie. Un fichier qui ne sera jamais versionne n'est pas un livrable d'output/ au sens de R-4 : c'est un artefact d'atelier. Si l'exclusion doit rester un choix explicite plutot qu'une deduction, un champ declare cote produit fait le meme travail — mais le silence doit alors jouer en faveur de la non-publication du nom</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-06</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>Mesure du 06/09/2026 chez Produit-12. `node oracles/oracle-conformite-projet.mjs .` rend verdict FAIL avec 247 findings FAIL : R-4 243, R-25 3, R-2 1. 242 d'entre eux portent des fichiers d'un unique dossier d'output/ que le .gitignore du produit exclut par une ligne assortie de son motif ecrit (« noms reels de proprietaires et de locataires — produits localement, jamais versionnes »). Verification : les 242 chemins passes a `git check-ignore --stdin` rendent 242 ignores sur 242, et 242 fichiers distincts. Les 242 constats sont tous R-4 (« livrable sans nommage &lt;Marque&gt; - &lt;Objet&gt; - AAAAMMJJ&lt;indice&gt; ») sur des PDF ranges selon la norme documentaire du metier du client ; 41 dossiers de premier niveau de ces chemins portent un nom reel de tiers, recopie tel quel dans le message du constat. Restent 5 constats reels (4 R-4, 1 R-2), soit 2 % du verdict. Aucun de ces noms n'entre dans un fichier suivi par git du produit — verifie : `git grep` sur trois noms echantillons rend 0 fichier suivi — la fuite est dans la SORTIE de l'oracle, pas dans le depot.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-12</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0873" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0873</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : une session parallèle a déposé les lots d'insatisfaction dans un dépôt vide au nom différent du produit</h3>
+          <div class="card-detail" data-cite><p class="lead">Les quatre lots INSATISFACTION ont été créés dans le dépôt GitHub command-manager (vide, branche claude/…) avec un .env.example et un ACCES-TEST.md propres, sans lien avec le dossier produit Produit-61 du run ; convergence à la main (git fetch puis import).</p><p class="detail-label">Proposition</p><ul class="puces"><li>lier le dépôt GitHub au produit à l'ouverture (COMPOSANTS-OPS.md) et faire porter au gabarit INSATISFACTION le nom du produit du run</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-06</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>deux socles à réconcilier, un import manuel de quatre fichiers</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-61</dd></div>
             
           </dl>
         </article>
