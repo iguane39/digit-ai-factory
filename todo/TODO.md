@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=0698d5d66676 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T14:44:09.789Z -->
+     sceaux: actifs=fb76f39f7e7e archive=6ce2fe14c2bb · dernier événement: 2026-09-08T14:52:30.175Z -->
 
-**190 actifs** (candidat 15 · décidé 19 · en cours 6 · corrigé 150 · écarté 0) · **782 archivés**.
+**190 actifs** (candidat 15 · décidé 14 · en cours 10 · corrigé 151 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -11,13 +11,12 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-0920 | decide | 16 | pilot : la copie INSTALLÉE de trois skills diverge de la source versionnée sur 28 fichiers après la campagne du 08/09 — ce qui s'exécute sur le poste n'est plus ce qui est versionné | **oui** — 28 fichiers divergents entre versionné et installé : les correctifs du jour ne s'exécutent pas encore |
+| TF-0682 | en_cours | 10 | Quinze contrôles du produit ne sont exercés par AUCUNE recette — être cité n'est pas être joué | non |
+| TF-0923 | en_cours | 3 | pilot : six volets d'oracle proposés par les items du 08/09 restent non livrés, cinq d'entre eux vivant dans le même juge de restitution que la campagne n'a pas voulu faire monter deux fois | **oui** — six doctrines opposables sans juge exécuté : la règle décore tant que rien ne la joue |
+| TF-0836 | en_cours | 1 | pilot : le hook qo-gate-write juge un template de maquette comme un livrable | **oui** — un blocage par écriture du template, six écritures |
+| TF-0838 | en_cours | 1 | pilot : le skill claude-api ne documente pas fallbacks avec messages.parse | **oui** — un écart déclaré au lieu d'une mise en œuvre |
 | TF-0674 | decide | 12.5 | La porte de fraîcheur de déploiement empreinte encore un échantillon — le correctif d'ensemble n'est pas appliqué | non |
-| TF-0682 | decide | 10 | Quinze contrôles du produit ne sont exercés par AUCUNE recette — être cité n'est pas être joué | non |
 | TF-0676 | decide | 6.7 | Aucun script de capture du produit ne produit systématiquement une pleine page | non |
-| TF-0923 | decide | 3 | pilot : six volets d'oracle proposés par les items du 08/09 restent non livrés, cinq d'entre eux vivant dans le même juge de restitution que la campagne n'a pas voulu faire monter deux fois | **oui** — six doctrines opposables sans juge exécuté : la règle décore tant que rien ne la joue |
-| TF-0836 | decide | 1 | pilot : le hook qo-gate-write juge un template de maquette comme un livrable | **oui** — un blocage par écriture du template, six écritures |
-| TF-0838 | decide | 1 | pilot : le skill claude-api ne documente pas fallbacks avec messages.parse | **oui** — un écart déclaré au lieu d'une mise en œuvre |
 | TF-0959 | candidat | 20 | canal confidentiel : une clé DÉJÀ pseudonymisée peut entrer dans une table de noms réels, et rien ne l'en empêche — l'arbitrage du 08/09 l'a fait une fois, la porte l'a rattrapé | **oui** — trois dépôts condamnés par la porte de publication et une rectification manuelle de la table, le 08/09 au matin, sur un défaut dont la garde était déjà écrite ailleurs depuis six jours |
 | TF-0956 | candidat | 10 | pilot : le registre ne sait ni détecter ni écarter un DOUBLON de candidature — six items identiques mot pour mot y sont entrés le 08/09, et rien ne les a signalés | **oui** — six candidatures en double entrées en une commande, non détectées ; le compte des items ouverts est faux de six tant qu'elles ne sont pas écartées, et aucun statut ne permet de les écarter |
 | TF-0965 | candidat | 10 | pilot : propager les skills a casse un test d'une forge voisine — une regle neuve du socle est mesuree sur le parc du pilot seulement, jamais sur les depots qui la CONSOMMENT | **oui** — une suite de tests d'une forge passee au rouge par un geste joue dans un autre depot, et un agent qui a declare l'echec preexistant de bonne foi parce que rien ne lui disait que la copie installee avait change sous lui |
@@ -26,6 +25,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0869 | corrige | 25 | pilot : aucun .env local créé d'office, le commanditaire a saisi sa clé Anthropic dans .env.example versionné | **oui** — git diff --stat .env.example : 1 ligne, clé de 108 caractères préfixée sk-ant- dans un fichier versionné ; un commit de plus et le secret partait |
 | TF-0870 | corrige | 20 | pilot : une clé Anthropic d'organisation sans espace de travail échoue en 400, variable ANTHROPIC_WORKSPACE_ID absente du gabarit et du skill | **oui** — un redéploiement qualif et un appel direct à l'API pour lire la cause ; smoke-qualif-20260906.json E-011 FAIL 502 |
 | TF-0872 | corrige | 20 | pilot : ETAPE-MEP § 3 bis ne prescrit ni comptes d'essai vides ni source des identifiants d'une qualif publique | **oui** — retour humain lot 20260906b, un run de version |
+| TF-0920 | corrige | 16 | pilot : la copie INSTALLÉE de trois skills diverge de la source versionnée sur 28 fichiers après la campagne du 08/09 — ce qui s'exécute sur le poste n'est plus ce qui est versionné | **oui** — 28 fichiers divergents entre versionné et installé : les correctifs du jour ne s'exécutent pas encore |
 | TF-0927 | corrige | 16 | pilot : l'anonymiseur remplace un nom À L'INTÉRIEUR d'un identifiant de code — c'est ce qui a rendu la suite de la forge des tests non collectable pendant dix-huit jours | **oui** — dix-huit jours de suite non jouée chez forge-tests, cause mesurée au commit d'anonymisation du 20/08 |
 | TF-0871 | corrige | 12.5 | pilot : la convention de démonstration (R-23, aide MODE_DEMO) a mis des identifiants sur une page servie sur Internet et dans un dépôt poussé | **oui** — git show 6e23fce:docs/projet/ACCES-TEST.md porte les valeurs ; retour humain en une minute d'essai |
 | TF-0891 | corrige | 12.5 | digit-ai-factory : le hook de restitution juge le FICHIER de synthèse, jamais le MESSAGE affiché — un fichier PASS a été paraphrasé à l'écran avec les blocs 3 et 8 hors format | **oui** — un aller-retour humain sur la première restitution du mandat ; le fichier PASS n'a protégé aucun lecteur |
