@@ -11,6 +11,17 @@ MEP — et le run Produit-10 a dû improviser ce que cette page encode désormai
 1. **Socle du RUN complet** : `input\`/`output\`/`docs\`/`forge\`, git local dès
    l'ouverture — et TOUT ce que le mandat produit est conforme (nommage R-4 des
    livrables, journaux d'oracles R-32, ledger).
+   **Et l'héritage s'installe AVANT la première écriture, existant compris** (TF-0892) :
+   `node <pilot>\scripts\recopier-heritage.mjs .` puis `.claude\settings.json` câblant
+   `forge\hooks\factory.mjs`. R-35/TF-0266 borne les FAIL portant sur des fichiers
+   ANTÉRIEURS ; elle ne dispense JAMAIS d'installer les hooks, qui ne jugent que ce que
+   le mandat écrit à partir de maintenant. Mesuré le 07/09 : socle posé sans héritage,
+   `.claude\` et `forge\hooks\` absents — **aucun hook n'a tourné de tout le mandat**, et
+   le défaut de forme de la restitution n'a été vu que par son destinataire.
+   Quand le hook `Stop` manque, le relevé d'ouverture NOMME les familles laissées sans
+   protection (`familles_protegees` de `gabarits\HERITAGE.json`, 1.8.0) — au minimum
+   **`restitution-forme` : « la restitution ne sera jugée par rien »** —, jamais un
+   « écart R-35 » anonyme : un écart déclaré sans sa conséquence ne se décide pas.
    **Sur un projet né sous la doctrine** : `oracle-conformite-projet.mjs` PASS, comme
    les autres. **Sur un existant antérieur à la doctrine (TF-0266, amendé le 15/08)** :
    l'oracle se JOUE quand même (R-35 — son verdict est l'état des lieux, consigné au
@@ -30,7 +41,9 @@ MEP — et le run Produit-10 a dû improviser ce que cette page encode désormai
 
 ## La séquence (remplace les 5 étapes du run produit)
 
-1. **Ouvrir** — socle + git + oracle de conformité PASS ; le mandat reformulé en une
+1. **Ouvrir** — socle + git + **héritage installé et hooks câblés** (invariant 1 :
+   `recopier-heritage.mjs` puis `.claude\settings.json`, avant la première écriture,
+   existant compris) + oracle de conformité PASS ; le mandat reformulé en une
    phrase au ledger (qui demande quoi, sur quel périmètre, avec quelle preuve attendue).
 2. **Cadrer la preuve** — AVANT de produire : quels oracles jugeront le livrable ?
    (forge-data : `oracle-tracer`/`oracle-profiler`/`oracle-restituer` ; forge-audit :
