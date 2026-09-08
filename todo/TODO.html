@@ -155,7 +155,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>d3eae1d68da0</code> · dernier événement 2026-09-08T12:59:37.381Z</p>
+      <p class="meta">sceau <code>ed6c55264421</code> · dernier événement 2026-09-08T14:09:26.718Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -165,8 +165,8 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="3 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">3</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="29 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">29</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="7 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">7</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="30 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">30</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="5 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">5</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="781 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">781</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
@@ -181,7 +181,7 @@
       <input type="search" id="recherche" placeholder="Rechercher (titre, détail, id TF, forge, demandeur…)" aria-label="Rechercher dans les items — insensible aux accents">
       
       <div class="dropdown" data-dim="forge">
-        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">18</span>) <span aria-hidden="true">▾</span></button>
+        <button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-forge">Forge (<span class="dd-n">19</span>) <span aria-hidden="true">▾</span></button>
         <div class="dd-panel" id="dd-forge" role="group" aria-label="Filtre Forge" hidden>
           <div class="dd-actions"><button type="button" data-act="tous">Tous</button><button type="button" data-act="aucun">Aucun</button></div>
           <label><input type="checkbox" value="digit-ai-factory" checked> digit-ai-factory</label>
@@ -196,6 +196,7 @@
           <label><input type="checkbox" value="digit-ai-forge-organization" checked> digit-ai-forge-organization</label>
           <label><input type="checkbox" value="digit-ai-forge-tests" checked> digit-ai-forge-tests</label>
           <label><input type="checkbox" value="digit-ai-page-html" checked> digit-ai-page-html</label>
+          <label><input type="checkbox" value="factory" checked> factory</label>
           <label><input type="checkbox" value="forge-conception" checked> forge-conception</label>
           <label><input type="checkbox" value="forge-design" checked> forge-design</label>
           <label><input type="checkbox" value="forge-development" checked> forge-development</label>
@@ -215,13 +216,13 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">176 / 176 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">182 / 182 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">53 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">45 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">12 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-data"><strong>digit-ai-forge-data</strong> <span class="toc-d">16 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">12 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-development"><strong>digit-ai-forge-development</strong> <span class="toc-d">4 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-observability"><strong>digit-ai-forge-observability</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-organization"><strong>digit-ai-forge-organization</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">9 item(s) reste-à-faire</span></a><a href="#digit-ai-page-html"><strong>digit-ai-page-html</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-conception"><strong>forge-conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-design"><strong>forge-design</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#forge-development"><strong>forge-development</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-tests"><strong>forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">10 item(s) reste-à-faire</span></a><a href="#seo-geo"><strong>seo-geo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">54 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">45 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">12 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-data"><strong>digit-ai-forge-data</strong> <span class="toc-d">16 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">12 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-development"><strong>digit-ai-forge-development</strong> <span class="toc-d">4 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-observability"><strong>digit-ai-forge-observability</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-organization"><strong>digit-ai-forge-organization</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">9 item(s) reste-à-faire</span></a><a href="#digit-ai-page-html"><strong>digit-ai-page-html</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#factory"><strong>factory</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#forge-conception"><strong>forge-conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-design"><strong>forge-design</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#forge-development"><strong>forge-development</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-tests"><strong>forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">11 item(s) reste-à-faire</span></a><a href="#seo-geo"><strong>seo-geo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-factory">
-      <h2>digit-ai-factory <span class="badge" title="53 item(s) actifs ciblant digit-ai-factory">53</span></h2>
+      <h2>digit-ai-factory <span class="badge" title="54 item(s) actifs ciblant digit-ai-factory">54</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-factory</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
@@ -391,19 +392,19 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0957" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
+        <article class="card s-candidat" id="item-TF-0959" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
           <header class="card-head">
-            <code class="tf-id">TF-0957</code>
+            <code class="tf-id">TF-0959</code>
             <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 20)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
-          <h3 class="card-titre">pilot : cinq bancs de test n'isolaient pas leurs tables et ont écrit neuf produits de fixture dans le référentiel RÉEL des pseudonymes — la porte de publication a refusé le dépôt sur 81 constats nés de noms inventés</h3>
-          <div class="card-detail" data-cite><p class="lead">Mesuré le 08/09 après-midi, en jouant les 46 bancs du dépôt d'affilée avec FORGE_NOMS_INTERDITS et FORGE_PRODUITS_PSEUDO exportés vers les tables réelles du canal confidentiel — ce que fait n'importe quelle session ouverte.</p><ul class="puces"><li>Cinq bancs ne posaient pas leurs propres tables jetables : ils ont hérité de l'environnement, et leurs produits jouets sont entrés dans la table de PRODUCTION, y recevant neuf pseudonymes consécutifs. La porte de publication a ensuite refusé le dépôt du pilot sur 81 constats bloquants, tous portant sur des noms qui n'existent pas et ne sont le nom de personne. La table a été restaurée depuis sa version consignée, le diff prouvant qu'aucune clé légitime n'avait été perdue. TROIS NIVEAUX DE CORRECTION, dont deux sont posés</li><li>POSÉ — les cinq bancs posent désormais leurs tables jetables sous le répertoire temporaire, comme les six autres bancs de la même famille le faisaient déjà ; les sous-processus qu'ils lancent en héritent, donc toute la chaîne est isolée</li><li>POSÉ — la fonction d'extension refuse d'écrire hors du répertoire temporaire quand le point d'entrée du processus est un banc, avec une fixture pure à deux sens : un chemin hors du temporaire est interdit, la table jetable d'un banc correct est autorisée</li><li>RESTE À FAIRE — cette garde ne voit PAS un banc qui lance l'ingestion en SOUS-PROCESSUS, où le point d'entrée n'est plus un fichier de banc ; c'est précisément le cas des cinq bancs incriminés, et seule la correction</li><li>les protège aujourd'hui. Un sixième banc écrit demain repartirait avec le défaut. Demande : un marqueur d'isolement propagé aux sous-processus, ou une autorisation explicite d'extension que seule la chaîne d'ingestion réelle porte. La classe voisine est déjà nommée dans le même module depuis le 02/09 : la garde « un nom de moins de 5 caractères ne s'inscrit pas » est née d'une fixture non isolée, et elle traitait la longueur du nom, pas la cause</li></ul></div>
+          <h3 class="card-titre">canal confidentiel : une clé DÉJÀ pseudonymisée peut entrer dans une table de noms réels, et rien ne l'en empêche — l'arbitrage du 08/09 l'a fait une fois, la porte l'a rattrapé</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat né de l'arbitrage des tables du 08/09 au matin.</p><ul class="puces"><li>En fusionnant les tables des deux postes, un pseudonyme déjà attribué a été inscrit comme s'il était un nom réel à pseudonymiser : la table s'est mise à pseudonymiser son propre pseudonyme, et la porte de publication a condamné trois dépôts avant que la rectification soit faite à la main</li><li>Le module d'anonymisation du pilot porte DÉJÀ la garde équivalente depuis le 02/09 — « un nom qui EST déjà un pseudonyme ne s'inscrit pas », avec son commentaire expliquant qu'une table qui pseudonymise ses propres pseudonymes tourne en rond et décale tout le parc d'un cran à chaque tour</li><li>L'oracle du canal, lui, ne la porte pas : il vérifie qu'un pseudonyme est unique par produit, jamais qu'une CLÉ n'est pas elle-même un pseudonyme</li><li>Demande : une règle de l'oracle du canal qui refuse toute clé de la forme d'un pseudonyme dans les deux tables, avec sa fixture rouge (une clé pseudonyme refusée, avec le pseudonyme qu'elle porte déjà) et sa fixture verte (un nom réel ordinaire accepté)</li><li>La leçon existait, elle était écrite, et elle n'avait pas été reprise là où elle valait aussi</li></ul></div>
           <dl class="card-meta">
             <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>81 constats bloquants de la porte de publication sur le dépôt du pilot, neuf clés parasites dans le référentiel de production, et une table restaurée à la main ; le défaut est passé inaperçu jusqu'à ce que la porte soit rejouée</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>trois dépôts condamnés par la porte de publication et une rectification manuelle de la table, le 08/09 au matin, sur un défaut dont la garde était déjà écrite ailleurs depuis six jours</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
             
           </dl>
@@ -635,6 +636,29 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>six retours humains en une journée sur des règles écrites ; neuf tours rendus sans mécanisme de jugement</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-10_Reporting</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0957" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0957</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : cinq bancs de test n'isolaient pas leurs tables et ont écrit neuf produits de fixture dans le référentiel RÉEL des pseudonymes — la porte de publication a refusé le dépôt sur 81 constats nés de noms inventés</h3>
+          <div class="card-detail" data-cite><p class="lead">Mesuré le 08/09 après-midi, en jouant les 46 bancs du dépôt d'affilée avec FORGE_NOMS_INTERDITS et FORGE_PRODUITS_PSEUDO exportés vers les tables réelles du canal confidentiel — ce que fait n'importe quelle session ouverte.</p><ul class="puces"><li>Cinq bancs ne posaient pas leurs propres tables jetables : ils ont hérité de l'environnement, et leurs produits jouets sont entrés dans la table de PRODUCTION, y recevant neuf pseudonymes consécutifs. La porte de publication a ensuite refusé le dépôt du pilot sur 81 constats bloquants, tous portant sur des noms qui n'existent pas et ne sont le nom de personne. La table a été restaurée depuis sa version consignée, le diff prouvant qu'aucune clé légitime n'avait été perdue. TROIS NIVEAUX DE CORRECTION, dont deux sont posés</li><li>POSÉ — les cinq bancs posent désormais leurs tables jetables sous le répertoire temporaire, comme les six autres bancs de la même famille le faisaient déjà ; les sous-processus qu'ils lancent en héritent, donc toute la chaîne est isolée</li><li>POSÉ — la fonction d'extension refuse d'écrire hors du répertoire temporaire quand le point d'entrée du processus est un banc, avec une fixture pure à deux sens : un chemin hors du temporaire est interdit, la table jetable d'un banc correct est autorisée</li><li>RESTE À FAIRE — cette garde ne voit PAS un banc qui lance l'ingestion en SOUS-PROCESSUS, où le point d'entrée n'est plus un fichier de banc ; c'est précisément le cas des cinq bancs incriminés, et seule la correction</li><li>les protège aujourd'hui. Un sixième banc écrit demain repartirait avec le défaut. Demande : un marqueur d'isolement propagé aux sous-processus, ou une autorisation explicite d'extension que seule la chaîne d'ingestion réelle porte. La classe voisine est déjà nommée dans le même module depuis le 02/09 : la garde « un nom de moins de 5 caractères ne s'inscrit pas » est née d'une fixture non isolée, et elle traitait la longueur du nom, pas la cause</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>81 constats bloquants de la porte de publication sur le dépôt du pilot, neuf clés parasites dans le référentiel de production, et une table restaurée à la main ; le défaut est passé inaperçu jusqu'à ce que la porte soit rejouée</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
             
           </dl>
         </article>
@@ -1593,6 +1617,29 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-decide" id="item-TF-0958" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0958</code>
+            <span class="statut s-decide">decide</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-forge-agents (quality-oracles) : la porte de publication prend 81 à 99 s sur le dépôt du pilot avec un jeu d'essai MINIMAL, et le facteur est le nombre de termes cherchés — un gate à ce prix se contourne</h3>
+          <div class="card-detail" data-cite><p class="lead">Mesuré le 08/09 après-midi par deux sources indépendantes, sur le même dépôt et avec des protocoles différents.</p><ul class="puces"><li>CÔTÉ PILOT : trois exécutions de la porte sur digit-ai-factory avec les tables réelles du canal, chacune dépassant le délai de 120 s du lanceur et devant partir en tâche de fond — ordre de grandeur 2 à 4 minutes. CÔTÉ CAMPAGNE, protocole propre (deux passes pour absorber le cache disque, mêmes tables pour toutes les passes, exécutions séquentielles pour éviter la contention) : 81 s et 99 s sur ce même dépôt de 900 révisions et 1369 fichiers suivis, avec un jeu d'essai de seulement 4 termes clients et 2 noms de produits. L'écart entre les deux mesures s'explique par la taille des tables : le temps croît avec le nombre de termes, ce qui confirme la cause. LA CAUSE, telle que la campagne l'a lue dans le code : la règle qui balaie l'historique lance une invocation de recherche PAR TERME et PAR LOT de révisions — 4 termes × 6 lots de 150 révisions = 24 invocations sur 900 révisions, là où 6 suffiraient. Les termes qui partagent leurs drapeaux de recherche (sensibilité à la casse, frontière de mot) tiennent dans UNE passe avec autant d'aiguilles</li><li>le prix du groupage est que la passe ne dit plus laquelle a mordu, mais l'identification fine ne coûte qu'une relecture des seules correspondances — c'est-à-dire presque jamais, le cas nominal d'une porte étant de ne rien trouver. La technique est déjà écrite par la campagne pour la règle des produits</li><li>elle vaut telle quelle pour celle des clients. POURQUOI CE N'EST PAS UN CONFORT : un contrôle bloquant qui coûte deux à quatre minutes à chaque publication ne protège plus rien le jour où quelqu'un apprend l'option qui le saute — et cette option est documentée dans le hameçon lui-même. La lenteur d'un gate est un défaut de sécurité, pas d'ergonomie. Demande : grouper les termes partageant leurs drapeaux en une passe par groupe, avec raffinement a posteriori sur les seules correspondances, et déclarer au non_jugé le temps mesuré sur le plus gros dépôt du parc. La campagne qui l'a diagnostiqué ne l'a délibérément PAS corrigé : la règle des clients n'est pas dans ses items, et y toucher aurait été le refactor opportuniste que le contrat de campagne interdit</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>81 s et 99 s mesurés avec 4 termes seulement ; 2 à 4 min avec les tables réelles, trois fois ; une première extension de la règle a doublé ce temps (177 s et 183 s) avant d'être reprise, ce qui montre que le motif se reproduit dès qu'on ajoute un angle</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-decide" id="item-TF-0953" data-cite data-forge="digit-ai-forge-agents" data-statut="decide" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0953</code>
@@ -1722,29 +1769,6 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6.7 — gain 4 × preuve 5 ÷ effort 3)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>un retour humain nommant un composant externe ; composant réécrit chez le produit</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-62</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-0958" data-cite data-forge="digit-ai-forge-agents" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0958</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 12.5)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-forge-agents (quality-oracles) : la porte de publication prend 81 à 99 s sur le dépôt du pilot avec un jeu d'essai MINIMAL, et le facteur est le nombre de termes cherchés — un gate à ce prix se contourne</h3>
-          <div class="card-detail" data-cite><p class="lead">Mesuré le 08/09 après-midi par deux sources indépendantes, sur le même dépôt et avec des protocoles différents.</p><ul class="puces"><li>CÔTÉ PILOT : trois exécutions de la porte sur digit-ai-factory avec les tables réelles du canal, chacune dépassant le délai de 120 s du lanceur et devant partir en tâche de fond — ordre de grandeur 2 à 4 minutes. CÔTÉ CAMPAGNE, protocole propre (deux passes pour absorber le cache disque, mêmes tables pour toutes les passes, exécutions séquentielles pour éviter la contention) : 81 s et 99 s sur ce même dépôt de 900 révisions et 1369 fichiers suivis, avec un jeu d'essai de seulement 4 termes clients et 2 noms de produits. L'écart entre les deux mesures s'explique par la taille des tables : le temps croît avec le nombre de termes, ce qui confirme la cause. LA CAUSE, telle que la campagne l'a lue dans le code : la règle qui balaie l'historique lance une invocation de recherche PAR TERME et PAR LOT de révisions — 4 termes × 6 lots de 150 révisions = 24 invocations sur 900 révisions, là où 6 suffiraient. Les termes qui partagent leurs drapeaux de recherche (sensibilité à la casse, frontière de mot) tiennent dans UNE passe avec autant d'aiguilles</li><li>le prix du groupage est que la passe ne dit plus laquelle a mordu, mais l'identification fine ne coûte qu'une relecture des seules correspondances — c'est-à-dire presque jamais, le cas nominal d'une porte étant de ne rien trouver. La technique est déjà écrite par la campagne pour la règle des produits</li><li>elle vaut telle quelle pour celle des clients. POURQUOI CE N'EST PAS UN CONFORT : un contrôle bloquant qui coûte deux à quatre minutes à chaque publication ne protège plus rien le jour où quelqu'un apprend l'option qui le saute — et cette option est documentée dans le hameçon lui-même. La lenteur d'un gate est un défaut de sécurité, pas d'ergonomie. Demande : grouper les termes partageant leurs drapeaux en une passe par groupe, avec raffinement a posteriori sur les seules correspondances, et déclarer au non_jugé le temps mesuré sur le plus gros dépôt du parc. La campagne qui l'a diagnostiqué ne l'a délibérément PAS corrigé : la règle des clients n'est pas dans ses items, et y toucher aurait été le refactor opportuniste que le contrat de campagne interdit</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 12.5 — gain 5 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-agents</dt><dd>81 s et 99 s mesurés avec 4 termes seulement ; 2 à 4 min avec les tables réelles, trois fois ; une première extension de la règle a doublé ce temps (177 s et 183 s) avant d'être reprise, ce qui montre que le motif se reproduit dès qu'on ajoute un angle</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot</dd></div>
             
           </dl>
         </article>
@@ -3898,9 +3922,32 @@
       </div>
     </section>
     <section id="digit-ai-page-html">
-      <h2>digit-ai-page-html <span class="badge" title="1 item(s) actifs ciblant digit-ai-page-html">1</span></h2>
+      <h2>digit-ai-page-html <span class="badge" title="2 item(s) actifs ciblant digit-ai-page-html">2</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-page-html</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0961" data-cite data-forge="digit-ai-page-html" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0961</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 7.5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-page-html : scripts/embarquer-composants.mjs ne s'importe pas et ne pose que dans le depot des skills — un produit qui embarque un composant du socle reecrit le poseur</h3>
+          <div class="card-detail" data-cite><p class="lead">Mesure du 03/09/2026. Le module exporte blocCanonique, echapper et sha, mais son analyse d'arguments s'execute a l'import : « if (constat === ecrire) { console.error(usage) ; process.exit(2) } » — tout import { blocCanonique } termine le processus avec le code 2 avant usage. Et --ecrire ne parcourt que SKILLSROOT (commentaire d'en-tete : « pose dans les pages du depot des skills »). Consequence : pour embarquer table-filters.js, table-filters.css et find-in-page.js dans un livrable avec les marqueurs COMPOSANT-EMBARQUE:DEBUT/FIN et l'empreinte sha256 que oracle-parite-assets attend, le produit a reimplemente le format du bloc en Python (echappement de &lt;/script, trois lignes de commentaire, attributs data-composant et data-empreinte). Copie conforme au format mais produite par un second outil — la classe de defaut que ce script a ete ecrit pour eliminer (« une copie non declaree est une fourche silencieuse »). PROPOSITION : separer l'API du point d'entree (analyse d'arguments sous if (import.meta.url === pathToFileURL(process.argv[1]).href)) et ajouter une commande --poser &lt;page.html&gt; --composants a.js,b.css qui pose les blocs dans n'importe quel fichier, hors du depot des skills — la parite devient jouable des deux cotes par le meme code, comme oracle-lot-retours.mjs l'est pour les lots.</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-03</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 7.5 — gain 3 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-page-html</dt><dd>un poseur reecrit en Python chez le produit pour trois composants, et trois copies dont la parite ne peut etre rejouee que par un outil maison</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-65</dd></div>
+            
+          </dl>
+        </article>
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
              titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
              socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
@@ -3921,6 +3968,81 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 7.5 — gain 3 × preuve 5 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-page-html</dt><dd>un poseur reecrit en Python chez le produit pour trois composants, et trois copies dont la parite ne peut etre rejouee que par un outil maison</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-03</dd></div>
+            
+          </dl>
+        </article>
+      </div>
+    </section>
+    <section id="factory">
+      <h2>factory <span class="badge" title="3 item(s) actifs ciblant factory">3</span></h2>
+      <p class="ch-apprend meta">Reste-à-faire ciblant <strong>factory</strong> — trié par statut puis priorité décroissante.</p>
+      <div class="cartes">
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0962" data-cite data-forge="factory" data-statut="candidat" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0962</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">factory : le TEXTE de la doctrine de restitution manquait chez le produit alors que le juge et le cablage etaient la, et le tableau de portee predit exactement ce que cela produit</h3>
+          <div class="card-detail" data-cite><p class="lead">Releve sur ce poste le 08/09/2026, apres retour humain.</p><ul class="puces"><li>Chez le produit : forge/hooks/factory.mjs PRESENT</li><li>claude/settings.json portant les quatre hooks PRESENT</li><li>forge/RESTITUTION.md ABSENT</li><li>forge/retours/CLASSES.json ABSENT alors que le gabarit des lots l exige depuis le 03/09. Le tableau de portee de gabarits/RESTITUTION.md nomme cet etat et sa consequence : « le juge refuse sans que rien n apprenne la forme : l agent devine ». La session a devine — trois messages de fin de traitement de 400 a 800 mots, dix blocs absents, aucun fichier ecrit, aucun jugement. Le retour humain recu est la phrase MEME que la v2.18.0 de la doctrine cite comme son propre retour fondateur : le defaut se reproduit chez un produit deux jours apres avoir ete corrige chez le pilot. Remede local applique et versionne (commit 6322ffe) : les deux artefacts sont recopies et suivis en git, pour qu un clone les porte sans dependre d une session d ouverture. Ce qui reste au pilot : que scripts/relever-heritage.mjs (R-47) distingue « absent » de « present perime » pour chaque copie identique declaree dans gabarits/HERITAGE.json, et que ce releve soit jouable SANS ouvrir de session sur le produit — puisque c est precisement l ouverture qui ne s est pas produite. Regle qui aurait evite le retour : oracles/hook-ouverture.mjs section « Heritage des produits », qui existe et n a pas ete jouee, ce qui est l objet du retour suivant</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur factory</dt><dd>trois messages de fin de traitement hors norme sur une session de plusieurs heures, un aller-retour humain, et la relecture des 822 lignes du gabarit pour reecrire la sortie</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-11</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0963" data-cite data-forge="factory" data-statut="candidat" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0963</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">factory : les trois pieces de la doctrine peuvent etre toutes presentes et conformes chez le produit et ne JAMAIS s executer, si la session s ouvre au-dessus de la racine du produit — et rien ne le dit</h3>
+          <div class="card-detail" data-cite><p class="lead">Fait mesure le 08/09/2026. La session travaillait depuis c:/dev/_Client-A/BourseAuxVacants2, qui CONTIENT Produit-11/ — le produit instancie, avec son forge/ et son .claude/settings.json — et deux dossiers voisins. La racine de session n a AUCUN .claude/ : ni SessionStart (ouverture) ni Stop (restitution) ne se sont declenches une seule fois en plusieurs heures, sur un mandat qui a produit trois commits, un deploiement et deux restitutions. Consequences enchainees, toutes constatees : le hook d ouverture n a pas recopie la doctrine, le hook de fin de tour n a refuse aucun message, et la session n a eu AUCUN signal — un hook qui ne s execute pas ne se distingue pas d un hook qui approuve. Le tableau de portee du gabarit nomme trois modes de defaillance (juge absent, cablage absent, texte absent) ; celui-ci est un QUATRIEME, il n y figure pas, et c est le seul ou les trois pieces sont conformes. C est aussi le plus probable en pratique : un produit livre dans un dossier de travail client se retrouve presque toujours imbrique. Trois pistes, la premiere suffisant a rendre le defaut visible : (1) que oracles/oracle-portee-doctrine.mjs ajoute un controle PD3 — si un forge/ est trouve dans un SOUS-dossier du repertoire courant et non dans le repertoire courant, le dire, avec le geste qui repare ; (2) que l heritage propose un .claude/settings.json au niveau de l espace de travail ENGLOBANT quand le produit est imbrique, deleguant au hook du sous-dossier ; (3) detection retrospective bon marche : un produit dont forge/ledger.jsonl porte des entrees du jour sans aucune trace d ouverture du meme jour a travaille hors doctrine. AUCUNE CLASSE de CLASSES.json v1.3.1 ne couvre ce defaut : heritage-avertissement-tardif vise l avertissement qui arrive trop tard, pas le mecanisme qui ne se declenche jamais. Classe proposee au pilot, a creer dans son referentiel et jamais dans ce sidecar : doctrine-non-declenchee-racine-au-dessus-du-produit, famille heritage-produit. La cle portee ci-dessous est donc la VOISINE la plus proche, faute de mieux.</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur factory</dt><dd>une session entiere hors doctrine sans aucun signal, decouverte par contestation humaine et non par un controle ; les dix retours du gabarit v2.5.0 a v2.18.0 sont sans effet sur un produit dans cet etat</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-11</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0964" data-cite data-forge="factory" data-statut="candidat" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0964</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">factory : une lecon payee et commentee dans un module d un produit n a aucun mecanisme pour atteindre le module suivant du MEME produit, et aucun oracle vert ne le voit</h3>
+          <div class="card-detail" data-cite><p class="lead">Fait mesure le 08/09/2026 sur ce depot. backend/src/alerts/expedition.py porte depuis le 06/09 un commentaire de neuf lignes intitule « le client_id est EXIGE ici, et ce n est pas de la prudence decorative » : il explique que l application ne porte qu une identite manageee ASSIGNEE PAR L UTILISATEUR et qu un fournisseur de jetons sans client_id echoue avec un message qui ne nomme pas la cause. Le module de stockage d images ecrit deux jours plus tard a construit DefaultAzureCredential() SANS argument, et a echoue exactement de cette facon dans le conteneur servi : trois ecrans enumerant PowerShell, Azure Developer CLI et un courtier interactif, la vraie cause absente. Ni la revue, ni ruff, ni bandit, ni 819 tests verts ne pouvaient le voir — les tests de route remplacent le client de stockage, ceux du client remplacent le container. Le defaut n a ete trouve qu en executant le code dans le conteneur deploye, par az containerapp exec. Deux pistes. (a) Un oracle statique bon marche : DefaultAzureCredential() construit sans managed_identity_client_id dans un depot dont le deploiement pose une identite assignee par l utilisateur est detectable par lecture, et la classe est frequente hors de ce produit. (b) Plus general et plus utile : la doctrine exige une preuve d oracle EXECUTE au bloc 4 d une restitution, sans exiger que la preuve soit produite LA OU LE CODE TOURNE. Ici tous les oracles etaient verts et la fonctionnalite etait cassee. Une regle du type « une chaine d authentification a un service externe se prouve dans l environnement cible, pas au banc » fermerait la classe. Regle existante la plus proche : aucune, ce qui designe un trou du socle au sens du paragraphe 4 de quality-oracles.</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-08</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur factory</dt><dd>un premier deploiement en dev livre avec la fonctionnalite cassee, 826 tests verts a l appui ; le defaut trouve par execution dans le conteneur, puis un second commit et un second deploiement</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-11</dd></div>
             
           </dl>
         </article>
@@ -4112,7 +4234,7 @@
       </div>
     </section>
     <section id="pilot">
-      <h2>pilot <span class="badge" title="10 item(s) actifs ciblant pilot">10</span></h2>
+      <h2>pilot <span class="badge" title="11 item(s) actifs ciblant pilot">11</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>pilot</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
@@ -4158,6 +4280,29 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur pilot</dt><dd>mesure le 24/08 : sur les trois produits localisables du poste, DEUX sont en defaut d'heritage et UN n'a jamais ete instancie — soit zero produit conforme sur trois. Celui decouvert aujourd'hui cumule quatre artefacts absents et l'absence totale de depot git : tout travail qui y serait fait est hors de portee d'un `git log`, d'un `git diff` et de toute restauration.</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant du 24/08, mandat « rejouer R-47 » — constat =&gt; candidat)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-0960" data-cite data-forge="pilot" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0960</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : aucune famille de gabarits/documents/catalogue.jsonl ne couvre un plan d'ordonnancement de mise en production — le document a ete bati entierement a la main et son en-tete declare « aucun gabarit »</h3>
+          <div class="card-detail" data-cite><p class="lead">Mesure du 03/09/2026 sur les 30 familles du catalogue du pilot.</p><ul class="puces"><li>dossier-mep est porte_ailleurs (ETAPE-MEP.md, format md), checklist-go-prod est porte_ailleurs chez forge-audit (liste de presence), dossier-cab est a_extraire. Aucune ne decrit un ORDONNANCEMENT : etapes identifiees, nature du geste (decider/construire/corriger/configurer/executer), dependances, proprietaire, niveau de blocage (MEP / fenetre / non bloquant), preuve de fin, phases datees. Consequence : la page « Ordonnancement des etapes de MEP - 20260903a » a ete construite entierement a la main sur assets/boilerplate.html (en-tete, KPI, legende, sept tableaux, chapitre des inversions), et son en-tete declare « aucun gabarit », ce qui rend tout retour ulterieur sur sa forme impossible a rattacher (G8 : fil gabarit + version_du_gabarit). Le meme trou existait dans ce projet pour la fiche securite (RA-33 du 24/08). PROPOSITION : creer la famille ordonnancement-mep (ou etendre dossier-mep d'un format HTML) : sections fixes comment lire / lots ordonnes / ecarts hors chemin / inversions interdites / lecture pour le comite</li><li>tableau normatif a colonnes fixes (#, objet, nature, a faire, depend de, proprietaire, bloquant, preuve de fin)</li><li>badges de nature et de blocage avec legende</li><li>data-v sur les colonnes temporelles. Provenance disponible : ce livrable, juge PASS par check_html.py (36/36), render_page.py (4 largeurs, ferme et etats ouverts) et oracle-filtres-tableau.mjs</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-03</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur pilot</dt><dd>une page de 127 Ko ecrite integralement hors gabarit (sept tableaux, en-tete, KPI, legende), une heure d'agent, et un document sans fil gabarit/version : aucun retour de forme ne pourra lui etre rattache</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-65</dd></div>
             
           </dl>
         </article>
