@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=32a176fa1ec8 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T09:58:44.332Z -->
+     sceaux: actifs=d2a893afd5b3 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T10:20:21.157Z -->
 
-**162 actifs** (candidat 6 · décidé 48 · en cours 5 · corrigé 103 · écarté 0) · **782 archivés**.
+**163 actifs** (candidat 6 · décidé 48 · en cours 5 · corrigé 104 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -46,6 +46,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0906 | corrige | 12.5 | digit-ai-factory : un produit CRÉÉ par le mandat le jour même a été traité comme « existant antérieur à la doctrine » (TF-0266) — neuf tours sans CLAUDE.md, hooks ni socle documentaire, six retours humains évitables | **oui** — six retours humains en une journée sur des règles écrites ; neuf tours rendus sans mécanisme de jugement |
 | TF-0913 | corrige | 12 | pilot : anonymiser-suivis --fichiers remplace l'alias le plus COURT d'un produit avant son nom complet — un lot pseudonymisé sous le mauvais numéro (Produit-10 au lieu de Produit-62), quinze fichiers renommés puis corrigés à la main le 08/09 | **oui** — quinze fichiers publiables réécrits sous un pseudonyme faux le 08/09, détectés par lecture humaine de l'index de la boîte et non par un oracle ; correction manuelle ≈ 10 min ; sans détection, un lot attribué au mauvais produit au registre des lots publiés |
 | TF-0924 | corrige | 12 | pilot : le second volet du correctif remis par un produit sur les projections de documentation n'est pas appliqué — le générateur du registre produit reste hors du geste, son dossier étant interdit à l'agent de campagne | **oui** — une projection de documentation du pilot tient les règles qu'il impose, l'autre non — mesuré à 34 % de largeur utile sur grand écran |
+| TF-0945 | corrige | 12 | pilot : la page d archive du registre ne marquait pas la prose qu elle CITE, et ses juges de forme lisaient les mots des emetteurs comme si la page les avait ecrits | **oui** — douze constats bloquants permanents sur une page generee du pilot, invisibles parce que personne ne jouait le controle sur elle |
 | TF-0892 | corrige | 10 | digit-ai-factory : RUN-MANDAT sur un existant (R-35) laisse démarrer sans .claude/settings.json ni forge/hooks/factory.mjs — le hook Stop n'a jamais tourné, la restitution n'a été jugée qu'à la main | **oui** — aucun hook exécuté pendant tout le mandat ; le défaut RF-1 n'a été vu que par le destinataire |
 | TF-0898 | corrige | 10 | digit-ai-factory : onze livrables d'un mandat nommés « AAAAMMJJ-objet.ext » au lieu de « <Marque> - <Objet> - AAAAMMJJ<indice>.<ext> » — R-4 n'est jugée que par oracle-conformite-projet, jamais joué sans socle, et RUN-MANDAT nomme la règle sans sa forme | **oui** — un tour humain, onze renommages, trois synthèses et une page HTML rejugées |
 | TF-0902 | corrige | 10 | digit-ai-factory : la règle 7 (livrable remplacé → old\) n'est ni citée dans RUN-MANDAT, ni jouée par un oracle (R-7 aveugle à deux versions cohabitant dans output\), ni vue par S16 quand la synthèse pose à l'humain une décision que la doctrine tranche | **oui** — un tour humain consommé par une décision déjà tranchée ; rangement fait en une commande une fois la règle lue |

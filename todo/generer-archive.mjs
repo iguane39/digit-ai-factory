@@ -168,8 +168,15 @@ const FORGES = [...new Set(items.map((e) => canon(forgeBrute(e))))].sort();
 const ligne = (dt, valeur, opt = {}) => {
   if (!valeur) return "";
   const corps = opt.pleine ? prose(valeur, "jalon-prose") : escLit(valeur);
+  // TF-0940 (08/09/2026) — UN CHAMP LONG EST UNE CITATION, ET IL SE MARQUE COMME TELLE.
+  // La vue COURANTE marque sa carte entière `data-cite` depuis TF-0517 ; l'archive ne le faisait
+  // ni pour ses cartes ni pour ses champs longs, et les juges de forme y lisaient donc la prose
+  // des ÉMETTEURS comme si la page l'avait écrite : 12 constats « identifiant muet » sur cette
+  // seule page, tous dans des champs cités, avant même qu'une règle neuve n'en ajoute d'autres.
+  // Le marquage porte sur le `dd` qui contient la prose, pas sur la ligne entière : l'intitulé
+  // (`dt`) est écrit par cette page et reste jugé.
   return `<div${opt.pleine ? ' class="pleine"' : ""}><dt>${esc(dt)}</dt>`
-    + `<dd${opt.legende ? ` title="${esc(opt.legende)}"` : ""}>${corps}</dd></div>`;
+    + `<dd${opt.pleine ? " data-cite" : ""}${opt.legende ? ` title="${esc(opt.legende)}"` : ""}>${corps}</dd></div>`;
 };
 const listeOuTexte = (v) => (Array.isArray(v) ? v.filter(Boolean).join(", ") : v);
 
@@ -210,7 +217,7 @@ const rendCarte = (e) => {
   // de contenu caché) se rend OUVERTE — mieux vaut tout montrer qu'un clic pour rien.
   const volume = jalons.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().length;
   return `
-        <article class="card s-${st}" id="item-${esc(e.id)}" data-forge="${esc(canon(brute))}" data-statut="${st}">
+        <article class="card s-${st}" id="item-${esc(e.id)}" data-cite data-forge="${esc(canon(brute))}" data-statut="${st}">
           <header class="card-head">
             <code class="tf-id">${esc(e.id)}</code>
             <span class="statut s-${st}">${LABEL_STATUT[st]}</span>
@@ -378,7 +385,12 @@ const html = `<!DOCTYPE html>
     .card-detail .lead{margin:.2em 0 .4em}
     .detail-label{font-family:var(--head);font-weight:700;font-size:.82rem;color:var(--muted);margin:.6em 0 .2em;text-transform:uppercase;letter-spacing:.03em}
     .puces{margin:.2em 0 .4em;padding-left:1.2em} .puces li{margin:.28em 0}
-    .card-detail,.card-detail li,.jalon-meta dd{overflow-wrap:anywhere}
+    /* TF-0940 : la coupure forcée est réservée aux jetons TECHNIQUES (chemins, identifiants),
+       jamais posée sur de la prose entière — un mot y casserait en deux au milieu d une ligne. */
+    .card-detail code,.card-detail .chemin,.jalon-meta dd code{overflow-wrap:anywhere}
+    .card-detail,.card-detail li,.jalon-meta dd{overflow-wrap:break-word}
+    .ch-apprend{color:var(--muted);margin:.2em 0 .8em}
+    [hidden]{display:none !important}
     /* histoire dépliable : la frise des jalons, création → archivage */
     .histoire{margin:14px 0 0;padding-top:12px;border-top:1px solid var(--line)}
     .histoire>summary{font-family:var(--head);font-weight:700;font-size:.8rem;color:var(--muted);
