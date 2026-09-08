@@ -96,7 +96,7 @@ Quatre décisions, toutes des gestes que la doctrine réserve à l'humain : publ
 - Les trois items laissés en cours : un diagnostic dont la correction vit chez le socle des pages, et deux paliers de stratégie de tests dont la condition de clôture exige une campagne sur un produit réel, que la recette a refusé de déclarer tenue sur un banc.
 - Les six volets d'oracle proposés par les items du pilot et non livrés par sa campagne : journalisés en candidature plutôt que bâclés, parce que cinq vivent dans le même juge et que la doctrine interdit de le faire monter deux fois dans la même session.
 - Les huit candidatures des trois lots arrivés en fin de mandat : entrées au registre en candidat, non décidées, parce qu'une candidature ne se décide pas seule.
-- Le lot du 03/09 non suivi, le fichier parasite à la racine du parc, les deux réserves du 01/09 : inchangés.
+- Le fichier parasite à la racine du parc et les deux réserves du 01/09 : inchangés. Le lot du 03/09, lui, est entré dans le suivi avec les lots du jour : la porte de publication rejouée sur le dépôt le déclare acceptable (PASS, aucun bloquant), son nom ne figurant dans aucune des deux tables — il reste néanmoins à rattacher à un produit lors de l’arbitrage.
 
 ## 6. Écarts à la lettre
 
