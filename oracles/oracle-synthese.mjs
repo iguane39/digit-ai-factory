@@ -73,6 +73,10 @@
  *   S35 une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » (02/09, TF-0766) ;
  *   S36 une page HTML citée comme livrée porte un verdict de critique d'implémentation (02/09, TF-0775) ;
  *   S37 une correction restituée porte son contrôle rouge → vert ou nomme sa classe (02/09, TF-0779) ;
+ *   S38 une action de TEST `auto_ia` n'est pas laissée non exécutée sous un motif d'EXEMPTION
+ *       (`hors_mandat`, `borne_atteinte`) — un test jouable s'exécute, règle 40 (08/09, TF-0923) ;
+ *   S39 une remontée annoncée au bloc 4 porte son identifiant — « remonté » sans identifiant se lit
+ *       « traité » et vaut « déposé, non traité », donc un reste du bloc 5 (08/09, TF-0923) ;
  *       et né du même retour : « le 3 était pour les prochaines actions ». Deux familles
  *       numérotées pareil ne se désignent pas ; le sélecteur nomme la sienne.
  *   S31 chaque OPTION du bloc 3 porte son COÛT et CE QU'ELLE EXCLUT (30/08) — exigence écrite
@@ -748,6 +752,51 @@ function juger(texte) {
     sansClasse.length
       ? ko("S37", `${sansClasse.length} correction(s) restituée(s) sans contrôle rouge → vert ni classe nommée — une correction après retour humain traite le symptôme, jamais la classe : « ${sansClasse[0].trim().slice(0, 90)} »`)
       : ok("S37", corrections.length ? "chaque correction restituée porte son contrôle rouge → vert ou nomme sa classe" : "aucune correction restituée");
+  }
+
+  // ---- S38 et S39 (08/09/2026, TF-0923 — deux des six volets proposés le 08/09 et jamais joués) -
+  //
+  // Le constat qui les fait naître est le même pour les six : la doctrine correspondante était
+  // écrite et opposable, et AUCUN contrôle ne la jouait. Une règle que rien n'exécute décore.
+  //
+  // S38 — UN TEST JOUABLE S'EXÉCUTE ; UN MOTIF D'EXEMPTION NE LE DISPENSE PAS. Le fait du 07/09
+  // (TF-0905) : une réponse a PROPOSÉ trois niveaux de tests, tous jouables en lecture seule, sans
+  // en exécuter un seul. La règle 40 — « un test proposé s'exécute » — existait ; S11 ne vérifiait
+  // que la PRÉSENCE d'un motif de non-exécution, jamais sa légitimité. Or deux des six motifs du
+  // vocabulaire de S11 sont des motifs d'EXEMPTION — `hors_mandat` et `borne_atteinte` : ils
+  // disent « ce n'est pas à moi » ou « j'ai atteint ma borne », et ils satisfont S11 sans que rien
+  // n'ait été mesuré. Apposés sur une action de TEST, ils transforment la règle 40 en intention.
+  //
+  // POURQUOI CES DEUX-LÀ SEULEMENT, et pas les quatre autres. `dependance_bloc_3`,
+  // `gate_gouvernance`, `garde_fou` et `dependance_externe` nomment un OBSTACLE extérieur à
+  // l'auteur : une décision qu'il n'a pas prise, une gate humaine, un service qui ne répond pas.
+  // Un test réellement bloqué par l'un d'eux reste non exécuté sans faute — et la fixture verte le
+  // prouve, sans quoi cette règle mordrait sur un travail juste. Les deux motifs d'exemption, eux,
+  // sont des déclarations de PÉRIMÈTRE que l'auteur écrit seul : c'est le seul endroit où le
+  // vocabulaire de S11 peut servir à se dispenser de mesurer.
+  {
+    const bActions = bloc(texte, BLOCS[7][0]) || "";
+    const TEST = uni(/\b(tests?|recettes?|bancs?|couverture|self-test|jeu d'essai|oracles?)\b/i);
+    const EXEMPTION = /\b(hors_mandat|borne_atteinte)\b/;
+    const testsIA = actionsGroupees(bActions).filter((g) => /\bauto_ia\b/.test(g) && TEST.test(g));
+    const esquives = testsIA.filter((g) => EXEMPTION.test(g));
+    esquives.length
+      ? ko("S38", `${esquives.length} action(s) de TEST sur ${testsIA.length} sont laissées non exécutées sous un motif d'EXEMPTION (\`hors_mandat\`, \`borne_atteinte\`) — un test jouable s'exécute (règle 40) ; ces deux motifs déclarent un périmètre, ils ne mesurent rien : « ${esquives[0].replace(/\s+/g, " ").trim().slice(0, 110)} »`)
+      : ok("S38", testsIA.length ? `${testsIA.length} action(s) de test \`auto_ia\` — aucune ne s'exempte de mesurer` : "aucune action de test `auto_ia` non exécutée");
+  }
+  // S39 — « REMONTÉ » N'EST PAS « TRAITÉ », SAUF SI LE DÉPÔT EST TRAÇABLE. Déposer un constat chez
+  // une autre forge est un geste réel, et le bloc 4 a raison de le dire. Mais SANS IDENTIFIANT, le
+  // lecteur ne peut ni retrouver ce qui a été remonté, ni savoir si quelqu'un l'a pris : la ligne
+  // se lit « traité » et vaut « déposé, non traité » — c'est-à-dire un reste, qui appartient au
+  // bloc 5 avec son motif (S5). Avec son identifiant, elle redevient ce qu'elle prétend être : une
+  // chose qu'on peut aller voir. La règle ne juge donc PAS la remontée, elle juge sa traçabilité.
+  {
+    const bTraite = bloc(texte, BLOCS[3][0]) || "";
+    const remontees = puces(bTraite).filter((l) => uni(/\bremont[ée]e?s?\b/i).test(l));
+    const sansId = remontees.filter((l) => !ID_STABLE.test(l));
+    sansId.length
+      ? ko("S39", `${sansId.length} remontée(s) sur ${remontees.length} sont annoncées au bloc 4 SANS identifiant — « remonté » sans identifiant se lit « traité » et vaut « déposé, non traité » : la ligne appartient au bloc 5 avec son motif, ou porte l'identifiant qui la rend retrouvable : « ${sansId[0].trim().slice(0, 90)} »`)
+      : ok("S39", remontees.length ? `${remontees.length} remontée(s) du bloc 4 portent leur identifiant` : "aucune remontée annoncée au bloc 4");
   }
 
   // ---- S21 (TF-0526, 23/08) — « acces » et « presence » se PROUVENT, ils ne s'affirment pas ---
@@ -1776,6 +1825,30 @@ Aucun écart : la demande a été suivie à la lettre.
   const accentFinal = verte.replace("publication TENTÉE le 14/08, `HTTP 403 Authorization_RequestDenied` ;",
     "accès tenté le 14/08, sortie de `git push` : refusé par le portail ;");
   writeFileSync(join(dir, "accent-final.md"), accentFinal, "utf8");
+  // 08/09 — S38 ET S39 DANS LEURS DEUX SENS (TF-0923). Chacune tient sur UN mot : le motif pour
+  // S38, l'identifiant pour S39. Les deux fixtures d'une paire sont donc identiques à ce mot près
+  // — c'est la seule forme qui prouve que la règle juge bien ce qu'elle prétend juger, et non le
+  // reste de la ligne. Sans le sens VERT, S38 accuserait tout test non exécuté, y compris celui
+  // qu'un obstacle extérieur bloque réellement, et S39 accuserait toute remontée : on aurait
+  // remplacé un trou par une règle qui crie sur un travail juste.
+  const ACTION_TEST = "- **A-3** — enfin TF-0222 (auto_ia) — jouer la recette de couverture du mapping.\n"
+    + "  - motif de non-exécution : MOTIF — la recette est jouable en lecture seule.\n"
+    + "  - si rien n'est fait : la couverture reste annoncée et jamais mesurée.\n";
+  const avecTest = (motif) => verte.replace(
+    /- \*\*A-3\*\* — enfin TF-0222 \(auto_ia\)[\s\S]*$/,
+    ACTION_TEST.replace("MOTIF", motif));
+  const testEsquive = avecTest("hors_mandat");
+  const testBloque = avecTest("dependance_bloc_3");
+  writeFileSync(join(dir, "test-esquive.md"), testEsquive, "utf8");
+  writeFileSync(join(dir, "test-bloque.md"), testBloque, "utf8");
+  // S39 : la MÊME puce de bloc 4, avec et sans son identifiant. « remonté à forge-design » se lit
+  // « traité » dans les deux cas ; seul l'identifiant dit au lecteur où aller voir.
+  const REMONTEE = "- Défaut de contraste remonté à forge-design — preuve : `check_contrast` 3 constats.";
+  const remonteeNue = verte.replace("## 5. Non traité", REMONTEE + "\n\n## 5. Non traité");
+  const remonteeTracee = verte.replace("## 5. Non traité",
+    REMONTEE.replace("forge-design", "forge-design (TF-0930)") + "\n\n## 5. Non traité");
+  writeFileSync(join(dir, "remontee-nue.md"), remonteeNue, "utf8");
+  writeFileSync(join(dir, "remontee-tracee.md"), remonteeTracee, "utf8");
   const moi = fileURLToPath(import.meta.url);
   const rv = spawnSync(process.execPath, [moi, join(dir, "verte.md")], { encoding: "utf8" });
   const rr = spawnSync(process.execPath, [moi, join(dir, "rouge.md")], { encoding: "utf8" });
@@ -1920,9 +1993,28 @@ Aucun écart : la demande a été suivie à la lettre.
       casse.push("les memes rappels courts SANS chapeau commun passent S15 — l'assouplissement aurait supprime la regle");
     }
   }
+  // 08/09 — S38 ET S39, LEURS DEUX SENS CHACUNE (TF-0923).
+  const rte = spawnSync(process.execPath, [moi, join(dir, "test-esquive.md")], { encoding: "utf8" });
+  const rtb = spawnSync(process.execPath, [moi, join(dir, "test-bloque.md")], { encoding: "utf8" });
+  if (!/"S38"[^}]*FAIL/.test(rte.stdout))
+    casse.push("S38 : une action de TEST laissée non exécutée sous `hors_mandat` passe — la règle 40 " +
+      "redevient une intention, et c'est exactement le cas du 07/09 où trois niveaux de tests jouables ont été PROPOSÉS sans qu'un seul tourne");
+  if (!/"S38"[^}]*PASS/.test(rtb.stdout))
+    casse.push("S38 : le MÊME test, bloqué par `dependance_bloc_3` — un obstacle extérieur à l'auteur —, est accusé : " +
+      "la règle mordrait sur un travail juste : " + (/"S38"[\s\S]{0,180}/.exec(rtb.stdout) || [""])[0].replace(/\s+/g, " "));
+  const rrn = spawnSync(process.execPath, [moi, join(dir, "remontee-nue.md")], { encoding: "utf8" });
+  const rrt = spawnSync(process.execPath, [moi, join(dir, "remontee-tracee.md")], { encoding: "utf8" });
+  if (!/"S39"[^}]*FAIL/.test(rrn.stdout))
+    casse.push("S39 : une remontée annoncée au bloc 4 SANS identifiant passe pour traitée — le lecteur ne peut " +
+      "ni la retrouver ni savoir si quelqu'un l'a prise, donc elle vaut « déposé, non traité »");
+  if (!/"S39"[^}]*PASS/.test(rrt.stdout))
+    casse.push("S39 : la MÊME remontée, avec son identifiant, est accusée — la règle juge la remontée au lieu de sa traçabilité : " +
+      (/"S39"[\s\S]{0,180}/.exec(rrt.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S38"[^}]*PASS/.test(rv.stdout) || !/"S39"[^}]*PASS/.test(rv.stdout))
+    casse.push("S38 ou S39 accuse la fixture VERTE, qui ne porte ni test esquivé ni remontée : la règle crie sur un travail juste");
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 14/14 PASS (verte PASS ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3)");
+    : "Self-test restitution : 16/16 PASS (verte PASS ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger)");
   process.exit(casse.length ? 1 : 0);
 }
 

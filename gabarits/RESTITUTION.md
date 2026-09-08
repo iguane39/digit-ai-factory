@@ -7,7 +7,7 @@ prouvée à zéro faux positif, et ne voit rien. Le marquage a été vérifié t
 `oracle-synthese` (S1-S8 à l'époque, S1-S33 depuis la v2.15.0) sur une synthèse réelle PASS avant d'être prescrit ici.
 Cette consigne, elle, ne se marque PAS : c'est un référentiel normatif, pas un livrable.
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 2.18.0, 08/09/2026** : **le VERDICT
+Référentiel versionné (loi n° 4, daté-éditable) — **version 2.19.0, 08/09/2026** : **un test jouable s'exécute, et « remonté » n'est pas « traité »** (TF-0923 — deux des six volets d'oracle proposés le 08/09 et restés non joués). Le constat qui les fait naître est commun aux six : *la doctrine était écrite et opposable, et aucun contrôle ne la jouait — une règle que rien n'exécute décore.* **S38** — une action de TEST `auto_ia` n'est pas laissée non exécutée sous un motif d'**exemption** (`hors_mandat`, `borne_atteinte`). Le fait du 07/09 (TF-0905) : une réponse a PROPOSÉ trois niveaux de tests, tous jouables en lecture seule, sans en exécuter un seul. La règle 40 — « un test proposé s'exécute » — existait ; S11 ne vérifiait que la PRÉSENCE d'un motif, jamais sa légitimité. Or deux des six motifs de son vocabulaire déclarent un PÉRIMÈTRE que l'auteur écrit seul : ils satisfont S11 sans que rien n'ait été mesuré. *Les quatre autres — `dependance_bloc_3`, `gate_gouvernance`, `garde_fou`, `dependance_externe` — nomment un obstacle EXTÉRIEUR à l'auteur : un test qu'ils bloquent reste non exécuté sans faute, et la fixture verte le prouve.* **S39** — une remontée annoncée au bloc 4 porte son identifiant. Déposer un constat chez une autre forge est un geste réel, et le bloc 4 a raison de le dire ; mais SANS identifiant, le lecteur ne peut ni retrouver ce qui a été remonté ni savoir si quelqu'un l'a pris : la ligne se lit « traité » et vaut « **déposé, non traité** », c'est-à-dire un reste, qui appartient au bloc 5 avec son motif (S5). *La règle ne juge pas la remontée : elle juge sa traçabilité.* Les deux paires de fixtures ne diffèrent que d'un mot — le motif pour S38, l'identifiant pour S39 — seule forme qui prouve qu'une règle juge ce qu'elle prétend juger et non le reste de la ligne. Précédente : **2.18.0, 08/09/2026** : **le VERDICT
 affiché mesure ce que le fichier jugé mesure, et une restitution n'est pas un fil d'avancement**
 (TF-0918 — mandat de campagne du 08/09). Le fait : au cours d'un mandat long, sept campagnes
 rendaient leurs rapports l'une après l'autre, et à chacun le hook `Stop` exigeait une restitution.
@@ -795,8 +795,9 @@ jamais celui de l'auteur :
 - **S8 ignore la tournure conditionnelle de S19.** « si rien n'est fait » contient le mot
   « fait », que S8 lisait comme une affirmation de complétion sans preuve.
 
-**Exécuté** : `node oracles\oracle-synthese.mjs <synthese.md>` — règles S1-S33 binaires,
-fixtures double sens au self-test (la fixture rouge échoue sur 16 règles distinctes).
+**Exécuté** : `node oracles\oracle-synthese.mjs <synthese.md>` — règles S1-S39 binaires,
+fixtures double sens au self-test, 16 cas (la fixture rouge échoue sur 29 règles distinctes ; S29,
+S30, S31, S32, S33, S38 et S39 portent en plus leur propre paire, rouge ET verte).
 **Proportionnalité (v2.5.0, inchangée)** : bloquantes S1, S3, S4, S6 ; tout le reste — S17 à S20
 comprises — entre en AVERTISSANTE, dit en une ligne sous la réponse et jamais réécrit. Une action
 sans conséquence rend la liste moins utile, jamais illisible ; les règles se durciront quand le
