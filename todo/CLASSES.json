@@ -735,6 +735,19 @@
     "porte-sans-chemin-des-tables",
     "porte-cle-courte-sans-frontiere"
    ]
+  },
+  {
+   "cle": "regle-neuve-sans-mesure-de-bruit",
+   "famille": "page-html-socle",
+   "libelle": "Une regle neuve du socle est mise en service apres avoir mesure son bruit sur les documents du depot qui l ecrit et sur ceux du pilot, jamais sur les depots qui CONSOMMENT le socle sans en etre proprietaires : la propagation vers la copie installee fait alors rougir une suite ailleurs, et l equipe qui la subit croit l echec preexistant parce que la cause vit hors de son depot",
+   "creee_le": "2026-09-08",
+   "fondee_par": [],
+   "regle": "une regle neuve du socle mesure son bruit sur les documents de TOUS les depots qui l invoquent ; et le geste de propagation releve les depots consommateurs, rejoue leur verification native avant et apres, et signale bruyamment tout depot qui passait et ne passe plus -- meme doctrine que l ecrivain du registre, qui annule son ecriture si l oracle passait et ne passe plus",
+   "oracle": "a creer : releve des depots consommateurs et rejeu avant/apres a la propagation ; candidature du 08/09",
+   "voisines": [
+    "banc-etend-referentiel-production",
+    "gate-cout-invite-au-contournement"
+   ]
   }
  ]
 }

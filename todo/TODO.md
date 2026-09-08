@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=ed6c55264421 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T14:09:26.718Z -->
+     sceaux: actifs=5ae3b99f3060 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T14:13:49.783Z -->
 
-**182 actifs** (candidat 7 · décidé 30 · en cours 5 · corrigé 140 · écarté 0) · **782 archivés**.
+**183 actifs** (candidat 8 · décidé 30 · en cours 5 · corrigé 140 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -20,6 +20,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0838 | decide | 1 | pilot : le skill claude-api ne documente pas fallbacks avec messages.parse | **oui** — un écart déclaré au lieu d'une mise en œuvre |
 | TF-0959 | candidat | 20 | canal confidentiel : une clé DÉJÀ pseudonymisée peut entrer dans une table de noms réels, et rien ne l'en empêche — l'arbitrage du 08/09 l'a fait une fois, la porte l'a rattrapé | **oui** — trois dépôts condamnés par la porte de publication et une rectification manuelle de la table, le 08/09 au matin, sur un défaut dont la garde était déjà écrite ailleurs depuis six jours |
 | TF-0956 | candidat | 10 | pilot : le registre ne sait ni détecter ni écarter un DOUBLON de candidature — six items identiques mot pour mot y sont entrés le 08/09, et rien ne les a signalés | **oui** — six candidatures en double entrées en une commande, non détectées ; le compte des items ouverts est faux de six tant qu'elles ne sont pas écartées, et aucun statut ne permet de les écarter |
+| TF-0965 | candidat | 10 | pilot : propager les skills a casse un test d'une forge voisine — une regle neuve du socle est mesuree sur le parc du pilot seulement, jamais sur les depots qui la CONSOMMENT | **oui** — une suite de tests d'une forge passee au rouge par un geste joue dans un autre depot, et un agent qui a declare l'echec preexistant de bonne foi parce que rien ne lui disait que la copie installee avait change sous lui |
 | TF-0869 | corrige | 25 | pilot : aucun .env local créé d'office, le commanditaire a saisi sa clé Anthropic dans .env.example versionné | **oui** — git diff --stat .env.example : 1 ligne, clé de 108 caractères préfixée sk-ant- dans un fichier versionné ; un commit de plus et le secret partait |
 | TF-0870 | corrige | 20 | pilot : une clé Anthropic d'organisation sans espace de travail échoue en 400, variable ANTHROPIC_WORKSPACE_ID absente du gabarit et du skill | **oui** — un redéploiement qualif et un appel direct à l'API pour lire la cause ; smoke-qualif-20260906.json E-011 FAIL 502 |
 | TF-0872 | corrige | 20 | pilot : ETAPE-MEP § 3 bis ne prescrit ni comptes d'essai vides ni source des identifiants d'une qualif publique | **oui** — retour humain lot 20260906b, un run de version |
