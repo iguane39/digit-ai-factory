@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=1017e1ab034b archive=6ce2fe14c2bb · dernier événement: 2026-09-08T15:11:00.937Z -->
+     sceaux: actifs=9119c71ace81 archive=6ce2fe14c2bb · dernier événement: 2026-09-08T16:21:04.983Z -->
 
-**190 actifs** (candidat 15 · décidé 14 · en cours 9 · corrigé 152 · écarté 0) · **782 archivés**.
+**197 actifs** (candidat 22 · décidé 14 · en cours 9 · corrigé 152 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -88,6 +88,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0969 | candidat | 20 | digit-ai-page-html : la regle L30 de check_html.py cherche les termes de son referentiel en SOUS-CHAINE — gate est trouve dans aggregate_type et le chapitre est accuse d'employer un terme absent | **oui** — quatre gloses d'un terme absent ecrites dans un seul produit pour satisfaire le controle ; un passage FAIL sans defaut reel |
 | TF-0968 | candidat | 12.5 | digit-ai-page-html : la sonde V15 de render_page.py rend FAIL par ARITHMETIQUE sur tout tableau dont la hauteur tombe dans une bande, sans qu'aucun collant ne masque quoi que ce soit | **oui** — gate R-32 non prononcable vert sur une page par ailleurs conforme ; trois constats declares au journal, et les memes trois constats sur une page deja livree |
 | TF-0970 | candidat | 12.5 | digit-ai-page-html : kpi-filter.js applique l'attribut de la carte ACTIVE a TOUS les tableaux du perimetre — cliquer une carte d'un tableau vide les autres tableaux a cartes, sans un mot au lecteur | **oui** — un tableau de 160 lignes vide sans explication dans une page remise a un destinataire ; decouvert par la mesure, aucun oracle ne le voit |
+| TF-0973 | candidat | 10 | digit-ai-page-html : NUANCE sur RA-24 — la sonde V15 attrape de VRAIS defauts, la corriger ne doit pas la desarmer ; ses deux causes doivent se distinguer dans son message | **oui** — un tableau vide annonce a 276 lignes, vu par la seule sonde que le lot precedent signalait comme bruyante ; trois autres controles verts sur la meme page |
 | TF-0899 | corrige | 25 | digit-ai-forge-agents (digit-ai-page-html) : table-filters.js pose « position: relative » en ligne sur chaque th filtrable et écrase le « sticky » de L29 — le « top: var(--hh) » devient un décalage permanent de 104 px, l'en-tête de tableau se pose sur ses deux premières lignes | **oui** — un tour humain, page régénérée sous un indice neuf, cinq oracles rejoués, mesure au navigateur écrite par le produit |
 | TF-0900 | corrige | 20 | digit-ai-forge-agents (digit-ai-page-html) : « .table-hote { overflow-x: auto } » du boilerplate fait du conteneur la zone de défilement du thead collé — l'en-tête se fige sous le haut du tableau (+67 px au repos), jamais sous l'en-tête de page | **oui** — même tour humain que RA-2 ; quatre tableaux sur huit concernés par cette seule cause |
 | TF-0896 | corrige | 15 | digit-ai-forge-agents (digit-ai-page-html) : le boilerplate cite la balise « <style> » en toutes lettres dans un commentaire HTML avant la vraie balise — un générateur qui extrait le style par première occurrence embarque le commentaire, Chromium ne lit qu'une règle CSS et les oracles mesurent des symptômes sans lien avec la cause | **oui** — trois passes complètes de check_html + render_page sur une page de 188 Ko avant de trouver une cause d'une ligne |
@@ -150,7 +151,10 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0972 | candidat | 10 | forge-data : la resolution des references d'un langage de calcul n'a aucun contrat — casse et references non qualifiees font perdre des colonnes en SILENCE | **oui** — trois colonnes perdues et trois colonnes faussement declarees inutilisees, sans aucune erreur affichee ; decouvert par un audit manuel des references non resolues |
+| TF-0974 | candidat | 8.3 | forge-data : un referentiel de lineage qui DECRIT ses cibles en prose au lieu de les NOMMER rend tout re-perimetrage indecidable a la machine | **oui** — deux tables de rattachement ecrites a la main chez le producteur ; une premiere regle automatique qui gardait 74 colonnes sur 74 sans le dire |
 | TF-0971 | candidat | 6.3 | forge-data : aucun oracle ni outil ne mesure l'USAGE REEL d'un modele de restitution — la couverture se mesure contre le MODELE, jamais contre ce qui est a l'ECRAN | **oui** — quatre outils ecrits chez le producteur ; une dette annoncee a 38 colonnes dont 18 sont inutiles au rapport |
+| TF-0975 | candidat | 1 | forge-data : aucun oracle ne rapproche un modele de restitution d'un EXTRAIT du rapport livre par le client - la seule preuve EXTERNE qu'une reconstruction visera juste | **oui** — trois scripts et une recette de 18 controles ecrits chez le producteur pour un rapprochement que ni oracle-couvrir ni oracle-reconcilier ne prononce ; 60/60 au meme rang, 6 colonnes hors extrait motivees, 28 colonnes de l'extrait sans equivalent au modele |
+| TF-0976 | candidat | 1 | forge-data : un export Power BI porte un pied de page Filtres appliques qui entre dans les donnees, et c'est en meme temps la SEULE trace de ce que l'extrait ne contient pas | **oui** — 21 559 lignes comptees au premier jet contre 21 557 reelles sur les trois feuilles ; une modalite fantome de Period ; la portee filtree de l'extrait (periode unique 202606, pays non vide, GLA non nulle en gestion loc) n'etait lisible que dans la ligne que la lecture naive traite en donnee |
 | TF-0893 | corrige | 10 | digit-ai-forge-data : traduire-unity-catalog ne lit que l'export des system tables — sur un workspace réel system.access est refusé (SQLSTATE 42501) alors que l'API REST lineage-tracking répond | **oui** — lineage de 30 tables transcrit à la main depuis des réponses d'API |
 | TF-0936 | corrige | 10 | digit-ai-forge-data : le vocabulaire dit « grain » (modele-dimensionnel@1, oracle-modeliser, gabarits, commentaires DDL) ; le destinataire lit « granularité » | **oui** — un retour humain ; 33 substitutions et une table d'accords |
 | TF-0942 | corrige | 10 | digit-ai-forge-data : la projection d'évolutions par couche (proposée en RD-5) rend une liste PLATE — la hiérarchie schéma › table › colonne est perdue, le statut n'existe qu'à la ligne la plus fine, un schéma n'apparaît nulle part comme objet | **oui** — un retour humain le lendemain de la livraison de la projection |
@@ -212,6 +216,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
+| TF-0977 | candidat | 1 | forge-organization : le registre des types n'a aucun type pour un livrable de COMPARAISON a deux sens, et R-25 interdit d'en improviser un | **oui** — 32 types au registre, aucun ne couvrant une comparaison a deux sens ; le livrable 20260908v est sorti sous le type Rapport, exact mais muet sur sa nature |
 | TF-0837 | corrige | 1 | forge-organization : oracle-filtres-tableau G3/G6 exigent init et règle print dans le document | **oui** — G3/G6 FAIL sur la page rendue, nonce CSP ajouté |
 
 ## digit-ai-forge-tests
@@ -242,6 +247,8 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0962 | candidat | 1 | factory : le TEXTE de la doctrine de restitution manquait chez le produit alors que le juge et le cablage etaient la, et le tableau de portee predit exactement ce que cela produit | **oui** — trois messages de fin de traitement hors norme sur une session de plusieurs heures, un aller-retour humain, et la relecture des 822 lignes du gabarit pour reecrire la sortie |
 | TF-0963 | candidat | 1 | factory : les trois pieces de la doctrine peuvent etre toutes presentes et conformes chez le produit et ne JAMAIS s executer, si la session s ouvre au-dessus de la racine du produit — et rien ne le dit | **oui** — une session entiere hors doctrine sans aucun signal, decouverte par contestation humaine et non par un controle ; les dix retours du gabarit v2.5.0 a v2.18.0 sont sans effet sur un produit dans cet etat |
 | TF-0964 | candidat | 1 | factory : une lecon payee et commentee dans un module d un produit n a aucun mecanisme pour atteindre le module suivant du MEME produit, et aucun oracle vert ne le voit | **oui** — un premier deploiement en dev livre avec la fonctionnalite cassee, 826 tests verts a l appui ; le defaut trouve par execution dans le conteneur, puis un second commit et un second deploiement |
+| TF-0978 | candidat | 1 | factory : les trois exemptions du paragraphe Portee sont des proprietes du MESSAGE alors que la judgeabilite est une propriete du TOUR — un agent qui s auto-evalue satisfait donc l exemption en ecrivant court | **oui** — deux retours humains sur le format de sortie dans la meme session, dont le second APRES que la doctrine ait ete installee, lue et appliquee une fois avec succes |
+| TF-0979 | candidat | 1 | factory : la doctrine ne prescrit aucune forme pour un tour de travail INACHEVE, et ce vide est ce qui rend l exemption attirante | **oui** — deux tours de cette session sont tombes sur ce cas, et les deux ont produit une sortie hors norme ; sans forme prescrite, la correction du retour precedent laisse l agent devant deux formes fausses |
 
 ## forge-conception
 
