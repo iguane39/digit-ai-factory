@@ -278,6 +278,10 @@
   "cas": 7,
   "vu_le": "2026-09-03"
  },
+ "scripts/lib-vue-html.test.mjs": {
+  "cas": 8,
+  "vu_le": "2026-09-08"
+ },
  "scripts/readme-dossiers.test.mjs": {
   "cas": 7,
   "vu_le": "2026-08-26"

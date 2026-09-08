@@ -40,7 +40,7 @@ export function mdVersHtml(corps) {
       const cellules = (r) => r.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
       const tetes = cellules(rangs[0]);
       const corpsT = rangs.slice(1).filter((r) => !/^\s*\|[\s:|-]+\|?\s*$/.test(r));
-      out.push(`<div class="scroll"><table><thead><tr>${tetes.map((t) => `<th scope="col">${inline(t)}</th>`).join("")}</tr></thead><tbody>${
+      out.push(`<div class="defile"><table><thead><tr>${tetes.map((t) => `<th scope="col">${inline(t)}</th>`).join("")}</tr></thead><tbody>${
         corpsT.map((r) => `<tr>${cellules(r).map((c) => `<td>${inline(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`);
       continue;
     }
@@ -107,8 +107,11 @@ export function coquille({ titre, description, front, svg, corpsHtml, source, le
     body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:16px}
     /* 75-100 % de la fenêtre, toujours : 92vw en dessous de 1826px, plafond confort 1680px, plancher 75vw au-delà */
     .wrap{max-width:clamp(75vw,1680px,92vw);margin:0 auto;padding:32px 24px 64px}
-    /* la prose vit dans une colonne à sa mesure (L2) — tables et figures y défilent en interne */
-    .colonne{max-width:75ch;margin:0 auto}
+    /* page de DONNEES (I1 / L26) : le contenu prend toute la largeur du .wrap (>= 75 vw) — une colonne
+       de 75ch laissait 34 % de l'ecran a 1920 px, mesure Playwright du 07/09 (646 px sur 1920). La classe
+       s'appelle desormais defile et non scroll : le depot ecrit ses noms en francais.
+       ATTENTION : ce bloc vit dans un litteral gabarit JavaScript — aucun accent grave ici. */
+    .colonne{max-width:none;margin:0}
     h1,h2,h3{font-family:var(--head);font-weight:800;line-height:1.2}
     h1{font-size:1.7rem;margin:0 0 .2em} h2{font-size:1.25rem;font-weight:700;margin:1.5em 0 .4em}
     h3{font-size:1.02rem;font-weight:700;margin:1.1em 0 .3em}
@@ -116,7 +119,7 @@ export function coquille({ titre, description, front, svg, corpsHtml, source, le
     .meta{color:var(--muted);font-size:.85rem;margin:.2em 0 0}
     blockquote{margin:14px 0;padding:10px 16px;border-left:3px solid var(--blue);background:var(--surface);border-radius:0 var(--r-sm) var(--r-sm) 0;color:var(--muted)}
     blockquote p{margin:0}
-    .scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin:10px 0}
+    .defile{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin:10px 0}
     table{border-collapse:collapse;width:100%;font-size:.92rem}
     th{font-family:var(--head);font-weight:700;text-align:left;padding:9px 12px;border-bottom:2px solid var(--line)}
     td{padding:7px 12px;border-bottom:1px solid var(--line);vertical-align:top}
@@ -134,10 +137,10 @@ export function coquille({ titre, description, front, svg, corpsHtml, source, le
        ATTENTION : ce bloc vit dans un litteral gabarit JavaScript. Aucun accent grave ici, il
        fermerait la chaine et casserait tout ce qui suit — defaut commis en ecrivant ce commentaire. */
     @media (max-width:640px){.wrap{padding:16px 12px 48px} h1{font-size:1.3rem}
-      .scroll td{display:block;overflow-wrap:anywhere}}
+      .defile td{display:block;overflow-wrap:anywhere}}
     @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
     @page{margin:14mm}
-    @media print{.scroll{overflow:visible;border:none} figure{break-inside:avoid} tr{break-inside:avoid} body{background:#fff}}
+    @media print{.defile{overflow:visible;border:none} figure{break-inside:avoid} tr{break-inside:avoid} body{background:#fff}}
   </style>
 </head>
 <body>
@@ -195,7 +198,7 @@ export function svgBoites(noeuds, liens, { parRangee = 3, w = 220, h = 64, gx = 
         <text data-overlap-ok="" x="${p.x + w / 2}" y="${p.y + 46}" text-anchor="middle" font-family="DM Sans,system-ui,sans-serif" font-size="11" fill="#64748B">${esc(n.sous || "")}</text>
       </g>`;
   });
-  return `      <svg viewBox="0 0 ${W} ${H}" width="${W}" xmlns="http://www.w3.org/2000/svg">
+  return `      <svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${Math.round(W * 1.8)}px" xmlns="http://www.w3.org/2000/svg">
         <defs><marker id="fl" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#64748B"/></marker></defs>
 ${fleches.join("\n")}
 ${boites.join("\n")}
