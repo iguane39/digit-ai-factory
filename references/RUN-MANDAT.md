@@ -23,7 +23,17 @@ MEP — et le run Produit-10 a dû improviser ce que cette page encode désormai
    **`restitution-forme` : « la restitution ne sera jugée par rien »** —, jamais un
    « écart R-35 » anonyme : un écart déclaré sans sa conséquence ne se décide pas.
    **Sur un projet né sous la doctrine** : `oracle-conformite-projet.mjs` PASS, comme
-   les autres. **Sur un existant antérieur à la doctrine (TF-0266, amendé le 15/08)** :
+   les autres. **Qui est « un existant » se MESURE, jamais ne se déclare** (TF-0906) :
+   TF-0266 ne couvre qu'un dépôt dont le **premier commit est ANTÉRIEUR au `run_open`**
+   du mandat. Un dépôt `git init` par le mandat lui-même n'a rien d'antérieur : tout ce
+   qu'il porte a été écrit par ce run, et aucun FAIL n'y est un écart déclarable.
+   *Mesuré le 07/09* : un produit créé le jour même a été traité comme un existant —
+   six synthèses ont déclaré « socle hors mandat, écarts R-35 », la conformité est
+   restée FAIL toute la journée sur six règles, neuf tours ont été rendus sans mécanisme
+   de jugement, et six retours humains ont porté sur des règles déjà écrites.
+   Le geste : `git log --reverse --format=%aI | head -1` comparé au `run_open` — s'il
+   n'y a pas d'antériorité, on installe et on corrige, on ne déclare pas.
+   **Sur un existant antérieur à la doctrine (TF-0266, amendé le 15/08)** :
    l'oracle se JOUE quand même (R-35 — son verdict est l'état des lieux, consigné au
    ledger en `oracles_verdict`), mais un FAIL portant sur des fichiers ANTÉRIEURS au
    mandat ne bloque pas le run : les constats partent en **écarts déclarés au ledger**
