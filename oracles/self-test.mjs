@@ -1039,5 +1039,46 @@ check("R-19 borne : aucun ledger nulle part → SANS_OBJET, jamais un FAIL", () 
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
+// ---- TF-0898 (08/09) — `--regles` : R-4 jouable SEULE sur un `output\` -----------------------
+// Double sens obligatoire. VERT : un output\ au nommage R-4 rend PASS et RIEN d'autre que R-4 —
+// c'est ce « rien d'autre » qui rend la commande utilisable avant une remise, sur un projet qui
+// n'a pas encore de socle. ROUGE : le nommage « AAAAMMJJ-objet.ext » (la forme exacte des onze
+// livrables du 07/09) rend FAIL, et le FAIL est bien porté par R-4.
+const lanceArgs = (...args) => {
+  try { return { exit: 0, rapport: JSON.parse(sh("node", [oracle, ...args])) }; }
+  catch (e) { return { exit: e.status, rapport: JSON.parse(String(e.stdout || "{}")) }; }
+};
+const projetOutput = (nomLivrable) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-regles-"));
+  mkdirSync(join(d, "output"), { recursive: true });
+  writeFileSync(join(d, "output", nomLivrable), "# livrable\n", "utf8");
+  return d;
+};
+check("TF-0898 vert : --regles R-4 sur un output\\ bien nommé → PASS, et SEULE R-4 est rendue", () => {
+  const d = projetOutput("Client-A - Rapport de mapping - 20260907b.md");
+  try {
+    const r = lanceArgs(d, "--regles", "R-4");
+    const regles = [...new Set((r.rapport.findings || []).map((f) => f.regle))];
+    if (r.exit !== 0) throw new Error(`attendu PASS, obtenu exit ${r.exit} : ${JSON.stringify(r.rapport.findings)}`);
+    if (regles.join(",") !== "R-4") throw new Error(`la sortie porte ${regles.join(", ") || "rien"} — la commande n'est pas jouable seule`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-0898 rouge : --regles R-4 sur « AAAAMMJJ-objet.ext » (forme des onze livrables du 07/09) → FAIL porté par R-4", () => {
+  const d = projetOutput("20260907-lineage-tenancy.md");
+  try {
+    const r = lanceArgs(d, "--regles", "R-4");
+    if (r.exit !== 1) throw new Error(`la forme fautive passe : exit ${r.exit}`);
+    const f = (r.rapport.findings || []).find((x) => x.regle === "R-4" && x.statut === "FAIL");
+    if (!f) throw new Error("FAIL rendu, mais pas sous R-4 — le remède ne serait pas nommé");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-0898 borne : une règle demandée sans constat est DITE, jamais un PASS silencieux", () => {
+  const d = projetOutput("Client-A - Rapport de mapping - 20260907b.md");
+  try {
+    const f = (lanceArgs(d, "--regles", "R-99").rapport.findings || []).find((x) => x.regle === "R-99");
+    if (!f || f.statut !== "SANS_OBJET") throw new Error("un identifiant de règle inconnu rend un vert muet");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 console.log(`\nSelf-test conformité projet : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

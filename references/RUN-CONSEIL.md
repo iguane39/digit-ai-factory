@@ -135,7 +135,11 @@ choix des lots et de la trajectoire (fin du bloc 4), lancement de chaque run de 
 
 ## Clôture
 
-Livrables nommés R-4 dans `output\`, oracle-livrable-conseil PASS sur diagnostic et
+Livrables nommés R-4 dans `output\` — la forme en clair, `<Marque> - <Objet> -
+AAAAMMJJ<indice>.<ext>`, indice alloué par `scripts\allouer-indice.mjs` et jamais à la
+main, contrôlée avant remise par
+`node <pilot>\oracles\oracle-conformite-projet.mjs <projet> --regles R-4` (TF-0898) —,
+oracle-livrable-conseil PASS sur diagnostic et
 démarche ROI (journaux sous `forge\oracles\`), synthèse au format
 `gabarits\RESTITUTION.md`, `run_close` au ledger. Le suivi des bénéfices (section 4 de
 la démarche ROI) porte ses rendez-vous datés : chaque revue est un mini-mandat qui

@@ -36,7 +36,31 @@ import { fileURLToPath } from "node:url";
 import { empreinteTexte } from "../scripts/lib-empreinte.mjs";
 import { attribuerDivergence, racineWebDeclaree } from "../scripts/relever-heritage.mjs";
 
-const cible = process.argv[2];
+// TF-0898 (08/09/2026) — R-4 DOIT ÊTRE JOUABLE SEULE, SUR UN `output\` ET RIEN D'AUTRE.
+// Le fait : onze livrables d'un mandat sont sortis en « AAAAMMJJ-objet.ext » parce que la FORME
+// du nom ne vit qu'ici, dans un oracle qui n'avait jamais été installé chez le produit, et que
+// le jouer en entier sur un projet sans socle rend des dizaines de constats sans rapport — donc
+// personne ne le joue. `--regles R-4` restreint la SORTIE et le VERDICT aux règles demandées :
+// le contrôle du nommage redevient une commande d'une ligne, opposable avant la remise.
+// Ce qui n'est PAS fait, et c'est déclaré : les autres règles s'exécutent quand même (elles ne
+// coûtent que des lectures de fichiers) — le filtre porte sur ce qui est RENDU, pas sur ce qui
+// est calculé. Prétendre l'inverse demanderait de découper l'oracle, et un découpage non prouvé
+// coûterait plus que la lecture qu'il économise.
+const argv = process.argv.slice(2);
+const iRegles = argv.indexOf("--regles");
+const REGLES_DEMANDEES = iRegles >= 0
+  ? new Set(String(argv[iRegles + 1] || "").split(",").map((s) => s.trim()).filter(Boolean))
+  : null;
+if (REGLES_DEMANDEES && !REGLES_DEMANDEES.size) {
+  console.log(JSON.stringify({ oracle: "oracle-conformite-projet", verdict: "ERREUR",
+    message: "--regles attend une liste non vide (ex. --regles R-4 ou --regles R-4,R-7)" }));
+  process.exit(2);
+}
+// `iRegles + 1` vaut 0 quand `--regles` est absent (iRegles = -1) : sans cette garde, le premier
+// argument — la cible — était filtré, et TOUT appel ordinaire de l'oracle rendait « racine
+// introuvable ». Défaut commis puis mesuré ici même : 50 cas de la recette rouges d'un coup.
+const iValeur = iRegles >= 0 ? iRegles + 1 : -1;
+const cible = argv.filter((a, i) => !a.startsWith("--") && i !== iValeur)[0];
 if (!cible || !existsSync(cible)) {
   console.log(JSON.stringify({ oracle: "oracle-conformite-projet", verdict: "ERREUR", message: "racine de projet introuvable" }));
   process.exit(2);
@@ -1393,9 +1417,22 @@ const nonJuge = [
   "R-19 forme des clés (TF-0320) : seule la FORME des clés `versions_forges` est jugée, pas leur COMPLÉTUDE — un run_open qui ne relève que 5 forges sur 14 en noms complets reste PASS (Produit-01 en portait 5) ; un run_open sans `ts` n'est pas jugé sur la forme (pas de date, pas d'entrée en vigueur opposable) ; les run_open antérieurs au 2026-08-17 sont des antériorités déclarées, jamais réécrites",
 ];
 
-const echecs = findings.filter((f) => f.statut === "FAIL").length;
+// TF-0898 : le filtre ne s'applique qu'à la SORTIE et au verdict. Une règle demandée qui n'a
+// rendu aucun finding est DITE — sans quoi « --regles R-99 » sortirait un PASS silencieux, le
+// pire des états pour un contrôle qu'on lance justement pour être rassuré.
+const rendus = REGLES_DEMANDEES ? findings.filter((f) => REGLES_DEMANDEES.has(f.regle)) : findings;
+if (REGLES_DEMANDEES) {
+  for (const r of REGLES_DEMANDEES) {
+    if (!rendus.some((f) => f.regle === r)) {
+      rendus.push({ regle: r, statut: "SANS_OBJET", ou: "-",
+        message: "règle demandée par --regles, mais cet oracle n'a rendu aucun constat sous cet identifiant — vérifier l'orthographe (R-1..R-27, R-32, R-42, R-43, R-47)" });
+    }
+  }
+}
+const echecs = rendus.filter((f) => f.statut === "FAIL").length;
 console.log(JSON.stringify({
   oracle: "oracle-conformite-projet", version: "1.0.0", cible: String(cible),
-  verdict: echecs ? "FAIL" : "PASS", findings, non_juge: nonJuge,
+  ...(REGLES_DEMANDEES ? { regles_demandees: [...REGLES_DEMANDEES] } : {}),
+  verdict: echecs ? "FAIL" : "PASS", findings: rendus, non_juge: nonJuge,
 }, null, 1));
 process.exit(echecs ? 1 : 0);

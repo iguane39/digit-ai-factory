@@ -86,6 +86,15 @@ MEP — et le run Produit-10 a dû improviser ce que cette page encode désormai
    toutes jugées PASS, et zéro page ; le destinataire a répondu « aucun fichier HTML n'a
    été généré […] il doit faire partie intégrante de la proposition », et la page a dû
    être produite après coup avec trois passes d'oracles.
+   **La forme du nom, en clair — elle ne vit plus seulement dans l'oracle** (TF-0898) :
+   `<Marque> - <Objet> - AAAAMMJJ<indice>.<ext>`, par exemple
+   `Client-A - Rapport de mapping - 20260907b.html`. **Jamais** `20260907-objet.ext` :
+   cette forme-là est l'exception ÉCRITE des seules études d'`output\03-etudes` du pilot
+   (`gabarits\ETUDE-OPPORTUNITE.md`), et c'est elle qu'un agent a recopiée pour onze
+   livrables d'un mandat, faute de la voir démentie ici. L'indice s'alloue par
+   `node <pilot>\scripts\allouer-indice.mjs`, jamais à la main. Le contrôle se joue seul,
+   sans socle installé et avant la remise :
+   `node <pilot>\oracles\oracle-conformite-projet.mjs <projet> --regles R-4`.
    Puis : lot `<projet> - RETOURS - AAAAMMJJ<i>.md` +
    sidecar remis à `<pilot>\input\00-retours\`, `run_close`, synthèse **au format
    `gabarits\RESTITUTION.md`** (8 blocs, horodatée, jugée par `oracle-synthese.mjs`).
