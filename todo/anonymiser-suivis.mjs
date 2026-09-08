@@ -216,6 +216,23 @@ function selfTest() {
   const side = plan.contenus.find((c) => c.fichier === "note.md");
   if (!side || side.avant !== faux["note.md"].toString("utf8")) casse.push("le plan ne garde pas le contenu d'avant d'un fichier réécrit — la ré-empreinte n'a plus de preuve");
 
+  // 3 ter) TF-0913 (08/09) — DEUX CLES QUI SE RECOUVRENT : LA PLUS LONGUE PASSE D'ABORD.
+  //        Le fait, payé deux fois le 08/09 : une table portant « X » et « X_Reporting » a nommé
+  //        quinze fichiers sous le pseudonyme du MAUVAIS produit, la clé courte ayant été
+  //        rencontrée la première. Le sens rouge est prouvé ici sur le plan lui-même : si le tri
+  //        disparaissait, le nom de destination porterait le pseudonyme de la clé courte.
+  writeFileSync(join(dir, "_produits-pseudonymes.json"), JSON.stringify({
+    produits: { "ZorglubZAP": "Produit-07", "ZorglubZAPetal": "Produit-42" },
+  }), "utf8");
+  process.env.FORGE_NOMS_INTERDITS = join(dir, "_noms-interdits.json");
+  process.env.FORGE_PRODUITS_PSEUDO = join(dir, "_produits-pseudonymes.json");
+  const recouvrement = { "ZorglubZAPetal - RETOURS - 20260908a.md": Buffer.from("lot du produit ZorglubZAPetal\n", "utf8") };
+  const planR = planifier(dir, Object.keys(recouvrement), (f) => recouvrement[f]);
+  const renR = planR.renommages.find((r) => r.de.startsWith("ZorglubZAPetal"));
+  if (!renR || !renR.vers.startsWith("Produit-42")) casse.push("la cle la plus LONGUE ne passe pas en premier : le nom de destination est " + (renR ? renR.vers : "absent"));
+  const contR = planR.contenus.find((c) => c.fichier.startsWith("ZorglubZAPetal"));
+  if (!contR || !/Produit-42/.test(contR.texte) || /Produit-07etal/.test(contR.texte)) casse.push("le CONTENU est coupé par la clé courte : " + (contR ? contR.texte.trim() : "absent"));
+
   // 4) un REFERENTIEL MANQUANT arrete tout, sans ecrire une ligne
   process.env.FORGE_NOMS_INTERDITS = join(dir, "_absent.json");
   let leve = false;
@@ -225,9 +242,9 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test anonymiser-suivis : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test anonymiser-suivis : 7/7 PASS (contenu porteur nettoyé ; fichier propre NON réécrit ; contenu d'avant conservé ; "
+    : "Self-test anonymiser-suivis : 9/9 PASS (contenu porteur nettoyé ; fichier propre NON réécrit ; contenu d'avant conservé ; "
       + "nom de fichier porteur renommé ; destination du renommage propre ; binaire sauté et hors du "
-      + "plan d'écriture ; référentiel manquant = arrêt sans écriture)");
+      + "plan d'écriture ; référentiel manquant = arrêt sans écriture ; clé la plus longue appariée avant la clé courte qui la contient, nom ET contenu, TF-0913)");
   return casse.length ? 1 : 0;
 }
 

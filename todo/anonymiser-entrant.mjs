@@ -168,7 +168,20 @@ export function anonymiser(texte) {
   let out = texte;
   // Les PRODUITS d'abord : leurs noms sont souvent plus longs et contiennent parfois un nom de
   // client (`Produit-04`). Substituer le client en premier casserait la clé du produit.
-  for (const [nom, pseudo] of Object.entries(produits.produits || {})) {
+  // TF-0913 (08/09/2026) — LA CLÉ LA PLUS LONGUE D'ABORD, ET C'EST TOUT L'ÉCART.
+  //
+  // LE FAIT, mesuré deux fois le 08/09 sur des lots réels : la table portait « X » et
+  // « X_Reporting », deux produits distincts. `Object.entries` rend les clés dans l'ordre
+  // d'insertion ; la courte est arrivée la première, `out.split(nom).join(pseudo)` a coupé au
+  // milieu de la longue, et quinze fichiers ont été nommés et réécrits sous le pseudonyme du
+  // MAUVAIS produit. Le registre, lui, portait le bon : `ingerer-lot` résout le nom complet.
+  // Personne n'a rien écrit à la main, et l'outil affichait « [ANONYMISÉ] » à chaque passe.
+  //
+  // Le remède ne coûte qu'un tri : une clé qui en contient une autre passe AVANT elle, donc la
+  // courte ne trouve plus rien à couper. Il vaut aussi pour les clients ci-dessous, où le même
+  // recouvrement existe (un sigle contenu dans un nom).
+  const parLongueur = (a, b) => String(b[0]).length - String(a[0]).length;
+  for (const [nom, pseudo] of Object.entries(produits.produits || {}).sort(parLongueur)) {
     if (out.includes(nom)) { out = out.split(nom).join(pseudo); remplaces.push(nom); }
     // TF-0742 (02/09/2026) : UNE table qui n'énumère qu'une graphie ne protège que cette graphie.
     // Mesuré le 01/09 : la clé concaténée était substituée, la forme ESPACÉE du même nom — écrite
@@ -180,7 +193,7 @@ export function anonymiser(texte) {
     const re = variantes(nom);
     if (re && re.test(out)) { out = out.replace(re, pseudo); remplaces.push(nom); }
   }
-  for (const [de, vers] of clients.table) {
+  for (const [de, vers] of [...clients.table].sort(parLongueur)) {
     if (out.includes(de)) { out = out.split(de).join(vers); remplaces.push(de); }
   }
   for (const [de, vers] of clients.sigles) {
