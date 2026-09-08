@@ -51,6 +51,16 @@ MEP — et le run Produit-10 a dû improviser ce que cette page encode désormai
    en définir un (standard `quality-oracles`) puis le remonter au registre. Les
    arbitrages de nommage entrant vs R-4 se tranchent ICI (R-4 alinéa RV-2 : le pilot
    prime, correspondance au ledger).
+   **Un mandat qui livre un mapping, un modèle, un DDL ou une reconstruction livre AUSSI
+   sa recette EXÉCUTÉE** (TF-0905, règle 40 « un test proposé s'exécute ») : la couverture
+   (combien d'objets de la source retrouvés dans la cible, combien d'orphelins nommés) et
+   la cohérence (chaque affirmation du livrable confrontée à l'état réel) se MESURENT
+   avant la remise, jamais après le retour humain. Un test jouable en LECTURE SEULE se
+   joue : `hors_mandat` et `borne_atteinte` ne sont pas des motifs recevables pour lui —
+   les seuls motifs qui tiennent sont ceux qui nomment un accès manquant, avec sa trace.
+   *Mesuré le 07/09* : trois niveaux de tests proposés, aucun exécuté ; joués après le
+   retour, ils ont rendu 38 colonnes et 22 mesures orphelines et une incohérence — que la
+   reconstruction aurait perdues.
 3. **Produire sous oracles** — le livrable se construit par éditions chirurgicales,
    chaque chiffre tracé à sa source (forge-data : marqueurs `[c:id]`), aucune écriture
    hors du projet (les bases connectées se lisent en LECTURE SEULE — requêtes archivées
@@ -75,4 +85,6 @@ MEP — et le run Produit-10 a dû improviser ce que cette page encode désormai
 Contrat « prêt à remettre » (tous mesurables) : conformité JOUÉE — PASS sur projet né
 sous la doctrine, verdict consigné + écarts antérieurs déclarés sur existant (TF-0266) ·
 livrables du RUN conformes (R-4, R-32) · oracles du domaine PASS (ou écarts déclarés) ·
-traçabilité des chiffres 100 % · ledger vérifié · lot de retours remis.
+traçabilité des chiffres 100 % · **recette exécutée quand le livrable est un mapping, un
+modèle, un DDL ou une reconstruction — couverture et cohérence chiffrées (TF-0905)** ·
+ledger vérifié · lot de retours remis.
