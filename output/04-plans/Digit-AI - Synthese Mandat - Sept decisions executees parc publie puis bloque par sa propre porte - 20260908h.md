@@ -6,7 +6,7 @@ Vos sept décisions ont été suivies dans la minute : les huit dépôts sont pu
 
 - **quoi** — exécution des sept décisions humaines du 08/09 (D-29 (a) publication, puis A-74, A-73, A-72, A-71, A-66, A-68), puis lancement de quatre campagnes, sondage de leurs rapports, et traitement du changement d'état de la porte.
 - **sur quoi** — les huit dépôts du parc, la copie installée des skills, le canal confidentiel, le registre du pilot.
-- **quand** — 2026-09-08 15:50 UTC+02:00 (Europe/Paris), durée ≈ 3 h 50 à l'heure de ce dépôt ; une campagne encore en cours, à six items de la fin.
+- **quand** — 2026-09-08 15:50 UTC+02:00 (Europe/Paris), durée ≈ 3 h 25 à l'heure de ce dépôt, relevée à l'horloge (19 h 16) et non estimée ; une campagne encore en cours, sur son dernier item.
 - **qui** — pilot digit-ai-factory 73e3bab ; porte de publication du skill des oracles, `oracles\oracle-skills.mjs`, `oracles\oracle-synthese.mjs`, `oracles\oracle-boite-entree.mjs`, `todo\bancs-isoles.mjs` (neuf), `todo\anonymiser-suivis.mjs` ; quatre agents de campagne sous `gabarits\AGENT-CAMPAGNE.md`.
 
 ## 2. Verdict en une ligne
@@ -86,6 +86,8 @@ Une décision attend, et elle bloque toute publication.
 - J'ai rapproché à tort les deux cents occurrences et cinq identifiants techniques trouvés ailleurs → la campagne a corrigé : deux tables et deux angles distincts, et son chiffre ne dit rien des identifiants.
 - J'ai affirmé trois fois que la porte rendait PASS sur le pilot → c'était exact pour la version installée d'alors, et faux depuis la propagation ; la mesure est refaite et le fait est écrit.
 - J'ai tranché seul une option qu'un item laissait à arbitrer, la règle d'intention portant désormais à toute restitution et non à la seule étude d'opportunité → pourquoi : le retour humain d'origine dit « tous types de demande », et la loi transverse du noyau ne connaît aucune restriction. Dites-moi si vous la voulez autrement.
+- J'ai porté dans trois restitutions des heures que je n'avais pas relevées → je les ai reprises des émissions d'une campagne, qui les avait estimées par extrapolation et me l'a signalé → pourquoi c'est une faute et pas un détail : une heure devinée dans un en-tête se lit comme une heure mesurée, et rien ne la distingue. L'écart réel allait jusqu'à une heure et demie. L'heure de ce dépôt est relevée à l'horloge ; les durées, elles, étaient déjà lues et restent valides.
+- J'ai attribué à la dernière campagne quatre livraisons qui étaient de la précédente — une règle de chapitre, deux règles d'infobulle et le composant d'infobulle → elle m'a corrigé → pourquoi cela compte : c'est ce que j'inscrirai au ledger de version, et une attribution fausse y resterait. Sa campagne a posé l'extension d'une règle d'infobulle, deux règles neuves, deux composants, les corrections de deux canevas et le groupage de la porte.
 
 ## 7. Risques
 
