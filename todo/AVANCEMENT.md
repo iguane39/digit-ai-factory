@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau 37fe84af2316)]
+sources_de_verite: [todo/TODO.jsonl (sceau d7a73df5e13b)]
 verifie_le: 2026-09-08
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `37fe84af2316`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `d7a73df5e13b`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -19,10 +19,10 @@ les corrections donnerait l'illusion d'un progrès net.
 
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
-| Ouverts | 78 | candidats, décidés ou en cours — le reste à faire réel |
+| Ouverts | 79 | candidats, décidés ou en cours — le reste à faire réel |
 | Clos sur gains constatés | 52 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 0 | décidés non faits, motif écrit — jamais un silence |
-| Total suivi | 130 | tout ce que le registre a jamais porté |
+| Total suivi | 131 | tout ce que le registre a jamais porté |
 
 ## Ce qui reste ouvert, par forge
 
@@ -91,7 +91,7 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0857 | digit-ai-schemas : ce que la critique forge-design laisse apres TF-0791 — trois CONFLITS entre oracles de forg | candidat | digit-ai-forge-design, digit-ai-forge-agents | 2.7 |
 | TF-0825 | digit-ai-forge-agents : etendre la porte de publication aux noms de produits demande deux garde-fous, parce qu | candidat | digit-ai-forge-agents | 1 |
 | TF-0828 | digit-ai-forge-agents : la regle C5 de la porte de publication juge trois angles sur les quatre que C1-C4 couv | candidat | digit-ai-forge-agents | 1 |
-| TF-0889 | digit-ai-forge-agents : quatre fixtures rendaient un verdict qui dependait de la machine, et deux jugeaient un | candidat | digit-ai-forge-agents | 1 |
+| TF-0912 | digit-ai-forge-agents : quatre fixtures rendaient un verdict qui dependait de la machine, et deux jugeaient un | candidat | digit-ai-forge-agents | 1 |
 
 ### digit-ai-forge-design — 9 item(s)
 
@@ -139,7 +139,7 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0832 | forge-conception : T5 attend corps-sha256 que ni derive-les-vues ni vues.md ne documentent | candidat | digit-ai-forge-conception | 1 |
 | TF-0854 | digit-ai-forge-conception : les tables closes des oracles sont elles aussi des transcriptions de prose que rie | candidat | digit-ai-forge-conception | 1 |
 
-### pilot — 3 item(s)
+### pilot — 4 item(s)
 
 Les items ouverts ciblant pilot, du score le plus fort au plus faible. Le score est
 celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
@@ -147,6 +147,7 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | Id | Titre | Statut | Forge(s) | Score |
 |---|---|---|---|---|
 | TF-0549 | R-47 trouve des son premier rejeu un TROISIEME produit sans heritage — et celui-la n'a meme pas de depot git : | decide | pilot | 10 |
+| TF-0889 | pilot : aucune famille de gabarits/documents/catalogue.jsonl ne couvre un plan d'ordonnancement de mise en pro | decide | pilot | 10 |
 | TF-0830 | digit-ai-forge-design : la critique d implementation juge le CSS herite du socle digit-ai-page-html (table-fil | decide | digit-ai-forge-design, pilot | 7.5 |
 | TF-0791 | Cascade Intention > Strategie > Tactique > Operationnel + test retro : la definition des demandes ne capture p | en_cours | pilot | 6.7 |
 

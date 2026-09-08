@@ -23,6 +23,6 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | [`05-catalogues-readmes-forges\`](05-catalogues-readmes-forges/README.md) | dossier (14 fichiers) | — | Sections « catalogue de services » proposées aux README des treize forges, générées depuis `catalogues\catalogue.jsonl` ; `LISEZMOI.md` explique la remise à cha… |
 | [`05-insatisfactions\`](05-insatisfactions/README.md) | dossier (1 fichier) | — | Dossiers d'instruction des insatisfactions (TF-0287) : un dossier `INS-XXXX\` par insatisfaction, chemins portés par `insatisfactions\REGISTRE.jsonl` (registre … |
 | [`06-travaux-confies\`](06-travaux-confies/README.md) | dossier (22 fichiers) | — | Originaux des lots de travaux confiés par le pilot à une forge ou à un produit (`pilot - TRAVAUX - AAAAMMJJ<i>.md` + sidecar `.tf.jsonl`, format `gabarits\TRAVA… |
-| `LISEZMOI.md` | fichier | 47,0 Ko | output\ — rangement (13/08/2026, amendé le 18/08/2026 — TF-0339) |
+| `LISEZMOI.md` | fichier | 47,2 Ko | output\ — rangement (13/08/2026, amendé le 18/08/2026 — TF-0339) |
 
 _1 fichier(s), 7 sous-dossier(s)_ · voir aussi `LISEZMOI.md` (conventions et correspondance des anciens chemins)
