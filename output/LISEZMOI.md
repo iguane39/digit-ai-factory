@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 239 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 240 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -229,6 +229,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md | 20260901b | 13.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md` |
 | Digit-AI - Synthese Mandat - Campagnes en cours trois corrections closes porte rouge sur quatre depots - 20260908d.md | 20260908d | 20.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagnes en cours trois corrections closes porte rouge sur quatre depots - 20260908d.md` |
 | Digit-AI - Synthese Mandat - Canal confidentiel et actions 58 60 61 62 63 - 20260907m.md | 20260907m | 25.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Canal confidentiel et actions 58 60 61 62 63 - 20260907m.md` |
+| Digit-AI - Synthese Mandat - Decision 31a la porte connait le canal - 20260908a.md | 20260908a | 14.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Decision 31a la porte connait le canal - 20260908a.md` |
 | Digit-AI - Synthese Mandat - Decision 5a et TF-0793 clos - 20260903f.md | 20260903f | 13.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Decision 5a et TF-0793 clos - 20260903f.md` |
 | Digit-AI - Synthese Mandat - Decision 5a jetons digit-ai-schemas - 20260904a.md | 20260904a | 19.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Decision 5a jetons digit-ai-schemas - 20260904a.md` |
 | Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md | 20260905j | 20 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 11b 12a - 20260905j.md` |
