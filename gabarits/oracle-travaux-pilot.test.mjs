@@ -196,5 +196,40 @@ check("T6 rouge (TF-0888) — la FORME VERBALE « portée … par `<module>` » 
   att(/derive-les-vues/.test(r.constats.find((x) => x.regle === "T6").message), "le module porté dans la vue n'est plus nommé");
 });
 
+// ── T7 (TF-0915) : un fait portant sur une CONFIGURATION EXTERNE cite sa lecture et sa date ──
+// Le 05/09, un lot du pilot a affirmé « avance rapide seulement » sur une branche que
+// l'hébergeur protège autrement (revue exigée, deux contrôles requis, `enforce_admins` faux) ;
+// T1 à T6 ont rendu PASS, la forge l'a lue comme vraie, et la configuration réelle n'a été
+// mesurée que le lendemain par `gh api …/branches/main/protection`.
+const ELEMENT_CONFIG = `### TF-0886 — aligner la voie de publication · gravité majeur
+
+- **Le fait**, mesuré le 05/09/2026 : la branche principale accepte l'avance rapide seulement.
+- **Pourquoi cela vous concerne** : votre voie de publication suppose une fusion à trois points.
+- **Ce qui est demandé** : aligner la voie sur la règle de branche.
+- **Effort estimé** : simple × court
+- **Comment vous saurez que c'est fait** : la publication passe sans rejet.
+- **Si ce n'est pas fait** : chaque publication est rejetée.`;
+
+check("T7 rouge (TF-0915) — une règle de branche AFFIRMÉE sans commande de lecture ni date est REFUSÉE", () => {
+  const r = verifier(LOT({ elements: [ELEMENT_CONFIG] }));
+  att(echoue(r, "T7"), "un fait de configuration externe non lu a passé — T1 n'exige que l'écriture, pas la lecture");
+  const c = r.constats.find((x) => x.regle === "T7");
+  att(/TF-0886/.test(c.message), "le constat ne nomme pas l'élément fautif");
+  att(/Configuration externe lue/.test(c.remede || ""), "le remède ne donne pas la ligne à écrire");
+});
+
+check("T7 vert (TF-0915) — la même affirmation, avec sa commande de lecture et sa date, passe", () => {
+  const r = verifier(LOT({ elements: [ELEMENT_CONFIG],
+    dejaFait: "- **Configuration externe lue** (T7) : `gh api repos/o/r/branches/main/protection` le 2026-09-06 → revue exigée, push forcé interdit" }));
+  att(!echoue(r, "T7"), "un fait lu et daté a été refusé");
+});
+
+check("T7 vert borne — un lot qui n'affirme AUCUNE configuration externe n'a rien à lire chez l'hébergeur", () => {
+  const r = verifier(LOT());
+  att(!echoue(r, "T7"), "un lot sans configuration externe a été refusé");
+  att(/rien à lire chez l'hébergeur/.test(r.constats.find((x) => x.regle === "T7").message),
+    "le constat ne dit pas qu'il n'y avait rien à lire");
+});
+
 console.log(`\noracle-travaux-pilot (TF-0627) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

@@ -117,5 +117,68 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
   if (r.verdict !== "PASS") throw new Error(`verdict ${r.verdict} — un titre en capitales sans accent reste le même titre`);
 });
 
+// ---- R-49 (TF-0884) : UN LOT REMIS ET INGÉRÉ NE SE RÉÉCRIT JAMAIS ----------------------------
+//
+// Le 06/09, un compte rendu a pris l'indice « a » déjà porté par un lot du même produit remis et
+// ingéré le matin même ; une écriture ordinaire l'a remplacé, et aucun contrôle ne s'y est opposé.
+// Les DEUX SENS se jouent sur le MÊME lot et le MÊME registre jetable : seule l'empreinte change.
+// Le registre est détourné par `FORGE_REGISTRE` — jamais le registre réel, qu'aucune recette
+// n'a le droit de toucher.
+{
+  const { mkdtempSync, writeFileSync, rmSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const { createHash } = await import("node:crypto");
+
+  const T = mkdtempSync(join(tmpdir(), "lot-r49-"));
+  const CORPS = "# lot\n\n" + R45 + "\n" + R46;
+  const cheminLot = join(T, "PROD - RETOURS - 20260906a.md");
+  const cheminSidecar = join(T, "PROD - RETOURS - 20260906a.tf.jsonl");
+  const SIDECAR_ORIGINE = '{"schema":1,"titre":"le constat d origine"}\n';
+  writeFileSync(cheminLot, CORPS, "utf8");
+  writeFileSync(cheminSidecar, SIDECAR_ORIGINE, "utf8");
+  const empreinteOrigine = createHash("sha256").update(SIDECAR_ORIGINE).digest("hex");
+
+  const registre = join(T, "REGISTRE.jsonl");
+  writeFileSync(registre, JSON.stringify({
+    ev: "ingestion", ts: "2026-09-06T07:12:00.000Z", lot_sha: empreinteOrigine,
+    fichier: "input/00-retours/PROD - RETOURS - 20260906a.tf.jsonl", creations: 2,
+  }) + "\n", "utf8");
+  process.env.FORGE_REGISTRE = registre;
+
+  check("R-49 vert — le lot ingéré porte encore l'empreinte consignée : rien n'a été réécrit", () => {
+    const c = constat(verifier(cheminLot), "R-49");
+    if (!c || c.statut !== "PASS") throw new Error(`statut ${c ? c.statut : "absent"} — un lot intact est accusé de réécriture`);
+  });
+
+  check("R-49 rouge — le MÊME chemin, une AUTRE empreinte : l'écrasement est refusé et l'indice suivant prescrit", () => {
+    writeFileSync(cheminSidecar, '{"schema":1,"titre":"un compte rendu qui a pris la place"}\n', "utf8");
+    const r = verifier(cheminLot);
+    const c = constat(r, "R-49");
+    if (!c || c.statut !== "FAIL") throw new Error(`statut ${c ? c.statut : "absent"} — l'écrasement d'un lot ingéré passe encore`);
+    if (r.verdict !== "FAIL") throw new Error("le verdict global ne bascule pas alors qu'une règle échoue");
+    if (!/INDICE SUIVANT/.test(c.remede || "")) throw new Error("le remède ne prescrit pas l'indice suivant — un message qui prescrit la moitié du geste conduit à la seconde violation (TF-0552)");
+    if (!/allouer-indice/.test(c.remede || "")) throw new Error("le remède ne nomme pas l'outil qui donne l'indice");
+  });
+
+  check("R-49 borne — un lot JAMAIS ingéré sous ce nom est une première remise, pas une réécriture", () => {
+    const neuf = join(T, "PROD - RETOURS - 20260906b.md");
+    writeFileSync(neuf, CORPS, "utf8");
+    writeFileSync(join(T, "PROD - RETOURS - 20260906b.tf.jsonl"), '{"schema":1}\n', "utf8");
+    const c = constat(verifier(neuf), "R-49");
+    if (!c || c.statut !== "PASS") throw new Error(`statut ${c ? c.statut : "absent"} — une première remise est prise pour un écrasement`);
+    if (!/première/.test(c.message)) throw new Error("le constat ne dit pas que la remise est une première");
+  });
+
+  check("R-49 borne — hors du pilot (registre injoignable), la règle est SANS_OBJET et le DIT", () => {
+    process.env.FORGE_REGISTRE = join(T, "registre-qui-n-existe-pas.jsonl");
+    const c = constat(verifier(cheminLot), "R-49");
+    if (!c || c.statut !== "SANS_OBJET") throw new Error(`statut ${c ? c.statut : "absent"} — la copie du module chez un produit crierait sur une donnée qu'elle n'a pas`);
+  });
+
+  delete process.env.FORGE_REGISTRE;
+  try { rmSync(T, { recursive: true, force: true }); } catch { /* verrou toléré */ }
+}
+
 console.log(`\noracle-lot-retours (TF-0597) : ${pass} PASS, ${echec} FAIL`);
 process.exit(echec ? 1 : 0);

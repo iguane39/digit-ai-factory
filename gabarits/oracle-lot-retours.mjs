@@ -44,6 +44,18 @@
  * NON jugé, et c'est délibéré : la JUSTESSE d'un verdict de généralisation. Un raisonnement
  * écrit peut être faux et se corrige ; un raisonnement absent est perdu pour tout le monde.
  *
+ * R-49 (TF-0884, 08/09/2026) — UN LOT REMIS ET INGÉRÉ NE SE RÉÉCRIT JAMAIS. Le 06/09, un compte
+ * rendu d'agent a pris l'indice « a » que son mandat nommait, déjà porté par un lot du même
+ * produit remis et ingéré le matin même ; une écriture ordinaire l'a remplacé, et rien ne s'y est
+ * opposé — ni le gabarit (qui écrit pourtant « un lot remis ne se modifie JAMAIS »), ni cet
+ * oracle (PASS sur l'écrasement), ni la boîte d'entrée, qui ne le voit qu'à l'ouverture suivante.
+ * La règle confronte l'empreinte du sidecar présent à celle consignée par l'événement d'ingestion
+ * portant le même nom de fichier ; deux empreintes différentes pour un même chemin = le fichier a
+ * été réécrit après sa remise, et le remède est l'INDICE SUIVANT, jamais une retouche. Hors du
+ * pilot — la copie de ce module que chaque produit reçoit par l'héritage n'a pas le registre sous
+ * la main — la règle rend SANS_OBJET et le DIT : un contrôle qui exige une donnée absente crie
+ * partout sauf là où il sert.
+ *
  * ANTÉRIORITÉ DÉCLARÉE : R-45 ne juge que les lots datés du 21/08 ou après, R-46 du 22/08 ou
  * après. La date se lit dans le NOM du fichier (`… - AAAAMMJJ<lettre>.md`), jamais sur le
  * disque : une copie change la date de fichier, pas la date du lot.
@@ -53,9 +65,11 @@
  * Exit : 0 = forme tenue (ou lot antérieur aux règles) · 1 = forme en défaut · 2 = lot illisible.
  */
 import { readFileSync, existsSync } from "node:fs";
-import { basename } from "node:path";
+import { basename, dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { createHash } from "node:crypto";
 
-export const VERSION = "1.0.0";
+export const VERSION = "1.1.0";
 
 /** R-45 depuis le 21/08/2026, R-46 depuis le 22/08 — antériorité déclarée, jamais devinée. */
 export const SEUILS = { "R-45": "20260821", "R-46": "20260822" };
@@ -147,6 +161,60 @@ export function verifier(cheminLot, texteFourni) {
       continue;
     }
     ajouter(regle, "PASS", `section « ${quoi} » présente et substantielle`, null);
+  }
+
+  // ---- R-49 · UN LOT REMIS ET INGÉRÉ NE SE RÉÉCRIT JAMAIS (TF-0884, 08/09/2026) --------------
+  //
+  // Le fait, arrivé le 06/09 et réparé par l'agent qui l'avait commis : un compte rendu a pris
+  // l'indice « a » que son mandat nommait, déjà porté par un lot du MÊME produit remis et ingéré
+  // le matin même (commit e3031e1). Une écriture ordinaire l'a remplacé, et RIEN ne s'y est
+  // opposé — ni le gabarit (qui écrit pourtant « un lot remis ne se modifie JAMAIS »), ni cet
+  // oracle (PASS sur l'écrasement), ni la boîte d'entrée, qui ne le voit qu'à l'ouverture
+  // suivante. L'histoire du registre aurait divergé du fichier : le registre porte les
+  // candidatures du lot d'origine, le disque porte un autre texte, et plus rien ne les rapproche.
+  //
+  // CE QUI EST JUGÉ : le CHEMIN du sidecar de ce lot figure-t-il déjà dans un événement
+  // `ingestion` du registre, sous une empreinte DIFFÉRENTE de celle du sidecar présent ? Si oui,
+  // le fichier a été réécrit après sa remise, et le remède est l'indice SUIVANT — jamais une
+  // retouche. Empreinte normalisée en LF, comme à l'ingestion (idiome TF-0253/TF-0359) : sans
+  // quoi un simple aller-retour git en CRLF passerait pour une réécriture.
+  //
+  // POURQUOI SANS_OBJET AILLEURS QU'AU PILOT, et ce n'est pas un adoucissement : ce module est
+  // aussi la COPIE CONFORME que chaque produit reçoit par l'héritage, et un produit n'a pas le
+  // registre du pilot sous la main. Un contrôle qui exigerait une donnée absente crierait chez
+  // tout le monde sauf là où il sert. Le registre introuvable est DIT, jamais tu.
+  const sidecar = String(cheminLot).replace(/\.md$/i, ".tf.jsonl");
+  // `FORGE_REGISTRE` prime — recettes et registres jetables, même idiome que les tables du canal
+  // confidentiel (`FORGE_NOMS_INTERDITS`). Sans lui, la recette ne pourrait éprouver cette règle
+  // qu'en écrivant dans le registre RÉEL, ce qu'aucune recette n'a le droit de faire.
+  const registre = process.env.FORGE_REGISTRE
+    || join(dirname(fileURLToPath(import.meta.url)), "..", "todo", "TODO.jsonl");
+  if (texteFourni !== undefined) {
+    // Jugé sur un texte en mémoire : il n'y a pas de fichier à confronter au registre.
+  } else if (!existsSync(registre)) {
+    ajouter("R-49", "SANS_OBJET",
+      "registre des ingestions hors de portée (copie du module chez un produit) — l'écrasement d'un lot déjà ingéré se juge à la porte du pilot",
+      null);
+  } else if (!existsSync(sidecar)) {
+    ajouter("R-49", "SANS_OBJET", `sidecar « ${basename(sidecar)} » absent — aucune empreinte à confronter aux ingestions`, null);
+  } else {
+    const empreinteActuelle = createHash("sha256").update(readFileSync(sidecar, "utf8").split("\r\n").join("\n")).digest("hex");
+    const cle = basename(sidecar).toLowerCase();
+    const ingestions = readFileSync(registre, "utf8").split("\n").filter((l) => l.trim())
+      .map((l) => { try { return JSON.parse(l); } catch { return null; } })
+      .filter((e) => e && e.ev === "ingestion" && typeof e.fichier === "string"
+        && basename(e.fichier.split("\\").join("/")).toLowerCase() === cle);
+    if (!ingestions.length) {
+      ajouter("R-49", "PASS", `« ${basename(String(cheminLot))} » n'a jamais été ingéré sous ce nom — la remise est une première`, null);
+    } else if (ingestions.some((e) => e.lot_sha === empreinteActuelle
+      || (e.reempreinte && e.reempreinte.lot_sha_avant === empreinteActuelle))) {
+      ajouter("R-49", "PASS", `« ${basename(String(cheminLot))} » est ingéré, et son sidecar porte encore l'empreinte consignée — le lot n'a pas été réécrit`, null);
+    } else {
+      ajouter("R-49", "FAIL",
+        `« ${basename(String(cheminLot))} » a DÉJÀ été ingéré (empreinte consignée ${String(ingestions[ingestions.length - 1].lot_sha).slice(0, 12)}, le ${String(ingestions[ingestions.length - 1].ts || "?").slice(0, 10)}) et son sidecar en porte une AUTRE (${empreinteActuelle.slice(0, 12)}) — `
+        + "un lot remis ne se modifie JAMAIS : le registre porte les candidatures du texte d'origine, et son histoire vient de diverger du fichier",
+        `restaurer le lot d'origine (\`git checkout HEAD -- "${cheminLot}" "${sidecar}"\`) et remettre le nouveau texte sous l'INDICE SUIVANT — \`node scripts\\allouer-indice.mjs\` le donne`);
+    }
   }
 
   return { verdict: constats.some((c) => c.statut === "FAIL") ? "FAIL" : "PASS", date, constats };

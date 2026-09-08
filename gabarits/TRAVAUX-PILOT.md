@@ -10,6 +10,15 @@
   reste au pilot (`output\` daté). Statut : `a_traiter` → `traite le <date>` — seule édition
   autorisée après coup : cette ligne de statut.
 - **Statut** : a_traiter
+- **Sort du lot reçu** (TF-0883 — prescrit ici, **juge en attente** : son entrée en vigueur
+  demande une ligne dans l'émetteur des lots, `todo\emettre-travaux.mjs`, hors du périmètre de la
+  campagne qui a écrit cette prescription) : ce lot entre dans l'histoire du produit — `git add` du
+  fichier et de son sidecar — SAUF si `git check-ignore "<ce fichier>"` le déclare ignoré, auquel
+  cas il reste hors de l'histoire et vit sur le seul poste qui l'a reçu. *La ligne est
+  OBLIGATOIRE, dans l'un ou l'autre cas.* Le canal supposait la boîte d'entrée ignorée par git
+  sans le dire ; mesuré le 06/09 chez un produit qui versionne `input\` à dessein, la question a
+  été tranchée dans le mandat HUMAIN qui accompagnait le lot — et deux fichiers reçus sont restés
+  non suivis indéfiniment. Une garde qui vit dans un mandat ne protège que la session qui l'a reçue.
 
 > ## ⛔ AVANT DE TRAITER — un geste, une seconde
 >
@@ -77,6 +86,7 @@ la clôture de ses propres items (`gains_constates`).
 - **Effort estimé** : <simple|moyen|complexe|très complexe> × <court|moyen|long|très long>
 - **Comment vous saurez que c'est fait** : <la commande à rejouer, ou le fait à constater>
 - **Module producteur lu** (T6, seulement si « ce qui est demandé » nomme un module qui produit un artefact — « transcrit par `x` », « porté par `x` ») : `<module>` produit <artefact> (source : <chemin ou SKILL.md lu>)
+- **Configuration externe lue** (T7, seulement si l'élément affirme un fait qui vit chez l'hébergeur — règle ou protection de branche, avance rapide, revue exigée, contrôle requis, push forcé, droits d'accès du dépôt, secret d'organisation) : `<commande de lecture>` le <AAAA-MM-JJ> → <ce qu'elle rend>
 - **Si ce n'est pas fait** : <la conséquence de l'inaction — jamais une menace, un fait>
 
 ## Ce que le pilot a déjà fait de son côté

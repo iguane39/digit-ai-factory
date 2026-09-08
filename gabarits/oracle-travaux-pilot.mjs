@@ -57,6 +57,16 @@
  *      forge a dû répartir le travail elle-même, et l'écart n'avait aucune classe où entrer.
  *      *Nommer un producteur sans l'avoir lu, c'est confier une tâche à quelqu'un qui n'existe
  *      pas.* T6 exige la lecture DÉCLARÉE, pas sa justesse (même borne que T1).
+ * T7 · tout fait portant sur une CONFIGURATION EXTERNE cite la COMMANDE qui l'a lue et sa DATE
+ *      (TF-0915, 08/09/2026). Le 05/09, un lot du pilot a affirmé une règle de branche (« avance
+ *      rapide seulement ») sans l'avoir lue chez l'hébergeur ; T1 à T6 ont rendu PASS, la forge
+ *      l'a lue comme vraie, et la configuration RÉELLE — une revue exigée, deux contrôles requis,
+ *      `enforce_admins` à faux, push forcé interdit — n'a été mesurée que le lendemain, par une
+ *      lecture directe de la protection de branche chez l'hébergeur. Coût : un aller-retour
+ *      humain et un lot de retours. *Une configuration externe se LIT en une commande ;
+ *      l'affirmer sans l'avoir lue est un choix, pas une contrainte.* T7 ne juge toujours pas la
+ *      VÉRACITÉ — le pilot ne rejoue rien chez l'hébergeur d'un produit — il juge que la lecture
+ *      a eu lieu et qu'elle est datée.
  *
  * NON JUGÉ, et c'est délibéré :
  *   · la JUSTESSE de ce qui est demandé — un contrôle de forme ne juge pas un fond, et un
@@ -65,6 +75,19 @@
  *     précisément ce que le canal laisse au produit ;
  *   · la VÉRACITÉ d'un moyen de vérification : T1 exige qu'il soit écrit, pas qu'il soit exact.
  *     Vérifier cela demanderait de jouer la commande chez le produit, ce que le pilot ne fait pas.
+ *     T7 (TF-0915) réduit la portée de cette borne SANS la lever : pour une configuration EXTERNE
+ *     lisible en direct, la lecture est exigée et datée — c'est la seule classe de faits qu'un
+ *     émetteur peut vérifier sans entrer chez le destinataire ;
+ *   · le SORT DU LOT REÇU dans l'histoire du produit (TF-0883) : le gabarit le PRESCRIT depuis le
+ *     08/09 — le canal supposait la boîte d'entrée ignorée par git sans le dire, et deux fichiers
+ *     reçus sont restés non suivis indéfiniment — mais AUCUN juge ne l'exige encore. La règle
+ *     existe, écrite et éprouvée à double sens ; son entrée en vigueur demande une ligne dans
+ *     l'émetteur des lots (`todo\emettre-travaux.mjs`, en-tête du lot généré), hors du périmètre
+ *     d'écriture de la campagne qui a livré T7. Doctrine opposable, juge en attente : c'est
+ *     exactement l'état que TF-0923 nomme, et il est DÉCLARÉ plutôt que tu ;
+ *   · le vocabulaire déclencheur de T7 est BORNÉ et écrit : une configuration externe racontée en
+ *     d'autres mots ne sera pas vue. Faux négatif ASSUMÉ — le seuil conservateur protège de
+ *     l'inverse, exiger une lecture d'hébergeur sur une phrase ordinaire.
  *
  * Usage : node oracle-travaux-pilot.mjs <lot.md> [--json]
  * Exit : 0 = forme tenue · 1 = forme en défaut · 2 = lot illisible.
@@ -72,7 +95,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { basename } from "node:path";
 
-export const VERSION = "1.1.0";
+export const VERSION = "1.2.0";
 
 const SECTION_TRAVAUX = /^##\s+Travaux\s+confi[ée]s\s*$/im;
 const SECTION_DEJA_FAIT = /^##\s+Ce\s+que\s+le\s+pilot\s+a\s+d[ée]j[àa]\s+fait\s+de\s+son\s+c[ôo]t[ée]\s*$/im;
@@ -103,6 +126,11 @@ const AUCUNE_BORNE = /aucune\s+borne|rien\s+n['’]est\s+[ée]cart[ée]\s+de\s+c
 const PRODUCTEUR_NOMME = /(?:(?:transcri|produi|[ée]cri|d[ée]riv|g[ée]n[ée]r|r[ée]g[ée]n[ée]r)[a-zéèê]*|porté(?:e?s)?)\s+(?:[^`\n]{0,60}?\s)?par\s+`([^`\n]+)`/gi;
 //: T6 (TF-0888) — un complément qui commence par un tiret est une OPTION, jamais un module.
 const EST_OPTION = (jeton) => /^-/.test(jeton.trim());
+//: T7 — une CONFIGURATION EXTERNE nommée : ce qui vit chez l'hébergeur, lisible en direct, et que
+//: personne ne peut deviner depuis le dépôt. Le vocabulaire est BORNÉ et écrit, jamais deviné.
+const CONFIGURATION_EXTERNE = /(r[èe]gle\s+de\s+branche|protection\s+de\s+branche|branch\s+protection|avance\s+rapide|fast[- ]forward|revue\s+(exig[ée]e|requise|obligatoire)|push\s+forc[ée]|force[- ]push|enforce_admins|contr[ôo]les?\s+requis|required\s+status\s+check|droits\s+d['’]acc[èe]s\s+du\s+d[ée]p[ôo]t|permissions\s+du\s+d[ée]p[ôo]t|secret[s]?\s+d['’]organisation|variable[s]?\s+d['’]environnement\s+de\s+l['’]h[ée]bergeur)/i;
+//: T7 — la lecture déclarée d'une configuration externe : une commande EN BACKTICKS et une DATE.
+const LECTURE_EXTERNE = /configuration\s+externe\s+lue[^\n]*?`([^`\n]+)`[^\n]*?(\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}|\d{2}\/\d{2})/gi;
 //: T6 — la lecture déclarée du producteur : « **Module producteur lu** : `x` … » (une ligne par module).
 const LECTURE_PRODUCTEUR = /module\s+producteur\s+lu[^\n]*?`([^`\n]+)`/gi;
 
@@ -228,6 +256,37 @@ export function verifier(cheminOuTexte, nomFichier) {
   } else {
     ok("T6", elements.length && lus.size ? `${lus.size} module(s) producteur(s) nommé(s), chacun lu et sa source citée`
       : "aucun module producteur nommé — rien à lire");
+  }
+
+  // ---- T7 : un fait portant sur une CONFIGURATION EXTERNE cite la commande de lecture et sa
+  //           date (TF-0915) -----------------------------------------------------------------
+  //
+  // T1 exige qu'un moyen de vérification soit ÉCRIT, jamais qu'il soit EXACT — et c'est déclaré au
+  // non_juge depuis l'origine. Le 05/09, un lot du pilot a affirmé une règle de branche (« avance
+  // rapide seulement ») sans l'avoir lue chez l'hébergeur ; T1 à T6 ont rendu PASS, la forge l'a
+  // lue comme vraie, et la configuration RÉELLE — une revue exigée, deux contrôles requis,
+  // `enforce_admins` à faux, push forcé interdit — n'a été mesurée que le lendemain, par
+  // `gh api …/branches/main/protection`. Coût : un aller-retour humain et un lot de retours.
+  //
+  // CE QUE T7 CHANGE, ET CE QU'IL NE CHANGE PAS. Il ne juge toujours pas la VÉRACITÉ d'un fait —
+  // le pilot ne rejoue pas une commande chez l'hébergeur d'un produit. Il juge que le fait a été
+  // LU : une configuration externe est lisible en direct, donc l'affirmer sans citer sa lecture
+  // est un choix, pas une contrainte. C'est la même mécanique que T6 sur les modules producteurs,
+  // portée sur ce qui vit hors du dépôt. Le vocabulaire déclencheur est BORNÉ et écrit ci-dessus :
+  // une configuration racontée en d'autres mots ne sera pas vue, et c'est un faux négatif ASSUMÉ —
+  // le seuil conservateur protège de l'inverse, exiger une lecture sur une phrase ordinaire.
+  const luesExternes = new Set();
+  LECTURE_EXTERNE.lastIndex = 0;
+  for (let l; (l = LECTURE_EXTERNE.exec(texte)) !== null;) luesExternes.add(l[1].trim());
+  const sansLecture = elements.filter((e) => CONFIGURATION_EXTERNE.test(e.corps));
+  if (sansLecture.length && !luesExternes.size) {
+    ko("T7", `${sansLecture.length} élément(s) affirment une CONFIGURATION EXTERNE (${sansLecture.map((e) => e.id).join(", ")}) sans citer la commande qui l'a lue ni sa date — `
+      + "une règle de branche, un contrôle requis ou un droit d'accès se LIT en une commande ; l'affirmer sans l'avoir lue, c'est faire lire au produit une configuration inventée (lot 20260905f : « avance rapide seulement » sur une branche qui exigeait une revue)",
+      "ajouter à l'élément « - **Configuration externe lue** (T7) : `<commande de lecture>` le <AAAA-MM-JJ> → <ce qu'elle rend> »");
+  } else if (sansLecture.length) {
+    ok("T7", `${sansLecture.length} élément(s) affirment une configuration externe, et ${luesExternes.size} lecture(s) sont citées avec leur date`);
+  } else {
+    ok("T7", "aucun fait portant sur une configuration externe — rien à lire chez l'hébergeur");
   }
 
   return { fichier: nom, version: VERSION, constats,

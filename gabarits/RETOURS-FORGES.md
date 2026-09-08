@@ -61,6 +61,18 @@ référentiel : une classe ne se crée jamais dans un sidecar. Un retour dont la
 close chez le pilot entre quand même, **marqué récidive** — c'est précisément l'information
 que la factory cherche : une correction qui n'a pas redescendu jusqu'à vous.
 
+**L'indice est PRIS dès que le lot est remis (R-49, TF-0884, 08/09)** : avant d'écrire un lot,
+demander l'indice libre du jour — `node scripts\allouer-indice.mjs` — plutôt que de reprendre
+celui qu'un mandat nomme. Le 06/09, un compte rendu a pris l'indice « a » que son mandat citait,
+déjà porté par un lot du même produit remis et **ingéré le matin même** ; une écriture ordinaire
+l'a remplacé, et *aucun contrôle ne s'y est opposé* — ni ce gabarit, qui l'écrit pourtant, ni
+l'oracle de forme, ni la boîte d'entrée, qui ne l'aurait vu qu'à l'ouverture suivante. L'histoire
+du registre aurait divergé du fichier : le registre porte les candidatures du texte d'origine, le
+disque un autre texte, et plus rien ne les rapproche. Depuis, **R-49** de `oracle-lot-retours`
+refuse un lot dont le chemin est déjà ingéré sous une AUTRE empreinte, et prescrit l'indice
+suivant. Le geste de réparation, s'il est déjà trop tard : restaurer le lot d'origine depuis git,
+puis remettre le nouveau texte sous l'indice suivant.
+
 **Rectifier un retour déjà remis (TF-0703, 31/08)** : un lot remis ne se modifie JAMAIS — et
 c'est cette immuabilité qui force à déclarer une erreur plutôt qu'à l'effacer. Le geste
 complémentaire passe par un NOUVEAU lot : une ligne de sidecar portant deux champs optionnels,
