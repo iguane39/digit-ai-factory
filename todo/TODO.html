@@ -155,7 +155,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>02306c067f7b</code> · dernier événement 2026-09-08T09:32:56.004Z</p>
+      <p class="meta">sceau <code>1171fc90fd52</code> · dernier événement 2026-09-08T09:44:03.150Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -166,7 +166,7 @@
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
       <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="0 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">0</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
-      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="60 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">60</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="54 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">54</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="4 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">4</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="781 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">781</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
     </div>
@@ -2180,10 +2180,10 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0874" data-cite data-forge="digit-ai-forge-conception" data-statut="decide" data-prio="haute">
+        <article class="card s-corrige" id="item-TF-0874" data-cite data-forge="digit-ai-forge-conception" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0874</code>
-            <span class="statut s-decide">decide</span>
+            <span class="statut s-corrige">corrige</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 20)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -2194,121 +2194,6 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 20 — gain 4 × preuve 5 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>deux exigences ajoutées en run de version (E-074, E-075)</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-61</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0885" data-cite data-forge="digit-ai-forge-conception" data-statut="decide" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0885</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 5)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-forge-conception : le point d'entrée déclaré au manifeste rend FAIL sur toute cible, même verte — oracle-retro-modele lit EXIGENCES.json comme du Markdown et sort en 1 au lieu de 2</h3>
-          <div class="card-detail" data-cite><p class="lead">Constat RC-9 du lot de la forge de conception du 05/09 (20260905d), en prose faute de classe ; classe créée sur D-26 (a).</p><ul class="puces"><li>manifeste.json désigne run-oracles-conception.mjs &lt;EXIGENCES.json&gt; comme point d'entrée</li><li>sept des dix oracles ne jugent pas EXIGENCES.json, six l'annoncent proprement en NON_JUGE (exit 2), oracle-retro-modele rend FAIL : le verdict agrégé vaut FAIL sur toute cible, y compris verte. Le produit 61 l'a mesuré de son côté (TF-0831). Demande : NON_JUGE hors domaine, jamais FAIL</li><li>la recette du lanceur joue une cible verte et exige exit 0</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-07</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 5 — gain 4 × preuve 4 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>le point d'entrée d'une forge est rouge sur toute cible : un produit qui le joue ne peut pas obtenir de verdict</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">digit-ai-forge-conception</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0827" data-cite data-forge="digit-ai-forge-conception" data-statut="decide" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0827</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-forge-conception : la seconde famille de vues garde le sceau de provenance seul, et la variante « liste close de sections cablee » ne ferme pas le trou — mesure a l'appui</h3>
-          <div class="card-detail" data-cite><p class="lead">TF-0818 vient de donner aux vues derivees d'EXIGENCES.json une empreinte de leur propre corps (oracle-tracabilite T5). La SECONDE famille de vues de la meme forge — les vues par profil VUE-PO.md / VUE-CSM.md / VUE-UTILISATEUR.md, derivees de RETRO-MODELE.md — reste scellee par source_sha256 seul, juge par oracle-vues-profil VP2 : exactement l'etat corrige ce soir sur la premiere famille. Le point qui depasse le cas particulier : cet oracle porte DEJA la seconde variante que le lot laissait au jugement de la forge — VP4 verifie une liste close de sections imposees par profil — et cette liste ne voit PAS l'amputation qui compte. Mesure du 05/09/2026 sur oracles/fixtures/vues-profil-verte : la vue fait 750 caracteres ; la section « Regles de gestion » VIDEE de son contenu, le titre laisse en place (162 caracteres retires, 22 % de la vue), rend VP1, VP2, VP3 et VP4 tous PASS, exit 0. Contre-mesure du meme banc : la section retiree AVEC son titre fait bien echouer VP4 — c'est la seule amputation que la variante attrape, et ce n'est pas celle qui fait disparaitre une decision, puisqu'il suffit de garder le titre.</p><p class="detail-label">Proposition</p><ul class="puces"><li>porter corps-sha256 sur les vues par profil aussi, avec une regle VP5 jumelle de T5 et le meme etat SANS_OBJET pour les vues anterieures</li><li>le format, le calcul et l'idiome de message sont ecrits et eprouves par TF-0818, le cout est celui des fixtures. Corollaire pour la doctrine et pour la regle de la classe elle-meme : une liste de sections cablee ne remplace jamais une empreinte de corps — elle prouve qu'un titre est la, jamais qu'il y a quelque chose dessous</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>Banc joue le 05/09/2026 sur la fixture verte des vues par profil, deux amputations comparees. (1) Section « Regles de gestion » videe, titre garde : 750 caracteres -&gt; 588, soit 162 retires (22 %) ; oracle-vues-profil rend PASS sur ses quatre regles, exit 0 — la decision disparue est indetectable. (2) Meme section retiree avec son titre : 750 -&gt; 566 ; VP4 rend FAIL (« 1 section(s) imposee(s) du profil absente(s) »), VP2 rend toujours PASS. La regle qui devrait voir le contenu ne voit que le titre, et la regle du sceau ne voit que la source. Cout de reference : TF-0818 a comble le meme trou sur la premiere famille en une passe, 6 cas de branche et 2 fixtures dediees, sans toucher au sceau de la source ni migrer aucune vue existante.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">digit-ai-forge-conception</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0831" data-cite data-forge="digit-ai-forge-conception" data-statut="decide" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0831</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-conception : run-oracles-conception sans --seulement juge EXIGENCES.json comme un RETRO-MODELE</h3>
-          <div class="card-detail" data-cite><p class="lead">run-oracles-conception.mjs &lt;EXIGENCES.json&gt; sans --seulement rend FAIL : oracle-retro-modele juge EXIGENCES.json comme un RETRO-MODELE.md (RM1-RM5 FAIL au lieu de SANS_OBJET).</p><p class="detail-label">Proposition</p><ul class="puces"><li>déclarer un oracle non applicable au type d'artefact</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>un FAIL à lire dans le code du runner avant de trouver --seulement</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-61</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0832" data-cite data-forge="digit-ai-forge-conception" data-statut="decide" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0832</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-conception : T5 attend corps-sha256 que ni derive-les-vues ni vues.md ne documentent</h3>
-          <div class="card-detail" data-cite><p class="lead">derive-les-vues prescrit l'en-tête source-sha256 mais oracle-tracabilite T5 attend aussi corps-sha256 (TF-0818) : la vue produite selon la doctrine sort SANS_OBJET sur T5.</p><p class="detail-label">Proposition</p><ul class="puces"><li>documenter le double sceau</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>T5 SANS_OBJET sur les vues du run</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-61</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-decide" id="item-TF-0854" data-cite data-forge="digit-ai-forge-conception" data-statut="decide" data-prio="basse">
-          <header class="card-head">
-            <code class="tf-id">TF-0854</code>
-            <span class="statut s-decide">decide</span>
-            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">digit-ai-forge-conception : les tables closes des oracles sont elles aussi des transcriptions de prose que rien ne relie a leur source — trois instances, dont une posee par le lot qui referme la premiere</h3>
-          <div class="card-detail" data-cite><p class="lead">TF-0822 vient de rendre verifiable la transcription d'un CHAMP de referentiel depuis la prose (ecarts_exigences_socle &lt;- section 7 d'EXIGENCES.md, ecarts_surface_implicite &lt;- section 3 de SURFACE.md), par l'oracle neuf oracle-exigences-md regles P3 et P4. La MEME transcription existe dans la meme forge, du document de methode vers la CONSTANTE DE CODE, et rien ne la verifie. Trois tables portent en commentaire qu'elles sont la « transcription executable » d'un document en prose et « ne l'etendent pas » : SURFACE_IMPLICITE dans oracle-surface (11 cles, source typologie-surface.md section « Surface implicite SaaS »), EXIGENCES_SOCLE dans oracle-exigences (3 cles, source schema-referentiel.md section « Exigences socle candidates »), et SECTIONS_EXIGENCES_MD dans oracle-exigences-md (7 sections, source le gabarit d'EXIGENCES.md du meme document) — cette troisieme est ECRITE PAR LE LOT QUI REFERME LA PREMIERE INSTANCE. Le libelle de la classe s'y applique mot pour mot : l'oracle prouve que la regle est ecrite, jamais qu'elle a ete decidee.</p><p class="detail-label">Proposition</p><ul class="puces"><li>le patron de verification existe deja chez la forge et il est eprouve — le cas 6 de la branche TF-0818 du self-test extrait la phrase citee dans un message d'echec et la confronte a vues.md, mot pour mot. Le generaliser en un cas de recette par table close (pour chaque cle de la table du code, la chercher dans la table de prose declaree, et l'inverse) coute une fonction et trois appels. Corollaire pour la doctrine et pour la regle de la classe elle-meme : une transcription est une transcription, que la cible soit un champ JSON ou une constante de code</li><li>la regle de la classe ne vise aujourd'hui qu'un « champ machine » d'un referentiel, et se lit donc comme ne concernant pas le code des oracles</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-06</dd></div>
-            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>Banc joue le 06/09/2026 sur le depot de la forge. (1) Comptes confrontes a la main : oracle-surface SURFACE_IMPLICITE = 11 cles contre 11 lignes de la table close de typologie-surface.md ; oracle-exigences-md SECTIONS_EXIGENCES_MD = 7 sections contre 7 lignes du gabarit de schema-referentiel.md. Ils concordent, et aucun controle ne le verifie. (2) Derive introduite a dessein : un douzieme candidat (`bandeau-cookies`) ajoute a la table close EN PROSE de typologie-surface.md -&gt; oracle-surface rend exit 0 sur sa fixture verte, et node oracles/self-test.mjs rend SELF-TEST VERT (15 oracles, 55 regles, 86 cellules de matrice comparees). La table du code reste a 11, personne ne le dit ; fichier restaure, self-test vert de nouveau. (3) Cout de reference : TF-0822 a comble le meme trou sur le premier support (champ JSON &lt;- prose) en une passe, avec un oracle neuf de 4 regles, 12 cas de branche et 2 fixtures dediees ; ici le patron a suivre existe deja et est joue (cas 6 de la branche TF-0818), il reste a l'appliquer aux trois tables.</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">digit-ai-forge-conception</dd></div>
             
           </dl>
         </article>
@@ -2332,6 +2217,29 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 4 × preuve 3 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>meme fait que TF-0802 : 404 nue en production une semaine, vue par l'exploitant et par aucune revue</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot-synthese-20260905d</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0885" data-cite data-forge="digit-ai-forge-conception" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0885</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 5)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-forge-conception : le point d'entrée déclaré au manifeste rend FAIL sur toute cible, même verte — oracle-retro-modele lit EXIGENCES.json comme du Markdown et sort en 1 au lieu de 2</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat RC-9 du lot de la forge de conception du 05/09 (20260905d), en prose faute de classe ; classe créée sur D-26 (a).</p><ul class="puces"><li>manifeste.json désigne run-oracles-conception.mjs &lt;EXIGENCES.json&gt; comme point d'entrée</li><li>sept des dix oracles ne jugent pas EXIGENCES.json, six l'annoncent proprement en NON_JUGE (exit 2), oracle-retro-modele rend FAIL : le verdict agrégé vaut FAIL sur toute cible, y compris verte. Le produit 61 l'a mesuré de son côté (TF-0831). Demande : NON_JUGE hors domaine, jamais FAIL</li><li>la recette du lanceur joue une cible verte et exige exit 0</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-07</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 5 — gain 4 × preuve 4 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>le point d'entrée d'une forge est rouge sur toute cible : un produit qui le joue ne peut pas obtenir de verdict</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">digit-ai-forge-conception</dd></div>
             
           </dl>
         </article>
@@ -2446,6 +2354,98 @@
             <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
             <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>Mesure du 05/09/2026 sur le depot de la forge : sur les onze oracles, zero ne prend EXIGENCES.md en entree, et les huit qui jugent EXIGENCES.json n'ont aucun champ a lire pour ces trois candidates. Cout de reference : TF-0811 a comble le meme trou pour la surface implicite en une passe, avec 7 cas de fixtures et un champ de quatre sous-champs — le meme profil de travail rendrait jugeables trois lois transverses de plus.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">digit-ai-forge-conception</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0827" data-cite data-forge="digit-ai-forge-conception" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0827</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-forge-conception : la seconde famille de vues garde le sceau de provenance seul, et la variante « liste close de sections cablee » ne ferme pas le trou — mesure a l'appui</h3>
+          <div class="card-detail" data-cite><p class="lead">TF-0818 vient de donner aux vues derivees d'EXIGENCES.json une empreinte de leur propre corps (oracle-tracabilite T5). La SECONDE famille de vues de la meme forge — les vues par profil VUE-PO.md / VUE-CSM.md / VUE-UTILISATEUR.md, derivees de RETRO-MODELE.md — reste scellee par source_sha256 seul, juge par oracle-vues-profil VP2 : exactement l'etat corrige ce soir sur la premiere famille. Le point qui depasse le cas particulier : cet oracle porte DEJA la seconde variante que le lot laissait au jugement de la forge — VP4 verifie une liste close de sections imposees par profil — et cette liste ne voit PAS l'amputation qui compte. Mesure du 05/09/2026 sur oracles/fixtures/vues-profil-verte : la vue fait 750 caracteres ; la section « Regles de gestion » VIDEE de son contenu, le titre laisse en place (162 caracteres retires, 22 % de la vue), rend VP1, VP2, VP3 et VP4 tous PASS, exit 0. Contre-mesure du meme banc : la section retiree AVEC son titre fait bien echouer VP4 — c'est la seule amputation que la variante attrape, et ce n'est pas celle qui fait disparaitre une decision, puisqu'il suffit de garder le titre.</p><p class="detail-label">Proposition</p><ul class="puces"><li>porter corps-sha256 sur les vues par profil aussi, avec une regle VP5 jumelle de T5 et le meme etat SANS_OBJET pour les vues anterieures</li><li>le format, le calcul et l'idiome de message sont ecrits et eprouves par TF-0818, le cout est celui des fixtures. Corollaire pour la doctrine et pour la regle de la classe elle-meme : une liste de sections cablee ne remplace jamais une empreinte de corps — elle prouve qu'un titre est la, jamais qu'il y a quelque chose dessous</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>Banc joue le 05/09/2026 sur la fixture verte des vues par profil, deux amputations comparees. (1) Section « Regles de gestion » videe, titre garde : 750 caracteres -&gt; 588, soit 162 retires (22 %) ; oracle-vues-profil rend PASS sur ses quatre regles, exit 0 — la decision disparue est indetectable. (2) Meme section retiree avec son titre : 750 -&gt; 566 ; VP4 rend FAIL (« 1 section(s) imposee(s) du profil absente(s) »), VP2 rend toujours PASS. La regle qui devrait voir le contenu ne voit que le titre, et la regle du sceau ne voit que la source. Cout de reference : TF-0818 a comble le meme trou sur la premiere famille en une passe, 6 cas de branche et 2 fixtures dediees, sans toucher au sceau de la source ni migrer aucune vue existante.</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">digit-ai-forge-conception</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0831" data-cite data-forge="digit-ai-forge-conception" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0831</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-conception : run-oracles-conception sans --seulement juge EXIGENCES.json comme un RETRO-MODELE</h3>
+          <div class="card-detail" data-cite><p class="lead">run-oracles-conception.mjs &lt;EXIGENCES.json&gt; sans --seulement rend FAIL : oracle-retro-modele juge EXIGENCES.json comme un RETRO-MODELE.md (RM1-RM5 FAIL au lieu de SANS_OBJET).</p><p class="detail-label">Proposition</p><ul class="puces"><li>déclarer un oracle non applicable au type d'artefact</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>un FAIL à lire dans le code du runner avant de trouver --seulement</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-61</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0832" data-cite data-forge="digit-ai-forge-conception" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0832</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-conception : T5 attend corps-sha256 que ni derive-les-vues ni vues.md ne documentent</h3>
+          <div class="card-detail" data-cite><p class="lead">derive-les-vues prescrit l'en-tête source-sha256 mais oracle-tracabilite T5 attend aussi corps-sha256 (TF-0818) : la vue produite selon la doctrine sort SANS_OBJET sur T5.</p><p class="detail-label">Proposition</p><ul class="puces"><li>documenter le double sceau</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-05</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>T5 SANS_OBJET sur les vues du run</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-61</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-0854" data-cite data-forge="digit-ai-forge-conception" data-statut="corrige" data-prio="basse">
+          <header class="card-head">
+            <code class="tf-id">TF-0854</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-basse" title="priorité dérivée du score (valeur 1)">Priorité Basse</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">digit-ai-forge-conception : les tables closes des oracles sont elles aussi des transcriptions de prose que rien ne relie a leur source — trois instances, dont une posee par le lot qui referme la premiere</h3>
+          <div class="card-detail" data-cite><p class="lead">TF-0822 vient de rendre verifiable la transcription d'un CHAMP de referentiel depuis la prose (ecarts_exigences_socle &lt;- section 7 d'EXIGENCES.md, ecarts_surface_implicite &lt;- section 3 de SURFACE.md), par l'oracle neuf oracle-exigences-md regles P3 et P4. La MEME transcription existe dans la meme forge, du document de methode vers la CONSTANTE DE CODE, et rien ne la verifie. Trois tables portent en commentaire qu'elles sont la « transcription executable » d'un document en prose et « ne l'etendent pas » : SURFACE_IMPLICITE dans oracle-surface (11 cles, source typologie-surface.md section « Surface implicite SaaS »), EXIGENCES_SOCLE dans oracle-exigences (3 cles, source schema-referentiel.md section « Exigences socle candidates »), et SECTIONS_EXIGENCES_MD dans oracle-exigences-md (7 sections, source le gabarit d'EXIGENCES.md du meme document) — cette troisieme est ECRITE PAR LE LOT QUI REFERME LA PREMIERE INSTANCE. Le libelle de la classe s'y applique mot pour mot : l'oracle prouve que la regle est ecrite, jamais qu'elle a ete decidee.</p><p class="detail-label">Proposition</p><ul class="puces"><li>le patron de verification existe deja chez la forge et il est eprouve — le cas 6 de la branche TF-0818 du self-test extrait la phrase citee dans un message d'echec et la confronte a vues.md, mot pour mot. Le generaliser en un cas de recette par table close (pour chaque cle de la table du code, la chercher dans la table de prose declaree, et l'inverse) coute une fonction et trois appels. Corollaire pour la doctrine et pour la regle de la classe elle-meme : une transcription est une transcription, que la cible soit un champ JSON ou une constante de code</li><li>la regle de la classe ne vise aujourd'hui qu'un « champ machine » d'un referentiel, et se lit donc comme ne concernant pas le code des oracles</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-06</dd></div>
+            <div><dt>Priorité</dt><dd>Basse <span class="meta-sub">(score 1 — gain 3 × preuve 1 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-conception</dt><dd>Banc joue le 06/09/2026 sur le depot de la forge. (1) Comptes confrontes a la main : oracle-surface SURFACE_IMPLICITE = 11 cles contre 11 lignes de la table close de typologie-surface.md ; oracle-exigences-md SECTIONS_EXIGENCES_MD = 7 sections contre 7 lignes du gabarit de schema-referentiel.md. Ils concordent, et aucun controle ne le verifie. (2) Derive introduite a dessein : un douzieme candidat (`bandeau-cookies`) ajoute a la table close EN PROSE de typologie-surface.md -&gt; oracle-surface rend exit 0 sur sa fixture verte, et node oracles/self-test.mjs rend SELF-TEST VERT (15 oracles, 55 regles, 86 cellules de matrice comparees). La table du code reste a 11, personne ne le dit ; fichier restaure, self-test vert de nouveau. (3) Cout de reference : TF-0822 a comble le meme trou sur le premier support (champ JSON &lt;- prose) en une passe, avec un oracle neuf de 4 regles, 12 cas de branche et 2 fixtures dediees ; ici le patron a suivre existe deja et est joue (cas 6 de la branche TF-0818), il reste a l'appliquer aux trois tables.</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">digit-ai-forge-conception</dd></div>
             
           </dl>
