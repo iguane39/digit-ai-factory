@@ -32,6 +32,7 @@ const produits = JSON.parse(readFileSync(PRODUITS, "utf8")).produits || {};
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const lignes = [];
 const noms = []; // paires littérales pour les NOMS DE FICHIERS
+const motifs = []; // motifs de VARIANTES pour les NOMS DE FICHIERS (09/09/2026, cinquième passe)
 for (const n of clients.noms || []) {
   const c = clients.pseudonymes?.[n]; if (!c) continue;
   const cap = n[0].toUpperCase() + n.slice(1).toLowerCase();
@@ -50,13 +51,43 @@ for (const [k, v] of Object.entries(produits)) {
   noms.push([k, v]);
   if (!k.includes(".")) {
     const mots = k.replace(/([a-z0-9])([A-Z])/g, "$1 $2").replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2").split(/[\s\-_]+/).filter(Boolean);
-    if (mots.length >= 2 && mots.join("").length >= 8) lignes.push(`regex:(?i)(?<![A-Za-z0-9])${mots.map(esc).join("[\\s\\-_]*")}(?![A-Za-z0-9])==>${v}`);
+    if (mots.length >= 2 && mots.join("").length >= 8) {
+      const corps = `(?i)(?<![A-Za-z0-9])${mots.map(esc).join("[\\s\\-_]*")}(?![A-Za-z0-9])`;
+      lignes.push(`regex:${corps}==>${v}`);
+      // LE NOM DE FICHIER A BESOIN DU MÊME MOTIF QUE LE CONTENU (09/09/2026, cinquième passe).
+      // Le fait : la passe du 09/09 a laissé UN constat sur 939 — « Produit-11 » dans le
+      // nom d'un rapport, la clé de table étant « Produit-11 ». Les contenus étaient
+      // couverts depuis le 03/09 par la variante de graphie ; le rappel de noms, lui, ne faisait
+      // que du LITTÉRAL. Or la porte juge un nom de fichier AVEC les variantes : une règle qui
+      // vaut pour le contenu et pas pour le nom laisse un nom de client dans un chemin publié,
+      // et le chemin est ce qu'un moteur de recherche indexe en premier.
+      motifs.push([corps, v]);
+    }
   }
 }
 const uniq = [...new Set(lignes)];
 mkdirSync(sortie, { recursive: true });
 writeFileSync(join(sortie, "remplacements.txt"), uniq.join("\n") + "\n", "utf8");
+// UN NOM DE FICHIER SE SUBSTITUE AVEC UNE FRONTIÈRE DE MOT, JAMAIS EN LITTÉRAL NU (09/09/2026).
+// Le défaut, relevé par le banc écrit ce jour-là et présent depuis l'origine du script : la
+// substitution des noms se faisait par `str.replace()`, sans frontière — un fichier `Zorgon.mjs`
+// devenait `Produit-92on.mjs` dès qu'une clé « Zorg » existait, et le vrai parc porte des clés
+// courtes comme « Produit-09 ». Le CONTENU avait sa frontière depuis le 06/09 (TF-0826) ; le NOM ne
+// l'avait pas. La frontière retenue ici est celle de la PORTE — `[A-Za-z0-9]`, sans le souligné —
+// parce qu'un chemin n'est pas du code : renommer `lib_<cle>_helper.py` est voulu, alors que couper
+// un identifiant dans une source ne l'est pas (TF-0927).
+const bordee = (t) => `(?<![A-Za-z0-9])${t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![A-Za-z0-9])`;
 const paires = [...noms].sort((a, b) => b[0].length - a[0].length);
-const py = `paires = ${JSON.stringify(paires)}\nfor de, vers in paires:\n    filename = filename.replace(de.encode(), vers.encode())\nreturn filename`;
+const tousMotifs = [
+  ...paires.map(([t, v]) => [bordee(t), v]),   // les clés, du plus long au plus court
+  ...motifs,                                    // puis les variantes de graphie des noms composés
+];
+const py = [
+  "import re",
+  `motifs = ${JSON.stringify(tousMotifs)}`,
+  "for motif, vers in motifs:",
+  "    filename = re.sub(motif.encode(), vers.encode(), filename)",
+  "return filename",
+].join("\n");
 writeFileSync(join(sortie, "filename-callback.py"), py, "utf8");
-console.log(JSON.stringify({ regles_contenu_et_messages: uniq.length, paires_noms_de_fichiers: paires.length, sortie }));
+console.log(JSON.stringify({ regles_contenu_et_messages: uniq.length, motifs_noms_de_fichiers: tousMotifs.length, sortie }));
