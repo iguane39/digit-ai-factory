@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau 1e92996f9ab2)]
+sources_de_verite: [todo/TODO.jsonl (sceau bfb95972b02a)]
 verifie_le: 2026-09-10
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `1e92996f9ab2`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `bfb95972b02a`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -20,9 +20,9 @@ les corrections donnerait l'illusion d'un progrès net.
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
 | Ouverts | 62 | candidats, décidés ou en cours — le reste à faire réel |
-| Clos sur gains constatés | 169 | corrigés avec leur mesure avant/après |
+| Clos sur gains constatés | 170 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 0 | décidés non faits, motif écrit — jamais un silence |
-| Total suivi | 231 | tout ce que le registre a jamais porté |
+| Total suivi | 232 | tout ce que le registre a jamais porté |
 
 ## Ce qui reste ouvert, par forge
 
@@ -111,7 +111,7 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-1001 | forge-audit : six champs que le moteur de rapport sait rendre restent vides sans que la porte machine le dise | candidat | digit-ai-forge-audit | 10 |
 | TF-0940 | digit-ai-forge-agents / digit-ai-forge-audit : deux implémentations du schéma de base de données coexistent (r | en_cours | digit-ai-forge-agents, digit-ai-forge-audit | 6.7 |
 | TF-0947 | digit-ai-forge-agents / digit-ai-forge-audit : deux implémentations du schéma de base de données coexistent (r | decide | digit-ai-forge-agents, digit-ai-forge-audit | 6.7 |
-| TF-1005 | forge-audit : realigner les deux rapports d audit de reference sur le format courant en conservant leur conten | en_cours | digit-ai-forge-audit | 3 |
+| TF-1014 | forge-audit : le referentiel de reference du 21/08 n est pas convertible au format courant — son CONTENU (them | candidat | digit-ai-forge-audit | 3 |
 
 ### digit-ai-forge-data — 5 item(s)
 

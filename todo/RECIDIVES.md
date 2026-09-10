@@ -1,10 +1,10 @@
 # Récidives et descente — tableau de bord
 
-<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 1e92996f9ab2 · archive 6ce2fe14c2bb · classes ad5c003a9022 · relevés 87cfd092d942 · héritage 23d6b9c4bee8. État au 2026-09-10T14:07:19.521Z (ts max des sources, jamais l'horloge). -->
+<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre bfb95972b02a · archive 6ce2fe14c2bb · classes ad5c003a9022 · relevés 87cfd092d942 · héritage 23d6b9c4bee8. État au 2026-09-10T14:54:55.153Z (ts max des sources, jamais l'horloge). -->
 
 Ce tableau de bord répond à trois questions que le registre seul ne savait pas poser : est-ce la deuxième fois, chez qui, et depuis combien de temps la correction existe sans être appliquée. Il se lit avec sa contre-métrique : un compteur de récidives qui baisse pendant que le nombre de classes monte est un compteur contourné, pas un progrès.
 
-**Périmètre mesuré** : 1012 item(s) au registre (actifs et archive), 196 portant une classe, 110 marqué(s) récidive ; référentiel de 62 classe(s) en 18 famille(s) (v1.6.0) ; 18 relevé(s) d'héritage.
+**Périmètre mesuré** : 1013 item(s) au registre (actifs et archive), 197 portant une classe, 111 marqué(s) récidive ; référentiel de 62 classe(s) en 18 famille(s) (v1.6.0) ; 18 relevé(s) d'héritage.
 
 ## 1. Récidives par classe
 
@@ -23,12 +23,12 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `anonymisation-portee-partielle` | anonymisation | 16 | 2 | 5 | 31 % | pilot ×4, Produit-12 ×1 | 2026-09-06 |
 | `page-html-filtres-tableau` | page-html-socle | 5 | 4 | 5 | 100 % | Produit-12 ×1, Produit-61 ×1, Produit-62 ×3 | 2026-09-08 |
 | `page-html-sticky-superposes` | page-html-socle | 5 | 1 | 5 | 100 % | Produit-61 ×1, Produit-10 ×4 | 2026-09-08 |
+| `gabarit-conception-non-jugee` | gabarit-document | 3 | 3 | 3 | 100 % | Produit-61 ×2, pilot ×1 | 2026-09-10 |
 | `page-html-dictionnaire-colonnes` | page-html-socle | 4 | 1 | 3 | 75 % | Produit-10 ×3 | 2026-09-08 |
 | `skill-non-invoque-lexique` | skill-ou-oracle-non-invoque | 3 | 1 | 3 | 100 % | Produit-10 ×1, Produit-62 ×1, Produit-11 ×1 | 2026-09-09 |
 | `alias-de-transition-perime-survivant` | heritage-produit | 3 | 1 | 2 | 67 % | Produit-11 ×1, Produit-61 ×1 | 2026-09-09 |
 | `auteur-juge-son-contrat` | skill-ou-oracle-non-invoque | 2 | 1 | 2 | 2/2 (sous 3 items, taux non significatif) | Produit-11 ×2 | 2026-09-08 |
 | `contrat-de-sortie-sans-domicile` | contrat-interface-forge | 3 | 1 | 2 | 67 % | Produit-62 ×1, Produit-61 ×1 | 2026-09-09 |
-| `gabarit-conception-non-jugee` | gabarit-document | 2 | 3 | 2 | 2/2 (sous 3 items, taux non significatif) | Produit-61 ×2 | 2026-09-10 |
 | `page-html-largeur-lecture-donnees` | page-html-socle | 3 | 2 | 2 | 67 % | Produit-10 ×2 | 2026-09-08 |
 | `page-html-sommaire-absent` | page-html-socle | 2 | 2 | 2 | 2/2 (sous 3 items, taux non significatif) | Produit-10 ×2 | 2026-09-08 |
 | `porte-cle-courte-sans-frontiere` | hook-ou-gate | 4 | 1 | 2 | 50 % | Produit-62 ×2 | 2026-09-09 |

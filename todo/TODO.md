@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=1e92996f9ab2 archive=6ce2fe14c2bb · dernier événement: 2026-09-10T14:07:19.521Z -->
+     sceaux: actifs=bfb95972b02a archive=6ce2fe14c2bb · dernier événement: 2026-09-10T14:54:55.153Z -->
 
-**231 actifs** (candidat 22 · décidé 27 · en cours 13 · corrigé 169 · écarté 0) · **782 archivés**.
+**232 actifs** (candidat 23 · décidé 27 · en cours 12 · corrigé 170 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -154,10 +154,11 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
-| TF-1005 | en_cours | 3 | forge-audit : realigner les deux rapports d audit de reference sur le format courant en conservant leur contenu — arbitrage humain du 10/09, le contenu fait foi et la forme a evolue | **oui** — oui — un rapport d audit remis le 09/09 a ete refuse par le commanditaire sur sa forme, et le lot qui le remonte classe le constat BLOQUANT ; l ecart est chiffre par un oracle rejoue (exit 1, 13 erreurs sur la reference mesuree ici), et tant qu il n est pas resorbe chaque remise rouvre le meme aller-retour |
 | TF-1000 | candidat | 15 | forge-audit : la charte d exemple fictive livree avec la forge prime sur la typographie declaree du tenant | **oui** — un livrable remis a un commanditaire dans la typographie d un client fictif ; defaut invisible aux deux portes machine, trouve par lecture du generateur de theme |
 | TF-1001 | candidat | 10 | forge-audit : six champs que le moteur de rapport sait rendre restent vides sans que la porte machine le dise | **oui** — les trois syntheses et les douze lignes de reprise applicative ont du etre ecrites hors de l etape d audit, a partir du socle documentaire du produit ; le rapport disait son manque et aucune porte ne l a escalade |
+| TF-1014 | candidat | 3 | forge-audit : le referentiel de reference du 21/08 n est pas convertible au format courant — son CONTENU (themes de perimetre, types de preuve, livrables attendus, bareme, 9 ADR) n a pas de case dans le pack de dimensions | **oui** — oui — un rapport d audit a ete refuse par le commanditaire le 09/09 parce qu il ne ressemblait pas aux references ; le referentiel courant differe du referentiel de reference sur 149 themes sur 152 et 9 ADR sur 33, et rien ne juge un referentiel rendu |
 | TF-0862 | corrige | 5.3 | forge-audit : oracle executable dans profiles/powerbi sur les fichiers TMDL/PBIP d'un modele semantique — mesure definie une fois (CTL-D05-02 et 10), relations actives et non ambigues, table de dates marquee et contigue (CTL-D05-13), mode de connexion declare par profil de besoin (CTL-D05-14), roles de securite au niveau ligne presents, statut de certification (CTL-D05-15) — sans point de terminaison XMLA (manque M4, lot L5) | non |
+| TF-1005 | corrige | 3 | forge-audit : realigner les deux rapports d audit de reference sur le format courant en conservant leur contenu — arbitrage humain du 10/09, le contenu fait foi et la forme a evolue | **oui** — oui — un rapport d audit remis le 09/09 a ete refuse par le commanditaire sur sa forme, et le lot qui le remonte classe le constat BLOQUANT ; l ecart est chiffre par un oracle rejoue (exit 1, 13 erreurs sur la reference mesuree ici), et tant qu il n est pas resorbe chaque remise rouvre le meme aller-retour |
 
 ## digit-ai-forge-conception
 
