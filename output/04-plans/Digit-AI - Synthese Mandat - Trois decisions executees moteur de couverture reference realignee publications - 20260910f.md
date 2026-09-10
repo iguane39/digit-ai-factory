@@ -10,7 +10,7 @@ Vos trois décisions ont été suivies dans l'ordre où elles se conditionnaient
 
 - **quoi** — exécution des décisions humaines D-7 (a), D-8 (a) et D-9 (a) du 10/09/2026 : couverture des règles au plan de remédiation chez forge-audit, dépôt des livrables réalignés chez le produit porteur des références, publication du pilot et de forge-agents.
 - **sur quoi** — la factory `digit-ai-factory` (le pilot) ; sous mandat humain `digit-ai-forge-audit` (D-7), `digit-ai-forge-agents` (publication, D-9) et le produit porteur des références (dépôt, D-8).
-- **quand** — 2026-09-10 15:20 UTC+02:00 (Europe/Paris), durée ≈ 1 h 10, relevée à l'horloge et non estimée.
+- **quand** — 2026-09-10 17:15 UTC+02:00 (Europe/Paris) ; votre message « 7a, 8a, 9a » est horodaté 16:46, durée ≈ 30 min, relevée à l'horloge et non estimée.
 - **qui** — pilot `digit-ai-factory`, `main` publié en `5233c2a` ; forge-agents publié en `3d16b96` ; forge-audit commit local `53ca664` ; oracles joués : `verifier-rapport.mjs`, `verifier-rapport-html.mjs`, `build-rapport.mjs`, lanceur `tools\verifier.mjs` (forge-audit), `oracle-nom-client-publie` (trois fois avant push, deux fois sur clone frais), `oracle-todo`, `oracle-boite-entree`.
 
 ## 2. Verdict en une ligne
