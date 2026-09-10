@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 249 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 250 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -272,6 +272,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md | 20260817a | 7.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md` |
 | Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Reecriture des histoires design tests development decision D10a - 20260907h.md | 20260907h | 13.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Reecriture des histoires design tests development decision D10a - 20260907h.md` |
+| Digit-AI - Synthese Mandat - Regle de portee du GO ecrite et publiee restitution partie d office - 20260910c.md | 20260910c | 11.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Regle de portee du GO ecrite et publiee restitution partie d office - 20260910c.md` |
 | Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md | 20260830b | 19.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Remise a niveau et renommage - 20260830b.md` |
 | Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md | 20260830j | 16.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Remontee automatique des retours produits - 20260830j.md` |
 | Digit-AI - Synthese Mandat - Retours ingeres et cinq campagnes lancees sur soixante cinq items - 20260908g.md | 20260908g | 37.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours ingeres et cinq campagnes lancees sur soixante cinq items - 20260908g.md` |
