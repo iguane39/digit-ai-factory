@@ -47,7 +47,7 @@ Une seule décision.
   - preuve : `oracle-todo` **PASS** ; TF-1014 ingéré (lot `eb6ed6fe81d4`) après pseudonymisation du sidecar (1 nom substitué, 0 restant) ; mesure portée : 152 thèmes de périmètre dont 3 retrouvés, 109 types de preuve, 131 livrables, 17 noms de dimension dont 5 retrouvés, 33 ADR dont 9 absents du modèle courant.
 - **D-9 (a) — le pilot est publié.** Quatorze enregistrements, dont les sept de la session voisine.
   - preuve : porte sur l'arbre juste avant le push **PASS, 51 constats, 0 bloquant** ; `git merge-base --is-ancestor` vrai ; `9500c07..5233c2a` ; après `fetch`, `origin/main` = `HEAD` = `5233c2a`, 0/0 ; clone frais à branche unique hors de c:\dev : **679 commits, 44 références, PASS, 1 constat — le verdict —, 0 antériorité, 0 bloquant** ; la règle N4 par familles et R-38 §4 y sont lus.
-- **D-9 (a) — la forge des agents est publiée.** Onze enregistrements : dix de campagnes antérieures et le report de la remontée §4.
+- **D-9 (a) — la forge des agents est publiée.** Onze enregistrements : dix de campagnes antérieures et le report de la remontée §4 (TF-1006).
   - preuve : porte sur l'arbre juste avant le push **PASS, 22 constats, 0 bloquant** ; `a539fa9..3d16b96` ; après `fetch`, 0/0 ; clone frais : **156 commits, 21 références, PASS, 22 constats dont 21 antériorités, 0 bloquant** ; la section « Oracles portés par un engagement » y est lue, **0** nom réel.
 - **La session voisine est informée** des trois exécutions, de la publication de ses enregistrements, et de ce qui lui revient — rien, la propagation étant humaine.
   - preuve : message envoyé et accusé par la messagerie inter-sessions.
