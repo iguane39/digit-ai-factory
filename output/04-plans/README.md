@@ -20,7 +20,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md` | fichier | 4,3 Ko | Digit-AI — Note de migration : les chemins du pilot renommé — 20260818b |
 | `Digit-AI - Note Revue - Denominateur des freres - 20260818a.md` | fichier | 4,1 Ko | Digit-AI — Note de revue : le dénominateur des « frères » — 20260818a |
 | `Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` | fichier | 3,2 Ko | Plan de renommage `digit-ai-forge-pilot` → `digit-ai-factory` — fenêtre A exécutée, gate n |
-| `Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` | fichier | 27,3 Ko | Restitution — la clé que la session voisine déclarait inexistante existe, et la réécriture |
+| `Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` | fichier | 28,3 Ko | Restitution — la clé que la session voisine déclarait inexistante existe, et la réécriture |
 | `Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md` | fichier | 5,7 Ko | Synthèse — Décision d'engagement actée, exécution transférée au produit — 20260901i |
 | `Digit-AI - Synthese - Etapes transferees au produit par lot de travaux - 20260901j.md` | fichier | 5,2 Ko | Synthèse — Les étapes de la décision transférées au produit — 20260901j |
 | `Digit-AI - Synthese - Etude donnees de recherche et cascade intention - 20260901h.md` | fichier | 10,4 Ko | Synthèse — Étude des données de recherche et cascade de l'intention — 20260901h |
@@ -92,7 +92,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Sept campagnes closes et format de sortie corrige - 20260908e.md` | fichier | 22,8 Ko | Synthèse de mandat — les sept campagnes sont closes et vérifiées une par une, et le défaut |
 | `Digit-AI - Synthese Mandat - Sept decisions executees parc publie puis bloque par sa propre porte - 20260908h.md` | fichier | 45,1 Ko | Synthèse de mandat — vos sept décisions sont exécutées, le parc est publié, la porte le bl |
 | `Digit-AI - Synthese Mandat - Six actions et une porte de publication - 20260901f.md` | fichier | 12,8 Ko | Synthèse de mandat — les six actions, et la porte qui a refusé la publication |
-| `Digit-AI - Synthese Mandat - Six actions retenues cinq faites la derniere a une erreur structurelle pres - 20260910e.md` | fichier | 25,1 Ko | Synthèse de mandat — vos six actions : cinq sont faites, la sixième bute sur une question  |
+| `Digit-AI - Synthese Mandat - Six actions retenues cinq faites la derniere a une erreur structurelle pres - 20260910e.md` | fichier | 25,9 Ko | Synthèse de mandat — vos six actions : cinq sont faites, la sixième bute sur une question  |
 | `Digit-AI - Synthese Mandat - Surveillance des recidives TF-0790 - 20260903c.md` | fichier | 11,3 Ko | Synthèse de mandat — surveillance des récidives entre les runs (03/09/2026, après votre dé |
 | `Digit-AI - Synthese Mandat - Synchronisation et action A45 de l autre poste - 20260907k.md` | fichier | 14,1 Ko | Synthèse de mandat — synchronisation faite et action A-45 de l'autre poste jouée ici : rie |
 | `Digit-AI - Synthese Mandat - Synchronisation GitHub - 20260822a.md` | fichier | 13,2 Ko | Digit-AI — Synthèse de mandat — Synchronisation GitHub — 20260822a |
