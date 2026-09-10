@@ -30,4 +30,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `remesurer-plutot-que-croire-20260910a.tf.jsonl` | fichier | 4,9 Ko | 1 ligne(s) JSONL |
 | `revue-classes-20260903a.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
 
-_12 fichier(s), 1 sous-dossier(s)_
+_12 fichier(s), 1 sous-dossier(s)_ · 2 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

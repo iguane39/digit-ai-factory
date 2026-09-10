@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.7.0",
+ "version": "1.8.0",
  "date": "2026-09-10",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -936,6 +936,36 @@
    "voisines": [
     "emplacement-livrable-hors-convention",
     "porte-sans-chemin-des-tables"
+   ]
+  },
+  {
+   "cle": "journal-de-versions-dormant",
+   "famille": "versionnement-livrable",
+   "libelle": "Un depot DECLARE une convention de versionnement — CHANGELOG SemVer, tags, version de paquet — et cesse de la tenir sans la retirer : les enregistrements de fonctionnalites s empilent sans entree, la section << Non publie >> reste ouverte depuis des semaines, la version du paquet ne bouge plus sous des tags qui ont avance. La convention ecrite ment alors sur l etat du depot, et rien ne la juge : un lecteur qui lit le journal croit le depot fige, un lecteur qui lit l histoire croit le journal a jour. Le defaut est silencieux parce que chaque enregistrement pris seul est correct — c est l ABSENCE d entree qui est le defaut, et une absence n est jugee par personne",
+   "creee_le": "2026-09-10",
+   "fondee_par": [
+    "TF-1016"
+   ],
+   "regle": "une convention de versionnement declaree dans un depot (CHANGELOG.md, tags, champ version) est TENUE ou RETIREE : tout enregistrement qui touche `tools/`, `core/` ou `oracles/` porte une entree au journal, et un journal sans entree depuis N enregistrements fait rougir la recette du depot",
+   "oracle": "a creer : dans la recette de chaque forge (tools/verifier.mjs ou equivalent), compter les enregistrements depuis la derniere modification du CHANGELOG qui touchent le code livre ; plafond declare ; mesure de reference : 14 enregistrements sans entree du 15/08 au 10/09/2026 chez forge-audit",
+   "voisines": [
+    "livrable-ecrase-sans-indice",
+    "emplacement-livrable-hors-convention"
+   ]
+  },
+  {
+   "cle": "recette-locale-ne-rejoue-pas-l-environnement-de-la-ci",
+   "famille": "hook-ou-gate",
+   "libelle": "Une recette locale rejoue les ETAPES du workflow de CI (elle le lit, TF-0553) mais pas son ENVIRONNEMENT — variable CI, variables env: des etapes, outils absents du runner (navigateur) — et des tests changent de verdict selon cet environnement : SKIP ici, ECHEC la-bas. La recette rend un vert qui ne prouve rien sur le rouge d en face, la CI rouge cesse d etre lue parce que la recette est verte, et le depot se publie sur ce vert. Le defaut ne se voit qu en LISANT le run hebergee apres le push, ce que personne ne fait quand la recette locale a deja dit oui",
+   "creee_le": "2026-09-10",
+   "fondee_par": [
+    "TF-1017"
+   ],
+   "regle": "une recette qui pretend rejouer la CI pose l environnement que le workflow declare (CI=true, env: de chaque etape) et DIT en sortie chaque condition qu elle ne peut pas rejouer ; un test n a qu un verdict par situation, jamais un SKIP hors CI et un ECHEC en CI ; toute publication d une forge lit le run de CI hebergee et l inscrit a la restitution",
+   "oracle": "a creer : dans la recette de chaque forge, comparer le dernier run de CI hebergee (gh run view) au verdict local — divergence = rouge avec les tests qui different ; mesure de reference : forge-audit, 8 runs rouges du 24/08 au 10/09/2026 sous une recette locale verte (11 groupes OK)",
+   "voisines": [
+    "regle-qui-interdit-son-propre-remede",
+    "controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas"
    ]
   }
  ]

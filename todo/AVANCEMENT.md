@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau bfb95972b02a)]
+sources_de_verite: [todo/TODO.jsonl (sceau 0547e914a257)]
 verifie_le: 2026-09-10
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `bfb95972b02a`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `0547e914a257`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -19,10 +19,10 @@ les corrections donnerait l'illusion d'un progrès net.
 
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
-| Ouverts | 62 | candidats, décidés ou en cours — le reste à faire réel |
+| Ouverts | 65 | candidats, décidés ou en cours — le reste à faire réel |
 | Clos sur gains constatés | 170 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 0 | décidés non faits, motif écrit — jamais un silence |
-| Total suivi | 232 | tout ce que le registre a jamais porté |
+| Total suivi | 235 | tout ce que le registre a jamais porté |
 
 ## Ce qui reste ouvert, par forge
 
@@ -30,7 +30,7 @@ La table se lit par forge cible : c'est l'unité de décision, puisqu'une correc
 livre dans un dépôt. L'ordre suit le NOMBRE d'items ouverts, jamais leur priorité — la
 priorité vit dans la colonne de score.
 
-### digit-ai-factory — 26 item(s)
+### digit-ai-factory — 29 item(s)
 
 Les items ouverts ciblant digit-ai-factory, du score le plus fort au plus faible. Le score est
 celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
@@ -56,15 +56,18 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0993 | parc : la chaîne d'anonymisation annonce « pseudonymisé » sans dire ce qui a RÉSISTÉ — le champ `refuses` est  | candidat | digit-ai-factory | 8 |
 | TF-0676 | Aucun script de capture du produit ne produit systématiquement une pleine page | decide | digit-ai-factory | 6.7 |
 | TF-0983 | pilot : les vues generees du registre sont versionnees — 1173 revisions de contenu derive, qui transforment UN | candidat | digit-ai-factory | 6.7 |
+| TF-1015 | pilot : un clone de verification sur un chemin profond echoue au checkout — 22 fichiers depassent, avec les si | candidat | digit-ai-factory, digit-ai-forge-agents | 6 |
+| TF-1016 | forge-audit : le journal de versions est dormant — 14 enregistrements de fonctionnalites depuis le 15/08 sans  | candidat | digit-ai-forge-audit, digit-ai-factory | 6 |
 | TF-1003 | pilot : le preflight d ingestion compte des COMMITS la ou son invariant est un MAXIMUM D IDENTIFIANT — sur une | candidat | digit-ai-factory | 4.5 |
 | TF-1009 | gabarits : SIX erreurs de mesure en une journee, AUCUNE trouvee par celui qui l avait commise — le seul mecani | candidat | digit-ai-factory | 4.5 |
 | TF-1011 | pilot : la seconde condition de R-38 §4 — un enregistrement de restitution ne porte QUE des restitutions — est | candidat | digit-ai-factory | 4.5 |
+| TF-1017 | forge-audit : la CI hebergee est rouge sur 8 pushs consecutifs depuis le 24/08 pendant que la recette locale e | candidat | digit-ai-forge-audit, digit-ai-factory | 4.5 |
 | TF-0923 | pilot : six volets d'oracle proposés par les items du 08/09 restent non livrés, cinq d'entre eux vivant dans l | en_cours | digit-ai-factory | 3 |
 | TF-0836 | pilot : le hook qo-gate-write juge un template de maquette comme un livrable | en_cours | digit-ai-factory | 1 |
 | TF-0838 | pilot : le skill claude-api ne documente pas fallbacks avec messages.parse | en_cours | digit-ai-factory | 1 |
 | TF-0987 | pilot : le vocabulaire ferme des motifs d'oracle-synthese est cherche dans TOUT le groupe de puce, spans de co | decide | digit-ai-factory | 1 |
 
-### digit-ai-forge-agents — 13 item(s)
+### digit-ai-forge-agents — 14 item(s)
 
 Les items ouverts ciblant digit-ai-forge-agents, du score le plus fort au plus faible. Le score est
 celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
@@ -82,8 +85,24 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0938 | digit-ai-forge-agents (digit-ai-schemas / digit-ai-page-html) : aucun gabarit de schéma de base de données DIF | en_cours | digit-ai-forge-agents | 6.7 |
 | TF-0940 | digit-ai-forge-agents / digit-ai-forge-audit : deux implémentations du schéma de base de données coexistent (r | en_cours | digit-ai-forge-agents, digit-ai-forge-audit | 6.7 |
 | TF-0947 | digit-ai-forge-agents / digit-ai-forge-audit : deux implémentations du schéma de base de données coexistent (r | decide | digit-ai-forge-agents, digit-ai-forge-audit | 6.7 |
+| TF-1015 | pilot : un clone de verification sur un chemin profond echoue au checkout — 22 fichiers depassent, avec les si | candidat | digit-ai-factory, digit-ai-forge-agents | 6 |
 | TF-1002 | quality-oracles : la porte de publication accuse un sigle DANS un mot ordinaire, et localise son constat sur l | candidat | digit-ai-forge-agents | 4.5 |
 | TF-1006 | parc : le registre des oracles a ete ETENDU dans la copie INSTALLEE d un skill, jamais dans sa source versionn | en_cours | digit-ai-forge-agents | 4.5 |
+
+### digit-ai-forge-audit — 7 item(s)
+
+Les items ouverts ciblant digit-ai-forge-audit, du score le plus fort au plus faible. Le score est
+celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
+
+| Id | Titre | Statut | Forge(s) | Score |
+|---|---|---|---|---|
+| TF-1000 | forge-audit : la charte d exemple fictive livree avec la forge prime sur la typographie declaree du tenant | candidat | digit-ai-forge-audit | 15 |
+| TF-1001 | forge-audit : six champs que le moteur de rapport sait rendre restent vides sans que la porte machine le dise | candidat | digit-ai-forge-audit | 10 |
+| TF-0940 | digit-ai-forge-agents / digit-ai-forge-audit : deux implémentations du schéma de base de données coexistent (r | en_cours | digit-ai-forge-agents, digit-ai-forge-audit | 6.7 |
+| TF-0947 | digit-ai-forge-agents / digit-ai-forge-audit : deux implémentations du schéma de base de données coexistent (r | decide | digit-ai-forge-agents, digit-ai-forge-audit | 6.7 |
+| TF-1016 | forge-audit : le journal de versions est dormant — 14 enregistrements de fonctionnalites depuis le 15/08 sans  | candidat | digit-ai-forge-audit, digit-ai-factory | 6 |
+| TF-1017 | forge-audit : la CI hebergee est rouge sur 8 pushs consecutifs depuis le 24/08 pendant que la recette locale e | candidat | digit-ai-forge-audit, digit-ai-factory | 4.5 |
+| TF-1014 | forge-audit : le referentiel de reference du 21/08 n est pas convertible au format courant — son CONTENU (them | candidat | digit-ai-forge-audit | 3 |
 
 ### factory — 7 item(s)
 
@@ -99,19 +118,6 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0979 | factory : la doctrine ne prescrit aucune forme pour un tour de travail INACHEVE, et ce vide est ce qui rend l  | decide | factory | 1 |
 | TF-0985 | factory : un tableau de reference organise par « ce qui varie » oblige le lecteur a recoller le document, et a | decide | factory | 1 |
 | TF-0986 | factory : un secret ne se publie pas, et rien ne dit comment un lecteur IDENTIFIE celui qui est en place | decide | factory | 1 |
-
-### digit-ai-forge-audit — 5 item(s)
-
-Les items ouverts ciblant digit-ai-forge-audit, du score le plus fort au plus faible. Le score est
-celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
-
-| Id | Titre | Statut | Forge(s) | Score |
-|---|---|---|---|---|
-| TF-1000 | forge-audit : la charte d exemple fictive livree avec la forge prime sur la typographie declaree du tenant | candidat | digit-ai-forge-audit | 15 |
-| TF-1001 | forge-audit : six champs que le moteur de rapport sait rendre restent vides sans que la porte machine le dise | candidat | digit-ai-forge-audit | 10 |
-| TF-0940 | digit-ai-forge-agents / digit-ai-forge-audit : deux implémentations du schéma de base de données coexistent (r | en_cours | digit-ai-forge-agents, digit-ai-forge-audit | 6.7 |
-| TF-0947 | digit-ai-forge-agents / digit-ai-forge-audit : deux implémentations du schéma de base de données coexistent (r | decide | digit-ai-forge-agents, digit-ai-forge-audit | 6.7 |
-| TF-1014 | forge-audit : le referentiel de reference du 21/08 n est pas convertible au format courant — son CONTENU (them | candidat | digit-ai-forge-audit | 3 |
 
 ### digit-ai-forge-data — 5 item(s)
 

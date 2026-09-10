@@ -1,10 +1,10 @@
 # Récidives et descente — tableau de bord
 
-<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre bfb95972b02a · archive 6ce2fe14c2bb · classes ad5c003a9022 · relevés 87cfd092d942 · héritage 23d6b9c4bee8. État au 2026-09-10T14:54:55.153Z (ts max des sources, jamais l'horloge). -->
+<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 0547e914a257 · archive 6ce2fe14c2bb · classes fe7bf6d3c1a5 · relevés 87cfd092d942 · héritage 23d6b9c4bee8. État au 2026-09-10T15:57:37.096Z (ts max des sources, jamais l'horloge). -->
 
 Ce tableau de bord répond à trois questions que le registre seul ne savait pas poser : est-ce la deuxième fois, chez qui, et depuis combien de temps la correction existe sans être appliquée. Il se lit avec sa contre-métrique : un compteur de récidives qui baisse pendant que le nombre de classes monte est un compteur contourné, pas un progrès.
 
-**Périmètre mesuré** : 1013 item(s) au registre (actifs et archive), 197 portant une classe, 111 marqué(s) récidive ; référentiel de 62 classe(s) en 18 famille(s) (v1.6.0) ; 18 relevé(s) d'héritage.
+**Périmètre mesuré** : 1016 item(s) au registre (actifs et archive), 200 portant une classe, 111 marqué(s) récidive ; référentiel de 65 classe(s) en 18 famille(s) (v1.8.0) ; 18 relevé(s) d'héritage.
 
 ## 1. Récidives par classe
 
@@ -46,12 +46,14 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `boite-entree-produit-statut-git-non-dit` | contrat-interface-forge | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `brief-sans-regles-de-socle` | skill-ou-oracle-non-invoque | 0 | 1 | 0 | — | — | — |
 | `champ-transcrit-de-prose-sans-correspondance` | regle-morte | 3 | 1 | 0 | 0 % | — | — |
+| `chemin-de-livrable-au-dela-du-plafond-de-la-plateforme` | emplacement-livrable | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `controle-sans-fixture-double-sens` | skill-ou-oracle-non-invoque | 2 | 0 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
 | `controle-vrai-sur-le-mauvais-invariant` | regle-morte | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `deux-regles-du-socle-inconciliables` | page-html-socle | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `emplacement-livrable-hors-convention` | emplacement-livrable | 3 | 0 | 0 | 0 % | — | — |
 | `fixture-jugee-par-son-seul-oracle` | skill-ou-oracle-non-invoque | 7 | 1 | 0 | 0 % | — | — |
 | `gate-cout-invite-au-contournement` | hook-ou-gate | 3 | 0 | 0 | 0 % | — | — |
+| `journal-de-versions-dormant` | versionnement-livrable | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `l99-forme-sortie` | skill-ou-oracle-non-invoque | 0 | 1 | 0 | — | — | — |
 | `livrable-ecrase-sans-indice` | versionnement-livrable | 0 | 1 | 0 | — | — | — |
 | `lot-de-travaux-mauvais-module-producteur` | lot-forme | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
@@ -64,6 +66,7 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `page-html-temps-affiche` | page-html-socle | 0 | 1 | 0 | — | — | — |
 | `porte-sans-chemin-des-tables` | hook-ou-gate | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `quantificateur-sacrifie-au-budget-du-texte` | regle-morte | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
+| `recette-locale-ne-rejoue-pas-l-environnement-de-la-ci` | hook-ou-gate | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `registre-doublon-non-detecte` | lot-forme | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `regle-balaie-prose-et-identifiants` | regle-morte | 3 | 1 | 0 | 0 % | — | — |
 | `regle-de-branche-annoncee-differente-configuree` | contrat-interface-forge | 2 | 1 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
@@ -89,6 +92,7 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 | `boucle-retour-sans-descente` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `brief-sans-regles-de-socle` | 2026-09-02 | CLAUDE.md | 11 produit(s) atteint(s) en 1–7 j ; 1 non atteint(s) (Produit-11) |
 | `champ-transcrit-de-prose-sans-correspondance` | 2026-09-06 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
+| `chemin-de-livrable-au-dela-du-plafond-de-la-plateforme` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `compte-total-hors-canal-des-constats` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `contrat-de-sortie-sans-domicile` | 2026-09-06 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas` | — | — | non mesurable : aucune clôture fondatrice au registre |
@@ -105,6 +109,7 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 | `gate-cout-invite-au-contournement` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `gate-ecriture-juge-fichier-entier` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `heritage-avertissement-tardif` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
+| `journal-de-versions-dormant` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `l99-forme-sortie` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `lecture-tiers-non-jugee` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `livrable-ecrase-sans-indice` | 2026-08-23 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
@@ -128,6 +133,7 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 | `porte-cle-courte-sans-frontiere` | 2026-09-07 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `porte-sans-chemin-des-tables` | 2026-09-08 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `quantificateur-sacrifie-au-budget-du-texte` | 2026-09-10 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
+| `recette-locale-ne-rejoue-pas-l-environnement-de-la-ci` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `recette-verdict-non-prononcable` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `registre-doublon-non-detecte` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `regle-balaie-prose-et-identifiants` | — | — | non mesurable : aucune clôture fondatrice au registre |
@@ -171,10 +177,10 @@ Comment lire : le nombre de classes créées par semaine ISO, puis les classes s
 | Semaine | Classes créées |
 |---|---|
 | 2026-S36 | 37 |
-| 2026-S37 | 25 |
+| 2026-S37 | 28 |
 
 - Classes sans clôture fondatrice : `emplacement-livrable-hors-convention`, `registre-doublon-non-detecte`, `banc-etend-referentiel-production`, `gate-cout-invite-au-contournement`, `regle-neuve-sans-mesure-de-bruit`, `controle-sans-fixture-double-sens`, `deux-regles-du-socle-inconciliables`, `controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas`, `controle-vrai-sur-le-mauvais-invariant`, `regle-ecrite-sans-oracle-qui-la-joue`
-- Retours entrés sous une classe suspecte : TF-0995 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1003 (controle-vrai-sur-le-mauvais-invariant), TF-1006 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1011 (regle-ecrite-sans-oracle-qui-la-joue)
+- Retours entrés sous une classe suspecte : TF-0995 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1003 (controle-vrai-sur-le-mauvais-invariant), TF-1006 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1011 (regle-ecrite-sans-oracle-qui-la-joue), TF-1015 (chemin-de-livrable-au-dela-du-plafond-de-la-plateforme), TF-1016 (journal-de-versions-dormant), TF-1017 (recette-locale-ne-rejoue-pas-l-environnement-de-la-ci)
 
 ## Ce que cette vue ne juge pas
 
