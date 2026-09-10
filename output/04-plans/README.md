@@ -20,7 +20,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md` | fichier | 4,3 Ko | Digit-AI — Note de migration : les chemins du pilot renommé — 20260818b |
 | `Digit-AI - Note Revue - Denominateur des freres - 20260818a.md` | fichier | 4,1 Ko | Digit-AI — Note de revue : le dénominateur des « frères » — 20260818a |
 | `Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` | fichier | 3,2 Ko | Plan de renommage `digit-ai-forge-pilot` → `digit-ai-factory` — fenêtre A exécutée, gate n |
-| `Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` | fichier | 22,8 Ko | Restitution — la clé que la session voisine déclarait inexistante existe, et la réécriture |
+| `Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` | fichier | 24,2 Ko | Restitution — la clé que la session voisine déclarait inexistante existe, et la réécriture |
 | `Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md` | fichier | 5,7 Ko | Synthèse — Décision d'engagement actée, exécution transférée au produit — 20260901i |
 | `Digit-AI - Synthese - Etapes transferees au produit par lot de travaux - 20260901j.md` | fichier | 5,2 Ko | Synthèse — Les étapes de la décision transférées au produit — 20260901j |
 | `Digit-AI - Synthese - Etude donnees de recherche et cascade intention - 20260901h.md` | fichier | 10,4 Ko | Synthèse — Étude des données de recherche et cascade de l'intention — 20260901h |
