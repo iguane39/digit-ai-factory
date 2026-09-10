@@ -863,6 +863,21 @@
     "compte-total-hors-canal-des-constats",
     "regle-balaie-prose-et-identifiants"
    ]
+  },
+  {
+   "cle": "quantificateur-sacrifie-au-budget-du-texte",
+   "famille": "regle-morte",
+   "libelle": "Un texte normatif sous PLAFOND DE TAILLE doit gagner quelques octets, et le mot qu on retire est celui qui << ne semble pas indispensable a la phrase >> — or dans une regle, le mot le plus court est souvent celui qui porte le plus : seulement, jamais, toute, aucun, uniquement. Retirer un quantificateur ne raccourcit pas la regle, il l ASSOUPLIT : << accepte sur verdict d oracle SEULEMENT >> devient << accepte sur verdict d oracle >>, qui n exclut plus rien. Le defaut est invisible a la relecture parce que la phrase reste grammaticale et garde son sujet ; il ne se voit qu en comparant les deux versions, et il voyage avec un commit dont le motif annonce autre chose — ici << noyau dans son budget >>. C est un assouplissement qu aucun humain n a decide, produit par une contrainte de mise en page",
+   "creee_le": "2026-09-10",
+   "fondee_par": [
+    "TF-1010"
+   ],
+   "regle": "un texte normatif sous plafond ne gagne JAMAIS ses octets sur un quantificateur : la reformulation doit conserver l exclusivite (<< sur le seul verdict >> vaut << sur verdict … seulement >>), et les octets se prennent sur ce qui n a pas de force normative — une glose, un exemple, un renvoi. Tout commit qui reduit un texte normatif declare, dans son message, les mots retires",
+   "oracle": "a creer : relever les diffs d un texte normatif ou un quantificateur (seul, seulement, uniquement, jamais, aucun, tout, toute) DISPARAIT sans etre remplace par une tournure equivalente — le controle juge la perte du quantificateur, pas la longueur",
+   "voisines": [
+    "texte-sur-la-graphie-detruit-par-sa-pseudonymisation",
+    "regle-balaie-prose-et-identifiants"
+   ]
   }
  ]
 }

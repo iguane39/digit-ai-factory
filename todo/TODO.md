@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=001b279e32f8 archive=6ce2fe14c2bb · dernier événement: 2026-09-10T12:32:14.458Z -->
+     sceaux: actifs=fccddf50e93a archive=6ce2fe14c2bb · dernier événement: 2026-09-10T12:52:18.216Z -->
 
-**227 actifs** (candidat 22 · décidé 27 · en cours 11 · corrigé 167 · écarté 0) · **782 archivés**.
+**228 actifs** (candidat 23 · décidé 27 · en cours 11 · corrigé 167 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -22,6 +22,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0956 | decide | 10 | pilot : le registre ne sait ni détecter ni écarter un DOUBLON de candidature — six items identiques mot pour mot y sont entrés le 08/09, et rien ne les a signalés | **oui** — six candidatures en double entrées en une commande, non détectées ; le compte des items ouverts est faux de six tant qu'elles ne sont pas écartées, et aucun statut ne permet de les écarter |
 | TF-0676 | decide | 6.7 | Aucun script de capture du produit ne produit systématiquement une pleine page | non |
 | TF-0987 | decide | 1 | pilot : le vocabulaire ferme des motifs d'oracle-synthese est cherche dans TOUT le groupe de puce, spans de code inclus - un nom de donnee se fait lire comme un motif et la regle rougit sur une action irreprochable | **oui** — S21 a compte 2 actions concernees au lieu de 1 et rendu FAIL sur une action dont le motif declare est decision ; deux passes d'oracle et une lecture de l'implementation pour le diagnostic ; remede applique chez le producteur : renommer une colonne de livrable en etats_porteurs |
+| TF-1010 | candidat | 25 | pilot : le noyau a perdu le mot << seulement >> pour tenir dans son plafond — l acceptation d un livrable a cesse d etre exclusive, et personne ne l a decide | **oui** — le garde-fou le plus structurant du parc — un livrable ne s accepte que sur verdict d oracle execute — a cesse d etre exclusif dans le noyau, publie, sans decision humaine |
 | TF-0959 | candidat | 20 | canal confidentiel : une clé DÉJÀ pseudonymisée peut entrer dans une table de noms réels, et rien ne l'en empêche — l'arbitrage du 08/09 l'a fait une fois, la porte l'a rattrapé | **oui** — trois dépôts condamnés par la porte de publication et une rectification manuelle de la table, le 08/09 au matin, sur un défaut dont la garde était déjà écrite ailleurs depuis six jours |
 | TF-1004 | candidat | 20 | pilot : le generateur des regles de reecriture d'historique n'avait AUCUN banc, et il commande un geste irreversible sur une histoire publiee — deux defauts trouves le jour ou on le lui a ecrit | **oui** — cinq reecritures d'histoire publiee jouees par un outil sans aucune fixture ; le banc ecrit le sixieme jour a trouve deux defauts, dont un present depuis l'origine |
 | TF-1007 | candidat | 15 | parc : un commentaire et un message de commit qui documentaient un defaut de graphie ont ete rendus tautologiques par leur propre pseudonymisation — « X dans le nom, la cle etant X » | **oui** — deux explications de defaut rendues tautologiques dans le meme fichier, et un message de commit reecrit par un tiers parce qu aucun hook ne le couvre |
