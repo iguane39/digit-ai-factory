@@ -68,8 +68,8 @@
   "vu_le": "2026-08-27"
  },
  "oracle-claude-md.mjs": {
-  "cas": 9,
-  "vu_le": "2026-09-03"
+  "cas": 14,
+  "vu_le": "2026-09-10"
  },
  "oracle-conformite-projet.mjs": {
   "cas": 65,
@@ -253,6 +253,10 @@
  "oracles/oracle-parite-configuration.test.mjs": {
   "cas": 18,
   "vu_le": "2026-08-26"
+ },
+ "oracles/pre-commit-quantificateurs.test.mjs": {
+  "cas": 6,
+  "vu_le": "2026-09-10"
  },
  "oracles/resoudre-pilot.test.mjs": {
   "cas": 9,

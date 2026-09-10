@@ -9,6 +9,18 @@
  *      plafond, sept références restaient orphelines et le contrôle rouge finissait par être ignoré) ;
  *      une citation transitive ne vaut que si le document citant est lui-même atteint depuis le
  *      noyau. N2 vaut aussi pour les entrées de l'index : un document cité et absent est un défaut.
+ *  N4  AUCUN QUANTIFICATEUR NE DISPARAÎT du noyau entre sa version COMMISE et sa version de
+ *      travail (TF-1010, 10/09/2026). Le 10/09, pour faire tenir une ligne dans le plafond N1, le
+ *      mot « seulement » a été retiré de « Livrable accepté sur verdict d'oracle exécuté
+ *      seulement » en le prenant pour un adverbe redondant. Il portait toute l'exclusivité de la
+ *      règle : sans lui, la phrase dit qu'un verdict SUFFIT et n'interdit plus rien. Publié une
+ *      heure, trouvé par une relecture de diff — rien ne garantit qu'il y en ait une la prochaine
+ *      fois. N4 compare, mot à mot et à frontière Unicode, le nombre d'occurrences d'une liste
+ *      close de mots qui INTERDISENT, QUANTIFIENT ou EXCLUENT ; toute baisse est un FAIL nommant
+ *      le mot et les deux comptes. Un déplacement (même compte) passe : N4 juge la perte, pas
+ *      la prose. Sans version commise lisible (hors dépôt git), N4 se déclare NON JUGÉ, jamais
+ *      PASS — un gardien sans référence ne rassure personne. C'est R-43 (« renforcer oui,
+ *      assouplir jamais ») rendu mécanique sur le seul texte que toute session lit en premier.
  * Usage : node oracle-claude-md.mjs [racine]      — exit 0 PASS / 1 FAIL.
  *         node oracle-claude-md.mjs --self-test   — fixtures double sens.
  *
@@ -25,10 +37,70 @@ import { readFileSync, existsSync, readdirSync, statSync, mkdtempSync, mkdirSync
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
+import { execFileSync } from "node:child_process";
+
+// N4 — les FAMILLES CLOSES de mots dont la disparition affaiblit une règle. Fermées à dessein :
+// « tout » ou « chaque » sont trop fréquents en prose pour compter sans bruit ; ceux-ci ne
+// s'écrivent dans un noyau que pour interdire, quantifier ou exclure.
+//
+// POURQUOI DES FAMILLES ET NON UNE LISTE PLATE (10/09/2026, A-109). La première version comptait
+// chaque mot séparément, et elle REFUSAIT la reformulation que son propre message de refus
+// recommande : « sur verdict … seulement » → « sur le seul verdict … » fait tomber « seulement »
+// de 1 à 0 et monter « seul » de 0 à 1. L'exclusivité est intégralement conservée, et la règle
+// criait à la perte. Éprouvé en conditions réelles : le hameçon refusait la réparation même du
+// noyau qui a été faite ce matin. Une règle qui interdit son propre remède ne se contourne pas,
+// elle se désactive — c'est ainsi qu'un gardien meurt. On compte donc par FAMILLE de sens : la
+// perte se mesure sur le total de la famille, jamais sur un mot. Perdre « jamais » en ajoutant
+// « seul » reste un FAIL, puisque ce sont deux familles distinctes.
+const FAMILLES = {
+  exclusivité: ["seulement", "seul", "seule", "seuls", "seules", "uniquement", "exclusivement"],
+  négation: ["jamais", "aucun", "aucune", "aucuns", "aucunes", "sans exception"],
+  universalité: ["toujours"],
+  interdiction: ["interdit", "interdite", "interdits", "interdites"],
+  obligation: ["obligatoire", "obligatoires"],
+};
+
+/** Compte les occurrences d'un mot, insensible à la casse, à frontière de mot UNICODE — un accent
+ *  n'est pas une frontière (classe TF-0805 : « seule » ne doit pas matcher dans « seulement »). */
+function compter(texte, mot) {
+  const re = new RegExp("(?<![\\p{L}\\p{N}])" + mot.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(?![\\p{L}\\p{N}])", "giu");
+  return (texte.match(re) || []).length;
+}
+
+/** Le noyau tel qu'il est COMMIS (HEAD), ou null hors dépôt git — jamais une chaîne vide. */
+function noyauCommis(racine) {
+  try {
+    return execFileSync("git", ["-C", racine, "show", "HEAD:CLAUDE.md"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+  } catch { return null; }
+}
+
+/** N4 pur, testable sans git : rend les findings de la comparaison de deux textes.
+ *
+ *  EXPORTÉ (10/09/2026, A-109) parce que la LIMITE DÉCLARÉE de N4 se ferme ailleurs : la règle
+ *  compare le noyau de travail à sa version COMMISE, donc elle ne voit plus un affaiblissement
+ *  une fois qu'il est commis. La garde du passage travail → commit vit dans le hameçon de
+ *  pré-commit, qui doit comparer l'INDEX à HEAD — pas l'arbre de travail, sinon il manquerait
+ *  une perte mise en index et accuserait une édition non indexée. Une seule implémentation de
+ *  la comparaison pour les deux appelants : celle-ci. */
+export function jugerQuantificateurs(avant, apres) {
+  const perdus = [];
+  for (const [famille, mots] of Object.entries(FAMILLES)) {
+    const total = (t) => mots.reduce((n, mot) => n + compter(t, mot), 0);
+    const a = total(avant), b = total(apres);
+    if (b < a) {
+      // On NOMME les mots qui ont baissé : « la famille exclusivité perd 1 » n'aide personne à
+      // retrouver la ligne, alors que « seulement 1 → 0 » la désigne.
+      const detail = mots.filter((m) => compter(apres, m) < compter(avant, m))
+        .map((m) => `« ${m} » ${compter(avant, m)} → ${compter(apres, m)}`).join(", ");
+      perdus.push(`famille ${famille} ${a} → ${b} (${detail})`);
+    }
+  }
+  return perdus;
+}
 
 const PLAFOND = 6144;
 
-function juger(racine) {
+function juger(racine, precedent = undefined) {
   const findings = [];
   const ko = (regle, message) => findings.push({ regle, statut: "FAIL", message });
   const ok = (regle, message) => findings.push({ regle, statut: "PASS", message });
@@ -45,6 +117,20 @@ function juger(racine) {
   taille <= PLAFOND
     ? ok("N1", `noyau ${taille} octets ≤ ${PLAFOND}`)
     : ko("N1", `noyau ${taille} octets > plafond ${PLAFOND} — déplacer le détail vers references\\`);
+
+  // N4 — la perte d'un quantificateur entre la version commise et la version de travail.
+  {
+    const courant = readFileSync(noyau, "utf8");
+    const avant = precedent !== undefined ? precedent : noyauCommis(racine);
+    if (avant === null) {
+      findings.push({ regle: "N4", statut: "NON_JUGE", message: "aucune version commise lisible du noyau (hors dépôt git) — la perte d'un quantificateur ne peut pas être jugée, et ce n'est PAS un PASS" });
+    } else {
+      const perdus = jugerQuantificateurs(avant, courant);
+      perdus.length
+        ? ko("N4", `${perdus.length} quantificateur(s) DISPARU(S) du noyau par rapport à la version commise : ${perdus.join(", ")} — un mot qui interdit, quantifie ou exclut ne se retire pas pour tenir un budget (R-43 : renforcer oui, assouplir jamais ; TF-1010)`)
+        : ok("N4", "aucun quantificateur perdu par rapport à la version commise");
+    }
+  }
 
   const refDir = join(racine, "references");
   // Une citation est `references\X.md` en tête de chemin : `skills\…\references\X.md` désigne le
@@ -116,6 +202,27 @@ function selfTest() {
   const entreeMorte = juger(monter("cite `references\\INDEX.md`.\n", { "INDEX.md": "cite `references\\FANTOME.md`" }));
   cas.push(["N2  — entrée d'index vers un fichier absent", echoue(entreeMorte, "N2")]);
 
+  // N4 (TF-1010) — dans ses TROIS sens, sans git : le texte commis est passé directement.
+  const regle = "- Livrable accepté sur verdict d'oracle exécuté seulement ; jamais de réponse inventée.\n";
+  const baseN4 = monter(regle + "Cite `references\\ACCUEIL.md`.\n", { "ACCUEIL.md": "x" });
+  // rouge : le mot « seulement » retiré — le cas exact du 10/09.
+  const sansSeulement = juger(baseN4, regle.replace(" seulement", "") === regle ? regle : regle);
+  const perdu = juger(monter(regle.replace(" seulement", "") + "Cite `references\\ACCUEIL.md`.\n", { "ACCUEIL.md": "x" }), regle);
+  cas.push(["N4  — « seulement » retiré entre la version commise et la version de travail : FAIL", echoue(perdu, "N4")
+            && perdu.find((f) => f.regle === "N4").message.includes("seulement") && perdu.find((f) => f.regle === "N4").message.includes("1 → 0")]);
+  // vert : même texte.
+  cas.push(["N4  — texte identique : PASS", !echoue(sansSeulement, "N4")]);
+  // vert : le mot DÉPLACÉ (même compte) — N4 juge la perte, pas la prose.
+  const deplace = juger(monter("- Livrable accepté seulement sur verdict d'oracle exécuté ; jamais de réponse inventée.\nCite `references\\ACCUEIL.md`.\n", { "ACCUEIL.md": "x" }), regle);
+  cas.push(["N4  — quantificateur déplacé, compte égal : PASS", !echoue(deplace, "N4")]);
+  // frontière Unicode : « seule » ne compte pas dans « seulement », et sa perte n'est pas masquée.
+  const accent = juger(monter("la seulement règle\nCite `references\\ACCUEIL.md`.\n", { "ACCUEIL.md": "x" }), "la seule règle seulement\n");
+  cas.push(["N4  — « seule » perdu n'est pas masqué par « seulement » (frontière Unicode)", echoue(accent, "N4")
+            && accent.find((f) => f.regle === "N4").message.includes("« seule »")]);
+  // hors dépôt git : NON_JUGE, jamais PASS.
+  const horsGit = juger(monter("x\n", {}));
+  cas.push(["N4  — sans version commise : NON_JUGE déclaré, ni PASS ni FAIL", horsGit.some((f) => f.regle === "N4" && f.statut === "NON_JUGE")]);
+
   // Noyau absent : refus franc, jamais un PASS par défaut.
   const vide = juger(mkdtempSync(join(tmpdir(), "vide-")));
   cas.push(["N1  — CLAUDE.md absent", echoue(vide, "N1")]);
@@ -130,10 +237,21 @@ function selfTest() {
 }
 
 // ---- entrée -----------------------------------------------------------------------------------
+//
+// L'ENTRÉE NE S'EXÉCUTE QUE SI CE FICHIER EST LE PROGRAMME LANCÉ (10/09/2026, A-109). Sans cette
+// garde, le module JUGEAIT et APPELAIT process.exit() dès qu'un autre fichier l'importait : la
+// garde de pré-commit qui réutilise `jugerQuantificateurs` n'a jamais eu la main, et son cas rouge
+// rendait 0 en silence — un contrôle muet, pas un contrôle indulgent. Un module qui sort du
+// processus à l'import ne peut être réutilisé par personne, et son banc double sens ne le voit pas
+// puisqu'il s'exécute, lui, en programme principal.
+const LANCE_DIRECTEMENT = process.argv[1] && process.argv[1].replace(/\\/g, "/").endsWith("oracles/oracle-claude-md.mjs");
+if (LANCE_DIRECTEMENT) {
 if (process.argv.includes("--self-test")) process.exit(selfTest());
 
 const racine = process.argv[2] || join(dirname(fileURLToPath(import.meta.url)), "..");
 const findings = juger(racine);
 const echecs = findings.filter((f) => f.statut === "FAIL").length;
-console.log(JSON.stringify({ oracle: "oracle-claude-md", version: "1.2.0", verdict: echecs ? "FAIL" : "PASS", findings }, null, 1));
+console.log(JSON.stringify({ oracle: "oracle-claude-md", version: "1.3.0", verdict: echecs ? "FAIL" : "PASS", findings,
+  non_juge: ["N4 juge la DISPARITION d'un mot d'une liste close, jamais son sens : un quantificateur ajouté dans une phrase qui l'inverse (« jamais interdit ») passe ; et un mot hors liste qui portait une exclusivité (« exclusif », « strictement ») n'est pas vu — la liste s'étend au registre, pas dans le code", "N4 compare à HEAD : un affaiblissement déjà COMMIS n'est plus vu au tour suivant — la règle protège le passage travail → commit, c'est le hameçon de pré-commit ou la suite du dépôt qui doit la jouer"] }, null, 1));
 process.exit(echecs ? 1 : 0);
+}
