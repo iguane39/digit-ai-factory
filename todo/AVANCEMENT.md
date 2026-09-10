@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau efa5e8834812)]
+sources_de_verite: [todo/TODO.jsonl (sceau 63370763cf29)]
 verifie_le: 2026-09-10
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `efa5e8834812`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `63370763cf29`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -19,10 +19,10 @@ les corrections donnerait l'illusion d'un progrès net.
 
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
-| Ouverts | 57 | candidats, décidés ou en cours — le reste à faire réel |
+| Ouverts | 60 | candidats, décidés ou en cours — le reste à faire réel |
 | Clos sur gains constatés | 167 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 0 | décidés non faits, motif écrit — jamais un silence |
-| Total suivi | 224 | tout ce que le registre a jamais porté |
+| Total suivi | 227 | tout ce que le registre a jamais porté |
 
 ## Ce qui reste ouvert, par forge
 
@@ -30,7 +30,7 @@ La table se lit par forge cible : c'est l'unité de décision, puisqu'une correc
 livre dans un dépôt. L'ordre suit le NOMBRE d'items ouverts, jamais leur priorité — la
 priorité vit dans la colonne de score.
 
-### digit-ai-factory — 21 item(s)
+### digit-ai-factory — 24 item(s)
 
 Les items ouverts ciblant digit-ai-factory, du score le plus fort au plus faible. Le score est
 celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
@@ -39,6 +39,7 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 |---|---|---|---|---|
 | TF-0959 | canal confidentiel : une clé DÉJÀ pseudonymisée peut entrer dans une table de noms réels, et rien ne l'en empê | candidat | digit-ai-factory | 20 |
 | TF-1004 | pilot : le generateur des regles de reecriture d'historique n'avait AUCUN banc, et il commande un geste irreve | candidat | digit-ai-factory | 20 |
+| TF-1007 | parc : un commentaire et un message de commit qui documentaient un defaut de graphie ont ete rendus tautologiq | candidat | digit-ai-factory | 15 |
 | TF-0674 | La porte de fraîcheur de déploiement empreinte encore un échantillon — le correctif d'ensemble n'est pas appli | decide | digit-ai-factory | 12.5 |
 | TF-0982 | pilot : les tables du canal n ont qu une date GLOBALE — chaque extension rend le passe fautif RETROACTIVEMENT, | en_cours | digit-ai-factory | 12.5 |
 | TF-0988 | pilot : un mot d'EXCLUSIVITE dans une demande humaine (« uniquement », « seulement ») n'est couvert par aucune | decide | digit-ai-factory | 12.5 |
@@ -47,6 +48,7 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0956 | pilot : le registre ne sait ni détecter ni écarter un DOUBLON de candidature — six items identiques mot pour m | decide | digit-ai-factory | 10 |
 | TF-0965 | pilot : propager les skills a casse un test d'une forge voisine — une regle neuve du socle est mesuree sur le  | candidat | digit-ai-factory | 10 |
 | TF-0990 | pilot : le referentiel de restitution declare une exemption que son juge n'implemente pas — un tour sans nouve | candidat | digit-ai-factory | 10 |
+| TF-1008 | pilot : un clone rebati apres reecriture d historique garde l ANCIENNE histoire atteignable par le REMISAGE —  | candidat | digit-ai-factory | 10 |
 | TF-0966 | pilot : la pseudonymisation ne couvre pas les IDENTIFIANTS TECHNIQUES cites dans le corps d un item — cinq obj | candidat | digit-ai-factory | 8.3 |
 | TF-0967 | pilot : oracle-conformite-projet n a AUCUN banc de fixtures, et son propre en-tete affirme le contraire — c es | candidat | digit-ai-factory | 8.3 |
 | TF-0992 | pilot : la règle S37 du juge des restitutions accuse le NOM D'UN CHAMP de la preuve — `corriges: []`, une sort | candidat | digit-ai-factory | 8 |
@@ -54,6 +56,7 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0676 | Aucun script de capture du produit ne produit systématiquement une pleine page | decide | digit-ai-factory | 6.7 |
 | TF-0983 | pilot : les vues generees du registre sont versionnees — 1173 revisions de contenu derive, qui transforment UN | candidat | digit-ai-factory | 6.7 |
 | TF-1003 | pilot : le preflight d ingestion compte des COMMITS la ou son invariant est un MAXIMUM D IDENTIFIANT — sur une | candidat | digit-ai-factory | 4.5 |
+| TF-1009 | gabarits : SIX erreurs de mesure en une journee, AUCUNE trouvee par celui qui l avait commise — le seul mecani | candidat | digit-ai-factory | 4.5 |
 | TF-0923 | pilot : six volets d'oracle proposés par les items du 08/09 restent non livrés, cinq d'entre eux vivant dans l | en_cours | digit-ai-factory | 3 |
 | TF-0836 | pilot : le hook qo-gate-write juge un template de maquette comme un livrable | en_cours | digit-ai-factory | 1 |
 | TF-0838 | pilot : le skill claude-api ne documente pas fallbacks avec messages.parse | en_cours | digit-ai-factory | 1 |

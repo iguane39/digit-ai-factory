@@ -1,10 +1,10 @@
 # Récidives et descente — tableau de bord
 
-<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre efa5e8834812 · archive 6ce2fe14c2bb · classes c25e3cb26ded · relevés 87cfd092d942 · héritage 23d6b9c4bee8. État au 2026-09-10T06:54:31.885Z (ts max des sources, jamais l'horloge). -->
+<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 63370763cf29 · archive 6ce2fe14c2bb · classes e8670fd5ac84 · relevés 87cfd092d942 · héritage 23d6b9c4bee8. État au 2026-09-10T07:20:53.769Z (ts max des sources, jamais l'horloge). -->
 
 Ce tableau de bord répond à trois questions que le registre seul ne savait pas poser : est-ce la deuxième fois, chez qui, et depuis combien de temps la correction existe sans être appliquée. Il se lit avec sa contre-métrique : un compteur de récidives qui baisse pendant que le nombre de classes monte est un compteur contourné, pas un progrès.
 
-**Périmètre mesuré** : 1005 item(s) au registre (actifs et archive), 189 portant une classe, 108 marqué(s) récidive ; référentiel de 57 classe(s) en 18 famille(s) (v1.5.0) ; 18 relevé(s) d'héritage.
+**Périmètre mesuré** : 1008 item(s) au registre (actifs et archive), 192 portant une classe, 109 marqué(s) récidive ; référentiel de 58 classe(s) en 18 famille(s) (v1.5.0) ; 18 relevé(s) d'héritage.
 
 ## 1. Récidives par classe
 
@@ -33,13 +33,14 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `page-html-sommaire-absent` | page-html-socle | 2 | 2 | 2 | 2/2 (sous 3 items, taux non significatif) | Produit-10 ×2 | 2026-09-08 |
 | `porte-cle-courte-sans-frontiere` | hook-ou-gate | 4 | 1 | 2 | 50 % | Produit-62 ×2 | 2026-09-09 |
 | `restitution-fichier-juge-mal-choisi` | restitution-forme | 2 | 1 | 2 | 2/2 (sous 3 items, taux non significatif) | Produit-10 ×2 | 2026-09-08 |
-| `compte-total-hors-canal-des-constats` | contrat-interface-forge | 2 | 1 | 1 | 1/2 (sous 3 items, taux non significatif) | pilot ×1 | 2026-09-08 |
+| `compte-total-hors-canal-des-constats` | contrat-interface-forge | 4 | 1 | 1 | 25 % | pilot ×1 | 2026-09-08 |
 | `controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas` | regle-morte | 2 | 0 | 1 | 1/2 (sous 3 items, taux non significatif) | pilot ×1 | 2026-09-10 |
 | `correction-symptome-sans-classe` | lot-forme | 3 | 1 | 1 | 33 % | Produit-62 ×1 | 2026-09-09 |
 | `garde-lexicale-frontiere-ascii` | regle-morte | 9 | 2 | 1 | 11 % | Produit-62 ×1 | 2026-09-08 |
 | `page-html-liste-renvoi-sans-detail` | page-html-socle | 1 | 1 | 1 | 1/1 (sous 3 items, taux non significatif) | Produit-10 ×1 | 2026-09-08 |
 | `page-html-teinte-refus` | page-html-socle | 1 | 1 | 1 | 1/1 (sous 3 items, taux non significatif) | Produit-10 ×1 | 2026-09-08 |
 | `point-entree-declare-rouge-sur-toute-cible` | regle-morte | 3 | 1 | 1 | 33 % | Produit-62 ×1 | 2026-09-09 |
+| `texte-sur-la-graphie-detruit-par-sa-pseudonymisation` | anonymisation | 1 | 1 | 1 | 1/1 (sous 3 items, taux non significatif) | pilot ×1 | 2026-09-10 |
 | `banc-etend-referentiel-production` | anonymisation | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `boite-entree-produit-statut-git-non-dit` | contrat-interface-forge | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `brief-sans-regles-de-socle` | skill-ou-oracle-non-invoque | 0 | 1 | 0 | — | — | — |
@@ -133,6 +134,7 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 | `sceau-de-vue-provenance-sans-contenu` | 2026-09-05 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `skill-non-invoque-lexique` | 2026-08-14 | CLAUDE.md | 11 produit(s) atteint(s) en 20–26 j ; 1 non atteint(s) (Produit-11) |
 | `surface-implicite-non-livree` | 2026-09-05 | CLAUDE.md | 11 produit(s) atteint(s) en 2–4 j ; 1 non atteint(s) (Produit-11) |
+| `texte-sur-la-graphie-detruit-par-sa-pseudonymisation` | — | — | non mesurable : aucune clôture fondatrice au registre |
 
 ## 3. Taux d'héritage par règle (dernier relevé)
 
@@ -161,7 +163,7 @@ Comment lire : le nombre de classes créées par semaine ISO, puis les classes s
 | Semaine | Classes créées |
 |---|---|
 | 2026-S36 | 37 |
-| 2026-S37 | 20 |
+| 2026-S37 | 21 |
 
 - Classes sans clôture fondatrice : `emplacement-livrable-hors-convention`, `registre-doublon-non-detecte`, `banc-etend-referentiel-production`, `gate-cout-invite-au-contournement`, `regle-neuve-sans-mesure-de-bruit`, `controle-sans-fixture-double-sens`, `deux-regles-du-socle-inconciliables`, `controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas`, `controle-vrai-sur-le-mauvais-invariant`
 - Retours entrés sous une classe suspecte : TF-0995 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1003 (controle-vrai-sur-le-mauvais-invariant), TF-1006 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas)

@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=918b21582a69 archive=6ce2fe14c2bb · dernier événement: 2026-09-10T07:08:31.115Z -->
+     sceaux: actifs=63370763cf29 archive=6ce2fe14c2bb · dernier événement: 2026-09-10T07:20:53.769Z -->
 
-**226 actifs** (candidat 21 · décidé 27 · en cours 11 · corrigé 167 · écarté 0) · **782 archivés**.
+**227 actifs** (candidat 22 · décidé 27 · en cours 11 · corrigé 167 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -34,6 +34,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0993 | candidat | 8 | parc : la chaîne d'anonymisation annonce « pseudonymisé » sans dire ce qui a RÉSISTÉ — le champ `refuses` est ignoré par le script du pilot et par le lanceur installable | **oui** — un commit annoncé pseudonymisé pouvant porter un nom réel laissé en place à dessein, découvert plus tard par la porte quand il est déjà dans l'histoire |
 | TF-0983 | candidat | 6.7 | pilot : les vues generees du registre sont versionnees — 1173 revisions de contenu derive, qui transforment UNE occurrence au registre en 25 dans l histoire | **oui** — 75 des 194 occurrences historiques du 08/09 viennent de la seule amplification par les vues generees ; 1173 revisions de contenu derive dans l histoire du depot |
 | TF-1003 | candidat | 4.5 | pilot : le preflight d ingestion compte des COMMITS la ou son invariant est un MAXIMUM D IDENTIFIANT — sur une histoire reecrite il refuse pour toujours, et sa seule issue fait declarer un hors-ligne qui est faux | **oui** — oui — le canal d ingestion des retours a ete ferme dans ce tour meme, sur un risque de collision qui n existait pas (max identique des deux cotes, mesure) ; le remede propose par le message (git pull --rebase) est celui que le mode operatoire de reecriture interdit explicitement, et la seule issue praticable oblige a declarer un hors-ligne faux |
+| TF-1009 | candidat | 4.5 | gabarits : SIX erreurs de mesure en une journee, AUCUNE trouvee par celui qui l avait commise — le seul mecanisme qui a fonctionne est le contre-mesurage par un tiers, et il n est prescrit nulle part | **oui** — oui — six erreurs de mesure en une journee sur un seul depot, dont deux ecrites au registre avant rectification et une ecrite dans une decision soumise a l humain ; aucune trouvee par son auteur ; deux partagent la meme cause mecanique, une sortie bornee lue comme complete |
 | TF-0869 | corrige | 25 | pilot : aucun .env local créé d'office, le commanditaire a saisi sa clé Anthropic dans .env.example versionné | **oui** — git diff --stat .env.example : 1 ligne, clé de 108 caractères préfixée sk-ant- dans un fichier versionné ; un commit de plus et le secret partait |
 | TF-0870 | corrige | 20 | pilot : une clé Anthropic d'organisation sans espace de travail échoue en 400, variable ANTHROPIC_WORKSPACE_ID absente du gabarit et du skill | **oui** — un redéploiement qualif et un appel direct à l'API pour lire la cause ; smoke-qualif-20260906.json E-011 FAIL 502 |
 | TF-0872 | corrige | 20 | pilot : ETAPE-MEP § 3 bis ne prescrit ni comptes d'essai vides ni source des identifiants d'une qualif publique | **oui** — retour humain lot 20260906b, un run de version |
