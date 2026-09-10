@@ -255,7 +255,7 @@
   "vu_le": "2026-08-26"
  },
  "oracles/pre-commit-quantificateurs.test.mjs": {
-  "cas": 6,
+  "cas": 8,
   "vu_le": "2026-09-10"
  },
  "oracles/resoudre-pilot.test.mjs": {

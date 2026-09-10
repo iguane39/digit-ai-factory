@@ -907,6 +907,21 @@
     "compte-total-hors-canal-des-constats",
     "quantificateur-sacrifie-au-budget-du-texte"
    ]
+  },
+  {
+   "cle": "regle-qui-interdit-son-propre-remede",
+   "famille": "hook-ou-gate",
+   "libelle": "Un controle BLOQUANT refuse la correction que son propre message de refus RECOMMANDE. L auteur qui obeit a la consigne se fait refuser une seconde fois, et la seule issue qui lui reste est le contournement : le gardien ne se discute pas, il se DESACTIVE, et il emporte avec lui la protection qu il portait. Le defaut ne se voit ni a la lecture du code ni dans un banc de fixtures construites autour du cas nominal — il ne se voit qu en JOUANT le remede que le message prescrit, ce que personne ne pense a tester puisque c est precisement ce qu on croit avoir rendu possible",
+   "creee_le": "2026-09-10",
+   "fondee_par": [
+    "TF-1013"
+   ],
+   "regle": "tout controle bloquant dont le message propose une correction porte, a son banc, un cas qui JOUE cette correction et qui doit PASSER — la fixture du remede est aussi obligatoire que la fixture du defaut",
+   "oracle": "a creer : relever les controles dont le message de refus contient une prescription (<< reformulez >>, << remplacez >>, << utilisez >>) et dont le banc ne porte aucun cas jouant cette prescription",
+   "voisines": [
+    "controle-sans-fixture-double-sens",
+    "quantificateur-sacrifie-au-budget-du-texte"
+   ]
   }
  ]
 }

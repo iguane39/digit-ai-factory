@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=5dcb132d3b03 archive=6ce2fe14c2bb · dernier événement: 2026-09-10T13:55:09.547Z -->
+     sceaux: actifs=63a968d6da44 archive=6ce2fe14c2bb · dernier événement: 2026-09-10T13:59:51.426Z -->
 
-**230 actifs** (candidat 21 · décidé 27 · en cours 13 · corrigé 169 · écarté 0) · **782 archivés**.
+**231 actifs** (candidat 22 · décidé 27 · en cours 13 · corrigé 169 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -23,6 +23,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0676 | decide | 6.7 | Aucun script de capture du produit ne produit systématiquement une pleine page | non |
 | TF-0987 | decide | 1 | pilot : le vocabulaire ferme des motifs d'oracle-synthese est cherche dans TOUT le groupe de puce, spans de code inclus - un nom de donnee se fait lire comme un motif et la regle rougit sur une action irreprochable | **oui** — S21 a compte 2 actions concernees au lieu de 1 et rendu FAIL sur une action dont le motif declare est decision ; deux passes d'oracle et une lecture de l'implementation pour le diagnostic ; remede applique chez le producteur : renommer une colonne de livrable en etats_porteurs |
 | TF-0959 | candidat | 20 | canal confidentiel : une clé DÉJÀ pseudonymisée peut entrer dans une table de noms réels, et rien ne l'en empêche — l'arbitrage du 08/09 l'a fait une fois, la porte l'a rattrapé | **oui** — trois dépôts condamnés par la porte de publication et une rectification manuelle de la table, le 08/09 au matin, sur un défaut dont la garde était déjà écrite ailleurs depuis six jours |
+| TF-1013 | candidat | 20 | pilot : la regle des quantificateurs REFUSAIT la reformulation que son propre message recommande — posee telle quelle, elle aurait bloque la reparation du noyau faite le matin meme | **oui** — un gardien bloquant qui refusait le geste qu il conseille, et qui aurait bloque la reparation du noyau faite le matin meme |
 | TF-1007 | candidat | 15 | parc : un commentaire et un message de commit qui documentaient un defaut de graphie ont ete rendus tautologiques par leur propre pseudonymisation — « X dans le nom, la cle etant X » | **oui** — deux explications de defaut rendues tautologiques dans le meme fichier, et un message de commit reecrit par un tiers parce qu aucun hook ne le couvre |
 | TF-0965 | candidat | 10 | pilot : propager les skills a casse un test d'une forge voisine — une regle neuve du socle est mesuree sur le parc du pilot seulement, jamais sur les depots qui la CONSOMMENT | **oui** — une suite de tests d'une forge passee au rouge par un geste joue dans un autre depot, et un agent qui a declare l'echec preexistant de bonne foi parce que rien ne lui disait que la copie installee avait change sous lui |
 | TF-0990 | candidat | 10 | pilot : le referentiel de restitution declare une exemption que son juge n'implemente pas — un tour sans nouveaute doit rendre un accuse bref, et l'accuse bref est refuse | **oui** — un accuse de reception de trois phrases refuse par quatre regles bloquantes, puis quatre-vingt-dix lignes de restitution pour un tour ou rien n'a change |
