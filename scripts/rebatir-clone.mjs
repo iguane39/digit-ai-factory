@@ -38,10 +38,10 @@
 // porte, message} · exit 0 = rebâti (ou rien à rebâtir) · 1 = rejeu d'un patch échoué · 2 = refus.
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { homedir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { cheminsTables } from "./lib-confidentiel.mjs";
+import { cheminSkillsInstalles } from "./lib-config-installee.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -165,7 +165,7 @@ R.apres = { head: head(), avance: compte("origin/main..HEAD"), retard: compte("H
 
 // 8 · porte de publication (jamais de push)
 const pistesOracle = [
-  join(process.env.FORGE_SKILLS_INSTALLES || join(homedir(), ".claude", "skills"), "quality-oracles", "scripts", "oracle-nom-client-publie.mjs"),
+  join(cheminSkillsInstalles(), "quality-oracles", "scripts", "oracle-nom-client-publie.mjs"),
   join(racineParc, "digit-ai-forge-agents", ".claude", "skills", "quality-oracles", "scripts", "oracle-nom-client-publie.mjs"),
 ];
 const oracle = pistesOracle.find((p) => existsSync(p));

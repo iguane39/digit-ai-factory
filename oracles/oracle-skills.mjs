@@ -3,8 +3,12 @@
  * oracle-skills.mjs — les skills et hooks qui S'EXÉCUTENT sont-ils ceux que les dépôts VERSIONNENT ?
  *
  * Pourquoi il existe. Un skill vit en deux exemplaires : la source, versionnée dans une forge,
- * et la copie installée sous `~/.claude/skills/`, qui est celle que la session invoque
- * réellement. Rien ne les liait. Mesure du 15/08, en livrant la règle L14 : sur 20 skills
+ * et la COPIE INSTALLÉE, qui est celle que la session invoque réellement. Cette copie vit sous
+ * `~/.claude/skills/` TANT QUE la variable de plateforme `CLAUDE_CONFIG_DIR` n'est pas posée —
+ * quand elle l'est, le harnais charge le répertoire qu'elle désigne, et lui seul. Cet en-tête a
+ * longtemps écrit « sous `~/.claude/skills/` » sans cette réserve, et c'était FAUX : le 09/09/2026
+ * l'oracle a rendu PASS sur 24 skills alignés dont la session n'en chargeait aucun (TF-0995, K10).
+ * La résolution ne vit plus ici : `scripts/lib-config-installee.mjs` en est le seul endroit. Rien ne les liait. Mesure du 15/08, en livrant la règle L14 : sur 20 skills
  * versionnés, **4 divergeaient et 5 n'étaient pas installés du tout**. Autrement dit, neuf
  * skills sur vingt n'étaient pas ce que le dépôt croyait livrer — dont `quality-oracles`, cité
  * comme loi transversale : la version qui s'exécutait n'était pas la version versionnée.
@@ -35,6 +39,9 @@
  *       l'écart est nommé avec la commande qui le poserait.
  *   K8  une entrée de câblage INSTALLÉE pointe-t-elle un FICHIER QUI EXISTE — déclaré, JAMAIS en
  *       échec, même gouvernance que K7 : un câblage vers un chemin mort se lit « câblé ».
+ *   K10 OÙ cet oracle a-t-il regardé — déclaré, JAMAIS en échec : la racine de configuration
+ *       mesurée ET la variable qui l'a décidée, en PASS comme en FAIL, plus ce qui manque à
+ *       cette racine (`skills\`, `CLAUDE.md` de niveau poste) avec le geste qui répare.
  *
  * K6 (TF-0290). Le gate C7 `qo-gate-write.mjs` — celui qui bloque l'écriture de TOUT livrable,
  * cinq blocages réels dans la seule journée du 15/08 — ne vivait qu'en copie installée : aucune
@@ -56,6 +63,23 @@
  * décision n'est pas prise, et un gate qu'on apprend à contourner ne protège plus rien (précédent
  * R-33 bis). K7 rend PASS avec ses constats en clair, et `non_juge` dit pourquoi il ne bloque pas.
  * Le passage de K7 en bloquant sera une décision humaine, pas une décision d'oracle.
+ *
+ * K10 (TF-0995, 09/09/2026). Toute la chaîne d'alignement résolvait la copie installée par
+ * `join(homedir(), ".claude")`, écrit en dur — huit sites. Le harnais, lui, charge le répertoire
+ * désigné par `CLAUDE_CONFIG_DIR` quand elle est posée. Mesure du 09/09 sur une session ouverte
+ * avec `CLAUDE_CONFIG_DIR=%USERPROFILE%\.claude-b` : 24 skills sous `~\.claude\skills`, ZÉRO sous
+ * le répertoire réellement chargé, K1 et K2 verts, `bootstrap` écrivant « Poste prêt — skills
+ * alignés », et le noyau de niveau poste jamais chargé — donc pas non plus la loi transverse
+ * `quality-oracles`. Le défaut s'est payé côté humain (une formule du lexique d'invocation traitée
+ * sans son skill) et a été trouvé par CONTESTATION, pas par un contrôle.
+ *
+ * Ce que K10 ajoute une fois la résolution corrigée. La correction seule suffit à faire rougir K1
+ * quand la racine chargée est vide — c'est voulu, et son remède est mécanique (`--appliquer`).
+ * K10 couvre ce que K1 ne peut pas voir : le `CLAUDE.md` de niveau poste, qu'aucune règle ne
+ * regardait. Et surtout il NOMME, dans tous les cas, la racine mesurée et la variable qui l'a
+ * décidée. C'est la moitié qui manquait : les artefacts étaient bien là, alignés, à jour, et aucun
+ * verdict ne disait où l'on avait regardé — un verdict qui ne le dit pas ne se conteste pas.
+ * Classe `controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas` (famille `regle-morte`).
  *
  * K8 (TF-0305). K7 confronte deux CÂBLAGES ; il ne vérifie pas que la commande câblée pointe un
  * fichier qui EXISTE. Or une entrée dont la commande désigne un chemin mort — hook désinstallé,
@@ -108,11 +132,12 @@
 // d'environnement (TF-0648).
 import {
   existsSync, readFileSync, readdirSync, statSync, mkdirSync, copyFileSync, writeFileSync,
-  mkdtempSync, renameSync,
+  mkdtempSync, renameSync, rmSync,
 } from "node:fs";
 import { basename, dirname, join, resolve, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir, tmpdir } from "node:os";
+import { racineConfigInstallee, skillsInstalles, hooksInstalles, settingsInstalle as settingsInstalleDe } from "../scripts/lib-config-installee.mjs";
 
 const VERSION = "1.3.0"; // 1.3.0 : K8 (le câblage installé pointe-t-il un fichier qui existe — TF-0305)
 const ORACLE = "oracle-skills";
@@ -173,6 +198,8 @@ const NON_JUGE = [
   "K8 ne juge que les entrées de câblage INSTALLÉES que K7 confronte déjà (celles dont la commande nomme un hook versionné) : le câblage personnel de l'humain n'est ni résolu, ni listé, ni compté (même prudence que K4)",
   "K8 ne juge pas ce que le fichier câblé CONTIENT, ni s'il est exécutable, ni si son interpréteur est installé : il répond à une seule question, le fichier existe-t-il",
   "`--appliquer` n'installe ni ne câble rien au titre de K8 : un chemin mort se répare à la main (R-29)",
+  "K10 dit OÙ l'oracle a regardé et ce que cette racine porte ; il ne juge PAS que le harnais charge bien ce répertoire — cela dépend de la plateforme, pas d'un fichier lisible. Il est DÉCLARATIF, jamais en échec (même gouvernance que K7 et K8) : quand la racine chargée est vide, ce sont K1 et K6 qui rougissent, et leur remède est mécanique (`--appliquer`)",
+  "K10 ne juge pas le CONTENU du `CLAUDE.md` de niveau poste : il constate sa présence, pas ce qu'il prescrit",
 ];
 
 function racineForges() {
@@ -729,7 +756,8 @@ function relevePreambule(par_nom, findings) {
 
 function juger(racine, installes, appliquer = false, purger = false,
                installesHooks = join(dirname(installes), "hooks"),
-               settingsInstalle = join(dirname(installes), "settings.json")) {
+               settingsInstalle = join(dirname(installes), "settings.json"),
+               config = racineConfigInstallee()) {
   const findings = [];
   const par_nom = sources(racine);
   if (par_nom.size === 0) {
@@ -829,6 +857,29 @@ function juger(racine, installes, appliquer = false, purger = false,
       ? `${personnels.length} skill(s) personnel(s) sans source versionnée, déclarés et non jugés : ${personnels.join(", ")}`
       : "aucun skill installé sans source versionnée",
   });
+  // K10 (TF-0995) · OÙ cet oracle a-t-il regardé, et est-ce bien ce que la session charge ?
+  // DÉCLARATIF, jamais en échec — même gouvernance que K7 et K8 : cet oracle s'ouvre à tout run
+  // (R-35), et poser une racine de configuration engage toutes les sessions du poste (R-29). Sa
+  // valeur n'est pas de bloquer, c'est de rendre le verdict CONTESTABLE : le 09/09, 24 skills
+  // étaient déclarés alignés et zéro chargé, et rien dans la sortie ne disait où l'on avait
+  // regardé. Un verdict qui ne nomme pas le répertoire mesuré ne se conteste pas.
+  {
+    const aSkills = existsSync(join(config.racine, "skills"));
+    const aNoyau = existsSync(join(config.racine, "CLAUDE.md"));
+    const manques = [];
+    if (!aSkills) manques.push("le dossier skills (aucun skill invocable par la session)");
+    if (!aNoyau) manques.push("le fichier CLAUDE.md (le noyau de niveau poste, qui porte la loi transverse « tout livrable passe par quality-oracles », n'est pas chargé)");
+    findings.push({
+      regle: "K10", statut: "PASS", ou: config.racine,
+      message: manques.length === 0
+        ? `racine de configuration mesurée : ${config.racine} — décidée par ${config.decidee_par} ; elle porte bien un dossier skills et un CLAUDE.md de niveau poste`
+        : `racine de configuration mesurée : ${config.racine} — décidée par ${config.decidee_par}. Il y MANQUE ${manques.join(" et ")}. `
+          + `Les autres règles de cet oracle peuvent être VERTES sur un parc que la session ne charge pas : c'est le défaut du 09/09 (24 skills alignés, 0 invocable). `
+          + `Remède : node bootstrap.mjs --pull propage les skills vers cette racine (oracle-skills --appliquer) ; le CLAUDE.md de niveau poste s'y copie depuis ${join(homedir(), ".claude", "CLAUDE.md")}`
+          + `${config.variable ? ` ; ou retirer ${config.variable} pour revenir au défaut ~/.claude` : ""}`,
+    });
+  }
+
   findings.sort((a, b) => a.regle.localeCompare(b.regle) || (a.statut === "FAIL" ? -1 : 1));
 
   return {
@@ -1395,6 +1446,53 @@ function selfTest() {
             && /CHEMIN MORT/.test(k8de(rApp5).message)
             && /n'a rien installé ni câblé au titre de K8/.test(k8de(rApp5).message)]);
 
+  // ---- K10 (TF-0995) · la fixture à DEUX racines de configuration ------------------------------
+  // C'est la recette que le lot du 09/09 demande, et elle doit ÉCHOUER là où l'oracle rendait PASS.
+  // Deux racines : l'une PEUPLÉE (les skills y sont installés), l'autre VIDE. `CLAUDE_CONFIG_DIR`
+  // pointe tour à tour sur l'une et sur l'autre. Avant la correction, la résolution était écrite en
+  // dur sur `~/.claude` : les deux cas rendaient le MÊME verdict, et le cas « racine vide » passait
+  // au vert. C'est exactement le 09/09 — 24 skills alignés, zéro chargé.
+  const base10 = mkdtempSync(join(tmpdir(), "skills-k10-"));
+  const racine10 = join(base10, "forges");
+  const src10 = join(racine10, "digit-ai-forge-agents", ".claude", "skills");
+  poser(join(src10, "alpha", "SKILL.md"), "# alpha\n");
+  const peuple = join(base10, "config-peuple");
+  const vide = join(base10, "config-vide");
+  poser(join(peuple, "skills", "alpha", "SKILL.md"), "# alpha\n");
+  poser(join(peuple, "CLAUDE.md"), "# noyau de poste\n");
+  mkdirSync(vide, { recursive: true });
+
+  // Sens VERT : la racine chargée est celle qui porte les skills.
+  const cfgP = racineConfigInstallee({ CLAUDE_CONFIG_DIR: peuple });
+  const instP = skillsInstalles({ CLAUDE_CONFIG_DIR: peuple }).chemin;
+  let r10 = juger(racine10, instP, false, false, join(peuple, "hooks"), join(peuple, "settings.json"), cfgP);
+  const k10P = r10.findings.find((f) => f.regle === "K10");
+  cas.push(["K10   — racine chargée peuplée : PASS, et le verdict NOMME la racine et sa variable",
+            r10.verdict === "PASS" && Boolean(k10P)
+            && k10P.message.includes(peuple) && k10P.message.includes("CLAUDE_CONFIG_DIR")]);
+
+  // Sens ROUGE : la racine chargée est VIDE. La résolution partagée y emmène `installes`, et K1
+  // rougit — alors qu'avant la correction, `installes` restait sur `~/.claude/skills` et passait.
+  const cfgV = racineConfigInstallee({ CLAUDE_CONFIG_DIR: vide });
+  const instV = skillsInstalles({ CLAUDE_CONFIG_DIR: vide }).chemin;
+  r10 = juger(racine10, instV, false, false, join(vide, "hooks"), join(vide, "settings.json"), cfgV);
+  const k10V = r10.findings.find((f) => f.regle === "K10");
+  cas.push(["K10   — racine chargée VIDE : l'oracle ÉCHOUE là où il rendait PASS (K1)",
+            r10.verdict === "FAIL" && echoue(r10, "K1")]);
+  cas.push(["K10   — racine vide : le CLAUDE.md de poste manquant est DIT avec son remède",
+            Boolean(k10V) && k10V.statut === "PASS" && k10V.message.includes(vide)
+            && k10V.message.includes("CLAUDE.md") && k10V.message.includes("bootstrap.mjs --pull")]);
+
+  // La résolution elle-même, dans ses trois sens — c'est elle que les huit sites partagent.
+  cas.push(["K10   — CLAUDE_CONFIG_DIR décide la racine quand elle est posée",
+            racineConfigInstallee({ CLAUDE_CONFIG_DIR: vide }).racine === resolve(vide)]);
+  cas.push(["K10   — FORGE_SKILLS_INSTALLES reste PRIORITAIRE (voie des recettes)",
+            skillsInstalles({ CLAUDE_CONFIG_DIR: vide, FORGE_SKILLS_INSTALLES: instP }).chemin === resolve(instP)]);
+  cas.push(["K10   — une variable posée à la chaîne VIDE est traitée comme absente",
+            racineConfigInstallee({ CLAUDE_CONFIG_DIR: "   " }).variable === null]);
+
+  rmSync(base10, { recursive: true, force: true });
+
   let bons = 0;
   for (const [nom, tenu] of cas) {
     console.log(`  [${tenu ? "OK    " : "ECHEC "}] ${nom}`);
@@ -1413,18 +1511,23 @@ const lire = (drapeau, defaut) => {
   return i >= 0 && args[i + 1] ? resolve(args[i + 1]) : defaut;
 };
 const racine = lire("--racine", racineForges());
-const installes = lire("--installes", join(homedir(), ".claude", "skills"));
-// Les hooks installés sont le frère du dossier des skills (`~\.claude\hooks`) — déduit plutôt que
-// redemandé, pour qu'un `--installes` de test emmène ses hooks avec lui.
+// TF-0995 : la racine de configuration se résout par lib-config-installee, qui lit d'abord
+// `CLAUDE_CONFIG_DIR` — la variable que le HARNAIS charge. Avant, ce défaut était `~/.claude`
+// écrit en dur : l'oracle jugeait un parc que la session ne lisait pas, et rendait PASS dessus.
+const config = racineConfigInstallee();
+const installes = lire("--installes", skillsInstalles().chemin);
+// Les hooks installés sont le frère du dossier des skills — déduit plutôt que redemandé, pour
+// qu'un `--installes` de test emmène ses hooks avec lui.
 const installes_hooks = lire("--installes-hooks", join(dirname(installes), "hooks"));
-// Le câblage installé est le frère des deux autres (`~\.claude\settings.json`) — même déduction.
+// Le câblage installé est le frère des deux autres — même déduction.
 const settings_installe = lire("--settings-installe", join(dirname(installes), "settings.json"));
 const appliquer = args.includes("--appliquer");
 const purger = args.includes("--purger");
 
 const { verdict, findings, motif, applique, purge } = juger(
-  racine, installes, appliquer, purger, installes_hooks, settings_installe);
+  racine, installes, appliquer, purger, installes_hooks, settings_installe, config);
 process.stdout.write(JSON.stringify(
-  { oracle: ORACLE, version: VERSION, racine, installes, installes_hooks, settings_installe, verdict, motif, applique, purge, findings, non_juge: NON_JUGE },
+  { oracle: ORACLE, version: VERSION, racine, racine_config: config.racine, config_decidee_par: config.decidee_par,
+    installes, installes_hooks, settings_installe, verdict, motif, applique, purge, findings, non_juge: NON_JUGE },
   null, 1) + "\n");
 process.exit(verdict === "FAIL" ? 1 : verdict === "SKIP" ? 2 : 0);

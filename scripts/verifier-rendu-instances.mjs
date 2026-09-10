@@ -37,9 +37,10 @@
  */
 import { existsSync, readdirSync, mkdtempSync, rmSync, statSync } from "node:fs";
 import { join, dirname, relative } from "node:path";
-import { tmpdir, homedir } from "node:os";
+import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { cheminSkillsInstalles } from "./lib-config-installee.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
@@ -51,7 +52,7 @@ const largeur = iL > -1 ? args[iL + 1] : "1440";
 // la cible. Sans lui, le contrôle garde son périmètre historique : le catalogue du pilot.
 const cible = args.find((a, i) => !a.startsWith("--") && (iL === -1 || i !== iL + 1)) || null;
 
-const SOCLE = join(homedir(), ".claude", "skills", "digit-ai-page-html", "scripts", "render_page.py");
+const SOCLE = join(cheminSkillsInstalles(), "digit-ai-page-html", "scripts", "render_page.py");
 // LA LISTE N'EST PLUS ÉCRITE ICI (choix humain du 23/08, option « source unique ») : elle est LUE
 // dans le socle, qui la publie par `--familles`. Une copie locale se serait décalée le jour où une
 // famille naît — c'est exactement ce qui a laissé deux familles bloquantes se faire relire en

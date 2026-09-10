@@ -30,8 +30,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { join, dirname } from "node:path";
-import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
+import { cheminSkillsInstalles } from "./lib-config-installee.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
@@ -85,7 +85,7 @@ const CONSOMMATEURS = [
   ["digit-ai-forge-design/oracles/rendu-comparatif.mjs", "comparatif avant/après de forge-design"],
   ["digit-ai-factory/scripts/verifier-rendu-instances.mjs", "contrôle de rendu des instances de gabarits (pilot)"],
 ];
-const SOCLE = join(homedir(), ".claude", "skills", "digit-ai-page-html", "scripts", "render_page.py");
+const SOCLE = join(cheminSkillsInstalles(), "digit-ai-page-html", "scripts", "render_page.py");
 
 const sortir = (code) => {
   console.log(JSON.stringify({ outil: "verifier-familles-mesure",

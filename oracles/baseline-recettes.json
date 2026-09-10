@@ -27,8 +27,8 @@
   "vu_le": "2026-09-08"
  },
  "gabarits/oracle-travaux-pilot.test.mjs": {
-  "cas": 23,
-  "vu_le": "2026-09-08"
+  "cas": 27,
+  "vu_le": "2026-09-09"
  },
  "hook-lexique.mjs": {
   "cas": 7,
@@ -146,8 +146,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-portee-doctrine.mjs": {
-  "cas": 5,
-  "vu_le": "2026-08-26"
+  "cas": 9,
+  "vu_le": "2026-09-09"
  },
  "oracle-portee-doctrine.mjs (parc réel)": {
   "non_lu": true,
@@ -194,8 +194,8 @@
   "vu_le": "2026-08-27"
  },
  "oracle-skills.mjs": {
-  "cas": 72,
-  "vu_le": "2026-08-26"
+  "cas": 78,
+  "vu_le": "2026-09-09"
  },
  "oracle-skills.mjs (parc réel)": {
   "non_lu": true,
@@ -207,8 +207,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-synthese.mjs": {
-  "cas": 14,
-  "vu_le": "2026-09-05"
+  "cas": 18,
+  "vu_le": "2026-09-09"
  },
  "oracle-trace-mutation-mep.mjs": {
   "cas": 8,
@@ -282,6 +282,10 @@
   "cas": 3,
   "vu_le": "2026-09-07"
  },
+ "scripts/generer-remplacements-historique.test.mjs": {
+  "cas": 11,
+  "vu_le": "2026-09-09"
+ },
  "scripts/lib-pseudonyme-produit.test.mjs": {
   "cas": 7,
   "vu_le": "2026-09-03"
@@ -329,6 +333,10 @@
  "scripts/verifier-secours.test.mjs": {
   "cas": 7,
   "vu_le": "2026-08-26"
+ },
+ "todo/bancs-isoles.test.mjs": {
+  "cas": 4,
+  "vu_le": "2026-09-09"
  },
  "todo/emettre-travaux.test.mjs": {
   "cas": 31,
@@ -385,6 +393,10 @@
  "todo/observer-recidives.test.mjs": {
   "cas": 4,
   "vu_le": "2026-09-03"
+ },
+ "todo/pre-commit-anonymise.test.mjs": {
+  "cas": 6,
+  "vu_le": "2026-09-09"
  },
  "todo/preflight-collision.test.mjs": {
   "cas": 5,

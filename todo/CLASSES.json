@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.3.1",
- "date": "2026-09-08",
+ "version": "1.5.0",
+ "date": "2026-09-09",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -820,6 +820,33 @@
    "voisines": [
     "controle-sans-fixture-double-sens",
     "regle-balaie-prose-et-identifiants"
+   ]
+  },
+  {
+   "cle": "controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas",
+   "famille": "regle-morte",
+   "libelle": "Un controle mesure un emplacement CODE EN DUR alors que l'execution reelle en charge un autre, designe par une variable d'environnement de la plateforme. Il rend PASS sur un parc que la session n'a jamais vu : les artefacts sont bien la, alignes, a jour — et aucun n'est charge. Le defaut est invisible par construction, parce que le verdict ne NOMME pas le repertoire qu'il a mesure : rien dans la sortie ne permet de s'apercevoir qu'on a regarde ailleurs. Il se paie une fois que la consequence est visible cote humain (un skill qui ne se declenche pas, une loi transverse non chargee), jamais au moment du controle",
+   "creee_le": "2026-09-09",
+   "fondee_par": [],
+   "regle": "tout controle qui juge une copie INSTALLEE resout sa racine par la variable de la plateforme d'abord (CLAUDE_CONFIG_DIR), le defaut ensuite, via UNE fonction partagee ; et son verdict NOMME le repertoire mesure et la variable qui l'a decide, en PASS comme en FAIL — un verdict qui ne dit pas ou il a regarde ne se conteste pas",
+   "oracle": "a creer : oracle-skills K10 — fixture a deux repertoires de configuration, l'un peuplé l'autre vide, CLAUDE_CONFIG_DIR pointant sur le vide ; l'oracle doit ECHOUER la ou il rend PASS aujourd'hui",
+   "voisines": [
+    "regle-balaie-prose-et-identifiants",
+    "recette-verdict-non-prononcable"
+   ]
+  },
+  {
+   "cle": "controle-vrai-sur-le-mauvais-invariant",
+   "famille": "regle-morte",
+   "libelle": "Un controle mesure une GRANDEUR CORRELEE a ce qu il protege au lieu de l invariant lui-meme — un nombre de commits pour un maximum d identifiant, un compte de fichiers pour une couverture. Tant que la correlation tient, il a raison et personne ne voit la substitution ; le jour ou elle se rompt (une histoire reecrite, un depot reclone, un renommage en masse), il rend un verdict FAUX avec une mecanique JUSTE — donc incontestable, puisque son calcul est verifiable et exact. Deux aggravations le rendent couteux plutot que genant : le remede qu il NOMME est derive de la mauvaise grandeur, donc parfois destructeur pour la situation reelle ; et son echappatoire fait DECLARER a l operateur un etat qui n est pas le sien, ce qui laisse une trace fausse",
+   "creee_le": "2026-09-09",
+   "fondee_par": [],
+   "regle": "un controle mesure l INVARIANT qu il protege, enonce en une phrase dans son propre code (« aucun identifiant deja frappe ailleurs »), et jamais une grandeur qui lui est seulement correlee ; quand la grandeur mesuree et l invariant divergent, le message NOMME la divergence, ne propose aucun remede derive de la grandeur, et l echappatoire eventuelle fait declarer un FAIT VERIFIE, jamais un etat suppose",
+   "oracle": "a creer : fixture a double sens ou la correlation est ROMPUE — deux etats qui different sur la grandeur mesuree mais partagent l invariant doivent PASSER, deux etats identiques sur la grandeur mais divergents sur l invariant doivent ECHOUER",
+   "voisines": [
+    "controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas",
+    "controle-sans-fixture-double-sens",
+    "compte-total-hors-canal-des-constats"
    ]
   }
  ]

@@ -34,10 +34,10 @@
  */
 import { createHash } from "node:crypto";
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync, mkdirSync } from "node:fs";
-import { homedir } from "node:os";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { cheminSkillsInstalles } from "./lib-config-installee.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
@@ -143,7 +143,7 @@ if (lanceEnDirect) {
   const args = process.argv.slice(2);
   const val = (n) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : null; };
   const r = relever({
-    dossierSkills: val("--skills") || process.env.FORGE_SKILLS_INSTALLES || join(homedir(), ".claude", "skills"),
+    dossierSkills: val("--skills") || cheminSkillsInstalles(),
     journal: val("--journal") || join(PILOT, ".oracles", "empreintes-skills.json"),
     avecSocle: !args.includes("--sans-socle"),
   });

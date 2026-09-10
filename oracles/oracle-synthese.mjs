@@ -294,7 +294,7 @@ const RE_LIGNE_OPTION = /^\s*(?:[-*+]\s+|\|\s*)?\**\(?[a-e]\)/;
 // N'OUVRE QUE LA TÊTE D'UNE DÉCISION : la ligne citée qui porte le repli (« > **Si rien n'est
 // décidé** … ») doit rester RATTACHÉE à la décision, sinon elle deviendrait une décision sans
 // options et S15 comme S32 crieraient sur une forme juste.
-const RE_TETE_CITATION = /^>\s*\**\s*(?:d[ée]cision\s*)?(?:n[°ºo]\s*)?(?:D\s*-?\s*)?\d{1,2}\s*(?:[.)\-–—:·]|\*\*|\s)/i;
+const RE_TETE_CITATION = /^>\s*\**\s*(?:d[ée]cision\s*)?(?:n[°ºo]\s*)?(?:D\s*-?\s*)?\d{1,3}\s*(?:[.)\-–—:·]|\*\*|\s)/i;
 // Le préfixe d'une tête de décision, quelle que soit sa mise en page : chevron de citation,
 // puce, ou titre de section. Retiré avant de lire le numéro et avant de compter le chapeau.
 const TETE_DECISION = /^\s*(?:>\s*)?(?:[-*+]\s+|#{2,6}\s*)?/;
@@ -611,7 +611,7 @@ function juger(texte) {
   // par son seul sélecteur — la règle serait satisfaite par l'étiquette que S33 vient d'imposer,
   // et deux restitutions cesseraient de se comparer sans que rien ne crie. Le sélecteur est donc
   // retiré AVANT la mesure, exactement comme le nom d'acteur l'est pour S13.
-  juger8("S14", ACTEURS, (g) => ID_STABLE.test(g.replace(/\bA\s*-?\s*\d{1,2}\b/g, " ")) || DECLAREE_NEUVE.test(g),
+  juger8("S14", ACTEURS, (g) => ID_STABLE.test(g.replace(/\bA\s*-?\s*\d{1,3}\b/g, " ")) || DECLAREE_NEUVE.test(g),
     "une action sans identifiant stable ni mention `neuve` : deux restitutions successives ne se comparent pas, " +
     "et la même ligne se re-sert d'une liste à l'autre.",
     "chaque action porte un identifiant stable ou se déclare neuve");
@@ -651,7 +651,7 @@ function juger(texte) {
   // interdit depuis le 24/08.
   //
   // AVERTISSANTE, comme toute règle neuve depuis la v2.5.0.
-  const RE_SELECTEUR_ACTION = /^(?:\*\*|`|\s)*(?:action\s*(?:n[°ºo]\s*)?|A\s*-?\s*)(\d{1,2})\b/i;
+  const RE_SELECTEUR_ACTION = /^(?:\*\*|`|\s)*(?:action\s*(?:n[°ºo]\s*)?|A\s*-?\s*)(\d{1,3})\b/i;
   const selecteurDAction = (ligne) => {
     const candidats = /^\s*\|/.test(ligne)
       ? ligne.split("|").map((c) => c.trim()).filter(Boolean)
@@ -1181,14 +1181,41 @@ function juger(texte) {
   // La marque d'une recherche PAR NOM : un motif d'expression, un `LIKE`, un `grep`, ou le fait de
   // dire qu'on a cherché un nom. C'est cette marque qui distingue « aucune table de X » (une
   // conclusion tirée d'une recherche) de « aucune table n'est écrite » (un fait du produit).
-  const RECHERCHE_PAR_NOM = /(%[\w]+%|LIKE\s|ILIKE\s|grep|motif|pattern|nom\s+(?:contenant|comportant|qui\s+contient)|contenant\s+`|par\s+nom|dont\s+le\s+nom)/i;
+  //
+  // TF-0998 (09/09/2026) — LE MOT « motif » EST SORTI DU VOCABULAIRE, ET C'EST LE GABARIT QUI
+  // L'EXIGE. Il y figurait NU. Or « — motif : … » est le libellé que `gabarits\RESTITUTION.md`
+  // impose à CHAQUE ligne du bloc 5. Toute ligne de non-traité portant un mot d'absence et nommant
+  // un objet de catalogue était donc lue comme une recherche par nom qui n'a rien trouvé. Cas
+  // mesuré le 09/09 : « Publier, actualiser ou interroger quoi que ce soit dans l'espace de
+  // travail — motif : `garde_fou` (R-38, aucune publication sur un service hébergé sans GO humain
+  // consigné) » a rendu S24 FAIL. Aucune recherche n'était rapportée : la ligne dit qu'une
+  // publication est interdite par une règle. Le rédacteur n'a eu d'autre issue que de RETIRER le
+  // mot « aucune » de sa propre phrase, sans gain de sens, pour obtenir un vert.
+  //
+  // *Un détecteur dont le vocabulaire recouvre un mot que le gabarit IMPOSE se déclenche sur la
+  // forme prescrite elle-même : il ne juge plus une tournure de l'auteur, il pénalise l'obéissance
+  // au gabarit.* Même classe que TF-0992 (`regle-balaie-prose-et-identifiants`), autre mécanisme :
+  // là c'était une preuve citée, ici c'est un libellé structurel.
+  //
+  // DEUX GARDES, parce qu'une seule laisserait la porte entrouverte. (1) Le mot est BORNÉ à ses
+  // emplois de recherche (« motif de nom », « motifs de recherche ») ; le sens visé — un motif SQL
+  // ou une expression rationnelle — reste couvert par `%…%`, `LIKE`, `grep` et `pattern`, qui
+  // portent la fixture rouge historique du 24/08 sans y toucher. (2) Le libellé structurel du
+  // bloc 5 est RETIRÉ de la phrase avant tout test : ce que le gabarit écrit n'est pas ce que
+  // l'auteur écrit, et aucun détecteur lexical n'a à le lire.
+  const RECHERCHE_PAR_NOM = /(%[\w]+%|LIKE\s|ILIKE\s|grep|motifs?\s+(?:de\s+)?(?:nom|recherche|table|colonne)|pattern|nom\s+(?:contenant|comportant|qui\s+contient)|contenant\s+`|par\s+nom|dont\s+le\s+nom)/i;
+  // Le libellé que le gabarit impose à chaque ligne du bloc 5 — retiré avant jugement.
+  const LIBELLE_GABARIT = /[—–-]\s*motifs?\s*(?:de\s+non-ex[ée]cution\s*)?:/gi;
   // L'acquittement : la recherche par STRUCTURE est déclarée, ou l'énoncé se borne au NOM.
   const PAR_STRUCTURE = /(par\s+structure|structurel|des\s+colonnes\s+plut[ôo]t|motif\s+de\s+valeurs|par\s+valeurs|contrainte\s+de\s+cl[ée]|information_schema\.columns|recherche\s+compl[ée]mentaire|crois[ée]\s+avec)/i;
   const BORNE_AU_NOM = /(dont\s+le\s+NOM|aucun\s+objet\s+dont\s+le\s+nom|le\s+nom\s+cherch[ée]|au\s+vu\s+des\s+seuls\s+noms|sur\s+ce\s+seul\s+crit[èe]re\s+de\s+nom)/i;
   {
     const phrases = texte.split(/(?<=[.!?;])\s+|\n/).map((x) => x.trim()).filter(Boolean);
-    const risquees = phrases.filter((x) =>
-      ABSENCE_TROUVEE.test(x) && OBJET_DE_CATALOGUE.test(x) && RECHERCHE_PAR_NOM.test(x));
+    const risquees = phrases.filter((x) => {
+      // Le libellé du gabarit sort AVANT le test : il est écrit par la doctrine, pas par l'auteur.
+      const dit = x.replace(LIBELLE_GABARIT, " ");
+      return ABSENCE_TROUVEE.test(dit) && OBJET_DE_CATALOGUE.test(dit) && RECHERCHE_PAR_NOM.test(dit);
+    });
     const nues = risquees.filter((x) => !PAR_STRUCTURE.test(x) && !BORNE_AU_NOM.test(x));
     if (!risquees.length) ok("S24", "aucune absence conclue d'une recherche par nom — rien à borner");
     else if (nues.length) ko("S24", `${nues.length} absence(s) sur ${risquees.length} conclue(s) d'une recherche PAR NOM : ` +
@@ -1350,7 +1377,7 @@ function juger(texte) {
     // La carve-out est la même que celle de `TF-####` pour S23 : un sélecteur introduit dans le
     // MÊME message, et prescrit par une autre règle du même gabarit, n'est pas ce que S15 traque.
     // Elle vise l'identifiant écrit AILLEURS et AVANT, que le lecteur ne peut pas connaître.
-    const sansSelecteur = (t) => t.replace(/\bD-\d{1,2}\b/g, " ");
+    const sansSelecteur = (t) => t.replace(/\bD-\d{1,3}\b/g, " ");
     const chapeau = (g) => sansSelecteur(g.split("(a)")[0]
       .replace(TETE_DECISION, "").replace(/>\s*/g, " ").replace(/\|[^|]*/g, " ").replace(/\*\*/g, "")).trim();
     // TF-0573 (24/08) — UN DOSSIER DE PLUSIEURS DÉCISIONS A BESOIN D'UN ENDROIT POUR SON CONTEXTE
@@ -1427,7 +1454,7 @@ function juger(texte) {
   // décision : S33 le prescrit et le vérifie, et la doctrine impose qu'il ouvre chaque action du
   // bloc 8. Sans cette exclusion, S23 dénoncerait « A-1 (3 emplois) » sur une restitution dont le
   // seul tort serait d'obéir — le renvoi par sélecteur est justement ce que S17 exige.
-  const EXCLUS_S23 = /^(?:TF-?\d{3,4}|[DA]-?\d{1,2})$/;
+  const EXCLUS_S23 = /^(?:TF-?\d{3,4}|[DA]-?\d{1,3})$/;
   const occurrences = new Map();
   for (const m of texte.matchAll(RE_DESIGNATEUR)) {
     const brut = m[0];
@@ -1579,7 +1606,7 @@ function juger(texte) {
   // self-test : `D-5` passe, une décision sans numéro échoue toujours.
   const numeroDeDecision = (g) => {
     const tete = g.replace(TETE_DECISION, "").replace(/^\*\*/, "").trim();
-    const m = /^(?:d[ée]cision\s*(?:n[°ºo]\s*)?|D\s*-?\s*)(\d{1,2})\b/i.exec(tete);
+    const m = /^(?:d[ée]cision\s*(?:n[°ºo]\s*)?|D\s*-?\s*)(\d{1,3})\b/i.exec(tete);
     return m ? m[1] : null;
   };
   if (groupesDecisions.length) {
@@ -1947,6 +1974,26 @@ Aucun écart : la demande a été suivie à la lettre.
   const sourceDoctrine = poseDecision("`REGLES-PROJET.md` règle 7 tranche — un livrable remplacé part sous `old\\` du même dossier, versionné");
   writeFileSync(join(dir, "source-chantier.md"), sourceChantier, "utf8");
   writeFileSync(join(dir, "source-doctrine.md"), sourceDoctrine, "utf8");
+  // 09/09 — S24 DANS SES DEUX SENS (TF-0998). La paire ne varie QUE sur la nature du fragment qui
+  // porte le mot : un LIBELLÉ que le gabarit impose, contre une RECHERCHE que l'auteur rapporte.
+  // C'est la seule forme qui prouve que la règle juge ce qu'elle prétend juger — le mécanisme de
+  // recherche, pas le vocabulaire du gabarit.
+  //
+  // Sens VERT : la ligne exacte refusée le 09/09, au bloc 5, avec son « — motif : » prescrit. Elle
+  // ne rapporte aucune recherche : elle dit qu'une publication est interdite par une règle.
+  const nl = String.fromCharCode(10);
+  const ligneGabarit = "- Publier, actualiser ou interroger quoi que ce soit dans l'espace de travail — motif : `garde_fou` (R-38, aucune publication sur un service hébergé sans GO humain consigné).";
+  const motifGabarit = verte.replace("## 5. Non traité" + nl, "## 5. Non traité" + nl + ligneGabarit + nl);
+  writeFileSync(join(dir, "motif-gabarit.md"), motifGabarit, "utf8");
+  // Sens ROUGE : une VRAIE recherche par nom qui ne trouve rien, au bloc 7. Elle emploie le mot
+  // « motif » dans son sens de RECHERCHE (« les motifs de nom joués sur… ») — c'est ce qui prouve
+  // que le mot a été BORNÉ et non supprimé : la correction devait retirer une collision, pas
+  // éteindre la règle. Et la phrase ne porte ni acquittement par STRUCTURE ni borne au NOM, donc
+  // elle conclut bien l'absence de LA CHOSE depuis l'absence du NOM — le défaut du 24/08.
+  const rechercheNom = verte.replace("## 7. Risques", "## 7. Risques" + nl + nl
+    + "- Aucune table de transcodification dans le catalogue : les motifs de nom joués sur les trois schémas ne remontent rien." + nl);
+  writeFileSync(join(dir, "recherche-nom.md"), rechercheNom, "utf8");
+
   const moi = fileURLToPath(import.meta.url);
   const rv = spawnSync(process.execPath, [moi, join(dir, "verte.md")], { encoding: "utf8" });
   const rr = spawnSync(process.execPath, [moi, join(dir, "rouge.md")], { encoding: "utf8" });
@@ -2005,6 +2052,17 @@ Aucun écart : la demande a été suivie à la lettre.
         (new RegExp(`"${regle}"[\\s\\S]{0,180}`).exec(rct.stdout) || [""])[0].replace(/\s+/g, " "));
     }
   }
+  // TF-0998 — S24 dans ses DEUX sens.
+  const rmg = spawnSync(process.execPath, [moi, join(dir, "motif-gabarit.md")], { encoding: "utf8" });
+  if (!/"S24"[^}]*PASS/.test(rmg.stdout))
+    casse.push("S24 (TF-0998) : une ligne du bloc 5 portant le libellé « — motif : » que le GABARIT impose est lue comme " +
+      "une recherche par nom — la règle pénalise l'obéissance au gabarit, et le rédacteur n'a d'autre issue que de " +
+      "réécrire sa phrase sans gain de sens : " + (/"S24"[\s\S]{0,200}/.exec(rmg.stdout) || [""])[0].replace(/\s+/g, " "));
+  const rRechNom = spawnSync(process.execPath, [moi, join(dir, "recherche-nom.md")], { encoding: "utf8" });
+  if (!/"S24"[^}]*FAIL/.test(rRechNom.stdout))
+    casse.push("S24 (TF-0998) : une VRAIE recherche par nom qui ne trouve rien (« aucune table dont le nom contient `taux` », " +
+      "grep sur 206 tables) passe — en bornant le mot « motif » on a éteint la règle au lieu de la corriger");
+
   const ron = spawnSync(process.execPath, [moi, join(dir, "options-nues.md")], { encoding: "utf8" });
   if (!/"S31"[^}]*FAIL/.test(ron.stdout))
     casse.push("S31 : des options sans coût ni exclusion passent pour un choix fermé — la règle ne crie jamais");
@@ -2131,7 +2189,7 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("S40 ou S41 accuse la fixture VERTE, qui ne cite ni chemin en forme d'étude ni décision régie : la règle crie sur un travail juste");
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 18/18 PASS (verte PASS ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS))");
+    : "Self-test restitution : 18/18 PASS (verte PASS ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime))");
   process.exit(casse.length ? 1 : 0);
 }
 

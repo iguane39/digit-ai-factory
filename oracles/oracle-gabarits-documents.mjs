@@ -42,16 +42,17 @@
 // d'environnement (TF-0648).
 import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { tmpdir, homedir } from "node:os";
+import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { cheminSkillsInstalles } from "../scripts/lib-config-installee.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
 const args = process.argv.slice(2);
 
 const CANDIDATS_SOCLE = [
-  join(homedir(), ".claude", "skills", "digit-ai-page-html", "scripts", "check_html.py"),
+  join(cheminSkillsInstalles(), "digit-ai-page-html", "scripts", "check_html.py"),
   join(PILOT, "..", "digit-ai-forge-agents", ".claude", "skills", "digit-ai-page-html", "scripts", "check_html.py"),
 ];
 const SOCLE = CANDIDATS_SOCLE.find(existsSync) || null;

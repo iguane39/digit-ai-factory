@@ -25,11 +25,12 @@
  */
 import { existsSync, readFileSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
 import { join, resolve, dirname } from "node:path";
-import { homedir, tmpdir } from "node:os";
+import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { cheminSkillsInstalles } from "../scripts/lib-config-installee.mjs";
 
-const SKILLS = process.env.FORGE_SKILLS_INSTALLES || join(homedir(), ".claude", "skills");
+const SKILLS = cheminSkillsInstalles();
 const ORACLE_FILTRES = join(SKILLS, "quality-oracles", "scripts", "oracle-filtres-tableau.mjs");
 
 /** Le fichier visé par l'entrée du hook (Write/Edit), ou null. */

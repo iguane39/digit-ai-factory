@@ -20,7 +20,9 @@
 //                 perdre le travail propre au poste (scripts/rebatir-clone.mjs, D-12 a du 07/09) ;
 //                 jamais de push — la publication reste un GO humain
 // Env :  BOOTSTRAP_SOURCE        base des dépôts (défaut https://github.com/iguane39)
-//        FORGE_SKILLS_INSTALLES  dossier des skills installés (défaut ~/.claude/skills)
+//        FORGE_SKILLS_INSTALLES  dossier des skills installés (prioritaire — voie des recettes)
+//        CLAUDE_CONFIG_DIR      racine de configuration que le HARNAIS charge (défaut ~/.claude)
+//                               résolution unique : scripts/lib-config-installee.mjs (TF-0995)
 //
 // Sans --pull, le poste est seulement MESURÉ : un dépôt en retard est un DÉFAUT dont le
 // remède est nommé (--pull). Un skill installé en écart est un DÉFAUT dont le remède est
@@ -32,7 +34,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, renameSync, readdirSync, statSync, readlinkSync } from "node:fs";
 import { createHash } from "node:crypto";
-import { homedir } from "node:os";
+import { skillsInstalles } from "./scripts/lib-config-installee.mjs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -117,7 +119,11 @@ const sansSkills = args.includes("--sans-skills");
 const sansPilot = args.includes("--sans-pilot");
 const iRacine = args.indexOf("--racine");
 const racine = resolve(iRacine >= 0 ? args[iRacine + 1] : process.env.FORGE_ROOT || dirname(ICI));
-const SKILLS_INSTALLES = process.env.FORGE_SKILLS_INSTALLES || join(homedir(), ".claude", "skills");
+// La copie installée se résout par lib-config-installee (TF-0995) : `CLAUDE_CONFIG_DIR` est la
+// variable que le HARNAIS lit — l'ignorer faisait juger un parc que la session ne charge pas.
+// `SKILLS_DECIDE_PAR` accompagne le chemin partout où il s'imprime : un verdict qui ne dit pas
+// où il a regardé ne se conteste pas.
+const { chemin: SKILLS_INSTALLES, decide_par: SKILLS_DECIDE_PAR } = skillsInstalles();
 
 const run = (cmd, argv, cwd) => {
   const r = spawnSync(cmd, argv, { cwd, encoding: "utf-8", windowsHide: true });
@@ -545,11 +551,11 @@ else {
     };
     let v = juger(false);
     if (v.code === 2) ligne("avert", `skills — non jugeables : ${v.verdict || "SKIP"} (aucun skill versionné trouvé sous la racine ?)`);
-    else if (v.code === 0) ligne("ok", `skills installés = skills versionnés (${SKILLS_INSTALLES})`);
+    else if (v.code === 0) ligne("ok", `skills installés = skills versionnés (${SKILLS_INSTALLES} — ${SKILLS_DECIDE_PAR})`);
     else if (pull) {
       const a = juger(true);
       v = juger(false);
-      if (v.code === 0) ligne("ok", `skills propagés vers ${SKILLS_INSTALLES} (oracle-skills --appliquer, décision portée par --pull) — rejeu PASS`);
+      if (v.code === 0) ligne("ok", `skills propagés vers ${SKILLS_INSTALLES} — ${SKILLS_DECIDE_PAR} (oracle-skills --appliquer, décision portée par --pull) — rejeu PASS`);
       else defaut(`skills — ${v.echecs.length} règle(s) encore en échec après propagation : ${[...new Set(v.echecs.map((x) => x.regle))].join(", ")}`,
         `node oracles/oracle-skills.mjs --racine "${racine}" (le verdict nomme le remède ; --purger si des orphelins subsistent)`);
       if (a.code === 2) averts.push("propagation SKIP");

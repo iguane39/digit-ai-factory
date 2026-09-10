@@ -28,6 +28,10 @@
  * « Ne touche pas les produits, seuls les produits se modifient eux-mêmes » (mandat du 23/08). Le
  * remède d'un constat est donc toujours un run demandé au produit, jamais une copie d'ici.
  *
+ * PD3 (TF-0996, 09/09/2026) ajoute la question que PD1 et PD2 ne posent pas : la doctrine est-elle
+ * chargée pour CETTE session ? Un produit conforme dont la session est ouverte UN CRAN AU-DESSUS
+ * n'exécute aucun de ses hameçons. Voir le bloc de la fonction `jugerPortee` pour le fait mesuré.
+ *
  *   node oracles\oracle-portee-doctrine.mjs             → jugement du parc
  *   node oracles\oracle-portee-doctrine.mjs --self-test → double sens sur un parc fabriqué
  */
@@ -149,6 +153,63 @@ export function juger({ registre, racine }) {
   return findings;
 }
 
+/**
+ * PD3 — LA DOCTRINE EST-ELLE CHARGÉE POUR *CETTE* SESSION ? (TF-0996, 09/09/2026)
+ *
+ * PD1 et PD2 jugent l'INSTALLATION chez un produit : les pièces sont-elles posées. Elles ne
+ * disent rien de la PORTÉE de la session en cours. Or le harnais ne charge les réglages QUE de sa
+ * racine : une session ouverte sur le dossier de travail qui CONTIENT le produit instancié ne
+ * charge ni son `.claude\settings.json`, ni aucun de ses hameçons — le produit peut être
+ * parfaitement conforme à PD2, et pourtant rien ne s'exécute.
+ *
+ * LE FAIT (09/09/2026, récidive à un jour de TF-0963). Le 08/09, cet état a fait manquer les
+ * hameçons `SessionStart` et `Stop`. Le 09/09, le MÊME état a fait manquer le troisième,
+ * `UserPromptSubmit` — et c'est le seul dont la conséquence est immédiatement visible par
+ * l'humain : une formule du lexique d'invocation RV-6 n'a rien déclenché, et la réponse rendue
+ * n'était pas celle attendue. Preuve que le mécanisme est bon et que SEULE SA PORTÉE est en
+ * cause : `node oracles\hook-lexique.mjs --self-test` rend 7 PASS / 0 FAIL, dont le cas exact, et
+ * la copie du produit rend la même ligne d'injection — exécutée depuis la racine englobante.
+ *
+ * POURQUOI PD3 BLOQUE ALORS QUE PD1 ET PD2 NE BLOQUENT PAS. Ce n'est pas une exception à la
+ * doctrine du fichier, c'en est l'application : PD1 et PD2 ne bloquent pas parce que leur cible
+ * est un dépôt produit que le pilot n'a pas le droit de modifier (N-21 : « le contrôle NOMME sans
+ * BLOQUER quand la cible n'est pas la sienne »). La cible de PD3 est la RACINE DE SESSION de
+ * celui qui l'exécute — la seule chose qu'il puisse réparer sur-le-champ, et le geste est connu.
+ */
+export function jugerPortee(cwd) {
+  // La question est celle du lot, mot pour mot : « un forge\ existe-t-il dans un SOUS-dossier du
+  // répertoire courant et non dans le répertoire courant ». Profondeur UN seulement — au-delà, on
+  // ne décrit plus une racine de session mal placée mais un parc, et PD1 s'en charge déjà.
+  if (existsSync(join(cwd, "forge"))) {
+    return { regle: "PD3", statut: "PASS", ou: cwd, message:
+      "la racine de session porte elle-même un forge\\ — le harnais y charge les réglages du produit" };
+  }
+  let enfants = [];
+  try { enfants = readdirSync(cwd, { withFileTypes: true }).filter((d) => d.isDirectory()); } catch {}
+  const imbriques = [];
+  for (const d of enfants) {
+    if (d.name.startsWith(".") || d.name === "node_modules") continue;
+    const sous = join(cwd, d.name);
+    if (!existsSync(join(sous, "forge"))) continue;
+    const cable = existsSync(join(sous, ".claude", "settings.json"));
+    imbriques.push({ nom: d.name, cable });
+  }
+  if (!imbriques.length) {
+    return { regle: "PD3", statut: "PASS", ou: cwd, message:
+      "aucun produit instancié dans un sous-dossier direct de la racine de session — rien à signaler" };
+  }
+  const noms = imbriques.map((i) => `${i.nom}${i.cable ? " (câblé, et pourtant inerte d'ici)" : " (non câblé)"}`);
+  return { regle: "PD3", statut: "FAIL", ou: cwd, message:
+    `RACINE DE SESSION AU-DESSUS DU PRODUIT : ${imbriques.length} produit(s) instancié(s) dans un sous-dossier ` +
+    `direct (${noms.join(", ")}), et AUCUN forge\\ ici. Le harnais ne charge les réglages que de SA racine : ` +
+    "les hameçons du produit (SessionStart, UserPromptSubmit, Stop, PostToolUse) ne s'exécutent pas, " +
+    "quel que soit leur état de conformité chez lui. C'est invisible sans ce constat — rien n'échoue, " +
+    "tout se tait. Remède : ouvrir la session DANS le dossier du produit ; ou, si la racine englobante " +
+    "doit rester la racine de travail, y poser un .claude\\settings.json qui délègue au hook du " +
+    "sous-dossier par chemin préfixé (le report des seuls hameçons non ambigus relève d'un arbitrage " +
+    "du pilot — TF-0963)" };
+}
+
 const verdictDe = (f) => (f.some((x) => x.statut === "FAIL") ? "FAIL" : f.every((x) => x.statut === "SKIP") ? "SKIP" : "PASS");
 
 if (args[0] === "--self-test") {
@@ -185,11 +246,30 @@ if (args[0] === "--self-test") {
   if (!juger({ registre, racine }).find((x) => x.ou === "Complet" && x.statut === "FAIL")) {
     casse.push("un hook présent mais non câblé passe — c'est l'état qui donne confiance sans rien faire");
   }
+  // PD3, dans ses TROIS sens. `racine` contient « Complet », qui porte un forge\ : une session
+  // ouverte LÀ est au-dessus du produit, et c'est le défaut du 09/09.
+  const pd3Dessus = jugerPortee(racine);
+  if (pd3Dessus.statut !== "FAIL" || !/Complet/.test(pd3Dessus.message)) {
+    casse.push("PD3 : une racine de session AU-DESSUS d'un produit instancié n'est pas nommée — c'est le défaut du 09/09 (le lexique d'invocation n'a rien déclenché)");
+  }
+  if (!/settings\.json/.test(pd3Dessus.message)) casse.push("PD3 : le constat ne porte pas le geste qui répare");
+  // Sens vert n° 1 : la session est ouverte DANS le produit.
+  if (jugerPortee(join(racine, "Complet")).statut !== "PASS") {
+    casse.push("PD3 : une session ouverte DANS le produit est accusée à tort");
+  }
+  // Sens vert n° 2 : un dossier sans aucun produit imbriqué (le cas du pilot lui-même).
+  const neutre = join(dir, "neutre");
+  mkdirSync(join(neutre, "oracles"), { recursive: true });
+  if (jugerPortee(neutre).statut !== "PASS") {
+    casse.push("PD3 : un dossier sans produit imbriqué est accusé à tort — ce serait le pilot lui-même");
+  }
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test portée de doctrine : 5/5 PASS (produit complet → PASS ; hook sans le texte → FAIL nommé ; " +
-      "dépôt jamais instancié → HORS_DOCTRINE ; produit absent du poste → NON_VERIFIE ; hook non câblé → FAIL)");
+    : "Self-test portée de doctrine : 9/9 PASS (produit complet → PASS ; hook sans le texte → FAIL nommé ; " +
+      "dépôt jamais instancié → HORS_DOCTRINE ; produit absent du poste → NON_VERIFIE ; hook non câblé → FAIL ; " +
+      "PD3 racine au-dessus du produit → FAIL avec son remède ; PD3 session dans le produit → PASS ; " +
+      "PD3 dossier sans produit imbriqué → PASS)");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -197,6 +277,8 @@ const registre = join(PILOT, "todo", "TODO.jsonl");
 const brute = process.env.FORGE_ROOT || join(PILOT, "..");
 const racine = isAbsolute(brute) ? brute : join(PILOT, brute);
 const findings = juger({ registre, racine });
+// PD3 se juge sur la RACINE DE SESSION, pas sur le parc : c'est la portée de CE run.
+findings.push(jugerPortee(process.cwd()));
 const verdict = verdictDe(findings);
 // LE VERDICT EST VRAI, LE CODE DE SORTIE NE BLOQUE PAS, ET LES DEUX SE DISENT. Tous les constats
 // portent sur des DÉPÔTS PRODUITS, que le pilot n'a pas le droit de modifier (mandat humain du
@@ -206,13 +288,20 @@ const verdict = verdictDe(findings);
 // bloque sur ce qu'il ne peut pas faire réparer apprend à être contourné.
 // Le jour où un constat porterait sur le PILOT lui-même, il sortirait en 1 : c'est la seule cible
 // dont ce dépôt est responsable.
-const surLePilot = findings.filter((f) => f.statut === "FAIL" && /digit-ai-factory|pilot/i.test(f.ou));
+// Deux familles de constats bloquants, et une seule raison : la cible est réparable par qui
+// exécute. Le pilot pour PD1-PD2 (seul dépôt dont il est responsable) ; la RACINE DE SESSION pour
+// PD3 (le geste est à portée immédiate). Tout le reste porte sur des produits : nommé, jamais
+// bloquant — « un contrôle qui bloque sur ce qu'il ne peut pas faire réparer apprend à être
+// contourné ».
+const bloquants = findings.filter((f) => f.statut === "FAIL"
+  && (f.regle === "PD3" || /digit-ai-factory|pilot/i.test(f.ou)));
+const surLePilot = bloquants;
 console.log(JSON.stringify({
   oracle: "oracle-portee-doctrine",
   version: "1.0.0",
   verdict,
   portee_du_code_de_sortie: surLePilot.length
-    ? "1 — un constat porte sur le pilot, seule cible dont ce dépôt est responsable"
+    ? `1 — ${surLePilot.map((f) => f.regle).join(", ")} : le constat porte sur une cible réparable par qui exécute (le pilot pour PD1-PD2, la racine de session pour PD3)`
     : "0 — tous les constats portent sur des produits : le pilot les NOMME, il ne les corrige pas et ne se bloque pas dessus",
   racine,
   findings,
@@ -223,6 +312,11 @@ console.log(JSON.stringify({
     "c'est le travail de R-47 (gabarits\\HERITAGE.json), et le dupliquer créerait deux vérités",
     "l'écriture du remède : le pilot n'écrit jamais chez un produit (mandat humain du 23/08). Un constat " +
     "d'ici se corrige par un run demandé au produit, et le constat reste ouvert jusque-là",
+    "PD3 ne regarde QU'UN niveau sous la racine de session : au-delà, on ne décrit plus une racine mal " +
+    "placée mais un parc, et PD1 s'en charge. Un produit imbriqué à deux niveaux échappe donc à PD3, " +
+    "et c'est assumé plutôt que de rendre un constat par dépôt du disque",
+    "PD3 constate que le harnais NE PEUT PAS charger les réglages du sous-dossier ; il ne lit pas ce que " +
+    "le harnais a effectivement chargé — cela ne s'écrit dans aucun fichier lisible d'ici",
   ],
 }, null, 1));
 process.exit(surLePilot.length ? 1 : 0);
