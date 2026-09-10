@@ -20,7 +20,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md` | fichier | 4,3 Ko | Digit-AI — Note de migration : les chemins du pilot renommé — 20260818b |
 | `Digit-AI - Note Revue - Denominateur des freres - 20260818a.md` | fichier | 4,1 Ko | Digit-AI — Note de revue : le dénominateur des « frères » — 20260818a |
 | `Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` | fichier | 3,2 Ko | Plan de renommage `digit-ai-forge-pilot` → `digit-ai-factory` — fenêtre A exécutée, gate n |
-| `Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` | fichier | 19,0 Ko | Restitution — la clé que la session voisine déclarait inexistante existe, et la réécriture |
+| `Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` | fichier | 20,6 Ko | Restitution — la clé que la session voisine déclarait inexistante existe, et la réécriture |
 | `Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md` | fichier | 5,7 Ko | Synthèse — Décision d'engagement actée, exécution transférée au produit — 20260901i |
 | `Digit-AI - Synthese - Etapes transferees au produit par lot de travaux - 20260901j.md` | fichier | 5,2 Ko | Synthèse — Les étapes de la décision transférées au produit — 20260901j |
 | `Digit-AI - Synthese - Etude donnees de recherche et cascade intention - 20260901h.md` | fichier | 10,4 Ko | Synthèse — Étude des données de recherche et cascade de l'intention — 20260901h |
@@ -76,6 +76,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Publication de forge-development actions A39 A37 - 20260907l.md` | fichier | 10,7 Ko | Synthèse de mandat — actions A-39 puis A-37 exécutées : la protection levée puis remise à  |
 | `Digit-AI - Synthese Mandat - Publication des forges decision D9a - 20260907g.md` | fichier | 11,2 Ko | Synthèse de mandat — décision D-9 (a) exécutée : quatre dépôts publiés, trois forges reten |
 | `Digit-AI - Synthese Mandat - Publication et campagne des items decides - 20260831d.md` | fichier | 22,9 Ko | Synthèse de mandat — publié, neuf chantiers décidés menés à fond, et les travaux partis ch |
+| `Digit-AI - Synthese Mandat - Publication faite et verifiee sur clone frais zero anteriorite - 20260910b.md` | fichier | 12,0 Ko | Synthèse de mandat — votre feu vert est exécuté, le travail est publié, et la vérification |
 | `Digit-AI - Synthese Mandat - Quatre decisions executees parc publie et tables arbitrees - 20260908f.md` | fichier | 14,1 Ko | Synthèse de mandat — vos quatre décisions et vos quatre actions exécutées : le parc entier |
 | `Digit-AI - Synthese Mandat - Recopie de l heritage et parite - 20260830h.md` | fichier | 14,6 Ko | Synthèse de mandat — la Factory se recopie chez les produits, et un contrôle de configurat |
 | `Digit-AI - Synthese Mandat - Recupere et traite tout - 20260817a.md` | fichier | 7,1 Ko | Synthèse de mandat — « récupère la todo et les retours, traite les tous » (18 items, 7 cam |
@@ -117,4 +118,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 | `Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte au vert - 20260910a.md` | fichier | 20,0 Ko | Synthèse de mandat — vos deux décisions sont exécutées, la copie locale est reconstruite,  |
 
-_100 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_101 fichier(s), 0 sous-dossier(s)_
