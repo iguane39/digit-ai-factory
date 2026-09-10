@@ -1,10 +1,10 @@
 # Récidives et descente — tableau de bord
 
-<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 5dcb132d3b03 · archive 6ce2fe14c2bb · classes 8bf80645a1a2 · relevés 87cfd092d942 · héritage 23d6b9c4bee8. État au 2026-09-10T13:55:09.547Z (ts max des sources, jamais l'horloge). -->
+<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 8a124d2d0143 · archive 6ce2fe14c2bb · classes ad5c003a9022 · relevés 87cfd092d942 · héritage 23d6b9c4bee8. État au 2026-09-10T14:03:57.269Z (ts max des sources, jamais l'horloge). -->
 
 Ce tableau de bord répond à trois questions que le registre seul ne savait pas poser : est-ce la deuxième fois, chez qui, et depuis combien de temps la correction existe sans être appliquée. Il se lit avec sa contre-métrique : un compteur de récidives qui baisse pendant que le nombre de classes monte est un compteur contourné, pas un progrès.
 
-**Périmètre mesuré** : 1011 item(s) au registre (actifs et archive), 195 portant une classe, 110 marqué(s) récidive ; référentiel de 61 classe(s) en 18 famille(s) (v1.6.0) ; 18 relevé(s) d'héritage.
+**Périmètre mesuré** : 1012 item(s) au registre (actifs et archive), 196 portant une classe, 110 marqué(s) récidive ; référentiel de 62 classe(s) en 18 famille(s) (v1.6.0) ; 18 relevé(s) d'héritage.
 
 ## 1. Récidives par classe
 
@@ -69,6 +69,7 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `regle-de-branche-annoncee-differente-configuree` | contrat-interface-forge | 2 | 1 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
 | `regle-ecrite-sans-oracle-qui-la-joue` | skill-ou-oracle-non-invoque | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `regle-neuve-sans-mesure-de-bruit` | page-html-socle | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
+| `regle-qui-interdit-son-propre-remede` | hook-ou-gate | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `releve-heritage-juge-arbre-pas-histoire` | heritage-produit | 0 | 1 | 0 | — | — | — |
 | `restitution-action-humaine-geste-agent` | restitution-forme | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `restitution-rendu-visuel-non-critique` | restitution-forme | 0 | 1 | 0 | — | — | — |
@@ -133,6 +134,7 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 | `regle-de-branche-annoncee-differente-configuree` | 2026-09-08 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `regle-ecrite-sans-oracle-qui-la-joue` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `regle-neuve-sans-mesure-de-bruit` | — | — | non mesurable : aucune clôture fondatrice au registre |
+| `regle-qui-interdit-son-propre-remede` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `releve-heritage-juge-arbre-pas-histoire` | 2026-09-08 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `restitution-action-humaine-geste-agent` | 2026-09-02 | forge/RESTITUTION.md | 1 produit(s) atteint(s) en 7–7 j ; 11 non atteint(s) (Produit-11, client-a-cockpit-ia, Plateforme_video_IA_complet, Produit-01, Produit-12, Produit-02, Produit-10, Produit-04, COMPTA---Ventillation-de-facture-Fournisseur-A, Client-A-POC-to-Prod, Produit-64) |
 | `restitution-fichier-juge-mal-choisi` | 2026-09-02 | forge/RESTITUTION.md | 1 produit(s) atteint(s) en 7–7 j ; 11 non atteint(s) (Produit-11, client-a-cockpit-ia, Plateforme_video_IA_complet, Produit-01, Produit-12, Produit-02, Produit-10, Produit-04, COMPTA---Ventillation-de-facture-Fournisseur-A, Client-A-POC-to-Prod, Produit-64) |
@@ -169,7 +171,7 @@ Comment lire : le nombre de classes créées par semaine ISO, puis les classes s
 | Semaine | Classes créées |
 |---|---|
 | 2026-S36 | 37 |
-| 2026-S37 | 24 |
+| 2026-S37 | 25 |
 
 - Classes sans clôture fondatrice : `emplacement-livrable-hors-convention`, `registre-doublon-non-detecte`, `banc-etend-referentiel-production`, `gate-cout-invite-au-contournement`, `regle-neuve-sans-mesure-de-bruit`, `controle-sans-fixture-double-sens`, `deux-regles-du-socle-inconciliables`, `controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas`, `controle-vrai-sur-le-mauvais-invariant`, `regle-ecrite-sans-oracle-qui-la-joue`
 - Retours entrés sous une classe suspecte : TF-0995 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1003 (controle-vrai-sur-le-mauvais-invariant), TF-1006 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1011 (regle-ecrite-sans-oracle-qui-la-joue)

@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau 5dcb132d3b03)]
+sources_de_verite: [todo/TODO.jsonl (sceau 8a124d2d0143)]
 verifie_le: 2026-09-10
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `5dcb132d3b03`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `8a124d2d0143`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -19,10 +19,10 @@ les corrections donnerait l'illusion d'un progrès net.
 
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
-| Ouverts | 61 | candidats, décidés ou en cours — le reste à faire réel |
+| Ouverts | 62 | candidats, décidés ou en cours — le reste à faire réel |
 | Clos sur gains constatés | 169 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 0 | décidés non faits, motif écrit — jamais un silence |
-| Total suivi | 230 | tout ce que le registre a jamais porté |
+| Total suivi | 231 | tout ce que le registre a jamais porté |
 
 ## Ce qui reste ouvert, par forge
 
@@ -30,7 +30,7 @@ La table se lit par forge cible : c'est l'unité de décision, puisqu'une correc
 livre dans un dépôt. L'ordre suit le NOMBRE d'items ouverts, jamais leur priorité — la
 priorité vit dans la colonne de score.
 
-### digit-ai-factory — 25 item(s)
+### digit-ai-factory — 26 item(s)
 
 Les items ouverts ciblant digit-ai-factory, du score le plus fort au plus faible. Le score est
 celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
@@ -38,6 +38,7 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | Id | Titre | Statut | Forge(s) | Score |
 |---|---|---|---|---|
 | TF-0959 | canal confidentiel : une clé DÉJÀ pseudonymisée peut entrer dans une table de noms réels, et rien ne l'en empê | candidat | digit-ai-factory | 20 |
+| TF-1013 | pilot : la regle des quantificateurs REFUSAIT la reformulation que son propre message recommande — posee telle | candidat | digit-ai-factory | 20 |
 | TF-1007 | parc : un commentaire et un message de commit qui documentaient un defaut de graphie ont ete rendus tautologiq | candidat | digit-ai-factory | 15 |
 | TF-0674 | La porte de fraîcheur de déploiement empreinte encore un échantillon — le correctif d'ensemble n'est pas appli | decide | digit-ai-factory | 12.5 |
 | TF-0982 | pilot : les tables du canal n ont qu une date GLOBALE — chaque extension rend le passe fautif RETROACTIVEMENT, | en_cours | digit-ai-factory | 12.5 |
