@@ -561,6 +561,16 @@ exactement le défaut**. Étude : `output\03-etudes\20260817-etude-opportunite-p
 3. Périmètre : livrables des produits ET du pilot ; les pages dont la publication est la
    FINALITÉ décidée du produit (site public en MEP) suivent leur voie normale (gates MEP,
    GO humain) — R-38 vise le canal de COMMODITÉ, pas la mise en production.
+4. **Portée du GO pour le DÉPÔT lui-même (D-4 (a), 10/09/2026).** Le `push` d'un dépôt
+   reste un GO humain (noyau §Garde-fous). Mais un GO donné sur un TRAVAIL couvre d'office
+   les **enregistrements de restitution** de ce travail — synthèse, vues régénérées du
+   registre, index de dossiers — à deux conditions : la porte de publication
+   (`oracle-nom-client-publie`) est rejouée sur l'arbre JUSTE AVANT le push et rend PASS,
+   et l'enregistrement ne porte rien d'autre que la restitution. Tout autre contenu
+   ramène au GO explicite. *Pourquoi* : le 10/09, chaque tour laissait un enregistrement
+   orphelin d'avance sur l'origine, à attendre un feu vert de plus pour le compte rendu
+   d'un travail déjà publié — un aller-retour par tour sans qu'aucun risque nouveau ne
+   soit couvert, la restitution passant la même barrière que le travail.
 
 **Appelants (R-35)** : le garde-fou du noyau (`CLAUDE.md` §Garde-fous) et
 `gabarits\CLAUDE-PRODUIT.md` §Conventions (toute session produit le charge) ; la FORME
