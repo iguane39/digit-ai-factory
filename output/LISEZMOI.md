@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 253 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 254 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -204,7 +204,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Note Revue - Denominateur des freres - 20260818a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Note Revue - Denominateur des freres - 20260818a.md.jugement.json` |
 | Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md | 20260817a | 3.2 Ko | `04-plans/Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` |
 | Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md.jugement.json` |
-| Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md | 20260910a | 31.4 Ko | `04-plans/Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` |
+| Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md | 20260910a | 32.7 Ko | `04-plans/Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` |
 | Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md | 20260901i | 5.8 Ko | `04-plans/Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md` |
 | Digit-AI - Synthese - Etapes transferees au produit par lot de travaux - 20260901j.md | 20260901j | 5.3 Ko | `04-plans/Digit-AI - Synthese - Etapes transferees au produit par lot de travaux - 20260901j.md` |
 | Digit-AI - Synthese - Etude donnees de recherche et cascade intention - 20260901h.md | 20260901h | 10.5 Ko | `04-plans/Digit-AI - Synthese - Etude donnees de recherche et cascade intention - 20260901h.md` |
@@ -246,6 +246,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md | 20260905h | 13.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md` |
 | Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md | 20260831a | 15.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md` |
 | Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md | 20260905g | 19.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md` |
+| Digit-AI - Synthese Mandat - Forge d audit publiee CI hebergee rouge - 20260910g.md | 20260910g | 19.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Forge d audit publiee CI hebergee rouge - 20260910g.md` |
 | Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md | 20260830c | 17.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md` |
 | Digit-AI - Synthese Mandat - Heritage a l ouverture et localisateurs - 20260830g.md | 20260830g | 16.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Heritage a l ouverture et localisateurs - 20260830g.md` |
 | Digit-AI - Synthese Mandat - Histoire du pilot reecrite et republiee zero nom restant - 20260909a.md | 20260909a | 20.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Histoire du pilot reecrite et republiee zero nom restant - 20260909a.md` |

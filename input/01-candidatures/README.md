@@ -18,6 +18,8 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 |---|---|---|---|
 | [`old\`](old/README.md) | dossier (59 fichiers) | — | Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — archive figée, jamais ré-ingérée. |
 | `chemin-de-livrable-au-dela-du-plafond-plateforme-20260910a.tf.jsonl` | fichier | 4,1 Ko | 1 ligne(s) JSONL |
+| `ci-hebergee-rouge-environnement-non-rejoue-forge-audit-20260910a.tf.jsonl` | fichier | 4,0 Ko | 1 ligne(s) JSONL |
+| `journal-de-versions-dormant-forge-audit-20260910a.tf.jsonl` | fichier | 3,4 Ko | 1 ligne(s) JSONL |
 | `oracle-condition-restitution-seule-20260910a.tf.jsonl` | fichier | 3,5 Ko | 1 ligne(s) JSONL |
 | `porte-publication-faux-positif-20260909a.tf.jsonl` | fichier | 4,5 Ko | 1 ligne(s) JSONL |
 | `preflight-ingestion-histoire-reecrite-20260909a.tf.jsonl` | fichier | 4,3 Ko | 1 ligne(s) JSONL |
@@ -30,4 +32,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `remesurer-plutot-que-croire-20260910a.tf.jsonl` | fichier | 4,9 Ko | 1 ligne(s) JSONL |
 | `revue-classes-20260903a.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
 
-_12 fichier(s), 1 sous-dossier(s)_ · 2 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_14 fichier(s), 1 sous-dossier(s)_
