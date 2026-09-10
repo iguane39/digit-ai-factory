@@ -21,19 +21,19 @@ Une session voisine m'a annoncé qu'elle s'était trompée hier, et qu'un terme 
 
 Deux décisions attendent. La première est petite et touche le texte de règles du projet ; la seconde est celle d'hier, restée ouverte. Celle sur la reconstruction des copies locales a été tranchée par vous entre-temps, et la session voisine l'a exécutée.
 
-> **D-35 — Le texte de règles a perdu le mot qui rendait une règle exclusive, pour tenir dans son plafond de taille : le remet-on, et par quelle formulation ?**
+> **D-35 — Le correctif du texte de règles est écrit et vérifié, mais la version publiée reste affaiblie : le publie-t-on maintenant ?**
 >
-> La règle disait qu'un livrable ne s'accepte que sur le verdict d'un contrôle exécuté, et le mot qui portait ce « que » a été retiré pour gagner de la place. La phrase reste grammaticale et garde son sujet, ce qui rend la perte invisible à la relecture : elle dit désormais qu'un tel verdict suffit, au lieu de dire qu'il est le seul motif recevable. Rien d'autre n'a changé, et le retrait n'a été décidé par personne — c'est l'effet d'une contrainte de mise en page sur un texte qui est à cinq caractères de son plafond.
+> La règle disait qu'un livrable ne s'accepte que sur le verdict d'un contrôle exécuté, et le mot qui portait ce « que » avait été retiré pour gagner de la place. La session qui l'avait retiré a reconnu l'erreur et l'a réparé dans l'heure : la phrase rend de nouveau l'exclusivité, et j'ai vérifié moi-même que le texte tient sous son plafond et que son contrôle passe. Mais cette réparation n'est pas publiée : le texte que lit toute session qui s'ouvre est encore celui qui n'exclut plus rien, et il le restera jusqu'à votre feu vert. Le coût de l'attente n'est pas nul, il court.
 >
-> **Recommandation : (a).** Source consultée : `CLAUDE.md`, règle R-43, qui pose que les règles de la factory se renforcent et ne s'assouplissent jamais — c'est la doctrine qui tranche le mot, et elle est explicite. La reformulation proposée rend l'exclusivité pour quatre caractères de plus que la version publiée, donc sous le plafond, sans toucher à rien d'autre.
+> **Recommandation : (a).** Source consultée : `CLAUDE.md`, règle R-43, qui pose que les règles de la factory se renforcent et ne s'assouplissent jamais — c'est la doctrine qui tranche, et elle est explicite. Le correctif est déjà écrit, vérifié et sans effet de bord ; ce qui reste n'est pas un travail mais un feu vert, et chaque heure d'attente est une heure où le texte de référence dit l'inverse de ce que le projet veut dire.
 
 | Option | Ce qu'elle coûte | Ce qu'elle exclut |
 |---|---|---|
-| (a) Reformuler pour rendre l'exclusivité sans le mot retiré — « sur le seul verdict d'un oracle exécuté » | Simple × court : quatre caractères, le texte reste sous son plafond | Rien |
-| (b) Remettre le mot tel quel et gagner la place ailleurs | Simple × court, mais il faut choisir la ligne où l'on rogne, donc un second arbitrage | La possibilité de ne toucher qu'à une seule ligne |
-| (c) Assumer le texte tel qu'il est publié, et l'écrire comme un choix | Nul en effort | La garantie qu'un livrable ne s'accepte que sur un contrôle exécuté — ce serait un assouplissement décidé, et non subi |
+| (a) Publier le correctif maintenant | Un feu vert, rien de plus : le travail est fait, vérifié, et son contrôle passe | Rien |
+| (b) Attendre la prochaine publication groupée | Nul en effort, mais le texte de référence reste faux d'ici là, et il est lu à chaque ouverture de session | La garantie que ce qui est publié dit ce que le projet veut dire |
+| (c) Assumer le texte publié tel quel, et l'écrire comme un choix | Nul en effort | La garantie qu'un livrable ne s'accepte que sur un contrôle exécuté — ce serait un assouplissement décidé, et non subi |
 
-> **Si rien n'est décidé** : (c) s'applique de fait, sans avoir été choisi — la règle reste publiée sans son exclusivité, et toute session qui lira ce texte y verra un motif d'acceptation parmi d'autres.
+> **Si rien n'est décidé** : (b) s'applique de fait et glisse vers (c) — le correctif dort en local, la règle reste publiée sans son exclusivité, et toute session qui lira ce texte y verra un motif d'acceptation parmi d'autres.
 
 > **D-33 — Deux dépôts frères portent peut-être le même passif dans leur histoire : leur applique-t-on la même passe, ou attend-on une mesure avant de décider ?**
 >
@@ -70,6 +70,8 @@ Deux décisions attendent. La première est petite et touche le texte de règles
   - preuve : sur le clone LOCAL, **PASS avec 50 antériorités** ; sur un clone FRAIS À BRANCHE UNIQUE de l'origine, **PASS avec 0 antériorité**, 655 commits et 44 références. La différence entre les deux mesures **est** le remisage. Un dépôt peut donc rendre PASS en déclarant cinquante antériorités qui n'existent que chez lui — et le lecteur qui prend ce PASS pour un verdict sur le publié se trompe dans les deux sens : il croit l'histoire publiée moins propre qu'elle n'est, et il ignore que sa copie porte 306 commits que personne n'a voulus. Deux sessions, deux clones distincts, même verdict.
 - **Le noyau a perdu le mot qui rendait une règle exclusive, et personne ne l'a décidé.** Contrôle : lecture du diff publié, deux lignes changées ; classe neuve `quantificateur-sacrifie-au-budget-du-texte`.
   - preuve : la puce des garde-fous disait « Livrable accepté sur verdict d'oracle exécuté SEULEMENT » et dit désormais « Livrable accepté sur verdict d'oracle exécuté ». Le mot n'ornait pas la phrase, il l'exclusivait : sans lui, un verdict d'oracle SUFFIT au lieu d'être le SEUL motif, et l'acceptation sur relecture ou sur confiance n'est plus interdite. Le commit porteur est légitime et décidé par vous — la portée du feu vert — mais vous n'avez pas décidé cela ; c'est un effet de bord d'un plafond de taille, et la doctrine du projet pose que ses règles se renforcent et ne s'assouplissent jamais. Journalisé en **TF-1010**, avec le remède chiffré et l'outillage qui l'aurait attrapé.
+- **Le correctif du noyau est écrit, et je l'ai vérifié plutôt que de le croire.** Contrôle rouge → vert : la puce rendait un verdict d'oracle SUFFISANT → elle rend de nouveau ce verdict EXCLUSIF.
+  - preuve : la puce lit désormais « Livrable accepté sur le seul verdict d'un oracle exécuté » ; le texte pèse **6139 octets pour un plafond de 6144**, et son contrôle rend **PASS**. Les six octets manquants ont été pris sur un mot qui DÉCRIT — « proprement », que la clause suivante définit déjà — et non sur un mot qui interdit. **Mais ce correctif n'est pas publié** : le texte en ligne porte encore la version affaiblie.
 - **Deux explications de défaut rendues tautologiques par leur propre pseudonymisation, et réparées.** Contrôle rouge → vert : le contrôle d'anonymisation joué sur le fichier réparé rend zéro substitution due et zéro nom porteur, et le banc du script rend 11 PASS ; classe neuve `texte-sur-la-graphie-detruit-par-sa-pseudonymisation`.
   - preuve : mon commentaire opposait deux graphies du même nom — c'était tout son propos — et la chaîne les a remplacées par le MÊME pseudonyme : la phrase disait « X dans le nom, la clé étant X ». Le même fichier annonçait « des clés courtes comme <pseudonyme de dix caractères> », ce qui contredit le mot « courtes ». Les deux passages décrivent désormais la forme ou empruntent un nom inventé, ce que le banc du même script faisait déjà. Journalisé en **TF-1007**, récidive de TF-0993.
 
@@ -86,6 +88,7 @@ Deux décisions attendent. La première est petite et touche le texte de règles
 ## 6. Écarts à la lettre
 
 - **Une session voisine m'a annoncé une correction, et je ne l'ai pas reprise** → j'ai mesuré avant de la croire, puis je l'ai contredite avec les chiffres → pourquoi : la correction portait sur le fondement d'un geste irréversible que je venais d'exécuter, et l'accepter sur parole aurait laissé entrer au registre une affirmation qui conduit à réintroduire un nom de client.
+- **J'ai chiffré à quatre caractères une reformulation qui en coûte onze** → corrigé ici, et la session voisine l'a relevé en l'appliquant → pourquoi cela compte plus qu'une erreur d'arithmétique : ce chiffre était dans une RECOMMANDATION que je vous adressais, et il faisait paraître le remède gratuit alors qu'il obligeait à trouver six octets ailleurs — c'est-à-dire à rouvrir exactement le geste qui avait causé le défaut.
 
 ## 7. Risques
 
