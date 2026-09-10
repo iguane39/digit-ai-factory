@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=f323e5dd41ff archive=6ce2fe14c2bb · dernier événement: 2026-09-10T06:56:07.656Z -->
+     sceaux: actifs=7c9df61ae0db archive=6ce2fe14c2bb · dernier événement: 2026-09-10T07:05:14.794Z -->
 
-**225 actifs** (candidat 20 · décidé 27 · en cours 11 · corrigé 167 · écarté 0) · **782 archivés**.
+**226 actifs** (candidat 21 · décidé 27 · en cours 11 · corrigé 167 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -27,6 +27,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-1007 | candidat | 15 | parc : un commentaire et un message de commit qui documentaient un defaut de graphie ont ete rendus tautologiques par leur propre pseudonymisation — « X dans le nom, la cle etant X » | **oui** — deux explications de defaut rendues tautologiques dans le meme fichier, et un message de commit reecrit par un tiers parce qu aucun hook ne le couvre |
 | TF-0965 | candidat | 10 | pilot : propager les skills a casse un test d'une forge voisine — une regle neuve du socle est mesuree sur le parc du pilot seulement, jamais sur les depots qui la CONSOMMENT | **oui** — une suite de tests d'une forge passee au rouge par un geste joue dans un autre depot, et un agent qui a declare l'echec preexistant de bonne foi parce que rien ne lui disait que la copie installee avait change sous lui |
 | TF-0990 | candidat | 10 | pilot : le referentiel de restitution declare une exemption que son juge n'implemente pas — un tour sans nouveaute doit rendre un accuse bref, et l'accuse bref est refuse | **oui** — un accuse de reception de trois phrases refuse par quatre regles bloquantes, puis quatre-vingt-dix lignes de restitution pour un tour ou rien n'a change |
+| TF-1008 | candidat | 10 | pilot : un clone rebati apres reecriture d historique garde l ANCIENNE histoire atteignable par le REMISAGE — troisieme vecteur apres l arborescence liee et la branche de sauvegarde | **oui** — 306 commits de l histoire d avant reecriture, dont 180 portant un nom reel, survivant dans un clone declare rebati, par une reference qu aucun controle n enumere |
 | TF-0966 | candidat | 8.3 | pilot : la pseudonymisation ne couvre pas les IDENTIFIANTS TECHNIQUES cites dans le corps d un item — cinq objets d un systeme client vivent en clair dans le registre publie, invisibles a la porte | **oui** — cinq identifiants techniques d un systeme client en clair dans un depot publie, invisibles a la porte parce qu absents des tables ; decouverts par un agent qui les avait recopies dans ses fixtures avant de les remplacer de lui-meme |
 | TF-0967 | candidat | 8.3 | pilot : oracle-conformite-projet n a AUCUN banc de fixtures, et son propre en-tete affirme le contraire — c est l oracle dont un FAIL suspend l ouverture de tout run | **oui** — l oracle qui suspend l ouverture de tout run n a aucune fixture, et son en-tete affirme qu il en a — deux volets d un item decide sont bloques par ce manque, et la campagne a prefere s arreter plutot que d empiler une regle non eprouvee |
 | TF-0992 | candidat | 8 | pilot : la règle S37 du juge des restitutions accuse le NOM D'UN CHAMP de la preuve — `corriges: []`, une sortie verte, est comptée comme une correction sans classe | **oui** — une preuve exacte paraphrasée pour obtenir un vert, sur le bloc dont la valeur tient à son exactitude |
