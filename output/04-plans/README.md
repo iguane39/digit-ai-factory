@@ -20,7 +20,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Note Migration - Chemins du pilot renomme - 20260818b.md` | fichier | 4,3 Ko | Digit-AI — Note de migration : les chemins du pilot renommé — 20260818b |
 | `Digit-AI - Note Revue - Denominateur des freres - 20260818a.md` | fichier | 4,1 Ko | Digit-AI — Note de revue : le dénominateur des « frères » — 20260818a |
 | `Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` | fichier | 3,2 Ko | Plan de renommage `digit-ai-forge-pilot` → `digit-ai-factory` — fenêtre A exécutée, gate n |
-| `Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` | fichier | 30,2 Ko | Restitution — la clé que la session voisine déclarait inexistante existe, et la réécriture |
+| `Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` | fichier | 31,3 Ko | Restitution — la clé que la session voisine déclarait inexistante existe, et la réécriture |
 | `Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md` | fichier | 5,7 Ko | Synthèse — Décision d'engagement actée, exécution transférée au produit — 20260901i |
 | `Digit-AI - Synthese - Etapes transferees au produit par lot de travaux - 20260901j.md` | fichier | 5,2 Ko | Synthèse — Les étapes de la décision transférées au produit — 20260901j |
 | `Digit-AI - Synthese - Etude donnees de recherche et cascade intention - 20260901h.md` | fichier | 10,4 Ko | Synthèse — Étude des données de recherche et cascade de l'intention — 20260901h |
@@ -116,7 +116,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Traite tous les retours - 20260817a.md` | fichier | 5,1 Ko | Synthèse de mandat — « tous les retours de 00-retours sont-ils traités ? traite-les, archi |
 | `Digit-AI - Synthese Mandat - Traite tous les retours et todos - 20260902a.md` | fichier | 27,7 Ko | Synthèse de mandat — tous les retours pris, la boîte prouvée vide, et vingt-quatre chantie |
 | `Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md` | fichier | 9,8 Ko | Digit-AI — Synthèse de mandat — Traite tous les sujets suivants — 20260823a |
-| `Digit-AI - Synthese Mandat - Trois decisions executees moteur de couverture reference realignee publications - 20260910f.md` | fichier | 19,2 Ko | Synthèse de mandat — vos trois décisions sont exécutées : le moteur d'audit sait couvrir,  |
+| `Digit-AI - Synthese Mandat - Trois decisions executees moteur de couverture reference realignee publications - 20260910f.md` | fichier | 25,4 Ko | Synthèse de mandat — vos trois décisions sont exécutées : le moteur d'audit sait couvrir,  |
 | `Digit-AI - Synthese Mandat - Trois lots ingeres et quatre defauts du pilot corriges - 20260909b.md` | fichier | 23,2 Ko | Synthèse de mandat — la boîte de retours est vide, quatre défauts du pilot sont corrigés e |
 | `Digit-AI - Synthese Mandat - Verification de non perte jouable - 20260901d.md` | fichier | 9,0 Ko | Synthèse de mandat — le tri reste éteint, et sa vérification cesse d'être une intention |
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
