@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.5.0",
+ "version": "1.6.0",
  "date": "2026-09-10",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -877,6 +877,35 @@
    "voisines": [
     "texte-sur-la-graphie-detruit-par-sa-pseudonymisation",
     "regle-balaie-prose-et-identifiants"
+   ]
+  },
+  {
+   "cle": "regle-ecrite-sans-oracle-qui-la-joue",
+   "famille": "skill-ou-oracle-non-invoque",
+   "libelle": "Une regle est ecrite dans un texte opposable — noyau, regles du projet, gabarit — avec ses conditions, et AUCUN controle ne la joue : elle tient a la discipline de celui qui l applique, c est-a-dire a rien d opposable. Elle decore tant que rien ne la joue, et le jour ou elle est enfreinte, rien ne le nomme avant que le mal soit fait. La classe se distingue du controle sans fixture (le controle existe mais n est pas eprouve) et du controle mort (il existe et rend PASS a tort) : ici, il n y a pas de controle du tout",
+   "creee_le": "2026-09-10",
+   "fondee_par": [],
+   "regle": "toute regle qui pose une CONDITION verifiable — une liste de chemins, une nature de fichier, une valeur, un ordre — nomme l oracle qui la joue ou porte, le jour ou elle est ecrite, une candidature pour cet oracle ; une regle sans juge ni candidature n entre pas dans un texte opposable",
+   "oracle": "a creer par cas ; pour R-38 §4 : oracle-nature-enregistrement (candidature du 10/09), fixture a double sens — commit de restitution seule PASS, le meme plus une ligne du noyau FAIL",
+   "voisines": [
+    "controle-sans-fixture-double-sens",
+    "controle-vrai-sur-le-mauvais-invariant",
+    "point-entree-declare-rouge-sur-toute-cible"
+   ]
+  },
+  {
+   "cle": "date-de-fichier-menteuse-apres-copie",
+   "famille": "hook-ou-gate",
+   "libelle": "Un outil de propagation ecrase un fichier par une copie qui PRESERVE l horodatage de la SOURCE. Le fichier ecrase porte donc la date de ce qui l a remplace, jamais celle de l ecrasement, et l evenement ne laisse AUCUNE trace : ni journal, ni date, ni sauvegarde. Pire que l absence de trace, la date devient un signal MENTEUR — un lecteur qui l interroge pour savoir si le fichier a bouge recemment conclut qu il n a pas ete touche, et il en tire une deduction inverse de la verite. Le defaut se manifeste au moment ou deux sessions comparent leurs mesures : celle d AVANT l ecrasement et celle d APRES ne se contredisent pas, elles se succedent, mais rien dans le systeme ne permet de le savoir",
+   "creee_le": "2026-09-10",
+   "fondee_par": [
+    "TF-1012"
+   ],
+   "regle": "un outil qui ECRASE un fichier hors versionnement journalise le geste — chemin, empreinte d avant, empreinte d apres, horodatage REEL — et ne se repose jamais sur la date du fichier pour temoigner ; et tout diagnostic qui invoque une date de fichier declare d abord si l outil qui l a ecrit preserve ou non l horodatage de sa source",
+   "oracle": "a creer : une fixture ou un fichier recent est ecrase par une source plus ancienne, et ou le controle doit RELEVER l ecrasement malgre une date inchangee — un controle qui se fie a la date rend PASS et prouve ainsi qu il ne mesure rien",
+   "voisines": [
+    "compte-total-hors-canal-des-constats",
+    "quantificateur-sacrifie-au-budget-du-texte"
    ]
   }
  ]
