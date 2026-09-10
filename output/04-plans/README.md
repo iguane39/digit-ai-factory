@@ -58,6 +58,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md` | fichier | 19,1 Ko | Synthèse de mandat — second « fais tous les A » achevé : les sept items de forges sont clo |
 | `Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md` | fichier | 17,7 Ko | Synthèse de mandat — forme par défaut du bloc 3, et redescente de la doctrine aux produits |
 | `Digit-AI - Synthese Mandat - Heritage a l ouverture et localisateurs - 20260830g.md` | fichier | 16,0 Ko | Synthèse de mandat — le contrôle d'héritage joué à chaque ouverture, et la fin d'un faux r |
+| `Digit-AI - Synthese Mandat - Histoire du pilot reecrite et republiee zero nom restant - 20260909a.md` | fichier | 20,3 Ko | Synthèse de mandat — l'histoire publiée du pilot est réécrite, republiée, et ne porte plus |
 | `Digit-AI - Synthese Mandat - Identifiants exposes verification - 20260830i.md` | fichier | 16,4 Ko | Synthèse de mandat — ce qu'ouvrent réellement les onze porteurs de secrets du poste (30/08 |
 | `Digit-AI - Synthese Mandat - Ingestion rouverte et banc au vert - 20260831c.md` | fichier | 13,8 Ko | Synthèse de mandat — l'ingestion rouverte, deux journées enregistrées, et le banc entièrem |
 | `Digit-AI - Synthese Mandat - Juste milieu du canal de remontee - 20260830k.md` | fichier | 15,1 Ko | Synthèse de mandat — le juste milieu entre les deux voies de remontée, et pourquoi ce n'es |
@@ -110,7 +111,8 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Traite tous les retours - 20260817a.md` | fichier | 5,1 Ko | Synthèse de mandat — « tous les retours de 00-retours sont-ils traités ? traite-les, archi |
 | `Digit-AI - Synthese Mandat - Traite tous les retours et todos - 20260902a.md` | fichier | 27,7 Ko | Synthèse de mandat — tous les retours pris, la boîte prouvée vide, et vingt-quatre chantie |
 | `Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md` | fichier | 9,8 Ko | Digit-AI — Synthèse de mandat — Traite tous les sujets suivants — 20260823a |
+| `Digit-AI - Synthese Mandat - Trois lots ingeres et quatre defauts du pilot corriges - 20260909b.md` | fichier | 23,2 Ko | Synthèse de mandat — la boîte de retours est vide, quatre défauts du pilot sont corrigés e |
 | `Digit-AI - Synthese Mandat - Verification de non perte jouable - 20260901d.md` | fichier | 9,0 Ko | Synthèse de mandat — le tri reste éteint, et sa vérification cesse d'être une intention |
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 
-_96 fichier(s), 0 sous-dossier(s)_ · 2 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_98 fichier(s), 0 sous-dossier(s)_

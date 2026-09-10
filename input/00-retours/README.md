@@ -173,6 +173,8 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-61 - RETOURS - 20260906b.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
 | `Produit-61 - RETOURS - 20260906c.md` | fichier | 7,7 Ko | Retours forges — Produit-61 — 20260906c |
 | `Produit-61 - RETOURS - 20260906c.tf.jsonl` | fichier | 5,1 Ko | 6 ligne(s) JSONL |
+| `Produit-61 - RETOURS - 20260909c.md` | fichier | 10,1 Ko | Retours forges — Produit-61 — 20260909c |
+| `Produit-61 - RETOURS - 20260909c.tf.jsonl` | fichier | 4,8 Ko | 3 ligne(s) JSONL |
 | `Produit-62 - RETOURS - 20260907a.md` | fichier | 7,4 Ko | Retours forges — Produit-62 — 20260907a |
 | `Produit-62 - RETOURS - 20260907a.tf.jsonl` | fichier | 3,1 Ko | 2 ligne(s) JSONL |
 | `Produit-62 - RETOURS - 20260907b.md` | fichier | 5,2 Ko | Retours forges — Produit-62 — 20260907b |
@@ -216,9 +218,11 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-62 - RETOURS - 20260909a.tf.jsonl` | fichier | 4,3 Ko | 2 ligne(s) JSONL |
 | `Produit-62 - RETOURS - 20260909b.md` | fichier | 5,4 Ko | Retours forges — Produit-62 — 20260909b |
 | `Produit-62 - RETOURS - 20260909b.tf.jsonl` | fichier | 2,3 Ko | 1 ligne(s) JSONL |
+| `Produit-62 - RETOURS - 20260909c.md` | fichier | 6,4 Ko | Retours forges — Produit-62 — 20260909c |
+| `Produit-62 - RETOURS - 20260909c.tf.jsonl` | fichier | 2,8 Ko | 1 ligne(s) JSONL |
 | `Produit-65 - RETOURS - 20260903a.md` | fichier | 15,9 Ko | Retours forges — Bibliothèque vidéo IA Enseigne-A — 20260903a |
 | `Produit-65 - RETOURS - 20260903a.tf.jsonl` | fichier | 4,4 Ko | 2 ligne(s) JSONL |
 | `produits-anciens - RETOURS - 20260906a.md` | fichier | 19,6 Ko | Retours forges — produits-anciens — 20260906a |
 | `produits-anciens - RETOURS - 20260906a.tf.jsonl` | fichier | 3,0 Ko | 1 ligne(s) JSONL |
 
-_202 fichier(s), 2 sous-dossier(s)_ · 4 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_206 fichier(s), 2 sous-dossier(s)_
