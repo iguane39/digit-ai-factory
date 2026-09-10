@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
  "version": "1.5.0",
- "date": "2026-09-09",
+ "date": "2026-09-10",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -847,6 +847,21 @@
     "controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas",
     "controle-sans-fixture-double-sens",
     "compte-total-hors-canal-des-constats"
+   ]
+  },
+  {
+   "cle": "texte-sur-la-graphie-detruit-par-sa-pseudonymisation",
+   "famille": "anonymisation",
+   "libelle": "Un texte dont le SUJET est la graphie d un nom — un commentaire qui oppose deux ecritures du meme terme, un message de commit qui documente un defaut de frontiere de mot, une fixture decrite en prose — est DETRUIT par sa propre pseudonymisation : les graphies contrastees deviennent le meme pseudonyme, et la phrase se met a dire << X ecrit X >>. La chaine se comporte correctement et ne peut pas savoir : elle voit un nom, elle le remplace. Le defaut est invisible au moment ou il se produit — la substitution est annoncee comme un succes — et il ne se voit qu a la relecture, souvent des semaines plus tard, quand la seule explication d un correctif est devenue une tautologie. Il frappe exactement les textes qui documentent les defauts d anonymisation, c est-a-dire ceux qu on a le plus besoin de pouvoir relire",
+   "creee_le": "2026-09-10",
+   "fondee_par": [
+    "TF-1007"
+   ],
+   "regle": "un texte qui parle de la GRAPHIE d un nom ne cite jamais un nom reel : il DECRIT la forme (<< une cle en minuscules a tirets contre le meme nom en Majuscules a Espaces >>) ou emploie un nom INVENTE, comme le font les bancs a tables jetables. La regle vaut pour le code, les commentaires, les messages de commit et les restitutions",
+   "oracle": "a creer : relever les textes ou un meme pseudonyme apparait DEUX FOIS dans une phrase opposant deux graphies (<< A dans le nom, la cle etant A >>) — signature mecanique de la tautologie produite par la substitution",
+   "voisines": [
+    "compte-total-hors-canal-des-constats",
+    "regle-balaie-prose-et-identifiants"
    ]
   }
  ]

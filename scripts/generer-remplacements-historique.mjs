@@ -55,12 +55,17 @@ for (const [k, v] of Object.entries(produits)) {
       const corps = `(?i)(?<![A-Za-z0-9])${mots.map(esc).join("[\\s\\-_]*")}(?![A-Za-z0-9])`;
       lignes.push(`regex:${corps}==>${v}`);
       // LE NOM DE FICHIER A BESOIN DU MÊME MOTIF QUE LE CONTENU (09/09/2026, cinquième passe).
-      // Le fait : la passe du 09/09 a laissé UN constat sur 939 — « Produit-11 » dans le
-      // nom d'un rapport, la clé de table étant « Produit-11 ». Les contenus étaient
-      // couverts depuis le 03/09 par la variante de graphie ; le rappel de noms, lui, ne faisait
-      // que du LITTÉRAL. Or la porte juge un nom de fichier AVEC les variantes : une règle qui
-      // vaut pour le contenu et pas pour le nom laisse un nom de client dans un chemin publié,
-      // et le chemin est ce qu'un moteur de recherche indexe en premier.
+      // Le fait : la passe du 09/09 a laissé UN constat sur 939 — une clé écrite en minuscules
+      // à tirets dans la table, et le même nom écrit en Majuscules à Espaces dans le nom d'un
+      // rapport. Les contenus étaient couverts depuis le 03/09 par la variante de graphie ; le
+      // rappel de noms, lui, ne faisait que du LITTÉRAL. Or la porte juge un nom de fichier AVEC
+      // les variantes : une règle qui vaut pour le contenu et pas pour le nom laisse un nom de
+      // client dans un chemin publié, et le chemin est ce qu'un moteur indexe en premier.
+      // L'exemple est décrit et non cité, et c'est voulu : la première version de ce commentaire
+      // citait les deux graphies réelles, la chaîne d'anonymisation les a remplacées par LE MÊME
+      // pseudonyme, et la phrase s'est mise à dire « X écrit X ». Un texte dont le SUJET est la
+      // graphie d'un nom se détruit en le pseudonymisant — il s'écrit donc sans nom réel dès le
+      // départ, ou avec un nom inventé comme le fait le banc de ce script.
       motifs.push([corps, v]);
     }
   }
@@ -71,8 +76,8 @@ writeFileSync(join(sortie, "remplacements.txt"), uniq.join("\n") + "\n", "utf8")
 // UN NOM DE FICHIER SE SUBSTITUE AVEC UNE FRONTIÈRE DE MOT, JAMAIS EN LITTÉRAL NU (09/09/2026).
 // Le défaut, relevé par le banc écrit ce jour-là et présent depuis l'origine du script : la
 // substitution des noms se faisait par `str.replace()`, sans frontière — un fichier `Zorgon.mjs`
-// devenait `Produit-92on.mjs` dès qu'une clé « Zorg » existait, et le vrai parc porte des clés
-// courtes comme « Produit-09 ». Le CONTENU avait sa frontière depuis le 06/09 (TF-0826) ; le NOM ne
+// devenait `Produit-92on.mjs` dès qu'une clé « Zorg » existait — et le vrai parc porte des clés
+// de TROIS LETTRES. Le CONTENU avait sa frontière depuis le 06/09 (TF-0826) ; le NOM ne
 // l'avait pas. La frontière retenue ici est celle de la PORTE — `[A-Za-z0-9]`, sans le souligné —
 // parce qu'un chemin n'est pas du code : renommer `lib_<cle>_helper.py` est voulu, alors que couper
 // un identifiant dans une source ne l'est pas (TF-0927).
