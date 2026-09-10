@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=bfb95972b02a archive=6ce2fe14c2bb · dernier événement: 2026-09-10T14:54:55.153Z -->
+     sceaux: actifs=93f512996ae2 archive=6ce2fe14c2bb · dernier événement: 2026-09-10T15:34:19.015Z -->
 
-**232 actifs** (candidat 23 · décidé 27 · en cours 12 · corrigé 170 · écarté 0) · **782 archivés**.
+**233 actifs** (candidat 24 · décidé 27 · en cours 12 · corrigé 170 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -34,6 +34,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0992 | candidat | 8 | pilot : la règle S37 du juge des restitutions accuse le NOM D'UN CHAMP de la preuve — `corriges: []`, une sortie verte, est comptée comme une correction sans classe | **oui** — une preuve exacte paraphrasée pour obtenir un vert, sur le bloc dont la valeur tient à son exactitude |
 | TF-0993 | candidat | 8 | parc : la chaîne d'anonymisation annonce « pseudonymisé » sans dire ce qui a RÉSISTÉ — le champ `refuses` est ignoré par le script du pilot et par le lanceur installable | **oui** — un commit annoncé pseudonymisé pouvant porter un nom réel laissé en place à dessein, découvert plus tard par la porte quand il est déjà dans l'histoire |
 | TF-0983 | candidat | 6.7 | pilot : les vues generees du registre sont versionnees — 1173 revisions de contenu derive, qui transforment UNE occurrence au registre en 25 dans l histoire | **oui** — 75 des 194 occurrences historiques du 08/09 viennent de la seule amplification par les vues generees ; 1173 revisions de contenu derive dans l histoire du depot |
+| TF-1015 | candidat | 6 | pilot : un clone de verification sur un chemin profond echoue au checkout — 22 fichiers depassent, avec les sidecars d oracle, le plafond de 260 caracteres de Windows ; R-4 juge la forme du nom et jamais sa longueur, la procedure de clone ne declare pas core.longpaths | **oui** — oui — la verification prescrite par la doctrine avant tout push a echoue a son premier emplacement le 10/09/2026 (22 fichiers refuses, checkout impossible) et a du etre rejouee ailleurs avec une option que rien ne documente |
 | TF-1003 | candidat | 4.5 | pilot : le preflight d ingestion compte des COMMITS la ou son invariant est un MAXIMUM D IDENTIFIANT — sur une histoire reecrite il refuse pour toujours, et sa seule issue fait declarer un hors-ligne qui est faux | **oui** — oui — le canal d ingestion des retours a ete ferme dans ce tour meme, sur un risque de collision qui n existait pas (max identique des deux cotes, mesure) ; le remede propose par le message (git pull --rebase) est celui que le mode operatoire de reecriture interdit explicitement, et la seule issue praticable oblige a declarer un hors-ligne faux |
 | TF-1009 | candidat | 4.5 | gabarits : SIX erreurs de mesure en une journee, AUCUNE trouvee par celui qui l avait commise — le seul mecanisme qui a fonctionne est le contre-mesurage par un tiers, et il n est prescrit nulle part | **oui** — oui — six erreurs de mesure en une journee sur un seul depot, dont deux ecrites au registre avant rectification et une ecrite dans une decision soumise a l humain ; aucune trouvee par son auteur ; deux partagent la meme cause mecanique, une sortie bornee lue comme complete |
 | TF-1011 | candidat | 4.5 | pilot : la seconde condition de R-38 §4 — un enregistrement de restitution ne porte QUE des restitutions — est ecrite et n est jouee par rien, alors qu elle est la seule garde contre un push de travail deguise en compte rendu | **oui** — oui — le jour ou la regle est ecrite, un commit couvert par un GO a emporte une modification du noyau non decidee (TF-1010), et rien ne l a nomme avant le push ; la condition qui l aurait arretee existe en prose et nulle part en code |
