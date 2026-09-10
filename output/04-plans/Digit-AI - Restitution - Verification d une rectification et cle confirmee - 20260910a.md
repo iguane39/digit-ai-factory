@@ -101,6 +101,7 @@ Une seule décision reste ouverte, et c'est celle d'hier. Les deux autres ont é
 - **Une clé de table cherchée comme une expression rationnelle** : signal = un compte de porteurs anormalement haut, et des clés qui sont des chemins de disque ; parade = la recherche littérale, et le critère de sélection d'une clé est sa NATURE et non sa longueur.
 - **Un texte de règles qui gagne ses octets sur un quantificateur** : signal = un commit dont le motif annonce une contrainte de taille et dont le diff supprime un « seulement », un « jamais » ou un « aucun » ; parade = la règle en service, sondée, ET la garde de pré-commit qui ferme sa limite déclarée. Ce qui reste découvert : un affaiblissement commis avec `--no-verify`, geste alors déclaré.
 - **Un gardien qui interdit son propre remède** : signal = un message de refus qui prescrit une correction, et un banc qui ne joue jamais cette correction ; parade = TF-1013 — la fixture du remède est aussi obligatoire que la fixture du défaut, et elle l'est justement parce qu'elle est à portée de l'auteur : sans quoi le gardien ne se discute pas, il se désactive.
+- **Une recette que rien n'exécute à la publication** : signal = un dépôt sans workflow, ou une CI dont personne ne lit le verdict ; parade = TF-1018 ; en attendant, les 104 oracles du pilot ne tournent que si quelqu'un y pense — je les ai joués à la main avant chaque enregistrement, et rien n'y obligeait.
 
 ## 8. Prochaines actions — un tableau, l'acteur en colonne
 
