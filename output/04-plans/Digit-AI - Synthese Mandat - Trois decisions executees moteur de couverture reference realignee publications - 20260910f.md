@@ -46,7 +46,7 @@ Une seule décision.
 - **TF-1005 clos, TF-1014 ouvert.** La clôture porte les deux volets et sa descente ; le référentiel du 21/08 devient un chantier de contenu à part, mesuré.
   - preuve : `oracle-todo` **PASS** ; TF-1014 ingéré (lot `eb6ed6fe81d4`) après pseudonymisation du sidecar (1 nom substitué, 0 restant) ; mesure portée : 152 thèmes de périmètre dont 3 retrouvés, 109 types de preuve, 131 livrables, 17 noms de dimension dont 5 retrouvés, 33 ADR dont 9 absents du modèle courant.
 - **D-9 (a) — le pilot est publié.** Quatorze enregistrements, dont les sept de la session voisine.
-  - preuve : porte sur l'arbre juste avant le push **PASS, 51 constats, 0 bloquant** ; `git merge-base --is-ancestor` vrai ; `9500c07..5233c2a` ; après `fetch`, `origin/main` = `HEAD` = `5233c2a`, 0/0 ; clone frais à branche unique hors de c:\dev : **679 commits, 44 références, PASS, 1 constat — le verdict —, 0 antériorité, 0 bloquant** ; la règle N4 par familles et R-38 §4 y sont lus.
+  - preuve : porte sur l'arbre juste avant le push **PASS, 51 constats, 0 bloquant** ; `git merge-base --is-ancestor` vrai ; `9500c07..5233c2a` ; après `fetch`, `origin/main` = `HEAD` = `5233c2a`, 0/0 ; clone frais à branche unique hors de c:\dev : **679 commits, 44 références, PASS, 1 constat — le verdict —, 0 antériorité, 0 bloquant** ; la règle N4 (les quantificateurs du noyau comptés par familles) et R-38 §4 y sont lus.
 - **D-9 (a) — la forge des agents est publiée.** Onze enregistrements : dix de campagnes antérieures et le report de la remontée §4 (TF-1006).
   - preuve : porte sur l'arbre juste avant le push **PASS, 22 constats, 0 bloquant** ; `a539fa9..3d16b96` ; après `fetch`, 0/0 ; clone frais : **156 commits, 21 références, PASS, 22 constats dont 21 antériorités, 0 bloquant** ; la section « Oracles portés par un engagement » y est lue, **0** nom réel.
 - **La session voisine est informée** des trois exécutions, de la publication de ses enregistrements, et de ce qui lui revient — rien, la propagation étant humaine.
@@ -55,7 +55,7 @@ Une seule décision.
 ## 5. Non traité — avec son motif
 
 - La publication de la forge d'audit (`53ca664`) — motif : `gate_gouvernance`, c'est la décision D-10 ; D-9 nommait deux dépôts, pas trois.
-- La propagation des skills (`bootstrap --pull`) qui installerait la section reportée et remettrait K2 au vert — motif : `gate_gouvernance`, la propagation engage toutes les sessions du poste (R-29 : les dépenses et les portes de gouvernance restent humaines).
+- La propagation des skills (`bootstrap --pull`) qui installerait la section reportée et remettrait K2 (la copie installée des skills égale à sa source) au vert — motif : `gate_gouvernance`, la propagation engage toutes les sessions du poste (R-29 : les dépenses et les portes de gouvernance restent humaines).
 - Le chantier de contenu du référentiel du 21/08 (TF-1014) — motif : `gate_gouvernance`, c'est une candidature, et « décide TF-1014 » est votre mot ; le pilot a mesuré, extrait et déposé, il n'écrit pas la doctrine d'audit.
 - Le commit des fichiers déposés chez le produit — motif : `hors_mandat`, le mandat était le dépôt ; le commit appartient au produit et à sa session.
 - Le retrait du remisage — motif : `gate_gouvernance`, supprimer est un geste humain ; l'inspection est faite.

@@ -8,10 +8,10 @@ Une session voisine m'a annoncé qu'elle s'était trompée hier, et qu'un terme 
 
 ## 1. En-tête d'identification
 
-- **quoi** — vérification d'une rectification remontée par une session voisine, puis contrôle du clone reconstruit, de la publication, et d'une retouche du texte de règles du projet.
-- **sur quoi** — la table des pseudonymes du canal confidentiel, le dépôt publié du pilot, et le noyau `CLAUDE.md`.
-- **quand** — 2026-09-10, de 14 h 20 à 15 h 20 UTC+02:00 (Europe/Paris), durée ≈ 1 h ; lecture seule pendant la reconstruction menée par la session voisine, puis écriture.
-- **qui** — pilot digit-ai-factory 85b29bd, publié ; `oracle-nom-client-publie` en version installée, `oracle-claude-md`, `todo\oracle-todo.mjs`, `oracles\oracle-synthese.mjs`.
+- **quoi** — vérification d'une rectification remontée par une session voisine, contrôle du clone reconstruit et de la publication, sondage de la règle neuve, pose de la garde qui ferme sa limite, puis vérification de l'état publié final.
+- **sur quoi** — la table des pseudonymes du canal confidentiel, le dépôt publié du pilot, le noyau `CLAUDE.md` et le hameçon de pré-commit.
+- **quand** — 2026-09-10, de 14 h 20 à 17 h 30 UTC+02:00 (Europe/Paris), durée ≈ 3 h 10 ; lecture seule pendant la reconstruction menée par la session voisine, puis écriture.
+- **qui** — pilot digit-ai-factory 3285ef5 ; `oracle-nom-client-publie`, `oracle-claude-md`, `oracles\pre-commit-quantificateurs.mjs`, `todo\oracle-todo.mjs`, `oracles\oracle-synthese.mjs`.
 
 ## 2. Verdict en une ligne
 
@@ -58,7 +58,7 @@ Une seule décision reste ouverte, et c'est celle d'hier. Les deux autres ont é
 - **J'ai refusé de clore un item au motif que son banc n'était rattaché à aucun cliquet, et c'était faux aussi.** Contrôle : lecture du cliquet lui-même.
   - preuve : `oracles\baseline-recettes.json` porte `scripts/generer-remplacements-historique.test.mjs` avec **11 cas, vu le 2026-09-09** — le lanceur ramasse tout banc du dépôt, donc la moitié préventive que je réclamais était faite par construction le soir même où j'ai écrit l'item. **TF-1004 est désormais CLOS** sur cette preuve, et l'action que je maintenais au tableau n'avait plus d'objet.
 - **La règle qui verra le prochain affaiblissement est écrite, et je l'ai sondée au lieu de la croire.** Contrôle rouge → vert, avec son témoin : cas rouge **FAIL**, témoin de la version d'avant **0 constat**, cas vert **PASS**.
-  - preuve : sur un dépôt jetable où le noyau commis porte le mot et où l'arbre de travail ne l'a plus, la règle rend « 1 quantificateur(s) DISPARU(S) … « seulement » 1 → 0 » ; la version précédente de l'oracle, rejouée sur le MÊME cas, n'émet aucun constat de cette règle — sans ce témoin, un rouge ne prouverait rien. Sa limite est déclarée par l'oracle lui-même et je l'ai vérifiée : elle compare à la version commise, donc un affaiblissement DÉJÀ commis n'est plus vu au tour suivant — la garde du passage travail → commit reste à poser. **TF-1010 est clos**, ainsi que **TF-1004**.
+  - preuve : sur un dépôt jetable où le noyau commis porte le mot et où l'arbre de travail ne l'a plus, la règle rend « 1 quantificateur(s) DISPARU(S) … « seulement » 1 → 0 » ; la version précédente de l'oracle, rejouée sur le MÊME cas, n'émet aucun constat de cette règle — sans ce témoin, un rouge ne prouverait rien. Sa limite est déclarée par l'oracle lui-même et je l'ai vérifiée : elle compare à la version commise, donc un affaiblissement DÉJÀ commis n'est plus vu au tour suivant — c'est la garde du passage travail → commit, posée depuis. **TF-1010 est clos**, ainsi que **TF-1004**.
 - **La garde du quantificateur est posée au passage travail → commit, et elle juge l'INDEX.** Contrôle rouge → vert en conditions réelles : le commit qui retire le mot est REFUSÉ, le dépôt reste à un commit ; la reformulation qui garde l'exclusivité passe.
   - preuve : banc **8 PASS, 0 FAIL**, dont deux cas négatifs qui prouvent qu'elle juge bien l'index — une perte présente sur le disque mais NON indexée ne déclenche rien, et un noyau absent du commit ne se juge pas. Elle ferme la limite que la règle déclare elle-même : celle-ci compare à la version commise, donc une fois l'affaiblissement commis elle ne le voit plus.
 - **En la câblant, j'ai trouvé deux défauts qu'aucune lecture ne montrait.** Classe neuve `regle-qui-interdit-son-propre-remede`, **TF-1013**.
