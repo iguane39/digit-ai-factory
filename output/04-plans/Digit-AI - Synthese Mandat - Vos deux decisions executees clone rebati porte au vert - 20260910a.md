@@ -11,7 +11,7 @@ Vos deux arbitrages ont été suivis. Votre nuance sur le second a changé le tr
 - **quoi** — exécution des deux décisions humaines D-1 (a) et D-2 (a) de la synthèse de la veille : enregistrement du travail, reconstruction de la copie locale, inscription de l'arbitrage sur la forme des rapports d'audit.
 - **sur quoi** — la factory `digit-ai-factory` (le pilot) : son dépôt local, sa bibliothèque de gabarits, son registre d'améliorations.
 - **quand** — 2026-09-10 08:55 UTC+02:00 (Europe/Paris), durée ≈ 45 min, relevée à l'horloge et non estimée.
-- **qui** — pilot `digit-ai-factory`, branche `main` en `560deb9` ; outils mobilisés : `bootstrap.mjs --rebatir`, `todo\anonymiser-suivis.mjs`, `todo\ingerer-lot.mjs`, `todo\journaliser.mjs` ; oracles : `oracle-nom-client-publie`, `oracle-todo`, `oracle-boite-entree`, `oracle-catalogues`, `oracle-gabarits-documents`, `oracle-portee-doctrine`, plus le lanceur `oracles\self-tests.mjs`.
+- **qui** — pilot `digit-ai-factory`, branche `main` en `bfd7c47` (10 enregistrements d'avance sur l'origine, 0 de retard, dont ceux de la session voisine qui travaille en parallèle sur le même dépôt) ; outils mobilisés : `bootstrap.mjs --rebatir`, `todo\anonymiser-suivis.mjs`, `todo\ingerer-lot.mjs`, `todo\journaliser.mjs` ; oracles : `oracle-nom-client-publie`, `oracle-todo`, `oracle-boite-entree`, `oracle-catalogues`, `oracle-gabarits-documents`, `oracle-portee-doctrine`, plus le lanceur `oracles\self-tests.mjs`.
 
 ## 2. Verdict en une ligne
 
@@ -104,8 +104,8 @@ Ce tableau ne liste que les restes ; ce qui est fait est au bloc 4 avec sa preuv
 ## 9. Traces
 
 - `output\04-plans\Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte au vert - 20260910a.md` — ce document.
-- Trois enregistrements locaux : `24d48f6` (session voisine, texte pseudonymisé), `dc30ea8` (le mandat), `560deb9` (index régénérés) ; branche `main`, 3 en avance sur `origin/main`, 0 en retard.
+- Enregistrements locaux, dont les trois rejoués par la reconstruction : `24d48f6` (session voisine, texte pseudonymisé), `dc30ea8` (le mandat), `560deb9` (index régénérés) ; puis ceux des deux sessions au fil du tour. Branche `main` en `bfd7c47`, 10 en avance sur `origin/main`, 0 de retard, arbre propre.
 - `C:\dev\_sauvegardes\digit-ai-factory-20260910-063614.bundle` (98 285 067 octets, vérifié) et son dossier de correctifs `…-063614-patches\`.
 - `gabarits\documents\catalogue.jsonl` — entrée `gd-rapport-audit` portant l'arbitrage et la correction d'instruction.
-- `todo\TODO.jsonl` et ses vues régénérées ; `input\01-candidatures\realignement-references-audit-20260910a.tf.jsonl` et `input\01-candidatures\registre-oracles-edite-en-copie-installee-20260910a.tf.jsonl`.
+- `todo\TODO.jsonl` et ses vues régénérées ; les trois candidatures de ce tour sous `input\01-candidatures\` — le réalignement des références d'audit, la remontée d'oracle écrite dans la copie installée, et la leçon de méthode sur les mesures.
 - Aucun livrable HTML produit dans ce tour : la critique d'implémentation de forge-design est sans objet.
