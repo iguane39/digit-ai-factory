@@ -82,7 +82,7 @@ Une seule décision reste ouverte, et elle est celle d'hier : celle sur la recon
 | A-103 | Restituer le champ des occurrences qui ont RÉSISTÉ à la substitution, et couvrir le message de commit | TF-0993 | auto_ia | `gate_gouvernance` — candidature non décidée, et le changement touche un contrat partagé entre deux dépôts | `passer()` rend `refuses` à côté de `corriges`, et le hameçon l'affiche en avertissant | un commit annoncé pseudonymisé peut porter un nom réel |
 | A-67 | Sur l'autre poste, à sa prochaine ouverture : reconstruire ses clones, dont celui du pilot désormais réécrit | TF-0829 | manuelle_dev | `presence` : commandes à jouer sur l'autre machine — `git -C ../digit-ai-forge-development rev-list --count HEAD..@{u}` rend 0 ici, il ne mesure que ce poste | `node bootstrap.mjs --pull` puis `node bootstrap.mjs --rebatir <dépôt>` | l'autre poste travaillera sur une histoire incompatible et pourrait republier les noms |
 
-Ordre : **A-104 en premier, parce qu'elle est la seule dont la fenêtre se ferme — un commit non rejoué se constate au moment de la reconstruction, pas trois jours après** ; A-100 ensuite, parce qu'elle informe la seule décision ouverte ; A-101 et A-103 quand leurs candidatures sont décidées ; A-67 à l'ouverture de l'autre poste.
+Ordre : **A-105 en premier, parce qu'elle est la seule qui empêche le défaut de se reproduire au prochain clone rebâti** ; A-106 dès que le remisage aura été inspecté, sa fenêtre se fermant le jour où quelqu'un croira ce clone assaini ; A-100 ensuite, parce qu'elle informe la seule décision ouverte ; A-101 et A-103 quand leurs candidatures sont décidées ; A-67 à l'ouverture de l'autre poste.
 
 ## 9. Traces
 
