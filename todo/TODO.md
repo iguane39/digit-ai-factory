@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=0547e914a257 archive=6ce2fe14c2bb · dernier événement: 2026-09-10T15:57:37.096Z -->
+     sceaux: actifs=a7296c80057d archive=6ce2fe14c2bb · dernier événement: 2026-09-10T15:59:47.733Z -->
 
-**235 actifs** (candidat 26 · décidé 27 · en cours 12 · corrigé 170 · écarté 0) · **782 archivés**.
+**236 actifs** (candidat 27 · décidé 27 · en cours 12 · corrigé 170 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -29,6 +29,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0990 | candidat | 10 | pilot : le referentiel de restitution declare une exemption que son juge n'implemente pas — un tour sans nouveaute doit rendre un accuse bref, et l'accuse bref est refuse | **oui** — un accuse de reception de trois phrases refuse par quatre regles bloquantes, puis quatre-vingt-dix lignes de restitution pour un tour ou rien n'a change |
 | TF-1008 | candidat | 10 | pilot : un clone rebati apres reecriture d historique garde l ANCIENNE histoire atteignable par le REMISAGE — troisieme vecteur apres l arborescence liee et la branche de sauvegarde | **oui** — 306 commits de l histoire d avant reecriture, dont 180 portant un nom reel, survivant dans un clone declare rebati, par une reference qu aucun controle n enumere |
 | TF-1012 | candidat | 10 | pilot : la propagation des skills ecrase un fichier SANS trace, et la date du fichier ecrase MENT — elle porte celle de la source, ce qui a fait conclure a tort qu il n avait pas bouge | **oui** — une remontee d oracle portant un nom de client effacee sans trace, et une conclusion ecrite dans un document depose — << rien n a ete perdu >> — tiree d une date de fichier qui disait l inverse de la verite |
+| TF-1018 | candidat | 10 | parc : UN SEUL depot sur six a une CI hebergee — le pilot, qui porte la doctrine et 104 oracles, n en a AUCUNE, et rien ne rejoue sa recette a la publication | **oui** — 104 oracles et leur agregateur qui ne s executent que si quelqu un y pense, sur le depot qui porte la doctrine du parc et qui a ete publie six fois dans la journee |
 | TF-0966 | candidat | 8.3 | pilot : la pseudonymisation ne couvre pas les IDENTIFIANTS TECHNIQUES cites dans le corps d un item — cinq objets d un systeme client vivent en clair dans le registre publie, invisibles a la porte | **oui** — cinq identifiants techniques d un systeme client en clair dans un depot publie, invisibles a la porte parce qu absents des tables ; decouverts par un agent qui les avait recopies dans ses fixtures avant de les remplacer de lui-meme |
 | TF-0967 | candidat | 8.3 | pilot : oracle-conformite-projet n a AUCUN banc de fixtures, et son propre en-tete affirme le contraire — c est l oracle dont un FAIL suspend l ouverture de tout run | **oui** — l oracle qui suspend l ouverture de tout run n a aucune fixture, et son en-tete affirme qu il en a — deux volets d un item decide sont bloques par ce manque, et la campagne a prefere s arreter plutot que d empiler une regle non eprouvee |
 | TF-0992 | candidat | 8 | pilot : la règle S37 du juge des restitutions accuse le NOM D'UN CHAMP de la preuve — `corriges: []`, une sortie verte, est comptée comme une correction sans classe | **oui** — une preuve exacte paraphrasée pour obtenir un vert, sur le bloc dont la valeur tient à son exactitude |
