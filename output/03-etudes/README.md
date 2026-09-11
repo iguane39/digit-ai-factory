@@ -68,4 +68,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `20260907-L99-mission-data-silver-gold-powerbi.md` | fichier | 47,5 Ko | Analyse L99 — « Identifie les compétences manquantes des forges pour une mission data Silv |
 | `20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md` | fichier | 10,9 Ko | Pourquoi faut-il réécrire l'histoire à chaque fois, et comment cesser |
 
-_51 fichier(s), 0 sous-dossier(s)_
+_51 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

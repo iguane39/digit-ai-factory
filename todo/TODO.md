@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=a0917c2c0a89 archive=6ce2fe14c2bb · dernier événement: 2026-09-11T08:55:30.101Z -->
+     sceaux: actifs=007b84477481 archive=6ce2fe14c2bb · dernier événement: 2026-09-11T09:04:53.006Z -->
 
-**238 actifs** (candidat 24 · décidé 27 · en cours 12 · corrigé 175 · écarté 0) · **782 archivés**.
+**241 actifs** (candidat 27 · décidé 27 · en cours 12 · corrigé 175 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -109,7 +109,9 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0991 | candidat | 10 | parc : un contrôle borné à 200 constats déclare son vrai total dans une ligne de prose — le pilot a publié 200 pour un passif de 939 | **oui** — un chiffre faux d'un facteur 3,8 publié dans une étude et dans une synthèse remise à l'humain, trois sous-comptes dérivés à retirer, et une invariance publiée comme preuve qui ne prouve rien |
 | TF-0994 | candidat | 10 | digit-ai-forge-agents : le garde-fou anti-écrasement de l'installeur de hameçons ne tient qu'à UNE LETTRE — il reconnaît « son » hameçon par une sous-chaîne qui est un nom de fichier | **oui** — un garde-fou anti-écrasement dont la solidité tient à une lettre de différence entre deux noms de fichiers écrits le même jour pour la même fonction |
 | TF-0997 | candidat | 10 | digit-ai-forge-agents : le champ disable-model-invocation a bien ete retire des 3 skills du lexique, mais le COMMENTAIRE de frontmatter qui l'expliquait a survecu et dit au modele l'inverse de la description du meme en-tete | **oui** — non paye seul : degrade le dernier declencheur de secours dans l'exact scenario ou le hook manque, scenario constate le 09/09 |
+| TF-1022 | candidat | 9 | forge-agents : l archive digit-ai-pptx.skill charge << toujours >> references/charte.md, layouts.md et assets.md, et n en contient aucun | **oui** — oui — trois references chargees << toujours >> absentes de l archive ; le rendu de toute propale Digit-AI depend de ce skill |
 | TF-1002 | candidat | 4.5 | quality-oracles : la porte de publication accuse un sigle DANS un mot ordinaire, et localise son constat sur la mauvaise ligne — les deux se sont vus sur le commentaire qui documente ce faux positif | **oui** — oui — la porte de publication rend un FAIL structurel sur l'arbre de travail du pilot pour un mot ordinaire ; dans ce tour, séparer le passif connu du possible nom neuf a demandé un classificateur écrit à la main, faux du premier coup, et une lecture de fichier pour retrouver un terme que le constat localisait 29 lignes plus bas |
+| TF-1021 | candidat | 4.5 | forge-agents : quatre skills exerces (communication, propale, propale-review, pptx) ne sont versionnes par aucune forge, non installes au poste, alors que quatre agents compiles les chargent comme point d entree | **oui** — oui — un pipeline versionne appelle quatre capacites non versionnees ; une propale reelle produite le 24/07 n est rejouable sur aucun clone ; l etude d opportunite du 11/09 doit d abord declarer cet etat avant de proposer quoi que ce soit |
 | TF-0899 | corrige | 25 | digit-ai-forge-agents (digit-ai-page-html) : table-filters.js pose « position: relative » en ligne sur chaque th filtrable et écrase le « sticky » de L29 — le « top: var(--hh) » devient un décalage permanent de 104 px, l'en-tête de tableau se pose sur ses deux premières lignes | **oui** — un tour humain, page régénérée sous un indice neuf, cinq oracles rejoués, mesure au navigateur écrite par le produit |
 | TF-0954 | corrige | 25 | digit-ai-page-html : une INFOBULLE QUI RECOPIE LA CELLULE qu'elle explique passe tous les oracles — L3 et L18 exigent une explication, aucune règle ne juge le rapport entre l'explication et ce qu'elle explique | **oui** — un retour humain sur une page déjà jugée PASS ; famille entière de fausses explications générées |
 | TF-0900 | corrige | 20 | digit-ai-forge-agents (digit-ai-page-html) : « .table-hote { overflow-x: auto } » du boilerplate fait du conteneur la zone de défilement du thead collé — l'en-tête se fige sous le haut du tableau (+67 px au repos), jamais sous l'en-tête de page | **oui** — même tour humain que RA-2 ; quatre tableaux sur huit concernés par cette seule cause |
@@ -214,6 +216,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0847 | en_cours | 1 | forge-design : render_page contenu_rogne signale les champs de saisie dont la valeur dépasse la largeur | **oui** — un aller-retour de rendu |
+| TF-1023 | candidat | 4.5 | forge-design / forge-agents : la marque Digit-AI est portee par deux chartes contradictoires (pptx : Montserrat/Inter/#2563EB ; page-html : Roboto/DM Sans) et aucun systeme-de-marque Digit-AI n existe | **oui** — oui — deux valeurs de police et de couleur pour la meme marque dans deux skills en service ; aucun artefact de marque source ; precedent B1-B4 de forge-design (TF-0483) : une direction artistique verte a tous les oracles rejetee en bloc |
 | TF-0875 | corrige | 12.5 | forge-design : un état saisi ne survit pas à la navigation de la barre basse et rien ne le juge | **oui** — retour humain lot 20260906d, correctif E-076 et parcours navigateur ajouté |
 | TF-0925 | corrige | 12 | digit-ai-forge-design : l'oracle du panneau de tâche doit admettre la page dédiée comme troisième motif de création, sinon l'impasse avec le pan interface se referme depuis l'autre côté | **oui** — une action laissée au développeur et insoldable tant que les deux forges se contredisent |
 | TF-0846 | corrige | 10 | forge-design : la barre basse sticky de la doctrine mobile chevauche le contenu (V4) hors coquille défilante | **oui** — 18 pages FAIL V4 au premier passage 5 bis |

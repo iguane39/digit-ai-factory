@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.9.0",
+ "version": "1.10.0",
  "date": "2026-09-11",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -980,6 +980,50 @@
    "oracle": "a creer (regle par. 4) : hook-restitution — apres un message humain de forme << D-N (x) >> / << Nx >>, un message de fin de tour dont le texte est IDENTIQUE au precedent (meme empreinte) ou qui repose la meme D-N au bloc 3 est FAIL : decision recue, geste absent ; mesure de reference : 11/09/2026, session 31d2f3c7, << 11a >> a 09:05 et 09:07, deux restitutions de 3156 mots identiques a 09:07:31 et 09:09:32 (journal des hooks : 0 ecriture, 3 commandes), push a 09:10:08",
    "voisines": [
     "restitution-fichier-juge-mal-choisi"
+   ]
+  },
+  {
+   "cle": "capacite-hors-versionnement-de-forge",
+   "famille": "contrat-interface-forge",
+   "libelle": "Une capacite EXERCEE dans un run reel — skill, agent compile, expert — est citee comme point d entree par un agent (<< charger le skill X >>), un catalogue ou une fiche, et ne vit que sous forme d archive dans un dossier ignore par git d une forge, non installee au poste : aucun depot n en porte la source lisible, l histoire ni la version. Le pipeline qui l appelle est versionne, la capacite qu il appelle ne l est pas ; un clone frais de la forge ne peut pas rejouer le run, et une etude qui compte sur elle batit sur du sable. Mesure du 11/09/2026 : quatre skills (communication, propale, propale-review, pptx) sous input/03-skills/ de forge-agents, cites par les quatre agents P4, absents de ~/.claude/skills",
+   "creee_le": "2026-09-11",
+   "fondee_par": [
+    "TF-1021"
+   ],
+   "regle": "toute capacite citee comme point d entree par un agent compile, un catalogue de services ou une fiche expert est versionnee EN SOURCE par une forge (jamais en archive seule, jamais sous un dossier ignore) et installee par bootstrap ; ce qui est confidentiel dans son instance (marque, prix, references) en est separe et vit au canal confidentiel",
+   "oracle": "a creer : oracle-skills ou oracle-ecosysteme croise les skills cites par .claude/agents/*.md (<< charger le skill >>) et par catalogue.jsonl avec les skills versionnes en source ET presents dans ~/.claude/skills ; tout ecart est un FAIL nomme",
+   "voisines": [
+    "contrat-de-sortie-sans-domicile",
+    "alias-de-transition-perime-survivant"
+   ]
+  },
+  {
+   "cle": "reference-chargee-toujours-absente-du-paquet",
+   "famille": "regle-morte",
+   "libelle": "Le SKILL.md d un skill charge << toujours >> ou << obligatoirement >> une reference interne (references/charte.md, layouts.md, assets.md) que son paquet ne contient pas : l instruction est morte a l execution, le skill produit sans la charte qu il promet, et rien ne le signale. Mesure du 11/09/2026 : digit-ai-pptx.skill v2.5.0 porte 4 fichiers, aucun des trois references chargees a l etape 1 de son workflow",
+   "creee_le": "2026-09-11",
+   "fondee_par": [
+    "TF-1022"
+   ],
+   "regle": "le paquet d un skill porte chaque fichier que son SKILL.md cite en chemin relatif ; un lien interne non resolu dans le paquet est un FAIL du skill, pas un avertissement",
+   "oracle": "a creer : oracle-skills resout chaque chemin relatif cite par un SKILL.md (references/, scripts/, templates/) dans l arborescence du skill ; fixture rouge = un SKILL.md citant un fichier absent",
+   "voisines": [
+    "controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas",
+    "point-entree-declare-rouge-sur-toute-cible"
+   ]
+  },
+  {
+   "cle": "marque-emettrice-portee-par-deux-chartes",
+   "famille": "donnees-perissables-en-dur",
+   "libelle": "La marque d un emetteur (polices, couleurs, gabarits) est ecrite EN DUR dans plusieurs skills de rendu avec des valeurs contradictoires, sans systeme-de-marque source unique (MARQUE.md, tokens.css) : chaque support porte sa propre << charte officielle >>, et aucun oracle ne peut juger la coherence entre un deck et une page. Mesure du 11/09/2026 : Digit-AI est Montserrat/Inter/#2563EB chez digit-ai-pptx (<< charte officielle v2 >>) et Roboto/DM Sans chez digit-ai-page-html (<< jamais Syne >>) ; aucun MARQUE.md ni tokens.css Digit-AI sur le poste",
+   "creee_le": "2026-09-11",
+   "fondee_par": [
+    "TF-1023"
+   ],
+   "regle": "la marque d un emetteur vit dans UN systeme-de-marque (cat-des-01 : tokens.css + MARQUE.md), date et source, que tout skill de rendu (deck, page, document) CONSOMME au lieu de porter ses propres valeurs ; deux chartes pour un emetteur = une a retirer, ou une divergence datee et motivee",
+   "oracle": "a creer : les oracles tokens T1-T6 de forge-design joues sur chaque skill de rendu contre le tokens.css de l emetteur ; a defaut, un controle qui extrait polices et couleurs des SKILL.md de rendu et refuse deux valeurs pour une meme marque",
+   "voisines": [
+    "deux-regles-du-socle-inconciliables"
    ]
   }
  ]
