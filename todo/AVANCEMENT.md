@@ -1,13 +1,13 @@
 ---
 role: rapport d'avancement — VUE GÉNÉRÉE du registre, jamais éditée à la main
-sources_de_verite: [todo/TODO.jsonl (sceau bba960a542af)]
+sources_de_verite: [todo/TODO.jsonl (sceau a0917c2c0a89)]
 verifie_le: 2026-09-11
 ---
 
 # Rapport d'avancement — TODO-FORGE
 
 > **Vue générée** par `node scripts\generer-avancement.mjs`, jamais éditée à la main.
-> Source : `todo\TODO.jsonl`, sceau `bba960a542af`. Aucun chiffre de ce document n'est
+> Source : `todo\TODO.jsonl`, sceau `a0917c2c0a89`. Aucun chiffre de ce document n'est
 > saisi : tous sont comptés dans le registre au moment de la génération — c'est la seule
 > façon d'être sûr qu'un nombre est juste, ne jamais l'écrire.
 
@@ -19,10 +19,10 @@ les corrections donnerait l'illusion d'un progrès net.
 
 | Grandeur | Compte | Ce que ça dit |
 |---|---|---|
-| Ouverts | 62 | candidats, décidés ou en cours — le reste à faire réel |
+| Ouverts | 63 | candidats, décidés ou en cours — le reste à faire réel |
 | Clos sur gains constatés | 175 | corrigés avec leur mesure avant/après |
 | Écartés avec motif | 0 | décidés non faits, motif écrit — jamais un silence |
-| Total suivi | 237 | tout ce que le registre a jamais porté |
+| Total suivi | 238 | tout ce que le registre a jamais porté |
 
 ## Ce qui reste ouvert, par forge
 
@@ -101,6 +101,19 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0985 | factory : un tableau de reference organise par « ce qui varie » oblige le lecteur a recoller le document, et a | decide | factory | 1 |
 | TF-0986 | factory : un secret ne se publie pas, et rien ne dit comment un lecteur IDENTIFIE celui qui est en place | decide | factory | 1 |
 
+### digit-ai-forge-audit — 5 item(s)
+
+Les items ouverts ciblant digit-ai-forge-audit, du score le plus fort au plus faible. Le score est
+celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
+
+| Id | Titre | Statut | Forge(s) | Score |
+|---|---|---|---|---|
+| TF-1000 | forge-audit : la charte d exemple fictive livree avec la forge prime sur la typographie declaree du tenant | candidat | digit-ai-forge-audit | 15 |
+| TF-1001 | forge-audit : six champs que le moteur de rapport sait rendre restent vides sans que la porte machine le dise | candidat | digit-ai-forge-audit | 10 |
+| TF-1020 | forge-audit : sur le runner Linux la fiche PDF sort sur DEUX pages au lieu d une et le juge la refuse (P3), pe | candidat | digit-ai-forge-audit | 9 |
+| TF-0940 | digit-ai-forge-agents / digit-ai-forge-audit : deux implémentations du schéma de base de données coexistent (r | en_cours | digit-ai-forge-agents, digit-ai-forge-audit | 6.7 |
+| TF-0947 | digit-ai-forge-agents / digit-ai-forge-audit : deux implémentations du schéma de base de données coexistent (r | decide | digit-ai-forge-agents, digit-ai-forge-audit | 6.7 |
+
 ### digit-ai-forge-data — 5 item(s)
 
 Les items ouverts ciblant digit-ai-forge-data, du score le plus fort au plus faible. Le score est
@@ -113,18 +126,6 @@ celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
 | TF-0971 | forge-data : aucun oracle ni outil ne mesure l'USAGE REEL d'un modele de restitution — la couverture se mesure | decide | digit-ai-forge-data | 6.3 |
 | TF-0975 | forge-data : aucun oracle ne rapproche un modele de restitution d'un EXTRAIT du rapport livre par le client -  | decide | digit-ai-forge-data | 1 |
 | TF-0976 | forge-data : un export Power BI porte un pied de page Filtres appliques qui entre dans les donnees, et c'est e | decide | digit-ai-forge-data | 1 |
-
-### digit-ai-forge-audit — 4 item(s)
-
-Les items ouverts ciblant digit-ai-forge-audit, du score le plus fort au plus faible. Le score est
-celui du registre (gain x preuve / effort) : il ordonne, il ne decide pas.
-
-| Id | Titre | Statut | Forge(s) | Score |
-|---|---|---|---|---|
-| TF-1000 | forge-audit : la charte d exemple fictive livree avec la forge prime sur la typographie declaree du tenant | candidat | digit-ai-forge-audit | 15 |
-| TF-1001 | forge-audit : six champs que le moteur de rapport sait rendre restent vides sans que la porte machine le dise | candidat | digit-ai-forge-audit | 10 |
-| TF-0940 | digit-ai-forge-agents / digit-ai-forge-audit : deux implémentations du schéma de base de données coexistent (r | en_cours | digit-ai-forge-agents, digit-ai-forge-audit | 6.7 |
-| TF-0947 | digit-ai-forge-agents / digit-ai-forge-audit : deux implémentations du schéma de base de données coexistent (r | decide | digit-ai-forge-agents, digit-ai-forge-audit | 6.7 |
 
 ### pilot — 3 item(s)
 

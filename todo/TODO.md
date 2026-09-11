@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=bba960a542af archive=6ce2fe14c2bb · dernier événement: 2026-09-11T08:42:49.377Z -->
+     sceaux: actifs=a0917c2c0a89 archive=6ce2fe14c2bb · dernier événement: 2026-09-11T08:55:30.101Z -->
 
-**237 actifs** (candidat 23 · décidé 27 · en cours 12 · corrigé 175 · écarté 0) · **782 archivés**.
+**238 actifs** (candidat 24 · décidé 27 · en cours 12 · corrigé 175 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -159,6 +159,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-1000 | candidat | 15 | forge-audit : la charte d exemple fictive livree avec la forge prime sur la typographie declaree du tenant | **oui** — un livrable remis a un commanditaire dans la typographie d un client fictif ; defaut invisible aux deux portes machine, trouve par lecture du generateur de theme |
 | TF-1001 | candidat | 10 | forge-audit : six champs que le moteur de rapport sait rendre restent vides sans que la porte machine le dise | **oui** — les trois syntheses et les douze lignes de reprise applicative ont du etre ecrites hors de l etape d audit, a partir du socle documentaire du produit ; le rapport disait son manque et aucune porte ne l a escalade |
+| TF-1020 | candidat | 9 | forge-audit : sur le runner Linux la fiche PDF sort sur DEUX pages au lieu d une et le juge la refuse (P3), pendant que le runner Windows la rend sur une page — la pile de polices du theme (system-ui, Segoe UI, Roboto, Arial) n existe pas sur le runner Linux et rien ne l installe ni ne l embarque | **oui** — oui — le run est rouge sur Linux pour la neuvieme publication consecutive, mais pour une cause differente des huit precedentes ; sans police embarquee, tout audit dont la fiche est imprimee hors du poste Windows peut sortir sur deux pages et etre refuse par son propre juge |
 | TF-1016 | corrige | 6 | forge-audit : le journal de versions est dormant — 14 enregistrements de fonctionnalites depuis le 15/08 sans entree au CHANGELOG, section << Non publie >> ouverte depuis le 14/08, package.json a 1.0.0 sous des tags a v1.17.0 ; la convention declaree ment sur l etat et rien ne la juge | **oui** — oui — au moment de publier un changement de contrat de donnees (D-10 (a)), aucune version n existait a inscrire au ledger du pilot, et la question a coute une mesure a la main ; le journal decrit un depot fige au 14/08 alors que 14 enregistrements l ont change |
 | TF-0862 | corrige | 5.3 | forge-audit : oracle executable dans profiles/powerbi sur les fichiers TMDL/PBIP d'un modele semantique — mesure definie une fois (CTL-D05-02 et 10), relations actives et non ambigues, table de dates marquee et contigue (CTL-D05-13), mode de connexion declare par profil de besoin (CTL-D05-14), roles de securite au niveau ligne presents, statut de certification (CTL-D05-15) — sans point de terminaison XMLA (manque M4, lot L5) | non |
 | TF-1017 | corrige | 4.5 | forge-audit : la CI hebergee est rouge sur 8 pushs consecutifs depuis le 24/08 pendant que la recette locale est verte — la recette rejoue les ETAPES de la CI, pas son ENVIRONNEMENT (variable CI, navigateur absent), et deux tests ne se comportent qu en CI | **oui** — oui — 8 runs rouges consecutifs sur 17 jours sans qu aucune restitution ne les nomme, et trois publications de la forge faites sur une recette locale verte qui ne voyait pas le rouge |
