@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=7ed8ac7edd66 archive=6ce2fe14c2bb · dernier événement: 2026-09-11T13:22:48.760Z -->
+     sceaux: actifs=0d62896992a8 archive=6ce2fe14c2bb · dernier événement: 2026-09-11T14:09:15.202Z -->
 
-**273 actifs** (candidat 50 · décidé 36 · en cours 12 · corrigé 175 · écarté 0) · **782 archivés**.
+**281 actifs** (candidat 58 · décidé 36 · en cours 12 · corrigé 175 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -240,7 +240,10 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0847 | en_cours | 1 | forge-design : render_page contenu_rogne signale les champs de saisie dont la valeur dépasse la largeur | **oui** — un aller-retour de rendu |
 | TF-1030 | decide | 9 | forge-design / forge-agents : la transparence des contenus generes (AI Act article 50, en vigueur depuis le 2026-08-02) n est portee par aucune regle de marque ni aucun controle sur les livrables publics (M10, verdict O3) | **oui** — oui — obligation reglementaire en vigueur depuis 40 jours a la date de l etude, non portee par l ecosysteme |
 | TF-1023 | decide | 4.5 | forge-design / forge-agents : la marque Digit-AI est portee par deux chartes contradictoires (pptx : Montserrat/Inter/#2563EB ; page-html : Roboto/DM Sans) et aucun systeme-de-marque Digit-AI n existe | **oui** — oui — deux valeurs de police et de couleur pour la meme marque dans deux skills en service ; aucun artefact de marque source ; precedent B1-B4 de forge-design (TF-0483) : une direction artistique verte a tous les oracles rejetee en bloc |
+| TF-1056 | candidat | 25 | forge-design : la regle S1 d'oracle-slop refuse un triangle CSS comme un bandeau lateral, et ce refus plafonne tout le parc a Refondre | **oui** — le verdict maximal atteignable par toute page du parc chargeant le socle est Refondre ; un verdict que personne ne peut atteindre cesse d'etre lu, et la grille de critique perd son pouvoir de discrimination |
+| TF-1057 | candidat | 12.5 | forge-design : oracle-tokens lit les jetons d'un bloc @media print comme ceux du theme sombre, et declenche un red flag de contraste sur toute page correctement contrastee | **oui** — un red flag de contraste faux sur tout produit du parc qui porte un theme sombre, donc sur tout produit conforme a la doctrine du socle ; deux heures de recherche de cause sur ce produit avant d'etablir l'origine |
 | TF-1034 | candidat | 9 | forge-design : le corpus tokens-digit-ai.tokens.json (mode digit-ai de systeme-de-marque) n est plus la charte du socle — registre << refus >> absent, six fonds pleins de badges absents, aucun jeton de focus, et un theme sombre derive par recalcul alors que le socle porte le sien (S-G1) | **oui** — oui — quatre ecarts mesures entre le corpus << canonique >> et le socle qu il pretend relever ; une page consommant le corpus sortirait sans registre refus ni focus prescrit |
+| TF-1058 | candidat | 7.5 | forge-design : la regle T8 confronte l'anneau de focus a tout jeton nomme -bg, remplissages de composants compris, et se satisfait d'un renommage | **oui** — le contournement est plus court que la correction : un renommage de jeton efface 12 constats en trente secondes, ce qui enseigne le contournement plutot que la regle |
 | TF-1035 | candidat | 6 | forge-design (systeme-de-marque) : deux outils du systeme de marque ne tiennent pas leur propre contrat — generer-tokens-css.mjs ecrit un en-tete fige (<< Source unique : corpus/tokens-digit-ai.tokens.json >>) quelle que soit la source, et generer-design-md.mjs ne resout pas les alias var() que le generateur emet | **oui** — oui — un en-tete faux dans deux fichiers derives du produit, un DESIGN.md genere depuis une feuille intermediaire non contractuelle |
 | TF-0875 | corrige | 12.5 | forge-design : un état saisi ne survit pas à la navigation de la barre basse et rien ne le juge | **oui** — retour humain lot 20260906d, correctif E-076 et parcours navigateur ajouté |
 | TF-0925 | corrige | 12 | digit-ai-forge-design : l'oracle du panneau de tâche doit admettre la page dédiée comme troisième motif de création, sinon l'impasse avec le pan interface se referme depuis l'autre côté | **oui** — une action laissée au développeur et insoldable tant que les deux forges se contredisent |
@@ -307,7 +310,16 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | id | statut | score | titre | payé en réel |
 |---|---|---|---|---|
 | TF-0961 | decide | 7.5 | digit-ai-page-html : scripts/embarquer-composants.mjs ne s'importe pas et ne pose que dans le depot des skills — un produit qui embarque un composant du socle reecrit le poseur | **oui** — un poseur reecrit en Python chez le produit pour trois composants, et trois copies dont la parite ne peut etre rejouee que par un outil maison |
+| TF-1060 | candidat | 10 | digit-ai-page-html : la regle V15 de render_page signale comme masque un en-tete collant que son propre tableau, trop court, a desepingle | **oui** — trois bloquants faux qui occupent la dimension Hierarchie de la grille de critique et masquent ce que V15 trouverait vraiment ; le message oriente vers un remede qui ne peut pas fonctionner |
+| TF-1061 | candidat | 10 | digit-ai-page-html : la regle V4 signale comme chevauchement un en-tete position: sticky recouvrant le contenu qu'il survole — sa fonction meme | **oui** — quatre bloquants faux sur cinq etats mesures ; le seul controle qui juge une page ailleurs qu'au repos rend un rouge constant et cesse d'informer |
+| TF-1059 | candidat | 8.3 | digit-ai-page-html : les composants du socle portent 40 ecarts durs, et l'exemption prevue pour cela est hors d'atteinte par le chemin d'integration que le socle prescrit | **oui** — 40 ecarts durs restants sur ce produit apres correction complete de son propre CSS ; le meme comptage attend tout produit du parc qui charge ces trois composants |
 | TF-0890 | corrige | 7.5 | digit-ai-page-html : scripts/embarquer-composants.mjs ne s'importe pas et ne pose que dans le depot des skills — un produit qui embarque un composant du socle reecrit le poseur | **oui** — un poseur reecrit en Python chez le produit pour trois composants, et trois copies dont la parite ne peut etre rejouee que par un outil maison |
+
+## digit-ai-schemas
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-1063 | candidat | 20 | digit-ai-schemas : le canevas de modele de donnees ne definit sa palette qu'en theme clair — 36 ecarts durs, et des schemas a fonds clairs sur page sombre partout ou il est monte | **oui** — 36 ecarts durs par page, et un schema illisible en theme sombre chez tout produit qui monte le canevas ; chaque produit doit redecouvrir et reecrire la meme projection |
 
 ## factory
 
@@ -368,6 +380,12 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0794 | corrige | 1 | pilot : le remede que R-42 prescrit ne solde pas le defaut qu'il vise, et l'ecriture concurrente du ledger collisionne par construction | **oui** — un FAIL R-42 incurable a chaque conformite tant que la collision n'est pas consommable ; le lot 20260901b a compile son controle de completude SANS voir la seq 75 ecrite 3 minutes plus tot par l'autre session |
 | TF-0795 | corrige | 1 | pilot : CI3 rend PASS sur des controles qui declarent leurs codes de sortie sans posseder AUCUN chemin d'echec — etre declare n'est pas etre rendu | **oui** — un controle qui ne sait pas echouer rassure au lieu de juger — les trois defauts dormants de TF-0679 ont coute un chantier entier avant d'etre vus |
 | TF-0801 | corrige | 1 | pilot : R-19 sans voie de rectification pour une cle malformee de versions_forges, et le depot digit-ai-queue innommable sous son vrai nom | **oui** — cloture du run v0.6.0 : run_open seq 134 avec cle digit-ai-queue (nom reel du depot au bootstrap) -> FAIL R-19 ; rectification seq 141 deposee et SANS EFFET ; issue prise : cle reecrite en forme canonique, geste que la doctrine reprouve, choisi faute de voie |
+
+## quality-oracles
+
+| id | statut | score | titre | payé en réel |
+|---|---|---|---|---|
+| TF-1062 | candidat | 20 | quality-oracles : oracle-a11y compte les identifiants dupliques a l'interieur des commentaires de script et rend un bloquant WCAG 4.1.1 sur une page sans doublon | **oui** — un bloquant d'accessibilite faux sur toute page autonome inlinant les assets du socle ; la dimension Accessibilite pese 25 % de la note ponderee de la critique |
 
 ## seo-geo
 
