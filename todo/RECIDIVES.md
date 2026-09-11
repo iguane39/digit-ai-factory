@@ -1,10 +1,10 @@
 # Récidives et descente — tableau de bord
 
-<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 2e7d487ce314 · archive 6ce2fe14c2bb · classes b844aa74d165 · relevés fd7e1cbf8f6e · héritage 23d6b9c4bee8. État au 2026-09-11T12:50:04.228Z (ts max des sources, jamais l'horloge). -->
+<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 4c7804a42562 · archive 6ce2fe14c2bb · classes aad8281cfd6b · relevés 5c183c9dfa57 · héritage 23d6b9c4bee8. État au 2026-09-11T14:12:35.888Z (ts max des sources, jamais l'horloge). -->
 
 Ce tableau de bord répond à trois questions que le registre seul ne savait pas poser : est-ce la deuxième fois, chez qui, et depuis combien de temps la correction existe sans être appliquée. Il se lit avec sa contre-métrique : un compteur de récidives qui baisse pendant que le nombre de classes monte est un compteur contourné, pas un progrès.
 
-**Périmètre mesuré** : 1048 item(s) au registre (actifs et archive), 220 portant une classe, 121 marqué(s) récidive ; référentiel de 69 classe(s) en 18 famille(s) (v1.10.0) ; 20 relevé(s) d'héritage.
+**Périmètre mesuré** : 1063 item(s) au registre (actifs et archive), 235 portant une classe, 126 marqué(s) récidive ; référentiel de 72 classe(s) en 18 famille(s) (v1.11.0) ; 21 relevé(s) d'héritage.
 
 ## 1. Récidives par classe
 
@@ -14,14 +14,14 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 |---|---|---|---|---|---|---|---|
 | `gabarit-famille-manquante` | gabarit-document | 13 | 1 | 13 | 100 % | Produit-03 ×1, Produit-10 ×5, Produit-62 ×6, Produit-65 ×1 | 2026-09-09 |
 | `oracle-remplace-par-controle-maison` | skill-ou-oracle-non-invoque | 14 | 1 | 12 | 86 % | Produit-61 ×1, Produit-03 ×1, Produit-10 ×5, Produit-62 ×3, Produit-65 ×1, Produit-11 ×1 | 2026-09-11 |
-| `boucle-retour-sans-descente` | heritage-produit | 9 | 1 | 9 | 100 % | Produit-62 ×2, Produit-12 ×2, Produit-10 ×2, Produit-11 ×3 | 2026-09-11 |
+| `boucle-retour-sans-descente` | heritage-produit | 10 | 1 | 10 | 100 % | Produit-62 ×2, Produit-12 ×2, Produit-10 ×2, Produit-11 ×3, Produit-64 ×1 | 2026-09-11 |
 | `heritage-avertissement-tardif` | heritage-produit | 7 | 1 | 7 | 100 % | Produit-02 ×2, Produit-10 ×3, Produit-11 ×2 | 2026-09-08 |
 | `lecture-tiers-non-jugee` | skill-ou-oracle-non-invoque | 7 | 1 | 7 | 100 % | Produit-10 ×3, Produit-62 ×2, Produit-11 ×2 | 2026-09-08 |
+| `page-html-filtres-tableau` | page-html-socle | 7 | 4 | 7 | 100 % | Produit-12 ×1, Produit-61 ×1, Produit-62 ×3, Produit-64 ×2 | 2026-09-08 |
 | `recette-verdict-non-prononcable` | regle-morte | 8 | 3 | 7 | 88 % | Produit-61 ×3, Produit-10 ×1, pilot ×1, Produit-62 ×2 | 2026-09-09 |
 | `surface-implicite-non-livree` | affordance-ui | 15 | 1 | 7 | 47 % | Produit-61 ×6, Produit-10 ×1 | 2026-09-07 |
 | `gate-ecriture-juge-fichier-entier` | hook-ou-gate | 7 | 1 | 6 | 86 % | Produit-60 ×1, Produit-62 ×1, pilot ×3, Produit-61 ×1 | 2026-09-05 |
 | `anonymisation-portee-partielle` | anonymisation | 16 | 2 | 5 | 31 % | pilot ×4, Produit-12 ×1 | 2026-09-06 |
-| `page-html-filtres-tableau` | page-html-socle | 5 | 4 | 5 | 100 % | Produit-12 ×1, Produit-61 ×1, Produit-62 ×3 | 2026-09-08 |
 | `page-html-sticky-superposes` | page-html-socle | 5 | 1 | 5 | 100 % | Produit-61 ×1, Produit-10 ×4 | 2026-09-08 |
 | `gabarit-conception-non-jugee` | gabarit-document | 3 | 3 | 3 | 100 % | Produit-61 ×2, pilot ×1 | 2026-09-10 |
 | `page-html-dictionnaire-colonnes` | page-html-socle | 4 | 1 | 3 | 75 % | Produit-10 ×3 | 2026-09-08 |
@@ -35,10 +35,12 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `page-html-sommaire-absent` | page-html-socle | 2 | 2 | 2 | 2/2 (sous 3 items, taux non significatif) | Produit-10 ×2 | 2026-09-08 |
 | `porte-cle-courte-sans-frontiere` | hook-ou-gate | 4 | 1 | 2 | 50 % | Produit-62 ×2 | 2026-09-09 |
 | `restitution-fichier-juge-mal-choisi` | restitution-forme | 2 | 1 | 2 | 2/2 (sous 3 items, taux non significatif) | Produit-10 ×2 | 2026-09-08 |
+| `champ-transcrit-de-prose-sans-correspondance` | regle-morte | 4 | 1 | 1 | 25 % | Produit-64 ×1 | 2026-09-08 |
 | `compte-total-hors-canal-des-constats` | contrat-interface-forge | 4 | 1 | 1 | 25 % | pilot ×1 | 2026-09-08 |
 | `controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas` | regle-morte | 2 | 0 | 1 | 1/2 (sous 3 items, taux non significatif) | pilot ×1 | 2026-09-10 |
 | `correction-symptome-sans-classe` | lot-forme | 3 | 1 | 1 | 33 % | Produit-62 ×1 | 2026-09-09 |
 | `date-de-fichier-menteuse-apres-copie` | hook-ou-gate | 1 | 1 | 1 | 1/1 (sous 3 items, taux non significatif) | pilot ×1 | 2026-09-10 |
+| `emplacement-livrable-hors-convention` | emplacement-livrable | 4 | 0 | 1 | 25 % | Produit-62 ×1 | 2026-09-11 |
 | `garde-lexicale-frontiere-ascii` | regle-morte | 9 | 2 | 1 | 11 % | Produit-62 ×1 | 2026-09-08 |
 | `page-html-grille-non-alignee` | page-html-socle | 1 | 1 | 1 | 1/1 (sous 3 items, taux non significatif) | Produit-11 ×1 | 2026-09-11 |
 | `page-html-teinte-refus` | page-html-socle | 1 | 1 | 1 | 1/1 (sous 3 items, taux non significatif) | Produit-10 ×1 | 2026-09-08 |
@@ -48,14 +50,14 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `banc-etend-referentiel-production` | anonymisation | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `boite-entree-produit-statut-git-non-dit` | contrat-interface-forge | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `brief-sans-regles-de-socle` | skill-ou-oracle-non-invoque | 0 | 1 | 0 | — | — | — |
-| `capacite-hors-versionnement-de-forge` | contrat-interface-forge | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
-| `champ-transcrit-de-prose-sans-correspondance` | regle-morte | 3 | 1 | 0 | 0 % | — | — |
+| `capacite-hors-versionnement-de-forge` | contrat-interface-forge | 2 | 1 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
 | `chemin-de-livrable-au-dela-du-plafond-de-la-plateforme` | emplacement-livrable | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `controle-vrai-sur-le-mauvais-invariant` | regle-morte | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `decision-humaine-rendue-restituee-sans-geste` | restitution-forme | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `deux-regles-du-socle-inconciliables` | page-html-socle | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
-| `emplacement-livrable-hors-convention` | emplacement-livrable | 3 | 0 | 0 | 0 % | — | — |
+| `exemption-hors-atteinte-par-le-chemin-prescrit` | contrat-interface-forge | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `fixture-jugee-par-son-seul-oracle` | skill-ou-oracle-non-invoque | 7 | 1 | 0 | 0 % | — | — |
+| `gabarit-sans-parite-de-theme` | gabarit-document | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `gate-cout-invite-au-contournement` | hook-ou-gate | 3 | 0 | 0 | 0 % | — | — |
 | `journal-de-versions-dormant` | versionnement-livrable | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `l99-forme-sortie` | skill-ou-oracle-non-invoque | 0 | 1 | 0 | — | — | — |
@@ -66,6 +68,7 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `marque-de-propriete-devinee-par-sous-chaine` | hook-ou-gate | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `marque-emettrice-portee-par-deux-chartes` | donnees-perissables-en-dur | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `motif-exclusion-couvert-compte-absent` | heritage-produit | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
+| `oracle-faux-positif` | regle-morte | 6 | 0 | 0 | 0 % | — | — |
 | `page-html-polices-distantes` | page-html-socle | 0 | 1 | 0 | — | — | — |
 | `page-html-temps-affiche` | page-html-socle | 0 | 1 | 0 | — | — | — |
 | `porte-sans-chemin-des-tables` | hook-ou-gate | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
@@ -74,7 +77,7 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `reference-chargee-toujours-absente-du-paquet` | regle-morte | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `registre-doublon-non-detecte` | lot-forme | 2 | 0 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
 | `regle-de-branche-annoncee-differente-configuree` | contrat-interface-forge | 2 | 1 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
-| `regle-ecrite-sans-oracle-qui-la-joue` | skill-ou-oracle-non-invoque | 4 | 0 | 0 | 0 % | — | — |
+| `regle-ecrite-sans-oracle-qui-la-joue` | skill-ou-oracle-non-invoque | 5 | 0 | 0 | 0 % | — | — |
 | `regle-neuve-sans-mesure-de-bruit` | page-html-socle | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `regle-qui-interdit-son-propre-remede` | hook-ou-gate | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `releve-heritage-juge-arbre-pas-histoire` | heritage-produit | 0 | 1 | 0 | — | — | — |
@@ -108,9 +111,11 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 | `decision-humaine-rendue-restituee-sans-geste` | 2026-09-11 | forge/RESTITUTION.md | 3 produit(s) atteint(s) en 0–0 j ; 9 non atteint(s) (bav-dev, Produit-11, Produit-01, client-a-cockpit-ia, Produit-10, Produit-02, COMPTA---Ventillation-de-facture-Fournisseur-A, Produit-61, Produit-04) |
 | `deux-regles-du-socle-inconciliables` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `emplacement-livrable-hors-convention` | — | — | non mesurable : aucune clôture fondatrice au registre |
+| `exemption-hors-atteinte-par-le-chemin-prescrit` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `fixture-jugee-par-son-seul-oracle` | 2026-09-06 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `gabarit-conception-non-jugee` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `gabarit-famille-manquante` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
+| `gabarit-sans-parite-de-theme` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `garde-lexicale-frontiere-ascii` | 2026-09-05 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `gate-cout-invite-au-contournement` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `gate-ecriture-juge-fichier-entier` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
@@ -125,6 +130,7 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 | `marque-de-propriete-devinee-par-sous-chaine` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `marque-emettrice-portee-par-deux-chartes` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `motif-exclusion-couvert-compte-absent` | 2026-09-08 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
+| `oracle-faux-positif` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `oracle-remplace-par-controle-maison` | 2026-09-02 | CLAUDE.md | 12 produit(s) atteint(s) en 1–9 j ; 2 non atteint(s) (Produit-11, bav-dev) |
 | `page-html-dictionnaire-colonnes` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `page-html-filtres-tableau` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
@@ -160,23 +166,23 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 
 ## 3. Taux d'héritage par règle (dernier relevé)
 
-Comment lire : une ligne par artefact hérité déclaré dans `gabarits/HERITAGE.json`, état au relevé du 2026-09-11T08:50:23.054Z sur 12 produit(s) ; *conformes* compte les produits chez qui l'artefact est présent et à jour ; *familles* dit de quelles familles de défaut cet artefact protège.
+Comment lire : une ligne par artefact hérité déclaré dans `gabarits/HERITAGE.json`, état au relevé du 2026-09-11T13:50:48.724Z sur 11 produit(s) ; *conformes* compte les produits chez qui l'artefact est présent et à jour ; *familles* dit de quelles familles de défaut cet artefact protège.
 
 | Artefact | Mode | Conformes | Familles protégées |
 |---|---|---|---|
-| forge/retours/GABARIT-LOT-RETOURS.md | copie_conforme | 12/12 | lot-forme |
-| forge/retours/oracle-lot.mjs | copie_conforme | 12/12 | lot-forme |
-| forge/hooks/factory.mjs | copie_conforme | 12/12 | skill-ou-oracle-non-invoque, restitution-forme, page-html-socle, heritage-produit |
-| forge/RESTITUTION.md | copie_conforme | 0/12 | restitution-forme |
-| .claude/settings.json | presence_et_motif | 12/12 | skill-ou-oracle-non-invoque, restitution-forme, page-html-socle, heritage-produit |
-| CLAUDE.md | presence_et_motif | 12/12 | skill-ou-oracle-non-invoque |
-| robots.txt | presence | 12/12 | — |
-| llms.txt | presence | 12/12 | — |
-| forge/travaux/TRAVAUX-PILOT.md | copie_conforme | 12/12 | heritage-produit |
-| forge/travaux/ECARTS-ASSUMES.md | presence | 12/12 | heritage-produit |
-| forge/travaux/oracle-travaux.mjs | copie_conforme | 12/12 | heritage-produit |
-| .gitignore | presence_et_motifs | 12/12 | secret-hors-perimetre |
-| forge/retours/CLASSES.json | copie_conforme | 12/12 | heritage-produit, lot-forme |
+| forge/retours/GABARIT-LOT-RETOURS.md | copie_conforme | 11/11 | lot-forme |
+| forge/retours/oracle-lot.mjs | copie_conforme | 11/11 | lot-forme |
+| forge/hooks/factory.mjs | copie_conforme | 11/11 | skill-ou-oracle-non-invoque, restitution-forme, page-html-socle, heritage-produit |
+| forge/RESTITUTION.md | copie_conforme | 2/11 | restitution-forme |
+| .claude/settings.json | presence_et_motif | 11/11 | skill-ou-oracle-non-invoque, restitution-forme, page-html-socle, heritage-produit |
+| CLAUDE.md | presence_et_motif | 11/11 | skill-ou-oracle-non-invoque |
+| robots.txt | presence | 11/11 | — |
+| llms.txt | presence | 11/11 | — |
+| forge/travaux/TRAVAUX-PILOT.md | copie_conforme | 11/11 | heritage-produit |
+| forge/travaux/ECARTS-ASSUMES.md | presence | 11/11 | heritage-produit |
+| forge/travaux/oracle-travaux.mjs | copie_conforme | 11/11 | heritage-produit |
+| .gitignore | presence_et_motifs | 11/11 | secret-hors-perimetre |
+| forge/retours/CLASSES.json | copie_conforme | 2/11 | heritage-produit, lot-forme |
 
 ## 4. Contre-métrique : classes créées
 
@@ -185,10 +191,10 @@ Comment lire : le nombre de classes créées par semaine ISO, puis les classes s
 | Semaine | Classes créées |
 |---|---|
 | 2026-S36 | 37 |
-| 2026-S37 | 32 |
+| 2026-S37 | 35 |
 
-- Classes sans clôture fondatrice : `emplacement-livrable-hors-convention`, `registre-doublon-non-detecte`, `banc-etend-referentiel-production`, `gate-cout-invite-au-contournement`, `regle-neuve-sans-mesure-de-bruit`, `controle-sans-fixture-double-sens`, `deux-regles-du-socle-inconciliables`, `controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas`, `controle-vrai-sur-le-mauvais-invariant`, `regle-ecrite-sans-oracle-qui-la-joue`
-- Retours entrés sous une classe suspecte : TF-0995 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1003 (controle-vrai-sur-le-mauvais-invariant), TF-1006 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1011 (regle-ecrite-sans-oracle-qui-la-joue), TF-1015 (chemin-de-livrable-au-dela-du-plafond-de-la-plateforme), TF-1016 (journal-de-versions-dormant), TF-1017 (recette-locale-ne-rejoue-pas-l-environnement-de-la-ci), TF-1021 (capacite-hors-versionnement-de-forge), TF-1022 (reference-chargee-toujours-absente-du-paquet), TF-1023 (marque-emettrice-portee-par-deux-chartes), TF-1039 (registre-doublon-non-detecte), TF-1040 (controle-sans-fixture-double-sens), TF-1041 (regle-ecrite-sans-oracle-qui-la-joue), TF-1043 (regle-ecrite-sans-oracle-qui-la-joue), TF-1044 (regle-ecrite-sans-oracle-qui-la-joue)
+- Classes sans clôture fondatrice : `emplacement-livrable-hors-convention`, `registre-doublon-non-detecte`, `banc-etend-referentiel-production`, `gate-cout-invite-au-contournement`, `regle-neuve-sans-mesure-de-bruit`, `controle-sans-fixture-double-sens`, `deux-regles-du-socle-inconciliables`, `controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas`, `controle-vrai-sur-le-mauvais-invariant`, `regle-ecrite-sans-oracle-qui-la-joue`, `oracle-faux-positif`, `exemption-hors-atteinte-par-le-chemin-prescrit`, `gabarit-sans-parite-de-theme`
+- Retours entrés sous une classe suspecte : TF-0995 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1003 (controle-vrai-sur-le-mauvais-invariant), TF-1006 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1011 (regle-ecrite-sans-oracle-qui-la-joue), TF-1015 (chemin-de-livrable-au-dela-du-plafond-de-la-plateforme), TF-1016 (journal-de-versions-dormant), TF-1017 (recette-locale-ne-rejoue-pas-l-environnement-de-la-ci), TF-1021 (capacite-hors-versionnement-de-forge), TF-1022 (reference-chargee-toujours-absente-du-paquet), TF-1023 (marque-emettrice-portee-par-deux-chartes), TF-1039 (registre-doublon-non-detecte), TF-1040 (controle-sans-fixture-double-sens), TF-1041 (regle-ecrite-sans-oracle-qui-la-joue), TF-1043 (regle-ecrite-sans-oracle-qui-la-joue), TF-1044 (regle-ecrite-sans-oracle-qui-la-joue), TF-1056 (oracle-faux-positif), TF-1057 (oracle-faux-positif), TF-1058 (oracle-faux-positif), TF-1059 (exemption-hors-atteinte-par-le-chemin-prescrit), TF-1060 (oracle-faux-positif), TF-1061 (oracle-faux-positif), TF-1062 (oracle-faux-positif), TF-1063 (gabarit-sans-parite-de-theme), TF-1064 (regle-ecrite-sans-oracle-qui-la-joue)
 
 ## Ce que cette vue ne juge pas
 

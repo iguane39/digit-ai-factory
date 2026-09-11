@@ -69,5 +69,6 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md` | fichier | 10,9 Ko | Pourquoi faut-il réécrire l'histoire à chaque fois, et comment cesser |
 | `20260911-etude-opportunite-communication-marketing-ao.md` | fichier | 45,9 Ko | Étude d'opportunité — communication, marketing et réponse aux appels d'offres pour Digit-A |
 | `20260911-L99-forge-communication-marketing.md` | fichier | 52,4 Ko | Analyse L99 — « Construire une forge communication & marketing pour Digit-AI : étude d'opp |
+| `20260911-L99-regles-d-ecriture-factory.md` | fichier | 58,5 Ko | Analyse L99 — « Améliorer tous les textes générés par la Factory : état de l'art, règles d |
 
-_53 fichier(s), 0 sous-dossier(s)_
+_54 fichier(s), 0 sous-dossier(s)_
