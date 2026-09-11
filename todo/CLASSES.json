@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.8.0",
- "date": "2026-09-10",
+ "version": "1.9.0",
+ "date": "2026-09-11",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -966,6 +966,20 @@
    "voisines": [
     "regle-qui-interdit-son-propre-remede",
     "controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas"
+   ]
+  },
+  {
+   "cle": "decision-humaine-rendue-restituee-sans-geste",
+   "famille": "restitution-forme",
+   "libelle": "Une decision humaine rendue par son selecteur (<< 11a >>) recoit en reponse la restitution de la veille rejouee MOT POUR MOT, sans le geste qu elle commande ; le geste n est joue qu a la repetition du mot humain, et aucune restitution ne dit que les reponses precedentes n ont rien fait. Vu de l humain, le pilot boucle : il redemande une decision deja rendue",
+   "creee_le": "2026-09-11",
+   "fondee_par": [
+    "TF-1019"
+   ],
+   "regle": "noyau loi 5 (l IA fait, l humain decide) et gabarits/RESTITUTION.md v2.18.0 (un tour qui n apporte rien de neuf rend un accuse bref) — un mot humain de la forme << D-N (x) >> ou << Nx >> commande son geste dans le MEME tour ; la restitution qui suit porte la preuve du geste (sortie executee), jamais la decision reposee ni la synthese precedente rejouee",
+   "oracle": "a creer (regle par. 4) : hook-restitution — apres un message humain de forme << D-N (x) >> / << Nx >>, un message de fin de tour dont le texte est IDENTIQUE au precedent (meme empreinte) ou qui repose la meme D-N au bloc 3 est FAIL : decision recue, geste absent ; mesure de reference : 11/09/2026, session 31d2f3c7, << 11a >> a 09:05 et 09:07, deux restitutions de 3156 mots identiques a 09:07:31 et 09:09:32 (journal des hooks : 0 ecriture, 3 commandes), push a 09:10:08",
+   "voisines": [
+    "restitution-fichier-juge-mal-choisi"
    ]
   }
  ]

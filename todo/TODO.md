@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=a7296c80057d archive=6ce2fe14c2bb · dernier événement: 2026-09-10T15:59:47.733Z -->
+     sceaux: actifs=d56c5cdf055b archive=6ce2fe14c2bb · dernier événement: 2026-09-11T07:34:52.871Z -->
 
-**236 actifs** (candidat 27 · décidé 27 · en cours 12 · corrigé 170 · écarté 0) · **782 archivés**.
+**237 actifs** (candidat 28 · décidé 27 · en cours 12 · corrigé 170 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -39,6 +39,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-1003 | candidat | 4.5 | pilot : le preflight d ingestion compte des COMMITS la ou son invariant est un MAXIMUM D IDENTIFIANT — sur une histoire reecrite il refuse pour toujours, et sa seule issue fait declarer un hors-ligne qui est faux | **oui** — oui — le canal d ingestion des retours a ete ferme dans ce tour meme, sur un risque de collision qui n existait pas (max identique des deux cotes, mesure) ; le remede propose par le message (git pull --rebase) est celui que le mode operatoire de reecriture interdit explicitement, et la seule issue praticable oblige a declarer un hors-ligne faux |
 | TF-1009 | candidat | 4.5 | gabarits : SIX erreurs de mesure en une journee, AUCUNE trouvee par celui qui l avait commise — le seul mecanisme qui a fonctionne est le contre-mesurage par un tiers, et il n est prescrit nulle part | **oui** — oui — six erreurs de mesure en une journee sur un seul depot, dont deux ecrites au registre avant rectification et une ecrite dans une decision soumise a l humain ; aucune trouvee par son auteur ; deux partagent la meme cause mecanique, une sortie bornee lue comme complete |
 | TF-1011 | candidat | 4.5 | pilot : la seconde condition de R-38 §4 — un enregistrement de restitution ne porte QUE des restitutions — est ecrite et n est jouee par rien, alors qu elle est la seule garde contre un push de travail deguise en compte rendu | **oui** — oui — le jour ou la regle est ecrite, un commit couvert par un GO a emporte une modification du noyau non decidee (TF-1010), et rien ne l a nomme avant le push ; la condition qui l aurait arretee existe en prose et nulle part en code |
+| TF-1019 | candidat | 4.5 | pilot : une decision humaine rendue (<< 11a >>) a recu DEUX FOIS la restitution de la veille rejouee mot pour mot, sans le geste — le push n a ete joue qu apres le second rappel, et aucune restitution ne dit que les deux premieres reponses n ont rien fait | **oui** — oui — deux tours de restitution (2 x 3156 mots) pour zero geste, l humain contraint de repeter une decision deja rendue, puis d ouvrir une troisieme session pour demander pourquoi ; la meme forme (decision rendue, geste absent) n est mesuree par aucun oracle |
 | TF-0869 | corrige | 25 | pilot : aucun .env local créé d'office, le commanditaire a saisi sa clé Anthropic dans .env.example versionné | **oui** — git diff --stat .env.example : 1 ligne, clé de 108 caractères préfixée sk-ant- dans un fichier versionné ; un commit de plus et le secret partait |
 | TF-1010 | corrige | 25 | pilot : le noyau a perdu le mot << seulement >> pour tenir dans son plafond — l acceptation d un livrable a cesse d etre exclusive, et personne ne l a decide | **oui** — le garde-fou le plus structurant du parc — un livrable ne s accepte que sur verdict d oracle execute — a cesse d etre exclusif dans le noyau, publie, sans decision humaine |
 | TF-0870 | corrige | 20 | pilot : une clé Anthropic d'organisation sans espace de travail échoue en 400, variable ANTHROPIC_WORKSPACE_ID absente du gabarit et du skill | **oui** — un redéploiement qualif et un appel direct à l'API pour lire la cause ; smoke-qualif-20260906.json E-011 FAIL 502 |

@@ -14,7 +14,7 @@
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digit-AI — TODO-FORGE · Reste à faire — V20260910</title>
+  <title>Digit-AI — TODO-FORGE · Reste à faire — V20260911</title>
   <meta name="description" content="Reste-à-faire du registre TODO-FORGE : candidats à décider, décidés, en cours — détaillés en puces, avec date de création, priorité de traitement et impact sur la forge concernée.">
   <meta name="theme-color" content="#2563EB">
   <!-- Favicon-lettre (13/08) : « F » = Forge (projet). -->
@@ -155,7 +155,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>0547e914a257</code> · dernier événement 2026-09-10T15:57:37.096Z</p>
+      <p class="meta">sceau <code>d56c5cdf055b</code> · dernier événement 2026-09-11T07:34:52.871Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -165,7 +165,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="26 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">26</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="28 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">28</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="27 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">27</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="12 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">12</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="781 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">781</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -216,13 +216,13 @@
         </div>
       </div>
       <button id="reinit" type="button">Réinitialiser les filtres</button>
-      <span id="compteur" class="compteur" aria-live="polite">235 / 235 item(s) affichés</span>
+      <span id="compteur" class="compteur" aria-live="polite">237 / 237 item(s) affichés</span>
     </div>
     <p id="vide" class="etat-vide" hidden>Aucun item ne correspond aux filtres ou à la recherche — <button type="button" id="vide-reinit" class="lien-btn">réinitialiser</button>.</p>
-    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">79 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">55 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">7 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">12 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-data"><strong>digit-ai-forge-data</strong> <span class="toc-d">21 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">12 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-development"><strong>digit-ai-forge-development</strong> <span class="toc-d">4 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-observability"><strong>digit-ai-forge-observability</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-organization"><strong>digit-ai-forge-organization</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">9 item(s) reste-à-faire</span></a><a href="#digit-ai-page-html"><strong>digit-ai-page-html</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#factory"><strong>factory</strong> <span class="toc-d">9 item(s) reste-à-faire</span></a><a href="#forge-conception"><strong>forge-conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-design"><strong>forge-design</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#forge-development"><strong>forge-development</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-tests"><strong>forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">11 item(s) reste-à-faire</span></a><a href="#seo-geo"><strong>seo-geo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
+    <nav class="toc" aria-label="Sommaire"><a href="#digit-ai-factory"><strong>digit-ai-factory</strong> <span class="toc-d">81 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-agents"><strong>digit-ai-forge-agents</strong> <span class="toc-d">55 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-audit"><strong>digit-ai-forge-audit</strong> <span class="toc-d">7 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-conception"><strong>digit-ai-forge-conception</strong> <span class="toc-d">12 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-data"><strong>digit-ai-forge-data</strong> <span class="toc-d">21 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-design"><strong>digit-ai-forge-design</strong> <span class="toc-d">12 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-development"><strong>digit-ai-forge-development</strong> <span class="toc-d">4 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-observability"><strong>digit-ai-forge-observability</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-ops"><strong>digit-ai-forge-ops</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-organization"><strong>digit-ai-forge-organization</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#digit-ai-forge-tests"><strong>digit-ai-forge-tests</strong> <span class="toc-d">9 item(s) reste-à-faire</span></a><a href="#digit-ai-page-html"><strong>digit-ai-page-html</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#factory"><strong>factory</strong> <span class="toc-d">9 item(s) reste-à-faire</span></a><a href="#forge-conception"><strong>forge-conception</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-design"><strong>forge-design</strong> <span class="toc-d">3 item(s) reste-à-faire</span></a><a href="#forge-development"><strong>forge-development</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a><a href="#forge-tests"><strong>forge-tests</strong> <span class="toc-d">2 item(s) reste-à-faire</span></a><a href="#pilot"><strong>pilot</strong> <span class="toc-d">11 item(s) reste-à-faire</span></a><a href="#seo-geo"><strong>seo-geo</strong> <span class="toc-d">1 item(s) reste-à-faire</span></a></nav>
     <main>
     <section id="digit-ai-factory">
-      <h2>digit-ai-factory <span class="badge" title="79 item(s) actifs ciblant digit-ai-factory">79</span></h2>
+      <h2>digit-ai-factory <span class="badge" title="81 item(s) actifs ciblant digit-ai-factory">81</span></h2>
       <p class="ch-apprend meta">Reste-à-faire ciblant <strong>digit-ai-factory</strong> — trié par statut puis priorité décroissante.</p>
       <div class="cartes">
         <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
@@ -645,6 +645,29 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-1018" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-1018</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 10)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">parc : UN SEUL depot sur six a une CI hebergee — le pilot, qui porte la doctrine et 104 oracles, n en a AUCUNE, et rien ne rejoue sa recette a la publication</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat en passant du 10/09, ne d une remontee de la session voisine sur un depot frere dont la CI hebergee etait ROUGE depuis huit publications sans que personne le sache, parce que la recette LOCALE etait verte — elle rejoue les etapes sans l environnement.</p><ul class="puces"><li>J ai voulu verifier le meme angle sur le pilot, que je venais de publier six fois dans la journee, et j ai trouve l inverse : le pilot n a AUCUN workflow, aucune execution chez l hebergeur. Rien de rouge ne s y cachait, donc ma verification du jour etait complete — mais pour une raison qui n est pas rassurante. MESURE SUR SIX DEPOTS : un seul porte un workflow (la forge d audit) ; les cinq autres, dont le pilot, n en ont aucun. Le pilot porte pourtant le noyau doctrinal, les tables de decision, 104 oracles et leur agregateur. LES DEUX FACES DU MEME DEFAUT, et c est ce qui rend le constat utile : chez la forge d audit, une CI existe et son rouge n est pas lu — un verdict rendu que personne ne regarde. Chez le pilot, aucun verdict n est rendu — une recette de 104 oracles qui ne s execute que si quelqu un y pense. Les deux produisent le meme etat : une regression publiee que rien ne signale. Le premier est pire a lire, le second est pire a ignorer, parce qu il ne laisse meme pas une trace rouge a retrouver. CE QUE J AI FAIT AUJOURD HUI, et qui montre le trou : j ai joue la recette complete a la main avant chaque enregistrement — 104 oracles, self-test de l oracle du noyau, banc de la garde neuve. Rien ne m y obligeait, et la prochaine session peut publier sans le faire. Proposition, a decider :</li><li>un workflow minimal chez le pilot qui rejoue oracles/self-tests.mjs et todo/oracle-todo.mjs a chaque publication — pas la porte de publication, qui coute trois a cinq minutes et lit des tables hors depot</li><li>l ouverture de session LIT le dernier verdict de la CI des depots qui en ont une, et le DECLARE, au lieu de laisser un rouge dormir huit publications. La borne a ecrire : une CI ne remplace pas la recette locale, qui reste jouee avant tout enregistrement — elle attrape ce que le poste ne voit pas, et elle ne voit pas ce qui depend du poste. Fixture double sens : un depot dont la CI est rouge doit etre DECLARE a l ouverture, un depot vert ne doit rien produire</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-10</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 10 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>104 oracles et leur agregateur qui ne s executent que si quelqu un y pense, sur le depot qui porte la doctrine du parc et qui a ete publie six fois dans la journee</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">digit-ai-factory (pilot, verification d un angle remonte par une session voisine)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-candidat" id="item-TF-0966" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0966</code>
@@ -875,6 +898,35 @@ BORNE DECLAREE : l oracle ne juge que la NATURE des fichiers par leur chemin ; i
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>oui — le jour ou la regle est ecrite, un commit couvert par un GO a emporte une modification du noyau non decidee (TF-1010), et rien ne l a nomme avant le push ; la condition qui l aurait arretee existe en prose et nulle part en code</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (action A-4 retenue par l humain le 10/09/2026)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-candidat" id="item-TF-1019" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-1019</code>
+            <span class="statut s-candidat">candidat</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : une decision humaine rendue (&lt;&lt; 11a &gt;&gt;) a recu DEUX FOIS la restitution de la veille rejouee mot pour mot, sans le geste — le push n a ete joue qu apres le second rappel, et aucune restitution ne dit que les deux premieres reponses n ont rien fait</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat en passant du 11/09/2026, en verifiant l execution de la decision humaine D-11 (a) apres que l humain a ecrit, dans une session neuve : &lt;&lt; Dans les precedentes sessions, tu boucles sans traiter D11a comme demande.</p><ul class="puces"><li>&gt;&gt;
+
+CE QUE LA MESURE DIT. Transcription de la session 31d2f3c7 : l humain ecrit &lt;&lt; 11a &gt;&gt; a 09:05:01 puis, sans reponse utile, de nouveau &lt;&lt; 11a &gt;&gt; a 09:07:39. Les deux reponses de fin de tour, a 09:07:31 et 09:09:32, sont la synthese de la veille (20260910g) REJOUEE MOT POUR MOT : 3156 mots chacune, meme titre, meme bloc 3 reposant D-11 a l humain qui vient de la trancher. Le journal des hooks (`.claude/hooks-journal.jsonl`) le confirme : deux entrees &lt;&lt; message portant un VERDICT (3156 mots, sans ecriture) &gt;&gt;, 0 ecriture et 3 commandes chacune, verdict PASS de `oracle-synthese` les deux fois. Le geste commande — `git push` du sha juge — n est joue qu a 09:10:08 (reflog de `origin/main` : &lt;&lt; update by push &gt;&gt;, a72cdd8..a6eaf1f), puis la restitution 20260911a est deposee a 09:23:51 et publiee a 09:31:07. Le resultat final est correct ; ce qui est defectueux, c est le CHEMIN : deux tours de restitution pour zero geste, et l humain qui doit repeter un mot deja rendu.
+
+POURQUOI C EST UN DEFAUT GENERALISE</li><li>La consigne v2.18.0 dit qu un tour qui n apporte rien de neuf rend un accuse bref, et v2.17.0 que ce qui s affiche est le fichier juge : lues ensemble sans le geste, elles produisent exactement ce cas — le fichier juge (la synthese de la veille) est reaffiche tel quel, l oracle le juge PASS puisqu il EST une synthese PASS, et rien ne mesure que le message humain qui precede etait une DECISION attendant un GESTE</li><li>L oracle de restitution juge la forme du message, jamais son rapport au message humain qui le precede : une decision rendue suivie d une restitution qui la repose est invisible pour lui</li><li>La loi 5 du noyau (l IA fait, l humain decide) est violee dans son sens : l humain a decide, et l IA a redemande.
+
+PROPOSITION</li><li>`hook-restitution` lit le dernier message humain : s il a la forme d un selecteur de decision (&lt;&lt; D-N</li><li>&gt;&gt;, &lt;&lt; Nx &gt;&gt;, &lt;&lt; N x &gt;&gt;), la restitution du tour doit porter au bloc 4 une preuve executee liee a cette D-N, et ne peut pas reposer la meme D-N au bloc 3 — sinon FAIL (decision recue, geste absent)</li><li>Un message de fin de tour dont l empreinte de texte est IDENTIQUE a celle du message precedent de la meme session est FAIL d office : rejouer la meme restitution n est jamais un tour</li><li>Fixture rouge/verte a partir de la mesure de reference ci-dessus</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-11</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>oui — deux tours de restitution (2 x 3156 mots) pour zero geste, l humain contraint de repeter une decision deja rendue, puis d ouvrir une troisieme session pour demander pourquoi ; la meme forme (decision rendue, geste absent) n est mesuree par aucun oracle</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant, verification de l execution de D-11 (a) du 11/09/2026)</dd></div>
             
           </dl>
         </article>

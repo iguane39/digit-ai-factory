@@ -1,10 +1,10 @@
 # Récidives et descente — tableau de bord
 
-<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre a7296c80057d · archive 6ce2fe14c2bb · classes fe7bf6d3c1a5 · relevés 78986cb8fda5 · héritage 23d6b9c4bee8. État au 2026-09-10T15:59:47.733Z (ts max des sources, jamais l'horloge). -->
+<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre d56c5cdf055b · archive 6ce2fe14c2bb · classes 01032e127fb1 · relevés 78986cb8fda5 · héritage 23d6b9c4bee8. État au 2026-09-11T07:34:52.871Z (ts max des sources, jamais l'horloge). -->
 
 Ce tableau de bord répond à trois questions que le registre seul ne savait pas poser : est-ce la deuxième fois, chez qui, et depuis combien de temps la correction existe sans être appliquée. Il se lit avec sa contre-métrique : un compteur de récidives qui baisse pendant que le nombre de classes monte est un compteur contourné, pas un progrès.
 
-**Périmètre mesuré** : 1017 item(s) au registre (actifs et archive), 201 portant une classe, 112 marqué(s) récidive ; référentiel de 65 classe(s) en 18 famille(s) (v1.8.0) ; 19 relevé(s) d'héritage.
+**Périmètre mesuré** : 1018 item(s) au registre (actifs et archive), 202 portant une classe, 112 marqué(s) récidive ; référentiel de 66 classe(s) en 18 famille(s) (v1.9.0) ; 19 relevé(s) d'héritage.
 
 ## 1. Récidives par classe
 
@@ -49,6 +49,7 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `champ-transcrit-de-prose-sans-correspondance` | regle-morte | 3 | 1 | 0 | 0 % | — | — |
 | `chemin-de-livrable-au-dela-du-plafond-de-la-plateforme` | emplacement-livrable | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `controle-vrai-sur-le-mauvais-invariant` | regle-morte | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
+| `decision-humaine-rendue-restituee-sans-geste` | restitution-forme | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `deux-regles-du-socle-inconciliables` | page-html-socle | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `emplacement-livrable-hors-convention` | emplacement-livrable | 3 | 0 | 0 | 0 % | — | — |
 | `fixture-jugee-par-son-seul-oracle` | skill-ou-oracle-non-invoque | 7 | 1 | 0 | 0 % | — | — |
@@ -100,6 +101,7 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 | `controle-vrai-sur-le-mauvais-invariant` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `correction-symptome-sans-classe` | 2026-09-02 | forge/retours/GABARIT-LOT-RETOURS.md | 2 produit(s) atteint(s) en 6–7 j ; 12 non atteint(s) (Produit-11, client-a-cockpit-ia, Plateforme_video_IA_complet, Produit-01, Produit-12, Produit-02, Produit-10, Produit-04, COMPTA---Ventillation-de-facture-Fournisseur-A, Produit-64, bav-dev, Produit-61) |
 | `date-de-fichier-menteuse-apres-copie` | — | — | non mesurable : aucune clôture fondatrice au registre |
+| `decision-humaine-rendue-restituee-sans-geste` | — | forge/RESTITUTION.md | non mesurable : aucune clôture fondatrice au registre |
 | `deux-regles-du-socle-inconciliables` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `emplacement-livrable-hors-convention` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `fixture-jugee-par-son-seul-oracle` | 2026-09-06 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
@@ -177,7 +179,7 @@ Comment lire : le nombre de classes créées par semaine ISO, puis les classes s
 | Semaine | Classes créées |
 |---|---|
 | 2026-S36 | 37 |
-| 2026-S37 | 28 |
+| 2026-S37 | 29 |
 
 - Classes sans clôture fondatrice : `emplacement-livrable-hors-convention`, `registre-doublon-non-detecte`, `banc-etend-referentiel-production`, `gate-cout-invite-au-contournement`, `regle-neuve-sans-mesure-de-bruit`, `controle-sans-fixture-double-sens`, `deux-regles-du-socle-inconciliables`, `controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas`, `controle-vrai-sur-le-mauvais-invariant`, `regle-ecrite-sans-oracle-qui-la-joue`
 - Retours entrés sous une classe suspecte : TF-0995 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1003 (controle-vrai-sur-le-mauvais-invariant), TF-1006 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1011 (regle-ecrite-sans-oracle-qui-la-joue), TF-1015 (chemin-de-livrable-au-dela-du-plafond-de-la-plateforme), TF-1016 (journal-de-versions-dormant), TF-1017 (recette-locale-ne-rejoue-pas-l-environnement-de-la-ci)
