@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=27693ec0afd9 archive=6ce2fe14c2bb · dernier événement: 2026-09-11T11:29:41.661Z -->
+     sceaux: actifs=c41e0e6a1571 archive=6ce2fe14c2bb · dernier événement: 2026-09-11T12:12:29.203Z -->
 
-**251 actifs** (candidat 29 · décidé 35 · en cours 12 · corrigé 175 · écarté 0) · **782 archivés**.
+**253 actifs** (candidat 30 · décidé 36 · en cours 12 · corrigé 175 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -226,7 +226,9 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 |---|---|---|---|---|
 | TF-0847 | en_cours | 1 | forge-design : render_page contenu_rogne signale les champs de saisie dont la valeur dépasse la largeur | **oui** — un aller-retour de rendu |
 | TF-1030 | decide | 9 | forge-design / forge-agents : la transparence des contenus generes (AI Act article 50, en vigueur depuis le 2026-08-02) n est portee par aucune regle de marque ni aucun controle sur les livrables publics (M10, verdict O3) | **oui** — oui — obligation reglementaire en vigueur depuis 40 jours a la date de l etude, non portee par l ecosysteme |
-| TF-1023 | candidat | 4.5 | forge-design / forge-agents : la marque Digit-AI est portee par deux chartes contradictoires (pptx : Montserrat/Inter/#2563EB ; page-html : Roboto/DM Sans) et aucun systeme-de-marque Digit-AI n existe | **oui** — oui — deux valeurs de police et de couleur pour la meme marque dans deux skills en service ; aucun artefact de marque source ; precedent B1-B4 de forge-design (TF-0483) : une direction artistique verte a tous les oracles rejetee en bloc |
+| TF-1023 | decide | 4.5 | forge-design / forge-agents : la marque Digit-AI est portee par deux chartes contradictoires (pptx : Montserrat/Inter/#2563EB ; page-html : Roboto/DM Sans) et aucun systeme-de-marque Digit-AI n existe | **oui** — oui — deux valeurs de police et de couleur pour la meme marque dans deux skills en service ; aucun artefact de marque source ; precedent B1-B4 de forge-design (TF-0483) : une direction artistique verte a tous les oracles rejetee en bloc |
+| TF-1034 | candidat | 9 | forge-design : le corpus tokens-digit-ai.tokens.json (mode digit-ai de systeme-de-marque) n est plus la charte du socle — registre << refus >> absent, six fonds pleins de badges absents, aucun jeton de focus, et un theme sombre derive par recalcul alors que le socle porte le sien (S-G1) | **oui** — oui — quatre ecarts mesures entre le corpus << canonique >> et le socle qu il pretend relever ; une page consommant le corpus sortirait sans registre refus ni focus prescrit |
+| TF-1035 | candidat | 6 | forge-design (systeme-de-marque) : deux outils du systeme de marque ne tiennent pas leur propre contrat — generer-tokens-css.mjs ecrit un en-tete fige (<< Source unique : corpus/tokens-digit-ai.tokens.json >>) quelle que soit la source, et generer-design-md.mjs ne resout pas les alias var() que le generateur emet | **oui** — oui — un en-tete faux dans deux fichiers derives du produit, un DESIGN.md genere depuis une feuille intermediaire non contractuelle |
 | TF-0875 | corrige | 12.5 | forge-design : un état saisi ne survit pas à la navigation de la barre basse et rien ne le juge | **oui** — retour humain lot 20260906d, correctif E-076 et parcours navigateur ajouté |
 | TF-0925 | corrige | 12 | digit-ai-forge-design : l'oracle du panneau de tâche doit admettre la page dédiée comme troisième motif de création, sinon l'impasse avec le pan interface se referme depuis l'autre côté | **oui** — une action laissée au développeur et insoldable tant que les deux forges se contredisent |
 | TF-0846 | corrige | 10 | forge-design : la barre basse sticky de la doctrine mobile chevauche le contenu (V4) hors coquille défilante | **oui** — 18 pages FAIL V4 au premier passage 5 bis |

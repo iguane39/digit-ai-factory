@@ -24,6 +24,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `forge-communication-constats-l99-20260911a.tf.jsonl` | fichier | 6,6 Ko | 3 ligne(s) JSONL |
 | `forge-communication-lot-skills-constats-20260911a.tf.jsonl` | fichier | 4,5 Ko | 2 ligne(s) JSONL |
 | `forge-communication-verdict-o3-20260911a.tf.jsonl` | fichier | 13,8 Ko | 8 ligne(s) JSONL |
+| `forge-design-marque-digit-ai-constats-20260911a.tf.jsonl` | fichier | 4,5 Ko | 2 ligne(s) JSONL |
 | `journal-de-versions-dormant-forge-audit-20260910a.tf.jsonl` | fichier | 3,4 Ko | 1 ligne(s) JSONL |
 | `oracle-condition-restitution-seule-20260910a.tf.jsonl` | fichier | 3,5 Ko | 1 ligne(s) JSONL |
 | `porte-publication-faux-positif-20260909a.tf.jsonl` | fichier | 4,5 Ko | 1 ligne(s) JSONL |
@@ -37,4 +38,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `remesurer-plutot-que-croire-20260910a.tf.jsonl` | fichier | 4,9 Ko | 1 ligne(s) JSONL |
 | `revue-classes-20260903a.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
 
-_19 fichier(s), 1 sous-dossier(s)_
+_20 fichier(s), 1 sous-dossier(s)_
