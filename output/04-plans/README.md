@@ -28,6 +28,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Boucle - 17 restants du registre - 20260818a.md` | fichier | 13,1 Ko | Digit-AI — Synthèse de boucle : les 17 restants du registre — 20260818a |
 | `Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md` | fichier | 3,6 Ko | Synthèse de campagne — 4e mandat global « ok, fais tout » |
 | `Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md` | fichier | 3,7 Ko | Synthèse de diagnostic — pourquoi aucun avancement toutes les 3 minutes (TF-0252) |
+| `Digit-AI - Synthese L99 - Forge communication marketing prompt reecrit trois candidatures - 20260911f.md` | fichier | 19,9 Ko | Synthèse L99 — le prompt « forge communication & marketing » est réécrit et jugé, trois co |
 | `Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md` | fichier | 15,3 Ko | Synthèse de mandat — actions 31, 32 et 33 achevées : la forge de développement est publiée |
 | `Digit-AI - Synthese Mandat - Actions 36 a 40 achevees - 20260905k.md` | fichier | 23,3 Ko | Synthèse de mandat — actions 36 à 40 achevées : deux lots instruits et publiés, les branch |
 | `Digit-AI - Synthese Mandat - Amelioration continue pas 0 a 4 - 20260903b.md` | fichier | 19,1 Ko | Synthèse de mandat — amélioration continue, du pas 0 au pas 4 (03/09/2026, après validatio |
@@ -44,6 +45,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Canal confidentiel et actions 58 60 61 62 63 - 20260907m.md` | fichier | 25,4 Ko | Synthèse de mandat — le canal confidentiel existe et les tables y vivent, la forge des out |
 | `Digit-AI - Synthese Mandat - D-11 a etait executee a 09h10 boucle mesuree et deposee - 20260911b.md` | fichier | 21,7 Ko | Synthèse de mandat — D-11 (a) était déjà exécutée à 09:10 ; ce qui bouclait, c'est la rest |
 | `Digit-AI - Synthese Mandat - D-12 a executee regle etendue registre publie - 20260911c.md` | fichier | 14,9 Ko | Synthèse de mandat — D-12 (a) exécutée : la règle de publication couvre désormais les cand |
+| `Digit-AI - Synthese Mandat - D-13 a executee pilot et forge publies CI lue - 20260911e.md` | fichier | 13,4 Ko | Synthèse de mandat — D-13 (a) exécutée : le pilot et la forge d'audit sont publiés et véri |
 | `Digit-AI - Synthese Mandat - Decision 31a la porte connait le canal - 20260908a.md` | fichier | 14,6 Ko | Synthèse de mandat — décision 31 (a) exécutée : la porte de publication trouve seule les t |
 | `Digit-AI - Synthese Mandat - Decision 5a et TF-0793 clos - 20260903f.md` | fichier | 13,8 Ko | Synthèse de mandat — décision 5a appliquée et premier chantier du pilot clos (03/09/2026) |
 | `Digit-AI - Synthese Mandat - Decision 5a jetons digit-ai-schemas - 20260904a.md` | fichier | 19,7 Ko | Synthèse — décision 5a du 04/09/2026 : le skill de schémas émet des jetons |
@@ -127,4 +129,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 | `Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte au vert - 20260910a.md` | fichier | 20,0 Ko | Synthèse de mandat — vos deux décisions sont exécutées, la copie locale est reconstruite,  |
 
-_110 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_112 fichier(s), 0 sous-dossier(s)_

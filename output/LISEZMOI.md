@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 259 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 261 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -192,6 +192,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260907-etude-opportunite-mission-data-silver-gold-powerbi.md | — | 43.4 Ko | `03-etudes/20260907-etude-opportunite-mission-data-silver-gold-powerbi.md` |
 | 20260907-L99-mission-data-silver-gold-powerbi.md | — | 47.5 Ko | `03-etudes/20260907-L99-mission-data-silver-gold-powerbi.md` |
 | 20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md | — | 10.9 Ko | `03-etudes/20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md` |
+| 20260911-L99-forge-communication-marketing.md | — | 52.4 Ko | `03-etudes/20260911-L99-forge-communication-marketing.md` |
 
 ### 04-plans
 
@@ -215,6 +216,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Campagne - Quatrieme mandat global - 20260815a.md.jugement.json` |
 | Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md | 20260815a | 3.8 Ko | `04-plans/Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md` |
 | Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md.jugement.json` |
+| Digit-AI - Synthese L99 - Forge communication marketing prompt reecrit trois candidatures - 20260911f.md | 20260911f | 19.9 Ko | `04-plans/Digit-AI - Synthese L99 - Forge communication marketing prompt reecrit trois candidatures - 20260911f.md` |
 | Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md | 20260905i | 15.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md` |
 | Digit-AI - Synthese Mandat - Actions 36 a 40 achevees - 20260905k.md | 20260905k | 23.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Actions 36 a 40 achevees - 20260905k.md` |
 | Digit-AI - Synthese Mandat - Amelioration continue pas 0 a 4 - 20260903b.md | 20260903b | 19.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Amelioration continue pas 0 a 4 - 20260903b.md` |
@@ -233,7 +235,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Canal confidentiel et actions 58 60 61 62 63 - 20260907m.md | 20260907m | 25.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Canal confidentiel et actions 58 60 61 62 63 - 20260907m.md` |
 | Digit-AI - Synthese Mandat - D-11 a etait executee a 09h10 boucle mesuree et deposee - 20260911b.md | 20260911b | 21.7 Ko | `04-plans/Digit-AI - Synthese Mandat - D-11 a etait executee a 09h10 boucle mesuree et deposee - 20260911b.md` |
 | Digit-AI - Synthese Mandat - D-12 a executee regle etendue registre publie - 20260911c.md | 20260911c | 14.9 Ko | `04-plans/Digit-AI - Synthese Mandat - D-12 a executee regle etendue registre publie - 20260911c.md` |
-| Digit-AI - Synthese Mandat - D-13 a executee pilot et forge publies CI lue - 20260911e.md | 20260911e | 13.3 Ko | `04-plans/Digit-AI - Synthese Mandat - D-13 a executee pilot et forge publies CI lue - 20260911e.md` |
+| Digit-AI - Synthese Mandat - D-13 a executee pilot et forge publies CI lue - 20260911e.md | 20260911e | 13.4 Ko | `04-plans/Digit-AI - Synthese Mandat - D-13 a executee pilot et forge publies CI lue - 20260911e.md` |
 | Digit-AI - Synthese Mandat - Decision 31a la porte connait le canal - 20260908a.md | 20260908a | 14.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Decision 31a la porte connait le canal - 20260908a.md` |
 | Digit-AI - Synthese Mandat - Decision 5a et TF-0793 clos - 20260903f.md | 20260903f | 13.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Decision 5a et TF-0793 clos - 20260903f.md` |
 | Digit-AI - Synthese Mandat - Decision 5a jetons digit-ai-schemas - 20260904a.md | 20260904a | 19.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Decision 5a jetons digit-ai-schemas - 20260904a.md` |
