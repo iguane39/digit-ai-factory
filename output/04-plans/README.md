@@ -48,7 +48,8 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - D-11 a etait executee a 09h10 boucle mesuree et deposee - 20260911b.md` | fichier | 21,7 Ko | Synthèse de mandat — D-11 (a) était déjà exécutée à 09:10 ; ce qui bouclait, c'est la rest |
 | `Digit-AI - Synthese Mandat - D-12 a executee regle etendue registre publie - 20260911c.md` | fichier | 14,9 Ko | Synthèse de mandat — D-12 (a) exécutée : la règle de publication couvre désormais les cand |
 | `Digit-AI - Synthese Mandat - D-13 a executee pilot et forge publies CI lue - 20260911e.md` | fichier | 13,4 Ko | Synthèse de mandat — D-13 (a) exécutée : le pilot et la forge d'audit sont publiés et véri |
-| `Digit-AI - Synthese Mandat - D-3 a executee spec digit-ai-marketing RUN-AO lots lances - 20260911h.md` | fichier | 26,3 Ko | Synthèse de mandat — D-3 (a) est exécutée : les huit candidatures sont décidées, les quatr |
+| `Digit-AI - Synthese Mandat - D-3 a executee spec digit-ai-marketing RUN-AO lots lances - 20260911h.md` | fichier | 25,8 Ko | Synthèse de mandat — D-3 (a) est exécutée : les huit candidatures sont décidées, les quatr |
+| `Digit-AI - Synthese Mandat - D-4 executee marque a deux supports produit en naissance - 20260911i.md` | fichier | 22,5 Ko | Synthèse de mandat — D-4 est exécutée : le système de marque Digit-AI existe à deux suppor |
 | `Digit-AI - Synthese Mandat - Decision 31a la porte connait le canal - 20260908a.md` | fichier | 14,6 Ko | Synthèse de mandat — décision 31 (a) exécutée : la porte de publication trouve seule les t |
 | `Digit-AI - Synthese Mandat - Decision 5a et TF-0793 clos - 20260903f.md` | fichier | 13,8 Ko | Synthèse de mandat — décision 5a appliquée et premier chantier du pilot clos (03/09/2026) |
 | `Digit-AI - Synthese Mandat - Decision 5a jetons digit-ai-schemas - 20260904a.md` | fichier | 19,7 Ko | Synthèse — décision 5a du 04/09/2026 : le skill de schémas émet des jetons |
@@ -132,4 +133,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 | `Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte au vert - 20260910a.md` | fichier | 20,0 Ko | Synthèse de mandat — vos deux décisions sont exécutées, la copie locale est reconstruite,  |
 
-_115 fichier(s), 0 sous-dossier(s)_
+_116 fichier(s), 0 sous-dossier(s)_
