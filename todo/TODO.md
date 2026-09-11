@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=4c7804a42562 archive=6ce2fe14c2bb · dernier événement: 2026-09-11T14:12:35.888Z -->
+     sceaux: actifs=b81cb29f24be archive=6ce2fe14c2bb · dernier événement: 2026-09-11T14:40:30.149Z -->
 
-**282 actifs** (candidat 59 · décidé 36 · en cours 12 · corrigé 175 · écarté 0) · **782 archivés**.
+**283 actifs** (candidat 60 · décidé 36 · en cours 12 · corrigé 175 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -216,6 +216,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-0971 | decide | 6.3 | forge-data : aucun oracle ni outil ne mesure l'USAGE REEL d'un modele de restitution — la couverture se mesure contre le MODELE, jamais contre ce qui est a l'ECRAN | **oui** — quatre outils ecrits chez le producteur ; une dette annoncee a 38 colonnes dont 18 sont inutiles au rapport |
 | TF-0975 | decide | 1 | forge-data : aucun oracle ne rapproche un modele de restitution d'un EXTRAIT du rapport livre par le client - la seule preuve EXTERNE qu'une reconstruction visera juste | **oui** — trois scripts et une recette de 18 controles ecrits chez le producteur pour un rapprochement que ni oracle-couvrir ni oracle-reconcilier ne prononce ; 60/60 au meme rang, 6 colonnes hors extrait motivees, 28 colonnes de l'extrait sans equivalent au modele |
 | TF-0976 | decide | 1 | forge-data : un export Power BI porte un pied de page Filtres appliques qui entre dans les donnees, et c'est en meme temps la SEULE trace de ce que l'extrait ne contient pas | **oui** — 21 559 lignes comptees au premier jet contre 21 557 reelles sur les trois feuilles ; une modalite fantome de Period ; la portee filtree de l'extrait (periode unique 202606, pays non vide, GLA non nulle en gestion loc) n'etait lisible que dans la ligne que la lecture naive traite en donnee |
+| TF-1065 | candidat | 20 | forge-data : fastparquet, seul moteur Parquet disponible sous controle d'application, ecrit des horodatages en NANOSECONDES que Databricks refuse a la lecture — et la recette d'export ne le voit pas, parce qu'elle relit avec le moteur qui a ecrit | **oui** — un chargement de 218 Mo prepare, televerse et lance avant que le defaut n'apparaisse ; reextraction complete des 27 tables et second televersement pour le corriger ; la recette d'export rendait PASS sur six controles au moment ou le fichier etait deja illisible pour sa destination |
 | TF-1044 | candidat | 10 | forge-data : la correction TF-0936 garde << grain >> dans un registre machine (commentaires DDL, messages d'oracles) plus large que ce que le destinataire tolere, et R8 ne la joue qu'en avertissement sur les seuls rapports — le mot est revenu deux jours plus tard dans un DDL, un mapping et un chargement | **oui** — un second retour humain sur un mot deja corrige et clos (seq 99) ; trois livrables du produit reedites sous de nouveaux indices le 2026-09-10 ; un controle de vocabulaire ecrit chez le produit faute d'oracle de la forge jouable sur un DDL |
 | TF-0893 | corrige | 10 | digit-ai-forge-data : traduire-unity-catalog ne lit que l'export des system tables — sur un workspace réel system.access est refusé (SQLSTATE 42501) alors que l'API REST lineage-tracking répond | **oui** — lineage de 30 tables transcrit à la main depuis des réponses d'API |
 | TF-0936 | corrige | 10 | digit-ai-forge-data : le vocabulaire dit « grain » (modele-dimensionnel@1, oracle-modeliser, gabarits, commentaires DDL) ; le destinataire lit « granularité » | **oui** — un retour humain ; 33 substitutions et une table d'accords |
