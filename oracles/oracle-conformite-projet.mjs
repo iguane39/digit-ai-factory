@@ -322,7 +322,37 @@ for (const [dossier, parCle] of indicesParDossier) {
       "deux livrables qui le partagent ne s'ordonnent pas (TF-0750) ; réindexer le plus récent (`scripts\\allouer-indice.mjs`)");
   }
 }
-if (r4) ok("R-4", "output/, docs/", "livrables au nommage daté, indices uniques par jour et par dossier (ou aucun livrable)");
+// R-4 · PLAFOND DE LONGUEUR DU CHEMIN (TF-1015, décidé le 11/09/2026 — alinéa de la règle 4).
+//
+// LE FAIT DU 10/09 : un clone de vérification (`git clone --single-branch`) posé dans un bac à
+// sable au préfixe d'environ 130 caractères a rendu « Filename too long » sur 22 fichiers — 19
+// sidecars d'oracle sous `.oracles\output\04-plans\` et 3 synthèses —, puis « Clone succeeded,
+// but checkout failed » : le dépôt est arrivé SANS arbre de travail, et la vérification que la
+// doctrine prescrit avant tout push n'a pas pu se jouer.
+//
+// R-4 jugeait la FORME du nom et jamais sa LONGUEUR — un nom parfaitement conforme suffit à
+// rendre le dépôt inclonable. L'arithmétique : le plus long chemin suivi faisait 146 caractères,
+// le sidecar d'oracle en ajoute 26 (`.oracles\` en tête, `.oracles-historique.jsonl` en queue), et
+// sous MAX_PATH = 260 sans `core.longpaths` il ne restait que 260 − 146 − 1 = 113 caractères de
+// préfixe. D'où la borne : chemin relatif + 26 ≤ 150, qui laisse 110 caractères de préfixe.
+//
+// Ici, ce sont les fichiers RÉELS du disque qui sont mesurés — symétrique de S42 dans
+// `oracle-synthese`, qui mesure les chemins CITÉS et le fichier jugé. Les sidecars eux-mêmes ne
+// sont pas parcourus : ils sont comptés par les 26 caractères ajoutés à leur livrable.
+const SIDECAR_ORACLE = 26, PLAFOND_CHEMIN = 150;
+for (const f of fichiers(p("output"))) {
+  const r = rel(f);
+  if (/(^|\/)\.oracles\//.test(r)) continue;      // comptés dans les 26 caractères de leur livrable
+  if (estExcluDuDepot(r)) continue;               // TF-0853 : jamais versionné = jamais cloné
+  if (r.length + SIDECAR_ORACLE <= PLAFOND_CHEMIN) continue;
+  r4 = false;
+  ko("R-4", r, `chemin de ${r.length} caractères, soit ${r.length + SIDECAR_ORACLE} avec les ${SIDECAR_ORACLE} du sidecar d'oracle — ` +
+    `${r.length + SIDECAR_ORACLE - PLAFOND_CHEMIN} au-dessus du plafond de ${PLAFOND_CHEMIN} (R-4, alinéa TF-1015 du 11/09/2026). ` +
+    `Préfixe de clone admissible qui en résulte : ${260 - r.length - 27} caractères — sous MAX_PATH = 260 sans \`core.longpaths\`, ` +
+    "le checkout d'un clone de vérification échoue sur ce fichier (10/09/2026 : 22 fichiers refusés, dépôt sans arbre de travail). " +
+    "Raccourcir l'<Objet> du nom, la forme du nommage étant tenue par ailleurs");
+}
+if (r4) ok("R-4", "output/, docs/", `livrables au nommage daté, indices uniques par jour et par dossier, chemins sous le plafond de ${PLAFOND_CHEMIN} caractères sidecar compris (ou aucun livrable)`);
 
 // R-25 — le <Type> de tout livrable daté figure au registre des types (D-04 organization,
 // encodé le 11/08 TF-0084). Le type est le premier mot du 2e segment ; comparaison

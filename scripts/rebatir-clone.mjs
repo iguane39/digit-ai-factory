@@ -56,7 +56,11 @@ const sortir = (code, message) => { R.message = message; process.stdout.write(JS
 
 if (!depotArg) sortir(2, "usage : node scripts/rebatir-clone.mjs <chemin-dépôt> [--sauvegardes <dossier>] [--essai] [--json-only]");
 const depot = R.depot;
-const git = (...a) => spawnSync("git", a, { cwd: depot, encoding: "utf8" });
+// core.longpaths : ce script n'appelle aucun `git clone` (il RÉALIGNE un clone existant), mais
+// `reset --hard` et `am --3way` réécrivent l'arbre de travail — sous MAX_PATH = 260, un chemin
+// long y échoue exactement comme au checkout d'un clone frais (TF-1015, 10/09/2026 : 22 fichiers
+// refusés, dépôt sans arbre de travail). L'option est donc portée par TOUS les appels git d'ici.
+const git = (...a) => spawnSync("git", ["-c", "core.longpaths=true", ...a], { cwd: depot, encoding: "utf8" });
 const ok = (r) => r.status === 0;
 if (!existsSync(join(depot, ".git"))) sortir(2, `${depot} n'est pas un dépôt git`);
 if (!ok(git("remote", "get-url", "origin"))) sortir(2, "aucun remote `origin` — rien à rebâtir dessus");

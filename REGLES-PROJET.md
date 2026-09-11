@@ -39,6 +39,22 @@ Comment un fichier s'appelle, et **ce que son nom promet**. Chaque ligne porte s
 | 5 | L'indice est une lettre (a, b, c…) par itération du même jour ; une nouvelle version = un **nouveau fichier daté**, jamais d'écrasement — **CÂBLÉE depuis le 23/08** : `node scripts\verifier-jugement.mjs <dossier>` compare l'empreinte d'un livrable à celle de son sceau, et refuse une modification à indice inchangé (TF-0523) | observée (`20260721b` → `20260721d`, `revue.md`/`revue-v2`), **et reproduite le 23/08 : le même fichier écrasé quatre fois, une heure après avoir signalé le même défaut ailleurs** | livrables uniquement | S+O | faible | **défaut** |
 | 25 | Le `<Type>` du nom de tout livrable daté (2ᵉ segment, 1ᵉʳ mot) **figure au registre des types** (`registre-types.json` d'organization, comparaison insensible casse/accents) — un type nouveau s'ajoute au registre dans un commit motivé (D-04), jamais improvisé dans un nom. Registre lu en dépôt frère ; poste non équipé → non jugeable, pas FAIL | **D-04 organization (décidée 08/08), encodée 11/08 (TF-0084)** — registre 1.1.0, 29 types, complété sur usage réel | produits, nouveaux + rattrapage | O | nul | **défaut** |
 
+**Alinéa LONGUEUR DE CHEMIN (D-11/D-12 exécutées, décision TF-1015 du 11/09/2026).** La règle 4
+fixe la FORME du nom et rien n'y bornait sa LONGUEUR. Désormais : le chemin **relatif** (depuis la
+racine du dépôt) d'un livrable **cité ou déposé sous `output\`**, augmenté des **26 caractères du
+sidecar d'oracle** (`.oracles\` en tête, `.oracles-historique.jsonl` en queue), ne dépasse pas
+**150 caractères**. Pourquoi : sous `MAX_PATH` = 260 sans `core.longpaths`, un chemin suivi de 146
+caractères ne laisse que **113 caractères** de préfixe de clone, et le 10/09/2026 un clone de
+vérification a refusé 22 fichiers au checkout — dépôt sans arbre de travail, vérification avant
+push impossible. Et le défaut ne se voit pas chez celui qui ÉCRIT (dépôt à `c:\dev\…`, préfixe
+court) : il ne se voit que chez celui qui **vérifie**. Câblé, jamais seulement écrit :
+`oracle-synthese` règle **S42** (fichier jugé + chemins cités, fixture à double sens 150/151),
+`oracle-conformite-projet` règle **4** (fichiers réels d'`output\`), et
+`git clone -c core.longpaths=true` déclaré partout où l'on clone (`bootstrap.mjs`,
+`references\TODO-FORGE.md`).
+Les fichiers antérieurs au-dessus de la borne ne sont pas renommés : ils sont **nommés** par
+l'oracle, un renommage cassant les liens déjà restitués.
+
 **Alinéa paramétrage (TF-0322, décidé le 17/08 — étude 20260817f, verdict O1 : refus
 instruit d'un système de paramètres).** Trois classes de conventions ne se négocient pas,
 chacune pour un motif mesuré : les **identifiants stables** (ids TF, ids de schéma §3 bis —
@@ -583,6 +599,11 @@ exactement le défaut**. Étude : `output\03-etudes\20260817-etude-opportunite-p
    client) est couvert par la porte. Le 10/09 et le 11/09, chaque constat en passant
    a coûté une décision de publication (D-11, D-12) sans qu'aucun risque nouveau ne
    soit couvert — la même forme que le paragraphe 4 corrigeait pour les restitutions.
+   *Outillage (11/09, action A-2)* : `scripts\verifier-avance-publication.mjs` classe
+   chaque enregistrement en avance sur l'origine (`restitution` · `candidature` ·
+   `explicite`) et rend FAIL dès qu'un enregistrement `explicite` est présent, sauf GO
+   déclaré (`--go "<motif>"`) ; le hook `pre-push` du pilot le joue avant la porte des
+   noms, le GO se déclare par `FORGE_PUSH_GO="D-N (x) du JJ/MM"`.
 
 **Appelants (R-35)** : le garde-fou du noyau (`CLAUDE.md` §Garde-fous) et
 `gabarits\CLAUDE-PRODUIT.md` §Conventions (toute session produit le charge) ; la FORME

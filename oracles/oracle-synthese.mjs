@@ -81,6 +81,10 @@
  *       forme RÉSERVÉE à `output\03-etudes\` — partout ailleurs R-4 s'applique (08/09, TF-0923) ;
  *   S41 une décision portant un mot que la DOCTRINE du projet régit cite cette doctrine en source :
  *       une source qui n'est pas celle qui tranche est une opinion sourcée (08/09, TF-0923) ;
+ *   S42 le chemin RELATIF du fichier jugé, et de chaque chemin de livrable cité sous `output\`,
+ *       augmenté des 26 caractères du sidecar d'oracle, tient sous 150 caractères (11/09, TF-1015) —
+ *       R-4 juge la FORME du nom et jamais sa LONGUEUR : un nom conforme peut rendre le dépôt
+ *       inclonable sur un chemin profond, et le défaut ne se voit que chez celui qui VÉRIFIE ;
  *       et né du même retour : « le 3 était pour les prochaines actions ». Deux familles
  *       numérotées pareil ne se désignent pas ; le sélecteur nomme la sienne.
  *   S31 chaque OPTION du bloc 3 porte son COÛT et CE QU'ELLE EXCLUT (30/08) — exigence écrite
@@ -102,7 +106,7 @@
 // son remede sont alors NOMMES. Un oracle qui ne distingue pas les deux fait passer une panne
 // d'environnement pour un defaut du produit (TF-0648).
 import { existsSync, readFileSync, writeFileSync, mkdtempSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -360,7 +364,11 @@ function bloc(texte, motif) {
   return texte.slice(debut, suivant === -1 ? undefined : debut + suivant);
 }
 
-function juger(texte) {
+// `cheminJuge` — le chemin du fichier passé en argument, quand il y en a un. S42 (TF-1015) juge
+// la LONGUEUR d'un chemin, donc elle a besoin du chemin ; toutes les autres règles ne lisent que
+// le texte et ne le voient jamais. Facultatif : `juger(texte)` reste valide, S42 ne mesure alors
+// que les chemins CITÉS.
+function juger(texte, cheminJuge = null) {
   const findings = [];
   const ok = (regle, message) => findings.push({ regle, statut: "PASS", message });
   const ko = (regle, message) => findings.push({ regle, statut: "FAIL", message });
@@ -1565,6 +1573,59 @@ function juger(texte) {
     fautifs.length
       ? ko("S40", `${fautifs.length} chemin(s) de livrable cité(s) portent le préfixe daté « AAAAMMJJ-… » hors de \`output\\03-etudes\\\` — cette forme est RÉSERVÉE aux études (gabarits\\ETUDE-OPPORTUNITE.md) ; partout ailleurs sous \`output\\\`, R-4 impose « <Marque> - <Objet> - AAAAMMJJ<indice>.<ext> » : ${fautifs.slice(0, 2).join(", ")}`)
       : ok("S40", cites.length ? `${cites.length} chemin(s) de livrable cité(s) sous \`output\\\`, aucun n'emprunte la forme réservée aux études` : "aucun chemin de livrable d'`output\\` cité");
+
+    // ---- S42 (11/09/2026, TF-1015) — UN NOM CONFORME PEUT RENDRE LE DÉPÔT INCLONABLE --------
+    //
+    // LE FAIT, MESURÉ LE 10/09. Un clone de vérification (`git clone --single-branch`) posé dans
+    // un bac à sable dont le préfixe faisait ~130 caractères a rendu « Filename too long » sur 22
+    // fichiers — 19 sidecars d'oracle sous `.oracles\output\04-plans\` et 3 synthèses — puis
+    // « Clone succeeded, but checkout failed » : le dépôt est arrivé SANS arbre de travail, et la
+    // vérification que la doctrine prescrit avant tout push n'a pas pu se jouer.
+    //
+    // POURQUOI R-4 NE LE VOIT PAS : elle fixe la FORME du nom (« <Marque> - <Objet> -
+    // AAAAMMJJ<indice>.<ext> ») et rien n'y borne sa LONGUEUR. Un nom parfaitement conforme, assez
+    // descriptif pour se lire, suffit. L'arithmétique : le plus long chemin SUIVI du dépôt faisait
+    // 146 caractères, le sidecar d'oracle en ajoute 26 (`.oracles\` en tête, `.oracles-historique
+    // .jsonl` en queue), et sous MAX_PATH = 260 sans `core.longpaths` il ne restait que
+    // 260 − 146 − 1 = 113 caractères de préfixe admissible. D'où le plafond : chemin relatif + 26
+    // ≤ 150, qui laisse 110 caractères de préfixe — la marge que le bac à sable d'une session
+    // consomme couramment.
+    //
+    // ET C'EST UN DÉFAUT QUI NE SE VOIT PAS CHEZ CELUI QUI L'ÉCRIT : sur le poste de travail, le
+    // dépôt vit à `c:\dev\…`, préfixe court, tout passe. Il n'apparaît qu'au premier clone profond,
+    // c'est-à-dire chez celui qui VÉRIFIE — la place exacte où un défaut coûte le plus cher.
+    //
+    // La règle juge DEUX choses avec la même borne : le fichier jugé lui-même (une synthèse est un
+    // livrable d'`output\`, elle se déposera là et son sidecar avec) et chaque chemin d'`output\`
+    // CITÉ — même extraction que S40, la restitution nomme ce qu'elle dépose. Le remède, lui, est
+    // écrit ailleurs : `git clone -c core.longpaths=true` sur un préfixe court.
+    const SIDECAR = 26, PLAFOND = 150;
+    const RACINE = dirname(dirname(fileURLToPath(import.meta.url)));
+    // Hors du dépôt (fixture en dossier temporaire), le chemin relatif n'a pas de sens : on juge
+    // alors le NOM, qui est ce qui voyagera quand le fichier sera déposé sous `output\`.
+    const relatifDepuisRacine = (f) => {
+      const r = relative(RACINE, resolve(f));
+      return !r || r.startsWith("..") ? basename(resolve(f)) : r.replaceAll("\\", "/");
+    };
+    const mesures = new Map();
+    if (cheminJuge) mesures.set(relatifDepuisRacine(cheminJuge), true);
+    for (const c of cites) {
+      const norme = c.trim().replaceAll("\\", "/").replace(/^.*?(?=output\/)/i, "");
+      if (norme) mesures.set(norme, true);
+    }
+    const chemins = [...mesures.keys()];
+    const trop = chemins.filter((c) => c.length + SIDECAR > PLAFOND).sort((a, b) => b.length - a.length);
+    if (trop.length) {
+      ko("S42", `${trop.length} chemin(s) dépassent le plafond de longueur (chemin relatif + ${SIDECAR} de sidecar d'oracle ≤ ${PLAFOND}, R-4 alinéa TF-1015) — ` +
+        trop.slice(0, 3).map((c) => `« ${c} » : ${c.length} caractères, soit ${c.length + SIDECAR} avec son sidecar, ` +
+          `${c.length + SIDECAR - PLAFOND} de trop ; préfixe de clone admissible ${260 - c.length - 27} caractères`).join(" · ") +
+        " — sous MAX_PATH = 260 sans `core.longpaths`, le checkout d'un clone de vérification échoue sur ces fichiers (10/09/2026 : 22 fichiers refusés, dépôt sans arbre de travail). Raccourcir l'<Objet> du nom, la forme R-4 étant tenue par ailleurs");
+    } else {
+      const plusLong = chemins.reduce((m, c) => Math.max(m, c.length), 0);
+      ok("S42", chemins.length
+        ? `S42 PASS : ${chemins.length} chemin(s), le plus long fait ${plusLong} caractères (+${SIDECAR} de sidecar ≤ ${PLAFOND})`
+        : "aucun chemin à mesurer — ni fichier jugé nommé, ni chemin d'`output\\` cité");
+    }
   }
 
   // ---- S30 (28/08/2026) — UNE DÉCISION SE SÉLECTIONNE, DONC ELLE PORTE UN NUMÉRO ------------
@@ -1993,6 +2054,21 @@ Aucun écart : la demande a été suivie à la lettre.
   const rechercheNom = verte.replace("## 7. Risques", "## 7. Risques" + nl + nl
     + "- Aucune table de transcodification dans le catalogue : les motifs de nom joués sur les trois schémas ne remontent rien." + nl);
   writeFileSync(join(dir, "recherche-nom.md"), rechercheNom, "utf8");
+  // 11/09 — S42 DANS SES DEUX SENS (TF-1015). La paire ne varie QUE d'UN caractère : le même
+  // chemin, au même dossier, à la même forme R-4, long de 124 puis de 125 caractères. Avec les 26
+  // caractères du sidecar d'oracle, le premier fait exactement 150 — le plafond, tenu — et le
+  // second 151. C'est la seule forme qui prouve que la règle juge la LONGUEUR et rien d'autre :
+  // sans le sens vert, elle pourrait accuser tout chemin cité et personne ne le verrait.
+  const cheminDeLongueur = (n) => {
+    const tete = "output\\04-plans\\Digit-AI - Synthese Mandat - ";
+    const queue = " - 20260911a.md";
+    return tete + "x".repeat(n - tete.length - queue.length) + queue;
+  };
+  const PUCE_CHEMIN = (n) => "- Livrable déposé — preuve : `" + cheminDeLongueur(n) + "`, oracle-conformite-projet PASS.";
+  const cheminPile = verte.replace("## 5. Non traité", PUCE_CHEMIN(124) + nl + nl + "## 5. Non traité");
+  const cheminTropLong = verte.replace("## 5. Non traité", PUCE_CHEMIN(125) + nl + nl + "## 5. Non traité");
+  writeFileSync(join(dir, "chemin-pile-150.md"), cheminPile, "utf8");
+  writeFileSync(join(dir, "chemin-151.md"), cheminTropLong, "utf8");
 
   const moi = fileURLToPath(import.meta.url);
   const rv = spawnSync(process.execPath, [moi, join(dir, "verte.md")], { encoding: "utf8" });
@@ -2187,9 +2263,22 @@ Aucun écart : la demande a été suivie à la lettre.
       "ouvert le bon texte : " + (/"S41"[\s\S]{0,180}/.exec(rsdoc.stdout) || [""])[0].replace(/\s+/g, " "));
   if (!/"S40"[^}]*PASS/.test(rv.stdout) || !/"S41"[^}]*PASS/.test(rv.stdout))
     casse.push("S40 ou S41 accuse la fixture VERTE, qui ne cite ni chemin en forme d'étude ni décision régie : la règle crie sur un travail juste");
+  // 11/09 — S42 DANS SES DEUX SENS (TF-1015), à UN caractère près.
+  if (cheminDeLongueur(124).length !== 124 || cheminDeLongueur(125).length !== 125)
+    casse.push("fixture S42 : les chemins construits ne font pas 124 et 125 caractères — la paire ne prouve plus la borne");
+  const rcp = spawnSync(process.execPath, [moi, join(dir, "chemin-pile-150.md")], { encoding: "utf8" });
+  const rc151 = spawnSync(process.execPath, [moi, join(dir, "chemin-151.md")], { encoding: "utf8" });
+  if (!/"S42"[^}]*FAIL/.test(rc151.stdout))
+    casse.push("S42 : un chemin de livrable cité qui fait 151 caractères avec son sidecar d'oracle passe — c'est celui-là qui " +
+      "a fait échouer le checkout d'un clone de vérification le 10/09 (22 fichiers refusés, dépôt sans arbre de travail)");
+  if (!/"S42"[^}]*PASS/.test(rcp.stdout))
+    casse.push("S42 : le MÊME chemin à UN caractère de moins — exactement 150 avec son sidecar, donc le plafond TENU — est accusé : " +
+      "la règle mord sur un nom conforme : " + (/"S42"[\s\S]{0,180}/.exec(rcp.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S42"[^}]*PASS/.test(rv.stdout))
+    casse.push("S42 accuse la fixture VERTE, qui ne cite aucun chemin long : la règle crie sur un travail juste");
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 18/18 PASS (verte PASS ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime))");
+    : "Self-test restitution : 19/19 PASS (verte PASS ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail))");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -2197,7 +2286,7 @@ if (!arg || !existsSync(arg)) {
   console.log(JSON.stringify({ oracle: "oracle-synthese", verdict: "ERREUR", message: "synthèse introuvable — usage : node oracle-synthese.mjs <synthese.md> | --self-test" }));
   process.exit(2);
 }
-const findings = juger(readFileSync(arg, "utf8"));
+const findings = juger(readFileSync(arg, "utf8"), arg);   // le chemin : S42 juge sa longueur (TF-1015)
 const verdict = verdictDe(findings);
 console.log(JSON.stringify({
   oracle: "oracle-synthese",

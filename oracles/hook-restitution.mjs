@@ -39,21 +39,24 @@ function lireStdin() {
   try { return JSON.parse(readFileSync(0, "utf8") || "{}"); } catch { return {}; }
 }
 
-export function analyserTranscript(texte) {
-  const entrees = texte.split(/\r?\n/).filter((l) => l.trim()).map((l) => { try { return JSON.parse(l); } catch { return null; } })
-    .filter((e) => e && !e.isSidechain);
-  const contenu = (e) => { const c = e.message?.content; return Array.isArray(c) ? c : typeof c === "string" ? [{ type: "text", text: c }] : []; };
-  const estHumain = (e) => e.type === "user" && !e.isMeta && contenu(e).some((b) => b.type === "text") && !contenu(e).some((b) => b.type === "tool_result");
-  let debut = -1;
-  for (let i = entrees.length - 1; i >= 0; i--) if (estHumain(entrees[i])) { debut = i; break; }
-  const tour = entrees.slice(debut + 1);
+const contenuDe = (e) => { const c = e.message?.content; return Array.isArray(c) ? c : typeof c === "string" ? [{ type: "text", text: c }] : []; };
+const estHumain = (e) => e.type === "user" && !e.isMeta && contenuDe(e).some((b) => b.type === "text") && !contenuDe(e).some((b) => b.type === "tool_result");
+const texteDe = (e) => contenuDe(e).filter((b) => b.type === "text").map((b) => b.text).join("\n").trim();
+
+// Un SEGMENT est ce qui suit un message humain — un tour. `mesurerSegment` en rend l'effort
+// (écritures, commandes), les fichiers .md déposés et le texte FINAL. Il est appelé DEUX fois par
+// `analyserTranscript` : sur le tour courant, et sur celui d'AVANT. TF-1019 (11/09/2026) a montré
+// qu'un message final ne se juge pas seulement en lui-même, mais dans son rapport au message
+// humain qui le précède et au message final qui l'a précédé.
+function mesurerSegment(segment) {
+  const contenu = contenuDe;
   let ecritures = 0, commandes = 0;
   const fichiersMd = [];
   // Chaque texte du tour, AVEC le nombre d'outils déjà vus à ce moment-là. C'est ce compteur qui
   // permet de reconnaître un texte FINAL : rien ne l'a suivi.
   const tousLesTextes = [];
   let outils = 0;
-  for (const e of tour) {
+  for (const e of segment) {
     if (e.type !== "assistant") continue;
     const blocs = contenu(e);
     const textes = blocs.filter((b) => b.type === "text").map((b) => b.text).join("\n").trim();
@@ -110,8 +113,24 @@ export function analyserTranscript(texte) {
   const totalOutils = outils;
   const finaux = tousLesTextes.filter((t) => t.outilsAvant === totalOutils);
   const dernierTexte = finaux.length ? finaux[finaux.length - 1].texte : "";
-  return { travail: ecritures >= 1 || commandes >= 4, ecritures, commandes, dernierTexte,
-           textes: tousLesTextes.length, finaux: finaux.length, fichiersMd };
+  return { ecritures, commandes, dernierTexte, textes: tousLesTextes.length, finaux: finaux.length, fichiersMd };
+}
+
+export function analyserTranscript(texte) {
+  const entrees = texte.split(/\r?\n/).filter((l) => l.trim()).map((l) => { try { return JSON.parse(l); } catch { return null; } })
+    .filter((e) => e && !e.isSidechain);
+  const humains = [];
+  for (let i = 0; i < entrees.length; i++) if (estHumain(entrees[i])) humains.push(i);
+  const debut = humains.length ? humains[humains.length - 1] : -1;
+  const m = mesurerSegment(entrees.slice(debut + 1));
+  // TF-1019 — les deux pièces que le contrôle GESTE réclame et que personne ne lisait : le DERNIER
+  // message humain (celui auquel la réponse répond) et le texte final du tour PRÉCÉDENT (celui que
+  // la réponse ne doit pas être). Sans second message humain, le segment d'avant commence au début
+  // du transcript : c'est bien le tour qui précède, et il n'y en a pas d'autre.
+  const avant = humains.length >= 2 ? humains[humains.length - 2] : -1;
+  const textePrecedent = debut >= 0 ? mesurerSegment(entrees.slice(avant + 1, debut)).dernierTexte : "";
+  const dernierHumain = debut >= 0 ? texteDe(entrees[debut]) : "";
+  return { travail: m.ecritures >= 1 || m.commandes >= 4, ...m, dernierHumain, textePrecedent };
 }
 
 export function juger(texte) {
@@ -275,6 +294,66 @@ export function comparerAffiche(message, fichier) {
   return ecarts;
 }
 
+// ---- TF-1019 (11/09/2026) — UNE DÉCISION RENDUE RÉCLAME LA PREUVE DU GESTE, PAS SA REDEMANDE --
+//
+// LE FAIT, mesuré sur la transcription d'une session de ce poste et le journal des hooks.
+// L'humain écrit « 11a » (décision D-11, option (a)) à 07:05:01Z, puis de nouveau « 11a » à
+// 07:07:39Z. Les deux messages de fin de tour (07:07:31Z, 07:09:32Z) sont la synthèse de la
+// VEILLE REJOUÉE MOT POUR MOT — 3156 mots, même titre, même bloc 3 qui repose D-11. Le hook les a
+// jugés PASS les deux fois (« message portant un VERDICT (3156 mots, sans écriture) », 0 écriture,
+// 3 commandes). Le geste demandé — le push — n'est venu qu'à 09:10:08.
+//
+// POURQUOI AUCUNE DES RÈGLES EXISTANTES NE POUVAIT LE VOIR. `oracle-synthese` juge la FORME d'un
+// message : ses blocs, son verdict, ses décisions, ses actions. Une restitution conforme rejouée
+// à l'identique est, par construction, conforme — c'est la même. Et `comparerAffiche` compare
+// l'écran au FICHIER du tour, jamais le message au MESSAGE PRÉCÉDENT ni au message HUMAIN qui
+// l'appelle. Il manquait la seule relation qui dit si quelque chose s'est passé : *ce tour-ci
+// répond-il à ce qui vient d'être demandé, ou rejoue-t-il le tour d'avant ?*
+//
+// CE QUI EST AJOUTÉ, et rien de plus. Quand le dernier message humain est un SÉLECTEUR DE
+// DÉCISION — et rien d'autre que des sélecteurs : « 11a », « D-11 (a) », « 32b, 30a » —, il ne
+// demande pas une analyse, il tranche. La réponse doit donc porter la PREUVE du geste au bloc 4.
+// Deux formes de non-geste sont refusées, toutes deux BLOQUANTES parce qu'elles laissent le
+// lecteur croire qu'il n'a pas décidé :
+//   1. le message final est IDENTIQUE au précédent (aux espaces près) — le tour n'a rien produit ;
+//   2. la même D-N est REPOSÉE au bloc 3 — on redemande ce qui vient d'être répondu.
+// La reconnaissance est volontairement ANCRÉE sur le message entier : un message qui n'est QUE
+// des sélecteurs est sans ambiguïté, alors qu'un « 11a » noyé dans une phrase peut être une
+// citation, une référence ou un chiffre. Mieux vaut ne pas voir un cas que crier sur une prose.
+const SELECTEUR_UN = "(?:D\\s*-?\\s*)?\\d{1,2}\\s*\\(?\\s*[a-c]\\s*\\)?";
+const SELECTEURS_SEULS = new RegExp(`^\\s*${SELECTEUR_UN}(?:(?:\\s*[,;]\\s*|\\s+)(?:et\\s+)?${SELECTEUR_UN})*\\s*[.!]?\\s*$`, "i");
+const SELECTEUR_GLOBAL = /(?:D\s*-?\s*)?(\d{1,2})\s*\(?\s*([a-c])\s*\)?/gi;
+// La décision REPOSÉE se lit à la forme que le gabarit prescrit depuis la v2.14.0 : le bloc de
+// citation « > **D-N — <question>** ». On ne lit pas le mot « décision » en prose — une
+// restitution a le droit de PARLER d'une décision déjà prise (« D-11 (a) exécutée ») ; ce qui est
+// refusé, c'est de la REPOSER, et c'est la forme du bloc 3 qui le dit.
+const decisionsReposees = (t) => [...new Set([...String(t || "")
+  .matchAll(/(?:^|\n)\s*>\s*\*{0,2}\s*D\s*-?\s*(\d{1,2})\s*\*{0,2}\s*[—–-]/g)].map((x) => x[1]))];
+const normaliserTexte = (t) => String(t || "").replace(/\s+/g, " ").trim();
+
+export function selecteursDecision(messageHumain) {
+  const t = String(messageHumain || "").trim();
+  if (!t || !SELECTEURS_SEULS.test(t)) return [];
+  SELECTEUR_GLOBAL.lastIndex = 0;
+  return [...t.matchAll(SELECTEUR_GLOBAL)].map((m) => ({ n: String(Number(m[1])), option: m[2].toLowerCase() }));
+}
+
+export function controlerGeste({ dernierHumain, dernierTexte, textePrecedent, texteSynthese = "" }) {
+  const selecteurs = selecteursDecision(dernierHumain);
+  if (!selecteurs.length) return { applicable: false, decision: null, verdict: "SANS_OBJET", ecarts: [] };
+  const decision = selecteurs.map((s) => `D-${s.n} (${s.option})`).join(", ");
+  const ecarts = [];
+  if (dernierTexte && textePrecedent && normaliserTexte(dernierTexte) === normaliserTexte(textePrecedent))
+    ecarts.push(`décision ${decision} reçue, geste absent : le message de fin de tour est identique au précédent`);
+  const reposees = new Set([...decisionsReposees(dernierTexte), ...decisionsReposees(texteSynthese)]);
+  for (const s of selecteurs)
+    if (reposees.has(s.n))
+      ecarts.push(`décision D-${s.n} (${s.option}) reçue, geste absent : la même D-${s.n} est reposée au bloc 3`);
+  return { applicable: true, decision, verdict: ecarts.length ? "FAIL" : "PASS", ecarts };
+}
+
+const RAPPEL_GESTE = "Un mot de décision reçoit la PREUVE du geste au bloc 4, jamais la décision reposée.";
+
 // ---- TF-0904 (08/09/2026) — UN VERDICT RENDU SANS ÉCRIRE UN FICHIER EST UNE RESTITUTION -------
 //
 // LE FAIT, mesuré le 07/09 : question humaine « la proposition a-t-elle été testée ? peut-on
@@ -366,13 +445,14 @@ const BLOQUANTES = new Set(["S1", "S3", "S4", "S6"]);
 // se mettent à jour ENSEMBLE ou la doctrine ne s'applique pas. Le même défaut vaut pour la ligne
 // des gates de `hook-ouverture.mjs`, corrigée le même jour et pour la même raison.
 
-const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.20.0) : bloc 0 « synthèse d'ouverture » en langage commanditaire (≥ 20 mots, sans identifiant, chemin ni sha — l'état, ce que ça change, ce qui est attendu du lecteur), puis les 8 blocs numérotés, aucun omis (un bloc vide se dit en une ligne). · 1 en-tête (quoi · sur quoi · date ET heure avec fuseau + durée · qui avec version) · 2 verdict en une ligne FACTUEL (un chiffre, un compteur) · 3 décisions attendues de l'humain, EN TÊTE, chacune en BLOC DE CITATION et dans cet ordre exact : « > **D-N — <la question, posée comme une question, avec son point d'interrogation>** » (N continu dans la session, jamais remis à 1), puis le rappel du sujet en prose (≥ 25 mots, sans identifiant nu — 12 mots si un chapeau commun d'au moins 40 mots ouvre le bloc), puis « > **Recommandation : (a).** Source consultée : <le document d'où sort la réponse proposée> » et pourquoi ; PUIS, hors de la citation et pleine largeur, le tableau des options « | Option | Ce qu'elle coûte | Ce qu'elle exclut | », une ligne par (a)/(b)/(c) ; PUIS « > **Si rien n'est décidé** : (c) … ». Si rien n'attend l'humain, le dire en une ligne · 4 traité, chaque puce avec sa preuve (oracle, verdict, chiffre) · 5 non traité, chaque puce avec son motif · 6 écarts à la lettre (« vous avez demandé → j'ai fait → pourquoi », ou « aucun écart ») · 7 risques (énoncé + signal + parade) · 8 prochaines actions en UN TABLEAU UNIQUE, l'acteur en COLONNE et jamais en section, trié auto_ia d'abord — chaque action porte son sélecteur **A-N** distinct (jamais un numéro nu : un « 3 » nu ne dit pas s'il désigne la décision 3 ou l'action 3), son identifiant stable TF-#### ou la mention `neuve`, son acteur (auto_ia | manuelle_dev | manuelle_utilisateur), le motif de non-exécution si auto_ia (gate_gouvernance | dependance_bloc_3 | garde_fou | borne_atteinte | dependance_externe | hors_mandat), la raison d'impossibilité IA si elle est laissée à l'humain (acces | decision | depense | presence | irreversible, non accentués — et pour acces comme pour presence, la TRACE MESURÉE de la tentative : code de réponse, message d'erreur, sortie de commande), un chemin ou une commande qui la rend exécutable telle quelle, et ce qu'il en coûte de NE PAS la faire · 9 traces (chemins relatifs et vérifiables). Puces ≤ 2 niveaux. Un renvoi nomme son sujet ou son sélecteur, jamais une position (« ligne 5 » est un défaut). Effort en complexité × durée, jamais en jours. · v2.16.0 (02/09) : une action manuelle_utilisateur ne demande jamais à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent, seule la VALEUR lui reste) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation (forge-design) ; une correction restituée nomme son contrôle rouge → vert ou sa classe. · v2.17.0 (08/09) : CE MESSAGE EST LE FICHIER JUGÉ, jamais son résumé — quand une synthèse a été déposée dans le tour, le message affiché reprend ses blocs 3 et 8 EN ENTIER (tableau des options, sélecteurs A-N, acteurs du vocabulaire gelé auto_ia | manuelle_dev | manuelle_utilisateur) ; la LONGUEUR n'est pas un motif de condensation, et un fichier PASS paraphrasé à l'écran ne protège aucun lecteur. · v2.18.0 (08/09) : LE VERDICT AFFICHÉ MESURE CE QUE LE FICHIER JUGÉ MESURE — une restitution n'est pas un fil d'avancement : si l'écran a été enrichi au fil du tour (un rapport reçu, un compteur qui monte), c'est le FICHIER qu'il faut redéposer, jamais l'écran qu'il faut appauvrir ; la trace est la pièce opposable, et une pièce périmée ment à tous ceux qui la reliront. · v2.19.0 (08/09) : UN TEST JOUABLE S'EXÉCUTE — une action de TEST auto_ia (recette, banc, couverture, self-test) ne se laisse pas non exécutée sous `hors_mandat` ni `borne_atteinte` : ces deux motifs déclarent un périmètre que tu écris seul, ils ne mesurent rien ; joue la recette, ou nomme l'obstacle EXTÉRIEUR qui la bloque (dependance_bloc_3, gate_gouvernance, garde_fou, dependance_externe). Et « REMONTÉ » N'EST PAS « TRAITÉ » : une remontée annoncée au bloc 4 porte son identifiant TF-####, sans quoi le lecteur ne peut ni la retrouver ni savoir si quelqu'un l'a prise — elle vaut alors « déposé, non traité » et appartient au bloc 5 avec son motif. · v2.20.0 (08/09) : LA FORME DATÉE EN TÊTE EST RÉSERVÉE AUX ÉTUDES — un livrable cité sous `output\\` porte « <Marque> - <Objet> - AAAAMMJJ<indice>.<ext> » (R-4) ; le préfixe « AAAAMMJJ-… » n'appartient qu'à `output\\03-etudes\\`, et onze livrables d'un mandat sont sortis hors R-4 le 07/09 pour l'avoir imité. Et QUAND LA DOCTRINE RÉGIT LE MOT, C'EST ELLE LA SOURCE : une décision qui parle d'une version remplacée, d'un `old\\`, d'un livrable à supprimer ou à renommer cite REGLES-PROJET.md, CLAUDE.md, ETAPES-RUN.md ou la règle numérotée qui la tranche — sourcer par un fichier du chantier une question que la doctrine a déjà tranchée, c'est poser une question qui n'avait pas à l'être.";
+const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.21.0) : bloc 0 « synthèse d'ouverture » en langage commanditaire (≥ 20 mots, sans identifiant, chemin ni sha — l'état, ce que ça change, ce qui est attendu du lecteur), puis les 8 blocs numérotés, aucun omis (un bloc vide se dit en une ligne). · 1 en-tête (quoi · sur quoi · date ET heure avec fuseau + durée · qui avec version) · 2 verdict en une ligne FACTUEL (un chiffre, un compteur) · 3 décisions attendues de l'humain, EN TÊTE, chacune en BLOC DE CITATION et dans cet ordre exact : « > **D-N — <la question, posée comme une question, avec son point d'interrogation>** » (N continu dans la session, jamais remis à 1), puis le rappel du sujet en prose (≥ 25 mots, sans identifiant nu — 12 mots si un chapeau commun d'au moins 40 mots ouvre le bloc), puis « > **Recommandation : (a).** Source consultée : <le document d'où sort la réponse proposée> » et pourquoi ; PUIS, hors de la citation et pleine largeur, le tableau des options « | Option | Ce qu'elle coûte | Ce qu'elle exclut | », une ligne par (a)/(b)/(c) ; PUIS « > **Si rien n'est décidé** : (c) … ». Si rien n'attend l'humain, le dire en une ligne · 4 traité, chaque puce avec sa preuve (oracle, verdict, chiffre) · 5 non traité, chaque puce avec son motif · 6 écarts à la lettre (« vous avez demandé → j'ai fait → pourquoi », ou « aucun écart ») · 7 risques (énoncé + signal + parade) · 8 prochaines actions en UN TABLEAU UNIQUE, l'acteur en COLONNE et jamais en section, trié auto_ia d'abord — chaque action porte son sélecteur **A-N** distinct (jamais un numéro nu : un « 3 » nu ne dit pas s'il désigne la décision 3 ou l'action 3), son identifiant stable TF-#### ou la mention `neuve`, son acteur (auto_ia | manuelle_dev | manuelle_utilisateur), le motif de non-exécution si auto_ia (gate_gouvernance | dependance_bloc_3 | garde_fou | borne_atteinte | dependance_externe | hors_mandat), la raison d'impossibilité IA si elle est laissée à l'humain (acces | decision | depense | presence | irreversible, non accentués — et pour acces comme pour presence, la TRACE MESURÉE de la tentative : code de réponse, message d'erreur, sortie de commande), un chemin ou une commande qui la rend exécutable telle quelle, et ce qu'il en coûte de NE PAS la faire · 9 traces (chemins relatifs et vérifiables). Puces ≤ 2 niveaux. Un renvoi nomme son sujet ou son sélecteur, jamais une position (« ligne 5 » est un défaut). Effort en complexité × durée, jamais en jours. · v2.16.0 (02/09) : une action manuelle_utilisateur ne demande jamais à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent, seule la VALEUR lui reste) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation (forge-design) ; une correction restituée nomme son contrôle rouge → vert ou sa classe. · v2.17.0 (08/09) : CE MESSAGE EST LE FICHIER JUGÉ, jamais son résumé — quand une synthèse a été déposée dans le tour, le message affiché reprend ses blocs 3 et 8 EN ENTIER (tableau des options, sélecteurs A-N, acteurs du vocabulaire gelé auto_ia | manuelle_dev | manuelle_utilisateur) ; la LONGUEUR n'est pas un motif de condensation, et un fichier PASS paraphrasé à l'écran ne protège aucun lecteur. · v2.18.0 (08/09) : LE VERDICT AFFICHÉ MESURE CE QUE LE FICHIER JUGÉ MESURE — une restitution n'est pas un fil d'avancement : si l'écran a été enrichi au fil du tour (un rapport reçu, un compteur qui monte), c'est le FICHIER qu'il faut redéposer, jamais l'écran qu'il faut appauvrir ; la trace est la pièce opposable, et une pièce périmée ment à tous ceux qui la reliront. · v2.19.0 (08/09) : UN TEST JOUABLE S'EXÉCUTE — une action de TEST auto_ia (recette, banc, couverture, self-test) ne se laisse pas non exécutée sous `hors_mandat` ni `borne_atteinte` : ces deux motifs déclarent un périmètre que tu écris seul, ils ne mesurent rien ; joue la recette, ou nomme l'obstacle EXTÉRIEUR qui la bloque (dependance_bloc_3, gate_gouvernance, garde_fou, dependance_externe). Et « REMONTÉ » N'EST PAS « TRAITÉ » : une remontée annoncée au bloc 4 porte son identifiant TF-####, sans quoi le lecteur ne peut ni la retrouver ni savoir si quelqu'un l'a prise — elle vaut alors « déposé, non traité » et appartient au bloc 5 avec son motif. · v2.20.0 (08/09) : LA FORME DATÉE EN TÊTE EST RÉSERVÉE AUX ÉTUDES — un livrable cité sous `output\\` porte « <Marque> - <Objet> - AAAAMMJJ<indice>.<ext> » (R-4) ; le préfixe « AAAAMMJJ-… » n'appartient qu'à `output\\03-etudes\\`, et onze livrables d'un mandat sont sortis hors R-4 le 07/09 pour l'avoir imité. Et QUAND LA DOCTRINE RÉGIT LE MOT, C'EST ELLE LA SOURCE : une décision qui parle d'une version remplacée, d'un `old\\`, d'un livrable à supprimer ou à renommer cite REGLES-PROJET.md, CLAUDE.md, ETAPES-RUN.md ou la règle numérotée qui la tranche — sourcer par un fichier du chantier une question que la doctrine a déjà tranchée, c'est poser une question qui n'avait pas à l'être. · v2.21.0 (11/09) : UN MOT DE DÉCISION REÇOIT LA PREUVE DU GESTE — quand le message humain qui précède est un sélecteur de décision (« 11a », « D-11 (a) », « 32b, 30a »), il tranche et n'attend plus d'analyse : ton bloc 4 porte la preuve exécutée du geste que l'option choisie commandait, ton bloc 3 ne repose JAMAIS la même D-N, et ta réponse n'est jamais la restitution précédente rejouée mot pour mot — le 11/09 la synthèse de la veille a été renvoyée deux fois à l'identique après deux « 11a », et le geste n'est venu que deux heures plus tard (TF-1019).";
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const entree = lireStdin();
   const chemin = entree.transcript_path;
   if (!chemin || !existsSync(chemin)) process.exit(0); // rien à juger sans transcript
-  const { travail, ecritures, commandes, dernierTexte, textes, fichiersMd } = analyserTranscript(readFileSync(chemin, "utf8"));
+  const { travail, ecritures, commandes, dernierTexte, textes, fichiersMd, dernierHumain, textePrecedent } =
+    analyserTranscript(readFileSync(chemin, "utf8"));
   const portee = jugeable({ travail, ecritures, commandes, dernierTexte });
   if (!portee.juge) process.exit(0);
   const { code, fails } = juger(dernierTexte);
@@ -380,10 +460,16 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // TRANCHE doit se retrouver à l'écran. Bloquant, parce qu'une décision absente de l'écran ne peut
   // pas être prise — et la garde anti-boucle empêche qu'un faux positif coûte plus d'une relecture.
   const fichierSynthese = syntheseDuTour(fichiersMd);
-  let ecartsAffichage = [];
+  let ecartsAffichage = [], texteSynthese = "";
   try {
-    if (fichierSynthese) ecartsAffichage = comparerAffiche(dernierTexte, readFileSync(fichierSynthese, "utf8"));
+    if (fichierSynthese) {
+      texteSynthese = readFileSync(fichierSynthese, "utf8");
+      ecartsAffichage = comparerAffiche(dernierTexte, texteSynthese);
+    }
   } catch { /* fichier illisible : une lecture ratée ne se transforme pas en accusation */ }
+  // TF-1019 — le GESTE : ce tour répond-il au mot de décision qui vient d'être reçu, ou rejoue-t-il
+  // le tour d'avant ? S'ajoute aux règles existantes, n'en remplace aucune.
+  const geste = controlerGeste({ dernierHumain, dernierTexte, textePrecedent, texteSynthese });
   const bloquants = fails.filter((f) => BLOQUANTES.has(f.regle));
   const avertissements = fails.filter((f) => !BLOQUANTES.has(f.regle));
   const journal = join(ICI, "..", ".claude", "hooks-journal.jsonl");
@@ -392,15 +478,17 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     appendFileSync(journal, JSON.stringify({
       ts: new Date().toISOString(), hook: "restitution", session: entree.session_id, ecritures, commandes,
       portee: portee.motif,
-      verdict: (code === 0 && !ecartsAffichage.length) ? "PASS" : ((bloquants.length || ecartsAffichage.length) ? "FAIL" : "AVERTISSEMENT"),
+      verdict: (code === 0 && !ecartsAffichage.length && geste.verdict !== "FAIL")
+        ? "PASS" : ((bloquants.length || ecartsAffichage.length || geste.verdict === "FAIL") ? "FAIL" : "AVERTISSEMENT"),
       regles: fails.map((f) => f.regle), bloquantes: bloquants.map((f) => f.regle),
       synthese_deposee: fichierSynthese || null, ecarts_affichage: ecartsAffichage,
+      ...(geste.applicable ? { geste: { decision: geste.decision, verdict: geste.verdict, ecarts: geste.ecarts } } : {}),
       deja_refuse: !!entree.stop_hook_active,
     }) + "\n");
   } catch { /* journal facultatif */ }
-  if (code === 0 && !ecartsAffichage.length) process.exit(0);
+  if (code === 0 && !ecartsAffichage.length && geste.verdict !== "FAIL") process.exit(0);
   // Avertissements seuls : dits sous la réponse, jamais réécrits — pas de doublon à l'écran.
-  if (!bloquants.length && !ecartsAffichage.length) {
+  if (!bloquants.length && !ecartsAffichage.length && geste.verdict !== "FAIL") {
     console.log(JSON.stringify({
       systemMessage: `[restitution — R-44] avertissement${avertissements.length > 1 ? "s" : ""} non bloquant${avertissements.length > 1 ? "s" : ""} : ` +
         avertissements.map((f) => `${f.regle} — ${f.message}`).join(" · ") +
@@ -413,6 +501,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     ...bloquants.map((f) => `${f.regle} — ${f.message}`),
     ...ecartsAffichage.map((e) => `AFFICHAGE — ton message affiché ne dit pas ce que la synthèse déposée disait : ${e}. `
       + `Le document jugé est ${fichierSynthese} : reprends-en le bloc 3 en entier plutôt qu'une version abrégée.`),
+    ...geste.ecarts.map((e) => `GESTE — ${e}. ${RAPPEL_GESTE}`),
   ].join("\n");
   const enPlus = avertissements.length ? `\n(à corriger au passage, non bloquant : ${avertissements.map((f) => f.regle).join(", ")})` : "";
   console.log(JSON.stringify({ decision: "block", reason: `[hook restitution — R-44] oracle-synthese FAIL BLOQUANT sur ta réponse finale :\n${motifs}${enPlus}\n\n${RAPPEL}` }));

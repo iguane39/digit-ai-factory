@@ -16,12 +16,12 @@
  * La conformité du message « bon » est établie par oracle-synthese lui-même (pas par le test).
  * Joué par oracles/self-tests.mjs (I2).
  */
-import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, writeFileSync, readFileSync, rmSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { comparerAffiche } from "./hook-restitution.mjs";
+import { comparerAffiche, controlerGeste } from "./hook-restitution.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const HOOK = join(ICI, "hook-restitution.mjs");
@@ -240,8 +240,92 @@ try {
   const e14 = comparerAffiche(REFORMULE, AVEC_VERDICT);
   if (e14.some((x) => /VERDICT \(bloc 2\) affiché/.test(x)))
     echecs.push(`14 ter : identifiants, empreinte, date et version comptés comme des faits mesurés — écarts : ${e14.join(" | ")}`);
+
+  // 15 à 18 (TF-1019, 11/09) — UNE DÉCISION RENDUE RÉCLAME LA PREUVE DU GESTE.
+  // Le fait, mesuré sur une transcription de ce poste : l'humain écrit « 11a » à 07:05:01Z puis de
+  // nouveau « 11a » à 07:07:39Z ; les deux messages de fin de tour sont la synthèse de la VEILLE
+  // REJOUÉE MOT POUR MOT — 3156 mots, même bloc 3 reposant D-11 — et le hook les a jugés PASS les
+  // deux fois. `oracle-synthese` juge la FORME d'un message, jamais son rapport au message humain
+  // qui le précède : une restitution conforme rejouée à l'identique est, par construction,
+  // conforme. Le geste demandé (le push) n'est venu que deux heures plus tard.
+  const FIXTURES = join(ICI, "fixtures");
+  const lancerFichier = (p) => {
+    const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8",
+      input: JSON.stringify({ session_id: "test-geste", transcript_path: p, stop_hook_active: false }) });
+    let d = null;
+    try { d = JSON.parse(r.stdout || "null"); } catch { /* pas de JSON = laisse passer */ }
+    return d;
+  };
+  // Les DEUX textes des fixtures sont PASS pour oracle-synthese lui-même : le rouge est donc rouge
+  // par le GESTE seul, jamais par un défaut de forme qui masquerait ce qu'on prétend prouver.
+  for (const f of ["geste-pose.md", "geste-fait.md"]) {
+    const o = spawnSync(process.execPath, [ORACLE, join(FIXTURES, f)], { encoding: "utf8" });
+    if (o.status !== 0)
+      echecs.push(`15 : la fixture ${f} est refusée par oracle-synthese (${(o.stdout.match(/"regle": "(S\d+)",\s*"statut": "FAIL"/g) || []).join(" ")}) — le rouge ne prouverait pas le geste`);
+  }
+
+  const d15 = lancerFichier(join(FIXTURES, "geste-rouge.jsonl"));
+  if (d15?.decision !== "block")
+    echecs.push(`15 bis : « 11a » reçu, restitution rejouée mot pour mot → attendu block, obtenu ${JSON.stringify(d15).slice(0, 200)}`);
+  else {
+    if (!/GESTE — décision D-11 \(a\) reçue, geste absent : le message de fin de tour est identique au précédent/.test(d15.reason))
+      echecs.push(`15 ter : le refus ne nomme pas le message identique au précédent — ${String(d15.reason).slice(0, 220)}`);
+    if (!/la même D-11 est reposée au bloc 3/.test(d15.reason))
+      echecs.push("15 quater : le refus ne nomme pas la décision reposée au bloc 3");
+    if (!/PREUVE du geste au bloc 4/.test(d15.reason))
+      echecs.push("15 quinquies : le refus ne porte pas le rappel court");
+  }
+
+  // 16 — LE SENS VERT, sans lequel la règle ne prouverait rien : la même décision reçue, mais le
+  // tour PRODUIT le geste — message final différent du précédent, D-11 n'est plus reposée (la
+  // suite se joue sur D-12), et le bloc 4 porte la preuve exécutée du push.
+  const d16 = lancerFichier(join(FIXTURES, "geste-vert.jsonl"));
+  if (d16 !== null)
+    echecs.push(`16 : « 11a » + geste exécuté → attendu laisser passer, obtenu ${JSON.stringify(d16).slice(0, 300)}`);
+
+  // 17 — LA BORNE : le même transcript rouge, mais le dernier message humain n'est PAS un
+  // sélecteur. Le contrôle ne s'applique pas — sans cette borne il crierait sur toute conversation
+  // où une restitution ressemble à la précédente, et ce n'est pas ce qu'il existe pour attraper.
+  {
+    const lignes = readFileSync(join(FIXTURES, "geste-rouge.jsonl"), "utf8").trim().split("\n");
+    for (let i = lignes.length - 1; i >= 0; i--) {
+      const e = JSON.parse(lignes[i]);
+      if (e.type === "user" && typeof e.message?.content === "string") {
+        e.message.content = "Traite toutes les actions";
+        lignes[i] = JSON.stringify(e);
+        break;
+      }
+    }
+    const p = join(base, "geste-non-selecteur.jsonl");
+    writeFileSync(p, lignes.join("\n") + "\n", "utf8");
+    const d17 = lancerFichier(p);
+    if (d17 && /GESTE —/.test(String(d17.reason || "")))
+      echecs.push(`17 : dernier message humain « Traite toutes les actions » → GESTE ne doit pas s'appliquer : ${String(d17.reason).slice(0, 200)}`);
+  }
+
+  // 18 — LES FORMES du sélecteur, reconnues et NON reconnues. La reconnaissance est ancrée sur le
+  // message ENTIER : un message qui n'est QUE des sélecteurs est sans ambiguïté, alors qu'un
+  // « 11a » noyé dans une phrase peut être une citation, une référence ou un chiffre.
+  for (const [texte, attendu] of [
+    ["11a", "D-11 (a)"], ["11 a", "D-11 (a)"], ["D-11 (a)", "D-11 (a)"], ["D-11 a", "D-11 (a)"],
+    ["D11a", "D-11 (a)"], ["d-11 (A)", "D-11 (a)"], ["  11b  ", "D-11 (b)"], ["11c.", "D-11 (c)"],
+    ["32b, 30a", "D-32 (b), D-30 (a)"], ["32b 30a", "D-32 (b), D-30 (a)"],
+    ["D-32 (b), D-30 (a)", "D-32 (b), D-30 (a)"],
+  ]) {
+    const g = controlerGeste({ dernierHumain: texte, dernierTexte: "un message", textePrecedent: "un autre" });
+    if (!g.applicable || g.decision !== attendu)
+      echecs.push(`18 : « ${texte} » → attendu ${attendu}, obtenu ${g.applicable ? g.decision : "non reconnu"}`);
+    else if (g.verdict !== "PASS")
+      echecs.push(`18 : « ${texte} » → un tour qui produit un message neuf doit rendre PASS, obtenu ${g.verdict}`);
+  }
+  for (const texte of ["Traite toutes les actions", "", "fais le point sur 11a et dis-moi",
+    "la règle 11 a été appliquée hier sur les onze livrables du mandat", "ok", "continue"]) {
+    const g = controlerGeste({ dernierHumain: texte, dernierTexte: "x", textePrecedent: "y" });
+    if (g.applicable)
+      echecs.push(`18 bis : « ${texte.slice(0, 40)} » pris pour un sélecteur (${g.decision}) — la règle crierait sur une prose`);
+  }
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 200)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error("hook-restitution : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log("hook-restitution : 16/16 — hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918)");
+console.log("hook-restitution : 20/20 — hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019)");

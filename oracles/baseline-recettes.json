@@ -72,8 +72,8 @@
   "vu_le": "2026-09-10"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 65,
-  "vu_le": "2026-09-08"
+  "cas": 66,
+  "vu_le": "2026-09-11"
  },
  "oracle-constantes-externes.mjs": {
   "cas": 12,
@@ -207,8 +207,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-synthese.mjs": {
-  "cas": 18,
-  "vu_le": "2026-09-09"
+  "cas": 19,
+  "vu_le": "2026-09-11"
  },
  "oracle-trace-mutation-mep.mjs": {
   "cas": 8,
@@ -239,8 +239,8 @@
   "vu_le": "2026-09-02"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 16,
-  "vu_le": "2026-09-08"
+  "cas": 20,
+  "vu_le": "2026-09-11"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
   "cas": 14,
@@ -303,8 +303,8 @@
   "vu_le": "2026-09-08"
  },
  "scripts/rebatir-clone.test.mjs": {
-  "cas": 5,
-  "vu_le": "2026-09-07"
+  "cas": 6,
+  "vu_le": "2026-09-11"
  },
  "scripts/recopier-heritage.test.mjs": {
   "cas": 12,

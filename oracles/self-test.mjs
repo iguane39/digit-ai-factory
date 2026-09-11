@@ -522,6 +522,40 @@ check("TF-0853 — un chemin que `git check-ignore` déclare EXCLU n'est jamais 
     throw new Error("le voisin NON exclu n'est plus jugé — l'exclusion a désarmé R-4 au-delà de sa portée");
 });
 
+// ---- fixture LONGUEUR DE CHEMIN (TF-1015, 11/09) : R-4 jugeait la FORME du nom et jamais sa
+// LONGUEUR. Le 10/09, un clone de vérification a rendu « Filename too long » sur 22 fichiers puis
+// « checkout failed » : le dépôt est arrivé sans arbre de travail, et la vérification prescrite
+// avant tout push n'a pas pu se jouer. Les DEUX SENS sur la MÊME fixture, à UN caractère près :
+// un chemin de 124 caractères (150 avec les 26 du sidecar d'oracle — le plafond, tenu) est muet,
+// son jumeau de 125 (151) est dénoncé. Sans le sens vert, la règle pourrait accuser tout livrable
+// un peu descriptif, ce qui la ferait désarmer au premier remaniement. ---------------------------
+const rougeLong = mkdtempSync(join(tmpdir(), "conf-long-"));
+mkdirSync(join(rougeLong, "output", "04-plans"), { recursive: true });
+const cheminDeLongueur = (n) => {
+  const tete = "output/04-plans/Produit - Synthese Mandat - ";
+  const queue = " - 20260911a.md";
+  return tete + "x".repeat(n - tete.length - queue.length) + queue;
+};
+const CHEMIN_PILE = cheminDeLongueur(124);        // 150 avec le sidecar : le plafond, TENU
+const CHEMIN_TROP = cheminDeLongueur(125);        // 151 : un caractère de trop
+writeFileSync(join(rougeLong, CHEMIN_PILE), "x" + NL_TEST);
+writeFileSync(join(rougeLong, CHEMIN_TROP), "x" + NL_TEST);
+sh("git", ["init", "-q", "-b", "main"], rougeLong);
+
+check("TF-1015 — R-4 dénonce un chemin d'output\\ qui dépasse 150 caractères sidecar compris, et se tait sur son jumeau à exactement 150", () => {
+  if (CHEMIN_PILE.length !== 124 || CHEMIN_TROP.length !== 125)
+    throw new Error(`fixture invalide : ${CHEMIN_PILE.length} et ${CHEMIN_TROP.length} caractères attendus 124 et 125`);
+  const { rapport } = lance(rougeLong);
+  const r4 = rapport.findings.filter((f) => f.regle === "R-4" && f.statut === "FAIL");
+  const surTrop = r4.find((f) => f.ou === CHEMIN_TROP && /plafond/.test(f.message));
+  if (!surTrop)
+    throw new Error(`aucun constat R-4 de longueur sur le chemin de 151 caractères — c'est celui-là qui a fait échouer le checkout le 10/09 : ${JSON.stringify(r4.map((f) => f.ou))}`);
+  if (!/113|110|\b\d{2,3} caractères\b/.test(surTrop.message) || !/préfixe de clone admissible/i.test(surTrop.message))
+    throw new Error(`le constat ne dit pas le préfixe de clone admissible, donc il n'est pas actionnable : « ${surTrop.message.slice(0, 160)} »`);
+  if (r4.some((f) => f.ou === CHEMIN_PILE))
+    throw new Error("le jumeau à EXACTEMENT 150 caractères sidecar compris est accusé — la règle mord sur un nom conforme");
+});
+
 // ---- fixture ROUGE-ENV (TF-0869) : le `.env.example` est PRÉSENT, RENSEIGNÉ et SUIVI — donc
 // vert pour les trois sous-contrôles historiques de R-13 — et il porte pourtant deux valeurs
 // qui n'auraient jamais dû entrer dans un fichier versionné : une variable déléguée à l'humain

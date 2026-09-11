@@ -1,6 +1,6 @@
 # Récidives et descente — tableau de bord
 
-<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre d56c5cdf055b · archive 6ce2fe14c2bb · classes 01032e127fb1 · relevés 78986cb8fda5 · héritage 23d6b9c4bee8. État au 2026-09-11T07:34:52.871Z (ts max des sources, jamais l'horloge). -->
+<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre bba960a542af · archive 6ce2fe14c2bb · classes 01032e127fb1 · relevés 78986cb8fda5 · héritage 23d6b9c4bee8. État au 2026-09-11T08:42:49.377Z (ts max des sources, jamais l'horloge). -->
 
 Ce tableau de bord répond à trois questions que le registre seul ne savait pas poser : est-ce la deuxième fois, chez qui, et depuis combien de temps la correction existe sans être appliquée. Il se lit avec sa contre-métrique : un compteur de récidives qui baisse pendant que le nombre de classes monte est un compteur contourné, pas un progrès.
 
@@ -93,7 +93,7 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 | `boucle-retour-sans-descente` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `brief-sans-regles-de-socle` | 2026-09-02 | CLAUDE.md | 12 produit(s) atteint(s) en 1–9 j ; 2 non atteint(s) (Produit-11, bav-dev) |
 | `champ-transcrit-de-prose-sans-correspondance` | 2026-09-06 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
-| `chemin-de-livrable-au-dela-du-plafond-de-la-plateforme` | — | — | non mesurable : aucune clôture fondatrice au registre |
+| `chemin-de-livrable-au-dela-du-plafond-de-la-plateforme` | 2026-09-11 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `compte-total-hors-canal-des-constats` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `contrat-de-sortie-sans-domicile` | 2026-09-06 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas` | — | — | non mesurable : aucune clôture fondatrice au registre |
@@ -101,7 +101,7 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 | `controle-vrai-sur-le-mauvais-invariant` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `correction-symptome-sans-classe` | 2026-09-02 | forge/retours/GABARIT-LOT-RETOURS.md | 2 produit(s) atteint(s) en 6–7 j ; 12 non atteint(s) (Produit-11, client-a-cockpit-ia, Plateforme_video_IA_complet, Produit-01, Produit-12, Produit-02, Produit-10, Produit-04, COMPTA---Ventillation-de-facture-Fournisseur-A, Produit-64, bav-dev, Produit-61) |
 | `date-de-fichier-menteuse-apres-copie` | — | — | non mesurable : aucune clôture fondatrice au registre |
-| `decision-humaine-rendue-restituee-sans-geste` | — | forge/RESTITUTION.md | non mesurable : aucune clôture fondatrice au registre |
+| `decision-humaine-rendue-restituee-sans-geste` | 2026-09-11 | forge/RESTITUTION.md | 3 produit(s) atteint(s) en 0–0 j ; 9 non atteint(s) (bav-dev, Produit-11, Produit-01, client-a-cockpit-ia, Produit-10, Produit-02, COMPTA---Ventillation-de-facture-Fournisseur-A, Produit-61, Produit-04) |
 | `deux-regles-du-socle-inconciliables` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `emplacement-livrable-hors-convention` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `fixture-jugee-par-son-seul-oracle` | 2026-09-06 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
@@ -111,7 +111,7 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 | `gate-cout-invite-au-contournement` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `gate-ecriture-juge-fichier-entier` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `heritage-avertissement-tardif` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
-| `journal-de-versions-dormant` | — | — | non mesurable : aucune clôture fondatrice au registre |
+| `journal-de-versions-dormant` | 2026-09-11 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `l99-forme-sortie` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `lecture-tiers-non-jugee` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `livrable-ecrase-sans-indice` | 2026-08-23 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
@@ -135,7 +135,7 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 | `porte-cle-courte-sans-frontiere` | 2026-09-07 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `porte-sans-chemin-des-tables` | 2026-09-08 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `quantificateur-sacrifie-au-budget-du-texte` | 2026-09-10 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
-| `recette-locale-ne-rejoue-pas-l-environnement-de-la-ci` | — | — | non mesurable : aucune clôture fondatrice au registre |
+| `recette-locale-ne-rejoue-pas-l-environnement-de-la-ci` | 2026-09-11 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `recette-verdict-non-prononcable` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `registre-doublon-non-detecte` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `regle-balaie-prose-et-identifiants` | — | — | non mesurable : aucune clôture fondatrice au registre |

@@ -155,7 +155,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>d56c5cdf055b</code> · dernier événement 2026-09-11T07:34:52.871Z</p>
+      <p class="meta">sceau <code>bba960a542af</code> · dernier événement 2026-09-11T08:42:49.377Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -165,7 +165,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="28 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">28</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="23 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">23</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="27 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">27</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="12 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">12</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="781 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">781</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -783,39 +783,6 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-1015" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-1015</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : un clone de verification sur un chemin profond echoue au checkout — 22 fichiers depassent, avec les sidecars d oracle, le plafond de 260 caracteres de Windows ; R-4 juge la forme du nom et jamais sa longueur, la procedure de clone ne declare pas core.longpaths</h3>
-          <div class="card-detail" data-cite><p class="lead">Constat en passant du 10/09/2026, en rejouant la porte de publication sur un clone FRAIS a branche unique de l origine — la mesure que la doctrine prescrit pour repondre a &lt;&lt; que porte le publie ? &gt;&gt; (TF-1008 : un verdict sur la copie locale decrit la copie, remisage compris, pas l objet publie).
-
-CE QUI S EST PASSE.</p><ul class="puces"><li>`git clone --single-branch --branch main &lt;origine&gt;` dans le bac a sable de la session, dont le prefixe fait environ 130 caracteres : &lt;&lt; error: unable to create file … : Filename too long &gt;&gt; sur 22 fichiers — 19 sidecars d oracle sous `.oracles/output/04-plans/` (`&lt;synthese&gt;.md.oracles-historique.jsonl`, `.oracles-cache.json`, `.oracles.json`) et 3 syntheses sous `output/04-plans/` (indices 20260908d, 20260910e, 20260910f) — puis &lt;&lt; fatal: unable to checkout working tree — Clone succeeded, but checkout failed &gt;&gt;. La verification n a pas pu se faire a cet emplacement.
-
-MESURE. Le plus long chemin SUIVI du depot fait 146 caracteres (un sidecar `.oracles/…/… - 20260907i.md.oracles-historique.jsonl`) ; aucun ne depasse 150. Sous le plafond de 260 caracteres de Windows (MAX_PATH, sans core.longpaths), le prefixe de clone admissible est donc de 113 caracteres au plus : le poste de travail (`c:\dev\&lt;depot&gt;\`, 23 caracteres) ne voit rien, un bac a sable de session (130) ou un runner profond voit tout. Le sidecar d oracle ajoute 26 caracteres (`.oracles/` + `.oracles-historique.jsonl`) a chaque nom de synthese, et ces sidecars sont SUIVIS par git.
-
-REMEDE CONFIRME, PAS SUPPOSE. Rejoue a 17:31 sur un prefixe de 41 caracteres avec `git clone -c core.longpaths=true --single-branch` : checkout complet, 683 enregistrements, 44 references, 0 remisage — la porte a pu etre rejouee.
-
-POURQUOI C EST UN DEFAUT GENERALISE</li><li>R-4 fixe la FORME du nom (`&lt;Marque&gt; - &lt;Objet&gt; - AAAAMMJJ&lt;indice&gt;.&lt;ext&gt;`) et rien ne borne sa LONGUEUR : l objet d une synthese s allonge a mesure qu il veut tout dire, et l oracle de restitution ne le mesure pas</li><li>La procedure de verification sur clone frais (fiche du skill quality-oracles, memoire de session &lt;&lt; porte de publication sur clones temporaires &gt;&gt;) et `bootstrap.mjs --rebatir` supposent une plateforme sans plafond : `core.longpaths` n est declare nulle part</li><li>Le defaut ne se voit qu au premier clone profond, c est-a-dire chez celui qui VERIFIE — le pire endroit.
-
-PROPOSITION</li><li>Un plafond au registre des regles : chemin relatif du livrable + 26 caracteres de sidecar &lt;= 150 (ou toute valeur decidee), juge par oracle-synthese sur le fichier qu il juge (S-nouvelle) et par l oracle de conformite projet sur `output\`</li><li>`git clone -c core.longpaths=true` dans `bootstrap.mjs --rebatir`, dans le mode operatoire de verification sur clone frais, et dans la fiche du skill quality-oracles — declare, jamais suppose</li><li>fixture a double sens : un nom de 150 caracteres passe, un nom de 151 est refuse avec le prefixe admissible en clair</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-10</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>oui — la verification prescrite par la doctrine avant tout push a echoue a son premier emplacement le 10/09/2026 (22 fichiers refuses, checkout impossible) et a du etre rejouee ailleurs avec une option que rien ne documente</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant, mesure de verification du push R-38 par. 4 du 10/09/2026)</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-candidat" id="item-TF-1003" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-1003</code>
@@ -898,35 +865,6 @@ BORNE DECLAREE : l oracle ne juge que la NATURE des fichiers par leur chemin ; i
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>oui — le jour ou la regle est ecrite, un commit couvert par un GO a emporte une modification du noyau non decidee (TF-1010), et rien ne l a nomme avant le push ; la condition qui l aurait arretee existe en prose et nulle part en code</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (action A-4 retenue par l humain le 10/09/2026)</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-1019" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-1019</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">pilot : une decision humaine rendue (&lt;&lt; 11a &gt;&gt;) a recu DEUX FOIS la restitution de la veille rejouee mot pour mot, sans le geste — le push n a ete joue qu apres le second rappel, et aucune restitution ne dit que les deux premieres reponses n ont rien fait</h3>
-          <div class="card-detail" data-cite><p class="lead">Constat en passant du 11/09/2026, en verifiant l execution de la decision humaine D-11 (a) apres que l humain a ecrit, dans une session neuve : &lt;&lt; Dans les precedentes sessions, tu boucles sans traiter D11a comme demande.</p><ul class="puces"><li>&gt;&gt;
-
-CE QUE LA MESURE DIT. Transcription de la session 31d2f3c7 : l humain ecrit &lt;&lt; 11a &gt;&gt; a 09:05:01 puis, sans reponse utile, de nouveau &lt;&lt; 11a &gt;&gt; a 09:07:39. Les deux reponses de fin de tour, a 09:07:31 et 09:09:32, sont la synthese de la veille (20260910g) REJOUEE MOT POUR MOT : 3156 mots chacune, meme titre, meme bloc 3 reposant D-11 a l humain qui vient de la trancher. Le journal des hooks (`.claude/hooks-journal.jsonl`) le confirme : deux entrees &lt;&lt; message portant un VERDICT (3156 mots, sans ecriture) &gt;&gt;, 0 ecriture et 3 commandes chacune, verdict PASS de `oracle-synthese` les deux fois. Le geste commande — `git push` du sha juge — n est joue qu a 09:10:08 (reflog de `origin/main` : &lt;&lt; update by push &gt;&gt;, a72cdd8..a6eaf1f), puis la restitution 20260911a est deposee a 09:23:51 et publiee a 09:31:07. Le resultat final est correct ; ce qui est defectueux, c est le CHEMIN : deux tours de restitution pour zero geste, et l humain qui doit repeter un mot deja rendu.
-
-POURQUOI C EST UN DEFAUT GENERALISE</li><li>La consigne v2.18.0 dit qu un tour qui n apporte rien de neuf rend un accuse bref, et v2.17.0 que ce qui s affiche est le fichier juge : lues ensemble sans le geste, elles produisent exactement ce cas — le fichier juge (la synthese de la veille) est reaffiche tel quel, l oracle le juge PASS puisqu il EST une synthese PASS, et rien ne mesure que le message humain qui precede etait une DECISION attendant un GESTE</li><li>L oracle de restitution juge la forme du message, jamais son rapport au message humain qui le precede : une decision rendue suivie d une restitution qui la repose est invisible pour lui</li><li>La loi 5 du noyau (l IA fait, l humain decide) est violee dans son sens : l humain a decide, et l IA a redemande.
-
-PROPOSITION</li><li>`hook-restitution` lit le dernier message humain : s il a la forme d un selecteur de decision (&lt;&lt; D-N</li><li>&gt;&gt;, &lt;&lt; Nx &gt;&gt;, &lt;&lt; N x &gt;&gt;), la restitution du tour doit porter au bloc 4 une preuve executee liee a cette D-N, et ne peut pas reposer la meme D-N au bloc 3 — sinon FAIL (decision recue, geste absent)</li><li>Un message de fin de tour dont l empreinte de texte est IDENTIQUE a celle du message precedent de la meme session est FAIL d office : rejouer la meme restitution n est jamais un tour</li><li>Fixture rouge/verte a partir de la mesure de reference ci-dessus</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-11</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>oui — deux tours de restitution (2 x 3156 mots) pour zero geste, l humain contraint de repeter une decision deja rendue, puis d ouvrir une troisieme session pour demander pourquoi ; la meme forme (decision rendue, geste absent) n est mesuree par aucun oracle</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant, verification de l execution de D-11 (a) du 11/09/2026)</dd></div>
             
           </dl>
         </article>
@@ -1649,6 +1587,39 @@ PROPOSITION</li><li>`hook-restitution` lit le dernier message humain : s il a la
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-1015" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-1015</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : un clone de verification sur un chemin profond echoue au checkout — 22 fichiers depassent, avec les sidecars d oracle, le plafond de 260 caracteres de Windows ; R-4 juge la forme du nom et jamais sa longueur, la procedure de clone ne declare pas core.longpaths</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat en passant du 10/09/2026, en rejouant la porte de publication sur un clone FRAIS a branche unique de l origine — la mesure que la doctrine prescrit pour repondre a &lt;&lt; que porte le publie ? &gt;&gt; (TF-1008 : un verdict sur la copie locale decrit la copie, remisage compris, pas l objet publie).
+
+CE QUI S EST PASSE.</p><ul class="puces"><li>`git clone --single-branch --branch main &lt;origine&gt;` dans le bac a sable de la session, dont le prefixe fait environ 130 caracteres : &lt;&lt; error: unable to create file … : Filename too long &gt;&gt; sur 22 fichiers — 19 sidecars d oracle sous `.oracles/output/04-plans/` (`&lt;synthese&gt;.md.oracles-historique.jsonl`, `.oracles-cache.json`, `.oracles.json`) et 3 syntheses sous `output/04-plans/` (indices 20260908d, 20260910e, 20260910f) — puis &lt;&lt; fatal: unable to checkout working tree — Clone succeeded, but checkout failed &gt;&gt;. La verification n a pas pu se faire a cet emplacement.
+
+MESURE. Le plus long chemin SUIVI du depot fait 146 caracteres (un sidecar `.oracles/…/… - 20260907i.md.oracles-historique.jsonl`) ; aucun ne depasse 150. Sous le plafond de 260 caracteres de Windows (MAX_PATH, sans core.longpaths), le prefixe de clone admissible est donc de 113 caracteres au plus : le poste de travail (`c:\dev\&lt;depot&gt;\`, 23 caracteres) ne voit rien, un bac a sable de session (130) ou un runner profond voit tout. Le sidecar d oracle ajoute 26 caracteres (`.oracles/` + `.oracles-historique.jsonl`) a chaque nom de synthese, et ces sidecars sont SUIVIS par git.
+
+REMEDE CONFIRME, PAS SUPPOSE. Rejoue a 17:31 sur un prefixe de 41 caracteres avec `git clone -c core.longpaths=true --single-branch` : checkout complet, 683 enregistrements, 44 references, 0 remisage — la porte a pu etre rejouee.
+
+POURQUOI C EST UN DEFAUT GENERALISE</li><li>R-4 fixe la FORME du nom (`&lt;Marque&gt; - &lt;Objet&gt; - AAAAMMJJ&lt;indice&gt;.&lt;ext&gt;`) et rien ne borne sa LONGUEUR : l objet d une synthese s allonge a mesure qu il veut tout dire, et l oracle de restitution ne le mesure pas</li><li>La procedure de verification sur clone frais (fiche du skill quality-oracles, memoire de session &lt;&lt; porte de publication sur clones temporaires &gt;&gt;) et `bootstrap.mjs --rebatir` supposent une plateforme sans plafond : `core.longpaths` n est declare nulle part</li><li>Le defaut ne se voit qu au premier clone profond, c est-a-dire chez celui qui VERIFIE — le pire endroit.
+
+PROPOSITION</li><li>Un plafond au registre des regles : chemin relatif du livrable + 26 caracteres de sidecar &lt;= 150 (ou toute valeur decidee), juge par oracle-synthese sur le fichier qu il juge (S-nouvelle) et par l oracle de conformite projet sur `output\`</li><li>`git clone -c core.longpaths=true` dans `bootstrap.mjs --rebatir`, dans le mode operatoire de verification sur clone frais, et dans la fiche du skill quality-oracles — declare, jamais suppose</li><li>fixture a double sens : un nom de 150 caracteres passe, un nom de 151 est refuse avec le prefixe admissible en clair</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-10</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>oui — la verification prescrite par la doctrine avant tout push a echoue a son premier emplacement le 10/09/2026 (22 fichiers refuses, checkout impossible) et a du etre rejouee ailleurs avec une option que rien ne documente</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant, mesure de verification du push R-38 par. 4 du 10/09/2026)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-corrige" id="item-TF-0884" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0884</code>
@@ -1663,6 +1634,35 @@ PROPOSITION</li><li>`hook-restitution` lit le dernier message humain : s il a la
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 5 — gain 4 × preuve 5 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>un lot ingéré écrasé sans qu'aucun contrôle le dise, le 06/09 ; l'histoire du registre aurait divergé du fichier</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">Produit-12</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-1019" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-1019</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">pilot : une decision humaine rendue (&lt;&lt; 11a &gt;&gt;) a recu DEUX FOIS la restitution de la veille rejouee mot pour mot, sans le geste — le push n a ete joue qu apres le second rappel, et aucune restitution ne dit que les deux premieres reponses n ont rien fait</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat en passant du 11/09/2026, en verifiant l execution de la decision humaine D-11 (a) apres que l humain a ecrit, dans une session neuve : &lt;&lt; Dans les precedentes sessions, tu boucles sans traiter D11a comme demande.</p><ul class="puces"><li>&gt;&gt;
+
+CE QUE LA MESURE DIT. Transcription de la session 31d2f3c7 : l humain ecrit &lt;&lt; 11a &gt;&gt; a 09:05:01 puis, sans reponse utile, de nouveau &lt;&lt; 11a &gt;&gt; a 09:07:39. Les deux reponses de fin de tour, a 09:07:31 et 09:09:32, sont la synthese de la veille (20260910g) REJOUEE MOT POUR MOT : 3156 mots chacune, meme titre, meme bloc 3 reposant D-11 a l humain qui vient de la trancher. Le journal des hooks (`.claude/hooks-journal.jsonl`) le confirme : deux entrees &lt;&lt; message portant un VERDICT (3156 mots, sans ecriture) &gt;&gt;, 0 ecriture et 3 commandes chacune, verdict PASS de `oracle-synthese` les deux fois. Le geste commande — `git push` du sha juge — n est joue qu a 09:10:08 (reflog de `origin/main` : &lt;&lt; update by push &gt;&gt;, a72cdd8..a6eaf1f), puis la restitution 20260911a est deposee a 09:23:51 et publiee a 09:31:07. Le resultat final est correct ; ce qui est defectueux, c est le CHEMIN : deux tours de restitution pour zero geste, et l humain qui doit repeter un mot deja rendu.
+
+POURQUOI C EST UN DEFAUT GENERALISE</li><li>La consigne v2.18.0 dit qu un tour qui n apporte rien de neuf rend un accuse bref, et v2.17.0 que ce qui s affiche est le fichier juge : lues ensemble sans le geste, elles produisent exactement ce cas — le fichier juge (la synthese de la veille) est reaffiche tel quel, l oracle le juge PASS puisqu il EST une synthese PASS, et rien ne mesure que le message humain qui precede etait une DECISION attendant un GESTE</li><li>L oracle de restitution juge la forme du message, jamais son rapport au message humain qui le precede : une decision rendue suivie d une restitution qui la repose est invisible pour lui</li><li>La loi 5 du noyau (l IA fait, l humain decide) est violee dans son sens : l humain a decide, et l IA a redemande.
+
+PROPOSITION</li><li>`hook-restitution` lit le dernier message humain : s il a la forme d un selecteur de decision (&lt;&lt; D-N</li><li>&gt;&gt;, &lt;&lt; Nx &gt;&gt;, &lt;&lt; N x &gt;&gt;), la restitution du tour doit porter au bloc 4 une preuve executee liee a cette D-N, et ne peut pas reposer la meme D-N au bloc 3 — sinon FAIL (decision recue, geste absent)</li><li>Un message de fin de tour dont l empreinte de texte est IDENTIQUE a celle du message precedent de la meme session est FAIL d office : rejouer la meme restitution n est jamais un tour</li><li>Fixture rouge/verte a partir de la mesure de reference ci-dessus</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-11</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>oui — deux tours de restitution (2 x 3156 mots) pour zero geste, l humain contraint de repeter une decision deja rendue, puis d ouvrir une troisieme session pour demander pourquoi ; la meme forme (decision rendue, geste absent) n est mesuree par aucun oracle</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant, verification de l execution de D-11 (a) du 11/09/2026)</dd></div>
             
           </dl>
         </article>
@@ -3465,10 +3465,10 @@ PROPOSITION</li><li>Faire porter à la porte la même frontière que le généra
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-1016" data-cite data-forge="digit-ai-forge-audit" data-statut="candidat" data-prio="haute">
+        <article class="card s-corrige" id="item-TF-1016" data-cite data-forge="digit-ai-forge-audit" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-1016</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-corrige">corrige</span>
             <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -3494,10 +3494,33 @@ PROPOSITION</li><li>Decider : TENIR la convention (entree par enregistrement tou
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-1017" data-cite data-forge="digit-ai-forge-audit" data-statut="candidat" data-prio="moyenne">
+        <article class="card s-corrige" id="item-TF-0862" data-cite data-forge="digit-ai-forge-audit" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-0862</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 5.3)">Priorité Haute</span>
+            
+          </header>
+          <h3 class="card-titre">forge-audit : oracle executable dans profiles/powerbi sur les fichiers TMDL/PBIP d'un modele semantique — mesure definie une fois (CTL-D05-02 et 10), relations actives et non ambigues, table de dates marquee et contigue (CTL-D05-13), mode de connexion declare par profil de besoin (CTL-D05-14), roles de securite au niveau ligne presents, statut de certification (CTL-D05-15) — sans point de terminaison XMLA (manque M4, lot L5)</h3>
+          <div class="card-detail" data-cite><p class="lead">Etude d'opportunite 20260907a, manque M4. Le profil powerbi (10 controles, version 1.0.0) verifie par DMV XMLA ou « bascule en revue outillee » faute d'outillage programmatique ; TMDL est le format texte par defaut d'un projet PBIP depuis 2025-09, ce qui rend les controles programmatiques sur fichiers, sans capacite Premium (donnee du projet, jamais un achat de forge). Mecaniser ses propres controles reste dans la frontiere de forge-audit (cat-aud-02 oracles d'audit). Preuve de pret : self-test PASS ; fixture verte = modele TMDL a table de dates marquee et mesures uniques ; rouge = mesure dupliquee, relation ambigue. Si non fait : modele semantique revu a la main au portail, aucun controle a chaque commit. Effort : complexe x moyen. Barre : BPA + PBIP/TMDL (TF-0859).</p></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-07</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 5.3 — gain 4 × preuve 4 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-audit</dt><dd><span class="meta-sub">non chiffré</span></dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (message du 07/09/2026, decisions D-1 a et D-2 a) via etude d'opportunite du pilot</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-1017" data-cite data-forge="digit-ai-forge-audit" data-statut="corrige" data-prio="moyenne">
           <header class="card-head">
             <code class="tf-id">TF-1017</code>
-            <span class="statut s-candidat">candidat</span>
+            <span class="statut s-corrige">corrige</span>
             <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 4.5)">Priorité Moyenne</span>
             <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
           </header>
@@ -3516,60 +3539,6 @@ PROPOSITION</li><li>`tools/verifier.mjs` rejoue l environnement declare par le w
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 4.5 — gain 3 × preuve 3 ÷ effort 2)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-audit</dt><dd>oui — 8 runs rouges consecutifs sur 17 jours sans qu aucune restitution ne les nomme, et trois publications de la forge faites sur une recette locale verte qui ne voyait pas le rouge</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant, execution de D-10 (a) du 10/09/2026)</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-1014" data-cite data-forge="digit-ai-forge-audit" data-statut="candidat" data-prio="moyenne">
-          <header class="card-head">
-            <code class="tf-id">TF-1014</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">forge-audit : le referentiel de reference du 21/08 n est pas convertible au format courant — son CONTENU (themes de perimetre, types de preuve, livrables attendus, bareme, 9 ADR) n a pas de case dans le pack de dimensions</h3>
-          <div class="card-detail" data-cite><p class="lead">Mesure du 10/09/2026, en executant la decision humaine D-2 (a) (le contenu des references fait foi, le format courant fait foi) sur la seconde des deux references designees par le commanditaire comme le standard : `Client-A - Referentiel POC-to-Prod - Audit - 20260821a.html`.</p><ul class="puces"><li>Le rapport du 25/08, lui, a ete realigne (TF-1005 clos). Le referentiel ne l a pas ete, et ce n est pas une conversion manquee : c est un AUTRE DOCUMENT.
-
-CE QUE LA MESURE DIT. Le referentiel du 21/08 decrit chacune de ses 17 dimensions par : des THEMES de perimetre (152 au total), des TYPES de preuve (109), des LIVRABLES attendus (131) et un BAREME de notation par dimension. Le referentiel courant (`tools/build-referentiel.mjs`, genere pour le tenant : 18 dimensions, 175 controles, 323 Ko) decrit chaque dimension par ses CONTROLES CTL derives des ADR. Confrontation : 3 themes sur 152 se retrouvent tels quels dans le referentiel courant, 5 noms de dimension sur 17, et 9 des 33 ADR cites par la reference sont ABSENTS du modele courant (ADR0307, ADR0510, ADR0623 a ADR0627, ADR0629, ADR0709). Le fichier d ecart complet est depose a cote du referentiel courant chez le produit porteur des references (D-8</li><li>POURQUOI C EST UN CHANTIER DE CONTENU ET PAS UNE CONVERSION. Le rapport du 25/08 portait des DONNEES (scores, verdicts, constats) que le format courant sait recevoir ; il a suffi de les deriver. Le referentiel du 21/08 porte une DOCTRINE PAR DIMENSION — ce qu il faut regarder, quelles preuves comptent, ce qui doit etre livre, comment on note — que le pack de dimensions de forge-audit (`core/dimensions/dimensions.yaml`) ne modelise pas : il porte un identifiant, un libelle, une famille, un nombre de themes et une applicabilite par profil, rien de plus. Faire entrer le contenu du 21/08 dans le format courant suppose donc d ETENDRE le modele du pack (themes, preuves, livrables, bareme par dimension), d y verser les 152/109/131 elements de la reference, et de faire entrer les 9 ADR manquants dans la base d ADR — puis de faire generer le referentiel courant a partir de cela.
-
-CE QUE CELA COUTE DE NE PAS LE FAIRE : le commanditaire tient le referentiel du 21/08 pour le standard ; tant que le referentiel courant n en porte pas le contenu, chaque audit livre un referentiel que le commanditaire ne reconnait pas, et l aller-retour du 09/09 (rapport refuse sur sa forme) se rejouera sur le referentiel.
-
-PROPOSITION</li><li>Etendre `dimensions.yaml` (ou un pack adjacent, pour ne pas alourdir l existant) d un bloc par dimension : `themes[]`, `preuves[]` (type, description), `livrables[]`, `bareme` — le contenu du 21/08 en est la premiere alimentation, versee mecaniquement depuis `ref-donnees.json` (extraction deja faite, deposee avec l ecart)</li><li>Faire entrer les 9 ADR absents dans la base d ADR de la forge, avec leur derivation en regles CTL</li><li>Faire rendre ces blocs par `build-referentiel.mjs` et les juger par une regle du gate (un referentiel dont une dimension n a ni theme ni preuve ni livrable est incomplet)</li><li>Fixture a double sens sur le rendu du referentiel — il n en a aucune aujourd hui : `verifier-rapport-html` juge les rapports, rien ne juge un referentiel. C est une lacune en soi, a traiter dans le meme chantier.
-
-BORNE : le pilot n ecrit pas ce contenu — c est la matiere de la forge d audit et de son commanditaire ; le pilot a mesure l ecart, depose l extraction, et nomme ce qu il faudrait</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-10</dd></div>
-            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 3 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-audit</dt><dd>oui — un rapport d audit a ete refuse par le commanditaire le 09/09 parce qu il ne ressemblait pas aux references ; le referentiel courant differe du referentiel de reference sur 149 themes sur 152 et 9 ADR sur 33, et rien ne juge un referentiel rendu</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (action A-4 de la synthese 20260910e, ouverte par la decision D-7 (a) du 10/09/2026)</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-corrige" id="item-TF-0862" data-cite data-forge="digit-ai-forge-audit" data-statut="corrige" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-0862</code>
-            <span class="statut s-corrige">corrige</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 5.3)">Priorité Haute</span>
-            
-          </header>
-          <h3 class="card-titre">forge-audit : oracle executable dans profiles/powerbi sur les fichiers TMDL/PBIP d'un modele semantique — mesure definie une fois (CTL-D05-02 et 10), relations actives et non ambigues, table de dates marquee et contigue (CTL-D05-13), mode de connexion declare par profil de besoin (CTL-D05-14), roles de securite au niveau ligne presents, statut de certification (CTL-D05-15) — sans point de terminaison XMLA (manque M4, lot L5)</h3>
-          <div class="card-detail" data-cite><p class="lead">Etude d'opportunite 20260907a, manque M4. Le profil powerbi (10 controles, version 1.0.0) verifie par DMV XMLA ou « bascule en revue outillee » faute d'outillage programmatique ; TMDL est le format texte par defaut d'un projet PBIP depuis 2025-09, ce qui rend les controles programmatiques sur fichiers, sans capacite Premium (donnee du projet, jamais un achat de forge). Mecaniser ses propres controles reste dans la frontiere de forge-audit (cat-aud-02 oracles d'audit). Preuve de pret : self-test PASS ; fixture verte = modele TMDL a table de dates marquee et mesures uniques ; rouge = mesure dupliquee, relation ambigue. Si non fait : modele semantique revu a la main au portail, aucun controle a chaque commit. Effort : complexe x moyen. Barre : BPA + PBIP/TMDL (TF-0859).</p></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-07</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 5.3 — gain 4 × preuve 4 ÷ effort 3)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-forge-audit</dt><dd><span class="meta-sub">non chiffré</span></dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (message du 07/09/2026, decisions D-1 a et D-2 a) via etude d'opportunite du pilot</dd></div>
             
           </dl>
         </article>
@@ -3603,6 +3572,37 @@ CE QUE CET ITEM EVITE S IL EST TENU : chaque rapport d audit remis rouvre aujour
             <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 3 ÷ effort 3)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-forge-audit</dt><dd>oui — un rapport d audit remis le 09/09 a ete refuse par le commanditaire sur sa forme, et le lot qui le remonte classe le constat BLOQUANT ; l ecart est chiffre par un oracle rejoue (exit 1, 13 erreurs sur la reference mesuree ici), et tant qu il n est pas resorbe chaque remise rouvre le meme aller-retour</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">humain (decision D-2 du 10/09/2026, synthese 20260909b)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-1014" data-cite data-forge="digit-ai-forge-audit" data-statut="corrige" data-prio="moyenne">
+          <header class="card-head">
+            <code class="tf-id">TF-1014</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-moyenne" title="priorité dérivée du score (valeur 3)">Priorité Moyenne</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">forge-audit : le referentiel de reference du 21/08 n est pas convertible au format courant — son CONTENU (themes de perimetre, types de preuve, livrables attendus, bareme, 9 ADR) n a pas de case dans le pack de dimensions</h3>
+          <div class="card-detail" data-cite><p class="lead">Mesure du 10/09/2026, en executant la decision humaine D-2 (a) (le contenu des references fait foi, le format courant fait foi) sur la seconde des deux references designees par le commanditaire comme le standard : `Client-A - Referentiel POC-to-Prod - Audit - 20260821a.html`.</p><ul class="puces"><li>Le rapport du 25/08, lui, a ete realigne (TF-1005 clos). Le referentiel ne l a pas ete, et ce n est pas une conversion manquee : c est un AUTRE DOCUMENT.
+
+CE QUE LA MESURE DIT. Le referentiel du 21/08 decrit chacune de ses 17 dimensions par : des THEMES de perimetre (152 au total), des TYPES de preuve (109), des LIVRABLES attendus (131) et un BAREME de notation par dimension. Le referentiel courant (`tools/build-referentiel.mjs`, genere pour le tenant : 18 dimensions, 175 controles, 323 Ko) decrit chaque dimension par ses CONTROLES CTL derives des ADR. Confrontation : 3 themes sur 152 se retrouvent tels quels dans le referentiel courant, 5 noms de dimension sur 17, et 9 des 33 ADR cites par la reference sont ABSENTS du modele courant (ADR0307, ADR0510, ADR0623 a ADR0627, ADR0629, ADR0709). Le fichier d ecart complet est depose a cote du referentiel courant chez le produit porteur des references (D-8</li><li>POURQUOI C EST UN CHANTIER DE CONTENU ET PAS UNE CONVERSION. Le rapport du 25/08 portait des DONNEES (scores, verdicts, constats) que le format courant sait recevoir ; il a suffi de les deriver. Le referentiel du 21/08 porte une DOCTRINE PAR DIMENSION — ce qu il faut regarder, quelles preuves comptent, ce qui doit etre livre, comment on note — que le pack de dimensions de forge-audit (`core/dimensions/dimensions.yaml`) ne modelise pas : il porte un identifiant, un libelle, une famille, un nombre de themes et une applicabilite par profil, rien de plus. Faire entrer le contenu du 21/08 dans le format courant suppose donc d ETENDRE le modele du pack (themes, preuves, livrables, bareme par dimension), d y verser les 152/109/131 elements de la reference, et de faire entrer les 9 ADR manquants dans la base d ADR — puis de faire generer le referentiel courant a partir de cela.
+
+CE QUE CELA COUTE DE NE PAS LE FAIRE : le commanditaire tient le referentiel du 21/08 pour le standard ; tant que le referentiel courant n en porte pas le contenu, chaque audit livre un referentiel que le commanditaire ne reconnait pas, et l aller-retour du 09/09 (rapport refuse sur sa forme) se rejouera sur le referentiel.
+
+PROPOSITION</li><li>Etendre `dimensions.yaml` (ou un pack adjacent, pour ne pas alourdir l existant) d un bloc par dimension : `themes[]`, `preuves[]` (type, description), `livrables[]`, `bareme` — le contenu du 21/08 en est la premiere alimentation, versee mecaniquement depuis `ref-donnees.json` (extraction deja faite, deposee avec l ecart)</li><li>Faire entrer les 9 ADR absents dans la base d ADR de la forge, avec leur derivation en regles CTL</li><li>Faire rendre ces blocs par `build-referentiel.mjs` et les juger par une regle du gate (un referentiel dont une dimension n a ni theme ni preuve ni livrable est incomplet)</li><li>Fixture a double sens sur le rendu du referentiel — il n en a aucune aujourd hui : `verifier-rapport-html` juge les rapports, rien ne juge un referentiel. C est une lacune en soi, a traiter dans le meme chantier.
+
+BORNE : le pilot n ecrit pas ce contenu — c est la matiere de la forge d audit et de son commanditaire ; le pilot a mesure l ecart, depose l extraction, et nomme ce qu il faudrait</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-10</dd></div>
+            <div><dt>Priorité</dt><dd>Moyenne <span class="meta-sub">(score 3 — gain 3 × preuve 3 ÷ effort 3)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-forge-audit</dt><dd>oui — un rapport d audit a ete refuse par le commanditaire le 09/09 parce qu il ne ressemblait pas aux references ; le referentiel courant differe du referentiel de reference sur 149 themes sur 152 et 9 ADR sur 33, et rien ne juge un referentiel rendu</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (action A-4 de la synthese 20260910e, ouverte par la decision D-7 (a) du 10/09/2026)</dd></div>
             
           </dl>
         </article>

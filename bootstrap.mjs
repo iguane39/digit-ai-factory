@@ -255,7 +255,7 @@ for (const f of FORGES) {
     defaut(`${f.nom} — le dossier existe SANS dépôt git`, "le déplacer ou le supprimer, puis relancer");
   } else {
     // core.longpaths : les forges portent des noms de fichiers longs (convention
-    // "Digit-AI - ... - AAAAMMJJx.md") qui dépassent MAX_PATH sous Windows.
+    // "Digit-AI - ... - AAAAMMJJx.md") qui dépassent MAX_PATH sous Windows (TF-1015).
     const r = git(racine, "clone", "--quiet", "-c", "core.longpaths=true", `${SOURCE}/${f.nom}.git`, dest);
     if (r.status === 0) {
       const e = etatDepot(dest);
@@ -284,7 +284,9 @@ for (const f of FORGES) {
     // (recette du bootstrap, miroir local) peut ne pas porter ce dépôt privé : alors on le DIT en
     // avertissement, jamais en défaut — un miroir sans canal n'est pas un poste sans tables, c'est
     // un poste dont les tables restent à l'ancien emplacement, ce que lib-confidentiel déclare.
-    const r = git(racine, "clone", "--quiet", `${SOURCE}/${CANAL.nom}.git`, dest);
+    // core.longpaths : même motif que pour les forges — sous MAX_PATH = 260, un chemin long
+    // refusé au checkout laisse un clone SANS arbre de travail (TF-1015, 10/09/2026).
+    const r = git(racine, "clone", "--quiet", "-c", "core.longpaths=true", `${SOURCE}/${CANAL.nom}.git`, dest);
     if (r.status === 0) ligne("ok", `${CANAL.nom} — canal confidentiel cloné en ${dest} ; si ce poste portait encore des tables libres, jouer scripts/fusionner-tables-confidentielles.mjs`);
     else if (process.env.BOOTSTRAP_SOURCE) { ligne("avert", `${CANAL.nom} — canal confidentiel absent à la source surchargée ${SOURCE} : tables lues à l'ancien emplacement s'il existe`); averts.push(`${CANAL.nom} absent à la source surchargée`); }
     else defaut(`${CANAL.nom} — canal confidentiel ABSENT et clone en échec : ${(r.stderr || "").trim().split("\n")[0].slice(0, 120)}`, `vérifier l'accès au dépôt PRIVÉ ${SOURCE}/${CANAL.nom}.git (gh auth status), puis scripts/fusionner-tables-confidentielles.mjs si des tables libres existent`);

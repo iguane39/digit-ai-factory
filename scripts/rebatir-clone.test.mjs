@@ -9,7 +9,7 @@ import assert from "node:assert/strict";
 const CAS = [];
 const test = (nom, fn) => CAS.push([nom, fn]);
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdtempSync, readdirSync, writeFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -132,6 +132,16 @@ test("fetch fait AVANT l'outil + commit réécrit dont le contenu change → seu
   assert.ok(existsSync(join(poste, "local.txt")));
   assert.match(g(poste, "show", "HEAD~1:b.txt"), /pseudonymisé/, "le contenu réécrit du distant est conservé, pas écrasé par l'ancien");
   rmSync(base, { recursive: true, force: true });
+});
+
+test("TF-1015 — tout appel git du script porte `-c core.longpaths=true` (l'arbre de travail se réécrit ici aussi)", () => {
+  const source = readFileSync(SCRIPT, "utf8");
+  const helper = source.split("\n").find((l) => /^const git = /.test(l));
+  assert.ok(helper, "l'aide `git` du script n'est plus reconnaissable — l'assertion ne prouve plus rien");
+  assert.match(helper, /"-c",\s*"core\.longpaths=true"/,
+    "sans core.longpaths, `reset --hard` et `am --3way` échouent sur un chemin long comme le checkout du 10/09 (22 fichiers refusés)");
+  assert.equal((source.match(/git\(\s*["']clone["']/g) || []).length, 0,
+    "un `git clone` est apparu dans le script : vérifier qu'il porte lui aussi -c core.longpaths=true (TF-1015)");
 });
 
 let pass = 0, fail = 0;
