@@ -48,7 +48,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - D-11 a etait executee a 09h10 boucle mesuree et deposee - 20260911b.md` | fichier | 21,7 Ko | Synthèse de mandat — D-11 (a) était déjà exécutée à 09:10 ; ce qui bouclait, c'est la rest |
 | `Digit-AI - Synthese Mandat - D-12 a executee regle etendue registre publie - 20260911c.md` | fichier | 14,9 Ko | Synthèse de mandat — D-12 (a) exécutée : la règle de publication couvre désormais les cand |
 | `Digit-AI - Synthese Mandat - D-13 a executee pilot et forge publies CI lue - 20260911e.md` | fichier | 13,4 Ko | Synthèse de mandat — D-13 (a) exécutée : le pilot et la forge d'audit sont publiés et véri |
-| `Digit-AI - Synthese Mandat - D-3 a executee spec digit-ai-marketing RUN-AO lots lances - 20260911h.md` | fichier | 21,7 Ko | Synthèse de mandat — D-3 (a) est exécutée : les huit candidatures sont décidées, le type d |
+| `Digit-AI - Synthese Mandat - D-3 a executee spec digit-ai-marketing RUN-AO lots lances - 20260911h.md` | fichier | 26,3 Ko | Synthèse de mandat — D-3 (a) est exécutée : les huit candidatures sont décidées, les quatr |
 | `Digit-AI - Synthese Mandat - Decision 31a la porte connait le canal - 20260908a.md` | fichier | 14,6 Ko | Synthèse de mandat — décision 31 (a) exécutée : la porte de publication trouve seule les t |
 | `Digit-AI - Synthese Mandat - Decision 5a et TF-0793 clos - 20260903f.md` | fichier | 13,8 Ko | Synthèse de mandat — décision 5a appliquée et premier chantier du pilot clos (03/09/2026) |
 | `Digit-AI - Synthese Mandat - Decision 5a jetons digit-ai-schemas - 20260904a.md` | fichier | 19,7 Ko | Synthèse — décision 5a du 04/09/2026 : le skill de schémas émet des jetons |
