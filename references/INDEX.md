@@ -21,6 +21,7 @@ l'oracle refuse l'orphelin dans les deux sens (référence sans entrée ici, ent
 | `references\PATRONS-EPROUVES.md` | Patrons éprouvés — mécanismes payés une fois, réutilisables tels quels |
 | `references\PRODUCTION-OOXML.md` | Production d'un document OOXML depuis une référence client — relevé de charte et gates |
 | `references\REGLES-DE-NON-REPETITION.md` | Règles de non-répétition |
+| `references\RUN-AO.md` | Run de réponse à appel d'offres — quand le livrable est une offre à échéance, construite sur des documents tiers |
 | `references\RUN-CONSEIL.md` | Run de conseil — quand le livrable est une trajectoire, pas un logiciel ni un seul document |
 | `references\RUN-MANDAT.md` | Run de mandat transverse — quand le livrable est un document, pas un logiciel |
 | `references\RUN-VERSION.md` | Run de version (produit existant) — détail opérationnel |
