@@ -67,6 +67,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `20260907-etude-opportunite-mission-data-silver-gold-powerbi.md` | fichier | 43,4 Ko | Étude d'opportunité — préparation des forges à une mission data Silver/Gold sur Databricks |
 | `20260907-L99-mission-data-silver-gold-powerbi.md` | fichier | 47,5 Ko | Analyse L99 — « Identifie les compétences manquantes des forges pour une mission data Silv |
 | `20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md` | fichier | 10,9 Ko | Pourquoi faut-il réécrire l'histoire à chaque fois, et comment cesser |
+| `20260911-etude-opportunite-communication-marketing-ao.md` | fichier | 45,5 Ko | Étude d'opportunité — communication, marketing et réponse aux appels d'offres pour Digit-A |
 | `20260911-L99-forge-communication-marketing.md` | fichier | 52,4 Ko | Analyse L99 — « Construire une forge communication & marketing pour Digit-AI : étude d'opp |
 
-_52 fichier(s), 0 sous-dossier(s)_
+_53 fichier(s), 0 sous-dossier(s)_
