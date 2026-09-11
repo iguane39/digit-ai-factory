@@ -77,7 +77,7 @@ Une seule décision reste ouverte, et c'est celle d'hier. Les deux autres ont é
 - **Le retrait du remisage** : non fait — motif : garde-fou R-29 (la règle du projet qui réserve toute suppression à l'humain) ; il date du 01/09, d'avant les deux sessions, et peut porter du travail mis de côté.
 - **La reprise du message de mon commit, vidé de son sens par la pseudonymisation** : non faite — motif : il est déjà dans l'histoire publiée, et le fichier porte désormais l'explication complète.
 - **Le passif éventuel des deux dépôts frères** : c'est la décision D-33 — motif : dépendance à une décision humaine.
-- **La publication de cette restitution** : non faite — motif : gate de gouvernance. Mon enregistrement ne porte QUE la restitution et entrerait donc dans ce que la règle neuve couvre, mais un enregistrement de REGISTRE d'une autre session est venu se poser au-dessus : publier la branche emporterait son registre sans feu vert. Rien n'exige de publier maintenant, et je ne pousse pas — ni la branche, ni mon empreinte seule, ce que la règle neuve du projet exclut ; les précédents sont partis sous vos feux verts, après inspection de leur contenu par la session qui poussait.
+- **La publication de cette restitution** : FAITE depuis, sous votre feu vert, par la session voisine qui poussait — mes quatre derniers enregistrements du soir sont vérifiés un par un comme ancêtres de la branche publiée. Ce qui reste vrai du motif qui bloquait : je n'ai poussé moi-même ni la branche, ni mon empreinte seule ; un enregistrement de REGISTRE d'une autre session s'était posé au-dessus des miens, et publier la branche aurait emporté son registre sans feu vert. **C'est encore le cas maintenant** — le seul enregistrement en avance sur l'origine est le sien, pas le mien, et je ne le pousse pas.
 - **La propagation de la copie installée des skills** : non faite — motif : garde-fou, elle écrit hors du dépôt et reste un geste humain ; tant qu'elle n'a pas lieu, le contrôle des skills reste rouge **dans le sens attendu** — la source est en avance sur la copie, et la prochaine propagation posera la remontée au lieu de l'effacer.
 
 ## 6. Écarts à la lettre
@@ -118,7 +118,7 @@ Ordre : **A-105 en premier, parce qu'elle empêche le défaut de se reproduire a
 
 ## 9. Traces
 
-- Dépôt public — `https://github.com/iguane39/digit-ai-factory`, `origin/main` `5233c2a` après publication de mes six enregistrements ; porte rejouée sur clone frais à branche unique de l'état FINAL : **PASS, 0 antériorité, 0 bloquant**.
+- Dépôt public — `https://github.com/iguane39/digit-ai-factory`, `origin/main` `5233c2a` après publication de mes six enregistrements de la journée, puis `a6eaf1f` et **691 enregistrements** après celle de mes quatre derniers ; porte rejouée sur clone frais à branche unique de l'état FINAL : **PASS, 0 antériorité, 0 bloquant**.
 - Noyau — `CLAUDE.md` corrigé ET PUBLIÉ, 6139 octets pour un plafond de 6144, `oracle-claude-md` PASS ; l'affaiblissement aura été en ligne de 14 h 41 min 50 s à 14 h 59 min 38 s.
 - Canal confidentiel — `C:\dev\_confidentiel\tables\produits-pseudonymes.json`, 65 produits, commit `7a070e0` du 08/09 à 19 h 13, inchangé depuis.
 - `oracles\pre-commit-quantificateurs.mjs` et son banc (8 cas), posés au hameçon de pré-commit ; `oracles\oracle-claude-md.mjs` corrigé de deux défauts, recette 14/14.
