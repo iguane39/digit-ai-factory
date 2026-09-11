@@ -11,7 +11,11 @@ qui recevront chacune un lot. L'étude instruit la demande du 11/09/2026 telle q
 l'analyse L99 du même jour, sous la décision humaine prise à sa lecture — « exécute le prompt »,
 soit D-1 (a) : la lecture reconstruite de l'intention et les huit écarts à la lettre sont validés.
 La question de l'interne (collaborateurs, recrutement) n'a pas été tranchée : elle est traitée ici
-comme question ouverte de l'hypothèse H1.
+comme question ouverte de l'hypothèse H1. **Rectification du 11/09/2026 (décision D-3 (a), « le
+spécifique Digit-AI ira dans un projet dédié »)** : le produit autonome de l'objet M4 se nomme
+`digit-ai-marketing` ; le nom de travail `digit-ai-communication` employé plus bas désigne ce
+même produit (TF-1024 rectifiée ; spécification de création : `output\04-plans\Digit-AI -
+Specification Produit - digit-ai-marketing - 20260911a.md`).
 
 Mesures relevées le **2026-09-11** sur les dépôts tels que présents sur le poste (relevé
 d'ouverture : forge-agents à jour, forge-design à jour, pilot 2 enregistrements en avance).
