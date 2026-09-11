@@ -37,5 +37,6 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `registre-oracles-edite-en-copie-installee-20260910a.tf.jsonl` | fichier | 4,6 Ko | 1 ligne(s) JSONL |
 | `remesurer-plutot-que-croire-20260910a.tf.jsonl` | fichier | 4,9 Ko | 1 ligne(s) JSONL |
 | `revue-classes-20260903a.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
+| `socle-html-syne-faux-positif-20260911a.tf.jsonl` | fichier | 2,3 Ko | 1 ligne(s) JSONL |
 
-_20 fichier(s), 1 sous-dossier(s)_
+_21 fichier(s), 1 sous-dossier(s)_

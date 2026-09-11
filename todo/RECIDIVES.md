@@ -1,10 +1,10 @@
 # Récidives et descente — tableau de bord
 
-<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre c41e0e6a1571 · archive 6ce2fe14c2bb · classes b844aa74d165 · relevés fd7e1cbf8f6e · héritage 23d6b9c4bee8. État au 2026-09-11T12:12:29.203Z (ts max des sources, jamais l'horloge). -->
+<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 2e7d487ce314 · archive 6ce2fe14c2bb · classes b844aa74d165 · relevés fd7e1cbf8f6e · héritage 23d6b9c4bee8. État au 2026-09-11T12:50:04.228Z (ts max des sources, jamais l'horloge). -->
 
 Ce tableau de bord répond à trois questions que le registre seul ne savait pas poser : est-ce la deuxième fois, chez qui, et depuis combien de temps la correction existe sans être appliquée. Il se lit avec sa contre-métrique : un compteur de récidives qui baisse pendant que le nombre de classes monte est un compteur contourné, pas un progrès.
 
-**Périmètre mesuré** : 1034 item(s) au registre (actifs et archive), 206 portant une classe, 112 marqué(s) récidive ; référentiel de 69 classe(s) en 18 famille(s) (v1.10.0) ; 20 relevé(s) d'héritage.
+**Périmètre mesuré** : 1048 item(s) au registre (actifs et archive), 220 portant une classe, 121 marqué(s) récidive ; référentiel de 69 classe(s) en 18 famille(s) (v1.10.0) ; 20 relevé(s) d'héritage.
 
 ## 1. Récidives par classe
 
@@ -13,35 +13,37 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | Classe | Famille | Items | Fondateurs | Récidives | Taux | Produits ayant récidivé | Dernière |
 |---|---|---|---|---|---|---|---|
 | `gabarit-famille-manquante` | gabarit-document | 13 | 1 | 13 | 100 % | Produit-03 ×1, Produit-10 ×5, Produit-62 ×6, Produit-65 ×1 | 2026-09-09 |
-| `oracle-remplace-par-controle-maison` | skill-ou-oracle-non-invoque | 13 | 1 | 11 | 85 % | Produit-61 ×1, Produit-03 ×1, Produit-10 ×5, Produit-62 ×3, Produit-65 ×1 | 2026-09-09 |
+| `oracle-remplace-par-controle-maison` | skill-ou-oracle-non-invoque | 14 | 1 | 12 | 86 % | Produit-61 ×1, Produit-03 ×1, Produit-10 ×5, Produit-62 ×3, Produit-65 ×1, Produit-11 ×1 | 2026-09-11 |
+| `boucle-retour-sans-descente` | heritage-produit | 9 | 1 | 9 | 100 % | Produit-62 ×2, Produit-12 ×2, Produit-10 ×2, Produit-11 ×3 | 2026-09-11 |
 | `heritage-avertissement-tardif` | heritage-produit | 7 | 1 | 7 | 100 % | Produit-02 ×2, Produit-10 ×3, Produit-11 ×2 | 2026-09-08 |
 | `lecture-tiers-non-jugee` | skill-ou-oracle-non-invoque | 7 | 1 | 7 | 100 % | Produit-10 ×3, Produit-62 ×2, Produit-11 ×2 | 2026-09-08 |
 | `recette-verdict-non-prononcable` | regle-morte | 8 | 3 | 7 | 88 % | Produit-61 ×3, Produit-10 ×1, pilot ×1, Produit-62 ×2 | 2026-09-09 |
 | `surface-implicite-non-livree` | affordance-ui | 15 | 1 | 7 | 47 % | Produit-61 ×6, Produit-10 ×1 | 2026-09-07 |
-| `boucle-retour-sans-descente` | heritage-produit | 6 | 1 | 6 | 100 % | Produit-62 ×1, Produit-12 ×2, Produit-10 ×2, Produit-11 ×1 | 2026-09-08 |
 | `gate-ecriture-juge-fichier-entier` | hook-ou-gate | 7 | 1 | 6 | 86 % | Produit-60 ×1, Produit-62 ×1, pilot ×3, Produit-61 ×1 | 2026-09-05 |
 | `anonymisation-portee-partielle` | anonymisation | 16 | 2 | 5 | 31 % | pilot ×4, Produit-12 ×1 | 2026-09-06 |
 | `page-html-filtres-tableau` | page-html-socle | 5 | 4 | 5 | 100 % | Produit-12 ×1, Produit-61 ×1, Produit-62 ×3 | 2026-09-08 |
 | `page-html-sticky-superposes` | page-html-socle | 5 | 1 | 5 | 100 % | Produit-61 ×1, Produit-10 ×4 | 2026-09-08 |
 | `gabarit-conception-non-jugee` | gabarit-document | 3 | 3 | 3 | 100 % | Produit-61 ×2, pilot ×1 | 2026-09-10 |
 | `page-html-dictionnaire-colonnes` | page-html-socle | 4 | 1 | 3 | 75 % | Produit-10 ×3 | 2026-09-08 |
+| `page-html-largeur-lecture-donnees` | page-html-socle | 4 | 2 | 3 | 75 % | Produit-10 ×2, Produit-11 ×1 | 2026-09-11 |
 | `skill-non-invoque-lexique` | skill-ou-oracle-non-invoque | 3 | 1 | 3 | 100 % | Produit-10 ×1, Produit-62 ×1, Produit-11 ×1 | 2026-09-09 |
 | `alias-de-transition-perime-survivant` | heritage-produit | 3 | 1 | 2 | 67 % | Produit-11 ×1, Produit-61 ×1 | 2026-09-09 |
 | `auteur-juge-son-contrat` | skill-ou-oracle-non-invoque | 2 | 1 | 2 | 2/2 (sous 3 items, taux non significatif) | Produit-11 ×2 | 2026-09-08 |
 | `contrat-de-sortie-sans-domicile` | contrat-interface-forge | 3 | 1 | 2 | 67 % | Produit-62 ×1, Produit-61 ×1 | 2026-09-09 |
-| `page-html-largeur-lecture-donnees` | page-html-socle | 3 | 2 | 2 | 67 % | Produit-10 ×2 | 2026-09-08 |
+| `controle-sans-fixture-double-sens` | skill-ou-oracle-non-invoque | 4 | 0 | 2 | 50 % | pilot ×1, Produit-11 ×1 | 2026-09-11 |
+| `page-html-liste-renvoi-sans-detail` | page-html-socle | 2 | 1 | 2 | 2/2 (sous 3 items, taux non significatif) | Produit-10 ×1, Produit-11 ×1 | 2026-09-11 |
 | `page-html-sommaire-absent` | page-html-socle | 2 | 2 | 2 | 2/2 (sous 3 items, taux non significatif) | Produit-10 ×2 | 2026-09-08 |
 | `porte-cle-courte-sans-frontiere` | hook-ou-gate | 4 | 1 | 2 | 50 % | Produit-62 ×2 | 2026-09-09 |
 | `restitution-fichier-juge-mal-choisi` | restitution-forme | 2 | 1 | 2 | 2/2 (sous 3 items, taux non significatif) | Produit-10 ×2 | 2026-09-08 |
 | `compte-total-hors-canal-des-constats` | contrat-interface-forge | 4 | 1 | 1 | 25 % | pilot ×1 | 2026-09-08 |
 | `controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas` | regle-morte | 2 | 0 | 1 | 1/2 (sous 3 items, taux non significatif) | pilot ×1 | 2026-09-10 |
-| `controle-sans-fixture-double-sens` | skill-ou-oracle-non-invoque | 3 | 0 | 1 | 33 % | pilot ×1 | 2026-09-10 |
 | `correction-symptome-sans-classe` | lot-forme | 3 | 1 | 1 | 33 % | Produit-62 ×1 | 2026-09-09 |
 | `date-de-fichier-menteuse-apres-copie` | hook-ou-gate | 1 | 1 | 1 | 1/1 (sous 3 items, taux non significatif) | pilot ×1 | 2026-09-10 |
 | `garde-lexicale-frontiere-ascii` | regle-morte | 9 | 2 | 1 | 11 % | Produit-62 ×1 | 2026-09-08 |
-| `page-html-liste-renvoi-sans-detail` | page-html-socle | 1 | 1 | 1 | 1/1 (sous 3 items, taux non significatif) | Produit-10 ×1 | 2026-09-08 |
+| `page-html-grille-non-alignee` | page-html-socle | 1 | 1 | 1 | 1/1 (sous 3 items, taux non significatif) | Produit-11 ×1 | 2026-09-11 |
 | `page-html-teinte-refus` | page-html-socle | 1 | 1 | 1 | 1/1 (sous 3 items, taux non significatif) | Produit-10 ×1 | 2026-09-08 |
 | `point-entree-declare-rouge-sur-toute-cible` | regle-morte | 3 | 1 | 1 | 33 % | Produit-62 ×1 | 2026-09-09 |
+| `regle-balaie-prose-et-identifiants` | regle-morte | 4 | 1 | 1 | 25 % | pilot ×1 | 2026-09-11 |
 | `texte-sur-la-graphie-detruit-par-sa-pseudonymisation` | anonymisation | 1 | 1 | 1 | 1/1 (sous 3 items, taux non significatif) | pilot ×1 | 2026-09-10 |
 | `banc-etend-referentiel-production` | anonymisation | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `boite-entree-produit-statut-git-non-dit` | contrat-interface-forge | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
@@ -64,17 +66,15 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `marque-de-propriete-devinee-par-sous-chaine` | hook-ou-gate | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `marque-emettrice-portee-par-deux-chartes` | donnees-perissables-en-dur | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `motif-exclusion-couvert-compte-absent` | heritage-produit | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
-| `page-html-grille-non-alignee` | page-html-socle | 0 | 1 | 0 | — | — | — |
 | `page-html-polices-distantes` | page-html-socle | 0 | 1 | 0 | — | — | — |
 | `page-html-temps-affiche` | page-html-socle | 0 | 1 | 0 | — | — | — |
 | `porte-sans-chemin-des-tables` | hook-ou-gate | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `quantificateur-sacrifie-au-budget-du-texte` | regle-morte | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
-| `recette-locale-ne-rejoue-pas-l-environnement-de-la-ci` | hook-ou-gate | 2 | 1 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
+| `recette-locale-ne-rejoue-pas-l-environnement-de-la-ci` | hook-ou-gate | 3 | 1 | 0 | 0 % | — | — |
 | `reference-chargee-toujours-absente-du-paquet` | regle-morte | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
-| `registre-doublon-non-detecte` | lot-forme | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
-| `regle-balaie-prose-et-identifiants` | regle-morte | 3 | 1 | 0 | 0 % | — | — |
+| `registre-doublon-non-detecte` | lot-forme | 2 | 0 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
 | `regle-de-branche-annoncee-differente-configuree` | contrat-interface-forge | 2 | 1 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
-| `regle-ecrite-sans-oracle-qui-la-joue` | skill-ou-oracle-non-invoque | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
+| `regle-ecrite-sans-oracle-qui-la-joue` | skill-ou-oracle-non-invoque | 4 | 0 | 0 | 0 % | — | — |
 | `regle-neuve-sans-mesure-de-bruit` | page-html-socle | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `regle-qui-interdit-son-propre-remede` | hook-ou-gate | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `releve-heritage-juge-arbre-pas-histoire` | heritage-produit | 0 | 1 | 0 | — | — | — |
@@ -188,7 +188,7 @@ Comment lire : le nombre de classes créées par semaine ISO, puis les classes s
 | 2026-S37 | 32 |
 
 - Classes sans clôture fondatrice : `emplacement-livrable-hors-convention`, `registre-doublon-non-detecte`, `banc-etend-referentiel-production`, `gate-cout-invite-au-contournement`, `regle-neuve-sans-mesure-de-bruit`, `controle-sans-fixture-double-sens`, `deux-regles-du-socle-inconciliables`, `controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas`, `controle-vrai-sur-le-mauvais-invariant`, `regle-ecrite-sans-oracle-qui-la-joue`
-- Retours entrés sous une classe suspecte : TF-0995 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1003 (controle-vrai-sur-le-mauvais-invariant), TF-1006 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1011 (regle-ecrite-sans-oracle-qui-la-joue), TF-1015 (chemin-de-livrable-au-dela-du-plafond-de-la-plateforme), TF-1016 (journal-de-versions-dormant), TF-1017 (recette-locale-ne-rejoue-pas-l-environnement-de-la-ci), TF-1021 (capacite-hors-versionnement-de-forge), TF-1022 (reference-chargee-toujours-absente-du-paquet), TF-1023 (marque-emettrice-portee-par-deux-chartes)
+- Retours entrés sous une classe suspecte : TF-0995 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1003 (controle-vrai-sur-le-mauvais-invariant), TF-1006 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1011 (regle-ecrite-sans-oracle-qui-la-joue), TF-1015 (chemin-de-livrable-au-dela-du-plafond-de-la-plateforme), TF-1016 (journal-de-versions-dormant), TF-1017 (recette-locale-ne-rejoue-pas-l-environnement-de-la-ci), TF-1021 (capacite-hors-versionnement-de-forge), TF-1022 (reference-chargee-toujours-absente-du-paquet), TF-1023 (marque-emettrice-portee-par-deux-chartes), TF-1039 (registre-doublon-non-detecte), TF-1040 (controle-sans-fixture-double-sens), TF-1041 (regle-ecrite-sans-oracle-qui-la-joue), TF-1043 (regle-ecrite-sans-oracle-qui-la-joue), TF-1044 (regle-ecrite-sans-oracle-qui-la-joue)
 
 ## Ce que cette vue ne juge pas
 
