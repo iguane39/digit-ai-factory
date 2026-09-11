@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 254 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 255 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -250,6 +250,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md | 20260830c | 17.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Forme du bloc 3 et redescente aux produits - 20260830c.md` |
 | Digit-AI - Synthese Mandat - Heritage a l ouverture et localisateurs - 20260830g.md | 20260830g | 16.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Heritage a l ouverture et localisateurs - 20260830g.md` |
 | Digit-AI - Synthese Mandat - Histoire du pilot reecrite et republiee zero nom restant - 20260909a.md | 20260909a | 20.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Histoire du pilot reecrite et republiee zero nom restant - 20260909a.md` |
+| Digit-AI - Synthese Mandat - Huit enregistrements publies registre en ligne a jour - 20260911a.md | 20260911a | 12.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Huit enregistrements publies registre en ligne a jour - 20260911a.md` |
 | Digit-AI - Synthese Mandat - Identifiants exposes verification - 20260830i.md | 20260830i | 16.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Identifiants exposes verification - 20260830i.md` |
 | Digit-AI - Synthese Mandat - Ingestion rouverte et banc au vert - 20260831c.md | 20260831c | 13.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Ingestion rouverte et banc au vert - 20260831c.md` |
 | Digit-AI - Synthese Mandat - Juste milieu du canal de remontee - 20260830k.md | 20260830k | 15.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Juste milieu du canal de remontee - 20260830k.md` |

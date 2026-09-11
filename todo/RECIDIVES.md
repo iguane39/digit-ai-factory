@@ -1,10 +1,10 @@
 # Récidives et descente — tableau de bord
 
-<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 0547e914a257 · archive 6ce2fe14c2bb · classes fe7bf6d3c1a5 · relevés 87cfd092d942 · héritage 23d6b9c4bee8. État au 2026-09-10T15:57:37.096Z (ts max des sources, jamais l'horloge). -->
+<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre a7296c80057d · archive 6ce2fe14c2bb · classes fe7bf6d3c1a5 · relevés 78986cb8fda5 · héritage 23d6b9c4bee8. État au 2026-09-10T15:59:47.733Z (ts max des sources, jamais l'horloge). -->
 
 Ce tableau de bord répond à trois questions que le registre seul ne savait pas poser : est-ce la deuxième fois, chez qui, et depuis combien de temps la correction existe sans être appliquée. Il se lit avec sa contre-métrique : un compteur de récidives qui baisse pendant que le nombre de classes monte est un compteur contourné, pas un progrès.
 
-**Périmètre mesuré** : 1016 item(s) au registre (actifs et archive), 200 portant une classe, 111 marqué(s) récidive ; référentiel de 65 classe(s) en 18 famille(s) (v1.8.0) ; 18 relevé(s) d'héritage.
+**Périmètre mesuré** : 1017 item(s) au registre (actifs et archive), 201 portant une classe, 112 marqué(s) récidive ; référentiel de 65 classe(s) en 18 famille(s) (v1.8.0) ; 19 relevé(s) d'héritage.
 
 ## 1. Récidives par classe
 
@@ -35,6 +35,7 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `restitution-fichier-juge-mal-choisi` | restitution-forme | 2 | 1 | 2 | 2/2 (sous 3 items, taux non significatif) | Produit-10 ×2 | 2026-09-08 |
 | `compte-total-hors-canal-des-constats` | contrat-interface-forge | 4 | 1 | 1 | 25 % | pilot ×1 | 2026-09-08 |
 | `controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas` | regle-morte | 2 | 0 | 1 | 1/2 (sous 3 items, taux non significatif) | pilot ×1 | 2026-09-10 |
+| `controle-sans-fixture-double-sens` | skill-ou-oracle-non-invoque | 3 | 0 | 1 | 33 % | pilot ×1 | 2026-09-10 |
 | `correction-symptome-sans-classe` | lot-forme | 3 | 1 | 1 | 33 % | Produit-62 ×1 | 2026-09-09 |
 | `date-de-fichier-menteuse-apres-copie` | hook-ou-gate | 1 | 1 | 1 | 1/1 (sous 3 items, taux non significatif) | pilot ×1 | 2026-09-10 |
 | `garde-lexicale-frontiere-ascii` | regle-morte | 9 | 2 | 1 | 11 % | Produit-62 ×1 | 2026-09-08 |
@@ -47,7 +48,6 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `brief-sans-regles-de-socle` | skill-ou-oracle-non-invoque | 0 | 1 | 0 | — | — | — |
 | `champ-transcrit-de-prose-sans-correspondance` | regle-morte | 3 | 1 | 0 | 0 % | — | — |
 | `chemin-de-livrable-au-dela-du-plafond-de-la-plateforme` | emplacement-livrable | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
-| `controle-sans-fixture-double-sens` | skill-ou-oracle-non-invoque | 2 | 0 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
 | `controle-vrai-sur-le-mauvais-invariant` | regle-morte | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `deux-regles-du-socle-inconciliables` | page-html-socle | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `emplacement-livrable-hors-convention` | emplacement-livrable | 3 | 0 | 0 | 0 % | — | — |
@@ -88,9 +88,9 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 | `anonymisation-portee-partielle` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `auteur-juge-son-contrat` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `banc-etend-referentiel-production` | — | — | non mesurable : aucune clôture fondatrice au registre |
-| `boite-entree-produit-statut-git-non-dit` | 2026-09-08 | forge/travaux/TRAVAUX-PILOT.md | 3 produit(s) atteint(s) en 0–1 j ; 8 non atteint(s) (Produit-11, client-a-cockpit-ia, Produit-01, Produit-02, COMPTA---Ventillation-de-facture-Fournisseur-A, Produit-10, Produit-04, Produit-64) |
+| `boite-entree-produit-statut-git-non-dit` | 2026-09-08 | forge/travaux/TRAVAUX-PILOT.md | 3 produit(s) atteint(s) en 0–1 j ; 10 non atteint(s) (Produit-11, client-a-cockpit-ia, Produit-01, Produit-02, COMPTA---Ventillation-de-facture-Fournisseur-A, Produit-10, Produit-04, Produit-64, bav-dev, Produit-61) |
 | `boucle-retour-sans-descente` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
-| `brief-sans-regles-de-socle` | 2026-09-02 | CLAUDE.md | 11 produit(s) atteint(s) en 1–7 j ; 1 non atteint(s) (Produit-11) |
+| `brief-sans-regles-de-socle` | 2026-09-02 | CLAUDE.md | 12 produit(s) atteint(s) en 1–9 j ; 2 non atteint(s) (Produit-11, bav-dev) |
 | `champ-transcrit-de-prose-sans-correspondance` | 2026-09-06 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `chemin-de-livrable-au-dela-du-plafond-de-la-plateforme` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `compte-total-hors-canal-des-constats` | — | — | non mesurable : aucune clôture fondatrice au registre |
@@ -98,7 +98,7 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 | `controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `controle-sans-fixture-double-sens` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `controle-vrai-sur-le-mauvais-invariant` | — | — | non mesurable : aucune clôture fondatrice au registre |
-| `correction-symptome-sans-classe` | 2026-09-02 | forge/retours/GABARIT-LOT-RETOURS.md | 2 produit(s) atteint(s) en 6–7 j ; 10 non atteint(s) (Produit-11, client-a-cockpit-ia, Plateforme_video_IA_complet, Produit-01, Produit-12, Produit-02, Produit-10, Produit-04, COMPTA---Ventillation-de-facture-Fournisseur-A, Produit-64) |
+| `correction-symptome-sans-classe` | 2026-09-02 | forge/retours/GABARIT-LOT-RETOURS.md | 2 produit(s) atteint(s) en 6–7 j ; 12 non atteint(s) (Produit-11, client-a-cockpit-ia, Plateforme_video_IA_complet, Produit-01, Produit-12, Produit-02, Produit-10, Produit-04, COMPTA---Ventillation-de-facture-Fournisseur-A, Produit-64, bav-dev, Produit-61) |
 | `date-de-fichier-menteuse-apres-copie` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `deux-regles-du-socle-inconciliables` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `emplacement-livrable-hors-convention` | — | — | non mesurable : aucune clôture fondatrice au registre |
@@ -113,12 +113,12 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 | `l99-forme-sortie` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `lecture-tiers-non-jugee` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `livrable-ecrase-sans-indice` | 2026-08-23 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
-| `lot-de-travaux-mauvais-module-producteur` | 2026-09-05 | forge/travaux/TRAVAUX-PILOT.md | 8 produit(s) atteint(s) en 2–4 j ; 4 non atteint(s) (Produit-11, client-a-cockpit-ia, Plateforme_video_IA_complet, Produit-64) |
-| `lot-remis-ecrasable` | 2026-09-08 | forge/retours/oracle-lot.mjs | 9 produit(s) atteint(s) en 0–1 j ; 2 non atteint(s) (client-a-cockpit-ia, Produit-64) |
+| `lot-de-travaux-mauvais-module-producteur` | 2026-09-05 | forge/travaux/TRAVAUX-PILOT.md | 8 produit(s) atteint(s) en 2–4 j ; 6 non atteint(s) (Produit-11, client-a-cockpit-ia, Plateforme_video_IA_complet, Produit-64, bav-dev, Produit-61) |
+| `lot-remis-ecrasable` | 2026-09-08 | forge/retours/oracle-lot.mjs | 9 produit(s) atteint(s) en 0–1 j ; 4 non atteint(s) (client-a-cockpit-ia, Produit-64, bav-dev, Produit-61) |
 | `maquette-absente-avant-code` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `marque-de-propriete-devinee-par-sous-chaine` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `motif-exclusion-couvert-compte-absent` | 2026-09-08 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
-| `oracle-remplace-par-controle-maison` | 2026-09-02 | CLAUDE.md | 11 produit(s) atteint(s) en 1–7 j ; 1 non atteint(s) (Produit-11) |
+| `oracle-remplace-par-controle-maison` | 2026-09-02 | CLAUDE.md | 12 produit(s) atteint(s) en 1–9 j ; 2 non atteint(s) (Produit-11, bav-dev) |
 | `page-html-dictionnaire-colonnes` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `page-html-filtres-tableau` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
 | `page-html-grille-non-alignee` | 2026-09-02 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
@@ -142,33 +142,33 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 | `regle-neuve-sans-mesure-de-bruit` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `regle-qui-interdit-son-propre-remede` | — | — | non mesurable : aucune clôture fondatrice au registre |
 | `releve-heritage-juge-arbre-pas-histoire` | 2026-09-08 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
-| `restitution-action-humaine-geste-agent` | 2026-09-02 | forge/RESTITUTION.md | 1 produit(s) atteint(s) en 7–7 j ; 11 non atteint(s) (Produit-11, client-a-cockpit-ia, Plateforme_video_IA_complet, Produit-01, Produit-12, Produit-02, Produit-10, Produit-04, COMPTA---Ventillation-de-facture-Fournisseur-A, Client-A-POC-to-Prod, Produit-64) |
-| `restitution-fichier-juge-mal-choisi` | 2026-09-02 | forge/RESTITUTION.md | 1 produit(s) atteint(s) en 7–7 j ; 11 non atteint(s) (Produit-11, client-a-cockpit-ia, Plateforme_video_IA_complet, Produit-01, Produit-12, Produit-02, Produit-10, Produit-04, COMPTA---Ventillation-de-facture-Fournisseur-A, Client-A-POC-to-Prod, Produit-64) |
-| `restitution-rendu-visuel-non-critique` | 2026-09-02 | forge/RESTITUTION.md | 1 produit(s) atteint(s) en 7–7 j ; 11 non atteint(s) (Produit-11, client-a-cockpit-ia, Plateforme_video_IA_complet, Produit-01, Produit-12, Produit-02, Produit-10, Produit-04, COMPTA---Ventillation-de-facture-Fournisseur-A, Client-A-POC-to-Prod, Produit-64) |
+| `restitution-action-humaine-geste-agent` | 2026-09-02 | forge/RESTITUTION.md | 1 produit(s) atteint(s) en 7–7 j ; 13 non atteint(s) (Produit-11, client-a-cockpit-ia, Plateforme_video_IA_complet, Produit-01, Produit-12, Produit-02, Produit-10, Produit-04, COMPTA---Ventillation-de-facture-Fournisseur-A, Client-A-POC-to-Prod, Produit-64, bav-dev, Produit-61) |
+| `restitution-fichier-juge-mal-choisi` | 2026-09-02 | forge/RESTITUTION.md | 1 produit(s) atteint(s) en 7–7 j ; 13 non atteint(s) (Produit-11, client-a-cockpit-ia, Plateforme_video_IA_complet, Produit-01, Produit-12, Produit-02, Produit-10, Produit-04, COMPTA---Ventillation-de-facture-Fournisseur-A, Client-A-POC-to-Prod, Produit-64, bav-dev, Produit-61) |
+| `restitution-rendu-visuel-non-critique` | 2026-09-02 | forge/RESTITUTION.md | 1 produit(s) atteint(s) en 7–7 j ; 13 non atteint(s) (Produit-11, client-a-cockpit-ia, Plateforme_video_IA_complet, Produit-01, Produit-12, Produit-02, Produit-10, Produit-04, COMPTA---Ventillation-de-facture-Fournisseur-A, Client-A-POC-to-Prod, Produit-64, bav-dev, Produit-61) |
 | `sceau-de-vue-provenance-sans-contenu` | 2026-09-05 | — | non mesurable : la règle ne vit dans aucun artefact hérité (R-47) — descente par le pilot seul |
-| `skill-non-invoque-lexique` | 2026-08-14 | CLAUDE.md | 11 produit(s) atteint(s) en 20–26 j ; 1 non atteint(s) (Produit-11) |
-| `surface-implicite-non-livree` | 2026-09-05 | CLAUDE.md | 11 produit(s) atteint(s) en 2–4 j ; 1 non atteint(s) (Produit-11) |
+| `skill-non-invoque-lexique` | 2026-08-14 | CLAUDE.md | 12 produit(s) atteint(s) en 20–28 j ; 2 non atteint(s) (Produit-11, bav-dev) |
+| `surface-implicite-non-livree` | 2026-09-05 | CLAUDE.md | 12 produit(s) atteint(s) en 2–6 j ; 2 non atteint(s) (Produit-11, bav-dev) |
 | `texte-sur-la-graphie-detruit-par-sa-pseudonymisation` | — | — | non mesurable : aucune clôture fondatrice au registre |
 
 ## 3. Taux d'héritage par règle (dernier relevé)
 
-Comment lire : une ligne par artefact hérité déclaré dans `gabarits/HERITAGE.json`, état au relevé du 2026-09-09T12:44:25.664Z sur 10 produit(s) ; *conformes* compte les produits chez qui l'artefact est présent et à jour ; *familles* dit de quelles familles de défaut cet artefact protège.
+Comment lire : une ligne par artefact hérité déclaré dans `gabarits/HERITAGE.json`, état au relevé du 2026-09-11T07:11:21.271Z sur 12 produit(s) ; *conformes* compte les produits chez qui l'artefact est présent et à jour ; *familles* dit de quelles familles de défaut cet artefact protège.
 
 | Artefact | Mode | Conformes | Familles protégées |
 |---|---|---|---|
-| forge/retours/GABARIT-LOT-RETOURS.md | copie_conforme | 3/10 | lot-forme |
-| forge/retours/oracle-lot.mjs | copie_conforme | 3/10 | lot-forme |
-| forge/hooks/factory.mjs | copie_conforme | 8/10 | skill-ou-oracle-non-invoque, restitution-forme, page-html-socle, heritage-produit |
-| forge/RESTITUTION.md | copie_conforme | 3/10 | restitution-forme |
-| .claude/settings.json | presence_et_motif | 10/10 | skill-ou-oracle-non-invoque, restitution-forme, page-html-socle, heritage-produit |
-| CLAUDE.md | presence_et_motif | 9/10 | skill-ou-oracle-non-invoque |
-| robots.txt | presence | 4/10 | — |
-| llms.txt | presence | 4/10 | — |
-| forge/travaux/TRAVAUX-PILOT.md | copie_conforme | 3/10 | heritage-produit |
-| forge/travaux/ECARTS-ASSUMES.md | presence | 5/10 | heritage-produit |
-| forge/travaux/oracle-travaux.mjs | copie_conforme | 3/10 | heritage-produit |
-| .gitignore | presence_et_motifs | 2/10 | secret-hors-perimetre |
-| forge/retours/CLASSES.json | copie_conforme | 3/10 | heritage-produit, lot-forme |
+| forge/retours/GABARIT-LOT-RETOURS.md | copie_conforme | 3/12 | lot-forme |
+| forge/retours/oracle-lot.mjs | copie_conforme | 3/12 | lot-forme |
+| forge/hooks/factory.mjs | copie_conforme | 9/12 | skill-ou-oracle-non-invoque, restitution-forme, page-html-socle, heritage-produit |
+| forge/RESTITUTION.md | copie_conforme | 3/12 | restitution-forme |
+| .claude/settings.json | presence_et_motif | 11/12 | skill-ou-oracle-non-invoque, restitution-forme, page-html-socle, heritage-produit |
+| CLAUDE.md | presence_et_motif | 10/12 | skill-ou-oracle-non-invoque |
+| robots.txt | presence | 5/12 | — |
+| llms.txt | presence | 5/12 | — |
+| forge/travaux/TRAVAUX-PILOT.md | copie_conforme | 3/12 | heritage-produit |
+| forge/travaux/ECARTS-ASSUMES.md | presence | 6/12 | heritage-produit |
+| forge/travaux/oracle-travaux.mjs | copie_conforme | 3/12 | heritage-produit |
+| .gitignore | presence_et_motifs | 3/12 | secret-hors-perimetre |
+| forge/retours/CLASSES.json | copie_conforme | 0/12 | heritage-produit, lot-forme |
 
 ## 4. Contre-métrique : classes créées
 
