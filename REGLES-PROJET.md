@@ -571,6 +571,18 @@ exactement le défaut**. Étude : `output\03-etudes\20260817-etude-opportunite-p
    orphelin d'avance sur l'origine, à attendre un feu vert de plus pour le compte rendu
    d'un travail déjà publié — un aller-retour par tour sans qu'aucun risque nouveau ne
    soit couvert, la restitution passant la même barrière que le travail.
+5. **Extension aux constats en passant (D-12 (a), 11/09/2026).** La même couverture
+   d'office vaut pour un **enregistrement de registre qui ne porte que des candidatures
+   en `candidat`** — le sidecar ingéré, l'événement d'ingestion, la classe neuve qui la
+   fonde dans `todo\CLASSES.json` et les vues régénérées —, aux deux mêmes conditions
+   (porte PASS juste avant le push, rien d'autre dans l'enregistrement). Reste au GO
+   explicite tout enregistrement qui porte une **décision**, une **clôture**, une
+   **règle** ou un contenu de produit. *Pourquoi* : une candidature en `candidat` ne
+   décide rien — elle attend le mot humain au registre, publiée ou non ; la publier ne
+   franchit aucune gate humaine (R-29), et le seul risque qu'un push porte (un nom de
+   client) est couvert par la porte. Le 10/09 et le 11/09, chaque constat en passant
+   a coûté une décision de publication (D-11, D-12) sans qu'aucun risque nouveau ne
+   soit couvert — la même forme que le paragraphe 4 corrigeait pour les restitutions.
 
 **Appelants (R-35)** : le garde-fou du noyau (`CLAUDE.md` §Garde-fous) et
 `gabarits\CLAUDE-PRODUIT.md` §Conventions (toute session produit le charge) ; la FORME
