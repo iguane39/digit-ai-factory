@@ -39,5 +39,6 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `revue-classes-20260903a.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
 | `socle-html-syne-faux-positif-20260911a.tf.jsonl` | fichier | 2,3 Ko | 1 ligne(s) JSONL |
 | `style-redactionnel-sans-oracle-20260911a.tf.jsonl` | fichier | 3,3 Ko | 1 ligne(s) JSONL |
+| `viewport-de-conception-fullhd-4k-20260912a.tf.jsonl` | fichier | 3,1 Ko | 1 ligne(s) JSONL |
 
-_22 fichier(s), 1 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_23 fichier(s), 1 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

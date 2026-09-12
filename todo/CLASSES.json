@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.12.0",
+ "version": "1.13.0",
  "date": "2026-09-12",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -1083,6 +1083,21 @@
    "voisines": [
     "page-html-largeur-lecture-donnees",
     "restitution-rendu-visuel-non-critique"
+   ]
+  },
+  {
+   "cle": "sequence-octale-interpretee-au-rendu",
+   "famille": "page-html-socle",
+   "libelle": "Un generateur de page rend le texte d un item en interpretant une sequence d antislash comme un echappement (\u0000 lu comme l octet nul, \n comme un saut de ligne) : la donnee est intacte (aucun octet nul dans le registre), la page generee porte l octet, et elle devient BINAIRE pour toute recherche textuelle et FAIL pour l oracle des caracteres de controle. Le defaut est invisible a l ecran (l octet nul ne s affiche pas) et se voit chez celui qui verifie. La classe se distingue de texte-sur-la-graphie-detruit-par-sa-pseudonymisation (une transformation VOULUE qui abime un texte) : ici la transformation n est voulue par personne, c est un chemin Windows cite dans un texte",
+   "creee_le": "2026-09-12",
+   "fondee_par": [
+    "TF-1067"
+   ],
+   "regle": "un generateur de page ne fait passer aucun texte de donnee par une evaluation qui interprete les antislashs (gabarit evalue, remplacement a motifs speciaux, decodage d echappements) ; le texte est echappe pour HTML et insere tel quel ; un chemin Windows cite dans un item se rend avec son antislash ; oracle-caracteres-controle joue sur la page generee a chaque regeneration",
+   "oracle": "oracle-caracteres-controle.mjs (CC1, existant, joue par self-tests.mjs) ; a cabler dans todo/generer-page.mjs apres ecriture pour que la regeneration echoue au lieu de laisser la page binaire",
+   "voisines": [
+    "texte-sur-la-graphie-detruit-par-sa-pseudonymisation",
+    "regle-balaie-prose-et-identifiants"
    ]
   }
  ]
