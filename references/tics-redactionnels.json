@@ -1,0 +1,148 @@
+{
+  "format": "pilot/tics-redactionnels@1",
+  "version": "1.0.0",
+  "date": "2026-09-12",
+  "source": "Mandat humain du 12/09/2026 (décisions D-1 (a), D-3 (a) de la synthèse 20260911j) sur l'analyse L99 output/03-etudes/20260911-L99-regles-d-ecriture-factory.md. Familles dérivées de deux catalogues de signes (Wikipédia FR « Aide:Identifier l'usage d'une IA générative », Wikipédia EN « Wikipedia:Signs of AI writing », lus le 11/09/2026), des règles de terrain RULE-A..I d'agent-style (2026) et de guides francophones de détection 2026 ; seuils CALIBRÉS sur le corpus du pilot le 12/09/2026 (voir « calibrage »).",
+  "pourquoi_une_donnee_et_pas_du_code": "Loi transverse n° 4 — une donnée volatile est une donnée, pas du code. Les tournures qui trahissent une écriture générée changent avec chaque génération de modèle (Wikipédia EN mesure la chute de « delve » en 2025) : une liste en dur dans l'oracle obligerait à publier une version de l'oracle pour ajouter ou retirer un mot. Chaque entrée est datée et sourcée ; chaque famille porte un seuil de densité explicite, recalibrable sans toucher au code.",
+  "pourquoi_par_famille_et_par_densite_et_jamais_un_mot_isole": "Un mot isolé n'est pas un défaut : « crucial » a sa place une fois par document, un tiret d'incise est la ponctuation normale du français. C'est la DENSITÉ (occurrences pour mille mots de prose) et l'accumulation de familles qui trahissent une cadence mécanique — Wikipédia EN : « one or two coincidental, many indicate AI ». Un oracle qui crie sur un mot se fait désactiver dans la semaine (leçon N4 du noyau, leçon JARGON-A-GLOSER) ; un oracle de densité, calibré pour que le corpus PASS reste PASS, survit.",
+  "regle": "Pour chaque famille, l'oracle compte les occurrences dans la PROSE du texte (hors blocs de code, spans de code, front matter, URL, lignes de séparation de tableau) et les rapporte à mille mots. Au-delà de `seuil_avertissement`, il avertit ; au-delà de `seuil_echec`, il échoue. Un texte de moins de `mots_minimum` mots n'est jugé sur aucune densité (un court texte à un seul tic n'est pas un texte à tics). Les motifs sont des expressions régulières insensibles à la casse, à frontière de mot Unicode.",
+  "mots_minimum": 150,
+  "calibrage": {
+    "corpus": "output/04-plans/*.md (118 synthèses et notes), output/03-etudes/*.md, references/*.md, gabarits/*.md du pilot au 12/09/2026",
+    "methode": "densités mesurées par famille ; seuil_avertissement posé au voisinage du 90e centile du corpus, seuil_echec au double ou au-delà du maximum observé sur les textes déjà jugés PASS, de sorte que le corpus reste PASS à 95 % ou plus (baseline de non-régression, contrat §4 du mandat)",
+    "mesure_du": "2026-09-12",
+    "resultat": "204 textes mesurés ; les sept familles lexicales sont quasi absentes du corpus (maximum observé : emphase-creuse 1,9 ‰, parallélisme 1,2 ‰, clôture 0,8 ‰, annonce 0,4 ‰, les trois autres 0) — leurs seuils sont posés d'après les catalogues, non d'après le corpus, et se vérifient sur la fixture rouge ; la ponctuation de cadence est la seule famille dense (voir sa note). Rejeu : node oracles/oracle-ecriture.mjs --baseline output/04-plans"
+  },
+  "familles": [
+    {
+      "cle": "annonce-vide",
+      "libelle": "Annonce ou méta-commentaire qui dit qu'on va dire au lieu de dire",
+      "ce_que_le_lecteur_paie": "une phrase lue pour rien avant l'information ; en série, l'impression d'un texte qui se regarde écrire",
+      "remede": "supprimer l'annonce et commencer par le fait ; un chapitre ouvre par ce que le lecteur apprend (M7, L7)",
+      "seuil_avertissement": 2.0,
+      "seuil_echec": 5.0,
+      "motifs": [
+        {"motif": "il est important de (noter|souligner|rappeler|préciser|mentionner)", "langue": "fr", "source": "guides FR 2026 ; Wikipédia FR « phrases creuses »", "depuis": "2026-09-12"},
+        {"motif": "il (convient|est essentiel|est crucial|est primordial|est nécessaire) de (noter|souligner|rappeler|préciser|comprendre)", "langue": "fr", "source": "guides FR 2026 (cours-ndrc)", "depuis": "2026-09-12"},
+        {"motif": "notons que|force est de constater|il va sans dire|comme (nous l'avons|on l'a) (vu|dit|mentionné)", "langue": "fr", "source": "agent-style RULE-04 (mots inutiles)", "depuis": "2026-09-12"},
+        {"motif": "(dans|au cours de) (ce|cet) (chapitre|article|document|section)[^.\\n]{0,40}nous (allons|verrons)|nous allons (voir|aborder|examiner|explorer)", "langue": "fr", "source": "Wikipédia FR « plans répétitifs »", "depuis": "2026-09-12"},
+        {"motif": "it('s| is) (important|worth|essential|crucial) to (note|mention|remember|understand)|note that|as (we|I) (mentioned|discussed|saw)", "langue": "en", "source": "Wikipédia EN « superficial analysis »", "depuis": "2026-09-12"}
+      ]
+    },
+    {
+      "cle": "cloture-resumante",
+      "libelle": "Clôture qui résume ce que le bloc vient de dire",
+      "ce_que_le_lecteur_paie": "relire ce qu'il vient de lire ; le signal le plus constant des textes générés selon les deux catalogues Wikipédia",
+      "remede": "supprimer la phrase de synthèse en fin de bloc ; la synthèse vit une fois, en ouverture (bloc 0, M7)",
+      "seuil_avertissement": 1.0,
+      "seuil_echec": 3.0,
+      "motifs": [
+        {"motif": "en (conclusion|résumé|somme|définitive)|pour (résumer|conclure|faire court)|au final|en fin de compte|tout compte fait", "langue": "fr", "source": "Wikipédia FR « sections Conclusion » ; agent-style RULE-E", "depuis": "2026-09-12"},
+        {"motif": "in (conclusion|summary|short)|to (sum up|summarize|conclude)|overall,|all in all", "langue": "en", "source": "Wikipédia EN ; agent-style RULE-E", "depuis": "2026-09-12"}
+      ]
+    },
+    {
+      "cle": "emphase-creuse",
+      "libelle": "Adjectif ou image qui amplifie sans fait",
+      "ce_que_le_lecteur_paie": "un ton promotionnel qui ne dit rien ; Wikipédia FR : « ton promotionnel », « emphase excessive » ; Wikipédia EN : « undue emphasis on significance », « promotional language »",
+      "remede": "remplacer par le fait (un chiffre, un nom, une date, une conséquence) ou supprimer",
+      "seuil_avertissement": 3.0,
+      "seuil_echec": 8.0,
+      "motifs": [
+        {"motif": "crucial(e|es|s)?|primordial(e|es|s)?|incontournable(s)?|révolutionnaire(s)?|révolutionn(e|er|ent)|sans précédent|véritable (levier|atout|révolution|game changer)", "langue": "fr", "source": "guides FR 2026 (« crucial, significatif, robuste, substantiel ») ; Wikipédia FR « emphase »", "depuis": "2026-09-12"},
+        {"motif": "à l'ère (de|du|des)|dans un monde (où|en)|en constante évolution|au cœur (de|du|des)|plongeons|plongée (dans|au)", "langue": "fr", "source": "guides FR 2026 (« À l'ère de… », « Plongeons dans… »)", "depuis": "2026-09-12"},
+        {"motif": "delve|tapestry|testament to|pivotal|groundbreaking|cutting-edge|seamless(ly)?|game-?changer|vibrant|ever-evolving|landscape of|unlock(s|ing)? the|elevate(s|d)?|harness(es|ing)? the|robust and", "langue": "en", "source": "Wikipédia EN « AI vocabulary » (daté : liste GPT-4 / GPT-4o) ; impeccable marketing-buzzword", "depuis": "2026-09-12"}
+      ]
+    },
+    {
+      "cle": "parallelisme-mecanique",
+      "libelle": "Symétrie de construction par réflexe : négation-affirmation, balancement",
+      "ce_que_le_lecteur_paie": "une phrase qui semble réfuter une objection que personne n'a faite ; Wikipédia EN : « negative parallelisms », « rule of three » ; agent-style RULE-07 (forme affirmative)",
+      "remede": "dire la chose affirmativement ; garder la symétrie quand les idées sont réellement coordonnées (RULE-09)",
+      "seuil_avertissement": 2.0,
+      "seuil_echec": 5.0,
+      "motifs": [
+        {"motif": "non seulement[^.\\n]{0,80}mais (aussi|également|encore)|qu'il s'agisse de|que ce soit[^.\\n]{0,60} ou|ce n'est pas (un|une|seulement|simplement)[^.\\n]{0,60}(c'est|mais)", "langue": "fr", "source": "Wikipédia EN « negative parallelisms » transposé ; guides FR 2026", "depuis": "2026-09-12"},
+        {"motif": "not (just|only|merely)[^.\\n]{0,80}but (also|rather)?|it's not (a|about)[^.\\n]{0,60}it's", "langue": "en", "source": "Wikipédia EN « negative parallelisms » ; impeccable aphoristic-cadence", "depuis": "2026-09-12"}
+      ]
+    },
+    {
+      "cle": "attribution-vague",
+      "libelle": "Autorité floue à la place d'une source",
+      "ce_que_le_lecteur_paie": "une affirmation qu'il ne peut pas vérifier ; Wikipédia EN : « weasel wording » ; LC2 du pilot : un chiffre sans source ne vaut rien",
+      "remede": "nommer la source (fichier, ligne, URL, personne, date) ou marquer « à vérifier »",
+      "seuil_avertissement": 1.0,
+      "seuil_echec": 3.0,
+      "motifs": [
+        {"motif": "les experts (s'accordent|estiment|considèrent|recommandent)|il est (généralement|communément|largement) (admis|reconnu|accepté)|de nombreuses (études|recherches|sources) (montrent|indiquent|démontrent)|on (considère|estime|sait) (généralement )?que|selon (certains|de nombreux|la plupart des) (experts|spécialistes|observateurs)", "langue": "fr", "source": "Wikipédia EN « vague attributions » transposé", "depuis": "2026-09-12"},
+        {"motif": "experts (say|agree|argue|believe)|studies (show|suggest|indicate)|it is (widely|generally) (known|accepted|believed)|industry reports|some critics", "langue": "en", "source": "Wikipédia EN « vague attributions »", "depuis": "2026-09-12"}
+      ]
+    },
+    {
+      "cle": "formule-de-conversation",
+      "libelle": "Reste de dialogue d'assistant dans un texte destiné à un lecteur",
+      "ce_que_le_lecteur_paie": "un texte qui s'adresse à un interlocuteur absent ; Wikipédia EN : « collaborative communication », « knowledge-cutoff disclaimers »",
+      "remede": "supprimer ; un livrable ne converse pas, il informe",
+      "seuil_avertissement": 0.5,
+      "seuil_echec": 2.0,
+      "motifs": [
+        {"motif": "n'hésitez pas à|j'espère que (cela|ceci|ça) (vous )?(aide|aidera|sera utile)|excellente question|bien sûr !|absolument !|je (serais|suis) ravi(e)? de|à ma (dernière|date de) (mise à jour|connaissance)|en tant qu'(IA|intelligence artificielle|modèle de langage)", "langue": "fr", "source": "Wikipédia EN « communication patterns » transposé ; Wikipédia FR « commentaires d'édition »", "depuis": "2026-09-12"},
+        {"motif": "i hope this helps|feel free to|let me know if|as an ai|as of my last (update|training)|great question|certainly!|absolutely!", "langue": "en", "source": "Wikipédia EN « collaborative communication », « knowledge-cutoff disclaimers »", "depuis": "2026-09-12"}
+      ]
+    },
+    {
+      "cle": "transition-de-remplissage",
+      "libelle": "Connecteur d'addition en tête de phrase, par réflexe",
+      "ce_que_le_lecteur_paie": "une transition qui n'articule rien ; agent-style RULE-D ; Wikipédia EN : « Additionally » en tête de la liste du vocabulaire IA",
+      "remede": "supprimer le connecteur ou articuler réellement (cause, opposition, conséquence)",
+      "seuil_avertissement": 4.0,
+      "seuil_echec": 10.0,
+      "motifs": [
+        {"motif": "^\\s*(de plus|en outre|par ailleurs|également|aussi|d'autre part|qui plus est)\\s*,", "langue": "fr", "source": "agent-style RULE-D", "depuis": "2026-09-12", "par_ligne": true},
+        {"motif": "^\\s*(additionally|furthermore|moreover|also)\\s*,", "langue": "en", "source": "agent-style RULE-D ; Wikipédia EN « AI vocabulary »", "depuis": "2026-09-12", "par_ligne": true}
+      ]
+    },
+    {
+      "cle": "ponctuation-de-cadence",
+      "libelle": "Tiret d'incise employé à la place de la virgule, du point ou des deux-points, en cascade",
+      "ce_que_le_lecteur_paie": "une phrase qui rebondit au lieu de finir ; le tiret d'incise est légitime en français, sa CASCADE (plusieurs par phrase, à chaque phrase) est une cadence mécanique — Wikipédia EN « overuse of em dashes », impeccable em-dash-overuse (advisory)",
+      "remede": "un tiret d'incise par phrase au plus ; sinon une virgule, un point, ou deux phrases",
+      "seuil_avertissement": 25.0,
+      "seuil_echec": 40.0,
+      "motifs": [
+        {"motif": "\\s[—–]\\s", "langue": "*", "source": "Wikipédia EN ; agent-style RULE-B ; impeccable em-dash-overuse", "depuis": "2026-09-12"}
+      ],
+      "note_calibrage": "mesuré le 12/09/2026 sur 204 textes du pilot (≥ 150 mots) : médiane 18,6 tirets d'incise pour mille mots, 75e centile 24,3, 90e centile 31,6, 95e centile 35,7, maximum 60,2. Le corpus du pilot est écrit en style d'incise dense (doctrines, synthèses) : le seuil d'échec est posé au-dessus du 95e centile pour que ce corpus reste PASS et que seule une cascade nettement supérieure échoue ; l'avertissement au voisinage du 75e centile. À recalibrer à la baisse quand la règle E-8 aura fait baisser la densité des textes neufs."
+    }
+  ],
+  "anteriorite": {
+    "regle": "Un fichier listé ici est un texte normatif interne antérieur à la doctrine d'écriture : l'oracle rend SKIP dessus (jamais FAIL) tant qu'il n'est pas réécrit ; il sera jugé à sa prochaine réécriture de fond, jamais rétroactivement (typologie §1 du mandat, chapitre 8 de l'analyse).",
+    "chemins": [
+      "REGLES-PROJET.md",
+      "CLAUDE.md",
+      "CONTRAT-INTERFACE.md",
+      "INVENTAIRE.md",
+      "gabarits/RESTITUTION.md",
+      "gabarits/AGENT-CAMPAGNE.md",
+      "gabarits/TRAVAUX-PILOT.md",
+      "gabarits/RETOURS-FORGES.md",
+      "gabarits/CLAUDE-PRODUIT.md",
+      "references/ACCUEIL.md",
+      "references/ETAPES-RUN.md",
+      "references/RUN-MANDAT.md",
+      "references/RUN-VERSION.md",
+      "references/RUN-CONSEIL.md",
+      "references/RUN-AO.md",
+      "references/TODO-FORGE.md",
+      "references/BEST-PRACTICES-HTML.md",
+      "references/INTENTION.md",
+      "references/PATRONS-EPROUVES.md"
+    ]
+  },
+  "non_juge": [
+    "la JUSTESSE d'une voix, la véracité d'un fait, la pertinence d'un choix : l'oracle compte des tournures, il ne lit pas",
+    "le jargon hors des référentiels existants (JARGON-A-GLOSER.json, jargon-a-gloser.json du socle) : couvert par S20, S23, M18, L30, jamais ici",
+    "les textes d'application (T4 : libellés, erreurs, états vides) : leurs chaînes vivent dans du code ou des fichiers de ressources que cet oracle ne lit pas — lot de travaux forge-design",
+    "un tic hors liste : un motif qui n'a encore coûté aucun aller-retour n'est pas détecté ; la liste grossit par les retours humains, jamais par la devinette"
+  ]
+}

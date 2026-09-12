@@ -81,6 +81,9 @@
  *       forme RÉSERVÉE à `output\03-etudes\` — partout ailleurs R-4 s'applique (08/09, TF-0923) ;
  *   S41 une décision portant un mot que la DOCTRINE du projet régit cite cette doctrine en source :
  *       une source qui n'est pas celle qui tranche est une opinion sourcée (08/09, TF-0923) ;
+ *   S43 (12/09/2026, TF-1064) le STYLE de la restitution relève du plancher d'écriture
+ *       (references\ECRITURE.md) : verdict délégué à oracle-ecriture.mjs — FAIL si l'oracle
+ *       échoue, avertissements comptés, SANS_OBJET si l'oracle manque ; non bloquante ;
  *   S42 le chemin RELATIF du fichier jugé, et de chaque chemin de livrable cité sous `output\`,
  *       augmenté des 26 caractères du sidecar d'oracle, tient sous 150 caractères (11/09, TF-1015) —
  *       R-4 juge la FORME du nom et jamais sa LONGUEUR : un nom conforme peut rendre le dépôt
@@ -1628,6 +1631,58 @@ function juger(texte, cheminJuge = null) {
     }
   }
 
+  // ---- S43 (12/09/2026, TF-1064) — LE STYLE DE LA RESTITUTION RELÈVE DU PLANCHER D'ÉCRITURE ----
+  //
+  // LE FAIT. Quarante-deux règles jugent la FORME d'une restitution (blocs, sélecteurs, preuves,
+  // gloses, chemins) ; aucune n'en jugeait le STYLE : une restitution saturée d'annonces vides,
+  // de clôtures résumantes, d'emphase creuse ou de tirets en cascade passait S1-S42 sans un mot.
+  // Le mandat humain du 12/09/2026 (D-1 (a), synthèse 20260911j) a posé la doctrine
+  // `references\ECRITURE.md` (E-1..E-12) et son juge `oracle-ecriture.mjs` (densités par famille
+  // de `references\tics-redactionnels.json`, phrases longues en série, puces trop profondes,
+  // emphase de structure). S43 DÉLÈGUE : elle ne réimplémente aucun motif (R3), elle joue l'oracle
+  // sur le texte jugé et reprend son verdict. FAIL seulement si l'oracle échoue (une saturation
+  // nette, calibrée pour que le corpus PASS reste PASS à 95 %) ; ses avertissements sont comptés
+  // dans le message, jamais promus. Oracle absent ou illisible : SANS_OBJET, dit, jamais tu.
+  // S43 n'est pas bloquante au hook Stop — même raisonnement que S11-S14 : un style lourd rend la
+  // restitution moins agréable, jamais inutilisable.
+  {
+    const oracleEcriture = join(dirname(fileURLToPath(import.meta.url)), "oracle-ecriture.mjs");
+    if (!existsSync(oracleEcriture)) {
+      findings.push({ regle: "S43", statut: "SANS_OBJET", message: "oracle-ecriture.mjs absent de ce poste — style non jugé (references\\ECRITURE.md du pilot)" });
+    } else {
+      const RACINE43 = dirname(dirname(fileURLToPath(import.meta.url)));
+      const dir43 = mkdtempSync(join(tmpdir(), "s43-"));
+      const tmp43 = join(dir43, "restitution.md");
+      writeFileSync(tmp43, texte);
+      const args43 = [oracleEcriture, tmp43];
+      if (cheminJuge) {
+        const r = relative(RACINE43, resolve(cheminJuge));
+        if (r && !r.startsWith("..")) args43.push("--chemin-relatif", r.replaceAll("\\", "/"));
+      }
+      const r43 = spawnSync(process.execPath, args43, { encoding: "utf8", timeout: 60000 });
+      let j43 = null;
+      try { j43 = JSON.parse((r43.stdout || "").slice((r43.stdout || "").indexOf("{"))); } catch { /* illisible */ }
+      if (!j43 || !j43.verdict) {
+        findings.push({ regle: "S43", statut: "SANS_OBJET", message: `oracle-ecriture ILLISIBLE (exit ${r43.status}) — ce n'est pas un constat sur la restitution` });
+      } else {
+        const fails43 = (j43.findings || []).filter((f) => f.statut === "FAIL");
+        const averts43 = (j43.findings || []).filter((f) => f.statut === "AVERT");
+        if (j43.verdict === "FAIL") {
+          ko("S43", `style en défaut selon le plancher d'écriture (references\\ECRITURE.md) : ${fails43.length} règle(s) EC en échec — ` +
+            fails43.slice(0, 3).map((f) => `${f.regle} : ${String(f.message).replace(/\s+/g, " ").slice(0, 140)}`).join(" · ") +
+            (averts43.length ? ` ; ${averts43.length} avertissement(s)` : "") +
+            " — corriger avant remise : node oracles\\oracle-ecriture.mjs <ce fichier>");
+        } else if (j43.verdict === "SKIP") {
+          ok("S43", "texte normatif antérieur à la doctrine d'écriture — style non jugé (antériorité déclarée)");
+        } else {
+          ok("S43", averts43.length
+            ? `style PASS (${j43.mots || "?"} mots) avec ${averts43.length} avertissement(s) : ` + averts43.slice(0, 2).map((f) => `${f.regle} ${String(f.message).replace(/\s+/g, " ").slice(0, 90)}`).join(" · ")
+            : `style PASS (${j43.mots || "?"} mots, aucune famille au-dessus de son seuil)`);
+        }
+      }
+    }
+  }
+
   // ---- S30 (28/08/2026) — UNE DÉCISION SE SÉLECTIONNE, DONC ELLE PORTE UN NUMÉRO ------------
   //
   // LE RETOUR EST LA MESURE, mot pour mot : « Il n'y a pas de numéro sur les décisions, je ne
@@ -2290,7 +2345,7 @@ const findings = juger(readFileSync(arg, "utf8"), arg);   // le chemin : S42 jug
 const verdict = verdictDe(findings);
 console.log(JSON.stringify({
   oracle: "oracle-synthese",
-  version: "1.2.0",
+  version: "1.3.0",
   cible: arg,
   verdict,
   findings,

@@ -14,6 +14,8 @@ l'oracle refuse l'orphelin dans les deux sens (référence sans entrée ici, ent
 | `references\CHAINE-TRADUCTION.md` | Traduire, auditer : deux chaînes déclarées |
 | `references\CONVENTION-DEPOTS-MIS-DE-COTE.md` | Un dépôt mis de côté se RENOMME, il ne s'exclut pas |
 | `references\CORRESPONDANCE-RENOMMAGE-FACTORY.md` | Table de correspondance §3 bis — renommage `digit-ai-forge-pilot` → `digit-ai-factory` |
+| `references\ECRITURE.md` | Écriture — le plancher transverse des textes de la Factory (règles E-1 à E-12, typologie T1-T5, précédence, mesure) |
+| `references\tics-redactionnels.json` | Donnée fermée des familles de tournures creuses (seuils de densité, antériorité), jouée par `oracles\oracle-ecriture.mjs` |
 | `references\EMPREINTES.md` | Empreintes — un seul format, et un registre qui le fait tenir |
 | `references\ETAPES-RUN.md` | Étapes d'un run produit — détail opérationnel |
 | `references\INTEGRATIONS-FOURNISSEURS.md` | Faits mesurés sur les interfaces de fournisseurs |

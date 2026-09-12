@@ -32,6 +32,11 @@
             "type": "command",
             "command": "node forge/hooks/factory.mjs page-html",
             "timeout": 90
+          },
+          {
+            "type": "command",
+            "command": "node forge/hooks/factory.mjs ecriture",
+            "timeout": 60
           }
         ]
       }

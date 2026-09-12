@@ -39,4 +39,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `pilot - TRAVAUX - 20260908a.md` | fichier | 7,3 Ko | Travaux confiés par le pilot — digit-ai-forge-agents — 20260908a |
 | `pilot - TRAVAUX - 20260908a.tf.jsonl` | fichier | 991 o | 1 ligne(s) JSONL |
 
-_22 fichier(s), 0 sous-dossier(s)_
+_22 fichier(s), 0 sous-dossier(s)_ · 6 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

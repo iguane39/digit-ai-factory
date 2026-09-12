@@ -52,6 +52,16 @@
             "timeout": 30
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node oracles/hook-ecriture.mjs",
+            "timeout": 60
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [

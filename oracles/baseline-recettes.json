@@ -30,6 +30,10 @@
   "cas": 27,
   "vu_le": "2026-09-09"
  },
+ "hook-ecriture.mjs": {
+  "cas": 9,
+  "vu_le": "2026-09-12"
+ },
  "hook-lexique.mjs": {
   "cas": 7,
   "vu_le": "2026-09-03"
@@ -94,6 +98,10 @@
  "oracle-ecosysteme.mjs": {
   "cas": 11,
   "vu_le": "2026-08-26"
+ },
+ "oracle-ecriture.mjs": {
+  "cas": 4,
+  "vu_le": "2026-09-12"
  },
  "oracle-empreintes.mjs": {
   "cas": 7,

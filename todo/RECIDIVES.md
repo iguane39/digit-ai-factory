@@ -1,10 +1,10 @@
 # Récidives et descente — tableau de bord
 
-<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 4c7804a42562 · archive 6ce2fe14c2bb · classes aad8281cfd6b · relevés 5c183c9dfa57 · héritage 23d6b9c4bee8. État au 2026-09-11T14:12:35.888Z (ts max des sources, jamais l'horloge). -->
+<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre ee8ecc9064ad · archive 6ce2fe14c2bb · classes f3d05bab200f · relevés 5c183c9dfa57 · héritage 1b74016f29d6. État au 2026-09-12T13:52:01.216Z (ts max des sources, jamais l'horloge). -->
 
 Ce tableau de bord répond à trois questions que le registre seul ne savait pas poser : est-ce la deuxième fois, chez qui, et depuis combien de temps la correction existe sans être appliquée. Il se lit avec sa contre-métrique : un compteur de récidives qui baisse pendant que le nombre de classes monte est un compteur contourné, pas un progrès.
 
-**Périmètre mesuré** : 1063 item(s) au registre (actifs et archive), 235 portant une classe, 126 marqué(s) récidive ; référentiel de 72 classe(s) en 18 famille(s) (v1.11.0) ; 21 relevé(s) d'héritage.
+**Périmètre mesuré** : 1065 item(s) au registre (actifs et archive), 237 portant une classe, 126 marqué(s) récidive ; référentiel de 73 classe(s) en 18 famille(s) (v1.12.0) ; 21 relevé(s) d'héritage.
 
 ## 1. Récidives par classe
 
@@ -52,7 +52,7 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `brief-sans-regles-de-socle` | skill-ou-oracle-non-invoque | 0 | 1 | 0 | — | — | — |
 | `capacite-hors-versionnement-de-forge` | contrat-interface-forge | 2 | 1 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
 | `chemin-de-livrable-au-dela-du-plafond-de-la-plateforme` | emplacement-livrable | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
-| `controle-vrai-sur-le-mauvais-invariant` | regle-morte | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
+| `controle-vrai-sur-le-mauvais-invariant` | regle-morte | 2 | 0 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
 | `decision-humaine-rendue-restituee-sans-geste` | restitution-forme | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `deux-regles-du-socle-inconciliables` | page-html-socle | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `exemption-hors-atteinte-par-le-chemin-prescrit` | contrat-interface-forge | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
@@ -84,6 +84,7 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `restitution-action-humaine-geste-agent` | restitution-forme | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `restitution-rendu-visuel-non-critique` | restitution-forme | 0 | 1 | 0 | — | — | — |
 | `sceau-de-vue-provenance-sans-contenu` | regle-morte | 3 | 1 | 0 | 0 % | — | — |
+| `viewport-de-conception-non-fixe` | page-html-socle | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 
 ## 2. Délai clôture au pilot → descente constatée chez le produit
 
@@ -163,6 +164,7 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 | `skill-non-invoque-lexique` | 2026-08-14 | CLAUDE.md | 12 produit(s) atteint(s) en 20–28 j ; 2 non atteint(s) (Produit-11, bav-dev) |
 | `surface-implicite-non-livree` | 2026-09-05 | CLAUDE.md | 12 produit(s) atteint(s) en 2–6 j ; 2 non atteint(s) (Produit-11, bav-dev) |
 | `texte-sur-la-graphie-detruit-par-sa-pseudonymisation` | — | — | non mesurable : aucune clôture fondatrice au registre |
+| `viewport-de-conception-non-fixe` | — | — | non mesurable : aucune clôture fondatrice au registre |
 
 ## 3. Taux d'héritage par règle (dernier relevé)
 
@@ -172,9 +174,9 @@ Comment lire : une ligne par artefact hérité déclaré dans `gabarits/HERITAGE
 |---|---|---|---|
 | forge/retours/GABARIT-LOT-RETOURS.md | copie_conforme | 11/11 | lot-forme |
 | forge/retours/oracle-lot.mjs | copie_conforme | 11/11 | lot-forme |
-| forge/hooks/factory.mjs | copie_conforme | 11/11 | skill-ou-oracle-non-invoque, restitution-forme, page-html-socle, heritage-produit |
+| forge/hooks/factory.mjs | copie_conforme | 11/11 | skill-ou-oracle-non-invoque, restitution-forme, page-html-socle, heritage-produit, ecriture-style |
 | forge/RESTITUTION.md | copie_conforme | 2/11 | restitution-forme |
-| .claude/settings.json | presence_et_motif | 11/11 | skill-ou-oracle-non-invoque, restitution-forme, page-html-socle, heritage-produit |
+| .claude/settings.json | presence_et_motif | 11/11 | skill-ou-oracle-non-invoque, restitution-forme, page-html-socle, heritage-produit, ecriture-style |
 | CLAUDE.md | presence_et_motif | 11/11 | skill-ou-oracle-non-invoque |
 | robots.txt | presence | 11/11 | — |
 | llms.txt | presence | 11/11 | — |
@@ -183,6 +185,7 @@ Comment lire : une ligne par artefact hérité déclaré dans `gabarits/HERITAGE
 | forge/travaux/oracle-travaux.mjs | copie_conforme | 11/11 | heritage-produit |
 | .gitignore | presence_et_motifs | 11/11 | secret-hors-perimetre |
 | forge/retours/CLASSES.json | copie_conforme | 2/11 | heritage-produit, lot-forme |
+| forge/ECRITURE.md | copie_conforme | 0/0 | ecriture-style |
 
 ## 4. Contre-métrique : classes créées
 
@@ -191,10 +194,10 @@ Comment lire : le nombre de classes créées par semaine ISO, puis les classes s
 | Semaine | Classes créées |
 |---|---|
 | 2026-S36 | 37 |
-| 2026-S37 | 35 |
+| 2026-S37 | 36 |
 
 - Classes sans clôture fondatrice : `emplacement-livrable-hors-convention`, `registre-doublon-non-detecte`, `banc-etend-referentiel-production`, `gate-cout-invite-au-contournement`, `regle-neuve-sans-mesure-de-bruit`, `controle-sans-fixture-double-sens`, `deux-regles-du-socle-inconciliables`, `controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas`, `controle-vrai-sur-le-mauvais-invariant`, `regle-ecrite-sans-oracle-qui-la-joue`, `oracle-faux-positif`, `exemption-hors-atteinte-par-le-chemin-prescrit`, `gabarit-sans-parite-de-theme`
-- Retours entrés sous une classe suspecte : TF-0995 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1003 (controle-vrai-sur-le-mauvais-invariant), TF-1006 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1011 (regle-ecrite-sans-oracle-qui-la-joue), TF-1015 (chemin-de-livrable-au-dela-du-plafond-de-la-plateforme), TF-1016 (journal-de-versions-dormant), TF-1017 (recette-locale-ne-rejoue-pas-l-environnement-de-la-ci), TF-1021 (capacite-hors-versionnement-de-forge), TF-1022 (reference-chargee-toujours-absente-du-paquet), TF-1023 (marque-emettrice-portee-par-deux-chartes), TF-1039 (registre-doublon-non-detecte), TF-1040 (controle-sans-fixture-double-sens), TF-1041 (regle-ecrite-sans-oracle-qui-la-joue), TF-1043 (regle-ecrite-sans-oracle-qui-la-joue), TF-1044 (regle-ecrite-sans-oracle-qui-la-joue), TF-1056 (oracle-faux-positif), TF-1057 (oracle-faux-positif), TF-1058 (oracle-faux-positif), TF-1059 (exemption-hors-atteinte-par-le-chemin-prescrit), TF-1060 (oracle-faux-positif), TF-1061 (oracle-faux-positif), TF-1062 (oracle-faux-positif), TF-1063 (gabarit-sans-parite-de-theme), TF-1064 (regle-ecrite-sans-oracle-qui-la-joue)
+- Retours entrés sous une classe suspecte : TF-0995 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1003 (controle-vrai-sur-le-mauvais-invariant), TF-1006 (controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas), TF-1011 (regle-ecrite-sans-oracle-qui-la-joue), TF-1015 (chemin-de-livrable-au-dela-du-plafond-de-la-plateforme), TF-1016 (journal-de-versions-dormant), TF-1017 (recette-locale-ne-rejoue-pas-l-environnement-de-la-ci), TF-1021 (capacite-hors-versionnement-de-forge), TF-1022 (reference-chargee-toujours-absente-du-paquet), TF-1023 (marque-emettrice-portee-par-deux-chartes), TF-1039 (registre-doublon-non-detecte), TF-1040 (controle-sans-fixture-double-sens), TF-1041 (regle-ecrite-sans-oracle-qui-la-joue), TF-1043 (regle-ecrite-sans-oracle-qui-la-joue), TF-1044 (regle-ecrite-sans-oracle-qui-la-joue), TF-1056 (oracle-faux-positif), TF-1057 (oracle-faux-positif), TF-1058 (oracle-faux-positif), TF-1059 (exemption-hors-atteinte-par-le-chemin-prescrit), TF-1060 (oracle-faux-positif), TF-1061 (oracle-faux-positif), TF-1062 (oracle-faux-positif), TF-1063 (gabarit-sans-parite-de-theme), TF-1064 (regle-ecrite-sans-oracle-qui-la-joue), TF-1066 (viewport-de-conception-non-fixe)
 
 ## Ce que cette vue ne juge pas
 

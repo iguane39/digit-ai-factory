@@ -68,6 +68,14 @@ c:\dev\<nom-produit>\
   ...                       # le code du produit, à la racine du projet
 ```
 
+**Plancher d'écriture (12/09/2026, mandat humain, TF-1064).** Tout texte Markdown écrit par un
+run — chez le pilot, chez une forge, chez un produit — relève de `references\ECRITURE.md` du pilot
+(règles E-1 à E-12, typologie T1-T5, précédence gabarit > plancher > voix de marque). Le juge est
+`oracles\oracle-ecriture.mjs`, joué à l'écriture par le hook `ecriture` (pilot :
+`.claude\settings.json` ; produit : `forge\hooks\factory.mjs ecriture`, hérité en copie conforme) ;
+sa donnée est `references\tics-redactionnels.json`, datée et sourcée, recalibrable sans toucher
+au code. Le plancher ne réécrit ni le code, ni les données, ni les citations, ni l'histoire.
+
 Le produit naît directement chez lui — aucune promotion à faire. Création de son dépôt git et
 push : sur validation humaine uniquement. (Historique : le run pilote du 04/08 vit encore sous
 `pilot\runs\` — convention antérieure, conservée comme archive.)

@@ -40,4 +40,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `socle-html-syne-faux-positif-20260911a.tf.jsonl` | fichier | 2,3 Ko | 1 ligne(s) JSONL |
 | `style-redactionnel-sans-oracle-20260911a.tf.jsonl` | fichier | 3,3 Ko | 1 ligne(s) JSONL |
 
-_22 fichier(s), 1 sous-dossier(s)_
+_22 fichier(s), 1 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

@@ -28,8 +28,13 @@ const [nom, ...options] = process.argv.slice(2);
 // `lexique` (03/09/2026, mandat d'amélioration continue) : hook UserPromptSubmit — le lexique
 // d'invocation RV-6 (« améliore le prompt », « l99 », « barre », « améliore ce skill ») cesse d'être
 // une consigne que l'agent oublie : le hook reconnaît le mot-clé et injecte l'appel du skill.
-const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique"]);
-if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ouverture | restitution | page-html | lexique)`); process.exit(0); }
+// `ecriture` (12/09/2026, mandat humain D-1 (a) de la synthèse 20260911j, TF-1064) : hook PostToolUse
+// joué à chaque écriture d'un fichier .md du produit — le plancher d'écriture du pilot
+// (references/ECRITURE.md, E-1..E-12) se rencontre au moment où l'on écrit : densités de tournures
+// creuses par famille, phrases longues en série, puces trop profondes, emphase de structure.
+// Avertit, ne bloque jamais.
+const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture"]);
+if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ouverture | restitution | page-html | lexique | ecriture)`); process.exit(0); }
 
 const candidats = [
   process.env.FORGE_ROOT && join(process.env.FORGE_ROOT, "digit-ai-factory"),
