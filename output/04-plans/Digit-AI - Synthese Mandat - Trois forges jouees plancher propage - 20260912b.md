@@ -15,13 +15,13 @@ Vos deux décisions sont exécutées. Les trois forges ont traité leurs lots su
 
 ## 2. Verdict en une ligne
 
-**forge-agents `a2cc83d` + `38310c7` (registre 2.20.0 à 57 oracles, fixtures écriture au manifest, `check_markdown --style`, `render_page` à six largeurs jusqu'à 3840 avec V18, socle 264/264, banc 253 verts et 1 échec antérieur) ; forge-design `89bcc33` (grille à sept largeurs, largeur de conception 1920, `oracle-textes-application` 24/24, banc 40 oracles verts) ; forge-development `fd73af5` (deux disciplines, playbook PASS au plancher) ; 3 lots de retours PASS ingérés (TF-1068 récidive, TF-1069, TF-1070) ; propagation faite (installé : `quality-oracles` 2.14.0, `digit-ai-page-html` 1.21.0), délégation vérifiée depuis la copie installée : « Règles : M7, M10, M14, M18, EC-1..EC-6 — Style : PASS » (M7 (l'ouverture de chaque chapitre par ce qu'il apprend), M10 (le mode d'emploi de chaque tableau), M14 (aucune plomberie interne dans le texte), M18 (un identifiant porte son sens en ligne), puis EC-1 (la densité de tournures creuses par famille) à EC-6 (l'antériorité déclarée d'un texte normatif), les six règles de l'oracle d'écriture) ; A-4 : TF-1067 en candidat ; D-2 (a) journalisée ; `oracle-todo` PASS, 288 actifs ; pilot `be669f2` (13 fichiers), 0 push sur 4 dépôts.**
+**forge-agents `a2cc83d` + `38310c7` (registre 2.20.0 à 57 oracles, fixtures écriture au manifest, `check_markdown --style`, `render_page` à six largeurs jusqu'à 3840 avec V18, socle 264/264, banc 253 verts et 1 échec antérieur) ; forge-design `89bcc33` (grille à sept largeurs, largeur de conception 1920, `oracle-textes-application` 24/24, banc 40 oracles verts) ; forge-development `fd73af5` (deux disciplines, playbook PASS au plancher) ; 3 lots de retours PASS ingérés (TF-1068 récidive, TF-1069, TF-1070) ; propagation faite (installé : `quality-oracles` 2.14.0, `digit-ai-page-html` 1.21.0), délégation vérifiée depuis la copie installée : « Règles : M7, M10, M14, M18, EC-1..EC-6 — Style : PASS » (M7 (l'ouverture de chaque chapitre par ce qu'il apprend), M10 (le mode d'emploi de chaque tableau), M14 (aucune plomberie interne dans le texte), M18 (un identifiant porte son sens en ligne), puis EC-1 (la densité de tournures creuses par famille) à EC-6 (l'antériorité déclarée d'un texte normatif), les six règles de l'oracle d'écriture) ; A-4 : TF-1067 en candidat ; D-2 (a) de la synthèse 20260912a journalisée ; `oracle-todo` PASS, 288 actifs ; pilot `be669f2` (13 fichiers), 0 push sur 4 dépôts.**
 
 ## 3. Décisions attendues de l'humain
 
 Trois décisions.
 
-> **D-1 — Le conflit entre la colonne de lecture prescrite (E4, 1 080 px) et le plafond de 100 caractères par ligne du contrôle 4K se tranche-t-il en gardant la colonne et en ne bloquant que la prose que rien ne tient ?**
+> **D-6 — Le conflit entre la colonne de lecture prescrite (E4, 1 080 px) et le plafond de 100 caractères par ligne du contrôle 4K se tranche-t-il en gardant la colonne et en ne bloquant que la prose que rien ne tient ?**
 >
 > Il s'agit du conflit que le run de forge-agents a mesuré entre la colonne de lecture que le socle prescrit pour la prose et le plafond de caractères par ligne que le lot du jour demandait au contrôle de rendu 4K (la candidature est au bloc 4). Mesuré : la colonne `.chap.lire` que le socle prescrit depuis l'arbitrage humain du 21/08 rend 134 caractères par ligne en 16 px, à 1920 comme à 3840 ; le lot demandait un plafond de 100. Appliqué à la lettre, le contrôle V18 condamnerait toute page conforme au socle dès 2560 px. La parade posée par la forge : un paragraphe tenu par un conteneur de lecture déclaré n'est pas bloqué (sa mesure est publiée) ; seule la prose que rien ne tient l'est (228 caractères par ligne à 2560, 342 à 3840). Le point ouvert est la doctrine : garder la colonne à 1 080 px, ou la resserrer, ou porter le plafond à 135.
 >
@@ -35,7 +35,7 @@ Trois décisions.
 
 > **Si rien n'est décidé** : l'option (a) s'applique — l'état livré reste, la candidature reste en candidat.
 
-> **D-2 — La récidive du gabarit de lot de travaux (l'encadré obligatoire prescrit un chemin qui n'existe que chez un produit) se corrige-t-elle maintenant dans le gabarit du pilot ?**
+> **D-7 — La récidive du gabarit de lot de travaux (l'encadré obligatoire prescrit un chemin qui n'existe que chez un produit) se corrige-t-elle maintenant dans le gabarit du pilot ?**
 >
 > Il s'agit du défaut que forge-design a remonté dans son lot de retours : le gabarit de lot de travaux du pilot prescrit, dans son encadré obligatoire, une commande dont le chemin n'existe que chez les produits instanciés, jamais chez une forge (la candidature, classée récidive de `boucle-retour-sans-descente` après six clôtures antérieures, est au bloc 4). L'encadré ⛔ de `gabarits\TRAVAUX-PILOT.md` dit « node forge\travaux\oracle-travaux.mjs », chemin posé par l'héritage chez les produits seulement ; chez une forge il rend « module introuvable », et la forge a dû jouer `gabarits\oracle-travaux-pilot.mjs` du pilot à la place. Le remède est une phrase dans le gabarit (« chez une forge : node <pilot>\gabarits\oracle-travaux-pilot.mjs ») et une fixture dans son oracle ; c'est une écriture du pilot, dans un texte que les trois lots de ce jour ont déjà cité.
 >
@@ -49,7 +49,7 @@ Trois décisions.
 
 > **Si rien n'est décidé** : l'option (b) s'applique — la candidature reste en candidat, marquée récidive.
 
-> **D-3 — Les deux candidatures techniques nées ce tour (les octets nuls de la page générée du registre ; le domaine style qui entre au registre sans déclencheur automatique sur les `.md`) sont-elles acceptées ?**
+> **D-8 — Les deux candidatures techniques nées ce tour (les octets nuls de la page générée du registre ; le domaine style qui entre au registre sans déclencheur automatique sur les `.md`) sont-elles acceptées ?**
 >
 > Il s'agit de deux constats techniques nés ce tour, dont les identifiants sont au bloc 4 : d'un côté un défaut du pilot, le générateur de la page du registre lit un chemin Windows cité dans un item comme un octet nul et le harnais de recettes reste à 105 sur 107 ; de l'autre un écart déclaré par forge-agents, l'entrée du registre porte `ext: []` faute de mesure de bruit sur les textes des produits, le calibrage du 12/09 ne portant que sur 204 textes du pilot (quatrième écart déclaré dans son lot). Les remèdes : échapper le texte au rendu et jouer l'oracle des caractères de contrôle après chaque régénération ; mesurer la baseline sur les `.md` d'au moins trois produits, puis poser `ext: [".md"]`.
 >
@@ -85,9 +85,9 @@ Trois décisions.
 ## 5. Non traité — avec son motif
 
 - Les quatre publications (pilot `be669f2` et cette synthèse ; forge-agents `38310c7` ; forge-design `89bcc33` ; forge-development `fd73af5`) — motif : bloqué par un garde-fou, R-38 §4-5 ; chaque enregistrement porte des livrables explicites ; feu vert par dépôt.
-- La correction du générateur de la page du registre (octets nuls) et la mesure de bruit sur les `.md` des produits — motif : dépendance à une décision humaine (D-3).
-- La correction du gabarit de lot de travaux (encadré) — motif : dépendance à une décision humaine (D-2).
-- L'arbitrage E4 / V18 — motif : dépendance à une décision humaine (D-1) ; l'état livré tient la doctrine du 21/08.
+- La correction du générateur de la page du registre (octets nuls) et la mesure de bruit sur les `.md` des produits — motif : dépendance à une décision humaine (D-8).
+- La correction du gabarit de lot de travaux (encadré) — motif : dépendance à une décision humaine (D-7).
+- L'arbitrage E4 / V18 — motif : dépendance à une décision humaine (D-6) ; l'état livré tient la doctrine du 21/08.
 - Les deux échecs antérieurs du banc installé de `quality-oracles` (`fixture sca/red` : l'oracle rend PASS au lieu de SKIP quand l'outil externe ne répond pas ; « derive-les-vues » : description de skill de 1 048 caractères) — motif : hors mandat ; le premier est signalé sans classe par forge-agents (RA-5), le second appartient à forge-conception.
 - `versions-livrees.json` de forge-agents non incrémenté — motif : hors mandat, déclaré par la forge ; `oracle-etat-forge` (O3) le relèvera à sa prochaine publication.
 - La clôture de TF-1064 et TF-1066 — motif : dépendance à D-2 (a) de la synthèse 20260912a (gains constatés au 10/10, baseline rejouée sur les textes neufs).
@@ -95,10 +95,10 @@ Trois décisions.
 ## 6. Écarts à la lettre
 
 - **Vous avez écrit** « 1b » (lancer les runs de forge sur les lots) → **j'ai fait** les trois runs, puis la propagation des skills vers les copies installées du poste (`oracle-skills --appliquer`), puis une correction supplémentaire chez forge-agents. **Pourquoi** : sans propagation, aucun résultat de forge-agents n'existe pour la session (les oracles jouent sur la copie installée) ; c'est le geste que le bootstrap joue à chaque ouverture ; et la propagation a révélé le résolveur défaillant, corrigé sous le même mandat.
-- **Le lot demandait** des règles nommées TA1 à TA4 (les quatre règles de l'oracle des textes d'application, telles que le lot les désignait) → **forge-design a nommé** T4-1 à T4-4. **Pourquoi** : ces identifiants sont déjà pris par `oracle-taste` et cités sous ce sens par la grille de critique ; écart écrit dans l'oracle, le registre local et le lot de retours (RD-19).
+- **Le lot demandait** des règles nommées TA1 à TA4 (les quatre règles de l'oracle des textes d'application, telles que le lot les désignait) → **forge-design a nommé** T4-1 à T4-4. **Pourquoi** : ces identifiants sont déjà pris par `oracle-taste` et cités sous ce sens par la grille de critique ; écart écrit dans l'oracle, le registre local et le lot de retours (RD-69).
 - **Le lot demandait** « le numéro suivant de la série V » → **forge-agents a nommé** V18. **Pourquoi** : V17 est déjà pris par `conteneur_bride_donnees` dans la checklist canonique.
 - **Le lot demandait** la grille complète dans `oracle-baseline.mjs` → **forge-design a retenu** cinq largeurs (3840, 2560, 1920, 1024, 390). **Pourquoi** : coût de stockage des captures approuvées ; 1440 et 768 restent jugés par `render_page.py` ; écart déclaré au `non_juge` de l'oracle.
-- **Le lot demandait** l'entrée au registre avec déclenchement sur les `.md` → **forge-agents a posé** `ext: []`. **Pourquoi** : aucune mesure de bruit sur les textes des produits ; écart déclaré par la forge et soumis en D-3.
+- **Le lot demandait** l'entrée au registre avec déclenchement sur les `.md` → **forge-agents a posé** `ext: []`. **Pourquoi** : aucune mesure de bruit sur les textes des produits ; écart déclaré par la forge et soumis en D-8.
 
 ## 7. Risques
 
@@ -107,30 +107,30 @@ Trois décisions.
   - parade : feu vert par dépôt (A-1), dans l'ordre forge-agents puis pilot puis les deux autres ; acceptation déclarée d'ici là.
 - Le contrôle V18 bloque une page conforme au socle si son conteneur de lecture n'est pas déclaré ;
   - signal : un FAIL `v18_prose_etiree` sur une page qui porte pourtant `.chap.lire` ;
-  - parade : D-1 ; la parade de forge-agents exempte les conteneurs déclarés (`.lire`, `[data-mesure-lecture]`).
+  - parade : D-6 ; la parade de forge-agents exempte les conteneurs déclarés (`.lire`, `[data-mesure-lecture]`).
 - Le style des `.md` des produits n'est jugé que par le hook, pas par `run-oracles` ;
   - signal : un produit dont `run-oracles.mjs` ne liste aucun contrôle de style sur ses documents ;
-  - parade : D-3 (a), mesure de bruit puis `ext: [".md"]`.
+  - parade : D-8 (a), mesure de bruit puis `ext: [".md"]`.
 - Le harnais du pilot reste à 105/107 et le banc installé à deux échecs, tous antérieurs ;
   - signal : `self-tests.mjs` et `self-test.mjs` (installé) en défaut sur les mêmes entrées à la prochaine ouverture ;
-  - parade : D-3 (a) pour les octets nuls ; les deux autres passent la main au bloc 8 (A-6).
+  - parade : D-8 (a) pour les octets nuls ; les deux autres passent la main au bloc 8 (A-6).
 
 ## 8. Prochaines actions
 
-Ordre du tableau : les actions de l'IA d'abord (tri par acteur), classées par dépendance — ce qui attend D-2 avant D-3, le push en dernier parce qu'il attend un feu vert distinct ; puis les actions humaines, dans l'ordre des décisions qu'elles tranchent.
+Ordre du tableau : les actions de l'IA d'abord (tri par acteur), classées par dépendance — ce qui attend D-7 avant D-8, le push en dernier parce qu'il attend un feu vert distinct ; puis les actions humaines, dans l'ordre des décisions qu'elles tranchent.
 
 | Sélecteur | Action | Acteur | Motif | Effort |
 |---|---|---|---|---|
-| A-1 | Corriger `gabarits\TRAVAUX-PILOT.md` (encadré : chez une forge, `node <pilot>\gabarits\oracle-travaux-pilot.mjs`) et `oracle-travaux-pilot.mjs` (fixture : un lot reçu par une forge cite la commande du pilot), rejouer les trois lots du jour, journaliser la clôture de TF-1068 (neuve) | auto_ia | `dependance_bloc_3` — attend D-2 (a) ; à défaut, l'encadré reste faux chez une forge | simple × court |
-| A-2 | Corriger `todo\generer-page.mjs` (texte échappé pour HTML, inséré tel quel ; `oracle-caracteres-controle` joué après régénération), fixture rouge/verte, rejouer `self-tests.mjs` et journaliser TF-1067 (neuve) | auto_ia | `dependance_bloc_3` — attend D-3 (a) ou (b) ; à défaut, le harnais reste à 105/107 | simple × court |
-| A-3 | Mesurer la baseline de `oracle-ecriture` sur les `.md` de trois produits du parc (lecture seule), publier la mesure dans `tics-redactionnels.json`, puis lot de travaux à forge-agents pour `ext: [".md"]` (TF-1070) (neuve) | auto_ia | `dependance_bloc_3` — attend D-3 (a) ; à défaut, le registre ne déclenche pas sur les documents | simple × moyen |
-| A-4 | Journaliser D-1 (TF-1069 : clôture sur l'état livré si (a), sinon lot à forge-agents), régénérer les vues, rejouer `oracle-todo` (TF-1069) | auto_ia | `dependance_bloc_3` — attend D-1 ; à défaut, TF-1069 reste en candidat | simple × court |
+| A-1 | Corriger `gabarits\TRAVAUX-PILOT.md` (encadré : chez une forge, `node <pilot>\gabarits\oracle-travaux-pilot.mjs`) et `oracle-travaux-pilot.mjs` (fixture : un lot reçu par une forge cite la commande du pilot), rejouer les trois lots du jour, journaliser la clôture de TF-1068 (neuve) | auto_ia | `dependance_bloc_3` — attend D-7 (a) ; à défaut, l'encadré reste faux chez une forge | simple × court |
+| A-2 | Corriger `todo\generer-page.mjs` (texte échappé pour HTML, inséré tel quel ; `oracle-caracteres-controle` joué après régénération), fixture rouge/verte, rejouer `self-tests.mjs` et journaliser TF-1067 (neuve) | auto_ia | `dependance_bloc_3` — attend D-8 (a) ou (b) ; à défaut, le harnais reste à 105/107 | simple × court |
+| A-3 | Mesurer la baseline de `oracle-ecriture` sur les `.md` de trois produits du parc (lecture seule), publier la mesure dans `tics-redactionnels.json`, puis lot de travaux à forge-agents pour `ext: [".md"]` (TF-1070) (neuve) | auto_ia | `dependance_bloc_3` — attend D-8 (a) ; à défaut, le registre ne déclenche pas sur les documents | simple × moyen |
+| A-4 | Journaliser D-6 (TF-1069 : clôture sur l'état livré si (a), sinon lot à forge-agents), régénérer les vues, rejouer `oracle-todo` (TF-1069) | auto_ia | `dependance_bloc_3` — attend D-6 ; à défaut, TF-1069 reste en candidat | simple × court |
 | A-5 | Rejouer la baseline de l'oracle d'écriture sur les textes du 12/09 au 10/10 et resserrer les seuils (décision D-2 (a) de la synthèse 20260912a ; TF-1064, TF-1066) | auto_ia | `dependance_bloc_3` — attend l'échéance du 10/10 ; à défaut, les seuils du 12/09 restent | simple × court |
 | A-6 | Journaliser deux candidatures pour les échecs antérieurs du banc installé (`oracle-sca` rend PASS sans outil ; description de `derive-les-vues` trop longue), cibles forge-agents et forge-conception (neuve) | auto_ia | `hors_mandat` — constats en passant des forges, sans classe adéquate pour le premier ; à défaut, le banc reste à deux échecs sans item qui les porte | simple × court |
 | A-7 | Pousser les quatre dépôts (forge-agents `38310c7`, pilot `be669f2` et cette synthèse, forge-design `89bcc33`, forge-development `fd73af5`), `FORGE_PUSH_GO` posé avec le motif, porte des noms rejouée par chaque hook pre-push (neuve) | auto_ia | `gate_gouvernance` (un feu vert humain qui conditionne le geste) — attend le GO de A-11 : chaque enregistrement porte des livrables explicites, R-38 §4 ; à défaut, tout reste local | simple × court |
-| A-8 | Trancher D-1 — répondre « D-1 (a) », « (b) » ou « (c) » ; exécution par l'IA (neuve) | manuelle_utilisateur | `decision` — c'est un arbitrage de doctrine entre deux règles du socle, réservé à l'humain ; sinon : l'état livré reste et TF-1069 reste en candidat | simple × court |
-| A-9 | Trancher D-2 — répondre « D-2 (a) », « (b) » ou « (c) » ; correction du gabarit par l'IA (neuve) | manuelle_utilisateur | `decision` — la décision sur un candidat est humaine ; sinon : TF-1068 reste en candidat, marqué récidive | simple × court |
-| A-10 | Trancher D-3 — répondre « D-3 (a) », « (b) » ou « (c) » ; corrections et mesure par l'IA (neuve) | manuelle_utilisateur | `decision` — la décision sur un candidat est humaine ; sinon : les deux restent en candidat | simple × court |
+| A-8 | Trancher D-6 — répondre « D-6 (a) », « (b) » ou « (c) » ; exécution par l'IA (neuve) | manuelle_utilisateur | `decision` — c'est un arbitrage de doctrine entre deux règles du socle, réservé à l'humain ; sinon : l'état livré reste et TF-1069 reste en candidat | simple × court |
+| A-9 | Trancher D-7 — répondre « D-7 (a) », « (b) » ou « (c) » ; correction du gabarit par l'IA (neuve) | manuelle_utilisateur | `decision` — la décision sur un candidat est humaine ; sinon : TF-1068 reste en candidat, marqué récidive | simple × court |
+| A-10 | Trancher D-8 — répondre « D-8 (a) », « (b) » ou « (c) » ; corrections et mesure par l'IA (neuve) | manuelle_utilisateur | `decision` — la décision sur un candidat est humaine ; sinon : les deux restent en candidat | simple × court |
 | A-11 | Donner le feu vert de publication — répondre « pousse les quatre » ou nommer les dépôts à pousser (neuve) | manuelle_utilisateur | `decision` — R-38 §4 : le push d'un enregistrement portant des livrables explicites est un GO humain ; sinon : quatre dépôts restent en avance, en local | simple × court |
 
 ## 9. Traces
