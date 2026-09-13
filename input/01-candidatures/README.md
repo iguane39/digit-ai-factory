@@ -27,6 +27,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `forge-design-marque-digit-ai-constats-20260911a.tf.jsonl` | fichier | 4,5 Ko | 2 ligne(s) JSONL |
 | `journal-de-versions-dormant-forge-audit-20260910a.tf.jsonl` | fichier | 3,4 Ko | 1 ligne(s) JSONL |
 | `oracle-condition-restitution-seule-20260910a.tf.jsonl` | fichier | 3,5 Ko | 1 ligne(s) JSONL |
+| `page-registre-octets-nuls-20260912a.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
 | `porte-publication-faux-positif-20260909a.tf.jsonl` | fichier | 4,5 Ko | 1 ligne(s) JSONL |
 | `preflight-ingestion-histoire-reecrite-20260909a.tf.jsonl` | fichier | 4,3 Ko | 1 ligne(s) JSONL |
 | `Produit-02 - CANDIDATURE - Etude DataForSEO - 20260831a.md` | fichier | 7,3 Ko | Produit-02 — Candidature : étude poussée de la stratégie DataForSEO — 20260831a |
@@ -41,4 +42,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `style-redactionnel-sans-oracle-20260911a.tf.jsonl` | fichier | 3,3 Ko | 1 ligne(s) JSONL |
 | `viewport-de-conception-fullhd-4k-20260912a.tf.jsonl` | fichier | 3,1 Ko | 1 ligne(s) JSONL |
 
-_23 fichier(s), 1 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_24 fichier(s), 1 sous-dossier(s)_

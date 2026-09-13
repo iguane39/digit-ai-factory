@@ -30,6 +30,8 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `digit-ai-forge-agents - RETOURS - 20260907a.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
 | `digit-ai-forge-agents - RETOURS - 20260908a.md` | fichier | 22,8 Ko | Retours forges — digit-ai-forge-agents — 20260908a |
 | `digit-ai-forge-agents - RETOURS - 20260908a.tf.jsonl` | fichier | 4,5 Ko | 1 ligne(s) JSONL |
+| `digit-ai-forge-agents - RETOURS - 20260912a.md` | fichier | 19,9 Ko | Retours forges — digit-ai-forge-agents — 20260912a |
+| `digit-ai-forge-agents - RETOURS - 20260912a.tf.jsonl` | fichier | 5,2 Ko | 2 ligne(s) JSONL |
 | `digit-ai-forge-conception - RETOURS - 20260905a.md` | fichier | 16,8 Ko | Retours forges — digit-ai-forge-conception — 20260905a |
 | `digit-ai-forge-conception - RETOURS - 20260905a.tf.jsonl` | fichier | 5,1 Ko | 3 ligne(s) JSONL |
 | `digit-ai-forge-conception - RETOURS - 20260905b.md` | fichier | 18,2 Ko | Retours forges — digit-ai-forge-conception — 20260905b |
@@ -42,10 +44,14 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `digit-ai-forge-conception - RETOURS - 20260906a.tf.jsonl` | fichier | 3,3 Ko | 1 ligne(s) JSONL |
 | `digit-ai-forge-design - RETOURS - 20260905a.md` | fichier | 15,2 Ko | Retours forges — digit-ai-forge-design — 20260905a |
 | `digit-ai-forge-design - RETOURS - 20260905a.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
+| `digit-ai-forge-design - RETOURS - 20260912a.md` | fichier | 27,1 Ko | Retours forges — digit-ai-forge-design — 20260912a |
+| `digit-ai-forge-design - RETOURS - 20260912a.tf.jsonl` | fichier | 3,4 Ko | 1 ligne(s) JSONL |
 | `digit-ai-forge-development - RETOURS - 20260905a.md` | fichier | 12,8 Ko | Retours forges — digit-ai-forge-development — 20260905a |
 | `digit-ai-forge-development - RETOURS - 20260905a.tf.jsonl` | fichier | 2,4 Ko | 1 ligne(s) JSONL |
 | `digit-ai-forge-development - RETOURS - 20260905b.md` | fichier | 17,4 Ko | Retours forges — digit-ai-forge-development — 20260905b |
 | `digit-ai-forge-development - RETOURS - 20260905b.tf.jsonl` | fichier | 5,8 Ko | 2 ligne(s) JSONL |
+| `digit-ai-forge-development - RETOURS - 20260912a.md` | fichier | 6,3 Ko | Retours forges — digit-ai-forge-development — 20260912a |
+| `digit-ai-forge-development - RETOURS - 20260912a.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
 | `digit-ai-forge-tests - RETOURS - 20260905a.md` | fichier | 12,7 Ko | Retours forges — digit-ai-forge-tests — 20260905a |
 | `digit-ai-forge-tests - RETOURS - 20260905a.tf.jsonl` | fichier | 3,2 Ko | 2 ligne(s) JSONL |
 | `Produit-01 - RETOURS - 20260827a.md` | fichier | 8,3 Ko | Retours forges — Produit-01 — 20260827a |
@@ -241,4 +247,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `produits-anciens - RETOURS - 20260906a.md` | fichier | 19,6 Ko | Retours forges — produits-anciens — 20260906a |
 | `produits-anciens - RETOURS - 20260906a.tf.jsonl` | fichier | 3,0 Ko | 1 ligne(s) JSONL |
 
-_222 fichier(s), 2 sous-dossier(s)_ · 6 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_228 fichier(s), 2 sous-dossier(s)_
