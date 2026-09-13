@@ -42,4 +42,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `style-redactionnel-sans-oracle-20260911a.tf.jsonl` | fichier | 3,3 Ko | 1 ligne(s) JSONL |
 | `viewport-de-conception-fullhd-4k-20260912a.tf.jsonl` | fichier | 3,1 Ko | 1 ligne(s) JSONL |
 
-_24 fichier(s), 1 sous-dossier(s)_
+_24 fichier(s), 1 sous-dossier(s)_ · 2 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

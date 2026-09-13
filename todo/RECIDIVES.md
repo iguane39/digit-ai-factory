@@ -1,10 +1,10 @@
 # Récidives et descente — tableau de bord
 
-<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 06a122db961f · archive 6ce2fe14c2bb · classes b8ee14d0fc53 · relevés 5c183c9dfa57 · héritage 1b74016f29d6. État au 2026-09-12T15:33:16.291Z (ts max des sources, jamais l'horloge). -->
+<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 389e4952e050 · archive 6ce2fe14c2bb · classes b8ee14d0fc53 · relevés 5c183c9dfa57 · héritage 1b74016f29d6. État au 2026-09-13T15:46:00.266Z (ts max des sources, jamais l'horloge). -->
 
 Ce tableau de bord répond à trois questions que le registre seul ne savait pas poser : est-ce la deuxième fois, chez qui, et depuis combien de temps la correction existe sans être appliquée. Il se lit avec sa contre-métrique : un compteur de récidives qui baisse pendant que le nombre de classes monte est un compteur contourné, pas un progrès.
 
-**Périmètre mesuré** : 1069 item(s) au registre (actifs et archive), 241 portant une classe, 127 marqué(s) récidive ; référentiel de 74 classe(s) en 18 famille(s) (v1.13.0) ; 21 relevé(s) d'héritage.
+**Périmètre mesuré** : 1071 item(s) au registre (actifs et archive), 243 portant une classe, 129 marqué(s) récidive ; référentiel de 74 classe(s) en 18 famille(s) (v1.13.0) ; 21 relevé(s) d'héritage.
 
 ## 1. Récidives par classe
 
@@ -20,8 +20,8 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `page-html-filtres-tableau` | page-html-socle | 7 | 4 | 7 | 100 % | Produit-12 ×1, Produit-61 ×1, Produit-62 ×3, Produit-64 ×2 | 2026-09-08 |
 | `recette-verdict-non-prononcable` | regle-morte | 8 | 3 | 7 | 88 % | Produit-61 ×3, Produit-10 ×1, pilot ×1, Produit-62 ×2 | 2026-09-09 |
 | `surface-implicite-non-livree` | affordance-ui | 15 | 1 | 7 | 47 % | Produit-61 ×6, Produit-10 ×1 | 2026-09-07 |
+| `anonymisation-portee-partielle` | anonymisation | 17 | 2 | 6 | 35 % | pilot ×5, Produit-12 ×1 | 2026-09-13 |
 | `gate-ecriture-juge-fichier-entier` | hook-ou-gate | 7 | 1 | 6 | 86 % | Produit-60 ×1, Produit-62 ×1, pilot ×3, Produit-61 ×1 | 2026-09-05 |
-| `anonymisation-portee-partielle` | anonymisation | 16 | 2 | 5 | 31 % | pilot ×4, Produit-12 ×1 | 2026-09-06 |
 | `page-html-sticky-superposes` | page-html-socle | 5 | 1 | 5 | 100 % | Produit-61 ×1, Produit-10 ×4 | 2026-09-08 |
 | `gabarit-conception-non-jugee` | gabarit-document | 3 | 3 | 3 | 100 % | Produit-61 ×2, pilot ×1 | 2026-09-10 |
 | `page-html-dictionnaire-colonnes` | page-html-socle | 4 | 1 | 3 | 75 % | Produit-10 ×3 | 2026-09-08 |
@@ -45,6 +45,7 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `page-html-grille-non-alignee` | page-html-socle | 1 | 1 | 1 | 1/1 (sous 3 items, taux non significatif) | Produit-11 ×1 | 2026-09-11 |
 | `page-html-teinte-refus` | page-html-socle | 1 | 1 | 1 | 1/1 (sous 3 items, taux non significatif) | Produit-10 ×1 | 2026-09-08 |
 | `point-entree-declare-rouge-sur-toute-cible` | regle-morte | 3 | 1 | 1 | 33 % | Produit-62 ×1 | 2026-09-09 |
+| `recette-locale-ne-rejoue-pas-l-environnement-de-la-ci` | hook-ou-gate | 4 | 1 | 1 | 25 % | pilot ×1 | 2026-09-13 |
 | `regle-balaie-prose-et-identifiants` | regle-morte | 4 | 1 | 1 | 25 % | pilot ×1 | 2026-09-11 |
 | `texte-sur-la-graphie-detruit-par-sa-pseudonymisation` | anonymisation | 1 | 1 | 1 | 1/1 (sous 3 items, taux non significatif) | pilot ×1 | 2026-09-10 |
 | `banc-etend-referentiel-production` | anonymisation | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
@@ -73,7 +74,6 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `page-html-temps-affiche` | page-html-socle | 0 | 1 | 0 | — | — | — |
 | `porte-sans-chemin-des-tables` | hook-ou-gate | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `quantificateur-sacrifie-au-budget-du-texte` | regle-morte | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
-| `recette-locale-ne-rejoue-pas-l-environnement-de-la-ci` | hook-ou-gate | 3 | 1 | 0 | 0 % | — | — |
 | `reference-chargee-toujours-absente-du-paquet` | regle-morte | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `registre-doublon-non-detecte` | lot-forme | 2 | 0 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
 | `regle-de-branche-annoncee-differente-configuree` | contrat-interface-forge | 2 | 1 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
