@@ -134,7 +134,7 @@ import {
   existsSync, readFileSync, readdirSync, statSync, mkdirSync, copyFileSync, writeFileSync,
   mkdtempSync, renameSync, rmSync, appendFileSync, utimesSync,
 } from "node:fs";
-import { createHash } from "node:crypto";
+import { empreinteFichier } from "../scripts/lib-empreinte.mjs";
 import { basename, dirname, join, resolve, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir, tmpdir } from "node:os";
@@ -355,7 +355,10 @@ function decrireEcart({ manquants, divergents, orphelins }) {
 // (chemin, empreinte d'avant, empreinte d'après, heure réelle du geste) dans un journal HORS du
 // dépôt, et une copie dont l'empreinte a changé depuis sa dernière propagation journalisée est
 // relevée (K11) — sans consulter aucune date — et jamais écrasée.
-const empreinte = (p) => createHash("sha256").update(readFileSync(p)).digest("hex");
+// Le format UNIQUE du parc (N-7, `scripts\lib-empreinte.mjs`), fins de ligne normalisées : avec
+// core.autocrlf, un fichier reposé en CRLF sans qu'un octet de contenu change ne doit pas passer
+// pour une copie modifiée — c'est aussi ce que `memeContenu` tient pour identique.
+const empreinte = (p) => empreinteFichier(p);
 const cleJournal = (p) => resolve(p).toLowerCase();
 
 // ---- TF-1099 (14/09/2026) · UNE SOURCE EN COURS DE MODIFICATION NE SE PROPAGE PAS ----------------
