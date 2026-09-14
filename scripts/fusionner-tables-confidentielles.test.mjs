@@ -56,6 +56,34 @@ try {
     att(typeof p.date_derniere_extension === "string", "la date de dernière extension n'est pas posée");
     att(renommes(r) === 2, `2 anciens fichiers renommés attendus, ${renommes(r)}`);
   });
+  // TF-0959 — une CLÉ qui est déjà un pseudonyme ne s'inscrit jamais (fait du 08/09 au matin).
+  const parcPseudo = (produits, clients) => {
+    const r = parc({ anciens: false });
+    writeFileSync(join(r, "_produits-pseudonymes.json"), JSON.stringify({ produits }), "utf8");
+    writeFileSync(join(r, "_noms-interdits.json"), JSON.stringify({ noms: clients, identifiants: [], sigles: [], pseudonymes: Object.fromEntries(clients.map((c, i) => [c, `Client-${"CDE"[i]}`])) }), "utf8");
+    return r;
+  };
+  check("ROUGE TF-0959 — la clé produit « Produit-02 » (déjà un pseudonyme) est refusée, nommée avec le pseudonyme qu'elle porte, rien d'écrit", () => {
+    const r = parcPseudo({ "Produit-02": "Produit-07" }, ["Fictilabs"]);
+    const { status, j } = jouer(r);
+    att(status === 1, `exit ${status} attendu 1`);
+    att(j && j.conflits.some((c) => /Produit-02/.test(c) && /EST déjà un pseudonyme/.test(c) && /Produit-07/.test(c)), `conflit non nommé : ${JSON.stringify(j && j.conflits)}`);
+    const p = JSON.parse(readFileSync(join(r, "_confidentiel", "tables", "produits-pseudonymes.json"), "utf8"));
+    att(!("Produit-02" in p.produits), "la clé pseudonyme est entrée au canal");
+    att(renommes(r) === 0, "un ancien fichier a été renommé malgré le conflit");
+  });
+  check("ROUGE TF-0959 — le nom client « Client-A » (pseudonyme) est refusé comme nom réel", () => {
+    const r = parcPseudo({}, ["Client-A"]);
+    const { status, j } = jouer(r);
+    att(status === 1 && j && j.conflits.some((c) => /Client-A/.test(c) && /EST déjà un pseudonyme/.test(c)), `refus attendu : ${JSON.stringify(j && j.conflits)}`);
+  });
+  check("VERT TF-0959 — un nom réel ordinaire est accepté (la garde ne mord pas sur un vrai nom)", () => {
+    const r = parcPseudo({ "delta-quatre": "Produit-04" }, ["Fictilabs"]);
+    const { status, j } = jouer(r);
+    att(status === 0, `exit ${status} attendu 0 — ${JSON.stringify(j && j.conflits)}`);
+    const p = JSON.parse(readFileSync(join(r, "_confidentiel", "tables", "produits-pseudonymes.json"), "utf8"));
+    att(p.produits["delta-quatre"] === "Produit-04", "le nom réel n'est pas entré au canal");
+  });
   check("VERT — sans ancien fichier, rien à faire, exit 0", () => {
     const r = parc({ anciens: false });
     const { status, j } = jouer(r);
