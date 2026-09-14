@@ -8,7 +8,10 @@
 
 - **Contexte** : <clôture du run <run-id> | inspection production v<X> | incident | autre>
 - **Références ledger** : `forge\ledger.jsonl` seq <n, n…> (entrées `type: retour`)
-- **Remise au pilot** : copier ce fichier (et son sidecar) dans `<pilot>\input\00-retours\` —
+- **Remise au pilot** : copier ce fichier (et son sidecar) dans le SAS
+  `<pilot>\input\00-retours\_arrivee\` (ignoré par git), jamais à la racine de `input\00-retours\` :
+  le pilot l'y dépose lui-même après pseudonymisation (`todo\accueillir-lot.mjs`, TF-0981) ; un lot
+  au nom réel posé à la racine est refusé (règle LOT-SAS de l'oracle, TF-1054) —
   l'original reste ici (historique du produit). Statut : `a_remettre` → `remis le <date>`
   (seule édition autorisée après coup : cette ligne de statut).
 - **Statut** : a_remettre
@@ -39,7 +42,7 @@ Convention de gravité : **bloquant** (a bloqué ou failli bloquer) · **majeur*
 aller-retour ou une découverte par lecture de code) · **mineur** (confort/précision).
 Si un retour se rapporte à un item du registre TODO-FORGE du pilot, citer son id
 (`TF-xxxx`) — chaque retour intégré recevra le sien. **Les forges aussi** peuvent déposer un
-lot avec ce gabarit, ciblant n'importe quelle autre forge (remise : `input\00-retours\` du
+lot avec ce gabarit, ciblant n'importe quelle autre forge (remise : `input\00-retours\_arrivee\` du
 pilot, préfixé du nom de la forge émettrice).
 
 **Sidecar machine (obligatoire depuis le 08/08)** : à côté de ce lot, un fichier

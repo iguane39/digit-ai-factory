@@ -180,5 +180,67 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
   try { rmSync(T, { recursive: true, force: true }); } catch { /* verrou toléré */ }
 }
 
+// ---- LOT-SAS (TF-1054) : UN LOT ARRIVE PAR LE SAS, JAMAIS À LA RACINE SOUS UN NOM RÉEL -------
+//
+// Tables JETABLES, noms INVENTÉS, variables posées dans CE processus seulement — jamais les tables
+// du canal confidentiel (incident du 08/09). Le quatrième cas JOUE le remède que le message
+// prescrit (TF-1013) : un gardien qui refuserait son propre remède se ferait désactiver.
+{
+  const { mkdtempSync, mkdirSync, writeFileSync, readdirSync, rmSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const T = mkdtempSync(join(tmpdir(), "lot-sas-"));
+  const avant = { c: process.env.FORGE_NOMS_INTERDITS, p: process.env.FORGE_PRODUITS_PSEUDO };
+  writeFileSync(join(T, "_noms.json"), JSON.stringify({ noms: ["Zorglub"], identifiants: [], sigles: [], pseudonymes: { Zorglub: "Client-A" } }), "utf8");
+  writeFileSync(join(T, "_prod.json"), JSON.stringify({ produits: { "CalculatriceZorglubZAP": "Produit-01" } }), "utf8");
+  process.env.FORGE_NOMS_INTERDITS = join(T, "_noms.json");
+  process.env.FORGE_PRODUITS_PSEUDO = join(T, "_prod.json");
+  const boite = join(T, "input", "00-retours"), arrivee = join(boite, "_arrivee");
+  mkdirSync(arrivee, { recursive: true });
+  const CORPS = "# lot\n\n" + R45 + "\n" + R46;
+
+  check("LOT-SAS rouge — un lot au NOM RÉEL posé à la racine de la boîte : FAIL, et le remède nomme le sas", () => {
+    const c = constat(verifier(join(boite, "CalculatriceZorglubZAP - RETOURS - 20260914a.md"), CORPS), "LOT-SAS");
+    if (!c || c.statut !== "FAIL") throw new Error(`statut ${c ? c.statut : "absent"} — un lot au nom réel dans le répertoire suivi passe encore`);
+    if (!/_arrivee/.test(c.remede || "") || !/accueillir-lot/.test(c.remede || "")) throw new Error("le remède ne nomme ni le sas ni le geste qui le vide");
+  });
+
+  check("LOT-SAS vert — un lot au nom PSEUDONYMISÉ à la racine : sortie normale du sas, PASS", () => {
+    const c = constat(verifier(join(boite, "Produit-01 - RETOURS - 20260914a.md"), CORPS), "LOT-SAS");
+    if (!c || c.statut !== "PASS") throw new Error(`statut ${c ? c.statut : "absent"} — un lot accueilli est accusé`);
+  });
+
+  check("LOT-SAS vert — le même lot au nom réel DANS le sas : PASS, c'est sa place", () => {
+    const c = constat(verifier(join(arrivee, "CalculatriceZorglubZAP - RETOURS - 20260914a.md"), CORPS), "LOT-SAS");
+    if (!c || c.statut !== "PASS") throw new Error(`statut ${c ? c.statut : "absent"}`);
+  });
+
+  {
+    const { accueillir } = await import("../todo/accueillir-lot.mjs");
+    writeFileSync(join(arrivee, "CalculatriceZorglubZAP - RETOURS - 20260914b.md"), CORPS, "utf8");
+    const r = accueillir({ arrivee, boite });
+    const depose = readdirSync(boite).find((n) => /RETOURS - 20260914b\.md$/.test(n));
+    check("LOT-SAS remède joué — après `accueillir-lot`, le lot redéposé à la racine rend PASS", () => {
+      if (!depose) throw new Error(`le remède n'a rien déposé à la racine — ${JSON.stringify(r).slice(0, 200)}`);
+      const c = constat(verifier(join(boite, depose)), "LOT-SAS");
+      if (!c || c.statut !== "PASS") throw new Error(`statut ${c ? c.statut : "absent"} — le gardien refuse le geste qu'il prescrit (classe TF-1013)`);
+    });
+  }
+
+  check("LOT-SAS borne — tables introuvables : SANS_OBJET, et le motif est DIT", () => {
+    process.env.FORGE_NOMS_INTERDITS = join(T, "absente.json");
+    const c = constat(verifier(join(boite, "CalculatriceZorglubZAP - RETOURS - 20260914a.md"), CORPS), "LOT-SAS");
+    if (!c || c.statut !== "SANS_OBJET" || !/introuvables/.test(c.message)) throw new Error(`statut ${c ? c.statut : "absent"} — un juge sans table ne doit ni accuser ni absoudre en silence`);
+  });
+
+  check("LOT-SAS borne — un lot hors de la boîte du pilot (chez le produit) : SANS_OBJET", () => {
+    const c = constat(verifier(join(T, "forge", "retours", "PROD - RETOURS - 20260914a.md"), CORPS), "LOT-SAS");
+    if (!c || c.statut !== "SANS_OBJET") throw new Error(`statut ${c ? c.statut : "absent"}`);
+  });
+
+  for (const [k, v] of [["FORGE_NOMS_INTERDITS", avant.c], ["FORGE_PRODUITS_PSEUDO", avant.p]]) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
+  try { rmSync(T, { recursive: true, force: true }); } catch { /* verrou toléré */ }
+}
+
 console.log(`\noracle-lot-retours (TF-0597) : ${pass} PASS, ${echec} FAIL`);
 process.exit(echec ? 1 : 0);

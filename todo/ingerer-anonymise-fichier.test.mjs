@@ -45,7 +45,12 @@ const ENV = {
 };
 
 const NOM = "Zorglub-Courrier - RETOURS - 20260101a";
-const boite = join(T, "input", "00-retours");
+// HORS de la racine de la boîte, et c'est voulu (TF-1054, 14/09/2026) : un lot au nom réel posé à
+// la racine SUIVIE de `input\00-retours\` est désormais refusé par LOT-SAS avant toute écriture
+// — le dernier cas de cette recette le prouve. La fuite que cette recette garde (le chemin
+// consigné dans l'événement) reste ouverte pour tout lot ingéré depuis un AUTRE endroit, et c'est
+// celui-là qu'elle joue ; ses quatre assertions sont inchangées.
+const boite = join(T, "remise-directe");
 mkdirSync(boite, { recursive: true });
 const sidecar = join(boite, `${NOM}.tf.jsonl`);
 // Deux candidatures : R-47 ne joue que sur un lot à plus d'une création (borne de l'ingesteur).
@@ -91,6 +96,24 @@ check("la sortie de l'outil ne répète pas le nom réel du produit dans sa lign
   const ligne = sortie.split("\n").find((l) => /\[ANONYMIS/.test(l) && /produit/.test(l)) || "";
   if (/Zorglub-Courrier/.test(ligne)) throw new Error(`la ligne d'annonce porte le nom réel : ${ligne}`);
 });
+
+// TF-1054 — le MÊME lot posé à la racine de la boîte : refus atomique qui nomme le sas, registre intact.
+{
+  const racineBoite = join(T, "input", "00-retours");
+  mkdirSync(racineBoite, { recursive: true });
+  const sc = join(racineBoite, `${NOM}.tf.jsonl`);
+  writeFileSync(sc, readFileSync(sidecar, "utf8"), "utf8");
+  writeFileSync(join(racineBoite, `${NOM}.md`), "# lot\n\n## pilot\n\ntable\n", "utf8");
+  const reg2 = join(T, "TODO-racine.jsonl");
+  writeFileSync(reg2, "", "utf8");
+  const r2 = spawnSync(process.execPath, [OUTIL, sc, "--registre", reg2, "--sans-fetch"], { encoding: "utf8", env: ENV, timeout: 180000 });
+  const s2 = (r2.stdout || "") + (r2.stderr || "");
+  check("TF-1054 — le même lot à la RACINE de la boîte : refusé (LOT-SAS), le sas nommé, registre intact", () => {
+    if (r2.status === 0) throw new Error("un lot au nom réel posé à la racine suivie est ingéré");
+    if (!/LOT-SAS/.test(s2) || !/_arrivee/.test(s2)) throw new Error(`le refus ne nomme ni la règle ni le sas : ${s2.slice(0, 300)}`);
+    if (readFileSync(reg2, "utf8").trim()) throw new Error("le registre a été écrit malgré le refus");
+  });
+}
 
 rmSync(T, { recursive: true, force: true });
 console.log(`\ningerer-lot (l'événement d'ingestion est anonymisé comme la candidature) : ${pass} PASS, ${fail} FAIL`);
