@@ -40,6 +40,23 @@ test("clone à jour → rien à rebâtir (exit 0), aucune sauvegarde écrite", (
   assert.equal(r.code, 0, r.brut);
   assert.match(r.j.message, /rien à rebâtir/);
   assert.equal(r.j.sauvegarde, null);
+  assert.deepEqual(r.j.references_divergentes, [], `un clone à jour n'a aucune référence hors branche à nommer — rendu : ${JSON.stringify(r.j.references_divergentes)}`);
+  rmSync(base, { recursive: true, force: true });
+});
+
+test("TF-1008 — un remisage sur l'ANCIENNE histoire survit au rebâti : il est NOMMÉ avec ses commits propres, jamais supprimé", () => {
+  const { base, auteur, poste } = parc();
+  writeFileSync(join(poste, "a.txt"), "mis de côté\n");
+  g(poste, "stash", "push", "-q", "-m", "travail mis de cote");
+  g(auteur, "filter-branch", "-f", "--msg-filter", "sed s/NomClient/Client-A/", "--", "--all");
+  g(auteur, "push", "-q", "--force", "origin", "main");
+  const r = lancer(poste, "--sauvegardes", join(base, "sauv"));
+  assert.equal(r.code, 0, `exit ${r.code} attendu 0 — ${r.brut}`);
+  const s = (r.j.references_divergentes || []).find((x) => x.reference === "refs/stash");
+  assert.ok(s, `le remisage qui garde l'ancienne histoire n'est pas nommé — rendu : ${JSON.stringify(r.j.references_divergentes)}`);
+  assert.ok(s.commits_propres >= 1, `commits propres du remisage : ${s.commits_propres}, au moins 1 attendu`);
+  assert.match(r.j.message, /hors de la branche/, "le message du rebâti tait la référence divergente");
+  assert.match(g(poste, "stash", "list"), /travail mis de cote/, "le remisage a été supprimé — supprimer est un geste humain (R-29)");
   rmSync(base, { recursive: true, force: true });
 });
 
