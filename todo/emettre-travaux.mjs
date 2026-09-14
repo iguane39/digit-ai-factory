@@ -444,10 +444,14 @@ if (lanceEnDirect) {
       ? readdirSync(boite).filter((f) => f.endsWith(".md"))
         .map((f) => ({ nom: f, txt: readFileSync(join(boite, f), "utf8") }))
       : [];
-    const dejaLa = lotsPresents.find((l) => l.txt.includes(sceau));
+    // Tous les lots de même sceau, pas le premier trouvé : après une correction, l'ancien lot et le
+    // correctif cohabitent, et c'est la présence de la rédaction du jour dans L'UN D'EUX qui dit
+    // que rien n'est à redéposer (sans quoi chaque passage relivrerait la correction).
+    const memeSceau = lotsPresents.filter((l) => l.txt.includes(sceau));
+    const dejaLa = memeSceau[memeSceau.length - 1];
     let correction = null;
     if (dejaLa) {
-      if (dejaLa.txt.includes(lot.redaction)) { ignores += 1; console.log(`[DÉJÀ DÉPOSÉ] ${ligne.produit} — empreinte ${sceau}, rien de redéposé`); continue; }
+      if (memeSceau.some((l) => l.txt.includes(lot.redaction))) { ignores += 1; console.log(`[DÉJÀ DÉPOSÉ] ${ligne.produit} — empreinte ${sceau}, rien de redéposé`); continue; }
       if (!CORRIGER_REDACTION) {
         ignores += 1;
         console.log(`[DÉJÀ DÉPOSÉ] ${ligne.produit} — empreinte ${sceau}, rien de redéposé ; sa RÉDACTION diffère de celle d'aujourd'hui (« ${dejaLa.nom} ») — \`--corriger-redaction\` livre la nouvelle forme sous l'indice suivant, sans toucher au contenu (TF-1083)`);
