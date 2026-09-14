@@ -93,6 +93,23 @@ check("VERT — toutes les occurrences substituables : aucun reste annoncé", ()
   att(r.refuses.length === 0, `un reste est annoncé alors que tout a été substitué : ${JSON.stringify(r.refuses)}`);
 });
 
+// TF-1007 — L'EXEMPLE RENDU TAUTOLOGIQUE. Deux graphies d'un même nom de produit (clé à tirets,
+// nom à espaces) dans une ligne : la pseudonymisation les rend par le MÊME pseudonyme. Le geste
+// doit le signaler ; deux occurrences d'une MÊME graphie ne le doivent pas.
+check("ROUGE — deux graphies différentes rendues par le même pseudonyme : tautologie signalée, ligne et nombre", () => {
+  const f = poser("graphies.md", "intro\nla clé calculatrice-zorglub-zap, et le nom Calculatrice Zorglub ZAP dans le rapport\n");
+  const r = passer({ fichiers: [f], ecrire: false, racine: DEPOT });
+  const t = (r.tautologies || []).find((x) => x.fichier === f);
+  att(t, `aucune tautologie signalée : ${JSON.stringify(r.tautologies)}`);
+  att(t.ligne === 2 && t.pseudo === "Produit-01" && t.graphies === 2, `signalement inexact : ${JSON.stringify(t)}`);
+});
+
+check("VERT — la même graphie deux fois dans une ligne : rien à signaler", () => {
+  const f = poser("meme-graphie.md", "Le client Zorglub a signé, et Zorglub paiera.\n");
+  const r = passer({ fichiers: [f], ecrire: false, racine: DEPOT });
+  att(!(r.tautologies || []).some((x) => x.fichier === f), `une répétition d'une même graphie est prise pour une tautologie : ${JSON.stringify(r.tautologies)}`);
+});
+
 check("le mode essai n'écrit rien — le fichier porteur est intact après la passe", () => {
   const f = poser("essai.md", "Lot de Zorglub.\n");
   passer({ fichiers: [f], ecrire: false, racine: DEPOT });

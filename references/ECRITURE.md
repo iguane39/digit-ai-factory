@@ -140,6 +140,18 @@ zéro emploi restant. Pour T4 : un libellé nomme ce que la personne contrôle (
 modifications », pas « Valider ») ; une erreur dit ce qui s'est passé puis comment réparer ; un
 état vide invite à agir.
 
+### E-13 — Un exemple de nom masqué se décrit ou s'invente, il ne se cite pas
+
+Un texte qui explique un défaut d'anonymisation oppose souvent deux graphies d'un même nom
+(une clé en minuscules à tirets, le même nom en majuscules à espaces). Cité tel quel, l'exemple
+passe par la pseudonymisation, qui rend les deux graphies par le même pseudonyme : la phrase dit
+alors « X dans le nom, la clé étant X » et n'explique plus rien. Cela s'est produit deux fois
+dans un même fichier le 10/09 (TF-1007), et un message de commit a dû être réécrit par un tiers.
+L'exemple se **décrit** (« la clé en minuscules à tirets, le nom en majuscules à espaces ») ou
+se prend à un **nom inventé**, comme les bancs le font avec leurs tables jetables.
+*Contrôle* : le hook de pré-commit (`todo\pre-commit-anonymise.mjs`) avertit quand un même
+pseudonyme remplace deux graphies différentes dans une même ligne.
+
 ## Précédence
 
 1. La structure imposée par un gabarit prime (blocs et tableaux de `RESTITUTION.md`, sections

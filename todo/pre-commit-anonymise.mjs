@@ -78,7 +78,7 @@ export function passer({ fichiers, ecrire = true, racine = RACINE } = {}) {
   // TF-0993 : `refuses` — les occurrences que la chaîne a LAISSÉES EN PLACE à dessein (collées à
   // un identifiant, TF-0927). Le hook annonçait « pseudonymisé » sans jamais dire ce qui avait
   // résisté ; le 09/09, un nom est ainsi resté dans un commentaire du pilot, vu par la seule relecture.
-  const corriges = [], nomsPorteurs = [], refuses = [];
+  const corriges = [], nomsPorteurs = [], refuses = [], tautologies = [];
   for (const f of liste) {
     const abs = join(racine, f);
     if (!existsSync(abs)) continue;
@@ -92,6 +92,7 @@ export function passer({ fichiers, ecrire = true, racine = RACINE } = {}) {
     const { texte, remplaces, refuses: resistes } = anonymiser(brut, { code: EST_CODE.test(f) });
     for (const x of resistes || []) refuses.push({ fichier: f, ligne: x.ligne ?? null, motif: x.motif, autour: x.autour });
     if (texte === brut) continue;
+    for (const t of tautologiesCreees(brut, texte)) tautologies.push({ fichier: f, ...t });
 
     if (ecrire) {
       writeFileSync(abs, texte, "utf8");
@@ -99,7 +100,33 @@ export function passer({ fichiers, ecrire = true, racine = RACINE } = {}) {
     }
     corriges.push({ fichier: f, termes: remplaces.length });
   }
-  return { corriges, nomsPorteurs, refuses };
+  return { corriges, nomsPorteurs, refuses, tautologies };
+}
+
+/**
+ * TF-1007 — L'EXEMPLE RENDU TAUTOLOGIQUE. Une ligne où un même pseudonyme remplace au moins deux
+ * graphies DIFFÉRENTES d'origine : si elle opposait ces graphies, elle dit désormais « X, la clé
+ * étant X ». On retrouve les graphies d'origine en alignant la ligne réécrite sur l'originale (les
+ * morceaux entre deux pseudonymes sont restés identiques). Rend `{ ligne, pseudo, graphies }` —
+ * le NOMBRE de graphies, jamais les graphies elles-mêmes, qui sont des noms réels.
+ */
+const PSEUDO = /Produit-\d{2,}|Client-[A-Z]{1,3}/g;
+export function tautologiesCreees(avant, apres) {
+  const la = avant.split("\n"), lp = apres.split("\n"), out = [];
+  if (la.length !== lp.length) return out;
+  for (let i = 0; i < lp.length; i++) {
+    if (la[i] === lp[i]) continue;
+    for (const pseudo of new Set(lp[i].match(PSEUDO) || [])) {
+      const morceaux = lp[i].split(pseudo);
+      if (morceaux.length < 3) continue;
+      const re = new RegExp("^" + morceaux.map((m) => m.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("(.+?)") + "$");
+      const m = re.exec(la[i]);
+      if (!m) continue;
+      const graphies = new Set(m.slice(1).filter((g) => g !== pseudo));
+      if (graphies.size >= 2) out.push({ ligne: i + 1, pseudo, graphies: graphies.size });
+    }
+  }
+  return out;
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("\\", "/")
@@ -134,6 +161,12 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
       } catch { /* le journal ne doit jamais bloquer un commit */ }
     }
     console.error("  Le commit part. Renommer l'identifiant à la main avant de publier, sans quoi la porte le trouvera dans l'histoire.\n");
+  }
+
+  if (r.tautologies.length) {
+    console.error(`\n  AVERTISSEMENT — ${r.tautologies.length} ligne(s) où un même pseudonyme remplace des graphies DIFFÉRENTES (TF-1007) :`);
+    for (const t of r.tautologies) console.error(`  [tautologie ?] ${t.fichier}:${t.ligne} — ${t.pseudo} remplace ${t.graphies} graphies distinctes`);
+    console.error("  Si la phrase opposait ces graphies, elle ne dit plus rien : décrire l'exemple ou le prendre à un nom inventé (references\\ECRITURE.md, E-13).\n");
   }
 
   if (r.nomsPorteurs.length) {
