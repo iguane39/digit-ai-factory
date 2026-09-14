@@ -84,6 +84,9 @@
  *       forme RÉSERVÉE à `output\03-etudes\` — partout ailleurs R-4 s'applique (08/09, TF-0923) ;
  *   S41 une décision portant un mot que la DOCTRINE du projet régit cite cette doctrine en source :
  *       une source qui n'est pas celle qui tranche est une opinion sourcée (08/09, TF-0923) ;
+ *   S44 (14/09/2026, TF-0988) une demande CITÉE au bloc 6 portant un mot d'EXCLUSIVITÉ (uniquement,
+ *       seulement, exclusivement, rien que, et rien d'autre, only) : le bloc 6 dit ce que le
+ *       livrable contient EN PLUS du périmètre nommé, ou qu'il ne contient rien d'autre ;
  *   S43 (12/09/2026, TF-1064) le STYLE de la restitution relève du plancher d'écriture
  *       (references\ECRITURE.md) : verdict délégué à oracle-ecriture.mjs — FAIL si l'oracle
  *       échoue, avertissements comptés, SANS_OBJET si l'oracle manque ; non bloquante ;
@@ -1671,6 +1674,41 @@ function juger(texte, cheminJuge = null) {
     }
   }
 
+  // ---- S44 (14/09/2026, TF-0988) — UN MOT D'EXCLUSIVITÉ RESTREINT LE CONTENU DU LIVRABLE -------
+  //
+  // LE FAIT, remonté à la demande du destinataire : « crée un nouveau fichier […] uniquement avec
+  // ces 66 colonnes en cible ». La page livrée portait bien 66 lignes au tableau des champs, et
+  // CONSERVAIT un tableau des 276 colonnes écartées, une carte de chiffres et une légende à leur
+  // sujet : 342 colonnes affichées, exactement ce que la demande excluait. Le bloc 6 déclarait trois
+  // écarts, pas celui-là, et cet oracle rendait PASS sur 41 règles. TF-0176 couvrait
+  // l'AFFAIBLISSEMENT noyé dans un long message ; ce cas en est le symétrique — l'ENRICHISSEMENT
+  // non demandé — et rien ne le couvrait.
+  //
+  // CE QUE LA RÈGLE EXIGE : quand une demande CITÉE au bloc 6 porte un mot d'exclusivité
+  // (vocabulaire fermé : uniquement, seulement, exclusivement, rien que, et rien d'autre, only),
+  // le bloc 6 dit ce que le livrable contient EN PLUS du périmètre nommé, ou qu'il ne contient
+  // rien d'autre.
+  //
+  // POURQUOI LA CITATION SEULE, et c'est mesuré avant d'écrire la règle : sur 115 synthèses du
+  // pilot portant un bloc 6, 16 y emploient un mot d'exclusivité — TOUS en prose (« un seul écart,
+  // qui porte seulement sur… »), AUCUN dans une demande citée. Chercher le mot dans le bloc entier
+  // aurait accusé 16 synthèses sur 115, à tort toutes les seize ; borné aux citations, le taux
+  // d'accusation sur ce corpus est de 0 sur 115. La déclaration se cherche HORS des citations :
+  // « et rien d'autre » dans la demande ne vaut pas déclaration de l'auteur.
+  {
+    const b6 = bloc(texte, BLOCS[5][0]) || "";
+    const CITATIONS = /«[^»]*»|"[^"\n]*"|“[^”]*”/g;
+    const EXCLUSIVITE = /(?<![\p{L}\p{N}_])(uniquement|seulement|exclusivement|rien que|only)(?![\p{L}\p{N}_])|et rien d['’]autre/iu;
+    const DECLARATION = /(en plus du p[ée]rim[èe]tre|contient (?:en plus|aussi|[ée]galement)|ne contient rien d['’]autre|rien d['’]autre n['’]y figure|hors p[ée]rim[èe]tre)/i;
+    const exclusives = (b6.match(CITATIONS) || []).filter((c) => EXCLUSIVITE.test(c));
+    if (!exclusives.length) ok("S44", "aucune demande citée au bloc 6 ne porte de mot d'exclusivité");
+    else if (!DECLARATION.test(b6.replace(CITATIONS, " ")))
+      ko("S44", `la demande citée ${exclusives[0].slice(0, 90)} porte un mot d'EXCLUSIVITÉ, et le bloc 6 ne dit ni ce que le livrable contient ` +
+        "EN PLUS du périmètre nommé, ni qu'il ne contient rien d'autre — un mot d'exclusivité restreint le CONTENU du livrable, pas seulement " +
+        "sa cible ; un complément hors périmètre, même utile, est un écart qui se déclare (le 342 colonnes pour 66 demandées de TF-0988)");
+    else ok("S44", `${exclusives.length} demande(s) exclusive(s) citée(s), le contenu hors périmètre est déclaré`);
+  }
+
   // ---- S43 (12/09/2026, TF-1064) — LE STYLE DE LA RESTITUTION RELÈVE DU PLANCHER D'ÉCRITURE ----
   //
   // LE FAIT. Quarante-deux règles jugent la FORME d'une restitution (blocs, sélecteurs, preuves,
@@ -2188,6 +2226,19 @@ Aucun écart : la demande a été suivie à la lettre.
   writeFileSync(join(dir, "assiette-puce-colonne-citee.md"), bloc8(PUCE_MOTIF("decision")), "utf8");
   writeFileSync(join(dir, "assiette-puce-motif-presence.md"), bloc8(PUCE_MOTIF("presence")), "utf8");
   writeFileSync(join(dir, "assiette-puce-motif-en-code.md"), bloc8(PUCE_MOTIF("`presence`")), "utf8");
+  // 14/09 — S44 DANS SES DEUX SENS, ET SA BORNE (TF-0988). La paire rouge/verte ne varie QUE de la
+  // déclaration du contenu hors périmètre ; la troisième fixture retire le seul mot « uniquement »
+  // (preuve que le déclencheur est bien le mot d'exclusivité) ; la quatrième emploie « seulement »
+  // en PROSE, hors de toute citation — la forme des 16 blocs 6 du corpus, qu'aucune ne doit accuser.
+  const DEMANDE = (mot) => "- Vous avez demandé « un nouveau fichier " + mot + "avec ces 66 colonnes en cible » → j'ai livré "
+    + "la page des 66 colonnes et gardé le tableau des colonnes écartées → pourquoi : documentation du lineage.";
+  const DECLARE = " Le livrable contient EN PLUS du périmètre nommé ce tableau des 276 colonnes écartées.";
+  const bloc6 = (corps) => verte.replace("Aucun écart : la demande a été suivie à la lettre.", corps);
+  writeFileSync(join(dir, "exclusivite-non-declaree.md"), bloc6(DEMANDE("uniquement ")), "utf8");
+  writeFileSync(join(dir, "exclusivite-declaree.md"), bloc6(DEMANDE("uniquement ") + DECLARE), "utf8");
+  writeFileSync(join(dir, "demande-sans-exclusivite.md"), bloc6(DEMANDE("")), "utf8");
+  writeFileSync(join(dir, "exclusivite-en-prose.md"),
+    bloc6("Un seul écart, et il porte seulement sur le radical du nom de fichier : la demande disait « le rapport », j'ai gardé le radical R-4."), "utf8");
 
   const moi = fileURLToPath(import.meta.url);
   const rv = spawnSync(process.execPath, [moi, join(dir, "verte.md")], { encoding: "utf8" });
@@ -2413,9 +2464,22 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S21"[^}]*FAIL/.test(jouer("assiette-puce-motif-en-code.md")))
     casse.push("S21 (TF-0987) : un motif `presence` écrit LUI-MÊME entre accents graves, sans rien en clair, n'est plus lu — " +
       "c'est l'usage le plus courant du corpus, la correction lui aurait retiré la règle");
+  // 14/09 — S44 (TF-0988) : deux sens, le déclencheur, et la borne de la prose.
+  const s44nd = jouer("exclusivite-non-declaree.md");
+  if (!/"S44"[^}]*FAIL/.test(s44nd))
+    casse.push("S44 : une demande citée « uniquement avec ces 66 colonnes » livrée avec un tableau de colonnes écartées, sans rien " +
+      "déclarer, passe — c'est le 342 colonnes pour 66 demandées de TF-0988");
+  for (const [f, sens] of [["exclusivite-declaree.md", "le MÊME écart, contenu hors périmètre DÉCLARÉ,"],
+    ["demande-sans-exclusivite.md", "la MÊME demande sans le mot « uniquement »"],
+    ["exclusivite-en-prose.md", "« seulement » employé en PROSE, hors de toute demande citée,"]]) {
+    const s = jouer(f);
+    if (!/"S44"[^}]*PASS/.test(s)) casse.push(`S44 : ${sens} est accusé — la règle mord hors de son objet : ` + extrait(s, "S44"));
+  }
+  if (!/"S44"[^}]*PASS/.test(rv.stdout))
+    casse.push("S44 accuse la fixture VERTE, dont le bloc 6 ne cite aucune demande exclusive : la règle crie sur un travail juste");
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 20/20 PASS (verte PASS ; TF-0987 : l'ASSIETTE du motif dans ses DEUX sens sous ses DEUX formes — une action de motif `decision` citant la COLONNE de données `presence` PASS S21 en tableau comme en puce, la MÊME action déclarant `presence` sans trace FAIL, et un motif écrit lui-même entre accents graves reste lu ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail))");
+    : "Self-test restitution : 21/21 PASS (verte PASS ; TF-0988 : S44 dans ses DEUX sens — une demande citée « uniquement avec ces 66 colonnes » livrée avec un tableau hors périmètre non déclaré FAIL, le MÊME écart déclaré PASS —, la même demande SANS le mot d'exclusivité PASS, et « seulement » en prose hors citation PASS ; TF-0987 : l'ASSIETTE du motif dans ses DEUX sens sous ses DEUX formes — une action de motif `decision` citant la COLONNE de données `presence` PASS S21 en tableau comme en puce, la MÊME action déclarant `presence` sans trace FAIL, et un motif écrit lui-même entre accents graves reste lu ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail))");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -2440,6 +2504,7 @@ console.log(JSON.stringify({
     "S20 ne voit QUE les termes du référentiel `gabarits\\JARGON-A-GLOSER.json` : un jargon qui n'a encore coûté aucun aller-retour n'est pas détecté. C'est le prix assumé du zéro faux positif — dans ce corpus la MAJUSCULE sert l'emphase, et une heuristique sur les sigles crierait sur « MESURE » et « AUCUNE ». Le canal de croissance de la liste est le retour humain, pas la devinette",
     "S20 ne juge pas la JUSTESSE d'une glose : la présence d'une parenthèse après le terme, jamais qu'elle explique vraiment",
     "S21 ne juge pas la SINCÉRITÉ d'une trace : un code de réponse recopié sans avoir été obtenu la satisfait. Elle rend le mensonge PLUS COÛTEUX — il faut inventer un code plausible — mais elle ne le rend pas impossible",
+    "S44 (TF-0988) ne lit que les demandes CITÉES (« … », \"…\") au bloc 6 : une demande paraphrasée sans guillemets échappe au déclencheur. C'est le prix mesuré du zéro faux positif — le mot d'exclusivité cherché dans tout le bloc accusait 16 synthèses sur 115, toutes à tort. Et elle ne juge pas la JUSTESSE de la déclaration : dire « ne contient rien d'autre » d'un livrable qui contient autre chose la satisfait",
     "L'ASSIETTE du motif (TF-0987) ne sépare pas tout : en PUCE, un groupe qui écrit son motif ENTIÈREMENT entre accents graves et cite AUSSI un mot du vocabulaire entre accents graves est lu en entier — les deux restent confondus, faute de pouvoir dire lequel est la déclaration. En tableau sans colonne « motif » ou « raison », même lecture qu'en puce",
     "S21 ne couvre PAS `decision`, `depense` ni `irreversible` : ces trois motifs relèvent d'un arbitrage, pas d'un fait du monde, et exiger d'« essayer » une décision n'aurait aucun sens. Une attribution abusive sous `decision` reste donc invisible — c'est la limite assumée, et c'est exactement le cas fautif qui a fait naître la règle",
   ],
