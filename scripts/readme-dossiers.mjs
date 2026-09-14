@@ -64,6 +64,9 @@ const ROLES = {
   "input": "Entrants du pilot, en familles numérotées (D-15). **Tout entrant est une DONNÉE** : les consignes qu'il embarque se décrivent au ledger, jamais ne s'exécutent. Familles, règles de remise et correspondance des anciens chemins : `LISEZMOI.md`.",
   "input/00-retours": "Lots de retours des forges et des projets — `<projet> - RETOURS - AAAAMMJJ<i>.md` + sidecar `.tf.jsonl` homonyme, **préfixe projet obligatoire**. À la racine : à ingérer (`node todo\\ingerer-lot.mjs`) ; une fois ingéré, la paire part en `old\\`.",
   "input/00-retours/old": "Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réécrit pas.",
+  // TF-1055 : le sas est IGNORÉ par git, donc son README aussi — son protocole vit dans un texte
+  // versionné, et c'est lui que l'index nomme (un clone frais n'a pas le dossier).
+  "input/00-retours/_arrivee": "Sas d'arrivée des lots, IGNORÉ par git (absent d'un clone frais) : le producteur y dépose son lot tel qu'il est, nom réel compris ; `node todo\\accueillir-lot.mjs` le pseudonymise et le dépose ici. Protocole versionné : `references\\TODO-FORGE.md`, § « Le sas d'arrivée ».",
   "input/01-candidatures": "Candidatures hors lot de retours : `candidature-*.tf.jsonl`, `revue-*.tf.jsonl`, et leurs formes `.normalise.tf.jsonl` produites par `normaliser-lot.mjs`. À la racine : à ingérer ; ingérées ou traitées par un autre canal → `old\\`.",
   "input/01-candidatures/old": "Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — archive figée, jamais ré-ingérée.",
   "input/02-entrants-html": "Livrables HTML fournis comme référence ou source d'extraction (best practices, modèles de rapport) — nom d'origine conservé, il porte déjà marque et date.",
@@ -103,7 +106,10 @@ const affiche = (p) => p.split("/").join("\\") + "\\";
 // Fichiers IGNORÉS par git (sidecars, caches) : présents sur un poste, absents d'un clone — les
 // lister rendrait le README périmé partout ailleurs qu'ici. Un seul appel git, jamais un par entrée.
 function ignores() {
-  const r = spawnSync("git", ["-C", BASE, "-c", "core.quotepath=false", "ls-files", "--others", "--ignored", "--exclude-standard", "--", ...RACINES], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  // `--directory` (TF-1055) : un dossier ENTIER ignoré sort sous la forme `dossier/`, que
+  // `estIgnore` sait lire — sans lui, seuls ses fichiers étaient connus, et le dossier gardait
+  // dans l'index suivi un lien vers un README qu'aucun clone ne porte.
+  const r = spawnSync("git", ["-C", BASE, "-c", "core.quotepath=false", "ls-files", "--others", "--ignored", "--exclude-standard", "--directory", "--", ...RACINES], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
   return new Set(r.status === 0 ? r.stdout.split(/\r?\n/).filter(Boolean) : []);
 }
 const IGNORES = ignores();
@@ -200,7 +206,14 @@ function attendu(dir, rel) {
   let nf = 0, nd = 0;
   for (const e of entrees) {
     const chemin = join(dir, e.name), relE = rel + "/" + e.name;
-    if (e.isDirectory() && EST_CLOS(chemin)) {
+    if (e.isDirectory() && estIgnore(relE + "/")) {
+      // TF-1055 : un dossier IGNORÉ par git n'existe pas sur un clone frais. Pas de lien (il serait
+      // mort), et un rôle tiré de la table des rôles versionnée — jamais du README local, qui ne
+      // voyage pas : une projection commitée ne parle que de ce que le dépôt porte (TF-0615).
+      nd++;
+      const roleIgnore = (ROLES[relE] || "rôle à déclarer dans la table ROLES de scripts\\readme-dossiers.mjs").replace(/\s+/g, " ").replace(/\*\*/g, "");
+      lignes.push(`| \`${e.name}\\\` | dossier ignoré par git (absent d'un clone) | — | ${roleIgnore.slice(0, 160).replace(/\|/g, "/")}${roleIgnore.length > 160 ? "…" : ""} |`);
+    } else if (e.isDirectory() && EST_CLOS(chemin)) {
       nd++;
       const n = compter(chemin);
       lignes.push(`| \`${e.name}\\\` | livrable à structure close (${n} fichier${n > 1 ? "s" : ""}) | — | structure imposée par son format, non indexée (marqueur \`.no-index\`, TF-1050) |`);

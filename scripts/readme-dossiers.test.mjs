@@ -185,6 +185,30 @@ check("TF-0914 : le MÊME fichier, une fois COMMIS, entre dans l'index sans autr
   rmSync(B, { recursive: true, force: true });
 }
 
+// TF-1055 — UN DOSSIER IGNORÉ PAR GIT N'A PAS DE LIEN DANS L'INDEX SUIVI. Le sas d'arrivée est
+// ignoré ; son README aussi. L'index suivi du parent y pointait : lien mort sur tout clone frais.
+{
+  const B = mkdtempSync(join(tmpdir(), "readme-ignore-"));
+  const gb = (...a) => spawnSync("git", ["-C", B, ...a], { encoding: "utf8" });
+  gb("init", "-q", "-b", "main");
+  mkdirSync(join(B, "input", "sas"), { recursive: true });
+  mkdirSync(join(B, "input", "suivi"), { recursive: true });
+  writeFileSync(join(B, ".gitignore"), "input/sas/\n", "utf8");
+  writeFileSync(join(B, "input", "sas", "lot.md"), "# lot\n", "utf8");
+  writeFileSync(join(B, "input", "suivi", "doc.md"), "# doc\n", "utf8");
+  gb("add", ".gitignore", "input/suivi/doc.md");
+  spawnSync(process.execPath, [OUTIL, "--base", B, "--racines", "input"], { encoding: "utf8" });
+  const t = readFileSync(join(B, "input", "README.md"), "utf8");
+  check("TF-1055 rouge → vert — le dossier ignoré n'a PAS de lien vers un README qu'aucun clone ne porte", () => {
+    if (/\]\(sas\/README\.md\)/.test(t)) throw new Error("l'index suivi pointe encore vers le README d'un dossier ignoré");
+    if (!/`sas\\` \| dossier ignoré par git/.test(t)) throw new Error("le dossier ignoré n'est pas déclaré comme tel");
+  });
+  check("TF-1055 vert — un dossier SUIVI garde son lien", () => {
+    if (!/\]\(suivi\/README\.md\)/.test(t)) throw new Error("le lien d'un dossier suivi a disparu — la règle mord trop large");
+  });
+  rmSync(B, { recursive: true, force: true });
+}
+
 rmSync(T, { recursive: true, force: true });
 console.log(`\nreadme-dossiers, table sans dates (TF-0503) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

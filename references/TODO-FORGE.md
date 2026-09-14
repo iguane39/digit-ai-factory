@@ -115,6 +115,20 @@ TODO.jsonl par une autre session est **interdite** — toute candidature passe p
 se détecte : règle **R10** de l'oracle (creation de session externe sans événement
 `ingestion` — incident TF-0049).
 
+**Le sas d'arrivée — le protocole de remise, domicilié ici parce que le sas est ignoré (TF-0981
+puis TF-1055, 14/09/2026).** `input\00-retours\_arrivee\` est IGNORÉ par git (`.gitignore`) : un
+lot peut y séjourner sous son nom réel sans qu'aucun `git add` puisse l'emporter. Son README local
+ne voyage donc pas, et un clone frais n'a pas le dossier : la règle vit ici.
+- **Qui y écrit, et quand** : le produit ou la forge émettrice, au moment de la remise — le `.md`
+  et son sidecar `.tf.jsonl`, tels qu'ils sont, nom réel compris. Jamais à la racine de
+  `input\00-retours\`, qui est suivie (`gabarits\RETOURS-FORGES.md` le prescrit au producteur).
+- **Deux gestes ensuite, deux verdicts** : `node todo\accueillir-lot.mjs` pseudonymise le nom et le
+  contenu et DÉPLACE le lot à la racine suivie ; puis `node todo\ingerer-lot.mjs <sidecar>` l'ingère.
+- **Ce qui le garde** : la règle LOT-SAS de `gabarits\oracle-lot-retours.mjs` refuse, à
+  l'ingestion, un lot posé à la racine sous un nom réel, en nommant le sas.
+- Un sas **vide est l'état normal**. Un lot DÉJÀ suivi sous un nom réel ne relève pas du sas mais
+  de `todo\anonymiser-suivis.mjs`.
+
 **Ce qu’un lot n'a PAS remonté se déclare (R-45, 21/08).** Tout lot daté du 21/08 ou après
 porte une section « Remarques restées au produit » : chaque remarque que le produit a corrigée
 chez lui sans la remonter y figure avec son **verdict de généralisation** — non généralisable et
