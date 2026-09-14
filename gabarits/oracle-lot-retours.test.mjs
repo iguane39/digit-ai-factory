@@ -242,5 +242,67 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
   try { rmSync(T, { recursive: true, force: true }); } catch { /* verrou toléré */ }
 }
 
+// ---- LOT-IDS (TF-1039) : UN IDENTIFIANT DE RETOUR N'EST JAMAIS REPRIS ----------------------
+//
+// Le cas du 11/09 rejoué en miniature : un lot antérieur définit RT-50, le suivant le reprend.
+// Le cas vert est le REMÈDE que le message prescrit, lu dans le message lui-même (TF-1013).
+{
+  const { mkdtempSync, writeFileSync, rmSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const T = mkdtempSync(join(tmpdir(), "lot-ids-"));
+  const CORPS = (lignes) => "# lot\n\n| Réf | gravité | retour |\n|---|---|---|\n" + lignes + "\n" + R45 + "\n" + R46;
+  writeFileSync(join(T, "PROD - RETOURS - 20260914a.md"), CORPS("| RT-49 | majeur | un |\n| RT-50 | mineur | deux |"), "utf8");
+  const suivant = join(T, "PROD - RETOURS - 20260914b.md");
+  let remede = "";
+
+  check("LOT-IDS rouge — un lot reprend RT-50, défini par un lot antérieur du même produit : FAIL, premier libre donné", () => {
+    const c = constat(verifier(suivant, CORPS("| RT-50 | majeur | autre chose |")), "LOT-IDS");
+    if (!c || c.statut !== "FAIL") throw new Error(`statut ${c ? c.statut : "absent"} — la reprise d'un identifiant passe encore`);
+    if (!/RT-50 \(PROD - RETOURS - 20260914a\.md\)/.test(c.message)) throw new Error("le message ne nomme pas le lot qui porte déjà l'identifiant");
+    if (!/RT-51/.test(c.remede || "")) throw new Error(`le remède ne donne pas le premier libre : ${c.remede}`);
+    remede = /RT-\d+/.exec(c.remede)[0];
+  });
+
+  check("LOT-IDS remède joué — le lot renuméroté au premier libre qu'on lui a donné : PASS", () => {
+    const c = constat(verifier(suivant, CORPS(`| ${remede || "RT-51"} | majeur | autre chose |`)), "LOT-IDS");
+    if (!c || c.statut !== "PASS") throw new Error(`statut ${c ? c.statut : "absent"} — le gardien refuse le numéro qu'il prescrit`);
+  });
+
+  check("LOT-IDS vert — un identifiant CITÉ dans la prose n'est pas repris : PASS", () => {
+    const c = constat(verifier(suivant, CORPS("| RT-51 | majeur | suite de RT-50, déjà remonté |") + "\nComme dit en RT-50.\n"), "LOT-IDS");
+    if (!c || c.statut !== "PASS") throw new Error(`statut ${c ? c.statut : "absent"} — une citation est prise pour une définition`);
+  });
+
+  check("LOT-IDS vert — un tableau de RAPPEL (RT-50 en tête de ligne, sans gravité) ne redéfinit rien : PASS", () => {
+    const c = constat(verifier(suivant, CORPS("| RT-51 | majeur | neuf |") + "\n| Retour antérieur | Ce que ce lot ajoute |\n|---|---|\n| **RT-50** | le complète |\n"), "LOT-IDS");
+    if (!c || c.statut !== "PASS") throw new Error(`statut ${c ? c.statut : "absent"} — un rappel est pris pour une reprise (faux positif mesuré sur un lot réel du 26/08)`);
+  });
+
+  check("LOT-IDS rouge — la graphie à zéros (RT-050) désigne le même retour", () => {
+    const c = constat(verifier(suivant, CORPS("| RT-050 | majeur | x |")), "LOT-IDS");
+    if (!c || c.statut !== "FAIL") throw new Error(`statut ${c ? c.statut : "absent"}`);
+  });
+
+  check("LOT-IDS borne — le lot ANTÉRIEUR n'est pas accusé par son successeur", () => {
+    writeFileSync(suivant, CORPS("| RT-50 | majeur | autre chose |"), "utf8");
+    const c = constat(verifier(join(T, "PROD - RETOURS - 20260914a.md")), "LOT-IDS");
+    if (!c || c.statut !== "PASS") throw new Error(`statut ${c ? c.statut : "absent"} — c'est le suivant qui reprend, pas le premier`);
+  });
+
+  check("LOT-IDS borne — un AUTRE produit peut porter RT-50 : PASS", () => {
+    const c = constat(verifier(join(T, "AUTRE - RETOURS - 20260914c.md"), CORPS("| RT-50 | majeur | x |")), "LOT-IDS");
+    if (!c || c.statut !== "PASS") throw new Error(`statut ${c ? c.statut : "absent"} — l'unicité est par produit`);
+  });
+
+  check("LOT-IDS borne — un lot antérieur au 14/09 : SANS_OBJET, antériorité dite", () => {
+    writeFileSync(join(T, "PROD - RETOURS - 20260910a.md"), CORPS("| RT-50 | x | y |"), "utf8");
+    const c = constat(verifier(join(T, "PROD - RETOURS - 20260911a.md"), CORPS("| RT-50 | x | y |")), "LOT-IDS");
+    if (!c || c.statut !== "SANS_OBJET" || !/antériorité/.test(c.message)) throw new Error(`statut ${c ? c.statut : "absent"}`);
+  });
+
+  try { rmSync(T, { recursive: true, force: true }); } catch { /* verrou toléré */ }
+}
+
 console.log(`\noracle-lot-retours (TF-0597) : ${pass} PASS, ${echec} FAIL`);
 process.exit(echec ? 1 : 0);

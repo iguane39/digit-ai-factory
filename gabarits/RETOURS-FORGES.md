@@ -94,7 +94,9 @@ un **dérivé** `.normalise.tf.jsonl` — l'original reçu n'est jamais modifié
 choses plutôt que de les deviner : un titre où aucune forge n'est nommée (la cible ne se
 devine pas — écrire « `<forge>` : … » en tête du titre), et un retour sans preuve.
 **Ids uniques par produit** : préfixe par forge (RT/RC/RD/RV/RA/RS) + numéro **jamais
-réutilisé** — continuer la séquence des lots précédents du même produit.
+réutilisé** — continuer la séquence des lots précédents du même produit. Jugé depuis le
+14/09/2026 (règle LOT-IDS de `forge\retours\oracle-lot.mjs`, TF-1039) : un identifiant déjà
+défini par un lot antérieur du même produit est refusé, et le premier libre est donné.
 
 ---
 

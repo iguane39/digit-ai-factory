@@ -60,6 +60,13 @@
  * `input\00-retours\` sous un nom réel n'est pas passé par `_arrivee\` : il est refusé, et le
  * remède nomme le sas. Hors de la boîte du pilot, et dans la copie héritée, SANS_OBJET dit.
  *
+ * LOT-IDS (TF-1039, 14/09/2026) — UN IDENTIFIANT DE RETOUR N'EST JAMAIS REPRIS. Le gabarit écrit
+ * « ids uniques par produit, numéro jamais réutilisé » ; personne ne le jugeait, et le 11/09 un
+ * lot a repris RT-50 à RT-52, déjà définis par deux lots antérieurs du même produit, dans le même
+ * dossier. La règle lit les lots VOISINS antérieurs du même produit (lecture de répertoire, pas
+ * de registre) et refuse un identifiant qu'ils définissent déjà, en donnant le premier libre.
+ * Bornée au 14/09 : un lot remis ne se modifie jamais, le passé ne se répare pas.
+ *
  * ANTÉRIORITÉ DÉCLARÉE : R-45 ne juge que les lots datés du 21/08 ou après, R-46 du 22/08 ou
  * après. La date se lit dans le NOM du fichier (`… - AAAAMMJJ<lettre>.md`), jamais sur le
  * disque : une copie change la date de fichier, pas la date du lot.
@@ -68,7 +75,7 @@
  *   node oracle-lot-retours.mjs <lot.md> [--json]
  * Exit : 0 = forme tenue (ou lot antérieur aux règles) · 1 = forme en défaut · 2 = lot illisible.
  */
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
@@ -102,6 +109,61 @@ export function dateDuLot(chemin) {
   const m = /(\d{8})[a-z]?\.(?:md|tf\.jsonl)$/i.exec(nom)
     || /(\d{8})[a-z]?\.normalise\.tf\.jsonl$/i.exec(nom);
   return m ? m[1] : null;
+}
+
+/** LOT-IDS (TF-1039) : entrée en vigueur — antériorité déclarée, un lot remis ne se modifie jamais. */
+export const SEUIL_IDS = "20260914";
+// Un identifiant est DÉFINI en tête d'une ligne de tableau qui porte sa GRAVITÉ dans l'une des deux
+// cellules suivantes (`| RT-50 | majeur | …`, la forme du gabarit), ou en tête d'un titre
+// (`### RT-50 — …`). Cité dans la prose (« déjà remontée en RT-6 ») ou dans un tableau de RAPPEL
+// sans gravité, il ne l'est pas. Mesuré sur 247 lots réels le 14/09 : sans l'exigence de gravité,
+// un tableau de rappel (« ce que ce retour ajoute aux lots du jour ») accusait huit reprises à tort.
+const ID_EN_TETE_DE_LIGNE = /^\s*\|\s*\**\s*(R[A-Z])-0*(\d+)\b[^|\n]*\|(?:[^|\n]*\|)?\s*\**\s*(?:bloquant|majeur|mineur)\b/gim;
+const ID_EN_TITRE = /^#{2,4}\s+\**\s*(R[A-Z])-0*(\d+)\b/gm;
+const NOM_DE_LOT = /^(.*) - RETOURS - (\d{8}[a-z]?)\.md$/i;
+
+/** Les identifiants qu'un lot DÉFINIT, numéros normalisés (`RT-050` = `RT-50`). */
+export function idsDefinis(texte) {
+  const ids = new Set();
+  for (const re of [ID_EN_TETE_DE_LIGNE, ID_EN_TITRE]) for (const m of String(texte).matchAll(re)) ids.add(`${m[1].toUpperCase()}-${Number(m[2])}`);
+  return ids;
+}
+
+/**
+ * Les identifiants de ce lot déjà définis par un lot ANTÉRIEUR du même produit, dans le même
+ * dossier (et son `old\`, où la boîte du pilot range ce qu'elle a ingéré). Rend `null` si le nom
+ * n'est pas celui d'un lot. `premierLibre` : par famille en double, le numéro qui suit le plus
+ * grand déjà défini par les voisins.
+ */
+export function idsEnDouble(cheminLot, texte) {
+  const nom = basename(String(cheminLot).split("\\").join("/"));
+  const m = NOM_DE_LOT.exec(nom);
+  if (!m) return null;
+  const [, prefixe, cle] = m;
+  const dossier = dirname(resolve(String(cheminLot)));
+  const dossiers = [dossier, join(dossier, "old")];
+  if (/^_arrivee$/i.test(basename(dossier))) dossiers.push(join(dossier, ".."), join(dossier, "..", "old"));
+  const porteurs = new Map(), max = {};
+  let voisins = 0;
+  for (const d of dossiers) {
+    if (!existsSync(d)) continue;
+    for (const n of readdirSync(d)) {
+      const v = NOM_DE_LOT.exec(n);
+      if (!v || n === nom || v[1].toLowerCase() !== prefixe.toLowerCase() || v[2] >= cle) continue;
+      voisins++;
+      let t = "";
+      try { t = readFileSync(join(d, n), "utf8"); } catch { continue; }
+      for (const id of idsDefinis(t)) {
+        if (!porteurs.has(id)) porteurs.set(id, n);
+        const [fam, num] = id.split("-");
+        max[fam] = Math.max(max[fam] || 0, Number(num));
+      }
+    }
+  }
+  const doublons = [...idsDefinis(texte)].filter((id) => porteurs.has(id)).map((id) => ({ id, lot: porteurs.get(id) }));
+  const premierLibre = {};
+  for (const { id } of doublons) { const fam = id.split("-")[0]; premierLibre[fam] = `${fam}-${(max[fam] || 0) + 1}`; }
+  return { doublons, premierLibre, voisins };
 }
 
 /** Le corps d'une section, jusqu'au prochain titre de niveau 2. */
@@ -261,6 +323,22 @@ export function verifier(cheminLot, texteFourni) {
         "déplacer le lot ET son sidecar dans `input\\00-retours\\_arrivee\\` (ignoré par git), puis jouer `node todo\\accueillir-lot.mjs` : il pseudonymise le nom et le contenu et redépose le lot à la racine");
     } else if (juge) {
       ajouter("LOT-SAS", "PASS", `« ${nomDuLot} » porte un nom déjà pseudonymisé — sortie normale du sas`, null);
+    }
+  }
+
+  // ---- LOT-IDS · UN IDENTIFIANT DE RETOUR N'EST JAMAIS REPRIS (TF-1039) ----------------------
+  if (date < SEUIL_IDS) {
+    ajouter("LOT-IDS", "SANS_OBJET", `lot du ${date}, antérieur à l'entrée en vigueur de LOT-IDS (${SEUIL_IDS}) — antériorité déclarée`, null);
+  } else {
+    const r = idsEnDouble(cheminLot, texte);
+    if (!r) {
+      ajouter("LOT-IDS", "SANS_OBJET", "le nom n'est pas celui d'un lot (« <projet> - RETOURS - AAAAMMJJ<lettre>.md ») — les voisins ne se trouvent pas", null);
+    } else if (r.doublons.length) {
+      ajouter("LOT-IDS", "FAIL",
+        `${r.doublons.length} identifiant(s) déjà défini(s) par un lot antérieur du même produit : ${r.doublons.map((d) => `${d.id} (${d.lot})`).join(", ")} — deux retours différents porteraient la même référence au registre`,
+        `renuméroter à partir du premier libre : ${Object.values(r.premierLibre).join(", ")} — un numéro n'est jamais réutilisé, la séquence continue celle des lots précédents`);
+    } else {
+      ajouter("LOT-IDS", "PASS", `aucun identifiant repris des ${r.voisins} lot(s) antérieur(s) du même produit`, null);
     }
   }
 
