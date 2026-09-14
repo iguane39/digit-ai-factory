@@ -18,6 +18,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 |---|---|---|---|
 | [`old\`](old/README.md) | dossier (59 fichiers) | — | Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — archive figée, jamais ré-ingérée. |
 | `chemin-de-livrable-au-dela-du-plafond-plateforme-20260910a.tf.jsonl` | fichier | 4,1 Ko | 1 ligne(s) JSONL |
+| `ci-forge-development-rouge-depuis-le-08-09-20260913a.tf.jsonl` | fichier | 2,6 Ko | 1 ligne(s) JSONL |
 | `ci-hebergee-rouge-environnement-non-rejoue-forge-audit-20260910a.tf.jsonl` | fichier | 4,0 Ko | 1 ligne(s) JSONL |
 | `decision-humaine-restituee-sans-geste-pilot-20260911a.tf.jsonl` | fichier | 3,8 Ko | 1 ligne(s) JSONL |
 | `fiche-pdf-deux-pages-sur-runner-sans-polices-forge-audit-20260911a.tf.jsonl` | fichier | 4,4 Ko | 1 ligne(s) JSONL |
@@ -26,6 +27,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `forge-communication-verdict-o3-20260911a.tf.jsonl` | fichier | 13,8 Ko | 8 ligne(s) JSONL |
 | `forge-design-marque-digit-ai-constats-20260911a.tf.jsonl` | fichier | 4,5 Ko | 2 ligne(s) JSONL |
 | `journal-de-versions-dormant-forge-audit-20260910a.tf.jsonl` | fichier | 3,4 Ko | 1 ligne(s) JSONL |
+| `nom-client-dans-message-de-commit-20260913a.tf.jsonl` | fichier | 2,9 Ko | 1 ligne(s) JSONL |
 | `oracle-condition-restitution-seule-20260910a.tf.jsonl` | fichier | 3,5 Ko | 1 ligne(s) JSONL |
 | `page-registre-octets-nuls-20260912a.tf.jsonl` | fichier | 2,2 Ko | 1 ligne(s) JSONL |
 | `porte-publication-faux-positif-20260909a.tf.jsonl` | fichier | 4,5 Ko | 1 ligne(s) JSONL |
@@ -42,4 +44,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `style-redactionnel-sans-oracle-20260911a.tf.jsonl` | fichier | 3,3 Ko | 1 ligne(s) JSONL |
 | `viewport-de-conception-fullhd-4k-20260912a.tf.jsonl` | fichier | 3,1 Ko | 1 ligne(s) JSONL |
 
-_24 fichier(s), 1 sous-dossier(s)_ · 2 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_26 fichier(s), 1 sous-dossier(s)_ · 2 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

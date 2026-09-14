@@ -166,4 +166,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `RETOURS-FORGES-03.md` | fichier | 5,1 Ko | Retours forges — lot 03 (2026-08-06) |
 | `RETOURS-FORGES.md` | fichier | 9,9 Ko | Retours du run `Produit-12-20260805a` — à remettre au steering |
 
-_149 fichier(s), 0 sous-dossier(s)_
+_149 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
