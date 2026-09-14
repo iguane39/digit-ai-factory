@@ -660,6 +660,17 @@ verts, mutation 0,90).
    sous `forge\etapes\`, seul le rapport d'exécution est un livrable d'`output\`.
 3. **L'e2e déclare le cycle de vie de son instance** (monter/démonter, ce qui reste
    debout est publié) — la règle s'arme pleinement à la résolution de TF-0340/0341.
+4. **La recette d'un livrable défini par un PÉRIMÈTRE porte un contrôle d'EXCLUSIVITÉ**
+   (TF-0989, 14/09/2026). Un test prouve d'ordinaire une PRÉSENCE ; un périmètre est par
+   définition une ASSERTION D'ABSENCE. Toute recette d'un livrable défini par un périmètre
+   — un tableau réduit à N colonnes, un export filtré, un jeu anonymisé, un lot trié —
+   énumère la population COMPLÉMENTAIRE et la cherche dans le livrable : le contrôle échoue
+   si elle s'y trouve. Le fait : une recette de 20 contrôles a rendu PASS sur une page de
+   342 colonnes quand 66 étaient demandées — elle comptait ce qui devait être là, jamais ce
+   qui ne devait pas y être ; le contrôle manquant tenait en douze lignes. Symétrique de S44
+   côté restitution (TF-0988). **Non mécanisé, et c'est dit** : aucun oracle ne sait, sans
+   le livrable, qu'une recette porte sur un périmètre — la règle se relit à la revue de la
+   recette, et son absence se déclare au bloc 5 de la restitution.
 
 **Appelants (R-35)** : le pas de l'étape 5 (`ETAPES-RUN.md` — la boucle ne se clôt pas
 sur un solde non nul) et le contrat « prêt client » (traçabilité exigences→tests 100 %
