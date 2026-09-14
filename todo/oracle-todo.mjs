@@ -30,6 +30,11 @@
  *      toute création marquée `recidive_de` est SIGNALÉE — statut AVERT, jamais FAIL : la
  *      récidive est une mesure de la descente, refuser le registre qui la porte la cacherait.
  *      Entre avertissante (doctrine v2.5.0 de RESTITUTION.md) : se durcira sur corpus propre.
+ *  R14 (14/09/2026, TF-0956) une création dont le titre ET le contenu sont identiques à ceux
+ *      d'une création antérieure (aux espaces et à la casse près) est un DOUBLON STRICT : après
+ *      le seuil, il n'est admis que clos en `ecarte` avec un motif_ecart qui nomme l'original.
+ *      `ingerer-lot.mjs` le refuse déjà à la porte ; R14 juge ce qui entrerait par un autre
+ *      chemin. Les 11 paires antérieures au seuil sont une antériorité déclarée.
  *  R9 bis — RECTIFICATION DÉCLARÉE d'un horodatage (TF-0413, patron R-42/TF-0410). Un
  *      événement `ev: "rectification_horodatage"` porte `entrees: [{id, ts_consigne,
  *      ts_reel_estime, cause}]` : R9 se juge alors sur `ts_reel_estime`, et l'écart s'IMPRIME
@@ -252,6 +257,33 @@ for (const id of etatsActifs.keys())
 for (const [id, e] of etatsArchive)
   if (e.statut !== "archive") ko("R8", id, `dans l'archive avec statut ${e.statut}`);
 
+// ---- R14 (TF-0956, 14/09/2026) — UN DOUBLON STRICT NE S'INSTALLE PAS COMME UN ITEM ---------
+// LE FAIT, mesuré le 08/09 : six candidatures au titre ET au contenu identiques à six autres sont
+// entrées au registre sans qu'aucune règle ne bronche, puis ont été DÉCIDÉES avec leur motif écrit
+// en prose — elles comptent donc comme des items ordinaires dans toutes les mesures.
+// `ingerer-lot.mjs` refuse désormais le doublon strict à la porte ; R14 juge ce qui aurait pu
+// entrer par un autre chemin. Un doublon strict POSTÉRIEUR au seuil n'est admis que clos en
+// `ecarte`, avec un motif_ecart qui NOMME l'original : le statut d'écartement existe depuis
+// TF-0157 (13/08, motif obligatoire par R7) et c'est lui qui retire l'item de toute mesure de gains.
+// ANTÉRIORITÉ DÉCLARÉE : 11 paires strictes mesurées au 14/09 (8 du 08/09, 3 des 11-12/08)
+// précèdent la règle ; elles sont comptées au non_juge, jamais réécrites.
+const SEUIL_R14 = "2026-09-14T18:00:00Z";
+const normContenu = (s) => String(s || "").normalize("NFC").replace(/\s+/g, " ").trim().toLowerCase();
+const originaux = new Map();
+let doublonsAnterieurs = 0;
+const creationsToutes = [...lire(archive), ...lire(actifs)].filter((e) => e.ev === "creation" && e.id)
+  .sort((a, b) => String(a.ts).localeCompare(String(b.ts)));
+for (const e of creationsToutes) {
+  const cle = `${normContenu(e.titre)} ${normContenu(e.contenu)}`;
+  const orig = originaux.get(cle);
+  if (!orig) { originaux.set(cle, e.id); continue; }
+  if (String(e.ts) < SEUIL_R14) { doublonsAnterieurs++; continue; }
+  const etat = etatsActifs.get(e.id) || etatsArchive.get(e.id) || {};
+  const ecarte = ["ecarte", "archive"].includes(etat.statut) && String(etat.motif_ecart || "").includes(orig);
+  if (!ecarte) ko("R14", e.id, `doublon STRICT de ${orig} (titre et contenu identiques, aux espaces et à la casse près) — ` +
+    `un doublon ne se décide pas comme un item : le clore en \`ecarte\` avec un motif_ecart qui nomme ${orig}, pour qu'il ne compte dans aucune mesure (TF-0956)`);
+}
+
 if (!findings.some((f) => f.statut === "FAIL")) {
   ok("R1-R11", `${etatsActifs.size} item(s) actif(s), ${etatsArchive.size} archivé(s) — registre intègre`
     + (notes.length ? ` ; ${notes.length} horodatage(s) RECTIFIÉ(s) par déclaration — ${notes.slice(0, 3).join(" · ")}${notes.length > 3 ? ` · … (${notes.length - 3} de plus, tous imprimés par --rectifications)` : ""}` : ""));
@@ -268,6 +300,7 @@ console.log(JSON.stringify({
   oracle: "oracle-todo", version: "1.3.0", verdict: echecs ? "FAIL" : "PASS", findings,
   non_juge: [
     `R13 : ${classesVues} création(s) classée(s), ${recidivesVues} récidive(s) marquée(s) — la récidive est AVERTISSANTE, elle mesure la descente et ne met jamais le registre en échec ; la JUSTESSE d'une classe déclarée par un producteur n'est pas jugée`,
+    `R14 : ${doublonsAnterieurs} doublon(s) strict(s) antérieur(s) au ${SEUIL_R14}, déclarés et non jugés (antériorité mesurée le 14/09 : 11 paires) ; un quasi-doublon — un mot de différence — n'est pas un doublon strict : il relève du rapprochement signalé à l'ingestion, jamais d'un refus`,
     "la pertinence des scores (gain/effort) est un jugement humain, pas une règle",
     "la véracité des gains_constates n'est pas vérifiée dans le monde — seule leur présence l'est",
     "R11 ne juge que l'AVANCE sur l'heure d'exécution : un ts en RETARD (antidaté) reste hors de portée, comme un ts faux mais plausible — seul l'impossible est refusé",

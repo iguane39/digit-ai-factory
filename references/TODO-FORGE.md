@@ -84,7 +84,15 @@ cacherait. Une classe créée SANS clôture fondatrice moins de 30 jours après 
 voisine est signalée `classe_suspecte` — la façon la moins chère de faire baisser un compteur est
 d'inventer des clés. (3) **R13** de l'oracle : une classe hors référentiel est un FAIL ; une
 récidive marquée est AVERTISSANTE (doctrine v2.5.0 de la restitution : elle se durcira sur corpus
-propre). **La vue `todo\RECIDIVES.md`** (`generer-recidives.mjs`, générée, jamais éditée)
+propre). (4) **Le DOUBLON STRICT est refusé à la porte** (TF-0956, 14/09) : une candidature dont
+le titre ET le contenu, après anonymisation et aux espaces et à la casse près, sont ceux d'une
+création du registre (actifs ou archive) ou d'une autre ligne du même lot, fait rejeter le lot en
+bloc, l'original nommé — un lot RENOMMÉ se rattache, il ne se ré-ingère pas (six doublons entrés
+ainsi le 08/09). **R14** de l'oracle juge ce qui entrerait par un autre chemin : un doublon strict
+postérieur à son seuil n'est admis que clos en `ecarte`, avec un `motif_ecart` qui nomme
+l'original — le statut d'écartement (TF-0157) est ce qui le retire de toute mesure de gains. Les
+11 paires antérieures sont une antériorité déclarée au `non_juge`, jamais réécrite ; un
+quasi-doublon reste une piste de rapprochement, jamais un refus. **La vue `todo\RECIDIVES.md`** (`generer-recidives.mjs`, générée, jamais éditée)
 porte le taux de récidive par classe et par produit, le délai clôture → descente constatée (lu
 dans `todo\HERITAGE-RELEVES.jsonl`, que le hook d'ouverture du pilot écrit à chaque relevé
 R-47), le taux d'héritage par artefact, et la contre-métrique : classes créées par semaine et

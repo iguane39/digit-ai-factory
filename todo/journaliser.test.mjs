@@ -29,8 +29,11 @@ const lancer = (evenements, registre, extra = []) => {
   return { code: r.status, corps, brut: r.stdout || r.stderr || "" };
 };
 
+// Le titre porte l'id (14/09, TF-0956) : cinq créations au titre et au contenu identiques sont des
+// doublons STRICTS, que R14 refuse désormais après son seuil — et ce banc juge l'HORODATAGE, pas le
+// contenu. La donnée de remplissage change ; aucune assertion ne bouge.
 const creation = (sur = {}) => ({
-  ev: "creation", id: "TF-9900", titre: "t", contenu: "c", demandeur: "humain — recette",
+  ev: "creation", id: "TF-9900", titre: `t ${sur.id || "TF-9900"}`, contenu: "c", demandeur: "humain — recette",
   source: "recette", date_demande: "2026-08-20", statut: "candidat",
   forges_cibles_initiales: ["digit-ai-factory"],
   score: { gain: 1, preuve: 1, effort: 1, valeur: 1 }, ...sur,
