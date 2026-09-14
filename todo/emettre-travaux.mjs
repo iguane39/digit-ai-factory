@@ -311,6 +311,18 @@ export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
    faible selon le registre, et chacun porte son effort estimé et sa vérification. Un constat
    écarté rejoint vos « Écarts assumés » avec son motif : il ne disparaît pas.`;
 
+  // TF-1068 (14/09/2026) — LE CHEMIN DU JUGE SE CALCULE À L'ÉMISSION. L'encadré prescrivait le
+  // chemin d'un PRODUIT instancié (`forge\travaux\oracle-travaux.mjs`), qu'une forge destinataire
+  // n'a pas : la commande « obligatoire » échouait chez elle, et rien ne le disait. Le pilot
+  // regarde le destinataire comme il le fait déjà pour « Sort du lot reçu », et donne le bon.
+  const jugeHerite = existsSync(join(ligne.dossier, "forge", "travaux", "oracle-travaux.mjs"));
+  const commandeJuge = jugeHerite
+    ? 'node forge\\travaux\\oracle-travaux.mjs "<ce fichier>.md"'
+    : `node "${join(PILOT, "gabarits", "oracle-travaux-pilot.mjs")}" "<ce fichier>.md"`;
+  const raisonJuge = jugeHerite
+    ? "Chemin calculé à l'émission : votre dépôt porte le juge hérité (`forge\\travaux\\`) (TF-1068)."
+    : "Chemin calculé à l'émission : votre dépôt ne porte pas `forge\\travaux\\` — le juge se joue à sa SOURCE, chez le pilot (TF-1068).";
+
   const md = `# Travaux confiés par le pilot — ${ligne.produit} — ${jour}${indice}
 
 - **Émetteur** : \`digit-ai-factory\` (le pilot)
@@ -331,8 +343,10 @@ export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
 > ## ⛔ AVANT DE TRAITER — un geste, une seconde
 >
 > \`\`\`
-> node forge\\travaux\\oracle-travaux.mjs "<ce fichier>.md"
+> ${commandeJuge}
 > \`\`\`
+>
+> ${raisonJuge}
 >
 > Le même module a été joué par le pilot AVANT de déposer ce lot. Si ce fichier vous manque,
 > l'héritage n'est pas tenu — et c'est précisément le sujet de ce lot.

@@ -187,6 +187,25 @@ try {
     att(/DÉJÀ DÉPOSÉ/.test(r2.stdout), "le second passage ne DIT pas qu'il n'a rien redéposé");
   });
 
+  // ── TF-1068 — LE CHEMIN DU JUGE SE CALCULE À L'ÉMISSION : un destinataire sans `forge\travaux\`
+  // reçoit la commande du pilot à sa source ; un produit qui porte le juge hérité reçoit la sienne.
+  check("TF-1068 — le chemin du juge suit le destinataire : sans juge hérité, la source du pilot ; avec, `forge\\travaux\\`", () => {
+    const lotDe = (nomParc, avecJuge) => {
+      const faux = join(T, nomParc);
+      const produit = join(faux, "_Client", "produit-recette");
+      mkdirSync(join(produit, "forge", "travaux"), { recursive: true });
+      if (avecJuge) writeFileSync(join(produit, "forge", "travaux", "oracle-travaux.mjs"), "// juge hérité\n", "utf8");
+      spawnSync(process.execPath, [join(ICI, "emettre-travaux.mjs"), "--tous"], { encoding: "utf8", env: { ...process.env, FORGE_ROOT: faux } });
+      const boite = join(produit, "input", "00-travaux");
+      const f = readdirSync(boite).find((x) => x.endsWith(".md"));
+      return readFileSync(join(boite, f), "utf8");
+    };
+    const sans = lotDe("parc-juge-absent", false);
+    att(/oracle-travaux-pilot\.mjs/.test(sans) && /ne porte pas/.test(sans), "un destinataire sans juge hérité reçoit une commande qui ne tourne pas chez lui");
+    const avec = lotDe("parc-juge-present", true);
+    att(/node forge\\travaux\\oracle-travaux\.mjs/.test(avec) && !/oracle-travaux-pilot\.mjs"/.test(avec), "un produit qui porte le juge hérité ne reçoit pas SA commande");
+  });
+
   // ── TF-1083 — UNE CORRECTION DE RÉDACTION SE LIVRE SUR DEMANDE, JAMAIS D'OFFICE. On simule un lot
   // déposé avant la règle (sans empreinte de rédaction) : le passage ordinaire ne redépose rien
   // mais DIT que la forme diffère ; `--corriger-redaction` livre un lot correctif sous l'indice
