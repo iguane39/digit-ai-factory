@@ -296,6 +296,15 @@ let candidatures = lignes.map((l, i) => {
   let c;
   try { c = JSON.parse(l); } catch { motifs.push(`ligne ${i + 1} : JSON invalide`); return null; }
   if (c.schema !== 1) motifs.push(`ligne ${i + 1} : schema attendu 1, reçu ${c.schema}`);
+  // TF-1067 (14/09/2026) — UN CARACTÈRE DE CONTRÔLE N'ENTRE PAS AU REGISTRE. Quatre octets nuls y
+  // sont entrés par des lots dont un chemin « input\\00-retours » avait été écrit dans une chaîne
+  // Python non brute : « \\00 » y est un octet nul, que le sidecar a porté en échappement JSON. Le
+  // registre étant append-only, la seule place où l'arrêter est ici, avant l'écriture.
+  for (const [champ, v] of Object.entries(c)) {
+    if (typeof v !== "string") continue;
+    const k = [...v].findIndex((ch) => { const n = ch.charCodeAt(0); return (n < 32 && n !== 9 && n !== 10 && n !== 13) || n === 127; });
+    if (k >= 0) motifs.push(`ligne ${i + 1} : le champ « ${champ} » porte un caractère de contrôle U+${[...v][k].charCodeAt(0).toString(16).padStart(4, "0").toUpperCase()} (après « ${[...v].slice(Math.max(0, k - 20), k).join("")} ») — un chemin Windows écrit dans une chaîne Python non brute (« \\00 ») en produit un : écrire la chaîne brute (r"…") ou doubler l'antislash, puis remettre le lot sous l'indice suivant (TF-1067)`);
+  }
   if (c.id) motifs.push(`ligne ${i + 1} : une candidature ne porte JAMAIS d'id (frappé à l'ingestion)`);
   for (const champ of ["titre", "contenu", "demandeur", "source", "date_demande"])
     if (!c[champ]) motifs.push(`ligne ${i + 1} : champ ${champ} manquant`);
