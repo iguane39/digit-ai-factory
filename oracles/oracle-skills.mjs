@@ -135,7 +135,7 @@ import {
   mkdtempSync, renameSync, rmSync, appendFileSync, utimesSync,
 } from "node:fs";
 import { createHash } from "node:crypto";
-import { basename, dirname, join, resolve, relative } from "node:path";
+import { basename, dirname, join, resolve, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir, tmpdir } from "node:os";
 import { racineConfigInstallee, skillsInstalles, hooksInstalles, settingsInstalle as settingsInstalleDe } from "../scripts/lib-config-installee.mjs";
@@ -357,6 +357,15 @@ function decrireEcart({ manquants, divergents, orphelins }) {
 // relevée (K11) — sans consulter aucune date — et jamais écrasée.
 const empreinte = (p) => createHash("sha256").update(readFileSync(p)).digest("hex");
 const cleJournal = (p) => resolve(p).toLowerCase();
+
+// ---- TF-1099 (14/09/2026) · UNE SOURCE EN COURS DE MODIFICATION NE SE PROPAGE PAS ----------------
+// `bootstrap.mjs --pull` joue `--appliquer` à chaque ouverture de session : des états INTERMÉDIAIRES
+// d'arbres en cours de campagne (fichiers modifiés, commits non publiés) ont ainsi été recopiés vers
+// la copie installée, que toutes les sessions du poste exécutent. `--sauf-sources <dépôt,…>` nomme
+// les dépôts sources à épargner : leurs skills et hooks ne sont ni comparés ni propagés, et c'est
+// DÉCLARÉ (K12) — jamais tu. C'est le lanceur qui mesure l'état des dépôts ; l'oracle obéit.
+let SAUF_SOURCES = [];
+const enCoursDeModification = (p) => SAUF_SOURCES.some((d) => cleJournal(p).startsWith(d.endsWith(sep) ? d : d + sep));
 function journalPropagation(installes) {
   return process.env.FORGE_JOURNAL_PROPAGATION || join(dirname(installes), "propagations-skills.jsonl");
 }
@@ -437,6 +446,7 @@ function jugerHooks(racine, installes, appliquer, findings, applique, trace = { 
   for (const [rel, chemins] of [...par_nom].sort()) {
     const src = chemins[0];
     const dst = join(installes, rel);
+    if (chemins.length === 1 && enCoursDeModification(src)) continue; // TF-1099 : déclaré en K12 par juger()
     if (chemins.length > 1) {
       // Même raison que K3 : sans source unique, il n'y a rien à comparer et surtout rien à
       // appliquer — `--appliquer` prendrait la première venue, c'est-à-dire arbitrerait en
@@ -829,10 +839,12 @@ function juger(racine, installes, appliquer = false, purger = false,
     }
   }
 
+  const reportes = [];
   for (const [nom, chemins] of [...par_nom].sort()) {
     if (ambigus.has(nom)) continue;
     const src = chemins[0];
     const dst = join(installes, nom);
+    if (enCoursDeModification(src)) { reportes.push(nom); continue; }
     if (!existsSync(dst)) {
       if (appliquer) { copier(src, dst, { ...trace, contexte: `skill ${nom}` }); applique.push(`${nom} (installé)`); continue; }
       findings.push({
@@ -884,6 +896,14 @@ function juger(racine, installes, appliquer = false, purger = false,
         message: `la copie installée DIVERGE de ${relative(racine, src)} sur ${diff.total} fichier(s) — ${diff.nature} : ${diff.liste} — c'est la copie qui s'exécute · diff calculé ${LIBELLE_EXCLUS}`,
       });
     }
+  }
+
+  if (reportes.length) {
+    findings.push({
+      regle: "K12", statut: "PASS", ou: "(sources en cours de modification)",
+      message: `${reportes.length} skill(s) de source(s) EN COURS DE MODIFICATION ni comparé(s) ni propagé(s) : ${reportes.join(", ")} — `
+        + "arbre modifié ou commits non publiés au dépôt source, déclarés par le lanceur (--sauf-sources) ; leur copie installée reste celle d'avant, et ils le seront sur un état propre et publié (TF-1099)",
+    });
   }
 
   // K6 : les hooks, même contrat que les skills (TF-0290).
@@ -1079,6 +1099,25 @@ function selfTest() {
   // Nettoyage : les cas suivants attendent un parc sans K11 en échec.
   rmSync(join(src, "epsilon"), { recursive: true, force: true });
   rmSync(join(inst, "epsilon"), { recursive: true, force: true });
+
+  // K12 (TF-1099) — une source EN COURS DE MODIFICATION n'est ni comparée ni propagée, et c'est
+  // déclaré. Rouge d'origine : sans l'exclusion, `--appliquer` recopiait l'état intermédiaire.
+  const srcDesign = join(racine, "digit-ai-forge-design", "skills");
+  poser(join(srcDesign, "eta", "SKILL.md"), "# eta, état intermédiaire de campagne\n");
+  poser(join(inst, "eta", "SKILL.md"), "# eta installé\n");
+  SAUF_SOURCES = [cleJournal(join(racine, "digit-ai-forge-design"))];
+  const rK12 = juger(racine, inst, true);
+  cas.push(["K12   — source en cours : --appliquer n'écrase PAS la copie installée",
+            readFileSync(join(inst, "eta", "SKILL.md"), "utf8").includes("installé")]);
+  cas.push(["K12   — et c'est DÉCLARÉ, jamais tu", rK12.findings.some((f) => f.regle === "K12" && /eta/.test(f.message))]);
+  SAUF_SOURCES = [];
+  r = juger(racine, inst);
+  cas.push(["K12   — la même source hors exclusion : l'écart redevient visible (K2)",
+            r.findings.some((f) => f.regle === "K2" && f.statut === "FAIL" && f.ou === "eta")]);
+  juger(racine, inst, true);
+  cas.push(["K12   — et un état propre se propage", readFileSync(join(inst, "eta", "SKILL.md"), "utf8").includes("intermédiaire")]);
+  rmSync(join(srcDesign, "eta"), { recursive: true, force: true });
+  rmSync(join(inst, "eta"), { recursive: true, force: true });
 
   // K4 : un skill personnel est déclaré, jamais mis en échec.
   poser(join(inst, "perso", "SKILL.md"), "# perso\n");
@@ -1605,6 +1644,7 @@ const installes_hooks = lire("--installes-hooks", join(dirname(installes), "hook
 const settings_installe = lire("--settings-installe", join(dirname(installes), "settings.json"));
 const appliquer = args.includes("--appliquer");
 const purger = args.includes("--purger");
+SAUF_SOURCES = lire("--sauf-sources", "").split(",").map((s) => s.trim()).filter(Boolean).map((s) => cleJournal(s));
 
 const { verdict, findings, motif, applique, purge } = juger(
   racine, installes, appliquer, purger, installes_hooks, settings_installe, config);

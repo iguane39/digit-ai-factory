@@ -13,7 +13,11 @@
 //   --racine      racine d'installation (défaut : $FORGE_ROOT, sinon le parent de ce dépôt)
 //   --pull        met à jour (git pull --ff-only) le pilot puis les forges présentes, et
 //                 propage les skills versionnés vers la copie installée (oracle-skills
-//                 --appliquer) — lancer --pull EST la décision humaine de propagation (R-29)
+//                 --appliquer) d'un état PROPRE et PUBLIÉ de chaque forge : un dépôt source qui a
+//                 des changements non publiés sous ses skills ou ses hooks (arbre modifié, commits
+//                 non poussés) n'est pas recopié, et c'est dit en [avert] (TF-1099). Lancer --pull
+//                 décide de propager ce qui est publié — jamais un état intermédiaire que personne
+//                 n'a vu (R-29)
 //   --sans-skills ne juge ni ne propage les skills (recette sur dépôts factices)
 //   --sans-pilot  ne touche pas au dépôt pilot courant (recette)
 //   --rebatir <dépôt> [--essai]  rebâtit un clone DIVERGÉ sur son histoire publiée réécrite, sans
@@ -542,9 +546,33 @@ else {
   const oracle = join(ICI, "oracles", "oracle-skills.mjs");
   if (!existsSync(oracle)) ligne("avert", "oracles/oracle-skills.mjs absent — skills non jugés");
   else {
+    // TF-1099 (14/09/2026) — L'ÉTAT INTERMÉDIAIRE D'UNE CAMPAGNE NE SE PROPAGE PAS. Ce bloc tourne à
+    // chaque ouverture de session : des arbres en cours de campagne (fichiers modifiés, commits non
+    // publiés) étaient recopiés vers la copie installée que toutes les sessions du poste exécutent.
+    // Un dépôt source qui a des changements NON PUBLIÉS sous ses skills ou ses hooks est épargné et
+    // NOMMÉ ; les autres se propagent. L'oracle n'est pas juge de l'état des dépôts : il obéit à
+    // `--sauf-sources`, et déclare ce qu'il a épargné (K12).
+    const SOUS = [".claude/skills", "skills", ".claude/hooks", "hooks"];
+    const enCours = [];
+    for (const e of readdirSync(racine, { withFileTypes: true })) {
+      if (!e.isDirectory()) continue;
+      const d = join(racine, e.name);
+      if (!existsSync(join(d, ".git"))) continue;
+      const presents = SOUS.filter((s) => existsSync(join(d, s)));
+      if (!presents.length) continue;
+      const sale = sortie(git(d, "status", "--porcelain", "--", ...presents)).split("\n").filter(Boolean).length;
+      const amont = git(d, "rev-list", "--count", "@{u}..HEAD", "--", ...presents);
+      const nonPublies = amont.status === 0 ? Number(sortie(amont)) || 0 : 0;
+      if (sale || nonPublies) enCours.push({ nom: e.name, chemin: d, sale, nonPublies });
+    }
+    for (const x of enCours) {
+      ligne("avert", `skills de ${x.nom} NON propagés : ${x.sale} fichier(s) modifié(s) et ${x.nonPublies} commit(s) non publié(s) sous ses skills ou hooks — état intermédiaire ; ils le seront au prochain --pull sur un état propre et publié (TF-1099)`);
+      averts.push(`skills de ${x.nom} épargnés (TF-1099)`);
+    }
     const juger = (appliquer) => {
       const argv = [oracle, "--racine", racine, "--installes", SKILLS_INSTALLES];
       if (appliquer) argv.push("--appliquer");
+      if (enCours.length) argv.push("--sauf-sources", enCours.map((x) => x.chemin).join(","));
       const r = run(process.execPath, argv, ICI);
       let rapport = {};
       try { rapport = JSON.parse(r.stdout); } catch { /* sortie non JSON : jugée par le code de retour */ }
