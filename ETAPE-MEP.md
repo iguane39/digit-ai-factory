@@ -144,7 +144,7 @@ Cinq controles, et pour chacun **la preuve exigee** — pas la case a cocher. Le
 |---|---|---|
 | M-1 | Build du conteneur | `docker build` exit 0, image taguée `<produit>:<run-id>` |
 | M-2 | Healthcheck | HTTP 200 sur l'endpoint de santé de l'instance staging, 3 mesures espacées de 10 s |
-| M-3 | Smoke tests | ≥ 1 parcours rejoué par exigence MVP d'impact maximal (champ `cotation.impact` du référentiel `EXIGENCES.json` — toutes les ex æquo du niveau le plus élevé), exécutés **contre l'instance staging servie**, pas contre un TestClient |
+| M-3 | Smoke tests | ≥ 1 parcours rejoué par exigence MVP d'impact maximal (champ `cotation.impact` du référentiel `EXIGENCES.json` — toutes les ex æquo du niveau le plus élevé), exécutés **contre l'instance staging servie**, pas contre un TestClient ; tout parcours qui **s'AUTHENTIFIE auprès d'un service externe** (identité managée, fournisseur de jetons, clé d'API) en fait partie et se rejoue depuis l'instance servie — une chaîne d'authentification se prouve là où le code tourne, jamais au seul banc (§ 3 septies, TF-0964) |
 | M-4 | Rollback | procédure de `ROLLBACK.md` exécutée une fois avec succès (retour N-1 + healthcheck 200 + retour N) **et RELUE après coup** : le fichier ne porte aucune valeur masquée (`***`, `[REDACTED]`) ni vide — §2 bis, TF-0512 |
 | M-5 | Propreté | aucun secret en clair dans l'image ni dans compose (scan des fichiers embarqués) |
 | M-6 | Hôte historique | **si et seulement si** le produit déclare un hôte historique : la CIBLE d'une redirection résout et répond AVANT que la redirection soit armée, et l'ANCIEN hôte est interrogé APRÈS déploiement (200, ou 301 vers un emplacement qui répond, chemin et requête préservés) — §3 quater, TF-0482 |
@@ -152,6 +152,26 @@ Cinq controles, et pour chacun **la preuve exigee** — pas la case a cocher. Le
 | M-8 | **Jalon de fraîcheur DÉRIVÉ DE TOUT L'ENSEMBLE DÉPLOYÉ** | **si et seulement si** le déploiement est gardé par une porte qui attend de voir « la nouvelle version en ligne » : la valeur qu'elle compare est une **fonction de l'ENSEMBLE déployé** — empreinte du **manifeste de l'arbre de sortie** (chemins triés + hachages, condensés), ou **identifiant de commit injecté à la génération**. Jamais un numéro tenu à la main ; **jamais non plus l'empreinte d'un artefact échantillonné**. Le critère tient en une phrase : *si on ne sait pas dire « elle change dès que N'IMPORTE QUOI change », le jalon échantillonne.* Preuve exigée : un **test négatif joué sur un fichier QUELCONQUE de l'arbre**, pas sur celui que la porte regarde — §3 sexies, TF-0666 et TF-0672 |
 
 | M-9 | **404 personnalisée, par langue, statut conservé** | **si et seulement si** le produit a une surface web : sur l'instance staging servie, (a) une adresse inconnue sous chaque préfixe de langue rend **404** (jamais 200) avec une page du MÊME gabarit que les autres — menu, charte, liens de secours — dans la langue du préfixe, **et une adresse inconnue SANS préfixe rend le même 404 dans la langue par défaut** (TF-0809) ; (b) la page porte `noindex` et l'exclusion du sitemap est **déclarée** dans l'oracle SEO du produit ; (c) une ressource non-HTML inconnue rend un 404 **nu**. Preuve : la sortie JSON de la **recette générique de forge-tests** `recette\quatre_cent_quatre.py` (paramètres : URL de staging, préfixes de langue, langue par défaut, sitemap — TF-0803, 05/09/2026) jouée contre l'instance staging ; un contrôle propre au produit n'est admis que s'il joue les mêmes cas et le dit (TF-0808). Patron **P-2**, `references\PATRONS-EPROUVES.md` — TF-0802. |
+
+### § 3 septies — Une chaîne d'authentification se prouve LÀ OÙ LE CODE TOURNE (M-3, TF-0964, 14/09/2026)
+
+**Le fait, du 08/09/2026.** Un module d'expédition portait depuis deux jours un commentaire de neuf
+lignes expliquant pourquoi l'identifiant client de l'identité managée est EXIGÉ : l'application ne
+porte qu'une identité assignée par l'utilisateur, et un fournisseur de jetons construit sans cet
+identifiant échoue avec un message qui ne nomme pas la cause. Le module de stockage écrit deux jours
+plus tard a construit son fournisseur de jetons SANS argument, et a échoué exactement ainsi dans le
+conteneur servi. Ni la revue, ni l'analyse statique, ni 819 tests verts ne pouvaient le voir : les
+tests de route remplacent le client du service, ceux du client remplacent le conteneur. Le défaut
+n'a été trouvé qu'en exécutant le code dans le conteneur déployé. *Tous les oracles étaient verts et
+la fonctionnalité était cassée : la preuve exigée au bloc 4 d'une restitution était exécutée, mais
+pas LÀ OÙ LE CODE TOURNE.*
+
+**D'où M-3 étendu** : un parcours qui s'authentifie auprès d'un service externe se rejoue contre
+l'instance servie, jamais au seul banc — un banc qui remplace le client prouve la logique, jamais la
+chaîne d'authentification. **Ce qui n'est pas mécanisé ici, et c'est dit** : le contrôle statique
+« fournisseur de jetons construit sans identifiant alors que le déploiement pose une identité
+assignée par l'utilisateur » relève d'une forge qui contrôle le code du produit ; il est versé en
+candidature, il ne se code pas dans cette étape.
 
 ### § 3 sexies — Une porte qui ne distingue pas l'avant de l'après valide un déploiement qui n'a pas eu lieu (M-8, TF-0666)
 
