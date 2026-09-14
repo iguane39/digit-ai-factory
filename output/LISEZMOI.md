@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 279 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 280 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -195,6 +195,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260911-etude-opportunite-communication-marketing-ao.md | — | 45.9 Ko | `03-etudes/20260911-etude-opportunite-communication-marketing-ao.md` |
 | 20260911-L99-forge-communication-marketing.md | — | 52.4 Ko | `03-etudes/20260911-L99-forge-communication-marketing.md` |
 | 20260911-L99-regles-d-ecriture-factory.md | — | 58.5 Ko | `03-etudes/20260911-L99-regles-d-ecriture-factory.md` |
+| 20260914-etude-opportunite-premiers-html-nouveaux-formats.md | — | 31.2 Ko | `03-etudes/20260914-etude-opportunite-premiers-html-nouveaux-formats.md` |
 | 20260914-L99-qualite-premiers-html-nouveaux-formats.md | — | 57.9 Ko | `03-etudes/20260914-L99-qualite-premiers-html-nouveaux-formats.md` |
 
 ### 04-plans
