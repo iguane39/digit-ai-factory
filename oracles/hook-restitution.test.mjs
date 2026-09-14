@@ -117,6 +117,10 @@ try {
   const ob = spawnSync(process.execPath, [ORACLE, fb], { encoding: "utf8" });
   if (ob.status !== 0) echecs.push(`fixture BON refusée par oracle-synthese : ${(ob.stdout.match(/"regle": "(S\d+)",\s*"statut": "FAIL"/g) || []).join(" ")}`);
 
+  // 1 porte AUSSI la précédence de TF-0978 (14/09) : MAUVAIS fait 17 mots et ne porte aucun mot de
+  // verdict — exactement la forme des exemptions « accusé de réception » et « réponse courte ». Sur
+  // un tour de TRAVAIL il doit pourtant être jugé, donc refusé : aucune exemption ne s'applique à un
+  // tour qui a écrit ou lancé quelque chose, quelle que soit la longueur du message.
   const r1 = lancer("mauvais", MAUVAIS, ["Write", "Bash"]);
   if (r1.decision?.decision !== "block") echecs.push(`1 : travail + hors format → attendu block, obtenu ${JSON.stringify(r1.decision)} ${r1.stderr.slice(0, 120)}`);
   else if (!/S1/.test(r1.decision.reason)) echecs.push("1 : le refus ne nomme pas la règle S1 (blocs absents)");
