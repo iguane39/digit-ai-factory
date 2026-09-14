@@ -155,6 +155,18 @@ vide — « aucun environnement de données interrogé » — jamais par silence
 vit dans `oracle-conformite-projet` (R-20) et n'exige la section qu'à partir du premier
 `verifie_le` postérieur au 24/08, par le même mécanisme d'antériorité déclarée que ci-dessus.
 
+**Un tableau indexé par environnement est AUTOSUFFISANT** (TF-0985, 14/09/2026). Un
+`PARAMETRAGE.md` portait quatre tableaux pour un seul appel — requête, en-têtes, jeton, et « ce qui
+est servi par environnement », ce dernier ne portant que le delta : chaque élément était présent,
+exact et sourcé, et AUCUN tableau ne permettait d'émettre la requête. Retour humain : « Comment je
+peux faire si je n'ai pas les infos les plus importantes ? » Le lecteur arrive par SON
+environnement, jamais par le début du document ; factoriser le commun coûte peu à écrire et beaucoup
+à lire. Un tableau par environnement porte donc tout ce qui sert à l'action, y compris ce qui ne
+varie pas ; la factorisation reste admise dans la prose qui explique. Le contrôle vit dans
+`oracle-conformite-projet` (R-20) : dans une ligne dont la première cellule nomme un environnement,
+aucune cellule ne renvoie ailleurs (« voir ci-dessus », « idem », « défaut du code ») ; exigé à
+partir du premier `verifie_le` postérieur au 14/09, même mécanisme d'antériorité déclarée.
+
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
 | 20 | `docs\projet\` complet — **8 fichiers + 2 projections générées** : `TECHNOS.md` (technologies + versions + liens, ancrées lockfiles), `COMPOSANTS-OPS.md` (hiérarchie/noms/types/IDs/URLs/IPs des composants déployés — depuis `ops etat`/plans/DOSSIER-MEP, instanciations datées, placeholders si dépôt public), `PARAMETRAGE.md` (signification des variables, URLs/ports par environnement — hébergés en placeholders), `ACCES-TEST.md` (profils + comptes de démo locale), `COMMANDES.md` (install, dev, test, build, deploy qualif, rollback, seed démo — blocs exécutables), `FONCTIONNEL.md` (**TF-0087** : ce que fait le produit et pour qui — rôles, objets métier et cycle de vie, parcours, règles de gestion, exclusions assumées ; vue d'`EXIGENCES.json` quand il existe, sinon rédigé du code et daté), `ARCHITECTURE.md` et `MODELE-DONNEES.md` (**TF-0091** : sources des vues techniques — structure logique / tables-colonnes-liens — projetées en `ARCHITECTURE.html` et `MODELE-DONNEES.html` par les générateurs du pilot, vues JAMAIS éditées à la main) ; chaque fichier ouvre par un frontmatter YAML (`role`, `sources_de_verite`, `verifie_le`). Noms **fixes** — documents vivants exemptés du nommage daté R-4 (ce ne sont pas des livrables). Autres fichiers admis seulement s'ils servent l'automatisation ou l'onboarding ET n'existent pas déjà sous forme machine (sinon renvoi) | manque constaté : les runs de version redécouvrent tout ; FONCTIONNEL : demande humaine en clôture du run Produit-11 | produits, nouveaux + rattrapage | P0+O | faible | **défaut** |

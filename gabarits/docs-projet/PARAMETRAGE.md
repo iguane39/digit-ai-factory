@@ -76,6 +76,12 @@ protégeait une entropie négligeable et laissait trois questions sans réponse.
 > `<nom-appli>-<env>.` avec env ∈ {`dev`, `qualif`, `production`} — ex.
 > `https://produit-02-production.up.railway.app`. Le staging outillé de
 > l'étape MEP s'appelle **qualif** dans les URLs. Local et BDD hors périmètre.
+>
+> **Tableau AUTOSUFFISANT (R-20, TF-0985)** : le lecteur arrive par SON environnement, jamais par
+> le début du document. Chaque ligne porte tout ce qui sert à l'action — y compris ce qui ne varie
+> pas d'un environnement à l'autre (méthode, route, en-têtes). « idem », « voir ci-dessus » ou
+> « défaut du code » sans la valeur résolue sont refusés dans ce tableau ; la factorisation reste
+> admise dans la prose qui EXPLIQUE, jamais dans le tableau dont on se sert.
 
 | Environnement | Front | Back/API | BDD | Notes |
 |---|---|---|---|---|

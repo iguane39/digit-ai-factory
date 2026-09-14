@@ -1362,6 +1362,47 @@ else {
     }
   }
 
+  // R-20 (suite) · UN TABLEAU PAR ENVIRONNEMENT EST AUTOSUFFISANT (TF-0985, 14/09/2026).
+  //
+  // LE FAIT, mesuré le 08/09 sur un PARAMETRAGE.md : quatre tableaux pour un seul appel — la
+  // requête, les en-têtes, le jeton, et « ce qui est réellement servi par environnement », ce
+  // dernier ne portant que le DELTA. Chaque élément était présent, exact et sourcé ; AUCUN tableau
+  // ne permettait d'émettre la requête. Retour humain : « Comment je peux faire si je n'ai pas les
+  // infos les plus importantes ? » Le lecteur n'arrive jamais par le début du document : il arrive
+  // par SON environnement. Factoriser le commun en tête coûte peu à ÉCRIRE et beaucoup à LIRE.
+  //
+  // CE QUI EST JUGÉ, et c'est l'oracle bon marché que l'item proposait : dans une ligne de tableau
+  // dont la première cellule nomme un environnement, aucune cellule ne RENVOIE ailleurs au lieu de
+  // porter la valeur (« voir ci-dessus », « idem », « défaut du code »). La factorisation reste
+  // admise dans la prose qui EXPLIQUE, jamais dans le tableau dont on se sert.
+  //
+  // ANTÉRIORITÉ, par le même mécanisme que les sections de COMPOSANTS-OPS : le signal de date est
+  // DANS le fichier. Mesure du 14/09 sur les six PARAMETRAGE.md de produits du poste : deux
+  // portent des renvois (1 et 4 cellules) ; tous sont revus avant le 15/09 — aucun n'est accusé,
+  // tous sont nommés en antériorité, et la règle mord dès leur prochaine revue datée.
+  if (existsSync(pp)) {
+    const corps85 = readFileSync(pp, "utf8");
+    const verifie85 = (/^verifie_le\s*:\s*(\d{4}-\d{2}-\d{2})\s*$/m.exec(frontmatter(corps85) || "") || [])[1] || null;
+    const RE_ENV85 = /^(locale?|dev|qualif|qualification|recette|staging|preprod|production|prod)$/i;
+    const RENVOI85 = /(voir ci-dessus|voir plus haut|cf\.?\s*ci-dessus|\bci-dessus\b|\bidem\b|d[ée]faut du code|m[êe]me valeur que)/i;
+    const renvois = [];
+    corps85.split(/\r?\n/).forEach((l, i) => {
+      if (!/^\s*\|/.test(l)) return;
+      const c = l.trim().replace(/^\|/, "").replace(/\|\s*$/, "").split("|").map((x) => x.trim());
+      if (!RE_ENV85.test(c[0] || "")) return;
+      const fautive = c.slice(1).find((x) => RENVOI85.test(x));
+      if (fautive) renvois.push(`ligne ${i + 1} (${c[0]}) : « ${fautive.slice(0, 50)} »`);
+    });
+    if (!renvois.length)
+      ok("R-20", "docs\\projet\\PARAMETRAGE.md", "tableaux par environnement autosuffisants — aucune cellule ne renvoie ailleurs au lieu de porter la valeur");
+    else if (verifie85 && verifie85 >= "2026-09-15")
+      ko("R-20", "docs\\projet\\PARAMETRAGE.md", `${renvois.length} cellule(s) d'un tableau par environnement RENVOIENT ailleurs au lieu de porter la valeur — ${renvois.slice(0, 3).join(" · ")} — `
+        + "un tableau indexé par environnement est AUTOSUFFISANT : le lecteur arrive par SON environnement, pas par le début du document ; "
+        + "il porte tout ce qui sert à l'action, y compris ce qui ne varie pas. La factorisation reste admise dans la prose qui explique (TF-0985)");
+    else
+      antecedences.push(`R-20 (tableau par environnement autosuffisant) non jugé sur docs\\projet\\PARAMETRAGE.md : ${renvois.length} renvoi(s) relevé(s), la règle naît le 14/09 (TF-0985) et le document porte verifie_le=${verifie85 || "non daté"} — antériorité déclarée ; exigée dès la prochaine revue datée`);
+  }
+
   // R-26 · modèle de données ancré au schéma réel (TF-0091) : chaque table déclarée dans
   // MODELE-DONNEES.md porte une provenance (fichier/dossier de schéma) qui EXISTE et qui
   // CONTIENT le nom de la table — jamais rédigé de mémoire (loi 4). Exemption explicite :
