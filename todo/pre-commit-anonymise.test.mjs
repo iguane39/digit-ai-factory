@@ -73,6 +73,26 @@ check("REFUS — tables illisibles : le geste LÈVE au lieu de laisser passer", 
   att(leve, "un référentiel absent laisse passer : anonymiser à moitié donnerait l'impression que le dépôt est propre");
 });
 
+// TF-0993 — CE QUI A RÉSISTÉ SE DIT. Une occurrence collée à un identifiant de CODE reste en place
+// à dessein (TF-0927) ; le geste doit la RENDRE, avec son fichier et sa ligne. Second sens : un
+// fichier dont toutes les occurrences sont substituables n'annonce aucun reste.
+check("ROUGE — une occurrence collée à un identifiant de code est RENDUE dans `refuses`, avec fichier et ligne", () => {
+  const f = poser("calcul.js", "// en-tête\nconst calc_Zorglub_total = 1;\n");
+  const r = passer({ fichiers: [f], ecrire: false, racine: DEPOT });
+  att(Array.isArray(r.refuses), "passer() ne rend pas `refuses` — ce qui a résisté reste muet");
+  const x = r.refuses.find((y) => y.fichier === f);
+  att(x, `l'occurrence laissée en place n'est pas rendue : ${JSON.stringify(r.refuses)}`);
+  att(x.ligne === 2, `ligne ${x.ligne} rendue, 2 attendue`);
+  att(/identifiant/.test(x.motif || ""), "le motif ne dit pas pourquoi l'occurrence est restée");
+  att(!/Zorglub/.test(x.autour || ""), "le contexte rendu répète le nom réel au lieu de le masquer");
+});
+
+check("VERT — toutes les occurrences substituables : aucun reste annoncé", () => {
+  const f = poser("prose.md", "Le client Zorglub a signé.\n");
+  const r = passer({ fichiers: [f], ecrire: false, racine: DEPOT });
+  att(r.refuses.length === 0, `un reste est annoncé alors que tout a été substitué : ${JSON.stringify(r.refuses)}`);
+});
+
 check("le mode essai n'écrit rien — le fichier porteur est intact après la passe", () => {
   const f = poser("essai.md", "Lot de Zorglub.\n");
   passer({ fichiers: [f], ecrire: false, racine: DEPOT });

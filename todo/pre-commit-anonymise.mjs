@@ -75,7 +75,10 @@ export function passer({ fichiers, ecrire = true, racine = RACINE } = {}) {
   // depot jetable au lieu de celui-ci. Un module qui ne sait travailler que sur son propre depot
   // ne se teste que sur son propre depot, donc jamais dans les deux sens.
   const liste = fichiers ?? fichiersIndexes();
-  const corriges = [], nomsPorteurs = [];
+  // TF-0993 : `refuses` — les occurrences que la chaîne a LAISSÉES EN PLACE à dessein (collées à
+  // un identifiant, TF-0927). Le hook annonçait « pseudonymisé » sans jamais dire ce qui avait
+  // résisté ; le 09/09, un nom est ainsi resté dans un commentaire du pilot, vu par la seule relecture.
+  const corriges = [], nomsPorteurs = [], refuses = [];
   for (const f of liste) {
     const abs = join(racine, f);
     if (!existsSync(abs)) continue;
@@ -86,7 +89,8 @@ export function passer({ fichiers, ecrire = true, racine = RACINE } = {}) {
     let brut;
     try { brut = readFileSync(abs, "utf8"); } catch { continue; }
     if (brut.includes("\0")) continue;                      // binaire : jamais réécrit
-    const { texte, remplaces } = anonymiser(brut, { code: EST_CODE.test(f) });
+    const { texte, remplaces, refuses: resistes } = anonymiser(brut, { code: EST_CODE.test(f) });
+    for (const x of resistes || []) refuses.push({ fichier: f, ligne: x.ligne ?? null, motif: x.motif, autour: x.autour });
     if (texte === brut) continue;
 
     if (ecrire) {
@@ -95,7 +99,7 @@ export function passer({ fichiers, ecrire = true, racine = RACINE } = {}) {
     }
     corriges.push({ fichier: f, termes: remplaces.length });
   }
-  return { corriges, nomsPorteurs };
+  return { corriges, nomsPorteurs, refuses };
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("\\", "/")
@@ -115,6 +119,21 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
     try {
       appendFileSync(JOURNAL, JSON.stringify({ ts: new Date().toISOString(), ...c }) + "\n", "utf8");
     } catch { /* le journal ne doit jamais bloquer un commit */ }
+  }
+
+  // TF-0993 — CE QUI A RÉSISTÉ SE DIT, EN AVERTISSANT : la non-substitution est voulue (couper un
+  // identifiant casserait le code), donc le commit part — mais le nom part avec lui, et la porte le
+  // trouvera dans l'histoire, au moment le plus cher. Le journal l'enregistre aussi : une trace qui
+  // ne consigne que ce qu'elle a corrigé ment par omission sur ce qui reste.
+  if (r.refuses.length) {
+    console.error(`\n  AVERTISSEMENT — ${r.refuses.length} occurrence(s) d'un nom réel LAISSÉE(S) EN PLACE à dessein (collée(s) à un identifiant, TF-0927) :`);
+    for (const x of r.refuses) {
+      console.error(`  [résisté] ${x.fichier}${x.ligne ? `:${x.ligne}` : ""} — ${x.autour}\n    motif : ${x.motif}`);
+      try {
+        appendFileSync(JOURNAL, JSON.stringify({ ts: new Date().toISOString(), resiste: true, ...x }) + "\n", "utf8");
+      } catch { /* le journal ne doit jamais bloquer un commit */ }
+    }
+    console.error("  Le commit part. Renommer l'identifiant à la main avant de publier, sans quoi la porte le trouvera dans l'histoire.\n");
   }
 
   if (r.nomsPorteurs.length) {
