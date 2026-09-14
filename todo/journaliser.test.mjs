@@ -65,8 +65,11 @@ check("refuse un `ts` fourni — et n'écrit RIEN (le refus ne laisse pas de moi
 const r3 = join(T, "registre-3.jsonl");
 writeFileSync(r3, "", "utf8");
 check("un lot de 5 événements sort en horodatages STRICTEMENT croissants", () => {
-  const lot = [creation(), creation({ id: "TF-9901" }), creation({ id: "TF-9902" }),
-    creation({ id: "TF-9903" }), creation({ id: "TF-9904" })];
+  // Cinq items DISTINCTS (TF-0956) : cinq créations au même titre et au même contenu seraient des
+  // doublons stricts, que R14 refuse à bon droit — la fixture doit être fausse sur le point qu'elle
+  // teste (l'ordre des horodatages) et juste sur tout le reste.
+  const lot = [creation(), creation({ id: "TF-9901", titre: "t1" }), creation({ id: "TF-9902", titre: "t2" }),
+    creation({ id: "TF-9903", titre: "t3" }), creation({ id: "TF-9904", titre: "t4" })];
   const r = lancer(lot, r3);
   if (r.code !== 0) throw new Error(`exit ${r.code} : ${r.corps.message}`);
   const ts = readFileSync(r3, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l).ts);
