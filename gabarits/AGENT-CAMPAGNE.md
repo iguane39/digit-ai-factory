@@ -93,6 +93,26 @@ En tête de rapport : version de départ du dépôt (`git log -1 --format=%h` av
 commits), état du working tree préexistant s'il n'était pas propre. En pied : la liste
 des vérifications natives exécutées avec leur verdict final.
 
+**Mesurer, et rendre une mesure (TF-1009, 14/09/2026).** Le 09-10/09, sur un même dépôt, six
+erreurs de mesure en une journée, et aucune trouvée par son auteur : six sur six par un tiers, ou
+par l'auteur seulement après avoir été contredit. Deux avaient la même cause mécanique, une sortie
+bornée par un `head` lue comme un résultat complet. Ce qui les a rattrapées se prescrit ici :
+- **Remesurer plutôt que reprendre** : un nombre venu d'un tiers se rejoue avant d'être cité.
+- **Un nombre porte son PÉRIMÈTRE et sa PROVENANCE** : ce qui est compté, sur quelle population,
+  mesuré ici ou rapporté. Un nombre rapporté et non vérifié est MARQUÉ, jamais fondu dans la prose ;
+  refuser de signer un nombre qu'on n'a pas produit est un geste attendu, pas une impolitesse.
+- **Aucune borne d'affichage silencieuse** : si une sortie est bornée (`head`, `-n`,
+  `--max-count`, plafond d'oracle), le total se dit à côté, ou la borne se retire.
+- **Une cause inconnue se déclare** : une troisième hypothèse qui colle au symptôme ferme l'enquête.
+- **Une inférence n'est pas un constat** : on ouvre la pièce qui répond (l'outil, le fichier) au
+  lieu de déduire ce qu'elle doit contenir.
+- **Jouer le remède qu'on recommande** : tout contrôle bloquant dont le message propose une
+  correction porte à son banc un cas qui exécute cette correction et doit PASSER (TF-1013).
+- **Lire le verdict avant d'enregistrer** : la garde d'un commit est un `if` sur la valeur lue,
+  jamais un enchaînement de commandes qui continue après un FAIL affiché.
+- **Contre-mesurer ce qui fonde une décision humaine** : une mesure qui entre dans un bloc de
+  décision se rejoue par un autre agent ou par une seconde voie avant d'y entrer.
+
 ## Ce que le pilot fait de ton rapport
 
 Le pilot vérifie par sondage, écrit les événements du registre (corrige avec tes
