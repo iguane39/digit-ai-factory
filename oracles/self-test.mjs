@@ -388,6 +388,37 @@ check("rouge-docs : R-20..R-24 + R-26 se déclenchent, localisantes", () => {
   for (const f of rapport.findings) if (!f.ou || !f.message) throw new Error(`finding ${f.regle} sans localisation`);
 });
 
+// TF-0985 (14/09) — UN TABLEAU PAR ENVIRONNEMENT EST AUTOSUFFISANT : les deux sens, et l'antériorité.
+// La paire ne varie QUE de la date de revue du document : le MÊME « idem » dans la ligne production
+// est un défaut dans un document revu le 15/09, une antériorité déclarée dans un document revu le
+// 11/08. La verte, sans renvoi, prouve déjà que la règle ne crie pas sur un tableau complet.
+const PARAM_RENVOI = (date) => '---\nrole: parametrage\nsources_de_verite: [.env.example]\nverifie_le: ' + date +
+  '\nvariables:\n  - PORT\n  - API_TIERCE_CLE\n---\n# Paramétrage\n\n' +
+  '## URLs & ports par environnement\n\n' +
+  '| Environnement | Front | Back/API | BDD | Notes |\n|---|---|---|---|---|\n' +
+  '| locale | http://localhost:5173 | http://localhost:8080 | localhost:5432 | réel local OK |\n' +
+  '| qualif | https://demoapp-qualif.up.railway.app | https://demoapp-api-qualif.up.railway.app | <HOTE_BDD_QUALIF> | staging de la MEP |\n' +
+  '| production | https://demoapp-production.up.railway.app | idem | <HOTE_BDD_PROD> | GO humain |\n';
+const variante85 = (date) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-r20-85-"));
+  cpSync(verte, d, { recursive: true });
+  writeFileSync(join(d, "docs", "projet", "PARAMETRAGE.md"), PARAM_RENVOI(date));
+  return d;
+};
+check("R-20 (TF-0985) : une cellule « idem » dans la ligne production d'un document revu le 15/09 → FAIL localisant", () => {
+  const { exit, rapport } = lance(variante85("2026-09-15"));
+  const f = rapport.findings.filter((x) => x.regle === "R-20" && x.statut === "FAIL" && /RENVOIENT/.test(x.message));
+  if (exit !== 1 || f.length !== 1) throw new Error(`exit ${exit}, ${f.length} constat(s) R-20 de renvoi — 1 attendu`);
+  if (!/PARAMETRAGE\.md/.test(f[0].ou) || !/production/.test(f[0].message)) throw new Error("le constat ne localise ni le fichier ni la ligne");
+});
+check("R-20 (TF-0985) : le MÊME renvoi dans un document revu le 11/08 → antériorité DÉCLARÉE, jamais un FAIL", () => {
+  const { rapport } = lance(variante85("2026-08-11"));
+  if (rapport.findings.some((x) => x.regle === "R-20" && x.statut === "FAIL" && /RENVOIENT/.test(x.message)))
+    throw new Error("la règle condamne un document revu avant sa naissance");
+  if (!JSON.stringify(rapport).includes("tableau par environnement autosuffisant"))
+    throw new Error("l'antériorité n'est pas NOMMÉE — un renvoi toléré doit rester visible");
+});
+
 check("rouge-docs : un identifiant et un mot de passe de démo écrits en VALEUR → 2 constats R-23 nommant le profil (TF-0871)", () => {
   const { rapport } = lance(rougeDocs);
   const valeurs = rapport.findings.filter((f) => f.regle === "R-23" && f.statut === "FAIL" && /est une VALEUR/.test(f.message));

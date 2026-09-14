@@ -78,6 +78,31 @@ for (const [nom, lignes] of rouges) {
   });
 }
 
+// ── R14 (TF-0956, 14/09) : un doublon STRICT ne s'installe pas comme un item ──────────────
+// Les paires ne varient QUE de ce que la règle juge : l'écartement motivé, un mot du contenu, la
+// date. Sans les vertes, R14 accuserait l'écartement qu'elle prescrit ou un quasi-doublon légitime.
+const DOUBLON = [item({ ts: "2026-09-14T19:00:00Z" }), item({ id: "TF-9002", ts: "2026-09-14T19:00:01Z" })];
+const ecarter = (motif) => maj({ id: "TF-9002", ts: "2026-09-14T19:10:00Z", statut: "ecarte", motif_ecart: motif, decideur: "h", date_decision: "2026-09-14" });
+const casR14 = [
+  ["rouge", "doublon strict postérieur au seuil, laissé en candidat", DOUBLON],
+  ["rouge", "le MÊME doublon écarté sous un motif qui ne nomme PAS l'original", [...DOUBLON, ecarter("doublon")]],
+  ["verte", "le MÊME doublon clos en ecarte, motif nommant TF-9001", [...DOUBLON, ecarter("doublon strict de TF-9001")]],
+  ["verte", "UN mot de différence dans le contenu", [DOUBLON[0], item({ id: "TF-9002", ts: "2026-09-14T19:00:01Z", contenu: "c prime" })]],
+  ["verte", "doublon ANTÉRIEUR au seuil — antériorité déclarée, jamais réécrite", [item({}), item({ id: "TF-9002", ts: "2026-08-08T10:00:01Z" })]],
+];
+for (const [sens, nom, lignes] of casR14) {
+  const f = join(T, "R14-" + createHash("sha256").update(nom).digest("hex").slice(0, 6) + ".jsonl");
+  writeFileSync(f, lignes.join("\n") + "\n");
+  check(`${sens} R14 : ${nom} → ${sens === "rouge" ? "FAIL, R14 nommée" : "PASS"}`, () => {
+    const r = lance(f);
+    if (sens === "verte" && r !== 0) throw new Error(`exit ${r.code} : ${r.sortie.slice(0, 240)}`);
+    if (sens === "rouge") {
+      if (r === 0) throw new Error("aurait dû échouer");
+      if (!r.sortie.includes('"R14"')) throw new Error("règle R14 absente des findings");
+    }
+  });
+}
+
 // ── R9 bis (TF-0413) : RECTIFICATION DÉCLARÉE d'un horodatage, patron R-42/TF-0410 ──────
 // Le fait : 123 événements du registre portaient un ts composé à la main, en avance de 92 à
 // 449 min sur le commit qui les a publiés — au point qu'un écrit HONNÊTE du même jour devenait

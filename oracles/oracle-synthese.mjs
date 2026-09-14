@@ -61,6 +61,9 @@
  *       GROUPE, la TRACE MESURÉE de la tentative — un code de réponse, un message d'erreur, une
  *       sortie de commande (TF-0526, 23/08/2026). S12 lit un jeton de vocabulaire ; elle ne peut
  *       pas voir la différence entre une impossibilité ÉPROUVÉE et une impossibilité SUPPOSÉE.
+ *       ASSIETTE (TF-0987, 14/09/2026) : S11, S12 et S21 lisent le motif là où il est DÉCLARÉ —
+ *       la colonne « Motif / raison » d'un tableau, le texte hors spans de code d'une puce qui
+ *       porte un motif en clair. Un nom de colonne cité ailleurs n'est plus un motif.
  *   S30 toute décision du bloc 3 porte un NUMÉRO, et les numéros sont DISTINCTS (28/08) — une
  *       décision se désigne pour se trancher. S4 compte des options et ne voit jamais que la
  *       QUESTION est insélectionnable ; le destinataire avait invente la numerotation avant de
@@ -81,6 +84,15 @@
  *       forme RÉSERVÉE à `output\03-etudes\` — partout ailleurs R-4 s'applique (08/09, TF-0923) ;
  *   S41 une décision portant un mot que la DOCTRINE du projet régit cite cette doctrine en source :
  *       une source qui n'est pas celle qui tranche est une opinion sourcée (08/09, TF-0923) ;
+ *   S44 (14/09/2026, TF-0988) une demande CITÉE au bloc 6 portant un mot d'EXCLUSIVITÉ (uniquement,
+ *       seulement, exclusivement, rien que, et rien d'autre, only) : le bloc 6 dit ce que le
+ *       livrable contient EN PLUS du périmètre nommé, ou qu'il ne contient rien d'autre ;
+ *   S45 (14/09/2026, TF-0791) le bloc 6 porte l'INTENTION citée et le TEST RÉTRO (loi n° 7,
+ *       references\INTENTION.md) — restitutions datées du 15/09/2026 ou après ; les antérieures
+ *       ne pouvaient pas connaître la règle, antériorité déclarée ;
+ *   S46 (14/09/2026, TF-0979) un bloc 2 qui se déclare POINT D'ÉTAPE (tour de travail dont le
+ *       résultat n'est pas encore mesurable) dit « reste à mesurer : <quoi> — par <quoi> » ; même
+ *       borne de date que S45 ;
  *   S43 (12/09/2026, TF-1064) le STYLE de la restitution relève du plancher d'écriture
  *       (references\ECRITURE.md) : verdict délégué à oracle-ecriture.mjs — FAIL si l'oracle
  *       échoue, avertissements comptés, SANS_OBJET si l'oracle manque ; non bloquante ;
@@ -589,6 +601,41 @@ function juger(texte, cheminJuge = null) {
   const groupes8 = actionsGroupees(bActions)
     .filter((g) => !MOTIFS_ABSENCE.test(g.replace(/^\s*[-*]\s+/, "").slice(0, 40)));
 
+  // ---- TF-0987 (14/09/2026) — L'ASSIETTE D'UN MOTIF : OÙ le vocabulaire fermé se cherche ------
+  //
+  // LE FAIT, mesuré deux fois de suite sur la même restitution d'un produit : une action dont le
+  // motif déclaré est `decision` disait comment faire — ouvrir le livrable et trier sur sa colonne
+  // `presence`, nom RÉEL d'une colonne de données. S21 cherchait son vocabulaire dans le groupe
+  // ENTIER : elle a lu le nom de la colonne comme un motif, compté 2 actions concernées au lieu de
+  // 1 et rendu FAIL — sur une ligne que sa propre portée écarte (`decision` n'est pas concerné).
+  // Le contournement a été de RENOMMER la colonne du livrable : un oracle de forme a dicté le
+  // schéma d'une donnée. La frontière de mot était là ; c'est le PÉRIMÈTRE de lecture qui manquait.
+  //
+  // DEUX LECTURES, dans cet ordre :
+  //   · en TABLEAU (la forme par défaut du bloc 8), le motif vit dans SA colonne — l'en-tête qui
+  //     nomme « motif » ou « raison ». Seule cette cellule est lue : les autres disent quoi faire et
+  //     comment, et un identifiant qu'elles citent n'est jamais une déclaration ;
+  //   · en PUCE, un span de code est une CITATION. MAIS le corpus écrit très souvent le motif
+  //     lui-même entre accents graves (224 occurrences dans 73 synthèses du pilot au 14/09) : les
+  //     retirer tous accuserait des actions justes. Les spans ne sont donc retirés QUE si le groupe
+  //     porte AUSSI un motif en clair — l'auteur a alors déclaré son motif hors code, et ce qui
+  //     reste entre accents graves cite autre chose.
+  // Vaut pour S11, S12 et S21, qui partagent le mécanisme.
+  const SANS_CODE = (s) => s.replace(/```[\s\S]*?```/g, " ").replace(/`[^`\n]*`/g, " ");
+  const VOCAB_MOTIF = new RegExp(`${MOTIFS_IA.source}|${MOTIFS_HUMAIN.source}`);
+  const COLONNE_MOTIF = /\b(motif|raison)\b/i;
+  const enteteActions = entetesDeTableau(bActions)[0] || "";
+  const cellules = (l) => l.trim().replace(/^\|/, "").replace(/\|\s*$/, "").split("|").map((c) => c.trim());
+  const assietteMotif = (g) => {
+    if (enteteActions && g.startsWith(enteteActions + " |")) {
+      const k = cellules(enteteActions).findIndex((h) => COLONNE_MOTIF.test(h));
+      const c = cellules(g.slice(enteteActions.length + 1));
+      if (k >= 0 && k < c.length) return c[k];
+    }
+    const clair = SANS_CODE(g);
+    return VOCAB_MOTIF.test(clair) ? clair : g;
+  };
+
   const juger8 = (regle, cible, predicat, siKo, siOk) => {
     const concernes = groupes8.filter((g) => cible.test(g));
     if (!concernes.length) return ok(regle, `aucune action concernée — ${siOk}`);
@@ -598,12 +645,12 @@ function juger(texte, cheminJuge = null) {
       : ok(regle, `${concernes.length} action(s) concernée(s) — ${siOk}`);
   };
 
-  juger8("S11", /\bauto_ia\b/, (g) => MOTIFS_IA.test(g),
+  juger8("S11", /\bauto_ia\b/, (g) => MOTIFS_IA.test(assietteMotif(g)),
     "une action `auto_ia` listée en RESTE sans motif de non-exécution : la voie automatisée est le défaut, " +
     "donc ce qui n'a pas été fait se justifie. Vocabulaire : gate_gouvernance, dependance_bloc_3, garde_fou, borne_atteinte, dependance_externe, hors_mandat.",
     "chaque action `auto_ia` non exécutée porte son motif");
 
-  juger8("S12", HUMAINS, (g) => MOTIFS_HUMAIN.test(g),
+  juger8("S12", HUMAINS, (g) => MOTIFS_HUMAIN.test(assietteMotif(g)),
     "une action laissée à l'humain sans raison d'impossibilité IA — loi transverse n° 5. " +
     "Vocabulaire : acces, decision, depense, presence, irreversible (non accentués).",
     "chaque action humaine porte sa raison d'impossibilité");
@@ -856,7 +903,9 @@ function juger(texte, cheminJuge = null) {
   const TRACE_CODE = /(HTTP\s*\d{3}|\b\d{3}\s+(?:Forbidden|Unauthorized|Denied|Conflict)\b|\bE[A-Z]{4,}\b|Authorization_\w+)/;
   const TRACE_MOT = uni(/(exit\s*\d|permission denied|access denied|\btent[ée]e?s?\b|\bessay[ée]e?s?\b|\brefus[ée]e?s?\b|\bmesur[ée]e?s?\b)/i);
   const TRACE_TENTATIVE = { test: (g) => TRACE_CODE.test(g) || TRACE_MOT.test(g) };
-  juger8("S21", MOTIFS_MESURABLES, (g) => TRACE_TENTATIVE.test(g) && preuve(g),
+  // La CIBLE se lit dans l'assiette du motif (TF-0987) ; la TRACE, elle, se cherche dans tout le
+  // groupe — un code de réponse cité entre accents graves est bien une preuve de tentative.
+  juger8("S21", { test: (g) => MOTIFS_MESURABLES.test(assietteMotif(g)) }, (g) => TRACE_TENTATIVE.test(g) && preuve(g),
     "un motif `acces` ou `presence` SANS trace mesurée de la tentative : l'impossibilité est affirmée, " +
     "pas éprouvée. Ces deux motifs affirment un FAIT DU MONDE, donc ils se mesurent — un code de " +
     "réponse, un message d'erreur, une sortie de commande, dans le même groupe de puce. " +
@@ -1631,6 +1680,99 @@ function juger(texte, cheminJuge = null) {
     }
   }
 
+  // ---- S44 (14/09/2026, TF-0988) — UN MOT D'EXCLUSIVITÉ RESTREINT LE CONTENU DU LIVRABLE -------
+  //
+  // LE FAIT, remonté à la demande du destinataire : « crée un nouveau fichier […] uniquement avec
+  // ces 66 colonnes en cible ». La page livrée portait bien 66 lignes au tableau des champs, et
+  // CONSERVAIT un tableau des 276 colonnes écartées, une carte de chiffres et une légende à leur
+  // sujet : 342 colonnes affichées, exactement ce que la demande excluait. Le bloc 6 déclarait trois
+  // écarts, pas celui-là, et cet oracle rendait PASS sur 41 règles. TF-0176 couvrait
+  // l'AFFAIBLISSEMENT noyé dans un long message ; ce cas en est le symétrique — l'ENRICHISSEMENT
+  // non demandé — et rien ne le couvrait.
+  //
+  // CE QUE LA RÈGLE EXIGE : quand une demande CITÉE au bloc 6 porte un mot d'exclusivité
+  // (vocabulaire fermé : uniquement, seulement, exclusivement, rien que, et rien d'autre, only),
+  // le bloc 6 dit ce que le livrable contient EN PLUS du périmètre nommé, ou qu'il ne contient
+  // rien d'autre.
+  //
+  // POURQUOI LA CITATION SEULE, et c'est mesuré avant d'écrire la règle : sur 115 synthèses du
+  // pilot portant un bloc 6, 16 y emploient un mot d'exclusivité — TOUS en prose (« un seul écart,
+  // qui porte seulement sur… »), AUCUN dans une demande citée. Chercher le mot dans le bloc entier
+  // aurait accusé 16 synthèses sur 115, à tort toutes les seize ; borné aux citations, le taux
+  // d'accusation sur ce corpus est de 0 sur 115. La déclaration se cherche HORS des citations :
+  // « et rien d'autre » dans la demande ne vaut pas déclaration de l'auteur.
+  {
+    const b6 = bloc(texte, BLOCS[5][0]) || "";
+    const CITATIONS = /«[^»]*»|"[^"\n]*"|“[^”]*”/g;
+    const EXCLUSIVITE = /(?<![\p{L}\p{N}_])(uniquement|seulement|exclusivement|rien que|only)(?![\p{L}\p{N}_])|et rien d['’]autre/iu;
+    const DECLARATION = /(en plus du p[ée]rim[èe]tre|contient (?:en plus|aussi|[ée]galement)|ne contient rien d['’]autre|rien d['’]autre n['’]y figure|hors p[ée]rim[èe]tre)/i;
+    const exclusives = (b6.match(CITATIONS) || []).filter((c) => EXCLUSIVITE.test(c));
+    if (!exclusives.length) ok("S44", "aucune demande citée au bloc 6 ne porte de mot d'exclusivité");
+    else if (!DECLARATION.test(b6.replace(CITATIONS, " ")))
+      ko("S44", `la demande citée ${exclusives[0].slice(0, 90)} porte un mot d'EXCLUSIVITÉ, et le bloc 6 ne dit ni ce que le livrable contient ` +
+        "EN PLUS du périmètre nommé, ni qu'il ne contient rien d'autre — un mot d'exclusivité restreint le CONTENU du livrable, pas seulement " +
+        "sa cible ; un complément hors périmètre, même utile, est un écart qui se déclare (le 342 colonnes pour 66 demandées de TF-0988)");
+    else ok("S44", `${exclusives.length} demande(s) exclusive(s) citée(s), le contenu hors périmètre est déclaré`);
+  }
+
+  // ---- S45 (14/09/2026, TF-0791) — LE RÉSULTAT SERT L'INTENTION, PAS LA LETTRE ---------------
+  //
+  // Loi transverse n° 7 et references\INTENTION.md, mot pour mot du retour humain du 01/09 :
+  // « Intention > Stratégie > Tactique > Opérationnel, puis test rétro dans l'autre sens […] À
+  // appliquer sur tous types de demande, pas uniquement sur les études d'opportunité. » Depuis le
+  // 01/09, seul l'oracle des études le jouait (E9, E10) : une restitution — la forme de TOUT
+  // message de fin de traitement — pouvait servir sa lettre sans que rien ne demande si elle
+  // servait l'intention. Décision du 08/09, option 1 : la règle porte au gabarit de restitution.
+  // Le bloc 6 compare déjà la réalisation à la LETTRE ; il porte désormais l'intention citée et le
+  // TEST RÉTRO. Seule la PRÉSENCE se mesure, comme E10 : la justesse d'une remontée ne l'est pas.
+  //
+  // ANTÉRIORITÉ : la règle ne juge que les restitutions dont l'en-tête est daté du 15/09/2026 ou
+  // après — aucune des 120 synthèses du pilot n'a pu la connaître, et un juge qui condamne ce
+  // qu'aucun geste licite ne peut plus réparer finit par se lire comme du bruit (même motif que
+  // R11 du registre et T8 du juge des lots). La date est celle que S2 exige déjà dans l'en-tête.
+  {
+    const SEUIL_S45 = "2026-09-15";
+    const enTete45 = bloc(texte, BLOCS[0][0]) || texte.slice(0, 800);
+    const m45 = enTete45.match(/\b(\d{4})-(\d{2})-(\d{2})\b|\b(\d{2})\/(\d{2})\/(\d{4})\b/);
+    const date45 = m45 ? (m45[1] ? `${m45[1]}-${m45[2]}-${m45[3]}` : `${m45[6]}-${m45[5]}-${m45[4]}`) : null;
+    const b6 = bloc(texte, BLOCS[5][0]) || "";
+    if (!date45) ok("S45", "en-tête sans date lisible — S2 le refuse ; le test rétro n'est pas jugé sans date");
+    else if (date45 < SEUIL_S45) ok("S45", `restitution datée du ${date45}, antérieure à la règle du test rétro (${SEUIL_S45}) — non jugée, antériorité déclarée`);
+    else {
+      const manque = [!/\bintention\b/i.test(b6) && "l'INTENTION citée", !/test\s+r[ée]tro/i.test(b6) && "le TEST RÉTRO"].filter(Boolean);
+      manque.length
+        ? ko("S45", `le bloc 6 ne porte pas ${manque.join(" ni ")} — le résultat se compare à la lettre ET à l'intention : ` +
+          "« Intention : « … » » dans les mots de l'humain, puis « Test rétro : … », du résultat remonté à cette intention " +
+          "(loi n° 7, references\\INTENTION.md ; une correction triviale le dit en une ligne)")
+        : ok("S45", "le bloc 6 porte l'intention citée et le test rétro");
+    }
+  }
+
+  // ---- S46 (14/09/2026, TF-0979) — UN POINT D'ÉTAPE DIT CE QUI RESTE À MESURER, ET PAR QUOI --
+  //
+  // LE FAIT : deux messages brefs d'une même session, au même moment — un déploiement lancé, dont
+  // le résultat conditionnait le verdict. Une restitution complète y était prématurée, un accusé
+  // de réception faux ; la forme dégradée n'est ouverte qu'aux sorties machine. L'agent choisissait
+  // entre deux formes fausses, et l'exemption était la moins coûteuse. La doctrine ouvre donc une
+  // forme de POINT D'ÉTAPE, JUGÉE : les huit blocs, un bloc 2 « Verdict — point d'étape » qui porte
+  // ce qui est mesuré (S3) ET « reste à mesurer : <quoi> — par <quoi> ». S46 juge ce second terme :
+  // un point d'étape qui ne dit pas ce qui manque ni ce qui le mesurera est un verdict partiel
+  // déguisé. Antériorité : restitutions datées du 15/09/2026 ou après (même borne que S45 — le
+  // corpus porte un « point d'étape » du 05/09 qui ne pouvait pas connaître la règle).
+  {
+    const SEUIL_S46 = "2026-09-15";
+    const enTete46 = bloc(texte, BLOCS[0][0]) || texte.slice(0, 800);
+    const m46 = enTete46.match(/\b(\d{4})-(\d{2})-(\d{2})\b|\b(\d{2})\/(\d{2})\/(\d{4})\b/);
+    const date46 = m46 ? (m46[1] ? `${m46[1]}-${m46[2]}-${m46[3]}` : `${m46[6]}-${m46[5]}-${m46[4]}`) : null;
+    const bV46 = bloc(texte, BLOCS[1][0]) || "";
+    if (!/point\s+d['’][ée]tape/i.test(bV46)) ok("S46", "verdict ordinaire — pas un point d'étape");
+    else if (!date46 || date46 < SEUIL_S46) ok("S46", `point d'étape ${date46 ? `daté du ${date46}, ` : "sans date lisible, "}antérieur à la règle (${SEUIL_S46}) — non jugé, antériorité déclarée`);
+    else if (!/reste\s+[àa]\s+mesurer[\s\S]{0,300}?\bpar\b/i.test(bV46))
+      ko("S46", "le bloc 2 se déclare POINT D'ÉTAPE sans dire « reste à mesurer : <quoi> — par <quoi> » — un point d'étape qui ne nomme ni ce qui manque ni ce qui le mesurera " +
+        "est un verdict partiel déguisé (gabarits\\RESTITUTION.md, forme de point d'étape, TF-0979)");
+    else ok("S46", "point d'étape : ce qui reste à mesurer est nommé, avec ce qui le mesurera");
+  }
+
   // ---- S43 (12/09/2026, TF-1064) — LE STYLE DE LA RESTITUTION RELÈVE DU PLANCHER D'ÉCRITURE ----
   //
   // LE FAIT. Quarante-deux règles jugent la FORME d'une restitution (blocs, sélecteurs, preuves,
@@ -2124,6 +2266,62 @@ Aucun écart : la demande a été suivie à la lettre.
   const cheminTropLong = verte.replace("## 5. Non traité", PUCE_CHEMIN(125) + nl + nl + "## 5. Non traité");
   writeFileSync(join(dir, "chemin-pile-150.md"), cheminPile, "utf8");
   writeFileSync(join(dir, "chemin-151.md"), cheminTropLong, "utf8");
+  // 14/09 — L'ASSIETTE DU MOTIF DANS SES DEUX SENS, SOUS SES DEUX FORMES (TF-0987). Chaque paire ne
+  // varie QUE du motif déclaré — `decision` contre `presence` —, la cellule « comment » citant dans
+  // les deux cas la colonne de données `presence` : c'est le cas exact mesuré chez le produit.
+  // Sens VERT : le nom de colonne n'est pas un motif, S21 n'est pas concernée. Sens ROUGE : le MÊME
+  // mot, déclaré comme motif sans trace, reste accusé — preuve que l'assiette a été BORNÉE et non
+  // que S21 a été éteinte. Cinquième fixture : un motif écrit LUI-MÊME entre accents graves, sans
+  // rien en clair, reste lu (l'usage le plus courant du corpus) — sinon la correction aurait
+  // retiré à S21 tout motif mis en forme de code.
+  const TABLE_MOTIF = (motif) => "## 8. Prochaines actions" + nl + nl
+    + "| Sélecteur | Identifiant | Acteur | Action | Motif / raison | Comment | Si rien n'est fait |" + nl
+    + "|---|---|---|---|---|---|---|" + nl
+    + "| A-1 | TF-0220 | manuelle_utilisateur | arbitrer les intitulés à garder | " + motif
+    + " — choix métier sur le périmètre | ouvrir `output\\03-donnees\\intitules.xlsx` et trier sur la colonne `presence` | les intitulés restent tous affichés |" + nl;
+  const PUCE_MOTIF = (motif) => "## 8. Prochaines actions" + nl
+    + "- **A-1** — TF-0220 (manuelle_utilisateur) — arbitrer les intitulés à garder." + nl
+    + "  - pourquoi pas l'IA : " + motif + " — choix métier sur le périmètre ;" + nl
+    + "  - où : ouvrir `output\\03-donnees\\intitules.xlsx` et trier sur la colonne `presence`." + nl
+    + "  - si rien n'est fait : les intitulés restent tous affichés." + nl;
+  const bloc8 = (corps) => verte.replace(/## 8\. Prochaines actions[\s\S]*$/, corps);
+  writeFileSync(join(dir, "assiette-tableau-colonne-citee.md"), bloc8(TABLE_MOTIF("decision")), "utf8");
+  writeFileSync(join(dir, "assiette-tableau-motif-presence.md"), bloc8(TABLE_MOTIF("presence")), "utf8");
+  writeFileSync(join(dir, "assiette-puce-colonne-citee.md"), bloc8(PUCE_MOTIF("decision")), "utf8");
+  writeFileSync(join(dir, "assiette-puce-motif-presence.md"), bloc8(PUCE_MOTIF("presence")), "utf8");
+  writeFileSync(join(dir, "assiette-puce-motif-en-code.md"), bloc8(PUCE_MOTIF("`presence`")), "utf8");
+  // 14/09 — S44 DANS SES DEUX SENS, ET SA BORNE (TF-0988). La paire rouge/verte ne varie QUE de la
+  // déclaration du contenu hors périmètre ; la troisième fixture retire le seul mot « uniquement »
+  // (preuve que le déclencheur est bien le mot d'exclusivité) ; la quatrième emploie « seulement »
+  // en PROSE, hors de toute citation — la forme des 16 blocs 6 du corpus, qu'aucune ne doit accuser.
+  const DEMANDE = (mot) => "- Vous avez demandé « un nouveau fichier " + mot + "avec ces 66 colonnes en cible » → j'ai livré "
+    + "la page des 66 colonnes et gardé le tableau des colonnes écartées → pourquoi : documentation du lineage.";
+  const DECLARE = " Le livrable contient EN PLUS du périmètre nommé ce tableau des 276 colonnes écartées.";
+  const bloc6 = (corps) => verte.replace("Aucun écart : la demande a été suivie à la lettre.", corps);
+  writeFileSync(join(dir, "exclusivite-non-declaree.md"), bloc6(DEMANDE("uniquement ")), "utf8");
+  writeFileSync(join(dir, "exclusivite-declaree.md"), bloc6(DEMANDE("uniquement ") + DECLARE), "utf8");
+  writeFileSync(join(dir, "demande-sans-exclusivite.md"), bloc6(DEMANDE("")), "utf8");
+  writeFileSync(join(dir, "exclusivite-en-prose.md"),
+    bloc6("Un seul écart, et il porte seulement sur le radical du nom de fichier : la demande disait « le rapport », j'ai gardé le radical R-4."), "utf8");
+  // 14/09 — S45 DANS SES DEUX SENS, ET SON ANTÉRIORITÉ (TF-0791). La paire est la fixture verte
+  // re-datée du 15/09 : sans les deux lignes du test rétro au bloc 6 elle échoue, avec elles elle
+  // passe. La verte d'origine, datée du 14/08, prouve l'antériorité : elle ne porte pas le test
+  // rétro et ne doit PAS être accusée — la règle ne condamne pas ce qui la précède.
+  const redatee = verte.replace("terminée le 2026-08-14 à 15h48", "terminée le 2026-09-15 à 10h12");
+  const RETRO = "Aucun écart : la demande a été suivie à la lettre." + nl
+    + "- Intention : « savoir si la version corrigée peut sortir » — citée du message humain." + nl
+    + "- Test rétro : le banc rouge rejoué en entier répond à cette question ; la publication reste à décider au bloc 3.";
+  writeFileSync(join(dir, "retro-absent.md"), redatee, "utf8");
+  writeFileSync(join(dir, "retro-present.md"), redatee.replace("Aucun écart : la demande a été suivie à la lettre.", RETRO), "utf8");
+  // 14/09 — S46 DANS SES DEUX SENS, ET SON ANTÉRIORITÉ (TF-0979). La paire ne varie QUE de la clause
+  // « reste à mesurer : … — par … » au bloc 2 d'un point d'étape daté du 15/09 ; la troisième porte
+  // le MÊME bloc 2 fautif dans la verte datée du 14/08 — antérieure à la règle, elle n'est pas accusée.
+  const ETAPE = (fin) => "## 2. Verdict — point d'étape" + nl + "3 contrôles sur 5 mesurés, tous verts" + fin;
+  const avecEtape = (base, fin) => base.replace(/## 2\. Verdict\n[^\n]*/, ETAPE(fin));
+  writeFileSync(join(dir, "etape-sans-reste.md"), avecEtape(redatee, "."), "utf8");
+  writeFileSync(join(dir, "etape-avec-reste.md"),
+    avecEtape(redatee, " ; reste à mesurer : le déploiement en qualif — par le pipeline `deploy-qualif`, lancé à 10h05."), "utf8");
+  writeFileSync(join(dir, "etape-anterieure.md"), avecEtape(verte, "."), "utf8");
 
   const moi = fileURLToPath(import.meta.url);
   const rv = spawnSync(process.execPath, [moi, join(dir, "verte.md")], { encoding: "utf8" });
@@ -2331,9 +2529,60 @@ Aucun écart : la demande a été suivie à la lettre.
       "la règle mord sur un nom conforme : " + (/"S42"[\s\S]{0,180}/.exec(rcp.stdout) || [""])[0].replace(/\s+/g, " "));
   if (!/"S42"[^}]*PASS/.test(rv.stdout))
     casse.push("S42 accuse la fixture VERTE, qui ne cite aucun chemin long : la règle crie sur un travail juste");
+  // 14/09 — L'ASSIETTE DU MOTIF (TF-0987), deux formes, deux sens, et le motif en code conservé.
+  const jouer = (f) => spawnSync(process.execPath, [moi, join(dir, f)], { encoding: "utf8" }).stdout;
+  const extrait = (s, r) => (new RegExp(`"${r}"[\\s\\S]{0,180}`).exec(s) || [""])[0].replace(/\s+/g, " ");
+  for (const forme of ["tableau", "puce"]) {
+    const vert = jouer(`assiette-${forme}-colonne-citee.md`);
+    const rougeA = jouer(`assiette-${forme}-motif-presence.md`);
+    if (!/"S21"[^}]*PASS/.test(vert))
+      casse.push(`S21 (TF-0987, ${forme}) : une action de motif \`decision\` citant la COLONNE de données \`presence\` est accusée — ` +
+        "le nom de colonne est lu comme un motif, c'est le défaut qui a fait renommer un livrable : " + extrait(vert, "S21"));
+    if (!/"S12"[^}]*PASS/.test(vert))
+      casse.push(`S12 (TF-0987, ${forme}) : le motif \`decision\`, déclaré à sa place, n'est plus lu : ` + extrait(vert, "S12"));
+    if (!/"S21"[^}]*FAIL/.test(rougeA))
+      casse.push(`S21 (TF-0987, ${forme}) : la MÊME action déclarant réellement le motif \`presence\` sans trace passe — ` +
+        "l'assiette aurait éteint la règle au lieu de la borner");
+  }
+  if (!/"S21"[^}]*FAIL/.test(jouer("assiette-puce-motif-en-code.md")))
+    casse.push("S21 (TF-0987) : un motif `presence` écrit LUI-MÊME entre accents graves, sans rien en clair, n'est plus lu — " +
+      "c'est l'usage le plus courant du corpus, la correction lui aurait retiré la règle");
+  // 14/09 — S44 (TF-0988) : deux sens, le déclencheur, et la borne de la prose.
+  const s44nd = jouer("exclusivite-non-declaree.md");
+  if (!/"S44"[^}]*FAIL/.test(s44nd))
+    casse.push("S44 : une demande citée « uniquement avec ces 66 colonnes » livrée avec un tableau de colonnes écartées, sans rien " +
+      "déclarer, passe — c'est le 342 colonnes pour 66 demandées de TF-0988");
+  for (const [f, sens] of [["exclusivite-declaree.md", "le MÊME écart, contenu hors périmètre DÉCLARÉ,"],
+    ["demande-sans-exclusivite.md", "la MÊME demande sans le mot « uniquement »"],
+    ["exclusivite-en-prose.md", "« seulement » employé en PROSE, hors de toute demande citée,"]]) {
+    const s = jouer(f);
+    if (!/"S44"[^}]*PASS/.test(s)) casse.push(`S44 : ${sens} est accusé — la règle mord hors de son objet : ` + extrait(s, "S44"));
+  }
+  if (!/"S44"[^}]*PASS/.test(rv.stdout))
+    casse.push("S44 accuse la fixture VERTE, dont le bloc 6 ne cite aucune demande exclusive : la règle crie sur un travail juste");
+  // 14/09 — S45 (TF-0791) : les deux sens sur une restitution du 15/09, et l'antériorité.
+  if (!/"S45"[^}]*FAIL/.test(jouer("retro-absent.md")))
+    casse.push("S45 : une restitution datée du 15/09 dont le bloc 6 ne porte ni l'intention citée ni le test rétro passe — " +
+      "la loi n° 7 ne mord toujours que sur les études");
+  const s45p = jouer("retro-present.md");
+  if (!/"S45"[^}]*PASS/.test(s45p))
+    casse.push("S45 : la MÊME restitution portant « Intention : « … » » et « Test rétro : … » au bloc 6 est accusée : " + extrait(s45p, "S45"));
+  if (!/"S45"[^}]*PASS/.test(rv.stdout))
+    casse.push("S45 accuse la fixture VERTE, datée du 14/08 : la règle condamne une restitution qui ne pouvait pas la connaître");
+  // 14/09 — S46 (TF-0979) : les deux sens sur un point d'étape du 15/09, et l'antériorité.
+  if (!/"S46"[^}]*FAIL/.test(jouer("etape-sans-reste.md")))
+    casse.push("S46 : un point d'étape daté du 15/09 qui ne dit ni ce qui reste à mesurer ni ce qui le mesurera passe — " +
+      "c'est un verdict partiel déguisé, la forme que TF-0979 existe pour refuser");
+  for (const [f, sens] of [["etape-avec-reste.md", "le MÊME point d'étape nommant « reste à mesurer : … — par … »"],
+    ["etape-anterieure.md", "le MÊME bloc 2 fautif dans une restitution du 14/08, antérieure à la règle,"]]) {
+    const s = jouer(f);
+    if (!/"S46"[^}]*PASS/.test(s)) casse.push(`S46 : ${sens} est accusé : ` + extrait(s, "S46"));
+  }
+  if (!/"S46"[^}]*PASS/.test(rv.stdout))
+    casse.push("S46 accuse la fixture VERTE, dont le verdict n'est pas un point d'étape : la règle crie sur un travail juste");
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 19/19 PASS (verte PASS ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail))");
+    : "Self-test restitution : 23/23 PASS (verte PASS ; TF-0979 : S46 dans ses DEUX sens — un point d'étape daté du 15/09 qui ne dit ni ce qui reste à mesurer ni ce qui le mesurera FAIL, le MÊME nommant « reste à mesurer : … — par … » PASS —, et le même bloc 2 fautif daté du 14/08 PASS, antériorité déclarée ; TF-0791 : S45 dans ses DEUX sens — une restitution datée du 15/09 dont le bloc 6 ne porte ni l'intention citée ni le test rétro FAIL, la MÊME portant « Intention : « … » » et « Test rétro : … » PASS —, et la verte datée du 14/08 PASS, antériorité déclarée ; TF-0988 : S44 dans ses DEUX sens — une demande citée « uniquement avec ces 66 colonnes » livrée avec un tableau hors périmètre non déclaré FAIL, le MÊME écart déclaré PASS —, la même demande SANS le mot d'exclusivité PASS, et « seulement » en prose hors citation PASS ; TF-0987 : l'ASSIETTE du motif dans ses DEUX sens sous ses DEUX formes — une action de motif `decision` citant la COLONNE de données `presence` PASS S21 en tableau comme en puce, la MÊME action déclarant `presence` sans trace FAIL, et un motif écrit lui-même entre accents graves reste lu ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail))");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -2358,6 +2607,10 @@ console.log(JSON.stringify({
     "S20 ne voit QUE les termes du référentiel `gabarits\\JARGON-A-GLOSER.json` : un jargon qui n'a encore coûté aucun aller-retour n'est pas détecté. C'est le prix assumé du zéro faux positif — dans ce corpus la MAJUSCULE sert l'emphase, et une heuristique sur les sigles crierait sur « MESURE » et « AUCUNE ». Le canal de croissance de la liste est le retour humain, pas la devinette",
     "S20 ne juge pas la JUSTESSE d'une glose : la présence d'une parenthèse après le terme, jamais qu'elle explique vraiment",
     "S21 ne juge pas la SINCÉRITÉ d'une trace : un code de réponse recopié sans avoir été obtenu la satisfait. Elle rend le mensonge PLUS COÛTEUX — il faut inventer un code plausible — mais elle ne le rend pas impossible",
+    "S46 (TF-0979) ne juge qu'un bloc 2 qui se DÉCLARE point d'étape : un verdict partiel qui ne le dit pas relève de S3, pas d'elle. Et elle vérifie que ce qui reste à mesurer et ce qui le mesurera sont NOMMÉS, jamais que la mesure annoncée aura lieu — le point d'étape suivant, lui, le dira",
+    "S45 (TF-0791) ne mesure que la PRÉSENCE de l'intention citée et du test rétro au bloc 6, comme E10 pour les études : qu'une remontée soit JUSTE, et que l'intention citée soit LA VRAIE, n'est pas mécanisable — la validation de l'intention par l'humain (references\\INTENTION.md, niveau 1) reste le seul contrôle du fond. Et une restitution sans date lisible n'est pas jugée par S45 : S2 la refuse déjà",
+    "S44 (TF-0988) ne lit que les demandes CITÉES (« … », \"…\") au bloc 6 : une demande paraphrasée sans guillemets échappe au déclencheur. C'est le prix mesuré du zéro faux positif — le mot d'exclusivité cherché dans tout le bloc accusait 16 synthèses sur 115, toutes à tort. Et elle ne juge pas la JUSTESSE de la déclaration : dire « ne contient rien d'autre » d'un livrable qui contient autre chose la satisfait",
+    "L'ASSIETTE du motif (TF-0987) ne sépare pas tout : en PUCE, un groupe qui écrit son motif ENTIÈREMENT entre accents graves et cite AUSSI un mot du vocabulaire entre accents graves est lu en entier — les deux restent confondus, faute de pouvoir dire lequel est la déclaration. En tableau sans colonne « motif » ou « raison », même lecture qu'en puce",
     "S21 ne couvre PAS `decision`, `depense` ni `irreversible` : ces trois motifs relèvent d'un arbitrage, pas d'un fait du monde, et exiger d'« essayer » une décision n'aurait aucun sens. Une attribution abusive sous `decision` reste donc invisible — c'est la limite assumée, et c'est exactement le cas fautif qui a fait naître la règle",
   ],
 }, null, 1));

@@ -155,6 +155,18 @@ vide — « aucun environnement de données interrogé » — jamais par silence
 vit dans `oracle-conformite-projet` (R-20) et n'exige la section qu'à partir du premier
 `verifie_le` postérieur au 24/08, par le même mécanisme d'antériorité déclarée que ci-dessus.
 
+**Un tableau indexé par environnement est AUTOSUFFISANT** (TF-0985, 14/09/2026). Un
+`PARAMETRAGE.md` portait quatre tableaux pour un seul appel — requête, en-têtes, jeton, et « ce qui
+est servi par environnement », ce dernier ne portant que le delta : chaque élément était présent,
+exact et sourcé, et AUCUN tableau ne permettait d'émettre la requête. Retour humain : « Comment je
+peux faire si je n'ai pas les infos les plus importantes ? » Le lecteur arrive par SON
+environnement, jamais par le début du document ; factoriser le commun coûte peu à écrire et beaucoup
+à lire. Un tableau par environnement porte donc tout ce qui sert à l'action, y compris ce qui ne
+varie pas ; la factorisation reste admise dans la prose qui explique. Le contrôle vit dans
+`oracle-conformite-projet` (R-20) : dans une ligne dont la première cellule nomme un environnement,
+aucune cellule ne renvoie ailleurs (« voir ci-dessus », « idem », « défaut du code ») ; exigé à
+partir du premier `verifie_le` postérieur au 14/09, même mécanisme d'antériorité déclarée.
+
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
 | 20 | `docs\projet\` complet — **8 fichiers + 2 projections générées** : `TECHNOS.md` (technologies + versions + liens, ancrées lockfiles), `COMPOSANTS-OPS.md` (hiérarchie/noms/types/IDs/URLs/IPs des composants déployés — depuis `ops etat`/plans/DOSSIER-MEP, instanciations datées, placeholders si dépôt public), `PARAMETRAGE.md` (signification des variables, URLs/ports par environnement — hébergés en placeholders), `ACCES-TEST.md` (profils + comptes de démo locale), `COMMANDES.md` (install, dev, test, build, deploy qualif, rollback, seed démo — blocs exécutables), `FONCTIONNEL.md` (**TF-0087** : ce que fait le produit et pour qui — rôles, objets métier et cycle de vie, parcours, règles de gestion, exclusions assumées ; vue d'`EXIGENCES.json` quand il existe, sinon rédigé du code et daté), `ARCHITECTURE.md` et `MODELE-DONNEES.md` (**TF-0091** : sources des vues techniques — structure logique / tables-colonnes-liens — projetées en `ARCHITECTURE.html` et `MODELE-DONNEES.html` par les générateurs du pilot, vues JAMAIS éditées à la main) ; chaque fichier ouvre par un frontmatter YAML (`role`, `sources_de_verite`, `verifie_le`). Noms **fixes** — documents vivants exemptés du nommage daté R-4 (ce ne sont pas des livrables). Autres fichiers admis seulement s'ils servent l'automatisation ou l'onboarding ET n'existent pas déjà sous forme machine (sinon renvoi) | manque constaté : les runs de version redécouvrent tout ; FONCTIONNEL : demande humaine en clôture du run Produit-11 | produits, nouveaux + rattrapage | P0+O | faible | **défaut** |
@@ -171,6 +183,7 @@ Ce qui distingue un environnement d'un autre, et ce qui ne doit jamais les trave
 |---|---|---|---|---|---|---|
 | 13 | `.env.example` versionné et **exhaustif** : toutes les variables attendues — applicatives ET infra (ports, URLs, cible de déploiement, drapeaux `*_MODE_DEMO`) — valeurs par défaut sûres ou vides, en-tête « ne jamais renseigner de secret ici ». **Aucune VALEUR sensible, jamais** (TF-0869) : une variable marquée `# à fournir :` reste VIDE dans l'exemple, et aucun motif de secret fort n'y figure — l'exemple est une liste de NOMS, la valeur vit dans le `.env` local. Le `.env` local NAÎT à l'ouverture, copié de l'exemple par le hook (jamais écrasé s'il existe) : la place où poser un secret existe avant qu'on ait besoin d'en poser un | observée (design, tests, ASDMailManager, Produit-02 — en-tête littéral constaté) ; TF-0869 : clé d'API de 108 caractères saisie dans un `.env.example` versionné faute de `.env` local | produits, nouveaux + rattrapage | P0+O | faible | **défaut** |
 | 14 | `.env` réel toujours gitignoré ; aucun secret committé, jamais | observée partout + loi pilot existante | tous | O | nul | **défaut** (quasi-loi déjà) |
+| 14 bis | **Un secret documenté se désigne par son EMPREINTE**, jamais par sa valeur ni par « au coffre » seul : ses **5 premiers caractères et sa longueur**, relevés **depuis l'exécution qui le porte** (conteneur servi, fonction), jamais depuis le coffre, et datés (loi 4). L'empreinte répond aux trois questions d'exploitation que « au coffre » laisse ouvertes — deux environnements partagent-ils la clé, est-ce celle mise en circulation, une rotation a-t-elle pris effet — et la longueur détecte une clé tronquée. Forme : `gabarits\docs-projet\PARAMETRAGE.md`, « Identifier un secret sans le publier » | TF-0986 (08/09) : deux clés d'abonnement dev et qualif trouvées DIFFÉRENTES une fois relevées depuis les conteneurs, alors que le document remis écrivait « secret, au coffre » | produits | S | nul | **défaut** |
 | 15 | Les variables que la forge ne peut pas renseigner (clés tierces, identifiants) portent un commentaire `# à fournir :` dans `.env.example` — elles alimentent directement les `non_testables[]` de l'étape qualif (RT-6) | générique, prolonge RT-6 | produits | P0+S | faible | **défaut** |
 | 26 | **Modèle de données ancré au schéma réel** : chaque table déclarée dans `MODELE-DONNEES.md` porte une `provenance:` (fichier/dossier de schéma — migration, ORM, DDL) qui existe et contient le nom de la table ; table introuvable dans sa provenance = FAIL localisant. Exemption explicite : « sans objet — aucune persistance » (loi 3). Placeholders de squelette non jugés. Complétude inverse et exactitude des colonnes : revue de schéma (non_juge) | **TF-0091** (décision humaine du 11/08) — le REX Produit-11 : modèle reconstitué de tête en plein run | produits, nouveaux + rattrapage | O | nul | **défaut** |
 | 27 | **Surface web née ouverte aux agents IA** : tout produit à surface web copie à l'ouverture `gabarits\web\robots.txt` (agents IA de recherche AUTORISÉS par défaut — GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended… ; bloquer = décision consignée, datée et motivée DANS le fichier) et `gabarits\web\llms.txt` (carte du site pour les moteurs génératifs, ouverture reprise de FONCTIONNEL.md, tenue par development/MEP, cohérente avec le sitemap). Oracle : un `robots.txt` présent qui interdit un agent IA sans ligne de décision = FAIL ; `llms.txt` absent à côté d'un `robots.txt` = FAIL ; aucun `robots.txt` = SANS_OBJET (surface web non déclarée) | **décision humaine du 11/08 (TF-0095)** — pendant produit du nœud 58 de la grille seo | produits à surface web, nouveaux + rattrapage | P0+O | nul | **défaut** |
@@ -659,6 +672,17 @@ verts, mutation 0,90).
    sous `forge\etapes\`, seul le rapport d'exécution est un livrable d'`output\`.
 3. **L'e2e déclare le cycle de vie de son instance** (monter/démonter, ce qui reste
    debout est publié) — la règle s'arme pleinement à la résolution de TF-0340/0341.
+4. **La recette d'un livrable défini par un PÉRIMÈTRE porte un contrôle d'EXCLUSIVITÉ**
+   (TF-0989, 14/09/2026). Un test prouve d'ordinaire une PRÉSENCE ; un périmètre est par
+   définition une ASSERTION D'ABSENCE. Toute recette d'un livrable défini par un périmètre
+   — un tableau réduit à N colonnes, un export filtré, un jeu anonymisé, un lot trié —
+   énumère la population COMPLÉMENTAIRE et la cherche dans le livrable : le contrôle échoue
+   si elle s'y trouve. Le fait : une recette de 20 contrôles a rendu PASS sur une page de
+   342 colonnes quand 66 étaient demandées — elle comptait ce qui devait être là, jamais ce
+   qui ne devait pas y être ; le contrôle manquant tenait en douze lignes. Symétrique de S44
+   côté restitution (TF-0988). **Non mécanisé, et c'est dit** : aucun oracle ne sait, sans
+   le livrable, qu'une recette porte sur un périmètre — la règle se relit à la revue de la
+   recette, et son absence se déclare au bloc 5 de la restitution.
 
 **Appelants (R-35)** : le pas de l'étape 5 (`ETAPES-RUN.md` — la boucle ne se clôt pas
 sur un solde non nul) et le contrat « prêt client » (traçabilité exigences→tests 100 %

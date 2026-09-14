@@ -76,8 +76,8 @@
   "vu_le": "2026-09-10"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 66,
-  "vu_le": "2026-09-11"
+  "cas": 68,
+  "vu_le": "2026-09-14"
  },
  "oracle-constantes-externes.mjs": {
   "cas": 12,
@@ -215,8 +215,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-synthese.mjs": {
-  "cas": 19,
-  "vu_le": "2026-09-11"
+  "cas": 23,
+  "vu_le": "2026-09-14"
  },
  "oracle-trace-mutation-mep.mjs": {
   "cas": 8,
@@ -369,6 +369,10 @@
  "todo/ingerer-derogation.test.mjs": {
   "cas": 11,
   "vu_le": "2026-08-26"
+ },
+ "todo/ingerer-doublon.test.mjs": {
+  "cas": 4,
+  "vu_le": "2026-09-14"
  },
  "todo/ingerer-emetteur-forge.test.mjs": {
   "cas": 2,

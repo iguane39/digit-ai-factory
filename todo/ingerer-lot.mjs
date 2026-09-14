@@ -441,6 +441,38 @@ if (remplacesTotal.length) {
     remplacesTotal.join(", "));
   console.log("  Les tables de correspondance vivent HORS des dépôts.");
 }
+// ---- DOUBLON STRICT : refusé à la porte (TF-0956, 14/09/2026) ------------------------------
+// LE FAIT, mesuré le 08/09 : deux lots RENOMMÉS par la passe de pseudonymisation sont redevenus
+// « jamais ingérés » — l'idempotence reconnaît un lot à l'empreinte de son FICHIER, et le
+// renommage avait changé ses octets — puis ont été ingérés une seconde fois : six candidatures au
+// titre ET au contenu identiques à six autres, entrées sans que rien ne bronche, puis DÉCIDÉES
+// faute de vocabulaire. Le rapprochement ci-dessus dit « ressemble à » et ne bloque jamais, à
+// raison : trois paires sur cinq y sont deux faces d'un même épisode. Un doublon STRICT n'a pas
+// cette ambiguïté — même titre, même contenu, aux espaces et à la casse près — et il se compare
+// APRÈS anonymisation, puisque c'est le texte anonymisé que le registre porte. Il est donc REFUSÉ,
+// avec l'id de l'original. Mesure au 14/09 : 11 paires strictes au registre, toutes antérieures.
+{
+  const norm = (s) => String(s || "").normalize("NFC").replace(/\s+/g, " ").trim().toLowerCase();
+  const cle = (c) => `${norm(c.titre)} ${norm(c.contenu)}`;
+  const connus = new Map();
+  for (const e of [...lireEv(archive), ...evenements])
+    if (e.ev === "creation" && e.id && !connus.has(cle(e))) connus.set(cle(e), e.id);
+  const doublons = [];
+  const vusDansLeLot = new Map();
+  candidatures.forEach((c, i) => {
+    if (c.rectifie !== undefined) return;
+    const k = cle(c);
+    if (connus.has(k)) doublons.push(`ligne ${i + 1} « ${String(c.titre).slice(0, 60)} » : doublon STRICT de ${connus.get(k)} (titre et contenu identiques après anonymisation)`);
+    else if (vusDansLeLot.has(k)) doublons.push(`ligne ${i + 1} « ${String(c.titre).slice(0, 60)} » : doublon STRICT de la ligne ${vusDansLeLot.get(k)} du même lot`);
+    else vusDansLeLot.set(k, i + 1);
+  });
+  if (doublons.length) {
+    console.error(`[REJET ATOMIQUE] ${sidecarPath} — registre intact. Doublon(s) strict(s) (TF-0956) :\n  - ${doublons.join("\n  - ")}\n` +
+      "  REMÈDE : un lot RENOMMÉ se rattache, il ne se ré-ingère pas ; une récidive se déclare par sa `classe`, avec un\n" +
+      "  contenu qui dit ce qui est neuf ; la correction d'un item existant passe par `rectifie`.");
+    process.exit(1);
+  }
+}
 // ---- récidive : la classe est-elle déjà close en corrige ? --------------------------------
 // Deux sources, réunies : les items que la classe déclare l'avoir FONDÉE (todo/CLASSES.json,
 // `fondee_par`) et tout item du registre portant déjà cette `classe`. La date de correction se
