@@ -16,6 +16,6 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
-| _(dossier vide)_ | | | |
+| `INSTRUCTION.md` | fichier | 11,2 Ko | INS-0005 — « sur la page client, panier et commande sont inactifs et l'aide vide le panier |
 
-_0 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_1 fichier(s), 0 sous-dossier(s)_

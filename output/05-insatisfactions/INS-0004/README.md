@@ -16,6 +16,6 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
-| _(dossier vide)_ | | | |
+| `INSTRUCTION.md` | fichier | 6,7 Ko | INS-0004 — « le lien vers la page client n'est pas accessible depuis l'administration » |
 
-_0 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_1 fichier(s), 0 sous-dossier(s)_

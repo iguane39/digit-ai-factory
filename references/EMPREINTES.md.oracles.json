@@ -1,0 +1,79 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\references\\EMPREINTES.md",
+  "date_iso": "2026-09-14T20:52:51.991Z",
+  "registre_version": "2.20.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "FAIL",
+  "resume": {
+    "pass": 4,
+    "fail": 1,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "references\\EMPREINTES.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "references\\EMPREINTES.md",
+      "verdict": "FAIL",
+      "detail": "1 constat(s) · M18 identifiant muet : « RA-1 » employé sans son sens (ligne 121) — première occurrence dans le document. Hors HTML il n'y a ni infobulle ni ancre : la glose est EN LIGNE, entre parenthèses, après un tiret, ou après deux-points. Retour client du 22/08 : « je ne sais pas ce qu'est E2 »."
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "references\\EMPREINTES.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "references\\EMPREINTES.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "references\\EMPREINTES.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · 0 total(aux) de colonne vérifié(s) par re-somme + 1 effectif(s) annoncé(s) rapproché(s) de leur cardinal réel + 0/0 mesure(s) publiée(s) portant leur dénominateur et leurs unités, 0 écart"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "references\\EMPREINTES.md",
+      "verdict": "PASS",
+      "detail": "4 constat(s) · 3 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (3 avertissement(s)) ; nombre « 1 554 831 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "references\\EMPREINTES.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "references\\EMPREINTES.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "references\\EMPREINTES.md",
+    "ts": "2026-09-14T20:52:51.991Z",
+    "fichiers": {
+      "references\\EMPREINTES.md": "c1661a5b70ead3841f006f31faecd46f658417ddffa24859d835549cef6af1b5"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "FAIL"
+}

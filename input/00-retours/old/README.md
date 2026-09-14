@@ -162,8 +162,9 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Produit-11 - RETOURS - 20260825a.tf.jsonl` | fichier | 4,4 Ko | 2 ligne(s) JSONL |
 | `Produit-11 - RETOURS - 20260825b.md` | fichier | 7,2 Ko | Retours forges — Produit-11 — 20260825b |
 | `Produit-11 - RETOURS - 20260825b.tf.jsonl` | fichier | 4,2 Ko | 2 ligne(s) JSONL |
+| `Produit-61 - Étude - 20260909b.md` | fichier | 8,1 Ko | Pourquoi la construction a laissé passer ce que l'audit trouve |
 | `RETOURS-FORGES-02.md` | fichier | 15,8 Ko | Retours du run `Produit-12-20260805a` — à remettre au steering |
 | `RETOURS-FORGES-03.md` | fichier | 5,1 Ko | Retours forges — lot 03 (2026-08-06) |
 | `RETOURS-FORGES.md` | fichier | 9,9 Ko | Retours du run `Produit-12-20260805a` — à remettre au steering |
 
-_149 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_150 fichier(s), 0 sous-dossier(s)_

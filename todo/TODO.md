@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=e576a684b2f6 archive=6ce2fe14c2bb · dernier événement: 2026-09-14T19:51:33.905Z -->
+     sceaux: actifs=8dd6e83f75fe archive=6ce2fe14c2bb · dernier événement: 2026-09-14T20:10:53.429Z -->
 
-**309 actifs** (candidat 84 · décidé 36 · en cours 14 · corrigé 175 · écarté 0) · **782 archivés**.
+**310 actifs** (candidat 85 · décidé 36 · en cours 14 · corrigé 175 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -197,6 +197,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-1001 | candidat | 10 | forge-audit : six champs que le moteur de rapport sait rendre restent vides sans que la porte machine le dise | **oui** — les trois syntheses et les douze lignes de reprise applicative ont du etre ecrites hors de l etape d audit, a partir du socle documentaire du produit ; le rapport disait son manque et aucune porte ne l a escalade |
 | TF-1080 | candidat | 10 | forge-audit : le contrôle de redite applique le seuil des paires d'un même domaine à tout le plan | **oui** — quatre passages de construction du rapport et quatorze reformulations avant de franchir la porte de rendu |
 | TF-1020 | candidat | 9 | forge-audit : sur le runner Linux la fiche PDF sort sur DEUX pages au lieu d une et le juge la refuse (P3), pendant que le runner Windows la rend sur une page — la pile de polices du theme (system-ui, Segoe UI, Roboto, Arial) n existe pas sur le runner Linux et rien ne l installe ni ne l embarque | **oui** — oui — le run est rouge sur Linux pour la neuvieme publication consecutive, mais pour une cause differente des huit precedentes ; sans police embarquee, tout audit dont la fiche est imprimee hors du poste Windows peut sortir sur deux pages et etre refuse par son propre juge |
+| TF-1092 | candidat | 6 | forge-audit : sur ce poste, deux etapes de la recette locale (portes de la fiche securite, batterie des oracles) sont rouges avant toute modification — le moteur d impression PDF n annonce pas son port DevTools en 30 s, et la recette ne dit pas que son verdict n est pas prononcable | **oui** — oui — deux rouges d environnement a chaque passe locale, re-diagnostiques par la campagne |
 | TF-1081 | candidat | 1 | forge-audit : le runbook d'onboarding fait écrire l'espace tenant dans le dépôt de la forge | **oui** — lecture des outils pour trouver la voie conforme au garde-fou |
 | TF-1016 | corrige | 6 | forge-audit : le journal de versions est dormant — 14 enregistrements de fonctionnalites depuis le 15/08 sans entree au CHANGELOG, section << Non publie >> ouverte depuis le 14/08, package.json a 1.0.0 sous des tags a v1.17.0 ; la convention declaree ment sur l etat et rien ne la juge | **oui** — oui — au moment de publier un changement de contrat de donnees (D-10 (a)), aucune version n existait a inscrire au ledger du pilot, et la question a coute une mesure a la main ; le journal decrit un depot fige au 14/08 alors que 14 enregistrements l ont change |
 | TF-0862 | corrige | 5.3 | forge-audit : oracle executable dans profiles/powerbi sur les fichiers TMDL/PBIP d'un modele semantique — mesure definie une fois (CTL-D05-02 et 10), relations actives et non ambigues, table de dates marquee et contigue (CTL-D05-13), mode de connexion declare par profil de besoin (CTL-D05-14), roles de securite au niveau ligne presents, statut de certification (CTL-D05-15) — sans point de terminaison XMLA (manque M4, lot L5) | non |
