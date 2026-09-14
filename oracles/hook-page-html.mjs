@@ -32,6 +32,16 @@ import { cheminSkillsInstalles } from "../scripts/lib-config-installee.mjs";
 
 const SKILLS = cheminSkillsInstalles();
 const ORACLE_FILTRES = join(SKILLS, "quality-oracles", "scripts", "oracle-filtres-tableau.mjs");
+// TF-1098 (14/09/2026) — la LECTURE PAR UN TIERS et la CONCEPTION DU LIVRABLE se jouent d'office.
+// Mesure du 14/09 (todo\RECIDIVES.md) : la classe lecture-tiers-non-jugee récidive 7 fois sur 7,
+// parce que ces deux oracles ne tournaient que sur invocation explicite. Joués ici en
+// AVERTISSEMENT, comme le reste de ce hook — leur taux d'accusation se mesure avant tout blocage.
+const ORACLE_LECTURE = join(SKILLS, "quality-oracles", "scripts", "oracle-lecture-tiers.mjs");
+const ORACLE_CONCEPTION = join(SKILLS, "quality-oracles", "scripts", "oracle-conception-livrable.mjs");
+export const ORACLES_DOCUMENTAIRES = [
+  { libelle: "lecture par un tiers (T1-T3)", chemin: ORACLE_LECTURE },
+  { libelle: "conception du livrable (C1-C4)", chemin: ORACLE_CONCEPTION },
+];
 
 /** Le fichier visé par l'entrée du hook (Write/Edit), ou null. */
 export function fichierVise(entree) {
@@ -65,6 +75,23 @@ export function jouer(page, oracle = ORACLE_FILTRES) {
   return lignes;
 }
 
+/**
+ * TF-1098 — un oracle documentaire joué en AVERTISSEMENT : son verdict et ses règles en défaut,
+ * jamais un blocage. Un oracle absent du poste est DIT ; un verdict illisible n'est pas un constat.
+ */
+export function jouerAvertissement(page, { libelle, chemin }) {
+  if (!existsSync(page)) return [];
+  if (!existsSync(chemin)) return [`[page-html] ${libelle} NON jouée sur ${page} : ${chemin} absent de ce poste — installer les skills (bootstrap.mjs --pull)`];
+  const r = spawnSync(process.execPath, [chemin, page], { encoding: "utf8", timeout: 60000 });
+  let j = null;
+  try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* illisible */ }
+  if (!j) return [`[page-html] ${libelle} ILLISIBLE sur ${page} (exit ${r.status}) — ce n'est pas un constat sur la page`];
+  const fails = (j.findings || []).filter((f) => f.statut === "FAIL");
+  if (!fails.length) return [`[page-html] ${page} : ${libelle} ${j.verdict}`];
+  return [`[page-html] ${page} : ${libelle} ${j.verdict} — AVERTISSEMENT, non bloquant (TF-1098) : ${fails.length} règle(s) en défaut`,
+    ...fails.slice(0, 4).map((f) => `  - ${f.regle} : ${String(f.message || "").slice(0, 160)}`)];
+}
+
 function selfTest() {
   const dir = mkdtempSync(join(tmpdir(), "hook-page-html-"));
   const casse = [];
@@ -86,9 +113,23 @@ process.exit(fail ? 1 : 0);
   if (fichierVise(JSON.stringify({ tool_input: { file_path: "c:/x/page.html" } })) !== "c:/x/page.html") casse.push("le fichier .html du hook n'est pas reconnu");
   if (fichierVise(JSON.stringify({ tool_input: { file_path: "c:/x/notes.md" } })) !== null) casse.push("un fichier non-HTML est pris pour une page");
   if (fichierVise("{pas du json") !== null) casse.push("une entrée illisible n'est pas ignorée");
+  // TF-1098 : un oracle documentaire en défaut AVERTIT (règle nommée) ; conforme, il le dit ; absent, il le dit.
+  const fauxDoc = join(dir, "doc.mjs");
+  writeFileSync(fauxDoc, `import { readFileSync } from "node:fs";
+const t = readFileSync(process.argv[2], "utf8");
+const fail = t.includes("sans-intention");
+console.log(JSON.stringify({ verdict: fail ? "FAIL" : "PASS", findings: fail ? [{ regle: "T1", statut: "FAIL", message: "la page ne dit pas ce qu'elle permet de décider" }] : [{ regle: "T1", statut: "PASS" }] }));
+process.exit(fail ? 1 : 0);
+`, "utf8");
+  const docRouge = join(dir, "doc-rouge.html"); writeFileSync(docRouge, "<main class='sans-intention'></main>", "utf8");
+  const dr = jouerAvertissement(docRouge, { libelle: "lecture par un tiers (T1-T3)", chemin: fauxDoc });
+  if (!dr.some((l) => /AVERTISSEMENT/.test(l)) || !dr.some((l) => /T1/.test(l))) casse.push("un oracle documentaire en défaut n'avertit pas avec sa règle (TF-1098)");
+  if (!jouerAvertissement(verte, { libelle: "lecture par un tiers (T1-T3)", chemin: fauxDoc }).some((l) => /PASS/.test(l))) casse.push("une page conforme à l'oracle documentaire n'est pas dite PASS");
+  if (!jouerAvertissement(verte, { libelle: "conception", chemin: join(dir, "nulle-part.mjs") }).some((l) => /NON jouée/.test(l))) casse.push("un oracle documentaire absent est tu au lieu d'être dit");
+  if (ORACLES_DOCUMENTAIRES.length !== 2) casse.push("les deux oracles documentaires ne sont plus déclarés");
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length ? `Self-test hook-page-html : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test hook-page-html : 7/7 PASS (page en défaut signalée avec sa règle ; page conforme PASS ; fichier absent silencieux ; oracle absent DIT ; entrée .html reconnue ; .md ignoré ; JSON illisible ignoré)");
+    : "Self-test hook-page-html : 11/11 PASS (page en défaut signalée avec sa règle ; page conforme PASS ; fichier absent silencieux ; oracle absent DIT ; entrée .html reconnue ; .md ignoré ; JSON illisible ignoré ; oracle documentaire en défaut AVERTIT avec sa règle ; conforme dit PASS ; absent DIT ; deux oracles documentaires déclarés)");
   return casse.length ? 1 : 0;
 }
 
@@ -101,7 +142,7 @@ if (lanceEnDirect) {
   if (i >= 0) page = args[i + 1];
   else { let stdin = ""; try { stdin = readFileSync(0, "utf8"); } catch { /* pas de stdin */ } page = fichierVise(stdin); }
   if (!page) process.exit(0);
-  const lignes = jouer(resolve(page));
+  const lignes = [...jouer(resolve(page)), ...ORACLES_DOCUMENTAIRES.flatMap((o) => jouerAvertissement(resolve(page), o))];
   if (lignes.length) console.log(lignes.join("\n"));
   process.exit(0);
 }
