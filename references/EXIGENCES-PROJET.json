@@ -217,8 +217,9 @@
    "id": "R-15.1",
    "regle": 15,
    "enonce": "les variables non renseignables portent `# à fournir :` dans `.env.example`",
-   "statut": "non_couverte",
-   "motif": "AUCUN contrôle, ni ici ni ailleurs — le motif `# à fournir :` n'est vérifié que dans ACCES-TEST.md au titre de R-23. Couvrable immédiatement : le fichier et le motif sont tous deux déterministes."
+   "statut": "couverte",
+   "controle": "R-15 / .env.example",
+   "note": "couverte le 14/09/2026 (TF-1080) : une variable SANS valeur dit qui la fournit (« # à fournir : ») ou que le vide est voulu ; bloquant dès que le fichier a entamé la discipline, avertissement sinon — mesure d'entrée : 6 produits sur 8 portaient des variables vides muettes au premier jet"
   },
   {
    "id": "R-15.2",

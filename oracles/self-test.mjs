@@ -586,6 +586,40 @@ check("verte : un `.env.example` à valeurs VIDES sous « # à fournir : » ne d
   if (r13.length) throw new Error(`R-13 : 0 constat attendu sur la fixture verte, ${r13.length} obtenu(s) — ${r13.map((f) => f.message).join(" | ")}`);
 });
 
+// ---- R-15 (TF-1080) : une variable SANS valeur porte « # à fournir : » (exigence R-15.1) ----
+// Rouge : une variable muette, et une variable dont le marqueur est sur la ligne qui PRÉCÈDE (la
+// seconde ne doit pas être accusée). Vert : la fixture verte, dont la variable vide porte son marqueur.
+const rougeR15 = mkdtempSync(join(tmpdir(), "conf-rouge-r15-"));
+writeFileSync(join(rougeR15, ".env.example"),
+  "# ne jamais renseigner de secret ici\nPORT=8000\nAPI_TIERCE_CLE=\n# à fournir : identifiant du partenaire\nPARTENAIRE_ID=\n");
+check("rouge-r15 : une variable SANS valeur ni marqueur → R-15 FAIL, variable et ligne nommées (TF-1080)", () => {
+  try {
+    const { rapport } = lance(rougeR15);
+    const f = rapport.findings.find((x) => x.regle === "R-15" && x.statut === "FAIL");
+    if (!f) throw new Error("aucun constat R-15 sur une variable muette");
+    if (!/API_TIERCE_CLE \(ligne 3\)/.test(f.message)) throw new Error(`le constat ne nomme pas la variable et sa ligne : ${f.message}`);
+    if (/PARTENAIRE_ID/.test(f.message)) throw new Error("un marqueur posé sur la ligne qui PRÉCÈDE n'est pas reconnu");
+  } finally { rmSync(rougeR15, { recursive: true, force: true }); }
+});
+// Bornes calibrées sur le parc (8 produits, 6 accusés au premier jet) : le vide DÉCLARÉ valide
+// n'est pas accusé, et un fichier qui n'a pas entamé la discipline reçoit un avertissement en PASS.
+const borneR15 = mkdtempSync(join(tmpdir(), "conf-borne-r15-"));
+writeFileSync(join(borneR15, ".env.example"), "PORT=8000\n# Vide = import desactive\nIMPORT_DESACTIVE=\nJETON_TIERS=\n");
+check("borne-r15 : aucun « # à fournir : » dans le fichier → R-15 PASS avec AVERTISSEMENT, et le vide déclaré n'est pas cité (TF-1080)", () => {
+  try {
+    const { rapport } = lance(borneR15);
+    const f = rapport.findings.find((x) => x.regle === "R-15");
+    if (!f || f.statut !== "PASS") throw new Error(`R-15 attendu PASS (avertissement) : ${JSON.stringify(f)}`);
+    if (!/AVERTISSEMENT/.test(f.message) || !/JETON_TIERS/.test(f.message)) throw new Error(`l'avertissement ne nomme pas la variable muette : ${f.message}`);
+    if (/IMPORT_DESACTIVE/.test(f.message)) throw new Error("une variable dont le vide est DÉCLARÉ valide est accusée");
+  } finally { rmSync(borneR15, { recursive: true, force: true }); }
+});
+check("verte : toute variable sans valeur porte son marqueur → R-15 PASS (TF-1080)", () => {
+  const { rapport } = lance(verte);
+  const f = rapport.findings.find((x) => x.regle === "R-15");
+  if (!f || f.statut !== "PASS") throw new Error(`R-15 attendu PASS sur la fixture verte : ${JSON.stringify(f)}`);
+});
+
 // ---- fixture ROUGE-LOCK (TF-0128) : reproduit le cas réel Produit-11 — des versions SONT
 // déclarées dans TECHNOS.md mais aucune source ne les confronte : ni dans les 2 niveaux de
 // descente autorisés (un décoy à 3 niveaux, hors périmètre, ne compte pas), ni dans un

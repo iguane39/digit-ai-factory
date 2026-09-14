@@ -880,6 +880,32 @@ else {
     }
   });
   if (sainEx) ok("R-13", basename(envEx), "présent avec variables déclarées, aucune valeur ni motif de secret");
+  // R-15 (TF-1080, 14/09/2026) — exigence R-15.1 : une variable que la forge ne renseigne pas porte
+  // « # à fournir : ». Jugé sur la seule forme mécanisable : une variable SANS valeur et SANS
+  // marqueur (sur sa ligne, ou sur la ligne de commentaire qui la précède) ne dit pas qui la
+  // renseigne. Une variable AVEC valeur par défaut n'est pas jugée : savoir si elle est tierce
+  // demande de connaître le produit (déclaré au non_juge).
+  // CALIBRÉ SUR LE PARC, et c'est une mesure (N-23) : jouée brute sur les 8 produits porteurs d'un
+  // `.env.example`, la règle en accusait 6, dont des variables OPTIONNELLES dont le commentaire dit
+  // déjà « Vide = … ». Deux bornes en sortent. (1) Une variable vide qui DÉCLARE que le vide est
+  // valide (« vide », « optionnel », « facultatif », « par défaut », sur sa ligne ou celle d'avant)
+  // n'est pas muette. (2) Le refus ne vaut que pour un fichier qui a ENTAMÉ la discipline (au moins
+  // un « # à fournir : ») ; ailleurs le constat est un AVERTISSEMENT en PASS — cet oracle garde
+  // l'ouverture de tout run, et une règle neuve qui bloquerait 6 produits sur 8 se ferait désactiver.
+  const lignesEx = readFileSync(envEx, "utf8").split(/\r?\n/);
+  const DIT_QUI = /#\s*à\s+fournir/i, DIT_VIDE = /#.*\b(vide|optionnel|facultati|par d[ée]faut)/i;
+  const muettes = [];
+  lignesEx.forEach((ligne, i) => {
+    const m = /^([A-Z][A-Z0-9_]*)=(.*)$/.exec(ligne);
+    if (!m || m[2].split("#")[0].trim()) return;
+    const avant = i > 0 && /^\s*#/.test(lignesEx[i - 1]) ? lignesEx[i - 1] : "";
+    if (DIT_QUI.test(m[2]) || DIT_VIDE.test(m[2]) || DIT_QUI.test(avant) || DIT_VIDE.test(avant)) return;
+    muettes.push(`${m[1]} (ligne ${i + 1})`);
+  });
+  const entamee = lignesEx.some((l) => DIT_QUI.test(l));
+  if (muettes.length && entamee) ko("R-15", basename(envEx), `${muettes.length} variable(s) SANS valeur, sans « # à fournir : » et sans déclaration de vide valide — ${muettes.join(", ")} : rien ne dit qui la renseigne, et l'étape qualif ne peut pas la porter en non_testable (RT-6). Ajouter « # à fournir : <qui, où> », ou « # vide = <effet> » si le vide est voulu (R-15.1, TF-1080)`);
+  else if (muettes.length) ok("R-15", basename(envEx), `AVERTISSEMENT, non bloquant : la discipline « # à fournir : » n'est pas entamée dans ce fichier, et ${muettes.length} variable(s) vide(s) ne disent ni qui les fournit ni que le vide est voulu — ${muettes.slice(0, 6).join(", ")}${muettes.length > 6 ? ", …" : ""} (R-15.1, TF-1080)`);
+  else ok("R-15", basename(envEx), "toute variable sans valeur dit qui la fournit ou que le vide est voulu (R-15.1)");
 }
 
 // R-14 — .env jamais versionné
@@ -1620,7 +1646,7 @@ const nonJuge = [
   "R-5 (pas d'écrasement de version) : invisible statiquement — jugé par revue de diff",
   "R-7 bis (TF-0902) : LAQUELLE de deux versions cohabitantes est la courante n'est pas jugée — le constat nomme les fichiers et le geste (`git mv` vers `old\\` du même dossier), il ne choisit pas à la place de l'auteur ; deux formats d'un même livrable (`.html` et `.pdf` du même radical) ne sont pas deux versions, l'extension entre dans la clé",
   "R-2, R-4, R-7 bis et R-25 (TF-0853) : un chemin que  declare EXCLU du depot n est pas juge — le depot a ecrit que ce fichier n entrera jamais dans son histoire, donc ce n est pas un livrable mais un artefact d atelier. Mesure du 06/09 : 242 constats sur 247 portaient les fichiers d un seul dossier exclu, dont 41 dossiers au nom REEL d un tiers du client recopie dans le message. Hors depot git, aucune exclusion n est deduite",
-  "R-15 (marqueurs « à fournir » exhaustifs) : l'oracle ne sait pas quelles variables sont tierces",
+  "R-15 : seule une variable SANS valeur est jugée (R-15.1, TF-1080) ; une variable AVEC valeur par défaut qui serait en réalité tierce n'est pas vue — l'oracle ne sait pas quelles variables sont tierces",
   "input\\ non jugé en nommage : les entrants humains arrivent tels quels",
   "seule la PRÉSENCE de CLAUDE.md/README est jugée, pas la pertinence de leur contenu",
   "R-21 : correspondance nom+version par inclusion textuelle dans les lockfiles — pas de résolution sémantique de graphes de dépendances ; recherche bornée à 2 niveaux de descente (hors sources_de_verite déclarées, lues où qu'elles soient) — un lockfile plus profond que 2 niveaux et non déclaré reste invisible",
