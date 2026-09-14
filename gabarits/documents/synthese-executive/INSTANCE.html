@@ -53,7 +53,7 @@
   Ce qui vient du socle n'est PAS recopié en doctrine : largeur de lecture (.chap.lire),
   thème, print, favicon, bascule sombre restent la propriété du socle et suivent ses correctifs.
 -->
-<title>{Objet du rapport} · {Client} — 20260821a</title>
+<title>Client-A — Synthèse exécutive — Audit POC-to-Prod — 20260914a</title>
   <meta name="description" content="{Résumé clair du livrable en une phrase.}">
   <meta name="theme-color" content="#2563EB">
   <!-- « light » à l'écriture : le script d'initialisation ci-dessus le passe à « dark » si,
@@ -292,9 +292,9 @@
   <div class="wrap">
     <header class="doc" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
       <div>
-        <p class="eyebrow">{Client} · Rapport de données</p>
-        <h1>{Objet du rapport}</h1>
-        <p class="muted">Périmètre : {ce qui est couvert — et ce qui ne l'est pas} · Établi le {date}<br>Gabarit : gd-rapport-donnees · version du gabarit 1.1.0 — à reporter tel quel dans tout retour sur ce document</p>
+        <p class="eyebrow">Client-A · Synthèse exécutive</p>
+        <h1>Synthèse exécutive</h1>
+        <p class="muted">Objet : audit de passage en production · Établi le 14/09/2026 · Indice : 20260914a<br>Destinataire : comité de changement · Périmètre : service de restitution<br>Gabarit : gd-synthese-executive · version du gabarit 1.0.0 — à reporter tel quel dans tout retour sur ce document</p>
       </div>
       <!-- S-G1 (3/4, R-30) — bouton de bascule thème sombre -->
       <button id="theme-toggle" class="theme-toggle" type="button"
@@ -315,125 +315,83 @@
       <nav class="toc" aria-label="Sommaire">
         <h2>Sommaire</h2>
         <ol>
-          <li><a href="#resultat"><span class="toc-t">Le résultat en une page</span><span class="toc-d">ce que le lecteur retient, avant tout détail</span></a></li>
-          <li><a href="#contenu"><span class="toc-t">Ce que contiennent les données</span><span class="toc-d">les sources, leur périmètre et leur fraîcheur</span></a></li>
-          <li><a href="#detail"><span class="toc-t">Le détail, élément par élément</span><span class="toc-d">chaque élément avec sa mesure et son verdict</span></a></li>
-          <li><a href="#synthese"><span class="toc-t">Synthèse</span><span class="toc-d">ce qui ressort de l'ensemble des éléments</span></a></li>
-          <li><a href="#decisions"><span class="toc-t">Décisions restantes</span><span class="toc-d">ce qui reste à trancher, et par qui</span></a></li>
-          <li><a href="#tracabilite"><span class="toc-t">Traçabilité</span><span class="toc-d">d'où vient chaque chiffre, et comment le rejouer</span></a></li>
+          <li><a href="#verdict"><span class="toc-t">Verdict</span><span class="toc-d">le verdict et le score global, en une page</span></a></li>
+          <li><a href="#risques"><span class="toc-t">Les trois risques majeurs</span><span class="toc-d">trois risques, en impact métier</span></a></li>
+          <li><a href="#decisions"><span class="toc-t">Les décisions attendues</span><span class="toc-d">ce qui est demandé à l'instance de décision</span></a></li>
+          <li><a href="#cout"><span class="toc-t">Coût et délai de remédiation</span><span class="toc-d">l'ordre de grandeur, jamais en jours</span></a></li>
+          <li><a href="#echeance"><span class="toc-t">La prochaine échéance</span><span class="toc-d">la date et ce qui y sera mesuré</span></a></li>
+          <li><a href="#pouraller"><span class="toc-t">Pour aller plus loin</span><span class="toc-d">où lire le détail, document par document</span></a></li>
         </ol>
       </nav>
       <div class="doc-corps">
-      <!-- V19 (TF-1038, 14/09/2026) — LA LARGEUR DE CONTENU EST UNE PROPRIETE DE LA PAGE.
-           Jusqu'en 1.0.0, trois sections portaient `.chap.lire` (1 080 px) et trois prenaient
-           la largeur offerte (1 350 px) : mesure au navigateur a 1920 px, six sections soeurs,
-           deux largeurs. C'est le defaut que le retour humain du 11/09 decrivait, et il etait
-           HERITE par tout document tire de ce modele. `.lire` est retire des trois sections :
-           un rapport de donnees est un document de DONNEES, il prend une seule largeur.
-           Une section qui assumerait la sienne le declarerait par `data-largeur-exception`.
-      -->
-      <!-- 1 · LE RÉSULTAT EN UNE PAGE — le verdict avant toute mécanique.
-           Un lecteur qui s'arrête ici repart avec le résultat. -->
-      <section class="chap" id="resultat">
-        <h2>Le résultat en une page</h2>
-        <p class="ch-apprend">Ce chapitre donne le verdict d'ensemble avant tout détail : ce que les données disent, en une page, et la décision qu'elles permettent de prendre ou d'ajourner.</p>
-        <p>{Trois à cinq phrases en langage de commanditaire : ce qu'on a trouvé, et ce que
-           ça change pour celui qui lit. Aucune méthode ici.}</p>
-        <div class="table-hote">
-          <table class="repli-cartes">
-            <caption>Chiffres portant le résultat</caption>
-            <thead><tr><th scope="col">Indicateur</th><th scope="col">Valeur</th><th scope="col">Unité</th><th scope="col">Source</th></tr></thead>
-            <tbody>
-              <tr>
-                <td data-label="Indicateur">{…}</td>
-                <td data-label="Valeur">{…}</td>
-                <td data-label="Unité">{…}</td>
-                <td data-label="Source">{renvoi à la section Traçabilité}</td>
-              </tr>
-            </tbody>
-          </table>
-          <p class="etat-vide">Aucun indicateur ne correspond au filtre en cours. {Comment revenir à la vue complète.}</p>
-        </div>
+      <!-- UNE SEULE LARGEUR DE CONTENU (V19) : aucune section ne porte `.lire`.
+           UN MEME ENSEMBLE N EST ENUMERE QU UNE FOIS (L32) : le detail vit dans la ligne. -->
+
+      <section id="verdict">
+        <h2>Verdict</h2>
+        <p class="chapo ch-apprend">Le produit peut passer en production. Ce qui manque relève de l'autorité et de deux objets de plateforme, non du logiciel : aucune ligne de code ne reste à écrire.</p>
+        <p class="contenu">Ce chapitre contient le verdict, le score global et la date de l'audit. Il ne contient ni risque ni décision : ils ont leur chapitre.</p>
+<p>Verdict : favorable sous réserve · Score global : 14 sur 18 dimensions tenues · Audit mené du 09/09/2026 au 13/09/2026.</p>
       </section>
 
-      <!-- 2 · CE QUE CONTIENNENT LES DONNÉES — de quoi juger si le reste tient. -->
-      <section class="chap" id="contenu">
-        <h2>Ce que contiennent les données</h2>
-        <p class="ch-apprend">Ce chapitre décrit les sources lues : leur périmètre, leur date de fraîcheur, ce qu'elles couvrent et ce qu'elles ne couvrent pas — pour que chaque chiffre du rapport ait une origine nommée.</p>
-        <p>{Volumes, période couverte, complétude, anomalies structurelles.}</p>
+      <section id="risques">
+        <h2>Les trois risques majeurs</h2>
+        <p class="chapo ch-apprend">Les trois risques partagent une cause : des gestes d'exploitation qui n'ont pas encore de propriétaire nommé. Aucun ne porte sur le logiciel lui-même.</p>
+        <p class="contenu">Ce chapitre contient trois risques au plus, chacun avec son impact métier, sa probabilité et sa parade. Il ne contient pas le plan de remédiation complet.</p>
+        <table class="repli-cartes">
+          <caption>Les trois risques majeurs, en impact métier</caption>
+          <thead><tr>
+            <th data-definition="Le risque énoncé en impact métier, jamais en vocabulaire technique.">Risque</th>
+            <th data-definition="Ce que l'organisation perd concrètement — un service, un délai, une conformité.">Impact si réalisé</th>
+            <th data-definition="Probabilité déclarée. Valeurs : forte, moyenne, faible.">Probabilité</th>
+            <th data-definition="Le geste qui le réduit, et le rôle qui le porte.">Parade</th>
+          </tr></thead>
+          <tbody>
+            <tr><td>Le service est indisponible chaque matin à l'ouverture</td><td>Les utilisateurs de la première heure ne peuvent pas travailler</td><td><span class="badge ko" title="Probabilité : forte — constatée deux jours de suite.">forte</span></td><td>Activer le préchauffage au démarrage — exploitation applicative</td></tr>
+            <tr><td>L'homologation sécurité n'est pas signée à la date de bascule</td><td>La bascule est reportée de quinze jours, prochain créneau disponible</td><td><span class="badge part" title="Probabilité : moyenne — le dossier est déposé, non instruit.">moyenne</span></td><td>Instruire le dossier déposé le 09/09 — responsable sécurité</td></tr>
+            <tr><td>Le secret de connexion est déposé avant que le compte existe</td><td>Le service démarre avec un secret qui n'authentifie rien, et l'échec se lit comme une panne réseau</td><td><span class="badge ok" title="Probabilité : faible — l ordre est écrit à l ordonnancement.">faible</span></td><td>Tenir l'ordre S-01 puis S-02 — exploitation plateforme</td></tr>
+          </tbody>
+        </table>
       </section>
 
-      <!-- 3 · LE DÉTAIL, ÉLÉMENT PAR ÉLÉMENT — la table longue.
-           D3 : au-delà de trois colonnes, le repli en cartes est dû (class="repli-cartes"
-           + data-label sur CHAQUE td). D4 : l'état vide est écrit. -->
-      <section id="detail">
-        <h2>Le détail, élément par élément</h2>
-        <p class="ch-apprend">Ce chapitre passe les éléments un par un, chacun avec sa mesure, son seuil et son verdict, dans l'ordre où le lecteur les rencontre dans le tableau.</p>
-        <div class="table-hote">
-          <table class="repli-cartes">
-            <caption>Détail par élément</caption>
-            <thead><tr><th scope="col">Élément</th><th scope="col">État</th><th scope="col">Mesure</th><th scope="col">Commentaire</th></tr></thead>
-            <tbody>
-              <tr>
-                <td data-label="Élément">{…}</td>
-                <td data-label="État">{…}</td>
-                <td data-label="Mesure">{ce qui l'établit}</td>
-                <td data-label="Commentaire">{…}</td>
-              </tr>
-            </tbody>
-          </table>
-          <p class="etat-vide">Aucun élément ne correspond au filtre en cours. {Comment revenir à la vue complète.}</p>
-        </div>
-      </section>
-
-      <!-- 4 · SYNTHÈSE — ce que le détail dessine, pas une répétition du résultat. -->
-      <section class="chap" id="synthese">
-        <h2>Synthèse</h2>
-        <p class="ch-apprend">Ce chapitre rassemble ce qui ressort de l'ensemble : les tendances, les écarts qui comptent, et ce qui distingue un signal d'un bruit de mesure.</p>
-        <p>{…}</p>
-      </section>
-
-      <!-- 5 · DÉCISIONS RESTANTES — une décision sans porteur nommé n'en est pas une. -->
       <section id="decisions">
-        <h2>Décisions restantes</h2>
-        <p class="ch-apprend">Ce chapitre liste ce qui reste à trancher, par qui, avant quelle date — une décision sans décideur nommé n'y figure pas.</p>
-        <div class="table-hote">
-          <table class="repli-cartes">
-            <caption>Décisions restant à trancher</caption>
-            <thead><tr><th scope="col">Décision</th><th scope="col">Options</th><th scope="col">Conséquences</th><th scope="col">Qui tranche</th><th scope="col">Pour quand</th></tr></thead>
-            <tbody>
-              <tr>
-                <td data-label="Décision">{…}</td>
-                <td data-label="Options">{…}</td>
-                <td data-label="Conséquences">{…}</td>
-                <td data-label="Qui tranche">{nom, pas un service}</td>
-                <td data-label="Pour quand">{date}</td>
-              </tr>
-            </tbody>
-          </table>
-          <p class="etat-vide">Aucune décision restante. {Qui l'a vérifié, et quand.}</p>
-        </div>
+        <h2>Les décisions attendues</h2>
+        <p class="chapo ch-apprend">Deux décisions vous reviennent, et la première commande la date de la seconde.</p>
+        <p class="contenu">Ce chapitre contient les décisions demandées, le rôle qui les prend et l'échéance de chacune.</p>
+        <table class="repli-cartes">
+          <caption>Les décisions attendues de l'instance de décision</caption>
+          <thead><tr>
+            <th data-definition="Ce qui doit être tranché, formulé en choix et non en question ouverte.">Décision</th>
+            <th data-definition="Un RÔLE, jamais un nom de personne.">Attendue de</th>
+            <th data-definition="L'échéance, au format ISO, et ce qui la commande.">Avant le</th>
+            <th data-definition="Ce qui se produit par défaut. Une décision sans option par défaut n'en est pas une.">Si rien n'est décidé</th>
+          </tr></thead>
+          <tbody>
+            <tr><td>Instruire ou refuser le dossier d'homologation déposé le 09/09</td><td>Responsable sécurité</td><td>2026-09-21, faute de quoi le créneau du 28/09 tombe</td><td>Le créneau du 28/09 est rendu et le suivant est au 12/10</td></tr>
+            <tr><td>Attribuer le créneau de bascule</td><td>Comité de changement</td><td>2026-09-24, après l'homologation</td><td>Aucun créneau n'est réservé et la bascule glisse d'un mois</td></tr>
+          </tbody>
+        </table>
       </section>
 
-      <!-- 6 · TRAÇABILITÉ — un rapport dont les chiffres ne se rejouent pas est une opinion. -->
-      <section id="tracabilite">
-        <h2>Traçabilité</h2>
-        <p class="ch-apprend">Ce chapitre dit d'où vient chaque chiffre et comment le rejouer : les fichiers lus, la commande jouée, et l'empreinte du jeu de données.</p>
-        <div class="table-hote">
-          <table class="repli-cartes">
-            <caption>Origine de chaque chiffre</caption>
-            <thead><tr><th scope="col">Chiffre</th><th scope="col">Requête ou fichier</th><th scope="col">Extrait le</th><th scope="col">Empreinte</th></tr></thead>
-            <tbody>
-              <tr>
-                <td data-label="Chiffre">{…}</td>
-                <td data-label="Requête ou fichier">{…}</td>
-                <td data-label="Extrait le">{date}</td>
-                <td data-label="Empreinte">{sha256 si le jeu est figé}</td>
-              </tr>
-            </tbody>
-          </table>
-          <p class="etat-vide">Aucune source déclarée — un rapport de données sans traçabilité ne se remet pas.</p>
-        </div>
+      <section id="cout">
+        <h2>Coût et délai de remédiation</h2>
+        <p class="chapo ch-apprend">La remédiation est courte et peu risquée : elle ne touche ni le logiciel ni les données, seulement la configuration de démarrage et deux objets de plateforme.</p>
+        <p class="contenu">Ce chapitre contient l'ordre de grandeur de l'effort et de la durée, par lot de remédiation. Il ne contient aucun montant.</p>
+<p>Remédiation : complexité simple × durée courte. Le détail par lot vit au plan d'ordonnancement de mise en production du 14/09/2026.</p>
+      </section>
+
+      <section id="echeance">
+        <h2>La prochaine échéance</h2>
+        <p class="chapo ch-apprend">La prochaine échéance est la revue du 28 septembre, qui rejouera les deux mesures du diagnostic.</p>
+        <p class="contenu">Ce chapitre contient la date de la prochaine revue et les mesures qui y seront rejouées.</p>
+<p>Prochaine échéance : 2026-09-28. Ce qui y sera mesuré : le délai du premier appel du jour, source journal du service ; et l'état du préchauffage, source configuration de démarrage.</p>
+      </section>
+
+      <section id="pouraller">
+        <h2>Pour aller plus loin</h2>
+        <p class="chapo ch-apprend">Le détail de chaque point vit dans trois documents, et cette synthèse n'en reprend rien.</p>
+        <p class="contenu">Ce chapitre contient les renvois vers le rapport complet, le registre des risques et le plan de remédiation.</p>
+<p>Rapport complet : rapport d'audit POC-to-Prod du 13/09/2026 · Registre des risques : registre du changement CHG-2026-0914 · Plan de remédiation : ordonnancement de mise en production du 14/09/2026.</p>
       </section>
       </div>
       </div>

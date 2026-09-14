@@ -1,10 +1,10 @@
 # Récidives et descente — tableau de bord
 
-<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 17a71965d514 · archive 6ce2fe14c2bb · classes b8ee14d0fc53 · relevés 6b0d2525d634 · héritage 1b74016f29d6. État au 2026-09-14T11:13:51.627Z (ts max des sources, jamais l'horloge). -->
+<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 5995bcdc9ccb · archive 6ce2fe14c2bb · classes b8ee14d0fc53 · relevés d6da571150e6 · héritage 1b74016f29d6. État au 2026-09-14T11:59:51.687Z (ts max des sources, jamais l'horloge). -->
 
 Ce tableau de bord répond à trois questions que le registre seul ne savait pas poser : est-ce la deuxième fois, chez qui, et depuis combien de temps la correction existe sans être appliquée. Il se lit avec sa contre-métrique : un compteur de récidives qui baisse pendant que le nombre de classes monte est un compteur contourné, pas un progrès.
 
-**Périmètre mesuré** : 1076 item(s) au registre (actifs et archive), 245 portant une classe, 129 marqué(s) récidive ; référentiel de 74 classe(s) en 18 famille(s) (v1.13.0) ; 26 relevé(s) d'héritage.
+**Périmètre mesuré** : 1079 item(s) au registre (actifs et archive), 247 portant une classe, 129 marqué(s) récidive ; référentiel de 74 classe(s) en 18 famille(s) (v1.13.0) ; 27 relevé(s) d'héritage.
 
 ## 1. Récidives par classe
 
@@ -55,7 +55,7 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `chemin-de-livrable-au-dela-du-plafond-de-la-plateforme` | emplacement-livrable | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `controle-vrai-sur-le-mauvais-invariant` | regle-morte | 2 | 0 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
 | `decision-humaine-rendue-restituee-sans-geste` | restitution-forme | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
-| `deux-regles-du-socle-inconciliables` | page-html-socle | 2 | 0 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
+| `deux-regles-du-socle-inconciliables` | page-html-socle | 3 | 0 | 0 | 0 % | — | — |
 | `exemption-hors-atteinte-par-le-chemin-prescrit` | contrat-interface-forge | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `fixture-jugee-par-son-seul-oracle` | skill-ou-oracle-non-invoque | 7 | 1 | 0 | 0 % | — | — |
 | `gabarit-sans-parite-de-theme` | gabarit-document | 1 | 0 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
@@ -77,7 +77,7 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `reference-chargee-toujours-absente-du-paquet` | regle-morte | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `registre-doublon-non-detecte` | lot-forme | 2 | 0 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
 | `regle-de-branche-annoncee-differente-configuree` | contrat-interface-forge | 2 | 1 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
-| `regle-ecrite-sans-oracle-qui-la-joue` | skill-ou-oracle-non-invoque | 7 | 0 | 0 | 0 % | — | — |
+| `regle-ecrite-sans-oracle-qui-la-joue` | skill-ou-oracle-non-invoque | 8 | 0 | 0 | 0 % | — | — |
 | `regle-neuve-sans-mesure-de-bruit` | page-html-socle | 2 | 0 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
 | `regle-qui-interdit-son-propre-remede` | hook-ou-gate | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `releve-heritage-juge-arbre-pas-histoire` | heritage-produit | 0 | 1 | 0 | — | — | — |
@@ -170,7 +170,7 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 
 ## 3. Taux d'héritage par règle (dernier relevé)
 
-Comment lire : une ligne par artefact hérité déclaré dans `gabarits/HERITAGE.json`, état au relevé du 2026-09-14T10:36:20.189Z sur 0 produit(s) ; *conformes* compte les produits chez qui l'artefact est présent et à jour ; *familles* dit de quelles familles de défaut cet artefact protège.
+Comment lire : une ligne par artefact hérité déclaré dans `gabarits/HERITAGE.json`, état au relevé du 2026-09-14T11:50:12.640Z sur 0 produit(s) ; *conformes* compte les produits chez qui l'artefact est présent et à jour ; *familles* dit de quelles familles de défaut cet artefact protège.
 
 | Artefact | Mode | Conformes | Familles protégées |
 |---|---|---|---|

@@ -276,7 +276,7 @@
       <div>
         <p class="eyebrow">interne · Rapport de données</p>
         <h1>Registre des lots</h1>
-        <p class="muted">Périmètre : à compléter par le projet · Établi le à compléter par le projet<br>Gabarit : gd-rapport-donnees · version du gabarit 1.0.0 — à reporter tel quel dans tout retour sur ce document</p>
+        <p class="muted">Périmètre : à compléter par le projet · Établi le à compléter par le projet<br>Gabarit : gd-rapport-donnees · version du gabarit 1.1.0 — à reporter tel quel dans tout retour sur ce document</p>
       </div>
       <!-- S-G1 (3/4, R-30) — bouton de bascule thème sombre -->
       <button id="theme-toggle" class="theme-toggle" type="button"
@@ -306,9 +306,17 @@
         </ol>
       </nav>
       <div class="doc-corps">
+      <!-- V19 (TF-1038, 14/09/2026) — LA LARGEUR DE CONTENU EST UNE PROPRIETE DE LA PAGE.
+           Jusqu'en 1.0.0, trois sections portaient `.chap.lire` (1 080 px) et trois prenaient
+           la largeur offerte (1 350 px) : mesure au navigateur a 1920 px, six sections soeurs,
+           deux largeurs. C'est le defaut que le retour humain du 11/09 decrivait, et il etait
+           HERITE par tout document tire de ce modele. `.lire` est retire des trois sections :
+           un rapport de donnees est un document de DONNEES, il prend une seule largeur.
+           Une section qui assumerait la sienne le declarerait par `data-largeur-exception`.
+      -->
       <!-- 1 · LE RÉSULTAT EN UNE PAGE — le verdict avant toute mécanique.
            Un lecteur qui s'arrête ici repart avec le résultat. -->
-      <section class="chap lire" id="resultat">
+      <section class="chap" id="resultat">
         <h2>Le résultat en une page</h2>
         <p class="ch-apprend">Ce chapitre donne le verdict d'ensemble avant tout détail : ce que les données disent, en une page, et la décision qu'elles permettent de prendre ou d'ajourner.</p>
         <p>{Trois à cinq phrases en langage de commanditaire : ce qu'on a trouvé, et ce que
@@ -331,7 +339,7 @@
       </section>
 
       <!-- 2 · CE QUE CONTIENNENT LES DONNÉES — de quoi juger si le reste tient. -->
-      <section class="chap lire" id="contenu">
+      <section class="chap" id="contenu">
         <h2>Ce que contiennent les données</h2>
         <p class="ch-apprend">Ce chapitre décrit les sources lues : leur périmètre, leur date de fraîcheur, ce qu'elles couvrent et ce qu'elles ne couvrent pas — pour que chaque chiffre du rapport ait une origine nommée.</p>
         <p>Registre des lots</p>
@@ -361,7 +369,7 @@
       </section>
 
       <!-- 4 · SYNTHÈSE — ce que le détail dessine, pas une répétition du résultat. -->
-      <section class="chap lire" id="synthese">
+      <section class="chap" id="synthese">
         <h2>Synthèse</h2>
         <p class="ch-apprend">Ce chapitre rassemble ce qui ressort de l'ensemble : les tendances, les écarts qui comptent, et ce qui distingue un signal d'un bruit de mesure.</p>
         <p>à compléter par le projet</p>
