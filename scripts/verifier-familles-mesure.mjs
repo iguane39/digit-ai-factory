@@ -49,8 +49,29 @@ const NON_JUGE = [
   "les familles produites AILLEURS que par la mesure du socle : ce contrôle a UNE source de production déclarée, il ne découvre pas les autres",
   "la JUSTESSE de la lecture : qu'un consommateur mentionne une famille ne prouve pas qu'il en fait quelque chose d'utile — seul le fait qu'il la NOMME est vérifié",
   "les consommateurs hors de la liste écrite ci-dessous : un appelant neuf reste invisible tant qu'il n'y figure pas, et c'est le prix d'une liste écrite plutôt que devinée",
-  "la SÉVÉRITÉ que chaque consommateur donne à une famille : lire une famille bloquante comme un simple avertissement est une dérive que ce contrôle ne voit pas (elle a été payée le 23/08 chez forge-design)",
+  "la SÉVÉRITÉ appliquée À L'EXÉCUTION par un consommateur qui lit la table publiée : F4 juge la sévérité ÉCRITE dans une copie locale (désaccord non déclaré = échec, rabaissement déclaré `rabaissement-assume : <motif>` = avertissement, TF-1091), jamais ce que le code en fait ensuite",
 ];
+
+/**
+ * F4 (TF-1091, 14/09/2026) — les poids d'une copie locale confrontés à ceux du socle. Un
+ * désaccord est un ÉCHEC, sauf s'il est un RABAISSEMENT DÉCLARÉ sur sa ligne
+ * (`rabaissement-assume : <motif d'au moins dix caractères>`) : il devient alors un
+ * avertissement nommé. Le 23/08, deux familles bloquantes étaient lues comme avertissements chez
+ * forge-design, et rien ne le disait ; un rabaissement peut être légitime, il ne peut pas être muet.
+ */
+export function desaccordsSeverite(source, publiee) {
+  const desaccords = [], declares = [];
+  for (const [cle, v] of Object.entries(publiee || {})) {
+    const m = new RegExp(`${cle}[^\\n]{0,80}?(bloquant|avertissement|BLOQUANT)[^\\n]*`).exec(source);
+    if (!m) continue;
+    const lu = /bloquant/i.test(m[1]) ? "bloquant" : "avertissement";
+    if (lu === v.severite) continue;
+    const decl = /rabaissement-assume\s*:\s*(\S.{9,})/.exec(m[0]);
+    if (decl && v.severite === "bloquant" && lu === "avertissement") declares.push(`${cle} : socle « ${v.severite} », local « ${lu} » — déclaré : ${decl[1].trim().slice(0, 80)}`);
+    else desaccords.push(`${cle} : socle « ${v.severite} », local « ${lu} »`);
+  }
+  return { desaccords, declares };
+}
 
 /** La SOURCE de production. Deux endroits, et le premier passage sur le parc a imposé le second :
  *  le littéral `issues = { … }` de la mesure, ET les familles ajoutées APRÈS coup côté Python
@@ -128,6 +149,20 @@ if (args.includes("--self-test")) {
   att("une famille nommée et NON produite n'apparaît pas comme lue (branche morte)",
     !mort.nommees.includes("v9_disparue"));
 
+  // F4 (TF-1091) · la sévérité d'une copie locale, dans les deux sens, et le rabaissement DÉCLARÉ.
+  const socle = { v1_overflow: { severite: "bloquant" }, v2_contrast: { severite: "bloquant" } };
+  const muet = desaccordsSeverite('const P = { v1_overflow: "avertissement", v2_contrast: "bloquant" };', socle);
+  att("F4 rouge — une famille bloquante lue comme avertissement, sans déclaration : désaccord",
+    muet.desaccords.length === 1 && /v1_overflow/.test(muet.desaccords[0]) && !muet.declares.length);
+  const assume = desaccordsSeverite('const P = { v1_overflow: "avertissement", // rabaissement-assume : page de démonstration, jamais servie\n v2_contrast: "bloquant" };', socle);
+  att("F4 vert — le même rabaissement DÉCLARÉ avec son motif sur sa ligne : avertissement nommé, pas un échec",
+    !assume.desaccords.length && assume.declares.length === 1 && /démonstration/.test(assume.declares[0]));
+  const court = desaccordsSeverite('const P = { v1_overflow: "avertissement" // rabaissement-assume : x\n };', socle);
+  att("F4 borne — un motif de moins de dix caractères ne déclare rien : le désaccord reste un échec",
+    court.desaccords.length === 1);
+  const accord = desaccordsSeverite('const P = { v1_overflow: "bloquant", v2_contrast: "BLOQUANT" };', socle);
+  att("F4 vert — les poids d'accord avec le socle : rien à dire", !accord.desaccords.length && !accord.declares.length);
+
   console.log(`\nRecette familles-mesure : ${pass}/${pass + echecs.length} cas`);
   process.exit(echecs.length ? 1 : 0);
 }
@@ -198,12 +233,10 @@ if (publiee) {
     if (!existsSync(chemin)) continue;
     const source = readFileSync(chemin, "utf8");
     if (/--familles|familles-mesure@1/.test(source)) continue;   // pas de copie : rien à confronter
-    const desaccords = [];
-    for (const [cle, v] of Object.entries(publiee)) {
-      const m = new RegExp(`${cle}[^\\n]{0,80}?(bloquant|avertissement|BLOQUANT)`).exec(source);
-      if (!m) continue;
-      const lu = /bloquant/i.test(m[1]) ? "bloquant" : "avertissement";
-      if (lu !== v.severite) desaccords.push(`${cle} : socle « ${v.severite} », local « ${lu} »`);
+    const { desaccords, declares } = desaccordsSeverite(source, publiee);
+    if (declares.length) {
+      av("F4", rel, `${quoi} : ${declares.length} RABAISSEMENT(S) DÉCLARÉ(S) — ${declares.join(" ; ")}. ` +
+        "Un constat bloquant lu comme un avertissement, assumé et motivé sur sa ligne (TF-1091)");
     }
     if (desaccords.length) {
       ko("F4", rel, `${quoi} : ${desaccords.length} poids en DÉSACCORD avec le socle — ` +
