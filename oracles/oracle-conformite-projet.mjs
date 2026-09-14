@@ -1138,6 +1138,31 @@ const FICHIERS_DP = ["TECHNOS.md", "COMPOSANTS-OPS.md", "PARAMETRAGE.md", "ACCES
 const PROJECTIONS_DP = ["ARCHITECTURE.html", "MODELE-DONNEES.html"]; // vues générées, jamais saisies (scripts du pilot)
 if (!existsSync(dp)) ko("R-20", "docs\\projet\\", "dossier absent — socle documentaire du produit (TECHNOS, COMPOSANTS-OPS, PARAMETRAGE, ACCES-TEST, COMMANDES)");
 else {
+  // R-20 ter (TF-0985, 14/09/2026) — un tableau de RÉFÉRENCE indexé par environnement est
+  // AUTOSUFFISANT : aucune cellule ne renvoie ailleurs sans valeur résolue. Mesuré sur les
+  // `docs\projet\` du parc (105 fichiers) : 13 tableaux à en-tête d'environnement, 4 porteurs d'un
+  // renvoi chez 2 produits, dont le tableau de paramétrage du cas fondateur (cinq « idem », deux
+  // « défaut du code »). AVERTISSEMENT en PASS, et c'est une décision : cet oracle garde l'ouverture
+  // de tout run, et une règle neuve se durcit sur un corpus lu, pas sur sa première mesure.
+  {
+    const ENV_ENTETE = /\b(dev|développement|developpement|qualif|qualification|recette|préprod|preprod|prod|production|staging|uat)\b/i;
+    const RENVOI = /voir ci-dessus|voir plus haut|cf\.? plus haut|\bidem\b|défaut du code|defaut du code/i;
+    const renvois = [];
+    for (const f of FICHIERS_DP) {
+      const fp = join(dp, f);
+      if (!existsSync(fp)) continue;
+      const L = readFileSync(fp, "utf8").split(/\r?\n/);
+      for (let i = 0; i < L.length; i++) {
+        if (!/^\s*\|/.test(L[i]) || !/^\s*\|[\s:|-]+\|\s*$/.test(L[i + 1] || "") || !ENV_ENTETE.test(L[i])) continue;
+        let n = 0;
+        for (let k = i + 2; k < L.length && /^\s*\|/.test(L[k]); k++) n += L[k].split("|").filter((c) => RENVOI.test(c)).length;
+        if (n) renvois.push(`${f}:${i + 1} (${n} cellule(s))`);
+      }
+    }
+    ok("R-20 ter", "docs\\projet\\", renvois.length
+      ? `AVERTISSEMENT, non bloquant : ${renvois.length} tableau(x) indexé(s) par environnement renvoient ailleurs au lieu de porter la valeur (« idem », « voir ci-dessus », « défaut du code ») — ${renvois.join(", ")} ; un tel tableau porte TOUT ce qui sert à l'action, y compris ce qui ne varie pas (R-20 ter, TF-0985)`
+      : "les tableaux indexés par environnement portent leurs valeurs, sans renvoi (R-20 ter)");
+  }
   let ok20 = true;
   for (const f of FICHIERS_DP) {
     const fp = join(dp, f);

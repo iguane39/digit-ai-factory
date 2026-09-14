@@ -1234,6 +1234,23 @@ doit etre livree comme un fichier*, jamais comme une phrase dans un document de 
 qui n'a nulle part ou s'appliquer ne se viole pas — elle ne s'applique simplement jamais, et
 personne ne le voit.
 
+## AG bis. R-20 ter — un tableau de RÉFÉRENCE indexé par environnement est AUTOSUFFISANT (TF-0985 — 14/09)
+
+Fait du 08/09, sur le document de paramétrage d'un produit (l'un des huit fichiers de
+`docs\projet\` que R-20 prescrit) : quatre tableaux pour un seul appel — la requête, les
+en-têtes, le jeton, puis « ce qui est servi par environnement », ce dernier ne portant QUE le
+delta entre deux environnements. Chaque élément était exact et sourcé ; aucun tableau ne
+permettait d'émettre la requête. Le lecteur arrive par SON environnement, jamais par le début :
+« Comment je peux faire si je n'ai pas les infos les plus importantes ? ».
+
+**R-20 ter.** Un tableau indexé par environnement, par tenant ou par instance porte TOUT ce qui
+est nécessaire à l'action dans cet environnement, y compris ce qui ne varie pas. La
+factorisation reste admise pour l'EXPLICATION (un paragraphe qui dit ce qui est commun), jamais
+pour le tableau dont on se sert. Aucune cellule d'un tel tableau ne renvoie ailleurs sans valeur
+résolue (« voir ci-dessus », « idem », « défaut du code »). Le coût est asymétrique : la
+duplication coûte quelques lignes à l'auteur une fois, l'absence coûte un aller-retour au lecteur
+à chaque consultation.
+
 ## AH. R-54 — un ECART ne se DECLARE qu'apres deux questions, et un patron paye entre au referentiel (TF-0740 — 02/09)
 
 **Le fait, et il vient d'un produit (lot `Produit-02 - RETOURS - 20260901a`, ledger produit

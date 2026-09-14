@@ -620,6 +620,26 @@ check("verte : toute variable sans valeur porte son marqueur → R-15 PASS (TF-1
   if (!f || f.statut !== "PASS") throw new Error(`R-15 attendu PASS sur la fixture verte : ${JSON.stringify(f)}`);
 });
 
+// ---- R-20 ter (TF-0985) : un tableau indexé par environnement ne renvoie pas ailleurs ----
+// Rouge : le cas fondateur en miniature (« idem », « défaut du code ») → avertissement nommé.
+// Vert : le même tableau, chaque cellule portant sa valeur → rien à dire.
+const tableauEnv = (cellQualif, cellDefaut) => "---\nrole: x\nsources_de_verite: [x]\nverifie_le: 2026-09-14\n---\n# Paramétrage\n\n" +
+  `| | dev | qualif |\n|---|---|---|\n| URL de base | https://api-dev.exemple.test | ${cellQualif} |\n| Délai | 30 s | ${cellDefaut} |\n`;
+for (const [nom, q, d, attenduAvert] of [["rouge", "idem", "absente → défaut du code", true], ["verte", "https://api-qualif.exemple.test", "30 s", false]]) {
+  const dir = mkdtempSync(join(tmpdir(), `conf-r20ter-${nom}-`));
+  mkdirSync(join(dir, "docs", "projet"), { recursive: true });
+  writeFileSync(join(dir, "docs", "projet", "PARAMETRAGE.md"), tableauEnv(q, d));
+  check(`${nom}-r20ter : tableau indexé par environnement ${attenduAvert ? "avec renvois → AVERTISSEMENT nommé" : "autosuffisant → rien à dire"} (TF-0985)`, () => {
+    try {
+      const { rapport } = lance(dir);
+      const f = rapport.findings.find((x) => x.regle === "R-20 ter");
+      if (!f || f.statut !== "PASS") throw new Error(`R-20 ter attendu PASS (non bloquant) : ${JSON.stringify(f)}`);
+      if (attenduAvert && !(/AVERTISSEMENT/.test(f.message) && /PARAMETRAGE\.md:8 \(2 cellule/.test(f.message))) throw new Error(`le renvoi n'est pas nommé avec sa ligne : ${f.message}`);
+      if (!attenduAvert && /AVERTISSEMENT/.test(f.message)) throw new Error(`un tableau autosuffisant est accusé : ${f.message}`);
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+}
+
 // ---- fixture ROUGE-LOCK (TF-0128) : reproduit le cas réel Produit-11 — des versions SONT
 // déclarées dans TECHNOS.md mais aucune source ne les confronte : ni dans les 2 niveaux de
 // descente autorisés (un décoy à 3 niveaux, hors périmètre, ne compte pas), ni dans un
