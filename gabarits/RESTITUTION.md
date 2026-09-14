@@ -159,7 +159,14 @@ Sur une ligne ou deux, toujours les mêmes champs :
 - **quoi** — la nature du traitement (run, campagne, mandat, audit, recette) ;
 - **sur quoi** — le produit ou la forge, nommé ;
 - **quand** — **date ET heure de fin, avec le fuseau**, plus la **durée** du traitement ;
-- **qui** — l'agent ou la forge, avec sa version ou son commit.
+- **qui** — l'agent ou la forge, avec sa version ou son commit ;
+- **intention** — l'intention initiale de la demande, en une phrase, suivie du **test rétro** :
+  le résultat répond-il à cette intention, et pas seulement à la lettre de la consigne ? Doctrine :
+  `references\INTENTION.md` (loi transverse n° 7). Un écart s'écrit au bloc 6.
+
+*Pourquoi l'intention* (TF-0791) : une étude conforme à sa définition et verte à ses contrôles a
+été refusée par son destinataire le 01/09, sept questions de son retour restant sans réponse. La
+règle mordait sur les seules études d'opportunité ; le retour demandait « tous types de demande ».
 
 *Pourquoi l'heure* : plusieurs traitements tombent le même jour — le 14/08 en a vu quatre pour
 un seul produit. Sans heure, deux synthèses du même jour ne s'ordonnent pas, et « le dernier
