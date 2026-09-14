@@ -73,6 +73,10 @@
        sinon les replis système des tokens --head/--sans/--mono prennent le relais. -->
 
   <style>
+    /* TF-1037 (14/09/2026) — le plafond suit le nombre de colonnes : un tableau de sept colonnes
+       ou plus élargit le conteneur. Au plafond de 1 680 px, huit colonnes dont quatre de prose
+       rendaient des cellules de trois lignes pour quinze mots (retour humain du 11/09). */
+    :root:has(table th:nth-child(7)) { --w: clamp(85vw, 2100px, 96vw); }
     :root {
       /* Couleurs — marque & surfaces */
       --blue: #2563EB;
