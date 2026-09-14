@@ -24,7 +24,11 @@ consignation.
 **Deux sessions, un seul compteur : ce qui est couvert et ce qui ne l'est pas** (TF-0394 puis
 TF-0481). Le préflight de `ingerer-lot.mjs` fait `git fetch` puis compare `HEAD..origin/main`
 sur les deux registres, et REFUSE l'ingestion si le distant a avancé — sinon les ids séquentiels
-repartiraient du mauvais maximum. C'est juste, et ça reste.
+repartiraient du mauvais maximum. C'est juste, et ça reste. **Depuis TF-1003 (14/09/2026), il juge
+ce qu'il protège** : un distant « en avance » en commits ne refuse que s'il porte une CRÉATION
+absente d'ici, ou frappée ailleurs sous le même id (autre `ts` de frappe). Deux histoires DIVERGENTES
+au même registre — la signature d'une réécriture non encore republiée — ingèrent, et le message
+nomme la divergence sans jamais proposer `git pull --rebase` (« à recloner, pas à fusionner »).
 
 Mais c'est un **check-then-act** : il regarde AVANT d'écrire. Il ne peut rien contre la fenêtre
 qui s'ouvre PENDANT l'ingestion — deux sessions qui frappent les mêmes numéros avant que l'une

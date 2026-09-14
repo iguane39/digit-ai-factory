@@ -17,7 +17,7 @@
 import { readFileSync, appendFileSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
-import { dirname, isAbsolute, join, resolve } from "node:path";
+import { basename, dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 // TF-0597 (24/08) — LES RÈGLES DE FORME NE VIVENT PLUS ICI. Elles vivent dans
 // `gabarits\oracle-lot-retours.mjs`, que ce fichier IMPORTE et que l'héritage fait voyager
@@ -141,8 +141,35 @@ if (!process.argv.includes("--sans-fetch")) {
       execFileSync("git", ["-C", todoDir, "fetch", "--quiet", "origin"], { stdio: "ignore", timeout: 20000 });
       const enRetard = Number(git(["rev-list", "--count", "HEAD..origin/main", "--", "TODO.jsonl", "TODO-ARCHIVE.jsonl"]));
       if (enRetard > 0) {
-        console.error(`[REFUS PRÉFLIGHT TF-0394] le registre distant a avancé : ${enRetard} commit(s) touchant TODO.jsonl/TODO-ARCHIVE.jsonl absents du local — les ids séquentiels repartiraient du mauvais max. git pull --rebase, puis ré-ingérer. (--sans-fetch pour assumer explicitement le hors-ligne)`);
-        process.exit(1);
+        // TF-1003 (09/09/2026) — LE PRÉFLIGHT JUGE CE QU'IL PROTÈGE, PAS UN COMPTE DE COMMITS.
+        // Mesuré ce jour-là : 526 commits distants absents du local ET 527 locaux absents du
+        // distant — deux histoires DIVERGENTES (réécriture d'histoire, TF-0752), portant le même
+        // registre. Le refus était définitif tant que la republication (geste humain) n'était pas
+        // faite, son remède `git pull --rebase` est celui que le mode opératoire de réécriture
+        // interdit, et la seule issue faisait déclarer un hors-ligne faux. L'invariant réel : aucune
+        // CRÉATION du distant ne manque ici, ni ne porte ici un autre horodatage de frappe (même id,
+        // autre item — la collision de TF-0394). Le `ts` d'une création est stampé à l'ingestion :
+        // une réécriture de textes ne le touche pas, un item frappé ailleurs en porte un autre.
+        const creationsDe = (texte) => new Map(String(texte || "").split("\n").filter((l) => l.trim())
+          .map((l) => { try { return JSON.parse(l); } catch { return null; } })
+          .filter((ev) => ev && ev.ev === "creation" && ev.id).map((ev) => [ev.id, String(ev.ts || "")]));
+        const auDistant = (f) => { try { return git(["show", `origin/main:./${f}`]); } catch { return ""; } };
+        const ici = (f) => (existsSync(join(todoDir, f)) ? readFileSync(join(todoDir, f), "utf8") : "");
+        const distant = new Map([...creationsDe(auDistant("TODO.jsonl")), ...creationsDe(auDistant("TODO-ARCHIVE.jsonl"))]);
+        const local = new Map([...creationsDe(ici(basename(registre))), ...creationsDe(ici("TODO-ARCHIVE.jsonl"))]);
+        const inconnus = [...distant].filter(([id, ts]) => !local.has(id) || local.get(id) !== ts).map(([id]) => id);
+        const diverge = Number(git(["rev-list", "--count", "origin/main..HEAD"])) > 0;
+        const lectureDivergence = "histoires DIVERGENTES (chacune porte des commits que l'autre n'a pas — signature d'une réécriture d'histoire) : "
+          + "ne JAMAIS `git pull --rebase` ici, le mode opératoire de réécriture le proscrit (references/TODO-FORGE.md, TF-0752 : « à recloner, pas à fusionner ») ; "
+          + "la republication est un geste humain (R-38)";
+        if (inconnus.length) {
+          console.error(`[REFUS PRÉFLIGHT TF-0394] le registre distant porte ${inconnus.length} création(s) absente(s) d'ici ou frappée(s) ailleurs sous le même id (${inconnus.slice(0, 5).join(", ")}${inconnus.length > 5 ? ", …" : ""}) — les ids séquentiels repartiraient du mauvais max. `
+            + (diverge ? `${lectureDivergence} ; rapatrier ces créations avant d'ingérer.` : "git pull --rebase, puis ré-ingérer.")
+            + " (--sans-fetch pour assumer explicitement le hors-ligne)");
+          process.exit(1);
+        }
+        console.error(`[préflight TF-0394/TF-1003] ${enRetard} commit(s) distant(s) touchent le registre, mais leurs ${distant.size} création(s) sont toutes ici, frappées à l'identique — aucun id ne peut entrer en collision, ingestion poursuivie`
+          + (diverge ? `. ${lectureDivergence}` : ""));
       }
     } catch {
       console.error("[préflight TF-0394] fetch/comparaison origin impossible (hors ligne ? remote absent ?) — unicité inter-sessions NON vérifiée, ingestion locale assumée");
