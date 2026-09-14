@@ -187,6 +187,35 @@ try {
     att(/DÉJÀ DÉPOSÉ/.test(r2.stdout), "le second passage ne DIT pas qu'il n'a rien redéposé");
   });
 
+  // ── TF-1083 — UNE CORRECTION DE RÉDACTION SE LIVRE SUR DEMANDE, JAMAIS D'OFFICE. On simule un lot
+  // déposé avant la règle (sans empreinte de rédaction) : le passage ordinaire ne redépose rien
+  // mais DIT que la forme diffère ; `--corriger-redaction` livre un lot correctif sous l'indice
+  // suivant, qui le déclare ; un second passage avec le drapeau ne redépose plus rien.
+  check("TF-1083 — une correction de RÉDACTION se livre sur demande, jamais d'office, et reste idempotente", () => {
+    const faux = join(T, "parc-redaction");
+    const produit = join(faux, "_Client", "produit-recette");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    const lancer = (...a) => spawnSync(process.execPath, [join(ICI, "emettre-travaux.mjs"), "--tous", ...a],
+      { encoding: "utf8", env: { ...process.env, FORGE_ROOT: faux } });
+    lancer();
+    const boite = join(produit, "input", "00-travaux");
+    const lots = () => readdirSync(boite).filter((f) => f.endsWith(".md"));
+    const premier = lots()[0];
+    att(premier && /Empreinte de la rédaction/.test(readFileSync(join(boite, premier), "utf8")), "le lot déposé ne porte pas son empreinte de rédaction");
+    const chemin = join(boite, premier);
+    writeFileSync(chemin, readFileSync(chemin, "utf8").replace(/^- \*\*Empreinte de la rédaction\*\*[^\n]*\n/m, ""), "utf8");
+    const r2 = lancer();
+    att(lots().length === 1, "une rédaction différente a été redéposée d'office — le canal rabâcherait");
+    att(/RÉDACTION diffère/.test(r2.stdout) && /--corriger-redaction/.test(r2.stdout), "la différence de rédaction n'est pas dite, ni son geste");
+    lancer("--corriger-redaction");
+    att(lots().length === 2, `${lots().length} lot(s) après la correction, 2 attendus`);
+    const neuf = lots().find((f) => f !== premier);
+    att(/Correction de RÉDACTION/.test(readFileSync(join(boite, neuf), "utf8")), "le lot correctif ne dit pas qu'il corrige la rédaction");
+    att(readFileSync(chemin, "utf8").includes("a_traiter"), "l'ancien lot a été touché");
+    lancer("--corriger-redaction");
+    att(lots().length === 2, "la correction n'est pas idempotente");
+  });
+
   // ── TF-0680 — L'INCLUSION, ET SA BORNE. Deux sens, parce que la borne compte autant que la
   // règle : un lot dont les éléments sont TOUS déjà dans un lot NON TRAITÉ n'apporte rien et ne
   // se dépose pas ; le même, face à un lot DÉJÀ TRAITÉ, doit repartir — sans quoi un constat
