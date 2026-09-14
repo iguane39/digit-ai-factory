@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 281 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 283 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -401,6 +401,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | pilot - TRAVAUX - 20260912b.tf.jsonl | — | 1.5 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260912b.tf.jsonl` |
 | pilot - TRAVAUX - 20260912c.md | 20260912c | 7.7 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260912c.md` |
 | pilot - TRAVAUX - 20260912c.tf.jsonl | — | 1.4 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260912c.tf.jsonl` |
+| pilot - TRAVAUX - 20260914a.md | 20260914a | 12.9 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260914a.md` |
+| pilot - TRAVAUX - 20260914a.tf.jsonl | — | 2.2 Ko | `06-travaux-confies/pilot - TRAVAUX - 20260914a.tf.jsonl` |
 
 *Un livrable présent et absent de ce tableau est un défaut : cet index est régénéré, et un
 index qui a dérivé de son dossier ne sert plus qu'à donner confiance à tort.*
