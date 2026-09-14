@@ -132,8 +132,9 @@
 // d'environnement (TF-0648).
 import {
   existsSync, readFileSync, readdirSync, statSync, mkdirSync, copyFileSync, writeFileSync,
-  mkdtempSync, renameSync, rmSync,
+  mkdtempSync, renameSync, rmSync, appendFileSync, utimesSync,
 } from "node:fs";
+import { createHash } from "node:crypto";
 import { basename, dirname, join, resolve, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir, tmpdir } from "node:os";
@@ -346,11 +347,50 @@ function decrireEcart({ manquants, divergents, orphelins }) {
   };
 }
 
-function copier(src, dst) {
+// ---- TF-1012 (10/09/2026) · UN ÉCRASEMENT LAISSE UNE TRACE, ET SA DATE NE PROUVE RIEN --------
+// Le 10/09, une copie installée portait six lignes de plus que sa source ; une propagation l'a
+// écrasée sans trace, et la date du fichier ÉCRASÉ était celle de la SOURCE — `copyFileSync` passe
+// par CopyFileW sur ce poste, qui copie l'horodatage de dernière écriture. Un lecteur a conclu
+// « rien n'a bougé » d'une date qui disait l'inverse. Donc : chaque écrasement réel est JOURNALISÉ
+// (chemin, empreinte d'avant, empreinte d'après, heure réelle du geste) dans un journal HORS du
+// dépôt, et une copie dont l'empreinte a changé depuis sa dernière propagation journalisée est
+// relevée (K11) — sans consulter aucune date — et jamais écrasée.
+const empreinte = (p) => createHash("sha256").update(readFileSync(p)).digest("hex");
+const cleJournal = (p) => resolve(p).toLowerCase();
+function journalPropagation(installes) {
+  return process.env.FORGE_JOURNAL_PROPAGATION || join(dirname(installes), "propagations-skills.jsonl");
+}
+/** La dernière entrée journalisée de chaque cible. */
+function lireJournal(journal) {
+  const derniers = new Map();
+  if (!existsSync(journal)) return derniers;
+  for (const l of readFileSync(journal, "utf8").split("\n")) {
+    try { const e = JSON.parse(l); if (e && e.cible) derniers.set(cleJournal(e.cible), e); } catch { /* ligne illisible ignorée */ }
+  }
+  return derniers;
+}
+/** La copie a-t-elle changé depuis ce que la dernière propagation y a posé ? (null si jamais journalisée) */
+function modifieeDepuisPropagation(cible, derniers) {
+  const e = derniers.get(cleJournal(cible));
+  if (!e || !e.sha_apres || !existsSync(cible)) return null;
+  return empreinte(cible) !== e.sha_apres ? e : null;
+}
+/** Écrase (ou pose) une cible depuis sa source, et le JOURNALISE. Ne fait rien si le contenu est déjà là. */
+function ecraser(srcFichier, cible, trace) {
+  if (existsSync(cible) && memeContenu(srcFichier, cible)) return false;
+  const avant = existsSync(cible) ? empreinte(cible) : null;
+  mkdirSync(dirname(cible), { recursive: true });
+  copyFileSync(srcFichier, cible);
+  const e = { ts: new Date().toISOString(), contexte: trace.contexte, cible, source: srcFichier, sha_avant: avant, sha_apres: empreinte(cible) };
+  try { appendFileSync(trace.journal, JSON.stringify(e) + "\n", "utf8"); } catch { /* un journal injoignable ne bloque pas la propagation */ }
+  trace.derniers.set(cleJournal(cible), e);
+  return true;
+}
+
+function copier(src, dst, trace, epargner = new Set()) {
   for (const f of fichiers(src)) {
-    const cible = join(dst, f);
-    mkdirSync(dirname(cible), { recursive: true });
-    copyFileSync(join(src, f), cible);
+    if (epargner.has(f)) continue;
+    ecraser(join(src, f), join(dst, f), trace);
   }
 }
 
@@ -385,7 +425,7 @@ function purgerOrphelins(dst, nom, orphelins, racineQuarantaine, horodatage) {
  *  skill, c'est peut-être le hook personnel de l'humain. On ne déplace pas ce qu'on ne juge pas.
  *  Écrit dans `findings` et `applique` du jugement principal.
  */
-function jugerHooks(racine, installes, appliquer, findings, applique) {
+function jugerHooks(racine, installes, appliquer, findings, applique, trace = { journal: journalPropagation(installes), derniers: new Map(), contexte: "hook" }) {
   const par_nom = sourcesHooks(racine);
   const poses = existsSync(installes) ? fichiers(installes) : [];
   const set_poses = new Set(poses);
@@ -410,8 +450,7 @@ function jugerHooks(racine, installes, appliquer, findings, applique) {
     }
     if (!set_poses.has(rel)) {
       if (appliquer) {
-        mkdirSync(dirname(dst), { recursive: true });
-        copyFileSync(src, dst);
+        ecraser(src, dst, { ...trace, contexte: `hook ${rel}` });
         applique.push(`hook ${rel} (installé)`);
         continue;
       }
@@ -431,7 +470,7 @@ function jugerHooks(racine, installes, appliquer, findings, applique) {
       });
       continue;
     }
-    if (appliquer) { copyFileSync(src, dst); applique.push(`hook ${rel} (remis à niveau)`); continue; }
+    if (appliquer) { ecraser(src, dst, { ...trace, contexte: `hook ${rel}` }); applique.push(`hook ${rel} (remis à niveau)`); continue; }
     echec = true;
     findings.push({
       regle: "K6", statut: "FAIL", ou: rel,
@@ -772,6 +811,8 @@ function juger(racine, installes, appliquer = false, purger = false,
   const purge = [];
   const racineQuarantaine = join(installes, ".quarantaine");
   const horodatage = horodatageQuarantaine();
+  const journal = journalPropagation(installes);
+  const trace = { journal, derniers: lireJournal(journal), contexte: "skill" };
 
   // K9 · le relevé, avant tout jugement : il décrit le parc, il n'en juge rien.
   relevePreambule(par_nom, findings);
@@ -793,7 +834,7 @@ function juger(racine, installes, appliquer = false, purger = false,
     const src = chemins[0];
     const dst = join(installes, nom);
     if (!existsSync(dst)) {
-      if (appliquer) { copier(src, dst); applique.push(`${nom} (installé)`); continue; }
+      if (appliquer) { copier(src, dst, { ...trace, contexte: `skill ${nom}` }); applique.push(`${nom} (installé)`); continue; }
       findings.push({
         regle: "K1", statut: "FAIL", ou: nom,
         message: `versionné dans ${relative(racine, src)} mais JAMAIS installé — la session ne peut pas l'invoquer (\`--appliquer\` pour l'installer)`,
@@ -826,7 +867,18 @@ function juger(racine, installes, appliquer = false, purger = false,
         });
         continue;
       }
-      if (appliquer) { copier(src, dst); applique.push(`${nom} (${diff.total} fichier(s) remis à niveau)`); continue; }
+      // K11 (TF-1012) — une copie installée modifiée APRÈS sa dernière propagation journalisée porte
+      // un travail que la source n'a pas : elle est relevée, et `--appliquer` ne l'écrase pas.
+      const modifiees = divergents.filter((f) => modifieeDepuisPropagation(join(dst, f), trace.derniers));
+      if (modifiees.length) {
+        findings.push({
+          regle: "K11", statut: "FAIL", ou: nom,
+          message: `${modifiees.length} fichier(s) de la copie installée modifié(s) APRÈS sa dernière propagation (${modifiees.join(", ")}) — `
+            + `l'empreinte présente n'est plus celle que le journal ${journal} y a posée : la copie porte un travail que la source versionnée n'a pas, et \`--appliquer\` refuse de l'effacer. `
+            + "Reporter ce travail dans la source (ou le retirer), puis rejouer. Sa DATE ne le montre pas : sur ce poste, la copie préserve l'horodatage de la source (CopyFileW)",
+        });
+      }
+      if (appliquer) { copier(src, dst, { ...trace, contexte: `skill ${nom}` }, new Set(modifiees)); applique.push(`${nom} (${diff.total - modifiees.length} fichier(s) remis à niveau${modifiees.length ? `, ${modifiees.length} épargné(s) — K11` : ""})`); continue; }
       findings.push({
         regle: "K2", statut: "FAIL", ou: nom,
         message: `la copie installée DIVERGE de ${relative(racine, src)} sur ${diff.total} fichier(s) — ${diff.nature} : ${diff.liste} — c'est la copie qui s'exécute · diff calculé ${LIBELLE_EXCLUS}`,
@@ -835,7 +887,7 @@ function juger(racine, installes, appliquer = false, purger = false,
   }
 
   // K6 : les hooks, même contrat que les skills (TF-0290).
-  jugerHooks(racine, installesHooks, appliquer, findings, applique);
+  jugerHooks(racine, installesHooks, appliquer, findings, applique, { ...trace, contexte: "hook" });
   // K7 : leur CÂBLAGE — déclaré, jamais en échec (TF-0297). K8 y est adossé : le câblage installé
   // pointe-t-il un fichier qui existe (TF-0305) — même gouvernance déclarative.
   jugerCablage(racine, settingsInstalle, installesHooks, appliquer, findings);
@@ -850,6 +902,7 @@ function juger(racine, installes, appliquer = false, purger = false,
     ["K2", `chaque copie installée est identique à sa source (${LIBELLE_EXCLUS})`],
     ["K3", "aucun nom de skill revendiqué par deux forges"],
     ["K5", "aucune copie installée en avance sur sa source"],
+    ["K11", `aucune copie installée modifiée depuis sa dernière propagation journalisée (${journal})`],
   ]) if (!vues.has(regle)) findings.push({ regle, statut: "PASS", message });
   findings.push({
     regle: "K4", statut: "PASS",
@@ -997,6 +1050,35 @@ function selfTest() {
   const retrouve = existsSync(quarantaine)
     && readdirSync(quarantaine, { recursive: true }).some((f) => String(f).includes("package-lock.json"));
   cas.push(["      — les fichiers purgés sont retrouvables sous .quarantaine", retrouve]);
+
+  // K11 (TF-1012) — le cas du 10/09 : une copie installée ENRICHIE après sa propagation, dont la
+  // date ne dit rien (ramenée à celle d'avant). Rouge : relevée, et `--appliquer` l'épargne.
+  // Vert : une copie à jour ne dit rien. Le journal vit sous le parc temporaire, jamais au poste.
+  const journalTest = join(base, "propagations-skills.jsonl");
+  poser(join(src, "epsilon", "SKILL.md"), "# epsilon v1\n");
+  juger(racine, inst, true);
+  const cibleE = join(inst, "epsilon", "SKILL.md");
+  const lignesJ = existsSync(journalTest) ? readFileSync(journalTest, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)) : [];
+  const entreeE = lignesJ.filter((e) => cleJournal(e.cible) === cleJournal(cibleE)).pop();
+  cas.push(["K11   — la pose d'un fichier est JOURNALISÉE (cible, empreintes d'avant et d'après, heure réelle)",
+            !!entreeE && entreeE.sha_avant === null && /^[0-9a-f]{64}$/.test(entreeE.sha_apres || "") && !Number.isNaN(Date.parse(entreeE.ts))]);
+  const dateAvant = statSync(cibleE).mtime;
+  writeFileSync(cibleE, "# epsilon v1\nsix lignes ajoutées sur la copie installée\n");
+  utimesSync(cibleE, dateAvant, dateAvant);
+  poser(join(src, "epsilon", "SKILL.md"), "# epsilon v2\n");
+  r = juger(racine, inst);
+  cas.push(["K11   — copie modifiée APRÈS sa propagation : relevée, alors que sa date n'a pas bougé", echoue(r, "K11")]);
+  juger(racine, inst, true);
+  cas.push(["K11 bis— --appliquer n'efface PAS le travail porté par la copie installée",
+            readFileSync(cibleE, "utf8").includes("six lignes ajoutées")]);
+  poser(join(src, "zeta", "SKILL.md"), "# zeta\n");
+  juger(racine, inst, true);
+  r = juger(racine, inst);
+  cas.push(["K11   — copie à jour après propagation : aucun constat",
+            !r.findings.some((f) => f.regle === "K11" && f.statut === "FAIL" && f.ou === "zeta")]);
+  // Nettoyage : les cas suivants attendent un parc sans K11 en échec.
+  rmSync(join(src, "epsilon"), { recursive: true, force: true });
+  rmSync(join(inst, "epsilon"), { recursive: true, force: true });
 
   // K4 : un skill personnel est déclaré, jamais mis en échec.
   poser(join(inst, "perso", "SKILL.md"), "# perso\n");
