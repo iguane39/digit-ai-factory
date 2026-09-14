@@ -581,6 +581,35 @@ check("rouge R13 : classe hors référentiel → FAIL exit 1, règle nommée", (
   if (!/"regle": "R13",\s*"statut": "FAIL"/.test(r.sortie)) throw new Error("R13 absente des échecs");
 });
 
+// ── R14 (TF-0956, 14/09/2026) : un doublon STRICT se sort des mesures, ou il échoue ──
+// Le seuil est avancé au 01/09 pour la recette : un ts postérieur à l'heure d'exécution
+// tomberait sous R11, et la fixture échouerait pour une autre raison que celle qu'elle teste.
+const avantR14 = process.env.TODO_SEUIL_R14;
+process.env.TODO_SEUIL_R14 = "2026-09-01T00:00:00Z";
+const jumeau = (sur) => item({ id: "TF-9002", ts: "2026-09-10T10:00:00Z", date_demande: "2026-09-10", ...sur });
+const r14rouge = join(T, "R14-rouge.jsonl");
+writeFileSync(r14rouge, [item({ titre: "même titre", contenu: "même contenu" }), jumeau({ titre: "Même  titre", contenu: "même contenu" })].join("\n") + "\n", "utf8");
+check("rouge R14 : doublon strict (à la casse et aux espaces près) entré après le seuil, non écarté → FAIL, l'original nommé", () => {
+  const r = lance(r14rouge);
+  if (r === 0 || r.code !== 1) throw new Error(`exit ${r === 0 ? 0 : r.code} attendu 1`);
+  if (!/"regle": "R14"/.test(r.sortie) || !/TF-9001/.test(r.sortie)) throw new Error("R14 absente ou l'original n'est pas nommé");
+});
+const r14ecarte = join(T, "R14-ecarte.jsonl");
+writeFileSync(r14ecarte, [item({ titre: "même titre", contenu: "même contenu" }), jumeau({ titre: "même titre", contenu: "même contenu" }),
+  maj({ id: "TF-9002", ts: "2026-09-10T11:00:00Z", statut: "ecarte", motif_ecart: "doublon strict de TF-9001", decideur: "humain", date_decision: "2026-09-10" }),
+].join("\n") + "\n", "utf8");
+check("verte R14 : le même doublon ÉCARTÉ avec son motif → PASS (il ne compte plus comme item ouvert)", () => {
+  const r = lance(r14ecarte);
+  if (r !== 0) throw new Error(`exit ${r.code} : ${r.sortie.slice(0, 300)}`);
+});
+const r14anterieur = join(T, "R14-anterieur.jsonl");
+writeFileSync(r14anterieur, [item({ titre: "même titre", contenu: "même contenu" }), jumeau({ ts: "2026-08-20T10:00:00Z", date_demande: "2026-08-20", titre: "même titre", contenu: "même contenu" })].join("\n") + "\n", "utf8");
+check("borne R14 : un doublon créé AVANT le seuil n'est pas jugé, et il est COMPTÉ au non_juge", () => {
+  const sortie = execFileSync("node", [oracle, r14anterieur, join(T, "vide.jsonl")], { encoding: "utf8" });
+  if (!/R14 : 1 doublon\(s\) strict\(s\) créé\(s\) avant/.test(sortie)) throw new Error("l'antériorité n'est pas comptée — une dette qu'on cesse de juger doit rester visible");
+});
+if (avantR14 === undefined) delete process.env.TODO_SEUIL_R14; else process.env.TODO_SEUIL_R14 = avantR14;
+
 rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 console.log(`\nSelf-test TODO-FORGE : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

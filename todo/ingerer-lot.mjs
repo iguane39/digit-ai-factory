@@ -383,6 +383,32 @@ if (rectifications.length) {
   }
 }
 
+// ---- DOUBLON STRICT : REFUSÉ, jamais ingéré une seconde fois (TF-0956, 14/09/2026) ----------
+// Le 08/09, deux lots renommés par la pseudonymisation sont redevenus « jamais ingérés » pour la
+// boîte d'entrée, et ont été ingérés une seconde fois : six candidatures identiques mot pour mot
+// à six autres, entrées sans que rien ne bronche. Le rapprochement ci-dessous SIGNALE sans juger,
+// et c'est juste pour un recouvrement de mots ; un titre ET un contenu identiques (à la casse et
+// aux espaces près) ne sont pas une ressemblance, ce sont le même item.
+{
+  const norm = (s) => String(s || "").toLowerCase().replace(/\s+/g, " ").trim();
+  const connus = new Map();
+  for (const e of [...evenements, ...lireEv(archive)])
+    if (e.ev === "creation" && e.id) connus.set(`${norm(e.titre)} | ${norm(e.contenu)}`, e.id);
+  const motifsDoublon = [];
+  for (const [i, c] of candidatures.entries()) {
+    if (c.rectifie) continue;
+    const cle = `${norm(c.titre)} | ${norm(c.contenu)}`;
+    if (connus.has(cle)) motifsDoublon.push(`ligne ${i + 1} : titre ET contenu identiques à ${connus.get(cle)} — doublon strict`);
+    else connus.set(cle, `la ligne ${i + 1} du même lot`);
+  }
+  if (motifsDoublon.length) {
+    console.error(`[REJET ATOMIQUE] ${sidecarPath} — registre intact. Motifs :\n  - ${motifsDoublon.join("\n  - ")}\n`
+      + "  REMÈDE : un lot déjà ingéré sous un autre nom se RATTACHE (`node todo\\reempreinter-lot.mjs <sidecar> --par-rapprochement`),\n"
+      + "  il ne se réingère pas ; un item réellement nouveau se reformule (TF-0956).");
+    process.exit(1);
+  }
+}
+
 // ---- rapprochement contre le registre : SIGNALE, ne bloque JAMAIS (TF-0618) ---------------
 // Un produit remonte ce qu'il OBSERVE, et il n'a aucun moyen de savoir ce que le registre du pilot
 // contient : `TODO-PRODUIT.md` porte les items qui LE concernent, pas ceux que le pilot a corriges

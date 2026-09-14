@@ -86,6 +86,10 @@ function lire(fichier) {
 const SEUIL_R10 = "2026-08-09T00:00:00Z";
 const SEUIL_R7_ECART = "2026-08-13T00:00:00Z"; // naissance de TF-0157
 const SEUIL_R12_DESCENTE = "2026-09-02T14:00:00Z"; // TF-0757 : les clôtures antérieures restent de la prose, déclaré
+// R14 (TF-0956) : un DOUBLON STRICT (titre ET contenu identiques à une création antérieure) entré
+// après ce seuil sans être écarté ni marqué `doublon_de` est un FAIL. Mesuré au 14/09 : 11 groupes
+// de doublons stricts (dont les six du 08/09) existent avant lui — antériorité DÉCLARÉE et comptée.
+const SEUIL_R14 = process.env.TODO_SEUIL_R14 || "2026-09-14T12:00:00Z";
 // R13 : le référentiel de classes — surchargeable par --classes pour la recette.
 const iClasses = process.argv.indexOf("--classes");
 const CLASSES_PATH = iClasses > 0 ? process.argv[iClasses + 1] : join(ICI, "CLASSES.json");
@@ -191,7 +195,7 @@ function replier(evenements, ou) {
         recidivesVues++;
         avert("R13", e.id, `RÉCIDIVE de ${e.recidive_de.join(", ")} (classe « ${e.classe} ») — la descente n'a pas tenu chez « ${e.demandeur} » ; à lire au tableau de bord todo/RECIDIVES.md, jamais à effacer`);
       }
-      etats.set(e.id, { ...e, ts: tsEffectif });
+      etats.set(e.id, { ...e, ts: tsEffectif, ts_creation: tsEffectif });
     } else if (e.ev === "maj") {
       const etat = etats.get(e.id);
       if (!etat) { ko("R2", `${ou}:${e.ligne}`, `maj sans creation préalable pour ${e.id}`); continue; }
@@ -252,6 +256,22 @@ for (const id of etatsActifs.keys())
 for (const [id, e] of etatsArchive)
   if (e.statut !== "archive") ko("R8", id, `dans l'archive avec statut ${e.statut}`);
 
+// R14 (TF-0956, 14/09/2026) — UN DOUBLON STRICT NE COMPTE PAS COMME UN ITEM. Le 08/09, six
+// candidatures identiques mot pour mot à six autres sont entrées en une commande, et aucune règle
+// n'a bronché. Le statut `ecarte` (R5, R7 : motif obligatoire) existe pour les sortir des mesures ;
+// un doublon qui ne le porte pas, ni `doublon_de`, fausse chaque compte d'items ouverts.
+const normTexte = (s) => String(s || "").toLowerCase().replace(/\s+/g, " ").trim();
+const parEmpreinte = new Map();
+let r14Anterieurs = 0;
+for (const [id, e] of [...etatsActifs, ...etatsArchive].sort((a, b) => a[0].localeCompare(b[0]))) {
+  const cle = `${normTexte(e.titre)} | ${normTexte(e.contenu)}`;
+  const premier = parEmpreinte.get(cle);
+  if (!premier) { parEmpreinte.set(cle, id); continue; }
+  if (String(e.ts_creation || "") < SEUIL_R14) { r14Anterieurs++; continue; }
+  if (e.statut === "ecarte" || e.doublon_de) continue;
+  ko("R14", id, `titre ET contenu identiques à ${premier} — doublon strict entré sans être écarté : le passer en ecarte (motif_ecart, R7) ou le marquer doublon_de, sans quoi il compte comme un item ouvert de plus (TF-0956)`);
+}
+
 if (!findings.some((f) => f.statut === "FAIL")) {
   ok("R1-R11", `${etatsActifs.size} item(s) actif(s), ${etatsArchive.size} archivé(s) — registre intègre`
     + (notes.length ? ` ; ${notes.length} horodatage(s) RECTIFIÉ(s) par déclaration — ${notes.slice(0, 3).join(" · ")}${notes.length > 3 ? ` · … (${notes.length - 3} de plus, tous imprimés par --rectifications)` : ""}` : ""));
@@ -268,6 +288,7 @@ console.log(JSON.stringify({
   oracle: "oracle-todo", version: "1.3.0", verdict: echecs ? "FAIL" : "PASS", findings,
   non_juge: [
     `R13 : ${classesVues} création(s) classée(s), ${recidivesVues} récidive(s) marquée(s) — la récidive est AVERTISSANTE, elle mesure la descente et ne met jamais le registre en échec ; la JUSTESSE d'une classe déclarée par un producteur n'est pas jugée`,
+    `R14 : ${r14Anterieurs} doublon(s) strict(s) créé(s) avant ${SEUIL_R14} — antériorité déclarée, non jugés ; un doublon à la reformulation près (même défaut, autres mots) n'est pas un doublon strict et relève du rapprochement, qui signale sans juger`,
     "la pertinence des scores (gain/effort) est un jugement humain, pas une règle",
     "la véracité des gains_constates n'est pas vérifiée dans le monde — seule leur présence l'est",
     "R11 ne juge que l'AVANCE sur l'heure d'exécution : un ts en RETARD (antidaté) reste hors de portée, comme un ts faux mais plausible — seul l'impossible est refusé",
