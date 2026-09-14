@@ -23,7 +23,7 @@
  *
  * Joué par `oracles\self-tests.mjs` (I2).
  */
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -158,6 +158,32 @@ check("TF-0914 : le MÊME fichier, une fois COMMIS, entre dans l'index sans autr
   if (!t.includes(NOM_NON_SUIVI)) throw new Error("un fichier SUIVI reste absent de l'index — la règle a mordu trop large");
   if (/NON suivi\(s\) par git/.test(t)) throw new Error("le pied annonce encore un écart alors qu'il n'y en a plus");
 });
+
+// TF-1050 — UN LIVRABLE À STRUCTURE CLOSE NE REÇOIT AUCUN INDEX. Le cas du 11/09 en miniature :
+// une définition de modèle à trois niveaux. Marquée `.no-index`, elle ne reçoit rien et son
+// parent la compte pour un ; la même sans marqueur reçoit un README par niveau (le défaut).
+{
+  const B = mkdtempSync(join(tmpdir(), "readme-clos-"));
+  for (const d of ["clos", "ouvert"]) {
+    mkdirSync(join(B, "input", d, "definition", "tables"), { recursive: true });
+    writeFileSync(join(B, "input", d, "definition", "tables", "Dim Bien.tmdl"), "table\n", "utf8");
+  }
+  writeFileSync(join(B, "input", "clos", ".no-index"), "", "utf8");
+  spawnSync(process.execPath, [OUTIL, "--base", B, "--racines", "input"], { encoding: "utf8" });
+  check("TF-1050 vert — le dossier marqué `.no-index` ne reçoit AUCUN README, à aucun niveau", () => {
+    for (const d of ["clos", "clos/definition", "clos/definition/tables"])
+      if (existsSync(join(B, "input", d, "README.md"))) throw new Error(`un README est écrit dans le livrable à structure close : ${d}`);
+  });
+  check("TF-1050 — le parent le compte comme UN livrable à structure close", () => {
+    const t = readFileSync(join(B, "input", "README.md"), "utf8");
+    if (!/`clos\\` \| livrable à structure close \(1 fichier\)/.test(t)) throw new Error("le parent ne déclare pas le livrable clos comme une entrée unique");
+  });
+  check("TF-1050 rouge — le même dossier SANS marqueur reçoit un README par niveau (le défaut d'origine)", () => {
+    for (const d of ["ouvert", "ouvert/definition", "ouvert/definition/tables"])
+      if (!existsSync(join(B, "input", d, "README.md"))) throw new Error(`le témoin sans marqueur n'a pas son README en ${d} — la recette ne prouve plus rien`);
+  });
+  rmSync(B, { recursive: true, force: true });
+}
 
 rmSync(T, { recursive: true, force: true });
 console.log(`\nreadme-dossiers, table sans dates (TF-0503) : ${pass} PASS, ${fail} FAIL`);

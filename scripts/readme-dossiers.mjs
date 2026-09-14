@@ -91,6 +91,12 @@ const ROLES = {
 const EST_SIDECAR = (nom) => /\.(jugement|oracles|oracles-cache)\.json$/i.test(nom)
   || /\.oracles-historique\.jsonl$/i.test(nom);
 const EST_MACHINE = (nom) => nom.startsWith(".") || nom === "_oracles";
+// TF-1050 (14/09/2026) — UN LIVRABLE À STRUCTURE CLOSE NE REÇOIT AUCUN INDEX. Mesuré le 11/09 chez
+// un produit : un livrable au format imposé (projet Power BI : définition de modèle sémantique,
+// rapport) a reçu HUIT README, un par niveau, dont un dans la définition du modèle — étrangers au
+// format, et reproduits à chaque écriture. Le dossier le DÉCLARE par un fichier `.no-index` à sa
+// racine : le générateur n'y descend pas, et le parent le compte comme un livrable unique.
+const EST_CLOS = (dir) => existsSync(join(dir, ".no-index"));
 const posix = (p) => p.split(sep).join("/");
 const affiche = (p) => p.split("/").join("\\") + "\\";
 
@@ -194,7 +200,11 @@ function attendu(dir, rel) {
   let nf = 0, nd = 0;
   for (const e of entrees) {
     const chemin = join(dir, e.name), relE = rel + "/" + e.name;
-    if (e.isDirectory()) {
+    if (e.isDirectory() && EST_CLOS(chemin)) {
+      nd++;
+      const n = compter(chemin);
+      lignes.push(`| \`${e.name}\\\` | livrable à structure close (${n} fichier${n > 1 ? "s" : ""}) | — | structure imposée par son format, non indexée (marqueur \`.no-index\`, TF-1050) |`);
+    } else if (e.isDirectory()) {
       nd++;
       const n = compter(chemin);
       // Le rôle du sous-dossier (son README, sinon la table des rôles) : une ligne qui dit ce
@@ -232,7 +242,7 @@ function attendu(dir, rel) {
 function* dossiers(dir) {
   yield dir;
   for (const e of readdirSync(dir, { withFileTypes: true }))
-    if (e.isDirectory() && !EST_MACHINE(e.name)) yield* dossiers(join(dir, e.name));
+    if (e.isDirectory() && !EST_MACHINE(e.name) && !EST_CLOS(join(dir, e.name))) yield* dossiers(join(dir, e.name));
 }
 
 const defauts = [];
