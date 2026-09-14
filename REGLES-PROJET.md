@@ -668,6 +668,13 @@ verts, mutation 0,90).
    pour une page, un export réduit, un jeu anonymisé, un lot filtré. Preuve attendue de la
    recette : le livrable au périmètre exact (PASS) et le même plus un élément hors périmètre
    (FAIL).
+5. **Une chaîne d'authentification vers un service externe se prouve LÀ OÙ LE CODE TOURNE**
+   (TF-0964, 14/09/2026) — dans l'environnement cible, avec l'identité réelle (conteneur
+   déployé, exécution sur place), jamais au banc seul : un test qui remplace le client
+   d'authentification ne prouve pas la chaîne. Fait du 08/09 : 826 tests verts, une
+   fonctionnalité cassée au premier déploiement, trouvée par exécution dans le conteneur servi.
+   Corollaire : une leçon écrite en commentaire dans un module (« ce paramètre est EXIGÉ ici »)
+   se remonte en règle ou en contrôle du produit, sans quoi le module suivant la repaie.
 
 **Appelants (R-35)** : le pas de l'étape 5 (`ETAPES-RUN.md` — la boucle ne se clôt pas
 sur un solde non nul) et le contrat « prêt client » (traçabilité exigences→tests 100 %
