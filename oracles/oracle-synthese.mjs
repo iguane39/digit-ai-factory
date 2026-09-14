@@ -61,6 +61,9 @@
  *       GROUPE, la TRACE MESURÉE de la tentative — un code de réponse, un message d'erreur, une
  *       sortie de commande (TF-0526, 23/08/2026). S12 lit un jeton de vocabulaire ; elle ne peut
  *       pas voir la différence entre une impossibilité ÉPROUVÉE et une impossibilité SUPPOSÉE.
+ *       ASSIETTE (TF-0987, 14/09/2026) : S11, S12 et S21 lisent le motif là où il est DÉCLARÉ —
+ *       la colonne « Motif / raison » d'un tableau, le texte hors spans de code d'une puce qui
+ *       porte un motif en clair. Un nom de colonne cité ailleurs n'est plus un motif.
  *   S30 toute décision du bloc 3 porte un NUMÉRO, et les numéros sont DISTINCTS (28/08) — une
  *       décision se désigne pour se trancher. S4 compte des options et ne voit jamais que la
  *       QUESTION est insélectionnable ; le destinataire avait invente la numerotation avant de
@@ -589,6 +592,41 @@ function juger(texte, cheminJuge = null) {
   const groupes8 = actionsGroupees(bActions)
     .filter((g) => !MOTIFS_ABSENCE.test(g.replace(/^\s*[-*]\s+/, "").slice(0, 40)));
 
+  // ---- TF-0987 (14/09/2026) — L'ASSIETTE D'UN MOTIF : OÙ le vocabulaire fermé se cherche ------
+  //
+  // LE FAIT, mesuré deux fois de suite sur la même restitution d'un produit : une action dont le
+  // motif déclaré est `decision` disait comment faire — ouvrir le livrable et trier sur sa colonne
+  // `presence`, nom RÉEL d'une colonne de données. S21 cherchait son vocabulaire dans le groupe
+  // ENTIER : elle a lu le nom de la colonne comme un motif, compté 2 actions concernées au lieu de
+  // 1 et rendu FAIL — sur une ligne que sa propre portée écarte (`decision` n'est pas concerné).
+  // Le contournement a été de RENOMMER la colonne du livrable : un oracle de forme a dicté le
+  // schéma d'une donnée. La frontière de mot était là ; c'est le PÉRIMÈTRE de lecture qui manquait.
+  //
+  // DEUX LECTURES, dans cet ordre :
+  //   · en TABLEAU (la forme par défaut du bloc 8), le motif vit dans SA colonne — l'en-tête qui
+  //     nomme « motif » ou « raison ». Seule cette cellule est lue : les autres disent quoi faire et
+  //     comment, et un identifiant qu'elles citent n'est jamais une déclaration ;
+  //   · en PUCE, un span de code est une CITATION. MAIS le corpus écrit très souvent le motif
+  //     lui-même entre accents graves (224 occurrences dans 73 synthèses du pilot au 14/09) : les
+  //     retirer tous accuserait des actions justes. Les spans ne sont donc retirés QUE si le groupe
+  //     porte AUSSI un motif en clair — l'auteur a alors déclaré son motif hors code, et ce qui
+  //     reste entre accents graves cite autre chose.
+  // Vaut pour S11, S12 et S21, qui partagent le mécanisme.
+  const SANS_CODE = (s) => s.replace(/```[\s\S]*?```/g, " ").replace(/`[^`\n]*`/g, " ");
+  const VOCAB_MOTIF = new RegExp(`${MOTIFS_IA.source}|${MOTIFS_HUMAIN.source}`);
+  const COLONNE_MOTIF = /\b(motif|raison)\b/i;
+  const enteteActions = entetesDeTableau(bActions)[0] || "";
+  const cellules = (l) => l.trim().replace(/^\|/, "").replace(/\|\s*$/, "").split("|").map((c) => c.trim());
+  const assietteMotif = (g) => {
+    if (enteteActions && g.startsWith(enteteActions + " |")) {
+      const k = cellules(enteteActions).findIndex((h) => COLONNE_MOTIF.test(h));
+      const c = cellules(g.slice(enteteActions.length + 1));
+      if (k >= 0 && k < c.length) return c[k];
+    }
+    const clair = SANS_CODE(g);
+    return VOCAB_MOTIF.test(clair) ? clair : g;
+  };
+
   const juger8 = (regle, cible, predicat, siKo, siOk) => {
     const concernes = groupes8.filter((g) => cible.test(g));
     if (!concernes.length) return ok(regle, `aucune action concernée — ${siOk}`);
@@ -598,12 +636,12 @@ function juger(texte, cheminJuge = null) {
       : ok(regle, `${concernes.length} action(s) concernée(s) — ${siOk}`);
   };
 
-  juger8("S11", /\bauto_ia\b/, (g) => MOTIFS_IA.test(g),
+  juger8("S11", /\bauto_ia\b/, (g) => MOTIFS_IA.test(assietteMotif(g)),
     "une action `auto_ia` listée en RESTE sans motif de non-exécution : la voie automatisée est le défaut, " +
     "donc ce qui n'a pas été fait se justifie. Vocabulaire : gate_gouvernance, dependance_bloc_3, garde_fou, borne_atteinte, dependance_externe, hors_mandat.",
     "chaque action `auto_ia` non exécutée porte son motif");
 
-  juger8("S12", HUMAINS, (g) => MOTIFS_HUMAIN.test(g),
+  juger8("S12", HUMAINS, (g) => MOTIFS_HUMAIN.test(assietteMotif(g)),
     "une action laissée à l'humain sans raison d'impossibilité IA — loi transverse n° 5. " +
     "Vocabulaire : acces, decision, depense, presence, irreversible (non accentués).",
     "chaque action humaine porte sa raison d'impossibilité");
@@ -856,7 +894,9 @@ function juger(texte, cheminJuge = null) {
   const TRACE_CODE = /(HTTP\s*\d{3}|\b\d{3}\s+(?:Forbidden|Unauthorized|Denied|Conflict)\b|\bE[A-Z]{4,}\b|Authorization_\w+)/;
   const TRACE_MOT = uni(/(exit\s*\d|permission denied|access denied|\btent[ée]e?s?\b|\bessay[ée]e?s?\b|\brefus[ée]e?s?\b|\bmesur[ée]e?s?\b)/i);
   const TRACE_TENTATIVE = { test: (g) => TRACE_CODE.test(g) || TRACE_MOT.test(g) };
-  juger8("S21", MOTIFS_MESURABLES, (g) => TRACE_TENTATIVE.test(g) && preuve(g),
+  // La CIBLE se lit dans l'assiette du motif (TF-0987) ; la TRACE, elle, se cherche dans tout le
+  // groupe — un code de réponse cité entre accents graves est bien une preuve de tentative.
+  juger8("S21", { test: (g) => MOTIFS_MESURABLES.test(assietteMotif(g)) }, (g) => TRACE_TENTATIVE.test(g) && preuve(g),
     "un motif `acces` ou `presence` SANS trace mesurée de la tentative : l'impossibilité est affirmée, " +
     "pas éprouvée. Ces deux motifs affirment un FAIT DU MONDE, donc ils se mesurent — un code de " +
     "réponse, un message d'erreur, une sortie de commande, dans le même groupe de puce. " +
@@ -2124,6 +2164,30 @@ Aucun écart : la demande a été suivie à la lettre.
   const cheminTropLong = verte.replace("## 5. Non traité", PUCE_CHEMIN(125) + nl + nl + "## 5. Non traité");
   writeFileSync(join(dir, "chemin-pile-150.md"), cheminPile, "utf8");
   writeFileSync(join(dir, "chemin-151.md"), cheminTropLong, "utf8");
+  // 14/09 — L'ASSIETTE DU MOTIF DANS SES DEUX SENS, SOUS SES DEUX FORMES (TF-0987). Chaque paire ne
+  // varie QUE du motif déclaré — `decision` contre `presence` —, la cellule « comment » citant dans
+  // les deux cas la colonne de données `presence` : c'est le cas exact mesuré chez le produit.
+  // Sens VERT : le nom de colonne n'est pas un motif, S21 n'est pas concernée. Sens ROUGE : le MÊME
+  // mot, déclaré comme motif sans trace, reste accusé — preuve que l'assiette a été BORNÉE et non
+  // que S21 a été éteinte. Cinquième fixture : un motif écrit LUI-MÊME entre accents graves, sans
+  // rien en clair, reste lu (l'usage le plus courant du corpus) — sinon la correction aurait
+  // retiré à S21 tout motif mis en forme de code.
+  const TABLE_MOTIF = (motif) => "## 8. Prochaines actions" + nl + nl
+    + "| Sélecteur | Identifiant | Acteur | Action | Motif / raison | Comment | Si rien n'est fait |" + nl
+    + "|---|---|---|---|---|---|---|" + nl
+    + "| A-1 | TF-0220 | manuelle_utilisateur | arbitrer les intitulés à garder | " + motif
+    + " — choix métier sur le périmètre | ouvrir `output\\03-donnees\\intitules.xlsx` et trier sur la colonne `presence` | les intitulés restent tous affichés |" + nl;
+  const PUCE_MOTIF = (motif) => "## 8. Prochaines actions" + nl
+    + "- **A-1** — TF-0220 (manuelle_utilisateur) — arbitrer les intitulés à garder." + nl
+    + "  - pourquoi pas l'IA : " + motif + " — choix métier sur le périmètre ;" + nl
+    + "  - où : ouvrir `output\\03-donnees\\intitules.xlsx` et trier sur la colonne `presence`." + nl
+    + "  - si rien n'est fait : les intitulés restent tous affichés." + nl;
+  const bloc8 = (corps) => verte.replace(/## 8\. Prochaines actions[\s\S]*$/, corps);
+  writeFileSync(join(dir, "assiette-tableau-colonne-citee.md"), bloc8(TABLE_MOTIF("decision")), "utf8");
+  writeFileSync(join(dir, "assiette-tableau-motif-presence.md"), bloc8(TABLE_MOTIF("presence")), "utf8");
+  writeFileSync(join(dir, "assiette-puce-colonne-citee.md"), bloc8(PUCE_MOTIF("decision")), "utf8");
+  writeFileSync(join(dir, "assiette-puce-motif-presence.md"), bloc8(PUCE_MOTIF("presence")), "utf8");
+  writeFileSync(join(dir, "assiette-puce-motif-en-code.md"), bloc8(PUCE_MOTIF("`presence`")), "utf8");
 
   const moi = fileURLToPath(import.meta.url);
   const rv = spawnSync(process.execPath, [moi, join(dir, "verte.md")], { encoding: "utf8" });
@@ -2331,9 +2395,27 @@ Aucun écart : la demande a été suivie à la lettre.
       "la règle mord sur un nom conforme : " + (/"S42"[\s\S]{0,180}/.exec(rcp.stdout) || [""])[0].replace(/\s+/g, " "));
   if (!/"S42"[^}]*PASS/.test(rv.stdout))
     casse.push("S42 accuse la fixture VERTE, qui ne cite aucun chemin long : la règle crie sur un travail juste");
+  // 14/09 — L'ASSIETTE DU MOTIF (TF-0987), deux formes, deux sens, et le motif en code conservé.
+  const jouer = (f) => spawnSync(process.execPath, [moi, join(dir, f)], { encoding: "utf8" }).stdout;
+  const extrait = (s, r) => (new RegExp(`"${r}"[\\s\\S]{0,180}`).exec(s) || [""])[0].replace(/\s+/g, " ");
+  for (const forme of ["tableau", "puce"]) {
+    const vert = jouer(`assiette-${forme}-colonne-citee.md`);
+    const rougeA = jouer(`assiette-${forme}-motif-presence.md`);
+    if (!/"S21"[^}]*PASS/.test(vert))
+      casse.push(`S21 (TF-0987, ${forme}) : une action de motif \`decision\` citant la COLONNE de données \`presence\` est accusée — ` +
+        "le nom de colonne est lu comme un motif, c'est le défaut qui a fait renommer un livrable : " + extrait(vert, "S21"));
+    if (!/"S12"[^}]*PASS/.test(vert))
+      casse.push(`S12 (TF-0987, ${forme}) : le motif \`decision\`, déclaré à sa place, n'est plus lu : ` + extrait(vert, "S12"));
+    if (!/"S21"[^}]*FAIL/.test(rougeA))
+      casse.push(`S21 (TF-0987, ${forme}) : la MÊME action déclarant réellement le motif \`presence\` sans trace passe — ` +
+        "l'assiette aurait éteint la règle au lieu de la borner");
+  }
+  if (!/"S21"[^}]*FAIL/.test(jouer("assiette-puce-motif-en-code.md")))
+    casse.push("S21 (TF-0987) : un motif `presence` écrit LUI-MÊME entre accents graves, sans rien en clair, n'est plus lu — " +
+      "c'est l'usage le plus courant du corpus, la correction lui aurait retiré la règle");
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 19/19 PASS (verte PASS ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail))");
+    : "Self-test restitution : 20/20 PASS (verte PASS ; TF-0987 : l'ASSIETTE du motif dans ses DEUX sens sous ses DEUX formes — une action de motif `decision` citant la COLONNE de données `presence` PASS S21 en tableau comme en puce, la MÊME action déclarant `presence` sans trace FAIL, et un motif écrit lui-même entre accents graves reste lu ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail))");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -2358,6 +2440,7 @@ console.log(JSON.stringify({
     "S20 ne voit QUE les termes du référentiel `gabarits\\JARGON-A-GLOSER.json` : un jargon qui n'a encore coûté aucun aller-retour n'est pas détecté. C'est le prix assumé du zéro faux positif — dans ce corpus la MAJUSCULE sert l'emphase, et une heuristique sur les sigles crierait sur « MESURE » et « AUCUNE ». Le canal de croissance de la liste est le retour humain, pas la devinette",
     "S20 ne juge pas la JUSTESSE d'une glose : la présence d'une parenthèse après le terme, jamais qu'elle explique vraiment",
     "S21 ne juge pas la SINCÉRITÉ d'une trace : un code de réponse recopié sans avoir été obtenu la satisfait. Elle rend le mensonge PLUS COÛTEUX — il faut inventer un code plausible — mais elle ne le rend pas impossible",
+    "L'ASSIETTE du motif (TF-0987) ne sépare pas tout : en PUCE, un groupe qui écrit son motif ENTIÈREMENT entre accents graves et cite AUSSI un mot du vocabulaire entre accents graves est lu en entier — les deux restent confondus, faute de pouvoir dire lequel est la déclaration. En tableau sans colonne « motif » ou « raison », même lecture qu'en puce",
     "S21 ne couvre PAS `decision`, `depense` ni `irreversible` : ces trois motifs relèvent d'un arbitrage, pas d'un fait du monde, et exiger d'« essayer » une décision n'aurait aucun sens. Une attribution abusive sous `decision` reste donc invisible — c'est la limite assumée, et c'est exactement le cas fautif qui a fait naître la règle",
   ],
 }, null, 1));
