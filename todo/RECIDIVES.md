@@ -1,10 +1,10 @@
 # Récidives et descente — tableau de bord
 
-<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 389e4952e050 · archive 6ce2fe14c2bb · classes b8ee14d0fc53 · relevés 5c183c9dfa57 · héritage 1b74016f29d6. État au 2026-09-13T15:46:00.266Z (ts max des sources, jamais l'horloge). -->
+<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 1b1e70fc354f · archive 6ce2fe14c2bb · classes b8ee14d0fc53 · relevés bd5aff0681d3 · héritage 1b74016f29d6. État au 2026-09-14T09:56:10.312Z (ts max des sources, jamais l'horloge). -->
 
 Ce tableau de bord répond à trois questions que le registre seul ne savait pas poser : est-ce la deuxième fois, chez qui, et depuis combien de temps la correction existe sans être appliquée. Il se lit avec sa contre-métrique : un compteur de récidives qui baisse pendant que le nombre de classes monte est un compteur contourné, pas un progrès.
 
-**Périmètre mesuré** : 1071 item(s) au registre (actifs et archive), 243 portant une classe, 129 marqué(s) récidive ; référentiel de 74 classe(s) en 18 famille(s) (v1.13.0) ; 21 relevé(s) d'héritage.
+**Périmètre mesuré** : 1076 item(s) au registre (actifs et archive), 245 portant une classe, 129 marqué(s) récidive ; référentiel de 74 classe(s) en 18 famille(s) (v1.13.0) ; 25 relevé(s) d'héritage.
 
 ## 1. Récidives par classe
 
@@ -77,7 +77,7 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 | `reference-chargee-toujours-absente-du-paquet` | regle-morte | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `registre-doublon-non-detecte` | lot-forme | 2 | 0 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
 | `regle-de-branche-annoncee-differente-configuree` | contrat-interface-forge | 2 | 1 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
-| `regle-ecrite-sans-oracle-qui-la-joue` | skill-ou-oracle-non-invoque | 5 | 0 | 0 | 0 % | — | — |
+| `regle-ecrite-sans-oracle-qui-la-joue` | skill-ou-oracle-non-invoque | 7 | 0 | 0 | 0 % | — | — |
 | `regle-neuve-sans-mesure-de-bruit` | page-html-socle | 2 | 0 | 0 | 0/2 (sous 3 items, taux non significatif) | — | — |
 | `regle-qui-interdit-son-propre-remede` | hook-ou-gate | 1 | 1 | 0 | 0/1 (sous 3 items, taux non significatif) | — | — |
 | `releve-heritage-juge-arbre-pas-histoire` | heritage-produit | 0 | 1 | 0 | — | — | — |
@@ -170,23 +170,23 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 
 ## 3. Taux d'héritage par règle (dernier relevé)
 
-Comment lire : une ligne par artefact hérité déclaré dans `gabarits/HERITAGE.json`, état au relevé du 2026-09-11T13:50:48.724Z sur 11 produit(s) ; *conformes* compte les produits chez qui l'artefact est présent et à jour ; *familles* dit de quelles familles de défaut cet artefact protège.
+Comment lire : une ligne par artefact hérité déclaré dans `gabarits/HERITAGE.json`, état au relevé du 2026-09-14T09:41:18.512Z sur 0 produit(s) ; *conformes* compte les produits chez qui l'artefact est présent et à jour ; *familles* dit de quelles familles de défaut cet artefact protège.
 
 | Artefact | Mode | Conformes | Familles protégées |
 |---|---|---|---|
-| forge/retours/GABARIT-LOT-RETOURS.md | copie_conforme | 11/11 | lot-forme |
-| forge/retours/oracle-lot.mjs | copie_conforme | 11/11 | lot-forme |
-| forge/hooks/factory.mjs | copie_conforme | 11/11 | skill-ou-oracle-non-invoque, restitution-forme, page-html-socle, heritage-produit, ecriture-style |
-| forge/RESTITUTION.md | copie_conforme | 2/11 | restitution-forme |
-| .claude/settings.json | presence_et_motif | 11/11 | skill-ou-oracle-non-invoque, restitution-forme, page-html-socle, heritage-produit, ecriture-style |
-| CLAUDE.md | presence_et_motif | 11/11 | skill-ou-oracle-non-invoque |
-| robots.txt | presence | 11/11 | — |
-| llms.txt | presence | 11/11 | — |
-| forge/travaux/TRAVAUX-PILOT.md | copie_conforme | 11/11 | heritage-produit |
-| forge/travaux/ECARTS-ASSUMES.md | presence | 11/11 | heritage-produit |
-| forge/travaux/oracle-travaux.mjs | copie_conforme | 11/11 | heritage-produit |
-| .gitignore | presence_et_motifs | 11/11 | secret-hors-perimetre |
-| forge/retours/CLASSES.json | copie_conforme | 2/11 | heritage-produit, lot-forme |
+| forge/retours/GABARIT-LOT-RETOURS.md | copie_conforme | 0/0 | lot-forme |
+| forge/retours/oracle-lot.mjs | copie_conforme | 0/0 | lot-forme |
+| forge/hooks/factory.mjs | copie_conforme | 0/0 | skill-ou-oracle-non-invoque, restitution-forme, page-html-socle, heritage-produit, ecriture-style |
+| forge/RESTITUTION.md | copie_conforme | 0/0 | restitution-forme |
+| .claude/settings.json | presence_et_motif | 0/0 | skill-ou-oracle-non-invoque, restitution-forme, page-html-socle, heritage-produit, ecriture-style |
+| CLAUDE.md | presence_et_motif | 0/0 | skill-ou-oracle-non-invoque |
+| robots.txt | presence | 0/0 | — |
+| llms.txt | presence | 0/0 | — |
+| forge/travaux/TRAVAUX-PILOT.md | copie_conforme | 0/0 | heritage-produit |
+| forge/travaux/ECARTS-ASSUMES.md | presence | 0/0 | heritage-produit |
+| forge/travaux/oracle-travaux.mjs | copie_conforme | 0/0 | heritage-produit |
+| .gitignore | presence_et_motifs | 0/0 | secret-hors-perimetre |
+| forge/retours/CLASSES.json | copie_conforme | 0/0 | heritage-produit, lot-forme |
 | forge/ECRITURE.md | copie_conforme | 0/0 | ecriture-style |
 
 ## 4. Contre-métrique : classes créées

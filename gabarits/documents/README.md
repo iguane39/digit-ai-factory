@@ -12,7 +12,12 @@ et c'est voulu : le doublon coûte plus cher que le renvoi.
 Source unique : **`catalogue.jsonl`** — une ligne par famille, avec sa **provenance** (le ou
 les livrables réels d'où la forme est tirée) et son **statut**. Les vues, s'il y en a un jour,
 s'en dérivent ; ce fichier ne se recopie pas à la main. Oracle : `oracles\oracle-gabarits-documents.mjs`
-(G1-G7, joué par la recette du pilot).
+(G1-G5, joué par la recette du pilot). **G5 (14/09/2026)** : toute famille déclarant `html` porte son
+`point_de_depart` — son TYPE (`squelette` · `generateur` · `canevas` · `aucun`) et, sauf pour `aucun`,
+le CHEMIN qui le porte, vérifié sur disque. *Relevé du 14/09 : sur 20 familles déclarant `html`, 3 ont
+un squelette, 2 un générateur, 1 les canevas d'un skill, et 14 n'ont aucun point de départ.* Le champ
+existe parce qu'un balayage qui ne cherchait qu'un `SQUELETTE.html` en comptait 17 — la question n'était
+décidable par aucune requête.
 
 *Pourquoi cette bibliothèque existe.* Chaque projet réinventait la forme de ses livrables, et
 les défauts de forme se rejouaient d'un projet à l'autre — largeur de lecture, tableaux
@@ -45,7 +50,7 @@ recommandée :
 
 | Pièce | Où | Ce qu'elle fait |
 |---|---|---|
-| **Le fil** | l'en-tête de chaque document produit | il porte `gabarit` (id de famille) et `version_du_gabarit`. Sans ce couple, « il manquait une section » ne se rattache à rien. Exigé des gabarits par **G8** |
+| **Le fil** | l'en-tête de chaque document produit | il porte `gabarit` (id de famille) et `version_du_gabarit`. Sans ce couple, « il manquait une section » ne se rattache à rien. Exigé des gabarits par **G4** — et cette ligne a annoncé un « G8 » que rien n'implémentait jusqu'au 14/09/2026 (TF-1077) |
 | **La demande** | `gabarits\RETOURS-FORGES.md`, section « Retours sur les documents produits » | quatre colonnes, par ordre d'utilité : ce qui a été **ajouté à la main**, ce qui a **gêné le lecteur**, ce qui a **manqué**, la **portée** |
 | **Le refus** | `ingerer-lot.mjs` et **B7** de `oracle-boite-entree` | un lot du 22/08 ou après qui ne porte pas la section est refusé à l'ingestion, registre intact (R-46) |
 
