@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=1b1e70fc354f archive=6ce2fe14c2bb · dernier événement: 2026-09-14T09:56:10.312Z -->
+     sceaux: actifs=17a71965d514 archive=6ce2fe14c2bb · dernier événement: 2026-09-14T11:13:51.627Z -->
 
-**295 actifs** (candidat 69 · décidé 36 · en cours 14 · corrigé 176 · écarté 0) · **782 archivés**.
+**295 actifs** (candidat 68 · décidé 36 · en cours 14 · corrigé 177 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -326,7 +326,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-1060 | candidat | 10 | digit-ai-page-html : la regle V15 de render_page signale comme masque un en-tete collant que son propre tableau, trop court, a desepingle | **oui** — trois bloquants faux qui occupent la dimension Hierarchie de la grille de critique et masquent ce que V15 trouverait vraiment ; le message oriente vers un remede qui ne peut pas fonctionner |
 | TF-1061 | candidat | 10 | digit-ai-page-html : la regle V4 signale comme chevauchement un en-tete position: sticky recouvrant le contenu qu'il survole — sa fonction meme | **oui** — quatre bloquants faux sur cinq etats mesures ; le seul controle qui juge une page ailleurs qu'au repos rend un rouge constant et cesse d'informer |
 | TF-1059 | candidat | 8.3 | digit-ai-page-html : les composants du socle portent 40 ecarts durs, et l'exemption prevue pour cela est hors d'atteinte par le chemin d'integration que le socle prescrit | **oui** — 40 ecarts durs restants sur ce produit apres correction complete de son propre CSS ; le meme comptage attend tout produit du parc qui charge ces trois composants |
-| TF-1074 | candidat | 8 | digit-ai-page-html : les 40 regles de check_html et les 25 familles de render_page jugent des proprietes LOCALES, et les trois defauts de septembre sont GLOBAUX — aucune regle de COMPOSITION n existe | **oui** — mesure rejouee le 14/09 : le balayage qui ne cherchait qu une forme de point de depart comptait 17 familles nues, il y en a 14 |
+| TF-1074 | corrige | 8 | digit-ai-page-html : les 40 regles de check_html et les 25 familles de render_page jugent des proprietes LOCALES, et les trois defauts de septembre sont GLOBAUX — aucune regle de COMPOSITION n existe | **oui** — mesure rejouee le 14/09 : le balayage qui ne cherchait qu une forme de point de depart comptait 17 familles nues, il y en a 14 |
 | TF-0890 | corrige | 7.5 | digit-ai-page-html : scripts/embarquer-composants.mjs ne s'importe pas et ne pose que dans le depot des skills — un produit qui embarque un composant du socle reecrit le poseur | **oui** — un poseur reecrit en Python chez le produit pour trois composants, et trois copies dont la parite ne peut etre rejouee que par un outil maison |
 
 ## digit-ai-schemas
