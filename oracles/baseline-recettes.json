@@ -23,8 +23,8 @@
   "vu_le": "2026-08-26"
  },
  "gabarits/oracle-lot-retours.test.mjs": {
-  "cas": 17,
-  "vu_le": "2026-09-08"
+  "cas": 31,
+  "vu_le": "2026-09-14"
  },
  "gabarits/oracle-travaux-pilot.test.mjs": {
   "cas": 27,
@@ -35,12 +35,12 @@
   "vu_le": "2026-09-12"
  },
  "hook-lexique.mjs": {
-  "cas": 7,
-  "vu_le": "2026-09-03"
+  "cas": 13,
+  "vu_le": "2026-09-14"
  },
  "hook-page-html.mjs": {
-  "cas": 7,
-  "vu_le": "2026-09-02"
+  "cas": 11,
+  "vu_le": "2026-09-14"
  },
  "hook-produits-intacts.mjs": {
   "cas": 14,
@@ -76,8 +76,8 @@
   "vu_le": "2026-09-10"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 66,
-  "vu_le": "2026-09-11"
+  "cas": 71,
+  "vu_le": "2026-09-14"
  },
  "oracle-constantes-externes.mjs": {
   "cas": 12,
@@ -202,8 +202,8 @@
   "vu_le": "2026-08-27"
  },
  "oracle-skills.mjs": {
-  "cas": 78,
-  "vu_le": "2026-09-09"
+  "cas": 86,
+  "vu_le": "2026-09-14"
  },
  "oracle-skills.mjs (parc réel)": {
   "non_lu": true,
@@ -235,8 +235,8 @@
   "vu_le": "2026-08-27"
  },
  "oracles/hook-lexique.test.mjs": {
-  "cas": 4,
-  "vu_le": "2026-09-03"
+  "cas": 6,
+  "vu_le": "2026-09-14"
  },
  "oracles/hook-ouverture.test.mjs": {
   "cas": 5,
@@ -291,8 +291,8 @@
   "vu_le": "2026-08-26"
  },
  "scripts/fusionner-tables-confidentielles.test.mjs": {
-  "cas": 3,
-  "vu_le": "2026-09-07"
+  "cas": 6,
+  "vu_le": "2026-09-14"
  },
  "scripts/generer-remplacements-historique.test.mjs": {
   "cas": 11,
@@ -307,16 +307,20 @@
   "vu_le": "2026-09-08"
  },
  "scripts/readme-dossiers.test.mjs": {
-  "cas": 9,
-  "vu_le": "2026-09-08"
+  "cas": 14,
+  "vu_le": "2026-09-14"
  },
  "scripts/rebatir-clone.test.mjs": {
-  "cas": 6,
-  "vu_le": "2026-09-11"
+  "cas": 7,
+  "vu_le": "2026-09-14"
  },
  "scripts/recopier-heritage.test.mjs": {
   "cas": 12,
   "vu_le": "2026-09-08"
+ },
+ "scripts/relever-appelants.test.mjs": {
+  "cas": 4,
+  "vu_le": "2026-09-14"
  },
  "scripts/relever-empreintes-skills.test.mjs": {
   "cas": 8,
@@ -351,24 +355,36 @@
   "vu_le": "2026-09-09"
  },
  "todo/emettre-travaux.test.mjs": {
-  "cas": 31,
-  "vu_le": "2026-09-01"
+  "cas": 33,
+  "vu_le": "2026-09-14"
+ },
+ "todo/generer-page.test.mjs": {
+  "cas": 4,
+  "vu_le": "2026-09-14"
  },
  "todo/generer-recidives.test.mjs": {
   "cas": 5,
   "vu_le": "2026-09-03"
  },
  "todo/ingerer-anonymise-fichier.test.mjs": {
-  "cas": 4,
-  "vu_le": "2026-09-02"
+  "cas": 5,
+  "vu_le": "2026-09-14"
  },
  "todo/ingerer-classe.test.mjs": {
   "cas": 8,
   "vu_le": "2026-09-03"
  },
+ "todo/ingerer-controle.test.mjs": {
+  "cas": 2,
+  "vu_le": "2026-09-14"
+ },
  "todo/ingerer-derogation.test.mjs": {
   "cas": 11,
   "vu_le": "2026-08-26"
+ },
+ "todo/ingerer-doublon.test.mjs": {
+  "cas": 4,
+  "vu_le": "2026-09-14"
  },
  "todo/ingerer-emetteur-forge.test.mjs": {
   "cas": 2,
@@ -407,12 +423,12 @@
   "vu_le": "2026-09-03"
  },
  "todo/pre-commit-anonymise.test.mjs": {
-  "cas": 6,
-  "vu_le": "2026-09-09"
+  "cas": 10,
+  "vu_le": "2026-09-14"
  },
  "todo/preflight-collision.test.mjs": {
-  "cas": 5,
-  "vu_le": "2026-08-26"
+  "cas": 7,
+  "vu_le": "2026-09-14"
  },
  "todo/rapprocher.test.mjs": {
   "cas": 7,
@@ -427,7 +443,7 @@
   "vu_le": "2026-08-26"
  },
  "todo/self-test.mjs": {
-  "cas": 52,
-  "vu_le": "2026-09-03"
+  "cas": 55,
+  "vu_le": "2026-09-14"
  }
 }
