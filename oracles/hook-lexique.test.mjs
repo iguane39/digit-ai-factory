@@ -13,10 +13,20 @@ let pass = 0, fail = 0;
 const check = (nom, fn) => { try { fn(); console.log(`  [PASS] ${nom}`); pass++; } catch (e) { console.error(`  [FAIL] ${nom} — ${e.message}`); fail++; } };
 const jouer = (prompt) => spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: JSON.stringify({ prompt }) });
 
-check("self-test du hook : 7 cas verts", () => {
+check("self-test du hook : 13 cas verts", () => {
   const r = spawnSync(process.execPath, [HOOK, "--self-test"], { encoding: "utf8" });
   if (r.status !== 0) throw new Error(`exit ${r.status} : ${r.stdout}`);
-  if (!/7 PASS, 0 FAIL/.test(r.stdout)) throw new Error(`compte inattendu : ${r.stdout.split("\n").pop()}`);
+  if (!/13 PASS, 0 FAIL/.test(r.stdout)) throw new Error(`compte inattendu : ${r.stdout.split("\n").pop()}`);
+});
+// TF-1103 — deux injections à tort le 14/09, sur des notifications de fin de tâche d'agents.
+check("hook — message HUMAIN « l99 améliore ce prompt » → contexte nommant prompt-analyzer-l99", () => {
+  const r = jouer("l99 améliore ce prompt");
+  if (r.status !== 0 || !/prompt-analyzer-l99/.test(r.stdout)) throw new Error(`appel humain non reconnu : ${r.stdout}`);
+});
+check("hook — NOTIFICATION d'agent citant « usages L99 (M2) » et « prompt-analyzer-l99 » → stdout VIDE", () => {
+  const r = jouer("<task-notification>\n<summary>Agent terminé</summary>\nRelevé : usages L99 (M2) ; le skill prompt-analyzer-l99 a rendu son rapport. l99 améliore ce prompt\n</task-notification>");
+  if (r.status !== 0) throw new Error(`exit ${r.status}`);
+  if (r.stdout.trim() !== "") throw new Error(`une notification a déclenché le lexique : ${r.stdout}`);
 });
 check("hook — « Améliore ce prompt : … » sur stdin → contexte nommant prompt-analyzer-l99, exit 0", () => {
   const r = jouer("Améliore ce prompt : conçois un système");
