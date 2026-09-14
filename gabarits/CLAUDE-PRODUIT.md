@@ -98,6 +98,11 @@ décision, l'omettre est un oubli (loi n° 3).
   un produit qui ne déploie rien y déclare quand même ce qu'il LIT · toute
   évolution de config → PARAMETRAGE/COMMANDES) ; comptes de démo locale derrière
   `MODE_DEMO`, jamais de secret.
+- **Un écart au socle détecté en cours de mandat s'écrit en retour DANS LE TOUR où il est
+  détecté** (TF-1048) — une entrée au lot de retours en cours (`forge\retours\`, avec sa classe ;
+  s'il est corrigé sur place, à la section « Remarques restées au produit »), sans attendre le hook
+  de fin de tour ni une relance humaine. C'est une obligation de l'agent, pas du hook : le hook peut
+  être muet (session ouverte à une racine englobante), l'obligation ne l'est jamais.
 - `<conventions spécifiques au produit>`
 
 ## Lexique d'invocation (RV-6, étendu aux produits par TF-0723)
