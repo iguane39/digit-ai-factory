@@ -377,7 +377,10 @@ que son verdict soit au ledger (`oracles_verdict`). Un produit sans ce contrôle
 
 La mise en **production** exige un GO humain explicite, donné sur `DOSSIER-MEP.md`, qui contient :
 
-- les verdicts d'oracles des 5 étapes (avec références ledger `seq`) ;
+- les verdicts d'oracles des 5 étapes (avec références ledger `seq`) ; un verdict de forge-ops
+  ARCHIVÉ (`.ops-journal.jsonl`) ne se cite qu'après confrontation à l'état présent de sa cible —
+  `node scripts\verifier-verdict-archive.mjs <cible|journal>` : FRAIS se cite, PÉRIMÉ se rejoue
+  (TF-1084, reste de TF-0579) ;
 - le rapport forge-tests (couvertures, mutation, findings, pans non couverts), le **dashboard
   de tests** (copie datée dans `output\`) et la liste `actions[manuelle_utilisateur]` extraite
   du rapport — chaque saisie attendue de l'utilisateur (champs, où, pourquoi) pour compléter
