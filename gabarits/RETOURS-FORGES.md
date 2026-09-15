@@ -58,9 +58,13 @@ remontée automatique — le `.md` reste la lecture humaine.
 du sidecar désigne UNE classe de `forge\retours\CLASSES.json` — copie identique du référentiel
 du pilot, reçue avec ce gabarit. Une classe est le défaut généralisé que ce retour illustre — la
 règle qui aurait évité le retour — jamais une famille. Lot sans classe, ou à classe inconnue :
-**refusé à l'ingestion**, avec les clés proches. Aucune clé ne convient ? Le dire dans le `.md`
-(section « La règle qui aurait évité le retour ») et laisser le pilot créer la classe dans son
-référentiel : une classe ne se crée jamais dans un sidecar. Un retour dont la classe est déjà
+**refusé à l'ingestion**, avec les clés proches. **Aucune clé ne convient ?** C'est un défaut
+vraiment neuf, et il a sa sortie conforme (TF-1128, 15/09/2026) : la ligne porte la clé RÉSERVÉE
+`"classe": "classe-a-creer"` et `"classe_proposee": {"cle": "…", "famille": "…", "libelle": "…"}`
+(une famille existante, une clé qui n'existe pas encore), et le `.md` nomme la clé proposée, sa
+famille et son libellé dans la section « La règle qui aurait évité le retour ». Le lot entre ; le
+pilot crée la classe dans son référentiel et y rattache le retour. Une classe ne se crée jamais
+dans un sidecar, et une clé approchée choisie faute de mieux fausse le compte des récidives. Un retour dont la classe est déjà
 close chez le pilot entre quand même, **marqué récidive** — c'est précisément l'information
 que la factory cherche : une correction qui n'a pas redescendu jusqu'à vous.
 

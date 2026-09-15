@@ -276,8 +276,32 @@ const proches = (cle) => {
     .map((k) => ({ k, n: k.split(/[^a-z0-9]+/).filter((j) => jetons.has(j)).length + (k.includes(String(cle).toLowerCase()) ? 2 : 0) }))
     .filter((x) => x.n > 0).sort((a, b) => b.n - a.n || a.k.localeCompare(b.k)).slice(0, 5).map((x) => x.k);
 };
+// TF-1128 (15/09/2026) — UN DÉFAUT VRAIMENT NEUF A UNE SORTIE CONFORME. Le gabarit de lot disait,
+// à quinze lignes d'écart, « classe inconnue : refusé » et « aucune clé ne convient ? le dire dans
+// le .md et laisser le pilot créer la classe » : le producteur n'avait AUCUNE voie qui passe — soit
+// son lot entier était refusé, soit il rangeait le retour sous une clé approchée et faussait le
+// compte des récidives, soit il ne remontait rien. La clé RÉSERVÉE `classe-a-creer` est la
+// sortie : admise à la condition que la ligne porte `classe_proposee` {cle, famille, libelle},
+// que la clé proposée n'existe pas déjà, que sa famille soit connue, et que le .md du lot la
+// nomme. Le retour entre avec `classe: null` et `classe_a_creer` ; le pilot crée la vraie classe
+// dans le référentiel et rattache le retour. La classe ne se crée toujours pas dans un sidecar.
+const CLE_A_CREER = "classe-a-creer";
+const TEXTE_LOT_MD = (() => {
+  const md = String(sidecarPath).replace(/\.normalise\.tf\.jsonl$/i, ".md").replace(/\.tf\.jsonl$/i, ".md");
+  try { return existsSync(md) ? readFileSync(md, "utf8") : ""; } catch { return ""; }
+})();
+const verifierClasseACreer = (c, i) => {
+  const p = c.classe_proposee && typeof c.classe_proposee === "object" ? c.classe_proposee : {};
+  const manque = ["cle", "famille", "libelle"].filter((k) => !p[k] || !String(p[k]).trim());
+  const familles = new Set([...FAMILLES, ...((REF_CLASSES?.familles || []).map((f) => f.cle))]);
+  if (manque.length) motifs.push(`ligne ${i + 1} : classe « ${CLE_A_CREER} » sans classe_proposee complète — manque ${manque.join(", ")} ; la ligne porte "classe_proposee": {"cle", "famille", "libelle"} et le .md les nomme (section « La règle qui aurait évité le retour »)`);
+  else if (CLASSES.has(String(p.cle))) motifs.push(`ligne ${i + 1} : classe proposée « ${p.cle} » EXISTE déjà au référentiel — la porter directement dans "classe", sans passer par « ${CLE_A_CREER} »`);
+  else if (!familles.has(String(p.famille))) motifs.push(`ligne ${i + 1} : famille « ${p.famille} » de la classe proposée inconnue — familles du référentiel : ${[...familles].join(", ")}`);
+  else if (!TEXTE_LOT_MD.includes(String(p.cle))) motifs.push(`ligne ${i + 1} : la classe proposée « ${p.cle} » n'est pas nommée dans le .md du lot — le lecteur humain doit y trouver la clé, sa famille et son libellé (section « La règle qui aurait évité le retour »)`);
+};
 const verifierClasse = (c, i) => {
   if (c.rectifie !== undefined) return;
+  if (String(c.classe) === CLE_A_CREER && REF_CLASSES) { verifierClasseACreer(c, i); return; }
   const exigee = EST_UN_LOT && DATE_LOT && DATE_LOT >= SEUIL_CLASSE;
   if (c.classe === undefined || c.classe === null || c.classe === "") {
     if (exigee) {
@@ -289,7 +313,7 @@ const verifierClasse = (c, i) => {
   if (!REF_CLASSES) { motifs.push(`ligne ${i + 1} : classe « ${c.classe} » déclarée mais référentiel ${CLASSES_PATH} illisible — on ne juge pas une clé sans référentiel`); return; }
   if (!CLASSES.has(String(c.classe))) {
     const p = proches(c.classe);
-    motifs.push(`ligne ${i + 1} : classe « ${c.classe} » inconnue du référentiel — clés proches : ${p.length ? p.join(", ") : "(aucune)"} ; si aucune ne convient, créer la clé dans todo/CLASSES.json (datée, sourcée, rattachée à sa famille) puis remettre le lot`);
+    motifs.push(`ligne ${i + 1} : classe « ${c.classe} » inconnue du référentiel — clés proches : ${p.length ? p.join(", ") : "(aucune)"} ; si aucune ne convient, porter "classe": "${CLE_A_CREER}" avec "classe_proposee": {"cle", "famille", "libelle"} et nommer la clé proposée dans le .md — le pilot crée la classe dans son référentiel (TF-1128)`);
   }
 };
 let candidatures = lignes.map((l, i) => {
@@ -561,7 +585,11 @@ const nouvelles = candidatures.map((c) => {
   const score = c.score && [c.score.gain, c.score.preuve, c.score.effort].every((v) => typeof v === "number")
     ? { ...c.score, valeur: Math.round((c.score.gain * c.score.preuve / c.score.effort) * 10) / 10 }
     : { gain: 3, preuve: 1, effort: 3, valeur: 1, par_defaut: true };
-  const classe = c.classe ? String(c.classe) : null;
+  // TF-1128 : la clé réservée n'entre jamais comme classe — elle se compterait hors référentiel
+  // (R13). Le retour entre sans classe, avec la proposition, que le pilot instruit.
+  const aCreer = String(c.classe) === CLE_A_CREER ? c.classe_proposee : null;
+  if (aCreer) console.error(`[CLASSE À CRÉER] « ${aCreer.cle} » (famille ${aCreer.famille}) proposée par ${produitDuLot} — le retour ENTRE sans classe ; créer la clé dans todo/CLASSES.json (datée, sourcée), puis rattacher le retour par rectification`);
+  const classe = c.classe && !aCreer ? String(c.classe) : null;
   const rec = classe ? recidiveDe(classe, c.date_demande) : [];
   const susp = classe ? classeSuspecte(classe) : null;
   if (rec.length) {
@@ -576,6 +604,7 @@ const nouvelles = candidatures.map((c) => {
     date_demande: c.date_demande, statut: "candidat",
     forges_cibles_initiales: c.forges_cibles_initiales, forges_cibles_reelles: null,
     classe, recidive_de: rec.length ? rec : null, ...(susp ? { classe_suspecte: susp } : {}),
+    ...(aCreer ? { classe_a_creer: { cle: aCreer.cle, famille: aCreer.famille, libelle: aCreer.libelle } } : {}),
     score, preuve_du_cout: c.preuve_du_cout ?? null,
     decideur: null, date_decision: null, date_correction: null, corrections_realisees: null,
     gains_constates: null, version_forge_corrigee: null, produits_beneficiaires: null,

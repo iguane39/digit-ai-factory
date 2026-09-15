@@ -82,7 +82,10 @@ la date se lit au registre, N-6). Il est **hérité en copie identique** (`forge
 R-47) : le producteur qui écrit un lot y lit ce qu'il doit déclarer. (2) **À l'ingestion**, tout
 retour d'un lot daté du 03/09 ou après porte `classe` ; absente ou inconnue, `ingerer-lot.mjs`
 REFUSE en nommant les clés proches — une classe nouvelle se crée dans le référentiel, jamais dans
-un sidecar. Un retour dont la classe est déjà close en `corrige` ENTRE, marqué `recidive_de`,
+un sidecar. Le défaut vraiment neuf a sa sortie (TF-1128, 15/09/2026) : la clé RÉSERVÉE
+`classe-a-creer`, admise si la ligne porte `classe_proposee` {cle, famille, libelle} et que le `.md`
+nomme la clé ; le retour entre avec `classe: null` et `classe_a_creer`, et le pilot crée la classe
+puis rattache le retour (recette : `todo\ingerer-classe.test.mjs`, 13 cas). Un retour dont la classe est déjà close en `corrige` ENTRE, marqué `recidive_de`,
 avec l'oracle censé l'avoir attrapé : la récidive est la mesure de la descente, la refuser la
 cacherait. Une classe créée SANS clôture fondatrice moins de 30 jours après un retour d'une classe
 voisine est signalée `classe_suspecte` — la façon la moins chère de faire baisser un compteur est
