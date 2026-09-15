@@ -314,6 +314,10 @@
   "cas": 7,
   "vu_le": "2026-09-14"
  },
+ "scripts/recette-pilot-hebergee.test.mjs": {
+  "cas": 10,
+  "vu_le": "2026-09-15"
+ },
  "scripts/recopier-heritage.test.mjs": {
   "cas": 12,
   "vu_le": "2026-09-08"

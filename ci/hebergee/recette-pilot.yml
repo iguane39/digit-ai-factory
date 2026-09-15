@@ -1,0 +1,37 @@
+# recette-pilot.yml — rejeu hébergé minimal de la recette du pilot (TF-1018, décision « 12a »
+# du 15/09/2026, option O3 de l'étude d'opportunité citée par le mandat).
+#
+# INACTIF PAR CONSTRUCTION : ce fichier vit ici, hors de .github/workflows/, précisément pour
+# qu'aucune exécution hébergée ne se déclenche avant un GO humain distinct (R-38). Voir
+# ci/hebergee/ACTIVER.md pour le geste d'activation et ce qu'il engage.
+#
+# Ce que ce fichier rejoue, et seulement cela : les deux mêmes commandes que la recette locale
+# du pilot, sans rien d'autre — aucun secret, aucune API tierce payante, aucun déploiement.
+# `oracles/self-tests.mjs` rend SKIP (exit 2, traité comme succès par l'agrégateur lui-même)
+# sur ses contrôles d'état du parc réel (I4) quand les dépôts frères sont absents, ce qui est
+# la situation normale d'un runner hébergé qui ne clone que ce dépôt.
+name: Recette pilot (hébergée)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  recette:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
+      - name: Installer Node 20+
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Self-tests des oracles du pilot (oracles/self-tests.mjs)
+        run: node oracles/self-tests.mjs
+
+      - name: Self-test du registre TODO-FORGE (todo/self-test.mjs)
+        run: node todo/self-test.mjs
