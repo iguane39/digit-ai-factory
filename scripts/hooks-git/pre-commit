@@ -1,0 +1,28 @@
+#!/bin/sh
+# pre-commit — deux gardes, dans cet ordre, et toutes deux sur l'INDEX jamais sur l'histoire.
+#
+# COPIE VERSIONNÉE (TF-1041, 15/09/2026). Le hook installé vit dans .git/hooks/, qui ne voyage
+# pas : un clone frais ou rebâti n'en avait AUCUN, et les deux gardes ci-dessous étaient déclarées
+# sans jamais être appelées. `node scripts/verifier-hooks-git.mjs --installer` pose cette copie
+# quand le hook manque (jamais par-dessus un hook existant) ; bootstrap.mjs le joue à l'ouverture.
+#
+# 1. LE NOM EST RETIRE avant que le commit n'existe (TF-0980, decision D-31 a du 08/09). Cette
+#    garde-la CORRIGE le contenu indexe et le re-indexe : aucun refus, aucune interruption. Elle
+#    ne refuse que dans deux cas -- tables illisibles, ou NOM de fichier porteur -- et le dit
+#    alors avec la commande exacte.
+#
+# 2. AUCUN QUANTIFICATEUR NE DISPARAIT DU NOYAU (A-109, TF-1010, 10/09). Celle-ci REFUSE, et elle
+#    l'assume : le 10/09, le mot << seulement >> a ete retire de << Livrable accepte sur verdict
+#    d oracle execute seulement >> pour gagner cinq octets, et la regle a cesse d etre exclusive
+#    pendant 17 minutes de publication. La regle N4 de oracle-claude-md attrape ce cas mais compare
+#    a la version COMMISE : une fois l affaiblissement commis, elle ne le voit plus. Cette garde
+#    est la moitie manquante -- elle juge le passage travail -> commit, seul instant ou le mot est
+#    encore rattrapable sans reecrire l histoire.
+#
+# Les deux ne coutent que quelques millisecondes, la ou la porte de publication prend trois a cinq
+# minutes -- c'est pour cela qu'elles vivent ici et non au push.
+#
+# Contournement explicite si vous savez ce que vous faites : git commit --no-verify
+RACINE="$(git rev-parse --show-toplevel)"
+node "$RACINE/todo/pre-commit-anonymise.mjs" || exit $?
+node "$RACINE/oracles/pre-commit-quantificateurs.mjs" || exit $?

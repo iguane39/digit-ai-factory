@@ -218,6 +218,18 @@ if (!sansPilot) {
   const empreinteAvant = createHash("sha256").update(readFileSync(MOI)).digest("hex");
   if (existsSync(join(ICI, ".git"))) traiterPresent("digit-ai-factory (pilot)", ICI);
   else ligne("avert", "digit-ai-factory (pilot) — pas un dépôt git : fraîcheur du pilot non vérifiable");
+  // TF-1041 (15/09/2026) — les gardes de pré-commit du pilot sont APPELÉES, pas seulement déclarées.
+  // `.git/hooks/` ne voyage pas : un clone frais ou rebâti n'avait aucun hook, et la garde des
+  // quantificateurs (TF-1010) n'était jamais jouée. Sans --pull, on mesure ; avec, on pose la copie
+  // versionnée si le hook MANQUE — jamais par-dessus un hook existant.
+  if (existsSync(join(ICI, ".git"))) {
+    const h = spawnSync(process.execPath, [join(ICI, "scripts", "verifier-hooks-git.mjs"), "--depot", ICI, ...(pull ? ["--installer"] : [])], { encoding: "utf8" });
+    const lignes = (h.stdout || "").trim().split(/\r?\n/);
+    for (const l of lignes.filter((x) => /^\[INSTALLÉ\]/.test(x))) ligne("ok", `digit-ai-factory (pilot) — ${l.replace(/^\[INSTALLÉ\]\s*/, "")}`);
+    if (h.status === 0) ligne("ok", "digit-ai-factory (pilot) — gardes de pré-commit appelées par le hook installé");
+    else if (h.status === 1) defaut(`digit-ai-factory (pilot) — ${lignes.filter((x) => x.startsWith("[FAIL]")).join(" · ").slice(0, 300)}`,
+      pull ? "fusionner à la main depuis scripts/hooks-git/pre-commit" : "node bootstrap.mjs --pull (pose le hook s'il manque)");
+  }
   const empreinteApres = createHash("sha256").update(readFileSync(MOI)).digest("hex");
   if (empreinteAvant !== empreinteApres && !process.env.BOOTSTRAP_RELANCE) {
     // Ce script vient d'être mis à jour par son propre pull : le reste doit s'exécuter avec la
