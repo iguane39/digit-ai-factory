@@ -87,6 +87,18 @@
       --amber: #D97706; --amber-fill: #FFFBEB; --amber-line: #FDE9C8;
       --teal:  #0E9488; --teal-fill:  #EFFDFB; --teal-line:  #C7F0EA;
       --green: #15803D; --green-fill: #F2FCF5; --green-line: #CFEEDD;
+      /* Rouge — quatrieme accent semantique, AJOUT de la bibliotheque (14/09) : le
+         boilerplate du socle n en porte pas, et les familles affichent des etats
+         DEFAVORABLES (bloquant, ecarte, probabilite forte) que ok/part/info ne disent pas.
+         Meme grammaire que les trois autres : encre pleine, fond tres clair, filet.
+         Verse en candidat au socle ; tant qu il n y est pas, il vit ici. */
+      --red:   #B91C1C; --red-fill:   #FEF2F2; --red-line:   #F7D4D4;
+      /* Fonds PLEINS des badges — encre blanche dessus. Valeurs reprises de la fixture
+         verte du socle ; elles ne changent pas entre clair et sombre : un etat garde sa
+         couleur quel que soit le theme, et le contraste de l encre blanche est tenu par
+         la clarte du fond, pas par celle de la page. */
+      --green-solid: #166534; --teal-solid: #0F5F8F;
+      --amber-solid: #92400E; --red-solid:  #B91C1C;
       /* Rayons */
       --r: 12px; --r-sm: 8px;
       /* Largeur du conteneur et largeur de lecture — cf. regle L2.
@@ -113,6 +125,7 @@
       --amber: #FBBF6D; --amber-fill: #2B2210; --amber-line: #4A3A18;
       --teal:  #5FE6D6; --teal-fill:  #0E2A27; --teal-line:  #164E48;
       --green: #7BE0A0; --green-fill: #0F2A1B; --green-line: #1C4A30;
+      --red:   #F59B9B; --red-fill:   #2C1414; --red-line:   #4E2323;
     }
 
     * { box-sizing: border-box; }
@@ -198,6 +211,7 @@
         --amber:#D97706; --amber-fill:#FFFBEB; --amber-line:#FDE9C8;
         --teal:#0E9488;  --teal-fill:#EFFDFB;  --teal-line:#C7F0EA;
         --green:#15803D; --green-fill:#F2FCF5; --green-line:#CFEEDD;
+        --red:#B91C1C;   --red-fill:#FEF2F2;   --red-line:#F7D4D4;
       }
       body { background: var(--surface); }
       .wrap { max-width: none; padding: 0; }
@@ -282,19 +296,70 @@
     .doc-grille > nav.toc ol, .doc-grille > nav.toc ul { columns: 1; }
     .doc-grille > nav.toc h2 { font-size: 1.05rem; margin: 0 0 .5em; }
     .doc-grille > .doc-corps { min-width: 0; }
-    @media (max-width: 900px) { .doc-grille { grid-template-columns: 1fr; } .doc-grille > nav.toc { position: static; max-height: none; } }
+    /* Le geste canonique du socle (L25) pose `position: static` sous 900 px et ANNONCE en
+       commentaire une « bande repliable sur mobile » que son CSS ne fournit pas : mesure le
+       15/09 sur les cinq familles, `sommaire_perdu` BLOQUANT a 768 px et a 390 px, sur des
+       pages de 3 a 4 ecrans. La bande existe ici — le sommaire reste colle en tete, borne au
+       tiers de la fenetre et defilable : atteignable sans manger l ecran. */
+    @media (max-width: 900px) {
+      .doc-grille { grid-template-columns: 1fr; }
+      .doc-grille > nav.toc { position: sticky; top: 0; max-height: 33vh; overflow: auto; z-index: 5; }
+    }
     .toc .toc-t { display: block; text-decoration: underline; }
     .toc .toc-d { display: block; color: var(--muted); font-size: .84rem; }
     @media (max-width: 760px) { .toc ol, .toc ul { columns: 1; } }
+
+    /* ── Encre secondaire et badges de statut ─────────────────────────────────
+       Loi transverse n°1 : toute affordance est cablee ou n existe pas. `muted` et
+       `badge` etaient EMPLOYEES par ces gabarits sans aucune regle CSS — mesure le
+       15/09 sur les cinq familles : un `<span class="badge ok">` se rendait en texte
+       nu, sans pastille ni fond, et l etat qu il annonce ne se voyait pas.
+       Forme reprise TELLE QUELLE de references/composants.md du socle (§2) : le texte
+       reste en --ink (contraste garanti), la couleur semantique est portee par la
+       pastille, le fond et le filet — jamais par le texte colore seul, qui echoue le
+       contraste AA et viole WCAG 1.4.1 (couleur seule). */
+    .muted { color: var(--muted); }
+    /* L identification du document est de la PROSE, et se borne comme telle : mesure le
+       15/09, 105 caracteres par ligne a 3840 px des que l objet du document est long (V18
+       bloquant). Le header est en flex, rien ne le bornait. */
+    /* La bride est portee par le BLOC qui porte le texte, jamais par le texte : L2 refuse
+       `max-width` pose sur un <p> (mesure le 15/09, ratio 0.80 pour un seuil de 0.85) et
+       l attribut de declaration ne vaut que pour V18. La doctrine du socle est la meme des
+       deux cotes — la mesure de lecture se pose sur le CONTENEUR. */
+    /* 84ch et non 90 : `ch` mesure le zero, la police de corps est plus etroite, et 90ch
+       laissait passer 103 caracteres par ligne — mesure le 15/09, V18 bloquant a 2560 px. */
+    .doc-ident { max-width: 84ch; }
+    /* Une chaine technique ne deborde pas : mesure le 15/09, une URL et un motif de format
+       en monospace poussaient une table a 465 px dans une fenetre de 390 (V1 bloquant, 33
+       descendants entraines). Les mots ordinaires ne se coupent PAS — `break-word` n agit
+       que si le mot ne tient pas dans sa colonne ; `anywhere` est reserve au monospace, ou
+       la chaine n a pas de cesure naturelle. */
+    th, td { overflow-wrap: break-word; }
+    code { overflow-wrap: anywhere; }
+    /* Fonds PLEINS et non pastel : mesure le 15/09, la forme pastel de composants.md §2 du
+       socle rend 18 a 36 constats V16 « etats indiscernables » par page — ses quatre teintes
+       de fond vivent toutes entre L* 93 et 97, et V16 du meme socle les refuse. Forme reprise
+       de la fixture VERTE du socle (v16-etats-pleins.html) : fond plein, encre blanche,
+       GLYPHE par palier — la distinction ne repose jamais sur la seule couleur (WCAG 1.4.1). */
+    .badge { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; font-weight: 700;
+      color: #FFFFFF; padding: 2px 10px; border-radius: 999px; border: 1px solid transparent; }
+    .badge.ok   { background: var(--green-solid); }
+    .badge.part { background: var(--amber-solid); }
+    .badge.info { background: var(--teal-solid); }
+    .badge.ko   { background: var(--red-solid); }
+    .badge.ok::before   { content: "\2713"; }
+    .badge.part::before { content: "\2192"; }
+    .badge.info::before { content: "\2194"; }
+    .badge.ko::before   { content: "\2717"; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header class="doc" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
-      <div>
+      <div class="doc-ident">
         <p class="eyebrow">{Client} · Rapport de données</p>
         <h1>{Objet du rapport}</h1>
-        <p class="muted">Périmètre : {ce qui est couvert — et ce qui ne l'est pas} · Établi le {date}<br>Gabarit : gd-rapport-donnees · version du gabarit 1.0.0 — à reporter tel quel dans tout retour sur ce document</p>
+        <p class="muted">Périmètre : {ce qui est couvert — et ce qui ne l'est pas} · Établi le {date}<br>Gabarit : gd-rapport-donnees · version du gabarit 1.1.0 — à reporter tel quel dans tout retour sur ce document</p>
       </div>
       <!-- S-G1 (3/4, R-30) — bouton de bascule thème sombre -->
       <button id="theme-toggle" class="theme-toggle" type="button"
@@ -324,11 +389,20 @@
         </ol>
       </nav>
       <div class="doc-corps">
+      <!-- V19 (TF-1038, 14/09/2026) — LA LARGEUR DE CONTENU EST UNE PROPRIETE DE LA PAGE.
+           Jusqu'en 1.0.0, trois sections portaient `.chap.lire` (1 080 px) et trois prenaient
+           la largeur offerte (1 350 px) : mesure au navigateur a 1920 px, six sections soeurs,
+           deux largeurs. C'est le defaut que le retour humain du 11/09 decrivait, et il etait
+           HERITE par tout document tire de ce modele. `.lire` est retire des trois sections :
+           un rapport de donnees est un document de DONNEES, il prend une seule largeur.
+           Une section qui assumerait la sienne le declarerait par `data-largeur-exception`.
+      -->
       <!-- 1 · LE RÉSULTAT EN UNE PAGE — le verdict avant toute mécanique.
            Un lecteur qui s'arrête ici repart avec le résultat. -->
       <section class="chap lire" id="resultat">
         <h2>Le résultat en une page</h2>
         <p class="ch-apprend">Ce chapitre donne le verdict d'ensemble avant tout détail : ce que les données disent, en une page, et la décision qu'elles permettent de prendre ou d'ajourner.</p>
+        <p class="contenu">Ce chapitre contient le verdict d'ensemble, la période couverte et la décision qu'il permet ou ajourne. Il ne contient aucun détail élément par élément : ils ont leur chapitre.</p>
         <p>{Trois à cinq phrases en langage de commanditaire : ce qu'on a trouvé, et ce que
            ça change pour celui qui lit. Aucune méthode ici.}</p>
         <div class="table-hote">
@@ -352,15 +426,17 @@
       <section class="chap lire" id="contenu">
         <h2>Ce que contiennent les données</h2>
         <p class="ch-apprend">Ce chapitre décrit les sources lues : leur périmètre, leur date de fraîcheur, ce qu'elles couvrent et ce qu'elles ne couvrent pas — pour que chaque chiffre du rapport ait une origine nommée.</p>
+        <p class="contenu">Ce chapitre contient les sources lues, leur périmètre, leur date de fraîcheur et ce qu'elles ne couvrent pas. Il ne contient aucune mesure : il dit d'où elles viendront.</p>
         <p>{Volumes, période couverte, complétude, anomalies structurelles.}</p>
       </section>
 
       <!-- 3 · LE DÉTAIL, ÉLÉMENT PAR ÉLÉMENT — la table longue.
            D3 : au-delà de trois colonnes, le repli en cartes est dû (class="repli-cartes"
            + data-label sur CHAQUE td). D4 : l'état vide est écrit. -->
-      <section id="detail">
+      <section class="chap lire" id="detail">
         <h2>Le détail, élément par élément</h2>
         <p class="ch-apprend">Ce chapitre passe les éléments un par un, chacun avec sa mesure, son seuil et son verdict, dans l'ordre où le lecteur les rencontre dans le tableau.</p>
+        <p class="contenu">Ce chapitre contient une ligne par élément mesuré, chacune avec sa mesure, son seuil et son verdict. Il ne contient ni tendance ni conclusion d'ensemble.</p>
         <div class="table-hote">
           <table class="repli-cartes">
             <caption>Détail par élément</caption>
@@ -382,13 +458,15 @@
       <section class="chap lire" id="synthese">
         <h2>Synthèse</h2>
         <p class="ch-apprend">Ce chapitre rassemble ce qui ressort de l'ensemble : les tendances, les écarts qui comptent, et ce qui distingue un signal d'un bruit de mesure.</p>
+        <p class="contenu">Ce chapitre contient les tendances et les écarts qui ressortent de l'ensemble, et ce qui sépare un signal d'un bruit de mesure. Il ne reprend aucun élément un par un.</p>
         <p>{…}</p>
       </section>
 
       <!-- 5 · DÉCISIONS RESTANTES — une décision sans porteur nommé n'en est pas une. -->
-      <section id="decisions">
+      <section class="chap lire" id="decisions">
         <h2>Décisions restantes</h2>
         <p class="ch-apprend">Ce chapitre liste ce qui reste à trancher, par qui, avant quelle date — une décision sans décideur nommé n'y figure pas.</p>
+        <p class="contenu">Ce chapitre contient les décisions restantes, le rôle qui tranche, l'échéance et ce qui se produit à défaut. Il ne contient pas les arguments : ils vivent aux chapitres précédents.</p>
         <div class="table-hote">
           <table class="repli-cartes">
             <caption>Décisions restant à trancher</caption>
@@ -408,9 +486,10 @@
       </section>
 
       <!-- 6 · TRAÇABILITÉ — un rapport dont les chiffres ne se rejouent pas est une opinion. -->
-      <section id="tracabilite">
+      <section class="chap lire" id="tracabilite">
         <h2>Traçabilité</h2>
         <p class="ch-apprend">Ce chapitre dit d'où vient chaque chiffre et comment le rejouer : les fichiers lus, la commande jouée, et l'empreinte du jeu de données.</p>
+        <p class="contenu">Ce chapitre contient les fichiers lus, la commande rejouable et l'empreinte du jeu de données. Il ne contient aucune interprétation : elle vit à la synthèse.</p>
         <div class="table-hote">
           <table class="repli-cartes">
             <caption>Origine de chaque chiffre</caption>
