@@ -1,10 +1,10 @@
 # Récidives et descente — tableau de bord
 
-<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre da3f8ac60cd6 · archive 6ce2fe14c2bb · classes b8ee14d0fc53 · relevés 810f471e8c96 · héritage 1b74016f29d6. État au 2026-09-15T13:05:01.388Z (ts max des sources, jamais l'horloge). -->
+<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre f0a4fbc3266b · archive 6ce2fe14c2bb · classes b8ee14d0fc53 · relevés 810f471e8c96 · héritage 1b74016f29d6. État au 2026-09-15T13:18:06.150Z (ts max des sources, jamais l'horloge). -->
 
 Ce tableau de bord répond à trois questions que le registre seul ne savait pas poser : est-ce la deuxième fois, chez qui, et depuis combien de temps la correction existe sans être appliquée. Il se lit avec sa contre-métrique : un compteur de récidives qui baisse pendant que le nombre de classes monte est un compteur contourné, pas un progrès.
 
-**Périmètre mesuré** : 1084 item(s) au registre (actifs et archive), 247 portant une classe, 129 marqué(s) récidive ; référentiel de 74 classe(s) en 18 famille(s) (v1.13.0) ; 28 relevé(s) d'héritage.
+**Périmètre mesuré** : 1085 item(s) au registre (actifs et archive), 247 portant une classe, 129 marqué(s) récidive ; référentiel de 74 classe(s) en 18 famille(s) (v1.13.0) ; 28 relevé(s) d'héritage.
 
 ## 1. Récidives par classe
 

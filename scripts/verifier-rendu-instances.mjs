@@ -47,7 +47,16 @@ const PILOT = join(ICI, "..");
 const args = process.argv.slice(2);
 const jsonOnly = args.includes("--json");
 const iL = args.indexOf("--largeur");
-const largeur = iL > -1 ? args[iL + 1] : "1440";
+// LA LARGEUR N'EST PLUS ÉCRITE ICI NON PLUS (15/09/2026) — même doctrine que la liste des familles
+// ci-dessous, et pour une raison mesurée. Ce contrôle figeait `--widths 1440`, une fenêtre sur les
+// SIX que le socle juge par défaut (3840, 2560, 1920, 1280, 768, 390). Or trois familles
+// bloquantes ne parlent QU'EN DEHORS de 1440 : V18 (mesure de lecture) à partir de 2560 px,
+// `sommaire_perdu` à 768 et 390 px, V1 (débordement) à 390 px. Preuve jouée le 15/09 sur les dix
+// pages de l'enregistrement 385b1ae : PASS 10/10 à 1440 px ici, FAIL 10/10 au périmètre par
+// défaut du socle. Un contrôle qui ne regarde qu'une fenêtre sur six ne dit pas « conforme », il
+// dit « conforme à 1440 px » — et personne ne lisait la nuance. Sans `--largeur`, le périmètre
+// est désormais CELUI DU SOCLE ; `--largeur` reste pour restreindre volontairement, et le dit.
+const largeur = iL > -1 ? args[iL + 1] : null;
 // TF-0695 : le premier argument positionnel — ni un drapeau, ni la valeur de `--largeur` — est
 // la cible. Sans lui, le contrôle garde son périmètre historique : le catalogue du pilot.
 const cible = args.find((a, i) => !a.startsWith("--") && (iL === -1 || i !== iL + 1)) || null;
@@ -132,7 +141,8 @@ const findings = [];
 let echecs = 0;
 for (const f of instances) {
   const nom = nomDe(f);
-  const r = spawnSync(python, ["-X", "utf8", SOCLE, f, "--widths", largeur, "--output", "json",
+  const r = spawnSync(python, ["-X", "utf8", SOCLE, f,
+    ...(largeur ? ["--widths", largeur] : []), "--output", "json",
     "--out", captures], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
   let rapport = null;
   try { rapport = JSON.parse((r.stdout || "").trim()); } catch { /* traité juste après */ }
@@ -142,22 +152,29 @@ for (const f of instances) {
       (r.stderr || "").split("\n")[0].slice(0, 160) });
     continue;
   }
-  const bp = rapport.breakpoints?.[largeur];
+  // Toutes les largeurs rendues sont jugées, et le constat NOMME celle où le défaut se voit :
+  // « V18 ×2 » sans la fenêtre laisserait chercher à l'œil sur six captures.
+  const fenetres = Object.keys(rapport.breakpoints || {});
   const causes = [];
-  for (const famille of BLOQUANTES) {
-    const n = (bp?.issues?.[famille] || []).length;
-    if (n) causes.push(`${table[famille].libelle} ×${n}`);
+  for (const w of fenetres) {
+    const bp = rapport.breakpoints[w];
+    for (const famille of BLOQUANTES) {
+      const n = (bp?.issues?.[famille] || []).length;
+      if (n) causes.push(`${table[famille].libelle} ×${n} à ${w}px`);
+    }
   }
+  const ou_ = largeur ? `${largeur}px` : `${fenetres.length} largeur(s) : ${fenetres.join(", ")}px`;
   if (causes.length) {
     echecs += 1;
-    findings.push({ statut: "FAIL", ou: nom, message: `rendu en défaut à ${largeur}px : ` +
+    findings.push({ statut: "FAIL", ou: nom, message: `rendu en défaut sur ${ou_} : ` +
       causes.join(", ") + ". Le contrôle de marquage ne voit AUCUNE de ces causes : " +
       "un livrable n'est conforme qu'après les deux" });
   } else {
-    findings.push({ statut: "PASS", ou: nom, message: `rendu propre à ${largeur}px ` +
+    findings.push({ statut: "PASS", ou: nom, message: `rendu propre sur ${ou_} ` +
       `(${BLOQUANTES.length} familles bloquantes vérifiées, lues dans la table du socle)` });
   }
 }
 rmSync(captures, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 sortir(echecs ? "FAIL" : "PASS", echecs ? 1 : 0, findings,
-  `${instances.length} instance(s) rendue(s) à ${largeur}px`);
+  `${instances.length} instance(s) rendue(s) ${largeur ? `à ${largeur}px (périmètre RESTREINT par --largeur)`
+    : "sur le périmètre par défaut du socle — toutes ses largeurs"}`);

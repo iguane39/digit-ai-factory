@@ -1,9 +1,9 @@
 # TODO-FORGE — registre d'amélioration de l'écosystème
 
 <!-- VUE GÉNÉRÉE par generer-vue.mjs — NE PAS ÉDITER. Source unique : TODO.jsonl.
-     sceaux: actifs=da3f8ac60cd6 archive=6ce2fe14c2bb · dernier événement: 2026-09-15T13:05:01.388Z -->
+     sceaux: actifs=f0a4fbc3266b archive=6ce2fe14c2bb · dernier événement: 2026-09-15T13:18:06.150Z -->
 
-**303 actifs** (candidat 72 · décidé 36 · en cours 14 · corrigé 181 · écarté 0) · **782 archivés**.
+**304 actifs** (candidat 72 · décidé 36 · en cours 14 · corrigé 182 · écarté 0) · **782 archivés**.
 Gouvernance : tout entre en *candidat* ; seul un mandat humain passe en *décidé* (« décide TF-xxxx »).
 Score = gain × preuve (×2 payé en run réel) ÷ effort.
 
@@ -59,6 +59,7 @@ Score = gain × preuve (×2 payé en run réel) ÷ effort.
 | TF-1070 | candidat | 1 | digit-ai-factory : le domaine << style redactionnel >> entre au registre sans declencheur automatique, faute de mesure de bruit sur les produits | **oui** — Le lot de travaux demande l entree de domaine et ne dit rien du declenchement ; la donnee du pilot (references/tics-redactionnels.json) declare son calibrage : 204 textes, tous issus du pilot, seuil d echec des tirets d incise pose a 40 pour mille au-dessus du 95e centile mesure a 18,6. Aucun chiffre equivalent n existe pour un produit. L ecart est ecrit dans le champ non_juge de l entree de registre (registre-oracles.json, oracle 48 sur 57) et dans la ligne homologue du .md, donc lisible par tout run qui consulte le registre. Classe deja fondee chez le pilot : une regle neuve mise en service sans mesure de bruit sur les depots qui CONSOMMENT le socle fait rougir une suite ailleurs, et l equipe qui la subit desactive le controle. |
 | TF-0869 | corrige | 25 | pilot : aucun .env local créé d'office, le commanditaire a saisi sa clé Anthropic dans .env.example versionné | **oui** — git diff --stat .env.example : 1 ligne, clé de 108 caractères préfixée sk-ant- dans un fichier versionné ; un commit de plus et le secret partait |
 | TF-1010 | corrige | 25 | pilot : le noyau a perdu le mot << seulement >> pour tenir dans son plafond — l acceptation d un livrable a cesse d etre exclusive, et personne ne l a decide | **oui** — le garde-fou le plus structurant du parc — un livrable ne s accepte que sur verdict d oracle execute — a cesse d etre exclusif dans le noyau, publie, sans decision humaine |
+| TF-1086 | corrige | 25 | le controle de rendu du pilot figeait UNE fenetre sur les SIX que le socle juge : trois familles bloquantes ne parlent qu en dehors de 1440 px, et rien ne le disait | **oui** — mesure du 15/09 : PASS 10/10 a 1440 px contre FAIL 10/10 au perimetre du socle, sur les memes dix fichiers — le controle etait structurellement aveugle a trois familles bloquantes sur les siennes |
 | TF-0870 | corrige | 20 | pilot : une clé Anthropic d'organisation sans espace de travail échoue en 400, variable ANTHROPIC_WORKSPACE_ID absente du gabarit et du skill | **oui** — un redéploiement qualif et un appel direct à l'API pour lire la cause ; smoke-qualif-20260906.json E-011 FAIL 502 |
 | TF-0872 | corrige | 20 | pilot : ETAPE-MEP § 3 bis ne prescrit ni comptes d'essai vides ni source des identifiants d'une qualif publique | **oui** — retour humain lot 20260906b, un run de version |
 | TF-0998 | corrige | 20 | pilot : le detecteur de recherche par nom de S24 (oracle-synthese) compte le mot << motif >>, libelle prescrit par le gabarit a chaque ligne du bloc 5 — une ligne de non-traite ordinaire est refusee comme une recherche par nom sans resultat | **oui** — une ligne du bloc 5 sans aucune recherche refusee a la premiere passe ; reformulation sans gain de sens et second passage d'oracle ; reproductible sur toute restitution dont le bloc 5 nomme une table ou un espace de travail avec un mot d'absence |
