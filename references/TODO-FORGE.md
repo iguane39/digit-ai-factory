@@ -221,7 +221,13 @@ tables valides, aucun secret, entrants en forme, un pseudonyme par produit). Le 
 deux postes ont étendu chacun leur table libre pendant deux jours sans aucun lien — mêmes numéros par
 chance, pas par construction. Règle : toute extension d'une table se commet et se pousse dans la foulée ;
 `scripts\lib-confidentiel.mjs` est le seul endroit qui sait où lire les tables (variable d'environnement,
-canal, sinon ancien fichier libre EN LE DISANT).
+canal, sinon ancien fichier libre EN LE DISANT). **Un identifiant technique inconnu des tables se fait
+qualifier à l'ingestion (TF-0966, 15/09/2026)** : après la substitution, `ingerer-lot.mjs` relève les
+formes `MAJUSCULES_SOULIGNÉES` et `schema.table` absentes du vocabulaire public du pilot
+(`todo\identifiants-techniques.mjs`), les NOMME à l'écran et en compte le nombre à l'événement
+d'ingestion (`identifiants_a_qualifier`, jamais les noms). Confidentiel : l'inscrire à la table des
+noms interdits du canal et rectifier les items ; sinon, rien. Avertissement et non refus : mesuré le
+15/09, 43 créations sur 350 en portent au moins un.
 
 **La propagation d'une correction se MESURE, elle ne se souhaite pas (TF-0689, 01/09).** Le
 champ `produits_beneficiaires` est de la prose — 73 items clos en portaient au 27/08, aucun

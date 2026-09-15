@@ -29,6 +29,7 @@ import { fileURLToPath } from "node:url";
 import { verifier as verifierFormeLot } from "../gabarits/oracle-lot-retours.mjs";
 import { localiserProduit, causeDuRefus } from "./localiser-produit.mjs";
 import { anonymiserCandidature, pseudoProduit, anonymiser, EST_EMETTEUR_FORGE } from "./anonymiser-entrant.mjs";
+import { aQualifier } from "./identifiants-techniques.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const sidecarPath = process.argv[2];
@@ -527,6 +528,19 @@ if (remplacesTotal.length) {
     remplacesTotal.join(", "));
   console.log("  Les tables de correspondance vivent HORS des dépôts.");
 }
+// TF-0966 (15/09/2026) — UN IDENTIFIANT TECHNIQUE INCONNU DES TABLES SE FAIT QUALIFIER. Le 08/09,
+// cinq identifiants d'un système client (MAJUSCULES_SOULIGNÉES, schema.table) sont entrés au
+// registre publié, absents des deux tables : ni l'anonymisation ni la porte ne pouvaient les voir.
+// Relevé APRÈS la substitution (un nom connu est déjà remplacé), moins le vocabulaire public du
+// pilot. AVERTISSEMENT, pas refus : mesuré le 15/09, 43 créations sur 350 en portent au moins un —
+// un refus arrêterait un lot sur huit pour une question qu'un humain seul peut trancher. Le nombre
+// entre à l'événement d'ingestion ; les NOMS, jamais — ils sont peut-être confidentiels.
+const identifiantsAQualifier = aQualifier(candidatures.map((c) => `${c.titre || ""} ${c.contenu || ""}`));
+if (identifiantsAQualifier.length) {
+  console.error(`[IDENTIFIANTS À QUALIFIER] ${identifiantsAQualifier.length} identifiant(s) technique(s) absent(s) des tables et du vocabulaire public du pilot : ` +
+    `${identifiantsAQualifier.join(", ")}\n  Confidentiel ? l'inscrire à la table des noms interdits du canal (identifiants + pseudonymes) et rectifier les items ; ` +
+    "sinon, rien à faire. Le registre est publié : la question se pose MAINTENANT, pas après le push (TF-0966).");
+}
 // ---- récidive : la classe est-elle déjà close en corrige ? --------------------------------
 // Deux sources, réunies : les items que la classe déclare l'avoir FONDÉE (todo/CLASSES.json,
 // `fondee_par`) et tout item du registre portant déjà cette `classe`. La date de correction se
@@ -629,6 +643,7 @@ const nbRectifications = candidatures.filter((c) => c.rectifie !== undefined).le
 const evIngestion = { ev: "ingestion", ts, lot_sha: lotSha, fichier: anonymiser(String(sidecarPath)).texte, creations: nouvelles.length - nbRectifications };
 if (nbRectifications) evIngestion.rectifications = nbRectifications;
 if (nbRecidives) evIngestion.recidives = nbRecidives;
+if (identifiantsAQualifier.length) evIngestion.identifiants_a_qualifier = identifiantsAQualifier.length;
 if (reglesDerogees.length) {
   evIngestion.derogation = { regles: [...new Set(reglesDerogees)], motif: derogationMotif, decision: "humaine" };
 }
