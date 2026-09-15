@@ -30,6 +30,7 @@ import { verifier as verifierFormeLot } from "../gabarits/oracle-lot-retours.mjs
 import { localiserProduit, causeDuRefus } from "./localiser-produit.mjs";
 import { anonymiserCandidature, pseudoProduit, anonymiser, EST_EMETTEUR_FORGE } from "./anonymiser-entrant.mjs";
 import { aQualifier } from "./identifiants-techniques.mjs";
+import { aQualifier as adressesIpAQualifier, messageAQualifier as messageAdressesIp } from "./adresses-ip.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const sidecarPath = process.argv[2];
@@ -541,6 +542,11 @@ if (identifiantsAQualifier.length) {
     `${identifiantsAQualifier.join(", ")}\n  Confidentiel ? l'inscrire à la table des noms interdits du canal (identifiants + pseudonymes) et rectifier les items ; ` +
     "sinon, rien à faire. Le registre est publié : la question se pose MAINTENANT, pas après le push (TF-0966).");
 }
+// TF-1134 (a) (15/09/2026) — UNE ADRESSE IP N'EST DANS AUCUNE TABLE. L'adresse IPv4 d'un poste en
+// service est entrée au registre le 15/09. Même modèle que TF-0966 : NOMMÉE à l'écran, COMPTÉE à
+// l'événement d'ingestion, jamais écrite dans ce dernier ; avertissement, pas refus.
+const adressesIp = adressesIpAQualifier(candidatures.map((c) => `${c.titre || ""} ${c.contenu || ""}`));
+if (adressesIp.length) console.error(messageAdressesIp(adressesIp, "le lot"));
 // ---- récidive : la classe est-elle déjà close en corrige ? --------------------------------
 // Deux sources, réunies : les items que la classe déclare l'avoir FONDÉE (todo/CLASSES.json,
 // `fondee_par`) et tout item du registre portant déjà cette `classe`. La date de correction se
@@ -644,6 +650,7 @@ const evIngestion = { ev: "ingestion", ts, lot_sha: lotSha, fichier: anonymiser(
 if (nbRectifications) evIngestion.rectifications = nbRectifications;
 if (nbRecidives) evIngestion.recidives = nbRecidives;
 if (identifiantsAQualifier.length) evIngestion.identifiants_a_qualifier = identifiantsAQualifier.length;
+if (adressesIp.length) evIngestion.adresses_ip_a_qualifier = adressesIp.length;
 if (reglesDerogees.length) {
   evIngestion.derogation = { regles: [...new Set(reglesDerogees)], motif: derogationMotif, decision: "humaine" };
 }
