@@ -48,7 +48,12 @@ export function corpusPublic(racine = join(ICI, "..")) {
   if (corpusMemo !== null) return corpusMemo;
   const r = spawnSync("git", ["-C", racine, "-c", "core.quotepath=false", "ls-files", "--", "scripts", "oracles", "references", "gabarits", "todo/*.mjs"],
     { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
-  const fichiers = r.status === 0 ? r.stdout.split(/\r?\n/).filter((f) => /\.(mjs|md|json|py)$/i.test(f)) : [];
+  // Une RECETTE ou une FIXTURE qui cite un identifiant ne le rend pas public : ses noms sont
+  // inventés pour être relevés. Mesuré le 15/09 — le banc de ce module, une fois commis, a fait
+  // entrer ses propres identifiants rouges au vocabulaire public, et son cas rouge est passé au
+  // vert… en échouant dans le harnais seulement : une recette verte sur l'arbre de son auteur.
+  const fichiers = r.status === 0 ? r.stdout.split(/\r?\n/)
+    .filter((f) => /\.(mjs|md|json|py)$/i.test(f) && !/\.test\.mjs$/i.test(f) && !/(^|\/)fixtures\//.test(f)) : [];
   const morceaux = [];
   for (const f of fichiers) { try { morceaux.push(readFileSync(join(racine, f), "utf8")); } catch { /* fichier du relevé absent du disque */ } }
   corpusMemo = morceaux.join("\n");

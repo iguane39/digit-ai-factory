@@ -227,7 +227,8 @@ formes `MAJUSCULES_SOULIGNÉES` et `schema.table` absentes du vocabulaire public
 (`todo\identifiants-techniques.mjs`), les NOMME à l'écran et en compte le nombre à l'événement
 d'ingestion (`identifiants_a_qualifier`, jamais les noms). Confidentiel : l'inscrire à la table des
 noms interdits du canal et rectifier les items ; sinon, rien. Avertissement et non refus : mesuré le
-15/09, 43 créations sur 350 en portent au moins un.
+15/09, 42 créations sur 350 en portent au moins un. Le vocabulaire public exclut les recettes et les
+fixtures, dont les identifiants sont inventés pour être relevés.
 
 **La propagation d'une correction se MESURE, elle ne se souhaite pas (TF-0689, 01/09).** Le
 champ `produits_beneficiaires` est de la prose — 73 items clos en portaient au 27/08, aucun

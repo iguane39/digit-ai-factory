@@ -532,7 +532,7 @@ if (remplacesTotal.length) {
 // cinq identifiants d'un système client (MAJUSCULES_SOULIGNÉES, schema.table) sont entrés au
 // registre publié, absents des deux tables : ni l'anonymisation ni la porte ne pouvaient les voir.
 // Relevé APRÈS la substitution (un nom connu est déjà remplacé), moins le vocabulaire public du
-// pilot. AVERTISSEMENT, pas refus : mesuré le 15/09, 43 créations sur 350 en portent au moins un —
+// pilot. AVERTISSEMENT, pas refus : mesuré le 15/09, 42 créations sur 350 en portent au moins un —
 // un refus arrêterait un lot sur huit pour une question qu'un humain seul peut trancher. Le nombre
 // entre à l'événement d'ingestion ; les NOMS, jamais — ils sont peut-être confidentiels.
 const identifiantsAQualifier = aQualifier(candidatures.map((c) => `${c.titre || ""} ${c.contenu || ""}`));
