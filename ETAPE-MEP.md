@@ -19,6 +19,8 @@ Qui fait quoi, et surtout qui NE decide pas : ce tableau se lit par acteur, et l
 | oracle-ops (O-1…O-4) | pointeur sain, healthcheck rejoué, journal intègre, rollback prouvable — verdicts versés au dossier MEP |
 | oracle-ops (O-8, TF-0527) | tout travail PLANIFIÉ installé par la MEP est exerçable à la demande, câblé et distinct de sa cadence — consommé par M-7, § 3 quinquies |
 | oracle-ops (O-7, TF-1075) | l'ensemble servi est conforme à son scellé (empreinte de TOUT l'arbre déployé) — contrôle exécutable de M-8, § 3 sexies |
+| oracle-ops (O-13, TF-1116 et TF-1118) | tout geste destructif écrit dans un document d'exploitation ou un carnet d'écarts porte sa MATURITÉ (éprouvé sur cette cible, ou déduit et à mesurer) et sa MESURE DE NON-RÉGRESSION — joué sur les documents que la MEP produit, § 3 septies |
+| oracle-ops (O-14, TF-1114) | chaque nom de l'export machine du parc figure littéralement dans `docs\projet\COMPOSANTS-OPS.md` — joué à chaque MEP qui actualise ce document, § 3 septies |
 | pilot (cette étape) | orchestre les gestes, exécute M-1…M-5 (qui consomme O-1…O-4 comme preuves), assemble `DOSSIER-MEP.md` |
 | humain | **GO production** — incompressible, jamais délégué à un oracle |
 
@@ -289,6 +291,32 @@ déclarées hors jugement, pas jugées vertes.
 
 **Contrôle exécutable** (chez forge-ops) :
 `node <ops>\oracles\oracle-ops.mjs <racine-du-produit> --planifie` — verdict O-8.
+
+### § 3 septies — Un geste destructif et un inventaire se jugent contre le réel (O-13, O-14)
+
+**Le fait, mesuré le 14/09/2026 chez un produit.** Un correctif réussi sur un environnement a été
+écrit comme geste à jouer sur un second, où il était infaisable : 161 adresses de sortie contre une
+seule. Rien ne distinguait ce geste DÉDUIT d'un geste ÉPROUVÉ (TF-1116). Sur dix lignes d'un
+inventaire de suppression, aucune ne portait la vérification qui prouve que rien n'a rompu, alors
+qu'une suppression d'infrastructure casse à retardement (TF-1118). Et l'inventaire des composants
+restait conforme un mois entier pendant que le parc changeait de moitié : sept noms de l'export
+réel manquaient au document (TF-1114).
+
+**Ce que la MEP exige, et le contrôle qui le joue** (forge-ops b7ea0ea) :
+- tout geste destructif (supprimer, retirer, fermer, purger, détruire) écrit dans `DOSSIER-MEP.md`,
+  un document d'exploitation ou le carnet d'écarts porte « éprouvé sur cette cible le AAAA-MM-JJ »
+  ou « déduit d'une autre cible, à mesurer avant exécution », et une ligne « Mesure de
+  non-régression : <commande> » qui FORCE l'événement différé (connexion neuve, réplica
+  redémarré) — `node <ops>\oracles\oracle-ops.mjs <document.md>`, verdict O-13 ;
+- l'étape MEP dépose un export machine du parc dans `forge\etapes\mep\` (requête d'inventaire du
+  fournisseur, ou `ops.mjs etat --sortie`), et chaque nom de l'export figure littéralement dans
+  `docs\projet\COMPOSANTS-OPS.md` — un « idem » ou une accolade n'est pas un nom —
+  `node <ops>\oracles\oracle-ops.mjs --inventaire-composants <export.json> docs\projet\COMPOSANTS-OPS.md`,
+  verdict O-14. Sans export, O-14 rend « données insuffisantes », jamais un vert.
+
+**Ce qui n'est pas jugé ici** : le sens inverse d'O-14 (un composant déclaré actif existe dans
+l'export) attend un vocabulaire de statut au document, en étude avec TF-1113 ; la justesse d'une
+mesure de non-régression n'est pas jugée, seulement sa présence.
 
 ## 3 bis. Qualif populée (avant le GO — demande utilisateur RT-6/RS-7)
 
