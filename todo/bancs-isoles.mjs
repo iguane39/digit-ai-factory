@@ -52,7 +52,22 @@ const DOSSIERS = ["todo", "scripts", "oracles", "gabarits", "."];
  * D'où deux formes admises et deux seulement : le nom de module avec son extension (un import ou
  * un sous-processus le porte toujours), ou la fonction d'inscription suivie de sa parenthèse.
  */
-const TOUCHE_LA_CHAINE = /(?:anonymiser-entrant|anonymiser-suivis|ingerer-lot|reempreinter-lot|emettre-travaux)\.mjs|pseudoProduit\s*\(|pseudonymeProduit\s*\(/;
+//
+// TF-1133 (15/09/2026) : deux modules de plus, qui appellent l'anonymiseur sans le nommer dans le
+// banc — `readme-dossiers.mjs` (il pseudonymise chaque index qu'il écrit, D-37) et
+// `accueillir-lot.mjs`. Deux recettes du générateur d'index lisaient ainsi les tables RÉELLES de ce
+// poste sans que ce contrôle les voie, et tombaient sur un clone frais, où le canal n'existe pas.
+const TOUCHE_LA_CHAINE = /(?:anonymiser-entrant|anonymiser-suivis|ingerer-lot|reempreinter-lot|emettre-travaux|readme-dossiers|accueillir-lot)\.mjs|pseudoProduit\s*\(|pseudonymeProduit\s*\(/;
+
+/**
+ * Les fichiers de RECETTE lus : le motif de `oracles/self-tests.mjs` (I2), et pas seulement
+ * `*.test.mjs`. TF-1133 : `todo/self-test.mjs` lance `ingerer-lot.mjs` six fois, et ce contrôle ne
+ * le lisait pas — il ne finit pas en `.test.mjs`. Il ingérait sur les tables réelles de ce poste.
+ * `self-tests.mjs`, l'AGRÉGATEUR, n'en est pas une : il ne lance aucune chaîne, et cite ses remèdes
+ * en prose (`node scripts\readme-dossiers.mjs`) — le motif exige donc `self-test` suivi de `-…` ou
+ * de `.mjs`, jamais d'un `s`.
+ */
+const EST_UNE_RECETTE = (n) => /\.test\.mjs$/i.test(n) || /^self-test(?:-[^.]+)?\.mjs$/i.test(n);
 
 /** Le banc DÉSIGNE-t-il ses tables ? Les deux variables, posées avant tout appel. */
 const DESIGNE_SES_TABLES = /FORGE_PRODUITS_PSEUDO/;
@@ -66,7 +81,7 @@ export function relever(racine = RACINE) {
     let noms = [];
     try { noms = readdirSync(join(racine, d)); } catch { continue; }
     for (const n of noms) {
-      if (!/\.test\.mjs$/i.test(n)) continue;
+      if (!EST_UNE_RECETTE(n)) continue;
       const chemin = join(racine, d, n);
       let txt = "";
       try { txt = readFileSync(chemin, "utf8"); } catch { continue; }
@@ -104,6 +119,8 @@ export function verifier(racine = RACINE) {
       "la PRÉVENTION dans la chaîne elle-même : les deux gardes de `anonymiser-entrant.mjs` couvrent le banc "
         + "qui l'appelle directement, jamais celui qui lance un sous-processus — limite mesurée le 08/09 et écrite ici",
       "l'ORDRE des instructions : ce contrôle voit que les tables sont désignées, pas qu'elles le sont avant le premier appel",
+      "les recettes INTERNES d'un oracle (`--self-test` dans `oracle-*.mjs`) : le fichier porte aussi le mode réel, qui lit "
+        + "légitimement les tables du canal, et ses commentaires citent les modules — le motif accuserait une mention",
     ],
   };
 }

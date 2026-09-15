@@ -221,6 +221,21 @@ check("R10 verte : creation externe couverte par ingestion → PASS", () => {
 });
 
 // ---- circuit d'ingestion (candidature → registre), sur registre TEMPORAIRE -----------------
+// TF-1133 (15/09/2026) — L'INGESTION PSEUDONYMISE, DONC ELLE A BESOIN DE TABLES, ET CE SONT LES
+// NÔTRES. Sans tables désignées, `ingerer-lot.mjs` lisait celles du canal confidentiel de ce poste :
+// la recette passait ici sur des noms réels, et s'arrêtait sur un clone frais (« référentiel des
+// clients introuvable »), 6 cas sur 55. Les tables sont INVENTÉES, posées sous le dossier temporaire
+// de la recette, et désignées pour ses seuls sous-processus : jamais lues, copiées ni exportées
+// depuis le canal (TF-0957, incident du 08/09).
+writeFileSync(join(T, "_noms-interdits.json"), JSON.stringify({
+  noms: ["Zorglub"], identifiants: [], sigles: [], pseudonymes: { Zorglub: "Client-A" },
+}), "utf8");
+writeFileSync(join(T, "_produits-pseudonymes.json"), JSON.stringify({ produits: {} }), "utf8");
+const ENV_INGESTION = {
+  ...process.env,
+  FORGE_NOMS_INTERDITS: join(T, "_noms-interdits.json"),
+  FORGE_PRODUITS_PSEUDO: join(T, "_produits-pseudonymes.json"),
+};
 const ingerer = join(ICI, "ingerer-lot.mjs");
 const regT = join(T, "registre.jsonl");
 writeFileSync(regT, item({}) + "\n"); // TF-9001 existant → les ids frappés commencent à 9002
@@ -234,7 +249,7 @@ writeFileSync(side, [cand({}), cand({ titre: "friction Y", score: { gain: 4, pre
 const shaReg = () => empreinteFichier(regT);   // TF-0615 : fonction partagee
 
 check("ingestion verte : 2 candidatures → 2 creations en candidat, ids frappés à la suite", () => {
-  execFileSync("node", [ingerer, side, "--registre", regT], { encoding: "utf8" });
+  execFileSync("node", [ingerer, side, "--registre", regT], { env: ENV_INGESTION, encoding: "utf8" });
   const evs = readFileSync(regT, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
   const crees = evs.filter((e) => e.ev === "creation" && e.id !== "TF-9001");
   if (crees.length !== 2) throw new Error(`${crees.length} créations, attendu 2`);
@@ -246,7 +261,7 @@ check("ingestion verte : 2 candidatures → 2 creations en candidat, ids frappé
 
 check("ingestion idempotente : ré-ingérer le même lot → 0 création, registre inchangé", () => {
   const avant = shaReg();
-  const sortie = execFileSync("node", [ingerer, side, "--registre", regT], { encoding: "utf8" });
+  const sortie = execFileSync("node", [ingerer, side, "--registre", regT], { env: ENV_INGESTION, encoding: "utf8" });
   if (!sortie.includes("DÉJÀ INGÉRÉ")) throw new Error("l'idempotence n'a pas joué");
   if (shaReg() !== avant) throw new Error("le registre a changé");
 });
@@ -261,7 +276,7 @@ check("ingestion idempotente aux fins de ligne : le MEME lot en CRLF → 0 créa
   const crlf = join(T, "lot-crlf.tf.jsonl");
   writeFileSync(crlf, readFileSync(side, "utf8").split("\n").join("\r\n"));
   const avant = shaReg();
-  const sortie = execFileSync("node", [ingerer, crlf, "--registre", regT], { encoding: "utf8" });
+  const sortie = execFileSync("node", [ingerer, crlf, "--registre", regT], { env: ENV_INGESTION, encoding: "utf8" });
   if (!sortie.includes("DÉJÀ INGÉRÉ")) throw new Error("le même lot réécrit en CRLF a été ré-ingéré — doublons (TF-0359)");
   if (shaReg() !== avant) throw new Error("le registre a changé");
 });
@@ -270,7 +285,7 @@ check("ingestion rouge (fins de ligne) : un lot au contenu DIFFÉRENT en CRLF es
   const autre = join(T, "lot-autre-crlf.tf.jsonl");
   writeFileSync(autre, (cand({ titre: "friction Z, jamais vue" }) + "\n").split("\n").join("\r\n"));
   const avant = shaReg();
-  const sortie = execFileSync("node", [ingerer, autre, "--registre", regT], { encoding: "utf8" });
+  const sortie = execFileSync("node", [ingerer, autre, "--registre", regT], { env: ENV_INGESTION, encoding: "utf8" });
   if (sortie.includes("DÉJÀ INGÉRÉ")) throw new Error("un lot NEUF confondu avec un ancien — la normalisation est devenue aveugle");
   if (shaReg() === avant) throw new Error("le registre n'a pas bougé alors qu'une candidature neuve entrait");
 });
@@ -279,7 +294,7 @@ check("ingestion rouge : 1 ligne invalide → rejet ATOMIQUE motivé, registre i
   const mauvais = join(T, "mauvais.tf.jsonl");
   writeFileSync(mauvais, [cand({}), cand({ titre: undefined })].join("\n") + "\n");
   const avant = shaReg();
-  try { execFileSync("node", [ingerer, mauvais, "--registre", regT], { encoding: "utf8", stdio: "pipe" }); }
+  try { execFileSync("node", [ingerer, mauvais, "--registre", regT], { env: ENV_INGESTION, encoding: "utf8", stdio: "pipe" }); }
   catch (e) {
     if (e.status !== 1) throw new Error(`exit ${e.status} attendu 1`);
     if (!String(e.stderr).includes("REJET ATOMIQUE")) throw new Error("rejet non motivé");
@@ -292,7 +307,7 @@ check("ingestion rouge : 1 ligne invalide → rejet ATOMIQUE motivé, registre i
 check("ingestion : une candidature portant un id est refusée (frappage = écrivain unique)", () => {
   const avecId = join(T, "avec-id.tf.jsonl");
   writeFileSync(avecId, cand({ id: "TF-0099" }) + "\n");
-  try { execFileSync("node", [ingerer, avecId, "--registre", regT], { encoding: "utf8", stdio: "pipe" }); }
+  try { execFileSync("node", [ingerer, avecId, "--registre", regT], { env: ENV_INGESTION, encoding: "utf8", stdio: "pipe" }); }
   catch (e) { if (e.status === 1) return; throw new Error(`exit ${e.status}`); }
   throw new Error("aurait dû refuser");
 });
@@ -303,7 +318,7 @@ const exportOk = join(T, "TF-decisions-ok.json");
 writeFileSync(exportOk, JSON.stringify({ schema: 1, type: "decisions-todo-forge", sceau_source: "x", exporte_le: "2026-08-09T08:00:00Z",
   decisions: [{ id: "TF-9002", decider: true, commentaire: "priorité haute" }, { id: "TF-9003", decider: false, commentaire: "à regrouper avec TF-9002" }] }));
 check("export appliqué : decide tracé (décideur humain) + commentaires conservés", () => {
-  execFileSync("node", [appliquer, exportOk, "--registre", regT], { encoding: "utf8" });
+  execFileSync("node", [appliquer, exportOk, "--registre", regT], { env: ENV_INGESTION, encoding: "utf8" });
   const evs = readFileSync(regT, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
   const etat = new Map();
   for (const e of evs) { if (e.ev === "creation") etat.set(e.id, { ...e }); else if (e.ev === "maj") Object.assign(etat.get(e.id) ?? {}, e); }
@@ -314,21 +329,21 @@ check("export appliqué : decide tracé (décideur humain) + commentaires conser
 });
 check("export idempotent : ré-appliqué → 0 modification", () => {
   const avant = shaReg();
-  const s = execFileSync("node", [appliquer, exportOk, "--registre", regT], { encoding: "utf8" });
+  const s = execFileSync("node", [appliquer, exportOk, "--registre", regT], { env: ENV_INGESTION, encoding: "utf8" });
   if (!s.includes("DÉJÀ APPLIQUÉ") || shaReg() !== avant) throw new Error("idempotence en défaut");
 });
 check("export rouge : id inconnu → rejet ATOMIQUE, registre intact", () => {
   const mauvais = join(T, "TF-decisions-ko.json");
   writeFileSync(mauvais, JSON.stringify({ schema: 1, type: "decisions-todo-forge", decisions: [{ id: "TF-0000", decider: true }] }));
   const avant = shaReg();
-  try { execFileSync("node", [appliquer, mauvais, "--registre", regT], { encoding: "utf8", stdio: "pipe" }); }
+  try { execFileSync("node", [appliquer, mauvais, "--registre", regT], { env: ENV_INGESTION, encoding: "utf8", stdio: "pipe" }); }
   catch (e) { if (e.status !== 1 || shaReg() !== avant) throw new Error("rejet non atomique"); return; }
   throw new Error("aurait dû rejeter");
 });
 check("export rouge : decider sur un item déjà décidé → rejet (transition illégale)", () => {
   const redecide = join(T, "TF-decisions-re.json");
   writeFileSync(redecide, JSON.stringify({ schema: 1, type: "decisions-todo-forge", decisions: [{ id: "TF-9002", decider: true }] }));
-  try { execFileSync("node", [appliquer, redecide, "--registre", regT], { encoding: "utf8", stdio: "pipe" }); }
+  try { execFileSync("node", [appliquer, redecide, "--registre", regT], { env: ENV_INGESTION, encoding: "utf8", stdio: "pipe" }); }
   catch (e) { if (e.status === 1) return; throw new Error(`exit ${e.status}`); }
   throw new Error("aurait dû rejeter");
 });

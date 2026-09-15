@@ -33,6 +33,18 @@
  * en gabarit — un paragraphe de doctrine ne s'exécute pas, un pas de recette si.
  * SKIP (exit 2) vaut succès : sur un poste sans les dépôts frères, il n'y a rien à juger.
  *
+ * CRITÈRE « PARC ABSENT » (TF-1133, 15/09/2026). Un oracle d'état se déclare SANS OBJET — exit 2,
+ * ou un constat SANS_OBJET dans un verdict PASS s'il juge le reste — quand la matière qu'il juge
+ * n'est ni dans le dépôt cloné ni sous `FORGE_ROOT`, et SEULEMENT alors. Il écrit son motif, que ce
+ * harnais affiche. Trois matières sont concernées : un dépôt frère non cloné sous la racine
+ * (oracle-empreintes, site déclaré par site déclaré) ; le canal confidentiel absent, donc les tables
+ * de pseudonymisation introuvables (oracle-readme-dossiers) ; aucune source de skill sous la racine
+ * (oracle-skills). Un oracle dont la matière EST le dépôt (oracle-caracteres-controle) n'a jamais
+ * de parc absent : un clone porte ce qu'il juge, et son rouge sur un clone est un vrai rouge. Sur ce
+ * poste, où le parc et le canal sont là, rien n'est déclaré sans objet et tout est jugé. Le fait :
+ * sur un clone frais, quatre de ces oracles jugeaient un parc absent et le circuit hébergé aurait
+ * été rouge à sa première exécution.
+ *
  * Usage : node oracles\self-tests.mjs        → exit 0 si tout passe, 1 sinon.
  */
 import { execFileSync, spawnSync } from "node:child_process";
@@ -273,15 +285,21 @@ for (const { nom, remede, args: argsParc } of ETAT_DU_PARC) {
   // existe pour eteindre. Un chemin relatif se resout depuis la racine du pilot.
   const cibles = (argsParc || []).map((c) => join(ICI, "..", c));
   const r = spawnSync(process.execPath, [join(ICI, nom), ...cibles], { encoding: "utf8" });
-  let verdict = null;
-  try { verdict = JSON.parse(r.stdout || "{}").verdict; } catch { /* sortie non JSON : le code de retour tranche */ }
-  // 0 PASS · 2 non jugeable (dépôts frères absents) → succès. 1 FAIL → échec, avec le remède.
+  let verdict = null, sansObjet = null;
+  try {
+    const j = JSON.parse(r.stdout || "{}");
+    verdict = j.verdict;
+    // TF-1133 : un « sans objet » dit POURQUOI — le motif de l'oracle, ou ses constats SANS_OBJET.
+    const motifs = [j.motif, ...(j.findings || []).filter((f) => f.statut === "SANS_OBJET").map((f) => f.message)].filter(Boolean);
+    sansObjet = motifs.length ? motifs.join(" · ") : null;
+  } catch { /* sortie non JSON : le code de retour tranche */ }
+  // 0 PASS · 2 non jugeable (parc absent, critère ci-dessus) → succès. 1 FAIL → échec, avec le remède.
   const ok = r.status === 0 || r.status === 2;
   resultats.push({
     nom: `${nom} (parc réel)`,
     statut: ok ? "OK" : "ECHEC",
     detail: ok
-      ? `I4 — ${verdict || "sans verdict lisible"} sur le parc`
+      ? `I4 — ${verdict || "sans verdict lisible"} sur le parc${sansObjet ? ` · non jugé : ${sansObjet.slice(0, 220)}${sansObjet.length > 220 ? "…" : ""}` : ""}`
       : `I4 — ${verdict || "FAIL"} sur le parc · remède : ${remede}`,
     via: "I4 (oracle d'état)",
   });

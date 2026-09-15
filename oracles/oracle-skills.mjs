@@ -1615,6 +1615,20 @@ function selfTest() {
   cas.push(["K10   — une variable posée à la chaîne VIDE est traitée comme absente",
             racineConfigInstallee({ CLAUDE_CONFIG_DIR: "   " }).variable === null]);
 
+  // ---- TF-1133 · CRITÈRE « PARC ABSENT » : aucune installation à comparer ------------------------
+  // Vert : racine PAR DÉFAUT inexistante, rien d'imposé — un runner hébergé ; l'oracle se déclare
+  // sans objet. Rouges : une racine qui existe, une racine DÉSIGNÉE par variable (le défaut du 09/09,
+  // K10), un dossier d'installation imposé — tous restent jugés.
+  const absente10 = join(base10, "config-absente");
+  cas.push(["SANS OBJET — racine par défaut INEXISTANTE et rien d'imposé : aucune installation à comparer (runner, TF-1133)",
+            installationAbsente({ config: { racine: absente10, variable: null }, installesImpose: false }) === true]);
+  cas.push(["SANS OBJET — refusé si la racine par défaut EXISTE, même vide : elle est jugée",
+            installationAbsente({ config: { racine: vide, variable: null }, installesImpose: false }) === false]);
+  cas.push(["SANS OBJET — refusé si la racine est DÉSIGNÉE par CLAUDE_CONFIG_DIR, même inexistante : K10 la juge",
+            installationAbsente({ config: { racine: absente10, variable: "CLAUDE_CONFIG_DIR" }, installesImpose: false }) === false]);
+  cas.push(["SANS OBJET — refusé si le dossier des skills installés est IMPOSÉ (--installes, FORGE_SKILLS_INSTALLES)",
+            installationAbsente({ config: { racine: absente10, variable: null }, installesImpose: true }) === false]);
+
   rmSync(base10, { recursive: true, force: true });
 
   let bons = 0;
@@ -1624,6 +1638,18 @@ function selfTest() {
   }
   console.log(`Self-test oracle-skills : ${bons}/${cas.length}`);
   return bons === cas.length ? 0 : 1;
+}
+
+/**
+ * TF-1133 (15/09/2026) — CRITÈRE « PARC ABSENT » de cet oracle : il n'y a AUCUNE installation à
+ * comparer. La racine de configuration est celle PAR DÉFAUT (aucune variable ne la désigne), aucun
+ * dossier d'installation n'est imposé, et elle n'existe pas : un runner hébergé, ou un poste sans
+ * Claude Code. Sur un clone frais avec les dépôts frères, l'oracle y rendait K1 FAIL sur chaque skill
+ * versionné — « jamais installé » là où rien ne peut l'être. Une racine DÉSIGNÉE et vide reste jugée :
+ * c'est le défaut du 09/09 que K10 existe pour attraper.
+ */
+function installationAbsente({ config, installesImpose, existe = existsSync }) {
+  return config.variable === null && !installesImpose && !existe(config.racine);
 }
 
 // ---- entrée -----------------------------------------------------------------------------------
@@ -1645,6 +1671,13 @@ const installes = lire("--installes", skillsInstalles().chemin);
 const installes_hooks = lire("--installes-hooks", join(dirname(installes), "hooks"));
 // Le câblage installé est le frère des deux autres — même déduction.
 const settings_installe = lire("--settings-installe", join(dirname(installes), "settings.json"));
+if (installationAbsente({ config, installesImpose: args.includes("--installes") || skillsInstalles().variable === "FORGE_SKILLS_INSTALLES" })) {
+  const motif = `aucune installation à comparer : la racine de configuration par défaut ${config.racine} n'existe pas et aucune variable `
+    + "ne la désigne (runner hébergé, ou poste sans Claude Code) — K1 à K11 ne sont pas jugés ; une racine désignée et vide, elle, l'est (K10, TF-1133)";
+  process.stdout.write(JSON.stringify({ oracle: ORACLE, version: VERSION, racine, racine_config: config.racine, config_decidee_par: config.decidee_par,
+    installes, verdict: "SKIP", motif, findings: [], non_juge: NON_JUGE }, null, 1) + "\n");
+  process.exit(2);
+}
 const appliquer = args.includes("--appliquer");
 const purger = args.includes("--purger");
 SAUF_SOURCES = lire("--sauf-sources", "").split(",").map((s) => s.trim()).filter(Boolean).map((s) => cleJournal(s));

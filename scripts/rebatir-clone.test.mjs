@@ -18,7 +18,11 @@ const ICI = dirname(fileURLToPath(import.meta.url));
 const SCRIPT = join(ICI, "rebatir-clone.mjs");
 const sh = (cwd, cmd, ...a) => { const r = spawnSync(cmd, a, { cwd, encoding: "utf8" }); if (r.status !== 0) throw new Error(`${cmd} ${a.join(" ")} : ${r.stderr || r.stdout}`); return (r.stdout || "").trim(); };
 const g = (cwd, ...a) => sh(cwd, "git", "-c", "user.email=recette@example.com", "-c", "user.name=recette", "-c", "commit.gpgsign=false", ...a);
-const lancer = (depot, ...opts) => { const r = spawnSync(process.execPath, [SCRIPT, depot, "--json-only", ...opts], { encoding: "utf8", env: { ...process.env, FORGE_ROOT: dirname(depot), FORGE_SKILLS_INSTALLES: join(dirname(depot), "aucun-skill") } }); let j = null; try { j = JSON.parse(r.stdout); } catch { /* laissé nul */ } return { code: r.status, j, brut: r.stdout + r.stderr }; };
+// TF-1133 (15/09/2026) : l'outil rejoue des commits (`git am`), ce qui exige une identité git. Celle
+// de ce poste vient de sa configuration globale ; un runner hébergé n'en a aucune, et la recette y
+// tombait sur « Author identity unknown » (2 cas sur 7). Elle pose donc la sienne, pour l'outil aussi.
+const IDENTITE = { GIT_AUTHOR_NAME: "recette", GIT_AUTHOR_EMAIL: "recette@example.com", GIT_COMMITTER_NAME: "recette", GIT_COMMITTER_EMAIL: "recette@example.com" };
+const lancer = (depot, ...opts) => { const r = spawnSync(process.execPath, [SCRIPT, depot, "--json-only", ...opts], { encoding: "utf8", env: { ...process.env, ...IDENTITE, FORGE_ROOT: dirname(depot), FORGE_SKILLS_INSTALLES: join(dirname(depot), "aucun-skill") } }); let j = null; try { j = JSON.parse(r.stdout); } catch { /* laissé nul */ } return { code: r.status, j, brut: r.stdout + r.stderr }; };
 
 function parc() {
   const base = mkdtempSync(join(tmpdir(), "rebatir-"));

@@ -30,10 +30,16 @@
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { lireCircuit, defautsDeSortie, verdictDesPas } from "./simuler-recette-hebergee.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const RACINE = join(ICI, "..");
 const CHEMIN_WORKFLOW = join(RACINE, "ci", "hebergee", "recette-pilot.yml");
+const CHEMIN_ACTIVER = join(RACINE, "ci", "hebergee", "ACTIVER.md");
+const SIMULATEUR = join(RACINE, "scripts", "simuler-recette-hebergee.mjs");
+// TF-1133 : ce que la recette lit HORS du pilot. Le registre des types d'organization (R-25) et le
+// socle HTML de forge-agents (check_html) ; les deux dépôts sont publics, donc clonables sans secret.
+const FRERES = ["digit-ai-forge-organization", "digit-ai-forge-agents"];
 
 let pass = 0, fail = 0;
 const check = (nom, fn) => {
@@ -84,7 +90,27 @@ function verifierRecette(texte) {
   if (!/node\s+todo\/self-test\.mjs/.test(texte)) motifs.push("n'appelle pas `node todo/self-test.mjs`");
   if (/secrets\./.test(texte)) motifs.push("référence un `secrets.*` — le mandat interdit tout secret");
   if (!/node-version:\s*['"]?(2\d|[3-9]\d)/.test(texte)) motifs.push("aucune version Node 20+ déclarée (`node-version`)");
+  // TF-1133 — le banc jugeait le fichier, jamais ce que le runner aurait sous la main. Rejoué sur un
+  // clone frais, le premier jet rendait 9 recettes en défaut sur 115 : pilot seul, profondeur 1.
+  const c = lireCircuit(texte);
+  if (!c.principal || c.principal.profondeur !== 0)
+    motifs.push("le pilot n'est pas récupéré avec son historique complet (`fetch-depth: 0`) — relever-heritage lit l'historique, un clone de profondeur 1 le fait échouer");
+  for (const f of FRERES)
+    if (!c.freres.some((x) => x.nom === f)) motifs.push(`le dépôt frère public ${f} n'est pas récupéré à côté du pilot`);
+  if (!c.env.FORGE_ROOT) motifs.push("FORGE_ROOT n'est pas posé sur la racine commune du pilot et de ses frères");
+  if (c.principal && !c.principal.path && c.freres.length)
+    motifs.push("le pilot est récupéré à la racine de l'espace de travail : ses frères seraient DANS lui, pas à côté (poser `path:`)");
   return motifs;
+}
+
+// TF-1133 — la simulation se joue AVANT le geste : ACTIVER.md la cite, et avant la ligne du geste.
+function simulationAvantGeste(texte) {
+  const iSim = texte.indexOf("simuler-recette-hebergee.mjs");
+  const iGeste = texte.indexOf("Geste d'activation");
+  if (iSim < 0) return "ACTIVER.md ne fait pas jouer `scripts/simuler-recette-hebergee.mjs`";
+  if (iGeste < 0) return "ACTIVER.md ne nomme plus le geste d'activation";
+  if (iSim > iGeste) return "ACTIVER.md cite la simulation APRÈS le geste d'activation — un verdict rendu après le geste n'éclaire plus rien";
+  return null;
 }
 
 // ── Fixture VERTE : le fichier réel ───────────────────────────────────────────────────────────
@@ -172,6 +198,57 @@ check("(rouge) une branche autre que main sans main déclarée est rejetée", ()
   const motifs = verifierRecette(mauvais);
   if (!motifs.some((m) => m.includes("pull_request"))) throw new Error("l'absence de pull_request n'a pas été détectée");
   if (!motifs.some((m) => m.includes("branche `main`"))) throw new Error("l'absence de branche main n'a pas été détectée");
+});
+
+// ── TF-1133 : ce que le runner reçoit, et la simulation qui le rejoue avant le geste ──────────
+check("(rouge, TF-1133) le premier jet du circuit — pilot seul, profondeur 1, sans FORGE_ROOT — est rejeté, chaque manque nommé", () => {
+  const premierJet = [
+    "on:", "  push:", "    branches: [main]", "  pull_request:", "    branches: [main]",
+    "jobs:", "  recette:", "    runs-on: ubuntu-latest", "    steps:",
+    "      - name: Récupérer le dépôt", "        uses: actions/checkout@v4",
+    "      - uses: actions/setup-node@v4", "        with:", "          node-version: \"20\"",
+    "      - run: node oracles/self-tests.mjs", "      - run: node todo/self-test.mjs",
+  ].join("\n") + "\n";
+  const motifs = verifierRecette(premierJet);
+  for (const attendu of ["fetch-depth: 0", ...FRERES, "FORGE_ROOT"])
+    if (!motifs.some((m) => m.includes(attendu))) throw new Error(`manque non nommé : ${attendu} (motifs : ${motifs.join(" ; ")})`);
+});
+
+check("(rouge, TF-1133) un circuit qui clone les frères sans `path:` pour le pilot est rejeté (les frères seraient dans le pilot)", () => {
+  const imbrique = readFileSync(CHEMIN_WORKFLOW, "utf8").replace(/\n\s*path: digit-ai-factory/, "");
+  if (!verifierRecette(imbrique).some((m) => m.includes("path:"))) throw new Error("un pilot posé à la racine de l'espace de travail n'est pas détecté");
+});
+
+check("(vert) le simulateur lit dans le circuit RÉEL ce que le runner fera : historique complet, deux frères à côté, FORGE_ROOT, deux commandes dans le pilot", () => {
+  if (!existsSync(SIMULATEUR)) throw new Error("scripts/simuler-recette-hebergee.mjs absent");
+  const c = lireCircuit(readFileSync(CHEMIN_WORKFLOW, "utf8"));
+  if (!c.principal || c.principal.profondeur !== 0 || c.principal.path !== "digit-ai-factory") throw new Error(`pilot lu : ${JSON.stringify(c.principal)}`);
+  for (const f of FRERES) if (!c.freres.some((x) => x.nom === f && x.path === f)) throw new Error(`frère ${f} non lu à côté du pilot : ${JSON.stringify(c.freres)}`);
+  if (!/github\.workspace/.test(c.env.FORGE_ROOT || "")) throw new Error(`FORGE_ROOT lu : ${c.env.FORGE_ROOT}`);
+  if (c.commandes.length !== 2 || c.commandes.some((x) => x.dossier !== "digit-ai-factory")) throw new Error(`commandes lues : ${JSON.stringify(c.commandes)}`);
+});
+
+check("ACTIVER.md fait jouer la simulation AVANT le geste d'activation", () => {
+  const motif = simulationAvantGeste(readFileSync(CHEMIN_ACTIVER, "utf8"));
+  if (motif) throw new Error(motif);
+});
+
+check("(rouge) une notice qui cite la simulation APRÈS le geste, ou pas du tout, est rejetée", () => {
+  if (!simulationAvantGeste("Geste d'activation : déplacer.\nPuis jouer scripts/simuler-recette-hebergee.mjs.")) throw new Error("simulation après le geste non détectée");
+  if (!simulationAvantGeste("Geste d'activation : déplacer, puis publier.")) throw new Error("absence de simulation non détectée");
+});
+
+check("(rouge) le verdict de simulation nomme les échecs du harnais, et un code non nul muet ne se tait pas", () => {
+  const sortie = "  [OK    ] a.mjs  3/3\n  [ECHEC ] todo/self-test.mjs  Self-test TODO-FORGE : 49 PASS, 6 FAIL\n  [CAS PERDUS] b.mjs : 11 → 9 cas\n";
+  const d = defautsDeSortie(sortie, 1);
+  if (d.length !== 2 || !d[0].includes("todo/self-test.mjs") || !d[1].includes("CAS PERDUS")) throw new Error(`défauts lus : ${JSON.stringify(d)}`);
+  if (defautsDeSortie("rien de lisible\n", 1).length !== 1) throw new Error("un pas en échec sans ligne de défaut est passé sous silence");
+  if (verdictDesPas([{ nom: "p1", code: 0, defauts: [] }, { nom: "p2", code: 1, defauts: ["x"] }]).verdict !== "ROUGE") throw new Error("un pas rouge rend un verdict VERT");
+});
+
+check("(vert) une sortie verte à code 0 ne rend aucun défaut, et le verdict est VERT seulement si chaque pas sort à 0", () => {
+  if (defautsDeSortie("  [OK    ] a.mjs  3/3\n  115/115 recettes jouées et vertes\n", 0).length) throw new Error("défaut inventé sur une sortie verte");
+  if (verdictDesPas([{ nom: "p1", code: 0, defauts: [] }, { nom: "p2", code: 0, defauts: [] }]).verdict !== "VERT") throw new Error("deux pas verts ne rendent pas VERT");
 });
 
 console.log(`\nBanc recette-pilot-hebergee (ci/hebergee) : ${pass} PASS, ${fail} FAIL`);

@@ -37,6 +37,18 @@ const check = (nom, fn) => {
   catch (e) { console.error(`  [FAIL] ${nom} — ${e.message}`); fail++; }
 };
 
+// TF-1133 (15/09/2026) — LE GÉNÉRATEUR PSEUDONYMISE CE QU'IL ÉCRIT (D-37), DONC CETTE RECETTE LUI
+// DONNE DES TABLES, ET CE SONT LES SIENNES. Sans elles, il lisait celles du canal confidentiel de ce
+// poste (origine « canal » mesurée) ; sur un clone frais, sans canal, il refusait à bon droit
+// d'écrire un index qu'il ne pouvait pas pseudonymiser, et la recette tombait sur ENOENT au premier
+// README attendu. Tables INVENTÉES, sous un dossier temporaire, désignées pour ce processus et ses
+// sous-processus seulement : jamais lues, copiées ni exportées depuis le canal (TF-0957).
+const TABLES = mkdtempSync(join(tmpdir(), "readme-tables-"));
+writeFileSync(join(TABLES, "_noms-interdits.json"), JSON.stringify({ noms: ["Zorglub"], identifiants: [], sigles: [], pseudonymes: { Zorglub: "Client-A" } }), "utf8");
+writeFileSync(join(TABLES, "_produits-pseudonymes.json"), JSON.stringify({ produits: {} }), "utf8");
+process.env.FORGE_NOMS_INTERDITS = join(TABLES, "_noms-interdits.json");
+process.env.FORGE_PRODUITS_PSEUDO = join(TABLES, "_produits-pseudonymes.json");
+
 const T = mkdtempSync(join(tmpdir(), "readme-sans-dates-"));
 mkdirSync(join(T, "input", "sous"), { recursive: true });
 mkdirSync(join(T, "output"), { recursive: true });
@@ -249,5 +261,6 @@ check("TF-0914 : le MÊME fichier, une fois COMMIS, entre dans l'index sans autr
 }
 
 rmSync(T, { recursive: true, force: true });
+rmSync(TABLES, { recursive: true, force: true });
 console.log(`\nreadme-dossiers, table sans dates (TF-0503) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

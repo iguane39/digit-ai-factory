@@ -47,6 +47,19 @@ poser("mention.test.mjs", [
   'compteDe("emettre-travaux (TF-0627) : 24 PASS, 0 FAIL");',
 ].join("\n"));
 
+// (4) ROUGE, TF-1133 — une recette `self-test*.mjs` (motif I2, sans `.test.mjs`) qui ingère sans
+//     désigner ses tables : le cas exact de `todo/self-test.mjs`, invisible à ce contrôle jusqu'au 15/09.
+poser("self-test.mjs", [
+  'import { execFileSync } from "node:child_process";',
+  'execFileSync("node", ["ingerer-lot.mjs", "lot.tf.jsonl", "--registre", "r.jsonl"]);',
+].join("\n"));
+
+// (5) ROUGE, TF-1133 — un banc qui lance le générateur d'index, qui pseudonymise ce qu'il écrit.
+poser("index.test.mjs", [
+  'import { spawnSync } from "node:child_process";',
+  'spawnSync(process.execPath, ["readme-dossiers.mjs", "--base", "x"]);',
+].join("\n"));
+
 const r = verifier(T);
 
 check("ROUGE — un banc qui lance la chaîne en sous-processus sans désigner ses tables est REFUSÉ", () => {
@@ -62,12 +75,28 @@ check("VERT — le même banc, tables jetables désignées, passe", () => {
 
 check("VERT, borne — un banc qui MENTIONNE un nom de module en prose n'est pas concerné", () => {
   att(!r.constats.some((x) => x.fichier.endsWith("mention.test.mjs")), "une mention en chaîne de test est prise pour un appel — faux positif payé le 08/09");
-  att(r.bancs_touchant_la_chaine === 2, `le contrôle relève ${r.bancs_touchant_la_chaine} bancs touchant la chaîne, 2 attendus`);
+  att(r.bancs_touchant_la_chaine === 4, `le contrôle relève ${r.bancs_touchant_la_chaine} bancs touchant la chaîne, 4 attendus (nu, isolé, self-test, index)`);
 });
 
 check("le verdict et les compteurs sont cohérents", () => {
   att(r.verdict === "FAIL", "un parc portant un banc nu rend PASS");
   att(r.isoles === 1, `isolés = ${r.isoles}, 1 attendu`);
+});
+
+check("ROUGE, TF-1133 — une recette `self-test.mjs` qui ingère sans tables est lue et REFUSÉE", () => {
+  att(r.constats.some((x) => x.fichier.endsWith("todo/self-test.mjs")), "la recette self-test*.mjs n'est pas lue — c'est le trou par lequel todo/self-test.mjs ingérait sur les tables réelles");
+});
+
+check("ROUGE, TF-1133 — un banc qui lance le générateur d'index sans tables est REFUSÉ", () => {
+  att(r.constats.some((x) => x.fichier.endsWith("index.test.mjs")), "le générateur d'index pseudonymise ce qu'il écrit : un banc qui le lance touche la chaîne");
+});
+
+// TF-1133 — LE CONTRÔLE JOUÉ SUR LE DÉPÔT RÉEL. Jusqu'au 15/09, seul ce banc l'appelait, et sur ses
+// fixtures : aucun pas de recette ne le jouait sur les recettes du dépôt, qui pouvaient donc lire les
+// tables du canal sans que rien le dise. Une règle qui ne juge que ses fixtures ne juge rien.
+check("le dépôt RÉEL : toute recette qui touche la chaîne désigne des tables jetables", () => {
+  const reel = verifier();
+  att(reel.verdict === "PASS", `${reel.constats.length} recette(s) non isolée(s) : ${reel.constats.map((c) => c.fichier).join(", ")}`);
 });
 
 rmSync(T, { recursive: true, force: true });
