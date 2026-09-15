@@ -156,3 +156,24 @@ session principale (outil SendMessage, destinataire « main ») :
 - **côté pilot** : chaque émission reçue est RELAYÉE à l'humain immédiatement, sans
   réécriture. Le silence au-delà d'une fenêtre est un défaut de contrat (TF-0094),
   jamais une économie.
+
+## Rendre la main : jamais sur une attente, jamais sur un arbre sale (TF-1132)
+
+**Le fait, les 14 et 15/09/2026.** Trois agents de campagne se sont arrêtés sur une phrase
+d'attente (« j'attends la fin de la vérification lancée en arrière-plan ») alors que leur harnais
+ne suivait plus aucune tâche d'arrière-plan : l'attente ne pouvait pas se résoudre d'elle-même.
+Coût : trois relances manuelles, deux fixtures de banc laissées mutées dans un dépôt avec une
+recette qui y écrivait ses diagnostics, et un commit tardif arrivé pendant que le pilot reprenait
+le chantier.
+
+- **Aucun tour ne se clôt sur l'attente d'une tâche d'arrière-plan.** Une vérification longue se
+  joue en AVANT-PLAN, avec un délai explicite (paramètre de délai de l'outil) ; si elle a été
+  lancée en arrière-plan, son résultat est RELU avant de rendre la main. Un agent qui s'arrête
+  dit ce qui est fini et ce qui ne l'est pas ; il n'annonce jamais qu'il attend.
+- **`git status` propre avant tout message de fin, même intermédiaire.** Aucun fichier de
+  diagnostic, aucune fixture mutée, aucune modification non commitée de TES chemins ; ce qui
+  appartient à une autre session se liste au message, sans y toucher.
+
+Ces deux règles ne sont pas mécanisées : l'état des tâches d'arrière-plan d'un harnais n'est
+écrit dans aucun fichier qu'un oracle pourrait lire, et un contrôle de l'arbre au moment où un
+agent rend la main relève d'un hook de fin d'agent, dont le câblage est une décision du pilot.
