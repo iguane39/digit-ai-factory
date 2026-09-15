@@ -768,7 +768,8 @@ else {
     // vérification restée celle du gabarit est un AVERTISSEMENT (règle neuve, corpus à lire).
     {
       const PILOT47 = join(dirname(fileURLToPath(import.meta.url)), "..");
-      const dateDe = (t) => (/^verifie_le\s*:\s*(\d{4}-\d{2}-\d{2})\s*$/m.exec(frontmatter(t) || "") || [])[1] || null;
+      const SEUIL_HERITES_1119 = "2026-09-15";
+      const dateDe =(t) => (/^verifie_le\s*:\s*(\d{4}-\d{2}-\d{2})\s*$/m.exec(frontmatter(t) || "") || [])[1] || null;
       for (const a of heritage.artefacts) {
         if (!/^presence/.test(a.mode || "")) continue;
         const src = join(PILOT47, a.source), dst = p(a.cible);
@@ -778,11 +779,17 @@ else {
         const perimes = declares.filter((m) => !tSrc.includes(m));
         if (perimes.length) so("R-20", `HERITAGE.json déclare pour ${a.source} des marqueurs que le gabarit ne porte plus : ${perimes.join(", ")} — déclaration à retirer (TF-1119)`);
         const restes = declares.filter((m) => tSrc.includes(m) && tDst.includes(m));
-        if (restes.length) {
+        const vSrc = dateDe(tSrc), vDst = dateDe(tDst);
+        // ANTÉRIORITÉ, jamais un défaut rétroactif (correctif du 15/09, même idiome que les
+        // sections de COMPOSANTS-OPS) : cet oracle suspend l'ouverture de run sur un FAIL, et la
+        // règle est née le 15/09. Un fichier revu avant, ou jamais daté, est relevé au non_juge —
+        // mesuré au parc : 12 écarts, tous antérieurs — et exigé à sa prochaine revue datée.
+        if (restes.length && vDst && vDst >= SEUIL_HERITES_1119) {
           ko("R-20", a.cible, `${restes.length} marqueur(s) du gabarit ${a.source} NON INSTANCIÉ(S) dans ce fichier hérité — `
             + `une fiche qui porte encore ses trous est une fiction plausible, quel que soit son dossier (R-20 ter étendu, TF-1119). Ex. : ${restes.slice(0, 4).join(", ")}`);
+        } else if (restes.length) {
+          antecedences.push(`R-20 ter (fichier hérité) non jugé sur ${a.cible} : ${restes.length} marqueur(s) du gabarit non instancié(s) (${restes.slice(0, 3).join(", ")}) ; la règle naît le ${SEUIL_HERITES_1119} (TF-1119) et le document porte verifie_le=${vDst || "non daté"} — antériorité déclarée, jamais un défaut de produit ; exigée dès sa prochaine revue datée`);
         }
-        const vSrc = dateDe(tSrc), vDst = dateDe(tDst);
         if (vDst && (vDst === vSrc || vDst === a.depuis)) {
           ok("R-20", a.cible, `AVERTISSEMENT, non bloquant : verifie_le=${vDst} est la date du GABARIT, pas celle d'une revue du produit — `
             + "un fichier hérité jamais revu se lit comme revu (TF-1119)");
@@ -808,7 +815,10 @@ else {
         chercher(p("docs"), 0);
         chercher(p("forge"), 0);
         const nonCites = autres.filter((f) => !texteCarnet.includes(basename(f)));
-        nonCites.length
+        const vCarnet = dateDe(texteCarnet);
+        if (nonCites.length && !(vCarnet && vCarnet >= SEUIL_HERITES_1119)) {
+          antecedences.push(`R-20 (carnet d'écarts) non jugé sur forge/travaux/ECARTS-ASSUMES.md : ${nonCites.length} autre(s) carnet(s) d'écarts non cité(s) (${nonCites.map((f) => basename(f)).join(", ")}) ; la règle naît le ${SEUIL_HERITES_1119} (TF-1119) et le carnet porte verifie_le=${vCarnet || "non daté"} — antériorité déclarée ; exigée dès sa prochaine revue datée`);
+        } else nonCites.length
           ? ko("R-20", "forge/travaux/ECARTS-ASSUMES.md", `${nonCites.length} autre(s) carnet(s) d'écarts non cité(s) par le carnet hérité : `
             + `${nonCites.map((f) => relative(cible, f).replaceAll("\\", "/")).join(", ")} — deux contenants pour une même notion : l'un est rempli, l'autre ment. `
             + "Soit le carnet hérité absorbe ces écarts, soit il nomme l'autre carnet dans sa section « Frontière » (TF-1119)")

@@ -272,17 +272,40 @@ check("R-20 ter BORNE : une fiche instanciée ne déclenche RIEN — la règle n
 // TF-1119 — R-20 ter sort de docs\projet\ : tout fichier HÉRITÉ personnalisable qui garde un
 // marqueur de son gabarit est une fiction plausible. Le cas fondateur : le carnet d'écarts reçu
 // tel quel (titre à marqueur, date du gabarit), et un second carnet que le premier ne cite pas.
-check("TF-1119 rouge — le carnet hérité resté au gabarit brut : marqueur FAIL et date du gabarit signalée", () => {
+check("TF-1119 ANTÉRIEUR — le carnet brut revu avant le 15/09 : jamais un FAIL, antériorité déclarée au non_juge, date du gabarit signalée", () => {
   const carnet = join(verte, "forge", "travaux", "ECARTS-ASSUMES.md");
   const avant = readFileSync(carnet, "utf8");
   try {
     writeFileSync(carnet, readFileSync(join(GAB47, "ECARTS-ASSUMES.md"), "utf8"));
     const { exit, rapport } = lance(verte);
-    const f = rapport.findings.find((x) => x.regle === "R-20" && x.statut === "FAIL" && x.ou === "forge/travaux/ECARTS-ASSUMES.md" && /<produit>/.test(x.message));
-    if (exit !== 1 || !f) throw new Error(`exit ${exit}, marqueur non vu : ${JSON.stringify(rapport.findings.filter((x) => /ECARTS/.test(x.ou || "")))}`);
+    if (rapport.findings.some((x) => x.statut === "FAIL" && x.ou === "forge/travaux/ECARTS-ASSUMES.md")) throw new Error("un document antérieur à la règle est mis en échec — défaut rétroactif, il bloquerait l'ouverture de run");
+    if (exit !== 0) throw new Error(`exit ${exit} attendu 0 sur la verte`);
+    if (!rapport.non_juge.some((l) => /R-20 ter \(fichier hérité\) non jugé sur forge\/travaux\/ECARTS-ASSUMES\.md.*<produit>.*verifie_le=2026-08-26/.test(l))) throw new Error("l'antériorité n'est pas déclarée au non_juge");
     const d = rapport.findings.find((x) => x.regle === "R-20" && x.ou === "forge/travaux/ECARTS-ASSUMES.md" && /date du GABARIT/.test(x.message));
     if (!d || d.statut !== "PASS") throw new Error("la date du gabarit n'est pas signalée en avertissement");
   } finally { writeFileSync(carnet, avant); }
+});
+check("TF-1119 rouge POSTÉRIEUR — le même carnet brut revu le 15/09 : marqueur FAIL, nommé", () => {
+  const carnet = join(verte, "forge", "travaux", "ECARTS-ASSUMES.md");
+  const avant = readFileSync(carnet, "utf8");
+  try {
+    writeFileSync(carnet, readFileSync(join(GAB47, "ECARTS-ASSUMES.md"), "utf8").replace(/^verifie_le:.*$/m, "verifie_le: 2026-09-15"));
+    const { exit, rapport } = lance(verte);
+    const f = rapport.findings.find((x) => x.regle === "R-20" && x.statut === "FAIL" && x.ou === "forge/travaux/ECARTS-ASSUMES.md" && /<produit>/.test(x.message));
+    if (exit !== 1 || !f) throw new Error(`exit ${exit}, marqueur non vu : ${JSON.stringify(rapport.findings.filter((x) => /ECARTS/.test(x.ou || "")))}`);
+  } finally { writeFileSync(carnet, avant); }
+});
+check("TF-1119 ANTÉRIEUR — un second carnet non cité par un carnet revu avant le 15/09 : antériorité déclarée, jamais un FAIL", () => {
+  const autre = join(verte, "docs", "projet", "CARNET-ECARTS.md");
+  const carnet = join(verte, "forge", "travaux", "ECARTS-ASSUMES.md");
+  const avant = readFileSync(carnet, "utf8");
+  try {
+    writeFileSync(autre, "# Carnet d'écarts du référentiel client\n");
+    writeFileSync(carnet, avant.replace(/^verifie_le:.*$/m, "verifie_le: 2026-09-01"));
+    const { exit, rapport } = lance(verte);
+    if (exit !== 0 || rapport.findings.some((x) => x.statut === "FAIL" && /carnet/i.test(x.message))) throw new Error(`exit ${exit} : défaut rétroactif`);
+    if (!rapport.non_juge.some((l) => /R-20 \(carnet d'écarts\) non jugé.*CARNET-ECARTS\.md.*verifie_le=2026-09-01/.test(l))) throw new Error("l'antériorité du second carnet n'est pas déclarée");
+  } finally { rmSync(autre, { force: true }); writeFileSync(carnet, avant); }
 });
 check("TF-1119 rouge → vert — un second carnet d'écarts non cité est un FAIL ; cité par le carnet hérité, il passe", () => {
   const autre = join(verte, "docs", "projet", "CARNET-ECARTS.md");
