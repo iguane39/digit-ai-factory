@@ -751,6 +751,70 @@ else {
         }
       }
     }
+    // R-20 ter ÉTENDU AUX FICHIERS HÉRITÉS (TF-1119, 15/09/2026). La règle « une fiche qui porte
+    // encore ses marqueurs n'est pas une fiche » (TF-0647) était BORNÉE à docs\projet\ ; le défaut
+    // qu'elle traite ne connaît aucune frontière de dossier. Mesuré le 14/09 chez un produit : le
+    // carnet `forge\travaux\ECARTS-ASSUMES.md`, reçu par héritage dix-neuf jours plus tôt, portait
+    // encore `<produit>` dans son titre, la date du gabarit et ZÉRO écart, pendant qu'un second
+    // carnet créé à la main en portait ONZE — aucun des deux ne citant l'autre, et cet oracle
+    // rendait zéro constat. Une session qui lit le carnet prescrit conclut « aucun écart assumé » :
+    // réponse fausse et plausible. Jugé ici : tout artefact PERSONNALISABLE de HERITAGE.json
+    // (modes `presence*` — une copie conforme porte ses marqueurs à bon droit). Les marqueurs jugés
+    // sont ceux que le contrat DÉCLARE (`marqueurs_a_instancier`), jamais devinés : mesuré sur les
+    // onze produits du parc le 15/09, un relevé de tous les chevrons du gabarit rendait 30 échecs
+    // neufs dont 18 faux positifs (déclarés : 12 échecs neufs, aucun faux positif relevé) —
+    // `<pilot>`, `<forge>`, `<projet>` sont des CONVENTIONS de chemin
+    // que le produit garde, et le `<qui>` de robots.txt vit dans un exemple commenté. Une date de
+    // vérification restée celle du gabarit est un AVERTISSEMENT (règle neuve, corpus à lire).
+    {
+      const PILOT47 = join(dirname(fileURLToPath(import.meta.url)), "..");
+      const dateDe = (t) => (/^verifie_le\s*:\s*(\d{4}-\d{2}-\d{2})\s*$/m.exec(frontmatter(t) || "") || [])[1] || null;
+      for (const a of heritage.artefacts) {
+        if (!/^presence/.test(a.mode || "")) continue;
+        const src = join(PILOT47, a.source), dst = p(a.cible);
+        if (!existsSync(src) || !existsSync(dst)) continue;
+        const tSrc = readFileSync(src, "utf8"), tDst = readFileSync(dst, "utf8");
+        const declares = Array.isArray(a.marqueurs_a_instancier) ? a.marqueurs_a_instancier : [];
+        const perimes = declares.filter((m) => !tSrc.includes(m));
+        if (perimes.length) so("R-20", `HERITAGE.json déclare pour ${a.source} des marqueurs que le gabarit ne porte plus : ${perimes.join(", ")} — déclaration à retirer (TF-1119)`);
+        const restes = declares.filter((m) => tSrc.includes(m) && tDst.includes(m));
+        if (restes.length) {
+          ko("R-20", a.cible, `${restes.length} marqueur(s) du gabarit ${a.source} NON INSTANCIÉ(S) dans ce fichier hérité — `
+            + `une fiche qui porte encore ses trous est une fiction plausible, quel que soit son dossier (R-20 ter étendu, TF-1119). Ex. : ${restes.slice(0, 4).join(", ")}`);
+        }
+        const vSrc = dateDe(tSrc), vDst = dateDe(tDst);
+        if (vDst && (vDst === vSrc || vDst === a.depuis)) {
+          ok("R-20", a.cible, `AVERTISSEMENT, non bloquant : verifie_le=${vDst} est la date du GABARIT, pas celle d'une revue du produit — `
+            + "un fichier hérité jamais revu se lit comme revu (TF-1119)");
+        }
+      }
+      // Deux carnets pour une même notion : un seul est rempli, et l'autre ment. Le carnet hérité
+      // doit CITER tout autre carnet d'écarts du produit (et le gabarit le prescrit) — sinon FAIL.
+      const carnet = p("forge/travaux/ECARTS-ASSUMES.md");
+      if (existsSync(carnet)) {
+        const texteCarnet = readFileSync(carnet, "utf8");
+        const autres = [];
+        const chercher = (d, prof) => {
+          if (prof > 3 || !existsSync(d)) return;
+          for (const e of readdirSync(d, { withFileTypes: true })) {
+            if (e.name.startsWith(".") || e.name === "node_modules" || e.name === "old") continue;
+            const f = join(d, e.name);
+            if (e.isDirectory()) chercher(f, prof + 1);
+            // Un CARNET, pas tout fichier qui parle d'écarts : un « rapport d'écarts » de
+            // rapprochement de données n'en est pas un (faux positif mesuré sur le parc le 15/09).
+            else if (/carnet.*[ée]carts?|^[ée]carts?[-_ ]/i.test(e.name) && /\.md$/i.test(e.name) && f !== carnet) autres.push(f);
+          }
+        };
+        chercher(p("docs"), 0);
+        chercher(p("forge"), 0);
+        const nonCites = autres.filter((f) => !texteCarnet.includes(basename(f)));
+        nonCites.length
+          ? ko("R-20", "forge/travaux/ECARTS-ASSUMES.md", `${nonCites.length} autre(s) carnet(s) d'écarts non cité(s) par le carnet hérité : `
+            + `${nonCites.map((f) => relative(cible, f).replaceAll("\\", "/")).join(", ")} — deux contenants pour une même notion : l'un est rempli, l'autre ment. `
+            + "Soit le carnet hérité absorbe ces écarts, soit il nomme l'autre carnet dans sa section « Frontière » (TF-1119)")
+          : autres.length && ok("R-20", "forge/travaux/ECARTS-ASSUMES.md", `${autres.length} autre(s) carnet(s) d'écarts, tous cités par le carnet hérité (TF-1119)`);
+      }
+    }
     // TF-0881 (08/09) — L'ALIAS DE TRANSITION QUI SURVIT À CÔTÉ DE LA CIBLE CANONIQUE. L'alias
     // n'est LU que si la cible canonique manque (TF-0710, à bon droit). Mais quand les DEUX
     // existent, l'ancien fichier — 62 lignes du 14/08, sans obligation de classe ni section « la

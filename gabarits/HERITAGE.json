@@ -1,7 +1,8 @@
 {
   "schema": "pilot/heritage@1",
-  "version": "1.9.0",
-  "date": "2026-09-12",
+  "version": "1.10.0",
+  "date": "2026-09-15",
+  "evolution_1_10_0": "TF-1119 (15/09/2026) : un artefact personnalisable (modes `presence*`) peut déclarer `marqueurs_a_instancier` — les trous que le produit DOIT remplir. `oracle-conformite-projet` (R-20 ter étendu) refuse une copie qui en garde un, quel que soit son dossier, et signale une `verifie_le` restée celle du gabarit. Déclarés et non devinés : mesuré sur les onze produits du parc le 15/09, un relevé de tous les chevrons rendait 30 échecs neufs dont 18 faux positifs (conventions de chemin, exemple commenté de robots.txt, rapport de rapprochement pris pour un carnet) ; déclarés, 12 échecs neufs et aucun faux positif relevé. Le carnet d'écarts hérité doit aussi citer tout autre carnet d'écarts du produit.",
   "evolution_1_7_0": "TF-0765 (02/09/2026) : le lanceur de hooks (copie identique) connaît un troisième hook, `page-html` — PostToolUse sur Write|Edit, joue les règles de socle d'une page HTML (filtres de tableau L4 / G1-G6) chez le produit au moment où il écrit ; `settings-produit.json` (présence et motif) le câble ; `CLAUDE-PRODUIT.md` porte une section « Règles de socle applicables » remplie à l'ouverture. Les produits dont la copie du lanceur est périmée la reçoivent à leur prochaine ouverture (hook-ouverture, recopie des copies identiques).",
   "regle": "Tout artefact que le pilot COPIE chez un produit se déclare ici avec son mode de contrôle. Un artefact absent de ce référentiel n'est pas jugé par R-47 — l'oubli se voit à la revue, il ne se devine pas.",
   "pourquoi": "Constat du 23/08, deux produits en trois jours. Produit-02 possède un `forge\\retours\\` complet, portant ses lots, et AUCUN gabarit RETOURS-FORGES.md : le dossier a été créé, la copie n'y est jamais arrivée. Produit-05 n'a ni l'un ni l'autre. Résultat mesuré : 15 candidatures refusées à l'ingestion par R-45/R-46 pour une forme que le produit ne pouvait pas connaître, faute d'avoir le gabarit qui la porte. La cause n'était pas une négligence de produit mais une COPIE SANS PREUVE : rien ne vérifiait qu'elle était arrivée, et rien ne vérifie encore qu'elle est à jour. Le contrôle R-43 lui-même ne fait qu'un `existsSync` sur les hooks — un hook périmé passe au vert.",
@@ -82,6 +83,10 @@
       "cible": "CLAUDE.md",
       "mode": "presence_et_motif",
       "motif_exige": "R-43",
+      "marqueurs_a_instancier": [
+        "<commande>",
+        "<autre type de ce produit>"
+      ],
       "motif": "les instructions du produit. Personnalisées par construction — le gabarit porte des `<…>` que l'orchestrateur remplit. Seule la clause de précédence est exigée, et R-43 la juge déjà ; la déclaration ici rend le contrôle exhaustif plutôt que dispersé.",
       "depuis": "2026-08-23",
       "familles_protegees": [
@@ -120,6 +125,9 @@
       "source": "gabarits/ECARTS-ASSUMES.md",
       "cible": "forge/travaux/ECARTS-ASSUMES.md",
       "mode": "presence",
+      "marqueurs_a_instancier": [
+        "<produit>"
+      ],
       "motif": "LE CARNET DES ECARTS ASSUMES (R-20 bis). `TRAVAUX-PILOT.md` imposait depuis sa creation qu'un element ecarte « rejoigne les Ecarts assumes du carnet du produit avec son motif et sa date », en ajoutant qu'« un ecart tu est indiscernable d'un oubli » — et AUCUN gabarit ne creait ce carnet, R-20 bis n'etant defini nulle part. Mesure du 26/08 (TF-0655) : pour declarer UN ecart, un produit a du DEDUIRE l'emplacement et ecrire dans le fichier qu'il l'avait place par defaut. A l'echelle du parc, chaque produit en aurait invente un autre, et des ecarts eparpilles sous des noms differents ne se relevent pas. Mode `presence` et non `copie_conforme` : le carnet se REMPLIT chez le produit, exiger qu'il reste identique au gabarit reviendrait a interdire d'y ecrire.",
       "depuis": "2026-08-26",
       "familles_protegees": [

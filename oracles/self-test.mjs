@@ -49,6 +49,13 @@ for (const a of CONTRAT47.artefacts) {
   const source47 = join(GAB47, "..", String(a.source).replaceAll("/", "\\\\"));
   writeFileSync(cible47, existsSync(source47) ? readFileSync(source47, "utf8") : "");
 }
+// TF-1119 : un carnet hérité se REMPLIT. La verte l'instancie comme le ferait un produit — titre
+// nommé, date de revue propre — sans quoi elle prouverait conforme un gabarit brut.
+{
+  const carnet = join(verte, "forge", "travaux", "ECARTS-ASSUMES.md");
+  if (existsSync(carnet)) writeFileSync(carnet, readFileSync(carnet, "utf8")
+    .replaceAll("<produit>", "Produit-test").replace(/^verifie_le:.*$/m, "verifie_le: 2026-09-15"));
+}
 writeFileSync(join(verte, "CLAUDE.md"),
   "# Produit\n## Routage forge — obligatoire\nvalider : forge_tests\névoluer : run de version\ndéployer : MEP\n");
 writeFileSync(join(verte, "README.md"), "# Produit\nDémarrage : 2 commandes.\n");
@@ -260,6 +267,41 @@ check("R-20 ter BORNE : une fiche instanciée ne déclenche RIEN — la règle n
   const { rapport } = lance(verte);
   const f = rapport.findings.filter((x) => x.regle === "R-20" && /marqueur/.test(x.message || ""));
   if (f.length) throw new Error(`faux positif sur une fiche instanciée : ${f[0].message}`);
+});
+
+// TF-1119 — R-20 ter sort de docs\projet\ : tout fichier HÉRITÉ personnalisable qui garde un
+// marqueur de son gabarit est une fiction plausible. Le cas fondateur : le carnet d'écarts reçu
+// tel quel (titre à marqueur, date du gabarit), et un second carnet que le premier ne cite pas.
+check("TF-1119 rouge — le carnet hérité resté au gabarit brut : marqueur FAIL et date du gabarit signalée", () => {
+  const carnet = join(verte, "forge", "travaux", "ECARTS-ASSUMES.md");
+  const avant = readFileSync(carnet, "utf8");
+  try {
+    writeFileSync(carnet, readFileSync(join(GAB47, "ECARTS-ASSUMES.md"), "utf8"));
+    const { exit, rapport } = lance(verte);
+    const f = rapport.findings.find((x) => x.regle === "R-20" && x.statut === "FAIL" && x.ou === "forge/travaux/ECARTS-ASSUMES.md" && /<produit>/.test(x.message));
+    if (exit !== 1 || !f) throw new Error(`exit ${exit}, marqueur non vu : ${JSON.stringify(rapport.findings.filter((x) => /ECARTS/.test(x.ou || "")))}`);
+    const d = rapport.findings.find((x) => x.regle === "R-20" && x.ou === "forge/travaux/ECARTS-ASSUMES.md" && /date du GABARIT/.test(x.message));
+    if (!d || d.statut !== "PASS") throw new Error("la date du gabarit n'est pas signalée en avertissement");
+  } finally { writeFileSync(carnet, avant); }
+});
+check("TF-1119 rouge → vert — un second carnet d'écarts non cité est un FAIL ; cité par le carnet hérité, il passe", () => {
+  const autre = join(verte, "docs", "projet", "CARNET-ECARTS.md");
+  const carnet = join(verte, "forge", "travaux", "ECARTS-ASSUMES.md");
+  const avant = readFileSync(carnet, "utf8");
+  try {
+    writeFileSync(autre, "# Carnet d'écarts du référentiel client\n\n## RC-27\nécart ouvert\n");
+    let r = lance(verte);
+    const f = r.rapport.findings.find((x) => x.regle === "R-20" && x.statut === "FAIL" && /CARNET-ECARTS\.md/.test(x.message));
+    if (r.exit !== 1 || !f) throw new Error(`second carnet non cité non vu (exit ${r.exit})`);
+    writeFileSync(carnet, avant.replace("*Autre carnet d'écarts : aucun.*", "*Autre carnet d'écarts : `docs/projet/CARNET-ECARTS.md` — les écarts au référentiel client y vivent.*"));
+    r = lance(verte);
+    if (r.rapport.findings.some((x) => x.regle === "R-20" && x.statut === "FAIL" && /carnet/i.test(x.message))) throw new Error("le carnet cité reste en échec — le remède ne passe pas");
+  } finally { rmSync(autre, { force: true }); writeFileSync(carnet, avant); }
+});
+check("TF-1119 BORNE — un carnet hérité instancié, sans second carnet, ne déclenche rien", () => {
+  const { rapport } = lance(verte);
+  const f = rapport.findings.filter((x) => x.ou === "forge/travaux/ECARTS-ASSUMES.md");
+  if (f.some((x) => x.statut === "FAIL" || /AVERTISSEMENT/.test(x.message))) throw new Error(`faux positif : ${JSON.stringify(f)}`);
 });
 
 check("R-11 bis : section présente mais incomplète → le manquant est NOMMÉ (TF-0373)", () => {

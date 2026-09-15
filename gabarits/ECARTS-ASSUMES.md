@@ -41,6 +41,22 @@ Un écart = une section `##`. Quatre champs, tous obligatoires — l'omission ne
 - **Un refus opposé au pilot.** Le pilot confie et argumente ; le produit décide. Un écart n'a pas
   à être négocié — il a à être **écrit**, pour que personne ne le redécouvre comme un oubli.
 
+## Frontière — un seul carnet, ou deux qui se citent (TF-1119)
+
+**Le fait, mesuré le 14/09/2026 chez un produit.** Ce carnet, reçu par héritage, portait encore
+le marqueur du titre, la date du gabarit et zéro écart dix-neuf jours après sa réception ; un
+second carnet, créé à la main pour un référentiel d'audit client, en portait onze. Aucun des deux
+ne citait l'autre. Une session qui lit ce carnet-ci conclut « aucun écart assumé » : la réponse est
+fausse et plausible.
+
+Ce carnet est donc **le** carnet des écarts assumés du produit. Si une autre obligation impose un
+second carnet (référentiel d'audit, exigence d'un client), ce carnet-ci le **nomme** ici, par son
+chemin, et dit ce qui vit où ; l'autre carnet renvoie à celui-ci. Sinon, ses écarts sont repris
+ici. `oracle-conformite-projet` (R-20) refuse un autre fichier d'écarts sous `docs\` ou `forge\`
+que ce carnet ne cite pas, et un marqueur de ce gabarit resté dans le carnet.
+
+*Autre carnet d'écarts : aucun.*
+
 ## Écarts
 
 <!-- Un écart par section `##`. Supprimer cette ligne au premier écart écrit. -->
