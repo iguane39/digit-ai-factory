@@ -29,7 +29,7 @@ role_destinataire: {qui lit ce rapport, et pour quelle décision}
 > **Périmètre** {ce qui est couvert, et ce qui ne l'est pas}
 > **Sources** {jeux de données, dates d'extraction, volumes}
 > **Établi le** {date} · **Méthode** {comment les mesures ont été faites}
-> **Gabarit** gd-rapport-donnees · **Version du gabarit** 1.0.0
+> **Gabarit** gd-rapport-donnees · **Version du gabarit** 1.0.1
 ```
 **`destinataire` est dû, et il est LU PAR UN ORACLE** (TF-0504, 22/08/2026). `R-2` d'`oracle-conformite-projet` ne juge la localisation que des artefacts MARQUÉS : sans cette ligne, un document né de ce gabarit est invisible au contrôle — et c'est arrivé, une fiche écrite hors `output\` qu'aucun oracle ne pouvait voir, trouvée par relecture humaine. La valeur est FERMÉE : `humain` pour un livrable, `aucun` pour un document normatif. Le rôle du lecteur, lui, vit sous `role_destinataire` — utile, mais ce n'est pas la marque.
 
@@ -38,7 +38,9 @@ Un lecteur qui trouve un manque dans ce document ne peut le remonter utilement q
 DE QUEL gabarit et de QUELLE version il vient : sans ce couple, le retour dit « il manquait une
 section » et personne ne sait à quoi l'appliquer. Voir la boucle de retour en fin de gabarit.
 
-Valeurs pour cette famille : `gabarit: gd-rapport-donnees` · `version_du_gabarit: 1.0.0`.
+Valeurs pour cette famille : `gabarit: gd-rapport-donnees` · `version_du_gabarit: 1.0.1`.
+La 1.0.1 (15/09/2026, TF-1038) déclare la largeur de la page (`<body data-largeur="lecture">`,
+règle D10) : les trois chapitres étaient déjà bridés, seule la déclaration manquait.
 
 
 Le périmètre **dit ce qu'il exclut**. Un périmètre qui n'énumère que ce qu'il couvre laisse le

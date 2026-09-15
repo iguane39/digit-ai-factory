@@ -25,6 +25,11 @@
  *   G4 · le document REND son gabarit et sa version (`Gabarit : gd-… · version du gabarit x.y.z`),
  *        visiblement — jamais seulement en commentaire. Une instance périmée est invisible sur
  *        l'artefact, et la section R-46 des lots devient impossible à remplir sans lui (TF-0690).
+ *   G5 · la largeur de contenu est une propriété de la PAGE (règle D10, TF-1038) : un document
+ *        qui porte des chapitres `.chap` déclare `data-largeur="lecture|donnees"` sur `<body>` ou
+ *        `<main>`, et ses chapitres tiennent la déclaration (`.lire` partout en lecture, nulle part
+ *        en données), sauf un chapitre marqué `largeur-exception`. Jugé sur le MARQUAGE : la
+ *        largeur rendue reste au socle de rendu, et ce contrôle ne la prétend pas mesurée.
  *
  * CE QU'IL NE FAIT PAS : rendre la page. Le rendu a son propre contrôle — `scripts\verifier-rendu-
  * instances.mjs` — et le dupliquer créerait deux vérités sur les familles bloquantes. Il ne juge
@@ -172,6 +177,32 @@ export function juger(dossier) {
           message: `porte ${id[1]} et sa version, visibles dans le rendu` });
       }
     }
+
+    // G5 (TF-1038, 15/09/2026) — LA LARGEUR EST UNE PROPRIÉTÉ DE LA PAGE. Le fait : un lecteur a
+    // demandé d'homogénéiser la largeur d'une page où neuf chapitres alternaient pleine largeur et
+    // `.chap.lire` bridé, dans l'ordre de leur nature et non de la lecture. Le squelette
+    // prescrivait les deux gabarits de chapitre sans dire que l'alternance était un défaut.
+    for (const n of ["SQUELETTE.html", "INSTANCE.html"].filter((f) => fichiers.includes(f))) {
+      const texte = sansCommentaires(readFileSync(p(n), "utf8"));
+      const chapitres = [...texte.matchAll(/<[a-z][a-z0-9]*\b[^>]*\bclass\s*=\s*(["'])([^"']*)\1[^>]*>/gi)]
+        .map((m) => m[2].split(/\s+/)).filter((cls) => cls.includes("chap"));
+      if (!chapitres.length) {
+        findings.push({ regle: "G5", statut: "PASS", ou: `${fam}/${n}`, message: "aucun chapitre à largeur nommée (`.chap`) — rien à homogénéiser" });
+        continue;
+      }
+      const decl = (/<(?:body|main)\b[^>]*\bdata-largeur\s*=\s*(["'])(lecture|donnees)\1/i.exec(texte) || [])[2] || null;
+      const jugés = chapitres.filter((cls) => !cls.includes("largeur-exception"));
+      const bridés = jugés.filter((cls) => cls.includes("lire")).length;
+      const pleins = jugés.length - bridés;
+      let ecart = null;
+      if (!decl && bridés && pleins) ecart = `${bridés} chapitre(s) bridé(s) (.lire) et ${pleins} en pleine largeur, SANS déclaration de page`;
+      else if (!decl) ecart = `${chapitres.length} chapitre(s) .chap sans déclaration de largeur de page — la page dit si elle est de lecture ou de données`;
+      else if (decl === "lecture" && pleins) ecart = `page déclarée « lecture » et ${pleins} chapitre(s) en pleine largeur non marqué(s) largeur-exception`;
+      else if (decl === "donnees" && bridés) ecart = `page déclarée « donnees » et ${bridés} chapitre(s) bridé(s) (.lire) non marqué(s) largeur-exception`;
+      findings.push(ecart
+        ? { regle: "G5", statut: "FAIL", ou: `${fam}/${n}`, message: `${ecart}. La largeur est une propriété de la PAGE : \`<body data-largeur="lecture|donnees">\`, les écarts voulus marqués \`largeur-exception\` (règle D10, TF-1038)` }
+        : { regle: "G5", statut: "PASS", ou: `${fam}/${n}`, message: `page « ${decl} », ${chapitres.length} chapitre(s) conformes${chapitres.length > jugés.length ? ` dont ${chapitres.length - jugés.length} exception(s) déclarée(s)` : ""}` });
+    }
   }
   if (!familles.length) findings.push({ regle: "G1", statut: "SKIP", ou: dossier, message: "aucune famille de gabarit sous ce dossier" });
   return findings;
@@ -227,6 +258,26 @@ if (args[0] === "--self-test") {
   f = juger(dir);
   if (!g("G2", "copie").some((x) => x.statut === "FAIL")) casse.push("une instance copie du squelette passe G2");
 
+  // G5 (TF-1038) : deux rouges (alternance sans déclaration ; déclaration « lecture » contredite)
+  // et deux verts (lecture tenue ; données avec une exception déclarée).
+  const CHAP = (cls) => `<section class="${cls}"><p>Chapitre rempli le 15 septembre 2026.</p></section>`;
+  const poserLargeur = (nom, corps, decl) => {
+    mkdirSync(join(dir, nom), { recursive: true });
+    writeFileSync(join(dir, nom, "GABARIT.md"), "# doctrine\n", "utf8");
+    const page = (t) => PAGE(t, corps + COUPLE).replace("<body>", decl ? `<body data-largeur="${decl}">` : "<body>");
+    writeFileSync(join(dir, nom, "SQUELETTE.html"), page("Squelette"), "utf8");
+    writeFileSync(join(dir, nom, "INSTANCE.html"), page("Instance").replace("Chapitre rempli", "Chapitre instancié"), "utf8");
+  };
+  poserLargeur("largeur-alternee", CHAP("chap") + CHAP("chap lire") + CHAP("chap"), null);
+  poserLargeur("largeur-contredite", CHAP("chap lire") + CHAP("chap"), "lecture");
+  poserLargeur("largeur-lecture", CHAP("chap lire") + CHAP("chap lire"), "lecture");
+  poserLargeur("largeur-donnees", CHAP("chap") + CHAP("chap lire largeur-exception"), "donnees");
+  f = juger(dir);
+  if (!g("G5", "largeur-alternee").every((x) => x.statut === "FAIL" && /SANS déclaration/.test(x.message))) casse.push("des largeurs alternées sans déclaration passent G5 — le défaut du 11/09");
+  if (!g("G5", "largeur-contredite").every((x) => x.statut === "FAIL" && /déclarée « lecture »/.test(x.message))) casse.push("une page « lecture » à chapitre plein non marqué passe G5");
+  if (!g("G5", "largeur-lecture").every((x) => x.statut === "PASS")) casse.push("une page « lecture » tenue échoue G5 — la règle accuse ce qu'elle prescrit");
+  if (!g("G5", "largeur-donnees").every((x) => x.statut === "PASS" && /exception/.test(x.message))) casse.push("une exception déclarée n'est pas admise par G5");
+
   // G3, sens rouge : une classe posée sans règle CSS — le défaut exact du 24/08, en modèle réduit.
   mkdirSync(join(dir, "classe-nue"), { recursive: true });
   writeFileSync(join(dir, "classe-nue", "GABARIT.md"), "# doctrine\n", "utf8");
@@ -235,7 +286,7 @@ if (args[0] === "--self-test") {
   f = juger(dir);
   const g3 = g("G3", "classe-nue");
   if (g3.every((x) => x.statut === "SKIP")) {
-    console.log("Self-test gabarits-documents : 4/5 PASS, G3 non joué (socle de marquage ou python absent — " +
+    console.log("Self-test gabarits-documents : 8/9 PASS, G3 non joué (socle de marquage ou python absent — " +
       "il est déclaré, pas supposé)" + (casse.length ? " · CASSE : " + casse.join(" · ") : ""));
     rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
     process.exit(casse.length ? 1 : 0);
@@ -245,9 +296,11 @@ if (args[0] === "--self-test") {
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test gabarits-documents : 7/7 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ; " +
+    : "Self-test gabarits-documents : 11/11 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ; " +
       "instance à trous → FAIL ; instance copie du squelette → FAIL ; classe posée sans règle CSS → FAIL au marquage ; " +
-      "couple gabarit+version rendu → PASS G4 ; document sans le couple → FAIL G4)");
+      "couple gabarit+version rendu → PASS G4 ; document sans le couple → FAIL G4 ; largeurs alternées sans " +
+      "déclaration → FAIL G5 ; page « lecture » contredite → FAIL G5 ; page « lecture » tenue → PASS G5 ; " +
+      "page « donnees » avec exception déclarée → PASS G5)");
   process.exit(casse.length ? 1 : 0);
 }
 
