@@ -121,8 +121,8 @@
   "vu_le": "2026-08-27"
  },
  "oracle-gabarits-documents.mjs": {
-  "cas": 7,
-  "vu_le": "2026-08-31"
+  "cas": 11,
+  "vu_le": "2026-09-15"
  },
  "oracle-gabarits-documents.mjs (parc réel)": {
   "non_lu": true,
