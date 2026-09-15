@@ -155,6 +155,18 @@ vide — « aucun environnement de données interrogé » — jamais par silence
 vit dans `oracle-conformite-projet` (R-20) et n'exige la section qu'à partir du premier
 `verifie_le` postérieur au 24/08, par le même mécanisme d'antériorité déclarée que ci-dessus.
 
+**L'inventaire de `COMPOSANTS-OPS.md` dit l'USAGE, pas seulement la présence** (TF-1113, TF-1117,
+TF-1120, 15/09/2026, étude 20260915a option O1). *Mesure du 14/09* : dix éléments sans
+consommateur coexistaient avec un document conforme, deux suppressions évidentes d'après le nom
+auraient tué le produit, et sur dix lignes déclarées inutilisées cinq n'étaient pas supprimables.
+Le fichier porte donc une colonne **Statut** à vocabulaire fermé (actif / partagé / déclaré /
+inutilisé / hors périmètre), justifiée par un consommateur résolu et jamais par le nom ; une table
+« qui consomme quoi » ; et une section « Composants inutilisés », déclarée même vide, aux colonnes
+preuve d'inutilité, « ce qui cesse de fonctionner si on le supprime », statut de supprimabilité
+(supprimable / non supprimable, droit absent / non supprimable, décision / non supprimable, tiers
+propriétaire), « créé par quoi », geste, titulaire du droit. R-20 en juge la présence et les deux
+vocabulaires dès le premier `verifie_le` du 15/09 ou après ; avant, antériorité déclarée.
+
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
 | 20 | `docs\projet\` complet — **8 fichiers + 2 projections générées** : `TECHNOS.md` (technologies + versions + liens, ancrées lockfiles), `COMPOSANTS-OPS.md` (hiérarchie/noms/types/IDs/URLs/IPs des composants déployés — depuis `ops etat`/plans/DOSSIER-MEP, instanciations datées, placeholders si dépôt public), `PARAMETRAGE.md` (signification des variables, URLs/ports par environnement — hébergés en placeholders), `ACCES-TEST.md` (profils + comptes de démo locale), `COMMANDES.md` (install, dev, test, build, deploy qualif, rollback, seed démo — blocs exécutables), `FONCTIONNEL.md` (**TF-0087** : ce que fait le produit et pour qui — rôles, objets métier et cycle de vie, parcours, règles de gestion, exclusions assumées ; vue d'`EXIGENCES.json` quand il existe, sinon rédigé du code et daté), `ARCHITECTURE.md` et `MODELE-DONNEES.md` (**TF-0091** : sources des vues techniques — structure logique / tables-colonnes-liens — projetées en `ARCHITECTURE.html` et `MODELE-DONNEES.html` par les générateurs du pilot, vues JAMAIS éditées à la main) ; chaque fichier ouvre par un frontmatter YAML (`role`, `sources_de_verite`, `verifie_le`). Noms **fixes** — documents vivants exemptés du nommage daté R-4 (ce ne sont pas des livrables). Autres fichiers admis seulement s'ils servent l'automatisation ou l'onboarding ET n'existent pas déjà sous forme machine (sinon renvoi) | manque constaté : les runs de version redécouvrent tout ; FONCTIONNEL : demande humaine en clôture du run Produit-11 | produits, nouveaux + rattrapage | P0+O | faible | **défaut** |

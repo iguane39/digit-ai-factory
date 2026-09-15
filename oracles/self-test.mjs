@@ -327,6 +327,54 @@ check("TF-1119 BORNE — un carnet hérité instancié, sans second carnet, ne d
   if (f.some((x) => x.statut === "FAIL" || /AVERTISSEMENT/.test(x.message))) throw new Error(`faux positif : ${JSON.stringify(f)}`);
 });
 
+// TF-1113, TF-1117, TF-1120 — L'INVENTAIRE DIT L'USAGE (R-20 étendu, étude 20260915a option O1).
+// Même borne que 01faf22 : antérieur au 15/09 → antériorité déclarée ; postérieur → jugé.
+const COP_BASE = (date, corps) => `---\nrole: composants\nsources_de_verite: ["ops.mjs etat"]\nverifie_le: ${date}\n---\n# Composants\n\n`
+  + "## Environnements de données\n\naucun environnement de données interrogé.\n\n## Infrastructure déclarée\n\naucune infrastructure posée hors dépôt.\n\n" + corps;
+const COP_USAGE = "## Inventaire par environnement\n\n| Composant | Type | Environnement | Statut | Vérifié le |\n|---|---|---|---|---|\n"
+  + "| api | service | production | **actif** | 2026-09-15 |\n| plateforme | conteneurs | production | partagée | 2026-09-15 |\n\n"
+  + "## Imbrications et usages — qui consomme quoi\n\n| Composant | Consommé par | Pour quoi | Preuve |\n|---|---|---|---|\n| bdd | api | persistance | secretRef, 2026-09-15 |\n\n"
+  + "## Composants inutilisés\n\n| Composant | preuve d'inutilité | ce qui cesse de fonctionner si on le supprime | statut de supprimabilité | créé par quoi | geste | titulaire du droit |\n|---|---|---|---|---|---|---|\n"
+  + "| regle-pare-feu | aucun consommateur, requête du 2026-09-15 | l'accès du poste en service | non supprimable, décision | geste manuel | `az … delete` | propriétaire de la base |\n";
+const avecCop = (contenu, fn) => {
+  const chemin = join(verte, "docs", "projet", "COMPOSANTS-OPS.md");
+  const avant = readFileSync(chemin, "utf8");
+  try { writeFileSync(chemin, contenu); return fn(lance(verte)); } finally { writeFileSync(chemin, avant); }
+};
+const echecsUsage = (rapport) => rapport.findings.filter((x) => x.regle === "R-20" && x.statut === "FAIL" && /TF-1113/.test(x.message));
+check("TF-1113 ANTÉRIEUR — COMPOSANTS-OPS revu avant le 15/09, sans les trois pièces : antériorité déclarée, jamais un FAIL", () => {
+  avecCop(COP_BASE("2026-09-14", ""), ({ exit, rapport }) => {
+    if (echecsUsage(rapport).length || exit !== 0) throw new Error(`défaut rétroactif : exit ${exit}, ${JSON.stringify(echecsUsage(rapport))}`);
+    if (!rapport.non_juge.some((l) => /R-20 \(usage des composants\) non jugé.*verifie_le=2026-09-14/.test(l))) throw new Error("antériorité non déclarée");
+  });
+});
+check("TF-1113 rouge — revu le 15/09 sans colonne Statut, sans table ni section : chaque manque est un FAIL nommé", () => {
+  avecCop(COP_BASE("2026-09-15", ""), ({ exit, rapport }) => {
+    const m = echecsUsage(rapport).map((x) => x.message).join(" | ");
+    if (exit !== 1) throw new Error(`exit ${exit}`);
+    for (const attendu of ["colonne Statut", "qui consomme quoi", "Composants inutilisés"]) if (!m.includes(attendu)) throw new Error(`manque non nommé : ${attendu} — ${m.slice(0, 300)}`);
+  });
+});
+check("TF-1113 vert — revu le 15/09, les trois pièces présentes et les vocabulaires tenus : PASS", () => {
+  avecCop(COP_BASE("2026-09-15", COP_USAGE), ({ exit, rapport }) => {
+    if (echecsUsage(rapport).length || exit !== 0) throw new Error(`exit ${exit} : ${JSON.stringify(echecsUsage(rapport)).slice(0, 400)}`);
+    if (!rapport.findings.some((x) => x.regle === "R-20" && x.statut === "PASS" && /vocabulaires fermés tenus/.test(x.message))) throw new Error("le PASS n'est pas dit");
+  });
+});
+check("TF-1113 vert — section « Composants inutilisés » DÉCLARÉE VIDE : PASS (loi n° 3)", () => {
+  const vide = COP_USAGE.replace(/## Composants inutilisés[\s\S]*$/, "## Composants inutilisés\n\naucun composant inutilisé relevé le 2026-09-15.\n");
+  avecCop(COP_BASE("2026-09-15", vide), ({ exit, rapport }) => {
+    if (echecsUsage(rapport).length || exit !== 0) throw new Error(`exit ${exit} : ${JSON.stringify(echecsUsage(rapport)).slice(0, 300)}`);
+  });
+});
+check("TF-1117/TF-1120 rouge — Statut hors vocabulaire, supprimabilité hors vocabulaire, colonne « créé par quoi » absente : chacun nommé", () => {
+  const faux = COP_USAGE.replace("**actif**", "vital").replace("non supprimable, décision", "peut-être").replace(" créé par quoi |", " origine |");
+  avecCop(COP_BASE("2026-09-15", faux), ({ exit, rapport }) => {
+    const m = echecsUsage(rapport).map((x) => x.message).join(" | ");
+    if (exit !== 1 || !/vital/.test(m) || !/peut-être/.test(m) || !/créé par quoi/.test(m)) throw new Error(`exit ${exit} : ${m.slice(0, 400)}`);
+  });
+});
+
 check("R-11 bis : section présente mais incomplète → le manquant est NOMMÉ (TF-0373)", () => {
   const chemin = join(verte, "CLAUDE.md");
   const avant = readFileSync(chemin, "utf8");

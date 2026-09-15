@@ -46,10 +46,45 @@ lit ici, jamais dans la mémoire de la session en cours.
 
 *Le même parc, vu par environnement plutôt que par hiérarchie. Cette vue sert à répondre à « qu'est-ce qui tourne en production ? » — une question que l'arborescence ci-dessus ne tranche pas.*
 
-| Composant | Type | Environnement | ID | URL | IP | Vérifié le |
+| Composant | Type | Environnement | ID | URL | IP | Statut | Vérifié le |
+|---|---|---|---|---|---|---|---|
+| {api} | {service} | staging | {<ID>} | {<URL_STAGING>} | {<IP|n/a>} | {actif} | {AAAA-MM-JJ} |
+| {api} | {service} | production | {<ID>} | {<URL_PROD>} | {<IP|n/a>} | {actif} | {AAAA-MM-JJ} |
+
+**La colonne Statut dit l'USAGE, pas la présence (TF-1113).** Vocabulaire fermé, une valeur par
+ligne : **actif** · **partagé** (lu, non possédé) · **déclaré** (décrit, non instancié) ·
+**inutilisé** (reporté à la section « Composants inutilisés ») · **hors périmètre**. Chaque valeur
+est justifiée par un consommateur résolu au tableau « qui consomme quoi » (image référencée,
+référence de secret, identité portée, cible d'alerte, appel dans le code), jamais par le nom. Le
+fait du 14/09/2026 : dix éléments sans consommateur coexistaient avec un document conforme, et
+deux suppressions évidentes d'après le nom auraient tué le produit.
+
+## Imbrications et usages — qui consomme quoi (TF-1113)
+
+*Le tableau qui justifie chaque statut. Un composant sans ligne ici n'a pas de consommateur
+prouvé.*
+
+| Composant | Consommé par | Pour quoi | Preuve (commande ou fichier, date) |
+|---|---|---|---|
+| {bdd} | {api} | {persistance des objets métier} | {référence de secret de l'api, AAAA-MM-JJ} |
+
+## Composants inutilisés (TF-1113, TF-1117, TF-1120)
+
+*Obligatoire, et déclarée même vide : « aucun composant inutilisé relevé le AAAA-MM-JJ » est une
+réponse complète (loi n° 3).* L'absence de consommateur ouvre une question, elle ne rend pas un
+verdict : le 14/09/2026, sur dix lignes déclarées inutilisées, cinq n'étaient pas supprimables.
+
+| Composant | preuve d'inutilité | ce qui cesse de fonctionner si on le supprime | statut de supprimabilité | créé par quoi | geste | titulaire du droit |
 |---|---|---|---|---|---|---|
-| {api} | {service} | staging | {<ID>} | {<URL_STAGING>} | {<IP|n/a>} | {AAAA-MM-JJ} |
-| {api} | {service} | production | {<ID>} | {<URL_PROD>} | {<IP|n/a>} | {AAAA-MM-JJ} |
+| {composant} | {consommateur cherché, commande jouée, date} | {mesuré, jamais supposé} | {supprimable} | {pile d'infrastructure et adresse · étape de pipeline et ligne · geste manuel · tiers nommé} | {commande} | {qui a le droit de la jouer} |
+
+- **statut de supprimabilité**, vocabulaire fermé (TF-1117) : supprimable · non supprimable,
+  droit absent · non supprimable, décision · non supprimable, tiers propriétaire.
+- **créé par quoi** (TF-1120) : pile d'infrastructure et adresse de la ressource, étape de
+  pipeline et sa ligne, geste manuel, ou tiers nommé. Supprimer une instance sans traiter ce qui
+  la crée est un nettoyage qui se défait tout seul. Un nettoyage se clôt sur trois questions :
+  l'instance est-elle supprimée sur CHAQUE environnement où elle existe, ce qui la crée est-il
+  traité, et le PROCHAIN environnement la recréera-t-il ?
 
 ## Cible d'exploitation forge-ops
 

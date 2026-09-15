@@ -1337,6 +1337,77 @@ else {
         + "est une réponse complète, jamais un silence");
     else
       antecedences.push(`R-20 (infrastructure déclarée) non jugé sur docs\\projet\\COMPOSANTS-OPS.md : la section naît le 26/08 (TF-0651) et le document porte verifie_le=${verifieCop || "non daté"} — antériorité déclarée, jamais un défaut de produit ; elle sera exigée dès la prochaine revue datée`);
+
+    // R-20 (suite) · L'INVENTAIRE DIT L'USAGE, PAS SEULEMENT LA PRÉSENCE (TF-1113, TF-1117, TF-1120 ;
+    // étude 20260915a, option O1 : R-20 étendu, aucun fichier neuf). LE FAIT, 14/09/2026 : dix
+    // éléments sans consommateur coexistaient avec un COMPOSANTS-OPS conforme ; deux suppressions
+    // évidentes d'après le nom auraient tué le produit ; sur dix lignes déclarées inutilisées, cinq
+    // n'étaient pas supprimables ; et aucune ne disait ce qui la crée, donc ce qui la recréerait.
+    // Jugé : la PRÉSENCE de la colonne Statut, de la table « qui consomme quoi » et de la section
+    // « Composants inutilisés » avec ses colonnes, et les deux vocabulaires fermés (accord en genre
+    // et en nombre toléré). NON jugé : qu'un statut soit justifié par un consommateur résolu plutôt
+    // que par le nom — la table le permet, sa justesse se lit à la revue.
+    // ANTÉRIORITÉ, même borne que le correctif 01faf22 : exigé dès le premier verifie_le ≥ 15/09.
+    {
+      const SEUIL_USAGE = "2026-09-15";
+      const plat = (s) => String(s).normalize("NFD").replace(/\p{M}/gu, "").replace(/[’]/g, "'").replace(/[*`✂]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
+      const L = texteCop.split(/\r?\n/);
+      const cellules = (l) => l.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
+      const tables = [];
+      for (let i = 0; i < L.length - 1; i++) {
+        if (!/^\s*\|/.test(L[i]) || !/^\s*\|[\s:|-]+\|\s*$/.test(L[i + 1])) continue;
+        const t = { ligne: i, entetes: cellules(L[i]).map(plat), lignes: [] };
+        for (let k = i + 2; k < L.length && /^\s*\|/.test(L[k]); k++) t.lignes.push(cellules(L[k]));
+        tables.push(t);
+      }
+      const titres = L.map((l, i) => ({ l, i })).filter((x) => /^#{2,}\s/.test(x.l));
+      const sectionDe = (motif) => {
+        const t = titres.find((x) => motif.test(plat(x.l)));
+        if (!t) return null;
+        const suivant = titres.find((x) => x.i > t.i && x.l.match(/^#+/)[0].length <= t.l.match(/^#+/)[0].length);
+        return { debut: t.i, fin: suivant ? suivant.i : L.length };
+      };
+      const valeursDe = (t, col) => t.lignes.map((r) => r[col] || "").filter((v) => v && !/^\{.*\}$/.test(v.trim()));
+      const flexion = (mot) => new RegExp(`^${mot.replace(/ /g, "\\s")}(e|s|es)?$`);
+      const VOCAB_STATUT = ["actif", "partage", "declare", "inutilise", "hors perimetre"];
+      const VOCAB_SUPPR = ["supprimable", "non supprimable, droit absent", "non supprimable, decision", "non supprimable, tiers proprietaire"];
+      // Les LIBELLÉS EXACTS du gabarit, que la règle O-15 de forge-ops lit aussi : le message les
+      // cite tels quels, la comparaison se fait sur leur forme aplatie.
+      const COLS_INUTILISES = ["preuve d'inutilité", "ce qui cesse de fonctionner si on le supprime", "statut de supprimabilité", "créé par quoi", "geste", "titulaire du droit"];
+      const manques = [], vocab = [];
+      const tablesStatut = tables.filter((t) => t.entetes.includes("statut"));
+      if (!tablesStatut.length) manques.push("colonne Statut à l'inventaire (actif / partagé / déclaré / inutilisé / hors périmètre)");
+      for (const t of tablesStatut) {
+        const col = t.entetes.indexOf("statut");
+        const hors = valeursDe(t, col).filter((v) => !VOCAB_STATUT.some((m) => flexion(m).test(plat(v))));
+        if (hors.length) vocab.push(`Statut hors vocabulaire fermé (ligne ${t.ligne + 1}) : ${[...new Set(hors)].slice(0, 5).join(", ")}`);
+      }
+      const conso = sectionDe(/qui consomme quoi/);
+      if (!conso || !tables.some((t) => t.ligne > conso.debut && t.ligne < conso.fin)) manques.push("table « qui consomme quoi »");
+      const inut = sectionDe(/composants? inutilis/);
+      if (!inut) manques.push("section « Composants inutilisés » (déclarée même vide — loi n° 3)");
+      else {
+        const tIn = tables.filter((t) => t.ligne > inut.debut && t.ligne < inut.fin && t.entetes.some((e) => e.includes("supprimabilite") || e.includes("preuve d'inutilite")));
+        const videDeclaree = /aucun composant inutilise/.test(plat(L.slice(inut.debut, inut.fin).join(" ")));
+        if (!tIn.length && !videDeclaree) manques.push("table de la section « Composants inutilisés », ou sa déclaration vide « aucun composant inutilisé relevé le AAAA-MM-JJ »");
+        for (const t of tIn) {
+          const absentes = COLS_INUTILISES.filter((c) => !t.entetes.some((e) => e.includes(plat(c))));
+          if (absentes.length) manques.push(`colonne(s) de la section « Composants inutilisés » : ${absentes.join(", ")}`);
+          const col = t.entetes.findIndex((e) => e.includes("statut de supprimabilite"));
+          if (col >= 0) {
+            const hors = valeursDe(t, col).filter((v) => !VOCAB_SUPPR.includes(plat(v).replace(/\s*[,;:—–-]\s*/g, ", ")));
+            if (hors.length) vocab.push(`statut de supprimabilité hors vocabulaire fermé (ligne ${t.ligne + 1}) : ${[...new Set(hors)].slice(0, 5).join(", ")}`);
+          }
+        }
+      }
+      const ecarts = [...manques.map((m) => `manque : ${m}`), ...vocab];
+      if (verifieCop && verifieCop >= SEUIL_USAGE) {
+        for (const e of ecarts) ko("R-20", "docs\\projet\\COMPOSANTS-OPS.md", `${e} — l'inventaire dit l'USAGE, pas seulement la présence : un composant inutile y est sinon indiscernable d'un composant vital (TF-1113, TF-1117, TF-1120 ; gabarit gabarits\\docs-projet\\COMPOSANTS-OPS.md)`);
+        if (!ecarts.length) ok("R-20", "docs\\projet\\COMPOSANTS-OPS.md", "colonne Statut, table « qui consomme quoi » et section « Composants inutilisés » présentes, vocabulaires fermés tenus (TF-1113, TF-1117, TF-1120)");
+      } else if (ecarts.length) {
+        antecedences.push(`R-20 (usage des composants) non jugé sur docs\\projet\\COMPOSANTS-OPS.md : ${ecarts.length} écart(s) (${ecarts.slice(0, 3).join(" ; ")}) ; la règle naît le ${SEUIL_USAGE} (TF-1113, TF-1117, TF-1120) et le document porte verifie_le=${verifieCop || "non daté"} — antériorité déclarée, jamais un défaut de produit ; exigée dès la prochaine revue datée`);
+      }
+    }
   }
 
 
