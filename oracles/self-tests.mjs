@@ -327,16 +327,24 @@ for (const b of bilan.baisses) {
     + "Une recette qui perd des cas rend un harnais vert — retirer un cas est un geste ÉCRIT : "
     + "rejouer avec `--appliquer` après avoir dit POURQUOI, ou restaurer les cas.");
 }
-if (bilan.montees.length && !bilan.baisses.length) ecrireBaseline(CHEMIN_BASELINE, bilan.baseline);
-if (bilan.baisses.length && APPLIQUER) {
+// TF-1082 — une recette de la baseline ABSENTE du passage est nommée et fait échouer, exemption
+// comprise : le cliquet des cas ne voyait pas la disparition d'un fichier entier.
+for (const d of bilan.disparues) {
+  console.error(`  [RECETTE DISPARUE] ${d.nom}${d.exemption ? " (exemption déclarée)" : d.cas !== null ? ` (${d.cas} cas)` : ""} : `
+    + "présente à la baseline, jouée par PERSONNE à ce passage. Restaurer la recette, ou retirer l'entrée "
+    + "par `--appliquer` après avoir dit POURQUOI — une disparition est un geste écrit.");
+}
+if (bilan.montees.length && !bilan.baisses.length && !bilan.disparues.length) ecrireBaseline(CHEMIN_BASELINE, bilan.baseline);
+if ((bilan.baisses.length || bilan.disparues.length) && APPLIQUER) {
   const accepte = { ...bilan.baseline };
   for (const b of bilan.baisses) accepte[b.nom] = { cas: b.vu, vu_le: jour, baisse_acceptee_le: jour };
+  for (const d of bilan.disparues) delete accepte[d.nom];
   ecrireBaseline(CHEMIN_BASELINE, accepte);
-  console.log(`  [CLIQUET] ${bilan.baisses.length} baisse(s) ACCEPTÉE(S) et datée(s) par --appliquer`);
+  console.log(`  [CLIQUET] ${bilan.baisses.length} baisse(s) et ${bilan.disparues.length} disparition(s) ACCEPTÉE(S) par --appliquer`);
 }
 
 const echecs = resultats.filter((r) => r.statut !== "OK");
-const perdus = APPLIQUER ? [] : bilan.baisses;
+const perdus = APPLIQUER ? [] : [...bilan.baisses, ...bilan.disparues];
 console.log("=".repeat(78));
 console.log(
   echecs.length || perdus.length

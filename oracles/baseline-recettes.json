@@ -76,8 +76,8 @@
   "vu_le": "2026-09-10"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 71,
-  "vu_le": "2026-09-14"
+  "cas": 81,
+  "vu_le": "2026-09-15"
  },
  "oracle-constantes-externes.mjs": {
   "cas": 12,
@@ -251,8 +251,8 @@
   "vu_le": "2026-09-11"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
-  "cas": 14,
-  "vu_le": "2026-09-01"
+  "cas": 16,
+  "vu_le": "2026-09-15"
  },
  "oracles/oracle-controles-injoignables.test.mjs": {
   "cas": 22,
@@ -307,8 +307,8 @@
   "vu_le": "2026-09-08"
  },
  "scripts/readme-dossiers.test.mjs": {
-  "cas": 14,
-  "vu_le": "2026-09-14"
+  "cas": 17,
+  "vu_le": "2026-09-15"
  },
  "scripts/rebatir-clone.test.mjs": {
   "cas": 7,
@@ -338,6 +338,10 @@
   "cas": 8,
   "vu_le": "2026-08-26"
  },
+ "scripts/verifier-hooks-git.test.mjs": {
+  "cas": 6,
+  "vu_le": "2026-09-15"
+ },
  "scripts/verifier-jeu-livrables.test.mjs": {
   "cas": 7,
   "vu_le": "2026-08-31"
@@ -353,6 +357,10 @@
  "scripts/verifier-secours.test.mjs": {
   "cas": 7,
   "vu_le": "2026-08-26"
+ },
+ "scripts/verifier-verdict-archive.test.mjs": {
+  "cas": 8,
+  "vu_le": "2026-09-15"
  },
  "todo/bancs-isoles.test.mjs": {
   "cas": 4,
@@ -375,8 +383,8 @@
   "vu_le": "2026-09-14"
  },
  "todo/ingerer-classe.test.mjs": {
-  "cas": 8,
-  "vu_le": "2026-09-03"
+  "cas": 13,
+  "vu_le": "2026-09-15"
  },
  "todo/ingerer-controle.test.mjs": {
   "cas": 2,
@@ -393,6 +401,10 @@
  "todo/ingerer-emetteur-forge.test.mjs": {
   "cas": 2,
   "vu_le": "2026-09-05"
+ },
+ "todo/ingerer-identifiants.test.mjs": {
+  "cas": 3,
+  "vu_le": "2026-09-15"
  },
  "todo/ingerer-r45.test.mjs": {
   "cas": 8,

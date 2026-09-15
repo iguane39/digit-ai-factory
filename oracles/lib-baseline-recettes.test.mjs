@@ -151,13 +151,25 @@ check("le fichier écrit est TRIÉ — un fichier versionné dont l'ordre bouge 
   att(Object.keys(lire(f)).length === 2, "le fichier écrit ne se relit pas");
 });
 
-check("le cliquet reste MUET sur ce qu'il n'a pas vu — aucune recette inventée", () => {
-  // Une baseline qui porte une recette disparue ne doit pas la faire échouer ici : ce cliquet
-  // compte des CAS, pas des FICHIERS. La disparition d'un fichier entier est un autre objet,
-  // et le prétendre couvert serait la demi-couverture que N-38 dénonce.
+check("TF-1082 rouge — une recette ENTIÈRE disparue du passage est NOMMÉE, son entrée gardée, rien d'inventé", () => {
+  // Le cliquet comptait des CAS, pas des FICHIERS : une recette disparue entière sortait en silence.
+  // Elle est désormais nommée ; le compte de cas, lui, ne la déclare pas « baisse » (autre objet).
   const b = confronter([], { "todo/disparue.test.mjs": { cas: 11, vu_le: "2026-08-25" } }, JOUR);
-  att(b.baisses.length === 0 && b.nonLus.length === 0, "le cliquet s'est prononcé sur une absence");
-  att(b.baseline["todo/disparue.test.mjs"].cas === 11, "l'entrée d'une recette absente a été perdue");
+  att(b.disparues.length === 1 && b.disparues[0].nom === "todo/disparue.test.mjs" && b.disparues[0].cas === 11, "la disparition n'est pas nommée");
+  att(b.baisses.length === 0 && b.nonLus.length === 0, "la disparition a été comptée comme une baisse de cas ou un non-lu");
+  att(b.baseline["todo/disparue.test.mjs"].cas === 11, "l'entrée d'une recette absente a été perdue en silence");
+  att(Object.keys(b.baseline).length === 1, "une recette a été inventée");
+});
+
+check("TF-1082 rouge — une EXEMPTION disparue est nommée aussi : sans compte, elle n'avait aucune autre protection", () => {
+  const b = confronter([ok("oracles/a.test.mjs", "a : 3 PASS, 0 FAIL")],
+    { "oracles/a.test.mjs": { cas: 3 }, "oracle-x.mjs (parc réel)": { non_lu: true, motif: "état du parc" } }, JOUR);
+  att(b.disparues.length === 1 && b.disparues[0].exemption === true, "l'exemption disparue n'est pas nommée comme telle");
+});
+
+check("TF-1082 borne — une recette présente et EN ÉCHEC n'est PAS une disparition", () => {
+  const b = confronter([{ nom: "oracles/a.test.mjs", statut: "ECHEC", resume: "a : 1 PASS, 2 FAIL" }], { "oracles/a.test.mjs": { cas: 3 } }, JOUR);
+  att(b.disparues.length === 0, "une recette en échec est prise pour une disparition");
 });
 
 console.log(`\nbaseline-recettes (TF-0681) : ${pass} PASS, ${fail} FAIL`);

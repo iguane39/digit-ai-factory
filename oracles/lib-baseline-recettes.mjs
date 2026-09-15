@@ -146,7 +146,17 @@ export function confronter(resultats, baseline, jour) {
       baisses.push({ nom: r.nom, avant, vu, perdus: avant - vu });
     }
   }
-  return { baisses, montees, nonLus, baseline: suivante };
+  // TF-1082 (15/09/2026) — LE CLIQUET COMPTE AUSSI LES FICHIERS. Il comptait des CAS : une recette
+  // qui disparaissait ENTIÈRE sortait du passage sans un mot, son entrée restait à la baseline et
+  // personne ne la comparait plus. Les onze exemptions (`non_lu`) étaient plus exposées encore :
+  // sans compte, rien ne les protégeait de leur propre disparition. Toute entrée de la baseline
+  // absente du passage est désormais NOMMÉE ; l'entrée est gardée, jamais perdue en silence — son
+  // retrait est un geste écrit de l'appelant (`--appliquer`). Une recette présente et EN ÉCHEC
+  // n'est pas une disparition : elle a déjà son verdict.
+  const vus = new Set(resultats.map((r) => r.nom));
+  const disparues = Object.keys(baseline).filter((nom) => !vus.has(nom))
+    .map((nom) => ({ nom, exemption: Boolean(baseline[nom] && baseline[nom].non_lu), cas: baseline[nom] && Number.isInteger(baseline[nom].cas) ? baseline[nom].cas : null }));
+  return { baisses, montees, nonLus, disparues, baseline: suivante };
 }
 
 /** Écrit la baseline, triée par nom — un fichier versionné dont l'ordre bouge est illisible. */
