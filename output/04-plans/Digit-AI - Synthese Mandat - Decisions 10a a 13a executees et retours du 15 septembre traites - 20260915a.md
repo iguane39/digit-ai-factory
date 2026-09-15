@@ -4,7 +4,7 @@ destinataire: humain
 
 # Synthèse de mandat — vos décisions 10a à 13a sont exécutées, et les retours du 15/09 sont traités (15/09/2026)
 
-Vos quatre décisions d'hier sont exécutées. Les 22 candidatures nées des retours reçus depuis hier sont instruites : 20 sont closes, 2 restent reportées au titre de D-11. Le registre passe de 265 à 289 items clos. Rien n'est publié. Vous demandiez s'il y a quelque chose à pousser : oui, 110 commits attendent sur 9 dépôts. 102 sont prêts, et les 8 de l'exploitation attendent votre décision D-14.
+Vos quatre décisions d'hier sont exécutées. Les 22 candidatures nées des retours reçus depuis hier sont instruites : 20 sont closes, 2 restent reportées au titre de D-11. Le registre passe de 265 à 289 items clos. Rien n'est publié. Vous demandiez s'il y a quelque chose à pousser : oui, 110 commits attendent sur 9 dépôts, sans compter le commit de cette synthèse. 102 sont prêts, et les 8 de l'exploitation attendent votre décision D-14.
 
 ## 1. En-tête d'identification
 
@@ -15,7 +15,7 @@ Vos quatre décisions d'hier sont exécutées. Les 22 candidatures nées des ret
 
 ## 2. Verdict en une ligne
 
-**Registre : clos 265 → 289, en cours 36 → 34, candidats 3 → 2, `oracle-todo` PASS ; 25 décisions et 24 clôtures journalisées ; D-10 à D-13 exécutées ; harnais du pilot 115/115 après propagation, contrôle des skills PASS ; 110 commits locaux sur 9 dépôts, dont 102 prêts à publier ; 0 publication.**
+**Registre : clos 265 → 289, en cours 36 → 34, candidats 3 → 2, `oracle-todo` PASS ; 25 décisions et 24 clôtures journalisées ; D-10 à D-13 exécutées ; harnais du pilot 115/115 après propagation, contrôle des skills PASS ; 110 commits locaux sur 9 dépôts hors le commit de cette synthèse, dont 102 prêts à publier ; 0 publication.**
 
 ## 3. Décisions attendues de l'humain
 
@@ -109,7 +109,7 @@ Sept actions restent : deux pour moi, dont une attend votre réponse à D-14, qu
 
 Ordre : A-1 au retour de la campagne, puisque rien d'autre n'est en cours ; A-2 dès votre réponse à D-14 ; A-3 quand vous voulez pour les 102 commits prêts, parce qu'ils sont tous sondés ; A-4 et A-5 ensemble, pour trancher la confidentialité avant d'enregistrer ; A-6 après A-1 et A-3 ; A-7 ne bloque rien.
 
-Commits prêts, par dépôt : pilot 51, outils 16, design 11, données 7, audit 6, développement 5, tests 5, conventions 1. Exploitation 8, après D-14.
+Commits prêts, par dépôt : pilot 51, plus le commit de cette synthèse, outils 16, design 11, données 7, audit 6, développement 5, tests 5, conventions 1. Exploitation 8, après D-14.
 
 ## 9. Traces
 
