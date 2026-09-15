@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 288 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 289 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -341,6 +341,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Traite tous les retours et todos - 20260902a.md | 20260902a | 27.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite tous les retours et todos - 20260902a.md` |
 | Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md | 20260823a | 9.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md` |
 | Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Traite tous les sujets - 20260823a.md.jugement.json` |
+| Digit-AI - Synthese Mandat - Trois correctifs au socle et balayage des perimetres - 20260915c.md | 20260915c | 22.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Trois correctifs au socle et balayage des perimetres - 20260915c.md` |
 | Digit-AI - Synthese Mandat - Trois decisions executees moteur de couverture reference realignee publications - 20260910f.md | 20260910f | 25.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Trois decisions executees moteur de couverture reference realignee publications - 20260910f.md` |
 | Digit-AI - Synthese Mandat - Trois forges jouees plancher propage - 20260912b.md | 20260912b | 26.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Trois forges jouees plancher propage - 20260912b.md` |
 | Digit-AI - Synthese Mandat - Trois lots ingeres et quatre defauts du pilot corriges - 20260909b.md | 20260909b | 23.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Trois lots ingeres et quatre defauts du pilot corriges - 20260909b.md` |
