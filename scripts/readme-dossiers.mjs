@@ -99,7 +99,26 @@ const EST_MACHINE = (nom) => nom.startsWith(".") || nom === "_oracles";
 // rapport) a reçu HUIT README, un par niveau, dont un dans la définition du modèle — étrangers au
 // format, et reproduits à chaque écriture. Le dossier le DÉCLARE par un fichier `.no-index` à sa
 // racine : le générateur n'y descend pas, et le parent le compte comme un livrable unique.
-const EST_CLOS = (dir) => existsSync(join(dir, ".no-index"));
+//
+// TF-1126 (15/09/2026) — LE MARQUEUR NE SUFFIT PAS : UN FORMAT TIERS SE RECONNAÎT À SON MANIFESTE.
+// Le même produit, le 15/09 : le marqueur n'était pas encore hérité, et 9 README sont entrés dans
+// un projet Power BI (29 → 37 fichiers) ; le client de publication, qui envoie à l'API TOUT fichier
+// du dossier, comptait 26 parties au lieu de 22 pour le modèle et 6 au lieu de 3 pour le rapport.
+// L'information existait sur disque — le manifeste du format — et rien ne la lisait. Un dossier
+// est donc clos s'il porte `.no-index`, OU un manifeste tiers connu (`*.pbip`, `.platform`), OU
+// si son nom est celui d'un élément de format imposé (`*.SemanticModel`, `*.Report`, `*.Dataset`).
+// `package.json` n'y est PAS : il marque un projet de code, qu'on indexe légitimement.
+const MANIFESTES_TIERS = [/\.pbip$/i, /^\.platform$/];
+const NOMS_FORMAT_TIERS = /\.(SemanticModel|Report|Dataset)$/;
+const motifClos = (dir) => {
+  if (existsSync(join(dir, ".no-index"))) return "marqueur `.no-index`, TF-1050";
+  if (NOMS_FORMAT_TIERS.test(dir)) return "élément de format tiers reconnu à son nom, TF-1126";
+  let noms = [];
+  try { noms = readdirSync(dir); } catch { return null; }
+  const m = noms.find((n) => MANIFESTES_TIERS.some((r) => r.test(n)));
+  return m ? `manifeste tiers \`${m}\`, TF-1126` : null;
+};
+const EST_CLOS = (dir) => motifClos(dir) !== null;
 const posix = (p) => p.split(sep).join("/");
 const affiche = (p) => p.split("/").join("\\") + "\\";
 
@@ -216,7 +235,7 @@ function attendu(dir, rel) {
     } else if (e.isDirectory() && EST_CLOS(chemin)) {
       nd++;
       const n = compter(chemin);
-      lignes.push(`| \`${e.name}\\\` | livrable à structure close (${n} fichier${n > 1 ? "s" : ""}) | — | structure imposée par son format, non indexée (marqueur \`.no-index\`, TF-1050) |`);
+      lignes.push(`| \`${e.name}\\\` | livrable à structure close (${n} fichier${n > 1 ? "s" : ""}) | — | structure imposée par son format, non indexée (${motifClos(chemin)}) |`);
     } else if (e.isDirectory()) {
       nd++;
       const n = compter(chemin);

@@ -23,7 +23,7 @@
  *
  * Joué par `oracles\self-tests.mjs` (I2).
  */
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, existsSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, existsSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -181,6 +181,45 @@ check("TF-0914 : le MÊME fichier, une fois COMMIS, entre dans l'index sans autr
   check("TF-1050 rouge — le même dossier SANS marqueur reçoit un README par niveau (le défaut d'origine)", () => {
     for (const d of ["ouvert", "ouvert/definition", "ouvert/definition/tables"])
       if (!existsSync(join(B, "input", d, "README.md"))) throw new Error(`le témoin sans marqueur n'a pas son README en ${d} — la recette ne prouve plus rien`);
+  });
+  rmSync(B, { recursive: true, force: true });
+}
+
+// TF-1126 — UN FORMAT TIERS SE RECONNAÎT À SON MANIFESTE, SANS MARQUEUR. Le cas du 15/09 en
+// miniature : un projet Power BI (`.pbip` à la racine, un `.SemanticModel\` et un `.Report\`) que
+// personne n'a marqué. Il ne reçoit aucun README, et son décompte de fichiers ne bouge pas ; un
+// dossier ordinaire voisin reçoit toujours le sien (le sens vert qui prouve que la règle ne mord
+// pas trop large). Et un élément de format reconnu à son seul nom, hors projet, est clos aussi.
+{
+  const B = mkdtempSync(join(tmpdir(), "readme-tiers-"));
+  const P = join(B, "output", "Projet Power BI");
+  mkdirSync(join(P, "Modele.SemanticModel", "definition", "tables"), { recursive: true });
+  mkdirSync(join(P, "Modele.Report", "definition"), { recursive: true });
+  writeFileSync(join(P, "Modele.pbip"), "{}\n", "utf8");
+  writeFileSync(join(P, "Modele.SemanticModel", "definition", "tables", "Dim.tmdl"), "table\n", "utf8");
+  writeFileSync(join(P, "Modele.Report", "definition", "report.json"), "{}\n", "utf8");
+  mkdirSync(join(B, "output", "ordinaire", "sous"), { recursive: true });
+  writeFileSync(join(B, "output", "ordinaire", "sous", "note.md"), "# note\n", "utf8");
+  mkdirSync(join(B, "output", "Seul.SemanticModel", "definition"), { recursive: true });
+  writeFileSync(join(B, "output", "Seul.SemanticModel", "definition", "model.tmdl"), "model\n", "utf8");
+  const compte = (d) => { let n = 0; for (const e of readdirSync(d, { withFileTypes: true })) n += e.isDirectory() ? compte(join(d, e.name)) : 1; return n; };
+  const avant = compte(P);
+  spawnSync(process.execPath, [OUTIL, "--base", B, "--racines", "output"], { encoding: "utf8" });
+  check("TF-1126 vert — le projet au manifeste tiers ne reçoit AUCUN README, à aucune profondeur, et garde son décompte", () => {
+    for (const d of ["", "Modele.SemanticModel", "Modele.SemanticModel/definition", "Modele.SemanticModel/definition/tables", "Modele.Report", "Modele.Report/definition"])
+      if (existsSync(join(P, d, "README.md"))) throw new Error(`un README est écrit dans le format tiers : ${d || "(racine)"}`);
+    const apres = compte(P);
+    if (apres !== avant) throw new Error(`décompte ${avant} → ${apres}`);
+  });
+  check("TF-1126 — le parent nomme le manifeste qui a clos le dossier", () => {
+    const t = readFileSync(join(B, "output", "README.md"), "utf8");
+    if (!/`Projet Power BI\\` \| livrable à structure close \(3 fichiers\) .*manifeste tiers `Modele\.pbip`/.test(t)) throw new Error("le parent ne déclare pas le projet comme livrable clos par son manifeste");
+    if (!/`Seul\.SemanticModel\\` \| livrable à structure close .*reconnu à son nom/.test(t)) throw new Error("l'élément de format reconnu à son nom n'est pas déclaré clos");
+  });
+  check("TF-1126 vert — un dossier ordinaire voisin reçoit toujours son README, à chaque niveau", () => {
+    for (const d of ["ordinaire", "ordinaire/sous"])
+      if (!existsSync(join(B, "output", d, "README.md"))) throw new Error(`README manquant en ${d} — la règle mord trop large`);
+    if (existsSync(join(B, "output", "Seul.SemanticModel", "README.md"))) throw new Error("README écrit dans un élément de format reconnu à son nom");
   });
   rmSync(B, { recursive: true, force: true });
 }
