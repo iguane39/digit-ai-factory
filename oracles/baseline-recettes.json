@@ -338,6 +338,10 @@
   "cas": 8,
   "vu_le": "2026-08-26"
  },
+ "scripts/verifier-familles-mesure.mjs": {
+  "cas": 11,
+  "vu_le": "2026-09-15"
+ },
  "scripts/verifier-hooks-git.test.mjs": {
   "cas": 6,
   "vu_le": "2026-09-15"
@@ -362,8 +366,20 @@
   "cas": 8,
   "vu_le": "2026-09-15"
  },
+ "todo/accueillir-lot.mjs": {
+  "cas": 4,
+  "vu_le": "2026-09-15"
+ },
  "todo/adresses-ip.test.mjs": {
   "cas": 14,
+  "vu_le": "2026-09-15"
+ },
+ "todo/anonymiser-entrant.mjs": {
+  "cas": 10,
+  "vu_le": "2026-09-15"
+ },
+ "todo/anonymiser-suivis.mjs": {
+  "cas": 10,
   "vu_le": "2026-09-15"
  },
  "todo/bancs-isoles.test.mjs": {

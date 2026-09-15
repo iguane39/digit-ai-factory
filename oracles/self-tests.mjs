@@ -143,10 +143,21 @@ for (const zone of zonesTests) {
     // `oracles\` restent hors de ce motif : ils sont déjà joués par I1 (via `DEDIES`), et
     // `self-tests.mjs` s'y appellerait lui-même.
     const motif = (f) => f.endsWith(".test.mjs") || (zone !== "oracles" && /^self-test.*\.mjs$/.test(f));
-    fichiers = readdirSync(join(RACINE, zone)).filter(motif).sort();
+    fichiers = readdirSync(join(RACINE, zone)).filter(motif).sort().map((nom) => ({ nom, args: [] }));
+    // I2 ter (TF-1135, 15/09) : un OUTIL hors `oracles\` qui porte son propre `--self-test` était
+    // invisible aux deux motifs — `todo\accueillir-lot.mjs`, qui pseudonymise chaque lot entrant,
+    // en était, avec trois autres. Le critère lit le CODE (le test de `process.argv`), jamais une
+    // simple mention du drapeau : un outil qui en lance un autre avec `--self-test` n'est pas joué.
+    if (zone !== "oracles") {
+      for (const nom of readdirSync(join(RACINE, zone)).filter((f) => f.endsWith(".mjs") && !motif(f)).sort()) {
+        let source = "";
+        try { source = readFileSync(join(RACINE, zone, nom), "utf8"); } catch { continue; }
+        if (/\b(?:process\.argv|argv|args)(?:\.slice\(\d+\))?\.includes\(\s*["']--self-test["']\s*\)/.test(source)) fichiers.push({ nom, args: ["--self-test"] });
+      }
+    }
   } catch { continue; }
-  for (const nom of fichiers) {
-    const r = spawnSync(process.execPath, [join(RACINE, zone, nom)], { encoding: "utf8" });
+  for (const { nom, args } of fichiers) {
+    const r = spawnSync(process.execPath, [join(RACINE, zone, nom), ...args], { encoding: "utf8" });
     const lignes = (r.stdout || "").trim().split("\n").filter((l) => l.trim());
     const resume = lignes[lignes.length - 1] || r.stderr?.split("\n")[0] || "aucune sortie";
     resultats.push({
