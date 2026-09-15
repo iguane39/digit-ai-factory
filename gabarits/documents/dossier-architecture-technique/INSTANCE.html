@@ -198,7 +198,15 @@
     .doc-grille > nav.toc ol, .doc-grille > nav.toc ul { columns: 1; }
     .doc-grille > nav.toc h2 { font-size: 1.05rem; margin: 0 0 .5em; }
     .doc-grille > .doc-corps { min-width: 0; }
-    @media (max-width: 900px) { .doc-grille { grid-template-columns: 1fr; } .doc-grille > nav.toc { position: static; max-height: none; } }
+    /* Le geste canonique du socle (L25) pose `position: static` sous 900 px et ANNONCE en
+       commentaire une « bande repliable sur mobile » que son CSS ne fournit pas : mesure le
+       15/09 sur les cinq familles, `sommaire_perdu` BLOQUANT a 768 px et a 390 px, sur des
+       pages de 3 a 4 ecrans. La bande existe ici — le sommaire reste colle en tete, borne au
+       tiers de la fenetre et defilable : atteignable sans manger l ecran. */
+    @media (max-width: 900px) {
+      .doc-grille { grid-template-columns: 1fr; }
+      .doc-grille > nav.toc { position: sticky; top: 0; max-height: 33vh; overflow: auto; z-index: 5; }
+    }
     .toc .toc-t { display: block; text-decoration: underline; }
     .toc .toc-d { display: block; color: var(--muted); font-size: .84rem; }
     @media (max-width: 760px) { .toc ol, .toc ul { columns: 1; } }
@@ -339,7 +347,9 @@
     </header>
 
     <main>
+      <div class="chap lire">
       <p>Ce dossier porte la structure du produit, les décisions qui l'ont façonnée, et l'écart entre ce qui tourne et ce qui est visé. Il <strong>assemble</strong> les documents vivants du produit : il y renvoie, il ne les recopie pas.</p>
+      </div>
 
       <div class="doc-grille">
       <nav class="toc" aria-label="Sommaire">
@@ -357,7 +367,7 @@
       </nav>
       <div class="doc-corps">
 
-      <section id="en-tete">
+      <section class="chap lire" id="en-tete">
         <h2 data-toc="hors">En-tête — à renseigner, et à re-dater</h2>
         <p class="ch-apprend">Ce bloc dit de QUOI le dossier parle et QUAND il a été vérifié pour la dernière fois. Un dossier dont on ignore la date de vérification ne se distingue pas d'un dossier faux : c'est le seul champ qu'on relit avant de suivre une procédure.</p>
         <div class="card">
@@ -399,16 +409,18 @@
         </figure>
       </section>
 
-      <section id="objet">
+      <section class="chap lire" id="objet">
         <h2>1 · Objet, périmètre et lecteurs</h2>
         <p class="ch-apprend">Pour quelle décision ce dossier existe, ce qu'il couvre, ce qu'il ne couvre pas, et pour qui. Un périmètre qui n'énumère que ses inclusions laisse le lecteur supposer le reste — et il supposera large.</p>
+        <p class="contenu">Ce chapitre contient l'objet du dossier, son périmètre applicatif et la liste des lecteurs auxquels il s'adresse. Il ne contient aucune description de composant : elles ont leur chapitre.</p>
         <p>Décision servie : à compléter par le projet. Lecteurs : interne.</p>
         <p><strong>Hors périmètre</strong> : à compléter par le projet.</p>
       </section>
 
-      <section id="vue-logique">
+      <section class="chap lire" id="vue-logique">
         <h2>2 · Vue logique — par renvoi</h2>
         <p class="ch-apprend">Le résumé d'ensemble et le schéma — rien de plus. La vue logique détaillée vit dans le document de travail du produit et fait foi : la recopier ici crée deux descriptions qui divergeront, et le lecteur ne saura pas laquelle est à jour.</p>
+        <p class="contenu">Ce chapitre contient la vue logique de la solution et le renvoi vers le schéma qui la porte. Il ne contient ni instance déployée ni dimensionnement : ils vivent aux composants.</p>
         <p>à compléter par le projet</p>
         <p>Vue logique détaillée (composants, flux, données, delivery) : voir <code>docs\projet\ARCHITECTURE.md</code>. <strong>Non recopiée ici.</strong></p>
         <figure>
@@ -416,9 +428,10 @@
         </figure>
       </section>
 
-      <section id="composants">
+      <section class="chap lire" id="composants">
         <h2>3 · Composants et instances — par renvoi</h2>
         <p class="ch-apprend">L'inventaire instancié se lit ailleurs ; ce qui figure ici est ce que ce document est seul à porter — les dépendances EXTERNES, leur contrat, et ce qui se passe quand elles tombent. C'est la partie qu'aucun inventaire technique ne contient.</p>
+        <p class="contenu">Ce chapitre contient une ligne par composant et par instance déployée, avec son rôle et son environnement. Il ne contient pas les décisions qui ont conduit à ce découpage : elles vivent aux ADR.</p>
         <p>Inventaire instancié par environnement : voir <code>docs\projet\COMPOSANTS-OPS.md</code>. <strong>Non recopié ici.</strong></p>
         <div class="table-hote">
           <table class="repli-cartes">
@@ -431,9 +444,10 @@
         </div>
       </section>
 
-      <section id="trajectoire">
+      <section class="chap lire" id="trajectoire">
         <h2>4 · Trajectoire — de l'existant à la cible</h2>
         <p class="ch-apprend">Ce qui sépare ce qui tourne de ce qui est visé, écart par écart. Un écart sans jalon n'est pas une trajectoire mais une intention ; un jalon sans porteur nommé non plus. Cette section est due dès que le dossier décrit les deux états.</p>
+        <p class="contenu">Ce chapitre contient les étapes qui mènent de l'existant à la cible, avec ce qui bascule à chacune. Il ne contient pas le mode opératoire de bascule : il vit à l'ordonnancement de mise en production.</p>
         <div class="table-hote">
           <table class="repli-cartes">
             <caption>Écarts entre l'existant et la cible</caption>
@@ -445,9 +459,10 @@
         </div>
       </section>
 
-      <section id="adr">
+      <section class="chap lire" id="adr">
         <h2>5 · Décisions d'architecture (ADR)</h2>
         <p class="ch-apprend">Chaque décision structurante avec ses alternatives écartées et le motif du choix. C'est la trace du raisonnement qui distingue un dossier d'architecture d'une simple description : elle permet de rouvrir une décision sans la refaire de zéro.</p>
+        <p class="contenu">Ce chapitre contient une ligne par décision d'architecture, avec l'option retenue, les options écartées et le motif. Il ne contient aucune décision en attente d'arbitrage.</p>
         <div class="table-hote">
           <table class="repli-cartes">
             <caption>Décisions d'architecture</caption>
@@ -460,9 +475,10 @@
         <p>Si le produit s'adosse à un registre d'ADR existant : y renvoyer, et ne lister ici que les décisions propres au produit.</p>
       </section>
 
-      <section id="securite">
+      <section class="chap lire" id="securite">
         <h2>6 · Sécurité</h2>
         <p class="ch-apprend">Quatre sujets qu'un comité demandera de toute façon. Le plus souvent omis est la PORTÉE d'un geste délégué à un fournisseur d'identité : ne pas la trancher fait hériter du comportement le plus large, et l'omission vaut adoption.</p>
+        <p class="contenu">Ce chapitre contient les mesures de sécurité portées par l'architecture : cloisonnement, authentification, chiffrement, traces. Il ne contient ni analyse de risque ni plan de remédiation.</p>
         <div class="table-hote">
           <table class="repli-cartes">
             <caption>Sujets de sécurité</caption>
@@ -477,9 +493,10 @@
         </div>
       </section>
 
-      <section id="enf">
+      <section class="chap lire" id="enf">
         <h2>7 · Exigences non fonctionnelles, et comment on les vérifie</h2>
         <p class="ch-apprend">Chaque exigence avec sa cible chiffrée ET le moyen qui la mesure. La colonne « comment elle est mesurée » est celle qu'on saute par réflexe — et sans elle une exigence non fonctionnelle est un vœu, pas un engagement.</p>
+        <p class="contenu">Ce chapitre contient une ligne par exigence non fonctionnelle, avec son seuil et la façon de le vérifier. Il ne contient aucun résultat de mesure : un dossier d'architecture décrit la cible, il ne la recette pas.</p>
         <div class="table-hote">
           <table class="repli-cartes">
             <caption>Exigences non fonctionnelles</caption>
@@ -494,9 +511,10 @@
         <p>Le mode opératoire qui TIENT ces cibles vit dans le dossier d'exploitation ; ce dossier-ci en porte l'<strong>engagement</strong>.</p>
       </section>
 
-      <section id="risques">
+      <section class="chap lire" id="risques">
         <h2>8 · Hypothèses, risques et mesures</h2>
         <p class="ch-apprend">Ce sur quoi le dossier repose sans l'avoir vérifié, et ce qui peut mal tourner avec la mesure prise et le risque qui RESTE. Un dossier sans risque déclaré est suspect : il signifie soit une architecture parfaite, soit une relecture rapide.</p>
+        <p class="contenu">Ce chapitre contient les hypothèses de conception encore ouvertes et les risques d'architecture, chacun avec sa mesure de réduction. Il ne contient pas les risques de projet : ils vivent à la revue RAID.</p>
         <h3>Hypothèses</h3>
         <div class="table-hote">
           <table class="repli-cartes">
@@ -519,7 +537,7 @@
         </div>
       </section>
 
-      <section id="optionnelles">
+      <section class="chap lire" id="optionnelles">
         <h2 data-toc="hors">Sections optionnelles — et comment les omettre</h2>
         <p class="ch-apprend">Une section optionnelle non retenue se DÉCLARE en une ligne, avec son motif. Un titre suivi d'un emplacement vide est un défaut, pas une omission : le lecteur ne peut pas distinguer « pas concerné » de « pas rempli », et il tranchera au pire.</p>
         <div class="table-hote">
@@ -538,7 +556,7 @@
         </div>
       </section>
 
-      <section id="personnalisation">
+      <section class="chap lire" id="personnalisation">
         <h2 data-toc="hors">Contrat de personnalisation</h2>
         <p class="ch-apprend">Trois listes fermées, pour qu'un projet sache exactement où finit sa liberté. Ce qui n'est pas dans la colonne « peut » ne se change pas sans le déclarer — sinon deux instances du même gabarit cessent d'être comparables.</p>
         <div class="table-hote">

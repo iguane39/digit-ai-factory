@@ -32,6 +32,15 @@
  *        pour la machine — et la question « cette famille a-t-elle de quoi démarrer » restait
  *        indécidable.* La règle ne juge pas la QUALITÉ du point de départ, seulement qu'il soit
  *        déclaré et qu'il existe là où il est dit ;
+ *   G6 · toute famille SANS point de départ dit ce qui l'EMPÊCHE, dans un vocabulaire fermé
+ *        (`poste-porteur` · `arbitrage` · `reclassement` · `aucun`), et un `poste-porteur` dit OÙ
+ *        vivent ses sources. Née le 15/09/2026 de la décision humaine D-11 (b). *Sans elle, une
+ *        DÉPENDANCE D'ENVIRONNEMENT — les sources existent, elles ne sont pas sur ce poste — se lit
+ *        exactement comme une DETTE DE TRAVAIL, et le compte des familles démunies envoie le
+ *        travail au mauvais endroit.* La règle rend AUSSI la répartition à chaque passage : c'est
+ *        la mesure que la décision demandait, et une classification qui ne se compte pas ne se
+ *        pilote pas. Elle ne juge pas la SINCÉRITÉ d'un empêchement — un `poste-porteur` apposé
+ *        sur une famille que ce poste pourrait servir la satisfait, et seul un lecteur le voit ;
  *   G4 · le document REND son gabarit et sa version (`Gabarit : gd-… · version du gabarit x.y.z`),
  *        visiblement — jamais seulement en commentaire. Une instance périmée est invisible sur
  *        l'artefact, et la section R-46 des lots devient impossible à remplir sans lui (TF-0690).
@@ -102,6 +111,10 @@ function marquage(fichier) {
 
 const TYPES_DEPART = new Set(["squelette", "generateur", "canevas", "aucun"]);
 
+// G6 — vocabulaire FERMÉ des empêchements. Un ensemble ouvert produirait autant de motifs que de
+// rédacteurs, et la répartition ne se compterait plus.
+const EMPECHEMENTS = new Set(["poste-porteur", "arbitrage", "reclassement", "aucun"]);
+
 /**
  * G5 — LE POINT DE DÉPART D'UNE FAMILLE SE DÉCLARE, ET SON CHEMIN EXISTE.
  *
@@ -147,6 +160,23 @@ export function jugerCatalogue(chemin, racineParc) {
         ? findings.push({ regle: "G5", statut: "FAIL", ou, message:
             `type « aucun » ET un chemin (« ${d.chemin} ») : la déclaration se contredit, l'un des deux est faux` })
         : findings.push({ regle: "G5", statut: "PASS", ou, message: "aucun point de départ — déclaré, donc comptable" });
+      // G6 — CE QUI EMPÊCHE se déclare, dans un vocabulaire fermé. Sans lui, une dépendance
+      // d'environnement (les sources existent, elles sont ailleurs) se lit comme une dette de
+      // travail (personne ne l'a fait) : deux choses qui ne se traitent pas au même endroit,
+      // et un compte qui les mélange envoie le travail au mauvais poste.
+      if (!EMPECHEMENTS.has(d.empechement)) {
+        findings.push({ regle: "G6", statut: "FAIL", ou, message:
+          `famille sans point de départ et sans \`empechement\` reconnu (« ${d.empechement} ») — ` +
+          `attendus : ${[...EMPECHEMENTS].join(", ")}. Un « aucun » non classé mélange la dette de ` +
+          `travail et la dépendance d'environnement` });
+      } else if (d.empechement === "poste-porteur" && !(d.sources_attendues_sur || "").trim()) {
+        findings.push({ regle: "G6", statut: "FAIL", ou, message:
+          "empêchement « poste-porteur » sans `sources_attendues_sur` — dire que les sources sont " +
+          "ailleurs sans dire OÙ ne permet à personne d'aller les chercher" });
+      } else {
+        findings.push({ regle: "G6", statut: "PASS", ou, message:
+          `empêchement « ${d.empechement} » déclaré${d.sources_attendues_sur ? ` — sources sur : ${d.sources_attendues_sur}` : ""}` });
+      }
       continue;
     }
     if (!d.chemin) {
@@ -175,6 +205,20 @@ export function jugerCatalogue(chemin, racineParc) {
         `point de départ déclaré et INTROUVABLE : ${d.chemin} — une déclaration non vérifiée est une affirmation` });
     }
   }
+
+  // G6, second sens — la RÉPARTITION, rendue à chaque passage. Une classification qui ne se
+  // compte pas ne se pilote pas : le nombre de familles démunies ne dit rien tant qu'il mélange
+  // ce qui attend un poste et ce que personne n'a fait.
+  const nus = html.filter((f) => (f.point_de_depart || {}).type === "aucun");
+  const par = {};
+  for (const f of nus) { const e = f.point_de_depart.empechement || "non classé"; par[e] = (par[e] || 0) + 1; }
+  const environnement = par["poste-porteur"] || 0;
+  const travail = (par["aucun"] || 0) + (par["reclassement"] || 0) + (par["arbitrage"] || 0);
+  findings.push({ regle: "G6", statut: "PASS", ou: chemin, message:
+    `couverture : ${html.length - nus.length} famille(s) html outillée(s), ${nus.length} sans point de départ — ` +
+    `dont ${environnement} dépendance(s) d'environnement et ${travail} dette(s) de travail` +
+    (nus.length ? ` (${Object.entries(par).map(([k, v]) => `${k}: ${v}`).join(", ")})` : "") });
+
   return findings;
 }
 
@@ -347,7 +391,8 @@ if (args[0] === "--self-test") {
   // VERT : les quatre types déclarés, chacun conforme.
   const catVert = ecrireCat("vert.jsonl", [
     { famille: "a", formats: ["html"], point_de_depart: { type: "squelette", chemin: "depot-pilot/gabarits/documents/fam-ok/SQUELETTE.html" } },
-    { famille: "b", formats: ["html"], point_de_depart: { type: "aucun", chemin: null } },
+    { famille: "b", formats: ["html"], point_de_depart: { type: "aucun", chemin: null, empechement: "aucun" } },
+    { famille: "d", formats: ["html"], point_de_depart: { type: "aucun", chemin: null, empechement: "poste-porteur", sources_attendues_sur: "un poste qui porte les livrables" } },
     { famille: "c", formats: ["md"] },
   ]);
   if (verdictsG5(catVert).some((v) => v !== "PASS")) casse.push("G5 accuse un catalogue conforme : " + JSON.stringify(jugerCatalogue(catVert, parc)));
@@ -360,6 +405,22 @@ if (args[0] === "--self-test") {
   const catFantome = ecrireCat("r2.jsonl", [
     { famille: "a", formats: ["html"], point_de_depart: { type: "squelette", chemin: "depot-pilot/gabarits/documents/fam-ok/ABSENT.html" } }]);
   if (!verdictsG5(catFantome).includes("FAIL")) casse.push("G5 laisse passer un point de départ déclaré et introuvable");
+
+  // --- G6, LES DEUX SENS ROUGES. Une classification qu'aucun contrôle ne tient redevient de la
+  // prose en trois semaines : c'est ce qui était arrivé au champ `sources`, et la raison pour
+  // laquelle `empechement` naît avec sa fixture rouge plutôt que sans.
+  const verdictsG6 = (f) => jugerCatalogue(f, parc).filter((x) => x.regle === "G6").map((x) => x.statut);
+
+  // ROUGE G6-1 : « aucun » sans empêchement — une dépendance d'environnement et une dette de
+  // travail se lisent alors pareil, et le compte des familles démunies mélange les deux.
+  const catSansEmp = ecrireCat("r6a.jsonl", [
+    { famille: "a", formats: ["html"], point_de_depart: { type: "aucun", chemin: null } }]);
+  if (!verdictsG6(catSansEmp).includes("FAIL")) casse.push("G6 laisse passer un « aucun » sans empêchement classé");
+
+  // ROUGE G6-2 : « poste-porteur » sans dire OÙ — personne ne peut aller chercher les sources.
+  const catSansOu = ecrireCat("r6b.jsonl", [
+    { famille: "a", formats: ["html"], point_de_depart: { type: "aucun", chemin: null, empechement: "poste-porteur" } }]);
+  if (!verdictsG6(catSansOu).includes("FAIL")) casse.push("G6 laisse passer « poste-porteur » sans sources_attendues_sur");
 
   // ROUGE 3 : « aucun » ET un chemin — la déclaration se contredit.
   const catContradictoire = ecrireCat("r3.jsonl", [
@@ -376,9 +437,10 @@ if (args[0] === "--self-test") {
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test gabarits-documents : 12/12 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ; " +
+    : "Self-test gabarits-documents : 14/14 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ; " +
       "instance à trous → FAIL ; instance copie du squelette → FAIL ; classe posée sans règle CSS → FAIL au marquage ; " +
-      "couple gabarit+version rendu → PASS G4 ; document sans le couple → FAIL G4 ; G5 dans ses CINQ sens — catalogue " +
+      "couple gabarit+version rendu → PASS G4 ; document sans le couple → FAIL G4 ; G6 dans ses DEUX sens rouges — "
+      + "« aucun » sans empêchement classé → FAIL, « poste-porteur » sans dire OÙ → FAIL ; G5 dans ses CINQ sens — catalogue " +
       "conforme → PASS, famille html sans champ → FAIL, chemin déclaré introuvable → FAIL, « aucun » avec un chemin → FAIL, " +
       "dépôt porteur absent du poste → SKIP et jamais PASS)");
   process.exit(casse.length ? 1 : 0);

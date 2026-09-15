@@ -41,7 +41,7 @@
        que le nom de fichier). Sans lui, deux révisions du même jour portent le même nom à
        l'écran ; « V1 » ne les distingue pas (défaut du 17/08, lot Produit-01). -->
   <!--
-  SQUELETTE — Rapport de données · bibliothèque de gabarits de documents du pilot.
+  SQUELETTE — Ordonnancement de mise en production · bibliothèque de gabarits de documents du pilot.
   Dérivé de assets/boilerplate.html du socle digit-ai-page-html (forge-agents), auquel il
   AJOUTE ce que la famille exige et que le socle ne fournit pas encore :
     · le repli des tableaux en cartes sous 900 px (doctrine D3) — un conteneur
@@ -87,6 +87,18 @@
       --amber: #D97706; --amber-fill: #FFFBEB; --amber-line: #FDE9C8;
       --teal:  #0E9488; --teal-fill:  #EFFDFB; --teal-line:  #C7F0EA;
       --green: #15803D; --green-fill: #F2FCF5; --green-line: #CFEEDD;
+      /* Rouge — quatrieme accent semantique, AJOUT de la bibliotheque (14/09) : le
+         boilerplate du socle n en porte pas, et les familles affichent des etats
+         DEFAVORABLES (bloquant, ecarte, probabilite forte) que ok/part/info ne disent pas.
+         Meme grammaire que les trois autres : encre pleine, fond tres clair, filet.
+         Verse en candidat au socle ; tant qu il n y est pas, il vit ici. */
+      --red:   #B91C1C; --red-fill:   #FEF2F2; --red-line:   #F7D4D4;
+      /* Fonds PLEINS des badges — encre blanche dessus. Valeurs reprises de la fixture
+         verte du socle ; elles ne changent pas entre clair et sombre : un etat garde sa
+         couleur quel que soit le theme, et le contraste de l encre blanche est tenu par
+         la clarte du fond, pas par celle de la page. */
+      --green-solid: #166534; --teal-solid: #0F5F8F;
+      --amber-solid: #92400E; --red-solid:  #B91C1C;
       /* Rayons */
       --r: 12px; --r-sm: 8px;
       /* Largeur du conteneur et largeur de lecture — cf. regle L2.
@@ -113,6 +125,7 @@
       --amber: #FBBF6D; --amber-fill: #2B2210; --amber-line: #4A3A18;
       --teal:  #5FE6D6; --teal-fill:  #0E2A27; --teal-line:  #164E48;
       --green: #7BE0A0; --green-fill: #0F2A1B; --green-line: #1C4A30;
+      --red:   #F59B9B; --red-fill:   #2C1414; --red-line:   #4E2323;
     }
 
     * { box-sizing: border-box; }
@@ -198,6 +211,7 @@
         --amber:#D97706; --amber-fill:#FFFBEB; --amber-line:#FDE9C8;
         --teal:#0E9488;  --teal-fill:#EFFDFB;  --teal-line:#C7F0EA;
         --green:#15803D; --green-fill:#F2FCF5; --green-line:#CFEEDD;
+        --red:#B91C1C;   --red-fill:#FEF2F2;   --red-line:#F7D4D4;
       }
       body { background: var(--surface); }
       .wrap { max-width: none; padding: 0; }
@@ -282,16 +296,67 @@
     .doc-grille > nav.toc ol, .doc-grille > nav.toc ul { columns: 1; }
     .doc-grille > nav.toc h2 { font-size: 1.05rem; margin: 0 0 .5em; }
     .doc-grille > .doc-corps { min-width: 0; }
-    @media (max-width: 900px) { .doc-grille { grid-template-columns: 1fr; } .doc-grille > nav.toc { position: static; max-height: none; } }
+    /* Le geste canonique du socle (L25) pose `position: static` sous 900 px et ANNONCE en
+       commentaire une « bande repliable sur mobile » que son CSS ne fournit pas : mesure le
+       15/09 sur les cinq familles, `sommaire_perdu` BLOQUANT a 768 px et a 390 px, sur des
+       pages de 3 a 4 ecrans. La bande existe ici — le sommaire reste colle en tete, borne au
+       tiers de la fenetre et defilable : atteignable sans manger l ecran. */
+    @media (max-width: 900px) {
+      .doc-grille { grid-template-columns: 1fr; }
+      .doc-grille > nav.toc { position: sticky; top: 0; max-height: 33vh; overflow: auto; z-index: 5; }
+    }
     .toc .toc-t { display: block; text-decoration: underline; }
     .toc .toc-d { display: block; color: var(--muted); font-size: .84rem; }
     @media (max-width: 760px) { .toc ol, .toc ul { columns: 1; } }
+
+    /* ── Encre secondaire et badges de statut ─────────────────────────────────
+       Loi transverse n°1 : toute affordance est cablee ou n existe pas. `muted` et
+       `badge` etaient EMPLOYEES par ces gabarits sans aucune regle CSS — mesure le
+       15/09 sur les cinq familles : un `<span class="badge ok">` se rendait en texte
+       nu, sans pastille ni fond, et l etat qu il annonce ne se voyait pas.
+       Forme reprise TELLE QUELLE de references/composants.md du socle (§2) : le texte
+       reste en --ink (contraste garanti), la couleur semantique est portee par la
+       pastille, le fond et le filet — jamais par le texte colore seul, qui echoue le
+       contraste AA et viole WCAG 1.4.1 (couleur seule). */
+    .muted { color: var(--muted); }
+    /* L identification du document est de la PROSE, et se borne comme telle : mesure le
+       15/09, 105 caracteres par ligne a 3840 px des que l objet du document est long (V18
+       bloquant). Le header est en flex, rien ne le bornait. */
+    /* La bride est portee par le BLOC qui porte le texte, jamais par le texte : L2 refuse
+       `max-width` pose sur un <p> (mesure le 15/09, ratio 0.80 pour un seuil de 0.85) et
+       l attribut de declaration ne vaut que pour V18. La doctrine du socle est la meme des
+       deux cotes — la mesure de lecture se pose sur le CONTENEUR. */
+    /* 84ch et non 90 : `ch` mesure le zero, la police de corps est plus etroite, et 90ch
+       laissait passer 103 caracteres par ligne — mesure le 15/09, V18 bloquant a 2560 px. */
+    .doc-ident { max-width: 84ch; }
+    /* Une chaine technique ne deborde pas : mesure le 15/09, une URL et un motif de format
+       en monospace poussaient une table a 465 px dans une fenetre de 390 (V1 bloquant, 33
+       descendants entraines). Les mots ordinaires ne se coupent PAS — `break-word` n agit
+       que si le mot ne tient pas dans sa colonne ; `anywhere` est reserve au monospace, ou
+       la chaine n a pas de cesure naturelle. */
+    th, td { overflow-wrap: break-word; }
+    code { overflow-wrap: anywhere; }
+    /* Fonds PLEINS et non pastel : mesure le 15/09, la forme pastel de composants.md §2 du
+       socle rend 18 a 36 constats V16 « etats indiscernables » par page — ses quatre teintes
+       de fond vivent toutes entre L* 93 et 97, et V16 du meme socle les refuse. Forme reprise
+       de la fixture VERTE du socle (v16-etats-pleins.html) : fond plein, encre blanche,
+       GLYPHE par palier — la distinction ne repose jamais sur la seule couleur (WCAG 1.4.1). */
+    .badge { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; font-weight: 700;
+      color: #FFFFFF; padding: 2px 10px; border-radius: 999px; border: 1px solid transparent; }
+    .badge.ok   { background: var(--green-solid); }
+    .badge.part { background: var(--amber-solid); }
+    .badge.info { background: var(--teal-solid); }
+    .badge.ko   { background: var(--red-solid); }
+    .badge.ok::before   { content: "\2713"; }
+    .badge.part::before { content: "\2192"; }
+    .badge.info::before { content: "\2194"; }
+    .badge.ko::before   { content: "\2717"; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header class="doc" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
-      <div>
+      <div class="doc-ident">
         <p class="eyebrow">Client-A · Ordonnancement de mise en production</p>
         <h1>Ordonnancement des étapes de mise en production</h1>
         <p class="muted">Projet : Produit-11 — passage en production du service de restitution · Indice : 20260914a · Établi le 14/09/2026<br>Commit de référence : <code>main @ 2026-09-13</code> · Artefact visé : <code>v1.4.0</code>, commit <code>a3cde26</code><br>Sources : dossier de changement CHG-2026-0914, constats d'audit du 11/09/2026, état du dépôt vérifié le 13/09/2026<br>Gabarit : gd-ordonnancement-mep · version du gabarit 1.0.0 — à reporter tel quel dans tout retour sur ce document</p>
@@ -333,7 +398,7 @@
            DANS sa ligne (ligne depliable), jamais dans un second listing de fiches. -->
 
       <!-- 5 · LA LECTURE POUR LE COMITE — redigee en DERNIER, lue en PREMIER. -->
-      <section id="comite">
+      <section class="chap lire" id="comite">
         <h2>La lecture pour le comité</h2>
         <p class="contenu">Ce chapitre contient le compte des 9 étapes par famille — code, objets de plateforme, décisions, mode opératoire — et la phrase qui tranche. Il ne contient aucune étape : elles vivent au chapitre des lots.</p>
         <p class="chapo ch-apprend">Le produit est prêt ; ce qui manque est essentiellement de l'autorité et deux objets de plateforme. Aucune ligne de code ne reste à écrire, et les deux objets absents se créent en une opération chacun, sans dépendance entre eux.</p>
@@ -341,7 +406,7 @@
       </section>
 
       <!-- 1 · COMMENT LIRE — le compte, les deux legendes FERMEES, et ce qui n'est pas couvert. -->
-      <section id="lecture">
+      <section class="chap lire" id="lecture">
         <h2>Comment lire ce tableau</h2>
         <p class="contenu">Ce chapitre contient le compte des étapes et des lots, les deux légendes fermées — la nature d'une étape et son blocage — et la liste de ce que le tableau ne couvre pas.</p>
         <p class="chapo ch-apprend">9 étapes, 2 lots, un seul ordre. Cet ordre est une contrainte établie, pas une préférence de rédaction : 2 inversions cassent la mise en production, et elles sont nommées au chapitre « Les inversions qui cassent la MEP ».</p>
@@ -381,7 +446,7 @@
 
       <!-- 2 · LES LOTS ORDONNES — colonnes FIXES, dans cet ordre, pour TOUS les lots.
            Le detail d'une etape vit DANS sa ligne, jamais dans un second listing (L32). -->
-      <section id="lots">
+      <section class="chap lire" id="lots">
         <h2>Les lots ordonnés</h2>
         <p class="contenu">Ce chapitre contient une ligne par étape, regroupée par lot, avec sa dépendance, son propriétaire et sa preuve de fin. Il ne contient ni le mode opératoire, ni les écarts exclus.</p>
         <p class="chapo ch-apprend">Un lot regroupe les étapes qui partagent une fenêtre temporelle et un propriétaire dominant. Le titre d'un lot porte sa fenêtre RELATIVE tant que le créneau n'est pas attribué — c'est une étape « Décider » qui l'attribue.</p>
@@ -431,7 +496,7 @@
       </section>
 
       <!-- 3 · ECARTS DECLARES — exclus, pas oublies. -->
-      <section id="ecarts">
+      <section class="chap lire" id="ecarts">
         <h2>Écarts déclarés, maintenus hors du chemin</h2>
         <p class="contenu">Ce chapitre contient les sujets volontairement absents du chemin, chacun avec son statut, son motif chiffré et le rôle qui doit le trancher.</p>
         <p class="chapo ch-apprend">Un lecteur qui ne trouve pas un sujet connu dans le tableau des étapes doit le trouver ici avec son motif — sans quoi il ne peut pas distinguer un arbitrage d'un oubli, et c'est exactement ce qu'un comité cherche.</p>
@@ -452,7 +517,7 @@
       </section>
 
       <!-- 4 · LES INVERSIONS — la section qui JUSTIFIE le document. -->
-      <section id="inversions">
+      <section class="chap lire" id="inversions">
         <h2>Les inversions qui cassent la MEP</h2>
         <p class="contenu">Ce chapitre contient la liste des couples d'étapes dont l'ordre ne peut pas être échangé, et pour chacun ce qui casse si on l'inverse.</p>
         <p class="chapo ch-apprend">Le reste du tableau se réordonne sans dommage ; celles-là, non. C'est la section qui justifie ce document : sans elle, un ordonnancement est un planning de plus ; avec elle, il porte l'information que personne d'autre ne détient.</p>
@@ -466,7 +531,7 @@
     </main>
 
     <footer class="doc">
-      {Client} · Rapport de données · {AAAAMMJJindice}
+      {Client} · Ordonnancement de mise en production · {AAAAMMJJindice}
     </footer>
   </div>
 
