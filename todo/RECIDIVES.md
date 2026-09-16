@@ -1,6 +1,6 @@
 # Récidives et descente — tableau de bord
 
-<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 25582c86bc43 · archive 6ce2fe14c2bb · classes 515349512697 · relevés d7baf49e3e68 · héritage 4f975ceb94eb. État au 2026-09-16T08:43:54.095Z (ts max des sources, jamais l'horloge). -->
+<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 29f71eb36306 · archive 6ce2fe14c2bb · classes 515349512697 · relevés d7baf49e3e68 · héritage 4f975ceb94eb. État au 2026-09-16T09:33:31.480Z (ts max des sources, jamais l'horloge). -->
 
 Ce tableau de bord répond à trois questions que le registre seul ne savait pas poser : est-ce la deuxième fois, chez qui, et depuis combien de temps la correction existe sans être appliquée. Il se lit avec sa contre-métrique : un compteur de récidives qui baisse pendant que le nombre de classes monte est un compteur contourné, pas un progrès.
 
