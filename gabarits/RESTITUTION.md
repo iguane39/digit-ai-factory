@@ -7,7 +7,7 @@ prouvée à zéro faux positif, et ne voit rien. Le marquage a été vérifié t
 `oracle-synthese` (S1-S8 à l'époque, S1-S33 depuis la v2.15.0) sur une synthèse réelle PASS avant d'être prescrit ici.
 Cette consigne, elle, ne se marque PAS : c'est un référentiel normatif, pas un livrable.
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 2.21.0, 11/09/2026** : **un mot de décision reçoit la PREUVE du geste, jamais la décision reposée** (TF-1019 — transcription d'une session de ce poste et journal des hooks, 11/09). **S-GESTE** — quand le dernier message humain n'est QUE des sélecteurs de décision (« 11a », « 11 a », « D-11 (a) », « D-11 a », « D11a », « 32b, 30a »), il TRANCHE : il n'attend plus une analyse mais la PREUVE EXÉCUTÉE, au bloc 4, du geste que l'option choisie commandait. Le fait du 11/09 : l'humain écrit « 11a » à 07:05:01Z puis de nouveau « 11a » à 07:07:39Z, et les deux messages de fin de tour (07:07:31Z, 07:09:32Z) sont la synthèse de la VEILLE REJOUÉE MOT POUR MOT — 3156 mots, même titre, même bloc 3 reposant D-11 — jugés PASS les deux fois ; le geste demandé, le push, n'est venu qu'à 09:10:08. *Une restitution conforme rejouée à l'identique est, par construction, conforme : `oracle-synthese` juge la FORME d'un message et n'a jamais regardé son rapport au message humain qui l'appelle ni au message final qui l'a précédé — il manquait la seule relation qui dit si quelque chose s'est passé.* Deux formes de non-geste sont donc refusées, BLOQUANTES l'une comme l'autre parce qu'elles laissent le lecteur croire qu'il n'a pas décidé : le message final IDENTIQUE au précédent (aux espaces près), et la même `D-N` REPOSÉE au bloc 3 — dans le message affiché comme dans la synthèse déposée. Le contrôle vit dans `oracles\hook-restitution.mjs` (`controlerGeste`), s'inscrit au journal des hooks sous `geste`, porte le rappel court « un mot de décision reçoit la PREUVE du geste au bloc 4, jamais la décision reposée », et sa reconnaissance est ANCRÉE sur le message humain ENTIER : un « 11a » noyé dans une phrase peut être une citation, une référence ou un chiffre, et la borne verte — dernier message humain « Traite toutes les actions », contrôle inapplicable — la prouve autant que la paire rouge/verte de `oraclesixtures\`. Précédente : **2.20.0, 08/09/2026** : **la forme datée est réservée aux études, et la doctrine est la source quand elle régit le mot** (TF-0923 — second paquet des six volets restés non joués). **S40** — un chemin de livrable cité sous `output\` n'emprunte pas le préfixe daté « AAAAMMJJ-… ». Deux nommages cohabitent chez le pilot et un seul est général : R-4 impose « `<Marque> - <Objet> - AAAAMMJJ<indice>.<ext>` » à tout livrable d'`output\` ; `output\03-etudes\` en est l'**exception écrite**, son préfixe daté faisant lire le dossier dans l'ordre chronologique (`gabarits\ETUDE-OPPORTUNITE.md`). Le fait du 07/09 (TF-0898) : onze livrables d'un mandat sont sortis en « 20260907-objet.ext » — la forme des études, recopiée hors des études, sur trois tours et quatre synthèses PASS. *L'exception s'était propagée par imitation parce que rien ne disait qu'elle en était une.* La règle lit les chemins CITÉS, pas le disque : une restitution qui annonce un livrable le nomme, et c'est là que la forme se voit. **S41** — une décision portant un mot que la doctrine du projet RÉGIT cite cette doctrine en source. S16 exige déjà une recommandation et LA source consultée ; elle ne regarde pas LAQUELLE. Le fait du 07/09 (TF-0902) : « garder ou supprimer la version remplacée » a été posé à l'humain, recommandation et source à l'appui — donc S16 PASS — alors que `REGLES-PROJET.md` règle 7 y répond depuis toujours : un livrable remplacé part sous `old\` du même dossier, versionné. *Une recommandation sans source est une opinion ; une source qui n'est pas celle qui TRANCHE est une opinion sourcée.* La règle ne juge pas la réponse — indécidable à la machine — elle juge que la doctrine a été ouverte là où elle régit le mot ; son vocabulaire est donc étroit et fermé, l'élargir rendrait la règle bavarde sur des décisions qu'aucun texte ne tranche. Précédente : **2.19.0, 08/09/2026** : **un test jouable s'exécute, et « remonté » n'est pas « traité »** (TF-0923 — deux des six volets d'oracle proposés le 08/09 et restés non joués). Le constat qui les fait naître est commun aux six : *la doctrine était écrite et opposable, et aucun contrôle ne la jouait — une règle que rien n'exécute décore.* **S38** — une action de TEST `auto_ia` n'est pas laissée non exécutée sous un motif d'**exemption** (`hors_mandat`, `borne_atteinte`). Le fait du 07/09 (TF-0905) : une réponse a PROPOSÉ trois niveaux de tests, tous jouables en lecture seule, sans en exécuter un seul. La règle 40 — « un test proposé s'exécute » — existait ; S11 ne vérifiait que la PRÉSENCE d'un motif, jamais sa légitimité. Or deux des six motifs de son vocabulaire déclarent un PÉRIMÈTRE que l'auteur écrit seul : ils satisfont S11 sans que rien n'ait été mesuré. *Les quatre autres — `dependance_bloc_3`, `gate_gouvernance`, `garde_fou`, `dependance_externe` — nomment un obstacle EXTÉRIEUR à l'auteur : un test qu'ils bloquent reste non exécuté sans faute, et la fixture verte le prouve.* **S39** — une remontée annoncée au bloc 4 porte son identifiant. Déposer un constat chez une autre forge est un geste réel, et le bloc 4 a raison de le dire ; mais SANS identifiant, le lecteur ne peut ni retrouver ce qui a été remonté ni savoir si quelqu'un l'a pris : la ligne se lit « traité » et vaut « **déposé, non traité** », c'est-à-dire un reste, qui appartient au bloc 5 avec son motif (S5). *La règle ne juge pas la remontée : elle juge sa traçabilité.* Les deux paires de fixtures ne diffèrent que d'un mot — le motif pour S38, l'identifiant pour S39 — seule forme qui prouve qu'une règle juge ce qu'elle prétend juger et non le reste de la ligne. Précédente : **2.18.0, 08/09/2026** : **le VERDICT
+Référentiel versionné (loi n° 4, daté-éditable) — **version 2.22.0, 16/09/2026** : **la doctrine de restitution reprend les six retours qui la visaient**, et cinq d'entre eux portaient sur un VIDE du texte plutôt que sur une règle fausse. **Aucune exemption ne s'applique à un tour de travail** (TF-0978) — la jugeabilité est une propriété du TOUR, les exemptions sont des propriétés du MESSAGE, et un tour à trois commits et un `apply` irréversible a été restitué en 140 mots sous couvert de « réponse courte ». **Le POINT D'ÉTAPE existe** (TF-0979) : une forme JUGÉE pour un tour de travail dont le résultat n'est pas encore mesurable — blocs 1, 4 et 8 pleins, bloc 2 remplacé par « ce qui reste à mesurer, et par quoi » —, parce que le format le plus utile n'existait pas et que ce vide rendait l'exemption attirante. **L'exemption « rien de neuf » est implémentée** (TF-0990) : le texte l'annonçait depuis la v2.18.0, son juge l'ignorait, et un accusé de trois phrases était refusé sur quatre constats bloquants ; elle est désormais bornée par TROIS absences mécanisables — aucun verdict, aucune `D-N`, aucune `A-N` — et le trou symétrique se ferme, un message court qui pose une décision étant jugé. **S44** — un mot d'exclusivité dans la demande citée restreint le CONTENU du livrable, pas seulement sa cible (TF-0988 : 342 colonnes livrées là où 66 étaient demandées, bloc 6 muet, oracle PASS sur 41 règles). **S45** — quand un traitement est arrêté, le bloc 3 s'ouvre par l'INVENTAIRE DES BLOQUANTS, chacun énoncé sur place (TF-1127, retour humain : « sans avoir à fouiller dans un fichier quelque part ») ; taux d'accusation mesuré avant écriture sur les 207 documents du dépôt — S44 4,8 %, S45 7,7 % —, et le second déclencheur proposé pour S45, toute ligne `auto_ia` non exécutée, a été ÉCARTÉ parce qu'il aurait accusé la quasi-totalité du corpus. **Un secret se désigne par son empreinte** — cinq premiers caractères et longueur, relevés depuis l'exécution qui le porte (TF-0986). Précédente : **2.21.0, 11/09/2026** : **un mot de décision reçoit la PREUVE du geste, jamais la décision reposée** (TF-1019 — transcription d'une session de ce poste et journal des hooks, 11/09). **S-GESTE** — quand le dernier message humain n'est QUE des sélecteurs de décision (« 11a », « 11 a », « D-11 (a) », « D-11 a », « D11a », « 32b, 30a »), il TRANCHE : il n'attend plus une analyse mais la PREUVE EXÉCUTÉE, au bloc 4, du geste que l'option choisie commandait. Le fait du 11/09 : l'humain écrit « 11a » à 07:05:01Z puis de nouveau « 11a » à 07:07:39Z, et les deux messages de fin de tour (07:07:31Z, 07:09:32Z) sont la synthèse de la VEILLE REJOUÉE MOT POUR MOT — 3156 mots, même titre, même bloc 3 reposant D-11 — jugés PASS les deux fois ; le geste demandé, le push, n'est venu qu'à 09:10:08. *Une restitution conforme rejouée à l'identique est, par construction, conforme : `oracle-synthese` juge la FORME d'un message et n'a jamais regardé son rapport au message humain qui l'appelle ni au message final qui l'a précédé — il manquait la seule relation qui dit si quelque chose s'est passé.* Deux formes de non-geste sont donc refusées, BLOQUANTES l'une comme l'autre parce qu'elles laissent le lecteur croire qu'il n'a pas décidé : le message final IDENTIQUE au précédent (aux espaces près), et la même `D-N` REPOSÉE au bloc 3 — dans le message affiché comme dans la synthèse déposée. Le contrôle vit dans `oracles\hook-restitution.mjs` (`controlerGeste`), s'inscrit au journal des hooks sous `geste`, porte le rappel court « un mot de décision reçoit la PREUVE du geste au bloc 4, jamais la décision reposée », et sa reconnaissance est ANCRÉE sur le message humain ENTIER : un « 11a » noyé dans une phrase peut être une citation, une référence ou un chiffre, et la borne verte — dernier message humain « Traite toutes les actions », contrôle inapplicable — la prouve autant que la paire rouge/verte de `oraclesixtures\`. Précédente : **2.20.0, 08/09/2026** : **la forme datée est réservée aux études, et la doctrine est la source quand elle régit le mot** (TF-0923 — second paquet des six volets restés non joués). **S40** — un chemin de livrable cité sous `output\` n'emprunte pas le préfixe daté « AAAAMMJJ-… ». Deux nommages cohabitent chez le pilot et un seul est général : R-4 impose « `<Marque> - <Objet> - AAAAMMJJ<indice>.<ext>` » à tout livrable d'`output\` ; `output\03-etudes\` en est l'**exception écrite**, son préfixe daté faisant lire le dossier dans l'ordre chronologique (`gabarits\ETUDE-OPPORTUNITE.md`). Le fait du 07/09 (TF-0898) : onze livrables d'un mandat sont sortis en « 20260907-objet.ext » — la forme des études, recopiée hors des études, sur trois tours et quatre synthèses PASS. *L'exception s'était propagée par imitation parce que rien ne disait qu'elle en était une.* La règle lit les chemins CITÉS, pas le disque : une restitution qui annonce un livrable le nomme, et c'est là que la forme se voit. **S41** — une décision portant un mot que la doctrine du projet RÉGIT cite cette doctrine en source. S16 exige déjà une recommandation et LA source consultée ; elle ne regarde pas LAQUELLE. Le fait du 07/09 (TF-0902) : « garder ou supprimer la version remplacée » a été posé à l'humain, recommandation et source à l'appui — donc S16 PASS — alors que `REGLES-PROJET.md` règle 7 y répond depuis toujours : un livrable remplacé part sous `old\` du même dossier, versionné. *Une recommandation sans source est une opinion ; une source qui n'est pas celle qui TRANCHE est une opinion sourcée.* La règle ne juge pas la réponse — indécidable à la machine — elle juge que la doctrine a été ouverte là où elle régit le mot ; son vocabulaire est donc étroit et fermé, l'élargir rendrait la règle bavarde sur des décisions qu'aucun texte ne tranche. Précédente : **2.19.0, 08/09/2026** : **un test jouable s'exécute, et « remonté » n'est pas « traité »** (TF-0923 — deux des six volets d'oracle proposés le 08/09 et restés non joués). Le constat qui les fait naître est commun aux six : *la doctrine était écrite et opposable, et aucun contrôle ne la jouait — une règle que rien n'exécute décore.* **S38** — une action de TEST `auto_ia` n'est pas laissée non exécutée sous un motif d'**exemption** (`hors_mandat`, `borne_atteinte`). Le fait du 07/09 (TF-0905) : une réponse a PROPOSÉ trois niveaux de tests, tous jouables en lecture seule, sans en exécuter un seul. La règle 40 — « un test proposé s'exécute » — existait ; S11 ne vérifiait que la PRÉSENCE d'un motif, jamais sa légitimité. Or deux des six motifs de son vocabulaire déclarent un PÉRIMÈTRE que l'auteur écrit seul : ils satisfont S11 sans que rien n'ait été mesuré. *Les quatre autres — `dependance_bloc_3`, `gate_gouvernance`, `garde_fou`, `dependance_externe` — nomment un obstacle EXTÉRIEUR à l'auteur : un test qu'ils bloquent reste non exécuté sans faute, et la fixture verte le prouve.* **S39** — une remontée annoncée au bloc 4 porte son identifiant. Déposer un constat chez une autre forge est un geste réel, et le bloc 4 a raison de le dire ; mais SANS identifiant, le lecteur ne peut ni retrouver ce qui a été remonté ni savoir si quelqu'un l'a pris : la ligne se lit « traité » et vaut « **déposé, non traité** », c'est-à-dire un reste, qui appartient au bloc 5 avec son motif (S5). *La règle ne juge pas la remontée : elle juge sa traçabilité.* Les deux paires de fixtures ne diffèrent que d'un mot — le motif pour S38, l'identifiant pour S39 — seule forme qui prouve qu'une règle juge ce qu'elle prétend juger et non le reste de la ligne. Précédente : **2.18.0, 08/09/2026** : **le VERDICT
 affiché mesure ce que le fichier jugé mesure, et une restitution n'est pas un fil d'avancement**
 (TF-0918 — mandat de campagne du 08/09). Le fait : au cours d'un mandat long, sept campagnes
 rendaient leurs rapports l'une après l'autre, et à chacun le hook `Stop` exigeait une restitution.
@@ -179,6 +179,31 @@ Ce que le lecteur retiendrait s'il ne lisait que ça. Un fait, pas une apprécia
 S-01 TENU, 19/19 au banc rouge »*, jamais *« tout s'est bien passé »*.
 
 ### 3. Décisions attendues de l'humain
+
+**QUAND UN TRAITEMENT EST ARRÊTÉ, LE BLOC S'OUVRE PAR L'INVENTAIRE DES BLOQUANTS** — avant toute
+décision (TF-1127, retour humain du 13/09/2026, mot pour mot : « S'il y a des bloquants pour
+avancer, il faut les afficher pour que l'utilisateur puisse les traiter, et cela sans avoir à
+fouiller dans un fichier quelque part »). *Le défaut était de GABARIT, pas de rédaction* : un
+bloquant est simultanément un non-traité (bloc 5), une décision (bloc 3), une action à débloquer
+(bloc 8) et un risque s'il dure (bloc 7) — le gabarit GARANTISSAIT donc qu'il soit écrit quatre
+fois et jamais en entier. Mesuré sur une restitution jugée PASS : la production était arrêtée, les
+éléments qui la bloquaient étaient répartis entre trois blocs, et les trois valeurs réellement
+attendues n'apparaissaient nulle part en clair et rassemblées.
+
+L'inventaire **se déclare par son libellé** — une ligne portant le mot « bloquant(s) », avant les
+décisions — et non par sa seule position : une puce d'inventaire posée en tête se lit sinon comme
+la première décision, et c'est ce piège qui a fait échouer la première écriture de la règle sur sa
+propre fixture verte. Chaque bloquant porte **trois choses, sur place** :
+
+| Ce qui est bloqué | Ce qu'il faut fournir ou décider pour le lever | Ce qui se passe si rien n'est fourni |
+|---|---|---|
+
+**Un bloquant qui renvoie à un fichier, à une section ou à un autre bloc pour être compris n'est
+PAS énoncé** : le renvoi est le défaut même que le retour dénonce. La règle **S45** le tient — si
+le bloc 5 porte un motif de la famille bloquante (`garde_fou`, `dependance_bloc_3`,
+`dependance_externe`, `gate_gouvernance`) ou si le bloc 8 porte une ligne `auto_ia` non exécutée,
+alors le bloc 3 ouvre par un inventaire d'au moins autant d'entrées, dont aucune ne contient de
+chemin de fichier ni de renvoi à une autre section.
 
 **En tête, jamais en fin.** Chaque décision est présentée en **choix fermé** — l'humain
 tranche, il ne rédige pas :
@@ -535,6 +560,30 @@ cité porte, ici ou au bloc 4, le verdict daté de la critique d'implémentation
    des faits, et les tronquer reviendrait à cacher un reste.
 3. **Chiffres et chemins**, pas d'adjectifs : « 19/19 », « `output\03-etudes\…` ».
 4. **Un échec se dit avec sa sortie**, un contournement se dit comme contournement.
+5. **UN SECRET SE DÉSIGNE PAR SON EMPREINTE, jamais par sa valeur — et jamais par rien**
+   (TF-0986, 08/09/2026). Écrire « secret, au coffre » ne permet de répondre à aucune des trois
+   questions d'exploitation les plus courantes : les deux environnements partagent-ils cette clé,
+   celle en place est-elle celle qui a été mise en circulation, une rotation a-t-elle pris effet.
+   *La prudence tenait la moitié de la règle et laissait tomber la moitié UTILE.* Un secret cité se
+   désigne donc par ses **cinq premiers caractères et sa LONGUEUR** — « `26f12…`, 32 caractères » —
+   et le relevé se fait **depuis l'exécution qui porte le secret**, jamais depuis le coffre, de
+   sorte qu'aucune valeur ne transite par un poste de travail. Deux corollaires font la valeur de
+   la forme : la longueur détecte une clé tronquée par un copier-coller, et l'empreinte compare
+   deux environnements sans rien divulguer. Le jour où la règle a été écrite, elle a montré que
+   deux clés supposées identiques commençaient par `26f12…` et `54f1c…` — donc qu'une rotation
+   faite d'un côté ne couvrait pas l'autre, ce que personne ne pouvait savoir.
+6. **UN MOT D'EXCLUSIVITÉ RESTREINT LE CONTENU DU LIVRABLE, pas seulement sa cible** (TF-0988,
+   règle **S44**). Quand la demande humaine citée au bloc 6 porte « uniquement », « seulement »,
+   « exclusivement », « rien que », « et rien d'autre » ou « only », la restitution déclare ce que
+   le livrable contient **EN PLUS** du périmètre nommé — ou déclare qu'il ne contient rien d'autre.
+   *Le fait* : « crée un nouveau fichier uniquement avec ces 66 colonnes en cible » a produit une
+   page portant bien 66 lignes de champs, mais CONSERVANT un tableau de 276 colonnes écartées, une
+   carte de chiffres et une légende — 342 colonnes affichées, soit exactement ce que la demande
+   excluait ; le bloc 6 déclarait trois écarts et pas celui-là, et l'oracle rendait PASS sur
+   41 règles. La doctrine couvrait déjà l'affaiblissement noyé dans un long message (TF-0176) ;
+   ceci en est le SYMÉTRIQUE — l'**enrichissement non demandé** — et l'ajout « pour information »
+   d'un complément hors périmètre est un écart, même utile : il se déclare AVANT la livraison, ou
+   se pose en question d'une ligne.
 
 ## Ce que la restitution ne fait jamais
 
@@ -553,6 +602,30 @@ en-tête horodaté · verdict en une ligne · restes classés par acteur. Les d�
 risques et traces relèvent de la restitution écrite, pas d'une sortie machine — mais
 **l'horodatage et le verdict, eux, sont exigibles partout**. Les règles S11 à S14 ne s'y
 appliquent pas non plus : elles jugent un fichier, et une CLI n'en écrit pas.
+
+## Point d'étape — un tour de travail dont le résultat n'est pas encore mesurable (TF-0979)
+
+**Le format le plus utile n'existait pas, et c'est ce vide qui rendait l'exemption attirante.** Le
+fait du 08/09/2026 : un déploiement lancé et en cours, dont le résultat conditionne le verdict du
+bloc 2, et rien à faire que d'attendre. Une restitution complète y est prématurée — son verdict
+serait partiel et son bloc 8 porterait une action « attendre ». Un accusé de réception y est faux —
+le tour a travaillé. La forme dégradée ci-dessus ne s'ouvre qu'aux sorties MACHINE. L'agent
+choisissait donc entre deux formes fausses, ce qui explique, sans l'excuser, le recours à
+l'exemption décrit au §Portée.
+
+**Le point d'étape est une forme JUGÉE**, et c'est ce qui le sépare d'une exemption. Il s'ouvre
+seulement sur un tour de travail dont le résultat n'est pas encore mesurable, et il le DÉCLARE en
+tête, par la mention **`point d'étape`** dans le bloc 1 :
+
+- **blocs 1, 4 et 8 obligatoires et pleins** — l'en-tête horodaté, ce qui a été traité avec ses
+  preuves exécutées, et les prochaines actions par acteur ;
+- **bloc 2 remplacé par une ligne unique** : « ce qui reste à mesurer, et par quoi » — la mesure
+  attendue et l'outil qui la rendra, jamais un verdict partiel présenté comme un verdict ;
+- **blocs 3, 5, 6, 7 et 9 admis en une ligne** s'ils sont vides, comme partout ailleurs (loi n° 3).
+
+Un point d'étape ne clôt rien : le tour qui reçoit la mesure rend la restitution complète, et c'est
+elle qui porte le verdict. *Deux points d'étape de suite sur le même sujet sans mesure entre eux
+sont un reste, pas un avancement* — la seconde fois, le bloc 5 porte l'attente avec son motif.
 
 ## Deux formes que le bloc 3 admet, et une qu'il refuse (TF-0568, 0572, 0573 — 24/08/2026)
 
@@ -764,7 +837,22 @@ sans qu'aucun mécanisme le refuse. Retour humain : « pourquoi le prompt ne sui
 portant un VERDICT** (vocabulaire fermé : verdict, conforme / non conforme, garanti, exhaustif,
 `PASS`, `FAIL`, recette verte / rouge / exécutée) · **tout message final de 150 mots ou plus**.
 
-**Les trois exemptions, et rien d'autre** — écrites ici pour qu'on ne les élargisse pas en
+**AUCUNE EXEMPTION NE S'APPLIQUE À UN TOUR DE TRAVAIL, quelle que soit la longueur du message**
+(TF-0978, 08/09/2026). Les exemptions ci-dessous sont des propriétés du MESSAGE — sa longueur, son
+vocabulaire — alors que la jugeabilité est d'abord une propriété du TOUR. Le critère « tour de
+travail » se teste EN PREMIER et rien ne l'affaiblit : un tour qui a écrit un fichier, produit un
+commit ou lancé une exécution est jugé, même rendu en cent mots. *Le fait qui écrit cette phrase* :
+un tour portant trois commits, une purge de rétention avec neuf tests neufs, un défaut bloquant
+trouvé et corrigé, deux branches promues et un `apply` IRRÉVERSIBLE a été restitué en 140 mots de
+prose — aucun bloc, aucun fichier, aucun jugement — sous le couvert de l'exemption « réponse
+courte ». *L'incitation est perverse et CROÎT AVEC LA CHARGE* : plus le tour est lourd, plus la
+restitution complète coûte à écrire, et plus l'exemption est tentante. Ce n'est donc pas une règle
+à ajouter, c'est une PRÉCÉDENCE à rendre explicite — `jugeable` la tient déjà dans cet ordre, et le
+texte le disait dans une phrase d'ouverture que le tableau, seul élément à structure fermée de la
+section, faisait oublier. Sur un tour de travail dont le résultat n'est pas encore mesurable, la
+forme n'est pas l'exemption : c'est le **point d'étape** (§ dédié).
+
+**Les quatre exemptions, et rien d'autre** — écrites ici pour qu'on ne les élargisse pas en
 silence, et tenues par `oracles\hook-restitution.mjs` (fonction `jugeable`, recette double sens) :
 
 | Exemption | Ce que c'est | Borne |
@@ -772,6 +860,24 @@ silence, et tenues par `oracles\hook-restitution.mjs` (fonction `jugeable`, rece
 | accusé de réception | « c'est noté », « je m'en occupe » | moins de 150 mots ET aucun mot de verdict |
 | réponse courte | une information rendue sans jugement | idem |
 | question rendue à l'humain | `bloque_question` — la session s'arrête pour demander | le texte finit par « ? » ET fait 60 mots au plus |
+| rien de neuf | une notification de tâche de fond, un rapport reçu et rien d'autre | les TROIS absences : aucun mot de verdict, aucune décision `D-N`, aucune action `A-N` — et moins de 150 mots |
+
+**L'exemption « rien de neuf » et ses trois lignes** (TF-0990, 09/09/2026). Le référentiel
+l'annonçait depuis la v2.18.0 et son juge ne l'implémentait pas : un accusé de trois phrases rendu
+sur une notification de tâche échue — dépôt inchangé, aucun contrôle rejoué, aucun verdict déplacé —
+a été REFUSÉ sur quatre constats bloquants, et la restitution complète écrite à la place faisait
+quatre-vingt-dix lignes pour dire qu'il ne s'était rien passé. *Une exemption écrite dans le
+référentiel et absente de son juge n'existe pas : c'est le juge qui fait la règle, et le texte
+devient trompeur pour qui le lit.* La forme est donc NORMALISÉE — trois lignes, pas une de plus :
+
+1. **ce qui est arrivé** (l'événement, daté) ;
+2. **ce que cela ne change pas** (le dépôt, les verdicts en place) ;
+3. **ce qui reste attendu de l'humain** — ou la déclaration que rien ne l'est.
+
+Et elle est BORNÉE par les trois absences, qui sont mécanisables et que `jugeable` teste
+désormais : *un message court qui pose une décision `D-N` ou une action `A-N` n'a rien d'un accusé
+de réception* — il demande un geste, donc il est jugé. C'est le trou que la v2.21.0 laissait
+ouvert, et il se ferme par la même écriture qui ouvre l'exemption.
 
 **Pourquoi le seuil est HAUT (150 mots) et non bas.** Un hook `Stop` juge APRÈS l'affichage : tout
 refus laisse la version rejetée à l'écran et fait relire le message (v2.5.0). Mieux vaut manquer

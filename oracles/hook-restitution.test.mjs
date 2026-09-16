@@ -179,6 +179,27 @@ try {
   if (r9.decision !== null)
     echecs.push(`9 : question rendue à l'humain → attendu non jugé, obtenu ${JSON.stringify(r9.decision).slice(0, 160)}`);
 
+  // 21 et 22 (TF-0990, 16/09) — L'EXEMPTION « RIEN DE NEUF » ET SA BORNE, DANS LEURS DEUX SENS.
+  // Le référentiel l'annonçait depuis la v2.18.0 et le juge l'ignorait : un accusé de trois phrases
+  // rendu sur une notification de tâche échue — dépôt inchangé, aucun verdict déplacé — était refusé
+  // sur quatre constats bloquants, et la restitution complète écrite à la place faisait
+  // quatre-vingt-dix lignes pour dire qu'il ne s'était rien passé. Elle est nommée, et bornée par
+  // les TROIS absences : un message court qui POSE une décision demande un geste, donc il est jugé.
+  const RIEN_DE_NEUF = "La tâche de fond lancée hier s'est terminée à 06h12. Rien n'a changé dans le dépôt : "
+    + "aucun fichier écrit, aucun contrôle rejoué. Rien n'est attendu de vous à ce stade.";
+  const r21 = lancer("rien-de-neuf", RIEN_DE_NEUF, ["Read"]);
+  if (r21.decision !== null)
+    echecs.push("21 : accusé « rien de neuf » — trois lignes, aucun verdict, aucune D-N ni A-N — attendu NON jugé ; "
+      + `l'exemption écrite au §Portée resterait absente de son juge, obtenu ${JSON.stringify(r21.decision).slice(0, 160)}`);
+
+  const POSE_UNE_DECISION = "La tâche de fond s'est terminée à 06h12. Le dépôt est inchangé. "
+    + "D-4 — faut-il publier la branche maintenant, ou attendre le prochain lot ? Dites-moi (a) ou (b).";
+  const r22 = lancer("court-mais-decisif", POSE_UNE_DECISION, ["Read"]);
+  if (r22.decision?.decision !== "block")
+    echecs.push("22 : un message court qui POSE une décision D-N passerait pour un accusé de réception — "
+      + "l'exemption « rien de neuf » perdrait sa borne et s'appliquerait à un message qui demande un geste, "
+      + `obtenu ${JSON.stringify(r22.decision)}`);
+
   // 5 — défaut de DÉTAIL seul : la structure tient, une puce du bloc 4 perd sa preuve.
   // S8 cherche un mot d'achèvement (« fait », « terminé », « clos », ✓) dans une puce SANS
   // preuve : on retire la preuve de la seule puce du bloc 4 et on garde le mot.
@@ -328,4 +349,4 @@ try {
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error("hook-restitution : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log("hook-restitution : 20/20 — hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019)");
+console.log("hook-restitution : 22/22 — hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019), exemption « rien de neuf » dans ses DEUX sens — un accusé de trois lignes sans verdict ni D-N NON jugé, le même message posant une D-N JUGÉ (TF-0990)");
