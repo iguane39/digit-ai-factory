@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Étude d'opportunité — préparation des forges à une mission data Silver/Gold sur Databricks puis rapports Power BI — 20260907a</title>
+  <meta name="description" content="Audience : le pilote de l'écosystème, qui décide des mandats, et les forges nommées au verdict,">
+  <meta name="theme-color" content="#2563EB">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3Ctext x='32' y='44' font-family='Segoe UI,Roboto,sans-serif' font-size='38' font-weight='700' fill='white' text-anchor='middle'%3ED%3C/text%3E%3C/svg%3E">
+  <style>
+    :root{--blue:#2563EB;--bg:#FAFBFF;--surface:#FFFFFF;--ink:#0F172A;--muted:#64748B;
+      --faint:#94A3B8;--line:#E6EAF2;--teal:#0E9488;--teal-fill:#EFFDFB;--amber:#B45309;
+      --amber-fill:#FFFBEB;--r:12px;--r-sm:8px;
+      --head:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;
+      --sans:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+      --mono:"JetBrains Mono",ui-monospace,"Consolas",monospace}
+    *{box-sizing:border-box} html{-webkit-text-size-adjust:100%}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:16px}
+    /* 75-100 % de la fenêtre, toujours : 92vw en dessous de 1826px, plafond confort 1680px, plancher 75vw au-delà */
+    .wrap{max-width:clamp(75vw,1680px,92vw);margin:0 auto;padding:32px 24px 64px}
+    /* page de DONNEES (I1 / L26) : le contenu prend toute la largeur du .wrap (>= 75 vw) — une colonne
+       de 75ch laissait 34 % de l'ecran a 1920 px, mesure Playwright du 07/09 (646 px sur 1920). La classe
+       s'appelle desormais defile et non scroll : le depot ecrit ses noms en francais.
+       ATTENTION : ce bloc vit dans un litteral gabarit JavaScript — aucun accent grave ici. */
+    .colonne{max-width:none;margin:0}
+    h1,h2,h3{font-family:var(--head);font-weight:800;line-height:1.2}
+    h1{font-size:1.7rem;margin:0 0 .2em} h2{font-size:1.25rem;font-weight:700;margin:1.5em 0 .4em}
+    h3{font-size:1.02rem;font-weight:700;margin:1.1em 0 .3em}
+    code{font-family:var(--mono);font-size:.9em}
+    /* L19 autorise nommement la coupure sur un lien : une URL est un identifiant, pas un mot. */
+    a{color:var(--blue);overflow-wrap:anywhere}
+    /* LA MESURE DE LECTURE SE POSE SUR LE CONTENEUR, JAMAIS SUR LE TEXTE (16/09/2026).
+       Mesure de l'oracle de rendu sur une page d'etude : 221 caracteres par ligne a 3840 px
+       pour un plafond de 135 (V18) — l'oeil perd le debut de la ligne suivante. Un premier
+       remede a borne le PARAGRAPHE par max-width : L2 l'a refuse aussitot, et son message
+       dit le remede juste — « poser la mesure de lecture sur le CONTENEUR (.chap.lire), pas
+       sur le texte, ET la declarer par data-mesure-lecture des lors qu'il a des freres plus
+       larges ». *Les deux regles ne se contredisent pas : ensemble, elles decrivent une
+       seule construction*, celle du gabarit de chapitre du socle (E4, token a 1 080 px).
+       Les tableaux restent FRERES du chapitre et gardent toute la largeur offerte. */
+    .meta{color:var(--muted);font-size:.85rem;margin:.2em 0 0}
+    /* CENTRE, ET D'UN SEUL RYTHME. Deux mesures de l'oracle de rendu, le meme jour :
+       · L2 (conteneur) — la colonne de lecture calee A GAUCHE laissait 1 752 px de vide a droite
+         et 0 a gauche, sans voisin : le remede qu'il nomme est de la CENTRER, ou de lui donner un
+         voisin utile. Ici elle a des freres — les tableaux — mais pas a sa hauteur : on centre.
+       · V7 (rythme) — les espaces entre paragraphes mesuraient 85 / 57 / 57 / 54 px : un rythme
+         vertical qui varie sans raison se lit comme un defaut de mise en page. Les marges sont
+         posees une fois, en bas seulement, pour que deux blocs voisins ne cumulent jamais. */
+    .chap.lire{max-width:1080px;margin-inline:auto}
+    .chap.lire>*{margin-top:0;margin-bottom:16px}
+    .chap.lire>h2{margin-top:28px} .chap.lire>h3{margin-top:20px}
+    .chap.lire>*:first-child{margin-top:0}
+    blockquote{margin:14px 0;padding:10px 16px;border-left:3px solid var(--blue);background:var(--surface);border-radius:0 var(--r-sm) var(--r-sm) 0;color:var(--muted)}
+    blockquote p{margin:0}
+    .defile{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin:10px 0}
+    table{border-collapse:collapse;width:100%;font-size:.92rem}
+    th{font-family:var(--head);font-weight:700;text-align:left;padding:9px 12px;border-bottom:2px solid var(--line)}
+    td{padding:7px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+    tr:last-child td{border-bottom:none}
+    ul{margin:.4em 0;padding-left:1.3em}
+    figure{margin:16px 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;overflow-x:auto}
+    figcaption{color:var(--muted);font-size:.85rem;margin-top:8px}
+    svg{max-width:100%;height:auto}
+    footer{margin-top:40px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:14px}
+    /* L19 (TF-0556, 24/08) — LA COUPURE DE MOT QUITTE LA PROSE. La propriete overflow-wrap:anywhere
+       etait posee sur .meta, td et footer : ravageuse sur du texte courant, ou un mot se casse en
+       deux au milieu d'une ligne sans cesure ni trait d'union. Elle ne reste QUE sur les cellules,
+       et seulement sous le palier de repli, la ou le socle l'EXIGE (composants.md section 6) — un
+       identifiant long dans une cellule etroite doit pouvoir se couper, une phrase jamais.
+       ATTENTION : ce bloc vit dans un litteral gabarit JavaScript. Aucun accent grave ici, il
+       fermerait la chaine et casserait tout ce qui suit — defaut commis en ecrivant ce commentaire. */
+    /* SUR MOBILE, L'EN-TETE AUSSI PASSE EN BLOC (16/09/2026). La regle ne convertissait que les
+       cellules de donnees : la ligne d'EN-TETE, restee en cellules de tableau, continuait d'imposer
+       sa largeur, et l'oracle mesurait un tableau a 441 px de bord droit pour une fenetre de
+       390 px (V1). Un conteneur defilant ne suffit pas a eteindre V1 — la regle mesure le bord
+       droit de chaque element, defilant ou non, et elle a raison : une page qui se lit en poussant
+       le doigt de cote se lit mal. */
+    /* CE QUI NE SE COUPE PAS POUSSE LA PAGE — ET LA COUPURE A UN PERIMETRE (16/09/2026).
+       Deux mesures sur une etude qui cite beaucoup de chemins : a 768 px un tableau sortait a
+       799 px, et a 390 px le DOCUMENT mesurait 419 px de large. La cause est un jeton insecable
+       qui impose sa longueur a sa cellule, donc au tableau, donc a la page.
+       PREMIER REMEDE, REFUSE DANS LA MINUTE : autoriser la coupure sur les cellules. L19 l'a
+       rejete, et elle a raison — un mot francais s'y casse n'importe ou (« Utilisabl/e »), et la
+       regle reserve nommement la coupure a code, pre, aux liens et aux cellules d'IDENTIFIANTS.
+       REMEDE TENU : la coupure ne touche que les fragments de CODE, ou vivent justement les
+       chemins et les identifiants qui poussaient la page. La prose n'est jamais touchee. */
+    code{overflow-wrap:anywhere}
+    @media (max-width:640px){.wrap{padding:16px 12px 48px} h1{font-size:1.3rem}
+      .defile td,.defile th{display:block;overflow-wrap:anywhere}
+      .defile table{width:100%} .chap.lire{max-width:none}}
+    @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+    @page{margin:14mm}
+    @media print{.defile{overflow:visible;border:none} figure{break-inside:avoid} tr{break-inside:avoid} body{background:#fff}}
+  </style>
+  <style>
+/* table-filters.css — habillage charté du composant de filtres de colonne (D-12).
+   TF-0176 (13/08) : un composant se livre AVEC son CSS — livré nu, il sort en rendu brut
+   navigateur chez tous ses hôtes (constaté sur le dashboard forge-tests du 13/08, refusé
+   par son destinataire). À inliner dans le bloc de style de la page, à côté du script du
+   composant — JAMAIS de balise écrite en toutes lettres dans ce commentaire (même famille
+   de piège que RA-1 : un « script » ouvrant en commentaire fausse toute lecture paresseuse
+   du document). Ne consomme que les tokens :root du socle (--surface, --ink, --muted,
+   --line, --blue, --r-sm) : aucune couleur en dur, les deux thèmes sont servis. TF-1059
+   (11/09) : deux couleurs en dur restaient (texte du bouton actif, repli du survol), treize
+   espacements sortaient de l'échelle 4pt et quatre anneaux de focus n'étaient pas prescrits —
+   corrigés ici, à la source, plutôt que dans chaque produit. */
+
+.tf-btn {
+  font: inherit; font-size: .72rem; line-height: 1;
+  color: var(--blue); background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 4px 8px; margin-left: 8px; cursor: pointer; vertical-align: middle;
+}
+.tf-btn:hover { border-color: var(--blue); }
+.tf-btn:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+/* filtre ACTIF : l'état se voit sans ouvrir le panneau */
+.tf-btn.tf-on { background: var(--blue); color: var(--surface); border-color: var(--blue); }
+
+.tf-panel {
+  position: absolute; z-index: 30; top: calc(100% + 4px); left: 0;
+  min-width: 230px; max-width: 320px; max-height: 320px; overflow: auto;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .16);
+  padding: 12px; text-align: left; text-transform: none;
+  font-family: var(--sans); font-size: .85rem; font-weight: 400;
+  letter-spacing: normal; cursor: default;
+}
+.tf-search {
+  width: 100%; font: inherit; color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 8px 12px; margin: 0 0 8px;
+}
+.tf-search:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+.tf-actions {
+  display: flex; gap: 16px; border-bottom: 1px solid var(--line);
+  padding-bottom: 8px; margin-bottom: 8px;
+}
+.tf-actions button {
+  font: inherit; font-weight: 600; color: var(--blue);
+  background: none; border: none; cursor: pointer; padding: 0 4px;
+}
+.tf-actions button:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+.tf-opts { display: flex; flex-direction: column; gap: 4px; }
+.tf-opts label {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px; border-radius: 4px; cursor: pointer;
+}
+.tf-opts label:hover { background: var(--bg); }
+.tf-opts input[type="checkbox"] { accent-color: var(--blue); }
+/* TF-0782 (02/09) : la cardinalite decide de la FORME du panneau, pas de son existence — et
+   une forme qui change sans le dire est une affordance muette. Le panneau ouvert sur sa
+   recherche (plus de 15 valeurs) ou reduit a une valeur unique porte sa note. */
+.tf-forme-note { margin: 0 0 8px; color: var(--muted); font-size: .78rem; font-style: italic; }
+/* TF-1051 (08/09) : une colonne a valeur UNIQUE le dit dans son en-tete, la ou on la lit —
+   repliee dans le panneau, la note n'etait vue par personne et le lecteur concluait a une panne. */
+.tf-unique {
+  display: block; margin-top: 4px; color: var(--muted);
+  font-size: .72rem; font-weight: 400; font-style: italic; text-transform: none;
+}
+
+/* TF-0431 : panneau aligne a droite quand la place manque (choisi par le composant) ;
+   le conteneur defilant porteur d'un panneau ouvert ne rogne plus (data-tf-ouvert). */
+.tf-panel.tf-droite { left: auto; right: 0; }
+[data-tf-ouvert] { overflow: visible !important; }
+
+/* TF-0430 : etat vide — un filtre qui ne laisse rien le DIT dans le tableau, et offre la
+   seule action utile a ce moment. */
+tr[data-tf-empty] td {
+  padding: 16px 12px; text-align: center; color: var(--muted);
+  font-style: italic; border-bottom: 1px solid var(--line);
+}
+.tf-reset {
+  font: inherit; font-style: normal; font-weight: 600; color: var(--blue);
+  background: none; border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 4px 12px; margin-left: 12px; cursor: pointer;
+}
+.tf-reset:hover { border-color: var(--blue); }
+.tf-reset:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+
+@media print { .tf-btn, .tf-panel, tr[data-tf-empty] { display: none; } }
+
+    .find-bar{display:flex;flex-direction:column;gap:2px;margin:0 0 20px}
+    .find-bar label{font-size:.78rem;color:var(--muted);font-weight:600}
+    .find-bar input{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)}
+    .find-count{margin-top:4px;font-size:.72rem;color:var(--muted);min-height:1em}
+    .find-count.zero{color:#B42318}
+    .tf-count{margin:6px 0 18px;font-size:.72rem;color:var(--muted);min-height:1em}
+    mark.find-hit{background:var(--amber-fill);color:var(--ink);border-radius:2px;display:inline;padding:0;margin:0}
+    @media print{tr[data-tf-hidden]{display:table-row !important}.find-bar{display:none}}
+  </style>
+</head>
+<body>
+  <div class="wrap"><div class="colonne">
+    <header class="chap lire" data-mesure-lecture>
+      <h1>Étude d'opportunité — préparation des forges à une mission data Silver/Gold sur Databricks puis rapports Power BI — 20260907a</h1>
+      <p class="meta">rôle : étude d'opportunité (instruction entre candidat et décidé) — préparation des forges à une mission data Silver/Gold sur Databricks puis rapports Power BI ; issue du prompt réécrit par l'analyse L99 du 07/09/2026 et des décisions humaines D-1 (a) et D-2 (a) du même jour · sources de vérité : <code>[output/03-etudes/20260907-L99-mission-data-silver-gold-powerbi.md, digit-ai-forge-data (CLAUDE.md, README.md, references/STANDARDS-DATA.md, references/REX-DATA.md, references/profils-moteur/LISEZMOI.md et databricks.md, scripts/, oracles/self-test.mjs rejoué le 07/09), digit-ai-forge-audit (core/adr/06-data, core/adr/08-reporting, core/controls/D05.json, profiles/powerbi, profiles/databricks-lakehouse, docs/EXTENSION-CORPUS.md), digit-ai-forge-agents (experts-forge/fiches/expert-data-platform-cloud.md, la-barre/references/registre-barres.md), digit-ai-forge-development/docs/run-playbook.md, digit-ai-forge-tests (README.md, forge_tests/adaptateurs/data.py, forge_tests/generateur_data.py), digit-ai-forge-ops/README.md, digit-ai-forge-observability/README.md, digit-ai-forge-design (oracles/, scripts/, skills/), catalogues/catalogue.jsonl, REGLES-PROJET.md §H, references/RUN-CONSEIL.md, references/RUN-MANDAT.md, references/TODO-FORGE.md, references/INTENTION.md]</code> · vérifié le 2026-09-07</p>
+    </header>
+    <main>
+    <div class="find-bar">
+      <label for="find">Rechercher dans le document</label>
+      <input id="find" type="search" placeholder="Rechercher dans le document…">
+      <p id="findCount" class="find-count" aria-live="polite"></p>
+    </div>
+
+<section class="chap lire" data-mesure-lecture>
+<p>Audience : le pilote de l'écosystème, qui décide des mandats, et les forges nommées au verdict, qui recevront chacune un lot. L'étude instruit la demande du 07/09/2026 telle que réécrite par l'analyse L99 du même jour, sous les deux décisions humaines prises à sa lecture : les sept écarts à la lettre sont validés, et la plateforme cible est <strong>Databricks</strong>.</p>
+<p>Mesures relevées le <strong>2026-09-07</strong> sur les dépôts des forges tels que présents sur le poste (relevé d'ouverture de session : toutes les forges « à jour », forge-agents « en avance de 3 commits non poussés »). <strong>Date de péremption : 2026-11-07</strong> — au-delà, la table de la section 2 (confrontation à l'existant) doit être rejouée, parce que trois forges citées ont livré au moins un verbe neuf par mois depuis juillet.</p>
+<p><strong>Ce que le lecteur va apprendre.</strong> La mission n'exige aucune forge nouvelle. L'écosystème porte déjà la gouvernance de bout en bout (dix-huit décisions d'architecture data et reporting, un profil Power BI, un profil Databricks lakehouse), la discipline de la donnée (six verbes exercés, 73 contrôles au self-test rejoué ce jour) et l'expertise plateforme (une fiche expert admise). Ce qui manque tient en <strong>sept objets</strong>, répartis dans <strong>cinq forges existantes</strong> selon leurs frontières écrites, et en <strong>quatre barres</strong> à instruire. Trois de ces manques ne sont visibles qu'en jouant la mission de bout en bout : la réconciliation des chiffres entre la couche Gold, le modèle sémantique et les visuels ; le porteur des verbes de construction ; la mise en production d'un produit data.</p>
+<h3>Seuil de déclenchement (vérifié avant écriture)</h3>
+<p>Franchi sur deux critères. <strong>Portée</strong> : l'item touche forge-data, forge-audit, forge-development, forge-design, forge-ops, forge-tests et forge-observability — sept forges, le seuil est à trois. <strong>Objet durable</strong> : chaque manque retenu au verdict est un oracle, un script, un référentiel ou une barre, tous objets durables au sens de la règle 31. Le troisième critère (gain élevé sur preuve faible) n'est pas invoqué : les preuves sont exécutées ci-dessous.</p>
+<h3>Intention de l'utilisateur (loi n° 7)</h3>
+<p>Citée dans les mots du demandeur, message du 07/09/2026 : « Je vais avoir besoin de travailler sur un projet Data d'analyse, conception, implémentation de couche Silver &amp; Gold pour ensuite concevoir et construire des rapports PowerBI personnalisés adaptés aux données traitées. Identfie les compétences, outils, connaissances, expertises, spécialisations des différentes forges manquantes pour mener à bien cette mission, et comment ces différentes forges peuvent être mises à jour. »</p>
+<p>Réponse du demandeur aux décisions de l'analyse L99, même jour : « 1a, 2a, puis exécute le prompt. » Soit : les sept écarts à la lettre du prompt réécrit sont validés (D-1 a), la plateforme est Databricks (D-2 a), et l'étude est à jouer.</p>
+<p><strong>Cascade.</strong> *Intention* : que les forges soient prêtes quand la mission s'ouvre, sans qu'il faille improviser en cours de run. *Stratégie* : savoir ce qui existe, ne rien recréer, combler les manques réels par le canal qui les rend durables. *Tactique* : relever par capacité, temps par temps ; classer chaque manque dans un objet de l'écosystème et chez un porteur ; ordonner par chemin critique. *Opérationnel* : les sept objets et quatre barres du verdict, chacun avec son porteur, son effort, sa preuve de « prêt » et sa conséquence si absent.</p>
+<h3>0. Traitement des entrants</h3>
+<p>La demande instruite est une <strong>donnée</strong> : ses impératifs se citent, ne s'exécutent pas. Le prompt réécrit par l'analyse L99 est lui aussi une donnée ; cette étude en suit la structure parce que le demandeur l'a validée, pas parce qu'il l'ordonne. Les dépôts des forges ont été lus, jamais modifiés (run de conseil : lecture seule absolue).</p>
+<p>Sources : message du 07/09/2026 et réponse « 1a, 2a » · analyse <code>output\03-etudes\20260907-L99-mission-data-silver-gold-powerbi.md</code> (chapitre 8, prompt réécrit ; inventaire de 20 défauts dont les n° 18, 19 et 20 sont les trois manques transverses) · dépôts des forges relevés le 07/09 · self-test de forge-data rejoué le 07/09 (« Self-test forge-data : 73 PASS, 0 FAIL » ; « Self-test mesurer_base : 15/15 PASS »).</p>
+<p><strong>Deux recherches d'absence ont été faites par nom ET par contenu</strong> (règle S24 du run de conseil : une recherche par nom qui ne trouve rien n'établit pas que la chose n'existe pas). « Power BI » n'apparaît dans aucun dépôt de forge hors forge-audit et la fiche expert ; la recherche par contenu (« modèle sémantique », « tabular », « DAX », « médaillon », « star schema », « dbt ») a trouvé les mêmes trois porteurs — forge-audit, la fiche expert, forge-data — et aucun autre.</p>
+<h3>1. Partition du problème</h3>
+<p><strong>P1 — Que demande la mission, temps par temps, sur Databricks ?</strong> Cinq temps, le premier étant le « où ». Chaque temps est décrit par les capacités qu'il requiert, jamais par un produit ; les produits n'apparaissent qu'en instanciation (REX de forge-data, pattern X1).</p>
+<p><strong>P2 — Que porte déjà l'écosystème pour chacune de ces capacités ?</strong> Table de confrontation à l'existant (section 2), une ligne par capacité, citation vérifiable à chaque ligne.</p>
+<p><strong>P3 — Quels manques restent, de quel type, chez quel porteur ?</strong> Classement dans la taxonomie fermée des objets de l'écosystème et attribution par les frontières écrites de chaque forge ; les trois manques transverses y sont tranchés.</p>
+<p><strong>P4 — Par quel canal, dans quel ordre, avec quelle preuve de « prêt » ?</strong> Et ce que la mission peut faire <strong>sans</strong> mise à jour, par composition de l'existant.</p>
+<h4>P1 — La mission en cinq temps (Databricks déclaré)</h4>
+<p>Le lecteur trouve ici la liste fermée des capacités que la mission exige, temps par temps : c'est elle, et non une liste de compétences, que la section 2 confronte à l'existant. Le « où » est un temps à part entière, parce que sans lui aucun chiffre de la mission n'est attribuable.</p>
+</section>
+<div class="defile"><table><thead><tr><th scope="col">Temps</th><th scope="col">Ce que la mission y fait</th><th scope="col">Capacités requises</th></tr></thead><tbody><tr><td>T0 — le « où »</td><td>déclarer l'instance (hôte, espace de travail, catalogue par environnement) et rendre tout chiffre attribuable à son instance</td><td>identité d'instance ; environnements déclarés ; mesure en lecture seule archivée avec sa cible</td></tr><tr><td>T1 — analyse de la couche brute (Bronze)</td><td>relever le schéma réel, ses commentaires, ses clés, ce qui manque en trois états ; profiler les jeux ; poser le lineage amont</td><td>import d'un schéma exporté au dialecte Databricks ; lecture des commentaires de colonnes ; profilage ; lineage colonne d'Unity Catalog ; cadrage plateforme</td></tr><tr><td>T2 — Silver</td><td>typer, dédoublonner, conformer, historiser ; transformer sous tests ; contractualiser vers Gold ; observer la fraîcheur</td><td>transformation SQL/Delta sous tests et documentation générée ; assertions de qualité exécutables ; contrat producteur→consommateur ; lineage T1→T2 ; sondes entre les runs</td></tr><tr><td>T3 — Gold = modèle dimensionnel</td><td>dessiner la matrice en bus depuis les questions des rapports ; déclarer grain, faits, dimensions conformes, dimension temps, changements lents ; construire</td><td>modélisation dimensionnelle jugée ; dessin du modèle ; contrat Gold→restitution ; lineage T2→T3</td></tr><tr><td>T4 — modèle sémantique et rapports Power BI</td><td>modèle sémantique en formats texte (projet PBIP, définition TMDL), mesures définies une fois, mode de connexion par profil de besoin, sécurité au niveau ligne, thème dérivé de la marque, rapports maquettés puis construits, chiffres réconciliés avec Gold, publication sur GO</td><td>jugement du modèle sémantique sur ses fichiers ; thème Power BI dérivé des tokens ; maquette validée avant construction ; réconciliation des chiffres ; promotion entre espaces de travail sur GO humain</td></tr></tbody></table></div>
+<section class="chap lire" data-mesure-lecture>
+<p><strong>Comment lire ce tableau</strong> : une ligne par temps, dans l'ordre de construction ; la dernière colonne est la liste des capacités que la section 2 confronte une à une à l'existant. L'ordre de <strong>conception</strong> de T3 et T4 est inverse de l'ordre de construction : les questions des rapports fixent le grain de Gold (référence Kimball, retenue par forge-data ; décision d'architecture ADR0801 *(modèle sémantique gouverné en schéma en étoile)* de forge-audit, invariante).</p>
+<h3>2. Non-recouvrement contre l'existant</h3>
+<p><strong>Comment lire ce tableau</strong> : une ligne par capacité de P1, dans l'ordre des temps ; la citation est le fait relevé (fichier, section, identifiant de catalogue, sortie exécutée) ; le verdict dit si l'existant <strong>recouvre</strong> la capacité (rien à créer), la recouvre <strong>partiellement</strong> (extension), ou <strong>ne recouvre pas</strong> (manque). Les identifiants de catalogue <code>cat-xxx-nn</code> sont ceux de <code>catalogues\catalogue.jsonl</code> du pilot (84 lignes, version 1.8.0).</p>
+</section>
+<div class="defile"><table id="tab-1" data-filterable><thead><tr><th scope="col">Existant examiné</th><th scope="col">Citation</th><th scope="col">Verdict (recouvre / ne recouvre pas)</th></tr></thead><tbody><tr><td>T0 · identité d'instance</td><td>forge-data, oracle-tracer règle T7 (CLAUDE.md : « environnement de chaque dataset — <code>namespace</code> désignant l'INSTANCE, jugé à partir du 24/08 ») ; <code>scripts/mesurer_base.py</code> : « Le champ <code>cible</code> (TF-0595, 24/08) porte le profil, le warehouse, l'HÔTE et le <code>namespace</code> » ; self-test rejoué le 07/09 : « 15/15 PASS (8 garde lecture-seule + 7 identité de cible) »</td><td><strong>recouvre</strong> — le « où » est exigé et archivé, sur Databricks précisément</td></tr><tr><td>T0 · environnements déclarés</td><td>pilot, <code>references\RUN-CONSEIL.md</code> étape C0 : « Il s'écrit à deux endroits, et les deux sont contrôlés : <code>docs\projet\COMPOSANTS-OPS.md</code> section « Environnements de données » (R-20) et le <code>namespace</code> de chaque dataset »</td><td><strong>recouvre</strong></td></tr><tr><td>T0 · mesure en lecture seule</td><td>catalogue <code>cat-dat-08</code> « Mesurer une base connectée », statut prouvé ; <code>mesurer_base.py</code> : « toute requête dont la tête n'est pas SELECT / SHOW / DESCRIBE / DESC / WITH / EXPLAIN est REFUSÉE avant tout appel réseau »</td><td><strong>recouvre</strong></td></tr><tr><td>T1 · import d'un schéma exporté, dialecte Databricks</td><td>forge-data <code>references/profils-moteur/LISEZMOI.md</code> point 5 : « Seul le dialecte Postgres est aujourd'hui consommé par <code>scripts/importer.mjs</code> (v0). Les profils Oracle / Azure SQL / Databricks documentent leur dialecte pour une extension future du verbe … le jour où un artefact réel de ce moteur doit être importé » ; <code>databricks.md</code> : « pour un futur parseur analogue à <code>importer</code>, hors v0 »</td><td><strong>recouvre partiellement</strong> — le profil existe, le verbe ne lit pas ce dialecte : extension d'<code>importer</code> (manque M1)</td></tr><tr><td>T1 · commentaires de colonnes, absences en trois états</td><td>REX-DATA X15 et X16 ; <code>importer.mjs</code> « rattache <code>COMMENT ON TABLE/COLUMN</code> aux <code>description</code> du contrat@1 … et DÉNONCE tout objet cité qu'il ne trouve pas » ; « relève la CIBLE de chaque <code>FOREIGN KEY</code> et dénonce celles qui pointent vers une table absente »</td><td><strong>recouvre</strong> — sur le dialecte Postgres ; hérité par M1 sur Databricks</td></tr><tr><td>T1 · profilage des jeux</td><td>skill <code>data-quality-auditor</code> (poste, <code>~/.claude/skills</code>) ; forge-data CLAUDE.md : « Le profiling de datasets appartient au skill <code>data-quality-auditor</code> (appelé, pas réécrit) » ; fiche forge-data : « composition … doctrinale, pas outillée (pas d'appel machine) »</td><td><strong>recouvre</strong> — composition conversationnelle, limite connue et acceptée</td></tr><tr><td>T1 · lineage colonne Unity Catalog</td><td>catalogue <code>cat-dat-07</code> prouvé ; CLAUDE.md : « Validé sur fixture synthétique uniquement — aucun export réel disponible sans workspace Unity Catalog Premium/Enterprise payant »</td><td><strong>recouvre</strong> — l'export réel est une donnée du projet, pas un manque de forge</td></tr><tr><td>T1 · cadrage plateforme</td><td>fiche <code>expert-data-platform-cloud</code>, « Statut registre : ok — admise le 24/07/2026 », rubrique 1 « Localisation des irritants dans le modèle en couches », déclencheurs <code>Databricks|médaillon|Bronze.Silver.Gold</code></td><td><strong>recouvre</strong> — annotations de cadrage, jamais d'exécution (frontière de la fiche)</td></tr><tr><td>T2 · assertions de qualité</td><td>catalogue <code>cat-dat-01</code> prouvé ; barre Great Expectations (STANDARDS-DATA, retenu 0.9) ; règles P1-P4 ; ADR0605 *(qualité des données : règles, seuils et contrôles automatisés)* → CTL-D05-04</td><td><strong>recouvre</strong></td></tr><tr><td>T2 · contrat producteur→consommateur</td><td>catalogue <code>cat-dat-05</code> prouvé ; barre ODCS v3.1.0 ; ADR0607 *(contrats de données d'intégration)* → CTL-D05-06</td><td><strong>recouvre</strong></td></tr><tr><td>T2 · lineage entre couches</td><td>catalogue <code>cat-dat-02</code> prouvé, T1-T7 ; ADR0608 *(observabilité des données : monitoring, alerting et lignage)* → CTL-D05-07</td><td><strong>recouvre</strong> (déclaré ; la véracité runtime reste la dette D-D2 connue)</td></tr><tr><td>T2 · transformation sous tests et documentation générée</td><td>STANDARDS-DATA : dbt-core « retenu (barre) — niveau du verbe restituer : déclaré → généré » ; aucun verbe de forge-data ne juge un projet de transformation ; forge-development <code>docs\run-playbook.md</code> : cible « FastAPI + React + PostgreSQL », manifeste <code>.forge/profile.toml</code> (P-18) à rôles <code>backend</code>/<code>frontend</code> ; ADR0803 *(transformations au plus près de la source)* → CTL-D05-12 « logique de transformation significative testée et versionnée au plus près de la source » (mode revue)</td><td><strong>ne recouvre pas</strong> — la barre existe pour un autre verbe, la gouvernance l'exige en revue, aucun verbe ne juge la forme d'un projet de transformation ni ne le construit sous gates (manque M2, et question du porteur)</td></tr><tr><td>T2 · tests du pan data d'un produit</td><td>forge-tests <code>forge_tests/adaptateurs/data.py</code> : « Adaptateur Data (SQL) — tables et contraintes depuis les migrations, exercées PAR VIOLATION » ; <code>generateur_data.py</code> : « une contrainte non exercée se teste toujours de la même façon — on la viole, on attend un rejet »</td><td><strong>recouvre partiellement</strong> — couvre les contraintes de migrations SQL d'un produit web ; ne lit pas les contraintes Delta (<code>CONSTRAINT … CHECK</code>, <code>NOT NULL</code>) ni les tests d'un projet de transformation ; à composer avec M2, pas à dupliquer</td></tr><tr><td>T2 · sondes entre les runs</td><td>catalogue <code>cat-obs-01</code>, <code>cat-obs-02</code> prouvés ; INVENTAIRE §12 : « composition avec un oracle réel de forge-data à exercer au premier plan réel » ; dette D-OB1 « pas de scheduler ni d'alerting »</td><td><strong>recouvre</strong> — la sonde <code>commande</code> peut appeler <code>mesurer_base.py</code> ; premier plan réel à écrire dans la mission, pas dans la forge</td></tr><tr><td>T3 · modélisation dimensionnelle jugée</td><td>STANDARDS-DATA ligne Kimball : « retenu (référence de modélisation) — vocabulaire des couches et du dimensionnel dans REX/playbooks — <strong>pas d'oracle</strong> » ; ADR0801 → CTL-D05-10 (mode revue), ADR0804 *(dimension de temps normalisée)* → CTL-D05-13, ADR0602 *(modélisation validée par une autorité data, traçabilité colonne)* → CTL-D16-01/02/03</td><td><strong>ne recouvre pas</strong> — la gouvernance exige un modèle en étoile documenté et validé, personne ne le juge mécaniquement (manque M3)</td></tr><tr><td>T3 · dessin du modèle</td><td>skill <code>digit-ai-schemas</code>, canevas « Modèle de données — schéma relationnel, tables / colonnes / clés / relations, classification PII »</td><td><strong>recouvre</strong></td></tr><tr><td>T3 · contrat Gold→restitution</td><td><code>cat-dat-05</code> ; ADR0802 *(source unique homogène de la couche BI)* → CTL-D05-11</td><td><strong>recouvre</strong></td></tr><tr><td>T4 · jugement du modèle sémantique</td><td>forge-audit <code>profiles/powerbi/README.md</code> : « 10 contrôles sont liés dans bindings.json », vérification « en priorité sur l'introspection du modèle tabulaire via les DMV exposées par le point de terminaison XMLA … et sur les règles Best Practice Analyzer (Tabular Editor). Lorsqu'aucun outillage programmatique n'est disponible … le contrôle bascule en revue outillée » ; contrôles CTL-D05-10, 13, 14, 15 « mode revue »</td><td><strong>recouvre partiellement</strong> — la revue existe, aucun oracle exécutable ne lit les fichiers TMDL/PBIP du modèle (manque M4) ; le point de terminaison XMLA exige une capacité Premium ou Fabric, donnée du projet</td></tr><tr><td>T4 · thème Power BI dérivé de la marque</td><td>forge-design <code>cat-des-07</code> « Tokens DTCG (source → dérivé) », <code>scripts/generer-tokens-css.mjs</code>, <code>oracle-dtcg.mjs</code> ; <code>cat-des-09</code> « Contrôler la généricité d'une interface » (<code>oracle-taste.mjs &lt;page.html&gt;</code>, HTML seulement) ; aucune cible « thème Power BI » dans les scripts</td><td><strong>recouvre partiellement</strong> — la source de tokens existe, la dérivation vers un thème Power BI (fichier JSON de thème) n'existe pas (manque M5)</td></tr><tr><td>T4 · maquette validée avant construction</td><td>pilot, <code>references\RUN-VERSION.md</code> (TF-0780) : « Un run de version qui touche une INTERFACE … porte au ledger une entrée « maquette_validee » … AVANT la première ligne de code de la vue » ; <code>cat-des-04</code> critique aval, statut déclaré</td><td><strong>recouvre</strong> — règle de process, s'applique à un rapport comme à une page</td></tr><tr><td>T4 · réconciliation des chiffres Gold ↔ mesures ↔ visuels</td><td>forge-data <code>cat-dat-03</code> restituer, R1-R5 : « tout chiffre d'un rapport référence une entrée déclarée » — sur un rapport <strong>Markdown</strong> ; <code>mesurer_base.py</code> archive « le couple requête/résultat/CIBLE »</td><td><strong>ne recouvre pas</strong> — un chiffre de rapport Markdown est ancré, un chiffre de mesure DAX ou de visuel ne l'est pas ; aucun verbe ne compare deux lots de mesures (manque M6)</td></tr><tr><td>T4 · promotion entre espaces de travail sur GO</td><td>forge-ops README : « trois verbes : déployer, exploiter, restaurer … <code>node scripts\ops.mjs deployer|restaurer|etat &lt;cible&gt;</code> », <code>cat-ops-03</code> « Plans cloud plan-first — génère, n'exécute jamais » (cibles railway, gcp, azure, aws) ; forge-audit <code>profiles/databricks-lakehouse/README.md</code> : « Les déploiements … sont appliqués par des Databricks Asset Bundles versionnés » (mode revue) ; pilot R-38 : aucun livrable publié sur un service hébergé sans GO humain</td><td><strong>ne recouvre pas</strong> — aucune cible de plan pour un bundle Databricks ni pour un espace de travail Power BI ; la gouvernance l'attend, l'outillage manque (manque M7)</td></tr><tr><td>Toute forge nouvelle « data-produit » ou « BI »</td><td>REGLES-PROJET §H, R-28 : « ≥ 2 verbes outillés exécutables qui n'existent dans aucune forge … v0 exercée … cadence ou un mandat propres … intégration … le jour même » ; corollaire : « un corpus de savoir sans verbe outillé est un référentiel versionné »</td><td>jugé en section 4, option O1</td></tr></tbody></table></div>
+<p class="tf-count" data-tf-count-for="tab-1" aria-live="polite"></p>
+<section class="chap lire" data-mesure-lecture>
+<p><strong>Ce que la table établit.</strong> Sur vingt-quatre capacités, quatorze sont recouvertes, cinq partiellement, cinq pas du tout. Les sept manques sont tous des <strong>extensions</strong> de verbes ou de cibles existants (M1, M4, M5, M7), ou des verbes de <strong>jugement de forme</strong> qui prolongent une gouvernance déjà écrite (M3, M4, M6), sauf un : M2, la transformation, qui est un verbe de <strong>construction</strong> et pose la question du porteur.</p>
+<h3>3. État de l'art daté</h3>
+<p><strong>A. Mesures et faits internes, tous datés à moins de vingt-quatre mois.</strong></p>
+<p>1. <strong>Self-test de forge-data, rejoué le 2026-09-07</strong> — « Self-test forge-data : 73 PASS,    0 FAIL » ; « Self-test mesurer_base : 15/15 PASS ». Dernier commit de la forge : ce86658,    2026-08-24. 2. <strong>Fiche d'audit forge-data, 2026-08-19</strong> — self-test « 54 PASS, 0 FAIL » à cette date ; dettes    D-D1 (grain colonne→colonne) « entamée par le traducteur Unity Catalog », D-D2 (lineage    déclaré vs exécuté) « inchangée ». 3. <strong>Profil-moteur Databricks, 2026-08-12</strong> (frontmatter <code>challenge_date</code>) — « <code>PRIMARY KEY</code> /    <code>FOREIGN KEY</code> … informationnelles seulement — déclarées au catalogue mais jamais appliquées    par le moteur » : un brouillon d'assertions dérivé d'une clé Databricks « doit porter un    avertissement de fiabilité inférieure ». 4. <strong>Corpus AuditCore de forge-audit, 2026-07-11 (décisions) et 2026-07-12 (contrôles v1.3)</strong> —    « Couverture : 65/65 ADRs ont ≥ 1 contrôle dérivé — 0 orphelin » ; les six décisions    reporting ADR0801 à ADR0806 dérivent CTL-D05-10 à CTL-D05-15 ; profil Power BI version 1.0.0,    dix contrôles ; profil Databricks lakehouse, quinze contrôles. 5. <strong>Fiche expert data-platform-cloud, admise le 2026-07-24</strong> — « 4 clients plateformes data    (Databricks, Fabric, Fabric Medallion, Snowflake) » ; corpus 7 points. 6. <strong>Standards de forge-data, 2026-08-11</strong> — Kimball « retenu (référence de modélisation) … pas    d'oracle » ; dbt-core, Great Expectations, OpenLineage, ODCS v3.1.0 retenus en barres. 7. <strong>Registre la-barre, relevé le 2026-09-07</strong> — dix entrées ; aucune ne cible un modèle    sémantique, un projet de transformation ni un modèle dimensionnel.</p>
+<p><strong>B. Sources externes datées, citées pour la classe d'outil, jamais pour un chiffre transposé.</strong> Elles établissent une chose : chaque manque M1 à M7 s'exerce aujourd'hui sur un <strong>format texte ou une ligne de commande</strong>, condition posée par l'analyse L99 pour qu'un verbe soit exerçable par un agent.</p>
+<p>8. <strong>Power BI, format de projet PBIP et langage TMDL</strong> — la vue TMDL de Power BI Desktop est en    disponibilité générale depuis <strong>2025-09</strong>, après une introduction en 2025-01 ; à cette    disponibilité, TMDL est devenu le format par défaut du modèle sémantique dans un projet    PBIP (<a href="https://powerbi.microsoft.com/en-us/blog/tmdl-in-power-bi-desktop-developer-mode-preview/">blog Power BI, TMDL en mode développeur</a> ;    <a href="https://lukasreese.com/2026/03/30/pbix-vs-pbir-vs-pbip/">PBIX vs PBIR vs PBIP, 2026-03-30</a>).    Conséquence : un modèle sémantique est un dossier de fichiers texte versionnables ; M4 et M6    peuvent le lire sans ouvrir l'application. 9. <strong>Tabular Editor, analyseur de bonnes pratiques en ligne de commande</strong> — <code>-A / -ANALYZE</code>    pour la version 2 ; commande <code>te bpa run</code> avec <code>--ci github</code> ou <code>--ci vsts</code> pour la CLI    récente, règles publiées sur le dépôt    <a href="https://github.com/TabularEditor/BestPracticeRules">TabularEditor/BestPracticeRules</a>    (<a href="https://docs.tabulareditor.com/en/features/Command-line-Options.html">documentation ligne de commande</a> ;    <a href="https://tabulareditor.com/blog/ci-cd-scripts-for-tabular-editor-2s-cli">scripts CI/CD pour la CLI</a>).    Le profil Power BI de forge-audit les cite déjà ; M4 en fait une barre. 10. <strong>Databricks, bundles déclaratifs (Databricks Asset Bundles, renommés Declarative     Automation Bundles)</strong> — disponibilité générale annoncée en <strong>2024-04</strong>     (<a href="https://www.databricks.com/blog/announcing-general-availability-databricks-asset-bundles">annonce Databricks</a> ;     <a href="https://docs.databricks.com/aws/en/dev-tools/bundles/">documentation</a>). Conséquence : un     déploiement Databricks est un fichier de configuration validable hors ligne ; M7 peut le     juger en « plan-first » comme les cibles cloud existantes de forge-ops. 11. <strong>dbt Core 1.10, 2025-06-16 ; dbt Fusion en préversion depuis 2025-08-20</strong>     (<a href="https://docs.getdbt.com/docs/dbt-versions">journal des versions dbt</a> ;     <a href="https://github.com/dbt-labs/dbt-core/blob/main/docs/roadmap/2025-05-new-engine-same-language.md">feuille de route « même langage, nouveau moteur », 2025-05</a>).     Conséquence pour M2 : la forme d'un projet de transformation (modèles, tests, documentation     générée, <code>ref</code>/<code>source</code>) reste stable d'un moteur à l'autre ; c'est cette forme, pas un     moteur, que la barre existante décrit. 12. <strong>Microsoft Fabric, Direct Lake</strong> — modèles composites Direct Lake + import en préversion     publique ; depuis le <strong>2025-09-05</strong> les modèles sémantiques par défaut ne sont plus créés     automatiquement (<a href="https://learn.microsoft.com/en-us/fabric/data-warehouse/semantic-models">documentation Fabric</a> ;     <a href="https://learn.microsoft.com/en-us/fabric/fundamentals/direct-lake-develop">développer en Direct Lake</a>).     Cité pour une raison seulement : la plateforme étant Databricks, le mode Direct Lake n'est     <strong>pas</strong> disponible pour la mission ; les modes à profiler (ADR0805 *(homogénéité des modes     de stockage et de connexion BI)*) sont import et DirectQuery.</p>
+<h3>4. Options — jeu fermé O0-O4</h3>
+<p><strong>O0 — ne rien faire.</strong> La mission se joue par composition de l'existant et par gestes humains là où il manque un verbe. <strong>Réfutée</strong>, coût du statu quo cité : la couche Gold serait jugée à l'œil (Kimball « pas d'oracle », STANDARDS-DATA) ; la réconciliation des chiffres serait manuelle, et le précédent de forge-data dit ce que cela vaut (« 788 nus contre 135 ancrés sur cinq rapports réels, tous PASS », TF-0378) ; la mise en production serait artisanale, ce qui est le trou prouvé qui a fait naître forge-ops (« MEP sans forge, déploiement artisanal », TF-0040). Trois manques dont l'écosystème a déjà payé le prix ailleurs.</p>
+<p><strong>O1 — une forge nouvelle « data-produit ».</strong> Jugée contre les quatre points de R-28. Point 1, deux verbes outillés sans recouvrement : tenable (M2 transformer, M3 modéliser, M6 réconcilier n'existent nulle part). Point 2, v0 exercée : tenable sur fixtures. <strong>Point 3, cadence ou mandat propres : non tenu</strong> — un produit data suit la même séquence de run qu'un produit web (conception, design, development, tests, MEP), et ses verbes sont des jugements de forme (forge-data) ou de gouvernance (forge-audit), pas une cadence distincte. Point 4, intégration le jour même : coûteux (bootstrap, fiche, inventaire, contrat, noyau, schéma, catalogue). Coût : complexité très complexe × durée longue. Exclut : la frontière de forge-data (« composition, jamais duplication ») serait doublée par une forge qui juge aussi de la donnée.</p>
+<p><strong>O2 — tout chez forge-data.</strong> Les sept manques ajoutés à la forge de la discipline. Coût : complexité complexe × durée moyenne. Exclut : la frontière écrite de forge-data, « vérifie la forme de la discipline, pas le contenu des données » — un verbe qui <strong>construit</strong> une transformation (M2) ou <strong>dérive</strong> un thème (M5) n'est pas un jugement de forme ; l'analyse L99 a nommé ce risque « fourre-tout data » (chapitre 7).</p>
+<p><strong>O3 — répartition par frontières écrites, extensions de verbes existants, barres instruites.</strong> Chaque manque va chez la forge dont la frontière le nomme déjà : jugements de forme de la donnée chez forge-data (M1, M3, M6), mécanisation d'un contrôle de gouvernance chez forge-audit (M4), dérivation de tokens chez forge-design (M5), plan de déploiement chez forge-ops (M7), discipline de construction chez forge-development (M2, par un profil data du manifeste P-18), composition chez forge-tests. Quatre barres au registre la-barre. Coût : complexité complexe × durée moyenne, en sept lots indépendants. Exclut : rien de la mission ; exclut une forge nouvelle tant que le point 3 de R-28 n'est pas tenu.</p>
+<p><strong>O4 — référentiels et fiches seulement, aucun verbe.</strong> Un référentiel Power BI daté, un profil Databricks enrichi, une fiche expert « modélisation dimensionnelle ». Coût : complexité simple × durée courte. Exclut : toute preuve exécutée ; la loi de l'écosystème (« un ✓ sans oracle exécuté n'est pas un ✓ ») s'appliquerait à Gold, au modèle sémantique et aux chiffres sans qu'aucun oracle ne puisse la tenir.</p>
+<h3>5. Verdict</h3>
+<ul><li><strong>Option retenue</strong> : <strong>O3</strong> — sept objets répartis dans cinq forges existantes selon leurs</li></ul>
+<p>  frontières écrites, quatre barres instruites, aucune forge nouvelle ; O1 reste réévaluable si   un second produit data révèle une cadence propre (point 3 de R-28).</p>
+<ul><li><strong>Coût</strong> : complexité complexe × durée moyenne pour l'ensemble ; par lot, voir la table 5.2.</li></ul>
+<p>  Tokens : sept mandats de forge de taille comparable à TF-0139 (verbe importer) ; dette   déclarée : D-D2 (véracité runtime) inchangée, la réconciliation M6 compare des mesures   archivées, pas une exécution observée.</p>
+<ul><li><strong>Candidature(s) émise(s)</strong> : huit, journalisées le 2026-09-07 par <code>todo\journaliser.mjs</code></li></ul>
+<p>  (registre PASS avant et après écriture), puis <strong>décidées le même jour</strong> par décision humaine   D-3 option (a), dans l'ordre des lots — TF-0858 (M1, L1), TF-0859 (quatre barres, L2), TF-0860   (M3, L3), TF-0861 (M2, L4), TF-0862 (M4, L5), TF-0863 (M5, L6), TF-0864 (M6, L7), TF-0865   (M7, L8) ; chacune ouvre un mandat de forge (run de mandat, <code>references\RUN-MANDAT.md</code>). Le   pilot n'écrit dans aucune forge : ce sont les mandats qui écrivent.</p>
+<ul><li><strong>Plan de revue</strong> : <strong>2026-09-21</strong> — confrontation du verdict aux mandats ouverts et au « où »</li></ul>
+<p>  réel de la mission (instance, catalogues, capacité Premium ou non) ; <strong>2026-11-07</strong> —   péremption de la table de non-recouvrement.</p>
+<ul><li><strong>Test rétro</strong> : joué en section 5.4, depuis chaque élément opérationnel jusqu'à l'intention ;</li></ul>
+<p>  aucune rupture, un élément retiré (voir 5.4).</p>
+<h4>5.1 Les sept manques, typés et attribués</h4>
+<p><strong>Comment lire ce tableau</strong> : une ligne par manque, dans l'ordre des temps de la mission ; la lettre de type renvoie à la taxonomie de l'analyse L99 — (a) verbe outillé, (b) référentiel versionné, (c) fiche expert, (d) barre, (e) skill, (f) décision d'architecture et contrôle ; le porteur est justifié par la frontière citée ; le calibrage dit sur quel artefact texte le verbe s'exerce.</p>
+</section>
+<div class="defile"><table><thead><tr><th scope="col">Manque</th><th scope="col">Type</th><th scope="col">Porteur et justification</th><th scope="col">Calibrage (artefact jugé)</th><th scope="col">Preuve d'usage dans la mission</th></tr></thead><tbody><tr><td><strong>M1</strong> — importer un schéma exporté au dialecte Databricks (DDL <code>SHOW CREATE TABLE</code>, export <code>information_schema</code> en JSON), clés informationnelles avertie</td><td>(a) extension d'<code>importer.mjs</code> + (b) profil <code>databricks.md</code> porté en version 1.1.0</td><td>forge-data — LISEZMOI des profils, point 5 : l'extension « prouvée par non-recouvrement le jour où un artefact réel de ce moteur doit être importé » ; ce jour est T1</td><td>fichier texte exporté, jamais une connexion (loi n° 4 de la forge)</td><td>T1 : brouillon d'assertions et de contrat Bronze, commentaires et clés orphelines dénoncés</td></tr><tr><td><strong>M2</strong> — juger la forme d'un projet de transformation Silver/Gold (chaque modèle : source ou <code>ref</code> déclaré, au moins un test, description ; documentation générée, jamais écrite à la main) et le construire sous gates</td><td>(a) oracle « transformer » chez forge-data (forme) + (e) profil data du manifeste <code>.forge/profile.toml</code> chez forge-development (construction : rôle <code>transformations</code>, commandes <code>test</code> et <code>docs</code>) + (d) barre dbt-core rattachée au verbe</td><td>forge-data pour le <strong>jugement</strong> (frontière : forme de la discipline) ; forge-development pour la <strong>construction</strong> (playbook, disciplines RV-3/RV-4 ; P-18 « clé absente = non applicable ») ; forge-tests compose son pan data avec les tests du projet au lieu de les rejouer</td><td>arborescence de projet (SQL/YAML), sortie de <code>dbt test</code> ou équivalent archivée en JSON</td><td>T2 et T3 : Silver et Gold construites sous tests, documentation générée, lineage déclaré</td></tr><tr><td><strong>M3</strong> — juger un modèle dimensionnel déclaré : grain de chaque fait, dimensions conformes, clés de substitution, dimension temps contiguë, type de changement lent par dimension, matrice en bus</td><td>(a) oracle « modéliser » + (d) barre Kimball</td><td>forge-data — STANDARDS-DATA : Kimball « retenu … pas d'oracle » ; le format déclaratif rejoint <code>lineage@1</code> et <code>contrat@1</code> ; forge-audit garde la revue (CTL-D05-10, 13)</td><td>fichier déclaratif <code>forge-data/modele-dimensionnel@1</code> (JSON), fixtures rouge/verte</td><td>T3 : Gold conçue depuis les questions de T4, jugée avant construction</td></tr><tr><td><strong>M4</strong> — juger un modèle sémantique sur ses fichiers TMDL/PBIP : mesure définie une fois (CTL-D05-02 et 10), relations actives et non ambiguës, table de dates marquée et contiguë (CTL-D05-13), mode de connexion déclaré par profil (CTL-D05-14), rôles de sécurité au niveau ligne présents, statut de certification (CTL-D05-15)</td><td>(a) oracle exécutable dans <code>profiles/powerbi</code> + (d) barre « règles Best Practice Analyzer de Tabular Editor + format PBIP/TMDL »</td><td>forge-audit — son profil dit que le contrôle « bascule en revue » faute d'outillage programmatique ; le format TMDL le rend programmatique ; mécaniser ses propres contrôles reste dans sa frontière</td><td>dossier PBIP/TMDL en texte ; jamais le point de terminaison XMLA (capacité payante, donnée du projet)</td><td>T4 : modèle sémantique jugé à chaque commit, avant publication</td></tr><tr><td><strong>M5</strong> — dériver un thème Power BI (fichier JSON de thème : palette, polices, styles de visuels) depuis <code>tokens.css</code> DTCG, et le juger contre la marque</td><td>(a) cible « powerbi » de <code>generer-tokens-css.mjs</code> ou script frère + règle dans <code>oracle-dtcg.mjs</code></td><td>forge-design — <code>cat-des-07</code> « Tokens DTCG (source → dérivé) » : une cible dérivée de plus ; loi n° 6 (rendu générique = défaut)</td><td>fichier JSON de thème, fixture rouge (thème par défaut) / verte (thème dérivé)</td><td>T4 : rapports « personnalisés » par construction, jamais par thème par défaut</td></tr><tr><td><strong>M6</strong> — réconcilier deux lots de mesures identifiées : agrégats Gold archivés par <code>mesurer_base.py</code> et valeurs des mesures du modèle sémantique (requête DAX exportée en JSON par l'API du service, ou export de visuel), tolérance déclarée, chaque écart nommé</td><td>(a) oracle « réconcilier » + extension de <code>restituer</code> (un <code>[c:id]</code> peut pointer un lot de réconciliation)</td><td>forge-data — prolonge <code>restituer</code> (« tout chiffre … référence une entrée déclarée ») aux chiffres qui ne sont pas dans un Markdown ; compose <code>mesurer_base.py</code></td><td>deux fichiers JSON de mesures archivés (id, valeur, cible, date) ; jamais une connexion depuis l'oracle</td><td>T4 : chaque mesure exposée réconciliée avec Gold avant GO ; défaut n° 18 de l'analyse clos</td></tr><tr><td><strong>M7</strong> — plan de promotion d'un produit data : cible « databricks-bundle » (validation hors ligne du bundle, quatre phases, retour arrière réel, zéro credential) et cible « powerbi-workspace » (projet PBIP versionné, promotion dev → test → prod, publication conditionnée au GO humain R-38)</td><td>(a) deux cibles de <code>ops.mjs plan</code> + règle O-5 étendue</td><td>forge-ops — <code>cat-ops-03</code> « Plans cloud plan-first — génère, n'exécute jamais » : deux cibles de plus ; forge-audit garde la revue (profil Databricks lakehouse)</td><td>fichiers de bundle et de projet en texte ; plan JSON jugé par O-5</td><td>MEP : dossier de mise en production complet, GO humain avant toute publication</td></tr></tbody></table></div>
+<section class="chap lire" data-mesure-lecture>
+<h4>5.2 Plan de mise à jour par canal, ordonné par chemin critique</h4>
+<p><strong>Comment lire ce tableau</strong> : une ligne par lot, dans l'ordre de traitement ; l'ordre suit le chemin critique de la mission (ce dont T1 a besoin avant T2, T2 avant T3, T3 avant T4, la MEP en dernier) ; l'effort parle en complexité × durée ; la preuve de « prêt » est binaire et exécutée ; la dernière colonne dit ce qui se passe si le lot n'est pas fait.</p>
+</section>
+<div class="defile"><table id="tab-2" data-filterable><thead><tr><th scope="col">Lot</th><th scope="col">Contenu</th><th scope="col">Canal</th><th scope="col">Effort</th><th scope="col">Preuve de « prêt »</th><th scope="col">Si non fait</th></tr></thead><tbody><tr><td>L1</td><td>M1 (importer Databricks + profil 1.1.0)</td><td>candidature → mandat forge-data ; outil : extension de <code>scripts/importer.mjs</code>, fixture <code>schema-databricks-{verte,rouge}</code></td><td>moyen × court</td><td><code>oracles/self-test.mjs</code> double sens PASS avec le round-trip Databricks ; <code>cat-dat-06</code> mis à jour</td><td>T1 se fait à la main : assertions et contrat Bronze écrits sans dérivation, clés orphelines non dénoncées</td></tr><tr><td>L2</td><td>barres : Kimball (M3), dbt-core rattachée à « transformer » (M2), Tabular Editor BPA + PBIP/TMDL (M4)</td><td>skill <code>la-barre</code>, mode pré-vol ; quatre entrées <code>statut: todo</code> → <code>ok</code> après test d'existence</td><td>simple × court</td><td>quatre entrées au registre avec <code>dernier_test</code> daté PASS</td><td>M2, M3, M4 se construisent sans niveau de référence, ce que la doctrine la-barre interdit</td></tr><tr><td>L3</td><td>M3 (oracle modéliser, format <code>modele-dimensionnel@1</code>)</td><td>candidature → mandat forge-data ; outil : <code>write-an-oracle</code></td><td>complexe × moyen</td><td>self-test double sens PASS ; fixture verte = étoile à quatre dimensions dont temps ; rouge = grain absent, temps trouée</td><td>Gold jugée à l'œil ; CTL-D05-10 et 13 restent en revue seule</td></tr><tr><td>L4</td><td>M2 (oracle transformer chez forge-data ; profil data P-18 chez forge-development ; composition forge-tests)</td><td>deux candidatures → deux mandats ; outil : <code>write-an-oracle</code> côté data, édition du playbook côté development</td><td>complexe × moyen</td><td>self-test PASS ; un projet fixture passe le profil data du playbook (commandes <code>test</code> et <code>docs</code> résolues) ; forge-tests lit la sortie de tests archivée</td><td>Silver et Gold construites hors gates ; la traçabilité exigences → tests du contrat « prêt client » ne couvre pas la donnée</td></tr><tr><td>L5</td><td>M4 (oracle TMDL/PBIP chez forge-audit)</td><td>candidature → mandat forge-audit ; outil : <code>write-an-oracle</code> dans <code>profiles/powerbi</code></td><td>complexe × moyen</td><td>self-test PASS ; fixture verte = modèle TMDL à table de dates marquée et mesures uniques ; rouge = mesure dupliquée, relation ambiguë</td><td>le modèle sémantique est revu à la main au portail ; aucun contrôle à chaque commit</td></tr><tr><td>L6</td><td>M5 (thème Power BI dérivé)</td><td>candidature → mandat forge-design ; outil : extension de <code>generer-tokens-css.mjs</code> et <code>oracle-dtcg.mjs</code></td><td>moyen × court</td><td>fixture rouge (thème par défaut) FAIL, verte (thème dérivé) PASS ; <code>cat-des-07</code> mis à jour</td><td>rapports au thème par défaut : défaut de loi n° 6, visible du client</td></tr><tr><td>L7</td><td>M6 (oracle réconcilier + extension restituer)</td><td>candidature → mandat forge-data ; outil : <code>write-an-oracle</code>, composition <code>mesurer_base.py</code></td><td>complexe × moyen</td><td>self-test PASS ; fixture verte = deux lots égaux sous tolérance ; rouge = un écart nommé</td><td>les chiffres des visuels ne sont attribuables à rien ; le précédent des « 788 nus » se rejoue en DAX</td></tr><tr><td>L8</td><td>M7 (cibles databricks-bundle et powerbi-workspace de <code>ops.mjs plan</code>)</td><td>candidature → mandat forge-ops</td><td>complexe × moyen</td><td>O-5 PASS sur un plan fixture à quatre phases et retour arrière ; refus sans credential ; GO humain exigé avant <code>publish</code></td><td>MEP artisanale ; publication sur le service sans plan ni retour arrière prouvé</td></tr><tr><td>L9</td><td>retours de la mission (lots <code>forge\retours\</code>) : premier run réel de forge-data de bout en bout, premières instanciations réelles des profils Power BI et Databricks lakehouse</td><td>canal standard des lots de retours vers <code>input\00-retours\</code> du pilot</td><td>simple × court par lot</td><td><code>oracle-lot.mjs</code> exit 0 sur chaque lot</td><td>ce que la mission apprend ne redescend pas (règle R12 du registre)</td></tr></tbody></table></div>
+<p class="tf-count" data-tf-count-for="tab-2" aria-live="polite"></p>
+<section class="chap lire" data-mesure-lecture>
+<p><strong>Ordre justifié en une clause</strong> : L1 et L2 d'abord parce qu'ils coûtent le moins et débloquent T1 et le niveau de référence de trois autres lots ; L3 avant L4 parce que Gold se conçoit avant de se construire ; L5 à L7 en parallèle parce qu'ils sont indépendants et tous nécessaires avant le GO de T4 ; L8 en dernier parce que la MEP ferme la mission.</p>
+<h4>5.3 Ce que la mission fait SANS mise à jour</h4>
+<p>Par composition de l'existant, dès l'ouverture du run :</p>
+<ul><li><strong>T0</strong> : <code>docs\projet\COMPOSANTS-OPS.md</code> renseigné (R-20), <code>mesurer_base.py</code> avec sa cible</li></ul>
+<p>  archivée, <code>namespace</code> sur chaque dataset (T7).</p>
+<ul><li><strong>T1</strong> : cadrage par la fiche expert data-platform-cloud ; profilage par <code>data-quality-auditor</code></li></ul>
+<p>  ; lineage Unity Catalog traduit si l'export réel est fourni par le projet ; en attendant L1,   un export DDL Databricks se lit à la main avec le profil-moteur <code>databricks.md</code> comme grille   (types, contraintes appliquées vs informationnelles).</p>
+<ul><li><strong>T2</strong> : assertions (<code>oracle-profiler</code>), contrat Silver (<code>oracle-contractualiser</code>), lineage</li></ul>
+<p>  T1→T2 (<code>oracle-tracer</code>), sonde de fraîcheur (<code>observer.mjs</code> avec une sonde <code>commande</code> appelant   <code>mesurer_base.py</code>).</p>
+<ul><li><strong>T3</strong> : dessin du modèle par <code>digit-ai-schemas</code> (canevas modèle de données) ; contrat</li></ul>
+<p>  Gold→BI ; revue de gouvernance par forge-audit sur mandat (CTL-D05-10, 13).</p>
+<ul><li><strong>T4</strong> : maquette des rapports validée avant construction (règle TF-0780) ; revue du modèle</li></ul>
+<p>  sémantique par le profil Power BI de forge-audit en mode revue outillée ; chiffres des rapports   Markdown ancrés par <code>oracle-restituer</code>.</p>
+<ul><li><strong>MEP</strong> : dossier de mise en production et GO humain (R-38) ; plan de déploiement écrit à la</li></ul>
+<p>  main, jugé à la relecture — c'est exactement le trou que L8 comble.</p>
+<h4>5.4 Test rétro (Opérationnel → Tactique → Stratégie → Intention)</h4>
+<p>Depuis chaque élément opérationnel du verdict :</p>
+<ul><li><strong>L1 importer Databricks</strong> → tactique « relever par capacité, T1 exige un import de schéma</li></ul>
+<p>  au bon dialecte » → stratégie « ne rien recréer : le profil existe, le verbe s'étend » →   intention « forges prêtes à l'ouverture ». Sans rupture.</p>
+<ul><li><strong>L2 quatre barres</strong> → tactique « toute construction de verbe part d'un niveau de référence</li></ul>
+<p>  testé d'existence » → stratégie « durable par le canal la-barre » → intention. Sans rupture.</p>
+<ul><li><strong>L3 modéliser</strong> → tactique « Gold est le modèle dimensionnel, conçu depuis les rapports » →</li></ul>
+<p>  stratégie « combler un manque réel : Kimball retenu sans oracle » → intention. Sans rupture.</p>
+<ul><li><strong>L4 transformer et profil data</strong> → tactique « T2 et T3 se construisent sous gates » →</li></ul>
+<p>  stratégie « le porteur suit la frontière écrite : jugement chez data, construction chez   development » → intention. Sans rupture.</p>
+<ul><li><strong>L5 modèle sémantique jugé sur fichiers</strong> → tactique « T4 se juge à chaque commit sur des</li></ul>
+<p>  fichiers texte » → stratégie « mécaniser une gouvernance déjà écrite » → intention. Sans rupture.</p>
+<ul><li><strong>L6 thème dérivé</strong> → tactique « personnalisé = dérivé de la marque » → stratégie « loi n° 6 »</li></ul>
+<p>  → intention « rapports personnalisés adaptés aux données traitées », mot pour mot. Sans rupture.</p>
+<ul><li><strong>L7 réconcilier</strong> → tactique « chaque chiffre exposé remonte à Gold » → stratégie « ne pas</li></ul>
+<p>  rejouer le précédent des chiffres nus » → intention. Sans rupture.</p>
+<ul><li><strong>L8 plan de promotion</strong> → tactique « MEP d'un produit data sur GO » → stratégie « le trou</li></ul>
+<p>  MEP a déjà coûté une fois » → intention. Sans rupture.</p>
+<ul><li><strong>L9 retours</strong> → tactique « ce que la mission apprend redescend » → stratégie « les forges</li></ul>
+<p>  restent prêtes pour la mission suivante » → intention. Sans rupture.</p>
+<ul><li><strong>Élément retiré</strong> : une fiche expert « modélisation dimensionnelle » (type c) envisagée en</li></ul>
+<p>  O4 ne remonte à aucune ligne tactique une fois L3 retenu — un oracle exécuté rend la fiche   redondante ; retirée du verdict.</p>
+<p>Les deux questions du demandeur, rejouées : « identifie les … manquantes » → section 5.1, sept manques typés, attribués, calibrés ; « comment ces forges peuvent être mises à jour » → section 5.2, neuf lots, chacun avec son canal, son effort, sa preuve et sa conséquence.</p>
+<h3>Interdits (tenus)</h3>
+<p>Aucun critère subjectif ; jeu fermé O0-O4 ; chaque ligne de non-recouvrement citée ; chaque source datée ; O0 réfutée sur coût cité ; aucun effort en jours ; aucune donnée client (fixtures synthétiques nommées à chaque preuve de « prêt ») ; aucune écriture dans une forge par cette étude.</p>
+</section>
+    </main>
+    <footer>Vue générée — NE PAS ÉDITER (la source Markdown fait foi ; la régénérer via le script du pilot). Sceau source <code>2c9558e1aa6c</code>.</footer>
+  </div></div>
+  <script>
+/* Digit-AI — Filtres de colonne sur tableaux de données.
+   Socle commun : voir references/composant-filtres-tableau.md (checklist G1-G9).
+   Viewer-only : le JS ne s'exécute pas à l'export WeasyPrint, la regle @media print
+   du livrable doit reafficher tr[data-tf-hidden].
+   Lot Produit-05 20260820b (TF-0429/0430/0431, 21/08) : rappel apresFiltrage et instance
+   enveloppable, etat vide avec « tout reafficher », panneau qui choisit son cote et
+   neutralise le rognage de son conteneur defilant tant qu'il est ouvert.
+
+   Lot Produit-02 20260902b/d (TF-0768/0769/0781/0782, 02/09) — L'ORDRE ET L'EXISTENCE.
+   Quatre defauts d'une meme famille : le composant lisait le TEXTE RENDU la ou il fallait lire
+   une VALEUR, et decidait de l'existence d'une facette la ou il ne devait decider que de sa
+   forme. Une console de donnees livree a du rearmer son propre tri et relire ses cases dans le
+   DOM pour compenser :
+     · TF-0768 — `parseFloat` sur « 1 000 » vaut 1 : les separateurs de milliers fr-FR (espace,
+       insecable, insecable etroite) arretent l'analyse au premier caractere non chiffre, et
+       TOUTE page en francais triait faux, en silence. Le tri et l'ordre des facettes lisent
+       desormais `data-v` / `data-sort` quand la cellule en porte, sinon le nombre se lit APRES
+       retrait des espaces et des signes.
+     · TF-0781 — `Object.keys(valeurs).sort()` rangeait les mois par ordre alphabetique
+       (« aout 2025, avr. 2026, dec. 2025 »). Une facette s'ordonne sur sa CLE, donc
+       chronologiquement des que la cellule porte un `data-v` ISO.
+     · TF-0782 — l'heuristique `1 < n < lignes` privait de facette la colonne CLE (huit marches
+       distincts sur huit lignes : aucun filtre la ou le lecteur en attendait un). La
+       cardinalite decide desormais de la FORME du panneau, jamais de son EXISTENCE ; la seule
+       sortie est une exemption DECLAREE (`data-filter-col="off"` + `data-filter-reason`).
+     · TF-0769 — `data-tf-ready` bloquait tout second `init` en rendant `null`, et la selection
+       vivait dans une fermeture inaccessible : une page qui re-rend ses tableaux perdait ses
+       filtres et devait les relire dans le DOM. L'etat est desormais LISIBLE et REJOUABLE —
+       `api.etat()`, `init(table, { etat })`, `api.rafraichir()`. */
+(function (root) {
+  'use strict';
+
+  /* ARBITRAGE PARTAGE DE LA VISIBILITE (TF-0953, 08/09/2026) — optionnel, jamais obligatoire :
+     un composant du socle ne cesse pas de fonctionner parce qu'un autre fichier manque. */
+  function arbitrage() { return root.DigitAIRowVisibility || null; }
+
+  var SEUIL_LIGNES = 8;
+  /* Au-dela de ce nombre de valeurs distinctes, la liste de cases n'est plus parcourable a
+     l'oeil : le panneau s'ouvre SUR SA RECHERCHE et le dit. C'est la FORME qui change — la
+     facette, elle, existe toujours (TF-0782). */
+  var SEUIL_RECHERCHE = 15;
+  var LIBELLE_VIDE = 'Aucune ligne ne correspond aux filtres.';
+  var LIBELLE_TOUT = 'Tout réafficher';
+
+  /* Les espaces qui separent les milliers en fr-FR : espace, insecable (U+00A0), insecable
+     etroite (U+202F), fine (U+2009), figure (U+2007). parseFloat s'arrete au premier. */
+  var RE_ESPACES = /\s/g;   /* \s couvre l'insecable U+00A0 et l'insecable etroite U+202F */
+  var RE_SIGNES = /[%€$£]/g;
+  var RE_NOMBRE = /^[+-]?\d+(?:[.,]\d+)?$/;
+
+  function norm(s) {
+    return String(s == null ? '' : s)
+      .normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+  }
+
+  /* TF-0768 : un nombre affiche a un habillage (milliers, unite, pourcentage). On le retire
+     AVANT l'analyse, et on n'accepte que ce qui est ENTIEREMENT numerique — « 12 mars » n'est
+     pas 12, et le laisser passer trierait une colonne de dates comme une colonne de nombres. */
+  function nombre(v) {
+    var s = String(v == null ? '' : v).replace(RE_ESPACES, '').replace(RE_SIGNES, '');
+    if (s.indexOf(',') !== -1 && s.indexOf('.') === -1) s = s.replace(',', '.');
+    return RE_NOMBRE.test(s) ? parseFloat(s) : NaN;
+  }
+
+  function corps(table) {
+    var tb = table.tBodies && table.tBodies[0];
+    /* TF-0175 : une ligne [data-detail] est le DÉPLIANT pleine largeur de la ligne qui la
+       précède — elle ne porte pas de données de colonnes et ne compte ni ne se filtre.
+       TF-0430 : la ligne d'état vide [data-tf-empty] est un message du composant, pas une donnée. */
+    return tb ? Array.prototype.slice.call(tb.rows).filter(function (tr) {
+      return !tr.hasAttribute('data-detail') && !tr.hasAttribute('data-tf-empty');
+    }) : [];
+  }
+
+  /* Le LIBELLE d'une cellule : ce que le lecteur voit, et ce qu'il coche. */
+  function valeur(tr, i) {
+    var td = tr.cells[i];
+    return td ? td.textContent.trim() : '';
+  }
+
+  /* La CLE D'ORDRE d'une cellule (TF-0768/0781) : `data-v`, sinon `data-sort`, sinon le texte
+     rendu. C'est la seule facon de dire « aout 2025 se range avant avr. 2026 » — un libelle de
+     mois n'a aucun ordre lisible, et une valeur formatee n'a pas d'ordre numerique. */
+  function cle(tr, i) {
+    var td = tr.cells[i];
+    if (!td) return '';
+    var d = td.getAttribute('data-v');
+    if (d === null) d = td.getAttribute('data-sort');
+    return d === null ? td.textContent.trim() : String(d).trim();
+  }
+
+  /* Comparateur unique du composant — tri de lignes ET ordre des valeurs de facette.
+     Deux nombres se comparent en nombres ; une date ISO (`2025-08`, `2025-08-14`) se compare en
+     texte, ce qui EST son ordre chronologique ; le vide passe en fin de liste. */
+  function comparer(a, b) {
+    var na = nombre(a), nb = nombre(b);
+    if (!isNaN(na) && !isNaN(nb)) return na < nb ? -1 : (na > nb ? 1 : 0);
+    if (a === '') return b === '' ? 0 : 1;
+    if (b === '') return -1;
+    var xa = norm(a), xb = norm(b);
+    return xa < xb ? -1 : (xa > xb ? 1 : 0);
+  }
+
+  function nbColonnes(table) {
+    var ths = table.tHead ? Array.prototype.slice.call(table.tHead.rows[0].cells) : [];
+    var n = 0;
+    ths.forEach(function (th) { n += th.colSpan || 1; });
+    if (!n) { var l = corps(table)[0]; n = l ? l.cells.length : 1; }
+    return n;
+  }
+
+  /* TF-0782 — CHAQUE en-tete recoit sa facette. L'heuristique de cardinalite ne decide plus que
+     de la FORME du panneau (`liste`, `recherche` quand les valeurs sont trop nombreuses pour
+     etre parcourues, `unique` quand la colonne n'en porte qu'une). La seule sortie est une
+     exemption DECLAREE sur le `<th>` : `data-filter-col="off"` + `data-filter-reason="…"`.
+     Sans motif, l'exemption est rendue au journal (`api.exemptions`) et l'oracle la refuse. */
+  function colonnes(table, lignes) {
+    var ths = table.tHead ? Array.prototype.slice.call(table.tHead.rows[0].cells) : [];
+    var cols = [], exemptions = [];
+    ths.forEach(function (th, i) {
+      /* L'INTITULE SE FIGE AU PREMIER PASSAGE (TF-0769). Apres `init`, le `<th>` contient le
+         declencheur ET le panneau : son `textContent` vaut alors « Statut›TousAucun livre en
+         cours… ». Relire l'intitule apres coup donnait une AUTRE cle de colonne, et la
+         selection conservee se retrouvait rangee sous un nom que plus personne ne demandait —
+         le rafraichissement perdait les filtres qu'il devait sauver. `data-col` rend
+         l'identite de la colonne stable, et lisible par un oracle. */
+      var libelle = (th.getAttribute('data-col') || th.textContent || '').trim();
+      if (!th.hasAttribute('data-col')) th.setAttribute('data-col', libelle);
+      if (th.getAttribute('data-filter-col') === 'off') {
+        exemptions.push({ colonne: libelle, index: i,
+                          motif: (th.getAttribute('data-filter-reason') || '').trim() });
+        return;
+      }
+      var ordres = {}, n = 0;
+      lignes.forEach(function (tr) {
+        var v = valeur(tr, i);
+        if (!(v in ordres)) { ordres[v] = cle(tr, i); n++; }
+      });
+      var valeurs = Object.keys(ordres).sort(function (x, y) {
+        return comparer(ordres[x], ordres[y]);
+      });
+      var forme = n <= 1 ? 'unique' : (n > SEUIL_RECHERCHE ? 'recherche' : 'liste');
+      cols.push({ th: th, index: i, libelle: libelle, valeurs: valeurs,
+                  ordres: ordres, forme: forme });
+    });
+    return { cols: cols, exemptions: exemptions };
+  }
+
+  function bouton(col, id) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tf-btn';
+    b.setAttribute('aria-expanded', 'false');
+    b.setAttribute('aria-controls', id);
+    b.setAttribute('aria-label', 'Filtrer ' + col.libelle);
+    b.textContent = '›';               /* chevron simple (TF-0435) : present dans toute pile de repli */
+    return b;
+  }
+
+  function panneau(col, id) {
+    var p = document.createElement('div');
+    p.className = 'tf-panel';
+    p.id = id;
+    p.hidden = true;
+    p.setAttribute('role', 'group');
+    p.setAttribute('aria-label', 'Filtrer ' + col.libelle);
+    /* La forme est LISIBLE dans le marquage : un oracle de rendu et un test d'interactions
+       peuvent dire laquelle a ete choisie, et pourquoi (TF-0782). */
+    p.setAttribute('data-tf-forme', col.forme);
+
+    var rech = document.createElement('input');
+    rech.type = 'search';
+    rech.className = 'tf-search';
+    rech.placeholder = 'Rechercher…';
+    rech.setAttribute('aria-label', 'Rechercher une valeur');
+
+    var actions = document.createElement('div');
+    actions.className = 'tf-actions';
+    var tous = document.createElement('button');
+    tous.type = 'button'; tous.className = 'tf-all'; tous.textContent = 'Tous';
+    var aucun = document.createElement('button');
+    aucun.type = 'button'; aucun.className = 'tf-none'; aucun.textContent = 'Aucun';
+    actions.appendChild(tous); actions.appendChild(aucun);
+
+    var opts = document.createElement('div');
+    opts.className = 'tf-opts';
+    col.valeurs.forEach(function (v) {
+      var lab = document.createElement('label');
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.className = 'tf-opt';
+      cb.value = v;
+      cb.checked = true;                    /* etat initial : tout coche, aucun filtre actif */
+      lab.appendChild(cb);
+      lab.appendChild(document.createTextNode(' ' + (v === '' ? '(vide)' : v)));
+      opts.appendChild(lab);
+    });
+
+    p.appendChild(rech); p.appendChild(actions); p.appendChild(opts);
+    /* Une forme qui change sans le dire est une affordance muette (loi n° 3) : le panneau
+       ANNONCE pourquoi il s'ouvre sur sa recherche, ou pourquoi il n'offre qu'une valeur. */
+    if (col.forme !== 'liste') {
+      var note = document.createElement('p');
+      note.className = 'tf-forme-note';
+      note.textContent = col.forme === 'recherche'
+        ? col.valeurs.length + ' valeurs distinctes — chercher puis « Tous ».'
+        : 'Une seule valeur dans cette colonne.';
+      p.insertBefore(note, opts);
+    }
+    return { panneau: p, recherche: rech, tous: tous, aucun: aucun, options: opts };
+  }
+
+  /* TF-0431 : le conteneur defilant le plus proche (overflow-x auto|scroll) rogne un panneau
+     absolu et gagne un ascenseur horizontal des qu'il s'ouvre. Tant qu'un panneau est ouvert,
+     son rognage est neutralise ; a la fermeture, l'etat inline d'origine est retabli. */
+  function conteneurDefilant(el) {
+    var p = el.parentElement;
+    while (p && p !== document.body) {
+      var o = getComputedStyle(p).overflowX;
+      if (o === 'auto' || o === 'scroll') return p;
+      p = p.parentElement;
+    }
+    return null;
+  }
+
+  /* RA-5 (14/08, revu TF-0768/0782 le 02/09) : le tri est ARME PAR DEFAUT — la règle L4 exige
+     « filtre, tri et recherche », et une page qui arme le sien le declare (`{ tri: false }` ou
+     `data-tf-tri="off"` sur la table). La cle de tri est celle de `cle()` : `data-v`/`data-sort`
+     d'abord, sinon le texte, lu comme un nombre APRES retrait des espaces de milliers. Les clics
+     sur .tf-btn/.tf-panel sont ignores, les lignes [data-detail] voyagent avec leur ligne mere.
+     Rend une fonction de DESARMEMENT : sans elle, un second init empilerait ses ecouteurs. */
+  function armerTri(table) {
+    var ths = table.tHead ? Array.prototype.slice.call(table.tHead.rows[0].cells) : [];
+    corps(table).forEach(function (tr) {
+      var d = tr.nextElementSibling;
+      tr.__tfDetail = (d && d.hasAttribute('data-detail')) ? d : null;
+    });
+    var poses = [];
+    ths.forEach(function (th, i) {
+      if (th.getAttribute('data-sort-col') === 'off') return;
+      if (!th.style.cursor) th.style.cursor = 'pointer';
+      var handler = function (ev) {
+        if (ev.target.closest && ev.target.closest('.tf-btn, .tf-panel')) return;
+        var sens = th.getAttribute('aria-sort') === 'ascending' ? -1 : 1;
+        ths.forEach(function (t) {
+          t.removeAttribute('aria-sort');
+          var m = t.querySelector('.tf-tri'); if (m) m.remove();
+        });
+        th.setAttribute('aria-sort', sens === 1 ? 'ascending' : 'descending');
+        var marque = document.createElement('span');
+        marque.className = 'tf-tri';
+        marque.textContent = sens === 1 ? ' ↑' : ' ↓';
+        th.appendChild(marque);
+        var tb = table.tBodies[0];
+        var tris = corps(table).slice();
+        tris.forEach(function (tr) {
+          var d = tr.nextElementSibling;
+          tr.__tfDetail = (d && d.hasAttribute('data-detail')) ? d : tr.__tfDetail;
+        });
+        tris.sort(function (a, b) { return comparer(cle(a, i), cle(b, i)) * sens; });
+        tris.forEach(function (tr) {
+          tb.appendChild(tr);
+          if (tr.__tfDetail) tb.appendChild(tr.__tfDetail);
+        });
+      };
+      th.addEventListener('click', handler);
+      poses.push({ th: th, handler: handler });
+    });
+    return function desarmer() {
+      poses.forEach(function (p) {
+        p.th.removeEventListener('click', p.handler);
+        var m = p.th.querySelector('.tf-tri'); if (m) m.remove();
+        p.th.removeAttribute('aria-sort');
+      });
+    };
+  }
+
+  /* init(table, opts) — opts.tri (bool, defaut VRAI) · opts.etat (etat rendu par api.etat())
+     · opts.reinit (bool) · opts.apresFiltrage(table, visibles, total) : rappel appele a la fin
+     de CHAQUE filtrage, y compris ceux declenches par les cases, Tous/Aucun et la recherche
+     (TF-0429 : avant, seul l'appel manuel a instance.appliquer etait observable, envelopper
+     l'instance etait silencieusement sans effet). Les gestionnaires internes passent par
+     api.appliquer : remplacer instance.appliquer est desormais honore.
+
+     TF-0769 — un second appel n'est plus un NON-EVENEMENT : sans `etat` ni `reinit`, il rend
+     l'instance deja construite (l'appelant peut donc la piloter sans l'avoir gardee) ; avec, il
+     detruit l'ancienne et reconstruit. */
+  function init(table, opts) {
+    opts = opts || {};
+    if (!table) return null;
+    if (table.getAttribute('data-filterable') === 'off') return null;
+    if (table.getAttribute('data-tf-ready') === '1') {
+      var deja = table.__tfApi || null;
+      if (!opts.etat && !opts.reinit) return deja;
+      if (deja && deja.detruire) deja.detruire();
+    }
+
+    /* DECLARER SON ATTRIBUT a l'arbitrage partage, jamais deviner ceux des autres. */
+    var V = arbitrage();
+    if (V) { V.register('data-tf-hidden'); }
+
+    var lignes = corps(table);
+    var scan = colonnes(table, lignes);
+    var cols = scan.cols;
+    if (!cols.length) return null;
+
+    var id = table.id || ('tf-' + Math.random().toString(36).slice(2, 8));
+    table.id = id;
+    var compteur = document.querySelector('[data-tf-count-for="' + id + '"]');
+    var etats = [];
+    var api = {};
+    var defilant = conteneurDefilant(table);
+    var overflowOrigine = null;
+    /* La selection vit HORS des fermetures de colonne (TF-0769) : elle survit a un
+       rafraichissement, se lit par api.etat() et se rejoue par init(table, { etat }). */
+    var selections = {};
+    var desarmerTri = null;
+    var surDocument = function (ev) { if (!table.contains(ev.target)) fermerTout(); };
+
+    /* TF-0430 : etat vide — une ligne de message pleine largeur et la seule action utile a ce
+       moment, « tout reafficher ». Libelle surchargeable par data-tf-vide sur la table. */
+    function ligneVide() {
+      var tb = table.tBodies[0];
+      var tr = tb.querySelector('tr[data-tf-empty]');
+      if (tr) return tr;
+      tr = document.createElement('tr');
+      tr.setAttribute('data-tf-empty', '');
+      tr.className = 'tf-vide';
+      var td = document.createElement('td');
+      td.colSpan = nbColonnes(table);
+      var msg = document.createElement('span');
+      msg.className = 'tf-vide-msg';
+      msg.textContent = table.getAttribute('data-tf-vide') || LIBELLE_VIDE;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'tf-reset';
+      b.textContent = LIBELLE_TOUT;
+      b.addEventListener('click', function () { toutReafficher(); });
+      td.appendChild(msg); td.appendChild(document.createTextNode(' ')); td.appendChild(b);
+      tr.appendChild(td);
+      tb.appendChild(tr);
+      return tr;
+    }
+
+    function toutReafficher() {
+      etats.forEach(function (e) {
+        Object.keys(e.selection).forEach(function (k) { e.selection[k] = true; });
+        var p = document.getElementById(e.bouton.getAttribute('aria-controls'));
+        if (p) Array.prototype.forEach.call(p.querySelectorAll('.tf-opt'), function (cb) { cb.checked = true; });
+      });
+      api.appliquer();
+    }
+
+    function appliquer() {
+      var visibles = 0;
+      lignes.forEach(function (tr) {
+        var ok = etats.every(function (e) {
+          return e.selection[valeur(tr, e.col.index)] !== false;
+        });
+        if (ok) {
+          tr.removeAttribute('data-tf-hidden');
+          /* LA VISIBILITE EST UNE DISJONCTION (TF-0953, 08/09/2026). Passer CE filtre ne suffit
+             pas a rendre une ligne visible : un autre mecanisme DECLARE a l'arbitrage peut
+             encore la masquer. Forcer `display: ''` ici ecrasait ce mecanisme sans un mot — et
+             c'est ce qui a oblige un produit a poser un MutationObserver sur `hidden` pour
+             reappliquer son pliage d'arbre apres chaque passage des filtres, puis a deplier
+             tout l'arbre a chaque changement de filtre pour ne jamais cacher un resultat.
+             Sans arbitrage charge, `masquee` n'est pas consultee et le comportement est
+             exactement celui d'avant. */
+          var autre = V ? V.masquee(tr, 'data-tf-hidden') : false;
+          tr.style.display = autre ? 'none' : '';
+          if (!autre) { visibles++; }
+        }
+        else {
+          tr.setAttribute('data-tf-hidden', ''); tr.style.display = 'none';
+          /* la ligne de détail suit le sort de sa ligne mère : masquée ET repliée */
+          var det = tr.nextElementSibling;
+          if (det && det.hasAttribute('data-detail')) { det.hidden = true; }
+        }
+        if (V) { V.apply(tr); }
+      });
+      etats.forEach(function (e) {
+        var actif = Object.keys(e.selection).some(function (k) { return !e.selection[k]; });
+        e.bouton.classList.toggle('tf-on', actif);
+      });
+      if (compteur) {
+        compteur.textContent = visibles + ' ligne' + (visibles > 1 ? 's' : '') +
+          ' sur ' + lignes.length;
+        compteur.classList.toggle('zero', visibles === 0);
+      }
+      var vide = table.tBodies[0].querySelector('tr[data-tf-empty]');
+      if (visibles === 0 && lignes.length) { ligneVide().hidden = false; }
+      else if (vide) { vide.hidden = true; }
+      if (typeof opts.apresFiltrage === 'function') opts.apresFiltrage(table, visibles, lignes.length);
+    }
+
+    function placer(b, p) {
+      /* TF-0431 : cote d'ouverture selon la place mesuree — a droite du bouton par defaut,
+         aligne sur le bord droit quand le panneau sortirait de la fenetre ou du conteneur. */
+      p.classList.remove('tf-droite');
+      var limite = defilant ? defilant.getBoundingClientRect().right : (window.innerWidth || document.documentElement.clientWidth);
+      var r = b.getBoundingClientRect();
+      var largeur = p.offsetWidth || 240;
+      if (r.left + largeur > limite - 8) p.classList.add('tf-droite');
+      if (defilant && overflowOrigine === null) {
+        overflowOrigine = defilant.style.overflow || '';
+        defilant.setAttribute('data-tf-ouvert', '');
+        defilant.style.overflow = 'visible';
+      }
+    }
+
+    function retirerUI() {
+      etats.forEach(function (e) {
+        if (e.bouton && e.bouton.parentNode) e.bouton.parentNode.removeChild(e.bouton);
+        var p = document.getElementById(e.bouton.getAttribute('aria-controls'));
+        if (p && p.parentNode) p.parentNode.removeChild(p);
+        var th = e.col && e.col.th;
+        if (th) {
+          th.removeAttribute('data-tf-forme');
+          var u = th.querySelector('.tf-unique'); if (u) u.parentNode.removeChild(u);
+        }
+      });
+      etats.length = 0;
+    }
+
+    function construireColonnes() {
+      cols.forEach(function (col, k) {
+        var pid = id + '-tf-' + k;
+        var b = bouton(col, pid);
+        var ui = panneau(col, pid);
+        var selection = selections[col.libelle] || (selections[col.libelle] = {});
+        /* une valeur neuve entre COCHEE (aucun filtre implicite) ; une valeur disparue du
+           tableau sort de la selection, sinon elle masquerait des lignes sans etre visible. */
+        col.valeurs.forEach(function (v) { if (!(v in selection)) selection[v] = true; });
+        Object.keys(selection).forEach(function (v) {
+          if (col.valeurs.indexOf(v) === -1) delete selection[v];
+        });
+        var etat = { col: col, bouton: b, selection: selection };
+        etats.push(etat);
+
+        /* TF-0899 (08/09/2026) — LE PANNEAU A BESOIN D UN ANCETRE POSITIONNE, PAS DE `relative`.
+           `.tf-panel` est un `position:absolute` : il lui faut un ancetre positionne, et le
+           `<th>` est le bon. Mais poser `relative` EN LIGNE ecrasait le geste L29 du socle
+           (`thead.colle th { position: sticky; top: var(--hh) }`) : le `top` restait, applique
+           a un `relative` — donc un DECALAGE PERMANENT de --hh. Mesure Playwright du 07/09 sur
+           quatre tableaux filtrables : `<th>` a 441 px pour 337 attendus (+104 = --hh), une a
+           deux lignes recouvertes a tout defilement, `<th>` a -59 px apres 200 px de
+           defilement — l en-tete ne collait JAMAIS. Un `<th>` deja positionne (sticky, relative,
+           absolute, fixed) ancre DEJA un absolu : on ne pose donc que sur un `<th>` `static`. */
+        var posThCalculee = 'static';
+        try {
+          posThCalculee = (window.getComputedStyle(col.th).position || 'static');
+        } catch (e) { posThCalculee = col.th.style.position || 'static'; }
+        if (posThCalculee === 'static') col.th.style.position = 'relative';
+        /* TF-1052 (08/09) : la forme se publie AUSSI sur le `<th>`, la ou un oracle et un test
+           cherchent la colonne — posee sur le seul panneau, une sonde de l'en-tete lisait `null`
+           sur 9 colonnes sur 9. TF-1051 : une colonne a valeur UNIQUE le dit dans l'en-tete,
+           sans clic — un destinataire a lu vingt fois la meme chaine et conclu a une panne. */
+        col.th.setAttribute('data-tf-forme', col.forme);
+        if (col.forme === 'unique') {
+          var u = document.createElement('span');
+          u.className = 'tf-unique';
+          u.textContent = 'une seule valeur';
+          col.th.appendChild(u);
+        }
+        col.th.appendChild(b);
+        col.th.appendChild(ui.panneau);
+        Array.prototype.forEach.call(ui.options.querySelectorAll('.tf-opt'), function (cb) {
+          cb.checked = selection[cb.value] !== false;
+        });
+
+        b.addEventListener('click', function () {
+          var ouvert = b.getAttribute('aria-expanded') === 'true';
+          fermerTout();
+          if (!ouvert) {
+            b.setAttribute('aria-expanded', 'true'); ui.panneau.hidden = false;
+            placer(b, ui.panneau);
+            ui.recherche.focus();
+          }
+        });
+
+        ui.recherche.addEventListener('input', function () {
+          var q = norm(ui.recherche.value);
+          Array.prototype.forEach.call(ui.options.children, function (lab) {
+            lab.hidden = q !== '' && norm(lab.textContent).indexOf(q) === -1;
+          });
+        });
+
+        /* Tous / Aucun portent sur les valeurs actuellement visibles dans la liste. */
+        function masse(valeurCible) {
+          Array.prototype.forEach.call(ui.options.children, function (lab) {
+            if (lab.hidden) return;
+            var cb = lab.querySelector('.tf-opt');
+            cb.checked = valeurCible;
+            selection[cb.value] = valeurCible;
+          });
+          api.appliquer();
+        }
+        ui.tous.addEventListener('click', function () { masse(true); });
+        ui.aucun.addEventListener('click', function () { masse(false); });
+
+        ui.options.addEventListener('change', function (ev) {
+          var cb = ev.target;
+          if (!cb.classList.contains('tf-opt')) return;
+          selection[cb.value] = cb.checked;
+          api.appliquer();
+        });
+
+        ui.panneau.addEventListener('keydown', function (ev) {
+          if (ev.key === 'Escape') { fermerTout(); b.focus(); }
+        });
+      });
+    }
+
+    function fermerTout() {
+      etats.forEach(function (e) {
+        e.bouton.setAttribute('aria-expanded', 'false');
+        var p = document.getElementById(e.bouton.getAttribute('aria-controls'));
+        if (p) { p.hidden = true; p.classList.remove('tf-droite'); }
+      });
+      if (defilant && overflowOrigine !== null) {
+        defilant.style.overflow = overflowOrigine;
+        defilant.removeAttribute('data-tf-ouvert');
+        overflowOrigine = null;
+      }
+    }
+
+    if (opts.tri !== false && table.getAttribute('data-tf-tri') !== 'off') {
+      desarmerTri = armerTri(table);
+    }
+    construireColonnes();
+    document.addEventListener('click', surDocument);
+
+    table.setAttribute('data-tf-ready', '1');
+    table.__tfApi = api;
+    api.table = table;
+    api.appliquer = appliquer;
+    api.fermerTout = fermerTout;
+    api.toutReafficher = toutReafficher;
+    api.exemptions = scan.exemptions;
+
+    /* TF-0769 — L'ETAT SE LIT ET SE REJOUE. Il est nomme par LIBELLE de colonne, pas par
+       index : une colonne peut se deplacer entre deux rendus, son intitule reste le meme.
+       Ne sont listees que les valeurs EXCLUES — un etat vide veut dire « aucun filtre », ce
+       qui reste vrai si le tableau gagne des valeurs entre deux rendus. */
+    api.etat = function () {
+      var out = { version: 1, colonnes: {} };
+      etats.forEach(function (e) {
+        var exclues = Object.keys(e.selection).filter(function (v) { return e.selection[v] === false; });
+        if (exclues.length) out.colonnes[e.col.libelle] = { exclues: exclues };
+      });
+      return out;
+    };
+
+    api.restaurer = function (etat) {
+      if (!etat || !etat.colonnes) return api;
+      etats.forEach(function (e) {
+        var voulu = etat.colonnes[e.col.libelle];
+        var exclues = (voulu && voulu.exclues) || [];
+        Object.keys(e.selection).forEach(function (v) {
+          e.selection[v] = exclues.indexOf(v) === -1;
+        });
+        var p = document.getElementById(e.bouton.getAttribute('aria-controls'));
+        if (p) Array.prototype.forEach.call(p.querySelectorAll('.tf-opt'), function (cb) {
+          cb.checked = e.selection[cb.value] !== false;
+        });
+      });
+      api.appliquer();
+      return api;
+    };
+
+    /* La page a re-rendu son tableau : on relit ses lignes et ses valeurs, on retire les
+       panneaux devenus faux et on reconstruit SUR LA SELECTION CONSERVEE. Sans cette
+       fonction, la seule voie etait de relire les cases dans le DOM et de les rejouer par
+       des evenements `change` — ce qu'une console livree a effectivement du ecrire. */
+    api.rafraichir = function () {
+      /* Les panneaux partent AVANT le re-balayage : sans cela, le scan relirait ses propres
+         injections comme du contenu de colonne. */
+      retirerUI();
+      lignes = corps(table);
+      var neuf = colonnes(table, lignes);
+      cols = neuf.cols;
+      api.exemptions = neuf.exemptions;
+      construireColonnes();
+      api.appliquer();
+      return api;
+    };
+
+    api.detruire = function () {
+      retirerUI();
+      document.removeEventListener('click', surDocument);
+      if (desarmerTri) { desarmerTri(); desarmerTri = null; }
+      var vide = table.tBodies[0] && table.tBodies[0].querySelector('tr[data-tf-empty]');
+      if (vide && vide.parentNode) vide.parentNode.removeChild(vide);
+      lignes.forEach(function (tr) {
+        tr.removeAttribute('data-tf-hidden');
+        /* Detruire CE composant ne demasque que CE qu'il masquait : une ligne cachee par un
+           autre mecanisme declare le reste. */
+        var encore = V ? V.masquee(tr, 'data-tf-hidden') : false;
+        tr.style.display = encore ? 'none' : '';
+        if (V) { V.apply(tr); }
+      });
+      table.removeAttribute('data-tf-ready');
+      try { delete table.__tfApi; } catch (e) { table.__tfApi = null; }
+    };
+
+    if (opts.etat) api.restaurer(opts.etat);
+    else api.appliquer();
+    return api;
+  }
+
+  function initAll(racine, opts) {
+    var scope = racine || document;
+    return Array.prototype.map.call(
+      scope.querySelectorAll('table[data-filterable]'),
+      function (t) { return init(t, opts); }
+    );
+  }
+
+  root.DigitAITableFilters = { init: init, initAll: initAll, SEUIL_LIGNES: SEUIL_LIGNES,
+                               SEUIL_RECHERCHE: SEUIL_RECHERCHE, nombre: nombre,
+                               comparer: comparer };
+})(typeof window !== 'undefined' ? window : this);
+
+  </script>
+  <script>
+/* find-in-page.js — Recherche dans un conteneur + compteur d'occurrences · socle Digit-AI
+ *
+ * Surligne les correspondances (<mark class="find-hit">) dans un conteneur et affiche
+ * un compteur d'occurrences mis à jour à chaque frappe. Insensible aux accents.
+ *
+ * ⚠️ La classe du surlignage est `find-hit`, JAMAIS `find`. `find` est le nom que prend
+ * naturellement le conteneur du champ de recherche dans un livrable ; quand les deux
+ * partagent la classe, une règle `.find { display: flex }` écrite pour le conteneur
+ * s'applique aussi au <mark> et casse le mot surligné (défaut mesuré en production :
+ * le « s » de « clics » rejeté à 606 px du mot). Les trois classes du composant sont
+ * disjointes : `find-hit` (surlignage), `find-count` (compteur), et ce que le livrable
+ * veut pour son conteneur.
+ *
+ * ⚠️ Viewer-only : le JS ne s'exécute pas à l'export PDF (WeasyPrint). Si le livrable
+ * vise aussi le PDF, prévoir un équivalent statique de l'information.
+ *
+ * Câblage minimal (RA-1, 13/08 : la balise FERMANTE de script est ÉCHAPPÉE en <\/script> dans
+ * ce commentaire — cet asset s'inline (règle A1), et une fermante nue dans un commentaire
+ * fermerait la balise hôte au milieu du fichier : composant tronqué, silencieusement).
+ * TF-1062 (11/09) : ce commentaire l'écrivait lui-même EN CLAIR. Une copie inlinée à la main
+ * était coupée ici, et le câblage ci-dessous devenait du vrai DOM — trois identifiants
+ * dupliqués, que oracle-a11y a comptés à juste titre. Cette explication ne cite plus la
+ * séquence ; self_test.py vérifie qu'aucun asset inlinable ne la porte :
+ *   <input id="find" type="text" placeholder="Rechercher…">
+ *   <div id="findCount" class="find-count" aria-live="polite"></div>
+ *   <div id="content"> … contenu à fouiller … </div>
+ *   <script src="find-in-page.js"><\/script>
+ *   <script>
+ *     DigitAIFindInPage.init(
+ *       document.getElementById('find'),
+ *       document.getElementById('content'),
+ *       document.getElementById('findCount')
+ *     );
+ *   <\/script>
+ *
+ * CSS attendu (à adapter aux tokens du livrable) :
+ *   mark.find-hit { background: #fde9c8; color: inherit; display: inline; padding: 0; margin: 0; }
+ *   .find-count { margin-top: 4px; font-size: .72rem; color: var(--muted); min-height: 1em; }
+ *   .find-count.zero { color: #c0392b; }
+ */
+(function (global) {
+  'use strict';
+
+  // Regex insensible aux accents et à la casse à partir d'une saisie libre.
+  function buildRegex(q) {
+    q = (q || '').trim();
+    if (!q) return null;
+    var map = { a: 'aàâäá', e: 'eéèêëế', i: 'iîïí', o: 'oôöó', u: 'uùûüú', c: 'cç', n: 'nñ', y: 'yÿ' };
+    var pat = '';
+    for (var i = 0; i < q.length; i++) {
+      var ch = q[i], low = ch.toLowerCase();
+      if (map[low]) pat += '[' + map[low] + map[low].toUpperCase() + ']';
+      else if (/[a-z0-9]/i.test(ch)) pat += ch;
+      else pat += '\\' + ch; // échappe les caractères spéciaux regex
+    }
+    try { return new RegExp(pat, 'gi'); } catch (e) { return null; }
+  }
+
+  // Surligne les correspondances dans root et renvoie le nombre d'occurrences.
+  function highlight(root, re) {
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    var nodes = [], n, count = 0;
+    while ((n = walker.nextNode())) nodes.push(n);
+    for (var k = 0; k < nodes.length; k++) {
+      var tn = nodes[k];
+      if (tn.parentNode && /^(MARK|SCRIPT|STYLE)$/.test(tn.parentNode.nodeName)) continue;
+      var txt = tn.nodeValue; re.lastIndex = 0;
+      if (!re.test(txt)) continue; re.lastIndex = 0;
+      var frag = document.createDocumentFragment(), last = 0, m;
+      while ((m = re.exec(txt))) {
+        if (m.index > last) frag.appendChild(document.createTextNode(txt.slice(last, m.index)));
+        var mk = document.createElement('mark');
+        mk.className = 'find-hit';   // jamais 'find' : cf. avertissement en tête de fichier
+        mk.textContent = m[0];
+        frag.appendChild(mk);
+        count++;
+        last = m.index + m[0].length;
+        if (m.index === re.lastIndex) re.lastIndex++; // évite les boucles sur match vide
+      }
+      if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
+      tn.parentNode.replaceChild(frag, tn);
+    }
+    return count;
+  }
+
+  /* Branche la recherche live sur un champ.
+   * input, container, counter : éléments DOM (counter optionnel).
+   * getHTML (optionnel) : fonction renvoyant le HTML pristine courant — à fournir
+   *   quand le conteneur change de contenu (ex. panneau qui charge un autre document).
+   *   Sinon, le HTML initial est capturé une fois à l'init.
+   * Retourne { run, refresh } : run() relance la recherche, refresh() re-capture
+   *   le HTML pristine (mode sans getHTML). */
+  function init(input, container, counter, getHTML) {
+    if (!input || !container) return null;
+    var pristine = getHTML ? null : container.innerHTML;
+    function run() {
+      container.innerHTML = getHTML ? getHTML() : pristine;
+      var re = buildRegex(input.value);
+      if (!re) {
+        if (counter) { counter.textContent = ''; counter.classList.remove('zero'); }
+        return;
+      }
+      var nb = highlight(container, re);
+      if (counter) {
+        counter.textContent = nb === 0 ? 'Aucune occurrence' : (nb + ' occurrence' + (nb > 1 ? 's' : ''));
+        counter.classList.toggle('zero', nb === 0);
+      }
+    }
+    input.addEventListener('input', run);
+    return {
+      run: run,
+      refresh: function () { if (!getHTML) pristine = container.innerHTML; }
+    };
+  }
+
+  global.DigitAIFindInPage = { init: init, buildRegex: buildRegex, highlight: highlight };
+})(window);
+
+  </script>
+  <script>
+    DigitAITableFilters.initAll(document);
+    DigitAIFindInPage.init(document.getElementById('find'), document.querySelector('main'), document.getElementById('findCount'));
+  </script>
+</body>
+</html>

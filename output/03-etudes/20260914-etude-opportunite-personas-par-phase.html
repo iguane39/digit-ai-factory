@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Étude d'opportunité — personas par phase de run — 20260914a</title>
+  <meta name="description" content="Audience : le pilote de l'écosystème, qui décide des mandats, et les forges nommées au verdict. L'étude">
+  <meta name="theme-color" content="#2563EB">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3Ctext x='32' y='44' font-family='Segoe UI,Roboto,sans-serif' font-size='38' font-weight='700' fill='white' text-anchor='middle'%3ED%3C/text%3E%3C/svg%3E">
+  <style>
+    :root{--blue:#2563EB;--bg:#FAFBFF;--surface:#FFFFFF;--ink:#0F172A;--muted:#64748B;
+      --faint:#94A3B8;--line:#E6EAF2;--teal:#0E9488;--teal-fill:#EFFDFB;--amber:#B45309;
+      --amber-fill:#FFFBEB;--r:12px;--r-sm:8px;
+      --head:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;
+      --sans:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+      --mono:"JetBrains Mono",ui-monospace,"Consolas",monospace}
+    *{box-sizing:border-box} html{-webkit-text-size-adjust:100%}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:16px}
+    /* 75-100 % de la fenêtre, toujours : 92vw en dessous de 1826px, plafond confort 1680px, plancher 75vw au-delà */
+    .wrap{max-width:clamp(75vw,1680px,92vw);margin:0 auto;padding:32px 24px 64px}
+    /* page de DONNEES (I1 / L26) : le contenu prend toute la largeur du .wrap (>= 75 vw) — une colonne
+       de 75ch laissait 34 % de l'ecran a 1920 px, mesure Playwright du 07/09 (646 px sur 1920). La classe
+       s'appelle desormais defile et non scroll : le depot ecrit ses noms en francais.
+       ATTENTION : ce bloc vit dans un litteral gabarit JavaScript — aucun accent grave ici. */
+    .colonne{max-width:none;margin:0}
+    h1,h2,h3{font-family:var(--head);font-weight:800;line-height:1.2}
+    h1{font-size:1.7rem;margin:0 0 .2em} h2{font-size:1.25rem;font-weight:700;margin:1.5em 0 .4em}
+    h3{font-size:1.02rem;font-weight:700;margin:1.1em 0 .3em}
+    code{font-family:var(--mono);font-size:.9em}
+    /* L19 autorise nommement la coupure sur un lien : une URL est un identifiant, pas un mot. */
+    a{color:var(--blue);overflow-wrap:anywhere}
+    /* LA MESURE DE LECTURE SE POSE SUR LE CONTENEUR, JAMAIS SUR LE TEXTE (16/09/2026).
+       Mesure de l'oracle de rendu sur une page d'etude : 221 caracteres par ligne a 3840 px
+       pour un plafond de 135 (V18) — l'oeil perd le debut de la ligne suivante. Un premier
+       remede a borne le PARAGRAPHE par max-width : L2 l'a refuse aussitot, et son message
+       dit le remede juste — « poser la mesure de lecture sur le CONTENEUR (.chap.lire), pas
+       sur le texte, ET la declarer par data-mesure-lecture des lors qu'il a des freres plus
+       larges ». *Les deux regles ne se contredisent pas : ensemble, elles decrivent une
+       seule construction*, celle du gabarit de chapitre du socle (E4, token a 1 080 px).
+       Les tableaux restent FRERES du chapitre et gardent toute la largeur offerte. */
+    .meta{color:var(--muted);font-size:.85rem;margin:.2em 0 0}
+    /* CENTRE, ET D'UN SEUL RYTHME. Deux mesures de l'oracle de rendu, le meme jour :
+       · L2 (conteneur) — la colonne de lecture calee A GAUCHE laissait 1 752 px de vide a droite
+         et 0 a gauche, sans voisin : le remede qu'il nomme est de la CENTRER, ou de lui donner un
+         voisin utile. Ici elle a des freres — les tableaux — mais pas a sa hauteur : on centre.
+       · V7 (rythme) — les espaces entre paragraphes mesuraient 85 / 57 / 57 / 54 px : un rythme
+         vertical qui varie sans raison se lit comme un defaut de mise en page. Les marges sont
+         posees une fois, en bas seulement, pour que deux blocs voisins ne cumulent jamais. */
+    .chap.lire{max-width:1080px;margin-inline:auto}
+    .chap.lire>*{margin-top:0;margin-bottom:16px}
+    .chap.lire>h2{margin-top:28px} .chap.lire>h3{margin-top:20px}
+    .chap.lire>*:first-child{margin-top:0}
+    blockquote{margin:14px 0;padding:10px 16px;border-left:3px solid var(--blue);background:var(--surface);border-radius:0 var(--r-sm) var(--r-sm) 0;color:var(--muted)}
+    blockquote p{margin:0}
+    .defile{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin:10px 0}
+    table{border-collapse:collapse;width:100%;font-size:.92rem}
+    th{font-family:var(--head);font-weight:700;text-align:left;padding:9px 12px;border-bottom:2px solid var(--line)}
+    td{padding:7px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+    tr:last-child td{border-bottom:none}
+    ul{margin:.4em 0;padding-left:1.3em}
+    figure{margin:16px 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;overflow-x:auto}
+    figcaption{color:var(--muted);font-size:.85rem;margin-top:8px}
+    svg{max-width:100%;height:auto}
+    footer{margin-top:40px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:14px}
+    /* L19 (TF-0556, 24/08) — LA COUPURE DE MOT QUITTE LA PROSE. La propriete overflow-wrap:anywhere
+       etait posee sur .meta, td et footer : ravageuse sur du texte courant, ou un mot se casse en
+       deux au milieu d'une ligne sans cesure ni trait d'union. Elle ne reste QUE sur les cellules,
+       et seulement sous le palier de repli, la ou le socle l'EXIGE (composants.md section 6) — un
+       identifiant long dans une cellule etroite doit pouvoir se couper, une phrase jamais.
+       ATTENTION : ce bloc vit dans un litteral gabarit JavaScript. Aucun accent grave ici, il
+       fermerait la chaine et casserait tout ce qui suit — defaut commis en ecrivant ce commentaire. */
+    /* SUR MOBILE, L'EN-TETE AUSSI PASSE EN BLOC (16/09/2026). La regle ne convertissait que les
+       cellules de donnees : la ligne d'EN-TETE, restee en cellules de tableau, continuait d'imposer
+       sa largeur, et l'oracle mesurait un tableau a 441 px de bord droit pour une fenetre de
+       390 px (V1). Un conteneur defilant ne suffit pas a eteindre V1 — la regle mesure le bord
+       droit de chaque element, defilant ou non, et elle a raison : une page qui se lit en poussant
+       le doigt de cote se lit mal. */
+    /* CE QUI NE SE COUPE PAS POUSSE LA PAGE — ET LA COUPURE A UN PERIMETRE (16/09/2026).
+       Deux mesures sur une etude qui cite beaucoup de chemins : a 768 px un tableau sortait a
+       799 px, et a 390 px le DOCUMENT mesurait 419 px de large. La cause est un jeton insecable
+       qui impose sa longueur a sa cellule, donc au tableau, donc a la page.
+       PREMIER REMEDE, REFUSE DANS LA MINUTE : autoriser la coupure sur les cellules. L19 l'a
+       rejete, et elle a raison — un mot francais s'y casse n'importe ou (« Utilisabl/e »), et la
+       regle reserve nommement la coupure a code, pre, aux liens et aux cellules d'IDENTIFIANTS.
+       REMEDE TENU : la coupure ne touche que les fragments de CODE, ou vivent justement les
+       chemins et les identifiants qui poussaient la page. La prose n'est jamais touchee. */
+    code{overflow-wrap:anywhere}
+    @media (max-width:640px){.wrap{padding:16px 12px 48px} h1{font-size:1.3rem}
+      .defile td,.defile th{display:block;overflow-wrap:anywhere}
+      .defile table{width:100%} .chap.lire{max-width:none}}
+    @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+    @page{margin:14mm}
+    @media print{.defile{overflow:visible;border:none} figure{break-inside:avoid} tr{break-inside:avoid} body{background:#fff}}
+  </style>
+  <style>
+/* table-filters.css — habillage charté du composant de filtres de colonne (D-12).
+   TF-0176 (13/08) : un composant se livre AVEC son CSS — livré nu, il sort en rendu brut
+   navigateur chez tous ses hôtes (constaté sur le dashboard forge-tests du 13/08, refusé
+   par son destinataire). À inliner dans le bloc de style de la page, à côté du script du
+   composant — JAMAIS de balise écrite en toutes lettres dans ce commentaire (même famille
+   de piège que RA-1 : un « script » ouvrant en commentaire fausse toute lecture paresseuse
+   du document). Ne consomme que les tokens :root du socle (--surface, --ink, --muted,
+   --line, --blue, --r-sm) : aucune couleur en dur, les deux thèmes sont servis. TF-1059
+   (11/09) : deux couleurs en dur restaient (texte du bouton actif, repli du survol), treize
+   espacements sortaient de l'échelle 4pt et quatre anneaux de focus n'étaient pas prescrits —
+   corrigés ici, à la source, plutôt que dans chaque produit. */
+
+.tf-btn {
+  font: inherit; font-size: .72rem; line-height: 1;
+  color: var(--blue); background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 4px 8px; margin-left: 8px; cursor: pointer; vertical-align: middle;
+}
+.tf-btn:hover { border-color: var(--blue); }
+.tf-btn:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+/* filtre ACTIF : l'état se voit sans ouvrir le panneau */
+.tf-btn.tf-on { background: var(--blue); color: var(--surface); border-color: var(--blue); }
+
+.tf-panel {
+  position: absolute; z-index: 30; top: calc(100% + 4px); left: 0;
+  min-width: 230px; max-width: 320px; max-height: 320px; overflow: auto;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .16);
+  padding: 12px; text-align: left; text-transform: none;
+  font-family: var(--sans); font-size: .85rem; font-weight: 400;
+  letter-spacing: normal; cursor: default;
+}
+.tf-search {
+  width: 100%; font: inherit; color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 8px 12px; margin: 0 0 8px;
+}
+.tf-search:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+.tf-actions {
+  display: flex; gap: 16px; border-bottom: 1px solid var(--line);
+  padding-bottom: 8px; margin-bottom: 8px;
+}
+.tf-actions button {
+  font: inherit; font-weight: 600; color: var(--blue);
+  background: none; border: none; cursor: pointer; padding: 0 4px;
+}
+.tf-actions button:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+.tf-opts { display: flex; flex-direction: column; gap: 4px; }
+.tf-opts label {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px; border-radius: 4px; cursor: pointer;
+}
+.tf-opts label:hover { background: var(--bg); }
+.tf-opts input[type="checkbox"] { accent-color: var(--blue); }
+/* TF-0782 (02/09) : la cardinalite decide de la FORME du panneau, pas de son existence — et
+   une forme qui change sans le dire est une affordance muette. Le panneau ouvert sur sa
+   recherche (plus de 15 valeurs) ou reduit a une valeur unique porte sa note. */
+.tf-forme-note { margin: 0 0 8px; color: var(--muted); font-size: .78rem; font-style: italic; }
+/* TF-1051 (08/09) : une colonne a valeur UNIQUE le dit dans son en-tete, la ou on la lit —
+   repliee dans le panneau, la note n'etait vue par personne et le lecteur concluait a une panne. */
+.tf-unique {
+  display: block; margin-top: 4px; color: var(--muted);
+  font-size: .72rem; font-weight: 400; font-style: italic; text-transform: none;
+}
+
+/* TF-0431 : panneau aligne a droite quand la place manque (choisi par le composant) ;
+   le conteneur defilant porteur d'un panneau ouvert ne rogne plus (data-tf-ouvert). */
+.tf-panel.tf-droite { left: auto; right: 0; }
+[data-tf-ouvert] { overflow: visible !important; }
+
+/* TF-0430 : etat vide — un filtre qui ne laisse rien le DIT dans le tableau, et offre la
+   seule action utile a ce moment. */
+tr[data-tf-empty] td {
+  padding: 16px 12px; text-align: center; color: var(--muted);
+  font-style: italic; border-bottom: 1px solid var(--line);
+}
+.tf-reset {
+  font: inherit; font-style: normal; font-weight: 600; color: var(--blue);
+  background: none; border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 4px 12px; margin-left: 12px; cursor: pointer;
+}
+.tf-reset:hover { border-color: var(--blue); }
+.tf-reset:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+
+@media print { .tf-btn, .tf-panel, tr[data-tf-empty] { display: none; } }
+
+    .find-bar{display:flex;flex-direction:column;gap:2px;margin:0 0 20px}
+    .find-bar label{font-size:.78rem;color:var(--muted);font-weight:600}
+    .find-bar input{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)}
+    .find-count{margin-top:4px;font-size:.72rem;color:var(--muted);min-height:1em}
+    .find-count.zero{color:#B42318}
+    .tf-count{margin:6px 0 18px;font-size:.72rem;color:var(--muted);min-height:1em}
+    mark.find-hit{background:var(--amber-fill);color:var(--ink);border-radius:2px;display:inline;padding:0;margin:0}
+    @media print{tr[data-tf-hidden]{display:table-row !important}.find-bar{display:none}}
+  </style>
+</head>
+<body>
+  <div class="wrap"><div class="colonne">
+    <header class="chap lire" data-mesure-lecture>
+      <h1>Étude d'opportunité — personas par phase de run — 20260914a</h1>
+      <p class="meta">rôle : étude d'opportunité (instruction entre candidat et décidé) — personas apportant des points de vue ou des façons d'opérer différents à chaque phase d'un run ; issue du prompt réécrit par l'analyse L99 du 14/09/2026 et de la décision humaine D-1 (a) du même jour (« 1a ») · sources de vérité : <code>[output/03-etudes/20260914-L99-personas-par-phase.md (chapitre 8, prompt réécrit), output/03-etudes/20260914-personas-mesure-protocole.md (figé 09:12), output/03-etudes/20260914-personas-mesure-echantillon.md (figé 09:27, retrait après reconstitution), output/03-etudes/20260813-etude-personas-agents.md, gabarits/RESTITUTION.md (l. 133, l. 534-536), gabarits/ETUDE-OPPORTUNITE.md, oracles/oracle-etude-opportunite.mjs (E1-E10), REGLES-PROJET.md (R-31 l. 319-331), CLAUDE.md du pilot (§ Lancement d'un run), ~/.claude/skills/experts-forge/SKILL.md (l. 17-20) et references/registre-experts.md (17 fiches ok) et references/schema-fiche-expert.md, ~/.claude/skills/contre-expertise/SKILL.md (l. 34-51), ~/.claude/skills/forge-agents/SKILL.md (description), ~/.claude/skills/digit-ai-propale/SKILL.md (l. 37-40), ~/.claude/skills/quality-oracles/references/registre-oracles.md (entrée oracle-judge), dix sources externes datées (section 3), lots de retours de input/00-retours/ (données, lecture seule)]</code> · vérifié le 2026-09-14</p>
+    </header>
+    <main>
+    <div class="find-bar">
+      <label for="find">Rechercher dans le document</label>
+      <input id="find" type="search" placeholder="Rechercher dans le document…">
+      <p id="findCount" class="find-count" aria-live="polite"></p>
+    </div>
+
+<section class="chap lire" data-mesure-lecture>
+<p>Audience : le pilote de l'écosystème, qui décide des mandats, et les forges nommées au verdict. L'étude instruit la demande du 14/09/2026 telle que réécrite par l'analyse L99 du même jour, sous la décision humaine prise à sa lecture : « 1a », soit D-1 (a), la lecture reconstruite de l'intention et les sept écarts à la lettre validés, le prompt réécrit exécuté tel quel.</p>
+<p><strong>Ce que le lecteur va apprendre.</strong> Aucun des trois personas mesurés ne franchit le seuil fixé avant la mesure. La relecture de référence, sans persona, retrouve 2 défauts échappés sur 9 ; le meilleur persona en retrouve 3, là où il en fallait 4. Le seul gain tient à un défaut de synthèse de fin de tour, et il repose sur deux étiquettes où le juge a lui-même hésité. Surtout, 6 défauts sur 9 n'ont été vus par aucune des quatre relectures : ils ne se voient qu'en exécutant, en rendant ou en connaissant le contexte de diffusion, et aucun rôle ne remplace cette mesure. Le verdict retient le statu quo pour les personas, sous réserve, et propose de garder l'échantillon et son protocole comme banc rejouable pour mesurer tout futur mécanisme de relecture.</p>
+<p><strong>Décision humaine du 14/09/2026</strong> (« 2a &amp; 3a », synthèse <code>20260914b</code>) : le statu quo est adopté, aucun persona n'est construit ; le banc est accepté (TF-1073) et vit sous <code>oracles\banc-defauts-echappes\</code>, ses livrables reconstitués dans le canal confidentiel.</p>
+<h3>Seuil de déclenchement (vérifié avant écriture)</h3>
+<p>Franchi sur deux critères. <strong>Objet durable</strong> : toute option autre que le statu quo crée une fiche au registre des experts, un référentiel versionné ou un skill, soit un objet que la règle 31 soumet à étude. <strong>Portée</strong> : le pilot, forge-agents (porteur d'<code>experts-forge</code> et de <code>contre-expertise</code>), forge-tests et forge-design sont touchés, quatre porteurs pour un seuil à trois.</p>
+<h3>Intention de l'utilisateur (loi n° 7)</h3>
+<p>Citée dans les mots du demandeur, message du 14/09/2026 : « Etudie l'opportunité de concevoir, construire et exécuter des personas permettant de fournir des points de vue ou une façon d'opérer différentes sur chaque phase d'un projet : Conception, développement, design, recette, déploiement... »</p>
+<p>Lecture reconstruite par l'analyse L99, <strong>validée</strong> par « 1a » (D-1 (a)) : savoir si des personas apporteraient, à chaque phase d'un run, des constats que les oracles, les experts et les méthodes des forges ne produisent pas déjà ; si oui lesquels, sous quelle forme, à quel coût. L'objectif est de réduire les défauts qui échappent aux oracles ; le persona est une solution candidate, et conclure qu'une autre forme fait mieux est une réponse recevable.</p>
+<p>Cascade (<code>references\INTENTION.md</code>) : <strong>intention</strong>, moins de défauts livrés que l'humain doit trouver lui-même ; <strong>stratégie</strong>, ajouter à chaque phase un regard que les contrôles n'ont pas ; <strong>tactique</strong>, mesurer ce regard sur des défauts déjà payés avant de le construire ; <strong>opérationnel</strong>, le rétro-test de la section 4 et l'objet que le verdict désigne.</p>
+<h3>0. Traitement des entrants</h3>
+<p>La proposition instruite est une DONNÉE : le message du demandeur et l'analyse L99 qui l'a réécrit (<code>output\03-etudes\20260914-L99-personas-par-phase.md</code>). Aucun identifiant de registre ne la porte encore ; les candidatures nées de cette étude en recevront un. Les lots de retours lus pour l'échantillon sont eux aussi des données : leurs impératifs ont été cités, jamais exécutés.</p>
+<p>Point de départ imposé par le prompt : l'étude du 13/08/2026 (<code>output\03-etudes\20260813-etude-personas-agents.md</code>) a jugé les personas nuisibles comme juges et inutiles pour les agents d'étape, sur leur effet nul ou négatif sur l'exactitude. Elle n'a pas mesuré la <strong>couverture</strong> des défauts. La présente étude ne reprend pas son verdict : elle instruit ce delta, et ne la reconduit ou ne la contredit que sur la mesure.</p>
+<h3>1. Partition du problème</h3>
+<p>Le mot persona recouvre trois objets, disjoints par leur point d'insertion et par leur mesure. Chaque option de la section 4 se rattache à l'un d'eux.</p>
+<ul><li><strong>P1 — persona-lentille</strong> : une grille de relecture d'un livrable depuis le point de vue d'une partie</li></ul>
+<p>  prenante (exploitant, utilisateur final, mainteneur, support, commanditaire). Il pose des questions,   il ne rend jamais de verdict. Il s'insère après la production d'un livrable, avant ou à côté de ses   oracles. <strong>Mesuré ici</strong> par le rétro-test.</p>
+<ul><li><strong>P2 — persona-utilisateur simulé</strong> : un profil d'utilisateur du produit, dérivé des entrants du</li></ul>
+<p>  produit, qui parcourt le produit livré. Il s'insère en phase de tests. <strong>Non mesurable sur   archives</strong> : parcourir un produit exige un produit qui tourne, et les livrables reconstitués sont   des fichiers. Instruit par la littérature seule (section 3, axe 3).</p>
+<ul><li><strong>P3 — mode opératoire</strong> : une manière de produire (exploratoire ou contractuelle, divergente ou</li></ul>
+<p>  convergente) appliquée par l'agent d'une phase. Il change la production, pas sa relecture.   L'étude du 13/08 en couvre la part « rôle incarné de l'agent d'étape » ; le reste est instruit par la   littérature seule (section 3, axe 1).</p>
+<p>Phases, dans l'ordre de la factory (<code>CLAUDE.md</code>, § Lancement d'un run) : conception, design, development, tests (dont la revue graphique 5 bis), MEP ; plus les forges transverses mobilisées (ops, data, websec, seo-geo). La restitution de fin de tour, livrable du pilot, est traitée comme une phase de plus. « Déploiement » se lit MEP : forge-ops outille, le GO reste humain.</p>
+<h3>2. Non-recouvrement contre l'existant</h3>
+<p><strong>Mode de lecture</strong> : une ligne par mécanisme existant qui pourrait déjà porter le point de vue demandé ; la citation localise ce qu'il fait, la dernière colonne dit s'il recouvre la partition P1, P2 ou P3. Les lignes vont du plus proche au plus éloigné.</p>
+</section>
+<div class="defile"><table id="tab-1" data-filterable><thead><tr><th scope="col">Existant examiné</th><th scope="col">Citation</th><th scope="col">Verdict (recouvre / ne recouvre pas)</th></tr></thead><tbody><tr><td>Étude du 13/08/2026</td><td><code>20260813-etude-personas-agents.md</code> §3 : personas « nuisibles » pour le pilot en juge, « inutiles » pour les agents d'étape ; §1 : exactitude, jamais la couverture</td><td>recouvre P3 (rôle incarné de l'agent) ; ne recouvre pas P1 : la couverture n'y est pas mesurée</td></tr><tr><td>Consigne de restitution</td><td><code>gabarits\RESTITUTION.md</code> l. 133 : « un persona ne remplace pas un oracle exécuté » ; l. 534-536 : ne jamais « inventer une posture […] pour juger le livrable »</td><td>ne recouvre pas : elle borne tout persona (jamais de verdict), elle n'en fournit aucun</td></tr><tr><td><code>experts-forge</code></td><td><code>SKILL.md</code> l. 17-20 : « Un expert qui ne change pas matériellement une réponse n'est pas un expert », admission par fixture A/B ; <code>registre-experts.md</code> : 17 fiches en statut <code>ok</code>, toutes des domaines de contenu (data, SEO, accessibilité, ops cloud…)</td><td>recouvre le <strong>mécanisme</strong> de P1 (fiche déclarative, épreuve A/B) ; ne recouvre pas son <strong>contenu</strong> : aucune fiche ne porte le regard d'une partie prenante ni ne se rattache à une phase</td></tr><tr><td><code>contre-expertise</code></td><td><code>SKILL.md</code> l. 47-51 : angle A3 « jouer le contradicteur — hypothèses fragiles, scénarios d'échec, au moins 1 alternative crédible comparée »</td><td>ne recouvre pas : un seul regard (le contradicteur), sur invocation explicite, jamais par phase</td></tr><tr><td><code>forge-agents</code></td><td><code>SKILL.md</code>, description : « dérive les agents spécialisés justifiés (outils, arbitre ou parallélisme distincts) »</td><td>ne recouvre pas : il découpe un workflow en agents, il ne fournit pas de point de vue de relecture</td></tr><tr><td>Revue graphique aval de forge-design</td><td><code>CLAUDE.md</code> du pilot, étape 5 bis : « revue graphique d'implémentation (forge-design, mode aval) »</td><td>recouvre P1 pour la seule phase design et le seul regard graphique</td></tr><tr><td>Personas de <code>digit-ai-propale</code></td><td><code>SKILL.md</code> l. 37-40 : bloc personas « dérivé des entrants uniquement — persona introuvable = question à l'étape 1, jamais d'invention »</td><td>ne recouvre pas : personas de rédaction commerciale ; fournit la règle de dérivation que P2 doit reprendre</td></tr><tr><td>Juge <code>oracle-judge</code> de <code>quality-oracles</code></td><td><code>registre-oracles.md</code>, entrée <code>oracle-judge</code> : juge LLM armé d'une rubrique, sollicité quand aucun oracle déterministe ne couvre le domaine</td><td>ne recouvre pas : il juge un livrable contre une rubrique, il ne cherche pas de défaut depuis un rôle</td></tr><tr><td>Boucle de fermeture de forge-tests</td><td><code>CLAUDE.md</code> du pilot, étape 5 : « audit forge-tests + boucle de fermeture bornée (≤ 5 cycles, G-2 absolue) »</td><td>ne recouvre pas : elle ferme les écarts que les tests mesurent, elle n'ajoute pas de regard</td></tr></tbody></table></div>
+<p class="tf-count" data-tf-count-for="tab-1" aria-live="polite"></p>
+<section class="chap lire" data-mesure-lecture>
+<h3>3. État de l'art daté</h3>
+<p>Dix sources publiées après le 14/09/2024, ouvertes le 14/09/2026 par une recherche déléguée (modèle Sonnet, défaut de routage du contrat d'interface §4, escalade : aucune), chacune lue sur sa page arXiv, son HTML ou son billet. Limite déclarée : pour PRISM, seul le résumé a pu être lu, pas ses tableaux ; ConvApparel est un billet technique, sans preprint évalué identifié.</p>
+<p><strong>Mode de lecture</strong> : une ligne par source, groupées par axe ; la dernière colonne donne le résultat chiffré quand il existe. Les axes suivent la partition : l'axe 2 instruit P1, l'axe 3 instruit P2, l'axe 1 instruit P3.</p>
+</section>
+<div class="defile"><table id="tab-2" data-filterable><thead><tr><th scope="col">Axe</th><th scope="col">Source (date, localisateur)</th><th scope="col">Résultat principal</th></tr></thead><tbody><tr><td>1 — exactitude</td><td>Hu, Rostami, Thomason, *PRISM*, 2026-03-19, arXiv 2603.18507</td><td>le persona expert améliore l'alignement sur préférence humaine et sécurité ; l'exactitude se maintient seulement quand un routage le retire des tâches discriminantes</td></tr><tr><td>1 — exactitude</td><td>Xiao et al., *When Does Persona Prompting Actually Help?*, 2026-05-28, arXiv 2605.29420</td><td>le rôle rend les réponses plus exhaustives et plus jargonneuses (profondeur d = 0,54) et moins claires (p &lt; 0,001), sans gain d'exactitude (écart d'environ 1 %)</td></tr><tr><td>1 — exactitude</td><td>Li, Yang, Mehta, Onoue, *Persona Non Grata*, 2026-04-13, arXiv 2604.11120</td><td>le classement d'un même persona s'inverse selon la méthode (taux d'attaque 0,038 en prompt, 0,818 en pilotage d'activation) : l'effet persona dépend de la façon de le mesurer</td></tr><tr><td>2 — couverture</td><td>Lu et al., *Towards Practical Defect-Focused Automated Code Review*, 2025-05-28, arXiv 2505.17928</td><td>ablation : augmenter le nombre de relecteurs « lifts key bug inclusion but raises false alarms » ; gain global de 2× sur un modèle seul</td></tr><tr><td>2 — couverture</td><td>Bharadwaj, Karanam, Kennady, *Multi-Agent LLM Committees for Autonomous Software Beta Testing*, 2025-12-21, arXiv 2512.21352</td><td>environ 12 % seulement des bogues sont trouvés par plus d'un persona : la diversité des rôles élargit la couverture ; pas d'ablation croisée rôle × taille du comité</td></tr><tr><td>2 — couverture</td><td>Agarwal, *Refute-or-Promote*, 2026-04-22, arXiv 2604.19049</td><td>des rôles adverses éliminent 79 à 83 % des candidats faux avant divulgation ; l'auteur déclare n'avoir isolé aucun mécanisme par ablation</td></tr><tr><td>3 — utilisateurs simulés</td><td>Zhou et al., *Mind the Sim2Real Gap in User Simulation for Agentic Tasks*, 2026-07-31 (v2), arXiv 2603.11245</td><td>31 simulateurs contre 451 humains : succès des agents gonflé de 14,2 points par les simulateurs ; un modèle plus fort ne simule pas mieux</td></tr><tr><td>3 — utilisateurs simulés</td><td>Seshadri et al., *Lost in Simulation*, 2026-01-23, arXiv 2601.17087</td><td>calibration systématiquement faussée ; écart de 11,2 points selon le dialecte simulé</td></tr><tr><td>3 — utilisateurs simulés</td><td>Bougie et al., *PerceptUI*, 2026-06-04, arXiv 2606.05697</td><td>corrélation avec des humains ρ = 0,703 sur une tâche, mais 44,3 % d'exactitude sous le hasard (50 %) sur une autre ; biais démographiques déclarés par les auteurs</td></tr><tr><td>3 — utilisateurs simulés</td><td>Meshi, Goldman et al., *ConvApparel*, 2026-04-09, billet Google Research</td><td>un discriminateur reconnaît « nearly all » les conversations simulées : l'écart de réalisme persiste même pour les meilleurs simulateurs</td></tr></tbody></table></div>
+<p class="tf-count" data-tf-count-for="tab-2" aria-live="polite"></p>
+<section class="chap lire" data-mesure-lecture>
+<p>Analogue ancien, signalé comme tel et hors du compte des dix : Basili, Green, Laitenberger, Lanubile, Shull, Sørumgård, Zelkowitz, *The Empirical Investigation of Perspective-Based Reading*, Empirical Software Engineering, vol. 1, p. 133-164, 1996 (notice Springer, DOI 10.1007/BF00368702). Des équipes humaines lisant une spécification par perspectives (concepteur, testeur, utilisateur) y obtiennent une couverture significativement meilleure ; le chiffre individuel (32,14 % contre 24,64 %) vient d'un rapport technique des mêmes auteurs, daté 1999 par son hébergeur : <strong>provenance non tranchée</strong>.</p>
+<p><strong>Ce que la littérature dit, par axe.</strong> Sur l'<strong>exactitude</strong> (axe 1), rien depuis mars 2026 ne retourne le verdict du 13/08 : le rôle déplace le style, pas la justesse (preuve moyenne). Sur la <strong>couverture</strong> (axe 2), deux sources convergent vers un gain de rappel par diversité de rôles, payé en fausses alertes, et une seule l'isole par ablation (preuve moyenne sur l'existence du gain, faible sur sa cause). Sur les <strong>utilisateurs simulés</strong> (axe 3), quatre sources convergent : l'écart aux vrais utilisateurs est systématique et chiffré, et rien ne le comble encore (preuve forte sur le biais).</p>
+<h3>4. Options — jeu fermé O0-O4</h3>
+<h4>Ce que la mesure a donné</h4>
+<p>La mesure suit le protocole figé le 14/09/2026 à 09:12 (<code>output\03-etudes\20260914-personas-mesure-protocole.md</code>), dans cet ordre horodaté : échantillon à 09:27, relecture de référence à 10:04:21, fiches à 10:06:15, passes à 10:17:59, puis jugement à l'aveugle. Chaque relecture a tourné dans une session neuve (modèle Sonnet) qui ne voyait que les neuf livrables reconstitués. Un juge distinct a étiqueté les constats sans savoir de quelle relecture venait chaque liste. Seuil fixé d'avance : un persona est retenu s'il retrouve au moins 2 livrables de plus que la référence, soit 4 sur 9, sans dépasser le double de ses constats faux, soit 2.</p>
+<p><strong>Mode de lecture</strong> : une ligne par relecture ; le rappel compte les livrables où au moins un constat désigne le défaut échappé ; R, A et F sont les étiquettes du juge (retrouvé, autre défaut réel, faux ou générique) ; la dernière colonne applique le seuil.</p>
+</section>
+<div class="defile"><table><thead><tr><th scope="col">Relecture</th><th scope="col">Rappel (sur 9)</th><th scope="col">Livrables retrouvés</th><th scope="col">R / A / F</th><th scope="col">Tokens</th><th scope="col">Au seuil</th></tr></thead><tbody><tr><td>Référence, sans persona</td><td>2</td><td>logos, chaînes traduites</td><td>5 / 37 / 1</td><td>208 372</td><td>référence</td></tr><tr><td>Exploitant</td><td>1</td><td>chaînes traduites</td><td>2 / 52 / 0</td><td>191 793</td><td>non : rappel 1 &lt; 4</td></tr><tr><td>Utilisateur final</td><td>3</td><td>synthèse, logos, chaînes traduites</td><td>8 / 52 / 3</td><td>181 825</td><td>non : rappel 3 &lt; 4, faux 3 &gt; 2</td></tr><tr><td>Mainteneur</td><td>3</td><td>synthèse, logos, chaînes traduites</td><td>5 / 50 / 0</td><td>184 642</td><td>non : rappel 3 &lt; 4</td></tr></tbody></table></div>
+<section class="chap lire" data-mesure-lecture>
+<p>Quatre faits en sortent.</p>
+<ul><li><strong>Aucun persona n'atteint le seuil.</strong> Le meilleur rappel est de 3 sur 9, pour 4 exigés.</li><li><strong>Le seul gain porte sur un défaut, et il est fragile.</strong> E-04 (synthèse de fin de tour du pilot,</li></ul>
+<p>  action laissée au développeur sans chemin ni commande) est retrouvé par l'utilisateur final et le   mainteneur, pas par la référence. Ces deux étiquettes R sont précisément celles où le juge déclare   avoir hésité avec A : sans elles, les deux personas tombent au niveau de la référence.</p>
+<ul><li><strong>Les défauts faciles sont vus par tous, les difficiles par personne.</strong> E-06 (logos, variante</li></ul>
+<p>  blanche identique à la variante couleur) et E-07 (chaînes traduites, fautes d'accord après   substitution) sont retrouvés par trois ou quatre relectures. Six défauts ne le sont par aucune :   E-01 (fiche d'accès de test, identifiants connus sur une qualification publique), E-02 (canevas de   fiche sécurité, sans champ sur l'audience admise), E-03 (squelette HTML, sommaire sans règle de   style), E-05 (porte de fraîcheur, contrôle limité à la page d'accueil), E-08 (installateur du   hameçon, cas limite : tables désignées par un emplacement deviné) et E-15 (badges de statut, fonds   trop proches pour être distingués). Le juge note quatre constats « proches » sur deux d'entre eux   (E-01 et E-08), aucun ne les désignant.</p>
+<ul><li><strong>Plus de regards, plus de bruit.</strong> L'union des trois personas retrouve 3 livrables, autant que</li></ul>
+<p>  le meilleur persona seul. La relecture qui produit le plus de constats (utilisateur final, 63) est   aussi celle qui en produit le plus de faux (3), comme l'ablation de Lu et al. (2025) le mesure en   revue de code. Trois lentilles coûtent 558 260 tokens, soit 2,7 fois la référence, pour au plus un   livrable de plus.</p>
+<p>Ce que ces six défauts ont en commun est la vraie leçon de la mesure : ils ne se lisent pas, ils se constatent. Un sommaire sans règle de style se voit au rendu, une distance entre couleurs se calcule, un contrôle limité à une page se prouve en déployant une autre page, une qualification publique se sait par son adresse. Le regard qui manque à ces phases est <strong>exécuté</strong>, pas incarné, et c'est le domaine des oracles de <code>quality-oracles</code> (règle §4 : domaine sans oracle, en définir un).</p>
+<p>Un constat n'a pas été étiqueté par le juge (le sixième du mainteneur sur les logos) : 215 constats jugés sur 216. Il ne peut pas changer le verdict, puisque le mainteneur a déjà retrouvé ce défaut et qu'un F de plus le laisserait sous le plafond.</p>
+<h4>Les options</h4>
+<p><strong>Mode de lecture</strong> : une ligne par option du jeu fermé ; la colonne « sur la mesure » dit ce que les chiffres ci-dessus en font. Les options vont de la plus légère à la plus lourde.</p>
+</section>
+<div class="defile"><table><thead><tr><th scope="col">Option</th><th scope="col">Contenu</th><th scope="col">Coût</th><th scope="col">Ce qu'elle exclut</th><th scope="col">Sur la mesure</th></tr></thead><tbody><tr><td><strong>O0 — ne rien faire</strong></td><td>le verdict du 13/08 tient et s'étend à la couverture : aucun persona n'est construit</td><td>nul</td><td>un regard de partie prenante outillé</td><td><strong>retenue</strong> : aucun persona n'atteint le seuil fixé d'avance</td></tr><tr><td><strong>O1 — fiches de point de vue dans <code>experts-forge</code></strong></td><td>trois fiches « exploitant », « utilisateur final », « mainteneur » admises par l'épreuve A/B du registre</td><td>moyen × court, plus environ 180 000 tokens par relecture et par phase</td><td>rien d'autre : le mécanisme existe</td><td><strong>réfutée</strong> : cette mesure EST l'épreuve A/B que l'admission exigerait, et aucune fiche ne change matériellement le rappel ; la loi du registre les refuse d'elle-même</td></tr><tr><td><strong>O2 — grille de lentilles par phase</strong></td><td>référentiel versionné de questions par phase, branché dans <code>contre-expertise</code> ou dans la boucle de fermeture de forge-tests</td><td>moyen × moyen, plus 2,7 fois les tokens d'une relecture à chaque phase</td><td>l'épreuve A/B : la grille entrerait sans admission</td><td><strong>réfutée</strong> : même contenu que O1 sans l'épreuve, pour au plus un livrable gagné et plus de faux constats</td></tr><tr><td><strong>O3 — utilisateur simulé en tests</strong></td><td>profils dérivés des entrants, qui parcourent le produit livré chez forge-tests</td><td>complexe × long (un banc de parcours à construire)</td><td>un produit sans environnement de test exécutable</td><td><strong>réfutée à ce stade</strong> : non mesurable sur archives, et l'axe 3 chiffre un écart systématique aux vrais utilisateurs (Zhou et al. 2026 : succès gonflé de 14,2 points) ; réouverture si un banc de parcours réels existe</td></tr><tr><td><strong>O4 — skill neuf</strong></td><td>un skill « personas de phase »</td><td>complexe × moyen</td><td>la réutilisation d'<code>experts-forge</code></td><td><strong>réfutée</strong> : aucun verbe outillé absent ailleurs (règle 31, critère 1), et O1 à O3 sont réfutées par la mesure</td></tr></tbody></table></div>
+<section class="chap lire" data-mesure-lecture>
+<p>La partition P3 (mode opératoire de l'agent de phase) n'a pas d'option propre : elle reste sous le verdict du 13/08 et de l'axe 1 (le rôle déplace le style, pas la justesse), aucune mesure neuve ne l'ayant rouverte.</p>
+<h3>5. Verdict</h3>
+<ul><li><strong>Option retenue : O0</strong>, sous réserve. Aucun persona n'est construit ; le verdict du 13/08 s'étend</li></ul>
+<p>  de l'exactitude à la couverture des défauts échappés.</p>
+<ul><li><strong>Coût</strong> : nul pour O0. Coût de l'étude elle-même : complexe × moyen, 1 920 959 tokens délégués à</li></ul>
+<p>  neuf sessions Sonnet (recherche, sélection, reconstitution, quatre relectures, fiches, jugement).</p>
+<ul><li><strong>Réserves</strong>, qui font du verdict un verdict sous réserve : 9 livrables au lieu de 10 ; phase de</li></ul>
+<p>  tests absente de l'échantillon ; fiches sans corpus, choix fait pour que la doctrine née de ces   défauts ne les fasse pas retrouver après coup ; un seul juge, du même modèle que les relecteurs ;   deux étiquettes hésitantes qui portent tout le gain observé ; un constat non jugé.</p>
+<ul><li><strong>Candidature émise</strong> : <code>input\01-candidatures\personas-banc-defauts-echappes-20260914a.tf.jsonl</code>.</li></ul>
+<p>  Ce n'est pas un persona : elle propose de garder l'échantillon, son protocole et ses quatre   relectures comme <strong>banc rejouable</strong>, pour mesurer tout futur mécanisme de relecture (persona,   expert, juge) contre les mêmes défauts déjà payés. La décision reste humaine.</p>
+<ul><li><strong>Plan de revue</strong> : 2026-12-14. Rejouer le banc avec au moins dix nouveaux défauts échappés</li></ul>
+<p>  remontés d'ici là ; rouvrir O1 si un persona y franchit le seuil.</p>
+<ul><li><strong>Test rétro</strong> : l'élément opérationnel (aucun persona construit, banc proposé) remonte à la</li></ul>
+<p>  tactique (mesurer avant de construire : faite, seuil non atteint), puis à la stratégie (ajouter à   chaque phase un regard que les contrôles n'ont pas : la mesure montre que ce regard est exécuté,   pas incarné), puis à l'intention (moins de défauts livrés que l'humain doit trouver lui-même : servie   par les oracles d'exécution et de rendu, et par un banc qui chiffre tout mécanisme proposé). Aucune   rupture. Les mots du demandeur rejoués un à un : « concevoir » → trois fiches conçues ;   « construire » → aucun objet durable, l'épreuve en tient lieu ; « exécuter » → quatre relectures   sur neuf livrables ; « points de vue différents » → différents dans leurs constats, pas dans les   défauts échappés retrouvés ; « façon d'opérer » → non mesurée, verdict du 13/08 ; « chaque phase »   → quatre phases et la restitution, les tests faute de livrable relisable.</p>
+<h3>Annexe — détail de la mesure par livrable</h3>
+<p><strong>Mode de lecture</strong> : une ligne par livrable de l'échantillon, dans l'ordre des phases ; chaque cellule donne les étiquettes R / A / F de la relecture en colonne. Les données brutes sont dans <code>20260914-personas-mesure-baseline.md</code> et <code>20260914-personas-mesure-passes.md</code> ; les étiquettes du juge et la clé de correspondance ont été produites par deux scripts, dans l'espace de travail de la session.</p>
+</section>
+<div class="defile"><table id="tab-3" data-filterable><thead><tr><th scope="col">Livrable</th><th scope="col">Phase</th><th scope="col">Référence</th><th scope="col">Exploitant</th><th scope="col">Utilisateur final</th><th scope="col">Mainteneur</th></tr></thead><tbody><tr><td>E-02</td><td>conception</td><td>0 / 6 / 0</td><td>0 / 6 / 0</td><td>0 / 8 / 0</td><td>0 / 6 / 0</td></tr><tr><td>E-03</td><td>design</td><td>0 / 5 / 0</td><td>0 / 7 / 0</td><td>0 / 8 / 0</td><td>0 / 8 / 0</td></tr><tr><td>E-15</td><td>design</td><td>0 / 4 / 0</td><td>0 / 4 / 0</td><td>0 / 5 / 0</td><td>0 / 4 / 0</td></tr><tr><td>E-06</td><td>development</td><td>2 / 2 / 0</td><td>0 / 4 / 0</td><td>2 / 2 / 1</td><td>2 / 3 / 0</td></tr><tr><td>E-07</td><td>development</td><td>3 / 2 / 0</td><td>2 / 4 / 0</td><td>5 / 3 / 0</td><td>2 / 4 / 0</td></tr><tr><td>E-08</td><td>development</td><td>0 / 4 / 0</td><td>0 / 6 / 0</td><td>0 / 6 / 0</td><td>0 / 6 / 0</td></tr><tr><td>E-01</td><td>MEP</td><td>0 / 5 / 1</td><td>0 / 8 / 0</td><td>0 / 8 / 0</td><td>0 / 6 / 0</td></tr><tr><td>E-05</td><td>MEP</td><td>0 / 5 / 0</td><td>0 / 8 / 0</td><td>0 / 7 / 0</td><td>0 / 8 / 0</td></tr><tr><td>E-04</td><td>restitution</td><td>0 / 4 / 0</td><td>0 / 5 / 0</td><td>1 / 5 / 2</td><td>1 / 5 / 0</td></tr></tbody></table></div>
+<p class="tf-count" data-tf-count-for="tab-3" aria-live="polite"></p>
+<section class="chap lire" data-mesure-lecture>
+<p>Délégations et routage : neuf sessions au modèle Sonnet, défaut du contrat d'interface §4 ; escalade de modèle : aucune.</p>
+</section>
+    </main>
+    <footer>Vue générée — NE PAS ÉDITER (la source Markdown fait foi ; la régénérer via le script du pilot). Sceau source <code>da4ced729dc7</code>.</footer>
+  </div></div>
+  <script>
+/* Digit-AI — Filtres de colonne sur tableaux de données.
+   Socle commun : voir references/composant-filtres-tableau.md (checklist G1-G9).
+   Viewer-only : le JS ne s'exécute pas à l'export WeasyPrint, la regle @media print
+   du livrable doit reafficher tr[data-tf-hidden].
+   Lot Produit-05 20260820b (TF-0429/0430/0431, 21/08) : rappel apresFiltrage et instance
+   enveloppable, etat vide avec « tout reafficher », panneau qui choisit son cote et
+   neutralise le rognage de son conteneur defilant tant qu'il est ouvert.
+
+   Lot Produit-02 20260902b/d (TF-0768/0769/0781/0782, 02/09) — L'ORDRE ET L'EXISTENCE.
+   Quatre defauts d'une meme famille : le composant lisait le TEXTE RENDU la ou il fallait lire
+   une VALEUR, et decidait de l'existence d'une facette la ou il ne devait decider que de sa
+   forme. Une console de donnees livree a du rearmer son propre tri et relire ses cases dans le
+   DOM pour compenser :
+     · TF-0768 — `parseFloat` sur « 1 000 » vaut 1 : les separateurs de milliers fr-FR (espace,
+       insecable, insecable etroite) arretent l'analyse au premier caractere non chiffre, et
+       TOUTE page en francais triait faux, en silence. Le tri et l'ordre des facettes lisent
+       desormais `data-v` / `data-sort` quand la cellule en porte, sinon le nombre se lit APRES
+       retrait des espaces et des signes.
+     · TF-0781 — `Object.keys(valeurs).sort()` rangeait les mois par ordre alphabetique
+       (« aout 2025, avr. 2026, dec. 2025 »). Une facette s'ordonne sur sa CLE, donc
+       chronologiquement des que la cellule porte un `data-v` ISO.
+     · TF-0782 — l'heuristique `1 < n < lignes` privait de facette la colonne CLE (huit marches
+       distincts sur huit lignes : aucun filtre la ou le lecteur en attendait un). La
+       cardinalite decide desormais de la FORME du panneau, jamais de son EXISTENCE ; la seule
+       sortie est une exemption DECLAREE (`data-filter-col="off"` + `data-filter-reason`).
+     · TF-0769 — `data-tf-ready` bloquait tout second `init` en rendant `null`, et la selection
+       vivait dans une fermeture inaccessible : une page qui re-rend ses tableaux perdait ses
+       filtres et devait les relire dans le DOM. L'etat est desormais LISIBLE et REJOUABLE —
+       `api.etat()`, `init(table, { etat })`, `api.rafraichir()`. */
+(function (root) {
+  'use strict';
+
+  /* ARBITRAGE PARTAGE DE LA VISIBILITE (TF-0953, 08/09/2026) — optionnel, jamais obligatoire :
+     un composant du socle ne cesse pas de fonctionner parce qu'un autre fichier manque. */
+  function arbitrage() { return root.DigitAIRowVisibility || null; }
+
+  var SEUIL_LIGNES = 8;
+  /* Au-dela de ce nombre de valeurs distinctes, la liste de cases n'est plus parcourable a
+     l'oeil : le panneau s'ouvre SUR SA RECHERCHE et le dit. C'est la FORME qui change — la
+     facette, elle, existe toujours (TF-0782). */
+  var SEUIL_RECHERCHE = 15;
+  var LIBELLE_VIDE = 'Aucune ligne ne correspond aux filtres.';
+  var LIBELLE_TOUT = 'Tout réafficher';
+
+  /* Les espaces qui separent les milliers en fr-FR : espace, insecable (U+00A0), insecable
+     etroite (U+202F), fine (U+2009), figure (U+2007). parseFloat s'arrete au premier. */
+  var RE_ESPACES = /\s/g;   /* \s couvre l'insecable U+00A0 et l'insecable etroite U+202F */
+  var RE_SIGNES = /[%€$£]/g;
+  var RE_NOMBRE = /^[+-]?\d+(?:[.,]\d+)?$/;
+
+  function norm(s) {
+    return String(s == null ? '' : s)
+      .normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+  }
+
+  /* TF-0768 : un nombre affiche a un habillage (milliers, unite, pourcentage). On le retire
+     AVANT l'analyse, et on n'accepte que ce qui est ENTIEREMENT numerique — « 12 mars » n'est
+     pas 12, et le laisser passer trierait une colonne de dates comme une colonne de nombres. */
+  function nombre(v) {
+    var s = String(v == null ? '' : v).replace(RE_ESPACES, '').replace(RE_SIGNES, '');
+    if (s.indexOf(',') !== -1 && s.indexOf('.') === -1) s = s.replace(',', '.');
+    return RE_NOMBRE.test(s) ? parseFloat(s) : NaN;
+  }
+
+  function corps(table) {
+    var tb = table.tBodies && table.tBodies[0];
+    /* TF-0175 : une ligne [data-detail] est le DÉPLIANT pleine largeur de la ligne qui la
+       précède — elle ne porte pas de données de colonnes et ne compte ni ne se filtre.
+       TF-0430 : la ligne d'état vide [data-tf-empty] est un message du composant, pas une donnée. */
+    return tb ? Array.prototype.slice.call(tb.rows).filter(function (tr) {
+      return !tr.hasAttribute('data-detail') && !tr.hasAttribute('data-tf-empty');
+    }) : [];
+  }
+
+  /* Le LIBELLE d'une cellule : ce que le lecteur voit, et ce qu'il coche. */
+  function valeur(tr, i) {
+    var td = tr.cells[i];
+    return td ? td.textContent.trim() : '';
+  }
+
+  /* La CLE D'ORDRE d'une cellule (TF-0768/0781) : `data-v`, sinon `data-sort`, sinon le texte
+     rendu. C'est la seule facon de dire « aout 2025 se range avant avr. 2026 » — un libelle de
+     mois n'a aucun ordre lisible, et une valeur formatee n'a pas d'ordre numerique. */
+  function cle(tr, i) {
+    var td = tr.cells[i];
+    if (!td) return '';
+    var d = td.getAttribute('data-v');
+    if (d === null) d = td.getAttribute('data-sort');
+    return d === null ? td.textContent.trim() : String(d).trim();
+  }
+
+  /* Comparateur unique du composant — tri de lignes ET ordre des valeurs de facette.
+     Deux nombres se comparent en nombres ; une date ISO (`2025-08`, `2025-08-14`) se compare en
+     texte, ce qui EST son ordre chronologique ; le vide passe en fin de liste. */
+  function comparer(a, b) {
+    var na = nombre(a), nb = nombre(b);
+    if (!isNaN(na) && !isNaN(nb)) return na < nb ? -1 : (na > nb ? 1 : 0);
+    if (a === '') return b === '' ? 0 : 1;
+    if (b === '') return -1;
+    var xa = norm(a), xb = norm(b);
+    return xa < xb ? -1 : (xa > xb ? 1 : 0);
+  }
+
+  function nbColonnes(table) {
+    var ths = table.tHead ? Array.prototype.slice.call(table.tHead.rows[0].cells) : [];
+    var n = 0;
+    ths.forEach(function (th) { n += th.colSpan || 1; });
+    if (!n) { var l = corps(table)[0]; n = l ? l.cells.length : 1; }
+    return n;
+  }
+
+  /* TF-0782 — CHAQUE en-tete recoit sa facette. L'heuristique de cardinalite ne decide plus que
+     de la FORME du panneau (`liste`, `recherche` quand les valeurs sont trop nombreuses pour
+     etre parcourues, `unique` quand la colonne n'en porte qu'une). La seule sortie est une
+     exemption DECLAREE sur le `<th>` : `data-filter-col="off"` + `data-filter-reason="…"`.
+     Sans motif, l'exemption est rendue au journal (`api.exemptions`) et l'oracle la refuse. */
+  function colonnes(table, lignes) {
+    var ths = table.tHead ? Array.prototype.slice.call(table.tHead.rows[0].cells) : [];
+    var cols = [], exemptions = [];
+    ths.forEach(function (th, i) {
+      /* L'INTITULE SE FIGE AU PREMIER PASSAGE (TF-0769). Apres `init`, le `<th>` contient le
+         declencheur ET le panneau : son `textContent` vaut alors « Statut›TousAucun livre en
+         cours… ». Relire l'intitule apres coup donnait une AUTRE cle de colonne, et la
+         selection conservee se retrouvait rangee sous un nom que plus personne ne demandait —
+         le rafraichissement perdait les filtres qu'il devait sauver. `data-col` rend
+         l'identite de la colonne stable, et lisible par un oracle. */
+      var libelle = (th.getAttribute('data-col') || th.textContent || '').trim();
+      if (!th.hasAttribute('data-col')) th.setAttribute('data-col', libelle);
+      if (th.getAttribute('data-filter-col') === 'off') {
+        exemptions.push({ colonne: libelle, index: i,
+                          motif: (th.getAttribute('data-filter-reason') || '').trim() });
+        return;
+      }
+      var ordres = {}, n = 0;
+      lignes.forEach(function (tr) {
+        var v = valeur(tr, i);
+        if (!(v in ordres)) { ordres[v] = cle(tr, i); n++; }
+      });
+      var valeurs = Object.keys(ordres).sort(function (x, y) {
+        return comparer(ordres[x], ordres[y]);
+      });
+      var forme = n <= 1 ? 'unique' : (n > SEUIL_RECHERCHE ? 'recherche' : 'liste');
+      cols.push({ th: th, index: i, libelle: libelle, valeurs: valeurs,
+                  ordres: ordres, forme: forme });
+    });
+    return { cols: cols, exemptions: exemptions };
+  }
+
+  function bouton(col, id) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tf-btn';
+    b.setAttribute('aria-expanded', 'false');
+    b.setAttribute('aria-controls', id);
+    b.setAttribute('aria-label', 'Filtrer ' + col.libelle);
+    b.textContent = '›';               /* chevron simple (TF-0435) : present dans toute pile de repli */
+    return b;
+  }
+
+  function panneau(col, id) {
+    var p = document.createElement('div');
+    p.className = 'tf-panel';
+    p.id = id;
+    p.hidden = true;
+    p.setAttribute('role', 'group');
+    p.setAttribute('aria-label', 'Filtrer ' + col.libelle);
+    /* La forme est LISIBLE dans le marquage : un oracle de rendu et un test d'interactions
+       peuvent dire laquelle a ete choisie, et pourquoi (TF-0782). */
+    p.setAttribute('data-tf-forme', col.forme);
+
+    var rech = document.createElement('input');
+    rech.type = 'search';
+    rech.className = 'tf-search';
+    rech.placeholder = 'Rechercher…';
+    rech.setAttribute('aria-label', 'Rechercher une valeur');
+
+    var actions = document.createElement('div');
+    actions.className = 'tf-actions';
+    var tous = document.createElement('button');
+    tous.type = 'button'; tous.className = 'tf-all'; tous.textContent = 'Tous';
+    var aucun = document.createElement('button');
+    aucun.type = 'button'; aucun.className = 'tf-none'; aucun.textContent = 'Aucun';
+    actions.appendChild(tous); actions.appendChild(aucun);
+
+    var opts = document.createElement('div');
+    opts.className = 'tf-opts';
+    col.valeurs.forEach(function (v) {
+      var lab = document.createElement('label');
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.className = 'tf-opt';
+      cb.value = v;
+      cb.checked = true;                    /* etat initial : tout coche, aucun filtre actif */
+      lab.appendChild(cb);
+      lab.appendChild(document.createTextNode(' ' + (v === '' ? '(vide)' : v)));
+      opts.appendChild(lab);
+    });
+
+    p.appendChild(rech); p.appendChild(actions); p.appendChild(opts);
+    /* Une forme qui change sans le dire est une affordance muette (loi n° 3) : le panneau
+       ANNONCE pourquoi il s'ouvre sur sa recherche, ou pourquoi il n'offre qu'une valeur. */
+    if (col.forme !== 'liste') {
+      var note = document.createElement('p');
+      note.className = 'tf-forme-note';
+      note.textContent = col.forme === 'recherche'
+        ? col.valeurs.length + ' valeurs distinctes — chercher puis « Tous ».'
+        : 'Une seule valeur dans cette colonne.';
+      p.insertBefore(note, opts);
+    }
+    return { panneau: p, recherche: rech, tous: tous, aucun: aucun, options: opts };
+  }
+
+  /* TF-0431 : le conteneur defilant le plus proche (overflow-x auto|scroll) rogne un panneau
+     absolu et gagne un ascenseur horizontal des qu'il s'ouvre. Tant qu'un panneau est ouvert,
+     son rognage est neutralise ; a la fermeture, l'etat inline d'origine est retabli. */
+  function conteneurDefilant(el) {
+    var p = el.parentElement;
+    while (p && p !== document.body) {
+      var o = getComputedStyle(p).overflowX;
+      if (o === 'auto' || o === 'scroll') return p;
+      p = p.parentElement;
+    }
+    return null;
+  }
+
+  /* RA-5 (14/08, revu TF-0768/0782 le 02/09) : le tri est ARME PAR DEFAUT — la règle L4 exige
+     « filtre, tri et recherche », et une page qui arme le sien le declare (`{ tri: false }` ou
+     `data-tf-tri="off"` sur la table). La cle de tri est celle de `cle()` : `data-v`/`data-sort`
+     d'abord, sinon le texte, lu comme un nombre APRES retrait des espaces de milliers. Les clics
+     sur .tf-btn/.tf-panel sont ignores, les lignes [data-detail] voyagent avec leur ligne mere.
+     Rend une fonction de DESARMEMENT : sans elle, un second init empilerait ses ecouteurs. */
+  function armerTri(table) {
+    var ths = table.tHead ? Array.prototype.slice.call(table.tHead.rows[0].cells) : [];
+    corps(table).forEach(function (tr) {
+      var d = tr.nextElementSibling;
+      tr.__tfDetail = (d && d.hasAttribute('data-detail')) ? d : null;
+    });
+    var poses = [];
+    ths.forEach(function (th, i) {
+      if (th.getAttribute('data-sort-col') === 'off') return;
+      if (!th.style.cursor) th.style.cursor = 'pointer';
+      var handler = function (ev) {
+        if (ev.target.closest && ev.target.closest('.tf-btn, .tf-panel')) return;
+        var sens = th.getAttribute('aria-sort') === 'ascending' ? -1 : 1;
+        ths.forEach(function (t) {
+          t.removeAttribute('aria-sort');
+          var m = t.querySelector('.tf-tri'); if (m) m.remove();
+        });
+        th.setAttribute('aria-sort', sens === 1 ? 'ascending' : 'descending');
+        var marque = document.createElement('span');
+        marque.className = 'tf-tri';
+        marque.textContent = sens === 1 ? ' ↑' : ' ↓';
+        th.appendChild(marque);
+        var tb = table.tBodies[0];
+        var tris = corps(table).slice();
+        tris.forEach(function (tr) {
+          var d = tr.nextElementSibling;
+          tr.__tfDetail = (d && d.hasAttribute('data-detail')) ? d : tr.__tfDetail;
+        });
+        tris.sort(function (a, b) { return comparer(cle(a, i), cle(b, i)) * sens; });
+        tris.forEach(function (tr) {
+          tb.appendChild(tr);
+          if (tr.__tfDetail) tb.appendChild(tr.__tfDetail);
+        });
+      };
+      th.addEventListener('click', handler);
+      poses.push({ th: th, handler: handler });
+    });
+    return function desarmer() {
+      poses.forEach(function (p) {
+        p.th.removeEventListener('click', p.handler);
+        var m = p.th.querySelector('.tf-tri'); if (m) m.remove();
+        p.th.removeAttribute('aria-sort');
+      });
+    };
+  }
+
+  /* init(table, opts) — opts.tri (bool, defaut VRAI) · opts.etat (etat rendu par api.etat())
+     · opts.reinit (bool) · opts.apresFiltrage(table, visibles, total) : rappel appele a la fin
+     de CHAQUE filtrage, y compris ceux declenches par les cases, Tous/Aucun et la recherche
+     (TF-0429 : avant, seul l'appel manuel a instance.appliquer etait observable, envelopper
+     l'instance etait silencieusement sans effet). Les gestionnaires internes passent par
+     api.appliquer : remplacer instance.appliquer est desormais honore.
+
+     TF-0769 — un second appel n'est plus un NON-EVENEMENT : sans `etat` ni `reinit`, il rend
+     l'instance deja construite (l'appelant peut donc la piloter sans l'avoir gardee) ; avec, il
+     detruit l'ancienne et reconstruit. */
+  function init(table, opts) {
+    opts = opts || {};
+    if (!table) return null;
+    if (table.getAttribute('data-filterable') === 'off') return null;
+    if (table.getAttribute('data-tf-ready') === '1') {
+      var deja = table.__tfApi || null;
+      if (!opts.etat && !opts.reinit) return deja;
+      if (deja && deja.detruire) deja.detruire();
+    }
+
+    /* DECLARER SON ATTRIBUT a l'arbitrage partage, jamais deviner ceux des autres. */
+    var V = arbitrage();
+    if (V) { V.register('data-tf-hidden'); }
+
+    var lignes = corps(table);
+    var scan = colonnes(table, lignes);
+    var cols = scan.cols;
+    if (!cols.length) return null;
+
+    var id = table.id || ('tf-' + Math.random().toString(36).slice(2, 8));
+    table.id = id;
+    var compteur = document.querySelector('[data-tf-count-for="' + id + '"]');
+    var etats = [];
+    var api = {};
+    var defilant = conteneurDefilant(table);
+    var overflowOrigine = null;
+    /* La selection vit HORS des fermetures de colonne (TF-0769) : elle survit a un
+       rafraichissement, se lit par api.etat() et se rejoue par init(table, { etat }). */
+    var selections = {};
+    var desarmerTri = null;
+    var surDocument = function (ev) { if (!table.contains(ev.target)) fermerTout(); };
+
+    /* TF-0430 : etat vide — une ligne de message pleine largeur et la seule action utile a ce
+       moment, « tout reafficher ». Libelle surchargeable par data-tf-vide sur la table. */
+    function ligneVide() {
+      var tb = table.tBodies[0];
+      var tr = tb.querySelector('tr[data-tf-empty]');
+      if (tr) return tr;
+      tr = document.createElement('tr');
+      tr.setAttribute('data-tf-empty', '');
+      tr.className = 'tf-vide';
+      var td = document.createElement('td');
+      td.colSpan = nbColonnes(table);
+      var msg = document.createElement('span');
+      msg.className = 'tf-vide-msg';
+      msg.textContent = table.getAttribute('data-tf-vide') || LIBELLE_VIDE;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'tf-reset';
+      b.textContent = LIBELLE_TOUT;
+      b.addEventListener('click', function () { toutReafficher(); });
+      td.appendChild(msg); td.appendChild(document.createTextNode(' ')); td.appendChild(b);
+      tr.appendChild(td);
+      tb.appendChild(tr);
+      return tr;
+    }
+
+    function toutReafficher() {
+      etats.forEach(function (e) {
+        Object.keys(e.selection).forEach(function (k) { e.selection[k] = true; });
+        var p = document.getElementById(e.bouton.getAttribute('aria-controls'));
+        if (p) Array.prototype.forEach.call(p.querySelectorAll('.tf-opt'), function (cb) { cb.checked = true; });
+      });
+      api.appliquer();
+    }
+
+    function appliquer() {
+      var visibles = 0;
+      lignes.forEach(function (tr) {
+        var ok = etats.every(function (e) {
+          return e.selection[valeur(tr, e.col.index)] !== false;
+        });
+        if (ok) {
+          tr.removeAttribute('data-tf-hidden');
+          /* LA VISIBILITE EST UNE DISJONCTION (TF-0953, 08/09/2026). Passer CE filtre ne suffit
+             pas a rendre une ligne visible : un autre mecanisme DECLARE a l'arbitrage peut
+             encore la masquer. Forcer `display: ''` ici ecrasait ce mecanisme sans un mot — et
+             c'est ce qui a oblige un produit a poser un MutationObserver sur `hidden` pour
+             reappliquer son pliage d'arbre apres chaque passage des filtres, puis a deplier
+             tout l'arbre a chaque changement de filtre pour ne jamais cacher un resultat.
+             Sans arbitrage charge, `masquee` n'est pas consultee et le comportement est
+             exactement celui d'avant. */
+          var autre = V ? V.masquee(tr, 'data-tf-hidden') : false;
+          tr.style.display = autre ? 'none' : '';
+          if (!autre) { visibles++; }
+        }
+        else {
+          tr.setAttribute('data-tf-hidden', ''); tr.style.display = 'none';
+          /* la ligne de détail suit le sort de sa ligne mère : masquée ET repliée */
+          var det = tr.nextElementSibling;
+          if (det && det.hasAttribute('data-detail')) { det.hidden = true; }
+        }
+        if (V) { V.apply(tr); }
+      });
+      etats.forEach(function (e) {
+        var actif = Object.keys(e.selection).some(function (k) { return !e.selection[k]; });
+        e.bouton.classList.toggle('tf-on', actif);
+      });
+      if (compteur) {
+        compteur.textContent = visibles + ' ligne' + (visibles > 1 ? 's' : '') +
+          ' sur ' + lignes.length;
+        compteur.classList.toggle('zero', visibles === 0);
+      }
+      var vide = table.tBodies[0].querySelector('tr[data-tf-empty]');
+      if (visibles === 0 && lignes.length) { ligneVide().hidden = false; }
+      else if (vide) { vide.hidden = true; }
+      if (typeof opts.apresFiltrage === 'function') opts.apresFiltrage(table, visibles, lignes.length);
+    }
+
+    function placer(b, p) {
+      /* TF-0431 : cote d'ouverture selon la place mesuree — a droite du bouton par defaut,
+         aligne sur le bord droit quand le panneau sortirait de la fenetre ou du conteneur. */
+      p.classList.remove('tf-droite');
+      var limite = defilant ? defilant.getBoundingClientRect().right : (window.innerWidth || document.documentElement.clientWidth);
+      var r = b.getBoundingClientRect();
+      var largeur = p.offsetWidth || 240;
+      if (r.left + largeur > limite - 8) p.classList.add('tf-droite');
+      if (defilant && overflowOrigine === null) {
+        overflowOrigine = defilant.style.overflow || '';
+        defilant.setAttribute('data-tf-ouvert', '');
+        defilant.style.overflow = 'visible';
+      }
+    }
+
+    function retirerUI() {
+      etats.forEach(function (e) {
+        if (e.bouton && e.bouton.parentNode) e.bouton.parentNode.removeChild(e.bouton);
+        var p = document.getElementById(e.bouton.getAttribute('aria-controls'));
+        if (p && p.parentNode) p.parentNode.removeChild(p);
+        var th = e.col && e.col.th;
+        if (th) {
+          th.removeAttribute('data-tf-forme');
+          var u = th.querySelector('.tf-unique'); if (u) u.parentNode.removeChild(u);
+        }
+      });
+      etats.length = 0;
+    }
+
+    function construireColonnes() {
+      cols.forEach(function (col, k) {
+        var pid = id + '-tf-' + k;
+        var b = bouton(col, pid);
+        var ui = panneau(col, pid);
+        var selection = selections[col.libelle] || (selections[col.libelle] = {});
+        /* une valeur neuve entre COCHEE (aucun filtre implicite) ; une valeur disparue du
+           tableau sort de la selection, sinon elle masquerait des lignes sans etre visible. */
+        col.valeurs.forEach(function (v) { if (!(v in selection)) selection[v] = true; });
+        Object.keys(selection).forEach(function (v) {
+          if (col.valeurs.indexOf(v) === -1) delete selection[v];
+        });
+        var etat = { col: col, bouton: b, selection: selection };
+        etats.push(etat);
+
+        /* TF-0899 (08/09/2026) — LE PANNEAU A BESOIN D UN ANCETRE POSITIONNE, PAS DE `relative`.
+           `.tf-panel` est un `position:absolute` : il lui faut un ancetre positionne, et le
+           `<th>` est le bon. Mais poser `relative` EN LIGNE ecrasait le geste L29 du socle
+           (`thead.colle th { position: sticky; top: var(--hh) }`) : le `top` restait, applique
+           a un `relative` — donc un DECALAGE PERMANENT de --hh. Mesure Playwright du 07/09 sur
+           quatre tableaux filtrables : `<th>` a 441 px pour 337 attendus (+104 = --hh), une a
+           deux lignes recouvertes a tout defilement, `<th>` a -59 px apres 200 px de
+           defilement — l en-tete ne collait JAMAIS. Un `<th>` deja positionne (sticky, relative,
+           absolute, fixed) ancre DEJA un absolu : on ne pose donc que sur un `<th>` `static`. */
+        var posThCalculee = 'static';
+        try {
+          posThCalculee = (window.getComputedStyle(col.th).position || 'static');
+        } catch (e) { posThCalculee = col.th.style.position || 'static'; }
+        if (posThCalculee === 'static') col.th.style.position = 'relative';
+        /* TF-1052 (08/09) : la forme se publie AUSSI sur le `<th>`, la ou un oracle et un test
+           cherchent la colonne — posee sur le seul panneau, une sonde de l'en-tete lisait `null`
+           sur 9 colonnes sur 9. TF-1051 : une colonne a valeur UNIQUE le dit dans l'en-tete,
+           sans clic — un destinataire a lu vingt fois la meme chaine et conclu a une panne. */
+        col.th.setAttribute('data-tf-forme', col.forme);
+        if (col.forme === 'unique') {
+          var u = document.createElement('span');
+          u.className = 'tf-unique';
+          u.textContent = 'une seule valeur';
+          col.th.appendChild(u);
+        }
+        col.th.appendChild(b);
+        col.th.appendChild(ui.panneau);
+        Array.prototype.forEach.call(ui.options.querySelectorAll('.tf-opt'), function (cb) {
+          cb.checked = selection[cb.value] !== false;
+        });
+
+        b.addEventListener('click', function () {
+          var ouvert = b.getAttribute('aria-expanded') === 'true';
+          fermerTout();
+          if (!ouvert) {
+            b.setAttribute('aria-expanded', 'true'); ui.panneau.hidden = false;
+            placer(b, ui.panneau);
+            ui.recherche.focus();
+          }
+        });
+
+        ui.recherche.addEventListener('input', function () {
+          var q = norm(ui.recherche.value);
+          Array.prototype.forEach.call(ui.options.children, function (lab) {
+            lab.hidden = q !== '' && norm(lab.textContent).indexOf(q) === -1;
+          });
+        });
+
+        /* Tous / Aucun portent sur les valeurs actuellement visibles dans la liste. */
+        function masse(valeurCible) {
+          Array.prototype.forEach.call(ui.options.children, function (lab) {
+            if (lab.hidden) return;
+            var cb = lab.querySelector('.tf-opt');
+            cb.checked = valeurCible;
+            selection[cb.value] = valeurCible;
+          });
+          api.appliquer();
+        }
+        ui.tous.addEventListener('click', function () { masse(true); });
+        ui.aucun.addEventListener('click', function () { masse(false); });
+
+        ui.options.addEventListener('change', function (ev) {
+          var cb = ev.target;
+          if (!cb.classList.contains('tf-opt')) return;
+          selection[cb.value] = cb.checked;
+          api.appliquer();
+        });
+
+        ui.panneau.addEventListener('keydown', function (ev) {
+          if (ev.key === 'Escape') { fermerTout(); b.focus(); }
+        });
+      });
+    }
+
+    function fermerTout() {
+      etats.forEach(function (e) {
+        e.bouton.setAttribute('aria-expanded', 'false');
+        var p = document.getElementById(e.bouton.getAttribute('aria-controls'));
+        if (p) { p.hidden = true; p.classList.remove('tf-droite'); }
+      });
+      if (defilant && overflowOrigine !== null) {
+        defilant.style.overflow = overflowOrigine;
+        defilant.removeAttribute('data-tf-ouvert');
+        overflowOrigine = null;
+      }
+    }
+
+    if (opts.tri !== false && table.getAttribute('data-tf-tri') !== 'off') {
+      desarmerTri = armerTri(table);
+    }
+    construireColonnes();
+    document.addEventListener('click', surDocument);
+
+    table.setAttribute('data-tf-ready', '1');
+    table.__tfApi = api;
+    api.table = table;
+    api.appliquer = appliquer;
+    api.fermerTout = fermerTout;
+    api.toutReafficher = toutReafficher;
+    api.exemptions = scan.exemptions;
+
+    /* TF-0769 — L'ETAT SE LIT ET SE REJOUE. Il est nomme par LIBELLE de colonne, pas par
+       index : une colonne peut se deplacer entre deux rendus, son intitule reste le meme.
+       Ne sont listees que les valeurs EXCLUES — un etat vide veut dire « aucun filtre », ce
+       qui reste vrai si le tableau gagne des valeurs entre deux rendus. */
+    api.etat = function () {
+      var out = { version: 1, colonnes: {} };
+      etats.forEach(function (e) {
+        var exclues = Object.keys(e.selection).filter(function (v) { return e.selection[v] === false; });
+        if (exclues.length) out.colonnes[e.col.libelle] = { exclues: exclues };
+      });
+      return out;
+    };
+
+    api.restaurer = function (etat) {
+      if (!etat || !etat.colonnes) return api;
+      etats.forEach(function (e) {
+        var voulu = etat.colonnes[e.col.libelle];
+        var exclues = (voulu && voulu.exclues) || [];
+        Object.keys(e.selection).forEach(function (v) {
+          e.selection[v] = exclues.indexOf(v) === -1;
+        });
+        var p = document.getElementById(e.bouton.getAttribute('aria-controls'));
+        if (p) Array.prototype.forEach.call(p.querySelectorAll('.tf-opt'), function (cb) {
+          cb.checked = e.selection[cb.value] !== false;
+        });
+      });
+      api.appliquer();
+      return api;
+    };
+
+    /* La page a re-rendu son tableau : on relit ses lignes et ses valeurs, on retire les
+       panneaux devenus faux et on reconstruit SUR LA SELECTION CONSERVEE. Sans cette
+       fonction, la seule voie etait de relire les cases dans le DOM et de les rejouer par
+       des evenements `change` — ce qu'une console livree a effectivement du ecrire. */
+    api.rafraichir = function () {
+      /* Les panneaux partent AVANT le re-balayage : sans cela, le scan relirait ses propres
+         injections comme du contenu de colonne. */
+      retirerUI();
+      lignes = corps(table);
+      var neuf = colonnes(table, lignes);
+      cols = neuf.cols;
+      api.exemptions = neuf.exemptions;
+      construireColonnes();
+      api.appliquer();
+      return api;
+    };
+
+    api.detruire = function () {
+      retirerUI();
+      document.removeEventListener('click', surDocument);
+      if (desarmerTri) { desarmerTri(); desarmerTri = null; }
+      var vide = table.tBodies[0] && table.tBodies[0].querySelector('tr[data-tf-empty]');
+      if (vide && vide.parentNode) vide.parentNode.removeChild(vide);
+      lignes.forEach(function (tr) {
+        tr.removeAttribute('data-tf-hidden');
+        /* Detruire CE composant ne demasque que CE qu'il masquait : une ligne cachee par un
+           autre mecanisme declare le reste. */
+        var encore = V ? V.masquee(tr, 'data-tf-hidden') : false;
+        tr.style.display = encore ? 'none' : '';
+        if (V) { V.apply(tr); }
+      });
+      table.removeAttribute('data-tf-ready');
+      try { delete table.__tfApi; } catch (e) { table.__tfApi = null; }
+    };
+
+    if (opts.etat) api.restaurer(opts.etat);
+    else api.appliquer();
+    return api;
+  }
+
+  function initAll(racine, opts) {
+    var scope = racine || document;
+    return Array.prototype.map.call(
+      scope.querySelectorAll('table[data-filterable]'),
+      function (t) { return init(t, opts); }
+    );
+  }
+
+  root.DigitAITableFilters = { init: init, initAll: initAll, SEUIL_LIGNES: SEUIL_LIGNES,
+                               SEUIL_RECHERCHE: SEUIL_RECHERCHE, nombre: nombre,
+                               comparer: comparer };
+})(typeof window !== 'undefined' ? window : this);
+
+  </script>
+  <script>
+/* find-in-page.js — Recherche dans un conteneur + compteur d'occurrences · socle Digit-AI
+ *
+ * Surligne les correspondances (<mark class="find-hit">) dans un conteneur et affiche
+ * un compteur d'occurrences mis à jour à chaque frappe. Insensible aux accents.
+ *
+ * ⚠️ La classe du surlignage est `find-hit`, JAMAIS `find`. `find` est le nom que prend
+ * naturellement le conteneur du champ de recherche dans un livrable ; quand les deux
+ * partagent la classe, une règle `.find { display: flex }` écrite pour le conteneur
+ * s'applique aussi au <mark> et casse le mot surligné (défaut mesuré en production :
+ * le « s » de « clics » rejeté à 606 px du mot). Les trois classes du composant sont
+ * disjointes : `find-hit` (surlignage), `find-count` (compteur), et ce que le livrable
+ * veut pour son conteneur.
+ *
+ * ⚠️ Viewer-only : le JS ne s'exécute pas à l'export PDF (WeasyPrint). Si le livrable
+ * vise aussi le PDF, prévoir un équivalent statique de l'information.
+ *
+ * Câblage minimal (RA-1, 13/08 : la balise FERMANTE de script est ÉCHAPPÉE en <\/script> dans
+ * ce commentaire — cet asset s'inline (règle A1), et une fermante nue dans un commentaire
+ * fermerait la balise hôte au milieu du fichier : composant tronqué, silencieusement).
+ * TF-1062 (11/09) : ce commentaire l'écrivait lui-même EN CLAIR. Une copie inlinée à la main
+ * était coupée ici, et le câblage ci-dessous devenait du vrai DOM — trois identifiants
+ * dupliqués, que oracle-a11y a comptés à juste titre. Cette explication ne cite plus la
+ * séquence ; self_test.py vérifie qu'aucun asset inlinable ne la porte :
+ *   <input id="find" type="text" placeholder="Rechercher…">
+ *   <div id="findCount" class="find-count" aria-live="polite"></div>
+ *   <div id="content"> … contenu à fouiller … </div>
+ *   <script src="find-in-page.js"><\/script>
+ *   <script>
+ *     DigitAIFindInPage.init(
+ *       document.getElementById('find'),
+ *       document.getElementById('content'),
+ *       document.getElementById('findCount')
+ *     );
+ *   <\/script>
+ *
+ * CSS attendu (à adapter aux tokens du livrable) :
+ *   mark.find-hit { background: #fde9c8; color: inherit; display: inline; padding: 0; margin: 0; }
+ *   .find-count { margin-top: 4px; font-size: .72rem; color: var(--muted); min-height: 1em; }
+ *   .find-count.zero { color: #c0392b; }
+ */
+(function (global) {
+  'use strict';
+
+  // Regex insensible aux accents et à la casse à partir d'une saisie libre.
+  function buildRegex(q) {
+    q = (q || '').trim();
+    if (!q) return null;
+    var map = { a: 'aàâäá', e: 'eéèêëế', i: 'iîïí', o: 'oôöó', u: 'uùûüú', c: 'cç', n: 'nñ', y: 'yÿ' };
+    var pat = '';
+    for (var i = 0; i < q.length; i++) {
+      var ch = q[i], low = ch.toLowerCase();
+      if (map[low]) pat += '[' + map[low] + map[low].toUpperCase() + ']';
+      else if (/[a-z0-9]/i.test(ch)) pat += ch;
+      else pat += '\\' + ch; // échappe les caractères spéciaux regex
+    }
+    try { return new RegExp(pat, 'gi'); } catch (e) { return null; }
+  }
+
+  // Surligne les correspondances dans root et renvoie le nombre d'occurrences.
+  function highlight(root, re) {
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    var nodes = [], n, count = 0;
+    while ((n = walker.nextNode())) nodes.push(n);
+    for (var k = 0; k < nodes.length; k++) {
+      var tn = nodes[k];
+      if (tn.parentNode && /^(MARK|SCRIPT|STYLE)$/.test(tn.parentNode.nodeName)) continue;
+      var txt = tn.nodeValue; re.lastIndex = 0;
+      if (!re.test(txt)) continue; re.lastIndex = 0;
+      var frag = document.createDocumentFragment(), last = 0, m;
+      while ((m = re.exec(txt))) {
+        if (m.index > last) frag.appendChild(document.createTextNode(txt.slice(last, m.index)));
+        var mk = document.createElement('mark');
+        mk.className = 'find-hit';   // jamais 'find' : cf. avertissement en tête de fichier
+        mk.textContent = m[0];
+        frag.appendChild(mk);
+        count++;
+        last = m.index + m[0].length;
+        if (m.index === re.lastIndex) re.lastIndex++; // évite les boucles sur match vide
+      }
+      if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
+      tn.parentNode.replaceChild(frag, tn);
+    }
+    return count;
+  }
+
+  /* Branche la recherche live sur un champ.
+   * input, container, counter : éléments DOM (counter optionnel).
+   * getHTML (optionnel) : fonction renvoyant le HTML pristine courant — à fournir
+   *   quand le conteneur change de contenu (ex. panneau qui charge un autre document).
+   *   Sinon, le HTML initial est capturé une fois à l'init.
+   * Retourne { run, refresh } : run() relance la recherche, refresh() re-capture
+   *   le HTML pristine (mode sans getHTML). */
+  function init(input, container, counter, getHTML) {
+    if (!input || !container) return null;
+    var pristine = getHTML ? null : container.innerHTML;
+    function run() {
+      container.innerHTML = getHTML ? getHTML() : pristine;
+      var re = buildRegex(input.value);
+      if (!re) {
+        if (counter) { counter.textContent = ''; counter.classList.remove('zero'); }
+        return;
+      }
+      var nb = highlight(container, re);
+      if (counter) {
+        counter.textContent = nb === 0 ? 'Aucune occurrence' : (nb + ' occurrence' + (nb > 1 ? 's' : ''));
+        counter.classList.toggle('zero', nb === 0);
+      }
+    }
+    input.addEventListener('input', run);
+    return {
+      run: run,
+      refresh: function () { if (!getHTML) pristine = container.innerHTML; }
+    };
+  }
+
+  global.DigitAIFindInPage = { init: init, buildRegex: buildRegex, highlight: highlight };
+})(window);
+
+  </script>
+  <script>
+    DigitAITableFilters.initAll(document);
+    DigitAIFindInPage.init(document.getElementById('find'), document.querySelector('main'), document.getElementById('findCount'));
+  </script>
+</body>
+</html>

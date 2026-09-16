@@ -125,7 +125,7 @@
   "vu_le": "2026-08-27"
  },
  "oracle-gabarits-documents.mjs": {
-  "cas": 14,
+  "cas": 18,
   "vu_le": "2026-09-16"
  },
  "oracle-gabarits-documents.mjs (parc réel)": {
@@ -302,6 +302,10 @@
   "cas": 6,
   "vu_le": "2026-09-14"
  },
+ "scripts/generer-page-etude.mjs": {
+  "cas": 7,
+  "vu_le": "2026-09-16"
+ },
  "scripts/generer-remplacements-historique.test.mjs": {
   "cas": 11,
   "vu_le": "2026-09-09"
@@ -311,8 +315,8 @@
   "vu_le": "2026-09-03"
  },
  "scripts/lib-vue-html.test.mjs": {
-  "cas": 8,
-  "vu_le": "2026-09-08"
+  "cas": 13,
+  "vu_le": "2026-09-16"
  },
  "scripts/readme-dossiers.test.mjs": {
   "cas": 17,

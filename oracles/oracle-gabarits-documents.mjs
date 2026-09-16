@@ -166,6 +166,55 @@ export function resoudreFamille(nomFichier, catalogue) {
   return { resolue: false, famille: null, cle: mots.slice(0, 2).join(" "), candidats: proches.slice(0, 5) };
 }
 
+// ---- G9 (16/09/2026, TF-0923 volet 3) — UNE PROPOSITION REMISE À UN HUMAIN PORTE SA PAGE ------
+//
+// LA DOCTRINE ÉTAIT ÉCRITE ET JOUÉE PAR PERSONNE. `references\RUN-MANDAT.md` pas 5 et
+// `references\RUN-CONSEIL.md` C5 disent depuis le 07/09/2026 (TF-0895) que toute proposition
+// remise à un humain se remet AUSSI en page autoportante, sauf écart déclaré au ledger. Le retour
+// fondateur est une phrase du destinataire : « aucun fichier HTML n'a été généré […] il doit faire
+// partie intégrante de la proposition ». Quatre mois de doctrine, zéro contrôle.
+//
+// LA PORTÉE A ÉTÉ TRANCHÉE PAR UNE DÉCISION HUMAINE, et elle méritait de l'être. En préparant la
+// règle, la mesure a rendu CINQ études d'opportunité postérieures à la doctrine, toutes sans page :
+// soit la doctrine n'était pas appliquée, soit elle ne visait pas les études. La question a été
+// posée plutôt que tranchée seul — *une règle écrite sur une lecture contestée accuse du travail
+// juste* —, et la réponse du 16/09 retient la première lecture : une étude d'opportunité nomme son
+// audience en tête, « le pilote de l'écosystème, qui décide des mandats ». Un document dont le
+// lecteur nommé est celui qui décide EST remis à un humain, quel que soit le mot de son titre.
+//
+// L'ANTÉRIORITÉ EST DÉCLARÉE, JAMAIS RATTRAPÉE EN SILENCE : un livrable daté d'avant l'entrée de
+// la doctrine rend SANS_OBJET. La règle 5 interdit de réécrire l'existant, et une règle qui
+// accuserait quarante-sept documents le jour de sa naissance se ferait désactiver le lendemain.
+const ROLES_PAGE_DUE = /^(proposition|trajectoire|etude|conseil)\b/i;
+const ENTREE_DOCTRINE = "20260907";   // TF-0895 — jour où la règle est devenue opposable
+
+/** G9 sur UN livrable Markdown : `{ regle, statut, ou, message }`. */
+export function jugerPageHomonyme(chemin, { existe = null, depuis = ENTREE_DOCTRINE } = {}) {
+  const nom = String(chemin).replace(/^.*[\\/]/, "");
+  if (!/\.md$/i.test(nom) || /^(README|LISEZMOI)\.md$/i.test(nom)) {
+    return { regle: "G9", statut: "SKIP", ou: nom, message: "ce n'est pas un livrable Markdown — la question ne se pose pas" };
+  }
+  const objet = objetDuNom(nom);
+  const sansAccent = String(objet).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  if (!ROLES_PAGE_DUE.test(sansAccent)) {
+    return { regle: "G9", statut: "SKIP", ou: nom,
+      message: `rôle « ${sansAccent.split(" ")[0] || "?"} » — la page n'est due qu'aux propositions, trajectoires, études et conseils remis à un humain` };
+  }
+  const date = (/(\d{8})/.exec(nom) || [])[1];
+  if (!date || date < depuis) {
+    return { regle: "G9", statut: "SANS_OBJET", ou: nom,
+      message: `livrable antérieur au ${depuis} — la doctrine de la page homonyme lui est postérieure, et la règle 5 interdit de réécrire l'existant (antériorité DÉCLARÉE, jamais rattrapée en silence)` };
+  }
+  const cible = String(chemin).replace(/\.md$/i, ".html");
+  const present = existe === null ? existsSync(cible) : existe;
+  return present
+    ? { regle: "G9", statut: "PASS", ou: nom, message: "la page homonyme est là, à côté de sa source" }
+    : { regle: "G9", statut: "FAIL", ou: nom,
+        message: "aucune page homonyme — une proposition remise à un humain se remet AUSSI en page autoportante " +
+          "(RUN-MANDAT.md pas 5, RUN-CONSEIL.md C5, socle digit-ai-page-html, R-32). " +
+          "La produire : `node scripts\\generer-page-etude.mjs <ce fichier>` ; l'écart se déclare au ledger avec son motif." };
+}
+
 /** G8 sur UN livrable : `{ regle, statut, ou, message }`. */
 export function jugerLivrable(chemin, catalogue) {
   const nom = String(chemin).replace(/^.*[\\/]/, "");
@@ -403,14 +452,31 @@ if (args[0] === "--self-test") {
         `pas, et la règle désigne la mauvaise famille en rendant PASS : ${plusLong.message.slice(0, 120)}`);
   }
 
+  // G9 (TF-0923 volet 3) — LA PAGE HOMONYME, DANS SES QUATRE SENS. Les quatre cas ne diffèrent que
+  // par UNE propriété du nom ou du disque : c'est la seule forme qui prouve que la règle juge ce
+  // qu'elle prétend juger. Le quatrième — l'antériorité — est celui qui empêche la règle de
+  // naître en accusant quarante-sept documents que la règle 5 interdit de réécrire.
+  const g9 = (nom, opts) => jugerPageHomonyme(nom, opts);
+  if (g9("20260914-etude-opportunite-x.md", { existe: false }).statut !== "FAIL")
+    casse.push("G9 : une étude postérieure à la doctrine, SANS page homonyme, passe — c'est le silence qui a valu " +
+      "le retour « aucun fichier HTML n'a été généré […] il doit faire partie intégrante de la proposition »");
+  if (g9("20260914-etude-opportunite-x.md", { existe: true }).statut !== "PASS")
+    casse.push("G9 : la MÊME étude, AVEC sa page, est accusée — la règle juge autre chose que la présence de la page");
+  if (g9("20260101-etude-opportunite-x.md", { existe: false }).statut !== "SANS_OBJET")
+    casse.push("G9 : une étude ANTÉRIEURE à l'entrée de la doctrine est accusée — la règle 5 interdit de réécrire " +
+      "l'existant, et une règle qui accuse quarante-sept documents le jour de sa naissance se fait désactiver le lendemain");
+  if (g9("Digit-AI - Synthese Mandat - Sujet - 20260916a.md", { existe: false }).statut !== "SKIP")
+    casse.push("G9 : une RESTITUTION est traitée comme une proposition — la page n'est due qu'aux propositions, " +
+      "trajectoires, études et conseils remis à un humain");
+
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test gabarits-documents : 14/14 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ; " +
+    : "Self-test gabarits-documents : 18/18 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ; " +
       "instance à trous → FAIL ; instance copie du squelette → FAIL ; classe posée sans règle CSS → FAIL au marquage ; " +
       "couple gabarit+version rendu → PASS G4 ; document sans le couple → FAIL G4 ; largeurs alternées sans " +
       "déclaration → FAIL G5 ; page « lecture » contredite → FAIL G5 ; page « lecture » tenue → PASS G5 ; " +
-      "page « donnees » avec exception déclarée → PASS G5 ; G8 dans ses TROIS sens (TF-1076) : un livrable « Synthese … » résout la famille des restitutions, un « Note Migration … » — type absent du catalogue — FAIL en nommant les clés proches, et « Synthese Executive » résout sa PROPRE famille, le préfixe le plus long gagnant sur le plus court)");
+      "page « donnees » avec exception déclarée → PASS G5 ; G8 dans ses TROIS sens (TF-1076) : un livrable « Synthese … » résout la famille des restitutions, un « Note Migration … » — type absent du catalogue — FAIL en nommant les clés proches, et « Synthese Executive » résout sa PROPRE famille, le préfixe le plus long gagnant sur le plus court) ; G9 dans ses QUATRE sens (TF-0923 volet 3) : une etude posterieure a la doctrine SANS page homonyme FAIL, la MEME avec sa page PASS, une etude ANTERIEURE a la doctrine SANS_OBJET — antecedence declaree, jamais rattrapee en silence —, et une restitution SKIP, la page n etant due qu aux propositions remises a un humain)");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -430,7 +496,7 @@ if (args.includes("--livrable")) {
       message: "usage : node oracle-gabarits-documents.mjs --livrable <chemin.md> [<chemin.md>…]" }, null, 1));
     process.exit(2);
   }
-  const f8 = vus.map((c) => jugerLivrable(c, cat));
+  const f8 = vus.flatMap((c) => [jugerLivrable(c, cat), jugerPageHomonyme(c)]);
   const v8 = f8.some((x) => x.statut === "FAIL") ? "FAIL" : "PASS";
   console.log(JSON.stringify({
     oracle: "oracle-gabarits-documents", mode: "livrable", version: "1.1.0", verdict: v8, findings: f8,
@@ -438,6 +504,7 @@ if (args.includes("--livrable")) {
       "le CONTENU du livrable : G8 lit son NOM, que R-4 rend porteur, et ne classe jamais un document par sa prose — une devinette ferait crier l'oracle sur du travail juste",
       "la JUSTESSE de la famille résolue : un livrable nommé « Synthese … » qui serait en réalité une étude résout « restitution » et G8 ne le verra pas",
       "les livrables dont le nom ne suit NI R-4 NI la forme datée des études : leur radical entier sert de type, et la résolution échoue le plus souvent — c'est voulu, un nom hors convention est déjà un défaut R-4",
+      "G9 ne juge que la PRÉSENCE de la page homonyme, jamais sa fraîcheur ni son contenu : une page générée puis laissée derrière une source corrigée la satisfait. Sa conformité au socle est le travail de check_html et render_page, joués séparément",
     ],
   }, null, 1));
   process.exit(v8 === "FAIL" ? 1 : 0);
