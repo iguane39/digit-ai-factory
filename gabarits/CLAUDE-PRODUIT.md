@@ -133,6 +133,7 @@ premier run ; le `run_open` du ledger le recopie (TF-0373).
 | **exigences** | `<chemin>` ou `absent — <motif>` | le seul terme de comparaison EXTERNE des cas dérivés ; sans lui, un cas généré sur une garde fausse CONFIRME le bug au lieu de le révéler |
 | **anomalies** | `<chemin>` ou `absent — <motif>` | ce que le CLIENT sait déjà de ses défauts (export JSONL de son gestionnaire de tickets, `FORGE_TESTS_ANOMALIES`) |
 | **contrat_interface** | `<chemin>` ou `absent — <motif>` | ce que le produit promet à ses appelants (OpenAPI, schéma, cahier) |
+| **lexique** | `forge\LEXIQUE.json` ou `absent — <motif>` | les mots que le destinataire de CE produit a dit ne pas lire, et ceux qui les remplacent. Lu à chaque écriture d'un `.md` (EC-7) et à chaque fin de tour (S46) ; rempli par la session qui REÇOIT le retour, avant de prononcer « corrigé ». Un retour de vocabulaire clos sans descente ici s'est fait redemander par le client deux jours plus tard (TF-1045) |
 
 *Pourquoi cette section existe* : treize anomalies clients ont vécu trois semaines dans un board
 pendant que six campagnes d'audit tournaient sans savoir qu'elles existaient. Le défaut n'était

@@ -25,6 +25,7 @@
  * EC-2 phrases longues en série · EC-3 profondeur de puces (S7 étendu à tout Markdown) ·
  * EC-4 emphase de structure (gras de paragraphe, puces emoji) · EC-5 attaques répétées (AVERT
  * seulement) · EC-6 antériorité (un texte normatif antérieur à la doctrine rend SKIP, jamais FAIL).
+ * EC-7 terme proscrit par le LEXIQUE DU DESTINATAIRE, lu dans le socle du produit (TF-1045).
  * Un AVERT n'échoue jamais : il nomme, et c'est ce qui permet à l'oracle de rester branché.
  *
  * Usage : node oracles\oracle-ecriture.mjs <fichier.md> [--donnee <tics.json>] [--chemin-relatif <x>] [--json]
@@ -32,7 +33,8 @@
  *         node oracles\oracle-ecriture.mjs --self-test
  * Exit : 0 PASS ou SKIP · 1 FAIL · 2 erreur (fichier introuvable, donnée illisible).
  */
-import { existsSync, readFileSync, writeFileSync, mkdtempSync, rmSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdtempSync, mkdirSync, rmSync, readdirSync } from "node:fs";
+import { chargerLexique, termesEmployes } from "./lib-lexique.mjs";
 import { join, dirname, resolve, relative, basename } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
@@ -388,6 +390,41 @@ export function juger(texte, options = {}) {
     pousser("EC-5", "PASS", "aucune série de trois attaques identiques");
   }
 
+  // EC-7 (TF-1045, 16/09/2026) — LE MOT QUE LE DESTINATAIRE NE LIT PAS.
+  //
+  // LE FAIT : un retour de vocabulaire clos « corrigé » le 08/09, le même mot redemandé par le
+  // client le 10/09. Mesure du 11/09 — le référentiel de jargon du pilot ne portait pas le terme,
+  // le CLAUDE.md du produit ne citait aucun lexique, et le juge des restitutions ne lisait aucun
+  // glossaire : deux synthèses employant le terme étaient PASS sur 41 règles. *Le producteur
+  // n'avait rencontré la règle NULLE PART sur son chemin.* C'est pour cela que la règle vit ICI en
+  // premier : cet oracle est joué à CHAQUE écriture d'un `.md` du produit, donc au moment où l'on
+  // écrit, et non au retour humain suivant.
+  //
+  // LE LEXIQUE EST CELUI DU PRODUIT, jamais une liste globale : le terme fondateur est un mot
+  // ordinaire du français et un terme juste ailleurs. Absent, la règle rend SKIP — dit à voix
+  // haute, jamais PASS par silence. Les citations ne sont pas jugées (`termesEmployes` retire le
+  // code) : un nom de champ n'est pas une déclaration d'intention de l'auteur.
+  {
+    const lex = chargerLexique({ cheminJuge: options.cheminJuge || null });
+    if (!lex.trouve)
+      pousser("EC-7", "SKIP", "aucun lexique de client dans le socle de ce projet (forge\\LEXIQUE.json, docs\\projet\\LEXIQUE.json ou references\\LEXIQUE.json) — vocabulaire du destinataire non jugé");
+    else if (lex.illisible)
+      pousser("EC-7", "SKIP", `lexique ILLISIBLE (${lex.chemin}) : ${lex.illisible} — ce n'est pas un constat sur le texte`);
+    else if (!lex.termes.length)
+      pousser("EC-7", "SKIP", `lexique présent et VIDE (${lex.chemin}) — aucun terme n'a encore coûté d'aller-retour`);
+    else {
+      const employes = termesEmployes(texte, lex.termes);
+      if (employes.length)
+        pousser("EC-7", "FAIL",
+          `${employes.length} terme(s) proscrit(s) par le lexique du destinataire : ` +
+          employes.map((t) => `« ${t.proscrit} » (${t.occurrences}) → « ${t.remplacer_par || "à remplacer"} »`).join(" · ") +
+          " — un mot qui a coûté un aller-retour au client se remplace avant la livraison, pas après le second retour",
+          ligneDe(0));
+      else
+        pousser("EC-7", "PASS", `aucun des ${lex.termes.length} terme(s) proscrit(s) du lexique n'est employé`);
+    }
+  }
+
   const verdict = findings.some((f) => f.statut === "FAIL") ? "FAIL" : "PASS";
   return { mots, verdict, findings, non_juge: nonJuge(donnee) };
 }
@@ -580,6 +617,45 @@ function selfTest() {
   const ec1 = (courte.j?.findings || []).filter((f) => f.regle === "EC-1");
   if (!(ec1.length === 1 && ec1[0].statut === "SKIP")) casse.push("courte : les densites sont jugees alors que le texte est sous le minimum");
 
+  // 5, 6 et 7 (TF-1045) — EC-7, LE LEXIQUE DU DESTINATAIRE, DANS SES TROIS SENS. Sans lexique, la
+  // regle rend SKIP et le dit : un produit sans lexique n'est jamais PASS par silence. Avec un
+  // lexique, le meme texte passe ou echoue selon le SEUL mot qui change — et la citation du meme
+  // mot entre accents graves n'est jamais comptee, sans quoi le lexique ferait paraphraser des
+  // preuves exactes, defaut paye le meme jour sur S37 (TF-0992).
+  const ec7Absent = jouer("sans-lexique.md", FIXTURE_COURTE);
+  const f7abs = (ec7Absent.j?.findings || []).filter((f) => f.regle === "EC-7");
+  if (!(f7abs.length === 1 && f7abs[0].statut === "SKIP"))
+    casse.push("EC-7 : sans lexique dans le socle du projet, la regle devrait rendre SKIP et le DIRE — " +
+      `obtenu ${JSON.stringify(f7abs)}`);
+
+  mkdirSync(join(dir, "produit", "forge"), { recursive: true });
+  writeFileSync(join(dir, "produit", "forge", "LEXIQUE.json"), JSON.stringify({
+    format: "pilot/lexique-produit@1",
+    termes: [{ proscrit: "grain", remplacer_par: "granularite", depuis: "2026-09-08",
+      preuve: "retour humain du 08/09/2026, redemande le 10/09 (ledger seq 99)" }],
+  }), "utf8");
+  const jouerProduit = (nom, contenu) => {
+    const chemin = join(dir, "produit", nom);
+    writeFileSync(chemin, contenu, "utf8");
+    const r = spawnSync(process.execPath, [moi, chemin], { encoding: "utf8" });
+    let j = null;
+    try { j = JSON.parse(r.stdout || "{}"); } catch { /* illisible */ }
+    return { statut: r.status, j };
+  };
+  const LEX_ROUGE = "# Note\n\nLe modele expose le grain quotidien des ventes, puis le grain magasin.\n"
+    + "La colonne `grain` du registre machine garde son nom : c'est une citation, pas une intention.\n";
+  const LEX_VERTE = LEX_ROUGE.replace("le grain quotidien", "la granularite quotidienne").replace("le grain magasin", "la granularite magasin");
+  const ec7r = jouerProduit("lexique-rouge.md", LEX_ROUGE);
+  const ec7v = jouerProduit("lexique-verte.md", LEX_VERTE);
+  const f7r = (ec7r.j?.findings || []).find((f) => f.regle === "EC-7");
+  const f7v = (ec7v.j?.findings || []).find((f) => f.regle === "EC-7");
+  if (f7r?.statut !== "FAIL")
+    casse.push("EC-7 : deux emplois en prose d'un terme proscrit par le lexique du destinataire passent — " +
+      "c'est par ce silence qu'un mot clos « corrige » le 08/09 a ete redemande par le client le 10/09 (TF-1045)");
+  if (f7v?.statut !== "PASS")
+    casse.push("EC-7 : le MEME texte avec le terme retenu est accuse — la citation entre accents graves est comptee " +
+      `comme une intention de l'auteur : ${JSON.stringify(f7v)}`);
+
   // 4. ANTERIORITE — le meme texte rouge, sous un chemin declare, rend SKIP et jamais FAIL.
   const ante = jouer("anteriorite.md", FIXTURE_ROUGE, ["--chemin-relatif", "REGLES-PROJET.md"]);
   if (ante.statut !== 0) casse.push(`anteriorite : exit ${ante.statut}, attendu 0`);
@@ -591,7 +667,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test ${NOM} : ${casse.length} DEFAUT(S)\n - ${casse.join("\n - ")}`
-    : `Self-test ${NOM} : 4 cas, 0 défaut (4/4 PASS — rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP)`);
+    : `Self-test ${NOM} : 7 cas, 0 défaut (7/7 PASS — rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045))`);
   return casse.length ? 1 : 0;
 }
 
@@ -623,7 +699,7 @@ if (lanceEnDirect) {
   const cheminRelatif = valeur("--chemin-relatif") || relative(RACINE, resolve(cible)).replace(/\\/g, "/");
   let texte;
   try { texte = readFileSync(cible, "utf8"); } catch (e) { erreur(`fichier illisible : ${cible} (${e.message})`); }
-  const r = juger(texte, { donnee, cheminRelatif });
+  const r = juger(texte, { donnee, cheminRelatif, cheminJuge: resolve(cible) });
   console.log(JSON.stringify({
     oracle: NOM, version: VERSION, cible: String(cible).replace(/\\/g, "/"),
     mots: r.mots, verdict: r.verdict, findings: r.findings, non_juge: r.non_juge,

@@ -1,7 +1,7 @@
 {
   "schema": "pilot/heritage@1",
-  "version": "1.10.0",
-  "date": "2026-09-15",
+  "version": "1.11.0",
+  "date": "2026-09-16",
   "evolution_1_10_0": "TF-1119 (15/09/2026) : un artefact personnalisable (modes `presence*`) peut déclarer `marqueurs_a_instancier` — les trous que le produit DOIT remplir. `oracle-conformite-projet` (R-20 ter étendu) refuse une copie qui en garde un, quel que soit son dossier, et signale une `verifie_le` restée celle du gabarit. Déclarés et non devinés : mesuré sur les onze produits du parc le 15/09, un relevé de tous les chevrons rendait 30 échecs neufs dont 18 faux positifs (conventions de chemin, exemple commenté de robots.txt, rapport de rapprochement pris pour un carnet) ; déclarés, 12 échecs neufs et aucun faux positif relevé. Le carnet d'écarts hérité doit aussi citer tout autre carnet d'écarts du produit.",
   "evolution_1_7_0": "TF-0765 (02/09/2026) : le lanceur de hooks (copie identique) connaît un troisième hook, `page-html` — PostToolUse sur Write|Edit, joue les règles de socle d'une page HTML (filtres de tableau L4 / G1-G6) chez le produit au moment où il écrit ; `settings-produit.json` (présence et motif) le câble ; `CLAUDE-PRODUIT.md` porte une section « Règles de socle applicables » remplie à l'ouverture. Les produits dont la copie du lanceur est périmée la reçoivent à leur prochaine ouverture (hook-ouverture, recopie des copies identiques).",
   "regle": "Tout artefact que le pilot COPIE chez un produit se déclare ici avec son mode de contrôle. Un artefact absent de ce référentiel n'est pas jugé par R-47 — l'oubli se voit à la revue, il ne se devine pas.",
@@ -187,8 +187,18 @@
       "familles_protegees": [
         "ecriture-style"
       ]
+    },
+    {
+      "source": "gabarits/LEXIQUE-PRODUIT.json",
+      "cible": "forge/LEXIQUE.json",
+      "mode": "presence",
+      "motif": "le lexique du destinataire de CE produit : son contenu est par construction propre au client, donc il ne se compare pas. Le pilot fournit le gabarit vide et sa doctrine ; la session qui REÇOIT un retour de vocabulaire le remplit, avant de prononcer « corrigé » (R12, champ descente).",
+      "depuis": "2026-09-16",
+      "pourquoi": "TF-1045 — un retour de vocabulaire clos « corrigé » le 08/09/2026 et le même mot redemandé par le client le 10/09. Le producteur n'avait rencontré la règle nulle part sur son chemin : ni le référentiel de jargon du pilot, ni le CLAUDE.md du produit, ni le juge des restitutions ne portaient le terme, et deux synthèses l'employant étaient PASS sur 41 règles. Le fichier est lu par oracles/oracle-ecriture.mjs (EC-7, à chaque écriture d'un .md) et par oracles/oracle-synthese.mjs (S46, à chaque fin de tour) : deux portes, une liste.",
+      "familles_protegees": []
     }
   ],
   "evolution_1_8_0": "Mandat d'amélioration continue (03/09/2026) : (1) le lanceur de hooks (copie identique) connaît un quatrième hook, `lexique` — UserPromptSubmit, le lexique d'invocation RV-6 devient un détrompeur ; `settings-produit.json` le câble ; (2) `todo/CLASSES.json` est hérité en copie identique (forge/retours/CLASSES.json) — le producteur qui écrit un lot y lit les classes qu'il doit déclarer ; (3) chaque artefact déclare les FAMILLES de défaut dont il protège (`familles_protegees`), pour que le relevé d'ouverture nomme, chez un produit non équipé, ce dont il n'est pas protégé — et non seulement ce qui lui manque.",
-  "evolution_1_9_0": "Mandat humain du 12/09/2026 (TF-1064, analyse L99 du 11/09) : (1) le lanceur de hooks connaît un cinquième hook, `ecriture` — PostToolUse sur Write|Edit d'un `.md`, joue `oracles/oracle-ecriture.mjs` du pilot (densités de tournures creuses par famille, phrases longues en série, puces trop profondes, emphase de structure ; avertit, ne bloque pas) ; `settings-produit.json` le câble ; (2) `references/ECRITURE.md` est hérité en copie conforme sous `forge/ECRITURE.md` ; (3) la famille de défaut `ecriture-style` est déclarée protégée par ces trois artefacts ; (4) `CLAUDE-PRODUIT.md` porte deux lignes de socle neuves (texte Markdown, textes d'application) et la règle de design E5 (viewport de conception 1920 px, responsive jusqu'au 4K, décision humaine du 12/09)."
+  "evolution_1_9_0": "Mandat humain du 12/09/2026 (TF-1064, analyse L99 du 11/09) : (1) le lanceur de hooks connaît un cinquième hook, `ecriture` — PostToolUse sur Write|Edit d'un `.md`, joue `oracles/oracle-ecriture.mjs` du pilot (densités de tournures creuses par famille, phrases longues en série, puces trop profondes, emphase de structure ; avertit, ne bloque pas) ; `settings-produit.json` le câble ; (2) `references/ECRITURE.md` est hérité en copie conforme sous `forge/ECRITURE.md` ; (3) la famille de défaut `ecriture-style` est déclarée protégée par ces trois artefacts ; (4) `CLAUDE-PRODUIT.md` porte deux lignes de socle neuves (texte Markdown, textes d'application) et la règle de design E5 (viewport de conception 1920 px, responsive jusqu'au 4K, décision humaine du 12/09).",
+  "evolution_1_11_0": "TF-1045, 16/09/2026 — le LEXIQUE DU DESTINATAIRE entre au contrat, en mode presence. Le vocabulaire d'un client appartient à son produit : le terme du retour fondateur est un mot ordinaire du français et un terme juste dans la doctrine du pilot, donc une liste globale accuserait la prose de la factory pour un retour reçu ailleurs. Absent chez un produit, les deux règles qui le lisent rendent SKIP ou SANS_OBJET et le disent — jamais PASS par silence."
 }

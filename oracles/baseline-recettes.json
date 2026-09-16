@@ -100,8 +100,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-ecriture.mjs": {
-  "cas": 4,
-  "vu_le": "2026-09-12"
+  "cas": 7,
+  "vu_le": "2026-09-16"
  },
  "oracle-empreintes.mjs": {
   "cas": 9,
@@ -215,7 +215,7 @@
   "vu_le": "2026-08-26"
  },
  "oracle-synthese.mjs": {
-  "cas": 24,
+  "cas": 27,
   "vu_le": "2026-09-16"
  },
  "oracle-trace-mutation-mep.mjs": {

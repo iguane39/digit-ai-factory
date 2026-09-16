@@ -108,11 +108,12 @@
 // Exit : 0 = conforme · 1 = defaut MESURE · 2 = JE NE PEUX PAS MESURER — la condition et
 // son remede sont alors NOMMES. Un oracle qui ne distingue pas les deux fait passer une panne
 // d'environnement pour un defaut du produit (TF-0648).
-import { existsSync, readFileSync, writeFileSync, mkdtempSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdtempSync, mkdirSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { chargerLexique, termesEmployes } from "./lib-lexique.mjs";
 
 // Un bloc = son titre reconnu par un motif. Le libellé exact est libre : c'est la PRÉSENCE du
 // bloc qui est opposable, pas sa formulation — imposer un mot à mot rendrait la consigne
@@ -1886,6 +1887,44 @@ function juger(texte, cheminJuge = null) {
     }
   }
 
+  // ---- S46 (16/09/2026, TF-1045) — LE MOT QUE LE DESTINATAIRE NE LIT PAS ---------------------
+  //
+  // LE FAIT, et c'est un DEUXIÈME retour sur un mot déjà corrigé. Le 08/09, un client dit ne pas
+  // lire le terme employé ; l'item est clos « corrigé ». Le 10/09, il redemande le même mot.
+  // Mesure du 11/09 : `gabarits\JARGON-A-GLOSER.json` ne portait pas le terme (0 entrée), le
+  // `CLAUDE.md` du produit ne citait ni glossaire ni lexique, et CET ORACLE — le gate que toute
+  // synthèse traverse (R-44) — ne lisait aucun glossaire ; deux synthèses employant le terme
+  // étaient PASS sur 41 règles. *Une correction qui vit dans le registre du pilot et nulle part
+  // sur le chemin du producteur n'est pas câblée* (loi n° 1, et R12 mot pour mot).
+  //
+  // LA RÈGLE EST LA JUMELLE D'EC-7, et les deux lisent la MÊME donnée par le MÊME module
+  // (`lib-lexique.mjs`) : en réimplémenter une seconde lecture serait la classe
+  // `oracle-remplace-par-controle-maison` que le registre compte par ailleurs. EC-7 attrape le mot
+  // à l'écriture du livrable, S46 à la fin du tour — deux portes, une liste.
+  //
+  // LE LEXIQUE EST CELUI DU PRODUIT, pas une liste globale, et ce choix est la règle elle-même :
+  // le terme fondateur est un mot ordinaire du français, juste dans la doctrine du pilot ; une
+  // liste globale accuserait la prose de la factory pour un retour reçu ailleurs. Absent : SANS
+  // OBJET, dit à voix haute et jamais PASS par silence. Les citations ne sont pas jugées — un nom
+  // de champ entre accents graves n'est pas une déclaration d'intention de l'auteur (TF-0992).
+  {
+    const lex = chargerLexique({ cheminJuge });
+    if (!lex.trouve)
+      findings.push({ regle: "S46", statut: "SANS_OBJET", message: "aucun lexique de client dans le socle de ce projet (forge\\LEXIQUE.json, docs\\projet\\LEXIQUE.json ou references\\LEXIQUE.json) — vocabulaire du destinataire non jugé" });
+    else if (lex.illisible)
+      findings.push({ regle: "S46", statut: "SANS_OBJET", message: `lexique ILLISIBLE (${lex.chemin}) : ${lex.illisible} — ce n'est pas un constat sur la restitution` });
+    else if (!lex.termes.length)
+      findings.push({ regle: "S46", statut: "SANS_OBJET", message: `lexique présent et VIDE (${lex.chemin}) — aucun terme n'a encore coûté d'aller-retour` });
+    else {
+      const employes = termesEmployes(texte, lex.termes);
+      employes.length
+        ? ko("S46", `${employes.length} terme(s) proscrit(s) par le lexique du destinataire : ` +
+            employes.map((t) => `« ${t.proscrit} » (${t.occurrences}) → « ${t.remplacer_par || "à remplacer"} »`).join(" · ") +
+            " — un mot qui a coûté un aller-retour au client ne revient pas dans la restitution qui annonce sa correction")
+        : ok("S46", `aucun des ${lex.termes.length} terme(s) proscrit(s) du lexique n'est employé`);
+    }
+  }
+
   // ---- S30 (28/08/2026) — UNE DÉCISION SE SÉLECTIONNE, DONC ELLE PORTE UN NUMÉRO ------------
   //
   // LE RETOUR EST LA MESURE, mot pour mot : « Il n'y a pas de numéro sur les décisions, je ne
@@ -2662,9 +2701,38 @@ Aucun écart : la demande a été suivie à la lettre.
       (/"S45"[\s\S]{0,200}/.exec(r45v.stdout) || [""])[0].replace(/\s+/g, " "));
   if (!/"S45"[^}]*PASS/.test(rv.stdout))
     casse.push("S45 accuse la fixture VERTE, dont le bloc 5 ne porte aucun motif d'obstacle : la règle crie sur un travail juste");
+  // 16/09 — S46 DANS SES TROIS SENS (TF-1045). Le lexique est celui du PRODUIT : les fixtures
+  // vivent donc sous un faux socle de produit, avec son `forge\LEXIQUE.json`. Sans lexique — le cas
+  // de toutes les autres fixtures et du pilot lui-même —, la règle rend SANS_OBJET et le DIT.
+  mkdirSync(join(dir, "produit", "forge"), { recursive: true });
+  writeFileSync(join(dir, "produit", "forge", "LEXIQUE.json"), JSON.stringify({
+    format: "pilot/lexique-produit@1",
+    termes: [{ proscrit: "grain", remplacer_par: "granularite", depuis: "2026-09-08",
+      preuve: "retour humain du 08/09/2026, redemande le 10/09 (ledger seq 99)" }],
+  }), "utf8");
+  const B4lex = "- Garde de précondition sur le pan qualif — preuve : 18 tests, 0 finding quand la garde s'active.";
+  const s46r = verte.replace(B4lex, B4lex + "\n- Modèle sémantique livré au grain quotidien — preuve : 12 mesures, exit 0.");
+  const s46v = verte.replace(B4lex, B4lex + "\n- Modèle sémantique livré à la granularite quotidienne — preuve : 12 mesures, exit 0.");
+  const f46r = join(dir, "produit", "s46-terme-proscrit.md");
+  const f46v = join(dir, "produit", "s46-terme-retenu.md");
+  writeFileSync(f46r, s46r, "utf8");
+  writeFileSync(f46v, s46v, "utf8");
+  const r46r = spawnSync(process.execPath, [moi, f46r], { encoding: "utf8" });
+  const r46v = spawnSync(process.execPath, [moi, f46v], { encoding: "utf8" });
+  if (!/"S46"[^}]*FAIL/.test(r46r.stdout))
+    casse.push("S46 : une restitution employant un terme que le destinataire a dit ne pas lire passe — c'est par ce " +
+      "silence qu'un mot clos « corrigé » le 08/09 a été redemandé par le client le 10/09, deux synthèses PASS sur " +
+      "41 règles entre les deux (TF-1045)");
+  if (!/"S46"[^}]*PASS/.test(r46v.stdout))
+    casse.push("S46 : la MÊME restitution avec le terme retenu est accusée : " +
+      (/"S46"[\s\S]{0,200}/.exec(r46v.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S46"[^}]*SANS_OBJET/.test(rv.stdout))
+    casse.push("S46 : sans lexique dans le socle du projet, la règle devrait rendre SANS_OBJET et le DIRE — " +
+      "un produit sans lexique n'est jamais PASS par silence : " +
+      (/"S46"[\s\S]{0,160}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 24/24 PASS (verte PASS ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) — taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
+    : "Self-test restitution : 27/27 PASS (verte PASS ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) ; S46 dans ses TROIS sens (TF-1045 : une restitution employant un terme proscrit par le lexique du destinataire FAIL, la MEME avec le terme retenu PASS, et SANS_OBJET dit a voix haute quand le projet n a pas de lexique) — taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
   process.exit(casse.length ? 1 : 0);
 }
 
