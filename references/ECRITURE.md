@@ -58,7 +58,7 @@ jugé à sa prochaine réécriture de fond.
 
 ## Les règles
 
-Douze règles, numérotées E-1 à E-12. Chaque règle porte les types qu'elle vise, son juge et son
+Quinze règles, numérotées E-1 à E-15 — les douze du plancher d'origine, puis E-13, E-14 et E-15, nées de retours humains datés. Chaque règle porte les types qu'elle vise, son juge et son
 statut : **mécanisée** (un script la joue), **déléguée** (un oracle existant la joue déjà) ou
 **revue** (aucun script ; elle se tient à la relecture, et c'est dit). Les exemples avant / après
 sont tirés de textes réels de la Factory.
@@ -152,11 +152,57 @@ se prend à un **nom inventé**, comme les bancs le font avec leurs tables jetab
 *Contrôle* : le hook de pré-commit (`todo\pre-commit-anonymise.mjs`) avertit quand un même
 pseudonyme remplace deux graphies différentes dans une même ligne.
 
+### E-14 — Une valeur, une heure, une date s'écrivent en chiffres
+*Types T1, T2, T3, T4. Juge : EC-9 (`oracle-ecriture.mjs`). Mécanisée.*
+
+Retour humain du 16/09/2026, mot pour mot : « Utilise des chiffres plutôt que l'écriture en toutes
+lettres pour les valeurs numériques, les heures et les dates. 7 septembre ou 7/09 plutôt que sept
+septembre, 8,8 Mo plutôt que huit virgule huit. » Le fait qui l'a provoqué : une restitution écrite
+le matin même rendait ses mesures en toutes lettres — « huit virgule huit mégaoctets », « cent
+trente-deux révisions », « le sept septembre ». *Un chiffre écrit en lettres cesse d'être
+comparable d'un coup d'œil* : le lecteur doit le reconstituer avant de le mettre en regard du
+suivant, et c'est exactement ce qu'un tableau de mesures existe pour lui épargner. La règle E-3 du
+plancher demande déjà « un chiffre, un nom, un chemin, une date, sourcés » ; celle-ci dit sous
+quelle FORME, parce que la première ne le disait pas et qu'on peut donc la satisfaire en lettres.
+
+**Ce qu'elle vise** : les valeurs suivies d'une unité ou d'un dénombrable (`8,8 Mo`, `132 révisions`,
+`5 pages`, `3,9 %`), les dates (`7 septembre`, `7/09`, `16/09/2026`) et les heures (`14h05`).
+**Ce qu'elle ne vise pas**, et la frontière est nette : l'article et le pronom (« un défaut », « une
+règle »), les locutions figées (« en deux temps », « des deux côtés »), et les nombres qui ouvrent
+une phrase, où l'usage français préfère la lettre.
+
+Avant (16/09, restitution du pilot) : « huit virgule huit mégaoctets compressés sur les deux cent
+quatre-vingts du dépôt, soit trois pour cent ». Après : « 8,8 Mo compressés sur 280, soit 3,1 % ».
+
+### E-15 — Un bloc de code qu'on RECOPIE sert tout lecteur ; un bloc qu'on EXÉCUTE ne sert qu'un exécutant
+*Type T2. Juge : EC-10 (`oracle-ecriture.mjs`), qui lit le lecteur déclaré du document. Mécanisée.*
+
+Retour humain du 15/09/2026, mot pour mot : « Les développeurs IA ne sont pas des codeurs, les
+lignes de code affichées doivent donc l'être uniquement si cela est strictement nécessaire. Pour
+voir les trigrammes déjà pris, pas la peine de code "az repos list...", un simple check sur l'URL
+du repo suffit. » Mesuré sur le livrable : 18 blocs de code, dont 4 commandes de console ; les 14
+autres — métadonnées de guide, arborescence de dépôt, motifs de nommage — se **recopient**, et
+aucun n'a été contesté.
+
+La distinction porte sur le GESTE que le bloc demande, pas sur sa longueur. Un bloc qu'on recopie
+(une arborescence, un motif de nommage, un en-tête à reproduire) sert tout lecteur, y compris
+celui qui n'ouvrira jamais un terminal. Un bloc qu'on exécute ne sert qu'un lecteur qui exécute :
+pour tous les autres, il remplace une action simple par une compétence qu'ils n'ont pas.
+
+**Le juge lit le lecteur, il ne le devine pas.** Un document qui déclare `role_destinataire`
+(règle D11 des gabarits) est jugé sur cette déclaration : si le lecteur est un exécutant, les
+commandes sont à leur place ; sinon elles sont un défaut, et la règle les nomme une à une. Un
+document qui ne déclare AUCUN lecteur rend SKIP, dit à voix haute — jamais PASS par silence.
+
+Avant (15/09, guide pour développeurs assistés par IA) : un bloc `az repos list --query …` pour
+vérifier qu'un trigramme est libre. Après : « ouvrez l'URL du dépôt — si elle répond, le trigramme
+est pris ».
+
 ## Précédence
 
 1. La structure imposée par un gabarit prime (blocs et tableaux de `RESTITUTION.md`, sections
    d'une étude) : aucune règle de ce document ne s'y oppose.
-2. Le plancher (E-1 à E-12) ne se franchit pas.
+2. Le plancher (E-1 à E-15) ne se franchit pas.
 3. La voix du produit (`MARQUE.md`) se déploie au-dessus : ton, registre, vocabulaire choisi.
 4. Un conflit entre une règle de forge et ce document se tranche par la règle la plus stricte
    (R-43 : renforcer oui, assouplir jamais) et se consigne au ledger.

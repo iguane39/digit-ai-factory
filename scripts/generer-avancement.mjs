@@ -93,7 +93,7 @@ md.push("Trois nombres suffisent à situer la mission : ce qui reste ouvert, ce 
 md.push("gains constatés, et ce qui a été écarté avec son motif. Un relevé qui ne compterait que");
 md.push("les corrections donnerait l'illusion d'un progrès net.");
 md.push("");
-md.push("| Grandeur | Compte | Ce que ça dit |");
+md.push("| Grandeur | Compte | Lecture |");
 md.push("|---|---|---|");
 md.push(`| Ouverts | ${ouverts.length} | candidats, décidés ou en cours — le reste à faire réel |`);
 md.push(`| Clos sur gains constatés | ${corriges.length} | corrigés avec leur mesure avant/après |`);
@@ -130,7 +130,7 @@ if (bloques.length) {
   for (const i of bloques) md.push(`| ${i.id} | ${echapper((i.titre || "").slice(0, 110))} |`);
   md.push("");
 }
-md.push("## Ce que ce rapport ne dit pas");
+md.push("## Hors de portée de ce rapport");
 md.push("");
 md.push("- **Il ne dit pas l'effort restant** : le registre porte un score de valeur, pas une charge.");
 md.push("  Un rapport qui additionnerait des scores fabriquerait une charge qui n'a jamais été estimée.");

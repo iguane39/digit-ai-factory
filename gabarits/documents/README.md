@@ -84,9 +84,9 @@ il n'est pas encore fait — et le dire vaut mieux qu'une bibliothèque qui a l'
 
 ---
 
-## Doctrine transverse — ce que tout document généré tient
+## Doctrine transverse — les invariants de tout document généré
 
-Sept règles, toutes **nées d'un retour payé** sur un livrable réel. Elles ne dépendent ni du
+Onze règles, toutes **nées d'un retour payé** sur un livrable réel. Elles ne dépendent ni du
 format ni de la forge productrice : un tableau illisible au mobile l'est autant dans un rapport
 d'audit que dans un rapport de données. Chaque gabarit déclare celles qu'il engage, et l'oracle
 vérifie que la déclaration existe (G4).
@@ -104,6 +104,8 @@ vérifie que la déclaration existe (G4).
 | **D9** | **Une mesure dit son DÉNOMINATEUR.** Tout chiffre publié énonce ce qu'il inclut ; on ne mesure un acteur que sur ce qu'il a eu l'occasion de faire ; une absence de déclaration n'est pas un échec et ne se compte pas comme un zéro ; un objet écarté d'un canal n'est pas retiré de la mesure ; un compte vaut mieux qu'un pourcentage quand le dénominateur est petit ou hétérogène ; et un pourcentage affiché SANS sa formule écrite à côté est un défaut. Pratique la moins chère : l'épreuve de l'étonnement — faire lire les résultats à qui connaît le terrain, et instruire LA MESURE d'abord quand un résultat le surprend. | TF-0760 (02/09) : une carte de chaleur juste case par case et fausse en bloc — un produit affiché à 0 % sur une exigence qu'il tient, parce que le dénominateur était fabriqué par les déclarations des AUTRES acteurs. Le contrôle mécanisable (pourcentage sans formule) est porté par oracle-calculs. |
 
 | **D10** | **La largeur de contenu est une propriété de la PAGE, pas du chapitre.** Un document est de lecture (tout bridé) ou de données (tout en pleine largeur) : il le déclare sur `<body data-largeur="lecture|donnees">`, et un chapitre qui s'en écarte se marque `largeur-exception`. Des largeurs qui alternent entre chapitres voisins, sans déclaration, sont un défaut — l'œil relit la mise en page au lieu du contenu. Jugé statiquement par **G5** d'`oracle-gabarits-documents` ; la largeur RENDUE reste au socle de rendu. | Retour humain direct du 11/09 (TF-1038) : « homogénéise la largeur des contenus de la page principale pour ne pas avoir des grandes largeurs mixées avec des petites » — neuf chapitres, cinq pleins et quatre bridés, dans l'ordre de leur NATURE et non de la lecture ; troisième demande du même lecteur dans le même message. |
+
+| **D11** | **Le document du LECTEUR ne porte pas le contenu de son AUTEUR.** Chaque gabarit déclare son `lecteur` — qui le lit, et quelles décisions il prend avec — et la frontière se tranche par un critère d'ACTION : une information qui change ce que le lecteur FAIT reste chez lui, y compris quand elle est inconfortable (« cette règle n'est pas encore opposable, appliquez-la et signalez tout écart ») ; une information qui ne change que ce que l'AUTEUR doit encore obtenir — registre d'arbitrages, historique des versions, statut de relecture — part dans le document d'auteur, cité en renvoi. **Et un document long se découpe en VUES d'un fichier unique, pas en fichiers**, sauf si son lecteur a demandé le contraire : le partage d'un livrable en onze morceaux est un coût pour lui, jamais pour son auteur. Jugé sur la bibliothèque par **G10** ; la frontière dans une INSTANCE reste une relecture. | Retour humain du 15/09/2026, mot pour mot : « pour que les sujets qui concernent le créateur du fichier n'arrivent pas à destination des lecteurs du fichier, ça n'est en aucun cas professionnel ». Mesuré sur le livrable : un registre de sept arbitrages avec leur instance et leur état, l'historique des versions, et un bandeau « statut projet, non opposable » sur chaque page d'un guide destiné à des développeurs — et onze fichiers livrés quand le destinataire en voulait un à onze vues (TF-1142). |
 
 *Ces règles sont une DOCTRINE, pas un oracle.* Ce qui les exécute vit ailleurs et est nommé
 famille par famille dans le catalogue (`oracles` de chaque ligne) : le socle HTML pour D1-D3 et

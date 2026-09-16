@@ -7,7 +7,7 @@ Décision humaine D-3 (b) du 03/09/2026 : le noyau est au plafond (N1, 6 144 oct
 le détail, le noyau ne porte qu'une ligne. **À tenir à jour à chaque référence ajoutée ou retirée** —
 l'oracle refuse l'orphelin dans les deux sens (référence sans entrée ici, entrée ici sans fichier).
 
-| Document | Ce qu'il tient |
+| Document | Contenu |
 |---|---|
 | `references\ACCUEIL.md` | Protocole d'accueil — de l'intention de l'utilisateur au run |
 | `references\BEST-PRACTICES-HTML.md` | Référentiel de best practices HTML — forge Digit-AI |

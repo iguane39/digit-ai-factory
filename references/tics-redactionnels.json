@@ -1,7 +1,8 @@
 {
   "format": "pilot/tics-redactionnels@1",
-  "version": "1.0.0",
-  "date": "2026-09-12",
+  "version": "1.2.0",
+  "date": "2026-09-16",
+  "evolution_1_2_0": "Deux apports du 16/09/2026, écrits par deux sessions du pilot le même jour : (1) la famille `annonce-nominalisee` et ses positions bloquantes, jouées par EC-8 — retour humain « arrête d'utiliser le terme \"Ce que\" », TF-1137 ; (2) la clé `chiffres_en_lettres`, jouée par EC-9 — retour humain « utilise des chiffres plutôt que l'écriture en toutes lettres », E-14. S'y ajoute (3) la clé `blocs_de_code`, jouée par EC-10 — retour humain « les développeurs IA ne sont pas des codeurs », E-15 et TF-1138. Le numéro a porté 1.1.0 pour deux contenus différents pendant une heure, le temps que les deux sessions se coordonnent : c'est la fenêtre décrite par references/TODO-FORGE.md pour le registre, transposée à une donnée.",
   "source": "Mandat humain du 12/09/2026 (décisions D-1 (a), D-3 (a) de la synthèse 20260911j) sur l'analyse L99 output/03-etudes/20260911-L99-regles-d-ecriture-factory.md. Familles dérivées de deux catalogues de signes (Wikipédia FR « Aide:Identifier l'usage d'une IA générative », Wikipédia EN « Wikipedia:Signs of AI writing », lus le 11/09/2026), des règles de terrain RULE-A..I d'agent-style (2026) et de guides francophones de détection 2026 ; seuils CALIBRÉS sur le corpus du pilot le 12/09/2026 (voir « calibrage »).",
   "pourquoi_une_donnee_et_pas_du_code": "Loi transverse n° 4 — une donnée volatile est une donnée, pas du code. Les tournures qui trahissent une écriture générée changent avec chaque génération de modèle (Wikipédia EN mesure la chute de « delve » en 2025) : une liste en dur dans l'oracle obligerait à publier une version de l'oracle pour ajouter ou retirer un mot. Chaque entrée est datée et sourcée ; chaque famille porte un seuil de densité explicite, recalibrable sans toucher au code.",
   "pourquoi_par_famille_et_par_densite_et_jamais_un_mot_isole": "Un mot isolé n'est pas un défaut : « crucial » a sa place une fois par document, un tiret d'incise est la ponctuation normale du français. C'est la DENSITÉ (occurrences pour mille mots de prose) et l'accumulation de familles qui trahissent une cadence mécanique — Wikipédia EN : « one or two coincidental, many indicate AI ». Un oracle qui crie sur un mot se fait désactiver dans la semaine (leçon N4 du noyau, leçon JARGON-A-GLOSER) ; un oracle de densité, calibré pour que le corpus PASS reste PASS, survit.",
@@ -22,11 +23,36 @@
       "seuil_avertissement": 2.0,
       "seuil_echec": 5.0,
       "motifs": [
-        {"motif": "il est important de (noter|souligner|rappeler|préciser|mentionner)", "langue": "fr", "source": "guides FR 2026 ; Wikipédia FR « phrases creuses »", "depuis": "2026-09-12"},
-        {"motif": "il (convient|est essentiel|est crucial|est primordial|est nécessaire) de (noter|souligner|rappeler|préciser|comprendre)", "langue": "fr", "source": "guides FR 2026 (cours-ndrc)", "depuis": "2026-09-12"},
-        {"motif": "notons que|force est de constater|il va sans dire|comme (nous l'avons|on l'a) (vu|dit|mentionné)", "langue": "fr", "source": "agent-style RULE-04 (mots inutiles)", "depuis": "2026-09-12"},
-        {"motif": "(dans|au cours de) (ce|cet) (chapitre|article|document|section)[^.\\n]{0,40}nous (allons|verrons)|nous allons (voir|aborder|examiner|explorer)", "langue": "fr", "source": "Wikipédia FR « plans répétitifs »", "depuis": "2026-09-12"},
-        {"motif": "it('s| is) (important|worth|essential|crucial) to (note|mention|remember|understand)|note that|as (we|I) (mentioned|discussed|saw)", "langue": "en", "source": "Wikipédia EN « superficial analysis »", "depuis": "2026-09-12"}
+        {
+          "motif": "il est important de (noter|souligner|rappeler|préciser|mentionner)",
+          "langue": "fr",
+          "source": "guides FR 2026 ; Wikipédia FR « phrases creuses »",
+          "depuis": "2026-09-12"
+        },
+        {
+          "motif": "il (convient|est essentiel|est crucial|est primordial|est nécessaire) de (noter|souligner|rappeler|préciser|comprendre)",
+          "langue": "fr",
+          "source": "guides FR 2026 (cours-ndrc)",
+          "depuis": "2026-09-12"
+        },
+        {
+          "motif": "notons que|force est de constater|il va sans dire|comme (nous l'avons|on l'a) (vu|dit|mentionné)",
+          "langue": "fr",
+          "source": "agent-style RULE-04 (mots inutiles)",
+          "depuis": "2026-09-12"
+        },
+        {
+          "motif": "(dans|au cours de) (ce|cet) (chapitre|article|document|section)[^.\\n]{0,40}nous (allons|verrons)|nous allons (voir|aborder|examiner|explorer)",
+          "langue": "fr",
+          "source": "Wikipédia FR « plans répétitifs »",
+          "depuis": "2026-09-12"
+        },
+        {
+          "motif": "it('s| is) (important|worth|essential|crucial) to (note|mention|remember|understand)|note that|as (we|I) (mentioned|discussed|saw)",
+          "langue": "en",
+          "source": "Wikipédia EN « superficial analysis »",
+          "depuis": "2026-09-12"
+        }
       ]
     },
     {
@@ -37,8 +63,18 @@
       "seuil_avertissement": 1.0,
       "seuil_echec": 3.0,
       "motifs": [
-        {"motif": "en (conclusion|résumé|somme|définitive)|pour (résumer|conclure|faire court)|au final|en fin de compte|tout compte fait", "langue": "fr", "source": "Wikipédia FR « sections Conclusion » ; agent-style RULE-E", "depuis": "2026-09-12"},
-        {"motif": "in (conclusion|summary|short)|to (sum up|summarize|conclude)|overall,|all in all", "langue": "en", "source": "Wikipédia EN ; agent-style RULE-E", "depuis": "2026-09-12"}
+        {
+          "motif": "en (conclusion|résumé|somme|définitive)|pour (résumer|conclure|faire court)|au final|en fin de compte|tout compte fait",
+          "langue": "fr",
+          "source": "Wikipédia FR « sections Conclusion » ; agent-style RULE-E",
+          "depuis": "2026-09-12"
+        },
+        {
+          "motif": "in (conclusion|summary|short)|to (sum up|summarize|conclude)|overall,|all in all",
+          "langue": "en",
+          "source": "Wikipédia EN ; agent-style RULE-E",
+          "depuis": "2026-09-12"
+        }
       ]
     },
     {
@@ -49,9 +85,24 @@
       "seuil_avertissement": 3.0,
       "seuil_echec": 8.0,
       "motifs": [
-        {"motif": "crucial(e|es|s)?|primordial(e|es|s)?|incontournable(s)?|révolutionnaire(s)?|révolutionn(e|er|ent)|sans précédent|véritable (levier|atout|révolution|game changer)", "langue": "fr", "source": "guides FR 2026 (« crucial, significatif, robuste, substantiel ») ; Wikipédia FR « emphase »", "depuis": "2026-09-12"},
-        {"motif": "à l'ère (de|du|des)|dans un monde (où|en)|en constante évolution|au cœur (de|du|des)|plongeons|plongée (dans|au)", "langue": "fr", "source": "guides FR 2026 (« À l'ère de… », « Plongeons dans… »)", "depuis": "2026-09-12"},
-        {"motif": "delve|tapestry|testament to|pivotal|groundbreaking|cutting-edge|seamless(ly)?|game-?changer|vibrant|ever-evolving|landscape of|unlock(s|ing)? the|elevate(s|d)?|harness(es|ing)? the|robust and", "langue": "en", "source": "Wikipédia EN « AI vocabulary » (daté : liste GPT-4 / GPT-4o) ; impeccable marketing-buzzword", "depuis": "2026-09-12"}
+        {
+          "motif": "crucial(e|es|s)?|primordial(e|es|s)?|incontournable(s)?|révolutionnaire(s)?|révolutionn(e|er|ent)|sans précédent|véritable (levier|atout|révolution|game changer)",
+          "langue": "fr",
+          "source": "guides FR 2026 (« crucial, significatif, robuste, substantiel ») ; Wikipédia FR « emphase »",
+          "depuis": "2026-09-12"
+        },
+        {
+          "motif": "à l'ère (de|du|des)|dans un monde (où|en)|en constante évolution|au cœur (de|du|des)|plongeons|plongée (dans|au)",
+          "langue": "fr",
+          "source": "guides FR 2026 (« À l'ère de… », « Plongeons dans… »)",
+          "depuis": "2026-09-12"
+        },
+        {
+          "motif": "delve|tapestry|testament to|pivotal|groundbreaking|cutting-edge|seamless(ly)?|game-?changer|vibrant|ever-evolving|landscape of|unlock(s|ing)? the|elevate(s|d)?|harness(es|ing)? the|robust and",
+          "langue": "en",
+          "source": "Wikipédia EN « AI vocabulary » (daté : liste GPT-4 / GPT-4o) ; impeccable marketing-buzzword",
+          "depuis": "2026-09-12"
+        }
       ]
     },
     {
@@ -62,8 +113,18 @@
       "seuil_avertissement": 2.0,
       "seuil_echec": 5.0,
       "motifs": [
-        {"motif": "non seulement[^.\\n]{0,80}mais (aussi|également|encore)|qu'il s'agisse de|que ce soit[^.\\n]{0,60} ou|ce n'est pas (un|une|seulement|simplement)[^.\\n]{0,60}(c'est|mais)", "langue": "fr", "source": "Wikipédia EN « negative parallelisms » transposé ; guides FR 2026", "depuis": "2026-09-12"},
-        {"motif": "not (just|only|merely)[^.\\n]{0,80}but (also|rather)?|it's not (a|about)[^.\\n]{0,60}it's", "langue": "en", "source": "Wikipédia EN « negative parallelisms » ; impeccable aphoristic-cadence", "depuis": "2026-09-12"}
+        {
+          "motif": "non seulement[^.\\n]{0,80}mais (aussi|également|encore)|qu'il s'agisse de|que ce soit[^.\\n]{0,60} ou|ce n'est pas (un|une|seulement|simplement)[^.\\n]{0,60}(c'est|mais)",
+          "langue": "fr",
+          "source": "Wikipédia EN « negative parallelisms » transposé ; guides FR 2026",
+          "depuis": "2026-09-12"
+        },
+        {
+          "motif": "not (just|only|merely)[^.\\n]{0,80}but (also|rather)?|it's not (a|about)[^.\\n]{0,60}it's",
+          "langue": "en",
+          "source": "Wikipédia EN « negative parallelisms » ; impeccable aphoristic-cadence",
+          "depuis": "2026-09-12"
+        }
       ]
     },
     {
@@ -74,8 +135,18 @@
       "seuil_avertissement": 1.0,
       "seuil_echec": 3.0,
       "motifs": [
-        {"motif": "les experts (s'accordent|estiment|considèrent|recommandent)|il est (généralement|communément|largement) (admis|reconnu|accepté)|de nombreuses (études|recherches|sources) (montrent|indiquent|démontrent)|on (considère|estime|sait) (généralement )?que|selon (certains|de nombreux|la plupart des) (experts|spécialistes|observateurs)", "langue": "fr", "source": "Wikipédia EN « vague attributions » transposé", "depuis": "2026-09-12"},
-        {"motif": "experts (say|agree|argue|believe)|studies (show|suggest|indicate)|it is (widely|generally) (known|accepted|believed)|industry reports|some critics", "langue": "en", "source": "Wikipédia EN « vague attributions »", "depuis": "2026-09-12"}
+        {
+          "motif": "les experts (s'accordent|estiment|considèrent|recommandent)|il est (généralement|communément|largement) (admis|reconnu|accepté)|de nombreuses (études|recherches|sources) (montrent|indiquent|démontrent)|on (considère|estime|sait) (généralement )?que|selon (certains|de nombreux|la plupart des) (experts|spécialistes|observateurs)",
+          "langue": "fr",
+          "source": "Wikipédia EN « vague attributions » transposé",
+          "depuis": "2026-09-12"
+        },
+        {
+          "motif": "experts (say|agree|argue|believe)|studies (show|suggest|indicate)|it is (widely|generally) (known|accepted|believed)|industry reports|some critics",
+          "langue": "en",
+          "source": "Wikipédia EN « vague attributions »",
+          "depuis": "2026-09-12"
+        }
       ]
     },
     {
@@ -86,8 +157,18 @@
       "seuil_avertissement": 0.5,
       "seuil_echec": 2.0,
       "motifs": [
-        {"motif": "n'hésitez pas à|j'espère que (cela|ceci|ça) (vous )?(aide|aidera|sera utile)|excellente question|bien sûr !|absolument !|je (serais|suis) ravi(e)? de|à ma (dernière|date de) (mise à jour|connaissance)|en tant qu'(IA|intelligence artificielle|modèle de langage)", "langue": "fr", "source": "Wikipédia EN « communication patterns » transposé ; Wikipédia FR « commentaires d'édition »", "depuis": "2026-09-12"},
-        {"motif": "i hope this helps|feel free to|let me know if|as an ai|as of my last (update|training)|great question|certainly!|absolutely!", "langue": "en", "source": "Wikipédia EN « collaborative communication », « knowledge-cutoff disclaimers »", "depuis": "2026-09-12"}
+        {
+          "motif": "n'hésitez pas à|j'espère que (cela|ceci|ça) (vous )?(aide|aidera|sera utile)|excellente question|bien sûr !|absolument !|je (serais|suis) ravi(e)? de|à ma (dernière|date de) (mise à jour|connaissance)|en tant qu'(IA|intelligence artificielle|modèle de langage)",
+          "langue": "fr",
+          "source": "Wikipédia EN « communication patterns » transposé ; Wikipédia FR « commentaires d'édition »",
+          "depuis": "2026-09-12"
+        },
+        {
+          "motif": "i hope this helps|feel free to|let me know if|as an ai|as of my last (update|training)|great question|certainly!|absolutely!",
+          "langue": "en",
+          "source": "Wikipédia EN « collaborative communication », « knowledge-cutoff disclaimers »",
+          "depuis": "2026-09-12"
+        }
       ]
     },
     {
@@ -98,8 +179,20 @@
       "seuil_avertissement": 4.0,
       "seuil_echec": 10.0,
       "motifs": [
-        {"motif": "^\\s*(de plus|en outre|par ailleurs|également|aussi|d'autre part|qui plus est)\\s*,", "langue": "fr", "source": "agent-style RULE-D", "depuis": "2026-09-12", "par_ligne": true},
-        {"motif": "^\\s*(additionally|furthermore|moreover|also)\\s*,", "langue": "en", "source": "agent-style RULE-D ; Wikipédia EN « AI vocabulary »", "depuis": "2026-09-12", "par_ligne": true}
+        {
+          "motif": "^\\s*(de plus|en outre|par ailleurs|également|aussi|d'autre part|qui plus est)\\s*,",
+          "langue": "fr",
+          "source": "agent-style RULE-D",
+          "depuis": "2026-09-12",
+          "par_ligne": true
+        },
+        {
+          "motif": "^\\s*(additionally|furthermore|moreover|also)\\s*,",
+          "langue": "en",
+          "source": "agent-style RULE-D ; Wikipédia EN « AI vocabulary »",
+          "depuis": "2026-09-12",
+          "par_ligne": true
+        }
       ]
     },
     {
@@ -110,11 +203,71 @@
       "seuil_avertissement": 25.0,
       "seuil_echec": 40.0,
       "motifs": [
-        {"motif": "\\s[—–]\\s", "langue": "*", "source": "Wikipédia EN ; agent-style RULE-B ; impeccable em-dash-overuse", "depuis": "2026-09-12"}
+        {
+          "motif": "\\s[—–]\\s",
+          "langue": "*",
+          "source": "Wikipédia EN ; agent-style RULE-B ; impeccable em-dash-overuse",
+          "depuis": "2026-09-12"
+        }
       ],
       "note_calibrage": "mesuré le 12/09/2026 sur 204 textes du pilot (≥ 150 mots) : médiane 18,6 tirets d'incise pour mille mots, 75e centile 24,3, 90e centile 31,6, 95e centile 35,7, maximum 60,2. Le corpus du pilot est écrit en style d'incise dense (doctrines, synthèses) : le seuil d'échec est posé au-dessus du 95e centile pour que ce corpus reste PASS et que seule une cascade nettement supérieure échoue ; l'avertissement au voisinage du 75e centile. À recalibrer à la baisse quand la règle E-8 aura fait baisser la densité des textes neufs."
+    },
+    {
+      "cle": "annonce-nominalisee",
+      "libelle": "Annonce NOMINALISÉE : « Ce que ce document tient », « Ce qu'il ne porte pas »",
+      "ce_que_le_lecteur_paie": "un titre qui PROMET un contenu au lieu de le nommer : le lecteur doit ouvrir le chapitre pour savoir de quoi il parle, et une table des matières faite de ces titres ne se survole pas",
+      "remede": "nommer le contenu — « Ce que le guide couvre » devient « Périmètre du guide », « Ce qu'il ne tient pas » devient « Hors périmètre » ; en en-tête de colonne, le nom de la grandeur mesurée",
+      "pourquoi_cette_famille_existe": "la famille annonce-vide (E-5) ne reconnaît que des annonces VERBALES (« nous allons voir », « il est important de noter ») ; « Ce que X apprend » annonce sans employer aucun de ces verbes et passe sous le filet. Mesuré le 15/09/2026 : 84 occurrences dans un seul livrable de 11 pages, dont 6 en titre de chapitre et 20 en en-tête de colonne, pendant que l'oracle rendait PASS sur 15 228 mots de prose (TF-1137).",
+      "seuil_avertissement": 1.0,
+      "seuil_echec": 6.5,
+      "positions_bloquantes": [
+        "titre",
+        "en-tete-de-colonne"
+      ],
+      "exemptions": [
+        {
+          "literal": "Ce qu'elle coûte",
+          "portee": "en-tete-de-colonne",
+          "depuis": "2026-09-16",
+          "motif": "libellé IMPOSÉ par le tableau d'options du bloc 3 de gabarits/RESTITUTION.md et vérifié LITTÉRALEMENT par S31 de oracle-synthese.mjs, par hook-restitution.mjs et par hook-ouverture.mjs : le proscrire sans réécrire d'abord la doctrine rendrait toute synthèse conforme au gabarit ÉCHOUÉE ici, et toute synthèse conforme ici REFUSÉE par le hook Stop",
+          "leve_par": "TF-1149 — décision humaine sur la réécriture des deux libellés du tableau d'options"
+        },
+        {
+          "literal": "Ce qu'elle exclut",
+          "portee": "en-tete-de-colonne",
+          "depuis": "2026-09-16",
+          "motif": "même prescription que « Ce qu'elle coûte », même tableau, mêmes trois juges",
+          "leve_par": "TF-1149 — décision humaine sur la réécriture des deux libellés du tableau d'options"
+        }
+      ],
+      "motifs": [
+        {
+          "motif": "ce (?:que|qu'il|qu'elle|qu'ils|qu'elles|qu’il|qu’elle)\\s+(?:[^.\\n]{0,40}?\\s)?(?:ne\\s+)?(?:tient|contient|porte|couvre|recouvre|apprend|dit|embarque|emporte|renferme)(?:\\b|s\\b|nent\\b)",
+          "langue": "fr",
+          "source": "retour humain du 15/09/2026, mot pour mot : « Arrête d'utiliser le terme \"Ce que\" comme \"Ce que ce document tient...\" \"Ce qu'il ne tient pas\". Déjà demandé plusieurs fois et remonté à la Factory plusieurs fois. »",
+          "depuis": "2026-09-16"
+        }
+      ],
+      "note_calibrage": "mesuré le 16/09/2026 sur 472 textes Markdown du pilot (≥ 150 mots, hors old/) : 238 occurrences, 157 textes porteurs ; densités ‰ — 50e centile 0,00, 90e 0,96, 95e 1,85, maximum 6,37. Seuil d'avertissement posé à 1 ‰ (voisinage du 90e centile), seuil d'échec à 6,5 ‰ (au-delà du maximum observé) : la DENSITÉ avertit, elle ne condamne pas — le corpus reste PASS. Les dents de la famille sont dans EC-8, qui REFUSE la tournure en titre et en en-tête de colonne : c'est là que le retour humain l'a relevée, 6 titres et 20 en-têtes sur un seul livrable."
     }
   ],
+  "blocs_de_code": {
+    "regle": "E-15 (TF-1138, 16/09/2026) — dans un texte T2, un bloc de code qu'on RECOPIE sert tout lecteur ; un bloc qu'on EXÉCUTE ne sert qu'un lecteur qui exécute. EC-10 lit le lecteur DÉCLARÉ du document (`role_destinataire` ou `lecteur` du front matter, règle D11 des gabarits) : si ce lecteur porte un marqueur d'exécutant, les commandes sont à leur place ; sinon elles sont nommées une à une. Aucun lecteur déclaré rend SKIP, dit à voix haute — jamais PASS par silence.",
+    "source": "retour humain du 15/09/2026, mot pour mot : « Les développeurs IA ne sont pas des codeurs, les lignes de code affichées doivent donc l'être uniquement si cela est strictement nécessaire. Pour voir les trigrammes déjà pris, pas la peine de code \"az repos list...\", un simple check sur l'URL du repo suffit. » Mesure du même jour : 18 blocs de code dans le livrable, 4 commandes de console, 14 blocs qui se recopient et qu'aucun retour n'a contestés.",
+    "pourquoi_le_lecteur_et_pas_le_bloc": "Juger le bloc seul rendrait la règle fausse dans les deux sens : un runbook d'exploitation DOIT porter ses commandes, un guide de conception n'en porte aucune. Ce qui change, c'est le lecteur — la règle se branche donc sur la déclaration que les gabarits portent déjà, au lieu d'inventer une heuristique sur le contenu.",
+    "invocations": [
+      {"motif": "^\\s*(?:\\$|>|#)\\s+\\S", "source": "invite de commande explicite", "depuis": "2026-09-16"},
+      {"motif": "^\\s*(?:sudo\\s+)?(?:node|npm|npx|pnpm|yarn|git|python|python3|pip|az|aws|gcloud|docker|kubectl|terraform|curl|wget|ssh|scp|bash|sh|powershell|pwsh|dotnet|mvn|gradle|make|cargo|go|psql|mysql|sqlcmd)\\b", "source": "invocation d'outil en ligne de commande", "depuis": "2026-09-16"}
+    ],
+    "lecteurs_executants": [
+      {"motif": "exploitant|astreinte|run\\b|ops\\b|sre\\b|administrateur|devops|int[ée]grateur|d[ée]veloppeur(?!s? (?:ia|assist))", "pourquoi": "un lecteur dont le métier EST d'exécuter : la commande lui épargne une traduction, elle ne lui en impose pas", "depuis": "2026-09-16"}
+    ],
+    "non_juge": [
+      "la NÉCESSITÉ d'une commande donnée : la règle dit à qui elle s'adresse, elle ne dit pas si celle-là valait la peine",
+      "un bloc de code qui se RECOPIE (arborescence, motif de nommage, en-tête, extrait de configuration) : il n'est jamais compté, quel que soit le lecteur",
+      "les documents sans lecteur déclaré : SKIP dit à voix haute — la règle ne devine pas un destinataire"
+    ]
+  },
   "anteriorite": {
     "regle": "Un fichier listé ici est un texte normatif interne antérieur à la doctrine d'écriture : l'oracle rend SKIP dessus (jamais FAIL) tant qu'il n'est pas réécrit ; il sera jugé à sa prochaine réécriture de fond, jamais rétroactivement (typologie §1 du mandat, chapitre 8 de l'analyse).",
     "chemins": [
@@ -144,5 +297,142 @@
     "le jargon hors des référentiels existants (JARGON-A-GLOSER.json, jargon-a-gloser.json du socle) : couvert par S20, S23, M18, L30, jamais ici",
     "les textes d'application (T4 : libellés, erreurs, états vides) : leurs chaînes vivent dans du code ou des fichiers de ressources que cet oracle ne lit pas — lot de travaux forge-design",
     "un tic hors liste : un motif qui n'a encore coûté aucun aller-retour n'est pas détecté ; la liste grossit par les retours humains, jamais par la devinette"
-  ]
+  ],
+  "chiffres_en_lettres": {
+    "source": "retour humain du 16/09/2026, mot pour mot : « Utilise des chiffres plutôt que l'écriture en toutes lettres pour les valeurs numériques, les heures et les dates. 7 septembre ou 7/09 plutôt que sept septembre, 8,8 Mo plutôt que huit virgule huit. » Le fait : une restitution écrite le matin même rendait ses mesures en toutes lettres — « huit virgule huit mégaoctets », « cent trente-deux révisions », « le sept septembre ».",
+    "regle": "E-14 du plancher d'écriture. Un nombre écrit en lettres est un défaut dès qu'il porte une VALEUR : suivi d'une unité ou d'un dénombrable, suivi d'un mois, ou composé avec « virgule » ou « pour cent ». Ailleurs — article, pronom, locution figée, nombre en tête de phrase — la lettre reste juste, et la règle se tait.",
+    "pourquoi_pas_une_densite": "Les neuf familles de ce fichier comptent des TICS, dont seule l'accumulation trahit. Une mesure écrite en lettres n'est pas un tic : elle coûte au lecteur dès la première, parce qu'il doit la reconstituer avant de la comparer à la suivante. Le seuil est donc à un, et la règle ne vit pas parmi les familles.",
+    "pourquoi_un_declencheur_et_pas_une_liste_de_nombres": "Chercher les mots-nombres seuls accuserait « un défaut », « une règle », « en deux temps », et un oracle qui crie sur l'usage légitime se fait désactiver dans la semaine (leçon N4). C'est le DÉCLENCHEUR À DROITE qui fait la valeur : l'unité, le dénombrable, le mois. « neuf » suivi de rien reste l'adjectif ; « neuf cas » est un nombre.",
+    "nombres": [
+      "deux",
+      "trois",
+      "quatre",
+      "cinq",
+      "six",
+      "sept",
+      "huit",
+      "neuf",
+      "dix",
+      "onze",
+      "douze",
+      "treize",
+      "quatorze",
+      "quinze",
+      "seize",
+      "vingt",
+      "trente",
+      "quarante",
+      "cinquante",
+      "soixante",
+      "cent",
+      "cents",
+      "mille",
+      "million",
+      "millions",
+      "milliard",
+      "milliards"
+    ],
+    "nombre_exclu": {
+      "un": "article indéfini et pronom : « un défaut », « l'un des deux » — l'accuser rendrait la règle inutilisable",
+      "une": "idem au féminin"
+    },
+    "unites": [
+      "Mo",
+      "Ko",
+      "Go",
+      "To",
+      "px",
+      "%",
+      "€",
+      "km",
+      "ms",
+      "Hz",
+      "mégaoctets",
+      "kilooctets",
+      "gigaoctets",
+      "caractères",
+      "pour cent"
+    ],
+    "denombrables": [
+      "révision",
+      "révisions",
+      "page",
+      "pages",
+      "ligne",
+      "lignes",
+      "fichier",
+      "fichiers",
+      "item",
+      "items",
+      "cas",
+      "test",
+      "tests",
+      "règle",
+      "règles",
+      "oracle",
+      "oracles",
+      "défaut",
+      "défauts",
+      "occurrence",
+      "occurrences",
+      "dépôt",
+      "dépôts",
+      "commit",
+      "commits",
+      "colonne",
+      "colonnes",
+      "mot",
+      "mots",
+      "jour",
+      "jours",
+      "heure",
+      "heures",
+      "minute",
+      "minutes",
+      "seconde",
+      "secondes",
+      "produit",
+      "produits",
+      "forge",
+      "forges",
+      "recette",
+      "recettes",
+      "session",
+      "sessions",
+      "mesure",
+      "mesures",
+      "fois",
+      "classe",
+      "classes",
+      "entrée",
+      "entrées",
+      "volet",
+      "volets",
+      "skill",
+      "skills"
+    ],
+    "mois": [
+      "janvier",
+      "février",
+      "mars",
+      "avril",
+      "mai",
+      "juin",
+      "juillet",
+      "août",
+      "septembre",
+      "octobre",
+      "novembre",
+      "décembre"
+    ],
+    "liaisons": [
+      "et",
+      "virgule"
+    ],
+    "non_juge": [
+      "un nombre en TÊTE DE PHRASE, où l'usage français préfère la lettre : la règle ne regarde pas la position",
+      "une valeur écrite en lettres dont le dénombrable est absent de la liste — celle-ci est FERMÉE et se remplit à l'usage, comme le référentiel de jargon",
+      "les citations : un retour humain ou une sortie d'outil reproduits tels quels gardent leur forme, et la règle ne lit pas ce qui vit entre accents graves"
+    ]
+  }
 }

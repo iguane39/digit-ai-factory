@@ -314,6 +314,46 @@ export function juger(dossier) {
       }
     }
 
+    // G10 (TF-1142, 16/09/2026) — LE DOCUMENT DU LECTEUR NE PORTE PAS LE CONTENU DE SON AUTEUR.
+    //
+    // LE FAIT, mot pour mot : « pour que les sujets qui concernent le créateur du fichier
+    // n'arrivent pas à destination des lecteurs du fichier, ça n'est en aucun cas professionnel ».
+    // Mesuré sur le livrable qui l'a provoqué — un guide destiné à des développeurs portait un
+    // registre de sept arbitrages avec leur instance et leur état, l'historique des versions du
+    // document, et un bandeau « statut projet, non opposable » sur chacune de ses onze pages.
+    //
+    // CE QUE CETTE RÈGLE NE DIT PAS : supprimer les incertitudes. Un développeur DOIT savoir si la
+    // règle qu'il applique est opposable — cette information change ce qu'il fait, elle reste chez
+    // lui. La frontière est un critère d'ACTION, pas de confort : ce qui ne change que le travail
+    // de l'AUTEUR part au document d'auteur. C'est pourquoi le juge porte sur la DÉCLARATION du
+    // lecteur, et jamais sur le contenu d'une instance : trancher « cette phrase sert-elle le
+    // lecteur ? » est une relecture, pas une mesure, et un oracle qui le prétendrait mentirait.
+    // CE QUE CETTE RÈGLE MESURE, ET POURQUOI PAS CE QU'ON CROYAIT. L'item demandait d'exiger un
+    // champ `lecteur`. Mesuré AVANT d'écrire la règle : les CINQ familles portent déjà
+    // `role_destinataire: {qui lit ce rapport, et pour quelle décision}` — la déclaration existe,
+    // sous un autre nom, et une règle posée là aurait été VERTE sur les cinq, donc verte sur le
+    // défaut même qu'elle existe pour attraper. Ce qu'aucun gabarit ne porte, c'est la FRONTIÈRE :
+    // la section qui nomme ce qui part au document d'auteur au lieu d'aller au lecteur. La règle
+    // est donc posée là, et la déclaration du lecteur reste vérifiée comme sa condition.
+    {
+      const LECTEUR = /^\s*(?:role_destinataire|lecteur)\s*:\s*\S/im;
+      const FRONTIERE = /^\s*#{2,4}\s*[^\n]*document d['’]auteur/im;
+      const texte = readFileSync(p("GABARIT.md"), "utf8");
+      const manque = [!LECTEUR.test(texte) && "la déclaration `role_destinataire` (qui lit, et pour quelle décision)",
+        !FRONTIERE.test(texte) && "la section « Document d'auteur », qui nomme ce qui NE va PAS au lecteur"].filter(Boolean);
+      if (manque.length) {
+        findings.push({ regle: "G10", statut: "FAIL", ou: `${fam}/GABARIT.md`, message:
+          `le gabarit ne porte pas ${manque.join(" ni ")} — sans elle, le registre d'arbitrages, ` +
+          "l'historique des versions et le statut de relecture partent au lecteur, et personne ne le " +
+          "voit : c'est le refus humain du 15/09 (« ça n'est en aucun cas professionnel »). La frontière " +
+          "se tranche par un critère d'ACTION — ce qui change ce que le lecteur FAIT reste chez lui, ce " +
+          "qui ne change que le travail de l'AUTEUR part au document d'auteur (règle D11, TF-1142)" });
+      } else {
+        findings.push({ regle: "G10", statut: "PASS", ou: `${fam}/GABARIT.md`,
+          message: "lecteur déclaré et frontière lecteur/auteur écrite (D11)" });
+      }
+    }
+
     // G5 (TF-1038, 15/09/2026) — LA LARGEUR EST UNE PROPRIÉTÉ DE LA PAGE. Le fait : un lecteur a
     // demandé d'homogénéiser la largeur d'une page où neuf chapitres alternaient pleine largeur et
     // `.chap.lire` bridé, dans l'ordre de leur nature et non de la lecture. Le squelette
