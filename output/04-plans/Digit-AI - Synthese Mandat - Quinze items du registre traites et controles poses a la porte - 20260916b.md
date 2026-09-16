@@ -216,7 +216,7 @@ reviennent — trois arbitrages et le feu vert de publication. Les premiers sont
 | **A-4** | Trancher D-1, le mandat d'écriture chez les dépôts voisins | `manuelle_utilisateur` | neuve | `decision` — la règle réserve à l'humain l'ouverture d'un dépôt frère | bloc 3 de cette synthèse, option (a), (b) ou (c) | vingt-deux items restent ouverts et leurs récidives continuent d'être comptées |
 | **A-5** | Trancher D-2, le sort des vues du registre versionnées | `manuelle_utilisateur` | TF-0983 | `decision` — trois voies dont aucune n'est prescrite par un texte | bloc 3 de cette synthèse, option (c) recommandée | le coût de l'amplification continue d'être payé sans être écrit |
 | **A-6** | Trancher D-3, la portée de la règle des pages de proposition | `manuelle_utilisateur` | TF-0923 | `decision` — la doctrine parle de proposition, la mesure porte sur des études | bloc 3 de cette synthèse, option (b) recommandée | le contrôle ne peut pas être écrit sans risquer d'accuser cinq documents justes |
-| **A-7** | Donner le feu vert de publication des sept enregistrements de ce tour | `manuelle_utilisateur` | neuve | `decision` — la porte du dépôt réserve la publication au mot humain | `FORGE_PUSH_GO="<motif>" git push` depuis `c:\dev\digit-ai-factory` | le travail reste local et les produits ne reçoivent pas la doctrine v2.22.0 |
+| **A-7** | Donner le feu vert de publication des onze enregistrements de ce tour | `manuelle_utilisateur` | neuve | `decision` — la porte du dépôt réserve la publication au mot humain | `FORGE_PUSH_GO="<motif>" git push` depuis `c:\dev\digit-ai-factory` | le travail reste local et les produits ne reçoivent pas la doctrine v2.22.0 |
 
 ## 9. Traces
 
