@@ -68,13 +68,13 @@ design (01-pages-temoins), organization (01-etudes, 02-composants), seo (01-deci
 date et son indice — donc au moins trois espaces. Or le résolveur de liens de la session de
 travail **coupe le chemin au premier espace** : un livrable n'est jamais atteignable au clic,
 ni tel quel, ni encodé, ni entre chevrons. Mesuré le 24/08/2026 sur un produit : **22
-livrables, 0 atteignable**, pendant onze jours sans que la cause soit nommée.
+livrables, 0 atteignable**, pendant 11 jours sans que la cause soit nommée.
 
 Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous sont donnés
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 307 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 309 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -241,6 +241,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese L99 - Forge communication marketing prompt reecrit trois candidatures - 20260911f.md | 20260911f | 19.9 Ko | `04-plans/Digit-AI - Synthese L99 - Forge communication marketing prompt reecrit trois candidatures - 20260911f.md` |
 | Digit-AI - Synthese L99 - Personas par phase prompt reecrit - 20260914a.md | 20260914a | 12.7 Ko | `04-plans/Digit-AI - Synthese L99 - Personas par phase prompt reecrit - 20260914a.md` |
 | Digit-AI - Synthese L99 - Regles d ecriture de la Factory prompt reecrit et esquisse profil - 20260911j.md | 20260911j | 21.5 Ko | `04-plans/Digit-AI - Synthese L99 - Regles d ecriture de la Factory prompt reecrit et esquisse profil - 20260911j.md` |
+| Digit-AI - Synthese Mandat - 115 valeurs passees en chiffres chez les producteurs - 20260916e.md | 20260916e | 8.4 Ko | `04-plans/Digit-AI - Synthese Mandat - 115 valeurs passees en chiffres chez les producteurs - 20260916e.md` |
 | Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md | 20260905i | 15.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md` |
 | Digit-AI - Synthese Mandat - Actions 36 a 40 achevees - 20260905k.md | 20260905k | 23.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Actions 36 a 40 achevees - 20260905k.md` |
 | Digit-AI - Synthese Mandat - Amelioration continue pas 0 a 4 - 20260903b.md | 20260903b | 19.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Amelioration continue pas 0 a 4 - 20260903b.md` |
@@ -254,6 +255,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md.jugement.json | — | 0.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md.jugement.json` |
 | Digit-AI - Synthese Mandat - Barres validees et publication decisions D6a D7a - 20260907e.md | 20260907e | 10.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Barres validees et publication decisions D6a D7a - 20260907e.md` |
 | Digit-AI - Synthese Mandat - Bloc 3 forme de reference - 20260830f.md | 20260830f | 15.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Bloc 3 forme de reference - 20260830f.md` |
+| Digit-AI - Synthese Mandat - Boite d entree videe et huit items clos sous campagnes - 20260916e.md | 20260916e | 25.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Boite d entree videe et huit items clos sous campagnes - 20260916e.md` |
 | Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md | 20260901b | 13.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md` |
 | Digit-AI - Synthese Mandat - Campagnes en cours trois corrections closes porte rouge sur quatre depots - 20260908d.md | 20260908d | 20.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagnes en cours trois corrections closes porte rouge sur quatre depots - 20260908d.md` |
 | Digit-AI - Synthese Mandat - Canal confidentiel et actions 58 60 61 62 63 - 20260907m.md | 20260907m | 25.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Canal confidentiel et actions 58 60 61 62 63 - 20260907m.md` |
