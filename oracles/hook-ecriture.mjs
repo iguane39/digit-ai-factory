@@ -46,6 +46,47 @@ export function fichierVise(entree) {
   } catch { return null; }
 }
 
+// LA FAMILLE DU LIVRABLE, DEMANDÉE AU MOMENT OÙ ON LE NOMME (TF-1076, 16/09/2026).
+//
+// LE FAIT est au tableau de bord des récidives : la classe `gabarit-famille-manquante` compte
+// 13 items, 1 fondateur et 13 RÉCIDIVES — 100 %, chez quatre produits. *Une classe dont chaque
+// retour est une récidive dit que la correction ne redescend pas au moment où le livrable
+// s'écrit.* Et la cause tenait en une ligne : la classe déclarait l'oracle « G8 », qui n'existait
+// pas. Le catalogue des familles n'était interrogeable que par un lecteur qui savait déjà qu'il
+// existait — c'est-à-dire par personne au moment utile.
+//
+// PORTÉE : les livrables, et eux seuls. Un `.md` de code, de référence ou de gabarit n'a pas de
+// famille de document à résoudre ; ce qui en a une vit sous `output\` (R-4) ou sous le `forge\`
+// d'un produit. Ailleurs, la question ne se pose pas et la poser ferait du bruit.
+//
+// AVERTIT, NE BLOQUE PAS, comme tout ce hook : un livrable se construit en plusieurs écritures, et
+// bloquer au caractère près apprendrait à désactiver le hook (leçon N4).
+const EST_LIVRABLE = /(^|[\\/])(output|livrables)[\\/]/i;
+const ORACLE_FAMILLES = join(ICI, "oracle-gabarits-documents.mjs");
+
+/** Joue G8 sur un livrable ; rend les lignes à imprimer (vide si le fichier n'est pas un livrable). */
+export function jouerFamille(fichier, oracle = ORACLE_FAMILLES) {
+  const lignes = [];
+  if (!fichier || !EST_LIVRABLE.test(String(fichier).replace(/\\/g, "/"))) return lignes;
+  const nom = basename(fichier);
+  if (!existsSync(oracle)) {
+    lignes.push(`[famille] non jouée sur ${nom} : ${oracle} absent de ce poste — installer les outils (bootstrap.mjs --pull)`);
+    return lignes;
+  }
+  const r = spawnSync(process.execPath, [oracle, "--livrable", nom], { encoding: "utf8", timeout: 30000 });
+  let j = null;
+  try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* illisible */ }
+  const f = j?.findings?.[0];
+  if (!f) {
+    lignes.push(`[famille] oracle-gabarits-documents ILLISIBLE sur ${nom} (exit ${r.status}) — ce n'est pas un constat sur le livrable`);
+    return lignes;
+  }
+  lignes.push(f.statut === "PASS"
+    ? `[famille] ${nom} : ${f.message}`
+    : `[famille] ${nom} : G8 — ${f.message}`);
+  return lignes;
+}
+
 /** Joue l'oracle d'écriture sur un fichier ; rend les lignes à imprimer. */
 export function jouer(fichier, oracle = ORACLE) {
   const lignes = [];
@@ -116,6 +157,21 @@ function selfTest() {
   const verte = join(dir, "verte.md"); writeFileSync(verte, VERTE, "utf8");
   const lignesRouges = jouer(rouge);
   if (!lignesRouges.some((l) => /style FAIL/.test(l))) casse.push(`un texte fautif n'est pas signalé FAIL (${lignesRouges.join(" | ") || "aucune ligne"})`);
+  // G8 (TF-1076) : la famille n'est demandée QU'aux livrables, et elle se résout ou se nomme.
+  if (jouerFamille(join(dir, "note.md")).length)
+    casse.push("la famille est demandée à un .md qui n'est pas un livrable — la question ne se pose pas hors de `output\\`");
+  mkdirSync(join(dir, "output", "04-plans"), { recursive: true });
+  const couvert = join(dir, "output", "04-plans", "Digit-AI - Synthese Mandat - Campagne close - 20260916a.md");
+  const nu = join(dir, "output", "04-plans", "Digit-AI - Note Migration - Chemins renommes - 20260916a.md");
+  writeFileSync(couvert, VERTE, "utf8"); writeFileSync(nu, VERTE, "utf8");
+  const lignesCouvert = jouerFamille(couvert);
+  const lignesNu = jouerFamille(nu);
+  if (!lignesCouvert.some((l) => /famille « restitution »/.test(l)))
+    casse.push(`un livrable « Synthese … » ne résout pas sa famille au catalogue (${lignesCouvert.join(" | ") || "aucune ligne"})`);
+  if (!lignesNu.some((l) => /G8 — aucune famille/.test(l)))
+    casse.push("un livrable d'un type ABSENT du catalogue n'est pas signalé à l'écriture — c'est par ce silence que la " +
+      `classe gabarit-famille-manquante récidive dans 13 cas sur 13 (${lignesNu.join(" | ") || "aucune ligne"})`);
+
   const lignesVertes = jouer(verte);
   if (!lignesVertes.some((l) => /style PASS/.test(l))) casse.push(`un texte sobre n'est pas déclaré PASS (${lignesVertes.join(" | ") || "aucune ligne"})`);
   if (jouer(join(dir, "absent.md")).length) casse.push("un fichier absent produit une sortie");
@@ -124,7 +180,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test hook-ecriture : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test hook-ecriture : 9/9 PASS (.md reconnu ; .html, README.md, node_modules et entrée illisible écartés ; texte fautif FAIL ; texte sobre PASS ; fichier absent silencieux ; oracle absent DIT)");
+    : "Self-test hook-ecriture : 12/12 PASS (.md reconnu ; .html, README.md, node_modules et entrée illisible écartés ; texte fautif FAIL ; texte sobre PASS ; fichier absent silencieux ; oracle absent DIT ; G8 dans ses TROIS sens — pas de famille demandée hors `output\\`, famille résolue sur un « Synthese … », type absent du catalogue NOMMÉ à l'écriture (TF-1076))");
   return casse.length ? 1 : 0;
 }
 
@@ -142,7 +198,7 @@ if (lanceEnDirect) {
     fichier = fichierVise(stdin);
   }
   if (!fichier) process.exit(0);
-  const lignes = jouer(resolve(fichier));
+  const lignes = [...jouer(resolve(fichier)), ...jouerFamille(resolve(fichier))];
   if (lignes.length) console.log(lignes.join("\n"));
   process.exit(0);
 }

@@ -95,6 +95,93 @@ function marquage(fichier) {
   return { verdict: m ? m[1] : "ILLISIBLE", detail: sortie.split("\n").filter((l) => /^\s+\[/.test(l)).slice(0, 3).join(" · ") };
 }
 
+// ---- G8 (TF-1076, 16/09/2026) — UN LIVRABLE ÉCRIT SANS FAMILLE AU CATALOGUE ------------------
+//
+// LE FAIT, et il est au tableau de bord des récidives : la classe `gabarit-famille-manquante`
+// compte 13 items, 1 fondateur et 13 RÉCIDIVES — un taux de 100 %, chez quatre produits. *Une
+// classe dont chaque retour est une récidive dit que la correction ne redescend pas au moment où
+// le livrable s'écrit.* La cause tenait en une ligne du référentiel : la classe déclarait son
+// oracle — « oracle-gabarits-documents G8 » — et cette règle N'EXISTAIT PAS. Le catalogue n'était
+// interrogeable que par un lecteur humain qui savait déjà qu'il existait.
+//
+// CE QUE LA RÈGLE FAIT, ET CE QU'ELLE NE FAIT PAS. Elle ne classe pas un document par son contenu
+// — indécidable à la machine, et une devinette ferait crier l'oracle sur du travail juste. Elle
+// lit le NOM, que R-4 rend porteur : « <Marque> - <Objet> - AAAAMMJJ<indice>.<ext> », où l'Objet
+// s'ouvre sur le type du document. Le catalogue déclare, famille par famille, les types de nom
+// qu'elle couvre (`types_de_nom`, v1.2.0), et la résolution essaie le préfixe le plus LONG d'abord
+// pour que « synthese executive » ne retombe pas sur « synthese ».
+//
+// ELLE AVERTIT LÀ OÙ ELLE EST JOUÉE À L'ÉCRITURE et n'échoue que sur appel explicite : un livrable
+// se construit en plusieurs écritures, et bloquer au caractère près apprendrait à désactiver le
+// hook (leçon N4). Ce qu'elle apporte est ailleurs — le producteur rencontre la question de la
+// famille AU MOMENT où il nomme son fichier, et non au retour humain suivant.
+const CATALOGUE = join(PILOT, "gabarits", "documents", "catalogue.jsonl");
+
+/** Les lignes du catalogue, méta comprise. Absent ou illisible : liste vide, dite par l'appelant. */
+export function lireCatalogue(chemin = CATALOGUE) {
+  try {
+    return readFileSync(chemin, "utf8").trim().split(/\r?\n/).filter(Boolean)
+      .map((l) => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
+  } catch { return []; }
+}
+
+const NORMALISER = (s) => String(s).normalize("NFD").replace(/[̀-ͯ]/g, "")
+  .toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+/** Le champ <Objet> d'un nom R-4, ou le radical entier quand le nom ne suit pas la forme. */
+export function objetDuNom(nomFichier) {
+  const base = String(nomFichier).replace(/\.[a-z0-9]+$/i, "");
+  const parts = base.split(" - ");
+  // « <Marque> - <Objet> - AAAAMMJJ<indice> » : l'Objet est au milieu, le dernier champ est daté.
+  if (parts.length >= 3 && /^\d{8}[a-z]?$/i.test(parts[parts.length - 1].trim())) {
+    return parts.slice(1, -1).join(" ");
+  }
+  // Forme datée en tête, réservée aux études : « AAAAMMJJ-objet-en-tirets ».
+  const date = /^(\d{8})[-_](.+)$/.exec(base);
+  if (date) return date[2];
+  return base;
+}
+
+/**
+ * Résout la famille d'un livrable par son nom. Rend `{ resolue, famille, cle, candidats }`.
+ * `catalogue` : les lignes de `gabarits\documents\catalogue.jsonl`, méta comprise.
+ */
+export function resoudreFamille(nomFichier, catalogue) {
+  const index = new Map();
+  for (const f of catalogue) {
+    for (const t of f.types_de_nom || []) index.set(NORMALISER(t), f);
+  }
+  const mots = NORMALISER(objetDuNom(nomFichier)).split(" ").filter(Boolean);
+  for (let n = Math.min(4, mots.length); n >= 1; n--) {
+    const cle = mots.slice(0, n).join(" ");
+    if (index.has(cle)) {
+      const f = index.get(cle);
+      return { resolue: true, famille: f.famille, id: f.id, statut: f.statut, cle, candidats: [] };
+    }
+  }
+  // Rien ne résout : on rend les clés les plus PROCHES, parce qu'un refus qui ne propose rien
+  // pousse à écrire son propre gabarit — la classe voisine, `oracle-remplace-par-controle-maison`.
+  const premier = mots[0] || "";
+  const proches = [...index.keys()].filter((k) => k.startsWith(premier.slice(0, 4)) || premier.startsWith(k.split(" ")[0]));
+  return { resolue: false, famille: null, cle: mots.slice(0, 2).join(" "), candidats: proches.slice(0, 5) };
+}
+
+/** G8 sur UN livrable : `{ regle, statut, ou, message }`. */
+export function jugerLivrable(chemin, catalogue) {
+  const nom = String(chemin).replace(/^.*[\\/]/, "");
+  const r = resoudreFamille(nom, catalogue);
+  if (r.resolue) {
+    return { regle: "G8", statut: "PASS", ou: nom,
+      message: `famille « ${r.famille} » (${r.id}, statut ${r.statut}) résolue sur « ${r.cle} »` };
+  }
+  return { regle: "G8", statut: "FAIL", ou: nom,
+    message: `aucune famille du catalogue ne couvre « ${r.cle || nom} » — un type de document produit sans famille, ` +
+      "c'est un gabarit réinventé à chaque livrable et une forme qu'aucun oracle ne juge. " +
+      (r.candidats.length ? `Clés proches : ${r.candidats.join(", ")}. ` : "") +
+      "Déclarer la famille dans `gabarits\\documents\\catalogue.jsonl` (champ `types_de_nom`), " +
+      "ou renommer le livrable avec le type d'une famille existante."};
+}
+
 export function juger(dossier) {
   const findings = [];
   const familles = existsSync(dossier)
@@ -293,15 +380,67 @@ if (args[0] === "--self-test") {
   }
   if (!g3.some((x) => x.statut === "FAIL")) casse.push("une classe posée sans règle CSS passe G3 — c'est le défaut mesuré le 24/08");
 
+  // G8 (TF-1076) — LA RÉSOLUTION D'UNE FAMILLE PAR LE NOM, DANS SES TROIS SENS. Les fixtures sont
+  // des NOMS, pas des fichiers : la règle lit ce que R-4 rend porteur et ne touche jamais au
+  // contenu. Le troisième sens est celui qui compte le plus — le préfixe le plus LONG gagne, sans
+  // quoi « Synthese Executive » retomberait sur la famille des restitutions et la règle rendrait
+  // PASS en désignant la mauvaise famille : muette en croyant vivre.
+  const cat8 = lireCatalogue();
+  if (!cat8.length) {
+    casse.push("G8 : le catalogue des familles est illisible depuis le self-test — la règle ne peut rien juger");
+  } else {
+    const g8 = (nom) => jugerLivrable(nom, cat8);
+    const couvert = g8("Digit-AI - Synthese Mandat - Campagne close - 20260916a.md");
+    const nu = g8("Digit-AI - Note Migration - Chemins renommes - 20260916a.md");
+    const plusLong = g8("Digit-AI - Synthese Executive - Etat du parc - 20260916a.md");
+    if (!(couvert.statut === "PASS" && couvert.message.includes("restitution")))
+      casse.push(`G8 : un livrable « Synthese … » ne résout pas la famille des restitutions — ${couvert.message.slice(0, 120)}`);
+    if (nu.statut !== "FAIL")
+      casse.push("G8 : un livrable d'un type ABSENT du catalogue passe — c'est par ce silence que la classe " +
+        "gabarit-famille-manquante récidive dans 13 cas sur 13, l'oracle qu'elle déclarait n'ayant jamais existé");
+    if (!(plusLong.statut === "PASS" && plusLong.message.includes("synthese-executive")))
+      casse.push("G8 : « Synthese Executive » retombe sur la famille des restitutions — le préfixe le plus LONG ne gagne " +
+        `pas, et la règle désigne la mauvaise famille en rendant PASS : ${plusLong.message.slice(0, 120)}`);
+  }
+
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test gabarits-documents : 11/11 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ; " +
+    : "Self-test gabarits-documents : 14/14 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ; " +
       "instance à trous → FAIL ; instance copie du squelette → FAIL ; classe posée sans règle CSS → FAIL au marquage ; " +
       "couple gabarit+version rendu → PASS G4 ; document sans le couple → FAIL G4 ; largeurs alternées sans " +
       "déclaration → FAIL G5 ; page « lecture » contredite → FAIL G5 ; page « lecture » tenue → PASS G5 ; " +
-      "page « donnees » avec exception déclarée → PASS G5)");
+      "page « donnees » avec exception déclarée → PASS G5 ; G8 dans ses TROIS sens (TF-1076) : un livrable « Synthese … » résout la famille des restitutions, un « Note Migration … » — type absent du catalogue — FAIL en nommant les clés proches, et « Synthese Executive » résout sa PROPRE famille, le préfixe le plus long gagnant sur le plus court)");
   process.exit(casse.length ? 1 : 0);
+}
+
+// MODE LIVRABLE (G8) — `--livrable <chemin…>` juge des NOMS de livrables, pas le dossier des
+// gabarits. Deux domaines, un seul oracle : dupliquer la lecture du catalogue dans un contrôle à
+// part serait la classe `oracle-remplace-par-controle-maison`, que ce dépôt compte par ailleurs.
+if (args.includes("--livrable")) {
+  const cat = lireCatalogue();
+  if (!cat.length) {
+    console.log(JSON.stringify({ oracle: "oracle-gabarits-documents", mode: "livrable", verdict: "ERREUR",
+      message: `catalogue illisible ou absent : ${CATALOGUE}` }, null, 1));
+    process.exit(2);
+  }
+  const vus = args.slice(args.indexOf("--livrable") + 1).filter((a) => !a.startsWith("--"));
+  if (!vus.length) {
+    console.log(JSON.stringify({ oracle: "oracle-gabarits-documents", mode: "livrable", verdict: "ERREUR",
+      message: "usage : node oracle-gabarits-documents.mjs --livrable <chemin.md> [<chemin.md>…]" }, null, 1));
+    process.exit(2);
+  }
+  const f8 = vus.map((c) => jugerLivrable(c, cat));
+  const v8 = f8.some((x) => x.statut === "FAIL") ? "FAIL" : "PASS";
+  console.log(JSON.stringify({
+    oracle: "oracle-gabarits-documents", mode: "livrable", version: "1.1.0", verdict: v8, findings: f8,
+    non_juge: [
+      "le CONTENU du livrable : G8 lit son NOM, que R-4 rend porteur, et ne classe jamais un document par sa prose — une devinette ferait crier l'oracle sur du travail juste",
+      "la JUSTESSE de la famille résolue : un livrable nommé « Synthese … » qui serait en réalité une étude résout « restitution » et G8 ne le verra pas",
+      "les livrables dont le nom ne suit NI R-4 NI la forme datée des études : leur radical entier sert de type, et la résolution échoue le plus souvent — c'est voulu, un nom hors convention est déjà un défaut R-4",
+    ],
+  }, null, 1));
+  process.exit(v8 === "FAIL" ? 1 : 0);
 }
 
 const findings = juger(args[0] || join(PILOT, "gabarits", "documents"));

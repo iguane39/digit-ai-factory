@@ -31,8 +31,8 @@
   "vu_le": "2026-09-09"
  },
  "hook-ecriture.mjs": {
-  "cas": 9,
-  "vu_le": "2026-09-12"
+  "cas": 12,
+  "vu_le": "2026-09-16"
  },
  "hook-lexique.mjs": {
   "cas": 13,
@@ -121,8 +121,8 @@
   "vu_le": "2026-08-27"
  },
  "oracle-gabarits-documents.mjs": {
-  "cas": 11,
-  "vu_le": "2026-09-15"
+  "cas": 14,
+  "vu_le": "2026-09-16"
  },
  "oracle-gabarits-documents.mjs (parc réel)": {
   "non_lu": true,
