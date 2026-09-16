@@ -1,10 +1,10 @@
 # Récidives et descente — tableau de bord
 
-<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 29f71eb36306 · archive 6ce2fe14c2bb · classes 515349512697 · relevés d7baf49e3e68 · héritage 4f975ceb94eb. État au 2026-09-16T09:33:31.480Z (ts max des sources, jamais l'horloge). -->
+<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre b3e044d67470 · archive 6ce2fe14c2bb · classes 515349512697 · relevés 21aba22d6f07 · héritage 4f975ceb94eb. État au 2026-09-16T12:10:07.248Z (ts max des sources, jamais l'horloge). -->
 
 Ce tableau de bord répond à trois questions que le registre seul ne savait pas poser : est-ce la deuxième fois, chez qui, et depuis combien de temps la correction existe sans être appliquée. Il se lit avec sa contre-métrique : un compteur de récidives qui baisse pendant que le nombre de classes monte est un compteur contourné, pas un progrès.
 
-**Périmètre mesuré** : 1135 item(s) au registre (actifs et archive), 307 portant une classe, 164 marqué(s) récidive ; référentiel de 83 classe(s) en 18 famille(s) (v1.13.0) ; 24 relevé(s) d'héritage.
+**Périmètre mesuré** : 1135 item(s) au registre (actifs et archive), 307 portant une classe, 164 marqué(s) récidive ; référentiel de 83 classe(s) en 18 famille(s) (v1.13.0) ; 26 relevé(s) d'héritage.
 
 ## 1. Récidives par classe
 
@@ -188,14 +188,14 @@ Comment lire : une ligne par classe fondée par une clôture ; *correction* est 
 
 ## 3. Taux d'héritage par règle (dernier relevé)
 
-Comment lire : une ligne par artefact hérité déclaré dans `gabarits/HERITAGE.json`, état au relevé du 2026-09-16T07:25:42.916Z sur 11 produit(s) ; *conformes* compte les produits chez qui l'artefact est présent et à jour ; *familles* dit de quelles familles de défaut cet artefact protège.
+Comment lire : une ligne par artefact hérité déclaré dans `gabarits/HERITAGE.json`, état au relevé du 2026-09-16T11:12:57.031Z sur 11 produit(s) ; *conformes* compte les produits chez qui l'artefact est présent et à jour ; *familles* dit de quelles familles de défaut cet artefact protège.
 
 | Artefact | Mode | Conformes | Familles protégées |
 |---|---|---|---|
 | forge/retours/GABARIT-LOT-RETOURS.md | copie_conforme | 1/11 | lot-forme |
 | forge/retours/oracle-lot.mjs | copie_conforme | 3/11 | lot-forme |
 | forge/hooks/factory.mjs | copie_conforme | 3/11 | skill-ou-oracle-non-invoque, restitution-forme, page-html-socle, heritage-produit, ecriture-style |
-| forge/RESTITUTION.md | copie_conforme | 3/11 | restitution-forme |
+| forge/RESTITUTION.md | copie_conforme | 0/11 | restitution-forme |
 | .claude/settings.json | presence_et_motif | 11/11 | skill-ou-oracle-non-invoque, restitution-forme, page-html-socle, heritage-produit, ecriture-style |
 | CLAUDE.md | presence_et_motif | 11/11 | skill-ou-oracle-non-invoque |
 | robots.txt | presence | 11/11 | — |
@@ -206,7 +206,7 @@ Comment lire : une ligne par artefact hérité déclaré dans `gabarits/HERITAGE
 | .gitignore | presence_et_motifs | 11/11 | secret-hors-perimetre |
 | forge/retours/CLASSES.json | copie_conforme | 1/11 | heritage-produit, lot-forme |
 | forge/ECRITURE.md | copie_conforme | 3/11 | ecriture-style |
-| forge/LEXIQUE.json | presence | 0/0 | — |
+| forge/LEXIQUE.json | presence | 0/11 | — |
 
 ## 4. Contre-métrique : classes créées
 
