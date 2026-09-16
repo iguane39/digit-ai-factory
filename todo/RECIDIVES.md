@@ -1,10 +1,10 @@
 # Récidives et descente — tableau de bord
 
-<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre b8abbb8fae47 · archive 6ce2fe14c2bb · classes 515349512697 · relevés d7baf49e3e68 · héritage a4c70d3be332. État au 2026-09-16T08:00:32.690Z (ts max des sources, jamais l'horloge). -->
+<!-- VUE GÉNÉRÉE par todo/generer-recidives.mjs — NE PAS ÉDITER. Sources scellées : registre 25582c86bc43 · archive 6ce2fe14c2bb · classes 515349512697 · relevés d7baf49e3e68 · héritage 4f975ceb94eb. État au 2026-09-16T08:43:54.095Z (ts max des sources, jamais l'horloge). -->
 
 Ce tableau de bord répond à trois questions que le registre seul ne savait pas poser : est-ce la deuxième fois, chez qui, et depuis combien de temps la correction existe sans être appliquée. Il se lit avec sa contre-métrique : un compteur de récidives qui baisse pendant que le nombre de classes monte est un compteur contourné, pas un progrès.
 
-**Périmètre mesuré** : 1134 item(s) au registre (actifs et archive), 306 portant une classe, 163 marqué(s) récidive ; référentiel de 83 classe(s) en 18 famille(s) (v1.13.0) ; 24 relevé(s) d'héritage.
+**Périmètre mesuré** : 1135 item(s) au registre (actifs et archive), 307 portant une classe, 164 marqué(s) récidive ; référentiel de 83 classe(s) en 18 famille(s) (v1.13.0) ; 24 relevé(s) d'héritage.
 
 ## 1. Récidives par classe
 
@@ -12,8 +12,8 @@ Comment lire : une ligne par classe du référentiel, triée par récidives déc
 
 | Classe | Famille | Items | Fondateurs | Récidives | Taux | Produits ayant récidivé | Dernière |
 |---|---|---|---|---|---|---|---|
+| `oracle-remplace-par-controle-maison` | skill-ou-oracle-non-invoque | 17 | 1 | 15 | 88 % | Produit-61 ×1, Produit-03 ×1, Produit-10 ×5, Produit-62 ×3, Produit-65 ×1, Produit-11 ×1, pilot ×2, Produit-64 ×1 | 2026-09-16 |
 | `gabarit-famille-manquante` | gabarit-document | 14 | 1 | 14 | 100 % | Produit-03 ×1, Produit-10 ×5, Produit-62 ×6, Produit-65 ×1, pilot ×1 | 2026-09-14 |
-| `oracle-remplace-par-controle-maison` | skill-ou-oracle-non-invoque | 16 | 1 | 14 | 88 % | Produit-61 ×1, Produit-03 ×1, Produit-10 ×5, Produit-62 ×3, Produit-65 ×1, Produit-11 ×1, pilot ×1, Produit-64 ×1 | 2026-09-14 |
 | `boucle-retour-sans-descente` | heritage-produit | 11 | 1 | 11 | 100 % | Produit-62 ×2, Produit-12 ×2, Produit-10 ×2, Produit-11 ×3, Produit-64 ×1, pilot ×1 | 2026-09-12 |
 | `recette-verdict-non-prononcable` | regle-morte | 11 | 3 | 10 | 91 % | Produit-61 ×3, Produit-10 ×1, pilot ×4, Produit-62 ×2 | 2026-09-14 |
 | `heritage-avertissement-tardif` | heritage-produit | 8 | 1 | 8 | 100 % | Produit-02 ×2, Produit-10 ×3, Produit-11 ×2, pilot ×1 | 2026-09-14 |
@@ -206,6 +206,7 @@ Comment lire : une ligne par artefact hérité déclaré dans `gabarits/HERITAGE
 | .gitignore | presence_et_motifs | 11/11 | secret-hors-perimetre |
 | forge/retours/CLASSES.json | copie_conforme | 1/11 | heritage-produit, lot-forme |
 | forge/ECRITURE.md | copie_conforme | 3/11 | ecriture-style |
+| forge/LEXIQUE.json | presence | 0/0 | — |
 
 ## 4. Contre-métrique : classes créées
 
