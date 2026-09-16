@@ -16,14 +16,14 @@ jamais d'application sans validation humaine.
 
 Un persona, une fiche d'expert, une grille de lentilles, un juge : tout dispositif proposé au parc
 pour **trouver plus de défauts** se mesure avant d'entrer, et il se mesure contre une relecture qui
-n'a pas le dispositif. Le banc est `oraclesanc-defauts-echappes\` — neuf défauts échappés RÉELS,
+n'a pas le dispositif. Le banc est `oracles\banc-defauts-echappes\` — neuf défauts échappés RÉELS,
 trouvés par un humain après un vert des oracles, avec leur livrable reconstitué dans son état
 d'avant correction, le protocole figé, la relecture de référence et le script de décompte.
 
 **Le seuil ne se renégocie pas après la mesure** : une condition candidate est retenue si elle
 retrouve au moins deux livrables de plus que la référence sans dépasser le double de ses constats
 faux (`manifeste.json`, clé `seuil`). Il est écrit dans le manifeste, daté, et le décompte est
-exécuté — `node oraclesanc-defauts-echappes\decompter.mjs` rend `retenu: oui|non`, jamais une
+exécuté — `node oracles\banc-defauts-echappes\decompter.mjs` rend `retenu: oui|non`, jamais une
 appréciation. La recette du banc est jouée par le harnais (I2, 3 cas, sous cliquet).
 
 *Ce que la première mesure a coûté et pourquoi le banc est gardé* : sur les neuf défauts, la

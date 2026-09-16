@@ -342,6 +342,10 @@
   "cas": 31,
   "vu_le": "2026-09-08"
  },
+ "scripts/verifier-avance-publication.test.mjs": {
+  "cas": 7,
+  "vu_le": "2026-09-16"
+ },
  "scripts/verifier-bascule.test.mjs": {
   "cas": 8,
   "vu_le": "2026-08-26"
