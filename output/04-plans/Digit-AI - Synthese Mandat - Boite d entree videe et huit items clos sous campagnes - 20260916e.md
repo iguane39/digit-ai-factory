@@ -9,7 +9,7 @@ destinataire: humain
 Quatre lots de retours dormaient dans le dossier d'arrivée depuis le 15 septembre, dont trois
 sous un nom réel de client : ils sont entrés, anonymisés, et les 16 demandes qu'ils portaient
 sont au registre. Les 19 demandes qui attendaient votre feu vert sont passées en décidées sous
-votre mandat, et 9 d'entre elles sont déjà corrigées avec leur mesure. Ce qui change pour vous :
+votre mandat, et 17 sont corrigées avec leur mesure. Ce qui change pour vous :
 les trois reproches d'écriture que vous avez faits le 15 septembre — la tournure « Ce que… », les
 lignes de commande dans un guide qui ne s'adresse pas à des techniciens, et le contenu d'auteur
 livré au lecteur — ne dépendent plus de la vigilance de qui écrit ; un contrôle les refuse
@@ -22,23 +22,23 @@ qui bloque la publication de l'ensemble du dépôt principal.
   d'améliorations, et 4 campagnes d'écriture sur les dépôts voisins.
 - **sur quoi** — le pilot `digit-ai-factory` ; écritures mandatées chez `digit-ai-forge-data`,
   `digit-ai-forge-design` et `digit-ai-forge-agents` (commits locaux, aucun push).
-- **quand** — le 16/09/2026, de 14h10 à 16h15 (Europe/Paris), durée 2 h 05. Traitement en cours
-  au moment de cette remise : 1 campagne sur 4 court encore, celle du socle des pages.
+- **quand** — le 16/09/2026, de 14h10 à 18h00 (Europe/Paris), durée 3 h 50. Les 4 campagnes ont
+  rendu leur rapport ; aucun traitement ne court encore.
 - **qui** — session pilot Claude Opus 5 ; dépôt passé de `b485ca3` à `d61c90d` ; 4 agents de
   campagne délégués (3 Opus 5, 1 Sonnet 5), escalade de modèle : aucune.
 - **intention** — vider ce qui attend et faire baisser la file, pas seulement produire du travail.
-  **Test rétro** : la file passe de 60 à 50 items ouverts *alors que* 16 demandes neuves y sont
-  entrées dans le même tour ; sans elles, elle serait à 34. L'intention est tenue sur les deux
+  **Test rétro** : la file passe de 60 à 42 items ouverts *alors que* 16 demandes neuves y sont
+  entrées dans le même tour ; sans elles, elle serait à 26. L'intention est tenue sur les deux
   bouts — ce qui attendait est entré, et ce qui était décidé a été fait.
 
 ## 2. Verdict en une ligne
 
-**Boîte d'entrée FAIL → PASS** (4 lots, 16 demandes) · **19 candidats décidés** · **9 items clos
+**Boîte d'entrée FAIL → PASS** (4 lots, 16 demandes) · **19 candidats décidés** · **17 items clos
 sur gains mesurés**, 4 remis en cours avec leur reste nommé, 1 réaffecté sur diagnostic exécuté ·
-registre **exit 0**, 50 items ouverts contre 60 · harnais du pilot **122/123** · recettes natives
+registre **exit 0**, 42 items ouverts contre 60 · harnais du pilot **122/123** · recettes natives
 des 3 forges écrites : forge-data **273 PASS**, forge-design **48 oracles / 132 règles**,
-quality-oracles **269 contrôles exit 0** · porte de publication du pilot **FAIL, 299 constats sur
-un seul nom**.
+quality-oracles **269 contrôles**, socle des pages **357/357** — toutes exit 0 · porte de
+publication du pilot **FAIL, 299 constats sur un seul nom**.
 
 ## 3. Décisions attendues de vous
 
@@ -59,7 +59,13 @@ se passe si rien ne vient :
   n'appelle pas d'arbitrage aujourd'hui : il faut d'abord qu'un mandat couvre la forge de
   l'audit, où vit l'autre moitié, puis trancher si l'on accepte de perdre le rendu anglais des
   rapports ou si l'on assume 2 moteurs déclarés ; sans cela, les 2 continuent de diverger, et le
-  canevas dit au moins désormais ce que sa reprise coûterait.
+  canevas dit au moins désormais ce que sa reprise coûterait ;
+- **la migration des 1 716 exemptions de recouvrement en forme ancienne est à l'arrêt** ; il faut
+  décider à quelle date la forme ancienne cesse d'être admise ; sans cette date, elle reste
+  recensée mais jamais refusée, et la migration n'a aucune raison de commencer ;
+- **la propagation vers les copies installées des skills est à l'arrêt** ; elle se joue au
+  prochain démarrage de session, qui rejoue la fraîcheur du poste, et elle écrit hors de tout
+  dépôt ; jusque-là ce qui s'exécute sur ce poste n'est plus ce qui est versionné, sur 5 skills.
 
 > **D-1 — La publication du pilot est fermée sur un seul nom : est-ce le nom qui change, ou la table ?**
 > La porte de publication refuse le dépôt du pilot sur 299 constats, et les 299 portent le même
@@ -132,6 +138,29 @@ se passe si rien ne vient :
 > **Si rien n'est décidé** : (b) s'applique par défaut — le compte existe dans cette synthèse,
 > il n'est publié nulle part, et rien n'empêche la 31e famille sans juge d'être créée demain.
 
+> **D-4 — À quelle date la forme ancienne d'exemption de recouvrement cesse-t-elle d'être admise ?**
+> Une exemption servait jusqu'ici d'interrupteur : posée sur un élément, elle éteignait le contrôle
+> de recouvrement sur lui tout entier. Elle se déclare désormais par paire — les 2 identifiants dont
+> le chevauchement est voulu —, et le contrôle voit à nouveau ce qu'elle avalait : un libellé de
+> flèche imprimé dans la boîte voisine, qui avait traversé 2 livraisons et 4 exécutions des 3
+> oracles. La forme ancienne n'a pas été supprimée : 1 716 occurrences ont été mesurées dans le
+> parc ce jour, et les casser d'un commit rougirait tout le parc avant qu'aucune migration n'ait
+> commencé. Elle est donc admise et RECENSÉE, page par page, avec le geste à faire.
+> **Recommandation : (b).** Source consultée : le rapport de campagne du socle des pages, qui
+> mesure les occurrences dans `.claude/skills/digit-ai-page-html/` et les dépôts qui le
+> consomment, et qui signale cet écart comme le plus fort de ses 8 items. Le recensement rend la
+> dette visible sans rien casser ; une date lui donne une fin, et l'absence de date la laisse
+> croître.
+
+| Option | Ce qu'elle coûte | Ce qu'elle exclut |
+|---|---|---|
+| **(a)** refuser la forme ancienne dès maintenant | simple × court à écrire, mais 1 716 occurrences passent au rouge avant toute migration | exclut de livrer quoi que ce soit tant que la migration n'est pas finie |
+| **(b)** poser une date de fin d'admission, et migrer d'ici là au fil des pages touchées | moyen × long — la migration suit les pages qu'on rouvre, elle ne mobilise pas de tour dédié | exclut de fermer la dette rapidement |
+| **(c)** garder la forme ancienne sans date | gratuit | exclut toute fin : le recensement devient un compteur qu'on regarde monter |
+
+> **Si rien n'est décidé** : (c) s'applique — la forme ancienne reste admise, recensée, et les
+> occurrences relevées n'ont aucune raison de baisser.
+
 ## 4. Traité — avec sa preuve
 
 - **Le sas d'arrivée est vidé** : 4 lots y attendaient depuis le 15/09, dont 3 sous un nom réel
@@ -200,6 +229,36 @@ se passe si rien ne vient :
     d'août laissées par le geste fautif, qui portent 46 domaines tous présents aujourd'hui à la
     source. Les 2 sondes concordent. Borne dite, et elle est celle des 2 : elles ne couvrent que
     3 instantanés, et rien ne garde trace de ce que la copie a porté entre 2 propagations.
+- **Le socle des pages ferme ses 8 items**, et 3 d'entre eux corrigent des contrôles qui se
+  contredisaient ou se taisaient. Classes fermées : `oracle-perimetre-de-non-mesure-non-publie`,
+  `regle-qui-interdit-son-propre-remede`, `deux-regles-du-socle-inconciliables`,
+  `controle-vrai-sur-le-mauvais-invariant`, `controle-joue-sur-fichier-pas-sur-instance-servie`
+  et `controle-sans-fixture-double-sens`.
+  - preuve : recette native du socle 308/308 → **357/357**, exit 0, rejouée avant chacun des
+    8 enregistrements. Comparaison avant/après sur **454 pages HTML de 4 dépôts** : 2 échecs
+    ajoutés, tous deux sur les fixtures rouges écrites pour les prouver, 7 échecs retirés, tous
+    sur les fixtures écrites pour montrer les faux positifs, et **aucune page réelle du parc
+    touchée**.
+  - TF-1147 et TF-1148 : un identifiant de dessin partagé entre 2 SVG, et un renvoi qui sort de
+    son propre SVG, sont refusés — bruit mesuré AVANT la pose sur 467 pages de 11 dépôts, zéro
+    fichier touché ; et le contrôle de rendu passe sur les 4 fixtures, ce qui prouve le point de
+    l'item : aucune sonde de rendu ne pouvait voir ce défaut.
+  - TF-1141 : un verdict vert du contrôle de marquage porte désormais 6 lignes de périmètre au
+    lieu de zéro, chaque famille hors champ vérifiée NOMMÉMENT par le banc.
+  - TF-1139 : une page trop haute rend son verdict en **2,4 s** avec son constat chiffré, au lieu
+    des dizaines de minutes payées le 15 septembre ; le banc mesure la DURÉE, pas seulement le
+    message, et c'est elle qui prouve qu'aucune capture n'a été tentée.
+  - TF-1144 : la règle d'impression qu'un autre contrôle PRESCRIT dans son message de refus passe
+    désormais son propre banc — 3 échecs bloquants → 0 —, et le remède RENFORCE : les sélecteurs
+    d'attribut sont évalués au lieu d'être abandonnés, et un sélecteur sans point d'ancrage ne
+    retient plus tout.
+  - TF-1143 : le contraste d'un actif n'est plus jugé sous l'échelle 1, et l'agent a
+    CONTRE-MESURÉ lui-même — 17,85:1 à l'échelle 1, 3,66:1 à 0,25, sans qu'un pixel de la page
+    ait bougé. Au-dessus de l'échelle 1, la règle est inchangée, seuil compris.
+  - TF-1145 : 2 règles qui lisaient le même premier bloc de navigation lisent toutes les
+    navigations ; la contradiction est levée sans rien désactiver, et un contrôle S'ÉLARGIT.
+  - TF-1146 : l'exemption de recouvrement se déclare par paire, et le constat qu'elle avalait
+    revient — 0 → 1 sur la fixture rouge, 0 → 0 sur sa jumelle verte à une coordonnée près.
 - **Un contrôle du parc rouvert par un commit de ce tour a été refermé dans le même tour** : le
   site de scellement neuf de la forge du design est déclaré à la table des empreintes.
   - preuve : contrôle FAIL nommant le site, puis exit 0 ; trouvé par la session voisine et signalé
@@ -207,12 +266,14 @@ se passe si rien ne vient :
 
 ## 5. Non traité
 
-- La campagne du socle des pages, 3 items restants sur 8 : motif `borne_atteinte` — elle n'est pas
-  bloquée, 5 items sont déjà commis chez elle avec leur recette verte à chaque fois (312, 318,
-  323, 328 puis 331 cas, exit 0), sa cadence mesurée est de 33 minutes par item et elle annonce
-  la fin vers 17h50 ; ses résultats entreront au registre à sa remise, et cette synthèse sera
-  redéposée à jour. La campagne de la forge des agents, elle, a rendu son rapport et ses 3 items
-  sont consignés.
+- La généralisation du périmètre de non-mesure au contrat commun des oracles du registre, seconde
+  moitié de TF-1141 : motif `borne_atteinte` — elle touche le registre du pilot et un skill qu'une
+  autre session modifiait au même moment ; c'est elle qui étendrait la correction au-delà du seul
+  oracle de marquage, et elle reste à faire.
+- La migration des 1 716 exemptions de recouvrement en forme ancienne : motif
+  `dependance_bloc_3` — elle attend la date de D-4. Le recensement la rend visible page par page.
+- La propagation vers les copies installées des 5 skills touchés : motif `gate_gouvernance` —
+  elle écrit hors de tout dépôt, sous le profil du poste, et c'est un geste humain.
 - TF-0940, deux moteurs pour le même schéma de base de données, moitié faite : motif
   `garde_fou` — l'autre moitié vit chez la forge de l'audit, et elle porte un arbitrage que la
   campagne a REFUSÉ de rendre seule. La divergence est de fond et mesurée : le moteur du voisin
@@ -244,10 +305,10 @@ se passe si rien ne vient :
 ## 6. Écarts à la lettre
 
 - **Vous avez demandé** « traite tous les todos & les retours ». **J'ai fait** : tous les retours,
-  et 11 des 51 todos. **Pourquoi** : les retours étaient bornés et sont tous entrés ; les todos ne
-  le sont pas — 51 items dont plusieurs demandent chacun une campagne complète. J'ai pris les
-  items au score le plus fort et ceux que vos retours du 15 septembre venaient de fonder, et je
-  nomme les 40 autres au chapitre précédent plutôt que de laisser croire à un traitement complet.
+  et 21 des 60 todos. **Pourquoi** : les retours étaient bornés et sont tous entrés ; les todos ne
+  le sont pas — plusieurs demandent chacun une campagne complète. J'ai pris les items au score le
+  plus fort et ceux que vos retours du 15 septembre venaient de fonder, et je nomme les 42 qui
+  restent au chapitre précédent plutôt que de laisser croire à un traitement complet.
 - **Vous avez demandé** de traiter, **j'ai aussi décidé** les 19 candidats en attente. **Pourquoi** :
   la gouvernance du registre réserve ce passage à un mandat humain explicite, et « traite tous les
   todos » en est un ; sans ce passage, aucun candidat n'aurait pu être exécuté. Le précédent du
@@ -256,6 +317,25 @@ se passe si rien ne vient :
   qui ne la reconnaît pas et a donc exécuté l'accueil réel au lieu d'afficher son aide. Le geste
   était le bon à cette étape et rien n'a été perdu, mais il n'était pas voulu à cet instant, et il
   est dit ici plutôt que tu.
+- **Un agent de campagne a enregistré hors de ses 3 items** : la porte native de son dépôt était
+  rouge avant toute écriture de sa part, une fixture dérivée ayant divergé de sa source au pilot.
+  **Pourquoi** : sans cela ses 3 enregistrements se faisaient sur une porte rouge. Il l'a remise
+  au vert d'abord, l'a déclaré, et n'a touché aucune assertion.
+- **Un agent de campagne a étendu 2 règles au-delà de la lettre de son brief** : une liste de
+  balises portée de 4 à 8, et un remède qui ÉVALUE les sélecteurs d'attribut au lieu de se borner
+  à refuser de tout retenir. **Pourquoi** : mécanisme de défaut identique dans les
+  2 cas, bruit vérifié nul sur 467 pages, et la version littérale aurait supprimé les faux
+  positifs EN MÊME TEMPS que les vrais. Renforcement des deux côtés, jamais assouplissement.
+- **Le même agent a gardé une forme qu'il devait supprimer** : l'exemption de recouvrement en
+  forme ancienne continue d'exempter, recensée au lieu d'être refusée. **Pourquoi** : les
+  occurrences mesurées dans le parc se compteraient en milliers, et les casser d'un commit ferait
+  rougir tout le parc avant toute migration. C'est l'écart qu'il signale lui-même comme le plus
+  fort de sa campagne, et il vous revient en D-4.
+- **Une erreur de mesure a été trouvée et corrigée avant d'être citée** : la première passe de
+  non-régression du socle rapportait 8 échecs apparus, artefact de son propre banc — la copie
+  « avant » vivait seule dans un répertoire temporaire et ne trouvait donc pas son référentiel de
+  jargon, qu'elle lisait vide. L'arbre « avant » a été reconstruit complet et rejoué ; aucun
+  chiffre de la première passe n'est cité nulle part.
 
 ## 7. Risques
 
@@ -281,7 +361,7 @@ se passe si rien ne vient :
 
 ## 8. Prochaines actions
 
-Les 6 travaux que le pilot mène seul sont listés d'abord, puis les 3 gestes qui vous reviennent :
+Les 7 travaux que le pilot mène seul sont listés d'abord, puis les 4 gestes qui vous reviennent :
 l'ordre suit l'acteur, et à acteur égal ce qui débloque le plus d'items passe devant.
 
 | Sélecteur | Action | Acteur | Identifiant | Motif / raison | Où | Si rien n'est fait |
@@ -292,9 +372,10 @@ l'ordre suit l'acteur, et à acteur égal ce qui débloque le plus d'items passe
 | **A-4** | Réécrire les 2 libellés du gabarit de restitution et de ses 3 juges | `auto_ia` | TF-1149 | `dependance_bloc_3` — D-2 | `gabarits/RESTITUTION.md`, `oracles/oracle-synthese.mjs`, les 2 hooks | la tournure que vous avez proscrite survit dans chaque restitution |
 | **A-5** | Construire la liste de vocabulaire transverse et la faire hériter par les produits | `auto_ia` | TF-1150 | `borne_atteinte` | `gabarits/LEXIQUE-PRODUIT.json` et `gabarits/HERITAGE.json` | un mot refusé par votre lecteur reste proscrit chez un seul produit |
 | **A-6** | Rejouer la porte de publication après arbitrage, puis publier | `auto_ia` | neuve | `dependance_bloc_3` — D-1, puis `gate_gouvernance` : la publication reste votre mot | `FORGE_PUSH_GO="<motif>" git push` depuis `c:devdigit-ai-factory` | le travail de la journée reste sur ce seul poste |
-| **A-7** | Trancher D-1, le statut du nom qui ferme la publication | `manuelle_utilisateur` | neuve | `decision` — arbitrer entre une marque à vous et un nom à masquer n'est pas un geste d'agent | bloc 3 de cette synthèse, option (a) recommandée | rien ne se publie, et le nombre d'enregistrements locaux monte à chaque tour |
-| **A-8** | Trancher D-2 et D-3 | `manuelle_utilisateur` | TF-1149 | `decision` — les 2 arbitrent une sévérité, qu'aucun texte ne prescrit | bloc 3 de cette synthèse, options (b) et (c) recommandées | 2 corrections restent écrites sans être opposables |
-| **A-9** | Faire tourner les identifiants publiés | `manuelle_utilisateur` | TF-1090 | `acces` — mesuré : `node oracles/oracle-secrets-hors-perimetre.mjs` rend FAIL sur le parc à chaque ouverture, SP2 « 3 porteurs DANS un dépôt qui ne les ignore pas », et aucune console de fournisseur n'est joignable depuis ce poste | console de chaque fournisseur nommé par la sortie de l'oracle | des identifiants publiés restent valides |
+| **A-8** | Trancher D-1, le statut du nom qui ferme la publication | `manuelle_utilisateur` | neuve | `decision` — arbitrer entre une marque à vous et un nom à masquer n'est pas un geste d'agent | bloc 3 de cette synthèse, option (a) recommandée | rien ne se publie, et le nombre d'enregistrements locaux monte à chaque tour |
+| **A-9** | Trancher D-2, D-3 et D-4 | `manuelle_utilisateur` | TF-1149 | `decision` — les 2 arbitrent une sévérité, qu'aucun texte ne prescrit | bloc 3 de cette synthèse, options (b) et (c) recommandées | 2 corrections restent écrites sans être opposables |
+| **A-10** | Propager les 5 skills modifiés vers leurs copies installées | `manuelle_utilisateur` | neuve | `decision` — la propagation écrit hors de tout dépôt, sous le profil du poste, et le gabarit réserve ce geste à une décision humaine explicite | au prochain démarrage de session, qui rejoue la fraîcheur du poste | ce qui s'exécute sur ce poste n'est plus ce qui est versionné, sur 5 skills |
+| **A-11** | Faire tourner les identifiants publiés | `manuelle_utilisateur` | TF-1090 | `acces` — mesuré : `node oracles/oracle-secrets-hors-perimetre.mjs` rend FAIL sur le parc à chaque ouverture, SP2 « 3 porteurs DANS un dépôt qui ne les ignore pas », et aucune console de fournisseur n'est joignable depuis ce poste | console de chaque fournisseur nommé par la sortie de l'oracle | des identifiants publiés restent valides |
 
 ## 9. Traces
 
