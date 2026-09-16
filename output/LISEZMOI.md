@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 300 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 306 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -189,13 +189,17 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260902-etude-opportunite-dataforseo-produit-02.md | — | 43.7 Ko | `03-etudes/20260902-etude-opportunite-dataforseo-produit-02.md` |
 | 20260903-L99-amelioration-continue.md | — | 42.3 Ko | `03-etudes/20260903-L99-amelioration-continue.md` |
 | 20260903-recidives-mesure.md | — | 7.3 Ko | `03-etudes/20260903-recidives-mesure.md` |
+| 20260907-etude-opportunite-mission-data-silver-gold-powerbi.html | — | 98.2 Ko | `03-etudes/20260907-etude-opportunite-mission-data-silver-gold-powerbi.html` |
 | 20260907-etude-opportunite-mission-data-silver-gold-powerbi.md | — | 43.4 Ko | `03-etudes/20260907-etude-opportunite-mission-data-silver-gold-powerbi.md` |
 | 20260907-L99-mission-data-silver-gold-powerbi.md | — | 47.5 Ko | `03-etudes/20260907-L99-mission-data-silver-gold-powerbi.md` |
 | 20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md | — | 10.9 Ko | `03-etudes/20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md` |
+| 20260911-etude-opportunite-communication-marketing-ao.html | — | 102.3 Ko | `03-etudes/20260911-etude-opportunite-communication-marketing-ao.html` |
 | 20260911-etude-opportunite-communication-marketing-ao.md | — | 45.9 Ko | `03-etudes/20260911-etude-opportunite-communication-marketing-ao.md` |
 | 20260911-L99-forge-communication-marketing.md | — | 52.4 Ko | `03-etudes/20260911-L99-forge-communication-marketing.md` |
 | 20260911-L99-regles-d-ecriture-factory.md | — | 58.5 Ko | `03-etudes/20260911-L99-regles-d-ecriture-factory.md` |
-| 20260914-etude-opportunite-conception-documentaire-amont.md | — | 24.6 Ko | `03-etudes/20260914-etude-opportunite-conception-documentaire-amont.md` |
+| 20260914-etude-opportunite-conception-documentaire-amont.html | — | 78 Ko | `03-etudes/20260914-etude-opportunite-conception-documentaire-amont.html` |
+| 20260914-etude-opportunite-conception-documentaire-amont.md | — | 24.9 Ko | `03-etudes/20260914-etude-opportunite-conception-documentaire-amont.md` |
+| 20260914-etude-opportunite-personas-par-phase.html | — | 76.7 Ko | `03-etudes/20260914-etude-opportunite-personas-par-phase.html` |
 | 20260914-etude-opportunite-personas-par-phase.md | — | 24.1 Ko | `03-etudes/20260914-etude-opportunite-personas-par-phase.md` |
 | 20260914-L99-conception-documentaire-amont.md | — | 36.8 Ko | `03-etudes/20260914-L99-conception-documentaire-amont.md` |
 | 20260914-L99-personas-par-phase.md | — | 34.9 Ko | `03-etudes/20260914-L99-personas-par-phase.md` |
@@ -205,6 +209,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260914-personas-mesure-passes.md | — | 54.9 Ko | `03-etudes/20260914-personas-mesure-passes.md` |
 | 20260914-personas-mesure-protocole.md | — | 4.4 Ko | `03-etudes/20260914-personas-mesure-protocole.md` |
 | 20260914-releve-restes-archives.md | — | 6.5 Ko | `03-etudes/20260914-releve-restes-archives.md` |
+| 20260915-etude-opportunite-inventaire-des-composants.html | — | 72.7 Ko | `03-etudes/20260915-etude-opportunite-inventaire-des-composants.html` |
 | 20260915-etude-opportunite-inventaire-des-composants.md | — | 21 Ko | `03-etudes/20260915-etude-opportunite-inventaire-des-composants.md` |
 
 ### 04-plans
@@ -271,6 +276,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Decisions 19a 20a et actions 44 a 48 - 20260905m.md | 20260905m | 24.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 19a 20a et actions 44 a 48 - 20260905m.md` |
 | Digit-AI - Synthese Mandat - Decisions 1a 2a 3a 4a - 20260903g.md | 20260903g | 16.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 1a 2a 3a 4a - 20260903g.md` |
 | Digit-AI - Synthese Mandat - Decisions 1a 2a 3b 4a synchronisation - 20260903e.md | 20260903e | 16.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 1a 2a 3b 4a synchronisation - 20260903e.md` |
+| Digit-AI - Synthese Mandat - Decisions 1b et 3a executees et cout des vues mesure - 20260916c.md | 20260916c | 13.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 1b et 3a executees et cout des vues mesure - 20260916c.md` |
 | Digit-AI - Synthese Mandat - Decisions 21a 22a 23a et actions 49 a 52 - 20260906n.md | 20260906n | 24.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 21a 22a 23a et actions 49 a 52 - 20260906n.md` |
 | Digit-AI - Synthese Mandat - Decisions 27a 28a forges rebaties - 20260907b.md | 20260907b | 18.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 27a 28a forges rebaties - 20260907b.md` |
 | Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md | 20260903b | 25.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md` |

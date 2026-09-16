@@ -1232,7 +1232,13 @@ function juger(texte, cheminJuge = null) {
     const b8 = bloc(texte, /##\s*8\.\s*Prochaines actions/i) || "";
     const declares = b7.split(/\n(?=\s*[-*])/).map((x) => x.trim()).filter((x) => RISQUE_DECOUVERT.test(x));
     // Un bloc 8 « vide » au sens de cette règle : aucune ligne d'action numérotée ni pointée.
-    const aUneAction = /^\s*(?:\d+\.|[-*])\s+\S/m.test(b8);
+    // UNE ACTION EN TABLEAU EST UNE ACTION (16/09/2026). S29 ne reconnaissait qu'une PUCE, et le
+    // gabarit prescrit le bloc 8 en TABLEAU UNIQUE depuis la v2.9.0 : une restitution conforme à
+    // S18 rendait donc « aucune action » pour S29, qui concluait « risque déclaré non couvert et
+    // rien à faire » sur un bloc 8 plein. *Deux règles du même référentiel se contredisaient* —
+    // exactement le défaut que TF-0508 avait corrigé pour S11 à S14, repris ici sur une règle plus
+    // jeune. Le constat a été fait sur la première restitution qui a exercé les deux ensemble.
+    const aUneAction = /^\s*(?:\d+\.|[-*])\s+\S/m.test(b8) || lignesDeDonnees(b8).length > 0;
     if (!b7) findings.push({ regle: "S29", statut: "SANS_OBJET", message: "aucun bloc de risques — rien à confronter" });
     else if (!declares.length) ok("S29", "aucun risque déclaré non couvert — rien à passer la main");
     else if (aUneAction) ok("S29", `${declares.length} risque(s) déclaré(s) non couvert(s), et le bloc 8 passe la main`);
