@@ -21,7 +21,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Note Revue - Denominateur des freres - 20260818a.md` | fichier | 4,1 Ko | Digit-AI — Note de revue : le dénominateur des « frères » — 20260818a |
 | `Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` | fichier | 3,2 Ko | Plan de renommage `digit-ai-forge-pilot` → `digit-ai-factory` — fenêtre A exécutée, gate n |
 | `Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` | fichier | 33,1 Ko | Restitution — la clé que la session voisine déclarait inexistante existe, et la réécriture |
-| `Digit-AI - Specification Produit - digit-ai-marketing - 20260911a.md` | fichier | 36,6 Ko | Spécification de création — produit `digit-ai-marketing` — 20260911a |
+| `Digit-AI - Specification Produit - Produit-66 - 20260911a.md` | fichier | 36,6 Ko | Spécification de création — produit `Produit-66` — 20260911a |
 | `Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md` | fichier | 5,7 Ko | Synthèse — Décision d'engagement actée, exécution transférée au produit — 20260901i |
 | `Digit-AI - Synthese - Etapes transferees au produit par lot de travaux - 20260901j.md` | fichier | 5,2 Ko | Synthèse — Les étapes de la décision transférées au produit — 20260901j |
 | `Digit-AI - Synthese - Etude donnees de recherche et cascade intention - 20260901h.md` | fichier | 10,4 Ko | Synthèse — Étude des données de recherche et cascade de l'intention — 20260901h |
@@ -53,7 +53,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - D-11 a etait executee a 09h10 boucle mesuree et deposee - 20260911b.md` | fichier | 21,7 Ko | Synthèse de mandat — D-11 (a) était déjà exécutée à 09:10 ; ce qui bouclait, c'est la rest |
 | `Digit-AI - Synthese Mandat - D-12 a executee regle etendue registre publie - 20260911c.md` | fichier | 14,9 Ko | Synthèse de mandat — D-12 (a) exécutée : la règle de publication couvre désormais les cand |
 | `Digit-AI - Synthese Mandat - D-13 a executee pilot et forge publies CI lue - 20260911e.md` | fichier | 13,4 Ko | Synthèse de mandat — D-13 (a) exécutée : le pilot et la forge d'audit sont publiés et véri |
-| `Digit-AI - Synthese Mandat - D-3 a executee spec digit-ai-marketing RUN-AO lots lances - 20260911h.md` | fichier | 25,8 Ko | Synthèse de mandat — D-3 (a) est exécutée : les huit candidatures sont décidées, les quatr |
+| `Digit-AI - Synthese Mandat - D-3 a executee spec Produit-66 RUN-AO lots lances - 20260911h.md` | fichier | 25,8 Ko | Synthèse de mandat — D-3 (a) est exécutée : les huit candidatures sont décidées, les quatr |
 | `Digit-AI - Synthese Mandat - D-4 executee marque a deux supports produit en naissance - 20260911i.md` | fichier | 27,9 Ko | Synthèse de mandat — D-4 est exécutée : la marque Digit-AI à deux supports est jugée, enre |
 | `Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md` | fichier | 21,8 Ko | Synthèse Mandat — D-4 (a) exécutée : les contrôles ne couvrent réellement que 2 défauts éc |
 | `Digit-AI - Synthese Mandat - D-6 D-9 D-7 D-8 executees - 20260914e.md` | fichier | 15,1 Ko | Synthèse Mandat — vos quatre décisions sont exécutées : notre juge de restitution est corr |
@@ -68,6 +68,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Decisions 19a 20a et actions 44 a 48 - 20260905m.md` | fichier | 24,3 Ko | Synthèse de mandat — décisions 19 et 20, actions 44 à 48 exécutées : trois forges publiées |
 | `Digit-AI - Synthese Mandat - Decisions 1a 2a 3a 4a - 20260903g.md` | fichier | 16,4 Ko | Synthèse — décisions 1a, 2a, 3a, 4a du 03/09/2026 |
 | `Digit-AI - Synthese Mandat - Decisions 1a 2a 3b 4a synchronisation - 20260903e.md` | fichier | 16,1 Ko | Synthèse de mandat — exécution des décisions 1a, 2a, 3b et 4a de la synchronisation (03/09 |
+| `Digit-AI - Synthese Mandat - Decisions 1b et 3a executees et cout des vues mesure - 20260916c.md` | fichier | 13,6 Ko | Vos deux décisions sont exécutées, et la troisième question a maintenant ses chiffres |
 | `Digit-AI - Synthese Mandat - Decisions 21a 22a 23a et actions 49 a 52 - 20260906n.md` | fichier | 24,8 Ko | Synthèse de mandat — décisions 21, 22 et 23, actions 49 à 52 exécutées : neuf histoires ré |
 | `Digit-AI - Synthese Mandat - Decisions 27a 28a forges rebaties - 20260907b.md` | fichier | 18,1 Ko | Synthèse de mandat — décisions 27 et 28 exécutées : les dix forges rebâties sur leur histo |
 | `Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md` | fichier | 25,9 Ko | Synthèse de mandat — vos trois décisions du matin exécutées : l'historique du pilot réécri |
@@ -148,4 +149,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 | `Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte au vert - 20260910a.md` | fichier | 20,0 Ko | Synthèse de mandat — vos deux décisions sont exécutées, la copie locale est reconstruite,  |
 
-_131 fichier(s), 0 sous-dossier(s)_ · 2 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_132 fichier(s), 0 sous-dossier(s)_ · 2 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
