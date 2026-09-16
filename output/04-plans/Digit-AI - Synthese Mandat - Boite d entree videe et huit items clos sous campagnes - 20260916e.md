@@ -9,7 +9,7 @@ destinataire: humain
 Quatre lots de retours dormaient dans le dossier d'arrivée depuis le 15 septembre, dont trois
 sous un nom réel de client : ils sont entrés, anonymisés, et les 16 demandes qu'ils portaient
 sont au registre. Les 19 demandes qui attendaient votre feu vert sont passées en décidées sous
-votre mandat, et 8 d'entre elles sont déjà corrigées avec leur mesure. Ce qui change pour vous :
+votre mandat, et 9 d'entre elles sont déjà corrigées avec leur mesure. Ce qui change pour vous :
 les trois reproches d'écriture que vous avez faits le 15 septembre — la tournure « Ce que… », les
 lignes de commande dans un guide qui ne s'adresse pas à des techniciens, et le contenu d'auteur
 livré au lecteur — ne dépendent plus de la vigilance de qui écrit ; un contrôle les refuse
@@ -22,22 +22,23 @@ qui bloque la publication de l'ensemble du dépôt principal.
   d'améliorations, et 4 campagnes d'écriture sur les dépôts voisins.
 - **sur quoi** — le pilot `digit-ai-factory` ; écritures mandatées chez `digit-ai-forge-data`,
   `digit-ai-forge-design` et `digit-ai-forge-agents` (commits locaux, aucun push).
-- **quand** — le 16/09/2026, de 14h10 à 15h45 (Europe/Paris), durée 1 h 35. Traitement en cours
-  au moment de cette remise : 2 campagnes sur 4 courent encore.
-- **qui** — session pilot Claude Opus 5 ; dépôt passé de `b485ca3` à `453b29b` ; 4 agents de
+- **quand** — le 16/09/2026, de 14h10 à 16h15 (Europe/Paris), durée 2 h 05. Traitement en cours
+  au moment de cette remise : 1 campagne sur 4 court encore, celle du socle des pages.
+- **qui** — session pilot Claude Opus 5 ; dépôt passé de `b485ca3` à `d61c90d` ; 4 agents de
   campagne délégués (3 Opus 5, 1 Sonnet 5), escalade de modèle : aucune.
 - **intention** — vider ce qui attend et faire baisser la file, pas seulement produire du travail.
-  **Test rétro** : la file passe de 60 à 51 items ouverts *alors que* 16 demandes neuves y sont
-  entrées dans le même tour ; sans elles, elle serait à 35. L'intention est tenue sur les deux
+  **Test rétro** : la file passe de 60 à 50 items ouverts *alors que* 16 demandes neuves y sont
+  entrées dans le même tour ; sans elles, elle serait à 34. L'intention est tenue sur les deux
   bouts — ce qui attendait est entré, et ce qui était décidé a été fait.
 
 ## 2. Verdict en une ligne
 
-**Boîte d'entrée FAIL → PASS** (4 lots, 16 demandes) · **19 candidats décidés** · **8 items clos
-sur gains mesurés**, 3 remis en cours avec leur reste nommé, 1 réaffecté sur diagnostic exécuté ·
-registre **exit 0** · harnais du pilot **122/123** · recettes natives des 3 forges écrites :
-forge-data **273 PASS**, forge-design **48 oracles / 132 règles**, quality-oracles **266 contrôles
-exit 0** · porte de publication du pilot **FAIL, 299 constats sur un seul nom**.
+**Boîte d'entrée FAIL → PASS** (4 lots, 16 demandes) · **19 candidats décidés** · **9 items clos
+sur gains mesurés**, 4 remis en cours avec leur reste nommé, 1 réaffecté sur diagnostic exécuté ·
+registre **exit 0**, 50 items ouverts contre 60 · harnais du pilot **122/123** · recettes natives
+des 3 forges écrites : forge-data **273 PASS**, forge-design **48 oracles / 132 règles**,
+quality-oracles **269 contrôles exit 0** · porte de publication du pilot **FAIL, 299 constats sur
+un seul nom**.
 
 ## 3. Décisions attendues de vous
 
@@ -53,7 +54,12 @@ se passe si rien ne vient :
 - **le verrou qui empêcherait une classe de défaut de se fermer sans juge est à l'arrêt** ; il
   faut choisir entre un refus immédiat et un cliquet ; sans ce choix, 30 classes sur 86 restent
   fermées sans protection exécutable, et les récidives continuent d'être comptées sans être
-  évitées.
+  évitées ;
+- **l'unification des 2 moteurs de schéma de base de données est à l'arrêt**, et ce bloquant-là
+  n'appelle pas d'arbitrage aujourd'hui : il faut d'abord qu'un mandat couvre la forge de
+  l'audit, où vit l'autre moitié, puis trancher si l'on accepte de perdre le rendu anglais des
+  rapports ou si l'on assume 2 moteurs déclarés ; sans cela, les 2 continuent de diverger, et le
+  canevas dit au moins désormais ce que sa reprise coûterait.
 
 > **D-1 — La publication du pilot est fermée sur un seul nom : est-ce le nom qui change, ou la table ?**
 > La porte de publication refuse le dépôt du pilot sur 299 constats, et les 299 portent le même
@@ -182,6 +188,18 @@ se passe si rien ne vient :
   du module existant et non par une liste maison.
   - preuve : recette 263 → 266 contrôles, exit 0 ; la porte native du dépôt, qui portait 1 échec
     hérité, est remise au vert avant la pose de la règle.
+- **TF-1006 — le registre des oracles ne s'écrit plus que dans sa source**, et la cause mécanique
+  a été trouvée : la valeur par défaut du générateur d'oracles visait la copie installée, et la
+  commande d'exemple du skill l'écrivait noir sur blanc. L'auteur du 10 septembre a suivi la
+  doctrine à la lettre ; c'est la doctrine qui l'envoyait au mauvais endroit.
+  - preuve : recette 266 → 269 contrôles, exit 0, avec un contrôle DIRECTIONNEL — un domaine
+    présent à la copie et absent de la source fait échouer, une source en avance ne fait pas
+    rougir, sans quoi le banc serait rouge à chaque commit et le contrôle désarmé. Le volet
+    resté sans réponse est mesuré par 2 sondes indépendantes : la comparaison des 2 arbres dans
+    les 2 sens (installé 58 domaines, source 58, aucun écart), et la lecture des 2 sauvegardes
+    d'août laissées par le geste fautif, qui portent 46 domaines tous présents aujourd'hui à la
+    source. Les 2 sondes concordent. Borne dite, et elle est celle des 2 : elles ne couvrent que
+    3 instantanés, et rien ne garde trace de ce que la copie a porté entre 2 propagations.
 - **Un contrôle du parc rouvert par un commit de ce tour a été refermé dans le même tour** : le
   site de scellement neuf de la forge du design est déclaré à la table des empreintes.
   - preuve : contrôle FAIL nommant le site, puis exit 0 ; trouvé par la session voisine et signalé
@@ -189,10 +207,18 @@ se passe si rien ne vient :
 
 ## 5. Non traité
 
-- Les 2 campagnes encore en cours — le socle des pages, 7 items restants sur 8, et la forge des
-  agents, 2 sur 3 : motif `borne_atteinte` — aucune n'est bloquée, le socle des pages a mesuré sa
-  cadence à environ 40 minutes par item dont 14 de recette et annonce la fin des 8 vers 18h00, la
-  forge des agents annonce 16h15 ; leurs résultats entreront au registre à leur remise.
+- La campagne du socle des pages, 3 items restants sur 8 : motif `borne_atteinte` — elle n'est pas
+  bloquée, 5 items sont déjà commis chez elle avec leur recette verte à chaque fois (312, 318,
+  323, 328 puis 331 cas, exit 0), sa cadence mesurée est de 33 minutes par item et elle annonce
+  la fin vers 17h50 ; ses résultats entreront au registre à sa remise, et cette synthèse sera
+  redéposée à jour. La campagne de la forge des agents, elle, a rendu son rapport et ses 3 items
+  sont consignés.
+- TF-0940, deux moteurs pour le même schéma de base de données, moitié faite : motif
+  `garde_fou` — l'autre moitié vit chez la forge de l'audit, et elle porte un arbitrage que la
+  campagne a REFUSÉ de rendre seule. La divergence est de fond et mesurée : le moteur du voisin
+  rend dans les 2 langues du rapport d'audit, le canevas canonique est une page française en
+  dur, et l'importer tel quel ferait perdre l'anglais à tout rapport produit en anglais. Le
+  canevas dit désormais ce que sa reprise coûterait, là où il déclarait seulement faire foi.
 - TF-1087, le contraste d'un visuel jugé sur son meilleur pixel : motif `garde_fou` — la
   correction vit entièrement chez la forge des agents, et le pilot n'écrit pas dans un dépôt que la
   campagne ne couvre pas. Le diagnostic est mesuré et non déduit : fichier, fonction et ligne
