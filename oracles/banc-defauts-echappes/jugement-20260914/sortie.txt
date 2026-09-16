@@ -1,0 +1,219 @@
+E-01 L1 1 A — pointe une désynchronisation HTML/seed.py (duplication), pas le risque d'exposition d'identifiants connus.
+E-01 L1 2 A — signale un compte de démo non rattaché à un test nommé, risque de suppression, pas d'exposition publique.
+E-01 L1 3 A — vise l'absence de contrôle validant le jeton Railway avant usage, sujet du déploiement, pas l'exposition des identifiants démo.
+E-01 L1 4 A — pointe des placeholders sans date/responsable dans COMPOSANTS-OPS, sujet de fraîcheur documentaire.
+E-01 L1 5 A — relève une incohérence de nom mode_demo/MODE_DEMO, sujet de traçabilité documentaire.
+E-01 L1 6 A — signale l'absence d'identifiant de projet Railway, sujet du déploiement.
+E-01 L2 1 A — vise l'absence de message d'erreur affiché au lecteur d'écran, défaut d'accessibilité distinct.
+E-01 L2 2 A — pointe un emplacement de jeton non actionable, sujet du déploiement.
+E-01 L2 3 A — relève un champ `role` trop étroit face au contenu réel, sujet de métadonnée.
+E-01 L2 4 A — signale l'absence de jeton CSRF, faille de sécurité distincte sans lien avec l'exposition d'identifiants triviaux.
+E-01 L2 5 F — la comparaison est fausse : la ligne « déploiement » du tableau ne donne pas non plus d'URL.
+E-01 L2 6 A — pointe une valeur d'état ("non déployé") à la place d'une date, sujet de cohérence de colonne.
+E-01 L3 1 A — vise des renvois de règles non expliqués, sujet de lisibilité documentaire.
+E-01 L3 2 A — pointe un identifiant qualif renvoyé à un `.env` "à fournir" sans porteur, sujet d'actionnabilité.
+E-01 L3 3 A — relève des valeurs de substitution dans COMPOSANTS-OPS, sujet de fraîcheur.
+E-01 L3 4 A — pointe l'absence de précision sur l'emplacement du jeton, sujet du déploiement.
+E-01 L3 5 A — signale "isolation multi-tenant" non défini, sujet de vocabulaire pour testeur.
+E-01 L3 6 A — relève une date de vérification incohérente avec "non déployé", sujet de fraîcheur globale.
+E-01 L3 7 A — pointe "Railway" jamais défini, remarque réelle mais mineure et différente du risque d'exposition.
+E-01 L3 8 A proche — relève l'affichage en clair des identifiants mais vise la confusion du lecteur sur leur validité, pas l'accès réel à un environnement public.
+E-01 L4 1 A — vise l'absence de vérification du jeton avant déploiement, sujet différent.
+E-01 L4 2 A — pointe l'absence de délai/conduite à tenir pour la création du compte qualif, sujet différent.
+E-01 L4 3 A — relève l'incohérence date de vérification / "non déployé", doublon thématique de L3-6, sujet différent du risque d'exposition.
+E-01 L4 4 A — signale l'absence de piste de diagnostic dans l'aide de connexion, sujet différent.
+E-01 L4 5 A — pointe l'absence de vérification post-déploiement du compte qualif, sujet différent.
+E-01 L4 6 A — relève l'incertitude sur la persistance des comptes démo, sujet différent.
+E-01 L4 7 A — vise l'absence de procédure pour vérifier le bon jeton posé, sujet différent.
+E-01 L4 8 A — pointe l'absence de nommage du coffre de secrets en production, sujet différent.
+E-02 L1 1 A — vise l'absence de supervision/disponibilité, sans rapport avec l'audience admise.
+E-02 L1 2 A — pointe l'astreinte sans déclencheur/délai, sujet différent.
+E-02 L1 3 A — signale l'absence de date de péremption de la fiche, sujet différent.
+E-02 L1 4 A — relève un seul champ d'URL pour plusieurs accès techniques, sujet de multiplicité des points d'accès, pas de l'audience humaine.
+E-02 L1 5 A — pointe l'absence de responsable de désactivation des comptes de test, gouvernance des tests, pas audience réelle.
+E-02 L1 6 A — vise l'absence de criticité/repli pour les intégrations tierces, sujet différent.
+E-02 L2 1 A — relève une syntaxe de placeholder mêlant variable et consigne, défaut de moteur de gabarit.
+E-02 L2 2 A — même défaut de placeholders sur plusieurs champs, sujet différent.
+E-02 L2 3 A — pointe un rôle utilisé à la fois comme variable et repère de colonne, sujet différent.
+E-02 L2 4 A — signale l'absence de date/version visible de la fiche, sujet différent.
+E-02 L2 5 A — vise l'absence de suite après un avis défavorable, sujet de processus.
+E-02 L2 6 A — relève un jargon d'outillage non défini dans le commentaire d'en-tête, sujet différent.
+E-02 L2 7 A — pointe une liste de types non explicitement fermée, sujet différent.
+E-02 L2 8 A — signale l'absence de classification de confidentialité du document, sujet différent.
+E-02 L3 1 A — vise des placeholders non résolvables par un moteur réel, défaut technique de gabarit.
+E-02 L3 2 A — pointe l'absence de champ de péremption/revue, sujet différent.
+E-02 L3 3 A — relève l'absence de champ dédié à l'expiration des comptes de test, gouvernance des tests, pas audience réelle.
+E-02 L3 4 A — signale l'absence de contrôle de résolution des placeholders avant diffusion, sujet différent.
+E-02 L3 5 A — pointe un seul avis de sécurité prévu, sans trace de désaccord, sujet différent.
+E-02 L3 6 A — relève un durcissement limité à trois puces d'exemple, sujet différent.
+E-02 L4 1 A — vise l'absence de localisation de la config/packs, sujet différent.
+E-02 L4 2 A — même défaut de placeholders mêlant variable et description, sujet différent.
+E-02 L4 3 A — pointe l'absence de règle de synchronisation d'un rôle utilisé comme variable, sujet différent.
+E-02 L4 4 A — signale l'absence de contrat doit/peut/ne change pas, comparé à E-03, sujet différent.
+E-02 L4 5 A — relève l'absence de version datée du gabarit lui-même, sujet différent.
+E-02 L4 6 A — pointe l'absence de date de fin de validité de la fiche, sujet différent.
+E-03 L1 1 A — vise une date figée "20260821a" sans avertissement, sujet différent du sommaire non stylé.
+E-03 L1 2 A — pointe des accolades {Client}/{Produit} non vérifiées avant diffusion, sujet différent.
+E-03 L1 3 A — signale des renvois vers des chemins internes inaccessibles au lecteur externe, sujet différent.
+E-03 L1 4 A — relève des paragraphes adressés à l'auteur du gabarit, sujet différent.
+E-03 L1 5 A — pointe le favicon "{L}" à remplacer manuellement sans vérification, sujet différent.
+E-03 L1 6 A — signale des commentaires internes de tickets restant dans la source livrée, sujet différent.
+E-03 L1 7 A — relève "État décrit" sans option pour un périmètre mixte non couvert, sujet différent.
+E-03 L1 8 A — pointe l'absence de valeur par défaut pour la portée de sécurité omise, sujet différent.
+E-03 L2 1 A — signale le jeton `--annee-ref` déclaré et jamais consommé, sujet différent du sommaire.
+E-03 L2 2 A — pointe deux systèmes de version sans règle de priorité, sujet différent.
+E-03 L2 3 A — relève une contradiction réelle entre "SANS une ligne de CSS ajoutée" et le bloc `<style>` substantiel présent, sujet différent.
+E-03 L2 4 A — signale les classes `.chap.lire`/`.chap.duo` inutilisées dans le corps, sujet différent.
+E-03 L2 5 A — pointe une règle de favicon incomplète pour des noms atypiques, sujet différent.
+E-03 L2 6 A — relève l'absence de détection d'une méta-description non remplacée, sujet différent.
+E-03 L2 7 A — signale le caractère obligatoire non précisé des quatre lignes de sécurité, sujet différent.
+E-03 L2 8 A — pointe une collision d'identifiants ADR non prévenue, sujet différent.
+E-03 L3 1 A — vise l'absence de colonne de détection du risque matérialisé, sujet différent du sommaire.
+E-03 L3 2 A — pointe l'absence de moyen de constater qu'une hypothèse est fausse, sujet différent.
+E-03 L3 3 A — signale l'absence de seuil d'alerte distinct de la cible chiffrée, sujet différent.
+E-03 L3 4 A — relève un renvoi au "dossier d'exploitation" non vérifié, sujet différent.
+E-03 L3 5 A — pointe trois lignes de sécurité restées des placeholders génériques, sujet différent.
+E-03 L3 6 A — signale une colonne "Repli" sans délai ni déclencheur, sujet différent.
+E-03 L3 7 A — relève l'absence d'indication d'un état intermédiaire sûr pour un jalon, sujet différent.
+E-03 L4 1 A — vise une date figée contredisant la règle A4 de datation du même fichier, sujet différent du sommaire.
+E-03 L4 2 A — doublon du jeton `--annee-ref` inutilisé, sujet différent.
+E-03 L4 3 A — pointe l'intitulé de colonne "Le" incomplet et incohérent avec "Date" ailleurs, sujet différent.
+E-03 L4 4 A — signale que `theme-color` reste figé en thème sombre, sujet différent.
+E-03 L4 5 A — relève des colonnes doit/peut/ne change pas non alignées par sujet d'une ligne à l'autre, sujet différent.
+E-04 L1 1 A — pointe un écart de comptage (14 au lieu de 15) sur la plage TF-0326..0339, sujet différent de l'action non exécutable.
+E-04 L1 2 A — relève "7 campagnes" jamais repris dans le corps du document, sujet différent.
+E-04 L1 3 A — signale une formule syntaxiquement incohérente sur les agents, sujet différent.
+E-04 L1 4 A — vise des compteurs de commits invérifiables, sujet différent.
+E-04 L2 1 A — pointe un chemin absolu non qualifié par poste pour l'action C7, sujet et action différents.
+E-04 L2 2 A — signale l'absence d'échéance/surveillance pour le retrait de la page publiée, action différente.
+E-04 L2 3 A — relève un motif d'abandon sans point de reprise pour l'archivage, action différente.
+E-04 L2 4 A — pointe des deltas de tests sans environnement précisé, sujet différent.
+E-04 L2 5 A — signale l'échéance W5-W7 sans destinataire d'alerte, dans les Risques, pas l'action non exécutable elle-même.
+E-04 L3 1 R — désigne les 2 plans W5-W7 non nommés (ni dépôts ni porteurs), même cause que l'action non exécutable de "Prochaines actions".
+E-04 L3 2 A — pointe "celui-ci" ne résolvant à aucun hash, sujet différent.
+E-04 L3 3 A — relève le statut ambigu de TF-0337, sujet différent.
+E-04 L3 4 A — signale TF-0329 sans date/porteur, autre candidat que l'action ciblée.
+E-04 L3 5 A — pointe l'absence d'archive du chiffre de départ 721, sujet différent.
+E-04 L3 6 A — relève "alinéa §B" sans texte source nommé, sujet différent.
+E-04 L4 1 A — critique générale sur les sigles non définis dans tout le document, pas ciblée sur l'action non exécutable.
+E-04 L4 2 A — pointe une URL tronquée pour une autre action (retrait de page), sujet différent.
+E-04 L4 3 A — relève "exécuté en présentation seule" resté vague, sujet différent.
+E-04 L4 4 R — désigne précisément le dernier point de "Prochaines actions" : INS-0001 non défini ailleurs rend l'action non localisable.
+E-04 L4 5 A — pointe un lien non explicité entre "18/18 traités" et "15 candidatures neuves", sujet différent.
+E-04 L4 6 F — contredit par le texte : chaque groupe de commits est bien associé à un dépôt nommé (pilot/tests/agents/design), seul le lien hypertexte manque.
+E-04 L4 7 A — relève l'absence de destinataire nommé pour tout le document, sujet différent.
+E-04 L4 8 F — contredit par le texte : le signal du risque RV-9 explique déjà la conséquence concrète ("un livrable... s'ouvre sombre chez un lecteur").
+E-05 L1 1 A — vise des sélecteurs de bandeau non reliés à leur source, sujet différent du contrôle mono-page.
+E-05 L1 2 A — pointe des bornes 170/190 jours non reliées à une config documentée, sujet différent.
+E-05 L1 3 A — signale une normalisation d'empreinte trop étroite face aux variations de production, sujet différent.
+E-05 L1 4 A — relève des codes de sortie 1/2 non expliqués, sujet différent.
+E-05 L1 5 A — pointe TOURS/DELAI non justifiés, sujet différent.
+E-05 L1 6 A — signale une dépendance rigide au format d'URL de version du script, sujet différent.
+E-05 L1 7 A — relève une liste NAVIGATEURS figée sans extension documentée, sujet différent.
+E-05 L1 8 A — pointe une séquence Consent Mode figée en dur sans référence au code source, sujet différent.
+E-05 L2 1 A — vise l'absence d'indication sur l'obtention de $URL_PROD, sujet différent.
+E-05 L2 2 A — signale que TOURS/DELAI_MS sont absents du commentaire d'usage, sujet différent.
+E-05 L2 3 A — pointe un message CHROME_PATH sans piste d'installation, sujet différent.
+E-05 L2 4 A — relève des sélecteurs spécifiques au produit non signalés comme tels, sujet différent.
+E-05 L2 5 A — signale des bornes de durée de cookie non documentées, sujet différent.
+E-05 L2 6 A — pointe des codes de sortie non expliqués pour un pipeline externe, sujet différent.
+E-05 L2 7 A — relève l'absence d'alerte automatique après épuisement des tentatives, sujet différent.
+E-05 L3 1 A — vise l'absence de destinataire d'escalade en cas d'échec, sujet différent.
+E-05 L3 2 A — pointe l'absence de code HTTP rapporté pendant le sondage, sujet différent.
+E-05 L3 3 A — signale l'absence de try/finally autour de Puppeteer, sujet différent.
+E-05 L3 4 A — relève l'absence de légende documentée des deux familles de codes de sortie, sujet différent.
+E-05 L3 5 A — pointe p.goto non protégé par try/catch, sujet différent.
+E-05 L3 6 A — signale que la durée totale possible n'est jamais affichée à l'exploitant, sujet différent.
+E-05 L3 7 A — relève l'absence de piste d'installation du navigateur, sujet différent.
+E-05 L3 8 A — pointe le contrôle de durée de cookie sauté silencieusement si absent, sujet différent.
+E-05 L4 1 A — vise une comparaison stricte de l'empreinte de page entière trop rigide, risque inverse (faux échecs) de celui du faux vert mono-page.
+E-05 L4 2 A — signale un clic sans vérification d'existence de l'élément, sujet différent.
+E-05 L4 3 A — pointe jusqu'à 10 minutes avant conclusion d'échec sans signal intermédiaire, sujet différent.
+E-05 L4 4 A — relève l'absence de garde pour un cookie sans expiration (`-1`), sujet différent.
+E-05 L4 5 A — signale l'absence de chemin macOS dans la liste NAVIGATEURS, sujet différent.
+E-06 L1 1 A — pointe des tailles déclarées différentes pour un même viewBox, sujet différent de l'identité des fichiers.
+E-06 L1 2 A — signale l'absence de repli si la classe `f-nav` n'est jamais posée, sujet différent.
+E-06 L1 3 A — relève un paramètre de version dupliqué sans mécanisme de synchronisation, sujet différent.
+E-06 L1 4 A — vise l'absence de contrôle de synchronisation future entre les deux fichiers, ne désigne pas leur identité actuelle.
+E-06 L2 1 R — désigne l'absence de toute règle CSS recolorant réellement `.logo-white`, contredisant l'affirmation du commentaire SVG.
+E-06 L2 2 R — désigne explicitement l'identité stricte des deux fichiers et l'absence de couleur blanche dans la variante "white".
+E-06 L2 3 A — pointe un `alt` dupliqué avec `aria-label` déjà présent, défaut d'accessibilité différent.
+E-06 L2 4 A — relève des hauteurs différentes pour un même viewBox, sujet différent.
+E-06 L3 1 R — désigne l'identité des deux fichiers et sa conséquence directe (couleurs sombres au lieu de blanc sur fond sombre).
+E-06 L3 2 R — désigne l'absence de filtre CSS assurant que le logo apparaît réellement blanc.
+E-06 L3 3 A — pointe l'alt dupliqué, sujet différent.
+E-06 L3 4 A — relève des hauteurs différentes, sujet différent.
+E-06 L3 5 F — repose sur une supposition non vérifiable ("peut apparaître décalé") que le livrable ne permet pas d'étayer.
+E-06 L4 1 R — désigne l'absence de filtre CSS garantissant que le logo "blanc" reste blanc sur fond sombre.
+E-06 L4 2 R — désigne l'identité stricte de contenu entre les deux fichiers.
+E-06 L4 3 A — pointe un ratio déformé par les hauteurs déclarées, sujet différent.
+E-06 L4 4 A — signale l'absence de règle d'incrémentation du paramètre de version, sujet différent.
+E-06 L4 5 A — relève la classe `.f-nav` non définie/expliquée, sujet différent.
+E-07 L1 1 R — "Ningún casa rural disponible" garde l'accord masculin, faute d'accord introduite par la substitution.
+E-07 L1 2 R — indispo1/indispoN espagnols gardent des accords masculins avec un nom devenu féminin.
+E-07 L1 3 R — indispo1/indispoN portugais gardent "reservado(s)" au masculin avec un nom féminin.
+E-07 L1 4 R — "adequados" resté masculin avec un sujet féminin pluriel dans groupes.intro (PT).
+E-07 L1 5 R — "práticos" resté masculin dans l'avis client traduit (PT).
+E-07 L1 6 A — vise la suppression de `metaSuffix`, perte de contenu sans lien avec un accord grammatical.
+E-07 L1 7 A — pointe des méta-descriptions raccourcies perdant de l'information, sujet différent.
+E-07 L1 8 A — relève une ligne `bienetre.intro` identique dans le diff, sujet de précision du commit, pas d'accord.
+E-07 L2 1 A — signale la suppression de `metaSuffix` sans preuve de mise à jour des consommateurs, sujet différent.
+E-07 L2 2 R — désigne précisément l'accord fautif "Ningún" avec "casa rural" féminin.
+E-07 L2 3 R — désigne les participes "reservado(s)" restés masculins en espagnol et en portugais.
+E-07 L2 4 A — pointe la perte du second numéro de téléphone dans meta.contact.desc, sujet différent.
+E-07 L2 5 A — relève une nouvelle clé `equipements` sans preuve de consommation, sujet différent.
+E-07 L2 6 A — signale l'absence de justification du périmètre ES/PT, sujet différent.
+E-07 L3 1 R — désigne l'article masculin "Ningún" resté avec "casa rural" féminin.
+E-07 L3 2 R — désigne le défaut d'accord d'indispo1/indispoN espagnols (otro/reservado non accordés au féminin).
+E-07 L3 3 R — désigne le même défaut d'accord côté portugais (reservado/reservados).
+E-07 L3 4 A — pointe la suppression de `metaSuffix` sans remplacement, sujet différent.
+E-07 L3 5 A — relève une nouvelle clé `equipements` hors périmètre annoncé du commit, sujet différent.
+E-07 L4 1 R — cite exactement les accords masculins fautifs introduits par la substitution en espagnol.
+E-07 L4 2 R — désigne le même défaut d'accord répété en portugais.
+E-07 L4 3 A — pointe l'ajout d'`equipements` sans preuve d'usage dans un gabarit, sujet différent.
+E-07 L4 4 A — relève la suppression de `metaSuffix` sans adaptation montrée du code consommateur, sujet différent.
+E-07 L4 5 A — signale des méta-descriptions réécrites au-delà du simple remplacement terminologique, sujet différent.
+E-07 L4 6 A — pointe l'absence de traçabilité du choix terminologique hors message de commit, sujet différent.
+E-08 L1 1 A — vise la fragilité de l'extraction du verdict par regex, sujet différent de l'appel sans tables.
+E-08 L1 2 A — pointe un code de sortie 0 malgré un CONFLIT, sujet différent.
+E-08 L1 3 A — signale une troncature des findings sans compte du reste, sujet différent.
+E-08 L1 4 A — relève une troncature de l'option par `split('=')[1]`, bug de parsing différent de l'absence d'appel des options.
+E-08 L2 1 A — pointe une incohérence SKIP dur vs dégradation douce entre référentiel et produits, logique interne de l'oracle, pas l'appel du hameçon.
+E-08 L2 2 A — même fragilité de l'extraction par sed, sujet différent.
+E-08 L2 3 A proche — vise l'emplacement deviné de l'ORACLE lui-même, pas celui de ses tables de référence.
+E-08 L2 4 A — signale que `--verifier` ne contrôle que la présence de la marque, pas l'actualité du contenu, sujet différent.
+E-08 L2 5 A — pointe la convention `RACINE` non expliquée, sujet différent.
+E-08 L2 6 A — relève l'absence de journalisation d'un contournement, sujet différent.
+E-08 L3 1 A — signale que "$RACINE" s'affiche littéralement au lieu de sa valeur, sujet différent.
+E-08 L3 2 A — même fragilité de l'extraction par sed, sujet différent.
+E-08 L3 3 A — pointe un CONFLIT agrégé au même compteur que les dépôts absents, sujet différent.
+E-08 L3 4 A — relève un code de sortie 0 malgré un CONFLIT non résolu, sujet différent.
+E-08 L3 5 A — signale une asymétrie non documentée entre les deux options pour un opérateur qui les configure, ne vise pas l'appel du hameçon.
+E-08 L3 6 A proche — vise la fragilité des variables d'environnement dans un hook git, pas l'absence de désignation des tables par le hameçon.
+E-08 L4 1 A — même défaut de message littéral "$RACINE", sujet différent.
+E-08 L4 2 A — même fragilité de l'extraction par sed, sujet différent.
+E-08 L4 3 A — même agrégation CONFLIT/absent au résumé, sujet différent.
+E-08 L4 4 A — même code de sortie 0 en cas de conflit, sujet différent.
+E-08 L4 5 A — pointe l'absence de vérification de la présence de `node`, sujet différent.
+E-08 L4 6 A proche — vise l'emplacement deviné de l'ORACLE lui-même, pas celui de ses tables de référence.
+E-15 L1 1 A — pointe l'absence de valeur pour deux jetons, catégorie explicitement exclue (absence de valeurs).
+E-15 L1 2 A — signale l'absence de correspondance palier→signification métier, sujet différent.
+E-15 L1 3 A — relève l'absence de valeurs de mode sombre, catégorie explicitement exclue.
+E-15 L1 4 A — pointe l'absence de source/date pour les valeurs manquantes, sujet différent.
+E-15 L2 1 A — même absence de valeur pour deux jetons, catégorie exclue.
+E-15 L2 2 A — signale l'absence de jetons -line/encre associés, sujet du contraste individuel, pas de proximité entre badges.
+E-15 L2 3 A — pointe l'absence de table de correspondance sémantique, sujet différent.
+E-15 L2 4 A — relève l'absence de valeurs de mode sombre, catégorie exclue.
+E-15 L3 1 A — signale une valeur vide via commentaire CSS, reste dans la catégorie des valeurs manquantes, exclue.
+E-15 L3 2 A — pointe que 40% des statuts manquent de couleur, catégorie des valeurs manquantes, exclue.
+E-15 L3 3 A — relève l'absence de jeton de bordure associé, sujet différent.
+E-15 L3 4 A — signale l'absence de valeurs de mode sombre, catégorie exclue.
+E-15 L4 1 A — même absence de valeur pour deux jetons, catégorie exclue.
+E-15 L4 2 A — pointe l'absence de correspondance sémantique, sujet différent.
+E-15 L4 3 A — relève l'absence de jeton de texte/bordure, sujet différent.
+E-15 L4 4 A — signale un risque de fondu du badge "neutre" dans le FOND DE PAGE, pas une confusion avec les autres badges.
+E-15 L4 5 A — pointe l'absence de valeurs de mode sombre, catégorie exclue.
+
+BILAN (non recopié : recalculé par decompter-jugement.mjs)
+
+Hésitations du juge : E-04 L3-1 et L4-4 (constats situés hors de « Prochaines actions » mais portant la même cause d'inexécutabilité) ; E-01 L3-8 (affichage en clair des identifiants démo, proche du risque d'exposition sans le désigner comme accès réel) ; E-08 L2-3/L3-6/L4-6 (emplacement deviné, mais de l'oracle lui-même et non de ses tables de référence).
