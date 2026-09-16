@@ -127,10 +127,29 @@ const RACINE = join(ICI, "..");
 //
 // Les zones sont donc DÉCOUVERTES : tout dossier de premier niveau du dépôt, plus la racine
 // elle-même. `node_modules` et les artefacts d'atelier sont exclus nommément — pas devinés.
-const HORS_ZONE = new Set([".git", "node_modules", ".venv", "__pycache__", ".oracles", "old"]);
+// I2 QUATER (TF-1073, 16/09/2026) — LA DÉCOUVERTE S'ARRÊTAIT AU PREMIER NIVEAU, et c'est la
+// TROISIÈME fois que cet agrégateur se fait prendre par la même cause sous une autre forme : la
+// liste des zones était écrite à la main (TF-0367), le motif de fichier était trop étroit
+// (TF-0413), le critère ignorait les outils portant leur propre drapeau (TF-1135). Ici c'est la
+// PROFONDEUR : `readdirSync` ne descend pas, donc un banc rangé dans son propre dossier était
+// invisible. Le cas : `oracles\banc-defauts-echappes\banc.test.mjs` — la recette du banc des
+// défauts échappés, gardé sur décision humaine du 14/09 (TF-1073) pour mesurer tout mécanisme de
+// relecture avant son adoption — verte, et jouée par PERSONNE. *Un contrôle qui parcourt une liste
+// ne voit jamais ce qui n'y est pas*, et une liste a autant de bords qu'on lui en laisse.
+//
+// DEUX NIVEAUX, pas davantage, et la borne est un choix : au-delà, on parcourrait les dépôts
+// clonés et les arbres de sortie que `HORS_ZONE` ne nomme pas un par un. Un banc rangé trois
+// niveaux plus bas resterait invisible — c'est déclaré ici plutôt que promis.
+const HORS_ZONE = new Set([".git", "node_modules", ".venv", "__pycache__", ".oracles", "old", "input", "output"]);
 const zonesTests = ["."];
 for (const d of readdirSync(RACINE, { withFileTypes: true })) {
-  if (d.isDirectory() && !HORS_ZONE.has(d.name)) zonesTests.push(d.name);
+  if (!d.isDirectory() || HORS_ZONE.has(d.name)) continue;
+  zonesTests.push(d.name);
+  let sous = [];
+  try { sous = readdirSync(join(RACINE, d.name), { withFileTypes: true }); } catch { sous = []; }
+  for (const f of sous) {
+    if (f.isDirectory() && !HORS_ZONE.has(f.name)) zonesTests.push(`${d.name}/${f.name}`);
+  }
 }
 for (const zone of zonesTests) {
   let fichiers = [];
@@ -142,13 +161,13 @@ for (const zone of zonesTests) {
     // invariants est exactement ce que cet agrégateur existe pour éteindre. Les self-tests DE
     // `oracles\` restent hors de ce motif : ils sont déjà joués par I1 (via `DEDIES`), et
     // `self-tests.mjs` s'y appellerait lui-même.
-    const motif = (f) => f.endsWith(".test.mjs") || (zone !== "oracles" && /^self-test.*\.mjs$/.test(f));
+    const motif = (f) => f.endsWith(".test.mjs") || (!zone.startsWith("oracles") && /^self-test.*\.mjs$/.test(f));
     fichiers = readdirSync(join(RACINE, zone)).filter(motif).sort().map((nom) => ({ nom, args: [] }));
     // I2 ter (TF-1135, 15/09) : un OUTIL hors `oracles\` qui porte son propre `--self-test` était
     // invisible aux deux motifs — `todo\accueillir-lot.mjs`, qui pseudonymise chaque lot entrant,
     // en était, avec trois autres. Le critère lit le CODE (le test de `process.argv`), jamais une
     // simple mention du drapeau : un outil qui en lance un autre avec `--self-test` n'est pas joué.
-    if (zone !== "oracles") {
+    if (!zone.startsWith("oracles")) {
       for (const nom of readdirSync(join(RACINE, zone)).filter((f) => f.endsWith(".mjs") && !motif(f)).sort()) {
         let source = "";
         try { source = readFileSync(join(RACINE, zone, nom), "utf8"); } catch { continue; }

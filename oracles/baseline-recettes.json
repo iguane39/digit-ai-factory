@@ -234,6 +234,10 @@
   "cas": 9,
   "vu_le": "2026-09-02"
  },
+ "oracles/banc-defauts-echappes/banc.test.mjs": {
+  "cas": 3,
+  "vu_le": "2026-09-16"
+ },
  "oracles/familles-numerotees.test.mjs": {
   "cas": 6,
   "vu_le": "2026-08-27"

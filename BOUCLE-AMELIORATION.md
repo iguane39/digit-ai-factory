@@ -12,6 +12,35 @@ Version 1.0.0 — 2026-08-04
 Le steering améliore les cinq forges par **itérations bornées**. Jamais d'amélioration spontanée,
 jamais d'application sans validation humaine.
 
+## Un mécanisme de relecture passe le banc avant d'être adopté (TF-1073, 14/09/2026, D-3 (a))
+
+Un persona, une fiche d'expert, une grille de lentilles, un juge : tout dispositif proposé au parc
+pour **trouver plus de défauts** se mesure avant d'entrer, et il se mesure contre une relecture qui
+n'a pas le dispositif. Le banc est `oraclesanc-defauts-echappes\` — neuf défauts échappés RÉELS,
+trouvés par un humain après un vert des oracles, avec leur livrable reconstitué dans son état
+d'avant correction, le protocole figé, la relecture de référence et le script de décompte.
+
+**Le seuil ne se renégocie pas après la mesure** : une condition candidate est retenue si elle
+retrouve au moins deux livrables de plus que la référence sans dépasser le double de ses constats
+faux (`manifeste.json`, clé `seuil`). Il est écrit dans le manifeste, daté, et le décompte est
+exécuté — `node oraclesanc-defauts-echappes\decompter.mjs` rend `retenu: oui|non`, jamais une
+appréciation. La recette du banc est jouée par le harnais (I2, 3 cas, sous cliquet).
+
+*Ce que la première mesure a coûté et pourquoi le banc est gardé* : sur les neuf défauts, la
+relecture de référence sans persona en retrouve 2 ; trois relectures avec persona — exploitant,
+utilisateur final, mainteneur — en retrouvent 1, 3 et 3, pour un seuil fixé d'avance à 4. Six
+défauts sur neuf ne sont vus par AUCUNE relecture : ils ne se constatent qu'en exécutant, en
+rendant, ou en connaissant le contexte de diffusion. La mesure a demandé 1 920 959 jetons délégués
+à neuf sessions, dont l'essentiel — reconstituer les livrables, contrôler les fuites, juger à
+l'aveugle — serait à refaire pour chaque dispositif proposé si le banc n'était pas gardé.
+
+**Ce que le banc ne dit pas, et c'est la moitié la plus utile de son verdict** : il mesure le
+RAPPEL d'un mécanisme de relecture, jamais la valeur d'un dispositif qui sert à autre chose
+qu'à trouver des défauts. Un persona qui améliore la formulation d'une réponse sans en trouver
+davantage échoue ce banc et peut rester utile ailleurs — l'écrire évite de lui faire dire plus
+qu'il ne dit. Le banc s'enrichit des défauts échappés remontés d'ici la revue du 14/12/2026,
+dont au moins un de la phase de tests, absente de l'échantillon d'aujourd'hui.
+
 ## Revue des classes — l'anticipation à partir de faits (03/09/2026, mandat d'amélioration continue)
 
 La boucle corrective ferme des retours un par un. Ce qu'elle ne voit pas, c'est la CLASSE qui
