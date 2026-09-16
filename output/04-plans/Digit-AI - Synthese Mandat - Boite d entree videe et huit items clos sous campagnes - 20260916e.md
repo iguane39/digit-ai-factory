@@ -295,9 +295,9 @@ se passe si rien ne vient :
 - TF-1150, le vocabulaire proscrit pour toute une forge et pas seulement pour un client : motif
   `borne_atteinte` — le mécanisme est clair, une liste transverse à côté de la liste par client,
   mais son contenu vous revient et la poser vide aurait fabriqué un dispositif sans emploi.
-- Les 40 items du registre ouverts et non traités dans ce tour, sur 51 : motif `borne_atteinte` —
-  le mandat demandait tout, 11 items ont été traités ou instruits ; aucun des 40 n'est bloqué, le
-  mandat d'écriture ouvert ce matin les rend tous exécutables.
+- Les 42 items du registre encore ouverts : motif `borne_atteinte` — le mandat demandait tout, et
+  21 items ont été traités ou instruits dans ce tour ; aucun des 42 n'est bloqué, le mandat
+  d'écriture ouvert ce matin les rend tous exécutables.
 - La rotation des identifiants publiés signalée au relevé d'ouverture : motif `acces` — elle se
   joue dans la console de chaque fournisseur, et le relevé d'ouverture le constate à chaque session
   sans jamais pouvoir agir.
@@ -352,12 +352,14 @@ se passe si rien ne vient :
   - parade : les 6 producteurs qui rejouaient le défaut sont corrigés à la source ; le corpus
     historique n'est pas réécrit, conformément à la portée temporelle du plancher d'écriture, et
     les seuils sont calibrés pour qu'il reste accepté.
-- **Les 2 campagnes encore en cours écrivent dans des dépôts voisins sans que leur résultat soit
-  encore mesuré.**
-  - signal : un rapport qui annonce un item clos sans sortie de recette à l'appui.
+- **17 items sont déclarés clos sur la foi de 4 rapports de campagne que je n'ai pas produits.**
+  - signal : un rapport qui annonce un item clos sans sortie de recette à l'appui, ou un dépôt
+    dont l'arbre n'est pas propre à la fin.
   - parade : le contrat de campagne exige la recette native verte avant chaque enregistrement, et
-    le pilot vérifie par sondage — le sondage de la forge des données a été fait ce tour, arbre
-    propre et 273 PASS reconstatés ici.
+    le pilot vérifie par sondage. Les 3 sondages ont été faits ce tour et REJOUÉS ici : forge-data
+    273 PASS, forge-agents 269 contrôles, socle des pages 357/357, les 3 arbres propres. Reste
+    non sondée la forge du design, dont je reprends les chiffres de son rapport sans les avoir
+    rejoués — ils sont marqués comme rapportés.
 
 ## 8. Prochaines actions
 
@@ -366,26 +368,31 @@ l'ordre suit l'acteur, et à acteur égal ce qui débloque le plus d'items passe
 
 | Sélecteur | Action | Acteur | Identifiant | Motif / raison | Où | Si rien n'est fait |
 |---|---|---|---|---|---|---|
-| **A-1** | Consigner au registre les résultats des 2 campagnes en cours, puis redéposer cette synthèse à jour | `auto_ia` | TF-1147 | `dependance_externe` — les 2 campagnes rendent leur rapport à leur rythme | `todo/TODO.jsonl` via `todo/journaliser.mjs` | 10 items resteraient corrigés dans un dépôt sans l'être au registre |
-| **A-2** | Reprendre les 40 items ouverts non traités, par score décroissant | `auto_ia` | TF-1018 | `borne_atteinte` — borne de temps de ce tour, aucun obstacle | `todo/TODO.md`, sous le mandat d'écriture déjà ouvert | la file cesse de baisser, et les récidives continuent d'être comptées sans être évitées |
+| **A-1** | Reprendre les 42 items ouverts non traités, par score décroissant | `auto_ia` | TF-1018 | `borne_atteinte` — borne de temps de ce tour, aucun obstacle | `todo/TODO.md`, sous le mandat d'écriture déjà ouvert | la file cesse de baisser, et les récidives continuent d'être comptées sans être évitées |
+| **A-2** | Étendre le périmètre de non-mesure au contrat commun des oracles du registre | `auto_ia` | TF-1141 | `borne_atteinte` — le registre était modifié par une autre session pendant la campagne | registre des oracles du skill `quality-oracles` | la correction reste bornée à un seul oracle, et les autres continuent de rendre un vert sans limite |
+| **A-7** | Migrer les exemptions de recouvrement en forme ancienne, au fil des pages rouvertes | `auto_ia` | TF-1146 | `dependance_bloc_3` — D-4 fixe la date de fin d'admission | pages du socle et des dépôts qui le consomment, recensées page par page | la dette reste un compteur qu'on regarde monter |
 | **A-3** | Poser le cliquet des familles de défaut sans juge | `auto_ia` | TF-1140 | `dependance_bloc_3` — D-3 arbitre sa sévérité | `todo/CLASSES.json` et `todo/oracle-todo.mjs` | la 31e famille sans juge peut être créée demain |
 | **A-4** | Réécrire les 2 libellés du gabarit de restitution et de ses 3 juges | `auto_ia` | TF-1149 | `dependance_bloc_3` — D-2 | `gabarits/RESTITUTION.md`, `oracles/oracle-synthese.mjs`, les 2 hooks | la tournure que vous avez proscrite survit dans chaque restitution |
 | **A-5** | Construire la liste de vocabulaire transverse et la faire hériter par les produits | `auto_ia` | TF-1150 | `borne_atteinte` | `gabarits/LEXIQUE-PRODUIT.json` et `gabarits/HERITAGE.json` | un mot refusé par votre lecteur reste proscrit chez un seul produit |
-| **A-6** | Rejouer la porte de publication après arbitrage, puis publier | `auto_ia` | neuve | `dependance_bloc_3` — D-1, puis `gate_gouvernance` : la publication reste votre mot | `FORGE_PUSH_GO="<motif>" git push` depuis `c:devdigit-ai-factory` | le travail de la journée reste sur ce seul poste |
+| **A-6** | Rejouer la porte de publication après arbitrage, puis publier | `auto_ia` | neuve | `dependance_bloc_3` — D-1, puis `gate_gouvernance` : la publication reste votre mot | `FORGE_PUSH_GO="<motif>" git push` depuis la racine du pilot | le travail de la journée reste sur ce seul poste |
 | **A-8** | Trancher D-1, le statut du nom qui ferme la publication | `manuelle_utilisateur` | neuve | `decision` — arbitrer entre une marque à vous et un nom à masquer n'est pas un geste d'agent | bloc 3 de cette synthèse, option (a) recommandée | rien ne se publie, et le nombre d'enregistrements locaux monte à chaque tour |
-| **A-9** | Trancher D-2, D-3 et D-4 | `manuelle_utilisateur` | TF-1149 | `decision` — les 2 arbitrent une sévérité, qu'aucun texte ne prescrit | bloc 3 de cette synthèse, options (b) et (c) recommandées | 2 corrections restent écrites sans être opposables |
+| **A-9** | Trancher D-2, D-3 et D-4 | `manuelle_utilisateur` | TF-1149 | `decision` — les 3 arbitrent une sévérité, qu'aucun texte ne prescrit | bloc 3 de cette synthèse, options (b), (c) et (b) recommandées | 3 corrections restent écrites sans être opposables |
 | **A-10** | Propager les 5 skills modifiés vers leurs copies installées | `manuelle_utilisateur` | neuve | `decision` — la propagation écrit hors de tout dépôt, sous le profil du poste, et le gabarit réserve ce geste à une décision humaine explicite | au prochain démarrage de session, qui rejoue la fraîcheur du poste | ce qui s'exécute sur ce poste n'est plus ce qui est versionné, sur 5 skills |
 | **A-11** | Faire tourner les identifiants publiés | `manuelle_utilisateur` | TF-1090 | `acces` — mesuré : `node oracles/oracle-secrets-hors-perimetre.mjs` rend FAIL sur le parc à chaque ouverture, SP2 « 3 porteurs DANS un dépôt qui ne les ignore pas », et aucune console de fournisseur n'est joignable depuis ce poste | console de chaque fournisseur nommé par la sortie de l'oracle | des identifiants publiés restent valides |
 
 ## 9. Traces
 
-- `todo/TODO.jsonl` — registre, 11 événements écrits ce tour ; vues régénérées
-  (vue Markdown, page, rapport d'avancement et tableau de bord des récidives).
+- `todo/TODO.jsonl` — registre, 21 événements écrits ce tour ; vues régénérées
+  (vue Markdown, page, rapport d'avancement et tableau de bord des récidives). 42 ouverts,
+  326 clos, 3 écartés.
 - `references/tics-redactionnels.json`, `references/ECRITURE.md`, `oracles/oracle-ecriture.mjs` —
   la donnée, la doctrine et les 2 juges d'écriture posés ce tour.
 - `gabarits/documents/README.md`, `oracles/oracle-gabarits-documents.mjs`, et les 5 gabarits de
   familles — la frontière lecteur/auteur.
 - `references/EMPREINTES.md` — le site de scellement déclaré.
 - `input/00-retours/` — les 4 lots accueillis, sous leur nom pseudonymisé.
-- enregistrements locaux du pilot : `1e87947`, `453b29b` ; forge-data `0d7f31f`, `a1ed23c` ;
-  forge-design `6add530`, `857785c` ; forge-agents `498bb0d`, `5a23b16`.
+- Fichier jugé : ce document — `oracle-synthese` PASS, `oracle-ecriture` PASS.
+- enregistrements locaux, tous non poussés : pilot `1e87947`, `453b29b`, `a5b4cf1`, `d61c90d`,
+  `3612a6e`, `cf798e0` ; forge-data `0d7f31f`, `a1ed23c` ; forge-design `6add530`, `857785c` ;
+  forge-agents `498bb0d`, `5a23b16`, `250e6c0`, `efff210`, `3fbee06`, `93454d8`, `dc84777`,
+  `823882a`, `d1240b9`, `89d2792`, `aa0cbba`, `a96f187`.
