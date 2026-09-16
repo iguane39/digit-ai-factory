@@ -193,10 +193,16 @@ attendues n'apparaissaient nulle part en clair et rassemblées.
 L'inventaire **se déclare par son libellé** — une ligne portant le mot « bloquant(s) », avant les
 décisions — et non par sa seule position : une puce d'inventaire posée en tête se lit sinon comme
 la première décision, et c'est ce piège qui a fait échouer la première écriture de la règle sur sa
-propre fixture verte. Chaque bloquant porte **trois choses, sur place** :
+propre fixture verte. Chaque bloquant porte **trois choses, sur place**, et il les porte **en liste, jamais en
+tableau** : le tableau du bloc 3 appartient aux OPTIONS d'une décision, et S18 refuse deux formes
+de tableau dans un même bloc. La première restitution qui a ouvert un inventaire l'a écrit en
+tableau et s'est fait refuser par S18 — *deux règles du même référentiel se contredisaient, et
+c'est la plus jeune qui avait tort.* Une entrée, trois segments :
 
-| Ce qui est bloqué | Ce qu'il faut fournir ou décider pour le lever | Ce qui se passe si rien n'est fourni |
-|---|---|---|
+- **ce qui est bloqué** — le travail à l'arrêt, nommé ;
+- **ce qu'il faut fournir ou décider** pour le lever ;
+- **ce qui se passe si rien n'est fourni.**
+
 
 **Un bloquant qui renvoie à un fichier, à une section ou à un autre bloc pour être compris n'est
 PAS énoncé** : le renvoi est le défaut même que le retour dénonce. La règle **S45** le tient — si

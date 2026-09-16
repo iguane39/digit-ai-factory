@@ -1856,7 +1856,12 @@ function juger(texte, cheminJuge = null) {
       // qui dépend du découpage qu'il précède n'est pas un repère.* Le gabarit prescrit donc un
       // LIBELLÉ — le mot « bloquant(s) » sur sa ligne —, et la règle le lit : un mot déclaré se
       // trouve sans dépendre d'une segmentation, et il apprend au rédacteur ce qu'on attend de lui.
-      const mLabel = /(^|\n)[^\n]{0,80}\bbloquants?\b[^\n]{0,80}(\n|$)/i.exec(b3);
+      // LA BORNE DE LONGUEUR NE SERVAIT À RIEN ET A COÛTÉ UN REFUS, le jour même de l'écriture de la
+      // règle. Un premier jet bornait le libellé à quatre-vingts caractères de part et d'autre du mot ;
+      // la PREMIÈRE restitution qui a ouvert un inventaire l'a écrit sur une ligne plus longue, et la
+      // règle a refusé un document qui la satisfaisait. *Une borne qu'aucun fait ne justifie est un
+      // piège qu'on se tend à soi-même* : le mot se cherche sur la ligne, sans condition de longueur.
+      const mLabel = /(^|\n)[^\n]*\bbloquants?\b[^\n]*(\n|$)/i.exec(b3);
       if (!mLabel) {
         ko("S45", `${bloquants.length} élément(s) bloqué(s) au bloc 5 (motif garde_fou, dependance_bloc_3, ` +
           "dependance_externe, gate_gouvernance) et AUCUN inventaire des bloquants au bloc 3 — quand un traitement est " +
