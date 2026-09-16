@@ -34,6 +34,16 @@ const ORACLE = join(ICI, "oracle-ecriture.mjs");
 const IGNORES = [/(^|[\\/])node_modules[\\/]/i, /(^|[\\/])\.git[\\/]/i, /(^|[\\/])old[\\/]/i];
 const INDEX_REGENERES = new Set(["readme.md", "lisezmoi.md"]);
 
+/** Le chemin écrit, quelle que soit son extension — `fichierVise` ne rend que les `.md`. */
+export function cheminEcrit(entree) {
+  try {
+    const j = typeof entree === "string" ? JSON.parse(entree || "{}") : (entree || {});
+    const p = j?.tool_input?.file_path || j?.tool_input?.path || j?.file_path || null;
+    if (!p || IGNORES.some((re) => re.test(p))) return null;
+    return p;
+  } catch { return null; }
+}
+
 /** Le fichier visé par l'entrée du hook (Write/Edit/MultiEdit), ou null. */
 export function fichierVise(entree) {
   try {
@@ -84,6 +94,29 @@ export function jouerFamille(fichier, oracle = ORACLE_FAMILLES) {
   lignes.push(f.statut === "PASS"
     ? `[famille] ${nom} : ${f.message}`
     : `[famille] ${nom} : G8 — ${f.message}`);
+  return lignes;
+}
+
+// LE REGISTRE DES ORACLES SOUS LES YEUX AU MOMENT OÙ ON ÉCRIT UN CONTRÔLE (TF-1077, 16/09/2026).
+//
+// LE FAIT EST UN TAUX : la classe `oracle-remplace-par-controle-maison` compte 14 items dont
+// 12 RÉCIDIVES — 86 %, chez six dépôts —, et le cas le plus net est écrit en toutes lettres :
+// « un contrôle de sécurité écrit à la main FAUTE D'AVOIR CHERCHÉ l'oracle du domaine ». La règle
+// existait au skill `quality-oracles` ; ce qui manquait était le moment. Personne ne relit un
+// registre au moment précis où il crée un `verifier-quelque-chose.mjs`.
+const ORACLE_CONTROLE = join(ICI, "oracle-controle-maison.mjs");
+
+/** Joue CM-1 sur un fichier de contrôle ; rend les lignes à imprimer (vide si hors portée). */
+export function jouerControleMaison(fichier, oracle = ORACLE_CONTROLE) {
+  const lignes = [];
+  if (!fichier || !existsSync(oracle)) return lignes;
+  const nom = basename(fichier);
+  const r = spawnSync(process.execPath, [oracle, fichier], { encoding: "utf8", timeout: 30000 });
+  let j = null;
+  try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* illisible */ }
+  const f = j?.findings?.[0];
+  if (!f || f.statut === "SKIP" || f.statut === "PASS") return lignes;   // hors portée, ou rien à dire
+  lignes.push(`[controle] ${nom} : CM-1 — ${f.message}`);
   return lignes;
 }
 
@@ -172,6 +205,19 @@ function selfTest() {
     casse.push("un livrable d'un type ABSENT du catalogue n'est pas signalé à l'écriture — c'est par ce silence que la " +
       `classe gabarit-famille-manquante récidive dans 13 cas sur 13 (${lignesNu.join(" | ") || "aucune ligne"})`);
 
+  // CM-1 (TF-1077) : un contrôle écrit à la main sur un domaine couvert est nommé ; un fichier
+  // ordinaire ne l'est pas. Le hook ne dit RIEN quand il n'y a rien à dire — un hook bavard se
+  // désactive, et ce dépôt a payé la leçon assez souvent pour ne pas la réapprendre.
+  const controle = join(dir, "verifier-securite-secrets.mjs");
+  writeFileSync(controle, "// Cherche les secrets et les tokens du depot.\n", "utf8");
+  const lignesControle = jouerControleMaison(controle);
+  if (!lignesControle.some((l) => /CM-1/.test(l)))
+    casse.push(`un contrôle de sécurité écrit à la main n'est pas signalé à l'écriture — c'est le cas de TF-1046, « faute d'avoir cherché l'oracle du domaine » (${lignesControle.join(" | ") || "aucune ligne"})`);
+  const ordinaire = join(dir, "generer-vue.mjs");
+  writeFileSync(ordinaire, "// Genere une vue.\n", "utf8");
+  if (jouerControleMaison(ordinaire).length)
+    casse.push("un fichier qui n'annonce aucun contrôle fait parler le hook — un hook bavard se désactive");
+
   const lignesVertes = jouer(verte);
   if (!lignesVertes.some((l) => /style PASS/.test(l))) casse.push(`un texte sobre n'est pas déclaré PASS (${lignesVertes.join(" | ") || "aucune ligne"})`);
   if (jouer(join(dir, "absent.md")).length) casse.push("un fichier absent produit une sortie");
@@ -180,7 +226,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test hook-ecriture : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test hook-ecriture : 12/12 PASS (.md reconnu ; .html, README.md, node_modules et entrée illisible écartés ; texte fautif FAIL ; texte sobre PASS ; fichier absent silencieux ; oracle absent DIT ; G8 dans ses TROIS sens — pas de famille demandée hors `output\\`, famille résolue sur un « Synthese … », type absent du catalogue NOMMÉ à l'écriture (TF-1076))");
+    : "Self-test hook-ecriture : 14/14 PASS (.md reconnu ; .html, README.md, node_modules et entrée illisible écartés ; texte fautif FAIL ; texte sobre PASS ; fichier absent silencieux ; oracle absent DIT ; G8 dans ses TROIS sens — pas de famille demandée hors `output\\`, famille résolue sur un « Synthese … », type absent du catalogue NOMMÉ à l'écriture (TF-1076) ; CM-1 dans ses DEUX sens — un contrôle de sécurité écrit à la main NOMMÉ, un fichier ordinaire silencieux (TF-1077))");
   return casse.length ? 1 : 0;
 }
 
@@ -190,15 +236,23 @@ if (lanceEnDirect) {
   const args = process.argv.slice(2);
   if (args.includes("--self-test")) process.exit(selfTest());
   let fichier = null;
+  let brut = null;
   const i = args.indexOf("--fichier");
-  if (i >= 0) fichier = args[i + 1];
+  if (i >= 0) { fichier = args[i + 1]; brut = args[i + 1]; }
   else {
     let stdin = "";
     try { stdin = readFileSync(0, "utf8"); } catch { /* pas de stdin */ }
     fichier = fichierVise(stdin);
+    brut = cheminEcrit(stdin);
   }
-  if (!fichier) process.exit(0);
-  const lignes = [...jouer(resolve(fichier)), ...jouerFamille(resolve(fichier))];
+  // Deux portées distinctes : la doctrine d'écriture et la famille ne concernent que les `.md`,
+  // le registre des oracles ne concerne QUE les fichiers de contrôle — souvent des `.mjs`, que
+  // `fichierVise` écarte par construction. Les lire séparément est ce qui évite de rendre l'un
+  // muet pour servir l'autre.
+  const lignes = [];
+  if (fichier && existsSync(resolve(fichier))) lignes.push(...jouer(resolve(fichier)), ...jouerFamille(resolve(fichier)));
+  if (brut && existsSync(resolve(brut))) lignes.push(...jouerControleMaison(resolve(brut)));
+  if (!lignes.length) process.exit(0);
   if (lignes.length) console.log(lignes.join("\n"));
   process.exit(0);
 }

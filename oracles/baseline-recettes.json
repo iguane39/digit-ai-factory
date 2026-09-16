@@ -31,7 +31,7 @@
   "vu_le": "2026-09-09"
  },
  "hook-ecriture.mjs": {
-  "cas": 12,
+  "cas": 14,
   "vu_le": "2026-09-16"
  },
  "hook-lexique.mjs": {
@@ -82,6 +82,10 @@
  "oracle-constantes-externes.mjs": {
   "cas": 12,
   "vu_le": "2026-08-26"
+ },
+ "oracle-controle-maison.mjs": {
+  "cas": 6,
+  "vu_le": "2026-09-16"
  },
  "oracle-controles-injoignables.mjs": {
   "cas": 22,
