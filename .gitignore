@@ -27,3 +27,25 @@ input/00-retours/_arrivee/
 
 # TF-0980 — journal des substitutions faites au commit : etat MACHINE, propre a ce poste.
 .claude/anonymisation-au-commit.jsonl
+
+# TF-0983 (D-4 (a), 16/09/2026) — UNE VUE GENEREE NE SE VERSIONNE PAS.
+# Les cinq fichiers ci-dessous sont DERIVES de `todo\TODO.jsonl` et `todo\TODO-ARCHIVE.jsonl`, et
+# regenerables en une commande. Les versionner coutait deux choses, mesurees le 16/09 :
+#   · 10,95 Mo compresses dans le pack, soit 3,9 % du depot — le moindre des deux ;
+#   · et surtout un facteur 2,6 sur tout effacement de nom dans l'histoire : un identifiant ecrit
+#     UNE fois dans la source vit dans 50 revisions de cette source, 50 de TODO.md et 32 de
+#     TODO.html, soit 132 au total dont 82 dues aux seules vues. Un contenu derive versionne
+#     multiplie par le nombre de regenerations le cout de toute erreur dans sa source.
+# CE QU'ON PERD, ET RIEN D'AUTRE : la lecture des vues sur l'hebergeur sans cloner. Verifie fichier
+# par fichier le 16/09 : aucun outil du parc ne les lit depuis l'HISTOIRE — `self-test.mjs` en prend
+# l'empreinte sur le DISQUE, `verifier-avance-publication.mjs` ne fait que les classer quand elles
+# apparaissent dans un enregistrement. Elles restent produites a chaque passage, et toute version
+# passee se regenere depuis la source de son epoque.
+# Les regenerer : node todo\generer-vue.mjs && node todo\generer-page.mjs
+#                 && node todo\generer-recidives.mjs && node todo\generer-archive.mjs
+#                 && node scripts\generer-avancement.mjs
+todo/TODO.md
+todo/TODO.html
+todo/TODO-ARCHIVE.html
+todo/RECIDIVES.md
+todo/AVANCEMENT.md

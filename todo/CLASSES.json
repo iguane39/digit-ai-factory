@@ -1,1104 +1,1277 @@
 {
- "schema": "pilot/classes@1",
- "version": "1.13.0",
- "date": "2026-09-12",
- "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
- "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
- "modele": {
-  "famille": "un regroupement de lecture, fermé, stable — sert aux vues et aux revues, jamais au comptage des récidives",
-  "classe": "un défaut généralisé, avec la règle où il vit et l'oracle qui le joue — un retour d'un lot en désigne UNE",
-  "fondee_par": "les items du registre dont la clôture a créé ou porté la règle (ids seulement : la date de correction se lit au registre, jamais recopiée ici — N-6)",
-  "voisines": "classes qu'un producteur pourrait confondre avec celle-ci ; une classe créée à moins de 30 jours d'un retour d'une voisine est signalée « classe suspecte » à l'ingestion",
-  "recidive": "un retour dont la classe est fondée par un item clos `corrige` AVANT la date du retour, ou dont un item du registre porte déjà cette classe et est clos `corrige` — il entre marqué `recidive_de`, jamais refusé"
- },
- "familles": [
-  {
-   "cle": "emplacement-livrable",
-   "libelle": "Un livrable rangé au mauvais endroit ou nommé hors convention"
-  },
-  {
-   "cle": "versionnement-livrable",
-   "libelle": "Un livrable écrasé, ou sans indice ni version datée"
-  },
-  {
-   "cle": "page-html-socle",
-   "libelle": "Une page HTML hors socle : charte, contraste, filtres, tableaux, ressources réseau, lisibilité"
-  },
-  {
-   "cle": "skill-ou-oracle-non-invoque",
-   "libelle": "Un skill, un oracle ou un contrôle existant non joué, ou remplacé par un contrôle maison"
-  },
-  {
-   "cle": "restitution-forme",
-   "libelle": "Une restitution de fin de tour hors gabarit"
-  },
-  {
-   "cle": "anonymisation",
-   "libelle": "Un nom réel de client ou de produit qui sort dans un dépôt ou un registre"
-  },
-  {
-   "cle": "secret-hors-perimetre",
-   "libelle": "Un secret, un jeton ou un fichier d'environnement qui transite ou se publie"
-  },
-  {
-   "cle": "heritage-produit",
-   "libelle": "Un artefact du pilot absent, périmé ou divergent chez un produit ; une correction qui ne redescend pas"
-  },
-  {
-   "cle": "horodatage-invente",
-   "libelle": "Un horodatage composé à la main au lieu d'être mesuré"
-  },
-  {
-   "cle": "affordance-ui",
-   "libelle": "Une affordance non câblée, un état vide muet, une cible de geste trop petite, une vue sans maquette"
-  },
-  {
-   "cle": "regle-morte",
-   "libelle": "Un contrôle qui rend PASS sur ce qu'il existe pour refuser, ou un verdict qui n'est plus prononçable"
-  },
-  {
-   "cle": "readme-role",
-   "libelle": "Un README ou LISEZMOI absent, non régénéré ou sans rôle rédigé"
-  },
-  {
-   "cle": "lot-forme",
-   "libelle": "Un lot de retours ou un sidecar hors forme, ou un retour qui traite le symptôme sans nommer sa classe"
-  },
-  {
-   "cle": "tracabilite-ledger",
-   "libelle": "Un ledger, une preuve ou une source absente ou non relue"
-  },
-  {
-   "cle": "hook-ou-gate",
-   "libelle": "Un hook ou un gate absent, bloquant à tort, ou contourné"
-  },
-  {
-   "cle": "gabarit-document",
-   "libelle": "Un gabarit de document incomplet, une famille manquante, une conception non jugée"
-  },
-  {
-   "cle": "contrat-interface-forge",
-   "libelle": "Une incompatibilité d'interface entre forges, ou entre le pilot et une forge"
-  },
-  {
-   "cle": "donnees-perissables-en-dur",
-   "libelle": "Un référentiel périssable écrit en dur au lieu d'une donnée datée"
-  }
- ],
- "classes": [
-  {
-   "cle": "page-html-polices-distantes",
-   "famille": "page-html-socle",
-   "libelle": "Une page HTML livrée charge une police ou une ressource distante au chargement",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0753"
-   ],
-   "regle": "references/BEST-PRACTICES-HTML.md A1 et D4",
-   "oracle": "digit-ai-page-html check_html.py A1",
-   "voisines": []
-  },
-  {
-   "cle": "page-html-sticky-superposes",
-   "famille": "page-html-socle",
-   "libelle": "L'en-tête de page et l'en-tête de tableau collants se superposent",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0754"
-   ],
-   "regle": "references/BEST-PRACTICES-HTML.md B1/B6 ; lisibilite.md L29",
-   "oracle": "digit-ai-page-html check_html.py",
-   "voisines": []
-  },
-  {
-   "cle": "page-html-teinte-refus",
-   "famille": "page-html-socle",
-   "libelle": "La teinte de refus n'est ni documentée ni employée pour un état refusé",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0755"
-   ],
-   "regle": "references/BEST-PRACTICES-HTML.md D5",
-   "oracle": "digit-ai-page-html check_html.py",
-   "voisines": []
-  },
-  {
-   "cle": "page-html-largeur-lecture-donnees",
-   "famille": "page-html-socle",
-   "libelle": "Une console ou un tableau de données livré dans une colonne de lecture de prose ; règles de largeur contradictoires",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0771",
-    "TF-0778"
-   ],
-   "regle": "references/BEST-PRACTICES-HTML.md I1 ; lisibilite.md L26 ; zero-defaut-visuel.md V12/V13",
-   "oracle": "digit-ai-page-html render_page.py",
-   "voisines": [
-    "page-html-grille-non-alignee"
-   ]
-  },
-  {
-   "cle": "page-html-sommaire-absent",
-   "famille": "page-html-socle",
-   "libelle": "Une page longue sans sommaire visible en permanence",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0772",
-    "TF-0787"
-   ],
-   "regle": "references/BEST-PRACTICES-HTML.md I2 ; lisibilite.md L25 ; zero-defaut-visuel.md V14",
-   "oracle": "digit-ai-page-html check_html.py",
-   "voisines": []
-  },
-  {
-   "cle": "page-html-grille-non-alignee",
-   "famille": "page-html-socle",
-   "libelle": "Les champs d'une même rangée de grille ne sont pas alignés",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0773"
-   ],
-   "regle": "references/BEST-PRACTICES-HTML.md I3 ; lisibilite.md L26 ; zero-defaut-visuel.md V11",
-   "oracle": "digit-ai-page-html render_page.py",
-   "voisines": [
-    "page-html-largeur-lecture-donnees"
-   ]
-  },
-  {
-   "cle": "page-html-dictionnaire-colonnes",
-   "famille": "page-html-socle",
-   "libelle": "Un tableau de données sans dictionnaire de colonnes",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0777"
-   ],
-   "regle": "references/BEST-PRACTICES-HTML.md I4 ; dictionnaire-de-colonnes.md (skill)",
-   "oracle": "digit-ai-page-html check_html.py",
-   "voisines": []
-  },
-  {
-   "cle": "page-html-filtres-tableau",
-   "famille": "page-html-socle",
-   "libelle": "Composant de filtres absent, tri maison, réinitialisation manquante, facettes tronquées ou colonne clé privée de filtre",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0768",
-    "TF-0769",
-    "TF-0781",
-    "TF-0782"
-   ],
-   "regle": "references/composant-filtres-tableau.md RA-5, G7, G8 ; references/BEST-PRACTICES-HTML.md I5-I6",
-   "oracle": "oracle-filtres-tableau (L4, G1-G6) ; hook page-html chez le produit",
-   "voisines": []
-  },
-  {
-   "cle": "page-html-temps-affiche",
-   "famille": "page-html-socle",
-   "libelle": "Une durée ou une date ne s'affiche pas comme du temps",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0783"
-   ],
-   "regle": "lisibilite.md L28 ; references/BEST-PRACTICES-HTML.md I5",
-   "oracle": "digit-ai-page-html check_html.py",
-   "voisines": []
-  },
-  {
-   "cle": "gabarit-conception-non-jugee",
-   "famille": "gabarit-document",
-   "libelle": "La conception d'un livrable n'est jugée par aucun oracle ; méthode de construction absente ; mesure case par case fausse dans l'ensemble",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0758",
-    "TF-0759",
-    "TF-0760"
-   ],
-   "regle": "gabarits/documents/README.md D8, D9",
-   "oracle": "oracle-gabarits-documents",
-   "voisines": []
-  },
-  {
-   "cle": "gabarit-famille-manquante",
-   "famille": "gabarit-document",
-   "libelle": "Aucune famille de gabarit ne couvre un type de document produit",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0756"
-   ],
-   "regle": "gabarits/documents/catalogue.jsonl",
-   "oracle": "oracle-gabarits-documents G8",
-   "voisines": []
-  },
-  {
-   "cle": "restitution-action-humaine-geste-agent",
-   "famille": "restitution-forme",
-   "libelle": "Une action laissée à l'humain lui demande de créer, ajouter ou écrire — un geste d'agent",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0766"
-   ],
-   "regle": "gabarits/RESTITUTION.md v2.16.0 S34",
-   "oracle": "oracle-synthese S34",
-   "voisines": []
-  },
-  {
-   "cle": "restitution-fichier-juge-mal-choisi",
-   "famille": "restitution-forme",
-   "libelle": "Le hook de fin de tour juge une analyse au lieu de la restitution",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0767"
-   ],
-   "regle": "gabarits/RESTITUTION.md v2.16.0 — marqueur réservé aux restitutions",
-   "oracle": "hook-restitution",
-   "voisines": []
-  },
-  {
-   "cle": "restitution-rendu-visuel-non-critique",
-   "famille": "restitution-forme",
-   "libelle": "Une page HTML citée comme livrée sans verdict de critique d'implémentation",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0775"
-   ],
-   "regle": "gabarits/RESTITUTION.md bloc 9 ; gabarits/CLAUDE-PRODUIT.md routage « juger le rendu visuel »",
-   "oracle": "oracle-synthese S36",
-   "voisines": []
-  },
-  {
-   "cle": "correction-symptome-sans-classe",
-   "famille": "lot-forme",
-   "libelle": "Une correction après retour traite le symptôme sans nommer la règle qui aurait évité le retour",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0779"
-   ],
-   "regle": "gabarits/RETOURS-FORGES.md « La règle qui aurait évité le retour »",
-   "oracle": "oracle-synthese S37",
-   "voisines": []
-  },
-  {
-   "cle": "brief-sans-regles-de-socle",
-   "famille": "skill-ou-oracle-non-invoque",
-   "libelle": "Le brief d'un produit HTML ne cite pas les règles de socle applicables",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0765"
-   ],
-   "regle": "gabarits/CLAUDE-PRODUIT.md « Règles de socle applicables » ; prompt-analyzer-l99 couches.md Ch8",
-   "oracle": "hook page-html (produit)",
-   "voisines": [
-    "skill-non-invoque-lexique"
-   ]
-  },
-  {
-   "cle": "auteur-juge-son-contrat",
-   "famille": "skill-ou-oracle-non-invoque",
-   "libelle": "L'auteur d'un brief juge son propre contrat de sortie",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0776"
-   ],
-   "regle": "references/ETAPES-RUN.md § 4 bis",
-   "oracle": "aucun — non mécanisable, déclaré",
-   "voisines": []
-  },
-  {
-   "cle": "lecture-tiers-non-jugee",
-   "famille": "skill-ou-oracle-non-invoque",
-   "libelle": "Aucun oracle ne juge si un lecteur sans contexte comprend le livrable",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0774"
-   ],
-   "regle": "quality-oracles oracle-lecture-tiers T1-T4 (invocation explicite)",
-   "oracle": "oracle-lecture-tiers",
-   "voisines": []
-  },
-  {
-   "cle": "l99-forme-sortie",
-   "famille": "skill-ou-oracle-non-invoque",
-   "libelle": "Une sortie d'analyse L99 hors règles de lisibilité dès l'écriture",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0770"
-   ],
-   "regle": "prompt-analyzer-l99 couches.md « Forme de la sortie »",
-   "oracle": "check_markdown.py M7/M10/M14/M18",
-   "voisines": []
-  },
-  {
-   "cle": "skill-non-invoque-lexique",
-   "famille": "skill-ou-oracle-non-invoque",
-   "libelle": "Un mot-clé du lexique d'invocation (« améliore le prompt », « l99 », « barre », « améliore ce skill ») n'a pas déclenché le skill",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0177"
-   ],
-   "regle": "CLAUDE.md lexique RV-6 ; oracles/hook-lexique.mjs (UserPromptSubmit, hérité par les produits)",
-   "oracle": "hook-lexique --self-test",
-   "voisines": [
-    "brief-sans-regles-de-socle"
-   ]
-  },
-  {
-   "cle": "gate-ecriture-juge-fichier-entier",
-   "famille": "hook-ou-gate",
-   "libelle": "Un gate d'écriture juge le fichier entier au lieu du delta",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0732"
-   ],
-   "regle": "quality-oracles profils/digit-ai.json section polices ; registre-oracles.md section précédence",
-   "oracle": "quality-oracles",
-   "voisines": []
-  },
-  {
-   "cle": "boucle-retour-sans-descente",
-   "famille": "heritage-produit",
-   "libelle": "Une correction close au pilot ne redescend pas sous une forme que le producteur rencontre",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0757"
-   ],
-   "regle": "references/TODO-FORGE.md R12 « descente »",
-   "oracle": "oracle-todo R12 ; oracle-todo R13 (récidive après descente)",
-   "voisines": [
-    "heritage-avertissement-tardif"
-   ]
-  },
-  {
-   "cle": "heritage-avertissement-tardif",
-   "famille": "heritage-produit",
-   "libelle": "L'avertissement d'héritage arrive à l'ingestion du lot au lieu de l'ouverture",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0762"
-   ],
-   "regle": "oracles/hook-ouverture.mjs section « Héritage des produits »",
-   "oracle": "scripts/relever-heritage.mjs (R-47)",
-   "voisines": [
-    "boucle-retour-sans-descente"
-   ]
-  },
-  {
-   "cle": "anonymisation-portee-partielle",
-   "famille": "anonymisation",
-   "libelle": "La passe d'anonymisation ne couvre qu'une partie des dépôts, ou l'historique porte encore des noms",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0764",
-    "TF-0752"
-   ],
-   "regle": "todo/anonymiser-suivis.mjs ; references/TODO-FORGE.md § réécrire l'historique",
-   "oracle": "oracle-nom-client-publie",
-   "voisines": []
-  },
-  {
-   "cle": "recette-verdict-non-prononcable",
-   "famille": "regle-morte",
-   "libelle": "Un verdict de recette dépend d'un outil non épinglé ou d'oracles dont l'empreinte n'est pas consignée",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0763",
-    "TF-0785",
-    "TF-0786"
-   ],
-   "regle": "README de forge-tests, ligne S-01",
-   "oracle": "recette forge-tests",
-   "voisines": []
-  },
-  {
-   "cle": "maquette-absente-avant-code",
-   "famille": "affordance-ui",
-   "libelle": "Une vue nouvelle codée sans maquette validée",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0780"
-   ],
-   "regle": "references/RUN-VERSION.md section maquette validée",
-   "oracle": "forge-design mode aval",
-   "voisines": []
-  },
-  {
-   "cle": "emplacement-livrable-hors-convention",
-   "famille": "emplacement-livrable",
-   "libelle": "Un livrable généré hors du dossier prévu ou sous un nom hors R-4",
-   "creee_le": "2026-09-03",
-   "fondee_par": [],
-   "regle": "REGLES-PROJET.md R-4",
-   "oracle": "oracle-conformite-projet R-4",
-   "voisines": []
-  },
-  {
-   "cle": "livrable-ecrase-sans-indice",
-   "famille": "versionnement-livrable",
-   "libelle": "Un livrable modifié après jugement sans nouvel indice daté",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0523"
-   ],
-   "regle": "REGLES-PROJET.md règle 5",
-   "oracle": "scripts/verifier-jugement.mjs",
-   "voisines": []
-  },
-  {
-   "cle": "oracle-remplace-par-controle-maison",
-   "famille": "skill-ou-oracle-non-invoque",
-   "libelle": "Un producteur écrit son propre contrôle de conformité faute d'avoir trouvé l'oracle du socle (RT-2 du 27/08, reproduit deux fois le 31/08 — TF-0757)",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0757"
-   ],
-   "regle": "quality-oracles registre-oracles.md (chercher l'oracle du domaine avant d'en écrire un) ; gabarits/CLAUDE-PRODUIT.md « Règles de socle applicables »",
-   "oracle": "quality-oracles (registre) ; hook page-html chez le produit",
-   "voisines": [
-    "brief-sans-regles-de-socle"
-   ]
-  },
-  {
-   "cle": "page-html-liste-renvoi-sans-detail",
-   "famille": "page-html-socle",
-   "libelle": "Une liste qui renvoie ailleurs dans la page au lieu de porter son détail (déjà remontée par un autre projet, reproduite — TF-0757)",
-   "creee_le": "2026-09-03",
-   "fondee_par": [
-    "TF-0757"
-   ],
-   "regle": "references/BEST-PRACTICES-HTML.md (socle des pages de données, second tour du 02/09)",
-   "oracle": "digit-ai-page-html check_html.py ; critique d'implémentation forge-design",
-   "voisines": [
-    "page-html-dictionnaire-colonnes"
-   ]
-  },
-  {
-   "cle": "surface-implicite-non-livree",
-   "famille": "affordance-ui",
-   "libelle": "Une page ou un etat de la surface implicite (404, etats vides, aide, favicon) qu'aucune demande de fonctionnalite ne fait emerger n'est ni concu, ni genere, ni juge — livre nu par defaut",
-   "creee_le": "2026-09-05",
-   "fondee_par": [
-    "TF-0802"
-   ],
-   "regle": "references/PATRONS-EPROUVES.md P-2 ; loi transverse n 3 (CLAUDE.md) ; ETAPE-MEP.md M-9",
-   "oracle": "ETAPE-MEP.md M-9 (preuve : controle executable du produit) — aucun oracle generique, candidature chez forge-tests",
-   "voisines": []
-  },
-  {
-   "cle": "garde-lexicale-frontiere-ascii",
-   "famille": "regle-morte",
-   "libelle": "Une garde lexicale sur du texte francais emploie la frontiere de mot ASCII du moteur de Node : un accent vaut frontiere — faux positifs (pronom lu dans un mot accentue) et faux negatifs (motif accentue jamais atteint)",
-   "creee_le": "2026-09-05",
-   "fondee_par": [
-    "TF-0799",
-    "TF-0805"
-   ],
-   "regle": "frontieres Unicode (assertions « pas une lettre Unicode » avant/apres, drapeau u) dans toute garde lexicale ; fixture double sens par garde",
-   "oracle": "self-test de l'oracle porteur (oracle-exigences E3/E8 chez forge-conception ; oracle-synthese S21 chez le pilot)",
-   "voisines": []
-  },
-  {
-   "cle": "sceau-de-vue-provenance-sans-contenu",
-   "famille": "regle-morte",
-   "libelle": "Le sceau d'une vue derivee prouve sa provenance (empreinte de la source), jamais son contenu : une vue amputee d'une section entiere garde un sceau valide et rend PASS — une decision opposable peut disparaitre sans qu'aucun oracle ne le voie",
-   "creee_le": "2026-09-05",
-   "fondee_par": [
-    "TF-0818"
-   ],
-   "regle": "une vue derivee porte l'empreinte de son propre corps en plus de celle de sa source, ou une liste close de sections attendues par type de vue est jugee par l'oracle de tracabilite (contrat de vues.md chez forge-conception, porte en prose a ce jour)",
-   "oracle": "forge-conception oracle-tracabilite T3 (a etendre) — aucun oracle generique ; candidature TF-0818",
-   "voisines": [
-    "recette-verdict-non-prononcable"
-   ]
-  },
-  {
-   "cle": "lot-de-travaux-mauvais-module-producteur",
-   "famille": "lot-forme",
-   "libelle": "Un lot de travaux confie a un module (verbe, skill, script) la production d un artefact que ce module ne produit jamais : le destinataire doit repartir le travail lui-meme, et l ecart n est pas remonte au sidecar faute de classe",
-   "creee_le": "2026-09-05",
-   "fondee_par": [
-    "TF-0819"
-   ],
-   "regle": "avant d ecrire « ce qui est demande », le pilot lit le module producteur nomme (son SKILL.md ou son en-tete) et cite ce qu il produit ; un lot qui nomme un producteur cite la ligne qui le prouve (gabarits/TRAVAUX-PILOT.md)",
-   "oracle": "gabarits/oracle-travaux-pilot.mjs — regle a ajouter (T6 : tout module producteur nomme existe et produit l artefact cite) ; candidature TF-0819",
-   "voisines": [
-    "correction-symptome-sans-classe"
-   ]
-  },
-  {
-   "cle": "champ-transcrit-de-prose-sans-correspondance",
-   "famille": "regle-morte",
-   "libelle": "Un champ machine déclaré « transcrit d'une décision écrite en prose » dont aucun contrôle ne vérifie qu'il en vient : l'oracle prouve que l'écart est écrit, jamais qu'il a été décidé — un écart écrit directement dans le JSON passe et personne ne l'a pris",
-   "creee_le": "2026-09-05",
-   "fondee_par": [
-    "TF-0822"
-   ],
-   "regle": "tout document en prose dont un champ machine est transcrit est un artefact JUGÉ (existence, forme) et une règle de correspondance vérifie que chaque entrée du champ existe dans la prose (forge-conception : EXIGENCES.md section 7, SURFACE.md section 3)",
-   "oracle": "forge-conception — oracle à créer (existence et forme d'EXIGENCES.md, correspondance prose ↔ champ) ; candidature TF-0822",
-   "voisines": [
-    "sceau-de-vue-provenance-sans-contenu"
-   ]
-  },
-  {
-   "cle": "fixture-jugee-par-son-seul-oracle",
-   "famille": "skill-ou-oracle-non-invoque",
-   "libelle": "Une fixture de recette dont le verdict n'est jugé que par l'oracle qu'elle sert : une règle neuve sur un oracle partagé fait basculer les verdicts des autres fixtures en silence, et seul un balayage manuel le voit",
-   "creee_le": "2026-09-05",
-   "fondee_par": [
-    "TF-0823"
-   ],
-   "regle": "le self-test publie la matrice des verdicts fixture × oracle et la compare à une matrice attendue versionnée ; un verdict qui change sans mise à jour de la matrice est un échec de recette",
-   "oracle": "forge-conception oracles/self-test.mjs (matrice à ajouter) ; candidature TF-0823 — patron transposable à toute forge à fixtures partagées",
-   "voisines": [
-    "recette-verdict-non-prononcable"
-   ]
-  },
-  {
-   "cle": "contrat-de-sortie-sans-domicile",
-   "famille": "contrat-interface-forge",
-   "libelle": "Le format de ce qu'un outil partagé REND (lanceur d'oracles, hook, script hérité) n'est écrit nulle part ni versionné : il change sans qu'un lecteur ait quoi surveiller, et le changement ne se déclare que par un lot de retours",
-   "creee_le": "2026-09-05",
-   "fondee_par": [
-    "TF-0824"
-   ],
-   "regle": "tout outil hérité par d'autres dépôts porte un contrat de SORTIE écrit et versionné à côté de son contrat d'entrée (forge-agents : references/regles-oracles.md pour run-oracles.mjs) ; un changement du contrat incrémente la version et se lit dans le registre",
-   "oracle": "forge-agents — recette de quality-oracles (contrat de sortie à documenter et à éprouver) ; candidature TF-0824",
-   "voisines": [
-    "recette-verdict-non-prononcable",
-    "auteur-juge-son-contrat"
-   ]
-  },
-  {
-   "cle": "porte-cle-courte-sans-frontiere",
-   "famille": "hook-ou-gate",
-   "libelle": "La porte de publication cherche une clé courte de la table (forme littérale d'un seul mot) sans frontière de mot : elle accuse à l'intérieur d'autres mots et de blobs encodés — faux positifs qui décrédibilisent les vrais constats",
-   "creee_le": "2026-09-07",
-   "fondee_par": [
-    "TF-0880"
-   ],
-   "regle": "toute graphie cherchée par la porte est bornée par des non-alphanumériques (la même frontière que les variantes), un blob base64 ne compte jamais ; fixture double sens (blob → PASS, mot entier → FAIL)",
-   "oracle": "forge-agents quality-oracles/scripts/oracle-nom-client-publie.mjs C5 et sa recette ; candidature TF-0880",
-   "voisines": [
-    "garde-lexicale-frontiere-ascii",
-    "anonymisation-portee-partielle"
-   ]
-  },
-  {
-   "cle": "alias-de-transition-perime-survivant",
-   "famille": "heritage-produit",
-   "libelle": "Un alias de transition (ancien nom d'un artefact hérité) survit à côté de la copie canonique à jour, et le relevé d'héritage cesse de le regarder dès que la cible canonique existe : le produit porte deux versions du même contrat, dont une périmée que ses lots citent encore",
-   "creee_le": "2026-09-07",
-   "fondee_par": [
-    "TF-0881"
-   ],
-   "regle": "quand la cible canonique est présente, un alias encore présent est compté PÉRIMÉ par R-47 et nommé avec le geste de retrait (le produit supprime, le pilot ne supprime jamais)",
-   "oracle": "scripts/relever-heritage.mjs (R-47) et sa recette ; candidature TF-0881",
-   "voisines": [
-    "heritage-avertissement-tardif"
-   ]
-  },
-  {
-   "cle": "motif-exclusion-couvert-compte-absent",
-   "famille": "heritage-produit",
-   "libelle": "Le relevé d'héritage compare des lignes nues exactes d'un fichier d'exclusion et compte « absent » un motif qu'une graphie plus large présente couvre déjà : la mise en conformité écrit des lignes redondantes",
-   "creee_le": "2026-09-07",
-   "fondee_par": [
-    "TF-0882"
-   ],
-   "regle": "un motif exigé est tenu s'il est présent OU couvert par un motif plus large du même fichier (même raisonnement que HERITAGE.json pose pour .env) ; fixture double sens",
-   "oracle": "scripts/relever-heritage.mjs (contrôle presence_et_motifs) et sa recette ; candidature TF-0882",
-   "voisines": [
-    "garde-lexicale-frontiere-ascii"
-   ]
-  },
-  {
-   "cle": "boite-entree-produit-statut-git-non-dit",
-   "famille": "contrat-interface-forge",
-   "libelle": "Le canal des lots de travaux suppose la boîte d'entrée du produit ignorée par git sans le dire : chez un produit qui versionne input\\, le lot reçu reste un fichier non suivi indéfiniment et aucune règle ne dit s'il entre dans son histoire",
-   "creee_le": "2026-09-07",
-   "fondee_par": [
-    "TF-0883"
-   ],
-   "regle": "gabarits/TRAVAUX-PILOT.md dit le sort du lot reçu dans les deux cas (boîte ignorée : rien ; boîte versionnée : le produit commet le lot marqué traité, jamais le pilot) et le lot le rappelle",
-   "oracle": "gabarits/oracle-travaux-pilot.mjs (règle T7 à ajouter : la ligne du sort du lot reçu est présente) ; candidature TF-0883",
-   "voisines": [
-    "lot-de-travaux-mauvais-module-producteur"
-   ]
-  },
-  {
-   "cle": "lot-remis-ecrasable",
-   "famille": "lot-forme",
-   "libelle": "Rien n'empêche d'écraser un lot de retours déjà remis et ingéré : l'immuabilité est écrite en prose des deux côtés du canal, l'oracle de forme juge le fichier écrit et non le fait qu'il en remplace un autre, et la boîte d'entrée ne le voit qu'à l'ouverture suivante",
-   "creee_le": "2026-09-07",
-   "fondee_par": [
-    "TF-0884"
-   ],
-   "regle": "un lot dont l'empreinte est au registre (événement d'ingestion) ne se réécrit pas : oracle-lot-retours refuse une écriture dont le chemin est déjà ingéré avec une autre empreinte, et le gabarit prescrit l'indice suivant",
-   "oracle": "gabarits/oracle-lot-retours.mjs (règle R-48 à ajouter, lecture des événements d'ingestion) ; candidature TF-0884",
-   "voisines": [
-    "lot-forme",
-    "versionnement-livrable"
-   ]
-  },
-  {
-   "cle": "releve-heritage-juge-arbre-pas-histoire",
-   "famille": "heritage-produit",
-   "libelle": "Le relevé d'héritage compare le disque du poste à la source du pilot et jamais l'état versionné du produit : un héritage recopié mais non commis rend PASS, et un clone ou un restore ramène l'héritage périmé après un relevé vert",
-   "creee_le": "2026-09-07",
-   "fondee_par": [
-    "TF-0848"
-   ],
-   "regle": "le relevé distingue « conforme et commis » de « conforme non commis » (git status --porcelain sur chaque artefact) et compte le second à part ; recopier-heritage.mjs imprime l'état git de ce qu'il laisse",
-   "oracle": "scripts/relever-heritage.mjs (état conforme_non_commis) et sa recette ; item TF-0848 (rattaché par défaut à heritage-avertissement-tardif, rectifié le 07/09)",
-   "voisines": [
-    "heritage-avertissement-tardif",
-    "boucle-retour-sans-descente"
-   ]
-  },
-  {
-   "cle": "point-entree-declare-rouge-sur-toute-cible",
-   "famille": "regle-morte",
-   "libelle": "Le point d'entrée déclaré au manifeste d'une forge (son lanceur agrégé) rend FAIL sur toute cible, même verte, parce qu'un oracle hors de son domaine sort en échec au lieu de se déclarer non jugeant : le verdict agrégé n'est plus prononçable",
-   "creee_le": "2026-09-07",
-   "fondee_par": [
-    "TF-0885"
-   ],
-   "regle": "un oracle appelé sur un artefact hors de son domaine sort en NON_JUGE (exit 2, motif déclaré), jamais en FAIL ; la recette du lanceur agrégé joue une cible verte et exige exit 0",
-   "oracle": "forge-conception oracles/run-oracles-conception.mjs et self-test (cas cible verte) ; candidature TF-0885 (le produit 61 l'a vu aussi : TF-0831)",
-   "voisines": [
-    "recette-verdict-non-prononcable",
-    "fixture-jugee-par-son-seul-oracle"
-   ]
-  },
-  {
-   "cle": "regle-de-branche-annoncee-differente-configuree",
-   "famille": "contrat-interface-forge",
-   "libelle": "La règle de protection d'une branche telle que le pilot l'annonce dans ses lots et synthèses diffère de la règle configurée chez l'hébergeur, et le compte qui pousse la contourne d'office : une protection qui ne protège pas, décrite comme si elle protégeait",
-   "creee_le": "2026-09-07",
-   "fondee_par": [
-    "TF-0886"
-   ],
-   "regle": "avant de décrire ou de lever une protection, la LIRE chez l'hébergeur (gh api …/branches/main/protection) et citer ses champs ; un contournement d'office (« Bypassed rule violations ») se déclare comme un constat",
-   "oracle": "aucun oracle générique — relevé à jouer dans le mode opératoire de réécriture (references/TODO-FORGE.md) ; candidature TF-0886",
-   "voisines": [
-    "anonymisation-portee-partielle"
-   ]
-  },
-  {
-   "cle": "porte-sans-chemin-des-tables",
-   "famille": "hook-ou-gate",
-   "libelle": "Un hook ou un lanceur appelle la porte de publication sans lui passer le chemin des tables, et la porte, dont les pistes par defaut ne connaissent pas le canal confidentiel, rend SKIP que le hook traite en refus : tout push est refuse la ou le hook est pose",
-   "creee_le": "2026-09-07",
-   "fondee_par": [
-    "TF-0887"
-   ],
-   "regle": "la porte connait le canal confidentiel dans ses pistes par defaut (<racine>/_confidentiel/tables/) et tout hook qui l appelle lui passe les chemins ou les variables FORGE_NOMS_INTERDITS / FORGE_PRODUITS_PSEUDO ; un SKIP dit son motif et le hook le repete",
-   "oracle": "forge-agents quality-oracles (pistes par defaut de oracle-nom-client-publie.mjs) et installer-hamecon-publication.mjs ; candidature TF-0887",
-   "voisines": [
-    "porte-cle-courte-sans-frontiere",
-    "heritage-avertissement-tardif"
-   ]
-  },
-  {
-   "cle": "registre-doublon-non-detecte",
-   "famille": "lot-forme",
-   "libelle": "Deux candidatures de contenu identique entrent au registre sans qu'aucune regle ne bronche, et aucun statut ne permet ensuite de les ecarter : l'ingestion compare les identifiants et les classes, jamais le contenu, et le vocabulaire du registre n'a que candidat, decide, en_cours et corrige",
-   "creee_le": "2026-09-08",
-   "fondee_par": [],
-   "regle": "l'ingestion calcule une empreinte du couple titre+contenu et refuse ou marque doublon_de une candidature deja presente ; le registre porte un statut d'ecartement avec motif obligatoire, qui ne compte pour aucun gain",
-   "oracle": "todo/oracle-todo.mjs (regle a creer) et todo/self-test.mjs, fixture double sens ; candidature du 08/09",
-   "voisines": [
-    "lot-remis-ecrasable",
-    "anonymisation-portee-partielle"
-   ]
-  },
-  {
-   "cle": "banc-etend-referentiel-production",
-   "famille": "anonymisation",
-   "libelle": "Un banc de test qui ne pose pas ses propres tables jetables herite des variables d environnement de la session et ecrit ses noms de fixtures dans le referentiel REEL des pseudonymes ; la porte de publication refuse ensuite le depot sur des noms qui n existent pas",
-   "creee_le": "2026-09-08",
-   "fondee_par": [],
-   "regle": "tout banc qui appelle la chaine d anonymisation, directement ou par un sous-processus, pose ses tables jetables sous le repertoire temporaire et les designe par FORGE_NOMS_INTERDITS et FORGE_PRODUITS_PSEUDO avant tout appel ; la fonction d extension refuse en outre d ecrire hors du repertoire temporaire quand le point d entree du processus est un banc",
-   "oracle": "todo/anonymiser-entrant.mjs --self-test (cas 3 sexies, garde pure a deux sens) ; les bancs eux-memes, rejoues avec les variables reelles au shell",
-   "voisines": [
-    "anonymisation-portee-partielle",
-    "registre-doublon-non-detecte"
-   ]
-  },
-  {
-   "cle": "gate-cout-invite-au-contournement",
-   "famille": "hook-ou-gate",
-   "libelle": "Un controle BLOQUANT dont le temps d execution depasse ce qu un humain accepte d attendre a chaque geste : il ne protege plus rien le jour ou quelqu un apprend l option qui le saute. La cause mesuree ici est une boucle qui relit la meme donnee une fois par terme cherche, la ou les termes partageant leurs drapeaux tiennent en une seule passe",
-   "creee_le": "2026-09-08",
-   "fondee_par": [],
-   "regle": "un controle pose en gate declare son temps d execution mesure sur le plus gros depot du parc, et toute extension le remesure avant/apres ; les termes d une recherche qui partagent leurs drapeaux se groupent en une passe, l identification fine se faisant a posteriori sur les seules correspondances",
-   "oracle": "mesure avant/apres sur digit-ai-factory (900 revisions, 1369 fichiers suivis), deux passes de chaque pour absorber le cache disque",
-   "voisines": [
-    "porte-sans-chemin-des-tables",
-    "porte-cle-courte-sans-frontiere"
-   ]
-  },
-  {
-   "cle": "regle-neuve-sans-mesure-de-bruit",
-   "famille": "page-html-socle",
-   "libelle": "Une regle neuve du socle est mise en service apres avoir mesure son bruit sur les documents du depot qui l ecrit et sur ceux du pilot, jamais sur les depots qui CONSOMMENT le socle sans en etre proprietaires : la propagation vers la copie installee fait alors rougir une suite ailleurs, et l equipe qui la subit croit l echec preexistant parce que la cause vit hors de son depot",
-   "creee_le": "2026-09-08",
-   "fondee_par": [],
-   "regle": "une regle neuve du socle mesure son bruit sur les documents de TOUS les depots qui l invoquent ; et le geste de propagation releve les depots consommateurs, rejoue leur verification native avant et apres, et signale bruyamment tout depot qui passait et ne passe plus -- meme doctrine que l ecrivain du registre, qui annule son ecriture si l oracle passait et ne passe plus",
-   "oracle": "a creer : releve des depots consommateurs et rejeu avant/apres a la propagation ; candidature du 08/09",
-   "voisines": [
-    "banc-etend-referentiel-production",
-    "gate-cout-invite-au-contournement"
-   ]
-  },
-  {
-   "cle": "controle-sans-fixture-double-sens",
-   "famille": "skill-ou-oracle-non-invoque",
-   "libelle": "Un controle en service n a aucun banc de fixtures dans les deux sens, et rien ne le dit -- pire, son en-tete affirme parfois en avoir. Aucune de ses regles n est alors eprouvee : une regle qui cesse de mordre ne signale rien, et une regle qui se met a mordre sur un artefact conforme bloque tout le monde sans qu on sache pourquoi",
-   "creee_le": "2026-09-08",
-   "fondee_par": [],
-   "regle": "tout controle en service porte un banc de fixtures double sens, sur artefact jetable ; une affirmation d en-tete sur l existence d un banc est verifiee par le banc lui-meme, jamais crue sur parole ; et aucune regle neuve ne s ajoute a un controle qui n en a pas avant que le harnais existe",
-   "oracle": "a creer pour oracle-conformite-projet ; candidature du 08/09",
-   "voisines": [
-    "fixture-jugee-par-son-seul-oracle",
-    "regle-neuve-sans-mesure-de-bruit"
-   ]
-  },
-  {
-   "cle": "deux-regles-du-socle-inconciliables",
-   "famille": "page-html-socle",
-   "libelle": "Deux regles du MEME socle se contredisent : tenir la premiere fait mecaniquement echouer la seconde, et aucun auteur ne peut satisfaire les deux. Le defaut ne se voit pas en lisant les regles une par une -- il n apparait que sur un artefact qui les applique toutes, et il se lit alors comme une faute de l auteur",
-   "creee_le": "2026-09-08",
-   "fondee_par": [],
-   "regle": "toute regle qui MESURE une densite, une proportion ou un ratio exclut de son denominateur les charges utiles que le socle impose par ailleurs (donnees encodees, polices embarquees, images en ligne) ; et une regle neuve se joue contre un artefact qui applique DEJA toutes les regles voisines, pas seulement contre sa propre fixture",
-   "oracle": "a creer : une fixture qui applique les regles voisines et doit rester verte ; candidature du 08/09",
-   "voisines": [
-    "regle-neuve-sans-mesure-de-bruit",
-    "controle-sans-fixture-double-sens"
-   ]
-  },
-  {
-   "cle": "compte-total-hors-canal-des-constats",
-   "famille": "contrat-interface-forge",
-   "libelle": "Un contrôle borne la liste de constats qu'il rend et déclare son vrai total AILLEURS — une ligne de prose d'un canal secondaire (« non jugé », en-tête, journal). Le lecteur, humain comme agent, compte les entrées du tableau et publie ce nombre comme si c'était le passif. Le défaut est invisible tant que le passif reste sous la borne, et il ne se manifeste jamais comme une erreur : les deux chiffres sont vrais, seul leur rapprochement est faux. Pire, il rend indémontrables les invariances mesurées sur la liste bornée — « autant de constats avant qu'après » ne prouve rien quand les deux mesures butent sur le même plafond",
-   "creee_le": "2026-09-08",
-   "fondee_par": [
-    "TF-0991"
-   ],
-   "regle": "un contrôle qui borne sa sortie porte son total DANS la structure qui porte ses constats (un champ frère de la liste : total, rendus, bornee), jamais dans un canal de prose ; et toute mesure d'invariance ou d'écart menée sur une liste bornée se joue sur le total, sinon elle se déclare non concluante",
-   "oracle": "à créer : une fixture qui dépasse la borne et dont le total est lu depuis le champ frère — la fixture doit ÉCHOUER si le lecteur ne peut obtenir le total qu'en analysant de la prose",
-   "voisines": [
-    "contrat-de-sortie-sans-domicile",
-    "sceau-de-vue-provenance-sans-contenu",
-    "gate-cout-invite-au-contournement"
-   ]
-  },
-  {
-   "cle": "regle-balaie-prose-et-identifiants",
-   "famille": "regle-morte",
-   "libelle": "Une regle balaie dans une MEME expression la prose ecrite par l auteur et les identifiants machine qu il cite en preuve — noms de champs, codes, sorties encadrees d accents graves. Elle se declenche alors sur un fragment dont le sens est l inverse de ce qu elle cherche, et le seul remede laisse a l auteur est de PARAPHRASER sa propre preuve pour obtenir un vert : le controle degrade exactement ce qu il est cense proteger. Le defaut a deux visages opposes et il faut les nommer ensemble — la regle devient MUETTE quand le motif technique avale un mot de prose, BAVARDE quand un motif de prose avale un identifiant ; le premier rassure a tort, le second pousse a abimer les preuves",
-   "creee_le": "2026-09-08",
-   "fondee_par": [
-    "TF-0992"
-   ],
-   "regle": "une regle qui juge de la PROSE exclut de son balayage les fragments cites entre accents graves et les blocs de code ; une regle qui juge des IDENTIFIANTS ne partage jamais son expression avec des mots francais, et n emprunte pas le drapeau insensible a la casse a ses voisines",
-   "oracle": "a creer : une fixture double sens ou les deux puces ne different QUE par la nature du fragment — une citation de sortie machine (PASS attendu) contre la meme forme ecrite en prose (FAIL attendu)",
-   "voisines": [
-    "controle-sans-fixture-double-sens",
-    "compte-total-hors-canal-des-constats",
-    "fixture-jugee-par-son-seul-oracle"
-   ]
-  },
-  {
-   "cle": "marque-de-propriete-devinee-par-sous-chaine",
-   "famille": "hook-ou-gate",
-   "libelle": "Un outil qui POSE un artefact partage (hameçon, fichier de configuration, entree de manifeste) reconnait << le sien >> en cherchant une SOUS-CHAINE — typiquement le nom de son propre script — dans ce qui occupe deja la place. Le garde-fou anti-ecrasement ne tient alors qu'a l'improbabilite que le fichier d'autrui contienne ce fragment : le jour ou il le contient, l'outil croit reconnaitre son ouvrage et ECRASE EN SILENCE le travail d'un tiers, en affichant << repose >>. Le defaut ne se voit dans aucune recette qui pose et repose SES propres artefacts ; il ne se voit que dans un cas ou l'occupant etranger ressemble au sien",
-   "creee_le": "2026-09-08",
-   "fondee_par": [
-    "TF-0994"
-   ],
-   "regle": "un outil qui pose un artefact partage y ecrit une SIGNATURE explicite — une ligne dediee, de forme qui ne peut pas apparaitre par accident, portant son nom ET sa version — et ne reconnait sa propriete que par cette ligne, jamais par un nom de fichier ni par un fragment de commande",
-   "oracle": "a creer : une fixture ou l'occupant ETRANGER contient le nom du script de l'outil — il doit etre classe CONFLIT et laisse intact ; sa jumelle porte la signature et doit etre reposee",
-   "voisines": [
-    "controle-sans-fixture-double-sens",
-    "regle-balaie-prose-et-identifiants"
-   ]
-  },
-  {
-   "cle": "controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas",
-   "famille": "regle-morte",
-   "libelle": "Un controle mesure un emplacement CODE EN DUR alors que l'execution reelle en charge un autre, designe par une variable d'environnement de la plateforme. Il rend PASS sur un parc que la session n'a jamais vu : les artefacts sont bien la, alignes, a jour — et aucun n'est charge. Le defaut est invisible par construction, parce que le verdict ne NOMME pas le repertoire qu'il a mesure : rien dans la sortie ne permet de s'apercevoir qu'on a regarde ailleurs. Il se paie une fois que la consequence est visible cote humain (un skill qui ne se declenche pas, une loi transverse non chargee), jamais au moment du controle",
-   "creee_le": "2026-09-09",
-   "fondee_par": [],
-   "regle": "tout controle qui juge une copie INSTALLEE resout sa racine par la variable de la plateforme d'abord (CLAUDE_CONFIG_DIR), le defaut ensuite, via UNE fonction partagee ; et son verdict NOMME le repertoire mesure et la variable qui l'a decide, en PASS comme en FAIL — un verdict qui ne dit pas ou il a regarde ne se conteste pas",
-   "oracle": "a creer : oracle-skills K10 — fixture a deux repertoires de configuration, l'un peuplé l'autre vide, CLAUDE_CONFIG_DIR pointant sur le vide ; l'oracle doit ECHOUER la ou il rend PASS aujourd'hui",
-   "voisines": [
-    "regle-balaie-prose-et-identifiants",
-    "recette-verdict-non-prononcable"
-   ]
-  },
-  {
-   "cle": "controle-vrai-sur-le-mauvais-invariant",
-   "famille": "regle-morte",
-   "libelle": "Un controle mesure une GRANDEUR CORRELEE a ce qu il protege au lieu de l invariant lui-meme — un nombre de commits pour un maximum d identifiant, un compte de fichiers pour une couverture. Tant que la correlation tient, il a raison et personne ne voit la substitution ; le jour ou elle se rompt (une histoire reecrite, un depot reclone, un renommage en masse), il rend un verdict FAUX avec une mecanique JUSTE — donc incontestable, puisque son calcul est verifiable et exact. Deux aggravations le rendent couteux plutot que genant : le remede qu il NOMME est derive de la mauvaise grandeur, donc parfois destructeur pour la situation reelle ; et son echappatoire fait DECLARER a l operateur un etat qui n est pas le sien, ce qui laisse une trace fausse",
-   "creee_le": "2026-09-09",
-   "fondee_par": [],
-   "regle": "un controle mesure l INVARIANT qu il protege, enonce en une phrase dans son propre code (« aucun identifiant deja frappe ailleurs »), et jamais une grandeur qui lui est seulement correlee ; quand la grandeur mesuree et l invariant divergent, le message NOMME la divergence, ne propose aucun remede derive de la grandeur, et l echappatoire eventuelle fait declarer un FAIT VERIFIE, jamais un etat suppose",
-   "oracle": "a creer : fixture a double sens ou la correlation est ROMPUE — deux etats qui different sur la grandeur mesuree mais partagent l invariant doivent PASSER, deux etats identiques sur la grandeur mais divergents sur l invariant doivent ECHOUER",
-   "voisines": [
-    "controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas",
-    "controle-sans-fixture-double-sens",
-    "compte-total-hors-canal-des-constats"
-   ]
-  },
-  {
-   "cle": "texte-sur-la-graphie-detruit-par-sa-pseudonymisation",
-   "famille": "anonymisation",
-   "libelle": "Un texte dont le SUJET est la graphie d un nom — un commentaire qui oppose deux ecritures du meme terme, un message de commit qui documente un defaut de frontiere de mot, une fixture decrite en prose — est DETRUIT par sa propre pseudonymisation : les graphies contrastees deviennent le meme pseudonyme, et la phrase se met a dire << X ecrit X >>. La chaine se comporte correctement et ne peut pas savoir : elle voit un nom, elle le remplace. Le defaut est invisible au moment ou il se produit — la substitution est annoncee comme un succes — et il ne se voit qu a la relecture, souvent des semaines plus tard, quand la seule explication d un correctif est devenue une tautologie. Il frappe exactement les textes qui documentent les defauts d anonymisation, c est-a-dire ceux qu on a le plus besoin de pouvoir relire",
-   "creee_le": "2026-09-10",
-   "fondee_par": [
-    "TF-1007"
-   ],
-   "regle": "un texte qui parle de la GRAPHIE d un nom ne cite jamais un nom reel : il DECRIT la forme (<< une cle en minuscules a tirets contre le meme nom en Majuscules a Espaces >>) ou emploie un nom INVENTE, comme le font les bancs a tables jetables. La regle vaut pour le code, les commentaires, les messages de commit et les restitutions",
-   "oracle": "a creer : relever les textes ou un meme pseudonyme apparait DEUX FOIS dans une phrase opposant deux graphies (<< A dans le nom, la cle etant A >>) — signature mecanique de la tautologie produite par la substitution",
-   "voisines": [
-    "compte-total-hors-canal-des-constats",
-    "regle-balaie-prose-et-identifiants"
-   ]
-  },
-  {
-   "cle": "quantificateur-sacrifie-au-budget-du-texte",
-   "famille": "regle-morte",
-   "libelle": "Un texte normatif sous PLAFOND DE TAILLE doit gagner quelques octets, et le mot qu on retire est celui qui << ne semble pas indispensable a la phrase >> — or dans une regle, le mot le plus court est souvent celui qui porte le plus : seulement, jamais, toute, aucun, uniquement. Retirer un quantificateur ne raccourcit pas la regle, il l ASSOUPLIT : << accepte sur verdict d oracle SEULEMENT >> devient << accepte sur verdict d oracle >>, qui n exclut plus rien. Le defaut est invisible a la relecture parce que la phrase reste grammaticale et garde son sujet ; il ne se voit qu en comparant les deux versions, et il voyage avec un commit dont le motif annonce autre chose — ici << noyau dans son budget >>. C est un assouplissement qu aucun humain n a decide, produit par une contrainte de mise en page",
-   "creee_le": "2026-09-10",
-   "fondee_par": [
-    "TF-1010"
-   ],
-   "regle": "un texte normatif sous plafond ne gagne JAMAIS ses octets sur un quantificateur : la reformulation doit conserver l exclusivite (<< sur le seul verdict >> vaut << sur verdict … seulement >>), et les octets se prennent sur ce qui n a pas de force normative — une glose, un exemple, un renvoi. Tout commit qui reduit un texte normatif declare, dans son message, les mots retires",
-   "oracle": "a creer : relever les diffs d un texte normatif ou un quantificateur (seul, seulement, uniquement, jamais, aucun, tout, toute) DISPARAIT sans etre remplace par une tournure equivalente — le controle juge la perte du quantificateur, pas la longueur",
-   "voisines": [
-    "texte-sur-la-graphie-detruit-par-sa-pseudonymisation",
-    "regle-balaie-prose-et-identifiants"
-   ]
-  },
-  {
-   "cle": "regle-ecrite-sans-oracle-qui-la-joue",
-   "famille": "skill-ou-oracle-non-invoque",
-   "libelle": "Une regle est ecrite dans un texte opposable — noyau, regles du projet, gabarit — avec ses conditions, et AUCUN controle ne la joue : elle tient a la discipline de celui qui l applique, c est-a-dire a rien d opposable. Elle decore tant que rien ne la joue, et le jour ou elle est enfreinte, rien ne le nomme avant que le mal soit fait. La classe se distingue du controle sans fixture (le controle existe mais n est pas eprouve) et du controle mort (il existe et rend PASS a tort) : ici, il n y a pas de controle du tout",
-   "creee_le": "2026-09-10",
-   "fondee_par": [],
-   "regle": "toute regle qui pose une CONDITION verifiable — une liste de chemins, une nature de fichier, une valeur, un ordre — nomme l oracle qui la joue ou porte, le jour ou elle est ecrite, une candidature pour cet oracle ; une regle sans juge ni candidature n entre pas dans un texte opposable",
-   "oracle": "a creer par cas ; pour R-38 §4 : oracle-nature-enregistrement (candidature du 10/09), fixture a double sens — commit de restitution seule PASS, le meme plus une ligne du noyau FAIL",
-   "voisines": [
-    "controle-sans-fixture-double-sens",
-    "controle-vrai-sur-le-mauvais-invariant",
-    "point-entree-declare-rouge-sur-toute-cible"
-   ]
-  },
-  {
-   "cle": "date-de-fichier-menteuse-apres-copie",
-   "famille": "hook-ou-gate",
-   "libelle": "Un outil de propagation ecrase un fichier par une copie qui PRESERVE l horodatage de la SOURCE. Le fichier ecrase porte donc la date de ce qui l a remplace, jamais celle de l ecrasement, et l evenement ne laisse AUCUNE trace : ni journal, ni date, ni sauvegarde. Pire que l absence de trace, la date devient un signal MENTEUR — un lecteur qui l interroge pour savoir si le fichier a bouge recemment conclut qu il n a pas ete touche, et il en tire une deduction inverse de la verite. Le defaut se manifeste au moment ou deux sessions comparent leurs mesures : celle d AVANT l ecrasement et celle d APRES ne se contredisent pas, elles se succedent, mais rien dans le systeme ne permet de le savoir",
-   "creee_le": "2026-09-10",
-   "fondee_par": [
-    "TF-1012"
-   ],
-   "regle": "un outil qui ECRASE un fichier hors versionnement journalise le geste — chemin, empreinte d avant, empreinte d apres, horodatage REEL — et ne se repose jamais sur la date du fichier pour temoigner ; et tout diagnostic qui invoque une date de fichier declare d abord si l outil qui l a ecrit preserve ou non l horodatage de sa source",
-   "oracle": "a creer : une fixture ou un fichier recent est ecrase par une source plus ancienne, et ou le controle doit RELEVER l ecrasement malgre une date inchangee — un controle qui se fie a la date rend PASS et prouve ainsi qu il ne mesure rien",
-   "voisines": [
-    "compte-total-hors-canal-des-constats",
-    "quantificateur-sacrifie-au-budget-du-texte"
-   ]
-  },
-  {
-   "cle": "regle-qui-interdit-son-propre-remede",
-   "famille": "hook-ou-gate",
-   "libelle": "Un controle BLOQUANT refuse la correction que son propre message de refus RECOMMANDE. L auteur qui obeit a la consigne se fait refuser une seconde fois, et la seule issue qui lui reste est le contournement : le gardien ne se discute pas, il se DESACTIVE, et il emporte avec lui la protection qu il portait. Le defaut ne se voit ni a la lecture du code ni dans un banc de fixtures construites autour du cas nominal — il ne se voit qu en JOUANT le remede que le message prescrit, ce que personne ne pense a tester puisque c est precisement ce qu on croit avoir rendu possible",
-   "creee_le": "2026-09-10",
-   "fondee_par": [
-    "TF-1013"
-   ],
-   "regle": "tout controle bloquant dont le message propose une correction porte, a son banc, un cas qui JOUE cette correction et qui doit PASSER — la fixture du remede est aussi obligatoire que la fixture du defaut",
-   "oracle": "a creer : relever les controles dont le message de refus contient une prescription (<< reformulez >>, << remplacez >>, << utilisez >>) et dont le banc ne porte aucun cas jouant cette prescription",
-   "voisines": [
-    "controle-sans-fixture-double-sens",
-    "quantificateur-sacrifie-au-budget-du-texte"
-   ]
-  },
-  {
-   "cle": "chemin-de-livrable-au-dela-du-plafond-de-la-plateforme",
-   "famille": "emplacement-livrable",
-   "libelle": "Un nom de livrable conforme a R-4 depasse, avec les sidecars d oracle qui le doublent (.oracles/<chemin>.oracles-historique.jsonl, 26 caracteres de plus), le plafond de chemin de la plateforme — 260 caracteres sous Windows — des que le depot est clone a plus d une centaine de caracteres de profondeur : le checkout echoue, et avec lui la verification sur clone frais que la doctrine prescrit avant tout push. La regle de nommage juge la FORME du nom, jamais sa LONGUEUR, et la procedure de clone ne declare pas core.longpaths. Le defaut ne se voit pas sur le poste de travail (chemin court) : il ne se voit qu au premier clone profond, c est-a-dire chez celui qui verifie",
-   "creee_le": "2026-09-10",
-   "fondee_par": [
-    "TF-1015"
-   ],
-   "regle": "REGLES-PROJET.md R-4 (forme du nom) — a completer d un plafond de longueur du chemin relatif, sidecars d oracle compris ; procedure de verification sur clone frais et bootstrap.mjs --rebatir : `git clone -c core.longpaths=true` declare, jamais suppose",
-   "oracle": "a creer : oracle-synthese — longueur du chemin relatif du fichier juge, plus 26 caracteres de sidecar, sous le plafond ; mesure de reference : `git clone` dans un chemin de 130 caracteres, 22 fichiers refuses le 10/09/2026",
-   "voisines": [
-    "emplacement-livrable-hors-convention",
-    "porte-sans-chemin-des-tables"
-   ]
-  },
-  {
-   "cle": "journal-de-versions-dormant",
-   "famille": "versionnement-livrable",
-   "libelle": "Un depot DECLARE une convention de versionnement — CHANGELOG SemVer, tags, version de paquet — et cesse de la tenir sans la retirer : les enregistrements de fonctionnalites s empilent sans entree, la section << Non publie >> reste ouverte depuis des semaines, la version du paquet ne bouge plus sous des tags qui ont avance. La convention ecrite ment alors sur l etat du depot, et rien ne la juge : un lecteur qui lit le journal croit le depot fige, un lecteur qui lit l histoire croit le journal a jour. Le defaut est silencieux parce que chaque enregistrement pris seul est correct — c est l ABSENCE d entree qui est le defaut, et une absence n est jugee par personne",
-   "creee_le": "2026-09-10",
-   "fondee_par": [
-    "TF-1016"
-   ],
-   "regle": "une convention de versionnement declaree dans un depot (CHANGELOG.md, tags, champ version) est TENUE ou RETIREE : tout enregistrement qui touche `tools/`, `core/` ou `oracles/` porte une entree au journal, et un journal sans entree depuis N enregistrements fait rougir la recette du depot",
-   "oracle": "a creer : dans la recette de chaque forge (tools/verifier.mjs ou equivalent), compter les enregistrements depuis la derniere modification du CHANGELOG qui touchent le code livre ; plafond declare ; mesure de reference : 14 enregistrements sans entree du 15/08 au 10/09/2026 chez forge-audit",
-   "voisines": [
-    "livrable-ecrase-sans-indice",
-    "emplacement-livrable-hors-convention"
-   ]
-  },
-  {
-   "cle": "recette-locale-ne-rejoue-pas-l-environnement-de-la-ci",
-   "famille": "hook-ou-gate",
-   "libelle": "Une recette locale rejoue les ETAPES du workflow de CI (elle le lit, TF-0553) mais pas son ENVIRONNEMENT — variable CI, variables env: des etapes, outils absents du runner (navigateur) — et des tests changent de verdict selon cet environnement : SKIP ici, ECHEC la-bas. La recette rend un vert qui ne prouve rien sur le rouge d en face, la CI rouge cesse d etre lue parce que la recette est verte, et le depot se publie sur ce vert. Le defaut ne se voit qu en LISANT le run hebergee apres le push, ce que personne ne fait quand la recette locale a deja dit oui",
-   "creee_le": "2026-09-10",
-   "fondee_par": [
-    "TF-1017"
-   ],
-   "regle": "une recette qui pretend rejouer la CI pose l environnement que le workflow declare (CI=true, env: de chaque etape) et DIT en sortie chaque condition qu elle ne peut pas rejouer ; un test n a qu un verdict par situation, jamais un SKIP hors CI et un ECHEC en CI ; toute publication d une forge lit le run de CI hebergee et l inscrit a la restitution",
-   "oracle": "a creer : dans la recette de chaque forge, comparer le dernier run de CI hebergee (gh run view) au verdict local — divergence = rouge avec les tests qui different ; mesure de reference : forge-audit, 8 runs rouges du 24/08 au 10/09/2026 sous une recette locale verte (11 groupes OK)",
-   "voisines": [
-    "regle-qui-interdit-son-propre-remede",
-    "controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas"
-   ]
-  },
-  {
-   "cle": "decision-humaine-rendue-restituee-sans-geste",
-   "famille": "restitution-forme",
-   "libelle": "Une decision humaine rendue par son selecteur (<< 11a >>) recoit en reponse la restitution de la veille rejouee MOT POUR MOT, sans le geste qu elle commande ; le geste n est joue qu a la repetition du mot humain, et aucune restitution ne dit que les reponses precedentes n ont rien fait. Vu de l humain, le pilot boucle : il redemande une decision deja rendue",
-   "creee_le": "2026-09-11",
-   "fondee_par": [
-    "TF-1019"
-   ],
-   "regle": "noyau loi 5 (l IA fait, l humain decide) et gabarits/RESTITUTION.md v2.18.0 (un tour qui n apporte rien de neuf rend un accuse bref) — un mot humain de la forme << D-N (x) >> ou << Nx >> commande son geste dans le MEME tour ; la restitution qui suit porte la preuve du geste (sortie executee), jamais la decision reposee ni la synthese precedente rejouee",
-   "oracle": "a creer (regle par. 4) : hook-restitution — apres un message humain de forme << D-N (x) >> / << Nx >>, un message de fin de tour dont le texte est IDENTIQUE au precedent (meme empreinte) ou qui repose la meme D-N au bloc 3 est FAIL : decision recue, geste absent ; mesure de reference : 11/09/2026, session 31d2f3c7, << 11a >> a 09:05 et 09:07, deux restitutions de 3156 mots identiques a 09:07:31 et 09:09:32 (journal des hooks : 0 ecriture, 3 commandes), push a 09:10:08",
-   "voisines": [
-    "restitution-fichier-juge-mal-choisi"
-   ]
-  },
-  {
-   "cle": "capacite-hors-versionnement-de-forge",
-   "famille": "contrat-interface-forge",
-   "libelle": "Une capacite EXERCEE dans un run reel — skill, agent compile, expert — est citee comme point d entree par un agent (<< charger le skill X >>), un catalogue ou une fiche, et ne vit que sous forme d archive dans un dossier ignore par git d une forge, non installee au poste : aucun depot n en porte la source lisible, l histoire ni la version. Le pipeline qui l appelle est versionne, la capacite qu il appelle ne l est pas ; un clone frais de la forge ne peut pas rejouer le run, et une etude qui compte sur elle batit sur du sable. Mesure du 11/09/2026 : quatre skills (communication, propale, propale-review, pptx) sous input/03-skills/ de forge-agents, cites par les quatre agents P4, absents de ~/.claude/skills",
-   "creee_le": "2026-09-11",
-   "fondee_par": [
-    "TF-1021"
-   ],
-   "regle": "toute capacite citee comme point d entree par un agent compile, un catalogue de services ou une fiche expert est versionnee EN SOURCE par une forge (jamais en archive seule, jamais sous un dossier ignore) et installee par bootstrap ; ce qui est confidentiel dans son instance (marque, prix, references) en est separe et vit au canal confidentiel",
-   "oracle": "a creer : oracle-skills ou oracle-ecosysteme croise les skills cites par .claude/agents/*.md (<< charger le skill >>) et par catalogue.jsonl avec les skills versionnes en source ET presents dans ~/.claude/skills ; tout ecart est un FAIL nomme",
-   "voisines": [
-    "contrat-de-sortie-sans-domicile",
-    "alias-de-transition-perime-survivant"
-   ]
-  },
-  {
-   "cle": "reference-chargee-toujours-absente-du-paquet",
-   "famille": "regle-morte",
-   "libelle": "Le SKILL.md d un skill charge << toujours >> ou << obligatoirement >> une reference interne (references/charte.md, layouts.md, assets.md) que son paquet ne contient pas : l instruction est morte a l execution, le skill produit sans la charte qu il promet, et rien ne le signale. Mesure du 11/09/2026 : digit-ai-pptx.skill v2.5.0 porte 4 fichiers, aucun des trois references chargees a l etape 1 de son workflow",
-   "creee_le": "2026-09-11",
-   "fondee_par": [
-    "TF-1022"
-   ],
-   "regle": "le paquet d un skill porte chaque fichier que son SKILL.md cite en chemin relatif ; un lien interne non resolu dans le paquet est un FAIL du skill, pas un avertissement",
-   "oracle": "a creer : oracle-skills resout chaque chemin relatif cite par un SKILL.md (references/, scripts/, templates/) dans l arborescence du skill ; fixture rouge = un SKILL.md citant un fichier absent",
-   "voisines": [
-    "controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas",
-    "point-entree-declare-rouge-sur-toute-cible"
-   ]
-  },
-  {
-   "cle": "marque-emettrice-portee-par-deux-chartes",
-   "famille": "donnees-perissables-en-dur",
-   "libelle": "La marque d un emetteur (polices, couleurs, gabarits) est ecrite EN DUR dans plusieurs skills de rendu avec des valeurs contradictoires, sans systeme-de-marque source unique (MARQUE.md, tokens.css) : chaque support porte sa propre << charte officielle >>, et aucun oracle ne peut juger la coherence entre un deck et une page. Mesure du 11/09/2026 : Digit-AI est Montserrat/Inter/#2563EB chez digit-ai-pptx (<< charte officielle v2 >>) et Roboto/DM Sans chez digit-ai-page-html (<< jamais Syne >>) ; aucun MARQUE.md ni tokens.css Digit-AI sur le poste",
-   "creee_le": "2026-09-11",
-   "fondee_par": [
-    "TF-1023"
-   ],
-   "regle": "la marque d un emetteur vit dans UN systeme-de-marque (cat-des-01 : tokens.css + MARQUE.md), date et source, que tout skill de rendu (deck, page, document) CONSOMME au lieu de porter ses propres valeurs ; deux chartes pour un emetteur = une a retirer, ou une divergence datee et motivee",
-   "oracle": "a creer : les oracles tokens T1-T6 de forge-design joues sur chaque skill de rendu contre le tokens.css de l emetteur ; a defaut, un controle qui extrait polices et couleurs des SKILL.md de rendu et refuse deux valeurs pour une meme marque",
-   "voisines": [
-    "deux-regles-du-socle-inconciliables"
-   ]
-  },
-  {
-   "cle": "oracle-faux-positif",
-   "famille": "regle-morte",
-   "libelle": "Un oracle rend rouge sur un artefact conforme : le verdict opposé cesse d'être prononçable, et l'auteur apprend à ignorer le juge",
-   "creee_le": "2026-09-11",
-   "fondee_par": [],
-   "regle": "quality-oracles SKILL.md — un oracle se valide par fixture DOUBLE SENS : il refuse ce qu'il doit refuser ET accepte ce qu'il doit accepter",
-   "oracle": "self-test de l'oracle en cause, sur une fixture conforme qui doit passer",
-   "voisines": [
-    "controle-vrai-sur-le-mauvais-invariant",
-    "controle-sans-fixture-double-sens",
-    "regle-neuve-sans-mesure-de-bruit"
-   ],
-   "note": "Créée le 2026-09-11 sur six retours du lot Produit-62 - RETOURS - 20260911c (RD-15, RD-16, RD-17, RS-02, RS-03, RQ-01) : un triangle CSS lu comme un bandeau latéral, un bloc @media print lu comme le thème sombre, un remplissage de badge lu comme une surface de page, un en-tête collant désépinglé par son propre tableau lu comme masqué, un en-tête position:sticky lu comme un chevauchement, un identifiant cité dans un commentaire de script compté comme un doublon du DOM. Distincte de controle-vrai-sur-le-mauvais-invariant : là, la mesure est juste et porte sur le mauvais objet ; ici, la mesure elle-même conclut à l'envers sur le bon objet. Le coût propre de cette classe est la DÉFIANCE : deux de ces six plafonnaient le verdict d'une grille entière."
-  },
-  {
-   "cle": "exemption-hors-atteinte-par-le-chemin-prescrit",
-   "famille": "contrat-interface-forge",
-   "libelle": "Un mécanisme d'exemption protège l'auteur d'un jugement sur ce qu'il ne possède pas, mais exige un geste d'intégration qu'aucun mode d'emploi n'impose : l'auteur conforme se fait juger",
-   "creee_le": "2026-09-11",
-   "fondee_par": [],
-   "regle": "forge-design oracles/lib/socle.mjs — un bloc du socle scellé par son empreinte n'est pas jugé ; digit-ai-page-html scripts/embarquer-composants.mjs — le poseur qui appose le sceau",
-   "oracle": "run-oracles-design.mjs, champ socle_exempte : verifies vide sur une page qui charge bel et bien des composants du socle",
-   "voisines": [
-    "heritage-non-tenu",
-    "emplacement-livrable-hors-convention",
-    "deux-regles-du-socle-inconciliables"
-   ],
-   "note": "Créée le 2026-09-11 sur RS-01 du lot Produit-62 - RETOURS - 20260911c : 40 écarts durs portés par trois composants du socle, socle_exempte rendant verifies:[] parce que le produit inline les assets lui-même, et le sceau intenable de toute façon puisque le produit doit patcher une couleur en dur pour que le composant tienne en thème sombre. Signature de la classe : les DEUX branches sont perdantes pour un auteur de bonne foi."
-  },
-  {
-   "cle": "gabarit-sans-parite-de-theme",
-   "famille": "gabarit-document",
-   "libelle": "Un gabarit partagé ne définit sa palette que pour un thème : chaque produit qui le monte doit redécouvrir et réécrire la projection manquante, ou livrer un rendu cassé dans l'autre thème",
-   "creee_le": "2026-09-11",
-   "fondee_par": [],
-   "regle": "forge-design oracle-tokens T4 et oracle-bascule B-T4 — une palette se dérive : une source, deux projections",
-   "oracle": "oracle-bascule.mjs sur une page qui monte le gabarit, thème clair et thème sombre",
-   "voisines": [
-    "heritage-non-tenu",
-    "controle-sans-fixture-double-sens"
-   ],
-   "note": "Créée le 2026-09-11 sur RC-01 du lot Produit-62 - RETOURS - 20260911c : 36 écarts durs d'un seul bloc (18 jetons du canevas de modèle de données du skill digit-ai-schemas, comptés par deux oracles), et des cartes de schéma à fonds clairs sur page sombre partout où le canevas est monté. La correction dans la page marche et duplique chez chaque produit une décision de palette qui appartient au gabarit."
-  },
-  {
-   "cle": "viewport-de-conception-non-fixe",
-   "famille": "page-html-socle",
-   "libelle": "Aucun texte ne fixe la largeur de CONCEPTION par defaut d un ecran de bureau ni la largeur MAXIMALE a laquelle une page reste conforme : chaque run choisit sa largeur de maquette (1280, 1440, 1920 selon l humeur), les grilles de rendu s arretent a la largeur du poste de l auteur, et une page jugee PASS sur cette grille deborde, etire sa prose ou laisse la moitie de l ecran vide sur le poste du lecteur. Le defaut est invisible a l auteur parce que son ecran est la borne de sa grille ; il se voit chez le lecteur equipe plus large. La classe se distingue de page-html-largeur-lecture-donnees (largeur de lecture CONTRADICTOIRE entre prose et donnees a une largeur donnee) : ici la largeur de reference elle-meme n est pas fixee",
-   "creee_le": "2026-09-12",
-   "fondee_par": [
-    "TF-1066"
-   ],
-   "regle": "toute maquette, page ou ecran de bureau se concoit a une largeur de reference ECRITE dans la doctrine (BEST-PRACTICES-HTML.md E5 : 1920 px, Full HD) et se verifie sans defaut bloquant jusqu a une largeur maximale ECRITE (3840 px, 4K) ; une grille de rendu qui s arrete en dessous de cette borne ne prouve rien au-dela",
-   "oracle": "render_page.py (socle) avec DEFAULT_WIDTHS etendu a 3840 et 2560 ; run-oracles-design.mjs et oracle-baseline.mjs (forge-design) sur la grille complete ; a outiller : un controle V qui refuse une mesure de lecture de prose > 100 ch a 3840 et une page de donnees qui n occupe pas la largeur",
-   "voisines": [
-    "page-html-largeur-lecture-donnees",
-    "restitution-rendu-visuel-non-critique"
-   ]
-  },
-  {
-   "cle": "sequence-octale-interpretee-au-rendu",
-   "famille": "page-html-socle",
-   "libelle": "Un generateur de page rend le texte d un item en interpretant une sequence d antislash comme un echappement (\u0000 lu comme l octet nul, \n comme un saut de ligne) : la donnee est intacte (aucun octet nul dans le registre), la page generee porte l octet, et elle devient BINAIRE pour toute recherche textuelle et FAIL pour l oracle des caracteres de controle. Le defaut est invisible a l ecran (l octet nul ne s affiche pas) et se voit chez celui qui verifie. La classe se distingue de texte-sur-la-graphie-detruit-par-sa-pseudonymisation (une transformation VOULUE qui abime un texte) : ici la transformation n est voulue par personne, c est un chemin Windows cite dans un texte",
-   "creee_le": "2026-09-12",
-   "fondee_par": [
-    "TF-1067"
-   ],
-   "regle": "un generateur de page ne fait passer aucun texte de donnee par une evaluation qui interprete les antislashs (gabarit evalue, remplacement a motifs speciaux, decodage d echappements) ; le texte est echappe pour HTML et insere tel quel ; un chemin Windows cite dans un item se rend avec son antislash ; oracle-caracteres-controle joue sur la page generee a chaque regeneration",
-   "oracle": "oracle-caracteres-controle.mjs (CC1, existant, joue par self-tests.mjs) ; a cabler dans todo/generer-page.mjs apres ecriture pour que la regeneration echoue au lieu de laisser la page binaire",
-   "voisines": [
-    "texte-sur-la-graphie-detruit-par-sa-pseudonymisation",
-    "regle-balaie-prose-et-identifiants"
-   ]
-  }
- ]
+  "schema": "pilot/classes@1",
+  "version": "1.15.0",
+  "date": "2026-09-16",
+  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
+  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
+  "modele": {
+    "famille": "un regroupement de lecture, fermé, stable — sert aux vues et aux revues, jamais au comptage des récidives",
+    "classe": "un défaut généralisé, avec la règle où il vit et l'oracle qui le joue — un retour d'un lot en désigne UNE",
+    "fondee_par": "les items du registre dont la clôture a créé ou porté la règle (ids seulement : la date de correction se lit au registre, jamais recopiée ici — N-6)",
+    "voisines": "classes qu'un producteur pourrait confondre avec celle-ci ; une classe créée à moins de 30 jours d'un retour d'une voisine est signalée « classe suspecte » à l'ingestion",
+    "recidive": "un retour dont la classe est fondée par un item clos `corrige` AVANT la date du retour, ou dont un item du registre porte déjà cette classe et est clos `corrige` — il entre marqué `recidive_de`, jamais refusé"
+  },
+  "familles": [
+    {
+      "cle": "emplacement-livrable",
+      "libelle": "Un livrable rangé au mauvais endroit ou nommé hors convention"
+    },
+    {
+      "cle": "versionnement-livrable",
+      "libelle": "Un livrable écrasé, ou sans indice ni version datée"
+    },
+    {
+      "cle": "page-html-socle",
+      "libelle": "Une page HTML hors socle : charte, contraste, filtres, tableaux, ressources réseau, lisibilité"
+    },
+    {
+      "cle": "skill-ou-oracle-non-invoque",
+      "libelle": "Un skill, un oracle ou un contrôle existant non joué, ou remplacé par un contrôle maison"
+    },
+    {
+      "cle": "restitution-forme",
+      "libelle": "Une restitution de fin de tour hors gabarit"
+    },
+    {
+      "cle": "anonymisation",
+      "libelle": "Un nom réel de client ou de produit qui sort dans un dépôt ou un registre"
+    },
+    {
+      "cle": "secret-hors-perimetre",
+      "libelle": "Un secret, un jeton ou un fichier d'environnement qui transite ou se publie"
+    },
+    {
+      "cle": "heritage-produit",
+      "libelle": "Un artefact du pilot absent, périmé ou divergent chez un produit ; une correction qui ne redescend pas"
+    },
+    {
+      "cle": "horodatage-invente",
+      "libelle": "Un horodatage composé à la main au lieu d'être mesuré"
+    },
+    {
+      "cle": "affordance-ui",
+      "libelle": "Une affordance non câblée, un état vide muet, une cible de geste trop petite, une vue sans maquette"
+    },
+    {
+      "cle": "regle-morte",
+      "libelle": "Un contrôle qui rend PASS sur ce qu'il existe pour refuser, ou un verdict qui n'est plus prononçable"
+    },
+    {
+      "cle": "readme-role",
+      "libelle": "Un README ou LISEZMOI absent, non régénéré ou sans rôle rédigé"
+    },
+    {
+      "cle": "lot-forme",
+      "libelle": "Un lot de retours ou un sidecar hors forme, ou un retour qui traite le symptôme sans nommer sa classe"
+    },
+    {
+      "cle": "tracabilite-ledger",
+      "libelle": "Un ledger, une preuve ou une source absente ou non relue"
+    },
+    {
+      "cle": "hook-ou-gate",
+      "libelle": "Un hook ou un gate absent, bloquant à tort, ou contourné"
+    },
+    {
+      "cle": "gabarit-document",
+      "libelle": "Un gabarit de document incomplet, une famille manquante, une conception non jugée"
+    },
+    {
+      "cle": "contrat-interface-forge",
+      "libelle": "Une incompatibilité d'interface entre forges, ou entre le pilot et une forge"
+    },
+    {
+      "cle": "donnees-perissables-en-dur",
+      "libelle": "Un référentiel périssable écrit en dur au lieu d'une donnée datée"
+    }
+  ],
+  "classes": [
+    {
+      "cle": "page-html-polices-distantes",
+      "famille": "page-html-socle",
+      "libelle": "Une page HTML livrée charge une police ou une ressource distante au chargement",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0753"
+      ],
+      "regle": "references/BEST-PRACTICES-HTML.md A1 et D4",
+      "oracle": "digit-ai-page-html check_html.py A1",
+      "voisines": []
+    },
+    {
+      "cle": "page-html-sticky-superposes",
+      "famille": "page-html-socle",
+      "libelle": "L'en-tête de page et l'en-tête de tableau collants se superposent",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0754"
+      ],
+      "regle": "references/BEST-PRACTICES-HTML.md B1/B6 ; lisibilite.md L29",
+      "oracle": "digit-ai-page-html check_html.py",
+      "voisines": []
+    },
+    {
+      "cle": "page-html-teinte-refus",
+      "famille": "page-html-socle",
+      "libelle": "La teinte de refus n'est ni documentée ni employée pour un état refusé",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0755"
+      ],
+      "regle": "references/BEST-PRACTICES-HTML.md D5",
+      "oracle": "digit-ai-page-html check_html.py",
+      "voisines": []
+    },
+    {
+      "cle": "page-html-largeur-lecture-donnees",
+      "famille": "page-html-socle",
+      "libelle": "Une console ou un tableau de données livré dans une colonne de lecture de prose ; règles de largeur contradictoires",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0771",
+        "TF-0778"
+      ],
+      "regle": "references/BEST-PRACTICES-HTML.md I1 ; lisibilite.md L26 ; zero-defaut-visuel.md V12/V13",
+      "oracle": "digit-ai-page-html render_page.py",
+      "voisines": [
+        "page-html-grille-non-alignee"
+      ]
+    },
+    {
+      "cle": "page-html-sommaire-absent",
+      "famille": "page-html-socle",
+      "libelle": "Une page longue sans sommaire visible en permanence",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0772",
+        "TF-0787"
+      ],
+      "regle": "references/BEST-PRACTICES-HTML.md I2 ; lisibilite.md L25 ; zero-defaut-visuel.md V14",
+      "oracle": "digit-ai-page-html check_html.py",
+      "voisines": []
+    },
+    {
+      "cle": "page-html-grille-non-alignee",
+      "famille": "page-html-socle",
+      "libelle": "Les champs d'une même rangée de grille ne sont pas alignés",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0773"
+      ],
+      "regle": "references/BEST-PRACTICES-HTML.md I3 ; lisibilite.md L26 ; zero-defaut-visuel.md V11",
+      "oracle": "digit-ai-page-html render_page.py",
+      "voisines": [
+        "page-html-largeur-lecture-donnees"
+      ]
+    },
+    {
+      "cle": "page-html-dictionnaire-colonnes",
+      "famille": "page-html-socle",
+      "libelle": "Un tableau de données sans dictionnaire de colonnes",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0777"
+      ],
+      "regle": "references/BEST-PRACTICES-HTML.md I4 ; dictionnaire-de-colonnes.md (skill)",
+      "oracle": "digit-ai-page-html check_html.py",
+      "voisines": []
+    },
+    {
+      "cle": "page-html-filtres-tableau",
+      "famille": "page-html-socle",
+      "libelle": "Composant de filtres absent, tri maison, réinitialisation manquante, facettes tronquées ou colonne clé privée de filtre",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0768",
+        "TF-0769",
+        "TF-0781",
+        "TF-0782"
+      ],
+      "regle": "references/composant-filtres-tableau.md RA-5, G7, G8 ; references/BEST-PRACTICES-HTML.md I5-I6",
+      "oracle": "oracle-filtres-tableau (L4, G1-G6) ; hook page-html chez le produit",
+      "voisines": []
+    },
+    {
+      "cle": "page-html-temps-affiche",
+      "famille": "page-html-socle",
+      "libelle": "Une durée ou une date ne s'affiche pas comme du temps",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0783"
+      ],
+      "regle": "lisibilite.md L28 ; references/BEST-PRACTICES-HTML.md I5",
+      "oracle": "digit-ai-page-html check_html.py",
+      "voisines": []
+    },
+    {
+      "cle": "gabarit-conception-non-jugee",
+      "famille": "gabarit-document",
+      "libelle": "La conception d'un livrable n'est jugée par aucun oracle ; méthode de construction absente ; mesure case par case fausse dans l'ensemble",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0758",
+        "TF-0759",
+        "TF-0760"
+      ],
+      "regle": "gabarits/documents/README.md D8, D9",
+      "oracle": "oracle-gabarits-documents",
+      "voisines": []
+    },
+    {
+      "cle": "gabarit-famille-manquante",
+      "famille": "gabarit-document",
+      "libelle": "Aucune famille de gabarit ne couvre un type de document produit",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0756"
+      ],
+      "regle": "gabarits/documents/catalogue.jsonl",
+      "oracle": "oracle-gabarits-documents G8",
+      "voisines": []
+    },
+    {
+      "cle": "restitution-action-humaine-geste-agent",
+      "famille": "restitution-forme",
+      "libelle": "Une action laissée à l'humain lui demande de créer, ajouter ou écrire — un geste d'agent",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0766"
+      ],
+      "regle": "gabarits/RESTITUTION.md v2.16.0 S34",
+      "oracle": "oracle-synthese S34",
+      "voisines": []
+    },
+    {
+      "cle": "restitution-fichier-juge-mal-choisi",
+      "famille": "restitution-forme",
+      "libelle": "Le hook de fin de tour juge une analyse au lieu de la restitution",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0767"
+      ],
+      "regle": "gabarits/RESTITUTION.md v2.16.0 — marqueur réservé aux restitutions",
+      "oracle": "hook-restitution",
+      "voisines": []
+    },
+    {
+      "cle": "restitution-rendu-visuel-non-critique",
+      "famille": "restitution-forme",
+      "libelle": "Une page HTML citée comme livrée sans verdict de critique d'implémentation",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0775"
+      ],
+      "regle": "gabarits/RESTITUTION.md bloc 9 ; gabarits/CLAUDE-PRODUIT.md routage « juger le rendu visuel »",
+      "oracle": "oracle-synthese S36",
+      "voisines": []
+    },
+    {
+      "cle": "correction-symptome-sans-classe",
+      "famille": "lot-forme",
+      "libelle": "Une correction après retour traite le symptôme sans nommer la règle qui aurait évité le retour",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0779"
+      ],
+      "regle": "gabarits/RETOURS-FORGES.md « La règle qui aurait évité le retour »",
+      "oracle": "oracle-synthese S37",
+      "voisines": []
+    },
+    {
+      "cle": "brief-sans-regles-de-socle",
+      "famille": "skill-ou-oracle-non-invoque",
+      "libelle": "Le brief d'un produit HTML ne cite pas les règles de socle applicables",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0765"
+      ],
+      "regle": "gabarits/CLAUDE-PRODUIT.md « Règles de socle applicables » ; prompt-analyzer-l99 couches.md Ch8",
+      "oracle": "hook page-html (produit)",
+      "voisines": [
+        "skill-non-invoque-lexique"
+      ]
+    },
+    {
+      "cle": "auteur-juge-son-contrat",
+      "famille": "skill-ou-oracle-non-invoque",
+      "libelle": "L'auteur d'un brief juge son propre contrat de sortie",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0776"
+      ],
+      "regle": "references/ETAPES-RUN.md § 4 bis",
+      "oracle": "aucun — non mécanisable, déclaré",
+      "voisines": []
+    },
+    {
+      "cle": "lecture-tiers-non-jugee",
+      "famille": "skill-ou-oracle-non-invoque",
+      "libelle": "Aucun oracle ne juge si un lecteur sans contexte comprend le livrable",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0774"
+      ],
+      "regle": "quality-oracles oracle-lecture-tiers T1-T4 (invocation explicite)",
+      "oracle": "oracle-lecture-tiers",
+      "voisines": []
+    },
+    {
+      "cle": "l99-forme-sortie",
+      "famille": "skill-ou-oracle-non-invoque",
+      "libelle": "Une sortie d'analyse L99 hors règles de lisibilité dès l'écriture",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0770"
+      ],
+      "regle": "prompt-analyzer-l99 couches.md « Forme de la sortie »",
+      "oracle": "check_markdown.py M7/M10/M14/M18",
+      "voisines": []
+    },
+    {
+      "cle": "skill-non-invoque-lexique",
+      "famille": "skill-ou-oracle-non-invoque",
+      "libelle": "Un mot-clé du lexique d'invocation (« améliore le prompt », « l99 », « barre », « améliore ce skill ») n'a pas déclenché le skill",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0177"
+      ],
+      "regle": "CLAUDE.md lexique RV-6 ; oracles/hook-lexique.mjs (UserPromptSubmit, hérité par les produits)",
+      "oracle": "hook-lexique --self-test",
+      "voisines": [
+        "brief-sans-regles-de-socle"
+      ]
+    },
+    {
+      "cle": "gate-ecriture-juge-fichier-entier",
+      "famille": "hook-ou-gate",
+      "libelle": "Un gate d'écriture juge le fichier entier au lieu du delta",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0732"
+      ],
+      "regle": "quality-oracles profils/digit-ai.json section polices ; registre-oracles.md section précédence",
+      "oracle": "quality-oracles",
+      "voisines": []
+    },
+    {
+      "cle": "boucle-retour-sans-descente",
+      "famille": "heritage-produit",
+      "libelle": "Une correction close au pilot ne redescend pas sous une forme que le producteur rencontre",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0757"
+      ],
+      "regle": "references/TODO-FORGE.md R12 « descente »",
+      "oracle": "oracle-todo R12 ; oracle-todo R13 (récidive après descente)",
+      "voisines": [
+        "heritage-avertissement-tardif"
+      ]
+    },
+    {
+      "cle": "heritage-avertissement-tardif",
+      "famille": "heritage-produit",
+      "libelle": "L'avertissement d'héritage arrive à l'ingestion du lot au lieu de l'ouverture",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0762"
+      ],
+      "regle": "oracles/hook-ouverture.mjs section « Héritage des produits »",
+      "oracle": "scripts/relever-heritage.mjs (R-47)",
+      "voisines": [
+        "boucle-retour-sans-descente"
+      ]
+    },
+    {
+      "cle": "anonymisation-portee-partielle",
+      "famille": "anonymisation",
+      "libelle": "La passe d'anonymisation ne couvre qu'une partie des dépôts, ou l'historique porte encore des noms",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0764",
+        "TF-0752"
+      ],
+      "regle": "todo/anonymiser-suivis.mjs ; references/TODO-FORGE.md § réécrire l'historique",
+      "oracle": "oracle-nom-client-publie",
+      "voisines": []
+    },
+    {
+      "cle": "recette-verdict-non-prononcable",
+      "famille": "regle-morte",
+      "libelle": "Un verdict de recette dépend d'un outil non épinglé ou d'oracles dont l'empreinte n'est pas consignée",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0763",
+        "TF-0785",
+        "TF-0786"
+      ],
+      "regle": "README de forge-tests, ligne S-01",
+      "oracle": "recette forge-tests",
+      "voisines": []
+    },
+    {
+      "cle": "maquette-absente-avant-code",
+      "famille": "affordance-ui",
+      "libelle": "Une vue nouvelle codée sans maquette validée",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0780"
+      ],
+      "regle": "references/RUN-VERSION.md section maquette validée",
+      "oracle": "forge-design mode aval",
+      "voisines": []
+    },
+    {
+      "cle": "emplacement-livrable-hors-convention",
+      "famille": "emplacement-livrable",
+      "libelle": "Un livrable généré hors du dossier prévu ou sous un nom hors R-4",
+      "creee_le": "2026-09-03",
+      "fondee_par": [],
+      "regle": "REGLES-PROJET.md R-4",
+      "oracle": "oracle-conformite-projet R-4",
+      "voisines": []
+    },
+    {
+      "cle": "livrable-ecrase-sans-indice",
+      "famille": "versionnement-livrable",
+      "libelle": "Un livrable modifié après jugement sans nouvel indice daté",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0523"
+      ],
+      "regle": "REGLES-PROJET.md règle 5",
+      "oracle": "scripts/verifier-jugement.mjs",
+      "voisines": []
+    },
+    {
+      "cle": "oracle-remplace-par-controle-maison",
+      "famille": "skill-ou-oracle-non-invoque",
+      "libelle": "Un producteur écrit son propre contrôle de conformité faute d'avoir trouvé l'oracle du socle (RT-2 du 27/08, reproduit deux fois le 31/08 — TF-0757)",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0757"
+      ],
+      "regle": "quality-oracles registre-oracles.md (chercher l'oracle du domaine avant d'en écrire un) ; gabarits/CLAUDE-PRODUIT.md « Règles de socle applicables »",
+      "oracle": "quality-oracles (registre) ; hook page-html chez le produit",
+      "voisines": [
+        "brief-sans-regles-de-socle"
+      ]
+    },
+    {
+      "cle": "page-html-liste-renvoi-sans-detail",
+      "famille": "page-html-socle",
+      "libelle": "Une liste qui renvoie ailleurs dans la page au lieu de porter son détail (déjà remontée par un autre projet, reproduite — TF-0757)",
+      "creee_le": "2026-09-03",
+      "fondee_par": [
+        "TF-0757"
+      ],
+      "regle": "references/BEST-PRACTICES-HTML.md (socle des pages de données, second tour du 02/09)",
+      "oracle": "digit-ai-page-html check_html.py ; critique d'implémentation forge-design",
+      "voisines": [
+        "page-html-dictionnaire-colonnes"
+      ]
+    },
+    {
+      "cle": "surface-implicite-non-livree",
+      "famille": "affordance-ui",
+      "libelle": "Une page ou un etat de la surface implicite (404, etats vides, aide, favicon) qu'aucune demande de fonctionnalite ne fait emerger n'est ni concu, ni genere, ni juge — livre nu par defaut",
+      "creee_le": "2026-09-05",
+      "fondee_par": [
+        "TF-0802"
+      ],
+      "regle": "references/PATRONS-EPROUVES.md P-2 ; loi transverse n 3 (CLAUDE.md) ; ETAPE-MEP.md M-9",
+      "oracle": "ETAPE-MEP.md M-9 (preuve : controle executable du produit) — aucun oracle generique, candidature chez forge-tests",
+      "voisines": []
+    },
+    {
+      "cle": "garde-lexicale-frontiere-ascii",
+      "famille": "regle-morte",
+      "libelle": "Une garde lexicale sur du texte francais emploie la frontiere de mot ASCII du moteur de Node : un accent vaut frontiere — faux positifs (pronom lu dans un mot accentue) et faux negatifs (motif accentue jamais atteint)",
+      "creee_le": "2026-09-05",
+      "fondee_par": [
+        "TF-0799",
+        "TF-0805"
+      ],
+      "regle": "frontieres Unicode (assertions « pas une lettre Unicode » avant/apres, drapeau u) dans toute garde lexicale ; fixture double sens par garde",
+      "oracle": "self-test de l'oracle porteur (oracle-exigences E3/E8 chez forge-conception ; oracle-synthese S21 chez le pilot)",
+      "voisines": []
+    },
+    {
+      "cle": "sceau-de-vue-provenance-sans-contenu",
+      "famille": "regle-morte",
+      "libelle": "Le sceau d'une vue derivee prouve sa provenance (empreinte de la source), jamais son contenu : une vue amputee d'une section entiere garde un sceau valide et rend PASS — une decision opposable peut disparaitre sans qu'aucun oracle ne le voie",
+      "creee_le": "2026-09-05",
+      "fondee_par": [
+        "TF-0818"
+      ],
+      "regle": "une vue derivee porte l'empreinte de son propre corps en plus de celle de sa source, ou une liste close de sections attendues par type de vue est jugee par l'oracle de tracabilite (contrat de vues.md chez forge-conception, porte en prose a ce jour)",
+      "oracle": "forge-conception oracle-tracabilite T3 (a etendre) — aucun oracle generique ; candidature TF-0818",
+      "voisines": [
+        "recette-verdict-non-prononcable"
+      ]
+    },
+    {
+      "cle": "lot-de-travaux-mauvais-module-producteur",
+      "famille": "lot-forme",
+      "libelle": "Un lot de travaux confie a un module (verbe, skill, script) la production d un artefact que ce module ne produit jamais : le destinataire doit repartir le travail lui-meme, et l ecart n est pas remonte au sidecar faute de classe",
+      "creee_le": "2026-09-05",
+      "fondee_par": [
+        "TF-0819"
+      ],
+      "regle": "avant d ecrire « ce qui est demande », le pilot lit le module producteur nomme (son SKILL.md ou son en-tete) et cite ce qu il produit ; un lot qui nomme un producteur cite la ligne qui le prouve (gabarits/TRAVAUX-PILOT.md)",
+      "oracle": "gabarits/oracle-travaux-pilot.mjs — regle a ajouter (T6 : tout module producteur nomme existe et produit l artefact cite) ; candidature TF-0819",
+      "voisines": [
+        "correction-symptome-sans-classe"
+      ]
+    },
+    {
+      "cle": "champ-transcrit-de-prose-sans-correspondance",
+      "famille": "regle-morte",
+      "libelle": "Un champ machine déclaré « transcrit d'une décision écrite en prose » dont aucun contrôle ne vérifie qu'il en vient : l'oracle prouve que l'écart est écrit, jamais qu'il a été décidé — un écart écrit directement dans le JSON passe et personne ne l'a pris",
+      "creee_le": "2026-09-05",
+      "fondee_par": [
+        "TF-0822"
+      ],
+      "regle": "tout document en prose dont un champ machine est transcrit est un artefact JUGÉ (existence, forme) et une règle de correspondance vérifie que chaque entrée du champ existe dans la prose (forge-conception : EXIGENCES.md section 7, SURFACE.md section 3)",
+      "oracle": "forge-conception — oracle à créer (existence et forme d'EXIGENCES.md, correspondance prose ↔ champ) ; candidature TF-0822",
+      "voisines": [
+        "sceau-de-vue-provenance-sans-contenu"
+      ]
+    },
+    {
+      "cle": "fixture-jugee-par-son-seul-oracle",
+      "famille": "skill-ou-oracle-non-invoque",
+      "libelle": "Une fixture de recette dont le verdict n'est jugé que par l'oracle qu'elle sert : une règle neuve sur un oracle partagé fait basculer les verdicts des autres fixtures en silence, et seul un balayage manuel le voit",
+      "creee_le": "2026-09-05",
+      "fondee_par": [
+        "TF-0823"
+      ],
+      "regle": "le self-test publie la matrice des verdicts fixture × oracle et la compare à une matrice attendue versionnée ; un verdict qui change sans mise à jour de la matrice est un échec de recette",
+      "oracle": "forge-conception oracles/self-test.mjs (matrice à ajouter) ; candidature TF-0823 — patron transposable à toute forge à fixtures partagées",
+      "voisines": [
+        "recette-verdict-non-prononcable"
+      ]
+    },
+    {
+      "cle": "contrat-de-sortie-sans-domicile",
+      "famille": "contrat-interface-forge",
+      "libelle": "Le format de ce qu'un outil partagé REND (lanceur d'oracles, hook, script hérité) n'est écrit nulle part ni versionné : il change sans qu'un lecteur ait quoi surveiller, et le changement ne se déclare que par un lot de retours",
+      "creee_le": "2026-09-05",
+      "fondee_par": [
+        "TF-0824"
+      ],
+      "regle": "tout outil hérité par d'autres dépôts porte un contrat de SORTIE écrit et versionné à côté de son contrat d'entrée (forge-agents : references/regles-oracles.md pour run-oracles.mjs) ; un changement du contrat incrémente la version et se lit dans le registre",
+      "oracle": "forge-agents — recette de quality-oracles (contrat de sortie à documenter et à éprouver) ; candidature TF-0824",
+      "voisines": [
+        "recette-verdict-non-prononcable",
+        "auteur-juge-son-contrat"
+      ]
+    },
+    {
+      "cle": "porte-cle-courte-sans-frontiere",
+      "famille": "hook-ou-gate",
+      "libelle": "La porte de publication cherche une clé courte de la table (forme littérale d'un seul mot) sans frontière de mot : elle accuse à l'intérieur d'autres mots et de blobs encodés — faux positifs qui décrédibilisent les vrais constats",
+      "creee_le": "2026-09-07",
+      "fondee_par": [
+        "TF-0880"
+      ],
+      "regle": "toute graphie cherchée par la porte est bornée par des non-alphanumériques (la même frontière que les variantes), un blob base64 ne compte jamais ; fixture double sens (blob → PASS, mot entier → FAIL)",
+      "oracle": "forge-agents quality-oracles/scripts/oracle-nom-client-publie.mjs C5 et sa recette ; candidature TF-0880",
+      "voisines": [
+        "garde-lexicale-frontiere-ascii",
+        "anonymisation-portee-partielle"
+      ]
+    },
+    {
+      "cle": "alias-de-transition-perime-survivant",
+      "famille": "heritage-produit",
+      "libelle": "Un alias de transition (ancien nom d'un artefact hérité) survit à côté de la copie canonique à jour, et le relevé d'héritage cesse de le regarder dès que la cible canonique existe : le produit porte deux versions du même contrat, dont une périmée que ses lots citent encore",
+      "creee_le": "2026-09-07",
+      "fondee_par": [
+        "TF-0881"
+      ],
+      "regle": "quand la cible canonique est présente, un alias encore présent est compté PÉRIMÉ par R-47 et nommé avec le geste de retrait (le produit supprime, le pilot ne supprime jamais)",
+      "oracle": "scripts/relever-heritage.mjs (R-47) et sa recette ; candidature TF-0881",
+      "voisines": [
+        "heritage-avertissement-tardif"
+      ]
+    },
+    {
+      "cle": "motif-exclusion-couvert-compte-absent",
+      "famille": "heritage-produit",
+      "libelle": "Le relevé d'héritage compare des lignes nues exactes d'un fichier d'exclusion et compte « absent » un motif qu'une graphie plus large présente couvre déjà : la mise en conformité écrit des lignes redondantes",
+      "creee_le": "2026-09-07",
+      "fondee_par": [
+        "TF-0882"
+      ],
+      "regle": "un motif exigé est tenu s'il est présent OU couvert par un motif plus large du même fichier (même raisonnement que HERITAGE.json pose pour .env) ; fixture double sens",
+      "oracle": "scripts/relever-heritage.mjs (contrôle presence_et_motifs) et sa recette ; candidature TF-0882",
+      "voisines": [
+        "garde-lexicale-frontiere-ascii"
+      ]
+    },
+    {
+      "cle": "boite-entree-produit-statut-git-non-dit",
+      "famille": "contrat-interface-forge",
+      "libelle": "Le canal des lots de travaux suppose la boîte d'entrée du produit ignorée par git sans le dire : chez un produit qui versionne input\\, le lot reçu reste un fichier non suivi indéfiniment et aucune règle ne dit s'il entre dans son histoire",
+      "creee_le": "2026-09-07",
+      "fondee_par": [
+        "TF-0883"
+      ],
+      "regle": "gabarits/TRAVAUX-PILOT.md dit le sort du lot reçu dans les deux cas (boîte ignorée : rien ; boîte versionnée : le produit commet le lot marqué traité, jamais le pilot) et le lot le rappelle",
+      "oracle": "gabarits/oracle-travaux-pilot.mjs (règle T7 à ajouter : la ligne du sort du lot reçu est présente) ; candidature TF-0883",
+      "voisines": [
+        "lot-de-travaux-mauvais-module-producteur"
+      ]
+    },
+    {
+      "cle": "lot-remis-ecrasable",
+      "famille": "lot-forme",
+      "libelle": "Rien n'empêche d'écraser un lot de retours déjà remis et ingéré : l'immuabilité est écrite en prose des deux côtés du canal, l'oracle de forme juge le fichier écrit et non le fait qu'il en remplace un autre, et la boîte d'entrée ne le voit qu'à l'ouverture suivante",
+      "creee_le": "2026-09-07",
+      "fondee_par": [
+        "TF-0884"
+      ],
+      "regle": "un lot dont l'empreinte est au registre (événement d'ingestion) ne se réécrit pas : oracle-lot-retours refuse une écriture dont le chemin est déjà ingéré avec une autre empreinte, et le gabarit prescrit l'indice suivant",
+      "oracle": "gabarits/oracle-lot-retours.mjs (règle R-48 à ajouter, lecture des événements d'ingestion) ; candidature TF-0884",
+      "voisines": [
+        "lot-forme",
+        "versionnement-livrable"
+      ]
+    },
+    {
+      "cle": "releve-heritage-juge-arbre-pas-histoire",
+      "famille": "heritage-produit",
+      "libelle": "Le relevé d'héritage compare le disque du poste à la source du pilot et jamais l'état versionné du produit : un héritage recopié mais non commis rend PASS, et un clone ou un restore ramène l'héritage périmé après un relevé vert",
+      "creee_le": "2026-09-07",
+      "fondee_par": [
+        "TF-0848"
+      ],
+      "regle": "le relevé distingue « conforme et commis » de « conforme non commis » (git status --porcelain sur chaque artefact) et compte le second à part ; recopier-heritage.mjs imprime l'état git de ce qu'il laisse",
+      "oracle": "scripts/relever-heritage.mjs (état conforme_non_commis) et sa recette ; item TF-0848 (rattaché par défaut à heritage-avertissement-tardif, rectifié le 07/09)",
+      "voisines": [
+        "heritage-avertissement-tardif",
+        "boucle-retour-sans-descente"
+      ]
+    },
+    {
+      "cle": "point-entree-declare-rouge-sur-toute-cible",
+      "famille": "regle-morte",
+      "libelle": "Le point d'entrée déclaré au manifeste d'une forge (son lanceur agrégé) rend FAIL sur toute cible, même verte, parce qu'un oracle hors de son domaine sort en échec au lieu de se déclarer non jugeant : le verdict agrégé n'est plus prononçable",
+      "creee_le": "2026-09-07",
+      "fondee_par": [
+        "TF-0885"
+      ],
+      "regle": "un oracle appelé sur un artefact hors de son domaine sort en NON_JUGE (exit 2, motif déclaré), jamais en FAIL ; la recette du lanceur agrégé joue une cible verte et exige exit 0",
+      "oracle": "forge-conception oracles/run-oracles-conception.mjs et self-test (cas cible verte) ; candidature TF-0885 (le produit 61 l'a vu aussi : TF-0831)",
+      "voisines": [
+        "recette-verdict-non-prononcable",
+        "fixture-jugee-par-son-seul-oracle"
+      ]
+    },
+    {
+      "cle": "regle-de-branche-annoncee-differente-configuree",
+      "famille": "contrat-interface-forge",
+      "libelle": "La règle de protection d'une branche telle que le pilot l'annonce dans ses lots et synthèses diffère de la règle configurée chez l'hébergeur, et le compte qui pousse la contourne d'office : une protection qui ne protège pas, décrite comme si elle protégeait",
+      "creee_le": "2026-09-07",
+      "fondee_par": [
+        "TF-0886"
+      ],
+      "regle": "avant de décrire ou de lever une protection, la LIRE chez l'hébergeur (gh api …/branches/main/protection) et citer ses champs ; un contournement d'office (« Bypassed rule violations ») se déclare comme un constat",
+      "oracle": "aucun oracle générique — relevé à jouer dans le mode opératoire de réécriture (references/TODO-FORGE.md) ; candidature TF-0886",
+      "voisines": [
+        "anonymisation-portee-partielle"
+      ]
+    },
+    {
+      "cle": "porte-sans-chemin-des-tables",
+      "famille": "hook-ou-gate",
+      "libelle": "Un hook ou un lanceur appelle la porte de publication sans lui passer le chemin des tables, et la porte, dont les pistes par defaut ne connaissent pas le canal confidentiel, rend SKIP que le hook traite en refus : tout push est refuse la ou le hook est pose",
+      "creee_le": "2026-09-07",
+      "fondee_par": [
+        "TF-0887"
+      ],
+      "regle": "la porte connait le canal confidentiel dans ses pistes par defaut (<racine>/_confidentiel/tables/) et tout hook qui l appelle lui passe les chemins ou les variables FORGE_NOMS_INTERDITS / FORGE_PRODUITS_PSEUDO ; un SKIP dit son motif et le hook le repete",
+      "oracle": "forge-agents quality-oracles (pistes par defaut de oracle-nom-client-publie.mjs) et installer-hamecon-publication.mjs ; candidature TF-0887",
+      "voisines": [
+        "porte-cle-courte-sans-frontiere",
+        "heritage-avertissement-tardif"
+      ]
+    },
+    {
+      "cle": "registre-doublon-non-detecte",
+      "famille": "lot-forme",
+      "libelle": "Deux candidatures de contenu identique entrent au registre sans qu'aucune regle ne bronche, et aucun statut ne permet ensuite de les ecarter : l'ingestion compare les identifiants et les classes, jamais le contenu, et le vocabulaire du registre n'a que candidat, decide, en_cours et corrige",
+      "creee_le": "2026-09-08",
+      "fondee_par": [],
+      "regle": "l'ingestion calcule une empreinte du couple titre+contenu et refuse ou marque doublon_de une candidature deja presente ; le registre porte un statut d'ecartement avec motif obligatoire, qui ne compte pour aucun gain",
+      "oracle": "todo/oracle-todo.mjs (regle a creer) et todo/self-test.mjs, fixture double sens ; candidature du 08/09",
+      "voisines": [
+        "lot-remis-ecrasable",
+        "anonymisation-portee-partielle"
+      ]
+    },
+    {
+      "cle": "banc-etend-referentiel-production",
+      "famille": "anonymisation",
+      "libelle": "Un banc de test qui ne pose pas ses propres tables jetables herite des variables d environnement de la session et ecrit ses noms de fixtures dans le referentiel REEL des pseudonymes ; la porte de publication refuse ensuite le depot sur des noms qui n existent pas",
+      "creee_le": "2026-09-08",
+      "fondee_par": [],
+      "regle": "tout banc qui appelle la chaine d anonymisation, directement ou par un sous-processus, pose ses tables jetables sous le repertoire temporaire et les designe par FORGE_NOMS_INTERDITS et FORGE_PRODUITS_PSEUDO avant tout appel ; la fonction d extension refuse en outre d ecrire hors du repertoire temporaire quand le point d entree du processus est un banc",
+      "oracle": "todo/anonymiser-entrant.mjs --self-test (cas 3 sexies, garde pure a deux sens) ; les bancs eux-memes, rejoues avec les variables reelles au shell",
+      "voisines": [
+        "anonymisation-portee-partielle",
+        "registre-doublon-non-detecte"
+      ]
+    },
+    {
+      "cle": "gate-cout-invite-au-contournement",
+      "famille": "hook-ou-gate",
+      "libelle": "Un controle BLOQUANT dont le temps d execution depasse ce qu un humain accepte d attendre a chaque geste : il ne protege plus rien le jour ou quelqu un apprend l option qui le saute. La cause mesuree ici est une boucle qui relit la meme donnee une fois par terme cherche, la ou les termes partageant leurs drapeaux tiennent en une seule passe",
+      "creee_le": "2026-09-08",
+      "fondee_par": [],
+      "regle": "un controle pose en gate declare son temps d execution mesure sur le plus gros depot du parc, et toute extension le remesure avant/apres ; les termes d une recherche qui partagent leurs drapeaux se groupent en une passe, l identification fine se faisant a posteriori sur les seules correspondances",
+      "oracle": "mesure avant/apres sur digit-ai-factory (900 revisions, 1369 fichiers suivis), deux passes de chaque pour absorber le cache disque",
+      "voisines": [
+        "porte-sans-chemin-des-tables",
+        "porte-cle-courte-sans-frontiere"
+      ]
+    },
+    {
+      "cle": "regle-neuve-sans-mesure-de-bruit",
+      "famille": "page-html-socle",
+      "libelle": "Une regle neuve du socle est mise en service apres avoir mesure son bruit sur les documents du depot qui l ecrit et sur ceux du pilot, jamais sur les depots qui CONSOMMENT le socle sans en etre proprietaires : la propagation vers la copie installee fait alors rougir une suite ailleurs, et l equipe qui la subit croit l echec preexistant parce que la cause vit hors de son depot",
+      "creee_le": "2026-09-08",
+      "fondee_par": [],
+      "regle": "une regle neuve du socle mesure son bruit sur les documents de TOUS les depots qui l invoquent ; et le geste de propagation releve les depots consommateurs, rejoue leur verification native avant et apres, et signale bruyamment tout depot qui passait et ne passe plus -- meme doctrine que l ecrivain du registre, qui annule son ecriture si l oracle passait et ne passe plus",
+      "oracle": "a creer : releve des depots consommateurs et rejeu avant/apres a la propagation ; candidature du 08/09",
+      "voisines": [
+        "banc-etend-referentiel-production",
+        "gate-cout-invite-au-contournement"
+      ]
+    },
+    {
+      "cle": "controle-sans-fixture-double-sens",
+      "famille": "skill-ou-oracle-non-invoque",
+      "libelle": "Un controle en service n a aucun banc de fixtures dans les deux sens, et rien ne le dit -- pire, son en-tete affirme parfois en avoir. Aucune de ses regles n est alors eprouvee : une regle qui cesse de mordre ne signale rien, et une regle qui se met a mordre sur un artefact conforme bloque tout le monde sans qu on sache pourquoi",
+      "creee_le": "2026-09-08",
+      "fondee_par": [],
+      "regle": "tout controle en service porte un banc de fixtures double sens, sur artefact jetable ; une affirmation d en-tete sur l existence d un banc est verifiee par le banc lui-meme, jamais crue sur parole ; et aucune regle neuve ne s ajoute a un controle qui n en a pas avant que le harnais existe",
+      "oracle": "a creer pour oracle-conformite-projet ; candidature du 08/09",
+      "voisines": [
+        "fixture-jugee-par-son-seul-oracle",
+        "regle-neuve-sans-mesure-de-bruit"
+      ]
+    },
+    {
+      "cle": "deux-regles-du-socle-inconciliables",
+      "famille": "page-html-socle",
+      "libelle": "Deux regles du MEME socle se contredisent : tenir la premiere fait mecaniquement echouer la seconde, et aucun auteur ne peut satisfaire les deux. Le defaut ne se voit pas en lisant les regles une par une -- il n apparait que sur un artefact qui les applique toutes, et il se lit alors comme une faute de l auteur",
+      "creee_le": "2026-09-08",
+      "fondee_par": [],
+      "regle": "toute regle qui MESURE une densite, une proportion ou un ratio exclut de son denominateur les charges utiles que le socle impose par ailleurs (donnees encodees, polices embarquees, images en ligne) ; et une regle neuve se joue contre un artefact qui applique DEJA toutes les regles voisines, pas seulement contre sa propre fixture",
+      "oracle": "a creer : une fixture qui applique les regles voisines et doit rester verte ; candidature du 08/09",
+      "voisines": [
+        "regle-neuve-sans-mesure-de-bruit",
+        "controle-sans-fixture-double-sens"
+      ]
+    },
+    {
+      "cle": "compte-total-hors-canal-des-constats",
+      "famille": "contrat-interface-forge",
+      "libelle": "Un contrôle borne la liste de constats qu'il rend et déclare son vrai total AILLEURS — une ligne de prose d'un canal secondaire (« non jugé », en-tête, journal). Le lecteur, humain comme agent, compte les entrées du tableau et publie ce nombre comme si c'était le passif. Le défaut est invisible tant que le passif reste sous la borne, et il ne se manifeste jamais comme une erreur : les deux chiffres sont vrais, seul leur rapprochement est faux. Pire, il rend indémontrables les invariances mesurées sur la liste bornée — « autant de constats avant qu'après » ne prouve rien quand les deux mesures butent sur le même plafond",
+      "creee_le": "2026-09-08",
+      "fondee_par": [
+        "TF-0991"
+      ],
+      "regle": "un contrôle qui borne sa sortie porte son total DANS la structure qui porte ses constats (un champ frère de la liste : total, rendus, bornee), jamais dans un canal de prose ; et toute mesure d'invariance ou d'écart menée sur une liste bornée se joue sur le total, sinon elle se déclare non concluante",
+      "oracle": "à créer : une fixture qui dépasse la borne et dont le total est lu depuis le champ frère — la fixture doit ÉCHOUER si le lecteur ne peut obtenir le total qu'en analysant de la prose",
+      "voisines": [
+        "contrat-de-sortie-sans-domicile",
+        "sceau-de-vue-provenance-sans-contenu",
+        "gate-cout-invite-au-contournement"
+      ]
+    },
+    {
+      "cle": "regle-balaie-prose-et-identifiants",
+      "famille": "regle-morte",
+      "libelle": "Une regle balaie dans une MEME expression la prose ecrite par l auteur et les identifiants machine qu il cite en preuve — noms de champs, codes, sorties encadrees d accents graves. Elle se declenche alors sur un fragment dont le sens est l inverse de ce qu elle cherche, et le seul remede laisse a l auteur est de PARAPHRASER sa propre preuve pour obtenir un vert : le controle degrade exactement ce qu il est cense proteger. Le defaut a deux visages opposes et il faut les nommer ensemble — la regle devient MUETTE quand le motif technique avale un mot de prose, BAVARDE quand un motif de prose avale un identifiant ; le premier rassure a tort, le second pousse a abimer les preuves",
+      "creee_le": "2026-09-08",
+      "fondee_par": [
+        "TF-0992"
+      ],
+      "regle": "une regle qui juge de la PROSE exclut de son balayage les fragments cites entre accents graves et les blocs de code ; une regle qui juge des IDENTIFIANTS ne partage jamais son expression avec des mots francais, et n emprunte pas le drapeau insensible a la casse a ses voisines",
+      "oracle": "a creer : une fixture double sens ou les deux puces ne different QUE par la nature du fragment — une citation de sortie machine (PASS attendu) contre la meme forme ecrite en prose (FAIL attendu)",
+      "voisines": [
+        "controle-sans-fixture-double-sens",
+        "compte-total-hors-canal-des-constats",
+        "fixture-jugee-par-son-seul-oracle"
+      ]
+    },
+    {
+      "cle": "marque-de-propriete-devinee-par-sous-chaine",
+      "famille": "hook-ou-gate",
+      "libelle": "Un outil qui POSE un artefact partage (hameçon, fichier de configuration, entree de manifeste) reconnait << le sien >> en cherchant une SOUS-CHAINE — typiquement le nom de son propre script — dans ce qui occupe deja la place. Le garde-fou anti-ecrasement ne tient alors qu'a l'improbabilite que le fichier d'autrui contienne ce fragment : le jour ou il le contient, l'outil croit reconnaitre son ouvrage et ECRASE EN SILENCE le travail d'un tiers, en affichant << repose >>. Le defaut ne se voit dans aucune recette qui pose et repose SES propres artefacts ; il ne se voit que dans un cas ou l'occupant etranger ressemble au sien",
+      "creee_le": "2026-09-08",
+      "fondee_par": [
+        "TF-0994"
+      ],
+      "regle": "un outil qui pose un artefact partage y ecrit une SIGNATURE explicite — une ligne dediee, de forme qui ne peut pas apparaitre par accident, portant son nom ET sa version — et ne reconnait sa propriete que par cette ligne, jamais par un nom de fichier ni par un fragment de commande",
+      "oracle": "a creer : une fixture ou l'occupant ETRANGER contient le nom du script de l'outil — il doit etre classe CONFLIT et laisse intact ; sa jumelle porte la signature et doit etre reposee",
+      "voisines": [
+        "controle-sans-fixture-double-sens",
+        "regle-balaie-prose-et-identifiants"
+      ]
+    },
+    {
+      "cle": "controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas",
+      "famille": "regle-morte",
+      "libelle": "Un controle mesure un emplacement CODE EN DUR alors que l'execution reelle en charge un autre, designe par une variable d'environnement de la plateforme. Il rend PASS sur un parc que la session n'a jamais vu : les artefacts sont bien la, alignes, a jour — et aucun n'est charge. Le defaut est invisible par construction, parce que le verdict ne NOMME pas le repertoire qu'il a mesure : rien dans la sortie ne permet de s'apercevoir qu'on a regarde ailleurs. Il se paie une fois que la consequence est visible cote humain (un skill qui ne se declenche pas, une loi transverse non chargee), jamais au moment du controle",
+      "creee_le": "2026-09-09",
+      "fondee_par": [],
+      "regle": "tout controle qui juge une copie INSTALLEE resout sa racine par la variable de la plateforme d'abord (CLAUDE_CONFIG_DIR), le defaut ensuite, via UNE fonction partagee ; et son verdict NOMME le repertoire mesure et la variable qui l'a decide, en PASS comme en FAIL — un verdict qui ne dit pas ou il a regarde ne se conteste pas",
+      "oracle": "a creer : oracle-skills K10 — fixture a deux repertoires de configuration, l'un peuplé l'autre vide, CLAUDE_CONFIG_DIR pointant sur le vide ; l'oracle doit ECHOUER la ou il rend PASS aujourd'hui",
+      "voisines": [
+        "regle-balaie-prose-et-identifiants",
+        "recette-verdict-non-prononcable"
+      ]
+    },
+    {
+      "cle": "controle-vrai-sur-le-mauvais-invariant",
+      "famille": "regle-morte",
+      "libelle": "Un controle mesure une GRANDEUR CORRELEE a ce qu il protege au lieu de l invariant lui-meme — un nombre de commits pour un maximum d identifiant, un compte de fichiers pour une couverture. Tant que la correlation tient, il a raison et personne ne voit la substitution ; le jour ou elle se rompt (une histoire reecrite, un depot reclone, un renommage en masse), il rend un verdict FAUX avec une mecanique JUSTE — donc incontestable, puisque son calcul est verifiable et exact. Deux aggravations le rendent couteux plutot que genant : le remede qu il NOMME est derive de la mauvaise grandeur, donc parfois destructeur pour la situation reelle ; et son echappatoire fait DECLARER a l operateur un etat qui n est pas le sien, ce qui laisse une trace fausse",
+      "creee_le": "2026-09-09",
+      "fondee_par": [],
+      "regle": "un controle mesure l INVARIANT qu il protege, enonce en une phrase dans son propre code (« aucun identifiant deja frappe ailleurs »), et jamais une grandeur qui lui est seulement correlee ; quand la grandeur mesuree et l invariant divergent, le message NOMME la divergence, ne propose aucun remede derive de la grandeur, et l echappatoire eventuelle fait declarer un FAIT VERIFIE, jamais un etat suppose",
+      "oracle": "a creer : fixture a double sens ou la correlation est ROMPUE — deux etats qui different sur la grandeur mesuree mais partagent l invariant doivent PASSER, deux etats identiques sur la grandeur mais divergents sur l invariant doivent ECHOUER",
+      "voisines": [
+        "controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas",
+        "controle-sans-fixture-double-sens",
+        "compte-total-hors-canal-des-constats"
+      ]
+    },
+    {
+      "cle": "texte-sur-la-graphie-detruit-par-sa-pseudonymisation",
+      "famille": "anonymisation",
+      "libelle": "Un texte dont le SUJET est la graphie d un nom — un commentaire qui oppose deux ecritures du meme terme, un message de commit qui documente un defaut de frontiere de mot, une fixture decrite en prose — est DETRUIT par sa propre pseudonymisation : les graphies contrastees deviennent le meme pseudonyme, et la phrase se met a dire << X ecrit X >>. La chaine se comporte correctement et ne peut pas savoir : elle voit un nom, elle le remplace. Le defaut est invisible au moment ou il se produit — la substitution est annoncee comme un succes — et il ne se voit qu a la relecture, souvent des semaines plus tard, quand la seule explication d un correctif est devenue une tautologie. Il frappe exactement les textes qui documentent les defauts d anonymisation, c est-a-dire ceux qu on a le plus besoin de pouvoir relire",
+      "creee_le": "2026-09-10",
+      "fondee_par": [
+        "TF-1007"
+      ],
+      "regle": "un texte qui parle de la GRAPHIE d un nom ne cite jamais un nom reel : il DECRIT la forme (<< une cle en minuscules a tirets contre le meme nom en Majuscules a Espaces >>) ou emploie un nom INVENTE, comme le font les bancs a tables jetables. La regle vaut pour le code, les commentaires, les messages de commit et les restitutions",
+      "oracle": "a creer : relever les textes ou un meme pseudonyme apparait DEUX FOIS dans une phrase opposant deux graphies (<< A dans le nom, la cle etant A >>) — signature mecanique de la tautologie produite par la substitution",
+      "voisines": [
+        "compte-total-hors-canal-des-constats",
+        "regle-balaie-prose-et-identifiants"
+      ]
+    },
+    {
+      "cle": "quantificateur-sacrifie-au-budget-du-texte",
+      "famille": "regle-morte",
+      "libelle": "Un texte normatif sous PLAFOND DE TAILLE doit gagner quelques octets, et le mot qu on retire est celui qui << ne semble pas indispensable a la phrase >> — or dans une regle, le mot le plus court est souvent celui qui porte le plus : seulement, jamais, toute, aucun, uniquement. Retirer un quantificateur ne raccourcit pas la regle, il l ASSOUPLIT : << accepte sur verdict d oracle SEULEMENT >> devient << accepte sur verdict d oracle >>, qui n exclut plus rien. Le defaut est invisible a la relecture parce que la phrase reste grammaticale et garde son sujet ; il ne se voit qu en comparant les deux versions, et il voyage avec un commit dont le motif annonce autre chose — ici << noyau dans son budget >>. C est un assouplissement qu aucun humain n a decide, produit par une contrainte de mise en page",
+      "creee_le": "2026-09-10",
+      "fondee_par": [
+        "TF-1010"
+      ],
+      "regle": "un texte normatif sous plafond ne gagne JAMAIS ses octets sur un quantificateur : la reformulation doit conserver l exclusivite (<< sur le seul verdict >> vaut << sur verdict … seulement >>), et les octets se prennent sur ce qui n a pas de force normative — une glose, un exemple, un renvoi. Tout commit qui reduit un texte normatif declare, dans son message, les mots retires",
+      "oracle": "a creer : relever les diffs d un texte normatif ou un quantificateur (seul, seulement, uniquement, jamais, aucun, tout, toute) DISPARAIT sans etre remplace par une tournure equivalente — le controle juge la perte du quantificateur, pas la longueur",
+      "voisines": [
+        "texte-sur-la-graphie-detruit-par-sa-pseudonymisation",
+        "regle-balaie-prose-et-identifiants"
+      ]
+    },
+    {
+      "cle": "regle-ecrite-sans-oracle-qui-la-joue",
+      "famille": "skill-ou-oracle-non-invoque",
+      "libelle": "Une regle est ecrite dans un texte opposable — noyau, regles du projet, gabarit — avec ses conditions, et AUCUN controle ne la joue : elle tient a la discipline de celui qui l applique, c est-a-dire a rien d opposable. Elle decore tant que rien ne la joue, et le jour ou elle est enfreinte, rien ne le nomme avant que le mal soit fait. La classe se distingue du controle sans fixture (le controle existe mais n est pas eprouve) et du controle mort (il existe et rend PASS a tort) : ici, il n y a pas de controle du tout",
+      "creee_le": "2026-09-10",
+      "fondee_par": [],
+      "regle": "toute regle qui pose une CONDITION verifiable — une liste de chemins, une nature de fichier, une valeur, un ordre — nomme l oracle qui la joue ou porte, le jour ou elle est ecrite, une candidature pour cet oracle ; une regle sans juge ni candidature n entre pas dans un texte opposable",
+      "oracle": "a creer par cas ; pour R-38 §4 : oracle-nature-enregistrement (candidature du 10/09), fixture a double sens — commit de restitution seule PASS, le meme plus une ligne du noyau FAIL",
+      "voisines": [
+        "controle-sans-fixture-double-sens",
+        "controle-vrai-sur-le-mauvais-invariant",
+        "point-entree-declare-rouge-sur-toute-cible"
+      ]
+    },
+    {
+      "cle": "date-de-fichier-menteuse-apres-copie",
+      "famille": "hook-ou-gate",
+      "libelle": "Un outil de propagation ecrase un fichier par une copie qui PRESERVE l horodatage de la SOURCE. Le fichier ecrase porte donc la date de ce qui l a remplace, jamais celle de l ecrasement, et l evenement ne laisse AUCUNE trace : ni journal, ni date, ni sauvegarde. Pire que l absence de trace, la date devient un signal MENTEUR — un lecteur qui l interroge pour savoir si le fichier a bouge recemment conclut qu il n a pas ete touche, et il en tire une deduction inverse de la verite. Le defaut se manifeste au moment ou deux sessions comparent leurs mesures : celle d AVANT l ecrasement et celle d APRES ne se contredisent pas, elles se succedent, mais rien dans le systeme ne permet de le savoir",
+      "creee_le": "2026-09-10",
+      "fondee_par": [
+        "TF-1012"
+      ],
+      "regle": "un outil qui ECRASE un fichier hors versionnement journalise le geste — chemin, empreinte d avant, empreinte d apres, horodatage REEL — et ne se repose jamais sur la date du fichier pour temoigner ; et tout diagnostic qui invoque une date de fichier declare d abord si l outil qui l a ecrit preserve ou non l horodatage de sa source",
+      "oracle": "a creer : une fixture ou un fichier recent est ecrase par une source plus ancienne, et ou le controle doit RELEVER l ecrasement malgre une date inchangee — un controle qui se fie a la date rend PASS et prouve ainsi qu il ne mesure rien",
+      "voisines": [
+        "compte-total-hors-canal-des-constats",
+        "quantificateur-sacrifie-au-budget-du-texte"
+      ]
+    },
+    {
+      "cle": "regle-qui-interdit-son-propre-remede",
+      "famille": "hook-ou-gate",
+      "libelle": "Un controle BLOQUANT refuse la correction que son propre message de refus RECOMMANDE. L auteur qui obeit a la consigne se fait refuser une seconde fois, et la seule issue qui lui reste est le contournement : le gardien ne se discute pas, il se DESACTIVE, et il emporte avec lui la protection qu il portait. Le defaut ne se voit ni a la lecture du code ni dans un banc de fixtures construites autour du cas nominal — il ne se voit qu en JOUANT le remede que le message prescrit, ce que personne ne pense a tester puisque c est precisement ce qu on croit avoir rendu possible",
+      "creee_le": "2026-09-10",
+      "fondee_par": [
+        "TF-1013"
+      ],
+      "regle": "tout controle bloquant dont le message propose une correction porte, a son banc, un cas qui JOUE cette correction et qui doit PASSER — la fixture du remede est aussi obligatoire que la fixture du defaut",
+      "oracle": "a creer : relever les controles dont le message de refus contient une prescription (<< reformulez >>, << remplacez >>, << utilisez >>) et dont le banc ne porte aucun cas jouant cette prescription",
+      "voisines": [
+        "controle-sans-fixture-double-sens",
+        "quantificateur-sacrifie-au-budget-du-texte"
+      ]
+    },
+    {
+      "cle": "chemin-de-livrable-au-dela-du-plafond-de-la-plateforme",
+      "famille": "emplacement-livrable",
+      "libelle": "Un nom de livrable conforme a R-4 depasse, avec les sidecars d oracle qui le doublent (.oracles/<chemin>.oracles-historique.jsonl, 26 caracteres de plus), le plafond de chemin de la plateforme — 260 caracteres sous Windows — des que le depot est clone a plus d une centaine de caracteres de profondeur : le checkout echoue, et avec lui la verification sur clone frais que la doctrine prescrit avant tout push. La regle de nommage juge la FORME du nom, jamais sa LONGUEUR, et la procedure de clone ne declare pas core.longpaths. Le defaut ne se voit pas sur le poste de travail (chemin court) : il ne se voit qu au premier clone profond, c est-a-dire chez celui qui verifie",
+      "creee_le": "2026-09-10",
+      "fondee_par": [
+        "TF-1015"
+      ],
+      "regle": "REGLES-PROJET.md R-4 (forme du nom) — a completer d un plafond de longueur du chemin relatif, sidecars d oracle compris ; procedure de verification sur clone frais et bootstrap.mjs --rebatir : `git clone -c core.longpaths=true` declare, jamais suppose",
+      "oracle": "a creer : oracle-synthese — longueur du chemin relatif du fichier juge, plus 26 caracteres de sidecar, sous le plafond ; mesure de reference : `git clone` dans un chemin de 130 caracteres, 22 fichiers refuses le 10/09/2026",
+      "voisines": [
+        "emplacement-livrable-hors-convention",
+        "porte-sans-chemin-des-tables"
+      ]
+    },
+    {
+      "cle": "journal-de-versions-dormant",
+      "famille": "versionnement-livrable",
+      "libelle": "Un depot DECLARE une convention de versionnement — CHANGELOG SemVer, tags, version de paquet — et cesse de la tenir sans la retirer : les enregistrements de fonctionnalites s empilent sans entree, la section << Non publie >> reste ouverte depuis des semaines, la version du paquet ne bouge plus sous des tags qui ont avance. La convention ecrite ment alors sur l etat du depot, et rien ne la juge : un lecteur qui lit le journal croit le depot fige, un lecteur qui lit l histoire croit le journal a jour. Le defaut est silencieux parce que chaque enregistrement pris seul est correct — c est l ABSENCE d entree qui est le defaut, et une absence n est jugee par personne",
+      "creee_le": "2026-09-10",
+      "fondee_par": [
+        "TF-1016"
+      ],
+      "regle": "une convention de versionnement declaree dans un depot (CHANGELOG.md, tags, champ version) est TENUE ou RETIREE : tout enregistrement qui touche `tools/`, `core/` ou `oracles/` porte une entree au journal, et un journal sans entree depuis N enregistrements fait rougir la recette du depot",
+      "oracle": "a creer : dans la recette de chaque forge (tools/verifier.mjs ou equivalent), compter les enregistrements depuis la derniere modification du CHANGELOG qui touchent le code livre ; plafond declare ; mesure de reference : 14 enregistrements sans entree du 15/08 au 10/09/2026 chez forge-audit",
+      "voisines": [
+        "livrable-ecrase-sans-indice",
+        "emplacement-livrable-hors-convention"
+      ]
+    },
+    {
+      "cle": "recette-locale-ne-rejoue-pas-l-environnement-de-la-ci",
+      "famille": "hook-ou-gate",
+      "libelle": "Une recette locale rejoue les ETAPES du workflow de CI (elle le lit, TF-0553) mais pas son ENVIRONNEMENT — variable CI, variables env: des etapes, outils absents du runner (navigateur) — et des tests changent de verdict selon cet environnement : SKIP ici, ECHEC la-bas. La recette rend un vert qui ne prouve rien sur le rouge d en face, la CI rouge cesse d etre lue parce que la recette est verte, et le depot se publie sur ce vert. Le defaut ne se voit qu en LISANT le run hebergee apres le push, ce que personne ne fait quand la recette locale a deja dit oui",
+      "creee_le": "2026-09-10",
+      "fondee_par": [
+        "TF-1017"
+      ],
+      "regle": "une recette qui pretend rejouer la CI pose l environnement que le workflow declare (CI=true, env: de chaque etape) et DIT en sortie chaque condition qu elle ne peut pas rejouer ; un test n a qu un verdict par situation, jamais un SKIP hors CI et un ECHEC en CI ; toute publication d une forge lit le run de CI hebergee et l inscrit a la restitution",
+      "oracle": "a creer : dans la recette de chaque forge, comparer le dernier run de CI hebergee (gh run view) au verdict local — divergence = rouge avec les tests qui different ; mesure de reference : forge-audit, 8 runs rouges du 24/08 au 10/09/2026 sous une recette locale verte (11 groupes OK)",
+      "voisines": [
+        "regle-qui-interdit-son-propre-remede",
+        "controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas"
+      ]
+    },
+    {
+      "cle": "decision-humaine-rendue-restituee-sans-geste",
+      "famille": "restitution-forme",
+      "libelle": "Une decision humaine rendue par son selecteur (<< 11a >>) recoit en reponse la restitution de la veille rejouee MOT POUR MOT, sans le geste qu elle commande ; le geste n est joue qu a la repetition du mot humain, et aucune restitution ne dit que les reponses precedentes n ont rien fait. Vu de l humain, le pilot boucle : il redemande une decision deja rendue",
+      "creee_le": "2026-09-11",
+      "fondee_par": [
+        "TF-1019"
+      ],
+      "regle": "noyau loi 5 (l IA fait, l humain decide) et gabarits/RESTITUTION.md v2.18.0 (un tour qui n apporte rien de neuf rend un accuse bref) — un mot humain de la forme << D-N (x) >> ou << Nx >> commande son geste dans le MEME tour ; la restitution qui suit porte la preuve du geste (sortie executee), jamais la decision reposee ni la synthese precedente rejouee",
+      "oracle": "a creer (regle par. 4) : hook-restitution — apres un message humain de forme << D-N (x) >> / << Nx >>, un message de fin de tour dont le texte est IDENTIQUE au precedent (meme empreinte) ou qui repose la meme D-N au bloc 3 est FAIL : decision recue, geste absent ; mesure de reference : 11/09/2026, session 31d2f3c7, << 11a >> a 09:05 et 09:07, deux restitutions de 3156 mots identiques a 09:07:31 et 09:09:32 (journal des hooks : 0 ecriture, 3 commandes), push a 09:10:08",
+      "voisines": [
+        "restitution-fichier-juge-mal-choisi"
+      ]
+    },
+    {
+      "cle": "capacite-hors-versionnement-de-forge",
+      "famille": "contrat-interface-forge",
+      "libelle": "Une capacite EXERCEE dans un run reel — skill, agent compile, expert — est citee comme point d entree par un agent (<< charger le skill X >>), un catalogue ou une fiche, et ne vit que sous forme d archive dans un dossier ignore par git d une forge, non installee au poste : aucun depot n en porte la source lisible, l histoire ni la version. Le pipeline qui l appelle est versionne, la capacite qu il appelle ne l est pas ; un clone frais de la forge ne peut pas rejouer le run, et une etude qui compte sur elle batit sur du sable. Mesure du 11/09/2026 : quatre skills (communication, propale, propale-review, pptx) sous input/03-skills/ de forge-agents, cites par les quatre agents P4, absents de ~/.claude/skills",
+      "creee_le": "2026-09-11",
+      "fondee_par": [
+        "TF-1021"
+      ],
+      "regle": "toute capacite citee comme point d entree par un agent compile, un catalogue de services ou une fiche expert est versionnee EN SOURCE par une forge (jamais en archive seule, jamais sous un dossier ignore) et installee par bootstrap ; ce qui est confidentiel dans son instance (marque, prix, references) en est separe et vit au canal confidentiel",
+      "oracle": "a creer : oracle-skills ou oracle-ecosysteme croise les skills cites par .claude/agents/*.md (<< charger le skill >>) et par catalogue.jsonl avec les skills versionnes en source ET presents dans ~/.claude/skills ; tout ecart est un FAIL nomme",
+      "voisines": [
+        "contrat-de-sortie-sans-domicile",
+        "alias-de-transition-perime-survivant"
+      ]
+    },
+    {
+      "cle": "reference-chargee-toujours-absente-du-paquet",
+      "famille": "regle-morte",
+      "libelle": "Le SKILL.md d un skill charge << toujours >> ou << obligatoirement >> une reference interne (references/charte.md, layouts.md, assets.md) que son paquet ne contient pas : l instruction est morte a l execution, le skill produit sans la charte qu il promet, et rien ne le signale. Mesure du 11/09/2026 : digit-ai-pptx.skill v2.5.0 porte 4 fichiers, aucun des trois references chargees a l etape 1 de son workflow",
+      "creee_le": "2026-09-11",
+      "fondee_par": [
+        "TF-1022"
+      ],
+      "regle": "le paquet d un skill porte chaque fichier que son SKILL.md cite en chemin relatif ; un lien interne non resolu dans le paquet est un FAIL du skill, pas un avertissement",
+      "oracle": "a creer : oracle-skills resout chaque chemin relatif cite par un SKILL.md (references/, scripts/, templates/) dans l arborescence du skill ; fixture rouge = un SKILL.md citant un fichier absent",
+      "voisines": [
+        "controle-ancre-sur-un-chemin-que-la-session-ne-charge-pas",
+        "point-entree-declare-rouge-sur-toute-cible"
+      ]
+    },
+    {
+      "cle": "marque-emettrice-portee-par-deux-chartes",
+      "famille": "donnees-perissables-en-dur",
+      "libelle": "La marque d un emetteur (polices, couleurs, gabarits) est ecrite EN DUR dans plusieurs skills de rendu avec des valeurs contradictoires, sans systeme-de-marque source unique (MARQUE.md, tokens.css) : chaque support porte sa propre << charte officielle >>, et aucun oracle ne peut juger la coherence entre un deck et une page. Mesure du 11/09/2026 : Digit-AI est Montserrat/Inter/#2563EB chez digit-ai-pptx (<< charte officielle v2 >>) et Roboto/DM Sans chez digit-ai-page-html (<< jamais Syne >>) ; aucun MARQUE.md ni tokens.css Digit-AI sur le poste",
+      "creee_le": "2026-09-11",
+      "fondee_par": [
+        "TF-1023"
+      ],
+      "regle": "la marque d un emetteur vit dans UN systeme-de-marque (cat-des-01 : tokens.css + MARQUE.md), date et source, que tout skill de rendu (deck, page, document) CONSOMME au lieu de porter ses propres valeurs ; deux chartes pour un emetteur = une a retirer, ou une divergence datee et motivee",
+      "oracle": "a creer : les oracles tokens T1-T6 de forge-design joues sur chaque skill de rendu contre le tokens.css de l emetteur ; a defaut, un controle qui extrait polices et couleurs des SKILL.md de rendu et refuse deux valeurs pour une meme marque",
+      "voisines": [
+        "deux-regles-du-socle-inconciliables"
+      ]
+    },
+    {
+      "cle": "oracle-faux-positif",
+      "famille": "regle-morte",
+      "libelle": "Un oracle rend rouge sur un artefact conforme : le verdict opposé cesse d'être prononçable, et l'auteur apprend à ignorer le juge",
+      "creee_le": "2026-09-11",
+      "fondee_par": [],
+      "regle": "quality-oracles SKILL.md — un oracle se valide par fixture DOUBLE SENS : il refuse ce qu'il doit refuser ET accepte ce qu'il doit accepter",
+      "oracle": "self-test de l'oracle en cause, sur une fixture conforme qui doit passer",
+      "voisines": [
+        "controle-vrai-sur-le-mauvais-invariant",
+        "controle-sans-fixture-double-sens",
+        "regle-neuve-sans-mesure-de-bruit"
+      ],
+      "note": "Créée le 2026-09-11 sur six retours du lot Produit-62 - RETOURS - 20260911c (RD-15, RD-16, RD-17, RS-02, RS-03, RQ-01) : un triangle CSS lu comme un bandeau latéral, un bloc @media print lu comme le thème sombre, un remplissage de badge lu comme une surface de page, un en-tête collant désépinglé par son propre tableau lu comme masqué, un en-tête position:sticky lu comme un chevauchement, un identifiant cité dans un commentaire de script compté comme un doublon du DOM. Distincte de controle-vrai-sur-le-mauvais-invariant : là, la mesure est juste et porte sur le mauvais objet ; ici, la mesure elle-même conclut à l'envers sur le bon objet. Le coût propre de cette classe est la DÉFIANCE : deux de ces six plafonnaient le verdict d'une grille entière."
+    },
+    {
+      "cle": "exemption-hors-atteinte-par-le-chemin-prescrit",
+      "famille": "contrat-interface-forge",
+      "libelle": "Un mécanisme d'exemption protège l'auteur d'un jugement sur ce qu'il ne possède pas, mais exige un geste d'intégration qu'aucun mode d'emploi n'impose : l'auteur conforme se fait juger",
+      "creee_le": "2026-09-11",
+      "fondee_par": [],
+      "regle": "forge-design oracles/lib/socle.mjs — un bloc du socle scellé par son empreinte n'est pas jugé ; digit-ai-page-html scripts/embarquer-composants.mjs — le poseur qui appose le sceau",
+      "oracle": "run-oracles-design.mjs, champ socle_exempte : verifies vide sur une page qui charge bel et bien des composants du socle",
+      "voisines": [
+        "heritage-non-tenu",
+        "emplacement-livrable-hors-convention",
+        "deux-regles-du-socle-inconciliables"
+      ],
+      "note": "Créée le 2026-09-11 sur RS-01 du lot Produit-62 - RETOURS - 20260911c : 40 écarts durs portés par trois composants du socle, socle_exempte rendant verifies:[] parce que le produit inline les assets lui-même, et le sceau intenable de toute façon puisque le produit doit patcher une couleur en dur pour que le composant tienne en thème sombre. Signature de la classe : les DEUX branches sont perdantes pour un auteur de bonne foi."
+    },
+    {
+      "cle": "gabarit-sans-parite-de-theme",
+      "famille": "gabarit-document",
+      "libelle": "Un gabarit partagé ne définit sa palette que pour un thème : chaque produit qui le monte doit redécouvrir et réécrire la projection manquante, ou livrer un rendu cassé dans l'autre thème",
+      "creee_le": "2026-09-11",
+      "fondee_par": [],
+      "regle": "forge-design oracle-tokens T4 et oracle-bascule B-T4 — une palette se dérive : une source, deux projections",
+      "oracle": "oracle-bascule.mjs sur une page qui monte le gabarit, thème clair et thème sombre",
+      "voisines": [
+        "heritage-non-tenu",
+        "controle-sans-fixture-double-sens"
+      ],
+      "note": "Créée le 2026-09-11 sur RC-01 du lot Produit-62 - RETOURS - 20260911c : 36 écarts durs d'un seul bloc (18 jetons du canevas de modèle de données du skill digit-ai-schemas, comptés par deux oracles), et des cartes de schéma à fonds clairs sur page sombre partout où le canevas est monté. La correction dans la page marche et duplique chez chaque produit une décision de palette qui appartient au gabarit."
+    },
+    {
+      "cle": "viewport-de-conception-non-fixe",
+      "famille": "page-html-socle",
+      "libelle": "Aucun texte ne fixe la largeur de CONCEPTION par defaut d un ecran de bureau ni la largeur MAXIMALE a laquelle une page reste conforme : chaque run choisit sa largeur de maquette (1280, 1440, 1920 selon l humeur), les grilles de rendu s arretent a la largeur du poste de l auteur, et une page jugee PASS sur cette grille deborde, etire sa prose ou laisse la moitie de l ecran vide sur le poste du lecteur. Le defaut est invisible a l auteur parce que son ecran est la borne de sa grille ; il se voit chez le lecteur equipe plus large. La classe se distingue de page-html-largeur-lecture-donnees (largeur de lecture CONTRADICTOIRE entre prose et donnees a une largeur donnee) : ici la largeur de reference elle-meme n est pas fixee",
+      "creee_le": "2026-09-12",
+      "fondee_par": [
+        "TF-1066"
+      ],
+      "regle": "toute maquette, page ou ecran de bureau se concoit a une largeur de reference ECRITE dans la doctrine (BEST-PRACTICES-HTML.md E5 : 1920 px, Full HD) et se verifie sans defaut bloquant jusqu a une largeur maximale ECRITE (3840 px, 4K) ; une grille de rendu qui s arrete en dessous de cette borne ne prouve rien au-dela",
+      "oracle": "render_page.py (socle) avec DEFAULT_WIDTHS etendu a 3840 et 2560 ; run-oracles-design.mjs et oracle-baseline.mjs (forge-design) sur la grille complete ; a outiller : un controle V qui refuse une mesure de lecture de prose > 100 ch a 3840 et une page de donnees qui n occupe pas la largeur",
+      "voisines": [
+        "page-html-largeur-lecture-donnees",
+        "restitution-rendu-visuel-non-critique"
+      ]
+    },
+    {
+      "cle": "sequence-octale-interpretee-au-rendu",
+      "famille": "page-html-socle",
+      "libelle": "Un generateur de page rend le texte d un item en interpretant une sequence d antislash comme un echappement (\u0000 lu comme l octet nul, \n comme un saut de ligne) : la donnee est intacte (aucun octet nul dans le registre), la page generee porte l octet, et elle devient BINAIRE pour toute recherche textuelle et FAIL pour l oracle des caracteres de controle. Le defaut est invisible a l ecran (l octet nul ne s affiche pas) et se voit chez celui qui verifie. La classe se distingue de texte-sur-la-graphie-detruit-par-sa-pseudonymisation (une transformation VOULUE qui abime un texte) : ici la transformation n est voulue par personne, c est un chemin Windows cite dans un texte",
+      "creee_le": "2026-09-12",
+      "fondee_par": [
+        "TF-1067"
+      ],
+      "regle": "un generateur de page ne fait passer aucun texte de donnee par une evaluation qui interprete les antislashs (gabarit evalue, remplacement a motifs speciaux, decodage d echappements) ; le texte est echappe pour HTML et insere tel quel ; un chemin Windows cite dans un item se rend avec son antislash ; oracle-caracteres-controle joue sur la page generee a chaque regeneration",
+      "oracle": "oracle-caracteres-controle.mjs (CC1, existant, joue par self-tests.mjs) ; a cabler dans todo/generer-page.mjs apres ecriture pour que la regeneration echoue au lieu de laisser la page binaire",
+      "voisines": [
+        "texte-sur-la-graphie-detruit-par-sa-pseudonymisation",
+        "regle-balaie-prose-et-identifiants"
+      ]
+    },
+    {
+      "cle": "constat-non-bloquant-jamais-lu",
+      "famille": "hook-ou-gate",
+      "libelle": "Un controle cable a un hook qui n affiche sa sortie qu en cas de blocage rend un echec que personne ne lit : il tourne, constate, sort en 0 parce qu il ne bloque que ce que le pilot peut reparer, et le defaut vit aussi longtemps qu avant son existence. Mesure le 14/09/2026 : oracle-secrets-hors-perimetre FAIL (11 porteurs hors depot, 3 dans des depots qui ne les ignorent pas, dont publies) a chaque fin de tour depuis sa pose, jamais affiche ; la rotation demandee le 30/08 sans trace. Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-6 (a))",
+      "creee_le": "2026-09-14",
+      "fondee_par": [],
+      "regle": "tout controle dont un constat ne bloque pas est cable la ou sa sortie est LUE (releve d ouverture, restitution) ; un hook qui avale la sortie d un controle non bloquant n est pas un cablage",
+      "oracle": "oracles/hook-ouverture.mjs, section « Secrets hors perimetre » (D-6 (a), 14/09/2026)",
+      "voisines": [
+        "regle-ecrite-sans-oracle-qui-la-joue",
+        "heritage-avertissement-tardif"
+      ]
+    },
+    {
+      "cle": "secret-porte-hors-perimetre",
+      "famille": "hook-ou-gate",
+      "libelle": "Un fichier porteur de secrets vit hors de tout depot, ou dans un depot qui ne l ignore pas, jusqu a etre publie : R-14 juge un depot et ne voit pas ce qui vit a cote. Un secret publie ne se retire pas, il se fait tourner. Reste du 14/09/2026 : 14 porteurs, dont des publies sur la branche principale de trois produits, clos en archive sans suite (TF-0616). Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
+      "creee_le": "2026-09-14",
+      "fondee_par": [
+        "TF-0616"
+      ],
+      "regle": "tout porteur de secret vit dans un depot qui l ignore ou dans un coffre ; un secret publie se fait tourner, le retirer du disque ne suffit pas",
+      "oracle": "oracles/oracle-secrets-hors-perimetre.mjs (SP1, SP2), lu a l ouverture (classe constat-non-bloquant-jamais-lu)",
+      "voisines": [
+        "constat-non-bloquant-jamais-lu",
+        "anonymisation-portee-partielle"
+      ]
+    },
+    {
+      "cle": "controle-ecrit-non-cable-a-son-etape",
+      "famille": "skill-ou-oracle-non-invoque",
+      "libelle": "Un controle existe, porte parfois sa recette, et aucune etape du run, aucun hook ni aucune recette ne l appelle : loi transverse n° 1, toute affordance est cablee ou n existe pas. La classe se distingue de regle-ecrite-sans-oracle-qui-la-joue (pas de controle du tout) et du controle mort (il rend PASS a tort). Releve des restes archives du 14/09/2026 : sept controles dans ce cas (TF-0522, TF-0592, TF-0594, TF-0647, TF-0669, TF-0726, TF-0733). Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
+      "creee_le": "2026-09-14",
+      "fondee_par": [
+        "TF-0522",
+        "TF-0592",
+        "TF-0594",
+        "TF-0647",
+        "TF-0669",
+        "TF-0726",
+        "TF-0733"
+      ],
+      "regle": "tout controle livre nomme l etape, le hook ou la recette qui l appelle, et un releve verifie que l appel existe",
+      "oracle": "a creer : releve des oracles du registre quality-oracles et du pilot sans appelant",
+      "voisines": [
+        "regle-ecrite-sans-oracle-qui-la-joue",
+        "lecture-tiers-non-jugee"
+      ]
+    },
+    {
+      "cle": "controle-joue-sur-fichier-pas-sur-instance-servie",
+      "famille": "page-html-socle",
+      "libelle": "Le rendu et les interactions d une page sont juges sur le fichier, jamais sur une instance servie : les etats apres interaction et les combinaisons de filtres croises ne sont joues par personne (TF-0480, TF-0493). Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
+      "creee_le": "2026-09-14",
+      "fondee_par": [
+        "TF-0480",
+        "TF-0493"
+      ],
+      "regle": "tout controle de rendu ou d interaction d une page qui sera servie se joue aussi sur une instance servie, combinaisons de filtres comprises",
+      "oracle": "a creer : matrice d etats de render_page.py sur une instance servie",
+      "voisines": [
+        "page-html-largeur-lecture-donnees"
+      ]
+    },
+    {
+      "cle": "severite-declaree-invisible-au-consommateur",
+      "famille": "regle-morte",
+      "libelle": "Une famille de mesure declare sa severite (bloquante), et ses consommateurs la lisent comme un avertissement : la severite existe dans la source et nulle part ou elle agit (TF-0531). Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
+      "creee_le": "2026-09-14",
+      "fondee_par": [
+        "TF-0531"
+      ],
+      "regle": "toute severite declaree par une famille de mesure est lue et appliquee par chacun de ses consommateurs, et un consommateur qui la rabaisse le dit",
+      "oracle": "a creer : controle de propagation de la severite des familles de mesure",
+      "voisines": [
+        "constat-non-bloquant-jamais-lu"
+      ]
+    },
+    {
+      "cle": "chaine-declaree-etapes-non-ecrites",
+      "famille": "contrat-interface-forge",
+      "libelle": "Une chaine de travail est declaree (etapes nommees, sortie promise) et la majorite de ses etapes n est ecrite nulle part : sept des dix etapes de la chaine de traduction et d audit d un produit (TF-0664). Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
+      "creee_le": "2026-09-14",
+      "fondee_par": [
+        "TF-0664"
+      ],
+      "regle": "une chaine n est declaree que si chacune de ses etapes a un porteur ecrit (skill, oracle, gabarit) ou est marquee a ecrire avec sa candidature",
+      "oracle": "a creer : releve des etapes de chaine sans porteur",
+      "voisines": [
+        "regle-ecrite-sans-oracle-qui-la-joue"
+      ]
+    },
+    {
+      "cle": "livrable-sans-identite-de-gabarit",
+      "famille": "gabarit-document",
+      "libelle": "Un livrable produit par un generateur de forge ne porte ni l identifiant ni la version de son gabarit, et un option de contournement (--gabarit) remplace la mesure de la cause : l instance perimee est invisible sur l artefact (TF-0690, TF-0702 ; regle G4 d oracle-gabarits-documents). Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
+      "creee_le": "2026-09-14",
+      "fondee_par": [
+        "TF-0690",
+        "TF-0702"
+      ],
+      "regle": "tout livrable rend visiblement l identifiant et la version de son gabarit, y compris quand il sort d un generateur de forge",
+      "oracle": "oracle-gabarits-documents G4, a etendre aux generateurs de forge",
+      "voisines": [
+        "gabarit-famille-manquante",
+        "gabarit-conception-non-jugee"
+      ]
+    },
+    {
+      "cle": "restitution-bloquants-disperses",
+      "famille": "restitution-forme",
+      "libelle": "Ce qui empeche d avancer est reparti entre plusieurs blocs de la restitution — une decision qui nomme le prealable bloquant et renvoie ailleurs, des restes aux motifs types, des actions qui repetent l information sous une autre forme — et nulle part ecrit en entier avec la valeur attendue et le geste qui le leve : le lecteur doit ouvrir un fichier pour savoir ce qui le bloque. Mesure le 13/09/2026 sur une restitution jugee PASS, production arretee (lot input/00-retours/Produit-64 - RETOURS - 20260913a.tf.jsonl, ligne 1).",
+      "creee_le": "2026-09-15",
+      "fondee_par": [],
+      "regle": "tout element qui bloque la suite est ecrit une fois, en entier, a un seul endroit de la restitution — ce qui manque, qui peut le fournir, le geste qui le leve — et les autres blocs y renvoient par son selecteur",
+      "oracle": "a creer dans oracle-synthese (candidature du lot input/00-retours/Produit-64 - RETOURS - 20260913a.tf.jsonl, ligne 1)",
+      "voisines": [
+        "restitution-fichier-juge-mal-choisi",
+        "restitution-action-humaine-geste-agent",
+        "restitution-rendu-visuel-non-critique"
+      ]
+    },
+    {
+      "cle": "preuve-produite-mais-illisible",
+      "famille": "page-html-socle",
+      "libelle": "Une preuve est produite et citee, mais elle ne peut pas etre lue par celui qui s en sert : une capture pleine page ramenee a la taille d affichage divise un corps de texte de 16 pixels par 9,5 a 23, et une revue de lecture se declare faite sur une image ou rien n est lisible. Mesure le 13-14/09/2026 : cinq defauts graphiques passes sous une revue declaree sans constat (lot input/00-retours/Produit-64 - RETOURS - 20260913a.tf.jsonl, ligne 5).",
+      "creee_le": "2026-09-15",
+      "fondee_par": [],
+      "regle": "une preuve visuelle citee a l appui d une revue est lisible a sa taille d affichage — capture decoupee ou a l echelle 1, jamais une pleine page reduite — et la revue nomme les captures qu elle a lues",
+      "oracle": "a creer dans render_page.py du socle digit-ai-page-html (candidature du lot input/00-retours/Produit-64 - RETOURS - 20260913a.tf.jsonl, ligne 5)",
+      "voisines": [
+        "restitution-rendu-visuel-non-critique",
+        "page-html-largeur-lecture-donnees"
+      ]
+    },
+    {
+      "cle": "oracle-perimetre-de-non-mesure-non-publie",
+      "famille": "regle-morte",
+      "libelle": "Un oracle rend son verdict sans publier ce qu'il ne mesure PAS — le vert se lit alors comme une absence de limite, pas comme une absence de publication",
+      "creee_le": "2026-09-16",
+      "fondee_par": [],
+      "regle": "quality-oracles §3, contrat commun : le bloc `non_juge` est obligatoire dans toute sortie d'oracle, PASS compris",
+      "oracle": "à créer — contrôle du contrat commun sur les sorties des oracles du registre (check_html.py en premier porteur constaté)",
+      "voisines": [
+        "oracle-faux-positif",
+        "controle-vrai-sur-le-mauvais-invariant",
+        "severite-declaree-invisible-au-consommateur"
+      ]
+    },
+    {
+      "cle": "contenu-d-auteur-livre-au-lecteur",
+      "famille": "gabarit-document",
+      "libelle": "Un document livré porte du contenu destiné à son AUTEUR (registre d'arbitrages, historique de versions, statut de relecture) au lieu du seul contenu qui change ce que son LECTEUR fait",
+      "creee_le": "2026-09-16",
+      "fondee_par": [],
+      "regle": "à écrire — aucun gabarit de gabarits/documents/ ne porte de champ « lecteur » ni de section « ce qui sort vers le document d'auteur »",
+      "oracle": "à créer — famille de check_markdown.py relevant les marqueurs de contenu d'auteur dans un document à lecteur déclaré",
+      "voisines": [
+        "gabarit-famille-manquante",
+        "gabarit-conception-non-jugee",
+        "livrable-sans-identite-de-gabarit"
+      ]
+    },
+    {
+      "cle": "valeur-en-lettres-dans-un-livrable",
+      "famille": "gabarit-document",
+      "libelle": "Une valeur, une heure ou une date ecrite en toutes lettres dans un livrable — le lecteur doit la reconstituer avant de la comparer a la suivante",
+      "creee_le": "2026-09-16",
+      "fondee_par": [],
+      "regle": "references/ECRITURE.md E-14",
+      "oracle": "oracle-ecriture EC-9",
+      "voisines": []
+    }
+  ]
 }

@@ -7,6 +7,31 @@ Le registre structuré des améliorations vit dans `todo\` : source unique `TODO
 (jamais éditée), archive `TODO-ARCHIVE.jsonl` (ids jamais réutilisés), `oracle-todo.mjs`
 (R1-R11) à faire passer après toute écriture.
 
+**Les vues ne sont plus versionnées (D-4 (a), 16/09/2026, TF-0983).** `TODO.md`, `TODO.html`,
+`TODO-ARCHIVE.html`, `RECIDIVES.md` et `AVANCEMENT.md` sont dérivés des deux `.jsonl` et
+régénérables en une commande ; ils sont désormais ignorés par git. *Un contenu dérivé versionné
+multiplie par le nombre de régénérations le coût de toute erreur dans sa source* — mesuré le
+16/09 : un identifiant écrit UNE fois dans la source vit dans 50 révisions de cette source, 50 de
+`TODO.md` et 32 de `TODO.html`, soit 132 au total dont 82 dues aux seules vues. Effacer un nom de
+client de l'histoire coûtait donc 2,6 fois le travail nécessaire. Le poids, lui, n'était pas le
+sujet : 10,95 Mo compressés sur 280, soit 3,9 % du dépôt.
+
+**Ce qui se perd, et rien d'autre** : la lecture des vues sur l'hébergeur sans cloner. Vérifié
+fichier par fichier le 16/09 — aucun outil du parc ne les lit depuis l'HISTOIRE : `self-test.mjs`
+en prend l'empreinte sur le disque, `verifier-avance-publication.mjs` ne fait que les classer
+quand elles apparaissent dans un enregistrement. Toute version passée se régénère depuis la source
+de son époque. **Les régénérer**, après toute écriture au registre :
+
+```
+node todo\generer-vue.mjs && node todo\generer-page.mjs && node todo\generer-recidives.mjs
+node todo\generer-archive.mjs && node scripts\generer-avancement.mjs
+```
+
+*Ce que cette décision NE fait pas* : elle arrête l'amplification à venir, elle ne nettoie pas les
+82 révisions déjà écrites. Les deux remèdes sont complémentaires, jamais concurrents — le second
+reste ouvert et coûte, lui, le reclonage du parc et 106 empreintes de commit citées au registre
+qui deviendraient orphelines.
+
 **Écrire au registre : `node todo\journaliser.mjs --fichier <evenements.json>`** (TF-0413,
 20/08). Les événements y entrent **sans `ts`** — l'outil le STAMPE. Il refuse tout événement
 qui en porte un, sans rien écrire, et il ANNULE son écriture (fichier repris à l'octet près)
