@@ -44,7 +44,7 @@ Un écart = une section `##`. Quatre champs, tous obligatoires — l'omission ne
 ## Frontière — un seul carnet, ou deux qui se citent (TF-1119)
 
 **Le fait, mesuré le 14/09/2026 chez un produit.** Ce carnet, reçu par héritage, portait encore
-le marqueur du titre, la date du gabarit et zéro écart dix-neuf jours après sa réception ; un
+le marqueur du titre, la date du gabarit et zéro écart 19 jours après sa réception ; un
 second carnet, créé à la main pour un référentiel d'audit client, en portait onze. Aucun des deux
 ne citait l'autre. Une session qui lit ce carnet-ci conclut « aucun écart assumé » : la réponse est
 fausse et plausible.

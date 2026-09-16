@@ -20,7 +20,7 @@ parent du dossier courant, sinon `c:\dev`, sinon `~/.digit-ai-forge`.
 
 `bootstrap.mjs --pull` vérifie les prérequis (git, node ≥ 18 ; gh facultatif — les forges
 sont publiques), met à jour **le pilot lui-même** (et se relance s'il a changé), clone ou
-met à jour les **treize forges** en dépôts frères, renomme sur place un dossier hérité
+met à jour les **13 forges** en dépôts frères, renomme sur place un dossier hérité
 d'un ancien nom, **propage les skills versionnés** vers `~/.claude/skills`, contrôle les
 points d'entrée et **affiche la version de chaque dépôt** (tag, sha, date, retard). Il ne
 dit **« Poste prêt »** que si tout est présent, à jour et aligné — sinon chaque défaut

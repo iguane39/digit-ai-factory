@@ -16,7 +16,7 @@ proscrits et le motif. Conséquence directe et mesurée : la session suivante r�
 **aucun contrôle ne pouvait le refuser** — un contrôle ne peut pas juger un choix qui n'est écrit
 nulle part.
 
-**Quatre défauts trouvés en une heure de balayage systématique**, là où un glossaire constitué *par
+**4 défauts trouvés en une heure de balayage systématique**, là où un glossaire constitué *par
 accident* n'en portait qu'un seul :
 
 - un `title` et un `H1` allemands disant « Pool » quand le catalogue dit « Hallenbad » **29 fois** ;
@@ -82,7 +82,7 @@ justesse — *un oracle peut dire que le champ manque, jamais qu'il est juste.*
   ne lit une phrase.** Une langue peut être structurellement conforme, terminologiquement exacte,
   dimensionnée pour la SERP — et fautive.
 
-## Exemple — trois termes, six lignes, tous venus de défauts réellement mesurés
+## Exemple — trois termes, 6 lignes, tous venus de défauts réellement mesurés
 
 ## logement de vacances
 

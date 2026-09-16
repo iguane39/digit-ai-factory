@@ -36,7 +36,7 @@ Comment un fichier s'appelle, et **ce que son nom promet**. Chaque ligne porte s
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
 | 4 | Tout livrable documentaire est nommé `<Projet> - <Objet> - AAAAMMJJ<indice>.<ext>` — **le nom du PROJET prime sur l'émetteur** (Q3-bis tranchée par l'humain le 09/08 : « Produit-02 - Audit SEO - … », plus jamais « Digit-AI - … » en tête). Les fichiers historiques ne sont pas renommés. **Alinéa RV-2 (Produit-10, 13/08)** : quand un ENTRANT exige un autre nommage pour le livrable, le nommage du pilot **prime** ; la correspondance entre le nom exigé et le nom produit est consignée au ledger (champ `note_nommage`) — jamais d'arbitrage silencieux | convention historique observée avec préfixe émetteur ; **décision humaine du 09/08** la corrige ; alinéa : retour Produit-10 RV-2 (conflit vécu, arbitré au ledger seq 1) | **livrables uniquement** (input\, output\, docs\) — JAMAIS le code (conflit C3) | S+O | faible | **défaut** |
-| 5 | L'indice est une lettre (a, b, c…) par itération du même jour ; une nouvelle version = un **nouveau fichier daté**, jamais d'écrasement — **CÂBLÉE depuis le 23/08** : `node scripts\verifier-jugement.mjs <dossier>` compare l'empreinte d'un livrable à celle de son sceau, et refuse une modification à indice inchangé (TF-0523) | observée (`20260721b` → `20260721d`, `revue.md`/`revue-v2`), **et reproduite le 23/08 : le même fichier écrasé quatre fois, une heure après avoir signalé le même défaut ailleurs** | livrables uniquement | S+O | faible | **défaut** |
+| 5 | L'indice est une lettre (a, b, c…) par itération du même jour ; une nouvelle version = un **nouveau fichier daté**, jamais d'écrasement — **CÂBLÉE depuis le 23/08** : `node scripts\verifier-jugement.mjs <dossier>` compare l'empreinte d'un livrable à celle de son sceau, et refuse une modification à indice inchangé (TF-0523) | observée (`20260721b` → `20260721d`, `revue.md`/`revue-v2`), **et reproduite le 23/08 : le même fichier écrasé 4 fois, une heure après avoir signalé le même défaut ailleurs** | livrables uniquement | S+O | faible | **défaut** |
 | 25 | Le `<Type>` du nom de tout livrable daté (2ᵉ segment, 1ᵉʳ mot) **figure au registre des types** (`registre-types.json` d'organization, comparaison insensible casse/accents) — un type nouveau s'ajoute au registre dans un commit motivé (D-04), jamais improvisé dans un nom. Registre lu en dépôt frère ; poste non équipé → non jugeable, pas FAIL | **D-04 organization (décidée 08/08), encodée 11/08 (TF-0084)** — registre 1.1.0, 29 types, complété sur usage réel | produits, nouveaux + rattrapage | O | nul | **défaut** |
 
 **Alinéa LONGUEUR DE CHEMIN (D-11/D-12 exécutées, décision TF-1015 du 11/09/2026).** La règle 4
@@ -56,7 +56,7 @@ Les fichiers antérieurs au-dessus de la borne ne sont pas renommés : ils sont 
 l'oracle, un renommage cassant les liens déjà restitués.
 
 **Alinéa paramétrage (TF-0322, décidé le 17/08 — étude 20260817f, verdict O1 : refus
-instruit d'un système de paramètres).** Trois classes de conventions ne se négocient pas,
+instruit d'un système de paramètres).** 3 classes de conventions ne se négocient pas,
 chacune pour un motif mesuré : les **identifiants stables** (ids TF, ids de schéma §3 bis —
 un id renuméroté casse toute traçabilité), le **motif daté des livrables** (règle 4 — 19 lots
 de 9 produits cohabitent dans une seule boîte d'entrée parce que le nom dit qui retourne
@@ -69,7 +69,7 @@ demandeur reçoit une voie, pas un mur ; critère de réouverture : un deuxième
 préférence réel consigné au ledger.
 
 **Une règle non câblée ne s'applique pas, y compris à celui qui vient de la citer** (TF-0523,
-23/08/2026). La règle 5 existait, était écrite, et connue. Elle a été enfreinte QUATRE FOIS sur le
+23/08/2026). La règle 5 existait, était écrite, et connue. Elle a été enfreinte 4 FOIS sur le
 même fichier — une heure après que le même défaut ait été signalé à la Factory sur un gabarit. Ce
 n'est pas un problème de mémoire : c'est qu'aucun mécanisme ne regardait.
 
@@ -127,7 +127,7 @@ condition pour que le document reste ouvert par son lecteur. Un **reste à faire
 fasse et vit aux « Améliorations ». Un **écart assumé** est une décision déjà prise : il se
 **redéclare** au prochain audit, il ne se re-propose pas. Une **contrainte conditionnelle** attend un
 fait du monde qui ne se produira peut-être jamais : elle n'appelle aucune action, donc aucune ligne
-d'action. *Mesure* : sur neuf lignes remises à un lecteur humain, deux ont été contestées — « sujet
+d'action. *Mesure* : sur 9 lignes remises à un lecteur humain, deux ont été contestées — « sujet
 déjà évoqué et traité », « non sujet, pourquoi cela sort ? » — non pour leur rédaction, mais pour
 leur emplacement. Le contrôle vit dans `oracle-conformite-projet` (R-20, nature des lignes) et
 n'exige la troisième section qu'à partir du premier `verifie_le` postérieur au 23/08 : avant, c'est
@@ -137,12 +137,12 @@ la règle qui a bougé, pas le produit.
 fichier était défini comme celui des **composants déployés**, « depuis `ops etat` / plans /
 DOSSIER-MEP ». Un produit d'analyse qui ne déploie **rien** mais interroge **plusieurs** entrepôts
 n'avait donc, en toute conformité, qu'à y écrire « aucun composant déployé » — ce qu'un produit a
-fait pendant onze jours, en une ligne, avec pour seule trace un identifiant d'hôte nu dans un
+fait pendant 11 jours, en une ligne, avec pour seule trace un identifiant d'hôte nu dans un
 tableau de dépendance externe. *Mesure du 24/08* : l'humain donne un nom de workspace ; ce nom ne
 se rapproche d'**aucun** élément du dépôt ; la réponse rendue est fausse, et le fichier censé
 porter ce rapprochement existait, était **conforme**, et vide de l'information. Le manque était
 dans la **définition** du fichier, pas dans son contrôle — `oracle-conformite-projet` vérifie la
-présence des huit fichiers et leur frontmatter, jamais la pertinence de leur contenu, et il le
+présence des 8 fichiers et leur frontmatter, jamais la pertinence de leur contenu, et il le
 déclare lui-même. La classe est **générique** : tout produit d'analyse de données a des
 environnements et aucun composant déployé. Le fichier porte donc aussi les **environnements de
 données interrogés** — par environnement : nom d'affichage (et *comment on le sait*), hôte,
@@ -158,7 +158,7 @@ vit dans `oracle-conformite-projet` (R-20) et n'exige la section qu'à partir du
 **L'inventaire de `COMPOSANTS-OPS.md` dit l'USAGE, pas seulement la présence** (TF-1113, TF-1117,
 TF-1120, 15/09/2026, étude 20260915a option O1). *Mesure du 14/09* : dix éléments sans
 consommateur coexistaient avec un document conforme, deux suppressions évidentes d'après le nom
-auraient tué le produit, et sur dix lignes déclarées inutilisées cinq n'étaient pas supprimables.
+auraient tué le produit, et sur 10 lignes déclarées inutilisées cinq n'étaient pas supprimables.
 Le fichier porte donc une colonne **Statut** à vocabulaire fermé (actif / partagé / déclaré /
 inutilisé / hors périmètre), justifiée par un consommateur résolu et jamais par le nom ; une table
 « qui consomme quoi » ; et une section « Composants inutilisés », déclarée même vide, aux colonnes
@@ -170,7 +170,7 @@ vocabulaires dès le premier `verifie_le` du 15/09 ou après ; avant, antériori
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
 | 20 | `docs\projet\` complet — **8 fichiers + 2 projections générées** : `TECHNOS.md` (technologies + versions + liens, ancrées lockfiles), `COMPOSANTS-OPS.md` (hiérarchie/noms/types/IDs/URLs/IPs des composants déployés — depuis `ops etat`/plans/DOSSIER-MEP, instanciations datées, placeholders si dépôt public), `PARAMETRAGE.md` (signification des variables, URLs/ports par environnement — hébergés en placeholders), `ACCES-TEST.md` (profils + comptes de démo locale), `COMMANDES.md` (install, dev, test, build, deploy qualif, rollback, seed démo — blocs exécutables), `FONCTIONNEL.md` (**TF-0087** : ce que fait le produit et pour qui — rôles, objets métier et cycle de vie, parcours, règles de gestion, exclusions assumées ; vue d'`EXIGENCES.json` quand il existe, sinon rédigé du code et daté), `ARCHITECTURE.md` et `MODELE-DONNEES.md` (**TF-0091** : sources des vues techniques — structure logique / tables-colonnes-liens — projetées en `ARCHITECTURE.html` et `MODELE-DONNEES.html` par les générateurs du pilot, vues JAMAIS éditées à la main) ; chaque fichier ouvre par un frontmatter YAML (`role`, `sources_de_verite`, `verifie_le`). Noms **fixes** — documents vivants exemptés du nommage daté R-4 (ce ne sont pas des livrables). Autres fichiers admis seulement s'ils servent l'automatisation ou l'onboarding ET n'existent pas déjà sous forme machine (sinon renvoi) | manque constaté : les runs de version redécouvrent tout ; FONCTIONNEL : demande humaine en clôture du run Produit-11 | produits, nouveaux + rattrapage | P0+O | faible | **défaut** |
-| 20 bis | `TODO-PRODUIT.md` sépare les **trois natures** : « Améliorations » n'accueille que de vrais restes à faire ; un écart déjà tranché vit aux « Écarts assumés » avec son motif et sa date ; une action suspendue à un événement extérieur vit à « Contraintes connues — ce ne sont PAS des restes à faire », avec sa condition de déclenchement. La section se déclare même vide (« aucune contrainte connue à ce jour ») — loi n° 3. Exigée dès le premier `verifie_le` postérieur au 2026-08-23 ; avant, antériorité déclarée au `non_juge` | deux lignes sur neuf contestées par le lecteur le 23/08 — « sujet déjà évoqué et traité » — pour leur emplacement, pas leur rédaction (TF-0528) | produits | O | nul | **défaut** |
+| 20 bis | `TODO-PRODUIT.md` sépare les **trois natures** : « Améliorations » n'accueille que de vrais restes à faire ; un écart déjà tranché vit aux « Écarts assumés » avec son motif et sa date ; une action suspendue à un événement extérieur vit à « Contraintes connues — ce ne sont PAS des restes à faire », avec sa condition de déclenchement. La section se déclare même vide (« aucune contrainte connue à ce jour ») — loi n° 3. Exigée dès le premier `verifie_le` postérieur au 2026-08-23 ; avant, antériorité déclarée au `non_juge` | 2 lignes sur neuf contestées par le lecteur le 23/08 — « sujet déjà évoqué et traité » — pour leur emplacement, pas leur rédaction (TF-0528) | produits | O | nul | **défaut** |
 | 21 | Fraîcheur TECHNOS : chaque `nom@version` du frontmatter `versions:` de `TECHNOS.md` correspond aux lockfiles/manifestes du produit (`package-lock.json`, `pyproject.toml`…) — une version divergente = FAIL | loi 4 : une donnée volatile est une donnée | produits | O | nul | **défaut** |
 | 22 | Parité PARAMETRAGE ↔ `.env.example` : les noms de variables déclarés dans le frontmatter `variables:` de `PARAMETRAGE.md` et ceux de `.env.example` (R-13, qui reste la liste qui fait foi) sont identiques | double vérité interdite | produits | O | nul | **défaut** |
 | 23 | `ACCES-TEST.md` : en-tête dur littéral « comptes de démonstration locale — jamais valides hors MODE_DEMO » présent, comptes créés par seed derrière drapeau `MODE_DEMO` (loi 2), **zéro motif de secret réel** (motifs d'oracle-secrets) ; tout accès d'environnement réel = référence `# à fournir :` (R-15 → non_testables) | R-14 + loi 2 + régime public | produits | O | nul | **défaut** |
@@ -377,7 +377,7 @@ forge-websec porte un contrat ASVS 5.0.0 L1 depuis le 12/08 que **rien ne branch
 exigence de sécurité lui soit opposée. Et le pentest manuel, exclu par websec (README §Limites),
 n'est repris par personne.
 
-**R-33.** Deux volets indissociables.
+**R-33.** 2 volets indissociables.
 
 1. **Branchement de l'existant** — les exigences ASVS curées s'opposent à l'étape *conception*
    (le profil `webapp` les pointe déjà), la méthode de test s'exécute à l'étape *tests*, et le
@@ -458,16 +458,16 @@ motivé** — exactement la discipline d'`oracle-sca` et d'`oracle-dast`.
 taste-skill (vendorer un skill externe pour l'exécuter) reste **fermée** tant que la réserve A1
 n'est pas levée : ce skill prescrit des ressources chargées par le réseau que `check_html.py`
 refuse en FAIL bloquant. Admettre un objet qui prescrit ce que l'écosystème interdit mettrait
-deux règles en contradiction chez le constructeur. La voie ouverte reste la **barre** (importer
+2 règles en contradiction chez le constructeur. La voie ouverte reste la **barre** (importer
 un niveau) et l'**extraction attribuée** des règles compatibles — toutes deux livrées.
 
 ## O. Un contrôle qui existe sans être joué n'existe pas (règle 35 — 15/08, TF-0232)
 
-Trois occurrences en deux jours, même maladie sous trois visages :
+3 occurrences en 2 jours, même maladie sous trois visages :
 
 - la consigne `RESTITUTION.md` v1 — écrite, **citée par aucun run**, donc jamais appliquée ;
 - `ruff` dans forge-tests — configuré, rendant 21 erreurs, **appelé par aucun pas de recette** ;
-- les self-tests des oracles du pilot — huit recettes à double sens, **jouées par rien**. Le
+- les self-tests des oracles du pilot — 8 recettes à double sens, **jouées par rien**. Le
   jour où un agrégateur les a lancées, il a trouvé que `oracle-claude-md`, gardien du plafond
   du noyau depuis TF-0037, **n'avait aucun self-test** : il n'avait jamais été vu refuser quoi
   que ce soit.
@@ -676,7 +676,7 @@ verts, mutation 0,90).
    ce qui ne doit PAS figurer au livrable — et la cherche dans le livrable ; il échoue si elle
    s'y trouve. Un test prouve d'ordinaire une PRÉSENCE ; un périmètre est une assertion
    d'ABSENCE. Fait du 09/09 : une recette de 20 contrôles a rendu PASS sur une page qui
-   affichait 342 colonnes au lieu de 66 ; le contrôle manquant tenait en douze lignes. Vaut
+   affichait 342 colonnes au lieu de 66 ; le contrôle manquant tenait en 12 lignes. Vaut
    pour une page, un export réduit, un jeu anonymisé, un lot filtré. Preuve attendue de la
    recette : le livrable au périmètre exact (PASS) et le même plus un élément hors périmètre
    (FAIL).
@@ -735,7 +735,7 @@ déjà décidés (jamais porter de prose exécutable), et l'engagement de crédi
 humain** (loi 5). Admission R-33 ter faite : `oracle-scan-agentdef.mjs` → PASS sur CAP-1..4,
 verdict consigné et non bloquant.
 
-**Dette DÉCLARÉE, et bornée.** Ces trois règles portent sur un objet que le pilot n'exécute
+**Dette DÉCLARÉE, et bornée.** Ces 3 règles portent sur un objet que le pilot n'exécute
 pas encore — c'est le patron de la règle dormante que R-35 dénonce. Borne : à la revue du
 **2026-11-17**, si aucun des trois invariants n'a servi à trancher une question réelle, ils se
 **retirent** plutôt que de dormir.
@@ -799,7 +799,7 @@ en statut `ok` fait porter son id de famille et sa version aux documents qui en 
 
 *Le fait qui la fait naître.* Les quatre premières familles de la bibliothèque ont été extraites
 en relevant ce que les projets **refaisaient à la main** — un gabarit de rapport de données barré
-par un projet le 13/08, des runbooks réinventés quatre fois, un document de compléments de DAT de
+par un projet le 13/08, des runbooks réinventés 4 fois, un document de compléments de DAT de
 281 lignes. Cette matière n'est arrivée que parce qu'on est allé la chercher, une fois, à la main.
 Rien ne la fait remonter en continu : le canal de retours existant parle des FORGES (outillage) et
 jamais des DOCUMENTS. Un gabarit ne vieillit pas en s'usant — il vieillit parce que la réalité des
@@ -873,7 +873,7 @@ celles du projet** : `REGLES-PROJET.md`, `CLAUDE.md` du pilot et les référence
 l'emportent sur le `CLAUDE.md` du produit et ses conventions locales. Un projet peut
 **renforcer** une règle de la factory (seuil plus strict, gate supplémentaire), jamais
 l'assouplir ni la contourner. Tout conflit se tranche en faveur de la factory et se
-consigne au ledger (`type: conflit_regles`, les deux règles citées) — un conflit répété
+consigne au ledger (`type: conflit_regles`, les 2 règles citées) — un conflit répété
 est un candidat au registre, pas une exception locale. Surface : la clause de précédence
 du `gabarits\CLAUDE-PRODUIT.md` (obligatoire, vérifiée par `oracle-conformite-projet`
 R-43) et les hooks de la factory installés chez le produit (R-44).
@@ -904,7 +904,7 @@ actions. Aucune n'avait d'exécutant : le pilot n'avait pas un seul hook.
    S5, S7, S8, S9, S10** (dites en une ligne sous la réponse, journalisées, jamais réécrites).
    `RESTITUTION.md` passe en **2.5.0**.
 2. **Fraîcheur exécutée** (`oracles\hook-ouverture.mjs`, hook `SessionStart`) :
-   `bootstrap.mjs --pull` joué à l'ouverture et à la reprise — pilot, treize forges,
+   `bootstrap.mjs --pull` joué à l'ouverture et à la reprise — pilot, 13 forges,
    skills, versions affichées — et les gates actifs dits à l'assistant.
 3. **README vivants** (`scripts\readme-dossiers.mjs`, hook `PostToolUse` +
    `oracle-readme-dossiers` en recette I4) : chaque dossier d'`input\` et d'`output\`
@@ -916,7 +916,7 @@ laisse passer — jamais en silence, jamais en bloquant le produit.
 
 ## Y. Un artefact hérité du pilot est présent ET à jour (règle 47 — 23/08, mandat humain)
 
-**Le constat.** Deux produits en trois jours, quinze candidatures refusées à la porte pour une
+**Le constat.** 2 produits en 3 jours, quinze candidatures refusées à la porte pour une
 forme que le produit ne pouvait pas connaître. `Produit-02` possède un `forge\retours\`
 complet, portant ses lots, et **aucun** `RETOURS-FORGES.md` : le dossier a été créé, la copie
 n'y est jamais arrivée. `Produit-05` n'a ni l'un ni l'autre. Ce n'était pas une négligence de
@@ -940,7 +940,7 @@ exigé, la personnalisation reste libre autour).
 
 **Le cercle est rompu au moment que le pilot maîtrise** : un produit qui remet un lot se nomme.
 `ingerer-lot.mjs` joue alors R-47 sur lui et le **dit**. **Avertissement, jamais blocage** —
-refuser l'ingestion parce que le produit n'a pas ses gabarits punirait deux fois le même défaut,
+refuser l'ingestion parce que le produit n'a pas ses gabarits punirait 2 fois le même défaut,
 une fois à la porte et une fois sur le travail déjà fait.
 
 **Trois prudences, chacune apprise d'un défaut réel** : un produit sans `forge\` n'a jamais été
@@ -954,10 +954,10 @@ vraies copies du pilot et fixture rouge) · câblage à l'ingestion (`todo\inger
 
 ## AE. R-52 — une doctrine opposable NOMME ses consommateurs et l'etat d'installation chez chacun (TF-0571 — 24/08)
 
-**Le constat.** Une session a travaille cinq heures dans un depot produit en rendant une dizaine de
+**Le constat.** Une session a travaille 5 heures dans un depot produit en rendant une dizaine de
 messages de fin de traitement : aucun sous la structure en huit blocs, aucun juge, aucun refus. Le
 hook qui rend la consigne opposable vivait chez le pilot et nulle part ailleurs. La mesure faite
-ensuite sur le parc est plus large que le retour : sur dix produits, cinq instancies, UN SEUL portant
+ensuite sur le parc est plus large que le retour : sur 10 produits, cinq instancies, UN SEUL portant
 le hook, ZERO portant le texte de la doctrine.
 
 **La regle.** Toute doctrine rendue opposable par un mecanisme — hook, oracle, gate — declare (a) la
@@ -981,7 +981,7 @@ registre. L'heritage porte les pieces : `gabarits\HERITAGE.json` v1.1.0, control
 ## Z. La couverture se compte en EXIGENCES, jamais en regles (TF-0548 — 23/08, mandat humain, voie (a))
 
 **Le constat.** La couverture affichait 24 regles sur 26, soit 92 %, pendant que quinze
-candidatures etaient refusees en trois jours a cause d'une exigence non controlee. La regle 18
+candidatures etaient refusees en 3 jours a cause d'une exigence non controlee. La regle 18
 exige le gabarit de retours depuis le 06/08 — « `forge\retours\` existe (GABARIT INCLUS) » — et son
 controle ne verifiait que le dossier. Comptee couverte a 100 %, elle l'etait a 20 %. Une metrique
 qui compte des REGLES la ou le travail se fait par EXIGENCE peut rester au vert indefiniment
@@ -1012,7 +1012,7 @@ ment dans le bon sens — c'est pire que de se declarer non couverte.
 Factory de retravailler les éléments qu'elle peut traiter toute seule sans que j'aie de décisions à
 prendre à ce niveau-là — l'exemple de l'input est particulièrement parlant, forcément que les inputs
 ne pouvaient pas entrer dans le périmètre d'audit, c'est juste logique. » Les **quatre** constats du
-lot de forge-tests de ce jour-là n'étaient pas quatre défauts : c'était **quatre fois le même
+lot de forge-tests de ce jour-là n'étaient pas 4 défauts : c'était **4 fois le même
 réflexe**. À chaque fois la réponse se déduisait du contexte — un dossier `input\` n'est pas du
 produit, un `.min.js.téléchargement` n'est pas du code, le tour qu'on vient d'exécuter est celui
 qu'on doit journaliser, les clés qu'on vient d'énumérer sont celles qu'on doit pré-remplir. À chaque
@@ -1055,7 +1055,7 @@ fait**. Sur cette base, l'agent a annoncé à l'humain que les deux identifiants
 domaine ; l'humain a décidé que celui-ci devait avoir les siens ; la constante a été vidée ;
 régression, intégration continue rouge, correctif.
 
-**L'API faisant autorité disait l'inverse, et l'a établi en trente secondes** : le flux avait été créé
+**L'API faisant autorité disait l'inverse, et l'a établi en 30 secondes** : le flux avait été créé
 le 15/08 à 12:12, `updateTime == createTime` — donc jamais modifié — et son URL par défaut était celle
 de ce domaine ; le conteneur portait même le nom du domaine. Le même dépôt contenait quatre autres
 constantes dans le même état.
@@ -1097,7 +1097,7 @@ régression est passée jusqu'à la branche principale, la CI est sortie rouge a
 échec, et une bascule de domaine a été bloquée plusieurs heures.
 
 **Ce qui ne marche pas, et il faut le dire** : documenter la liste des contrôles. Une liste écrite à la
-main dérive au premier ajout, et personne ne le voit — ce parc l'a déjà payé trois fois (les zones de
+main dérive au premier ajout, et personne ne le voit — ce parc l'a déjà payé 3 fois (les zones de
 la recette, le registre des empreintes, les exclusions par suffixe). **La liste se dérive** : on lit le
 workflow, et on exige que chacune de ses commandes soit atteignable localement. Plus une **cible
 agrégée** : une seule commande qui joue l'ensemble, sans quoi le recouvrement dépend de la mémoire de
@@ -1132,7 +1132,7 @@ rend **SANS_OBJET** : le contrat s'instaure, il ne se réclame pas rétroactivem
 
 ## AE. R-52 — une sonde mesure sur le canal REEL de son destinataire (TF-0585 — 25/08)
 
-**Le fait, et il a ete presente comme une preuve.** Le 23/08, un tableau de huit lignes a ete
+**Le fait, et il a ete presente comme une preuve.** Le 23/08, un tableau de 8 lignes a ete
 publie a un exploitant, avec des coches vertes, affirmant que quatre domaines convergeaient vers
 l'adresse canonique. Toutes ces mesures avaient ete faites en `http://`. Le 24/08, la meme
 verification en `https://` donne le resultat **oppose** : sept hostnames sur huit echouent au TLS,
@@ -1169,7 +1169,7 @@ terme retenu, les termes proscrits et le motif. Consequence directe : la session
 le mot, et **aucun controle ne pouvait le refuser** — *un controle ne juge pas un choix qui n'est
 ecrit nulle part.*
 
-**Quatre defauts trouves en une heure de balayage systematique**, la ou un glossaire constitue *par
+**4 defauts trouves en une heure de balayage systematique**, la ou un glossaire constitue *par
 accident* n'en portait qu'un seul : un `title` et un `H1` allemands disant « Pool » quand le
 catalogue dit « Hallenbad » **29 fois** ; l'anglais employant « deposit » pour la **caution** ET
 pour l'**acompte** ; un mot francais traite comme tel dans six langues alors qu'il est un
@@ -1239,7 +1239,7 @@ exiger qu'il reste identique au gabarit reviendrait a interdire d'y ecrire.
 
 **SECONDE INSTANCE DE LA MEME CLASSE, LE JOUR MEME (TF-0649).** La regle 10 du socle enumere depuis le 06/08 les exclusions qu'un produit doit porter a son `.gitignore` « des la creation ». Elle vivait en PROSE, dans un tableau de ce document, et n'avait donc AUCUN point d'application : un produit ne l'enfreignait pas, il ne la rencontrait jamais. Mesure remontee : un `.pyc` suivi par git, un second qui s'appretait a entrer. Le socle est desormais livre comme un FICHIER — `gabarits\gitignore-produit` — et entre au contrat d'heritage en mode `presence_et_motifs` : le fichier du produit doit CONTENIR les motifs edictes, il peut en porter d'autres. Un socle, pas un plafond : exiger l'identite reviendrait a interdire a un produit d'ignorer ses propres artefacts.
 
-**ET UNE VERIFICATION QUI A CHANGE LE LIVRABLE.** L'item demandait aussi d'exclure `old\`, au motif que « `Old\` jamais versionne » serait une regle de socle. **C'est FAUX contre ce document** : l'arbitrage C1, amende par decision humaine du 13/08 (TF-0150), rend `old\` AUTORISE et VERSIONNE — « l'ancien arbitrage *jamais versionne* est caduc ». L'exclusion n'a donc PAS ete livree, et le gabarit ecrit pourquoi. *Un produit appliquait une regle ABROGEE treize jours plus tot* : c'est le meme defaut vu par l'autre bout — non pas une regle sans point d'application, mais une ABROGATION qui n'a atteint personne.
+**ET UNE VERIFICATION QUI A CHANGE LE LIVRABLE.** L'item demandait aussi d'exclure `old\`, au motif que « `Old\` jamais versionne » serait une regle de socle. **C'est FAUX contre ce document** : l'arbitrage C1, amende par decision humaine du 13/08 (TF-0150), rend `old\` AUTORISE et VERSIONNE — « l'ancien arbitrage *jamais versionne* est caduc ». L'exclusion n'a donc PAS ete livree, et le gabarit ecrit pourquoi. *Un produit appliquait une regle ABROGEE 13 jours plus tot* : c'est le meme defaut vu par l'autre bout — non pas une regle sans point d'application, mais une ABROGATION qui n'a atteint personne.
 
 **La classe du defaut, plus large que ce cas** : *une regle de socle exprimable comme un fichier
 doit etre livree comme un fichier*, jamais comme une phrase dans un document de regles. Une regle
@@ -1248,7 +1248,7 @@ personne ne le voit.
 
 ## AG bis. R-20 ter — un tableau de RÉFÉRENCE indexé par environnement est AUTOSUFFISANT (TF-0985 — 14/09)
 
-Fait du 08/09, sur le document de paramétrage d'un produit (l'un des huit fichiers de
+Fait du 08/09, sur le document de paramétrage d'un produit (l'un des 8 fichiers de
 `docs\projet\` que R-20 prescrit) : quatre tableaux pour un seul appel — la requête, les
 en-têtes, le jeton, puis « ce qui est servi par environnement », ce dernier ne portant QUE le
 delta entre deux environnements. Chaque élément était exact et sourcé ; aucun tableau ne
@@ -1270,7 +1270,7 @@ seq 64-65).** L'exploitant demande un releve « tous les lundis matins a 6 h ».
 cron UTC unique et **declare l'ecart** ete/hiver (6 h l'hiver, 5 h l'ete) avec une justification
 chiffree presentee comme dissuasive — « exigerait deux crons et un test d'heure locale ». Or le
 produit portait DEJA la mecanique de la solution, construite la veille. Une question d'une ligne de
-l'exploitant a suffi ; la solution complete a coute une demi-heure, douze cas de test compris.
+l'exploitant a suffi ; la solution complete a coute une demi-heure, 12 cas de test compris.
 
 **Ce que le fait dit de la declaration d'ecart.** La declaration d'ecart est une pratique saine
 (R-20 bis, § AG) — et elle a servi ici de **sortie de moindre effort** : le cout de la solution a

@@ -3,7 +3,7 @@
  * generer-lisezmoi-output.mjs — L'INDEX CLIQUABLE des livrables d'un dossier `output\`
  * (D-15 al. e rendu INCONDITIONNEL et OUTILLÉ — TF-0560, 24/08/2026).
  *
- * LE FAIT, ET IL A COÛTÉ ONZE JOURS À UN DESTINATAIRE. La règle de nommage R-4 impose
+ * LE FAIT, ET IL A COÛTÉ 11 JOURS À UN DESTINATAIRE. La règle de nommage R-4 impose
  * `<Projet> - <Objet> - AAAAMMJJ<indice>.<ext>` : trois espaces au minimum, six en pratique. Or le
  * résolveur de liens de la session de travail coupe le chemin AU PREMIER ESPACE. Test à deux liens
  * conduit avec le destinataire le 24/08, sur un fichier créé exprès sans espace : le lien vers le
@@ -11,7 +11,7 @@
  * en `%20`, ni sous la forme à chevrons du Markdown. Le premier test écarte l'hypothèse de la racine
  * de l'atelier et ISOLE l'espace comme cause unique.
  *
- * Conséquence sur un seul produit : 22 livrables, 0 atteignable au clic, pendant onze jours, sans
+ * Conséquence sur un seul produit : 22 livrables, 0 atteignable au clic, pendant 11 jours, sans
  * que la cause soit nommée. La classe est GÉNÉRIQUE — elle vaut pour tout produit qui applique R-4,
  * et le seul dossier de rangement client du parc en porte 22.
  *
@@ -97,7 +97,7 @@ function rendreIndex(fam) {
   l.push("date et son indice — donc au moins trois espaces. Or le résolveur de liens de la session de");
   l.push("travail **coupe le chemin au premier espace** : un livrable n'est jamais atteignable au clic,");
   l.push("ni tel quel, ni encodé, ni entre chevrons. Mesuré le 24/08/2026 sur un produit : **22");
-  l.push("livrables, 0 atteignable**, pendant onze jours sans que la cause soit nommée.");
+  l.push("livrables, 0 atteignable**, pendant 11 jours sans que la cause soit nommée.");
   l.push("");
   l.push("Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous sont donnés");
   l.push("à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser");

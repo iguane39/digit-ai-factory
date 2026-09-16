@@ -76,13 +76,13 @@ au rapport : un seuil qu'on ne lit pas est un seuil qu'on ne discute pas.
 compte échoue, la campagne est proposée. Le choix inverse ferait passer un projet neuf entre les
 mailles pour toujours, et personne ne le verrait — c'est la forme la plus coûteuse du silence.
 
-**Et la règle a son EXÉCUTANT, sinon elle décore (01/09, le jour même).** `node oracles\oracle-trace-mutation-mep.mjs <produit>` juge le dossier de MEP en trois règles : **TM1** le dossier NOMME l'état de la campagne — jouée, ou proposée puis refusée, le silence étant le défaut fondateur ; **TM2** une campagne déclarée jouée porte sa preuve chiffrée ou localisante, jamais un ✓ nu ; **TM3** elle est ADOSSÉE au marqueur que la campagne écrit elle-même chez le produit — c'est la seule des trois qu'une phrase bien tournée ne peut pas satisfaire. Un produit sans dossier de MEP rend SANS_OBJET et jamais FAIL : l'étape n'a pas été atteinte, et juger une absence d'événement reviendrait à accabler un projet pour ne pas être allé assez loin.
+**Et la règle a son EXÉCUTANT, sinon elle décore (01/09, le jour même).** `node oracles\oracle-trace-mutation-mep.mjs <produit>` juge le dossier de MEP en 3 règles : **TM1** le dossier NOMME l'état de la campagne — jouée, ou proposée puis refusée, le silence étant le défaut fondateur ; **TM2** une campagne déclarée jouée porte sa preuve chiffrée ou localisante, jamais un ✓ nu ; **TM3** elle est ADOSSÉE au marqueur que la campagne écrit elle-même chez le produit — c'est la seule des trois qu'une phrase bien tournée ne peut pas satisfaire. Un produit sans dossier de MEP rend SANS_OBJET et jamais FAIL : l'étape n'a pas été atteinte, et juger une absence d'événement reviendrait à accabler un projet pour ne pas être allé assez loin.
 
 **Ce que le seuil bloquant devient quand le pan n'est pas joué** : sans porteur, et le rapport le
 DIT. Un pan non demandé et un pan dont le score est nul sont deux choses différentes ; les
 confondre au tableau de bord ferait lire une absence de mesure comme un échec de mesure.
 
-**Et quand la campagne est jouée, elle l'est DEUX FOIS la première fois (D-36 (a), 01/09/2026).**
+**Et quand la campagne est jouée, elle l'est 2 FOIS la première fois (D-36 (a), 01/09/2026).**
 Le ciblage par ligne mutée — ne rejouer, pour un mutant, que les tests couvrant la ligne
 altérée — est écrit et éteint. La décision humaine le laisse éteint jusqu'à sa vérification, et
 cette vérification se joue **à la prochaine campagne réelle**, pas « un jour » :
@@ -119,7 +119,7 @@ sert n'est pas une précaution, c'est une croyance.
 
 Ce n'est pas propre à un moteur : **tout secours imprimé dans un journal est exposé au même effet**,
 et le masquage est par nature imprévisible puisqu'il dépend de ce que le moteur a appris à masquer.
-Trois règles en sortent, et la troisième est celle qui manquait partout :
+3 règles en sortent, et la troisième est celle qui manquait partout :
 
 1. **Le retour arrière est un ARTEFACT** — `ROLLBACK.md` sur disque, versionné, remis au dossier de
    MEP. Le journal peut le répéter ; il ne le remplace pas.
@@ -171,7 +171,7 @@ balisage attendu était bien servi. *Le rouge était faux.*
 **Le faux rouge est le symptôme bénin ; le faux vert est le vrai risque.** Une porte incapable de
 distinguer l'avant de l'après valide aussi bien un déploiement **qui n'a pas eu lieu** — et c'est
 exactement le défaut que cette porte avait été écrite pour empêcher, après qu'une poussée n'eut
-rien déclenché et que la production eut servi l'ancienne version cinq minutes sans que rien ne le
+rien déclenché et que la production eut servi l'ancienne version 5 minutes sans que rien ne le
 signale. **La promesse était tenue à la lettre — la version est bien LUE dans le dépôt — et
 manquée dans l'esprit, puisqu'elle n'y VARIE pas.**
 
@@ -187,7 +187,7 @@ lendemain**. La porte lisait l'empreinte d'**UNE** page et concluait sur les **2
 sur une poussée réelle : **70 pages HTML modifiées, la page échantillonnée inchangée**, donc
 empreinte attendue identique à celle que servait encore l'ancien conteneur. La porte a écrit
 « déploiement en ligne au bout de 1 essai », les dix contrôles sont passés au vert et le
-rapport a conclu « production conforme » — pendant qu'au même instant deux pages servaient
+rapport a conclu « production conforme » — pendant qu'au même instant 2 pages servaient
 encore le contenu supprimé. Le déploiement réel a atterri **90 secondes plus tard**.
 
 **Une valeur qui ne varie JAMAIS avait été remplacée par une valeur qui ne varie QUE POUR UN
@@ -203,7 +203,7 @@ a mordu était l'INVERSE — le contenu avait changé sur 70 pages et la porte n
 il était **plus probable** que celui qui avait été prévu. **Déclarer un angle résiduel ne
 couvre que l'angle nommé**, et la déclaration donne un faux sentiment d'exhaustivité :
 l'écrire fait croire qu'on a fait le tour. Un aveu borné reste un aveu, jamais une couverture.
-*Cette page a payé sa propre règle en moins de vingt-quatre heures.*
+*Cette page a payé sa propre règle en moins de 24 heures.*
 
 **CE QUI RESTE OUVERT, sans prétendre que la liste soit close.** Le mécanisme d'attente
 lui-même n'est pas revu : même avec une valeur correcte, la porte reste une **comparaison
@@ -266,7 +266,7 @@ quelque chose à juger serait pire que ne rien juger.
 le relevé remis à l'humain annonçait « la veille est en place ». Son premier passage a rendu
 « Pas le premier lundi du mois — rien à faire » et s'est terminé **en succès**. Le script n'avait
 donc **jamais tourné sur un agent** : ni ses dépendances, ni son accès réseau, ni la présence de
-son interpréteur n'avaient été éprouvés. Le premier passage réel aurait eu lieu **quinze jours plus
+son interpréteur n'avaient été éprouvés. Le premier passage réel aurait eu lieu **15 jours plus
 tard**, au moment précis où l'on compte dessus. Après ajout d'un paramètre d'exécution forcée
 — distinct de la cadence, qui n'a pas changé — le mécanisme a tourné pour de vrai : trois contrôles
 rendus, tous verts, en 40 secondes.
@@ -296,7 +296,7 @@ déclarées hors jugement, pas jugées vertes.
 
 **Le fait, mesuré le 14/09/2026 chez un produit.** Un correctif réussi sur un environnement a été
 écrit comme geste à jouer sur un second, où il était infaisable : 161 adresses de sortie contre une
-seule. Rien ne distinguait ce geste DÉDUIT d'un geste ÉPROUVÉ (TF-1116). Sur dix lignes d'un
+seule. Rien ne distinguait ce geste DÉDUIT d'un geste ÉPROUVÉ (TF-1116). Sur 10 lignes d'un
 inventaire de suppression, aucune ne portait la vérification qui prouve que rien n'a rompu, alors
 qu'une suppression d'infrastructure casse à retardement (TF-1118). Et l'inventaire des composants
 restait conforme un mois entier pendant que le parc changeait de moitié : sept noms de l'export
@@ -411,7 +411,7 @@ poussée sur la branche principale déclenche des contrôles, l'hébergeur n'ins
 une vérification de production **se place sur le commit déclencheur** — pas sur la tête de branche —
 attend que l'URL publique serve **cette** version, et rejoue les contrôles décisifs dans un vrai
 navigateur. Ce dernier garde-fou existe parce qu'un incident du **15/08/2026** l'a exigé : une
-poussée réussie n'avait rien déployé, et la production a servi l'ancienne version **cinq minutes**
+poussée réussie n'avait rien déployé, et la production a servi l'ancienne version **5 minutes**
 sans qu'aucun signal ne le dise.
 
 **La route standard fabriquait donc une non-conformité permanente pour un produit qui fait mieux
@@ -442,7 +442,7 @@ s'applique : **on ne panache pas.**
    l'incident du 15/08.
 3. **Les preuves M-1 à M-7 restent dues, à l'identique.** Elles vivent dans le run plutôt que dans
    un dossier rédigé, et le run doit les rendre **récupérables** : un journal effacé au bout de
-   trente jours n'est pas une preuve opposable. Le rollback (M-4) reste écrit ET exercé — §2 bis
+   30 jours n'est pas une preuve opposable. Le rollback (M-4) reste écrit ET exercé — §2 bis
    ne bouge pas d'une ligne.
 4. **La variante est DÉCLARÉE au brief produit**, au même titre que la cible de déploiement, et
    consignée au ledger à l'ouverture du run. Jamais improvisée en cours de route : un produit qui
@@ -470,7 +470,7 @@ par le pilot, et le déclarer vaut mieux que de laisser croire l'inverse.
 ## 4 ter. Piloter Railway — le mode d'emploi qui se reperdait à chaque session (TF-0704, 0705, 0706, 0735)
 
 Railway est la cible cloud la plus fréquente du parc, et son mode d'emploi a été payé QUATRE
-fois avant d'être écrit ici : un domaine anonyme laissé onze jours en production, une campagne
+fois avant d'être écrit ici : un domaine anonyme laissé 11 jours en production, une campagne
 de tests qui a audité la mauvaise application, deux impasses de diagnostic en une session, et
 un déploiement déclaré « bloqué, geste humain requis » pendant qu'un jeton valide vivait sur le
 poste. Quatre faits, une cause : le principe vivait dans la mémoire des sessions.
@@ -483,7 +483,7 @@ poste. Quatre faits, une cause : le principe vivait dans la mémoire des session
   **Une impossibilité d'accès ne se déclare qu'après avoir tenté ce repli** : le contrôle
   d'entrée de l'étape échoue TÔT avec « jeton absent, attendu à `<emplacement>` » plutôt que de
   laisser la session conclure au geste humain — l'épisode du 31/08 a coûté un aller-retour
-  humain complet et une entrée de ledger fausse pour un déploiement qui a réussi trente minutes
+  humain complet et une entrée de ledger fausse pour un déploiement qui a réussi 30 minutes
   plus tard avec le jeton du poste.
 - **Le CLI ne sert qu'à téléverser** (TF-0704). `railway service` ne sait ni renommer un
   service ni corriger un domaine ; tout le reste passe par l'API GraphQL —

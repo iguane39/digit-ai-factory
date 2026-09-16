@@ -52,7 +52,7 @@ Trois destinataires, jamais confondus :
 | **FORGE(S)** | la règle, l'oracle, le périmètre à corriger | bloc f (lot sidecar) |
 | **PILOT** | ce qui relève de la doctrine ou du registre | candidats TF |
 
-Chaque solution porte son coût et ce qu'elle exclut. Une solution qui touche trois forges
+Chaque solution porte son coût et ce qu'elle exclut. Une solution qui touche 3 forges
 ou crée un objet durable déclenche l'étude d'opportunité (TF-0155) avant décision.
 
 ## Bloc e — Correctif et release, par la voie du produit

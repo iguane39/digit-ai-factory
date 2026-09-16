@@ -111,8 +111,8 @@ Contrat repris de `digit-ai-forge-agents/.claude/skills/forge-agents/scripts/led
 - **Écrivain unique : l'orchestrateur.** Les agents d'étape ne touchent jamais le ledger (défaut
   de verrou concurrent connu dans `ledger.mjs`, consigné au backlog). Ils rendent leurs résultats,
   l'orchestrateur consigne.
-- **Deux sessions le même jour sont le cas NORMAL d'un produit actif, pas l'exception (TF-0794 —
-  03/09/2026).** Mesuré le 01/09 chez le produit 02 : deux sessions légitimes ont calculé leur `seq`
+- **2 sessions le même jour sont le cas NORMAL d'un produit actif, pas l'exception (TF-0794 —
+  03/09/2026).** Mesuré le 01/09 chez le produit 02 : 2 sessions légitimes ont calculé leur `seq`
   depuis la même queue → deux seq 76 et deux seq 77, `ts` exacts et ordonnés, aucune ligne réécrite.
   Trois clauses en découlent : (1) **le `ts` est la clé d'ordre**, le `seq` dit la continuité d'append
   et se relit dans la queue du fichier IMMÉDIATEMENT avant un append écrit en UN SEUL appel — jamais
@@ -251,7 +251,7 @@ une voie de promotion et laissé la seconde ouverte (TF-0298).
 
 **Ce qui fait tenir la convention n'est pas le format, c'est le registre** : `oracle-empreintes`
 compare la table des sites déclarés à ce que le parc contient, et **un site non déclaré est un
-constat**. Sept items du registre relevaient de cette classe et ont été traités un par un, dont
+constat**. 7 items du registre relevaient de cette classe et ont été traités un par un, dont
 deux redécouvertes strictes du même défaut : sans contrôle, le sixième mécanisme naîtrait comme les
 cinq premiers. Joué à chaque recette du pilot sur le parc réel (I4).
 
@@ -304,7 +304,7 @@ comparative — un a priori jamais confronté. Protocole, appliqué à toute cam
    « aucune »** — l'absence d'escalade est une donnée, pas un silence.
 2. **Tranches comparables** : dès qu'une campagne comporte ≥ 2 tranches de nature équivalente
    (même type de correctif, dépôts différents), affecter A→Sonnet et B→Opus et comparer coût
-   par tranche **à qualité égale** (vérification native verte dans les deux cas).
+   par tranche **à qualité égale** (vérification native verte dans les 2 cas).
 3. **Verdict** : si Sonnet tient la qualité sur une classe de tâche, le tableau §4 est amendé
    (la classe descend d'un cran) ; si une escalade se répète sur une classe, elle monte. Toute
    modification du tableau cite ses mesures.

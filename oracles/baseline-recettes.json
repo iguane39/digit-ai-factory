@@ -104,7 +104,7 @@
   "vu_le": "2026-08-26"
  },
  "oracle-ecriture.mjs": {
-  "cas": 7,
+  "cas": 16,
   "vu_le": "2026-09-16"
  },
  "oracle-empreintes.mjs": {
@@ -297,6 +297,10 @@
  "scripts/balayer-motifs-numeriques.test.mjs": {
   "cas": 9,
   "vu_le": "2026-08-26"
+ },
+ "scripts/convertir-nombres-en-chiffres.mjs": {
+  "cas": 11,
+  "vu_le": "2026-09-16"
  },
  "scripts/fusionner-tables-confidentielles.test.mjs": {
   "cas": 6,

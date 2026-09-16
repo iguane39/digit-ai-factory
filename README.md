@@ -9,10 +9,10 @@ verifie_le: 2026-08-20
 > puis déroule [references/ACCUEIL.md](references/ACCUEIL.md). N'improvise pas.
 
 La **factory** de l'écosystème forge Digit-AI — son projet de pilotage. **Un seul point de démarrage** pour construire
-un produit en mobilisant les treize forges bout en bout, et pour les améliorer par itérations
+un produit en mobilisant les 13 forges bout en bout, et pour les améliorer par itérations
 bornées.
 
-**Les treize forges** — pipeline : [forge-conception](https://github.com/iguane39/digit-ai-forge-conception) ·
+**Les 13 forges** — pipeline : [forge-conception](https://github.com/iguane39/digit-ai-forge-conception) ·
 [forge-design](https://github.com/iguane39/digit-ai-forge-design) ·
 [forge-development](https://github.com/iguane39/digit-ai-forge-development) ·
 [forge-tests](https://github.com/iguane39/digit-ai-forge-tests) — transverses :
@@ -44,7 +44,7 @@ artefacts d'étapes, code — vit dans le projet produit.
 
 **Amorçage manuel** (équivalent de la phase 0) : cloner ce dépôt puis `node bootstrap.mjs --pull`
 — vérifie les prérequis (git, node ≥ 18 ; `gh` facultatif), met à jour **le pilot lui-même**,
-clone ou met à jour les treize forges en dépôts frères (`core.longpaths` activé : les noms de
+clone ou met à jour les 13 forges en dépôts frères (`core.longpaths` activé : les noms de
 fichiers des forges dépassent MAX_PATH sinon), renomme sur place un dossier hérité d'un ancien
 nom, **propage les skills versionnés vers `~/.claude/skills`**, contrôle les points d'entrée et
 **affiche la version de chaque dépôt** (tag, sha, date, retard sur origin). Il ne dit
@@ -87,7 +87,7 @@ Ce que chaque forge sait faire aujourd'hui — extrait de la source unique [cata
 
 <!-- CATALOGUE:FIN -->
 
-## Prompts d'usage — deux lignes, copier-coller strict
+## Prompts d'usage — 2 lignes, copier-coller strict
 
 Chaque bloc se colle **tel quel** dans une session Claude Code ouverte **dans le dossier du
 produit** — zéro modification, zéro mécanique. Toute l'intelligence vit dans le dépôt :

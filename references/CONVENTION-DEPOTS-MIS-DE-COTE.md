@@ -12,10 +12,10 @@ verifie_le: 2026-08-25
 `^digit-ai` que tous les balayages emploient — **une fois, à un seul endroit** — au lieu d'être
 écarté nommément dans chaque contrôle.
 
-## Le fait qui l'a produite, et il a coûté deux fois
+## Le fait qui l'a produite, et il a coûté 2 fois
 
 Le 23/08/2026, un clone **périmé** du dépôt renommé en `forge-seo-geo` vivait encore dans le parc :
-même dépôt distant, trois commits de retard. Il avait été contourné **par son nom** dans un seul
+même dépôt distant, 3 commits de retard. Il avait été contourné **par son nom** dans un seul
 oracle (`^digit-ai-forge-seo$`). Conséquence mesurée : tous les autres balayages le comptaient comme
 un dépôt **vivant** — le contrôle des promesses annonçait « 16 dépôts » pour 15 et lisait 26 fichiers
 de trop. *Un contournement local règle le symptôme là où on regarde et laisse la cause fausser tout
@@ -40,7 +40,7 @@ aucune cible**, donc des règles mortes qui donnaient l'illusion d'une protectio
 - `oracles/resoudre-pilot.mjs` continue de l'examiner, parce qu'une copie du pilot porte une
   signature indiscernable de l'original. C'est le marqueur **`PERIME.md`** à la racine du dépôt qui
   l'écarte, pas son nom — un fichier, pas une convention de nommage, parce que le résolveur doit
-  pouvoir se tromper *bruyamment* plutôt que choisir en silence entre deux dépôts qui se ressemblent.
+  pouvoir se tromper *bruyamment* plutôt que choisir en silence entre 2 dépôts qui se ressemblent.
 
 ## Le geste, en pratique
 

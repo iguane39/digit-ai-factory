@@ -3,7 +3,7 @@
 Référence chargée à la demande depuis le noyau. Elle existe parce qu'un livrable `.pptx` a été
 ENTIÈREMENT REFAIT après le verdict de son destinataire — « ne respecte pas DU TOUT la charte du
 document fourni en entrée » — et qu'un second a été refusé à l'ouverture par PowerPoint
-(TF-0686, TF-0687, TF-0688, lots Produit-11 des 27-28/08/2026). Les trois défauts avaient la
+(TF-0686, TF-0687, TF-0688, lots Produit-11 des 27-28/08/2026). Les 3 défauts avaient la
 même racine : produire AVANT d'avoir relevé, et remettre AVANT d'avoir contrôlé.
 
 ## Le relevé de charte : trois gestes, AVANT d'écrire une ligne (TF-0687)
@@ -47,7 +47,7 @@ comme le produit du cas réel appelle déjà `oracles/verifier-pdf.mjs`. Le cont
 
 ## La destination et le nom : réglés ailleurs, rappelés ici
 
-Deux règles voisines complètent la chaîne, chacune chez elle : la destination — `input\` en
+2 règles voisines complètent la chaîne, chacune chez elle : la destination — `input\` en
 LECTURE SEULE pour tout producteur, le livrable va sous `output\` dans le sous-dossier
 existant (TF-0688, règle 1 de `REGLES-PROJET.md`) — et l'indice du nom de sortie, alloué par
 `scripts/allouer-indice.mjs` (TF-0691) au lieu d'une constante dans le générateur.

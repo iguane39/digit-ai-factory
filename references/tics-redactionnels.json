@@ -256,11 +256,23 @@
     "source": "retour humain du 15/09/2026, mot pour mot : « Les développeurs IA ne sont pas des codeurs, les lignes de code affichées doivent donc l'être uniquement si cela est strictement nécessaire. Pour voir les trigrammes déjà pris, pas la peine de code \"az repos list...\", un simple check sur l'URL du repo suffit. » Mesure du même jour : 18 blocs de code dans le livrable, 4 commandes de console, 14 blocs qui se recopient et qu'aucun retour n'a contestés.",
     "pourquoi_le_lecteur_et_pas_le_bloc": "Juger le bloc seul rendrait la règle fausse dans les deux sens : un runbook d'exploitation DOIT porter ses commandes, un guide de conception n'en porte aucune. Ce qui change, c'est le lecteur — la règle se branche donc sur la déclaration que les gabarits portent déjà, au lieu d'inventer une heuristique sur le contenu.",
     "invocations": [
-      {"motif": "^\\s*(?:\\$|>|#)\\s+\\S", "source": "invite de commande explicite", "depuis": "2026-09-16"},
-      {"motif": "^\\s*(?:sudo\\s+)?(?:node|npm|npx|pnpm|yarn|git|python|python3|pip|az|aws|gcloud|docker|kubectl|terraform|curl|wget|ssh|scp|bash|sh|powershell|pwsh|dotnet|mvn|gradle|make|cargo|go|psql|mysql|sqlcmd)\\b", "source": "invocation d'outil en ligne de commande", "depuis": "2026-09-16"}
+      {
+        "motif": "^\\s*(?:\\$|>|#)\\s+\\S",
+        "source": "invite de commande explicite",
+        "depuis": "2026-09-16"
+      },
+      {
+        "motif": "^\\s*(?:sudo\\s+)?(?:node|npm|npx|pnpm|yarn|git|python|python3|pip|az|aws|gcloud|docker|kubectl|terraform|curl|wget|ssh|scp|bash|sh|powershell|pwsh|dotnet|mvn|gradle|make|cargo|go|psql|mysql|sqlcmd)\\b",
+        "source": "invocation d'outil en ligne de commande",
+        "depuis": "2026-09-16"
+      }
     ],
     "lecteurs_executants": [
-      {"motif": "exploitant|astreinte|run\\b|ops\\b|sre\\b|administrateur|devops|int[ée]grateur|d[ée]veloppeur(?!s? (?:ia|assist))", "pourquoi": "un lecteur dont le métier EST d'exécuter : la commande lui épargne une traduction, elle ne lui en impose pas", "depuis": "2026-09-16"}
+      {
+        "motif": "exploitant|astreinte|run\\b|ops\\b|sre\\b|administrateur|devops|int[ée]grateur|d[ée]veloppeur(?!s? (?:ia|assist))",
+        "pourquoi": "un lecteur dont le métier EST d'exécuter : la commande lui épargne une traduction, elle ne lui en impose pas",
+        "depuis": "2026-09-16"
+      }
     ],
     "non_juge": [
       "la NÉCESSITÉ d'une commande donnée : la règle dit à qui elle s'adresse, elle ne dit pas si celle-là valait la peine",
@@ -430,7 +442,7 @@
       "virgule"
     ],
     "non_juge": [
-      "un nombre en TÊTE DE PHRASE, où l'usage français préfère la lettre : la règle ne regarde pas la position",
+      "la POSITION dans la phrase : un nombre en tête de phrase est jugé comme les autres. Un premier jet l'exemptait au nom de l'usage français ; l'exemption est retirée le 16/09/2026, la consigne humaine ne portant pas cette nuance et le juge ne l'ayant jamais implémentée — une règle que son juge ignore n'existe pas",
       "une valeur écrite en lettres dont le dénombrable est absent de la liste — celle-ci est FERMÉE et se remplit à l'usage, comme le référentiel de jargon",
       "les citations : un retour humain ou une sortie d'outil reproduits tels quels gardent leur forme, et la règle ne lit pas ce qui vit entre accents graves"
     ]

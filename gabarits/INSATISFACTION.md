@@ -31,7 +31,7 @@ COMMENT ÇA MARCHE (tu n'as rien à faire de plus)
      produit sur lequel le run travaille — celui du dossier où vit ce run, dont le dépôt distant
      est ÉCRIT dans `docs\projet\COMPOSANTS-OPS.md` (« Dépôt de code du produit »). Le 06/09,
      une session parallèle a déposé quatre lots dans un dépôt distant VIDE au nom différent, avec
-     son propre socle : deux socles à réconcilier, et un import manuel de quatre fichiers. Un lot
+     son propre socle : deux socles à réconcilier, et un import manuel de 4 fichiers. Un lot
      déposé ailleurs que chez son produit n'est pas un lot, c'est une copie perdue.
 
   2. Tu n'écris JAMAIS le protocole. Pas de « étudie pourquoi », pas de « propose des

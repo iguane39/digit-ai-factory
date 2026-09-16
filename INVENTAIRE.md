@@ -2,7 +2,7 @@
 verifie_le: 2026-08-23
 ---
 
-# Inventaire des treize forges — 2026-08-04 · màj 2026-08-12 · vérifié le 2026-08-20 (RF-2 : passage conductor corrigé ; préséance : le code lu prime, puis CONTRAT-INTERFACE §5, puis ce document) (TF-0113 fraîcheur ; TF-0111/0112/0123 : +agents-security, +observability, +websec)
+# Inventaire des 13 forges — 2026-08-04 · màj 2026-08-12 · vérifié le 2026-08-20 (RF-2 : passage conductor corrigé ; préséance : le code lu prime, puis CONTRAT-INTERFACE §5, puis ce document) (TF-0113 fraîcheur ; TF-0111/0112/0123 : +agents-security, +observability, +websec)
 
 Synthèse issue de cinq explorations exhaustives (une par projet, fichiers cités vérifiés sur disque).
 Chaque forge est décrite selon : rôle, point d'entrée réel, entrées, sorties, oracles, maturité, manques pour l'orchestration.
@@ -226,7 +226,7 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
 - **Rôle** : **discipline de la donnée** des runs — la qualité en assertions exécutables
   (**profiler**), le lineage déclaré complet (**tracer**), les chiffres ancrés à leurs
   sources (**restituer**), l'accord producteur↔consommateur scellé (**contractualiser**,
-  TF-0108 du 12/08). Quatre oracles au niveau de quatre barres/standards (registre
+  TF-0108 du 12/08). 4 oracles au niveau de quatre barres/standards (registre
   la-barre) : Great Expectations, OpenLineage (grain colonne), dbt-core, ODCS v3.1.
 - **Frontière (verdict de non-recouvrement, phase 1 TF-0083)** : composition stricte — le
   profiling de datasets reste à `data-quality-auditor` (appelé), la police des montants
@@ -265,7 +265,7 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
 - **Rôle** : **observabilité continue** — surveiller ENTRE les runs ce que tout le reste de
   l'écosystème ne vérifie qu'en one-shot. Socle déclaratif `plan-observation@1` (sondes
   commande / oracle_externe / rapport_json / manuel), snapshots JSONL append-only, détection
-  de dérive (seuils, régression de verdict, disparition de sonde). Trois volets : data
+  de dérive (seuils, régression de verdict, disparition de sonde). 3 volets : data
   (prouvé sur fixture), tests (prouvé), veille citation IA (**déclaré**, méthode manuelle
   documentée). Elle observe et alerte, ne corrige jamais.
 - **Point d'entrée réel** : `node scripts\observer.mjs <plan.json>` ·
