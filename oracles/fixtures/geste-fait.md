@@ -12,7 +12,7 @@ La publication est faite : la version corrigée est partie vers le dépôt dista
 >
 > **Recommandation : (b).** Source consultée : `references\ETAPES-RUN.md` — un enchaînement de forge se prend en début de tour, jamais après un geste de publication.
 
-| Option | Ce qu'elle coûte | Ce qu'elle exclut |
+| Option | Coût | Exclusions |
 |---|---|---|
 | (a) enchaîner ce soir | une session longue | un état stable pour la nuit |
 | (b) reprendre demain matin | une demi-journée de décalage | l'avance prise ce soir |

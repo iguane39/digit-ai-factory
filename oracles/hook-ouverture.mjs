@@ -284,6 +284,43 @@ if (iPilot < 0) {
   }
 }
 
+// D-6 (a), 14/09/2026 — UN CONSTAT QUE PERSONNE NE LIT N'EST PAS UN CONSTAT (classe
+// constat-non-bloquant-jamais-lu). `oracle-secrets-hors-perimetre` est joué au hook Stop, qui
+// n'affiche rien quand il ne bloque pas ; ses constats sur les produits sortent en 0 par
+// construction et n'atteignaient aucun lecteur — mesuré le 14/09 : 11 porteurs hors dépôt et 3
+// dans des dépôts qui ne les ignorent pas, dont des publiés, relus à chaque fin de tour depuis sa
+// pose sans que personne les voie. L'ouverture les RELIT et les dit, en COMPTES seulement : jamais
+// un chemin ni une valeur (porte des noms) ; le détail se lit à la demande. Même section : l'état
+// du registre de dette du pilot (D-8 (a)), qui sinon ne serait lu par personne (loi n° 1).
+if (iPilot < 0) {
+  const os = join(PILOT, "oracles", "oracle-secrets-hors-perimetre.mjs");
+  if (existsSync(os)) {
+    lignes.push("", "## Secrets hors périmètre (D-6 (a), classe constat-non-bloquant-jamais-lu)");
+    const r = spawnSync(process.execPath, [os], { encoding: "utf8", cwd: PILOT, timeout: 90000 });
+    let j = null;
+    try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* dit ci-dessous */ }
+    if (!j) lignes.push(`- verdict ILLISIBLE (exit ${r.status}) — ce n'est pas un constat sur les secrets : ${(r.stderr || "").trim().slice(0, 160)}`);
+    else if (j.verdict === "PASS") lignes.push("- aucun porteur de secret hors périmètre.");
+    else {
+      for (const f of (j.findings || []).filter((x) => x.statut === "FAIL")) {
+        const n = (String(f.message).match(/^\s*(\d+)/) || [])[1] || "?";
+        lignes.push(`- ${f.regle} : ${n} porteur(s) ${f.regle === "SP2" ? "DANS un dépôt qui ne les ignore pas — le plus grave : publiés ; seule une ROTATION de l'identifiant réduit le risque" : "hors de tout dépôt, ni ignorés ni suivis"}`);
+      }
+      lignes.push("- À TRAITER : rotation des identifiants publiés (geste humain, console de chaque fournisseur), puis rangement ; détail, chemins compris : node oracles/oracle-secrets-hors-perimetre.mjs");
+    }
+  }
+  const rd = join(PILOT, "todo", "registre-dette.json");
+  if (existsSync(rd)) {
+    try {
+      const d = JSON.parse(readFileSync(rd, "utf8"));
+      const c = {};
+      for (const e of d.entrees || []) c[e.statut] = (c[e.statut] || 0) + 1;
+      lignes.push("", "## Registre de dette du pilot (D-8 (a), 14/09/2026)",
+        `- ${c.assume || 0} limite(s) assumée(s), ${c.todo || 0} reste(s) à instruire — todo\\registre-dette.json`);
+    } catch (e) { lignes.push("", "## Registre de dette du pilot", `- ILLISIBLE : ${e.message}`); }
+  }
+}
+
 // TF-0790 (décision D-2 (a), 03/09/2026) — LA CADENCE D'UN PLAN DE SURVEILLANCE EST TENUE PAR QUI
 // L'INVOQUE. forge-observability le dit elle-même : « la cadence est documentaire en v0 ». Sans
 // invocateur, le plan des récidives serait une intention de plus (N-1). L'ouverture du pilot joue
@@ -311,7 +348,7 @@ if (iPilot < 0) {
 
 lignes.push("",
   "## Gates actifs dans cette session (R-44)",
-  "- Tout message de fin de traitement — tour de TRAVAIL, verdict rendu, ou message de plus de 150 mots — suit gabarits\RESTITUTION.md — bloc 0 + 8 blocs, aucun omis. Bloc 3 : une décision par BLOC DE CITATION, ouverte par son sélecteur `D-N` et une QUESTION, rappel du sujet puis recommandation SOURCÉE, options en tableau `Option | Ce qu'elle coûte | Ce qu'elle exclut` hors citation, ligne de repli « si rien n'est décidé » pour finir. Bloc 8 : UN TABLEAU unique, l'acteur en COLONNE (auto_ia/manuelle_dev/manuelle_utilisateur), trié auto_ia d'abord, chaque action ouverte par son sélecteur `A-N` — les deux familles ne partagent JAMAIS la même numérotation. Effort en complexité × durée, jamais en jours. v2.18.0 (08/09) : le VERDICT que tu affiches mesure ce que le fichier jugé mesure — un tour qui n'apporte qu'un delta REDÉPOSE la synthèse à jour et affiche celle-là, il ne retouche pas l'écran seul ; un tour qui n'apporte rien de neuf rend un accusé bref, pas une restitution de plus. v2.17.0 (08/09) : ce que tu AFFICHES est le fichier jugé, jamais son résumé — les blocs 3 et 8 s'y reprennent en entier (tableau des options, sélecteurs A-N, acteurs du vocabulaire gelé) ; et un message final PORTANT UN VERDICT ou dépassant 150 mots est jugé même sans aucune écriture dans le tour. v2.16.0 (02/09) : aucune action manuelle_utilisateur ne demande à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation ; une correction restituée nomme son contrôle rouge → vert ou sa classe ; le fichier de synthèse se nomme Synthese ou Restitution — le marqueur `destinataire: humain` est réservé aux restitutions. Le hook Stop le juge par oracle-synthese et REFUSE l'arrêt en cas d'échec.",
+  "- Tout message de fin de traitement — tour de TRAVAIL, verdict rendu, ou message de plus de 150 mots — suit gabarits\RESTITUTION.md — bloc 0 + 8 blocs, aucun omis. Bloc 3 : une décision par BLOC DE CITATION, ouverte par son sélecteur `D-N` et une QUESTION, rappel du sujet puis recommandation SOURCÉE, options en tableau `Option | Coût | Exclusions` hors citation, ligne de repli « si rien n'est décidé » pour finir. Bloc 8 : UN TABLEAU unique, l'acteur en COLONNE (auto_ia/manuelle_dev/manuelle_utilisateur), trié auto_ia d'abord, chaque action ouverte par son sélecteur `A-N` — les deux familles ne partagent JAMAIS la même numérotation. Effort en complexité × durée, jamais en jours. v2.18.0 (08/09) : le VERDICT que tu affiches mesure ce que le fichier jugé mesure — un tour qui n'apporte qu'un delta REDÉPOSE la synthèse à jour et affiche celle-là, il ne retouche pas l'écran seul ; un tour qui n'apporte rien de neuf rend un accusé bref, pas une restitution de plus. v2.17.0 (08/09) : ce que tu AFFICHES est le fichier jugé, jamais son résumé — les blocs 3 et 8 s'y reprennent en entier (tableau des options, sélecteurs A-N, acteurs du vocabulaire gelé) ; et un message final PORTANT UN VERDICT ou dépassant 150 mots est jugé même sans aucune écriture dans le tour. v2.16.0 (02/09) : aucune action manuelle_utilisateur ne demande à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation ; une correction restituée nomme son contrôle rouge → vert ou sa classe ; le fichier de synthèse se nomme Synthese ou Restitution — le marqueur `destinataire: humain` est réservé aux restitutions. Le hook Stop le juge par oracle-synthese et REFUSE l'arrêt en cas d'échec.",
   "- Les README d'input\\ et output\\ se régénèrent après chaque écriture (hook PostToolUse) ; un rôle non rédigé est un défaut.",
   "- Quand la factory est impliquée, ses règles priment sur celles du projet (R-43).");
 console.log(lignes.join("\n"));

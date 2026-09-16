@@ -29,7 +29,7 @@ bref, jamais une restitution complète de plus. Précédente : **2.17.0, 08/09/2
 AFFICHÉ est le fichier jugé, et un verdict rendu sans écrire un fichier est une restitution**
 (TF-0891, TF-0904 — lot d'un produit du 07/09). Deux faits du même jour, une seule cause : le
 gate ne voyait pas ce que le lecteur lisait. **(1)** Un fichier `output\` jugé PASS S1-S37 a été
-PARAPHRASÉ à l'écran — bloc 3 rendu en prose sans le tableau `Option | Ce qu'elle coûte | Ce
+PARAPHRASÉ à l'écran — bloc 3 rendu en prose sans le tableau `Option | Coût | Ce
 qu'elle exclut` et sans option par défaut, bloc 8 avec « vous » et « IA » à la place des acteurs
 du vocabulaire gelé. Retour humain, mot pour mot : « Le prompt de sortie ne respecte pas le format
 attendu pour 3 & 8, pourquoi ? » *Un fichier PASS n'a protégé aucun lecteur* : les consignes
@@ -88,7 +88,7 @@ pour finir — et **deux règles neuves l'arment** : **S31** (chaque option port
 qu'elle exclut) et **S32** (chaque décision nomme son option par défaut), deux exigences écrites
 depuis le 13/08 et restées sans juge. **S30** admet la forme au tiret « D-5 — », qu'elle
 REFUSAIT. Précédente : **2.12.0, 30/08/2026** : la **forme par
-défaut du bloc 3 est le tableau d'options** (`Option` / `Ce qu'elle coûte` / `Ce qu'elle exclut`),
+défaut du bloc 3 est le tableau d'options** (`Option` / `Coût` / `Exclusions`),
 les trois autres mises en page restant admises — retour humain du 30/08, « le nouveau prompt de
 résultat a ce format là, pourquoi n'est-il pas appliqué sur ce projet ? », deux restitutions
 conformes dont l'écart de forme s'est lu comme un écart de version. Précédente : **2.11.0, 28/08/2026** (règle **S30** :
@@ -662,7 +662,7 @@ approché de mémoire, et c'est ce qui a fait durer le sujet.
 > **Recommandation : (a).** Source consultée : <le document d'où sort la réponse proposée>.
 > <pourquoi cette option et pas les autres>
 
-| Option | Ce qu'elle coûte | Ce qu'elle exclut |
+| Option | Coût | Exclusions |
 |---|---|---|
 | **(a)** … | … | … |
 | **(b)** … | … | … |
@@ -698,7 +698,7 @@ Cinq points, et chacun a sa raison :
    s'arrête là ; celui qui veut vérifier lit le tableau. L'inverse l'oblige à traverser trois
    options pour découvrir laquelle on lui propose.
 4. **Le tableau porte les options, jamais l'instruction.** Trois colonnes, dans cet ordre :
-   `Option` · `Ce qu'elle coûte` · `Ce qu'elle exclut`. Le coût s'écrit en complexité × durée ou
+   `Option` · `Coût` · `Exclusions`. Le coût s'écrit en complexité × durée ou
    en effet concret, **jamais en jours** (S10). Contrôle : **S31**.
 5. **La ligne de repli ferme la décision.** Ne pas trancher est une option, et elle s'applique
    toujours : la taire fait croire que ne rien faire est sans effet. Contrôle : **S32**.
@@ -712,7 +712,7 @@ interdit depuis le 24/08.
 *Le retour qui fait naître cette clause est, une fois de plus, la mesure elle-même.* Le 30/08, le
 destinataire compare deux restitutions rendues à deux jours d'écart sur deux dépôts de
 l'écosystème : l'une pose ses options en **tableau** — une ligne par option, trois colonnes
-`Option` / `Ce qu'elle coûte` / `Ce qu'elle exclut` —, l'autre les pose en **puces filles**. Sa
+`Option` / `Coût` / `Exclusions` —, l'autre les pose en **puces filles**. Sa
 question, mot pour mot : *« le nouveau prompt de résultat a ce format là, pourquoi n'est-il pas
 appliqué sur ce projet ? »* Les deux étaient conformes, et c'est précisément le problème : **le
 lecteur a lu une différence de forme comme une différence de version.**
@@ -720,7 +720,7 @@ lecteur a lu une différence de forme comme une différence de version.**
 Les quatre mises en page restent ADMISES — TF-0568 tient, et sa raison n'a pas changé. Ce qui
 s'ajoute est un **défaut** au sens propre : à contenu égal, on rend le tableau.
 
-| Option | Ce qu'elle coûte | Ce qu'elle exclut |
+| Option | Coût | Exclusions |
 |---|---|---|
 | **(a)** l'option, en gras, une ligne | son coût, en complexité × durée ou en effet | ce que la retenir ferme |
 

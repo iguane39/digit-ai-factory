@@ -2235,7 +2235,7 @@ Aucun écart : la demande a été suivie à la lettre.
     // et l'élargissement des localisateurs. Si l'une des deux se défait, S16 tombe ici.
     "> **Recommandation : (a).** Source consultée : la chaîne d'intégration .github/workflows/recette.yml, dont le dernier passage ne porte aucun défaut ouvert.",
     "",
-    "| Option | Ce qu'elle coûte | Ce qu'elle exclut |",
+    "| Option | Coût | Exclusions |",
     "|---|---|---|",
     "| **(a)** Taguer v1.12.0 maintenant | Effort simple × court | Exclut de grouper cette sortie avec le prochain lot |",
     "| **(b)** Attendre le prochain lot | Les 26 commits restent locaux | Exclut la publication cette semaine |",

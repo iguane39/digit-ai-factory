@@ -596,6 +596,34 @@ check("rouge R13 : classe hors référentiel → FAIL exit 1, règle nommée", (
   if (!/"regle": "R13",\s*"statut": "FAIL"/.test(r.sortie)) throw new Error("R13 absente des échecs");
 });
 
+// ── R15 (D-3 (c), 16/09/2026) : le CLIQUET des familles sans porteur exécutable ──────────────
+// Trois sens, et le troisième est celui qui fait tenir la règle : une famille NEUVE sans juge
+// échoue, la MÊME famille avec un juge passe, et une famille ANTÉRIEURE au seuil sans juge passe
+// aussi — sans ce dernier cas, le cliquet mettrait 28 familles au rouge du jour au lendemain, et
+// la leçon N4 du noyau dit ce qui arrive ensuite : le contrôle est désactivé dans la semaine.
+const classesR15 = join(T, "CLASSES-R15.json");
+const lanceR15 = (classes) => {
+  writeFileSync(classesR15, JSON.stringify({ classes }), "utf8");
+  const r = spawnSync("node", [oracle, join(T, "vide.jsonl"), join(T, "vide.jsonl"), "--classes", classesR15], { encoding: "utf8" });
+  return { code: r.status, sortie: String(r.stdout || "") };
+};
+const FAMILLE_NEUVE = { cle: "defaut-invente-pour-la-recette", famille: "regle-morte", creee_le: "2026-09-20", fondee_par: [] };
+check("rouge R15 : une famille CRÉÉE après le cliquet, sans porteur exécutable → FAIL exit 1, famille nommée", () => {
+  const r = lanceR15([{ ...FAMILLE_NEUVE, oracle: "à créer : un contrôle qui reste à écrire" }]);
+  if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1 : ${r.sortie.slice(0, 300)}`);
+  if (!/"regle": "R15",\s*"statut": "FAIL"/.test(r.sortie)) throw new Error("R15 absente des échecs");
+  if (!/defaut-invente-pour-la-recette/.test(r.sortie)) throw new Error("la famille en cause n'est pas nommée");
+});
+check("verte R15 : la MÊME famille neuve, avec un porteur qui existe → PASS exit 0", () => {
+  const r = lanceR15([{ ...FAMILLE_NEUVE, oracle: "pilot, oracles/oracle-todo.mjs R15" }]);
+  if (r.code !== 0) throw new Error(`exit ${r.code} attendu 0 : ${r.sortie.slice(0, 300)}`);
+});
+check("verte R15 : une famille ANTÉRIEURE au cliquet, sans porteur → PASS, et elle est COMPTÉE au non_juge", () => {
+  const r = lanceR15([{ ...FAMILLE_NEUVE, creee_le: "2026-09-03", oracle: "a creer par cas" }]);
+  if (r.code !== 0) throw new Error(`exit ${r.code} attendu 0 : ${r.sortie.slice(0, 300)}`);
+  if (!/1 antérieure\(s\) au cliquet/.test(r.sortie)) throw new Error("l'antériorité n'est pas comptée à voix haute");
+});
+
 // ── R14 (TF-0956, 14/09/2026) : un doublon STRICT se sort des mesures, ou il échoue ──
 // Le seuil est avancé au 01/09 pour la recette : un ts postérieur à l'heure d'exécution
 // tomberait sous R11, et la fixture échouerait pour une autre raison que celle qu'elle teste.

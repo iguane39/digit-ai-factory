@@ -440,7 +440,7 @@ export function juger(texte, options = {}) {
   // dans la DONNÉE (loi n° 4). Une famille sans ce champ n'est jugée que par EC-1, comme avant.
   //
   // LES EXEMPTIONS SONT DANS LA DONNÉE, DATÉES ET MOTIVÉES, jamais dans ce code : le tableau
-  // d'options du bloc 3 des restitutions IMPOSE « Ce qu'elle coûte » et « Ce qu'elle exclut », et
+  // d'options du bloc 3 des restitutions IMPOSE « Coût » et « Exclusions », et
   // trois juges les vérifient LITTÉRALEMENT. Les proscrire ici sans réécrire d'abord la doctrine
   // mettrait deux gardiens du même socle en contradiction — toute synthèse conforme au gabarit
   // échouerait ici, toute synthèse conforme ici serait refusée par le hook Stop.
@@ -452,9 +452,25 @@ export function juger(texte, options = {}) {
       const constats = [];
       for (const famille of bloquantes) {
         const exempte = (texte) => (famille.exemptions || []).some((e) => texte.includes(e.literal));
-        const regex = (famille.motifs || []).map((m) => new RegExp(m.motif, "giu"));
+        // LE MOTIF DE POSITION EST PLUS LARGE QUE CELUI DE DENSITÉ, et la mesure du 16/09 dit
+        // pourquoi : le motif de densité exige un verbe de contenance, et il ne voyait donc ni
+        // « Ce qu'elle coûte » ni « Ce qu'elle exclut ». En titre et en en-tête de colonne, la
+        // POSITION lève l'ambiguïté — aucun titre n'a besoin d'ouvrir par « Ce que » —, donc un
+        // motif large y est juste. Dans le corps, il crierait sur l'usage légitime, et la leçon N4
+        // dit ce qui arrive ensuite. Une famille sans `motifs_positions` garde son motif unique.
+        const regex = (famille.motifs_positions || famille.motifs || []).map((m) => new RegExp(m.motif, "giu"));
+        // `lastIndex` SE REMET À ZÉRO AVANT CHAQUE ESSAI, et pas seulement avant le premier : les
+        // expressions portent le drapeau global et sont partagées par tous les titres et toutes
+        // les cellules du document. Sans cette remise à zéro, la deuxième occurrence d'un même
+        // motif repart d'où la première s'était arrêtée et n'est jamais trouvée — défaut mesuré le
+        // 16/09 sur un motif ANCRÉ, où il rend la règle entièrement muette.
         const cherche = (texte) => {
-          for (const r of regex) { r.lastIndex = 0; const m = r.exec(texte); if (m) return m[0].trim(); }
+          for (const r of regex) {
+            r.lastIndex = 0;
+            const m = r.exec(texte);
+            r.lastIndex = 0;
+            if (m) return m[0].trim();
+          }
           return null;
         };
         for (let i = 0; i < horsCode.length; i++) {
@@ -860,15 +876,22 @@ function selfTest() {
     + "| Ce qu'elle apprend | Mesure |\n|---|---|\n| une ligne | une valeur |\n";
   const EC8_CORPS = "# Perimetre du guide\n\nCe paragraphe emploie la tournure dans son corps : "
     + "ce que le guide couvre est decrit ici, et cet emploi-la n'est pas un defaut de position.\n";
-  const EC8_EXEMPTE = "# Decision\n\nUn paragraphe de prose ordinaire qui pose le sujet avant le "
+  const EC8_GABARIT = "# Decision\n\nUn paragraphe de prose ordinaire qui pose le sujet avant le "
     + "tableau, comme le bloc 3 du gabarit de restitution le prescrit a chaque decision.\n\n"
-    + "| Option | Ce qu'elle coûte | Ce qu'elle exclut |\n|---|---|---|\n| (a) agir | rien | rien |\n";
+    + "| Option | Coût | Exclusions |\n|---|---|---|\n| (a) agir | rien | rien |\n";
+  // L'EXEMPTION EST LEVÉE (D-2 (a), 16/09/2026) : les 2 anciens libelles ne sont plus admis nulle
+  // part. Sans ce cas-la, rien ne prouverait la levee — un banc qui ne teste que la forme neuve
+  // serait vert avec l'exemption comme sans elle.
+  const EC8_ANCIENS = EC8_GABARIT.replace("| Option | Coût | Exclusions |",
+    "| Option | Ce qu'elle coûte | Ce qu'elle exclut |");
   const ec8r = jouer("ec8-rouge.md", EC8_ROUGE);
   const ec8c = jouer("ec8-corps.md", EC8_CORPS);
-  const ec8e = jouer("ec8-exempte.md", EC8_EXEMPTE);
+  const ec8e = jouer("ec8-gabarit.md", EC8_GABARIT);
+  const ec8a = jouer("ec8-anciens-libelles.md", EC8_ANCIENS);
   const f8r = (ec8r.j?.findings || []).find((f) => f.regle === "EC-8");
   const f8c = (ec8c.j?.findings || []).find((f) => f.regle === "EC-8");
   const f8e = (ec8e.j?.findings || []).find((f) => f.regle === "EC-8");
+  const f8a = (ec8a.j?.findings || []).find((f) => f.regle === "EC-8");
   if (f8r?.statut !== "FAIL" || !/titre/.test(f8r.message) || !/en-tête de colonne/.test(f8r.message))
     casse.push("EC-8 : une annonce nominalisee en TITRE et en EN-TETE DE COLONNE passe — c'est par ce "
       + `silence qu'un livrable de 11 pages a ete remis avec 6 titres et 20 en-tetes de cette forme (TF-1137) : ${JSON.stringify(f8r)}`);
@@ -876,8 +899,11 @@ function selfTest() {
     casse.push("EC-8 : la MEME tournure dans le CORPS est accusee — la regle porte sur la position, "
       + `pas sur le lexique, et un interdit lexical se fait desactiver dans la semaine (lecon N4) : ${JSON.stringify(f8c)}`);
   if (f8e?.statut !== "PASS")
-    casse.push("EC-8 : le tableau d'options que gabarits/RESTITUTION.md IMPOSE est refuse — ce juge et "
-      + `le hook Stop se contredisent alors sur toute synthese : ${JSON.stringify(f8e)}`);
+    casse.push("EC-8 : le tableau d'options que gabarits/RESTITUTION.md IMPOSE DEPUIS D-2 (a) est refuse — "
+      + `ce juge et le hook Stop se contrediraient alors sur toute synthese : ${JSON.stringify(f8e)}`);
+  if (f8a?.statut !== "FAIL")
+    casse.push("EC-8 : les 2 ANCIENS libelles du tableau d'options passent encore — l'exemption du "
+      + `16/09 devait etre LEVEE par D-2 (a), et un banc qui ne teste que la forme neuve ne le voit pas : ${JSON.stringify(f8a)}`);
 
   // 11, 12 et 13 (TF-1138) — EC-10, LE LECTEUR DECLARE. Trois sens : la commande REFUSEE quand le
   // lecteur n'execute pas, ADMISE quand il execute, et le document sans lecteur declare qui rend
@@ -943,7 +969,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test ${NOM} : ${casse.length} DEFAUT(S)\n - ${casse.join("\n - ")}`
-    : `Self-test ${NOM} : 16 cas, 0 défaut (16/16 PASS — rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138))`);
+    : `Self-test ${NOM} : 17 cas, 0 défaut (17/17 PASS — rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138))`);
   return casse.length ? 1 : 0;
 }
 

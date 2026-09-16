@@ -12,7 +12,7 @@ La publication de la version corrigée attend encore votre mot : tout est prêt 
 >
 > **Recommandation : (a).** Source consultée : `references\ETAPES-RUN.md` — le journal `recette.md` ne porte aucun défaut ouvert, et la règle de publication y est écrite.
 
-| Option | Ce qu'elle coûte | Ce qu'elle exclut |
+| Option | Coût | Exclusions |
 |---|---|---|
 | (a) pousser maintenant | nul | un dernier regard humain |
 | (b) pousser demain matin | un poste périmé une nuit | la mise à disposition immédiate |

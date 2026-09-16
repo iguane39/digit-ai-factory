@@ -221,7 +221,7 @@ try {
   // Les trois sens se jouent sur le MÊME fichier de référence, seule la paraphrase change.
   const FICHIER = BON.replace(
     "  - (a) pousser maintenant — coût nul, exclut un dernier regard humain ; recommandé : le journal `recette.md` ne porte aucun défaut ouvert.",
-    "\n| Option | Ce qu'elle coûte | Ce qu'elle exclut |\n|---|---|---|\n| (a) pousser maintenant | nul | un dernier regard humain |\n| (b) pousser demain | un poste périmé une nuit | la mise à disposition immédiate |\n");
+    "\n| Option | Coût | Exclusions |\n|---|---|---|\n| (a) pousser maintenant | nul | un dernier regard humain |\n| (b) pousser demain | un poste périmé une nuit | la mise à disposition immédiate |\n");
   if (comparerAffiche(FICHIER, FICHIER).length)
     echecs.push(`10 : le fichier comparé à LUI-MÊME rend un écart — la règle accuserait un affichage fidèle : ${comparerAffiche(FICHIER, FICHIER).join(" | ")}`);
 
