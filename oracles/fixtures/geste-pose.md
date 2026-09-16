@@ -8,7 +8,7 @@ La publication de la version corrigée attend encore votre mot : tout est prêt 
 
 ## 3. Décisions attendues
 
-> **D-11 — Publier maintenant la version corrigée du démarrage, ou attendre demain matin ?** Le contrôle vient de passer en entier sur un clone frais, donc la version est prête ; la seule question est de savoir si on la met à disposition des autres postes tout de suite, ou si on garde une nuit pour un dernier regard humain avant qu'elle ne circule.
+> **D-11 — Publier maintenant la version corrigée du démarrage, ou attendre demain matin ?** Le contrôle de `bootstrap.mjs` vient de passer en entier sur un clone frais, donc la version est prête ; la seule question est de savoir si on la met à disposition des autres postes tout de suite, ou si on garde une nuit pour un dernier regard humain avant qu'elle ne circule.
 >
 > **Recommandation : (a).** Source consultée : `references\ETAPES-RUN.md` — le journal `recette.md` ne porte aucun défaut ouvert, et la règle de publication y est écrite.
 

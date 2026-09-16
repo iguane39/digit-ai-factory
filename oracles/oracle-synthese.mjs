@@ -1523,6 +1523,67 @@ function juger(texte, cheminJuge = null) {
           (chapeauCommun ? ` (chapeau commun de ${motsPreambule} mots en tête du bloc : le rappel par décision se limite au delta)` : ""));
   }
 
+  // ---- S47 (retour humain du 16/09/2026) — UNE DÉCISION NOMME LA CHOSE DONT ELLE PARLE -------
+  //
+  // LE RETOUR EST LA MESURE, mot pour mot : « D-1, on ne comprend absolument rien au charabia, ce
+  // n'est pas clair, c'est flou, exactement ce que j'ai demandé de ne plus faire dans la
+  // communication. » La décision en cause demandait de trancher le sort d'un nom de dépôt qui
+  // ferme la porte de publication — SANS jamais écrire ce nom. Trois périphrases à la place :
+  // « un nom de dépôt de l'écosystème », « cet objet », « qui figure aussi dans la table des noms
+  // interdits ».
+  //
+  // LA CAUSE, et elle est instructive. La règle d'anonymisation protège les noms de clients dans
+  // tout fichier suivi, et une synthèse EST un fichier suivi. Pour ne pas écrire le nom, l'agent a
+  // tourné autour — et a produit une question inutilisable sur le dépôt de l'utilisateur LUI-MÊME.
+  // Une règle qui protège un tiers a empêché de parler clairement au propriétaire de la chose.
+  //
+  // POURQUOI LES CINQ RÈGLES DU BLOC 3 NE LE VOIENT PAS. S30 compte un numéro, S15 compte
+  // VINGT-CINQ MOTS de rappel, S16 cherche une source, S31 un tableau, S32 une ligne de repli. Une
+  // périphrase fait vingt-cinq mots : elle satisfait S15 et passe les quatre autres. *Aucune ne
+  // regarde si le rappel DÉSIGNE quelque chose.*
+  //
+  // CE QUE LA RÈGLE MESURE, ET CE QU'ELLE NE MESURE PAS. Elle exige un DÉSIGNATEUR dans le rappel
+  // de sujet : un fragment entre accents graves, un chemin, un identifiant de registre, un nom de
+  // dépôt, ou un mot capitalisé qui n'ouvre pas la phrase. Elle ne juge ni la justesse du nom, ni
+  // sa suffisance : un rappel peut nommer et rester obscur, et cela reste une relecture. Elle
+  // attrape le cas mesuré — un rappel fait ENTIÈREMENT de groupes nominaux indéfinis.
+  {
+    // Le titre se présente sous DEUX formes dans le parc, et les deux se retirent : la question
+    // est DANS le gras (« **D-1 — … ?** »), ou le gras ne porte que le sélecteur et la question
+    // suit (« **Décision 1 —** Publier … ? »). Dans le second cas, le premier mot de la question
+    // est capitalisé et compterait comme un nom propre. On retire donc le gras, PUIS la question
+    // jusqu'à son point d'interrogation, PUIS tout ce qui suit « Recommandation » — ce mot est
+    // capitalisé lui aussi et suit chaque rappel. Les trois bornes ont été trouvées en écrivant la
+    // règle, sur sa propre fixture rouge, et chacune la rendait muette : une règle qui juge le
+    // mauvais fragment est verte sur le défaut qu'elle existe pour attraper.
+    const chapeauS47 = (g) => g
+      .replace(/^\s*>?\s*\*\*[^*]*\*\*/, " ")
+      .replace(/^[^?]{0,220}\?/, " ")
+      .split(/\*\*\s*Recommandation|\(a\)/)[0]
+      .replace(/\bD-\d{1,3}\b/g, " ")
+      .replace(TETE_DECISION, "").replace(/>\s*/g, " ").replace(/\|[^|]*/g, " ").replace(/\*\*/g, "").trim();
+    const NOM_PROPRE = /(?:[.!?:;]\s+|\s)(?!Ce\b|Cet\b|Cette\b|Il\b|Elle\b|On\b|Un\b|Une\b|Le\b|La\b|Les\b|Et\b|Mais\b|Or\b|Sans\b|Pour\b|Dans\b|Sur\b|Trois\b|Deux\b|Quatre\b)[A-ZÀ-Ý][\p{L}-]{2,}/u;
+    // UN NOM DE DÉPÔT N'A PAS DE MAJUSCULE, et c'est précisément le nom qui manquait le 16/09.
+    // Trois segments joints par des tirets ne forment aucun mot français — c'est un identifiant,
+    // donc un désignateur, qu'il soit entre accents graves ou nu. L'exiger entre accents graves
+    // reviendrait à imposer une typographie pour dire un nom.
+    const SLUG = /\b[a-z0-9]+(?:-[a-z0-9]+){2,}\b/;
+    const designe = (c) => _LOCALISATEURS.test(c) || ID_STABLE.test(c) || SLUG.test(c) || NOM_PROPRE.test(" " + c);
+    const muettes = groupesDecisions.filter((g) => !designe(chapeauS47(g)));
+    if (muettes.length) {
+      ko("S47", `${muettes.length} décision(s) sur ${groupesDecisions.length} dont le rappel de sujet ne NOMME rien — `
+        + "ni fragment entre accents graves, ni chemin, ni identifiant, ni nom propre. Un rappel fait de groupes "
+        + "nominaux indéfinis (« un nom de… », « cet objet », « une chose qui… ») satisfait S15 par sa longueur et "
+        + "laisse le lecteur sans savoir DE QUOI on parle : c'est le retour humain du 16/09/2026, « on ne comprend "
+        + "absolument rien au charabia ». Quand un nom sensible appartient AU LECTEUR, il s'écrit — l'arbitrage de "
+        + `publication se traite ailleurs, jamais en rendant la question floue. Ex. : ${chapeauS47(muettes[0]).replace(/\s+/g, " ").slice(0, 110)}`);
+    } else if (groupesDecisions.length) {
+      ok("S47", `${groupesDecisions.length} décision(s), chacune nommant la chose dont elle parle`);
+    } else {
+      ok("S47", "aucune décision à nommer");
+    }
+  }
+
   // ---- S23 (TF-0572, 24/08) — UN DÉSIGNATEUR INVENTÉ PAR L'AGENT ÉCHAPPE À S15 COMME À S20 ---
   //
   // LE FAIT. Le dossier remis le 24/08 nommait ses objets par des codes que l'agent venait de créer
@@ -2257,6 +2318,21 @@ Aucun écart : la demande a été suivie à la lettre.
   writeFileSync(join(dir, "selecteur-double.md"), selecteurDouble, "utf8");
   const numeroNu = verte.replace("- **Décision 1 —** Publier", "- **1.** Publier");
   writeFileSync(join(dir, "numero-nu.md"), numeroNu, "utf8");
+  // S47 (retour humain du 16/09/2026) — LE RAPPEL QUI NE NOMME RIEN. La fixture remplace le
+  // rappel de la décision par des périphrases, sans rien changer d'autre : même numéro, même
+  // longueur, mêmes options, même source. Elle passe donc S15, S16, S30, S31 et S32 — et c'est
+  // exactement ce qui s'est produit le 16/09. La verte, elle, est la fixture d'origine : son
+  // rappel nomme la forge de tests et cite un journal entre accents graves.
+  const decisionMuette = verte.replace(
+    "- **Décision 1 —** Publier la version corrigée de la forge de tests ? Le banc rouge vient de tourner en entier :\n"
+    + "  chaque défaut planté volontairement a été détecté, donc la surveillance fonctionne et la\n"
+    + "  version est prête à sortir. Publier la rend visible aux autres projets ; ne pas publier la\n"
+    + "  laisse sur ce poste, et personne d'autre n'en profite tant qu'on attend.",
+    "- **Décision 1 —** Publie-t-on la version corrigée, ou attend-on ? Un des outils de la chaîne vient de\n"
+    + "  passer son contrôle en entier, donc cette chose est prête à sortir. La rendre visible aux\n"
+    + "  autres la met en circulation ; ne pas le faire la laisse là où elle est, et personne d'autre\n"
+    + "  n'en profite tant qu'on attend un arbitrage sur cet objet.");
+  writeFileSync(join(dir, "decision-muette.md"), decisionMuette, "utf8");
   writeFileSync(join(dir, "verte.md"), verte, "utf8");
   writeFileSync(join(dir, "rouge.md"), rouge, "utf8");
   // TF-0661 — S29 a besoin de SA fixture : la rouge porte des actions au bloc 8, donc la
@@ -2423,6 +2499,17 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S33"[^}]*PASS/.test(rv.stdout))
     casse.push("S33 : la verte, dont chaque action porte son sélecteur A-N, est accusée — la règle crie sur un travail juste : " +
       (/"S33"[sS]{0,180}/.exec(rv.stdout) || [""])[0].replace(/s+/g, " "));
+  // S47 dans ses DEUX sens. Le vert est celui qui compte le plus : la fixture d'origine nomme la
+  // forge de tests et cite un journal, donc la règle ne doit pas crier dessus — une règle qui
+  // accuse un rappel juste se fait désactiver, et c'est la leçon N4.
+  if (!/"S47"[^}]*PASS/.test(rv.stdout))
+    casse.push("S47 : la verte, dont le rappel nomme la forge de tests et cite son journal, est accusée — " +
+      (/"S47"[\s\S]{0,200}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
+  const rdm = spawnSync(process.execPath, [moi, join(dir, "decision-muette.md")], { encoding: "utf8" });
+  if (!/"S47"[^}]*FAIL/.test(rdm.stdout))
+    casse.push("S47 : un rappel fait ENTIÈREMENT de périphrases (« un des outils de la chaîne », « cette chose », " +
+      "« cet objet ») passe encore — il fait 25 mots, donc S15 le laisse passer, et le lecteur ne sait pas de quoi " +
+      "on parle. C'est le retour humain du 16/09/2026, mot pour mot : « on ne comprend absolument rien au charabia »");
   const rnn = spawnSync(process.execPath, [moi, join(dir, "numero-nu.md")], { encoding: "utf8" });
   if (!/"S30"[^}]*FAIL/.test(rnn.stdout))
     casse.push("S30 : un numéro NU (« 1. ») passe encore pour un sélecteur de décision — c'est par cette tolérance " +

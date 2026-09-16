@@ -8,7 +8,7 @@ La publication est faite : la version corrigée est partie vers le dépôt dista
 
 ## 3. Décisions attendues
 
-> **D-12 — Faut-il enchaîner sur la forge-ops ce soir, ou reprendre demain matin ?** La publication qui vient d'être faite libère la suite du mandat ; la seule question est de savoir si on enchaîne tout de suite sur la forge suivante, ou si on s'arrête là pour la journée avec un état propre.
+> **D-12 — Faut-il enchaîner sur la forge-ops ce soir, ou reprendre demain matin ?** La publication qui vient d'être faite libère la suite du mandat ; la seule question est de savoir si on enchaîne tout de suite sur `digit-ai-forge-ops`, ou si on s'arrête là pour la journée avec un état propre.
 >
 > **Recommandation : (b).** Source consultée : `references\ETAPES-RUN.md` — un enchaînement de forge se prend en début de tour, jamais après un geste de publication.
 

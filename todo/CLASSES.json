@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.16.0",
+ "version": "1.17.0",
  "date": "2026-09-16",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -1277,6 +1277,20 @@
    "regle": "references/ECRITURE.md E-14",
    "oracle": "oracle-ecriture EC-9",
    "voisines": []
+  },
+  {
+   "cle": "decision-sans-designateur",
+   "famille": "restitution-forme",
+   "libelle": "Une décision posée à l'humain ne NOMME pas la chose dont elle parle — des périphrases à la place du nom, et le lecteur ne peut pas trancher",
+   "creee_le": "2026-09-16",
+   "fondee_par": [],
+   "regle": "gabarits/RESTITUTION.md — le rappel de sujet d'une décision porte au moins un désignateur : un nom propre, un chemin, un identifiant, un fragment entre accents graves, ou un nom de dépôt. Quand un nom sensible appartient AU LECTEUR, il s'écrit : l'arbitrage de publication se traite ailleurs, jamais en rendant la question floue.",
+   "oracle": "pilot, oracles/oracle-synthese.mjs règle S47 — jouée par le hook Stop sur toute restitution et sur tout message de fin de tour, avec sa paire de fixtures : un rappel fait entièrement de périphrases FAIL, le même rappel nommant sa chose PASS",
+   "voisines": [
+    "lecture-tiers-non-jugee",
+    "restitution-forme-bloc-3",
+    "annonce-nominalisee"
+   ]
   }
  ],
  "cliquet_porteur": {
