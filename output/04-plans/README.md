@@ -80,6 +80,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Decisions 42a 43a 38a - 20260903b.md` | fichier | 25,9 Ko | Synthèse de mandat — vos trois décisions du matin exécutées : l'historique du pilot réécri |
 | `Digit-AI - Synthese Mandat - Decisions 8a 9a et actions 28 29 30 - 20260905h.md` | fichier | 13,5 Ko | Synthèse de mandat — décisions 8a et 9a exécutées : trois forges publiées, quatre candidat |
 | `Digit-AI - Synthese Mandat - Emission des retours cablee et sources muettes nommees - 20260917g.md` | fichier | 13,8 Ko | Synthèse de mandat — votre « 3a » est exécuté : un produit doit désormais dire ce qu'il re |
+| `Digit-AI - Synthese Mandat - Enregistrement fait publication refusee par la porte des noms - 20260917h.md` | fichier | 11,7 Ko | Synthèse de mandat — votre « 4b » est exécuté à moitié : l'enregistrement est fait, la pub |
 | `Digit-AI - Synthese Mandat - Etat des merges et commits - 20260915d.md` | fichier | 9,8 Ko | Synthèse de mandat — tout n'est pas encore commité, et une branche ancienne n'est pas fusi |
 | `Digit-AI - Synthese Mandat - Etude opportunite etat de l art - 20260831a.md` | fichier | 15,2 Ko | Synthèse de mandat — l'étude d'opportunité conclut de ne rien construire, et signale une f |
 | `Digit-AI - Synthese Mandat - Fais tous les A second tour acheve - 20260905g.md` | fichier | 19,1 Ko | Synthèse de mandat — second « fais tous les A » achevé : les sept items de forges sont clo |
@@ -159,4 +160,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte au vert - 20260910a.md` | fichier | 20,0 Ko | Synthèse de mandat — vos deux décisions sont exécutées, la copie locale est reconstruite,  |
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 
-_142 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_143 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
