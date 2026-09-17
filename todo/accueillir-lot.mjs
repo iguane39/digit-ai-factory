@@ -148,15 +148,70 @@ async function selfTest() {
   if (readdirSync(arr).length !== avant) casse.push("le mode essai a vidé l'arrivée");
   if (r4.faits.some((x) => x.ecrit)) casse.push("le mode essai déclare avoir écrit");
 
+  // 5) et 6) L'ANALYSE DES ARGUMENTS, DANS SES DEUX SENS (17/09/2026). Le défaut s'est produit
+  // DANS LA COUCHE CLI, pas dans `accueillir()` : le banc doit donc lancer le module comme un
+  // outil. Les deux cas ne diffèrent que par l'argument — `--zzz` refuse, `--aide` explique — et
+  // aucun des deux n'a le droit d'écrire quoi que ce soit. La preuve que rien n'a été accueilli est
+  // l'ABSENCE du rapport JSON de l'accueil, que le cas nominal imprime toujours.
+  const { spawnSync } = await import("node:child_process");
+  const moi = fileURLToPath(import.meta.url);
+  const jouer = (...a) => spawnSync(process.execPath, [moi, ...a], { encoding: "utf8" });
+  const rInconnu = jouer("--zzz");
+  if (rInconnu.status !== 2) casse.push(`une option INCONNUE ne fait pas refuser (exit ${rInconnu.status}) — le 16/09 et le 17/09, elle a lancé l'accueil RÉEL`);
+  if (/"en_attente"/.test(rInconnu.stdout || "")) casse.push("une option inconnue a déclenché l'accueil réel : le rapport d'accueil est imprimé");
+  if (!/Usage/.test((rInconnu.stderr || "") + (rInconnu.stdout || ""))) casse.push("le refus ne dit pas l'usage — il faut rouvrir le fichier pour savoir quoi taper");
+  for (const drapeau of ["--aide", "--help"]) {
+    const rAide = jouer(drapeau);
+    if (rAide.status !== 0) casse.push(`${drapeau} ne rend pas la main proprement (exit ${rAide.status})`);
+    if (!/Usage/.test(rAide.stdout || "")) casse.push(`${drapeau} n'affiche pas l'usage`);
+    if (/"en_attente"/.test(rAide.stdout || "")) casse.push(`${drapeau} a déclenché l'accueil RÉEL — c'est le défaut mesuré les 16 et 17/09`);
+  }
+
   rmSync(T, { recursive: true, force: true });
   for (const m of casse) console.log("  [FAIL] " + m);
-  console.log(`\nSelf-test accueillir-lot (TF-0981) : ${4 - casse.length}/4 cas, ${casse.length} FAIL`);
+  console.log(`\nSelf-test accueillir-lot (TF-0981) : ${6 - casse.length}/6 cas, ${casse.length} FAIL`);
   return casse.length ? 1 : 0;
 }
 
+/**
+ * L'usage, à un seul endroit : il sert l'écran d'aide ET le message de refus. Deux textes
+ * séparés divergent, et c'est le texte de refus qu'on lit quand on s'est trompé.
+ */
+export const USAGE = [
+  "Usage : node todo\\accueillir-lot.mjs [--essai | --self-test | --aide]",
+  "",
+  "  Pseudonymise le NOM et le CONTENU de chaque lot déposé dans input\\00-retours\\_arrivee\\",
+  "  (ignoré par git), puis le redépose dans input\\00-retours\\ (suivi). Il n'INGÈRE pas :",
+  "  `node todo\\ingerer-lot.mjs <lot>` reste le geste suivant.",
+  "",
+  "  --essai        relève ce qui serait fait : n'écrit rien, ne vide pas l'arrivée",
+  "  --self-test    joue le banc du module",
+  "  --aide, --help affiche cet écran",
+].join("\n");
+
 if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("\\", "/")
     === process.argv[1].toLowerCase().replaceAll("\\", "/")) {
-  if (process.argv.includes("--self-test")) process.exit(await selfTest());
+  // ---- UNE OPTION INCONNUE NE LANCE PAS L'ACCUEIL RÉEL (17/09/2026) -------------------------
+  //
+  // LE FAIT, DEUX FOIS. Le 16/09 avec `--aide`, le 17/09 avec `--help` : l'argument n'étant reconnu
+  // par aucun `includes`, il tombait dans le cas nominal et le module ACCUEILLAIT pour de bon —
+  // pseudonymisant et déplaçant les lots du sas vers le répertoire suivi. Qui demande l'aide d'un
+  // outil ne connaît pas encore son effet : c'est précisément le moment où il ne faut rien écrire.
+  //
+  // La reconnaissance par `includes` est muette par construction : elle répond à la question « cet
+  // argument-là est-il présent ? » et jamais « ai-je compris tout ce qu'on m'a donné ? ». Le
+  // vocabulaire est donc FERMÉ, et tout ce qui n'y est pas — option comme argument nu — fait
+  // REFUSER avant la moindre écriture, en rendant l'usage plutôt qu'un code sec.
+  const CONNUS = new Set(["--self-test", "--essai", "--aide", "--help"]);
+  const args = process.argv.slice(2);
+  if (args.includes("--aide") || args.includes("--help")) { console.log(USAGE); process.exit(0); }
+  const inconnus = args.filter((a) => !CONNUS.has(a));
+  if (inconnus.length) {
+    console.error(`[REFUS] argument(s) non reconnu(s) : ${inconnus.join(", ")} — RIEN n'a été accueilli, `
+      + `l'arrivée est intacte.\n\n${USAGE}`);
+    process.exit(2);
+  }
+  if (args.includes("--self-test")) process.exit(await selfTest());
   const r = accueillir({ essai: process.argv.includes("--essai") });
   // TF-1134 (a) : les adresses sont NOMMÉES à l'écran, lot par lot — jamais écrites ailleurs.
   for (const f of r.faits) { const m = messageAQualifier(f.adresses_ip_a_qualifier || [], f.vers); if (m) console.error(m); }
