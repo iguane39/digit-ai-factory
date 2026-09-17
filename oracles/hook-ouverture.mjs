@@ -293,6 +293,30 @@ if (iPilot < 0) {
 // pose sans que personne les voie. L'ouverture les RELIT et les dit, en COMPTES seulement : jamais
 // un chemin ni une valeur (porte des noms) ; le détail se lit à la demande. Même section : l'état
 // du registre de dette du pilot (D-8 (a)), qui sinon ne serait lu par personne (loi n° 1).
+// ---- LA PORTÉE DE CETTE SESSION SE DIT À L'OUVERTURE (TF-1047 / TF-0963, option O1, 17/09/2026)
+//
+// LE FAIT : un hameçon qui ne s'exécute pas ne se distingue pas d'un hameçon qui approuve. Une
+// session ouverte au-dessus du produit, ou sur une racine qui n'a repris qu'une PARTIE des
+// hameçons, travaille des heures sans qu'aucun contrôle ne parle — trois retours du même produit
+// pour trois symptômes d'une seule racine. L'étude du 14/09 tranche O1 : comparer, à l'ouverture,
+// le jeu ACTIF au jeu ATTENDU, et le NOMMER. Ni report d'hameçons, ni écriture chez le produit :
+// ces deux-là restent un arbitrage humain (R-29, TF-0963).
+{
+  const op = join(PILOT, "oracles", "oracle-portee-doctrine.mjs");
+  if (existsSync(op)) {
+    lignes.push("", "## Portée des hameçons pour CETTE racine de session (O1, TF-1047)");
+    const r = spawnSync(process.execPath, [op, "--hamecons"], { encoding: "utf8", timeout: 60000 });
+    let j = null;
+    try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* dit ci-dessous */ }
+    if (!j) lignes.push(`- verdict ILLISIBLE (exit ${r.status}) — ce n'est pas un constat sur la session : ${(r.stderr || "").trim().slice(0, 160)}`);
+    else for (const f of j.findings || []) {
+      if (f.statut === "PASS") lignes.push(`- ${f.regle} : ${f.message}`);
+      else if (f.statut === "SANS_OBJET") lignes.push(`- ${f.regle} sans objet — ${f.message}`);
+      else lignes.push(`- **${f.regle} — ${f.message}**`);
+    }
+  }
+}
+
 if (iPilot < 0) {
   const os = join(PILOT, "oracles", "oracle-secrets-hors-perimetre.mjs");
   if (existsSync(os)) {
