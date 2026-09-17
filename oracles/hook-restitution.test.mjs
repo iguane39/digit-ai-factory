@@ -200,6 +200,59 @@ try {
       + "l'exemption « rien de neuf » perdrait sa borne et s'appliquerait à un message qui demande un geste, "
       + `obtenu ${JSON.stringify(r22.decision)}`);
 
+  // 23 à 25 (TF-1182, 17/09) — LE RELAIS D'AVANCEMENT, ET LA BORNE QUI L'EMPÊCHE D'ÊTRE UN TROU.
+  //
+  // LE FAIT : une notification de tâche de fond — le rapport d'un agent de campagne — n'est pas un
+  // message HUMAIN, donc le segment ne se referme pas. Le relais de trois lignes qui la répercute
+  // se retrouve dans le même segment que les vingt écritures et la synthèse déposée une heure plus
+  // tôt : il est jugé comme un tour de travail et refusé parce qu'il ne reprend pas la synthèse en
+  // entier. Mesuré le 17/09 : quatre re-affichages complets d'une synthèse de 120 lignes en 45 min.
+  //
+  // Les trois transcripts ne diffèrent QUE par ce que la règle regarde : ce qui s'est passé entre
+  // les deux affichages (rien / une écriture), et ce que le relais porte (rien / une D-N).
+  {
+    const deposee = join(base, "Synthese - Mandat - 20260917a.md");
+    writeFileSync(deposee, "---\ndestinataire: humain\n---\n\n" + BON, "utf8");
+    const RELAIS = "L'agent de campagne sur le juge de restitution vient d'émettre son avancement : "
+      + "2 chantiers finis sur 5, le troisième en cours. Rien n'a changé dans le dépôt depuis mon dernier point.";
+    const relaisTranscript = (nom, texteRelais, ecritureEntreDeux) => {
+      const e = [
+        { type: "user", message: { role: "user", content: "traite les todos et retours" } },
+        { type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", name: "Write", input: { file_path: deposee } }] } },
+        { type: "user", message: { role: "user", content: [{ type: "tool_result", content: "ok" }] } },
+        { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: BON }] } },
+      ];
+      if (ecritureEntreDeux) {
+        e.push({ type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", name: "Edit", input: { file_path: join(base, "code.mjs") } }] } });
+        e.push({ type: "user", message: { role: "user", content: [{ type: "tool_result", content: "ok" }] } });
+      }
+      e.push({ type: "assistant", message: { role: "assistant", content: [{ type: "text", text: texteRelais }] } });
+      const p = join(base, nom + ".jsonl");
+      writeFileSync(p, e.map((x) => JSON.stringify(x)).join("\n") + "\n", "utf8");
+      const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8",
+        input: JSON.stringify({ session_id: "test-relais", transcript_path: p, stop_hook_active: false }) });
+      try { return JSON.parse(r.stdout || "null"); } catch { return null; }
+    };
+    const d23 = relaisTranscript("relais-sans-ecriture", RELAIS, false);
+    if (d23 !== null)
+      echecs.push("23 : un relais d'avancement de trois lignes, après une synthèse déjà affichée et RIEN d'écrit "
+        + `depuis, doit passer — sinon chaque relais force le ré-affichage de la synthèse entière (TF-1182), obtenu ${JSON.stringify(d23).slice(0, 220)}`);
+
+    // 24 — LE SENS QUI FERME LE TROU DE TF-0978 : une seule écriture entre les deux affichages, et
+    // le même message de trois lignes redevient un rendu de fin de tour, donc jugé, donc refusé.
+    const d24 = relaisTranscript("relais-apres-ecriture", RELAIS, true);
+    if (d24?.decision !== "block")
+      echecs.push("24 : une écriture s'est intercalée depuis le dernier affichage et le message de trois lignes passe — "
+        + `l'exemption de relais rouvrirait le trou fermé par TF-0978 (un tour qui a écrit reste jugé), obtenu ${JSON.stringify(d24).slice(0, 220)}`);
+
+    // 25 — LA SECONDE BORNE, celle de TF-0990 : un relais qui POSE une décision demande un geste à
+    // l'humain. Rien n'a été écrit depuis le dernier affichage, et il est jugé quand même.
+    const d25 = relaisTranscript("relais-qui-decide", RELAIS + " D-7 — faut-il publier la forge maintenant ?", false);
+    if (d25?.decision !== "block")
+      echecs.push("25 : un relais qui POSE une D-7 passerait pour un avancement — l'exemption perdrait les TROIS "
+        + `absences qu'elle partage avec « rien de neuf » (aucun verdict, aucune D-N, aucune A-N), obtenu ${JSON.stringify(d25).slice(0, 220)}`);
+  }
+
   // 5 — défaut de DÉTAIL seul : la structure tient, une puce du bloc 4 perd sa preuve.
   // S8 cherche un mot d'achèvement (« fait », « terminé », « clos », ✓) dans une puce SANS
   // preuve : on retire la preuve de la seule puce du bloc 4 et on garde le mot.
@@ -363,4 +416,4 @@ try {
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error("hook-restitution : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log("hook-restitution : 23/23 — marqueur lu en tête de ligne et jamais dans la prose : le gabarit qui le CITE n'est plus jugé à la place de la synthèse du tour (correction du 17 septembre 2026), hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019), exemption « rien de neuf » dans ses DEUX sens — un accusé de trois lignes sans verdict ni D-N NON jugé, le même message posant une D-N JUGÉ (TF-0990)");
+console.log("hook-restitution : 26/26 — relais d'avancement dans ses TROIS sens (TF-1182) : trois lignes après une synthèse déjà affichée et RIEN d'écrit depuis NON jugées, le MÊME message précédé d'une seule écriture JUGÉ (le trou de TF-0978 reste fermé), et le MÊME message posant une D-7 JUGÉ (les trois absences de TF-0990 tiennent) ; marqueur lu en tête de ligne et jamais dans la prose : le gabarit qui le CITE n'est plus jugé à la place de la synthèse du tour (correction du 17 septembre 2026), hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019), exemption « rien de neuf » dans ses DEUX sens — un accusé de trois lignes sans verdict ni D-N NON jugé, le même message posant une D-N JUGÉ (TF-0990)");

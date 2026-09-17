@@ -88,6 +88,10 @@
  *       augmenté des 26 caractères du sidecar d'oracle, tient sous 150 caractères (11/09, TF-1015) —
  *       R-4 juge la FORME du nom et jamais sa LONGUEUR : un nom conforme peut rendre le dépôt
  *       inclonable sur un chemin profond, et le défaut ne se voit que chez celui qui VÉRIFIE ;
+ *   S50 un POINT D'ÉTAPE déclaré au bloc 1 porte ses blocs 1, 4 et 8 PLEINS (17/09, TF-1182) —
+ *       la forme échange le verdict contre ces trois blocs ; vide, elle n'est qu'une exemption
+ *       déguisée en forme jugée. S1 admet alors le bloc 2 sous son titre de mesure, et S3 y juge
+ *       la mesure attendue et l'outil qui la rendra à défaut d'un verdict chiffré ;
  *       et né du même retour : « le 3 était pour les prochaines actions ». Deux familles
  *       numérotées pareil ne se désignent pas ; le sélecteur nomme la sienne.
  *   S31 chaque OPTION du bloc 3 porte son COÛT et CE QU'ELLE EXCLUT (30/08) — exigence écrite
@@ -144,6 +148,49 @@ const BLOCS = [
 ];
 
 const MOTIFS_ABSENCE = /(aucun|rien|n[ée]ant|sans objet|non concern)/i;
+
+// ---- LE POINT D'ÉTAPE (TF-1182, 17/09/2026) — UNE FORME ÉCRITE AU GABARIT ET INCONNUE DE SON JUGE
+//
+// LE FAIT, mesuré le 17/09 : `grep` de « point d'étape » dans ce fichier rendait ZÉRO occurrence,
+// alors que `gabarits\RESTITUTION.md` prescrit la forme depuis la v2.22.0 (TF-0979). Un point
+// d'étape écrit À LA LETTRE du gabarit — bloc 2 remplacé par « ce qui reste à mesurer, et par
+// quoi » — rendait donc S1 FAIL (« bloc 2 absent ») et S3 FAIL (« verdict sans fait mesurable »),
+// les deux BLOQUANTES. Le seul moyen de passer le hook était de DÉGUISER le point d'étape en
+// verdict, c'est-à-dire d'écrire un verdict partiel — exactement ce que la forme existe pour
+// éviter. *Une forme que le gabarit prescrit et que son juge refuse n'est pas une forme : c'est
+// un piège, et il apprend à contourner.*
+//
+// CE QUI N'EST PAS UN ASSOUPLISSEMENT, et c'est la raison pour laquelle la forme reste JUGÉE. Le
+// point d'étape n'enlève pas d'obligation, il en ÉCHANGE une : le verdict, qu'aucune mesure ne
+// porte encore, contre la ligne qui dit CE QUI RESTE À MESURER ET PAR QUOI (S3, second sens) et
+// contre l'exigence que les blocs 1, 4 et 8 soient PLEINS (S50). Un tour qui n'a rien produit
+// n'est pas un point d'étape : c'est un accusé de réception, et son exemption a ses propres
+// bornes (§Portée, TF-0990).
+//
+// LA DÉCLARATION SE FAIT AU BLOC 1, et nulle part ailleurs : le gabarit l'écrit (« il le DÉCLARE
+// en tête, par la mention `point d'étape` dans le bloc 1 »). Chercher la mention dans tout le
+// document ferait basculer en mode allégé toute restitution qui PARLE d'un point d'étape.
+const POINT_ETAPE = /\bpoint\s+d\s*['’]\s*[ée]tape\b/i;
+// Le bloc 2 d'un point d'étape porte le titre que la forme lui donne. Les deux titres sont admis —
+// « ## 2. Ce qui reste à mesurer, et par quoi » comme « ## 2. Verdict » gardé par habitude —, parce
+// que ce qui est opposable est la LIGNE de mesure, jamais la typographie du titre (leçon TF-0566).
+const BLOC_MESURE = new RegExp(`(^|\n)#{1,4}\\s*${NUM}(?:ce\\s+qui\\s+)?(?:reste\\s+)?[àa]\\s+mesurer`, "i");
+// Un bloc « plein » : ni vide, ni une déclaration d'absence, et assez de matière pour être lu.
+// Le compte porte sur les JETONS commençant par une lettre ou un chiffre — les séparateurs « · »
+// et les tirets d'une ligne d'en-tête ne gonflent pas la mesure.
+const compteMots = (s) => (String(s).match(/[\p{L}\p{N}]\S*/gu) || []).length;
+// UNE DÉCLARATION D'ABSENCE EST COURTE PAR NATURE — « aucune », « rien à signaler », « sans
+// objet ». Chercher le mot dans un bloc LONG accuse un bloc plein : mesuré sur les 148 synthèses
+// d'`output\04-plans\`, la première écriture de cette règle rendait UN faux positif, et sur la
+// colonne que le gabarit PRESCRIT lui-même au bloc 8 — « Si rien n'est fait ». Un contrôle qui
+// accuse la forme prescrite s'apprend à contourner (R-33 bis) : la borne de longueur est donc
+// dans la règle, pas dans la fixture.
+const declareSonVide = (t) => compteMots(t) <= 20 && MOTIFS_ABSENCE.test(t);
+const estPlein = (b, seuil) => {
+  const t = String(b || "").trim();
+  if (!t || declareSonVide(t)) return false;
+  return compteMots(t) >= seuil;
+};
 
 // Les jetons de verdict sont cherchés en CASSE EXACTE, et ce n'est pas un détail : avec le
 // drapeau insensible, `\bPASS\b` matche le mot français « passé » — en JavaScript `\b` est
@@ -439,8 +486,19 @@ function juger(texte, cheminJuge = null) {
   const ok = (regle, message) => findings.push({ regle, statut: "PASS", message });
   const ko = (regle, message) => findings.push({ regle, statut: "FAIL", message });
 
+  // Le POINT D'ÉTAPE se DÉCLARE, et il se déclare au bloc 1 (TF-1182). Sans bloc 1 reconnu, la
+  // mention n'est pas une déclaration : le document est jugé comme une restitution ordinaire.
+  const pointEtape = POINT_ETAPE.test(bloc(texte, BLOCS[0][0]) || "");
+
   // S1 — les 8 blocs
-  const absents = BLOCS.filter(([re]) => !re.test(texte)).map(([, nom]) => nom);
+  const absents = BLOCS.filter(([re], i) => {
+    if (re.test(texte)) return false;
+    // Point d'étape : le bloc 2 est REMPLACÉ par « ce qui reste à mesurer, et par quoi », donc son
+    // titre ne porte pas le mot « verdict ». Exiger le mot refusait la forme que le gabarit
+    // prescrit ; le bloc, lui, reste EXIGÉ — sous son autre titre (TF-1182).
+    if (pointEtape && i === 1 && BLOC_MESURE.test(texte)) return false;
+    return true;
+  }).map(([, nom]) => nom);
   absents.length
     ? ko("S1", `bloc(s) absent(s) : ${absents.join(" · ")} — un bloc sans contenu se DIT en une ligne, il ne disparaît pas (loi n° 3)`)
     : ok("S1", "les 8 blocs de la structure sont présents");
@@ -453,8 +511,25 @@ function juger(texte, cheminJuge = null) {
   else ko("S2", `en-tête sans ${!aDate ? "date" : ""}${!aDate && !aHeure ? " ni " : ""}${!aHeure ? "heure" : ""} — plusieurs traitements tombent le même jour, sans heure ils ne s'ordonnent pas`);
 
   // S3 — verdict factuel : au moins un fait mesurable dans le bloc verdict
-  const bVerdict = bloc(texte, BLOCS[1][0]) || "";
-  preuve(bVerdict)
+  // POINT D'ÉTAPE (TF-1182) : le bloc 2 ne porte pas de verdict, il porte la MESURE ATTENDUE et
+  // L'OUTIL QUI LA RENDRA. La règle ne disparaît pas, elle change d'objet — et elle reste exigeante
+  // sur le même point : nommer une chose vérifiable. « On verra demain » échoue des deux côtés.
+  const bVerdict = bloc(texte, BLOCS[1][0]) || (pointEtape ? bloc(texte, BLOC_MESURE) || "" : "");
+  if (pointEtape) {
+    // DEUX ISSUES, et l'alternative n'est pas une complaisance : elle est ce qui rend la règle
+    // NON RÉGRESSIVE. Mesuré sur les 148 synthèses d'`output\04-plans\` : cinq déclarent « point
+    // d'étape » au bloc 1, et QUATRE portent malgré tout un verdict chiffré — un mandat long est
+    // souvent un point d'étape ET une mesure. N'admettre que la ligne de mesure aurait accusé ces
+    // quatre-là sur une règle BLOQUANTE, c'est-à-dire fait échouer 2,7 % d'un corpus non réécrit
+    // au nom d'une forme censée l'aider. Ce qui reste refusé est le seul cas que la forme existe
+    // pour attraper : un bloc 2 qui ne mesure RIEN et ne dit pas non plus ce qui reste à mesurer.
+    const mesure = /mesur/i.test(bVerdict) && _LOCALISATEURS.test(bVerdict);
+    if (mesure) ok("S3", "point d'étape : ce qui reste à mesurer est nommé, avec l'outil qui le rendra");
+    else if (preuve(bVerdict)) ok("S3", "point d'étape : le bloc 2 porte un fait mesurable");
+    else ko("S3", "point d'étape sans fait mesurable NI ligne « ce qui reste à mesurer, et par quoi » — nomme la mesure "
+      + "attendue ET l'outil qui la rendra (une commande, un oracle, un fichier), ou porte un verdict chiffré ; "
+      + "« on regardera demain » n'est ni l'un ni l'autre");
+  } else preuve(bVerdict)
     ? ok("S3", "le verdict porte un fait mesurable")
     : ko("S3", "verdict sans fait mesurable — « tout s'est bien passé » n'est pas un verdict, « 19/19 » l'est");
 
@@ -2246,6 +2321,35 @@ function juger(texte, cheminJuge = null) {
     } else ok("S49", `${gestes} option(s) commandant un geste humain, chacune exécutable là où le choix se fait`);
   }
 
+  // ---- S50 (17/09/2026, TF-1182) — CE QUE LE POINT D'ÉTAPE PAIE POUR N'AVOIR PAS DE VERDICT ----
+  //
+  // Le gabarit le dit en trois clauses, et une seule est allégeante : blocs 1, 4 et 8 OBLIGATOIRES
+  // ET PLEINS · bloc 2 remplacé par la ligne de mesure (S3, second sens) · blocs 3, 5, 6, 7 et 9
+  // admis en une ligne, comme partout ailleurs. Sans S50, déclarer « point d'étape » au bloc 1
+  // suffirait à désarmer S3 sans rien donner en échange : ce serait une exemption déguisée en
+  // forme jugée, c'est-à-dire exactement ce que TF-0979 a créé le point d'étape pour empêcher.
+  //
+  // Les seuils sont bas et volontairement grossiers — huit jetons pour la ligne d'identification,
+  // douze pour le traité et pour les prochaines actions. Ils n'existent pas pour noter la prose :
+  // ils refusent le bloc VIDE et le bloc qui déclare son vide (« aucun », « rien »). Un point
+  // d'étape dont le traité est « rien encore » n'est pas un point d'étape, c'est une attente, et
+  // l'attente se dit au bloc 5 avec son motif.
+  //
+  // AVERTISSANTE à son entrée (hors de `BLOQUANTES` du hook), comme la doctrine v2.5.0 le prescrit
+  // pour toute règle neuve : elle se durcira quand le corpus l'aura absorbée.
+  if (!pointEtape) {
+    findings.push({ regle: "S50", statut: "SANS_OBJET",
+      message: "cette restitution ne se déclare pas « point d'étape » au bloc 1 — l'obligation des blocs 1, 4 et 8 pleins ne s'applique pas" });
+  } else {
+    const creux = [[0, "1. En-tête d'identification", 8], [3, "4. Traité", 12], [7, "8. Prochaines actions", 12]]
+      .filter(([i, , seuil]) => !estPlein(bloc(texte, BLOCS[i][0]) || "", seuil))
+      .map(([, nom]) => nom);
+    creux.length
+      ? ko("S50", `point d'étape : bloc(s) obligatoire(s) non PLEIN(s) — ${creux.join(" · ")}. Le point d'étape échange le `
+        + "verdict contre trois blocs pleins ; vide, il n'est plus qu'une exemption déguisée en forme jugée")
+      : ok("S50", "point d'étape : les blocs 1, 4 et 8 sont pleins");
+  }
+
   return findings;
 }
 
@@ -2988,9 +3092,52 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S48"[^}]*SANS_OBJET/.test(rv.stdout))
     casse.push("S48 : hors d'un produit (pilot, forge), la règle devrait rendre SANS_OBJET et le DIRE : " +
       (/"S48"[\s\S]{0,160}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
+  // 17/09 — LE POINT D'ÉTAPE DANS SES QUATRE SENS (TF-1182). Les quatre fixtures sortent de la
+  // VERTE et ne diffèrent d'elle que par ce que la forme change : la mention au bloc 1 et le titre
+  // du bloc 2. C'est la seule façon de prouver que ce qui est jugé est la FORME, et non un reste
+  // du document. Le premier sens est celui qui manquait au 17/09 : un point d'étape écrit à la
+  // lettre du gabarit doit être ACCEPTÉ, là où il rendait S1 et S3 FAIL — les deux bloquantes.
+  const EN_TETE_V = "## 1. En-tête\nCampagne · forge-tests · terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot.";
+  const VERDICT_V = "## 2. Verdict\nRecette S-01 (banc rouge de la forge de tests) TENU — 19/19 défauts détectés au banc rouge, pytest 365.";
+  // La glose de « S-01 » vit dans la ligne de verdict que la forme remplace : elle se reporte dans
+  // la ligne de mesure, sinon la fixture échouerait sur S23 et non sur ce qu'on prétend prouver.
+  const MESURE = "Reste à mesurer : la recette S-01 (banc rouge de la forge de tests) rejouée sur la version déployée — par `node oracles\\self-tests.mjs`, au retour du déploiement lancé à 15h44.";
+  const pe = verte
+    .replace(EN_TETE_V, "## 1. En-tête\nPoint d'étape · forge-tests · déploiement lancé le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot.")
+    .replace(VERDICT_V, "## 2. Ce qui reste à mesurer, et par quoi\n" + MESURE);
+  const peSansMesure = pe.replace(MESURE, "La recette S-01 (banc rouge de la forge de tests) semble bien partie, on regardera demain matin.");
+  const peSansTraite = pe.replace(B4lex, "- Rien encore : le déploiement n'a pas rendu la main.");
+  const jouerPe = (nom, contenu) => {
+    const f = join(dir, nom);
+    writeFileSync(f, contenu, "utf8");
+    return spawnSync(process.execPath, [moi, f], { encoding: "utf8" });
+  };
+  const rPe = jouerPe("point-etape-conforme.md", pe);
+  const rPeM = jouerPe("point-etape-sans-mesure.md", peSansMesure);
+  const rPeT = jouerPe("point-etape-sans-traite.md", peSansTraite);
+  if (rPe.status !== 0)
+    casse.push("POINT D'ÉTAPE : la forme que le gabarit PRESCRIT (TF-0979) est refusée par son propre juge — " +
+      "c'est le défaut du 17/09, qui obligeait à la déguiser en verdict : " +
+      ((rPe.stdout.match(/"regle": "S\d+",\s*"statut": "FAIL",\s*"message": "[^"]{0,120}/g) || []).join(" · ") || "sortie illisible"));
+  if (!/"S1"[^}]*PASS/.test(rPe.stdout))
+    casse.push("S1 : un point d'étape dont le bloc 2 porte son titre de mesure est déclaré amputé de son bloc 2");
+  if (!/"S3"[^}]*PASS/.test(rPe.stdout))
+    casse.push("S3 : la ligne « ce qui reste à mesurer, et par quoi » n'est pas reconnue à la place du verdict");
+  if (!/"S50"[^}]*PASS/.test(rPe.stdout))
+    casse.push("S50 : le point d'étape aux blocs 1, 4 et 8 pleins est accusé : " +
+      (/"S50"[\s\S]{0,200}/.exec(rPe.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S3"[^}]*FAIL/.test(rPeM.stdout))
+    casse.push("S3 : un point d'étape qui ne dit NI la mesure attendue NI l'outil qui la rendra passe — déclarer la " +
+      "forme suffirait alors à se dispenser du verdict sans rien donner en échange (TF-1182)");
+  if (!/"S50"[^}]*FAIL/.test(rPeT.stdout))
+    casse.push("S50 : un point d'étape dont le bloc 4 ne porte RIEN passe — la mention au bloc 1 deviendrait une " +
+      "exemption déguisée en forme jugée, exactement ce que TF-0979 existe pour empêcher");
+  if (!/"S50"[^}]*SANS_OBJET/.test(rv.stdout))
+    casse.push("S50 : hors d'un point d'étape déclaré, la règle devrait rendre SANS_OBJET et le DIRE : " +
+      (/"S50"[\s\S]{0,160}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 29/29 PASS (verte PASS ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) ; S46 dans ses TROIS sens (TF-1045 : une restitution employant un terme proscrit par le lexique du destinataire FAIL, la MEME avec le terme retenu PASS, et SANS_OBJET dit a voix haute quand le projet n a pas de lexique) ; S48 dans ses QUATRE sens (TF-1166 : chez un produit, un tour muet sur ce qu il remonte FAIL, « rien a remonter » PASS, un lot nomme PASS, une ligne qui ne tranche pas FAIL, et SANS_OBJET dit hors d un produit) ; S49 dans ses TROIS sens (TF-1172 : une option commandant « se connecter … puis saisir le code » sans mode operatoire FAIL, la MEME option avec sa ligne « Comment faire » et sa commande sur place PASS, et la verte d origine — aucune option ne commandant de geste — PASS) — taux d accusation mesure sur les 148 syntheses d output\\04-plans\\ avant mise en service : 2,0 % (3 fichiers) ; taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
+    : "Self-test restitution : 32/32 PASS (verte PASS ; le POINT D'ÉTAPE dans ses QUATRE sens (TF-1182 : la forme écrite À LA LETTRE du gabarit — mention au bloc 1, bloc 2 titré « ce qui reste à mesurer, et par quoi » — est ACCEPTÉE là où elle rendait S1 et S3 FAIL, les deux bloquantes ; la MÊME sans sa ligne de mesure ni aucun fait mesurable FAIL sur S3 ; la MÊME dont le bloc 4 ne porte RIEN FAIL sur S50 ; et S50 SANS_OBJET dit à voix haute hors d'un point d'étape déclaré) ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) ; S46 dans ses TROIS sens (TF-1045 : une restitution employant un terme proscrit par le lexique du destinataire FAIL, la MEME avec le terme retenu PASS, et SANS_OBJET dit a voix haute quand le projet n a pas de lexique) ; S48 dans ses QUATRE sens (TF-1166 : chez un produit, un tour muet sur ce qu il remonte FAIL, « rien a remonter » PASS, un lot nomme PASS, une ligne qui ne tranche pas FAIL, et SANS_OBJET dit hors d un produit) ; S49 dans ses TROIS sens (TF-1172 : une option commandant « se connecter … puis saisir le code » sans mode operatoire FAIL, la MEME option avec sa ligne « Comment faire » et sa commande sur place PASS, et la verte d origine — aucune option ne commandant de geste — PASS) — taux d accusation mesure sur les 148 syntheses d output\\04-plans\\ avant mise en service : 2,0 % (3 fichiers) ; taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
   process.exit(casse.length ? 1 : 0);
 }
 
