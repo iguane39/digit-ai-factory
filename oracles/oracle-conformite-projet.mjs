@@ -1844,6 +1844,61 @@ else {
     });
     if (ok23) ok("R-23", "docs\\projet\\ACCES-TEST.md", "en-tête démo-locale présent, aucun motif de secret, comptes de démo nommés par variables");
   }
+
+  // ---- R-23, SECOND VOLET (TF-1088, 17/09/2026) — LA FICHE EST LUE, LA PAGE SERVIE NE L'EST PAS
+  //
+  // LE FAIT, relevé au banc des défauts échappés (cas E-01, phase MEP) : « des identifiants de
+  // démonstration triviaux figurent en clair dans la fiche d'accès ET s'affichent sur la page de
+  // connexion quand le mode démo est actif, alors que l'environnement de qualification est servi
+  // publiquement sur Internet ». TF-0871 a fermé la MOITIÉ du trou le 06/09 — la fiche nomme des
+  // variables — et la moitié qui reste est celle que le visiteur voit : *un identifiant retiré du
+  // document et laissé à l'écran n'a pas été retiré.* La fiche est un document, la page est
+  // l'attaque.
+  //
+  // CE QUI EST JUGÉ : une ligne d'un gabarit de page SERVIE (connexion, aide) qui mentionne la
+  // démonstration ET affiche, sur la même ligne, soit une ADRESSE littérale, soit une valeur
+  // littérale derrière une étiquette de mot de passe. Un nom de variable, une interpolation
+  // (`{{ }}`, `${ }`, `<%= %>`) ou un `process.env` ne sont PAS des valeurs : ce qui est refusé,
+  // c'est la valeur en dur, celle qui part au navigateur.
+  //
+  // CE QUI N'EST PAS JUGÉ, et c'est dit au non_juge : que la page soit réellement servie, que le
+  // mode démo soit réellement actif en production, ou qu'un identifiant vive dans un composant
+  // dont le nom ne dit rien. La reconnaissance passe par le NOM du fichier — étroite et fermée,
+  // comme S41 : l'élargir rendrait la règle bavarde sur tout le code d'un produit.
+  const PAGE_SERVIE = /(^|[-_.])(connexion|login|sign-?in|authentification|aide|help)([-_.]|$)/i;
+  const EXT_PAGE = /\.(html?|jsx?|tsx?|vue|svelte|astro|ejs|hbs|handlebars|njk|liquid|php|cshtml)$/i;
+  const MENTION_DEMO = /(d[ée]mo|demonstration|MODE_DEMO)/i;
+  const ADRESSE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
+  const ETIQUETTE_MDP = /(mots?\s+de\s+passe|password|motdepasse|\bmdp\b|passphrase)/i;
+  // Une VALEUR en dur : ni interpolation, ni nom de variable, ni renvoi à l'environnement.
+  const valeurEnDur = (jeton) => jeton.length >= 4
+    && !/[{}$<>%]/.test(jeton) && !/process\.env|import\.meta\.env/.test(jeton)
+    && !/^[A-Z][A-Z0-9_]*$/.test(jeton);
+  for (const f of fichiers(cible)) {
+    const nom = f.split(/[\\/]/).pop();
+    if (!EXT_PAGE.test(nom) || !PAGE_SERVIE.test(nom.replace(EXT_PAGE, ""))) continue;
+    let contenu = "";
+    try { contenu = readFileSync(f, "utf8"); } catch { continue; }
+    contenu.split(/\r?\n/).forEach((ligne, i) => {
+      if (!MENTION_DEMO.test(ligne)) return;
+      const adresse = (ADRESSE.exec(ligne) || [])[0];
+      let motDePasse = null;
+      const m = ETIQUETTE_MDP.exec(ligne);
+      if (m) {
+        const apres = ligne.slice(m.index + m[0].length).replace(/^[\s:=«»"'`>\-–—/|]*/, "");
+        const jeton = (apres.match(/^[^\s<"'`,;)|]+/) || [""])[0];
+        if (valeurEnDur(jeton)) motDePasse = jeton;
+      }
+      if (!adresse && !motDePasse) return;
+      const quoi = [adresse && `l'adresse « ${adresse} »`, motDePasse && `le mot de passe « ${motDePasse} »`]
+        .filter(Boolean).join(" et ");
+      ko("R-23", `${rel(f)}:${i + 1}`, `la page SERVIE affiche ${quoi} dans un contexte de démonstration — ` +
+        "ce que le visiteur lit est un accès réel dès que l'environnement sort du poste local, et une " +
+        "qualification servie sur Internet en fait un compte ouvert à tous. La fiche d'accès nomme des " +
+        "variables depuis TF-0871 ; un identifiant retiré du document et laissé à l'écran n'a pas été " +
+        "retiré. Remède : n'afficher que le NOM de la variable, ou rien — la valeur vient du seed local (TF-1088)");
+    });
+  }
 }
 
 const nonJuge = [
@@ -1856,6 +1911,8 @@ const nonJuge = [
   "seule la PRÉSENCE de CLAUDE.md/README est jugée, pas la pertinence de leur contenu",
   "R-21 : correspondance nom+version par inclusion textuelle dans les lockfiles — pas de résolution sémantique de graphes de dépendances ; recherche bornée à 2 niveaux de descente (hors sources_de_verite déclarées, lues où qu'elles soient) — un lockfile plus profond que 2 niveaux et non déclaré reste invisible",
   "R-23 : motifs de secrets forts uniquement — un mot de passe réaliste inventé sans motif connu passe (revue humaine + gitleaks en CI)",
+  "R-23, volet « page servie » (TF-1088) : la reconnaissance passe par le NOM du fichier (connexion, login, sign-in, authentification, aide, help) — un identifiant de démonstration affiché depuis un composant dont le nom ne dit rien reste invisible. Le vocabulaire est étroit et fermé par choix : l'élargir à tout le code d'un produit rendrait la règle bavarde là où elle doit être opposable",
+  "R-23, volet « page servie » : ni que la page soit réellement SERVIE, ni que le mode démo soit actif hors du poste local. L'oracle lit un gabarit sur le disque ; c'est la conjonction des deux — page publique et mode démo — qui a fait l'incident E-01, et seule la moitié lisible est jugée",
   "R-24 : seules les URLs http(s) des lignes d'environnement de PARAMETRAGE.md sont jugées — URLs documentaires du corps et hôtes sans schéma (BDD) hors périmètre ; la correspondance <nom-appli> ↔ nom réel du produit reste une revue humaine (le SUFFIXE d'environnement, lui, est jugé mécaniquement depuis TF-0267 : accord avec la ligne, et doublon toujours en défaut)",
   "R-24 (TF-0267) : le doublon d'environnement n'est vu que sur un vocabulaire borné (dev, qualif, qualification, recette, staging, preprod, prod, production, uat) — un mot d'environnement maison passera ; « demo », « test » et « sandbox » en sont volontairement absents, ce sont aussi des noms d'applications",
   "R-24 (TF-0267) : la prose d'écart n'est détectée que sur un vocabulaire explicite (écart, dérogation, exception, non conforme, à renommer) croisé avec R-24/nommage/suffixe — un écart raconté en d'autres mots ne sera pas vu ; c'est le champ structuré `ecarts_r24` qui fait foi, pas la détection de prose",

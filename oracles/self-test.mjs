@@ -501,6 +501,42 @@ check("rouge-docs : R-20..R-24 + R-26 se déclenchent, localisantes", () => {
   for (const f of rapport.findings) if (!f.ou || !f.message) throw new Error(`finding ${f.regle} sans localisation`);
 });
 
+// ---- R-23, SECOND VOLET (TF-1088) — LA PAGE SERVIE, PAS SEULEMENT LA FICHE ----------------
+//
+// La paire sort du banc des défauts échappés, cas E-01 (phase MEP) : « des identifiants de
+// démonstration triviaux figurent en clair dans la fiche d'accès ET s'affichent sur la page de
+// connexion quand le mode démo est actif, alors que l'environnement de qualification est servi
+// publiquement sur Internet ». TF-0871 a fermé la fiche ; la page était restée hors de portée.
+// Les deux gabarits ne diffèrent QUE par la ligne d'aide affichée sous le formulaire.
+const PAGE_ROUGE = '<main>\n  <h1>Connexion</h1>\n  <form method="post">\n'
+  + '    <input name="identifiant" type="email">\n    <input name="motdepasse" type="password">\n'
+  + '    <button>Entrer</button>\n  </form>\n'
+  + '  <p class="aide">Démo : admin@demo.local / mot de passe demo-admin</p>\n</main>\n';
+const PAGE_VERTE = PAGE_ROUGE.replace(
+  '<p class="aide">Démo : admin@demo.local / mot de passe demo-admin</p>',
+  '<p class="aide">Mode démonstration : les comptes sont créés par le seed local (DEMO_ADMIN_IDENTIFIANT).</p>');
+mkdirSync(join(rougeDocs, "src", "pages"), { recursive: true });
+writeFileSync(join(rougeDocs, "src", "pages", "connexion.html"), PAGE_ROUGE);
+mkdirSync(join(verte, "src", "pages"), { recursive: true });
+writeFileSync(join(verte, "src", "pages", "connexion.html"), PAGE_VERTE);
+
+check("rouge-docs : la page de CONNEXION servie affiche les identifiants de démo → R-23 la nomme, ligne comprise (TF-1088)", () => {
+  const { rapport } = lance(rougeDocs);
+  const pages = rapport.findings.filter((f) => f.regle === "R-23" && f.statut === "FAIL" && /page SERVIE/.test(f.message));
+  if (pages.length !== 1) throw new Error(`R-23 page servie : 1 constat attendu, ${pages.length} obtenu(s) — `
+    + "sans lui, un identifiant retiré de la fiche et laissé à l'écran passerait pour retiré (cas E-01 du banc)");
+  if (!/src\/pages\/connexion\.html:\d+$/.test(pages[0].ou)) throw new Error(`le constat ne porte pas sa ligne : ${pages[0].ou}`);
+  if (!/admin@demo\.local/.test(pages[0].message) || !/demo-admin/.test(pages[0].message))
+    throw new Error("le constat ne nomme pas ce qui s'affiche : " + pages[0].message);
+});
+
+check("verte : LA MÊME page, sans valeur affichée, ne déclenche aucun R-23 (TF-1088)", () => {
+  const { rapport } = lance(verte);
+  const pages = rapport.findings.filter((f) => f.regle === "R-23" && f.statut === "FAIL");
+  if (pages.length) throw new Error("une page de connexion qui ne montre que le NOM de la variable est accusée : "
+    + pages.map((f) => f.ou + " " + f.message).join(" | "));
+});
+
 check("rouge-docs : un identifiant et un mot de passe de démo écrits en VALEUR → 2 constats R-23 nommant le profil (TF-0871)", () => {
   const { rapport } = lance(rougeDocs);
   const valeurs = rapport.findings.filter((f) => f.regle === "R-23" && f.statut === "FAIL" && /est une VALEUR/.test(f.message));
