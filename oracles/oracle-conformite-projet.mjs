@@ -99,6 +99,10 @@ const git = (...args) => spawnSync("git", ["-C", cible, ...args], { encoding: "u
 const aGit = existsSync(p(".git"));
 
 const MOTIF_DATE = / - \d{8}[a-z]?\.[\w.]+$/;
+// Le même nommage, sans extension : celui d'un livrable-DOSSIER (TF-1177). Un projet PBIP, un
+// export multi-fichiers, un site statique se remettent en dossier ; leurs parties sont imposées par
+// le format et ne se renomment pas.
+const MOTIF_DOSSIER_DATE = / - \d{8}[a-z]?$/;
 const EXT_CODE = new Set(["py", "js", "mjs", "cjs", "ts", "tsx", "jsx", "go", "rs", "java", "rb", "php", "cs"]);
 const EXT_LIVRABLE = new Set(["md", "pdf", "html", "pptx", "docx", "xlsx", "zip", "png", "svg"]);
 // LISEZMOI.md : index de dossier, pas un livrable daté (convention des familles numérotées
@@ -286,12 +290,43 @@ for (const d of ["output", "docs"]) {
   for (const f of fichiers(p(d))) {
     const nom = basename(f);
     const ext = nom.split(".").pop().toLowerCase();
-    if (EXCLUS_NOMMAGE.has(nom) || !EXT_LIVRABLE.has(ext) || /\/Old\//i.test("/" + rel(f))) continue;
+    if (/\/Old\//i.test("/" + rel(f))) continue;
     if (estExcluDuDepot(rel(f))) continue;   // TF-0853 : jamais versionné = pas un livrable
     // `.oracles\` : captures produites PAR `render_page.py` à côté de la page auditée — ce
     // sont des pièces de preuve d'oracle, pas des livrables remis. Les nommer R-4 reviendrait
     // à dater un journal (TF-0197).
     if (/[\/]\.oracles[\/]/.test("/" + rel(f))) continue;
+    // ---- TF-1177 (17/09/2026) — LES PARTIES D'UN LIVRABLE COMPOSÉ NE SONT PAS DES LIVRABLES ----
+    //
+    // LE FAIT DU 17/09 : un projet Power BI remis sous « output\<Marque> - Projet Power BI -
+    // 20260917m\ » a rendu TROIS R-4 FAIL, sur `fond.svg`, `reset1.png` et `reset2.png` — les
+    // ressources d'image du rapport, placées par le format à un emplacement imposé et référencées
+    // PAR LEUR NOM dans le rapport. Les 40 autres fichiers du même dossier (`.tmdl`, `.pbir`,
+    // `.pbism`, `.pbip`) n'étaient pas jugés, leur extension n'étant pas dans `EXT_LIVRABLE` : *le
+    // même dossier était conforme ou fautif selon l'extension de ses parties.* Et les renommer était
+    // impossible — le plafond de chemin de l'alinéa TF-1015 aurait été dépassé de 13 caractères.
+    //
+    // LE LIVRABLE REMIS EST LE DOSSIER, et c'est lui que R-4 juge : son nommage daté, son indice
+    // unique dans son dossier parent, et la longueur de chemin de CHAQUE partie — celle-là est
+    // mesurée plus bas, sur les fichiers réels, et ne bouge pas d'un caractère. Même raisonnement
+    // que pour `.oracles\` et `docs\projet\` : ce qui n'est pas remis ne porte pas le nom d'un remis.
+    //
+    // AUCUNE ÉCHAPPATOIRE GÉNÉRALE : la dispense tient au DOSSIER ANCÊTRE daté, jamais à
+    // l'emplacement ni à l'extension. Un `.png` livré à plat dans `output\` n'a aucun ancêtre daté,
+    // il reste jugé — et le banc le tient dans ce sens-là aussi.
+    const segments = rel(f).split("/");
+    const iDossier = segments.slice(0, -1).findIndex((s) => MOTIF_DOSSIER_DATE.test(s));
+    if (iDossier >= 0) {
+      const nomDossier = segments[iDossier];
+      const parent = segments.slice(0, iDossier).join("/") || ".";
+      const cleD = nomDossier.match(/ - (\d{8}[a-z]?)$/)[1];
+      if (!indicesParDossier.has(parent)) indicesParDossier.set(parent, new Map());
+      const parCleD = indicesParDossier.get(parent);
+      if (!parCleD.has(cleD)) parCleD.set(cleD, new Set());
+      parCleD.get(cleD).add(nomDossier);
+      continue;
+    }
+    if (EXCLUS_NOMMAGE.has(nom) || !EXT_LIVRABLE.has(ext)) continue;
     if (/^docs[\/]projet[\/]/.test(rel(f))) continue; // socle documentaire R-20 : documents vivants à noms fixes, pas des livrables datés
     // TF-0197 (14/08) : le gabarit d'étude du pilot PRESCRIT lui-même « output\03-etudes\
     // <AAAAMMJJ>-etude-<objet>.md » (gabarits\ETUDE-OPPORTUNITE.md l.6) — date en tête, pour

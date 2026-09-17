@@ -669,6 +669,30 @@ check("TF-1015 — R-4 dénonce un chemin d'output\\ qui dépasse 150 caractère
     throw new Error("le jumeau à EXACTEMENT 150 caractères sidecar compris est accusé — la règle mord sur un nom conforme");
 });
 
+// ---- fixture LIVRABLE-DOSSIER (TF-1177, 17/09) : R-4 jugeait au nommage daté les fichiers
+// INTERNES d'un livrable remis en DOSSIER. Le 17/09, un projet Power BI a rendu trois FAIL sur ses
+// ressources d'image — placées par le format à un emplacement imposé, référencées par leur nom dans
+// le rapport, et impossibles à renommer sans dépasser le plafond de chemin. Les DEUX SENS sur la
+// MÊME fixture : les parties d'un dossier daté sont muettes, le `.png` livré à PLAT dans `output\`
+// reste dénoncé — sans quoi la correction aurait pu désarmer R-4 sur toute une extension. ---------
+const rougeDossier = mkdtempSync(join(tmpdir(), "conf-dossier-"));
+const DOSSIER_LIVRABLE = "Produit - Projet Power BI - 20260917m";
+mkdirSync(join(rougeDossier, "output", DOSSIER_LIVRABLE, "Rapport.Report", "StaticResources"), { recursive: true });
+writeFileSync(join(rougeDossier, "output", DOSSIER_LIVRABLE, "Rapport.Report", "StaticResources", "fond.svg"), "<svg/>" + NL_TEST);
+writeFileSync(join(rougeDossier, "output", DOSSIER_LIVRABLE, "Rapport.Report", "report.json"), "{}" + NL_TEST);
+writeFileSync(join(rougeDossier, "output", "capture.png"), "x" + NL_TEST);   // à plat : toujours jugé
+sh("git", ["init", "-q", "-b", "main"], rougeDossier);
+
+check("TF-1177 — R-4 juge le DOSSIER-livrable daté et non ses parties internes, et le fichier livré à PLAT reste jugé", () => {
+  const { rapport } = lance(rougeDossier);
+  const r4 = rapport.findings.filter((f) => f.regle === "R-4" && f.statut === "FAIL");
+  const internes = r4.filter((f) => /StaticResources|report\.json/.test(f.ou));
+  if (internes.length)
+    throw new Error(`les parties internes d'un livrable-dossier sont jugées comme des livrables : ${internes.map((f) => f.ou).join(", ")}`);
+  if (!r4.some((f) => /capture\.png$/.test(f.ou) && /nommage/.test(f.message)))
+    throw new Error("le `.png` livré À PLAT dans output\\ n'est plus jugé — la dispense du dossier daté s'est étendue en échappatoire générale");
+});
+
 // ---- fixture ROUGE-ENV (TF-0869) : le `.env.example` est PRÉSENT, RENSEIGNÉ et SUIVI — donc
 // vert pour les trois sous-contrôles historiques de R-13 — et il porte pourtant deux valeurs
 // qui n'auraient jamais dû entrer dans un fichier versionné : une variable déléguée à l'humain
