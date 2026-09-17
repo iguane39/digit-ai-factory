@@ -24,7 +24,7 @@
  * dépasse 150 mots, écriture ou pas (fonction `jugeable`) ; les exemptions — accusé de réception,
  * réponse courte, question rendue à l'humain — sont écrites au §Portée du gabarit.
  */
-import { readFileSync, writeFileSync, mkdtempSync, appendFileSync, existsSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdtempSync, appendFileSync, existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
@@ -218,7 +218,42 @@ const replisDe = (t) => (bloc3De(t).match(/si rien n(?:'|’)est d[ée]cid|sans 
 // dans le fichier jugé, 2 à l'écran »). Parmi les fichiers marqués, la SYNTHÈSE se reconnaît à son
 // nom (Synthese / Restitution / RESTITUTION-*) ; le marqueur seul reste le repli quand aucun nom ne
 // tranche, et la doctrine (RESTITUTION.md) réserve désormais le marqueur aux restitutions.
-export function syntheseDuTour(chemins) {
+// TF-1184 (17/09/2026) — UN FICHIER RENOMMÉ HORS OUTIL D'ÉCRITURE SORT DE LA LISTE DU TOUR.
+//
+// LE FAIT, rejoué dans la session du pilot du 17/09 : la synthèse déposée a été RENOMMÉE par `mv`
+// pour tenir le plafond de longueur de chemin (S42). Le hook ne connaît que les chemins passés aux
+// outils d'ÉCRITURE ; ce chemin-là n'existe plus, et le nouveau n'a jamais transité par un outil.
+// Ce jour-là le repli a tenu — un seul fichier marqué dans le tour — mais rien ne le garantissait,
+// et deux fichiers marqués auraient fait juger l'écran contre le mauvais document.
+//
+// CE QUI EST AJOUTÉ, et sa borne : quand un chemin écrit N'EXISTE PLUS, on relit SON DOSSIER, et
+// lui seul. Un fichier disparu a été renommé, déplacé ou supprimé ; son dossier est le seul endroit
+// où le chercher sans balayer le disque. Les candidats sont ordonnés par date de modification, le
+// plus récent examiné en premier — c'est la seule chose qui distingue deux fichiers marqués
+// coexistant dans le même dossier, et c'est exactement le cas que le fait du 17/09 laissait ouvert.
+function relusDuDisque(chemins) {
+  const dossiers = new Set();
+  for (const c of chemins) {
+    if (!c || existsSync(c)) continue;
+    try { dossiers.add(dirname(c)); } catch { /* chemin non résolu : rien à relire */ }
+  }
+  const candidats = [];
+  for (const d of dossiers) {
+    let noms = [];
+    try { noms = readdirSync(d).filter((n) => /\.md$/i.test(n)); } catch { continue; }
+    for (const n of noms) {
+      const f = join(d, n);
+      if (chemins.includes(f)) continue;
+      try { candidats.push({ f, t: statSync(f).mtimeMs }); } catch { /* illisible : on passe */ }
+    }
+  }
+  // Du plus ANCIEN au plus RÉCENT : la boucle de `syntheseDuTour` parcourt la liste à l'envers,
+  // donc le dernier ajouté est le premier examiné.
+  return candidats.sort((a, b) => a.t - b.t).map((c) => c.f);
+}
+
+export function syntheseDuTour(cheminsEcrits) {
+  const chemins = [...cheminsEcrits, ...relusDuDisque(cheminsEcrits)];
   const marques = [];
   for (let i = chemins.length - 1; i >= 0; i--) {
     try {

@@ -16,7 +16,7 @@
  * La conformité du message « bon » est établie par oracle-synthese lui-même (pas par le test).
  * Joué par oracles/self-tests.mjs (I2).
  */
-import { mkdtempSync, writeFileSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, writeFileSync, readFileSync, rmSync, mkdirSync, utimesSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
@@ -412,8 +412,42 @@ try {
     if (syntheseDuTour([gabarit]) !== null) echecs.push("19 bis : un fichier qui ne porte le marqueur que dans sa prose est pris pour une synthèse");
     if (syntheseDuTour([synthese]) !== synthese) echecs.push("19 ter : la synthèse au marqueur en frontmatter n'est plus reconnue");
   }
+
+  // 27 à 29 (TF-1184, 17/09) — UN FICHIER RENOMMÉ HORS OUTIL D'ÉCRITURE RESTE LA SYNTHÈSE DU TOUR.
+  // Le fait rejoué le 17/09 : la synthèse déposée a été renommée par `mv` pour tenir le plafond de
+  // longueur de chemin (S42). Le hook ne connaît que les chemins passés aux outils d'écriture ; ce
+  // jour-là le repli a tenu parce qu'un seul fichier marqué existait, et rien ne le garantissait.
+  {
+    const d = join(base, "renomme");
+    mkdirSync(d, { recursive: true });
+    const ecrit = join(d, "Marque - Synthese Mandat - Un titre tres long qui depasse le plafond - 20260917a.md");
+    const renomme = join(d, "Marque - Synthese Mandat - Court - 20260917a.md");
+    writeFileSync(renomme, "---\ndestinataire: humain\n---\n\n# Synthèse renommée\n", "utf8");
+    // `ecrit` n'existe PAS : c'est l'état laissé par un `mv` — le chemin de l'outil d'écriture a
+    // disparu, le nouveau n'a jamais transité par un outil.
+    if (syntheseDuTour([ecrit]) !== renomme)
+      echecs.push("27 : un fichier de synthèse RENOMMÉ après son dépôt n'est pas retrouvé — le hook comparerait "
+        + `l'écran à rien du tout, ou au mauvais document (TF-1184), obtenu ${syntheseDuTour([ecrit])}`);
+
+    // 28 — LE CAS QUE LE 17/09 LAISSAIT OUVERT : deux fichiers marqués dans le même dossier. C'est
+    // le PLUS RÉCEMMENT MODIFIÉ qui est la synthèse de ce tour, et rien d'autre ne les distingue.
+    const vieux = join(d, "Marque - Synthese Mandat - De la veille - 20260916a.md");
+    writeFileSync(vieux, "---\ndestinataire: humain\n---\n\n# Synthèse de la veille\n", "utf8");
+    const jadis = new Date(Date.now() - 86400000);
+    utimesSync(vieux, jadis, jadis);
+    if (syntheseDuTour([ecrit]) !== renomme)
+      echecs.push("28 : deux synthèses marquées coexistent et ce n'est pas la plus récemment modifiée qui est "
+        + `retenue — le repli du 17/09 n'était garanti que par leur unicité, obtenu ${syntheseDuTour([ecrit])}`);
+
+    // 29 — LA BORNE : un chemin écrit qui EXISTE n'ouvre aucune relecture. Sans elle, un tour qui a
+    // écrit deux .md dans un dossier plein ferait juger un fichier qu'il n'a pas touché.
+    const present = join(d, "Marque - Synthese Mandat - Presente - 20260917b.md");
+    writeFileSync(present, "---\ndestinataire: humain\n---\n\n# Synthèse écrite par l'outil\n", "utf8");
+    if (syntheseDuTour([present]) !== present)
+      echecs.push(`29 : un chemin écrit et PRÉSENT n'est plus retenu — la relecture du disque déborde sur un fichier que le tour n'a pas touché, obtenu ${syntheseDuTour([present])}`);
+  }
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 200)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error("hook-restitution : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log("hook-restitution : 26/26 — relais d'avancement dans ses TROIS sens (TF-1182) : trois lignes après une synthèse déjà affichée et RIEN d'écrit depuis NON jugées, le MÊME message précédé d'une seule écriture JUGÉ (le trou de TF-0978 reste fermé), et le MÊME message posant une D-7 JUGÉ (les trois absences de TF-0990 tiennent) ; marqueur lu en tête de ligne et jamais dans la prose : le gabarit qui le CITE n'est plus jugé à la place de la synthèse du tour (correction du 17 septembre 2026), hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019), exemption « rien de neuf » dans ses DEUX sens — un accusé de trois lignes sans verdict ni D-N NON jugé, le même message posant une D-N JUGÉ (TF-0990)");
+console.log("hook-restitution : 29/29 — un fichier de synthèse RENOMMÉ hors outil d'écriture est retrouvé en relisant le dossier du chemin disparu, le plus récemment modifié l'emportant quand deux fichiers marqués coexistent, et un chemin écrit PRÉSENT n'ouvre aucune relecture (TF-1184) ; relais d'avancement dans ses TROIS sens (TF-1182) : trois lignes après une synthèse déjà affichée et RIEN d'écrit depuis NON jugées, le MÊME message précédé d'une seule écriture JUGÉ (le trou de TF-0978 reste fermé), et le MÊME message posant une D-7 JUGÉ (les trois absences de TF-0990 tiennent) ; marqueur lu en tête de ligne et jamais dans la prose : le gabarit qui le CITE n'est plus jugé à la place de la synthèse du tour (correction du 17 septembre 2026), hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019), exemption « rien de neuf » dans ses DEUX sens — un accusé de trois lignes sans verdict ni D-N NON jugé, le même message posant une D-N JUGÉ (TF-0990)");
