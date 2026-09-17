@@ -61,7 +61,8 @@ if (lanceEnDirect) {
   const racine = i >= 0 ? args[i + 1] : join(ICI, "..");
   if (!racine || !existsSync(racine) || !statSync(racine).isDirectory()) { console.error(`racine illisible : ${racine}`); process.exit(2); }
   const r = relever(racine);
-  if (args.includes("--json")) { console.log(JSON.stringify(r, null, 1)); process.exit(0); }
+  // `nombre_sans_appelant` : le scalaire que lit la sonde hebdomadaire du plan des récidives (TF-1165).
+  if (args.includes("--json")) { console.log(JSON.stringify({ nombre_sans_appelant: r.sansAppelant.length, ...r }, null, 1)); process.exit(0); }
   console.log(`relever-appelants — ${r.controles} contrôle(s), ${r.sansAppelant.length} sans appelant exécutable :`);
   for (const s of r.sansAppelant) console.log(`  - ${s.controle}${s.cite_en_doctrine ? " (cité en doctrine seulement)" : " (cité nulle part)"}`);
   process.exit(0);

@@ -9,8 +9,12 @@
  */
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import { spawnSync } from "node:child_process";
 import { relever } from "./relever-appelants.mjs";
+
+const ICI = dirname(fileURLToPath(import.meta.url));
 
 let pass = 0, fail = 0;
 const check = (nom, fn) => { try { fn(); console.log(`  [PASS] ${nom}`); pass++; } catch (e) { console.error(`  [FAIL] ${nom} — ${e.message}`); fail++; } };
@@ -39,6 +43,13 @@ try {
   });
   check("un hook lui-même est un contrôle compté", () => {
     if (r.controles !== 4) throw new Error(`${r.controles} contrôle(s) comptés, 4 attendus`);
+  });
+  check("SONDE (TF-1165) — `--json` rend `nombre_sans_appelant`, le scalaire que lit le plan hebdomadaire, égal à la liste", () => {
+    const s = spawnSync(process.execPath, [join(ICI, "relever-appelants.mjs"), "--racine", T, "--json"], { encoding: "utf8" });
+    if (s.status !== 0) throw new Error(`exit ${s.status} : ${s.stderr}`);
+    const d = JSON.parse(s.stdout);
+    if (d.nombre_sans_appelant !== d.sansAppelant.length || d.nombre_sans_appelant !== r.sansAppelant.length) throw new Error(`nombre_sans_appelant = ${d.nombre_sans_appelant}, liste = ${d.sansAppelant.length}, module = ${r.sansAppelant.length}`);
+    if (d.nombre_sans_appelant < 2) throw new Error("oracle-b et oracle-c ne sont pas comptés");
   });
 } finally { rmSync(T, { recursive: true, force: true }); }
 console.log(`\nrelever-appelants (TF-1096) : ${pass} PASS, ${fail} FAIL`);

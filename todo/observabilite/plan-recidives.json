@@ -1,27 +1,81 @@
 {
   "format": "forge-observability/plan@1",
   "nom": "recidives-pilot",
-  "_role": "TF-0790 (décision D-2 (a) du 03/09/2026) : surveiller ENTRE les runs le tableau de bord des récidives et de la descente. Une récidive de plus, une classe de plus ou un produit non équipé de plus depuis le relevé précédent est une DÉRIVE — le FAIL de derive.mjs est le signal, rien n'est appliqué automatiquement (R-29). Invoqué par todo/observer-recidives.mjs (chemins relatifs à la racine du pilot) ; cadence hebdomadaire tenue par le hook d'ouverture du pilot, premier passage exercé à la main le 03/09 (N-1).",
+  "_role": "TF-0790 (décision D-2 (a) du 03/09/2026) : surveiller ENTRE les runs le tableau de bord des récidives et de la descente. Une récidive de plus, une classe de plus ou un produit non équipé de plus depuis le relevé précédent est une DÉRIVE — le FAIL de derive.mjs est le signal, rien n'est appliqué automatiquement (R-29). Invoqué par todo/observer-recidives.mjs (chemins relatifs à la racine du pilot) ; cadence hebdomadaire tenue par le hook d'ouverture du pilot, premier passage exercé à la main le 03/09 (N-1). Étendu le 17/09/2026 (TF-1163 et TF-1165, décision D-2 (a), étude output/03-etudes/20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md) : la mesure a logé le retard de la boucle dans la descente chez les produits, le stock d'items décidés non clos, le silence des sources et les contrôles sans appelant — quatre grandeurs qu'aucune sonde ne lisait. Mêmes cadence, porteur et signal ; seuils max_delta 0 à régler après deux passages ; premier passage exercé à la demande le 17/09 (N-1).",
   "sondes": [
     {
       "nom": "recidives-regeneration",
       "type": "commande",
       "cadence": "hebdomadaire",
-      "commande": ["node", "todo/generer-recidives.mjs", "--json", "todo/observabilite/RECIDIVES.json"],
+      "commande": [
+        "node",
+        "todo/generer-recidives.mjs",
+        "--json",
+        "todo/observabilite/RECIDIVES.json"
+      ],
       "champ_valeur": "recidives",
-      "seuils": { "max_delta": 0 }
+      "seuils": {
+        "max_delta": 0
+      }
     },
     {
       "nom": "recidives-compteurs",
       "type": "rapport_json",
       "cadence": "hebdomadaire",
       "fichier": "todo/observabilite/RECIDIVES.json",
-      "champs": ["recidives", "classes", "classes_sans_fondateur", "retours_classe_suspecte", "produits_non_equipes", "manques_heritage"],
+      "champs": [
+        "recidives",
+        "classes",
+        "classes_sans_fondateur",
+        "retours_classe_suspecte",
+        "produits_non_equipes",
+        "manques_heritage",
+        "couples_non_atteints",
+        "produits_en_retard",
+        "stock_candidats",
+        "stock_decides_non_clos",
+        "items_ouverts_vieux",
+        "sources_silencieuses"
+      ],
       "seuils": {
-        "recidives": { "max_delta": 0 },
-        "classes": { "max_delta": 0 },
-        "produits_non_equipes": { "max_delta": 0 },
-        "retours_classe_suspecte": { "max_delta": 0 }
+        "recidives": {
+          "max_delta": 0
+        },
+        "classes": {
+          "max_delta": 0
+        },
+        "produits_non_equipes": {
+          "max_delta": 0
+        },
+        "retours_classe_suspecte": {
+          "max_delta": 0
+        },
+        "couples_non_atteints": {
+          "max_delta": 0
+        },
+        "items_ouverts_vieux": {
+          "max_delta": 0
+        },
+        "sources_silencieuses": {
+          "max_delta": 0
+        },
+        "stock_decides_non_clos": {
+          "max_delta": 10
+        }
+      }
+    },
+    {
+      "nom": "controles-sans-appelant",
+      "type": "commande",
+      "cadence": "hebdomadaire",
+      "commande": [
+        "node",
+        "scripts/relever-appelants.mjs",
+        "--json"
+      ],
+      "champ_valeur": "nombre_sans_appelant",
+      "seuils": {
+        "max_delta": 0
       }
     }
   ]

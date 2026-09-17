@@ -13,7 +13,8 @@
  * Options : --sans-bootstrap · --sans-readme (sessions produit : les README du pilot ne sont
  * pas leur affaire) · --pilot <dossier> (lanceur produit : chemin du pilot résolu).
  */
-import { existsSync, readFileSync, copyFileSync, mkdirSync, appendFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, copyFileSync, mkdirSync, appendFileSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join, dirname, sep } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -343,12 +344,28 @@ if (iPilot < 0) {
       else if (j.verdict === "donnees_insuffisantes") lignes.push(`- premier relevé écrit (snapshot ${j.snapshot_seq ?? "?"}) — la dérive se lira au prochain passage`);
       else lignes.push(`- DÉRIVE (${j.verdict}) : ${(j.derive?.findings || [j.message]).slice(0, 4).join(" ; ")} — lire todo/RECIDIVES.md, décider en revue des classes (rien n'est appliqué automatiquement)`);
     }
+    // TF-1166 (décision D-3 (a), 17/09/2026) — LES SOURCES MUETTES SE NOMMENT À CHAQUE OUVERTURE, pas une
+    // fois par semaine : le silence médian des sources de retours est passé de 8 à 11 jours entre le
+    // 30/08 et le 17/09 sans qu'aucune ligne le dise. Le calcul n'est PAS refait ici — une seconde
+    // lecture de la boîte serait un contrôle maison : `generer-recidives.mjs` est rejoué vers des
+    // fichiers TEMPORAIRES (aucune vue suivie n'est touchée à l'ouverture) et son JSON est lu.
+    // Une source sans activité n'a rien à remonter : la ligne nomme, elle ne condamne pas.
+    try {
+      const tmp = mkdtempSync(join(tmpdir(), "ouverture-recidives-"));
+      const r = spawnSync(process.execPath, [join(PILOT, "todo", "generer-recidives.mjs"), "--sortie", join(tmp, "R.md"), "--json", join(tmp, "R.json")], { encoding: "utf8", cwd: PILOT, timeout: 60000 });
+      const c = r.status === 0 ? JSON.parse(readFileSync(join(tmp, "R.json"), "utf8")) : null;
+      rmSync(tmp, { recursive: true, force: true });
+      if (!c) lignes.push(`- sources muettes : NON mesurées (generer-recidives exit ${r.status})`);
+      else if (c.sources_muettes === null) lignes.push("- sources muettes : non mesurable, boîte des lots de retours introuvable");
+      else if (!c.sources_muettes.length) lignes.push(`- sources de retours : aucune muette depuis plus de ${c.seuil_jours} j`);
+      else lignes.push(`- ${c.sources_muettes.length} source(s) de retours muette(s) depuis plus de ${c.seuil_jours} j : ${c.sources_muettes.slice(0, 8).map((s) => `${s.source} (${s.silence} j)`).join(", ")}${c.sources_muettes.length > 8 ? ", …" : ""} — une source sans activité n'a rien à remonter ; détail et descente par produit : todo/RECIDIVES.md sections 5 et 7`);
+    } catch (e) { lignes.push(`- sources muettes : NON mesurées (${String(e.message || e).slice(0, 120)})`); }
   }
 }
 
 lignes.push("",
   "## Gates actifs dans cette session (R-44)",
-  "- Tout message de fin de traitement — tour de TRAVAIL, verdict rendu, ou message de plus de 150 mots — suit gabarits\RESTITUTION.md — bloc 0 + 8 blocs, aucun omis. Bloc 3 : une décision par BLOC DE CITATION, ouverte par son sélecteur `D-N` et une QUESTION, rappel du sujet puis recommandation SOURCÉE, options en tableau `Option | Coût | Exclusions` hors citation, ligne de repli « si rien n'est décidé » pour finir. Bloc 8 : UN TABLEAU unique, l'acteur en COLONNE (auto_ia/manuelle_dev/manuelle_utilisateur), trié auto_ia d'abord, chaque action ouverte par son sélecteur `A-N` — les deux familles ne partagent JAMAIS la même numérotation. Effort en complexité × durée, jamais en jours. v2.18.0 (08/09) : le VERDICT que tu affiches mesure ce que le fichier jugé mesure — un tour qui n'apporte qu'un delta REDÉPOSE la synthèse à jour et affiche celle-là, il ne retouche pas l'écran seul ; un tour qui n'apporte rien de neuf rend un accusé bref, pas une restitution de plus. v2.17.0 (08/09) : ce que tu AFFICHES est le fichier jugé, jamais son résumé — les blocs 3 et 8 s'y reprennent en entier (tableau des options, sélecteurs A-N, acteurs du vocabulaire gelé) ; et un message final PORTANT UN VERDICT ou dépassant 150 mots est jugé même sans aucune écriture dans le tour. v2.16.0 (02/09) : aucune action manuelle_utilisateur ne demande à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation ; une correction restituée nomme son contrôle rouge → vert ou sa classe ; le fichier de synthèse se nomme Synthese ou Restitution — le marqueur `destinataire: humain` est réservé aux restitutions. Le hook Stop le juge par oracle-synthese et REFUSE l'arrêt en cas d'échec.",
+  "- Tout message de fin de traitement — tour de TRAVAIL, verdict rendu, ou message de plus de 150 mots — suit gabarits\\RESTITUTION.md — bloc 0 + 8 blocs, aucun omis. v2.23.0 (17/09) : CHEZ UN PRODUIT, le bloc 9 porte une ligne « Remontée à la factory : rien à remonter. » ou « Remontée à la factory : lot « <produit> - RETOURS - AAAAMMJJ<indice> » remis. » — « rien à remonter » est une réponse valide, le silence ne l'est pas (S48 ; sans objet au pilot et dans une forge). Bloc 3 : une décision par BLOC DE CITATION, ouverte par son sélecteur `D-N` et une QUESTION, rappel du sujet puis recommandation SOURCÉE, options en tableau `Option | Coût | Exclusions` hors citation, ligne de repli « si rien n'est décidé » pour finir. Bloc 8 : UN TABLEAU unique, l'acteur en COLONNE (auto_ia/manuelle_dev/manuelle_utilisateur), trié auto_ia d'abord, chaque action ouverte par son sélecteur `A-N` — les deux familles ne partagent JAMAIS la même numérotation. Effort en complexité × durée, jamais en jours. v2.18.0 (08/09) : le VERDICT que tu affiches mesure ce que le fichier jugé mesure — un tour qui n'apporte qu'un delta REDÉPOSE la synthèse à jour et affiche celle-là, il ne retouche pas l'écran seul ; un tour qui n'apporte rien de neuf rend un accusé bref, pas une restitution de plus. v2.17.0 (08/09) : ce que tu AFFICHES est le fichier jugé, jamais son résumé — les blocs 3 et 8 s'y reprennent en entier (tableau des options, sélecteurs A-N, acteurs du vocabulaire gelé) ; et un message final PORTANT UN VERDICT ou dépassant 150 mots est jugé même sans aucune écriture dans le tour. v2.16.0 (02/09) : aucune action manuelle_utilisateur ne demande à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation ; une correction restituée nomme son contrôle rouge → vert ou sa classe ; le fichier de synthèse se nomme Synthese ou Restitution — le marqueur `destinataire: humain` est réservé aux restitutions. Le hook Stop le juge par oracle-synthese et REFUSE l'arrêt en cas d'échec.",
   "- Les README d'input\\ et output\\ se régénèrent après chaque écriture (hook PostToolUse) ; un rôle non rédigé est un défaut.",
   "- Quand la factory est impliquée, ses règles priment sur celles du projet (R-43).");
 console.log(lignes.join("\n"));

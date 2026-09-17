@@ -17,12 +17,16 @@
  *   4. CONTRE-MÉTRIQUE : classes créées par semaine, et classes sans clôture fondatrice — parce
  *      que la façon la moins chère de faire baisser un compteur de récidives est d'inventer des
  *      clés neuves (Ch7 de l'analyse L99 du 03/09).
+ *   5-7. (TF-1163, TF-1164, étude du 17/09/2026) la descente PAR PRODUIT avec la relance proposée,
+ *      le STOCK des items ouverts avec sa contre-mesure (émises contre tranchées), et le SILENCE
+ *      des sources de retours — le pilot décide et clôt en moins d'un jour en médiane, le retard
+ *      mesuré vit dans ces trois grandeurs, qu'aucune sonde ne lisait.
  * Ce qui n'est pas mesurable se DIT (« non mesurable encore »), jamais mis à zéro.
  *
  * Usage : node todo\generer-recidives.mjs [--registre <TODO.jsonl>] [--archive <…>] [--classes <…>]
- *          [--releves <…>] [--heritage <…>] [--sortie <RECIDIVES.md>]
+ *          [--releves <…>] [--heritage <…>] [--retours <dossier>] [--sortie <RECIDIVES.md>] [--json <…>]
  */
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { dirname, join, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import { empreinteFichier } from "../scripts/lib-empreinte.mjs";
@@ -35,6 +39,11 @@ const CLS = arg("--classes", join(ICI, "CLASSES.json"));
 const REL = arg("--releves", join(ICI, "HERITAGE-RELEVES.jsonl"));
 const HER = arg("--heritage", join(ICI, "..", "gabarits", "HERITAGE.json"));
 const OUT = arg("--sortie", join(ICI, "RECIDIVES.md"));
+// `--retours <dossier>` (TF-1163, 17/09/2026) : la boîte des lots de retours, lue par ses NOMS de
+// fichiers seulement (`<source> - RETOURS - AAAAMMJJ<indice>.md`, racine et `old/`) — le silence
+// d'une source se mesure contre l'état des sources (ts max), jamais contre l'horloge.
+const RET = arg("--retours", join(ICI, "..", "input", "00-retours"));
+const SEUIL_JOURS = 7; // seuil commun des sections 5 à 7 — à régler après deux passages (TF-1163)
 // `--json <fichier>` (TF-0790, 03/09/2026) : les compteurs du tableau de bord dans un JSON que la sonde
 // `rapport_json` de forge-observability sait lire — et sur stdout, pour la sonde `commande`. La vue
 // Markdown reste générée dans le même passage : un seul calcul, deux formes.
@@ -55,9 +64,11 @@ let tsMax = "";
 for (const e of [...lire(ARC), ...lire(SRC)]) {
   if (e.ts && e.ts > tsMax) tsMax = e.ts;
   if (!e.id) continue;
-  if (e.ev === "creation") etats.set(e.id, { ...e, _corrige: null });
+  if (e.ev === "creation") etats.set(e.id, { ...e, _corrige: null, _cree: e.ts || null, _tranche: null });
   else if (e.ev === "maj" && etats.has(e.id)) {
     const s = etats.get(e.id); Object.assign(s, e);
+    // première sortie de `candidat` (décidé ou écarté) : la date où la candidature a été TRANCHÉE
+    if (!s._tranche && ["decide", "ecarte"].includes(e.statut)) s._tranche = e.ts || null;
     if (e.statut === "corrige") s._corrige = e.date_correction || String(e.ts || "").slice(0, 10);
   }
 }
@@ -93,6 +104,8 @@ const artefactDe = (c) => {
 };
 const CONFORME = (etat) => !["absent", "divergent", "incomplet", "hors_racine"].includes(etat);
 const delais = [];
+// TF-1164 (17/09/2026) : la même mesure, retournée PAR PRODUIT — « quel produit ouvrir en premier ».
+const descenteParProduit = new Map();
 for (const [k, c] of classes) {
   const dates = (c.fondee_par || []).map((id) => etats.get(id)?._corrige).filter(Boolean).sort();
   const dateCorrection = dates[0] || null;
@@ -107,6 +120,11 @@ for (const [k, c] of classes) {
     if (!a) continue;
     if (CONFORME(a.etat) && !produits.has(p.produit)) produits.set(p.produit, Math.round((Date.parse(r.ts) - Date.parse(dateCorrection)) / 86400000));
     else if (!produits.has(p.produit)) produits.set(p.produit, null);
+  }
+  for (const [p, v] of produits) {
+    const pp = descenteParProduit.get(p) || { atteints: 0, enRetard: [] };
+    if (v === null) pp.enRetard.push({ classe: k, correction: dateCorrection, artefact: art.cible }); else pp.atteints++;
+    descenteParProduit.set(p, pp);
   }
   const mesures = [...produits.values()].filter((v) => v !== null);
   const enAttente = [...produits.entries()].filter(([, v]) => v === null).map(([p]) => p);
@@ -129,6 +147,47 @@ const parSemaine = new Map();
 for (const c of classes.values()) if (c.creee_le) parSemaine.set(semaine(c.creee_le), (parSemaine.get(semaine(c.creee_le)) || 0) + 1);
 const sansFondateur = [...classes.values()].filter((c) => !(c.fondee_par || []).length).map((c) => c.cle);
 const suspectes = items.filter((s) => s.classe_suspecte).map((s) => `${s.id} (${s.classe})`);
+
+// ---- 5 à 7. descente par produit, stock des items ouverts, silence des sources (TF-1163, TF-1164) ----
+// L'étude du 17/09/2026 a mesuré que le retard de la boucle ne se loge pas dans la décision (médiane
+// inférieure à un jour) mais dans la descente chez les produits, dans le stock d'items décidés non
+// clos et dans le silence des sources — trois grandeurs qu'aucune sonde ne lisait. Tout se date contre
+// `tsMax` (l'état des sources), jamais contre l'horloge : la vue reste déterministe.
+const jourRef = tsMax ? tsMax.slice(0, 10) : null;
+const joursDepuis = (d) => (jourRef && d ? Math.round((Date.parse(jourRef) - Date.parse(String(d).slice(0, 10))) / 86400000) : null);
+const lignesProduits = [...descenteParProduit.entries()].map(([p, v]) => ({ produit: p, atteints: v.atteints, enRetard: v.enRetard,
+  retardMax: v.enRetard.length ? Math.max(...v.enRetard.map((x) => joursDepuis(x.correction) ?? 0)) : 0 }))
+  .sort((a, b) => b.retardMax - a.retardMax || b.enRetard.length - a.enRetard.length || a.produit.localeCompare(b.produit));
+const couplesNonAtteints = lignesProduits.reduce((n, l) => n + l.enRetard.length, 0);
+const produitsARelancer = lignesProduits.filter((l) => l.retardMax > SEUIL_JOURS);
+
+const OUVERTS = ["candidat", "decide", "en_cours"];
+const ouverts = items.filter((s) => OUVERTS.includes(s.statut));
+const stockCandidats = ouverts.filter((s) => s.statut === "candidat").length;
+const stockDecides = ouverts.length - stockCandidats;
+const ouvertsAges = ouverts.map((s) => ({ id: s.id, statut: s.statut, age: joursDepuis(s._cree) })).filter((s) => s.age !== null && s.age > SEUIL_JOURS).sort((a, b) => b.age - a.age || a.id.localeCompare(b.id));
+const fluxParSemaine = new Map();
+for (const s of items) {
+  if (s._cree) { const k = semaine(s._cree); const f = fluxParSemaine.get(k) || { emises: 0, tranchees: 0 }; f.emises++; fluxParSemaine.set(k, f); }
+  if (s._tranche) { const k = semaine(s._tranche); const f = fluxParSemaine.get(k) || { emises: 0, tranchees: 0 }; f.tranchees++; fluxParSemaine.set(k, f); }
+}
+const dernieresSemaines = [...fluxParSemaine.entries()].sort().slice(-4);
+
+const dernierLot = new Map();
+let retoursLus = false;
+for (const d of [RET, join(RET, "old")]) {
+  if (!existsSync(d)) continue;
+  retoursLus = true;
+  for (const f of readdirSync(d)) {
+    const m = f.match(/^(.+?) - RETOURS - (\d{4})(\d{2})(\d{2})[a-z]*\.md$/);
+    if (!m) continue;
+    const date = `${m[2]}-${m[3]}-${m[4]}`;
+    if (!dernierLot.has(m[1]) || dernierLot.get(m[1]) < date) dernierLot.set(m[1], date);
+  }
+}
+const silences = [...dernierLot.entries()].map(([source, date]) => ({ source, date, silence: joursDepuis(date) })).filter((s) => s.silence !== null)
+  .sort((a, b) => b.silence - a.silence || a.source.localeCompare(b.source));
+const sourcesSilencieuses = silences.filter((s) => s.silence > SEUIL_JOURS);
 
 // ---- rendu -----------------------------------------------------------------------------------
 const L = [];
@@ -173,7 +232,40 @@ if (!parSemaine.size) L.push(`| (aucune) | |`);
 L.push(``, `- Classes sans clôture fondatrice : ${sansFondateur.length ? sansFondateur.map((k) => `\`${k}\``).join(", ") : "aucune"}`,
   `- Retours entrés sous une classe suspecte : ${suspectes.length ? suspectes.join(", ") : "aucun"}`, ``);
 
+L.push(`## 5. Descente par produit — quel produit ouvrir en premier`, ``);
+if (!lignesProduits.length) L.push(`Non mesurable encore : aucune classe ne porte à la fois une clôture fondatrice, un artefact hérité et un relevé d'héritage postérieur à sa correction.`, ``);
+else {
+  L.push(`Comment lire : la section 2 retournée par produit. Une ligne par produit relevé, triée par retard décroissant ; *en retard* compte les classes corrigées au pilot dont l'artefact porteur n'est pas conforme chez ce produit ; le *retard* est l'âge en jours de la plus ancienne de ces corrections, mesuré contre l'état des sources. La recopie de l'héritage se fait à l'ouverture d'une session chez le produit : cette liste dit lequel ouvrir.`, ``,
+    `| Produit | Classes atteintes | Classes en retard | Retard max (j) | Classes en retard, de la plus ancienne à la plus récente |`, `|---|---|---|---|---|`);
+  for (const l of lignesProduits) L.push(`| ${l.produit} | ${l.atteints} | ${l.enRetard.length} | ${l.enRetard.length ? l.retardMax : "—"} | ${l.enRetard.sort((a, b) => a.correction.localeCompare(b.correction) || a.classe.localeCompare(b.classe)).map((x) => `\`${x.classe}\` (${x.correction})`).join(", ") || "—"} |`);
+  L.push(``, `- Couples produit × classe non atteints : ${couplesNonAtteints}.`,
+    `- Produits en retard de plus de ${SEUIL_JOURS} jours : ${produitsARelancer.length ? produitsARelancer.map((l) => l.produit).join(", ") : "aucun"}.`);
+  if (produitsARelancer.length) L.push(`- Relance PROPOSÉE, jamais jouée d'office : \`node todo\\emettre-travaux.mjs --produit <nom> --essai\` rend le lot sans rien écrire ; sans \`--essai\`, le lot est déposé dans la boîte d'entrée du produit, et rien d'autre n'est écrit chez lui. L'ouverture de la session reste un geste humain.`);
+  L.push(``);
+}
+
+L.push(`## 6. Stock des items ouverts et contre-mesure du débit`, ``,
+  `Comment lire : le stock à l'état des sources, puis les items ouverts depuis plus de ${SEUIL_JOURS} jours, puis le débit des 4 dernières semaines ISO — *émises* compte les items entrés au registre, *tranchées* ceux qui sont sortis de \`candidat\` (décidés ou écartés). Un stock qui monte deux semaines de suite demande une relecture du dispositif, pas une sonde de plus.`, ``,
+  `- Stock : ${stockCandidats} candidat(s) en attente de décision, ${stockDecides} item(s) décidé(s) ou en cours, non clos.`,
+  `- Ouverts depuis plus de ${SEUIL_JOURS} jours : ${ouvertsAges.length}${ouvertsAges.length ? ` — ${ouvertsAges.map((s) => `${s.id} (${s.statut}, ${s.age} j)`).join(", ")}` : ""}.`, ``,
+  `| Semaine | Émises | Tranchées |`, `|---|---|---|`);
+for (const [s, f] of dernieresSemaines) L.push(`| ${s} | ${f.emises} | ${f.tranchees} |`);
+if (!dernieresSemaines.length) L.push(`| (aucune) | | |`);
+L.push(``);
+
+L.push(`## 7. Silence des sources de retours`, ``);
+if (!retoursLus) L.push(`Non mesurable : la boîte des lots de retours est introuvable (\`--retours\`).`, ``);
+else {
+  L.push(`Comment lire : une ligne par source ayant remis au moins un lot, triée par silence décroissant ; le *silence* est le nombre de jours entre son dernier lot et l'état des sources. Une source sans activité n'a rien à remonter : la mesure ne distingue pas ce cas d'un oubli, et le dit.`, ``,
+    `| Source | Dernier lot | Silence (j) |`, `|---|---|---|`);
+  for (const s of silences) L.push(`| ${s.source} | ${s.date} | ${s.silence} |`);
+  if (!silences.length) L.push(`| (aucune source) | | |`);
+  L.push(``, `- Sources muettes depuis plus de ${SEUIL_JOURS} jours : ${sourcesSilencieuses.length} sur ${silences.length}.`, ``);
+}
+
 L.push(`## Ce que cette vue ne juge pas`, ``,
+  `- qu'un produit en retard soit FAUTIF : un produit que personne n'a ouvert depuis la correction n'a pas pu la recevoir — la section 5 nomme, elle ne condamne pas ;`,
+  `- qu'une source muette ait quelque chose à remonter : la section 7 lit des noms de fichiers, pas l'activité du produit ;`,
   `- la JUSTESSE d'une classe déclarée par un producteur : un retour mal classé est une récidive manquée, et seule une revue des classes (BOUCLE-AMELIORATION.md) la voit ;`,
   `- la descente d'une règle qui ne vit dans aucun artefact hérité : elle est déclarée non mesurable, jamais supposée faite ;`,
   `- les items antérieurs au 03/09/2026 sans classe : ils ne comptent ni comme items ni comme récidives — la mesure du pas 0 (output/03-etudes) les a lus une fois, à la main.`, ``);
@@ -189,6 +281,14 @@ if (JSON_OUT) {
     classes: classes.size, familles: familles.size, classes_sans_fondateur: sansFondateur.length, retours_classe_suspecte: suspectes.length,
     releves: releves.length, produits_releves: dernier ? (dernier.produits || []).length : null,
     produits_non_equipes: produitsNonEquipes, manques_heritage: manques,
+    // TF-1163 (17/09/2026) : les grandeurs où l'étude a mesuré le retard — `null` quand non mesurable.
+    couples_non_atteints: lignesProduits.length ? couplesNonAtteints : null,
+    produits_en_retard: lignesProduits.length ? produitsARelancer.length : null,
+    stock_candidats: stockCandidats, stock_decides_non_clos: stockDecides, items_ouverts_vieux: ouvertsAges.length,
+    sources_silencieuses: retoursLus ? sourcesSilencieuses.length : null,
+    // TF-1166 (D-3 (a), 17/09/2026) : les noms, pour la ligne du relevé d'ouverture du pilot — la sonde ne lit que le compte.
+    sources_muettes: retoursLus ? sourcesSilencieuses.map((s) => ({ source: s.source, silence: s.silence })) : null,
+    seuil_jours: SEUIL_JOURS,
   };
   writeFileSync(JSON_OUT, JSON.stringify(compteurs, null, 1) + "\n", "utf8");
   console.log(JSON.stringify(compteurs));

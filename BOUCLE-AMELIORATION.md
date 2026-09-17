@@ -84,6 +84,17 @@ mesure que personne ne relit entre deux tours est une mesure qui ne change rien 
 lanceur `todo\observer-recidives.mjs` (recette 4 cas rouge/vert), cadence hebdomadaire tenue par
 le hook d'ouverture du pilot, premier passage exercé — voir `fiches\forge-observability.md`.
 
+**Plan étendu le 17/09/2026 (TF-1163, TF-1164, TF-1165 — décision D-2 (a) sur l'étude
+`output\03-etudes\20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md`).** L'étude a
+écarté une revue hebdomadaire rédigée : sur 709 items clos en 4 semaines, le pilot décide et clôt
+en moins d'un jour en médiane. Le retard mesuré vit dans la descente chez les produits (88 couples
+produit × classe non atteints sur 164), dans le stock d'items décidés non clos (de 3 à 40 en
+4 semaines) et dans le silence des sources. Le plan lit désormais ces grandeurs, et le relevé des
+contrôles sans appelant y entre comme sonde `commande`. Le tableau de bord porte trois sections de
+plus : la descente PAR PRODUIT avec la relance proposée, jamais jouée d'office ; le stock et sa
+contre-mesure, candidatures émises contre tranchées ; le silence des sources. Mêmes cadence,
+porteur et signal ; seuils à régler après deux passages ; verdict de l'étude revu le 2026-10-15.
+
 ## Canal des retours produits (règle 18, 06/08/2026)
 
 Chaque produit prépare ses retours dans `forge\retours\` — un lot = un fichier

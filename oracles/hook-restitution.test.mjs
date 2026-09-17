@@ -21,7 +21,7 @@ import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { comparerAffiche, controlerGeste } from "./hook-restitution.mjs";
+import { comparerAffiche, controlerGeste, syntheseDuTour } from "./hook-restitution.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const HOOK = join(ICI, "hook-restitution.mjs");
@@ -345,8 +345,22 @@ try {
     if (g.applicable)
       echecs.push(`18 bis : « ${texte.slice(0, 40)} » pris pour un sélecteur (${g.decision}) — la règle crierait sur une prose`);
   }
+
+  // 19 — LE MARQUEUR SE LIT EN TÊTE DE LIGNE (17/09/2026). Le gabarit de restitution CITE le marqueur dans
+  // sa prose et s'appelle « restitution » : édité dans le même tour que la synthèse, il a été jugé à sa
+  // place. Les deux fichiers ne diffèrent que par la POSITION du marqueur : champ, ou mot dans une phrase.
+  {
+    const gabarit = join(base, "RESTITUTION.md");
+    const synthese = join(base, "Marque - Synthese Mandat - Objet - 20260917a.md");
+    writeFileSync(gabarit, "# Consigne de restitution\n\nLa synthèse naît avec `destinataire: humain` en frontmatter YAML.\n", "utf8");
+    writeFileSync(synthese, "---\ndestinataire: humain\n---\n\n# Synthèse\n", "utf8");
+    const choisi = syntheseDuTour([synthese, gabarit]);   // le gabarit est écrit EN DERNIER, comme le 17/09
+    if (choisi !== synthese) echecs.push(`19 : le gabarit qui CITE le marqueur est jugé à la place de la synthèse (${choisi})`);
+    if (syntheseDuTour([gabarit]) !== null) echecs.push("19 bis : un fichier qui ne porte le marqueur que dans sa prose est pris pour une synthèse");
+    if (syntheseDuTour([synthese]) !== synthese) echecs.push("19 ter : la synthèse au marqueur en frontmatter n'est plus reconnue");
+  }
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 200)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error("hook-restitution : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log("hook-restitution : 22/22 — hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019), exemption « rien de neuf » dans ses DEUX sens — un accusé de trois lignes sans verdict ni D-N NON jugé, le même message posant une D-N JUGÉ (TF-0990)");
+console.log("hook-restitution : 23/23 — marqueur lu en tête de ligne et jamais dans la prose : le gabarit qui le CITE n'est plus jugé à la place de la synthèse du tour (correction du 17 septembre 2026), hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019), exemption « rien de neuf » dans ses DEUX sens — un accusé de trois lignes sans verdict ni D-N NON jugé, le même message posant une D-N JUGÉ (TF-0990)");

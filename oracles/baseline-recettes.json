@@ -104,7 +104,7 @@
   "vu_le": "2026-08-26"
  },
  "oracle-ecriture.mjs": {
-  "cas": 16,
+  "cas": 17,
   "vu_le": "2026-09-16"
  },
  "oracle-empreintes.mjs": {
@@ -219,8 +219,8 @@
   "vu_le": "2026-08-26"
  },
  "oracle-synthese.mjs": {
-  "cas": 27,
-  "vu_le": "2026-09-16"
+  "cas": 28,
+  "vu_le": "2026-09-17"
  },
  "oracle-trace-mutation-mep.mjs": {
   "cas": 8,
@@ -255,8 +255,8 @@
   "vu_le": "2026-09-02"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 22,
-  "vu_le": "2026-09-16"
+  "cas": 23,
+  "vu_le": "2026-09-17"
  },
  "oracles/lib-baseline-recettes.test.mjs": {
   "cas": 16,
@@ -339,8 +339,8 @@
   "vu_le": "2026-09-08"
  },
  "scripts/relever-appelants.test.mjs": {
-  "cas": 4,
-  "vu_le": "2026-09-14"
+  "cas": 5,
+  "vu_le": "2026-09-17"
  },
  "scripts/relever-empreintes-skills.test.mjs": {
   "cas": 8,
@@ -415,8 +415,8 @@
   "vu_le": "2026-09-14"
  },
  "todo/generer-recidives.test.mjs": {
-  "cas": 5,
-  "vu_le": "2026-09-03"
+  "cas": 9,
+  "vu_le": "2026-09-17"
  },
  "todo/ingerer-anonymise-fichier.test.mjs": {
   "cas": 5,
@@ -499,7 +499,7 @@
   "vu_le": "2026-08-26"
  },
  "todo/self-test.mjs": {
-  "cas": 55,
-  "vu_le": "2026-09-14"
+  "cas": 58,
+  "vu_le": "2026-09-16"
  }
 }
