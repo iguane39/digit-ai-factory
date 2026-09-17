@@ -20,6 +20,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `chemin-de-livrable-au-dela-du-plafond-plateforme-20260910a.tf.jsonl` | fichier | 4,1 Ko | 1 ligne(s) JSONL |
 | `ci-forge-development-rouge-depuis-le-08-09-20260913a.tf.jsonl` | fichier | 2,6 Ko | 1 ligne(s) JSONL |
 | `ci-hebergee-rouge-environnement-non-rejoue-forge-audit-20260910a.tf.jsonl` | fichier | 4,0 Ko | 1 ligne(s) JSONL |
+| `cliquet-recettes-date-lue-comme-compte-20260917a.tf.jsonl` | fichier | 1,7 Ko | 1 ligne(s) JSONL |
 | `conception-documentaire-amont-20260914a.tf.jsonl` | fichier | 3,9 Ko | 2 ligne(s) JSONL |
 | `coquille-page-etude-slop-tokens-20260917b.tf.jsonl` | fichier | 2,1 Ko | 1 ligne(s) JSONL |
 | `decision-humaine-restituee-sans-geste-pilot-20260911a.tf.jsonl` | fichier | 3,8 Ko | 1 ligne(s) JSONL |
@@ -57,4 +58,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `valeurs-en-toutes-lettres-20260916a.tf.jsonl` | fichier | 2,5 Ko | 1 ligne(s) JSONL |
 | `viewport-de-conception-fullhd-4k-20260912a.tf.jsonl` | fichier | 3,1 Ko | 1 ligne(s) JSONL |
 
-_39 fichier(s), 1 sous-dossier(s)_ · 9 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_40 fichier(s), 1 sous-dossier(s)_ · 9 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

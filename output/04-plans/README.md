@@ -21,7 +21,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Note Revue - Denominateur des freres - 20260818a.md` | fichier | 4,1 Ko | Digit-AI — Note de revue : le dénominateur des « frères » — 20260818a |
 | `Digit-AI - Plan Renommage - Fenetre A factory - 20260817a.md` | fichier | 3,2 Ko | Plan de renommage `digit-ai-forge-pilot` → `digit-ai-factory` — fenêtre A exécutée, gate n |
 | `Digit-AI - Restitution - Verification d une rectification et cle confirmee - 20260910a.md` | fichier | 33,1 Ko | Restitution — la clé que la session voisine déclarait inexistante existe, et la réécriture |
-| `Digit-AI - Specification Produit - Produit-66 - 20260911a.md` | fichier | 36,6 Ko | Spécification de création — produit `Produit-66` — 20260911a |
+| `Digit-AI - Specification Produit - digit-ai-marketing - 20260911a.md` | fichier | 36,6 Ko | Spécification de création — produit `digit-ai-marketing` — 20260911a |
 | `Digit-AI - Synthese - D-3a actee et execution transferee au produit - 20260901i.md` | fichier | 5,7 Ko | Synthèse — Décision d'engagement actée, exécution transférée au produit — 20260901i |
 | `Digit-AI - Synthese - Etapes transferees au produit par lot de travaux - 20260901j.md` | fichier | 5,2 Ko | Synthèse — Les étapes de la décision transférées au produit — 20260901j |
 | `Digit-AI - Synthese - Etude donnees de recherche et cascade intention - 20260901h.md` | fichier | 10,4 Ko | Synthèse — Étude des données de recherche et cascade de l'intention — 20260901h |
@@ -59,7 +59,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - D-11 a etait executee a 09h10 boucle mesuree et deposee - 20260911b.md` | fichier | 21,7 Ko | Synthèse de mandat — D-11 (a) était déjà exécutée à 09:10 ; ce qui bouclait, c'est la rest |
 | `Digit-AI - Synthese Mandat - D-12 a executee regle etendue registre publie - 20260911c.md` | fichier | 14,9 Ko | Synthèse de mandat — D-12 (a) exécutée : la règle de publication couvre désormais les cand |
 | `Digit-AI - Synthese Mandat - D-13 a executee pilot et forge publies CI lue - 20260911e.md` | fichier | 13,4 Ko | Synthèse de mandat — D-13 (a) exécutée : le pilot et la forge d'audit sont publiés et véri |
-| `Digit-AI - Synthese Mandat - D-3 a executee spec Produit-66 RUN-AO lots lances - 20260911h.md` | fichier | 25,8 Ko | Synthèse de mandat — D-3 (a) est exécutée : les huit candidatures sont décidées, les quatr |
+| `Digit-AI - Synthese Mandat - D-3 a executee spec digit-ai-marketing RUN-AO lots lances - 20260911h.md` | fichier | 25,8 Ko | Synthèse de mandat — D-3 (a) est exécutée : les huit candidatures sont décidées, les quatr |
 | `Digit-AI - Synthese Mandat - D-4 executee marque a deux supports produit en naissance - 20260911i.md` | fichier | 27,9 Ko | Synthèse de mandat — D-4 est exécutée : la marque Digit-AI à deux supports est jugée, enre |
 | `Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md` | fichier | 21,8 Ko | Synthèse Mandat — D-4 (a) exécutée : les contrôles ne couvrent réellement que 2 défauts éc |
 | `Digit-AI - Synthese Mandat - D-6 D-9 D-7 D-8 executees - 20260914e.md` | fichier | 15,1 Ko | Synthèse Mandat — vos quatre décisions sont exécutées : notre juge de restitution est corr |
@@ -101,6 +101,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Noyau corrige publie exclusivite retablie en ligne - 20260910d.md` | fichier | 11,7 Ko | Synthèse de mandat — votre feu vert est exécuté, le noyau corrigé est en ligne, et l'affai |
 | `Digit-AI - Synthese Mandat - Outil de reconstruction de clone decision D12a - 20260907j.md` | fichier | 11,2 Ko | Synthèse de mandat — décision D-12 (a) exécutée : la reconstruction d'un clone divergé est |
 | `Digit-AI - Synthese Mandat - Parc synchronise avec GitHub - 20260913a.md` | fichier | 20,7 Ko | Synthèse de mandat — les huit dépôts en attente sont publiés et les dix-sept du parc sont  |
+| `Digit-AI - Synthese Mandat - Pilot publie et depot de marketing declare produit - 20260917i.md` | fichier | 9,1 Ko | Synthèse de mandat — votre « 5a » est exécuté : le dépôt de marketing est déclaré produit  |
 | `Digit-AI - Synthese Mandat - Plancher d ecriture pose regle Full HD 4K - 20260912a.md` | fichier | 25,5 Ko | Synthèse de mandat — le plancher d'écriture de la Factory est posé, jugé et câblé chez le  |
 | `Digit-AI - Synthese Mandat - Point d etape fais tous les A - 20260905f.md` | fichier | 12,3 Ko | Synthèse de mandat — point d'étape du second « fais tous les A » : le pilot a fini sa part |
 | `Digit-AI - Synthese Mandat - Pourquoi le bloc 3 derive - 20260830d.md` | fichier | 16,1 Ko | Synthèse de mandat — pourquoi le bloc des décisions dérive d'un rendu à l'autre (30/08/202 |
@@ -160,4 +161,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte au vert - 20260910a.md` | fichier | 20,0 Ko | Synthèse de mandat — vos deux décisions sont exécutées, la copie locale est reconstruite,  |
 | `Digit-AI - Synthese Mandat - Vues sorties du suivi et regle d ecriture des nombres - 20260916d.md` | fichier | 11,9 Ko | Les vues sortent du suivi, et les nombres s'écrivent en chiffres |
 
-_143 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_144 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
