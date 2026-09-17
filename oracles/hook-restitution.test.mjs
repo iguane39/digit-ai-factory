@@ -33,7 +33,7 @@ const MAUVAIS = "J'ai corrigé le script et commité. Tout s'est bien passé, di
 const BON = `La mise à jour demandée est en place et vérifiée : le poste repart sur les dernières versions des forges, et rien ne bloque la suite de votre journée. Ce que cela change : les prochaines sessions démarrent à jour sans geste de votre part. Ce qui est attendu de vous : une seule décision, ci-dessous, sur le moment de la publication.
 
 ## 1. En-tête
-- quoi : campagne de mise à jour · sur quoi : la factory · quand : 2026-08-20 21:40 (Europe/Paris), durée 35 min · qui : pilot v1.17.19.
+- quoi : campagne de mise à jour · sur quoi : la factory · quand : 2026-08-20 21:40 (Europe/Paris), durée 35 min · qui : pilot v1.17.19 · intention : que le poste reparte à jour sans geste de votre part, pas seulement que la recette passe. Test rétro : bootstrap et recette sont verts, l'intention est servie.
 
 ## 2. Verdict
 - Recette du pilot 22/22 verte, bootstrap 7/7.

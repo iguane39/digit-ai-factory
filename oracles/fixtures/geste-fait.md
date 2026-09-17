@@ -1,7 +1,7 @@
 La publication est faite : la version corrigée est partie vers le dépôt distant, et les autres postes la recevront à leur prochaine ouverture. Ce que cela change : la correction n'est plus locale, elle circule. Ce qui est attendu de vous : une seule décision, ci-dessous, sur la suite du mandat.
 
 ## 1. En-tête
-- quoi : exécution du geste de publication · sur quoi : la factory · quand : 2026-09-11 09:12 (Europe/Paris), durée 4 min · qui : pilot v1.17.19.
+- quoi : exécution du geste de publication · sur quoi : la factory · quand : 2026-09-11 09:12 (Europe/Paris), durée 4 min · qui : pilot v1.17.19 · intention : mettre les forges corrigées à disposition des autres postes, pas seulement clore les items. Test rétro : les 6 dépôts sont poussés, l'intention est servie.
 
 ## 2. Verdict
 - Publication exécutée, 683 commits reçus par le dépôt distant, recette 22/22 verte après coup.

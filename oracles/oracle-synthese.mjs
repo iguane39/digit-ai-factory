@@ -88,6 +88,9 @@
  *       augmenté des 26 caractères du sidecar d'oracle, tient sous 150 caractères (11/09, TF-1015) —
  *       R-4 juge la FORME du nom et jamais sa LONGUEUR : un nom conforme peut rendre le dépôt
  *       inclonable sur un chemin profond, et le défaut ne se voit que chez celui qui VÉRIFIE ;
+ *   S51 le bloc 1 porte l'INTENTION initiale de la demande et son TEST RÉTRO (17/09, TF-0791) —
+ *       loi transverse n° 7 : la règle ne mordait que sur l'étude d'opportunité, quand le retour humain
+ *       du 01/09 disait « tous types de demande ». Présence des deux pièces, jamais leur justesse ;
  *   S50 un POINT D'ÉTAPE déclaré au bloc 1 porte ses blocs 1, 4 et 8 PLEINS (17/09, TF-1182) —
  *       la forme échange le verdict contre ces trois blocs ; vide, elle n'est qu'une exemption
  *       déguisée en forme jugée. S1 admet alors le bloc 2 sous son titre de mesure, et S3 y juge
@@ -2321,6 +2324,46 @@ function juger(texte, cheminJuge = null) {
     } else ok("S49", `${gestes} option(s) commandant un geste humain, chacune exécutable là où le choix se fait`);
   }
 
+  // ---- S51 (17/09/2026, TF-0791) — LE BLOC 1 DIT L'INTENTION, ET IL DIT SI ELLE EST SERVIE ----
+  //
+  // LE FAIT QUI FONDE LA RÈGLE, et il est vieux de seize jours. Le 01/09, une étude d'opportunité
+  // CONFORME à sa définition et VERTE à tous ses contrôles a été refusée par son destinataire :
+  // sept questions de son retour restaient sans réponse dans le texte. La loi transverse n° 7 en
+  // est née — « le résultat sert l'intention, pas la lettre » — avec `references\INTENTION.md` et
+  // deux règles d'oracle. Mais ces deux règles (E9, E10) ne mordent que sur l'ÉTUDE, alors que le
+  // retour humain disait « tous types de demande ». Le champ `intention` et le test rétro sont au
+  // bloc 1 du gabarit depuis le 17/09 ; il manquait le juge, et *une règle que rien n'exécute
+  // décore* — c'est le constat commun aux treize récidives de la classe.
+  //
+  // CE QUE LA RÈGLE JUGE, et ce qu'elle laisse au lecteur : la PRÉSENCE des deux pièces, jamais
+  // leur justesse. Qu'une intention soit bien nommée, qu'un test rétro soit sincère, aucun oracle
+  // ne peut le voir — c'est au `non_juge`. Ce qu'elle rend impossible, c'est de rendre un travail
+  // sans avoir écrit une seule fois à quoi il servait.
+  //
+  // AVERTISSANTE à son entrée (hors de `BLOQUANTES` du hook), et ce n'est pas de la prudence de
+  // façade : le champ est né le 17/09, le corpus d'`output\04-plans\` ne l'a jamais porté, et une
+  // règle bloquante ferait relire huit blocs à chaque restitution jusqu'à ce que le corpus ait
+  // tourné. Elle se durcira comme la v2.0.0 avant elle.
+  {
+    const b1 = horsCode(bloc(texte, BLOCS[0][0]) || "");
+    const aIntention = /\bintention\b/i.test(b1);
+    const aRetro = /test\s+r[ée]tro/i.test(b1);
+    // Une intention se dit en une PHRASE : l'étiquette seule (« intention : — ») ne dit rien. Le
+    // compte porte sur la puce qui la porte, ou sur le bloc entier quand le bloc 1 n'est pas en
+    // puces — les deux formes sont admises par le gabarit (« sur une ligne ou deux »).
+    const zone = puces(b1).find((l) => /\bintention\b/i.test(l)) || b1;
+    const substantielle = compteMots(zone) >= 12;
+    if (aIntention && aRetro && substantielle) ok("S51", "bloc 1 : l'intention est dite et le test rétro est posé");
+    else {
+      const manques = [];
+      if (!aIntention) manques.push("l'INTENTION initiale de la demande");
+      else if (!substantielle) manques.push("une intention SUBSTANTIELLE (l'étiquette seule ne dit rien)");
+      if (!aRetro) manques.push("le TEST RÉTRO (« le résultat répond-il à cette intention, et pas seulement à la lettre ? »)");
+      ko("S51", `bloc 1 sans ${manques.join(" ni ")} — loi transverse n° 7, \`references\\INTENTION.md\` : `
+        + "un livrable conforme à la lettre et refusé par son destinataire a coûté une étude entière le 01/09 (TF-0791)");
+    }
+  }
+
   // ---- S50 (17/09/2026, TF-1182) — CE QUE LE POINT D'ÉTAPE PAIE POUR N'AVOIR PAS DE VERDICT ----
   //
   // Le gabarit le dit en trois clauses, et une seule est allégeante : blocs 1, 4 et 8 OBLIGATOIRES
@@ -2366,7 +2409,7 @@ fonctionne. Rien n'attend de correction ; la seule chose attendue de vous est la
 publication ci-dessous.
 
 ## 1. En-tête
-Campagne · forge-tests · terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot.
+Campagne · forge-tests · terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot · intention : prouver que la surveillance de la forge de tests attrape ce qu'elle doit attraper, pas seulement faire tourner la recette. Test rétro : les 19 défauts plantés sont tous détectés, l'intention est servie.
 
 ## 2. Verdict
 Recette S-01 (banc rouge de la forge de tests) TENU — 19/19 défauts détectés au banc rouge, pytest 365.
@@ -2428,7 +2471,7 @@ Aucun écart : la demande a été suivie à la lettre.
       "\n| id | acteur | action |\n|---|---|---|\n| A1 | manuelle_utilisateur | ouvrir le portail |\n| A2 | manuelle_utilisateur | créer la ligne GITHUB_JETON= dans le fichier .env et y coller le jeton |\n" +
       "\n| acteur | quoi |\n|---|---|\n| auto_ia | regrouper les constats |\n")
     .replace(/\n\nLe contrôle complet[\s\S]*?ci-dessous\./, "")  // S9 : plus d ouverture
-    .replace("terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot.", "terminée aujourd'hui.")
+    .replace("terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot ·", "terminée aujourd'hui ·")
     .replace("- Regroupement par cause racine : motif — sa cause est traitée, critère de réouverture écrit.", "- Regroupement par cause racine")
     .replace("Coût de la reprise proposée : complexité moyen · durée court.", "Coût de la reprise proposée : 2-3 j.")
     .replace("Recette S-01 (banc rouge de la forge de tests) TENU — 19/19 défauts détectés au banc rouge, pytest 365.", "Tout s'est bien passé.")
@@ -3097,13 +3140,15 @@ Aucun écart : la demande a été suivie à la lettre.
   // du bloc 2. C'est la seule façon de prouver que ce qui est jugé est la FORME, et non un reste
   // du document. Le premier sens est celui qui manquait au 17/09 : un point d'étape écrit à la
   // lettre du gabarit doit être ACCEPTÉ, là où il rendait S1 et S3 FAIL — les deux bloquantes.
-  const EN_TETE_V = "## 1. En-tête\nCampagne · forge-tests · terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot.";
+  const EN_TETE_V = "## 1. En-tête\nCampagne · forge-tests · terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot · intention : prouver que la surveillance de la forge de tests attrape ce qu'elle doit attraper, pas seulement faire tourner la recette. Test rétro : les 19 défauts plantés sont tous détectés, l'intention est servie.";
   const VERDICT_V = "## 2. Verdict\nRecette S-01 (banc rouge de la forge de tests) TENU — 19/19 défauts détectés au banc rouge, pytest 365.";
   // La glose de « S-01 » vit dans la ligne de verdict que la forme remplace : elle se reporte dans
   // la ligne de mesure, sinon la fixture échouerait sur S23 et non sur ce qu'on prétend prouver.
   const MESURE = "Reste à mesurer : la recette S-01 (banc rouge de la forge de tests) rejouée sur la version déployée — par `node oracles\\self-tests.mjs`, au retour du déploiement lancé à 15h44.";
   const pe = verte
-    .replace(EN_TETE_V, "## 1. En-tête\nPoint d'étape · forge-tests · déploiement lancé le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot.")
+    .replace(EN_TETE_V, "## 1. En-tête\nPoint d'étape · forge-tests · déploiement lancé le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot"
+      + " · intention : mettre la version corrigée de la forge de tests à disposition, pas seulement la construire."
+      + " Test rétro : le déploiement n'a pas rendu la main, l'intention n'est pas encore servie.")
     .replace(VERDICT_V, "## 2. Ce qui reste à mesurer, et par quoi\n" + MESURE);
   const peSansMesure = pe.replace(MESURE, "La recette S-01 (banc rouge de la forge de tests) semble bien partie, on regardera demain matin.");
   const peSansTraite = pe.replace(B4lex, "- Rien encore : le déploiement n'a pas rendu la main.");
@@ -3132,12 +3177,34 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S50"[^}]*FAIL/.test(rPeT.stdout))
     casse.push("S50 : un point d'étape dont le bloc 4 ne porte RIEN passe — la mention au bloc 1 deviendrait une " +
       "exemption déguisée en forme jugée, exactement ce que TF-0979 existe pour empêcher");
+  // 17/09 — S51 DANS SES TROIS SENS (TF-0791). Les trois fixtures ne diffèrent que par la FIN de
+  // la ligne d'en-tête : les deux pièces, l'intention seule, aucune des deux. C'est la seule forme
+  // qui prouve que la règle juge ce qu'elle prétend juger et non le reste du bloc 1.
+  const INTENTION = " · intention : prouver que la surveillance de la forge de tests attrape ce qu'elle doit "
+    + "attraper, pas seulement faire tourner la recette. Test rétro : les 19 défauts plantés sont tous détectés, "
+    + "l'intention est servie.";
+  const s51sansRien = verte.replace(INTENTION, ".");
+  const s51sansRetro = verte.replace(INTENTION, " · intention : prouver que la surveillance de la forge de tests "
+    + "attrape ce qu'elle doit attraper, pas seulement faire tourner la recette.");
+  const r51r = jouerPe("s51-sans-intention.md", s51sansRien);
+  const r51d = jouerPe("s51-sans-test-retro.md", s51sansRetro);
+  if (!/"S51"[^}]*PASS/.test(rv.stdout))
+    casse.push("S51 : la fixture VERTE, dont le bloc 1 porte l'intention ET son test rétro, est accusée : " +
+      (/"S51"[\s\S]{0,200}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S51"[^}]*FAIL/.test(r51r.stdout))
+    casse.push("S51 : un bloc 1 SANS intention passe — la loi transverse n° 7 resterait écrite au noyau et au " +
+      "gabarit sans qu'aucun juge ne la joue hors des études d'opportunité (TF-0791)");
+  if (!/"S51"[^}]*FAIL/.test(r51d.stdout))
+    casse.push("S51 : une intention dite SANS son test rétro passe — or c'est le test qui dit si le résultat sert " +
+      "l'intention ou seulement la lettre ; l'intention seule est une déclaration, pas une vérification");
+  if (!/"S51"[\s\S]{0,400}TEST RÉTRO/.test(r51d.stdout))
+    casse.push("S51 : le refus ne nomme pas la pièce manquante — l'auteur relirait son bloc 1 sans savoir quoi y ajouter");
   if (!/"S50"[^}]*SANS_OBJET/.test(rv.stdout))
     casse.push("S50 : hors d'un point d'étape déclaré, la règle devrait rendre SANS_OBJET et le DIRE : " +
       (/"S50"[\s\S]{0,160}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 32/32 PASS (verte PASS ; le POINT D'ÉTAPE dans ses QUATRE sens (TF-1182 : la forme écrite À LA LETTRE du gabarit — mention au bloc 1, bloc 2 titré « ce qui reste à mesurer, et par quoi » — est ACCEPTÉE là où elle rendait S1 et S3 FAIL, les deux bloquantes ; la MÊME sans sa ligne de mesure ni aucun fait mesurable FAIL sur S3 ; la MÊME dont le bloc 4 ne porte RIEN FAIL sur S50 ; et S50 SANS_OBJET dit à voix haute hors d'un point d'étape déclaré) ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) ; S46 dans ses TROIS sens (TF-1045 : une restitution employant un terme proscrit par le lexique du destinataire FAIL, la MEME avec le terme retenu PASS, et SANS_OBJET dit a voix haute quand le projet n a pas de lexique) ; S48 dans ses QUATRE sens (TF-1166 : chez un produit, un tour muet sur ce qu il remonte FAIL, « rien a remonter » PASS, un lot nomme PASS, une ligne qui ne tranche pas FAIL, et SANS_OBJET dit hors d un produit) ; S49 dans ses TROIS sens (TF-1172 : une option commandant « se connecter … puis saisir le code » sans mode operatoire FAIL, la MEME option avec sa ligne « Comment faire » et sa commande sur place PASS, et la verte d origine — aucune option ne commandant de geste — PASS) — taux d accusation mesure sur les 148 syntheses d output\\04-plans\\ avant mise en service : 2,0 % (3 fichiers) ; taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
+    : "Self-test restitution : 35/35 PASS (verte PASS ; S51 dans ses TROIS sens (TF-0791 : un bloc 1 SANS l'intention initiale de la demande FAIL, le MÊME portant l'intention mais PAS son test rétro FAIL et nommant la pièce manquante, la verte qui porte les deux PASS — taux mesuré à 94,6 % sur les 148 synthèses d'output\\04-plans\\ à la mise en service, le champ datant de la veille : avertissante) ; le POINT D'ÉTAPE dans ses QUATRE sens (TF-1182 : la forme écrite À LA LETTRE du gabarit — mention au bloc 1, bloc 2 titré « ce qui reste à mesurer, et par quoi » — est ACCEPTÉE là où elle rendait S1 et S3 FAIL, les deux bloquantes ; la MÊME sans sa ligne de mesure ni aucun fait mesurable FAIL sur S3 ; la MÊME dont le bloc 4 ne porte RIEN FAIL sur S50 ; et S50 SANS_OBJET dit à voix haute hors d'un point d'étape déclaré) ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) ; S46 dans ses TROIS sens (TF-1045 : une restitution employant un terme proscrit par le lexique du destinataire FAIL, la MEME avec le terme retenu PASS, et SANS_OBJET dit a voix haute quand le projet n a pas de lexique) ; S48 dans ses QUATRE sens (TF-1166 : chez un produit, un tour muet sur ce qu il remonte FAIL, « rien a remonter » PASS, un lot nomme PASS, une ligne qui ne tranche pas FAIL, et SANS_OBJET dit hors d un produit) ; S49 dans ses TROIS sens (TF-1172 : une option commandant « se connecter … puis saisir le code » sans mode operatoire FAIL, la MEME option avec sa ligne « Comment faire » et sa commande sur place PASS, et la verte d origine — aucune option ne commandant de geste — PASS) — taux d accusation mesure sur les 148 syntheses d output\\04-plans\\ avant mise en service : 2,0 % (3 fichiers) ; taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
   process.exit(casse.length ? 1 : 0);
 }
 

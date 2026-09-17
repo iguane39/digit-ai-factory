@@ -1,7 +1,7 @@
 La publication de la version corrigée attend encore votre mot : tout est prêt en local, vérifié sur un clone frais, et rien n'est parti vers le dépôt distant. Ce que cela change : la correction reste chez vous tant que le geste n'est pas fait, les autres postes continuent sur la version d'hier. Ce qui est attendu de vous : une seule décision, ci-dessous, sur le moment de la publication.
 
 ## 1. En-tête
-- quoi : synthèse du mandat de publication · sur quoi : la factory · quand : 2026-09-10 21:40 (Europe/Paris), durée 40 min · qui : pilot v1.17.19.
+- quoi : synthèse du mandat de publication · sur quoi : la factory · quand : 2026-09-10 21:40 (Europe/Paris), durée 40 min · qui : pilot v1.17.19 · intention : mettre les forges corrigées à disposition des autres postes, pas seulement clore les items. Test rétro : la publication reste à faire, l'intention n'est donc pas encore servie.
 
 ## 2. Verdict
 - Recette du pilot 22/22 verte, clone frais mesuré à 683 commits.
