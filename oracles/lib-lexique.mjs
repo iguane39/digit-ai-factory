@@ -37,6 +37,24 @@ const EMPLACEMENTS = [
   join("references", "LEXIQUE.json"),
 ];
 
+// ---- LE LEXIQUE TRANSVERSE (TF-1150, 17/09/2026) — CE QUE L'HUMAIN A TRANCHÉ POUR TOUS --------
+//
+// LE FAIT : le terme « grain » a été corrigé chez un produit (TF-1045), et le lexique recopié chez
+// un SECOND le 16/09 est arrivé vide — le fichier ne porte que le lexique de SON client. Le même
+// humain a redemandé le mot une TROISIÈME fois, sur un troisième livrable. *Une règle dont la
+// portée est le produit ne protège aucun autre produit, et c'est mécanique, pas accidentel.*
+//
+// CE QUI N'EST PAS CONTREDIT. `LEXIQUE-PRODUIT.json` refuse une liste globale DÉDUITE d'un retour
+// reçu ailleurs, et il a raison : un mot corrigé chez un client ne se propage pas par contagion.
+// Ici rien n'est déduit — c'est l'humain qui étend la portée, et chaque entrée porte la citation
+// qui l'ordonne. Les deux fichiers cohabitent donc, et leurs termes se CUMULENT : l'un dit ce
+// qu'un lecteur nommé a refusé chez lui, l'autre ce que le décideur a tranché une fois pour toutes.
+const EMPLACEMENTS_TRANSVERSE = [
+  join("forge", "LEXIQUE-TRANSVERSE.json"),
+  join("docs", "projet", "LEXIQUE-TRANSVERSE.json"),
+  join("references", "LEXIQUE-TRANSVERSE.json"),
+];
+
 /** La racine d'un projet : le premier parent qui porte un `.git`, un `forge\` ou un `CLAUDE.md`. */
 function racinesDepuis(depart) {
   const sorties = [];
@@ -54,6 +72,27 @@ function racinesDepuis(depart) {
  * Rend `{ trouve, chemin, termes }`. `trouve` faux = SANS_OBJET, jamais PASS par silence.
  * `termes` : `[{ proscrit, remplacer_par, depuis, preuve }]`, les entrées sans `proscrit` ignorées.
  */
+function premierLexique(departs, emplacements, origine) {
+  for (const depart of departs) {
+    for (const d of racinesDepuis(depart)) {
+      for (const rel of emplacements) {
+        const f = join(d, rel);
+        if (!existsSync(f)) continue;
+        try {
+          const j = JSON.parse(readFileSync(f, "utf8"));
+          const termes = (j.termes || [])
+            .filter((t) => t && typeof t.proscrit === "string" && t.proscrit.trim())
+            .map((t) => ({ ...t, origine }));
+          return { trouve: true, chemin: f, termes };
+        } catch (e) {
+          return { trouve: true, chemin: f, termes: [], illisible: e.message };
+        }
+      }
+    }
+  }
+  return { trouve: false, chemin: null, termes: [] };
+}
+
 export function chargerLexique({ cheminJuge = null, cwd = process.cwd() } = {}) {
   const departs = [];
   if (cheminJuge) {
@@ -63,22 +102,29 @@ export function chargerLexique({ cheminJuge = null, cwd = process.cwd() } = {}) 
     } catch { /* chemin non résolu : on se rabat sur le cwd */ }
   }
   departs.push(resolve(cwd));
-  for (const depart of departs) {
-    for (const d of racinesDepuis(depart)) {
-      for (const rel of EMPLACEMENTS) {
-        const f = join(d, rel);
-        if (!existsSync(f)) continue;
-        try {
-          const j = JSON.parse(readFileSync(f, "utf8"));
-          const termes = (j.termes || []).filter((t) => t && typeof t.proscrit === "string" && t.proscrit.trim());
-          return { trouve: true, chemin: f, termes };
-        } catch (e) {
-          return { trouve: true, chemin: f, termes: [], illisible: e.message };
-        }
-      }
-    }
+  const produit = premierLexique(departs, EMPLACEMENTS, "produit");
+  const transverse = premierLexique(departs, EMPLACEMENTS_TRANSVERSE, "transverse");
+  if (!produit.trouve && !transverse.trouve) return { trouve: false, chemin: null, chemins: [], termes: [] };
+  // UN SEUL TERME PAR MOT PROSCRIT, et c'est le lexique du PRODUIT qui l'emporte : son lecteur est
+  // nommé, et il a pu retenir un autre remplacement que le décideur. Le cumul n'est pas une fusion
+  // aveugle — deux constats pour le même mot feraient corriger deux fois la même phrase.
+  const vus = new Set();
+  const termes = [];
+  for (const t of [...produit.termes, ...transverse.termes]) {
+    const cle = t.proscrit.trim().toLowerCase();
+    if (vus.has(cle)) continue;
+    vus.add(cle);
+    termes.push(t);
   }
-  return { trouve: false, chemin: null, termes: [] };
+  const chemins = [produit.chemin, transverse.chemin].filter(Boolean);
+  const illisible = produit.illisible || transverse.illisible;
+  return {
+    trouve: true,
+    chemin: chemins.join(" + "),
+    chemins,
+    termes,
+    ...(illisible && !termes.length ? { illisible } : {}),
+  };
 }
 
 /**

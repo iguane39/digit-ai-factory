@@ -419,7 +419,10 @@ export function juger(texte, options = {}) {
       if (employes.length)
         pousser("EC-7", "FAIL",
           `${employes.length} terme(s) proscrit(s) par le lexique du destinataire : ` +
-          employes.map((t) => `« ${t.proscrit} » (${t.occurrences}) → « ${t.remplacer_par || "à remplacer"} »`).join(" · ") +
+          // TF-1150 : l'origine se dit — un terme TRANSVERSE vient d'une décision humaine portant
+          // sur tous les produits, pas d'un retour du lecteur de celui-ci.
+          employes.map((t) => `« ${t.proscrit} » (${t.occurrences}) → « ${t.remplacer_par || "à remplacer"} »`
+            + (t.origine === "transverse" ? " [transverse : décision humaine pour TOUS les produits]" : "")).join(" · ") +
           " — un mot qui a coûté un aller-retour au client se remplace avant la livraison, pas après le second retour",
           ligneDe(0));
       else
