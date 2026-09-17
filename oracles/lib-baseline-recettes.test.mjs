@@ -60,6 +60,24 @@ check("TF-0738 — une DATE à barre oblique dans le libellé n'est pas prise po
     "avec deux ratios, ce n'est pas le DERNIER qui est lu — le compte clôt un résumé, une date le commence");
 });
 
+check("TF-1169 — une DATE en FIN de résumé n'est pas prise pour le compte de cas non plus", () => {
+  // Le fait mesuré le 17/09 : « hook-restitution : 23/23 — … du tour (17/09), hors format … »
+  // enregistré au cliquet comme 17 cas, et le harnais en échec sur « 22 → 17 cas, 5 DISPARU(S) »
+  // alors que la recette venait de GAGNER un cas. TF-0738 avait déplacé la lecture du PREMIER ratio
+  // au DERNIER ; le même défaut est revenu par l'autre bout. Les deux cas ci-dessous ne diffèrent
+  // que par la POSITION de la date, et les deux doivent rendre 23 : c'est la seule forme qui prouve
+  // que la lecture s'ancre sur la FORME du compte et non sur un bout de ligne.
+  att(compteDe("hook-restitution : 23/23 — marqueur lu en tête de ligne (17/09), hors format refusé") === 23,
+    "la date en fin de résumé a été lue comme le compte — le harnais annonce des cas perdus qui n'existent pas");
+  att(compteDe("hook-restitution (correction du 17/09) : 23/23 — marqueur lu en tête de ligne") === 23,
+    "la date en tête de résumé a été lue comme le compte — c'est le défaut de TF-0738, par l'autre bout");
+  // SENS ROUGE : un résumé dont le SEUL ratio est une date n'a aucun compte lisible. Rendre le
+  // nombre de la date serait une baseline fausse dès son premier passage, et personne ne verrait
+  // naître l'erreur ; `null` fait NOMMER la recette au harnais.
+  att(compteDe("relever-heritage : tous les tests verts (17/09)") === null,
+    "un résumé dont le seul ratio est une date a produit un compte au lieu d'être déclaré illisible");
+});
+
 check("un verdict d'ÉTAT du parc n'est pas pris pour un compte de cas", () => {
   // Les oracles d'état rendent « I4 — PASS sur le parc » : aucun chiffre, donc rien à compter.
   // Les compter à zéro ferait échouer le cliquet à chaque exécution sur une absence normale.

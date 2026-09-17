@@ -85,8 +85,39 @@ export function compteDe(resume, sortie = null) {
   // au premier passage, et cette mesure-là n'a pas changé.
   const pass = /(\d{1,4})\s*PASS\b/i.exec(resume);
   if (pass) return Number(pass[1]);
+  // TF-1169 (17/09/2026) — UN RATIO QUI EST UNE DATE N'EST PAS UN COMPTE DE CAS, ET LE DÉFAUT DE
+  // TF-0738 EST REVENU PAR L'AUTRE BOUT DE LA LIGNE. Le 17/09, la recette du hook de restitution a
+  // rendu « hook-restitution : 23/23 — … du tour (17/09), hors format … ». Sans le mot « PASS », la
+  // lecture retombait sur le DERNIER ratio, et le dernier ratio était la DATE : le harnais a annoncé
+  // « 22 → 17 cas, 5 DISPARU(S) » sur une recette qui venait d'en GAGNER un, et a échoué. Coût : une
+  // recette complète du pilot de plus. Corriger « dernier » en « premier » aurait simplement renvoyé
+  // le défaut au bout d'où il venait le 01/09 — la position n'est pas l'invariant.
+  //
+  // L'INVARIANT EST LA FORME. Un compte de cas s'écrit N/N — les deux nombres sont ÉGAUX quand la
+  // recette est verte, et le cliquet ne compte QUE les recettes vertes (voir `confronter`) — ou bien
+  // il porte son mot juste après lui (« 16/16 cas », « 14/14 PASS »). Une date à barre oblique, elle,
+  // a un jour et un mois DIFFÉRENTS, le second au plus 12, et ne porte jamais ce mot. On écarte donc
+  // les ratios de forme DATE, on prend le premier ratio à nombres égaux, à défaut le dernier ratio
+  // restant — la lecture de TF-0738, qui garde les résumés qu'elle lisait déjà.
+  //
+  // SI TOUS LES RATIOS SONT DES DATES, la recette est rendue NON JUGÉE et le harnais la NOMME :
+  // illisible est un aveu, un compte inventé est une baseline fausse dont personne ne voit naître
+  // l'erreur.
   const ratios = [...resume.matchAll(/(\d{1,4})\s*\/\s*(\d{1,4})/g)];
-  if (ratios.length) return Number(ratios[ratios.length - 1][1]);
+  if (ratios.length) {
+    const estDate = (m) => {
+      const apres = resume.slice(m.index + m[0].length, m.index + m[0].length + 12);
+      if (/^\s*(?:cas|PASS)\b/i.test(apres)) return false;
+      const jour = Number(m[1]);
+      const mois = Number(m[2]);
+      return jour !== mois && jour >= 1 && jour <= 31 && mois >= 1 && mois <= 12;
+    };
+    const candidats = ratios.filter((m) => !estDate(m));
+    const egal = candidats.find((m) => Number(m[1]) === Number(m[2]));
+    if (egal) return Number(egal[1]);
+    if (candidats.length) return Number(candidats[candidats.length - 1][1]);
+    return null;
+  }
   return null;
 }
 
