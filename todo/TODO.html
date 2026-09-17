@@ -14,7 +14,7 @@
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digit-AI — TODO-FORGE · Reste à faire — V20260915</title>
+  <title>Digit-AI — TODO-FORGE · Reste à faire — V20260917</title>
   <meta name="description" content="Reste-à-faire du registre TODO-FORGE : candidats à décider, décidés, en cours — détaillés en puces, avec date de création, priorité de traitement et impact sur la forge concernée.">
   <meta name="theme-color" content="#2563EB">
   <!-- Favicon-lettre (13/08) : « F » = Forge (projet). -->
@@ -155,7 +155,7 @@
   <div class="wrap">
     <header class="entete">
       <h1>TODO-FORGE — reste à faire</h1>
-      <p class="meta">sceau <code>98229f3df7c2</code> · dernier événement 2026-09-15T14:47:52.973Z</p>
+      <p class="meta">sceau <code>836846392c65</code> · dernier événement 2026-09-17T08:39:53.044Z</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Bascule thème sombre" aria-pressed="false">
         <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -165,7 +165,7 @@
     <!-- H3 : les KPIs comptant des éléments AFFICHÉS filtrent la liste au clic ;
          « Clos » compte des éléments hors page (archive) : informatif, pas cliquable. -->
     <div class="kpis">
-      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="73 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">73</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
+      <button type="button" class="kpi" data-statut="candidat" aria-pressed="false" title="71 candidat(s) en attente de décision humaine — clic : n'afficher qu'eux"><span class="kpi-label">À décider</span><span class="kpi-value">71</span><span class="kpi-hint">candidats — la décision est humaine · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="decide" aria-pressed="false" title="36 item(s) décidés dont les travaux ne sont pas ouverts — clic : n'afficher qu'eux"><span class="kpi-label">Décidés, à lancer</span><span class="kpi-value">36</span><span class="kpi-hint">mandat donné, travaux non ouverts · clic&nbsp;: filtrer</span></button>
       <button type="button" class="kpi" data-statut="en_cours" aria-pressed="false" title="14 campagne(s) ouvertes au registre — clic : n'afficher qu'elles"><span class="kpi-label">En cours</span><span class="kpi-value">14</span><span class="kpi-hint">campagnes ouvertes au registre · clic&nbsp;: filtrer</span></button>
       <div class="kpi" title="781 item(s) clos déplacés vers todo\TODO-ARCHIVE.jsonl — hors de cette page, donc non filtrable ici"><span class="kpi-label">Clos, archivés</span><span class="kpi-value">781</span><span class="kpi-hint">hors vue — <code>todo\TODO-ARCHIVE.jsonl</code></span></div>
@@ -1084,29 +1084,6 @@
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-1087" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-1087</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 7)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">quatre controles du pilot enumerent chacun leur propre liste de « ce qui est un livrable », et les listes DIVERGENT : aucune source ne fait autorite</h3>
-          <div class="card-detail" data-cite><p class="lead">Constat du 15/09/2026, premier resultat du balayage de D-13 (a).</p><ul class="puces"><li>Quatre controles decident chacun dans leur coin quelles extensions sont jugees : oracle-unicite.mjs (.html/.htm par extracteur, plus une liste a huit extensions ailleurs), oracle-propagation.mjs (.html/.htm/.md), scripts/verifier-jeu-livrables.mjs (PORTEURS = .html/.htm/.md), scripts/verifier-jugement.mjs (JUGES = .html/.htm/.md/.pdf)</li><li>Un livrable PDF est donc juge par UN controle sur quatre, et aucune source ne tranche</li><li>CONSEQUENCE MESUREE SUR CE PARC : NULLE a ce jour — output/ porte 233 .md, 49 .json, 23 .jsonl, 10 .png et 6 .html, zero .pdf et zero .pptx</li><li>Le defaut est donc STRUCTUREL et non paye : il se paiera a la premiere famille de livrable neuve, et le parc en produit deja hors de ce depot (le skill digit-ai-pptx rend des .pptx)</li><li>C est la classe de TF-1086 appliquee aux CIBLES plutot qu aux fenetres : un perimetre de mesure ecrit en dur dans chaque controle, au lieu d etre lu chez celui qui en porte la reference</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-15</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 7 — gain 3 × preuve 5 ÷ effort 2)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>mesure du 15/09 : 4 listes divergentes sur 4 controles, 1 extension (.pdf) jugee par un seul ; 0 fichier concerne sur le parc actuel</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot digit-ai-factory (balayage de D-13 (a) du 15/09/2026)</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-candidat" id="item-TF-0983" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0983</code>
@@ -1144,29 +1121,6 @@
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>oui — le harnais de recettes du pilot est rouge depuis le 11/09 sur cette page (2/107), la page du registre est illisible pour grep, et le defaut ne se voit ni a l ecran ni dans la donnee</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (synthese 20260912a, action A-4)</dd></div>
-            
-          </dl>
-        </article>
-        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
-             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
-             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
-             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
-             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
-             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
-        <article class="card s-candidat" id="item-TF-1088" data-cite data-forge="digit-ai-factory" data-statut="candidat" data-prio="haute">
-          <header class="card-head">
-            <code class="tf-id">TF-1088</code>
-            <span class="statut s-candidat">candidat</span>
-            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
-            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
-          </header>
-          <h3 class="card-titre">oracle-trace-mutation-mep annonce chercher les dossiers de MEP « ou qu ils vivent » et borne sa recherche a quatre niveaux : le commentaire promet plus large que le code</h3>
-          <div class="card-detail" data-cite><p class="lead">Constat du 15/09/2026, second resultat du balayage de D-13 (a).</p><ul class="puces"><li>La fonction dossiersMep() de oracles/oracle-trace-mutation-mep.mjs porte en commentaire « Les dossiers de MEP d un produit, OU QU ILS VIVENT — la doctrine n impose pas leur place », et sa signature borne a `profondeur = 4`</li><li>Un dossier de MEP au cinquieme niveau echappe au controle SANS QUE RIEN NE LE DISE — ni constat, ni SKIP, ni avertissement</li><li>C est exactement la classe de TF-1081 au socle : un commentaire qui promet ce que son code ne fait pas, et qui se lit comme une garantie</li><li>CONSEQUENCE MESUREE : NULLE a ce jour — zero fichier DOSSIER-MEP*.md dans les quatorze depots du parc, verifie par find</li><li>Deux sorties possibles : borner et le DIRE (un SKIP quand la borne est atteinte), ou ne pas borner et payer le parcours</li></ul></div>
-          <dl class="card-meta">
-            <div><dt>Créé le</dt><dd>2026-09-15</dd></div>
-            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 5 ÷ effort 1)</span></dd></div>
-            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>mesure du 15/09 : commentaire « ou qu ils vivent » contre `profondeur = 4` ; 0 DOSSIER-MEP dans le parc, donc 0 cas paye a ce jour</dd></div>
-            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot digit-ai-factory (balayage de D-13 (a) du 15/09/2026)</dd></div>
             
           </dl>
         </article>
@@ -2187,6 +2141,29 @@ BORNE DECLAREE : l oracle ne juge que la NATURE des fichiers par leur chemin ; i
              que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
              L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
              dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-1087" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-1087</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 7)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">quatre controles du pilot enumerent chacun leur propre liste de « ce qui est un livrable », et les listes DIVERGENT : aucune source ne fait autorite</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat du 15/09/2026, premier resultat du balayage de D-13 (a).</p><ul class="puces"><li>Quatre controles decident chacun dans leur coin quelles extensions sont jugees : oracle-unicite.mjs (.html/.htm par extracteur, plus une liste a huit extensions ailleurs), oracle-propagation.mjs (.html/.htm/.md), scripts/verifier-jeu-livrables.mjs (PORTEURS = .html/.htm/.md), scripts/verifier-jugement.mjs (JUGES = .html/.htm/.md/.pdf)</li><li>Un livrable PDF est donc juge par UN controle sur quatre, et aucune source ne tranche</li><li>CONSEQUENCE MESUREE SUR CE PARC : NULLE a ce jour — output/ porte 233 .md, 49 .json, 23 .jsonl, 10 .png et 6 .html, zero .pdf et zero .pptx</li><li>Le defaut est donc STRUCTUREL et non paye : il se paiera a la premiere famille de livrable neuve, et le parc en produit deja hors de ce depot (le skill digit-ai-pptx rend des .pptx)</li><li>C est la classe de TF-1086 appliquee aux CIBLES plutot qu aux fenetres : un perimetre de mesure ecrit en dur dans chaque controle, au lieu d etre lu chez celui qui en porte la reference</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-15</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 7 — gain 3 × preuve 5 ÷ effort 2)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>mesure du 15/09 : 4 listes divergentes sur 4 controles, 1 extension (.pdf) jugee par un seul ; 0 fichier concerne sur le parc actuel</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot digit-ai-factory (balayage de D-13 (a) du 15/09/2026)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
         <article class="card s-corrige" id="item-TF-0915" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
           <header class="card-head">
             <code class="tf-id">TF-0915</code>
@@ -2234,6 +2211,29 @@ PROPOSITION</li><li>Un plafond au registre des regles : chemin relatif du livrab
             <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 3 ÷ effort 1)</span></dd></div>
             <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>oui — la verification prescrite par la doctrine avant tout push a echoue a son premier emplacement le 10/09/2026 (22 fichiers refuses, checkout impossible) et a du etre rejouee ailleurs avec une option que rien ne documente</dd></div>
             <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot (constat en passant, mesure de verification du push R-38 par. 4 du 10/09/2026)</dd></div>
+            
+          </dl>
+        </article>
+        <!-- La marque de citation porte sur TOUTE la carte, titre compris (TF-0517, 22/08) : le
+             titre est ecrit par l emetteur de la candidature, pas par cette page. La regle L18 du
+             socle exige qu un renvoi code porte son sens ; elle ne peut pas l exiger d un texte
+             que cette page CITE et que le registre garde append-only. Le detail l avait deja pour
+             L12 ; le titre le manquait, et L18 l a montre le jour meme. (Pas de retour arriere
+             dans ce commentaire : il vit dans un gabarit de chaine JS.) -->
+        <article class="card s-corrige" id="item-TF-1088" data-cite data-forge="digit-ai-factory" data-statut="corrige" data-prio="haute">
+          <header class="card-head">
+            <code class="tf-id">TF-1088</code>
+            <span class="statut s-corrige">corrige</span>
+            <span class="chip prio p-haute" title="priorité dérivée du score (valeur 6)">Priorité Haute</span>
+            <span class="chip reel" title="coût payé lors d'un run réel">payé en réel</span>
+          </header>
+          <h3 class="card-titre">oracle-trace-mutation-mep annonce chercher les dossiers de MEP « ou qu ils vivent » et borne sa recherche a quatre niveaux : le commentaire promet plus large que le code</h3>
+          <div class="card-detail" data-cite><p class="lead">Constat du 15/09/2026, second resultat du balayage de D-13 (a).</p><ul class="puces"><li>La fonction dossiersMep() de oracles/oracle-trace-mutation-mep.mjs porte en commentaire « Les dossiers de MEP d un produit, OU QU ILS VIVENT — la doctrine n impose pas leur place », et sa signature borne a `profondeur = 4`</li><li>Un dossier de MEP au cinquieme niveau echappe au controle SANS QUE RIEN NE LE DISE — ni constat, ni SKIP, ni avertissement</li><li>C est exactement la classe de TF-1081 au socle : un commentaire qui promet ce que son code ne fait pas, et qui se lit comme une garantie</li><li>CONSEQUENCE MESUREE : NULLE a ce jour — zero fichier DOSSIER-MEP*.md dans les quatorze depots du parc, verifie par find</li><li>Deux sorties possibles : borner et le DIRE (un SKIP quand la borne est atteinte), ou ne pas borner et payer le parcours</li></ul></div>
+          <dl class="card-meta">
+            <div><dt>Créé le</dt><dd>2026-09-15</dd></div>
+            <div><dt>Priorité</dt><dd>Haute <span class="meta-sub">(score 6 — gain 2 × preuve 5 ÷ effort 1)</span></dd></div>
+            <div class="impact"><dt>Impact sur digit-ai-factory</dt><dd>mesure du 15/09 : commentaire « ou qu ils vivent » contre `profondeur = 4` ; 0 DOSSIER-MEP dans le parc, donc 0 cas paye a ce jour</dd></div>
+            <div><dt>Demandeur</dt><dd title="run, session ou humain à l'origine de la candidature">pilot digit-ai-factory (balayage de D-13 (a) du 15/09/2026)</dd></div>
             
           </dl>
         </article>
