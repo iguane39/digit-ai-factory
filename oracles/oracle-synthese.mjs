@@ -2183,6 +2183,67 @@ function juger(texte, cheminJuge = null) {
         "que ne rien faire est sans effet. Formes admises : « si rien n'est décidé », « sans décision », " +
         `« à défaut : », « par défaut : ». Ex. : ${sansRepli[0][0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
     } else ok("S32", `${groupesLignes.length} décision(s), chacune nommant ce qui se passe si rien n'est décidé`);
+
+    // ---- S49 (17/09/2026, TF-1172) — UNE OPTION QUI COMMANDE UN GESTE HUMAIN DIT COMMENT LE FAIRE
+    //
+    // LE RETOUR EST LA MESURE, mot pour mot (16/09/2026) : « Tu dis ce qu'il faut faire, mais tu ne
+    // dis pas comment le faire simplement ? Du coup, on ne sait pas quoi faire. » La décision D-35 de
+    // la restitution du 16/09, jugée PASS sur 46 règles, demandait par quel chemin rouvrir la
+    // connexion Power BI, avec trois options portant chacune son coût et ce qu'elle exclut. Le mode
+    // opératoire — ouvrir un terminal, coller la commande de connexion, saisir le code dans le
+    // navigateur, valider le second facteur — existait, SOIXANTE LIGNES PLUS BAS, dans une action du
+    // bloc 8. Le lecteur tranche au bloc 3 et n'y va pas : la décision a dû être reposée au tour
+    // suivant.
+    //
+    // POURQUOI LES CINQ RÈGLES DU BLOC 3 NE LE VOIENT PAS. S31 exige d'une option son coût et ce
+    // qu'elle exclut, S16 une recommandation sourcée, S32 une ligne de repli, S15 et S47 un rappel
+    // qui nomme sa chose. Aucune ne regarde ce que le lecteur devra FAIRE une fois qu'il aura
+    // choisi. S13 pose cette exigence au bloc 8 — une action laissée à l'humain est exécutable telle
+    // quelle — et n'avait aucun symétrique au bloc 3, alors que le choix s'y fait.
+    //
+    // CE QUE LA RÈGLE MESURE, ET CE QU'ELLE NE MESURE PAS. Le vocabulaire des gestes est FERMÉ et
+    // ÉTROIT : des verbes où l'humain agit de ses mains sur un terminal, un écran ou un compte.
+    // « Publier », « valider », « ouvrir » employés seuls en sont EXCLUS — ils disent une intention,
+    // pas un geste, et les admettre accuserait la quasi-totalité du corpus, comme le second
+    // déclencheur écarté de S45. Une option qui porte un tel verbe doit être exécutable SUR PLACE :
+    // un localisateur dans sa ligne (commande entre accents graves, chemin, libellé d'écran), ou une
+    // ligne « Comment faire » dans le groupe de la décision. En tableau, une colonne « Comment
+    // faire » suffit — une ligne se juge avec son en-tête, comme pour S19 et S31.
+    //
+    // BORNE ASSUMÉE : un chemin cité dans l'option satisfait la règle sans énoncer les étapes. La
+    // règle juge qu'il y a DE QUOI exécuter là où le choix se fait, pas la qualité du mode
+    // opératoire — l'exiger en étapes numérotées imposerait une typographie, et une règle qui crie
+    // sur une option exécutable se fait désactiver. Taux d'accusation mesuré sur les synthèses
+    // d'`output\04-plans\` avant mise en service (le corpus antérieur n'est pas réécrit).
+    const GESTE_HUMAIN = /(se connecter|connectez-vous|s['’]authentifier|authentifiez-vous|saisir|saisissez|coller|collez|taper |tapez |cliquer|cliquez|installer|installez|ouvrir (?:un |le |la |l['’])?(?:terminal|console|invite de commande|navigateur)|lancer (?:la |une )?commande|ex[ée]cuter (?:la |une |le )?(?:commande|script)|valider (?:le |la |un )?(?:second facteur|double authentification|code|MFA)|publier soi-m[êe]me|pousser soi-m[êe]me|renouveler (?:le |un )?(?:jeton|secret|mot de passe))/i;
+    const COMMENT_FAIRE = /(comment faire|mode op[ée]ratoire|marche [àa] suivre)/i;
+    const sansGeste = [];
+    let gestes = 0;
+    for (const g of groupesLignes) {
+      const entete = g.find((l) => /^\s*\|/.test(l)) || "";
+      const enteteComment = COMMENT_FAIRE.test(entete);
+      // La ligne « Comment faire » du groupe porte elle-même son localisateur : un libellé nu
+      // (« Comment faire : voir plus bas ») est le renvoi que le retour du 16/09 dénonce.
+      const groupeComment = g.some((l) => !RE_LIGNE_OPTION.test(l) && COMMENT_FAIRE.test(l) && _LOCALISATEURS.test(l));
+      for (const l of g) {
+        if (!RE_LIGNE_OPTION.test(l)) continue;
+        if (OPTION_PAR_DEFAUT.test(l)) continue;
+        if (!GESTE_HUMAIN.test(l)) continue;
+        gestes++;
+        const enTableau = /^\s*\|/.test(l);
+        if (!(_LOCALISATEURS.test(l) || groupeComment || (enTableau && enteteComment))) sansGeste.push(l);
+      }
+    }
+    if (!gestes) ok("S49", "aucune option ne commande un geste humain — rien dont dire le comment");
+    else if (sansGeste.length) {
+      ko("S49", `${sansGeste.length} option(s) sur ${gestes} commandant un GESTE HUMAIN sans dire COMMENT le faire — ` +
+        "le lecteur sait quoi choisir et ne sait pas quoi faire, et le mode opératoire écrit soixante lignes " +
+        "plus bas au bloc 8 ne lui sert pas : il tranche ici. Dû sur place : la commande ou le chemin entre " +
+        "accents graves, le libellé de l'écran à ouvrir, ou une ligne « Comment faire : 1) … 2) … 3) … » dans " +
+        "le groupe de la décision (en tableau, une colonne « Comment faire » suffit). C'est le retour humain " +
+        "du 16/09/2026 : « Tu dis ce qu'il faut faire, mais tu ne dis pas comment le faire simplement ? Du " +
+        `coup, on ne sait pas quoi faire. » Ex. : ${sansGeste[0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
+    } else ok("S49", `${gestes} option(s) commandant un geste humain, chacune exécutable là où le choix se fait`);
   }
 
   return findings;
@@ -2374,6 +2435,23 @@ Aucun écart : la demande a été suivie à la lettre.
     + "  autres la met en circulation ; ne pas le faire la laisse là où elle est, et personne d'autre\n"
     + "  n'en profite tant qu'on attend un arbitrage sur cet objet.");
   writeFileSync(join(dir, "decision-muette.md"), decisionMuette, "utf8");
+  // S49 (TF-1172, retour humain du 16/09/2026) — L'OPTION QUI COMMANDE UN GESTE ET NE DIT PAS
+  // COMMENT. Les deux fixtures ajoutent la MÊME option (c) à la décision de la verte — même verbe
+  // de geste, même coût, même exclusion, même recommandation, même ligne de repli : elles ne
+  // diffèrent que par la ligne « Comment faire », et c'est la seule forme qui prouve que la règle
+  // juge le mode opératoire et non le reste de l'option. La verte d'origine, dont aucune option ne
+  // commande de geste, reste PASS — sans quoi la règle crierait sur tout le corpus.
+  const OPTION_GESTE = "  - (c) rouvrir la connexion soi-même — se connecter au portail puis saisir le code reçu ;"
+    + " coût : effort simple × court ; exclut de repartir sans intervention humaine.";
+  const COMMENT_GESTE = "  - Comment faire (c) : 1) ouvrir un terminal ; 2) coller `python forge\\etapes\\data\\sonde.py --login` ;"
+    + " 3) saisir le code affiché dans l'écran « Connexion » du navigateur.";
+  const saut = String.fromCharCode(10);
+  const gesteSansComment = verte.replace("  - sans décision : rien n'est publié.",
+    OPTION_GESTE + saut + "  - sans décision : rien n'est publié.");
+  const gesteAvecComment = verte.replace("  - sans décision : rien n'est publié.",
+    OPTION_GESTE + saut + COMMENT_GESTE + saut + "  - sans décision : rien n'est publié.");
+  writeFileSync(join(dir, "geste-sans-comment.md"), gesteSansComment, "utf8");
+  writeFileSync(join(dir, "geste-avec-comment.md"), gesteAvecComment, "utf8");
   writeFileSync(join(dir, "verte.md"), verte, "utf8");
   writeFileSync(join(dir, "rouge.md"), rouge, "utf8");
   // TF-0661 — S29 a besoin de SA fixture : la rouge porte des actions au bloc 8, donc la
@@ -2551,6 +2629,21 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("S47 : un rappel fait ENTIÈREMENT de périphrases (« un des outils de la chaîne », « cette chose », " +
       "« cet objet ») passe encore — il fait 25 mots, donc S15 le laisse passer, et le lecteur ne sait pas de quoi " +
       "on parle. C'est le retour humain du 16/09/2026, mot pour mot : « on ne comprend absolument rien au charabia »");
+  // 17/09 — S49 DANS SES TROIS SENS (TF-1172). Les deux fixtures ne diffèrent que par la ligne
+  // « Comment faire » ; le troisième sens est porté par la verte d'origine, dont aucune option ne
+  // commande de geste et que la règle doit laisser tranquille.
+  const rgs = spawnSync(process.execPath, [moi, join(dir, "geste-sans-comment.md")], { encoding: "utf8" });
+  const rga = spawnSync(process.execPath, [moi, join(dir, "geste-avec-comment.md")], { encoding: "utf8" });
+  if (!/"S49"[^}]*FAIL/.test(rgs.stdout))
+    casse.push("S49 : une option qui commande « se connecter … puis saisir le code » sans dire COMMENT le faire passe — " +
+      "c'est exactement la décision du 16/09/2026 dont le mode opératoire vivait soixante lignes plus bas, et qui a dû " +
+      "être reposée : « Tu dis ce qu'il faut faire, mais tu ne dis pas comment le faire simplement ? »");
+  if (!/"S49"[^}]*PASS/.test(rga.stdout))
+    casse.push("S49 : la MÊME option, avec sa ligne « Comment faire » et sa commande sur place, est accusée — " +
+      (/"S49"[\s\S]{0,200}/.exec(rga.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S49"[^}]*PASS/.test(rv.stdout))
+    casse.push("S49 : la verte, dont aucune option ne commande de geste humain, est accusée — la règle mordrait sur " +
+      "tout le corpus : " + (/"S49"[\s\S]{0,200}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
   const rnn = spawnSync(process.execPath, [moi, join(dir, "numero-nu.md")], { encoding: "utf8" });
   if (!/"S30"[^}]*FAIL/.test(rnn.stdout))
     casse.push("S30 : un numéro NU (« 1. ») passe encore pour un sélecteur de décision — c'est par cette tolérance " +
@@ -2897,7 +2990,7 @@ Aucun écart : la demande a été suivie à la lettre.
       (/"S48"[\s\S]{0,160}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 28/28 PASS (verte PASS ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) ; S46 dans ses TROIS sens (TF-1045 : une restitution employant un terme proscrit par le lexique du destinataire FAIL, la MEME avec le terme retenu PASS, et SANS_OBJET dit a voix haute quand le projet n a pas de lexique) ; S48 dans ses QUATRE sens (TF-1166 : chez un produit, un tour muet sur ce qu il remonte FAIL, « rien a remonter » PASS, un lot nomme PASS, une ligne qui ne tranche pas FAIL, et SANS_OBJET dit hors d un produit) — taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
+    : "Self-test restitution : 29/29 PASS (verte PASS ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) ; S46 dans ses TROIS sens (TF-1045 : une restitution employant un terme proscrit par le lexique du destinataire FAIL, la MEME avec le terme retenu PASS, et SANS_OBJET dit a voix haute quand le projet n a pas de lexique) ; S48 dans ses QUATRE sens (TF-1166 : chez un produit, un tour muet sur ce qu il remonte FAIL, « rien a remonter » PASS, un lot nomme PASS, une ligne qui ne tranche pas FAIL, et SANS_OBJET dit hors d un produit) ; S49 dans ses TROIS sens (TF-1172 : une option commandant « se connecter … puis saisir le code » sans mode operatoire FAIL, la MEME option avec sa ligne « Comment faire » et sa commande sur place PASS, et la verte d origine — aucune option ne commandant de geste — PASS) — taux d accusation mesure sur les 148 syntheses d output\\04-plans\\ avant mise en service : 2,0 % (3 fichiers) ; taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
   process.exit(casse.length ? 1 : 0);
 }
 
