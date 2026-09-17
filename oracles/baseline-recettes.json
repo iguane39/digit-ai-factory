@@ -298,6 +298,10 @@
   "cas": 11,
   "vu_le": "2026-09-09"
  },
+ "scripts/lib-extensions-jugees.test.mjs": {
+  "cas": 11,
+  "vu_le": "2026-09-17"
+ },
  "scripts/lib-pseudonyme-produit.test.mjs": {
   "cas": 7,
   "vu_le": "2026-09-03"
