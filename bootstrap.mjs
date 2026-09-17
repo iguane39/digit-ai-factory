@@ -85,6 +85,15 @@ const FORGES = [
   { nom: "digit-ai-queue", preuve: "protocole/README.md" },
 ];
 
+// LES PRODUITS DE L'ÉCOSYSTÈME QUI PORTENT SON NOM (décision humaine D-5 (a) du 17/09/2026). Un dépôt
+// nommé `digit-ai-…` n'est pas forcément une forge : `digit-ai-marketing` est un PRODUIT — il porte
+// `forge\`, `PROMPT-PRODUIT.md`, remet des lots de retours — publié sous le compte de l'écosystème.
+// Il tombait dans la question « hors liste » du balayage, et la table des pseudonymes le tenait pour
+// un nom à cacher : la porte de publication a refusé le pilot sur 40 occurrences dans 11 fichiers.
+// Il n'entre PAS dans `FORGES` : un produit ne se clone ni ne se tire à l'ouverture du poste, le pilot
+// n'y intervient que sur run demandé. Il se DÉCLARE ici, et le balayage cesse de poser la question.
+const PRODUITS_DE_L_ECOSYSTEME = new Set(["digit-ai-marketing"]);
+
 // LE PILOT ET SES NOMS D'HIER (TF-0525, mesuré le 25/08/2026). Le pilot n'est pas une forge et ne
 // figure pas dans `FORGES` : son nom s'écrivait donc en littéral à chaque endroit qui en avait
 // besoin, et ses anciens noms nulle part. Une source unique ici, parce qu'un troisième renommage
@@ -438,7 +447,7 @@ console.log("");
     // de toute vérification de fraîcheur, et rien ne l'avait jamais dit. Le contrôle ne tranche pas
     // — il POSE la question, parce que la réponse (entrer dans la liste, ou être hors périmètre
     // assumé) est une décision humaine.
-    if (/^digit-ai/i.test(nom) && !horsPerimetre(nom)) {
+    if (/^digit-ai/i.test(nom) && !horsPerimetre(nom) && !PRODUITS_DE_L_ECOSYSTEME.has(nom)) {
       suspects.push({ nom, motif: `dépôt de l'écosystème HORS LISTE avec son propre origin (${o || "origin illisible"}) — ni forge suivie, ni second clone, ni mise de côté : jamais vérifié par --pull. À inscrire dans la liste des forges, ou à déclarer hors périmètre` });
     }
   }
