@@ -286,6 +286,48 @@ export function syntheseDuTour(cheminsEcrits) {
   return choisirParmi(cheminsEcrits) || choisirParmi(relusDuDisque(cheminsEcrits));
 }
 
+// TF-1081 (19/09/2026) — LE SCEAU SE POSE SANS GESTE HUMAIN, ET SUR CE QUE LE TOUR A ÉCRIT.
+//
+// `scripts\verifier-jugement.mjs` refuse depuis le 23/08 un livrable modifié après son sceau à
+// indice inchangé (règle J-1). Le sceau, lui, restait un geste de la main : aucune synthèse n'en
+// portait, donc la règle 5 ne protégeait rien du côté des restitutions. Le moment où une synthèse
+// cesse d'être un brouillon est pourtant identifiable sans ambiguïté — c'est le PASS que ce hook
+// vient de rendre sur elle.
+//
+// LE CONFLIT AVEC J-1, ET SA MESURE. Poser le sceau UNE SEULE FOIS, à la lettre de REGLES-PROJET.md
+// (« au premier passage d'oracles »), ferait de chaque redépôt un écart J-1 — or le redépôt sous le
+// même indice est la pratique, et elle est licite depuis la v2.25.0 du gabarit (« REDÉPOSE la
+// synthèse à jour »). Mesure au journal des hooks de ce dépôt, 2905 lignes : sur 238 couples
+// (session, fichier) jugés, 53 l'ont été PLUSIEURS FOIS — 22,3 %, jusqu'à 18 fois pour une même
+// synthèse de mandat. Sceller une fois pour toutes aurait donc accusé un couple sur cinq, et une
+// règle qui accuse la pratique majoritaire se fait désactiver.
+//
+// L'INVARIANT RETENU, en une phrase : le sceau d'une synthèse porte l'état EXACT que l'oracle vient
+// de juger, et il ne se pose que sur le fichier ÉCRIT DANS LE TOUR — un redépôt jugé re-scelle, une
+// synthèse modifiée sans repasser son juge reste en écart.
+//
+// LA CLAUSE « ÉCRIT DANS LE TOUR » EST CE QUI FAIT TENIR LE RESTE, et elle n'est pas un détail de
+// portée : sans elle, un tour qui se contente de RELIRE une synthèse du disque — le repli de
+// TF-1187 — reposerait le sceau sur un contenu que personne n'a jugé, et blanchirait en silence
+// une édition faite à la main. Le repli sert à choisir quoi COMPARER ; il ne vaut pas jugement.
+//
+// Le geste est au mieux : un sceau qui échoue ne refuse jamais un tour conforme (chez un produit,
+// l'outil du pilot n'est pas là), et il se lit au journal sous `sceau`.
+export function syntheseEcriteDuTour(cheminsEcrits) {
+  return choisirParmi(cheminsEcrits);
+}
+
+export function scellerSynthese(fichier) {
+  if (!fichier || !existsSync(fichier)) return null;
+  const outil = join(ICI, "..", "scripts", "verifier-jugement.mjs");
+  if (!existsSync(outil)) return null;
+  try {
+    const r = spawnSync(process.execPath, [outil, fichier, "--sceller"], { encoding: "utf8" });
+    if (r.status !== 0) return null;
+    return JSON.parse(r.stdout).mesure?.scelles ? fichier : null;
+  } catch { return null; /* le sceau est un bonus, jamais un motif de refus */ }
+}
+
 // TF-0891 — ce qui s'ajoute aux deux propriétés de 30/08, et pourquoi CELLES-LÀ. Le critère reste
 // le même : on ne compare JAMAIS des textes mot à mot, seulement ce sur quoi le lecteur AGIT et
 // qui ne s'abrège donc pas. Trois propriétés de plus le remplissent :
@@ -590,21 +632,24 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const geste = controlerGeste({ dernierHumain, dernierTexte, textePrecedent, texteSynthese });
   const bloquants = fails.filter((f) => BLOQUANTES.has(f.regle));
   const avertissements = fails.filter((f) => !BLOQUANTES.has(f.regle));
+  // TF-1081 — le sceau suit le PASS, et seulement sur la synthèse que le tour a ÉCRITE.
+  const passe = code === 0 && !ecartsAffichage.length && geste.verdict !== "FAIL";
+  const sceau = passe ? scellerSynthese(syntheseEcriteDuTour(fichiersMd)) : null;
   const journal = join(ICI, "..", ".claude", "hooks-journal.jsonl");
   try {
     mkdirSync(dirname(journal), { recursive: true });
     appendFileSync(journal, JSON.stringify({
       ts: new Date().toISOString(), hook: "restitution", session: entree.session_id, ecritures, commandes,
       portee: portee.motif,
-      verdict: (code === 0 && !ecartsAffichage.length && geste.verdict !== "FAIL")
+      verdict: passe
         ? "PASS" : ((bloquants.length || ecartsAffichage.length || geste.verdict === "FAIL") ? "FAIL" : "AVERTISSEMENT"),
       regles: fails.map((f) => f.regle), bloquantes: bloquants.map((f) => f.regle),
-      synthese_deposee: fichierSynthese || null, ecarts_affichage: ecartsAffichage,
+      synthese_deposee: fichierSynthese || null, ecarts_affichage: ecartsAffichage, sceau,
       ...(geste.applicable ? { geste: { decision: geste.decision, verdict: geste.verdict, ecarts: geste.ecarts } } : {}),
       deja_refuse: !!entree.stop_hook_active,
     }) + "\n");
   } catch { /* journal facultatif */ }
-  if (code === 0 && !ecartsAffichage.length && geste.verdict !== "FAIL") process.exit(0);
+  if (passe) process.exit(0);
   // Avertissements seuls : dits sous la réponse, jamais réécrits — pas de doublon à l'écran.
   if (!bloquants.length && !ecartsAffichage.length && geste.verdict !== "FAIL") {
     console.log(JSON.stringify({

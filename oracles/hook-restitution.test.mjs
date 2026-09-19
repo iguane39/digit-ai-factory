@@ -466,8 +466,93 @@ try {
       echecs.push("30 : un fichier relu du disque est jugé à la place de la synthèse ÉCRITE dans le tour — "
         + `l'écran serait comparé à un texte étranger au message (TF-1187), obtenu ${syntheseDuTour([disparu, duTour])}`);
   }
+
+  // 31 à 34 (TF-1081, 19/09) — LE SCEAU SE POSE SANS GESTE HUMAIN, ET IL RESTE OPPOSABLE.
+  //
+  // Les quatre cas se jouent sur UN SEUL fichier, dans l'ordre où la journée d'un mandat les
+  // produit : dépôt, redépôt, retouche à la main, tour qui relit sans écrire. C'est cette suite
+  // qui prouve l'invariant — le sceau porte l'état exact que l'oracle vient de juger, et il ne se
+  // pose que sur le fichier écrit dans le tour.
+  {
+    const d31 = join(base, "sceau");
+    mkdirSync(d31, { recursive: true });
+    const JUGEUR = join(ICI, "..", "scripts", "verifier-jugement.mjs");
+    const f31 = join(d31, "Marque - Synthese Mandat - Sceau pose sans geste - 20260919a.md");
+    const corps = (reste) => `---\ndestinataire: humain\n---\n\n` + BON.replace(
+      "- la propagation sur les postes qui ne relancent jamais bootstrap — motif : hors de portée de ce correctif, couvert par la garde d'ouverture.",
+      `- ${reste} — motif : hors de portée de ce correctif, couvert par la garde d'ouverture.`);
+    const tourEcrivant = (cible) => [
+      { type: "user", message: { role: "user", content: "fais la mise à jour" } },
+      { type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", name: "Write", input: { file_path: cible } }] } },
+      { type: "user", message: { role: "user", content: [{ type: "tool_result", content: "ok" }] } },
+      { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: BON }] } },
+    ].map((e) => JSON.stringify(e)).join("\n") + "\n";
+    const jouerHook = (nom, cible) => {
+      const p = join(d31, nom + ".jsonl");
+      writeFileSync(p, tourEcrivant(cible), "utf8");
+      const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8",
+        input: JSON.stringify({ session_id: "test-sceau", transcript_path: p, stop_hook_active: false }) });
+      let d = null;
+      try { d = JSON.parse(r.stdout || "null"); } catch { /* pas de JSON = laisse passer */ }
+      return d;
+    };
+    const empreinteScellee = () => {
+      try { return JSON.parse(readFileSync(f31 + ".jugement.json", "utf8")).empreinte; } catch { return null; }
+    };
+    const jugerDossier = () => spawnSync(process.execPath, [JUGEUR, d31], { encoding: "utf8" });
+
+    // 31 — LE DÉPÔT. Le tour écrit la synthèse et rend PASS : le sceau naît de ce PASS, sans qu'un
+    // humain ait rien tapé. C'est la moitié manquante de TF-0523 — la règle 5 était câblée en
+    // DÉTECTION depuis le 23/08, et aucune synthèse n'était scellée, donc elle ne protégeait rien.
+    writeFileSync(f31, corps("la propagation sur les postes qui ne relancent jamais bootstrap"), "utf8");
+    const d31a = jouerHook("depot", f31);
+    if (d31a !== null)
+      echecs.push(`31 : un tour conforme déposant sa synthèse est refusé, obtenu ${JSON.stringify(d31a).slice(0, 200)}`);
+    const sceau1 = empreinteScellee();
+    if (!sceau1) echecs.push("31 : aucun sceau posé après le PASS sur la synthèse écrite dans le tour — le geste resterait "
+      + "manuel, et la règle 5 continuerait de ne protéger aucune restitution (TF-1081)");
+
+    // 32 — LE REDÉPÔT, ET C'EST LUI QUI ARBITRE LE CONFLIT AVEC J-1. La même synthèse, sous le même
+    // indice, réécrite et rejugée dans la session : mesuré au journal de ce dépôt, 53 couples
+    // (session, fichier) sur 238 sont dans ce cas — 22,3 %. Un sceau posé une fois pour toutes en
+    // ferait autant d'écarts J-1 sur une pratique que le gabarit prescrit depuis la v2.25.0.
+    writeFileSync(f31, corps("la propagation, et le poste hors ligne relevé au tour suivant"), "utf8");
+    const d31b = jouerHook("redepot", f31);
+    if (d31b !== null)
+      echecs.push(`32 : le redépôt conforme de la même synthèse est refusé, obtenu ${JSON.stringify(d31b).slice(0, 200)}`);
+    const sceau2 = empreinteScellee();
+    if (!sceau2 || sceau2 === sceau1)
+      echecs.push("32 : le sceau n'a pas suivi le redépôt jugé — la pratique licite du redépôt sous le même indice "
+        + "(gabarit v2.25.0) deviendrait un écart J-1 sur un couple (session, fichier) sur cinq");
+    if (jugerDossier().status !== 0)
+      echecs.push(`32 : verifier-jugement accuse une synthèse redéposée ET rejugée : ${jugerDossier().stdout.slice(0, 220)}`);
+
+    // 33 — LE SENS ROUGE. La synthèse est retouchée APRÈS son dernier jugement, sans repasser
+    // devant l'oracle : c'est le défaut fondateur de TF-0523, le même nom pour deux contenus, et
+    // il doit rester visible. Sans ce cas, l'automatisation du sceau serait indiscernable d'un
+    // désarmement de J-1.
+    writeFileSync(f31, corps("une ligne ajoutée à la main après la restitution"), "utf8");
+    const r33 = jugerDossier();
+    if (r33.status === 0 || !/J-1/.test(r33.stdout))
+      echecs.push("33 : une synthèse modifiée APRÈS son dernier jugement passe — le sceau automatique aurait désarmé "
+        + `J-1 au lieu de l'armer (TF-0523, TF-1081), obtenu ${r33.stdout.replace(/\s+/g, " ").slice(0, 200)}`);
+
+    // 34 — LA BORNE, ET C'EST ELLE QUI FAIT TENIR LE 33. Un tour qui ne fait que RELIRE la
+    // synthèse du disque — le repli de TF-1187, ouvert ici par un chemin écrit qui n'existe pas —
+    // rend PASS sans rien avoir écrit. S'il rescellait, il blanchirait la retouche du cas 33 en
+    // silence : le repli sert à choisir quoi COMPARER, il ne vaut pas jugement.
+    const d31d = jouerHook("relu", join(d31, "Marque - Synthese Mandat - Chemin disparu - 20260919z.md"));
+    if (d31d !== null)
+      echecs.push(`34 : le tour relisant la synthèse du disque est refusé, obtenu ${JSON.stringify(d31d).slice(0, 200)}`);
+    if (empreinteScellee() !== sceau2)
+      echecs.push("34 : un tour qui n'a RIEN écrit a reposé le sceau — la retouche faite à la main serait blanchie par "
+        + "une simple relecture, et J-1 ne verrait plus jamais rien (TF-1187, TF-1081)");
+    const r34 = jugerDossier();
+    if (r34.status === 0)
+      echecs.push("34 : après le tour de relecture, verifier-jugement ne voit plus la retouche du cas 33");
+  }
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 200)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error("hook-restitution : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log("hook-restitution : 30/30 — un fichier ÉCRIT dans le tour prime sur un fichier relu du disque, la relecture restant un repli (TF-1187) ; un fichier de synthèse RENOMMÉ hors outil d'écriture est retrouvé en relisant le dossier du chemin disparu, le plus récemment modifié l'emportant quand deux fichiers marqués coexistent, et un chemin écrit PRÉSENT n'ouvre aucune relecture (TF-1184) ; relais d'avancement dans ses TROIS sens (TF-1182) : trois lignes après une synthèse déjà affichée et RIEN d'écrit depuis NON jugées, le MÊME message précédé d'une seule écriture JUGÉ (le trou de TF-0978 reste fermé), et le MÊME message posant une D-7 JUGÉ (les trois absences de TF-0990 tiennent) ; marqueur lu en tête de ligne et jamais dans la prose : le gabarit qui le CITE n'est plus jugé à la place de la synthèse du tour (correction du 17 septembre 2026), hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019), exemption « rien de neuf » dans ses DEUX sens — un accusé de trois lignes sans verdict ni D-N NON jugé, le même message posant une D-N JUGÉ (TF-0990)");
+console.log("hook-restitution : 34/34 — le SCEAU d une synthese se pose sans geste humain sur le fichier ECRIT dans le tour, le redepot juge le met a jour (53 couples (session, fichier) sur 238 au journal de ce depot, 22,3 %), une retouche faite APRES le dernier jugement reste un ecart J-1, et un tour qui ne fait que RELIRE ne rescelle rien (TF-1081) ; un fichier ÉCRIT dans le tour prime sur un fichier relu du disque, la relecture restant un repli (TF-1187) ; un fichier de synthèse RENOMMÉ hors outil d'écriture est retrouvé en relisant le dossier du chemin disparu, le plus récemment modifié l'emportant quand deux fichiers marqués coexistent, et un chemin écrit PRÉSENT n'ouvre aucune relecture (TF-1184) ; relais d'avancement dans ses TROIS sens (TF-1182) : trois lignes après une synthèse déjà affichée et RIEN d'écrit depuis NON jugées, le MÊME message précédé d'une seule écriture JUGÉ (le trou de TF-0978 reste fermé), et le MÊME message posant une D-7 JUGÉ (les trois absences de TF-0990 tiennent) ; marqueur lu en tête de ligne et jamais dans la prose : le gabarit qui le CITE n'est plus jugé à la place de la synthèse du tour (correction du 17 septembre 2026), hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019), exemption « rien de neuf » dans ses DEUX sens — un accusé de trois lignes sans verdict ni D-N NON jugé, le même message posant une D-N JUGÉ (TF-0990)");
