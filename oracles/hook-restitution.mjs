@@ -252,21 +252,38 @@ function relusDuDisque(chemins) {
   return candidats.sort((a, b) => a.t - b.t).map((c) => c.f);
 }
 
-export function syntheseDuTour(cheminsEcrits) {
-  const chemins = [...cheminsEcrits, ...relusDuDisque(cheminsEcrits)];
+// TF-1187 (19/09/2026) — UN FICHIER ÉCRIT DANS LE TOUR PRIME SUR UN FICHIER RELU DU DISQUE.
+//
+// LE FAIT, chez un produit le 17/09, le jour même où TF-1184 est entré : un chemin écrit avait
+// disparu (renommé pour tenir S42), la relecture du dossier s'est donc ouverte — et ses candidats,
+// ajoutés EN QUEUE d'une liste parcourue À L'ENVERS, ont été examinés AVANT tout fichier passé par
+// un outil d'écriture. L'écran a été jugé contre la synthèse d'un tour antérieur (15:28) alors que
+// celle du tour (17:52) existait et avait transité par l'outil : trois constats portant sur un
+// texte étranger au message, une restitution PASS sur 51 règles refusée.
+//
+// L'INVARIANT, et il s'énonce en une phrase : la relecture du disque est un REPLI, elle ne répond
+// qu'à la question « le tour n'a laissé AUCUNE synthèse lisible parmi ses écritures, où est-elle
+// passée ? ». Ce que le tour a écrit et qui existe encore est une preuve ; ce que le dossier
+// contient par ailleurs est une présomption. Une présomption ne passe jamais devant une preuve.
+const estMarque = (c) => {
+  try {
+    if (!existsSync(c)) return false;
+    // 17/09/2026 (classe `restitution-fichier-juge-mal-choisi`, récidive) : le marqueur se lit en TÊTE DE
+    // LIGNE, comme un champ de frontmatter — jamais dans la prose. `gabarits\RESTITUTION.md` CITE le
+    // marqueur dans ses 400 premiers caractères et s'appelle « restitution » : édité dans un tour, il a
+    // été jugé à la place de la synthèse du tour, et une restitution conforme a été refusée.
+    return /^destinataire\s*:\s*humain\s*$/im.test(readFileSync(c, "utf8").slice(0, 400));
+  } catch { return false; /* illisible : ce n'est pas un constat sur l'auteur, on passe */ }
+};
+const choisirParmi = (chemins) => {
   const marques = [];
-  for (let i = chemins.length - 1; i >= 0; i--) {
-    try {
-      if (!existsSync(chemins[i])) continue;
-      // 17/09/2026 (classe `restitution-fichier-juge-mal-choisi`, récidive) : le marqueur se lit en TÊTE DE
-      // LIGNE, comme un champ de frontmatter — jamais dans la prose. `gabarits\RESTITUTION.md` CITE le
-      // marqueur dans ses 400 premiers caractères et s'appelle « restitution » : édité dans un tour, il a
-      // été jugé à la place de la synthèse du tour, et une restitution conforme a été refusée.
-      if (/^destinataire\s*:\s*humain\s*$/im.test(readFileSync(chemins[i], "utf8").slice(0, 400))) marques.push(chemins[i]);
-    } catch { /* illisible : ce n'est pas un constat sur l'auteur, on passe */ }
-  }
+  for (let i = chemins.length - 1; i >= 0; i--) if (estMarque(chemins[i])) marques.push(chemins[i]);
   const nomme = marques.find((c) => /synth[eè]se|restitution/i.test(String(c).split(/[\\/]/).pop()));
   return nomme || marques[0] || null;
+};
+
+export function syntheseDuTour(cheminsEcrits) {
+  return choisirParmi(cheminsEcrits) || choisirParmi(relusDuDisque(cheminsEcrits));
 }
 
 // TF-0891 — ce qui s'ajoute aux deux propriétés de 30/08, et pourquoi CELLES-LÀ. Le critère reste
