@@ -1094,17 +1094,85 @@ function juger(texte, cheminJuge = null) {
   // correctif », qui declare un PERIMETRE et non une incapacite d'agir. Une regle qui accuse un
   // travail juste se fait desactiver — et celle-ci apprend une tournure, elle ne refuse rien.
   const INCAPACITE = /(je ne (?:peux|pourrai) pas|impossible (?:depuis|d'ici)|pas (?:possible|faisable) (?:d'ici|depuis)|incapable de|bloqu[ée]{1,2} (?:pour|par) l'acc[èe]s)/i;
-  const PLUSIEURS_CHEMINS = /(deux (?:chemins|voies|acc[èe]s|portes)|CLI (?:et|puis|\+) API|API (?:et|puis|\+) CLI|autre (?:chemin|voie|porte|point d'entr[ée]e|acc[èe]s)|ni .{2,40} ni |seule (?:voie|porte|acc[èe]s)|unique (?:chemin|voie|acc[èe]s)|aucun autre chemin)/i;
+  //
+  // DURCISSEMENT DU 19/09/2026 (TF-1189) — LA FORMULE CESSAIT DE MESURER QUOI QUE CE SOIT.
+  //
+  // LE FAIT, mesure chez Produit-62 le 18/09. QUATRE appels ont ete emis vers un rapport Power BI,
+  // tous passant par l'espace de travail (`/v1.0/myorg/groups/{id}/reports`,
+  // `/v1.0/myorg/groups/{id}/reports/{id}`), tous refuses en 401 ; la conclusion ecrite fut « il
+  // n'existe aucun autre chemin, le portail et l'interface de programmation passent l'un comme
+  // l'autre par le meme droit d'appartenance a l'espace ». Le commanditaire a demande « tu n'as
+  // pas acces avec mon compte ? » : `GET /v1.0/myorg/reports/{id}` rendait 200 — le rapport est
+  // PARTAGE, le scope personnel l'atteint sans appartenance a l'espace. Cout : un constat FAUX
+  // ecrit dans DEUX syntheses jugees PASS, porte jusqu'au verdict de bascule d'une qualification,
+  // un rapport repris en version 2, et un ecart reel (une barre de pays a 9 valeurs contre 8)
+  // reste invisible tant que la comparaison des deux rendus vivants etait crue impossible.
+  //
+  // POURQUOI LA REGLE PASSAIT : son alternation unique acceptait la FORMULE (« seule voie »,
+  // « aucun autre chemin ») au meme titre que des chemins nommes. Elle jugeait donc la FORME DE
+  // LA DECLARATION, jamais que les chemins aient ete ESSAYES ni qu'ils soient DIFFERENTS —
+  // ecrire la formule coute trois mots, faire la mesure coute un appel, et le controle ne
+  // distinguait pas les deux. C'est la classe `controle-vrai-sur-le-mauvais-invariant`.
+  //
+  // CE QUI EST EXIGE MAINTENANT, et la formule n'en fait plus partie :
+  //   · les codes de retour de DEUX FAMILLES de chemins au moins — une famille etant un PREFIXE
+  //     d'URL distinct, pas une variante du meme : `…/myorg/groups/…` et `…/myorg/reports/…` sont
+  //     deux familles, `…/groups/{id}/reports` et `…/groups/{id}/reports/{id}` n'en sont qu'une ;
+  //   · OU la SOURCE qui etablit qu'un seul chemin existe — la documentation de la plateforme,
+  //     citee avec son localisateur. Une declaration adossee reste recevable ; une declaration
+  //     nue ne l'est plus.
+  //   · LE CAS FONDATEUR DE TF-0606 RESTE RECEVABLE EN PROSE : quand la restitution ne cite AUCUN
+  //     appel, nommer deux chemins (« CLI et API ») suffit encore, comme avant. Mais des qu'elle
+  //     en cite, LES APPELS FONT FOI — elle ne peut plus se payer de mots au-dessus de ses
+  //     propres traces, et c'est exactement la situation du 18/09.
+  // Doctrine, en une phrase : un refus prouve qu'une porte est fermee, jamais qu'il n'y en a qu'une.
+  const CHEMINS_NOMMES = /(deux (?:chemins|voies|acc[èe]s|portes)|CLI (?:et|puis|\+) API|API (?:et|puis|\+) CLI|(?<!aucun )(?<!pas d')autre (?:chemin|voie|porte|point d'entr[ée]e|acc[èe]s)|ni .{2,40} ni )/i;
+  // La FORMULE est desormais isolee de CHEMINS_NOMMES — et la negation l'est par un regard
+  // arriere, sans quoi « aucun autre chemin » continuerait de matcher « autre chemin ».
+  const FORMULE_UNIQUE = /(seule (?:voie|porte|acc[èe]s)|unique (?:chemin|voie|acc[èe]s)|aucun autre chemin)/i;
+  // Codes ENUMERES plutot qu'un motif a trois chiffres : « 148 fichiers » ou « 207 documents » sur
+  // la meme ligne qu'une URL ne doivent pas se lire comme un code de retour.
+  const CODE_RETOUR = /(\bHTTP\s*\d{3}\b|\b(?:200|201|202|204|301|302|304|400|401|403|404|405|409|410|429|500|502|503)\b|\bexit\s*\d+\b|\b(?:Unauthorized|Forbidden|Denied)\b|Authorization_\w+)/i;
+  const SOURCE_DOC = /(documentation|r[ée]f[ée]rence (?:officielle|de l'API)|sp[ée]cification|guide (?:officiel|d'API)|docs?\.[a-z]|learn\.microsoft)/i;
+  const LOCALISATEUR = /(https?:\/\/|`[^`]{3,}`|\b[\w.\-]+\.(?:md|json|html|pdf)\b)/i;
+  // La famille d'un chemin : ses deux premiers segments PORTEURS. Les segments de version, les
+  // gabarits `{id}` et les identifiants (chiffres, hexadecimal long) sont retires — ce sont eux
+  // qui faisaient passer quatre variantes d'un meme prefixe pour quatre chemins.
+  const familleDe = (u) => {
+    const seg = u.replace(/^https?:\/\/[^/]+/i, "").split("/").filter(Boolean)
+      .filter((s) => !/^v\d+(?:\.\d+)*$/i.test(s))
+      .filter((s) => !/^\{.*\}$/.test(s))
+      .filter((s) => !/^\d+$/.test(s))
+      .filter((s) => !/^[0-9a-f]{8}[0-9a-f-]*$/i.test(s));
+    return seg.length ? seg.slice(0, 2).join("/").toLowerCase()
+      : ((/^https?:\/\/([^/]+)/i.exec(u) || [, ""])[1] || "").toLowerCase();
+  };
   {
     const phrases = texte.split(/(?<=[.!?;])\s+|\n/).map((x) => x.trim()).filter(Boolean);
     const risquees = phrases.filter((x) => INCAPACITE.test(x));
-    const nues = risquees.filter((x) => !PLUSIEURS_CHEMINS.test(x));
+    // Un APPEL, pas un lien : une URL absolue, ou un chemin precede de son verbe. Le code de
+    // retour se lit sur la MEME ligne — c'est la forme sous laquelle une trace d'appel s'ecrit.
+    const appels = [];
+    for (const ligne of texte.split(/\n/)) {
+      const avecCode = CODE_RETOUR.test(ligne);
+      for (const m of ligne.matchAll(/https?:\/\/[^\s)`"'<>,;]+/gi)) appels.push({ u: m[0], code: avecCode });
+      for (const m of ligne.matchAll(/\b(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s+[`"']?(\/[^\s)`"'<>,;]+)/gi)) appels.push({ u: m[1], code: avecCode });
+    }
+    const familles = new Set(appels.filter((a) => a.code).map((a) => familleDe(a.u)).filter(Boolean));
+    const adossee = phrases.some((x) => SOURCE_DOC.test(x) && LOCALISATEUR.test(x));
+    const enProse = appels.length === 0;
+    const nues = risquees.filter((x) => familles.size < 2 && !adossee && !(enProse && CHEMINS_NOMMES.test(x)));
     if (!risquees.length) ok("S25", "aucune incapacite affirmee — rien a corroborer");
-    else if (nues.length) ko("S25", `${nues.length} incapacite(s) sur ${risquees.length} affirmee(s) sans nommer les CHEMINS essayes : ` +
-      "un outil qui refuse n'est pas une capacite absente — un CLI non authentifie ne dit rien de l'API du meme service. " +
-      "Nommer au moins DEUX chemins, ou declarer qu'un seul existe (« seule voie », « aucun autre chemin »). " +
+    else if (nues.length) ko("S25", `${nues.length} incapacite(s) sur ${risquees.length} affirmee(s) sans PREUVE de plusieurs chemins ` +
+      `(${appels.length} appel(s) cite(s), ${familles.size} famille(s) de chemin distincte(s) portant un code de retour) : ` +
+      "un outil qui refuse n'est pas une capacite absente, et la formule « seule voie » ne mesure rien — un refus prouve qu'une porte " +
+      "est fermee, jamais qu'il n'y en a qu'une. Porter les codes de retour de DEUX FAMILLES au moins — un prefixe d'URL distinct, pas " +
+      "une variante du meme : `…/myorg/groups/…` et `…/myorg/reports/…` sont deux familles, `…/groups/{id}/reports` et " +
+      "`…/groups/{id}/reports/{id}` n'en sont qu'une —, ou citer la SOURCE qui etablit qu'un seul chemin existe. " +
       `Ex. : ${nues[0].replace(/\s+/g, " ").slice(0, 110)}`);
-    else ok("S25", `${risquees.length} incapacite(s) affirmee(s), chacune adossee aux chemins essayes`);
+    else if (familles.size >= 2) ok("S25", `${risquees.length} incapacite(s) affirmee(s), adossee(s) aux codes de retour de ${familles.size} familles de chemins : ${[...familles].slice(0, 4).join(", ")}`);
+    else if (adossee) ok("S25", `${risquees.length} incapacite(s) affirmee(s), adossee(s) a la source qui etablit le chemin unique`);
+    else ok("S25", `${risquees.length} incapacite(s) affirmee(s) en prose — aucun appel cite, et chacune nomme au moins deux chemins`);
   }
 
   // ---- S26 (TF-0617, 25/08) — un contrôle qui confirme une écriture NOMME le chemin ABSOLU
@@ -3237,9 +3305,50 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S50"[^}]*SANS_OBJET/.test(rv.stdout))
     casse.push("S50 : hors d'un point d'étape déclaré, la règle devrait rendre SANS_OBJET et le DIRE : " +
       (/"S50"[\s\S]{0,160}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
+  // 19/09 — S25 DANS SES TROIS SENS (TF-1189). Les trois fixtures ne diffèrent que par la ligne
+  // ajoutée au bloc 5, et la troisième est celle qui prouve que la règle juge la PREUVE et non le
+  // mot : elle porte la formule fautive MOT POUR MOT et passe, parce que ses appels couvrent deux
+  // familles. La rouge est le texte du 18/09 — quatre appels tous sous `…/myorg/groups/…`, fermés
+  // par « il n'existe aucun autre chemin » —, et c'est lui qui a fait écrire un constat faux dans
+  // deux synthèses jugées PASS.
+  const B5cible = "- Regroupement par cause racine : motif — sa cause est traitée, critère de réouverture écrit.";
+  const S25_MEME_FAMILLE = "GET /v1.0/myorg/groups/{idEspace}/reports rend 401, "
+    + "GET /v1.0/myorg/groups/{idEspace}/reports/{idRapport} rend 401, "
+    + "GET /v1.0/myorg/groups/{idEspace}/reports/{idRapport}/pages rend 401, "
+    + "GET /v1.0/myorg/groups/{idEspace}/datasets rend 401";
+  const S25_DEUX_FAMILLES = "GET /v1.0/myorg/groups/{idEspace}/reports rend 401, "
+    + "GET /v1.0/myorg/reports/{idRapport} rend 403";
+  const ligne25 = (declaration, appels) => B5cible + "\n- Rapport d'origine : motif — je ne peux pas l'ouvrir, "
+    + `${declaration} : ${appels}.`;
+  const r25r = jouerPe("s25-quatre-appels-meme-famille.md",
+    verte.replace(B5cible, ligne25("il n'existe aucun autre chemin", S25_MEME_FAMILLE)));
+  const r25v = jouerPe("s25-deux-familles-avec-codes.md",
+    verte.replace(B5cible, ligne25("les deux chemins ont ete essayes", S25_DEUX_FAMILLES)));
+  const r25f = jouerPe("s25-formule-mais-deux-familles.md",
+    verte.replace(B5cible, ligne25("il n'existe aucun autre chemin", S25_DEUX_FAMILLES)));
+  if (!/"S25"[^}]*FAIL/.test(r25r.stdout))
+    casse.push("S25 : QUATRE appels d'une même famille (`…/myorg/groups/…`) refermés par « aucun autre chemin » passent — " +
+      "c'est l'échappatoire exacte du 18/09 : la formule tient lieu de mesure, et le constat faux a été écrit dans deux " +
+      "synthèses jugées PASS (TF-1189)");
+  if (!/famille\(s\) de chemin/i.test((/"S25"[\s\S]{0,400}/.exec(r25r.stdout) || [""])[0]))
+    casse.push("S25 : le refus ne dit pas combien de familles distinctes ont été comptées — l'auteur relirait sa " +
+      "restitution sans savoir ce qui manque : " + (/"S25"[\s\S]{0,200}/.exec(r25r.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S25"[^}]*PASS/.test(r25v.stdout))
+    casse.push("S25 : la MÊME incapacité, adossée aux codes de retour de DEUX familles distinctes (espace de travail et " +
+      "scope personnel), est accusée — la règle exigerait alors une preuve qu'aucune restitution honnête ne peut fournir : " +
+      (/"S25"[\s\S]{0,220}/.exec(r25v.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S25"[^}]*PASS/.test(r25f.stdout))
+    casse.push("S25 : la formule « il n'existe aucun autre chemin » est accusée ALORS QUE les appels cités couvrent deux " +
+      "familles — la règle jugerait le MOT au lieu de la preuve, c'est-à-dire l'erreur symétrique de celle qu'elle corrige : " +
+      (/"S25"[\s\S]{0,220}/.exec(r25f.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S25"[^}]*PASS/.test(rv.stdout))
+    casse.push("S25 accuse la fixture VERTE, qui n'affirme aucune incapacité : la règle crie sur un travail juste");
+  if (!/"S25"[^}]*FAIL/.test(rr.stdout))
+    casse.push("S25 : « je ne peux pas deployer d'ici, le CLI rend Unauthorized » — le cas fondateur de TF-0606, sans " +
+      "second chemin ni appel cité — passe : le durcissement du 19/09 a emporté la règle d'origine");
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 37/37 PASS (verte PASS ; le LEXIQUE TRANSVERSE dans ses DEUX sens (TF-1150 : le lexique du CLIENT est VIDE et le terme que l humain a proscrit POUR TOUS les produits est quand meme accuse, le constat disant son origine transverse ; la MEME restitution avec le terme retenu PASS) ; S51 dans ses TROIS sens (TF-0791 : un bloc 1 SANS l'intention initiale de la demande FAIL, le MÊME portant l'intention mais PAS son test rétro FAIL et nommant la pièce manquante, la verte qui porte les deux PASS — taux mesuré à 94,6 % sur les 148 synthèses d'output\\04-plans\\ à la mise en service, le champ datant de la veille : avertissante) ; le POINT D'ÉTAPE dans ses QUATRE sens (TF-1182 : la forme écrite À LA LETTRE du gabarit — mention au bloc 1, bloc 2 titré « ce qui reste à mesurer, et par quoi » — est ACCEPTÉE là où elle rendait S1 et S3 FAIL, les deux bloquantes ; la MÊME sans sa ligne de mesure ni aucun fait mesurable FAIL sur S3 ; la MÊME dont le bloc 4 ne porte RIEN FAIL sur S50 ; et S50 SANS_OBJET dit à voix haute hors d'un point d'étape déclaré) ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) ; S46 dans ses TROIS sens (TF-1045 : une restitution employant un terme proscrit par le lexique du destinataire FAIL, la MEME avec le terme retenu PASS, et SANS_OBJET dit a voix haute quand le projet n a pas de lexique) ; S48 dans ses QUATRE sens (TF-1166 : chez un produit, un tour muet sur ce qu il remonte FAIL, « rien a remonter » PASS, un lot nomme PASS, une ligne qui ne tranche pas FAIL, et SANS_OBJET dit hors d un produit) ; S49 dans ses TROIS sens (TF-1172 : une option commandant « se connecter … puis saisir le code » sans mode operatoire FAIL, la MEME option avec sa ligne « Comment faire » et sa commande sur place PASS, et la verte d origine — aucune option ne commandant de geste — PASS) — taux d accusation mesure sur les 148 syntheses d output\\04-plans\\ avant mise en service : 2,0 % (3 fichiers) ; taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
+    : "Self-test restitution : 39/39 PASS (verte PASS ; le LEXIQUE TRANSVERSE dans ses DEUX sens (TF-1150 : le lexique du CLIENT est VIDE et le terme que l humain a proscrit POUR TOUS les produits est quand meme accuse, le constat disant son origine transverse ; la MEME restitution avec le terme retenu PASS) ; S51 dans ses TROIS sens (TF-0791 : un bloc 1 SANS l'intention initiale de la demande FAIL, le MÊME portant l'intention mais PAS son test rétro FAIL et nommant la pièce manquante, la verte qui porte les deux PASS — taux mesuré à 94,6 % sur les 148 synthèses d'output\\04-plans\\ à la mise en service, le champ datant de la veille : avertissante) ; le POINT D'ÉTAPE dans ses QUATRE sens (TF-1182 : la forme écrite À LA LETTRE du gabarit — mention au bloc 1, bloc 2 titré « ce qui reste à mesurer, et par quoi » — est ACCEPTÉE là où elle rendait S1 et S3 FAIL, les deux bloquantes ; la MÊME sans sa ligne de mesure ni aucun fait mesurable FAIL sur S3 ; la MÊME dont le bloc 4 ne porte RIEN FAIL sur S50 ; et S50 SANS_OBJET dit à voix haute hors d'un point d'étape déclaré) ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) ; S46 dans ses TROIS sens (TF-1045 : une restitution employant un terme proscrit par le lexique du destinataire FAIL, la MEME avec le terme retenu PASS, et SANS_OBJET dit a voix haute quand le projet n a pas de lexique) ; S48 dans ses QUATRE sens (TF-1166 : chez un produit, un tour muet sur ce qu il remonte FAIL, « rien a remonter » PASS, un lot nomme PASS, une ligne qui ne tranche pas FAIL, et SANS_OBJET dit hors d un produit) ; S49 dans ses TROIS sens (TF-1172 : une option commandant « se connecter … puis saisir le code » sans mode operatoire FAIL, la MEME option avec sa ligne « Comment faire » et sa commande sur place PASS, et la verte d origine — aucune option ne commandant de geste — PASS) ; S25 dans ses TROIS sens (TF-1189 : QUATRE appels d une MEME famille (`…/myorg/groups/…`) refermes par « aucun autre chemin » FAIL, la MEME incapacite adossee aux codes de retour de DEUX familles distinctes — espace de travail et scope personnel — PASS, et la MEME formule fautive mot pour mot au-dessus de ces deux familles PASS ; le cas fondateur de TF-0606, sans appel cite, reste FAIL) — taux d accusation mesure sur les 149 syntheses d output\\04-plans\\ avant durcissement : 0,0 % (0 fichier, aucune incapacite declaree dans le corpus) — taux d accusation mesure sur les 148 syntheses d output\\04-plans\\ avant mise en service : 2,0 % (3 fichiers) ; taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
   process.exit(casse.length ? 1 : 0);
 }
 
