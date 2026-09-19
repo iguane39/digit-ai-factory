@@ -282,6 +282,12 @@ if (iPilot < 0) {
         "- À TRAITER AVANT TOUT AUTRE TRAVAIL de cette session : un lot remonté qui n'entre pas au registre",
         "  n'existe pour personne, et le producteur le croit pris. Détail : node oracles/oracle-boite-entree.mjs");
     }
+    // B9 (TF-1198, 19/09/2026) — le sas d'arrivée se DIT à l'ouverture. Le 19/09, six lots y ont
+    // attendu deux jours sous un « boîte à jour » : une règle que le relevé d'ouverture ne lit pas
+    // est une règle que personne ne rencontre (loi n° 1).
+    const f9 = j && (j.findings || []).find((x) => x.regle === "B9");
+    if (f9 && f9.statut === "FAIL") lignes.push(`- **BLOQUANT — ${f9.message}**`);
+    else if (f9 && f9.statut === "AVERTISSEMENT") lignes.push(`- ${f9.message}`);
   }
 }
 

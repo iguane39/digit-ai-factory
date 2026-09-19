@@ -32,6 +32,10 @@
  *       ancienneté que le hook d'ouverture du pilot rend bloquante. Six lots déposés le 07/09,
  *       zéro ingéré, un producteur qui écrit « remonté » — la remise est un dépôt de fichier,
  *       l'ingestion un geste de session que rien ne déclenchait.
+ *   B9  (TF-1198, 19/09) le SAS d'arrivée `_arrivee\`, ignoré par git et hors de B1-B8, est
+ *       compté : un lot qui y attend se DIT (avertissement), au-delà de 24 h c'est un OUBLI (FAIL).
+ *       Six lots y ont attendu deux jours sous un PASS. Le constat ne porte jamais un nom de lot :
+ *       il est réel, et c'est ce que le sas protège.
  *
  * Ce qu'il ne juge PAS : la valeur des candidatures, la justesse d'un retour, l'opportunité
  * de les traiter. Il dit qu'un travail est arrivé et n'a pas été pris, jamais s'il le mérite.
@@ -436,6 +440,37 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
         + "pour chacun (un lot sans sidecar passe d'abord par `node todo\\normaliser-lot.mjs`)" });
   }
 
+  // B9 (TF-1198, 19/09/2026) — LE SAS D'ARRIVÉE EST HORS DE TOUT, DONC PERSONNE NE LE REGARDE.
+  //
+  // LE FAIT : le 19/09, six lots des 17 et 18/09 attendaient dans `_arrivee\` — douze fichiers, huit
+  // demandes — pendant que ce contrôle rendait PASS et que le relevé d'ouverture annonçait « aucun
+  // lot non ingéré depuis plus de 24 h ». Rien n'était faux : le sas est IGNORÉ par git (c'est sa
+  // raison d'être, un lot y séjourne sous son nom réel) et il était hors du périmètre de B1 à B8,
+  // qui ne lisent que la racine suivie. Un lot remis selon le protocole était donc invisible tant
+  // qu'une session ne listait pas le dossier à la main.
+  //
+  // L'INVARIANT : un lot REMIS est un lot VU. Le sas n'est pas un lieu de séjour, c'est un passage ;
+  // ce qui y attend depuis moins de `SEUIL_OUBLI_H` heures se DIT sans bloquer (il vient d'arriver),
+  // ce qui y attend depuis plus longtemps est un OUBLI, au même seuil et pour la même raison que B8.
+  // CE QUE LE CONSTAT NE FAIT JAMAIS : imprimer le nom d'un lot du sas. Ce nom est réel, et ce
+  // rapport entre dans des restitutions versionnées — le compte et l'âge suffisent à agir.
+  const sasArrivee = join(repertoire, "_arrivee");
+  let auSas = [];
+  try { auSas = readdirSync(sasArrivee).filter((n) => /\.tf\.jsonl$/i.test(n)); } catch { /* sas absent : l'état d'un clone frais */ }
+  if (!auSas.length) {
+    findings.push({ regle: "B9", statut: "PASS", ou: "-", message: "sas d'arrivée vide — l'état normal" });
+  } else {
+    const ages = auSas.map((n) => { try { return (Date.now() - statSync(join(sasArrivee, n)).mtimeMs) / 3600000; } catch { return 0; } });
+    const plusVieux = Math.max(...ages);
+    const oubli = plusVieux > SEUIL_OUBLI_H;
+    findings.push({ regle: "B9", statut: oubli ? "FAIL" : "AVERTISSEMENT", ou: "_arrivee", depuis_h: Number(plusVieux.toFixed(1)),
+      message: `${auSas.length} lot(s) au sas d'arrivée, le plus ancien depuis ${plusVieux.toFixed(0)} h — `
+        + (oubli ? `au-delà de ${SEUIL_OUBLI_H} h ce n'est plus une arrivée, c'est un OUBLI : le producteur croit son travail remonté et personne ne le traite. `
+          : "ils attendent leur accueil. ")
+        + "À jouer : `node todo\\accueillir-lot.mjs` (pseudonymise et déplace), puis `node todo\\ingerer-lot.mjs <sidecar>` pour chacun. "
+        + "Les noms ne sont pas imprimés ici : ils sont réels, et c'est ce que le sas protège" });
+  }
+
   const vues = new Set(findings.map((f) => f.regle));
   for (const [regle, message] of [
     ["B1", `${sidecars.length} sidecar(s) présent(s), tous ingérés`],
@@ -743,6 +778,34 @@ function selfTest() {
     !!f8 && f8.statut === "FAIL" && /30 h/.test(f8.message), r.verdict]);
   cas.push(["B8 bis— le constat NOMME le lot et la commande qui le fait entrer",
     !!f8 && f8.statut === "FAIL" && /OUBLIE - RETOURS/.test(f8.message) && /ingerer-lot\.mjs/.test(f8.message), r.verdict]);
+
+  // B9 (TF-1198, 19/09) — LE SAS D'ARRIVÉE, dans ses TROIS sens. Boîte neuve, pour que rien des
+  // cas précédents ne pèse sur le verdict : seul le sas change entre les trois passages.
+  const boite9 = join(base, "b9", "00-retours");
+  mkdirSync(boite9, { recursive: true });
+  const reg9 = join(base, "b9", "TODO.jsonl");
+  writeFileSync(reg9, "");
+  const surB9 = (f) => f.regle === "B9";
+  r = juger(boite9, reg9, regIns);
+  cas.push(["B9    — sas absent ou vide : l'état normal, PASS",
+    r.findings.some((f) => surB9(f) && f.statut === "PASS") && r.verdict === "PASS", r.verdict]);
+  const sas = join(boite9, "_arrivee");
+  mkdirSync(sas);
+  writeFileSync(join(sas, "README.md"), "# sas\n");
+  const auSas = join(sas, "NomReelDuClient - RETOURS - 20260917a.tf.jsonl");
+  writeFileSync(auSas, '{"titre":"x"}\n');
+  writeFileSync(join(sas, "NomReelDuClient - RETOURS - 20260917a.md"), "# lot\n");
+  r = juger(boite9, reg9, regIns);
+  let f9 = r.findings.find(surB9);
+  cas.push(["B9 bis— un lot arrivé à l'instant au sas est DIT sans bloquer : il attend son accueil",
+    !!f9 && f9.statut === "AVERTISSEMENT" && r.verdict === "PASS" && /1 lot/.test(f9.message), r.verdict]);
+  utimesSync(auSas, vieux, vieux);
+  r = juger(boite9, reg9, regIns);
+  f9 = r.findings.find(surB9);
+  cas.push(["B9 ter— le même lot, au sas depuis 30 h, est un OUBLI : FAIL, la commande d'accueil nommée",
+    !!f9 && f9.statut === "FAIL" && r.verdict === "FAIL" && /30 h/.test(f9.message) && /accueillir-lot\.mjs/.test(f9.message), r.verdict]);
+  cas.push(["B9 quater— le constat ne porte JAMAIS le nom réel du lot : le sas existe pour qu'il ne sorte pas",
+    !!f9 && !/NomReelDuClient/.test(JSON.stringify(r)), r.verdict]);
 
   let ok = 0;
   for (const [nom, tenu, verdict] of cas) {
