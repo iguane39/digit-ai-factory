@@ -1,0 +1,145 @@
+{
+  "cible": "output/03-etudes/20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
+  "date_iso": "2026-09-19T13:22:06.471Z",
+  "registre_version": "2.21.0",
+  "profil": "digit-ai",
+  "niveau": "diffuse",
+  "verdict": "FAIL",
+  "resume": {
+    "pass": 9,
+    "fail": 3,
+    "skip": 6,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Rendu HTML / visuel",
+      "file": "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Conformité charte HTML (charte, sémantique, print)",
+      "file": "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Accessibilité (WCAG structurel)",
+      "file": "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · controles WCAG structurels OK"
+    },
+    {
+      "domaine": "Performance / poids",
+      "file": "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · poids/DOM dans les budgets (109 Ko, 527 nœuds, 485 hors zones repliées/citées)"
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Régression visuelle (golden diff)",
+      "file": "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Design généré : marqueurs de slop",
+      "file": "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
+      "verdict": "FAIL",
+      "detail": "1 constat(s) · couleur pure « #fff » : teinter vers la hue de marque"
+    },
+    {
+      "domaine": "Système de marque : traçabilité des tokens",
+      "file": "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
+      "verdict": "FAIL",
+      "detail": "25 constat(s) · couleur en dur « #fff » sur color : passer par var(--token) ; couleur en dur « #f6f8fc » sur background : passer par var(--token)"
+    },
+    {
+      "domaine": "Cible mobile : contrat d'usage tactile",
+      "file": "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
+      "verdict": "FAIL",
+      "detail": "4 constat(s) · 3 table(s) sans reflow en cartes sous 768 px : défilement horizontal forcé ; barre fixe collée à un bord sans env(safe-area-inset-*) : passage sous l'encoche ou l'indicateur de home"
+    },
+    {
+      "domaine": "Visuels générés : traçabilité et budget",
+      "file": "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · I1–I6 sans écart"
+    },
+    {
+      "domaine": "Mouvement : craft de l'animation",
+      "file": "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · R1–R7 sans écart"
+    },
+    {
+      "domaine": "Filtres de colonne sur tableaux de donnees",
+      "file": "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Autorité d'une décision affirmée",
+      "file": "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html",
+    "ts": "2026-09-19T13:22:06.470Z",
+    "fichiers": {
+      "output\\03-etudes\\20260919-etude-opportunite-plan-d-amelioration-post-audit.html": "497830c8bd0cb21337f94c79aa436aba05876e6e565e18aa568e930140f86118"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "FAIL"
+}

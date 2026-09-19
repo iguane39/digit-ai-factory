@@ -1,15 +1,15 @@
 {
  "outil": "generer-recidives",
- "etat_au": "2026-09-10T15:59:47.733Z",
- "items": 1017,
- "items_classes": 201,
- "recidives": 112,
- "classes": 65,
+ "etat_au": "2026-09-16T20:09:55.335Z",
+ "items": 1104,
+ "items_classes": 276,
+ "recidives": 149,
+ "classes": 74,
  "familles": 18,
- "classes_sans_fondateur": 10,
- "retours_classe_suspecte": 7,
- "releves": 19,
- "produits_releves": 12,
- "produits_non_equipes": 1,
- "manques_heritage": 91
+ "classes_sans_fondateur": 13,
+ "retours_classe_suspecte": 38,
+ "releves": 24,
+ "produits_releves": 6,
+ "produits_non_equipes": 0,
+ "manques_heritage": 34
 }

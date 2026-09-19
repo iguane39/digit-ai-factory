@@ -1,0 +1,79 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese Etude - Plan d amelioration post-audit verdict O2 forges impliquees - 20260919c.md",
+  "date_iso": "2026-09-19T11:20:48.411Z",
+  "registre_version": "2.21.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Etude - Plan d amelioration post-audit verdict O2 forges impliquees - 20260919c.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Etude - Plan d amelioration post-audit verdict O2 forges impliquees - 20260919c.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Etude - Plan d amelioration post-audit verdict O2 forges impliquees - 20260919c.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Etude - Plan d amelioration post-audit verdict O2 forges impliquees - 20260919c.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Etude - Plan d amelioration post-audit verdict O2 forges impliquees - 20260919c.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Etude - Plan d amelioration post-audit verdict O2 forges impliquees - 20260919c.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Etude - Plan d amelioration post-audit verdict O2 forges impliquees - 20260919c.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Etude - Plan d amelioration post-audit verdict O2 forges impliquees - 20260919c.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Etude - Plan d amelioration post-audit verdict O2 forges impliquees - 20260919c.md",
+    "ts": "2026-09-19T11:20:48.410Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Etude - Plan d amelioration post-audit verdict O2 forges impliquees - 20260919c.md": "18d9bfb0bcba0e8e925b5591d4444c87861761f7aa791747d7e12328d5932d9e"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

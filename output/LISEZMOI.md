@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 282 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
+**État** : 288 livrable(s) courant(s), 10 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -195,6 +195,9 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260911-etude-opportunite-communication-marketing-ao.md | — | 46.3 Ko | `03-etudes/20260911-etude-opportunite-communication-marketing-ao.md` |
 | 20260911-L99-forge-communication-marketing.md | — | 53 Ko | `03-etudes/20260911-L99-forge-communication-marketing.md` |
 | 20260911-L99-regles-d-ecriture-factory.md | — | 59.2 Ko | `03-etudes/20260911-L99-regles-d-ecriture-factory.md` |
+| 20260919-etude-opportunite-plan-d-amelioration-post-audit.html | — | 109.3 Ko | `03-etudes/20260919-etude-opportunite-plan-d-amelioration-post-audit.html` |
+| 20260919-etude-opportunite-plan-d-amelioration-post-audit.md | — | 31.2 Ko | `03-etudes/20260919-etude-opportunite-plan-d-amelioration-post-audit.md` |
+| 20260919-L99-audit-et-plan-d-amelioration-plateforme.md | — | 43.3 Ko | `03-etudes/20260919-L99-audit-et-plan-d-amelioration-plateforme.md` |
 
 ### 04-plans
 
@@ -220,6 +223,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md | 20260815a | 3.8 Ko | `04-plans/Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md` |
 | Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md.jugement.json | — | 0.4 Ko | `04-plans/Digit-AI - Synthese Diagnostic - Avancement des traitements longs - 20260815a.md.jugement.json` |
 | Digit-AI - Synthese Etude - Communication marketing AO verdict O3 huit candidatures - 20260911g.md | 20260911g | 22.3 Ko | `04-plans/Digit-AI - Synthese Etude - Communication marketing AO verdict O3 huit candidatures - 20260911g.md` |
+| Digit-AI - Synthese Etude - Plan d amelioration post-audit verdict O2 forges impliquees - 20260919c.md | 20260919c | 20.4 Ko | `04-plans/Digit-AI - Synthese Etude - Plan d amelioration post-audit verdict O2 forges impliquees - 20260919c.md` |
+| Digit-AI - Synthese L99 - Audit et plan d amelioration plateforme prompt reecrit - 20260919b.md | 20260919b | 17.2 Ko | `04-plans/Digit-AI - Synthese L99 - Audit et plan d amelioration plateforme prompt reecrit - 20260919b.md` |
 | Digit-AI - Synthese L99 - Forge communication marketing prompt reecrit trois candidatures - 20260911f.md | 20260911f | 20 Ko | `04-plans/Digit-AI - Synthese L99 - Forge communication marketing prompt reecrit trois candidatures - 20260911f.md` |
 | Digit-AI - Synthese L99 - Regles d ecriture de la Factory prompt reecrit et esquisse profil - 20260911j.md | 20260911j | 21.6 Ko | `04-plans/Digit-AI - Synthese L99 - Regles d ecriture de la Factory prompt reecrit et esquisse profil - 20260911j.md` |
 | Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md | 20260905i | 15.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Actions 31 32 33 achevees - 20260905i.md` |
@@ -309,6 +314,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Synchronisation GitHub et procedure de l autre poste - 20260907i.md | 20260907i | 15.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub et procedure de l autre poste - 20260907i.md` |
 | Digit-AI - Synthese Mandat - Synchronisation GitHub et reconstruction du clone - 20260903d.md | 20260903d | 25.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub et reconstruction du clone - 20260903d.md` |
 | Digit-AI - Synthese Mandat - Synchronisation GitHub reconstruction du clone - 20260907a.md | 20260907a | 19.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation GitHub reconstruction du clone - 20260907a.md` |
+| Digit-AI - Synthese Mandat - Synchronisation suspendue campagne du 14 09 jouee deux fois - 20260919a.md | 20260919a | 14.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation suspendue campagne du 14 09 jouee deux fois - 20260919a.md` |
 | Digit-AI - Synthese Mandat - TF-0794 clos rectification de seq - 20260905a.md | 20260905a | 12.3 Ko | `04-plans/Digit-AI - Synthese Mandat - TF-0794 clos rectification de seq - 20260905a.md` |
 | Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md | 20260905b | 9 Ko | `04-plans/Digit-AI - Synthese Mandat - TF-0795 clos chemin d echec des controles - 20260905b.md` |
 | Digit-AI - Synthese Mandat - TF-0801 clos cle de versions et file d attente - 20260905c.md | 20260905c | 10 Ko | `04-plans/Digit-AI - Synthese Mandat - TF-0801 clos cle de versions et file d attente - 20260905c.md` |

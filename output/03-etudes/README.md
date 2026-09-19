@@ -71,4 +71,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `20260911-L99-forge-communication-marketing.md` | fichier | 52,4 Ko | Analyse L99 — « Construire une forge communication & marketing pour Digit-AI : étude d'opp |
 | `20260911-L99-regles-d-ecriture-factory.md` | fichier | 58,5 Ko | Analyse L99 — « Améliorer tous les textes générés par la Factory : état de l'art, règles d |
 
-_54 fichier(s), 0 sous-dossier(s)_
+_54 fichier(s), 0 sous-dossier(s)_ · 3 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)

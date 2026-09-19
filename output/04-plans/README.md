@@ -43,6 +43,7 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Avancement des campagnes cable - 20260815a.md` | fichier | 3,4 Ko | Synthèse de mandat — option (a) : l'avancement des campagnes est câblé (TF-0252) |
 | `Digit-AI - Synthese Mandat - Barres validees et publication decisions D6a D7a - 20260907e.md` | fichier | 10,4 Ko | Synthèse de mandat — décisions D-6 (a) et D-7 (a) exécutées : quatre barres validées et cl |
 | `Digit-AI - Synthese Mandat - Bloc 3 forme de reference - 20260830f.md` | fichier | 15,3 Ko | Synthèse de mandat — la forme du bloc des décisions, relevée à la source et rendue lisible |
+| `Digit-AI - Synthese Mandat - Campagne des todos et retours - 20260915a.md` | fichier | 22,6 Ko | Synthèse de mandat — les retours en attente sont entrés au registre et la campagne des cin |
 | `Digit-AI - Synthese Mandat - Campagne tous les todos - 20260901b.md` | fichier | 13,1 Ko | Synthèse de mandat — la liste tranchée en bloc, vingt-deux chantiers clos, tout publié (01 |
 | `Digit-AI - Synthese Mandat - Campagnes en cours trois corrections closes porte rouge sur quatre depots - 20260908d.md` | fichier | 20,1 Ko | Synthèse de mandat — campagnes en cours : trois corrections vérifiées et closes, trois cam |
 | `Digit-AI - Synthese Mandat - Canal confidentiel et actions 58 60 61 62 63 - 20260907m.md` | fichier | 25,4 Ko | Synthèse de mandat — le canal confidentiel existe et les tables y vivent, la forge des out |
@@ -137,4 +138,4 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `Digit-AI - Synthese Mandat - Vocabulaire SEO site vs produit - 20260815a.md` | fichier | 3,2 Ko | Synthèse de mandat — « revois le prompt du SEO » (TF-0251) |
 | `Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte au vert - 20260910a.md` | fichier | 20,0 Ko | Synthèse de mandat — vos deux décisions sont exécutées, la copie locale est reconstruite,  |
 
-_120 fichier(s), 0 sous-dossier(s)_ · 1 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
+_121 fichier(s), 0 sous-dossier(s)_ · 3 fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)
