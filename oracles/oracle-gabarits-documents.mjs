@@ -25,6 +25,9 @@
  *   G4 · le document REND son gabarit et sa version (`Gabarit : gd-… · version du gabarit x.y.z`),
  *        visiblement — jamais seulement en commentaire. Une instance périmée est invisible sur
  *        l'artefact, et la section R-46 des lots devient impossible à remplir sans lui (TF-0690).
+ *   G7 · les sections que le CATALOGUE déclare obligatoires pour une famille (`sections_obligatoires`)
+ *        sont présentes comme titres de sa doctrine (TF-1170). La règle ne juge que ce qu'une
+ *        famille a DÉCLARÉ : une famille sans déclaration n'est jamais accusée ;
  *   G5 · la largeur de contenu est une propriété de la PAGE (règle D10, TF-1038) : un document
  *        qui porte des chapitres `.chap` déclare `data-largeur="lecture|donnees"` sur `<body>` ou
  *        `<main>`, et ses chapitres tiennent la déclaration (`.lire` partout en lecture, nulle part
@@ -231,7 +234,7 @@ export function jugerLivrable(chemin, catalogue) {
       "ou renommer le livrable avec le type d'une famille existante."};
 }
 
-export function juger(dossier) {
+export function juger(dossier, catalogue = lireCatalogue()) {
   const findings = [];
   const familles = existsSync(dossier)
     ? readdirSync(dossier, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name)
@@ -354,6 +357,53 @@ export function juger(dossier) {
       }
     }
 
+    // G7 (TF-1170, 20/09/2026) — UNE SECTION DÉCLARÉE OBLIGATOIRE EST DANS LA DOCTRINE.
+    //
+    // LE FAIT, et il est daté (retour Produit-62 RF-18 du 16/09/2026). Un commanditaire a dénoncé
+    // comme un défaut — « une seule table de fait, et pas 4 comme actuellement » — les QUATRE tables
+    // de faits qui appliquaient SA PROPRE décision, tranchée neuf jours plus tôt. La décision vivait
+    // au ledger du produit ; ni le modèle déclaré ni le mode d'emploi du livrable ne la portaient.
+    // Coût mesuré : 55 minutes d'analyse pour établir que le défaut dénoncé était une décision.
+    // *Un choix d'architecture non expliqué là où le lecteur le rencontre sera dénoncé comme un
+    // défaut — y compris par celui qui l'a pris.*
+    //
+    // POURQUOI LA RÈGLE EST PILOTÉE PAR LE CATALOGUE, et non écrite en dur comme G10. G10 exige la
+    // section « Document d'auteur » de TOUTE famille, parce que D11 vaut pour toutes. Ici non : la
+    // section « Choix d'architecture et décisions qui les fondent » n'a de sens que pour un livrable
+    // qui EST un dossier. L'écrire en dur accuserait les trente-huit familles du catalogue le jour de
+    // sa naissance, et une règle qui accuse du travail juste se fait désactiver le lendemain (la
+    // leçon est déjà payée, voir l'antériorité déclarée de G9). La règle juge donc ce qu'une famille
+    // a DÉCLARÉ vouloir tenir : taux d'accusation mesuré sur le parc AVANT écriture — 0 famille sur
+    // 38, puisque aucune ne déclarait encore le champ.
+    //
+    // CE QU'ELLE NE FAIT PAS : juger le CONTENU de la section, ni qu'une INSTANCE la remplisse. Une
+    // décision citée mais révoquée depuis passe cette règle et ment ; le ledger du produit fait foi,
+    // et aucun oracle du pilot ne le lit. C'est le `non_juge` que forge-data déclare déjà au même
+    // endroit (M7 d'oracle-modeliser : « reprise des mêmes décisions dans le mode d'emploi du
+    // livrable-dossier — gabarit du pilot, jamais jugé ici »), repris ici plutôt que tu des deux côtés.
+    {
+      const ligne = catalogue.find((f) => f.famille === fam);
+      const dues = (ligne && Array.isArray(ligne.sections_obligatoires)) ? ligne.sections_obligatoires : [];
+      if (!dues.length) {
+        findings.push({ regle: "G7", statut: "PASS", ou: `${fam}/GABARIT.md`, message:
+          "aucune section déclarée obligatoire au catalogue — la règle ne juge que ce qu'une famille " +
+          "a DÉCLARÉ vouloir tenir, et n'accuse jamais celle qui n'a rien déclaré" });
+      } else {
+        const texte = sansCommentaires(readFileSync(p("GABARIT.md"), "utf8"));
+        const titres = [...texte.matchAll(/^\s{0,3}#{2,6}\s+(.+?)\s*$/gm)].map((m) => NORMALISER(m[1]));
+        const absentes = dues.filter((s) => !titres.some((t) => t.includes(NORMALISER(s))));
+        findings.push(absentes.length
+          ? { regle: "G7", statut: "FAIL", ou: `${fam}/GABARIT.md`, message:
+              `section(s) déclarée(s) obligatoire(s) au catalogue et ABSENTE(S) de la doctrine : ` +
+              `${absentes.map((s) => `« ${s} »`).join(", ")}. La famille déclare tenir cette section ; ` +
+              "un gabarit qui ne la porte pas laisse chaque livrable la réinventer ou l'omettre — et " +
+              "c'est ainsi qu'un choix d'architecture non expliqué se fait dénoncer comme un défaut " +
+              "par celui-là même qui l'avait tranché (TF-1170, retour RF-18 du 16/09/2026)" }
+          : { regle: "G7", statut: "PASS", ou: `${fam}/GABARIT.md`, message:
+              `${dues.length} section(s) déclarée(s) obligatoire(s) au catalogue, toutes présentes dans la doctrine` });
+      }
+    }
+
     // G5 (TF-1038, 15/09/2026) — LA LARGEUR EST UNE PROPRIÉTÉ DE LA PAGE. Le fait : un lecteur a
     // demandé d'homogénéiser la largeur d'une page où neuf chapitres alternaient pleine largeur et
     // `.chap.lire` bridé, dans l'ordre de leur nature et non de la lecture. Le squelette
@@ -454,6 +504,36 @@ if (args[0] === "--self-test") {
   if (!g("G5", "largeur-lecture").every((x) => x.statut === "PASS")) casse.push("une page « lecture » tenue échoue G5 — la règle accuse ce qu'elle prescrit");
   if (!g("G5", "largeur-donnees").every((x) => x.statut === "PASS" && /exception/.test(x.message))) casse.push("une exception déclarée n'est pas admise par G5");
 
+  // G7 (TF-1170) — LA SECTION DÉCLARÉE OBLIGATOIRE, DANS SES TROIS SENS. Les trois familles ne
+  // diffèrent que par UNE propriété : ce que le catalogue déclare, et ce que la doctrine porte.
+  // Le troisième sens est celui qui empêche la règle de naître en accusant le parc entier — une
+  // famille qui ne déclare rien n'est pas jugée, et c'est ce qui rend la règle adoptable.
+  const SECTION = "Choix d'architecture et décisions qui les fondent";
+  const CAT_G7 = [
+    { famille: "g7-tenue", sections_obligatoires: [SECTION] },
+    { famille: "g7-manquante", sections_obligatoires: [SECTION] },
+    { famille: "g7-muette" },
+  ];
+  const poserG7 = (nom, corpsDoctrine) => {
+    mkdirSync(join(dir, nom), { recursive: true });
+    writeFileSync(join(dir, nom, "GABARIT.md"), corpsDoctrine, "utf8");
+    writeFileSync(join(dir, nom, "INSTANCE.md"), "# instance\n\nRemplie le 20 septembre 2026.\n" +
+      "\nGabarit : gd-g7 · version du gabarit 1.0.0\n", "utf8");
+  };
+  poserG7("g7-tenue", `# doctrine\n\n## ${SECTION}\n\nDepuis le ledger du produit.\n`);
+  poserG7("g7-manquante", "# doctrine\n\n## Le contenu du dossier\n\nSans la section due.\n");
+  poserG7("g7-muette", "# doctrine\n\n## Le contenu du dossier\n\nFamille qui ne déclare rien.\n");
+  const f7 = juger(dir, CAT_G7);
+  const g7 = (ou) => f7.filter((x) => x.regle === "G7" && x.ou.startsWith(ou));
+  if (!g7("g7-tenue").every((x) => x.statut === "PASS"))
+    casse.push("G7 : une famille qui PORTE la section qu'elle déclare est accusée — la règle accuse ce qu'elle prescrit");
+  if (!g7("g7-manquante").some((x) => x.statut === "FAIL" && /ABSENTE/.test(x.message)))
+    casse.push("G7 : une famille qui déclare une section obligatoire et ne la porte PAS passe — c'est le trou " +
+      "par lequel un choix d'architecture non expliqué se fait dénoncer comme un défaut (RF-18, 16/09/2026)");
+  if (!g7("g7-muette").every((x) => x.statut === "PASS" && /n'a rien déclaré/.test(x.message)))
+    casse.push("G7 : une famille qui ne déclare AUCUNE section obligatoire est jugée — la règle accuserait " +
+      "les 38 familles du parc le jour de sa naissance, et se ferait désactiver le lendemain");
+
   // G3, sens rouge : une classe posée sans règle CSS — le défaut exact du 24/08, en modèle réduit.
   mkdirSync(join(dir, "classe-nue"), { recursive: true });
   writeFileSync(join(dir, "classe-nue", "GABARIT.md"), "# doctrine\n", "utf8");
@@ -512,11 +592,11 @@ if (args[0] === "--self-test") {
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test gabarits-documents : 18/18 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ; " +
+    : "Self-test gabarits-documents : 21/21 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
       "instance à trous → FAIL ; instance copie du squelette → FAIL ; classe posée sans règle CSS → FAIL au marquage ; " +
       "couple gabarit+version rendu → PASS G4 ; document sans le couple → FAIL G4 ; largeurs alternées sans " +
       "déclaration → FAIL G5 ; page « lecture » contredite → FAIL G5 ; page « lecture » tenue → PASS G5 ; " +
-      "page « donnees » avec exception déclarée → PASS G5 ; G8 dans ses TROIS sens (TF-1076) : un livrable « Synthese … » résout la famille des restitutions, un « Note Migration … » — type absent du catalogue — FAIL en nommant les clés proches, et « Synthese Executive » résout sa PROPRE famille, le préfixe le plus long gagnant sur le plus court) ; G9 dans ses QUATRE sens (TF-0923 volet 3) : une etude posterieure a la doctrine SANS page homonyme FAIL, la MEME avec sa page PASS, une etude ANTERIEURE a la doctrine SANS_OBJET — antecedence declaree, jamais rattrapee en silence —, et une restitution SKIP, la page n etant due qu aux propositions remises a un humain)");
+      "page « donnees » avec exception déclarée → PASS G5 ; G7 dans ses TROIS sens (TF-1170) : une famille qui PORTE la section qu'elle déclare → PASS, une famille qui la DÉCLARE et ne la porte pas → FAIL, une famille qui ne déclare RIEN → PASS sans être jugée, ce qui empêche la règle d'accuser les 38 familles du parc le jour de sa naissance ; G8 dans ses TROIS sens (TF-1076) : un livrable « Synthese … » résout la famille des restitutions, un « Note Migration … » — type absent du catalogue — FAIL en nommant les clés proches, et « Synthese Executive » résout sa PROPRE famille, le préfixe le plus long gagnant sur le plus court) ; G9 dans ses QUATRE sens (TF-0923 volet 3) : une etude posterieure a la doctrine SANS page homonyme FAIL, la MEME avec sa page PASS, une etude ANTERIEURE a la doctrine SANS_OBJET — antecedence declaree, jamais rattrapee en silence —, et une restitution SKIP, la page n etant due qu aux propositions remises a un humain)");
   process.exit(casse.length ? 1 : 0);
 }
 

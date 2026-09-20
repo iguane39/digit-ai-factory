@@ -14,7 +14,12 @@ minoritaire**, et c'est voulu : le doublon coûte plus cher que le renvoi.
 Source unique : **`catalogue.jsonl`** — une ligne par famille, avec sa **provenance** (le ou
 les livrables réels d'où la forme est tirée) et son **statut**. Les vues, s'il y en a un jour,
 s'en dérivent ; ce fichier ne se recopie pas à la main. Oracle : `oracles\oracle-gabarits-documents.mjs`
-(G1-G7, joué par la recette du pilot).
+(G1-G5, G7-G10, joué par la recette du pilot — G6 est libre, réservé au contrôle de conception amont).
+
+**`sections_obligatoires` (TF-1170, 20/09/2026)** — une famille peut déclarer, au catalogue, les
+sections que sa doctrine DOIT porter ; **G7** vérifie qu'elles y sont. La règle ne juge que ce
+qu'une famille a déclaré : celle qui ne déclare rien n'est jamais accusée. C'est ce qui la rend
+adoptable — écrite en dur, elle aurait accusé les trente-huit familles le jour de sa naissance.
 
 *Pourquoi cette bibliothèque existe.* Chaque projet réinventait la forme de ses livrables, et
 les défauts de forme se rejouaient d'un projet à l'autre — largeur de lecture, tableaux
