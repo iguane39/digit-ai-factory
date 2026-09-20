@@ -1,6 +1,6 @@
 {
   "cible": "c:\\dev\\digit-ai-factory\\gabarits\\documents\\README.md",
-  "date_iso": "2026-09-20T16:49:30.128Z",
+  "date_iso": "2026-09-20T17:01:05.299Z",
   "registre_version": "2.24.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -26,7 +26,7 @@
       "domaine": "Lisibilité d'un document (Markdown)",
       "file": "gabarits\\documents\\README.md",
       "verdict": "FAIL",
-      "detail": "5 constat(s) · M18 identifiant muet : « RD-7 » employé sans son sens (ligne 106) — première occurrence dans le document. Hors HTML il n'y a ni infobulle ni ancre : la glose est EN LIGNE, entre parenthèses, après un tiret, ou après deux-points. Retour client du 22/08 : « je ne sais pas ce qu'est E2 ». ; M18 identifiant muet : « RD-8 » employé sans son sens (ligne 106) — première occurrence dans le document. Hors HTML il n'y a ni infobulle ni ancre : la glose est EN LIGNE, entre parenthèses, après un tiret, ou après deux-points. Retour client du 22/08 : « je ne sais pas ce qu'est E2 »."
+      "detail": "5 constat(s) · M18 identifiant muet : « RD-7 » employé sans son sens (ligne 131) — première occurrence dans le document. Hors HTML il n'y a ni infobulle ni ancre : la glose est EN LIGNE, entre parenthèses, après un tiret, ou après deux-points. Retour client du 22/08 : « je ne sais pas ce qu'est E2 ». ; M18 identifiant muet : « RD-8 » employé sans son sens (ligne 131) — première occurrence dans le document. Hors HTML il n'y a ni infobulle ni ancre : la glose est EN LIGNE, entre parenthèses, après un tiret, ou après deux-points. Retour client du 22/08 : « je ne sais pas ce qu'est E2 »."
     },
     {
       "domaine": "Format / livraison / versioning",
@@ -69,9 +69,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "gabarits\\documents\\README.md",
-    "ts": "2026-09-20T16:49:30.127Z",
+    "ts": "2026-09-20T17:01:05.299Z",
     "fichiers": {
-      "gabarits\\documents\\README.md": "f2e10532df3eb09ce2d099e03e7aa7028d803078d486f1dab9f5029a51c403ac"
+      "gabarits\\documents\\README.md": "b19939d62ef463369af0d37b5a67b03bcae4d22f58a683816f8a5fc1f49a45b9"
     }
   },
   "empreinte_motif": null,

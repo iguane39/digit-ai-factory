@@ -234,6 +234,166 @@ export function jugerLivrable(chemin, catalogue) {
       "ou renommer le livrable avec le type d'une famille existante."};
 }
 
+// ---- G6 (TF-1097, 20/09/2026) — LA CONCEPTION SE JUGE AVANT L'ÉCRITURE, PUIS LE DOCUMENT LA TIENT
+//
+// LE CHIFFRE QUI FONDE LA RÈGLE. Le rétro-test du 14/09/2026 a classé 20 griefs réels de lecteurs :
+// 11 auraient été évités par une conception fixée AVANT l'écriture, et par elle seule ; 2 par un
+// oracle existant qu'on aurait joué, 2 par les deux, 5 par rien. Le seuil fixé d'avance était de 6.
+// Les 11 se groupent en trois causes que cette règle vise une à une : un document sans famille ni
+// conception préalable, un vocabulaire du lecteur non fixé, un format non dérivé du volume.
+//
+// RÉSERVE DE L'ÉTUDE, REPRISE ET NON TUE : les 20 griefs ont été choisis et classés par une SEULE
+// session, sans jugement à l'aveugle ni second classeur ; revue fixée au 2026-10-14. La règle ne
+// prétend donc rien au-delà — elle rend la conception EXPLICITE et JUGEABLE, elle ne promet pas
+// moins de retours.
+//
+// POURQUOI UN MODE SUR APPEL, ET PAS UNE RÈGLE DU PARC. Une fiche est par DOCUMENT, jamais par
+// famille : il n'y a rien à balayer dans `gabarits\documents\`. Taux d'accusation du corpus existant
+// MESURÉ avant de choisir la sévérité : 0 — aucun document du parc ne porte de fiche, et la règle
+// n'en exige d'aucun. Elle est donc BLOQUANTE sur ce qu'on lui soumet, sans accuser personne
+// rétroactivement ; la règle 5 interdit de réécrire l'existant, et G9 a déjà payé cette leçon.
+//
+// CE QU'ELLE NE JUGE PAS, et la frontière est écrite au gabarit : la JUSTESSE du lecteur défini, la
+// PERTINENCE d'une intention, le BON choix d'un type de contenu, la qualité de la prose. Un oracle
+// mesure une présence, jamais une valeur.
+const TYPES_CONTENU = ["concept", "tache", "procedure", "processus", "principe", "fait",
+  "structure", "classification", "reference"];
+
+/** Un champ resté à l'état d'emplacement (`{…}`) ou vide n'est pas rempli. */
+const champVide = (v) => !v || !v.trim() || /^\{.*\}$/.test(v.trim()) || /^[….-]+$/.test(v.trim());
+
+/** La valeur d'un champ `cle: valeur` du corps de la fiche, première occurrence. */
+const champ = (texte, cle) => {
+  const m = new RegExp(`^\\s*${cle}\\s*:\\s*(.+?)\\s*$`, "im").exec(texte);
+  return m ? m[1] : null;
+};
+
+/** Les parties déclarées : chaque bloc ouvert par `- titre:`. */
+export function partiesDeLaFiche(texte) {
+  const morceaux = texte.split(/^[ \t]*-[ \t]*titre[ \t]*:/im).slice(1);
+  return morceaux.map((bloc, i) => {
+    const titre = (bloc.split(/\r?\n/)[0] || "").trim();
+    return { rang: i + 1, titre, intention: champ(bloc, "intention"), type: champ(bloc, "type_de_contenu") };
+  });
+}
+
+/**
+ * G6 sur UNE fiche de conception, et — si un document est fourni — sur le fait qu'il la TIENT.
+ * Rend un tableau de findings `{ regle, statut, ou, message }`.
+ */
+export function jugerFiche(cheminFiche, cheminDocument = null) {
+  const f = [];
+  const nom = String(cheminFiche).replace(/^.*[\\/]/, "");
+  let texte;
+  try { texte = sansCommentaires(readFileSync(cheminFiche, "utf8")); }
+  catch {
+    return [{ regle: "G6", statut: "FAIL", ou: nom, message:
+      `fiche de conception illisible ou absente : ${cheminFiche}. Le gabarit vit à ` +
+      "`gabarits\\documents\\FICHE-CONCEPTION.md` ; la fiche se remplit AVANT d'écrire le document" }];
+  }
+  const ok = (m) => f.push({ regle: "G6", statut: "PASS", ou: nom, message: m });
+  const ko = (m) => f.push({ regle: "G6", statut: "FAIL", ou: nom, message: m });
+
+  // 1 · la famille. « aucune » est une réponse ADMISE, à condition d'être assumée : la classe
+  // gabarit-famille-manquante récidive à 13 sur 13 parce que ce signal était avalé en silence.
+  const famille = champ(texte, "famille");
+  if (champVide(famille)) {
+    ko("aucune `famille` déclarée — un document écrit sans famille est un gabarit réinventé, et la " +
+      "classe `gabarit-famille-manquante` récidive dans 13 cas sur 13. Déclarer l'id du catalogue, " +
+      "ou `famille: aucune — candidature remontée` et remonter le candidat au registre");
+  } else ok(`famille déclarée : « ${famille} »`);
+
+  // 2 · le lecteur, par ses DÉCISIONS. Les quatre champs sont dus : deux griefs du rétro-test
+  // (18 et 20) viennent d'un vocabulaire non fixé avant l'écriture.
+  const CHAMPS_LECTEUR = ["decisions_attendues", "savoir_prealable", "vocabulaire_absent", "contexte_de_lecture"];
+  const manquants = CHAMPS_LECTEUR.filter((c) => champVide(champ(texte, c)));
+  if (manquants.length) {
+    ko(`lecteur incomplet — champ(s) non rempli(s) : ${manquants.join(", ")}. Le lecteur se définit ` +
+      "par ce qu'il doit DÉCIDER, ce qu'il sait déjà, les mots de notre métier qu'il n'a pas, et son " +
+      "contexte de lecture — jamais par un personnage (un rôle incarné ne fait pas trouver plus de défauts)");
+  } else ok("lecteur défini par ses décisions, son savoir, son vocabulaire absent et son contexte");
+
+  // 3 · les parties : une intention et un TYPE DE CONTENU du vocabulaire fermé, par partie.
+  const parties = partiesDeLaFiche(texte);
+  if (!parties.length) {
+    ko("aucune partie déclarée (`- titre:`) — sans parties, il n'y a pas de conception, seulement un titre");
+  } else {
+    const ecarts = [];
+    for (const p of parties) {
+      const ou = `partie ${p.rang} « ${(p.titre || "?").slice(0, 40)} »`;
+      if (champVide(p.titre)) ecarts.push(`${ou} : titre non rempli`);
+      if (champVide(p.intention)) ecarts.push(`${ou} : pas d'\`intention\` — la question du lecteur à laquelle elle répond`);
+      else {
+        // D8 : « un chapitre qui ne peut pas l'écrire sans paraphraser son titre se supprime ».
+        const ti = NORMALISER(p.titre || ""), it = NORMALISER(p.intention);
+        if (it === ti || (ti && it.replace(/\s/g, "").includes(ti.replace(/\s/g, "")) && it.split(" ").length <= ti.split(" ").length + 2)) {
+          ecarts.push(`${ou} : l'intention PARAPHRASE le titre — règle D8, une partie qui ne peut pas dire ` +
+            "ce qu'elle apprend au lecteur autrement qu'en répétant son titre se supprime");
+        } else if (it.split(" ").filter(Boolean).length < 5) {
+          ecarts.push(`${ou} : intention en ${it.split(" ").filter(Boolean).length} mot(s) — au moins 5, ` +
+            "et elle dit ce que le lecteur en TIRE, pas ce que la partie contient");
+        }
+      }
+      const t = NORMALISER(p.type || "");
+      if (champVide(p.type)) ecarts.push(`${ou} : pas de \`type_de_contenu\``);
+      else if (!TYPES_CONTENU.includes(t)) {
+        ecarts.push(`${ou} : type_de_contenu « ${p.type} » hors du vocabulaire FERMÉ ` +
+          `(${TYPES_CONTENU.join(", ")}) — un vocabulaire ouvert laisse écrire « présentation » ou ` +
+          "« contexte », qui ne commandent aucune forme, et c'est la forme que le type doit dériver");
+      }
+    }
+    if (ecarts.length) ko(`${parties.length} partie(s) déclarée(s), ${ecarts.length} écart(s) : ${ecarts.join(" · ")}`);
+    else ok(`${parties.length} partie(s), chacune avec son intention et son type de contenu du vocabulaire fermé`);
+  }
+
+  // 4 · le format, DÉRIVÉ : quatre griefs du rétro-test (2, 10, 11, 12) viennent d'un format
+  // choisi par habitude plutôt que dérivé du volume et du contexte de lecture.
+  const fmt = champ(texte, "format"), just = champ(texte, "justification");
+  if (champVide(fmt) || champVide(just)) {
+    ko(`format non dérivé — ${champVide(fmt) ? "`format` absent" : "`justification` absente"}. Le format ` +
+      "se DÉRIVE du volume attendu et du contexte de lecture, il ne se choisit pas par habitude : " +
+      "quatre des vingt griefs du rétro-test du 14/09 viennent exactement de là");
+  } else ok(`format « ${fmt} », justifié`);
+
+  // 5 · l'enjeu et sa validation humaine. « L'IA fait, l'humain décide » : la voie automatisée est
+  // le défaut, et c'est l'intervention humaine qui se justifie — jamais l'inverse (loi n° 5, R-29).
+  const enjeu = NORMALISER(champ(texte, "enjeu") || "");
+  if (!["fort", "ordinaire"].includes(enjeu)) {
+    ko(`\`enjeu\` absent ou hors vocabulaire (« fort » ou « ordinaire ») — le critère est écrit au ` +
+      "§ 6 du gabarit et ne se négocie pas au cas par cas");
+  } else if (enjeu === "fort") {
+    const par = champ(texte, "valide_par");
+    if (champVide(par) || /sans objet/i.test(par)) {
+      ko("fiche à enjeu FORT sans `valide_par` — un document qui sort de l'écosystème, fonde une " +
+        "décision engageante, porte des chiffres opposables, inaugure une famille neuve ou traîne un " +
+        "retour non soldé se conçoit sous validation humaine AVANT écriture (R-29 : les gates restent humains)");
+    } else ok(`enjeu fort, validé par « ${par} »`);
+  } else ok("enjeu ordinaire — la fiche reste due, c'est la validation humaine qui ne l'est pas");
+
+  // 6 · LE DOCUMENT TIENT-IL SA FICHE ? Second temps de la règle, et c'est lui qui empêche la fiche
+  // d'être un rite : une conception qu'on n'exécute pas coûte sans rien rendre.
+  if (cheminDocument) {
+    const nomDoc = String(cheminDocument).replace(/^.*[\\/]/, "");
+    let doc;
+    try { doc = sansCommentaires(readFileSync(cheminDocument, "utf8")); }
+    catch {
+      f.push({ regle: "G6", statut: "FAIL", ou: nomDoc, message: `document illisible ou absent : ${cheminDocument}` });
+      return f;
+    }
+    const titres = [...doc.matchAll(/^\s{0,3}#{1,6}\s+(.+?)\s*$/gm)].map((m) => NORMALISER(m[1]));
+    const absentes = parties.filter((p) => p.titre && !champVide(p.titre))
+      .filter((p) => !titres.some((t) => t.includes(NORMALISER(p.titre)) || NORMALISER(p.titre).includes(t)));
+    f.push(absentes.length
+      ? { regle: "G6", statut: "FAIL", ou: nomDoc, message:
+          `le document NE TIENT PAS sa fiche : ${absentes.length} partie(s) conçue(s) et absente(s) du ` +
+          `document — ${absentes.map((p) => `« ${p.titre} »`).join(", ")}. Une conception qu'on n'exécute ` +
+          "pas coûte sans rien rendre ; soit la partie s'écrit, soit la fiche se corrige AVANT, jamais après" }
+      : { regle: "G6", statut: "PASS", ou: nomDoc, message:
+          `le document tient sa fiche : les ${parties.length} partie(s) conçue(s) s'y retrouvent` });
+  }
+  return f;
+}
+
 export function juger(dossier, catalogue = lireCatalogue()) {
   const findings = [];
   const familles = existsSync(dossier)
@@ -589,14 +749,70 @@ if (args[0] === "--self-test") {
     casse.push("G9 : une RESTITUTION est traitée comme une proposition — la page n'est due qu'aux propositions, " +
       "trajectoires, études et conseils remis à un humain");
 
+  // G6 (TF-1097) — LA FICHE DE CONCEPTION, DANS SES SIX SENS. Chaque cas rouge ne diffère du cas
+  // vert que par UNE propriété : c'est la seule forme qui prouve que la règle juge ce qu'elle dit
+  // juger. Le sixième — le document qui ne tient pas sa fiche — est celui qui empêche la fiche de
+  // devenir un rite : une conception qu'on n'exécute pas coûte sans rien rendre.
+  const FICHE_OK = [
+    "famille: gd-rapport-donnees",
+    "enjeu: ordinaire",
+    "motif_enjeu: aucune",
+    "decisions_attendues: arbitrer quels rapports sont maintenus et lesquels sont retirés",
+    "savoir_prealable: connaît ses indicateurs métier et son organisation",
+    "vocabulaire_absent: lineage, granularité, dimension conforme",
+    "contexte_de_lecture: en comité, vingt minutes, projeté sur écran partagé",
+    "parties:",
+    "  - titre: Ce qui a été mesuré",
+    "    intention: le lecteur sait sur quelle population porte chaque chiffre avant de trancher",
+    "    type_de_contenu: fait",
+    "  - titre: Comment relire un chiffre",
+    "    intention: le lecteur retrouve seul la source d'un agrégat qui le surprend",
+    "    type_de_contenu: tache",
+    "format: html",
+    "volume_attendu: 2 parties, un tableau de 63 lignes",
+    "justification: 63 lignes filtrables et une lecture projetée en comité imposent une page HTML, pas un Markdown",
+  ].join("\n");
+  const poserFiche = (nom, muter) => {
+    const p6 = join(dir, nom);
+    writeFileSync(p6, muter ? muter(FICHE_OK) : FICHE_OK, "utf8");
+    return p6;
+  };
+  const verdict6 = (fiche, doc) => jugerFiche(fiche, doc);
+  const aFail = (fs, motif) => fs.some((x) => x.statut === "FAIL" && motif.test(x.message));
+
+  if (verdict6(poserFiche("f-ok.md")).some((x) => x.statut === "FAIL"))
+    casse.push("G6 : une fiche COMPLÈTE est accusée — la règle accuse ce qu'elle prescrit : " +
+      JSON.stringify(verdict6(poserFiche("f-ok.md")).filter((x) => x.statut === "FAIL").map((x) => x.message.slice(0, 90))));
+  if (!aFail(verdict6(poserFiche("f-lecteur.md", (t) => t.replace(/^vocabulaire_absent:.*$/m, "vocabulaire_absent: {les mots de NOTRE métier qu'il n'a pas}"))), /lecteur incomplet/))
+    casse.push("G6 : un champ du lecteur resté à l'état d'emplacement passe — c'est le vocabulaire non fixé " +
+      "avant l'écriture, deux griefs sur vingt du rétro-test du 14/09");
+  if (!aFail(verdict6(poserFiche("f-type.md", (t) => t.replace("type_de_contenu: fait", "type_de_contenu: présentation"))), /vocabulaire FERMÉ/))
+    casse.push("G6 : un type de contenu hors du vocabulaire fermé passe — « présentation » ne commande aucune forme");
+  if (!aFail(verdict6(poserFiche("f-paraphrase.md", (t) => t.replace("intention: le lecteur sait sur quelle population porte chaque chiffre avant de trancher", "intention: ce qui a été mesuré"))), /PARAPHRASE/))
+    casse.push("G6 : une intention qui paraphrase son titre passe — règle D8, la partie devrait se supprimer");
+  if (!aFail(verdict6(poserFiche("f-fort.md", (t) => t.replace("enjeu: ordinaire", "enjeu: fort").replace("motif_enjeu: aucune", "motif_enjeu: 1, 3"))), /enjeu FORT sans `valide_par`/))
+    casse.push("G6 : une fiche à enjeu FORT sans valideur humain passe — R-29, les gates restent humains");
+  if (!verdict6(poserFiche("f-fort-ok.md", (t) => t.replace("enjeu: ordinaire", "enjeu: fort").replace("motif_enjeu: aucune", "motif_enjeu: 1, 3\nvalide_par: le pilote, 2026-09-20"))).every((x) => x.statut === "PASS"))
+    casse.push("G6 : la MÊME fiche à enjeu fort, AVEC son valideur, est accusée — la règle juge autre chose que la présence du valideur");
+  // Le second temps : le DOCUMENT tient-il sa fiche ?
+  const docTenu = join(dir, "doc-tenu.md");
+  writeFileSync(docTenu, "# Rapport\n\n## Ce qui a été mesuré\n\nTexte.\n\n## Comment relire un chiffre\n\nTexte.\n", "utf8");
+  const docAmpute = join(dir, "doc-ampute.md");
+  writeFileSync(docAmpute, "# Rapport\n\n## Ce qui a été mesuré\n\nTexte.\n", "utf8");
+  if (verdict6(poserFiche("f-doc.md"), docTenu).some((x) => x.statut === "FAIL"))
+    casse.push("G6 : un document qui PORTE les deux parties conçues est accusé");
+  if (!aFail(verdict6(poserFiche("f-doc2.md"), docAmpute), /NE TIENT PAS sa fiche/))
+    casse.push("G6 : un document qui a PERDU une partie conçue passe — la fiche devient un rite, " +
+      "et une conception qu'on n'exécute pas coûte sans rien rendre");
+
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test gabarits-documents : 21/21 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
+    : "Self-test gabarits-documents : 29/29 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
       "instance à trous → FAIL ; instance copie du squelette → FAIL ; classe posée sans règle CSS → FAIL au marquage ; " +
       "couple gabarit+version rendu → PASS G4 ; document sans le couple → FAIL G4 ; largeurs alternées sans " +
       "déclaration → FAIL G5 ; page « lecture » contredite → FAIL G5 ; page « lecture » tenue → PASS G5 ; " +
-      "page « donnees » avec exception déclarée → PASS G5 ; G7 dans ses TROIS sens (TF-1170) : une famille qui PORTE la section qu'elle déclare → PASS, une famille qui la DÉCLARE et ne la porte pas → FAIL, une famille qui ne déclare RIEN → PASS sans être jugée, ce qui empêche la règle d'accuser les 38 familles du parc le jour de sa naissance ; G8 dans ses TROIS sens (TF-1076) : un livrable « Synthese … » résout la famille des restitutions, un « Note Migration … » — type absent du catalogue — FAIL en nommant les clés proches, et « Synthese Executive » résout sa PROPRE famille, le préfixe le plus long gagnant sur le plus court) ; G9 dans ses QUATRE sens (TF-0923 volet 3) : une etude posterieure a la doctrine SANS page homonyme FAIL, la MEME avec sa page PASS, une etude ANTERIEURE a la doctrine SANS_OBJET — antecedence declaree, jamais rattrapee en silence —, et une restitution SKIP, la page n etant due qu aux propositions remises a un humain)");
+      "page « donnees » avec exception déclarée → PASS G5 ; G6 dans ses HUIT sens (TF-1097) : fiche complète → PASS, champ du lecteur resté à l'état d'emplacement → FAIL, type de contenu hors vocabulaire fermé → FAIL, intention qui paraphrase son titre → FAIL (D8), enjeu FORT sans valideur → FAIL (R-29), la MÊME avec son valideur → PASS, document qui porte ses parties conçues → PASS, document qui en a perdu une → FAIL (une conception qu'on n'exécute pas coûte sans rien rendre) ; G7 dans ses TROIS sens (TF-1170) : une famille qui PORTE la section qu'elle déclare → PASS, une famille qui la DÉCLARE et ne la porte pas → FAIL, une famille qui ne déclare RIEN → PASS sans être jugée, ce qui empêche la règle d'accuser les 38 familles du parc le jour de sa naissance ; G8 dans ses TROIS sens (TF-1076) : un livrable « Synthese … » résout la famille des restitutions, un « Note Migration … » — type absent du catalogue — FAIL en nommant les clés proches, et « Synthese Executive » résout sa PROPRE famille, le préfixe le plus long gagnant sur le plus court) ; G9 dans ses QUATRE sens (TF-0923 volet 3) : une etude posterieure a la doctrine SANS page homonyme FAIL, la MEME avec sa page PASS, une etude ANTERIEURE a la doctrine SANS_OBJET — antecedence declaree, jamais rattrapee en silence —, et une restitution SKIP, la page n etant due qu aux propositions remises a un humain)");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -628,6 +844,32 @@ if (args.includes("--livrable")) {
     ],
   }, null, 1));
   process.exit(v8 === "FAIL" ? 1 : 0);
+}
+
+// MODE FICHE (G6, TF-1097) — `--fiche <fiche.md> [<document.md>]` juge la CONCEPTION avant
+// l'écriture, puis, si un document est donné, qu'il TIENT sa fiche. Sur appel explicite, comme
+// `--livrable` : une fiche est par document, jamais par famille, et il n'y a rien à balayer.
+if (args.includes("--fiche")) {
+  const vus = args.slice(args.indexOf("--fiche") + 1).filter((a) => !a.startsWith("--"));
+  if (!vus.length) {
+    console.log(JSON.stringify({ oracle: "oracle-gabarits-documents", mode: "fiche", verdict: "ERREUR",
+      message: "usage : node oracle-gabarits-documents.mjs --fiche <fiche.md> [<document.md>]" }, null, 1));
+    process.exit(2);
+  }
+  const f6 = jugerFiche(vus[0], vus[1] || null);
+  const v6 = f6.some((x) => x.statut === "FAIL") ? "FAIL" : "PASS";
+  console.log(JSON.stringify({
+    oracle: "oracle-gabarits-documents", mode: "fiche", version: "1.0.0", verdict: v6, findings: f6,
+    non_juge: [
+      "la JUSTESSE du lecteur défini : G6 vérifie que les quatre champs sont remplis, jamais qu'ils décrivent le vrai lecteur — c'est une relecture",
+      "la PERTINENCE d'une intention de partie et le BON choix d'un type de contenu : G6 mesure la présence et l'appartenance au vocabulaire fermé, pas la justesse",
+      "l'EXACTITUDE de la justification de format, et la qualité de la prose du document",
+      "que le CONTENU de chaque partie tienne le type déclaré : indécidable à la machine, et une devinette ferait crier l'oracle sur du travail juste",
+      "que le valideur d'une fiche à enjeu fort soit la bonne personne : G6 lit une présence, la décision reste humaine (R-29)",
+      "le document lui-même : G6 vérifie qu'il porte les parties conçues, jamais qu'il est bon — les oracles de forme (check_html, render_page) et de conception aval (quality-oracles) restent dus",
+    ],
+  }, null, 1));
+  process.exit(v6 === "FAIL" ? 1 : 0);
 }
 
 const findings = juger(args[0] || join(PILOT, "gabarits", "documents"));

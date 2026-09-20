@@ -14,7 +14,32 @@ minoritaire**, et c'est voulu : le doublon coûte plus cher que le renvoi.
 Source unique : **`catalogue.jsonl`** — une ligne par famille, avec sa **provenance** (le ou
 les livrables réels d'où la forme est tirée) et son **statut**. Les vues, s'il y en a un jour,
 s'en dérivent ; ce fichier ne se recopie pas à la main. Oracle : `oracles\oracle-gabarits-documents.mjs`
-(G1-G5, G7-G10, joué par la recette du pilot — G6 est libre, réservé au contrôle de conception amont).
+(G1-G5 et G7-G10 sur le parc, joué par la recette du pilot ; **G6** sur appel, voir ci-dessous).
+
+**`lecteur` et `type_de_contenu` (TF-1097, 20/09/2026)** — chaque famille déclare **qui la lit**,
+par quatre sous-champs et jamais par un personnage (`decisions_attendues`, `savoir_prealable`,
+`vocabulaire_absent`, `contexte_de_lecture`), et la **nature du contenu de chaque partie**, dans
+un vocabulaire fermé de neuf valeurs tiré de DITA 1.3 et d'Information Mapping — `concept`,
+`tache`, `procedure`, `processus`, `principe`, `fait`, `structure`, `classification`,
+`reference`. Le type **dérive la forme** : un `fait` porte sa formule et son dénominateur, une
+`tache` s'écrit en étapes numérotées, une `reference` se trie et se filtre. Les **dix familles au
+statut `ok`** sont renseignées ; les vingt-neuf autres portent un **vide DÉCLARÉ**, jamais un
+silence — une famille sans gabarit écrit n'a pas encore de parties dont on puisse dire le type.
+
+**La fiche de conception amont (TF-1097)** — `FICHE-CONCEPTION.md`, remplie par l'agent **avant
+d'écrire** tout document d'une famille, et validée par l'humain pour les **seuls documents à fort
+enjeu** (critère écrit, § 6 du gabarit : sortie de l'écosystème, décision engageante, chiffres
+opposables, famille neuve, retour antérieur non soldé). Jugée par **G6** :
+`node oracles\oracle-gabarits-documents.mjs --fiche <fiche.md> [<document.md>]` — la conception
+d'abord, puis que le document la **tienne**. Exemple rempli à côté : `FICHE-CONCEPTION-EXEMPLE.md`.
+
+*Ce que G6 fonde, et sa réserve.* Le rétro-test du 14/09/2026 attribue à la seule conception amont
+**11 des 20 griefs** réels de lecteurs, contre un seuil fixé d'avance à 6. Mais ces vingt griefs
+ont été classés par **une seule session, sans second classeur à l'aveugle**, et la revue est fixée
+au **2026-10-14**. La règle ne prétend rien au-delà : elle rend la conception explicite et
+jugeable, elle ne promet pas moins de retours. Coût mesuré le 20/09/2026 : fiche remplie de
+**28 lignes / 279 mots**, jugement en **45 ms**. Le temps de REMPLISSAGE par l'agent n'est pas
+instrumenté, et cela se déclare plutôt que de s'estimer.
 
 **`sections_obligatoires` (TF-1170, 20/09/2026)** — une famille peut déclarer, au catalogue, les
 sections que sa doctrine DOIT porter ; **G7** vérifie qu'elles y sont. La règle ne juge que ce
