@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<!-- A3 (TF-0303, 17/08) — charset PUIS viewport en TOUTE PREMIÈRE position. -->
+<meta charset="UTF-8">
+<!-- viewport-fit=cover (M3 d'oracle-mobile) : sans lui, les env(safe-area-inset-*) que la
+     bande de sommaire collante consomme plus bas VALENT ZÉRO. La règle refuse l'un sans l'autre. -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="destinataire" content="humain">
+<!-- TF-0504 (22/08/2026) — MARQUE DE DESTINATAIRE : R-2 d'oracle-conformite-projet ne juge
+     la localisation que des artefacts MARQUÉS. -->
+<!-- S-G1 (1/4, R-30) — initialisation AVANT le <style> : zéro flash, clair par défaut. -->
+<script>
+(function () {
+  var stocke = null;
+  try { stocke = localStorage.getItem('digitai-theme'); } catch (e) {}
+  var theme = stocke === 'dark' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  var meta = document.querySelector('meta[name="color-scheme"]');
+  if (meta) { meta.setAttribute('content', theme); }
+})();
+</script>
+  <!--
+  SQUELETTE — Charte de partenariat · bibliothèque de gabarits de documents du pilot.
+  Dérivé de assets/boilerplate.html du socle digit-ai-page-html (forge-agents), auquel il
+  AJOUTE ce que la famille exige :
+    · le RENDU PAPIER soigné — une charte SE SIGNE : le bloc des signatures ne se coupe
+      jamais en travers d'une page, chaque article reste d'un seul tenant, et le sommaire
+      comme la bascule de thème sortent à l'impression ;
+    · le repli des tableaux en cartes (D3) et l'état vide d'une table (D4) ;
+    · le sommaire en bande repliable collante sous 900 px (L25/sommaire_perdu) ;
+    · la colonne de lecture unique des blocs de tête, DÉCLARÉE par data-mesure-lecture —
+      brider un seul bloc crée la rupture d'alignement entre frères, mesurée sur la famille
+      courrier-fournisseur le 20/09/2026.
+  ÉCARTS VOLONTAIRES au fichier dont ce squelette est dérivé : `th, td` en `8px 12px` et le
+  sommaire latéral en `16px 20px` — 10 px et 18 px sont hors de l'échelle 4pt et
+  `oracle-tokens` les rend en écart DUR (T3).
+-->
+<title>{Nom du programme} · Charte de partenariat — 20260920a</title>
+  <meta name="description" content="{Cadre du partenariat en une phrase : parties, périmètre, durée.}">
+  <meta name="theme-color" content="#2563EB">
+  <meta name="color-scheme" content="light">
+  <!-- Favicon-lettre : remplacer {L} par la PREMIÈRE LETTRE de l'émetteur. -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3Ctext x='32' y='44' font-family='Segoe UI,Roboto,sans-serif' font-size='38' font-weight='700' fill='white' text-anchor='middle'%3E{L}%3C/text%3E%3C/svg%3E">
+
+  <!-- Polices : AUCUN chargement réseau (A1/D-10). Replis système par les tokens. -->
+
+  <style>
+    :root:has(table th:nth-child(7)) { --w: clamp(85vw, 2100px, 96vw); }
+    :root {
+      --blue: #2563EB;
+      --bg: #FAFBFF;
+      --surface: #FFFFFF;
+      --card: #FFFFFF;
+      --focus-anneau: 2px solid var(--blue);
+      --focus-decalage: 2px;
+      --ink: #0F172A;
+      --muted: #64748B;
+      --faint: #94A3B8;
+      --line: #E6EAF2;
+      --amber: #D97706; --amber-fill: #FFFBEB; --amber-line: #FDE9C8;
+      --teal:  #0E9488; --teal-fill:  #EFFDFB; --teal-line:  #C7F0EA;
+      --green: #15803D; --green-fill: #F2FCF5; --green-line: #CFEEDD;
+      --r: 12px; --r-sm: 8px;
+      --w: clamp(75vw, 1680px, 92vw); --prose: 75ch;
+      --head: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
+      --annee-ref: "2026";
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0B1220; --surface: #121B2E; --card: #121B2E;
+      --ink: #EEF2F8; --muted: #A9B4C4; --faint: #7C8AA0; --line: #263248;
+      --blue: #7DA2F5;
+      --amber: #FBBF6D; --amber-fill: #2B2210; --amber-line: #4A3A18;
+      --teal:  #5FE6D6; --teal-fill:  #0E2A27; --teal-line:  #164E48;
+      --green: #7BE0A0; --green-fill: #0F2A1B; --green-line: #1C4A30;
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans);
+      line-height: 1.55; font-size: 16px; }
+    .wrap { max-width: var(--w); margin: 0 auto; padding: 32px 24px 64px; }
+    .chap.lire { max-width: 1080px; margin-left: auto; margin-right: auto; }
+    .chap.duo { display: grid; grid-template-columns: 7fr 5fr; gap: 32px; align-items: start; }
+    @media (max-width: 1100px) { .chap.duo { grid-template-columns: 1fr; } }
+
+    h1, h2, h3 { font-family: var(--head); font-weight: 800; color: var(--ink); line-height: 1.2; }
+    h1 { font-size: 2rem; margin: 0 0 .25em; }
+    h2 { font-size: 1.4rem; font-weight: 700; margin: 2em 0 .5em; }
+    h3 { font-size: 1.1rem; font-weight: 700; margin: 1.5em 0 .4em; }
+    p, li { margin: 0 0 1em; }
+    a { color: var(--blue); }
+    code, pre { font-family: var(--mono); }
+
+    header.doc { border-bottom: 2px solid var(--blue); padding-bottom: 16px; margin-bottom: 24px; }
+    .eyebrow { color: var(--muted); font-size: .85rem; letter-spacing: .04em; text-transform: uppercase; }
+    .muted { color: var(--muted); }
+
+    .theme-toggle { appearance: none; border: 1px solid var(--line); background: var(--surface);
+      color: var(--ink); border-radius: 999px; width: 36px; height: 36px; flex: none; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; }
+    .theme-toggle:focus-visible { outline: var(--focus-anneau); outline-offset: var(--focus-decalage); }
+    .theme-toggle .icon-sun { display: none; }
+    :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+    :root[data-theme="dark"] .theme-toggle .icon-sun { display: inline; }
+
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+      padding: 20px 24px; margin: 16px 0; }
+
+    /* ── LA MESURE DE LECTURE DES BLOCS DE TÊTE ───────────────────────────────
+       Établie en REMPLISSANT un squelette de cette bibliothèque, pas en la supposant :
+       la mesure se pose sur le CONTENEUR et jamais sur le texte (l2_width) ; les blocs de
+       tête partagent UNE colonne, sinon brider l'un crée la rupture d'alignement entre
+       frères (l2_freres) ; cette colonne se CENTRE (l2_conteneur) ; et data-mesure-lecture
+       la DÉCLARE étroite à dessein face à ses frères plus larges. */
+    .entete-texte, .tete { max-width: 1080px; }
+    .tete { margin-left: auto; margin-right: auto; }
+    .tete > * + * { margin-top: 24px; }
+
+    /* Les deux parties, en regard : une charte est un document SYMÉTRIQUE. */
+    .parties { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .parties .bloc { background: var(--surface); border: 1px solid var(--line);
+      border-radius: var(--r-sm); padding: 12px 16px; }
+    .parties .bloc p { margin: 0 0 .3em; }
+    .parties .bloc .role { color: var(--muted); font-size: .82rem; text-transform: uppercase;
+      letter-spacing: .04em; margin-bottom: .5em; }
+    @media (max-width: 760px) { .parties { grid-template-columns: 1fr; } }
+
+    /* Les contrats auxquels la charte est SUBORDONNÉE, et ses dates. Le filet reste à 1px :
+       au-delà, `oracle-slop` le rend en écart DUR (S1, « bandeau latéral »). */
+    .refs { border: 1px solid var(--line); border-left: 1px solid var(--blue);
+      background: var(--surface); border-radius: var(--r-sm); padding: 12px 16px; }
+    .refs dl { margin: 0; display: grid; grid-template-columns: minmax(10ch, 18%) 1fr; gap: 8px 16px; }
+    .refs dt { color: var(--muted); font-weight: 700; }
+    .refs dd { margin: 0; }
+    @media (max-width: 640px) { .refs dl { grid-template-columns: 1fr; gap: 4px 0; }
+      .refs dd { margin: 0 0 .6em; } }
+
+    /* La règle par défaut de l'article 3 : elle se voit. Le texte reste à l'encre --ink :
+       porté par --amber sur --amber-fill il mesure 3,07:1, sous le seuil WCAG de 4,5:1
+       (mesuré par render_page V2 et oracle-tokens T5). L'accent vit dans le filet. */
+    .regle-defaut { border: 1px solid var(--amber); background: var(--amber-fill);
+      border-radius: var(--r-sm); padding: 16px 20px; margin: 20px 0; }
+    .regle-defaut p { margin: 0; }
+
+    footer.doc { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line);
+      color: var(--muted); font-size: .85rem; }
+
+    @media (max-width: 640px) { .wrap { padding: 24px 16px 48px; } h1 { font-size: 1.6rem; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    }
+
+    /* ── Export PDF / impression ──────────────────────────────────────────────
+       UNE CHARTE SE SIGNE. Le rendu papier est la forme de remise, pas une retombée. */
+    @page { size: A4; margin: 18mm 16mm; }
+    @page :first { margin-top: 22mm; }
+    @media print {
+      :root, :root[data-theme="dark"] {
+        --bg:#FFFFFF; --surface:#FFFFFF; --card:#FFFFFF; --ink:#0F172A;
+        --muted:#64748B; --faint:#94A3B8; --line:#E6EAF2; --blue:#2563EB;
+        --amber:#D97706; --amber-fill:#FFFBEB; --amber-line:#FDE9C8;
+        --teal:#0E9488;  --teal-fill:#EFFDFB;  --teal-line:#C7F0EA;
+        --green:#15803D; --green-fill:#F2FCF5; --green-line:#CFEEDD;
+      }
+      body { background: var(--surface); font-size: 11pt; }
+      .wrap { max-width: none; padding: 0; }
+      .chap.lire, .tete, .entete-texte { max-width: none; }
+      .card { break-inside: avoid; page-break-inside: avoid; }
+      nav.toc, .theme-toggle { display: none; }
+      .doc-grille { display: block; }
+      /* Un article coupé en travers d'une page se conteste ; le bloc des SIGNATURES coupé
+         en deux est pire encore — il laisse une page signée sans son objet. */
+      section, .refs, .parties, .regle-defaut, tr, #signatures { break-inside: avoid; page-break-inside: avoid; }
+      h2 { break-after: avoid; page-break-after: avoid; }
+      a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .85em; color: var(--muted); }
+      a[href^="#"]::after { content: none; }
+      .parties { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ── D3 · repli des tableaux en cartes ──────────────────────────────────── */
+    caption { text-align: left; font-weight: 700; padding: 0 0 8px; }
+    .table-hote { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { font-weight: 700; }
+    @media (max-width: 1400px) {
+      .table-hote:has(th:nth-child(7)) { overflow-x: visible; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes thead { display: none; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes tr { display: block; border: 1px solid var(--line); border-radius: 8px; margin: 0 0 12px; padding: 8px 12px; break-inside: avoid; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes td { display: grid; grid-template-columns: minmax(9ch, 38%) 1fr; gap: 8px; border: 0; padding: 4px 0; box-sizing: border-box; }
+      .table-hote:has(th:nth-child(7)) table.repli-cartes td::before { content: attr(data-label); font-weight: 700; color: var(--muted); }
+    }
+    @media (max-width: 1020px) {
+      .table-hote:has(th:nth-child(5)) { overflow-x: visible; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes thead { display: none; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes tr { display: block; border: 1px solid var(--line); border-radius: 8px; margin: 0 0 12px; padding: 8px 12px; break-inside: avoid; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes td { display: grid; grid-template-columns: minmax(9ch, 38%) 1fr; gap: 8px; border: 0; padding: 4px 0; box-sizing: border-box; }
+      .table-hote:has(th:nth-child(5)) table.repli-cartes td::before { content: attr(data-label); font-weight: 700; color: var(--muted); }
+    }
+    @media (max-width: 900px) {
+      .table-hote { overflow-x: visible; }
+      table.repli-cartes thead { display: none; }
+      table.repli-cartes tr { display: block; border: 1px solid var(--line); border-radius: 8px; margin: 0 0 12px; padding: 8px 12px; break-inside: avoid; }
+      table.repli-cartes td { display: grid; grid-template-columns: minmax(9ch, 38%) 1fr; gap: 8px; border: 0; padding: 4px 0; }
+      table.repli-cartes td::before { content: attr(data-label); font-weight: 700; color: var(--muted); }
+      table.repli-cartes td[data-label=""]::before { content: none; }
+    }
+
+    /* ── D4 · état vide ─────────────────────────────────────────────────────── */
+    .etat-vide { display: none; padding: 16px; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); }
+    .table-hote[data-vide="oui"] table { display: none; }
+    .table-hote[data-vide="oui"] .etat-vide { display: block; }
+
+    /* ── Sommaire (L6, L25) ─────────────────────────────────────────────────── */
+    .toc { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 24px; margin: 24px 0 32px; }
+    .toc ol, .toc ul { columns: 2; column-gap: 32px; padding-left: 20px; margin: 0; }
+    .toc li { break-inside: avoid; max-width: none; margin-bottom: .6em; }
+    .toc a { text-decoration: none; }
+    .toc summary { font-family: var(--head); font-weight: 700; font-size: 1.05rem;
+      cursor: pointer; padding: 4px 0; margin: 0 0 .4em; }
+    .toc summary:focus-visible { outline: var(--focus-anneau); outline-offset: var(--focus-decalage); }
+    .ch-apprend { color: var(--muted); margin: .2em 0 1.1em; }
+
+    .doc-grille { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 32px; align-items: start; }
+    .doc-grille > nav.toc { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; margin: 0; padding: 16px 20px; }
+    .doc-grille > nav.toc ol, .doc-grille > nav.toc ul { columns: 1; }
+    .doc-grille > .doc-corps { min-width: 0; }
+    @media (max-width: 900px) {
+      .doc-grille { grid-template-columns: 1fr; }
+      /* M3 — une barre collée à un bord respecte les retraits sûrs. */
+      .doc-grille > nav.toc { position: sticky; top: env(safe-area-inset-top, 0px);
+        z-index: 5; max-height: 60vh; margin: 0 0 16px; border-radius: 0 0 12px 12px;
+        padding-top: 8px; padding-bottom: 8px;
+        padding-left: calc(16px + env(safe-area-inset-left, 0px));
+        padding-right: calc(16px + env(safe-area-inset-right, 0px)); }
+    }
+    /* M5 — le paysage est traité explicitement : sur un téléphone couché la hauteur utile
+       tombe sous ~420 px, et une bande de sommaire à 60 vh mangerait ce qui reste. */
+    @media (orientation: landscape) and (max-height: 520px) {
+      .doc-grille > nav.toc { max-height: 40vh; }
+      .wrap { padding-top: 16px; padding-bottom: 32px; }
+    }
+    .toc .toc-t { display: block; text-decoration: underline; }
+    .toc .toc-d { display: block; color: var(--muted); font-size: .84rem; }
+    @media (max-width: 760px) { .toc ol, .toc ul { columns: 1; } }
+  </style>
+</head>
+<body data-largeur="lecture">
+  <div class="wrap">
+    <header class="doc" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+      <div class="entete-texte" data-mesure-lecture>
+        <p class="eyebrow">{Programme} · Charte de partenariat</p>
+        <h1>Charte de partenariat — {nom du programme}</h1>
+        <p class="muted">Indice {AAAAMMJJindice} · Date d'effet {JJ/MM/AAAA} · Échéance {JJ/MM/AAAA}<br>Gabarit : gd-charte-partenariat · version du gabarit 1.0.0 — à reporter tel quel dans tout retour sur ce document</p>
+      </div>
+      <button id="theme-toggle" class="theme-toggle" type="button"
+              aria-label="Bascule thème sombre" aria-pressed="false">
+        <svg class="icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>
+        </svg>
+        <svg class="icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="12" r="4.5"/>
+          <path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"
+                stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </header>
+
+    <main>
+      <!-- Les blocs de tête partagent UNE colonne de lecture, déclarée. -->
+      <div class="tete" data-mesure-lecture>
+
+      <!-- LES PARTIES — une charte est symétrique, et sa mise en page le dit. -->
+      <div class="parties">
+        <div class="bloc">
+          <p class="role">Partie A</p>
+          <p><strong>{Raison sociale}</strong></p>
+          <p>{Mandataire signataire et sa QUALITÉ}</p>
+        </div>
+        <div class="bloc">
+          <p class="role">Partie B</p>
+          <p><strong>{Raison sociale}</strong></p>
+          <p>{Mandataire signataire et sa QUALITÉ}</p>
+        </div>
+      </div>
+
+      <!-- SUBORDINATION ET DATES — l'ÉCHÉANCE est un champ de tête, pas une clause enfouie :
+           une charte sans date de fin visible se comporte comme un engagement perpétuel dans
+           l'esprit de celui qui la lit, et c'est le malentendu qui coûte cher à la rupture. -->
+      <div class="refs">
+        <dl>
+          <dt>Contrats</dt>
+          <dd>{accord-cadre, accord de confidentialité, leurs indices — la charte leur est SUBORDONNÉE}</dd>
+          <dt>Durée</dt>
+          <dd>Date d'effet {JJ/MM/AAAA} · <strong>Échéance {JJ/MM/AAAA}</strong> · reconduction {expresse ou tacite}</dd>
+          <dt>Kit partenaire</dt>
+          <dd>{indice du kit applicable — le kit dit COMMENT vendre ensemble, la charte SOUS QUELLES RÈGLES}</dd>
+        </dl>
+      </div>
+      </div><!-- /.tete -->
+
+      <div class="doc-grille">
+      <nav class="toc" aria-label="Sommaire">
+        <details open>
+          <summary>Sommaire</summary>
+          <ol>
+            <li><a href="#objet"><span class="toc-t">Objet et périmètre</span><span class="toc-d">sur quelles affaires elle peut être invoquée</span></a></li>
+            <li><a href="#engagements"><span class="toc-t">Engagements réciproques</span><span class="toc-d">ce dont on pourra constater le manquement</span></a></li>
+            <li><a href="#marque"><span class="toc-t">Usage du nom et de la marque</span><span class="toc-d">quatre usages, quatre réponses</span></a></li>
+            <li><a href="#confidentialite"><span class="toc-t">Confidentialité et données</span><span class="toc-d">par renvoi, plus le seul point non traité</span></a></li>
+            <li><a href="#sortie"><span class="toc-t">Durée, revue et sortie</span><span class="toc-d">y compris le sort des affaires en cours</span></a></li>
+            <li><a href="#signatures"><span class="toc-t">Signatures</span><span class="toc-d">les mandataires et leur qualité</span></a></li>
+          </ol>
+        </details>
+      </nav>
+      <div class="doc-corps">
+
+      <!-- 1 · OBJET ET PÉRIMÈTRE — borné sur TROIS axes, sans quoi la charte se voit
+           invoquée sur des affaires qu'aucune des deux parties n'avait en tête. -->
+      <section class="chap lire" id="objet">
+        <h2>Objet et périmètre</h2>
+        <p class="ch-apprend">Ce chapitre dit ce que la charte couvre et ce qu'elle laisse dehors — le lecteur y apprend sur quelles affaires elle peut être invoquée, et sur lesquelles elle est muette.</p>
+        <p>{L'objet, en deux phrases. Puis la SUBORDINATION : « La présente charte est
+           subordonnée aux contrats cités en tête ; en cas de divergence, le contrat prévaut
+           et la charte est réputée non écrite sur le point divergent. »}</p>
+        <p>Le périmètre est borné sur trois axes, et sur eux seuls :</p>
+        <ul>
+          <li><strong>territoires</strong> : {…} ;</li>
+          <li><strong>segments</strong> : {…} ;</li>
+          <li><strong>offres</strong> : {…}.</li>
+        </ul>
+        <p>{EXCLUSIONS ÉCRITES, jamais déduites (loi transverse n° 3) : hors du périmètre
+           ci-dessus, les parties sont libres et sans obligation l'une envers l'autre. Puis la
+           liste de ce qui est expressément exclu.}</p>
+      </section>
+
+      <!-- 2 · ENGAGEMENTS RÉCIPROQUES — la SYMÉTRIE est due : une charte où une colonne porte
+           huit engagements et l'autre deux est un contrat de sous-traitance qui n'ose pas
+           dire son nom, et le déséquilibre se retourne au premier désaccord. -->
+      <section class="chap lire" id="engagements">
+        <h2>Engagements réciproques</h2>
+        <p class="ch-apprend">Ce chapitre met en regard ce que chaque partie doit à l'autre — le lecteur y apprend ce dont il pourra constater le manquement, et rien d'autre n'y a sa place.</p>
+        <div class="table-hote">
+          <table class="repli-cartes">
+            <caption>Engagements, en regard</caption>
+            <thead><tr><th scope="col">Engagement</th><th scope="col">{Partie A}</th><th scope="col">{Partie B}</th></tr></thead>
+            <tbody>
+              <tr>
+                <td data-label="Engagement">{un engagement VÉRIFIABLE : un délai, un volume, une fréquence, une présence}</td>
+                <td data-label="{Partie A}">{…}</td>
+                <td data-label="{Partie B}">{…}</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="etat-vide">Aucun engagement réciproque déclaré — une charte sans engagement constatable ne produit aucun effet.</p>
+        </div>
+        <p class="muted">{« Promouvoir activement l'offre » n'est PAS un engagement : rien ne
+          permet d'en constater le manquement, donc rien n'en découle, et sa présence affaiblit
+          les lignes qui, elles, sont vérifiables.}</p>
+      </section>
+
+      <!-- 3 · USAGE DU NOM ET DE LA MARQUE — la section la plus consultée, et celle qu'on
+           oublie le plus souvent d'écrire. Quatre questions, réponses par OUI ou NON. -->
+      <section class="chap lire" id="marque">
+        <h2>Usage du nom, de la marque et des références</h2>
+        <p class="ch-apprend">Ce chapitre répond par oui ou par non à quatre usages précis — le lecteur y apprend exactement ce qu'il peut publier, et sous quelle forme.</p>
+        <div class="table-hote">
+          <table class="repli-cartes">
+            <caption>Les quatre usages, et leurs conditions</caption>
+            <thead><tr><th scope="col">Usage</th><th scope="col">Autorisé</th><th scope="col">Conditions</th></tr></thead>
+            <tbody>
+              <tr>
+                <td data-label="Usage">Citer l'autre partie comme partenaire sur un support public</td>
+                <td data-label="Autorisé">{oui / non}</td>
+                <td data-label="Conditions">{la FORMULATION EXACTE admise — « partenaire privilégié », « exclusif », « certifié » se décident ici ou s'interdisent}</td>
+              </tr>
+              <tr>
+                <td data-label="Usage">Employer le logo de l'autre partie</td>
+                <td data-label="Autorisé">{oui / non}</td>
+                <td data-label="Conditions">{sur quels supports, selon quel fichier de marque — RENVOI au fichier, jamais une description en prose}</td>
+              </tr>
+              <tr>
+                <td data-label="Usage">Nommer un client commun</td>
+                <td data-label="Autorisé">{non, sauf accord écrit du client}</td>
+                <td data-label="Conditions">{une référence client est une PUBLICATION : elle relève de la famille gd-etude-de-cas-client et de son accord daté}</td>
+              </tr>
+              <tr>
+                <td data-label="Usage">Annoncer le partenariat (communiqué, publication réseau)</td>
+                <td data-label="Autorisé">{oui / non}</td>
+                <td data-label="Conditions">{qui valide, sous quel délai, ET ce que vaut l'absence de réponse — refus, jamais accord}</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="etat-vide">Aucun usage déclaré — une charte muette sur la marque est lue comme une autorisation par celui qui en a envie.</p>
+        </div>
+        <div class="regle-defaut">
+          <p><strong>Règle par défaut.</strong> {« Tout usage du nom, de la marque, du logo ou
+             des références de l'autre partie qui n'est pas expressément autorisé au présent
+             article est INTERDIT. » Cette ligne coûte une phrase et évite le retrait d'un
+             support déjà imprimé : une charte silencieuse sur un usage est lue comme une
+             autorisation.}</p>
+        </div>
+      </section>
+
+      <!-- 4 · CONFIDENTIALITÉ — COURTE PAR CONSTRUCTION : elle renvoie, elle ne reformule
+           pas. Une reformulation crée une seconde version opposable. -->
+      <section class="chap lire" id="confidentialite">
+        <h2>Confidentialité et données</h2>
+        <p class="ch-apprend">Ce chapitre renvoie aux contrats plutôt que de les reformuler — le lecteur y apprend le seul point qu'aucun des deux ne traite.</p>
+        <p>{Les renvois, PAR LEUR ARTICLE : accord de confidentialité {indice}, articles {…} ;
+           protection des données, accord-cadre {indice}, article {…}. « La présente charte
+           n'ajoute, ne retranche et ne reformule aucune de ces stipulations. »}</p>
+        <p>{LE SEUL POINT AJOUTÉ, celui que les contrats ne portent jamais : ce que chaque
+           partie peut dire de l'autre à un tiers prospect, PENDANT le partenariat et APRÈS —
+           avec la durée de la mention au passé.}</p>
+      </section>
+
+      <!-- 5 · DURÉE, REVUE ET SORTIE — le troisième élément est celui qu'on omet, et c'est
+           le seul contentieux réellement probable. -->
+      <section class="chap lire" id="sortie">
+        <h2>Durée, revue et sortie</h2>
+        <p class="ch-apprend">Ce chapitre traite les trois temps de la charte, y compris celui qu'on omet le plus souvent : le sort des affaires en cours au jour du préavis.</p>
+        <p><strong>Durée.</strong> {Dates, et reconduction EXPRESSE ou tacite — dire laquelle.}</p>
+        <p><strong>Revue.</strong> {Une date, un ordre du jour minimal, et QUI CONVOQUE. Une
+           charte jamais revue devient fausse sans que personne ne le constate.}</p>
+        <p><strong>Sortie.</strong> {Le préavis, ET le sort des affaires en cours — c'est le
+           point qui manque dans la quasi-totalité des chartes écrites sans gabarit :}</p>
+        <ul>
+          <li>les <strong>affaires enregistrées et non signées</strong> : {vont-elles à leur terme, et dans quelle limite de temps} ;</li>
+          <li>les <strong>affaires signées</strong> : {la charte leur survit-elle} ;</li>
+          <li>les <strong>usages de marque</strong> de l'article 3 : {quand cessent-ils} ;</li>
+          <li>les <strong>ressources remises</strong> au titre du kit : {détruites ou restituées, sous quel délai}.</li>
+        </ul>
+      </section>
+
+      <!-- 6 · SIGNATURES — la QUALITÉ importe autant que le nom : un directeur commercial
+           n'engage pas toujours son organisation sur une exclusivité. -->
+      <section class="chap lire" id="signatures">
+        <h2>Signatures</h2>
+        <p class="ch-apprend">Ce chapitre recueille les mandataires et leur qualité — le lecteur y apprend qui engage chaque organisation, ce que le seul nom n'établit pas.</p>
+        <div class="table-hote">
+          <table class="repli-cartes">
+            <caption>Mandataires signataires</caption>
+            <thead><tr><th scope="col">Partie</th><th scope="col">Mandataire (qualité)</th><th scope="col">Lieu</th><th scope="col">Date</th></tr></thead>
+            <tbody>
+              <tr>
+                <td data-label="Partie">{Partie A}</td>
+                <td data-label="Mandataire (qualité)">{qualité qui habilite à engager sur les exclusivités}</td>
+                <td data-label="Lieu">{…}</td>
+                <td data-label="Date">{…}</td>
+              </tr>
+              <tr>
+                <td data-label="Partie">{Partie B}</td>
+                <td data-label="Mandataire (qualité)">{…}</td>
+                <td data-label="Lieu">{…}</td>
+                <td data-label="Date">{…}</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="etat-vide">Aucun signataire désigné — une charte non signée n'est pas un cadre, c'est un projet.</p>
+        </div>
+      </section>
+      </div>
+      </div>
+    </main>
+
+    <footer class="doc">
+      {Programme} · Charte de partenariat · {AAAAMMJJindice} · Gabarit gd-charte-partenariat v1.0.0
+    </footer>
+  </div>
+
+  <script>
+  (function () {
+    var bouton = document.getElementById('theme-toggle');
+    var racine = document.documentElement;
+    function appliquer(theme) {
+      racine.setAttribute('data-theme', theme);
+      try { localStorage.setItem('digitai-theme', theme); } catch (e) {}
+      bouton.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    }
+    bouton.setAttribute('aria-pressed', racine.getAttribute('data-theme') === 'dark' ? 'true' : 'false');
+    bouton.addEventListener('click', function () {
+      appliquer(racine.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+    /* Le sommaire : DÉPLIÉ sur bureau où il est latéral et collant, REPLIÉ sous 900 px où il
+       est une bande collée en haut — sans quoi il mangerait la moitié de l'écran. Après ce
+       réglage initial, c'est le lecteur qui ouvre et referme. */
+    var pli = document.querySelector('nav.toc details');
+    if (pli && window.matchMedia && !window.matchMedia('(min-width: 901px)').matches) {
+      pli.open = false;
+    }
+  })();
+  </script>
+</body>
+</html>
