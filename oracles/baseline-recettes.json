@@ -326,6 +326,10 @@
   "cas": 13,
   "vu_le": "2026-09-16"
  },
+ "scripts/oracles-design-page-generee.test.mjs": {
+  "cas": 7,
+  "vu_le": "2026-09-20"
+ },
  "scripts/readme-dossiers.test.mjs": {
   "cas": 17,
   "vu_le": "2026-09-15"

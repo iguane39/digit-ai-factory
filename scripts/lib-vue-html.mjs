@@ -123,9 +123,16 @@ export function coquille({ titre, description, front, svg, corpsHtml, source, le
   <meta name="color-scheme" content="light">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3Ctext x='32' y='44' font-family='Segoe UI,Roboto,sans-serif' font-size='38' font-weight='700' fill='white' text-anchor='middle'%3E${initiale}%3C/text%3E%3C/svg%3E">
   <style>
+    /* L'ECHELLE 4 PT EST UN JETON, PAS UNE HABITUDE (TF-1162, 20/09/2026). Les espacements de
+       cette coquille etaient ecrits a la main — 14, 10, 9, 7 px — et oracle-tokens de forge-design
+       les comptait un par un : ONZE ecarts T3 sur CHAQUE page produite par le generateur, plus
+       deux couleurs en dur (T1). Un defaut de coquille n'est pas un defaut de page : il se compte
+       autant de fois qu'il y a de pages, et aucune relecture de page ne le corrige.
+       Les jetons --e1..--e10 portent l'echelle ; T3 ne juge jamais une valeur passee par var(). */
     :root{--blue:#2563EB;--bg:#FAFBFF;--surface:#FFFFFF;--ink:#0F172A;--muted:#64748B;
       --faint:#94A3B8;--line:#E6EAF2;--teal:#0E9488;--teal-fill:#EFFDFB;--amber:#B45309;
-      --amber-fill:#FFFBEB;--r:12px;--r-sm:8px;
+      --amber-fill:#FFFBEB;--alerte:#B42318;--r:12px;--r-sm:8px;
+      --e1:4px;--e2:8px;--e3:12px;--e4:16px;--e5:20px;--e6:24px;--e8:32px;--e10:40px;
       --head:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;
       --sans:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
       --mono:"JetBrains Mono",ui-monospace,"Consolas",monospace}
@@ -165,18 +172,22 @@ export function coquille({ titre, description, front, svg, corpsHtml, source, le
     .chap.lire>*{margin-top:0;margin-bottom:16px}
     .chap.lire>h2{margin-top:28px} .chap.lire>h3{margin-top:20px}
     .chap.lire>*:first-child{margin-top:0}
-    blockquote{margin:14px 0;padding:10px 16px;border-left:3px solid var(--blue);background:var(--surface);border-radius:0 var(--r-sm) var(--r-sm) 0;color:var(--muted)}
+    /* PAS DE BANDEAU LATERAL DECORATIF (S1, oracle-slop). La citation portait un border-left de
+       3 px en couleur de marque — « le design touch le plus recycle des UI d'admin », dit la regle,
+       et elle est BLOQUANTE. La citation se distingue par son encadrement complet et son fond,
+       comme les autres blocs de surface de cette coquille : un seul vocabulaire, pas un accent. */
+    blockquote{margin:var(--e4) 0;padding:var(--e3) var(--e4);border:1px solid var(--line);background:var(--surface);border-radius:var(--r-sm);color:var(--muted)}
     blockquote p{margin:0}
-    .defile{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin:10px 0}
+    .defile{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin:var(--e3) 0}
     table{border-collapse:collapse;width:100%;font-size:.92rem}
-    th{font-family:var(--head);font-weight:700;text-align:left;padding:9px 12px;border-bottom:2px solid var(--line)}
-    td{padding:7px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+    th{font-family:var(--head);font-weight:700;text-align:left;padding:var(--e3);border-bottom:2px solid var(--line)}
+    td{padding:var(--e2) var(--e3);border-bottom:1px solid var(--line);vertical-align:top}
     tr:last-child td{border-bottom:none}
     ul{margin:.4em 0;padding-left:1.3em}
-    figure{margin:16px 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;overflow-x:auto}
-    figcaption{color:var(--muted);font-size:.85rem;margin-top:8px}
+    figure{margin:var(--e4) 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:var(--e4);overflow-x:auto}
+    figcaption{color:var(--muted);font-size:.85rem;margin-top:var(--e2)}
     svg{max-width:100%;height:auto}
-    footer{margin-top:40px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:14px}
+    footer{margin-top:var(--e10);color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:var(--e4)}
     /* L19 (TF-0556, 24/08) — LA COUPURE DE MOT QUITTE LA PROSE. La propriete overflow-wrap:anywhere
        etait posee sur .meta, td et footer : ravageuse sur du texte courant, ou un mot se casse en
        deux au milieu d'une ligne sans cesure ni trait d'union. Elle ne reste QUE sur les cellules,
@@ -205,7 +216,10 @@ export function coquille({ titre, description, front, svg, corpsHtml, source, le
       .defile table{width:100%} .chap.lire{max-width:none}}
     @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
     @page{margin:14mm}
-    @media print{.defile{overflow:visible;border:none} figure{break-inside:avoid} tr{break-inside:avoid} body{background:#fff}}
+    /* Le fond d'impression passe par le JETON de surface : un « #fff » ecrit ici est a la fois un
+       T1 bloquant (couleur en dur hors bloc de jetons) et un S4 majeur (blanc pur non teinte),
+       alors que --surface porte deja la valeur que la charte prescrit. */
+    @media print{.defile{overflow:visible;border:none} figure{break-inside:avoid} tr{break-inside:avoid} body{background:var(--surface)}}
   </style>
 </head>
 <body>

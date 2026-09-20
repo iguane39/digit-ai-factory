@@ -210,12 +210,16 @@ export function cablerComposants(html, ids, assets = {}) {
 `;
   const style = `  <style>
 ${css}
-    .find-bar{display:flex;flex-direction:column;gap:2px;margin:0 0 20px}
+    /* Espacements et couleurs pris aux JETONS de la coquille (TF-1162) : --e1..--e10 pour
+       l'échelle 4 pt, --alerte pour le compteur à zéro. Un « #B42318 » écrit ici est un T1
+       bloquant, et cinq espacements hors échelle étaient comptés sur chaque page portant la
+       barre de recherche — le défaut vit dans le générateur, pas dans la page. */
+    .find-bar{display:flex;flex-direction:column;gap:var(--e1);margin:0 0 var(--e5)}
     .find-bar label{font-size:.78rem;color:var(--muted);font-weight:600}
-    .find-bar input{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)}
-    .find-count{margin-top:4px;font-size:.72rem;color:var(--muted);min-height:1em}
-    .find-count.zero{color:#B42318}
-    .tf-count{margin:6px 0 18px;font-size:.72rem;color:var(--muted);min-height:1em}
+    .find-bar input{font:inherit;padding:var(--e2) var(--e3);border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)}
+    .find-count{margin-top:var(--e1);font-size:.72rem;color:var(--muted);min-height:1em}
+    .find-count.zero{color:var(--alerte)}
+    .tf-count{margin:var(--e2) 0 var(--e5);font-size:.72rem;color:var(--muted);min-height:1em}
     mark.find-hit{background:var(--amber-fill);color:var(--ink);border-radius:2px;display:inline;padding:0;margin:0}
     @media print{tr[data-tf-hidden]{display:table-row !important}.find-bar{display:none}}
   </style>
