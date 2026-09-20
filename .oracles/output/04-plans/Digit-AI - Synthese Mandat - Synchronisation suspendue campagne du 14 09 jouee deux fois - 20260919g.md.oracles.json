@@ -1,0 +1,79 @@
+{
+  "cible": "output/04-plans/Digit-AI - Synthese Mandat - Synchronisation suspendue campagne du 14 09 jouee deux fois - 20260919g.md",
+  "date_iso": "2026-09-20T10:18:14.303Z",
+  "registre_version": "2.24.0",
+  "profil": "digit-ai",
+  "niveau": "diffuse",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation suspendue campagne du 14 09 jouee deux fois - 20260919g.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation suspendue campagne du 14 09 jouee deux fois - 20260919g.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation suspendue campagne du 14 09 jouee deux fois - 20260919g.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation suspendue campagne du 14 09 jouee deux fois - 20260919g.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation suspendue campagne du 14 09 jouee deux fois - 20260919g.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation suspendue campagne du 14 09 jouee deux fois - 20260919g.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation suspendue campagne du 14 09 jouee deux fois - 20260919g.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation suspendue campagne du 14 09 jouee deux fois - 20260919g.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation suspendue campagne du 14 09 jouee deux fois - 20260919g.md",
+    "ts": "2026-09-20T10:18:14.302Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Synchronisation suspendue campagne du 14 09 jouee deux fois - 20260919g.md": "9ce893dad0cecffa8d403c220bf74db7c077b183e349ac5299ec9883d0dd7384"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

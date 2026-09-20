@@ -15,8 +15,8 @@ travail de ce poste qui n'avait pas d'équivalent : le rendu de documents Word, 
 référentiel d'appel d'offres, 2 barres de qualité pour la communication, les études et synthèses
 du 15 au 19 septembre, et 42 fiches du registre des travaux, renumérotées pour ne plus
 porter le même numéro que celles de l'autre poste. Rien n'est perdu : tout le code écarté reste
-dans l'histoire et dans des sauvegardes. Ce qui est attendu de vous : une décision de rangement,
-sans urgence.
+dans l'histoire et dans des sauvegardes. La seule décision ouverte, le rangement de la synthèse d'hier, est
+tranchée et exécutée. Ce qui est attendu de vous : rien.
 
 ## 1. En-tête d'identification
 
@@ -25,7 +25,8 @@ sans urgence.
 - **sur quoi** — le pilot `digit-ai-factory` et 6 forges : `digit-ai-forge-agents`,
   `digit-ai-forge-data`, `digit-ai-forge-design`, `digit-ai-forge-audit`, `digit-ai-forge-tests`,
   `digit-ai-forge-organization`. Les 9 autres dépôts du parc étaient déjà alignés.
-- **quand** — le 20/09/2026, de 10h55 à 12h05 (Europe/Paris), durée mesurée ≈ 70 min.
+- **quand** — le 20/09/2026, de 10h55 à 12h05, puis de 12h12 à 12h30 pour exécuter
+  votre réponse « 1a » (Europe/Paris), durée mesurée ≈ 90 min.
 - **qui** — session pilot Claude Fable 5.1 ; pilot passé de `f5d325ea` à `b69d80b5` ; aucun agent
   délégué, escalade de modèle : aucune.
 - **intention** — que ce poste et GitHub portent le même état, sans perdre le travail fait ici.
@@ -39,31 +40,16 @@ sans urgence.
 fraîcheur** · 51 fichiers en conflit arbitrés (pilot 24, forge-agents 14, forge-data 10,
 forge-design 2, forge-organization 1) · registre : 1 709 événements publiés + 110 locaux, 460
 créations, 42 items renumérotés TF-1201 à TF-1242, `oracle-todo` **PASS** · bancs : 9 joués, 9
-verts · porte des noms **PASS** 7 fois sur 7, jouée après le push et non avant.
+verts · porte des noms **PASS** 7 fois sur 7, jouée après le push et non avant · D-1 (a) exécutée : la
+synthèse du 19/09 est enregistrée sous la lettre d'index « g ».
 
 ## 3. Décisions attendues de vous
 
-1 décision. Aucun bloquant : rien n'est à l'arrêt.
+Aucune décision n'est attendue. Aucun bloquant : rien n'est à l'arrêt.
 
-> **D-1 — La synthèse d'hier sur la synchronisation suspendue entre-t-elle dans l'histoire du pilot, sous une lettre d'index libre ?**
->
-> Il s'agit du fichier `Digit-AI - Synthese Mandat - Synchronisation suspendue campagne du 14 09 jouee deux fois - 20260919a.md`,
-> écrit hier matin, qui posait la question à laquelle vous avez répondu aujourd'hui. Il n'est pas enregistré, et sa lettre d'index du 19/09, « a », est
-> aussi celle d'une synthèse que l'autre poste a publiée le même jour sous un autre titre. L'autre
-> synthèse non enregistrée, celle du film de 25 secondes, porte sa propre décision
-> ouverte et n'est pas concernée ici.
->
-> **Recommandation : (a).** Source consultée : `gabarits\RESTITUTION.md` (une restitution est un
-> livrable daté, rangé sous `output\04-plans\`) ; mesure du tour : `git status` du pilot la liste
-> non suivie, et `ls output\04-plans` montre 2 fichiers du 19/09 portant la lettre « a ».
-
-| Option | Coût | Exclusions |
-|---|---|---|
-| (a) l'enregistrer renommée sous la première lettre libre du 19/09, avec le fichier de verdict qui l'accompagne | effort simple × court | exclut de garder le nom sous lequel les synthèses d'hier la citent : le renvoi se corrige ici |
-| (b) la laisser non suivie sur ce poste | effort nul | exclut qu'un autre poste lise l'état des lieux qui a fondé votre décision du jour |
-| (c) la retirer du disque — geste fait par vous | effort simple × court | exclut toute trace de l'inventaire d'hier hors de la présente synthèse, qui n'en reprend que les chiffres |
-
-> **Si rien n'est décidé** : l'option (b) s'applique — le fichier reste sur ce poste, non suivi.
+La décision D-1 posée à l'affichage précédent de cette synthèse — ranger ou non le fichier
+de restitution du 19/09 sur la synchronisation suspendue — a reçu votre réponse « 1a » à 12h10 ;
+son exécution est au bloc 4.
 
 ## 4. Traité — avec sa preuve
 
@@ -125,12 +111,17 @@ verts · porte des noms **PASS** 7 fois sur 7, jouée après le push et non avan
   La source monte en 2.15.2, les orphelins partent en quarantaine datée, rien n'est supprimé.
   - preuve : `node oracles/oracle-skills.mjs --appliquer --purger` → **PASS** ;
     `node bootstrap.mjs --pull` → « Poste prêt », 16 dépôts « à jour ».
+- **D-1 (a) exécutée : la synthèse du 19/09 sur la synchronisation suspendue est enregistrée.**
+  Les lettres « a » à « e » du 19/09 sont suivies et « f » est prise sur disque ; elle devient
+  `Digit-AI - Synthese Mandat - Synchronisation suspendue campagne du 14 09 jouee deux fois - 20260919g.md`,
+  ses 3 fichiers de verdict renommés avec elle, son texte inchangé.
+  - preuve : `run-oracles.mjs` sur le nouveau nom → « CONFORME — 4 PASS, 3 SKIP, 0 échec »,
+    nommage compris ; chemin et fichier de verdict : 145 caractères, sous la borne de 150.
 - **Porte des noms.**
   - preuve : `oracle-nom-client-publie.mjs` → « "verdict":"PASS" » dans les 7 dépôts.
 
 ## 5. Non traité — avec son motif
 
-- La synthèse d'hier sur la synchronisation suspendue : motif `decision` — voir D-1.
 - La synthèse du film de 25 secondes, le rapport d'audit du Produit-61 posé dans la boîte
   d'entrée, les dossiers `brag-output` et `.claude\worktrees` : motif `hors_mandat` — non suivis
   avant ce tour, ils le restent ; aucun n'empêche l'alignement.
@@ -158,6 +149,9 @@ verts · porte des noms **PASS** 7 fois sur 7, jouée après le push et non avan
 - **5 événements du registre sont modifiés, et non ajoutés tels quels** : leur statut local est
   retiré et dit en note. C'est un écart à « l'histoire s'annote, elle ne se réécrit pas », assumé
   parce que l'oracle refusait la transition et que la clôture publiée vit dans l'arbre.
+- **La synthèse du 19/09 est enregistrée telle qu'écrite, et la doctrine publiée la refuserait** :
+  `oracle-synthese` y rend FAIL sur S43 (2 en-têtes de colonne) et S51 (intention au bloc 1), des
+  règles que ce poste n'avait pas le 19/09. Je ne l'ai pas réécrite : c'est un livrable daté.
 - **Le relevé de récidives local du 19/09 est écarté** : il mesurait un registre qui n'existe plus.
 
 ## 7. Risques
@@ -178,15 +172,13 @@ verts · porte des noms **PASS** 7 fois sur 7, jouée après le push et non avan
 
 ## 8. Prochaines actions
 
-Ordre du tableau : les 3 actions de l'IA d'abord, dans l'ordre où elles peuvent partir, puis
-la décision qui vous revient ; aucune n'empêche de travailler dès maintenant sur ce poste.
+Ordre du tableau : les 2 actions de l'IA, dans l'ordre où elles peuvent partir ; aucune
+n'empêche de travailler dès maintenant sur ce poste, et aucune ne vous revient.
 
 | Sél. | Action | Acteur | Id | Motif | Si rien n'est fait |
 |---|---|---|---|---|---|
 | **A-1** | Verser en candidature les 3 restes locaux sans équivalent publié : tableau d'empreinte de secret au gabarit de paramétrage, pseudonymisation d'une remontée, 6 fixtures du socle | `auto_ia` | neuve | `borne_atteinte` — ce tour synchronisait, il n'ouvrait pas de chantier | 3 idées du 14/09 ne vivent plus que dans l'histoire |
 | **A-2** | Installer sur ce poste les hameçons de pré-push du pilot et des forges, puis rejouer `scripts\verifier-hooks-git.mjs` | `auto_ia` | neuve | `borne_atteinte` — constat fait après la publication, hors de la demande | la porte des noms dépend de la mémoire de la session |
-| **A-3** | Enregistrer la synthèse d'hier sous une lettre libre | `auto_ia` | neuve | `dependance_bloc_3` — attend D-1 (a) | elle reste non suivie sur ce poste |
-| **A-4** | Trancher D-1 — répondre « D-1 (a) », « D-1 (b) » ou « D-1 (c) » | `manuelle_utilisateur` | neuve | `decision` — ranger ou retirer un livrable daté vous revient | l'option (b) s'applique |
 
 ## 9. Traces
 
@@ -198,4 +190,5 @@ la décision qui vous revient ; aucune n'empêche de travailler dès maintenant 
 - Enregistrements du pilot ce tour : `7083b851` (renumérotation), `e61910e5` (index avant
   fusion), `b69d80b5` (fusion).
 - Quarantaine des orphelins de la copie installée : `~\.claude\skills\.quarantaine\20260920-114909\`.
+- Synthèse du 19/09 rangée : `output-plans\`, lettre « g », verdicts sous `.oracles\output-plans\`.
 - Aucune page HTML livrée dans ce tour.
