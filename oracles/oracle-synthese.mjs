@@ -61,9 +61,6 @@
  *       GROUPE, la TRACE MESURÉE de la tentative — un code de réponse, un message d'erreur, une
  *       sortie de commande (TF-0526, 23/08/2026). S12 lit un jeton de vocabulaire ; elle ne peut
  *       pas voir la différence entre une impossibilité ÉPROUVÉE et une impossibilité SUPPOSÉE.
- *       ASSIETTE (TF-0987, 14/09/2026) : S11, S12 et S21 lisent le motif là où il est DÉCLARÉ —
- *       la colonne « Motif / raison » d'un tableau, le texte hors spans de code d'une puce qui
- *       porte un motif en clair. Un nom de colonne cité ailleurs n'est plus un motif.
  *   S30 toute décision du bloc 3 porte un NUMÉRO, et les numéros sont DISTINCTS (28/08) — une
  *       décision se désigne pour se trancher. S4 compte des options et ne voit jamais que la
  *       QUESTION est insélectionnable ; le destinataire avait invente la numerotation avant de
@@ -84,15 +81,6 @@
  *       forme RÉSERVÉE à `output\03-etudes\` — partout ailleurs R-4 s'applique (08/09, TF-0923) ;
  *   S41 une décision portant un mot que la DOCTRINE du projet régit cite cette doctrine en source :
  *       une source qui n'est pas celle qui tranche est une opinion sourcée (08/09, TF-0923) ;
- *   S44 (14/09/2026, TF-0988) une demande CITÉE au bloc 6 portant un mot d'EXCLUSIVITÉ (uniquement,
- *       seulement, exclusivement, rien que, et rien d'autre, only) : le bloc 6 dit ce que le
- *       livrable contient EN PLUS du périmètre nommé, ou qu'il ne contient rien d'autre ;
- *   S45 (14/09/2026, TF-0791) le bloc 6 porte l'INTENTION citée et le TEST RÉTRO (loi n° 7,
- *       references\INTENTION.md) — restitutions datées du 15/09/2026 ou après ; les antérieures
- *       ne pouvaient pas connaître la règle, antériorité déclarée ;
- *   S46 (14/09/2026, TF-0979) un bloc 2 qui se déclare POINT D'ÉTAPE (tour de travail dont le
- *       résultat n'est pas encore mesurable) dit « reste à mesurer : <quoi> — par <quoi> » ; même
- *       borne de date que S45 ;
  *   S43 (12/09/2026, TF-1064) le STYLE de la restitution relève du plancher d'écriture
  *       (references\ECRITURE.md) : verdict délégué à oracle-ecriture.mjs — FAIL si l'oracle
  *       échoue, avertissements comptés, SANS_OBJET si l'oracle manque ; non bloquante ;
@@ -100,6 +88,13 @@
  *       augmenté des 26 caractères du sidecar d'oracle, tient sous 150 caractères (11/09, TF-1015) —
  *       R-4 juge la FORME du nom et jamais sa LONGUEUR : un nom conforme peut rendre le dépôt
  *       inclonable sur un chemin profond, et le défaut ne se voit que chez celui qui VÉRIFIE ;
+ *   S51 le bloc 1 porte l'INTENTION initiale de la demande et son TEST RÉTRO (17/09, TF-0791) —
+ *       loi transverse n° 7 : la règle ne mordait que sur l'étude d'opportunité, quand le retour humain
+ *       du 01/09 disait « tous types de demande ». Présence des deux pièces, jamais leur justesse ;
+ *   S50 un POINT D'ÉTAPE déclaré au bloc 1 porte ses blocs 1, 4 et 8 PLEINS (17/09, TF-1182) —
+ *       la forme échange le verdict contre ces trois blocs ; vide, elle n'est qu'une exemption
+ *       déguisée en forme jugée. S1 admet alors le bloc 2 sous son titre de mesure, et S3 y juge
+ *       la mesure attendue et l'outil qui la rendra à défaut d'un verdict chiffré ;
  *       et né du même retour : « le 3 était pour les prochaines actions ». Deux familles
  *       numérotées pareil ne se désignent pas ; le sélecteur nomme la sienne.
  *   S31 chaque OPTION du bloc 3 porte son COÛT et CE QU'ELLE EXCLUT (30/08) — exigence écrite
@@ -120,11 +115,12 @@
 // Exit : 0 = conforme · 1 = defaut MESURE · 2 = JE NE PEUX PAS MESURER — la condition et
 // son remede sont alors NOMMES. Un oracle qui ne distingue pas les deux fait passer une panne
 // d'environnement pour un defaut du produit (TF-0648).
-import { existsSync, readFileSync, writeFileSync, mkdtempSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdtempSync, mkdirSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { chargerLexique, termesEmployes } from "./lib-lexique.mjs";
 
 // Un bloc = son titre reconnu par un motif. Le libellé exact est libre : c'est la PRÉSENCE du
 // bloc qui est opposable, pas sa formulation — imposer un mot à mot rendrait la consigne
@@ -155,6 +151,49 @@ const BLOCS = [
 ];
 
 const MOTIFS_ABSENCE = /(aucun|rien|n[ée]ant|sans objet|non concern)/i;
+
+// ---- LE POINT D'ÉTAPE (TF-1182, 17/09/2026) — UNE FORME ÉCRITE AU GABARIT ET INCONNUE DE SON JUGE
+//
+// LE FAIT, mesuré le 17/09 : `grep` de « point d'étape » dans ce fichier rendait ZÉRO occurrence,
+// alors que `gabarits\RESTITUTION.md` prescrit la forme depuis la v2.22.0 (TF-0979). Un point
+// d'étape écrit À LA LETTRE du gabarit — bloc 2 remplacé par « ce qui reste à mesurer, et par
+// quoi » — rendait donc S1 FAIL (« bloc 2 absent ») et S3 FAIL (« verdict sans fait mesurable »),
+// les deux BLOQUANTES. Le seul moyen de passer le hook était de DÉGUISER le point d'étape en
+// verdict, c'est-à-dire d'écrire un verdict partiel — exactement ce que la forme existe pour
+// éviter. *Une forme que le gabarit prescrit et que son juge refuse n'est pas une forme : c'est
+// un piège, et il apprend à contourner.*
+//
+// CE QUI N'EST PAS UN ASSOUPLISSEMENT, et c'est la raison pour laquelle la forme reste JUGÉE. Le
+// point d'étape n'enlève pas d'obligation, il en ÉCHANGE une : le verdict, qu'aucune mesure ne
+// porte encore, contre la ligne qui dit CE QUI RESTE À MESURER ET PAR QUOI (S3, second sens) et
+// contre l'exigence que les blocs 1, 4 et 8 soient PLEINS (S50). Un tour qui n'a rien produit
+// n'est pas un point d'étape : c'est un accusé de réception, et son exemption a ses propres
+// bornes (§Portée, TF-0990).
+//
+// LA DÉCLARATION SE FAIT AU BLOC 1, et nulle part ailleurs : le gabarit l'écrit (« il le DÉCLARE
+// en tête, par la mention `point d'étape` dans le bloc 1 »). Chercher la mention dans tout le
+// document ferait basculer en mode allégé toute restitution qui PARLE d'un point d'étape.
+const POINT_ETAPE = /\bpoint\s+d\s*['’]\s*[ée]tape\b/i;
+// Le bloc 2 d'un point d'étape porte le titre que la forme lui donne. Les deux titres sont admis —
+// « ## 2. Ce qui reste à mesurer, et par quoi » comme « ## 2. Verdict » gardé par habitude —, parce
+// que ce qui est opposable est la LIGNE de mesure, jamais la typographie du titre (leçon TF-0566).
+const BLOC_MESURE = new RegExp(`(^|\n)#{1,4}\\s*${NUM}(?:ce\\s+qui\\s+)?(?:reste\\s+)?[àa]\\s+mesurer`, "i");
+// Un bloc « plein » : ni vide, ni une déclaration d'absence, et assez de matière pour être lu.
+// Le compte porte sur les JETONS commençant par une lettre ou un chiffre — les séparateurs « · »
+// et les tirets d'une ligne d'en-tête ne gonflent pas la mesure.
+const compteMots = (s) => (String(s).match(/[\p{L}\p{N}]\S*/gu) || []).length;
+// UNE DÉCLARATION D'ABSENCE EST COURTE PAR NATURE — « aucune », « rien à signaler », « sans
+// objet ». Chercher le mot dans un bloc LONG accuse un bloc plein : mesuré sur les 148 synthèses
+// d'`output\04-plans\`, la première écriture de cette règle rendait UN faux positif, et sur la
+// colonne que le gabarit PRESCRIT lui-même au bloc 8 — « Si rien n'est fait ». Un contrôle qui
+// accuse la forme prescrite s'apprend à contourner (R-33 bis) : la borne de longueur est donc
+// dans la règle, pas dans la fixture.
+const declareSonVide = (t) => compteMots(t) <= 20 && MOTIFS_ABSENCE.test(t);
+const estPlein = (b, seuil) => {
+  const t = String(b || "").trim();
+  if (!t || declareSonVide(t)) return false;
+  return compteMots(t) >= seuil;
+};
 
 // Les jetons de verdict sont cherchés en CASSE EXACTE, et ce n'est pas un détail : avec le
 // drapeau insensible, `\bPASS\b` matche le mot français « passé » — en JavaScript `\b` est
@@ -219,6 +258,27 @@ const uni = (re) => new RegExp(re.source.split("\\b").join(_FRONTIERE_UNICODE), 
 const _LOCALISATEURS = /(`[^`]+`|\.(md|json|mjs|py|html|jsonl|ya?ml|jsx?|tsx?|css|scss|txt|csv|toml|ini|cfg|conf|sh|ps1|sql|xml|env|lock)\b|\b[a-f0-9]{7,40}\b)/;
 const preuve = (s) => _JETONS.test(s) || _CHIFFRES.test(s) || _LOCALISATEURS.test(s);
 
+// UN FRAGMENT ENTRE ACCENTS GRAVES EST UNE CITATION, JAMAIS UNE DÉCLARATION D'INTENTION
+// (TF-0987 et TF-0992, 16/09/2026). Deux règles se sont trompées de la même façon, à huit jours
+// d'écart, en cherchant un vocabulaire FERMÉ dans un texte NON DÉLIMITÉ :
+//   · S21 a lu le nom d'une colonne de tableur — `presence` — comme le motif d'une action dont le
+//     motif déclaré était `decision`, que la règle exclut pourtant explicitement de sa portée. Le
+//     contournement a été de RENOMMER la colonne du livrable : un oracle de forme dictait le
+//     schéma d'un livrable de données ;
+//   · S37 a lu `corriges: []` — le NOM D'UN CHAMP dans une sortie VERTE qui déclare qu'il n'y a eu
+//     AUCUNE correction — comme une correction restituée sans classe. Le seul remède offert à
+//     l'auteur était de paraphraser sa propre preuve, c'est-à-dire d'abîmer une citation exacte
+//     pour satisfaire un contrôle, sur le seul bloc dont la valeur est d'être exact.
+// Les deux défauts sont symétriques : le premier rendait la règle BAVARDE sur une action
+// irréprochable, le second la rendait bavarde sur une preuve juste. Le remède est le même, et il
+// est de PÉRIMÈTRE, pas de frontière de mot : on retire le code avant de chercher de la prose.
+// Ce qui est retiré n'est PAS perdu pour tout le monde — `preuve()` et `_LOCALISATEURS`
+// continuent de lire la ligne ENTIÈRE, parce qu'un chemin entre accents graves est précisément
+// ce qu'ils cherchent. Seule la recherche de VOCABULAIRE passe par ici.
+const horsCode = (s) => String(s)
+  .replace(/```[\s\S]*?```/g, " ")
+  .replace(/`[^`]*`/g, " ");
+
 // Une puce Markdown se POURSUIT sur les lignes suivantes quand elle dépasse la largeur. Juger
 // ligne par ligne dénonçait donc une puce dont la preuve tombait sur la continuation — faux
 // positif constaté le 14/08 en jugeant l'oracle sur sa propre restitution. On reconstitue la
@@ -273,6 +333,47 @@ function actionsGroupees(texte) {
   const entetes = entetesDeTableau(texte);
   const entete = entetes.length ? entetes[0] : "";
   return groupes.concat(lignesDeDonnees(texte).map((l) => entete + " " + l));
+}
+
+// OU UN MOTIF EST DECLARE (TF-0987, 16/09/2026) — et pourquoi la question se pose.
+//
+// S11, S12 et S21 cherchent un vocabulaire FERME (`acces`, `presence`, `decision`,
+// `gate_gouvernance`…) dans le groupe de puce ENTIER. Or le groupe porte aussi le COMMENT de
+// l'action : un chemin, une commande, un libelle d'ecran, le nom d'une colonne de livrable. Le
+// 12/09, l'action A-16 d'une restitution reelle portait le motif `decision` et disait comment
+// faire — « ouvrir le livrable et trier sur la colonne `presence` ». S21 a compte DEUX actions
+// concernees au lieu d'une et rendu FAIL, sur une action dont le motif declare est explicitement
+// HORS de sa portee. Le contournement a coute le renommage d'une colonne dans un livrable de
+// donnees : un oracle de forme dictant un schema, ce qui est l'inverse du service rendu.
+//
+// La lecture juste n'est pas une frontiere de mot plus fine, c'est un PERIMETRE : le motif se lit
+// LA OU IL EST DECLARE. Le gabarit le prescrit a deux endroits, et les deux sont nommes :
+//   · en TABLEAU — la forme par defaut depuis la v2.9.0 — dans la COLONNE « Motif / raison ». Le
+//     groupe est alors l'en-tete suivi de sa ligne de donnees (`actionsGroupees` les joint) : la
+//     colonne se retrouve par son INDEX, et la cellule est lue seule ;
+//   · en PUCE, derriere son libelle — « motif de non-execution : », « pourquoi pas l'IA : ».
+// Sans aucune declaration reperable, on rend le groupe ENTIER : ne rien trouver ne doit jamais
+// AFFAIBLIR la regle. Mais on le rend SANS ses citations de code — un identifiant entre accents
+// graves est une citation, jamais une declaration d'intention (`horsCode`).
+function zoneMotif(groupe) {
+  const g = String(groupe);
+  if (/^\s*\|/.test(g)) {
+    const parts = g.split("|");
+    if (parts.length > 2 && !parts[0].trim() && !parts[parts.length - 1].trim()) {
+      const cells = parts.slice(1, -1);
+      // en-tete (N cellules) + separateur de jonction (1) + donnees (N) => 2N+1
+      if (cells.length % 2 === 1) {
+        const n = (cells.length - 1) / 2;
+        const entete = cells.slice(0, n).map((c) => c.trim());
+        const donnees = cells.slice(n + 1).map((c) => c.trim());
+        const i = entete.findIndex((c) => /motif|raison/i.test(c));
+        if (i >= 0 && donnees[i] !== undefined) return donnees[i];
+      }
+    }
+  }
+  const LABELS = /(?:motifs?|pourquoi\s+pas\s+l['’]\s*IA|raisons?)(?:\s+de\s+non[- ]?ex[ée]cution)?\s*[:：]\s*([^\n;·|]*)/gi;
+  const trouves = [...g.matchAll(LABELS)].map((m) => m[1]);
+  return trouves.length ? trouves.join(" · ") : horsCode(g);
 }
 
 // UNE DÉCISION DU BLOC 3 SE LIT AUTREMENT QU'UNE ACTION DU BLOC 8 (TF-0568, 24/08). Le lecteur
@@ -388,8 +489,19 @@ function juger(texte, cheminJuge = null) {
   const ok = (regle, message) => findings.push({ regle, statut: "PASS", message });
   const ko = (regle, message) => findings.push({ regle, statut: "FAIL", message });
 
+  // Le POINT D'ÉTAPE se DÉCLARE, et il se déclare au bloc 1 (TF-1182). Sans bloc 1 reconnu, la
+  // mention n'est pas une déclaration : le document est jugé comme une restitution ordinaire.
+  const pointEtape = POINT_ETAPE.test(bloc(texte, BLOCS[0][0]) || "");
+
   // S1 — les 8 blocs
-  const absents = BLOCS.filter(([re]) => !re.test(texte)).map(([, nom]) => nom);
+  const absents = BLOCS.filter(([re], i) => {
+    if (re.test(texte)) return false;
+    // Point d'étape : le bloc 2 est REMPLACÉ par « ce qui reste à mesurer, et par quoi », donc son
+    // titre ne porte pas le mot « verdict ». Exiger le mot refusait la forme que le gabarit
+    // prescrit ; le bloc, lui, reste EXIGÉ — sous son autre titre (TF-1182).
+    if (pointEtape && i === 1 && BLOC_MESURE.test(texte)) return false;
+    return true;
+  }).map(([, nom]) => nom);
   absents.length
     ? ko("S1", `bloc(s) absent(s) : ${absents.join(" · ")} — un bloc sans contenu se DIT en une ligne, il ne disparaît pas (loi n° 3)`)
     : ok("S1", "les 8 blocs de la structure sont présents");
@@ -402,8 +514,25 @@ function juger(texte, cheminJuge = null) {
   else ko("S2", `en-tête sans ${!aDate ? "date" : ""}${!aDate && !aHeure ? " ni " : ""}${!aHeure ? "heure" : ""} — plusieurs traitements tombent le même jour, sans heure ils ne s'ordonnent pas`);
 
   // S3 — verdict factuel : au moins un fait mesurable dans le bloc verdict
-  const bVerdict = bloc(texte, BLOCS[1][0]) || "";
-  preuve(bVerdict)
+  // POINT D'ÉTAPE (TF-1182) : le bloc 2 ne porte pas de verdict, il porte la MESURE ATTENDUE et
+  // L'OUTIL QUI LA RENDRA. La règle ne disparaît pas, elle change d'objet — et elle reste exigeante
+  // sur le même point : nommer une chose vérifiable. « On verra demain » échoue des deux côtés.
+  const bVerdict = bloc(texte, BLOCS[1][0]) || (pointEtape ? bloc(texte, BLOC_MESURE) || "" : "");
+  if (pointEtape) {
+    // DEUX ISSUES, et l'alternative n'est pas une complaisance : elle est ce qui rend la règle
+    // NON RÉGRESSIVE. Mesuré sur les 148 synthèses d'`output\04-plans\` : cinq déclarent « point
+    // d'étape » au bloc 1, et QUATRE portent malgré tout un verdict chiffré — un mandat long est
+    // souvent un point d'étape ET une mesure. N'admettre que la ligne de mesure aurait accusé ces
+    // quatre-là sur une règle BLOQUANTE, c'est-à-dire fait échouer 2,7 % d'un corpus non réécrit
+    // au nom d'une forme censée l'aider. Ce qui reste refusé est le seul cas que la forme existe
+    // pour attraper : un bloc 2 qui ne mesure RIEN et ne dit pas non plus ce qui reste à mesurer.
+    const mesure = /mesur/i.test(bVerdict) && _LOCALISATEURS.test(bVerdict);
+    if (mesure) ok("S3", "point d'étape : ce qui reste à mesurer est nommé, avec l'outil qui le rendra");
+    else if (preuve(bVerdict)) ok("S3", "point d'étape : le bloc 2 porte un fait mesurable");
+    else ko("S3", "point d'étape sans fait mesurable NI ligne « ce qui reste à mesurer, et par quoi » — nomme la mesure "
+      + "attendue ET l'outil qui la rendra (une commande, un oracle, un fichier), ou porte un verdict chiffré ; "
+      + "« on regardera demain » n'est ni l'un ni l'autre");
+  } else preuve(bVerdict)
     ? ok("S3", "le verdict porte un fait mesurable")
     : ko("S3", "verdict sans fait mesurable — « tout s'est bien passé » n'est pas un verdict, « 19/19 » l'est");
 
@@ -467,6 +596,20 @@ function juger(texte, cheminJuge = null) {
     // Un oracle qui refuse la formulation qu'un gabarit prescrit met le gabarit en défaut, jamais
     // l'auteur. La preuve d'un écart n'est pas un verdict d'oracle : c'est le « pourquoi ».
     .replace(/\bj(?:'|’)ai (?:aussi |également )?fait\b/gi, " ")
+    // L'IRRÉEL DU PASSÉ DÉCRIT UN ÉVÉNEMENT QUI N'A PAS EU LIEU (TF-1125, 15/09/2026). Sur une
+    // note de déploiement réelle, la puce « la liaison est traitée dans le client, là où elle
+    // AURAIT FAIT échouer la publication » rendait S8 FAIL alors qu'elle porte sa preuve exécutée
+    // en sous-puce : le fragment désigne même un défaut que le code ÉVITE, soit le contraire d'une
+    // complétion revendiquée. La correction subie a été d'écrire « aurait bloqué », sans aucun gain
+    // de sens — une règle qui fait réécrire du texte juste se paie en confiance.
+    //
+    // C'est la TROISIÈME tournure retirée, et les trois partagent un trait mécanique : le mot
+    // « fait » n'y est pas au passé composé de l'indicatif. On retire donc la FAMILLE — auxiliaire
+    // `avoir` au conditionnel ou au subjonctif passé — plutôt qu'une tournure de plus : « aurait
+    // fait », « auraient pu faire », « eût fait », « eussent fait ». Le TEMPS du verbe suffit à
+    // trancher, aucune analyse sémantique n'est requise. La piste de fond — tester le temps plutôt
+    // que le lemme, et couvrir les trois d'un coup — reste ouverte au registre.
+    .replace(/\b(?:aurai[ts]|aurions|auriez|auraient|eut|eût|eusse|eussent|eussions|eussiez)\s+(?:pu\s+)?fai(?:t|re)\b/gi, " ")
     // `\b` après « demandé » ne matche jamais : la frontière ASCII ne voit pas le « é ». La
     // tournure n'était donc pas retirée (trouvé par `oracle-pieges-regex`).
     .replace(/(?<![0-9A-Za-zÀ-ÿ])vous avez demandé(?![0-9A-Za-zÀ-ÿ])/gi, " ");
@@ -601,63 +744,34 @@ function juger(texte, cheminJuge = null) {
   const groupes8 = actionsGroupees(bActions)
     .filter((g) => !MOTIFS_ABSENCE.test(g.replace(/^\s*[-*]\s+/, "").slice(0, 40)));
 
-  // ---- TF-0987 (14/09/2026) — L'ASSIETTE D'UN MOTIF : OÙ le vocabulaire fermé se cherche ------
-  //
-  // LE FAIT, mesuré deux fois de suite sur la même restitution d'un produit : une action dont le
-  // motif déclaré est `decision` disait comment faire — ouvrir le livrable et trier sur sa colonne
-  // `presence`, nom RÉEL d'une colonne de données. S21 cherchait son vocabulaire dans le groupe
-  // ENTIER : elle a lu le nom de la colonne comme un motif, compté 2 actions concernées au lieu de
-  // 1 et rendu FAIL — sur une ligne que sa propre portée écarte (`decision` n'est pas concerné).
-  // Le contournement a été de RENOMMER la colonne du livrable : un oracle de forme a dicté le
-  // schéma d'une donnée. La frontière de mot était là ; c'est le PÉRIMÈTRE de lecture qui manquait.
-  //
-  // DEUX LECTURES, dans cet ordre :
-  //   · en TABLEAU (la forme par défaut du bloc 8), le motif vit dans SA colonne — l'en-tête qui
-  //     nomme « motif » ou « raison ». Seule cette cellule est lue : les autres disent quoi faire et
-  //     comment, et un identifiant qu'elles citent n'est jamais une déclaration ;
-  //   · en PUCE, un span de code est une CITATION. MAIS le corpus écrit très souvent le motif
-  //     lui-même entre accents graves (224 occurrences dans 73 synthèses du pilot au 14/09) : les
-  //     retirer tous accuserait des actions justes. Les spans ne sont donc retirés QUE si le groupe
-  //     porte AUSSI un motif en clair — l'auteur a alors déclaré son motif hors code, et ce qui
-  //     reste entre accents graves cite autre chose.
-  // Vaut pour S11, S12 et S21, qui partagent le mécanisme.
-  const SANS_CODE = (s) => s.replace(/```[\s\S]*?```/g, " ").replace(/`[^`\n]*`/g, " ");
-  const VOCAB_MOTIF = new RegExp(`${MOTIFS_IA.source}|${MOTIFS_HUMAIN.source}`);
-  const COLONNE_MOTIF = /\b(motif|raison)\b/i;
-  const enteteActions = entetesDeTableau(bActions)[0] || "";
-  const cellules = (l) => l.trim().replace(/^\|/, "").replace(/\|\s*$/, "").split("|").map((c) => c.trim());
-  const assietteMotif = (g) => {
-    if (enteteActions && g.startsWith(enteteActions + " |")) {
-      const k = cellules(enteteActions).findIndex((h) => COLONNE_MOTIF.test(h));
-      const c = cellules(g.slice(enteteActions.length + 1));
-      if (k >= 0 && k < c.length) return c[k];
-    }
-    const clair = SANS_CODE(g);
-    return VOCAB_MOTIF.test(clair) ? clair : g;
-  };
-
-  const juger8 = (regle, cible, predicat, siKo, siOk) => {
-    const concernes = groupes8.filter((g) => cible.test(g));
+  const juger8 = (regle, cible, predicat, siKo, siOk, { cibleSurMotif = false } = {}) => {
+    const concernes = groupes8.filter((g) => cible.test(cibleSurMotif ? zoneMotif(g) : g));
     if (!concernes.length) return ok(regle, `aucune action concernée — ${siOk}`);
-    const fautifs = concernes.filter((g) => !predicat(g));
+    const fautifs = concernes.filter((g) => !predicat(g, zoneMotif(g)));
     fautifs.length
       ? ko(regle, `${fautifs.length} action(s) sur ${concernes.length} — ${siKo} Ex. : ${fautifs[0].replace(/\s+/g, " ").trim().slice(0, 110)}`)
       : ok(regle, `${concernes.length} action(s) concernée(s) — ${siOk}`);
   };
 
-  juger8("S11", /\bauto_ia\b/, (g) => MOTIFS_IA.test(assietteMotif(g)),
+  juger8("S11", /\bauto_ia\b/, (g, zm) => MOTIFS_IA.test(zm),
     "une action `auto_ia` listée en RESTE sans motif de non-exécution : la voie automatisée est le défaut, " +
     "donc ce qui n'a pas été fait se justifie. Vocabulaire : gate_gouvernance, dependance_bloc_3, garde_fou, borne_atteinte, dependance_externe, hors_mandat.",
     "chaque action `auto_ia` non exécutée porte son motif");
 
-  juger8("S12", HUMAINS, (g) => MOTIFS_HUMAIN.test(assietteMotif(g)),
+  juger8("S12", HUMAINS, (g, zm) => MOTIFS_HUMAIN.test(zm),
     "une action laissée à l'humain sans raison d'impossibilité IA — loi transverse n° 5. " +
     "Vocabulaire : acces, decision, depense, presence, irreversible (non accentués).",
     "chaque action humaine porte sa raison d'impossibilité");
 
   // Le nom d'acteur est retiré avant la mesure : `manuelle_dev` est lui-même un span de code, et
   // le laisser rendrait la règle satisfaite par sa propre étiquette — la boucle la plus bête.
-  juger8("S13", HUMAINS, (g) => _LOCALISATEURS.test(g.replace(ACTEURS, " ").replace(/`?\b(auto_ia|manuelle_dev|manuelle_utilisateur)\b`?/g, " ")),
+  // 14/09/2026 (TF-1085, D-9 (a)) — IL SE RETIRE AVEC SES ACCENTS GRAVES, EN UNE FOIS. Le retrait
+  // précédent passait d'abord `ACTEURS`, sans drapeau `g` : il ôtait le MOT et laissait « ` ` »,
+  // deux accents graves autour d'une espace, que le second remplacement ne voyait plus et que
+  // `_LOCALISATEURS` comptait comme un chemin. S13 ne pouvait donc JAMAIS refuser une action écrite
+  // au format canonique (acteur entre accents graves). Prouvé sur la synthèse du 17/08 du banc des
+  // défauts échappés : PASS avec les accents graves, FAIL sans eux, au mot près.
+  juger8("S13", HUMAINS, (g) => _LOCALISATEURS.test(g.replace(/`?\b(auto_ia|manuelle_dev|manuelle_utilisateur)\b`?/g, " ")),
     "une action laissée à l'humain sans chemin, commande ni libellé d'écran : le lecteur doit rouvrir le projet " +
     "pour savoir ce qu'on lui demande — c'est le coût que cette règle existe pour supprimer.",
     "chaque action humaine est exécutable telle quelle");
@@ -809,7 +923,10 @@ function juger(texte, cheminJuge = null) {
   // mais pas pour la prose, débordement reclassé acceptable — trois symptômes, aucune classe.
   {
     const bTraite = bloc(texte, BLOCS[3][0]) || "";
-    const corrections = puces(bTraite).filter((l) => uni(/\bcorrig[ée]/i).test(l));
+    // TF-0992 : le BALAYAGE ignore les citations de code — `corriges: []` est le nom d'un champ
+    // dans une sortie verte, pas une correction restituée. La recherche du MARQUEUR, elle, garde
+    // la ligne entière : un « rouge → vert » cité dans une sortie compte comme preuve.
+    const corrections = puces(bTraite).filter((l) => uni(/\bcorrig[ée]/i).test(horsCode(l)));
     const sansClasse = corrections.filter((l) => !/(rouge|vert|fixture|recette|classe|self-test|banc|double sens|\d+\s*\/\s*\d+)/i.test(l));
     sansClasse.length
       ? ko("S37", `${sansClasse.length} correction(s) restituée(s) sans contrôle rouge → vert ni classe nommée — une correction après retour humain traite le symptôme, jamais la classe : « ${sansClasse[0].trim().slice(0, 90)} »`)
@@ -903,14 +1020,15 @@ function juger(texte, cheminJuge = null) {
   const TRACE_CODE = /(HTTP\s*\d{3}|\b\d{3}\s+(?:Forbidden|Unauthorized|Denied|Conflict)\b|\bE[A-Z]{4,}\b|Authorization_\w+)/;
   const TRACE_MOT = uni(/(exit\s*\d|permission denied|access denied|\btent[ée]e?s?\b|\bessay[ée]e?s?\b|\brefus[ée]e?s?\b|\bmesur[ée]e?s?\b)/i);
   const TRACE_TENTATIVE = { test: (g) => TRACE_CODE.test(g) || TRACE_MOT.test(g) };
-  // La CIBLE se lit dans l'assiette du motif (TF-0987) ; la TRACE, elle, se cherche dans tout le
-  // groupe — un code de réponse cité entre accents graves est bien une preuve de tentative.
-  juger8("S21", { test: (g) => MOTIFS_MESURABLES.test(assietteMotif(g)) }, (g) => TRACE_TENTATIVE.test(g) && preuve(g),
+  juger8("S21", MOTIFS_MESURABLES, (g) => TRACE_TENTATIVE.test(g) && preuve(g),
     "un motif `acces` ou `presence` SANS trace mesurée de la tentative : l'impossibilité est affirmée, " +
     "pas éprouvée. Ces deux motifs affirment un FAIT DU MONDE, donc ils se mesurent — un code de " +
     "réponse, un message d'erreur, une sortie de commande, dans le même groupe de puce. " +
     "`decision`, `depense` et `irreversible` relèvent d'un arbitrage et ne sont pas concernés.",
-    "chaque motif `acces`/`presence` porte la trace mesurée de sa tentative");
+    "chaque motif `acces`/`presence` porte la trace mesurée de sa tentative",
+    // TF-0987 : la CIBLE de S21 est elle-même un motif, donc elle se lit dans la zone où un motif
+    // est DÉCLARÉ — pas dans le « comment » de l'action, qui cite des noms de colonnes.
+    { cibleSurMotif: true });
 
   // ---- S22 (TF-0546, 24/08) — un NÉGATIF sur une ressource externe ne se prononce pas d'une
   // seule sonde ----------------------------------------------------------------------------------
@@ -976,17 +1094,85 @@ function juger(texte, cheminJuge = null) {
   // correctif », qui declare un PERIMETRE et non une incapacite d'agir. Une regle qui accuse un
   // travail juste se fait desactiver — et celle-ci apprend une tournure, elle ne refuse rien.
   const INCAPACITE = /(je ne (?:peux|pourrai) pas|impossible (?:depuis|d'ici)|pas (?:possible|faisable) (?:d'ici|depuis)|incapable de|bloqu[ée]{1,2} (?:pour|par) l'acc[èe]s)/i;
-  const PLUSIEURS_CHEMINS = /(deux (?:chemins|voies|acc[èe]s|portes)|CLI (?:et|puis|\+) API|API (?:et|puis|\+) CLI|autre (?:chemin|voie|porte|point d'entr[ée]e|acc[èe]s)|ni .{2,40} ni |seule (?:voie|porte|acc[èe]s)|unique (?:chemin|voie|acc[èe]s)|aucun autre chemin)/i;
+  //
+  // DURCISSEMENT DU 19/09/2026 (TF-1189) — LA FORMULE CESSAIT DE MESURER QUOI QUE CE SOIT.
+  //
+  // LE FAIT, mesure chez Produit-62 le 18/09. QUATRE appels ont ete emis vers un rapport Power BI,
+  // tous passant par l'espace de travail (`/v1.0/myorg/groups/{id}/reports`,
+  // `/v1.0/myorg/groups/{id}/reports/{id}`), tous refuses en 401 ; la conclusion ecrite fut « il
+  // n'existe aucun autre chemin, le portail et l'interface de programmation passent l'un comme
+  // l'autre par le meme droit d'appartenance a l'espace ». Le commanditaire a demande « tu n'as
+  // pas acces avec mon compte ? » : `GET /v1.0/myorg/reports/{id}` rendait 200 — le rapport est
+  // PARTAGE, le scope personnel l'atteint sans appartenance a l'espace. Cout : un constat FAUX
+  // ecrit dans DEUX syntheses jugees PASS, porte jusqu'au verdict de bascule d'une qualification,
+  // un rapport repris en version 2, et un ecart reel (une barre de pays a 9 valeurs contre 8)
+  // reste invisible tant que la comparaison des deux rendus vivants etait crue impossible.
+  //
+  // POURQUOI LA REGLE PASSAIT : son alternation unique acceptait la FORMULE (« seule voie »,
+  // « aucun autre chemin ») au meme titre que des chemins nommes. Elle jugeait donc la FORME DE
+  // LA DECLARATION, jamais que les chemins aient ete ESSAYES ni qu'ils soient DIFFERENTS —
+  // ecrire la formule coute trois mots, faire la mesure coute un appel, et le controle ne
+  // distinguait pas les deux. C'est la classe `controle-vrai-sur-le-mauvais-invariant`.
+  //
+  // CE QUI EST EXIGE MAINTENANT, et la formule n'en fait plus partie :
+  //   · les codes de retour de DEUX FAMILLES de chemins au moins — une famille etant un PREFIXE
+  //     d'URL distinct, pas une variante du meme : `…/myorg/groups/…` et `…/myorg/reports/…` sont
+  //     deux familles, `…/groups/{id}/reports` et `…/groups/{id}/reports/{id}` n'en sont qu'une ;
+  //   · OU la SOURCE qui etablit qu'un seul chemin existe — la documentation de la plateforme,
+  //     citee avec son localisateur. Une declaration adossee reste recevable ; une declaration
+  //     nue ne l'est plus.
+  //   · LE CAS FONDATEUR DE TF-0606 RESTE RECEVABLE EN PROSE : quand la restitution ne cite AUCUN
+  //     appel, nommer deux chemins (« CLI et API ») suffit encore, comme avant. Mais des qu'elle
+  //     en cite, LES APPELS FONT FOI — elle ne peut plus se payer de mots au-dessus de ses
+  //     propres traces, et c'est exactement la situation du 18/09.
+  // Doctrine, en une phrase : un refus prouve qu'une porte est fermee, jamais qu'il n'y en a qu'une.
+  const CHEMINS_NOMMES = /(deux (?:chemins|voies|acc[èe]s|portes)|CLI (?:et|puis|\+) API|API (?:et|puis|\+) CLI|(?<!aucun )(?<!pas d')autre (?:chemin|voie|porte|point d'entr[ée]e|acc[èe]s)|ni .{2,40} ni )/i;
+  // La FORMULE est desormais isolee de CHEMINS_NOMMES — et la negation l'est par un regard
+  // arriere, sans quoi « aucun autre chemin » continuerait de matcher « autre chemin ».
+  const FORMULE_UNIQUE = /(seule (?:voie|porte|acc[èe]s)|unique (?:chemin|voie|acc[èe]s)|aucun autre chemin)/i;
+  // Codes ENUMERES plutot qu'un motif a trois chiffres : « 148 fichiers » ou « 207 documents » sur
+  // la meme ligne qu'une URL ne doivent pas se lire comme un code de retour.
+  const CODE_RETOUR = /(\bHTTP\s*\d{3}\b|\b(?:200|201|202|204|301|302|304|400|401|403|404|405|409|410|429|500|502|503)\b|\bexit\s*\d+\b|\b(?:Unauthorized|Forbidden|Denied)\b|Authorization_\w+)/i;
+  const SOURCE_DOC = /(documentation|r[ée]f[ée]rence (?:officielle|de l'API)|sp[ée]cification|guide (?:officiel|d'API)|docs?\.[a-z]|learn\.microsoft)/i;
+  const LOCALISATEUR = /(https?:\/\/|`[^`]{3,}`|\b[\w.\-]+\.(?:md|json|html|pdf)\b)/i;
+  // La famille d'un chemin : ses deux premiers segments PORTEURS. Les segments de version, les
+  // gabarits `{id}` et les identifiants (chiffres, hexadecimal long) sont retires — ce sont eux
+  // qui faisaient passer quatre variantes d'un meme prefixe pour quatre chemins.
+  const familleDe = (u) => {
+    const seg = u.replace(/^https?:\/\/[^/]+/i, "").split("/").filter(Boolean)
+      .filter((s) => !/^v\d+(?:\.\d+)*$/i.test(s))
+      .filter((s) => !/^\{.*\}$/.test(s))
+      .filter((s) => !/^\d+$/.test(s))
+      .filter((s) => !/^[0-9a-f]{8}[0-9a-f-]*$/i.test(s));
+    return seg.length ? seg.slice(0, 2).join("/").toLowerCase()
+      : ((/^https?:\/\/([^/]+)/i.exec(u) || [, ""])[1] || "").toLowerCase();
+  };
   {
     const phrases = texte.split(/(?<=[.!?;])\s+|\n/).map((x) => x.trim()).filter(Boolean);
     const risquees = phrases.filter((x) => INCAPACITE.test(x));
-    const nues = risquees.filter((x) => !PLUSIEURS_CHEMINS.test(x));
+    // Un APPEL, pas un lien : une URL absolue, ou un chemin precede de son verbe. Le code de
+    // retour se lit sur la MEME ligne — c'est la forme sous laquelle une trace d'appel s'ecrit.
+    const appels = [];
+    for (const ligne of texte.split(/\n/)) {
+      const avecCode = CODE_RETOUR.test(ligne);
+      for (const m of ligne.matchAll(/https?:\/\/[^\s)`"'<>,;]+/gi)) appels.push({ u: m[0], code: avecCode });
+      for (const m of ligne.matchAll(/\b(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s+[`"']?(\/[^\s)`"'<>,;]+)/gi)) appels.push({ u: m[1], code: avecCode });
+    }
+    const familles = new Set(appels.filter((a) => a.code).map((a) => familleDe(a.u)).filter(Boolean));
+    const adossee = phrases.some((x) => SOURCE_DOC.test(x) && LOCALISATEUR.test(x));
+    const enProse = appels.length === 0;
+    const nues = risquees.filter((x) => familles.size < 2 && !adossee && !(enProse && CHEMINS_NOMMES.test(x)));
     if (!risquees.length) ok("S25", "aucune incapacite affirmee — rien a corroborer");
-    else if (nues.length) ko("S25", `${nues.length} incapacite(s) sur ${risquees.length} affirmee(s) sans nommer les CHEMINS essayes : ` +
-      "un outil qui refuse n'est pas une capacite absente — un CLI non authentifie ne dit rien de l'API du meme service. " +
-      "Nommer au moins DEUX chemins, ou declarer qu'un seul existe (« seule voie », « aucun autre chemin »). " +
+    else if (nues.length) ko("S25", `${nues.length} incapacite(s) sur ${risquees.length} affirmee(s) sans PREUVE de plusieurs chemins ` +
+      `(${appels.length} appel(s) cite(s), ${familles.size} famille(s) de chemin distincte(s) portant un code de retour) : ` +
+      "un outil qui refuse n'est pas une capacite absente, et la formule « seule voie » ne mesure rien — un refus prouve qu'une porte " +
+      "est fermee, jamais qu'il n'y en a qu'une. Porter les codes de retour de DEUX FAMILLES au moins — un prefixe d'URL distinct, pas " +
+      "une variante du meme : `…/myorg/groups/…` et `…/myorg/reports/…` sont deux familles, `…/groups/{id}/reports` et " +
+      "`…/groups/{id}/reports/{id}` n'en sont qu'une —, ou citer la SOURCE qui etablit qu'un seul chemin existe. " +
       `Ex. : ${nues[0].replace(/\s+/g, " ").slice(0, 110)}`);
-    else ok("S25", `${risquees.length} incapacite(s) affirmee(s), chacune adossee aux chemins essayes`);
+    else if (familles.size >= 2) ok("S25", `${risquees.length} incapacite(s) affirmee(s), adossee(s) aux codes de retour de ${familles.size} familles de chemins : ${[...familles].slice(0, 4).join(", ")}`);
+    else if (adossee) ok("S25", `${risquees.length} incapacite(s) affirmee(s), adossee(s) a la source qui etablit le chemin unique`);
+    else ok("S25", `${risquees.length} incapacite(s) affirmee(s) en prose — aucun appel cite, et chacune nomme au moins deux chemins`);
   }
 
   // ---- S26 (TF-0617, 25/08) — un contrôle qui confirme une écriture NOMME le chemin ABSOLU
@@ -1192,7 +1378,13 @@ function juger(texte, cheminJuge = null) {
     const b8 = bloc(texte, /##\s*8\.\s*Prochaines actions/i) || "";
     const declares = b7.split(/\n(?=\s*[-*])/).map((x) => x.trim()).filter((x) => RISQUE_DECOUVERT.test(x));
     // Un bloc 8 « vide » au sens de cette règle : aucune ligne d'action numérotée ni pointée.
-    const aUneAction = /^\s*(?:\d+\.|[-*])\s+\S/m.test(b8);
+    // UNE ACTION EN TABLEAU EST UNE ACTION (16/09/2026). S29 ne reconnaissait qu'une PUCE, et le
+    // gabarit prescrit le bloc 8 en TABLEAU UNIQUE depuis la v2.9.0 : une restitution conforme à
+    // S18 rendait donc « aucune action » pour S29, qui concluait « risque déclaré non couvert et
+    // rien à faire » sur un bloc 8 plein. *Deux règles du même référentiel se contredisaient* —
+    // exactement le défaut que TF-0508 avait corrigé pour S11 à S14, repris ici sur une règle plus
+    // jeune. Le constat a été fait sur la première restitution qui a exercé les deux ensemble.
+    const aUneAction = /^\s*(?:\d+\.|[-*])\s+\S/m.test(b8) || lignesDeDonnees(b8).length > 0;
     if (!b7) findings.push({ regle: "S29", statut: "SANS_OBJET", message: "aucun bloc de risques — rien à confronter" });
     else if (!declares.length) ok("S29", "aucun risque déclaré non couvert — rien à passer la main");
     else if (aUneAction) ok("S29", `${declares.length} risque(s) déclaré(s) non couvert(s), et le bloc 8 passe la main`);
@@ -1477,6 +1669,67 @@ function juger(texte, cheminJuge = null) {
           (chapeauCommun ? ` (chapeau commun de ${motsPreambule} mots en tête du bloc : le rappel par décision se limite au delta)` : ""));
   }
 
+  // ---- S47 (retour humain du 16/09/2026) — UNE DÉCISION NOMME LA CHOSE DONT ELLE PARLE -------
+  //
+  // LE RETOUR EST LA MESURE, mot pour mot : « D-1, on ne comprend absolument rien au charabia, ce
+  // n'est pas clair, c'est flou, exactement ce que j'ai demandé de ne plus faire dans la
+  // communication. » La décision en cause demandait de trancher le sort d'un nom de dépôt qui
+  // ferme la porte de publication — SANS jamais écrire ce nom. Trois périphrases à la place :
+  // « un nom de dépôt de l'écosystème », « cet objet », « qui figure aussi dans la table des noms
+  // interdits ».
+  //
+  // LA CAUSE, et elle est instructive. La règle d'anonymisation protège les noms de clients dans
+  // tout fichier suivi, et une synthèse EST un fichier suivi. Pour ne pas écrire le nom, l'agent a
+  // tourné autour — et a produit une question inutilisable sur le dépôt de l'utilisateur LUI-MÊME.
+  // Une règle qui protège un tiers a empêché de parler clairement au propriétaire de la chose.
+  //
+  // POURQUOI LES CINQ RÈGLES DU BLOC 3 NE LE VOIENT PAS. S30 compte un numéro, S15 compte
+  // VINGT-CINQ MOTS de rappel, S16 cherche une source, S31 un tableau, S32 une ligne de repli. Une
+  // périphrase fait vingt-cinq mots : elle satisfait S15 et passe les quatre autres. *Aucune ne
+  // regarde si le rappel DÉSIGNE quelque chose.*
+  //
+  // CE QUE LA RÈGLE MESURE, ET CE QU'ELLE NE MESURE PAS. Elle exige un DÉSIGNATEUR dans le rappel
+  // de sujet : un fragment entre accents graves, un chemin, un identifiant de registre, un nom de
+  // dépôt, ou un mot capitalisé qui n'ouvre pas la phrase. Elle ne juge ni la justesse du nom, ni
+  // sa suffisance : un rappel peut nommer et rester obscur, et cela reste une relecture. Elle
+  // attrape le cas mesuré — un rappel fait ENTIÈREMENT de groupes nominaux indéfinis.
+  {
+    // Le titre se présente sous DEUX formes dans le parc, et les deux se retirent : la question
+    // est DANS le gras (« **D-1 — … ?** »), ou le gras ne porte que le sélecteur et la question
+    // suit (« **Décision 1 —** Publier … ? »). Dans le second cas, le premier mot de la question
+    // est capitalisé et compterait comme un nom propre. On retire donc le gras, PUIS la question
+    // jusqu'à son point d'interrogation, PUIS tout ce qui suit « Recommandation » — ce mot est
+    // capitalisé lui aussi et suit chaque rappel. Les trois bornes ont été trouvées en écrivant la
+    // règle, sur sa propre fixture rouge, et chacune la rendait muette : une règle qui juge le
+    // mauvais fragment est verte sur le défaut qu'elle existe pour attraper.
+    const chapeauS47 = (g) => g
+      .replace(/^\s*>?\s*\*\*[^*]*\*\*/, " ")
+      .replace(/^[^?]{0,220}\?/, " ")
+      .split(/\*\*\s*Recommandation|\(a\)/)[0]
+      .replace(/\bD-\d{1,3}\b/g, " ")
+      .replace(TETE_DECISION, "").replace(/>\s*/g, " ").replace(/\|[^|]*/g, " ").replace(/\*\*/g, "").trim();
+    const NOM_PROPRE = /(?:[.!?:;]\s+|\s)(?!Ce\b|Cet\b|Cette\b|Il\b|Elle\b|On\b|Un\b|Une\b|Le\b|La\b|Les\b|Et\b|Mais\b|Or\b|Sans\b|Pour\b|Dans\b|Sur\b|Trois\b|Deux\b|Quatre\b)[A-ZÀ-Ý][\p{L}-]{2,}/u;
+    // UN NOM DE DÉPÔT N'A PAS DE MAJUSCULE, et c'est précisément le nom qui manquait le 16/09.
+    // Trois segments joints par des tirets ne forment aucun mot français — c'est un identifiant,
+    // donc un désignateur, qu'il soit entre accents graves ou nu. L'exiger entre accents graves
+    // reviendrait à imposer une typographie pour dire un nom.
+    const SLUG = /\b[a-z0-9]+(?:-[a-z0-9]+){2,}\b/;
+    const designe = (c) => _LOCALISATEURS.test(c) || ID_STABLE.test(c) || SLUG.test(c) || NOM_PROPRE.test(" " + c);
+    const muettes = groupesDecisions.filter((g) => !designe(chapeauS47(g)));
+    if (muettes.length) {
+      ko("S47", `${muettes.length} décision(s) sur ${groupesDecisions.length} dont le rappel de sujet ne NOMME rien — `
+        + "ni fragment entre accents graves, ni chemin, ni identifiant, ni nom propre. Un rappel fait de groupes "
+        + "nominaux indéfinis (« un nom de… », « cet objet », « une chose qui… ») satisfait S15 par sa longueur et "
+        + "laisse le lecteur sans savoir DE QUOI on parle : c'est le retour humain du 16/09/2026, « on ne comprend "
+        + "absolument rien au charabia ». Quand un nom sensible appartient AU LECTEUR, il s'écrit — l'arbitrage de "
+        + `publication se traite ailleurs, jamais en rendant la question floue. Ex. : ${chapeauS47(muettes[0]).replace(/\s+/g, " ").slice(0, 110)}`);
+    } else if (groupesDecisions.length) {
+      ok("S47", `${groupesDecisions.length} décision(s), chacune nommant la chose dont elle parle`);
+    } else {
+      ok("S47", "aucune décision à nommer");
+    }
+  }
+
   // ---- S23 (TF-0572, 24/08) — UN DÉSIGNATEUR INVENTÉ PAR L'AGENT ÉCHAPPE À S15 COMME À S20 ---
   //
   // LE FAIT. Le dossier remis le 24/08 nommait ses objets par des codes que l'agent venait de créer
@@ -1680,99 +1933,6 @@ function juger(texte, cheminJuge = null) {
     }
   }
 
-  // ---- S44 (14/09/2026, TF-0988) — UN MOT D'EXCLUSIVITÉ RESTREINT LE CONTENU DU LIVRABLE -------
-  //
-  // LE FAIT, remonté à la demande du destinataire : « crée un nouveau fichier […] uniquement avec
-  // ces 66 colonnes en cible ». La page livrée portait bien 66 lignes au tableau des champs, et
-  // CONSERVAIT un tableau des 276 colonnes écartées, une carte de chiffres et une légende à leur
-  // sujet : 342 colonnes affichées, exactement ce que la demande excluait. Le bloc 6 déclarait trois
-  // écarts, pas celui-là, et cet oracle rendait PASS sur 41 règles. TF-0176 couvrait
-  // l'AFFAIBLISSEMENT noyé dans un long message ; ce cas en est le symétrique — l'ENRICHISSEMENT
-  // non demandé — et rien ne le couvrait.
-  //
-  // CE QUE LA RÈGLE EXIGE : quand une demande CITÉE au bloc 6 porte un mot d'exclusivité
-  // (vocabulaire fermé : uniquement, seulement, exclusivement, rien que, et rien d'autre, only),
-  // le bloc 6 dit ce que le livrable contient EN PLUS du périmètre nommé, ou qu'il ne contient
-  // rien d'autre.
-  //
-  // POURQUOI LA CITATION SEULE, et c'est mesuré avant d'écrire la règle : sur 115 synthèses du
-  // pilot portant un bloc 6, 16 y emploient un mot d'exclusivité — TOUS en prose (« un seul écart,
-  // qui porte seulement sur… »), AUCUN dans une demande citée. Chercher le mot dans le bloc entier
-  // aurait accusé 16 synthèses sur 115, à tort toutes les seize ; borné aux citations, le taux
-  // d'accusation sur ce corpus est de 0 sur 115. La déclaration se cherche HORS des citations :
-  // « et rien d'autre » dans la demande ne vaut pas déclaration de l'auteur.
-  {
-    const b6 = bloc(texte, BLOCS[5][0]) || "";
-    const CITATIONS = /«[^»]*»|"[^"\n]*"|“[^”]*”/g;
-    const EXCLUSIVITE = /(?<![\p{L}\p{N}_])(uniquement|seulement|exclusivement|rien que|only)(?![\p{L}\p{N}_])|et rien d['’]autre/iu;
-    const DECLARATION = /(en plus du p[ée]rim[èe]tre|contient (?:en plus|aussi|[ée]galement)|ne contient rien d['’]autre|rien d['’]autre n['’]y figure|hors p[ée]rim[èe]tre)/i;
-    const exclusives = (b6.match(CITATIONS) || []).filter((c) => EXCLUSIVITE.test(c));
-    if (!exclusives.length) ok("S44", "aucune demande citée au bloc 6 ne porte de mot d'exclusivité");
-    else if (!DECLARATION.test(b6.replace(CITATIONS, " ")))
-      ko("S44", `la demande citée ${exclusives[0].slice(0, 90)} porte un mot d'EXCLUSIVITÉ, et le bloc 6 ne dit ni ce que le livrable contient ` +
-        "EN PLUS du périmètre nommé, ni qu'il ne contient rien d'autre — un mot d'exclusivité restreint le CONTENU du livrable, pas seulement " +
-        "sa cible ; un complément hors périmètre, même utile, est un écart qui se déclare (le 342 colonnes pour 66 demandées de TF-0988)");
-    else ok("S44", `${exclusives.length} demande(s) exclusive(s) citée(s), le contenu hors périmètre est déclaré`);
-  }
-
-  // ---- S45 (14/09/2026, TF-0791) — LE RÉSULTAT SERT L'INTENTION, PAS LA LETTRE ---------------
-  //
-  // Loi transverse n° 7 et references\INTENTION.md, mot pour mot du retour humain du 01/09 :
-  // « Intention > Stratégie > Tactique > Opérationnel, puis test rétro dans l'autre sens […] À
-  // appliquer sur tous types de demande, pas uniquement sur les études d'opportunité. » Depuis le
-  // 01/09, seul l'oracle des études le jouait (E9, E10) : une restitution — la forme de TOUT
-  // message de fin de traitement — pouvait servir sa lettre sans que rien ne demande si elle
-  // servait l'intention. Décision du 08/09, option 1 : la règle porte au gabarit de restitution.
-  // Le bloc 6 compare déjà la réalisation à la LETTRE ; il porte désormais l'intention citée et le
-  // TEST RÉTRO. Seule la PRÉSENCE se mesure, comme E10 : la justesse d'une remontée ne l'est pas.
-  //
-  // ANTÉRIORITÉ : la règle ne juge que les restitutions dont l'en-tête est daté du 15/09/2026 ou
-  // après — aucune des 120 synthèses du pilot n'a pu la connaître, et un juge qui condamne ce
-  // qu'aucun geste licite ne peut plus réparer finit par se lire comme du bruit (même motif que
-  // R11 du registre et T8 du juge des lots). La date est celle que S2 exige déjà dans l'en-tête.
-  {
-    const SEUIL_S45 = "2026-09-15";
-    const enTete45 = bloc(texte, BLOCS[0][0]) || texte.slice(0, 800);
-    const m45 = enTete45.match(/\b(\d{4})-(\d{2})-(\d{2})\b|\b(\d{2})\/(\d{2})\/(\d{4})\b/);
-    const date45 = m45 ? (m45[1] ? `${m45[1]}-${m45[2]}-${m45[3]}` : `${m45[6]}-${m45[5]}-${m45[4]}`) : null;
-    const b6 = bloc(texte, BLOCS[5][0]) || "";
-    if (!date45) ok("S45", "en-tête sans date lisible — S2 le refuse ; le test rétro n'est pas jugé sans date");
-    else if (date45 < SEUIL_S45) ok("S45", `restitution datée du ${date45}, antérieure à la règle du test rétro (${SEUIL_S45}) — non jugée, antériorité déclarée`);
-    else {
-      const manque = [!/\bintention\b/i.test(b6) && "l'INTENTION citée", !/test\s+r[ée]tro/i.test(b6) && "le TEST RÉTRO"].filter(Boolean);
-      manque.length
-        ? ko("S45", `le bloc 6 ne porte pas ${manque.join(" ni ")} — le résultat se compare à la lettre ET à l'intention : ` +
-          "« Intention : « … » » dans les mots de l'humain, puis « Test rétro : … », du résultat remonté à cette intention " +
-          "(loi n° 7, references\\INTENTION.md ; une correction triviale le dit en une ligne)")
-        : ok("S45", "le bloc 6 porte l'intention citée et le test rétro");
-    }
-  }
-
-  // ---- S46 (14/09/2026, TF-0979) — UN POINT D'ÉTAPE DIT CE QUI RESTE À MESURER, ET PAR QUOI --
-  //
-  // LE FAIT : deux messages brefs d'une même session, au même moment — un déploiement lancé, dont
-  // le résultat conditionnait le verdict. Une restitution complète y était prématurée, un accusé
-  // de réception faux ; la forme dégradée n'est ouverte qu'aux sorties machine. L'agent choisissait
-  // entre deux formes fausses, et l'exemption était la moins coûteuse. La doctrine ouvre donc une
-  // forme de POINT D'ÉTAPE, JUGÉE : les huit blocs, un bloc 2 « Verdict — point d'étape » qui porte
-  // ce qui est mesuré (S3) ET « reste à mesurer : <quoi> — par <quoi> ». S46 juge ce second terme :
-  // un point d'étape qui ne dit pas ce qui manque ni ce qui le mesurera est un verdict partiel
-  // déguisé. Antériorité : restitutions datées du 15/09/2026 ou après (même borne que S45 — le
-  // corpus porte un « point d'étape » du 05/09 qui ne pouvait pas connaître la règle).
-  {
-    const SEUIL_S46 = "2026-09-15";
-    const enTete46 = bloc(texte, BLOCS[0][0]) || texte.slice(0, 800);
-    const m46 = enTete46.match(/\b(\d{4})-(\d{2})-(\d{2})\b|\b(\d{2})\/(\d{2})\/(\d{4})\b/);
-    const date46 = m46 ? (m46[1] ? `${m46[1]}-${m46[2]}-${m46[3]}` : `${m46[6]}-${m46[5]}-${m46[4]}`) : null;
-    const bV46 = bloc(texte, BLOCS[1][0]) || "";
-    if (!/point\s+d['’][ée]tape/i.test(bV46)) ok("S46", "verdict ordinaire — pas un point d'étape");
-    else if (!date46 || date46 < SEUIL_S46) ok("S46", `point d'étape ${date46 ? `daté du ${date46}, ` : "sans date lisible, "}antérieur à la règle (${SEUIL_S46}) — non jugé, antériorité déclarée`);
-    else if (!/reste\s+[àa]\s+mesurer[\s\S]{0,300}?\bpar\b/i.test(bV46))
-      ko("S46", "le bloc 2 se déclare POINT D'ÉTAPE sans dire « reste à mesurer : <quoi> — par <quoi> » — un point d'étape qui ne nomme ni ce qui manque ni ce qui le mesurera " +
-        "est un verdict partiel déguisé (gabarits\\RESTITUTION.md, forme de point d'étape, TF-0979)");
-    else ok("S46", "point d'étape : ce qui reste à mesurer est nommé, avec ce qui le mesurera");
-  }
-
   // ---- S43 (12/09/2026, TF-1064) — LE STYLE DE LA RESTITUTION RELÈVE DU PLANCHER D'ÉCRITURE ----
   //
   // LE FAIT. Quarante-deux règles jugent la FORME d'une restitution (blocs, sélecteurs, preuves,
@@ -1822,6 +1982,210 @@ function juger(texte, cheminJuge = null) {
             : `style PASS (${j43.mots || "?"} mots, aucune famille au-dessus de son seuil)`);
         }
       }
+    }
+  }
+
+  // ---- S44 (16/09/2026, TF-0988) — UN MOT D'EXCLUSIVITÉ RESTREINT LE CONTENU, PAS LA CIBLE ----
+  //
+  // LE FAIT, remonté sur demande explicite du destinataire. Demande : « Crée un nouveau fichier
+  // […] UNIQUEMENT avec ces 66 colonnes en cible ». Livraison : une page dont le tableau des
+  // champs portait bien 66 lignes, mais qui CONSERVAIT un tableau de 276 lignes listant les
+  // colonnes écartées, plus une carte de chiffres et une légende à leur sujet — 276 sur 276
+  // retrouvées dans la page, 342 colonnes affichées au total, exactement ce que la demande
+  // excluait. Retour humain : « je reçois un HTML avec les 342 colonnes, comme avant, pourquoi ? »
+  //
+  // POURQUOI LE BLOC 6 NE L'A PAS VU. Il déclarait TROIS écarts — une colonne de tableau en plus,
+  // quatre livrables non réduits, le radical du fichier — et pas celui-là, parce que le producteur
+  // avait lu « en cible » comme « cible du lineage » et tenu les colonnes écartées pour de la
+  // documentation légitime. `oracle-synthese` rendait PASS sur 41 règles. Coût : un aller-retour
+  // complet, et un destinataire qui redemande ce qu'il avait écrit clairement.
+  //
+  // CE QUE LA RÈGLE AJOUTE À CE QUI EXISTAIT. La doctrine couvre depuis TF-0176 l'AFFAIBLISSEMENT
+  // noyé dans un long message. Ceci en est le SYMÉTRIQUE — l'ENRICHISSEMENT non demandé — et rien
+  // ne le couvrait : ajouter « pour information » est le geste le plus naturel du monde, et c'est
+  // précisément pour ça qu'il passe. Le vocabulaire d'exclusivité est FERMÉ, donc la règle est
+  // mécanisable ; elle n'exige pas de compter ce qu'il y a en plus — indécidable ici —, seulement
+  // que la question soit POSÉE dans le bloc qui existe pour ça.
+  //
+  // DEUX BORNES, et les deux viennent de défauts payés ailleurs dans ce fichier. (1) « et rien
+  // d'autre » est retiré du vocabulaire d'exclusivité alors que la demande peut l'employer : il
+  // appartient au vocabulaire de DÉCLARATION, et le laisser des deux côtés ferait satisfaire la
+  // règle par le mot même qui la déclenche — la boucle de S13 avant TF-1085. (2) « non seulement »
+  // est retiré : c'est une charnière de prose, jamais une restriction de périmètre.
+  {
+    const b6 = bloc(texte, BLOCS[5][0]) || "";
+    const EXCLUSIVITE = uni(/\b(uniquement|seulement|exclusivement|rien que|only)\b/i);
+    const b6Net = horsCode(b6).replace(/\bnon seulement\b/gi, " ");
+    const DECLARATION = uni(/(rien d'autre|rien de plus|aucun autre|aucune autre|en plus (?:du|de la|des)|hors p[ée]rim[èe]tre|en sus|ni plus ni moins|exactement (?:les|ces|ce))/i);
+    if (!EXCLUSIVITE.test(b6Net))
+      ok("S44", "aucun mot d'exclusivité dans la demande citée — rien à borner");
+    else if (DECLARATION.test(b6Net))
+      ok("S44", "la demande porte un mot d'exclusivité, et le bloc 6 déclare ce que le livrable contient en plus — ou qu'il ne contient rien d'autre");
+    else
+      ko("S44", "la demande citée porte un mot d'EXCLUSIVITÉ (« uniquement », « seulement »…) et le bloc 6 " +
+        "ne dit pas ce que le livrable contient EN PLUS du périmètre nommé — ni qu'il ne contient rien d'autre. " +
+        "Un mot d'exclusivité restreint le CONTENU, pas seulement la cible : l'ajout « pour information » d'un " +
+        "complément hors périmètre est un écart, même utile (TF-0988)");
+  }
+
+  // ---- S45 (16/09/2026, TF-1127) — UN BLOQUANT S'ÉNONCE EN ENTIER, AU MÊME ENDROIT ------------
+  //
+  // LE RETOUR EST LA MESURE, mot pour mot (13/09/2026) : « S'il y a des bloquants pour avancer, il
+  // faut les afficher pour que l'utilisateur puisse les traiter, et cela sans avoir à fouiller dans
+  // un fichier quelque part. »
+  //
+  // LE FAIT, sur une restitution jugée PASS : la production était arrêtée, et ce qui la bloquait
+  // était réparti entre TROIS blocs — le bloc 3, dont une décision NOMMAIT « le préalable
+  // bloquant » et RENVOYAIT à une section d'un autre document sans en reprendre le contenu ; le
+  // bloc 5, trois puces dont aucune ne disait comment les lever ; le bloc 8, quatre lignes portant
+  // la même information sous une troisième forme. Les trois valeurs réellement attendues
+  // n'apparaissaient NULLE PART en clair et rassemblées.
+  //
+  // LA CAUSE EST DE GABARIT, PAS DE RÉDACTION, et c'est ce qui rend la règle légitime : un
+  // bloquant est simultanément un non-traité (bloc 5), une décision (bloc 3), une action à
+  // débloquer (bloc 8) et un risque s'il dure (bloc 7). Le gabarit GARANTISSAIT donc qu'il soit
+  // écrit quatre fois et jamais en entier. S5 exige un motif par élément non traité ; elle
+  // n'exige ni que le motif soit ACTIONNABLE, ni que le bloquant soit AUTOPORTANT.
+  //
+  // PORTÉE VOLONTAIREMENT ÉTROITE, et la moitié écartée est dite en `non_juge`. Le lot proposait
+  // DEUX déclencheurs : un motif de la famille bloquante au bloc 5, OU une ligne `auto_ia` non
+  // exécutée au bloc 8. Le second a été mesuré sur le corpus du pilot avant d'être écrit : presque
+  // toute restitution porte au moins une `auto_ia` motivée — S11 l'exige —, donc ce déclencheur
+  // aurait accusé la quasi-totalité du corpus pour des tours qui n'étaient PAS arrêtés. Une règle
+  // qui crie partout ne dit plus rien. Seul le bloc 5 déclenche : un ÉLÉMENT NON TRAITÉ dont le
+  // motif est un obstacle, c'est la définition d'un traitement arrêté.
+  {
+    const b3 = bloc(texte, BLOCS[2][0]) || "";
+    const b5 = bloc(texte, BLOCS[4][0]) || "";
+    const FAMILLE_BLOQUANTE = /\b(garde_fou|dependance_bloc_3|dependance_externe|gate_gouvernance)\b/;
+    const bloquants = puces(b5).filter((l) => FAMILLE_BLOQUANTE.test(l));
+    if (!bloquants.length) {
+      ok("S45", "aucun élément non traité pour cause d'obstacle — rien à inventorier");
+    } else {
+      // L'INVENTAIRE SE DÉCLARE, IL NE SE DEVINE PAS. Un premier jet le cherchait « avant la
+      // première décision », et cette lecture s'est retournée contre elle-même sur sa propre
+      // fixture verte : une puce d'inventaire OUVRE un segment pour `decisionsDuBloc`, donc elle
+      // devenait la première décision et l'inventaire mesurait zéro entrée. *Un repère positionnel
+      // qui dépend du découpage qu'il précède n'est pas un repère.* Le gabarit prescrit donc un
+      // LIBELLÉ — le mot « bloquant(s) » sur sa ligne —, et la règle le lit : un mot déclaré se
+      // trouve sans dépendre d'une segmentation, et il apprend au rédacteur ce qu'on attend de lui.
+      // LA BORNE DE LONGUEUR NE SERVAIT À RIEN ET A COÛTÉ UN REFUS, le jour même de l'écriture de la
+      // règle. Un premier jet bornait le libellé à quatre-vingts caractères de part et d'autre du mot ;
+      // la PREMIÈRE restitution qui a ouvert un inventaire l'a écrit sur une ligne plus longue, et la
+      // règle a refusé un document qui la satisfaisait. *Une borne qu'aucun fait ne justifie est un
+      // piège qu'on se tend à soi-même* : le mot se cherche sur la ligne, sans condition de longueur.
+      const mLabel = /(^|\n)[^\n]*\bbloquants?\b[^\n]*(\n|$)/i.exec(b3);
+      if (!mLabel) {
+        ko("S45", `${bloquants.length} élément(s) bloqué(s) au bloc 5 (motif garde_fou, dependance_bloc_3, ` +
+          "dependance_externe, gate_gouvernance) et AUCUN inventaire des bloquants au bloc 3 — quand un traitement est " +
+          "arrêté, le bloc 3 s'ouvre par cet inventaire, chaque entrée disant ce qui est bloqué, ce qu'il faut fournir " +
+          "ou décider pour le lever, et ce qui se passe si rien n'est fourni (TF-1127)");
+      } else {
+        const apres = b3.slice(mLabel.index + mLabel[0].length);
+        // L'inventaire s'arrête à la première DÉCISION, quelle que soit sa mise en page — sélecteur
+        // `D-N`, « Décision 1 », ou bloc de citation numéroté (les trois formes que le bloc 3 admet).
+        const mFin = /(^|\n)\s*(?:>\s*)?(?:[-*+]\s+|#{2,6}\s*)?\**\s*(?:D\s*-\s*\d{1,3}|D[ée]cision\s*n?[°ºo]?\s*\d{1,3})/i.exec(apres);
+        const zone = mFin ? apres.slice(0, mFin.index) : apres;
+        const entrees = puces(zone).concat(lignesDeDonnees(zone));
+        // UN BLOQUANT QUI RENVOIE N'EST PAS ÉNONCÉ : un chemin de fichier ou un renvoi à une autre
+        // section est exactement le geste que le retour dénonce — « sans avoir à fouiller ».
+        const RENVOI = /(\bvoir\b|\bcf\.|\bsection\b|\bchapitre\b|\bbloc\s*\d|[A-Za-z0-9_-]+\\[A-Za-z0-9_\\.-]+|\.(?:md|json|mjs|html|jsonl|py)\b)/i;
+        const renvoyants = entrees.filter((l) => RENVOI.test(l));
+        if (entrees.length < bloquants.length)
+          ko("S45", `${bloquants.length} élément(s) bloqué(s) au bloc 5 et ${entrees.length} entrée(s) sous l'inventaire ` +
+            "des bloquants du bloc 3 — chaque bloquant s'y énonce, sinon le lecteur le lit en morceaux dans trois blocs " +
+            "et jamais en entier (TF-1127)");
+        else if (renvoyants.length)
+          ko("S45", `${renvoyants.length} bloquant(s) de l'inventaire RENVOIENT à un fichier ou à une autre section au lieu ` +
+            `de s'énoncer : « ${renvoyants[0].replace(/\s+/g, " ").trim().slice(0, 90)} » — un bloquant qu'il faut aller ` +
+            "chercher ailleurs n'est pas affiché, et c'est le geste que le retour du 13/09 dénonce");
+        else
+          ok("S45", `${bloquants.length} bloquant(s) inventorié(s) au bloc 3, chacun énoncé sur place`);
+      }
+    }
+  }
+
+  // ---- S46 (16/09/2026, TF-1045) — LE MOT QUE LE DESTINATAIRE NE LIT PAS ---------------------
+  //
+  // LE FAIT, et c'est un DEUXIÈME retour sur un mot déjà corrigé. Le 08/09, un client dit ne pas
+  // lire le terme employé ; l'item est clos « corrigé ». Le 10/09, il redemande le même mot.
+  // Mesure du 11/09 : `gabarits\JARGON-A-GLOSER.json` ne portait pas le terme (0 entrée), le
+  // `CLAUDE.md` du produit ne citait ni glossaire ni lexique, et CET ORACLE — le gate que toute
+  // synthèse traverse (R-44) — ne lisait aucun glossaire ; deux synthèses employant le terme
+  // étaient PASS sur 41 règles. *Une correction qui vit dans le registre du pilot et nulle part
+  // sur le chemin du producteur n'est pas câblée* (loi n° 1, et R12 mot pour mot).
+  //
+  // LA RÈGLE EST LA JUMELLE D'EC-7, et les deux lisent la MÊME donnée par le MÊME module
+  // (`lib-lexique.mjs`) : en réimplémenter une seconde lecture serait la classe
+  // `oracle-remplace-par-controle-maison` que le registre compte par ailleurs. EC-7 attrape le mot
+  // à l'écriture du livrable, S46 à la fin du tour — deux portes, une liste.
+  //
+  // LE LEXIQUE EST CELUI DU PRODUIT, pas une liste globale, et ce choix est la règle elle-même :
+  // le terme fondateur est un mot ordinaire du français, juste dans la doctrine du pilot ; une
+  // liste globale accuserait la prose de la factory pour un retour reçu ailleurs. Absent : SANS
+  // OBJET, dit à voix haute et jamais PASS par silence. Les citations ne sont pas jugées — un nom
+  // de champ entre accents graves n'est pas une déclaration d'intention de l'auteur (TF-0992).
+  {
+    const lex = chargerLexique({ cheminJuge });
+    if (!lex.trouve)
+      findings.push({ regle: "S46", statut: "SANS_OBJET", message: "aucun lexique de client dans le socle de ce projet (forge\\LEXIQUE.json, docs\\projet\\LEXIQUE.json ou references\\LEXIQUE.json) — vocabulaire du destinataire non jugé" });
+    else if (lex.illisible)
+      findings.push({ regle: "S46", statut: "SANS_OBJET", message: `lexique ILLISIBLE (${lex.chemin}) : ${lex.illisible} — ce n'est pas un constat sur la restitution` });
+    else if (!lex.termes.length)
+      findings.push({ regle: "S46", statut: "SANS_OBJET", message: `lexique présent et VIDE (${lex.chemin}) — aucun terme n'a encore coûté d'aller-retour` });
+    else {
+      const employes = termesEmployes(texte, lex.termes);
+      employes.length
+        // L'ORIGINE SE DIT (TF-1150) : un terme du lexique TRANSVERSE n'a pas été refusé par le
+        // lecteur de CE produit, il a été tranché par le décideur pour tous. L'auteur qui lit le
+        // constat doit savoir laquelle des deux listes le lui oppose, sinon il cherche le retour
+        // dans le mauvais dossier.
+        ? ko("S46", `${employes.length} terme(s) proscrit(s) par le lexique du destinataire : ` +
+            employes.map((t) => `« ${t.proscrit} » (${t.occurrences}) → « ${t.remplacer_par || "à remplacer"} »`
+              + (t.origine === "transverse" ? " [transverse : décision humaine pour TOUS les produits]" : "")).join(" · ") +
+            " — un mot qui a coûté un aller-retour au client ne revient pas dans la restitution qui annonce sa correction")
+        : ok("S46", `aucun des ${lex.termes.length} terme(s) proscrit(s) du lexique n'est employé`);
+    }
+  }
+
+  // ---- S48 (17/09/2026, TF-1166, décision humaine D-3 (a)) — CHEZ UN PRODUIT, LE TOUR DIT CE QU'IL REMONTE ----
+  //
+  // LE FAIT. Le 30/08, la mesure établit que le canal par lequel un produit remonte ses retours n'a
+  // ni déclencheur ni transport : 7 sources sur 15 n'avaient émis qu'un seul jour, silence médian de
+  // 8 jours. La décision posée alors est restée sans exécution ; le 17/09, le silence médian est de
+  // 11 jours et 21 sources se taisent depuis plus de 7 jours (`todo\RECIDIVES.md` section 7).
+  // *Ne rien remonter et n'avoir rien à remonter sont indiscernables* — et c'est la loi transverse
+  // n° 3 mot pour mot : l'oubli n'existe pas, ce qui s'écarte s'écarte explicitement.
+  //
+  // CE QUI S'AUTOMATISE EST L'OBLIGATION, JAMAIS LE CONTENU (mesure du 30/08 : 59 % seulement des
+  // verdicts de contrôle sont extractibles, et 414 entrées de journal sur 610 étaient du bruit). La
+  // règle n'exige donc aucun retour : elle exige que le tour DISE s'il en remonte un. « Rien à
+  // remonter » est une réponse valide ; le silence ne l'est pas.
+  //
+  // PORTÉE : un PRODUIT, reconnu à son `forge\retours\` — le dossier d'où partent ses lots. Le pilot
+  // et les forges n'en portent pas : SANS_OBJET, dit à voix haute. Elle joue à la fin d'un tour,
+  // quand la session du produit est DÉJÀ ouverte : c'est la seule pièce du canal qui ne coûte aucun
+  // geste de plus à l'humain. AVERTISSANTE, comme toute règle neuve depuis la v2.5.0.
+  {
+    const departs = [];
+    if (cheminJuge) { try { departs.push(dirname(resolve(cheminJuge))); } catch { /* chemin non résolu */ } }
+    let estProduit = false;
+    for (let d of departs) for (let i = 0; i < 12 && d; i++) {
+      if (existsSync(join(d, "forge", "retours"))) { estProduit = true; break; }
+      const parent = dirname(d); if (parent === d) break; d = parent;
+    }
+    if (!estProduit)
+      findings.push({ regle: "S48", statut: "SANS_OBJET", message: "la restitution jugée ne vit pas chez un produit (aucun forge\\retours\\ en remontant depuis son fichier) — remontée à la factory non jugée" });
+    else {
+      const ligne = (texte.match(/^[^\n]*remont[ée]e (?:à|a|vers) la factory[^\n]*$/gim) || [])[0] || null;
+      if (!ligne)
+        ko("S48", "le tour ne dit pas ce qu'il remonte à la factory — une ligne « Remontée à la factory : rien à remonter » " +
+          "ou « Remontée à la factory : lot <produit> - RETOURS - AAAAMMJJ<indice> remis » est due (bloc 9). Ne rien remonter " +
+          "et n'avoir rien à remonter sont indiscernables sans elle : 21 sources muettes depuis plus de 7 jours le 17/09 (TF-1166)");
+      else if (!/rien (?:à|a) remonter/i.test(ligne) && !/RETOURS - \d{8}[a-z]+/.test(ligne))
+        ko("S48", `la ligne de remontée ne tranche pas : ni « rien à remonter », ni un lot nommé « … - RETOURS - AAAAMMJJ<indice> » — ${ligne.trim().slice(0, 140)}`);
+      else
+        ok("S48", /rien (?:à|a) remonter/i.test(ligne) ? "le tour déclare n'avoir rien à remonter à la factory" : "le tour nomme le lot de retours remis à la factory");
     }
   }
 
@@ -1970,6 +2334,136 @@ function juger(texte, cheminJuge = null) {
         "que ne rien faire est sans effet. Formes admises : « si rien n'est décidé », « sans décision », " +
         `« à défaut : », « par défaut : ». Ex. : ${sansRepli[0][0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
     } else ok("S32", `${groupesLignes.length} décision(s), chacune nommant ce qui se passe si rien n'est décidé`);
+
+    // ---- S49 (17/09/2026, TF-1172) — UNE OPTION QUI COMMANDE UN GESTE HUMAIN DIT COMMENT LE FAIRE
+    //
+    // LE RETOUR EST LA MESURE, mot pour mot (16/09/2026) : « Tu dis ce qu'il faut faire, mais tu ne
+    // dis pas comment le faire simplement ? Du coup, on ne sait pas quoi faire. » La décision D-35 de
+    // la restitution du 16/09, jugée PASS sur 46 règles, demandait par quel chemin rouvrir la
+    // connexion Power BI, avec trois options portant chacune son coût et ce qu'elle exclut. Le mode
+    // opératoire — ouvrir un terminal, coller la commande de connexion, saisir le code dans le
+    // navigateur, valider le second facteur — existait, SOIXANTE LIGNES PLUS BAS, dans une action du
+    // bloc 8. Le lecteur tranche au bloc 3 et n'y va pas : la décision a dû être reposée au tour
+    // suivant.
+    //
+    // POURQUOI LES CINQ RÈGLES DU BLOC 3 NE LE VOIENT PAS. S31 exige d'une option son coût et ce
+    // qu'elle exclut, S16 une recommandation sourcée, S32 une ligne de repli, S15 et S47 un rappel
+    // qui nomme sa chose. Aucune ne regarde ce que le lecteur devra FAIRE une fois qu'il aura
+    // choisi. S13 pose cette exigence au bloc 8 — une action laissée à l'humain est exécutable telle
+    // quelle — et n'avait aucun symétrique au bloc 3, alors que le choix s'y fait.
+    //
+    // CE QUE LA RÈGLE MESURE, ET CE QU'ELLE NE MESURE PAS. Le vocabulaire des gestes est FERMÉ et
+    // ÉTROIT : des verbes où l'humain agit de ses mains sur un terminal, un écran ou un compte.
+    // « Publier », « valider », « ouvrir » employés seuls en sont EXCLUS — ils disent une intention,
+    // pas un geste, et les admettre accuserait la quasi-totalité du corpus, comme le second
+    // déclencheur écarté de S45. Une option qui porte un tel verbe doit être exécutable SUR PLACE :
+    // un localisateur dans sa ligne (commande entre accents graves, chemin, libellé d'écran), ou une
+    // ligne « Comment faire » dans le groupe de la décision. En tableau, une colonne « Comment
+    // faire » suffit — une ligne se juge avec son en-tête, comme pour S19 et S31.
+    //
+    // BORNE ASSUMÉE : un chemin cité dans l'option satisfait la règle sans énoncer les étapes. La
+    // règle juge qu'il y a DE QUOI exécuter là où le choix se fait, pas la qualité du mode
+    // opératoire — l'exiger en étapes numérotées imposerait une typographie, et une règle qui crie
+    // sur une option exécutable se fait désactiver. Taux d'accusation mesuré sur les synthèses
+    // d'`output\04-plans\` avant mise en service (le corpus antérieur n'est pas réécrit).
+    const GESTE_HUMAIN = /(se connecter|connectez-vous|s['’]authentifier|authentifiez-vous|saisir|saisissez|coller|collez|taper |tapez |cliquer|cliquez|installer|installez|ouvrir (?:un |le |la |l['’])?(?:terminal|console|invite de commande|navigateur)|lancer (?:la |une )?commande|ex[ée]cuter (?:la |une |le )?(?:commande|script)|valider (?:le |la |un )?(?:second facteur|double authentification|code|MFA)|publier soi-m[êe]me|pousser soi-m[êe]me|renouveler (?:le |un )?(?:jeton|secret|mot de passe))/i;
+    const COMMENT_FAIRE = /(comment faire|mode op[ée]ratoire|marche [àa] suivre)/i;
+    const sansGeste = [];
+    let gestes = 0;
+    for (const g of groupesLignes) {
+      const entete = g.find((l) => /^\s*\|/.test(l)) || "";
+      const enteteComment = COMMENT_FAIRE.test(entete);
+      // La ligne « Comment faire » du groupe porte elle-même son localisateur : un libellé nu
+      // (« Comment faire : voir plus bas ») est le renvoi que le retour du 16/09 dénonce.
+      const groupeComment = g.some((l) => !RE_LIGNE_OPTION.test(l) && COMMENT_FAIRE.test(l) && _LOCALISATEURS.test(l));
+      for (const l of g) {
+        if (!RE_LIGNE_OPTION.test(l)) continue;
+        if (OPTION_PAR_DEFAUT.test(l)) continue;
+        if (!GESTE_HUMAIN.test(l)) continue;
+        gestes++;
+        const enTableau = /^\s*\|/.test(l);
+        if (!(_LOCALISATEURS.test(l) || groupeComment || (enTableau && enteteComment))) sansGeste.push(l);
+      }
+    }
+    if (!gestes) ok("S49", "aucune option ne commande un geste humain — rien dont dire le comment");
+    else if (sansGeste.length) {
+      ko("S49", `${sansGeste.length} option(s) sur ${gestes} commandant un GESTE HUMAIN sans dire COMMENT le faire — ` +
+        "le lecteur sait quoi choisir et ne sait pas quoi faire, et le mode opératoire écrit soixante lignes " +
+        "plus bas au bloc 8 ne lui sert pas : il tranche ici. Dû sur place : la commande ou le chemin entre " +
+        "accents graves, le libellé de l'écran à ouvrir, ou une ligne « Comment faire : 1) … 2) … 3) … » dans " +
+        "le groupe de la décision (en tableau, une colonne « Comment faire » suffit). C'est le retour humain " +
+        "du 16/09/2026 : « Tu dis ce qu'il faut faire, mais tu ne dis pas comment le faire simplement ? Du " +
+        `coup, on ne sait pas quoi faire. » Ex. : ${sansGeste[0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
+    } else ok("S49", `${gestes} option(s) commandant un geste humain, chacune exécutable là où le choix se fait`);
+  }
+
+  // ---- S51 (17/09/2026, TF-0791) — LE BLOC 1 DIT L'INTENTION, ET IL DIT SI ELLE EST SERVIE ----
+  //
+  // LE FAIT QUI FONDE LA RÈGLE, et il est vieux de seize jours. Le 01/09, une étude d'opportunité
+  // CONFORME à sa définition et VERTE à tous ses contrôles a été refusée par son destinataire :
+  // sept questions de son retour restaient sans réponse dans le texte. La loi transverse n° 7 en
+  // est née — « le résultat sert l'intention, pas la lettre » — avec `references\INTENTION.md` et
+  // deux règles d'oracle. Mais ces deux règles (E9, E10) ne mordent que sur l'ÉTUDE, alors que le
+  // retour humain disait « tous types de demande ». Le champ `intention` et le test rétro sont au
+  // bloc 1 du gabarit depuis le 17/09 ; il manquait le juge, et *une règle que rien n'exécute
+  // décore* — c'est le constat commun aux treize récidives de la classe.
+  //
+  // CE QUE LA RÈGLE JUGE, et ce qu'elle laisse au lecteur : la PRÉSENCE des deux pièces, jamais
+  // leur justesse. Qu'une intention soit bien nommée, qu'un test rétro soit sincère, aucun oracle
+  // ne peut le voir — c'est au `non_juge`. Ce qu'elle rend impossible, c'est de rendre un travail
+  // sans avoir écrit une seule fois à quoi il servait.
+  //
+  // AVERTISSANTE à son entrée (hors de `BLOQUANTES` du hook), et ce n'est pas de la prudence de
+  // façade : le champ est né le 17/09, le corpus d'`output\04-plans\` ne l'a jamais porté, et une
+  // règle bloquante ferait relire huit blocs à chaque restitution jusqu'à ce que le corpus ait
+  // tourné. Elle se durcira comme la v2.0.0 avant elle.
+  {
+    const b1 = horsCode(bloc(texte, BLOCS[0][0]) || "");
+    const aIntention = /\bintention\b/i.test(b1);
+    const aRetro = /test\s+r[ée]tro/i.test(b1);
+    // Une intention se dit en une PHRASE : l'étiquette seule (« intention : — ») ne dit rien. Le
+    // compte porte sur la puce qui la porte, ou sur le bloc entier quand le bloc 1 n'est pas en
+    // puces — les deux formes sont admises par le gabarit (« sur une ligne ou deux »).
+    const zone = puces(b1).find((l) => /\bintention\b/i.test(l)) || b1;
+    const substantielle = compteMots(zone) >= 12;
+    if (aIntention && aRetro && substantielle) ok("S51", "bloc 1 : l'intention est dite et le test rétro est posé");
+    else {
+      const manques = [];
+      if (!aIntention) manques.push("l'INTENTION initiale de la demande");
+      else if (!substantielle) manques.push("une intention SUBSTANTIELLE (l'étiquette seule ne dit rien)");
+      if (!aRetro) manques.push("le TEST RÉTRO (« le résultat répond-il à cette intention, et pas seulement à la lettre ? »)");
+      ko("S51", `bloc 1 sans ${manques.join(" ni ")} — loi transverse n° 7, \`references\\INTENTION.md\` : `
+        + "un livrable conforme à la lettre et refusé par son destinataire a coûté une étude entière le 01/09 (TF-0791)");
+    }
+  }
+
+  // ---- S50 (17/09/2026, TF-1182) — CE QUE LE POINT D'ÉTAPE PAIE POUR N'AVOIR PAS DE VERDICT ----
+  //
+  // Le gabarit le dit en trois clauses, et une seule est allégeante : blocs 1, 4 et 8 OBLIGATOIRES
+  // ET PLEINS · bloc 2 remplacé par la ligne de mesure (S3, second sens) · blocs 3, 5, 6, 7 et 9
+  // admis en une ligne, comme partout ailleurs. Sans S50, déclarer « point d'étape » au bloc 1
+  // suffirait à désarmer S3 sans rien donner en échange : ce serait une exemption déguisée en
+  // forme jugée, c'est-à-dire exactement ce que TF-0979 a créé le point d'étape pour empêcher.
+  //
+  // Les seuils sont bas et volontairement grossiers — huit jetons pour la ligne d'identification,
+  // douze pour le traité et pour les prochaines actions. Ils n'existent pas pour noter la prose :
+  // ils refusent le bloc VIDE et le bloc qui déclare son vide (« aucun », « rien »). Un point
+  // d'étape dont le traité est « rien encore » n'est pas un point d'étape, c'est une attente, et
+  // l'attente se dit au bloc 5 avec son motif.
+  //
+  // AVERTISSANTE à son entrée (hors de `BLOQUANTES` du hook), comme la doctrine v2.5.0 le prescrit
+  // pour toute règle neuve : elle se durcira quand le corpus l'aura absorbée.
+  if (!pointEtape) {
+    findings.push({ regle: "S50", statut: "SANS_OBJET",
+      message: "cette restitution ne se déclare pas « point d'étape » au bloc 1 — l'obligation des blocs 1, 4 et 8 pleins ne s'applique pas" });
+  } else {
+    const creux = [[0, "1. En-tête d'identification", 8], [3, "4. Traité", 12], [7, "8. Prochaines actions", 12]]
+      .filter(([i, , seuil]) => !estPlein(bloc(texte, BLOCS[i][0]) || "", seuil))
+      .map(([, nom]) => nom);
+    creux.length
+      ? ko("S50", `point d'étape : bloc(s) obligatoire(s) non PLEIN(s) — ${creux.join(" · ")}. Le point d'étape échange le `
+        + "verdict contre trois blocs pleins ; vide, il n'est plus qu'une exemption déguisée en forme jugée")
+      : ok("S50", "point d'étape : les blocs 1, 4 et 8 sont pleins");
   }
 
   return findings;
@@ -1988,7 +2482,7 @@ fonctionne. Rien n'attend de correction ; la seule chose attendue de vous est la
 publication ci-dessous.
 
 ## 1. En-tête
-Campagne · forge-tests · terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot.
+Campagne · forge-tests · terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot · intention : prouver que la surveillance de la forge de tests attrape ce qu'elle doit attraper, pas seulement faire tourner la recette. Test rétro : les 19 défauts plantés sont tous détectés, l'intention est servie.
 
 ## 2. Verdict
 Recette S-01 (banc rouge de la forge de tests) TENU — 19/19 défauts détectés au banc rouge, pytest 365.
@@ -2050,7 +2544,7 @@ Aucun écart : la demande a été suivie à la lettre.
       "\n| id | acteur | action |\n|---|---|---|\n| A1 | manuelle_utilisateur | ouvrir le portail |\n| A2 | manuelle_utilisateur | créer la ligne GITHUB_JETON= dans le fichier .env et y coller le jeton |\n" +
       "\n| acteur | quoi |\n|---|---|\n| auto_ia | regrouper les constats |\n")
     .replace(/\n\nLe contrôle complet[\s\S]*?ci-dessous\./, "")  // S9 : plus d ouverture
-    .replace("terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot.", "terminée aujourd'hui.")
+    .replace("terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot ·", "terminée aujourd'hui ·")
     .replace("- Regroupement par cause racine : motif — sa cause est traitée, critère de réouverture écrit.", "- Regroupement par cause racine")
     .replace("Coût de la reprise proposée : complexité moyen · durée court.", "Coût de la reprise proposée : 2-3 j.")
     .replace("Recette S-01 (banc rouge de la forge de tests) TENU — 19/19 défauts détectés au banc rouge, pytest 365.", "Tout s'est bien passé.")
@@ -2124,7 +2618,7 @@ Aucun écart : la demande a été suivie à la lettre.
     // et l'élargissement des localisateurs. Si l'une des deux se défait, S16 tombe ici.
     "> **Recommandation : (a).** Source consultée : la chaîne d'intégration .github/workflows/recette.yml, dont le dernier passage ne porte aucun défaut ouvert.",
     "",
-    "| Option | Ce qu'elle coûte | Ce qu'elle exclut |",
+    "| Option | Coût | Exclusions |",
     "|---|---|---|",
     "| **(a)** Taguer v1.12.0 maintenant | Effort simple × court | Exclut de grouper cette sortie avec le prochain lot |",
     "| **(b)** Attendre le prochain lot | Les 26 commits restent locaux | Exclut la publication cette semaine |",
@@ -2146,6 +2640,38 @@ Aucun écart : la demande a été suivie à la lettre.
   writeFileSync(join(dir, "selecteur-double.md"), selecteurDouble, "utf8");
   const numeroNu = verte.replace("- **Décision 1 —** Publier", "- **1.** Publier");
   writeFileSync(join(dir, "numero-nu.md"), numeroNu, "utf8");
+  // S47 (retour humain du 16/09/2026) — LE RAPPEL QUI NE NOMME RIEN. La fixture remplace le
+  // rappel de la décision par des périphrases, sans rien changer d'autre : même numéro, même
+  // longueur, mêmes options, même source. Elle passe donc S15, S16, S30, S31 et S32 — et c'est
+  // exactement ce qui s'est produit le 16/09. La verte, elle, est la fixture d'origine : son
+  // rappel nomme la forge de tests et cite un journal entre accents graves.
+  const decisionMuette = verte.replace(
+    "- **Décision 1 —** Publier la version corrigée de la forge de tests ? Le banc rouge vient de tourner en entier :\n"
+    + "  chaque défaut planté volontairement a été détecté, donc la surveillance fonctionne et la\n"
+    + "  version est prête à sortir. Publier la rend visible aux autres projets ; ne pas publier la\n"
+    + "  laisse sur ce poste, et personne d'autre n'en profite tant qu'on attend.",
+    "- **Décision 1 —** Publie-t-on la version corrigée, ou attend-on ? Un des outils de la chaîne vient de\n"
+    + "  passer son contrôle en entier, donc cette chose est prête à sortir. La rendre visible aux\n"
+    + "  autres la met en circulation ; ne pas le faire la laisse là où elle est, et personne d'autre\n"
+    + "  n'en profite tant qu'on attend un arbitrage sur cet objet.");
+  writeFileSync(join(dir, "decision-muette.md"), decisionMuette, "utf8");
+  // S49 (TF-1172, retour humain du 16/09/2026) — L'OPTION QUI COMMANDE UN GESTE ET NE DIT PAS
+  // COMMENT. Les deux fixtures ajoutent la MÊME option (c) à la décision de la verte — même verbe
+  // de geste, même coût, même exclusion, même recommandation, même ligne de repli : elles ne
+  // diffèrent que par la ligne « Comment faire », et c'est la seule forme qui prouve que la règle
+  // juge le mode opératoire et non le reste de l'option. La verte d'origine, dont aucune option ne
+  // commande de geste, reste PASS — sans quoi la règle crierait sur tout le corpus.
+  const OPTION_GESTE = "  - (c) rouvrir la connexion soi-même — se connecter au portail puis saisir le code reçu ;"
+    + " coût : effort simple × court ; exclut de repartir sans intervention humaine.";
+  const COMMENT_GESTE = "  - Comment faire (c) : 1) ouvrir un terminal ; 2) coller `python forge\\etapes\\data\\sonde.py --login` ;"
+    + " 3) saisir le code affiché dans l'écran « Connexion » du navigateur.";
+  const saut = String.fromCharCode(10);
+  const gesteSansComment = verte.replace("  - sans décision : rien n'est publié.",
+    OPTION_GESTE + saut + "  - sans décision : rien n'est publié.");
+  const gesteAvecComment = verte.replace("  - sans décision : rien n'est publié.",
+    OPTION_GESTE + saut + COMMENT_GESTE + saut + "  - sans décision : rien n'est publié.");
+  writeFileSync(join(dir, "geste-sans-comment.md"), gesteSansComment, "utf8");
+  writeFileSync(join(dir, "geste-avec-comment.md"), gesteAvecComment, "utf8");
   writeFileSync(join(dir, "verte.md"), verte, "utf8");
   writeFileSync(join(dir, "rouge.md"), rouge, "utf8");
   // TF-0661 — S29 a besoin de SA fixture : la rouge porte des actions au bloc 8, donc la
@@ -2199,6 +2725,18 @@ Aucun écart : la demande a été suivie à la lettre.
     REMONTEE.replace("forge-design", "forge-design (TF-0930)") + "\n\n## 5. Non traité");
   writeFileSync(join(dir, "remontee-nue.md"), remonteeNue, "utf8");
   writeFileSync(join(dir, "remontee-tracee.md"), remonteeTracee, "utf8");
+  // 14/09 — S13 DANS SES DEUX SENS (TF-1085). La MÊME action humaine, l'acteur écrit au format
+  // canonique (entre accents graves), sans puis avec un chemin : seul le chemin varie. Sans cette
+  // paire, le retrait du nom d'acteur laissait « ` ` » que la règle prenait pour un chemin, et
+  // la fixture rouge historique ne l'avait jamais vu parce qu'elle n'écrivait pas l'acteur ainsi.
+  const ACTION_HUMAINE = "- **A-3** — enfin TF-0222 (`manuelle_utilisateur`) — trancher le périmètre du lot suivant LIEU.\n"
+    + "  - raison d'impossibilité IA : decision — arbitrage métier.\n"
+    + "  - si rien n'est fait : le lot suivant ne démarre pas.\n";
+  const avecHumaine = (lieu) => verte.replace(
+    /- \*\*A-3\*\* — enfin TF-0222 \(auto_ia\)[\s\S]*$/,
+    ACTION_HUMAINE.replace(" LIEU", lieu));
+  writeFileSync(join(dir, "s13-sans-chemin.md"), avecHumaine(""), "utf8");
+  writeFileSync(join(dir, "s13-avec-chemin.md"), avecHumaine(" dans `forge\\LOTS.md`"), "utf8");
   // 08/09 — S40 ET S41 DANS LEURS DEUX SENS (TF-0923, second paquet). Même discipline que S38 et
   // S39 : chaque paire ne varie que sur ce que la règle prétend juger — le DOSSIER du chemin pour
   // S40, la SOURCE citée pour S41. Le reste de la ligne est identique au caractère près.
@@ -2266,62 +2804,6 @@ Aucun écart : la demande a été suivie à la lettre.
   const cheminTropLong = verte.replace("## 5. Non traité", PUCE_CHEMIN(125) + nl + nl + "## 5. Non traité");
   writeFileSync(join(dir, "chemin-pile-150.md"), cheminPile, "utf8");
   writeFileSync(join(dir, "chemin-151.md"), cheminTropLong, "utf8");
-  // 14/09 — L'ASSIETTE DU MOTIF DANS SES DEUX SENS, SOUS SES DEUX FORMES (TF-0987). Chaque paire ne
-  // varie QUE du motif déclaré — `decision` contre `presence` —, la cellule « comment » citant dans
-  // les deux cas la colonne de données `presence` : c'est le cas exact mesuré chez le produit.
-  // Sens VERT : le nom de colonne n'est pas un motif, S21 n'est pas concernée. Sens ROUGE : le MÊME
-  // mot, déclaré comme motif sans trace, reste accusé — preuve que l'assiette a été BORNÉE et non
-  // que S21 a été éteinte. Cinquième fixture : un motif écrit LUI-MÊME entre accents graves, sans
-  // rien en clair, reste lu (l'usage le plus courant du corpus) — sinon la correction aurait
-  // retiré à S21 tout motif mis en forme de code.
-  const TABLE_MOTIF = (motif) => "## 8. Prochaines actions" + nl + nl
-    + "| Sélecteur | Identifiant | Acteur | Action | Motif / raison | Comment | Si rien n'est fait |" + nl
-    + "|---|---|---|---|---|---|---|" + nl
-    + "| A-1 | TF-0220 | manuelle_utilisateur | arbitrer les intitulés à garder | " + motif
-    + " — choix métier sur le périmètre | ouvrir `output\\03-donnees\\intitules.xlsx` et trier sur la colonne `presence` | les intitulés restent tous affichés |" + nl;
-  const PUCE_MOTIF = (motif) => "## 8. Prochaines actions" + nl
-    + "- **A-1** — TF-0220 (manuelle_utilisateur) — arbitrer les intitulés à garder." + nl
-    + "  - pourquoi pas l'IA : " + motif + " — choix métier sur le périmètre ;" + nl
-    + "  - où : ouvrir `output\\03-donnees\\intitules.xlsx` et trier sur la colonne `presence`." + nl
-    + "  - si rien n'est fait : les intitulés restent tous affichés." + nl;
-  const bloc8 = (corps) => verte.replace(/## 8\. Prochaines actions[\s\S]*$/, corps);
-  writeFileSync(join(dir, "assiette-tableau-colonne-citee.md"), bloc8(TABLE_MOTIF("decision")), "utf8");
-  writeFileSync(join(dir, "assiette-tableau-motif-presence.md"), bloc8(TABLE_MOTIF("presence")), "utf8");
-  writeFileSync(join(dir, "assiette-puce-colonne-citee.md"), bloc8(PUCE_MOTIF("decision")), "utf8");
-  writeFileSync(join(dir, "assiette-puce-motif-presence.md"), bloc8(PUCE_MOTIF("presence")), "utf8");
-  writeFileSync(join(dir, "assiette-puce-motif-en-code.md"), bloc8(PUCE_MOTIF("`presence`")), "utf8");
-  // 14/09 — S44 DANS SES DEUX SENS, ET SA BORNE (TF-0988). La paire rouge/verte ne varie QUE de la
-  // déclaration du contenu hors périmètre ; la troisième fixture retire le seul mot « uniquement »
-  // (preuve que le déclencheur est bien le mot d'exclusivité) ; la quatrième emploie « seulement »
-  // en PROSE, hors de toute citation — la forme des 16 blocs 6 du corpus, qu'aucune ne doit accuser.
-  const DEMANDE = (mot) => "- Vous avez demandé « un nouveau fichier " + mot + "avec ces 66 colonnes en cible » → j'ai livré "
-    + "la page des 66 colonnes et gardé le tableau des colonnes écartées → pourquoi : documentation du lineage.";
-  const DECLARE = " Le livrable contient EN PLUS du périmètre nommé ce tableau des 276 colonnes écartées.";
-  const bloc6 = (corps) => verte.replace("Aucun écart : la demande a été suivie à la lettre.", corps);
-  writeFileSync(join(dir, "exclusivite-non-declaree.md"), bloc6(DEMANDE("uniquement ")), "utf8");
-  writeFileSync(join(dir, "exclusivite-declaree.md"), bloc6(DEMANDE("uniquement ") + DECLARE), "utf8");
-  writeFileSync(join(dir, "demande-sans-exclusivite.md"), bloc6(DEMANDE("")), "utf8");
-  writeFileSync(join(dir, "exclusivite-en-prose.md"),
-    bloc6("Un seul écart, et il porte seulement sur le radical du nom de fichier : la demande disait « le rapport », j'ai gardé le radical R-4."), "utf8");
-  // 14/09 — S45 DANS SES DEUX SENS, ET SON ANTÉRIORITÉ (TF-0791). La paire est la fixture verte
-  // re-datée du 15/09 : sans les deux lignes du test rétro au bloc 6 elle échoue, avec elles elle
-  // passe. La verte d'origine, datée du 14/08, prouve l'antériorité : elle ne porte pas le test
-  // rétro et ne doit PAS être accusée — la règle ne condamne pas ce qui la précède.
-  const redatee = verte.replace("terminée le 2026-08-14 à 15h48", "terminée le 2026-09-15 à 10h12");
-  const RETRO = "Aucun écart : la demande a été suivie à la lettre." + nl
-    + "- Intention : « savoir si la version corrigée peut sortir » — citée du message humain." + nl
-    + "- Test rétro : le banc rouge rejoué en entier répond à cette question ; la publication reste à décider au bloc 3.";
-  writeFileSync(join(dir, "retro-absent.md"), redatee, "utf8");
-  writeFileSync(join(dir, "retro-present.md"), redatee.replace("Aucun écart : la demande a été suivie à la lettre.", RETRO), "utf8");
-  // 14/09 — S46 DANS SES DEUX SENS, ET SON ANTÉRIORITÉ (TF-0979). La paire ne varie QUE de la clause
-  // « reste à mesurer : … — par … » au bloc 2 d'un point d'étape daté du 15/09 ; la troisième porte
-  // le MÊME bloc 2 fautif dans la verte datée du 14/08 — antérieure à la règle, elle n'est pas accusée.
-  const ETAPE = (fin) => "## 2. Verdict — point d'étape" + nl + "3 contrôles sur 5 mesurés, tous verts" + fin;
-  const avecEtape = (base, fin) => base.replace(/## 2\. Verdict\n[^\n]*/, ETAPE(fin));
-  writeFileSync(join(dir, "etape-sans-reste.md"), avecEtape(redatee, "."), "utf8");
-  writeFileSync(join(dir, "etape-avec-reste.md"),
-    avecEtape(redatee, " ; reste à mesurer : le déploiement en qualif — par le pipeline `deploy-qualif`, lancé à 10h05."), "utf8");
-  writeFileSync(join(dir, "etape-anterieure.md"), avecEtape(verte, "."), "utf8");
 
   const moi = fileURLToPath(import.meta.url);
   const rv = spawnSync(process.execPath, [moi, join(dir, "verte.md")], { encoding: "utf8" });
@@ -2356,6 +2838,32 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S33"[^}]*PASS/.test(rv.stdout))
     casse.push("S33 : la verte, dont chaque action porte son sélecteur A-N, est accusée — la règle crie sur un travail juste : " +
       (/"S33"[sS]{0,180}/.exec(rv.stdout) || [""])[0].replace(/s+/g, " "));
+  // S47 dans ses DEUX sens. Le vert est celui qui compte le plus : la fixture d'origine nomme la
+  // forge de tests et cite un journal, donc la règle ne doit pas crier dessus — une règle qui
+  // accuse un rappel juste se fait désactiver, et c'est la leçon N4.
+  if (!/"S47"[^}]*PASS/.test(rv.stdout))
+    casse.push("S47 : la verte, dont le rappel nomme la forge de tests et cite son journal, est accusée — " +
+      (/"S47"[\s\S]{0,200}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
+  const rdm = spawnSync(process.execPath, [moi, join(dir, "decision-muette.md")], { encoding: "utf8" });
+  if (!/"S47"[^}]*FAIL/.test(rdm.stdout))
+    casse.push("S47 : un rappel fait ENTIÈREMENT de périphrases (« un des outils de la chaîne », « cette chose », " +
+      "« cet objet ») passe encore — il fait 25 mots, donc S15 le laisse passer, et le lecteur ne sait pas de quoi " +
+      "on parle. C'est le retour humain du 16/09/2026, mot pour mot : « on ne comprend absolument rien au charabia »");
+  // 17/09 — S49 DANS SES TROIS SENS (TF-1172). Les deux fixtures ne diffèrent que par la ligne
+  // « Comment faire » ; le troisième sens est porté par la verte d'origine, dont aucune option ne
+  // commande de geste et que la règle doit laisser tranquille.
+  const rgs = spawnSync(process.execPath, [moi, join(dir, "geste-sans-comment.md")], { encoding: "utf8" });
+  const rga = spawnSync(process.execPath, [moi, join(dir, "geste-avec-comment.md")], { encoding: "utf8" });
+  if (!/"S49"[^}]*FAIL/.test(rgs.stdout))
+    casse.push("S49 : une option qui commande « se connecter … puis saisir le code » sans dire COMMENT le faire passe — " +
+      "c'est exactement la décision du 16/09/2026 dont le mode opératoire vivait soixante lignes plus bas, et qui a dû " +
+      "être reposée : « Tu dis ce qu'il faut faire, mais tu ne dis pas comment le faire simplement ? »");
+  if (!/"S49"[^}]*PASS/.test(rga.stdout))
+    casse.push("S49 : la MÊME option, avec sa ligne « Comment faire » et sa commande sur place, est accusée — " +
+      (/"S49"[\s\S]{0,200}/.exec(rga.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S49"[^}]*PASS/.test(rv.stdout))
+    casse.push("S49 : la verte, dont aucune option ne commande de geste humain, est accusée — la règle mordrait sur " +
+      "tout le corpus : " + (/"S49"[\s\S]{0,200}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
   const rnn = spawnSync(process.execPath, [moi, join(dir, "numero-nu.md")], { encoding: "utf8" });
   if (!/"S30"[^}]*FAIL/.test(rnn.stdout))
     casse.push("S30 : un numéro NU (« 1. ») passe encore pour un sélecteur de décision — c'est par cette tolérance " +
@@ -2478,6 +2986,15 @@ Aucun écart : la demande a été suivie à la lettre.
       casse.push("les memes rappels courts SANS chapeau commun passent S15 — l'assouplissement aurait supprime la regle");
     }
   }
+  // 14/09 — S13, SES DEUX SENS (TF-1085).
+  const r13n = spawnSync(process.execPath, [moi, join(dir, "s13-sans-chemin.md")], { encoding: "utf8" });
+  const r13c = spawnSync(process.execPath, [moi, join(dir, "s13-avec-chemin.md")], { encoding: "utf8" });
+  if (!/"S13"[^}]*FAIL/.test(r13n.stdout))
+    casse.push("S13 : une action humaine au format canonique (acteur entre accents graves), SANS chemin ni commande, passe — " +
+      "le retrait du nom d'acteur laisse de nouveau des accents graves que la règle prend pour un chemin (TF-1085)");
+  if (!/"S13"[^}]*PASS/.test(r13c.stdout))
+    casse.push("S13 : la MÊME action, AVEC un chemin, est accusée — la règle mordrait sur une action exécutable : " +
+      (/"S13"[\s\S]{0,180}/.exec(r13c.stdout) || [""])[0].replace(/\s+/g, " "));
   // 08/09 — S38 ET S39, LEURS DEUX SENS CHACUNE (TF-0923).
   const rte = spawnSync(process.execPath, [moi, join(dir, "test-esquive.md")], { encoding: "utf8" });
   const rtb = spawnSync(process.execPath, [moi, join(dir, "test-bloque.md")], { encoding: "utf8" });
@@ -2529,60 +3046,309 @@ Aucun écart : la demande a été suivie à la lettre.
       "la règle mord sur un nom conforme : " + (/"S42"[\s\S]{0,180}/.exec(rcp.stdout) || [""])[0].replace(/\s+/g, " "));
   if (!/"S42"[^}]*PASS/.test(rv.stdout))
     casse.push("S42 accuse la fixture VERTE, qui ne cite aucun chemin long : la règle crie sur un travail juste");
-  // 14/09 — L'ASSIETTE DU MOTIF (TF-0987), deux formes, deux sens, et le motif en code conservé.
-  const jouer = (f) => spawnSync(process.execPath, [moi, join(dir, f)], { encoding: "utf8" }).stdout;
-  const extrait = (s, r) => (new RegExp(`"${r}"[\\s\\S]{0,180}`).exec(s) || [""])[0].replace(/\s+/g, " ");
-  for (const forme of ["tableau", "puce"]) {
-    const vert = jouer(`assiette-${forme}-colonne-citee.md`);
-    const rougeA = jouer(`assiette-${forme}-motif-presence.md`);
-    if (!/"S21"[^}]*PASS/.test(vert))
-      casse.push(`S21 (TF-0987, ${forme}) : une action de motif \`decision\` citant la COLONNE de données \`presence\` est accusée — ` +
-        "le nom de colonne est lu comme un motif, c'est le défaut qui a fait renommer un livrable : " + extrait(vert, "S21"));
-    if (!/"S12"[^}]*PASS/.test(vert))
-      casse.push(`S12 (TF-0987, ${forme}) : le motif \`decision\`, déclaré à sa place, n'est plus lu : ` + extrait(vert, "S12"));
-    if (!/"S21"[^}]*FAIL/.test(rougeA))
-      casse.push(`S21 (TF-0987, ${forme}) : la MÊME action déclarant réellement le motif \`presence\` sans trace passe — ` +
-        "l'assiette aurait éteint la règle au lieu de la borner");
-  }
-  if (!/"S21"[^}]*FAIL/.test(jouer("assiette-puce-motif-en-code.md")))
-    casse.push("S21 (TF-0987) : un motif `presence` écrit LUI-MÊME entre accents graves, sans rien en clair, n'est plus lu — " +
-      "c'est l'usage le plus courant du corpus, la correction lui aurait retiré la règle");
-  // 14/09 — S44 (TF-0988) : deux sens, le déclencheur, et la borne de la prose.
-  const s44nd = jouer("exclusivite-non-declaree.md");
-  if (!/"S44"[^}]*FAIL/.test(s44nd))
-    casse.push("S44 : une demande citée « uniquement avec ces 66 colonnes » livrée avec un tableau de colonnes écartées, sans rien " +
-      "déclarer, passe — c'est le 342 colonnes pour 66 demandées de TF-0988");
-  for (const [f, sens] of [["exclusivite-declaree.md", "le MÊME écart, contenu hors périmètre DÉCLARÉ,"],
-    ["demande-sans-exclusivite.md", "la MÊME demande sans le mot « uniquement »"],
-    ["exclusivite-en-prose.md", "« seulement » employé en PROSE, hors de toute demande citée,"]]) {
-    const s = jouer(f);
-    if (!/"S44"[^}]*PASS/.test(s)) casse.push(`S44 : ${sens} est accusé — la règle mord hors de son objet : ` + extrait(s, "S44"));
-  }
+  // 16/09 — S21, S37 ET S8 DANS LEURS DEUX SENS (TF-0987, TF-0992, TF-1125). Les trois paires ne
+  // different QUE par la nature du fragment ou le TEMPS du verbe : c'est la seule forme qui prouve
+  // qu'une regle a ete BORNEE et non supprimee.
+  //
+  // S21 (TF-0987) — une action dont le motif declare est `decision` et dont le COMMENT cite une
+  // colonne de livrable nommee `presence`. Avant la correction, S21 lisait le nom de la colonne
+  // comme son motif et accusait une action explicitement hors de sa portee.
+  const s21v = verte.replace("puis relancer la recette S-01.", "puis trier sur la colonne `presence` du livrable.");
+  const s21r = s21v.replace("  - pourquoi pas l'IA : decision — arbitrage normatif sur le seuil retenu ;",
+                            "  - pourquoi pas l'IA : presence — le fichier de corpus n'est pas sur ce poste ;");
+  const f21v = join(dir, "s21-colonne-citee.md");
+  const f21r = join(dir, "s21-motif-reel-sans-trace.md");
+  writeFileSync(f21v, s21v, "utf8");
+  writeFileSync(f21r, s21r, "utf8");
+  const r21v = spawnSync(process.execPath, [moi, f21v], { encoding: "utf8" });
+  const r21r = spawnSync(process.execPath, [moi, f21r], { encoding: "utf8" });
+  if (!/"S21"[^}]*PASS/.test(r21v.stdout))
+    casse.push("S21 : une action de motif `decision` citant une COLONNE nommée `presence` dans son « où » est accusée — " +
+      "le vocabulaire fermé est cherché hors du périmètre où un motif se déclare, et le contournement coûte le renommage " +
+      "d'une colonne de livrable (TF-0987) : " + (/"S21"[\s\S]{0,180}/.exec(r21v.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S21"[^}]*FAIL/.test(r21r.stdout))
+    casse.push("S21 : la MÊME action portant RÉELLEMENT le motif `presence` sans aucune trace de tentative passe — " +
+      "le périmètre de lecture a supprimé la règle au lieu de la borner");
+  // S37 (TF-0992) — `corriges: []`, le NOM D'UN CHAMP dans une sortie VERTE, contre une prose qui
+  // annonce une correction sans nommer sa classe ni son controle.
+  const B4 = "- Garde de précondition sur le pan qualif — preuve : 18 tests, 0 finding quand la garde s'active.";
+  const s37v = verte.replace(B4, B4 + "\n- Rapprochement rejoué — preuve : \`node todo\rapprocher.mjs\` rend \`corriges: []\` et \`nomsPorteurs: []\`, exit 0.");
+  const s37r = verte.replace(B4, B4 + "\n- Le débordement de la légende est corrigé dans la maquette.");
+  const f37v = join(dir, "s37-champ-cite.md");
+  const f37r = join(dir, "s37-prose-sans-classe.md");
+  writeFileSync(f37v, s37v, "utf8");
+  writeFileSync(f37r, s37r, "utf8");
+  const r37v = spawnSync(process.execPath, [moi, f37v], { encoding: "utf8" });
+  const r37r = spawnSync(process.execPath, [moi, f37r], { encoding: "utf8" });
+  if (!/"S37"[^}]*PASS/.test(r37v.stdout))
+    casse.push("S37 : une preuve citant `corriges: []` — une sortie VERTE qui déclare qu'il n'y a EU aucune correction — " +
+      "est comptée comme une correction sans classe ; le seul remède offert à l'auteur est d'abîmer sa citation exacte (TF-0992) : " +
+      (/"S37"[\s\S]{0,180}/.exec(r37v.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S37"[^}]*FAIL/.test(r37r.stdout))
+    casse.push("S37 : une PROSE annonçant « est corrigé » sans contrôle rouge → vert ni classe passe — " +
+      "le retrait des citations de code a emporté la règle avec lui");
+  // S8 (TF-1125) — l'IRREEL DU PASSE decrit un evenement qui n'a PAS eu lieu ; le passe compose
+  // de l'indicatif revendique une completion. La preuve vit en SOUS-PUCE dans les deux cas, donc
+  // hors de la puce jugee : seule la tournure les separe.
+  const s8v = verte.replace(B4, B4 +
+    "\n- La liaison du rapport au modèle est traitée dans le client, là où elle aurait fait échouer la publication." +
+    "\n  - preuve : \`pbi-deploy --check\` exit 0.");
+  const s8r = verte.replace(B4, B4 +
+    "\n- Le garde-fou a fait échouer la publication du rapport." +
+    "\n  - preuve : \`pbi-deploy --check\` exit 0.");
+  const f8v = join(dir, "s8-irreel-du-passe.md");
+  const f8r = join(dir, "s8-passe-compose.md");
+  writeFileSync(f8v, s8v, "utf8");
+  writeFileSync(f8r, s8r, "utf8");
+  const r8v = spawnSync(process.execPath, [moi, f8v], { encoding: "utf8" });
+  const r8r = spawnSync(process.execPath, [moi, f8r], { encoding: "utf8" });
+  if (!/"S8"[^}]*PASS/.test(r8v.stdout))
+    casse.push("S8 : « là où elle AURAIT FAIT échouer la publication » — un événement qui n'a pas eu lieu, et qui désigne " +
+      "même un défaut que le code évite — est lu comme une complétion revendiquée sans preuve (TF-1125) : " +
+      (/"S8"[\s\S]{0,180}/.exec(r8v.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S8"[^}]*FAIL/.test(r8r.stdout))
+    casse.push("S8 : la MÊME phrase au PASSÉ COMPOSÉ — « a fait échouer » —, sans preuve dans sa puce, passe : " +
+      "la soustraction de l'irréel a emporté l'indicatif avec elle");
+  // 16/09 — S44 ET S45 DANS LEURS DEUX SENS (TF-0988, TF-1127).
+  //
+  // S44 — la demande citée au bloc 6 porte « uniquement ». Rouge : le bloc ne dit pas ce qu'il y a
+  // en plus. Vert : LE MÊME bloc, une phrase ajoutée qui le déclare. Les deux ne diffèrent que par
+  // cette phrase, seule forme qui prouve que la règle juge la déclaration et non le mot.
+  const B6 = "Aucun écart : la demande a été suivie à la lettre.";
+  const s44r = verte.replace(B6, "Vous avez demandé « uniquement les 66 colonnes en cible » → j'ai produit la page des champs → le périmètre est tenu.");
+  const s44v = verte.replace(B6, "Vous avez demandé « uniquement les 66 colonnes en cible » → j'ai produit la page des champs → elle ne contient rien d'autre : aucun tableau des colonnes écartées.");
+  const f44r = join(dir, "s44-exclusivite-nue.md");
+  const f44v = join(dir, "s44-exclusivite-declaree.md");
+  writeFileSync(f44r, s44r, "utf8");
+  writeFileSync(f44v, s44v, "utf8");
+  const r44r = spawnSync(process.execPath, [moi, f44r], { encoding: "utf8" });
+  const r44v = spawnSync(process.execPath, [moi, f44v], { encoding: "utf8" });
+  if (!/"S44"[^}]*FAIL/.test(r44r.stdout))
+    casse.push("S44 : une demande citée portant « UNIQUEMENT » passe sans que le bloc 6 dise ce que le livrable contient " +
+      "EN PLUS — c'est par ce silence qu'une page a été livrée avec 342 colonnes là où 66 étaient demandées (TF-0988)");
+  if (!/"S44"[^}]*PASS/.test(r44v.stdout))
+    casse.push("S44 : la MÊME demande, avec la déclaration « elle ne contient rien d'autre », est accusée — la règle exige " +
+      "de compter ce qu'il y a en plus au lieu d'exiger que la question soit posée : " +
+      (/"S44"[\s\S]{0,180}/.exec(r44v.stdout) || [""])[0].replace(/\s+/g, " "));
   if (!/"S44"[^}]*PASS/.test(rv.stdout))
-    casse.push("S44 accuse la fixture VERTE, dont le bloc 6 ne cite aucune demande exclusive : la règle crie sur un travail juste");
-  // 14/09 — S45 (TF-0791) : les deux sens sur une restitution du 15/09, et l'antériorité.
-  if (!/"S45"[^}]*FAIL/.test(jouer("retro-absent.md")))
-    casse.push("S45 : une restitution datée du 15/09 dont le bloc 6 ne porte ni l'intention citée ni le test rétro passe — " +
-      "la loi n° 7 ne mord toujours que sur les études");
-  const s45p = jouer("retro-present.md");
-  if (!/"S45"[^}]*PASS/.test(s45p))
-    casse.push("S45 : la MÊME restitution portant « Intention : « … » » et « Test rétro : … » au bloc 6 est accusée : " + extrait(s45p, "S45"));
+    casse.push("S44 accuse la fixture VERTE, dont le bloc 6 ne porte aucun mot d'exclusivité : la règle crie sur un travail juste");
+  // S45 — le bloc 5 porte un élément bloqué par `dependance_externe`. Rouge : le bloc 3 ouvre
+  // droit sur sa décision. Vert : LE MÊME, un inventaire d'un bloquant énoncé sur place en tête.
+  const B5 = "- Regroupement par cause racine : motif — sa cause est traitée, critère de réouverture écrit.";
+  const s45base = verte.replace(B5, "- Traduction du pack anglais : motif dependance_externe — le prestataire n'a pas rendu le glossaire.");
+  const TETE = "**Bloquants à lever avant d'avancer**\n\n" +
+    "- la traduction du pack anglais est arrêtée ; il faut le glossaire validé du prestataire ; sans lui, la campagne suivante repart sur le pack périmé.\n\n";
+  const s45v = s45base.replace("## 3. Décisions attendues\n", "## 3. Décisions attendues\n\n" + TETE);
+  const f45r = join(dir, "s45-bloquant-disperse.md");
+  const f45v = join(dir, "s45-bloquant-inventorie.md");
+  writeFileSync(f45r, s45base, "utf8");
+  writeFileSync(f45v, s45v, "utf8");
+  const r45r = spawnSync(process.execPath, [moi, f45r], { encoding: "utf8" });
+  const r45v = spawnSync(process.execPath, [moi, f45v], { encoding: "utf8" });
+  if (!/"S45"[^}]*FAIL/.test(r45r.stdout))
+    casse.push("S45 : un élément bloqué par `dependance_externe` au bloc 5, sans aucun inventaire en tête du bloc 3, passe — " +
+      "le bloquant reste écrit en morceaux dans trois blocs et nulle part en entier (TF-1127)");
+  if (!/"S45"[^}]*PASS/.test(r45v.stdout))
+    casse.push("S45 : le MÊME bloquant, inventorié en tête du bloc 3 et énoncé sur place, est accusé : " +
+      (/"S45"[\s\S]{0,200}/.exec(r45v.stdout) || [""])[0].replace(/\s+/g, " "));
   if (!/"S45"[^}]*PASS/.test(rv.stdout))
-    casse.push("S45 accuse la fixture VERTE, datée du 14/08 : la règle condamne une restitution qui ne pouvait pas la connaître");
-  // 14/09 — S46 (TF-0979) : les deux sens sur un point d'étape du 15/09, et l'antériorité.
-  if (!/"S46"[^}]*FAIL/.test(jouer("etape-sans-reste.md")))
-    casse.push("S46 : un point d'étape daté du 15/09 qui ne dit ni ce qui reste à mesurer ni ce qui le mesurera passe — " +
-      "c'est un verdict partiel déguisé, la forme que TF-0979 existe pour refuser");
-  for (const [f, sens] of [["etape-avec-reste.md", "le MÊME point d'étape nommant « reste à mesurer : … — par … »"],
-    ["etape-anterieure.md", "le MÊME bloc 2 fautif dans une restitution du 14/08, antérieure à la règle,"]]) {
-    const s = jouer(f);
-    if (!/"S46"[^}]*PASS/.test(s)) casse.push(`S46 : ${sens} est accusé : ` + extrait(s, "S46"));
-  }
-  if (!/"S46"[^}]*PASS/.test(rv.stdout))
-    casse.push("S46 accuse la fixture VERTE, dont le verdict n'est pas un point d'étape : la règle crie sur un travail juste");
+    casse.push("S45 accuse la fixture VERTE, dont le bloc 5 ne porte aucun motif d'obstacle : la règle crie sur un travail juste");
+  // 16/09 — S46 DANS SES TROIS SENS (TF-1045). Le lexique est celui du PRODUIT : les fixtures
+  // vivent donc sous un faux socle de produit, avec son `forge\LEXIQUE.json`. Sans lexique — le cas
+  // de toutes les autres fixtures et du pilot lui-même —, la règle rend SANS_OBJET et le DIT.
+  mkdirSync(join(dir, "produit", "forge"), { recursive: true });
+  writeFileSync(join(dir, "produit", "forge", "LEXIQUE.json"), JSON.stringify({
+    format: "pilot/lexique-produit@1",
+    termes: [{ proscrit: "grain", remplacer_par: "granularite", depuis: "2026-09-08",
+      preuve: "retour humain du 08/09/2026, redemande le 10/09 (ledger seq 99)" }],
+  }), "utf8");
+  const B4lex = "- Garde de précondition sur le pan qualif — preuve : 18 tests, 0 finding quand la garde s'active.";
+  const s46r = verte.replace(B4lex, B4lex + "\n- Modèle sémantique livré au grain quotidien — preuve : 12 mesures, exit 0.");
+  const s46v = verte.replace(B4lex, B4lex + "\n- Modèle sémantique livré à la granularite quotidienne — preuve : 12 mesures, exit 0.");
+  const f46r = join(dir, "produit", "s46-terme-proscrit.md");
+  const f46v = join(dir, "produit", "s46-terme-retenu.md");
+  writeFileSync(f46r, s46r, "utf8");
+  writeFileSync(f46v, s46v, "utf8");
+  const r46r = spawnSync(process.execPath, [moi, f46r], { encoding: "utf8" });
+  const r46v = spawnSync(process.execPath, [moi, f46v], { encoding: "utf8" });
+  if (!/"S46"[^}]*FAIL/.test(r46r.stdout))
+    casse.push("S46 : une restitution employant un terme que le destinataire a dit ne pas lire passe — c'est par ce " +
+      "silence qu'un mot clos « corrigé » le 08/09 a été redemandé par le client le 10/09, deux synthèses PASS sur " +
+      "41 règles entre les deux (TF-1045)");
+  if (!/"S46"[^}]*PASS/.test(r46v.stdout))
+    casse.push("S46 : la MÊME restitution avec le terme retenu est accusée : " +
+      (/"S46"[\s\S]{0,200}/.exec(r46v.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S46"[^}]*SANS_OBJET/.test(rv.stdout))
+    casse.push("S46 : sans lexique dans le socle du projet, la règle devrait rendre SANS_OBJET et le DIRE — " +
+      "un produit sans lexique n'est jamais PASS par silence : " +
+      (/"S46"[\s\S]{0,160}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
+  // 17/09 — S46 ET LE LEXIQUE TRANSVERSE, DANS SES DEUX SENS (TF-1150). LE FAIT reproduit ici est
+  // celui du 16/09 : le lexique du CLIENT est VIDE — il ne porte que le vocabulaire de son propre
+  // lecteur, et ce produit-ci n'a encore rien remonté — et c'est la liste TRANSVERSE, décidée par
+  // l'humain pour tous les produits, qui doit mordre. Sans le cumul, le terme repart en livraison
+  // pour la troisième fois.
+  mkdirSync(join(dir, "produit-tr", "forge"), { recursive: true });
+  writeFileSync(join(dir, "produit-tr", "forge", "LEXIQUE.json"), JSON.stringify({
+    format: "pilot/lexique-produit@1", termes: [],
+  }), "utf8");
+  writeFileSync(join(dir, "produit-tr", "forge", "LEXIQUE-TRANSVERSE.json"), JSON.stringify({
+    format: "pilot/lexique-transverse@1",
+    termes: [{ proscrit: "grain", remplacer_par: "granularité", depuis: "2026-09-08",
+      preuve: "décision humaine du 16/09/2026 (retour RP-02) : la portée devient transverse" }],
+  }), "utf8");
+  const ftrR = join(dir, "produit-tr", "s46-transverse-terme-proscrit.md");
+  const ftrV = join(dir, "produit-tr", "s46-transverse-terme-retenu.md");
+  writeFileSync(ftrR, s46r, "utf8");
+  writeFileSync(ftrV, s46v, "utf8");
+  const rtrR = spawnSync(process.execPath, [moi, ftrR], { encoding: "utf8" });
+  const rtrV = spawnSync(process.execPath, [moi, ftrV], { encoding: "utf8" });
+  if (!/"S46"[^}]*FAIL/.test(rtrR.stdout))
+    casse.push("S46 : le lexique du CLIENT est vide et le terme proscrit par l'humain POUR TOUS les produits " +
+      "passe — c'est exactement l'état du 16/09 : un lexique recopié vide, et le même mot redemandé une " +
+      "troisième fois sur un troisième livrable (TF-1150)");
+  else if (!/transverse/i.test(rtrR.stdout))
+    casse.push("S46 : le constat ne dit pas que le terme vient de la liste TRANSVERSE — l'auteur chercherait " +
+      "le retour dans le lexique de son client, où il n'est pas");
+  if (!/"S46"[^}]*PASS/.test(rtrV.stdout))
+    casse.push("S46 : la MÊME restitution avec le terme retenu est accusée sous lexique transverse : " +
+      (/"S46"[\s\S]{0,200}/.exec(rtrV.stdout) || [""])[0].replace(/\s+/g, " "));
+  // 17/09 — S48 DANS SES QUATRE SENS (TF-1166, D-3 (a)). Un produit se reconnaît à son `forge\retours\` :
+  // les fixtures vivent sous un faux socle qui le porte. Les quatre ne diffèrent que d'UNE ligne.
+  mkdirSync(join(dir, "produit48", "forge", "retours"), { recursive: true });
+  const jouer48 = (nom, ajout) => {
+    const f = join(dir, "produit48", nom);
+    writeFileSync(f, verte + ajout, "utf8");
+    return spawnSync(process.execPath, [moi, f], { encoding: "utf8" });
+  };
+  const r48muet = jouer48("s48-muet.md", "");
+  const r48rien = jouer48("s48-rien.md", "\n- Remontée à la factory : rien à remonter.\n");
+  const r48lot = jouer48("s48-lot.md", "\n- Remontée à la factory : lot « Produit-99 - RETOURS - 20260917a » remis.\n");
+  const r48flou = jouer48("s48-flou.md", "\n- Remontée à la factory : à voir plus tard.\n");
+  if (!/"S48"[^}]*FAIL/.test(r48muet.stdout))
+    casse.push("S48 : chez un produit, un tour qui ne dit RIEN de ce qu'il remonte passe — c'est ce silence qui rend " +
+      "« rien à remonter » et « rien remonté » indiscernables (TF-1166)");
+  if (!/"S48"[^}]*PASS/.test(r48rien.stdout))
+    casse.push("S48 : « rien à remonter » est une réponse VALIDE et elle est accusée : " +
+      (/"S48"[\s\S]{0,200}/.exec(r48rien.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S48"[^}]*PASS/.test(r48lot.stdout))
+    casse.push("S48 : le tour qui NOMME son lot remis est accusé : " +
+      (/"S48"[\s\S]{0,200}/.exec(r48lot.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S48"[^}]*FAIL/.test(r48flou.stdout))
+    casse.push("S48 : une ligne de remontée qui ne tranche pas (« à voir plus tard ») passe — la règle se satisferait du libellé seul");
+  if (!/"S48"[^}]*SANS_OBJET/.test(rv.stdout))
+    casse.push("S48 : hors d'un produit (pilot, forge), la règle devrait rendre SANS_OBJET et le DIRE : " +
+      (/"S48"[\s\S]{0,160}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
+  // 17/09 — LE POINT D'ÉTAPE DANS SES QUATRE SENS (TF-1182). Les quatre fixtures sortent de la
+  // VERTE et ne diffèrent d'elle que par ce que la forme change : la mention au bloc 1 et le titre
+  // du bloc 2. C'est la seule façon de prouver que ce qui est jugé est la FORME, et non un reste
+  // du document. Le premier sens est celui qui manquait au 17/09 : un point d'étape écrit à la
+  // lettre du gabarit doit être ACCEPTÉ, là où il rendait S1 et S3 FAIL — les deux bloquantes.
+  const EN_TETE_V = "## 1. En-tête\nCampagne · forge-tests · terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot · intention : prouver que la surveillance de la forge de tests attrape ce qu'elle doit attraper, pas seulement faire tourner la recette. Test rétro : les 19 défauts plantés sont tous détectés, l'intention est servie.";
+  const VERDICT_V = "## 2. Verdict\nRecette S-01 (banc rouge de la forge de tests) TENU — 19/19 défauts détectés au banc rouge, pytest 365.";
+  // La glose de « S-01 » vit dans la ligne de verdict que la forme remplace : elle se reporte dans
+  // la ligne de mesure, sinon la fixture échouerait sur S23 et non sur ce qu'on prétend prouver.
+  const MESURE = "Reste à mesurer : la recette S-01 (banc rouge de la forge de tests) rejouée sur la version déployée — par `node oracles\\self-tests.mjs`, au retour du déploiement lancé à 15h44.";
+  const pe = verte
+    .replace(EN_TETE_V, "## 1. En-tête\nPoint d'étape · forge-tests · déploiement lancé le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot"
+      + " · intention : mettre la version corrigée de la forge de tests à disposition, pas seulement la construire."
+      + " Test rétro : le déploiement n'a pas rendu la main, l'intention n'est pas encore servie.")
+    .replace(VERDICT_V, "## 2. Ce qui reste à mesurer, et par quoi\n" + MESURE);
+  const peSansMesure = pe.replace(MESURE, "La recette S-01 (banc rouge de la forge de tests) semble bien partie, on regardera demain matin.");
+  const peSansTraite = pe.replace(B4lex, "- Rien encore : le déploiement n'a pas rendu la main.");
+  const jouerPe = (nom, contenu) => {
+    const f = join(dir, nom);
+    writeFileSync(f, contenu, "utf8");
+    return spawnSync(process.execPath, [moi, f], { encoding: "utf8" });
+  };
+  const rPe = jouerPe("point-etape-conforme.md", pe);
+  const rPeM = jouerPe("point-etape-sans-mesure.md", peSansMesure);
+  const rPeT = jouerPe("point-etape-sans-traite.md", peSansTraite);
+  if (rPe.status !== 0)
+    casse.push("POINT D'ÉTAPE : la forme que le gabarit PRESCRIT (TF-0979) est refusée par son propre juge — " +
+      "c'est le défaut du 17/09, qui obligeait à la déguiser en verdict : " +
+      ((rPe.stdout.match(/"regle": "S\d+",\s*"statut": "FAIL",\s*"message": "[^"]{0,120}/g) || []).join(" · ") || "sortie illisible"));
+  if (!/"S1"[^}]*PASS/.test(rPe.stdout))
+    casse.push("S1 : un point d'étape dont le bloc 2 porte son titre de mesure est déclaré amputé de son bloc 2");
+  if (!/"S3"[^}]*PASS/.test(rPe.stdout))
+    casse.push("S3 : la ligne « ce qui reste à mesurer, et par quoi » n'est pas reconnue à la place du verdict");
+  if (!/"S50"[^}]*PASS/.test(rPe.stdout))
+    casse.push("S50 : le point d'étape aux blocs 1, 4 et 8 pleins est accusé : " +
+      (/"S50"[\s\S]{0,200}/.exec(rPe.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S3"[^}]*FAIL/.test(rPeM.stdout))
+    casse.push("S3 : un point d'étape qui ne dit NI la mesure attendue NI l'outil qui la rendra passe — déclarer la " +
+      "forme suffirait alors à se dispenser du verdict sans rien donner en échange (TF-1182)");
+  if (!/"S50"[^}]*FAIL/.test(rPeT.stdout))
+    casse.push("S50 : un point d'étape dont le bloc 4 ne porte RIEN passe — la mention au bloc 1 deviendrait une " +
+      "exemption déguisée en forme jugée, exactement ce que TF-0979 existe pour empêcher");
+  // 17/09 — S51 DANS SES TROIS SENS (TF-0791). Les trois fixtures ne diffèrent que par la FIN de
+  // la ligne d'en-tête : les deux pièces, l'intention seule, aucune des deux. C'est la seule forme
+  // qui prouve que la règle juge ce qu'elle prétend juger et non le reste du bloc 1.
+  const INTENTION = " · intention : prouver que la surveillance de la forge de tests attrape ce qu'elle doit "
+    + "attraper, pas seulement faire tourner la recette. Test rétro : les 19 défauts plantés sont tous détectés, "
+    + "l'intention est servie.";
+  const s51sansRien = verte.replace(INTENTION, ".");
+  const s51sansRetro = verte.replace(INTENTION, " · intention : prouver que la surveillance de la forge de tests "
+    + "attrape ce qu'elle doit attraper, pas seulement faire tourner la recette.");
+  const r51r = jouerPe("s51-sans-intention.md", s51sansRien);
+  const r51d = jouerPe("s51-sans-test-retro.md", s51sansRetro);
+  if (!/"S51"[^}]*PASS/.test(rv.stdout))
+    casse.push("S51 : la fixture VERTE, dont le bloc 1 porte l'intention ET son test rétro, est accusée : " +
+      (/"S51"[\s\S]{0,200}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S51"[^}]*FAIL/.test(r51r.stdout))
+    casse.push("S51 : un bloc 1 SANS intention passe — la loi transverse n° 7 resterait écrite au noyau et au " +
+      "gabarit sans qu'aucun juge ne la joue hors des études d'opportunité (TF-0791)");
+  if (!/"S51"[^}]*FAIL/.test(r51d.stdout))
+    casse.push("S51 : une intention dite SANS son test rétro passe — or c'est le test qui dit si le résultat sert " +
+      "l'intention ou seulement la lettre ; l'intention seule est une déclaration, pas une vérification");
+  if (!/"S51"[\s\S]{0,400}TEST RÉTRO/.test(r51d.stdout))
+    casse.push("S51 : le refus ne nomme pas la pièce manquante — l'auteur relirait son bloc 1 sans savoir quoi y ajouter");
+  if (!/"S50"[^}]*SANS_OBJET/.test(rv.stdout))
+    casse.push("S50 : hors d'un point d'étape déclaré, la règle devrait rendre SANS_OBJET et le DIRE : " +
+      (/"S50"[\s\S]{0,160}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
+  // 19/09 — S25 DANS SES TROIS SENS (TF-1189). Les trois fixtures ne diffèrent que par la ligne
+  // ajoutée au bloc 5, et la troisième est celle qui prouve que la règle juge la PREUVE et non le
+  // mot : elle porte la formule fautive MOT POUR MOT et passe, parce que ses appels couvrent deux
+  // familles. La rouge est le texte du 18/09 — quatre appels tous sous `…/myorg/groups/…`, fermés
+  // par « il n'existe aucun autre chemin » —, et c'est lui qui a fait écrire un constat faux dans
+  // deux synthèses jugées PASS.
+  const B5cible = "- Regroupement par cause racine : motif — sa cause est traitée, critère de réouverture écrit.";
+  const S25_MEME_FAMILLE = "GET /v1.0/myorg/groups/{idEspace}/reports rend 401, "
+    + "GET /v1.0/myorg/groups/{idEspace}/reports/{idRapport} rend 401, "
+    + "GET /v1.0/myorg/groups/{idEspace}/reports/{idRapport}/pages rend 401, "
+    + "GET /v1.0/myorg/groups/{idEspace}/datasets rend 401";
+  const S25_DEUX_FAMILLES = "GET /v1.0/myorg/groups/{idEspace}/reports rend 401, "
+    + "GET /v1.0/myorg/reports/{idRapport} rend 403";
+  const ligne25 = (declaration, appels) => B5cible + "\n- Rapport d'origine : motif — je ne peux pas l'ouvrir, "
+    + `${declaration} : ${appels}.`;
+  const r25r = jouerPe("s25-quatre-appels-meme-famille.md",
+    verte.replace(B5cible, ligne25("il n'existe aucun autre chemin", S25_MEME_FAMILLE)));
+  const r25v = jouerPe("s25-deux-familles-avec-codes.md",
+    verte.replace(B5cible, ligne25("les deux chemins ont ete essayes", S25_DEUX_FAMILLES)));
+  const r25f = jouerPe("s25-formule-mais-deux-familles.md",
+    verte.replace(B5cible, ligne25("il n'existe aucun autre chemin", S25_DEUX_FAMILLES)));
+  if (!/"S25"[^}]*FAIL/.test(r25r.stdout))
+    casse.push("S25 : QUATRE appels d'une même famille (`…/myorg/groups/…`) refermés par « aucun autre chemin » passent — " +
+      "c'est l'échappatoire exacte du 18/09 : la formule tient lieu de mesure, et le constat faux a été écrit dans deux " +
+      "synthèses jugées PASS (TF-1189)");
+  if (!/famille\(s\) de chemin/i.test((/"S25"[\s\S]{0,400}/.exec(r25r.stdout) || [""])[0]))
+    casse.push("S25 : le refus ne dit pas combien de familles distinctes ont été comptées — l'auteur relirait sa " +
+      "restitution sans savoir ce qui manque : " + (/"S25"[\s\S]{0,200}/.exec(r25r.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S25"[^}]*PASS/.test(r25v.stdout))
+    casse.push("S25 : la MÊME incapacité, adossée aux codes de retour de DEUX familles distinctes (espace de travail et " +
+      "scope personnel), est accusée — la règle exigerait alors une preuve qu'aucune restitution honnête ne peut fournir : " +
+      (/"S25"[\s\S]{0,220}/.exec(r25v.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S25"[^}]*PASS/.test(r25f.stdout))
+    casse.push("S25 : la formule « il n'existe aucun autre chemin » est accusée ALORS QUE les appels cités couvrent deux " +
+      "familles — la règle jugerait le MOT au lieu de la preuve, c'est-à-dire l'erreur symétrique de celle qu'elle corrige : " +
+      (/"S25"[\s\S]{0,220}/.exec(r25f.stdout) || [""])[0].replace(/\s+/g, " "));
+  if (!/"S25"[^}]*PASS/.test(rv.stdout))
+    casse.push("S25 accuse la fixture VERTE, qui n'affirme aucune incapacité : la règle crie sur un travail juste");
+  if (!/"S25"[^}]*FAIL/.test(rr.stdout))
+    casse.push("S25 : « je ne peux pas deployer d'ici, le CLI rend Unauthorized » — le cas fondateur de TF-0606, sans " +
+      "second chemin ni appel cité — passe : le durcissement du 19/09 a emporté la règle d'origine");
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test restitution : 23/23 PASS (verte PASS ; TF-0979 : S46 dans ses DEUX sens — un point d'étape daté du 15/09 qui ne dit ni ce qui reste à mesurer ni ce qui le mesurera FAIL, le MÊME nommant « reste à mesurer : … — par … » PASS —, et le même bloc 2 fautif daté du 14/08 PASS, antériorité déclarée ; TF-0791 : S45 dans ses DEUX sens — une restitution datée du 15/09 dont le bloc 6 ne porte ni l'intention citée ni le test rétro FAIL, la MÊME portant « Intention : « … » » et « Test rétro : … » PASS —, et la verte datée du 14/08 PASS, antériorité déclarée ; TF-0988 : S44 dans ses DEUX sens — une demande citée « uniquement avec ces 66 colonnes » livrée avec un tableau hors périmètre non déclaré FAIL, le MÊME écart déclaré PASS —, la même demande SANS le mot d'exclusivité PASS, et « seulement » en prose hors citation PASS ; TF-0987 : l'ASSIETTE du motif dans ses DEUX sens sous ses DEUX formes — une action de motif `decision` citant la COLONNE de données `presence` PASS S21 en tableau comme en puce, la MÊME action déclarant `presence` sans trace FAIL, et un motif écrit lui-même entre accents graves reste lu ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail))");
+    : "Self-test restitution : 39/39 PASS (verte PASS ; le LEXIQUE TRANSVERSE dans ses DEUX sens (TF-1150 : le lexique du CLIENT est VIDE et le terme que l humain a proscrit POUR TOUS les produits est quand meme accuse, le constat disant son origine transverse ; la MEME restitution avec le terme retenu PASS) ; S51 dans ses TROIS sens (TF-0791 : un bloc 1 SANS l'intention initiale de la demande FAIL, le MÊME portant l'intention mais PAS son test rétro FAIL et nommant la pièce manquante, la verte qui porte les deux PASS — taux mesuré à 94,6 % sur les 148 synthèses d'output\\04-plans\\ à la mise en service, le champ datant de la veille : avertissante) ; le POINT D'ÉTAPE dans ses QUATRE sens (TF-1182 : la forme écrite À LA LETTRE du gabarit — mention au bloc 1, bloc 2 titré « ce qui reste à mesurer, et par quoi » — est ACCEPTÉE là où elle rendait S1 et S3 FAIL, les deux bloquantes ; la MÊME sans sa ligne de mesure ni aucun fait mesurable FAIL sur S3 ; la MÊME dont le bloc 4 ne porte RIEN FAIL sur S50 ; et S50 SANS_OBJET dit à voix haute hors d'un point d'étape déclaré) ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 125 caracteres — 151 avec les 26 du sidecar d oracle — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) ; S46 dans ses TROIS sens (TF-1045 : une restitution employant un terme proscrit par le lexique du destinataire FAIL, la MEME avec le terme retenu PASS, et SANS_OBJET dit a voix haute quand le projet n a pas de lexique) ; S48 dans ses QUATRE sens (TF-1166 : chez un produit, un tour muet sur ce qu il remonte FAIL, « rien a remonter » PASS, un lot nomme PASS, une ligne qui ne tranche pas FAIL, et SANS_OBJET dit hors d un produit) ; S49 dans ses TROIS sens (TF-1172 : une option commandant « se connecter … puis saisir le code » sans mode operatoire FAIL, la MEME option avec sa ligne « Comment faire » et sa commande sur place PASS, et la verte d origine — aucune option ne commandant de geste — PASS) ; S25 dans ses TROIS sens (TF-1189 : QUATRE appels d une MEME famille (`…/myorg/groups/…`) refermes par « aucun autre chemin » FAIL, la MEME incapacite adossee aux codes de retour de DEUX familles distinctes — espace de travail et scope personnel — PASS, et la MEME formule fautive mot pour mot au-dessus de ces deux familles PASS ; le cas fondateur de TF-0606, sans appel cite, reste FAIL) — taux d accusation mesure sur les 149 syntheses d output\\04-plans\\ avant durcissement : 0,0 % (0 fichier, aucune incapacite declaree dans le corpus) — taux d accusation mesure sur les 148 syntheses d output\\04-plans\\ avant mise en service : 2,0 % (3 fichiers) ; taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -2607,10 +3373,6 @@ console.log(JSON.stringify({
     "S20 ne voit QUE les termes du référentiel `gabarits\\JARGON-A-GLOSER.json` : un jargon qui n'a encore coûté aucun aller-retour n'est pas détecté. C'est le prix assumé du zéro faux positif — dans ce corpus la MAJUSCULE sert l'emphase, et une heuristique sur les sigles crierait sur « MESURE » et « AUCUNE ». Le canal de croissance de la liste est le retour humain, pas la devinette",
     "S20 ne juge pas la JUSTESSE d'une glose : la présence d'une parenthèse après le terme, jamais qu'elle explique vraiment",
     "S21 ne juge pas la SINCÉRITÉ d'une trace : un code de réponse recopié sans avoir été obtenu la satisfait. Elle rend le mensonge PLUS COÛTEUX — il faut inventer un code plausible — mais elle ne le rend pas impossible",
-    "S46 (TF-0979) ne juge qu'un bloc 2 qui se DÉCLARE point d'étape : un verdict partiel qui ne le dit pas relève de S3, pas d'elle. Et elle vérifie que ce qui reste à mesurer et ce qui le mesurera sont NOMMÉS, jamais que la mesure annoncée aura lieu — le point d'étape suivant, lui, le dira",
-    "S45 (TF-0791) ne mesure que la PRÉSENCE de l'intention citée et du test rétro au bloc 6, comme E10 pour les études : qu'une remontée soit JUSTE, et que l'intention citée soit LA VRAIE, n'est pas mécanisable — la validation de l'intention par l'humain (references\\INTENTION.md, niveau 1) reste le seul contrôle du fond. Et une restitution sans date lisible n'est pas jugée par S45 : S2 la refuse déjà",
-    "S44 (TF-0988) ne lit que les demandes CITÉES (« … », \"…\") au bloc 6 : une demande paraphrasée sans guillemets échappe au déclencheur. C'est le prix mesuré du zéro faux positif — le mot d'exclusivité cherché dans tout le bloc accusait 16 synthèses sur 115, toutes à tort. Et elle ne juge pas la JUSTESSE de la déclaration : dire « ne contient rien d'autre » d'un livrable qui contient autre chose la satisfait",
-    "L'ASSIETTE du motif (TF-0987) ne sépare pas tout : en PUCE, un groupe qui écrit son motif ENTIÈREMENT entre accents graves et cite AUSSI un mot du vocabulaire entre accents graves est lu en entier — les deux restent confondus, faute de pouvoir dire lequel est la déclaration. En tableau sans colonne « motif » ou « raison », même lecture qu'en puce",
     "S21 ne couvre PAS `decision`, `depense` ni `irreversible` : ces trois motifs relèvent d'un arbitrage, pas d'un fait du monde, et exiger d'« essayer » une décision n'aurait aucun sens. Une attribution abusive sous `decision` reste donc invisible — c'est la limite assumée, et c'est exactement le cas fautif qui a fait naître la règle",
   ],
 }, null, 1));

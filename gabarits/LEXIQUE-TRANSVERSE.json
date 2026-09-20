@@ -1,0 +1,33 @@
+{
+  "format": "pilot/lexique-transverse@1",
+  "version": "1.0.0",
+  "date": "2026-09-17",
+  "source": "TF-1150 — retour RP-02 du lot « digit-ai-marketing - RETOURS - 20260916a » : « Le lexique du destinataire est borné au produit, alors que le retour humain vise la Data entière. » Le terme avait été corrigé chez un produit (TF-0936, TF-1045) ; le lexique recopié chez un second le 16/09/2026 est arrivé VIDE, et le même humain a redemandé le mot une TROISIÈME fois, sur un troisième livrable.",
+  "a_quoi_il_sert": "La liste des termes que l'humain a proscrits POUR TOUS LES PRODUITS, et non pour un seul destinataire. Elle complète `LEXIQUE-PRODUIT.json` sans le remplacer : l'un porte ce qu'un lecteur nommé a refusé chez lui, l'autre ce que le décideur a tranché une fois pour toutes.",
+  "pourquoi_il_ne_contredit_pas_le_lexique_de_produit": "`LEXIQUE-PRODUIT.json` refuse une liste globale DÉDUITE d'un retour reçu ailleurs, et il a raison : un mot corrigé chez un client ne se propage pas par contagion. Ici, rien n'est déduit — c'est l'humain qui ÉTEND lui-même la portée, et il l'écrit. Un terme n'entre dans ce fichier que sur une décision humaine citée, jamais sur une généralisation faite par un agent : c'est la seule différence entre les deux fichiers, et c'est celle qui compte.",
+  "qui_le_remplit": "La session du pilot qui REÇOIT la décision humaine d'étendre un terme à tous les produits, avant de prononcer « corrigé ». Chaque entrée porte la citation du retour ou de la décision qui l'ordonne — sans citation, l'entrée ne se crée pas.",
+  "ou_il_est_lu": [
+    "chez le PRODUIT, après recopie par l'héritage (`forge\\LEXIQUE-TRANSVERSE.json`, `gabarits\\HERITAGE.json`, mode copie identique)",
+    "`oracles\\lib-lexique.mjs` le fusionne au lexique du produit : les deux juges le lisent donc sans le savoir — `oracle-ecriture` règle EC-7 à chaque écriture d'un `.md`, `oracle-synthese` règle S46 sur toute restitution"
+  ],
+  "regle": "Mêmes bornes que le lexique de produit, et pour les mêmes raisons : un terme `proscrit` employé dans la PROSE est un défaut, le texte emploie `remplacer_par` ; ce qui vit entre accents graves ou dans un bloc de code est une citation — un nom de champ, une colonne, une sortie d'outil — et n'est jamais jugé (borne payée par TF-0992) ; les livrables ANTÉRIEURS à l'entrée d'un terme ne sont pas réécrits.",
+  "pourquoi_le_pilot_n_est_pas_juge_par_sa_propre_liste": "Ce fichier vit dans `gabarits\\`, qui est la SOURCE de l'héritage et n'est sur le chemin de lecture d'aucun juge — exactement comme `gabarits\\RESTITUTION.md`, que le pilot fournit sans se l'appliquer par ce chemin-là. Étendre la lecture au pilot lui-même est une décision humaine ouverte : elle accuserait sa propre doctrine, où « grain » est un mot juste (mesure du 17/09/2026 : 21 fichiers `.md` du pilot l'emploient, dont `INVENTAIRE.md` et `fiches\\forge-data.md`).",
+  "termes": [
+    {
+      "proscrit": "grain",
+      "remplacer_par": "granularité",
+      "depuis": "2026-09-08",
+      "etendu_a_tous_les_produits_le": "2026-09-16",
+      "preuve": "retour humain du 08/09/2026 (lot RETOURS RD-4) : « le vocabulaire dit grain, moi je lis granularité » ; redemandé le 10/09/2026 (ledger seq 99) ; redemandé une TROISIÈME fois sur un troisième livrable, d'où le retour RP-02 du 16/09/2026 qui ordonne la portée transverse (TF-1150)",
+      "portee": "tout livrable et toute restitution d'un produit, le domaine de la Data en premier lieu ; les noms de champs, colonnes et messages d'outil ne sont pas réécrits — ils se citent entre accents graves"
+    }
+  ],
+  "ecartes_et_pourquoi": [
+    "la tournure « Ce que… », citée par le même retour : elle est DÉJÀ refusée par la règle EC-8 du plancher d'écriture (`references\\ECRITURE.md`), en titre comme en en-tête de colonne, depuis le 16/09/2026. La porter ici créerait deux vérités pour une même règle, et c'est la classe de défaut que le registre compte sous `oracle-remplace-par-controle-maison`."
+  ],
+  "non_juge": [
+    "la JUSTESSE d'un terme retenu : ce fichier enregistre une décision humaine, il ne tranche pas une querelle de vocabulaire",
+    "un synonyme non listé : la liste est FERMÉE et se remplit sur décision humaine citée, jamais par devinette",
+    "les produits qui n'ont pas encore reçu la recopie : l'héritage descend à l'ouverture de leur session (R-47), donc un produit non ouvert depuis l'ajout d'un terme ne le porte pas encore"
+  ]
+}

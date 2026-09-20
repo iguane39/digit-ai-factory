@@ -8,7 +8,10 @@
 
 - **Contexte** : <clôture du run <run-id> | inspection production v<X> | incident | autre>
 - **Références ledger** : `forge\ledger.jsonl` seq <n, n…> (entrées `type: retour`)
-- **Remise au pilot** : copier ce fichier (et son sidecar) dans `<pilot>\input\00-retours\` —
+- **Remise au pilot** : copier ce fichier (et son sidecar) dans le SAS
+  `<pilot>\input\00-retours\_arrivee\` (ignoré par git), jamais à la racine de `input\00-retours\` :
+  le pilot l'y dépose lui-même après pseudonymisation (`todo\accueillir-lot.mjs`, TF-0981) ; un lot
+  au nom réel posé à la racine est refusé (règle LOT-SAS de l'oracle, TF-1054) —
   l'original reste ici (historique du produit). Statut : `a_remettre` → `remis le <date>`
   (seule édition autorisée après coup : cette ligne de statut).
 - **Statut** : a_remettre
@@ -39,7 +42,7 @@ Convention de gravité : **bloquant** (a bloqué ou failli bloquer) · **majeur*
 aller-retour ou une découverte par lecture de code) · **mineur** (confort/précision).
 Si un retour se rapporte à un item du registre TODO-FORGE du pilot, citer son id
 (`TF-xxxx`) — chaque retour intégré recevra le sien. **Les forges aussi** peuvent déposer un
-lot avec ce gabarit, ciblant n'importe quelle autre forge (remise : `input\00-retours\` du
+lot avec ce gabarit, ciblant n'importe quelle autre forge (remise : `input\00-retours\_arrivee\` du
 pilot, préfixé du nom de la forge émettrice).
 
 **Sidecar machine (obligatoire depuis le 08/08)** : à côté de ce lot, un fichier
@@ -55,9 +58,13 @@ remontée automatique — le `.md` reste la lecture humaine.
 du sidecar désigne UNE classe de `forge\retours\CLASSES.json` — copie identique du référentiel
 du pilot, reçue avec ce gabarit. Une classe est le défaut généralisé que ce retour illustre — la
 règle qui aurait évité le retour — jamais une famille. Lot sans classe, ou à classe inconnue :
-**refusé à l'ingestion**, avec les clés proches. Aucune clé ne convient ? Le dire dans le `.md`
-(section « La règle qui aurait évité le retour ») et laisser le pilot créer la classe dans son
-référentiel : une classe ne se crée jamais dans un sidecar. Un retour dont la classe est déjà
+**refusé à l'ingestion**, avec les clés proches. **Aucune clé ne convient ?** C'est un défaut
+vraiment neuf, et il a sa sortie conforme (TF-1128, 15/09/2026) : la ligne porte la clé RÉSERVÉE
+`"classe": "classe-a-creer"` et `"classe_proposee": {"cle": "…", "famille": "…", "libelle": "…"}`
+(une famille existante, une clé qui n'existe pas encore), et le `.md` nomme la clé proposée, sa
+famille et son libellé dans la section « La règle qui aurait évité le retour ». Le lot entre ; le
+pilot crée la classe dans son référentiel et y rattache le retour. Une classe ne se crée jamais
+dans un sidecar, et une clé approchée choisie faute de mieux fausse le compte des récidives. Un retour dont la classe est déjà
 close chez le pilot entre quand même, **marqué récidive** — c'est précisément l'information
 que la factory cherche : une correction qui n'a pas redescendu jusqu'à vous.
 
@@ -91,7 +98,9 @@ un **dérivé** `.normalise.tf.jsonl` — l'original reçu n'est jamais modifié
 choses plutôt que de les deviner : un titre où aucune forge n'est nommée (la cible ne se
 devine pas — écrire « `<forge>` : … » en tête du titre), et un retour sans preuve.
 **Ids uniques par produit** : préfixe par forge (RT/RC/RD/RV/RA/RS) + numéro **jamais
-réutilisé** — continuer la séquence des lots précédents du même produit.
+réutilisé** — continuer la séquence des lots précédents du même produit. Jugé depuis le
+14/09/2026 (règle LOT-IDS de `forge\retours\oracle-lot.mjs`, TF-1039) : un identifiant déjà
+défini par un lot antérieur du même produit est refusé, et le premier libre est donné.
 
 ---
 

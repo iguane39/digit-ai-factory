@@ -36,6 +36,11 @@
  *      quand git ne suit pas le fichier (un lot brut anonymisé sur disque) ;
  *   4. `anonymiser(avant)` est IDENTIQUE au contenu courant, aux fins de ligne près. Un caractère
  *      de plus est une édition : REFUS, rien n'est écrit, et le message dit quoi faire.
+ *   4 bis. SECONDE PREUVE, aussi stricte (TF-1134, décision D-15 a du 15/09/2026) : le contenu
+ *      courant porte UN masque d'adresse IP (`MOTIF_MASQUE` de `adresses-ip.mjs`), et
+ *      `masquerAdresses(anonymiser(avant), masque)` lui est IDENTIQUE, aux fins de ligne près. Chaque
+ *      adresse à qualifier — la définition unique de `adresses-ip.mjs`, exclusions comprises — est
+ *      remplacée par ce masque, et rien d'autre ne bouge. Le motif consigné est distinct.
  *
  * L'événement consigné est une `ingestion` sans `creations` — le seul type que le registre
  * accepte sans identifiant, précédent de `heritage_non_verifie` — portant un bloc `reempreinte`
@@ -54,6 +59,7 @@ import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 import { empreinteTexte, normaliserLignes } from "../scripts/lib-empreinte.mjs";
 import { anonymiser } from "./anonymiser-entrant.mjs";
+import { masquesDe, masquerAdresses, occurrences as occurrencesIp } from "./adresses-ip.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const SUFFIXE_SIDECAR = ".tf.jsonl";
@@ -225,12 +231,26 @@ export function decider({ sidecar, registre, depot, avant, parRapprochement = fa
         "anonymisé, `--par-rapprochement` confronte ses titres aux créations consignées ; sinon c'est une édition, pas une anonymisation" };
     }
   }
-  const attendu = normaliserLignes(anonymiser(origine.octets.toString("utf8")).texte);
+  const anonymise = anonymiser(origine.octets.toString("utf8")).texte;
+  const attendu = normaliserLignes(anonymise);
   const reel = normaliserLignes(courant.toString("utf8"));
+  let motif = "sidecar réécrit par l'anonymisation (D-37) : contenu courant = forme anonymisée du contenu ingéré, aucune candidature ajoutée ni retirée";
+  let preuve = "normaliserLignes(anonymiser(contenu ingéré)) === normaliserLignes(contenu courant)";
   if (attendu !== reel) {
-    return { code: 1, message: `le contenu courant de ${nom} n'est PAS la forme anonymisée du contenu ingéré` +
-      `${origine.commit ? ` (commit ${origine.commit.slice(0, 7)})` : ""} — c'est une ÉDITION : ce qui a été ajouté ` +
-      "n'est entré nulle part. Rien n'est écrit ; passer par une rectification (ingerer-lot, `rectifie`) ou ré-ingérer un lot neuf" };
+    // 4 bis (TF-1134, D-15 a) : un masque d'adresse IP, et rien d'autre. Un seul masque distinct, au
+    // moins une adresse masquée, et l'égalité exacte après masquage : sinon c'est une édition.
+    const masques = masquesDe(reel);
+    const nbAdresses = occurrencesIp(anonymise).length;
+    const masque = masques.length === 1 ? masques[0] : null;
+    if (!masque || !nbAdresses || normaliserLignes(masquerAdresses(anonymise, masque)) !== reel) {
+      return { code: 1, message: `le contenu courant de ${nom} n'est PAS la forme anonymisée du contenu ingéré` +
+        `${origine.commit ? ` (commit ${origine.commit.slice(0, 7)})` : ""}, ni cette forme aux seules adresses IP masquées ` +
+        `(${masques.length} masque(s) distinct(s), ${nbAdresses} adresse(s) à masquer) — c'est une ÉDITION : ce qui a été ajouté ` +
+        "n'est entré nulle part. Rien n'est écrit ; passer par une rectification (ingerer-lot, `rectifie`) ou ré-ingérer un lot neuf" };
+    }
+    motif = "adresse IP masquée sur décision humaine (D-15 a, TF-1134)";
+    preuve = `normaliserLignes(masquerAdresses(anonymiser(contenu ingéré), « ${masque} »)) === normaliserLignes(contenu courant) — ` +
+      `${nbAdresses} occurrence(s) d'adresse masquée(s), définition de todo/adresses-ip.mjs`;
   }
   const shaAvant = parSha.has(empreinteTexte(origine.octets.toString("utf8")))
     ? empreinteTexte(origine.octets.toString("utf8")) : shaBrut(origine.octets);
@@ -238,13 +258,13 @@ export function decider({ sidecar, registre, depot, avant, parRapprochement = fa
     ? relative(depot, sidecar).replaceAll("\\", "/") : String(sidecar);
   return {
     code: 0,
-    message: `${nom} : contenu courant = forme anonymisée du contenu ingéré${origine.commit ? ` (commit ${origine.commit.slice(0, 7)})` : " (copie d'avant fournie)"} — ré-empreinte à consigner`,
+    message: `${nom} : contenu courant = forme anonymisée du contenu ingéré${attendu !== reel ? ", adresses IP masquées (D-15 a)" : ""}${origine.commit ? ` (commit ${origine.commit.slice(0, 7)})` : " (copie d'avant fournie)"} — ré-empreinte à consigner`,
     evenement: {
       ev: "ingestion", lot_sha: empreinteTexte(reel), fichier: anonymiser(chemin).texte,
       reempreinte: {
         lot_sha_avant: shaAvant,
-        motif: "sidecar réécrit par l'anonymisation (D-37) : contenu courant = forme anonymisée du contenu ingéré, aucune candidature ajoutée ni retirée",
-        preuve: "normaliserLignes(anonymiser(contenu ingéré)) === normaliserLignes(contenu courant)",
+        motif,
+        preuve,
         commit_origine: origine.commit ? origine.commit.slice(0, 12) : null,
       },
     },

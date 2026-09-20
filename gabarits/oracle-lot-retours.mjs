@@ -56,6 +56,17 @@
  * la main — la règle rend SANS_OBJET et le DIT : un contrôle qui exige une donnée absente crie
  * partout sauf là où il sert.
  *
+ * LOT-SAS (TF-1054, 14/09/2026) — UN LOT ARRIVE PAR LE SAS. Un lot posé à la racine SUIVIE de
+ * `input\00-retours\` sous un nom réel n'est pas passé par `_arrivee\` : il est refusé, et le
+ * remède nomme le sas. Hors de la boîte du pilot, et dans la copie héritée, SANS_OBJET dit.
+ *
+ * LOT-IDS (TF-1039, 14/09/2026) — UN IDENTIFIANT DE RETOUR N'EST JAMAIS REPRIS. Le gabarit écrit
+ * « ids uniques par produit, numéro jamais réutilisé » ; personne ne le jugeait, et le 11/09 un
+ * lot a repris RT-50 à RT-52, déjà définis par deux lots antérieurs du même produit, dans le même
+ * dossier. La règle lit les lots VOISINS antérieurs du même produit (lecture de répertoire, pas
+ * de registre) et refuse un identifiant qu'ils définissent déjà, en donnant le premier libre.
+ * Bornée au 14/09 : un lot remis ne se modifie jamais, le passé ne se répare pas.
+ *
  * ANTÉRIORITÉ DÉCLARÉE : R-45 ne juge que les lots datés du 21/08 ou après, R-46 du 22/08 ou
  * après. La date se lit dans le NOM du fichier (`… - AAAAMMJJ<lettre>.md`), jamais sur le
  * disque : une copie change la date de fichier, pas la date du lot.
@@ -64,12 +75,21 @@
  *   node oracle-lot-retours.mjs <lot.md> [--json]
  * Exit : 0 = forme tenue (ou lot antérieur aux règles) · 1 = forme en défaut · 2 = lot illisible.
  */
-import { readFileSync, existsSync } from "node:fs";
-import { basename, dirname, join } from "node:path";
+import { readFileSync, existsSync, readdirSync } from "node:fs";
+import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 
-export const VERSION = "1.1.0";
+export const VERSION = "1.2.0";
+
+// LOT-SAS (TF-1054) juge un NOM avec le MÊME juge que `todo\accueillir-lot.mjs` — deux juges des
+// noms qui ne s'accordent pas donnent le pire des deux mondes (leçon de la casse, 01/09). Import
+// DYNAMIQUE et toléré : la copie de ce module qu'un produit reçoit par l'héritage n'a pas le
+// module d'anonymisation à côté d'elle, et elle doit rester jouable seule.
+let anonymiserPilot = null;
+try {
+  ({ anonymiser: anonymiserPilot } = await import(new URL("../todo/anonymiser-entrant.mjs", import.meta.url).href));
+} catch { /* copie héritée chez un produit : la règle y rend SANS_OBJET et le dit */ }
 
 /** R-45 depuis le 21/08/2026, R-46 depuis le 22/08 — antériorité déclarée, jamais devinée. */
 export const SEUILS = { "R-45": "20260821", "R-46": "20260822" };
@@ -89,6 +109,61 @@ export function dateDuLot(chemin) {
   const m = /(\d{8})[a-z]?\.(?:md|tf\.jsonl)$/i.exec(nom)
     || /(\d{8})[a-z]?\.normalise\.tf\.jsonl$/i.exec(nom);
   return m ? m[1] : null;
+}
+
+/** LOT-IDS (TF-1039) : entrée en vigueur — antériorité déclarée, un lot remis ne se modifie jamais. */
+export const SEUIL_IDS = "20260914";
+// Un identifiant est DÉFINI en tête d'une ligne de tableau qui porte sa GRAVITÉ dans l'une des deux
+// cellules suivantes (`| RT-50 | majeur | …`, la forme du gabarit), ou en tête d'un titre
+// (`### RT-50 — …`). Cité dans la prose (« déjà remontée en RT-6 ») ou dans un tableau de RAPPEL
+// sans gravité, il ne l'est pas. Mesuré sur 247 lots réels le 14/09 : sans l'exigence de gravité,
+// un tableau de rappel (« ce que ce retour ajoute aux lots du jour ») accusait huit reprises à tort.
+const ID_EN_TETE_DE_LIGNE = /^\s*\|\s*\**\s*(R[A-Z])-0*(\d+)\b[^|\n]*\|(?:[^|\n]*\|)?\s*\**\s*(?:bloquant|majeur|mineur)\b/gim;
+const ID_EN_TITRE = /^#{2,4}\s+\**\s*(R[A-Z])-0*(\d+)\b/gm;
+const NOM_DE_LOT = /^(.*) - RETOURS - (\d{8}[a-z]?)\.md$/i;
+
+/** Les identifiants qu'un lot DÉFINIT, numéros normalisés (`RT-050` = `RT-50`). */
+export function idsDefinis(texte) {
+  const ids = new Set();
+  for (const re of [ID_EN_TETE_DE_LIGNE, ID_EN_TITRE]) for (const m of String(texte).matchAll(re)) ids.add(`${m[1].toUpperCase()}-${Number(m[2])}`);
+  return ids;
+}
+
+/**
+ * Les identifiants de ce lot déjà définis par un lot ANTÉRIEUR du même produit, dans le même
+ * dossier (et son `old\`, où la boîte du pilot range ce qu'elle a ingéré). Rend `null` si le nom
+ * n'est pas celui d'un lot. `premierLibre` : par famille en double, le numéro qui suit le plus
+ * grand déjà défini par les voisins.
+ */
+export function idsEnDouble(cheminLot, texte) {
+  const nom = basename(String(cheminLot).split("\\").join("/"));
+  const m = NOM_DE_LOT.exec(nom);
+  if (!m) return null;
+  const [, prefixe, cle] = m;
+  const dossier = dirname(resolve(String(cheminLot)));
+  const dossiers = [dossier, join(dossier, "old")];
+  if (/^_arrivee$/i.test(basename(dossier))) dossiers.push(join(dossier, ".."), join(dossier, "..", "old"));
+  const porteurs = new Map(), max = {};
+  let voisins = 0;
+  for (const d of dossiers) {
+    if (!existsSync(d)) continue;
+    for (const n of readdirSync(d)) {
+      const v = NOM_DE_LOT.exec(n);
+      if (!v || n === nom || v[1].toLowerCase() !== prefixe.toLowerCase() || v[2] >= cle) continue;
+      voisins++;
+      let t = "";
+      try { t = readFileSync(join(d, n), "utf8"); } catch { continue; }
+      for (const id of idsDefinis(t)) {
+        if (!porteurs.has(id)) porteurs.set(id, n);
+        const [fam, num] = id.split("-");
+        max[fam] = Math.max(max[fam] || 0, Number(num));
+      }
+    }
+  }
+  const doublons = [...idsDefinis(texte)].filter((id) => porteurs.has(id)).map((id) => ({ id, lot: porteurs.get(id) }));
+  const premierLibre = {};
+  for (const { id } of doublons) { const fam = id.split("-")[0]; premierLibre[fam] = `${fam}-${(max[fam] || 0) + 1}`; }
+  return { doublons, premierLibre, voisins };
 }
 
 /** Le corps d'une section, jusqu'au prochain titre de niveau 2. */
@@ -214,6 +289,56 @@ export function verifier(cheminLot, texteFourni) {
         `« ${basename(String(cheminLot))} » a DÉJÀ été ingéré (empreinte consignée ${String(ingestions[ingestions.length - 1].lot_sha).slice(0, 12)}, le ${String(ingestions[ingestions.length - 1].ts || "?").slice(0, 10)}) et son sidecar en porte une AUTRE (${empreinteActuelle.slice(0, 12)}) — `
         + "un lot remis ne se modifie JAMAIS : le registre porte les candidatures du texte d'origine, et son histoire vient de diverger du fichier",
         `restaurer le lot d'origine (\`git checkout HEAD -- "${cheminLot}" "${sidecar}"\`) et remettre le nouveau texte sous l'INDICE SUIVANT — \`node scripts\\allouer-indice.mjs\` le donne`);
+    }
+  }
+
+  // ---- LOT-SAS · UN LOT NE SE DÉPOSE JAMAIS À LA RACINE DE LA BOÎTE SOUS UN NOM RÉEL (TF-1054) --
+  //
+  // Le fait, mesuré le 11/09 : le sas `input\00-retours\_arrivee\` (ignoré par git, TF-0981)
+  // existait depuis trois jours, et DEUX lots portant un nom réel de client étaient posés à la
+  // racine SUIVIE de la boîte — indexables, un `git add -A` les emportait. Le gabarit qui voyage
+  // jusqu'au producteur nommait encore la racine comme destination.
+  //
+  // CE QUI EST JUGÉ : un lot posé DIRECTEMENT dans `00-retours\` dont le NOM change sous le juge
+  // d'`accueillir-lot` — il n'a donc pas pu arriver par le sas, qui l'aurait pseudonymisé. Un lot
+  // au nom déjà pseudonymisé à la racine est la sortie normale du sas, pas un défaut. Le contenu
+  // n'est pas jugé ici : l'anonymiseur laisse à dessein en place une occurrence collée à un
+  // identifiant (TF-0927), et refuser ces lots fermerait la porte à des lots accueillis.
+  const dossierDuLot = basename(dirname(resolve(String(cheminLot))));
+  const nomDuLot = basename(String(cheminLot).split("\\").join("/"));
+  if (/^_arrivee$/i.test(dossierDuLot)) {
+    ajouter("LOT-SAS", "PASS", "lot déposé au sas d'arrivée — `node todo\\accueillir-lot.mjs` le pseudonymise avant qu'il ne devienne indexable", null);
+  } else if (!/^00-retours$/i.test(dossierDuLot)) {
+    ajouter("LOT-SAS", "SANS_OBJET", "lot hors de la boîte d'entrée du pilot — sa destination se juge quand il y est copié", null);
+  } else if (!anonymiserPilot) {
+    ajouter("LOT-SAS", "SANS_OBJET", "juge des noms hors de portée (copie héritée du module) — la destination se juge à la porte du pilot", null);
+  } else {
+    let juge = null;
+    try { juge = anonymiserPilot(nomDuLot); } catch (e) {
+      ajouter("LOT-SAS", "SANS_OBJET", `tables de pseudonymisation introuvables — le nom n'est pas jugé, et c'est dit (${String(e.message).slice(0, 80)})`, null);
+    }
+    if (juge && juge.texte !== nomDuLot) {
+      ajouter("LOT-SAS", "FAIL",
+        `« ${nomDuLot} » est posé à la RACINE suivie de la boîte sous un nom réel — il n'est pas passé par le sas, et un \`git add -A\` l'emporte dans l'histoire`,
+        "déplacer le lot ET son sidecar dans `input\\00-retours\\_arrivee\\` (ignoré par git), puis jouer `node todo\\accueillir-lot.mjs` : il pseudonymise le nom et le contenu et redépose le lot à la racine");
+    } else if (juge) {
+      ajouter("LOT-SAS", "PASS", `« ${nomDuLot} » porte un nom déjà pseudonymisé — sortie normale du sas`, null);
+    }
+  }
+
+  // ---- LOT-IDS · UN IDENTIFIANT DE RETOUR N'EST JAMAIS REPRIS (TF-1039) ----------------------
+  if (date < SEUIL_IDS) {
+    ajouter("LOT-IDS", "SANS_OBJET", `lot du ${date}, antérieur à l'entrée en vigueur de LOT-IDS (${SEUIL_IDS}) — antériorité déclarée`, null);
+  } else {
+    const r = idsEnDouble(cheminLot, texte);
+    if (!r) {
+      ajouter("LOT-IDS", "SANS_OBJET", "le nom n'est pas celui d'un lot (« <projet> - RETOURS - AAAAMMJJ<lettre>.md ») — les voisins ne se trouvent pas", null);
+    } else if (r.doublons.length) {
+      ajouter("LOT-IDS", "FAIL",
+        `${r.doublons.length} identifiant(s) déjà défini(s) par un lot antérieur du même produit : ${r.doublons.map((d) => `${d.id} (${d.lot})`).join(", ")} — deux retours différents porteraient la même référence au registre`,
+        `renuméroter à partir du premier libre : ${Object.values(r.premierLibre).join(", ")} — un numéro n'est jamais réutilisé, la séquence continue celle des lots précédents`);
+    } else {
+      ajouter("LOT-IDS", "PASS", `aucun identifiant repris des ${r.voisins} lot(s) antérieur(s) du même produit`, null);
     }
   }
 

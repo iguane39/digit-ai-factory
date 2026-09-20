@@ -198,6 +198,30 @@ try {
   attendre("preuve absente", lancer(), 1, /preuve absente/);
   git(join(racine, FORGES[1].nom), "checkout", "--", FORGES[1].preuve);
   attendre("preuve restaurée", lancer(), 0, /Poste prêt/);
+
+  // 5. TF-1099 — LA PROPAGATION AUTOMATIQUE N'EMPORTE PAS L'ÉTAT INTERMÉDIAIRE D'UNE CAMPAGNE.
+  // Trois dépôts sources : un skill commité ET publié (se propage), un skill commité non publié
+  // et un skill jamais commité (ne se propagent pas, et c'est DIT). Les copies installées vivent
+  // sous le parc temporaire (FORGE_SKILLS_INSTALLES, CLAUDE_CONFIG_DIR) — jamais celles du poste.
+  {
+    const presents = FORGES.map((f) => join(racine, f.nom)).filter((d) => existsSync(join(d, ".git")));
+    const [propre, avance, sale] = presents;
+    const config = join(base, "config-1099");
+    const inst = join(config, "skills");
+    mkdirSync(inst, { recursive: true });
+    const poserSkill = (d, nom) => { mkdirSync(join(d, ".claude", "skills", nom), { recursive: true }); writeFileSync(join(d, ".claude", "skills", nom, "SKILL.md"), `# ${nom}\n`); };
+    poserSkill(propre, "skill-propre"); git(propre, "add", "-A"); git(propre, "commit", "--quiet", "-m", "skill propre"); git(propre, "push", "--quiet", "origin", "main");
+    poserSkill(avance, "skill-non-publie"); git(avance, "add", "-A"); git(avance, "commit", "--quiet", "-m", "skill non publie");
+    poserSkill(sale, "skill-sale");
+    const r = spawnSync(process.execPath, [BOOTSTRAP, "--racine", racine, "--sans-pilot", "--pull"],
+      { encoding: "utf8", env: { ...process.env, BOOTSTRAP_SOURCE: bare, BOOTSTRAP_RELANCE: "1", FORGE_SKILLS_INSTALLES: inst, CLAUDE_CONFIG_DIR: config } });
+    joues += 1;
+    const sortie = (r.stdout || "") + (r.stderr || "");
+    if (!existsSync(join(inst, "skill-propre", "SKILL.md"))) echecs.push(`TF-1099 : le skill d'un dépôt PROPRE et publié n'est pas propagé — ${sortie.split("\n").filter((l) => /skills/.test(l)).join(" | ").slice(0, 300)}`);
+    if (existsSync(join(inst, "skill-non-publie"))) echecs.push("TF-1099 : un skill aux commits NON PUBLIÉS a été propagé vers la copie installée");
+    if (existsSync(join(inst, "skill-sale"))) echecs.push("TF-1099 : un skill d'un arbre MODIFIÉ a été propagé vers la copie installée");
+    if ((sortie.match(/NON propagés/g) || []).length < 2) echecs.push(`TF-1099 : les deux dépôts épargnés ne sont pas DITS sur une ligne [avert] — ${sortie.split("\n").filter((l) => /avert/.test(l)).join(" | ").slice(0, 300)}`);
+  }
 } catch (err) {
   echecs.push(`harnais : ${String(err).slice(0, 300)}`);
 } finally {

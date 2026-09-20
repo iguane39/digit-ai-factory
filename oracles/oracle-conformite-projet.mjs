@@ -99,6 +99,10 @@ const git = (...args) => spawnSync("git", ["-C", cible, ...args], { encoding: "u
 const aGit = existsSync(p(".git"));
 
 const MOTIF_DATE = / - \d{8}[a-z]?\.[\w.]+$/;
+// Le même nommage, sans extension : celui d'un livrable-DOSSIER (TF-1177). Un projet PBIP, un
+// export multi-fichiers, un site statique se remettent en dossier ; leurs parties sont imposées par
+// le format et ne se renomment pas.
+const MOTIF_DOSSIER_DATE = / - \d{8}[a-z]?$/;
 const EXT_CODE = new Set(["py", "js", "mjs", "cjs", "ts", "tsx", "jsx", "go", "rs", "java", "rb", "php", "cs"]);
 const EXT_LIVRABLE = new Set(["md", "pdf", "html", "pptx", "docx", "xlsx", "zip", "png", "svg"]);
 // LISEZMOI.md : index de dossier, pas un livrable daté (convention des familles numérotées
@@ -286,12 +290,43 @@ for (const d of ["output", "docs"]) {
   for (const f of fichiers(p(d))) {
     const nom = basename(f);
     const ext = nom.split(".").pop().toLowerCase();
-    if (EXCLUS_NOMMAGE.has(nom) || !EXT_LIVRABLE.has(ext) || /\/Old\//i.test("/" + rel(f))) continue;
+    if (/\/Old\//i.test("/" + rel(f))) continue;
     if (estExcluDuDepot(rel(f))) continue;   // TF-0853 : jamais versionné = pas un livrable
     // `.oracles\` : captures produites PAR `render_page.py` à côté de la page auditée — ce
     // sont des pièces de preuve d'oracle, pas des livrables remis. Les nommer R-4 reviendrait
     // à dater un journal (TF-0197).
     if (/[\/]\.oracles[\/]/.test("/" + rel(f))) continue;
+    // ---- TF-1177 (17/09/2026) — LES PARTIES D'UN LIVRABLE COMPOSÉ NE SONT PAS DES LIVRABLES ----
+    //
+    // LE FAIT DU 17/09 : un projet Power BI remis sous « output\<Marque> - Projet Power BI -
+    // 20260917m\ » a rendu TROIS R-4 FAIL, sur `fond.svg`, `reset1.png` et `reset2.png` — les
+    // ressources d'image du rapport, placées par le format à un emplacement imposé et référencées
+    // PAR LEUR NOM dans le rapport. Les 40 autres fichiers du même dossier (`.tmdl`, `.pbir`,
+    // `.pbism`, `.pbip`) n'étaient pas jugés, leur extension n'étant pas dans `EXT_LIVRABLE` : *le
+    // même dossier était conforme ou fautif selon l'extension de ses parties.* Et les renommer était
+    // impossible — le plafond de chemin de l'alinéa TF-1015 aurait été dépassé de 13 caractères.
+    //
+    // LE LIVRABLE REMIS EST LE DOSSIER, et c'est lui que R-4 juge : son nommage daté, son indice
+    // unique dans son dossier parent, et la longueur de chemin de CHAQUE partie — celle-là est
+    // mesurée plus bas, sur les fichiers réels, et ne bouge pas d'un caractère. Même raisonnement
+    // que pour `.oracles\` et `docs\projet\` : ce qui n'est pas remis ne porte pas le nom d'un remis.
+    //
+    // AUCUNE ÉCHAPPATOIRE GÉNÉRALE : la dispense tient au DOSSIER ANCÊTRE daté, jamais à
+    // l'emplacement ni à l'extension. Un `.png` livré à plat dans `output\` n'a aucun ancêtre daté,
+    // il reste jugé — et le banc le tient dans ce sens-là aussi.
+    const segments = rel(f).split("/");
+    const iDossier = segments.slice(0, -1).findIndex((s) => MOTIF_DOSSIER_DATE.test(s));
+    if (iDossier >= 0) {
+      const nomDossier = segments[iDossier];
+      const parent = segments.slice(0, iDossier).join("/") || ".";
+      const cleD = nomDossier.match(/ - (\d{8}[a-z]?)$/)[1];
+      if (!indicesParDossier.has(parent)) indicesParDossier.set(parent, new Map());
+      const parCleD = indicesParDossier.get(parent);
+      if (!parCleD.has(cleD)) parCleD.set(cleD, new Set());
+      parCleD.get(cleD).add(nomDossier);
+      continue;
+    }
+    if (EXCLUS_NOMMAGE.has(nom) || !EXT_LIVRABLE.has(ext)) continue;
     if (/^docs[\/]projet[\/]/.test(rel(f))) continue; // socle documentaire R-20 : documents vivants à noms fixes, pas des livrables datés
     // TF-0197 (14/08) : le gabarit d'étude du pilot PRESCRIT lui-même « output\03-etudes\
     // <AAAAMMJJ>-etude-<objet>.md » (gabarits\ETUDE-OPPORTUNITE.md l.6) — date en tête, pour
@@ -751,6 +786,80 @@ else {
         }
       }
     }
+    // R-20 ter ÉTENDU AUX FICHIERS HÉRITÉS (TF-1119, 15/09/2026). La règle « une fiche qui porte
+    // encore ses marqueurs n'est pas une fiche » (TF-0647) était BORNÉE à docs\projet\ ; le défaut
+    // qu'elle traite ne connaît aucune frontière de dossier. Mesuré le 14/09 chez un produit : le
+    // carnet `forge\travaux\ECARTS-ASSUMES.md`, reçu par héritage dix-neuf jours plus tôt, portait
+    // encore `<produit>` dans son titre, la date du gabarit et ZÉRO écart, pendant qu'un second
+    // carnet créé à la main en portait ONZE — aucun des deux ne citant l'autre, et cet oracle
+    // rendait zéro constat. Une session qui lit le carnet prescrit conclut « aucun écart assumé » :
+    // réponse fausse et plausible. Jugé ici : tout artefact PERSONNALISABLE de HERITAGE.json
+    // (modes `presence*` — une copie conforme porte ses marqueurs à bon droit). Les marqueurs jugés
+    // sont ceux que le contrat DÉCLARE (`marqueurs_a_instancier`), jamais devinés : mesuré sur les
+    // onze produits du parc le 15/09, un relevé de tous les chevrons du gabarit rendait 30 échecs
+    // neufs dont 18 faux positifs (déclarés : 12 échecs neufs, aucun faux positif relevé) —
+    // `<pilot>`, `<forge>`, `<projet>` sont des CONVENTIONS de chemin
+    // que le produit garde, et le `<qui>` de robots.txt vit dans un exemple commenté. Une date de
+    // vérification restée celle du gabarit est un AVERTISSEMENT (règle neuve, corpus à lire).
+    {
+      const PILOT47 = join(dirname(fileURLToPath(import.meta.url)), "..");
+      const SEUIL_HERITES_1119 = "2026-09-15";
+      const dateDe =(t) => (/^verifie_le\s*:\s*(\d{4}-\d{2}-\d{2})\s*$/m.exec(frontmatter(t) || "") || [])[1] || null;
+      for (const a of heritage.artefacts) {
+        if (!/^presence/.test(a.mode || "")) continue;
+        const src = join(PILOT47, a.source), dst = p(a.cible);
+        if (!existsSync(src) || !existsSync(dst)) continue;
+        const tSrc = readFileSync(src, "utf8"), tDst = readFileSync(dst, "utf8");
+        const declares = Array.isArray(a.marqueurs_a_instancier) ? a.marqueurs_a_instancier : [];
+        const perimes = declares.filter((m) => !tSrc.includes(m));
+        if (perimes.length) so("R-20", `HERITAGE.json déclare pour ${a.source} des marqueurs que le gabarit ne porte plus : ${perimes.join(", ")} — déclaration à retirer (TF-1119)`);
+        const restes = declares.filter((m) => tSrc.includes(m) && tDst.includes(m));
+        const vSrc = dateDe(tSrc), vDst = dateDe(tDst);
+        // ANTÉRIORITÉ, jamais un défaut rétroactif (correctif du 15/09, même idiome que les
+        // sections de COMPOSANTS-OPS) : cet oracle suspend l'ouverture de run sur un FAIL, et la
+        // règle est née le 15/09. Un fichier revu avant, ou jamais daté, est relevé au non_juge —
+        // mesuré au parc : 12 écarts, tous antérieurs — et exigé à sa prochaine revue datée.
+        if (restes.length && vDst && vDst >= SEUIL_HERITES_1119) {
+          ko("R-20", a.cible, `${restes.length} marqueur(s) du gabarit ${a.source} NON INSTANCIÉ(S) dans ce fichier hérité — `
+            + `une fiche qui porte encore ses trous est une fiction plausible, quel que soit son dossier (R-20 ter étendu, TF-1119). Ex. : ${restes.slice(0, 4).join(", ")}`);
+        } else if (restes.length) {
+          antecedences.push(`R-20 ter (fichier hérité) non jugé sur ${a.cible} : ${restes.length} marqueur(s) du gabarit non instancié(s) (${restes.slice(0, 3).join(", ")}) ; la règle naît le ${SEUIL_HERITES_1119} (TF-1119) et le document porte verifie_le=${vDst || "non daté"} — antériorité déclarée, jamais un défaut de produit ; exigée dès sa prochaine revue datée`);
+        }
+        if (vDst && (vDst === vSrc || vDst === a.depuis)) {
+          ok("R-20", a.cible, `AVERTISSEMENT, non bloquant : verifie_le=${vDst} est la date du GABARIT, pas celle d'une revue du produit — `
+            + "un fichier hérité jamais revu se lit comme revu (TF-1119)");
+        }
+      }
+      // Deux carnets pour une même notion : un seul est rempli, et l'autre ment. Le carnet hérité
+      // doit CITER tout autre carnet d'écarts du produit (et le gabarit le prescrit) — sinon FAIL.
+      const carnet = p("forge/travaux/ECARTS-ASSUMES.md");
+      if (existsSync(carnet)) {
+        const texteCarnet = readFileSync(carnet, "utf8");
+        const autres = [];
+        const chercher = (d, prof) => {
+          if (prof > 3 || !existsSync(d)) return;
+          for (const e of readdirSync(d, { withFileTypes: true })) {
+            if (e.name.startsWith(".") || e.name === "node_modules" || e.name === "old") continue;
+            const f = join(d, e.name);
+            if (e.isDirectory()) chercher(f, prof + 1);
+            // Un CARNET, pas tout fichier qui parle d'écarts : un « rapport d'écarts » de
+            // rapprochement de données n'en est pas un (faux positif mesuré sur le parc le 15/09).
+            else if (/carnet.*[ée]carts?|^[ée]carts?[-_ ]/i.test(e.name) && /\.md$/i.test(e.name) && f !== carnet) autres.push(f);
+          }
+        };
+        chercher(p("docs"), 0);
+        chercher(p("forge"), 0);
+        const nonCites = autres.filter((f) => !texteCarnet.includes(basename(f)));
+        const vCarnet = dateDe(texteCarnet);
+        if (nonCites.length && !(vCarnet && vCarnet >= SEUIL_HERITES_1119)) {
+          antecedences.push(`R-20 (carnet d'écarts) non jugé sur forge/travaux/ECARTS-ASSUMES.md : ${nonCites.length} autre(s) carnet(s) d'écarts non cité(s) (${nonCites.map((f) => basename(f)).join(", ")}) ; la règle naît le ${SEUIL_HERITES_1119} (TF-1119) et le carnet porte verifie_le=${vCarnet || "non daté"} — antériorité déclarée ; exigée dès sa prochaine revue datée`);
+        } else nonCites.length
+          ? ko("R-20", "forge/travaux/ECARTS-ASSUMES.md", `${nonCites.length} autre(s) carnet(s) d'écarts non cité(s) par le carnet hérité : `
+            + `${nonCites.map((f) => relative(cible, f).replaceAll("\\", "/")).join(", ")} — deux contenants pour une même notion : l'un est rempli, l'autre ment. `
+            + "Soit le carnet hérité absorbe ces écarts, soit il nomme l'autre carnet dans sa section « Frontière » (TF-1119)")
+          : autres.length && ok("R-20", "forge/travaux/ECARTS-ASSUMES.md", `${autres.length} autre(s) carnet(s) d'écarts, tous cités par le carnet hérité (TF-1119)`);
+      }
+    }
     // TF-0881 (08/09) — L'ALIAS DE TRANSITION QUI SURVIT À CÔTÉ DE LA CIBLE CANONIQUE. L'alias
     // n'est LU que si la cible canonique manque (TF-0710, à bon droit). Mais quand les DEUX
     // existent, l'ancien fichier — 62 lignes du 14/08, sans obligation de classe ni section « la
@@ -880,6 +989,32 @@ else {
     }
   });
   if (sainEx) ok("R-13", basename(envEx), "présent avec variables déclarées, aucune valeur ni motif de secret");
+  // R-15 (TF-1080, 14/09/2026) — exigence R-15.1 : une variable que la forge ne renseigne pas porte
+  // « # à fournir : ». Jugé sur la seule forme mécanisable : une variable SANS valeur et SANS
+  // marqueur (sur sa ligne, ou sur la ligne de commentaire qui la précède) ne dit pas qui la
+  // renseigne. Une variable AVEC valeur par défaut n'est pas jugée : savoir si elle est tierce
+  // demande de connaître le produit (déclaré au non_juge).
+  // CALIBRÉ SUR LE PARC, et c'est une mesure (N-23) : jouée brute sur les 8 produits porteurs d'un
+  // `.env.example`, la règle en accusait 6, dont des variables OPTIONNELLES dont le commentaire dit
+  // déjà « Vide = … ». Deux bornes en sortent. (1) Une variable vide qui DÉCLARE que le vide est
+  // valide (« vide », « optionnel », « facultatif », « par défaut », sur sa ligne ou celle d'avant)
+  // n'est pas muette. (2) Le refus ne vaut que pour un fichier qui a ENTAMÉ la discipline (au moins
+  // un « # à fournir : ») ; ailleurs le constat est un AVERTISSEMENT en PASS — cet oracle garde
+  // l'ouverture de tout run, et une règle neuve qui bloquerait 6 produits sur 8 se ferait désactiver.
+  const lignesEx = readFileSync(envEx, "utf8").split(/\r?\n/);
+  const DIT_QUI = /#\s*à\s+fournir/i, DIT_VIDE = /#.*\b(vide|optionnel|facultati|par d[ée]faut)/i;
+  const muettes = [];
+  lignesEx.forEach((ligne, i) => {
+    const m = /^([A-Z][A-Z0-9_]*)=(.*)$/.exec(ligne);
+    if (!m || m[2].split("#")[0].trim()) return;
+    const avant = i > 0 && /^\s*#/.test(lignesEx[i - 1]) ? lignesEx[i - 1] : "";
+    if (DIT_QUI.test(m[2]) || DIT_VIDE.test(m[2]) || DIT_QUI.test(avant) || DIT_VIDE.test(avant)) return;
+    muettes.push(`${m[1]} (ligne ${i + 1})`);
+  });
+  const entamee = lignesEx.some((l) => DIT_QUI.test(l));
+  if (muettes.length && entamee) ko("R-15", basename(envEx), `${muettes.length} variable(s) SANS valeur, sans « # à fournir : » et sans déclaration de vide valide — ${muettes.join(", ")} : rien ne dit qui la renseigne, et l'étape qualif ne peut pas la porter en non_testable (RT-6). Ajouter « # à fournir : <qui, où> », ou « # vide = <effet> » si le vide est voulu (R-15.1, TF-1080)`);
+  else if (muettes.length) ok("R-15", basename(envEx), `AVERTISSEMENT, non bloquant : la discipline « # à fournir : » n'est pas entamée dans ce fichier, et ${muettes.length} variable(s) vide(s) ne disent ni qui les fournit ni que le vide est voulu — ${muettes.slice(0, 6).join(", ")}${muettes.length > 6 ? ", …" : ""} (R-15.1, TF-1080)`);
+  else ok("R-15", basename(envEx), "toute variable sans valeur dit qui la fournit ou que le vide est voulu (R-15.1)");
 }
 
 // R-14 — .env jamais versionné
@@ -1112,6 +1247,31 @@ const FICHIERS_DP = ["TECHNOS.md", "COMPOSANTS-OPS.md", "PARAMETRAGE.md", "ACCES
 const PROJECTIONS_DP = ["ARCHITECTURE.html", "MODELE-DONNEES.html"]; // vues générées, jamais saisies (scripts du pilot)
 if (!existsSync(dp)) ko("R-20", "docs\\projet\\", "dossier absent — socle documentaire du produit (TECHNOS, COMPOSANTS-OPS, PARAMETRAGE, ACCES-TEST, COMMANDES)");
 else {
+  // R-20 ter (TF-0985, 14/09/2026) — un tableau de RÉFÉRENCE indexé par environnement est
+  // AUTOSUFFISANT : aucune cellule ne renvoie ailleurs sans valeur résolue. Mesuré sur les
+  // `docs\projet\` du parc (105 fichiers) : 13 tableaux à en-tête d'environnement, 4 porteurs d'un
+  // renvoi chez 2 produits, dont le tableau de paramétrage du cas fondateur (cinq « idem », deux
+  // « défaut du code »). AVERTISSEMENT en PASS, et c'est une décision : cet oracle garde l'ouverture
+  // de tout run, et une règle neuve se durcit sur un corpus lu, pas sur sa première mesure.
+  {
+    const ENV_ENTETE = /\b(dev|développement|developpement|qualif|qualification|recette|préprod|preprod|prod|production|staging|uat)\b/i;
+    const RENVOI = /voir ci-dessus|voir plus haut|cf\.? plus haut|\bidem\b|défaut du code|defaut du code/i;
+    const renvois = [];
+    for (const f of FICHIERS_DP) {
+      const fp = join(dp, f);
+      if (!existsSync(fp)) continue;
+      const L = readFileSync(fp, "utf8").split(/\r?\n/);
+      for (let i = 0; i < L.length; i++) {
+        if (!/^\s*\|/.test(L[i]) || !/^\s*\|[\s:|-]+\|\s*$/.test(L[i + 1] || "") || !ENV_ENTETE.test(L[i])) continue;
+        let n = 0;
+        for (let k = i + 2; k < L.length && /^\s*\|/.test(L[k]); k++) n += L[k].split("|").filter((c) => RENVOI.test(c)).length;
+        if (n) renvois.push(`${f}:${i + 1} (${n} cellule(s))`);
+      }
+    }
+    ok("R-20 ter", "docs\\projet\\", renvois.length
+      ? `AVERTISSEMENT, non bloquant : ${renvois.length} tableau(x) indexé(s) par environnement renvoient ailleurs au lieu de porter la valeur (« idem », « voir ci-dessus », « défaut du code ») — ${renvois.join(", ")} ; un tel tableau porte TOUT ce qui sert à l'action, y compris ce qui ne varie pas (R-20 ter, TF-0985)`
+      : "les tableaux indexés par environnement portent leurs valeurs, sans renvoi (R-20 ter)");
+  }
   let ok20 = true;
   for (const f of FICHIERS_DP) {
     const fp = join(dp, f);
@@ -1212,6 +1372,77 @@ else {
         + "est une réponse complète, jamais un silence");
     else
       antecedences.push(`R-20 (infrastructure déclarée) non jugé sur docs\\projet\\COMPOSANTS-OPS.md : la section naît le 26/08 (TF-0651) et le document porte verifie_le=${verifieCop || "non daté"} — antériorité déclarée, jamais un défaut de produit ; elle sera exigée dès la prochaine revue datée`);
+
+    // R-20 (suite) · L'INVENTAIRE DIT L'USAGE, PAS SEULEMENT LA PRÉSENCE (TF-1113, TF-1117, TF-1120 ;
+    // étude 20260915a, option O1 : R-20 étendu, aucun fichier neuf). LE FAIT, 14/09/2026 : dix
+    // éléments sans consommateur coexistaient avec un COMPOSANTS-OPS conforme ; deux suppressions
+    // évidentes d'après le nom auraient tué le produit ; sur dix lignes déclarées inutilisées, cinq
+    // n'étaient pas supprimables ; et aucune ne disait ce qui la crée, donc ce qui la recréerait.
+    // Jugé : la PRÉSENCE de la colonne Statut, de la table « qui consomme quoi » et de la section
+    // « Composants inutilisés » avec ses colonnes, et les deux vocabulaires fermés (accord en genre
+    // et en nombre toléré). NON jugé : qu'un statut soit justifié par un consommateur résolu plutôt
+    // que par le nom — la table le permet, sa justesse se lit à la revue.
+    // ANTÉRIORITÉ, même borne que le correctif 01faf22 : exigé dès le premier verifie_le ≥ 15/09.
+    {
+      const SEUIL_USAGE = "2026-09-15";
+      const plat = (s) => String(s).normalize("NFD").replace(/\p{M}/gu, "").replace(/[’]/g, "'").replace(/[*`✂]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
+      const L = texteCop.split(/\r?\n/);
+      const cellules = (l) => l.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
+      const tables = [];
+      for (let i = 0; i < L.length - 1; i++) {
+        if (!/^\s*\|/.test(L[i]) || !/^\s*\|[\s:|-]+\|\s*$/.test(L[i + 1])) continue;
+        const t = { ligne: i, entetes: cellules(L[i]).map(plat), lignes: [] };
+        for (let k = i + 2; k < L.length && /^\s*\|/.test(L[k]); k++) t.lignes.push(cellules(L[k]));
+        tables.push(t);
+      }
+      const titres = L.map((l, i) => ({ l, i })).filter((x) => /^#{2,}\s/.test(x.l));
+      const sectionDe = (motif) => {
+        const t = titres.find((x) => motif.test(plat(x.l)));
+        if (!t) return null;
+        const suivant = titres.find((x) => x.i > t.i && x.l.match(/^#+/)[0].length <= t.l.match(/^#+/)[0].length);
+        return { debut: t.i, fin: suivant ? suivant.i : L.length };
+      };
+      const valeursDe = (t, col) => t.lignes.map((r) => r[col] || "").filter((v) => v && !/^\{.*\}$/.test(v.trim()));
+      const flexion = (mot) => new RegExp(`^${mot.replace(/ /g, "\\s")}(e|s|es)?$`);
+      const VOCAB_STATUT = ["actif", "partage", "declare", "inutilise", "hors perimetre"];
+      const VOCAB_SUPPR = ["supprimable", "non supprimable, droit absent", "non supprimable, decision", "non supprimable, tiers proprietaire"];
+      // Les LIBELLÉS EXACTS du gabarit, que la règle O-15 de forge-ops lit aussi : le message les
+      // cite tels quels, la comparaison se fait sur leur forme aplatie.
+      const COLS_INUTILISES = ["preuve d'inutilité", "ce qui cesse de fonctionner si on le supprime", "statut de supprimabilité", "créé par quoi", "geste", "titulaire du droit"];
+      const manques = [], vocab = [];
+      const tablesStatut = tables.filter((t) => t.entetes.includes("statut"));
+      if (!tablesStatut.length) manques.push("colonne Statut à l'inventaire (actif / partagé / déclaré / inutilisé / hors périmètre)");
+      for (const t of tablesStatut) {
+        const col = t.entetes.indexOf("statut");
+        const hors = valeursDe(t, col).filter((v) => !VOCAB_STATUT.some((m) => flexion(m).test(plat(v))));
+        if (hors.length) vocab.push(`Statut hors vocabulaire fermé (ligne ${t.ligne + 1}) : ${[...new Set(hors)].slice(0, 5).join(", ")}`);
+      }
+      const conso = sectionDe(/qui consomme quoi/);
+      if (!conso || !tables.some((t) => t.ligne > conso.debut && t.ligne < conso.fin)) manques.push("table « qui consomme quoi »");
+      const inut = sectionDe(/composants? inutilis/);
+      if (!inut) manques.push("section « Composants inutilisés » (déclarée même vide — loi n° 3)");
+      else {
+        const tIn = tables.filter((t) => t.ligne > inut.debut && t.ligne < inut.fin && t.entetes.some((e) => e.includes("supprimabilite") || e.includes("preuve d'inutilite")));
+        const videDeclaree = /aucun composant inutilise/.test(plat(L.slice(inut.debut, inut.fin).join(" ")));
+        if (!tIn.length && !videDeclaree) manques.push("table de la section « Composants inutilisés », ou sa déclaration vide « aucun composant inutilisé relevé le AAAA-MM-JJ »");
+        for (const t of tIn) {
+          const absentes = COLS_INUTILISES.filter((c) => !t.entetes.some((e) => e.includes(plat(c))));
+          if (absentes.length) manques.push(`colonne(s) de la section « Composants inutilisés » : ${absentes.join(", ")}`);
+          const col = t.entetes.findIndex((e) => e.includes("statut de supprimabilite"));
+          if (col >= 0) {
+            const hors = valeursDe(t, col).filter((v) => !VOCAB_SUPPR.includes(plat(v).replace(/\s*[,;:—–-]\s*/g, ", ")));
+            if (hors.length) vocab.push(`statut de supprimabilité hors vocabulaire fermé (ligne ${t.ligne + 1}) : ${[...new Set(hors)].slice(0, 5).join(", ")}`);
+          }
+        }
+      }
+      const ecarts = [...manques.map((m) => `manque : ${m}`), ...vocab];
+      if (verifieCop && verifieCop >= SEUIL_USAGE) {
+        for (const e of ecarts) ko("R-20", "docs\\projet\\COMPOSANTS-OPS.md", `${e} — l'inventaire dit l'USAGE, pas seulement la présence : un composant inutile y est sinon indiscernable d'un composant vital (TF-1113, TF-1117, TF-1120 ; gabarit gabarits\\docs-projet\\COMPOSANTS-OPS.md)`);
+        if (!ecarts.length) ok("R-20", "docs\\projet\\COMPOSANTS-OPS.md", "colonne Statut, table « qui consomme quoi » et section « Composants inutilisés » présentes, vocabulaires fermés tenus (TF-1113, TF-1117, TF-1120)");
+      } else if (ecarts.length) {
+        antecedences.push(`R-20 (usage des composants) non jugé sur docs\\projet\\COMPOSANTS-OPS.md : ${ecarts.length} écart(s) (${ecarts.slice(0, 3).join(" ; ")}) ; la règle naît le ${SEUIL_USAGE} (TF-1113, TF-1117, TF-1120) et le document porte verifie_le=${verifieCop || "non daté"} — antériorité déclarée, jamais un défaut de produit ; exigée dès la prochaine revue datée`);
+      }
+    }
   }
 
 
@@ -1360,47 +1591,6 @@ else {
       }
       if (ok24) jugees ? ok("R-24", "docs\\projet\\PARAMETRAGE.md", `${jugees} URL(s) d'environnement au motif <appli>-{dev|qualif|production}, suffixe accordé à sa ligne${excuses ? ` (${excuses} écart(s) déclaré(s) en champ structuré)` : ""}`) : so("R-24", "environnements hébergés en placeholders — URLs réelles non encore posées");
     }
-  }
-
-  // R-20 (suite) · UN TABLEAU PAR ENVIRONNEMENT EST AUTOSUFFISANT (TF-0985, 14/09/2026).
-  //
-  // LE FAIT, mesuré le 08/09 sur un PARAMETRAGE.md : quatre tableaux pour un seul appel — la
-  // requête, les en-têtes, le jeton, et « ce qui est réellement servi par environnement », ce
-  // dernier ne portant que le DELTA. Chaque élément était présent, exact et sourcé ; AUCUN tableau
-  // ne permettait d'émettre la requête. Retour humain : « Comment je peux faire si je n'ai pas les
-  // infos les plus importantes ? » Le lecteur n'arrive jamais par le début du document : il arrive
-  // par SON environnement. Factoriser le commun en tête coûte peu à ÉCRIRE et beaucoup à LIRE.
-  //
-  // CE QUI EST JUGÉ, et c'est l'oracle bon marché que l'item proposait : dans une ligne de tableau
-  // dont la première cellule nomme un environnement, aucune cellule ne RENVOIE ailleurs au lieu de
-  // porter la valeur (« voir ci-dessus », « idem », « défaut du code »). La factorisation reste
-  // admise dans la prose qui EXPLIQUE, jamais dans le tableau dont on se sert.
-  //
-  // ANTÉRIORITÉ, par le même mécanisme que les sections de COMPOSANTS-OPS : le signal de date est
-  // DANS le fichier. Mesure du 14/09 sur les six PARAMETRAGE.md de produits du poste : deux
-  // portent des renvois (1 et 4 cellules) ; tous sont revus avant le 15/09 — aucun n'est accusé,
-  // tous sont nommés en antériorité, et la règle mord dès leur prochaine revue datée.
-  if (existsSync(pp)) {
-    const corps85 = readFileSync(pp, "utf8");
-    const verifie85 = (/^verifie_le\s*:\s*(\d{4}-\d{2}-\d{2})\s*$/m.exec(frontmatter(corps85) || "") || [])[1] || null;
-    const RE_ENV85 = /^(locale?|dev|qualif|qualification|recette|staging|preprod|production|prod)$/i;
-    const RENVOI85 = /(voir ci-dessus|voir plus haut|cf\.?\s*ci-dessus|\bci-dessus\b|\bidem\b|d[ée]faut du code|m[êe]me valeur que)/i;
-    const renvois = [];
-    corps85.split(/\r?\n/).forEach((l, i) => {
-      if (!/^\s*\|/.test(l)) return;
-      const c = l.trim().replace(/^\|/, "").replace(/\|\s*$/, "").split("|").map((x) => x.trim());
-      if (!RE_ENV85.test(c[0] || "")) return;
-      const fautive = c.slice(1).find((x) => RENVOI85.test(x));
-      if (fautive) renvois.push(`ligne ${i + 1} (${c[0]}) : « ${fautive.slice(0, 50)} »`);
-    });
-    if (!renvois.length)
-      ok("R-20", "docs\\projet\\PARAMETRAGE.md", "tableaux par environnement autosuffisants — aucune cellule ne renvoie ailleurs au lieu de porter la valeur");
-    else if (verifie85 && verifie85 >= "2026-09-15")
-      ko("R-20", "docs\\projet\\PARAMETRAGE.md", `${renvois.length} cellule(s) d'un tableau par environnement RENVOIENT ailleurs au lieu de porter la valeur — ${renvois.slice(0, 3).join(" · ")} — `
-        + "un tableau indexé par environnement est AUTOSUFFISANT : le lecteur arrive par SON environnement, pas par le début du document ; "
-        + "il porte tout ce qui sert à l'action, y compris ce qui ne varie pas. La factorisation reste admise dans la prose qui explique (TF-0985)");
-    else
-      antecedences.push(`R-20 (tableau par environnement autosuffisant) non jugé sur docs\\projet\\PARAMETRAGE.md : ${renvois.length} renvoi(s) relevé(s), la règle naît le 14/09 (TF-0985) et le document porte verifie_le=${verifie85 || "non daté"} — antériorité déclarée ; exigée dès la prochaine revue datée`);
   }
 
   // R-26 · modèle de données ancré au schéma réel (TF-0091) : chaque table déclarée dans
@@ -1654,6 +1844,61 @@ else {
     });
     if (ok23) ok("R-23", "docs\\projet\\ACCES-TEST.md", "en-tête démo-locale présent, aucun motif de secret, comptes de démo nommés par variables");
   }
+
+  // ---- R-23, SECOND VOLET (TF-1088, 17/09/2026) — LA FICHE EST LUE, LA PAGE SERVIE NE L'EST PAS
+  //
+  // LE FAIT, relevé au banc des défauts échappés (cas E-01, phase MEP) : « des identifiants de
+  // démonstration triviaux figurent en clair dans la fiche d'accès ET s'affichent sur la page de
+  // connexion quand le mode démo est actif, alors que l'environnement de qualification est servi
+  // publiquement sur Internet ». TF-0871 a fermé la MOITIÉ du trou le 06/09 — la fiche nomme des
+  // variables — et la moitié qui reste est celle que le visiteur voit : *un identifiant retiré du
+  // document et laissé à l'écran n'a pas été retiré.* La fiche est un document, la page est
+  // l'attaque.
+  //
+  // CE QUI EST JUGÉ : une ligne d'un gabarit de page SERVIE (connexion, aide) qui mentionne la
+  // démonstration ET affiche, sur la même ligne, soit une ADRESSE littérale, soit une valeur
+  // littérale derrière une étiquette de mot de passe. Un nom de variable, une interpolation
+  // (`{{ }}`, `${ }`, `<%= %>`) ou un `process.env` ne sont PAS des valeurs : ce qui est refusé,
+  // c'est la valeur en dur, celle qui part au navigateur.
+  //
+  // CE QUI N'EST PAS JUGÉ, et c'est dit au non_juge : que la page soit réellement servie, que le
+  // mode démo soit réellement actif en production, ou qu'un identifiant vive dans un composant
+  // dont le nom ne dit rien. La reconnaissance passe par le NOM du fichier — étroite et fermée,
+  // comme S41 : l'élargir rendrait la règle bavarde sur tout le code d'un produit.
+  const PAGE_SERVIE = /(^|[-_.])(connexion|login|sign-?in|authentification|aide|help)([-_.]|$)/i;
+  const EXT_PAGE = /\.(html?|jsx?|tsx?|vue|svelte|astro|ejs|hbs|handlebars|njk|liquid|php|cshtml)$/i;
+  const MENTION_DEMO = /(d[ée]mo|demonstration|MODE_DEMO)/i;
+  const ADRESSE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
+  const ETIQUETTE_MDP = /(mots?\s+de\s+passe|password|motdepasse|\bmdp\b|passphrase)/i;
+  // Une VALEUR en dur : ni interpolation, ni nom de variable, ni renvoi à l'environnement.
+  const valeurEnDur = (jeton) => jeton.length >= 4
+    && !/[{}$<>%]/.test(jeton) && !/process\.env|import\.meta\.env/.test(jeton)
+    && !/^[A-Z][A-Z0-9_]*$/.test(jeton);
+  for (const f of fichiers(cible)) {
+    const nom = f.split(/[\\/]/).pop();
+    if (!EXT_PAGE.test(nom) || !PAGE_SERVIE.test(nom.replace(EXT_PAGE, ""))) continue;
+    let contenu = "";
+    try { contenu = readFileSync(f, "utf8"); } catch { continue; }
+    contenu.split(/\r?\n/).forEach((ligne, i) => {
+      if (!MENTION_DEMO.test(ligne)) return;
+      const adresse = (ADRESSE.exec(ligne) || [])[0];
+      let motDePasse = null;
+      const m = ETIQUETTE_MDP.exec(ligne);
+      if (m) {
+        const apres = ligne.slice(m.index + m[0].length).replace(/^[\s:=«»"'`>\-–—/|]*/, "");
+        const jeton = (apres.match(/^[^\s<"'`,;)|]+/) || [""])[0];
+        if (valeurEnDur(jeton)) motDePasse = jeton;
+      }
+      if (!adresse && !motDePasse) return;
+      const quoi = [adresse && `l'adresse « ${adresse} »`, motDePasse && `le mot de passe « ${motDePasse} »`]
+        .filter(Boolean).join(" et ");
+      ko("R-23", `${rel(f)}:${i + 1}`, `la page SERVIE affiche ${quoi} dans un contexte de démonstration — ` +
+        "ce que le visiteur lit est un accès réel dès que l'environnement sort du poste local, et une " +
+        "qualification servie sur Internet en fait un compte ouvert à tous. La fiche d'accès nomme des " +
+        "variables depuis TF-0871 ; un identifiant retiré du document et laissé à l'écran n'a pas été " +
+        "retiré. Remède : n'afficher que le NOM de la variable, ou rien — la valeur vient du seed local (TF-1088)");
+    });
+  }
 }
 
 const nonJuge = [
@@ -1661,11 +1906,13 @@ const nonJuge = [
   "R-5 (pas d'écrasement de version) : invisible statiquement — jugé par revue de diff",
   "R-7 bis (TF-0902) : LAQUELLE de deux versions cohabitantes est la courante n'est pas jugée — le constat nomme les fichiers et le geste (`git mv` vers `old\\` du même dossier), il ne choisit pas à la place de l'auteur ; deux formats d'un même livrable (`.html` et `.pdf` du même radical) ne sont pas deux versions, l'extension entre dans la clé",
   "R-2, R-4, R-7 bis et R-25 (TF-0853) : un chemin que  declare EXCLU du depot n est pas juge — le depot a ecrit que ce fichier n entrera jamais dans son histoire, donc ce n est pas un livrable mais un artefact d atelier. Mesure du 06/09 : 242 constats sur 247 portaient les fichiers d un seul dossier exclu, dont 41 dossiers au nom REEL d un tiers du client recopie dans le message. Hors depot git, aucune exclusion n est deduite",
-  "R-15 (marqueurs « à fournir » exhaustifs) : l'oracle ne sait pas quelles variables sont tierces",
+  "R-15 : seule une variable SANS valeur est jugée (R-15.1, TF-1080) ; une variable AVEC valeur par défaut qui serait en réalité tierce n'est pas vue — l'oracle ne sait pas quelles variables sont tierces",
   "input\\ non jugé en nommage : les entrants humains arrivent tels quels",
   "seule la PRÉSENCE de CLAUDE.md/README est jugée, pas la pertinence de leur contenu",
   "R-21 : correspondance nom+version par inclusion textuelle dans les lockfiles — pas de résolution sémantique de graphes de dépendances ; recherche bornée à 2 niveaux de descente (hors sources_de_verite déclarées, lues où qu'elles soient) — un lockfile plus profond que 2 niveaux et non déclaré reste invisible",
   "R-23 : motifs de secrets forts uniquement — un mot de passe réaliste inventé sans motif connu passe (revue humaine + gitleaks en CI)",
+  "R-23, volet « page servie » (TF-1088) : la reconnaissance passe par le NOM du fichier (connexion, login, sign-in, authentification, aide, help) — un identifiant de démonstration affiché depuis un composant dont le nom ne dit rien reste invisible. Le vocabulaire est étroit et fermé par choix : l'élargir à tout le code d'un produit rendrait la règle bavarde là où elle doit être opposable",
+  "R-23, volet « page servie » : ni que la page soit réellement SERVIE, ni que le mode démo soit actif hors du poste local. L'oracle lit un gabarit sur le disque ; c'est la conjonction des deux — page publique et mode démo — qui a fait l'incident E-01, et seule la moitié lisible est jugée",
   "R-24 : seules les URLs http(s) des lignes d'environnement de PARAMETRAGE.md sont jugées — URLs documentaires du corps et hôtes sans schéma (BDD) hors périmètre ; la correspondance <nom-appli> ↔ nom réel du produit reste une revue humaine (le SUFFIXE d'environnement, lui, est jugé mécaniquement depuis TF-0267 : accord avec la ligne, et doublon toujours en défaut)",
   "R-24 (TF-0267) : le doublon d'environnement n'est vu que sur un vocabulaire borné (dev, qualif, qualification, recette, staging, preprod, prod, production, uat) — un mot d'environnement maison passera ; « demo », « test » et « sandbox » en sont volontairement absents, ce sont aussi des noms d'applications",
   "R-24 (TF-0267) : la prose d'écart n'est détectée que sur un vocabulaire explicite (écart, dérogation, exception, non conforme, à renommer) croisé avec R-24/nommage/suffixe — un écart raconté en d'autres mots ne sera pas vu ; c'est le champ structuré `ecarts_r24` qui fait foi, pas la détection de prose",

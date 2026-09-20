@@ -6,7 +6,7 @@
  * rendent le même octet. Sens rouge (du silence) : sans relevé d'héritage, la section 3 dit
  * « non mesurable encore » — jamais 0/0 ni une ligne vide.
  */
-import { mkdtempSync, writeFileSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, writeFileSync, readFileSync, rmSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -31,7 +31,13 @@ const registre = w("TODO.jsonl", [
   JSON.stringify({ ev: "creation", ts: "2026-09-03T10:00:01.000Z", id: "TF-0003", titre: "t", contenu: "c", demandeur: "produit-05", source: "lot", date_demande: "2026-09-03", statut: "candidat", forges_cibles_initiales: ["digit-ai-factory"], classe: "page-html-polices-distantes", recidive_de: null }),
 ].join("\n") + "\n");
 const vide = w("vide.jsonl", "");
-const generer = (releves, sortie) => spawnSync(process.execPath, [OUTIL, "--registre", registre, "--archive", vide, "--classes", classes, "--heritage", heritage, "--releves", releves, "--sortie", sortie], { encoding: "utf8" });
+// La boîte des lots est TOUJOURS passée : sans `--retours`, l'outil lirait la vraie boîte du pilot et la recette
+// dépendrait du jour où on la joue (TF-1163).
+const retours = join(T, "retours"); mkdirSync(join(retours, "old"), { recursive: true });
+writeFileSync(join(retours, "Produit-12 - RETOURS - 20260901a.md"), "x", "utf8");
+writeFileSync(join(retours, "old", "Produit-12 - RETOURS - 20260825a.md"), "x", "utf8");
+writeFileSync(join(retours, "README.md"), "x", "utf8");
+const generer = (releves, sortie, { reg = registre, ret = retours, json = null } = {}) => spawnSync(process.execPath, [OUTIL, "--registre", reg, "--archive", vide, "--classes", classes, "--heritage", heritage, "--releves", releves, "--retours", ret, "--sortie", sortie, ...(json ? ["--json", json] : [])], { encoding: "utf8" });
 
 check("verte — la récidive marquée apparaît sur sa classe, avec son produit et son compte", () => {
   const out = join(T, "R1.md"); const r = generer(join(T, "aucun-releve.jsonl"), out);
@@ -66,6 +72,48 @@ check("déterminisme — deux générations sur les mêmes sources rendent le m�
   const a = join(T, "D1.md"), b = join(T, "D2.md");
   generer(join(T, "RELEVES.jsonl"), a); generer(join(T, "RELEVES.jsonl"), b);
   if (readFileSync(a, "utf8") !== readFileSync(b, "utf8")) throw new Error("les deux générations diffèrent");
+});
+// ---- sections 5 à 7 (TF-1163, TF-1164, 17/09/2026) — tout se date contre l'état des sources, jamais l'horloge ----
+check("sous le seuil — à 7 jours de retard le produit est NOMMÉ en section 5 mais n'est pas proposé à la relance, et rien n'est vieux ni muet", () => {
+  const md = readFileSync(join(T, "R2.md"), "utf8");
+  if (!/\| Produit-05 \| 0 \| 1 \| 7 \| `restitution-x` \(2026-08-27\) \|/.test(md)) throw new Error("section 5 : ligne du produit en retard inattendue :\n" + md.split("\n").find((l) => l.startsWith("| Produit-05")));
+  if (!/\| Produit-12 \| 1 \| 0 \| — \|/.test(md)) throw new Error("section 5 : le produit atteint n'est pas compté");
+  if (!/Produits en retard de plus de 7 jours : aucun\./.test(md)) throw new Error("section 5 : un retard de 7 jours ne franchit pas le seuil");
+  if (/Relance PROPOSÉE/.test(md)) throw new Error("section 5 : relance proposée sous le seuil");
+  if (!/Stock : 2 candidat\(s\) en attente de décision, 0 item\(s\) décidé/.test(md)) throw new Error("section 6 : stock inattendu");
+  if (!/Ouverts depuis plus de 7 jours : 0\./.test(md)) throw new Error("section 6 : un item de 0 jour compté vieux");
+  if (!/\| Produit-12 \| 2026-09-01 \| 2 \|/.test(md)) throw new Error("section 7 : le dernier lot n'est pas le plus récent des deux dossiers");
+  if (!/Sources muettes depuis plus de 7 jours : 0 sur 1\./.test(md)) throw new Error("section 7 : silence de 2 jours compté muet");
+});
+check("au-dessus du seuil — l'état des sources avance de 9 jours : le produit est proposé à la relance, les items sont vieux, la source est muette, et le JSON le compte", () => {
+  const reg2 = w("TODO2.jsonl", readFileSync(registre, "utf8") + JSON.stringify({ ev: "maj", ts: "2026-09-12T10:00:00.000Z", id: "TF-0001", note: "n" }) + "\n");
+  const out = join(T, "R3.md"), js = join(T, "R3.json"); const r = generer(join(T, "RELEVES.jsonl"), out, { reg: reg2, json: js });
+  if (r.status !== 0) throw new Error(`exit ${r.status} : ${r.stderr}`);
+  const md = readFileSync(out, "utf8");
+  if (!/\| Produit-05 \| 0 \| 1 \| 16 \|/.test(md)) throw new Error("section 5 : retard non recalculé :\n" + md.split("\n").find((l) => l.startsWith("| Produit-05")));
+  if (!/Produits en retard de plus de 7 jours : Produit-05\./.test(md) || !/Relance PROPOSÉE, jamais jouée d'office/.test(md)) throw new Error("section 5 : la relance n'est pas proposée");
+  if (!/Ouverts depuis plus de 7 jours : 2 — TF-0002 \(candidat, 9 j\), TF-0003 \(candidat, 9 j\)\./.test(md)) throw new Error("section 6 : items vieux non nommés");
+  if (!/\| 2026-S36 \| 2 \| 0 \|/.test(md)) throw new Error("section 6 : débit émises/tranchées absent");
+  if (!/Sources muettes depuis plus de 7 jours : 1 sur 1\./.test(md)) throw new Error("section 7 : la source muette n'est pas comptée");
+  const c = JSON.parse(readFileSync(js, "utf8"));
+  const attendu = { couples_non_atteints: 1, produits_en_retard: 1, stock_candidats: 2, stock_decides_non_clos: 0, items_ouverts_vieux: 2, sources_silencieuses: 1 };
+  for (const [k, v] of Object.entries(attendu)) if (c[k] !== v) throw new Error(`compteur ${k} = ${c[k]}, attendu ${v}`);
+});
+check("silence dit — sans boîte de retours ni relevé, les sections 5 et 7 disent « non mesurable » et leurs compteurs sont null, jamais 0", () => {
+  const out = join(T, "R4.md"), js = join(T, "R4.json"); const r = generer(join(T, "aucun-releve.jsonl"), out, { ret: join(T, "boite-absente"), json: js });
+  if (r.status !== 0) throw new Error(`exit ${r.status} : ${r.stderr}`);
+  const md = readFileSync(out, "utf8");
+  if (!/## 5\. Descente par produit[^\n]*\n\nNon mesurable encore/.test(md)) throw new Error("section 5 muette");
+  if (!/## 7\. Silence des sources de retours\n\nNon mesurable : la boîte/.test(md)) throw new Error("section 7 muette");
+  const c = JSON.parse(readFileSync(js, "utf8"));
+  if (c.couples_non_atteints !== null || c.sources_silencieuses !== null) throw new Error(`compteurs non mesurables rendus ${c.couples_non_atteints} / ${c.sources_silencieuses}`);
+});
+check("tranchée — un item sorti de candidat compte dans la semaine de sa décision, et passe au stock des décidés non clos", () => {
+  const reg3 = w("TODO3.jsonl", readFileSync(registre, "utf8") + JSON.stringify({ ev: "maj", ts: "2026-09-04T10:00:00.000Z", id: "TF-0002", statut: "decide", decideur: "humain", date_decision: "2026-09-04" }) + "\n");
+  const out = join(T, "R5.md"); generer(join(T, "RELEVES.jsonl"), out, { reg: reg3 });
+  const md = readFileSync(out, "utf8");
+  if (!/\| 2026-S36 \| 2 \| 1 \|/.test(md)) throw new Error("débit : la décision n'est pas comptée tranchée");
+  if (!/Stock : 1 candidat\(s\) en attente de décision, 1 item\(s\) décidé/.test(md)) throw new Error("stock : le décidé non clos n'est pas compté");
 });
 rmSync(T, { recursive: true, force: true });
 console.log(`\ngenerer-recidives : ${pass} PASS, ${fail} FAIL`);

@@ -33,6 +33,8 @@
  * n'exécute aucun de ses hameçons. Voir le bloc de la fonction `jugerPortee` pour le fait mesuré.
  *
  *   node oracles\oracle-portee-doctrine.mjs             → jugement du parc
+ *   node oracles\oracle-portee-doctrine.mjs --hamecons  → PD3 et PD4 sur la racine de session seule
+ *                                                          (ce que le contrôle d'ouverture appelle)
  *   node oracles\oracle-portee-doctrine.mjs --self-test → double sens sur un parc fabriqué
  */
 // Exit : 0 = conforme · 1 = defaut MESURE. Cet oracle n'a AUCUN chemin « je ne peux pas
@@ -41,7 +43,7 @@
 // d'environnement (TF-0648).
 import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { join, dirname, isAbsolute } from "node:path";
-import { tmpdir } from "node:os";
+import { tmpdir, homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -210,6 +212,71 @@ export function jugerPortee(cwd) {
     "du pilot — TF-0963)" };
 }
 
+/**
+ * PD4 — LE JEU DE HAMEÇONS ACTIF EST-IL LE JEU ATTENDU ? (TF-1047 / TF-0963, 17/09/2026)
+ *
+ * CE QUE PD3 NE VOIT PAS, et c'est la moitié du défaut. PD3 répond à une question de FORME du
+ * disque : « un produit instancié vit-il dans un sous-dossier direct de ma racine ? ». Elle est
+ * muette sur une racine qui porte BIEN un `.claude\settings.json` mais n'y a repris qu'une PARTIE
+ * des hameçons — le cas exact du 11/09 : le fichier posé le 09/09 à la racine englobante reprend
+ * `UserPromptSubmit` et laisse les trois autres de côté. Résultat mesuré sur un mandat de
+ * plusieurs heures : aucune restitution au format, aucun fichier de restitution, aucun verdict.
+ * *Un hameçon qui ne s'exécute pas ne se distingue pas d'un hameçon qui approuve* — c'est la
+ * propriété qui rend ce défaut invisible, et c'est elle qu'on retire ici.
+ *
+ * LA DÉCISION QUI L'ORDONNE : option O1 de l'étude `output\03-etudes\20260914-etude-opportunite-
+ * obligations-hors-hook.md` — « comparer à l'ouverture de session le jeu de hooks ACTIF au jeu
+ * ATTENDU, chez le pilot ». Ni report des hameçons chez le produit (arbitrage humain, R-29, ce qui
+ * reste ouvert à TF-0963), ni écriture chez qui que ce soit : on NOMME.
+ *
+ * ATTENDU : les événements déclarés par `gabarits\settings-produit.json` du pilot — une DONNÉE
+ * éditable et datée (loi n° 4), jamais une liste gelée dans le code. Gabarit absent ou illisible :
+ * SANS_OBJET dit à voix haute, jamais un PASS par silence.
+ * ACTIF : ce que le harnais charge pour CETTE racine — `<racine>\.claude\settings.json`, son
+ * `settings.local.json`, et les réglages de l'utilisateur (`CLAUDE_CONFIG_DIR`, sinon
+ * `~\.claude\settings.json`), parce qu'un hameçon posé là s'exécute partout et qu'une règle qui
+ * l'ignorerait accuserait un poste correctement câblé.
+ */
+export function jugerHamecons(cwd, { pilot = join(ICI, ".."), utilisateur = undefined } = {}) {
+  const gabarit = join(pilot, "gabarits", "settings-produit.json");
+  let attendus = [];
+  try { attendus = Object.keys(JSON.parse(readFileSync(gabarit, "utf8")).hooks || {}); }
+  catch { return { regle: "PD4", statut: "SANS_OBJET", ou: cwd, message:
+    `gabarits\\settings-produit.json illisible ou absent (${gabarit}) — le jeu de hameçons ATTENDU n'est pas ` +
+    "connu, donc rien n'est comparé. Ce n'est pas un constat sur la session." }; }
+  if (!attendus.length) {
+    return { regle: "PD4", statut: "SANS_OBJET", ou: cwd, message:
+      "le gabarit de réglages ne déclare AUCUN hameçon — rien à comparer" };
+  }
+  const dossierUtilisateur = utilisateur === undefined
+    ? (process.env.CLAUDE_CONFIG_DIR || join(homedir(), ".claude"))
+    : utilisateur;
+  const sources = [join(cwd, ".claude", "settings.json"), join(cwd, ".claude", "settings.local.json")];
+  if (dossierUtilisateur) sources.push(join(dossierUtilisateur, "settings.json"));
+  const actifs = new Set();
+  const lus = [];
+  for (const s of sources) {
+    try {
+      const h = JSON.parse(readFileSync(s, "utf8")).hooks || {};
+      const noms = Object.keys(h).filter((k) => Array.isArray(h[k]) ? h[k].length : !!h[k]);
+      if (noms.length) { lus.push(s); noms.forEach((n) => actifs.add(n)); }
+    } catch { /* absent ou illisible : ce n'est pas une accusation, la source suivante répond */ }
+  }
+  const manquants = attendus.filter((e) => !actifs.has(e));
+  if (!manquants.length) {
+    return { regle: "PD4", statut: "PASS", ou: cwd, message:
+      `les ${attendus.length} hameçons attendus sont ACTIFS pour cette racine (${[...actifs].sort().join(", ")})` };
+  }
+  return { regle: "PD4", statut: "FAIL", ou: cwd, message:
+    `HAMEÇONS MANQUANTS POUR CETTE RACINE : ${manquants.join(", ")} — attendus ${attendus.join(", ")}, ` +
+    `actifs ${[...actifs].sort().join(", ") || "aucun"} (lu dans ${lus.join(", ") || "aucun fichier de réglages"}). ` +
+    "Un hameçon qui ne s'exécute pas ne se distingue pas d'un hameçon qui approuve : un mandat entier " +
+    "peut se rendre sans une seule restitution jugée, et rien ne le dit (TF-1047, 11/09/2026). " +
+    `Remède : reprendre les entrées manquantes de ${join(pilot, "gabarits", "settings-produit.json")} ` +
+    "dans le .claude\\settings.json de CETTE racine, en préfixant les chemins de commande par le " +
+    "sous-dossier quand le produit est imbriqué." };
+}
+
 const verdictDe = (f) => (f.some((x) => x.statut === "FAIL") ? "FAIL" : f.every((x) => x.statut === "SKIP") ? "SKIP" : "PASS");
 
 if (args[0] === "--self-test") {
@@ -263,22 +330,66 @@ if (args[0] === "--self-test") {
   if (jugerPortee(neutre).statut !== "PASS") {
     casse.push("PD3 : un dossier sans produit imbriqué est accusé à tort — ce serait le pilot lui-même");
   }
+  // PD4, dans ses TROIS sens (TF-1047 / TF-0963, option O1). Les deux premières racines ne
+  // diffèrent QUE par le contenu de leur `.claude\settings.json` : le jeu complet, ou le seul
+  // `UserPromptSubmit` — qui est exactement ce que la racine englobante portait le 09/09, et qui
+  // a laissé passer un mandat entier sans une seule restitution jugée.
+  const attendus = Object.keys(JSON.parse(readFileSync(join(PILOT, "gabarits", "settings-produit.json"), "utf8")).hooks || {});
+  const poserReglages = (nom, evenements) => {
+    const d = join(dir, nom, ".claude");
+    mkdirSync(d, { recursive: true });
+    const h = {};
+    for (const e of evenements) h[e] = [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs" }] }];
+    writeFileSync(join(d, "settings.json"), JSON.stringify({ hooks: h }), "utf8");
+    return join(dir, nom);
+  };
+  const complet = poserReglages("racine-complete", attendus);
+  const partiel = poserReglages("racine-partielle", ["UserPromptSubmit"]);
+  // `utilisateur: null` : les réglages du POSTE ne doivent pas verdir la fixture rouge — sans quoi
+  // la recette mesurerait la machine qui l'exécute, et non la règle.
+  const pd4v = jugerHamecons(complet, { pilot: PILOT, utilisateur: null });
+  const pd4r = jugerHamecons(partiel, { pilot: PILOT, utilisateur: null });
+  if (pd4v.statut !== "PASS") casse.push("PD4 : une racine portant les quatre hameçons attendus est accusée : " + pd4v.message);
+  if (pd4r.statut !== "FAIL") casse.push("PD4 : une racine qui ne reprend QUE UserPromptSubmit passe — c'est l'état " +
+    "exact du 09/09, et il a coûté un mandat entier rendu sans aucune restitution jugée (TF-1047)");
+  else {
+    for (const attendu of attendus.filter((e) => e !== "UserPromptSubmit")) {
+      if (!pd4r.message.includes(attendu)) casse.push(`PD4 : le constat ne nomme pas le hameçon manquant ${attendu}`);
+    }
+    if (!/settings-produit\.json/.test(pd4r.message)) casse.push("PD4 : le constat ne porte pas la source du jeu ATTENDU");
+  }
+  // Sens SANS_OBJET : sans gabarit de réglages lisible, la règle se tait à voix haute.
+  const pd4so = jugerHamecons(complet, { pilot: join(dir, "pilot-absent"), utilisateur: null });
+  if (pd4so.statut !== "SANS_OBJET") casse.push("PD4 : sans gabarit de réglages, la règle devrait rendre SANS_OBJET et le DIRE, obtenu " + pd4so.statut);
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test portée de doctrine : 9/9 PASS (produit complet → PASS ; hook sans le texte → FAIL nommé ; " +
+    : "Self-test portée de doctrine : 12/12 PASS (produit complet → PASS ; hook sans le texte → FAIL nommé ; " +
       "dépôt jamais instancié → HORS_DOCTRINE ; produit absent du poste → NON_VERIFIE ; hook non câblé → FAIL ; " +
       "PD3 racine au-dessus du produit → FAIL avec son remède ; PD3 session dans le produit → PASS ; " +
-      "PD3 dossier sans produit imbriqué → PASS)");
+      "PD3 dossier sans produit imbriqué → PASS ; PD4 jeu de hameçons complet → PASS, jeu réduit au seul " +
+      "UserPromptSubmit → FAIL nommant chaque hameçon manquant et la source du jeu attendu, gabarit de " +
+      "réglages absent → SANS_OBJET dit à voix haute)");
   process.exit(casse.length ? 1 : 0);
+}
+
+// `--hamecons` — LA PORTÉE DE CETTE SESSION, ET RIEN D'AUTRE. Le contrôle d'ouverture a besoin de
+// PD3 et PD4 sur sa racine ; balayer le parc entier pour les obtenir coûterait plusieurs secondes
+// à chaque démarrage, et un contrôle cher à l'ouverture finit par être retiré du chemin.
+if (args[0] === "--hamecons") {
+  const f = [jugerPortee(process.cwd()), jugerHamecons(process.cwd(), { pilot: PILOT })];
+  console.log(JSON.stringify({ oracle: "oracle-portee-doctrine", portee: "racine de session", cwd: process.cwd(),
+    verdict: verdictDe(f), findings: f }, null, 1));
+  process.exit(f.some((x) => x.statut === "FAIL") ? 1 : 0);
 }
 
 const registre = join(PILOT, "todo", "TODO.jsonl");
 const brute = process.env.FORGE_ROOT || join(PILOT, "..");
 const racine = isAbsolute(brute) ? brute : join(PILOT, brute);
 const findings = juger({ registre, racine });
-// PD3 se juge sur la RACINE DE SESSION, pas sur le parc : c'est la portée de CE run.
+// PD3 et PD4 se jugent sur la RACINE DE SESSION, pas sur le parc : c'est la portée de CE run.
 findings.push(jugerPortee(process.cwd()));
+findings.push(jugerHamecons(process.cwd(), { pilot: PILOT }));
 const verdict = verdictDe(findings);
 // LE VERDICT EST VRAI, LE CODE DE SORTIE NE BLOQUE PAS, ET LES DEUX SE DISENT. Tous les constats
 // portent sur des DÉPÔTS PRODUITS, que le pilot n'a pas le droit de modifier (mandat humain du
@@ -294,7 +405,7 @@ const verdict = verdictDe(findings);
 // bloquant — « un contrôle qui bloque sur ce qu'il ne peut pas faire réparer apprend à être
 // contourné ».
 const bloquants = findings.filter((f) => f.statut === "FAIL"
-  && (f.regle === "PD3" || /digit-ai-factory|pilot/i.test(f.ou)));
+  && (f.regle === "PD3" || f.regle === "PD4" || /digit-ai-factory|pilot/i.test(f.ou)));
 const surLePilot = bloquants;
 console.log(JSON.stringify({
   oracle: "oracle-portee-doctrine",
@@ -317,6 +428,14 @@ console.log(JSON.stringify({
     "et c'est assumé plutôt que de rendre un constat par dépôt du disque",
     "PD3 constate que le harnais NE PEUT PAS charger les réglages du sous-dossier ; il ne lit pas ce que " +
     "le harnais a effectivement chargé — cela ne s'écrit dans aucun fichier lisible d'ici",
+    "PD4 reconstitue le jeu ACTIF depuis les fichiers de réglages (racine, local, utilisateur) : c'est la " +
+    "meilleure approximation lisible, jamais l'état interne du harnais. Une politique d'entreprise ou un " +
+    "réglage passé en ligne de commande lui échappe",
+    "PD4 ne juge que la PRÉSENCE de l'événement, jamais que la commande câblée derrière soit la bonne ni " +
+    "qu'elle s'exécute sans erreur — un hameçon déclaré vers un script absent la satisfait",
+    "LA LIMITE IRRÉDUCTIBLE, et elle est la raison d'être de PD3 : sur une racine où AUCUN hameçon n'est " +
+    "câblé, le contrôle d'ouverture ne s'exécute pas non plus, donc PD4 ne parle pas. Ce cas-là se voit " +
+    "depuis le pilot, en jouant cet oracle à la main, ou par PD3 quand un produit est imbriqué",
   ],
 }, null, 1));
 process.exit(surLePilot.length ? 1 : 0);

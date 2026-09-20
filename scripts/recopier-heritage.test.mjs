@@ -148,6 +148,40 @@ try {
       "--forcer n'écrase pas — la porte de sortie n'existe pas");
   });
 
+  // ── TF-1171 : la garde protégeait la sortie du pilot contre le pilot ───────────────────────
+  // Le fait du 16/09 : R-47 FAIL prescrit ce script « EN UN GESTE » ; joué, il rend GARDE, exit 2,
+  // à cause de trois cibles que le hook d'ouverture de la MÊME session venait de recopier depuis le
+  // pilot. Les deux cas ci-dessous ne diffèrent que par le CONTENU de la cible modifiée : identique
+  // à la source du pilot, ou porteur d'un travail local.
+  check("TF-1171 — une cible modifiée-non-commise IDENTIQUE à la source du pilot ne bloque plus le geste", () => {
+    const produit = join(T, "produit-heritage-identique");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    const g = (...a) => spawnSync("git", ["-C", produit, "-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", ...a], { encoding: "utf8" });
+    g("init", "-q", "-b", "main");
+    lancer(produit);
+    g("add", "-A"); g("commit", "-q", "-m", "socle");
+    // Le geste du hook d'ouverture, reproduit : la cible est remise à la source du pilot et laissée
+    // NON COMMISE. Le fichier est bien « modifié » pour git — son contenu ne porte aucun travail.
+    const cible = join(produit, "forge", "RESTITUTION.md");
+    writeFileSync(cible, "# vieille version héritée\n", "utf8");
+    g("add", "-A"); g("commit", "-q", "-m", "version perimee");
+    writeFileSync(cible, readFileSync(join(PILOT, "gabarits", "RESTITUTION.md"), "utf8"), "utf8");
+    const r = lancer(produit);
+    att(r.code === 0, `exit ${r.code} : ${r.sortie.slice(0, 200)}`);
+    att(!/\[GARDE\]/.test(r.sortie),
+      `la garde bloque encore sur une cible dont le contenu EST la source du pilot — le script interdit son propre remède : ${r.sortie.slice(0, 300)}`);
+  });
+
+  check("TF-1171 borne — une VRAIE modification locale fait toujours refuser, et c'est ce que la garde existe pour protéger", () => {
+    const produit = join(T, "produit-heritage-identique");
+    writeFileSync(join(produit, "forge", "RESTITUTION.md"), "# ma version a moi, non commise\n", "utf8");
+    const r = lancer(produit);
+    att(/\[GARDE\]/.test(r.sortie), "une cible réellement modifiée n'est plus protégée — le travail local s'écrase en silence");
+    att(/--forcer/.test(r.sortie), "la garde ne dit plus comment passer outre");
+    att(readFileSync(join(produit, "forge", "RESTITUTION.md"), "utf8") === "# ma version a moi, non commise\n",
+      "le fichier modifié a été écrasé malgré la garde");
+  });
+
   // ── TF-0851 (2) : le geste rend compte de ce qu'il laisse au dépôt ─────────────────────────
   check("TF-0851 — le geste imprime la ligne `git add` des fichiers qu'il vient d'écrire", () => {
     const produit = join(T, "produit-add");

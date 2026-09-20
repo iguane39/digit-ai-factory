@@ -17,7 +17,7 @@
 import { readFileSync, appendFileSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
-import { dirname, isAbsolute, join, resolve } from "node:path";
+import { basename, dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 // TF-0597 (24/08) — LES RÈGLES DE FORME NE VIVENT PLUS ICI. Elles vivent dans
 // `gabarits\oracle-lot-retours.mjs`, que ce fichier IMPORTE et que l'héritage fait voyager
@@ -29,6 +29,8 @@ import { fileURLToPath } from "node:url";
 import { verifier as verifierFormeLot } from "../gabarits/oracle-lot-retours.mjs";
 import { localiserProduit, causeDuRefus } from "./localiser-produit.mjs";
 import { anonymiserCandidature, pseudoProduit, anonymiser, EST_EMETTEUR_FORGE } from "./anonymiser-entrant.mjs";
+import { aQualifier } from "./identifiants-techniques.mjs";
+import { aQualifier as adressesIpAQualifier, messageAQualifier as messageAdressesIp } from "./adresses-ip.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const sidecarPath = process.argv[2];
@@ -141,8 +143,35 @@ if (!process.argv.includes("--sans-fetch")) {
       execFileSync("git", ["-C", todoDir, "fetch", "--quiet", "origin"], { stdio: "ignore", timeout: 20000 });
       const enRetard = Number(git(["rev-list", "--count", "HEAD..origin/main", "--", "TODO.jsonl", "TODO-ARCHIVE.jsonl"]));
       if (enRetard > 0) {
-        console.error(`[REFUS PRÉFLIGHT TF-0394] le registre distant a avancé : ${enRetard} commit(s) touchant TODO.jsonl/TODO-ARCHIVE.jsonl absents du local — les ids séquentiels repartiraient du mauvais max. git pull --rebase, puis ré-ingérer. (--sans-fetch pour assumer explicitement le hors-ligne)`);
-        process.exit(1);
+        // TF-1003 (09/09/2026) — LE PRÉFLIGHT JUGE CE QU'IL PROTÈGE, PAS UN COMPTE DE COMMITS.
+        // Mesuré ce jour-là : 526 commits distants absents du local ET 527 locaux absents du
+        // distant — deux histoires DIVERGENTES (réécriture d'histoire, TF-0752), portant le même
+        // registre. Le refus était définitif tant que la republication (geste humain) n'était pas
+        // faite, son remède `git pull --rebase` est celui que le mode opératoire de réécriture
+        // interdit, et la seule issue faisait déclarer un hors-ligne faux. L'invariant réel : aucune
+        // CRÉATION du distant ne manque ici, ni ne porte ici un autre horodatage de frappe (même id,
+        // autre item — la collision de TF-0394). Le `ts` d'une création est stampé à l'ingestion :
+        // une réécriture de textes ne le touche pas, un item frappé ailleurs en porte un autre.
+        const creationsDe = (texte) => new Map(String(texte || "").split("\n").filter((l) => l.trim())
+          .map((l) => { try { return JSON.parse(l); } catch { return null; } })
+          .filter((ev) => ev && ev.ev === "creation" && ev.id).map((ev) => [ev.id, String(ev.ts || "")]));
+        const auDistant = (f) => { try { return git(["show", `origin/main:./${f}`]); } catch { return ""; } };
+        const ici = (f) => (existsSync(join(todoDir, f)) ? readFileSync(join(todoDir, f), "utf8") : "");
+        const distant = new Map([...creationsDe(auDistant("TODO.jsonl")), ...creationsDe(auDistant("TODO-ARCHIVE.jsonl"))]);
+        const local = new Map([...creationsDe(ici(basename(registre))), ...creationsDe(ici("TODO-ARCHIVE.jsonl"))]);
+        const inconnus = [...distant].filter(([id, ts]) => !local.has(id) || local.get(id) !== ts).map(([id]) => id);
+        const diverge = Number(git(["rev-list", "--count", "origin/main..HEAD"])) > 0;
+        const lectureDivergence = "histoires DIVERGENTES (chacune porte des commits que l'autre n'a pas — signature d'une réécriture d'histoire) : "
+          + "ne JAMAIS `git pull --rebase` ici, le mode opératoire de réécriture le proscrit (references/TODO-FORGE.md, TF-0752 : « à recloner, pas à fusionner ») ; "
+          + "la republication est un geste humain (R-38)";
+        if (inconnus.length) {
+          console.error(`[REFUS PRÉFLIGHT TF-0394] le registre distant porte ${inconnus.length} création(s) absente(s) d'ici ou frappée(s) ailleurs sous le même id (${inconnus.slice(0, 5).join(", ")}${inconnus.length > 5 ? ", …" : ""}) — les ids séquentiels repartiraient du mauvais max. `
+            + (diverge ? `${lectureDivergence} ; rapatrier ces créations avant d'ingérer.` : "git pull --rebase, puis ré-ingérer.")
+            + " (--sans-fetch pour assumer explicitement le hors-ligne)");
+          process.exit(1);
+        }
+        console.error(`[préflight TF-0394/TF-1003] ${enRetard} commit(s) distant(s) touchent le registre, mais leurs ${distant.size} création(s) sont toutes ici, frappées à l'identique — aucun id ne peut entrer en collision, ingestion poursuivie`
+          + (diverge ? `. ${lectureDivergence}` : ""));
       }
     } catch {
       console.error("[préflight TF-0394] fetch/comparaison origin impossible (hors ligne ? remote absent ?) — unicité inter-sessions NON vérifiée, ingestion locale assumée");
@@ -249,8 +278,32 @@ const proches = (cle) => {
     .map((k) => ({ k, n: k.split(/[^a-z0-9]+/).filter((j) => jetons.has(j)).length + (k.includes(String(cle).toLowerCase()) ? 2 : 0) }))
     .filter((x) => x.n > 0).sort((a, b) => b.n - a.n || a.k.localeCompare(b.k)).slice(0, 5).map((x) => x.k);
 };
+// TF-1128 (15/09/2026) — UN DÉFAUT VRAIMENT NEUF A UNE SORTIE CONFORME. Le gabarit de lot disait,
+// à quinze lignes d'écart, « classe inconnue : refusé » et « aucune clé ne convient ? le dire dans
+// le .md et laisser le pilot créer la classe » : le producteur n'avait AUCUNE voie qui passe — soit
+// son lot entier était refusé, soit il rangeait le retour sous une clé approchée et faussait le
+// compte des récidives, soit il ne remontait rien. La clé RÉSERVÉE `classe-a-creer` est la
+// sortie : admise à la condition que la ligne porte `classe_proposee` {cle, famille, libelle},
+// que la clé proposée n'existe pas déjà, que sa famille soit connue, et que le .md du lot la
+// nomme. Le retour entre avec `classe: null` et `classe_a_creer` ; le pilot crée la vraie classe
+// dans le référentiel et rattache le retour. La classe ne se crée toujours pas dans un sidecar.
+const CLE_A_CREER = "classe-a-creer";
+const TEXTE_LOT_MD = (() => {
+  const md = String(sidecarPath).replace(/\.normalise\.tf\.jsonl$/i, ".md").replace(/\.tf\.jsonl$/i, ".md");
+  try { return existsSync(md) ? readFileSync(md, "utf8") : ""; } catch { return ""; }
+})();
+const verifierClasseACreer = (c, i) => {
+  const p = c.classe_proposee && typeof c.classe_proposee === "object" ? c.classe_proposee : {};
+  const manque = ["cle", "famille", "libelle"].filter((k) => !p[k] || !String(p[k]).trim());
+  const familles = new Set([...FAMILLES, ...((REF_CLASSES?.familles || []).map((f) => f.cle))]);
+  if (manque.length) motifs.push(`ligne ${i + 1} : classe « ${CLE_A_CREER} » sans classe_proposee complète — manque ${manque.join(", ")} ; la ligne porte "classe_proposee": {"cle", "famille", "libelle"} et le .md les nomme (section « La règle qui aurait évité le retour »)`);
+  else if (CLASSES.has(String(p.cle))) motifs.push(`ligne ${i + 1} : classe proposée « ${p.cle} » EXISTE déjà au référentiel — la porter directement dans "classe", sans passer par « ${CLE_A_CREER} »`);
+  else if (!familles.has(String(p.famille))) motifs.push(`ligne ${i + 1} : famille « ${p.famille} » de la classe proposée inconnue — familles du référentiel : ${[...familles].join(", ")}`);
+  else if (!TEXTE_LOT_MD.includes(String(p.cle))) motifs.push(`ligne ${i + 1} : la classe proposée « ${p.cle} » n'est pas nommée dans le .md du lot — le lecteur humain doit y trouver la clé, sa famille et son libellé (section « La règle qui aurait évité le retour »)`);
+};
 const verifierClasse = (c, i) => {
   if (c.rectifie !== undefined) return;
+  if (String(c.classe) === CLE_A_CREER && REF_CLASSES) { verifierClasseACreer(c, i); return; }
   const exigee = EST_UN_LOT && DATE_LOT && DATE_LOT >= SEUIL_CLASSE;
   if (c.classe === undefined || c.classe === null || c.classe === "") {
     if (exigee) {
@@ -262,13 +315,22 @@ const verifierClasse = (c, i) => {
   if (!REF_CLASSES) { motifs.push(`ligne ${i + 1} : classe « ${c.classe} » déclarée mais référentiel ${CLASSES_PATH} illisible — on ne juge pas une clé sans référentiel`); return; }
   if (!CLASSES.has(String(c.classe))) {
     const p = proches(c.classe);
-    motifs.push(`ligne ${i + 1} : classe « ${c.classe} » inconnue du référentiel — clés proches : ${p.length ? p.join(", ") : "(aucune)"} ; si aucune ne convient, créer la clé dans todo/CLASSES.json (datée, sourcée, rattachée à sa famille) puis remettre le lot`);
+    motifs.push(`ligne ${i + 1} : classe « ${c.classe} » inconnue du référentiel — clés proches : ${p.length ? p.join(", ") : "(aucune)"} ; si aucune ne convient, porter "classe": "${CLE_A_CREER}" avec "classe_proposee": {"cle", "famille", "libelle"} et nommer la clé proposée dans le .md — le pilot crée la classe dans son référentiel (TF-1128)`);
   }
 };
 let candidatures = lignes.map((l, i) => {
   let c;
   try { c = JSON.parse(l); } catch { motifs.push(`ligne ${i + 1} : JSON invalide`); return null; }
   if (c.schema !== 1) motifs.push(`ligne ${i + 1} : schema attendu 1, reçu ${c.schema}`);
+  // TF-1067 (14/09/2026) — UN CARACTÈRE DE CONTRÔLE N'ENTRE PAS AU REGISTRE. Quatre octets nuls y
+  // sont entrés par des lots dont un chemin « input\\00-retours » avait été écrit dans une chaîne
+  // Python non brute : « \\00 » y est un octet nul, que le sidecar a porté en échappement JSON. Le
+  // registre étant append-only, la seule place où l'arrêter est ici, avant l'écriture.
+  for (const [champ, v] of Object.entries(c)) {
+    if (typeof v !== "string") continue;
+    const k = [...v].findIndex((ch) => { const n = ch.charCodeAt(0); return (n < 32 && n !== 9 && n !== 10 && n !== 13) || n === 127; });
+    if (k >= 0) motifs.push(`ligne ${i + 1} : le champ « ${champ} » porte un caractère de contrôle U+${[...v][k].charCodeAt(0).toString(16).padStart(4, "0").toUpperCase()} (après « ${[...v].slice(Math.max(0, k - 20), k).join("")} ») — un chemin Windows écrit dans une chaîne Python non brute (« \\00 ») en produit un : écrire la chaîne brute (r"…") ou doubler l'antislash, puis remettre le lot sous l'indice suivant (TF-1067)`);
+  }
   if (c.id) motifs.push(`ligne ${i + 1} : une candidature ne porte JAMAIS d'id (frappé à l'ingestion)`);
   for (const champ of ["titre", "contenu", "demandeur", "source", "date_demande"])
     if (!c[champ]) motifs.push(`ligne ${i + 1} : champ ${champ} manquant`);
@@ -352,6 +414,32 @@ if (rectifications.length) {
   }
   if (motifsRect.length) {
     console.error(`[REJET ATOMIQUE] ${sidecarPath} — registre intact. Motifs :\n  - ${motifsRect.join("\n  - ")}`);
+    process.exit(1);
+  }
+}
+
+// ---- DOUBLON STRICT : REFUSÉ, jamais ingéré une seconde fois (TF-0956, 14/09/2026) ----------
+// Le 08/09, deux lots renommés par la pseudonymisation sont redevenus « jamais ingérés » pour la
+// boîte d'entrée, et ont été ingérés une seconde fois : six candidatures identiques mot pour mot
+// à six autres, entrées sans que rien ne bronche. Le rapprochement ci-dessous SIGNALE sans juger,
+// et c'est juste pour un recouvrement de mots ; un titre ET un contenu identiques (à la casse et
+// aux espaces près) ne sont pas une ressemblance, ce sont le même item.
+{
+  const norm = (s) => String(s || "").toLowerCase().replace(/\s+/g, " ").trim();
+  const connus = new Map();
+  for (const e of [...evenements, ...lireEv(archive)])
+    if (e.ev === "creation" && e.id) connus.set(`${norm(e.titre)} | ${norm(e.contenu)}`, e.id);
+  const motifsDoublon = [];
+  for (const [i, c] of candidatures.entries()) {
+    if (c.rectifie) continue;
+    const cle = `${norm(c.titre)} | ${norm(c.contenu)}`;
+    if (connus.has(cle)) motifsDoublon.push(`ligne ${i + 1} : titre ET contenu identiques à ${connus.get(cle)} — doublon strict`);
+    else connus.set(cle, `la ligne ${i + 1} du même lot`);
+  }
+  if (motifsDoublon.length) {
+    console.error(`[REJET ATOMIQUE] ${sidecarPath} — registre intact. Motifs :\n  - ${motifsDoublon.join("\n  - ")}\n`
+      + "  REMÈDE : un lot déjà ingéré sous un autre nom se RATTACHE (`node todo\\reempreinter-lot.mjs <sidecar> --par-rapprochement`),\n"
+      + "  il ne se réingère pas ; un item réellement nouveau se reformule (TF-0956).");
     process.exit(1);
   }
 }
@@ -441,38 +529,24 @@ if (remplacesTotal.length) {
     remplacesTotal.join(", "));
   console.log("  Les tables de correspondance vivent HORS des dépôts.");
 }
-// ---- DOUBLON STRICT : refusé à la porte (TF-0956, 14/09/2026) ------------------------------
-// LE FAIT, mesuré le 08/09 : deux lots RENOMMÉS par la passe de pseudonymisation sont redevenus
-// « jamais ingérés » — l'idempotence reconnaît un lot à l'empreinte de son FICHIER, et le
-// renommage avait changé ses octets — puis ont été ingérés une seconde fois : six candidatures au
-// titre ET au contenu identiques à six autres, entrées sans que rien ne bronche, puis DÉCIDÉES
-// faute de vocabulaire. Le rapprochement ci-dessus dit « ressemble à » et ne bloque jamais, à
-// raison : trois paires sur cinq y sont deux faces d'un même épisode. Un doublon STRICT n'a pas
-// cette ambiguïté — même titre, même contenu, aux espaces et à la casse près — et il se compare
-// APRÈS anonymisation, puisque c'est le texte anonymisé que le registre porte. Il est donc REFUSÉ,
-// avec l'id de l'original. Mesure au 14/09 : 11 paires strictes au registre, toutes antérieures.
-{
-  const norm = (s) => String(s || "").normalize("NFC").replace(/\s+/g, " ").trim().toLowerCase();
-  const cle = (c) => `${norm(c.titre)} ${norm(c.contenu)}`;
-  const connus = new Map();
-  for (const e of [...lireEv(archive), ...evenements])
-    if (e.ev === "creation" && e.id && !connus.has(cle(e))) connus.set(cle(e), e.id);
-  const doublons = [];
-  const vusDansLeLot = new Map();
-  candidatures.forEach((c, i) => {
-    if (c.rectifie !== undefined) return;
-    const k = cle(c);
-    if (connus.has(k)) doublons.push(`ligne ${i + 1} « ${String(c.titre).slice(0, 60)} » : doublon STRICT de ${connus.get(k)} (titre et contenu identiques après anonymisation)`);
-    else if (vusDansLeLot.has(k)) doublons.push(`ligne ${i + 1} « ${String(c.titre).slice(0, 60)} » : doublon STRICT de la ligne ${vusDansLeLot.get(k)} du même lot`);
-    else vusDansLeLot.set(k, i + 1);
-  });
-  if (doublons.length) {
-    console.error(`[REJET ATOMIQUE] ${sidecarPath} — registre intact. Doublon(s) strict(s) (TF-0956) :\n  - ${doublons.join("\n  - ")}\n` +
-      "  REMÈDE : un lot RENOMMÉ se rattache, il ne se ré-ingère pas ; une récidive se déclare par sa `classe`, avec un\n" +
-      "  contenu qui dit ce qui est neuf ; la correction d'un item existant passe par `rectifie`.");
-    process.exit(1);
-  }
+// TF-0966 (15/09/2026) — UN IDENTIFIANT TECHNIQUE INCONNU DES TABLES SE FAIT QUALIFIER. Le 08/09,
+// cinq identifiants d'un système client (MAJUSCULES_SOULIGNÉES, schema.table) sont entrés au
+// registre publié, absents des deux tables : ni l'anonymisation ni la porte ne pouvaient les voir.
+// Relevé APRÈS la substitution (un nom connu est déjà remplacé), moins le vocabulaire public du
+// pilot. AVERTISSEMENT, pas refus : mesuré le 15/09, 42 créations sur 350 en portent au moins un —
+// un refus arrêterait un lot sur huit pour une question qu'un humain seul peut trancher. Le nombre
+// entre à l'événement d'ingestion ; les NOMS, jamais — ils sont peut-être confidentiels.
+const identifiantsAQualifier = aQualifier(candidatures.map((c) => `${c.titre || ""} ${c.contenu || ""}`));
+if (identifiantsAQualifier.length) {
+  console.error(`[IDENTIFIANTS À QUALIFIER] ${identifiantsAQualifier.length} identifiant(s) technique(s) absent(s) des tables et du vocabulaire public du pilot : ` +
+    `${identifiantsAQualifier.join(", ")}\n  Confidentiel ? l'inscrire à la table des noms interdits du canal (identifiants + pseudonymes) et rectifier les items ; ` +
+    "sinon, rien à faire. Le registre est publié : la question se pose MAINTENANT, pas après le push (TF-0966).");
 }
+// TF-1134 (a) (15/09/2026) — UNE ADRESSE IP N'EST DANS AUCUNE TABLE. L'adresse IPv4 d'un poste en
+// service est entrée au registre le 15/09. Même modèle que TF-0966 : NOMMÉE à l'écran, COMPTÉE à
+// l'événement d'ingestion, jamais écrite dans ce dernier ; avertissement, pas refus.
+const adressesIp = adressesIpAQualifier(candidatures.map((c) => `${c.titre || ""} ${c.contenu || ""}`));
+if (adressesIp.length) console.error(messageAdressesIp(adressesIp, "le lot"));
 // ---- récidive : la classe est-elle déjà close en corrige ? --------------------------------
 // Deux sources, réunies : les items que la classe déclare l'avoir FONDÉE (todo/CLASSES.json,
 // `fondee_par`) et tout item du registre portant déjà cette `classe`. La date de correction se
@@ -531,7 +605,11 @@ const nouvelles = candidatures.map((c) => {
   const score = c.score && [c.score.gain, c.score.preuve, c.score.effort].every((v) => typeof v === "number")
     ? { ...c.score, valeur: Math.round((c.score.gain * c.score.preuve / c.score.effort) * 10) / 10 }
     : { gain: 3, preuve: 1, effort: 3, valeur: 1, par_defaut: true };
-  const classe = c.classe ? String(c.classe) : null;
+  // TF-1128 : la clé réservée n'entre jamais comme classe — elle se compterait hors référentiel
+  // (R13). Le retour entre sans classe, avec la proposition, que le pilot instruit.
+  const aCreer = String(c.classe) === CLE_A_CREER ? c.classe_proposee : null;
+  if (aCreer) console.error(`[CLASSE À CRÉER] « ${aCreer.cle} » (famille ${aCreer.famille}) proposée par ${produitDuLot} — le retour ENTRE sans classe ; créer la clé dans todo/CLASSES.json (datée, sourcée), puis rattacher le retour par rectification`);
+  const classe = c.classe && !aCreer ? String(c.classe) : null;
   const rec = classe ? recidiveDe(classe, c.date_demande) : [];
   const susp = classe ? classeSuspecte(classe) : null;
   if (rec.length) {
@@ -546,6 +624,7 @@ const nouvelles = candidatures.map((c) => {
     date_demande: c.date_demande, statut: "candidat",
     forges_cibles_initiales: c.forges_cibles_initiales, forges_cibles_reelles: null,
     classe, recidive_de: rec.length ? rec : null, ...(susp ? { classe_suspecte: susp } : {}),
+    ...(aCreer ? { classe_a_creer: { cle: aCreer.cle, famille: aCreer.famille, libelle: aCreer.libelle } } : {}),
     score, preuve_du_cout: c.preuve_du_cout ?? null,
     decideur: null, date_decision: null, date_correction: null, corrections_realisees: null,
     gains_constates: null, version_forge_corrigee: null, produits_beneficiaires: null,
@@ -570,6 +649,8 @@ const nbRectifications = candidatures.filter((c) => c.rectifie !== undefined).le
 const evIngestion = { ev: "ingestion", ts, lot_sha: lotSha, fichier: anonymiser(String(sidecarPath)).texte, creations: nouvelles.length - nbRectifications };
 if (nbRectifications) evIngestion.rectifications = nbRectifications;
 if (nbRecidives) evIngestion.recidives = nbRecidives;
+if (identifiantsAQualifier.length) evIngestion.identifiants_a_qualifier = identifiantsAQualifier.length;
+if (adressesIp.length) evIngestion.adresses_ip_a_qualifier = adressesIp.length;
 if (reglesDerogees.length) {
   evIngestion.derogation = { regles: [...new Set(reglesDerogees)], motif: derogationMotif, decision: "humaine" };
 }

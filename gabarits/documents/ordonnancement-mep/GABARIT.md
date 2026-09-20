@@ -156,7 +156,7 @@ constat lui-même de 48 lignes de tableau ne le dérivera pas.
 
 ## Oracles
 
-| Contrôle | Ce qu'il tient |
+| Contrôle | Invariant tenu |
 |---|---|
 | `check_html.py` (digit-ai-page-html) | charte, sémantique, accessibilité, robustesse d'impression du rendu HTML |
 | `render_page.py` (digit-ai-page-html) | zéro défaut visuel sur 4 largeurs, **états ouverts compris** — un tableau de 48 lignes se juge déplié |
@@ -169,3 +169,27 @@ Un manque constaté sur ce gabarit remonte par la section **« Retours sur les d
 produits »** du lot de retours du projet (R-46), avec le couple `gd-ordonnancement-mep` +
 version. Sans ce couple, le retour dit « il manquait une section » et personne ne sait à quoi
 l'appliquer.
+
+---
+
+## Document d'auteur — ce qui ne va pas au lecteur
+
+Le lecteur de ce document est celui que déclare `role_destinataire`. Tout ce qui n'entre pas
+dans ses décisions sort d'ici et vit dans le **document d'auteur** — un fichier distinct, tenu par
+celui qui produit, cité en renvoi et jamais recopié :
+
+- le **registre des arbitrages** encore ouverts, avec leur instance et leur état ;
+- l'**historique des versions** du document et son statut de relecture ;
+- les **notes de production** : sources à confirmer, sections à reprendre, questions à l'auteur.
+
+**La frontière est un critère d'ACTION, pas de confort.** Une information qui change ce que le
+lecteur FAIT reste chez lui, même quand elle est inconfortable : « cette règle n'est pas encore
+opposable, appliquez-la et signalez tout écart » appartient au document du lecteur, parce qu'un
+lecteur doit savoir sur quoi il s'engage. Une information qui ne change que ce que l'AUTEUR doit
+encore obtenir part au document d'auteur. Le doute utile au lecteur se dit à l'endroit qui le
+concerne ; le doute de l'auteur ne le suit pas.
+
+**Un document long se découpe en VUES d'un fichier unique, pas en fichiers**, sauf demande
+contraire de son lecteur : onze fichiers à partager sont un coût pour lui, jamais pour son auteur.
+
+*Règle D11 (`gabarits\documents\README.md`), jugée par G10 d'`oracle-gabarits-documents.mjs`.*

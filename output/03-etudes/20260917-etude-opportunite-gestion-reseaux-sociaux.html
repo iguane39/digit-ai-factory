@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Étude d'opportunité — gestion dans la durée de la présence de Digit-AI sur les réseaux sociaux (« forge pour la gestion de réseaux sociaux ») — 20260917a</title>
+  <meta name="description" content="Audience : le pilote de l'écosystème, qui décide des mandats, et les porteurs nommés au verdict">
+  <meta name="theme-color" content="#2563EB">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3Ctext x='32' y='44' font-family='Segoe UI,Roboto,sans-serif' font-size='38' font-weight='700' fill='white' text-anchor='middle'%3ED%3C/text%3E%3C/svg%3E">
+  <style>
+    :root{--blue:#2563EB;--bg:#FAFBFF;--surface:#FFFFFF;--ink:#0F172A;--muted:#64748B;
+      --faint:#94A3B8;--line:#E6EAF2;--teal:#0E9488;--teal-fill:#EFFDFB;--amber:#B45309;
+      --amber-fill:#FFFBEB;--r:12px;--r-sm:8px;
+      --head:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;
+      --sans:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+      --mono:"JetBrains Mono",ui-monospace,"Consolas",monospace}
+    *{box-sizing:border-box} html{-webkit-text-size-adjust:100%}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:16px}
+    /* 75-100 % de la fenêtre, toujours : 92vw en dessous de 1826px, plafond confort 1680px, plancher 75vw au-delà */
+    .wrap{max-width:clamp(75vw,1680px,92vw);margin:0 auto;padding:32px 24px 64px}
+    /* page de DONNEES (I1 / L26) : le contenu prend toute la largeur du .wrap (>= 75 vw) — une colonne
+       de 75ch laissait 34 % de l'ecran a 1920 px, mesure Playwright du 07/09 (646 px sur 1920). La classe
+       s'appelle desormais defile et non scroll : le depot ecrit ses noms en francais.
+       ATTENTION : ce bloc vit dans un litteral gabarit JavaScript — aucun accent grave ici. */
+    .colonne{max-width:none;margin:0}
+    h1,h2,h3{font-family:var(--head);font-weight:800;line-height:1.2}
+    h1{font-size:1.7rem;margin:0 0 .2em} h2{font-size:1.25rem;font-weight:700;margin:1.5em 0 .4em}
+    h3{font-size:1.02rem;font-weight:700;margin:1.1em 0 .3em}
+    code{font-family:var(--mono);font-size:.9em}
+    /* L19 autorise nommement la coupure sur un lien : une URL est un identifiant, pas un mot. */
+    a{color:var(--blue);overflow-wrap:anywhere}
+    /* LA MESURE DE LECTURE SE POSE SUR LE CONTENEUR, JAMAIS SUR LE TEXTE (16/09/2026).
+       Mesure de l'oracle de rendu sur une page d'etude : 221 caracteres par ligne a 3840 px
+       pour un plafond de 135 (V18) — l'oeil perd le debut de la ligne suivante. Un premier
+       remede a borne le PARAGRAPHE par max-width : L2 l'a refuse aussitot, et son message
+       dit le remede juste — « poser la mesure de lecture sur le CONTENEUR (.chap.lire), pas
+       sur le texte, ET la declarer par data-mesure-lecture des lors qu'il a des freres plus
+       larges ». *Les deux regles ne se contredisent pas : ensemble, elles decrivent une
+       seule construction*, celle du gabarit de chapitre du socle (E4, token a 1 080 px).
+       Les tableaux restent FRERES du chapitre et gardent toute la largeur offerte. */
+    .meta{color:var(--muted);font-size:.85rem;margin:.2em 0 0}
+    /* CENTRE, ET D'UN SEUL RYTHME. Deux mesures de l'oracle de rendu, le meme jour :
+       · L2 (conteneur) — la colonne de lecture calee A GAUCHE laissait 1 752 px de vide a droite
+         et 0 a gauche, sans voisin : le remede qu'il nomme est de la CENTRER, ou de lui donner un
+         voisin utile. Ici elle a des freres — les tableaux — mais pas a sa hauteur : on centre.
+       · V7 (rythme) — les espaces entre paragraphes mesuraient 85 / 57 / 57 / 54 px : un rythme
+         vertical qui varie sans raison se lit comme un defaut de mise en page. Les marges sont
+         posees une fois, en bas seulement, pour que deux blocs voisins ne cumulent jamais. */
+    .chap.lire{max-width:1080px;margin-inline:auto}
+    .chap.lire>*{margin-top:0;margin-bottom:16px}
+    .chap.lire>h2{margin-top:28px} .chap.lire>h3{margin-top:20px}
+    .chap.lire>*:first-child{margin-top:0}
+    blockquote{margin:14px 0;padding:10px 16px;border-left:3px solid var(--blue);background:var(--surface);border-radius:0 var(--r-sm) var(--r-sm) 0;color:var(--muted)}
+    blockquote p{margin:0}
+    .defile{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin:10px 0}
+    table{border-collapse:collapse;width:100%;font-size:.92rem}
+    th{font-family:var(--head);font-weight:700;text-align:left;padding:9px 12px;border-bottom:2px solid var(--line)}
+    td{padding:7px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+    tr:last-child td{border-bottom:none}
+    ul{margin:.4em 0;padding-left:1.3em}
+    figure{margin:16px 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;overflow-x:auto}
+    figcaption{color:var(--muted);font-size:.85rem;margin-top:8px}
+    svg{max-width:100%;height:auto}
+    footer{margin-top:40px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:14px}
+    /* L19 (TF-0556, 24/08) — LA COUPURE DE MOT QUITTE LA PROSE. La propriete overflow-wrap:anywhere
+       etait posee sur .meta, td et footer : ravageuse sur du texte courant, ou un mot se casse en
+       deux au milieu d'une ligne sans cesure ni trait d'union. Elle ne reste QUE sur les cellules,
+       et seulement sous le palier de repli, la ou le socle l'EXIGE (composants.md section 6) — un
+       identifiant long dans une cellule etroite doit pouvoir se couper, une phrase jamais.
+       ATTENTION : ce bloc vit dans un litteral gabarit JavaScript. Aucun accent grave ici, il
+       fermerait la chaine et casserait tout ce qui suit — defaut commis en ecrivant ce commentaire. */
+    /* SUR MOBILE, L'EN-TETE AUSSI PASSE EN BLOC (16/09/2026). La regle ne convertissait que les
+       cellules de donnees : la ligne d'EN-TETE, restee en cellules de tableau, continuait d'imposer
+       sa largeur, et l'oracle mesurait un tableau a 441 px de bord droit pour une fenetre de
+       390 px (V1). Un conteneur defilant ne suffit pas a eteindre V1 — la regle mesure le bord
+       droit de chaque element, defilant ou non, et elle a raison : une page qui se lit en poussant
+       le doigt de cote se lit mal. */
+    /* CE QUI NE SE COUPE PAS POUSSE LA PAGE — ET LA COUPURE A UN PERIMETRE (16/09/2026).
+       Deux mesures sur une etude qui cite beaucoup de chemins : a 768 px un tableau sortait a
+       799 px, et a 390 px le DOCUMENT mesurait 419 px de large. La cause est un jeton insecable
+       qui impose sa longueur a sa cellule, donc au tableau, donc a la page.
+       PREMIER REMEDE, REFUSE DANS LA MINUTE : autoriser la coupure sur les cellules. L19 l'a
+       rejete, et elle a raison — un mot francais s'y casse n'importe ou (« Utilisabl/e »), et la
+       regle reserve nommement la coupure a code, pre, aux liens et aux cellules d'IDENTIFIANTS.
+       REMEDE TENU : la coupure ne touche que les fragments de CODE, ou vivent justement les
+       chemins et les identifiants qui poussaient la page. La prose n'est jamais touchee. */
+    code{overflow-wrap:anywhere}
+    @media (max-width:640px){.wrap{padding:16px 12px 48px} h1{font-size:1.3rem}
+      .defile td,.defile th{display:block;overflow-wrap:anywhere}
+      .defile table{width:100%} .chap.lire{max-width:none}}
+    @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+    @page{margin:14mm}
+    @media print{.defile{overflow:visible;border:none} figure{break-inside:avoid} tr{break-inside:avoid} body{background:#fff}}
+  </style>
+  <style>
+/* table-filters.css — habillage charté du composant de filtres de colonne (D-12).
+   TF-0176 (13/08) : un composant se livre AVEC son CSS — livré nu, il sort en rendu brut
+   navigateur chez tous ses hôtes (constaté sur le dashboard forge-tests du 13/08, refusé
+   par son destinataire). À inliner dans le bloc de style de la page, à côté du script du
+   composant — JAMAIS de balise écrite en toutes lettres dans ce commentaire (même famille
+   de piège que RA-1 : un « script » ouvrant en commentaire fausse toute lecture paresseuse
+   du document). Ne consomme que les tokens :root du socle (--surface, --ink, --muted,
+   --line, --blue, --r-sm) : aucune couleur en dur, les deux thèmes sont servis. TF-1059
+   (11/09) : deux couleurs en dur restaient (texte du bouton actif, repli du survol), treize
+   espacements sortaient de l'échelle 4pt et quatre anneaux de focus n'étaient pas prescrits —
+   corrigés ici, à la source, plutôt que dans chaque produit. */
+
+.tf-btn {
+  font: inherit; font-size: .72rem; line-height: 1;
+  color: var(--blue); background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 4px 8px; margin-left: 8px; cursor: pointer; vertical-align: middle;
+}
+.tf-btn:hover { border-color: var(--blue); }
+.tf-btn:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+/* filtre ACTIF : l'état se voit sans ouvrir le panneau */
+.tf-btn.tf-on { background: var(--blue); color: var(--surface); border-color: var(--blue); }
+
+.tf-panel {
+  position: absolute; z-index: 30; top: calc(100% + 4px); left: 0;
+  min-width: 230px; max-width: 320px; max-height: 320px; overflow: auto;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .16);
+  padding: 12px; text-align: left; text-transform: none;
+  font-family: var(--sans); font-size: .85rem; font-weight: 400;
+  letter-spacing: normal; cursor: default;
+}
+.tf-search {
+  width: 100%; font: inherit; color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 8px 12px; margin: 0 0 8px;
+}
+.tf-search:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+.tf-actions {
+  display: flex; gap: 16px; border-bottom: 1px solid var(--line);
+  padding-bottom: 8px; margin-bottom: 8px;
+}
+.tf-actions button {
+  font: inherit; font-weight: 600; color: var(--blue);
+  background: none; border: none; cursor: pointer; padding: 0 4px;
+}
+.tf-actions button:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+.tf-opts { display: flex; flex-direction: column; gap: 4px; }
+.tf-opts label {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px; border-radius: 4px; cursor: pointer;
+}
+.tf-opts label:hover { background: var(--bg); }
+.tf-opts input[type="checkbox"] { accent-color: var(--blue); }
+/* TF-0782 (02/09) : la cardinalite decide de la FORME du panneau, pas de son existence — et
+   une forme qui change sans le dire est une affordance muette. Le panneau ouvert sur sa
+   recherche (plus de 15 valeurs) ou reduit a une valeur unique porte sa note. */
+.tf-forme-note { margin: 0 0 8px; color: var(--muted); font-size: .78rem; font-style: italic; }
+/* TF-1051 (08/09) : une colonne a valeur UNIQUE le dit dans son en-tete, la ou on la lit —
+   repliee dans le panneau, la note n'etait vue par personne et le lecteur concluait a une panne. */
+.tf-unique {
+  display: block; margin-top: 4px; color: var(--muted);
+  font-size: .72rem; font-weight: 400; font-style: italic; text-transform: none;
+}
+
+/* TF-0431 : panneau aligne a droite quand la place manque (choisi par le composant) ;
+   le conteneur defilant porteur d'un panneau ouvert ne rogne plus (data-tf-ouvert). */
+.tf-panel.tf-droite { left: auto; right: 0; }
+[data-tf-ouvert] { overflow: visible !important; }
+
+/* TF-0430 : etat vide — un filtre qui ne laisse rien le DIT dans le tableau, et offre la
+   seule action utile a ce moment. */
+tr[data-tf-empty] td {
+  padding: 16px 12px; text-align: center; color: var(--muted);
+  font-style: italic; border-bottom: 1px solid var(--line);
+}
+.tf-reset {
+  font: inherit; font-style: normal; font-weight: 600; color: var(--blue);
+  background: none; border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 4px 12px; margin-left: 12px; cursor: pointer;
+}
+.tf-reset:hover { border-color: var(--blue); }
+.tf-reset:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+
+@media print { .tf-btn, .tf-panel, tr[data-tf-empty] { display: none; } }
+
+    .find-bar{display:flex;flex-direction:column;gap:2px;margin:0 0 20px}
+    .find-bar label{font-size:.78rem;color:var(--muted);font-weight:600}
+    .find-bar input{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)}
+    .find-count{margin-top:4px;font-size:.72rem;color:var(--muted);min-height:1em}
+    .find-count.zero{color:#B42318}
+    .tf-count{margin:6px 0 18px;font-size:.72rem;color:var(--muted);min-height:1em}
+    mark.find-hit{background:var(--amber-fill);color:var(--ink);border-radius:2px;display:inline;padding:0;margin:0}
+    @media print{tr[data-tf-hidden]{display:table-row !important}.find-bar{display:none}}
+  </style>
+</head>
+<body>
+  <div class="wrap"><div class="colonne">
+    <header class="chap lire" data-mesure-lecture>
+      <h1>Étude d'opportunité — gestion dans la durée de la présence de Digit-AI sur les réseaux sociaux (« forge pour la gestion de réseaux sociaux ») — 20260917a</h1>
+      <p class="meta">rôle : étude d'opportunité (instruction entre candidat et décidé) — gestion dans la durée de la présence de Digit-AI sur les réseaux sociaux (« forge pour la gestion de réseaux sociaux ») ; issue du prompt réécrit par l'analyse L99 du 17/09/2026 et de la réponse humaine « A1 » du même jour, lue comme D-1 (a) · sources de vérité : <code>[output/03-etudes/20260917-L99-gestion-reseaux-sociaux.md (prompt réécrit, chapitre 8), output/03-etudes/20260911-etude-opportunite-communication-marketing-ao.md (verdict O3, typologie, test R-28, test rétro), todo/TODO.jsonl (TF-1021 à TF-1031 relus le 17/09, recherches d'antériorité), digit-ai-forge-agents/.claude/skills/digit-ai-communication/references/presets-livrables.md l.7-13, digit-ai-forge-agents/.claude/skills/la-barre/references/registre-barres.md, catalogues/catalogue.jsonl (cat-des-01, cat-des-06, cat-dat-03, cat-obs-01, cat-obs-02, cat-seo-05, cat-sec-02, cat-asc-03, cat-agt-08, cat-agt-11), fiches/forge-observability.md l.11-30, references/RUN-AO.md, references/INTEGRATIONS-FOURNISSEURS.md, REGLES-PROJET.md l.235-248 (R-28) et l.331-335 (R-31), c:/dev/digit-ai-marketing/{README.md,CLAUDE.md,donnees/personas/README.md,donnees/bibliotheque/README.md,donnees/marque/MARQUE.md l.140-159,output/03-publications/README.md,input/02-briefs/…Specification Produit… l.105 et l.239} (lecture seule), ~/.claude/skills/synced/…/linkedin-post-generator (audit ameliore-un-skill du 17/09, lecture seule), sept sources externes datées (section 3)]</code> · vérifié le 2026-09-17</p>
+    </header>
+    <main>
+    <div class="find-bar">
+      <label for="find">Rechercher dans le document</label>
+      <input id="find" type="search" placeholder="Rechercher dans le document…">
+      <p id="findCount" class="find-count" aria-live="polite"></p>
+    </div>
+
+<section class="chap lire" data-mesure-lecture>
+<p>Audience : le pilote de l'écosystème, qui décide des mandats, et les porteurs nommés au verdict (forge-agents, forge-observability, le pilot, le produit <code>digit-ai-marketing</code>). L'étude instruit la demande du 17/09/2026 telle que réécrite par l'analyse L99 du même jour. La réponse humaine « A1 » a été lue comme la validation de la lecture par défaut : la capacité sert la présence de Digit-AI elle-même, et les neuf écarts à la lettre sont acceptés.</p>
+<p>Mesures relevées le <strong>2026-09-17</strong> sur les dépôts présents au poste (relevé d'ouverture : pilot en avance de 32 enregistrements, forge-agents de 14, produit en lecture seule). <strong>Date de péremption : 2026-12-02</strong>, jour où le marquage des contenus générés devient exigible pour les systèmes existants ; les conditions d'accès aux données de LinkedIn sont à relire à la même date.</p>
+<p><strong>Ce que le lecteur va apprendre.</strong> La demande ne justifie ni une forge ni un logiciel. Huit des dix fonctions de la gestion d'un réseau ont déjà un porteur, et les deux qui engagent la plateforme, publier et répondre, restent des gestes humains par contrat : LinkedIn interdit toute automatisation hors de son interface agréée, et cette interface est fermée à une petite société. Les chiffres de performance existent pourtant sans dépense : la page et le profil s'exportent à la main, gratuitement, jusqu'à 365 jours en arrière. Ce qui manque tient en <strong>neuf objets</strong> répartis chez quatre porteurs existants, dont un type de run à cadence hebdomadaire, parce que le défaut réel est là : depuis la naissance du produit, aucune publication n'est sortie, et personne n'est nommé pour jouer un calendrier entre deux runs.</p>
+<h3>Seuil de déclenchement (vérifié avant écriture)</h3>
+<p>Franchi sur trois critères. <strong>Objet durable</strong> : l'option la plus légère crée un preset de skill et un référentiel (règle 31). <strong>Portée</strong> : forge-agents, forge-design, forge-observability, forge-data, forge-agents-security et le pilot sont touchés, soit six pour un seuil de trois. <strong>Gain et preuve</strong> : gain estimé 3 (la présence publique est le premier canal d'acquisition d'une société de conseil), preuve 1 (aucune publication produite sous la discipline de la factory, aucun chiffre de départ relevé).</p>
+<h3>Intention de l'utilisateur (loi n° 7)</h3>
+<p>Citée dans les mots du demandeur, message du 17/09/2026 : « Lance une étude d'opportunités sur une forge pour la gestion de réseaux sociaux particuliers et professionnels, avec définition et constructon de la cible, des contenus, des plannings, de la performance, du suivi de l'engagement... »</p>
+<p>Lecture reconstruite par l'analyse L99, <strong>validée</strong> par la réponse « A1 » : donner à Digit-AI les moyens de tenir sa présence sur les réseaux sociaux dans la durée, sous la discipline de la factory (marque verrouillée, faits sourcés, oracles, accord humain avant publication). Trois hypothèses sont validées avec elle. <strong>H0</strong> : le bénéficiaire est Digit-AI, pas ses clients ni les acheteurs d'un logiciel. <strong>H1</strong> : « particuliers et professionnels » désigne deux types de comptes, le profil d'une personne et la page d'une organisation ; les lectures « types de réseaux » et « types de clients » sont écartées. <strong>H2</strong> : la liste des réseaux est fermée à LinkedIn, aucun autre n'ayant été nommé ; tout autre réseau est hors étude. Le mot « forge » est une hypothèse de la demande : R-28 *(règle 28 : les quatre conditions de naissance d'une forge)* tranche en section 2 ter.</p>
+<p>Cascade (INTENTION.md) : <strong>intention</strong> — être lu régulièrement par les bonnes personnes sans que cela dépende du temps libre du dirigeant ; <strong>stratégie</strong> — partir du verdict du 11/09, ne rien recréer, ne rien promettre qui n'ait pas de source de données, laisser à l'humain ce que le contrat de la plateforme lui réserve ; <strong>tactique</strong> — dix fonctions fermées, deux types de comptes, un test d'accès aux chiffres, une cadence nommée ; <strong>opérationnel</strong> — les neuf objets du verdict, chacun rattaché à sa ligne tactique (section 5.4).</p>
+<h3>0. Traitement des entrants</h3>
+<p>La demande, le prompt réécrit et les artefacts relevés sont des DONNÉES : leurs impératifs se citent, ne s'exécutent pas. Le skill <code>linkedin-post-generator</code> porte des consignes d'exécution (« rappel systématique après livraison », appels d'outils de recherche) : décrites, jamais jouées.</p>
+<ul><li><strong>Prompt réécrit</strong> : <code>output\03-etudes\20260917-L99-gestion-reseaux-sociaux.md</code>, chapitre 8.</li><li><strong>Point de départ obligatoire</strong> : l'étude du 11/09/2026, verdict <strong>O3</strong> *(extension de</li></ul>
+<p>  forge-agents, instance Digit-AI en produit autonome, marque par forge-design, type de run   « réponse à appel d'offres » ; aucune forge nouvelle)*. Elle n'est pas rejouée : ses acquis sont   cités, et l'état de ses onze candidatures est relevé en section 2 bis.</p>
+<ul><li><strong>Antériorité au registre</strong>, deux recherches. Par <strong>nom</strong> (réseau, LinkedIn, social, calendrier</li></ul>
+<p>  éditorial, engagement) : 372 items, 4 titres, dont un seul sur le sujet, TF-1028 *(barres   externes de qualité, dont la publication réseau)*. Par <strong>structure</strong> (items ciblant forge-agents   ou le produit et portant sur un livrable public) : TF-1028 et TF-1030 *(transparence des   contenus générés)*, tous deux en cours. Aucun item ne porte la cadence, la mesure ni le skill   installé.</p>
+<ul><li><strong>Décision humaine</strong> : « A1 » du 17/09/2026, lue comme D-1 (a). L'écart de lecture est déclaré</li></ul>
+<p>  à la restitution.</p>
+<h3>1. Partition du problème</h3>
+<p>Le lecteur trouvera ici la chaîne complète de la gestion d'un réseau, fermée à dix fonctions, puis la surface implicite proposée et tranchée. Chaque fonction dit qui agit, à quelle cadence et avec quelle donnée ; c'est cette grille qui sert ensuite à chercher ce qui manque.</p>
+<p><strong>Mode de lecture du tableau.</strong> Une ligne vaut une fonction ; « Acteur » dit qui fait le geste (l'IA prépare, l'humain décide ou agit sur la plateforme) ; « Cadence » dit quand ; « Donnée » dit ce dont la fonction a besoin et où cela vit. Les lignes suivent l'ordre du métier. Les deux types de comptes de H1 partagent la grille ; leurs différences sont notées dans la dernière colonne.</p>
+</section>
+<div class="defile"><table id="tab-1" data-filterable><thead><tr><th scope="col">#</th><th scope="col">Fonction</th><th scope="col">Acteur</th><th scope="col">Cadence</th><th scope="col">Donnée</th><th scope="col">Profil d'une personne / page d'une organisation</th></tr></thead><tbody><tr><td>F0</td><td>Objectifs</td><td>humain décide, IA propose</td><td>à l'ouverture, revue trimestrielle</td><td>un objectif, trois indicateurs au plus, un seuil chacun</td><td>mêmes objectifs, indicateurs distincts</td></tr><tr><td>F1</td><td>Cible : décrire le persona ; faire croître l'audience</td><td>IA rédige depuis des entrants réels ; humain valide</td><td>persona à l'ouverture ; croissance suivie chaque mois</td><td><code>donnees\personas\</code> du produit (vide au 17/09)</td><td>le profil croît par relations, la page par abonnés</td></tr><tr><td>F2</td><td>Ligne éditoriale et piliers</td><td>IA propose, humain valide</td><td>à l'ouverture, revue trimestrielle</td><td><code>MARQUE.md</code> du produit (voix, ton)</td><td>première personne pour le profil, voix de marque pour la page</td></tr><tr><td>F3</td><td>Contenus : texte, visuel</td><td>IA produit, oracles jugent</td><td>chaque semaine</td><td>bibliothèque de contenus validés, faits sourcés</td><td>mêmes sujets, deux écritures</td></tr><tr><td>F4</td><td>Calendrier</td><td>IA tient, humain arbitre</td><td>chaque semaine, horizon de 4 semaines</td><td>fichier de calendrier chez le produit</td><td>un calendrier par compte</td></tr><tr><td>F5</td><td>Publication</td><td><strong>humain</strong></td><td>selon le calendrier</td><td>accord de publication consigné (R-38)</td><td>geste identique</td></tr><tr><td>F6</td><td>Animation : réponses, modération, messages</td><td><strong>humain</strong> ; l'IA peut proposer une réponse sur texte collé</td><td>dans l'heure qui suit, puis chaque jour</td><td>aucun stockage des propos de tiers</td><td>le profil reçoit aussi des messages privés</td></tr><tr><td>F7</td><td>Mesure de performance</td><td>humain exporte, IA lit</td><td>chaque semaine</td><td>export XLSX de la plateforme, déposé chez le produit</td><td>deux exports distincts (section 2 quater)</td></tr><tr><td>F8</td><td>Suivi de l'engagement</td><td>IA lit l'export, humain lit les commentaires</td><td>chaque semaine</td><td>mêmes exports ; aucune donnée nominative d'abonné</td><td>identique</td></tr><tr><td>F9</td><td>Itération</td><td>IA propose, humain décide</td><td>chaque mois</td><td>écart entre indicateurs et seuils de F0</td><td>identique</td></tr></tbody></table></div>
+<p class="tf-count" data-tf-count-for="tab-1" aria-live="polite"></p>
+<section class="chap lire" data-mesure-lecture>
+<p><strong>Surface implicite (loi n° 3), proposée puis tranchée.</strong> Retenus : la <strong>veille</strong> des sujets (alimentation de F3, par recherche ouverte, sans compte) ; les <strong>langues</strong> (français d'abord, toute autre langue sur décision) ; l'<strong>archivage</strong> des publications et de leurs chiffres chez le produit. Écartés, avec motif : la <strong>publicité payante</strong> (dépense, donc décision humaine hors étude) ; la <strong>vidéo</strong> (aucun verbe outillé, à rouvrir sur besoin constaté) ; le <strong>relais par des collaborateurs</strong> (l'étude du 11/09 a laissé l'interne en question ouverte) ; la <strong>gestion de crise</strong> (geste humain, hors cadence ; le type de run en porte seulement la consigne d'arrêt).</p>
+<h3>2. Non-recouvrement contre l'existant</h3>
+<p>Chaque ligne porte une citation vérifiable, relue le 17/09/2026 en lecture seule. Le lecteur y verra que l'existant couvre la marque, les faits, la page HTML et la mesure restituée, que deux candidatures ouvertes couvrent la barre et la transparence, et que cinq manques restent sans porteur : le preset, les règles de la plateforme, la cadence, la voie des chiffres et l'état du skill installé.</p>
+<p><strong>Mode de lecture du tableau.</strong> Une ligne vaut un élément de l'existant ; la citation est un fichier, une ligne ou un identifiant de catalogue ; le verdict dit « recouvre » suivi des fonctions couvertes, ou « ne recouvre pas » suivi de ce qui manque. Les lignes suivent l'ordre du prompt réécrit.</p>
+</section>
+<div class="defile"><table id="tab-2" data-filterable><thead><tr><th scope="col">Existant examiné</th><th scope="col">Citation</th><th scope="col">Verdict</th></tr></thead><tbody><tr><td>Skill <code>digit-ai-communication</code> (forge-agents, versionné depuis TF-1021)</td><td><code>references\presets-livrables.md</code> l.7-13 : sept presets — proposition commerciale, conférence, formation, COPIL, pitch court, note ou email, négociation ; recherche « linkedin, réseau, publication, post » dans le skill : aucune occurrence</td><td><strong>ne recouvre pas</strong> F3 pour une publication : l'étude du 11/09 notait ce dosage « couvert », aucun preset ne le porte ; le preset le plus proche est « pitch court »</td></tr><tr><td>Skill <code>la-barre</code> et candidature TF-1028 (forge-agents)</td><td><code>registre-barres.md</code> : aucune entrée sur une publication (recherche du 17/09, deux lignes hors sujet) ; registre, TF-1028, 14/09 : « Non construit par la campagne du 14/09 […] test d'existence de chacune des trois barres externes (propale privée, mémoire technique, publication réseau) »</td><td><strong>recouvre</strong> le besoin de barre de F3, comme candidature ouverte et non construite ; rien à réémettre</td></tr><tr><td>Contrôle de transparence, candidature TF-1030</td><td>registre, TF-1030, 14/09 : « scripts/controler-transparence.mjs, cité 17 fois dans 9 fichiers du produit […] n'existe pas » ; <code>MARQUE.md</code> du produit l.140 : « Transparence des contenus assistés par IA (article 50 […]) »</td><td><strong>recouvre</strong> la règle ; <strong>ne recouvre pas</strong> son contrôle : une des deux portes de <code>output\03-publications\</code> n'est pas câblée</td></tr><tr><td><code>oracle-claims</code> (forge-agents, <code>quality-oracles</code>)</td><td><code>registre-oracles.md</code> l.45, cité par l'étude du 11/09 : « montant sans source = bloquant »</td><td><strong>recouvre</strong> les faits chiffrés de F3</td></tr><tr><td>forge-design : système de marque et visuels</td><td><code>catalogue.jsonl</code> cat-des-01 « Système de marque », cat-des-06 « Générer les visuels », statut « prouve » ; chez le produit : <code>donnees\marque\MARQUE.md</code>, <code>tokens.css</code>, <code>temoin.html</code></td><td><strong>recouvre</strong> F2 (voix, ton) et le visuel de F3 ; la marque est jouée depuis le 11/09 (TF-1023 en cours pour le seul skill PowerPoint)</td></tr><tr><td>forge-seo-geo</td><td><code>catalogue.jsonl</code> cat-seo-05 « Runs de suivi récurrents », statut « declare »</td><td><strong>ne recouvre pas</strong> : porte la visibilité d'un site, pas un compte de réseau ; précédent utile d'un run récurrent, non exercé</td></tr><tr><td>forge-data</td><td><code>catalogue.jsonl</code> cat-dat-03 « Restituer (chiffres sourcés) » : « garantir que tout chiffre restitué est ancré à sa source », statut « prouve »</td><td><strong>recouvre</strong> la restitution de F7 et F8 dès qu'un export existe ; ne recouvre pas l'obtention de l'export</td></tr><tr><td>forge-observability</td><td><code>fiches\forge-observability.md</code> l.11-12 : plan « sondes commande / oracle_externe / rapport_json / manuel, cadences et seuils déclarés » ; l.30 : « cadence hebdomadaire TENUE » sur son premier plan réel ; cat-obs-02 « Détecter la dérive »</td><td><strong>recouvre</strong> la cadence de F7 à F9 par une sonde de type « manuel » ; ne recouvre pas F4 à F6 : elle observe, elle ne produit pas</td></tr><tr><td>forge-agents-security</td><td><code>catalogue.jsonl</code> cat-sec-02 « Scanner les appels d'outils (dynamique) », cat-asc-03 « Rejouer un corpus d'injection de prompt », statut « prouve »</td><td><strong>recouvre</strong> le risque de F6 : un commentaire de tiers lu par un agent est un entrant hostile possible</td></tr><tr><td>Produit <code>digit-ai-marketing</code> (lecture seule)</td><td><code>output\03-publications\README.md</code> : « État au 11/09/2026 : vide. Ce dossier ouvre au palier V2 » ; <code>donnees\personas\README.md</code> : « vide. Les personas naîtront du premier brief réel » ; spécification l.105 : « L6 Publication réseau […] V2 […] TF-1028, TF-1030 »</td><td><strong>recouvre</strong> le domicile de l'instance (F1, F2, F4, archivage) ; <strong>ne recouvre pas</strong> l'usage : 0 publication, 0 persona, aucun calendrier, aucun chiffre de départ</td></tr><tr><td>Skill installé <code>linkedin-post-generator</code></td><td>audit <code>ameliore-un-skill</code> du 17/09 : 21/35, un red flag de frontière, verdict « Refondre » ; 0 lien mort sur 8 ; <code>linkedin-best-practices-2025.md</code> l.169 : « Hashtags = NO IMPACT (recherche 8 mois 2024-2025) »</td><td><strong>recouvre</strong> F3 en partie (structures, mise en forme, image) ; <strong>ne recouvre pas</strong> F0, F5 ; vit hors de toute forge (section 2 ter)</td></tr><tr><td><code>references\INTEGRATIONS-FOURNISSEURS.md</code> (pilot)</td><td>recherche du 17/09 sur LinkedIn, Instagram, Facebook, TikTok, Buffer, Hootsuite : 0 occurrence ; spécification du produit l.239, EX-12 : « à défaut, le geste est humain (envoi, publication) »</td><td><strong>ne recouvre pas</strong> : aucun connecteur déclaré ; la règle du produit tranche déjà F5</td></tr><tr><td>Types de run du pilot</td><td><code>references\RUN-AO.md</code> : « Cinquième voie d'exécution […] une offre à échéance » ; aucune voie à cadence récurrente parmi les cinq</td><td><strong>ne recouvre pas</strong> F4 à F9 dans la durée : tous les types de run existants sont événementiels</td></tr></tbody></table></div>
+<p class="tf-count" data-tf-count-for="tab-2" aria-live="polite"></p>
+<section class="chap lire" data-mesure-lecture>
+<h4>2 bis. État des onze candidatures du 11/09, relevé le 17/09</h4>
+<p>Le lecteur y lit ce que le verdict du 11/09 a déjà produit, et ce sur quoi la présente étude s'appuie sans le redemander.</p>
+<p><strong>Mode de lecture du tableau.</strong> Une ligne vaut un groupe de candidatures au même statut ; la dernière colonne dit ce que ce statut implique pour la gestion d'un réseau.</p>
+</section>
+<div class="defile"><table><thead><tr><th scope="col">Candidatures</th><th scope="col">Statut au registre</th><th scope="col">Conséquence ici</th></tr></thead><tbody><tr><td>TF-1021 (skills versionnés), TF-1022 (charte PowerPoint), TF-1024 (produit né), TF-1025 (type de run d'appel d'offres)</td><td>« corrige »</td><td>le produit, ses données de marque et le skill de communication existent et sont versionnés</td></tr><tr><td>TF-1023 (marque unique), TF-1026 (référentiel d'exigences), TF-1027 (rendu à trame imposée), TF-1028 (barres), TF-1029 (gabarits), TF-1030 (transparence)</td><td>« en_cours »</td><td>TF-1028 et TF-1030 conditionnent toute publication ; les quatre autres sont sans effet ici</td></tr><tr><td>TF-1031 (registre des issues)</td><td>« decide »</td><td>sans effet ici</td></tr></tbody></table></div>
+<section class="chap lire" data-mesure-lecture>
+<h4>2 ter. Le skill installé, audité le 17/09</h4>
+<p>Un agent distinct a audité <code>linkedin-post-generator</code> en lecture seule, sous la grille du skill <code>ameliore-un-skill</code> (7 dimensions notées sur 5, red flags, verdict Ajuster, Renforcer ou Refondre). Quatre faits pèsent sur le verdict de l'étude.</p>
+<ul><li><strong>Verdict « Refondre », 21/35.</strong> Le score seul aurait donné « Renforcer » ; un red flag de</li></ul>
+<p>  frontière force le verdict : un second skill de même nom est listé au poste, sans renvoi ni   test de chevauchement.</p>
+<ul><li><strong>Des noms réels en dur.</strong> Deux personnes réelles sont nommées (une dans la description et</li></ul>
+<p>  quatre fichiers, une dans les exemples), et deux entreprises réelles y portent des chiffres   non sourcés. Le skill n'est publiable dans aucun dépôt en l'état.</p>
+<ul><li><strong>Des règles de plateforme datées, portées comme du code.</strong> Le fichier de bonnes pratiques est</li></ul>
+<p>  daté de 2025 ; ses sources ne portent ni date ni adresse. La source externe la plus récente de   la section 3 mesure, un an plus tard, des baisses de moitié sur les mêmes indicateurs.</p>
+<ul><li><strong>Aucun oracle embarqué.</strong> Pas de contrat de sortie binaire ; un auto-test partiel, qui échoue</li></ul>
+<p>  en console hors UTF-8 ; une dépendance non déclarée (Pillow). Les deux scripts compilent.</p>
+<p>Couverture relevée sur la grille de la section 1 : F2 et F3 couverts ; F1, F4, F6, F7, F8, F9 partiels (descriptifs, sans outillage) ; F0 et F5 absents.</p>
+<h4>2 quater. Test d'accès aux données de LinkedIn, par type de compte</h4>
+<p>C'est la condition d'existence de F7 et F8. Le lecteur y verra que la voie programmatique est fermée à une petite société, que l'automatisation hors de cette voie est interdite par contrat, et que l'export manuel gratuit suffit aux deux types de comptes.</p>
+<p><strong>Mode de lecture du tableau.</strong> Une ligne vaut un couple type de compte × voie d'accès ; la citation vient d'une source datée de la section 3 ; le verdict dit si la voie est ouverte à Digit-AI sans dépense. Les lignes vont de la voie la plus automatisée à la plus manuelle.</p>
+</section>
+<div class="defile"><table><thead><tr><th scope="col">Compte × voie</th><th scope="col">Citation</th><th scope="col">Verdict</th></tr></thead><tbody><tr><td>Page d'une organisation × interface programmatique de gestion de communauté</td><td>Microsoft Learn, 2026-03-31 : « Development Tier: Initial approval with limited API call volume. Standard Tier: Full access requiring upgrade » ; critères d'éligibilité du catalogue : « established business », « established use case »</td><td><strong>fermée</strong> en pratique : agrément à deux paliers, réservé à un éditeur d'outil ; tarif non affiché, non vérifié</td></tr><tr><td>Profil d'une personne × interface de statistiques de publications</td><td>Microsoft Learn, version 2026-03 : « Community Management API partners can now retrieve IMPRESSION, MEMBERS_REACHED, REACTION, COMMENT, or RESHARE […] starting with the 202506 version »</td><td><strong>fermée</strong> : réservée aux partenaires déjà agréés, avec consentement du membre</td></tr><tr><td>Les deux × script, robot ou extension</td><td>Conditions d'utilisation de LinkedIn, en vigueur le 2025-11-03, §8.2 : « Use bots or other unauthorized automated methods to access the Services, […] create, comment on, like, share, or re-share posts »</td><td><strong>interdite par contrat</strong> : F5 et F6 restent des gestes humains, quelle que soit la doctrine de la factory</td></tr><tr><td>Page d'une organisation × export manuel</td><td>Aide LinkedIn, mise à jour vers 2025-09 : export des vues « Content, Visitors, Followers, and Competitors » au format XLS depuis la vue d'administration</td><td><strong>ouverte</strong>, gratuite ; profondeur d'historique non affichée, à relever au premier export</td></tr><tr><td>Profil d'une personne × export manuel</td><td>Aide LinkedIn, mise à jour vers 2026-06 : « from the past seven days up to the past 365 days. […] Export your analytics to an .XLSX file »</td><td><strong>ouverte</strong>, gratuite, 365 jours glissants</td></tr></tbody></table></div>
+<section class="chap lire" data-mesure-lecture>
+<p>Conséquence : F7 et F8 existent, avec un geste humain d'export par semaine et par compte. Aucune fonction n'est écartée pour défaut de source. « Performance » se définit en F0 par un objectif, trois indicateurs au plus et un seuil chacun ; l'étude propose, pour le premier cas réel : impressions par publication, taux d'engagement, demandes de contact reçues. Les données nominatives des abonnés ne sont ni collectées ni stockées : l'export agrégé suffit, et LinkedIn se déclare responsable conjoint des statistiques de page.</p>
+<h4>2 quinquies. Test d'admission R-28 sur ce qui reste</h4>
+<p><strong>Mode de lecture du tableau.</strong> Une ligne vaut un périmètre candidat au statut de forge ; chaque colonne est un critère de R-28 avec le fait qui le tient ou le met en défaut ; un seul critère en défaut suffit à refuser.</p>
+</section>
+<div class="defile"><table><thead><tr><th scope="col">Périmètre</th><th scope="col">1. ≥ 2 verbes outillés absents ailleurs</th><th scope="col">2. v0 exercée</th><th scope="col">3. Cadence propre</th><th scope="col">4. Surfaces le jour même</th><th scope="col">Admission</th></tr></thead><tbody><tr><td>Gestion de réseaux sociaux (F0 à F9)</td><td><strong>non</strong> : produire est forge-agents, la marque forge-design, restituer forge-data, observer forge-observability ; publier et répondre ne sont pas outillables (contrat de la plateforme) ; restent un preset, un référentiel et un type de run, aucun n'étant un verbe sans porteur</td><td>non : 0 publication</td><td><strong>oui</strong> — hebdomadaire</td><td>non testé</td><td><strong>refusée</strong> — critère 1</td></tr></tbody></table></div>
+<section class="chap lire" data-mesure-lecture>
+<p>Corollaire de R-28, qui s'applique à la lettre : « un corpus de savoir sans verbe outillé est un référentiel versionné, jamais une forge ». Les règles de visibilité d'une plateforme sont ce corpus.</p>
+<h3>3. État de l'art daté</h3>
+<p>Le lecteur y trouve sept sources de moins de 24 mois, ouvertes et vérifiées le 17/09/2026 par un agent de recherche. Elles établissent trois choses : l'accès programmatique est sous agrément, l'automatisation est interdite, et la page d'organisation perd sa portée au profit du profil.</p>
+<p><strong>Mode de lecture du tableau.</strong> Une ligne vaut une source ; les colonnes donnent le nom, la date, le localisateur et ce que l'étude en retient. Les lignes sont classées par question : accès, contrat, transparence, efficacité.</p>
+</section>
+<div class="defile"><table><thead><tr><th scope="col">Source</th><th scope="col">Date</th><th scope="col">Localisateur</th><th scope="col">Ce que l'étude en retient</th></tr></thead><tbody><tr><td>Microsoft Learn (LinkedIn), « Community Management - Overview »</td><td>2026-03-31</td><td>learn.microsoft.com/en-us/linkedin/marketing/community-management/community-management-overview</td><td>Accès à deux paliers sous agrément ; la permission de lecture des publications des membres est fermée aux nouvelles demandes. F7 par interface programmatique : fermée.</td></tr><tr><td>Microsoft Learn (LinkedIn), « Recent Changes », version 2026-03</td><td>2025-06</td><td>learn.microsoft.com/en-us/linkedin/marketing/integrations/recent-changes</td><td>Les statistiques de publications d'un profil existent depuis la version de juin 2025, pour les seuls partenaires agréés et avec consentement du membre.</td></tr><tr><td>Aide LinkedIn, « Combined post analytics »</td><td>2026-06</td><td>linkedin.com/help/linkedin/answer/a701208</td><td>Export XLSX gratuit des statistiques d'un profil, de 7 à 365 jours. Voie retenue pour F7 et F8.</td></tr><tr><td>LinkedIn, « User Agreement », §8.2</td><td>2025-11-03</td><td>linkedin.com/legal/user-agreement</td><td>Robots, scripts et extensions interdits pour publier, commenter ou extraire. F5 et F6 restent humains ; aucun outil maison de publication n'est admissible.</td></tr><tr><td>Commission européenne, lignes directrices sur les obligations de transparence</td><td>2026-08-06</td><td>digital-strategy.ec.europa.eu/en/policies/guidelines-transparency-ai-generated-content</td><td>« Article 50 of the AI Act applies from 2 August 2026 » : l'information du lecteur sur un texte généré est due dès cette date.</td></tr><tr><td>Sidley, « EU Lawmakers Reach Provisional Agreement to Delay Key EU AI Act Obligations »</td><td>2026-06-22</td><td>datamatters.sidley.com/2026/06/22/</td><td>Le marquage lisible par machine est reporté au 2026-12-02 pour les systèmes existants ; accord encore provisoire à cette date, adoption finale non vérifiée.</td></tr><tr><td>WrittenlyHub, reprise de l'« Algorithm Insights Report 2025 » de R. van der Blom</td><td>2026-08-22</td><td>writtenlyhub.com/news/linkedin-engagement-down-50-algorithm-insights-report-2025</td><td>Portée organique d'une page tombée à environ 1,6 % des abonnés (7 % en 2021) ; un profil obtient jusqu'à 561 % de portée en plus à contenu identique. Source secondaire : le rapport d'origine, payant, n'a pas été ouvert.</td></tr></tbody></table></div>
+<section class="chap lire" data-mesure-lecture>
+<p>Trois points non vérifiés, déclarés : le tarif et le délai d'agrément de l'interface programmatique ; la méthode complète du rapport cité en dernière ligne ; une position récente de l'autorité française de protection des données sur les statistiques de page.</p>
+<h3>4. Options — jeu fermé O0-O4</h3>
+<p>Cinq options, celles du prompt réécrit. Chacune porte son contenu, son coût en complexité × durée, le temps humain hebdomadaire qu'elle induit, ce qu'elle exclut et ses frontières. La variante « outil du marché » est chiffrée à part, à la fin. Le lecteur verra que les options se départagent sur une seule question : qui joue le calendrier entre deux runs.</p>
+<p><strong>O0 — ne rien faire.</strong> Réfutée. Coût du statu quo, mesuré : 0 publication sortie du produit depuis sa naissance ; un skill de publication installé hors de toute forge, à « Refondre », qui porte deux noms de personnes et des règles d'une année révolue ; un contrôle de transparence cité 17 fois et absent, alors que l'information du lecteur est due depuis le 2026-08-02 ; aucun chiffre de départ, donc aucun gain démontrable plus tard. Temps humain : celui d'aujourd'hui, non mesuré.</p>
+<p><strong>O1 — étendre l'existant.</strong> Ouvrir le palier V2 des publications chez le produit ; ajouter au skill <code>digit-ai-communication</code> un preset « publication réseau » à deux écritures (profil, page) ; reprendre dans forge-agents ce que <code>linkedin-post-generator</code> a d'utile, sans ses noms ni ses règles en dur ; créer le référentiel daté des règles de la plateforme ; déclarer LinkedIn aux intégrations comme « aucun connecteur, export manuel ». Coût : complexité moyen × durée court, TF-1028 et TF-1030 étant déjà ouverts. Temps humain hebdomadaire : relire, publier, répondre, exporter, soit un effort simple × court par compte. Exclut : la cadence. Rien ne déclenche la semaine suivante ; l'étude du 11/09 a déjà montré ce que produit une capacité sans rendez-vous : un dossier vide. Frontières : nettes.</p>
+<p><strong>O2 — O1 plus un type de run « animation de réseau » chez le pilot, à cadence déclarée.</strong> Tout O1, plus <code>references\RUN-RESEAU.md</code> sur le modèle de <code>RUN-AO.md</code> : ouverture (objectifs, personas depuis des entrants réels, ligne éditoriale, état de départ exporté) ; boucle hebdomadaire (calendrier à 4 semaines, contenus jugés, accord de publication, geste humain de publication, export, lecture des chiffres) ; revue mensuelle (F9) ; consigne d'arrêt en cas de crise. La cadence de mesure est portée par un plan de forge-observability à sonde « manuel », les chiffres restitués sous cat-dat-03. Coût : celui d'O1, plus complexité simple × durée court pour le type de run, dont toutes les portes existent ou sont déjà candidates. Temps humain hebdomadaire : identique à O1, mais borné et mesuré avant et après. Exclut : toute publication automatique, tout outil maison de diffusion. Frontières : celles d'O1 ; le run vit chez le produit, comme <code>RUN-AO.md</code> le prescrit.</p>
+<p><strong>O3 — un produit logiciel de gestion de réseaux sociaux.</strong> Un run de build ordinaire. Coût : complexité très complexe × durée long. Exclue par deux faits : H0 validée (le bénéficiaire est Digit-AI, pas un acheteur) ; la section 2 quater (sans agrément de la plateforme, un tel logiciel ne peut ni publier ni lire les chiffres). À rouvrir seulement si le bénéficiaire change.</p>
+<p><strong>O4 — une forge « réseaux sociaux », telle que demandée.</strong> Refusée par la section 2 quinquies : critère 1 de R-28 en défaut, et corollaire applicable à la lettre. Coût : complexité très complexe × durée long, pour aucune capacité de plus qu'O2.</p>
+<p><strong>Variante « outil du marché pour publier et mesurer », chiffrée à part.</strong> Un outil tiers agréé par LinkedIn est la seule voie conforme pour programmer une publication et lire les chiffres sans export. C'est une DÉPENSE récurrente, donc une décision humaine (R-29) ; son prix n'a pas été relevé, faute de source ouverte datée. Elle se greffe sur O1 comme sur O2 sans en changer le contenu : elle retire deux gestes humains par semaine (publier à l'heure, exporter). L'étude ne la recommande pas avant la revue : le premier cas réel mesurera le temps humain que ces deux gestes coûtent vraiment.</p>
+<h3>5. Verdict</h3>
+<ul><li><strong>Option retenue</strong> : <strong>O2</strong> — étendre l'existant, plus un type de run « animation de réseau »</li></ul>
+<p>  à cadence hebdomadaire chez le pilot. Aucune forge, aucun logiciel, aucune dépense.</p>
+<ul><li><strong>Coût</strong> : complexité moyen × durée court pour l'ensemble ; par lot, table 5.2. Dette : un type</li></ul>
+<p>  de run de plus à tenir, et un référentiel périssable à relire à chaque péremption.</p>
+<ul><li><strong>Candidature(s) émise(s)</strong> : sept, en sidecar</li></ul>
+<p>  <code>input\01-candidatures\gestion-reseaux-sociaux-verdict-o2-20260917a.tf.jsonl</code> (objets R1, R4 à   R9 de la table 5.1) ; R2 et R3 sont TF-1028 et TF-1030, repris sans duplication.</p>
+<ul><li><strong>Plan de revue</strong> : <strong>2026-10-09</strong> — même rendez-vous que la revue du verdict du 11/09 : état</li></ul>
+<p>  des neuf objets, et premières semaines du cas réel si le run est ouvert.</p>
+<ul><li><strong>Test rétro</strong> : joué en section 5.4 ; un élément retiré.</li><li><strong>Premier cas réel</strong> : le profil LinkedIn du dirigeant de Digit-AI, pendant 4 semaines, une</li></ul>
+<p>  publication par semaine. Motif du choix : la source du 2026-08-22 mesure la portée d'une page à   environ 1,6 % de ses abonnés, et l'export d'un profil donne 365 jours d'état de départ. La page   de l'organisation relaie, sans calendrier propre, jusqu'à la revue.</p>
+<ul><li><strong>Mesure du gain</strong> : temps humain hebdomadaire avant et après (relevé par le dirigeant, en</li></ul>
+<p>  minutes, à l'ouverture puis chaque semaine) ; les trois indicateurs de F0 contre leur seuil ;   le nombre de publications sorties, qui part de 0.</p>
+<h4>5.1 Les neuf objets, typés et attribués</h4>
+<p><strong>Mode de lecture du tableau.</strong> Une ligne vaut un manque ; les colonnes disent son type (au sens de R-31, règle 31 : tout objet durable naît selon le test d'une forge), son porteur, la fonction servie et la candidature qui le porte. Les lignes suivent le chemin critique.</p>
+</section>
+<div class="defile"><table id="tab-3" data-filterable><thead><tr><th scope="col">#</th><th scope="col">Manque</th><th scope="col">Type</th><th scope="col">Porteur</th><th scope="col">Sert</th><th scope="col">Candidature</th></tr></thead><tbody><tr><td>R1</td><td>Preset « publication réseau », deux écritures (profil, page), avec contrat de sortie binaire</td><td>extension d'un verbe outillé</td><td>forge-agents (<code>digit-ai-communication</code>)</td><td>F3</td><td>sidecar</td></tr><tr><td>R2</td><td>Barre externe « publication réseau »</td><td>barre (<code>la-barre</code>)</td><td>forge-agents</td><td>F3</td><td>TF-1028</td></tr><tr><td>R3</td><td>Contrôle exécutable de transparence, avec fixture rouge</td><td>contrôle</td><td>forge-agents, consommé par le produit</td><td>F3, F5</td><td>TF-1030</td></tr><tr><td>R4</td><td>Référentiel daté des règles de la plateforme : conditions d'utilisation, voies d'accès aux chiffres, constats de visibilité ; date de péremption</td><td>référentiel périssable (loi n° 4)</td><td>pilot (<code>references\</code>), sources de la section 3</td><td>F2 à F8</td><td>sidecar</td></tr><tr><td>R5</td><td>Reprise de <code>linkedin-post-generator</code> : ce qui sert (structures, mise en forme, image) entre dans R1 ; noms réels et règles en dur en sortent ; le doublon de nom est arbitré</td><td>skill à refondre</td><td>forge-agents ; décision humaine sur le doublon</td><td>F3</td><td>sidecar</td></tr><tr><td>R6</td><td>Type de run « animation de réseau » (<code>RUN-RESEAU.md</code>) : ouverture, boucle hebdomadaire, revue mensuelle, consigne d'arrêt</td><td>type de run</td><td>pilot</td><td>F0, F4 à F9</td><td>sidecar</td></tr><tr><td>R7</td><td>Plan de mesure : sonde « manuel » hebdomadaire sur l'export, seuils de F0, dérive signalée</td><td>plan (<code>forge-observability/plan@1</code>)</td><td>forge-observability (format), produit (plan et exports)</td><td>F7, F8, F9</td><td>sidecar</td></tr><tr><td>R8</td><td>Données de l'instance : objectifs, personas sourcés, ligne éditoriale, calendrier, état de départ ; ouverture du palier V2 des publications</td><td>donnée de l'instance</td><td>produit <code>digit-ai-marketing</code></td><td>F0, F1, F2, F4</td><td>sidecar</td></tr><tr><td>R9</td><td>Déclaration de LinkedIn aux intégrations : « aucun connecteur ; export manuel ; automatisation interdite par contrat (2025-11-03) »</td><td>ligne de référentiel</td><td>pilot (<code>INTEGRATIONS-FOURNISSEURS.md</code>)</td><td>F5, F7</td><td>sidecar</td></tr></tbody></table></div>
+<p class="tf-count" data-tf-count-for="tab-3" aria-live="polite"></p>
+<section class="chap lire" data-mesure-lecture>
+<h4>5.2 Plan de mise à jour par canal, ordonné par chemin critique</h4>
+<p><strong>Mode de lecture du tableau.</strong> Une ligne vaut un lot ; les colonnes disent le canal, l'effort en complexité × durée, la preuve de « prêt » et la conséquence de ne pas le faire. Un lot ne démarre pas avant ceux qu'il cite.</p>
+</section>
+<div class="defile"><table><thead><tr><th scope="col">Lot</th><th scope="col">Contenu</th><th scope="col">Canal</th><th scope="col">Effort</th><th scope="col">Preuve de « prêt »</th><th scope="col">Si non fait</th></tr></thead><tbody><tr><td>L-1</td><td>R4 + R9 : référentiel de la plateforme, déclaration aux intégrations</td><td>écriture chez le pilot</td><td>simple × court</td><td>frontmatter daté et sourcé ; <code>oracle-claude-md</code> PASS sur l'index</td><td>les règles restent dans un skill, périmées sans le dire</td></tr><tr><td>L-2</td><td>R2 + R3 : barre et contrôle de transparence</td><td>mandat chez forge-agents (candidatures déjà ouvertes)</td><td>moyen × court</td><td>test d'existence de la barre ; fixture : une publication sans mention → FAIL</td><td>aucune publication ne peut sortir conforme</td></tr><tr><td>L-3</td><td>R1 + R5 : preset et reprise du skill</td><td>mandat chez forge-agents, après arbitrage humain du doublon</td><td>moyen × court</td><td>auto-test à double sens ; 0 nom de personne ; <code>oracle-skills</code> PASS</td><td>le contenu reste produit par un skill hors forge</td></tr><tr><td>L-4</td><td>R6 : <code>RUN-RESEAU.md</code></td><td>référence du pilot</td><td>simple × court</td><td>fixture : une semaine rejouée à blanc, portes PASS</td><td>le calendrier n'est joué par personne</td></tr><tr><td>L-5</td><td>R8 + R7 : ouverture du run chez le produit, état de départ exporté, plan de mesure</td><td>run du produit, sur accord humain</td><td>moyen × court</td><td>export de 365 jours déposé ; plan jugé par forge-observability ; 3 indicateurs et seuils écrits</td><td>aucun gain démontrable</td></tr><tr><td>L-6</td><td>Premier cas réel : 4 semaines, une publication par semaine</td><td>boucle hebdomadaire de L-4</td><td>simple × moyen</td><td>4 accords de publication consignés, 4 exports lus, temps humain relevé</td><td>la capacité reste décorative (R-28 point 2)</td></tr></tbody></table></div>
+<section class="chap lire" data-mesure-lecture>
+<h4>5.3 Ce que Digit-AI fait SANS mise à jour</h4>
+<p>Le dirigeant peut publier dès aujourd'hui avec le skill installé, comme il le fait sans doute déjà. Ce qui ne se fait pas : une publication jugée contre une barre ; une mention de transparence contrôlée ; un fait chiffré sourcé par construction ; un état de départ ; une semaine qui s'enchaîne sur la précédente sans que quelqu'un y pense.</p>
+<h4>5.4 Test rétro (Opérationnel → Tactique → Stratégie → Intention)</h4>
+<ul><li><strong>R1, R5 preset et reprise du skill</strong> → tactique « dix fonctions fermées, F3 » → stratégie « ne</li></ul>
+<p>  rien recréer » → intention « des contenus ». Sans rupture.</p>
+<ul><li><strong>R2, R3 barre et transparence</strong> → tactique « une publication est un livrable jugé » →</li></ul>
+<p>  stratégie « discipline de la factory » → intention « être lu par les bonnes personnes » : un   contenu reconnaissable comme générique dessert ce but. Sans rupture.</p>
+<ul><li><strong>R4, R9 référentiel et déclaration</strong> → tactique « test d'accès aux chiffres » → stratégie « ne</li></ul>
+<p>  rien promettre sans source de données » → intention « de la performance ». Sans rupture.</p>
+<ul><li><strong>R6 type de run</strong> → tactique « une cadence nommée » → stratégie « laisser à l'humain ce que le</li></ul>
+<p>  contrat lui réserve, et borner son temps » → intention « des plannings ». Sans rupture.</p>
+<ul><li><strong>R7 plan de mesure</strong> → tactique « export hebdomadaire » → stratégie « mesurer » → intention</li></ul>
+<p>  « de la performance, du suivi de l'engagement », mot pour mot. Sans rupture.</p>
+<ul><li><strong>R8 données de l'instance</strong> → tactique « F0, F1, F2, F4 » → stratégie « partir du verdict du</li></ul>
+<p>  11/09 : l'instance vit chez le produit » → intention « définition et construction de la   cible ». Sans rupture.</p>
+<ul><li><strong>Élément retiré</strong> : un outil maison de programmation des publications, envisagé dans O1. Il ne</li></ul>
+<p>  remonte à aucune ligne tactique : le contrat de la plateforme l'interdit. Retiré.</p>
+<p>Les questions du demandeur, rejouées : « une forge » → section 2 quinquies, refusée sur le critère 1 ; « particuliers et professionnels » → deux types de comptes, traités à chaque ligne de la section 1 et testés séparément en 2 quater ; « la cible, les contenus, les plannings » → F1 à F4, portés par R1, R5, R6, R8 ; « la performance, le suivi de l'engagement » → F7 et F8, ouverts par l'export manuel, portés par R7.</p>
+<h3>Interdits (tenus)</h3>
+<p>Aucun critère subjectif ; jeu fermé O0-O4 ; chaque ligne de la section 2 citée ; chaque source datée ; O0 réfutée sur coût cité ; aucun effort chiffré autrement qu'en complexité × durée ; aucun nom de personne ni de client ; aucune écriture hors du pilot ; aucune publication, aucun compte créé, aucun identifiant de compte dans un fichier ; aucune donnée d'abonné collectée.</p>
+</section>
+    </main>
+    <footer>Vue générée — NE PAS ÉDITER (la source Markdown fait foi ; la régénérer via le script du pilot). Sceau source <code>5147cd65adfd</code>.</footer>
+  </div></div>
+  <script>
+/* Digit-AI — Filtres de colonne sur tableaux de données.
+   Socle commun : voir references/composant-filtres-tableau.md (checklist G1-G9).
+   Viewer-only : le JS ne s'exécute pas à l'export WeasyPrint, la regle @media print
+   du livrable doit reafficher tr[data-tf-hidden].
+   Lot Produit-05 20260820b (TF-0429/0430/0431, 21/08) : rappel apresFiltrage et instance
+   enveloppable, etat vide avec « tout reafficher », panneau qui choisit son cote et
+   neutralise le rognage de son conteneur defilant tant qu'il est ouvert.
+
+   Lot Produit-02 20260902b/d (TF-0768/0769/0781/0782, 02/09) — L'ORDRE ET L'EXISTENCE.
+   Quatre defauts d'une meme famille : le composant lisait le TEXTE RENDU la ou il fallait lire
+   une VALEUR, et decidait de l'existence d'une facette la ou il ne devait decider que de sa
+   forme. Une console de donnees livree a du rearmer son propre tri et relire ses cases dans le
+   DOM pour compenser :
+     · TF-0768 — `parseFloat` sur « 1 000 » vaut 1 : les separateurs de milliers fr-FR (espace,
+       insecable, insecable etroite) arretent l'analyse au premier caractere non chiffre, et
+       TOUTE page en francais triait faux, en silence. Le tri et l'ordre des facettes lisent
+       desormais `data-v` / `data-sort` quand la cellule en porte, sinon le nombre se lit APRES
+       retrait des espaces et des signes.
+     · TF-0781 — `Object.keys(valeurs).sort()` rangeait les mois par ordre alphabetique
+       (« aout 2025, avr. 2026, dec. 2025 »). Une facette s'ordonne sur sa CLE, donc
+       chronologiquement des que la cellule porte un `data-v` ISO.
+     · TF-0782 — l'heuristique `1 < n < lignes` privait de facette la colonne CLE (huit marches
+       distincts sur huit lignes : aucun filtre la ou le lecteur en attendait un). La
+       cardinalite decide desormais de la FORME du panneau, jamais de son EXISTENCE ; la seule
+       sortie est une exemption DECLAREE (`data-filter-col="off"` + `data-filter-reason`).
+     · TF-0769 — `data-tf-ready` bloquait tout second `init` en rendant `null`, et la selection
+       vivait dans une fermeture inaccessible : une page qui re-rend ses tableaux perdait ses
+       filtres et devait les relire dans le DOM. L'etat est desormais LISIBLE et REJOUABLE —
+       `api.etat()`, `init(table, { etat })`, `api.rafraichir()`. */
+(function (root) {
+  'use strict';
+
+  /* ARBITRAGE PARTAGE DE LA VISIBILITE (TF-0953, 08/09/2026) — optionnel, jamais obligatoire :
+     un composant du socle ne cesse pas de fonctionner parce qu'un autre fichier manque. */
+  function arbitrage() { return root.DigitAIRowVisibility || null; }
+
+  var SEUIL_LIGNES = 8;
+  /* Au-dela de ce nombre de valeurs distinctes, la liste de cases n'est plus parcourable a
+     l'oeil : le panneau s'ouvre SUR SA RECHERCHE et le dit. C'est la FORME qui change — la
+     facette, elle, existe toujours (TF-0782). */
+  var SEUIL_RECHERCHE = 15;
+  var LIBELLE_VIDE = 'Aucune ligne ne correspond aux filtres.';
+  var LIBELLE_TOUT = 'Tout réafficher';
+
+  /* Les espaces qui separent les milliers en fr-FR : espace, insecable (U+00A0), insecable
+     etroite (U+202F), fine (U+2009), figure (U+2007). parseFloat s'arrete au premier. */
+  var RE_ESPACES = /\s/g;   /* \s couvre l'insecable U+00A0 et l'insecable etroite U+202F */
+  var RE_SIGNES = /[%€$£]/g;
+  var RE_NOMBRE = /^[+-]?\d+(?:[.,]\d+)?$/;
+
+  function norm(s) {
+    return String(s == null ? '' : s)
+      .normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+  }
+
+  /* TF-0768 : un nombre affiche a un habillage (milliers, unite, pourcentage). On le retire
+     AVANT l'analyse, et on n'accepte que ce qui est ENTIEREMENT numerique — « 12 mars » n'est
+     pas 12, et le laisser passer trierait une colonne de dates comme une colonne de nombres. */
+  function nombre(v) {
+    var s = String(v == null ? '' : v).replace(RE_ESPACES, '').replace(RE_SIGNES, '');
+    if (s.indexOf(',') !== -1 && s.indexOf('.') === -1) s = s.replace(',', '.');
+    return RE_NOMBRE.test(s) ? parseFloat(s) : NaN;
+  }
+
+  function corps(table) {
+    var tb = table.tBodies && table.tBodies[0];
+    /* TF-0175 : une ligne [data-detail] est le DÉPLIANT pleine largeur de la ligne qui la
+       précède — elle ne porte pas de données de colonnes et ne compte ni ne se filtre.
+       TF-0430 : la ligne d'état vide [data-tf-empty] est un message du composant, pas une donnée. */
+    return tb ? Array.prototype.slice.call(tb.rows).filter(function (tr) {
+      return !tr.hasAttribute('data-detail') && !tr.hasAttribute('data-tf-empty');
+    }) : [];
+  }
+
+  /* Le LIBELLE d'une cellule : ce que le lecteur voit, et ce qu'il coche. */
+  function valeur(tr, i) {
+    var td = tr.cells[i];
+    return td ? td.textContent.trim() : '';
+  }
+
+  /* La CLE D'ORDRE d'une cellule (TF-0768/0781) : `data-v`, sinon `data-sort`, sinon le texte
+     rendu. C'est la seule facon de dire « aout 2025 se range avant avr. 2026 » — un libelle de
+     mois n'a aucun ordre lisible, et une valeur formatee n'a pas d'ordre numerique. */
+  function cle(tr, i) {
+    var td = tr.cells[i];
+    if (!td) return '';
+    var d = td.getAttribute('data-v');
+    if (d === null) d = td.getAttribute('data-sort');
+    return d === null ? td.textContent.trim() : String(d).trim();
+  }
+
+  /* Comparateur unique du composant — tri de lignes ET ordre des valeurs de facette.
+     Deux nombres se comparent en nombres ; une date ISO (`2025-08`, `2025-08-14`) se compare en
+     texte, ce qui EST son ordre chronologique ; le vide passe en fin de liste. */
+  function comparer(a, b) {
+    var na = nombre(a), nb = nombre(b);
+    if (!isNaN(na) && !isNaN(nb)) return na < nb ? -1 : (na > nb ? 1 : 0);
+    if (a === '') return b === '' ? 0 : 1;
+    if (b === '') return -1;
+    var xa = norm(a), xb = norm(b);
+    return xa < xb ? -1 : (xa > xb ? 1 : 0);
+  }
+
+  function nbColonnes(table) {
+    var ths = table.tHead ? Array.prototype.slice.call(table.tHead.rows[0].cells) : [];
+    var n = 0;
+    ths.forEach(function (th) { n += th.colSpan || 1; });
+    if (!n) { var l = corps(table)[0]; n = l ? l.cells.length : 1; }
+    return n;
+  }
+
+  /* TF-0782 — CHAQUE en-tete recoit sa facette. L'heuristique de cardinalite ne decide plus que
+     de la FORME du panneau (`liste`, `recherche` quand les valeurs sont trop nombreuses pour
+     etre parcourues, `unique` quand la colonne n'en porte qu'une). La seule sortie est une
+     exemption DECLAREE sur le `<th>` : `data-filter-col="off"` + `data-filter-reason="…"`.
+     Sans motif, l'exemption est rendue au journal (`api.exemptions`) et l'oracle la refuse. */
+  function colonnes(table, lignes) {
+    var ths = table.tHead ? Array.prototype.slice.call(table.tHead.rows[0].cells) : [];
+    var cols = [], exemptions = [];
+    ths.forEach(function (th, i) {
+      /* L'INTITULE SE FIGE AU PREMIER PASSAGE (TF-0769). Apres `init`, le `<th>` contient le
+         declencheur ET le panneau : son `textContent` vaut alors « Statut›TousAucun livre en
+         cours… ». Relire l'intitule apres coup donnait une AUTRE cle de colonne, et la
+         selection conservee se retrouvait rangee sous un nom que plus personne ne demandait —
+         le rafraichissement perdait les filtres qu'il devait sauver. `data-col` rend
+         l'identite de la colonne stable, et lisible par un oracle. */
+      var libelle = (th.getAttribute('data-col') || th.textContent || '').trim();
+      if (!th.hasAttribute('data-col')) th.setAttribute('data-col', libelle);
+      if (th.getAttribute('data-filter-col') === 'off') {
+        exemptions.push({ colonne: libelle, index: i,
+                          motif: (th.getAttribute('data-filter-reason') || '').trim() });
+        return;
+      }
+      var ordres = {}, n = 0;
+      lignes.forEach(function (tr) {
+        var v = valeur(tr, i);
+        if (!(v in ordres)) { ordres[v] = cle(tr, i); n++; }
+      });
+      var valeurs = Object.keys(ordres).sort(function (x, y) {
+        return comparer(ordres[x], ordres[y]);
+      });
+      var forme = n <= 1 ? 'unique' : (n > SEUIL_RECHERCHE ? 'recherche' : 'liste');
+      cols.push({ th: th, index: i, libelle: libelle, valeurs: valeurs,
+                  ordres: ordres, forme: forme });
+    });
+    return { cols: cols, exemptions: exemptions };
+  }
+
+  function bouton(col, id) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tf-btn';
+    b.setAttribute('aria-expanded', 'false');
+    b.setAttribute('aria-controls', id);
+    b.setAttribute('aria-label', 'Filtrer ' + col.libelle);
+    b.textContent = '›';               /* chevron simple (TF-0435) : present dans toute pile de repli */
+    return b;
+  }
+
+  function panneau(col, id) {
+    var p = document.createElement('div');
+    p.className = 'tf-panel';
+    p.id = id;
+    p.hidden = true;
+    p.setAttribute('role', 'group');
+    p.setAttribute('aria-label', 'Filtrer ' + col.libelle);
+    /* La forme est LISIBLE dans le marquage : un oracle de rendu et un test d'interactions
+       peuvent dire laquelle a ete choisie, et pourquoi (TF-0782). */
+    p.setAttribute('data-tf-forme', col.forme);
+
+    var rech = document.createElement('input');
+    rech.type = 'search';
+    rech.className = 'tf-search';
+    rech.placeholder = 'Rechercher…';
+    rech.setAttribute('aria-label', 'Rechercher une valeur');
+
+    var actions = document.createElement('div');
+    actions.className = 'tf-actions';
+    var tous = document.createElement('button');
+    tous.type = 'button'; tous.className = 'tf-all'; tous.textContent = 'Tous';
+    var aucun = document.createElement('button');
+    aucun.type = 'button'; aucun.className = 'tf-none'; aucun.textContent = 'Aucun';
+    actions.appendChild(tous); actions.appendChild(aucun);
+
+    var opts = document.createElement('div');
+    opts.className = 'tf-opts';
+    col.valeurs.forEach(function (v) {
+      var lab = document.createElement('label');
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.className = 'tf-opt';
+      cb.value = v;
+      cb.checked = true;                    /* etat initial : tout coche, aucun filtre actif */
+      lab.appendChild(cb);
+      lab.appendChild(document.createTextNode(' ' + (v === '' ? '(vide)' : v)));
+      opts.appendChild(lab);
+    });
+
+    p.appendChild(rech); p.appendChild(actions); p.appendChild(opts);
+    /* Une forme qui change sans le dire est une affordance muette (loi n° 3) : le panneau
+       ANNONCE pourquoi il s'ouvre sur sa recherche, ou pourquoi il n'offre qu'une valeur. */
+    if (col.forme !== 'liste') {
+      var note = document.createElement('p');
+      note.className = 'tf-forme-note';
+      note.textContent = col.forme === 'recherche'
+        ? col.valeurs.length + ' valeurs distinctes — chercher puis « Tous ».'
+        : 'Une seule valeur dans cette colonne.';
+      p.insertBefore(note, opts);
+    }
+    return { panneau: p, recherche: rech, tous: tous, aucun: aucun, options: opts };
+  }
+
+  /* TF-0431 : le conteneur defilant le plus proche (overflow-x auto|scroll) rogne un panneau
+     absolu et gagne un ascenseur horizontal des qu'il s'ouvre. Tant qu'un panneau est ouvert,
+     son rognage est neutralise ; a la fermeture, l'etat inline d'origine est retabli. */
+  function conteneurDefilant(el) {
+    var p = el.parentElement;
+    while (p && p !== document.body) {
+      var o = getComputedStyle(p).overflowX;
+      if (o === 'auto' || o === 'scroll') return p;
+      p = p.parentElement;
+    }
+    return null;
+  }
+
+  /* RA-5 (14/08, revu TF-0768/0782 le 02/09) : le tri est ARME PAR DEFAUT — la règle L4 exige
+     « filtre, tri et recherche », et une page qui arme le sien le declare (`{ tri: false }` ou
+     `data-tf-tri="off"` sur la table). La cle de tri est celle de `cle()` : `data-v`/`data-sort`
+     d'abord, sinon le texte, lu comme un nombre APRES retrait des espaces de milliers. Les clics
+     sur .tf-btn/.tf-panel sont ignores, les lignes [data-detail] voyagent avec leur ligne mere.
+     Rend une fonction de DESARMEMENT : sans elle, un second init empilerait ses ecouteurs. */
+  function armerTri(table) {
+    var ths = table.tHead ? Array.prototype.slice.call(table.tHead.rows[0].cells) : [];
+    corps(table).forEach(function (tr) {
+      var d = tr.nextElementSibling;
+      tr.__tfDetail = (d && d.hasAttribute('data-detail')) ? d : null;
+    });
+    var poses = [];
+    ths.forEach(function (th, i) {
+      if (th.getAttribute('data-sort-col') === 'off') return;
+      if (!th.style.cursor) th.style.cursor = 'pointer';
+      var handler = function (ev) {
+        if (ev.target.closest && ev.target.closest('.tf-btn, .tf-panel')) return;
+        var sens = th.getAttribute('aria-sort') === 'ascending' ? -1 : 1;
+        ths.forEach(function (t) {
+          t.removeAttribute('aria-sort');
+          var m = t.querySelector('.tf-tri'); if (m) m.remove();
+        });
+        th.setAttribute('aria-sort', sens === 1 ? 'ascending' : 'descending');
+        var marque = document.createElement('span');
+        marque.className = 'tf-tri';
+        marque.textContent = sens === 1 ? ' ↑' : ' ↓';
+        th.appendChild(marque);
+        var tb = table.tBodies[0];
+        var tris = corps(table).slice();
+        tris.forEach(function (tr) {
+          var d = tr.nextElementSibling;
+          tr.__tfDetail = (d && d.hasAttribute('data-detail')) ? d : tr.__tfDetail;
+        });
+        tris.sort(function (a, b) { return comparer(cle(a, i), cle(b, i)) * sens; });
+        tris.forEach(function (tr) {
+          tb.appendChild(tr);
+          if (tr.__tfDetail) tb.appendChild(tr.__tfDetail);
+        });
+      };
+      th.addEventListener('click', handler);
+      poses.push({ th: th, handler: handler });
+    });
+    return function desarmer() {
+      poses.forEach(function (p) {
+        p.th.removeEventListener('click', p.handler);
+        var m = p.th.querySelector('.tf-tri'); if (m) m.remove();
+        p.th.removeAttribute('aria-sort');
+      });
+    };
+  }
+
+  /* init(table, opts) — opts.tri (bool, defaut VRAI) · opts.etat (etat rendu par api.etat())
+     · opts.reinit (bool) · opts.apresFiltrage(table, visibles, total) : rappel appele a la fin
+     de CHAQUE filtrage, y compris ceux declenches par les cases, Tous/Aucun et la recherche
+     (TF-0429 : avant, seul l'appel manuel a instance.appliquer etait observable, envelopper
+     l'instance etait silencieusement sans effet). Les gestionnaires internes passent par
+     api.appliquer : remplacer instance.appliquer est desormais honore.
+
+     TF-0769 — un second appel n'est plus un NON-EVENEMENT : sans `etat` ni `reinit`, il rend
+     l'instance deja construite (l'appelant peut donc la piloter sans l'avoir gardee) ; avec, il
+     detruit l'ancienne et reconstruit. */
+  function init(table, opts) {
+    opts = opts || {};
+    if (!table) return null;
+    if (table.getAttribute('data-filterable') === 'off') return null;
+    if (table.getAttribute('data-tf-ready') === '1') {
+      var deja = table.__tfApi || null;
+      if (!opts.etat && !opts.reinit) return deja;
+      if (deja && deja.detruire) deja.detruire();
+    }
+
+    /* DECLARER SON ATTRIBUT a l'arbitrage partage, jamais deviner ceux des autres. */
+    var V = arbitrage();
+    if (V) { V.register('data-tf-hidden'); }
+
+    var lignes = corps(table);
+    var scan = colonnes(table, lignes);
+    var cols = scan.cols;
+    if (!cols.length) return null;
+
+    var id = table.id || ('tf-' + Math.random().toString(36).slice(2, 8));
+    table.id = id;
+    var compteur = document.querySelector('[data-tf-count-for="' + id + '"]');
+    var etats = [];
+    var api = {};
+    var defilant = conteneurDefilant(table);
+    var overflowOrigine = null;
+    /* La selection vit HORS des fermetures de colonne (TF-0769) : elle survit a un
+       rafraichissement, se lit par api.etat() et se rejoue par init(table, { etat }). */
+    var selections = {};
+    var desarmerTri = null;
+    var surDocument = function (ev) { if (!table.contains(ev.target)) fermerTout(); };
+
+    /* TF-0430 : etat vide — une ligne de message pleine largeur et la seule action utile a ce
+       moment, « tout reafficher ». Libelle surchargeable par data-tf-vide sur la table. */
+    function ligneVide() {
+      var tb = table.tBodies[0];
+      var tr = tb.querySelector('tr[data-tf-empty]');
+      if (tr) return tr;
+      tr = document.createElement('tr');
+      tr.setAttribute('data-tf-empty', '');
+      tr.className = 'tf-vide';
+      var td = document.createElement('td');
+      td.colSpan = nbColonnes(table);
+      var msg = document.createElement('span');
+      msg.className = 'tf-vide-msg';
+      msg.textContent = table.getAttribute('data-tf-vide') || LIBELLE_VIDE;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'tf-reset';
+      b.textContent = LIBELLE_TOUT;
+      b.addEventListener('click', function () { toutReafficher(); });
+      td.appendChild(msg); td.appendChild(document.createTextNode(' ')); td.appendChild(b);
+      tr.appendChild(td);
+      tb.appendChild(tr);
+      return tr;
+    }
+
+    function toutReafficher() {
+      etats.forEach(function (e) {
+        Object.keys(e.selection).forEach(function (k) { e.selection[k] = true; });
+        var p = document.getElementById(e.bouton.getAttribute('aria-controls'));
+        if (p) Array.prototype.forEach.call(p.querySelectorAll('.tf-opt'), function (cb) { cb.checked = true; });
+      });
+      api.appliquer();
+    }
+
+    function appliquer() {
+      var visibles = 0;
+      lignes.forEach(function (tr) {
+        var ok = etats.every(function (e) {
+          return e.selection[valeur(tr, e.col.index)] !== false;
+        });
+        if (ok) {
+          tr.removeAttribute('data-tf-hidden');
+          /* LA VISIBILITE EST UNE DISJONCTION (TF-0953, 08/09/2026). Passer CE filtre ne suffit
+             pas a rendre une ligne visible : un autre mecanisme DECLARE a l'arbitrage peut
+             encore la masquer. Forcer `display: ''` ici ecrasait ce mecanisme sans un mot — et
+             c'est ce qui a oblige un produit a poser un MutationObserver sur `hidden` pour
+             reappliquer son pliage d'arbre apres chaque passage des filtres, puis a deplier
+             tout l'arbre a chaque changement de filtre pour ne jamais cacher un resultat.
+             Sans arbitrage charge, `masquee` n'est pas consultee et le comportement est
+             exactement celui d'avant. */
+          var autre = V ? V.masquee(tr, 'data-tf-hidden') : false;
+          tr.style.display = autre ? 'none' : '';
+          if (!autre) { visibles++; }
+        }
+        else {
+          tr.setAttribute('data-tf-hidden', ''); tr.style.display = 'none';
+          /* la ligne de détail suit le sort de sa ligne mère : masquée ET repliée */
+          var det = tr.nextElementSibling;
+          if (det && det.hasAttribute('data-detail')) { det.hidden = true; }
+        }
+        if (V) { V.apply(tr); }
+      });
+      etats.forEach(function (e) {
+        var actif = Object.keys(e.selection).some(function (k) { return !e.selection[k]; });
+        e.bouton.classList.toggle('tf-on', actif);
+      });
+      if (compteur) {
+        compteur.textContent = visibles + ' ligne' + (visibles > 1 ? 's' : '') +
+          ' sur ' + lignes.length;
+        compteur.classList.toggle('zero', visibles === 0);
+      }
+      var vide = table.tBodies[0].querySelector('tr[data-tf-empty]');
+      if (visibles === 0 && lignes.length) { ligneVide().hidden = false; }
+      else if (vide) { vide.hidden = true; }
+      if (typeof opts.apresFiltrage === 'function') opts.apresFiltrage(table, visibles, lignes.length);
+    }
+
+    function placer(b, p) {
+      /* TF-0431 : cote d'ouverture selon la place mesuree — a droite du bouton par defaut,
+         aligne sur le bord droit quand le panneau sortirait de la fenetre ou du conteneur. */
+      p.classList.remove('tf-droite');
+      var limite = defilant ? defilant.getBoundingClientRect().right : (window.innerWidth || document.documentElement.clientWidth);
+      var r = b.getBoundingClientRect();
+      var largeur = p.offsetWidth || 240;
+      if (r.left + largeur > limite - 8) p.classList.add('tf-droite');
+      if (defilant && overflowOrigine === null) {
+        overflowOrigine = defilant.style.overflow || '';
+        defilant.setAttribute('data-tf-ouvert', '');
+        defilant.style.overflow = 'visible';
+      }
+    }
+
+    function retirerUI() {
+      etats.forEach(function (e) {
+        if (e.bouton && e.bouton.parentNode) e.bouton.parentNode.removeChild(e.bouton);
+        var p = document.getElementById(e.bouton.getAttribute('aria-controls'));
+        if (p && p.parentNode) p.parentNode.removeChild(p);
+        var th = e.col && e.col.th;
+        if (th) {
+          th.removeAttribute('data-tf-forme');
+          var u = th.querySelector('.tf-unique'); if (u) u.parentNode.removeChild(u);
+        }
+      });
+      etats.length = 0;
+    }
+
+    function construireColonnes() {
+      cols.forEach(function (col, k) {
+        var pid = id + '-tf-' + k;
+        var b = bouton(col, pid);
+        var ui = panneau(col, pid);
+        var selection = selections[col.libelle] || (selections[col.libelle] = {});
+        /* une valeur neuve entre COCHEE (aucun filtre implicite) ; une valeur disparue du
+           tableau sort de la selection, sinon elle masquerait des lignes sans etre visible. */
+        col.valeurs.forEach(function (v) { if (!(v in selection)) selection[v] = true; });
+        Object.keys(selection).forEach(function (v) {
+          if (col.valeurs.indexOf(v) === -1) delete selection[v];
+        });
+        var etat = { col: col, bouton: b, selection: selection };
+        etats.push(etat);
+
+        /* TF-0899 (08/09/2026) — LE PANNEAU A BESOIN D UN ANCETRE POSITIONNE, PAS DE `relative`.
+           `.tf-panel` est un `position:absolute` : il lui faut un ancetre positionne, et le
+           `<th>` est le bon. Mais poser `relative` EN LIGNE ecrasait le geste L29 du socle
+           (`thead.colle th { position: sticky; top: var(--hh) }`) : le `top` restait, applique
+           a un `relative` — donc un DECALAGE PERMANENT de --hh. Mesure Playwright du 07/09 sur
+           quatre tableaux filtrables : `<th>` a 441 px pour 337 attendus (+104 = --hh), une a
+           deux lignes recouvertes a tout defilement, `<th>` a -59 px apres 200 px de
+           defilement — l en-tete ne collait JAMAIS. Un `<th>` deja positionne (sticky, relative,
+           absolute, fixed) ancre DEJA un absolu : on ne pose donc que sur un `<th>` `static`. */
+        var posThCalculee = 'static';
+        try {
+          posThCalculee = (window.getComputedStyle(col.th).position || 'static');
+        } catch (e) { posThCalculee = col.th.style.position || 'static'; }
+        if (posThCalculee === 'static') col.th.style.position = 'relative';
+        /* TF-1052 (08/09) : la forme se publie AUSSI sur le `<th>`, la ou un oracle et un test
+           cherchent la colonne — posee sur le seul panneau, une sonde de l'en-tete lisait `null`
+           sur 9 colonnes sur 9. TF-1051 : une colonne a valeur UNIQUE le dit dans l'en-tete,
+           sans clic — un destinataire a lu vingt fois la meme chaine et conclu a une panne. */
+        col.th.setAttribute('data-tf-forme', col.forme);
+        if (col.forme === 'unique') {
+          var u = document.createElement('span');
+          u.className = 'tf-unique';
+          u.textContent = 'une seule valeur';
+          col.th.appendChild(u);
+        }
+        col.th.appendChild(b);
+        col.th.appendChild(ui.panneau);
+        Array.prototype.forEach.call(ui.options.querySelectorAll('.tf-opt'), function (cb) {
+          cb.checked = selection[cb.value] !== false;
+        });
+
+        b.addEventListener('click', function () {
+          var ouvert = b.getAttribute('aria-expanded') === 'true';
+          fermerTout();
+          if (!ouvert) {
+            b.setAttribute('aria-expanded', 'true'); ui.panneau.hidden = false;
+            placer(b, ui.panneau);
+            ui.recherche.focus();
+          }
+        });
+
+        ui.recherche.addEventListener('input', function () {
+          var q = norm(ui.recherche.value);
+          Array.prototype.forEach.call(ui.options.children, function (lab) {
+            lab.hidden = q !== '' && norm(lab.textContent).indexOf(q) === -1;
+          });
+        });
+
+        /* Tous / Aucun portent sur les valeurs actuellement visibles dans la liste. */
+        function masse(valeurCible) {
+          Array.prototype.forEach.call(ui.options.children, function (lab) {
+            if (lab.hidden) return;
+            var cb = lab.querySelector('.tf-opt');
+            cb.checked = valeurCible;
+            selection[cb.value] = valeurCible;
+          });
+          api.appliquer();
+        }
+        ui.tous.addEventListener('click', function () { masse(true); });
+        ui.aucun.addEventListener('click', function () { masse(false); });
+
+        ui.options.addEventListener('change', function (ev) {
+          var cb = ev.target;
+          if (!cb.classList.contains('tf-opt')) return;
+          selection[cb.value] = cb.checked;
+          api.appliquer();
+        });
+
+        ui.panneau.addEventListener('keydown', function (ev) {
+          if (ev.key === 'Escape') { fermerTout(); b.focus(); }
+        });
+      });
+    }
+
+    function fermerTout() {
+      etats.forEach(function (e) {
+        e.bouton.setAttribute('aria-expanded', 'false');
+        var p = document.getElementById(e.bouton.getAttribute('aria-controls'));
+        if (p) { p.hidden = true; p.classList.remove('tf-droite'); }
+      });
+      if (defilant && overflowOrigine !== null) {
+        defilant.style.overflow = overflowOrigine;
+        defilant.removeAttribute('data-tf-ouvert');
+        overflowOrigine = null;
+      }
+    }
+
+    if (opts.tri !== false && table.getAttribute('data-tf-tri') !== 'off') {
+      desarmerTri = armerTri(table);
+    }
+    construireColonnes();
+    document.addEventListener('click', surDocument);
+
+    table.setAttribute('data-tf-ready', '1');
+    table.__tfApi = api;
+    api.table = table;
+    api.appliquer = appliquer;
+    api.fermerTout = fermerTout;
+    api.toutReafficher = toutReafficher;
+    api.exemptions = scan.exemptions;
+
+    /* TF-0769 — L'ETAT SE LIT ET SE REJOUE. Il est nomme par LIBELLE de colonne, pas par
+       index : une colonne peut se deplacer entre deux rendus, son intitule reste le meme.
+       Ne sont listees que les valeurs EXCLUES — un etat vide veut dire « aucun filtre », ce
+       qui reste vrai si le tableau gagne des valeurs entre deux rendus. */
+    api.etat = function () {
+      var out = { version: 1, colonnes: {} };
+      etats.forEach(function (e) {
+        var exclues = Object.keys(e.selection).filter(function (v) { return e.selection[v] === false; });
+        if (exclues.length) out.colonnes[e.col.libelle] = { exclues: exclues };
+      });
+      return out;
+    };
+
+    api.restaurer = function (etat) {
+      if (!etat || !etat.colonnes) return api;
+      etats.forEach(function (e) {
+        var voulu = etat.colonnes[e.col.libelle];
+        var exclues = (voulu && voulu.exclues) || [];
+        Object.keys(e.selection).forEach(function (v) {
+          e.selection[v] = exclues.indexOf(v) === -1;
+        });
+        var p = document.getElementById(e.bouton.getAttribute('aria-controls'));
+        if (p) Array.prototype.forEach.call(p.querySelectorAll('.tf-opt'), function (cb) {
+          cb.checked = e.selection[cb.value] !== false;
+        });
+      });
+      api.appliquer();
+      return api;
+    };
+
+    /* La page a re-rendu son tableau : on relit ses lignes et ses valeurs, on retire les
+       panneaux devenus faux et on reconstruit SUR LA SELECTION CONSERVEE. Sans cette
+       fonction, la seule voie etait de relire les cases dans le DOM et de les rejouer par
+       des evenements `change` — ce qu'une console livree a effectivement du ecrire. */
+    api.rafraichir = function () {
+      /* Les panneaux partent AVANT le re-balayage : sans cela, le scan relirait ses propres
+         injections comme du contenu de colonne. */
+      retirerUI();
+      lignes = corps(table);
+      var neuf = colonnes(table, lignes);
+      cols = neuf.cols;
+      api.exemptions = neuf.exemptions;
+      construireColonnes();
+      api.appliquer();
+      return api;
+    };
+
+    api.detruire = function () {
+      retirerUI();
+      document.removeEventListener('click', surDocument);
+      if (desarmerTri) { desarmerTri(); desarmerTri = null; }
+      var vide = table.tBodies[0] && table.tBodies[0].querySelector('tr[data-tf-empty]');
+      if (vide && vide.parentNode) vide.parentNode.removeChild(vide);
+      lignes.forEach(function (tr) {
+        tr.removeAttribute('data-tf-hidden');
+        /* Detruire CE composant ne demasque que CE qu'il masquait : une ligne cachee par un
+           autre mecanisme declare le reste. */
+        var encore = V ? V.masquee(tr, 'data-tf-hidden') : false;
+        tr.style.display = encore ? 'none' : '';
+        if (V) { V.apply(tr); }
+      });
+      table.removeAttribute('data-tf-ready');
+      try { delete table.__tfApi; } catch (e) { table.__tfApi = null; }
+    };
+
+    if (opts.etat) api.restaurer(opts.etat);
+    else api.appliquer();
+    return api;
+  }
+
+  function initAll(racine, opts) {
+    var scope = racine || document;
+    return Array.prototype.map.call(
+      scope.querySelectorAll('table[data-filterable]'),
+      function (t) { return init(t, opts); }
+    );
+  }
+
+  root.DigitAITableFilters = { init: init, initAll: initAll, SEUIL_LIGNES: SEUIL_LIGNES,
+                               SEUIL_RECHERCHE: SEUIL_RECHERCHE, nombre: nombre,
+                               comparer: comparer };
+})(typeof window !== 'undefined' ? window : this);
+
+  </script>
+  <script>
+/* find-in-page.js — Recherche dans un conteneur + compteur d'occurrences · socle Digit-AI
+ *
+ * Surligne les correspondances (<mark class="find-hit">) dans un conteneur et affiche
+ * un compteur d'occurrences mis à jour à chaque frappe. Insensible aux accents.
+ *
+ * ⚠️ La classe du surlignage est `find-hit`, JAMAIS `find`. `find` est le nom que prend
+ * naturellement le conteneur du champ de recherche dans un livrable ; quand les deux
+ * partagent la classe, une règle `.find { display: flex }` écrite pour le conteneur
+ * s'applique aussi au <mark> et casse le mot surligné (défaut mesuré en production :
+ * le « s » de « clics » rejeté à 606 px du mot). Les trois classes du composant sont
+ * disjointes : `find-hit` (surlignage), `find-count` (compteur), et ce que le livrable
+ * veut pour son conteneur.
+ *
+ * ⚠️ Viewer-only : le JS ne s'exécute pas à l'export PDF (WeasyPrint). Si le livrable
+ * vise aussi le PDF, prévoir un équivalent statique de l'information.
+ *
+ * Câblage minimal (RA-1, 13/08 : la balise FERMANTE de script est ÉCHAPPÉE en <\/script> dans
+ * ce commentaire — cet asset s'inline (règle A1), et une fermante nue dans un commentaire
+ * fermerait la balise hôte au milieu du fichier : composant tronqué, silencieusement).
+ * TF-1062 (11/09) : ce commentaire l'écrivait lui-même EN CLAIR. Une copie inlinée à la main
+ * était coupée ici, et le câblage ci-dessous devenait du vrai DOM — trois identifiants
+ * dupliqués, que oracle-a11y a comptés à juste titre. Cette explication ne cite plus la
+ * séquence ; self_test.py vérifie qu'aucun asset inlinable ne la porte :
+ *   <input id="find" type="text" placeholder="Rechercher…">
+ *   <div id="findCount" class="find-count" aria-live="polite"></div>
+ *   <div id="content"> … contenu à fouiller … </div>
+ *   <script src="find-in-page.js"><\/script>
+ *   <script>
+ *     DigitAIFindInPage.init(
+ *       document.getElementById('find'),
+ *       document.getElementById('content'),
+ *       document.getElementById('findCount')
+ *     );
+ *   <\/script>
+ *
+ * CSS attendu (à adapter aux tokens du livrable) :
+ *   mark.find-hit { background: #fde9c8; color: inherit; display: inline; padding: 0; margin: 0; }
+ *   .find-count { margin-top: 4px; font-size: .72rem; color: var(--muted); min-height: 1em; }
+ *   .find-count.zero { color: #c0392b; }
+ */
+(function (global) {
+  'use strict';
+
+  // Regex insensible aux accents et à la casse à partir d'une saisie libre.
+  function buildRegex(q) {
+    q = (q || '').trim();
+    if (!q) return null;
+    var map = { a: 'aàâäá', e: 'eéèêëế', i: 'iîïí', o: 'oôöó', u: 'uùûüú', c: 'cç', n: 'nñ', y: 'yÿ' };
+    var pat = '';
+    for (var i = 0; i < q.length; i++) {
+      var ch = q[i], low = ch.toLowerCase();
+      if (map[low]) pat += '[' + map[low] + map[low].toUpperCase() + ']';
+      else if (/[a-z0-9]/i.test(ch)) pat += ch;
+      else pat += '\\' + ch; // échappe les caractères spéciaux regex
+    }
+    try { return new RegExp(pat, 'gi'); } catch (e) { return null; }
+  }
+
+  // Surligne les correspondances dans root et renvoie le nombre d'occurrences.
+  function highlight(root, re) {
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    var nodes = [], n, count = 0;
+    while ((n = walker.nextNode())) nodes.push(n);
+    for (var k = 0; k < nodes.length; k++) {
+      var tn = nodes[k];
+      if (tn.parentNode && /^(MARK|SCRIPT|STYLE)$/.test(tn.parentNode.nodeName)) continue;
+      var txt = tn.nodeValue; re.lastIndex = 0;
+      if (!re.test(txt)) continue; re.lastIndex = 0;
+      var frag = document.createDocumentFragment(), last = 0, m;
+      while ((m = re.exec(txt))) {
+        if (m.index > last) frag.appendChild(document.createTextNode(txt.slice(last, m.index)));
+        var mk = document.createElement('mark');
+        mk.className = 'find-hit';   // jamais 'find' : cf. avertissement en tête de fichier
+        mk.textContent = m[0];
+        frag.appendChild(mk);
+        count++;
+        last = m.index + m[0].length;
+        if (m.index === re.lastIndex) re.lastIndex++; // évite les boucles sur match vide
+      }
+      if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
+      tn.parentNode.replaceChild(frag, tn);
+    }
+    return count;
+  }
+
+  /* Branche la recherche live sur un champ.
+   * input, container, counter : éléments DOM (counter optionnel).
+   * getHTML (optionnel) : fonction renvoyant le HTML pristine courant — à fournir
+   *   quand le conteneur change de contenu (ex. panneau qui charge un autre document).
+   *   Sinon, le HTML initial est capturé une fois à l'init.
+   * Retourne { run, refresh } : run() relance la recherche, refresh() re-capture
+   *   le HTML pristine (mode sans getHTML). */
+  function init(input, container, counter, getHTML) {
+    if (!input || !container) return null;
+    var pristine = getHTML ? null : container.innerHTML;
+    function run() {
+      container.innerHTML = getHTML ? getHTML() : pristine;
+      var re = buildRegex(input.value);
+      if (!re) {
+        if (counter) { counter.textContent = ''; counter.classList.remove('zero'); }
+        return;
+      }
+      var nb = highlight(container, re);
+      if (counter) {
+        counter.textContent = nb === 0 ? 'Aucune occurrence' : (nb + ' occurrence' + (nb > 1 ? 's' : ''));
+        counter.classList.toggle('zero', nb === 0);
+      }
+    }
+    input.addEventListener('input', run);
+    return {
+      run: run,
+      refresh: function () { if (!getHTML) pristine = container.innerHTML; }
+    };
+  }
+
+  global.DigitAIFindInPage = { init: init, buildRegex: buildRegex, highlight: highlight };
+})(window);
+
+  </script>
+  <script>
+    DigitAITableFilters.initAll(document);
+    DigitAIFindInPage.init(document.getElementById('find'), document.querySelector('main'), document.getElementById('findCount'));
+  </script>
+</body>
+</html>

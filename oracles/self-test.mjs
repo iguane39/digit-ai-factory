@@ -49,6 +49,13 @@ for (const a of CONTRAT47.artefacts) {
   const source47 = join(GAB47, "..", String(a.source).replaceAll("/", "\\\\"));
   writeFileSync(cible47, existsSync(source47) ? readFileSync(source47, "utf8") : "");
 }
+// TF-1119 : un carnet hérité se REMPLIT. La verte l'instancie comme le ferait un produit — titre
+// nommé, date de revue propre — sans quoi elle prouverait conforme un gabarit brut.
+{
+  const carnet = join(verte, "forge", "travaux", "ECARTS-ASSUMES.md");
+  if (existsSync(carnet)) writeFileSync(carnet, readFileSync(carnet, "utf8")
+    .replaceAll("<produit>", "Produit-test").replace(/^verifie_le:.*$/m, "verifie_le: 2026-09-15"));
+}
 writeFileSync(join(verte, "CLAUDE.md"),
   "# Produit\n## Routage forge — obligatoire\nvalider : forge_tests\névoluer : run de version\ndéployer : MEP\n");
 writeFileSync(join(verte, "README.md"), "# Produit\nDémarrage : 2 commandes.\n");
@@ -262,6 +269,112 @@ check("R-20 ter BORNE : une fiche instanciée ne déclenche RIEN — la règle n
   if (f.length) throw new Error(`faux positif sur une fiche instanciée : ${f[0].message}`);
 });
 
+// TF-1119 — R-20 ter sort de docs\projet\ : tout fichier HÉRITÉ personnalisable qui garde un
+// marqueur de son gabarit est une fiction plausible. Le cas fondateur : le carnet d'écarts reçu
+// tel quel (titre à marqueur, date du gabarit), et un second carnet que le premier ne cite pas.
+check("TF-1119 ANTÉRIEUR — le carnet brut revu avant le 15/09 : jamais un FAIL, antériorité déclarée au non_juge, date du gabarit signalée", () => {
+  const carnet = join(verte, "forge", "travaux", "ECARTS-ASSUMES.md");
+  const avant = readFileSync(carnet, "utf8");
+  try {
+    writeFileSync(carnet, readFileSync(join(GAB47, "ECARTS-ASSUMES.md"), "utf8"));
+    const { exit, rapport } = lance(verte);
+    if (rapport.findings.some((x) => x.statut === "FAIL" && x.ou === "forge/travaux/ECARTS-ASSUMES.md")) throw new Error("un document antérieur à la règle est mis en échec — défaut rétroactif, il bloquerait l'ouverture de run");
+    if (exit !== 0) throw new Error(`exit ${exit} attendu 0 sur la verte`);
+    if (!rapport.non_juge.some((l) => /R-20 ter \(fichier hérité\) non jugé sur forge\/travaux\/ECARTS-ASSUMES\.md.*<produit>.*verifie_le=2026-08-26/.test(l))) throw new Error("l'antériorité n'est pas déclarée au non_juge");
+    const d = rapport.findings.find((x) => x.regle === "R-20" && x.ou === "forge/travaux/ECARTS-ASSUMES.md" && /date du GABARIT/.test(x.message));
+    if (!d || d.statut !== "PASS") throw new Error("la date du gabarit n'est pas signalée en avertissement");
+  } finally { writeFileSync(carnet, avant); }
+});
+check("TF-1119 rouge POSTÉRIEUR — le même carnet brut revu le 15/09 : marqueur FAIL, nommé", () => {
+  const carnet = join(verte, "forge", "travaux", "ECARTS-ASSUMES.md");
+  const avant = readFileSync(carnet, "utf8");
+  try {
+    writeFileSync(carnet, readFileSync(join(GAB47, "ECARTS-ASSUMES.md"), "utf8").replace(/^verifie_le:.*$/m, "verifie_le: 2026-09-15"));
+    const { exit, rapport } = lance(verte);
+    const f = rapport.findings.find((x) => x.regle === "R-20" && x.statut === "FAIL" && x.ou === "forge/travaux/ECARTS-ASSUMES.md" && /<produit>/.test(x.message));
+    if (exit !== 1 || !f) throw new Error(`exit ${exit}, marqueur non vu : ${JSON.stringify(rapport.findings.filter((x) => /ECARTS/.test(x.ou || "")))}`);
+  } finally { writeFileSync(carnet, avant); }
+});
+check("TF-1119 ANTÉRIEUR — un second carnet non cité par un carnet revu avant le 15/09 : antériorité déclarée, jamais un FAIL", () => {
+  const autre = join(verte, "docs", "projet", "CARNET-ECARTS.md");
+  const carnet = join(verte, "forge", "travaux", "ECARTS-ASSUMES.md");
+  const avant = readFileSync(carnet, "utf8");
+  try {
+    writeFileSync(autre, "# Carnet d'écarts du référentiel client\n");
+    writeFileSync(carnet, avant.replace(/^verifie_le:.*$/m, "verifie_le: 2026-09-01"));
+    const { exit, rapport } = lance(verte);
+    if (exit !== 0 || rapport.findings.some((x) => x.statut === "FAIL" && /carnet/i.test(x.message))) throw new Error(`exit ${exit} : défaut rétroactif`);
+    if (!rapport.non_juge.some((l) => /R-20 \(carnet d'écarts\) non jugé.*CARNET-ECARTS\.md.*verifie_le=2026-09-01/.test(l))) throw new Error("l'antériorité du second carnet n'est pas déclarée");
+  } finally { rmSync(autre, { force: true }); writeFileSync(carnet, avant); }
+});
+check("TF-1119 rouge → vert — un second carnet d'écarts non cité est un FAIL ; cité par le carnet hérité, il passe", () => {
+  const autre = join(verte, "docs", "projet", "CARNET-ECARTS.md");
+  const carnet = join(verte, "forge", "travaux", "ECARTS-ASSUMES.md");
+  const avant = readFileSync(carnet, "utf8");
+  try {
+    writeFileSync(autre, "# Carnet d'écarts du référentiel client\n\n## RC-27\nécart ouvert\n");
+    let r = lance(verte);
+    const f = r.rapport.findings.find((x) => x.regle === "R-20" && x.statut === "FAIL" && /CARNET-ECARTS\.md/.test(x.message));
+    if (r.exit !== 1 || !f) throw new Error(`second carnet non cité non vu (exit ${r.exit})`);
+    writeFileSync(carnet, avant.replace("*Autre carnet d'écarts : aucun.*", "*Autre carnet d'écarts : `docs/projet/CARNET-ECARTS.md` — les écarts au référentiel client y vivent.*"));
+    r = lance(verte);
+    if (r.rapport.findings.some((x) => x.regle === "R-20" && x.statut === "FAIL" && /carnet/i.test(x.message))) throw new Error("le carnet cité reste en échec — le remède ne passe pas");
+  } finally { rmSync(autre, { force: true }); writeFileSync(carnet, avant); }
+});
+check("TF-1119 BORNE — un carnet hérité instancié, sans second carnet, ne déclenche rien", () => {
+  const { rapport } = lance(verte);
+  const f = rapport.findings.filter((x) => x.ou === "forge/travaux/ECARTS-ASSUMES.md");
+  if (f.some((x) => x.statut === "FAIL" || /AVERTISSEMENT/.test(x.message))) throw new Error(`faux positif : ${JSON.stringify(f)}`);
+});
+
+// TF-1113, TF-1117, TF-1120 — L'INVENTAIRE DIT L'USAGE (R-20 étendu, étude 20260915a option O1).
+// Même borne que 01faf22 : antérieur au 15/09 → antériorité déclarée ; postérieur → jugé.
+const COP_BASE = (date, corps) => `---\nrole: composants\nsources_de_verite: ["ops.mjs etat"]\nverifie_le: ${date}\n---\n# Composants\n\n`
+  + "## Environnements de données\n\naucun environnement de données interrogé.\n\n## Infrastructure déclarée\n\naucune infrastructure posée hors dépôt.\n\n" + corps;
+const COP_USAGE = "## Inventaire par environnement\n\n| Composant | Type | Environnement | Statut | Vérifié le |\n|---|---|---|---|---|\n"
+  + "| api | service | production | **actif** | 2026-09-15 |\n| plateforme | conteneurs | production | partagée | 2026-09-15 |\n\n"
+  + "## Imbrications et usages — qui consomme quoi\n\n| Composant | Consommé par | Pour quoi | Preuve |\n|---|---|---|---|\n| bdd | api | persistance | secretRef, 2026-09-15 |\n\n"
+  + "## Composants inutilisés\n\n| Composant | preuve d'inutilité | ce qui cesse de fonctionner si on le supprime | statut de supprimabilité | créé par quoi | geste | titulaire du droit |\n|---|---|---|---|---|---|---|\n"
+  + "| regle-pare-feu | aucun consommateur, requête du 2026-09-15 | l'accès du poste en service | non supprimable, décision | geste manuel | `az … delete` | propriétaire de la base |\n";
+const avecCop = (contenu, fn) => {
+  const chemin = join(verte, "docs", "projet", "COMPOSANTS-OPS.md");
+  const avant = readFileSync(chemin, "utf8");
+  try { writeFileSync(chemin, contenu); return fn(lance(verte)); } finally { writeFileSync(chemin, avant); }
+};
+const echecsUsage = (rapport) => rapport.findings.filter((x) => x.regle === "R-20" && x.statut === "FAIL" && /TF-1113/.test(x.message));
+check("TF-1113 ANTÉRIEUR — COMPOSANTS-OPS revu avant le 15/09, sans les trois pièces : antériorité déclarée, jamais un FAIL", () => {
+  avecCop(COP_BASE("2026-09-14", ""), ({ exit, rapport }) => {
+    if (echecsUsage(rapport).length || exit !== 0) throw new Error(`défaut rétroactif : exit ${exit}, ${JSON.stringify(echecsUsage(rapport))}`);
+    if (!rapport.non_juge.some((l) => /R-20 \(usage des composants\) non jugé.*verifie_le=2026-09-14/.test(l))) throw new Error("antériorité non déclarée");
+  });
+});
+check("TF-1113 rouge — revu le 15/09 sans colonne Statut, sans table ni section : chaque manque est un FAIL nommé", () => {
+  avecCop(COP_BASE("2026-09-15", ""), ({ exit, rapport }) => {
+    const m = echecsUsage(rapport).map((x) => x.message).join(" | ");
+    if (exit !== 1) throw new Error(`exit ${exit}`);
+    for (const attendu of ["colonne Statut", "qui consomme quoi", "Composants inutilisés"]) if (!m.includes(attendu)) throw new Error(`manque non nommé : ${attendu} — ${m.slice(0, 300)}`);
+  });
+});
+check("TF-1113 vert — revu le 15/09, les trois pièces présentes et les vocabulaires tenus : PASS", () => {
+  avecCop(COP_BASE("2026-09-15", COP_USAGE), ({ exit, rapport }) => {
+    if (echecsUsage(rapport).length || exit !== 0) throw new Error(`exit ${exit} : ${JSON.stringify(echecsUsage(rapport)).slice(0, 400)}`);
+    if (!rapport.findings.some((x) => x.regle === "R-20" && x.statut === "PASS" && /vocabulaires fermés tenus/.test(x.message))) throw new Error("le PASS n'est pas dit");
+  });
+});
+check("TF-1113 vert — section « Composants inutilisés » DÉCLARÉE VIDE : PASS (loi n° 3)", () => {
+  const vide = COP_USAGE.replace(/## Composants inutilisés[\s\S]*$/, "## Composants inutilisés\n\naucun composant inutilisé relevé le 2026-09-15.\n");
+  avecCop(COP_BASE("2026-09-15", vide), ({ exit, rapport }) => {
+    if (echecsUsage(rapport).length || exit !== 0) throw new Error(`exit ${exit} : ${JSON.stringify(echecsUsage(rapport)).slice(0, 300)}`);
+  });
+});
+check("TF-1117/TF-1120 rouge — Statut hors vocabulaire, supprimabilité hors vocabulaire, colonne « créé par quoi » absente : chacun nommé", () => {
+  const faux = COP_USAGE.replace("**actif**", "vital").replace("non supprimable, décision", "peut-être").replace(" créé par quoi |", " origine |");
+  avecCop(COP_BASE("2026-09-15", faux), ({ exit, rapport }) => {
+    const m = echecsUsage(rapport).map((x) => x.message).join(" | ");
+    if (exit !== 1 || !/vital/.test(m) || !/peut-être/.test(m) || !/créé par quoi/.test(m)) throw new Error(`exit ${exit} : ${m.slice(0, 400)}`);
+  });
+});
+
 check("R-11 bis : section présente mais incomplète → le manquant est NOMMÉ (TF-0373)", () => {
   const chemin = join(verte, "CLAUDE.md");
   const avant = readFileSync(chemin, "utf8");
@@ -388,35 +501,40 @@ check("rouge-docs : R-20..R-24 + R-26 se déclenchent, localisantes", () => {
   for (const f of rapport.findings) if (!f.ou || !f.message) throw new Error(`finding ${f.regle} sans localisation`);
 });
 
-// TF-0985 (14/09) — UN TABLEAU PAR ENVIRONNEMENT EST AUTOSUFFISANT : les deux sens, et l'antériorité.
-// La paire ne varie QUE de la date de revue du document : le MÊME « idem » dans la ligne production
-// est un défaut dans un document revu le 15/09, une antériorité déclarée dans un document revu le
-// 11/08. La verte, sans renvoi, prouve déjà que la règle ne crie pas sur un tableau complet.
-const PARAM_RENVOI = (date) => '---\nrole: parametrage\nsources_de_verite: [.env.example]\nverifie_le: ' + date +
-  '\nvariables:\n  - PORT\n  - API_TIERCE_CLE\n---\n# Paramétrage\n\n' +
-  '## URLs & ports par environnement\n\n' +
-  '| Environnement | Front | Back/API | BDD | Notes |\n|---|---|---|---|---|\n' +
-  '| locale | http://localhost:5173 | http://localhost:8080 | localhost:5432 | réel local OK |\n' +
-  '| qualif | https://demoapp-qualif.up.railway.app | https://demoapp-api-qualif.up.railway.app | <HOTE_BDD_QUALIF> | staging de la MEP |\n' +
-  '| production | https://demoapp-production.up.railway.app | idem | <HOTE_BDD_PROD> | GO humain |\n';
-const variante85 = (date) => {
-  const d = mkdtempSync(join(tmpdir(), "conf-r20-85-"));
-  cpSync(verte, d, { recursive: true });
-  writeFileSync(join(d, "docs", "projet", "PARAMETRAGE.md"), PARAM_RENVOI(date));
-  return d;
-};
-check("R-20 (TF-0985) : une cellule « idem » dans la ligne production d'un document revu le 15/09 → FAIL localisant", () => {
-  const { exit, rapport } = lance(variante85("2026-09-15"));
-  const f = rapport.findings.filter((x) => x.regle === "R-20" && x.statut === "FAIL" && /RENVOIENT/.test(x.message));
-  if (exit !== 1 || f.length !== 1) throw new Error(`exit ${exit}, ${f.length} constat(s) R-20 de renvoi — 1 attendu`);
-  if (!/PARAMETRAGE\.md/.test(f[0].ou) || !/production/.test(f[0].message)) throw new Error("le constat ne localise ni le fichier ni la ligne");
+// ---- R-23, SECOND VOLET (TF-1088) — LA PAGE SERVIE, PAS SEULEMENT LA FICHE ----------------
+//
+// La paire sort du banc des défauts échappés, cas E-01 (phase MEP) : « des identifiants de
+// démonstration triviaux figurent en clair dans la fiche d'accès ET s'affichent sur la page de
+// connexion quand le mode démo est actif, alors que l'environnement de qualification est servi
+// publiquement sur Internet ». TF-0871 a fermé la fiche ; la page était restée hors de portée.
+// Les deux gabarits ne diffèrent QUE par la ligne d'aide affichée sous le formulaire.
+const PAGE_ROUGE = '<main>\n  <h1>Connexion</h1>\n  <form method="post">\n'
+  + '    <input name="identifiant" type="email">\n    <input name="motdepasse" type="password">\n'
+  + '    <button>Entrer</button>\n  </form>\n'
+  + '  <p class="aide">Démo : admin@demo.local / mot de passe demo-admin</p>\n</main>\n';
+const PAGE_VERTE = PAGE_ROUGE.replace(
+  '<p class="aide">Démo : admin@demo.local / mot de passe demo-admin</p>',
+  '<p class="aide">Mode démonstration : les comptes sont créés par le seed local (DEMO_ADMIN_IDENTIFIANT).</p>');
+mkdirSync(join(rougeDocs, "src", "pages"), { recursive: true });
+writeFileSync(join(rougeDocs, "src", "pages", "connexion.html"), PAGE_ROUGE);
+mkdirSync(join(verte, "src", "pages"), { recursive: true });
+writeFileSync(join(verte, "src", "pages", "connexion.html"), PAGE_VERTE);
+
+check("rouge-docs : la page de CONNEXION servie affiche les identifiants de démo → R-23 la nomme, ligne comprise (TF-1088)", () => {
+  const { rapport } = lance(rougeDocs);
+  const pages = rapport.findings.filter((f) => f.regle === "R-23" && f.statut === "FAIL" && /page SERVIE/.test(f.message));
+  if (pages.length !== 1) throw new Error(`R-23 page servie : 1 constat attendu, ${pages.length} obtenu(s) — `
+    + "sans lui, un identifiant retiré de la fiche et laissé à l'écran passerait pour retiré (cas E-01 du banc)");
+  if (!/src\/pages\/connexion\.html:\d+$/.test(pages[0].ou)) throw new Error(`le constat ne porte pas sa ligne : ${pages[0].ou}`);
+  if (!/admin@demo\.local/.test(pages[0].message) || !/demo-admin/.test(pages[0].message))
+    throw new Error("le constat ne nomme pas ce qui s'affiche : " + pages[0].message);
 });
-check("R-20 (TF-0985) : le MÊME renvoi dans un document revu le 11/08 → antériorité DÉCLARÉE, jamais un FAIL", () => {
-  const { rapport } = lance(variante85("2026-08-11"));
-  if (rapport.findings.some((x) => x.regle === "R-20" && x.statut === "FAIL" && /RENVOIENT/.test(x.message)))
-    throw new Error("la règle condamne un document revu avant sa naissance");
-  if (!JSON.stringify(rapport).includes("tableau par environnement autosuffisant"))
-    throw new Error("l'antériorité n'est pas NOMMÉE — un renvoi toléré doit rester visible");
+
+check("verte : LA MÊME page, sans valeur affichée, ne déclenche aucun R-23 (TF-1088)", () => {
+  const { rapport } = lance(verte);
+  const pages = rapport.findings.filter((f) => f.regle === "R-23" && f.statut === "FAIL");
+  if (pages.length) throw new Error("une page de connexion qui ne montre que le NOM de la variable est accusée : "
+    + pages.map((f) => f.ou + " " + f.message).join(" | "));
 });
 
 check("rouge-docs : un identifiant et un mot de passe de démo écrits en VALEUR → 2 constats R-23 nommant le profil (TF-0871)", () => {
@@ -587,6 +705,30 @@ check("TF-1015 — R-4 dénonce un chemin d'output\\ qui dépasse 150 caractère
     throw new Error("le jumeau à EXACTEMENT 150 caractères sidecar compris est accusé — la règle mord sur un nom conforme");
 });
 
+// ---- fixture LIVRABLE-DOSSIER (TF-1177, 17/09) : R-4 jugeait au nommage daté les fichiers
+// INTERNES d'un livrable remis en DOSSIER. Le 17/09, un projet Power BI a rendu trois FAIL sur ses
+// ressources d'image — placées par le format à un emplacement imposé, référencées par leur nom dans
+// le rapport, et impossibles à renommer sans dépasser le plafond de chemin. Les DEUX SENS sur la
+// MÊME fixture : les parties d'un dossier daté sont muettes, le `.png` livré à PLAT dans `output\`
+// reste dénoncé — sans quoi la correction aurait pu désarmer R-4 sur toute une extension. ---------
+const rougeDossier = mkdtempSync(join(tmpdir(), "conf-dossier-"));
+const DOSSIER_LIVRABLE = "Produit - Projet Power BI - 20260917m";
+mkdirSync(join(rougeDossier, "output", DOSSIER_LIVRABLE, "Rapport.Report", "StaticResources"), { recursive: true });
+writeFileSync(join(rougeDossier, "output", DOSSIER_LIVRABLE, "Rapport.Report", "StaticResources", "fond.svg"), "<svg/>" + NL_TEST);
+writeFileSync(join(rougeDossier, "output", DOSSIER_LIVRABLE, "Rapport.Report", "report.json"), "{}" + NL_TEST);
+writeFileSync(join(rougeDossier, "output", "capture.png"), "x" + NL_TEST);   // à plat : toujours jugé
+sh("git", ["init", "-q", "-b", "main"], rougeDossier);
+
+check("TF-1177 — R-4 juge le DOSSIER-livrable daté et non ses parties internes, et le fichier livré à PLAT reste jugé", () => {
+  const { rapport } = lance(rougeDossier);
+  const r4 = rapport.findings.filter((f) => f.regle === "R-4" && f.statut === "FAIL");
+  const internes = r4.filter((f) => /StaticResources|report\.json/.test(f.ou));
+  if (internes.length)
+    throw new Error(`les parties internes d'un livrable-dossier sont jugées comme des livrables : ${internes.map((f) => f.ou).join(", ")}`);
+  if (!r4.some((f) => /capture\.png$/.test(f.ou) && /nommage/.test(f.message)))
+    throw new Error("le `.png` livré À PLAT dans output\\ n'est plus jugé — la dispense du dossier daté s'est étendue en échappatoire générale");
+});
+
 // ---- fixture ROUGE-ENV (TF-0869) : le `.env.example` est PRÉSENT, RENSEIGNÉ et SUIVI — donc
 // vert pour les trois sous-contrôles historiques de R-13 — et il porte pourtant deux valeurs
 // qui n'auraient jamais dû entrer dans un fichier versionné : une variable déléguée à l'humain
@@ -616,6 +758,60 @@ check("verte : un `.env.example` à valeurs VIDES sous « # à fournir : » ne d
   const r13 = rapport.findings.filter((f) => f.regle === "R-13" && f.statut === "FAIL");
   if (r13.length) throw new Error(`R-13 : 0 constat attendu sur la fixture verte, ${r13.length} obtenu(s) — ${r13.map((f) => f.message).join(" | ")}`);
 });
+
+// ---- R-15 (TF-1080) : une variable SANS valeur porte « # à fournir : » (exigence R-15.1) ----
+// Rouge : une variable muette, et une variable dont le marqueur est sur la ligne qui PRÉCÈDE (la
+// seconde ne doit pas être accusée). Vert : la fixture verte, dont la variable vide porte son marqueur.
+const rougeR15 = mkdtempSync(join(tmpdir(), "conf-rouge-r15-"));
+writeFileSync(join(rougeR15, ".env.example"),
+  "# ne jamais renseigner de secret ici\nPORT=8000\nAPI_TIERCE_CLE=\n# à fournir : identifiant du partenaire\nPARTENAIRE_ID=\n");
+check("rouge-r15 : une variable SANS valeur ni marqueur → R-15 FAIL, variable et ligne nommées (TF-1080)", () => {
+  try {
+    const { rapport } = lance(rougeR15);
+    const f = rapport.findings.find((x) => x.regle === "R-15" && x.statut === "FAIL");
+    if (!f) throw new Error("aucun constat R-15 sur une variable muette");
+    if (!/API_TIERCE_CLE \(ligne 3\)/.test(f.message)) throw new Error(`le constat ne nomme pas la variable et sa ligne : ${f.message}`);
+    if (/PARTENAIRE_ID/.test(f.message)) throw new Error("un marqueur posé sur la ligne qui PRÉCÈDE n'est pas reconnu");
+  } finally { rmSync(rougeR15, { recursive: true, force: true }); }
+});
+// Bornes calibrées sur le parc (8 produits, 6 accusés au premier jet) : le vide DÉCLARÉ valide
+// n'est pas accusé, et un fichier qui n'a pas entamé la discipline reçoit un avertissement en PASS.
+const borneR15 = mkdtempSync(join(tmpdir(), "conf-borne-r15-"));
+writeFileSync(join(borneR15, ".env.example"), "PORT=8000\n# Vide = import desactive\nIMPORT_DESACTIVE=\nJETON_TIERS=\n");
+check("borne-r15 : aucun « # à fournir : » dans le fichier → R-15 PASS avec AVERTISSEMENT, et le vide déclaré n'est pas cité (TF-1080)", () => {
+  try {
+    const { rapport } = lance(borneR15);
+    const f = rapport.findings.find((x) => x.regle === "R-15");
+    if (!f || f.statut !== "PASS") throw new Error(`R-15 attendu PASS (avertissement) : ${JSON.stringify(f)}`);
+    if (!/AVERTISSEMENT/.test(f.message) || !/JETON_TIERS/.test(f.message)) throw new Error(`l'avertissement ne nomme pas la variable muette : ${f.message}`);
+    if (/IMPORT_DESACTIVE/.test(f.message)) throw new Error("une variable dont le vide est DÉCLARÉ valide est accusée");
+  } finally { rmSync(borneR15, { recursive: true, force: true }); }
+});
+check("verte : toute variable sans valeur porte son marqueur → R-15 PASS (TF-1080)", () => {
+  const { rapport } = lance(verte);
+  const f = rapport.findings.find((x) => x.regle === "R-15");
+  if (!f || f.statut !== "PASS") throw new Error(`R-15 attendu PASS sur la fixture verte : ${JSON.stringify(f)}`);
+});
+
+// ---- R-20 ter (TF-0985) : un tableau indexé par environnement ne renvoie pas ailleurs ----
+// Rouge : le cas fondateur en miniature (« idem », « défaut du code ») → avertissement nommé.
+// Vert : le même tableau, chaque cellule portant sa valeur → rien à dire.
+const tableauEnv = (cellQualif, cellDefaut) => "---\nrole: x\nsources_de_verite: [x]\nverifie_le: 2026-09-14\n---\n# Paramétrage\n\n" +
+  `| | dev | qualif |\n|---|---|---|\n| URL de base | https://api-dev.exemple.test | ${cellQualif} |\n| Délai | 30 s | ${cellDefaut} |\n`;
+for (const [nom, q, d, attenduAvert] of [["rouge", "idem", "absente → défaut du code", true], ["verte", "https://api-qualif.exemple.test", "30 s", false]]) {
+  const dir = mkdtempSync(join(tmpdir(), `conf-r20ter-${nom}-`));
+  mkdirSync(join(dir, "docs", "projet"), { recursive: true });
+  writeFileSync(join(dir, "docs", "projet", "PARAMETRAGE.md"), tableauEnv(q, d));
+  check(`${nom}-r20ter : tableau indexé par environnement ${attenduAvert ? "avec renvois → AVERTISSEMENT nommé" : "autosuffisant → rien à dire"} (TF-0985)`, () => {
+    try {
+      const { rapport } = lance(dir);
+      const f = rapport.findings.find((x) => x.regle === "R-20 ter");
+      if (!f || f.statut !== "PASS") throw new Error(`R-20 ter attendu PASS (non bloquant) : ${JSON.stringify(f)}`);
+      if (attenduAvert && !(/AVERTISSEMENT/.test(f.message) && /PARAMETRAGE\.md:8 \(2 cellule/.test(f.message))) throw new Error(`le renvoi n'est pas nommé avec sa ligne : ${f.message}`);
+      if (!attenduAvert && /AVERTISSEMENT/.test(f.message)) throw new Error(`un tableau autosuffisant est accusé : ${f.message}`);
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+}
 
 // ---- fixture ROUGE-LOCK (TF-0128) : reproduit le cas réel Produit-11 — des versions SONT
 // déclarées dans TECHNOS.md mais aucune source ne les confronte : ni dans les 2 niveaux de

@@ -26,6 +26,14 @@
 > node forge\travaux\oracle-travaux.mjs "<ce fichier>.md"
 > ```
 >
+> **Pas de `forge\travaux\` chez vous — vous êtes une FORGE, pas un produit instancié ?** Le juge
+> ne vous a pas été hérité (l'héritage ne voyage que vers les produits) : jouez-le à sa SOURCE,
+> chez le pilot (TF-1068) :
+>
+> ```
+> node <pilot>\gabarits\oracle-travaux-pilot.mjs "<ce fichier>.md"
+> ```
+>
 > Il rend **0** si la forme du lot est tenue, **1** sinon — et il dit alors ce qui manque. C'est
 > **exactement le contrôle** que le pilot joue AVANT d'émettre : le même module, importé des deux
 > côtés. Un lot qui passe chez le pilot passe ici.

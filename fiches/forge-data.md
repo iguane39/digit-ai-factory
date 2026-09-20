@@ -24,3 +24,12 @@ Preuve rejouée : self-test → **54 PASS, 0 FAIL** (fiche : 15/15 — grandie :
 cat-dat-08 porté du run réel Produit-10, R5 « chiffre nu » TF-0378/0379). D-D1 (grain
 colonne→colonne) : entamée par le traducteur Unity Catalog (TF-0141). D-D2 (lineage déclaré
 vs exécuté) inchangée. Aucun constat nouveau.
+
+**Migration d'un rapport Power BI vers un nouveau modèle (TF-1179, TF-1180, TF-1186, TF-1190 — 17 et
+19/09/2026).** La procédure vit chez la forge : `references\MIGRATION-RAPPORT-POWERBI.md`, 11 étapes,
+chacune gardée par un contrôle qui existe (`oracle-enchainer`, déclaration `.chaine.json`). Cinq
+oracles la jugent : `oracle-delimiter` (le périmètre se prend à ce que les visuels lisent),
+`oracle-reconstruire` (la mise en page fournie se conserve), `oracle-rendre` (liaisons, export
+chiffré, geste de rendu réel déclaré), `oracle-qualifier` (le rapport migré peut-il remplacer
+l'original ; classe « définition changée »), et la règle M7 d'`oracle-modeliser` (un modèle déclare
+les décisions qui l'ont façonné). Preuve rejouée le 19/09/2026 : self-test → **356 PASS, 0 FAIL**.

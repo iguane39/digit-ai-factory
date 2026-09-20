@@ -30,11 +30,6 @@
  *      toute création marquée `recidive_de` est SIGNALÉE — statut AVERT, jamais FAIL : la
  *      récidive est une mesure de la descente, refuser le registre qui la porte la cacherait.
  *      Entre avertissante (doctrine v2.5.0 de RESTITUTION.md) : se durcira sur corpus propre.
- *  R14 (14/09/2026, TF-0956) une création dont le titre ET le contenu sont identiques à ceux
- *      d'une création antérieure (aux espaces et à la casse près) est un DOUBLON STRICT : après
- *      le seuil, il n'est admis que clos en `ecarte` avec un motif_ecart qui nomme l'original.
- *      `ingerer-lot.mjs` le refuse déjà à la porte ; R14 juge ce qui entrerait par un autre
- *      chemin. Les 11 paires antérieures au seuil sont une antériorité déclarée.
  *  R9 bis — RECTIFICATION DÉCLARÉE d'un horodatage (TF-0413, patron R-42/TF-0410). Un
  *      événement `ev: "rectification_horodatage"` porte `entrees: [{id, ts_consigne,
  *      ts_reel_estime, cause}]` : R9 se juge alors sur `ts_reel_estime`, et l'écart s'IMPRIME
@@ -91,11 +86,38 @@ function lire(fichier) {
 const SEUIL_R10 = "2026-08-09T00:00:00Z";
 const SEUIL_R7_ECART = "2026-08-13T00:00:00Z"; // naissance de TF-0157
 const SEUIL_R12_DESCENTE = "2026-09-02T14:00:00Z"; // TF-0757 : les clôtures antérieures restent de la prose, déclaré
+// R14 (TF-0956) : un DOUBLON STRICT (titre ET contenu identiques à une création antérieure) entré
+// après ce seuil sans être écarté ni marqué `doublon_de` est un FAIL. Mesuré au 14/09 : 11 groupes
+// de doublons stricts (dont les six du 08/09) existent avant lui — antériorité DÉCLARÉE et comptée.
+const SEUIL_R14 = process.env.TODO_SEUIL_R14 || "2026-09-14T12:00:00Z";
 // R13 : le référentiel de classes — surchargeable par --classes pour la recette.
 const iClasses = process.argv.indexOf("--classes");
 const CLASSES_PATH = iClasses > 0 ? process.argv[iClasses + 1] : join(ICI, "CLASSES.json");
 let CLASSES = null;
-try { CLASSES = new Set((JSON.parse(readFileSync(CLASSES_PATH, "utf8")).classes || []).map((c) => c.cle)); } catch { CLASSES = null; }
+let CLASSES_BRUTES = null;
+try {
+  CLASSES_BRUTES = JSON.parse(readFileSync(CLASSES_PATH, "utf8")).classes || [];
+  CLASSES = new Set(CLASSES_BRUTES.map((c) => c.cle));
+} catch { CLASSES = null; CLASSES_BRUTES = null; }
+// R15 (D-3 (c), décision humaine du 16/09/2026) — UNE CLASSE FERMÉE SANS PORTEUR EXÉCUTABLE
+// N'EST PAS UNE PROTECTION, C'EST UNE INTENTION.
+//
+// LE FAIT, et c'est la question que l'humain a posée le 15/09 : « pourquoi ces défauts arrivent
+// encore ». Mesure du 16/09 sur les 86 familles du référentiel — 56 nomment un contrôle qui
+// EXISTE, 30 nomment un contrôle « à créer ». Un producteur ne rencontre nulle part une famille
+// dont le juge reste à écrire : elle est fermée au registre et absente de son chemin.
+//
+// POURQUOI UN CLIQUET ET NON UN REFUS. Refuser les 30 d'un coup mettrait un tiers du référentiel
+// au rouge du jour au lendemain, et la leçon N4 du noyau dit ce qui arrive ensuite — le contrôle
+// est désactivé dans la semaine. Le cliquet arrête l'hémorragie d'abord : une famille CRÉÉE à
+// partir du seuil nomme un juge qui existe, ou elle ne se crée pas. Les 30 antérieures sont
+// DÉCLARÉES et comptées au `non_juge`, jamais mises à zéro ni tues — elles se résorbent au rythme
+// des corrections qui les fondent.
+const SEUIL_R15 = process.env.TODO_SEUIL_R15 || "2026-09-16";
+// Un oracle « à créer », « aucun », vide ou réduit à un tiret n'est pas un porteur exécutable.
+// La liste est COURTE et écrite : deviner par heuristique classerait mal, et un classement faux
+// sur un cliquet bloquant coûte plus qu'un classement absent.
+const SANS_PORTEUR = /^\s*(?:$|-\s*$|(?:à|a)\s*cr[ée]er\b|aucun\b|n[ée]ant\b|non\s+m[ée]canis)/i;
 // R11 : entrée en vigueur POSTÉRIEURE au dernier horodatage inventé du registre
 // (2026-08-20T18:21:00Z) — les événements en deçà sont l'antériorité que TF-0413 a mesurée,
 // jamais réécrite (patron R-42 : on ne corrige pas l'histoire, on cesse d'en produire).
@@ -196,7 +218,7 @@ function replier(evenements, ou) {
         recidivesVues++;
         avert("R13", e.id, `RÉCIDIVE de ${e.recidive_de.join(", ")} (classe « ${e.classe} ») — la descente n'a pas tenu chez « ${e.demandeur} » ; à lire au tableau de bord todo/RECIDIVES.md, jamais à effacer`);
       }
-      etats.set(e.id, { ...e, ts: tsEffectif });
+      etats.set(e.id, { ...e, ts: tsEffectif, ts_creation: tsEffectif });
     } else if (e.ev === "maj") {
       const etat = etats.get(e.id);
       if (!etat) { ko("R2", `${ou}:${e.ligne}`, `maj sans creation préalable pour ${e.id}`); continue; }
@@ -257,31 +279,20 @@ for (const id of etatsActifs.keys())
 for (const [id, e] of etatsArchive)
   if (e.statut !== "archive") ko("R8", id, `dans l'archive avec statut ${e.statut}`);
 
-// ---- R14 (TF-0956, 14/09/2026) — UN DOUBLON STRICT NE S'INSTALLE PAS COMME UN ITEM ---------
-// LE FAIT, mesuré le 08/09 : six candidatures au titre ET au contenu identiques à six autres sont
-// entrées au registre sans qu'aucune règle ne bronche, puis ont été DÉCIDÉES avec leur motif écrit
-// en prose — elles comptent donc comme des items ordinaires dans toutes les mesures.
-// `ingerer-lot.mjs` refuse désormais le doublon strict à la porte ; R14 juge ce qui aurait pu
-// entrer par un autre chemin. Un doublon strict POSTÉRIEUR au seuil n'est admis que clos en
-// `ecarte`, avec un motif_ecart qui NOMME l'original : le statut d'écartement existe depuis
-// TF-0157 (13/08, motif obligatoire par R7) et c'est lui qui retire l'item de toute mesure de gains.
-// ANTÉRIORITÉ DÉCLARÉE : 11 paires strictes mesurées au 14/09 (8 du 08/09, 3 des 11-12/08)
-// précèdent la règle ; elles sont comptées au non_juge, jamais réécrites.
-const SEUIL_R14 = "2026-09-14T18:00:00Z";
-const normContenu = (s) => String(s || "").normalize("NFC").replace(/\s+/g, " ").trim().toLowerCase();
-const originaux = new Map();
-let doublonsAnterieurs = 0;
-const creationsToutes = [...lire(archive), ...lire(actifs)].filter((e) => e.ev === "creation" && e.id)
-  .sort((a, b) => String(a.ts).localeCompare(String(b.ts)));
-for (const e of creationsToutes) {
-  const cle = `${normContenu(e.titre)} ${normContenu(e.contenu)}`;
-  const orig = originaux.get(cle);
-  if (!orig) { originaux.set(cle, e.id); continue; }
-  if (String(e.ts) < SEUIL_R14) { doublonsAnterieurs++; continue; }
-  const etat = etatsActifs.get(e.id) || etatsArchive.get(e.id) || {};
-  const ecarte = ["ecarte", "archive"].includes(etat.statut) && String(etat.motif_ecart || "").includes(orig);
-  if (!ecarte) ko("R14", e.id, `doublon STRICT de ${orig} (titre et contenu identiques, aux espaces et à la casse près) — ` +
-    `un doublon ne se décide pas comme un item : le clore en \`ecarte\` avec un motif_ecart qui nomme ${orig}, pour qu'il ne compte dans aucune mesure (TF-0956)`);
+// R14 (TF-0956, 14/09/2026) — UN DOUBLON STRICT NE COMPTE PAS COMME UN ITEM. Le 08/09, six
+// candidatures identiques mot pour mot à six autres sont entrées en une commande, et aucune règle
+// n'a bronché. Le statut `ecarte` (R5, R7 : motif obligatoire) existe pour les sortir des mesures ;
+// un doublon qui ne le porte pas, ni `doublon_de`, fausse chaque compte d'items ouverts.
+const normTexte = (s) => String(s || "").toLowerCase().replace(/\s+/g, " ").trim();
+const parEmpreinte = new Map();
+let r14Anterieurs = 0;
+for (const [id, e] of [...etatsActifs, ...etatsArchive].sort((a, b) => a[0].localeCompare(b[0]))) {
+  const cle = `${normTexte(e.titre)} | ${normTexte(e.contenu)}`;
+  const premier = parEmpreinte.get(cle);
+  if (!premier) { parEmpreinte.set(cle, id); continue; }
+  if (String(e.ts_creation || "") < SEUIL_R14) { r14Anterieurs++; continue; }
+  if (e.statut === "ecarte" || e.doublon_de) continue;
+  ko("R14", id, `titre ET contenu identiques à ${premier} — doublon strict entré sans être écarté : le passer en ecarte (motif_ecart, R7) ou le marquer doublon_de, sans quoi il compte comme un item ouvert de plus (TF-0956)`);
 }
 
 if (!findings.some((f) => f.statut === "FAIL")) {
@@ -295,12 +306,31 @@ if (process.argv.includes("--rectifications")) {
   for (const n of notes) console.error(n);
   if (!notes.length) console.error("aucune rectification déclarée");
 }
+// ---- R15 (D-3 (c), 16/09/2026) — LE CLIQUET DES FAMILLES SANS PORTEUR EXÉCUTABLE -----------
+let r15Anterieures = 0;
+let r15Portees = 0;
+if (CLASSES_BRUTES === null) {
+  avert("R15", "-", `référentiel ${CLASSES_PATH} illisible — le cliquet des porteurs ne se joue pas`);
+} else {
+  for (const c of CLASSES_BRUTES) {
+    const sansPorteur = SANS_PORTEUR.test(String(c.oracle || ""));
+    if (!sansPorteur) { r15Portees++; continue; }
+    if (String(c.creee_le || "") < SEUIL_R15) { r15Anterieures++; continue; }
+    ko("R15", c.cle, `famille créée le ${c.creee_le} SANS porteur exécutable — son champ \`oracle\` vaut « ${String(c.oracle || "").slice(0, 60)} ». `
+      + "Une famille fermée dont le juge reste à écrire n'est pas une protection : le producteur ne la rencontre nulle part sur son chemin, "
+      + "et c'est la cause mesurée des récidives du 15/09. Nommer le contrôle qui la joue, ou ne pas créer la famille (décision humaine D-3 (c) du 16/09/2026)");
+  }
+  if (!findings.some((f) => f.regle === "R15" && f.statut === "FAIL"))
+    ok("R15", `${r15Portees} famille(s) portée(s) par un contrôle existant, ${r15Anterieures} antérieure(s) au cliquet — aucune famille neuve sans porteur`);
+}
+
 const echecs = findings.filter((f) => f.statut === "FAIL").length;
 console.log(JSON.stringify({
   oracle: "oracle-todo", version: "1.3.0", verdict: echecs ? "FAIL" : "PASS", findings,
   non_juge: [
     `R13 : ${classesVues} création(s) classée(s), ${recidivesVues} récidive(s) marquée(s) — la récidive est AVERTISSANTE, elle mesure la descente et ne met jamais le registre en échec ; la JUSTESSE d'une classe déclarée par un producteur n'est pas jugée`,
-    `R14 : ${doublonsAnterieurs} doublon(s) strict(s) antérieur(s) au ${SEUIL_R14}, déclarés et non jugés (antériorité mesurée le 14/09 : 11 paires) ; un quasi-doublon — un mot de différence — n'est pas un doublon strict : il relève du rapprochement signalé à l'ingestion, jamais d'un refus`,
+    `R14 : ${r14Anterieurs} doublon(s) strict(s) créé(s) avant ${SEUIL_R14} — antériorité déclarée, non jugés ; un doublon à la reformulation près (même défaut, autres mots) n'est pas un doublon strict et relève du rapprochement, qui signale sans juger`,
+    `R15 : ${r15Anterieures} famille(s) de défaut créée(s) avant ${SEUIL_R15} sans porteur exécutable — antériorité DÉCLARÉE, non jugée, et jamais mise à zéro. Chacune est une protection écrite que personne ne joue : le producteur ne la rencontre nulle part sur son chemin, et c'est la cause mesurée des récidives du 15/09. Elles se résorbent au rythme des corrections qui les fondent, et ce compte est l'indicateur à faire baisser`,
     "la pertinence des scores (gain/effort) est un jugement humain, pas une règle",
     "la véracité des gains_constates n'est pas vérifiée dans le monde — seule leur présence l'est",
     "R11 ne juge que l'AVANCE sur l'heure d'exécution : un ts en RETARD (antidaté) reste hors de portée, comme un ts faux mais plausible — seul l'impossible est refusé",

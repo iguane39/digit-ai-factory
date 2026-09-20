@@ -55,7 +55,7 @@ rien signaler** sont les seuls à relire avant chaque geste qui les touche.
 - **Ce n'est pas un guide d'installation.** Les secrets, les jetons et les procédures vivent ailleurs ;
   ici on dit seulement *où est la vérité et comment on la lit en entier*.
 - **Ce n'est pas figé.** Un écart découvert s'y ajoute le jour où il est payé — c'est la seule façon
-  qu'il ne soit pas payé deux fois.
+  qu'il ne soit pas payé 2 fois.
 
 ## Contrôle
 

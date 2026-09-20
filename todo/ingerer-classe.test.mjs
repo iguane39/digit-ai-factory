@@ -136,6 +136,41 @@ check("signal — classe SUSPECTE (créée sans clôture, < 30 j après un retou
   if (!r.creations[0].classe_suspecte) throw new Error("la création ne porte pas classe_suspecte");
 });
 
+// TF-1128 — UN DÉFAUT VRAIMENT NEUF A UNE SORTIE CONFORME. Le producteur suit la consigne « aucune
+// clé ne convient » : clé réservée `classe-a-creer`, proposition dans la ligne ET dans le .md. Le
+// cas vert JOUE ce remède et doit passer (la fixture du remède est aussi obligatoire que celle du
+// défaut) ; les rouges verrouillent chacune des quatre conditions.
+const PROP = { cle: "tableau-sans-unite", famille: "page-html-socle", libelle: "tableau chiffré sans unité" };
+const MD_PROP = MD + "\n## La règle qui aurait évité le retour\n\nClasse proposée : `tableau-sans-unite` (famille page-html-socle) — tableau chiffré sans unité.\n";
+check("TF-1128 vert — le remède joué : clé réservée + proposition complète + clé nommée au .md → le lot ENTRE, sans classe, avec la proposition", () => {
+  const r = ingerer({ nomLot: "PROD - RETOURS - 20260915a", lignes: [cand({ classe: "classe-a-creer", classe_proposee: PROP })], md: MD_PROP });
+  if (r.code !== 0) throw new Error(`exit ${r.code} attendu 0 : ${r.sortie.slice(0, 400)}`);
+  const c = r.creations[0];
+  if (!c || c.classe !== null) throw new Error(`classe attendue null (jamais la clé réservée) : ${JSON.stringify(c && c.classe)}`);
+  if (!c.classe_a_creer || c.classe_a_creer.cle !== "tableau-sans-unite") throw new Error("la proposition n'est pas portée par la création");
+  if (!/\[CLASSE À CRÉER\]/.test(r.sortie)) throw new Error("le pilot n'est pas averti qu'une classe est à créer");
+});
+check("TF-1128 rouge — clé réservée SANS proposition : refusé, le manque est nommé", () => {
+  const r = ingerer({ nomLot: "PROD - RETOURS - 20260915b", lignes: [cand({ classe: "classe-a-creer" })], md: MD_PROP });
+  if (r.code !== 1 || !/manque cle, famille, libelle/.test(r.sortie)) throw new Error(`exit ${r.code} : ${r.sortie.slice(0, 300)}`);
+  if (r.creations.length) throw new Error("registre touché");
+});
+check("TF-1128 rouge — clé proposée absente du .md : refusé (le lecteur humain doit la trouver)", () => {
+  const r = ingerer({ nomLot: "PROD - RETOURS - 20260915c", lignes: [cand({ classe: "classe-a-creer", classe_proposee: PROP })] });
+  if (r.code !== 1 || !/n'est pas nommée dans le \.md/.test(r.sortie)) throw new Error(`exit ${r.code} : ${r.sortie.slice(0, 300)}`);
+});
+check("TF-1128 rouge — clé proposée qui EXISTE déjà, ou famille inconnue : refusé, chaque motif nommé", () => {
+  const r1 = ingerer({ nomLot: "PROD - RETOURS - 20260915d", lignes: [cand({ classe: "classe-a-creer", classe_proposee: { ...PROP, cle: "page-html-sommaire-absent" } })], md: MD_PROP + "page-html-sommaire-absent\n" });
+  if (r1.code !== 1 || !/EXISTE déjà/.test(r1.sortie)) throw new Error(`clé existante : exit ${r1.code} : ${r1.sortie.slice(0, 300)}`);
+  const r2 = ingerer({ nomLot: "PROD - RETOURS - 20260915e", lignes: [cand({ classe: "classe-a-creer", classe_proposee: { ...PROP, famille: "famille-inventee" } })], md: MD_PROP });
+  if (r2.code !== 1 || !/famille « famille-inventee »/.test(r2.sortie)) throw new Error(`famille inconnue : exit ${r2.code} : ${r2.sortie.slice(0, 300)}`);
+});
+check("TF-1128 — le refus d'une classe inconnue indique désormais la sortie conforme, plus l'écriture du référentiel", () => {
+  const r = ingerer({ nomLot: "PROD - RETOURS - 20260915f", lignes: [cand({ classe: "page-html-polices" })] });
+  if (!/classe-a-creer/.test(r.sortie)) throw new Error("le refus ne nomme pas la clé réservée");
+  if (/créer la clé dans todo\/CLASSES\.json/.test(r.sortie)) throw new Error("le refus renvoie encore le producteur au référentiel du pilot");
+});
+
 check("rouge — référentiel de classes ILLISIBLE : un lot du 03/09 est refusé, jamais admis en silence", () => {
   const r = ingerer({ nomLot: "PROD - RETOURS - 20260903f", lignes: [cand({ classe: "page-html-polices-distantes" })], classes: join(T, "absent.json") });
   if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1`);

@@ -202,6 +202,49 @@ check("verte — rapprochement : titres anonymisés = créations consignées, en
   if (e.lot_sha !== empreinteTexte(ligneR(1) + "\n" + ligneR(2) + "\n")) throw new Error("l'empreinte consignée n'est pas celle du contenu courant");
 });
 
+// ---- seconde preuve : une adresse IP MASQUÉE sur décision humaine (TF-1134, D-15 a) --------------
+// Adresses INVENTÉES : la masquée dans une plage privée (10.213.47.9), celle qui reste en clair dans
+// une plage de documentation (192.0.2.4), que la définition unique n'a jamais à masquer.
+const MASQUE = "[adresse IP du poste, masquée le 15/09/2026]";
+const saleIp = (i) => `{"schema":1,"titre":"ZorglubMail : poste 10.213.47.9 injoignable","contenu":"lot 20260830${i}, exemple 192.0.2.4, relance 10.213.47.9"}\n`;
+const masqueIp = (i) => `{"schema":1,"titre":"Produit-01 : poste ${MASQUE} injoignable","contenu":"lot 20260830${i}, exemple 192.0.2.4, relance ${MASQUE}"}\n`;
+const poserLotIp = (i, courant) => {
+  const nom = `Produit-01 - RETOURS - 20260830${i}.tf.jsonl`;
+  const copie = join(T, `avant-${i}.tf.jsonl`);
+  writeFileSync(copie, saleIp(i), "utf8");
+  writeFileSync(REG, readFileSync(REG, "utf8") + evIngestion(empreinteTexte(saleIp(i)), `input/00-retours/${nom}`) + "\n", "utf8");
+  writeFileSync(join(BOITE_DIR, nom), courant, "utf8");
+  return { sidecar: join(BOITE_DIR, nom), copie };
+};
+
+check("rouge — masque PLUS une ligne ajoutée : REFUSÉ, ni l'une ni l'autre preuve ne tient, registre intact", () => {
+  const { sidecar, copie } = poserLotIp("g", masqueIp("g") + '{"schema":1,"titre":"ajout apres coup","contenu":"x"}\n');
+  const avant = evenements().length;
+  const r = lancer(sidecar, "--avant", copie);
+  if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1 — ${r.sortie.slice(0, 300)}`);
+  if (!/ÉDITION/.test(r.sortie)) throw new Error("le refus ne nomme pas l'édition");
+  if (evenements().length !== avant) throw new Error("le registre a été touché malgré le refus");
+});
+
+check("rouge — une adresse laissée EN CLAIR à côté du masque : REFUSÉ (le masquage n'est pas complet)", () => {
+  const { sidecar, copie } = poserLotIp("h", masqueIp("h").replace(`relance ${MASQUE}`, "relance 10.213.47.9"));
+  const avant = evenements().length;
+  const r = lancer(sidecar, "--avant", copie);
+  if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1 — ${r.sortie.slice(0, 300)}`);
+  if (evenements().length !== avant) throw new Error("le registre a été touché malgré le refus");
+});
+
+check("verte — le masque SEUL : CONSIGNÉ, motif distinct et preuve de masquage, sans l'adresse", () => {
+  const { sidecar, copie } = poserLotIp("f", masqueIp("f"));
+  const r = lancer(sidecar, "--avant", copie);
+  if (r.code !== 0) throw new Error(`exit ${r.code} : ${r.sortie.slice(0, 400)}`);
+  const e = evenements().pop();
+  if (!e.reempreinte || e.reempreinte.motif !== "adresse IP masquée sur décision humaine (D-15 a, TF-1134)") throw new Error(`motif : ${JSON.stringify(e.reempreinte)}`);
+  if (!/masquerAdresses/.test(e.reempreinte.preuve) || !/2 occurrence/.test(e.reempreinte.preuve)) throw new Error(`preuve : ${e.reempreinte.preuve}`);
+  if (e.lot_sha !== empreinteTexte(masqueIp("f")) || e.reempreinte.lot_sha_avant !== empreinteTexte(saleIp("f"))) throw new Error("empreintes d'avant ou d'après fausses");
+  if (/10\.213\.47\.9|Zorglub/.test(JSON.stringify(e))) throw new Error("l'événement consigné porte l'adresse ou un nom interdit");
+});
+
 rmSync(T, { recursive: true, force: true });
 console.log(`\nreempreinter-lot (ré-empreinte prouvée d'un sidecar anonymisé) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

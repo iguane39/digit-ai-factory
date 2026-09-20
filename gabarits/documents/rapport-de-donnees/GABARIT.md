@@ -29,7 +29,7 @@ role_destinataire: {qui lit ce rapport, et pour quelle décision}
 > **Périmètre** {ce qui est couvert, et ce qui ne l'est pas}
 > **Sources** {jeux de données, dates d'extraction, volumes}
 > **Établi le** {date} · **Méthode** {comment les mesures ont été faites}
-> **Gabarit** gd-rapport-donnees · **Version du gabarit** 1.0.0
+> **Gabarit** gd-rapport-donnees · **Version du gabarit** 1.0.1
 ```
 **`destinataire` est dû, et il est LU PAR UN ORACLE** (TF-0504, 22/08/2026). `R-2` d'`oracle-conformite-projet` ne juge la localisation que des artefacts MARQUÉS : sans cette ligne, un document né de ce gabarit est invisible au contrôle — et c'est arrivé, une fiche écrite hors `output\` qu'aucun oracle ne pouvait voir, trouvée par relecture humaine. La valeur est FERMÉE : `humain` pour un livrable, `aucun` pour un document normatif. Le rôle du lecteur, lui, vit sous `role_destinataire` — utile, mais ce n'est pas la marque.
 
@@ -38,7 +38,9 @@ Un lecteur qui trouve un manque dans ce document ne peut le remonter utilement q
 DE QUEL gabarit et de QUELLE version il vient : sans ce couple, le retour dit « il manquait une
 section » et personne ne sait à quoi l'appliquer. Voir la boucle de retour en fin de gabarit.
 
-Valeurs pour cette famille : `gabarit: gd-rapport-donnees` · `version_du_gabarit: 1.0.0`.
+Valeurs pour cette famille : `gabarit: gd-rapport-donnees` · `version_du_gabarit: 1.0.1`.
+La 1.0.1 (15/09/2026, TF-1038) déclare la largeur de la page (`<body data-largeur="lecture">`,
+règle D10) : les trois chapitres étaient déjà bridés, seule la déclaration manquait.
 
 
 Le périmètre **dit ce qu'il exclut**. Un périmètre qui n'énumère que ce qu'il couvre laisse le
@@ -122,3 +124,27 @@ quatre choses, dans cet ordre d'utilité :
 Reportez le couple `gabarit: gd-rapport-donnees` et `version_du_gabarit` tel qu'il figure en en-tête de
 votre document : c'est lui qui rend le retour applicable. Sans lui, « il manquait une section »
 ne se rattache à aucune famille et à aucune version (R-46).
+
+---
+
+## Document d'auteur — ce qui ne va pas au lecteur
+
+Le lecteur de ce document est celui que déclare `role_destinataire`. Tout ce qui n'entre pas
+dans ses décisions sort d'ici et vit dans le **document d'auteur** — un fichier distinct, tenu par
+celui qui produit, cité en renvoi et jamais recopié :
+
+- le **registre des arbitrages** encore ouverts, avec leur instance et leur état ;
+- l'**historique des versions** du document et son statut de relecture ;
+- les **notes de production** : sources à confirmer, sections à reprendre, questions à l'auteur.
+
+**La frontière est un critère d'ACTION, pas de confort.** Une information qui change ce que le
+lecteur FAIT reste chez lui, même quand elle est inconfortable : « cette règle n'est pas encore
+opposable, appliquez-la et signalez tout écart » appartient au document du lecteur, parce qu'un
+lecteur doit savoir sur quoi il s'engage. Une information qui ne change que ce que l'AUTEUR doit
+encore obtenir part au document d'auteur. Le doute utile au lecteur se dit à l'endroit qui le
+concerne ; le doute de l'auteur ne le suit pas.
+
+**Un document long se découpe en VUES d'un fichier unique, pas en fichiers**, sauf demande
+contraire de son lecteur : onze fichiers à partager sont un coût pour lui, jamais pour son auteur.
+
+*Règle D11 (`gabarits\documents\README.md`), jugée par G10 d'`oracle-gabarits-documents.mjs`.*

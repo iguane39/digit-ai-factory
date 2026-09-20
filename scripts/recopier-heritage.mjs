@@ -67,9 +67,30 @@ const norm = (s) => String(s).split("\r\n").join("\n").trimEnd();
 const FORCER = args.includes("--forcer");
 const gitProduit = (...a) => spawnSync("git", ["-C", cible, ...a], { encoding: "utf8", timeout: 20000 });
 const aGitProduit = existsSync(join(cible, ".git")) && gitProduit("rev-parse", "--git-dir").status === 0;
+// ---- TF-1171 · CE QUE LA GARDE PROTÉGEAIT ÉTAIT LA SORTIE DU PILOT LUI-MÊME -------------------
+//
+// LE FAIT, le 16/09/2026. `oracle-conformite-projet` rend R-47 FAIL sur un artefact absent et
+// prescrit ce script « EN UN GESTE ». Joué, il rend « GARDE — rien écrit », exit 2, à cause de
+// TROIS cibles modifiées-non-commises — que le hook d'ouverture de LA MÊME SESSION venait de
+// recopier depuis le pilot (« 3 artefact(s) MIS À JOUR à l'instant depuis le pilot »). Il a fallu
+// un commit intermédiaire pour que le geste prescrit puisse s'exécuter : une règle qui interdit son
+// propre remède (classe de TF-1013 et TF-1128).
+//
+// CE QUE LA GARDE JUGE, ET CE QU'ELLE JUGEAIT. Elle demandait à git si la cible était modifiée ou
+// non suivie ; l'état git dit qu'un fichier n'est PAS DANS L'HISTOIRE, jamais que son contenu porte
+// un travail. Quand le contenu de la cible est DÉJÀ celui de la source, l'écrasement est sans effet
+// et il n'y a rien à perdre — c'est le pilot qui se recopie sur lui-même. La comparaison se fait sur
+// le contenu normalisé en fins de ligne, exactement comme le mode `copie_conforme` juge la
+// conformité : deux fichiers que le contrat tient pour identiques ne peuvent pas être l'un un
+// travail local et l'autre non.
+//
+// LA GARDE RESTE ENTIÈRE POUR CE QU'ELLE PROTÈGE : une cible dont le contenu DIFFÈRE de la source,
+// modifiée ou non suivie, fait toujours basculer le geste en essai et demande `--forcer`. Les deux
+// cas du banc ne diffèrent que par le contenu de la cible.
 /** Une cible risque-t-elle de PERDRE du travail si on l'écrase ? Le motif est rendu, jamais deviné. */
-function risqueDEcrasement(dst) {
+function risqueDEcrasement(dst, src) {
   if (!aGitProduit || !existsSync(dst)) return null;
+  if (src && existsSync(src) && norm(readFileSync(dst, "utf8")) === norm(readFileSync(src, "utf8"))) return null;
   const rel = relative(cible, dst).replaceAll("\\", "/");
   if (gitProduit("ls-files", "--error-unmatch", "--", rel).status !== 0) {
     return `${rel} — présent et NON SUIVI par git : rien ne le rattraperait après écrasement`;
@@ -80,7 +101,8 @@ function risqueDEcrasement(dst) {
   return null;
 }
 const risques = contrat.artefacts
-  .map((a) => risqueDEcrasement(join(cible, String(a.cible).replaceAll("/", "\\"))))
+  .map((a) => risqueDEcrasement(join(cible, String(a.cible).replaceAll("/", "\\")),
+    join(PILOT, String(a.source).replaceAll("/", "\\"))))
   .filter(Boolean);
 let ESSAI_FORCE = false;
 if (risques.length && !FORCER && !ESSAI) {

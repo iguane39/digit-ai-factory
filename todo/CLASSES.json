@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.13.0",
- "date": "2026-09-12",
+ "version": "1.17.0",
+ "date": "2026-09-16",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -1099,6 +1099,203 @@
     "texte-sur-la-graphie-detruit-par-sa-pseudonymisation",
     "regle-balaie-prose-et-identifiants"
    ]
+  },
+  {
+   "cle": "constat-non-bloquant-jamais-lu",
+   "famille": "hook-ou-gate",
+   "libelle": "Un controle cable a un hook qui n affiche sa sortie qu en cas de blocage rend un echec que personne ne lit : il tourne, constate, sort en 0 parce qu il ne bloque que ce que le pilot peut reparer, et le defaut vit aussi longtemps qu avant son existence. Mesure le 14/09/2026 : oracle-secrets-hors-perimetre FAIL (11 porteurs hors depot, 3 dans des depots qui ne les ignorent pas, dont publies) a chaque fin de tour depuis sa pose, jamais affiche ; la rotation demandee le 30/08 sans trace. Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-6 (a))",
+   "creee_le": "2026-09-14",
+   "fondee_par": [],
+   "regle": "tout controle dont un constat ne bloque pas est cable la ou sa sortie est LUE (releve d ouverture, restitution) ; un hook qui avale la sortie d un controle non bloquant n est pas un cablage",
+   "oracle": "oracles/hook-ouverture.mjs, section « Secrets hors perimetre » (D-6 (a), 14/09/2026)",
+   "voisines": [
+    "regle-ecrite-sans-oracle-qui-la-joue",
+    "heritage-avertissement-tardif"
+   ]
+  },
+  {
+   "cle": "secret-porte-hors-perimetre",
+   "famille": "hook-ou-gate",
+   "libelle": "Un fichier porteur de secrets vit hors de tout depot, ou dans un depot qui ne l ignore pas, jusqu a etre publie : R-14 juge un depot et ne voit pas ce qui vit a cote. Un secret publie ne se retire pas, il se fait tourner. Reste du 14/09/2026 : 14 porteurs, dont des publies sur la branche principale de trois produits, clos en archive sans suite (TF-0616). Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
+   "creee_le": "2026-09-14",
+   "fondee_par": [
+    "TF-0616"
+   ],
+   "regle": "tout porteur de secret vit dans un depot qui l ignore ou dans un coffre ; un secret publie se fait tourner, le retirer du disque ne suffit pas",
+   "oracle": "oracles/oracle-secrets-hors-perimetre.mjs (SP1, SP2), lu a l ouverture (classe constat-non-bloquant-jamais-lu)",
+   "voisines": [
+    "constat-non-bloquant-jamais-lu",
+    "anonymisation-portee-partielle"
+   ]
+  },
+  {
+   "cle": "controle-ecrit-non-cable-a-son-etape",
+   "famille": "skill-ou-oracle-non-invoque",
+   "libelle": "Un controle existe, porte parfois sa recette, et aucune etape du run, aucun hook ni aucune recette ne l appelle : loi transverse n° 1, toute affordance est cablee ou n existe pas. La classe se distingue de regle-ecrite-sans-oracle-qui-la-joue (pas de controle du tout) et du controle mort (il rend PASS a tort). Releve des restes archives du 14/09/2026 : sept controles dans ce cas (TF-0522, TF-0592, TF-0594, TF-0647, TF-0669, TF-0726, TF-0733). Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
+   "creee_le": "2026-09-14",
+   "fondee_par": [
+    "TF-0522",
+    "TF-0592",
+    "TF-0594",
+    "TF-0647",
+    "TF-0669",
+    "TF-0726",
+    "TF-0733"
+   ],
+   "regle": "tout controle livre nomme l etape, le hook ou la recette qui l appelle, et un releve verifie que l appel existe",
+   "oracle": "a creer : releve des oracles du registre quality-oracles et du pilot sans appelant",
+   "voisines": [
+    "regle-ecrite-sans-oracle-qui-la-joue",
+    "lecture-tiers-non-jugee"
+   ]
+  },
+  {
+   "cle": "controle-joue-sur-fichier-pas-sur-instance-servie",
+   "famille": "page-html-socle",
+   "libelle": "Le rendu et les interactions d une page sont juges sur le fichier, jamais sur une instance servie : les etats apres interaction et les combinaisons de filtres croises ne sont joues par personne (TF-0480, TF-0493). Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
+   "creee_le": "2026-09-14",
+   "fondee_par": [
+    "TF-0480",
+    "TF-0493"
+   ],
+   "regle": "tout controle de rendu ou d interaction d une page qui sera servie se joue aussi sur une instance servie, combinaisons de filtres comprises",
+   "oracle": "a creer : matrice d etats de render_page.py sur une instance servie",
+   "voisines": [
+    "page-html-largeur-lecture-donnees"
+   ]
+  },
+  {
+   "cle": "severite-declaree-invisible-au-consommateur",
+   "famille": "regle-morte",
+   "libelle": "Une famille de mesure declare sa severite (bloquante), et ses consommateurs la lisent comme un avertissement : la severite existe dans la source et nulle part ou elle agit (TF-0531). Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
+   "creee_le": "2026-09-14",
+   "fondee_par": [
+    "TF-0531"
+   ],
+   "regle": "toute severite declaree par une famille de mesure est lue et appliquee par chacun de ses consommateurs, et un consommateur qui la rabaisse le dit",
+   "oracle": "a creer : controle de propagation de la severite des familles de mesure",
+   "voisines": [
+    "constat-non-bloquant-jamais-lu"
+   ]
+  },
+  {
+   "cle": "chaine-declaree-etapes-non-ecrites",
+   "famille": "contrat-interface-forge",
+   "libelle": "Une chaine de travail est declaree (etapes nommees, sortie promise) et la majorite de ses etapes n est ecrite nulle part : sept des dix etapes de la chaine de traduction et d audit d un produit (TF-0664). Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
+   "creee_le": "2026-09-14",
+   "fondee_par": [
+    "TF-0664"
+   ],
+   "regle": "une chaine n est declaree que si chacune de ses etapes a un porteur ecrit (skill, oracle, gabarit) ou est marquee a ecrire avec sa candidature",
+   "oracle": "a creer : releve des etapes de chaine sans porteur",
+   "voisines": [
+    "regle-ecrite-sans-oracle-qui-la-joue"
+   ]
+  },
+  {
+   "cle": "livrable-sans-identite-de-gabarit",
+   "famille": "gabarit-document",
+   "libelle": "Un livrable produit par un generateur de forge ne porte ni l identifiant ni la version de son gabarit, et un option de contournement (--gabarit) remplace la mesure de la cause : l instance perimee est invisible sur l artefact (TF-0690, TF-0702 ; regle G4 d oracle-gabarits-documents). Source : decision humaine du 14/09/2026, synthese output/04-plans/Digit-AI - Synthese Mandat - D-4 executee secrets et conception amont - 20260914d.md (D-8 (a))",
+   "creee_le": "2026-09-14",
+   "fondee_par": [
+    "TF-0690",
+    "TF-0702"
+   ],
+   "regle": "tout livrable rend visiblement l identifiant et la version de son gabarit, y compris quand il sort d un generateur de forge",
+   "oracle": "oracle-gabarits-documents G4, a etendre aux generateurs de forge",
+   "voisines": [
+    "gabarit-famille-manquante",
+    "gabarit-conception-non-jugee"
+   ]
+  },
+  {
+   "cle": "restitution-bloquants-disperses",
+   "famille": "restitution-forme",
+   "libelle": "Ce qui empeche d avancer est reparti entre plusieurs blocs de la restitution — une decision qui nomme le prealable bloquant et renvoie ailleurs, des restes aux motifs types, des actions qui repetent l information sous une autre forme — et nulle part ecrit en entier avec la valeur attendue et le geste qui le leve : le lecteur doit ouvrir un fichier pour savoir ce qui le bloque. Mesure le 13/09/2026 sur une restitution jugee PASS, production arretee (lot input/00-retours/Produit-64 - RETOURS - 20260913a.tf.jsonl, ligne 1).",
+   "creee_le": "2026-09-15",
+   "fondee_par": [],
+   "regle": "tout element qui bloque la suite est ecrit une fois, en entier, a un seul endroit de la restitution — ce qui manque, qui peut le fournir, le geste qui le leve — et les autres blocs y renvoient par son selecteur",
+   "oracle": "a creer dans oracle-synthese (candidature du lot input/00-retours/Produit-64 - RETOURS - 20260913a.tf.jsonl, ligne 1)",
+   "voisines": [
+    "restitution-fichier-juge-mal-choisi",
+    "restitution-action-humaine-geste-agent",
+    "restitution-rendu-visuel-non-critique"
+   ]
+  },
+  {
+   "cle": "preuve-produite-mais-illisible",
+   "famille": "page-html-socle",
+   "libelle": "Une preuve est produite et citee, mais elle ne peut pas etre lue par celui qui s en sert : une capture pleine page ramenee a la taille d affichage divise un corps de texte de 16 pixels par 9,5 a 23, et une revue de lecture se declare faite sur une image ou rien n est lisible. Mesure le 13-14/09/2026 : cinq defauts graphiques passes sous une revue declaree sans constat (lot input/00-retours/Produit-64 - RETOURS - 20260913a.tf.jsonl, ligne 5).",
+   "creee_le": "2026-09-15",
+   "fondee_par": [],
+   "regle": "une preuve visuelle citee a l appui d une revue est lisible a sa taille d affichage — capture decoupee ou a l echelle 1, jamais une pleine page reduite — et la revue nomme les captures qu elle a lues",
+   "oracle": "a creer dans render_page.py du socle digit-ai-page-html (candidature du lot input/00-retours/Produit-64 - RETOURS - 20260913a.tf.jsonl, ligne 5)",
+   "voisines": [
+    "restitution-rendu-visuel-non-critique",
+    "page-html-largeur-lecture-donnees"
+   ]
+  },
+  {
+   "cle": "oracle-perimetre-de-non-mesure-non-publie",
+   "famille": "regle-morte",
+   "libelle": "Un oracle rend son verdict sans publier ce qu'il ne mesure PAS — le vert se lit alors comme une absence de limite, pas comme une absence de publication",
+   "creee_le": "2026-09-16",
+   "fondee_par": [
+    "TF-1148",
+    "TF-1141"
+   ],
+   "regle": "quality-oracles §3, contrat commun : le bloc `non_juge` est obligatoire dans toute sortie d'oracle, PASS compris",
+   "oracle": "digit-ai-page-html, check_html.py — bloc « Périmètre de NON-MESURE » publié dans les DEUX sorties, texte et JSON, sur un verdict PASS comme sur un FAIL, et chaque famille hors champ vérifiée nommément par son banc (TF-1148, TF-1141)",
+   "voisines": [
+    "oracle-faux-positif",
+    "controle-vrai-sur-le-mauvais-invariant",
+    "severite-declaree-invisible-au-consommateur"
+   ]
+  },
+  {
+   "cle": "contenu-d-auteur-livre-au-lecteur",
+   "famille": "gabarit-document",
+   "libelle": "Un document livré porte du contenu destiné à son AUTEUR (registre d'arbitrages, historique de versions, statut de relecture) au lieu du seul contenu qui change ce que son LECTEUR fait",
+   "creee_le": "2026-09-16",
+   "fondee_par": [
+    "TF-1142"
+   ],
+   "regle": "à écrire — aucun gabarit de gabarits/documents/ ne porte de champ « lecteur » ni de section « ce qui sort vers le document d'auteur »",
+   "oracle": "pilot, oracles/oracle-gabarits-documents.mjs règle G10 — toute famille de la bibliothèque déclare son lecteur ET porte la section « Document d'auteur » qui nomme ce qui NE va PAS au lecteur (TF-1142)",
+   "voisines": [
+    "gabarit-famille-manquante",
+    "gabarit-conception-non-jugee",
+    "livrable-sans-identite-de-gabarit"
+   ]
+  },
+  {
+   "cle": "valeur-en-lettres-dans-un-livrable",
+   "famille": "gabarit-document",
+   "libelle": "Une valeur, une heure ou une date ecrite en toutes lettres dans un livrable — le lecteur doit la reconstituer avant de la comparer a la suivante",
+   "creee_le": "2026-09-16",
+   "fondee_par": [],
+   "regle": "references/ECRITURE.md E-14",
+   "oracle": "oracle-ecriture EC-9",
+   "voisines": []
+  },
+  {
+   "cle": "decision-sans-designateur",
+   "famille": "restitution-forme",
+   "libelle": "Une décision posée à l'humain ne NOMME pas la chose dont elle parle — des périphrases à la place du nom, et le lecteur ne peut pas trancher",
+   "creee_le": "2026-09-16",
+   "fondee_par": [],
+   "regle": "gabarits/RESTITUTION.md — le rappel de sujet d'une décision porte au moins un désignateur : un nom propre, un chemin, un identifiant, un fragment entre accents graves, ou un nom de dépôt. Quand un nom sensible appartient AU LECTEUR, il s'écrit : l'arbitrage de publication se traite ailleurs, jamais en rendant la question floue.",
+   "oracle": "pilot, oracles/oracle-synthese.mjs règle S47 — jouée par le hook Stop sur toute restitution et sur tout message de fin de tour, avec sa paire de fixtures : un rappel fait entièrement de périphrases FAIL, le même rappel nommant sa chose PASS",
+   "voisines": [
+    "lecture-tiers-non-jugee",
+    "restitution-forme-bloc-3",
+    "annonce-nominalisee"
+   ]
   }
- ]
+ ],
+ "cliquet_porteur": {
+  "depuis": "2026-09-16",
+  "regle": "Décision humaine D-3 (c) : une famille CRÉÉE à partir du 16/09/2026 nomme un contrôle qui EXISTE, ou elle ne se crée pas. Jugée par R15 de todo/oracle-todo.mjs.",
+  "anterieur": "Les familles créées AVANT le seuil et dont le juge reste à écrire sont DÉCLARÉES et comptées au `non_juge` de l'oracle, jamais mises à zéro ni tues : elles se résorbent au rythme des corrections qui les fondent. Refuser les 30 d'un coup aurait mis un tiers du référentiel au rouge, et la leçon N4 du noyau dit ce qui arrive ensuite."
+ }
 }

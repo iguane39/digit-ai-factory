@@ -7,10 +7,10 @@ D-1 (a) et D-3 (a) de la synthèse 20260911j) sur l'analyse L99
 plancher exige, à quels textes il s'applique, qui le juge, et ce qu'il ne fait pas.
 
 **Le fait qui l'a fait naître.** La forme des textes est jugée à chaque tour (quarante et une
-règles de synthèse, trente et une règles de lisibilité HTML, quatre règles Markdown, deux
+règles de synthèse, trente et une règles de lisibilité HTML, 4 règles Markdown, deux
 glossaires) ; leur style ne l'était par rien. Les retours humains de lisibilité entraient au
 registre après livraison : treize chapitres réécrits en tête le 08/09 (TF-0932), une explication
-demandée deux fois le 22/08 (TF-0511).
+demandée 2 fois le 22/08 (TF-0511).
 
 **Ce que le plancher n'est pas.** Il ne sert pas à masquer l'usage d'une IA : le ledger continue de
 déclarer ce qui est généré. Il n'interdit aucun mot ni aucun signe isolé : un tiret d'incise est
@@ -58,7 +58,7 @@ jugé à sa prochaine réécriture de fond.
 
 ## Les règles
 
-Douze règles, numérotées E-1 à E-12. Chaque règle porte les types qu'elle vise, son juge et son
+15 règles, numérotées E-1 à E-15 — les douze du plancher d'origine, puis E-13, E-14 et E-15, nées de retours humains datés. Chaque règle porte les types qu'elle vise, son juge et son
 statut : **mécanisée** (un script la joue), **déléguée** (un oracle existant la joue déjà) ou
 **revue** (aucun script ; elle se tient à la relecture, et c'est dit). Les exemples avant / après
 sont tirés de textes réels de la Factory.
@@ -72,7 +72,7 @@ vous reste à valider la lecture de votre intention. »
 
 ### E-2 — Une phrase porte une idée et un verbe
 *Tous types. Juge : `oracle-ecriture` EC-2 (phrases de plus de 35 mots en série). Mécanisée.*
-Viser vingt mots ; au-delà de trente-cinq, couper. Une phrase longue est une liberté ; trois
+Viser 20 mots ; au-delà de trente-cinq, couper. Une phrase longue est une liberté ; trois
 d'affilée avertissent ; l'échec est posé au maximum du corpus PASS (sept d'affilée, mesuré sur
 171 textes le 12/09) et se resserre à chaque recalibrage.
 
@@ -105,7 +105,7 @@ qui commencent par le même mot : la forme affirmative dit la même chose en moi
 
 ### E-8 — Le tiret, la parenthèse et les deux-points ne remplacent pas la virgule ni le point
 *Tous types. Juge : famille `ponctuation-de-cadence` de EC-1 (densité). Mécanisée.*
-Un tiret d'incise par phrase au plus. Une phrase qui rebondit trois fois se coupe en deux.
+Un tiret d'incise par phrase au plus. Une phrase qui rebondit 3 fois se coupe en deux.
 Avant (synthèse du 10/09) : « ordre retenu : remesurer — pour les mesures —, refuser de signer —
 pour les chiffres —, jouer le remède — pour le gardien lui-même. » Après : « Ordre retenu :
 remesurer les mesures, refuser de signer les chiffres, puis jouer le remède sur le gardien. »
@@ -135,16 +135,92 @@ précédent reste en prose. Découper une démonstration en puces casse le lien 
 ### E-12 — Le vocabulaire du lecteur, jamais celui du système
 *Types T2, T3, T4. Juge : `glossaire-restitution.json` (forge-data), contrat `voix.md` (T4). Revue.*
 Un terme de restitution est celui que le destinataire lit ; un terme machine reste dans le code.
-Avant (08/09, forge-data) : « grain » trente-trois fois dans un rapport. Après : « granularité »,
+Avant (08/09, forge-data) : « grain » 33 fois dans un rapport. Après : « granularité »,
 zéro emploi restant. Pour T4 : un libellé nomme ce que la personne contrôle (« Enregistrer les
 modifications », pas « Valider ») ; une erreur dit ce qui s'est passé puis comment réparer ; un
 état vide invite à agir.
+
+### E-13 — Un exemple de nom masqué se décrit ou s'invente, il ne se cite pas
+
+Un texte qui explique un défaut d'anonymisation oppose souvent deux graphies d'un même nom
+(une clé en minuscules à tirets, le même nom en majuscules à espaces). Cité tel quel, l'exemple
+passe par la pseudonymisation, qui rend les deux graphies par le même pseudonyme : la phrase dit
+alors « X dans le nom, la clé étant X » et n'explique plus rien. Cela s'est produit 2 fois
+dans un même fichier le 10/09 (TF-1007), et un message de commit a dû être réécrit par un tiers.
+L'exemple se **décrit** (« la clé en minuscules à tirets, le nom en majuscules à espaces ») ou
+se prend à un **nom inventé**, comme les bancs le font avec leurs tables jetables.
+*Contrôle* : le hook de pré-commit (`todo\pre-commit-anonymise.mjs`) avertit quand un même
+pseudonyme remplace deux graphies différentes dans une même ligne.
+
+### E-14 — Une valeur, une heure, une date s'écrivent en chiffres
+*Types T1, T2, T3, T4. Juge : EC-9 (`oracle-ecriture.mjs`). Mécanisée.*
+
+Retour humain du 16/09/2026, mot pour mot : « Utilise des chiffres plutôt que l'écriture en toutes
+lettres pour les valeurs numériques, les heures et les dates. 7 septembre ou 7/09 plutôt que sept
+septembre, 8,8 Mo plutôt que huit virgule huit. » Le fait qui l'a provoqué : une restitution écrite
+le matin même rendait ses mesures en toutes lettres — « 8,8 mégaoctets », « cent
+32 révisions », « le 7 septembre ». *Un chiffre écrit en lettres cesse d'être
+comparable d'un coup d'œil* : le lecteur doit le reconstituer avant de le mettre en regard du
+suivant, et c'est exactement ce qu'un tableau de mesures existe pour lui épargner. La règle E-3 du
+plancher demande déjà « un chiffre, un nom, un chemin, une date, sourcés » ; celle-ci dit sous
+quelle FORME, parce que la première ne le disait pas et qu'on peut donc la satisfaire en lettres.
+
+**Ce qu'elle vise** : les valeurs suivies d'une unité ou d'un dénombrable (`8,8 Mo`, `132 révisions`,
+`5 pages`, `3,9 %`), les dates (`7 septembre`, `7/09`, `16/09/2026`) et les heures (`14h05`).
+**Ce qu'elle ne vise pas**, et la frontière est nette : l'article et le pronom (« un défaut », « une
+règle »), les locutions figées (« en deux temps », « des deux côtés »). Un premier jet exemptait
+aussi les nombres qui OUVRENT une phrase, où l'usage français préfère la lettre — l'exemption est
+retirée le 16/09/2026, parce que le juge ne l'implémentait pas et qu'une règle que son juge ignore
+n'existe pas. La consigne humaine ne portait pas cette nuance : une valeur s'écrit en chiffres,
+y compris en tête de phrase.
+
+Avant (16/09, restitution du pilot) : `huit virgule huit megaoctets sur les deux cent quatre-vingts du depot, soit trois pour cent`.
+Après : « 8,8 Mo compressés sur 280, soit 3,1 % ».
+
+**L'exemple du défaut vit entre accents graves, et il l'a appris à ses dépens.** L'outil de
+conversion des producteurs a « corrigé » cette ligne-ci au premier passage : il a mis en chiffres
+l'illustration du défaut qu'elle sert à montrer, et l'exemple ne montrait plus rien. C'est la même
+classe que celle payée le matin sur le juge des restitutions — *une règle qui balaie un texte non
+délimité finit par juger sa propre démonstration*. Un avant/après ne se protège pas par la
+prudence de qui écrit : il se protège par la forme que la règle elle-même déclare hors de portée.
+
+**Le NOM d'un livrable est du texte aussi** (constat du 16/09/2026, en exécutant la décision qui
+corrige les producteurs). Les index d'`output\` sont restés non conformes après la correction de
+leurs générateurs, et la cause était ailleurs : les valeurs en lettres venaient des NOMS de
+fichiers — `Synthese Mandat - Quinze items du registre traites…`, écrit le matin même. Un nom se
+lit dans un index, dans un onglet et dans un lien ; il porte donc la règle. Les livrables déjà
+remis ne se renomment pas (règle 5) : elle vaut pour les suivants. *Aucun oracle ne juge encore le
+nom* — EC-9 lit le contenu d'un `.md`, jamais son intitulé —, et c'est déclaré ici plutôt que promis.
+
+### E-15 — Un bloc de code qu'on RECOPIE sert tout lecteur ; un bloc qu'on EXÉCUTE ne sert qu'un exécutant
+*Type T2. Juge : EC-10 (`oracle-ecriture.mjs`), qui lit le lecteur déclaré du document. Mécanisée.*
+
+Retour humain du 15/09/2026, mot pour mot : « Les développeurs IA ne sont pas des codeurs, les
+lignes de code affichées doivent donc l'être uniquement si cela est strictement nécessaire. Pour
+voir les trigrammes déjà pris, pas la peine de code "az repos list...", un simple check sur l'URL
+du repo suffit. » Mesuré sur le livrable : 18 blocs de code, dont 4 commandes de console ; les 14
+autres — métadonnées de guide, arborescence de dépôt, motifs de nommage — se **recopient**, et
+aucun n'a été contesté.
+
+La distinction porte sur le GESTE que le bloc demande, pas sur sa longueur. Un bloc qu'on recopie
+(une arborescence, un motif de nommage, un en-tête à reproduire) sert tout lecteur, y compris
+celui qui n'ouvrira jamais un terminal. Un bloc qu'on exécute ne sert qu'un lecteur qui exécute :
+pour tous les autres, il remplace une action simple par une compétence qu'ils n'ont pas.
+
+**Le juge lit le lecteur, il ne le devine pas.** Un document qui déclare `role_destinataire`
+(règle D11 des gabarits) est jugé sur cette déclaration : si le lecteur est un exécutant, les
+commandes sont à leur place ; sinon elles sont un défaut, et la règle les nomme une à une. Un
+document qui ne déclare AUCUN lecteur rend SKIP, dit à voix haute — jamais PASS par silence.
+
+Avant (15/09, guide pour développeurs assistés par IA) : un bloc `az repos list --query …` pour
+vérifier qu'un trigramme est libre. Après : « ouvrez l'URL du dépôt — si elle répond, le trigramme
+est pris ».
 
 ## Précédence
 
 1. La structure imposée par un gabarit prime (blocs et tableaux de `RESTITUTION.md`, sections
    d'une étude) : aucune règle de ce document ne s'y oppose.
-2. Le plancher (E-1 à E-12) ne se franchit pas.
+2. Le plancher (E-1 à E-15) ne se franchit pas.
 3. La voix du produit (`MARQUE.md`) se déploie au-dessus : ton, registre, vocabulaire choisi.
 4. Un conflit entre une règle de forge et ce document se tranche par la règle la plus stricte
    (R-43 : renforcer oui, assouplir jamais) et se consigne au ledger.
@@ -168,7 +244,7 @@ modifications », pas « Valider ») ; une erreur dit ce qui s'est passé puis c
 ## Mesure du gain
 
 Indicateurs relevés à la baseline du 12/09/2026 puis toutes les quatre semaines : retours humains
-de classe « jargon non glosé », « reprise de forme » et « explication demandée deux fois » par
+de classe « jargon non glosé », « reprise de forme » et « explication demandée 2 fois » par
 semaine (registre des candidats) ; taux de PASS de l'oracle sur les textes neufs ; densité
 médiane de tirets d'incise sur les synthèses du mois. La candidature TF-1064 se clôt sur gains
 constatés.

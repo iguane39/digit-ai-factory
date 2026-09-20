@@ -58,6 +58,7 @@ remplit ce tableau pour chaque type de livrable du produit, et le brief de chaqu
 | Tout écran ou maquette d'application de bureau | `references/BEST-PRACTICES-HTML.md` du pilot E5 : **viewport de conception par défaut 1920 px, responsive jusqu'au 4K** (décision humaine du 12/09/2026) ; contrat technique de forge-design | `render_page.py`, `run-oracles-design.mjs` de forge-design (grille de rendu étendue à 2560 et 3840) |
 | Tout texte Markdown écrit par le run (livrable, restitution, prompt, note) | `references/ECRITURE.md` du pilot : plancher E-1 à E-12 (lecteur nommé, phrases courtes, faits plutôt qu'adjectifs, ni annonce ni clôture résumante, ni remplissage, ni symétrie mécanique, un tiret d'incise par phrase, pas d'emphase de structure, sigles glosés) | `oracles/oracle-ecriture.mjs` du pilot (joué à chaque écriture d'un `.md` par le hook `ecriture` de `forge/hooks/factory.mjs`) ; donnée `references/tics-redactionnels.json` |
 | Textes d'application (libellés, erreurs, états vides, aide) | `references/ECRITURE.md` E-12 et contrat `voix.md` du skill `systeme-de-marque` (actions, erreurs, états vides) ; critère C15 (même libellé, même cible) | `check_maquette.py` (C15) ; style : revue, aucun oracle (lot de travaux forge-design du 12/09) |
+| Livrable de sécurité (plan de tests, audit, revue de surface exposée) | l'oracle du DOMAINE d'abord — loi `quality-oracles` : on cherche l'oracle avant d'en écrire un ; référentiels curés de `digit-ai-forge-websec` (`referentiels/asvs-l1.md`, `referentiels/wstg-cas.md`) — jamais un contrôle reconstruit par lecture du code (TF-1046) | oracles de `digit-ai-forge-websec` : `oracle-sca`, `oracle-exposition`, `oracle-dast` ; le livrable porte la trace d'exécution d'au moins l'un d'eux, ou le SKIP motivé qu'il a rendu |
 | <autre type de ce produit> | <règles> | <composant / oracle> |
 
 Un type absent de ce tableau n'a pas de règle de socle déclarée : le déclarer « aucune » est une
@@ -94,9 +95,17 @@ décision, l'omettre est un oubli (loi n° 3).
   development → MODELE-DONNEES ancré au schéma réel (R-26) · MEP → COMPOSANTS-OPS, qui porte
   DEUX inventaires — les composants DÉPLOYÉS **et** les environnements de DONNÉES interrogés,
   avec leur hôte, leur profil de connexion et le mode d'accès de chaque catalogue (TF-0594) ;
+  chaque composant y porte un Statut d'usage justifié par un consommateur, et un composant
+  inutilisé y dit ce qui cesse de fonctionner, sa supprimabilité et ce qui le crée (TF-1113,
+  TF-1117, TF-1120) ;
   un produit qui ne déploie rien y déclare quand même ce qu'il LIT · toute
   évolution de config → PARAMETRAGE/COMMANDES) ; comptes de démo locale derrière
   `MODE_DEMO`, jamais de secret.
+- **Un écart au socle détecté en cours de mandat s'écrit en retour DANS LE TOUR où il est
+  détecté** (TF-1048) — une entrée au lot de retours en cours (`forge\retours\`, avec sa classe ;
+  s'il est corrigé sur place, à la section « Remarques restées au produit »), sans attendre le hook
+  de fin de tour ni une relance humaine. C'est une obligation de l'agent, pas du hook : le hook peut
+  être muet (session ouverte à une racine englobante), l'obligation ne l'est jamais.
 - `<conventions spécifiques au produit>`
 
 ## Lexique d'invocation (RV-6, étendu aux produits par TF-0723)
@@ -124,6 +133,7 @@ premier run ; le `run_open` du ledger le recopie (TF-0373).
 | **exigences** | `<chemin>` ou `absent — <motif>` | le seul terme de comparaison EXTERNE des cas dérivés ; sans lui, un cas généré sur une garde fausse CONFIRME le bug au lieu de le révéler |
 | **anomalies** | `<chemin>` ou `absent — <motif>` | ce que le CLIENT sait déjà de ses défauts (export JSONL de son gestionnaire de tickets, `FORGE_TESTS_ANOMALIES`) |
 | **contrat_interface** | `<chemin>` ou `absent — <motif>` | ce que le produit promet à ses appelants (OpenAPI, schéma, cahier) |
+| **lexique** | `forge\LEXIQUE.json` ou `absent — <motif>` | les mots que le destinataire de CE produit a dit ne pas lire, et ceux qui les remplacent. Lu à chaque écriture d'un `.md` (EC-7) et à chaque fin de tour (S46) ; rempli par la session qui REÇOIT le retour, avant de prononcer « corrigé ». Un retour de vocabulaire clos sans descente ici s'est fait redemander par le client deux jours plus tard (TF-1045) |
 
 *Pourquoi cette section existe* : treize anomalies clients ont vécu trois semaines dans un board
 pendant que six campagnes d'audit tournaient sans savoir qu'elles existaient. Le défaut n'était

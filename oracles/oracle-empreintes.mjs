@@ -88,6 +88,38 @@ function* fichiers(dossier, prof = 0) {
   }
 }
 
+/**
+ * TF-1133 (15/09/2026) — UN SITE DÉCLARÉ SE JUGE DANS SON DÉPÔT, ET SEULEMENT SI CE DÉPÔT EST LÀ.
+ * Le `non_juge` le promettait (« les dépôts frères NON CLONÉS ne sont pas jugés ») et E1 ne le
+ * tenait pas : sur un clone frais avec deux frères, il déclarait morts dix sites vivants de forges
+ * absentes, et le circuit hébergé aurait été rouge sur un parc qui n'était pas là. La première
+ * cellule de chaque ligne de la table dit le dépôt (`pilot`, `forge-ops`…) ; un site dont AUCUN
+ * dépôt n'est cloné sous la racine est nommé hors parc, jamais compté mort.
+ */
+function sitesParDepot(texte) {
+  const par = new Map();
+  for (const ligne of String(texte).split(/\r?\n/)) {
+    if (!/^\s*\|/.test(ligne)) continue;
+    const depot = (ligne.split("|")[1] || "").replace(/\*/g, "").trim();
+    for (const m of ligne.matchAll(/`([^`]+\.(?:mjs|cjs|js|py))`/g)) {
+      const nom = basename(m[1]);
+      if (!par.has(nom)) par.set(nom, new Set());
+      par.get(nom).add(depot);
+    }
+  }
+  return par;
+}
+const dossierDuDepot = (depot) => (depot === "pilot" ? basename(PILOT) : `digit-ai-${depot}`);
+function classerMorts(morts, parDepot, depotsClones) {
+  const horsParc = [], vraimentMorts = [];
+  for (const nom of morts) {
+    const ds = [...(parDepot.get(nom) || [])];
+    if (ds.length && ds.every((d) => !depotsClones.includes(dossierDuDepot(d)))) horsParc.push({ nom, depots: ds });
+    else vraimentMorts.push(nom);
+  }
+  return { horsParc, vraimentMorts };
+}
+
 const sortir = (verdict, code) => {
   console.log(JSON.stringify({
     oracle: "oracle-empreintes", version: "1.0.0", racine: String(racine),
@@ -148,6 +180,19 @@ if (args.includes("--self-test")) {
     /app\/main\.mjs/);
   attendre("un JSON invalide est refusé, jamais ignoré", "FAIL", jouer("casse.json", "{ceci n'est pas"),
     /illisible/);
+
+  // TF-1133 — E1 par dépôt, les deux sens, sur une table inventée : un site mort d'un dépôt CLONÉ
+  // reste mort ; un site d'un dépôt NON CLONÉ est nommé hors parc, jamais compté mort.
+  const table = "| Dépôt | Site | Ce qui est scellé | Format |\n|---|---|---|---|\n"
+    + "| pilot | `scripts/vivant.mjs` · `scripts/mort.mjs` | a | b |\n| forge-exemple | `outils/ailleurs.mjs` | a | b |\n";
+  const cl = classerMorts(["mort.mjs", "ailleurs.mjs"], sitesParDepot(table), [basename(PILOT)]);
+  const casE1 = (quoi, tenu) => {
+    if (tenu) { pass++; console.log(`  [OK  ] ${quoi}`); } else { echecs.push(quoi); console.log(`  [ECHEC] ${quoi}`); }
+  };
+  casE1("E1 rouge — un site déclaré d'un dépôt CLONÉ qui ne hache plus reste un site mort",
+    cl.vraimentMorts.includes("mort.mjs") && !cl.horsParc.some((h) => h.nom === "mort.mjs"));
+  casE1("E1 — un site d'un dépôt NON CLONÉ sous la racine est nommé hors parc, jamais compté mort (TF-1133)",
+    cl.horsParc.some((h) => h.nom === "ailleurs.mjs" && h.depots.includes("forge-exemple")) && !cl.vraimentMorts.includes("ailleurs.mjs"));
 
   rmSync(base, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   console.log(`\nRecette empreintes : ${pass}/${pass + echecs.length} cas`);
@@ -251,13 +296,19 @@ for (const depot of depots) {
 }
 
 // E1 · un site déclaré qui ne hache plus (ou n'existe plus) laisse croire à une couverture.
-const morts = [...declares].filter((nom) => !trouves.has(nom));
+const { horsParc, vraimentMorts: morts } = classerMorts(
+  [...declares].filter((nom) => !trouves.has(nom)), sitesParDepot(registre), depots);
+if (horsParc.length) {
+  so("E1", String(racine), `${horsParc.length} site(s) déclaré(s) dans des dépôts NON CLONÉS sous cette racine, non jugés : ` +
+    horsParc.map((h) => `${h.nom} (${h.depots.join(", ")})`).join(", ") +
+    ". L'absence d'un dépôt n'est pas l'absence d'un site — clone frais ou runner hébergé (TF-1133)");
+}
 if (morts.length) {
   ko("E1", "references/EMPREINTES.md", `${morts.length} site(s) DÉCLARÉ(s) qui ne hachent plus ou n'existent plus : ` +
     `${morts.join(", ")}. Un registre qui garde un site mort donne une fausse impression de couverture — ` +
     "retirer la ligne, ou dire ce qui a remplacé le mécanisme");
 } else {
-  ok("E1", "references/EMPREINTES.md", `${declares.size} site(s) déclaré(s), tous présents et hachant encore`);
+  ok("E1", "references/EMPREINTES.md", `${declares.size - horsParc.length} site(s) déclaré(s) dans les dépôts clonés, tous présents et hachant encore`);
 }
 
 // E2 · LA RÈGLE QUI FAIT TENIR LA CONVENTION : aucun site non déclaré.

@@ -20,10 +20,24 @@ export function lireSource(texte) {
 
 // Mini-rendu MD (sous-ensemble volontaire : titres, tables, listes, citations,
 // paragraphes, `code`, **gras**) — tout passe par esc() AVANT les balises (S-C1).
+// UN LIEN MARKDOWN EST UN LIEN (16/09/2026). Le rendu ne les connaissait pas : « [texte](url) »
+// sortait EN CLAIR dans toutes les pages generees du parc — le lecteur voyait la syntaxe, et l'URL,
+// insecable, poussait la page. Mesure sur une etude qui cite dix-huit sources : a 390 px le
+// document mesurait 419 px de large, et l'oracle de rendu le refusait (V1) sans qu'aucun element
+// pris isolement ne soit en cause. Corriger l'affichage et le debordement est le meme geste.
+//
+// LES SCHEMES SONT EN LISTE FERMEE, et ce n'est pas un exces de prudence : la source d'une page
+// generee est un Markdown que le pilot ingere, parfois issu d'un entrant. Un « javascript: » y
+// deviendrait un lien executable dans un livrable remis a un humain. Seuls http, https, mailto et
+// les chemins relatifs passent ; le reste reste du texte, visible, jamais silencieusement retire.
+const LIEN_SUR = /^(?:(?:https?:\/\/|mailto:)[^\s"'<>]+|[.\/#][^\s"'<>]*|[A-Za-z0-9_-][^\s"':<>]*\.[A-Za-z]{2,8}(?:[#?\/][^\s"'<>]*)?)$/;
+
 function inline(s) {
   return esc(s)
     .replace(/`([^`]+)`/g, "<code>$1</code>")
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (tout, texte, url) =>
+      (LIEN_SUR.test(url) ? `<a href="${url}">${texte}</a>` : tout));
 }
 export function mdVersHtml(corps) {
   const lignes = corps.split(/\r?\n/);
@@ -37,7 +51,19 @@ export function mdVersHtml(corps) {
     if (/^\s*\|/.test(l)) {
       const rangs = [];
       while (i < lignes.length && /^\s*\|/.test(lignes[i])) { rangs.push(lignes[i]); i++; }
-      const cellules = (r) => r.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
+      // UN TUYAU ÉCHAPPÉ N'EST PAS UN SÉPARATEUR (16/09/2026, TF-0923 volet 3). Le découpage naïf
+      // sur « | » coupait les cellules à l'intérieur d'un fragment de code : la première étude passée
+      // en page portait `Databricks|médaillon|Bronze.Silver.Gold` et une commande à trois verbes
+      // alternés, et les deux lignes rendaient CINQ cellules pour un en-tête de trois. Le socle l'a
+      // nommé (règle S1) et la conséquence est celle qu'il décrit : *les valeurs glissent de colonne,
+      // la page rend faux sans jamais déborder, donc aucun contrôle de rendu ne le voit.*
+      //
+      // Markdown échappe déjà ce cas — « \\| » —, et c'est cette convention qui est honorée ici
+      // plutôt qu'une invention maison : on coupe sur les tuyaux NON précédés d'un antislash, puis on
+      // retire l'antislash d'échappement. Corriger la source ne suffisait pas : c'est le rendu qui
+      // ignorait l'échappement, et trois autres générateurs partagent cette fonction.
+      const cellules = (r) => r.trim().replace(/^\||\|$/g, "")
+        .split(/(?<!\\)\|/).map((c) => c.replace(/\\\|/g, "|").trim());
       const tetes = cellules(rangs[0]);
       const corpsT = rangs.slice(1).filter((r) => !/^\s*\|[\s:|-]+\|?\s*$/.test(r));
       out.push(`<div class="defile"><table><thead><tr>${tetes.map((t) => `<th scope="col">${inline(t)}</th>`).join("")}</tr></thead><tbody>${
@@ -116,7 +142,29 @@ export function coquille({ titre, description, front, svg, corpsHtml, source, le
     h1{font-size:1.7rem;margin:0 0 .2em} h2{font-size:1.25rem;font-weight:700;margin:1.5em 0 .4em}
     h3{font-size:1.02rem;font-weight:700;margin:1.1em 0 .3em}
     code{font-family:var(--mono);font-size:.9em}
+    /* L19 autorise nommement la coupure sur un lien : une URL est un identifiant, pas un mot. */
+    a{color:var(--blue);overflow-wrap:anywhere}
+    /* LA MESURE DE LECTURE SE POSE SUR LE CONTENEUR, JAMAIS SUR LE TEXTE (16/09/2026).
+       Mesure de l'oracle de rendu sur une page d'etude : 221 caracteres par ligne a 3840 px
+       pour un plafond de 135 (V18) — l'oeil perd le debut de la ligne suivante. Un premier
+       remede a borne le PARAGRAPHE par max-width : L2 l'a refuse aussitot, et son message
+       dit le remede juste — « poser la mesure de lecture sur le CONTENEUR (.chap.lire), pas
+       sur le texte, ET la declarer par data-mesure-lecture des lors qu'il a des freres plus
+       larges ». *Les deux regles ne se contredisent pas : ensemble, elles decrivent une
+       seule construction*, celle du gabarit de chapitre du socle (E4, token a 1 080 px).
+       Les tableaux restent FRERES du chapitre et gardent toute la largeur offerte. */
     .meta{color:var(--muted);font-size:.85rem;margin:.2em 0 0}
+    /* CENTRE, ET D'UN SEUL RYTHME. Deux mesures de l'oracle de rendu, le meme jour :
+       · L2 (conteneur) — la colonne de lecture calee A GAUCHE laissait 1 752 px de vide a droite
+         et 0 a gauche, sans voisin : le remede qu'il nomme est de la CENTRER, ou de lui donner un
+         voisin utile. Ici elle a des freres — les tableaux — mais pas a sa hauteur : on centre.
+       · V7 (rythme) — les espaces entre paragraphes mesuraient 85 / 57 / 57 / 54 px : un rythme
+         vertical qui varie sans raison se lit comme un defaut de mise en page. Les marges sont
+         posees une fois, en bas seulement, pour que deux blocs voisins ne cumulent jamais. */
+    .chap.lire{max-width:1080px;margin-inline:auto}
+    .chap.lire>*{margin-top:0;margin-bottom:16px}
+    .chap.lire>h2{margin-top:28px} .chap.lire>h3{margin-top:20px}
+    .chap.lire>*:first-child{margin-top:0}
     blockquote{margin:14px 0;padding:10px 16px;border-left:3px solid var(--blue);background:var(--surface);border-radius:0 var(--r-sm) var(--r-sm) 0;color:var(--muted)}
     blockquote p{margin:0}
     .defile{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin:10px 0}
@@ -136,8 +184,25 @@ export function coquille({ titre, description, front, svg, corpsHtml, source, le
        identifiant long dans une cellule etroite doit pouvoir se couper, une phrase jamais.
        ATTENTION : ce bloc vit dans un litteral gabarit JavaScript. Aucun accent grave ici, il
        fermerait la chaine et casserait tout ce qui suit — defaut commis en ecrivant ce commentaire. */
+    /* SUR MOBILE, L'EN-TETE AUSSI PASSE EN BLOC (16/09/2026). La regle ne convertissait que les
+       cellules de donnees : la ligne d'EN-TETE, restee en cellules de tableau, continuait d'imposer
+       sa largeur, et l'oracle mesurait un tableau a 441 px de bord droit pour une fenetre de
+       390 px (V1). Un conteneur defilant ne suffit pas a eteindre V1 — la regle mesure le bord
+       droit de chaque element, defilant ou non, et elle a raison : une page qui se lit en poussant
+       le doigt de cote se lit mal. */
+    /* CE QUI NE SE COUPE PAS POUSSE LA PAGE — ET LA COUPURE A UN PERIMETRE (16/09/2026).
+       Deux mesures sur une etude qui cite beaucoup de chemins : a 768 px un tableau sortait a
+       799 px, et a 390 px le DOCUMENT mesurait 419 px de large. La cause est un jeton insecable
+       qui impose sa longueur a sa cellule, donc au tableau, donc a la page.
+       PREMIER REMEDE, REFUSE DANS LA MINUTE : autoriser la coupure sur les cellules. L19 l'a
+       rejete, et elle a raison — un mot francais s'y casse n'importe ou (« Utilisabl/e »), et la
+       regle reserve nommement la coupure a code, pre, aux liens et aux cellules d'IDENTIFIANTS.
+       REMEDE TENU : la coupure ne touche que les fragments de CODE, ou vivent justement les
+       chemins et les identifiants qui poussaient la page. La prose n'est jamais touchee. */
+    code{overflow-wrap:anywhere}
     @media (max-width:640px){.wrap{padding:16px 12px 48px} h1{font-size:1.3rem}
-      .defile td{display:block;overflow-wrap:anywhere}}
+      .defile td,.defile th{display:block;overflow-wrap:anywhere}
+      .defile table{width:100%} .chap.lire{max-width:none}}
     @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
     @page{margin:14mm}
     @media print{.defile{overflow:visible;border:none} figure{break-inside:avoid} tr{break-inside:avoid} body{background:#fff}}
@@ -145,7 +210,7 @@ export function coquille({ titre, description, front, svg, corpsHtml, source, le
 </head>
 <body>
   <div class="wrap"><div class="colonne">
-    <header>
+    <header class="chap lire" data-mesure-lecture>
       <h1>${esc(titre)}</h1>
       <p class="meta">rôle : ${esc(front.role || "—")} · sources de vérité : <code>${esc(front.sources_de_verite || "—")}</code> · vérifié le ${esc(front.verifie_le || "—")}</p>
     </header>

@@ -64,14 +64,37 @@ Ce que le dossier contient à l'instant de la dernière régénération — chaq
 | `20260902-etude-opportunite-dataforseo-produit-02.md` | fichier | 43,7 Ko | Étude d'opportunité — entrée de DataForSEO dans le dispositif de mesure de Produit-02 — 20 |
 | `20260903-L99-amelioration-continue.md` | fichier | 42,3 Ko | Analyse L99 — « Conçois et construis un système d'amélioration continue de la factory » |
 | `20260903-recidives-mesure.md` | fichier | 7,3 Ko | Récidives au registre — mesure du pas 0 (03/09/2026) |
+| `20260907-etude-opportunite-mission-data-silver-gold-powerbi.html` | fichier | 98,2 Ko | Étude d'opportunité — préparation des forges à une mission data Silver/Gold sur Databricks |
 | `20260907-etude-opportunite-mission-data-silver-gold-powerbi.md` | fichier | 43,4 Ko | Étude d'opportunité — préparation des forges à une mission data Silver/Gold sur Databricks |
 | `20260907-L99-mission-data-silver-gold-powerbi.md` | fichier | 47,5 Ko | Analyse L99 — « Identifie les compétences manquantes des forges pour une mission data Silv |
 | `20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md` | fichier | 10,9 Ko | Pourquoi faut-il réécrire l'histoire à chaque fois, et comment cesser |
+| `20260911-etude-opportunite-communication-marketing-ao.html` | fichier | 102,3 Ko | Étude d'opportunité — communication, marketing et réponse aux appels d'offres pour Digit-A |
 | `20260911-etude-opportunite-communication-marketing-ao.md` | fichier | 45,9 Ko | Étude d'opportunité — communication, marketing et réponse aux appels d'offres pour Digit-A |
 | `20260911-L99-forge-communication-marketing.md` | fichier | 52,4 Ko | Analyse L99 — « Construire une forge communication & marketing pour Digit-AI : étude d'opp |
 | `20260911-L99-regles-d-ecriture-factory.md` | fichier | 58,5 Ko | Analyse L99 — « Améliorer tous les textes générés par la Factory : état de l'art, règles d |
+| `20260914-etude-opportunite-conception-documentaire-amont.html` | fichier | 78,0 Ko | Étude d'opportunité — conception documentaire en amont — 20260914b |
+| `20260914-etude-opportunite-conception-documentaire-amont.md` | fichier | 24,9 Ko | Étude d'opportunité — conception documentaire en amont — 20260914b |
+| `20260914-etude-opportunite-personas-par-phase.html` | fichier | 76,7 Ko | Étude d'opportunité — personas par phase de run — 20260914a |
+| `20260914-etude-opportunite-personas-par-phase.md` | fichier | 24,1 Ko | Étude d'opportunité — personas par phase de run — 20260914a |
+| `20260914-L99-conception-documentaire-amont.md` | fichier | 36,8 Ko | Analyse L99 — « Concevoir en amont les documents HTML par type de document, de contenu et  |
+| `20260914-L99-personas-par-phase.md` | fichier | 34,9 Ko | Analyse L99 — « Des personas pour apporter des points de vue différents à chaque phase d'u |
+| `20260914-personas-mesure-baseline.md` | fichier | 19,5 Ko | Relecture de référence sans persona — sortie brute (14/09/2026) |
+| `20260914-personas-mesure-echantillon.md` | fichier | 5,8 Ko | Échantillon — dix défauts échappés (14/09/2026) |
+| `20260914-personas-mesure-fiches.md` | fichier | 5,5 Ko | Fiches de persona — exploitant, utilisateur final, mainteneur (14/09/2026) |
+| `20260914-personas-mesure-passes.md` | fichier | 54,9 Ko | Relectures avec persona — sorties brutes (14/09/2026) |
+| `20260914-personas-mesure-protocole.md` | fichier | 4,4 Ko | Protocole de mesure — personas par phase (figé le 14/09/2026 à 09:12) |
+| `20260914-releve-restes-archives.md` | fichier | 6,5 Ko | Relevé des restes archivés du pilot — 103 restes, quatre catégories (14/09/2026) |
+| `20260915-etude-opportunite-inventaire-des-composants.html` | fichier | 72,7 Ko | Étude d'opportunité — inventaire des composants et prérequis d’environnement — 20260915a |
+| `20260915-etude-opportunite-inventaire-des-composants.md` | fichier | 21,0 Ko | Étude d'opportunité — inventaire des composants et prérequis d’environnement — 20260915a |
+| `20260917-etude-opportunite-gestion-reseaux-sociaux.html` | fichier | 91,9 Ko | Étude d'opportunité — gestion dans la durée de la présence de Digit-AI sur les réseaux soc |
+| `20260917-etude-opportunite-gestion-reseaux-sociaux.md` | fichier | 37,0 Ko | Étude d'opportunité — gestion dans la durée de la présence de Digit-AI sur les réseaux soc |
+| `20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md` | fichier | 18,7 Ko | Étude d'opportunité — revue hebdomadaire de l'existant — 20260917a |
+| `20260917-L99-gestion-reseaux-sociaux.md` | fichier | 45,7 Ko | Analyse L99 — « Lance une étude d'opportunités sur une forge pour la gestion de réseaux so |
+| `20260917-L99-revue-hebdomadaire-amelioration-continue.md` | fichier | 36,5 Ko | Analyse L99 — « Un process hebdomadaire d'analyse de l'existant pour l'amélioration contin |
+| `20260917-releve-autres-reseaux-sociaux.md` | fichier | 8,3 Ko | Relevé — les autres réseaux sociaux et les étapes non traitées (17/09/2026) |
+| `20260917-revue-hebdomadaire-mesure-pas0.md` | fichier | 21,2 Ko | Annexe de mesure — pas 0 de l'étude « revue hebdomadaire de l'existant » |
 | `20260919-etude-opportunite-plan-d-amelioration-post-audit.html` | fichier | 109,3 Ko | Digit-AI — Étude d'opportunité : plan d'amélioration après audit · Pilot — 20260919a |
 | `20260919-etude-opportunite-plan-d-amelioration-post-audit.md` | fichier | 31,2 Ko | Étude d'opportunité — plan d'amélioration d'une application après audit, rendu en page HTM |
 | `20260919-L99-audit-et-plan-d-amelioration-plateforme.md` | fichier | 43,3 Ko | Analyse L99 — « Un audit, et en plus un plan d'amélioration complet de la plateforme » |
 
-_57 fichier(s), 0 sous-dossier(s)_
+_80 fichier(s), 0 sous-dossier(s)_

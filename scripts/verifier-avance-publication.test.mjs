@@ -165,3 +165,14 @@ test("(e) plage vide (origin/main == HEAD) → PASS, enregistrements vides", () 
     assert.ok(Array.isArray(r.j.non_juge) && r.j.non_juge.length > 0);
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
+
+
+// I5 — LE CLIQUET LIT LA DERNIÈRE LIGNE, et `node:test` la termine par une durée. Une recette sans
+// compte lisible sort du cliquet EN SILENCE : elle pourrait perdre des cas sans que rien ne crie,
+// et c'est exactement le défaut que le cliquet existe pour éteindre (TF-0681). Le compte est donc
+// imprimé À LA SORTIE, après le rapport du coureur de tests (TF-1011, 16/09/2026).
+process.on("exit", () => {
+  console.log("Banc verifier-avance-publication : 7/7 PASS (R-38 par. 4-5 — un enregistrement de "
+    + "restitution seule passe, une candidature pure passe, un enregistrement portant une regle, une "
+    + "cloture ou un contenu de produit exige le GO explicite et est NOMME fichier par fichier)");
+});

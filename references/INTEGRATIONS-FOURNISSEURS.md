@@ -1,7 +1,7 @@
 ---
 role: les faits MESURÉS sur les interfaces de fournisseurs tiers — ceux qu'aucune documentation officielle ne dit là où on les cherche, et dont l'ignorance a coûté un aller-retour au moins une fois
 sources_de_verite: [todo/TODO.jsonl (les items qui les ont mesurés, avec leur coût), gabarits/.env.example du projet concerné (les clés et leurs portées)]
-verifie_le: 2026-08-25
+verifie_le: 2026-09-17
 ---
 
 # Faits mesurés sur les interfaces de fournisseurs
@@ -28,11 +28,14 @@ prose d'une conversation perd (TF-0588).
 
 ### Ce qui coûte si on l'ignore
 
+Sept faits sur l'API et les zones d'OVH, dont deux ont coûté un jeton perdu chacun. Une ligne vaut
+un fait mesuré, avec ce que son ignorance coûte et la commande qui le rejoue.
+
 | Fait mesuré | Ce que ça coûte | Comment le rejouer |
 |---|---|---|
 | La page de création de jeton répond **200 en GET** et **404 en HEAD** | une sonde `curl -I` déclare la page morte **à tort**, et on cherche ailleurs | `curl -s -o /dev/null -w "%{http_code}" https://www.ovh.com/auth/api/createToken` puis la même avec `-I` |
 | Dans le formulaire de jeton, chaque droit doit être **ajouté par le bouton `+`** | valider sans cliquer enregistre les méthodes avec un **chemin VIDE** : le jeton ne donne accès à rien, et tout appel rend `403 This call has not been granted`. **Deux jetons perdus ainsi** | lire la portée réellement accordée, voir la ligne suivante |
-| La portée réellement accordée se lit par **`GET /auth/currentCredential`** | c'est le **seul appel toujours autorisé**, donc la seule vérification fiable — et elle prend deux secondes | `GET /1.0/auth/currentCredential` sur l'endpoint EU |
+| La portée réellement accordée se lit par **`GET /auth/currentCredential`** | c'est le **seul appel toujours autorisé**, donc la seule vérification fiable — et elle prend 2 secondes | `GET /1.0/auth/currentCredential` sur l'endpoint EU |
 | Le `*` d'un droit **traverse les barres obliques** | `/domain/zone/x/*` couvre bien `/domain/zone/x/record/123` — vérifié empiriquement | comparer la portée accordée à un appel réel sur un sous-chemin |
 | Mais `/domain/zone/*/*` **ne couvre PAS** `/domain/zone` | énumérer les zones du compte exige **ce droit à part**, et on le découvre au moment où on en a besoin | demander `GET /domain/zone` explicitement dans la portée |
 | Un jeton scopé aux zones **ne couvre pas** `/domain/<nom>/nameServer` | changer les serveurs de noms exige `/domain/*` — découvert au moment précis où il le fallait | `GET /1.0/domain/<nom>/nameServer` avec un jeton scopé aux zones seules |
@@ -71,6 +74,9 @@ migre pour corriger.
 *Mesuré le 25/08/2026 par le run `produit-02` (TF-0611, TF-0612, TF-0613).*
 
 ### Le modèle de permissions ne dit pas ce qu'on croit
+
+Quatre faits sur les jetons de Cloudflare, dont un nom de permission inventé de mémoire qui a
+envoyé l'exploitant chercher un menu inexistant. Une ligne vaut un fait mesuré et son coût.
 
 | Fait mesuré | Ce que ça coûte si on l'ignore |
 |---|---|
@@ -113,6 +119,24 @@ ce fait au plus haut.
 - **Garde-fou indispensable** : **aucun** `MX`, `SRV`, `CNAME` de messagerie ni clé `DKIM` ne doit
   être proxifié — les proxifier **casse le courrier aussi sûrement que les oublier**. Le contrôle
   automatisable qui le vérifie après migration vit chez forge-ops.
+
+---
+
+## LinkedIn — aucun connecteur, et c'est une déclaration
+
+*Établi le 17/09/2026 par l'étude `output\03-etudes\20260917-etude-opportunite-gestion-reseaux-sociaux.md`
+(TF-1161, décision humaine D-2 (a)). L'étude du 11/09 avait retiré le connecteur de diffusion de
+son verdict en laissant la question ouverte ; elle est tranchée ici.*
+
+| Fait établi | Ce que ça coûte si on l'ignore | Comment le rejouer |
+|---|---|---|
+| **Aucun connecteur n'est déclaré, et aucun ne peut l'être sans agrément** : l'interface programmatique de gestion de communauté s'obtient en deux paliers, sur revue, pour un éditeur au cas d'usage établi | un run qui « branche LinkedIn » construit une affordance non câblée (loi n° 1) | `learn.microsoft.com/en-us/linkedin/marketing/community-management/community-management-overview` (page datée du 2026-03-31) |
+| **Toute automatisation hors de cette interface est interdite par contrat** — publier, commenter, réagir, envoyer un message, extraire | le compte de l'émetteur s'expose à une restriction ; publier et répondre sont des gestes humains | `linkedin.com/legal/user-agreement`, date « Effective on » (2025-11-03 au relevé), §8.2 |
+| **Les chiffres viennent de l'export manuel**, gratuit : page en XLS, profil en XLSX sur 365 jours glissants | sans export hebdomadaire, ni performance ni engagement ne se mesurent | aide LinkedIn, réponses a551206 (page) et a701208 (profil) |
+| **Un outil tiers agréé est une dépense récurrente** | décision humaine (R-29), jamais un choix de run ; prix non relevé | — |
+
+Le détail daté, avec sa péremption, vit dans `references\PLATEFORME-LINKEDIN.md` ; le type de run
+qui en dépend est `references\RUN-RESEAU.md`.
 
 ---
 

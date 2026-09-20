@@ -13,7 +13,11 @@
 //   --racine      racine d'installation (défaut : $FORGE_ROOT, sinon le parent de ce dépôt)
 //   --pull        met à jour (git pull --ff-only) le pilot puis les forges présentes, et
 //                 propage les skills versionnés vers la copie installée (oracle-skills
-//                 --appliquer) — lancer --pull EST la décision humaine de propagation (R-29)
+//                 --appliquer) d'un état PROPRE et PUBLIÉ de chaque forge : un dépôt source qui a
+//                 des changements non publiés sous ses skills ou ses hooks (arbre modifié, commits
+//                 non poussés) n'est pas recopié, et c'est dit en [avert] (TF-1099). Lancer --pull
+//                 décide de propager ce qui est publié — jamais un état intermédiaire que personne
+//                 n'a vu (R-29)
 //   --sans-skills ne juge ni ne propage les skills (recette sur dépôts factices)
 //   --sans-pilot  ne touche pas au dépôt pilot courant (recette)
 //   --rebatir <dépôt> [--essai]  rebâtit un clone DIVERGÉ sur son histoire publiée réécrite, sans
@@ -80,6 +84,15 @@ const FORGES = [
   // autoportant et clonable seul, donc son README est ce qui doit exister pour que la file serve.
   { nom: "digit-ai-queue", preuve: "protocole/README.md" },
 ];
+
+// LES PRODUITS DE L'ÉCOSYSTÈME QUI PORTENT SON NOM (décision humaine D-5 (a) du 17/09/2026). Un dépôt
+// nommé `digit-ai-…` n'est pas forcément une forge : `digit-ai-marketing` est un PRODUIT — il porte
+// `forge\`, `PROMPT-PRODUIT.md`, remet des lots de retours — publié sous le compte de l'écosystème.
+// Il tombait dans la question « hors liste » du balayage, et la table des pseudonymes le tenait pour
+// un nom à cacher : la porte de publication a refusé le pilot sur 40 occurrences dans 11 fichiers.
+// Il n'entre PAS dans `FORGES` : un produit ne se clone ni ne se tire à l'ouverture du poste, le pilot
+// n'y intervient que sur run demandé. Il se DÉCLARE ici, et le balayage cesse de poser la question.
+const PRODUITS_DE_L_ECOSYSTEME = new Set(["digit-ai-marketing"]);
 
 // LE PILOT ET SES NOMS D'HIER (TF-0525, mesuré le 25/08/2026). Le pilot n'est pas une forge et ne
 // figure pas dans `FORGES` : son nom s'écrivait donc en littéral à chaque endroit qui en avait
@@ -214,6 +227,18 @@ if (!sansPilot) {
   const empreinteAvant = createHash("sha256").update(readFileSync(MOI)).digest("hex");
   if (existsSync(join(ICI, ".git"))) traiterPresent("digit-ai-factory (pilot)", ICI);
   else ligne("avert", "digit-ai-factory (pilot) — pas un dépôt git : fraîcheur du pilot non vérifiable");
+  // TF-1041 (15/09/2026) — les gardes de pré-commit du pilot sont APPELÉES, pas seulement déclarées.
+  // `.git/hooks/` ne voyage pas : un clone frais ou rebâti n'avait aucun hook, et la garde des
+  // quantificateurs (TF-1010) n'était jamais jouée. Sans --pull, on mesure ; avec, on pose la copie
+  // versionnée si le hook MANQUE — jamais par-dessus un hook existant.
+  if (existsSync(join(ICI, ".git"))) {
+    const h = spawnSync(process.execPath, [join(ICI, "scripts", "verifier-hooks-git.mjs"), "--depot", ICI, ...(pull ? ["--installer"] : [])], { encoding: "utf8" });
+    const lignes = (h.stdout || "").trim().split(/\r?\n/);
+    for (const l of lignes.filter((x) => /^\[INSTALLÉ\]/.test(x))) ligne("ok", `digit-ai-factory (pilot) — ${l.replace(/^\[INSTALLÉ\]\s*/, "")}`);
+    if (h.status === 0) ligne("ok", "digit-ai-factory (pilot) — gardes de pré-commit appelées par le hook installé");
+    else if (h.status === 1) defaut(`digit-ai-factory (pilot) — ${lignes.filter((x) => x.startsWith("[FAIL]")).join(" · ").slice(0, 300)}`,
+      pull ? "fusionner à la main depuis scripts/hooks-git/pre-commit" : "node bootstrap.mjs --pull (pose le hook s'il manque)");
+  }
   const empreinteApres = createHash("sha256").update(readFileSync(MOI)).digest("hex");
   if (empreinteAvant !== empreinteApres && !process.env.BOOTSTRAP_RELANCE) {
     // Ce script vient d'être mis à jour par son propre pull : le reste doit s'exécuter avec la
@@ -422,7 +447,7 @@ console.log("");
     // de toute vérification de fraîcheur, et rien ne l'avait jamais dit. Le contrôle ne tranche pas
     // — il POSE la question, parce que la réponse (entrer dans la liste, ou être hors périmètre
     // assumé) est une décision humaine.
-    if (/^digit-ai/i.test(nom) && !horsPerimetre(nom)) {
+    if (/^digit-ai/i.test(nom) && !horsPerimetre(nom) && !PRODUITS_DE_L_ECOSYSTEME.has(nom)) {
       suspects.push({ nom, motif: `dépôt de l'écosystème HORS LISTE avec son propre origin (${o || "origin illisible"}) — ni forge suivie, ni second clone, ni mise de côté : jamais vérifié par --pull. À inscrire dans la liste des forges, ou à déclarer hors périmètre` });
     }
   }
@@ -542,9 +567,33 @@ else {
   const oracle = join(ICI, "oracles", "oracle-skills.mjs");
   if (!existsSync(oracle)) ligne("avert", "oracles/oracle-skills.mjs absent — skills non jugés");
   else {
+    // TF-1099 (14/09/2026) — L'ÉTAT INTERMÉDIAIRE D'UNE CAMPAGNE NE SE PROPAGE PAS. Ce bloc tourne à
+    // chaque ouverture de session : des arbres en cours de campagne (fichiers modifiés, commits non
+    // publiés) étaient recopiés vers la copie installée que toutes les sessions du poste exécutent.
+    // Un dépôt source qui a des changements NON PUBLIÉS sous ses skills ou ses hooks est épargné et
+    // NOMMÉ ; les autres se propagent. L'oracle n'est pas juge de l'état des dépôts : il obéit à
+    // `--sauf-sources`, et déclare ce qu'il a épargné (K12).
+    const SOUS = [".claude/skills", "skills", ".claude/hooks", "hooks"];
+    const enCours = [];
+    for (const e of readdirSync(racine, { withFileTypes: true })) {
+      if (!e.isDirectory()) continue;
+      const d = join(racine, e.name);
+      if (!existsSync(join(d, ".git"))) continue;
+      const presents = SOUS.filter((s) => existsSync(join(d, s)));
+      if (!presents.length) continue;
+      const sale = sortie(git(d, "status", "--porcelain", "--", ...presents)).split("\n").filter(Boolean).length;
+      const amont = git(d, "rev-list", "--count", "@{u}..HEAD", "--", ...presents);
+      const nonPublies = amont.status === 0 ? Number(sortie(amont)) || 0 : 0;
+      if (sale || nonPublies) enCours.push({ nom: e.name, chemin: d, sale, nonPublies });
+    }
+    for (const x of enCours) {
+      ligne("avert", `skills de ${x.nom} NON propagés : ${x.sale} fichier(s) modifié(s) et ${x.nonPublies} commit(s) non publié(s) sous ses skills ou hooks — état intermédiaire ; ils le seront au prochain --pull sur un état propre et publié (TF-1099)`);
+      averts.push(`skills de ${x.nom} épargnés (TF-1099)`);
+    }
     const juger = (appliquer) => {
       const argv = [oracle, "--racine", racine, "--installes", SKILLS_INSTALLES];
       if (appliquer) argv.push("--appliquer");
+      if (enCours.length) argv.push("--sauf-sources", enCours.map((x) => x.chemin).join(","));
       const r = run(process.execPath, argv, ICI);
       let rapport = {};
       try { rapport = JSON.parse(r.stdout); } catch { /* sortie non JSON : jugée par le code de retour */ }

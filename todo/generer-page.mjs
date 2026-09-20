@@ -35,9 +35,21 @@ import { fileURLToPath } from "node:url";
 import { empreinteFichier } from "../scripts/lib-empreinte.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
-const SRC = join(ICI, "TODO.jsonl"), ARC = join(ICI, "TODO-ARCHIVE.jsonl"), OUT = join(ICI, "TODO.html");
+// Surchargeables POUR LA RECETTE (`generer-page.test.mjs`) : sans elles, éprouver le rendu
+// obligerait à réécrire la page réelle, ce qu'aucune recette n'a le droit de faire.
+const SRC = process.env.TODO_PAGE_SOURCE || join(ICI, "TODO.jsonl");
+const ARC = process.env.TODO_PAGE_ARCHIVE || join(ICI, "TODO-ARCHIVE.jsonl");
+const OUT = process.env.TODO_PAGE_SORTIE || join(ICI, "TODO.html");
 const lire = (f) => (existsSync(f) ? readFileSync(f, "utf8").split("\n").filter((l) => l.trim()).map((l) => JSON.parse(l)) : []);
-const esc = (s) => String(s ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+// TF-1067 (12/09/2026) — UN CARACTÈRE DE CONTRÔLE SE REND VISIBLE, JAMAIS TEL QUEL. Le registre
+// porte quatre `\u0000` (un chemin « input\00-retours » écrit dans une chaîne Python non brute
+// par un producteur) : recopiés tels quels, ils faisaient de la page un fichier binaire pour grep
+// et un FAIL d'oracle-caracteres-controle. Chaque caractère de contrôle (hors tabulation et fins
+// de ligne) devient son pictogramme Unicode (U+2400…, bloc « Control Pictures ») : visible,
+// cherchable, et il dit qu'il y a là quelque chose au lieu de le cacher.
+const PICTO_CONTROLE = (c) => String.fromCharCode(c.charCodeAt(0) === 0x7f ? 0x2421 : 0x2400 + c.charCodeAt(0));
+const esc = (s) => String(s ?? "").replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, PICTO_CONTROLE)
+  .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 
 // L11 : un littéral de langage cité dans un texte (None, null…) se rend en <code> —
 // c'est un jeton technique discuté, pas une fuite de producteur (TF-0089).
@@ -456,5 +468,12 @@ const html = `<!DOCTYPE html>
 </body>
 </html>
 `;
+// TF-1067 : une page qui porterait encore un caractère de contrôle ne s'écrit pas — mieux vaut
+// une page restée à la version d'avant qu'une page binaire que personne ne voit.
+const controleRestant = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/.exec(html);
+if (controleRestant) {
+  console.error(`generer-page : REFUS d'écrire ${OUT} — caractère de contrôle U+${controleRestant[0].charCodeAt(0).toString(16).padStart(4, "0").toUpperCase()} à la position ${controleRestant.index}, hors du rendu échappé (TF-1067)`);
+  process.exit(1);
+}
 writeFileSync(OUT, html);
 console.log(`TODO.html générée — ${etats.size} items, ${parForge.size} forges (sceau ${sceau}, cartes + bascule R-30)`);

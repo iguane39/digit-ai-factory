@@ -170,6 +170,8 @@ const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
 const args = process.argv.slice(2);
 const ESSAI = args.includes("--essai");
+// TF-1083 : une correction de RÉDACTION (même contenu confié, autre forme) ne part que sur demande.
+const CORRIGER_REDACTION = args.includes("--corriger-redaction");
 const valeur = (nom) => { const i = args.indexOf(nom); return i >= 0 ? args[i + 1] : null; };
 
 /** La date du lot, au format des lots du parc. Passée en argument pour rester déterministe. */
@@ -309,6 +311,18 @@ export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
    faible selon le registre, et chacun porte son effort estimé et sa vérification. Un constat
    écarté rejoint vos « Écarts assumés » avec son motif : il ne disparaît pas.`;
 
+  // TF-1068 (14/09/2026) — LE CHEMIN DU JUGE SE CALCULE À L'ÉMISSION. L'encadré prescrivait le
+  // chemin d'un PRODUIT instancié (`forge\travaux\oracle-travaux.mjs`), qu'une forge destinataire
+  // n'a pas : la commande « obligatoire » échouait chez elle, et rien ne le disait. Le pilot
+  // regarde le destinataire comme il le fait déjà pour « Sort du lot reçu », et donne le bon.
+  const jugeHerite = existsSync(join(ligne.dossier, "forge", "travaux", "oracle-travaux.mjs"));
+  const commandeJuge = jugeHerite
+    ? 'node forge\\travaux\\oracle-travaux.mjs "<ce fichier>.md"'
+    : `node "${join(PILOT, "gabarits", "oracle-travaux-pilot.mjs")}" "<ce fichier>.md"`;
+  const raisonJuge = jugeHerite
+    ? "Chemin calculé à l'émission : votre dépôt porte le juge hérité (`forge\\travaux\\`) (TF-1068)."
+    : "Chemin calculé à l'émission : votre dépôt ne porte pas `forge\\travaux\\` — le juge se joue à sa SOURCE, chez le pilot (TF-1068).";
+
   const md = `# Travaux confiés par le pilot — ${ligne.produit} — ${jour}${indice}
 
 - **Émetteur** : \`digit-ai-factory\` (le pilot)
@@ -329,8 +343,10 @@ export function lotHeritage(ligne, jour, indice, cheminRegistre = undefined) {
 > ## ⛔ AVANT DE TRAITER — un geste, une seconde
 >
 > \`\`\`
-> node forge\\travaux\\oracle-travaux.mjs "<ce fichier>.md"
+> ${commandeJuge}
 > \`\`\`
+>
+> ${raisonJuge}
 >
 > Le même module a été joué par le pilot AVANT de déposer ce lot. Si ce fichier vous manque,
 > l'héritage n'est pas tenu — et c'est précisément le sujet de ce lot.
@@ -386,7 +402,16 @@ ${ordre}
     verification: "node c:\\dev\\digit-ai-factory\\scripts\\relever-heritage.mjs ne liste plus cet artefact",
   })), ...sidecarConstats].join("\n") + "\n";
 
-  return { md, sidecar, elements: items.length, sceauConfie };
+  // TF-1083 (14/09/2026) — LA RÉDACTION A SON EMPREINTE, DISTINCTE DE CELLE DU CONTENU CONFIÉ.
+  // Le sceau couvre ce qui est confié, pas sa formulation : c'est voulu (ne pas rabâcher), et
+  // c'était un piège — une erreur de rédaction devenait indélébile, il a fallu effacer un lot à
+  // la main chez un produit (reste de TF-0645). L'empreinte de rédaction se calcule sur le texte
+  // hors date et indice du jour ; elle dit qu'une forme a changé, et `--corriger-redaction`
+  // livre la nouvelle forme sous l'indice suivant, sans jamais toucher au contenu ni à l'ancien lot.
+  const redaction = empreinteTexte(md.split(`${jour}${indice}`).join("<lot>").split(jour).join("<jour>"), 12);
+  const mdScelle = md.replace("- **Statut** : a_traiter\n",
+    `- **Statut** : a_traiter\n- **Empreinte de la rédaction** : \`${redaction}\` — elle change quand le pilot corrige la FORME d'un lot sans en changer le contenu (TF-1083)\n`);
+  return { md: mdScelle, sidecar, elements: items.length, sceauConfie, redaction };
 }
 
 // ---- exécution ------------------------------------------------------------------------------
@@ -433,8 +458,29 @@ if (lanceEnDirect) {
       ? readdirSync(boite).filter((f) => f.endsWith(".md"))
         .map((f) => ({ nom: f, txt: readFileSync(join(boite, f), "utf8") }))
       : [];
-    const dejaLa = lotsPresents.some((l) => l.txt.includes(sceau));
-    if (dejaLa) { ignores += 1; console.log(`[DÉJÀ DÉPOSÉ] ${ligne.produit} — empreinte ${sceau}, rien de redéposé`); continue; }
+    // Tous les lots de même sceau, pas le premier trouvé : après une correction, l'ancien lot et le
+    // correctif cohabitent, et c'est la présence de la rédaction du jour dans L'UN D'EUX qui dit
+    // que rien n'est à redéposer (sans quoi chaque passage relivrerait la correction).
+    const memeSceau = lotsPresents.filter((l) => l.txt.includes(sceau));
+    const dejaLa = memeSceau[memeSceau.length - 1];
+    let correction = null;
+    if (dejaLa) {
+      if (memeSceau.some((l) => l.txt.includes(lot.redaction))) { ignores += 1; console.log(`[DÉJÀ DÉPOSÉ] ${ligne.produit} — empreinte ${sceau}, rien de redéposé`); continue; }
+      if (!CORRIGER_REDACTION) {
+        ignores += 1;
+        console.log(`[DÉJÀ DÉPOSÉ] ${ligne.produit} — empreinte ${sceau}, rien de redéposé ; sa RÉDACTION diffère de celle d'aujourd'hui (« ${dejaLa.nom} ») — \`--corriger-redaction\` livre la nouvelle forme sous l'indice suivant, sans toucher au contenu (TF-1083)`);
+        continue;
+      }
+      correction = dejaLa.nom;
+      lot.md = lot.md.replace(/^(# [^\n]+\n)/, `$1\n> **Correction de RÉDACTION** de « ${dejaLa.nom} » : le contenu confié est identique (même empreinte \`${sceau}\`), seule la forme change. Ce lot le remplace pour la lecture ; l'ancien reste dans la boîte, et son statut vous appartient (TF-1083).\n`);
+      const rejuge = verifier(lot.md, `pilot - TRAVAUX - ${jour}${indice}.md`);
+      if (rejuge.verdict === "FAIL") {
+        refuses += 1;
+        console.error(`[REFUSÉ AVANT DÉPÔT] ${ligne.produit} — le lot correctif ne tient pas sa propre forme :`);
+        for (const c of rejuge.constats.filter((x) => x.statut === "FAIL")) console.error(`  - ${c.regle} : ${c.message}`);
+        continue;
+      }
+    }
 
     // ---- INCLUSION, ET PAS SEULEMENT ÉGALITÉ (TF-0680, mesure du 26/08/2026) ---------------
     //
@@ -459,7 +505,7 @@ if (lanceEnDirect) {
     const elementsDe = (txt) => new Set([...txt.matchAll(/^### (.+?)\s*$/gm)].map((m) => m[1].trim()));
     const estATraiter = (txt) => /^-\s+\*\*Statut\*\*\s*:\s*a_traiter\s*$/m.test(txt);
     const mien = elementsDe(lot.md);
-    const englobant = lotsPresents.find((l) => {
+    const englobant = correction ? null : lotsPresents.find((l) => {
       if (!estATraiter(l.txt)) return false;             // un lot TRAITÉ ne bloque rien
       const sien = elementsDe(l.txt);
       return mien.size > 0 && [...mien].every((e) => sien.has(e));

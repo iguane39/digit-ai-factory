@@ -73,6 +73,43 @@ check("REFUS — tables illisibles : le geste LÈVE au lieu de laisser passer", 
   att(leve, "un référentiel absent laisse passer : anonymiser à moitié donnerait l'impression que le dépôt est propre");
 });
 
+// TF-0993 — CE QUI A RÉSISTÉ SE DIT. Une occurrence collée à un identifiant de CODE reste en place
+// à dessein (TF-0927) ; le geste doit la RENDRE, avec son fichier et sa ligne. Second sens : un
+// fichier dont toutes les occurrences sont substituables n'annonce aucun reste.
+check("ROUGE — une occurrence collée à un identifiant de code est RENDUE dans `refuses`, avec fichier et ligne", () => {
+  const f = poser("calcul.js", "// en-tête\nconst calc_Zorglub_total = 1;\n");
+  const r = passer({ fichiers: [f], ecrire: false, racine: DEPOT });
+  att(Array.isArray(r.refuses), "passer() ne rend pas `refuses` — ce qui a résisté reste muet");
+  const x = r.refuses.find((y) => y.fichier === f);
+  att(x, `l'occurrence laissée en place n'est pas rendue : ${JSON.stringify(r.refuses)}`);
+  att(x.ligne === 2, `ligne ${x.ligne} rendue, 2 attendue`);
+  att(/identifiant/.test(x.motif || ""), "le motif ne dit pas pourquoi l'occurrence est restée");
+  att(!/Zorglub/.test(x.autour || ""), "le contexte rendu répète le nom réel au lieu de le masquer");
+});
+
+check("VERT — toutes les occurrences substituables : aucun reste annoncé", () => {
+  const f = poser("prose.md", "Le client Zorglub a signé.\n");
+  const r = passer({ fichiers: [f], ecrire: false, racine: DEPOT });
+  att(r.refuses.length === 0, `un reste est annoncé alors que tout a été substitué : ${JSON.stringify(r.refuses)}`);
+});
+
+// TF-1007 — L'EXEMPLE RENDU TAUTOLOGIQUE. Deux graphies d'un même nom de produit (clé à tirets,
+// nom à espaces) dans une ligne : la pseudonymisation les rend par le MÊME pseudonyme. Le geste
+// doit le signaler ; deux occurrences d'une MÊME graphie ne le doivent pas.
+check("ROUGE — deux graphies différentes rendues par le même pseudonyme : tautologie signalée, ligne et nombre", () => {
+  const f = poser("graphies.md", "intro\nla clé calculatrice-zorglub-zap, et le nom Calculatrice Zorglub ZAP dans le rapport\n");
+  const r = passer({ fichiers: [f], ecrire: false, racine: DEPOT });
+  const t = (r.tautologies || []).find((x) => x.fichier === f);
+  att(t, `aucune tautologie signalée : ${JSON.stringify(r.tautologies)}`);
+  att(t.ligne === 2 && t.pseudo === "Produit-01" && t.graphies === 2, `signalement inexact : ${JSON.stringify(t)}`);
+});
+
+check("VERT — la même graphie deux fois dans une ligne : rien à signaler", () => {
+  const f = poser("meme-graphie.md", "Le client Zorglub a signé, et Zorglub paiera.\n");
+  const r = passer({ fichiers: [f], ecrire: false, racine: DEPOT });
+  att(!(r.tautologies || []).some((x) => x.fichier === f), `une répétition d'une même graphie est prise pour une tautologie : ${JSON.stringify(r.tautologies)}`);
+});
+
 check("le mode essai n'écrit rien — le fichier porteur est intact après la passe", () => {
   const f = poser("essai.md", "Lot de Zorglub.\n");
   passer({ fichiers: [f], ecrire: false, racine: DEPOT });

@@ -9,7 +9,13 @@
 // cloné : pour chaque table, chaque clé de l'ancien fichier absente du canal y est ajoutée avec SON
 // pseudonyme — sauf conflit, qui est nommé et laissé à l'humain :
 //   · même clé, pseudonyme différent des deux côtés ;
-//   · pseudonyme déjà porté au canal par une autre clé (sinon deux produits sous un même numéro).
+//   · pseudonyme déjà porté au canal par une autre clé (sinon deux produits sous un même numéro) ;
+//   · CLÉ qui EST déjà un pseudonyme (TF-0959) — de la forme `Produit-NN` / `Client-X`, ou valeur
+//     déjà attribuée par la table : la table se mettrait à pseudonymiser son propre pseudonyme.
+//     Fait du 08/09 au matin : l'arbitrage des tables de deux postes l'a fait une fois, et la porte
+//     a condamné trois dépôts avant la rectification à la main. La garde existait depuis le 02/09
+//     dans `todo\anonymiser-entrant.mjs` (« un nom qui EST déjà un pseudonyme ne s'inscrit pas »),
+//     pas ici, où elle valait aussi.
 // DEUX PASSES : tout est d'abord évalué, rien n'est écrit tant qu'UN conflit existe dans l'une des
 // deux tables (un canal à moitié fusionné serait pire que pas fusionné). Sans conflit et sans
 // --essai, le canal est écrit et les anciens fichiers renommés `*.fusionne-<date>.json` (jamais
@@ -26,6 +32,9 @@ if (!existsSync(join(canal, "tables"))) { console.error(`illisible : le canal n'
 const jour = new Date().toISOString().slice(0, 10);
 const rapport = { canal, essai, tables: {}, conflits: [], ajouts: 0 };
 const normal = (k) => k.toLowerCase().replace(/[^a-z0-9]/g, "");
+// TF-0959 : une clé de la FORME d'un pseudonyme, ou déjà attribuée comme valeur, n'est pas un nom réel.
+const FORME_PSEUDONYME = /^(Produit-\d{2,}|Client-[A-Z]{1,3})$/i;
+const estPseudonyme = (k, valeurs) => FORME_PSEUDONYME.test(String(k).trim()) || valeurs.has(k);
 
 // Passe 1 : évaluer, sans écrire.
 const plans = [];
@@ -39,15 +48,23 @@ for (const [quoi, ancien, neuf] of paires) {
   let ajouts = 0;
   if (quoi === "produits") {
     const portes = new Map(Object.entries(n.produits).map(([k, v]) => [v, k]));
+    const valeursP = new Set([...Object.values(n.produits), ...Object.values(a.produits || {})]);
     for (const [k, v] of Object.entries(a.produits || {})) {
+      if (estPseudonyme(k, valeursP)) { rapport.conflits.push(`produits : la clé « ${k} » EST déjà un pseudonyme (l'ancien fichier lui donne ${v}) — une table qui pseudonymise ses propres pseudonymes décale tout le parc d'un cran (TF-0959)`); continue; }
       if (k in n.produits) { if (n.produits[k] !== v) rapport.conflits.push(`produits : clé « ${k} » → ${v} ici, ${n.produits[k]} au canal`); continue; }
       if (portes.has(v) && normal(portes.get(v)) !== normal(k)) { rapport.conflits.push(`produits : ${v} est déjà porté au canal par « ${portes.get(v)} », l'ancien fichier le donne à « ${k} »`); continue; }
       n.produits[k] = v; portes.set(v, k); ajouts++;
     }
     if (ajouts) n.date_derniere_extension = jour;
   } else {
-    for (const champ of ["noms", "identifiants", "sigles"]) for (const x of a[champ] || []) if (!(n[champ] || []).includes(x)) { (n[champ] ||= []).push(x); ajouts++; }
+    const valeursC = new Set([...Object.values(n.pseudonymes || {}), ...Object.values(a.pseudonymes || {})]);
+    for (const champ of ["noms", "identifiants", "sigles"]) for (const x of a[champ] || []) {
+      if (estPseudonyme(x, valeursC)) { rapport.conflits.push(`clients : « ${x} » (${champ}) EST déjà un pseudonyme — il ne s'inscrit pas comme nom réel (TF-0959)`); continue; }
+      if (!(n[champ] || []).includes(x)) { (n[champ] ||= []).push(x); ajouts++; }
+    }
     for (const [k, v] of Object.entries(a.pseudonymes || {})) {
+      if (estPseudonyme(k, valeursC)) continue; // déjà nommé en conflit ci-dessus s'il était listé
+
       if (k in (n.pseudonymes || {})) { if (n.pseudonymes[k] !== v) rapport.conflits.push(`clients : « ${k} » → ${v} ici, ${n.pseudonymes[k]} au canal`); continue; }
       (n.pseudonymes ||= {})[k] = v; ajouts++;
     }

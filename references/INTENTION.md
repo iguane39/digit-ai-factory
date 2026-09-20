@@ -1,6 +1,6 @@
 # La cascade de l'intention — Intention → Stratégie → Tactique → Opérationnel
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 1.1.0, 14/09/2026** (le contrôle s'étend aux restitutions, S45 ; précédente 1.0.0, 01/09/2026). Porté par la
+Référentiel versionné (loi n° 4, daté-éditable) — **version 1.1.0, 20/09/2026** (le contrôle s'étend aux restitutions, S51 ; précédente 1.0.0, 01/09/2026). Porté par la
 **loi transverse n° 7** du noyau ; né du retour humain du 01/09/2026 (TF-0791) et décidé le
 même jour (D-2, option a).
 
@@ -62,11 +62,10 @@ aller-retour qui coûte moins qu'il ne rapporte.
 - **Études d'opportunité** : `oracles\oracle-etude-opportunite.mjs` — **E9** (section
   « Intention de l'utilisateur » présente, citation dans les mots du demandeur) et **E10**
   (test rétro présent et joué). Gabarit porteur : `gabarits\ETUDE-OPPORTUNITE.md`.
-- **Restitutions — tout message de fin de traitement** (décision du 08/09, option 1, exécutée le
-  14/09 ; TF-0791) : `oracles\oracle-synthese.mjs` **S45** — le bloc 6 porte l'intention citée
-  (« Intention : « … » ») et le test rétro (« Test rétro : … »). Gabarit porteur :
-  `gabarits\RESTITUTION.md`, bloc 6. Ne juge que les restitutions datées du 15/09/2026 ou après :
-  les antérieures n'ont pas pu connaître la règle.
+- **Restitutions — tout message de fin de traitement** (décision du 08/09, option 1 ; TF-0791) :
+  `oracles\oracle-synthese.mjs` **S51**, depuis le 17/09/2026 — le bloc 1 porte l'intention
+  initiale de la demande et son test rétro ; un écart s'écrit au bloc 6. Présence des deux pièces,
+  jamais leur justesse. Gabarit porteur : `gabarits\RESTITUTION.md`, bloc 1.
 - **Le fond n'est pas mécanisable** et c'est déclaré : aucun oracle ne mesure qu'une
   remontée est *juste*, ni qu'une intention citée est *la vraie*. La validation de
   l'intention par l'utilisateur (niveau 1) est le seul contrôle du fond — humaine, tracée.

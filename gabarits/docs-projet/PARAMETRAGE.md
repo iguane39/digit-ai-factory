@@ -45,43 +45,12 @@ renseigné, et **recopier le message de l'amont** dans son propre diagnostic au 
 remplacer par un code générique. Une variable absente du gabarit ne se devine pas ; un message
 d'erreur avalé se paie en redéploiements.
 
-### Identifier un secret sans le publier — son EMPREINTE (TF-0986)
-
-La valeur d'un secret ne s'écrit jamais ici (R-13, R-14). Mais « secret, au coffre » ne répond à
-aucune des trois questions d'exploitation les plus courantes : les deux environnements partagent-ils
-cette clé ? celle en place est-elle celle qui a été mise en circulation ? une rotation a-t-elle pris
-effet ? Un secret se désigne donc par son **empreinte** : ses **5 premiers caractères et sa
-longueur**, jamais sa valeur.
-
-| Secret | Environnement | Empreinte (5 premiers caractères · longueur) | Relevée le | Relevée depuis |
-|---|---|---|---|---|
-| {NOM_DU_SECRET} | {qualif} | {abcde… · 32} | {AAAA-MM-JJ} | {l'exécution qui le porte : conteneur servi, fonction, job} |
-
-- le relevé se fait **depuis l'exécution qui porte le secret** (le conteneur servi, la fonction),
-  jamais depuis le coffre : aucune valeur ne transite par un poste de travail ;
-- la **longueur** détecte une clé tronquée par un copier-coller ; deux empreintes différentes pour
-  une même variable disent qu'une rotation faite d'un côté ne couvre pas l'autre ;
-- l'empreinte est **datée** : c'est une donnée volatile (loi n° 4), elle se relève de nouveau après
-  toute rotation.
-
-**Le fait qui l'impose (08/09)** : le document remis écrivait « secret, au coffre » et s'en
-satisfaisait. Relevées depuis les conteneurs servis, les deux clés d'abonnement de dev et de qualif
-étaient DIFFÉRENTES, toutes deux de 32 caractères — ce que personne ne pouvait savoir, et qui
-signifiait qu'une rotation faite d'un côté ne couvrait pas l'autre. Refuser d'écrire cinq caractères
-protégeait une entropie négligeable et laissait trois questions sans réponse.
-
 ## URLs & ports par environnement
 
 > **R-24 (décision du 11/08)** : tout hôte applicatif hébergé est préfixé
 > `<nom-appli>-<env>.` avec env ∈ {`dev`, `qualif`, `production`} — ex.
 > `https://produit-02-production.up.railway.app`. Le staging outillé de
 > l'étape MEP s'appelle **qualif** dans les URLs. Local et BDD hors périmètre.
->
-> **Tableau AUTOSUFFISANT (R-20, TF-0985)** : le lecteur arrive par SON environnement, jamais par
-> le début du document. Chaque ligne porte tout ce qui sert à l'action — y compris ce qui ne varie
-> pas d'un environnement à l'autre (méthode, route, en-têtes). « idem », « voir ci-dessus » ou
-> « défaut du code » sans la valeur résolue sont refusés dans ce tableau ; la factorisation reste
-> admise dans la prose qui EXPLIQUE, jamais dans le tableau dont on se sert.
 
 | Environnement | Front | Back/API | BDD | Notes |
 |---|---|---|---|---|

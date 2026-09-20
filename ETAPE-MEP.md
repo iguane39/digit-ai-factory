@@ -18,6 +18,9 @@ Qui fait quoi, et surtout qui NE decide pas : ce tableau se lit par acteur, et l
 | forge-ops | `ops.mjs deployer <build> <cible>` (healthcheck **avant** bascule, `COURANT` atomique), `restaurer` (rollback re-vérifié puis journalisé), `journal.jsonl` append-only |
 | oracle-ops (O-1…O-4) | pointeur sain, healthcheck rejoué, journal intègre, rollback prouvable — verdicts versés au dossier MEP |
 | oracle-ops (O-8, TF-0527) | tout travail PLANIFIÉ installé par la MEP est exerçable à la demande, câblé et distinct de sa cadence — consommé par M-7, § 3 quinquies |
+| oracle-ops (O-7, TF-1075) | l'ensemble servi est conforme à son scellé (empreinte de TOUT l'arbre déployé) — contrôle exécutable de M-8, § 3 sexies |
+| oracle-ops (O-13, TF-1116 et TF-1118) | tout geste destructif écrit dans un document d'exploitation ou un carnet d'écarts porte sa MATURITÉ (éprouvé sur cette cible, ou déduit et à mesurer) et sa MESURE DE NON-RÉGRESSION — joué sur les documents que la MEP produit, § 3 septies |
+| oracle-ops (O-14, TF-1114) | chaque nom de l'export machine du parc figure littéralement dans `docs\projet\COMPOSANTS-OPS.md` — joué à chaque MEP qui actualise ce document, § 3 septies |
 | pilot (cette étape) | orchestre les gestes, exécute M-1…M-5 (qui consomme O-1…O-4 comme preuves), assemble `DOSSIER-MEP.md` |
 | humain | **GO production** — incompressible, jamais délégué à un oracle |
 
@@ -73,13 +76,13 @@ au rapport : un seuil qu'on ne lit pas est un seuil qu'on ne discute pas.
 compte échoue, la campagne est proposée. Le choix inverse ferait passer un projet neuf entre les
 mailles pour toujours, et personne ne le verrait — c'est la forme la plus coûteuse du silence.
 
-**Et la règle a son EXÉCUTANT, sinon elle décore (01/09, le jour même).** `node oracles\oracle-trace-mutation-mep.mjs <produit>` juge le dossier de MEP en trois règles : **TM1** le dossier NOMME l'état de la campagne — jouée, ou proposée puis refusée, le silence étant le défaut fondateur ; **TM2** une campagne déclarée jouée porte sa preuve chiffrée ou localisante, jamais un ✓ nu ; **TM3** elle est ADOSSÉE au marqueur que la campagne écrit elle-même chez le produit — c'est la seule des trois qu'une phrase bien tournée ne peut pas satisfaire. Un produit sans dossier de MEP rend SANS_OBJET et jamais FAIL : l'étape n'a pas été atteinte, et juger une absence d'événement reviendrait à accabler un projet pour ne pas être allé assez loin.
+**Et la règle a son EXÉCUTANT, sinon elle décore (01/09, le jour même).** `node oracles\oracle-trace-mutation-mep.mjs <produit>` juge le dossier de MEP en 3 règles : **TM1** le dossier NOMME l'état de la campagne — jouée, ou proposée puis refusée, le silence étant le défaut fondateur ; **TM2** une campagne déclarée jouée porte sa preuve chiffrée ou localisante, jamais un ✓ nu ; **TM3** elle est ADOSSÉE au marqueur que la campagne écrit elle-même chez le produit — c'est la seule des trois qu'une phrase bien tournée ne peut pas satisfaire. Un produit sans dossier de MEP rend SANS_OBJET et jamais FAIL : l'étape n'a pas été atteinte, et juger une absence d'événement reviendrait à accabler un projet pour ne pas être allé assez loin.
 
 **Ce que le seuil bloquant devient quand le pan n'est pas joué** : sans porteur, et le rapport le
 DIT. Un pan non demandé et un pan dont le score est nul sont deux choses différentes ; les
 confondre au tableau de bord ferait lire une absence de mesure comme un échec de mesure.
 
-**Et quand la campagne est jouée, elle l'est DEUX FOIS la première fois (D-36 (a), 01/09/2026).**
+**Et quand la campagne est jouée, elle l'est 2 FOIS la première fois (D-36 (a), 01/09/2026).**
 Le ciblage par ligne mutée — ne rejouer, pour un mutant, que les tests couvrant la ligne
 altérée — est écrit et éteint. La décision humaine le laisse éteint jusqu'à sa vérification, et
 cette vérification se joue **à la prochaine campagne réelle**, pas « un jour » :
@@ -116,7 +119,7 @@ sert n'est pas une précaution, c'est une croyance.
 
 Ce n'est pas propre à un moteur : **tout secours imprimé dans un journal est exposé au même effet**,
 et le masquage est par nature imprévisible puisqu'il dépend de ce que le moteur a appris à masquer.
-Trois règles en sortent, et la troisième est celle qui manquait partout :
+3 règles en sortent, et la troisième est celle qui manquait partout :
 
 1. **Le retour arrière est un ARTEFACT** — `ROLLBACK.md` sur disque, versionné, remis au dossier de
    MEP. Le journal peut le répéter ; il ne le remplace pas.
@@ -144,34 +147,14 @@ Cinq controles, et pour chacun **la preuve exigee** — pas la case a cocher. Le
 |---|---|---|
 | M-1 | Build du conteneur | `docker build` exit 0, image taguée `<produit>:<run-id>` |
 | M-2 | Healthcheck | HTTP 200 sur l'endpoint de santé de l'instance staging, 3 mesures espacées de 10 s |
-| M-3 | Smoke tests | ≥ 1 parcours rejoué par exigence MVP d'impact maximal (champ `cotation.impact` du référentiel `EXIGENCES.json` — toutes les ex æquo du niveau le plus élevé), exécutés **contre l'instance staging servie**, pas contre un TestClient ; tout parcours qui **s'AUTHENTIFIE auprès d'un service externe** (identité managée, fournisseur de jetons, clé d'API) en fait partie et se rejoue depuis l'instance servie — une chaîne d'authentification se prouve là où le code tourne, jamais au seul banc (§ 3 septies, TF-0964) |
+| M-3 | Smoke tests | ≥ 1 parcours rejoué par exigence MVP d'impact maximal (champ `cotation.impact` du référentiel `EXIGENCES.json` — toutes les ex æquo du niveau le plus élevé), exécutés **contre l'instance staging servie**, pas contre un TestClient |
 | M-4 | Rollback | procédure de `ROLLBACK.md` exécutée une fois avec succès (retour N-1 + healthcheck 200 + retour N) **et RELUE après coup** : le fichier ne porte aucune valeur masquée (`***`, `[REDACTED]`) ni vide — §2 bis, TF-0512 |
 | M-5 | Propreté | aucun secret en clair dans l'image ni dans compose (scan des fichiers embarqués) |
 | M-6 | Hôte historique | **si et seulement si** le produit déclare un hôte historique : la CIBLE d'une redirection résout et répond AVANT que la redirection soit armée, et l'ANCIEN hôte est interrogé APRÈS déploiement (200, ou 301 vers un emplacement qui répond, chemin et requête préservés) — §3 quater, TF-0482 |
 | M-7 | Travail planifié | **si et seulement si** le produit embarque une définition planifiée (cron) : elle porte un mode d'exercice à la demande CÂBLÉ, distinct de sa cadence, et elle a été EXERCÉE une fois — verdict O-8 de forge-ops, § 3 quinquies, TF-0527 |
-| M-8 | **Jalon de fraîcheur DÉRIVÉ DE TOUT L'ENSEMBLE DÉPLOYÉ** | **si et seulement si** le déploiement est gardé par une porte qui attend de voir « la nouvelle version en ligne » : la valeur qu'elle compare est une **fonction de l'ENSEMBLE déployé** — empreinte du **manifeste de l'arbre de sortie** (chemins triés + hachages, condensés), ou **identifiant de commit injecté à la génération**. Jamais un numéro tenu à la main ; **jamais non plus l'empreinte d'un artefact échantillonné**. Le critère tient en une phrase : *si on ne sait pas dire « elle change dès que N'IMPORTE QUOI change », le jalon échantillonne.* Preuve exigée : un **test négatif joué sur un fichier QUELCONQUE de l'arbre**, pas sur celui que la porte regarde — §3 sexies, TF-0666 et TF-0672 |
+| M-8 | **Jalon de fraîcheur DÉRIVÉ DE TOUT L'ENSEMBLE DÉPLOYÉ** | **si et seulement si** le déploiement est gardé par une porte qui attend de voir « la nouvelle version en ligne » : la valeur qu'elle compare est une **fonction de l'ENSEMBLE déployé** — empreinte du **manifeste de l'arbre de sortie** (chemins triés + hachages, condensés), ou **identifiant de commit injecté à la génération**. Jamais un numéro tenu à la main ; **jamais non plus l'empreinte d'un artefact échantillonné**. Le critère tient en une phrase : *si on ne sait pas dire « elle change dès que N'IMPORTE QUOI change », le jalon échantillonne.* Preuve exigée : un **test négatif joué sur un fichier QUELCONQUE de l'arbre**, pas sur celui que la porte regarde — §3 sexies, TF-0666 et TF-0672. **Contrôle exécutable : la règle O-7 de forge-ops** (`node <ops>\oracles\oracle-ops.mjs <cible> --empreinte`, empreinte de l'ensemble déployé confrontée au scellé) ; sa preuve par perturbation — une page hors accueil modifiée, qu'un critère sur une seule page ne voit pas et qu'O-7 nomme — est jouée au self-test de forge-ops depuis 2fe5f3d (TF-1075) |
 
 | M-9 | **404 personnalisée, par langue, statut conservé** | **si et seulement si** le produit a une surface web : sur l'instance staging servie, (a) une adresse inconnue sous chaque préfixe de langue rend **404** (jamais 200) avec une page du MÊME gabarit que les autres — menu, charte, liens de secours — dans la langue du préfixe, **et une adresse inconnue SANS préfixe rend le même 404 dans la langue par défaut** (TF-0809) ; (b) la page porte `noindex` et l'exclusion du sitemap est **déclarée** dans l'oracle SEO du produit ; (c) une ressource non-HTML inconnue rend un 404 **nu**. Preuve : la sortie JSON de la **recette générique de forge-tests** `recette\quatre_cent_quatre.py` (paramètres : URL de staging, préfixes de langue, langue par défaut, sitemap — TF-0803, 05/09/2026) jouée contre l'instance staging ; un contrôle propre au produit n'est admis que s'il joue les mêmes cas et le dit (TF-0808). Patron **P-2**, `references\PATRONS-EPROUVES.md` — TF-0802. |
-
-### § 3 septies — Une chaîne d'authentification se prouve LÀ OÙ LE CODE TOURNE (M-3, TF-0964, 14/09/2026)
-
-**Le fait, du 08/09/2026.** Un module d'expédition portait depuis deux jours un commentaire de neuf
-lignes expliquant pourquoi l'identifiant client de l'identité managée est EXIGÉ : l'application ne
-porte qu'une identité assignée par l'utilisateur, et un fournisseur de jetons construit sans cet
-identifiant échoue avec un message qui ne nomme pas la cause. Le module de stockage écrit deux jours
-plus tard a construit son fournisseur de jetons SANS argument, et a échoué exactement ainsi dans le
-conteneur servi. Ni la revue, ni l'analyse statique, ni 819 tests verts ne pouvaient le voir : les
-tests de route remplacent le client du service, ceux du client remplacent le conteneur. Le défaut
-n'a été trouvé qu'en exécutant le code dans le conteneur déployé. *Tous les oracles étaient verts et
-la fonctionnalité était cassée : la preuve exigée au bloc 4 d'une restitution était exécutée, mais
-pas LÀ OÙ LE CODE TOURNE.*
-
-**D'où M-3 étendu** : un parcours qui s'authentifie auprès d'un service externe se rejoue contre
-l'instance servie, jamais au seul banc — un banc qui remplace le client prouve la logique, jamais la
-chaîne d'authentification. **Ce qui n'est pas mécanisé ici, et c'est dit** : le contrôle statique
-« fournisseur de jetons construit sans identifiant alors que le déploiement pose une identité
-assignée par l'utilisateur » relève d'une forge qui contrôle le code du produit ; il est versé en
-candidature, il ne se code pas dans cette étape.
 
 ### § 3 sexies — Une porte qui ne distingue pas l'avant de l'après valide un déploiement qui n'a pas eu lieu (M-8, TF-0666)
 
@@ -188,7 +171,7 @@ balisage attendu était bien servi. *Le rouge était faux.*
 **Le faux rouge est le symptôme bénin ; le faux vert est le vrai risque.** Une porte incapable de
 distinguer l'avant de l'après valide aussi bien un déploiement **qui n'a pas eu lieu** — et c'est
 exactement le défaut que cette porte avait été écrite pour empêcher, après qu'une poussée n'eut
-rien déclenché et que la production eut servi l'ancienne version cinq minutes sans que rien ne le
+rien déclenché et que la production eut servi l'ancienne version 5 minutes sans que rien ne le
 signale. **La promesse était tenue à la lettre — la version est bien LUE dans le dépôt — et
 manquée dans l'esprit, puisqu'elle n'y VARIE pas.**
 
@@ -204,7 +187,7 @@ lendemain**. La porte lisait l'empreinte d'**UNE** page et concluait sur les **2
 sur une poussée réelle : **70 pages HTML modifiées, la page échantillonnée inchangée**, donc
 empreinte attendue identique à celle que servait encore l'ancien conteneur. La porte a écrit
 « déploiement en ligne au bout de 1 essai », les dix contrôles sont passés au vert et le
-rapport a conclu « production conforme » — pendant qu'au même instant deux pages servaient
+rapport a conclu « production conforme » — pendant qu'au même instant 2 pages servaient
 encore le contenu supprimé. Le déploiement réel a atterri **90 secondes plus tard**.
 
 **Une valeur qui ne varie JAMAIS avait été remplacée par une valeur qui ne varie QUE POUR UN
@@ -220,7 +203,7 @@ a mordu était l'INVERSE — le contenu avait changé sur 70 pages et la porte n
 il était **plus probable** que celui qui avait été prévu. **Déclarer un angle résiduel ne
 couvre que l'angle nommé**, et la déclaration donne un faux sentiment d'exhaustivité :
 l'écrire fait croire qu'on a fait le tour. Un aveu borné reste un aveu, jamais une couverture.
-*Cette page a payé sa propre règle en moins de vingt-quatre heures.*
+*Cette page a payé sa propre règle en moins de 24 heures.*
 
 **CE QUI RESTE OUVERT, sans prétendre que la liste soit close.** Le mécanisme d'attente
 lui-même n'est pas revu : même avec une valeur correcte, la porte reste une **comparaison
@@ -283,7 +266,7 @@ quelque chose à juger serait pire que ne rien juger.
 le relevé remis à l'humain annonçait « la veille est en place ». Son premier passage a rendu
 « Pas le premier lundi du mois — rien à faire » et s'est terminé **en succès**. Le script n'avait
 donc **jamais tourné sur un agent** : ni ses dépendances, ni son accès réseau, ni la présence de
-son interpréteur n'avaient été éprouvés. Le premier passage réel aurait eu lieu **quinze jours plus
+son interpréteur n'avaient été éprouvés. Le premier passage réel aurait eu lieu **15 jours plus
 tard**, au moment précis où l'on compte dessus. Après ajout d'un paramètre d'exécution forcée
 — distinct de la cadence, qui n'a pas changé — le mécanisme a tourné pour de vrai : trois contrôles
 rendus, tous verts, en 40 secondes.
@@ -308,6 +291,32 @@ déclarées hors jugement, pas jugées vertes.
 
 **Contrôle exécutable** (chez forge-ops) :
 `node <ops>\oracles\oracle-ops.mjs <racine-du-produit> --planifie` — verdict O-8.
+
+### § 3 septies — Un geste destructif et un inventaire se jugent contre le réel (O-13, O-14)
+
+**Le fait, mesuré le 14/09/2026 chez un produit.** Un correctif réussi sur un environnement a été
+écrit comme geste à jouer sur un second, où il était infaisable : 161 adresses de sortie contre une
+seule. Rien ne distinguait ce geste DÉDUIT d'un geste ÉPROUVÉ (TF-1116). Sur 10 lignes d'un
+inventaire de suppression, aucune ne portait la vérification qui prouve que rien n'a rompu, alors
+qu'une suppression d'infrastructure casse à retardement (TF-1118). Et l'inventaire des composants
+restait conforme un mois entier pendant que le parc changeait de moitié : sept noms de l'export
+réel manquaient au document (TF-1114).
+
+**Ce que la MEP exige, et le contrôle qui le joue** (forge-ops b7ea0ea) :
+- tout geste destructif (supprimer, retirer, fermer, purger, détruire) écrit dans `DOSSIER-MEP.md`,
+  un document d'exploitation ou le carnet d'écarts porte « éprouvé sur cette cible le AAAA-MM-JJ »
+  ou « déduit d'une autre cible, à mesurer avant exécution », et une ligne « Mesure de
+  non-régression : <commande> » qui FORCE l'événement différé (connexion neuve, réplica
+  redémarré) — `node <ops>\oracles\oracle-ops.mjs <document.md>`, verdict O-13 ;
+- l'étape MEP dépose un export machine du parc dans `forge\etapes\mep\` (requête d'inventaire du
+  fournisseur, ou `ops.mjs etat --sortie`), et chaque nom de l'export figure littéralement dans
+  `docs\projet\COMPOSANTS-OPS.md` — un « idem » ou une accolade n'est pas un nom —
+  `node <ops>\oracles\oracle-ops.mjs --inventaire-composants <export.json> docs\projet\COMPOSANTS-OPS.md`,
+  verdict O-14. Sans export, O-14 rend « données insuffisantes », jamais un vert.
+
+**Ce qui n'est pas jugé ici** : le sens inverse d'O-14 (un composant déclaré actif existe dans
+l'export) attend un vocabulaire de statut au document, en étude avec TF-1113 ; la justesse d'une
+mesure de non-régression n'est pas jugée, seulement sa présence.
 
 ## 3 bis. Qualif populée (avant le GO — demande utilisateur RT-6/RS-7)
 
@@ -368,7 +377,10 @@ que son verdict soit au ledger (`oracles_verdict`). Un produit sans ce contrôle
 
 La mise en **production** exige un GO humain explicite, donné sur `DOSSIER-MEP.md`, qui contient :
 
-- les verdicts d'oracles des 5 étapes (avec références ledger `seq`) ;
+- les verdicts d'oracles des 5 étapes (avec références ledger `seq`) ; un verdict de forge-ops
+  ARCHIVÉ (`.ops-journal.jsonl`) ne se cite qu'après confrontation à l'état présent de sa cible —
+  `node scripts\verifier-verdict-archive.mjs <cible|journal>` : FRAIS se cite, PÉRIMÉ se rejoue
+  (TF-1084, reste de TF-0579) ;
 - le rapport forge-tests (couvertures, mutation, findings, pans non couverts), le **dashboard
   de tests** (copie datée dans `output\`) et la liste `actions[manuelle_utilisateur]` extraite
   du rapport — chaque saisie attendue de l'utilisateur (champs, où, pourquoi) pour compléter
@@ -399,7 +411,7 @@ poussée sur la branche principale déclenche des contrôles, l'hébergeur n'ins
 une vérification de production **se place sur le commit déclencheur** — pas sur la tête de branche —
 attend que l'URL publique serve **cette** version, et rejoue les contrôles décisifs dans un vrai
 navigateur. Ce dernier garde-fou existe parce qu'un incident du **15/08/2026** l'a exigé : une
-poussée réussie n'avait rien déployé, et la production a servi l'ancienne version **cinq minutes**
+poussée réussie n'avait rien déployé, et la production a servi l'ancienne version **5 minutes**
 sans qu'aucun signal ne le dise.
 
 **La route standard fabriquait donc une non-conformité permanente pour un produit qui fait mieux
@@ -430,7 +442,7 @@ s'applique : **on ne panache pas.**
    l'incident du 15/08.
 3. **Les preuves M-1 à M-7 restent dues, à l'identique.** Elles vivent dans le run plutôt que dans
    un dossier rédigé, et le run doit les rendre **récupérables** : un journal effacé au bout de
-   trente jours n'est pas une preuve opposable. Le rollback (M-4) reste écrit ET exercé — §2 bis
+   30 jours n'est pas une preuve opposable. Le rollback (M-4) reste écrit ET exercé — §2 bis
    ne bouge pas d'une ligne.
 4. **La variante est DÉCLARÉE au brief produit**, au même titre que la cible de déploiement, et
    consignée au ledger à l'ouverture du run. Jamais improvisée en cours de route : un produit qui
@@ -458,7 +470,7 @@ par le pilot, et le déclarer vaut mieux que de laisser croire l'inverse.
 ## 4 ter. Piloter Railway — le mode d'emploi qui se reperdait à chaque session (TF-0704, 0705, 0706, 0735)
 
 Railway est la cible cloud la plus fréquente du parc, et son mode d'emploi a été payé QUATRE
-fois avant d'être écrit ici : un domaine anonyme laissé onze jours en production, une campagne
+fois avant d'être écrit ici : un domaine anonyme laissé 11 jours en production, une campagne
 de tests qui a audité la mauvaise application, deux impasses de diagnostic en une session, et
 un déploiement déclaré « bloqué, geste humain requis » pendant qu'un jeton valide vivait sur le
 poste. Quatre faits, une cause : le principe vivait dans la mémoire des sessions.
@@ -471,7 +483,7 @@ poste. Quatre faits, une cause : le principe vivait dans la mémoire des session
   **Une impossibilité d'accès ne se déclare qu'après avoir tenté ce repli** : le contrôle
   d'entrée de l'étape échoue TÔT avec « jeton absent, attendu à `<emplacement>` » plutôt que de
   laisser la session conclure au geste humain — l'épisode du 31/08 a coûté un aller-retour
-  humain complet et une entrée de ledger fausse pour un déploiement qui a réussi trente minutes
+  humain complet et une entrée de ledger fausse pour un déploiement qui a réussi 30 minutes
   plus tard avec le jeton du poste.
 - **Le CLI ne sert qu'à téléverser** (TF-0704). `railway service` ne sait ni renommer un
   service ni corriger un domaine ; tout le reste passe par l'API GraphQL —

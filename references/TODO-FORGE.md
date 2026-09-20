@@ -7,6 +7,31 @@ Le registre structuré des améliorations vit dans `todo\` : source unique `TODO
 (jamais éditée), archive `TODO-ARCHIVE.jsonl` (ids jamais réutilisés), `oracle-todo.mjs`
 (R1-R11) à faire passer après toute écriture.
 
+**Les vues ne sont plus versionnées (D-4 (a), 16/09/2026, TF-0983).** `TODO.md`, `TODO.html`,
+`TODO-ARCHIVE.html`, `RECIDIVES.md` et `AVANCEMENT.md` sont dérivés des deux `.jsonl` et
+régénérables en une commande ; ils sont désormais ignorés par git. *Un contenu dérivé versionné
+multiplie par le nombre de régénérations le coût de toute erreur dans sa source* — mesuré le
+16/09 : un identifiant écrit UNE fois dans la source vit dans 50 révisions de cette source, 50 de
+`TODO.md` et 32 de `TODO.html`, soit 132 au total dont 82 dues aux seules vues. Effacer un nom de
+client de l'histoire coûtait donc 2,6 fois le travail nécessaire. Le poids, lui, n'était pas le
+sujet : 10,95 Mo compressés sur 280, soit 3,9 % du dépôt.
+
+**Ce qui se perd, et rien d'autre** : la lecture des vues sur l'hébergeur sans cloner. Vérifié
+fichier par fichier le 16/09 — aucun outil du parc ne les lit depuis l'HISTOIRE : `self-test.mjs`
+en prend l'empreinte sur le disque, `verifier-avance-publication.mjs` ne fait que les classer
+quand elles apparaissent dans un enregistrement. Toute version passée se régénère depuis la source
+de son époque. **Les régénérer**, après toute écriture au registre :
+
+```
+node todo\generer-vue.mjs && node todo\generer-page.mjs && node todo\generer-recidives.mjs
+node todo\generer-archive.mjs && node scripts\generer-avancement.mjs
+```
+
+*Ce que cette décision NE fait pas* : elle arrête l'amplification à venir, elle ne nettoie pas les
+82 révisions déjà écrites. Les deux remèdes sont complémentaires, jamais concurrents — le second
+reste ouvert et coûte, lui, le reclonage du parc et 106 empreintes de commit citées au registre
+qui deviendraient orphelines.
+
 **Écrire au registre : `node todo\journaliser.mjs --fichier <evenements.json>`** (TF-0413,
 20/08). Les événements y entrent **sans `ts`** — l'outil le STAMPE. Il refuse tout événement
 qui en porte un, sans rien écrire, et il ANNULE son écriture (fichier repris à l'octet près)
@@ -24,7 +49,11 @@ consignation.
 **Deux sessions, un seul compteur : ce qui est couvert et ce qui ne l'est pas** (TF-0394 puis
 TF-0481). Le préflight de `ingerer-lot.mjs` fait `git fetch` puis compare `HEAD..origin/main`
 sur les deux registres, et REFUSE l'ingestion si le distant a avancé — sinon les ids séquentiels
-repartiraient du mauvais maximum. C'est juste, et ça reste.
+repartiraient du mauvais maximum. C'est juste, et ça reste. **Depuis TF-1003 (14/09/2026), il juge
+ce qu'il protège** : un distant « en avance » en commits ne refuse que s'il porte une CRÉATION
+absente d'ici, ou frappée ailleurs sous le même id (autre `ts` de frappe). Deux histoires DIVERGENTES
+au même registre — la signature d'une réécriture non encore republiée — ingèrent, et le message
+nomme la divergence sans jamais proposer `git pull --rebase` (« à recloner, pas à fusionner »).
 
 Mais c'est un **check-then-act** : il regarde AVANT d'écrire. Il ne peut rien contre la fenêtre
 qui s'ouvre PENDANT l'ingestion — deux sessions qui frappent les mêmes numéros avant que l'une
@@ -78,7 +107,10 @@ la date se lit au registre, N-6). Il est **hérité en copie identique** (`forge
 R-47) : le producteur qui écrit un lot y lit ce qu'il doit déclarer. (2) **À l'ingestion**, tout
 retour d'un lot daté du 03/09 ou après porte `classe` ; absente ou inconnue, `ingerer-lot.mjs`
 REFUSE en nommant les clés proches — une classe nouvelle se crée dans le référentiel, jamais dans
-un sidecar. Un retour dont la classe est déjà close en `corrige` ENTRE, marqué `recidive_de`,
+un sidecar. Le défaut vraiment neuf a sa sortie (TF-1128, 15/09/2026) : la clé RÉSERVÉE
+`classe-a-creer`, admise si la ligne porte `classe_proposee` {cle, famille, libelle} et que le `.md`
+nomme la clé ; le retour entre avec `classe: null` et `classe_a_creer`, et le pilot crée la classe
+puis rattache le retour (recette : `todo\ingerer-classe.test.mjs`, 13 cas). Un retour dont la classe est déjà close en `corrige` ENTRE, marqué `recidive_de`,
 avec l'oracle censé l'avoir attrapé : la récidive est la mesure de la descente, la refuser la
 cacherait. Une classe créée SANS clôture fondatrice moins de 30 jours après un retour d'une classe
 voisine est signalée `classe_suspecte` — la façon la moins chère de faire baisser un compteur est
@@ -89,9 +121,9 @@ le titre ET le contenu, après anonymisation et aux espaces et à la casse près
 création du registre (actifs ou archive) ou d'une autre ligne du même lot, fait rejeter le lot en
 bloc, l'original nommé — un lot RENOMMÉ se rattache, il ne se ré-ingère pas (six doublons entrés
 ainsi le 08/09). **R14** de l'oracle juge ce qui entrerait par un autre chemin : un doublon strict
-postérieur à son seuil n'est admis que clos en `ecarte`, avec un `motif_ecart` qui nomme
-l'original — le statut d'écartement (TF-0157) est ce qui le retire de toute mesure de gains. Les
-11 paires antérieures sont une antériorité déclarée au `non_juge`, jamais réécrite ; un
+postérieur à son seuil (14/09/2026 12:00 Z) se passe en `ecarte` (avec son `motif_ecart`, R7) ou
+se marque `doublon_de`, sans quoi il compte comme un item ouvert de plus. Les doublons
+antérieurs sont une antériorité déclarée au `non_juge`, jamais réécrite ; un
 quasi-doublon reste une piste de rapprochement, jamais un refus. **La vue `todo\RECIDIVES.md`** (`generer-recidives.mjs`, générée, jamais éditée)
 porte le taux de récidive par classe et par produit, le délai clôture → descente constatée (lu
 dans `todo\HERITAGE-RELEVES.jsonl`, que le hook d'ouverture du pilot écrit à chaque relevé
@@ -118,6 +150,20 @@ TODO.jsonl par une autre session est **interdite** — toute candidature passe p
 (validation atomique, idempotente par sha du lot, ids frappés à l'ingestion). Le contournement
 se détecte : règle **R10** de l'oracle (creation de session externe sans événement
 `ingestion` — incident TF-0049).
+
+**Le sas d'arrivée — le protocole de remise, domicilié ici parce que le sas est ignoré (TF-0981
+puis TF-1055, 14/09/2026).** `input\00-retours\_arrivee\` est IGNORÉ par git (`.gitignore`) : un
+lot peut y séjourner sous son nom réel sans qu'aucun `git add` puisse l'emporter. Son README local
+ne voyage donc pas, et un clone frais n'a pas le dossier : la règle vit ici.
+- **Qui y écrit, et quand** : le produit ou la forge émettrice, au moment de la remise — le `.md`
+  et son sidecar `.tf.jsonl`, tels qu'ils sont, nom réel compris. Jamais à la racine de
+  `input\00-retours\`, qui est suivie (`gabarits\RETOURS-FORGES.md` le prescrit au producteur).
+- **Deux gestes ensuite, deux verdicts** : `node todo\accueillir-lot.mjs` pseudonymise le nom et le
+  contenu et DÉPLACE le lot à la racine suivie ; puis `node todo\ingerer-lot.mjs <sidecar>` l'ingère.
+- **Ce qui le garde** : la règle LOT-SAS de `gabarits\oracle-lot-retours.mjs` refuse, à
+  l'ingestion, un lot posé à la racine sous un nom réel, en nommant le sas.
+- Un sas **vide est l'état normal**. Un lot DÉJÀ suivi sous un nom réel ne relève pas du sas mais
+  de `todo\anonymiser-suivis.mjs`.
 
 **Ce qu’un lot n'a PAS remonté se déclare (R-45, 21/08).** Tout lot daté du 21/08 ou après
 porte une section « Remarques restées au produit » : chaque remarque que le produit a corrigée
@@ -193,7 +239,7 @@ restant se traite en corrigeant le GÉNÉRATEUR (pas le fichier de règles) et e
 Ce que la première passe a appris : un sigle se remplace insensible à la casse, comme la porte le
 juge — 96 constats tenaient à un identifiant de run en minuscules. Après le geste, deux choses
 restent humaines : la publication forcée (`git push --force`, R-38) et toute autre copie locale du
-dépôt, devenue incompatible avec la nouvelle histoire (à recloner, pas à fusionner). **Ce que la troisième passe a appris (05/09, forge-development, TF-0813)** : la mesure qui DÉCIDE une réécriture se fait sur un clone à BRANCHE UNIQUE de ce qui est publié — 89 constats vivaient dans une branche locale jamais poussée, l'histoire publiée était verte ; et une branche protégée sur GitHub refuse tout push forcé — vérifier la protection AVANT de réécrire, sinon la passe ne se publie pas. **Ce que la quatrième passe a appris (07/09, forge-design, forge-tests, forge-development, D-10)** : hors de `c:\dev`, la porte ne trouve pas les deux tables et rend SKIP, jamais PASS — les désigner par `FORGE_NOMS_INTERDITS` et `FORGE_PRODUITS_PSEUDO` avant de juger un clone frais ; et la porte lit `git log --all`, qui compte les **arborescences de travail liées** (`git worktree list`) : une arborescence d'une session antérieure, détachée sur l'ancienne histoire, a gardé 79 commits atteignables sur un clone local pourtant réaligné (262 commits vus pour 183) — retirer son enregistrement (`git worktree prune` après suppression de `.git\worktrees\<nom>`) fait partie du diagnostic d'un clone rebâti ; enfin `git filter-repo` se lance par `python -m git_filter_repo` sur un poste où `git filter-repo` répond « Function not implemented ». **Et la copie locale de l'AUTRE poste se rebâtit par l'outil, plus à la main (D-12 a, 07/09, TF-0877)** : `node bootstrap.mjs --rebatir <dépôt> [--essai]` (`scripts\rebatir-clone.mjs`, recette `scripts\rebatir-clone.test.mjs`) refuse un arbre sale, sauvegarde le clone entier en paquet vérifié sous `<racine>\_sauvegardes\`, exporte le delta propre au poste en patches, retire l'enregistrement des arborescences liées, réaligne sur `origin/main`, rejoue les patches (`git am --3way`, arrêt en exit 1 au premier conflit, patch conservé), joue la porte de publication avec les deux tables de la racine — et ne pousse jamais. Ce que git ne synchronise pas entre deux postes se copie à la main : les deux tables (`_noms-interdits.json`, `_produits-pseudonymes.json`) et, après `--pull`, la copie installée des skills (`oracle-skills --appliquer`, joué par `--pull`).
+dépôt, devenue incompatible avec la nouvelle histoire (à recloner, pas à fusionner). **Ce que la troisième passe a appris (05/09, forge-development, TF-0813)** : la mesure qui DÉCIDE une réécriture se fait sur un clone à BRANCHE UNIQUE de ce qui est publié — 89 constats vivaient dans une branche locale jamais poussée, l'histoire publiée était verte ; et une branche protégée sur GitHub refuse tout push forcé — vérifier la protection AVANT de réécrire, sinon la passe ne se publie pas. **Ce que la quatrième passe a appris (07/09, forge-design, forge-tests, forge-development, D-10)** : hors de `c:\dev`, la porte ne trouve pas les deux tables et rend SKIP, jamais PASS — les désigner par `FORGE_NOMS_INTERDITS` et `FORGE_PRODUITS_PSEUDO` avant de juger un clone frais ; et la porte lit `git log --all`, qui compte les **arborescences de travail liées** (`git worktree list`) : une arborescence d'une session antérieure, détachée sur l'ancienne histoire, a gardé 79 commits atteignables sur un clone local pourtant réaligné (262 commits vus pour 183) — retirer son enregistrement (`git worktree prune` après suppression de `.git\worktrees\<nom>`) fait partie du diagnostic d'un clone rebâti ; enfin `git filter-repo` se lance par `python -m git_filter_repo` sur un poste où `git filter-repo` répond « Function not implemented ». **Et la copie locale de l'AUTRE poste se rebâtit par l'outil, plus à la main (D-12 a, 07/09, TF-0877)** : `node bootstrap.mjs --rebatir <dépôt> [--essai]` (`scripts\rebatir-clone.mjs`, recette `scripts\rebatir-clone.test.mjs`) refuse un arbre sale, sauvegarde le clone entier en paquet vérifié sous `<racine>\_sauvegardes\`, exporte le delta propre au poste en patches, retire l'enregistrement des arborescences liées, réaligne sur `origin/main`, rejoue les patches (`git am --3way`, arrêt en exit 1 au premier conflit, patch conservé), joue la porte de publication avec les deux tables de la racine — et ne pousse jamais. **Le diagnostic d'un clone rebâti ÉNUMÈRE les références, il ne récite plus une liste de vecteurs (TF-1008, 14/09)** : après l'arborescence liée et la branche de sauvegarde, le remisage (`refs/stash`) a gardé le 10/09 306 commits de l'ancienne histoire dans un clone déclaré rebâti — la porte rendait PASS en les classant antériorités, ce qui ne veut pas dire qu'ils avaient disparu. `rebatir-clone` rend donc `references_divergentes` : chaque référence qui n'est pas un ancêtre de HEAD, avec ses commits propres ; il n'en supprime aucune (R-29). Ce que git ne synchronise pas entre deux postes se copie à la main : les deux tables (`_noms-interdits.json`, `_produits-pseudonymes.json`) et, après `--pull`, la copie installée des skills (`oracle-skills --appliquer`, joué par `--pull`).
 
 **Tout clone de vérification porte `git clone --single-branch -c core.longpaths=true` (TF-1015, 10/09/2026)** : sans l'option, le checkout a refusé 22 fichiers — 19 sidecars d'oracle et 3 synthèses — et le dépôt est arrivé sans arbre de travail.
 Et il se pose sur un **préfixe court** : le plafond de R-4 (chemin relatif + 26 de sidecar ≤ 150) laisse 110 caractères de préfixe admissible, un bac à sable de session en consomme couramment 130.
@@ -208,7 +254,14 @@ tables valides, aucun secret, entrants en forme, un pseudonyme par produit). Le 
 deux postes ont étendu chacun leur table libre pendant deux jours sans aucun lien — mêmes numéros par
 chance, pas par construction. Règle : toute extension d'une table se commet et se pousse dans la foulée ;
 `scripts\lib-confidentiel.mjs` est le seul endroit qui sait où lire les tables (variable d'environnement,
-canal, sinon ancien fichier libre EN LE DISANT).
+canal, sinon ancien fichier libre EN LE DISANT). **Un identifiant technique inconnu des tables se fait
+qualifier à l'ingestion (TF-0966, 15/09/2026)** : après la substitution, `ingerer-lot.mjs` relève les
+formes `MAJUSCULES_SOULIGNÉES` et `schema.table` absentes du vocabulaire public du pilot
+(`todo\identifiants-techniques.mjs`), les NOMME à l'écran et en compte le nombre à l'événement
+d'ingestion (`identifiants_a_qualifier`, jamais les noms). Confidentiel : l'inscrire à la table des
+noms interdits du canal et rectifier les items ; sinon, rien. Avertissement et non refus : mesuré le
+15/09, 42 créations sur 350 en portent au moins un. Le vocabulaire public exclut les recettes et les
+fixtures, dont les identifiants sont inventés pour être relevés.
 
 **La propagation d'une correction se MESURE, elle ne se souhaite pas (TF-0689, 01/09).** Le
 champ `produits_beneficiaires` est de la prose — 73 items clos en portaient au 27/08, aucun

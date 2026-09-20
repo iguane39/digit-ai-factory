@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "type": "decisions-todo-forge",
+  "sceau_source": "mandat verbal — aucun export de page",
+  "exporte_le": "2026-09-17",
+  "decisions": [
+    {
+      "id": "TF-1179",
+      "decider": true,
+      "commentaire": "Mandat global explicite du 17/09/2026 : « Traite les todos et retours ». Sous le seuil d étude d opportunité (TF-0155). Aucune clôture sans preuve rejouée par le pilot."
+    },
+    {
+      "id": "TF-1180",
+      "decider": true,
+      "commentaire": "Mandat global explicite du 17/09/2026 : « Traite les todos et retours ». Sous le seuil d étude d opportunité (TF-0155). Aucune clôture sans preuve rejouée par le pilot."
+    },
+    {
+      "id": "TF-1181",
+      "decider": true,
+      "commentaire": "Mandat global explicite du 17/09/2026 : « Traite les todos et retours ». Sous le seuil d étude d opportunité (TF-0155). Aucune clôture sans preuve rejouée par le pilot."
+    },
+    {
+      "id": "TF-1182",
+      "decider": true,
+      "commentaire": "Mandat global explicite du 17/09/2026 : « Traite les todos et retours ». Sous le seuil d étude d opportunité (TF-0155). Aucune clôture sans preuve rejouée par le pilot."
+    },
+    {
+      "id": "TF-1183",
+      "decider": true,
+      "commentaire": "Mandat global explicite du 17/09/2026 : « Traite les todos et retours ». Sous le seuil d étude d opportunité (TF-0155). Aucune clôture sans preuve rejouée par le pilot."
+    },
+    {
+      "id": "TF-1184",
+      "decider": true,
+      "commentaire": "Mandat global explicite du 17/09/2026 : « Traite les todos et retours ». Sous le seuil d étude d opportunité (TF-0155). Aucune clôture sans preuve rejouée par le pilot."
+    }
+  ]
+}

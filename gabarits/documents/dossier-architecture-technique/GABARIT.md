@@ -24,7 +24,7 @@
 C'est la pièce la plus importante de ce fichier. Le recouvrement avec l'existant est **fort**,
 et l'ignorer aurait créé une seconde source de vérité sur l'architecture d'un produit.
 
-| Document confronté | Ce qu'il porte | Frontière retenue |
+| Document confronté | Contenu apporté | Frontière retenue |
 |---|---|---|
 | `docs\projet\ARCHITECTURE.md` (socle du pilot, R-20) | la **vue logique** : vue d'ensemble, composants, flux, données (D06), delivery (D09), choix structurants et renvois ADR. Normé, versionné, projeté en HTML par un générateur | **C'est déjà la moitié d'un DAT, et elle fait foi.** Le DAT n'en réécrit pas une ligne : il y **renvoie**. Ce qu'il ajoute est ce qu'`ARCHITECTURE.md` ne porte pas — trajectoire, sécurité, exigences non fonctionnelles, hypothèses et risques |
 | `docs\projet\COMPOSANTS-OPS.md` | l'**instancié déployé** par environnement | Renvoi. Un DAT qui recopie des noms de ressources est périmé au premier redéploiement |
@@ -200,3 +200,27 @@ quatre choses, dans cet ordre d'utilité :
 Reportez le couple `gabarit: gd-dossier-architecture` et `version_du_gabarit` tel qu'il figure en en-tête de
 votre document : c'est lui qui rend le retour applicable. Sans lui, « il manquait une section »
 ne se rattache à aucune famille et à aucune version (R-46).
+
+---
+
+## Document d'auteur — ce qui ne va pas au lecteur
+
+Le lecteur de ce document est celui que déclare `role_destinataire`. Tout ce qui n'entre pas
+dans ses décisions sort d'ici et vit dans le **document d'auteur** — un fichier distinct, tenu par
+celui qui produit, cité en renvoi et jamais recopié :
+
+- le **registre des arbitrages** encore ouverts, avec leur instance et leur état ;
+- l'**historique des versions** du document et son statut de relecture ;
+- les **notes de production** : sources à confirmer, sections à reprendre, questions à l'auteur.
+
+**La frontière est un critère d'ACTION, pas de confort.** Une information qui change ce que le
+lecteur FAIT reste chez lui, même quand elle est inconfortable : « cette règle n'est pas encore
+opposable, appliquez-la et signalez tout écart » appartient au document du lecteur, parce qu'un
+lecteur doit savoir sur quoi il s'engage. Une information qui ne change que ce que l'AUTEUR doit
+encore obtenir part au document d'auteur. Le doute utile au lecteur se dit à l'endroit qui le
+concerne ; le doute de l'auteur ne le suit pas.
+
+**Un document long se découpe en VUES d'un fichier unique, pas en fichiers**, sauf demande
+contraire de son lecteur : onze fichiers à partager sont un coût pour lui, jamais pour son auteur.
+
+*Règle D11 (`gabarits\documents\README.md`), jugée par G10 d'`oracle-gabarits-documents.mjs`.*

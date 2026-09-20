@@ -33,6 +33,27 @@
  * l'exemple que le gabarit prescrit mettrait le gabarit en défaut plutôt que l'auteur. Leçon payée
  * le 22/08 par un contrôle de Markdown qui accusait sept blocs sur neuf d'un document CONFORME.
  *
+ * DEUX ORACLES PORTENT CE NOM, ET ILS NE JUGENT PAS LA MÊME CHOSE (TF-1136, 17/09/2026). La règle
+ * CM-1 les a rapprochés au premier passage : même origine (TF-0324), mêmes cinq artefacts, deux
+ * dépôts, et aucun des deux ne citait l'autre. Comparés règle à règle, ils sont COMPLÉMENTAIRES,
+ * et chacun déclarait déjà le domaine de l'autre dans son propre `non_juge` — sans le nommer :
+ *   · CE FICHIER juge la FORME DU CONTENU des artefacts (C1 propriétaire nommé, C2 date butoir,
+ *     C3 relance ou aveu, C4 acteur du vocabulaire fermé et conséquence, C5 mesures avant/après,
+ *     C6 enseignement adossé à un fait). Son `non_juge` dit : « la CADENCE elle-même […] se lit
+ *     dans son historique, pas dans son contenu » ;
+ *   · `{skilldir}\scripts\oracle-cadence-de-mission.mjs` (skill `quality-oracles` de
+ *     `digit-ai-forge-agents`, invoqué par le registre pour le domaine « Cadence de mission
+ *     (artefacts périodiques) ») juge la FRAÎCHEUR déclarée dans l'état de mission (entrée
+ *     complète, vocabulaire fermé des périodes, retard en jours, source présente sur le disque,
+ *     les cinq artefacts tous rendus). Son `non_juge` dit : « le CONTENU des artefacts : cet
+ *     oracle juge leur FRAÎCHEUR, pas leur qualité ».
+ * Aucune règle n'est en double : un artefact frais et creux échoue ici, un artefact impeccable et
+ * vieux de trois semaines échoue là-bas. C'est l'HOMONYMIE qui est le défaut, pas la duplication —
+ * un lecteur qui cherche « l'oracle de cadence » en trouve deux et ne sait pas lequel jouer. Les
+ * deux font foi, chacun sur sa moitié, et la ligne ci-dessous le rend opposable à CM-1.
+ *
+ * oracle-du-socle: complémentaire de l'oracle du registre « Cadence de mission (artefacts périodiques) » (`scripts\oracle-cadence-de-mission.mjs` du skill quality-oracles), qui juge la FRAÎCHEUR déclarée ; ce fichier juge la FORME DU CONTENU, et les deux `non_juge` se renvoient l'un à l'autre (TF-1136)
+ *
  * Usage : node oracle-cadence.mjs <fichier.md> [...] [--json] · --self-test
  * Sortie : JSON {oracle,verdict,findings[],non_juge[]} · exit 0 = PASS · 1 = FAIL · 2 = SANS OBJET.
  */
@@ -51,7 +72,7 @@ const NON_JUGE = [
   "la PERTINENCE d'un enseignement, la JUSTESSE d'une parade, l'ATTRIBUTION d'un bénéfice — trois jugements humains",
   "la SINCÉRITÉ d'un nom de propriétaire ou d'une date : un nom inventé satisfait C1, et cet oracle rend la négligence coûteuse, pas le mensonge impossible",
   "les lignes encore à l'état de GABARIT (`{R-01}`) : juger l'exemple que le gabarit prescrit mettrait le gabarit en défaut, jamais l'auteur",
-  "la CADENCE elle-même : qu'un artefact hebdomadaire soit émis chaque semaine se lit dans son historique, pas dans son contenu",
+  "la CADENCE elle-même : qu'un artefact hebdomadaire soit émis chaque semaine se lit dans son historique, pas dans son contenu. Elle EST jugée, mais ailleurs — `scripts\\oracle-cadence-de-mission.mjs` du skill quality-oracles (domaine « Cadence de mission (artefacts périodiques) ») lit l'état de mission et rend le retard en jours ; les deux oracles portent le même nom de sujet et jugent des moitiés disjointes (TF-1136)",
   "le CONTENU d'une conséquence de non-action : C4 vérifie que la cellule est remplie, jamais qu'elle dit quelque chose — « à faire vite » la satisfait. Juger le fond demanderait de comprendre la prose, et la colonne remplie est déjà ce qui manquait",
 ];
 

@@ -13,7 +13,8 @@
  * Options : --sans-bootstrap · --sans-readme (sessions produit : les README du pilot ne sont
  * pas leur affaire) · --pilot <dossier> (lanceur produit : chemin du pilot résolu).
  */
-import { existsSync, readFileSync, copyFileSync, mkdirSync, appendFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, copyFileSync, mkdirSync, appendFileSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join, dirname, sep } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -281,6 +282,73 @@ if (iPilot < 0) {
         "- À TRAITER AVANT TOUT AUTRE TRAVAIL de cette session : un lot remonté qui n'entre pas au registre",
         "  n'existe pour personne, et le producteur le croit pris. Détail : node oracles/oracle-boite-entree.mjs");
     }
+    // B9 (TF-1198, 19/09/2026) — le sas d'arrivée se DIT à l'ouverture. Le 19/09, six lots y ont
+    // attendu deux jours sous un « boîte à jour » : une règle que le relevé d'ouverture ne lit pas
+    // est une règle que personne ne rencontre (loi n° 1).
+    const f9 = j && (j.findings || []).find((x) => x.regle === "B9");
+    if (f9 && f9.statut === "FAIL") lignes.push(`- **BLOQUANT — ${f9.message}**`);
+    else if (f9 && f9.statut === "AVERTISSEMENT") lignes.push(`- ${f9.message}`);
+  }
+}
+
+// D-6 (a), 14/09/2026 — UN CONSTAT QUE PERSONNE NE LIT N'EST PAS UN CONSTAT (classe
+// constat-non-bloquant-jamais-lu). `oracle-secrets-hors-perimetre` est joué au hook Stop, qui
+// n'affiche rien quand il ne bloque pas ; ses constats sur les produits sortent en 0 par
+// construction et n'atteignaient aucun lecteur — mesuré le 14/09 : 11 porteurs hors dépôt et 3
+// dans des dépôts qui ne les ignorent pas, dont des publiés, relus à chaque fin de tour depuis sa
+// pose sans que personne les voie. L'ouverture les RELIT et les dit, en COMPTES seulement : jamais
+// un chemin ni une valeur (porte des noms) ; le détail se lit à la demande. Même section : l'état
+// du registre de dette du pilot (D-8 (a)), qui sinon ne serait lu par personne (loi n° 1).
+// ---- LA PORTÉE DE CETTE SESSION SE DIT À L'OUVERTURE (TF-1047 / TF-0963, option O1, 17/09/2026)
+//
+// LE FAIT : un hameçon qui ne s'exécute pas ne se distingue pas d'un hameçon qui approuve. Une
+// session ouverte au-dessus du produit, ou sur une racine qui n'a repris qu'une PARTIE des
+// hameçons, travaille des heures sans qu'aucun contrôle ne parle — trois retours du même produit
+// pour trois symptômes d'une seule racine. L'étude du 14/09 tranche O1 : comparer, à l'ouverture,
+// le jeu ACTIF au jeu ATTENDU, et le NOMMER. Ni report d'hameçons, ni écriture chez le produit :
+// ces deux-là restent un arbitrage humain (R-29, TF-0963).
+{
+  const op = join(PILOT, "oracles", "oracle-portee-doctrine.mjs");
+  if (existsSync(op)) {
+    lignes.push("", "## Portée des hameçons pour CETTE racine de session (O1, TF-1047)");
+    const r = spawnSync(process.execPath, [op, "--hamecons"], { encoding: "utf8", timeout: 60000 });
+    let j = null;
+    try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* dit ci-dessous */ }
+    if (!j) lignes.push(`- verdict ILLISIBLE (exit ${r.status}) — ce n'est pas un constat sur la session : ${(r.stderr || "").trim().slice(0, 160)}`);
+    else for (const f of j.findings || []) {
+      if (f.statut === "PASS") lignes.push(`- ${f.regle} : ${f.message}`);
+      else if (f.statut === "SANS_OBJET") lignes.push(`- ${f.regle} sans objet — ${f.message}`);
+      else lignes.push(`- **${f.regle} — ${f.message}**`);
+    }
+  }
+}
+
+if (iPilot < 0) {
+  const os = join(PILOT, "oracles", "oracle-secrets-hors-perimetre.mjs");
+  if (existsSync(os)) {
+    lignes.push("", "## Secrets hors périmètre (D-6 (a), classe constat-non-bloquant-jamais-lu)");
+    const r = spawnSync(process.execPath, [os], { encoding: "utf8", cwd: PILOT, timeout: 90000 });
+    let j = null;
+    try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* dit ci-dessous */ }
+    if (!j) lignes.push(`- verdict ILLISIBLE (exit ${r.status}) — ce n'est pas un constat sur les secrets : ${(r.stderr || "").trim().slice(0, 160)}`);
+    else if (j.verdict === "PASS") lignes.push("- aucun porteur de secret hors périmètre.");
+    else {
+      for (const f of (j.findings || []).filter((x) => x.statut === "FAIL")) {
+        const n = (String(f.message).match(/^\s*(\d+)/) || [])[1] || "?";
+        lignes.push(`- ${f.regle} : ${n} porteur(s) ${f.regle === "SP2" ? "DANS un dépôt qui ne les ignore pas — le plus grave : publiés ; seule une ROTATION de l'identifiant réduit le risque" : "hors de tout dépôt, ni ignorés ni suivis"}`);
+      }
+      lignes.push("- À TRAITER : rotation des identifiants publiés (geste humain, console de chaque fournisseur), puis rangement ; détail, chemins compris : node oracles/oracle-secrets-hors-perimetre.mjs");
+    }
+  }
+  const rd = join(PILOT, "todo", "registre-dette.json");
+  if (existsSync(rd)) {
+    try {
+      const d = JSON.parse(readFileSync(rd, "utf8"));
+      const c = {};
+      for (const e of d.entrees || []) c[e.statut] = (c[e.statut] || 0) + 1;
+      lignes.push("", "## Registre de dette du pilot (D-8 (a), 14/09/2026)",
+        `- ${c.assume || 0} limite(s) assumée(s), ${c.todo || 0} reste(s) à instruire — todo\\registre-dette.json`);
+    } catch (e) { lignes.push("", "## Registre de dette du pilot", `- ILLISIBLE : ${e.message}`); }
   }
 }
 
@@ -306,12 +374,28 @@ if (iPilot < 0) {
       else if (j.verdict === "donnees_insuffisantes") lignes.push(`- premier relevé écrit (snapshot ${j.snapshot_seq ?? "?"}) — la dérive se lira au prochain passage`);
       else lignes.push(`- DÉRIVE (${j.verdict}) : ${(j.derive?.findings || [j.message]).slice(0, 4).join(" ; ")} — lire todo/RECIDIVES.md, décider en revue des classes (rien n'est appliqué automatiquement)`);
     }
+    // TF-1166 (décision D-3 (a), 17/09/2026) — LES SOURCES MUETTES SE NOMMENT À CHAQUE OUVERTURE, pas une
+    // fois par semaine : le silence médian des sources de retours est passé de 8 à 11 jours entre le
+    // 30/08 et le 17/09 sans qu'aucune ligne le dise. Le calcul n'est PAS refait ici — une seconde
+    // lecture de la boîte serait un contrôle maison : `generer-recidives.mjs` est rejoué vers des
+    // fichiers TEMPORAIRES (aucune vue suivie n'est touchée à l'ouverture) et son JSON est lu.
+    // Une source sans activité n'a rien à remonter : la ligne nomme, elle ne condamne pas.
+    try {
+      const tmp = mkdtempSync(join(tmpdir(), "ouverture-recidives-"));
+      const r = spawnSync(process.execPath, [join(PILOT, "todo", "generer-recidives.mjs"), "--sortie", join(tmp, "R.md"), "--json", join(tmp, "R.json")], { encoding: "utf8", cwd: PILOT, timeout: 60000 });
+      const c = r.status === 0 ? JSON.parse(readFileSync(join(tmp, "R.json"), "utf8")) : null;
+      rmSync(tmp, { recursive: true, force: true });
+      if (!c) lignes.push(`- sources muettes : NON mesurées (generer-recidives exit ${r.status})`);
+      else if (c.sources_muettes === null) lignes.push("- sources muettes : non mesurable, boîte des lots de retours introuvable");
+      else if (!c.sources_muettes.length) lignes.push(`- sources de retours : aucune muette depuis plus de ${c.seuil_jours} j`);
+      else lignes.push(`- ${c.sources_muettes.length} source(s) de retours muette(s) depuis plus de ${c.seuil_jours} j : ${c.sources_muettes.slice(0, 8).map((s) => `${s.source} (${s.silence} j)`).join(", ")}${c.sources_muettes.length > 8 ? ", …" : ""} — une source sans activité n'a rien à remonter ; détail et descente par produit : todo/RECIDIVES.md sections 5 et 7`);
+    } catch (e) { lignes.push(`- sources muettes : NON mesurées (${String(e.message || e).slice(0, 120)})`); }
   }
 }
 
 lignes.push("",
   "## Gates actifs dans cette session (R-44)",
-  "- Tout message de fin de traitement — tour de TRAVAIL, verdict rendu, ou message de plus de 150 mots — suit gabarits\RESTITUTION.md — bloc 0 + 8 blocs, aucun omis. Bloc 3 : une décision par BLOC DE CITATION, ouverte par son sélecteur `D-N` et une QUESTION, rappel du sujet puis recommandation SOURCÉE, options en tableau `Option | Ce qu'elle coûte | Ce qu'elle exclut` hors citation, ligne de repli « si rien n'est décidé » pour finir. Bloc 8 : UN TABLEAU unique, l'acteur en COLONNE (auto_ia/manuelle_dev/manuelle_utilisateur), trié auto_ia d'abord, chaque action ouverte par son sélecteur `A-N` — les deux familles ne partagent JAMAIS la même numérotation. Effort en complexité × durée, jamais en jours. v2.18.0 (08/09) : le VERDICT que tu affiches mesure ce que le fichier jugé mesure — un tour qui n'apporte qu'un delta REDÉPOSE la synthèse à jour et affiche celle-là, il ne retouche pas l'écran seul ; un tour qui n'apporte rien de neuf rend un accusé bref, pas une restitution de plus. v2.17.0 (08/09) : ce que tu AFFICHES est le fichier jugé, jamais son résumé — les blocs 3 et 8 s'y reprennent en entier (tableau des options, sélecteurs A-N, acteurs du vocabulaire gelé) ; et un message final PORTANT UN VERDICT ou dépassant 150 mots est jugé même sans aucune écriture dans le tour. v2.16.0 (02/09) : aucune action manuelle_utilisateur ne demande à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation ; une correction restituée nomme son contrôle rouge → vert ou sa classe ; le fichier de synthèse se nomme Synthese ou Restitution — le marqueur `destinataire: humain` est réservé aux restitutions. Le hook Stop le juge par oracle-synthese et REFUSE l'arrêt en cas d'échec.",
+  "- Tout message de fin de traitement — tour de TRAVAIL, verdict rendu, ou message de plus de 150 mots — suit gabarits\\RESTITUTION.md — bloc 0 + 8 blocs, aucun omis. v2.27.0 (19/09) : UN REFUS PROUVE QU'UNE PORTE EST FERMÉE, JAMAIS QU'IL N'Y EN A QU'UNE — une incapacité d'accès déclarée porte les codes de retour de DEUX FAMILLES de chemins au moins (un préfixe d'URL ou un scope distinct, pas une variante du même), ou cite la source qui établit qu'un seul chemin existe ; « seule voie » ne vaut plus preuve (S25 durcie, TF-1189). v2.26.0 (17/09) : LE BLOC 1 DIT L'INTENTION DE LA DEMANDE — une phrase pour l'intention initiale, puis « Test rétro : » qui dit si le résultat la sert ou n'en sert que la lettre (S51, loi transverse n° 7). v2.25.0 (17/09) : UN TOUR DE TRAVAIL DONT LE RÉSULTAT N'EST PAS ENCORE MESURABLE SE DÉCLARE « POINT D'ÉTAPE » AU BLOC 1 — bloc 2 remplacé par « ce qui reste à mesurer, et par quoi » (la mesure attendue ET l'outil qui la rendra), blocs 1, 4 et 8 PLEINS (S50), les autres admis en une ligne ; et un RELAIS d'avancement de trois lignes, quand rien n'a été écrit depuis ton dernier affichage, ne se rejuge pas et ne reprend pas la synthèse déposée en entier (TF-1182). v2.24.0 (17/09) : UNE OPTION DU BLOC 3 QUI COMMANDE UN GESTE HUMAIN (se connecter, saisir, coller, installer, ouvrir un terminal, lancer une commande, valider un second facteur, publier soi-même) porte SUR PLACE de quoi l'exécuter — la commande entre accents graves, l'écran à ouvrir, ou une ligne « Comment faire : 1) … 2) … 3) … » (S49). v2.23.0 (17/09) : CHEZ UN PRODUIT, le bloc 9 porte une ligne « Remontée à la factory : rien à remonter. » ou « Remontée à la factory : lot « <produit> - RETOURS - AAAAMMJJ<indice> » remis. » — « rien à remonter » est une réponse valide, le silence ne l'est pas (S48 ; sans objet au pilot et dans une forge). Bloc 3 : une décision par BLOC DE CITATION, ouverte par son sélecteur `D-N` et une QUESTION, rappel du sujet puis recommandation SOURCÉE, options en tableau `Option | Coût | Exclusions` hors citation, ligne de repli « si rien n'est décidé » pour finir. Bloc 8 : UN TABLEAU unique, l'acteur en COLONNE (auto_ia/manuelle_dev/manuelle_utilisateur), trié auto_ia d'abord, chaque action ouverte par son sélecteur `A-N` — les deux familles ne partagent JAMAIS la même numérotation. Effort en complexité × durée, jamais en jours. v2.18.0 (08/09) : le VERDICT que tu affiches mesure ce que le fichier jugé mesure — un tour qui n'apporte qu'un delta REDÉPOSE la synthèse à jour et affiche celle-là, il ne retouche pas l'écran seul ; un tour qui n'apporte rien de neuf rend un accusé bref, pas une restitution de plus. v2.17.0 (08/09) : ce que tu AFFICHES est le fichier jugé, jamais son résumé — les blocs 3 et 8 s'y reprennent en entier (tableau des options, sélecteurs A-N, acteurs du vocabulaire gelé) ; et un message final PORTANT UN VERDICT ou dépassant 150 mots est jugé même sans aucune écriture dans le tour. v2.16.0 (02/09) : aucune action manuelle_utilisateur ne demande à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation ; une correction restituée nomme son contrôle rouge → vert ou sa classe ; le fichier de synthèse se nomme Synthese ou Restitution — le marqueur `destinataire: humain` est réservé aux restitutions. Le hook Stop le juge par oracle-synthese et REFUSE l'arrêt en cas d'échec.",
   "- Les README d'input\\ et output\\ se régénèrent après chaque écriture (hook PostToolUse) ; un rôle non rédigé est un défaut.",
   "- Quand la factory est impliquée, ses règles priment sur celles du projet (R-43).");
 console.log(lignes.join("\n"));

@@ -1,18 +1,18 @@
 La publication est faite : la version corrigée est partie vers le dépôt distant, et les autres postes la recevront à leur prochaine ouverture. Ce que cela change : la correction n'est plus locale, elle circule. Ce qui est attendu de vous : une seule décision, ci-dessous, sur la suite du mandat.
 
 ## 1. En-tête
-- quoi : exécution du geste de publication · sur quoi : la factory · quand : 2026-09-11 09:12 (Europe/Paris), durée 4 min · qui : pilot v1.17.19.
+- quoi : exécution du geste de publication · sur quoi : la factory · quand : 2026-09-11 09:12 (Europe/Paris), durée 4 min · qui : pilot v1.17.19 · intention : mettre les forges corrigées à disposition des autres postes, pas seulement clore les items. Test rétro : les 6 dépôts sont poussés, l'intention est servie.
 
 ## 2. Verdict
 - Publication exécutée, 683 commits reçus par le dépôt distant, recette 22/22 verte après coup.
 
 ## 3. Décisions attendues
 
-> **D-12 — Faut-il enchaîner sur la forge-ops ce soir, ou reprendre demain matin ?** La publication qui vient d'être faite libère la suite du mandat ; la seule question est de savoir si on enchaîne tout de suite sur la forge suivante, ou si on s'arrête là pour la journée avec un état propre.
+> **D-12 — Faut-il enchaîner sur la forge-ops ce soir, ou reprendre demain matin ?** La publication qui vient d'être faite libère la suite du mandat ; la seule question est de savoir si on enchaîne tout de suite sur `digit-ai-forge-ops`, ou si on s'arrête là pour la journée avec un état propre.
 >
 > **Recommandation : (b).** Source consultée : `references\ETAPES-RUN.md` — un enchaînement de forge se prend en début de tour, jamais après un geste de publication.
 
-| Option | Ce qu'elle coûte | Ce qu'elle exclut |
+| Option | Coût | Exclusions |
 |---|---|---|
 | (a) enchaîner ce soir | une session longue | un état stable pour la nuit |
 | (b) reprendre demain matin | une demi-journée de décalage | l'avance prise ce soir |

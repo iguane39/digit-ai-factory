@@ -1,0 +1,65 @@
+# recette-pilot.yml — rejeu hébergé minimal de la recette du pilot (TF-1018, décision « 12a »
+# du 15/09/2026, option O3 de l'étude d'opportunité citée par le mandat).
+#
+# INACTIF PAR CONSTRUCTION : ce fichier vit ici, hors de .github/workflows/, précisément pour
+# qu'aucune exécution hébergée ne se déclenche avant un GO humain distinct (R-38). Voir
+# ci/hebergee/ACTIVER.md pour le geste d'activation, ce qu'il engage, et la simulation locale
+# (scripts/simuler-recette-hebergee.mjs) qui se joue AVANT lui.
+#
+# Ce que ce fichier rejoue : les deux mêmes commandes que la recette locale du pilot — aucun secret,
+# aucune API tierce payante, aucun déploiement. TF-1133 : rejoué sur un clone frais, le premier jet
+# (le pilot seul, profondeur 1) rendait 9 recettes en défaut sur 115. Le runner reçoit donc ce que
+# la recette lit hors du pilot : l'historique complet (relever-heritage), les deux dépôts frères
+# PUBLICS clonés à côté (registre des types d'organization pour R-25, socle HTML de forge-agents),
+# et FORGE_ROOT posé sur leur parent commun. Les dépôts frères publics se clonent sans secret.
+# Ce qui n'est pas là par construction (canal confidentiel, forges non clonées, ~/.claude) est
+# déclaré sans objet, motif écrit, par les oracles d'état (critère dans oracles/self-tests.mjs, I4).
+name: Recette pilot (hébergée)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  recette:
+    runs-on: ubuntu-latest
+    env:
+      FORGE_ROOT: ${{ github.workspace }}
+    steps:
+      - name: Récupérer le pilot avec son historique complet
+        uses: actions/checkout@v4
+        with:
+          path: digit-ai-factory
+          fetch-depth: 0
+
+      - name: Récupérer le dépôt frère public digit-ai-forge-organization
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/digit-ai-forge-organization
+          path: digit-ai-forge-organization
+
+      - name: Récupérer le dépôt frère public digit-ai-forge-agents
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/digit-ai-forge-agents
+          path: digit-ai-forge-agents
+
+      - name: Installer Node 20+
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Installer Python 3 (le socle HTML n'emploie que la bibliothèque standard)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Self-tests des oracles du pilot (oracles/self-tests.mjs)
+        working-directory: digit-ai-factory
+        run: node oracles/self-tests.mjs
+
+      - name: Self-test du registre TODO-FORGE (todo/self-test.mjs)
+        working-directory: digit-ai-factory
+        run: node todo/self-test.mjs

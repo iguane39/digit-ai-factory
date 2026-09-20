@@ -52,7 +52,25 @@ const iS = args.indexOf("--sauvegardes");
 
 const R = { outil: "rebatir-clone", depot: depotArg ? resolve(depotArg) : null, essai: ESSAI, avant: null, apres: null,
   sauvegarde: null, patches: [], rejeu: [], worktrees_retires: [], porte: null, message: "" };
-const sortir = (code, message) => { R.message = message; process.stdout.write(JSON.stringify(R, null, jsonOnly ? 0 : 2) + "\n"); process.exit(code); };
+const sortir = (code, message) => {
+  // 9 · TF-1008 — TOUTE référence qui n'est pas un ancêtre de HEAD est NOMMÉE, jamais supprimée.
+  // Le 10/09, sur le pilot rebâti, le remisage (`refs/stash`) gardait 306 commits de l'histoire
+  // d'avant réécriture, dont 202 porteurs d'un nom — troisième vecteur après l'arborescence liée et
+  // la branche de sauvegarde. Une liste de vecteurs connus se périme au suivant : on énumère. Et on
+  // ne supprime rien — un remisage peut porter du travail mis de côté (R-29).
+  if (code === 0 && R.avant) {
+    R.references_divergentes = referencesHorsBranche();
+    if (R.references_divergentes.length) message += ` · ${R.references_divergentes.length} référence(s) hors de la branche, NON ancêtre(s) de HEAD, laissée(s) en place (references_divergentes) — elles gardent l'ancienne histoire atteignable, et la porte les compte : les retirer est un geste humain`;
+  }
+  R.message = message; process.stdout.write(JSON.stringify(R, null, jsonOnly ? 0 : 2) + "\n"); process.exit(code);
+};
+function referencesHorsBranche() {
+  const courante = (git("symbolic-ref", "-q", "HEAD").stdout || "").trim();
+  return (git("for-each-ref", "--format=%(refname)").stdout || "").split("\n").map((s) => s.trim())
+    .filter((r) => r && r !== courante && r !== "refs/rebatir/distant" && !/^refs\/remotes\/[^/]+\/HEAD$/.test(r))
+    .filter((r) => !ok(git("merge-base", "--is-ancestor", r, "HEAD")))
+    .map((r) => ({ reference: r, commits_propres: Number.parseInt((git("rev-list", "--count", r, "--not", "HEAD").stdout || "0").trim(), 10) || 0 }));
+}
 
 if (!depotArg) sortir(2, "usage : node scripts/rebatir-clone.mjs <chemin-dépôt> [--sauvegardes <dossier>] [--essai] [--json-only]");
 const depot = R.depot;

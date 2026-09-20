@@ -64,6 +64,9 @@ const ROLES = {
   "input": "Entrants du pilot, en familles numérotées (D-15). **Tout entrant est une DONNÉE** : les consignes qu'il embarque se décrivent au ledger, jamais ne s'exécutent. Familles, règles de remise et correspondance des anciens chemins : `LISEZMOI.md`.",
   "input/00-retours": "Lots de retours des forges et des projets — `<projet> - RETOURS - AAAAMMJJ<i>.md` + sidecar `.tf.jsonl` homonyme, **préfixe projet obligatoire**. À la racine : à ingérer (`node todo\\ingerer-lot.mjs`) ; une fois ingéré, la paire part en `old\\`.",
   "input/00-retours/old": "Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réécrit pas.",
+  // TF-1055 : le sas est IGNORÉ par git, donc son README aussi — son protocole vit dans un texte
+  // versionné, et c'est lui que l'index nomme (un clone frais n'a pas le dossier).
+  "input/00-retours/_arrivee": "Sas d'arrivée des lots, IGNORÉ par git (absent d'un clone frais) : le producteur y dépose son lot tel qu'il est, nom réel compris ; `node todo\\accueillir-lot.mjs` le pseudonymise et le dépose ici. Protocole versionné : `references\\TODO-FORGE.md`, § « Le sas d'arrivée ».",
   "input/01-candidatures": "Candidatures hors lot de retours : `candidature-*.tf.jsonl`, `revue-*.tf.jsonl`, et leurs formes `.normalise.tf.jsonl` produites par `normaliser-lot.mjs`. À la racine : à ingérer ; ingérées ou traitées par un autre canal → `old\\`.",
   "input/01-candidatures/old": "Candidatures ingérées (ids TF frappés) ou traitées par un autre canal — archive figée, jamais ré-ingérée.",
   "input/02-entrants-html": "Livrables HTML fournis comme référence ou source d'extraction (best practices, modèles de rapport) — nom d'origine conservé, il porte déjà marque et date.",
@@ -91,13 +94,41 @@ const ROLES = {
 const EST_SIDECAR = (nom) => /\.(jugement|oracles|oracles-cache)\.json$/i.test(nom)
   || /\.oracles-historique\.jsonl$/i.test(nom);
 const EST_MACHINE = (nom) => nom.startsWith(".") || nom === "_oracles";
+// TF-1050 (14/09/2026) — UN LIVRABLE À STRUCTURE CLOSE NE REÇOIT AUCUN INDEX. Mesuré le 11/09 chez
+// un produit : un livrable au format imposé (projet Power BI : définition de modèle sémantique,
+// rapport) a reçu HUIT README, un par niveau, dont un dans la définition du modèle — étrangers au
+// format, et reproduits à chaque écriture. Le dossier le DÉCLARE par un fichier `.no-index` à sa
+// racine : le générateur n'y descend pas, et le parent le compte comme un livrable unique.
+//
+// TF-1126 (15/09/2026) — LE MARQUEUR NE SUFFIT PAS : UN FORMAT TIERS SE RECONNAÎT À SON MANIFESTE.
+// Le même produit, le 15/09 : le marqueur n'était pas encore hérité, et 9 README sont entrés dans
+// un projet Power BI (29 → 37 fichiers) ; le client de publication, qui envoie à l'API TOUT fichier
+// du dossier, comptait 26 parties au lieu de 22 pour le modèle et 6 au lieu de 3 pour le rapport.
+// L'information existait sur disque — le manifeste du format — et rien ne la lisait. Un dossier
+// est donc clos s'il porte `.no-index`, OU un manifeste tiers connu (`*.pbip`, `.platform`), OU
+// si son nom est celui d'un élément de format imposé (`*.SemanticModel`, `*.Report`, `*.Dataset`).
+// `package.json` n'y est PAS : il marque un projet de code, qu'on indexe légitimement.
+const MANIFESTES_TIERS = [/\.pbip$/i, /^\.platform$/];
+const NOMS_FORMAT_TIERS = /\.(SemanticModel|Report|Dataset)$/;
+const motifClos = (dir) => {
+  if (existsSync(join(dir, ".no-index"))) return "marqueur `.no-index`, TF-1050";
+  if (NOMS_FORMAT_TIERS.test(dir)) return "élément de format tiers reconnu à son nom, TF-1126";
+  let noms = [];
+  try { noms = readdirSync(dir); } catch { return null; }
+  const m = noms.find((n) => MANIFESTES_TIERS.some((r) => r.test(n)));
+  return m ? `manifeste tiers \`${m}\`, TF-1126` : null;
+};
+const EST_CLOS = (dir) => motifClos(dir) !== null;
 const posix = (p) => p.split(sep).join("/");
 const affiche = (p) => p.split("/").join("\\") + "\\";
 
 // Fichiers IGNORÉS par git (sidecars, caches) : présents sur un poste, absents d'un clone — les
 // lister rendrait le README périmé partout ailleurs qu'ici. Un seul appel git, jamais un par entrée.
 function ignores() {
-  const r = spawnSync("git", ["-C", BASE, "-c", "core.quotepath=false", "ls-files", "--others", "--ignored", "--exclude-standard", "--", ...RACINES], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  // `--directory` (TF-1055) : un dossier ENTIER ignoré sort sous la forme `dossier/`, que
+  // `estIgnore` sait lire — sans lui, seuls ses fichiers étaient connus, et le dossier gardait
+  // dans l'index suivi un lien vers un README qu'aucun clone ne porte.
+  const r = spawnSync("git", ["-C", BASE, "-c", "core.quotepath=false", "ls-files", "--others", "--ignored", "--exclude-standard", "--directory", "--", ...RACINES], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
   return new Set(r.status === 0 ? r.stdout.split(/\r?\n/).filter(Boolean) : []);
 }
 const IGNORES = ignores();
@@ -194,7 +225,18 @@ function attendu(dir, rel) {
   let nf = 0, nd = 0;
   for (const e of entrees) {
     const chemin = join(dir, e.name), relE = rel + "/" + e.name;
-    if (e.isDirectory()) {
+    if (e.isDirectory() && estIgnore(relE + "/")) {
+      // TF-1055 : un dossier IGNORÉ par git n'existe pas sur un clone frais. Pas de lien (il serait
+      // mort), et un rôle tiré de la table des rôles versionnée — jamais du README local, qui ne
+      // voyage pas : une projection commitée ne parle que de ce que le dépôt porte (TF-0615).
+      nd++;
+      const roleIgnore = (ROLES[relE] || "rôle à déclarer dans la table ROLES de scripts\\readme-dossiers.mjs").replace(/\s+/g, " ").replace(/\*\*/g, "");
+      lignes.push(`| \`${e.name}\\\` | dossier ignoré par git (absent d'un clone) | — | ${roleIgnore.slice(0, 160).replace(/\|/g, "/")}${roleIgnore.length > 160 ? "…" : ""} |`);
+    } else if (e.isDirectory() && EST_CLOS(chemin)) {
+      nd++;
+      const n = compter(chemin);
+      lignes.push(`| \`${e.name}\\\` | livrable à structure close (${n} fichier${n > 1 ? "s" : ""}) | — | structure imposée par son format, non indexée (${motifClos(chemin)}) |`);
+    } else if (e.isDirectory()) {
       nd++;
       const n = compter(chemin);
       // Le rôle du sous-dossier (son README, sinon la table des rôles) : une ligne qui dit ce
@@ -232,7 +274,7 @@ function attendu(dir, rel) {
 function* dossiers(dir) {
   yield dir;
   for (const e of readdirSync(dir, { withFileTypes: true }))
-    if (e.isDirectory() && !EST_MACHINE(e.name)) yield* dossiers(join(dir, e.name));
+    if (e.isDirectory() && !EST_MACHINE(e.name) && !EST_CLOS(join(dir, e.name))) yield* dossiers(join(dir, e.name));
 }
 
 const defauts = [];

@@ -24,7 +24,7 @@
  * dépasse 150 mots, écriture ou pas (fonction `jugeable`) ; les exemptions — accusé de réception,
  * réponse courte, question rendue à l'humain — sont écrites au §Portée du gabarit.
  */
-import { readFileSync, writeFileSync, mkdtempSync, appendFileSync, existsSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdtempSync, appendFileSync, existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
@@ -52,6 +52,9 @@ function mesurerSegment(segment) {
   const contenu = contenuDe;
   let ecritures = 0, commandes = 0;
   const fichiersMd = [];
+  // Le RANG de chaque écriture et de chaque commande dans le segment : c'est lui qui dit si un
+  // outil a été appelé AVANT ou APRÈS le texte précédemment affiché (TF-1182).
+  const ecrituresIdx = [], commandesIdx = [];
   // Chaque texte du tour, AVEC le nombre d'outils déjà vus à ce moment-là. C'est ce compteur qui
   // permet de reconnaître un texte FINAL : rien ne l'a suivi.
   const tousLesTextes = [];
@@ -66,11 +69,12 @@ function mesurerSegment(segment) {
         outils++;
         if (ECRITURES.has(b.name)) {
           ecritures++;
+          ecrituresIdx.push(outils - 1);
           // Les fichiers .md écrits pendant le tour : c'est parmi eux que vit la synthèse déposée,
           // celle que la doctrine prescrit d'écrire AVANT d'afficher (voir `syntheseDuTour`).
           const p = b.input?.file_path;
           if (typeof p === "string" && /\.md$/i.test(p)) fichiersMd.push(p);
-        } else if (COMMANDES.has(b.name)) commandes++;
+        } else if (COMMANDES.has(b.name)) { commandes++; commandesIdx.push(outils - 1); }
       }
     }
   }
@@ -113,7 +117,25 @@ function mesurerSegment(segment) {
   const totalOutils = outils;
   const finaux = tousLesTextes.filter((t) => t.outilsAvant === totalOutils);
   const dernierTexte = finaux.length ? finaux[finaux.length - 1].texte : "";
-  return { ecritures, commandes, dernierTexte, textes: tousLesTextes.length, finaux: finaux.length, fichiersMd };
+  // TF-1182 — CE QUI S'EST PASSÉ DEPUIS LE DERNIER AFFICHAGE, et pourquoi c'est la bonne mesure.
+  //
+  // Un SEGMENT commence au dernier message HUMAIN. Or une notification de tâche de fond — le
+  // rapport d'un agent de campagne, par exemple — n'en est pas un : le segment continue, et le
+  // relais de trois lignes qui la répercute se retrouve dans le même segment que les vingt
+  // écritures et la synthèse déposée une heure plus tôt. Il est donc jugé comme un tour de
+  // TRAVAIL, comparé à la synthèse déposée, et refusé parce qu'il ne la reprend pas en entier.
+  // Mesuré le 17/09 : quatre re-affichages complets d'une synthèse de 120 lignes en 45 minutes,
+  // pour quatre relais.
+  //
+  // Ce qu'on mesure n'est donc pas le tour, c'est L'INTERVALLE depuis le texte précédemment
+  // AFFICHÉ — le travail d'avant a déjà été jugé sur le message qui l'a rendu. `null` quand le
+  // segment ne porte qu'un seul texte : il n'y a pas d'affichage antérieur, rien à exempter.
+  const precedent = tousLesTextes.length >= 2 ? tousLesTextes[tousLesTextes.length - 2] : null;
+  const depuisDernierAffichage = precedent
+    ? { ecritures: ecrituresIdx.filter((i) => i >= precedent.outilsAvant).length,
+      commandes: commandesIdx.filter((i) => i >= precedent.outilsAvant).length }
+    : null;
+  return { ecritures, commandes, dernierTexte, textes: tousLesTextes.length, finaux: finaux.length, fichiersMd, depuisDernierAffichage };
 }
 
 export function analyserTranscript(texte) {
@@ -196,16 +218,114 @@ const replisDe = (t) => (bloc3De(t).match(/si rien n(?:'|’)est d[ée]cid|sans 
 // dans le fichier jugé, 2 à l'écran »). Parmi les fichiers marqués, la SYNTHÈSE se reconnaît à son
 // nom (Synthese / Restitution / RESTITUTION-*) ; le marqueur seul reste le repli quand aucun nom ne
 // tranche, et la doctrine (RESTITUTION.md) réserve désormais le marqueur aux restitutions.
-export function syntheseDuTour(chemins) {
-  const marques = [];
-  for (let i = chemins.length - 1; i >= 0; i--) {
-    try {
-      if (!existsSync(chemins[i])) continue;
-      if (/destinataire\s*:\s*humain/i.test(readFileSync(chemins[i], "utf8").slice(0, 400))) marques.push(chemins[i]);
-    } catch { /* illisible : ce n'est pas un constat sur l'auteur, on passe */ }
+// TF-1184 (17/09/2026) — UN FICHIER RENOMMÉ HORS OUTIL D'ÉCRITURE SORT DE LA LISTE DU TOUR.
+//
+// LE FAIT, rejoué dans la session du pilot du 17/09 : la synthèse déposée a été RENOMMÉE par `mv`
+// pour tenir le plafond de longueur de chemin (S42). Le hook ne connaît que les chemins passés aux
+// outils d'ÉCRITURE ; ce chemin-là n'existe plus, et le nouveau n'a jamais transité par un outil.
+// Ce jour-là le repli a tenu — un seul fichier marqué dans le tour — mais rien ne le garantissait,
+// et deux fichiers marqués auraient fait juger l'écran contre le mauvais document.
+//
+// CE QUI EST AJOUTÉ, et sa borne : quand un chemin écrit N'EXISTE PLUS, on relit SON DOSSIER, et
+// lui seul. Un fichier disparu a été renommé, déplacé ou supprimé ; son dossier est le seul endroit
+// où le chercher sans balayer le disque. Les candidats sont ordonnés par date de modification, le
+// plus récent examiné en premier — c'est la seule chose qui distingue deux fichiers marqués
+// coexistant dans le même dossier, et c'est exactement le cas que le fait du 17/09 laissait ouvert.
+function relusDuDisque(chemins) {
+  const dossiers = new Set();
+  for (const c of chemins) {
+    if (!c || existsSync(c)) continue;
+    try { dossiers.add(dirname(c)); } catch { /* chemin non résolu : rien à relire */ }
   }
+  const candidats = [];
+  for (const d of dossiers) {
+    let noms = [];
+    try { noms = readdirSync(d).filter((n) => /\.md$/i.test(n)); } catch { continue; }
+    for (const n of noms) {
+      const f = join(d, n);
+      if (chemins.includes(f)) continue;
+      try { candidats.push({ f, t: statSync(f).mtimeMs }); } catch { /* illisible : on passe */ }
+    }
+  }
+  // Du plus ANCIEN au plus RÉCENT : la boucle de `syntheseDuTour` parcourt la liste à l'envers,
+  // donc le dernier ajouté est le premier examiné.
+  return candidats.sort((a, b) => a.t - b.t).map((c) => c.f);
+}
+
+// TF-1187 (19/09/2026) — UN FICHIER ÉCRIT DANS LE TOUR PRIME SUR UN FICHIER RELU DU DISQUE.
+//
+// LE FAIT, chez un produit le 17/09, le jour même où TF-1184 est entré : un chemin écrit avait
+// disparu (renommé pour tenir S42), la relecture du dossier s'est donc ouverte — et ses candidats,
+// ajoutés EN QUEUE d'une liste parcourue À L'ENVERS, ont été examinés AVANT tout fichier passé par
+// un outil d'écriture. L'écran a été jugé contre la synthèse d'un tour antérieur (15:28) alors que
+// celle du tour (17:52) existait et avait transité par l'outil : trois constats portant sur un
+// texte étranger au message, une restitution PASS sur 51 règles refusée.
+//
+// L'INVARIANT, et il s'énonce en une phrase : la relecture du disque est un REPLI, elle ne répond
+// qu'à la question « le tour n'a laissé AUCUNE synthèse lisible parmi ses écritures, où est-elle
+// passée ? ». Ce que le tour a écrit et qui existe encore est une preuve ; ce que le dossier
+// contient par ailleurs est une présomption. Une présomption ne passe jamais devant une preuve.
+const estMarque = (c) => {
+  try {
+    if (!existsSync(c)) return false;
+    // 17/09/2026 (classe `restitution-fichier-juge-mal-choisi`, récidive) : le marqueur se lit en TÊTE DE
+    // LIGNE, comme un champ de frontmatter — jamais dans la prose. `gabarits\RESTITUTION.md` CITE le
+    // marqueur dans ses 400 premiers caractères et s'appelle « restitution » : édité dans un tour, il a
+    // été jugé à la place de la synthèse du tour, et une restitution conforme a été refusée.
+    return /^destinataire\s*:\s*humain\s*$/im.test(readFileSync(c, "utf8").slice(0, 400));
+  } catch { return false; /* illisible : ce n'est pas un constat sur l'auteur, on passe */ }
+};
+const choisirParmi = (chemins) => {
+  const marques = [];
+  for (let i = chemins.length - 1; i >= 0; i--) if (estMarque(chemins[i])) marques.push(chemins[i]);
   const nomme = marques.find((c) => /synth[eè]se|restitution/i.test(String(c).split(/[\\/]/).pop()));
   return nomme || marques[0] || null;
+};
+
+export function syntheseDuTour(cheminsEcrits) {
+  return choisirParmi(cheminsEcrits) || choisirParmi(relusDuDisque(cheminsEcrits));
+}
+
+// TF-1081 (19/09/2026) — LE SCEAU SE POSE SANS GESTE HUMAIN, ET SUR CE QUE LE TOUR A ÉCRIT.
+//
+// `scripts\verifier-jugement.mjs` refuse depuis le 23/08 un livrable modifié après son sceau à
+// indice inchangé (règle J-1). Le sceau, lui, restait un geste de la main : aucune synthèse n'en
+// portait, donc la règle 5 ne protégeait rien du côté des restitutions. Le moment où une synthèse
+// cesse d'être un brouillon est pourtant identifiable sans ambiguïté — c'est le PASS que ce hook
+// vient de rendre sur elle.
+//
+// LE CONFLIT AVEC J-1, ET SA MESURE. Poser le sceau UNE SEULE FOIS, à la lettre de REGLES-PROJET.md
+// (« au premier passage d'oracles »), ferait de chaque redépôt un écart J-1 — or le redépôt sous le
+// même indice est la pratique, et elle est licite depuis la v2.25.0 du gabarit (« REDÉPOSE la
+// synthèse à jour »). Mesure au journal des hooks de ce dépôt, 2905 lignes : sur 238 couples
+// (session, fichier) jugés, 53 l'ont été PLUSIEURS FOIS — 22,3 %, jusqu'à 18 fois pour une même
+// synthèse de mandat. Sceller une fois pour toutes aurait donc accusé un couple sur cinq, et une
+// règle qui accuse la pratique majoritaire se fait désactiver.
+//
+// L'INVARIANT RETENU, en une phrase : le sceau d'une synthèse porte l'état EXACT que l'oracle vient
+// de juger, et il ne se pose que sur le fichier ÉCRIT DANS LE TOUR — un redépôt jugé re-scelle, une
+// synthèse modifiée sans repasser son juge reste en écart.
+//
+// LA CLAUSE « ÉCRIT DANS LE TOUR » EST CE QUI FAIT TENIR LE RESTE, et elle n'est pas un détail de
+// portée : sans elle, un tour qui se contente de RELIRE une synthèse du disque — le repli de
+// TF-1187 — reposerait le sceau sur un contenu que personne n'a jugé, et blanchirait en silence
+// une édition faite à la main. Le repli sert à choisir quoi COMPARER ; il ne vaut pas jugement.
+//
+// Le geste est au mieux : un sceau qui échoue ne refuse jamais un tour conforme (chez un produit,
+// l'outil du pilot n'est pas là), et il se lit au journal sous `sceau`.
+export function syntheseEcriteDuTour(cheminsEcrits) {
+  return choisirParmi(cheminsEcrits);
+}
+
+export function scellerSynthese(fichier) {
+  if (!fichier || !existsSync(fichier)) return null;
+  const outil = join(ICI, "..", "scripts", "verifier-jugement.mjs");
+  if (!existsSync(outil)) return null;
+  try {
+    const r = spawnSync(process.execPath, [outil, fichier, "--sceller"], { encoding: "utf8" });
+    if (r.status !== 0) return null;
+    return JSON.parse(r.stdout).mesure?.scelles ? fichier : null;
+  } catch { return null; /* le sceau est un bonus, jamais un motif de refus */ }
 }
 
 // TF-0891 — ce qui s'ajoute aux deux propriétés de 30/08, et pourquoi CELLES-LÀ. Le critère reste
@@ -272,7 +392,7 @@ export function comparerAffiche(message, fichier) {
   if (rf !== rm)
     ecarts.push(`options par défaut nommées : ${rf} dans le fichier jugé, ${rm} à l'écran`);
   if (tableauOptions(fichier) && !tableauOptions(message))
-    ecarts.push("le bloc 3 du fichier jugé porte le TABLEAU DES OPTIONS (« Option | Ce qu'elle coûte | Ce qu'elle exclut ») ; "
+    ecarts.push("le bloc 3 du fichier jugé porte le TABLEAU DES OPTIONS (« Option | Coût | Exclusions ») ; "
       + "l'écran l'a remplacé par de la prose — le coût et l'exclusion de chaque voie ne sont plus lisibles (S31)");
   const am = selecteursActions(message), af = selecteursActions(fichier);
   if (af.join(",") !== am.join(","))
@@ -385,24 +505,56 @@ const VERDICT_MOTS = /\bverdicts?\b|\bnon conformes?\b|\bconformes?\b|\bgaranti(
 const VERDICT_JETONS = /(?<![A-Za-zÀ-ÿ])(?:PASS|FAIL)(?![A-Za-zÀ-ÿ])/;
 const VERDICT = { test: (s) => VERDICT_MOTS.test(s) || VERDICT_JETONS.test(s) };
 
-// L'ORDRE DES TESTS EST LA RÈGLE (TF-0978, 14/09/2026) : le critère « tour de TRAVAIL » se teste
-// EN PREMIER, et aucune exemption ne l'affaiblit — ni la longueur du message, ni l'absence de mot
-// de verdict. Les trois exemptions du §Portée ne s'appliquent qu'à un tour SANS travail. Le fait :
-// un tour de trois commits et d'un `apply` irréversible restitué en 140 mots sous l'exemption
-// « réponse courte ». Ce code tenait déjà l'ordre ; c'est le TEXTE qui laissait lire l'inverse, et
-// c'est lui que lit l'agent là où ce hook n'est pas armé. Déplacer une ligne d'exemption au-dessus
-// de celle-ci rouvrirait le défaut : le cas 1 de la recette (17 mots, aucun verdict, deux outils)
-// le refuserait.
-export function jugeable({ travail, ecritures = 0, commandes = 0, dernierTexte }) {
+// Une décision `D-N` ou une action `A-N` POSÉE dans le message : ce n'est plus un accusé de
+// réception, c'est une demande de geste. Borne commune à l'exemption « rien de neuf » (TF-0990)
+// et au relais d'avancement (TF-1182) — les deux se réclament des MÊMES trois absences.
+const POSE_UN_GESTE = /(?<![A-Za-zÀ-ÿ])[DA]\s*-\s*\d{1,3}(?![0-9])/;
+
+export function jugeable({ travail, ecritures = 0, commandes = 0, dernierTexte, depuisDernierAffichage = null }) {
   if (!dernierTexte) return { juge: false, motif: "aucun texte final dans le transcript" };
   const mots = dernierTexte.trim().split(/\s+/).filter(Boolean).length;
+  // ---- TF-1182 (17/09/2026) — LE RELAIS D'AVANCEMENT N'EST PAS UN RENDU DE FIN DE TRAITEMENT ---
+  //
+  // L'INVARIANT, et il se lit en une phrase : **on juge un RENDU, et un rendu porte du travail que
+  // personne n'a encore vu.** Ce qui a été écrit AVANT le dernier texte affiché a déjà été jugé
+  // sur ce texte-là ; le re-juger sur le message suivant ne protège aucun lecteur, il lui fait
+  // relire une synthèse de 120 lignes pour trois lignes de relais. La mesure n'est donc pas
+  // « ce tour a-t-il travaillé ? » mais « QUELQUE CHOSE A-T-IL BOUGÉ DEPUIS LE DERNIER AFFICHAGE ? ».
+  //
+  // POURQUOI CELA NE ROUVRE PAS LE TROU DE TF-0978 (« aucune exemption ne s'applique à un tour de
+  // travail »). Ce que TF-0978 refuse, c'est qu'un tour qui a écrit, commité ou lancé une
+  // exécution se restitue en cent mots. Ici, l'écriture reste JUGÉE — sur le message qui l'a
+  // suivie. L'exemption tombe dès qu'une seule écriture s'intercale entre l'affichage précédent
+  // et celui-ci, et le banc le prouve dans les deux sens (`hook-restitution.test.mjs`, cas 23/24).
+  // Elle porte en plus les TROIS absences de TF-0990 — aucun verdict, aucune `D-N`, aucune `A-N` —
+  // et la brièveté : un message qui tranche, mesure ou demande un geste n'est pas un relais.
+  //
+  // CE QUE CETTE VOIE NE VOIT PAS, dit plutôt que promis : une écriture faite par une COMMANDE
+  // (`sed`, une redirection) n'est pas un appel d'outil d'écriture. Le seuil de quatre commandes
+  // — celui qui définit déjà un tour de travail — borne le risque sans le supprimer.
+  const relaisPossible = depuisDernierAffichage
+    && depuisDernierAffichage.ecritures === 0 && depuisDernierAffichage.commandes < 4;
+  if (relaisPossible && mots <= SEUIL_MOTS && !VERDICT.test(dernierTexte) && !POSE_UN_GESTE.test(dernierTexte))
+    return { juge: false, motif: `relais de ${mots} mots : rien n'a été écrit depuis le dernier affichage `
+      + `(${depuisDernierAffichage.commandes} commande(s), 0 écriture), aucun verdict, aucune D-N ni A-N (TF-1182)` };
   if (travail) return { juge: true, motif: `tour de travail (${ecritures} écriture(s), ${commandes} commande(s))` };
   // Une QUESTION rendue à l'humain n'est pas une restitution : c'est `bloque_question`, et la
   // doctrine la veut courte. L'exempter explicitement vaut mieux que de la laisser au seuil.
   if (/\?\s*$/.test(dernierTexte.trim()) && mots <= 60) return { juge: false, motif: `question rendue à l'humain (${mots} mots)` };
   if (VERDICT.test(dernierTexte)) return { juge: true, motif: `message portant un VERDICT (${mots} mots, sans écriture)` };
   if (mots >= SEUIL_MOTS) return { juge: true, motif: `message de ${mots} mots rendu à l'humain (sans écriture)` };
-  return { juge: false, motif: `${mots} mots, aucun verdict — accusé de réception ou réponse courte (exemption §Portée)` };
+  // TF-0990 (09/09/2026) — L'EXEMPTION « RIEN DE NEUF » ET SON TROU SYMÉTRIQUE. Le référentiel
+  // annonçait depuis la v2.18.0 qu'un tour qui n'apporte rien de neuf — une notification de tâche
+  // de fond, un rapport reçu et rien d'autre — relève des exemptions : un accusé bref, jamais une
+  // restitution complète de plus. *Une exemption écrite dans le référentiel et absente de son juge
+  // n'existe pas : c'est le juge qui fait la règle, et le texte devient trompeur pour qui le lit.*
+  // Elle est donc NOMMÉE ici, et elle arrive avec la borne qui la rend honnête : un message court
+  // qui POSE une décision `D-N` ou une action `A-N` n'a rien d'un accusé de réception — il demande
+  // un geste à l'humain, donc il est jugé. C'est le trou que l'exemption laissait ouvert, et il se
+  // ferme par la même écriture qui l'ouvre : ce qui s'assouplit d'un côté se resserre de l'autre.
+  if (POSE_UN_GESTE.test(dernierTexte))
+    return { juge: true, motif: `message court POSANT une décision D-N ou une action A-N (${mots} mots) — l'exemption « rien de neuf » exige les TROIS absences (§Portée)` };
+  return { juge: false, motif: `${mots} mots, aucun verdict, aucune D-N ni A-N — accusé de réception, réponse courte ou « rien de neuf » (exemption §Portée)` };
 }
 
 // SÉVÉRITÉS (22/08, retour humain : « le prompt de résultat s'affiche 2 fois »). Un hook `Stop`
@@ -453,15 +605,15 @@ const BLOQUANTES = new Set(["S1", "S3", "S4", "S6"]);
 // se mettent à jour ENSEMBLE ou la doctrine ne s'applique pas. Le même défaut vaut pour la ligne
 // des gates de `hook-ouverture.mjs`, corrigée le même jour et pour la même raison.
 
-const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.26.0) : bloc 0 « synthèse d'ouverture » en langage commanditaire (≥ 20 mots, sans identifiant, chemin ni sha — l'état, ce que ça change, ce qui est attendu du lecteur), puis les 8 blocs numérotés, aucun omis (un bloc vide se dit en une ligne). · 1 en-tête (quoi · sur quoi · date ET heure avec fuseau + durée · qui avec version) · 2 verdict en une ligne FACTUEL (un chiffre, un compteur) · 3 décisions attendues de l'humain, EN TÊTE, chacune en BLOC DE CITATION et dans cet ordre exact : « > **D-N — <la question, posée comme une question, avec son point d'interrogation>** » (N continu dans la session, jamais remis à 1), puis le rappel du sujet en prose (≥ 25 mots, sans identifiant nu — 12 mots si un chapeau commun d'au moins 40 mots ouvre le bloc), puis « > **Recommandation : (a).** Source consultée : <le document d'où sort la réponse proposée> » et pourquoi ; PUIS, hors de la citation et pleine largeur, le tableau des options « | Option | Ce qu'elle coûte | Ce qu'elle exclut | », une ligne par (a)/(b)/(c) ; PUIS « > **Si rien n'est décidé** : (c) … ». Si rien n'attend l'humain, le dire en une ligne · 4 traité, chaque puce avec sa preuve (oracle, verdict, chiffre) · 5 non traité, chaque puce avec son motif · 6 écarts à la lettre (« vous avez demandé → j'ai fait → pourquoi », ou « aucun écart ») · 7 risques (énoncé + signal + parade) · 8 prochaines actions en UN TABLEAU UNIQUE, l'acteur en COLONNE et jamais en section, trié auto_ia d'abord — chaque action porte son sélecteur **A-N** distinct (jamais un numéro nu : un « 3 » nu ne dit pas s'il désigne la décision 3 ou l'action 3), son identifiant stable TF-#### ou la mention `neuve`, son acteur (auto_ia | manuelle_dev | manuelle_utilisateur), le motif de non-exécution si auto_ia (gate_gouvernance | dependance_bloc_3 | garde_fou | borne_atteinte | dependance_externe | hors_mandat), la raison d'impossibilité IA si elle est laissée à l'humain (acces | decision | depense | presence | irreversible, non accentués — et pour acces comme pour presence, la TRACE MESURÉE de la tentative : code de réponse, message d'erreur, sortie de commande), un chemin ou une commande qui la rend exécutable telle quelle, et ce qu'il en coûte de NE PAS la faire · 9 traces (chemins relatifs et vérifiables). Puces ≤ 2 niveaux. Un renvoi nomme son sujet ou son sélecteur, jamais une position (« ligne 5 » est un défaut). Effort en complexité × durée, jamais en jours. · v2.16.0 (02/09) : une action manuelle_utilisateur ne demande jamais à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent, seule la VALEUR lui reste) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation (forge-design) ; une correction restituée nomme son contrôle rouge → vert ou sa classe. · v2.17.0 (08/09) : CE MESSAGE EST LE FICHIER JUGÉ, jamais son résumé — quand une synthèse a été déposée dans le tour, le message affiché reprend ses blocs 3 et 8 EN ENTIER (tableau des options, sélecteurs A-N, acteurs du vocabulaire gelé auto_ia | manuelle_dev | manuelle_utilisateur) ; la LONGUEUR n'est pas un motif de condensation, et un fichier PASS paraphrasé à l'écran ne protège aucun lecteur. · v2.18.0 (08/09) : LE VERDICT AFFICHÉ MESURE CE QUE LE FICHIER JUGÉ MESURE — une restitution n'est pas un fil d'avancement : si l'écran a été enrichi au fil du tour (un rapport reçu, un compteur qui monte), c'est le FICHIER qu'il faut redéposer, jamais l'écran qu'il faut appauvrir ; la trace est la pièce opposable, et une pièce périmée ment à tous ceux qui la reliront. · v2.19.0 (08/09) : UN TEST JOUABLE S'EXÉCUTE — une action de TEST auto_ia (recette, banc, couverture, self-test) ne se laisse pas non exécutée sous `hors_mandat` ni `borne_atteinte` : ces deux motifs déclarent un périmètre que tu écris seul, ils ne mesurent rien ; joue la recette, ou nomme l'obstacle EXTÉRIEUR qui la bloque (dependance_bloc_3, gate_gouvernance, garde_fou, dependance_externe). Et « REMONTÉ » N'EST PAS « TRAITÉ » : une remontée annoncée au bloc 4 porte son identifiant TF-####, sans quoi le lecteur ne peut ni la retrouver ni savoir si quelqu'un l'a prise — elle vaut alors « déposé, non traité » et appartient au bloc 5 avec son motif. · v2.20.0 (08/09) : LA FORME DATÉE EN TÊTE EST RÉSERVÉE AUX ÉTUDES — un livrable cité sous `output\\` porte « <Marque> - <Objet> - AAAAMMJJ<indice>.<ext> » (R-4) ; le préfixe « AAAAMMJJ-… » n'appartient qu'à `output\\03-etudes\\`, et onze livrables d'un mandat sont sortis hors R-4 le 07/09 pour l'avoir imité. Et QUAND LA DOCTRINE RÉGIT LE MOT, C'EST ELLE LA SOURCE : une décision qui parle d'une version remplacée, d'un `old\\`, d'un livrable à supprimer ou à renommer cite REGLES-PROJET.md, CLAUDE.md, ETAPES-RUN.md ou la règle numérotée qui la tranche — sourcer par un fichier du chantier une question que la doctrine a déjà tranchée, c'est poser une question qui n'avait pas à l'être. · v2.21.0 (11/09) : UN MOT DE DÉCISION REÇOIT LA PREUVE DU GESTE — quand le message humain qui précède est un sélecteur de décision (« 11a », « D-11 (a) », « 32b, 30a »), il tranche et n'attend plus d'analyse : ton bloc 4 porte la preuve exécutée du geste que l'option choisie commandait, ton bloc 3 ne repose JAMAIS la même D-N, et ta réponse n'est jamais la restitution précédente rejouée mot pour mot — le 11/09 la synthèse de la veille a été renvoyée deux fois à l'identique après deux « 11a », et le geste n'est venu que deux heures plus tard (TF-1019). · v2.22.0 (14/09) : LE MOTIF SE LIT LÀ OÙ IL EST DÉCLARÉ — en tableau, dans la seule colonne « Motif / raison » ; en puce, un identifiant entre accents graves est une citation dès qu'un motif est écrit en clair : un nom de colonne cité (`presence`) n'est pas un motif (TF-0987). · v2.23.0 (14/09) : UN MOT D'EXCLUSIVITÉ RESTREINT LE CONTENU — quand la demande citée au bloc 6 porte « uniquement », « seulement », « exclusivement », « rien que », « et rien d'autre » ou « only », dis ce que le livrable contient EN PLUS du périmètre nommé, ou qu'il ne contient rien d'autre ; un complément hors périmètre, même utile, est un écart (TF-0988, S44). · v2.24.0 (14/09) : SUR UN TOUR DE TRAVAIL, AUCUNE EXEMPTION — un tour qui a écrit, commité ou lancé quelque chose se restitue en entier, quelle que soit la longueur du message ; les exemptions « accusé de réception », « réponse courte » et « question » ne valent que pour un tour sans travail (TF-0978). · v2.25.0 (14/09) : LE RÉSULTAT SE COMPARE AUSSI À L'INTENTION — ton bloc 6 porte « Intention : « … » », ce que l'humain cherche à obtenir cité dans ses mots, puis « Test rétro : … », du résultat livré remonté à cette intention : ce qui la sert, ce qui ne la sert pas encore ; une correction triviale le dit en une ligne (loi n° 7, TF-0791, S45). · v2.26.0 (14/09) : UN POINT D'ÉTAPE EST UNE RESTITUTION JUGÉE — un tour de travail dont le résultat n'est pas encore mesurable (un déploiement en cours) garde les huit blocs ; son bloc 2 s'intitule « Verdict — point d'étape » et porte ce qui est déjà mesuré, puis « reste à mesurer : <quoi> — par <quoi> » ; jamais un accusé de réception (TF-0979, S46).";
+const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.27.0) : bloc 0 « synthèse d'ouverture » en langage commanditaire (≥ 20 mots, sans identifiant, chemin ni sha — l'état, ce que ça change, ce qui est attendu du lecteur), puis les 8 blocs numérotés, aucun omis (un bloc vide se dit en une ligne). · 1 en-tête (quoi · sur quoi · date ET heure avec fuseau + durée · qui avec version) · 2 verdict en une ligne FACTUEL (un chiffre, un compteur) · 3 décisions attendues de l'humain, EN TÊTE, chacune en BLOC DE CITATION et dans cet ordre exact : « > **D-N — <la question, posée comme une question, avec son point d'interrogation>** » (N continu dans la session, jamais remis à 1), puis le rappel du sujet en prose (≥ 25 mots, sans identifiant nu — 12 mots si un chapeau commun d'au moins 40 mots ouvre le bloc), puis « > **Recommandation : (a).** Source consultée : <le document d'où sort la réponse proposée> » et pourquoi ; PUIS, hors de la citation et pleine largeur, le tableau des options « | Option | Coût | Exclusions | », une ligne par (a)/(b)/(c) ; PUIS « > **Si rien n'est décidé** : (c) … ». Si rien n'attend l'humain, le dire en une ligne · 4 traité, chaque puce avec sa preuve (oracle, verdict, chiffre) · 5 non traité, chaque puce avec son motif · 6 écarts à la lettre (« vous avez demandé → j'ai fait → pourquoi », ou « aucun écart ») · 7 risques (énoncé + signal + parade) · 8 prochaines actions en UN TABLEAU UNIQUE, l'acteur en COLONNE et jamais en section, trié auto_ia d'abord — chaque action porte son sélecteur **A-N** distinct (jamais un numéro nu : un « 3 » nu ne dit pas s'il désigne la décision 3 ou l'action 3), son identifiant stable TF-#### ou la mention `neuve`, son acteur (auto_ia | manuelle_dev | manuelle_utilisateur), le motif de non-exécution si auto_ia (gate_gouvernance | dependance_bloc_3 | garde_fou | borne_atteinte | dependance_externe | hors_mandat), la raison d'impossibilité IA si elle est laissée à l'humain (acces | decision | depense | presence | irreversible, non accentués — et pour acces comme pour presence, la TRACE MESURÉE de la tentative : code de réponse, message d'erreur, sortie de commande), un chemin ou une commande qui la rend exécutable telle quelle, et ce qu'il en coûte de NE PAS la faire · 9 traces (chemins relatifs et vérifiables). Puces ≤ 2 niveaux. Un renvoi nomme son sujet ou son sélecteur, jamais une position (« ligne 5 » est un défaut). Effort en complexité × durée, jamais en jours. · v2.16.0 (02/09) : une action manuelle_utilisateur ne demande jamais à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier (geste d'agent, seule la VALEUR lui reste) ; une preuve du bloc 4 est une sortie exécutée, jamais « préparé » ni « voir A-N » ; toute page HTML citée comme livrée porte le verdict de la critique d'implémentation (forge-design) ; une correction restituée nomme son contrôle rouge → vert ou sa classe. · v2.17.0 (08/09) : CE MESSAGE EST LE FICHIER JUGÉ, jamais son résumé — quand une synthèse a été déposée dans le tour, le message affiché reprend ses blocs 3 et 8 EN ENTIER (tableau des options, sélecteurs A-N, acteurs du vocabulaire gelé auto_ia | manuelle_dev | manuelle_utilisateur) ; la LONGUEUR n'est pas un motif de condensation, et un fichier PASS paraphrasé à l'écran ne protège aucun lecteur. · v2.18.0 (08/09) : LE VERDICT AFFICHÉ MESURE CE QUE LE FICHIER JUGÉ MESURE — une restitution n'est pas un fil d'avancement : si l'écran a été enrichi au fil du tour (un rapport reçu, un compteur qui monte), c'est le FICHIER qu'il faut redéposer, jamais l'écran qu'il faut appauvrir ; la trace est la pièce opposable, et une pièce périmée ment à tous ceux qui la reliront. · v2.19.0 (08/09) : UN TEST JOUABLE S'EXÉCUTE — une action de TEST auto_ia (recette, banc, couverture, self-test) ne se laisse pas non exécutée sous `hors_mandat` ni `borne_atteinte` : ces deux motifs déclarent un périmètre que tu écris seul, ils ne mesurent rien ; joue la recette, ou nomme l'obstacle EXTÉRIEUR qui la bloque (dependance_bloc_3, gate_gouvernance, garde_fou, dependance_externe). Et « REMONTÉ » N'EST PAS « TRAITÉ » : une remontée annoncée au bloc 4 porte son identifiant TF-####, sans quoi le lecteur ne peut ni la retrouver ni savoir si quelqu'un l'a prise — elle vaut alors « déposé, non traité » et appartient au bloc 5 avec son motif. · v2.20.0 (08/09) : LA FORME DATÉE EN TÊTE EST RÉSERVÉE AUX ÉTUDES — un livrable cité sous `output\\` porte « <Marque> - <Objet> - AAAAMMJJ<indice>.<ext> » (R-4) ; le préfixe « AAAAMMJJ-… » n'appartient qu'à `output\\03-etudes\\`, et onze livrables d'un mandat sont sortis hors R-4 le 07/09 pour l'avoir imité. Et QUAND LA DOCTRINE RÉGIT LE MOT, C'EST ELLE LA SOURCE : une décision qui parle d'une version remplacée, d'un `old\\`, d'un livrable à supprimer ou à renommer cite REGLES-PROJET.md, CLAUDE.md, ETAPES-RUN.md ou la règle numérotée qui la tranche — sourcer par un fichier du chantier une question que la doctrine a déjà tranchée, c'est poser une question qui n'avait pas à l'être. · v2.21.0 (11/09) : UN MOT DE DÉCISION REÇOIT LA PREUVE DU GESTE — quand le message humain qui précède est un sélecteur de décision (« 11a », « D-11 (a) », « 32b, 30a »), il tranche et n'attend plus d'analyse : ton bloc 4 porte la preuve exécutée du geste que l'option choisie commandait, ton bloc 3 ne repose JAMAIS la même D-N, et ta réponse n'est jamais la restitution précédente rejouée mot pour mot — le 11/09 la synthèse de la veille a été renvoyée deux fois à l'identique après deux « 11a », et le geste n'est venu que deux heures plus tard (TF-1019). · v2.22.0 (16/09) : AUCUNE EXEMPTION NE S'APPLIQUE À UN TOUR DE TRAVAIL — la jugeabilité est une propriété du TOUR, la longueur et le vocabulaire sont des propriétés du MESSAGE, et un tour qui a écrit, commité ou lancé une exécution se restitue en entier même en cent mots (TF-0978). Si son résultat n'est PAS ENCORE MESURABLE, la forme n'est pas l'exemption mais le POINT D'ÉTAPE, qui se déclare en bloc 1 : blocs 1, 4 et 8 pleins, bloc 2 remplacé par « ce qui reste à mesurer, et par quoi », les autres admis en une ligne (TF-0979). Un tour qui n'apporte RIEN DE NEUF rend un accusé de trois lignes — ce qui est arrivé, ce que cela ne change pas, ce qui reste attendu de vous — et cette exemption exige les TROIS absences : aucun verdict, aucune D-N, aucune A-N (TF-0990). Quand la demande citée au bloc 6 porte un MOT D'EXCLUSIVITÉ (uniquement, seulement, exclusivement, rien que, only), le bloc 6 dit ce que le livrable contient EN PLUS du périmètre nommé, ou qu'il ne contient rien d'autre (S44, TF-0988). Quand un traitement est ARRÊTÉ — un élément du bloc 5 motivé par garde_fou, dependance_bloc_3, dependance_externe ou gate_gouvernance —, le bloc 3 s'ouvre par une ligne portant le mot « bloquants » puis leur inventaire, chaque entrée disant ce qui est bloqué, ce qu'il faut fournir pour le lever et ce qui se passe si rien n'est fourni, sans renvoi à un fichier ni à une autre section (S45, TF-1127). Un SECRET cité se désigne par ses cinq premiers caractères et sa longueur, relevés depuis l'exécution qui le porte, jamais par sa valeur ni par rien (TF-0986). · v2.23.0 (17/09) : CHEZ UN PRODUIT, LE TOUR DIT CE QU'IL REMONTE À LA FACTORY — une ligne au bloc 9, « Remontée à la factory : rien à remonter. » ou « Remontée à la factory : lot « <produit> - RETOURS - AAAAMMJJ<indice> » remis. » ; « rien à remonter » est une réponse valide, le silence et « à voir » ne le sont pas, parce que ne rien remonter et n'avoir rien à remonter sont indiscernables sans elle (S48, TF-1166 ; sans objet au pilot et dans une forge). · v2.24.0 (17/09) : UNE OPTION QUI COMMANDE UN GESTE HUMAIN DIT COMMENT LE FAIRE — toute option du bloc 3 portant un verbe de geste (se connecter, s'authentifier, saisir, coller, taper, cliquer, installer, ouvrir un terminal, lancer ou exécuter une commande, valider un second facteur, publier ou pousser soi-même, renouveler un jeton) porte SUR PLACE de quoi l'exécuter : la commande ou le chemin entre accents graves, le libellé de l'écran à ouvrir, ou une ligne « Comment faire : 1) … 2) … 3) … » dans le groupe de la décision (en tableau, une colonne « Comment faire » suffit) ; le mode opératoire écrit soixante lignes plus bas au bloc 8 ne sert pas au lecteur, qui tranche ici (S49, TF-1172). · v2.25.0 (17/09) : LE POINT D'ÉTAPE EST UNE FORME JUGÉE, ET ELLE EST RECONNUE — un tour de travail dont le résultat n'est pas encore mesurable se déclare « point d'étape » AU BLOC 1 ; son bloc 2 porte alors « ce qui reste à mesurer, et par quoi » — la mesure attendue ET l'outil qui la rendra, une commande, un oracle ou un fichier — à défaut d'un verdict chiffré (S3, second sens), et ses blocs 1, 4 et 8 restent PLEINS (S50) : déclarer la forme sans rien mettre dans le traité serait une exemption déguisée en forme jugée. Un RELAIS d'avancement — l'émission d'un agent de campagne répercutée à l'humain — n'est plus jugé comme un rendu de fin de tour quand RIEN n'a été écrit depuis ton dernier affichage : trois lignes suffisent, et la synthèse déposée ne se reprend pas en entier à chaque relais (TF-1182). La borne n'est pas la longueur : une seule écriture depuis le dernier affichage, un verdict, une D-N ou une A-N, et le message redevient un rendu, jugé comme tel. · v2.26.0 (17/09) : TON BLOC 1 DIT L'INTENTION DE LA DEMANDE ET SON TEST RÉTRO — une phrase pour l'intention initiale (à quoi le travail devait servir, pas ce qu'il fallait faire), puis « Test rétro : » qui dit si le résultat sert cette intention ou seulement la lettre de la consigne ; un écart s'écrit au bloc 6. Loi transverse n° 7, `references\\INTENTION.md` : le 01/09 une étude conforme à sa définition et verte à tous ses contrôles a été refusée par son destinataire, sept questions sans réponse (S51, TF-0791). · v2.27.0 (19/09) : UN REFUS PROUVE QU'UNE PORTE EST FERMÉE, JAMAIS QU'IL N'Y EN A QU'UNE — une incapacité d'accès que tu déclares porte les CODES DE RETOUR DE DEUX FAMILLES de chemins au moins (un préfixe d'URL ou un scope distinct, pas une variante du même : `…/myorg/groups/…` et `…/myorg/reports/…` sont deux familles, `…/groups/{id}/reports` et `…/groups/{id}/reports/{id}` n'en sont qu'une), ou elle CITE LA SOURCE qui établit qu'un seul chemin existe ; les formules « seule voie » et « aucun autre chemin » ne valent plus preuve à elles seules, et dès que tu cites des appels ce sont eux qui font foi (S25 durcie, TF-1189 : quatre appels d'une même famille plus la formule ont fait écrire un constat FAUX dans deux synthèses jugées PASS, le scope personnel rendant 200 là où l'espace de travail rendait 401).";
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const entree = lireStdin();
   const chemin = entree.transcript_path;
   if (!chemin || !existsSync(chemin)) process.exit(0); // rien à juger sans transcript
-  const { travail, ecritures, commandes, dernierTexte, textes, fichiersMd, dernierHumain, textePrecedent } =
-    analyserTranscript(readFileSync(chemin, "utf8"));
-  const portee = jugeable({ travail, ecritures, commandes, dernierTexte });
+  const { travail, ecritures, commandes, dernierTexte, textes, fichiersMd, dernierHumain, textePrecedent,
+    depuisDernierAffichage } = analyserTranscript(readFileSync(chemin, "utf8"));
+  const portee = jugeable({ travail, ecritures, commandes, dernierTexte, depuisDernierAffichage });
   if (!portee.juge) process.exit(0);
   const { code, fails } = juger(dernierTexte);
   // L'AFFICHÉ DIT CE QUE LE JUGÉ DISAIT : quand une synthèse a été déposée dans le tour, ce qui se
@@ -480,21 +632,24 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const geste = controlerGeste({ dernierHumain, dernierTexte, textePrecedent, texteSynthese });
   const bloquants = fails.filter((f) => BLOQUANTES.has(f.regle));
   const avertissements = fails.filter((f) => !BLOQUANTES.has(f.regle));
+  // TF-1081 — le sceau suit le PASS, et seulement sur la synthèse que le tour a ÉCRITE.
+  const passe = code === 0 && !ecartsAffichage.length && geste.verdict !== "FAIL";
+  const sceau = passe ? scellerSynthese(syntheseEcriteDuTour(fichiersMd)) : null;
   const journal = join(ICI, "..", ".claude", "hooks-journal.jsonl");
   try {
     mkdirSync(dirname(journal), { recursive: true });
     appendFileSync(journal, JSON.stringify({
       ts: new Date().toISOString(), hook: "restitution", session: entree.session_id, ecritures, commandes,
       portee: portee.motif,
-      verdict: (code === 0 && !ecartsAffichage.length && geste.verdict !== "FAIL")
+      verdict: passe
         ? "PASS" : ((bloquants.length || ecartsAffichage.length || geste.verdict === "FAIL") ? "FAIL" : "AVERTISSEMENT"),
       regles: fails.map((f) => f.regle), bloquantes: bloquants.map((f) => f.regle),
-      synthese_deposee: fichierSynthese || null, ecarts_affichage: ecartsAffichage,
+      synthese_deposee: fichierSynthese || null, ecarts_affichage: ecartsAffichage, sceau,
       ...(geste.applicable ? { geste: { decision: geste.decision, verdict: geste.verdict, ecarts: geste.ecarts } } : {}),
       deja_refuse: !!entree.stop_hook_active,
     }) + "\n");
   } catch { /* journal facultatif */ }
-  if (code === 0 && !ecartsAffichage.length && geste.verdict !== "FAIL") process.exit(0);
+  if (passe) process.exit(0);
   // Avertissements seuls : dits sous la réponse, jamais réécrits — pas de doublon à l'écran.
   if (!bloquants.length && !ecartsAffichage.length && geste.verdict !== "FAIL") {
     console.log(JSON.stringify({

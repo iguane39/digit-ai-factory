@@ -33,6 +33,18 @@
  * en gabarit — un paragraphe de doctrine ne s'exécute pas, un pas de recette si.
  * SKIP (exit 2) vaut succès : sur un poste sans les dépôts frères, il n'y a rien à juger.
  *
+ * CRITÈRE « PARC ABSENT » (TF-1133, 15/09/2026). Un oracle d'état se déclare SANS OBJET — exit 2,
+ * ou un constat SANS_OBJET dans un verdict PASS s'il juge le reste — quand la matière qu'il juge
+ * n'est ni dans le dépôt cloné ni sous `FORGE_ROOT`, et SEULEMENT alors. Il écrit son motif, que ce
+ * harnais affiche. Trois matières sont concernées : un dépôt frère non cloné sous la racine
+ * (oracle-empreintes, site déclaré par site déclaré) ; le canal confidentiel absent, donc les tables
+ * de pseudonymisation introuvables (oracle-readme-dossiers) ; aucune source de skill sous la racine
+ * (oracle-skills). Un oracle dont la matière EST le dépôt (oracle-caracteres-controle) n'a jamais
+ * de parc absent : un clone porte ce qu'il juge, et son rouge sur un clone est un vrai rouge. Sur ce
+ * poste, où le parc et le canal sont là, rien n'est déclaré sans objet et tout est jugé. Le fait :
+ * sur un clone frais, quatre de ces oracles jugeaient un parc absent et le circuit hébergé aurait
+ * été rouge à sa première exécution.
+ *
  * Usage : node oracles\self-tests.mjs        → exit 0 si tout passe, 1 sinon.
  */
 import { execFileSync, spawnSync } from "node:child_process";
@@ -115,10 +127,29 @@ const RACINE = join(ICI, "..");
 //
 // Les zones sont donc DÉCOUVERTES : tout dossier de premier niveau du dépôt, plus la racine
 // elle-même. `node_modules` et les artefacts d'atelier sont exclus nommément — pas devinés.
-const HORS_ZONE = new Set([".git", "node_modules", ".venv", "__pycache__", ".oracles", "old"]);
+// I2 QUATER (TF-1073, 16/09/2026) — LA DÉCOUVERTE S'ARRÊTAIT AU PREMIER NIVEAU, et c'est la
+// TROISIÈME fois que cet agrégateur se fait prendre par la même cause sous une autre forme : la
+// liste des zones était écrite à la main (TF-0367), le motif de fichier était trop étroit
+// (TF-0413), le critère ignorait les outils portant leur propre drapeau (TF-1135). Ici c'est la
+// PROFONDEUR : `readdirSync` ne descend pas, donc un banc rangé dans son propre dossier était
+// invisible. Le cas : `oracles\banc-defauts-echappes\banc.test.mjs` — la recette du banc des
+// défauts échappés, gardé sur décision humaine du 14/09 (TF-1073) pour mesurer tout mécanisme de
+// relecture avant son adoption — verte, et jouée par PERSONNE. *Un contrôle qui parcourt une liste
+// ne voit jamais ce qui n'y est pas*, et une liste a autant de bords qu'on lui en laisse.
+//
+// DEUX NIVEAUX, pas davantage, et la borne est un choix : au-delà, on parcourrait les dépôts
+// clonés et les arbres de sortie que `HORS_ZONE` ne nomme pas un par un. Un banc rangé trois
+// niveaux plus bas resterait invisible — c'est déclaré ici plutôt que promis.
+const HORS_ZONE = new Set([".git", "node_modules", ".venv", "__pycache__", ".oracles", "old", "input", "output"]);
 const zonesTests = ["."];
 for (const d of readdirSync(RACINE, { withFileTypes: true })) {
-  if (d.isDirectory() && !HORS_ZONE.has(d.name)) zonesTests.push(d.name);
+  if (!d.isDirectory() || HORS_ZONE.has(d.name)) continue;
+  zonesTests.push(d.name);
+  let sous = [];
+  try { sous = readdirSync(join(RACINE, d.name), { withFileTypes: true }); } catch { sous = []; }
+  for (const f of sous) {
+    if (f.isDirectory() && !HORS_ZONE.has(f.name)) zonesTests.push(`${d.name}/${f.name}`);
+  }
 }
 for (const zone of zonesTests) {
   let fichiers = [];
@@ -130,11 +161,22 @@ for (const zone of zonesTests) {
     // invariants est exactement ce que cet agrégateur existe pour éteindre. Les self-tests DE
     // `oracles\` restent hors de ce motif : ils sont déjà joués par I1 (via `DEDIES`), et
     // `self-tests.mjs` s'y appellerait lui-même.
-    const motif = (f) => f.endsWith(".test.mjs") || (zone !== "oracles" && /^self-test.*\.mjs$/.test(f));
-    fichiers = readdirSync(join(RACINE, zone)).filter(motif).sort();
+    const motif = (f) => f.endsWith(".test.mjs") || (!zone.startsWith("oracles") && /^self-test.*\.mjs$/.test(f));
+    fichiers = readdirSync(join(RACINE, zone)).filter(motif).sort().map((nom) => ({ nom, args: [] }));
+    // I2 ter (TF-1135, 15/09) : un OUTIL hors `oracles\` qui porte son propre `--self-test` était
+    // invisible aux deux motifs — `todo\accueillir-lot.mjs`, qui pseudonymise chaque lot entrant,
+    // en était, avec trois autres. Le critère lit le CODE (le test de `process.argv`), jamais une
+    // simple mention du drapeau : un outil qui en lance un autre avec `--self-test` n'est pas joué.
+    if (!zone.startsWith("oracles")) {
+      for (const nom of readdirSync(join(RACINE, zone)).filter((f) => f.endsWith(".mjs") && !motif(f)).sort()) {
+        let source = "";
+        try { source = readFileSync(join(RACINE, zone, nom), "utf8"); } catch { continue; }
+        if (/\b(?:process\.argv|argv|args)(?:\.slice\(\d+\))?\.includes\(\s*["']--self-test["']\s*\)/.test(source)) fichiers.push({ nom, args: ["--self-test"] });
+      }
+    }
   } catch { continue; }
-  for (const nom of fichiers) {
-    const r = spawnSync(process.execPath, [join(RACINE, zone, nom)], { encoding: "utf8" });
+  for (const { nom, args } of fichiers) {
+    const r = spawnSync(process.execPath, [join(RACINE, zone, nom), ...args], { encoding: "utf8" });
     const lignes = (r.stdout || "").trim().split("\n").filter((l) => l.trim());
     const resume = lignes[lignes.length - 1] || r.stderr?.split("\n")[0] || "aucune sortie";
     resultats.push({
@@ -273,15 +315,21 @@ for (const { nom, remede, args: argsParc } of ETAT_DU_PARC) {
   // existe pour eteindre. Un chemin relatif se resout depuis la racine du pilot.
   const cibles = (argsParc || []).map((c) => join(ICI, "..", c));
   const r = spawnSync(process.execPath, [join(ICI, nom), ...cibles], { encoding: "utf8" });
-  let verdict = null;
-  try { verdict = JSON.parse(r.stdout || "{}").verdict; } catch { /* sortie non JSON : le code de retour tranche */ }
-  // 0 PASS · 2 non jugeable (dépôts frères absents) → succès. 1 FAIL → échec, avec le remède.
+  let verdict = null, sansObjet = null;
+  try {
+    const j = JSON.parse(r.stdout || "{}");
+    verdict = j.verdict;
+    // TF-1133 : un « sans objet » dit POURQUOI — le motif de l'oracle, ou ses constats SANS_OBJET.
+    const motifs = [j.motif, ...(j.findings || []).filter((f) => f.statut === "SANS_OBJET").map((f) => f.message)].filter(Boolean);
+    sansObjet = motifs.length ? motifs.join(" · ") : null;
+  } catch { /* sortie non JSON : le code de retour tranche */ }
+  // 0 PASS · 2 non jugeable (parc absent, critère ci-dessus) → succès. 1 FAIL → échec, avec le remède.
   const ok = r.status === 0 || r.status === 2;
   resultats.push({
     nom: `${nom} (parc réel)`,
     statut: ok ? "OK" : "ECHEC",
     detail: ok
-      ? `I4 — ${verdict || "sans verdict lisible"} sur le parc`
+      ? `I4 — ${verdict || "sans verdict lisible"} sur le parc${sansObjet ? ` · non jugé : ${sansObjet.slice(0, 220)}${sansObjet.length > 220 ? "…" : ""}` : ""}`
       : `I4 — ${verdict || "FAIL"} sur le parc · remède : ${remede}`,
     via: "I4 (oracle d'état)",
   });
@@ -327,16 +375,24 @@ for (const b of bilan.baisses) {
     + "Une recette qui perd des cas rend un harnais vert — retirer un cas est un geste ÉCRIT : "
     + "rejouer avec `--appliquer` après avoir dit POURQUOI, ou restaurer les cas.");
 }
-if (bilan.montees.length && !bilan.baisses.length) ecrireBaseline(CHEMIN_BASELINE, bilan.baseline);
-if (bilan.baisses.length && APPLIQUER) {
+// TF-1082 — une recette de la baseline ABSENTE du passage est nommée et fait échouer, exemption
+// comprise : le cliquet des cas ne voyait pas la disparition d'un fichier entier.
+for (const d of bilan.disparues) {
+  console.error(`  [RECETTE DISPARUE] ${d.nom}${d.exemption ? " (exemption déclarée)" : d.cas !== null ? ` (${d.cas} cas)` : ""} : `
+    + "présente à la baseline, jouée par PERSONNE à ce passage. Restaurer la recette, ou retirer l'entrée "
+    + "par `--appliquer` après avoir dit POURQUOI — une disparition est un geste écrit.");
+}
+if (bilan.montees.length && !bilan.baisses.length && !bilan.disparues.length) ecrireBaseline(CHEMIN_BASELINE, bilan.baseline);
+if ((bilan.baisses.length || bilan.disparues.length) && APPLIQUER) {
   const accepte = { ...bilan.baseline };
   for (const b of bilan.baisses) accepte[b.nom] = { cas: b.vu, vu_le: jour, baisse_acceptee_le: jour };
+  for (const d of bilan.disparues) delete accepte[d.nom];
   ecrireBaseline(CHEMIN_BASELINE, accepte);
-  console.log(`  [CLIQUET] ${bilan.baisses.length} baisse(s) ACCEPTÉE(S) et datée(s) par --appliquer`);
+  console.log(`  [CLIQUET] ${bilan.baisses.length} baisse(s) et ${bilan.disparues.length} disparition(s) ACCEPTÉE(S) par --appliquer`);
 }
 
 const echecs = resultats.filter((r) => r.statut !== "OK");
-const perdus = APPLIQUER ? [] : bilan.baisses;
+const perdus = APPLIQUER ? [] : [...bilan.baisses, ...bilan.disparues];
 console.log("=".repeat(78));
 console.log(
   echecs.length || perdus.length

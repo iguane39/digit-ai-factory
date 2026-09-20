@@ -64,5 +64,31 @@ for (const [nom, tenue] of REGLES) {
   if (tenue(avant)) echecs.push(`ROUGE — ${nom} : l'assertion passe AUSSI sur la page d'avant le remède, elle ne prouve rien`);
 }
 
+// 16/09/2026 — LES LIENS MARKDOWN, ET LE PÉRIMÈTRE DES SCHÈMES ADMIS.
+//
+// Le rendu ne connaissait pas les liens : « [texte](url) » sortait EN CLAIR dans toutes les pages
+// générées du parc — le lecteur voyait la syntaxe, et l'URL, insécable, poussait la page au-delà
+// du viewport (V1 refusait une étude à 390 px, document mesuré à 419 px). Les deux moitiés du
+// défaut se corrigent d'un seul geste, et la seconde moitié est la plus importante : la source
+// d'une page générée est un Markdown que le pilot ingère, parfois issu d'un entrant. Un
+// « javascript: » y deviendrait un lien EXÉCUTABLE dans un livrable remis à un humain. La liste
+// des schèmes est donc FERMÉE, et ce qu'elle refuse reste du texte VISIBLE — jamais retiré en
+// silence : un lecteur qui voit la syntaxe brute sait qu'il manque quelque chose.
+for (const [libelle, source, attendu] of [
+  ["lien http rendu", "[doc](https://exemple.fr/a/b)", '<a href="https://exemple.fr/a/b">doc</a>'],
+  ["chemin relatif rendu", "[y](../autre.md)", '<a href="../autre.md">y</a>'],
+  ["mailto rendu", "[z](mailto:a@b.fr)", '<a href="mailto:a@b.fr">z</a>'],
+]) {
+  if (!mdVersHtml(source).includes(attendu)) echecs.push(`${libelle} : « ${source} » ne rend pas « ${attendu} »`);
+}
+for (const [libelle, source] of [
+  ["schème javascript refusé", "[x](javascript:alert(1))"],
+  ["schème data refusé", "[q](data:text/html;base64,AA)"],
+]) {
+  const rendu = mdVersHtml(source);
+  if (/<a /.test(rendu)) echecs.push(`${libelle} : un lien a été fabriqué sur un schème hors liste — « ${rendu} »`);
+  if (!rendu.includes("[")) echecs.push(`${libelle} : la syntaxe brute a DISPARU au lieu de rester visible — un refus silencieux ne s'apprend pas`);
+}
+
 if (echecs.length) { console.error("lib-vue-html : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log(`lib-vue-html (TF-0907) : ${REGLES.length * 2}/${REGLES.length * 2} — colonne pleine largeur, SVG à 100 %, classe defile, titre daté ; chaque règle prouvée dans ses DEUX sens (page produite / page d'avant le remède)`);
+console.log(`lib-vue-html (TF-0907) : ${REGLES.length * 2 + 5}/${REGLES.length * 2 + 5} — colonne pleine largeur, SVG à 100 %, classe defile, titre daté ; chaque règle prouvée dans ses DEUX sens (page produite / page d'avant le remède) ; liens markdown rendus pour http, chemin relatif et mailto, et REFUSÉS — syntaxe laissée visible — pour javascript: et data:`);

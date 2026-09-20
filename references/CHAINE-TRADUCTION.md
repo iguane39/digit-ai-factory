@@ -31,7 +31,7 @@ outillée aurait fourni.
 
 **Le coût réel n'est pas le temps de l'exploitant.** C'est : onze fautes d'accord parties EN
 PRODUCTION derrière une CI verte ; deux faits faux servis dans les sept langues ; une qualité
-qui n'a émergé que parce que l'exploitant a insisté trois fois.
+qui n'a émergé que parce que l'exploitant a insisté 3 fois.
 
 **La preuve que le défaut est structurel et non local.** Quatre retours remontés *séparément le
 même jour* — règle de glossaire jamais évaluée, sonde non rejouable, aucun oracle du genre
@@ -120,7 +120,7 @@ porte **quatre sections**, et chacune empêche une chose précise :
 | `## Relecture native` | « Faite par *<nom>*, *AAAA-MM-JJ* » **ou** « Refusée — *<motif>* » | onze fautes d'accord parties en production, la relecture ayant eu lieu APRÈS la mise en ligne |
 | `## Ancres verbatim` | une ligne par ancre : ``- `le texte exact` → chemin/du/fichier`` | un plan **inapplicable** : celui qui l'applique cherche un texte qui n'existe pas et ne peut pas trancher entre un plan faux et un fichier modifié |
 | `## Arbitrages posés à l'humain` | une puce par arbitrage, **liste non vide** | une chaîne qui a décidé à la place de quelqu'un — l'inverse de la loi n° 5 |
-| `## Contrôles mécaniques` | le verdict de l'accord **et** de la cohérence interne | les deux classes qui ont réellement franchi la chaîne : onze fautes d'accord, deux faits faux identiques dans les sept langues |
+| `## Contrôles mécaniques` | le verdict de l'accord **et** de la cohérence interne | les 2 classes qui ont réellement franchi la chaîne : onze fautes d'accord, deux faits faux identiques dans les sept langues |
 
 **Le REFUS est une réponse valide, le silence ne l'est pas.** T1 accepte « Refusée — aucun
 locuteur natif disponible avant la date de remise, et l'exploitant a tranché » exactement comme

@@ -29,7 +29,11 @@ import { readFileSync } from "node:fs";
 /** Le lexique, dans l'ordre du noyau. Chaque règle : motif sur le message ENTIER, skill, glose. */
 export const LEXIQUE = [
   { skill: "prompt-analyzer-l99", motif: /^\s*(?:\/?l99\b|(?:am[ée]liore[rz]?|optimise[rz]?|analyse[rz]?|audite[rz]?)\s+(?:ce|le|mon|ton|ces|les|un|une|cette)?\s*prompts?\b)/iu, forme: "« Améliore le prompt… » / « l99 »" },
-  { skill: "prompt-analyzer-l99", motif: /\bl99\b/iu, forme: "« l99 » dans le message", secondaire: true },
+  // TF-1103 (14/09/2026) — « l99 » au milieu d'un message ne déclenche que comme MOT ISOLÉ, en
+  // minuscules, hors code cité entre accents graves : collé à un identifiant (`prompt-analyzer-l99`),
+  // pris dans un chemin, ou écrit « L99 » (une référence de règle, comme L4 ou L22 du socle), ce
+  // n'est pas un appel. Le 14/09, deux notifications de fin de tâche l'ont déclenché ainsi.
+  { skill: "prompt-analyzer-l99", motif: /(?<![\p{L}\p{N}_\-./\\])l99(?![\p{L}\p{N}_\-./\\])/u, forme: "« l99 » dans le message", secondaire: true, horsCode: true },
   { skill: "la-barre", motif: /^\s*\/?barre\b/iu, forme: "« barre… » en tête de message" },
   { skill: "ameliore-un-skill", motif: /^\s*(?:am[ée]liore[rz]?|audite[rz]?|durcis|fiabilise[rz]?|score[rz]?|r[ée]vise[rz]?|optimise[rz]?)\s+(?:ce|le|mon|ton|un|une|cette|la)?\s*skill\b/iu, forme: "« améliore/audite ce skill »" },
 ];
@@ -37,11 +41,22 @@ export const LEXIQUE = [
 /** Rend les appels reconnus dans un message : [{skill, forme}], sans doublon de skill. */
 export function reconnaitre(message) {
   const vus = new Set(); const appels = [];
+  const brut = String(message || "");
+  const sansCode = brut.replace(/`[^`]*`/g, " ");
   for (const r of LEXIQUE) {
-    if (vus.has(r.skill) || !r.motif.test(String(message || ""))) continue;
+    if (vus.has(r.skill) || !r.motif.test(r.horsCode ? sansCode : brut)) continue;
     vus.add(r.skill); appels.push({ skill: r.skill, forme: r.forme });
   }
   return appels;
+}
+
+/**
+ * TF-1103 — le lexique ne parle qu'à un message HUMAIN. Une notification de fin de tâche d'agent,
+ * un message inter-sessions ou un rappel système arrivent par le même canal (`UserPromptSubmit`)
+ * et citent librement des noms de skills : ce ne sont pas des demandes.
+ */
+export function estMessageHumain(message) {
+  return !/<task-notification>|<cross-session-message|\[SYSTEM NOTIFICATION|<system-reminder>/i.test(String(message || ""));
 }
 
 /** Le texte injecté dans le contexte — une ligne par appel, ou rien. */
@@ -64,6 +79,13 @@ if (process.argv.includes("--self-test")) {
     ["Le prompt réécrit est bon, on le garde tel quel", []],
     ["Améliore le design de la page d'accueil", []],
     ["Corrige la barre de menu qui déborde sur mobile", []],
+    // TF-1103 : le mot isolé déclenche ; la référence de règle, l'identifiant, le code cité et le chemin non.
+    ["l99 améliore ce prompt", ["prompt-analyzer-l99"]],
+    ["puis passe-le au l99 avant envoi", ["prompt-analyzer-l99"]],
+    ["Relevé : usages L99 (M2) dans le module", []],
+    ["le skill `prompt-analyzer-l99` a rendu son rapport", []],
+    ["prompt-analyzer-l99 a rendu son rapport", []],
+    ["voir ~/.claude/skills/prompt-analyzer-l99/SKILL.md", []],
   ];
   for (const [msg, attendu] of cas) {
     const obtenu = reconnaitre(msg).map((a) => a.skill);
@@ -81,7 +103,7 @@ if (process.argv[1] && /hook-lexique\.mjs$/.test(process.argv[1]) && !process.ar
   let message = "";
   try { const j = JSON.parse(entree); message = typeof j.prompt === "string" ? j.prompt : String(j.user_prompt || j.message || ""); }
   catch { message = entree; }
-  const texte = contexte(message);
+  const texte = estMessageHumain(message) ? contexte(message) : "";
   if (texte) process.stdout.write(texte + "\n");
   process.exit(0);
 }

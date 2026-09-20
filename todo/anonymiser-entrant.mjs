@@ -283,6 +283,9 @@ function substituerHorsIdentifiant(texte, nom, pseudo, refuses, code) {
     if (collé && pseudoCasseUnIdent) {
       refuses.push({
         nom_masqué: `${nom.length} caractère(s)`, pseudo,
+        // TF-0993 : la LIGNE, pour que ce qui a résisté se retrouve. Stable d'une substitution à
+        // l'autre : un pseudonyme ne porte jamais de fin de ligne.
+        ligne: texte.slice(0, j).split("\n").length,
         motif: "l'occurrence est collée à un caractère d'identifiant et le pseudonyme en introduirait un "
           + "étranger — substituer casserait le code ; l'identifiant se renomme à la main",
         autour: texte.slice(Math.max(0, j - 24), j).replace(/\s+/g, " ")

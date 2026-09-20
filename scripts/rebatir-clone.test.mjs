@@ -18,7 +18,11 @@ const ICI = dirname(fileURLToPath(import.meta.url));
 const SCRIPT = join(ICI, "rebatir-clone.mjs");
 const sh = (cwd, cmd, ...a) => { const r = spawnSync(cmd, a, { cwd, encoding: "utf8" }); if (r.status !== 0) throw new Error(`${cmd} ${a.join(" ")} : ${r.stderr || r.stdout}`); return (r.stdout || "").trim(); };
 const g = (cwd, ...a) => sh(cwd, "git", "-c", "user.email=recette@example.com", "-c", "user.name=recette", "-c", "commit.gpgsign=false", ...a);
-const lancer = (depot, ...opts) => { const r = spawnSync(process.execPath, [SCRIPT, depot, "--json-only", ...opts], { encoding: "utf8", env: { ...process.env, FORGE_ROOT: dirname(depot), FORGE_SKILLS_INSTALLES: join(dirname(depot), "aucun-skill") } }); let j = null; try { j = JSON.parse(r.stdout); } catch { /* laissé nul */ } return { code: r.status, j, brut: r.stdout + r.stderr }; };
+// TF-1133 (15/09/2026) : l'outil rejoue des commits (`git am`), ce qui exige une identité git. Celle
+// de ce poste vient de sa configuration globale ; un runner hébergé n'en a aucune, et la recette y
+// tombait sur « Author identity unknown » (2 cas sur 7). Elle pose donc la sienne, pour l'outil aussi.
+const IDENTITE = { GIT_AUTHOR_NAME: "recette", GIT_AUTHOR_EMAIL: "recette@example.com", GIT_COMMITTER_NAME: "recette", GIT_COMMITTER_EMAIL: "recette@example.com" };
+const lancer = (depot, ...opts) => { const r = spawnSync(process.execPath, [SCRIPT, depot, "--json-only", ...opts], { encoding: "utf8", env: { ...process.env, ...IDENTITE, FORGE_ROOT: dirname(depot), FORGE_SKILLS_INSTALLES: join(dirname(depot), "aucun-skill") } }); let j = null; try { j = JSON.parse(r.stdout); } catch { /* laissé nul */ } return { code: r.status, j, brut: r.stdout + r.stderr }; };
 
 function parc() {
   const base = mkdtempSync(join(tmpdir(), "rebatir-"));
@@ -40,6 +44,23 @@ test("clone à jour → rien à rebâtir (exit 0), aucune sauvegarde écrite", (
   assert.equal(r.code, 0, r.brut);
   assert.match(r.j.message, /rien à rebâtir/);
   assert.equal(r.j.sauvegarde, null);
+  assert.deepEqual(r.j.references_divergentes, [], `un clone à jour n'a aucune référence hors branche à nommer — rendu : ${JSON.stringify(r.j.references_divergentes)}`);
+  rmSync(base, { recursive: true, force: true });
+});
+
+test("TF-1008 — un remisage sur l'ANCIENNE histoire survit au rebâti : il est NOMMÉ avec ses commits propres, jamais supprimé", () => {
+  const { base, auteur, poste } = parc();
+  writeFileSync(join(poste, "a.txt"), "mis de côté\n");
+  g(poste, "stash", "push", "-q", "-m", "travail mis de cote");
+  g(auteur, "filter-branch", "-f", "--msg-filter", "sed s/NomClient/Client-A/", "--", "--all");
+  g(auteur, "push", "-q", "--force", "origin", "main");
+  const r = lancer(poste, "--sauvegardes", join(base, "sauv"));
+  assert.equal(r.code, 0, `exit ${r.code} attendu 0 — ${r.brut}`);
+  const s = (r.j.references_divergentes || []).find((x) => x.reference === "refs/stash");
+  assert.ok(s, `le remisage qui garde l'ancienne histoire n'est pas nommé — rendu : ${JSON.stringify(r.j.references_divergentes)}`);
+  assert.ok(s.commits_propres >= 1, `commits propres du remisage : ${s.commits_propres}, au moins 1 attendu`);
+  assert.match(r.j.message, /hors de la branche/, "le message du rebâti tait la référence divergente");
+  assert.match(g(poste, "stash", "list"), /travail mis de cote/, "le remisage a été supprimé — supprimer est un geste humain (R-29)");
   rmSync(base, { recursive: true, force: true });
 });
 

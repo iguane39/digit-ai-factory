@@ -157,6 +157,45 @@ try {
     echecs.push(`POST-ROUGE : collision annoncée sans nommer l'id en cause (${dejaPris[1]})`);
   else if (!/renumeroter\.mjs/.test(pr.stderr || ""))
     echecs.push("POST-ROUGE : collision annoncée sans la commande qui répare");
+  // --- TF-1003 : DEUX HISTOIRES DIVERGENTES, LE MÊME REGISTRE — l'ingestion procède -------
+  //
+  // Le cas du 09/09 : une réécriture d'histoire publiée d'un côté, pas encore de l'autre. Le
+  // registre est le même des deux côtés ; seul le compte de commits disait « en retard ». Le
+  // second cas garde le vrai refus : le distant réécrit porte en plus une création frappée ailleurs.
+  const origin2 = join(base, "origin2.git");
+  mkdirSync(origin2);
+  git(origin2, "init", "--bare", "--initial-branch=main", ".");
+  const workC = join(base, "workC");
+  git(base, "clone", "--quiet", origin2, workC);
+  mkdirSync(join(workC, "todo"));
+  const registreC = join(workC, "todo", "TODO.jsonl");
+  writeFileSync(registreC, "", "utf8");
+  lancer([sidecar("c-initial.tf.jsonl", "item commun"), "--registre", registreC, "--sans-fetch"]);
+  git(workC, "add", "-A");
+  git(workC, "commit", "--quiet", "-m", "registre commun, message d origine");
+  git(workC, "push", "--quiet", "origin", "main");
+  const workD = join(base, "workD");
+  git(base, "clone", "--quiet", origin2, workD);
+  git(workD, "commit", "--quiet", "--amend", "-m", "registre commun, message reecrit");
+  git(workD, "push", "--quiet", "--force", "origin", "main");
+
+  const dv = lancer([sidecar("divergente.tf.jsonl", "divergente meme registre"), "--registre", registreC]);
+  if (dv.status !== 0) echecs.push(`DIVERGE-MÊME-REGISTRE : exit ${dv.status} attendu 0 — un refus sur un risque qui n'existe pas (TF-1003) : ${(dv.stderr || "").slice(0, 300)}`);
+  else if (/pull --rebase, puis/.test(dv.stderr || "")) echecs.push("DIVERGE-MÊME-REGISTRE : le message recommande encore `git pull --rebase` sur une histoire divergente");
+  else if (!/DIVERGENTES/.test(dv.stderr || "")) echecs.push("DIVERGE-MÊME-REGISTRE : la divergence n'est pas nommée");
+
+  // Le distant réécrit frappe en plus une création que C n'a pas : là, le refus est fondé.
+  lancer([sidecar("d-ailleurs.tf.jsonl", "frappe par D"), "--registre", join(workD, "todo", "TODO.jsonl"), "--sans-fetch"]);
+  git(workD, "add", "-A");
+  git(workD, "commit", "--quiet", "-m", "D frappe un id");
+  git(workD, "push", "--quiet", "origin", "main");
+  git(workC, "reset", "--hard", "--quiet", "HEAD");
+  const avantC = readFileSync(registreC, "utf8");
+  const da = lancer([sidecar("divergente-rouge.tf.jsonl", "divergente distant en avance"), "--registre", registreC]);
+  if (da.status !== 1) echecs.push(`DIVERGE-DISTANT-EN-AVANCE : exit ${da.status} attendu 1 — une création frappée ailleurs doit être refusée`);
+  else if (!/TF-0394/.test(da.stderr || "") || !/TF-0752/.test(da.stderr || "")) echecs.push("DIVERGE-DISTANT-EN-AVANCE : le refus ne nomme pas TF-0394 et le mode opératoire de réécriture");
+  else if (/pull --rebase, puis/.test(da.stderr || "")) echecs.push("DIVERGE-DISTANT-EN-AVANCE : `git pull --rebase` proposé sur une histoire divergente");
+  if (readFileSync(registreC, "utf8") !== avantC) echecs.push("DIVERGE-DISTANT-EN-AVANCE : le registre a été modifié malgré le refus");
 } catch (err) {
   echecs.push(`harnais : ${String(err).slice(0, 300)}`);
 } finally {
@@ -167,4 +206,4 @@ if (echecs.length) {
   console.error("preflight-collision (TF-0394) : FAIL\n  - " + echecs.join("\n  - "));
   process.exit(1);
 }
-console.log("preflight-collision (TF-0394, TF-0481, TF-0634) : 5/5 — verte ingère, rouge refuse (registre intact), --sans-fetch assume, post-contrôle compare (vert) et dénonce un id déjà pris (rouge)");
+console.log("preflight-collision (TF-0394, TF-0481, TF-0634, TF-1003) : 7/7 — verte ingère, rouge refuse (registre intact), --sans-fetch assume, post-contrôle compare (vert) et dénonce un id déjà pris (rouge), histoires divergentes au même registre ingèrent, divergentes au distant en avance refusent sans proposer de rebase");

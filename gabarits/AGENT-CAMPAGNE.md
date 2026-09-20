@@ -93,6 +93,26 @@ En tête de rapport : version de départ du dépôt (`git log -1 --format=%h` av
 commits), état du working tree préexistant s'il n'était pas propre. En pied : la liste
 des vérifications natives exécutées avec leur verdict final.
 
+**Mesurer, et rendre une mesure (TF-1009, 14/09/2026).** Le 09-10/09, sur un même dépôt, six
+erreurs de mesure en une journée, et aucune trouvée par son auteur : six sur six par un tiers, ou
+par l'auteur seulement après avoir été contredit. Deux avaient la même cause mécanique, une sortie
+bornée par un `head` lue comme un résultat complet. Ce qui les a rattrapées se prescrit ici :
+- **Remesurer plutôt que reprendre** : un nombre venu d'un tiers se rejoue avant d'être cité.
+- **Un nombre porte son PÉRIMÈTRE et sa PROVENANCE** : ce qui est compté, sur quelle population,
+  mesuré ici ou rapporté. Un nombre rapporté et non vérifié est MARQUÉ, jamais fondu dans la prose ;
+  refuser de signer un nombre qu'on n'a pas produit est un geste attendu, pas une impolitesse.
+- **Aucune borne d'affichage silencieuse** : si une sortie est bornée (`head`, `-n`,
+  `--max-count`, plafond d'oracle), le total se dit à côté, ou la borne se retire.
+- **Une cause inconnue se déclare** : une troisième hypothèse qui colle au symptôme ferme l'enquête.
+- **Une inférence n'est pas un constat** : on ouvre la pièce qui répond (l'outil, le fichier) au
+  lieu de déduire ce qu'elle doit contenir.
+- **Jouer le remède qu'on recommande** : tout contrôle bloquant dont le message propose une
+  correction porte à son banc un cas qui exécute cette correction et doit PASSER (TF-1013).
+- **Lire le verdict avant d'enregistrer** : la garde d'un commit est un `if` sur la valeur lue,
+  jamais un enchaînement de commandes qui continue après un FAIL affiché.
+- **Contre-mesurer ce qui fonde une décision humaine** : une mesure qui entre dans un bloc de
+  décision se rejoue par un autre agent ou par une seconde voie avant d'y entrer.
+
 ## Ce que le pilot fait de ton rapport
 
 Le pilot vérifie par sondage, écrit les événements du registre (corrige avec tes
@@ -136,3 +156,24 @@ session principale (outil SendMessage, destinataire « main ») :
 - **côté pilot** : chaque émission reçue est RELAYÉE à l'humain immédiatement, sans
   réécriture. Le silence au-delà d'une fenêtre est un défaut de contrat (TF-0094),
   jamais une économie.
+
+## Rendre la main : jamais sur une attente, jamais sur un arbre sale (TF-1132)
+
+**Le fait, les 14 et 15/09/2026.** Trois agents de campagne se sont arrêtés sur une phrase
+d'attente (« j'attends la fin de la vérification lancée en arrière-plan ») alors que leur harnais
+ne suivait plus aucune tâche d'arrière-plan : l'attente ne pouvait pas se résoudre d'elle-même.
+Coût : trois relances manuelles, deux fixtures de banc laissées mutées dans un dépôt avec une
+recette qui y écrivait ses diagnostics, et un commit tardif arrivé pendant que le pilot reprenait
+le chantier.
+
+- **Aucun tour ne se clôt sur l'attente d'une tâche d'arrière-plan.** Une vérification longue se
+  joue en AVANT-PLAN, avec un délai explicite (paramètre de délai de l'outil) ; si elle a été
+  lancée en arrière-plan, son résultat est RELU avant de rendre la main. Un agent qui s'arrête
+  dit ce qui est fini et ce qui ne l'est pas ; il n'annonce jamais qu'il attend.
+- **`git status` propre avant tout message de fin, même intermédiaire.** Aucun fichier de
+  diagnostic, aucune fixture mutée, aucune modification non commitée de TES chemins ; ce qui
+  appartient à une autre session se liste au message, sans y toucher.
+
+Ces deux règles ne sont pas mécanisées : l'état des tâches d'arrière-plan d'un harnais n'est
+écrit dans aucun fichier qu'un oracle pourrait lire, et un contrôle de l'arbre au moment où un
+agent rend la main relève d'un hook de fin d'agent, dont le câblage est une décision du pilot.
