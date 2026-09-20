@@ -521,5 +521,9 @@
  "todo/self-test.mjs": {
   "cas": 58,
   "vu_le": "2026-09-16"
+ },
+ "todo/semer-defauts.test.mjs": {
+  "cas": 11,
+  "vu_le": "2026-09-20"
  }
 }

@@ -1,0 +1,183 @@
+{
+  "format": "pilot/generateurs-defauts@1",
+  "date": "2026-09-20",
+  "_role": "TF-1079 (O2) — la table classe → GÉNÉRATEUR D'INSTANCE, en donnée (loi n° 4). Chaque entrée porte l'instance du défaut, son TÉMOIN sain jumeau, la commande du contrôle déclaré et LA RÈGLE visée. Le témoin n'est pas décoratif : sans lui, un contrôle qui refuse tout passerait pour une protection parfaite, et c'est exactement la forme de fausse assurance que TF-1079 cherche.",
+  "_fidelite": "un générateur n'est écrit que si l'instance reproduit le défaut FONDATEUR de la classe (champ `fondee_par` du référentiel, et l'item correspondant). Une instance taillée pour faire rougir le contrôle prouverait la fixture, pas la couverture — ce serait le défaut que ce verbe traque, retourné. Les classes sans instance fidèle sont déclarées `sans_generateur`, avec leur motif.",
+  "_borne": "les commandes ne visent QUE des contrôles du pilot, jouées sur un dossier temporaire. `{fichier}` et `{dossier}` sont substitués par le verbe ; `{pilot}` par la racine du dépôt. Aucun contrôle d'un dépôt frère, d'un produit ou du socle installé n'est lancé ici.",
+  "generateurs": {
+    "valeur-en-lettres-dans-un-livrable": {
+      "fonde_par": [],
+      "motif": "le défaut est un nombre écrit en toutes lettres dans un livrable : le lecteur doit le reconstituer avant de le comparer au suivant (E-14).",
+      "controle": {
+        "commande": [
+          "node",
+          "oracles/oracle-ecriture.mjs",
+          "{fichier}",
+          "--json"
+        ],
+        "regle": "EC-9"
+      },
+      "instance": {
+        "NOTE.md": "# Note de campagne\n\nLa campagne a trouve trois defauts et deux recidives sur le parc.\n"
+      },
+      "temoin": {
+        "NOTE.md": "# Note de campagne\n\nLa campagne a trouve 3 defauts et 2 recidives sur le parc.\n"
+      }
+    },
+    "restitution-action-humaine-geste-agent": {
+      "fonde_par": [
+        "TF-0766"
+      ],
+      "motif": "le défaut est une action laissée à l'humain qui lui demande d'ÉCRIRE une ligne — geste d'agent (loi n° 5) ; ce qui reste à l'humain est la VALEUR, jamais l'écriture.",
+      "controle": {
+        "commande": [
+          "node",
+          "oracles/oracle-synthese.mjs",
+          "{fichier}"
+        ],
+        "regle": "S34"
+      },
+      "instance": {
+        "Digit-AI - Synthese Semis - S34 - 20260920a.md": "---\ndestinataire: humain\n---\n\n# Synthese\n\n## 8. Prochaines actions\n\n| Action | Acteur |\n|---|---|\n| A-1 — ajouter la ligne CLE_API= au fichier .env | manuelle_utilisateur |\n"
+      },
+      "temoin": {
+        "Digit-AI - Synthese Semis - S34 - 20260920a.md": "---\ndestinataire: humain\n---\n\n# Synthese\n\n## 8. Prochaines actions\n\n| Action | Acteur |\n|---|---|\n| A-1 — fournir la valeur de la cle d API, le fichier est deja pose | manuelle_utilisateur |\n"
+      }
+    },
+    "restitution-rendu-visuel-non-critique": {
+      "fonde_par": [
+        "TF-0775"
+      ],
+      "motif": "le défaut est une page HTML citée comme LIVRÉE sans aucun verdict de critique d'implémentation : le routage « juger le rendu visuel » n'a pas été joué.",
+      "controle": {
+        "commande": [
+          "node",
+          "oracles/oracle-synthese.mjs",
+          "{fichier}"
+        ],
+        "regle": "S36"
+      },
+      "instance": {
+        "Digit-AI - Synthese Semis - S36 - 20260920b.md": "---\ndestinataire: humain\n---\n\n# Synthese\n\n## 4. Traite\n\n- output/rapport.html livre au client.\n"
+      },
+      "temoin": {
+        "Digit-AI - Synthese Semis - S36 - 20260920b.md": "---\ndestinataire: humain\n---\n\n# Synthese\n\n## 4. Traite\n\n- output/rapport.html livre au client — verdict rendu par critique-le-design : PASS.\n"
+      }
+    },
+    "correction-symptome-sans-classe": {
+      "fonde_par": [
+        "TF-0779"
+      ],
+      "motif": "le défaut est une correction restituée après un retour humain sans son contrôle rouge → vert ni sa classe nommée : elle traite le symptôme, jamais la classe.",
+      "controle": {
+        "commande": [
+          "node",
+          "oracles/oracle-synthese.mjs",
+          "{fichier}"
+        ],
+        "regle": "S37"
+      },
+      "instance": {
+        "Digit-AI - Synthese Semis - S37 - 20260920c.md": "---\ndestinataire: humain\n---\n\n# Synthese\n\n## 4. Traite\n\n- corrige : le titre de la page etait mal aligne.\n"
+      },
+      "temoin": {
+        "Digit-AI - Synthese Semis - S37 - 20260920c.md": "---\ndestinataire: humain\n---\n\n# Synthese\n\n## 4. Traite\n\n- corrige : titre mal aligne — classe gabarit-sans-parite-de-theme, recette rouge puis verte (3/3).\n"
+      }
+    },
+    "decision-sans-designateur": {
+      "fonde_par": [],
+      "motif": "le défaut est un rappel fait entièrement de périphrases, qui ne NOMME pas la chose dont il parle — le lecteur ne peut pas la retrouver.",
+      "controle": {
+        "commande": [
+          "node",
+          "oracles/oracle-synthese.mjs",
+          "{fichier}"
+        ],
+        "regle": "S47"
+      },
+      "instance": {
+        "Digit-AI - Synthese Test - Semis - 20260920d.md": "---\ndestinataire: humain\n---\n\n# Synthese\n\n## 3. Decisions\n\n> **D-1** — Faut-il retenir la voie evoquee plus haut pour le point souleve hier ?\n>\n> Rappel : la chose dont nous parlions la derniere fois reste en attente.\n"
+      },
+      "temoin": {
+        "Digit-AI - Synthese Test - Semis - 20260920d.md": "---\ndestinataire: humain\n---\n\n# Synthese\n\n## 3. Decisions\n\n> **D-1** — Faut-il cabler `scripts/verifier-sonde-glossaire.mjs` au hook d'ouverture ?\n>\n> Rappel : TF-1084 laisse ce cablage ouvert depuis le 15/09/2026.\n"
+      }
+    },
+    "sequence-octale-interpretee-au-rendu": {
+      "fonde_par": [
+        "TF-1067"
+      ],
+      "motif": "le défaut est un caractère de contrôle né d'un antislash de chemin Windows interprété (`scripts\\v…` → 0x0B) : invisible à la lecture, il rend le fichier binaire pour une recherche textuelle.",
+      "controle": {
+        "commande": [
+          "node",
+          "oracles/oracle-caracteres-controle.mjs",
+          "{dossier}"
+        ],
+        "regle": "CC1"
+      },
+      "instance": {
+        "DOCTRINE.md": "# Doctrine\n\nJouer scripts\u000berifier-secours.mjs avant toute bascule.\n"
+      },
+      "temoin": {
+        "DOCTRINE.md": "# Doctrine\n\nJouer scripts\\verifier-secours.mjs avant toute bascule.\n"
+      },
+      "avant": [
+        [
+          "git",
+          "init",
+          "-q"
+        ],
+        [
+          "git",
+          "add",
+          "-A"
+        ]
+      ],
+      "_avant_pourquoi": "oracle-caracteres-controle ne juge que les fichiers SUIVIS par git : sans depot, il rend SANS_OBJET et le semis ne seme rien."
+    },
+    "boucle-retour-sans-descente": {
+      "fonde_par": [
+        "TF-0757"
+      ],
+      "motif": "le défaut est une clôture d'item sans DESCENTE : la correction est faite, rien ne dit par quelle règle ou quel oracle la classe cesse de se reproduire — la boucle de retour ne redescend nulle part.",
+      "controle": {
+        "commande": [
+          "node",
+          "todo/oracle-todo.mjs",
+          "{fichier}"
+        ],
+        "regle": "R12"
+      },
+      "instance": {
+        "REGISTRE.jsonl": "{\"ev\":\"creation\",\"ts\":\"2026-09-01T10:00:00.000Z\",\"id\":\"TF-9001\",\"titre\":\"semis de controle\",\"statut\":\"candidat\",\"classe\":\"boucle-retour-sans-descente\",\"score\":{\"gain\":2,\"preuve\":2,\"effort\":2,\"valeur\":2}}\n{\"ev\":\"maj\",\"ts\":\"2026-09-02T10:00:00.000Z\",\"id\":\"TF-9001\",\"statut\":\"corrige\",\"date_correction\":\"2026-09-02\",\"corrections_realisees\":\"corrige a la main\",\"gains_constates\":\"rouge puis vert\"}\n"
+      },
+      "temoin": {
+        "REGISTRE.jsonl": "{\"ev\":\"creation\",\"ts\":\"2026-09-01T10:00:00.000Z\",\"id\":\"TF-9001\",\"titre\":\"semis de controle\",\"statut\":\"candidat\",\"classe\":\"boucle-retour-sans-descente\",\"score\":{\"gain\":2,\"preuve\":2,\"effort\":2,\"valeur\":2}}\n{\"ev\":\"maj\",\"ts\":\"2026-09-02T10:00:00.000Z\",\"id\":\"TF-9001\",\"statut\":\"corrige\",\"date_correction\":\"2026-09-02\",\"corrections_realisees\":\"corrige a la main\",\"gains_constates\":\"rouge puis vert\",\"descente\":{\"oracle\":\"todo/oracle-todo.mjs R12, joue a chaque cloture\"}}\n"
+      }
+    }
+  },
+  "sans_generateur": {
+    "heritage-avertissement-tardif": "le contrôle (`scripts/relever-heritage.mjs`) juge le PARC des produits, pas un livrable : semer une instance demanderait de fabriquer un faux produit dans la racine des forges, c'est-à-dire d'écrire hors du pilot.",
+    "alias-de-transition-perime-survivant": "même contrôle de parc que ci-dessus, et le défaut porte sur l'HISTOIRE d'un renommage — une instance fidèle exigerait un dépôt git fabriqué, pas un fichier.",
+    "motif-exclusion-couvert-compte-absent": "même contrôle de parc ; l'instance fidèle est un manifeste d'héritage d'un produit réel.",
+    "releve-heritage-juge-arbre-pas-histoire": "le défaut fondateur (TF-0848) est un état `conforme_non_commis` : il n'existe que dans un dépôt git avec un arbre sale, jamais dans un fichier.",
+    "secret-porte-hors-perimetre": "`oracle-secrets-hors-perimetre` balaie le DISQUE autour des dépôts. Semer une instance fidèle reviendrait à écrire un faux porteur de secret hors de tout dépôt — un geste que ce verbe ne doit pas faire, même en temporaire.",
+    "constat-non-bloquant-jamais-lu": "le contrôle déclaré est une SECTION du hook d'ouverture : ce qui est en cause est qu'un constat soit LU, pas qu'un fichier soit fautif. Rien à semer dans un livrable.",
+    "contenu-d-auteur-livre-au-lecteur": "`oracle-gabarits-documents` G10 juge la BIBLIOTHÈQUE de gabarits du dépôt, pas un document isolé.",
+    "gabarit-conception-non-jugee": "même oracle de parc : l'instance fidèle est une famille de gabarit sans instance, donc une arborescence du dépôt.",
+    "gabarit-famille-manquante": "même oracle de parc (G8).",
+    "livrable-sans-identite-de-gabarit": "même oracle de parc (G4), étendu aux générateurs de forge.",
+    "skill-non-invoque-lexique": "le contrôle déclaré est le self-test de `hook-lexique` : il juge un message de session, pas un livrable. Semer une instance demanderait de fabriquer un tour de session.",
+    "banc-etend-referentiel-production": "le contrôle déclaré est le self-test d'un outil : le défaut vit dans le BANC, pas dans une matière qu'on peut semer.",
+    "oracle-faux-positif": "la classe ne déclare aucun contrôle nommé — « le self-test de l'oracle en cause » désigne un oracle différent à chaque occurrence.",
+    "emplacement-livrable-hors-convention": "`oracle-conformite-projet` R-4 juge un PROJET entier : une instance fidèle est une arborescence de produit, pas un fichier, et le seuil de fidélité n'a pas été atteint dans le temps de cette campagne.",
+    "livrable-ecrase-sans-indice": "`scripts/verifier-jugement.mjs` confronte un jugement scellé à son livrable : l'instance fidèle exige un couple livrable + sidecar de jugement dont le sceau a été produit par l'outil lui-même — fabricable, non fabriqué ici.",
+    "lot-de-travaux-mauvais-module-producteur": "le contrôle déclaré porte la mention « règle à ajouter » (T6) : la règle visée n'existe pas encore, il n'y a rien à mettre en défaut.",
+    "boite-entree-produit-statut-git-non-dit": "idem — règle T7 déclarée « à ajouter ».",
+    "lot-remis-ecrasable": "idem — règle R-48 déclarée « à ajouter ».",
+    "page-html-filtres-tableau": "`oracle-filtres-tableau` n'existe pas dans le pilot : le contrôle déclaré vit chez le socle des skills, hors périmètre de ce verbe.",
+    "lecture-tiers-non-jugee": "`oracle-lecture-tiers` est introuvable dans le pilot — contrôle déclaré et jamais posé, ou vivant ailleurs.",
+    "gabarit-sans-parite-de-theme": "`oracle-bascule.mjs` est introuvable dans le pilot.",
+    "restitution-fichier-juge-mal-choisi": "`hook-restitution` se nourrit de l'état d'un tour de session sur son entrée standard, pas d'un livrable : une instance fidèle est une session, pas un fichier."
+  }
+}
