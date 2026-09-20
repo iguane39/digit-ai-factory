@@ -115,10 +115,14 @@
  *
  * Usage : node oracle-skills.mjs [--racine <dossier des forges>] [--installes <dossier>]
  *                               [--installes-hooks <dossier>] [--settings-installe <fichier>]
- *         node oracle-skills.mjs --appliquer   # copie source → installé (K1, K2 et K6)
+ *         node oracle-skills.mjs --appliquer   # copie source → installé (K1, K2 et K6), en
+ *                                              # rejouant la vérification native des dépôts qui
+ *                                              # CONSOMMENT les skills touchés, avant et après
+ *         node oracle-skills.mjs --appliquer --sans-consommateurs   # propage SANS les rejouer,
+ *                                              # et le DÉCLARE au verdict (suites longues, TF-0965)
  *         node oracle-skills.mjs --purger      # orphelins de la copie → quarantaine datée (K2)
  *         node oracle-skills.mjs --self-test
- * Exit : 0 PASS · 1 FAIL · 2 non jugeable.
+ * Exit : 0 PASS · 1 FAIL (y compris un consommateur qui passait et ne passe plus) · 2 non jugeable.
  *
  * --purger (TF-0254). `--appliquer` copie la source VERS la copie installée, il ne touche
  * jamais à ce que la copie contient EN PLUS (sauvegardes `.avant-*`, lockfiles générés à
@@ -139,6 +143,8 @@ import { basename, dirname, join, resolve, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir, tmpdir } from "node:os";
 import { racineConfigInstallee, skillsInstalles, hooksInstalles, settingsInstalle as settingsInstalleDe } from "../scripts/lib-config-installee.mjs";
+// TF-0965 — la table des dépôts consommateurs (DONNÉE datée) et le geste avant/après.
+import { encadrer } from "./consommateurs-skills.mjs";
 
 const VERSION = "1.3.0"; // 1.3.0 : K8 (le câblage installé pointe-t-il un fichier qui existe — TF-0305)
 const ORACLE = "oracle-skills";
@@ -201,6 +207,10 @@ const NON_JUGE = [
   "`--appliquer` n'installe ni ne câble rien au titre de K8 : un chemin mort se répare à la main (R-29)",
   "K10 dit OÙ l'oracle a regardé et ce que cette racine porte ; il ne juge PAS que le harnais charge bien ce répertoire — cela dépend de la plateforme, pas d'un fichier lisible. Il est DÉCLARATIF, jamais en échec (même gouvernance que K7 et K8) : quand la racine chargée est vide, ce sont K1 et K6 qui rougissent, et leur remède est mécanique (`--appliquer`)",
   "K10 ne juge pas le CONTENU du `CLAUDE.md` de niveau poste : il constate sa présence, pas ce qu'il prescrit",
+  "les dépôts CONSOMMATEURS non déclarés (TF-0965) : le rejeu avant/après ne porte que sur les entrées de `oracles\\consommateurs-skills.json`, une table DATÉE qu'un humain tient à jour. Un consommateur absent de la table n'est pas mesuré, et aucune découverte automatique ne le remplacerait — deviner qui consomme un skill à partir d'une recherche de texte ferait rejouer des suites de vingt minutes sur des dépôts qui n'ont qu'une mention en prose",
+  "les PRODUITS du parc, qui consomment aussi la copie installée : le pilot n'exécute rien chez un produit sans mandat humain. Leur mesure passe par un run qui leur est demandé",
+  "ce que la propagation casse AILLEURS que dans une vérification native : un consommateur dont la suite ne couvre pas la règle neuve passera au vert des deux côtés. Le rejeu prouve une NON-RÉGRESSION mesurée, jamais une absence d'effet",
+  "un consommateur rejoué et INDÉTERMINÉ (délai dépassé, lancement impossible) : déclaré tel quel, jamais compté pour un vert — une suite qui n'a pas fini n'a rien prouvé",
 ];
 
 function racineForges() {
@@ -1680,12 +1690,55 @@ if (installationAbsente({ config, installesImpose: args.includes("--installes") 
 }
 const appliquer = args.includes("--appliquer");
 const purger = args.includes("--purger");
+const sansConsommateurs = args.includes("--sans-consommateurs");
 SAUF_SOURCES = lire("--sauf-sources", "").split(",").map((s) => s.trim()).filter(Boolean).map((s) => cleJournal(s));
 
-const { verdict, findings, motif, applique, purge } = juger(
-  racine, installes, appliquer, purger, installes_hooks, settings_installe, config);
+// ---- TF-0965 · CE QUE LA PROPAGATION CASSE CHEZ CEUX QUI CONSOMMENT LA COPIE INSTALLÉE ----------
+//
+// La dérive versionné↔installé était mesurée sur le PILOT ; le bruit d'une règle neuve tombait chez
+// les dépôts qui CONSOMMENT la copie sans en être propriétaires — forge-tests le 08/09 puis le
+// 14/09, forge-design le 14/09. Trois fois la même mécanique : la cause vit hors du dépôt, elle
+// change sous lui, et sa suite rouge est imputée à un état préexistant.
+//
+// LE GESTE, calqué sur `todo\journaliser.mjs` : relever les consommateurs des skills qu'on S'APPRÊTE
+// à toucher (d'où la passe à blanc ci-dessous — les savoir APRÈS coup ne permet plus de mesurer
+// l'avant), jouer leur vérification native AVANT, propager, la rejouer APRÈS, et NOMMER tout dépôt
+// qui passait et ne passe plus. Jamais de retour arrière, jamais de blocage : elle signale (R-29).
+//
+// `--sans-consommateurs` existe parce que ces suites sont longues (jusqu'à vingt minutes chez
+// forge-tests) et que `bootstrap.mjs --pull` tourne à chaque ouverture de session. Le mode est
+// TOUJOURS déclaré dans la sortie : un raccourci silencieux se lirait comme une mesure verte.
+const propagation = () => juger(racine, installes, appliquer, purger, installes_hooks, settings_installe, config);
+let consommateurs;
+let rapport;
+if (appliquer && !sansConsommateurs) {
+  const aBlanc = juger(racine, installes, false, false, installes_hooks, settings_installe, config);
+  const skillsTouches = [...new Set((aBlanc.findings || [])
+    .filter((f) => f.statut === "FAIL" && (f.regle === "K1" || f.regle === "K2")).map((f) => f.ou).filter(Boolean))];
+  const enc = encadrer({ skills: skillsTouches, racine, propager: propagation });
+  rapport = enc.resultat;
+  consommateurs = { mode: "mesuré", mesure_le: enc.mesure_le, skills_touches: enc.skills_touches,
+    depots: enc.consommateurs, motif: enc.motif, avant: enc.avant, apres: enc.apres, findings: enc.findings };
+} else {
+  rapport = propagation();
+  if (appliquer) {
+    consommateurs = { mode: "--sans-consommateurs", depots: [], findings: [],
+      motif: "les dépôts qui CONSOMMENT la copie installée n'ont PAS été rejoués autour de cette propagation "
+        + "— une règle neuve du socle peut avoir rendu rouge une suite verte sans que rien ne le dise (TF-0965). "
+        + `Pour le savoir : node oracles/oracle-skills.mjs --racine "${racine}" --appliquer` };
+  }
+}
+const { verdict, findings, motif, applique, purge } = rapport;
+// Les constats des consommateurs rejoignent le corps du verdict : un constat rangé dans un bloc à
+// part n'est lu par personne (classe constat-non-bloquant-jamais-lu, D-6 (a) du 14/09).
+const findingsRendus = [...findings, ...(consommateurs?.findings || [])];
 process.stdout.write(JSON.stringify(
   { oracle: ORACLE, version: VERSION, racine, racine_config: config.racine, config_decidee_par: config.decidee_par,
-    installes, installes_hooks, settings_installe, verdict, motif, applique, purge, findings, non_juge: NON_JUGE },
+    installes, installes_hooks, settings_installe, verdict, motif, applique, purge, consommateurs,
+    findings: findingsRendus, non_juge: NON_JUGE },
   null, 1) + "\n");
-process.exit(verdict === "FAIL" ? 1 : verdict === "SKIP" ? 2 : 0);
+// Un DÉFAUT chez un consommateur sort en 1, BRUYAMMENT — la propagation, elle, a déjà eu lieu et
+// n'est ni annulée ni retenue : ce code de retour dit qu'il y a quelque chose à lire, pas qu'il
+// faut recommencer.
+const defautConsommateur = (consommateurs?.findings || []).some((f) => f.statut === "FAIL");
+process.exit(verdict === "FAIL" || defautConsommateur ? 1 : verdict === "SKIP" ? 2 : 0);

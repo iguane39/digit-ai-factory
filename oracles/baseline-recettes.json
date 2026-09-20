@@ -242,6 +242,10 @@
   "cas": 3,
   "vu_le": "2026-09-16"
  },
+ "oracles/consommateurs-skills.test.mjs": {
+  "cas": 14,
+  "vu_le": "2026-09-20"
+ },
  "oracles/familles-numerotees.test.mjs": {
   "cas": 6,
   "vu_le": "2026-08-27"

@@ -590,9 +590,17 @@ else {
       ligne("avert", `skills de ${x.nom} NON propagés : ${x.sale} fichier(s) modifié(s) et ${x.nonPublies} commit(s) non publié(s) sous ses skills ou hooks — état intermédiaire ; ils le seront au prochain --pull sur un état propre et publié (TF-1099)`);
       averts.push(`skills de ${x.nom} épargnés (TF-1099)`);
     }
+    // TF-0965 (20/09/2026) — LA PROPAGATION SAIT DÉSORMAIS REJOUER LES DÉPÔTS QUI CONSOMMENT LA
+    // COPIE INSTALLÉE, avant et après. Ce bloc-ci ne le lui demande PAS, et le dit : il tourne à
+    // CHAQUE ouverture de session, et les suites concernées vont jusqu'à vingt minutes chez
+    // forge-tests. Un contrôle qui ajouterait vingt minutes à toute ouverture serait coupé dans la
+    // semaine, et on aurait perdu les deux. La mesure appartient donc à la propagation DÉLIBÉRÉE —
+    // celle que la gate TF-0391 réserve à une décision humaine, et qui est exactement celle qui a
+    // cassé forge-tests le 08/09 et forge-design le 14/09. La commande est nommée ci-dessous : un
+    // raccourci qu'on ne nomme pas se lit comme une mesure verte.
     const juger = (appliquer) => {
       const argv = [oracle, "--racine", racine, "--installes", SKILLS_INSTALLES];
-      if (appliquer) argv.push("--appliquer");
+      if (appliquer) argv.push("--appliquer", "--sans-consommateurs");
       if (enCours.length) argv.push("--sauf-sources", enCours.map((x) => x.chemin).join(","));
       const r = run(process.execPath, argv, ICI);
       let rapport = {};
@@ -606,7 +614,15 @@ else {
     else if (pull) {
       const a = juger(true);
       v = juger(false);
-      if (v.code === 0) ligne("ok", `skills propagés vers ${SKILLS_INSTALLES} — ${SKILLS_DECIDE_PAR} (oracle-skills --appliquer, décision portée par --pull) — rejeu PASS`);
+      if (v.code === 0) {
+        ligne("ok", `skills propagés vers ${SKILLS_INSTALLES} — ${SKILLS_DECIDE_PAR} (oracle-skills --appliquer, décision portée par --pull) — rejeu PASS`);
+        // Le mode raccourci est DÉCLARÉ, jamais tu (TF-0965) : ce qui n'a pas été mesuré se dit à
+        // l'endroit où on lirait qu'il l'a été.
+        ligne("avert", "consommateurs NON rejoués autour de cette propagation (--sans-consommateurs) : une règle neuve du socle "
+          + `peut avoir rendu rouge une suite verte chez forge-tests, forge-design, forge-data ou forge-audit sans que rien ne le dise (TF-0965). `
+          + `Pour le savoir : node oracles/oracle-skills.mjs --racine "${racine}" --appliquer`);
+        averts.push("consommateurs des skills non rejoués (TF-0965)");
+      }
       else defaut(`skills — ${v.echecs.length} règle(s) encore en échec après propagation : ${[...new Set(v.echecs.map((x) => x.regle))].join(", ")}`,
         `node oracles/oracle-skills.mjs --racine "${racine}" (le verdict nomme le remède ; --purger si des orphelins subsistent)`);
       if (a.code === 2) averts.push("propagation SKIP");

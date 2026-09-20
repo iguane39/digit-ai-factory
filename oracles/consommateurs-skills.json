@@ -1,0 +1,43 @@
+{
+  "format": "pilot/consommateurs-skills@1",
+  "_role": "TF-0965 — QUI CONSOMME LA COPIE INSTALLÉE D'UN SKILL, ET PAR QUELLE COMMANDE ON SAIT QU'IL VA ENCORE BIEN. Une règle neuve du socle était mesurée sur le PILOT seulement ; le bruit tombait chez les dépôts qui consomment cette copie sans en être propriétaires. Cette table est une DONNÉE (loi transverse n° 4) : elle est datée, sourcée, et s'édite à la main quand le parc bouge — écrite en code, elle aurait vieilli sans que personne puisse la corriger sans toucher à l'oracle.",
+  "_ce_que_cette_table_n_est_pas": "un inventaire des dépôts qui MENTIONNENT un skill. Seuls y figurent les dépôts dont un fichier EXÉCUTABLE invoque la copie installée (`~/.claude/skills/<nom>/…`) et qui portent une vérification native jouable. Une mention en prose, en TODO ou en rapport ne fait pas d'un dépôt un consommateur : elle ne casse rien quand la règle bouge.",
+  "mesure_le": "2026-09-20",
+  "mesure_par": "balayage de c:\\dev\\digit-ai-forge-* sur le motif `.claude/skills/<nom>` dans les fichiers .py .mjs .js .json .md .ps1 .sh .toml .cfg, puis tri des seules invocations portées par un fichier exécutable. 13 dépôts balayés, 4 retenus.",
+  "_ecartes_et_pourquoi": [
+    "digit-ai-forge-agents — il est la SOURCE des skills, pas leur consommateur : ses occurrences sont les skills eux-mêmes. Le mesurer reviendrait à mesurer le dépôt qui écrit la règle, ce que TF-0965 nomme précisément comme le trou d'origine.",
+    "digit-ai-forge-organization, digit-ai-forge-seo-geo — occurrences en prose (CLAUDE.md, prompts) ou visant un skill absent du poste (`seo-audit-strategie`) : rien d'exécutable à rejouer.",
+    "les PRODUITS du parc — ils consomment aussi la copie installée, et aucun n'est listé ici : le pilot n'exécute rien chez un produit sans mandat (garde-fou du noyau). Un produit se mesure par un run qui lui est demandé."
+  ],
+  "consommateurs": [
+    {
+      "depot": "digit-ai-forge-tests",
+      "skills": ["digit-ai-page-html"],
+      "preuve_de_consommation": ["recette/verifier_corpus.py", "tests/test_tf_0786_oracles_du_socle.py"],
+      "verification": { "commande": ["uv", "run", "pytest", "-q"], "delai_ms": 1200000 },
+      "motif": "LE CAS FONDATEUR, deux fois. Le 08/09 la règle neuve des infobulles a rendu rouge une suite verte la veille ; le 14/09, `test_tf_0117` est tombé sur deux règles gagnées depuis par check_html (L30, L3). Les deux fois, la cause vivait HORS du dépôt et l'agent l'a crue préexistante. Suite longue (~1400 tests) : le délai est large à dessein — un délai trop court rendrait un INDÉTERMINÉ qu'on lirait comme un vert."
+    },
+    {
+      "depot": "digit-ai-forge-design",
+      "skills": ["digit-ai-page-html", "quality-oracles"],
+      "preuve_de_consommation": ["oracles/run-oracles-design.mjs"],
+      "verification": { "commande": ["node", "oracles/self-test.mjs"], "delai_ms": 600000 },
+      "motif": "SECONDE OCCURRENCE du 14/09 : son self-test rendait 2 échecs depuis le 12/09 parce que les règles V18 du socle `render_page.py` étaient devenues bloquantes sans figurer dans la table de sévérité de run-oracles-design — vérification native faussement verte chez un consommateur, trouvée seulement au rejeu d'une campagne."
+    },
+    {
+      "depot": "digit-ai-forge-data",
+      "skills": ["quality-oracles"],
+      "preuve_de_consommation": ["oracles/oracle-restituer.mjs"],
+      "verification": { "commande": ["node", "oracles/self-test.mjs"], "delai_ms": 600000 },
+      "motif": "oracle-restituer invoque la copie installée de quality-oracles ; aucune occurrence mesurée du défaut à ce jour — il est listé parce qu'il est EXPOSÉ, pas parce qu'il a déjà payé."
+    },
+    {
+      "depot": "digit-ai-forge-audit",
+      "skills": ["digit-ai-schemas"],
+      "preuve_de_consommation": ["tools/rapport-engine.mjs"],
+      "verification": { "commande": ["node", "tools/verifier.mjs"], "delai_ms": 600000 },
+      "motif": "rapport-engine rend ses schémas par la copie installée de digit-ai-schemas ; `npm test` du dépôt lance exactement cette commande. Exposé, jamais encore mordu."
+    }
+  ],
+  "_provenance_des_commandes": "chaque commande est celle que le dépôt déclare lui-même (README « points d'entrée » de forge-design et forge-data, `scripts.test` du package.json de forge-audit, `[tool.pytest.ini_options]` du pyproject de forge-tests). Le pilot a vérifié que le point d'entrée EXISTE sur ce poste ; il n'a joué AUCUNE de ces suites au moment d'écrire cette table — les jouer sur un dépôt frère hors propagation aurait été une écriture non mandatée."
+}
