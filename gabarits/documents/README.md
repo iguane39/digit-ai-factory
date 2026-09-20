@@ -4,10 +4,12 @@ Les gabarits de **livrables** que la factory propose à un projet, quel que soit
 un projet qui doit rendre un rapport de données, un diagnostic, un rapport d'audit ou une
 fiche de sécurité prend le gabarit de sa famille plutôt que d'inventer une forme.
 
-La bibliothèque est autant un **index** qu'un atelier. Sur ses trente-deux familles, seize sont des
-formes qu'une forge produit déjà : pour celles-là elle ne réécrit rien — elle dit où elles vivent,
-par quel outil les obtenir, et quel oracle les juge. **Écrire un gabarit est le cas minoritaire**,
-et c'est voulu : le doublon coûte plus cher que le renvoi.
+La bibliothèque est autant un **index** qu'un atelier. Sur ses **trente-huit** familles (recomptées
+sur `catalogue.jsonl` le 20/09/2026 : 9 `ok`, 18 `porte_ailleurs`, 11 `a_extraire` — le compte
+annoncé ici était resté à trente-deux alors que la source en portait trente-quatre), **dix-huit**
+sont des formes qu'une forge produit déjà : pour celles-là elle ne réécrit rien — elle dit où elles
+vivent, par quel outil les obtenir, et quel oracle les juge. **Écrire un gabarit est le cas
+minoritaire**, et c'est voulu : le doublon coûte plus cher que le renvoi.
 
 Source unique : **`catalogue.jsonl`** — une ligne par famille, avec sa **provenance** (le ou
 les livrables réels d'où la forme est tirée) et son **statut**. Les vues, s'il y en a un jour,

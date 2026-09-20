@@ -1,0 +1,79 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\gabarits\\documents\\kit-partenaire\\GABARIT.md",
+  "date_iso": "2026-09-20T16:31:13.562Z",
+  "registre_version": "2.24.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 3,
+    "fail": 0,
+    "skip": 4,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "gabarits\\documents\\kit-partenaire\\GABARIT.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "gabarits\\documents\\kit-partenaire\\GABARIT.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "gabarits\\documents\\kit-partenaire\\GABARIT.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "gabarits\\documents\\kit-partenaire\\GABARIT.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "gabarits\\documents\\kit-partenaire\\GABARIT.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "gabarits\\documents\\kit-partenaire\\GABARIT.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "gabarits\\documents\\kit-partenaire\\GABARIT.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "gabarits\\documents\\kit-partenaire\\GABARIT.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "gabarits\\documents\\kit-partenaire\\GABARIT.md",
+    "ts": "2026-09-20T16:31:13.561Z",
+    "fichiers": {
+      "gabarits\\documents\\kit-partenaire\\GABARIT.md": "ebaf6991b260927a92a12d1921c9a1571d8fb1e4e81981044532cb10ef0eb867"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

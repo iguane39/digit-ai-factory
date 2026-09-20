@@ -1,0 +1,79 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\gabarits\\documents\\kit-partenaire\\INSTANCE.md",
+  "date_iso": "2026-09-20T16:32:23.512Z",
+  "registre_version": "2.24.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "gabarits\\documents\\kit-partenaire\\INSTANCE.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "gabarits\\documents\\kit-partenaire\\INSTANCE.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "gabarits\\documents\\kit-partenaire\\INSTANCE.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "gabarits\\documents\\kit-partenaire\\INSTANCE.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "gabarits\\documents\\kit-partenaire\\INSTANCE.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "gabarits\\documents\\kit-partenaire\\INSTANCE.md",
+      "verdict": "PASS",
+      "detail": "2 constat(s) · 2 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; nombre « 2 000 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "gabarits\\documents\\kit-partenaire\\INSTANCE.md",
+      "verdict": "SKIP",
+      "detail": ""
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "gabarits\\documents\\kit-partenaire\\INSTANCE.md",
+      "verdict": "SKIP",
+      "detail": ""
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "gabarits\\documents\\kit-partenaire\\INSTANCE.md",
+    "ts": "2026-09-20T16:32:23.511Z",
+    "fichiers": {
+      "gabarits\\documents\\kit-partenaire\\INSTANCE.md": "75da7f753cc0068efb89ed63b06c48990fc682b8368d020877f3e09f83008e26"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}
